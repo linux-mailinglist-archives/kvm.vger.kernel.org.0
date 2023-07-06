@@ -2,216 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E63727494FF
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 07:32:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72EF2749523
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 07:53:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233208AbjGFFcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 01:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57128 "EHLO
+        id S233272AbjGFFxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 01:53:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233158AbjGFFcI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 01:32:08 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D561BC7;
-        Wed,  5 Jul 2023 22:32:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688621527; x=1720157527;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KVUs4bhGOt3/uYXQH2AZkEfvp9H4c7HOkrp0u7M/8fQ=;
-  b=aBdYe7U2BT31atEpq1sLqj5cmXWPRU+YYYcMNeVEs10BUrivbvDXa3mM
-   zFe26kG550XNcFn9M6yCx/kSLovZrWCik7dZIMvpwlfjJQcFgkG11QO6K
-   uVymlm0cdrRg1RaqzLR0eV6Rfz+4DBhQqVy67DnNRaxOh1GWj/4j9Ysym
-   kVFYzYwLDqMARNDe+nK0ZqGJKrn5U3VGPgGDYvWxMdR685DunLUTC/+D8
-   c3lzABYNy2/5XQuA786582ipSz125qmGK1g3nVQtBmOfZiUVjp99iJcFw
-   w89lxcUjmq6Ly2x1GMoGhbkCSxFZzN8k0h4Ig1kZmCa2uZz7Om5L4XVOM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="362379815"
-X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
-   d="scan'208";a="362379815"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 22:32:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="719477423"
-X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
-   d="scan'208";a="719477423"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga002.jf.intel.com with ESMTP; 05 Jul 2023 22:31:59 -0700
-Date:   Thu, 6 Jul 2023 13:31:58 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-Subject: Re: [PATCH v12 16/22] x86/virt/tdx: Initialize all TDMRs
-Message-ID: <20230706053158.73plfugwqvwwkdeo@yy-desk-7060>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <e01bbbc3ff4611adea84df683d83664714cd200f.1687784645.git.kai.huang@intel.com>
+        with ESMTP id S232965AbjGFFxM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 01:53:12 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2939173F
+        for <kvm@vger.kernel.org>; Wed,  5 Jul 2023 22:53:07 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b6b98ac328so3593391fa.0
+        for <kvm@vger.kernel.org>; Wed, 05 Jul 2023 22:53:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1688622786; x=1691214786;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MbLurLZ62LRhBoyKK/a+NkMCNn75BCIX5dmoVcJnOa4=;
+        b=GZRLr3+/iND4JiH/eec95IEfwzWiwvuMeewhoW9LLRb5Yu/99cTNAL1uQuRKsNRAbR
+         0wkM50R3efN4vAq8LK923KkRdgxTsnCIhWVut85AV4dlUZIUz26nPcE0AmQYEOorUmjh
+         k/ccFYU0ooJp8B2LxZPf8d8q1xZ3Oo6bDy+Lk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688622786; x=1691214786;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MbLurLZ62LRhBoyKK/a+NkMCNn75BCIX5dmoVcJnOa4=;
+        b=WvynIb5PuyVfgHVFWCyy2mDvRr9mNiI2ZDjOJUUgAC7Ljy2vqCMIqHbwQpdeK6NzgB
+         XvYAwBanZOYR8xHGpQ6EgT/AHr53Ugg/2xz8ApO4oaBEuir4nMh8CX5vvUBO3i9E4zLr
+         tE9D5GP8DygfESi0cS6ujthTUrVfgPOUj9Pjcg9s6GQKXo6Gr7/W4En5Ugs/ar6P6S/E
+         0yd9ePmYXaQImm+lpgofJY8EkaPwImb2ORsQ6kDyehwb0Oh+4naY84UCWFzmVWz7Obg1
+         C5V4I+aw9y39HXDNmTBMOYu1gDxAFrkOWPF3w0jwfAr3IO79oQS02+zKsvAov77ItHIE
+         VHlg==
+X-Gm-Message-State: ABy/qLZoxaCISk+iC1O1CNWyzOjt14iHhoYD8iYpy8FswLPRSMUY3OtJ
+        tgkw7Suqqw4yExjw9nJM70tThLxupLM46FDm9zysGw==
+X-Google-Smtp-Source: APBJJlF24HPQiLK/1UsY/Js5Vw/5R/DCo1JszMm+dpVp9f3gL+oA7VggoMNxpxtVwaFC87wS94UcWfopl/L3i9jY5zk=
+X-Received: by 2002:a2e:9015:0:b0:2b6:de41:b72f with SMTP id
+ h21-20020a2e9015000000b002b6de41b72fmr578113ljg.4.1688622786051; Wed, 05 Jul
+ 2023 22:53:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e01bbbc3ff4611adea84df683d83664714cd200f.1687784645.git.kai.huang@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-3-stevensd@google.com>
+ <20230706013423.GA3894444@ls.amr.corp.intel.com>
+In-Reply-To: <20230706013423.GA3894444@ls.amr.corp.intel.com>
+From:   David Stevens <stevensd@chromium.org>
+Date:   Thu, 6 Jul 2023 14:52:55 +0900
+Message-ID: <CAD=HUj4e3G6W74CyxicGH5k8mLmXt+JUK0ju5LCC6ESQ7EYgqQ@mail.gmail.com>
+Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 02:12:46AM +1200, Kai Huang wrote:
-> After the global KeyID has been configured on all packages, initialize
-> all TDMRs to make all TDX-usable memory regions that are passed to the
-> TDX module become usable.
+On Thu, Jul 6, 2023 at 10:34=E2=80=AFAM Isaku Yamahata <isaku.yamahata@gmai=
+l.com> wrote:
 >
-> This is the last step of initializing the TDX module.
+> On Tue, Jul 04, 2023 at 04:50:47PM +0900,
+> David Stevens <stevensd@chromium.org> wrote:
 >
-> Initializing TDMRs can be time consuming on large memory systems as it
-> involves initializing all metadata entries for all pages that can be
-> used by TDX guests.  Initializing different TDMRs can be parallelized.
-> For now to keep it simple, just initialize all TDMRs one by one.  It can
-> be enhanced in the future.
+> > From: David Stevens <stevensd@chromium.org>
+> >
+> > Introduce __kvm_follow_pfn, which will replace __gfn_to_pfn_memslot.
+> > __kvm_follow_pfn refactors the old API's arguments into a struct and,
+> > where possible, combines the boolean arguments into a single flags
+> > argument.
+> >
+> > Signed-off-by: David Stevens <stevensd@chromium.org>
+> > ---
+> >  include/linux/kvm_host.h |  16 ++++
+> >  virt/kvm/kvm_main.c      | 171 ++++++++++++++++++++++-----------------
+> >  virt/kvm/kvm_mm.h        |   3 +-
+> >  virt/kvm/pfncache.c      |   8 +-
+> >  4 files changed, 122 insertions(+), 76 deletions(-)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 9d3ac7720da9..ef2763c2b12e 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -97,6 +97,7 @@
+> >  #define KVM_PFN_ERR_HWPOISON (KVM_PFN_ERR_MASK + 1)
+> >  #define KVM_PFN_ERR_RO_FAULT (KVM_PFN_ERR_MASK + 2)
+> >  #define KVM_PFN_ERR_SIGPENDING       (KVM_PFN_ERR_MASK + 3)
+> > +#define KVM_PFN_ERR_NEEDS_IO (KVM_PFN_ERR_MASK + 4)
+> >
+> >  /*
+> >   * error pfns indicate that the gfn is in slot but faild to
+> > @@ -1156,6 +1157,21 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm=
+_memory_slot *slot, gfn_t gfn,
+> >  void kvm_release_page_clean(struct page *page);
+> >  void kvm_release_page_dirty(struct page *page);
+> >
+> > +struct kvm_follow_pfn {
+> > +     const struct kvm_memory_slot *slot;
+> > +     gfn_t gfn;
+> > +     unsigned int flags;
+> > +     bool atomic;
+> > +     /* Allow a read fault to create a writeable mapping. */
+> > +     bool allow_write_mapping;
+>
+> Maybe, make them const for input arguments?
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+Unfortunately using const isn't straightforward as long as the kernel
+continues to use -Wdeclaration-after-statement. If these fields were
+const, then they would need to be specified in the initializer when
+declaring the variable, but that's not necessarily always possible.
 
->
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
->
-> v11 -> v12:
->  - Added Kirill's tag
->
-> v10 -> v11:
->  - No update
->
-> v9 -> v10:
->  - Code change due to change static 'tdx_tdmr_list' to local 'tdmr_list'.
->
-> v8 -> v9:
->  - Improved changlog to explain why initializing TDMRs can take long
->    time (Dave).
->  - Improved comments around 'next-to-initialize' address (Dave).
->
-> v7 -> v8: (Dave)
->  - Changelog:
->    - explicitly call out this is the last step of TDX module initialization.
->    - Trimed down changelog by removing SEAMCALL name and details.
->  - Removed/trimmed down unnecessary comments.
->  - Other changes due to 'struct tdmr_info_list'.
->
-> v6 -> v7:
->  - Removed need_resched() check. -- Andi.
->
->
-> ---
->  arch/x86/virt/vmx/tdx/tdx.c | 60 ++++++++++++++++++++++++++++++++-----
->  arch/x86/virt/vmx/tdx/tdx.h |  1 +
->  2 files changed, 53 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index f5d4dbc11aee..52b7267ea226 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -994,6 +994,56 @@ static int config_global_keyid(void)
->  	return ret;
->  }
->
-> +static int init_tdmr(struct tdmr_info *tdmr)
-> +{
-> +	u64 next;
-> +
-> +	/*
-> +	 * Initializing a TDMR can be time consuming.  To avoid long
-> +	 * SEAMCALLs, the TDX module may only initialize a part of the
-> +	 * TDMR in each call.
-> +	 */
-> +	do {
-> +		struct tdx_module_output out;
-> +		int ret;
-> +
-> +		/* All 0's are unused parameters, they mean nothing. */
-> +		ret = seamcall(TDH_SYS_TDMR_INIT, tdmr->base, 0, 0, 0, NULL,
-> +				&out);
-> +		if (ret)
-> +			return ret;
-> +		/*
-> +		 * RDX contains 'next-to-initialize' address if
-> +		 * TDH.SYS.TDMR.INIT did not fully complete and
-> +		 * should be retried.
-> +		 */
-> +		next = out.rdx;
-> +		cond_resched();
-> +		/* Keep making SEAMCALLs until the TDMR is done */
-> +	} while (next < tdmr->base + tdmr->size);
-> +
-> +	return 0;
-> +}
-> +
-> +static int init_tdmrs(struct tdmr_info_list *tdmr_list)
-> +{
-> +	int i;
-> +
-> +	/*
-> +	 * This operation is costly.  It can be parallelized,
-> +	 * but keep it simple for now.
-> +	 */
-> +	for (i = 0; i < tdmr_list->nr_consumed_tdmrs; i++) {
-> +		int ret;
-> +
-> +		ret = init_tdmr(tdmr_entry(tdmr_list, i));
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int init_tdx_module(void)
->  {
->  	struct tdsysinfo_struct *sysinfo;
-> @@ -1067,14 +1117,8 @@ static int init_tdx_module(void)
->  	if (ret)
->  		goto out_reset_pamts;
->
-> -	/*
-> -	 * TODO:
-> -	 *
-> -	 *  - Initialize all TDMRs.
-> -	 *
-> -	 *  Return error before all steps are done.
-> -	 */
-> -	ret = -EINVAL;
-> +	/* Initialize TDMRs to complete the TDX module initialization */
-> +	ret = init_tdmrs(&tdmr_list);
->  out_reset_pamts:
->  	if (ret) {
->  		/*
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index a0438513bec0..f6b4e153890d 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -25,6 +25,7 @@
->  #define TDH_SYS_INFO		32
->  #define TDH_SYS_INIT		33
->  #define TDH_SYS_LP_INIT		35
-> +#define TDH_SYS_TDMR_INIT	36
->  #define TDH_SYS_CONFIG		45
->
->  struct cmr_info {
-> --
-> 2.40.1
->
+-David
