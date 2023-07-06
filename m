@@ -2,142 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AA51749FC7
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 16:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA00D749FF8
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 16:54:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233378AbjGFOvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 10:51:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37812 "EHLO
+        id S233548AbjGFOy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 10:54:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233453AbjGFOvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 10:51:14 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91608E70;
-        Thu,  6 Jul 2023 07:50:58 -0700 (PDT)
+        with ESMTP id S233660AbjGFOxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 10:53:10 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FB691FC7;
+        Thu,  6 Jul 2023 07:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688655058; x=1720191058;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0nzzDQA6LpkeZuLlmFjdXa775S2+WzO38zFOZwwC/sU=;
-  b=JbccH/kiOWKQ9Z56vwZMtb+fTlWhuxAbJM8I37bm101SI2uQxlSk/a1/
-   5s2y+UQaokH3ApRtuKypJwPDcSVIqTrCK1XOkL5sDDMjg8IIVaszoZ/oR
-   PcttBpIGdfE9T8HakJHz8ZsCRPB6qzf2ah4Q418eLScp/VFZaOc3cNriU
-   gwV7tibRpQGgTNYFLL3oxRYRwz6pCJfK2Bb+y9V3vd1JCNPL0nEAreNaq
-   hO4KrBF68+n0hbQXlwjnBiobREJlCPJfeENI9MkN4qw470Wr6JloGafb+
-   C8Il7X2L9lpB95zq93jksUhYAIeWw4159k4YXrVHuHxmHMWJD0+tqkimf
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="343209105"
+  t=1688655174; x=1720191174;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=7TWDTrZhqpzH7WQViyzB8gJRad/lUc15Zt3pA8KbCZI=;
+  b=NOsBcAXWHEPGB6y1Dtgg7QVx9K+nPaoNJbMwiEX8DH3l3Wgaj8yJMVui
+   9QYKrFTM2mDkESEyU2v+Yx7mLO3TS0g9uze/mZiHZaczkcvVYvxPJ1bh/
+   cLfqOTlygiup5BMQqikimzp5kcaVzagSF+lEr8GIzVb4gxRXpDX0q86h9
+   ZpdNkv3i8s3y9WmkVw8JTDvOqrfRdlFFFMpdMYjshGCbwUyiliMdf+gdC
+   IaPHeekFlzNVSScHfP3RD/bA+OaedZ1jQ82tjjGgTUvygPrw0qDPai2BE
+   BLuJajr9YvWcQn6rWsE2qJDT4+Qe/ViBpWKt/ruha5N1PCJvy9Eluvg5/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="394380265"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="343209105"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:49:54 -0700
+   d="scan'208";a="394380265"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:52:53 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="749174196"
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="669777985"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="749174196"
-Received: from adityan1-mobl1.amr.corp.intel.com (HELO [10.212.197.9]) ([10.212.197.9])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:49:53 -0700
-Message-ID: <0c32f845-aad0-3059-2efa-9f6e3bb3affb@intel.com>
-Date:   Thu, 6 Jul 2023 07:49:52 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v12 07/22] x86/virt/tdx: Add skeleton to enable TDX on
- demand
-Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>
+   d="scan'208";a="669777985"
+Received: from hegang-mobl.ccr.corp.intel.com (HELO localhost) ([10.255.31.139])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:52:50 -0700
+Date:   Thu, 6 Jul 2023 22:52:47 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     David Stevens <stevensd@chromium.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        Rafael J Wysocki <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        "nik.borisov@suse.com" <nik.borisov@suse.com>,
-        "hpa@zytor.com" <hpa@zytor.com>, Sagi Shahar <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, Chao Gao <chao.gao@intel.com>,
-        Len Brown <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Ying Huang <ying.huang@intel.com>,
-        Dan J Williams <dan.j.williams@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>
-References: <104d324cd68b12e14722ee5d85a660cccccd8892.1687784645.git.kai.huang@intel.com>
- <20230628131717.GE2438817@hirez.programming.kicks-ass.net>
- <0c9639db604a0670eeae5343d456e43d06b35d39.camel@intel.com>
- <20230630092615.GD2533791@hirez.programming.kicks-ass.net>
- <2659d6eef84f008635ba300f4712501ac88cef2c.camel@intel.com>
- <20230630183020.GA4253@hirez.programming.kicks-ass.net>
- <20230630190514.GH3436214@ls.amr.corp.intel.com>
- <ZJ9IKALhz1Q6ogu1@google.com>
- <20230704165836.GB462772@hirez.programming.kicks-ass.net>
- <1a8099e2-da28-6b2a-7b5a-1d6346b7f95d@intel.com>
- <20230705145750.GD4253@hirez.programming.kicks-ass.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230705145750.GD4253@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
+Message-ID: <20230706145247.ddjqsvmfdeimzva6@linux.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-3-stevensd@google.com>
+ <20230705031002.xrxk42hli6oavtlt@linux.intel.com>
+ <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
+ <20230705105343.iounmlflfued7lco@linux.intel.com>
+ <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/5/23 07:57, Peter Zijlstra wrote:
-> On Wed, Jul 05, 2023 at 07:34:06AM -0700, Dave Hansen wrote:
->> On 7/4/23 09:58, Peter Zijlstra wrote:
->>> If we have concerns about allocating the PAMT array, can't we use CMA
->>> for this? Allocate the whole thing at boot as CMA such that when not
->>> used for TDX it can be used for regular things like userspace and
->>> filecache pages?
->> I never thought of CMA as being super reliable.  Maybe it's improved
->> over the years.
->>
->> KVM also has a rather nasty habit of pinning pages, like for device
->> passthrough.  I suspect that means that we'll have one of two scenarios:
->>
->>  1. CMA works great, but the TDX/CMA area is unusable for KVM because
->>     it's pinning all its pages and they just get moved out of the CMA
->>     area immediately.  The CMA area is effectively wasted.
->>  2. CMA sucks, and users get sporadic TDX failures when they wait a long
->>     time to run a TDX guest after boot.  Users just work around the CMA
->>     support by starting up TDX guests at boot or demanding a module
->>     parameter be set.  Hacking in CMA support was a waste.
->>
->> Am I just too much of a pessimist?
-> Well, if CMA still sucks, then that needs fixing. If CMA works, but we
-> have a circular fail in that KVM needs to long-term pin the PAMT pages
-> but long-term pin is evicted from CMA (the whole point of long-term pin,
-> after all), then surely we can break that cycle somehow, since in this
-> case the purpose of the CMA is being able to grab that memory chunk when
-> we needs it.
+On Thu, Jul 06, 2023 at 02:29:24PM +0900, David Stevens wrote:
+> On Wed, Jul 5, 2023 at 7:53 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> >
+> > On Wed, Jul 05, 2023 at 06:22:59PM +0900, David Stevens wrote:
+> > > On Wed, Jul 5, 2023 at 12:10 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
+> > > >
+> > > > > @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+> > > > >   * The slow path to get the pfn of the specified host virtual address,
+> > > > >   * 1 indicates success, -errno is returned if error is detected.
+> > > > >   */
+> > > > > -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
+> > > > > -                        bool interruptible, bool *writable, kvm_pfn_t *pfn)
+> > > > > +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
+> > > > >  {
+> > > > > -     unsigned int flags = FOLL_HWPOISON;
+> > > > > +     unsigned int flags = FOLL_HWPOISON | FOLL_GET | foll->flags;
+> > > > >       struct page *page;
+> > > > >       int npages;
+> > > > >
+> > > > >       might_sleep();
+> > > > >
+> > > > > -     if (writable)
+> > > > > -             *writable = write_fault;
+> > > > > -
+> > > > > -     if (write_fault)
+> > > > > -             flags |= FOLL_WRITE;
+> > > > > -     if (async)
+> > > > > -             flags |= FOLL_NOWAIT;
+> > > > > -     if (interruptible)
+> > > > > -             flags |= FOLL_INTERRUPTIBLE;
+> > > > > -
+> > > > > -     npages = get_user_pages_unlocked(addr, 1, &page, flags);
+> > > > > +     npages = get_user_pages_unlocked(foll->hva, 1, &page, flags);
+> > > > >       if (npages != 1)
+> > > > >               return npages;
+> > > > >
+> > > > > +     foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
+> > > > > +
+> > > > >       /* map read fault as writable if possible */
+> > > > > -     if (unlikely(!write_fault) && writable) {
+> > > > > +     if (unlikely(!foll->writable) && foll->allow_write_mapping) {
+> > > >
+> > > > I guess !foll->writable should be !(foll->flags & FOLL_WRITE) here.
+> > >
+> > > The two statements are logically equivalent, although I guess using
+> > > !(foll->flags & FOLL_WRITE) may be a little clearer, if a little more
+> > > verbose.
+> >
+> > Well, as the comment says, we wanna try to map the read fault as writable
+> > whenever possible. And __gfn_to_pfn_memslot() will only set the FOLL_WRITE
+> > for write faults. So I guess using !foll->writable will not allow this.
+> > Did I miss anything?
 > 
-> That is, either way around is just a matter of a little code, no?
+> We just set the foll->writable out parameter to be equal to
+> ((foll->flags & FOLL_WRITE) && foll->allow_write_mapping). Taking a =
+> foll->flags & FOLL_WRITE and b = foll->allow_write_mapping, we have
+> !(a && b) && b -> (!a || !b) && b -> (!a && b) || (!b && b) -> !a &&
+> b.
 
-It's not a circular dependency, it's conflicting requirements.
+Ouch, my bad again... I typed "!foll->writable", but missed the "!" in
+my head while calculating... Thanks! :)
 
-CMA makes memory more available, but only in the face of unpinned pages.
-
-KVM can pin lots of pages, even outside of TDX-based VMs.
-
-So we either need to change how CMA works fundamentally or stop KVM from
-pinning pages.
-
-
+B.R.
+Yu
