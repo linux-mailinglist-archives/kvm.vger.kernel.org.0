@@ -2,137 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA00D749FF8
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 16:54:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1C94749FFA
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 16:55:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233548AbjGFOy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 10:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41760 "EHLO
+        id S233620AbjGFOy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 10:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233660AbjGFOxK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 10:53:10 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FB691FC7;
-        Thu,  6 Jul 2023 07:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688655174; x=1720191174;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=7TWDTrZhqpzH7WQViyzB8gJRad/lUc15Zt3pA8KbCZI=;
-  b=NOsBcAXWHEPGB6y1Dtgg7QVx9K+nPaoNJbMwiEX8DH3l3Wgaj8yJMVui
-   9QYKrFTM2mDkESEyU2v+Yx7mLO3TS0g9uze/mZiHZaczkcvVYvxPJ1bh/
-   cLfqOTlygiup5BMQqikimzp5kcaVzagSF+lEr8GIzVb4gxRXpDX0q86h9
-   ZpdNkv3i8s3y9WmkVw8JTDvOqrfRdlFFFMpdMYjshGCbwUyiliMdf+gdC
-   IaPHeekFlzNVSScHfP3RD/bA+OaedZ1jQ82tjjGgTUvygPrw0qDPai2BE
-   BLuJajr9YvWcQn6rWsE2qJDT4+Qe/ViBpWKt/ruha5N1PCJvy9Eluvg5/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="394380265"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="394380265"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:52:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="669777985"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="669777985"
-Received: from hegang-mobl.ccr.corp.intel.com (HELO localhost) ([10.255.31.139])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:52:50 -0700
-Date:   Thu, 6 Jul 2023 22:52:47 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     David Stevens <stevensd@chromium.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v7 2/8] KVM: Introduce __kvm_follow_pfn function
-Message-ID: <20230706145247.ddjqsvmfdeimzva6@linux.intel.com>
-References: <20230704075054.3344915-1-stevensd@google.com>
- <20230704075054.3344915-3-stevensd@google.com>
- <20230705031002.xrxk42hli6oavtlt@linux.intel.com>
- <CAD=HUj6-VbznOOtn5WJee7Of_nh33ygg7_ph2G=hgnvNk_Cbsw@mail.gmail.com>
- <20230705105343.iounmlflfued7lco@linux.intel.com>
- <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
+        with ESMTP id S233584AbjGFOy4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 10:54:56 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3331730;
+        Thu,  6 Jul 2023 07:54:29 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 366ElTTe016755;
+        Thu, 6 Jul 2023 14:54:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=G9WTq9pgi478SHWTcbW7p9G+EaQLNwDgdLwUsfwFH80=;
+ b=a52Kumxvk0Qp/MHulkgPcXdIUSCpxvaE0JxOuHi5wtSuhRjACammiMDHXkwnxhH/Fslf
+ YIrGqI9gqEOT5Xa6rrZqg2nmwqJwmiNRNJGLt10tEd2l4Pv+EJiIXBuk7cH2UafTShT3
+ vD3NK6kEQBPYPOeIfn2/SsFcxVQcijak5a8m9x+giGb/cpl4OWqcsebOh3jipH8A2xjR
+ e88NmrN/iG/4GEyxYQSnHbquYb+g8yIaEZxnB9pgK9SVTjODWiKDbOpPr8NH6ap5IuzI
+ XVK75K6S3OC0FVqhhxGFVSfRDRymde1pYqu4makPKcgkiz8bTikV9HXugp1L5Co37H83 1w== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rnypfg4uq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Jul 2023 14:54:14 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 366APqIF031685;
+        Thu, 6 Jul 2023 14:54:12 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3rjbs4tg9v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Jul 2023 14:54:12 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 366Es7BT57803030
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Jul 2023 14:54:07 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AA4620043;
+        Thu,  6 Jul 2023 14:54:07 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 548AB20040;
+        Thu,  6 Jul 2023 14:54:07 +0000 (GMT)
+Received: from a46lp67.. (unknown [9.152.108.100])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Jul 2023 14:54:07 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        borntraeger@linux.ibm.com
+Subject: [PATCH] KVM: s390: Don't WARN on PV validities
+Date:   Thu,  6 Jul 2023 14:53:35 +0000
+Message-Id: <20230706145335.136910-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=HUj5ezWt7rLAv2qOpFsMHyFU87Hqtw_p8pWNF5+oxbLhxDg@mail.gmail.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: QA0HXiJslPzt7_CRZpmbmsVwR1Meo0id
+X-Proofpoint-GUID: QA0HXiJslPzt7_CRZpmbmsVwR1Meo0id
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-06_11,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 bulkscore=0 adultscore=0
+ phishscore=0 spamscore=0 impostorscore=0 priorityscore=1501 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307060130
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 06, 2023 at 02:29:24PM +0900, David Stevens wrote:
-> On Wed, Jul 5, 2023 at 7:53 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> >
-> > On Wed, Jul 05, 2023 at 06:22:59PM +0900, David Stevens wrote:
-> > > On Wed, Jul 5, 2023 at 12:10 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
-> > > >
-> > > > > @@ -2514,35 +2512,26 @@ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
-> > > > >   * The slow path to get the pfn of the specified host virtual address,
-> > > > >   * 1 indicates success, -errno is returned if error is detected.
-> > > > >   */
-> > > > > -static int hva_to_pfn_slow(unsigned long addr, bool *async, bool write_fault,
-> > > > > -                        bool interruptible, bool *writable, kvm_pfn_t *pfn)
-> > > > > +static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
-> > > > >  {
-> > > > > -     unsigned int flags = FOLL_HWPOISON;
-> > > > > +     unsigned int flags = FOLL_HWPOISON | FOLL_GET | foll->flags;
-> > > > >       struct page *page;
-> > > > >       int npages;
-> > > > >
-> > > > >       might_sleep();
-> > > > >
-> > > > > -     if (writable)
-> > > > > -             *writable = write_fault;
-> > > > > -
-> > > > > -     if (write_fault)
-> > > > > -             flags |= FOLL_WRITE;
-> > > > > -     if (async)
-> > > > > -             flags |= FOLL_NOWAIT;
-> > > > > -     if (interruptible)
-> > > > > -             flags |= FOLL_INTERRUPTIBLE;
-> > > > > -
-> > > > > -     npages = get_user_pages_unlocked(addr, 1, &page, flags);
-> > > > > +     npages = get_user_pages_unlocked(foll->hva, 1, &page, flags);
-> > > > >       if (npages != 1)
-> > > > >               return npages;
-> > > > >
-> > > > > +     foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
-> > > > > +
-> > > > >       /* map read fault as writable if possible */
-> > > > > -     if (unlikely(!write_fault) && writable) {
-> > > > > +     if (unlikely(!foll->writable) && foll->allow_write_mapping) {
-> > > >
-> > > > I guess !foll->writable should be !(foll->flags & FOLL_WRITE) here.
-> > >
-> > > The two statements are logically equivalent, although I guess using
-> > > !(foll->flags & FOLL_WRITE) may be a little clearer, if a little more
-> > > verbose.
-> >
-> > Well, as the comment says, we wanna try to map the read fault as writable
-> > whenever possible. And __gfn_to_pfn_memslot() will only set the FOLL_WRITE
-> > for write faults. So I guess using !foll->writable will not allow this.
-> > Did I miss anything?
-> 
-> We just set the foll->writable out parameter to be equal to
-> ((foll->flags & FOLL_WRITE) && foll->allow_write_mapping). Taking a =
-> foll->flags & FOLL_WRITE and b = foll->allow_write_mapping, we have
-> !(a && b) && b -> (!a || !b) && b -> (!a && b) || (!b && b) -> !a &&
-> b.
+Validities usually indicate KVM errors and as such we want to print a
+message with a high priority to alert users that a validity
+occurred. With the introduction of Protected VMs it's become very easy
+to trigger validities via IOCTLs if the VM is in PV mode.
 
-Ouch, my bad again... I typed "!foll->writable", but missed the "!" in
-my head while calculating... Thanks! :)
+An optimal solution would be to return EINVALs to all IOCTLs that
+could result in such a situation. Unfortunately there are quite a lot
+of ways to trigger PV validities since the number of allowed SCB data
+combinations are very limited by FW in order to provide the guest's
+security.
 
-B.R.
-Yu
+Let's only log those validities to the KVM sysfs log and skip the
+WARN_ONCE(). This way we get a longish lasting log entry.
+
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+
+int -> ext:
+ * Fixed range
+ * Extended commit message 
+
+---
+ arch/s390/kvm/intercept.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+index 954d39adf85c..f3c1220fd1e2 100644
+--- a/arch/s390/kvm/intercept.c
++++ b/arch/s390/kvm/intercept.c
+@@ -97,9 +97,15 @@ static int handle_validity(struct kvm_vcpu *vcpu)
+ 	KVM_EVENT(3, "validity intercept 0x%x for pid %u (kvm 0x%pK)", viwhy,
+ 		  current->pid, vcpu->kvm);
+ 
+-	/* do not warn on invalid runtime instrumentation mode */
+-	WARN_ONCE(viwhy != 0x44, "kvm: unhandled validity intercept 0x%x\n",
+-		  viwhy);
++	/*
++	 * Do not warn on:
++	 *  - invalid runtime instrumentation mode
++	 *  - PV related validities since they can be triggered by userspace
++	 *    PV validities are in the 0x2XXX range
++	 */
++	WARN_ONCE(viwhy != 0x44 &&
++		  ((viwhy < 0x2000) || (viwhy >= 0x3000)),
++		  "kvm: unhandled validity intercept 0x%x\n", viwhy);
+ 	return -EINVAL;
+ }
+ 
+-- 
+2.34.1
+
