@@ -2,62 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DED6C749AA0
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 13:31:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA0EB749AA6
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 13:31:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232103AbjGFLbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 07:31:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35198 "EHLO
+        id S232330AbjGFLbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 07:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231546AbjGFLbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 07:31:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FF6199F
-        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 04:30:19 -0700 (PDT)
+        with ESMTP id S232097AbjGFLbj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 07:31:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4934C170F
+        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 04:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688643018;
+        s=mimecast20190719; t=1688643054;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IUyIouoC8ahxmdxehnDEnuXDxYXuSzzBD+vRAySsvH8=;
-        b=JppxA5gkv0z2zSIqNak0EcK/+02w/7t3NqeBBD4PaFhbFHZVleG6qiY+PlGOOO0jD8NtY0
-        VyFH20fYF7RggygsLhZ4FS8nGgQHvvZbQigZbyGNZxW2BtYLn5VOqcgnYGlkppFuxcn1VD
-        aOGOEB1hOa0/nHPrFxso/QgRscFZ9C4=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=RinQDlUt4K38HkHxLwhOYs8pH7N2WJkW7Jmb1TL6X3c=;
+        b=daTvktUaUzkWhbkD74TdmxfhS7MLdiT1fLQebvHYuPuzjzWasKJY3Bgpv3lQ9vaW1xw99N
+        gaaLdnmaEtr/f2W2kDch6azmuS0d+OMR4z+BKiC4sb2bDykScGImi2Z/FdFNGCuq/N9WiT
+        pSriEbyW5C8dZ/lrqdlntiEPogvcgIk=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-125-RXxfQG8AMyu1K1savWEaAA-1; Thu, 06 Jul 2023 07:30:17 -0400
-X-MC-Unique: RXxfQG8AMyu1K1savWEaAA-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635a3b9d24eso6621526d6.0
-        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 04:30:17 -0700 (PDT)
+ us-mta-74-QWIXZOF1Pom1DITtmSKluQ-1; Thu, 06 Jul 2023 07:30:53 -0400
+X-MC-Unique: QWIXZOF1Pom1DITtmSKluQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-635d9e482f1so8380466d6.1
+        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 04:30:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688643017; x=1691235017;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IUyIouoC8ahxmdxehnDEnuXDxYXuSzzBD+vRAySsvH8=;
-        b=X+ulsVhDHJWN/L1ckTzxFicRfJsUlT9DnD10JBWZDqcBV5N3RXBsWAsV1Fz0hc14Rc
-         n2mufletCdOHVNCH4s5/YRmiSLLEa34nt/39kDQ2smfQVw9dTdzF2D9HjDdsweSnkEAC
-         wbGl7SGeyCSggx0UH4Q0r2XcwUiA56JJCIlULwYiu/DHEKgmoaL3q+RVgq4OKvlHNQ8K
-         UDzMnPmcioBXULSGybngeN9NnipfVPAbjFik5B5UBKntsv7hhp9Ei89zvFYwXdTy+i2u
-         IP/u1lABRIsIC++almb6dyLHfX1qg2awSefIPna+fkby/bNvmYk6oevLY51l4k5GxmQa
-         IHgA==
-X-Gm-Message-State: ABy/qLY0q94LPk8X+AJkO7jEoQyGFx+kQsUYVmG+xTbW8FsYU167aUgQ
-        3mhkHm5hx8RNw/UwgqHXxJAoJOF7gj7dKC4h7edBjCmHCM5oorRF3Qtb8PrjAM5LRVy/2IjtTDJ
-        ysiUeJNsDrX3V
-X-Received: by 2002:a0c:db08:0:b0:625:aa49:19f1 with SMTP id d8-20020a0cdb08000000b00625aa4919f1mr1114229qvk.62.1688643017310;
-        Thu, 06 Jul 2023 04:30:17 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGGMC/kBtgH7sbrX8rD2ZgNOVsGU4yA48iFb2GJxy2p3hgBQJP/oIfvimw2fu1jmJDlCZa08A==
-X-Received: by 2002:a0c:db08:0:b0:625:aa49:19f1 with SMTP id d8-20020a0cdb08000000b00625aa4919f1mr1114196qvk.62.1688643017072;
-        Thu, 06 Jul 2023 04:30:17 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688643053; x=1691235053;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RinQDlUt4K38HkHxLwhOYs8pH7N2WJkW7Jmb1TL6X3c=;
+        b=Q+HkEfpjeE+xfsP+DF6G/9rHJGui9SwT5ONFpgLqJeLTiamvA+y9uAKBXu7X8FrclW
+         1RXuPPVkDYNzJUpH+5VIHxo40OBP2RQsRPnYHnH0cCMCyKoaT2h844Y95LcO/LGgp3+I
+         7NHBzquQXnaePh94HiUlRWRgFiX2gYEhF9XbSYZIengbznO+cxVxr/cjgaPsvquWXHLQ
+         tmSn3OFaCeNGkIaZ2hLqzp/tJTwC2DxZiGv20vwt96GHP15m2TxPZoXucUfXF0eI9Vsl
+         NtciJRD/dd76HNt35Ym4aFGAnI9oTap+JaYlXm4FPy/GU9bYok19aRWKA6sF1RA2ar68
+         Fy8A==
+X-Gm-Message-State: ABy/qLbJmWAUKgBx7TpDJ+5OTjK1uUyGmzXLXFPEh5NLoC96Yp8hI5kq
+        M3fpNQrZIOAB9mjofE68y2d70Z2WqS8dUkEQN4YvRsYo71aSfASDbA36Uga2z0+pVsX5uU4foJu
+        ifUQ6JtcPm4d+
+X-Received: by 2002:a0c:f549:0:b0:62f:effe:3dca with SMTP id p9-20020a0cf549000000b0062feffe3dcamr1420069qvm.2.1688643053018;
+        Thu, 06 Jul 2023 04:30:53 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEbUYOJppwMgQvsEvMakiRmaJatTD8CbvHxxx1dIrR+0X5zWXHf8RNpRxDwVdgtv2CCKKsXFA==
+X-Received: by 2002:a0c:f549:0:b0:62f:effe:3dca with SMTP id p9-20020a0cf549000000b0062feffe3dcamr1420051qvm.2.1688643052762;
+        Thu, 06 Jul 2023 04:30:52 -0700 (PDT)
 Received: from vschneid.remote.csb ([154.57.232.159])
-        by smtp.gmail.com with ESMTPSA id y12-20020a0c8ecc000000b006360778f314sm751558qvb.105.2023.07.06.04.30.11
+        by smtp.gmail.com with ESMTPSA id a12-20020a0ce38c000000b0062de6537febsm769879qvl.58.2023.07.06.04.30.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 04:30:16 -0700 (PDT)
+        Thu, 06 Jul 2023 04:30:52 -0700 (PDT)
 From:   Valentin Schneider <vschneid@redhat.com>
-To:     Steven Rostedt <rostedt@goodmis.org>
+To:     Frederic Weisbecker <frederic@kernel.org>
 Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
         bpf@vger.kernel.org, x86@kernel.org,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
         Masami Hiramatsu <mhiramat@kernel.org>,
         Jonathan Corbet <corbet@lwn.net>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -69,7 +73,6 @@ Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
         "Paul E. McKenney" <paulmck@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Uladzislau Rezki <urezki@gmail.com>,
@@ -97,15 +100,17 @@ Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         Daniel Bristot de Oliveira <bristot@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH 00/14] context_tracking,x86: Defer some IPIs until a
- user->kernel transition
-In-Reply-To: <20230705150328.16791f25@gandalf.local.home>
+Subject: Re: [RFC PATCH 11/14] context-tracking: Introduce work deferral
+ infrastructure
+In-Reply-To: <ZKXtfWZiM66dK5xC@localhost.localdomain>
 References: <20230705181256.3539027-1-vschneid@redhat.com>
- <20230705150328.16791f25@gandalf.local.home>
-Date:   Thu, 06 Jul 2023 12:30:10 +0100
-Message-ID: <xhsmhv8exuvjx.mognet@vschneid.remote.csb>
+ <20230705181256.3539027-12-vschneid@redhat.com>
+ <ZKXtfWZiM66dK5xC@localhost.localdomain>
+Date:   Thu, 06 Jul 2023 12:30:46 +0100
+Message-ID: <xhsmhttuhuvix.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -117,24 +122,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/07/23 15:03, Steven Rostedt wrote:
-> On Wed,  5 Jul 2023 19:12:42 +0100
-> Valentin Schneider <vschneid@redhat.com> wrote:
+On 06/07/23 00:23, Frederic Weisbecker wrote:
+> Le Wed, Jul 05, 2023 at 07:12:53PM +0100, Valentin Schneider a =C3=A9crit=
+ :
+>> +bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
+>> +{
+>> +	struct context_tracking *ct =3D per_cpu_ptr(&context_tracking, cpu);
+>> +	unsigned int old_work;
+>> +	bool ret =3D false;
+>> +
+>> +	preempt_disable();
+>> +
+>> +	old_work =3D atomic_read(&ct->work);
+>> +	/*
+>> +	 * Try setting the work until either
+>> +	 * - the target CPU no longer accepts any more deferred work
+>> +	 * - the work has been set
+>> +	 */
+>> +	while (!(old_work & CONTEXT_WORK_DISABLED) && !ret)
 >
->> o Patches 1-5 have been submitted previously and are included for the sake of
->>   testing
->
-> I should have commented on the previous set, but I did my review on this set ;-)
+> Isn't there a race here where you may have missed a CPU that just entered=
+ in
+> user and you eventually disturb it?
 >
 
-Thanks for having a look!
+Yes, unfortunately.
 
-> Anyway, I'm all for the patches. Care to send a new version covering my input?
+>> +		ret =3D atomic_try_cmpxchg(&ct->work, &old_work, old_work | work);
+>> +
+>> +	preempt_enable();
+>> +	return ret;
+>> +}
+> [...]
+>> @@ -100,14 +158,19 @@ static noinstr void ct_kernel_exit_state(int offse=
+t)
+>>   */
+>>  static noinstr void ct_kernel_enter_state(int offset)
+>>  {
+>> +	struct context_tracking *ct =3D this_cpu_ptr(&context_tracking);
+>>      int seq;
+>> +	unsigned int work;
+>>
+>> +	work =3D ct_work_fetch(ct);
+>
+> So this adds another fully ordered operation on user <-> kernel transitio=
+n.
+> How many such IPIs can we expect?
 >
 
-Sure thing, I'll send a v2 of these patches soonish.
+Despite having spent quite a lot of time on that question, I think I still
+only have a hunch.
 
-> Thanks,
+Poking around RHEL systems, I'd say 99% of the problematic IPIs are
+instruction patching and TLB flushes.
+
+Staring at the code, there's quite a lot of smp_calls for which it's hard
+to say whether the target CPUs can actually be isolated or not (e.g. the
+CPU comes from a cpumask shoved in a struct that was built using data from
+another struct of uncertain origins), but then again some of them don't
+need to hook into context_tracking.
+
+Long story short: I /think/ we can consider that number to be fairly small,
+but there could be more lurking in the shadows.
+
+> If this is just about a dozen, can we stuff them in the state like in the
+> following? We can potentially add more of them especially on 64 bits we c=
+ould
+> afford 30 different works, this is just shrinking the RCU extended quiesc=
+ent
+> state counter space. Worst case that can happen is that RCU misses 65535
+> idle/user <-> kernel transitions and delays a grace period...
 >
-> -- Steve
+
+I'm trying to grok how this impacts RCU, IIUC most of RCU mostly cares abou=
+t the
+even/odd-ness of the thing, and rcu_gp_fqs() cares about the actual value
+but only to check if it has changed over time (rcu_dynticks_in_eqs_since()
+only does a !=3D).
+
+I'm rephrasing here to make sure I get it - is it then that the worst case
+here is 2^(dynticks_counter_size) transitions happen between saving the
+dynticks snapshot and checking it again, so RCU waits some more?
 
