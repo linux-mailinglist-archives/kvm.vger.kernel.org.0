@@ -2,280 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48658749606
-	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 09:07:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51822749630
+	for <lists+kvm@lfdr.de>; Thu,  6 Jul 2023 09:19:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233604AbjGFHHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jul 2023 03:07:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
+        id S233024AbjGFHTh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jul 2023 03:19:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233511AbjGFHHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jul 2023 03:07:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4CBE65
-        for <kvm@vger.kernel.org>; Thu,  6 Jul 2023 00:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688627194;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
-        b=WPi70VA2OFQNnPhOkqpzgUs2IzgpyuoN9KD9hPEDU78pzeX4b17JRJgP1fmx6zumQhFZRm
-        yx8ezUqy3s1J3WtOPJ+Rzo8flGyRJJ7A4I99nyfNzGTZpSKNQucyrykeODOaJe0Zd8t1Zg
-        2iT5P8/s2PchwTlSpZ+l7hVx0cwK3pQ=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-TE6DCQYQOdGhvzfXZ7lH4A-1; Thu, 06 Jul 2023 03:06:33 -0400
-X-MC-Unique: TE6DCQYQOdGhvzfXZ7lH4A-1
-Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-bf0ba82473dso530360276.0
-        for <kvm@vger.kernel.org>; Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688627193; x=1691219193;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
-        b=KmFNSp1evpcdrF4d5eBDEtOOZ8smrQVxu0AVf2XgwAme0m3ald+2tiSlNV+XnhokVS
-         6qW1pwTce9pGlBiXfjyAP7s6Zz9jqqH9Wv9pB9Sxag6m4PzFnJ7X2posSuiS5WNzFdRp
-         s5HHb7DyZJlLFGxjvAHz1NCTmn7LMC/yvPP6vKFX0YxHNXXnLY97+u5MbxUCT6fA54as
-         IAwpt1Ct+96nUZgtCVgnN0SWpgYVH5vCWWNthiBuaEgPI7n+HlMlfueP1vp4451lJVl/
-         s/2qElCRuMz86ZuVHvw5huBL2SZdSbjbCBJDBnzQAy8+fmY7kdA4ISYW2/6C0vq9FmDk
-         90xw==
-X-Gm-Message-State: ABy/qLaRhf89tNGbIclKQh1ulnXIK9a4pdGJreQEFMUWPVmPduQEq2un
-        +rdSvFvy2CisIodr2/y+NZaDHdTopc+sneEaCbtrAUSqeDupDwRakK5XdotDg9YWMdyiIHmibXd
-        NhxaCBTNXzx1xMkwKIWCEdnqXlF7z
-X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id s4-20020a25b944000000b00c4d96a25d96mr2165155ybm.34.1688627193147;
-        Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHx7qsljWMwc5b+pAqOOzRL+zpISDZYM3lQSEoxYQUnDdgCGQcufSPdW0EttuPM5MBdQ9P2dGHiqiplFW64hl8=
-X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id
- s4-20020a25b944000000b00c4d96a25d96mr2165135ybm.34.1688627192836; Thu, 06 Jul
- 2023 00:06:32 -0700 (PDT)
+        with ESMTP id S229508AbjGFHTg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jul 2023 03:19:36 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B051989;
+        Thu,  6 Jul 2023 00:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688627975; x=1720163975;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=2g1bfmb7JvyQO85ZXkV2EeVN1io1hktM1VBz/kom3ng=;
+  b=O4kEhY8o19tVgYcLZUToDCznW+quQpWsCCCjWMyDrSZ8iihaqJ8mNRF/
+   BpDS+fEjoz6Xuo5dXWsD+GxoVchv0TI9C28zsW5U+I3CmwK6eyRMv/wYa
+   DI1SlhnI+D1vJCwhh3xdwcfIMqzL9qI/yez8gKCzOluPHDdFLNuElB0O2
+   GOMxYuZQ9GVlx3vpMxoeTBI+1s8WAQE7P0P+LKoEO4mkNg6ZOKB3MIYzy
+   7M8qi8cA7mQ/uGlCOqmgIXDJom/FVKEW34yGxByRP0UkstIy/mPoTmOR+
+   mzWIXQoLcQ1QqTMKEeScfc1zVRWMZwZNqDudZ0SxrRmsWhk2Q7FS2/R1u
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="367015570"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="367015570"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 00:19:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="784818848"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="784818848"
+Received: from hegang-mobl.ccr.corp.intel.com (HELO localhost) ([10.255.31.139])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 00:19:30 -0700
+Date:   Thu, 6 Jul 2023 15:19:28 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
+ __kvm_follow_pfn
+Message-ID: <20230706071927.o7gwmryonr3v3dpp@linux.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-6-stevensd@google.com>
+ <20230705101800.ut4c6topn6ylwczs@linux.intel.com>
+ <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
-In-Reply-To: <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Thu, 6 Jul 2023 09:05:56 +0200
-Message-ID: <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
+On Thu, Jul 06, 2023 at 01:52:08PM +0900, David Stevens wrote:
+> On Wed, Jul 5, 2023 at 7:17 PM Yu Zhang <yu.c.zhang@linux.intel.com> wrote:
 > >
-> > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redha=
-t.com> wrote:
-> > > >
-> > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrot=
-e:
-> > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@r=
-edhat.com> wrote:
-> > > > > >
-> > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin =
-wrote:
-> > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <ms=
-t@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9re=
-z wrote:
-> > > > > > > > > With the current code it is accepted as long as userland =
-send it.
-> > > > > > > > >
-> > > > > > > > > Although userland should not set a feature flag that has =
-not been
-> > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the curren=
-t code will not
-> > > > > > > > > complain for it.
-> > > > > > > > >
-> > > > > > > > > Since there is no specific reason for any parent to rejec=
-t that backend
-> > > > > > > > > feature bit when it has been proposed, let's control it a=
-t vdpa frontend
-> > > > > > > > > level. Future patches may move this control to the parent=
- driver.
-> > > > > > > > >
-> > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE=
-_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > > > > > >
-> > > > > > > > Please do send v3. And again, I don't want to send "after d=
-river ok" hack
-> > > > > > > > upstream at all, I merged it in next just to give it some t=
-esting.
-> > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > >
-> > > > > > >
-> > > > > > > Current devices do not support that semantic.
-> > > > > >
-> > > > > > Which devices specifically access the ring after DRIVER_OK but =
-before
-> > > > > > a kick?
-> > > > > >
-> > > > >
-> > > > > Previous versions of the QEMU LM series did a spurious kick to st=
-art
-> > > > > traffic at the LM destination [1]. When it was proposed, that spu=
-rious
-> > > > > kick was removed from the series because to check for descriptors
-> > > > > after driver_ok, even without a kick, was considered work of the
-> > > > > parent driver.
-> > > > >
-> > > > > I'm ok to go back to this spurious kick, but I'm not sure if the =
-hw
-> > > > > will read the ring before the kick actually. I can ask.
-> > > > >
-> > > > > Thanks!
-> > > > >
-> > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg0=
-2775.html
-> > > >
-> > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no=
-?
+> > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
+> > > From: David Stevens <stevensd@chromium.org>
 > > >
-> > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
-> > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > > Stop passing FOLL_GET to __kvm_follow_pfn. This allows the host to map
+> > > memory into the guest that is backed by un-refcounted struct pages - for
+> > > example, higher order non-compound pages allocated by the amdgpu driver
+> > > via ttm_pool_alloc_page.
+> >
+> > I guess you mean the tail pages of the higher order non-compound pages?
+> > And as to the head page, it is said to be set to one coincidentally[*],
+> > and shall not be considered as refcounted.  IIUC, refcount of this head
+> > page will be increased and decreased soon in hva_to_pfn_remapped(), so
+> > this may not be a problem(?). But treating this head page differently,
+> > as a refcounted one(e.g., to set the A/D flags), is weired.
+> >
+> > Or maybe I missed some context, e.g., can the head page be allocted to
+> > guest at all?
+> 
+> Yes, this is to allow mapping the tail pages of higher order
+> non-compound pages - I should have been more precise in my wording.
+> The head pages can already be mapped into the guest.
+> 
+> Treating the head and tail pages would require changing how KVM
+> behaves in a situation it supports today (rather than just adding
+> support for an unsupported situation). Currently, without this series,
+> KVM can map VM_PFNMAP|VM_IO memory backed by refcounted pages into the
+> guest. When that happens, KVM sets the A/D flags. I'm not sure whether
+> that's actually valid behavior, nor do I know whether anyone actually
+> cares about it. But it's what KVM does today, and I would shy away
+> from modifying that behavior without good reason.
+
+I know the A/D status of the refcounted, VM_PFNMAP|VM_IO backed pages
+will be recorded. And I have no idea if this is a necessary requirement
+either.
+
+But it feels awkward to see the head and the tail ones of non-compound
+pages be treated inconsistently. After all, the head page just happens
+to have its refcount being 1, it is not a real refcounted page.
+
+So I would suggest to mention such different behehavior in the commit
+message at least. :)
+
 > > >
-> > > But this reminds me one thing, as the thread is going too long, I
-> > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
-> > > supported?
-> > >
-> > > Thanks
+> > > @@ -883,7 +884,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+> > >   */
+> > >  static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+> > >  {
+> > > -     bool host_writable;
+> > > +     bool host_writable, is_refcounted;
+> > >       gpa_t first_pte_gpa;
+> > >       u64 *sptep, spte;
+> > >       struct kvm_memory_slot *slot;
+> > > @@ -940,10 +941,12 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+> > >       sptep = &sp->spt[i];
+> > >       spte = *sptep;
+> > >       host_writable = spte & shadow_host_writable_mask;
+> > > +     // TODO: is this correct?
+> > > +     is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
+> > >       slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+> > >       make_spte(vcpu, sp, slot, pte_access, gfn,
+> > >                 spte_to_pfn(spte), spte, true, false,
+> > > -               host_writable, &spte);
+> > > +               host_writable, is_refcounted, &spte);
 > >
-> > I don't see what does one have to do with another ...
-> >
-> > I think with RING_RESET we had another solution, enable rings
-> > mapping them to a zero page, then reset and re-enable later.
->
-> As discussed before, this seems to have some problems:
->
-> 1) The behaviour is not clarified in the document
-> 2) zero is a valid IOVA
->
+> > Could we restrict that a non-refcounted page shall not be used as shadow page?
+> 
+> I'm not very familiar with the shadow mmu, so my response might not
+> make sense. But do you mean not allowing non-refcoutned pages as the
+> guest page tables shadowed by a kvm_mmu_page? It would probably be
+> possible to do that, and I doubt anyone would care about the
+> restriction. But as far as I can tell, the guest page table is only
+> accessed via kvm_vcpu_read_guest_atomic, which handles non-refcounted
+> pages just fine.
 
-I think we're not on the same page here.
+Sorry, my brain just got baked... Pls just ignore this question :)
 
-As I understood, rings mapped to a zero page means essentially an
-avail ring whose avail_idx is always 0, offered to the device instead
-of the guest's ring. Once all CVQ commands are processed, we use
-RING_RESET to switch to the right ring, being guest's or SVQ vring.
-
-
-
-> Thanks
->
-> >
-> > > >
-> > > >
-> > > >
-> > > > > > > My plan was to convert
-> > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorr=
-y if I
-> > > > > > > was not explicit enough.
-> > > > > > >
-> > > > > > > The only solution I can see to that is to trap & emulate in t=
-he vdpa
-> > > > > > > (parent?) driver, as talked in virtio-comment. But that compl=
-icates
-> > > > > > > the architecture:
-> > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > * Store vq enable state separately, at
-> > > > > > > vdpa->config->set_vq_ready(true), but not transmit that enabl=
-e to hw
-> > > > > > > * Store the doorbell state separately, but do not configure i=
-t to the
-> > > > > > > device directly.
-> > > > > > >
-> > > > > > > But how to recover if the device cannot configure them at kic=
-k time,
-> > > > > > > for example?
-> > > > > > >
-> > > > > > > Maybe we can just fail if the parent driver does not support =
-enabling
-> > > > > > > the vq after DRIVER_OK? That way no new feature flag is neede=
-d.
-> > > > > > >
-> > > > > > > Thanks!
-> > > > > > >
-> > > > > > > >
-> > > > > > > > > ---
-> > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/l=
-inux/kernel/git/mst
-> > > > > > > > > commit. Please let me know if I should send a v3 of [1] i=
-nstead.
-> > > > > > > > >
-> > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send=
--email-mst@kernel.org/T/
-> > > > > > > > > ---
-> > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > >
-> > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioc=
-tl(struct file *filep,
-> > > > > > > > >  {
-> > > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
-> > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->conf=
-ig;
-> > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > -     u64 features;
-> > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > >       long r =3D 0;
-> > > > > > > > >
-> > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
-> > > > > > > > >               if (copy_from_user(&features, featurep, siz=
-eof(features)))
-> > > > > > > > >                       return -EFAULT;
-> > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > +                     parent_features =3D ops->get_backen=
-d_features(v->vdpa);
-> > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURE=
-S |
-> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SU=
-SPEND) |
-> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RE=
-SUME) |
-> > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_EN=
-ABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > +                              parent_features))
-> > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUS=
-PEND)) &&
-> > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > --
-> > > > > > > > > 2.39.3
-> > > > > > > >
-> > > > > >
-> > > >
-> >
->
-
+B.R.
+Yu
