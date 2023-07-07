@@ -2,110 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E21374B00C
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 13:41:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6B4974B047
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 13:50:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232029AbjGGLl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 07:41:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43858 "EHLO
+        id S231280AbjGGLuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 07:50:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231950AbjGGLl2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 07:41:28 -0400
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10D19171D;
-        Fri,  7 Jul 2023 04:41:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1688730087; x=1720266087;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=r4V2ufLUCNsoI97ffmWSoc6qtnrBHBX8sx3vLJWt3JA=;
-  b=GB83ByNCMyP5NdmRVx7WBD1l+HhFavzivCwKE3g3aogx0iHvzktwQTu8
-   MYXzBPNl5NOV3sp8rr89+tDNPEfxN9cplbdmvPrM8Pq1M8zZWhyZe2gj3
-   CG6zxpLbXyIBKCMPvjYtyvlbrABgS2vdZ1r80e6ajLwhOzXxPzA7tfG8B
-   0=;
-X-IronPort-AV: E=Sophos;i="6.01,187,1684800000"; 
-   d="scan'208";a="570858371"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 11:41:24 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2b-m6i4x-a893d89c.us-west-2.amazon.com (Postfix) with ESMTPS id 10D9C40D4E;
-        Fri,  7 Jul 2023 11:41:23 +0000 (UTC)
-Received: from EX19D002ANA003.ant.amazon.com (10.37.240.141) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 7 Jul 2023 11:41:22 +0000
-Received: from b0f1d8753182.ant.amazon.com (10.95.106.196) by
- EX19D002ANA003.ant.amazon.com (10.37.240.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 7 Jul 2023 11:41:17 +0000
-From:   Takahiro Itazuri <itazur@amazon.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Eric Northup <digitaleric@google.com>,
-        Eric Northup <digitaleric@gmail.com>,
-        Jon Cargille <jcargill@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <x86@kernel.org>, Takahiro Itazuri <zulinx86@gmail.com>,
-        Takahiro Itazuri <itazur@amazon.com>
-Subject: Re: [PATCH 1/1] KVM: pass through CPUID(0x80000006)
-Date:   Fri, 7 Jul 2023 12:41:07 +0100
-Message-ID: <20230707114107.73019-1-itazur@amazon.com>
-X-Mailer: git-send-email 2.38.0
-In-Reply-To: <20200415023726.GD12547@linux.intel.com>
-References: <20200415023726.GD12547@linux.intel.com>
+        with ESMTP id S229556AbjGGLuw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 07:50:52 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEACFE53
+        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 04:50:51 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367BmEKI002105;
+        Fri, 7 Jul 2023 11:50:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=OgrbxqxZiy/IEV/pD1B9ZsIerk6P1eg9FNEREDyUkBo=;
+ b=rAQgeKn0poml1n3TpcdDi9n7v1mV2PIelNj54Rxqd2xNa4T7bgsITEYdle/P8J4+kOWT
+ NrvuHa+ZXB6EPDCxWuqLyYhgvt3e4HReW6SgrDze9zqC2R42svkJliFcZsZ4lOQkJxN2
+ bhisuj4v2Saagg28YLYeNYjYa5PxgnLPZV5HIUuXH52I/oj5BJSOz7Yi8wbBBsdJCoCP
+ MkoOak3IB7pt5pKv6WQkyZWduUqsJ1Cvojqv74qM8yI7le+jaCALE+O8cTmKftn8b+NO
+ igEveuxgVVf18ulF+hM9Mt4tOxbR8oIyqG6RN4Qo6GTQnLOcZtTeJJ268VqdUQYQm2Wj WA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpj59g3j9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Jul 2023 11:50:30 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 367BmibW005217;
+        Fri, 7 Jul 2023 11:50:30 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpj59g3hr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Jul 2023 11:50:30 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3677meuI016768;
+        Fri, 7 Jul 2023 11:50:28 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rjbs4uyvs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Jul 2023 11:50:28 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 367BoPmk43057786
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 7 Jul 2023 11:50:25 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9547B20040;
+        Fri,  7 Jul 2023 11:50:25 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3DEBF20043;
+        Fri,  7 Jul 2023 11:50:20 +0000 (GMT)
+Received: from li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com (unknown [9.179.3.211])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Fri,  7 Jul 2023 11:50:19 +0000 (GMT)
+Date:   Fri, 7 Jul 2023 17:20:16 +0530
+From:   Kautuk Consul <kconsul@linux.vnet.ibm.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+        maz@kernel.org, robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+Message-ID: <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
+References: <20230602161921.208564-1-amoorthy@google.com>
+ <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.95.106.196]
-X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
- EX19D002ANA003.ant.amazon.com (10.37.240.141)
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZIn6VQSebTRN1jtX@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hKZ61VUave8D7AzCiDtdaJxWSBJ_c5bk
+X-Proofpoint-GUID: ojZ9cFLOkXewqrpaSn_t0VT2W2qDTc9O
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-07_08,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 phishscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ spamscore=0 clxscore=1015 mlxlogscore=755 suspectscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2307070107
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Please forgive me if this is an absurd question.
-
-Date:   Tue, 14 Apr 2020 19:37:26 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
->   Return the host's L2 cache and TLB information for CPUID.0x80000006
->   instead of zeroing out the entry as part of KVM_GET_SUPPORTED_CPUID.
->   This allows a userspace VMM to feed KVM_GET_SUPPORTED_CPUID's output
->   directly into KVM_SET_CPUID2 (without breaking the guest).
-
-I noticed that CPUID 0x80000005 also returns cache information (L1 Cache
-and TLB Information) when looking at AMD APM, while it is marked
-reserved on Intel SDM. What do you think about passing through CPUID
-0x80000005 to guests?
-
-To be honest, I'm not sure if it is harmless from security and
-performance perspectives in the first place.
-
-Regard security aspect, I'm a bit concerned that it could help malicious
-guests to know something to allow cache side channel attacks. However,
-CPUID 0x80000006 has already passed through L2 Cache and TLB and L3
-Cache Information. If passing through CPUID 0x80000006 is really fine,
-I'm guessing it is the case with CPUID 0x80000005 as well.
-
-In terms of performance, as far as I know, some softwares utilizes cache
-information to achieve better performance. To simply put, by letting
-guests know cache information, they may gain some benefits. Having said
-that, if I understand correctly, guests can be scheduled on CPUs that do
-not belong to the same group of CPUs that they run last time, unless
-guests are pinned to a specific set of host physical CPUs. In such
-cases, guests may not benefit from using cache information.
-
-If I'm missing something or say something wrong, I'd appreciate it if
-you could correct me. If it sounds no problem, I'd like to send a patch
-for it.
-
-Best regards,
-Takahiro Itazuri
-
+Hi,
+> 
+> > +
+> > +	preempt_disable();
+> > +	/*
+> > +	 * Ensure the this vCPU isn't modifying another vCPU's run struct, which
+> > +	 * would open the door for races between concurrent calls to this
+> > +	 * function.
+> > +	 */
+> > +	if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
+> > +		goto out;
+> 
+> Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is an
+> abomination that I wish didn't exist, not a pattern that should be copied.  If
+> we do keep this sanity check, it can simply be
+> 
+> 	if (WARN_ON_ONCE(vcpu != kvm_get_running_vcpu()))
+> 		return;
+> 
+> because as the comment for kvm_get_running_vcpu() explains, the returned vCPU
+> pointer won't change even if this task gets migrated to a different pCPU.  If
+> this code were doing something with vcpu->cpu then preemption would need to be
+> disabled throughout, but that's not the case.
+> 
+I think that this check is needed but without the WARN_ON_ONCE as per my 
+other comment.
+Reason is that we really need to insulate the code against preemption
+kicking in before the call to preempt_disable() as the logic seems to
+need this check to avoid concurrency problems.
+(I don't think Anish simply copied this if-check from mark_page_dirty_in_slot)
