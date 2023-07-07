@@ -2,33 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF68474B3D9
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 17:11:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7541D74B3DA
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 17:11:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232909AbjGGPLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 11:11:46 -0400
+        id S233106AbjGGPLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 11:11:47 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjGGPLo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 11:11:44 -0400
+        with ESMTP id S229480AbjGGPLq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 11:11:46 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7C1DD124
-        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 08:11:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D146124
+        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 08:11:45 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A4E11063;
-        Fri,  7 Jul 2023 08:12:25 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25426D75;
+        Fri,  7 Jul 2023 08:12:27 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8529D3F762;
-        Fri,  7 Jul 2023 08:11:41 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 832223F762;
+        Fri,  7 Jul 2023 08:11:43 -0700 (PDT)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     will@kernel.org, julien.thierry.kdev@gmail.com,
         Suzuki.Poulose@arm.com, andre.przywara@arm.com, maz@kernel.org,
         oliver.upton@linux.dev, jean-philippe.brucker@arm.com,
         apatel@ventanamicro.com, kvm@vger.kernel.org
-Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [PATCH kvmtool v2 1/4] util: Make pr_err() return void
-Date:   Fri,  7 Jul 2023 16:11:16 +0100
-Message-ID: <20230707151119.81208-2-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool v2 2/4] Replace printf/fprintf with pr_* macros
+Date:   Fri,  7 Jul 2023 16:11:17 +0100
+Message-ID: <20230707151119.81208-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230707151119.81208-1-alexandru.elisei@arm.com>
 References: <20230707151119.81208-1-alexandru.elisei@arm.com>
@@ -43,109 +42,245 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Of all the pr_* functions, pr_err() is the only function that returns a
-value, which is -1. The code in parse_options is the only code that relies
-on pr_err() returning a value, and that value must be exactly -1, because
-it is being treated differently than the other return values.
+To prepare for allowing finer control over the messages that kvmtool
+displays, replace printf() and fprintf() with the pr_* macros.
 
-This makes the code opaque, because it's not immediately obvious where that
-value comes from, and fragile, as a change in the return value of pr_err
-would break it.
+Minor changes were made to fix coding style issues that were pet peeves for
+the author. And use pr_err() in kvm_cpu__init() instead of pr_warning() for
+fatal errors.
 
-Make pr_err() more like the other functions and don't return a value.
+Also, fix the message when printing the exit code for KVM_EXIT_UNKNOWN by
+removing the '0x' part, because it's printing a decimal number, not a
+hexadecimal one (the format specifier is %llu, not %llx).
 
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
 Changelog:
 
-- Added Reviewed-by from Jean-Philippe, thanks!
-- Remove unneeded " " in get_arg()
+- Use pr_err() to directly replace fprintf() in kernel_usage_with_options()
+  instead of concatening the kernel locations.
+- Removed the '0x' from the "KVM exit code: 0x%llu" message in kvm_cpu_thread()
+  because the number is decimal (it's %llu, not %llx).
+- Reverted the changes to kvm__emulate_mmio() and debug_io () because those
+  messages are displayed with --debug-mmio, respectively --debug-ioport, and
+  --loglevel hiding them would have been counter-intuitive.
+- Replaced the "warning" string in kvm__emulate_mmio() with "MMIO warning", to
+  match the message from kvm__emulate_io(). And to make it clear that it isn't
+  toggled with --loglevel.
+- Removed extra spaces in virtio_compat_add_message().
 
- include/kvm/util.h   |  2 +-
- util/parse-options.c | 28 ++++++++++++++++------------
- util/util.c          |  3 +--
- 3 files changed, 18 insertions(+), 15 deletions(-)
+ arm/gic.c       |  5 ++---
+ builtin-run.c   | 37 +++++++++++++++++++------------------
+ builtin-setup.c | 16 ++++++++--------
+ guest_compat.c  |  2 +-
+ kvm-cpu.c       | 12 ++++++------
+ mmio.c          |  2 +-
+ 6 files changed, 37 insertions(+), 37 deletions(-)
 
-diff --git a/include/kvm/util.h b/include/kvm/util.h
-index b49454876a83..f51f370d2b37 100644
---- a/include/kvm/util.h
-+++ b/include/kvm/util.h
-@@ -39,7 +39,7 @@ extern bool do_debug_print;
+diff --git a/arm/gic.c b/arm/gic.c
+index a223a72cfeb9..0795e9509bf8 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -115,9 +115,8 @@ static int gic__create_its_frame(struct kvm *kvm, u64 its_frame_addr)
  
- extern void die(const char *err, ...) NORETURN __attribute__((format (printf, 1, 2)));
- extern void die_perror(const char *s) NORETURN;
--extern int pr_err(const char *err, ...) __attribute__((format (printf, 1, 2)));
-+extern void pr_err(const char *err, ...) __attribute__((format (printf, 1, 2)));
- extern void pr_warning(const char *err, ...) __attribute__((format (printf, 1, 2)));
- extern void pr_info(const char *err, ...) __attribute__((format (printf, 1, 2)));
- extern void set_die_routine(void (*routine)(const char *err, va_list params) NORETURN);
-diff --git a/util/parse-options.c b/util/parse-options.c
-index 9a1bbee6c271..d353256e2651 100644
---- a/util/parse-options.c
-+++ b/util/parse-options.c
-@@ -17,10 +17,13 @@
- static int opterror(const struct option *opt, const char *reason, int flags)
- {
- 	if (flags & OPT_SHORT)
--		return pr_err("switch `%c' %s", opt->short_name, reason);
--	if (flags & OPT_UNSET)
--		return pr_err("option `no-%s' %s", opt->long_name, reason);
--	return pr_err("option `%s' %s", opt->long_name, reason);
-+		pr_err("switch `%c' %s", opt->short_name, reason);
-+	else if (flags & OPT_UNSET)
-+		pr_err("option `no-%s' %s", opt->long_name, reason);
-+	else
-+		pr_err("option `%s' %s", opt->long_name, reason);
-+
-+	return -1;
- }
- 
- static int get_arg(struct parse_opt_ctx_t *p, const struct option *opt,
-@@ -429,14 +432,15 @@ is_abbreviated:
- 		return get_value(p, options, flags);
+ 	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &its_device);
+ 	if (err) {
+-		fprintf(stderr,
+-			"GICv3 ITS requested, but kernel does not support it.\n");
+-		fprintf(stderr, "Try --irqchip=gicv3 instead\n");
++		pr_err("GICv3 ITS requested, but kernel does not support it.");
++		pr_err("Try --irqchip=gicv3 instead");
+ 		return err;
  	}
  
--	if (ambiguous_option)
--		return pr_err("Ambiguous option: %s "
--				"(could be --%s%s or --%s%s)",
--				arg,
--				(ambiguous_flags & OPT_UNSET) ?  "no-" : "",
--				ambiguous_option->long_name,
--				(abbrev_flags & OPT_UNSET) ?  "no-" : "",
--				abbrev_option->long_name);
-+	if (ambiguous_option) {
-+		pr_err("Ambiguous option: %s (could be --%s%s or --%s%s)",
-+			arg,
-+			(ambiguous_flags & OPT_UNSET) ?  "no-" : "",
-+			ambiguous_option->long_name,
-+			(abbrev_flags & OPT_UNSET) ?  "no-" : "",
-+			abbrev_option->long_name);
-+		return -1;
+diff --git a/builtin-run.c b/builtin-run.c
+index bd0d0b9c2467..190a226e46da 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -271,12 +271,14 @@ static void *kvm_cpu_thread(void *arg)
+ 	return (void *) (intptr_t) 0;
+ 
+ panic_kvm:
+-	fprintf(stderr, "KVM exit reason: %u (\"%s\")\n",
++	pr_err("KVM exit reason: %u (\"%s\")",
+ 		current_kvm_cpu->kvm_run->exit_reason,
+ 		kvm_exit_reasons[current_kvm_cpu->kvm_run->exit_reason]);
+-	if (current_kvm_cpu->kvm_run->exit_reason == KVM_EXIT_UNKNOWN)
+-		fprintf(stderr, "KVM exit code: 0x%llu\n",
++
++	if (current_kvm_cpu->kvm_run->exit_reason == KVM_EXIT_UNKNOWN) {
++		pr_err("KVM exit code: %llu",
+ 			(unsigned long long)current_kvm_cpu->kvm_run->hw.hardware_exit_reason);
 +	}
- 	if (abbrev_option)
- 		return get_value(p, abbrev_option, abbrev_flags);
- 	return -2;
-diff --git a/util/util.c b/util/util.c
-index 1877105e3c08..f59f26e1581c 100644
---- a/util/util.c
-+++ b/util/util.c
-@@ -47,14 +47,13 @@ void die(const char *err, ...)
- 	va_end(params);
+ 
+ 	kvm_cpu__set_debug_fd(STDOUT_FILENO);
+ 	kvm_cpu__show_registers(current_kvm_cpu);
+@@ -313,10 +315,10 @@ static void kernel_usage_with_options(void)
+ 	const char **k;
+ 	struct utsname uts;
+ 
+-	fprintf(stderr, "Fatal: could not find default kernel image in:\n");
++	pr_err("Could not find default kernel image in:");
+ 	k = &default_kernels[0];
+ 	while (*k) {
+-		fprintf(stderr, "\t%s\n", *k);
++		pr_err("\t%s", *k);
+ 		k++;
+ 	}
+ 
+@@ -327,10 +329,10 @@ static void kernel_usage_with_options(void)
+ 	while (*k) {
+ 		if (snprintf(kernel, PATH_MAX, "%s-%s", *k, uts.release) < 0)
+ 			return;
+-		fprintf(stderr, "\t%s\n", kernel);
++		pr_err("\t%s", kernel);
+ 		k++;
+ 	}
+-	fprintf(stderr, "\nPlease see '%s run --help' for more options.\n\n",
++	pr_info("Please see '%s run --help' for more options.",
+ 		KVM_BINARY_NAME);
  }
  
--int pr_err(const char *err, ...)
-+void pr_err(const char *err, ...)
- {
- 	va_list params;
+@@ -656,8 +658,7 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
  
- 	va_start(params, err);
- 	error_builtin(err, params);
- 	va_end(params);
--	return -1;
+ 			if ((kvm_run_wrapper == KVM_RUN_DEFAULT && kvm->cfg.kernel_filename) ||
+ 				(kvm_run_wrapper == KVM_RUN_SANDBOX && kvm->cfg.sandbox)) {
+-				fprintf(stderr, "Cannot handle parameter: "
+-						"%s\n", argv[0]);
++				pr_err("Cannot handle parameter: %s", argv[0]);
+ 				usage_with_options(run_usage, options);
+ 				free(kvm);
+ 				return ERR_PTR(-EINVAL);
+@@ -775,15 +776,15 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+ 		kvm_run_set_real_cmdline(kvm);
+ 
+ 	if (kvm->cfg.kernel_filename) {
+-		printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+-		       kvm->cfg.kernel_filename,
+-		       (unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+-		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
++		pr_info("# %s run -k %s -m %Lu -c %d --name %s", KVM_BINARY_NAME,
++			kvm->cfg.kernel_filename,
++			(unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
++			kvm->cfg.nrcpus, kvm->cfg.guest_name);
+ 	} else if (kvm->cfg.firmware_filename) {
+-		printf("  # %s run --firmware %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+-		       kvm->cfg.firmware_filename,
+-		       (unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+-		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
++		pr_info("# %s run --firmware %s -m %Lu -c %d --name %s", KVM_BINARY_NAME,
++			kvm->cfg.firmware_filename,
++			(unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
++			kvm->cfg.nrcpus, kvm->cfg.guest_name);
+ 	}
+ 
+ 	if (init_list__init(kvm) < 0)
+@@ -815,7 +816,7 @@ static void kvm_cmd_run_exit(struct kvm *kvm, int guest_ret)
+ 	init_list__exit(kvm);
+ 
+ 	if (guest_ret == 0)
+-		printf("\n  # KVM session ended normally.\n");
++		pr_info("KVM session ended normally.");
  }
  
- void pr_warning(const char *warn, ...)
+ int kvm_cmd_run(int argc, const char **argv, const char *prefix)
+diff --git a/builtin-setup.c b/builtin-setup.c
+index b24d2a18921e..27b641982359 100644
+--- a/builtin-setup.c
++++ b/builtin-setup.c
+@@ -271,15 +271,15 @@ int kvm_cmd_setup(int argc, const char **argv, const char *prefix)
+ 		kvm_setup_help();
+ 
+ 	r = do_setup(instance_name);
+-	if (r == 0)
+-		printf("A new rootfs '%s' has been created in '%s%s'.\n\n"
+-			"You can now start it by running the following command:\n\n"
+-			"  %s run -d %s\n",
+-			instance_name, kvm__get_dir(), instance_name,
+-			KVM_BINARY_NAME,instance_name);
+-	else
+-		printf("Unable to create rootfs in %s%s: %s\n",
++	if (r == 0) {
++		pr_info("A new rootfs '%s' has been created in '%s%s'.",
++			instance_name, kvm__get_dir(), instance_name);
++		pr_info("You can now start it by running the following command:");
++		pr_info("%s run -d %s", KVM_BINARY_NAME, instance_name);
++	} else {
++		pr_err("Unable to create rootfs in %s%s: %s",
+ 			kvm__get_dir(), instance_name, strerror(errno));
++	}
+ 
+ 	return r;
+ }
+diff --git a/guest_compat.c b/guest_compat.c
+index fd4704b20b16..93f9aabcd6db 100644
+--- a/guest_compat.c
++++ b/guest_compat.c
+@@ -86,7 +86,7 @@ int compat__print_all_messages(void)
+ 
+ 		msg = list_first_entry(&messages, struct compat_message, list);
+ 
+-		printf("\n  # KVM compatibility warning.\n\t%s\n\t%s\n",
++		pr_warning("KVM compatibility warning.\n\t%s\n\t%s",
+ 			msg->title, msg->desc);
+ 
+ 		list_del(&msg->list);
+diff --git a/kvm-cpu.c b/kvm-cpu.c
+index 7dec08894cd3..1c566b3f21d6 100644
+--- a/kvm-cpu.c
++++ b/kvm-cpu.c
+@@ -265,32 +265,32 @@ int kvm_cpu__init(struct kvm *kvm)
+ 	recommended_cpus = kvm__recommended_cpus(kvm);
+ 
+ 	if (kvm->cfg.nrcpus > max_cpus) {
+-		printf("  # Limit the number of CPUs to %d\n", max_cpus);
++		pr_warning("Limiting the number of CPUs to %d", max_cpus);
+ 		kvm->cfg.nrcpus = max_cpus;
+ 	} else if (kvm->cfg.nrcpus > recommended_cpus) {
+-		printf("  # Warning: The maximum recommended amount of VCPUs"
+-			" is %d\n", recommended_cpus);
++		pr_warning("The maximum recommended amount of VCPUs is %d",
++			   recommended_cpus);
+ 	}
+ 
+ 	kvm->nrcpus = kvm->cfg.nrcpus;
+ 
+ 	task_eventfd = eventfd(0, 0);
+ 	if (task_eventfd < 0) {
+-		pr_warning("Couldn't create task_eventfd");
++		pr_err("Couldn't create task_eventfd");
+ 		return task_eventfd;
+ 	}
+ 
+ 	/* Alloc one pointer too many, so array ends up 0-terminated */
+ 	kvm->cpus = calloc(kvm->nrcpus + 1, sizeof(void *));
+ 	if (!kvm->cpus) {
+-		pr_warning("Couldn't allocate array for %d CPUs", kvm->nrcpus);
++		pr_err("Couldn't allocate array for %d CPUs", kvm->nrcpus);
+ 		return -ENOMEM;
+ 	}
+ 
+ 	for (i = 0; i < kvm->nrcpus; i++) {
+ 		kvm->cpus[i] = kvm_cpu__arch_init(kvm, i);
+ 		if (!kvm->cpus[i]) {
+-			pr_warning("unable to initialize KVM VCPU");
++			pr_err("unable to initialize KVM VCPU");
+ 			goto fail_alloc;
+ 		}
+ 	}
+diff --git a/mmio.c b/mmio.c
+index 5a114e9997d9..231ce91e3d47 100644
+--- a/mmio.c
++++ b/mmio.c
+@@ -203,7 +203,7 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+ 	mmio = mmio_get(&mmio_tree, phys_addr, len);
+ 	if (!mmio) {
+ 		if (vcpu->kvm->cfg.mmio_debug)
+-			fprintf(stderr,	"Warning: Ignoring MMIO %s at %016llx (length %u)\n",
++			fprintf(stderr,	"MMIO warning: Ignoring MMIO %s at %016llx (length %u)\n",
+ 				to_direction(is_write),
+ 				(unsigned long long)phys_addr, len);
+ 		goto out;
 -- 
 2.41.0
 
