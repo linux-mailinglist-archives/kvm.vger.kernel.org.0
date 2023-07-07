@@ -2,478 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E7D874AA16
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 06:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24D8B74AB01
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 08:19:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231467AbjGGEw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 00:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34314 "EHLO
+        id S232484AbjGGGT3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 02:19:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232123AbjGGEw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 00:52:56 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B2410F7;
-        Thu,  6 Jul 2023 21:52:53 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 42D53120003;
-        Fri,  7 Jul 2023 07:52:52 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 42D53120003
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1688705572;
-        bh=9VxNKVkl0KSq5bEapiGV2wEyObLBoul2dcTRSiwh07I=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=QW1pz+FNfZvjIW+CUyRkC3Fn0y4Ed+uo2ntS6eETda18OsY3HAxOo0YRCJcjBYmec
-         aiF77vaXeg77nyDBgG+RlA3tei6sEV+C87lgG4aKX4E4UqRgLUts4KOVoDJbenTENj
-         37dqfFJ7wtUh18cNYJnxpdIBV6t8bKFCoGzcu79ul0a8gbNpJiW7JXgAJgDmmRI8K/
-         Xmtoo/fqVUtKgbw26L2sQh9+VI7CyZAGQH/zwFKjc239xldtC6YuuYx83//QC4j8kW
-         Va4U3VZ5tNEx2biBwNHWigTzBqoUwHliTP5XzY23N4iegFHaRqYPuDSS0IbUh9/Rtu
-         /YCzYyYLaV2BQ==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Fri,  7 Jul 2023 07:52:51 +0300 (MSK)
-Received: from [192.168.0.12] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 7 Jul 2023 07:52:37 +0300
-Message-ID: <6328cdd3-3ee8-34f3-18b5-5de8c7454b2f@sberdevices.ru>
-Date:   Fri, 7 Jul 2023 07:47:37 +0300
+        with ESMTP id S229529AbjGGGT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 02:19:27 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2058.outbound.protection.outlook.com [40.92.18.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D11010F7;
+        Thu,  6 Jul 2023 23:19:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=emNK5+QT/elQNfOSakmsFHwidTLRgV2hSQ8kPGsq0YSiRoRX39kMJi5r8gkppq8mGiTyiFD32UpEyK0FtCNn/UvV67aFKyxrR0pB3w+bK+Mlm2Fl8Cf1Nt03EhWVZ0U2Pns5gTmRjpqWKjHuJzEV/qURrUZvuNLnVwV1q+K5NevrUq+5mEWmKn/9VYTFbOQZdbZApFdRHlRf9sV0Ync4cyscUm4T5X9YCDuIDPPpOUnkey0iBTOgwW17wzazeKPp4h979CDkogrAKw+f4bWEDg4TkVtxVfkaKem67HR3lZ1eaFlRMxXZwIS9/ue4l/mbMaT2fgvfcxggVQYto0R8FQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LT9P6s9zwLrdSUAWkaaS5qw2HWU7TUcwdZg786Kp9yE=;
+ b=QtocBPLo46fdORpcYapApbWczlgDUo0bfV+xI/vmk56n5pnfcm2AbVf8p+EgDjvFTQUYXlFO0wZ6aos1XSrQbw8crxb1kdP1VfGFbJC/+NGo0L6x0wA0GngefUDVhdD8ssxHaEPSLHMqfRmlS52cTGiEShaP0x6S8ZDwfE1ZGoNR3ocNrtAPhUx4+Mo8tYudK36V9ZPZwB3VaqnWF9ZjwZBdh2Z94kYHlZZs33w3p9AUZms2fqhusf/PkkuCJMIQkcahidy9ojmFVql5O8HF3GwmShSJ153BPeyLT95EzwScQ7seT/4T4NwvWs4weQ1qf50ZElGAxJ3UHvxrg+Eiug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LT9P6s9zwLrdSUAWkaaS5qw2HWU7TUcwdZg786Kp9yE=;
+ b=KcyKwB4vJXj0kp1PxvseF5QE7/lCwRiZSA1VKs+VV9rJLEXe56noO5ampJadAM0EdPLUd7DNn5BLeWe41rS9rGN7bemf9g7T1Z6OUgffvair2SbagExC8OU+5gtOi878RBTNad9s294Sn9D2VRn9IFsskg9M/EjY931x6e/k9liXctEDcA7sE+UaEiQd7+aivVkRqZIPAuzUtS2iapKFg0p4n0NyWk00f5+lavWzRC6M/1+8Zc2Mttr2cqAwFKeV2CqO1SEFwJ2+kfO0EVbCffUHjfy7mvdqQOGs+Qp5n8NjCTGRDrbrNc/wJRm1R9nZ/vSsBbFkpgQABpSWVrcNtA==
+Received: from BYAPR03MB4133.namprd03.prod.outlook.com (2603:10b6:a03:7d::19)
+ by BY5PR03MB5201.namprd03.prod.outlook.com (2603:10b6:a03:221::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.24; Fri, 7 Jul
+ 2023 06:19:22 +0000
+Received: from BYAPR03MB4133.namprd03.prod.outlook.com
+ ([fe80::5e99:a4d4:416:c671]) by BYAPR03MB4133.namprd03.prod.outlook.com
+ ([fe80::5e99:a4d4:416:c671%4]) with mapi id 15.20.6565.016; Fri, 7 Jul 2023
+ 06:19:22 +0000
+From:   Wang Jianchao <jianchwa@outlook.com>
+To:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org
+Cc:     arkinjob@outlook.com, linux-kernel@vger.kernel.org
+Subject: [RFC 0/3] KVM: x86: introduce pv feature lazy tscdeadline
+Date:   Fri,  7 Jul 2023 14:17:58 +0800
+Message-ID: <BYAPR03MB4133436C792BBF9EC6D77672CD2DA@BYAPR03MB4133.namprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain
+X-TMN:  [7TmDqB38EMK50384RSKeEPLu3yceHSC+usNKG67c59s=]
+X-ClientProxiedBy: TYCP286CA0131.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:2b6::13) To BYAPR03MB4133.namprd03.prod.outlook.com
+ (2603:10b6:a03:7d::19)
+X-Microsoft-Original-Message-ID: <1688710681-22896-1-git-send-email-jianchwa@outlook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v5 17/17] test/vsock: io_uring rx/tx tests
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
- <20230701063947.3422088-18-AVKrasnov@sberdevices.ru>
- <CAGxU2F5V8jfGnYnp3wdLR3PVwvW6ce02U+R5k1G81r2FdxCV0Q@mail.gmail.com>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <CAGxU2F5V8jfGnYnp3wdLR3PVwvW6ce02U+R5k1G81r2FdxCV0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178485 [Jul 06 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 520 520 ccb018a655251011855942a2571029252d3d69a2, {Tracking_from_domain_doesnt_match_to}, sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/07 00:05:00 #21574510
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR03MB4133:EE_|BY5PR03MB5201:EE_
+X-MS-Office365-Filtering-Correlation-Id: f004cce8-7c2a-4435-0b22-08db7eb21abb
+X-MS-Exchange-SLBlob-MailProps: AZnQBsB9XmqH3kRfXJefTp/U8AtyfwZL9p+77ELxSitshBlJg2k+K5Tcd6OTK2vBg5MH8Uh+g7oK2pR+Ng4Mexk5RQFBw/aeR76qo+OfBP5jYremHgTy6Gbm4fECN4PF4CG+/plsbZVYBsOrkAID6H7ttC/EHi/DUQmQDkAnrPiULI27fQ5UDDHZT6i5wugcNo8njVx468SrAvgnHwf6fPpUTETsNBvFW3z0lHFTcgN4rHlE8E9pe/dJk+RRXCzYqeDvdyvzr6GbRjh8uAv29m2xkObRP56GS5Hk2cfdn/4KLFAUMcJajIPceC5RgaY0Z374r51BFGDYuRCYlCAJeBdwfsQ7z6k94nQ6qB9m09nKqZXl5al/oae17/oEsu3S782KVuBpqqqyO94SpiHq9f0/3q8pupw5bzszyy7dj/FBa+KQAfUHF5bii6h7Q7i8+xv3T5VFH+Yf3lIQFTbh294vuF6ArLuuzoOAWTIGja8IMgqLLElv3cIv7KLS+4ayDmFMEqbap7FPIVF64OxxI4tj0JYKDheSwFLK78Nh3pe3KB0ch0GLo/8LsLb9FFGbCnZgiO5i/XLg8TV8Eof6PVfP7WM0w/2dRnH5o1T+Q4t1yaqZKLvKih+6kNm/HI44Ves62/bcGvaJoIMi3NELGzHSk+RkdrCUzRAE/vn3r9eL4ibSra6zfcvSg+ZPmYymOiIuKlK2GOZ26Cn9Pm9Xt1FSVGfPArtW7TnghBpbudp3HOoJNSji8cNzcaSrZ2O9IDlBcwOCI1o=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2RlPq0kHv77H4DS6I6XWXlQ89CKZuOVSQKMS4DTmcnNkLsjL8HAFTodpn+PhbjiOxtIw/FElyYpK9jPQxokR/LYvP8r9kfQTtpR/xog96rOebhTWRWcGHBz0BOIzyK+qvt+4qRtnI6w+OBFT1GcW9GGy3GO2jCgWjcfpuQBZLEbkf3kTeMeJF0JiQSqp9BabzTsbhoybJ9ZnLH4YlQzPM4qhAvCgctZrkLb/X2xtfO6vmGP7EdzLYcg1vZ4L+HStgw34QxWqmiGXx5wt//a6Hs6T4WiZeJfYBz2971iJ03bJfCWV5H2cGH6xh0+7jIrjwKnuIH8s0y7pGXeLxcnZV6wNQ39Em7KWPQtHuK4LeNbvbuDWSXgxrGzb1HZNfezAckFpPFrMtaiMfK/RHWqtCX7OZe4TuY+J4rCh2xicHCSxmdg/OH877eVfFh2F3v10uFxocLnNPC9wPiErD90mlkLpMk9dbVYeDIDbaKhRXE+mkI2gzdLMHjLex/H2KV3SNY/oF2KArPg4IW8BqautEHirbheSZqQGVkOJ3X1tRa8JjgLfcupSUXcOK5cS3AI8
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yXxD7jpupLNOvYK2zXcnTuGQEPtdPzlsZd/ryADLi+mAPaEubHfwVkfa2t90?=
+ =?us-ascii?Q?weaoZCqCyVXpPWT3fm8UHoI47/jgXq9KMukBPlyZsc6LCoMfQijsjCpGnEBn?=
+ =?us-ascii?Q?QnmWzuc/BmYCGQOar91D9e2DiPMOeBwFCHz78LEFDLS4tk8YqkOvQ4Wopjr2?=
+ =?us-ascii?Q?fQQX27OfGnbkb6uWqdZvP2oyI56v4EZA0sI9+v9yiQFu+SKKRvbVo0qahDuo?=
+ =?us-ascii?Q?VtfAEewxvmEjCHI0BBOYyIxoe2DMX3hxfyHrG9PvClwhFFVnXuLanoM8NcB3?=
+ =?us-ascii?Q?5p4aT3C5W/XPDnkCzYnQUeLA2iEjPxG916+jCMTq7RGvdqfd9cgDDgzB3klZ?=
+ =?us-ascii?Q?0YryHgFxeRd5Tevy/k2I+5J1kjXUHP/D4J4mZtLTiv4OrCdCkCIZK9LNts/x?=
+ =?us-ascii?Q?hk6YCLbPH2LGpgs9gwNprrGOfEC3Y8qnj7K/cxkRXNVnCO7whcVvOq5ZmDad?=
+ =?us-ascii?Q?gEOx+XUalHvTndu4wJzRhM2kPVUQ1ixYYsormEDYt45tkiKUcwcZu87XOTvP?=
+ =?us-ascii?Q?BxSoE4iMBGbIuE+Nn65YZHIXFqEhbDEwIJI6tRlSaUvMUATWRONe48voLSYo?=
+ =?us-ascii?Q?9a79mLgQUVASbBwsRZi66p77Ya4Kr4CKSuwsVwXry+FZ4ggnVqBQxMFX9+yL?=
+ =?us-ascii?Q?CFIWxbajy8RQmd93ccvIiOEpBcKa8znjMvcR0aUqfpkCsL/IcJ8dS64Jj2Vl?=
+ =?us-ascii?Q?FxKgHIJVlhB5/hl3ifxPWXX0A5Qdche/2RWUJPGfBhTes3wrPk6VLXU00iHR?=
+ =?us-ascii?Q?5AHxvv8Hn5Lo+5+k+xDNib6YlK/J5sDzYQb7aTsaItf+rqfP4kImY2JRM0MM?=
+ =?us-ascii?Q?qh5ziJ3ZZdqeMdtW7TVcwr5zCMQk57+fzds5jEXLvKTkfrLB4jPUj7xSeQ73?=
+ =?us-ascii?Q?BpyFHnRmFaKqPspLRbpMKy0/pfOTR2gl8rZt5B1rSayAtb1klypQLrlHhJS2?=
+ =?us-ascii?Q?1xdHrZu5CpwHX2ni05Nn/oKcxjqlcKpvsNUXCVj5dhHaMMAzuswGjy0/Vg3D?=
+ =?us-ascii?Q?DkL3hAjSy0JvyV+HANLn2zt5CvTYLm+Fv9pwGzqr9rgSpy5po2H65A99JMWE?=
+ =?us-ascii?Q?ZrsM11tBN5ioIcS8UBKLP+P9f5l24wQXn6Z0ShUd+XfQLSAqKfBO5svAq0jG?=
+ =?us-ascii?Q?3isJGJqv1PUdo3knOZ6ByEAAHPnyXwEp712/Byd4SM6KEHxmWIQpHT3HRG8w?=
+ =?us-ascii?Q?fY2UspcRKUegYOh89w364YgJBK3t7O7d2kbg0wHFTE2dy3UuSojWDCsRkyo?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f004cce8-7c2a-4435-0b22-08db7eb21abb
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR03MB4133.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2023 06:19:22.3165
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR03MB5201
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi
+
+This patchset attemps to introduce a new pv feature, lazy tscdeadline.
+Everytime guest write msr of MSR_IA32_TSC_DEADLINE, a vm-exit occurs
+and host side handle it. However, a lot of the vm-exit is unnecessary
+because the timer is often over-written before it expires. 
+
+v : write to msr of tsc deadline
+| : timer armed by tsc deadline
+
+         v v v v v        | | | | |
+--------------------------------------->  Time
+
+The timer armed by msr write is over-written before expires and the
+vm-exit caused by it are wasted. The lazy tscdeadline works as following,
+
+         v v v v v        |       |
+--------------------------------------->  Time
+                          '- arm -'
+
+The 1st timer is responsible for arming the next timer. When the armed
+timer is expired, it will check pending and arm a new timer.
+
+In the netperf test with TCP_RR on loopback, this lazy_tscdeadline can
+reduce vm-exit obviously.
+
+                         Close               Open
+--------------------------------------------------------
+VM-Exit
+             sum         12617503            5815737
+            intr      0% 37023            0% 33002
+           cpuid      0% 1                0% 0
+            halt     19% 2503932         47% 2780683
+       msr-write     79% 10046340        51% 2966824
+           pause      0% 90               0% 84
+   ept-violation      0% 584              0% 336
+   ept-misconfig      0% 0                0% 2
+preemption-timer      0% 29518            0% 34800
+-------------------------------------------------------
+MSR-Write
+            sum          10046455            2966864
+        apic-icr     25% 2533498         93% 2781235
+    tsc-deadline     74% 7512945          6% 185629
+
+This patchset is made and tested on 6.4.0, includes 3 patches,
+
+The 1st one adds necessary data structures for this feature
+The 2nd one adds the specific msr operations between guest and host
+The 3rd one are the one make this feature works.
+
+Any comment is welcome.
+
+Thanks
+Jianchao
+
+Wang Jianchao (3)
+	KVM: x86: add msr register and data structure for lazy tscdeadline
+	KVM: x86: exchange info about lazy_tscdeadline with msr
+	KVM: X86: add lazy tscdeadline support to reduce vm-exit of msr-write
 
 
-On 06.07.2023 20:06, Stefano Garzarella wrote:
-> On Sat, Jul 01, 2023 at 09:39:47AM +0300, Arseniy Krasnov wrote:
->> This adds set of tests which use io_uring for rx/tx. This test suite is
->> implemented as separated util like 'vsock_test' and has the same set of
->> input arguments as 'vsock_test'. These tests only cover cases of data
->> transmission (no connect/bind/accept etc).
-> 
-> Cool, thanks for adding this!
-> 
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> ---
->> tools/testing/vsock/Makefile           |   7 +-
->> tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
->> 2 files changed, 327 insertions(+), 1 deletion(-)
->> create mode 100644 tools/testing/vsock/vsock_uring_test.c
->>
->> diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
->> index 0a78787d1d92..8621ae73051d 100644
->> --- a/tools/testing/vsock/Makefile
->> +++ b/tools/testing/vsock/Makefile
->> @@ -1,12 +1,17 @@
->> # SPDX-License-Identifier: GPL-2.0-only
->> +ifeq ($(MAKECMDGOALS),vsock_uring_test)
->> +LDFLAGS = -luring
->> +endif
->> +
->> all: test vsock_perf
->> test: vsock_test vsock_diag_test
->> vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
->> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
->> vsock_perf: vsock_perf.o
->> +vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o $(LDFLAGS)
-> 
-> Why we need `$(LDFLAGS)` in the dependencies?
-
-Hm, yes, seems my mistake, LDFLAGS must be used without adding it to dependencies.
-I'll check it.
-
-Thanks, Arseniy
-
-> 
-> 
->>
->> CFLAGS += -g -O2 -Werror -Wall -I. -I../../include
->> -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow
->> -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
->> .PHONY: all test clean
->> clean:
->> -      ${RM} *.o *.d vsock_test vsock_diag_test
->> +      ${RM} *.o *.d vsock_test vsock_diag_test vsock_uring_test
->> -include *.d
->> diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
->> new file mode 100644
->> index 000000000000..7637ff510490
->> --- /dev/null
->> +++ b/tools/testing/vsock/vsock_uring_test.c
->> @@ -0,0 +1,321 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/* io_uring tests for vsock
->> + *
->> + * Copyright (C) 2023 SberDevices.
->> + *
->> + * Author: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> + */
->> +
->> +#include <getopt.h>
->> +#include <stdio.h>
->> +#include <stdlib.h>
->> +#include <string.h>
->> +#include <liburing.h>
->> +#include <unistd.h>
->> +#include <sys/mman.h>
->> +#include <linux/kernel.h>
->> +#include <error.h>
->> +
->> +#include "util.h"
->> +#include "control.h"
->> +
->> +#define PAGE_SIZE             4096
->> +#define RING_ENTRIES_NUM      4
->> +
->> +static struct vsock_test_data test_data_array[] = {
->> +      /* All elements have page aligned base and size. */
->> +      {
->> +              .vecs_cnt = 3,
->> +              {
->> +                      { NULL, PAGE_SIZE },
->> +                      { NULL, 2 * PAGE_SIZE },
->> +                      { NULL, 3 * PAGE_SIZE },
->> +              }
->> +      },
->> +      /* Middle element has both non-page aligned base and size. */
->> +      {
->> +              .vecs_cnt = 3,
->> +              {
->> +                      { NULL, PAGE_SIZE },
->> +                      { (void *)1, 200  },
->> +                      { NULL, 3 * PAGE_SIZE },
->> +              }
->> +      }
->> +};
->> +
->> +static void vsock_io_uring_client(const struct test_opts *opts,
->> +                                const struct vsock_test_data *test_data,
->> +                                bool msg_zerocopy)
->> +{
->> +      struct io_uring_sqe *sqe;
->> +      struct io_uring_cqe *cqe;
->> +      struct io_uring ring;
->> +      struct iovec *iovec;
->> +      struct msghdr msg;
->> +      int fd;
->> +
->> +      fd = vsock_stream_connect(opts->peer_cid, 1234);
->> +      if (fd < 0) {
->> +              perror("connect");
->> +              exit(EXIT_FAILURE);
->> +      }
->> +
->> +      if (msg_zerocopy)
->> +              enable_so_zerocopy(fd);
->> +
->> +      iovec = iovec_from_test_data(test_data);
->> +
->> +      if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
->> +              error(1, errno, "io_uring_queue_init");
->> +
->> +      if (io_uring_register_buffers(&ring, iovec, test_data->vecs_cnt))
->> +              error(1, errno, "io_uring_register_buffers");
->> +
->> +      memset(&msg, 0, sizeof(msg));
->> +      msg.msg_iov = iovec;
->> +      msg.msg_iovlen = test_data->vecs_cnt;
->> +      sqe = io_uring_get_sqe(&ring);
->> +
->> +      if (msg_zerocopy)
->> +              io_uring_prep_sendmsg_zc(sqe, fd, &msg, 0);
->> +      else
->> +              io_uring_prep_sendmsg(sqe, fd, &msg, 0);
->> +
->> +      if (io_uring_submit(&ring) != 1)
->> +              error(1, errno, "io_uring_submit");
->> +
->> +      if (io_uring_wait_cqe(&ring, &cqe))
->> +              error(1, errno, "io_uring_wait_cqe");
->> +
->> +      io_uring_cqe_seen(&ring, cqe);
->> +
->> +      control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
->> +
->> +      control_writeln("DONE");
->> +      io_uring_queue_exit(&ring);
->> +      free_iovec_test_data(test_data, iovec);
->> +      close(fd);
->> +}
->> +
->> +static void vsock_io_uring_server(const struct test_opts *opts,
->> +                                const struct vsock_test_data *test_data)
->> +{
->> +      unsigned long remote_hash;
->> +      unsigned long local_hash;
->> +      struct io_uring_sqe *sqe;
->> +      struct io_uring_cqe *cqe;
->> +      struct io_uring ring;
->> +      struct iovec iovec;
->> +      size_t data_len;
->> +      void *data;
->> +      int fd;
->> +
->> +      fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->> +      if (fd < 0) {
->> +              perror("accept");
->> +              exit(EXIT_FAILURE);
->> +      }
->> +
->> +      data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
->> +
->> +      data = malloc(data_len);
->> +      if (!data) {
->> +              perror("malloc");
->> +              exit(EXIT_FAILURE);
->> +      }
->> +
->> +      if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
->> +              error(1, errno, "io_uring_queue_init");
->> +
->> +      sqe = io_uring_get_sqe(&ring);
->> +      iovec.iov_base = data;
->> +      iovec.iov_len = data_len;
->> +
->> +      io_uring_prep_readv(sqe, fd, &iovec, 1, 0);
->> +
->> +      if (io_uring_submit(&ring) != 1)
->> +              error(1, errno, "io_uring_submit");
->> +
->> +      if (io_uring_wait_cqe(&ring, &cqe))
->> +              error(1, errno, "io_uring_wait_cqe");
->> +
->> +      if (cqe->res != data_len) {
->> +              fprintf(stderr, "expected %zu, got %u\n", data_len,
->> +                      cqe->res);
->> +              exit(EXIT_FAILURE);
->> +      }
->> +
->> +      local_hash = hash_djb2(data, data_len);
->> +
->> +      remote_hash = control_readulong();
->> +      if (remote_hash != local_hash) {
->> +              fprintf(stderr, "hash mismatch\n");
->> +              exit(EXIT_FAILURE);
->> +      }
->> +
->> +      control_expectln("DONE");
->> +      io_uring_queue_exit(&ring);
->> +      free(data);
->> +}
->> +
->> +void test_stream_uring_server(const struct test_opts *opts)
->> +{
->> +      int i;
->> +
->> +      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->> +              vsock_io_uring_server(opts, &test_data_array[i]);
->> +}
->> +
->> +void test_stream_uring_client(const struct test_opts *opts)
->> +{
->> +      int i;
->> +
->> +      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->> +              vsock_io_uring_client(opts, &test_data_array[i], false);
->> +}
->> +
->> +void test_stream_uring_msg_zc_server(const struct test_opts *opts)
->> +{
->> +      int i;
->> +
->> +      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->> +              vsock_io_uring_server(opts, &test_data_array[i]);
->> +}
->> +
->> +void test_stream_uring_msg_zc_client(const struct test_opts *opts)
->> +{
->> +      int i;
->> +
->> +      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->> +              vsock_io_uring_client(opts, &test_data_array[i], true);
->> +}
->> +
->> +static struct test_case test_cases[] = {
->> +      {
->> +              .name = "SOCK_STREAM io_uring test",
->> +              .run_server = test_stream_uring_server,
->> +              .run_client = test_stream_uring_client,
->> +      },
->> +      {
->> +              .name = "SOCK_STREAM io_uring MSG_ZEROCOPY test",
->> +              .run_server = test_stream_uring_msg_zc_server,
->> +              .run_client = test_stream_uring_msg_zc_client,
->> +      },
->> +      {},
->> +};
->> +
->> +static const char optstring[] = "";
->> +static const struct option longopts[] = {
->> +      {
->> +              .name = "control-host",
->> +              .has_arg = required_argument,
->> +              .val = 'H',
->> +      },
->> +      {
->> +              .name = "control-port",
->> +              .has_arg = required_argument,
->> +              .val = 'P',
->> +      },
->> +      {
->> +              .name = "mode",
->> +              .has_arg = required_argument,
->> +              .val = 'm',
->> +      },
->> +      {
->> +              .name = "peer-cid",
->> +              .has_arg = required_argument,
->> +              .val = 'p',
->> +      },
->> +      {
->> +              .name = "help",
->> +              .has_arg = no_argument,
->> +              .val = '?',
->> +      },
->> +      {},
->> +};
->> +
->> +static void usage(void)
->> +{
->> +      fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
->> +              "\n"
->> +              "  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
->> +              "  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
->> +              "\n"
->> +              "Run transmission tests using io_uring. Usage is the same as\n"
->> +              "in ./vsock_test\n"
->> +              "\n"
->> +              "Options:\n"
->> +              "  --help                 This help message\n"
->> +              "  --control-host <host>  Server IP address to connect to\n"
->> +              "  --control-port <port>  Server port to listen on/connect to\n"
->> +              "  --mode client|server   Server or client mode\n"
->> +              "  --peer-cid <cid>       CID of the other side\n"
->> +              );
->> +      exit(EXIT_FAILURE);
->> +}
->> +
->> +int main(int argc, char **argv)
->> +{
->> +      const char *control_host = NULL;
->> +      const char *control_port = NULL;
->> +      struct test_opts opts = {
->> +              .mode = TEST_MODE_UNSET,
->> +              .peer_cid = VMADDR_CID_ANY,
->> +      };
->> +
->> +      init_signals();
->> +
->> +      for (;;) {
->> +              int opt = getopt_long(argc, argv, optstring, longopts, NULL);
->> +
->> +              if (opt == -1)
->> +                      break;
->> +
->> +              switch (opt) {
->> +              case 'H':
->> +                      control_host = optarg;
->> +                      break;
->> +              case 'm':
->> +                      if (strcmp(optarg, "client") == 0) {
->> +                              opts.mode = TEST_MODE_CLIENT;
->> +                      } else if (strcmp(optarg, "server") == 0) {
->> +                              opts.mode = TEST_MODE_SERVER;
->> +                      } else {
->> +                              fprintf(stderr, "--mode must be \"client\" or \"server\"\n");
->> +                              return EXIT_FAILURE;
->> +                      }
->> +                      break;
->> +              case 'p':
->> +                      opts.peer_cid = parse_cid(optarg);
->> +                      break;
->> +              case 'P':
->> +                      control_port = optarg;
->> +                      break;
->> +              case '?':
->> +              default:
->> +                      usage();
->> +              }
->> +      }
->> +
->> +      if (!control_port)
->> +              usage();
->> +      if (opts.mode == TEST_MODE_UNSET)
->> +              usage();
->> +      if (opts.peer_cid == VMADDR_CID_ANY)
->> +              usage();
->> +
->> +      if (!control_host) {
->> +              if (opts.mode != TEST_MODE_SERVER)
->> +                      usage();
->> +              control_host = "0.0.0.0";
->> +      }
->> +
->> +      control_init(control_host, control_port,
->> +                   opts.mode == TEST_MODE_SERVER);
->> +
->> +      run_tests(test_cases, &opts);
->> +
->> +      control_cleanup();
->> +
->> +      return 0;
->> +}
->> --
->> 2.25.1
->>
-> 
+ arch/x86/include/asm/kvm_host.h      |  10 ++++++++
+ arch/x86/include/uapi/asm/kvm_para.h |   9 +++++++
+ arch/x86/kernel/apic/apic.c          |  47 ++++++++++++++++++++++++++++++++++-
+ arch/x86/kernel/kvm.c                |  13 ++++++++++
+ arch/x86/kvm/cpuid.c                 |   1 +
+ arch/x86/kvm/lapic.c                 | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ arch/x86/kvm/lapic.h                 |   4 +++
+ arch/x86/kvm/x86.c                   |  26 ++++++++++++++++++++
+ 8 files changed, 229 insertions(+), 9 deletions(-)
