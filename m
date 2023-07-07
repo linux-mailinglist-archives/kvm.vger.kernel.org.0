@@ -2,81 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D88E774B35C
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 16:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99E3474B35D
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 16:55:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233116AbjGGOy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 10:54:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39044 "EHLO
+        id S233088AbjGGOzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 10:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233088AbjGGOy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232942AbjGGOy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 7 Jul 2023 10:54:58 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E737E211D;
-        Fri,  7 Jul 2023 07:54:54 -0700 (PDT)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367ElpCw006311;
-        Fri, 7 Jul 2023 14:54:54 GMT
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0542122;
+        Fri,  7 Jul 2023 07:54:55 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367Ep3Ej026841;
+        Fri, 7 Jul 2023 14:54:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=4RrXp7ERIdUDp7nSEyIjv8QbkM92ocDvPwuWR9MTn48=;
- b=CLBd7je0LFBioA7r4KekHdQbKN/UOr7vLPwJ/gY43oskTHmMzAvIUsD4dJl7XTw1+IuA
- iIes+I5gu2T1UzjWn5bLteZ/AlrPTR9ItghOhumM7aB2vNl6/mE9FXCguAzAHYczUj1G
- hhVJjty0Or0VfUHGXgbrxF04EbntEfufKdhEOVcixpKT4r2eZjSfYjCH6FSsx+CoqsmH
- sEAKuuPT/1ubkAjaWEBiasgLOCAiCLrKXWqi486rOE+yJKwN//Weo/OA61WlXpqYSySw
- X71mDYPNcUqUNUcXMdE1zNp/CjxYc+TWV6+KuBctjk+isqbEHnkZcQGldl4m6/xY/Ndz aA== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=d51gIPBqumhmoz8tY6ExeotkiiiMsbvxNlzIaZJ9nBE=;
+ b=gvWFGYYFB3Nv+sAp+D1v5OqqBds05qwVZJn2OZQ94Sq1QyBlg9zhIp15AXVvowlQihMS
+ MSo/uxXTcz0Tq8tpYFJltSsVwCXcbM5MjKUSuf2Ji2G2+dqHbDvC2RqSP/cBcLpyNAvg
+ dCBD/tnSy7Xy+K9J7RZqCmZZQUpcLr0Q+Z90tpLn/9BR/unBGQgvWATPnd7/GpSchMP0
+ Bsof6dm80N1COrI4Y741unh1Ymdkdu9+5Ui3uFELyPEzX6y8hHlYzYeOSfMrUAQOZ56Q
+ 1gIgQIe6iKtGNCiggfI/AXYDUx245eau49McXYINTZy9cyHeEJ/FeS18JEioTPzmgeVR 6A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpmsd84yp-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpmu4g3e6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Jul 2023 14:54:53 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 367EonO2013784;
-        Fri, 7 Jul 2023 14:54:53 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpmsd84y1-1
+        Fri, 07 Jul 2023 14:54:55 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 367EpNEU027856;
+        Fri, 7 Jul 2023 14:54:54 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpmu4g3d4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Jul 2023 14:54:53 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 367BJ9eD000334;
-        Fri, 7 Jul 2023 14:54:51 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3rjbs52ynv-1
+        Fri, 07 Jul 2023 14:54:54 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3677lTER022404;
+        Fri, 7 Jul 2023 14:54:52 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rjbs4tyb7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Jul 2023 14:54:51 +0000
+        Fri, 07 Jul 2023 14:54:52 +0000
 Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 367Esl4Z1442366
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 367Esm1b16712310
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Jul 2023 14:54:47 GMT
+        Fri, 7 Jul 2023 14:54:49 GMT
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C88112004D;
-        Fri,  7 Jul 2023 14:54:47 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D9A4B2004B;
+        Fri,  7 Jul 2023 14:54:48 +0000 (GMT)
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA24120040;
-        Fri,  7 Jul 2023 14:54:46 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0217C20043;
+        Fri,  7 Jul 2023 14:54:48 +0000 (GMT)
 Received: from linux6.. (unknown [9.114.12.104])
         by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Jul 2023 14:54:46 +0000 (GMT)
+        Fri,  7 Jul 2023 14:54:47 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         thuth@redhat.com, david@redhat.com, nsg@linux.ibm.com,
         nrb@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 0/2] s390x: Improve console handling
-Date:   Fri,  7 Jul 2023 14:54:08 +0000
-Message-Id: <20230707145410.1679-1-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 1/2] lib: s390x: sclp: Add carriage return to line feed
+Date:   Fri,  7 Jul 2023 14:54:09 +0000
+Message-Id: <20230707145410.1679-2-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230707145410.1679-1-frankja@linux.ibm.com>
+References: <20230707145410.1679-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: tdjqpM-CUiiqoiEGFlua1USBp-0F-0B6
-X-Proofpoint-GUID: ZvVYbwCGqN94BEqmAwuW713jPrS4IK8N
+X-Proofpoint-ORIG-GUID: Ho7voHLAJgz_xmg-tDVleunvI-e8O_SL
+X-Proofpoint-GUID: Eps1vMi9Cj9p_MUE3eKddyo5RTH7izxw
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-07_10,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 spamscore=0 impostorscore=0
- mlxscore=0 suspectscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=772
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 bulkscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 spamscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2305260000 definitions=main-2307070134
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
@@ -88,32 +91,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Console IO is and has been in a state of "works for me". I don't think
-that will change soon since there's no need for a proper console
-driver when all we want is the ability to print or read a line at a
-time.
+Without the \r the output of the HMC ASCII console takes a lot of
+additional effort to read in comparison to the line mode console.
 
-However since input is only supported on the ASCII console I was
-forced to use it on the HMC. The HMC generally does not add a \r on a
-\n so each line doesn't necessarily start at column 0. It's time to
-finally fix that.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ lib/s390x/sclp-console.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-Also, since there are environments that only provide the line-mode
-console it's time to add line-mode input to properly support them.
-
-rfc -> v1:
-	- Switched to \r\n from \n\r
-	- Removed console clear
-	- Added truncation logic to maintain 2k limit
-
-Janosch Frank (2):
-  lib: s390x: sclp: Add carriage return to line feed
-  lib: s390x: sclp: Add line mode input handling
-
- lib/s390x/sclp-console.c | 193 +++++++++++++++++++++++++++++++++++----
- lib/s390x/sclp.h         |  26 +++++-
- 2 files changed, 198 insertions(+), 21 deletions(-)
-
+diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+index 19c74e46..66572774 100644
+--- a/lib/s390x/sclp-console.c
++++ b/lib/s390x/sclp-console.c
+@@ -97,14 +97,31 @@ static void sclp_print_ascii(const char *str)
+ {
+ 	int len = strlen(str);
+ 	WriteEventData *sccb = (void *)_sccb;
++	char *str_dest = (char *)&sccb->msg;
++	int i = 0, j = 0;
+ 
+ 	sclp_mark_busy();
+ 	memset(sccb, 0, sizeof(*sccb));
++
++	/*
++	 * Copy the string over and add a \r to all \n since the HMC
++	 * ASCII console requires it.
++	 */
++	for (; i < len && j < (PAGE_SIZE / 2); i++) {
++		if (str[i] == '\n') {
++			str_dest[j] = '\r';
++			j++;
++		}
++		str_dest[j] = str[i];
++		j++;
++	}
++
++	/* len has changed since we might have added \r */
++	len = j;
+ 	sccb->h.length = offsetof(WriteEventData, msg) + len;
+ 	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
+ 	sccb->ebh.length = sizeof(EventBufferHeader) + len;
+ 	sccb->ebh.type = SCLP_EVENT_ASCII_CONSOLE_DATA;
+-	memcpy(&sccb->msg, str, len);
+ 
+ 	sclp_service_call(SCLP_CMD_WRITE_EVENT_DATA, sccb);
+ }
 -- 
 2.34.1
 
