@@ -2,361 +2,399 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12CF674AEB7
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 12:27:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B308474AF83
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 13:10:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232593AbjGGK1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 06:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44086 "EHLO
+        id S232439AbjGGLJ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 07:09:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjGGK1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 06:27:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564611B6
-        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 03:26:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688725593;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=l9uA3+6C8czFWrHbeU5PWZu0llUuglU6MsiOJc1L2uI=;
-        b=U+jHinJXfZLXxbTY52/vI5MPAkGIPqiZux8txWSeXmbi4IhEaQEs5NlZoguUrRSyTok56W
-        k3XfGDkFdTpgsRcjRho8jPKpn035pVE6CMFtncKUV+n+0davGsivtwZ+uQDbpc5m9+YisF
-        urjWb7yHlISuui/J/okDNebRD57+phk=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-ETRLWMhiOzKyFf9n1N-_cw-1; Fri, 07 Jul 2023 06:26:31 -0400
-X-MC-Unique: ETRLWMhiOzKyFf9n1N-_cw-1
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-c5fc972760eso1734122276.1
-        for <kvm@vger.kernel.org>; Fri, 07 Jul 2023 03:26:31 -0700 (PDT)
+        with ESMTP id S229642AbjGGLJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 07:09:56 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B98172B
+        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 04:09:53 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1b078b34df5so1755414fac.2
+        for <kvm@vger.kernel.org>; Fri, 07 Jul 2023 04:09:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688728193; x=1691320193;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gA87/TMoO+oxcM9nNucuuBjcg2ftxsHvjEP7OyTBHw4=;
+        b=otEI68GFiyzx942GzdZUpL0VBCp3zJjuWGGSAqon9wRLRX+gdaL6bPUGvEWMJ+mBB6
+         PD91OYesInv9b93kLWMoV+9I27QpeOL62CGqZQiC6eSD0BV6O8/4ceZpqdPKaRrrdwA7
+         fdPPa/nD6P1cSlIeJh9zFbu6+a49nfzh/UZFEySsyhxi0No5ouqWfTFQ4/IVXOrNHnZS
+         jZXpRq/cLgb2iL3tf11oz7CEOIG7YKhayy6DOhrQWsfHvjWZJRFw7NmGd9xIXT38uDxE
+         RAVR8PT6Wg5sixBwTzdpHlZdBIXaKa6XBsq/yJXyJwwzKkEQZigGbtHn4hLf9tVrI+++
+         B1Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688725591; x=1691317591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l9uA3+6C8czFWrHbeU5PWZu0llUuglU6MsiOJc1L2uI=;
-        b=ejHpD9ID2+4B80LrHSFmjyU1kxWzUfS/SiSSSzFNNTJg26pIVqpoTD7yHk19MDYLrX
-         qlZM37cva+gpyAZm5M/b+VKtwaJzC7rSM/8Yqfxse+waH2A8XMEd0f6VVJdbmvhsLPdZ
-         AebgMZ5mYupE8ZPhqmZ8h13cu99h1z0ddtuNVs0rXtkXySsZAO9ZoI+G32dyg/KLlL5k
-         YpzzszE9QZDszaKozal1GZXHfRfaWZxrnS9cxfmo2c1zEH26bl/g7nAGspq0lM/8tzt2
-         Lr7TRH1LAiyh/SL5hJXgTR2VTTFkrbJYjU15e3RDRuirzSFxgijbZEcSjx70dc0mrOZL
-         084A==
-X-Gm-Message-State: ABy/qLbIhrZA2fLSIjsfzgRiso9WPiqLtF3sPu4cm6O0kE3k3eU/mdhn
-        Nzb7Aj39MIc1ahhD9UCbrfrgJq2NV8dk7uE+U/GO/UN533fAQG2GXV+4UGkF9kz6exNqHlDXVA2
-        7i+JY/CNDi9QAbRYxMjK+qEVNnQeH
-X-Received: by 2002:a25:9d0d:0:b0:c5e:168c:72f8 with SMTP id i13-20020a259d0d000000b00c5e168c72f8mr3816546ybp.31.1688725590997;
-        Fri, 07 Jul 2023 03:26:30 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHFfR+HB16RaNn8E06+qB/HUi3xKPCzbR0jJx4SJpdKzJsTRsNQo/dOxZKtprgsX1KxB9yKeDaDkO95DqxRmpI=
-X-Received: by 2002:a25:9d0d:0:b0:c5e:168c:72f8 with SMTP id
- i13-20020a259d0d000000b00c5e168c72f8mr3816533ybp.31.1688725590714; Fri, 07
- Jul 2023 03:26:30 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688728193; x=1691320193;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gA87/TMoO+oxcM9nNucuuBjcg2ftxsHvjEP7OyTBHw4=;
+        b=lPAE79zGOlm24Dw9Zx1xJKN5Y521yUTWITsBxwWHN/yoLCRECP6dw+Y9sK6Nphzhgx
+         T1mmsowO5Zi4TYbXmsvBilsoV87kb+QukbEiRoW0170pdy4VmvALn9CB11lbYhDazYRX
+         qaU2IiUmPYBfpU8tULBf5THfQoHBbit9T9vqNVYsep0kipxUd4g5JOBwP9ekSyrG10So
+         QAMt89ou7HBYSebF483cQo5WBNGJ9IAgo/JOfUAfTyPNoIGnvaz+jDIEU++gEBeO3NIk
+         PmNadEx7tAQzo1NjgJLpiLvm8gioCWYsJt6VNaV95obFsbWKkBTcbZoijxlJ63RWG9LD
+         gJJg==
+X-Gm-Message-State: ABy/qLb6hWh9jlncxD7WyyuSoCYAV4RlGVa5jLQGhfXCu54xw6mYQcOG
+        0ZPdytwc1XKHtbvQZS3TDys=
+X-Google-Smtp-Source: APBJJlGMPoNqtENxEw8auHksj2/M6Akcet5aMyi9N3gfFNfvVf9E6K5umAt4DjVQAvPiwFTLRXs2yw==
+X-Received: by 2002:a05:6871:a4:b0:1b4:624a:fb9 with SMTP id u36-20020a05687100a400b001b4624a0fb9mr51388oaa.46.1688728192602;
+        Fri, 07 Jul 2023 04:09:52 -0700 (PDT)
+Received: from ?IPV6:2804:14c:f435:9162::1002? ([2804:14c:f435:9162::1002])
+        by smtp.gmail.com with ESMTPSA id u17-20020a05687004d100b001b36c56e6a7sm1644593oam.44.2023.07.07.04.09.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jul 2023 04:09:52 -0700 (PDT)
+Message-ID: <b0047746-5b36-c39b-c669-055d08ca3164@gmail.com>
+Date:   Fri, 7 Jul 2023 08:09:47 -0300
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
- <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
- <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
- <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com>
- <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com> <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
-In-Reply-To: <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 7 Jul 2023 12:25:54 +0200
-Message-ID: <CAJaqyWfLFGGZa2Ue=n4cD3z329_z1p8Vr9X_ceBn+eBQ6LyjQw@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v6] ppc: Enable 2nd DAWR support on p10
+Content-Language: en-US
+To:     Shivaprasad G Bhat <sbhat@linux.ibm.com>,
+        david@gibson.dropbear.id.au
+Cc:     clg@kaod.org, groug@kaod.org, harshpb@linux.ibm.com,
+        npiggin@gmail.com, pbonzini@redhat.com, qemu-ppc@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org, ravi.bangoria@amd.com
+References: <168871963321.58984.15628382614621248470.stgit@ltcd89-lp2>
+From:   Daniel Henrique Barboza <danielhb413@gmail.com>
+In-Reply-To: <168871963321.58984.15628382614621248470.stgit@ltcd89-lp2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 7, 2023 at 9:57=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Thu, Jul 6, 2023 at 5:39=E2=80=AFPM Eugenio Perez Martin <eperezma@red=
-hat.com> wrote:
-> >
-> > On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com=
-> wrote:
-> > >
-> > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.co=
-m> wrote:
-> > > >
-> > > > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperez=
-ma@redhat.com> wrote:
-> > > > >
-> > > > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redha=
-t.com> wrote:
-> > > > > >
-> > > > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@=
-redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin =
-<mst@redhat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez M=
-artin wrote:
-> > > > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsir=
-kin <mst@redhat.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Per=
-ez Martin wrote:
-> > > > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. T=
-sirkin <mst@redhat.com> wrote:
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio=
- P=C3=A9rez wrote:
-> > > > > > > > > > > > > > With the current code it is accepted as long as=
- userland send it.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Although userland should not set a feature flag=
- that has not been
-> > > > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, =
-the current code will not
-> > > > > > > > > > > > > > complain for it.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Since there is no specific reason for any paren=
-t to reject that backend
-> > > > > > > > > > > > > > feature bit when it has been proposed, let's co=
-ntrol it at vdpa frontend
-> > > > > > > > > > > > > > level. Future patches may move this control to =
-the parent driver.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEN=
-D_F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@red=
-hat.com>
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Please do send v3. And again, I don't want to sen=
-d "after driver ok" hack
-> > > > > > > > > > > > > upstream at all, I merged it in next just to give=
- it some testing.
-> > > > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > Current devices do not support that semantic.
-> > > > > > > > > > >
-> > > > > > > > > > > Which devices specifically access the ring after DRIV=
-ER_OK but before
-> > > > > > > > > > > a kick?
-> > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > Previous versions of the QEMU LM series did a spurious =
-kick to start
-> > > > > > > > > > traffic at the LM destination [1]. When it was proposed=
-, that spurious
-> > > > > > > > > > kick was removed from the series because to check for d=
-escriptors
-> > > > > > > > > > after driver_ok, even without a kick, was considered wo=
-rk of the
-> > > > > > > > > > parent driver.
-> > > > > > > > > >
-> > > > > > > > > > I'm ok to go back to this spurious kick, but I'm not su=
-re if the hw
-> > > > > > > > > > will read the ring before the kick actually. I can ask.
-> > > > > > > > > >
-> > > > > > > > > > Thanks!
-> > > > > > > > > >
-> > > > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/20=
-23-01/msg02775.html
-> > > > > > > > >
-> > > > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_=
-OK too, no?
-> > > > > > > >
-> > > > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This se=
-ems
-> > > > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > > > > > >
-> > > > > > > > But this reminds me one thing, as the thread is going too l=
-ong, I
-> > > > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_R=
-ESET is
-> > > > > > > > supported?
-> > > > > > > >
-> > > > > > > > Thanks
-> > > > > > >
-> > > > > > > I don't see what does one have to do with another ...
-> > > > > > >
-> > > > > > > I think with RING_RESET we had another solution, enable rings
-> > > > > > > mapping them to a zero page, then reset and re-enable later.
-> > > > > >
-> > > > > > As discussed before, this seems to have some problems:
-> > > > > >
-> > > > > > 1) The behaviour is not clarified in the document
-> > > > > > 2) zero is a valid IOVA
-> > > > > >
-> > > > >
-> > > > > I think we're not on the same page here.
-> > > > >
-> > > > > As I understood, rings mapped to a zero page means essentially an
-> > > > > avail ring whose avail_idx is always 0, offered to the device ins=
-tead
-> > > > > of the guest's ring. Once all CVQ commands are processed, we use
-> > > > > RING_RESET to switch to the right ring, being guest's or SVQ vrin=
-g.
-> > > >
-> > > > I get this. This seems more complicated in the destination: shadow =
-vq + ASID?
-> > >
-> > > So it's something like:
-> > >
-> > > 1) set all vq ASID to shadow virtqueue
-> > > 2) do not add any bufs to data qp (stick 0 as avail index)
-> > > 3) start to restore states via cvq
-> > > 4) ring_rest for dataqp
-> > > 5) set_vq_state for dataqp
-> > > 6) re-initialize dataqp address etc
-> > > 7) set data QP ASID to guest
-> > > 8) set queue_enable
-> > >
-> > > ?
-> > >
-> >
-> > I think the change of ASID is not needed, as the guest cannot access
-> > the device in that timeframe anyway.
->
-> Yes but after the restore, we still want to shadow cvq, so ASID is still =
-needed?
->
+This one was a buzzer shot.
 
-Device or parent driver support for ASID is needed to shadow only CVQ.
-Bue the device may not support the switch of ASID after DRIVER_OK.
 
-Since dataplane can go in passthrough ASID all the time, we don't need
-to switch it after DRIVER_OK.
+Queued in gitlab.com/danielhb/qemu/tree/ppc-next. Thanks,
 
-> Thanks
->
-> > Moreover, it may require HW
-> > support. So steps 1 and 7 are not needed.
-> >
-> > Apart from that, the process is right.
-> >
-> >
-> > > Thanks
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > >
-> > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > > > > My plan was to convert
-> > > > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa=
- ops. Sorry if I
-> > > > > > > > > > > > was not explicit enough.
-> > > > > > > > > > > >
-> > > > > > > > > > > > The only solution I can see to that is to trap & em=
-ulate in the vdpa
-> > > > > > > > > > > > (parent?) driver, as talked in virtio-comment. But =
-that complicates
-> > > > > > > > > > > > the architecture:
-> > > > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > > > > > * Store vq enable state separately, at
-> > > > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit =
-that enable to hw
-> > > > > > > > > > > > * Store the doorbell state separately, but do not c=
-onfigure it to the
-> > > > > > > > > > > > device directly.
-> > > > > > > > > > > >
-> > > > > > > > > > > > But how to recover if the device cannot configure t=
-hem at kick time,
-> > > > > > > > > > > > for example?
-> > > > > > > > > > > >
-> > > > > > > > > > > > Maybe we can just fail if the parent driver does no=
-t support enabling
-> > > > > > > > > > > > the vq after DRIVER_OK? That way no new feature fla=
-g is needed.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Thanks!
-> > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org=
-/pub/scm/linux/kernel/git/mst
-> > > > > > > > > > > > > > commit. Please let me know if I should send a v=
-3 of [1] instead.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244=
--mutt-send-email-mst@kernel.org/T/
-> > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-=
-)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vho=
-st/vdpa.c
-> > > > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_un=
-locked_ioctl(struct file *filep,
-> > > > > > > > > > > > > >  {
-> > > > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_d=
-ata;
-> > > > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->=
-vdpa->config;
-> > > > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > > > > > > -     u64 features;
-> > > > > > > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > > > > > > >       long r =3D 0;
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES=
-) {
-> > > > > > > > > > > > > >               if (copy_from_user(&features, fea=
-turep, sizeof(features)))
-> > > > > > > > > > > > > >                       return -EFAULT;
-> > > > > > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > > > > > +                     parent_features =3D ops->=
-get_backend_features(v->vdpa);
-> > > > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKE=
-ND_FEATURES |
-> > > > > > > > > > > > > >                                BIT_ULL(VHOST_BA=
-CKEND_F_SUSPEND) |
-> > > > > > > > > > > > > >                                BIT_ULL(VHOST_BA=
-CKEND_F_RESUME) |
-> > > > > > > > > > > > > > -                              BIT_ULL(VHOST_BA=
-CKEND_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > > > > > +                              parent_features)=
-)
-> > > > > > > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BAC=
-KEND_F_SUSPEND)) &&
-> > > > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > > > > > --
-> > > > > > > > > > > > > > 2.39.3
-> > > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > >
-> > > > > > >
-> > > > > >
-> > > > >
-> > >
-> >
->
 
+Daniel
+
+
+On 7/7/23 05:47, Shivaprasad G Bhat wrote:
+> From: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+> 
+> As per the PAPR, bit 0 of byte 64 in pa-features property
+> indicates availability of 2nd DAWR registers. i.e. If this bit is set, 2nd
+> DAWR is present, otherwise not. Use KVM_CAP_PPC_DAWR1 capability to find
+> whether kvm supports 2nd DAWR or not. If it's supported, allow user to set
+> the pa-feature bit in guest DT using cap-dawr1 machine capability. Though,
+> watchpoint on powerpc TCG guest is not supported and thus 2nd DAWR is not
+> enabled for TCG mode.
+> 
+> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> ---
+> Changelog:
+> v5: https://lore.kernel.org/all/20210412114433.129702-1-ravi.bangoria@linux.ibm.com/
+> v5->v6:
+>    - The other patches in the original series already merged.
+>    - Rebased to the top of the tree. So, the gen_spr_book3s_310_dbg() is renamed
+>      to register_book3s_310_dbg_sprs() and moved to cpu_init.c accordingly.
+>    - No functional changes.
+> 
+> v4: https://lore.kernel.org/r/20210406053833.282907-1-ravi.bangoria@linux.ibm.com
+> v3->v4:
+>    - Make error message more proper.
+> 
+> v3: https://lore.kernel.org/r/20210330095350.36309-1-ravi.bangoria@linux.ibm.com
+> v3->v4:
+>    - spapr_dt_pa_features(): POWER10 processor is compatible with 3.0
+>      (PCR_COMPAT_3_00). No need to ppc_check_compat(3_10) for now as
+>      ppc_check_compati(3_00) will also be true. ppc_check_compat(3_10)
+>      can be added while introducing pa_features_310 in future.
+>    - Use error_append_hint() for hints. Also add ERRP_GUARD().
+>    - Add kvmppc_set_cap_dawr1() stub function for CONFIG_KVM=n.
+> 
+> v2: https://lore.kernel.org/r/20210329041906.213991-1-ravi.bangoria@linux.ibm.com
+> v2->v3:
+>    - Don't introduce pa_features_310[], instead, reuse pa_features_300[]
+>      for 3.1 guests, as there is no difference between initial values of
+>      them atm.
+>    - Call gen_spr_book3s_310_dbg() from init_proc_POWER10() instead of
+>      init_proc_POWER8(). Also, Don't call gen_spr_book3s_207_dbg() from
+>      gen_spr_book3s_310_dbg() as init_proc_POWER10() already calls it.
+> 
+> v1: https://lore.kernel.org/r/20200723104220.314671-1-ravi.bangoria@linux.ibm.com
+> v1->v2:
+>    - Introduce machine capability cap-dawr1 to enable/disable
+>      the feature. By default, 2nd DAWR is OFF for guests even
+>      when host kvm supports it. User has to manually enable it
+>      with -machine cap-dawr1=on if he wishes to use it.
+>    - Split the header file changes into separate patch. (Sync
+>      headers from v5.12-rc3)
+> 
+> [1] https://git.kernel.org/torvalds/c/bd1de1a0e6eff
+> 
+>   hw/ppc/spapr.c         |    7 ++++++-
+>   hw/ppc/spapr_caps.c    |   32 ++++++++++++++++++++++++++++++++
+>   include/hw/ppc/spapr.h |    6 +++++-
+>   target/ppc/cpu.h       |    2 ++
+>   target/ppc/cpu_init.c  |   15 +++++++++++++++
+>   target/ppc/kvm.c       |   12 ++++++++++++
+>   target/ppc/kvm_ppc.h   |   12 ++++++++++++
+>   7 files changed, 84 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 54dbfd7fe9..1e54e0c719 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -241,7 +241,7 @@ static void spapr_dt_pa_features(SpaprMachineState *spapr,
+>           0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 48 - 53 */
+>           /* 54: DecFP, 56: DecI, 58: SHA */
+>           0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 54 - 59 */
+> -        /* 60: NM atomic, 62: RNG */
+> +        /* 60: NM atomic, 62: RNG, 64: DAWR1 (ISA 3.1) */
+>           0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
+>       };
+>       uint8_t *pa_features = NULL;
+> @@ -282,6 +282,9 @@ static void spapr_dt_pa_features(SpaprMachineState *spapr,
+>            * in pa-features. So hide it from them. */
+>           pa_features[40 + 2] &= ~0x80; /* Radix MMU */
+>       }
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_DAWR1)) {
+> +        pa_features[66] |= 0x80;
+> +    }
+> 
+>       _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
+>   }
+> @@ -2084,6 +2087,7 @@ static const VMStateDescription vmstate_spapr = {
+>           &vmstate_spapr_cap_fwnmi,
+>           &vmstate_spapr_fwnmi,
+>           &vmstate_spapr_cap_rpt_invalidate,
+> +        &vmstate_spapr_cap_dawr1,
+>           NULL
+>       }
+>   };
+> @@ -4683,6 +4687,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>       smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_ON;
+>       smc->default_caps.caps[SPAPR_CAP_FWNMI] = SPAPR_CAP_ON;
+>       smc->default_caps.caps[SPAPR_CAP_RPT_INVALIDATE] = SPAPR_CAP_OFF;
+> +    smc->default_caps.caps[SPAPR_CAP_DAWR1] = SPAPR_CAP_OFF;
+> 
+>       /*
+>        * This cap specifies whether the AIL 3 mode for
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 5a0755d34f..2f2cf4a250 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -655,6 +655,28 @@ static void cap_ail_mode_3_apply(SpaprMachineState *spapr,
+>       }
+>   }
+> 
+> +static void cap_dawr1_apply(SpaprMachineState *spapr, uint8_t val,
+> +                               Error **errp)
+> +{
+> +    ERRP_GUARD();
+> +    if (!val) {
+> +        return; /* Disable by default */
+> +    }
+> +
+> +    if (tcg_enabled()) {
+> +        error_setg(errp, "DAWR1 not supported in TCG.");
+> +        error_append_hint(errp, "Try appending -machine cap-dawr1=off\n");
+> +    } else if (kvm_enabled()) {
+> +        if (!kvmppc_has_cap_dawr1()) {
+> +            error_setg(errp, "DAWR1 not supported by KVM.");
+> +            error_append_hint(errp, "Try appending -machine cap-dawr1=off\n");
+> +        } else if (kvmppc_set_cap_dawr1(val) < 0) {
+> +            error_setg(errp, "Error enabling cap-dawr1 with KVM.");
+> +            error_append_hint(errp, "Try appending -machine cap-dawr1=off\n");
+> +        }
+> +    }
+> +}
+> +
+>   SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>       [SPAPR_CAP_HTM] = {
+>           .name = "htm",
+> @@ -781,6 +803,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>           .type = "bool",
+>           .apply = cap_ail_mode_3_apply,
+>       },
+> +    [SPAPR_CAP_DAWR1] = {
+> +        .name = "dawr1",
+> +        .description = "Allow 2nd Data Address Watchpoint Register (DAWR1)",
+> +        .index = SPAPR_CAP_DAWR1,
+> +        .get = spapr_cap_get_bool,
+> +        .set = spapr_cap_set_bool,
+> +        .type = "bool",
+> +        .apply = cap_dawr1_apply,
+> +    },
+>   };
+> 
+>   static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+> @@ -923,6 +954,7 @@ SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+>   SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+>   SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI);
+>   SPAPR_CAP_MIG_STATE(rpt_invalidate, SPAPR_CAP_RPT_INVALIDATE);
+> +SPAPR_CAP_MIG_STATE(dawr1, SPAPR_CAP_DAWR1);
+> 
+>   void spapr_caps_init(SpaprMachineState *spapr)
+>   {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 538b2dfb89..47fffb921a 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -80,8 +80,10 @@ typedef enum {
+>   #define SPAPR_CAP_RPT_INVALIDATE        0x0B
+>   /* Support for AIL modes */
+>   #define SPAPR_CAP_AIL_MODE_3            0x0C
+> +/* DAWR1 */
+> +#define SPAPR_CAP_DAWR1                 0x0D
+>   /* Num Caps */
+> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_AIL_MODE_3 + 1)
+> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_DAWR1 + 1)
+> 
+>   /*
+>    * Capability Values
+> @@ -407,6 +409,7 @@ struct SpaprMachineState {
+>   #define H_SET_MODE_RESOURCE_SET_DAWR0           2
+>   #define H_SET_MODE_RESOURCE_ADDR_TRANS_MODE     3
+>   #define H_SET_MODE_RESOURCE_LE                  4
+> +#define H_SET_MODE_RESOURCE_SET_DAWR1           5
+> 
+>   /* Flags for H_SET_MODE_RESOURCE_LE */
+>   #define H_SET_MODE_ENDIAN_BIG    0
+> @@ -990,6 +993,7 @@ extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
+>   extern const VMStateDescription vmstate_spapr_cap_fwnmi;
+>   extern const VMStateDescription vmstate_spapr_cap_rpt_invalidate;
+>   extern const VMStateDescription vmstate_spapr_wdt;
+> +extern const VMStateDescription vmstate_spapr_cap_dawr1;
+> 
+>   static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
+>   {
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index af12c93ebc..64855935f7 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1588,9 +1588,11 @@ void ppc_compat_add_property(Object *obj, const char *name,
+>   #define SPR_PSPB              (0x09F)
+>   #define SPR_DPDES             (0x0B0)
+>   #define SPR_DAWR0             (0x0B4)
+> +#define SPR_DAWR1             (0x0B5)
+>   #define SPR_RPR               (0x0BA)
+>   #define SPR_CIABR             (0x0BB)
+>   #define SPR_DAWRX0            (0x0BC)
+> +#define SPR_DAWRX1            (0x0BD)
+>   #define SPR_HFSCR             (0x0BE)
+>   #define SPR_VRSAVE            (0x100)
+>   #define SPR_USPRG0            (0x100)
+> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+> index aeff71d063..c688e52928 100644
+> --- a/target/ppc/cpu_init.c
+> +++ b/target/ppc/cpu_init.c
+> @@ -5131,6 +5131,20 @@ static void register_book3s_207_dbg_sprs(CPUPPCState *env)
+>                           KVM_REG_PPC_CIABR, 0x00000000);
+>   }
+> 
+> +static void register_book3s_310_dbg_sprs(CPUPPCState *env)
+> +{
+> +    spr_register_kvm_hv(env, SPR_DAWR1, "DAWR1",
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        &spr_read_generic, &spr_write_generic,
+> +                        KVM_REG_PPC_DAWR1, 0x00000000);
+> +    spr_register_kvm_hv(env, SPR_DAWRX1, "DAWRX1",
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        SPR_NOACCESS, SPR_NOACCESS,
+> +                        &spr_read_generic, &spr_write_generic32,
+> +                        KVM_REG_PPC_DAWRX1, 0x00000000);
+> +}
+> +
+>   static void register_970_dbg_sprs(CPUPPCState *env)
+>   {
+>       /* Breakpoints */
+> @@ -6435,6 +6449,7 @@ static void init_proc_POWER10(CPUPPCState *env)
+>       /* Common Registers */
+>       init_proc_book3s_common(env);
+>       register_book3s_207_dbg_sprs(env);
+> +    register_book3s_310_dbg_sprs(env);
+> 
+>       /* Common TCG PMU */
+>       init_tcg_pmu_power8(env);
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index a8a935e267..05f68d2d91 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -89,6 +89,7 @@ static int cap_large_decr;
+>   static int cap_fwnmi;
+>   static int cap_rpt_invalidate;
+>   static int cap_ail_mode_3;
+> +static int cap_dawr1;
+> 
+>   static uint32_t debug_inst_opcode;
+> 
+> @@ -138,6 +139,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>       cap_ppc_nested_kvm_hv = kvm_vm_check_extension(s, KVM_CAP_PPC_NESTED_HV);
+>       cap_large_decr = kvmppc_get_dec_bits();
+>       cap_fwnmi = kvm_vm_check_extension(s, KVM_CAP_PPC_FWNMI);
+> +    cap_dawr1 = kvm_vm_check_extension(s, KVM_CAP_PPC_DAWR1);
+>       /*
+>        * Note: setting it to false because there is not such capability
+>        * in KVM at this moment.
+> @@ -2109,6 +2111,16 @@ int kvmppc_set_fwnmi(PowerPCCPU *cpu)
+>       return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
+>   }
+> 
+> +bool kvmppc_has_cap_dawr1(void)
+> +{
+> +    return !!cap_dawr1;
+> +}
+> +
+> +int kvmppc_set_cap_dawr1(int enable)
+> +{
+> +    return kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_DAWR1, 0, enable);
+> +}
+> +
+>   int kvmppc_smt_threads(void)
+>   {
+>       return cap_ppc_smt ? cap_ppc_smt : 1;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 611debc3ce..584916a6d1 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -67,6 +67,8 @@ bool kvmppc_has_cap_htm(void);
+>   bool kvmppc_has_cap_mmu_radix(void);
+>   bool kvmppc_has_cap_mmu_hash_v3(void);
+>   bool kvmppc_has_cap_xive(void);
+> +bool kvmppc_has_cap_dawr1(void);
+> +int kvmppc_set_cap_dawr1(int enable);
+>   int kvmppc_get_cap_safe_cache(void);
+>   int kvmppc_get_cap_safe_bounds_check(void);
+>   int kvmppc_get_cap_safe_indirect_branch(void);
+> @@ -352,6 +354,16 @@ static inline bool kvmppc_has_cap_xive(void)
+>       return false;
+>   }
+> 
+> +static inline bool kvmppc_has_cap_dawr1(void)
+> +{
+> +    return false;
+> +}
+> +
+> +static inline int kvmppc_set_cap_dawr1(int enable)
+> +{
+> +    abort();
+> +}
+> +
+>   static inline int kvmppc_get_cap_safe_cache(void)
+>   {
+>       return 0;
+> 
+> 
