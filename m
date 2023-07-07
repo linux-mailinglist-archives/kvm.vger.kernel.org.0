@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F1C2E74B614
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 20:06:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 793F974B628
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 20:13:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbjGGSGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 14:06:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58742 "EHLO
+        id S231929AbjGGSNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 14:13:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjGGSGO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 14:06:14 -0400
-Received: from mail-vk1-xa30.google.com (mail-vk1-xa30.google.com [IPv6:2607:f8b0:4864:20::a30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA882110
-        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 11:06:13 -0700 (PDT)
-Received: by mail-vk1-xa30.google.com with SMTP id 71dfb90a1353d-47e3c76fe7fso832444e0c.0
-        for <kvm@vger.kernel.org>; Fri, 07 Jul 2023 11:06:13 -0700 (PDT)
+        with ESMTP id S232735AbjGGSNl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 14:13:41 -0400
+Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 924262689
+        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 11:13:38 -0700 (PDT)
+Received: by mail-vk1-xa36.google.com with SMTP id 71dfb90a1353d-47e5cf4e347so830242e0c.3
+        for <kvm@vger.kernel.org>; Fri, 07 Jul 2023 11:13:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688753173; x=1691345173;
+        d=google.com; s=20221208; t=1688753617; x=1691345617;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TqypugKQXZjj/NYiOBpd9Ow35utqsr2sWxi8Xw/IL/w=;
-        b=f8AWRl/xIOmT1/naGq0CvDemv3Fh/xm/gc/2dITYuFqKGtBKaH66YsIkJzg5wqTiyN
-         Qs5oONLBe2h9wO8xvluWJ/l5uGd68P2ipVEXZmJAAlYBeY2GWA4ZvOIJHUKCiMWZ/Yhg
-         NX1JzexTWa0cWQwluGEXIXIg9Si8cfyRsCZJB1h72/qxdl80gVlvAautmX0cM+kY/vAO
-         XpKmYBmnHZHdHpFAgp/OHapIOHoXRhIcZRR8yYH9DsfBnxV0fk5pnOaFoMdxvv8/MlVP
-         RKxa852US+oL0f5OgN5fyhz/Xw1NYAFSK7Ug+JPE5OKq0KB51H/8YJvbSjwksGFmmxt+
-         ntJQ==
+        bh=wl3EtNl/p1Cktt9fRTEmIICzF7/RfPgCrlONVu2JLF8=;
+        b=eI1zn4t8Fh6JGMDJI5Bq+7k9dpO6L9rVaMjrtcmWYqrKPrO1lGvoMbJkHOfcaiJRuu
+         8ZcS1BjOpz6qzvA+9pcDi8DgVD2VZEcgbkRP7s4oBej2iD5vPASUI6/bfougCWgKO43P
+         rEPDKe/FvfuX94farPxg9s98aZydJ/J/L6rlBXiN6AXcJcnvLREy6w9Y/LEKYv8mqiy2
+         d9vVawDgwU9Nt8Ojzzr91B1hTG43ayZTAGEk6ATiupXwyhplsjkV6fc+Bxqn+kZNBHM7
+         IwoW71Fs7kXMoLYCT0sEKaMNCLSOXxg6zIhSzg6qiaUmVfJGk7LSUV1Kosj4ds6WvrT9
+         K4Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688753173; x=1691345173;
+        d=1e100.net; s=20221208; t=1688753617; x=1691345617;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TqypugKQXZjj/NYiOBpd9Ow35utqsr2sWxi8Xw/IL/w=;
-        b=DcGWM7yahFdqU/nhUMDRngT6QUKrbfYq6gWlfo/Y8pTcLOdDzabs9dsWJ3L8XnEXwj
-         /GJCd4wQeIK0ftzhI78Dem6+I4lkAuAcmXEHf+jRIA1Mu4q4U5q/AiTv9sQmSzuQ4teb
-         Yt3l06zM1YBjGYo+qw8tDamvgRG2TGdSOCQzg9gL8xpb/NpJmMTXQGTjXTB/h7z5vsdX
-         t6NS4JJLNtS22YNZgo35f1V3kgcKISHMw3Ur7fPtfuGvNUz4xloD0YnMKvYzO5MRiTxC
-         Z0ZB0mC8Tb+i3VnqKbx4M0M1EYO02dERq8xEPbc1K13n8+QJVAljCW/Q+73m0BDppaVO
-         ZkYg==
-X-Gm-Message-State: ABy/qLY6Evrw826jlRADMS+9fp2MDCSiLhY4FvcvmkQiQiVk55M3Zb+R
-        q9TNfVjJl7IC4L7VhWaRiUQNfj1hr3qV7rB1KiabpA==
-X-Google-Smtp-Source: APBJJlGi7OAkQcSYaK+NBRpEFW1iek9g+QZQvOeV63zyIQ3Jo0THiIx/dzD0Ma2Z0+/rSIsa8joQgLBMdgXTia2BfUM=
-X-Received: by 2002:a1f:db81:0:b0:471:2b9d:1e85 with SMTP id
- s123-20020a1fdb81000000b004712b9d1e85mr3250468vkg.14.1688753172966; Fri, 07
- Jul 2023 11:06:12 -0700 (PDT)
+        bh=wl3EtNl/p1Cktt9fRTEmIICzF7/RfPgCrlONVu2JLF8=;
+        b=WISa2Nvy8XO+diYxnJDk1wT4e27kkjH5K/G4RzBpx/pf0ULbLDgp1SNanmzKMsCJyR
+         zMRACEGKJQsqSTjpicgGL94kuDkEPp+nM0Sg0sfCNJyC70tzffEck3U92NRVRu1IN8kU
+         7tb4Dz1VC+BpjG9mOh+eDAX24xuXYgaXrSdw/IOkbOzPB5czMMgYZLhK1SQDbVqEAV7a
+         b53+eooFnt71+6oIjYoVqrz8u9dE0TNS4cQjVZUQ4rZCVd1Iun3PvY0LWMeiLFssPcof
+         BwrGE5m8YczVoEH/oDzqwff1zxjpm67KpXSIGOHv59RE0flZSnMt/vPIN1lZXzL2UndN
+         /MeQ==
+X-Gm-Message-State: ABy/qLYYM2NbnIJQmBiI1u6UO0WA2KSkn+JuHKmGvDmCqgDCIPUwuUuf
+        mlkqTh2bhKysMsZzDbniaCHtLqLjlDU+I5ucekZwrw==
+X-Google-Smtp-Source: APBJJlEeTRK3Fec77w837oSHwaixg5smdIYjkVaVUq4TvKapitjrP1VnWLoUGMQU/BcoXrFfefLWUw1J8FwYAXlfSXU=
+X-Received: by 2002:a1f:d2c5:0:b0:471:5110:49e8 with SMTP id
+ j188-20020a1fd2c5000000b00471511049e8mr4471582vkg.4.1688753617480; Fri, 07
+ Jul 2023 11:13:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-9-amoorthy@google.com>
- <ZIodEnUmwIv+Iuqd@google.com>
-In-Reply-To: <ZIodEnUmwIv+Iuqd@google.com>
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+ <ZIovIBVLIM69E5Bo@google.com>
+In-Reply-To: <ZIovIBVLIM69E5Bo@google.com>
 From:   Anish Moorthy <amoorthy@google.com>
-Date:   Fri, 7 Jul 2023 11:05:37 -0700
-Message-ID: <CAF7b7mr=v4oOMOaSWd2hYGCNc0JrUoiWki0WP52xZ1CJhU_=Zw@mail.gmail.com>
-Subject: Re: [PATCH v4 08/16] KVM: x86: Annotate -EFAULTs from kvm_handle_error_pfn()
+Date:   Fri, 7 Jul 2023 11:13:01 -0700
+Message-ID: <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
         kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
@@ -74,23 +74,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 1:03=E2=80=AFPM Sean Christopherson <seanjc@google.=
+On Wed, Jun 14, 2023 at 2:20=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
-> We have a helper for this too, gfn_round_for_level().  Ooh, but this isn'=
-t storing
-> a gfn, it's storing a gpa.  Naughty, naughty.
+> > +static inline bool kvm_slot_nowait_on_fault(
+> > +     const struct kvm_memory_slot *slot)
+>
+> Just when I was starting to think that we had beat all of the Google3 out=
+ of you :-)
 
-Caught in mischief I didn't even realize I was committing :O Anyways,
-I've taken all the feedback you provided here. Although,
+I was trying to stay under the line limit here :( But you've commented
+on that elsewhere. Fixed (hopefully :)
 
-> All that said, consuming fault->goal_level is unnecessary, and not be coi=
-ncidence.
-> The *only* time KVM should bail to userspace is if KVM failed to faultin =
-a 4KiB
-> page.  Providing a hugepage is done opportunistically, it's never a hard =
-requirement.
-> So throw away all of the above and see below.
+> And predicate helpers in KVM typically have "is" or "has" in the name, so=
+ that it's
+> clear the helper queries, versus e.g. sets the flag or something.
 
-I wonder if my arm64 patch commits the same error. I'll send an email
-over there asking Oliver about it.
+Done
+
+> KVM is anything but consistent, but if the helper is likely to be called =
+without
+> a known good memslot, it probably makes sense to have the helper check fo=
+r NULL,
+> e.g.
+
+Done: I was doing the null checks in other ways in the arch-specific
+code, but yeah it's easier to centralize that here.
+
+> However, do we actually need to force vendor code to query nowait?  At a =
+glance,
+> the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot(=
+) are
+> in flows that play nice with nowait or that don't support it at all.  So =
+I *think*
+> we can do this?
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index be06b09e9104..78024318286d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2403,6 +2403,11 @@ static bool memslot_is_readonly(const struct kvm_m=
+emory_slot *slot)
+>         return slot->flags & KVM_MEM_READONLY;
+>  }
+>
+> +static bool memslot_is_nowait_on_fault(const struct kvm_memory_slot *slo=
+t)
+> +{
+> +       return slot->flags & KVM_MEM_NOWAIT_ON_FAULT;
+> +}
+> +
+>  static unsigned long __gfn_to_hva_many(const struct kvm_memory_slot *slo=
+t, gfn_t gfn,
+>                                        gfn_t *nr_pages, bool write)
+>  {
+> @@ -2730,6 +2735,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_me=
+mory_slot *slot, gfn_t gfn,
+>                 writable =3D NULL;
+>         }
+>
+> +       if (async && memslot_is_nowait_on_fault(slot)) {
+> +               *async =3D false;
+> +               async =3D NULL;
+> +       }
+> +
+>         return hva_to_pfn(addr, atomic, interruptible, async, write_fault=
+,
+>                           writable);
+>  }
+
+Hmm, well not having to modify the vendor code would be nice... but
+I'll have to look more at __gfn_to_pfn_memslot()'s callers (and
+probably send more questions your way :). Hopefully it works out more
+like what you suggest.
