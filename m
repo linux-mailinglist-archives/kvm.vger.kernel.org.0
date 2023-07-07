@@ -2,346 +2,333 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EEEC74AC5F
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 09:58:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 927A274AC69
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 10:00:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232733AbjGGH6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 03:58:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43042 "EHLO
+        id S232763AbjGGIAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 04:00:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232698AbjGGH6b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 03:58:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189261FE6
-        for <kvm@vger.kernel.org>; Fri,  7 Jul 2023 00:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1688716664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mEpZPyCmaGemnrfXXAJXbPLd9RqjcNfujXNkxU7uJgg=;
-        b=Gl5TkiM/+Izmg0AgCUKtnpYWhIH8EEChGGzpzK+z9JdOdJ58SkehoTn/2kM5/fL84tn1WM
-        VXjMIYJ7AioWWWwXxRnF5XE1e2Ws70jbaA6grwL6prbKB+vYJ/MLTz7RgJp/2lEddC+cj0
-        pQ3nrekrqiHI4yS3E3nfeKEK28md5oA=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-jVd8cSPLOSu4ar-OU1RLsA-1; Fri, 07 Jul 2023 03:57:42 -0400
-X-MC-Unique: jVd8cSPLOSu4ar-OU1RLsA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b70c44b5fdso6095621fa.1
-        for <kvm@vger.kernel.org>; Fri, 07 Jul 2023 00:57:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688716660; x=1691308660;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mEpZPyCmaGemnrfXXAJXbPLd9RqjcNfujXNkxU7uJgg=;
-        b=fqoSN6eEOEhhLq0e7hkL71K8GtNUHxt+kFg9t69Vkq9AAGM70NKuNS74d5NdiP+ZoN
-         mZMzDC9FHr/fGHGwI7PoQvTui10cObLDfI294PgcYm5WFLUQQ90qD8Nr8mX0cIQEu6dM
-         XQfcdr5rT5WJGpFzHAJ0ojnuVzbcJxookm5mMYzBKu+o21uh+xea9pk2PxE00Lr1GdGV
-         Fetj0mXaubIRHD4OXQ+uWfx/5o/Q3CpwjqiMjXBjNNbIckJDcBd0KXrDK25f3anlqya/
-         yHPVE4lgDeGYaiH8+L0gS2i3/I6WglKKa8hzwXSA2AGrLS7xJHgnyZ0xFM6tt5ZgpvBa
-         q1+Q==
-X-Gm-Message-State: ABy/qLbkMW79d7fv6zwlnrDay5cGMcB2Pkj3nL9w5CoErjAhqKfPqguM
-        amKrIEYOibFTo1/dwOHhHgWTHkb0Q7DTHjlfbjx3ELWjiH7wtd895BqU1pNNPwfe/mR3LOfEoDb
-        sPWlAwwGTRP4Vd3W5Lf5Okw8BX+9t
-X-Received: by 2002:a2e:b44f:0:b0:2b6:f1ad:d535 with SMTP id o15-20020a2eb44f000000b002b6f1add535mr2897781ljm.14.1688716660601;
-        Fri, 07 Jul 2023 00:57:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGG1fs3IIGzeB+qQfUMI3hhjxPEwbtguF4w2sYwc43PKBLjt1WFHJckiuIlLy+s/ff9+yqeexlrDuimTasM8Xc=
-X-Received: by 2002:a2e:b44f:0:b0:2b6:f1ad:d535 with SMTP id
- o15-20020a2eb44f000000b002b6f1add535mr2897771ljm.14.1688716660214; Fri, 07
- Jul 2023 00:57:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
- <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
- <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
- <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com> <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
-In-Reply-To: <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 7 Jul 2023 15:57:28 +0800
-Message-ID: <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To:     Eugenio Perez Martin <eperezma@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S232134AbjGGIAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 04:00:42 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03686E6E;
+        Fri,  7 Jul 2023 01:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688716841; x=1720252841;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IsbVTnjxTAA4Ei/f3eIeXb4EV4uYOt03eZOtimba888=;
+  b=eKfRIsKzqseZZplibcN70z4vYJT2xxwrypptviNqyCv3+MQFLqV8DrKx
+   2GUpZr2QzpNRO5g74BmxvzPQWwMcJogtYi2K1BbtecpiFjBClcBYeYDSL
+   HWqBN3A4zCbwOHhmRWWtX8uZQ/kn+J0iFkqbYEsC3xwKEFaAIDsjuYorn
+   ZuFOgSX6dA+Ve/lT5XOpojEoZ7uVN4BUzxN0wrbMkNzpVrOjgwzLhF9ds
+   jpSkcZQkODJyK67P8FhTyvaIj0ZMFRua8CnWaXchLWmrqWxhfshy8h63p
+   w+oC+uF7s8lDAsC/TgZMtluCC6azs3UBZmWD4vNnBEU1vIuQcDLgkccne
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="363869560"
+X-IronPort-AV: E=Sophos;i="6.01,187,1684825200"; 
+   d="scan'208";a="363869560"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 01:00:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="670071904"
+X-IronPort-AV: E=Sophos;i="6.01,187,1684825200"; 
+   d="scan'208";a="670071904"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP; 07 Jul 2023 01:00:40 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 7 Jul 2023 01:00:40 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 7 Jul 2023 01:00:40 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 7 Jul 2023 01:00:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aP5xTnSN26B5IRWFfzh6ppHu44qBezOh/YkG9c9UhNQHjuGbP5TwcYuXM5FR3moat0tip+bSpSma0zdMJhjxg5/O+k8f5xeGgJ6zCj7euBU2judND3Kcul0y5A98JrcXuL8oSoVFsVHtEE4s39+Iiac+S5DlDknHgq8RduX5+Jbb/JFAnDRvsaeWfB97EjxZJhBAK9/q2rdy/OfbVpH7epXUX9tHd4YyGwSeUvwhXLvAgOWz4on+7T3cmBdYzT14Gx+d/D1PR4sb9GKXss1f89TSLuWOCqeFdTIfiDAXurdW/cpK7PQBVKt4b+f4SWA7/AzaO20p7UW3SuZXMsm9Cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NXqX7jojQZ5Iyr9cI+l5K/56BB4ItngPaEMK7f3an0o=;
+ b=degVHEueDt5tijEyfRK1o6D1uWkIhdUIN2TqcJxMtRwMcHKGO/ScQ2DDGgI1hu6HtHxjDlvzeNKlMBbabPCLJVBMKTrqYFBfga8JDKRGWhR4xlbzGwLPindbhOmgV5yApQizrgKf25GabsaQ4AICtz1Y+qSUCYZGV2siZwaru8/8Zmj2CXMqlJaQl9oxka5iRdl6SZHI7lOIhURKqPjvmOAwMoEkjJtEr4pOpgsXtAYrm1EX0DbXcNuPg4mwOtx9/csZhR5dDMKFQdpPUcNCSaDC8agohkXO+WeEf4ltjsFAqw9Zc/OQqq5QWkmJa1euEhZU3/XrWpDJ5c19eeVP4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SA2PR11MB5004.namprd11.prod.outlook.com (2603:10b6:806:112::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Fri, 7 Jul
+ 2023 08:00:38 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::806a:6364:af2:1aea]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::806a:6364:af2:1aea%6]) with mapi id 15.20.6565.019; Fri, 7 Jul 2023
+ 08:00:37 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Lixiao Yang <lixiao.yang@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Nicolin Chen" <nicolinc@nvidia.com>
+Subject: RE: [PATCH v7 14/19] iommufd: Add iommufd_device_replace()
+Thread-Topic: [PATCH v7 14/19] iommufd: Add iommufd_device_replace()
+Thread-Index: AQHZhzWxc9AQGNz7uk22Gbzehzlz5q+uQpiQ
+Date:   Fri, 7 Jul 2023 08:00:37 +0000
+Message-ID: <DS0PR11MB75290ABBADE3CC8C12B1AEDCC32DA@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <0-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
+ <14-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
+In-Reply-To: <14-v7-6c0fd698eda2+5e3-iommufd_alloc_jgg@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|SA2PR11MB5004:EE_
+x-ms-office365-filtering-correlation-id: 01f7aec7-7bc3-4506-8547-08db7ec03fd9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: npH2Gp1rGG+z5c+8mUhnzXwyRogJGdG9qdjwpoJ35mp9LH7nnK3hJGn05HY9HTTfGM6+p6bZSgyftFcVm2i5XnsMExtNvjNBWCksO7sZvFADsgqIy+YbBj/nhp24H88XbvuOBbBKnOJMkGdzmGvMK9dFRRX+ISJI0vL7nRjhcK9xqx/0QrSpQlmGkFElHQba8dr7DeHPbtECt/3N0vlAfszNgfCS1ipsyoIAF2LXTf6NWEPfArK8K1ImTnXB8sY3qrUVv9WPlf7sx8FDMV4Db7aHbczr+bgH/acyajZQ5Howc+90oSLZMm3lvvGTo1ubgolU9jMKrOsA6mRak/BUdOX2LT19mN4OG4vlsRmTSVOBcj3zG6O5Xolya3VS17zJnr78dqqSR2P7Wbl0jATIDytVnION2hlRTQ4dSzoi5HAyvzURZHJSoomp1ZuuoYLyCL6MJgy706ddWl528L56w++dEWFcE/idGr5EYH8gEreGz2TKa63hqn2nb2h+DWR5M/OkXnxQRSzBxGwJif54l4Ti9PHBcARwGchCvL1PaqfA0ELMDLnSkhvJYxY4nkeZwu+lV2pBZCDouNcyaIXUqPTt0DhAppuBLpc5qvJm0IyRsKSU0ZrnSboABFSg7fQC
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(346002)(376002)(396003)(136003)(451199021)(54906003)(110136005)(76116006)(71200400001)(478600001)(7696005)(186003)(26005)(83380400001)(6506007)(9686003)(2906002)(4326008)(66556008)(316002)(66476007)(64756008)(5660300002)(66946007)(8936002)(38100700002)(8676002)(41300700001)(52536014)(122000001)(66446008)(82960400001)(38070700005)(86362001)(33656002)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?deK9pbKeJSrC8lGnIeCHV7hBviaucQKlRxW2p12gmWhuLTJxczE03h+IeDL2?=
+ =?us-ascii?Q?enG/NgEDjAa3/nvaokX192nfN9CANY3/VVZYQTk7gMap8uzgDTRd/ZwNEn40?=
+ =?us-ascii?Q?fYBQwqEKBUPMGAzO9GO4OHN3Kuy2pUGiHQmfJ/MIA0cJGWh9s0pFGUg09s39?=
+ =?us-ascii?Q?u/CDVrS+txpsdfakpKDXUFpFsjvCkDwEX8rmB0/14/97XIX6QAFSHjTZWn66?=
+ =?us-ascii?Q?a52ucnz8VrCZEgenIKwonKzo8myWMXJG8IGo8wUS6NKLxI5Z3+pqhEOBmF47?=
+ =?us-ascii?Q?3vFia+blnMDCO64jpV5ixsmMizn1z11QRiJiTn3K1TuHQ6teC2Rb/tbuuidP?=
+ =?us-ascii?Q?bvG8A64gB0anpjxCIqZ1Da5/7zRCyG0IPw2fDNULWN4Ts79igjgzHZUWdtMf?=
+ =?us-ascii?Q?YEId9tjYWqb0l7yVQ7mQVTe5wix4/huLPL776/yISVshjpSLvnvv7Ih6m0+V?=
+ =?us-ascii?Q?fpbEgu90nFuTl+p0oAPFcSpJ+hfrxcz/rIgKqPxEuuV82Sc118tkduMYIoTc?=
+ =?us-ascii?Q?adrD/sH4imJVvFr9sCz8wTtAHbjSjsgnWBVdDs7ZzVdrDCTMWsYeoVQZP5b1?=
+ =?us-ascii?Q?MfkRd5gpyP+Wh4pyXFw1t3pREMb1ILJdN0/W6RqrHVv34zZgEGECKXtnqzw8?=
+ =?us-ascii?Q?KFJZ16wC27+kDZ11Lj4bXhkDq7qFUMtPBarqsoKWgL4iOcQ4yi9D9o2IgMFW?=
+ =?us-ascii?Q?eAuv2OXVpMUYp9GwX/ZT7f4ztH9ioU+roNZhBmbnRBEa0WkSyECqU3V9TFyl?=
+ =?us-ascii?Q?X8Jw3k6NpUnNIZq7Cx1HhOw2gvoeD0tolf+/4xPL9nu4KILklFh+I3LaXDqP?=
+ =?us-ascii?Q?RcGK29If/Vxa2qhArUauO4xhvM8oVsu0O7GSqACMljJHmQizfyRVOerEgkzV?=
+ =?us-ascii?Q?DhzJgq88kvXRt6shynF6CPZ+It0vpFBj8J0XDa2lyHnUiZwLa2hH2phGcnOv?=
+ =?us-ascii?Q?jXSYz35H06MgaZkO0hcZw25jIvigHZ9YzBdQfv65YepgYU9n2LnFfXjvPLcU?=
+ =?us-ascii?Q?8RJSaIzECaoaITGbZhod3fJ0jRUxT9jPNQqEKgBWyqPxXINCquK6tawJdI2y?=
+ =?us-ascii?Q?1pylKFWJaFm1j6HIQLaQLqrUTG5e6udvZUg4hsWiK/GqawfFgUaVyNkboUSw?=
+ =?us-ascii?Q?bx1rI3XhWjWvIZYhNnUV7Jq8x90Csdwnxuy4xlgRobRk/TRceRPey36LyBFh?=
+ =?us-ascii?Q?+Tret5DPNMX5QWyHnURdsu1ciDdFt85xAsLXu3sJtMVxI2Xc76VODbHuTUCp?=
+ =?us-ascii?Q?MghE2IT3rikxq88VkzCfBq7gnbJEF3LAali9AZ3b4PAGXo7z4RN0eNUR5zig?=
+ =?us-ascii?Q?i+yIWTVHV1jmr2lvAMoT+1FtxkxgZN38qWLxi70u9gUnC/TDQLV0SgorY53h?=
+ =?us-ascii?Q?x24+CKrsff+GHXjX+tuRGy+C8uHqAiNaen2/d5zWG/mnuTPS6OOuXjq57cEK?=
+ =?us-ascii?Q?im1VPOk1FapHqOP5cX1ZVehMMx/9sqWLISHIlyBkXCYDkFbZW8l2r1XIG7Vl?=
+ =?us-ascii?Q?fZHAfJ3+skGsOfwHacELg6W2KACvmcR/2cM8buJ64SMZbD4ZJfK1aFwuzgWW?=
+ =?us-ascii?Q?Noz+m4KAOOuNWQ0jr3c=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01f7aec7-7bc3-4506-8547-08db7ec03fd9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2023 08:00:37.2872
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7Xrym58rXRfbAUPGVY6BEdEsw80BuQ74RSEqe5Ya5m36EGMgQIwJKMcapJM5heggAYHTHpP+J6jQmmIGt5RpYw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5004
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 6, 2023 at 5:39=E2=80=AFPM Eugenio Perez Martin <eperezma@redha=
-t.com> wrote:
->
-> On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.com>=
- wrote:
-> > >
-> > > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperezma=
-@redhat.com> wrote:
-> > > >
-> > > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.=
-com> wrote:
-> > > > >
-> > > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@re=
-dhat.com> wrote:
-> > > > > >
-> > > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <m=
-st@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Mar=
-tin wrote:
-> > > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirki=
-n <mst@redhat.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez=
- Martin wrote:
-> > > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsi=
-rkin <mst@redhat.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=
-=C3=A9rez wrote:
-> > > > > > > > > > > > > With the current code it is accepted as long as u=
-serland send it.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Although userland should not set a feature flag t=
-hat has not been
-> > > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, th=
-e current code will not
-> > > > > > > > > > > > > complain for it.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Since there is no specific reason for any parent =
-to reject that backend
-> > > > > > > > > > > > > feature bit when it has been proposed, let's cont=
-rol it at vdpa frontend
-> > > > > > > > > > > > > level. Future patches may move this control to th=
-e parent driver.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_=
-F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redha=
-t.com>
-> > > > > > > > > > > >
-> > > > > > > > > > > > Please do send v3. And again, I don't want to send =
-"after driver ok" hack
-> > > > > > > > > > > > upstream at all, I merged it in next just to give i=
-t some testing.
-> > > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Current devices do not support that semantic.
-> > > > > > > > > >
-> > > > > > > > > > Which devices specifically access the ring after DRIVER=
-_OK but before
-> > > > > > > > > > a kick?
-> > > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Previous versions of the QEMU LM series did a spurious ki=
-ck to start
-> > > > > > > > > traffic at the LM destination [1]. When it was proposed, =
-that spurious
-> > > > > > > > > kick was removed from the series because to check for des=
-criptors
-> > > > > > > > > after driver_ok, even without a kick, was considered work=
- of the
-> > > > > > > > > parent driver.
-> > > > > > > > >
-> > > > > > > > > I'm ok to go back to this spurious kick, but I'm not sure=
- if the hw
-> > > > > > > > > will read the ring before the kick actually. I can ask.
-> > > > > > > > >
-> > > > > > > > > Thanks!
-> > > > > > > > >
-> > > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023=
--01/msg02775.html
-> > > > > > > >
-> > > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK=
- too, no?
-> > > > > > >
-> > > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seem=
-s
-> > > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > > > > >
-> > > > > > > But this reminds me one thing, as the thread is going too lon=
-g, I
-> > > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RES=
-ET is
-> > > > > > > supported?
-> > > > > > >
-> > > > > > > Thanks
-> > > > > >
-> > > > > > I don't see what does one have to do with another ...
-> > > > > >
-> > > > > > I think with RING_RESET we had another solution, enable rings
-> > > > > > mapping them to a zero page, then reset and re-enable later.
-> > > > >
-> > > > > As discussed before, this seems to have some problems:
-> > > > >
-> > > > > 1) The behaviour is not clarified in the document
-> > > > > 2) zero is a valid IOVA
-> > > > >
-> > > >
-> > > > I think we're not on the same page here.
-> > > >
-> > > > As I understood, rings mapped to a zero page means essentially an
-> > > > avail ring whose avail_idx is always 0, offered to the device inste=
-ad
-> > > > of the guest's ring. Once all CVQ commands are processed, we use
-> > > > RING_RESET to switch to the right ring, being guest's or SVQ vring.
-> > >
-> > > I get this. This seems more complicated in the destination: shadow vq=
- + ASID?
-> >
-> > So it's something like:
-> >
-> > 1) set all vq ASID to shadow virtqueue
-> > 2) do not add any bufs to data qp (stick 0 as avail index)
-> > 3) start to restore states via cvq
-> > 4) ring_rest for dataqp
-> > 5) set_vq_state for dataqp
-> > 6) re-initialize dataqp address etc
-> > 7) set data QP ASID to guest
-> > 8) set queue_enable
-> >
-> > ?
-> >
->
-> I think the change of ASID is not needed, as the guest cannot access
-> the device in that timeframe anyway.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Monday, May 15, 2023 10:00 PM
+>=20
+> Replace allows all the devices in a group to move in one step to a new
+> HWPT. Further, the HWPT move is done without going through a blocking
+> domain so that the IOMMU driver can implement some level of
+> non-distruption to ongoing DMA if that has meaning for it (eg for future
+> special driver domains)
+>=20
+> Replace uses a lot of the same logic as normal attach, except the actual
+> domain change over has different restrictions, and we are careful to
+> sequence things so that failure is going to leave everything the way it
+> was, and not get trapped in a blocking domain or something if there is
+> ENOMEM.
+>=20
+> Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/iommu/iommufd/device.c | 99 ++++++++++++++++++++++++++++++++++
+>  drivers/iommu/iommufd/main.c   |  1 +
+>  2 files changed, 100 insertions(+)
+>=20
+> diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/devic=
+e.c
+> index b7868c877d1c1c..ce758fbe3c525d 100644
+> --- a/drivers/iommu/iommufd/device.c
+> +++ b/drivers/iommu/iommufd/device.c
+> @@ -4,6 +4,7 @@
+>  #include <linux/iommufd.h>
+>  #include <linux/slab.h>
+>  #include <linux/iommu.h>
+> +#include "../iommu-priv.h"
+>=20
+>  #include "io_pagetable.h"
+>  #include "iommufd_private.h"
+> @@ -365,6 +366,84 @@ iommufd_device_do_attach(struct iommufd_device *idev=
+,
+>  	return NULL;
+>  }
+>=20
+> +static struct iommufd_hw_pagetable *
+> +iommufd_device_do_replace(struct iommufd_device *idev,
+> +			  struct iommufd_hw_pagetable *hwpt)
+> +{
+> +	struct iommufd_group *igroup =3D idev->igroup;
+> +	struct iommufd_hw_pagetable *old_hwpt;
+> +	unsigned int num_devices =3D 0;
+> +	struct iommufd_device *cur;
+> +	int rc;
+> +
+> +	mutex_lock(&idev->igroup->lock);
+> +
+> +	if (igroup->hwpt =3D=3D NULL) {
+> +		rc =3D -EINVAL;
+> +		goto err_unlock;
+> +	}
+> +
+> +	if (hwpt =3D=3D igroup->hwpt) {
+> +		mutex_unlock(&idev->igroup->lock);
+> +		return NULL;
+> +	}
+> +
+> +	/* Try to upgrade the domain we have */
+> +	list_for_each_entry(cur, &igroup->device_list, group_item) {
+> +		num_devices++;
+> +		if (cur->enforce_cache_coherency) {
+> +			rc =3D iommufd_hw_pagetable_enforce_cc(hwpt);
+> +			if (rc)
+> +				goto err_unlock;
+> +		}
+> +	}
+> +
+> +	old_hwpt =3D igroup->hwpt;
+> +	if (hwpt->ioas !=3D old_hwpt->ioas) {
+> +		list_for_each_entry(cur, &igroup->device_list, group_item) {
+> +			rc =3D iopt_table_enforce_dev_resv_regions(
+> +				&hwpt->ioas->iopt, cur->dev, NULL);
+> +			if (rc)
+> +				goto err_unresv;
+> +		}
+> +	}
+> +
+> +	rc =3D iommufd_group_setup_msi(idev->igroup, hwpt);
+> +	if (rc)
+> +		goto err_unresv;
+> +
+> +	rc =3D iommu_group_replace_domain(igroup->group, hwpt->domain);
+> +	if (rc)
+> +		goto err_unresv;
+> +
+> +	if (hwpt->ioas !=3D old_hwpt->ioas) {
+> +		list_for_each_entry(cur, &igroup->device_list, group_item)
+> +			iopt_remove_reserved_iova(&old_hwpt->ioas->iopt,
+> +						  cur->dev);
+> +	}
+> +
+> +	igroup->hwpt =3D hwpt;
+> +
+> +	/*
+> +	 * Move the refcounts held by the device_list to the new hwpt. Retain a
+> +	 * refcount for this thread as the caller will free it.
+> +	 */
+> +	refcount_add(num_devices, &hwpt->obj.users);
+> +	if (num_devices > 1)
+> +		WARN_ON(refcount_sub_and_test(num_devices - 1,
+> +					      &old_hwpt->obj.users));
+> +	mutex_unlock(&idev->igroup->lock);
+> +
+> +	/* Caller must destroy old_hwpt */
+> +	return old_hwpt;
+> +err_unresv:
+> +	list_for_each_entry(cur, &igroup->device_list, group_item)
+> +		iopt_remove_reserved_iova(&hwpt->ioas->iopt, cur->dev);
+> +err_unlock:
+> +	mutex_unlock(&idev->igroup->lock);
+> +	return ERR_PTR(rc);
+> +}
+> +
+>  typedef struct iommufd_hw_pagetable *(*attach_fn)(
+>  	struct iommufd_device *idev, struct iommufd_hw_pagetable *hwpt);
+>=20
+> @@ -523,6 +602,26 @@ int iommufd_device_attach(struct iommufd_device *ide=
+v, u32
+> *pt_id)
+>  }
+>  EXPORT_SYMBOL_NS_GPL(iommufd_device_attach, IOMMUFD);
+>=20
+> +/**
+> + * iommufd_device_replace - Change the device's iommu_domain
+> + * @idev: device to change
+> + * @pt_id: Input a IOMMUFD_OBJ_IOAS, or IOMMUFD_OBJ_HW_PAGETABLE
+> + *         Output the IOMMUFD_OBJ_HW_PAGETABLE ID
+> + *
+> + * This is the same as
+> + *   iommufd_device_detach();
+> + *   iommufd_device_attach();
 
-Yes but after the restore, we still want to shadow cvq, so ASID is still ne=
-eded?
+One blank line here would fix a warning as below in "make htmldocs".
 
-Thanks
+Documentation/userspace-api/iommufd:184: ./drivers/iommu/iommufd/device.c:6=
+65: WARNING: Definition list ends without a blank line; unexpected unindent=
+.
 
-> Moreover, it may require HW
-> support. So steps 1 and 7 are not needed.
->
-> Apart from that, the process is right.
->
->
-> > Thanks
-> >
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > >
-> > > >
-> > > > > Thanks
-> > > > >
-> > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > > > > My plan was to convert
-> > > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa o=
-ps. Sorry if I
-> > > > > > > > > > > was not explicit enough.
-> > > > > > > > > > >
-> > > > > > > > > > > The only solution I can see to that is to trap & emul=
-ate in the vdpa
-> > > > > > > > > > > (parent?) driver, as talked in virtio-comment. But th=
-at complicates
-> > > > > > > > > > > the architecture:
-> > > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > > > > * Store vq enable state separately, at
-> > > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit th=
-at enable to hw
-> > > > > > > > > > > * Store the doorbell state separately, but do not con=
-figure it to the
-> > > > > > > > > > > device directly.
-> > > > > > > > > > >
-> > > > > > > > > > > But how to recover if the device cannot configure the=
-m at kick time,
-> > > > > > > > > > > for example?
-> > > > > > > > > > >
-> > > > > > > > > > > Maybe we can just fail if the parent driver does not =
-support enabling
-> > > > > > > > > > > the vq after DRIVER_OK? That way no new feature flag =
-is needed.
-> > > > > > > > > > >
-> > > > > > > > > > > Thanks!
-> > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > > ---
-> > > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/p=
-ub/scm/linux/kernel/git/mst
-> > > > > > > > > > > > > commit. Please let me know if I should send a v3 =
-of [1] instead.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-m=
-utt-send-email-mst@kernel.org/T/
-> > > > > > > > > > > > > ---
-> > > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost=
-/vdpa.c
-> > > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlo=
-cked_ioctl(struct file *filep,
-> > > > > > > > > > > > >  {
-> > > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_dat=
-a;
-> > > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vd=
-pa->config;
-> > > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > > > > > -     u64 features;
-> > > > > > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > > > > > >       long r =3D 0;
-> > > > > > > > > > > > >
-> > > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) =
-{
-> > > > > > > > > > > > >               if (copy_from_user(&features, featu=
-rep, sizeof(features)))
-> > > > > > > > > > > > >                       return -EFAULT;
-> > > > > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > > > > +                     parent_features =3D ops->ge=
-t_backend_features(v->vdpa);
-> > > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND=
-_FEATURES |
-> > > > > > > > > > > > >                                BIT_ULL(VHOST_BACK=
-END_F_SUSPEND) |
-> > > > > > > > > > > > >                                BIT_ULL(VHOST_BACK=
-END_F_RESUME) |
-> > > > > > > > > > > > > -                              BIT_ULL(VHOST_BACK=
-END_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > > > > +                              parent_features))
-> > > > > > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKE=
-ND_F_SUSPEND)) &&
-> > > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > > > > --
-> > > > > > > > > > > > > 2.39.3
-> > > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> >
->
+Regards,
+Yi Liu
+
+> + * If it fails then no change is made to the attachment. The iommu drive=
+r may
+> + * implement this so there is no disruption in translation. This can onl=
+y be
+> + * called if iommufd_device_attach() has already succeeded.
+> + */
+> +int iommufd_device_replace(struct iommufd_device *idev, u32 *pt_id)
+> +{
+> +	return iommufd_device_change_pt(idev, pt_id,
+> +					&iommufd_device_do_replace);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(iommufd_device_replace, IOMMUFD);
+> +
+>  /**
+>   * iommufd_device_detach - Disconnect a device to an iommu_domain
+>   * @idev: device to detach
+> diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+> index 24f30f384df6f9..5b7f70543adb24 100644
+> --- a/drivers/iommu/iommufd/main.c
+> +++ b/drivers/iommu/iommufd/main.c
+> @@ -466,5 +466,6 @@ module_exit(iommufd_exit);
+>  MODULE_ALIAS_MISCDEV(VFIO_MINOR);
+>  MODULE_ALIAS("devname:vfio/vfio");
+>  #endif
+> +MODULE_IMPORT_NS(IOMMUFD_INTERNAL);
+>  MODULE_DESCRIPTION("I/O Address Space Management for passthrough devices=
+");
+>  MODULE_LICENSE("GPL");
+> --
+> 2.40.1
+
 
