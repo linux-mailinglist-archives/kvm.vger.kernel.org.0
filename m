@@ -2,336 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8DED74A99E
-	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 06:02:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC31B74AA0A
+	for <lists+kvm@lfdr.de>; Fri,  7 Jul 2023 06:46:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbjGGECD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jul 2023 00:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48622 "EHLO
+        id S232035AbjGGEqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jul 2023 00:46:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjGGEBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jul 2023 00:01:48 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A49E81FD7;
-        Thu,  6 Jul 2023 21:01:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688702506; x=1720238506;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VZx8xHPedaTRV9qKZIweeiLjMoAAs5qAkOe10n7Tb9Y=;
-  b=neXvGJ/OY4WMoBD50omoAvlbp0K/GGec+ezrLX9I5J/gzz3K7btippfH
-   Hv89CSUd3dzKcL6upZ9/3GTbmen4xUrvZ6os5TyWEsEv+nzelgZjFpNQ9
-   WOMgKs78+nOgPeLXMTySdv0qf5X8lMeanq+4r1IGyNHqBd8Rua7BM7qlv
-   wyMDWoyuYd6uzYMRzWdrnBMp5/izsNuUemO1YVRLOLrRGDOB0ZQHBsgB7
-   vSXkFJ9nu/DpPd7l0QGTpQQNdP53IQhPqEsnOVDW3A1Aa9xIs6061Ity8
-   E8na/eDMicMhG+C+6iHPzfb77S49tV6X3aK9UMDBZ3dmXrrMLUb6GPeRc
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="394561177"
-X-IronPort-AV: E=Sophos;i="6.01,187,1684825200"; 
-   d="scan'208";a="394561177"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 21:01:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="789805852"
-X-IronPort-AV: E=Sophos;i="6.01,187,1684825200"; 
-   d="scan'208";a="789805852"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga004.fm.intel.com with ESMTP; 06 Jul 2023 21:01:39 -0700
-Date:   Fri, 7 Jul 2023 12:01:38 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, david@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
-Subject: Re: [PATCH v12 19/22] x86/kexec(): Reset TDX private memory on
- platforms with TDX erratum
-Message-ID: <20230707040138.heqnc7ivonblejts@yy-desk-7060>
-References: <cover.1687784645.git.kai.huang@intel.com>
- <28aece770321e307d58df77eddee2d3fa851d15a.1687784645.git.kai.huang@intel.com>
+        with ESMTP id S229880AbjGGEqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jul 2023 00:46:44 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F501BD3;
+        Thu,  6 Jul 2023 21:46:39 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 5A368120006;
+        Fri,  7 Jul 2023 07:46:36 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 5A368120006
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1688705196;
+        bh=BLH3JWTBKcrpTqPSNAAkquBGueIo9kUvsSHUQwqAous=;
+        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+        b=GMAbtmyILykzo18tz7HcGoI9/c56KU3QOnFrVl7ELvAOMhvbvM5Nz8L5RPLPqetx8
+         9Fj+Jj32oSetO8ebiVxwNeXNie6QEgBEm2pwkAC01goyC3n62a0TWY7YKYtvy0+683
+         uSDAP1FrlkJs+kLH61iBOJXaxT1vCeeSbc0xxeLOhRevhU1T2LNwnQeeKLe8+BRyO+
+         jht7DP4N6VBI8FwTnzlKza+HJE5AtO/uaguTdA/SPPbNf0BNBw9tOWbI/euAWvYaRq
+         6hQmYSmJ77ZDuDfE1dQl/aRP9sdJSb0wQrKdP21/++EvD9f55X3KmtTJR6nfFPjP14
+         Hj2UJIJQMJ2Zg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Fri,  7 Jul 2023 07:46:36 +0300 (MSK)
+Received: from [192.168.0.12] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 7 Jul 2023 07:46:21 +0300
+Message-ID: <c2c96510-3476-ead9-75b2-93765508ae2a@sberdevices.ru>
+Date:   Fri, 7 Jul 2023 07:41:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <28aece770321e307d58df77eddee2d3fa851d15a.1687784645.git.kai.huang@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v5 00/17] vsock: MSG_ZEROCOPY flag support
+Content-Language: en-US
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
+ <CAGxU2F4t6b1pxGebzDknvUA8w0B2J9mURzAtSSmKYDVa+zNmZA@mail.gmail.com>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <CAGxU2F4t6b1pxGebzDknvUA8w0B2J9mURzAtSSmKYDVa+zNmZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178485 [Jul 06 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 520 520 ccb018a655251011855942a2571029252d3d69a2, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;git.kernel.org:7.1.1;lore.kernel.org:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/07 02:44:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/07 02:45:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/07 00:05:00 #21574510
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 02:12:49AM +1200, Kai Huang wrote:
-> The first few generations of TDX hardware have an erratum.  A partial
-> write to a TDX private memory cacheline will silently "poison" the
-> line.  Subsequent reads will consume the poison and generate a machine
-> check.  According to the TDX hardware spec, neither of these things
-> should have happened.
->
-> == Background ==
->
-> Virtually all kernel memory accesses operations happen in full
-> cachelines.  In practice, writing a "byte" of memory usually reads a 64
-> byte cacheline of memory, modifies it, then writes the whole line back.
-> Those operations do not trigger this problem.
->
-> This problem is triggered by "partial" writes where a write transaction
-> of less than cacheline lands at the memory controller.  The CPU does
-> these via non-temporal write instructions (like MOVNTI), or through
-> UC/WC memory mappings.  The issue can also be triggered away from the
-> CPU by devices doing partial writes via DMA.
->
-> == Problem ==
->
-> A fast warm reset doesn't reset TDX private memory.  Kexec() can also
-> boot into the new kernel directly.  Thus if the old kernel has enabled
-> TDX on the platform with this erratum, the new kernel may get unexpected
-> machine check.
->
-> Note that w/o this erratum any kernel read/write on TDX private memory
-> should never cause machine check, thus it's OK for the old kernel to
-> leave TDX private pages as is.
->
-> == Solution ==
->
-> In short, with this erratum, the kernel needs to explicitly convert all
-> TDX private pages back to normal to give the new kernel a clean slate
-> after kexec().  The BIOS is also expected to disable fast warm reset as
-> a workaround to this erratum, thus this implementation doesn't try to
-> reset TDX private memory for the reboot case in the kernel but depend on
-> the BIOS to enable the workaround.
->
-> For now TDX private memory can only be PAMT pages.  It would be ideal to
-> cover all types of TDX private memory here (TDX guest private pages and
-> Secure-EPT pages are yet to be implemented when TDX gets supported in
-> KVM), but there's no existing infrastructure to track TDX private pages.
-> It's not feasible to query the TDX module about page type either because
-> VMX has already been stopped when KVM receives the reboot notifier.
->
-> Another option is to blindly convert all memory pages.  But this may
-> bring non-trivial latency to kexec() on large memory systems (especially
-> when the number of TDX private pages is small).  Thus even with this
-> temporary solution, eventually it's better for the kernel to only reset
-> TDX private pages.  Also, it's problematic to convert all memory pages
-> because not all pages are mapped as writable in the direct-mapping.  The
-> kernel needs to switch to another page table which maps all pages as
-> writable (e.g., the identical-mapping table for kexec(), or a new page
-> table) to do so, but this looks overkill.
->
-> Therefore, rather than doing something dramatic, only reset PAMT pages
-> for now.  Do it in machine_kexec() to avoid additional overhead to the
-> machine reboot/shutdown as the kernel depends on the BIOS to disable
-> fast warm reset as a workaround for the reboot case.
->
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->
-> v11 -> v12:
->  - Changed comment/changelog to say kernel doesn't try to handle fast
->    warm reset but depends on BIOS to enable workaround (Kirill)
->  - Added a new tdx_may_has_private_mem to indicate system may have TDX
->    private memory and PAMTs/TDMRs are stable to access. (Dave).
->  - Use atomic_t for tdx_may_has_private_mem for build-in memory barrier
->    (Dave)
->  - Changed calling x86_platform.memory_shutdown() to calling
->    tdx_reset_memory() directly from machine_kexec() to avoid overhead to
->    normal reboot case.
->
-> v10 -> v11:
->  - New patch
->
->
-> ---
->  arch/x86/include/asm/tdx.h         |  2 +
->  arch/x86/kernel/machine_kexec_64.c |  9 ++++
->  arch/x86/virt/vmx/tdx/tdx.c        | 79 ++++++++++++++++++++++++++++++
->  3 files changed, 90 insertions(+)
->
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index 91416fd600cd..e95c9fbf52e4 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -100,10 +100,12 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  bool platform_tdx_enabled(void);
->  int tdx_cpu_enable(void);
->  int tdx_enable(void);
-> +void tdx_reset_memory(void);
->  #else	/* !CONFIG_INTEL_TDX_HOST */
->  static inline bool platform_tdx_enabled(void) { return false; }
->  static inline int tdx_cpu_enable(void) { return -ENODEV; }
->  static inline int tdx_enable(void)  { return -ENODEV; }
-> +static inline void tdx_reset_memory(void) { }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
-> index 1a3e2c05a8a5..232253bd7ccd 100644
-> --- a/arch/x86/kernel/machine_kexec_64.c
-> +++ b/arch/x86/kernel/machine_kexec_64.c
-> @@ -28,6 +28,7 @@
->  #include <asm/setup.h>
->  #include <asm/set_memory.h>
->  #include <asm/cpu.h>
-> +#include <asm/tdx.h>
->
->  #ifdef CONFIG_ACPI
->  /*
-> @@ -301,6 +302,14 @@ void machine_kexec(struct kimage *image)
->  	void *control_page;
->  	int save_ftrace_enabled;
->
-> +	/*
-> +	 * On the platform with "partial write machine check" erratum,
-> +	 * all TDX private pages need to be converted back to normal
-> +	 * before booting to the new kernel, otherwise the new kernel
-> +	 * may get unexpected machine check.
-> +	 */
-> +	tdx_reset_memory();
-> +
->  #ifdef CONFIG_KEXEC_JUMP
->  	if (image->preserve_context)
->  		save_processor_state();
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 85b24b2e9417..1107f4227568 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -51,6 +51,8 @@ static LIST_HEAD(tdx_memlist);
->
->  static struct tdmr_info_list tdx_tdmr_list;
->
-> +static atomic_t tdx_may_has_private_mem;
-> +
->  /*
->   * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
->   * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
-> @@ -1113,6 +1115,17 @@ static int init_tdx_module(void)
->  	 */
->  	wbinvd_on_all_cpus();
->
-> +	/*
-> +	 * Starting from this point the system may have TDX private
-> +	 * memory.  Make it globally visible so tdx_reset_memory() only
-> +	 * reads TDMRs/PAMTs when they are stable.
-> +	 *
-> +	 * Note using atomic_inc_return() to provide the explicit memory
-> +	 * ordering isn't mandatory here as the WBINVD above already
 
-WBINVD is serial instruction to make sure all things happen before
-it must be committed before finish the exection of this instruction,
-but it should not impact the instructions after it.
-(SDM Vol.3 9.3 Jun 2023)
 
-I think the atomic operation used below is to make sure the
-change to tdx_may_has_private_mem becomes visible immediately
-to other LPs which read it, e.g running tdx_reset_memory().
-atomic_inc() should be enough for this case because the
-locked Instructions are total order.
-(SDM Vol.3 9.2.3.8 June 2023).
+On 06.07.2023 20:07, Stefano Garzarella wrote:
+> On Sat, Jul 01, 2023 at 09:39:30AM +0300, Arseniy Krasnov wrote:
+>> Hello,
+>>
+>>                           DESCRIPTION
+>>
+>> this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
+>> current implementation for TCP as much as possible:
+>>
+>> 1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
+>>   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
+>>   flag will be ignored (e.g. without completion).
+>>
+>> 2) Kernel uses completions from socket's error queue. Single completion
+>>   for single tx syscall (or it can merge several completions to single
+>>   one). I used already implemented logic for MSG_ZEROCOPY support:
+>>   'msg_zerocopy_realloc()' etc.
+>>
+>> Difference with copy way is not significant. During packet allocation,
+>> non-linear skb is created and filled with pinned user pages.
+>> There are also some updates for vhost and guest parts of transport - in
+>> both cases i've added handling of non-linear skb for virtio part. vhost
+>> copies data from such skb to the guest's rx virtio buffers. In the guest,
+>> virtio transport fills tx virtio queue with pages from skb.
+>>
+>> Head of this patchset is:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
+>>
+>>
+>> This version has several limits/problems (all resolved at v5):
+>>
+>> 1) As this feature totally depends on transport, there is no way (or it
+>>   is difficult) to check whether transport is able to handle it or not
+>>   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
+>>   setsockopt callback from setsockopt callback for SOL_SOCKET, but this
+>>   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
+>>   are not considered to be called from each other. So in current version
+>>   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
+>>   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
+>>   tx routine will fail with EOPNOTSUPP.
+>>
+>>   ^^^ fixed in v5. Thanks to Bobby Eshleman.
+>>
+>> 2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
+>>   one completion. In each completion there is flag which shows how tx
+>>   was performed: zerocopy or copy. This leads that whole message must
+>>   be send in zerocopy or copy way - we can't send part of message with
+>>   copying and rest of message with zerocopy mode (or vice versa). Now,
+>>   we need to account vsock credit logic, e.g. we can't send whole data
+>>   once - only allowed number of bytes could sent at any moment. In case
+>>   of copying way there is no problem as in worst case we can send single
+>>   bytes, but zerocopy is more complex because smallest transmission
+>>   unit is single page. So if there is not enough space at peer's side
+>>   to send integer number of pages (at least one) - we will wait, thus
+>>   stalling tx side. To overcome this problem i've added simple rule -
+>>   zerocopy is possible only when there is enough space at another side
+>>   for whole message (to check, that current 'msghdr' was already used
+>>   in previous tx iterations i use 'iov_offset' field of it's iov iter).
+>>
+>>   ^^^
+>>   Discussed as ok during v2. Link:
+>>   https://lore.kernel.org/netdev/23guh3txkghxpgcrcjx7h62qsoj3xgjhfzgtbmqp2slrz3rxr4@zya2z7kwt75l/
+>>
+>> 3) loopback transport is not supported, because it requires to implement
+>>   non-linear skb handling in dequeue logic (as we "send" fragged skb
+>>   and "receive" it from the same queue). I'm going to implement it in
+>>   next versions.
+>>
+>>   ^^^ fixed in v2
+>>
+>> 4) Current implementation sets max length of packet to 64KB. IIUC this
+>>   is due to 'kmalloc()' allocated data buffers. I think, in case of
+>>   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
+>>   not touched for data - user space pages are used as buffers. Also
+>>   this limit trims every message which is > 64KB, thus such messages
+>>   will be send in copy mode due to 'iov_offset' check in 2).
+>>
+>>   ^^^ fixed in v2
+>>
+>>                         PATCHSET STRUCTURE
+>>
+>> Patchset has the following structure:
+>> 1) Handle non-linear skbuff on receive in virtio/vhost.
+>> 2) Handle non-linear skbuff on send in virtio/vhost.
+>> 3) Updates for AF_VSOCK.
+>> 4) Enable MSG_ZEROCOPY support on transports.
+>> 5) Tests/tools/docs updates.
+>>
+>>                            PERFORMANCE
+>>
+>> Performance: it is a little bit tricky to compare performance between
+>> copy and zerocopy transmissions. In zerocopy way we need to wait when
+>> user buffers will be released by kernel, so it is like synchronous
+>> path (wait until device driver will process it), while in copy way we
+>> can feed data to kernel as many as we want, don't care about device
+>> driver. So I compared only time which we spend in the 'send()' syscall.
+>> Then if this value will be combined with total number of transmitted
+>> bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
+>> enough credit, receiver allocates same amount of space as sender needs.
+>>
+>> Sender:
+>> ./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
+>>
+>> Receiver:
+>> ./vsock_perf --vsk-size 256M
+>>
+>> I run tests on two setups: desktop with Core i7 - I use this PC for
+>> development and in this case guest is nested guest, and host is normal
+>> guest. Another hardware is some embedded board with Atom - here I don't
+>> have nested virtualization - host runs on hw, and guest is normal guest.
+>>
+>> G2H transmission (values are Gbit/s):
+>>
+>>   Core i7 with nested guest.            Atom with normal guest.
+>>
+>> *-------------------------------*   *-------------------------------*
+>> |          |         |          |   |          |         |          |
+>> | buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+>> |          |         |          |   |          |         |          |
+>> *-------------------------------*   *-------------------------------*
+>> |   4KB    |    3    |    10    |   |   4KB    |   0.8   |   1.9    |
+>> *-------------------------------*   *-------------------------------*
+>> |   32KB   |   20    |    61    |   |   32KB   |   6.8   |   20.2   |
+>> *-------------------------------*   *-------------------------------*
+>> |   256KB  |   33    |   244    |   |   256KB  |   7.8   |   55     |
+>> *-------------------------------*   *-------------------------------*
+>> |    1M    |   30    |   373    |   |    1M    |   7     |   95     |
+>> *-------------------------------*   *-------------------------------*
+>> |    8M    |   22    |   475    |   |    8M    |   7     |   114    |
+>> *-------------------------------*   *-------------------------------*
+>>
+>> H2G:
+>>
+>>   Core i7 with nested guest.            Atom with normal guest.
+>>
+>> *-------------------------------*   *-------------------------------*
+>> |          |         |          |   |          |         |          |
+>> | buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+>> |          |         |          |   |          |         |          |
+>> *-------------------------------*   *-------------------------------*
+>> |   4KB    |   20    |    10    |   |   4KB    |   4.37  |    3     |
+>> *-------------------------------*   *-------------------------------*
+>> |   32KB   |   37    |    75    |   |   32KB   |   11    |   18     |
+>> *-------------------------------*   *-------------------------------*
+>> |   256KB  |   44    |   299    |   |   256KB  |   11    |   62     |
+>> *-------------------------------*   *-------------------------------*
+>> |    1M    |   28    |   335    |   |    1M    |   9     |   77     |
+>> *-------------------------------*   *-------------------------------*
+>> |    8M    |   27    |   417    |   |    8M    |  9.35   |  115     |
+>> *-------------------------------*   *-------------------------------*
+>>
+>> * Let's look to the first line of both tables - where copy is better
+>>   than zerocopy. I analyzed this case more deeply and found that
+>>   bottleneck is function 'vhost_work_queue()'. With 4K buffer size,
+>>   caller spends too much time in it with zerocopy mode (comparing to
+>>   copy mode). This happens only with 4K buffer size. This function just
+>>   calls 'wake_up_process()' and its internal logic does not depends on
+>>   skb, so i think potential reason (may be) is interval between two
+>>   calls of this function (e.g. how often it is called). Note, that
+>>   'vhost_work_queue()' differs from the same function at guest's side of
+>>   transport: 'virtio_transport_send_pkt()' uses 'queue_work()' which
+>>   i think is more optimized for worker purposes, than direct call to
+>>   'wake_up_process()'. But again - this is just my assumption.
+>>
+>> Loopback:
+>>
+>>   Core i7 with nested guest.            Atom with normal guest.
+>>
+>> *-------------------------------*   *-------------------------------*
+>> |          |         |          |   |          |         |          |
+>> | buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+>> |          |         |          |   |          |         |          |
+>> *-------------------------------*   *-------------------------------*
+>> |   4KB    |    8    |     7    |   |   4KB    |   1.8   |   1.3    |
+>> *-------------------------------*   *-------------------------------*
+>> |   32KB   |   38    |    44    |   |   32KB   |   10    |   10     |
+>> *-------------------------------*   *-------------------------------*
+>> |   256KB  |   55    |   168    |   |   256KB  |   15    |   36     |
+>> *-------------------------------*   *-------------------------------*
+>> |    1M    |   53    |   250    |   |    1M    |   12    |   45     |
+>> *-------------------------------*   *-------------------------------*
+>> |    8M    |   40    |   344    |   |    8M    |   11    |   74     |
+>> *-------------------------------*   *-------------------------------*
+>>
+>> I analyzed performace difference more deeply for the following setup:
+>> server: ./vsock_perf --vsk-size 16M
+>> client: ./vsock_perf --sender 2 --bytes 16M --buf-size 16K/4K [--zc]
+>>
+>> In other words I send 16M of data from guest to host in copy/zerocopy
+>> modes and with two different sizes of buffer - 4K and 64K. Let's see
+>> to tx path for both modes - it consists of two steps:
+>>
+>> copy:
+>> 1) Allocate skb of buffer's length.
+>> 2) Copy data to skb from buffer.
+>>
+>> zerocopy:
+>> 1) Allocate skb with header space only.
+>> 2) Pin pages of the buffer and insert them to skb.
+>>
+>> I measured average number of ns (returned by 'ktime_get()') for each
+>> step above:
+>> 1) Skb allocation (for both copy and zerocopy modes).
+>> 2) For copy mode in 'memcpy_to_msg()' - copying.
+>> 3) For zerocopy mode in '__zerocopy_sg_from_iter()' - pinning.
+>>
+>> Here are results for copy mode:
+>> *-------------------------------------*
+>> | buf | skb alloc | 'memcpy_to_msg()' |
+>> *-------------------------------------*
+>> |     |           |                   |
+>> | 64K |  5000ns   |      25000ns      |
+>> |     |           |                   |
+>> *-------------------------------------*
+>> |     |           |                   |
+>> | 4K  |  800ns    |      2200ns       |
+>> |     |           |                   |
+>> *-------------------------------------*
+>>
+>> Here are results for zerocopy mode:
+>> *-----------------------------------------------*
+>> | buf | skb alloc | '__zerocopy_sg_from_iter()' |
+>> *-----------------------------------------------*
+>> |     |           |                             |
+>> | 64K |  250ns    |          3500ns             |
+>> |     |           |                             |
+>> *-----------------------------------------------*
+>> |     |           |                             |
+>> | 4K  |  250ns    |          3000ns             |
+>> |     |           |                             |
+>> *-----------------------------------------------*
+>>
+>> I guess that reason of zerocopy performance is low overhead for page
+>> pinning: there is big difference between 4K and 64K in case of copying
+>> (25000 vs 2200), but in pinning case - just 3000 vs 3500.
+>>
+>> So, zerocopy is faster than classic copy mode, but of course it requires
+>> specific architecture of application due to user pages pinning, buffer
+>> size and alignment.
+>>
+>>                             NOTES
+>>
+>> If host fails to send data with "Cannot allocate memory", check value
+>> /proc/sys/net/core/optmem_max - it is accounted during completion skb
+>> allocation. Try to update it to for example 1M and try send again:
+>> "echo 1048576 > /proc/sys/net/core/optmem_max" (as root).
+>>
+>>                            TESTING
+>>
+>> This patchset includes set of tests for MSG_ZEROCOPY feature. I tried to
+>> cover new code as much as possible so there are different cases for
+>> MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
+>> vector types (different sizes, alignments, with unmapped pages). I also
+>> run tests with loopback transport and run vsockmon. In v3 i've added
+>> io_uring test as separated application.
+>>
+>>           LET'S SPLIT PATCHSET TO MAKE REVIEW EASIER
+>>
+>> In v3 Stefano Garzarella <sgarzare@redhat.com> asked to split this patchset
+>> for several parts, because it looks too big for review. I think in this
+>> version (v4) we can do it in the following way:
+>>
+>> [0001 - 0005] - this is preparation for virtio/vhost part.
+>> [0006 - 0009] - this is preparation for AF_VSOCK part.
+>> [0010 - 0014] - these patches allows to trigger logic from the previous
+>>                two parts. In addition 0014 is patch for Documentation.
+>> [0015 - rest] - updates for tests, utils. This part doesn't touch kernel
+>>                code and looks not critical.
+> 
+> Great!
 
-So per my understanding the key here is the atomic
-operation's guarantee on memory changes visibility, not the
-guarantee from WBINVD, the comment should be changed if
-this is the correct understanding.
+Thanks for review! All comments are clear for me.
 
-> +	 * does that.  Compiler barrier isn't needed here either.
-> +	 */
-> +	atomic_inc_return(&tdx_may_has_private_mem);
-> +
->  	/* Config the key of global KeyID on all packages */
->  	ret = config_global_keyid();
->  	if (ret)
-> @@ -1154,6 +1167,15 @@ static int init_tdx_module(void)
->  	 * as suggested by the TDX spec.
->  	 */
->  	tdmrs_reset_pamt_all(&tdx_tdmr_list);
-> +	/*
-> +	 * No more TDX private pages now, and PAMTs/TDMRs are
-> +	 * going to be freed.  Make this globally visible so
-> +	 * tdx_reset_memory() can read stable TDMRs/PAMTs.
-> +	 *
-> +	 * Note atomic_dec_return(), which is an atomic RMW with
-> +	 * return value, always enforces the memory barrier.
-> +	 */
-> +	atomic_dec_return(&tdx_may_has_private_mem);
->  out_free_pamts:
->  	tdmrs_free_pamt_all(&tdx_tdmr_list);
->  out_free_tdmrs:
-> @@ -1229,6 +1251,63 @@ int tdx_enable(void)
->  }
->  EXPORT_SYMBOL_GPL(tdx_enable);
->
-> +/*
-> + * Convert TDX private pages back to normal on platforms with
-> + * "partial write machine check" erratum.
-> + *
-> + * Called from machine_kexec() before booting to the new kernel.
-> + */
-> +void tdx_reset_memory(void)
-> +{
-> +	if (!platform_tdx_enabled())
-> +		return;
-> +
-> +	/*
-> +	 * Kernel read/write to TDX private memory doesn't
-> +	 * cause machine check on hardware w/o this erratum.
-> +	 */
-> +	if (!boot_cpu_has_bug(X86_BUG_TDX_PW_MCE))
-> +		return;
-> +
-> +	/* Called from kexec() when only rebooting cpu is alive */
-> +	WARN_ON_ONCE(num_online_cpus() != 1);
-> +
-> +	if (!atomic_read(&tdx_may_has_private_mem))
-> +		return;
-> +
-> +	/*
-> +	 * Ideally it's better to cover all types of TDX private pages,
-> +	 * but there's no existing infrastructure to tell whether a page
-> +	 * is TDX private memory or not.  Using SEAMCALL to query TDX
-> +	 * module isn't feasible either because: 1) VMX has been turned
-> +	 * off by reaching here so SEAMCALL cannot be made; 2) Even
-> +	 * SEAMCALL can be made the result from TDX module may not be
-> +	 * accurate (e.g., remote CPU can be stopped while the kernel
-> +	 * is in the middle of reclaiming one TDX private page and doing
-> +	 * MOVDIR64B).
-> +	 *
-> +	 * One solution could be just converting all memory pages, but
-> +	 * this may bring non-trivial latency on large memory systems
-> +	 * (especially when the number of TDX private pages is small).
-> +	 * So even with this temporary solution, eventually the kernel
-> +	 * should only convert TDX private pages.
-> +	 *
-> +	 * Also, not all pages are mapped as writable in direct mapping,
-> +	 * thus it's problematic to do so.  It can be done by switching
-> +	 * to the identical mapping table for kexec() or a new page table
-> +	 * which maps all pages as writable, but the complexity looks
-> +	 * overkill.
-> +	 *
-> +	 * Thus instead of doing something dramatic to convert all pages,
-> +	 * only convert PAMTs as for now TDX private pages can only be
-> +	 * PAMT.
-> +	 *
-> +	 * All other cpus are already dead.  TDMRs/PAMTs are stable when
-> +	 * @tdx_may_has_private_mem reads true.
-> +	 */
-> +	tdmrs_reset_pamt_all(&tdx_tdmr_list);
-> +}
-> +
->  static int __init record_keyid_partitioning(u32 *tdx_keyid_start,
->  					    u32 *nr_tdx_keyids)
->  {
-> --
-> 2.40.1
->
+> 
+> So IIUC all the issues are fixed. I left some comments, but I think
+> you can start sending the virtio/vhost preparation patches to net-next
+> (when it will re-open).
+> 
+> I just pointend out something to fix, and that maybe we can merge
+> the first 2 patches.
+> 
+> I think you can restart with v0, describing in the cover letter that
+> the patches was part of this RFC.
+
+Ok, I'll fix comments and send 0001-0005 (with first two merged) in a single
+net-next patchset!
+
+Thanks, Arseniy
+
+> 
+> Thanks,
+> Stefano
+> 
