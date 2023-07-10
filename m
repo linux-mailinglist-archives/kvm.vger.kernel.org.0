@@ -2,186 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C291E74D3DB
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 12:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A599B74D568
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 14:29:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbjGJKu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 06:50:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
+        id S231774AbjGJM3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 08:29:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230266AbjGJKuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 06:50:25 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A994D2;
-        Mon, 10 Jul 2023 03:50:24 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a3efebcc24so2213454b6e.1;
-        Mon, 10 Jul 2023 03:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688986223; x=1691578223;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8QS0QHZRgc0yC1/wavz49ZTrauQCkwXgMIynLbUS5Pg=;
-        b=jsxoJ/6AfM2z2Jbi7Qxnqr48oyHIlZ9VjUHuHNIV+7TcbyKQXms47bWClT+4DXMXs0
-         ir25EdDrrhrUXpNf8Ri9ekQsCOGVT06Yry7jHX9JxLUC3Y0ApM/RZKNf8U21Pi4cJLGr
-         7PKMP622+mGSa+zBYOGSGBZ2qvGiIy7bQm9w/MUvlVy32Gr5GuUOyOFxxKIRp1angeP1
-         JO1jPyNsfkMy0RjnV3bN2B10nR20vRHcM7ZfeMT+twuaqBRWpwCRR8MF6PB8aM/LOiPM
-         J72R+WjWSUztBZpwAWveQ7iLcJGpApDh8z8JFL4aGqVoywVoNIQ1Ku6Ftgf4lnDaI4Na
-         45PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688986223; x=1691578223;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8QS0QHZRgc0yC1/wavz49ZTrauQCkwXgMIynLbUS5Pg=;
-        b=UPM/W/wYNpGV7vX96L/Wb8LTBdqDbaE2KzpH1+kBxnPMsVsfvfmtu7m22+QkiRFR4c
-         gvotcyn3qLT2ilATkiDcLWMSPAS5mk/f/EiDdiB0MSWN59Bxu1PgBP0Vt7RDIbrnDixI
-         bmJc2s16uaraJp9g8Y+vV9tvRo9R1o70thrdL7GoJlB39HAxSfv4V+zoMOtM10QEhMO+
-         s2m1qlCWZTDVQNDbbMHUYEd2qNDZ8ylJVKG7/n6ayYe7fxqoknCEcZ+mSrUaiEIgVsHE
-         5/5UYeGS2LU+vnrl/S6SZFU17iDiRn6ppDeZGjXXCT+llrdMeoqPMXfQd9tP2RTyploF
-         LY4w==
-X-Gm-Message-State: ABy/qLblgVthjL7+wpdMqa/XkcWPuvv6cHB/NdpodoiICGxW/ddW1atO
-        nv7Rg117EqwvhDIt1xj+4KI=
-X-Google-Smtp-Source: APBJJlFqnB63ihfW/DUgKSDNLUVzZfipGKab2dVzGYJcz8uy6FOtbPAf7l733Fivfw47cV4QHQHDKw==
-X-Received: by 2002:a05:6358:2905:b0:134:ec26:b53 with SMTP id y5-20020a056358290500b00134ec260b53mr10481644rwb.16.1688986223148;
-        Mon, 10 Jul 2023 03:50:23 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id r23-20020a62e417000000b006661562429fsm7079151pfh.97.2023.07.10.03.50.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jul 2023 03:50:22 -0700 (PDT)
-Message-ID: <6def6249-bd36-875c-6faf-e4685b8c3fde@gmail.com>
-Date:   Mon, 10 Jul 2023 18:50:14 +0800
+        with ESMTP id S231718AbjGJM3c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 08:29:32 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16AACFF;
+        Mon, 10 Jul 2023 05:29:31 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B23191FF2F;
+        Mon, 10 Jul 2023 12:29:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1688992169; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MZLkluv/6AIU//IIXEFXPkZ4djC4dKJZJnHAbR0i6pk=;
+        b=JG5+ERTkzAQOeVmd6vOM39GiJh3EAB+8yxS5Rf9WPiIEloosOhiTyzlrUyo+DNozK13Jy9
+        +hS/sZmXsGOoRU7Rszus8GXPfIQFmYimrZbGO8VaaTB6gM8hbcZttx5Eql00VSSIuBQTZ4
+        d+c+N+dhgdi33rQJVKrx8yuOdfL2xDw=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 37E1F13A05;
+        Mon, 10 Jul 2023 12:29:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id CvAmDKn5q2REAgAAMHmgww
+        (envelope-from <jgross@suse.com>); Mon, 10 Jul 2023 12:29:29 +0000
+Message-ID: <acda7276-234b-9036-c178-ca2b441f3998@suse.com>
+Date:   Mon, 10 Jul 2023 14:29:28 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH 1/4] KVM: x86/pmu: Use enums instead of hardcoded magic
- for arch event indices
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH 0/3] x86/paravirt: Get rid of paravirt patching
+To:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Srivatsa S. Bhat (VMware)" <srivatsa@csail.mit.edu>,
+        Alexey Makhalov <amakhalov@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        xen-devel@lists.xenproject.org
+References: <20230608140333.4083-1-jgross@suse.com>
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230607010206.1425277-1-seanjc@google.com>
- <20230607010206.1425277-2-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230607010206.1425277-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+From:   Juergen Gross <jgross@suse.com>
+In-Reply-To: <20230608140333.4083-1-jgross@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------IvHaIO3XNlEm8DU31AArNzOS"
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/6/2023 9:02 am, Sean Christopherson wrote:
-> Add "enum intel_pmu_architectural_events" to replace the magic numbers for
-> the (pseudo-)architectural events, and to give a meaningful name to each
-> event so that new readers don't need psychic powers to understand what the
-> code is doing.
-> 
-> Cc: Aaron Lewis <aaronlewis@google.com>
-> Cc: Like Xu <like.xu.linux@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------IvHaIO3XNlEm8DU31AArNzOS
+Content-Type: multipart/mixed; boundary="------------ZR3DgzkYsvFZdf0BczSBdOFl";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org,
+ virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Srivatsa S. Bhat (VMware)" <srivatsa@csail.mit.edu>,
+ Alexey Makhalov <amakhalov@vmware.com>,
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, xen-devel@lists.xenproject.org
+Message-ID: <acda7276-234b-9036-c178-ca2b441f3998@suse.com>
+Subject: Re: [RFC PATCH 0/3] x86/paravirt: Get rid of paravirt patching
+References: <20230608140333.4083-1-jgross@suse.com>
+In-Reply-To: <20230608140333.4083-1-jgross@suse.com>
 
-Reviewed-by: Like Xu <likexu@tencent.com>
-// I should have done it. Thanks.
+--------------ZR3DgzkYsvFZdf0BczSBdOFl
+Content-Type: multipart/mixed; boundary="------------XavUypI85MKZWCdNgx90L6n0"
 
-> ---
->   arch/x86/kvm/vmx/pmu_intel.c | 55 ++++++++++++++++++++++++++++--------
->   1 file changed, 43 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 84be32d9f365..0050d71c9c01 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -22,23 +22,51 @@
->   
->   #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
->   
-> +enum intel_pmu_architectural_events {
-> +	/*
-> +	 * The order of the architectural events matters as support for each
-> +	 * event is enumerated via CPUID using the index of the event.
-> +	 */
-> +	INTEL_ARCH_CPU_CYCLES,
-> +	INTEL_ARCH_INSTRUCTIONS_RETIRED,
-> +	INTEL_ARCH_REFERENCE_CYCLES,
-> +	INTEL_ARCH_LLC_REFERENCES,
-> +	INTEL_ARCH_LLC_MISSES,
-> +	INTEL_ARCH_BRANCHES_RETIRED,
-> +	INTEL_ARCH_BRANCHES_MISPREDICTED,
-> +
-> +	NR_REAL_INTEL_ARCH_EVENTS,
-> +
-> +	/*
-> +	 * Pseudo-architectural event used to implement IA32_FIXED_CTR2, a.k.a.
-> +	 * TSC reference cycles.  The architectural reference cycles event may
-> +	 * or may not actually use the TSC as the reference, e.g. might use the
-> +	 * core crystal clock or the bus clock (yeah, "architectural").
-> +	 */
-> +	PSEUDO_ARCH_REFERENCE_CYCLES = NR_REAL_INTEL_ARCH_EVENTS,
-> +	NR_INTEL_ARCH_EVENTS,
-> +};
-> +
->   static struct {
->   	u8 eventsel;
->   	u8 unit_mask;
->   } const intel_arch_events[] = {
-> -	[0] = { 0x3c, 0x00 },
-> -	[1] = { 0xc0, 0x00 },
-> -	[2] = { 0x3c, 0x01 },
-> -	[3] = { 0x2e, 0x4f },
-> -	[4] = { 0x2e, 0x41 },
-> -	[5] = { 0xc4, 0x00 },
-> -	[6] = { 0xc5, 0x00 },
-> -	/* The above index must match CPUID 0x0A.EBX bit vector */
-> -	[7] = { 0x00, 0x03 },
-> +	[INTEL_ARCH_CPU_CYCLES]			= { 0x3c, 0x00 },
-> +	[INTEL_ARCH_INSTRUCTIONS_RETIRED]	= { 0xc0, 0x00 },
-> +	[INTEL_ARCH_REFERENCE_CYCLES]		= { 0x3c, 0x01 },
-> +	[INTEL_ARCH_LLC_REFERENCES]		= { 0x2e, 0x4f },
-> +	[INTEL_ARCH_LLC_MISSES]			= { 0x2e, 0x41 },
-> +	[INTEL_ARCH_BRANCHES_RETIRED]		= { 0xc4, 0x00 },
-> +	[INTEL_ARCH_BRANCHES_MISPREDICTED]	= { 0xc5, 0x00 },
-> +	[PSEUDO_ARCH_REFERENCE_CYCLES]		= { 0x00, 0x03 },
->   };
->   
->   /* mapping between fixed pmc index and intel_arch_events array */
-> -static int fixed_pmc_events[] = {1, 0, 7};
-> +static int fixed_pmc_events[] = {
-> +	[0] = INTEL_ARCH_INSTRUCTIONS_RETIRED,
-> +	[1] = INTEL_ARCH_CPU_CYCLES,
-> +	[2] = PSEUDO_ARCH_REFERENCE_CYCLES,
-> +};
->   
->   static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
->   {
-> @@ -92,13 +120,16 @@ static bool intel_hw_event_available(struct kvm_pmc *pmc)
->   	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
->   	int i;
->   
-> -	for (i = 0; i < ARRAY_SIZE(intel_arch_events); i++) {
-> +	BUILD_BUG_ON(ARRAY_SIZE(intel_arch_events) != NR_INTEL_ARCH_EVENTS);
-> +
-> +	for (i = 0; i < NR_INTEL_ARCH_EVENTS; i++) {
->   		if (intel_arch_events[i].eventsel != event_select ||
->   		    intel_arch_events[i].unit_mask != unit_mask)
->   			continue;
->   
->   		/* disable event that reported as not present by cpuid */
-> -		if ((i < 7) && !(pmu->available_event_types & (1 << i)))
-> +		if ((i < PSEUDO_ARCH_REFERENCE_CYCLES) &&
-> +		    !(pmu->available_event_types & (1 << i)))
+--------------XavUypI85MKZWCdNgx90L6n0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-CHECK: Unnecessary parentheses around 'i < PSEUDO_ARCH_REFERENCE_CYCLES'
-#164: FILE: arch/x86/kvm/vmx/pmu_intel.c:131:
-+		if ((i < PSEUDO_ARCH_REFERENCE_CYCLES) &&
-+		    !(pmu->available_event_types & (1 << i)))
+QW55IGNvbW1lbnRzPw0KDQpPbiAwOC4wNi4yMyAxNjowMywgSnVlcmdlbiBHcm9zcyB3cm90
+ZToNCj4gVGhpcyBpcyBhIHNtYWxsIHNlcmllcyBnZXR0aW5nIHJpZCBvZiBwYXJhdmlydCBw
+YXRjaGluZyBieSBzd2l0Y2hpbmcNCj4gY29tcGxldGVseSB0byBhbHRlcm5hdGl2ZSBwYXRj
+aGluZyBmb3IgdGhlIHNhbWUgZnVuY3Rpb25hbGl0eS4NCj4gDQo+IFRoZSBiYXNpYyBpZGVh
+IGlzIHRvIGFkZCB0aGUgY2FwYWJpbGl0eSB0byBzd2l0Y2ggZnJvbSBpbmRpcmVjdCB0bw0K
+PiBkaXJlY3QgY2FsbHMgdmlhIGEgc3BlY2lhbCBhbHRlcm5hdGl2ZSBwYXRjaGluZyBvcHRp
+b24uDQo+IA0KPiBUaGlzIHJlbW92ZXMgX3NvbWVfIG9mIHRoZSBwYXJhdmlydCBtYWNybyBt
+YXplLCBidXQgbW9zdCBvZiBpdCBuZWVkcw0KPiB0byBzdGF5IGR1ZSB0byB0aGUgbmVlZCBv
+ZiBoaWRpbmcgdGhlIGNhbGwgaW5zdHJ1Y3Rpb25zIGZyb20gdGhlDQo+IGNvbXBpbGVyIGlu
+IG9yZGVyIHRvIGF2b2lkIG5lZWRsZXNzIHJlZ2lzdGVyIHNhdmUvcmVzdG9yZS4NCj4gDQo+
+IFdoYXQgaXMgZ29pbmcgYXdheSBpcyB0aGUgbmFzdHkgc3RhY2tpbmcgb2YgYWx0ZXJuYXRp
+dmUgYW5kIHBhcmF2aXJ0DQo+IHBhdGNoaW5nIGFuZCAob2YgY291cnNlKSB0aGUgc3BlY2lh
+bCAucGFyYWluc3RydWN0aW9ucyBsaW5rZXIgc2VjdGlvbi4NCj4gDQo+IEkgaGF2ZSB0ZXN0
+ZWQgdGhlIHNlcmllcyBvbiBiYXJlIG1ldGFsIGFuZCBhcyBYZW4gUFYgZG9tYWluIHRvIHN0
+aWxsDQo+IHdvcmsuDQo+IA0KPiBSRkMgYmVjYXVzZSBJJ20gcXVpdGUgc3VyZSB0aGVyZSB3
+aWxsIGJlIHNvbWUgb2JqdG9vbCB3b3JrIG5lZWRlZA0KPiAoYXQgbGVhc3QgcmVtb3Zpbmcg
+dGhlIHNwZWNpZmljIHBhcmF2aXJ0IGhhbmRsaW5nKS4NCj4gDQo+IEp1ZXJnZW4gR3Jvc3Mg
+KDMpOg0KPiAgICB4ODYvcGFyYXZpcnQ6IG1vdmUgc29tZSBmdW5jdGlvbnMgYW5kIGRlZmlu
+ZXMgdG8gYWx0ZXJuYXRpdmUNCj4gICAgeDg2L2FsdGVybmF0aXZlOiBhZGQgaW5kaXJlY3Qg
+Y2FsbCBwYXRjaGluZw0KPiAgICB4ODYvcGFyYXZpcnQ6IHN3aXRjaCBtaXhlZCBwYXJhdmly
+dC9hbHRlcm5hdGl2ZSBjYWxscyB0byBhbHRlcm5hdGl2ZV8yDQo+IA0KPiAgIGFyY2gveDg2
+L2luY2x1ZGUvYXNtL2FsdGVybmF0aXZlLmggICAgICAgIHwgMjYgKysrKystDQo+ICAgYXJj
+aC94ODYvaW5jbHVkZS9hc20vcGFyYXZpcnQuaCAgICAgICAgICAgfCAzOSArKy0tLS0tLS0N
+Cj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9wYXJhdmlydF90eXBlcy5oICAgICB8IDY4ICsr
+Ky0tLS0tLS0tLS0tLS0NCj4gICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9xc3BpbmxvY2tfcGFy
+YXZpcnQuaCB8ICA0ICstDQo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vdGV4dC1wYXRjaGlu
+Zy5oICAgICAgfCAxMiAtLS0NCj4gICBhcmNoL3g4Ni9rZXJuZWwvYWx0ZXJuYXRpdmUuYyAg
+ICAgICAgICAgICB8IDk5ICsrKysrKysrKysrLS0tLS0tLS0tLS0tDQo+ICAgYXJjaC94ODYv
+a2VybmVsL2NhbGx0aHVua3MuYyAgICAgICAgICAgICAgfCAxNyArKy0tDQo+ICAgYXJjaC94
+ODYva2VybmVsL2t2bS5jICAgICAgICAgICAgICAgICAgICAgfCAgNCArLQ0KPiAgIGFyY2gv
+eDg2L2tlcm5lbC9tb2R1bGUuYyAgICAgICAgICAgICAgICAgIHwgMjAgKystLS0NCj4gICBh
+cmNoL3g4Ni9rZXJuZWwvcGFyYXZpcnQuYyAgICAgICAgICAgICAgICB8IDU0ICsrLS0tLS0t
+LS0tLS0NCj4gICBhcmNoL3g4Ni9rZXJuZWwvdm1saW51eC5sZHMuUyAgICAgICAgICAgICB8
+IDEzIC0tLQ0KPiAgIGFyY2gveDg2L3Rvb2xzL3JlbG9jcy5jICAgICAgICAgICAgICAgICAg
+IHwgIDIgKy0NCj4gICBhcmNoL3g4Ni94ZW4vaXJxLmMgICAgICAgICAgICAgICAgICAgICAg
+ICB8ICAyICstDQo+ICAgMTMgZmlsZXMgY2hhbmdlZCwgMTExIGluc2VydGlvbnMoKyksIDI0
+OSBkZWxldGlvbnMoLSkNCj4gDQoNCg==
+--------------XavUypI85MKZWCdNgx90L6n0
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
->   			return false;
->   
->   		break;
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------XavUypI85MKZWCdNgx90L6n0--
+
+--------------ZR3DgzkYsvFZdf0BczSBdOFl--
+
+--------------IvHaIO3XNlEm8DU31AArNzOS
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmSr+agFAwAAAAAACgkQsN6d1ii/Ey/t
+GAf+PlDTj1lgofSxQ5KcWOBwEvtHpmSz2yX2+b71GPNP+EuwtH/phyc/lp4O2P/0nSbDx+4kStS8
+iFWp0JVIje2K+ExMi5drxA3JZ26i6o2Xt/OpnPp+WULBrJaUOzIAoGU6Mo9rdHp6G0a5/kJesp7R
+jI/sKpmZtm9Y5GWHb7oV7aRw1wwarUHgJw8mVnh7isDkQ8PpvKJssS7jrbBGURxhfviYtmV5wcqY
+KaR5yFz97/9d042TFkPwtUMlgIFfWCIwZeKxB83CCRnmgBk+RP/TMQqqdky3VNE2zUbZCXQuippD
+YCS91d0eFmCgRKI96MpgM3/thFOaIOr3uVPwE3rWcw==
+=YrNk
+-----END PGP SIGNATURE-----
+
+--------------IvHaIO3XNlEm8DU31AArNzOS--
