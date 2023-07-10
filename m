@@ -2,105 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D141874D1A6
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 11:34:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EAFC74D1C6
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 11:38:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232861AbjGJJeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 05:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51156 "EHLO
+        id S231978AbjGJJir (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 05:38:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231635AbjGJJeK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 05:34:10 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70801709;
-        Mon, 10 Jul 2023 02:33:22 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A8r24Y011468;
-        Mon, 10 Jul 2023 09:33:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- from : subject : to : message-id : date; s=pp1;
- bh=n+gNm5CCZa1i/5LPuGfEcIyZbPri36sS610dE7kyS0g=;
- b=noCOc0Kuh3uqPgyzHgSYjQtLDA7q/K8bOhndnqxY3BoiScQI224WrOLN4Bigb5F8at6A
- 7UM1lQfNP3APsFpaFocWsMUxEKGh95l3H1onJSmA1DdIsHlNYamsmDjzmtGEAINtuhHq
- 2W0Df+NNu1DkVavvXkXdeLx/bu6UHX2YrucC++lvSGivosKkPGnHv2QjWNrnU2F5lmfR
- svk4u1ySyAkCyeffxkUooyzkY4yn2OjqUpJ6d2SRcdGms6H6g0ghTRLnzlJDlJ0Hkfr1
- ND8wJmhg3YGx36ER+StBAPQXZBAg9KfyFORFUNnYTurGjRjgtlP7c/T3UpS65uHRqgZc Pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrev2h1yb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Jul 2023 09:33:21 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36A9RvLH014969;
-        Mon, 10 Jul 2023 09:33:21 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrev2h1xm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Jul 2023 09:33:21 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36A4oQFo031029;
-        Mon, 10 Jul 2023 09:33:19 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rpye5953p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Jul 2023 09:33:19 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36A9XFZt10551852
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Jul 2023 09:33:15 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C550220043;
-        Mon, 10 Jul 2023 09:33:15 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C5FB20040;
-        Mon, 10 Jul 2023 09:33:15 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.28.83])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Jul 2023 09:33:15 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S231977AbjGJJiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 05:38:22 -0400
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBE410F6
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 02:36:19 -0700 (PDT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-55b2ab496ecso5005443a12.2
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 02:36:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688981742; x=1691573742;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BkYxv1M05zX8VBHrEtnKZwtlrHfy6mH9rQX8fwflF9Y=;
+        b=R86jzV9fPf4/IT/xdg9rexyHP1UZbcuO5mOo4AVsHvu28PcDNkWgxjTwGeo1cUG8jZ
+         LW2fYv0S6FFqCSAmBgrznHszyyuG60QQLFzqjKHDvxtlnrOK7x85fqX2jjKuU712yGqQ
+         hyR9gnAcsI5cpPlJCH6jPKU+Xrw5weVfffrcYnkbI97WoA1UWzVkhJs7eWGfCOLoGR8G
+         Iv2/Z3zh9HYohQ4sZsoAO190N8hg9X+Xa+V8k06G4A0odiAibJO5/spU/OEoMw4dlGfl
+         0rsScOvkTCGS/zfRp1oiEv94NF7RXEUZpBUZkWbOgSM9iMVH4WOjK9Foc34SCtDqMlUT
+         qNvg==
+X-Gm-Message-State: ABy/qLYDW09ZtIrDrHlW4oBsQ3p8OseIIJzltzApl6JxBP45sIVQIWsI
+        T+ahDI/xDAIhX8zDu8zBUSvPosDtozUEusLgLoVfnfZF0cgvpbM=
+X-Google-Smtp-Source: APBJJlEWa8FP93L1zlMe+TPinOwMVJ2SyWPaSeDuF2d3PWHzcSoKrI3S9LSsvLVG23uIDYpkp1Izh4g0Zp0RhzUnS5P5E39krjB/
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230707145410.1679-3-frankja@linux.ibm.com>
-References: <20230707145410.1679-1-frankja@linux.ibm.com> <20230707145410.1679-3-frankja@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com, david@redhat.com, nsg@linux.ibm.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH 2/2] lib: s390x: sclp: Add line mode input handling
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Message-ID: <168898159418.42553.16145415333685309101@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Mon, 10 Jul 2023 11:33:14 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9yHM1deWIYxzH7iDMZfcPIk0q5j8EwCZ
-X-Proofpoint-GUID: 2_cwJE3cvJGhsYLjhZwAnAq1ObLd7mn3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-10_07,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- adultscore=0 priorityscore=1501 bulkscore=0 spamscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2307100082
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a63:705e:0:b0:54f:d553:fbe6 with SMTP id
+ a30-20020a63705e000000b0054fd553fbe6mr8672860pgn.2.1688981742230; Mon, 10 Jul
+ 2023 02:35:42 -0700 (PDT)
+Date:   Mon, 10 Jul 2023 02:35:42 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c7224e06001eb4b1@google.com>
+Subject: [syzbot] Monthly kvm report (Jul 2023)
+From:   syzbot <syzbot+listf42719d660fa6d59a79a@syzkaller.appspotmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-07-07 16:54:10)
-> Time to add line-mode input so we can use input handling under LPAR if
-> there's no access to a ASCII console.
->=20
-> Line-mode IO is pretty wild and the documentation could be improved a
-> lot. Hence I've copied the input parsing functions from the s390-tools
-> zipl code.
+Hello kvm maintainers/developers,
 
-ZIPL is MIT and the copyright notice is not reproduced here.
+This is a 31-day syzbot report for the kvm subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/kvm
 
-NACK.
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 111 have been fixed so far.
 
-Please preserve the copyright notice or copy from a GPL-licensed project.
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 138     Yes   WARNING in kvm_arch_vcpu_ioctl_run (5)
+                  https://syzkaller.appspot.com/bug?extid=5feef0b9ee9c8e9e5689
+<2> 89      Yes   WARNING in handle_exception_nmi (2)
+                  https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
+<3> 58      No    WARNING in kthread_bind_mask
+                  https://syzkaller.appspot.com/bug?extid=087b7effddeec0697c66
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
