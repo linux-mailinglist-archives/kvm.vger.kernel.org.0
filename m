@@ -2,97 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7B4674DB02
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 18:25:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07FB774DB21
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 18:34:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbjGJQZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 12:25:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38840 "EHLO
+        id S229940AbjGJQeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 12:34:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjGJQZs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 12:25:48 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57ED94;
-        Mon, 10 Jul 2023 09:25:46 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-bcb6dbc477eso4303050276.1;
-        Mon, 10 Jul 2023 09:25:46 -0700 (PDT)
+        with ESMTP id S229863AbjGJQeU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 12:34:20 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CCDAB
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 09:34:18 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6687281b767so5535982b3a.1
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 09:34:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689006346; x=1691598346;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rcUxYhRfSgJ6UJMmI4gvN/iDnQgX6gIvJpFELMHmLcE=;
-        b=V8r9oUmNILl8gpI7KePWigjGb6juPhMnDQ/wrv4DQP5As/oXU9XrXK246f9ZHhlBJL
-         NgW9whpWQvfU7c+x8gRKyIabFQLq8y1KB/91koW4cjzXCsMLGDiimO1rnhQ4A+SGtHR5
-         0qPaQafXZZht0IpaBmneBm8MpeuLhudZwHH96ZviOLxHsfACKzldhpgZodjAA0l922q2
-         pnlbiw/dn1xzxjuAiZWozy6KLAqPUfb7KpDVMBORNS1iEcJq7uIR6HeZQpCMJbhktMq6
-         tW+actNpC+n4lGbQUGm2PT9us1+XZ/aHXZ8LEEsgbXOFg1elQLdqT5ptELvD1jDfTUxq
-         L3bA==
+        d=google.com; s=20221208; t=1689006858; x=1691598858;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=21f2RU0O+Dm1adZnCtcR9jtXzIDli0Vque4erFfsGVc=;
+        b=bfFsKDy6zOnQ4xlUnZwRZL742l9SPt3VWo2nUvvGj0tX7lD7Ay/RoH13YlkO4gWV1B
+         Cec876vsj9JQBATq2B5estI9SkEAokiAhVJMeTKkTrG8dOh+fXxOBngq4zyC1nb41oLn
+         xf3R6agFeSqdYsfJKz/mErKMYAHcWhhwfLrKHP0kFSdGPvCOTsb6wTqUFrVHfSb9mnvL
+         qN2mi4STex4P6GTf8/RdVgIad/Db34CTjPQ/cbDXcC2x/B22ubqytMZNkt1iqwI3YlR/
+         zubJKh3w1qK7uH2qaUP3TAlSfvgJ8G28+BxbXPGwYYLhiGMTpOJUaZ3z3b8xlMjPhFV0
+         6ORg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689006346; x=1691598346;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rcUxYhRfSgJ6UJMmI4gvN/iDnQgX6gIvJpFELMHmLcE=;
-        b=c0iWJCeBeGK5/IGy2EXtqVG60n6LiBsLNY++57l1FYElrynBNw3JrJ8AaUVXQ0mETr
-         fJdIsHL30AUM93ANv7CNFRmukrghVrXP4x5F8JQRlqxFnfLHJmodLrnkCyt0IdO2Cmjp
-         YB7MQHUt7eCkMLTqt9gm4U1MQr939prplMBnh/DlDtXmb6Gvam4DNMNcWIeRSoC1hIJV
-         q2pmZubu117k9gHvAyGoZx6w3nXTBzFl1hT4Phi2xxR6xb0Vv/Wy1oVeJfgJ0R9xbLXm
-         9R74kSTh8eM+JQ5iu59TlxPErkPoX5ZBM9LO9HdfG8AcnU9vIb2SVvcmcjyiXqswOsQg
-         iflw==
-X-Gm-Message-State: ABy/qLZwku94AKpV7VfHah4To9vWD1bkjE6ZCQO3kg/pmGp2MUn8XZgl
-        3ui2ytJToFzcZS7sIlV1zaeR2APk1Lg1xlAW3dk=
-X-Google-Smtp-Source: APBJJlE/krGaema6oAIGHffoO9jr9rNxV2NJ9f2ty64/UeXp1MrrtGwo2Rtyks4ROqL/F/KxuN96NsyBfRrrBujlbXI=
-X-Received: by 2002:a25:c0c8:0:b0:c86:55c7:d053 with SMTP id
- c191-20020a25c0c8000000b00c8655c7d053mr2292204ybf.25.1689006345894; Mon, 10
- Jul 2023 09:25:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230710130113.14563-1-tzimmermann@suse.de> <20230710130113.14563-10-tzimmermann@suse.de>
- <CANiq72=9PoV3FOcXx9FdiSLePKXDG4BSY_5-jddBkqDL=ua3FA@mail.gmail.com> <733273ad-89e1-d952-37ee-bb75c3ab8188@suse.de>
-In-Reply-To: <733273ad-89e1-d952-37ee-bb75c3ab8188@suse.de>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Mon, 10 Jul 2023 18:25:34 +0200
-Message-ID: <CANiq72kPh2KE=ADUxhPyyr7noWhC0fkzmDu8EBn_20focnZqtw@mail.gmail.com>
-Subject: Re: [PATCH 09/17] auxdisplay: Remove flag FBINFO_FLAG_DEFAULT from
- fbdev drivers
-To:     Thomas Zimmermann <tzimmermann@suse.de>
-Cc:     deller@gmx.de, javierm@redhat.com, linux-sh@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-staging@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-geode@lists.infradead.org, linux-nvidia@lists.surfsouth.com,
-        linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin van der Gracht <robin@protonic.nl>
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20221208; t=1689006858; x=1691598858;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=21f2RU0O+Dm1adZnCtcR9jtXzIDli0Vque4erFfsGVc=;
+        b=Mr9C9G3gayrV9Gf3jttkzE0sZ5UpMgUs3XwsGEIN2w1NJv1sXFiUd2QvCvGaSPxDFY
+         B1J9006fy4nQUeKYAc46UwDveicn4WioEbNZdCihb4hpAX7Jv0fQrPE2ilGa/3CkAVNa
+         j8PhFKZG9DQn9o5eBvYCrV4chuYu7aTvsCgSdlMNA7ekQPfLuehniGaKj3gdQsHybBO2
+         l1GbMnwzYndiwNkJkb5SrejE821QxcJmj9XCcDWvwdwkpHqdWUYNR97/FGhNNbeDc1WL
+         xrKNy5sqa9k+Z+aV6cT5i1Z7E8ztpDfw9mymmoC/N8N+umtR3OfzUc93RijyI8cZ2MmK
+         rWlg==
+X-Gm-Message-State: ABy/qLbQcLh81JpHt6LAJq/hCvjIKd+YfszH7Qc767PaRmBpmdNm9aNN
+        89rqwRUv/pWliCwN0EPieGC5DR8139s=
+X-Google-Smtp-Source: APBJJlEjyBicQw+/XqYFxNk01qqs57dOrv8MIQDFBq9CGNnEfdLDPZkMfTvXCuaPOdUsWYiLLCcY2+unbNE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2e9e:b0:682:a8df:e64b with SMTP id
+ fd30-20020a056a002e9e00b00682a8dfe64bmr17883460pfb.6.1689006858218; Mon, 10
+ Jul 2023 09:34:18 -0700 (PDT)
+Date:   Mon, 10 Jul 2023 09:34:16 -0700
+In-Reply-To: <CABgObfZCbt8YNuJSa358Er5DO4Eeb4UNbcdyNsWymSSqAnVSpA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230627003306.2841058-1-seanjc@google.com> <20230627003306.2841058-2-seanjc@google.com>
+ <CABgObfZCbt8YNuJSa358Er5DO4Eeb4UNbcdyNsWymSSqAnVSpA@mail.gmail.com>
+Message-ID: <ZKwzCA6guSJZGtJJ@google.com>
+Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.5
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 5:22=E2=80=AFPM Thomas Zimmermann <tzimmermann@suse=
-.de> wrote:
->
-> I'll append a patch to the series that documents this.
->
-> Sure.
+On Sat, Jul 01, 2023, Paolo Bonzini wrote:
+> On Tue, Jun 27, 2023 at 2:33=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >  - Fix a longstanding bug in the reporting of the number of entries ret=
+urned by
+> >    KVM_GET_CPUID2
+>=20
+> This description does not match the actual commit which says there is
+> no functional change. I have removed this entry from the merge commit,
+> letting it go under "Misc cleanups".
 
-Thanks!
+Hmm, which commit are you looking at?  This is the commit I was referring t=
+o in
+the tag.
 
-If you are planning to take it into some other tree:
+commit ab322c43cce97ff6d05439c9b72bf1513e3e1020
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Fri May 26 14:03:39 2023 -0700
 
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
-
-Otherwise, I can take it into the `auxdisplay` tree.
-
-Cheers,
-Miguel
+    KVM: x86: Update number of entries for KVM_GET_CPUID2 on success, not f=
+ailure
+   =20
+    Update cpuid->nent if and only if kvm_vcpu_ioctl_get_cpuid2() succeeds.
+    The sole caller copies @cpuid to userspace only on success, i.e. the
+    existing code effectively does nothing.
+   =20
+    Arguably, KVM should report the number of entries when returning -E2BIG=
+ so
+    that userspace doesn't have to guess the size, but all other similar KV=
+M
+    ioctls() don't report the size either, i.e. userspace is conditioned to
+    guess.
