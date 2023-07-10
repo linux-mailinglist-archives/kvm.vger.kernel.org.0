@@ -2,68 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AEA874DE90
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 21:51:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03BCE74DF1A
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 22:19:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231558AbjGJTvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 15:51:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52272 "EHLO
+        id S232124AbjGJUTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 16:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230047AbjGJTvF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 15:51:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EB0DE6B
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 12:50:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 493ED611E8
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:50:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AF72FC433C8
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:50:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689018658;
-        bh=Uw4fEY4Fo4EbZsNsizj3mh6e3aqt6mz7TWj7dOnhlQI=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=EyVCoEMV0Dwg9V22DJ523ZsgWnruVi3/0Rvw42ahikTFqiJ+GYj7114tNENkLzbgQ
-         vs3/I6369G7qu+K1WdrqBfqv38tCp63SmyCAqCBdvUo8EvUA8AETU3Dt8h1oKYko/k
-         nlLPVtm7MRntmmbpDIhPrgydiUgYSnCIRrpItBC5IdIzI/yP/37abVqowikb6QwIcG
-         /mmb1neQFtP4mXWd/86d60T0PCuPecO99hivbdvR6KDAurhjBEAFISzNEmCtwwsIRc
-         mEsB2m9sgMyNGSMtLk5lW3Omof7WjT8QnBFnAhFyAudxsW+CQskjtLQ5Inl2iY5DQT
-         aHuvp6DDesoHw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 9DFBAC53BD0; Mon, 10 Jul 2023 19:50:58 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217307] windows guest entering boot loop when nested
- virtualization enabled and hyperv installed
-Date:   Mon, 10 Jul 2023 19:50:58 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: webczat@outlook.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217307-28872-5kmj4iCPWz@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217307-28872@https.bugzilla.kernel.org/>
-References: <bug-217307-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S230017AbjGJUTI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 16:19:08 -0400
+Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4B51B9
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 13:18:54 -0700 (PDT)
+Date:   Mon, 10 Jul 2023 20:18:47 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1689020332;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LAPRUW6peEGGRK+R1RqPlmna3g9VSyHgb/bb91MQYh4=;
+        b=aabGCv8UKyntgxxPmTkby8BsgAR6UG16PIAPImK968UyD07tXhfaHiGufqW7gkv+q0G1/+
+        rzx98bAV2raKtiI9ENvIFayH/h3LgR6aYjBFmniwaELb47X87IVOk4/F1OBjq/Ymya55nD
+        fwm6MgxJVzB5+9wphSqrB/Zxu92dxfs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v5 3/6] KVM: arm64: Reject attempts to set invalid debug
+ arch version
+Message-ID: <ZKxnp6Tm3WwXupXw@linux.dev>
+References: <20230710192430.1992246-1-jingzhangos@google.com>
+ <20230710192430.1992246-4-jingzhangos@google.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710192430.1992246-4-jingzhangos@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -72,13 +59,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217307
+Jing,
 
---- Comment #20 from Micha=C5=82 Zegan (webczat@outlook.com) ---
-when i have a chance i might re-test, but for now it's a no.
+On Mon, Jul 10, 2023 at 07:24:26PM +0000, Jing Zhang wrote:
+> From: Oliver Upton <oliver.upton@linux.dev>
+> 
+> The debug architecture is mandatory in ARMv8, so KVM should not allow
+> userspace to configure a vCPU with less than that. Of course, this isn't
+> handled elegantly by the generic ID register plumbing, as the respective
+> ID register fields have a nonzero starting value.
+> 
+> Add an explicit check for debug versions less than v8 of the
+> architecture.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 
---=20
-You may reply to this email to add a comment.
+This patch should be ordered before the change that permits writes to
+the DebugVer field (i.e. the previous patch). While we're at it, there's
+another set of prerequisites for actually making the field writable.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+As Suraj pointed out earlier, we need to override the type of the field
+to be FTR_LOWER_SAFE instead of EXACT. Beyond that, KVM limits the field
+to 0x6, which is the minimum value for an ARMv8 implementation. We can
+relax this limitation up to v8p8, as I believe all of the changes are to
+external debug and wouldn't affect a KVM guest.
+
+Below is my (untested) diff on top of your series for both of these
+changes.
+
+-- 
+Thanks,
+Oliver
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 78ccc95624fa..35c4ab8cb5c8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1216,8 +1216,14 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
+ 	/* Some features have different safe value type in KVM than host features */
+ 	switch (id) {
+ 	case SYS_ID_AA64DFR0_EL1:
+-		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
++		switch (kvm_ftr.shift) {
++		case ID_AA64DFR0_EL1_PMUVer_SHIFT:
+ 			kvm_ftr.type = FTR_LOWER_SAFE;
++			break;
++		case ID_AA64DFR0_EL1_DebugVer_SHIFT:
++			kvm_ftr.type = FTR_LOWER_SAFE;
++			break;
++		}
+ 		break;
+ 	case SYS_ID_DFR0_EL1:
+ 		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
+@@ -1466,14 +1472,22 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return val;
+ }
+ 
++#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)				\
++({										\
++	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);			\
++	(val) &= ~reg##_##field##_MASK;						\
++	(val) |= FIELD_PREP(reg##_##field##_MASK,				\
++			  min(__f_val, (u64)reg##_##field##_##limit));		\
++	(val);									\
++})
++
+ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 					  const struct sys_reg_desc *rd)
+ {
+ 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+ 
+ 	/* Limit debug to ARMv8.0 */
+-	val &= ~ID_AA64DFR0_EL1_DebugVer_MASK;
+-	val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, IMP);
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+ 
+ 	/*
+ 	 * Only initialize the PMU version if the vCPU was configured with one.
+@@ -1529,6 +1543,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	u8 perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+ 	u64 val = read_sanitised_ftr_reg(SYS_ID_DFR0_EL1);
+ 
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
++
+ 	val &= ~ID_DFR0_EL1_PerfMon_MASK;
+ 	if (kvm_vcpu_has_pmu(vcpu))
+ 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+
