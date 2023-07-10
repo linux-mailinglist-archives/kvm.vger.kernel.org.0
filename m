@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F29C174DE77
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 21:47:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7CB174DE82
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 21:50:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbjGJTrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 15:47:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50434 "EHLO
+        id S231297AbjGJTuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 15:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229921AbjGJTrH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 15:47:07 -0400
+        with ESMTP id S231338AbjGJTuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 15:50:00 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4241C13E
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 12:47:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1521B8
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 12:49:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D4E79611C3
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:47:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3E035C433D9
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:47:05 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 469E7611BC
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:49:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ABE23C433CD
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:49:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689018425;
-        bh=g6Z4oY/wf5I24Nstd+O4lQ0Eag6tsTUNNPnyMZam5gw=;
+        s=k20201202; t=1689018588;
+        bh=I0J54nkW9r5PSjZwpab4F9NQIHQM2ClAiz9y8MwAvvM=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=FJ2Wpjx0i0wGfWgIblJQ/bynfGi6Zm56XHZDBq88+QXVFc9mMnURqU8stoeitgMK5
-         F7yXdgJEs8BBMxyTsVtTqPiywgPIM3t3ZnMhRsNQD8UN6BzDbE2iDUyAcYBMdMchSn
-         Qyb2ozz3tSIRYp9OI/Ih7jp71qkgPKFMM9F3/e6UdHWtBbZvoXHpWANz5Qd0/pwiAA
-         o/Cz+8dUTtdFnWTjBHZiYCsMyizgWItYnJ3JFmy3uJx7ZHW09s2v8O0wcqPg4vNhGb
-         4Eo01aoeJct6xnoRKhfFqfGm7TGPZNSnkA1Pm+2KFU8+wSIvm9jqPYVbXICoqkyc2K
-         jF5t1nNzNo+Zg==
+        b=cb5CU4Cumg7oLsK0dmNWp1FFPAFzzAgKpsS1r89xk3/63OrUE5j0XEgoquD5tJjd/
+         Qfm2+88lh8MNRbwrH6hFz93wIDS03SvAMYzL8jR9ZiPSXvpvue4N/j/Tskh3bVDRv5
+         3OWNGtQAitysrYtirPEkOpUuPdSGjEDkn1Uqg19/k5C9FCPko0y45vOwUcC87EBchn
+         J7d8l5LhbuI00QHh56lR80teIFKilK2PjCQ97pzRNJ6FgD6DcxHxbchAN3z9eQEd5R
+         g9CnqJaAUJIEFciUMLTLEK0+WWjH6pAS3AC7Vc4ohN1RGptGNoqaTN4B/Ng8czicfK
+         V0tvQohcwiG4g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 2ED07C4332E; Mon, 10 Jul 2023 19:47:05 +0000 (UTC)
+        id 9AF22C53BCD; Mon, 10 Jul 2023 19:49:48 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 217307] windows guest entering boot loop when nested
  virtualization enabled and hyperv installed
-Date:   Mon, 10 Jul 2023 19:47:04 +0000
+Date:   Mon, 10 Jul 2023 19:49:47 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -47,14 +47,14 @@ X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: seanjc@google.com
+X-Bugzilla-Who: webczat@outlook.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217307-28872-zb32orXLA7@https.bugzilla.kernel.org/>
+Message-ID: <bug-217307-28872-32D35T2sUW@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-217307-28872@https.bugzilla.kernel.org/>
 References: <bug-217307-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -74,18 +74,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D217307
 
---- Comment #18 from Sean Christopherson (seanjc@google.com) ---
-> it seems that my problem is something that exclusively affects 12th gen a=
-nd
-> above
-
-Can you try running a single vCPU VM, and pin that vCPU to a pCPU on a P-Co=
-re?=20
-If this is indeed specific to 12th gen CPUs, then my guess is that hybrid C=
-PUs
-are to blame.  E.g. KVM already disables vPMU (commit 4d7404e5ee00 "KVM:
-x86/pmu: Disable vPMU support on hybrid CPUs (host PMUs)"), I wouldn't be at
-all surprised if there are more problems lurking.
+--- Comment #19 from Micha=C5=82 Zegan (webczat@outlook.com) ---
+to be honest, i have tried with no luck, even though someone suggested that
+also works. it might be i've done it wrong, but i was checking virsh vcpuin=
+fo
+to confirm assignment. someone said using one core should work, it didn't.
+tried pinning to cpu0 which is one of my p-core's threads, and no.
 
 --=20
 You may reply to this email to add a comment.
