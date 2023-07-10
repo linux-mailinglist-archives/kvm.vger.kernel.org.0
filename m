@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D748874D695
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 15:02:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C24974D6B9
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 15:03:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231571AbjGJNCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 09:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48150 "EHLO
+        id S233018AbjGJNBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 09:01:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232376AbjGJNBd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 09:01:33 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A056711F;
-        Mon, 10 Jul 2023 06:01:25 -0700 (PDT)
+        with ESMTP id S232250AbjGJNB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 09:01:29 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C725A8;
+        Mon, 10 Jul 2023 06:01:23 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id AA9DB1FF87;
-        Mon, 10 Jul 2023 13:01:21 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0BDD7221C1;
+        Mon, 10 Jul 2023 13:01:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1688994081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1688994082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MBN05KgHaY0sMx1l1iBUjP749OE7Z5F7kgfPD8riQ2g=;
-        b=SuQ5e90aJch45HVzdyRHmRbbrzuHmO1SiTYMooQuvASBPdLqlTlVilzOBrVfV3XDxhivqO
-        BljjcN4Jyhf8bKj4o6lQrdesOVKLRNCvIG62NlYjtHiRrPJQ+Oi7z7go3R/fHNCwVTBrbS
-        EnLnpzZX5+qqT+i1TQVfz5Vbh+G68vQ=
+        bh=I0Gm3caehTf+DDNUO7FEiHJTJ/hpEoZRP8IUYE91TXw=;
+        b=Go7brugIegGY+ZVPi6YfHKxGodhrQekZWN2V2ZK6jxPYBTjY635csao0oKFNQYWr11kMz8
+        G39YnLW+q7ItBbkzh7LkyKVTEiNWztYwaEDCGYGHHmSJ6suqKc0jI7HYjJIJ0YgoIdBdUB
+        y0bMj50CzUM97CeHB3sibChMwMXdKNs=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1688994081;
+        s=susede2_ed25519; t=1688994082;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MBN05KgHaY0sMx1l1iBUjP749OE7Z5F7kgfPD8riQ2g=;
-        b=HMr8eJJ2iAGo8mdPxjB2hyPQv7w8MHRS1RtWaIIBe31IMfopJy4lG5GeGEKarxz7bk1cY8
-        17E3SBnQgzcfSCDA==
+        bh=I0Gm3caehTf+DDNUO7FEiHJTJ/hpEoZRP8IUYE91TXw=;
+        b=MsqvxlT6sFr6ha7xHjLd+Ynf+kok1rNaAtXEFt/8fbacjxNPr9mpxokzH4T2unRIgadntW
+        9gKaSCCViPXyQpCQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5E68F13A05;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AFEF513A05;
         Mon, 10 Jul 2023 13:01:21 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id mIUrFiEBrGTTFAAAMHmgww
+        id qGYSKiEBrGTTFAAAMHmgww
         (envelope-from <tzimmermann@suse.de>); Mon, 10 Jul 2023 13:01:21 +0000
 From:   Thomas Zimmermann <tzimmermann@suse.de>
 To:     deller@gmx.de, javierm@redhat.com
@@ -59,9 +59,9 @@ Cc:     linux-sh@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
         Thomas Zimmermann <tzimmermann@suse.de>
-Subject: [PATCH 16/17] fbdev/pxafb: Remove flag FBINFO_FLAG_DEFAULT
-Date:   Mon, 10 Jul 2023 14:50:20 +0200
-Message-ID: <20230710130113.14563-17-tzimmermann@suse.de>
+Subject: [PATCH 17/17] fbdev: Remove FBINFO_DEFAULT and FBINFO_FLAG_DEFAULT
+Date:   Mon, 10 Jul 2023 14:50:21 +0200
+Message-ID: <20230710130113.14563-18-tzimmermann@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230710130113.14563-1-tzimmermann@suse.de>
 References: <20230710130113.14563-1-tzimmermann@suse.de>
@@ -77,31 +77,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The flag FBINFO_FLAG_DEFAULT is 0 and has no effect, as struct
-fbinfo.flags has been allocated to zero by devm_kzalloc(). So do not
-set it.
-
-Flags should signal differences from the default values. After cleaning
-up all occurences of FBINFO_FLAG_DEFAULT, the token can be removed.
+Remove the unused flags FBINFO_DEFAULT and FBINFO_FLAG_DEFAULT. No
+functional changes.
 
 Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
 Cc: Helge Deller <deller@gmx.de>
 ---
- drivers/video/fbdev/pxafb.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/linux/fb.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/video/fbdev/pxafb.c b/drivers/video/fbdev/pxafb.c
-index c8c4677d06b4..beffb0602a2c 100644
---- a/drivers/video/fbdev/pxafb.c
-+++ b/drivers/video/fbdev/pxafb.c
-@@ -888,7 +888,6 @@ static void init_pxafb_overlay(struct pxafb_info *fbi, struct pxafb_layer *ofb,
- 	ofb->fb.var.vmode		= FB_VMODE_NONINTERLACED;
+diff --git a/include/linux/fb.h b/include/linux/fb.h
+index 1d5c13f34b09..43458f582f35 100644
+--- a/include/linux/fb.h
++++ b/include/linux/fb.h
+@@ -383,7 +383,6 @@ struct fb_tile_ops {
+ #endif /* CONFIG_FB_TILEBLITTING */
  
- 	ofb->fb.fbops			= &overlay_fb_ops;
--	ofb->fb.flags			= FBINFO_FLAG_DEFAULT;
- 	ofb->fb.node			= -1;
- 	ofb->fb.pseudo_palette		= NULL;
+ /* FBINFO_* = fb_info.flags bit flags */
+-#define FBINFO_DEFAULT		0
+ #define FBINFO_HWACCEL_DISABLED	0x0002
+ 	/* When FBINFO_HWACCEL_DISABLED is set:
+ 	 *  Hardware acceleration is turned off.  Software implementations
+@@ -504,8 +503,6 @@ struct fb_info {
+ 	bool skip_vt_switch; /* no VT switch on suspend/resume required */
+ };
  
+-#define FBINFO_FLAG_DEFAULT	FBINFO_DEFAULT
+-
+ /* This will go away
+  * fbset currently hacks in FB_ACCELF_TEXT into var.accel_flags
+  * when it wants to turn the acceleration engine on.  This is
 -- 
 2.41.0
 
