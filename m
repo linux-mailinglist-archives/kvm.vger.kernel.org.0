@@ -2,102 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07FB774DB21
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 18:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF5FF74DB25
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 18:34:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbjGJQeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 12:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41124 "EHLO
+        id S229998AbjGJQe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 12:34:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjGJQeU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 12:34:20 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CCDAB
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 09:34:18 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-6687281b767so5535982b3a.1
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 09:34:18 -0700 (PDT)
+        with ESMTP id S229732AbjGJQew (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 12:34:52 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8230AB;
+        Mon, 10 Jul 2023 09:34:51 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-263253063f9so3445167a91.1;
+        Mon, 10 Jul 2023 09:34:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689006858; x=1691598858;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=21f2RU0O+Dm1adZnCtcR9jtXzIDli0Vque4erFfsGVc=;
-        b=bfFsKDy6zOnQ4xlUnZwRZL742l9SPt3VWo2nUvvGj0tX7lD7Ay/RoH13YlkO4gWV1B
-         Cec876vsj9JQBATq2B5estI9SkEAokiAhVJMeTKkTrG8dOh+fXxOBngq4zyC1nb41oLn
-         xf3R6agFeSqdYsfJKz/mErKMYAHcWhhwfLrKHP0kFSdGPvCOTsb6wTqUFrVHfSb9mnvL
-         qN2mi4STex4P6GTf8/RdVgIad/Db34CTjPQ/cbDXcC2x/B22ubqytMZNkt1iqwI3YlR/
-         zubJKh3w1qK7uH2qaUP3TAlSfvgJ8G28+BxbXPGwYYLhiGMTpOJUaZ3z3b8xlMjPhFV0
-         6ORg==
+        d=gmail.com; s=20221208; t=1689006891; x=1691598891;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=McmzJB5w4UGeZqusQBhdxfjqigG3UhKtoIfFccLuj2s=;
+        b=UuZrn4FN/UbJwfewh85rKzjLye9uELQEX45+YZjjYTP/BYBPgS+1UF+XIPNG2dESCU
+         W86RtEBWvSwsPMW2x13eLsYhpVucWKpqju+x0agjnUbM9X4mJPFqV5rxvm4kT+xeCHJ2
+         VLT5n9dF1ENtaArZbX2UUhZour8m8LNq5DgukydBxaU2fh8GLhckDOL0rRtQHMK6r9Zy
+         jdOMwsf8im36X5gkixxf9GaLSAwdB6NrArpT95n6SO2ZLoGIlJK/Rxm4qX2jwfk/k1E7
+         Ou/qPcZpE/ua9W+K5ji+Kqm43nFA7KCT2k00BsUZLSUM4S3DFaj6X8Q0tH21tk5YJKRc
+         ar2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689006858; x=1691598858;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=21f2RU0O+Dm1adZnCtcR9jtXzIDli0Vque4erFfsGVc=;
-        b=Mr9C9G3gayrV9Gf3jttkzE0sZ5UpMgUs3XwsGEIN2w1NJv1sXFiUd2QvCvGaSPxDFY
-         B1J9006fy4nQUeKYAc46UwDveicn4WioEbNZdCihb4hpAX7Jv0fQrPE2ilGa/3CkAVNa
-         j8PhFKZG9DQn9o5eBvYCrV4chuYu7aTvsCgSdlMNA7ekQPfLuehniGaKj3gdQsHybBO2
-         l1GbMnwzYndiwNkJkb5SrejE821QxcJmj9XCcDWvwdwkpHqdWUYNR97/FGhNNbeDc1WL
-         xrKNy5sqa9k+Z+aV6cT5i1Z7E8ztpDfw9mymmoC/N8N+umtR3OfzUc93RijyI8cZ2MmK
-         rWlg==
-X-Gm-Message-State: ABy/qLbQcLh81JpHt6LAJq/hCvjIKd+YfszH7Qc767PaRmBpmdNm9aNN
-        89rqwRUv/pWliCwN0EPieGC5DR8139s=
-X-Google-Smtp-Source: APBJJlEjyBicQw+/XqYFxNk01qqs57dOrv8MIQDFBq9CGNnEfdLDPZkMfTvXCuaPOdUsWYiLLCcY2+unbNE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2e9e:b0:682:a8df:e64b with SMTP id
- fd30-20020a056a002e9e00b00682a8dfe64bmr17883460pfb.6.1689006858218; Mon, 10
- Jul 2023 09:34:18 -0700 (PDT)
-Date:   Mon, 10 Jul 2023 09:34:16 -0700
-In-Reply-To: <CABgObfZCbt8YNuJSa358Er5DO4Eeb4UNbcdyNsWymSSqAnVSpA@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230627003306.2841058-1-seanjc@google.com> <20230627003306.2841058-2-seanjc@google.com>
- <CABgObfZCbt8YNuJSa358Er5DO4Eeb4UNbcdyNsWymSSqAnVSpA@mail.gmail.com>
-Message-ID: <ZKwzCA6guSJZGtJJ@google.com>
-Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.5
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1689006891; x=1691598891;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=McmzJB5w4UGeZqusQBhdxfjqigG3UhKtoIfFccLuj2s=;
+        b=evkAKDT0cLgFyquxKWBG/YBFtPJVctEyZXGq3jun5dnbfhkdwBgP9sE4C5kpybrZIr
+         cCNxEuAEghN0WfCyFKLwf6psUEekJRQVXVcNJ+v/rqLjLHXF9eb8urERHAEk6temfgKx
+         gOecd4cbYwJw1XYaeQ1JwJPOiErMgDg54uPxqOJEg1Y3mqgVW6HWL0URhguN4y+BlUkz
+         0fpyg1uMUBVAH0V7ZtUxu4ATy0SiGuzNENBSW3exbuQG4N/kJxLmuPTwoCsKB/9kvqc/
+         G5WMyfufLlRW2UvTgbVxtKFiPQ3Giv79+2we2FAX3DLee96ukcGIzEicCTYBgxShAhB8
+         j/KQ==
+X-Gm-Message-State: ABy/qLYEfwPHbXoGLrUR3jDeSG+im09glk/Fe9GUTgD90IiIJnKfYTrW
+        /XMdcpoeRvvtKWp5mAYAAJc=
+X-Google-Smtp-Source: APBJJlFGgItLHZLzX11JZjIS73D9W6Es/hAVqOzRDVW3J19VHlBJaksBcwskjpiGnATOLXIP8QCxUQ==
+X-Received: by 2002:a17:90a:b315:b0:261:113e:50d2 with SMTP id d21-20020a17090ab31500b00261113e50d2mr13856226pjr.31.1689006890824;
+        Mon, 10 Jul 2023 09:34:50 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id t8-20020a17090aae0800b00263f40cf83esm6456783pjq.47.2023.07.10.09.34.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jul 2023 09:34:50 -0700 (PDT)
+Date:   Mon, 10 Jul 2023 09:34:48 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
+ __kvm_follow_pfn
+Message-ID: <20230710163448.GE3894444@ls.amr.corp.intel.com>
+References: <20230704075054.3344915-1-stevensd@google.com>
+ <20230704075054.3344915-6-stevensd@google.com>
+ <20230705101800.ut4c6topn6ylwczs@linux.intel.com>
+ <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
+ <20230706155805.GD3894444@ls.amr.corp.intel.com>
+ <CAD=HUj6GiK3TSSe7UY8C2Jd+3tjZNBa-TLgk-UodyL=E+qKavg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAD=HUj6GiK3TSSe7UY8C2Jd+3tjZNBa-TLgk-UodyL=E+qKavg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 01, 2023, Paolo Bonzini wrote:
-> On Tue, Jun 27, 2023 at 2:33=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >  - Fix a longstanding bug in the reporting of the number of entries ret=
-urned by
-> >    KVM_GET_CPUID2
->=20
-> This description does not match the actual commit which says there is
-> no functional change. I have removed this entry from the merge commit,
-> letting it go under "Misc cleanups".
+On Fri, Jul 07, 2023 at 10:35:02AM +0900,
+David Stevens <stevensd@chromium.org> wrote:
 
-Hmm, which commit are you looking at?  This is the commit I was referring t=
-o in
-the tag.
+> > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > > index e44ab512c3a1..b1607e314497 100644
+> > > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > >
+> > > > ...
+> > > >
+> > > > > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+> > > > >       bool host_writable = !fault || fault->map_writable;
+> > > > >       bool prefetch = !fault || fault->prefetch;
+> > > > >       bool write_fault = fault && fault->write;
+> > > > > +     bool is_refcounted = !fault || fault->is_refcounted_page;
+> > > >
+> > > > Just wonder, what if a non-refcounted page is prefetched?  Or is it possible in
+> > > > practice?
+> > >
+> > > Prefetching is still done via gfn_to_page_many_atomic, which sets
+> > > FOLL_GET. That's fixable, but it's not something this series currently
+> > > does.
+> >
+> > So if we prefetch a page, REFCOUNTED bit is cleared unconditionally with this
+> > hunk.  kvm_set_page_{dirty, accessed} won't be called as expected for prefetched
+> > spte.  If I read the patch correctly, REFCOUNTED bit in SPTE should represent
+> > whether the corresponding page is ref-countable or not, right?
+> >
+> > Because direct_pte_prefetch_many() is for legacy KVM MMU and FNAME(prefetch_pte)
+> > is shadow paging, we need to test it with legacy KVM MMU or shadow paging to hit
+> > the issue, though.
+> >
+> 
+> direct_pte_prefetch_many and prefetch_gpte both pass NULL for the
+> fault parameter, so is_refcounted will evaluate to true. So the spte's
+> refcounted bit will get set in that case.
 
-commit ab322c43cce97ff6d05439c9b72bf1513e3e1020
-Author: Sean Christopherson <seanjc@google.com>
-Date:   Fri May 26 14:03:39 2023 -0700
-
-    KVM: x86: Update number of entries for KVM_GET_CPUID2 on success, not f=
-ailure
-   =20
-    Update cpuid->nent if and only if kvm_vcpu_ioctl_get_cpuid2() succeeds.
-    The sole caller copies @cpuid to userspace only on success, i.e. the
-    existing code effectively does nothing.
-   =20
-    Arguably, KVM should report the number of entries when returning -E2BIG=
- so
-    that userspace doesn't have to guess the size, but all other similar KV=
-M
-    ioctls() don't report the size either, i.e. userspace is conditioned to
-    guess.
+Oops, my bad.  My point is "unconditionally".  Is the bit always set for
+non-refcountable pages?  Or non-refcountable pages are not prefeched?
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
