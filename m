@@ -2,187 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F5CF74D96C
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 17:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3917C74D988
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 17:06:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233345AbjGJPCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 11:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59108 "EHLO
+        id S233494AbjGJPGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 11:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233324AbjGJPCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 11:02:01 -0400
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C6DBCE
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 08:02:00 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-47dcf42d3a0so4006549e0c.1
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 08:02:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689001319; x=1691593319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d/sUNdtXxakq8jmp5wcqZtKus2+6D3V7y8Xb9orW/bc=;
-        b=lR0HiSsQ75xixs2SGZAUx9sppXeb2VUtOOA1aLvD1Hb0V2qN+kBZC9UiNkUQ53tEu1
-         9Q5CiNzlQZz8mFacRo11LBsVS1pTeTyHcDtR0FEIGnbtzOXQzTv8b0khJsEAa0DtMT+m
-         QXMw0qiZ+RRp+XH8/b/zhruC9D2pJ29/6N6NCYarnnTRaU4xL7uZrWYrhoSRtEay2v+9
-         CW5iqSb1KxLwErSMdYZCBTqHsSu4tZzjBa11fXJ3Ps6aUMwC/HLTMQDtlZegse4hJam7
-         vYtL82aJNmt5uP7KQD13A1hocVwS1F73iAyEppsbQilE+60bBvi+ZMrWmbfoa5+ZEj4W
-         FKTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689001319; x=1691593319;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d/sUNdtXxakq8jmp5wcqZtKus2+6D3V7y8Xb9orW/bc=;
-        b=HKhpdDWd94T9MKBw4Y8SNKW/cK2+gbNMmkfvMQfIV2Uf8VokJrA2bhgsZR4fvyd67P
-         V41hgagC0PYaOsr/hW/IatWIVwg0ysOqBAhYySGOgKiM6AReYIikBfZEbEI9SyLL5DTT
-         hjMYXYqPfd0g6kRB4wb/xN+w53euf5nOuZ7E2jGepHoo0P8b5Jqz/YFPjix6+rEc9lA1
-         jxcq8qtF9NJI4M6B2b35nZmQt7JBGoi1plZw8iwOikpzyvP1KirIiUtig5l4dFsax7qh
-         +8NQKtv8bTAcnuFXMxV8QM/Fl8X5YkrVPyxclocejIbPVCDgQbrdj5MPqc1DOORpMMuA
-         xOWQ==
-X-Gm-Message-State: ABy/qLZucfPFx02MYI97dO27fX50ggKrbZfVSgVn1PRH18qMwIsphL97
-        GeVlWVKDzRSyCLRfuEysqxKHYSjexZ3Hn44jhEwdNg==
-X-Google-Smtp-Source: APBJJlF2giwme5p7futOTNlJ8L8M/CNv5v2eRtIYUGAvhRDJ73OwpteVzgCU/DW4qF+q9LfswGKQiPI9yXVkzTwPeH8=
-X-Received: by 2002:a1f:c1ce:0:b0:46e:1a21:b52d with SMTP id
- r197-20020a1fc1ce000000b0046e1a21b52dmr4103998vkf.5.1689001319090; Mon, 10
- Jul 2023 08:01:59 -0700 (PDT)
+        with ESMTP id S233475AbjGJPGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 11:06:39 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC41B120;
+        Mon, 10 Jul 2023 08:06:35 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36AExNtb027240;
+        Mon, 10 Jul 2023 15:06:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=aK/3ICWzLRCLnLIiAZjU/F6f+FdlbS9GuzoT0VUFLm8=;
+ b=ObcaGd4MSx+FFl/a1G5XiBf6+GHeGccN4TiPar3hBP6j1f2kHmL9+zwMAk+8+kHZGF8L
+ 2wfYpALy15CIF+Vt/WeEy13tNE3MxSPbEwFQ+mHIj8QhIgVLuiBFjzvfBHU+h24HyfHZ
+ ZkCK/JLlbcdDP+geIZ/Loe97HfjvRITmAcMMRTMFLzk4Gw5I7nfCd4mrd1rq0q2l2eOz
+ cbMtsVOuFwmF+yMcWQeu1GQAbcfi+27dob7pcWgKinbnfHO4Xvcf/HmfBPojFKiFGdzM
+ Rc0JPDuGoyCLxW19Z1HBt+HEt+wK+tfnuK44JdYOZ48JMWARWk+tAQ9p4zoO5T4VF9Gt FQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrm7qge8n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jul 2023 15:06:32 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36AF0H8g029420;
+        Mon, 10 Jul 2023 15:06:07 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rrm7qgd00-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jul 2023 15:06:07 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36AErbWt016727;
+        Mon, 10 Jul 2023 15:05:40 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rpye599fh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jul 2023 15:05:39 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36AF5a3B31785712
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jul 2023 15:05:36 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9721C2004B;
+        Mon, 10 Jul 2023 15:05:36 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 405D620040;
+        Mon, 10 Jul 2023 15:05:36 +0000 (GMT)
+Received: from [9.171.90.148] (unknown [9.171.90.148])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Jul 2023 15:05:36 +0000 (GMT)
+Message-ID: <76daa0d8-829d-2d48-4d70-92097518d565@linux.ibm.com>
+Date:   Mon, 10 Jul 2023 17:05:35 +0200
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com> <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-In-Reply-To: <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Mon, 10 Jul 2023 08:00:00 -0700
-Message-ID: <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-To:     Kautuk Consul <kconsul@linux.vnet.ibm.com>
-Cc:     Sean Christopherson <seanjc@google.com>, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-        maz@kernel.org, robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230601070202.152094-1-nrb@linux.ibm.com>
+ <20230601070202.152094-7-nrb@linux.ibm.com>
+ <ab1047c5-77f1-d68b-cf05-4bcda44909ed@linux.ibm.com>
+ <168899937501.42553.5805213823249646110@t14-nrb>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 6/6] s390x: add a test for SIE without
+ MSO/MSL
+In-Reply-To: <168899937501.42553.5805213823249646110@t14-nrb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GNYn9_GD3rqK_eRjupLBXAvUOo1cywZ1
+X-Proofpoint-ORIG-GUID: nBPkQ7HFpro9icSxvpAjeW6nyKTFva1r
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-10_11,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
+ bulkscore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307100135
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > +   preempt_disable();
-> > > +   /*
-> > > +    * Ensure the this vCPU isn't modifying another vCPU's run struct=
-, which
-> > > +    * would open the door for races between concurrent calls to this
-> > > +    * function.
-> > > +    */
-> > > +   if (WARN_ON_ONCE(vcpu !=3D __this_cpu_read(kvm_running_vcpu)))
-> > > +           goto out;
-> >
-> > Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is a=
-n
-> > abomination that I wish didn't exist, not a pattern that should be copi=
-ed.  If
-> > we do keep this sanity check, it can simply be
-> >
-> >       if (WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu()))
-> >               return;
-> >
-> > because as the comment for kvm_get_running_vcpu() explains, the returne=
-d vCPU
-> > pointer won't change even if this task gets migrated to a different pCP=
-U.  If
-> > this code were doing something with vcpu->cpu then preemption would nee=
-d to be
-> > disabled throughout, but that's not the case.
-> >
-> I think that this check is needed but without the WARN_ON_ONCE as per my
-> other comment.
-> Reason is that we really need to insulate the code against preemption
-> kicking in before the call to preempt_disable() as the logic seems to
-> need this check to avoid concurrency problems.
-> (I don't think Anish simply copied this if-check from mark_page_dirty_in_=
-slot)
+On 7/10/23 16:29, Nico Boehr wrote:
+> Quoting Janosch Frank (2023-06-05 11:57:58)
+> [...]
+>>> diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
+>>> new file mode 100644
+>>> index 000000000000..c490a2aa825c
+> [...]
+>>> +#include <libcflat.h>
+>>> +#include <vmalloc.h>
+>>> +#include <asm/asm-offsets.h>
+>>
+>> I only did a cursory glance and wasn't able to see a use for this include.
+> 
+> Yep, thanks, I cleaned up the includes a bit.
+> 
+> [...]
+>>> +static void test_sie_dat(void)
+>>> +{
+>>> +     uint8_t r1;
+>>> +     bool contents_match;
+>>> +     uint64_t test_page_gpa, test_page_hpa;
+>>> +     uint8_t *test_page_hva;
+>>> +
+>>> +     /* guest will tell us the guest physical address of the test buffer */
+>>> +     sie(&vm);
+>>> +
+>>> +     r1 = (vm.sblk->ipa & 0xf0) >> 4;
+>>> +     test_page_gpa = vm.save_area.guest.grs[r1];
+>>> +     test_page_hpa = virt_to_pte_phys(guest_root, (void*)test_page_gpa);
+>>> +     test_page_hva = __va(test_page_hpa);
+>>> +     report(vm.sblk->icptcode == ICPT_INST &&
+>>> +            (vm.sblk->ipa & 0xFF00) == 0x8300 && vm.sblk->ipb == 0x9c0000,
+>>> +            "test buffer gpa=0x%lx hva=%p", test_page_gpa, test_page_hva);
+>>
+>> You could rebase on my pv_icptdata.h patch.
+>> Also the report string and boolean don't really relate to each other.
+> 
+> Which patch are we talking about? pv_icptdata_check_diag()?
+> 
+> Note that this is not a PV test, so I guess it's not applicable here?
 
-Heh, you're giving me too much credit here. I did copy-paste this
-check, not from from mark_page_dirty_in_slot() but from one of Sean's
-old responses [1]
+Ah right, we could extend that but for one use this should be fine.
+Let's see if there'll be more SIE tests that need this before building a 
+a full intercept check lib.
 
-> That said, I agree that there's a risk that KVM could clobber vcpu->run_r=
-un by
-> hitting an -EFAULT without the vCPU loaded, but that's a solvable problem=
-, e.g.
-> the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if cal=
-led
-> without the target vCPU being loaded:
->
->     int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
->     {
->         preempt_disable();
->         if (WARN_ON_ONCE(vcpu !=3D __this_cpu_read(kvm_running_vcpu)))
->             goto out;
->
->         vcpu->run->exit_reason =3D KVM_EXIT_MEMORY_FAULT;
->         ...
->     out:
->         preempt_enable();
->         return -EFAULT;
->     }
+Could you lower-case the 0xFF00 when you re-spin?
 
-Ancient history aside, let's figure out what's really needed here.
+> 
+>> Not every exit needs to be a report.
+>> Some should rather be asserts() or report_info()s.
+> 
+> Yeah, I have made report()s where it doesn't make sense to continue assert()s
+> 
+>>> +     contents_match = true;
+>>> +     for (unsigned int i = 0; i < GUEST_TEST_PAGE_COUNT; i++) {
+>>> +             uint8_t expected_val = 42 + i;
+>>
+>> Just because you can doesn't mean that you have to.
+>> At least leave a \n when declaring new variables...
+> 
+> I am a bit confused but I *guess* you wanted me to move the declaration of
+> expected_val to the beginning of the function?
+> 
 
-> Why use WARN_ON_ONCE when there is a clear possiblity of preemption
-> kicking in (with the possibility of vcpu_load/vcpu_put being called
-> in the new task) before preempt_disable() is called in this function ?
-> I think you should use WARN_ON_ONCE only where there is some impossible
-> or unhandled situation happening, not when there is a possibility of that
-> situation clearly happening as per the kernel code.
+Personally I'm not a big fan of declaring variables in the lower 
+function body, they are way too easy to overlook.
 
-I did some mucking around to try and understand the kvm_running_vcpu
-variable, and I don't think preemption/rescheduling actually trips the
-WARN here? From my (limited) understanding, it seems that the
-thread being preempted will cause a vcpu_put() via kvm_sched_out().
-But when the thread is eventually scheduled back in onto whatever
-core, it'll vcpu_load() via kvm_sched_in(), and the docstring for
-kvm_get_running_vcpu() seems to imply the thing that vcpu_load()
-stores into the per-cpu "kvm_running_vcpu" variable will be the same
-thing which would have been observed before preemption.
+I dimly remember there being a rule but when I used a few minutes to 
+look for it I couldn't find it anymore. Hmmmm, maybe I'm getting old.
 
-All that's to say: I wouldn't expect the value of
-"__this_cpu_read(kvm_running_vcpu)" to change in any given thread. If
-that's true, then the things I would expect this WARN to catch are (a)
-bugs where somehow the thread gets scheduled without calling
-vcpu_load() or (b) bizarre situations (probably all bugs?) where some
-vcpu thread has a hold of some _other_ kvm_vcpu* and is trying to do
-something with it.
+> [...]
+>>> diff --git a/s390x/snippets/c/sie-dat.c b/s390x/snippets/c/sie-dat.c
+>>> new file mode 100644
+>>> index 000000000000..e156d0c36c4c
+>>> --- /dev/null
+>>> +++ b/s390x/snippets/c/sie-dat.c
+>>> @@ -0,0 +1,58 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>> +/*
+>>> + * Snippet used by the sie-dat.c test to verify paging without MSO/MSL
+>>> + *
+>>> + * Copyright (c) 2023 IBM Corp
+>>> + *
+>>> + * Authors:
+>>> + *  Nico Boehr <nrb@linux.ibm.com>
+>>> + */
+>>> +#include <stddef.h>
+>>> +#include <inttypes.h>
+>>> +#include <string.h>
+>>> +#include <asm-generic/page.h>
+>>> +
+>>> +/* keep in sync with GUEST_TEST_PAGE_COUNT in s390x/sie-dat.c */
+>>> +#define TEST_PAGE_COUNT 10
+>>> +static uint8_t test_page[TEST_PAGE_COUNT * PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
+>>> +
+>>> +/* keep in sync with GUEST_TOTAL_PAGE_COUNT in s390x/sie-dat.c */
+>>> +#define TOTAL_PAGE_COUNT 256
+>>> +
+>>> +static inline void force_exit(void)
+>>> +{
+>>> +     asm volatile("diag      0,0,0x44\n");
+>>> +}
+>>> +
+>>> +static inline void force_exit_value(uint64_t val)
+>>> +{
+>>> +     asm volatile(
+>>> +             "diag   %[val],0,0x9c\n"
+>>> +             : : [val] "d"(val)
+>>> +     );
+>>> +}
+>>
+>> It feels like these need to go into a snippet lib.
+> 
+> A bunch of other tests do similar things, so I'll write a TODO and tackle it in
+> a seperate series.
 
+Thanks :)
 
-On Wed, Jun 14, 2023 at 10:35=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> Meh, this is overkill IMO.  The check in mark_page_dirty_in_slot() is an
-> abomination that I wish didn't exist, not a pattern that should be copied=
-.  If
-> we do keep this sanity check, it can simply be
->
->         if (WARN_ON_ONCE(vcpu !=3D kvm_get_running_vcpu()))
->                 return;
->
-> because as the comment for kvm_get_running_vcpu() explains, the returned =
-vCPU
-> pointer won't change even if this task gets migrated to a different pCPU.=
-  If
-> this code were doing something with vcpu->cpu then preemption would need =
-to be
-> disabled throughout, but that's not the case.
+> 
+> [...]
+>>> +
+>>> +__attribute__((section(".text"))) int main(void)
+>>
+>> The attribute shouldn't be needed anymore.
+> 
+> OK, removed.
+> 
+> [...]
+>>> +{
+>>> +     uint8_t *invalid_ptr;
+>>> +
+>>> +     memset(test_page, 0, sizeof(test_page));
+>>> +     /* tell the host the page's physical address (we're running DAT off) */
+>>> +     force_exit_value((uint64_t)test_page);
+>>> +
+>>> +     /* write some value to the page so the host can verify it */
+>>> +     for (size_t i = 0; i < TEST_PAGE_COUNT; i++)
+>>
+>> Why is i a size_t type?
+> 
+> Because it's a suitable unsigned type for use as an array index.
+> 
+> What should it be instead?
 
-Oh, looks like Sean said the same thing. Guess I probably should have
-read that reply more closely first :/
+I would have used a standard uint type but to be fair this doesn't kill 
+me either.
 
-
-[1] https://lore.kernel.org/kvm/ZBnLaidtZEM20jMp@google.com/
