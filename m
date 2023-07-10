@@ -2,148 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03BCE74DF1A
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 22:19:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A25274DF36
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 22:29:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbjGJUTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 16:19:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37496 "EHLO
+        id S229560AbjGJU3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 16:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbjGJUTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 16:19:08 -0400
-Received: from out-32.mta1.migadu.com (out-32.mta1.migadu.com [95.215.58.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4B51B9
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 13:18:54 -0700 (PDT)
-Date:   Mon, 10 Jul 2023 20:18:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689020332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LAPRUW6peEGGRK+R1RqPlmna3g9VSyHgb/bb91MQYh4=;
-        b=aabGCv8UKyntgxxPmTkby8BsgAR6UG16PIAPImK968UyD07tXhfaHiGufqW7gkv+q0G1/+
-        rzx98bAV2raKtiI9ENvIFayH/h3LgR6aYjBFmniwaELb47X87IVOk4/F1OBjq/Ymya55nD
-        fwm6MgxJVzB5+9wphSqrB/Zxu92dxfs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v5 3/6] KVM: arm64: Reject attempts to set invalid debug
- arch version
-Message-ID: <ZKxnp6Tm3WwXupXw@linux.dev>
-References: <20230710192430.1992246-1-jingzhangos@google.com>
- <20230710192430.1992246-4-jingzhangos@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230710192430.1992246-4-jingzhangos@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231344AbjGJU26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 16:28:58 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D66C413E
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 13:28:57 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8959fb3c7so58682225ad.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 13:28:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689020937; x=1691612937;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rF29GRgI8hOW8jLROF4KwGHDbjmxwt4c6jNir/qrBzs=;
+        b=jOkorrw1678EU4ez642rTZ8VfFOAcxpduo03I2ahHvbcWtPyX1J9zaxk9/HdnXV5NF
+         +8NbcVqbXxIEETOSio0rxJoqfOFcya+Q2zzEYN8/fNNNZhZr/koS7KObNfEFEr4edCYG
+         g2otY5bdgkOa+0E7RELb6lFzySFZIP8voBrD4PR9VBD7ILLRAclviplJxyOQPaXuKSMn
+         ANzmrhcTL3RD0Tl5DGWR/knsa+xTrfDSUDkyKz9aCBjL3LiPBp9HFz9nayULGVFla0nc
+         80PIUiTW0WSKogKnyAAfCYQjdVEQaXl8YbAY/SrRBlKDsx/fX9G5/KTdHoV2xrgWvcBg
+         +Pvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689020937; x=1691612937;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rF29GRgI8hOW8jLROF4KwGHDbjmxwt4c6jNir/qrBzs=;
+        b=IPnJt6UZpTnFQMsGthehilWu5SLi46nRB+YAnIbcD0Ybq0jsC9w49FWHP8ouLTHicc
+         PIdQkj8tXVOYlz5R/lbUfNiADLY0MXt6cQEghX3Upf3dYZKQiH5zQ0zX+mkerRCYJjXF
+         EZurhFdmjKlL1XmHLIMWbie2v85oWx1Tp5CWQC8HyHMufPfxbOgi466VWtWwFGdAhYOn
+         uI0jlNweYYujzCdePtKJQfqnzgE+JYFYerycEWgg15IpplBMJcNv4RE1kXgVxUqIZObE
+         qCQywLvvM8VMU0hfQtIvDcNQ35pPHLT6wkzBQVwg+1U3XtHaupOrficrEXmhFerKmzLJ
+         xh9w==
+X-Gm-Message-State: ABy/qLZ117N4Q7IiamYwQl/fiMC8yJvi8WDM/AaTycwTfPIVwDu3mwuN
+        rujlp+en5jVyYWKEdGf5QJMIkM4QiCc=
+X-Google-Smtp-Source: APBJJlG5lGHrhxyvgWQtaCd0VQa2a0kqO4lf9RNKbEuXXJ+s8Ne6YR8onYAvNGQVdSMH3WQ+Q13aPcYpSQc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:c1cd:b0:1b8:8fe2:6627 with SMTP id
+ c13-20020a170902c1cd00b001b88fe26627mr11923948plc.8.1689020937323; Mon, 10
+ Jul 2023 13:28:57 -0700 (PDT)
+Date:   Mon, 10 Jul 2023 13:28:55 -0700
+In-Reply-To: <000000000000c7224e06001eb4b1@google.com>
+Mime-Version: 1.0
+References: <000000000000c7224e06001eb4b1@google.com>
+Message-ID: <ZKxqB+eKM4bIyehI@google.com>
+Subject: Re: [syzbot] Monthly kvm report (Jul 2023)
+From:   Sean Christopherson <seanjc@google.com>
+To:     syzbot <syzbot+listf42719d660fa6d59a79a@syzkaller.appspotmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jing,
-
-On Mon, Jul 10, 2023 at 07:24:26PM +0000, Jing Zhang wrote:
-> From: Oliver Upton <oliver.upton@linux.dev>
+On Mon, Jul 10, 2023, syzbot wrote:
+> Hello kvm maintainers/developers,
 > 
-> The debug architecture is mandatory in ARMv8, so KVM should not allow
-> userspace to configure a vCPU with less than that. Of course, this isn't
-> handled elegantly by the generic ID register plumbing, as the respective
-> ID register fields have a nonzero starting value.
+> This is a 31-day syzbot report for the kvm subsystem.
+> All related reports/information can be found at:
+> https://syzkaller.appspot.com/upstream/s/kvm
 > 
-> Add an explicit check for debug versions less than v8 of the
-> architecture.
+> During the period, 2 new issues were detected and 0 were fixed.
+> In total, 5 issues are still open and 111 have been fixed so far.
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> Some of the still happening issues:
+> 
+> Ref Crashes Repro Title
+> <1> 138     Yes   WARNING in kvm_arch_vcpu_ioctl_run (5)
+>                   https://syzkaller.appspot.com/bug?extid=5feef0b9ee9c8e9e5689
 
-This patch should be ordered before the change that permits writes to
-the DebugVer field (i.e. the previous patch). While we're at it, there's
-another set of prerequisites for actually making the field writable.
+This will *hopefully* be resolved when the unrestricted guest patches[*] are
+applied.  This WARN is a bit of a catch-all.  The upside is that it detects a lot
+of bugs, the downside is completely unrelated bugs can have the same signature,
+i.e. there may be more bugs lurking.
 
-As Suraj pointed out earlier, we need to override the type of the field
-to be FTR_LOWER_SAFE instead of EXACT. Beyond that, KVM limits the field
-to 0x6, which is the minimum value for an ARMv8 implementation. We can
-relax this limitation up to v8p8, as I believe all of the changes are to
-external debug and wouldn't affect a KVM guest.
+[*] https://lore.kernel.org/all/20230613203037.1968489-1-seanjc@google.com
 
-Below is my (untested) diff on top of your series for both of these
-changes.
+> <2> 89      Yes   WARNING in handle_exception_nmi (2)
+>                   https://syzkaller.appspot.com/bug?extid=4688c50a9c8e68e7aaa1
 
--- 
-Thanks,
-Oliver
+This is likely a bug in the underlying GCE kernel, i.e. in L0.  Not sure how to
+bin this one.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 78ccc95624fa..35c4ab8cb5c8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1216,8 +1216,14 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
- 	/* Some features have different safe value type in KVM than host features */
- 	switch (id) {
- 	case SYS_ID_AA64DFR0_EL1:
--		if (kvm_ftr.shift == ID_AA64DFR0_EL1_PMUVer_SHIFT)
-+		switch (kvm_ftr.shift) {
-+		case ID_AA64DFR0_EL1_PMUVer_SHIFT:
- 			kvm_ftr.type = FTR_LOWER_SAFE;
-+			break;
-+		case ID_AA64DFR0_EL1_DebugVer_SHIFT:
-+			kvm_ftr.type = FTR_LOWER_SAFE;
-+			break;
-+		}
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		if (kvm_ftr.shift == ID_DFR0_EL1_PerfMon_SHIFT)
-@@ -1466,14 +1472,22 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return val;
- }
- 
-+#define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)				\
-+({										\
-+	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);			\
-+	(val) &= ~reg##_##field##_MASK;						\
-+	(val) |= FIELD_PREP(reg##_##field##_MASK,				\
-+			  min(__f_val, (u64)reg##_##field##_##limit));		\
-+	(val);									\
-+})
-+
- static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- 					  const struct sys_reg_desc *rd)
- {
- 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
- 
- 	/* Limit debug to ARMv8.0 */
--	val &= ~ID_AA64DFR0_EL1_DebugVer_MASK;
--	val |= SYS_FIELD_PREP_ENUM(ID_AA64DFR0_EL1, DebugVer, IMP);
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
- 
- 	/*
- 	 * Only initialize the PMU version if the vCPU was configured with one.
-@@ -1529,6 +1543,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	u8 perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
- 	u64 val = read_sanitised_ftr_reg(SYS_ID_DFR0_EL1);
- 
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
-+
- 	val &= ~ID_DFR0_EL1_PerfMon_MASK;
- 	if (kvm_vcpu_has_pmu(vcpu))
- 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+> <3> 58      No    WARNING in kthread_bind_mask
+>                   https://syzkaller.appspot.com/bug?extid=087b7effddeec0697c66
 
+This is more than likely a bug in either the workqueues or in sched, e.g. btrfs hit
+the same WARN a while back with a similarly innocuous alloc_workqueue() call.
+I'll (try to) re-label to "kernel".
