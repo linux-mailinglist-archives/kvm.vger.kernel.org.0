@@ -2,75 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91F7574DB7D
-	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 18:51:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F262574DC94
+	for <lists+kvm@lfdr.de>; Mon, 10 Jul 2023 19:35:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230427AbjGJQvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 12:51:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48962 "EHLO
+        id S232819AbjGJRfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 13:35:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230420AbjGJQvj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 12:51:39 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C878F2
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 09:51:39 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-665bd7fe2f4so5890847b3a.0
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 09:51:39 -0700 (PDT)
+        with ESMTP id S231637AbjGJRfM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 13:35:12 -0400
+X-Greylist: delayed 964 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 10 Jul 2023 10:35:11 PDT
+Received: from mailrelay6-1.pub.mailoutpod2-cph3.one.com (mailrelay6-1.pub.mailoutpod2-cph3.one.com [IPv6:2a02:2350:5:405::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE68CA
+        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 10:35:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689007898; x=1691599898;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lRU9KE0/UeG1sJBHq2OuDf9Y6hZBKDfbe6WNpwhFzK0=;
-        b=buVV+QQk90iJgfUh7Kqt1d2+0obGf2JPxRXP4oJ586nGq2pFwHByr0UpziYonmHBKq
-         pFpq8lX7kdAGGmFJdQNkWk9DZv4uReocJ3MD1Ba3CNsFdB01Wb5Lx0ieEvAxUEJdssn+
-         MrFfgk/NpgSXWV7f06QJSDLXuINxy2eUOCK6hpOTOkGDg8gpXGli7D4XmJ80gJYBKZLS
-         Ckg+NOslBTqeP+QGNLlh4kCH2vzEZZtWXW6gcX+IH+BtARZUteajxMX08hsbh3nHpKTl
-         27dU3CYhVWWTB7g8DXpFctVDPY1es87ZGdvh8qhGUXc16drPYFOGETN/93l5g6ToJt5e
-         lvqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689007898; x=1691599898;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lRU9KE0/UeG1sJBHq2OuDf9Y6hZBKDfbe6WNpwhFzK0=;
-        b=T6crb2cZ49XU7iA7USJJd5svZxK2ZRfMSh8fc2m2Con6hscPVegGZOF8mTSE30rqLV
-         kstyKoL/lZKP7ZRIrxTVyB0f+HWsxp4YK9nOO7E8SHqFEmenEeIJ94ZmnmrQdnpYDP18
-         oRtZkk4Dd7s8S1nyjBQtXQ/XQiqqwjfcatxC+Pa4SiFjZUM4NcRkOS6L52EQ83b4CAol
-         6t14xS/5EmKi2WWLedN+VQ97Y6iBYTahyIId+srY0646Q7E4q5UT3rdLdLpH6oQAYIOH
-         ECVyyxNjFUKhwJ+eb+EiyyJDV6EId4GAMBliapv21hKFEIRIgKENf27bb9Uzt8Xju8cZ
-         f0+w==
-X-Gm-Message-State: ABy/qLYI3gqdMTCTcotpCdKb8Gw72B/OjZoF8U+P+eJxlBOe7njUy5Ct
-        IXrk3nguFQrV8VkbMEtMaQTq6g37PEA=
-X-Google-Smtp-Source: APBJJlEiMclUC3rKcbE6nvWWGzZrZRVFK1l2kRju/N4dQe3BNwUcZvWCE2tCe6uUD20BY/kyQMs+bYFzLYI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:3921:b0:67c:a3a6:7a70 with SMTP id
- fh33-20020a056a00392100b0067ca3a67a70mr16686189pfb.4.1689007898532; Mon, 10
- Jul 2023 09:51:38 -0700 (PDT)
-Date:   Mon, 10 Jul 2023 09:51:36 -0700
-In-Reply-To: <20230706072954.4881-1-duminjie@vivo.com>
-Mime-Version: 1.0
-References: <20230706072954.4881-1-duminjie@vivo.com>
-Message-ID: <ZKw3GIg9ZiXMWCsE@google.com>
-Subject: Re: [PATCH v1] virt: kvm: Replace define function
-From:   Sean Christopherson <seanjc@google.com>
-To:     Minjie Du <duminjie@vivo.com>
-Cc:     linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        d=ravnborg.org; s=rsa1;
+        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+         from:date:from;
+        bh=IgD20OUQ8wy5rFFsoBYb/VGqjIM7D6p+vuvVuio9hik=;
+        b=CcwAZRGze1nz78tsTeGG31sH+B/tjdH+6ekcCAKy3lsh8Fx6Y+YXCD/TmIei/HlJU/+CjyCRKUyPh
+         4CUMeeNCmxnxg5WnN8WYc+Y/3TRBu3GgBHOLLMWNEmjaKunSp3X6NAJPGuB+DxEkEZX+QnanSr3FYn
+         2wlZ5UBU9Zu+O246GL/D/HneI1rQcFtBUkUV1dNMCwn+vM9M1hVrPjLsgJxFcU87WZ4nq2Vtx30nj9
+         ArzioTOrLCz4P2HsQj4ZOuK/Fmh+TNaxaKUMNXnO1dvheypIb7/oOCjfcrCaYpZhivEpRMotLSbonb
+         DLfigJoJ7elOqxhN67CrfrrG5kpNeWw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+        d=ravnborg.org; s=ed1;
+        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+         from:date:from;
+        bh=IgD20OUQ8wy5rFFsoBYb/VGqjIM7D6p+vuvVuio9hik=;
+        b=vxQog57Oi39/DPw2NHC1MnZmnCknkQQw5bg9fTJIlcxSuaigVTP3V2Z7GSu+tbSUPTOKht6NYG4oF
+         2pB/Sc4AQ==
+X-HalOne-ID: de71c874-1f45-11ee-b17e-6f01c1d0a443
+Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
+        by mailrelay6 (Halon) with ESMTPSA
+        id de71c874-1f45-11ee-b17e-6f01c1d0a443;
+        Mon, 10 Jul 2023 17:19:05 +0000 (UTC)
+Date:   Mon, 10 Jul 2023 19:19:03 +0200
+From:   Sam Ravnborg <sam@ravnborg.org>
+To:     Thomas Zimmermann <tzimmermann@suse.de>
+Cc:     deller@gmx.de, javierm@redhat.com, linux-fbdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        linux-geode@lists.infradead.org, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-nvidia@lists.surfsouth.com,
+        linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
+Subject: Re: [PATCH 00/17] fbdev: Remove FBINFO_DEFAULT and
+ FBINFO_FLAG_DEFAULT flags
+Message-ID: <20230710171903.GA14712@ravnborg.org>
+References: <20230710130113.14563-1-tzimmermann@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710130113.14563-1-tzimmermann@suse.de>
+X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLACK autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 06, 2023, Minjie Du wrote:
-> Replace DEFINE_SIMPLE_ATTRIBUTE with DEFINE_DEBUGFS_ATTRIBUTE.
+Hi Thomas,
 
-NAK.  I'm sending a patch to revert 5103068eaca2 ("debugfs, coccinelle: check for
-obsolete DEFINE_SIMPLE_ATTRIBUTE() usage"), this is beyond ridiculous.
+On Mon, Jul 10, 2023 at 02:50:04PM +0200, Thomas Zimmermann wrote:
+> Remove the unused flags FBINFO_DEFAULT and FBINFO_FLAG_DEFAULT from
+> fbdev and drivers, as briefly discussed at [1]. Both flags were maybe
+> useful when fbdev had special handling for driver modules. With
+> commit 376b3ff54c9a ("fbdev: Nuke FBINFO_MODULE"), they are both 0
+> and have no further effect.
+> 
+> Patches 1 to 7 remove FBINFO_DEFAULT from drivers. Patches 2 to 5
+> split this by the way the fb_info struct is being allocated. All flags
+> are cleared to zero during the allocation.
+> 
+> Patches 8 to 16 do the same for FBINFO_FLAG_DEFAULT. Patch 8 fixes
+> an actual bug in how arch/sh uses the tokne for struct fb_videomode,
+> which is unrelated.
+> 
+> Patch 17 removes both flag constants from <linux/fb.h>
 
-https://lore.kernel.org/all/Y3PPCHa9Yzi1sSnQ@google.com
+We have a few more flags that are unused - should they be nuked too?
+FBINFO_HWACCEL_FILLRECT
+FBINFO_HWACCEL_ROTATE
+FBINFO_HWACCEL_XPAN
+
+Unused as in no references from fbdev/core/*
+
+I would rather see one series nuke all unused FBINFO flags in one go.
+Assuming my quick grep are right and the above can be dropped.
+
+	Sam
