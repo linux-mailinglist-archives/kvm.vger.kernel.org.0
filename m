@@ -2,275 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3133374ED18
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 13:43:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12C8374ED3A
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 13:49:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbjGKLnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 07:43:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59468 "EHLO
+        id S231133AbjGKLts (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 07:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230398AbjGKLnF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 07:43:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 801DB11D
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 04:42:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689075735;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TVNlN8Fu7HKmMU86W9Jarak9bhN5uqIsTvRRP5Jak7k=;
-        b=KCqyOyuInjXCSkaL4exPNgn7PQOZypf/+FHH7G2zdBGhg7OKMBk1DDZ6odFtaQu9yDHQmj
-        DgZptEP7c5WkImYHMbW4/bAhdFHCD7jr/jXcsmlVi2x/aNsiaC5UFlRGcoh6vnSCKzMi0d
-        4rD9VSLgA26BPfc5rY/EzQ9iK5wMT8w=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-7-5Uj4JuEsMYmP22yOatKKbg-1; Tue, 11 Jul 2023 07:42:14 -0400
-X-MC-Unique: 5Uj4JuEsMYmP22yOatKKbg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30932d15a30so3468388f8f.1
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 04:42:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689075733; x=1691667733;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TVNlN8Fu7HKmMU86W9Jarak9bhN5uqIsTvRRP5Jak7k=;
-        b=Zwu5IX7UHVKSuwpQ3wsn6SxoffIzbbbNB00uThqHRF2ZQlENreD6p3gjqqimJIdVce
-         ZXav8rvg7XrSc3uMRa6BDtkd7TF5xj12P9WanB4A9SzWWTKQm69uihlJUfeQpC39LuAr
-         XBWlBMB+cMZnL5kU2WY1+/6FVYrBfWdFFsDOsVJTWM63/l+0qu9WcYGSt/LHhcpdWem+
-         Encvr8c9pWvYtdO7Ob0cq0yVYQLqW14FvNiT5ToLqglb2IDk7Z8eGL3zX9JMptIyuo9z
-         uGPH6Kp57bmTEBBBJ3S023HvNALHFkw5bhF46XcUQG3TTHu3+UWU5+cLwgN7Z+m3CZTa
-         tO+A==
-X-Gm-Message-State: ABy/qLY+ZCUGypmtuwegz+p4PjDwecckOZiZsd5xbuGREWetePi4nt31
-        qF8GVxpnwpcBC6mOo+jt04RYzcs2q8H6VwvBOu8M7o2dlBBTD/v325iEkWq6fDITbMPkVyKGL4T
-        a3fighRa66Fyk
-X-Received: by 2002:a05:6000:370:b0:313:f9a0:c530 with SMTP id f16-20020a056000037000b00313f9a0c530mr16858072wrf.52.1689075733282;
-        Tue, 11 Jul 2023 04:42:13 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG930FaW9+FN5ODUew7AowqA5AQd10iiEj46Z4R/Iy1KQe+FGD8mJ1gLZStu1NIkLAOOBxXqA==
-X-Received: by 2002:a05:6000:370:b0:313:f9a0:c530 with SMTP id f16-20020a056000037000b00313f9a0c530mr16858053wrf.52.1689075732814;
-        Tue, 11 Jul 2023 04:42:12 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c745:4000:13ad:ed64:37e6:115d? (p200300cbc745400013aded6437e6115d.dip0.t-ipconnect.de. [2003:cb:c745:4000:13ad:ed64:37e6:115d])
-        by smtp.gmail.com with ESMTPSA id s15-20020adff80f000000b00313f9a0c521sm2045310wrp.107.2023.07.11.04.42.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Jul 2023 04:42:12 -0700 (PDT)
-Message-ID: <68a8cba5-55b6-4c8a-f4e6-d528fc839285@redhat.com>
-Date:   Tue, 11 Jul 2023 13:42:10 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
+        with ESMTP id S230519AbjGKLtr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 07:49:47 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4918210E;
+        Tue, 11 Jul 2023 04:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689076184; x=1720612184;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=6HVyhJBMfXX4koWQki0Ix8P/RD79hA8q4xMA1Jt4AwY=;
+  b=U6alI2kaayqAqB7VJH2sLibdPfTWUXXpEOaVBWkDNuvogOroa0mtKH75
+   qzXvZqEVO65GQuVBEx186xkYMXbSuwm70Lu3OMH5ljt4gJRCyG28ZjhrH
+   LzmQZgdfct5MY+cVYMOOYVeXL+aOKOvHVAGjHlxNNAKwFBOrdYu5jKxZN
+   KP9MQnxalQmuniha9GAuaiIIrfemsev0ekjTd1leyeZhRyQUXw6VID4dU
+   dpPE0Zp1J0/tMUv+fHMM/Q3W9bcoinCsHlQ6JpT/X3aJP8QEG8xEyH5gv
+   wvy46UI/N+0ZOc8XuJH71hpQQCCRouNSHzuYyt1KacMgYv5mMBAkIkwY0
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="362060488"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="362060488"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 04:49:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="721070796"
+X-IronPort-AV: E=Sophos;i="6.01,196,1684825200"; 
+   d="scan'208";a="721070796"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga002.jf.intel.com with ESMTP; 11 Jul 2023 04:49:43 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 11 Jul 2023 04:49:43 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 11 Jul 2023 04:49:43 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 11 Jul 2023 04:49:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LXeVOKz0yd7SGZQsyYsEyX5DG44TyUvrGg/TGY6IOj+Qez77KCtOvT2vgil7kv9hpI+Cnp5Rf8wUEkKxB/hfO+06Q7F6PN9jGHIMDmPFmrsekLVzBFsKiFputLWdilriPq2Yv35DhPay8DmUbEhoZFqMTJKuNyYYZqod7iN73sRedyQUGshzK30wd2Ez1XT3i1T4PbnDVOcSqhBUvBQxp2/3CUY3sPSXcgGbxGHHcmQH4OmfW3TcrrU1HIwz8QwbVyhflsbQwHb5H7/7c+V23Pn4NIzI8GRPU2hlOII0uJLWV3H51IwEqWKpg85sxivH9mRaPsAhFTaRyNlPgE+Sqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6HVyhJBMfXX4koWQki0Ix8P/RD79hA8q4xMA1Jt4AwY=;
+ b=XvGL9oHwl6tAGQ1l1Vt+YmrdFxrCZnJIIdyknjTOZFxwPRTFKWGrbQZcA4bBtVwywGxhW9fGDxttY6uEbDfmI7eesHsU+yOXM4ILKQr/y2lWXGkufSXxB0yR9CY3ggEPiBzHiqVXQupjKrWLBY/nM10zUlQ/8F5jhSGyVv0mW74poO3akGWg6JB2q/n+ePTFtkqJ5BlcCA3QloqZXwwLYEOC6/fU6QmtUqWC096yJD+dwnRn/Er221QrYlXnnfufkQKfxHpUYPiRW+tpbYCsiTtk4GRB1taKzBrmoLDkRSaIhYemwMti+0wemUIuFWm+CF4J2rxHqlQIZnYL5BRuDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SJ2PR11MB8497.namprd11.prod.outlook.com (2603:10b6:a03:57b::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Tue, 11 Jul
+ 2023 11:49:39 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::aca2:5ddb:5e78:e3df]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::aca2:5ddb:5e78:e3df%4]) with mapi id 15.20.6565.028; Tue, 11 Jul 2023
+ 11:49:38 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "david@redhat.com" <david@redhat.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "nik.borisov@suse.com" <nik.borisov@suse.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
 Subject: Re: [PATCH v12 12/22] x86/virt/tdx: Allocate and set up PAMTs for
  TDMRs
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, x86@kernel.org, dave.hansen@intel.com,
-        kirill.shutemov@linux.intel.com, tony.luck@intel.com,
-        peterz@infradead.org, tglx@linutronix.de, bp@alien8.de,
-        mingo@redhat.com, hpa@zytor.com, seanjc@google.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, ashok.raj@intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, ying.huang@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
-        bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com
+Thread-Topic: [PATCH v12 12/22] x86/virt/tdx: Allocate and set up PAMTs for
+ TDMRs
+Thread-Index: AQHZqDW2SDcq1vhkU069JfN30XLipa+0iQgAgAACE4A=
+Date:   Tue, 11 Jul 2023 11:49:38 +0000
+Message-ID: <4fe54e141ec5040300d0e2552ea31b83aa947ec2.camel@intel.com>
 References: <cover.1687784645.git.kai.huang@intel.com>
- <85ea233226ec7a05e8c5627a499e97ea4cbd6950.1687784645.git.kai.huang@intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <85ea233226ec7a05e8c5627a499e97ea4cbd6950.1687784645.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+         <85ea233226ec7a05e8c5627a499e97ea4cbd6950.1687784645.git.kai.huang@intel.com>
+         <68a8cba5-55b6-4c8a-f4e6-d528fc839285@redhat.com>
+In-Reply-To: <68a8cba5-55b6-4c8a-f4e6-d528fc839285@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ2PR11MB8497:EE_
+x-ms-office365-filtering-correlation-id: f98684d1-557b-4d86-a405-08db8204e7df
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: jf93nEAAIBhFjacMj2T9Vn1tCTHtIHrnQNH2RY74uvGUGT5ge3BIkYOgTv4QqvCZFflhKMWu7f7C+LSNqOwlRMxfz82kzqG+eNtmPjjq1uQdW1tCs9uBm4LOHsK0YfZfpPM0PW2zBPMZZb7YPCUa2PjZx49rTzh2UR3sonXBFK/XV3JlsgTou84dnv6L3Iy9StHBKdtsE1gE82H44VUL3ozxJeBhfj094xDg3FJhjHi+2P1pOQjFq+RonUl+9D+DDav/4kN1boCJ/vyQpr8WPUl6KeMeiOD89HjU9Ju0tHNc1mnd5tt6/JxtBS2Atw9zg83bTfN0X1S6fS1UTngEAyKEU35rCPKFjD6XECeshKVvC17eUeYWeakRnhQye4eWFzJcFvVCP9wUXdKpKSuFY70d3nMXkxCYsTlKjxmuTG65gPl5Fq2Eh3aWupbPF1bTHy+eBeU6ZLvfa183VA7E0XTkJOUVlQ66pvXfJJR+lp39oVwmSnRpT7GjqrFCQ4nDjB9dIsdQ/CGjr6GJsscRZXrpnuSECibu8GUMy4z/DnpEhEVWmwhq+d041R5NRaF1gwi0eL86Ty/bzEFJU/6jjcDgPar/ek19xHEa4KY5nwI6O9U4LNtbEGCrQQTuODGL
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(136003)(366004)(39860400002)(376002)(451199021)(38100700002)(86362001)(82960400001)(38070700005)(36756003)(76116006)(110136005)(6486002)(54906003)(71200400001)(91956017)(122000001)(26005)(6506007)(186003)(6512007)(966005)(2616005)(478600001)(7416002)(316002)(66556008)(5660300002)(2906002)(66946007)(66476007)(8936002)(8676002)(64756008)(66446008)(83380400001)(4326008)(4744005)(41300700001)(17423001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?djZZZlNQVjJyaHBWbkp6RVJjbjR0Kzl0L280S0JXbGFQZ2dIbkY2cGwwc01Z?=
+ =?utf-8?B?ejZzSC83WndDbmtybFBYMmxCZU1VS2l6Rm45cVIwY0tGem1GUUYyZGUyOUd3?=
+ =?utf-8?B?YkRwRkRmWWxFTHI5Qi9QY2EvWlRtb0dNeitSbmZtYnhJMmtmdW9EZnpGWHNJ?=
+ =?utf-8?B?SDBpRlJhZHN2d2dBL0QxTllMb2tkaCt5YVcvK3YzN0xGUy91bVA2Q1ViUzJX?=
+ =?utf-8?B?VmFTTkpsR1VTSmxMdjcrdmNRNkFRbW5QV09sN1pla1lMM0Q3TTdWZ3JIWlZm?=
+ =?utf-8?B?T2t2R29JaEtPRmp6UTF1OVdoeSthNXRwdGdnV0wrUklraFlsREN2bjF0T2RQ?=
+ =?utf-8?B?VW4zSzByY1ZEUDZRZ2d4b2tIa2hnRHB3WDVDa2h1WVJIVm5GcnYrZzhJenhp?=
+ =?utf-8?B?MTF5UytjdUZKditDYy8yWEd6M1RDRFJGNHNKcWtBQ1Rrby9QWEErNDNPVnhn?=
+ =?utf-8?B?cmVCVXNEdnFLcURMMjd5VWxpcjVqVVcxTC9ZamRRWGZ5UkZ5TjIxaTlnNE8w?=
+ =?utf-8?B?VEExaC9nMmIxdjVaYTljNXNGUjhhRHJkL2NlQ0JuU1BiYVhkVlNJbVpYOUpK?=
+ =?utf-8?B?SmtYSjVOQjVmMTNPQjJ6cWQ3bVFrVXNlWmZEWWRXdTBHUDFoQSsrK0xxUlM1?=
+ =?utf-8?B?ZGt4dkVjaExVZ3QzdlNIeVQvd0xJNjg5cWNuSFA1R2IwMlc0eFA2MFo3QWVC?=
+ =?utf-8?B?clFQRjNnTEJiM3lnOGEvc1FhMyttY3krdE5ESHBQSTVCazc1YmtoQThvRmJE?=
+ =?utf-8?B?bGJGbDJWdW1laHdiR0tWSXZkSkJCN1F4SDRLMlQ4eld0eW1TUXkzTmNGM051?=
+ =?utf-8?B?MFBSSjBSQjhtVWJoZTB6UHBTZlR3ZTMwRUdsQlFnSVFBSERmWS9tNGVpM0Qy?=
+ =?utf-8?B?WWtBU2dQYlJrZXNHL2ZWTXRCN3E0dUhVQTdJTzJndFB2Yng0UTNrSm9Tazlo?=
+ =?utf-8?B?QmpjT1FSN0Qvc2tuUk5SQzM2a1pJemNXSVE0elg5U0JsSWtmdnRnM2JXM3B5?=
+ =?utf-8?B?RnRwRzdHNVBiVXVYT3RrdTI2eWdLaU84cGd3blQ1YW1GNExaVVdISitOYld0?=
+ =?utf-8?B?RnZETTdWL0NTeGFRb1BqMU90eCtYVXJIWkI1RE04SUZNMkNpUFowbHlZUmJN?=
+ =?utf-8?B?NDE0WFU0UElHZXpwaFhRZVF1SHdVMHJpMUkzMm9ORG1jZGk0b20vZ1Z1UVhG?=
+ =?utf-8?B?alNsT1dnbkd6RUpvRFRpZnB5OVNWTTVWR3gxTVJ2cE5wYnJtbE1BQlUzZ2xU?=
+ =?utf-8?B?TTI2WmdOV0swK3czejQweU54a1V1bzhUWEJlMU1uVXdZNnMrcE9FNDIxVmlp?=
+ =?utf-8?B?a1oyd0gvUkpkZGRUem00VGlwcHA5Z1J5T3VZeC9wUkZ1NkM2Z3RPVm5FTVVj?=
+ =?utf-8?B?RFpXTUN2L1JnS2hPVkZLZHFTc0lCYkkveFZyRi9XTkVFZEZTdmdMUTk4UUls?=
+ =?utf-8?B?bEVkcEY3NEFlYUZnb2FMSk0rSlc4S2FmQks0TjZNbkgydW03dWVzM1pEWEJV?=
+ =?utf-8?B?Qkh6aFVDditoeGRlZlduMDZ4Q0FKS1ErQUZjSzlLSHA0RXZ6ZVVWejJIckE5?=
+ =?utf-8?B?UE9ZM1RUTmYyc1RCMHR3QTNVcmNxeVFML1QzUUtobHBPMVEzNHVXZ0trSENy?=
+ =?utf-8?B?bmIrMlRVRWRhRDVUOTA3TWN1dzlGc2hvNTJMVFdZWDNjWGFaRFdjdGxrbmpB?=
+ =?utf-8?B?eS82Mm8xeVhEMTZEOWV6QlB5dE5zUjhneWxieE56ZlV4dS90TWZnYTlxQWVW?=
+ =?utf-8?B?NlZzTkp1WFNRUEFabmFBZ1laNDBZYmc1RVJvbldwSm9ST1JvWEJsMG4vSi9T?=
+ =?utf-8?B?WlVYOW9hUVpvVG1iNTZsNzRhVjM4VzZrS1Nmb2Z4L05pWGdmbG0xVWVlQ2dp?=
+ =?utf-8?B?bGZIc2pBVCt5M1ozNUNVemZUM1JRZm9lUEp5UDRkcUhIdmtWSVdLbVo2cUJh?=
+ =?utf-8?B?VzRkZGhWMkFlUUdqSlV2ajI5WVNsOWFqRWxIVHdYakF6T3Y0MWdwaGR5Y3E5?=
+ =?utf-8?B?MUtRQ0tSUTk2bldGY0QwdGRmY3ZSekVIdFp3Uy9ZWXJOZ1JieVp2cHJyc3Ez?=
+ =?utf-8?B?YUUweFlFUEhNRnNTMGRGL0VvWEI3NHZadmtUWHE0T0c1ayttYklvT05QNUZw?=
+ =?utf-8?Q?O4SSiYuImKuhbW/t5UxLfpxaV?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7A08481314DA3D4D919F30F7C85096ED@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f98684d1-557b-4d86-a405-08db8204e7df
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2023 11:49:38.4161
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: v3A7yAcoHuRGZ4yVWa7wl7uHep8Y9DRHa3rGHKEiCh53yTpMqVXeiHf5p4PSBJYmcgSrwixxWVbFyhwCQEiPow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8497
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.06.23 16:12, Kai Huang wrote:
-> The TDX module uses additional metadata to record things like which
-> guest "owns" a given page of memory.  This metadata, referred as
-> Physical Address Metadata Table (PAMT), essentially serves as the
-> 'struct page' for the TDX module.  PAMTs are not reserved by hardware
-> up front.  They must be allocated by the kernel and then given to the
-> TDX module during module initialization.
-> 
-> TDX supports 3 page sizes: 4K, 2M, and 1G.  Each "TD Memory Region"
-> (TDMR) has 3 PAMTs to track the 3 supported page sizes.  Each PAMT must
-> be a physically contiguous area from a Convertible Memory Region (CMR).
-> However, the PAMTs which track pages in one TDMR do not need to reside
-> within that TDMR but can be anywhere in CMRs.  If one PAMT overlaps with
-> any TDMR, the overlapping part must be reported as a reserved area in
-> that particular TDMR.
-> 
-> Use alloc_contig_pages() since PAMT must be a physically contiguous area
-> and it may be potentially large (~1/256th of the size of the given TDMR).
-> The downside is alloc_contig_pages() may fail at runtime.  One (bad)
-> mitigation is to launch a TDX guest early during system boot to get
-> those PAMTs allocated at early time, but the only way to fix is to add a
-> boot option to allocate or reserve PAMTs during kernel boot.
-> 
-> It is imperfect but will be improved on later.
-> 
-> TDX only supports a limited number of reserved areas per TDMR to cover
-> both PAMTs and memory holes within the given TDMR.  If many PAMTs are
-> allocated within a single TDMR, the reserved areas may not be sufficient
-> to cover all of them.
-> 
-> Adopt the following policies when allocating PAMTs for a given TDMR:
-> 
->    - Allocate three PAMTs of the TDMR in one contiguous chunk to minimize
->      the total number of reserved areas consumed for PAMTs.
->    - Try to first allocate PAMT from the local node of the TDMR for better
->      NUMA locality.
-> 
-> Also dump out how many pages are allocated for PAMTs when the TDX module
-> is initialized successfully.  This helps answer the eternal "where did
-> all my memory go?" questions.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
-> ---
-> 
-> v11 -> v12:
->   - Moved TDX_PS_NUM from tdx.c to <asm/tdx.h> (Kirill)
->   - "<= TDX_PS_1G" -> "< TDX_PS_NUM" (Kirill)
->   - Changed tdmr_get_pamt() to return base and size instead of base_pfn
->     and npages and related code directly (Dave).
->   - Simplified PAMT kb counting. (Dave)
->   - tdmrs_count_pamt_pages() -> tdmr_count_pamt_kb() (Kirill/Dave)
-> 
-> v10 -> v11:
->   - No update
-> 
-> v9 -> v10:
->   - Removed code change in disable_tdx_module() as it doesn't exist
->     anymore.
-> 
-> v8 -> v9:
->   - Added TDX_PS_NR macro instead of open-coding (Dave).
->   - Better alignment of 'pamt_entry_size' in tdmr_set_up_pamt() (Dave).
->   - Changed to print out PAMTs in "KBs" instead of "pages" (Dave).
->   - Added Dave's Reviewed-by.
-> 
-> v7 -> v8: (Dave)
->   - Changelog:
->    - Added a sentence to state PAMT allocation will be improved.
->    - Others suggested by Dave.
->   - Moved 'nid' of 'struct tdx_memblock' to this patch.
->   - Improved comments around tdmr_get_nid().
->   - WARN_ON_ONCE() -> pr_warn() in tdmr_get_nid().
->   - Other changes due to 'struct tdmr_info_list'.
-> 
-> v6 -> v7:
->   - Changes due to using macros instead of 'enum' for TDX supported page
->     sizes.
-> 
-> v5 -> v6:
->   - Rebase due to using 'tdx_memblock' instead of memblock.
->   - 'int pamt_entry_nr' -> 'unsigned long nr_pamt_entries' (Dave/Sagis).
->   - Improved comment around tdmr_get_nid() (Dave).
->   - Improved comment in tdmr_set_up_pamt() around breaking the PAMT
->     into PAMTs for 4K/2M/1G (Dave).
->   - tdmrs_get_pamt_pages() -> tdmrs_count_pamt_pages() (Dave).
-> 
-> - v3 -> v5 (no feedback on v4):
->   - Used memblock to get the NUMA node for given TDMR.
->   - Removed tdmr_get_pamt_sz() helper but use open-code instead.
->   - Changed to use 'switch .. case..' for each TDX supported page size in
->     tdmr_get_pamt_sz() (the original __tdmr_get_pamt_sz()).
->   - Added printing out memory used for PAMT allocation when TDX module is
->     initialized successfully.
->   - Explained downside of alloc_contig_pages() in changelog.
->   - Addressed other minor comments.
-> 
-> 
-> ---
->   arch/x86/Kconfig            |   1 +
->   arch/x86/include/asm/tdx.h  |   1 +
->   arch/x86/virt/vmx/tdx/tdx.c | 215 +++++++++++++++++++++++++++++++++++-
->   arch/x86/virt/vmx/tdx/tdx.h |   1 +
->   4 files changed, 213 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 2226d8a4c749..ad364f01de33 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -1959,6 +1959,7 @@ config INTEL_TDX_HOST
->   	depends on KVM_INTEL
->   	depends on X86_X2APIC
->   	select ARCH_KEEP_MEMBLOCK
-> +	depends on CONTIG_ALLOC
->   	help
->   	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
->   	  host and certain physical attacks.  This option enables necessary TDX
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index d8226a50c58c..91416fd600cd 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -24,6 +24,7 @@
->   #define TDX_PS_4K	0
->   #define TDX_PS_2M	1
->   #define TDX_PS_1G	2
-> +#define TDX_PS_NR	(TDX_PS_1G + 1)
->   
->   /*
->    * Used to gather the output registers values of the TDCALL and SEAMCALL
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 2ffc1517a93b..fd5417577f26 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -221,7 +221,7 @@ static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
->    * overlap.
->    */
->   static int add_tdx_memblock(struct list_head *tmb_list, unsigned long start_pfn,
-> -			    unsigned long end_pfn)
-> +			    unsigned long end_pfn, int nid)
->   {
->   	struct tdx_memblock *tmb;
->   
-> @@ -232,6 +232,7 @@ static int add_tdx_memblock(struct list_head *tmb_list, unsigned long start_pfn,
->   	INIT_LIST_HEAD(&tmb->list);
->   	tmb->start_pfn = start_pfn;
->   	tmb->end_pfn = end_pfn;
-> +	tmb->nid = nid;
->   
->   	/* @tmb_list is protected by mem_hotplug_lock */
->   	list_add_tail(&tmb->list, tmb_list);
-> @@ -259,9 +260,9 @@ static void free_tdx_memlist(struct list_head *tmb_list)
->   static int build_tdx_memlist(struct list_head *tmb_list)
->   {
->   	unsigned long start_pfn, end_pfn;
-> -	int i, ret;
-> +	int i, nid, ret;
->   
-> -	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, NULL) {
-> +	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, &nid) {
->   		/*
->   		 * The first 1MB is not reported as TDX convertible memory.
->   		 * Although the first 1MB is always reserved and won't end up
-> @@ -277,7 +278,7 @@ static int build_tdx_memlist(struct list_head *tmb_list)
->   		 * memblock has already guaranteed they are in address
->   		 * ascending order and don't overlap.
->   		 */
-> -		ret = add_tdx_memblock(tmb_list, start_pfn, end_pfn);
-> +		ret = add_tdx_memblock(tmb_list, start_pfn, end_pfn, nid);
->   		if (ret)
->   			goto err;
-
-Why did you decide to defer remembering the nid as well? I'd just move 
-that part to the patch that adds add_tdx_memblock().
-
--- 
-Cheers,
-
-David / dhildenb
-
+T24gVHVlLCAyMDIzLTA3LTExIGF0IDEzOjQyICswMjAwLCBEYXZpZCBIaWxkZW5icmFuZCB3cm90
+ZToNCj4gPiAtCQlyZXQgPSBhZGRfdGR4X21lbWJsb2NrKHRtYl9saXN0LCBzdGFydF9wZm4sIGVu
+ZF9wZm4pOw0KPiA+ICsJCXJldCA9IGFkZF90ZHhfbWVtYmxvY2sodG1iX2xpc3QsIHN0YXJ0X3Bm
+biwgZW5kX3BmbiwgbmlkKTsNCj4gPiDCoMKgwqAJCWlmIChyZXQpDQo+ID4gwqDCoMKgCQkJZ290
+byBlcnI7DQo+IA0KPiBXaHkgZGlkIHlvdSBkZWNpZGUgdG8gZGVmZXIgcmVtZW1iZXJpbmcgdGhl
+IG5pZCBhcyB3ZWxsPyBJJ2QganVzdCBtb3ZlIA0KPiB0aGF0IHBhcnQgdG8gdGhlIHBhdGNoIHRo
+YXQgYWRkcyBhZGRfdGR4X21lbWJsb2NrKCkuDQoNClRoYW5rcyBmb3IgdGhlIHJldmlldy4NCg0K
+VGhlIEBuaWQgaXMgdXNlZCB0byB0cnkgdG8gYWxsb2NhdGUgdGhlIFBBTVQgZnJvbSBsb2NhbCBu
+b2RlLiAgSXQgb25seSBnZXRzIHVzZWQNCmluIHRoaXMgcGF0Y2guICBPcmlnaW5hbGx5IChpbiB2
+NykgSSBoYWQgaXQgaW4gcGF0Y2ggMDkgYnV0IERhdmUgc3VnZ2VzdGVkIHRvDQptb3ZlIHRvIHRo
+aXMgcGF0Y2ggKHNlZSB0aGUgZmlyc3QgY29tbWVudCBpbiBiZWxvdyBsaW5rKToNCg0KaHR0cHM6
+Ly9sb3JlLmtlcm5lbC5vcmcvbGttbC84ZTY4MDNmNS1iZWM2LTg0M2QtZjNjNC03NTAwNmZmZDBk
+MmZAaW50ZWwuY29tLw0K
