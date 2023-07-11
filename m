@@ -2,99 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D69C74F331
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 17:19:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40DB174F354
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 17:24:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231784AbjGKPSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 11:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38044 "EHLO
+        id S232083AbjGKPYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 11:24:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231678AbjGKPSi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 11:18:38 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CFB9E;
-        Tue, 11 Jul 2023 08:18:37 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36BFF2No016941;
-        Tue, 11 Jul 2023 15:18:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : to : cc : subject : message-id : date; s=pp1;
- bh=ASYvEAEg58jzfr0uCG8q5lwqerxnbVzb/1DLtoelZms=;
- b=R7CsUwmucePLq2g0B2VCiRUtILvLSwruLlDFlyOf3RE38UuTq73Q9wpgJe6Hu03hZc7p
- jlhzWieSLRp3sowz3jZXuLWMV6M2YA+CF1NFZL00tvbxZQrUIpveBlfTO841IUZhFLnw
- AUImM/vvLoT0GNhXTFns19CDP/VrCjnJPJ5LdTCVSYlgpuEB4wGbuih9e0hAh9rfEydQ
- I8cArSjHk4mO4fBAPD+Xno+VxgA6T4OeWF2ElERyLPhfUCDq72PbMwkKcHJkfWWbVH80
- Kr5wOQBPEx1lH2BNB3dGoMqpESr1AyY8RtuDmp2juq1bqtCh/bnkG6sqEr0ERTBc/WyP IQ== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rs9j803yg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jul 2023 15:18:36 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36B7fD5Y018540;
-        Tue, 11 Jul 2023 15:18:34 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3rpy2e9d3t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jul 2023 15:18:34 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36BFITYv5309020
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jul 2023 15:18:29 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EBA8620040;
-        Tue, 11 Jul 2023 15:18:28 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C6D962004B;
-        Tue, 11 Jul 2023 15:18:28 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.51.229])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jul 2023 15:18:28 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S232046AbjGKPYq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 11:24:46 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A1710F1;
+        Tue, 11 Jul 2023 08:24:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de;
+ s=s31663417; t=1689089042; x=1689693842; i=deller@gmx.de;
+ bh=X5J8IwR1yeKrwbjkpPsX7TYJjlXNjW6vNyFiaXSONCI=;
+ h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+ b=GN6pEgcKFc3TiPb2BrkoJgWpY3wT6K0R5RBigRXBblVMjch41be3tnm2swuTsuX+Os7iA/8
+ Z9v2vToEYoOPOQ4s3z2aViTvBbo31jTtusNzIKxOpiwD7D9NwU7sqcIn+JNbk0jHZjwhfVLl2
+ d6iWR9cqVyWu0u7qANiT81Cpfdu3Eqc00ZipKFbQhesar/5TX1xB7U9VpXwXmNRtS/1YNiPfU
+ SRgIgcZf4Vy4C2hoDDHbvEMYqAxah1b5gF/4wDuoYtNwfTn8iZrmD7X6N5eREBk0mQ+SO7vLm
+ XJUXEar9IV97stc6Qd3jl7GNwSx3M24HJnop1aHhCU7ipk3XBcaQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.20.60] ([94.134.149.147]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N4hzZ-1ps3V72pTb-011i72; Tue, 11
+ Jul 2023 17:24:02 +0200
+Message-ID: <bf439387-6b13-0fd9-f61b-1a5cbf731187@gmx.de>
+Date:   Tue, 11 Jul 2023 17:24:01 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 00/17] fbdev: Remove FBINFO_DEFAULT and
+ FBINFO_FLAG_DEFAULT flags
+Content-Language: en-US
+To:     Sam Ravnborg <sam@ravnborg.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>
+Cc:     javierm@redhat.com, linux-fbdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        linux-geode@lists.infradead.org, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-nvidia@lists.surfsouth.com,
+        linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
+References: <20230710130113.14563-1-tzimmermann@suse.de>
+ <20230710171903.GA14712@ravnborg.org>
+ <ab92f8d9-36ab-06bc-b85b-d52b7a1bfe9a@suse.de>
+ <20230711144744.GA117276@ravnborg.org>
+From:   Helge Deller <deller@gmx.de>
+In-Reply-To: <20230711144744.GA117276@ravnborg.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230705111937.33472-2-imbrenda@linux.ibm.com>
-References: <20230705111937.33472-1-imbrenda@linux.ibm.com> <20230705111937.33472-2-imbrenda@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        frankja@linux.ibm.com, mhartmay@linux.ibm.com, nsg@linux.ibm.com,
-        borntraeger@de.ibm.com
-Subject: Re: [PATCH v2 1/2] KVM: s390: pv: simplify shutdown and fix race
-Message-ID: <168908870840.9488.10883720390869049418@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 11 Jul 2023 17:18:28 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1GAatIAo8lgqXvCgI3AThbYOnw_A0UlB
-X-Proofpoint-GUID: 1GAatIAo8lgqXvCgI3AThbYOnw_A0UlB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-11_08,2023-07-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- impostorscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1011
- adultscore=0 mlxscore=0 mlxlogscore=841 suspectscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307110135
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Provags-ID: V03:K1:6I/u9K9DZKAMaYzMuqb+xXVwXoFF+h72slV7307qnBcsm0Dzs1x
+ nG8x0xILsiEhhUVyajytT1uvIrwO9pRmYfPk78Yjls8o/KkVUspWf98tkujsctomDLRF6u0
+ UdBWhjkxLyl8NlhxrYI/AySAPNbWQr6NnCxEKWsR0EsTYbybHP0PZ/RgD80PFRH8fmhW/rk
+ TAn21cXKojNy9UOEmBO4g==
+UI-OutboundReport: notjunk:1;M01:P0:XNImko0fYwY=;AiV+j1oEN7JVd7gQE4GAf5pZu6m
+ wj99cJ2LSeHJsHr2sKsT5CY1HR5Yi2t55wwqJhZ6uGfcqxHOW/2sn0V3JJ1io82GaOhNRHzvt
+ zR9PmCQCilcJeIgDWCjc0NTIJrJwKg9hfWHSI53inWj0QmjAnOKmMCU3wO+aUNaQN4UL9Li4U
+ pS0CQrlM7YGW4BTIwfY0xyXtCF6IMWdx7BHqF3QxocVpNzMqT/GVE2zmfibCAiVqoVQY40T+o
+ NfQL+Sjc8hRtasBpRBrc2z21M5uGIuje56htBn3GdlF1wxQAOhS7U4WVJMB/RUoYnHtqc+5C7
+ Y3Z39Ph2nMGi4aLfGFPQ8o5aDWO2iSZAEyXK9ibsLnG8FE5wcp3HfnnPdYVrcXXRMfCi9Y0y8
+ dPaGqnM2nlp1XoENCoUkPedNE+amwXmHeMkLsw4/azwj2BHBlZDUJbT5TEDhDYiUleyOTHX6w
+ 9DrDsMO8KTBvWuKxlyh6SvhMiT5th1mL55DNnDe9iAzx5CzX3I/WPmvRDiOsFpDevTdtc/8Ul
+ fXWMM1JgkhhzesMwjc3WGGL0WR7ZLDoAXdy6HgvU6DYnM5ZKWbGaU0kGq3Xt62kPOP/TPi57t
+ 7xnqiNwytZ9sHQk0abZBXvyhMmffWWlPi7PkmADCqAImC+5wCWCuFIzRZjFe8toJm2oLadiV3
+ knPTCfauwkQqsirUUTKP+Fvtut4kgg/lM/XFnPlOr6ONXkR+PAt+jXB02SliulYmhRIkG9Cps
+ DEGpDks4ZL0YBrtLU06OAYGJk5e79ZlPpMsMOxggmhzdOq5gASDzlXo2v/5WI4kajcTiXWshU
+ AsE+znIk2ZnZVFDRN2aKd1kxacUupl9dFU1lXpXl4FV9iCrgKo+mSF8JrBT4S2N98M8WXk/wg
+ j6ZDK2VfivJIrmvtPfy2OGuo6dP1yz/NEjvVfotUNvuZgi41Wa3hoMtQxYuWKIroLVVgCW7x4
+ ElEk/ywwPT4Kak54lZ31n9Y0OxE=
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Claudio Imbrenda (2023-07-05 13:19:36)
-> Simplify the shutdown of non-protected VMs. There is no need to do
-> complex manipulations of the counter if it was zero.
->=20
-> This also fixes a very rare race which caused pages to be torn down
-> from the address space with a non-zero counter even on older machines
-> that don't support the UVC instruction, causing a crash.
->=20
-> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Fixes: fb491d5500a7 ("KVM: s390: pv: asynchronous destroy for reboot")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On 7/11/23 16:47, Sam Ravnborg wrote:
+> Hi Thomas,
+>
+> On Tue, Jul 11, 2023 at 08:24:40AM +0200, Thomas Zimmermann wrote:
+>> Hi Sam
+>>
+>> Am 10.07.23 um 19:19 schrieb Sam Ravnborg:
+>>> Hi Thomas,
+>>>
+>>> On Mon, Jul 10, 2023 at 02:50:04PM +0200, Thomas Zimmermann wrote:
+>>>> Remove the unused flags FBINFO_DEFAULT and FBINFO_FLAG_DEFAULT from
+>>>> fbdev and drivers, as briefly discussed at [1]. Both flags were maybe
+>>>> useful when fbdev had special handling for driver modules. With
+>>>> commit 376b3ff54c9a ("fbdev: Nuke FBINFO_MODULE"), they are both 0
+>>>> and have no further effect.
+>>>>
+>>>> Patches 1 to 7 remove FBINFO_DEFAULT from drivers. Patches 2 to 5
+>>>> split this by the way the fb_info struct is being allocated. All flag=
+s
+>>>> are cleared to zero during the allocation.
+>>>>
+>>>> Patches 8 to 16 do the same for FBINFO_FLAG_DEFAULT. Patch 8 fixes
+>>>> an actual bug in how arch/sh uses the tokne for struct fb_videomode,
+>>>> which is unrelated.
+>>>>
+>>>> Patch 17 removes both flag constants from <linux/fb.h>
+>>>
+>>> We have a few more flags that are unused - should they be nuked too?
+>>> FBINFO_HWACCEL_FILLRECT
+>>> FBINFO_HWACCEL_ROTATE
+>>> FBINFO_HWACCEL_XPAN
+>>
+>> It seems those are there for completeness. Nothing sets _ROTATE,
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+I think some fbdev drivers had hardware acceleration for ROTATE in the
+past. HWACCEL_XPAN is still in some drivers.
+
+>> the others are simply never checked. According to the comments,
+>> some are required, some are optional. I don't know what that
+>> means.
+
+I think it's OK if you remove those flags which aren't used anywhere,
+e.g. FBINFO_HWACCEL_ROTATE.
+
+>> IIRC there were complains about performance when Daniel tried to remove
+>> fbcon acceleration, so not all _HWACCEL_ flags are unneeded.
+
+Correct. I think COPYAREA and FILLRECT are the bare minimum to accelerate
+fbcon, IMAGEBLIT is for showing the tux penguin (?),
+XPAN/YPAN and YWRAP for some hardware screen panning needed by some driver=
+s
+(not sure if this is still used as I don't have such hardware, Geert?).
+
+>> Leaving them in for reference/completeness might be an option; or not. =
+I
+>> have no strong feelings about those flags.
+
+I'd say drop FBINFO_HWACCEL_ROTATE at least ?
+
+>>> Unused as in no references from fbdev/core/*
+>>>
+>>> I would rather see one series nuke all unused FBINFO flags in one go.
+>>> Assuming my quick grep are right and the above can be dropped.
+>>
+>> I would not want to extend this series. I'm removing _DEFAULT as it's
+>> absolutely pointless and confusing.
+
+Yes, Ok.
+
+Helge
