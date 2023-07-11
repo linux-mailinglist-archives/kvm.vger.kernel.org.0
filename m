@@ -2,162 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EBBA874E36D
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 03:25:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B32F74E41E
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 04:31:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231512AbjGKBZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 21:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
+        id S231368AbjGKCby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 22:31:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231148AbjGKBZW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 21:25:22 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0F57E49;
-        Mon, 10 Jul 2023 18:25:00 -0700 (PDT)
+        with ESMTP id S230047AbjGKCbu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 22:31:50 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB30BE;
+        Mon, 10 Jul 2023 19:31:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689038700; x=1720574700;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=fBOGNPEtiOBr68fPLTdlldaF2kKm1sGP+rYVw504gDY=;
-  b=dUbsX3I+1PVbQAej5+mi7MjuA0m+4OPl8c9fobynEDflnhVOPKdU9Afg
-   9pGvFOyjRIDNoxsGicEUrmSfflW2B27Gh0GXFW1P01gcz5+/77XSo3YwK
-   2lPK1w/Gu0CKKR+F2SJCmZsSpcp7CjQykk6APmc91HIXVepU5juGCSPv5
-   D+oCkHMq6+j8LWX9IKQPlV/09BiZCv9ma7v6bs5fp+P0zaidg7T4djhl9
-   /A0u3Xp8UZGmXAZvNFFIQxje7u402ns1HJlJ+HDI+tsJRBrstiAQsAj80
-   VubAIDy9Y4k7qnZ2Tc+LIhMeiIEdlmCsQvtmy7/U81YZP0pTVy3ENIEQE
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="364536906"
+  t=1689042708; x=1720578708;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zdpr/FW1wlL3zFcXST3lRyhYaFLZOqKGfdrI6I+Ber8=;
+  b=MQZSyFrBzEDFg/PajnN+vuG/5Lz9lplDvf3cU/0rMHvFXmSN78W3DdYD
+   lEPwgrD8Eu0qIhwQIeR20PNZY8FK7o/q/ezqmIlrQtwZKRC4EsVLQrlg3
+   hgOh8EXSMjLWwTMa5WiDy1/NdNMQTA9GIt1a6HWpcNbhgSS/WdGf/QDV4
+   ryp7Ofniwlq5J5XYWa8fBMXihTKhyN2Jo6/6WSvKN0+RYllvei+AjMJIF
+   rw5q3FDpIG/FXGEQiyIZ9/Zd+qV0G3Pw7znncONZLr/yLPz0H+yAEjRa0
+   mBsAOTkgo6vhyF1TmXuSk6F9rIv4ZFyeY9zyPutqRo6C0tSYi7uTEwrLg
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="368004621"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="364536906"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 18:24:26 -0700
+   d="scan'208";a="368004621"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 19:31:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="756173685"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="720907528"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="756173685"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga001.jf.intel.com with ESMTP; 10 Jul 2023 18:24:26 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 10 Jul 2023 18:24:26 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 10 Jul 2023 18:24:26 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 10 Jul 2023 18:24:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NW+RFIIpZ8Ph7hj+9cwLIF9WBcwt6hdocQ8zsNT5Fim6uSDfwRlg1XvrvlDeyKqamGH9pyEs2cz3vMPjNF/j0eC8G9VRTIOy/+be0frdIrTmEK2pJ5TQwUhUWHsAtKWoLr7rUWI9wvEjVnsuNVCteEeXVLCkTnhBHsj8nJqI/sukWN8xqjKcSDeYqHW9CXgqdO2vle3mgr7GqLJfPxE9/56CojO0Ju2WwOc2HHlY2u9cYPS3jrQZNCPiCqM0eh7SdV6GRyQ4Gj2zLElaZoOUx5PdWDHxdpHWBSB+GURxiFtn5ulOT1j0/8/5iDSgfigqlOnCkixKJ9GSnhIgigA2jw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fBOGNPEtiOBr68fPLTdlldaF2kKm1sGP+rYVw504gDY=;
- b=hkhrteKSqjUB8Q4JdeLY62Zcw9zrTmoMBMcXYU8gApOhFWR3f5iJboXGACHv1o6miwafL4cijl6jZmf83dT7fuxu+zAIOeVuGacFeIMKdk2Y/NbHMYchGVCNEegX25thIeUHGIoZJKwSw3izhwODdSRP+w5jLf30dKI5BVJhbqvQnKBjGgAgzkhd+62Us+QWsWuQteKNUb4rRELNIqBHiArvaHCE6APuNB36Mocf0kvNowZGBoWknTCgUUpjxvzcniZy48+sXFw9stEb2TCf3anTrXxnZL3CHnnEa8f64wrAs4v+5B7TISIueOXbplN9URjmEaokYfGi19RMaj3L3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by CY8PR11MB7339.namprd11.prod.outlook.com (2603:10b6:930:9f::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.32; Tue, 11 Jul
- 2023 01:24:23 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::4707:8818:a403:f7a9]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::4707:8818:a403:f7a9%6]) with mapi id 15.20.6565.028; Tue, 11 Jul 2023
- 01:24:23 +0000
-Message-ID: <a7b34b4b-3ce8-7dd7-969e-164abbd7e995@intel.com>
-Date:   Tue, 11 Jul 2023 09:24:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 00/21] Enable CET Virtualization
-To:     Sean Christopherson <seanjc@google.com>
-CC:     <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterz@infradead.org>,
-        <rppt@kernel.org>, <binbin.wu@linux.intel.com>,
-        <rick.p.edgecombe@intel.com>, <john.allen@amd.com>,
-        Gil Neiger <gil.neiger@intel.com>
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <ZIufL7p/ZvxjXwK5@google.com>
- <147246fc-79a2-3bb5-f51f-93dfc1cffcc0@intel.com>
- <ZIyiWr4sR+MqwmAo@google.com>
- <ffd84a94-abea-a813-a6da-59d45a5ac468@intel.com>
- <ZKyDy3IiB/6VHt02@google.com>
-Content-Language: en-US
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <ZKyDy3IiB/6VHt02@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0057.apcprd02.prod.outlook.com
- (2603:1096:4:54::21) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+   d="scan'208";a="720907528"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga002.jf.intel.com with ESMTP; 10 Jul 2023 19:31:26 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
+        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
+        lulu@redhat.com, suravee.suthikulpanit@amd.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: [PATCH v9 00/10] Enhance vfio PCI hot reset for vfio cdev device
+Date:   Mon, 10 Jul 2023 19:31:16 -0700
+Message-Id: <20230711023126.5531-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|CY8PR11MB7339:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ae202f0-cd1d-4169-fb4d-08db81ad8e99
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: P2teEDEF6GNy/8k35/MTj6OnhU41Q/cih+mL+HlV3A93pF22ORNi3xBaNjPqtxE4AUG0NLcXGab8diVxY2EsIQgBEZYju40uVYFipAEtYBbyn3S53NiW41q6/d/fMuX0lMSff+/LwK2lCbAZiUDW8XVAtWScPpGVvsVjPPy+st+FvZ7mKzuNthAY5VypkSN7cOBnT3bu29LTrwcG+BqklRmr6jKodUAeR+PjkGwnORHK4l3qeeTlruhQ866PzWe7iouF1ktknkx93qbEFvCN7GXIoHW/S9jjOJMejPycjcrcUzUXAmTlBVw8yZ+wRvGV//ZxdffEM+btu2Trc+fvth4bpt516UKHPqHRRWHBqMXNFB45aBPBSPaQLE/wD6AX3AAV3b8CcRA9sUbEl8/sJKWU3uxYD4I+Ktg3CWaLUVLs3qgK8qsAm0bE7l6agNVxlj3IHXtqQp8uYWFfkcJqnFw7I9KL4jH1mN7gRh3lHIR7HWOoMOaRWkzgcKEvyvGOMpI2bbGbcmrIYWQramCASIaszBK32kJdwrIRrA4EM2PxIvI7nDNGtfIYZbkSMb1m1oZvNtCSbsgpYH+3fS7Bhi6SbvrXY2gEBeCR90n5+vPMXiXKj5I6lGuD81GiBlZZOuTbXDLbouylLnkrJ6Qn9A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(376002)(346002)(39860400002)(366004)(136003)(451199021)(86362001)(31696002)(38100700002)(82960400001)(31686004)(36756003)(6666004)(6486002)(66946007)(2616005)(26005)(6506007)(53546011)(186003)(6512007)(2906002)(66476007)(66556008)(478600001)(8676002)(8936002)(5660300002)(83380400001)(4744005)(316002)(6916009)(4326008)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NXlqK3NIc1o0cExaTUNmVWNYVTZSOUQ4SlFySmVFbkR4VVNIZks2czI1U3U2?=
- =?utf-8?B?eDkvZkQyOFlXZmhnWnRqVHB1K1dFVWExNGg2aGo1b29FMnJ4dDlwb001bW1x?=
- =?utf-8?B?TUNob0JaS0lMbXBwNmFuNGduakd0dUNKNWNCbXdTL0I0eTM5V1k5dHRoWUE0?=
- =?utf-8?B?MDdxc1laWWRLZnBYN3g0Z3M1R2wyM3ZmTXZTOUhrVHZQN1p3aUlWNUhaVWZo?=
- =?utf-8?B?UGpiQmxDYU5WNC9zdktMRkR3L3lka2t3SklyN0pSQ2FVVlZBTFBwZHkySm1t?=
- =?utf-8?B?U0hxVWh1Z2dmZ3o2QlNTRS8wMUJKbyt6WG5veW41RHp4ZjJHZVRPTmFDSVBS?=
- =?utf-8?B?K05lNzgrbEZITGNXWGZBb3NHeWxjaXNwVzlyT2wwbTVjY09UMDFZdnFNcTNL?=
- =?utf-8?B?RFdkYk5GZmt3cVZKdzVqV0QyVXMzL2NRTnFTQlZRSGkxdGJ5dW1ZNzR5WlpD?=
- =?utf-8?B?SHlXb0paWVhPeXE2ZkZWZmlmait1Tk9PR1l0Qk43N2JuYm9uMUFLaVg2V0Fq?=
- =?utf-8?B?TmM5YVJNMnp6U2FXTmlOb24zdVFzZ1JDalpIN2VLaDJYdDVFS0lGVWh5bnJx?=
- =?utf-8?B?dmVlWEVySElGYTNkTFl2Z1ZXVW1KWVZ5enRTNFAvdTFWZFBReXhxSkdMY3g0?=
- =?utf-8?B?dW4xZm5GSDd1bXJZeTBlUytKSHZ6bURPbjQ2bTdWek1NMlNjYnVNazY0Um5r?=
- =?utf-8?B?ajJacW5haVlQK2E5aVVEZ1RxK2JmSWhRMTMxVVdxMFQ2aDJpUlJXMFFhOVZm?=
- =?utf-8?B?SUZSbGRiVUZ2R3dyVVFnVHhnTFFaMlBWUkQ0U01QOXhXd1N2RUpUMDh2c1Bj?=
- =?utf-8?B?R0tETkloLzIrR0pldzJmMXlXdXliWmdpSCtGWHUxV1VyLzBxZ21XUy9nQU80?=
- =?utf-8?B?TzBNTytJeTZaR2pteTFMUWNXN2RkS3RIMnNZV01BdVhrV1dCeS9FSHJWa2Ns?=
- =?utf-8?B?UWlLcnJTSDVIcVE3eDlZNDVCRXlSSVdrMEFYSExvV3Y4S0NXVXFnQXhCOGpQ?=
- =?utf-8?B?Q1ZxME0yK09ua0E4VFFrdmZhY29ZVEorZzZwcENheXpGUWVyaWVUWC92YVdn?=
- =?utf-8?B?WnJWTWszdHBEbE1sbDlXcFdUZVY2WTBrWVlzWVRwNy9COFZ5K0VaaEZMNlp1?=
- =?utf-8?B?aHVtSXZHazV4aFNyeFVqUzRIQW8yVXFESTFjTjJMSDFKaEVxQW9pWk0zZ0R5?=
- =?utf-8?B?MHpvNTQ2aytHRFBFOGVSWTZSWmNTb0VWTGlMWFptaG4yTitVZTE1YVVnY21J?=
- =?utf-8?B?REN4cW5QUVhodXM4VnlEcnlYNHF0L3hBZmptY0s2cWpKNXdhRDYxQ1JRNWxq?=
- =?utf-8?B?UW1MSDZwTExDT3h1WGU3bVZSek1MTk1QdlJYL2ZNVWM4MmxHYlR1b2NTQWUr?=
- =?utf-8?B?TDdxVi93ckdTNTF5K3NSYmxLNXJyL3IrMEpXd0NEWUtEaHBKV0FSN1FuZkJE?=
- =?utf-8?B?MS9oN3Q0MkJsY1NZd3dLci9MVklOQlJmcUZjQzlCeDdFLytOZmYwVXhXVkRY?=
- =?utf-8?B?Nno2amorU2tmeWJHaFZ5VVptaElyb1dVMUE3dlpSY2NMYzBSYlp3K0RsNXJZ?=
- =?utf-8?B?bmM3aVM0eFp0WmdKb2JlOUtRRjV4VUo2ZVRVS2lkdk1TYUJoQ2dvUHpsQkhO?=
- =?utf-8?B?M2dhUmdQZGVsWnRaVmhxQ2ZBUlF2YmtoWjFOOVNROUMrSEQ3L2FXM3E5aVEv?=
- =?utf-8?B?Um8yL2JQaTVJcDlGQkNsY2E1WDRwRnF3Vm5OckZOV3psbDA5cG9zcEtPc0hB?=
- =?utf-8?B?VXVLTEtCSm9TN0ZuMDZKOUlBM0F6R0k1ZUVJQmFJSjU4TERiMXRZc2VGU0FH?=
- =?utf-8?B?UTliZjVRYWppK0NTcUFBRnpXYjAvUDNDTkRoeCs0alZMUFdnTmgweXZyeFly?=
- =?utf-8?B?UlBJcWxlTWtReGlWeEg3aW1XVnplNHRnd1JkdzJOUG1mbHgwbVR4U0ladTFk?=
- =?utf-8?B?bHpxb1N0RGxLRVk4Y29NNVhCVkVuOHY1Q1hHVDZyUFlBK1VrUVRuaWY4d0lv?=
- =?utf-8?B?cVpEREg2eU9VYlBEQXI5c2R3TjFtU3VNbnh1OEtmOWZQbHpSaTJNaDVMd2VR?=
- =?utf-8?B?U1RXYUREbXRnblhNWHBwVHQyZm5MVXNFS09OMW8xVmg0c1JLeWkwaSt6cGdu?=
- =?utf-8?B?a0c2cmNZeXhNOHdLWlgvYzJxRXhKS0ZnVVIxVDRyMThJUU9xOURJZmJqRHBD?=
- =?utf-8?B?cWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ae202f0-cd1d-4169-fb4d-08db81ad8e99
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2023 01:24:22.8075
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BwI7BF4L7XdXyNJHAwCTrfSLFQ0tza/9Kq4ajbIkjl2tz08z9FH94cQp2sg+//I+iTR/JqbRAzJ3Dp38gyaBwA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7339
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -165,18 +68,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+VFIO_DEVICE_PCI_HOT_RESET requires user to pass an array of group fds
+to prove that it owns all devices affected by resetting the calling
+device. While for cdev devices, user can use an iommufd-based ownership
+checking model and invoke VFIO_DEVICE_PCI_HOT_RESET with a zero-length
+fd array.
 
-On 7/11/2023 6:18 AM, Sean Christopherson wrote:
-> On Mon, Jul 10, 2023, Weijiang Yang wrote:
->> Maybe you need modify above changelog a bit per the update.
-> Ya, I'll make sure the changelog gets updated before CET support is merged, though
-> feel free to post the next version without waiting for new changelog.
+This series extends VFIO_DEVICE_GET_PCI_HOT_RESET_INFO to check ownership
+and return the check result and the devid of affected devices to user. In
+the end, extends the VFIO_DEVICE_PCI_HOT_RESET to accept zero-length fd
+array for hot-reset with cdev devices.
 
-Sure, thanks!
+The new hot reset method and updated _INFO ioctl are tested with the
+below qemu:
 
->> Given the updated parts are technical forecast, I don't plan to implement it
->> in this series and still enumerate
->>
->> CET_SSS ==0 for guest. What's your thoughts?
-> Yes, definitely punt shadow-stack fixup to future enabling work.
-Got it.
+https://github.com/yiliu1765/qemu/tree/iommufd_rfcv4.mig.reset.v4_var3
+(requires to test with the cdev kernel)
+
+Change log:
+
+v9:
+ - Add Jason's r-b to patch 08
+
+v8: https://lore.kernel.org/kvm/ZJRnHO0p+pPgBZdr@nvidia.com/
+ - Add r-b from Jason to patch 03, 04, 05, 07, 09 of v7
+ - Add a patch to copy the per-device hot-reset structure to user during the
+   device loop instead of storing them in a buffer and copy all the contents
+   in one copy, this avoids an extra loop to count device and also avoids
+   allocating a temporay buffer for it. (Jason)
+ - Rename vfio_iommufd_device_hot_reset_devid() to be vfio_iommufd_get_dev_id()
+   and refine its return value for the case no valid ID can be returned. Hence
+   make it a general helper to get ID for a device. (Alex, Jason)
+ - Remove iommufd_ctx_has_group() CONIFG_IOMMUFD disabled stub as this API is
+   called in iommufd specific code which is compiled when CONFIG_IOMMU is
+   enabled. (Alex)
+ - Reaffirming Yanting's t-b (Tested NIC passthrough on Intel platform. mainly
+   regression tests)
+
+v7: https://lore.kernel.org/kvm/20230602121515.79374-1-yi.l.liu@intel.com/
+ - Drop noiommu support (patch 01 of v6 is dropped)
+ - Remove helpers to get devid and ictx for iommufd_access
+ - Document the dev_set representative requirement in the
+   VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for the cdev opened device (Alex)
+ - zero-length fd array approach is only for cdev opened device (Alex)
+
+v6: https://lore.kernel.org/kvm/20230522115751.326947-1-yi.l.liu@intel.com/
+ - Remove noiommu_access, reuse iommufd_access instead (Alex)
+ - vfio_iommufd_physical_ictx -> vfio_iommufd_device_ictx
+ - vfio_iommufd_physical_devid -> vfio_iommufd_device_hot_reset_devid
+ - Refine logic in patch 9 and 10 of v5, no uapi change. (Alex)
+ - Remove lockdep asset in vfio_pci_is_device_in_set (Cédric)
+ - Add t-b from Terrence (Tested GVT-g / GVT-d VFIO legacy mode / compat mode
+   / cdev mode, including negative tests. No regression be introduced.)
+
+v5: https://lore.kernel.org/kvm/20230513132136.15021-1-yi.l.liu@intel.com/
+ - Drop patch 01 of v4 (Alex)
+ - Create noiommu_access for noiommu devices (Jason)
+ - Reserve all negative iommufd IDs, hence VFIO can encode negative
+   values (Jason)
+ - Make vfio_iommufd_physical_devid() return -EINVAL if it's not called
+   with a physical device or a noiommu device.
+ - Add vfio_find_device_in_devset() in vfio_main.c (Alex)
+ - Add iommufd_ctx_has_group() to replace vfio_devset_iommufd_has_group().
+   Reason: vfio_devset_iommufd_has_group() only loops the devices within
+   the given devset to check the iommufd an iommu_group, but an iommu_group
+   can span into multiple devsets. So if failed to find the group in a
+   devset doesn't mean the group is not owned by the iommufd. So here either
+   needs to search all the devsets or add an iommufd API to check it. It
+   appears an iommufd API makes more sense.
+ - Adopt suggestions from Alex on patch 08 and 09 of v4, refine the hot-reset
+   uapi description and minor tweaks
+ - Use bitfields for bool members (Alex)
+
+v4: https://lore.kernel.org/kvm/20230426145419.450922-1-yi.l.liu@intel.com/
+ - Rename the patch series subject
+ - Patch 01 is moved from the cdev series
+ - Patch 02, 06 are new per review comments in v3
+ - Patch 03/04/05/07/08/09 are from v3 with updates
+
+v3: https://lore.kernel.org/kvm/20230401144429.88673-1-yi.l.liu@intel.com/
+ - Remove the new _INFO ioctl of v2, extend the existing _INFO ioctl to
+   report devid (Alex)
+ - Add r-b from Jason
+ - Add t-b from Terrence Xu and Yanting Jiang (mainly regression test)
+
+v2: https://lore.kernel.org/kvm/20230327093458.44939-1-yi.l.liu@intel.com/
+ - Split the patch 03 of v1 to be 03, 04 and 05 of v2 (Jaon)
+ - Add r-b from Kevin and Jason
+ - Add patch 10 to introduce a new _INFO ioctl for the usage of device
+   fd passing usage in cdev path (Jason, Alex)
+
+v1: https://lore.kernel.org/kvm/20230316124156.12064-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Yi Liu (10):
+  vfio/pci: Update comment around group_fd get in
+    vfio_pci_ioctl_pci_hot_reset()
+  vfio/pci: Move the existing hot reset logic to be a helper
+  iommufd: Reserve all negative IDs in the iommufd xarray
+  iommufd: Add iommufd_ctx_has_group()
+  iommufd: Add helper to retrieve iommufd_ctx and devid
+  vfio: Mark cdev usage in vfio_device
+  vfio: Add helper to search vfio_device in a dev_set
+  vfio/pci: Extend VFIO_DEVICE_GET_PCI_HOT_RESET_INFO for vfio device
+    cdev
+  vfio/pci: Copy hot-reset device info to userspace in the devices loop
+  vfio/pci: Allow passing zero-length fd array in
+    VFIO_DEVICE_PCI_HOT_RESET
+
+ drivers/iommu/iommufd/device.c   |  42 ++++++
+ drivers/iommu/iommufd/main.c     |   2 +-
+ drivers/vfio/iommufd.c           |  44 ++++++
+ drivers/vfio/pci/vfio_pci_core.c | 250 +++++++++++++++++++------------
+ drivers/vfio/vfio_main.c         |  15 ++
+ include/linux/iommufd.h          |   5 +
+ include/linux/vfio.h             |  22 +++
+ include/uapi/linux/vfio.h        |  71 ++++++++-
+ 8 files changed, 352 insertions(+), 99 deletions(-)
+
+-- 
+2.34.1
+
