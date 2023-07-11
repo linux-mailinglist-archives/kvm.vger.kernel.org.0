@@ -2,243 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CA1674FA46
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 00:00:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D4A174FA30
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 23:58:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231625AbjGKWAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 18:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48160 "EHLO
+        id S231134AbjGKV6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 17:58:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbjGKWAC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 18:00:02 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83392170A
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 15:00:01 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-57059e6f9c7so1630617b3.0
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 15:00:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689112801; x=1691704801;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccVD+v/KXcHhv0uWZezqc41e6QVd7uWNQyLzMUxhDwI=;
-        b=e/OHUuoBBcGsOIwFM1ihGsxpoWFlVjzLMAWcIxlED6fy/pQq7H8OwqSGXEvry5gTmX
-         4n4LJm3GrKYhp1rDcb2yZjoYmKujuDdwTE/pTr0qBWVQ3Mv7FqTUboTB8BJqLnZ++eP3
-         +Z5AMrB4uV2t/Yv3OGB4AzzvzxiLBamqfxXJJchimaePAXxst2FicMRdYA3ExEYktE31
-         eN5Wkg4N5lrPnQj1QCrAi02P4cVVslhw60TH3+m1+hFgH21D8rCn0hHB6zVsMmcWGVZt
-         f1BVBLr3QqPY8xNPlcA8vnOEbH04GpDVqoNu17fMR6IWcB/HZElSHY1LVXPIBa+K7LMT
-         zAVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689112801; x=1691704801;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccVD+v/KXcHhv0uWZezqc41e6QVd7uWNQyLzMUxhDwI=;
-        b=W+Mm4JgpUJESouJKyQRJBd5RggeUdneBCwFR6cE/8wvlPFiqKbrr5Xtp5JWA699Zkr
-         ugpPyYuW/9T61jE+z5B7Q84YMbYz9KwiIYTu0F/V5SD/mqZ0E/gNDlbpVAE4sfwsHAxi
-         OGRUZoOwqQfuii18PyeGu0zxXwFvxjismaA6M8k3HiNpCq0OXDXSOF86lQysTNHpPqa+
-         nXFWqmJ/2x4qEOhZ+FDZ2yYDvBnAOWtXz0p3oIzeoFetkXtwIBWcy32eG7XJB1MKphA4
-         wgx4tTc/fPODDqTMkm8veVNAZGnhbRmN1iwBrKjC43h307hVEASgdfFesGaNFTGGwkd9
-         wNiw==
-X-Gm-Message-State: ABy/qLY862PKTGWmUA3cO2huRVO9if1iG7Ic/Ic9ccwaDVtI1milQLhl
-        /YrM0aC9mzoIPyyQLlMOscO9q1UZ5VU=
-X-Google-Smtp-Source: APBJJlGIAl79q11h5ZhsnevB6cH0mxnTImxDoBGf6sOpWk2D0KKk/yU+n2H4PPFE466tsXaDVFr5sq8QXGg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ae4b:0:b0:56c:ed45:442c with SMTP id
- g11-20020a81ae4b000000b0056ced45442cmr1839ywk.5.1689112800813; Tue, 11 Jul
- 2023 15:00:00 -0700 (PDT)
-Date:   Tue, 11 Jul 2023 14:59:59 -0700
-In-Reply-To: <20230711203348.00000fb8.zhi.wang.linux@gmail.com>
-Mime-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-4-stevensd@google.com>
- <20230705161914.00004070.zhi.wang.linux@gmail.com> <CAD=HUj5cbzjrc0KD7xcibtRMRCzoJRJAzt7jTHSXUSpzyAYbdg@mail.gmail.com>
- <20230711203348.00000fb8.zhi.wang.linux@gmail.com>
-Message-ID: <ZK3Q34WNLjGVQQw+@google.com>
-Subject: Re: [PATCH v7 3/8] KVM: Make __kvm_follow_pfn not imply FOLL_GET
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     David Stevens <stevensd@chromium.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229551AbjGKV6S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 17:58:18 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722081704;
+        Tue, 11 Jul 2023 14:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689112697; x=1720648697;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xyZA7C6AH9ltjppdaMI0k4Tg4b3CqpfA1YAi4+vR8rQ=;
+  b=ZVWzHuXxzwSg+YP8d/XKugBEQR7wepFy9SGPXiW9cV3PquOo8Gouo566
+   GCVPG0hPDOkvxJdbGVr799NpkdMANy3IVy9Ve8vBwCwk20t+4QjRrvbQ6
+   wPOv9fFB29AUFaZariQFB2xSxLphi64cYttjasO72e7JZN9tbdYTWjEEd
+   NraI0it3wCYE5+UeYmXBBylb0YsegnPp5Uu1RsYxduBK2dwubELGp83TH
+   yzCsDDP47bgEr7io+CARsN7KcEHs8x0IDcFnnqUkRS3VpsOmzyio/EP6D
+   FIDk7DIOGI+hdu0IaZeQ7Q3nRFjIkSXgKOzH4UqpKvzq5TsNt531QuNU6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="428485264"
+X-IronPort-AV: E=Sophos;i="6.01,197,1684825200"; 
+   d="scan'208";a="428485264"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 14:57:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="724635780"
+X-IronPort-AV: E=Sophos;i="6.01,197,1684825200"; 
+   d="scan'208";a="724635780"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 14:57:53 -0700
+Date:   Tue, 11 Jul 2023 15:02:49 -0700
+From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH 9/9] iommu: Use fault cookie to store iopf_param
+Message-ID: <20230711150249.62917dad@jacob-builder>
+In-Reply-To: <20230711010642.19707-10-baolu.lu@linux.intel.com>
+References: <20230711010642.19707-1-baolu.lu@linux.intel.com>
+        <20230711010642.19707-10-baolu.lu@linux.intel.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 11, 2023, Zhi Wang wrote:
-> On Thu, 6 Jul 2023 15:49:39 +0900
-> David Stevens <stevensd@chromium.org> wrote:
+Hi BaoLu,
+
+On Tue, 11 Jul 2023 09:06:42 +0800, Lu Baolu <baolu.lu@linux.intel.com>
+wrote:
+
+> Remove the static iopf_param pointer from struct iommu_fault_param to
+> save memory.
 > 
-> > On Wed, Jul 5, 2023 at 10:19___PM Zhi Wang <zhi.wang.linux@gmail.com> wrote:
-> > >
-> > > On Tue,  4 Jul 2023 16:50:48 +0900
-> > > David Stevens <stevensd@chromium.org> wrote:
-> > > If yes, do we have to use FOLL_GET to resolve GFN associated with a tail page?
-> > > It seems gup can tolerate gup_flags without FOLL_GET, but it is more like a
-> > > temporary solution. I don't think it is a good idea to play tricks with
-> > > a temporary solution, more like we are abusing the toleration.  
-> > 
-> > I'm not sure I understand what you're getting at. This series never
-> > calls gup without FOLL_GET.
-> > 
-> > This series aims to provide kvm_follow_pfn as a unified API on top of
-> > gup+follow_pte. Since one of the major clients of this API uses an mmu
-> > notifier, it makes sense to support returning a pfn without taking a
-> > reference. And we indeed need to do that for certain types of memory.
-> > 
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  include/linux/iommu.h      |  2 --
+>  drivers/iommu/io-pgfault.c | 47 +++++++++++++++++++++++---------------
+>  2 files changed, 29 insertions(+), 20 deletions(-)
 > 
-> I am not having prob with taking a pfn without taking a ref. I am
-> questioning if using !FOLL_GET in struct kvm_follow_pfn to indicate taking
-> a pfn without a ref is a good idea or not, while there is another flag
-> actually showing it.
-> 
-> I can understand that using FOLL_XXX in kvm_follow_pfn saves some
-> translation between struct kvm_follow_pfn.{write, async, xxxx} and GUP
-> flags. However FOLL_XXX is for GUP. Using FOLL_XXX for reflecting the
-> requirements of GUP in the code path that going to call GUP is reasonable.
-> 
-> But using FOLL_XXX with purposes that are not related to GUP call really
-> feels off.
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index ffd6fe1317f4..5fe37a7c5a55 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -551,7 +551,6 @@ struct iommu_fault_param {
+>   * struct dev_iommu - Collection of per-device IOMMU data
+>   *
+>   * @fault_param: IOMMU detected device fault reporting data
+> - * @iopf_param:	 I/O Page Fault queue and data
+>   * @fwspec:	 IOMMU fwspec data
+>   * @iommu_dev:	 IOMMU device this device is linked to
+>   * @priv:	 IOMMU Driver private data
+> @@ -564,7 +563,6 @@ struct iommu_fault_param {
+>  struct dev_iommu {
+>  	struct mutex lock;
+>  	struct iommu_fault_param	*fault_param;
+> -	struct iopf_device_param	*iopf_param;
+>  	struct iommu_fwspec		*fwspec;
+>  	struct iommu_device		*iommu_dev;
+>  	void				*priv;
+> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+> index 1749e0869f2e..6a3a4e08e67e 100644
+> --- a/drivers/iommu/io-pgfault.c
+> +++ b/drivers/iommu/io-pgfault.c
+> @@ -158,7 +158,7 @@ int iommu_queue_iopf(struct iommu_fault *fault,
+> struct device *dev)
+>  	 * As long as we're holding param->lock, the queue can't be
+> unlinked
+>  	 * from the device and therefore cannot disappear.
+>  	 */
+> -	iopf_param = param->iopf_param;
+> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
+I am not sure I understand how does it know the cookie type is iopf_param
+for PASID 0?
 
-I agree, assuming you're talking specifically about the logic in hva_to_pfn_remapped()
-that handles non-refcounted pages, i.e. this
+Between IOPF and IOMMUFD use of the cookie, cookie types are different,
+right?
 
-	if (get_page_unless_zero(page)) {
-		foll->is_refcounted_page = true;
-		if (!(foll->flags & FOLL_GET))
-			put_page(page);
-	} else if (foll->flags & FOLL_GET) {
-		r = -EFAULT;
-	}
+>  	if (!iopf_param)
+>  		return -ENODEV;
+>  
+> @@ -235,7 +235,7 @@ int iopf_queue_flush_dev(struct device *dev)
+>  		return -ENODEV;
+>  
+>  	mutex_lock(&param->lock);
+> -	iopf_param = param->iopf_param;
+> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
+>  	if (iopf_param)
+>  		flush_workqueue(iopf_param->queue->wq);
+>  	else
+> @@ -286,9 +286,9 @@ EXPORT_SYMBOL_GPL(iopf_queue_discard_partial);
+>   */
+>  int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
+>  {
+> -	int ret = -EBUSY;
+> -	struct iopf_device_param *iopf_param;
+> +	struct iopf_device_param *iopf_param, *curr;
+>  	struct dev_iommu *param = dev->iommu;
+> +	int ret;
+>  
+>  	if (!param)
+>  		return -ENODEV;
+> @@ -303,16 +303,27 @@ int iopf_queue_add_device(struct iopf_queue *queue,
+> struct device *dev) 
+>  	mutex_lock(&queue->lock);
+>  	mutex_lock(&param->lock);
+> -	if (!param->iopf_param) {
+> -		list_add(&iopf_param->queue_list, &queue->devices);
+> -		param->iopf_param = iopf_param;
+> -		ret = 0;
+> +	curr = iommu_set_device_fault_cookie(dev, 0, iopf_param);
+> +	if (IS_ERR(curr)) {
+> +		ret = PTR_ERR(curr);
+> +		goto err_free;
+>  	}
+> +
+> +	if (curr) {
+> +		ret = -EBUSY;
+> +		goto err_restore;
+> +	}
+> +	list_add(&iopf_param->queue_list, &queue->devices);
+>  	mutex_unlock(&param->lock);
+>  	mutex_unlock(&queue->lock);
+>  
+> -	if (ret)
+> -		kfree(iopf_param);
+> +	return 0;
+> +err_restore:
+> +	iommu_set_device_fault_cookie(dev, 0, curr);
+> +err_free:
+> +	mutex_unlock(&param->lock);
+> +	mutex_unlock(&queue->lock);
+> +	kfree(iopf_param);
+>  
+>  	return ret;
+>  }
+> @@ -329,7 +340,6 @@ EXPORT_SYMBOL_GPL(iopf_queue_add_device);
+>   */
+>  int iopf_queue_remove_device(struct iopf_queue *queue, struct device
+> *dev) {
+> -	int ret = -EINVAL;
+>  	struct iopf_fault *iopf, *next;
+>  	struct iopf_device_param *iopf_param;
+>  	struct dev_iommu *param = dev->iommu;
+> @@ -339,16 +349,17 @@ int iopf_queue_remove_device(struct iopf_queue
+> *queue, struct device *dev) 
+>  	mutex_lock(&queue->lock);
+>  	mutex_lock(&param->lock);
+> -	iopf_param = param->iopf_param;
+> -	if (iopf_param && iopf_param->queue == queue) {
+> -		list_del(&iopf_param->queue_list);
+> -		param->iopf_param = NULL;
+> -		ret = 0;
+> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
+> +	if (!iopf_param || iopf_param->queue != queue) {
+> +		mutex_unlock(&param->lock);
+> +		mutex_unlock(&queue->lock);
+> +		return -EINVAL;
+>  	}
+> +
+> +	list_del(&iopf_param->queue_list);
+> +	iommu_set_device_fault_cookie(dev, 0, NULL);
+>  	mutex_unlock(&param->lock);
+>  	mutex_unlock(&queue->lock);
+> -	if (ret)
+> -		return ret;
+>  
+>  	/* Just in case some faults are still stuck */
+>  	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list)
 
-should be
 
-	if (get_page_unless_zero(page)) {
-		foll->is_refcounted_page = true;
-		if (!(foll->flags & FOLL_GET))
-			put_page(page);
-	else if (!foll->guarded_by_mmu_notifier)
-		r = -EFAULT;
+Thanks,
 
-because it's not the desire to grab a reference that makes getting non-refcounted
-pfns "safe", it's whether or not the caller is plugged into the MMU notifiers.
-
-Though that highlights that checking guarded_by_mmu_notifier should be done for
-*all* non-refcounted pfns, not just non-refcounted struct page memory.
-
-As for the other usage of FOLL_GET in this series (using it to conditionally do
-put_page()), IMO that's very much related to the GUP call.  Invoking put_page()
-is a hack to workaround the fact that GUP doesn't provide a way to get the pfn
-without grabbing a reference to the page.  In an ideal world, KVM would NOT pass
-FOLL_GET to the various GUP helpers, i.e. FOLL_GET would be passed as-is and KVM
-wouldn't "need" to kinda sorta overload FOLL_GET to manually drop the reference.
-
-I do think it's worth providing a helper to consolidate and document that hacky
-code, e.g. add a kvm_follow_refcounted_pfn() helper.
-
-All in all, I think the below (completely untested) is what we want?
-
-David (and others), I am planning on doing a full review of this series "soon",
-but it will likely be a few weeks until that happens.  I jumped in on this
-specific thread because this caught my eye and I really don't want to throw out
-*all* of the FOLL_GET usage.
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5b5afd70f239..90d424990e0a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2481,6 +2481,25 @@ static inline int check_user_page_hwpoison(unsigned long addr)
-        return rc == -EHWPOISON;
- }
- 
-+static kvm_pfn_t kvm_follow_refcounted_pfn(struct kvm_follow_pfn *foll,
-+                                          struct page *page)
-+{
-+       kvm_pfn_t pfn = page_to_pfn(page);
-+
-+       foll->is_refcounted_page = true;
-+
-+       /*
-+        * FIXME: Ideally, KVM wouldn't pass FOLL_GET to gup() when the caller
-+        * doesn't want to grab a reference, but gup() doesn't support getting
-+        * just the pfn, i.e. FOLL_GET is effectively mandatory.  If that ever
-+        * changes, drop this and simply don't pass FOLL_GET to gup().
-+        */
-+       if (!(foll->flags & FOLL_GET))
-+               put_page(page);
-+
-+       return pfn;
-+}
-+
- /*
-  * The fast path to get the writable pfn which will be stored in @pfn,
-  * true indicates success, otherwise false is returned.  It's also the
-@@ -2500,11 +2519,9 @@ static bool hva_to_pfn_fast(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
-                return false;
- 
-        if (get_user_page_fast_only(foll->hva, FOLL_WRITE, page)) {
--               *pfn = page_to_pfn(page[0]);
-                foll->writable = foll->allow_write_mapping;
--               foll->is_refcounted_page = true;
--               if (!(foll->flags & FOLL_GET))
--                       put_page(page[0]);
-+
-+               *pfn = kvm_follow_refcounted_pfn(foll, page[0]);
-                return true;
-        }
- 
-@@ -2528,7 +2545,6 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
-                return npages;
- 
-        foll->writable = (foll->flags & FOLL_WRITE) && foll->allow_write_mapping;
--       foll->is_refcounted_page = true;
- 
-        /* map read fault as writable if possible */
-        if (unlikely(!foll->writable) && foll->allow_write_mapping) {
-@@ -2540,9 +2556,8 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *foll, kvm_pfn_t *pfn)
-                        page = wpage;
-                }
-        }
--       *pfn = page_to_pfn(page);
--       if (!(foll->flags & FOLL_GET))
--               put_page(page);
-+
-+       *pfn = kvm_follow_refcounted_pfn(foll, page);
-        return npages;
- }
- 
-@@ -2610,17 +2625,16 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma, struct kvm_follow_pfn
-        if (!page)
-                goto out;
- 
--       if (get_page_unless_zero(page)) {
--               foll->is_refcounted_page = true;
--               if (!(foll->flags & FOLL_GET))
--                       put_page(page);
--       } else if (foll->flags & FOLL_GET) {
--               r = -EFAULT;
--       }
--
-+       if (get_page_unless_zero(page))
-+               WARN_ON_ONCE(kvm_follow_refcounted_pfn(foll, page) != pfn);
- out:
-        pte_unmap_unlock(ptep, ptl);
--       *p_pfn = pfn;
-+
-+       if (!foll->is_refcounted_page && !foll->guarded_by_mmu_notifier &&
-+           !allow_unsafe_mappings)
-+               r = -EFAULT;
-+       else
-+               *p_pfn = pfn;
- 
-        return r;
- }
-
+Jacob
