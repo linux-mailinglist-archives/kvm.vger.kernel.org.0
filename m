@@ -2,71 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF72474E499
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 04:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C0FB74E4B5
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 04:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbjGKC7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 22:59:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46670 "EHLO
+        id S230227AbjGKC7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 22:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229937AbjGKC7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 22:59:31 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0802E59
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:59:21 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b703c900e3so79924981fa.1
-        for <kvm@vger.kernel.org>; Mon, 10 Jul 2023 19:59:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1689044360; x=1691636360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+DBmSxEV9koNvPnH4f6fQb1MyHlXgygw1qw/AWmL9NU=;
-        b=jbRRZbz4ynuhPqqeV5apPzs0jqkJtDi55aZFCp3oS1Ky8RkTvPlwMnB4q/fiemRBoQ
-         /nqmDMG2P1A6auw8vdVkBVLFNlCCKg5J2gfTl+c6qkohrCouZIFJFDxXVd83G/CNdJVI
-         qpp4LD8m9YAEdXqPmRzBi1781HakxZf9US60Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689044360; x=1691636360;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+DBmSxEV9koNvPnH4f6fQb1MyHlXgygw1qw/AWmL9NU=;
-        b=Ix75mEWrPHu4TmNjv2dejsqQvfrqRs0jkn/Nu52iK7SE16Ml/rI6uE2jN+Cmg3AgzG
-         6PmHFO8wo9vpwCTwpVIavvr2jmqei0ntmMd69CSjZL46sfv7S/e3CV669At3ngOEOWGm
-         479xBNjInvRooiSjVd3iLnLm8fTORaLgZCyjSXvTND3k3G/2TzzE5EegNt2vK+wYQ46s
-         Zs2LVZB2kfzxRyYCwwiu8deZke8WjlHL/vNgSCJmW962+nkoWdf1WtiAWoBLYQ/lBV3k
-         faxtwzQAd+Lzk97MuaXvuF2BmpGbUuL8r0Zqdh7c0zNj/vK1aNeS9t8mbjWPd7xE5TwE
-         EZ+Q==
-X-Gm-Message-State: ABy/qLat3BdaO0E15WwWz//sB6X/9groMybX5eLky+fWqwoBy7JRuutK
-        Wml8KG/z+jyix/BTIcSdEA/PpNmXFK6tOGXQrj+ZWA==
-X-Google-Smtp-Source: APBJJlFhZxK1fGMNnOjl8Qk8f7Az5wy8Xg34SBiq6VLsMfXYX+pfTJMvsTItHqfjvno05fAVxl0LMgHzDd+1uLzcle4=
-X-Received: by 2002:a2e:7e12:0:b0:2b7:1b63:4657 with SMTP id
- z18-20020a2e7e12000000b002b71b634657mr5157080ljc.37.1689044359940; Mon, 10
- Jul 2023 19:59:19 -0700 (PDT)
+        with ESMTP id S230306AbjGKC7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 22:59:40 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86FF31A7;
+        Mon, 10 Jul 2023 19:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689044378; x=1720580378;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HcOydo8wLA/qSln+0xDpnkffMEGIG3fmLOI7pZDzYqk=;
+  b=RegbEMq+ef6T50aIoCKAbvrkAMAnvyKgIJ8+gF8W6yJHylH/aH3fqYis
+   wrEY8UyJ3btXf4/dAh7+FOWQ6Ny5RqCWHIomVKYLgvXy0oJNgFwUI5XpD
+   9T/GSvWPlF1rMjxTXphuUAlxpXdQC/Z9h6MhmzEasu6HiifrCA9Z1OePf
+   OrdWVFto7948727OZUEivpuMFGb6EFyTF/iorriUvFRWw2rFCNgYUt+sd
+   PQwNanEjZUvmWsKvqVQFis+8pvUicJO7bwqGQLA6K+d0N449kcY34J1x8
+   0JCTyy9Cr9NkjGhK3pq099GAcdalNCriDBty55JNWWYolsiQx+HXMtZDV
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="361973005"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="361973005"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 19:59:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="724250792"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="724250792"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga007.fm.intel.com with ESMTP; 10 Jul 2023 19:59:35 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
+        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
+        lulu@redhat.com, suravee.suthikulpanit@amd.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: [PATCH v14 06/26] vfio: Pass struct vfio_device_file * to vfio_device_open/close()
+Date:   Mon, 10 Jul 2023 19:59:08 -0700
+Message-Id: <20230711025928.6438-7-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230711025928.6438-1-yi.l.liu@intel.com>
+References: <20230711025928.6438-1-yi.l.liu@intel.com>
 MIME-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
- <20230705101800.ut4c6topn6ylwczs@linux.intel.com> <CAD=HUj41PAKC0x+c3zWAr-aCm59K7hs2zRh1uWs9778_Mai4UA@mail.gmail.com>
- <20230706155805.GD3894444@ls.amr.corp.intel.com> <CAD=HUj6GiK3TSSe7UY8C2Jd+3tjZNBa-TLgk-UodyL=E+qKavg@mail.gmail.com>
- <20230710163448.GE3894444@ls.amr.corp.intel.com>
-In-Reply-To: <20230710163448.GE3894444@ls.amr.corp.intel.com>
-From:   David Stevens <stevensd@chromium.org>
-Date:   Tue, 11 Jul 2023 11:59:08 +0900
-Message-ID: <CAD=HUj6ZEzVEFgn_J_9EPNMj5i-N=MSc0xZF8FweqrgTxUks0g@mail.gmail.com>
-Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,60 +69,196 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 1:34=E2=80=AFAM Isaku Yamahata <isaku.yamahata@gmai=
-l.com> wrote:
->
-> On Fri, Jul 07, 2023 at 10:35:02AM +0900,
-> David Stevens <stevensd@chromium.org> wrote:
->
-> > > > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > > > > index e44ab512c3a1..b1607e314497 100644
-> > > > > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > > >
-> > > > > ...
-> > > > >
-> > > > > > @@ -2937,6 +2943,7 @@ static int mmu_set_spte(struct kvm_vcpu *=
-vcpu, struct kvm_memory_slot *slot,
-> > > > > >       bool host_writable =3D !fault || fault->map_writable;
-> > > > > >       bool prefetch =3D !fault || fault->prefetch;
-> > > > > >       bool write_fault =3D fault && fault->write;
-> > > > > > +     bool is_refcounted =3D !fault || fault->is_refcounted_pag=
-e;
-> > > > >
-> > > > > Just wonder, what if a non-refcounted page is prefetched?  Or is =
-it possible in
-> > > > > practice?
-> > > >
-> > > > Prefetching is still done via gfn_to_page_many_atomic, which sets
-> > > > FOLL_GET. That's fixable, but it's not something this series curren=
-tly
-> > > > does.
-> > >
-> > > So if we prefetch a page, REFCOUNTED bit is cleared unconditionally w=
-ith this
-> > > hunk.  kvm_set_page_{dirty, accessed} won't be called as expected for=
- prefetched
-> > > spte.  If I read the patch correctly, REFCOUNTED bit in SPTE should r=
-epresent
-> > > whether the corresponding page is ref-countable or not, right?
-> > >
-> > > Because direct_pte_prefetch_many() is for legacy KVM MMU and FNAME(pr=
-efetch_pte)
-> > > is shadow paging, we need to test it with legacy KVM MMU or shadow pa=
-ging to hit
-> > > the issue, though.
-> > >
-> >
-> > direct_pte_prefetch_many and prefetch_gpte both pass NULL for the
-> > fault parameter, so is_refcounted will evaluate to true. So the spte's
-> > refcounted bit will get set in that case.
->
-> Oops, my bad.  My point is "unconditionally".  Is the bit always set for
-> non-refcountable pages?  Or non-refcountable pages are not prefeched?
+This avoids passing too much parameters in multiple functions. Per the
+input parameter change, rename the function to be vfio_df_open/close().
 
-The bit is never set for non-refcounted pages, and is always set for
-refcounted pages. The current series never prefetches non-refcounted
-pages, since it continues to use the gfn_to_page_many_atomic API.
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Terrence Xu <terrence.xu@intel.com>
+Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+---
+ drivers/vfio/group.c     | 20 ++++++++++++++------
+ drivers/vfio/vfio.h      |  8 ++++----
+ drivers/vfio/vfio_main.c | 25 +++++++++++++++----------
+ 3 files changed, 33 insertions(+), 20 deletions(-)
 
--David
+diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+index b56e19d2a02d..caf53716ddb2 100644
+--- a/drivers/vfio/group.c
++++ b/drivers/vfio/group.c
+@@ -169,8 +169,9 @@ static void vfio_device_group_get_kvm_safe(struct vfio_device *device)
+ 	spin_unlock(&device->group->kvm_ref_lock);
+ }
+ 
+-static int vfio_device_group_open(struct vfio_device *device)
++static int vfio_df_group_open(struct vfio_device_file *df)
+ {
++	struct vfio_device *device = df->device;
+ 	int ret;
+ 
+ 	mutex_lock(&device->group->group_lock);
+@@ -190,7 +191,11 @@ static int vfio_device_group_open(struct vfio_device *device)
+ 	if (device->open_count == 0)
+ 		vfio_device_group_get_kvm_safe(device);
+ 
+-	ret = vfio_device_open(device, device->group->iommufd);
++	df->iommufd = device->group->iommufd;
++
++	ret = vfio_df_open(df);
++	if (ret)
++		df->iommufd = NULL;
+ 
+ 	if (device->open_count == 0)
+ 		vfio_device_put_kvm(device);
+@@ -202,12 +207,15 @@ static int vfio_device_group_open(struct vfio_device *device)
+ 	return ret;
+ }
+ 
+-void vfio_device_group_close(struct vfio_device *device)
++void vfio_df_group_close(struct vfio_device_file *df)
+ {
++	struct vfio_device *device = df->device;
++
+ 	mutex_lock(&device->group->group_lock);
+ 	mutex_lock(&device->dev_set->lock);
+ 
+-	vfio_device_close(device, device->group->iommufd);
++	vfio_df_close(df);
++	df->iommufd = NULL;
+ 
+ 	if (device->open_count == 0)
+ 		vfio_device_put_kvm(device);
+@@ -228,7 +236,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+ 		goto err_out;
+ 	}
+ 
+-	ret = vfio_device_group_open(device);
++	ret = vfio_df_group_open(df);
+ 	if (ret)
+ 		goto err_free;
+ 
+@@ -260,7 +268,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+ 	return filep;
+ 
+ err_close_device:
+-	vfio_device_group_close(device);
++	vfio_df_group_close(df);
+ err_free:
+ 	kfree(df);
+ err_out:
+diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+index 332528af0846..2094f5a4ef04 100644
+--- a/drivers/vfio/vfio.h
++++ b/drivers/vfio/vfio.h
+@@ -21,13 +21,13 @@ struct vfio_device_file {
+ 
+ 	spinlock_t kvm_ref_lock; /* protect kvm field */
+ 	struct kvm *kvm;
++	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
+ };
+ 
+ void vfio_device_put_registration(struct vfio_device *device);
+ bool vfio_device_try_get_registration(struct vfio_device *device);
+-int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd);
+-void vfio_device_close(struct vfio_device *device,
+-		       struct iommufd_ctx *iommufd);
++int vfio_df_open(struct vfio_device_file *df);
++void vfio_df_close(struct vfio_device_file *df);
+ struct vfio_device_file *
+ vfio_allocate_device_file(struct vfio_device *device);
+ 
+@@ -92,7 +92,7 @@ void vfio_device_group_register(struct vfio_device *device);
+ void vfio_device_group_unregister(struct vfio_device *device);
+ int vfio_device_group_use_iommu(struct vfio_device *device);
+ void vfio_device_group_unuse_iommu(struct vfio_device *device);
+-void vfio_device_group_close(struct vfio_device *device);
++void vfio_df_group_close(struct vfio_device_file *df);
+ struct vfio_group *vfio_group_from_file(struct file *file);
+ bool vfio_group_enforced_coherent(struct vfio_group *group);
+ void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 8ef9210ad2aa..825b1eeaebe2 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -434,9 +434,10 @@ vfio_allocate_device_file(struct vfio_device *device)
+ 	return df;
+ }
+ 
+-static int vfio_device_first_open(struct vfio_device *device,
+-				  struct iommufd_ctx *iommufd)
++static int vfio_df_device_first_open(struct vfio_device_file *df)
+ {
++	struct vfio_device *device = df->device;
++	struct iommufd_ctx *iommufd = df->iommufd;
+ 	int ret;
+ 
+ 	lockdep_assert_held(&device->dev_set->lock);
+@@ -468,9 +469,11 @@ static int vfio_device_first_open(struct vfio_device *device,
+ 	return ret;
+ }
+ 
+-static void vfio_device_last_close(struct vfio_device *device,
+-				   struct iommufd_ctx *iommufd)
++static void vfio_df_device_last_close(struct vfio_device_file *df)
+ {
++	struct vfio_device *device = df->device;
++	struct iommufd_ctx *iommufd = df->iommufd;
++
+ 	lockdep_assert_held(&device->dev_set->lock);
+ 
+ 	if (device->ops->close_device)
+@@ -482,15 +485,16 @@ static void vfio_device_last_close(struct vfio_device *device,
+ 	module_put(device->dev->driver->owner);
+ }
+ 
+-int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd)
++int vfio_df_open(struct vfio_device_file *df)
+ {
++	struct vfio_device *device = df->device;
+ 	int ret = 0;
+ 
+ 	lockdep_assert_held(&device->dev_set->lock);
+ 
+ 	device->open_count++;
+ 	if (device->open_count == 1) {
+-		ret = vfio_device_first_open(device, iommufd);
++		ret = vfio_df_device_first_open(df);
+ 		if (ret)
+ 			device->open_count--;
+ 	}
+@@ -498,14 +502,15 @@ int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd)
+ 	return ret;
+ }
+ 
+-void vfio_device_close(struct vfio_device *device,
+-		       struct iommufd_ctx *iommufd)
++void vfio_df_close(struct vfio_device_file *df)
+ {
++	struct vfio_device *device = df->device;
++
+ 	lockdep_assert_held(&device->dev_set->lock);
+ 
+ 	vfio_assert_device_open(device);
+ 	if (device->open_count == 1)
+-		vfio_device_last_close(device, iommufd);
++		vfio_df_device_last_close(df);
+ 	device->open_count--;
+ }
+ 
+@@ -550,7 +555,7 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ 	struct vfio_device_file *df = filep->private_data;
+ 	struct vfio_device *device = df->device;
+ 
+-	vfio_device_group_close(device);
++	vfio_df_group_close(df);
+ 
+ 	vfio_device_put_registration(device);
+ 
+-- 
+2.34.1
+
