@@ -2,72 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6692574F89A
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 22:01:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 000F174F8AC
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 22:03:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbjGKUBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 16:01:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60756 "EHLO
+        id S229884AbjGKUDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 16:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbjGKUBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 16:01:19 -0400
-Received: from out-5.mta1.migadu.com (out-5.mta1.migadu.com [95.215.58.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D9710D2
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 13:01:18 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+        with ESMTP id S229537AbjGKUDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 16:03:36 -0400
+Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [IPv6:2001:41d0:203:375::29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4141BFD
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 13:03:05 -0700 (PDT)
+Date:   Tue, 11 Jul 2023 20:02:47 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689105676;
+        t=1689105771;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BW7lu2mzgzGoDumkBjzINg6OFqwOhCaVlVWH0EynxSc=;
-        b=lyVgupKC1qIjP3KD7eNvfKsAd1v8v8em8uJUofb+1dh3vYQFcPEvTWdYYG44rmUuKc4Eb1
-        AraP3PTFuP5b/Oq+8JOUkFnSgIuVdVugPlvBC2QLTHA17Sqre82Yd8QB8liZjhKSMjHljd
-        V4LCRrvNUnqzy3bVFke3mZmZrPGQ9OU=
+        bh=j7wpPKSWBw5SPfNkCzcIKlvtgTa7z9041l05WeQlyP8=;
+        b=p2knxbGe3yEElrh6ORsVsqD09+UwWkdlHYdv7AwamdXCHy7HAb9LoSpOMkPv6hVmc+gct3
+        7ye/cwJk4MZUKJ2suXw/hq0Rv0vmOlvqLc2I3OKwkXsGyuGuTspq1eNqEUHG4kNOMMKI/q
+        yGVOr4mOfyPNt0fsCTPvRWpGWfLFf58=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
+To:     Eric Auger <eauger@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         James Morse <james.morse@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: timers: Use CNTHCTL_EL2 when setting non-CNTKCTL_EL1 bits
-Date:   Tue, 11 Jul 2023 20:00:46 +0000
-Message-ID: <168910562677.2605377.4826778238561780912.b4-ty@linux.dev>
-In-Reply-To: <20230627140557.544885-1-maz@kernel.org>
+        Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: timers: Use CNTHCTL_EL2 when setting
+ non-CNTKCTL_EL1 bits
+Message-ID: <ZK21Z5WB6+bTjWA0@linux.dev>
 References: <20230627140557.544885-1-maz@kernel.org>
+ <d49225cb-3240-ea8e-11e6-b8ed30ce2fc8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d49225cb-3240-ea8e-11e6-b8ed30ce2fc8@redhat.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Jun 2023 15:05:57 +0100, Marc Zyngier wrote:
-> It recently appeared that, whien running VHE, there is a notable
-> difference between using CNTKCTL_EL1 and CNTHCTL_EL2, despite what
-> the architecture documents:
-> 
-> - When accessed from EL2, bits [19:18] and [16:10] same bits have
->   the same assignment as CNTHCTL_EL2
-> - When accessed from EL1, bits [19:18] and [16:10] are RES0
-> 
-> [...]
+On Tue, Jul 11, 2023 at 12:35:00PM +0200, Eric Auger wrote:
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Applied to kvmarm/fixes, thanks!
+Thanks for reviewing this Eric. I addressed your comments and picked up
+your R-b when applying Marc's patch.
 
-[1/1] KVM: arm64: timers: Use CNTHCTL_EL2 when setting non-CNTKCTL_EL1 bits
-      https://git.kernel.org/kvmarm/kvmarm/c/fe769e6c1f80
-
---
-Best,
+-- 
+Thanks,
 Oliver
