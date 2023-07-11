@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71FF674E2F7
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 03:08:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDCA974E2FB
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 03:09:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbjGKBIq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 21:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50294 "EHLO
+        id S231201AbjGKBI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 21:08:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230505AbjGKBIp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 21:08:45 -0400
+        with ESMTP id S231127AbjGKBIy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 21:08:54 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DFA312A;
-        Mon, 10 Jul 2023 18:08:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD8AE4C;
+        Mon, 10 Jul 2023 18:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689037724; x=1720573724;
+  t=1689037728; x=1720573728;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Yw3ldqeV4muXTG+DI6j0gzlwD7xkWN/7ajkI9p76rt8=;
-  b=NYSPCErfOGoQQIJ9+CI5B4Im+GrCpPLcDcCRq5xpj3LfWEdH5GXS5GVG
-   6hh52Q28Q0D+AjJq92awABs2Wwx2kZSYxK77C/2HXbGPiDHck7VzsLlua
-   WrVrsqXnZUkXCH6vy2S0qxtLGQGSYapKlIwOTpbdJ7knLFoa7b42KeD9H
-   KilLb98UclQh/APnh7zxqbXG+rJJYigwKrIvW+ClPyJjgSTeOyn0rodli
-   aiSXZ/GcRAnAqryuqh0hUkboVlkxqc3eZptO+4UFA+YpTuPXm39z2AdUt
-   aH8GANXwXmEoJMTF1oQlMaq2gkEQ3JjfREPSuXfcchGP+tsWQjjsQdkT6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="344816069"
+  bh=oKqphfPLpxwX/axdCJ/TL8Nqz/Tmz3XMJfkFpiYRxCo=;
+  b=T8v2tepWHIHNYjA9mHSUUdyqAnymV/eV6uLuAKGf4hhftRy01LpX1uzG
+   zFwaUd58zk20TU5ff2eKFDvPsQlNdEKbkTl02D2j7g8iN0AtqB+0UOVFn
+   vLq42pMBjMyKmzmjwLfP3JrZ/5RjBnCzfnOG+YcVw/Tm+d4y3/fLXhg/C
+   ACCvJTXMm7kpyWhYQt85HAfTAF/Aj/37J6w1LYMwLIF10BxCmrv456Ft2
+   3KFd59xkOGrydmhbLBz1O9ikLpl3Wpaxdye8ozaxa89fig74VMCjFbI2v
+   /lW4kvdhqC8MYvXqQfXaCYZ7F9Wd95KoGdvzanIXRd0qtWmSxwHlUC9zO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="344816083"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="344816069"
+   d="scan'208";a="344816083"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 18:08:43 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 18:08:48 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="810999814"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="810999840"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="810999814"
+   d="scan'208";a="810999840"
 Received: from allen-box.sh.intel.com ([10.239.159.127])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2023 18:08:39 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2023 18:08:44 -0700
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
         Robin Murphy <robin.murphy@arm.com>,
@@ -49,9 +49,9 @@ Cc:     Yi Liu <yi.l.liu@intel.com>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         iommu@lists.linux.dev, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH 2/9] iommu: Add device parameter to iopf handler
-Date:   Tue, 11 Jul 2023 09:06:35 +0800
-Message-Id: <20230711010642.19707-3-baolu.lu@linux.intel.com>
+Subject: [PATCH 3/9] iommu: Add common code to handle IO page faults
+Date:   Tue, 11 Jul 2023 09:06:36 +0800
+Message-Id: <20230711010642.19707-4-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230711010642.19707-1-baolu.lu@linux.intel.com>
 References: <20230711010642.19707-1-baolu.lu@linux.intel.com>
@@ -67,81 +67,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the device parameter to the iopf handler so that it can know which
-device this fault was generated.
+The individual iommu drivers report iommu faults by calling
+iommu_report_device_fault(), where a pre-registered device fault handler
+is called to route the fault to another fault handler installed on the
+corresponding iommu domain.
 
-This is necessary for use cases such as delivering IO page faults to user
-space. The IOMMUFD layer needs to be able to lookup the device id of a
-fault and route it together with the fault message to the user space.
+The pre-registered device fault handler is static and won't be dynamic
+as the fault handler is eventually per iommu domain. Replace the device
+fault handler with a static common code to avoid unnecessary code.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/iommu.h      | 1 +
- drivers/iommu/iommu-sva.h  | 4 ++--
- drivers/iommu/io-pgfault.c | 2 +-
- drivers/iommu/iommu-sva.c  | 2 +-
- 4 files changed, 5 insertions(+), 4 deletions(-)
+ drivers/iommu/iommu.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 0eb0fb852020..a00fb43b5e73 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -249,6 +249,7 @@ struct iommu_domain {
- 	struct iommu_domain_geometry geometry;
- 	struct iommu_dma_cookie *iova_cookie;
- 	enum iommu_page_response_code (*iopf_handler)(struct iommu_fault *fault,
-+						      struct device *dev,
- 						      void *data);
- 	void *fault_data;
- 	union {
-diff --git a/drivers/iommu/iommu-sva.h b/drivers/iommu/iommu-sva.h
-index 54946b5a7caf..c848661c4e20 100644
---- a/drivers/iommu/iommu-sva.h
-+++ b/drivers/iommu/iommu-sva.h
-@@ -23,7 +23,7 @@ struct iopf_queue *iopf_queue_alloc(const char *name);
- void iopf_queue_free(struct iopf_queue *queue);
- int iopf_queue_discard_partial(struct iopf_queue *queue);
- enum iommu_page_response_code
--iommu_sva_handle_iopf(struct iommu_fault *fault, void *data);
-+iommu_sva_handle_iopf(struct iommu_fault *fault, struct device *dev, void *data);
- 
- #else /* CONFIG_IOMMU_SVA */
- static inline int iommu_queue_iopf(struct iommu_fault *fault, void *cookie)
-@@ -63,7 +63,7 @@ static inline int iopf_queue_discard_partial(struct iopf_queue *queue)
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index da340f11c5f5..41328f03e8b4 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1278,6 +1278,28 @@ int iommu_unregister_device_fault_handler(struct device *dev)
  }
+ EXPORT_SYMBOL_GPL(iommu_unregister_device_fault_handler);
  
- static inline enum iommu_page_response_code
--iommu_sva_handle_iopf(struct iommu_fault *fault, void *data)
-+iommu_sva_handle_iopf(struct iommu_fault *fault, struct device *dev, void *data)
- {
- 	return IOMMU_PAGE_RESP_INVALID;
- }
-diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-index e5b8b9110c13..fa604e1b5c5c 100644
---- a/drivers/iommu/io-pgfault.c
-+++ b/drivers/iommu/io-pgfault.c
-@@ -88,7 +88,7 @@ static void iopf_handler(struct work_struct *work)
- 		 * faults in the group if there is an error.
- 		 */
- 		if (status == IOMMU_PAGE_RESP_SUCCESS)
--			status = domain->iopf_handler(&iopf->fault,
-+			status = domain->iopf_handler(&iopf->fault, group->dev,
- 						      domain->fault_data);
++static int iommu_handle_io_pgfault(struct device *dev,
++				   struct iommu_fault *fault)
++{
++	struct iommu_domain *domain;
++
++	if (fault->type != IOMMU_FAULT_PAGE_REQ)
++		return -EINVAL;
++
++	if (fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID)
++		domain = iommu_get_domain_for_dev_pasid(dev, fault->prm.pasid, 0);
++	else
++		domain = iommu_get_domain_for_dev(dev);
++
++	if (!domain || !domain->iopf_handler)
++		return -ENODEV;
++
++	if (domain->iopf_handler == iommu_sva_handle_iopf)
++		return iommu_queue_iopf(fault, dev);
++
++	return domain->iopf_handler(fault, dev, domain->fault_data);
++}
++
+ /**
+  * iommu_report_device_fault() - Report fault event to device driver
+  * @dev: the device
+@@ -1320,7 +1342,7 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
+ 		mutex_unlock(&fparam->lock);
+ 	}
  
- 		if (!(iopf->fault.prm.flags &
-diff --git a/drivers/iommu/iommu-sva.c b/drivers/iommu/iommu-sva.c
-index 3ebd4b6586b3..14766a2b61af 100644
---- a/drivers/iommu/iommu-sva.c
-+++ b/drivers/iommu/iommu-sva.c
-@@ -157,7 +157,7 @@ EXPORT_SYMBOL_GPL(iommu_sva_get_pasid);
-  * I/O page fault handler for SVA
-  */
- enum iommu_page_response_code
--iommu_sva_handle_iopf(struct iommu_fault *fault, void *data)
-+iommu_sva_handle_iopf(struct iommu_fault *fault, struct device *dev, void *data)
- {
- 	vm_fault_t ret;
- 	struct vm_area_struct *vma;
+-	ret = fparam->handler(&evt->fault, fparam->data);
++	ret = iommu_handle_io_pgfault(dev, &evt->fault);
+ 	if (ret && evt_pending) {
+ 		mutex_lock(&fparam->lock);
+ 		list_del(&evt_pending->list);
 -- 
 2.34.1
 
