@@ -2,90 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35B1D74F4A0
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 18:15:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD65E74F521
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 18:26:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230474AbjGKQPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 12:15:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49612 "EHLO
+        id S230398AbjGKQ0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 12:26:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231163AbjGKQPE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 12:15:04 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4889E12F
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 09:15:03 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-569e7aec37bso53141007b3.2
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 09:15:03 -0700 (PDT)
+        with ESMTP id S230072AbjGKQ0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 12:26:41 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3987A99
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 09:26:40 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-666fb8b1bc8so5311205b3a.1
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 09:26:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689092102; x=1691684102;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=srPbiHu7W6kwoYdYL0mD3A931iU7Il78HDCrkGjWI18=;
-        b=6GfxYY+/kNebainzUExcm0kQOXE8VIdIJTrFYR88700u3EMMAkDsbxBLzYT9Bo0Dbn
-         X4WP8RKAKpiRw38HH1IOD/Ll3c5Mr2BWvHVFgcWeOdni6SH5iNaJXixzQ6xeyWbmE6Ja
-         ZRugymzdXfIlfEUuZWO5wYF6iiixvGnAHNCg4K0b6Q9PBi0zp/VrhYEbH06FtOjVzOX+
-         6d5/+WoGA3vU8omo9fueeHecveYzIQkopQ0b8jSbNK9of4g9wYbl7HuAih2KCXstCAyc
-         YoYsnumvUOSKzTJafNIfgDKaCUAha6iaZhM9ZGYH4meQGAw16z+PyYFzBgq8B7o68DGq
-         J0PQ==
+        d=chromium.org; s=google; t=1689092800; x=1691684800;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FnogQ7HLpRF5+op/EYR0WRYtuefnaYhu4nhQsCtg9DI=;
+        b=nYXGo198BbM03RIP7UU0985bq/mKFrMAZ8QCvoEU4vxnvQjVmDh6w8bxrebH1kiVMq
+         PQcNyVMFfAV1nbaAlu8bOMRieTT7CGsuiLLQeHGEWH64OnH1dNkXSKZy2yAPeY5wfUYx
+         lhkX6B3dh8M7Ad8XpfWKjutJ7uQK7QnTyvDzA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689092102; x=1691684102;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=srPbiHu7W6kwoYdYL0mD3A931iU7Il78HDCrkGjWI18=;
-        b=DQcV5D2pioGM7wuw7WU6b1a2Ar4W0zhKlxY2z7NrqoYCqLUxLCOfF4pTS9maLOvPAX
-         K7gVNC6hMASzrgds6ikYbUvP1vrl3AWSJp2wOK+UjZDFcuOJHxYUbUqV27O5wrd5qqPm
-         Zxh0OeWbbJIV1a8lF/ElGsWWbl1EIHuuWxM1Ndebc3ugtKQc9fsRnbmA8zvdx/cBtjP7
-         s0U7zibbG0ZoCTaX9YCZ1zaEBYPc/FA1k7Jwqy/pooXPrUCsBALE2QOTnFQEBsj/rlJ2
-         W/vKPk7UvEHtrY0/AGT96UDKW7aSEm2PeNwEBRvr0Mg8liut1LhmPpUxQo9c6JVgtKjN
-         rUXA==
-X-Gm-Message-State: ABy/qLYcuoceTcdmOO9mHs6pGgP7lR2OpjyngTBLn7H1fomCujq19/1S
-        Whn7ezA8fACTlHN6jZwaTpd6dAzp9Ak=
-X-Google-Smtp-Source: APBJJlFDVl9hAuTBxssdwIqHHMl2Olc1sB8n2KGDINQU8/fv4APjnsjPNp19mUGXHW8A1zY9dOMASSOsb5o=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b663:0:b0:570:7d9b:9b16 with SMTP id
- h35-20020a81b663000000b005707d9b9b16mr114199ywk.2.1689092102486; Tue, 11 Jul
- 2023 09:15:02 -0700 (PDT)
-Date:   Tue, 11 Jul 2023 09:15:00 -0700
-In-Reply-To: <20230710133427.fb599ef486c7b764d9ca2cc3@linux-foundation.org>
-Mime-Version: 1.0
+        d=1e100.net; s=20221208; t=1689092800; x=1691684800;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FnogQ7HLpRF5+op/EYR0WRYtuefnaYhu4nhQsCtg9DI=;
+        b=DXB7uZiPYwAstwma/ntIg4wdo4zD9XLrwcNwxwOfNdHC90A0SQk3VbKbjz9SQORU7L
+         NuB0Z81eCKrqsTr+i9QiZVAj3ccTJdfAJRIwIlZkSWO0jaz2Dl92NiMnrioKdEoCkXvT
+         +4EewIgOoaHu++dfh4pNMgBPzqcupUsu6eP9LlEm+TuJANxcbM+HBhRku6Cu+8O527um
+         ltcrikr7DrxQS7aNNCB8ozKz6ea0UejLhTXqts4A7JgClEB7W9/IsB2uBCghnF0TE05Y
+         77gHEp6Os6oDkTAeRlUqA99oyJN6ykRnrH2MjDx9PfD7eVeKM1xKsLigYGvLRTOuG1Zz
+         wPXg==
+X-Gm-Message-State: ABy/qLYP8H1kfQuDb3wxDhpcYHj6PLNZ00u7/028h5kKObhqUs6CzAhj
+        /CKx0S5zfYDRnosyamtekAnrdw==
+X-Google-Smtp-Source: APBJJlHPT8zxb8dffvFxjIXVZsxroWt6k1sP9UuWClw8e3VLZG1MIqrloCoxrh09rhTflME/mNoIww==
+X-Received: by 2002:a05:6a20:60b:b0:122:92d0:452a with SMTP id 11-20020a056a20060b00b0012292d0452amr16544394pzl.37.1689092799583;
+        Tue, 11 Jul 2023 09:26:39 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id d20-20020aa78154000000b0066f37665a6asm1916962pfn.117.2023.07.11.09.26.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jul 2023 09:26:39 -0700 (PDT)
+Date:   Tue, 11 Jul 2023 09:26:38 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Zheng Zhang <zheng.zhang@email.ucr.edu>,
+        linux-hardening@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [BUG]: bad usercopy in kvm_stats_read in mm/usercopy.c
+Message-ID: <202307110925.CBAF286C0A@keescook>
 References: <CAC_GQSr3xzZaeZt85k_RCBd5kfiOve8qXo7a81Cq53LuVQ5r=Q@mail.gmail.com>
  <20230710133427.fb599ef486c7b764d9ca2cc3@linux-foundation.org>
-Message-ID: <ZK2ABPwCke32Kh0q@google.com>
-Subject: Re: [BUG]: bad usercopy in kvm_stats_read in mm/usercopy.c
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Zheng Zhang <zheng.zhang@email.ucr.edu>, keescook@chromium.org,
-        linux-hardening@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+ <ZK2ABPwCke32Kh0q@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZK2ABPwCke32Kh0q@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 10, 2023, Andrew Morton wrote:
-> On Sun, 9 Jul 2023 14:32:09 -0700 Zheng Zhang <zheng.zhang@email.ucr.edu> wrote:
-> 
-> > Kees, Andrew, and  to whom it may concern:
+On Tue, Jul 11, 2023 at 09:15:00AM -0700, Sean Christopherson wrote:
+> On Mon, Jul 10, 2023, Andrew Morton wrote:
+> > On Sun, 9 Jul 2023 14:32:09 -0700 Zheng Zhang <zheng.zhang@email.ucr.edu> wrote:
 > > 
-> > Hello! We have found a bug in the Linux kernel version 6.2.0 by syzkaller
-> > with our own templates. It also produces a POC.
-> > Attached is the report, log, and reproducers generated by syzkaller
-> > Please let me know if there is any additional information that I can
-> > provide to help debug this issue.
-> > Thanks!
+> > > Kees, Andrew, and  to whom it may concern:
+> > > 
+> > > Hello! We have found a bug in the Linux kernel version 6.2.0 by syzkaller
+> > > with our own templates. It also produces a POC.
+> > > Attached is the report, log, and reproducers generated by syzkaller
+> > > Please let me know if there is any additional information that I can
+> > > provide to help debug this issue.
+> > > Thanks!
+> > 
+> > Let's cc the kvm mailing list.
+> > 
+> > Original email is at
+> > https://lkml.kernel.org/r/CAC_GQSr3xzZaeZt85k_RCBd5kfiOve8qXo7a81Cq53LuVQ5r=Q@mail.gmail.com
 > 
-> Let's cc the kvm mailing list.
-> 
-> Original email is at
-> https://lkml.kernel.org/r/CAC_GQSr3xzZaeZt85k_RCBd5kfiOve8qXo7a81Cq53LuVQ5r=Q@mail.gmail.com
+> Yeaaaah.  We failed kernel programming 101.  KVM installs file descriptors to
+> let userspace read VM and vCPU stats, but doesn't grab a reference to the VM to
+> ensure the VM and its vCPUs are kept alive until the stats fds are closed.  I'll
+> send a patch.
 
-Yeaaaah.  We failed kernel programming 101.  KVM installs file descriptors to
-let userspace read VM and vCPU stats, but doesn't grab a reference to the VM to
-ensure the VM and its vCPUs are kept alive until the stats fds are closed.  I'll
-send a patch.
+Thanks! Another victory for hardened usercopy. :)
+
+-- 
+Kees Cook
