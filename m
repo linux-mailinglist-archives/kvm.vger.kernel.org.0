@@ -2,153 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40DB174F354
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 17:24:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44AD274F36C
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 17:29:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232083AbjGKPYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 11:24:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41226 "EHLO
+        id S232014AbjGKP3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 11:29:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232046AbjGKPYq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 11:24:46 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A1710F1;
-        Tue, 11 Jul 2023 08:24:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de;
- s=s31663417; t=1689089042; x=1689693842; i=deller@gmx.de;
- bh=X5J8IwR1yeKrwbjkpPsX7TYJjlXNjW6vNyFiaXSONCI=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=GN6pEgcKFc3TiPb2BrkoJgWpY3wT6K0R5RBigRXBblVMjch41be3tnm2swuTsuX+Os7iA/8
- Z9v2vToEYoOPOQ4s3z2aViTvBbo31jTtusNzIKxOpiwD7D9NwU7sqcIn+JNbk0jHZjwhfVLl2
- d6iWR9cqVyWu0u7qANiT81Cpfdu3Eqc00ZipKFbQhesar/5TX1xB7U9VpXwXmNRtS/1YNiPfU
- SRgIgcZf4Vy4C2hoDDHbvEMYqAxah1b5gF/4wDuoYtNwfTn8iZrmD7X6N5eREBk0mQ+SO7vLm
- XJUXEar9IV97stc6Qd3jl7GNwSx3M24HJnop1aHhCU7ipk3XBcaQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.20.60] ([94.134.149.147]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N4hzZ-1ps3V72pTb-011i72; Tue, 11
- Jul 2023 17:24:02 +0200
-Message-ID: <bf439387-6b13-0fd9-f61b-1a5cbf731187@gmx.de>
-Date:   Tue, 11 Jul 2023 17:24:01 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 00/17] fbdev: Remove FBINFO_DEFAULT and
- FBINFO_FLAG_DEFAULT flags
-Content-Language: en-US
-To:     Sam Ravnborg <sam@ravnborg.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>
-Cc:     javierm@redhat.com, linux-fbdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        linux-geode@lists.infradead.org, dri-devel@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-nvidia@lists.surfsouth.com,
-        linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
-References: <20230710130113.14563-1-tzimmermann@suse.de>
- <20230710171903.GA14712@ravnborg.org>
- <ab92f8d9-36ab-06bc-b85b-d52b7a1bfe9a@suse.de>
- <20230711144744.GA117276@ravnborg.org>
-From:   Helge Deller <deller@gmx.de>
-In-Reply-To: <20230711144744.GA117276@ravnborg.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:6I/u9K9DZKAMaYzMuqb+xXVwXoFF+h72slV7307qnBcsm0Dzs1x
- nG8x0xILsiEhhUVyajytT1uvIrwO9pRmYfPk78Yjls8o/KkVUspWf98tkujsctomDLRF6u0
- UdBWhjkxLyl8NlhxrYI/AySAPNbWQr6NnCxEKWsR0EsTYbybHP0PZ/RgD80PFRH8fmhW/rk
- TAn21cXKojNy9UOEmBO4g==
-UI-OutboundReport: notjunk:1;M01:P0:XNImko0fYwY=;AiV+j1oEN7JVd7gQE4GAf5pZu6m
- wj99cJ2LSeHJsHr2sKsT5CY1HR5Yi2t55wwqJhZ6uGfcqxHOW/2sn0V3JJ1io82GaOhNRHzvt
- zR9PmCQCilcJeIgDWCjc0NTIJrJwKg9hfWHSI53inWj0QmjAnOKmMCU3wO+aUNaQN4UL9Li4U
- pS0CQrlM7YGW4BTIwfY0xyXtCF6IMWdx7BHqF3QxocVpNzMqT/GVE2zmfibCAiVqoVQY40T+o
- NfQL+Sjc8hRtasBpRBrc2z21M5uGIuje56htBn3GdlF1wxQAOhS7U4WVJMB/RUoYnHtqc+5C7
- Y3Z39Ph2nMGi4aLfGFPQ8o5aDWO2iSZAEyXK9ibsLnG8FE5wcp3HfnnPdYVrcXXRMfCi9Y0y8
- dPaGqnM2nlp1XoENCoUkPedNE+amwXmHeMkLsw4/azwj2BHBlZDUJbT5TEDhDYiUleyOTHX6w
- 9DrDsMO8KTBvWuKxlyh6SvhMiT5th1mL55DNnDe9iAzx5CzX3I/WPmvRDiOsFpDevTdtc/8Ul
- fXWMM1JgkhhzesMwjc3WGGL0WR7ZLDoAXdy6HgvU6DYnM5ZKWbGaU0kGq3Xt62kPOP/TPi57t
- 7xnqiNwytZ9sHQk0abZBXvyhMmffWWlPi7PkmADCqAImC+5wCWCuFIzRZjFe8toJm2oLadiV3
- knPTCfauwkQqsirUUTKP+Fvtut4kgg/lM/XFnPlOr6ONXkR+PAt+jXB02SliulYmhRIkG9Cps
- DEGpDks4ZL0YBrtLU06OAYGJk5e79ZlPpMsMOxggmhzdOq5gASDzlXo2v/5WI4kajcTiXWshU
- AsE+znIk2ZnZVFDRN2aKd1kxacUupl9dFU1lXpXl4FV9iCrgKo+mSF8JrBT4S2N98M8WXk/wg
- j6ZDK2VfivJIrmvtPfy2OGuo6dP1yz/NEjvVfotUNvuZgi41Wa3hoMtQxYuWKIroLVVgCW7x4
- ElEk/ywwPT4Kak54lZ31n9Y0OxE=
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232186AbjGKP3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 11:29:18 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5ADC133
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 08:29:17 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bacfa4ef059so6511186276.2
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 08:29:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689089357; x=1691681357;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BZNT+5cYt7mx7oEaiQ13ihjtEzSR8MjFtzStZZPURr4=;
+        b=gypF4zw0UurGdZNnY7tnZPzjmzPO0RfqKibCydwdPBEGXgbUv+lfc/TYNQ7xQhqnoH
+         IHDl5pNu9grquWf9ybhtrBkmnXq2a2enN7dZlVAChyz8igGvGXR7X1/0+Ye41RCY6eET
+         z9pITmnv5VbSV7ed+9hXSzgMhmpdgdFx4dPujjW4ngz2zJKWIp42x/Pz/UPvMG5zA5BM
+         893hc/eA8cM8/u5uaIkZEJKM4VaPBigIj1MOOgMjRIiYUyhztY194IZdvSvkD2bqEByG
+         2hng92wvdPACTfDST52dj+cJejFvfOBiF9YkgWXarz8E5tP/HwfQez9roz5A1iundo/P
+         80aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689089357; x=1691681357;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BZNT+5cYt7mx7oEaiQ13ihjtEzSR8MjFtzStZZPURr4=;
+        b=J1kcjWhZLXIsjDePOoCLnyMCRdetspLDDmNxbyKU3PHZYRZ3nd4/jWiFiBEIKk7zHP
+         TWkdR258CAaHgO5N+hix93xEsugamuwQeajgjmdZOkxv9ev+AQ5fxrKl9mlA8JqFFT9q
+         HajYtwl8oyuDT5XETjSJBFR4RWTaG7mMMQOvXK7QfqFedPzMhbHW9jdd6nH+i2cmebos
+         6HtCESFOP/nfKLW4HmAFbtW8HsTZLRS6k6ks0AtSjk+ISsE5TbAJtzd9oubZwdknthfB
+         cG/+yUor9jZh5JfEWgcqbqQ8EwhQr6BdIpU0TOtjSDaJp4IZIk7oMQrjKjcfZeTwJtIQ
+         kc8Q==
+X-Gm-Message-State: ABy/qLY6Ssz9b0wlIju4hWfhQRMAhQ01X8R2cVcp6LHOcXc9XiNCTibv
+        JJuES7BdyOE+TICWKP0fpt2QeY84BNU=
+X-Google-Smtp-Source: APBJJlGFGYYGagVN7vTY3wC9eCumsMZqXbeKPXvjR5MQqtf90kvmwuPYWXIb7T3NbU7esv5D5N974RuQD6o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:5585:0:b0:bed:d03a:fc5f with SMTP id
+ j127-20020a255585000000b00bedd03afc5fmr90974ybb.11.1689089357189; Tue, 11 Jul
+ 2023 08:29:17 -0700 (PDT)
+Date:   Tue, 11 Jul 2023 08:29:15 -0700
+In-Reply-To: <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+ <ZIovIBVLIM69E5Bo@google.com> <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
+ <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com>
+Message-ID: <ZK11Sxobf53RsAmH@google.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/11/23 16:47, Sam Ravnborg wrote:
-> Hi Thomas,
->
-> On Tue, Jul 11, 2023 at 08:24:40AM +0200, Thomas Zimmermann wrote:
->> Hi Sam
->>
->> Am 10.07.23 um 19:19 schrieb Sam Ravnborg:
->>> Hi Thomas,
->>>
->>> On Mon, Jul 10, 2023 at 02:50:04PM +0200, Thomas Zimmermann wrote:
->>>> Remove the unused flags FBINFO_DEFAULT and FBINFO_FLAG_DEFAULT from
->>>> fbdev and drivers, as briefly discussed at [1]. Both flags were maybe
->>>> useful when fbdev had special handling for driver modules. With
->>>> commit 376b3ff54c9a ("fbdev: Nuke FBINFO_MODULE"), they are both 0
->>>> and have no further effect.
->>>>
->>>> Patches 1 to 7 remove FBINFO_DEFAULT from drivers. Patches 2 to 5
->>>> split this by the way the fb_info struct is being allocated. All flag=
-s
->>>> are cleared to zero during the allocation.
->>>>
->>>> Patches 8 to 16 do the same for FBINFO_FLAG_DEFAULT. Patch 8 fixes
->>>> an actual bug in how arch/sh uses the tokne for struct fb_videomode,
->>>> which is unrelated.
->>>>
->>>> Patch 17 removes both flag constants from <linux/fb.h>
->>>
->>> We have a few more flags that are unused - should they be nuked too?
->>> FBINFO_HWACCEL_FILLRECT
->>> FBINFO_HWACCEL_ROTATE
->>> FBINFO_HWACCEL_XPAN
->>
->> It seems those are there for completeness. Nothing sets _ROTATE,
+On Fri, Jul 07, 2023, Anish Moorthy wrote:
+> > Hmm, well not having to modify the vendor code would be nice... but
+> > I'll have to look more at __gfn_to_pfn_memslot()'s callers (and
+> > probably send more questions your way :). Hopefully it works out more
+> > like what you suggest.
+> 
+> I took a look of my own, and I don't think moving the nowait query
+> into __gfn_to_pfn_memslot() would work. At issue is the actual
+> behavior of KVM_CAP_NOWAIT_ON_FAULT, which I documented as follows:
+> 
+> > The presence of this capability indicates that userspace may pass the
+> > KVM_MEM_NOWAIT_ON_FAULT flag to KVM_SET_USER_MEMORY_REGION to cause KVM_RUN
+> > to fail (-EFAULT) in response to page faults for which resolution would require
+> > the faulting thread to sleep.
 
-I think some fbdev drivers had hardware acceleration for ROTATE in the
-past. HWACCEL_XPAN is still in some drivers.
+Well, that description is wrong for other reasons.  As mentioned in my reply
+(got snipped), the behavior is not tied to sleeping or waiting on I/O.
 
->> the others are simply never checked. According to the comments,
->> some are required, some are optional. I don't know what that
->> means.
+>  Moving the nowait check out of __kvm_faultin_pfn()/user_mem_abort()
+> and into __gfn_to_pfn_memslot() means that, obviously, other callers
+> will start to see behavior changes. Some of that is probably actually
+> necessary for that documentation to be accurate (since any usages of
+> __gfn_to_pfn_memslot() under KVM_RUN should respect the memslot flag),
+> but I think there are consumers of __gfn_to_pfn_memslot() from outside
+> KVM_RUN.
 
-I think it's OK if you remove those flags which aren't used anywhere,
-e.g. FBINFO_HWACCEL_ROTATE.
+Yeah, replace "in response to page faults" with something along the lines of "if
+an access in guest context ..."
 
->> IIRC there were complains about performance when Daniel tried to remove
->> fbcon acceleration, so not all _HWACCEL_ flags are unneeded.
+> Anyways, after some searching on my end: I think the only caller of
+> __gfn_to_pfn_memslot() in core kvm/x86/arm64 where moving the "nowait"
+> check into the function actually changes anything is gfn_to_pfn(). But
+> that function gets called from vmx_vcpu_create() (through
+> kvm_alloc_apic_access_page()), and *that* certainly doesn't look like
+> something KVM_RUN does or would ever call.
 
-Correct. I think COPYAREA and FILLRECT are the bare minimum to accelerate
-fbcon, IMAGEBLIT is for showing the tux penguin (?),
-XPAN/YPAN and YWRAP for some hardware screen panning needed by some driver=
-s
-(not sure if this is still used as I don't have such hardware, Geert?).
+Correct, but that particular gfn_to_pfn() works on a KVM-internal memslot, i.e.
+will never have the "fast-only" flag set.
 
->> Leaving them in for reference/completeness might be an option; or not. =
-I
->> have no strong feelings about those flags.
+	hva = __x86_set_memory_region(kvm, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT, <===
+				      APIC_DEFAULT_PHYS_BASE, PAGE_SIZE);
+	if (IS_ERR(hva)) {
+		ret = PTR_ERR(hva);
+		goto out;
+	}
 
-I'd say drop FBINFO_HWACCEL_ROTATE at least ?
+	page = gfn_to_page(kvm, APIC_DEFAULT_PHYS_BASE >> PAGE_SHIFT);
+	if (is_error_page(page)) {
+		ret = -EFAULT;
+		goto out;
+	} 
 
->>> Unused as in no references from fbdev/core/*
->>>
->>> I would rather see one series nuke all unused FBINFO flags in one go.
->>> Assuming my quick grep are right and the above can be dropped.
->>
->> I would not want to extend this series. I'm removing _DEFAULT as it's
->> absolutely pointless and confusing.
+On x86, there should not be any other usages of user memslots outside of KVM_RUN.
+arm64 is unfortunately a different story (see this thread[*]), but we may be able
+to solve that with a documentation update.  I *think* the accesses are limited to
+the sub-ioctl KVM_DEV_ARM_VGIC_GRP_CTRL, and more precisely the sub-sub-ioctls
+KVM_DEV_ARM_ITS_{SAVE,RESTORE}_TABLES and KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.
 
-Yes, Ok.
-
-Helge
+[*] https://lore.kernel.org/all/Y1ghIKrAsRFwSFsO@google.com
