@@ -2,128 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE18074F235
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 16:27:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 661FA74F248
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 16:32:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233677AbjGKO1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 10:27:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34058 "EHLO
+        id S231990AbjGKOcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 10:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233449AbjGKO1B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 10:27:01 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 142FC2139
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 07:26:17 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-57745160c1dso65000137b3.2
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 07:26:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689085527; x=1691677527;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=p56sBbCS+VPrS5cOX2wwAyiH2Cg/fGXPAAbSLjc9HmQ=;
-        b=G9ZmthhhEWojkB7p9qdG0NlmayOu64h8X2dBXxGMYbiFdGXXEUX2oyzC6fFrumID5N
-         98vlOxYGDbsB8BsZYbCu5+cNjdgpXDDF3wPvFmpX1D/3wiXeEI7iIbWaLd2Y8S1kcK51
-         g9AEp3AGfRn3IH5ErdyFegxvkav3Hez4Pqo60UTx9c8Mo77h2wLDQUn/qNlpfbjeYv3l
-         BXG4TLJ1lnjA9oyO1JcxOVrUNvF1oP+UeGFwZ78x/HxF67SpfkkngNuMfv0ud6ParpnM
-         ur81S62LVTRhXeUfmkPypJAXBF0q5GmQYpveV1kpJbP42oZcLd7cONmfF2+Ipt3sxdG7
-         gZpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689085527; x=1691677527;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p56sBbCS+VPrS5cOX2wwAyiH2Cg/fGXPAAbSLjc9HmQ=;
-        b=e1tJwxzs59by3yvmiwyupxPIPcwdEIAHMmwG8ywBI6KwaUiy1pOx+i9cmQEEenn/u4
-         MhfahZorNcSqJahn7tLvlzXLmkayMwfx2MZmo8pz+4NjAPiIGaiJd6wuTHZ/v+qUW7jo
-         6dq5hRV07dS2RgFZLZFbOekZ+UOCiPAofd1Cw2LtNSxFWfMyEURVbg8+bta+3GpcT6g1
-         dK391bcQdf5lIPtL1pdBxlugol4vIX+uk0ndAmy1+47Gmv9mykhIxXBQYvT9QBnrodm/
-         uQrkhjw3W2PW8dcjovdoDA72FutpXNzgNvdQ0dPEpp6Py57/lNhY0fb1QW300+Z/OQyQ
-         zy0A==
-X-Gm-Message-State: ABy/qLbayCv4s5AD+F7teiLhsIWsKj7yZSdV4v9+5Euld7xFGl1NcfS0
-        a71UObLI40HqRe948w0OBmR9Gx8K924=
-X-Google-Smtp-Source: APBJJlGypUsi6FziBQD/5n1q9oaBq8wtOZmggi8VuvEfNqxbkCHQTwUdZQaONZSNZ8Qt3Y2NvWdpI/kBNjM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ac44:0:b0:55d:6af3:1e2c with SMTP id
- z4-20020a81ac44000000b0055d6af31e2cmr126252ywj.3.1689085527641; Tue, 11 Jul
- 2023 07:25:27 -0700 (PDT)
-Date:   Tue, 11 Jul 2023 07:25:26 -0700
-In-Reply-To: <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com> <ZKf7+D474ESdNP3D@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
- <CAF7b7mr7BZayOxE2y8K87+AfYuGoDc7_kA2ouA3kBuhSgDiomg@mail.gmail.com> <ZKzSf82kuik7wYkA@li-a450e7cc-27df-11b2-a85c-b5a9ac31e8ef.ibm.com>
-Message-ID: <ZK1mVriphYnZu6Cd@google.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kautuk Consul <kconsul@linux.vnet.ibm.com>
-Cc:     Anish Moorthy <amoorthy@google.com>, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, pbonzini@redhat.com,
-        maz@kernel.org, robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229970AbjGKOcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 10:32:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C8EF4;
+        Tue, 11 Jul 2023 07:31:56 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36BEVkNw005194;
+        Tue, 11 Jul 2023 14:31:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9ZAVi6KiU/ro/z+p6FjNut0qxPvIL3XbeOtGZatE0Io=;
+ b=SZQLnI57GBZIxjTJMUb8Nfoe8TwYYannXVn6Qs4T2T9VetR0+sVdnnPXBQVQfKH7lhFo
+ LRqmLH6oGTkQHBE7BzScclxFRiG0PgGS5MTkS5hhfa4kSsg/T4q2dsD1yYI9teTFwjCA
+ n7V1RU8x/sIsXEs0baPWXTx/OEAKj9iJgRaOc4k/Yk75Y4/dRwpVIdFt7wbkPisfY4c0
+ vuEQmE5QXVdFI+KZ5yAh6zZQu62eIKZwdsZLtLIFwTjIHFCjFX/BROASSND9PkcNtuQE
+ wKVgTYhpL2T0KPQgH3OkxV8qx6E3b2kkvx2AnMaR7C+7Bz2CxAScq+6JBISukZqcat1S PA== 
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rs8wur081-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Jul 2023 14:31:55 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36BAl28h009204;
+        Tue, 11 Jul 2023 14:31:52 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rpye51c8m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Jul 2023 14:31:52 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36BEVmNp15794878
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jul 2023 14:31:48 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D65420040;
+        Tue, 11 Jul 2023 14:31:48 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D8A6220049;
+        Tue, 11 Jul 2023 14:31:47 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 11 Jul 2023 14:31:47 +0000 (GMT)
+Date:   Tue, 11 Jul 2023 16:31:46 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, frankja@linux.ibm.com,
+        mhartmay@linux.ibm.com, nsg@linux.ibm.com, borntraeger@de.ibm.com,
+        nrb@linux.ibm.com
+Subject: Re: [PATCH v2 2/2] KVM: s390: pv: fix index value of replaced ASCE
+Message-ID: <20230711163146.557e9d75@p-imbrenda>
+In-Reply-To: <dba58cf1-59ed-f1f3-fdbe-59d213f0a7b5@linaro.org>
+References: <20230705111937.33472-1-imbrenda@linux.ibm.com>
+        <20230705111937.33472-3-imbrenda@linux.ibm.com>
+        <dba58cf1-59ed-f1f3-fdbe-59d213f0a7b5@linaro.org>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ZBw8A1FRQ1_ZGYCeZHiP55nMwpdpnDNq
+X-Proofpoint-ORIG-GUID: ZBw8A1FRQ1_ZGYCeZHiP55nMwpdpnDNq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-11_08,2023-07-11_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ suspectscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=971
+ impostorscore=0 mlxscore=0 clxscore=1011 spamscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307110131
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 11, 2023, Kautuk Consul wrote:
-> > > That said, I agree that there's a risk that KVM could clobber vcpu->run_run by
-> > > hitting an -EFAULT without the vCPU loaded, but that's a solvable problem, e.g.
-> > > the helper to fill KVM_EXIT_MEMORY_FAULT could be hardened to yell if called
-> > > without the target vCPU being loaded:
-> > >
-> > >     int kvm_handle_efault(struct kvm_vcpu *vcpu, ...)
-> > >     {
-> > >         preempt_disable();
-> > >         if (WARN_ON_ONCE(vcpu != __this_cpu_read(kvm_running_vcpu)))
-> > >             goto out;
-> > >
-> > >         vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
-> > >         ...
-> > >     out:
-> > >         preempt_enable();
-> > >         return -EFAULT;
-> > >     }
-> > 
-> > Ancient history aside, let's figure out what's really needed here.
-> > 
-> > > Why use WARN_ON_ONCE when there is a clear possiblity of preemption
-> > > kicking in (with the possibility of vcpu_load/vcpu_put being called
-> > > in the new task) before preempt_disable() is called in this function ?
-> > > I think you should use WARN_ON_ONCE only where there is some impossible
-> > > or unhandled situation happening, not when there is a possibility of that
-> > > situation clearly happening as per the kernel code.
-> > 
-> > I did some mucking around to try and understand the kvm_running_vcpu
-> > variable, and I don't think preemption/rescheduling actually trips the
-> > WARN here? From my (limited) understanding, it seems that the
-> > thread being preempted will cause a vcpu_put() via kvm_sched_out().
-> > But when the thread is eventually scheduled back in onto whatever
-> > core, it'll vcpu_load() via kvm_sched_in(), and the docstring for
-> > kvm_get_running_vcpu() seems to imply the thing that vcpu_load()
-> > stores into the per-cpu "kvm_running_vcpu" variable will be the same
-> > thing which would have been observed before preemption.
-> > 
-> > All that's to say: I wouldn't expect the value of
-> > "__this_cpu_read(kvm_running_vcpu)" to change in any given thread. If
-> > that's true, then the things I would expect this WARN to catch are (a)
-> > bugs where somehow the thread gets scheduled without calling
-> > vcpu_load() or (b) bizarre situations (probably all bugs?) where some
-> > vcpu thread has a hold of some _other_ kvm_vcpu* and is trying to do
-> > something with it.
-> Oh I completely missed the scheduling path for KVM.
-> But since vcpu_put and vcpu_load are exported symbols, I wonder what'll
-> happen when there are calls to these functions from places other
-> than kvm_sched_in() and kvm_sched_out() ? Just thinking out loud.
+On Tue, 11 Jul 2023 16:12:54 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> wrote:
 
-Invoking this helper without the target vCPU loaded on the current task would be
-considered a bug.  kvm.ko exports a rather disgusting number of symbols purely for
-use by vendor modules, e.g. kvm-intel.ko and kvm-amd.ko on x86.  The exports are
-not at all intended to be used by non-KVM code, i.e. any such misuse would also be
-considered a bug.
+> On 5/7/23 13:19, Claudio Imbrenda wrote:
+> > The index field of the struct page corresponding to a guest ASCE should
+> > be 0. When replacing the ASCE in s390_replace_asce(), the index of the
+> > new ASCE should also be set to 0.
+> >=20
+> > Having the wrong index might lead to the wrong addresses being passed
+> > around when notifying pte invalidations, and eventually to validity
+> > intercepts (VM crash) if the prefix gets unmapped and the notifier gets
+> > called with the wrong address. =20
+>=20
+> Can that also happen in crst_table_alloc()?
+
+no. ->index is only used for gmap page tables (guest mapping), from
+the root to pmd tables. the last level (ptes) is shared between guest
+mapping and QEMU address space. i.e. the ptes are the ones from QEMU.
+
+the last level of page tables is not expected to have ->index set
+(since that one actually belongs to QEMU and not to the guest mapping)
+
+guest page tables (all levels, except ptes) are allocated with
+gmap_alloc_table(), which correctly sets ->index
+
+the top level of a guest mapping is allocated in gmap_alloc(), which
+also correctly sets ->index to 0.
+
+>=20
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > ---
+> >   arch/s390/mm/gmap.c | 1 +
+> >   1 file changed, 1 insertion(+) =20
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+
+thank you!
+=20
+
