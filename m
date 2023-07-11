@@ -2,137 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49FB774F582
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 18:33:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1DF74F570
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 18:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232894AbjGKQdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 12:33:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33930 "EHLO
+        id S233429AbjGKQd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 12:33:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233291AbjGKQc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 12:32:59 -0400
-Received: from out-21.mta0.migadu.com (out-21.mta0.migadu.com [91.218.175.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEF6D19B7
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 09:32:45 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689093163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QoMhwjFigAbTHq+HcB9GYpyFfpHDzGgLNmwruJkUmC8=;
-        b=mjzopN32gkDIHH2DKeXPU4Uhh5gf5z6r2DVtvgerWF+e+HZlmhuYpklBE1idXQeZo+0qP6
-        kmmBiis6yM0xkO0eQgkG3GzLPBwQlnlpbqo8JYOMgGxYMoHSFvkTp+dFbaI/Dx0l2tA5er
-        DVLQ6sEcNFPLD8VVKk9IBe1o8Q3fX7c=
-From:   Sui Jingfeng <sui.jingfeng@linux.dev>
-To:     Alex Deucher <alexander.deucher@amd.com>,
-        Christian Koenig <christian.koenig@amd.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Airlie <airlied@redhat.com>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Jocelyn Falempe <jfalempe@redhat.com>,
-        Javier Martinez Canillas <javierm@redhat.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Ben Skeggs <bskeggs@redhat.com>, Lyude Paul <lyude@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Helge Deller <deller@gmx.de>,
-        Mario Limonciello <mario.limonciello@amd.com>
-Cc:     amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        nouveau@lists.freedesktop.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        Sui Jingfeng <suijingfeng@loongson.cn>,
-        Pan Xinhui <Xinhui.Pan@amd.com>,
-        Hawking Zhang <Hawking.Zhang@amd.com>,
-        Lijo Lazar <lijo.lazar@amd.com>,
-        YiPeng Chai <YiPeng.Chai@amd.com>,
-        Bokun Zhang <Bokun.Zhang@amd.com>,
-        Likun Gao <Likun.Gao@amd.com>
-Subject: [PATCH v3 5/9] drm/amdgpu: Implement the is_primary_gpu callback of vga_client_register()
-Date:   Wed, 12 Jul 2023 00:31:51 +0800
-Message-Id: <20230711163155.791522-6-sui.jingfeng@linux.dev>
-In-Reply-To: <20230711163155.791522-1-sui.jingfeng@linux.dev>
-References: <20230711163155.791522-1-sui.jingfeng@linux.dev>
+        with ESMTP id S233421AbjGKQdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 12:33:05 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DE210C4;
+        Tue, 11 Jul 2023 09:32:51 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-66c729f5618so5174496b3a.1;
+        Tue, 11 Jul 2023 09:32:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689093170; x=1691685170;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UhCv7ij8x1pOlset39Oaz9+RB/0V1BBSqVlCMCRIhxI=;
+        b=GDG6/MLFxdRV/HIVa34aoxVfgdHvb+65IuZcu4RJeSzjj7Lgggdw2TNhg2ZI2jqKDS
+         ioe0AcKVhyRN4e4XWrJl+KGatb1kPWP0BonPFcArWJQnFJqSfqMYQQNwX0Z0NB10Vz0F
+         T2VII+6TCbCw/uX8WtPYA7TFpGdB6q1xyervSEgpsGYToVcQqtkZZdS2aKCy+/G0p8jE
+         9EBgh9EJx1Q73rRgKDcrMHjuMHQn0ljIIH8BY2YQPQ5x0g6D0mRdk3IgK9e8qFRLGf3c
+         mzExEvkK1iFL7dGYO5f8D0JVT3sADOaK1x0t4djb3+tACQFrfOn9B7DIbp66RTHPjaan
+         Ky5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689093170; x=1691685170;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UhCv7ij8x1pOlset39Oaz9+RB/0V1BBSqVlCMCRIhxI=;
+        b=Y+Xk+YcTrlZ4VNKlLTzL5OPb1gdhhO+j1eAooKOyvzBYZ2M1AePITtvOIVRueoQpYl
+         jr2CCUC6dftU7n54ukSy4kGxiQsMddB2QyfvSqRVvtefz7JMmjVXme7L6zrjdL9lHyCS
+         8D1O6oJvHKn3L5nh9jZNR8jB/Up562xkHMJeVtrYC9YVEYnC55djorPOy7IY0hYYVP8H
+         6sLbDuzRN1Zn5Rdgu7ojl0KIbRgmBLZSdMnm4WG3zU5bxkeDdC+4TVYxOmyd2dF579+F
+         xkcuSfGE+6jcNVT6te7pZseMzszW7BlKMsdSfZ6Kd9bB23KO8jrhhJ3Q0fOxuky0+2JZ
+         86/w==
+X-Gm-Message-State: ABy/qLZgJg2c2JDS6LAmUDSeIcQC+AySAnf5O0+/eBtExzqRfCysCYvb
+        VxwlZLIQMHiUFgSf3DgjoI7QuVT6961a7Wcz
+X-Google-Smtp-Source: APBJJlEYX8MP7cdCsuhoVmMV0duMmMivth79k3DahAyDgJT8EIrgNpWQhckIbIT8w78EAZQzlWT24w==
+X-Received: by 2002:a05:6a00:cce:b0:682:537f:2cb8 with SMTP id b14-20020a056a000cce00b00682537f2cb8mr21087293pfv.26.1689093169971;
+        Tue, 11 Jul 2023 09:32:49 -0700 (PDT)
+Received: from [192.168.255.10] ([114.84.31.161])
+        by smtp.gmail.com with ESMTPSA id j23-20020aa79297000000b006636c4f57a6sm1930119pfa.27.2023.07.11.09.32.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jul 2023 09:32:49 -0700 (PDT)
+Message-ID: <81c32ae2-ff21-131f-e498-f87b1e7fe3b5@gmail.com>
+Date:   Wed, 12 Jul 2023 00:32:45 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH 4/4] KVM: x86/pmu: Move .hw_event_available() check out of
+ PMC filter helper
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Aaron Lewis <aaronlewis@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230607010206.1425277-1-seanjc@google.com>
+ <20230607010206.1425277-5-seanjc@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230607010206.1425277-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sui Jingfeng <suijingfeng@loongson.cn>
+On 2023/6/7 09:02, Sean Christopherson wrote:
+> Move the call to kvm_x86_pmu.hw_event_available(), which has nothing to
+> with the userspace PMU filter, out of check_pmu_event_filter() and into
+> its sole caller pmc_event_is_allowed().  pmc_event_is_allowed() didn't
+> exist when commit 7aadaa988c5e ("KVM: x86/pmu: Drop amd_event_mapping[]
+> in the KVM context"), so presumably the motivation for invoking
+> .hw_event_available() from check_pmu_event_filter() was to avoid having
+> to add multiple call sites.
 
-[why]
+The event unavailability check based on intel cpuid is, in my opinion,
+part of our pmu_event_filter mechanism. Unavailable events can be
+defined either by KVM userspace or by architectural cpuid (if any).
 
-The vga_is_firmware_default() function defined in drivers/pci/vgaarb.c is
-arch-dependent, it's a dummy on non-x86 architectures. This made VGAARB
-lost an important condition for the arbitration on non-x86 platform. The
-rules about which GPU is (or should be) the primary display device get used
-by userspace are obscure on non-x86 platform, let's made the things clear.
+The bigger issue here is what happens when the two rules conflict, and
+the answer can be found more easily by putting the two parts in one
+function (the architectural cpuid rule takes precedence).
 
-[how]
-
-The device that owns the firmware framebuffer should be the default boot
-device. This patch adds an arch-independent function to implement this
-rule. The vgaarb subsystem will call back to amdgpu_is_primary_gpu() when
-drm/amdgpu is bound to an AMDGPU device successfully.
-
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: Christian Konig <christian.koenig@amd.com>
-Cc: Pan Xinhui <Xinhui.Pan@amd.com>
-Cc: David Airlie <airlied@gmail.com>
-Cc: Daniel Vetter <daniel@ffwll.ch>
-Cc: Hawking Zhang <Hawking.Zhang@amd.com>
-Cc: Mario Limonciello <mario.limonciello@amd.com>
-Cc: Lijo Lazar <lijo.lazar@amd.com>
-Cc: YiPeng Chai <YiPeng.Chai@amd.com>
-Cc: Bokun Zhang <Bokun.Zhang@amd.com>
-CC: Likun Gao <Likun.Gao@amd.com>
-Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
----
- drivers/gpu/drm/amd/amdgpu/amdgpu_device.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
-index d98f0801ac77..b638eff58636 100644
---- a/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
-+++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c
-@@ -3690,6 +3690,15 @@ static void amdgpu_device_set_mcbp(struct amdgpu_device *adev)
- 		DRM_INFO("MCBP is enabled\n");
- }
- 
-+static bool amdgpu_is_primary_gpu(struct pci_dev *pdev)
-+{
-+	struct drm_device *dev = pci_get_drvdata(pdev);
-+	struct amdgpu_device *adev = drm_to_adev(dev);
-+	struct amdgpu_gmc *gmc = &adev->gmc;
-+
-+	return drm_aperture_contain_firmware_fb(gmc->aper_base, gmc->aper_size);
-+}
-+
- /**
-  * amdgpu_device_init - initialize the driver
-  *
-@@ -4103,7 +4112,8 @@ int amdgpu_device_init(struct amdgpu_device *adev,
- 	/* this will fail for cards that aren't VGA class devices, just
- 	 * ignore it */
- 	if ((adev->pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA)
--		vga_client_register(adev->pdev, amdgpu_device_vga_set_decode, NULL);
-+		vga_client_register(adev->pdev, amdgpu_device_vga_set_decode,
-+				    amdgpu_is_primary_gpu);
- 
- 	px = amdgpu_device_supports_px(ddev);
- 
--- 
-2.25.1
-
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/pmu.c | 4 +---
+>   1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 1690d41c1830..2a32dc6aa3f7 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -387,9 +387,6 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>   	struct kvm_x86_pmu_event_filter *filter;
+>   	struct kvm *kvm = pmc->vcpu->kvm;
+>   
+> -	if (!static_call(kvm_x86_pmu_hw_event_available)(pmc))
+> -		return false;
+> -
+>   	filter = srcu_dereference(kvm->arch.pmu_event_filter, &kvm->srcu);
+>   	if (!filter)
+>   		return true;
+> @@ -403,6 +400,7 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>   static bool pmc_event_is_allowed(struct kvm_pmc *pmc)
+>   {
+>   	return pmc_is_globally_enabled(pmc) && pmc_speculative_in_use(pmc) &&
+> +	       static_call(kvm_x86_pmu_hw_event_available)(pmc) &&
+>   	       check_pmu_event_filter(pmc);
+>   }
+>   
