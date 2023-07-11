@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEE4674FBA5
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 01:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37F9174FBA8
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 01:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232159AbjGKXCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 19:02:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
+        id S232139AbjGKXCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 19:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232107AbjGKXBy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 19:01:54 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07C41982
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ca48836fec5so70004276.3
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:45 -0700 (PDT)
+        with ESMTP id S231674AbjGKXB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 19:01:58 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73F3319A3
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:47 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-262e5e719eeso6943422a91.1
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689116505; x=1691708505;
+        d=google.com; s=20221208; t=1689116507; x=1691708507;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=GyUg5dlzIa8McwdzPE+wxpmpG2aTO24P2TiMipK75HY=;
-        b=Y2C7A9LJxKi26AKZCOedeQsoU3MSTc2nCv9iMnVsDgIcycFwF2iW/mzm4WJG9duMfW
-         E6cxW6CLJjgVxajIFrFH1vILGdm2llWGYIwxULVvyPOHOSPSf45rTDmJlnDVcJW2DpSV
-         yFj3uOhDqKIzO5tGc1CYv5gEHb47dgZeH2zz/FzRNqmF/yGQv6AT83/BxCF+asTB7gCi
-         lGmI4ZTZRIWM1VXqLMA1+zHzXj5Rj7+cVH9NOZqZqCjtP2TsuqP/6PzCFvhNvuKWFY+N
-         rwxN6Cl/NT3yjxO74GFQR/LkqBACrzmAydFPX2wn1C1SNALxw4OYgP0PMjKBYvu23ErB
-         KtcQ==
+        bh=qyvtqeRPq/MlF0ZTdDehI+RMIDCPhIW4IOYWhk2FAaM=;
+        b=QEG302AqsBou4e85I0bF1Fz1XHfj0kuK+s+Tyb/kkQXroB3QCJtAhiMap8KwBAPra/
+         6dcmyFBYaZJ8RT7RQa7OY1Sv8Bq/HZxHa/hQ/i0T48PfCJX4o82eWzWooZWWpf9I/9hI
+         BmJU4cP7FdnXukTED5kPtBE1V7fVEVH3jgT7bjT7vwZcpSYJXmNuAefLnVlGTauwTbFN
+         J2hChuMEbuHZ4Lg75AxBrMxefqcIHUIiyVrsJFOykmBCruaMa6gD+2f0zzjDugYF/Nby
+         c66Uj630xv5E9wJ2kPs2CBKz123BxpbrZJ38lJWWHiYCINz+XSK+zr8bzynn2LI3K0tL
+         ynqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689116505; x=1691708505;
+        d=1e100.net; s=20221208; t=1689116507; x=1691708507;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GyUg5dlzIa8McwdzPE+wxpmpG2aTO24P2TiMipK75HY=;
-        b=iQyyK4ZVitLk3IwghAct27PKMWl+wY82FDZE2dnGTUfZj/h9uxppKMAQBbcACQm2pu
-         0rPrpEVUs5xNylbRTtqPJ5jzZQCHjoMvuH++YYT67U1iV6MjU1UbbAwz4IGqZM3k6YnV
-         4j11RUkz1/0RitLaPrMe1xqyV8OTERa5ifAJLT+PRkrOwZtRqvbu5MaJWho7/AImu6b2
-         NAsni/iEYM9R/cJDyAgZKeWKFydcfhmroXCqrLSq/kj2pPsN4WnT7pdtQtzha0ZKRPFq
-         KJ7ESjQoVetd5rifroxLBawF9mC0Lp29rLJG5rfksZ6g7QvBNw+O6QADic0zln5kCWuY
-         k0Lw==
-X-Gm-Message-State: ABy/qLbrhUxRAo/qQGYV6B0hxooF409M/09DOmLKdkMB8CP5ysdrqnBI
-        zPlA/fpfV/rmfMY0Q5hRvwI+YQ8HCYo=
-X-Google-Smtp-Source: APBJJlFUFLR8L4iRRHt9rKjYaaqegk++QZhf19a4JUv2eiG3mJ24F0+9Bee8MHPbDKZ6dEhXoMkWSkYNdZ0=
+        bh=qyvtqeRPq/MlF0ZTdDehI+RMIDCPhIW4IOYWhk2FAaM=;
+        b=Ua7JigLTC7gmhjXCMHTJtqXaZALvZO0wJ1NmIRYeWnIIvAngCKpCwx1a5F82Zclc0E
+         i/J21y1gQrMSpC1pTdVIgaKVrfnhka1YmAIaeihaIGX8dzLMneB5tPDGD0/LgJx1B21r
+         3mby8O6cDwbPWhfRKDMu7SIVZwFDXh9OI1QJVfx5ibeFekFoyOjuZM8u6JSpoJHH/mR/
+         JSBe56cshCoO51WZVS/Rvm7gy6a7bM4zkf7H3o/K9mgLERW34sLQ2RmVrgv3XLlsxHgr
+         iQMcRi4Ap9pfV2NFK4m7eqAKUTPccK0FrrDGMyHrDQadMe/MbUt7JSVll5GEE9zVONft
+         yc6g==
+X-Gm-Message-State: ABy/qLaXr+Vl6asGVrXqBAxHhlK0LQVpZ1TCD5j4gUKFY0kI6HBxC05s
+        HbLB8Ctkxd0AT4jyr8tXj/m+8aVL+OM=
+X-Google-Smtp-Source: APBJJlFssnO9DQk9xNcC8/Dw0TPX6R+aq2Z9D0TlOLfkADLXcqzjIuHJH8FHS9An3QkxmoLlpbPu6f6OJtY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:508:b0:c4b:6ed6:6147 with SMTP id
- x8-20020a056902050800b00c4b6ed66147mr155293ybs.9.1689116505063; Tue, 11 Jul
- 2023 16:01:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ead1:b0:1b9:e8e5:b0a4 with SMTP id
+ p17-20020a170902ead100b001b9e8e5b0a4mr2142642pld.8.1689116506840; Tue, 11 Jul
+ 2023 16:01:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 11 Jul 2023 16:01:29 -0700
+Date:   Tue, 11 Jul 2023 16:01:30 -0700
 In-Reply-To: <20230711230131.648752-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230711230131.648752-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230711230131.648752-6-seanjc@google.com>
-Subject: [PATCH 5/7] KVM: selftests: Verify userspace can create "redundant"
- binary stats files
+Message-ID: <20230711230131.648752-7-seanjc@google.com>
+Subject: [PATCH 6/7] KVM: selftests: Verify stats fd can be dup()'d and read
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -72,77 +71,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that KVM doesn't artificially limit KVM_GET_STATS_FD to a single
-file per VM/vCPU.  There's no known use case for getting multiple stats
-fds, but it should work, and more importantly creating multiple files will
-make it easier to test that KVM correct manages VM refcounts for stats
-files.
+Expand the binary stats test to verify that a stats fd can be dup()'d
+and read, to (very) roughly simulate userspace passing around the file.
+Adding the dup() test is primarily an intermediate step towards verifying
+that userspace can read VM/vCPU stats before _and_ after userspace closes
+its copy of the VM fd; the dup() test itself is only mildly interesting.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/kvm_binary_stats_test.c     | 25 +++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/kvm_binary_stats_test.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-index 874fa5092551..653f10d8fb7c 100644
+index 653f10d8fb7c..5317e27b77d0 100644
 --- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
 +++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-@@ -185,6 +185,7 @@ static void stats_test(int stats_fd)
- 
- int main(int argc, char *argv[])
- {
-+	int vm_stats_fds, *vcpu_stats_fds;
- 	int i, j;
- 	struct kvm_vcpu **vcpus;
- 	struct kvm_vm **vms;
-@@ -217,18 +218,37 @@ int main(int argc, char *argv[])
- 	vcpus = malloc(sizeof(struct kvm_vcpu *) * max_vm * max_vcpu);
- 	TEST_ASSERT(vcpus, "Allocate memory for storing vCPU pointers");
- 
-+	/*
-+	 * Not per-VM as the array is populated, used, and invalidated within a
-+	 * single for-loop iteration.
-+	 */
-+	vcpu_stats_fds = calloc(max_vm, sizeof(*vcpu_stats_fds));
-+	TEST_ASSERT(vcpu_stats_fds, "Allocate memory for VM stats fds");
-+
- 	for (i = 0; i < max_vm; ++i) {
- 		vms[i] = vm_create_barebones();
- 		for (j = 0; j < max_vcpu; ++j)
- 			vcpus[i * max_vcpu + j] = __vm_vcpu_add(vms[i], j);
+@@ -232,17 +232,23 @@ int main(int argc, char *argv[])
  	}
  
--	/* Check stats read for every VM and VCPU */
-+	/*
-+	 * Check stats read for every VM and vCPU, with a variety of testcases.
-+	 * Note, stats_test() closes the passed in stats fd.
-+	 */
+ 	/*
+-	 * Check stats read for every VM and vCPU, with a variety of testcases.
++	 * Check stats read for every VM and vCPU, with a variety of flavors.
+ 	 * Note, stats_test() closes the passed in stats fd.
+ 	 */
  	for (i = 0; i < max_vm; ++i) {
-+		vm_stats_fds = vm_get_stats_fd(vms[i]);
-+
-+		/* Verify userspace can instantiate multiple stats files. */
++		/*
++		 * Verify that creating multiple userspace references to a
++		 * single stats file works and doesn't cause explosions.
++		 */
+ 		vm_stats_fds = vm_get_stats_fd(vms[i]);
++		stats_test(dup(vm_stats_fds));
+ 
+ 		/* Verify userspace can instantiate multiple stats files. */
  		stats_test(vm_get_stats_fd(vms[i]));
  
--		for (j = 0; j < max_vcpu; ++j)
-+		for (j = 0; j < max_vcpu; ++j) {
-+			vcpu_stats_fds[j] = vcpu_get_stats_fd(vcpus[i * max_vcpu + j]);
+ 		for (j = 0; j < max_vcpu; ++j) {
+ 			vcpu_stats_fds[j] = vcpu_get_stats_fd(vcpus[i * max_vcpu + j]);
++			stats_test(dup(vcpu_stats_fds[j]));
  			stats_test(vcpu_get_stats_fd(vcpus[i * max_vcpu + j]));
-+		}
-+
-+		stats_test(vm_stats_fds);
-+		for (j = 0; j < max_vcpu; ++j)
-+			stats_test(vcpu_stats_fds[j]);
+ 		}
  
- 		ksft_test_result_pass("vm%i\n", i);
- 	}
-@@ -237,6 +257,7 @@ int main(int argc, char *argv[])
- 		kvm_vm_free(vms[i]);
- 	free(vms);
- 	free(vcpus);
-+	free(vcpu_stats_fds);
- 
- 	ksft_finished();	/* Print results and exit() accordingly */
- }
 -- 
 2.41.0.255.g8b1d071c50-goog
 
