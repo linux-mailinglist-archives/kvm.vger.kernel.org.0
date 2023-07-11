@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 629C874E43D
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 04:32:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B706174E49F
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 04:59:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231715AbjGKCcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 22:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35840 "EHLO
+        id S230292AbjGKC7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 22:59:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbjGKCbz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 22:31:55 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5616CA;
-        Mon, 10 Jul 2023 19:31:53 -0700 (PDT)
+        with ESMTP id S229997AbjGKC7e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 22:59:34 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A31D194;
+        Mon, 10 Jul 2023 19:59:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689042713; x=1720578713;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2GyvMzThFhMpYnKJH9uGH6skLhpYcLOvBk0gbISpxP0=;
-  b=SdroeyRZD2WTkkuWLmoqXFtVyiB8V6U16tu+EevliLm4sep4xQMroSBL
-   VxTl3prddqJMQ8BtvunHnGzzzzoOkoESZRCn+zC+Ud6zZ/X3U15y5JgXT
-   Kc1d49eFJGVKSuj9swQ5LKqlbBvLL1PU4Dds+dUV/cMdYY61jw2wx9lfB
-   ZLE/9uEehf7e7gtHXl1lR5/vJ5deRbkXgh0bQQgv5CZfX/CfabnLJp+ky
-   +1AlL5iaPfK1M80e4+6DsPHxKa6AnOmEwpFlyAPkvVucEUr9Y/ajVbEGO
-   yjEytyX4eDH/+cmJbwT424hZmtsgWfKBG2oFq35axFYzrn80PhdfEsbSB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="368004752"
+  t=1689044371; x=1720580371;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LCh+AEc45NM+4ZkanWZcKWzdXA5t1PElXUyFPto3FpY=;
+  b=B/YgN4f/LZYsvNHHwkbbNik5HFHjNccels+tVK2CAs6mHaq1HzlBZC2X
+   sN04i7a+EQ+Sd1H4dnO092IdBFhIYvkSpRjDJK1WIbBX3m5uffmqDxF7D
+   rO00kvwp4kGTZO7dU+3Bytalt8+hOGu0hywjL3nXJxBYGlU8ZO1us7MfL
+   Wmt6OnCdS5djhU4ePZyIw8Lv3WbB6c17B3LF6Bo1y0YwXAFSax9OB4r70
+   vJOQuYOTBFmXlV/0jM4u4q8dLC7zwL5gd0GZsjpdZVSiDBunP/jW5KKb1
+   6eFID/9XLFsxEn+vhR79QyBbE+c5A9jVR5YSDmbHhiC54Wek7znpWD+Ip
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="361972920"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="368004752"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 19:31:34 -0700
+   d="scan'208";a="361972920"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 19:59:30 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="720907620"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="724250746"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="720907620"
+   d="scan'208";a="724250746"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga002.jf.intel.com with ESMTP; 10 Jul 2023 19:31:33 -0700
+  by fmsmga007.fm.intel.com with ESMTP; 10 Jul 2023 19:59:29 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -51,17 +51,16 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com, zhenzhong.duan@intel.com,
         clegoate@redhat.com
-Subject: [PATCH v9 10/10] vfio/pci: Allow passing zero-length fd array in VFIO_DEVICE_PCI_HOT_RESET
-Date:   Mon, 10 Jul 2023 19:31:26 -0700
-Message-Id: <20230711023126.5531-11-yi.l.liu@intel.com>
+Subject: [PATCH v14 00/26] Add vfio_device cdev for iommufd support
+Date:   Mon, 10 Jul 2023 19:59:02 -0700
+Message-Id: <20230711025928.6438-1-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230711023126.5531-1-yi.l.liu@intel.com>
-References: <20230711023126.5531-1-yi.l.liu@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,187 +68,287 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the way user to invoke hot-reset for the devices opened by cdev
-interface. User should check the flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED
-in the output of VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl before doing
-hot-reset for cdev devices.
+Existing VFIO provides group-centric user APIs for userspace. Userspace
+opens the /dev/vfio/$group_id first before getting device fd and hence
+getting access to device. This is not the desired model for iommufd. Per
+the conclusion of community discussion[1], iommufd provides device-centric
+kAPIs and requires its consumer (like VFIO) to be device-centric user
+APIs. Such user APIs are used to associate device with iommufd and also
+the I/O address spaces managed by the iommufd.
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 61 ++++++++++++++++++++++++++------
- include/uapi/linux/vfio.h        | 21 +++++++++++
- 2 files changed, 71 insertions(+), 11 deletions(-)
+This series first introduces a per device file structure to be prepared
+for further enhancement and refactors the kvm-vfio code to be prepared
+for accepting device file from userspace. After this, adds a mechanism for
+blocking device access before iommufd bind. Then refactors the vfio to be
+able to handle cdev path (e.g. iommufd binding, no-iommufd, [de]attach ioas).
+This refactor includes making the device_open exclusive between the group
+and the cdev path, only allow single device open in cdev path; vfio-iommufd
+code is also refactored to support cdev. e.g. split the vfio_iommufd_bind()
+into two steps. Eventually, adds the cdev support for vfio device and the
+new ioctls, then makes group infrastructure optional as it is not needed
+when vfio device cdev is compiled.
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 4737eeacd538..1845540006f5 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -181,7 +181,8 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
- struct vfio_pci_group_info;
- static void vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
- static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
--				      struct vfio_pci_group_info *groups);
-+				      struct vfio_pci_group_info *groups,
-+				      struct iommufd_ctx *iommufd_ctx);
- 
- /*
-  * INTx masking requires the ability to disable INTx signaling via PCI_COMMAND
-@@ -1329,8 +1330,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
- 	if (ret)
- 		return ret;
- 
--	/* Somewhere between 1 and count is OK */
--	if (!array_count || array_count > count)
-+	if (array_count > count)
- 		return -EINVAL;
- 
- 	group_fds = kcalloc(array_count, sizeof(*group_fds), GFP_KERNEL);
-@@ -1379,7 +1379,7 @@ vfio_pci_ioctl_pci_hot_reset_groups(struct vfio_pci_core_device *vdev,
- 	info.count = array_count;
- 	info.files = files;
- 
--	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info);
-+	ret = vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, &info, NULL);
- 
- hot_reset_release:
- 	for (file_idx--; file_idx >= 0; file_idx--)
-@@ -1402,13 +1402,21 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
- 	if (hdr.argsz < minsz || hdr.flags)
- 		return -EINVAL;
- 
-+	/* zero-length array is only for cdev opened devices */
-+	if (!!hdr.count == vfio_device_cdev_opened(&vdev->vdev))
-+		return -EINVAL;
-+
- 	/* Can we do a slot or bus reset or neither? */
- 	if (!pci_probe_reset_slot(vdev->pdev->slot))
- 		slot = true;
- 	else if (pci_probe_reset_bus(vdev->pdev->bus))
- 		return -ENODEV;
- 
--	return vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
-+	if (hdr.count)
-+		return vfio_pci_ioctl_pci_hot_reset_groups(vdev, hdr.count, slot, arg);
-+
-+	return vfio_pci_dev_set_hot_reset(vdev->vdev.dev_set, NULL,
-+					  vfio_iommufd_device_ictx(&vdev->vdev));
- }
- 
- static int vfio_pci_ioctl_ioeventfd(struct vfio_pci_core_device *vdev,
-@@ -2376,13 +2384,16 @@ const struct pci_error_handlers vfio_pci_core_err_handlers = {
- };
- EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
- 
--static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
-+static bool vfio_dev_in_groups(struct vfio_device *vdev,
- 			       struct vfio_pci_group_info *groups)
- {
- 	unsigned int i;
- 
-+	if (!groups)
-+		return false;
-+
- 	for (i = 0; i < groups->count; i++)
--		if (vfio_file_has_dev(groups->files[i], &vdev->vdev))
-+		if (vfio_file_has_dev(groups->files[i], vdev))
- 			return true;
- 	return false;
- }
-@@ -2458,7 +2469,8 @@ static int vfio_pci_dev_set_pm_runtime_get(struct vfio_device_set *dev_set)
-  * get each memory_lock.
-  */
- static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
--				      struct vfio_pci_group_info *groups)
-+				      struct vfio_pci_group_info *groups,
-+				      struct iommufd_ctx *iommufd_ctx)
- {
- 	struct vfio_pci_core_device *cur_mem;
- 	struct vfio_pci_core_device *cur_vma;
-@@ -2488,11 +2500,38 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
- 		goto err_unlock;
- 
- 	list_for_each_entry(cur_vma, &dev_set->device_list, vdev.dev_set_list) {
-+		bool owned;
-+
- 		/*
--		 * Test whether all the affected devices are contained by the
--		 * set of groups provided by the user.
-+		 * Test whether all the affected devices can be reset by the
-+		 * user.
-+		 *
-+		 * If called from a group opened device and the user provides
-+		 * a set of groups, all the devices in the dev_set should be
-+		 * contained by the set of groups provided by the user.
-+		 *
-+		 * If called from a cdev opened device and the user provides
-+		 * a zero-length array, all the devices in the dev_set must
-+		 * be bound to the same iommufd_ctx as the input iommufd_ctx.
-+		 * If there is any device that has not been bound to any
-+		 * iommufd_ctx yet, check if its iommu_group has any device
-+		 * bound to the input iommufd_ctx.  Such devices can be
-+		 * considered owned by the input iommufd_ctx as the device
-+		 * cannot be owned by another iommufd_ctx when its iommu_group
-+		 * is owned.
-+		 *
-+		 * Otherwise, reset is not allowed.
- 		 */
--		if (!vfio_dev_in_groups(cur_vma, groups)) {
-+		if (iommufd_ctx) {
-+			int devid = vfio_iommufd_get_dev_id(&cur_vma->vdev,
-+							    iommufd_ctx);
-+
-+			owned = (devid > 0 || devid == -ENOENT);
-+		} else {
-+			owned = vfio_dev_in_groups(&cur_vma->vdev, groups);
-+		}
-+
-+		if (!owned) {
- 			ret = -EINVAL;
- 			goto err_undo;
- 		}
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index e680720ddddc..4c3d548e9c96 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -717,6 +717,9 @@ enum {
-  *	  affected devices are represented in the dev_set and also owned by
-  *	  the user.  This flag is available only when
-  *	  flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set, otherwise reserved.
-+ *	  When set, user could invoke VFIO_DEVICE_PCI_HOT_RESET with a zero
-+ *	  length fd array on the calling device as the ownership is validated
-+ *	  by iommufd_ctx.
-  *
-  * Return: 0 on success, -errno on failure:
-  *	-enospc = insufficient buffer, -enodev = unsupported for device.
-@@ -748,6 +751,24 @@ struct vfio_pci_hot_reset_info {
-  * VFIO_DEVICE_PCI_HOT_RESET - _IOW(VFIO_TYPE, VFIO_BASE + 13,
-  *				    struct vfio_pci_hot_reset)
-  *
-+ * A PCI hot reset results in either a bus or slot reset which may affect
-+ * other devices sharing the bus/slot.  The calling user must have
-+ * ownership of the full set of affected devices as determined by the
-+ * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl.
-+ *
-+ * When called on a device file descriptor acquired through the vfio
-+ * group interface, the user is required to provide proof of ownership
-+ * of those affected devices via the group_fds array in struct
-+ * vfio_pci_hot_reset.
-+ *
-+ * When called on a direct cdev opened vfio device, the flags field of
-+ * struct vfio_pci_hot_reset_info reports the ownership status of the
-+ * affected devices and this ioctl must be called with an empty group_fds
-+ * array.  See above INFO ioctl definition for ownership requirements.
-+ *
-+ * Mixed usage of legacy groups and cdevs across the set of affected
-+ * devices is not supported.
-+ *
-  * Return: 0 on success, -errno on failure.
-  */
- struct vfio_pci_hot_reset {
+This series is based on some preparation works done to vfio emulated devices[2]
+and vfio pci hot reset enhancements[3].
+
+This series is a prerequisite for iommu nesting for vfio device[4] [5].
+
+The complete code can be found in below branch, simple tests done to the
+legacy group path and the cdev path. Draft QEMU branch can be found at[6]
+
+https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v14
+(config CONFIG_IOMMUFD=y CONFIG_VFIO_DEVICE_CDEV=y)
+
+base-commit: 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5
+
+[1] https://lore.kernel.org/kvm/BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com/
+[2] https://lore.kernel.org/kvm/20230327093351.44505-1-yi.l.liu@intel.com/ - merged
+[3] https://lore.kernel.org/kvm/20230711023126.5531-1-yi.l.liu@intel.com/
+[4] https://lore.kernel.org/linux-iommu/20230511143844.22693-1-yi.l.liu@intel.com/
+[5] https://lore.kernel.org/linux-iommu/20230511145110.27707-1-yi.l.liu@intel.com/#t
+[6] https://github.com/yiliu1765/qemu/tree/iommufd_rfcv4.mig.reset.v4_var3
+
+Change log:
+
+v14:
+ - Add Jason's r-b to patch 10, 11, 12, 13, 15, 16, 17 and 23 of cdev v12
+ - Refine iommufd_access_detach() (Jason)
+ - Split the device_del() movement to be a separate patch (Jason)
+ - Move kvm !null test into _vfio_device_get_kvm_safe() to save some lines
+   and rename it to be vfio_device_get_kvm_safe() (Jason)
+ - Make VFIO_DEVICE_CDEV depending on !SPAPR_TCE_IOMMU to suit the fact that
+   SPAPR_TCE_IOMMU does not support cdev (Alex)
+ - Add iommufd_ctx_from_fd() to replace vfio_get_iommufd_from_fd() (Jason)
+ - Check cdev only ioctls in vfio_device_fops_unl_ioctl() (Jason)
+ - patch 17, 19, 20 and 21 of v14 is newly added per above review comemnts.
+
+v13: https://lore.kernel.org/kvm/20230616093946.68711-1-yi.l.liu@intel.com/
+ - vfio_device_first_open() and vfio_device_last_close() to be vfio_df_device_first_open()
+   vfio_df_device_last_close() (Alex)
+ - Define struct vfio_device_file::access_granted as u8 and also place the u32 devid to
+   be behind this flag as this structure access is hot, so needs to avoid too much hole
+   in the structure (Alex)
+ - Use u8 instead bool in the struct vfio_device for the flags (Alex)
+ - Define BIND, ATTACH, DETACH ioctl behind VFIO_DEVICE_FEATURE whose offset is 17 (Alex)
+ - Drop patch 20, 21, 22 of v12 (Alex)
+ - Per the patch drop, still needs to detect the physical devices that do not have
+   IOMMU in the cdev registration as cdev does not support such devices. Per the
+   suggestion from Jason, lift the IOMMU_CAP_CACHE_COHERENCY check to be in vfio_main.c
+   so that it can fail the registration of such devices if only cdev is compiled. (Jason, Alex)
+ - Refine the vfio.rst doc, highlight that the cdev device access is stil bound with
+   iommu group. (Alex)
+ - Reaffirm t-b from below folks:
+   Nicolin Chen - Test nesting branch which is based on cdev v12, the test is done on ARM64 (SMMUv3)
+   Matthew Rosato - vfio-pci, vfio-ap, vfio-ccw under container, compat and cdev mode, and nesting
+                    test on SMMUv3 and Intel.
+   Yanting Jiang - regression tests with NIC passthrough on Intel platform
+
+v12: https://lore.kernel.org/kvm/20230602121653.80017-1-yi.l.liu@intel.com/#r
+ - Rename vfio_device_xx() to be vfio_df_xx() if the object is vfio_device_file (Alex)
+ - Refine patch 10 of v11 (Alex)
+ - Add new device ioctls from offset 18 (Alex)
+ - Add a patch to check group->type for noiommu test, no need to check
+   CONFIG_VFIO_NOIOMMU (Alex)
+ - Refine the logic of vfio_device_set_noiommu() per Alex's suggestion. The noiommu
+   taint is moved to __vfio_register_dev(), also add a check on group type before
+   calling vfio_device_set_noiommu() as only physical device can be noiommu device.
+ - Drop noiommu support for cdev, patch 16 of v11 is dropped, the related changes
+   are in patch 17 - 24 of this series.
+
+v11: https://lore.kernel.org/kvm/20230513132827.39066-1-yi.l.liu@intel.com/
+ - Add back the noiommu determination at vfio device registration patch and
+   put it prior to compiling vfio_group code optionally as compiling vfio_group
+   optionaly is the major reason for it.
+ - Fix a typo related to SPAPR (Cédric Le Goater)
+ - Add t-b from Shameerali Kolothum Thodi, tested on HiSilicon D06(ARM64) platform
+   with a NIC pass-through
+
+v10: https://lore.kernel.org/kvm/20230426150321.454465-1-yi.l.liu@intel.com/
+ - Drop patch 03 of v9 as vfio_file_is_group() is still needed by pci hot reset path
+ - Drop 11 of v9 per the change of noiommu support
+ - Move patch 18 of v9 to hot-reset series [3]
+ - vfio_file_has_device_access() is dropped as no usage now (hot-reset does not accept
+   device fd, hence no need for this helper)
+ - Minor change to patch 02, mainly make it back to patch v2 of v6 which is before
+   splitting hot-reset series
+ - Minor change in 10 and 11 due to rebase
+ - Functional changes in patch 19, 20 and 21 per the latest noiommu support
+   policy. noiommu device can be bound to valid iommufd now, this is different
+   from the prior policy in which noiommu device is not allowed to be bound to
+   valid iommufd. So may pay more attention on the three patches, previous r-b
+   and t-b are dropped for these three patches.
+
+v9: https://lore.kernel.org/kvm/20230401151833.124749-1-yi.l.liu@intel.com/
+ - Use smp_load_acquire() in vfio_file_has_device_access() for df->access_granted (Alex)
+ - Fix lock init in patch 16 of v8 (Jon Pan-Doh)
+ - Split patch 20 of v8 (Alex)
+ - Refine noiommu logic in BIND_IOMMUFD (Alex)
+ - Remove dev_cookie in BIND_IOMMUFD ioctl (Alex, Jason)
+ - Remove static_assert in ATTACH/DETACH ioctl handling (Alex)
+ - Remove device->ops->bind_iommufd presence check in BIND_IOMMUFD/ATTACH/DETACH handling (Alex)
+ - Remove VFIO dependecny for VFIO_CONTAINER as VFIO_GROUP should imply it (Alex)
+ - Improve the documentation per suggestions from Alex on patch 24 of v8 (Alex)
+ - Remove WARN_ON(df->group) in vfio_device_group_uses_container() of patch 11
+ - Add r-b from Kevin to patch 18/19 of v8
+ - Add r-b from Jason to patch 03/10/11 of v8
+ - Add t-b from Yanting Jiang and Nicolin Chen
+
+v8: https://lore.kernel.org/kvm/20230327094047.47215-1-yi.l.liu@intel.com/
+ - Add patch 18 to determine noiommu device at vfio_device registration (Jason)
+ - Add patch 19 to name noiommu device with "noiommu-" prefix to be par with
+   group path
+ - Add r-b from Kevin
+ - Add t-b from Terrence
+
+v7: https://lore.kernel.org/kvm/20230316125534.17216-1-yi.l.liu@intel.com/
+ - Split the vfio-pci hot reset changes to be separate patch series (Jason, Kevin)
+ - More polish on no-iommufd support (patch 11 - 13) in cdev path (Kevin)
+ - iommufd_access_detach() in patch 16 is added by Nic for emulated devices (Kevin, Jason)
+
+v6: https://lore.kernel.org/kvm/20230308132903.465159-1-yi.l.liu@intel.com/#t
+ - Add r-b from Jason on patch 01 - 08 and 13 in v5
+ - Based on the prerequisite mini-series which makes vfio emulated devices
+   be prepared to cdev (Jason)
+ - Add the approach to pass a set of device fds to do hot reset ownership
+   check, while the zero-length array approach is also kept. (Jason, Kevin, Alex)
+ - Drop patch 10 of v5, it is reworked by patch 13 and 17 in v6 (Jason)
+ - Store vfio_group pointer in vfio_device_file to check if user is using
+   legacy vfio container (Jason)
+ - Drop the is_cdev_device flag (introduced in patch 14 of v5) as the group
+   pointer stored in vfio_device_file can cover it.
+ - Add iommu_group check in the cdev no-iommu path patch 24 (Kevin)
+ - Add t-b from Terrence, Nicolin and Matthew (thanks for the help, some patches
+   are new in this version, so I just added t-b to the patches that are also
+   in v5 and no big change, for others would add in this version).
+
+v5: https://lore.kernel.org/kvm/20230227111135.61728-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin on patch 08, 13, 14, 15 and 17.
+ - Rename patch 02 to limit the change for KVM facing kAPIs. The vfio pci
+   hot reset path only accepts group file until patch 09. (Kevin)
+ - Update comment around smp_load_acquire(&df->access_granted) (Yan)
+ - Adopt Jason's suggestion on the vfio pci hot reset path, passing zero-length
+   fd array to indicate using bound iommufd_ctx as ownership check. (Jason, Kevin)
+ - Direct read df->access_granted value in vfio_device_cdev_close() (Kevin, Yan, Jason)
+ - Wrap the iommufd get/put into a helper to refine the error path of
+   vfio_device_ioctl_bind_iommufd(). (Yan)
+
+v4: https://lore.kernel.org/kvm/20230221034812.138051-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin on patch 09/10
+ - Add a line in devices/vfio.rst to emphasize user should add group/device to
+   KVM prior to invoke open_device op which may be called in the VFIO_GROUP_GET_DEVICE_FD
+   or VFIO_DEVICE_BIND_IOMMUFD ioctl.
+ - Modify VFIO_GROUP/VFIO_DEVICE_CDEV Kconfig dependency (Alex)
+ - Select VFIO_GROUP for SPAPR (Jason)
+ - Check device fully-opened in PCI hotreset path for device fd (Jason)
+ - Set df->access_granted in the caller of vfio_device_open() since
+   the caller may fail in other operations, but df->access_granted
+   does not allow a true to false change. So it should be set only when
+   the open path is really done successfully. (Yan, Kevin)
+ - Fix missing iommufd_ctx_put() in the cdev path (Yan)
+ - Fix an issue found in testing exclusion between group and cdev path.
+   vfio_device_cdev_close() should check df->access_granted before heading
+   to other operations.
+ - Update vfio.rst for iommufd/cdev
+
+v3: https://lore.kernel.org/kvm/20230213151348.56451-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin on patch 03, 06, 07, 08.
+ - Refine the group and cdev path exclusion. Remove vfio_device:single_open;
+   add vfio_group::cdev_device_open_cnt to achieve exlucsion between group
+   path and cdev path (Kevin, Jason)
+ - Fix a bug in the error handling path (Yan Zhao)
+ - Address misc remarks from Kevin
+
+v2: https://lore.kernel.org/kvm/20230206090532.95598-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin and Eric on patch 01 02 04.
+ - "Split kvm/vfio: Provide struct kvm_device_ops::release() insted of ::destroy()"
+   from this series and got applied. (Alex, Kevin, Jason, Mathhew)
+ - Add kvm_ref_lock to protect vfio_device_file->kvm instead of reusing
+   dev_set->lock as dead-lock is observed with vfio-ap which would try to
+   acquire kvm_lock. This is opposite lock order with kvm_device_release()
+   which holds kvm_lock first and then hold dev_set->lock. (Kevin)
+ - Use a separate ioctl for detaching IOAS. (Alex)
+ - Rename vfio_device_file::single_open to be is_cdev_device (Kevin, Alex)
+ - Move the vfio device cdev code into device_cdev.c and add a VFIO_DEVICE_CDEV
+   kconfig for it. (Kevin, Jason)
+
+v1: https://lore.kernel.org/kvm/20230117134942.101112-1-yi.l.liu@intel.com/
+ - Fix the circular refcount between kvm struct and device file reference. (JasonG)
+ - Address comments from KevinT
+ - Remained the ioctl for detach, needs to Alex's taste
+   (https://lore.kernel.org/kvm/BN9PR11MB5276BE9F4B0613EE859317028CFF9@BN9PR11MB5276.namprd11.prod.outlook.com/)
+
+rfc: https://lore.kernel.org/kvm/20221219084718.9342-1-yi.l.liu@intel.com/
+
+Thanks,
+	Yi Liu
+
+Nicolin Chen (1):
+  iommufd/device: Add iommufd_access_detach() API
+
+Yi Liu (25):
+  vfio: Allocate per device file structure
+  vfio: Refine vfio file kAPIs for KVM
+  vfio: Accept vfio device file in the KVM facing kAPI
+  kvm/vfio: Prepare for accepting vfio device fd
+  kvm/vfio: Accept vfio device file from userspace
+  vfio: Pass struct vfio_device_file * to vfio_device_open/close()
+  vfio: Block device access via device fd until device is opened
+  vfio: Add cdev_device_open_cnt to vfio_group
+  vfio: Make vfio_df_open() single open for device cdev path
+  vfio-iommufd: Move noiommu compat validation out of
+    vfio_iommufd_bind()
+  vfio-iommufd: Split bind/attach into two steps
+  vfio: Record devid in vfio_device_file
+  vfio-iommufd: Add detach_ioas support for physical VFIO devices
+  vfio-iommufd: Add detach_ioas support for emulated VFIO devices
+  vfio: Move vfio_device_group_unregister() to be the first operation in
+    unregister
+  vfio: Move device_del() before waiting for the last vfio_device
+    registration refcount
+  vfio: Add cdev for vfio_device
+  vfio: Test kvm pointer in _vfio_device_get_kvm_safe()
+  iommufd: Add iommufd_ctx_from_fd()
+  vfio: Avoid repeated user pointer cast in vfio_device_fops_unl_ioctl()
+  vfio: Add VFIO_DEVICE_BIND_IOMMUFD
+  vfio: Add VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT
+  vfio: Move the IOMMU_CAP_CACHE_COHERENCY check in
+    __vfio_register_dev()
+  vfio: Compile vfio_group infrastructure optionally
+  docs: vfio: Add vfio device cdev description
+
+ Documentation/driver-api/vfio.rst             | 147 ++++++++++-
+ Documentation/virt/kvm/devices/vfio.rst       |  47 ++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |   1 +
+ drivers/iommu/iommufd/Kconfig                 |   4 +-
+ drivers/iommu/iommufd/device.c                |  74 +++++-
+ drivers/iommu/iommufd/iommufd_private.h       |   2 +
+ drivers/iommu/iommufd/main.c                  |  23 ++
+ drivers/s390/cio/vfio_ccw_ops.c               |   1 +
+ drivers/s390/crypto/vfio_ap_ops.c             |   1 +
+ drivers/vfio/Kconfig                          |  27 ++
+ drivers/vfio/Makefile                         |   3 +-
+ drivers/vfio/device_cdev.c                    | 228 +++++++++++++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c             |   1 +
+ drivers/vfio/group.c                          | 173 ++++++++-----
+ drivers/vfio/iommufd.c                        |  94 ++++---
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |   2 +
+ drivers/vfio/pci/mlx5/main.c                  |   1 +
+ drivers/vfio/pci/vfio_pci.c                   |   1 +
+ drivers/vfio/platform/vfio_amba.c             |   1 +
+ drivers/vfio/platform/vfio_platform.c         |   1 +
+ drivers/vfio/vfio.h                           | 218 ++++++++++++++--
+ drivers/vfio/vfio_main.c                      | 239 ++++++++++++++++--
+ include/linux/iommufd.h                       |   2 +
+ include/linux/vfio.h                          |  46 +++-
+ include/uapi/linux/kvm.h                      |  13 +-
+ include/uapi/linux/vfio.h                     |  71 ++++++
+ samples/vfio-mdev/mbochs.c                    |   1 +
+ samples/vfio-mdev/mdpy.c                      |   1 +
+ samples/vfio-mdev/mtty.c                      |   1 +
+ virt/kvm/vfio.c                               | 137 +++++-----
+ 30 files changed, 1317 insertions(+), 244 deletions(-)
+ create mode 100644 drivers/vfio/device_cdev.c
+
 -- 
 2.34.1
 
