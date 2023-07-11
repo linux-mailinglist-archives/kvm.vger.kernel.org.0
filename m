@@ -2,219 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D4A174FA30
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 23:58:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C95C74FB9B
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 01:01:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231134AbjGKV6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 17:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
+        id S231486AbjGKXBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 19:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbjGKV6S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 17:58:18 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722081704;
-        Tue, 11 Jul 2023 14:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689112697; x=1720648697;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xyZA7C6AH9ltjppdaMI0k4Tg4b3CqpfA1YAi4+vR8rQ=;
-  b=ZVWzHuXxzwSg+YP8d/XKugBEQR7wepFy9SGPXiW9cV3PquOo8Gouo566
-   GCVPG0hPDOkvxJdbGVr799NpkdMANy3IVy9Ve8vBwCwk20t+4QjRrvbQ6
-   wPOv9fFB29AUFaZariQFB2xSxLphi64cYttjasO72e7JZN9tbdYTWjEEd
-   NraI0it3wCYE5+UeYmXBBylb0YsegnPp5Uu1RsYxduBK2dwubELGp83TH
-   yzCsDDP47bgEr7io+CARsN7KcEHs8x0IDcFnnqUkRS3VpsOmzyio/EP6D
-   FIDk7DIOGI+hdu0IaZeQ7Q3nRFjIkSXgKOzH4UqpKvzq5TsNt531QuNU6
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="428485264"
-X-IronPort-AV: E=Sophos;i="6.01,197,1684825200"; 
-   d="scan'208";a="428485264"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 14:57:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="724635780"
-X-IronPort-AV: E=Sophos;i="6.01,197,1684825200"; 
-   d="scan'208";a="724635780"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.24.100.114])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 14:57:53 -0700
-Date:   Tue, 11 Jul 2023 15:02:49 -0700
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH 9/9] iommu: Use fault cookie to store iopf_param
-Message-ID: <20230711150249.62917dad@jacob-builder>
-In-Reply-To: <20230711010642.19707-10-baolu.lu@linux.intel.com>
-References: <20230711010642.19707-1-baolu.lu@linux.intel.com>
-        <20230711010642.19707-10-baolu.lu@linux.intel.com>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229963AbjGKXBg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 19:01:36 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AB71E60
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:35 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8ad356f6fso64574975ad.3
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689116495; x=1691708495;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ArFj1o9NSdPQxx1m9ygKjSQno20NdD8JCdPYTouZybg=;
+        b=x3HRX0SKKbx4+NkpXEbDDUTRypVaGi5VgoGmKzAPfyHkaq+gWEOmJea0l+ewoaRCoI
+         MO0KeNEAbjAVDfwPZsGrevdQcfi1D23vyyqcKUfZ9uuB1Mp1DpNJFiM+rupUsres0QDw
+         U4GVVXSxS1rEzthJHabrf1jVkEVc4hMyLnCLHC/qrZZly88AWh0Fn5bPdfV14ch1ap1q
+         M0LOUGuRRtXHH0IHWpipEXuSwvQDCv9+aMUrqtrbEc9ijPXBDT4lPCc8NzGyjtxQIFrZ
+         M2q4eqVEWBtxTQBkSW96Zv56mj0cnwERzxiQ/8KWp0+vM9060eSDFwE2f7jzcQj9c8xl
+         oj7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689116495; x=1691708495;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ArFj1o9NSdPQxx1m9ygKjSQno20NdD8JCdPYTouZybg=;
+        b=CNVRITVWGhlnxkQTTQgZjkh9dhDMVS3R5Q/06ddNApuLaUzijU/5noBuP3EmM7dtSC
+         Q4ElnK4IipUid4OfSrf1OIhfOPIQwiD0UK+oXnChjfxgJLZ6GP+47keARQ6nlZjOhViN
+         jTVU1rb0vLK6im/AFP6B0gSUeCh1vjO5Y57Yaa8LhCEWaaeu8fvyefp0NHz261tNBrJR
+         Nsxm1Jha55njwHn0KwIOEl6nVRVRWOS5TMECuK2FoijFLnk4Ll647E/YPVVsdPi8HmMA
+         6sH9QlZXtOVqfXWA+b4E8WGGPvRuIYqH6PJjksAZvqBj5iIBtEXY8YVgX/vFvl5KkH5f
+         ZRKw==
+X-Gm-Message-State: ABy/qLbfhu1EQzIbKBWZ0L8idKw3WEaZZHVnIG7ZQQme46JzFCtlL/4m
+        fvaW1SNrnmofEhsAOZiuwuTraZwbJUY=
+X-Google-Smtp-Source: APBJJlEnsGjdY86SpJV8AfP5O0Y+w0eDh5v2W1Ha3ueE6ESzD8l1xlfCwxQzysRlxUoU47FTo8Gi3Z0O4EQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:aa09:b0:1b8:95fc:d0f with SMTP id
+ be9-20020a170902aa0900b001b895fc0d0fmr12256129plb.7.1689116494750; Tue, 11
+ Jul 2023 16:01:34 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 11 Jul 2023 16:01:24 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230711230131.648752-1-seanjc@google.com>
+Subject: [PATCH 0/7] KVM: Grab KVM references for stats fds
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zheng Zhang <zheng.zhang@email.ucr.edu>,
+        Kees Cook <keescook@chromium.org>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi BaoLu,
+Grab a reference to the VM when handing a userspace stats fds for VMs and
+vCPUs to ensure the stats files don't outlive the VM and its vCPUs, and add
+a regression testcase in selftests.
 
-On Tue, 11 Jul 2023 09:06:42 +0800, Lu Baolu <baolu.lu@linux.intel.com>
-wrote:
+Sean Christopherson (7):
+  KVM: Grab a reference to KVM for VM and vCPU stats file descriptors
+  KVM: selftests: Use pread() to read binary stats header
+  KVM: selftests: Clean up stats fd in common stats_test() helper
+  KVM: selftests: Explicitly free vcpus array in binary stats test
+  KVM: selftests: Verify userspace can create "redundant" binary stats
+    files
+  KVM: selftests: Verify stats fd can be dup()'d and read
+  KVM: selftests: Verify stats fd is usable after VM fd has been closed
 
-> Remove the static iopf_param pointer from struct iommu_fault_param to
-> save memory.
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  include/linux/iommu.h      |  2 --
->  drivers/iommu/io-pgfault.c | 47 +++++++++++++++++++++++---------------
->  2 files changed, 29 insertions(+), 20 deletions(-)
-> 
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index ffd6fe1317f4..5fe37a7c5a55 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -551,7 +551,6 @@ struct iommu_fault_param {
->   * struct dev_iommu - Collection of per-device IOMMU data
->   *
->   * @fault_param: IOMMU detected device fault reporting data
-> - * @iopf_param:	 I/O Page Fault queue and data
->   * @fwspec:	 IOMMU fwspec data
->   * @iommu_dev:	 IOMMU device this device is linked to
->   * @priv:	 IOMMU Driver private data
-> @@ -564,7 +563,6 @@ struct iommu_fault_param {
->  struct dev_iommu {
->  	struct mutex lock;
->  	struct iommu_fault_param	*fault_param;
-> -	struct iopf_device_param	*iopf_param;
->  	struct iommu_fwspec		*fwspec;
->  	struct iommu_device		*iommu_dev;
->  	void				*priv;
-> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-> index 1749e0869f2e..6a3a4e08e67e 100644
-> --- a/drivers/iommu/io-pgfault.c
-> +++ b/drivers/iommu/io-pgfault.c
-> @@ -158,7 +158,7 @@ int iommu_queue_iopf(struct iommu_fault *fault,
-> struct device *dev)
->  	 * As long as we're holding param->lock, the queue can't be
-> unlinked
->  	 * from the device and therefore cannot disappear.
->  	 */
-> -	iopf_param = param->iopf_param;
-> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
-I am not sure I understand how does it know the cookie type is iopf_param
-for PASID 0?
-
-Between IOPF and IOMMUFD use of the cookie, cookie types are different,
-right?
-
->  	if (!iopf_param)
->  		return -ENODEV;
->  
-> @@ -235,7 +235,7 @@ int iopf_queue_flush_dev(struct device *dev)
->  		return -ENODEV;
->  
->  	mutex_lock(&param->lock);
-> -	iopf_param = param->iopf_param;
-> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
->  	if (iopf_param)
->  		flush_workqueue(iopf_param->queue->wq);
->  	else
-> @@ -286,9 +286,9 @@ EXPORT_SYMBOL_GPL(iopf_queue_discard_partial);
->   */
->  int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
->  {
-> -	int ret = -EBUSY;
-> -	struct iopf_device_param *iopf_param;
-> +	struct iopf_device_param *iopf_param, *curr;
->  	struct dev_iommu *param = dev->iommu;
-> +	int ret;
->  
->  	if (!param)
->  		return -ENODEV;
-> @@ -303,16 +303,27 @@ int iopf_queue_add_device(struct iopf_queue *queue,
-> struct device *dev) 
->  	mutex_lock(&queue->lock);
->  	mutex_lock(&param->lock);
-> -	if (!param->iopf_param) {
-> -		list_add(&iopf_param->queue_list, &queue->devices);
-> -		param->iopf_param = iopf_param;
-> -		ret = 0;
-> +	curr = iommu_set_device_fault_cookie(dev, 0, iopf_param);
-> +	if (IS_ERR(curr)) {
-> +		ret = PTR_ERR(curr);
-> +		goto err_free;
->  	}
-> +
-> +	if (curr) {
-> +		ret = -EBUSY;
-> +		goto err_restore;
-> +	}
-> +	list_add(&iopf_param->queue_list, &queue->devices);
->  	mutex_unlock(&param->lock);
->  	mutex_unlock(&queue->lock);
->  
-> -	if (ret)
-> -		kfree(iopf_param);
-> +	return 0;
-> +err_restore:
-> +	iommu_set_device_fault_cookie(dev, 0, curr);
-> +err_free:
-> +	mutex_unlock(&param->lock);
-> +	mutex_unlock(&queue->lock);
-> +	kfree(iopf_param);
->  
->  	return ret;
->  }
-> @@ -329,7 +340,6 @@ EXPORT_SYMBOL_GPL(iopf_queue_add_device);
->   */
->  int iopf_queue_remove_device(struct iopf_queue *queue, struct device
-> *dev) {
-> -	int ret = -EINVAL;
->  	struct iopf_fault *iopf, *next;
->  	struct iopf_device_param *iopf_param;
->  	struct dev_iommu *param = dev->iommu;
-> @@ -339,16 +349,17 @@ int iopf_queue_remove_device(struct iopf_queue
-> *queue, struct device *dev) 
->  	mutex_lock(&queue->lock);
->  	mutex_lock(&param->lock);
-> -	iopf_param = param->iopf_param;
-> -	if (iopf_param && iopf_param->queue == queue) {
-> -		list_del(&iopf_param->queue_list);
-> -		param->iopf_param = NULL;
-> -		ret = 0;
-> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
-> +	if (!iopf_param || iopf_param->queue != queue) {
-> +		mutex_unlock(&param->lock);
-> +		mutex_unlock(&queue->lock);
-> +		return -EINVAL;
->  	}
-> +
-> +	list_del(&iopf_param->queue_list);
-> +	iommu_set_device_fault_cookie(dev, 0, NULL);
->  	mutex_unlock(&param->lock);
->  	mutex_unlock(&queue->lock);
-> -	if (ret)
-> -		return ret;
->  
->  	/* Just in case some faults are still stuck */
->  	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list)
+ .../selftests/kvm/include/kvm_util_base.h     |  6 +-
+ .../selftests/kvm/kvm_binary_stats_test.c     | 72 ++++++++++++-------
+ virt/kvm/kvm_main.c                           | 24 +++++++
+ 3 files changed, 75 insertions(+), 27 deletions(-)
 
 
-Thanks,
+base-commit: 255006adb3da71bb75c334453786df781b415f54
+-- 
+2.41.0.255.g8b1d071c50-goog
 
-Jacob
