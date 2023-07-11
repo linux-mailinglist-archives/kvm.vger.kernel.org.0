@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23CE074E506
-	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 05:02:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9920B74E50A
+	for <lists+kvm@lfdr.de>; Tue, 11 Jul 2023 05:02:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbjGKDCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jul 2023 23:02:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48516 "EHLO
+        id S231241AbjGKDCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jul 2023 23:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230457AbjGKDBr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jul 2023 23:01:47 -0400
+        with ESMTP id S231228AbjGKDBx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jul 2023 23:01:53 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB8319A1;
-        Mon, 10 Jul 2023 20:01:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4509B19AE;
+        Mon, 10 Jul 2023 20:01:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689044480; x=1720580480;
+  t=1689044486; x=1720580486;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+jFCGxQLqVCE0fOgD9TvDF3il67l3rPfGC/swcDibKU=;
-  b=ZIRVX22SIcyXOS1YeYz2zVznKZKSYr1Uk5M05L5aRDD/X9VVCrY9J11a
-   lqpMWVOujseS3HoFNur9MXbrvZ5G8xUo9kV5hxx2nkQtaqoUYBc5Bwj87
-   ToS6xfAnDai4pyprttquMgO0RQbbhkMvhYJVQWRxB1UpIewr6igliOEa1
-   StOupahUbDtlyemjmZUjYmTGOxd9AkzaGEudu6DRpvw/yU1nUa6x5FzoL
-   5KvHW48Fral8LUvbTRP3GZLQv79wJ+PCLm5yqB4npyNRTEIy9jYRudhrB
-   DTeWsab2PHXqukDJVz8gEjZrUlaV+VrXYCRjKCGs1oNjo4bvfzWPyzVRD
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="361973219"
+  bh=eHPns7k1QmUrqabjYUd5HnssmG+fpnnjXdPgPppcU80=;
+  b=PzA98uwtqNi2jjBg+Fu43bKbcY0kPKV1FoiqpwEINUfMY7apDnOCVNhN
+   FycPcI1NFmJ4AeDh4A8IXzEq5FZ+mXFPznxQfgq/R36XEfgjJjpRyVY5s
+   9QXjNKGQupzKNg0yq9vdS7newet+h8aze+PnEfxSgjppDegJMDuIPVYZF
+   ck8jKzSDjjyiBwxGwkcPhQFbbgAFwr4LSFOwVzP40+e4b2Vxej9WsXhgq
+   p+GQlha2gOX5kTNcDRm5dXHpliJvVIbgKF299lAcXVw5RPxHtDxeblPXR
+   jM0gHOFLIo2KhJAafcqW7Yj1QQNPqrvOYT9qyERrZhF6ZQvLN2cb78t96
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="361973234"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="361973219"
+   d="scan'208";a="361973234"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 19:59:54 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 19:59:55 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="724250931"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="724250942"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="724250931"
+   d="scan'208";a="724250942"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga007.fm.intel.com with ESMTP; 10 Jul 2023 19:59:53 -0700
+  by fmsmga007.fm.intel.com with ESMTP; 10 Jul 2023 19:59:54 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -51,9 +51,9 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com, zhenzhong.duan@intel.com,
         clegoate@redhat.com
-Subject: [PATCH v14 23/26] vfio: Add VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT
-Date:   Mon, 10 Jul 2023 19:59:25 -0700
-Message-Id: <20230711025928.6438-24-yi.l.liu@intel.com>
+Subject: [PATCH v14 24/26] vfio: Move the IOMMU_CAP_CACHE_COHERENCY check in __vfio_register_dev()
+Date:   Mon, 10 Jul 2023 19:59:26 -0700
+Message-Id: <20230711025928.6438-25-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230711025928.6438-1-yi.l.liu@intel.com>
 References: <20230711025928.6438-1-yi.l.liu@intel.com>
@@ -69,202 +69,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds ioctl for userspace to attach device cdev fd to and detach
-from IOAS/hw_pagetable managed by iommufd.
+The IOMMU_CAP_CACHE_COHERENCY check only applies to the physical devices
+that are IOMMU-backed. But it is now in the group code. If want to compile
+vfio_group infrastructure out, this check needs to be moved out of the group
+code.
 
-    VFIO_DEVICE_ATTACH_IOMMUFD_PT: attach vfio device to IOAS or hw_pagetable
-				   managed by iommufd. Attach can be undo
-				   by VFIO_DEVICE_DETACH_IOMMUFD_PT or device
-				   fd close.
-    VFIO_DEVICE_DETACH_IOMMUFD_PT: detach vfio device from the current attached
-				   IOAS or hw_pagetable managed by iommufd.
+Another reason for this change is to fail the device registration for the
+physical devices that do not have IOMMU if the group code is not compiled
+as the cdev interface does not support such devices.
 
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Tested-by: Terrence Xu <terrence.xu@intel.com>
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/vfio/device_cdev.c | 58 ++++++++++++++++++++++++++++++++++++++
- drivers/vfio/vfio.h        |  5 ++++
- drivers/vfio/vfio_main.c   | 15 +++++++++-
- include/uapi/linux/vfio.h  | 44 +++++++++++++++++++++++++++++
- 4 files changed, 121 insertions(+), 1 deletion(-)
+ drivers/vfio/group.c     | 10 ----------
+ drivers/vfio/vfio_main.c | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-index f40784dd5561..e75da0a70d1f 100644
---- a/drivers/vfio/device_cdev.c
-+++ b/drivers/vfio/device_cdev.c
-@@ -152,6 +152,64 @@ void vfio_df_unbind_iommufd(struct vfio_device_file *df)
- 	vfio_device_unblock_group(device);
- }
+diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+index 5c17ad812313..610a429c6191 100644
+--- a/drivers/vfio/group.c
++++ b/drivers/vfio/group.c
+@@ -682,16 +682,6 @@ static struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
+ 	if (!iommu_group)
+ 		return ERR_PTR(-EINVAL);
  
-+int vfio_df_ioctl_attach_pt(struct vfio_device_file *df,
-+			    struct vfio_device_attach_iommufd_pt __user *arg)
-+{
-+	struct vfio_device *device = df->device;
-+	struct vfio_device_attach_iommufd_pt attach;
-+	unsigned long minsz;
-+	int ret;
-+
-+	minsz = offsetofend(struct vfio_device_attach_iommufd_pt, pt_id);
-+
-+	if (copy_from_user(&attach, arg, minsz))
-+		return -EFAULT;
-+
-+	if (attach.argsz < minsz || attach.flags)
-+		return -EINVAL;
-+
-+	mutex_lock(&device->dev_set->lock);
-+	ret = device->ops->attach_ioas(device, &attach.pt_id);
-+	if (ret)
-+		goto out_unlock;
-+
-+	if (copy_to_user(&arg->pt_id, &attach.pt_id, sizeof(attach.pt_id))) {
-+		ret = -EFAULT;
-+		goto out_detach;
-+	}
-+	mutex_unlock(&device->dev_set->lock);
-+
-+	return 0;
-+
-+out_detach:
-+	device->ops->detach_ioas(device);
-+out_unlock:
-+	mutex_unlock(&device->dev_set->lock);
-+	return ret;
-+}
-+
-+int vfio_df_ioctl_detach_pt(struct vfio_device_file *df,
-+			    struct vfio_device_detach_iommufd_pt __user *arg)
-+{
-+	struct vfio_device *device = df->device;
-+	struct vfio_device_detach_iommufd_pt detach;
-+	unsigned long minsz;
-+
-+	minsz = offsetofend(struct vfio_device_detach_iommufd_pt, flags);
-+
-+	if (copy_from_user(&detach, arg, minsz))
-+		return -EFAULT;
-+
-+	if (detach.argsz < minsz || detach.flags)
-+		return -EINVAL;
-+
-+	mutex_lock(&device->dev_set->lock);
-+	device->ops->detach_ioas(device);
-+	mutex_unlock(&device->dev_set->lock);
-+
-+	return 0;
-+}
-+
- static char *vfio_device_devnode(const struct device *dev, umode_t *mode)
- {
- 	return kasprintf(GFP_KERNEL, "vfio/devices/%s", dev_name(dev));
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index 137d3e9ca798..1493bf8f4086 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -266,6 +266,11 @@ vfio_iommufd_compat_attach_ioas(struct vfio_device *device,
- }
- #endif
- 
-+int vfio_df_ioctl_attach_pt(struct vfio_device_file *df,
-+			    struct vfio_device_attach_iommufd_pt __user *arg);
-+int vfio_df_ioctl_detach_pt(struct vfio_device_file *df,
-+			    struct vfio_device_detach_iommufd_pt __user *arg);
-+
- #if IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV)
- void vfio_init_device_cdev(struct vfio_device *device);
- 
+-	/*
+-	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
+-	 * restore cache coherency. It has to be checked here because it is only
+-	 * valid for cases where we are using iommu groups.
+-	 */
+-	if (!device_iommu_capable(dev, IOMMU_CAP_CACHE_COHERENCY)) {
+-		iommu_group_put(iommu_group);
+-		return ERR_PTR(-EINVAL);
+-	}
+-
+ 	mutex_lock(&vfio.group_lock);
+ 	group = vfio_group_find_from_iommu(iommu_group);
+ 	if (group) {
 diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 9fdf93ff17cf..ba1d84afe081 100644
+index ba1d84afe081..902f06e52c48 100644
 --- a/drivers/vfio/vfio_main.c
 +++ b/drivers/vfio/vfio_main.c
-@@ -1162,6 +1162,19 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+@@ -292,6 +292,17 @@ static int __vfio_register_dev(struct vfio_device *device,
  	if (ret)
  		return ret;
  
-+	/* cdev only ioctls */
-+	if (IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV) && !df->group) {
-+		switch (cmd) {
-+		case VFIO_DEVICE_ATTACH_IOMMUFD_PT:
-+			ret = vfio_df_ioctl_attach_pt(df, uptr);
-+			goto out;
-+
-+		case VFIO_DEVICE_DETACH_IOMMUFD_PT:
-+			ret = vfio_df_ioctl_detach_pt(df, uptr);
-+			goto out;
-+		}
++	/*
++	 * VFIO always sets IOMMU_CACHE because we offer no way for userspace to
++	 * restore cache coherency. It has to be checked here because it is only
++	 * valid for cases where we are using iommu groups.
++	 */
++	if (type == VFIO_IOMMU && !vfio_device_is_noiommu(device) &&
++	    !device_iommu_capable(device->dev, IOMMU_CAP_CACHE_COHERENCY)) {
++		ret = -EINVAL;
++		goto err_out;
 +	}
 +
- 	switch (cmd) {
- 	case VFIO_DEVICE_FEATURE:
- 		ret = vfio_ioctl_device_feature(device, uptr);
-@@ -1174,7 +1187,7 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
- 			ret = device->ops->ioctl(device, cmd, arg);
- 		break;
- 	}
--
-+out:
- 	vfio_device_pm_runtime_put(device);
- 	return ret;
- }
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 098946b23e86..fa06e3eb4955 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -924,6 +924,50 @@ struct vfio_device_bind_iommufd {
- 
- #define VFIO_DEVICE_BIND_IOMMUFD	_IO(VFIO_TYPE, VFIO_BASE + 18)
- 
-+/*
-+ * VFIO_DEVICE_ATTACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 19,
-+ *					struct vfio_device_attach_iommufd_pt)
-+ * @argsz:	User filled size of this data.
-+ * @flags:	Must be 0.
-+ * @pt_id:	Input the target id which can represent an ioas or a hwpt
-+ *		allocated via iommufd subsystem.
-+ *		Output the input ioas id or the attached hwpt id which could
-+ *		be the specified hwpt itself or a hwpt automatically created
-+ *		for the specified ioas by kernel during the attachment.
-+ *
-+ * Associate the device with an address space within the bound iommufd.
-+ * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.  This is only
-+ * allowed on cdev fds.
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_device_attach_iommufd_pt {
-+	__u32	argsz;
-+	__u32	flags;
-+	__u32	pt_id;
-+};
-+
-+#define VFIO_DEVICE_ATTACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 19)
-+
-+/*
-+ * VFIO_DEVICE_DETACH_IOMMUFD_PT - _IOW(VFIO_TYPE, VFIO_BASE + 20,
-+ *					struct vfio_device_detach_iommufd_pt)
-+ * @argsz:	User filled size of this data.
-+ * @flags:	Must be 0.
-+ *
-+ * Remove the association of the device and its current associated address
-+ * space.  After it, the device should be in a blocking DMA state.  This is only
-+ * allowed on cdev fds.
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vfio_device_detach_iommufd_pt {
-+	__u32	argsz;
-+	__u32	flags;
-+};
-+
-+#define VFIO_DEVICE_DETACH_IOMMUFD_PT		_IO(VFIO_TYPE, VFIO_BASE + 20)
-+
- /*
-  * Provide support for setting a PCI VF Token, which is used as a shared
-  * secret between PF and VF drivers.  This feature may only be set on a
+ 	ret = vfio_device_add(device);
+ 	if (ret)
+ 		goto err_out;
 -- 
 2.34.1
 
