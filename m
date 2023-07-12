@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 228927500E3
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 10:13:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8789E75018B
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 10:31:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232140AbjGLIN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 04:13:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45620 "EHLO
+        id S232702AbjGLIbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 04:31:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232077AbjGLIN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 04:13:28 -0400
+        with ESMTP id S231497AbjGLIbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 04:31:09 -0400
 Received: from mail.208.org (unknown [183.242.55.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154BA135
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 01:13:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293352702
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 01:26:17 -0700 (PDT)
 Received: from mail.208.org (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTP id 4R19V94znlzBR5lR
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 16:13:21 +0800 (CST)
+        by mail.208.org (Postfix) with ESMTP id 4R19n228kvzBS5qp
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 16:26:14 +0800 (CST)
 Authentication-Results: mail.208.org (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)" header.d=208.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
         content-transfer-encoding:content-type:message-id:user-agent
         :references:in-reply-to:subject:to:from:date:mime-version; s=
-        dkim; t=1689149601; x=1691741602; bh=cNcfxK9dXcCkj+rw5iyDLfxZk4R
-        VhrDL/EdmfTA64mE=; b=jnE8enGd5oC1LCdWYWLJ5kmhi7kidfbQhuxShgADZBD
-        E3F3Rif6SgfFhz5F/TO5h5RpP0JL3u8fFb7oIt0AkMxNM1V0EVaIU1h8Jc7Uz4hf
-        f3gIT6FnYolr/ofjMPzc62rwTMhPhj/K1Enm6pt1SW2aXqc+Zi6m06Ss1yvYgDaq
-        lZ495wAtRGlGq4ZIhr3WXXUEpIdVEez05yAlkKb8rLq8HXScj8mfXdlF+DbsoCKE
-        J1zMgj6JfspO31S5q/Genl9O34ODMl8cJNRkPtAXovh52r1BC1r6zIjAvqlI1/Vr
-        OsRIcwF0/j3cAcgCp91nudm2GOOp45LZnnTBWTPG9jg==
+        dkim; t=1689150374; x=1691742375; bh=oltV5Rd5AD0T6xUiH4VHdUcjoRX
+        Ryw0tUkvVw8Y4vQY=; b=l0IWnV4ACmHpyX7cI2eWSd4hZuu4q+WvuoJl5Vf0ExK
+        fImaInY2EcoSrQ8NhfTm+6xQHPYEEFNNuw6ztno++J0WaPkCphQrAsRUt2a6xKkM
+        X75ttgsMd5e83BjOcpTsGpeM36bBB1Lu1yXti+h1sBGq1WNFz/sy2B35e0D4FHqO
+        OPa6Iu3DN20plWLY76/lAnJ/mkThpoMv3yclxlDu+SZDENSOBD9CWqeYBVNqshVY
+        0gMjCb64NB9W1G79xz+SP2I+UVG6RkWrVZMEp8cSdOMdB7kM/T9o9ZS6FDiBB5gZ
+        ZpEPbiS+zarATEeE14eblkJnrFB9mUAYwmFn+EszG6A==
 X-Virus-Scanned: amavisd-new at mail.208.org
 Received: from mail.208.org ([127.0.0.1])
         by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id l0ZAzdujYALp for <kvm@vger.kernel.org>;
-        Wed, 12 Jul 2023 16:13:21 +0800 (CST)
+        with ESMTP id LR4RsT7fcuh2 for <kvm@vger.kernel.org>;
+        Wed, 12 Jul 2023 16:26:14 +0800 (CST)
 Received: from localhost (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTPSA id 4R19V91xZXzBR5CY;
-        Wed, 12 Jul 2023 16:13:21 +0800 (CST)
+        by mail.208.org (Postfix) with ESMTPSA id 4R19n16GhtzBR5lP;
+        Wed, 12 Jul 2023 16:26:13 +0800 (CST)
 MIME-Version: 1.0
-Date:   Wed, 12 Jul 2023 16:13:21 +0800
+Date:   Wed, 12 Jul 2023 16:26:13 +0800
 From:   shijie001@208suo.com
 To:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org
 Cc:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: Fix warnings in reverse_cpuid.h
-In-Reply-To: <tencent_DBF42EC58C9AC22E9F96E4F5FCB76FEBB009@qq.com>
-References: <tencent_DBF42EC58C9AC22E9F96E4F5FCB76FEBB009@qq.com>
+Subject: [PATCH] KVM: x86/pmu: Fix warnings in pmu.h
+In-Reply-To: <tencent_C12CFA09493ED8DFE9D60EEBEE92C7E82605@qq.com>
+References: <tencent_C12CFA09493ED8DFE9D60EEBEE92C7E82605@qq.com>
 User-Agent: Roundcube Webmail
-Message-ID: <f1dc314d0ec59e41cee17d5a36452c73@208suo.com>
+Message-ID: <9ffeb53096b6caf0323e4d7bd452ef76@208suo.com>
 X-Sender: shijie001@208suo.com
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
@@ -62,23 +62,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 The following checkpatch warning is removed:
-WARNING: Use #include <linux/cpufeature.h> instead of <asm/cpufeature.h>
+WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
 
 Signed-off-by: Jie Shi <shijie001@208suo.com>
 ---
-  arch/x86/kvm/reverse_cpuid.h | 2 +-
+  arch/x86/kvm/pmu.h | 2 +-
   1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index 56cbdb24400a..07a0fff2b27e 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -3,7 +3,7 @@
-  #define ARCH_X86_KVM_REVERSE_CPUID_H
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 7d9ba301c090..dbc131b378f2 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -249,7 +249,7 @@ static inline bool pmc_is_globally_enabled(struct 
+kvm_pmc *pmc)
 
-  #include <uapi/asm/kvm.h>
--#include <asm/cpufeature.h>
-+#include <linux/cpufeature.h>
-  #include <asm/cpufeatures.h>
-
-  /*
+  void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+  void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+-int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
++int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned int pmc, u64 *data);
+  bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int 
+idx);
+  bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
+  int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
