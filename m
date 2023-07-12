@@ -2,98 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E6E4750D7C
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 18:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0F1A750D9E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 18:11:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjGLQG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 12:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43282 "EHLO
+        id S232124AbjGLQLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 12:11:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232606AbjGLQG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 12:06:27 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 841141999
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 09:06:26 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36CFwSmG027186;
-        Wed, 12 Jul 2023 16:06:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Gp2YqfsYUz4wUcxJP8bUg17GBeBKTkwwQfgJONjVPCg=;
- b=QaCQlm5n+XQ81tN/Mqor1CIvftHqhoNl+IIrNbCPeLkrdzoejKrJCNPd9dmGSzD23iP1
- jNYXrLcVHhkVlYjR1HdTJVpLDxiwtNd0HfMIB0T3VDEpajCCenddAxyCh5mwh+uVJ2AX
- PDjCW26A6Qx9HbegrJEpX+Vb3X0sDuByYAE3+eXhQ/zGOKEjnpDaSZhzfxgXIjyyDQZN
- EKuhxWAurSLjnMmncz4jDVQ4mC3OC5nDNtd14el+bQDxj/4rGNHAxQZLwoeykwbXiEg5
- 8S8VoU0Iz8+EMWDh3xbh2CsTwdpyNaC7ZzkX6FN06duhxW/tj5Bo5/FSwHFo5ODSc6Pe iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rsy4h0kmh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 16:06:09 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36CFnuOF030937;
-        Wed, 12 Jul 2023 16:06:04 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rsy4h0k94-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 16:06:04 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36CBmn1u027667;
-        Wed, 12 Jul 2023 16:06:00 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rpye51yvf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 16:06:00 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36CG5tS37799370
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Jul 2023 16:05:55 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 517AF20043;
-        Wed, 12 Jul 2023 16:05:55 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C584720040;
-        Wed, 12 Jul 2023 16:05:54 +0000 (GMT)
-Received: from [9.152.222.242] (unknown [9.152.222.242])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 12 Jul 2023 16:05:54 +0000 (GMT)
-Message-ID: <139d1b79-e6d2-a6cc-6dcd-8e500cee1f1b@linux.ibm.com>
-Date:   Wed, 12 Jul 2023 18:05:54 +0200
+        with ESMTP id S229649AbjGLQLD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 12:11:03 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1029C134
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 09:11:02 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b8b2886364so47405395ad.0
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 09:11:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1689178261; x=1691770261;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P/gyHWRhdmt3W1ZOf5pRL6UNntD92OSXMXDmAzXvrNg=;
+        b=fGAuAcLoInUfc0q3fFxWXNh784K2v5lXc+3MSoA4NM4bybLlq2A877Q95K6HPCvW9i
+         S9PrgoE9ClCRf5R1/0nlUvszFDWskGWmxaLRyn6U+mvK6cGOHNG3QzCcA15MOd4qS2MD
+         OJtKncBfjTZp/dtZdSfB6Y79/SxulIFkSPojn75EDVKeTnitLdCwvm2lEdtuzzfq/gqP
+         WgwieP0Xy0H7L55RHFo3oyH4kuqlxT+6te6xDOc3zCzYjO3yerYeY6DGF8VaQC7y7Sjo
+         udyKf12J7tGNllcGbv7sN3p3I7EUKSbpIMb+L6OF6oOhCDg1p7ZtWEyjTUOrd3JjZGPW
+         EHRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689178261; x=1691770261;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P/gyHWRhdmt3W1ZOf5pRL6UNntD92OSXMXDmAzXvrNg=;
+        b=lfDfDBg4k6ZAEwtn7nWx8ShJThXRmMuP/5bre7jOXhsFnepBKmGIlY8bQLTGKg7BM1
+         34ZWEOS16ySjOnaj2GZl1OK4FlGhWxymv/753C1bRys28t2c2zRif7QECFJ/Hz8gyK9L
+         Zyulx7bJdGBU0UJ/y7i7onR2ofDq226CbxsjsOrvsffMd/R8O0Yc/CX0aLsBnLw/478B
+         vJhhmXG2ebU7nG/1DbAQolV1AmPEBh6dgcvtjRKg6/xpLa/hz8mgaW8rN4afxR5ig8Vo
+         8EzuJ/gR4sUWjzCBkEFqsz30Snr02WiU9bkjBBUL6Q4WgrxK2MLgCJLz2CM13OPvPFem
+         ek6g==
+X-Gm-Message-State: ABy/qLb+cL0nMUmA8Zg/ON89+mpMGZsNo+QLMY+ocTlmCnA+eK+yn1ih
+        rWZowLgufHhSw0x1qVY5gZd6cw==
+X-Google-Smtp-Source: APBJJlFJQ/muT40Pd9YoRXcgQ+QCoBx9dXiJIoyQqgXxxQpDnA04YVdYrtkec+9jLWPYZIUFBi9Fcg==
+X-Received: by 2002:a17:903:489:b0:1b8:6cae:4400 with SMTP id jj9-20020a170903048900b001b86cae4400mr15606614plb.37.1689178261471;
+        Wed, 12 Jul 2023 09:11:01 -0700 (PDT)
+Received: from anup-ubuntu-vm.localdomain ([171.76.82.173])
+        by smtp.gmail.com with ESMTPSA id bc2-20020a170902930200b001b9f032bb3dsm3811650plb.3.2023.07.12.09.10.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 09:11:01 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Samuel Ortiz <sameo@rivosinc.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH 0/7] KVM RISC-V ONE_REG ISA extension improvements
+Date:   Wed, 12 Jul 2023 21:40:40 +0530
+Message-Id: <20230712161047.1764756-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v21 11/20] qapi/s390x/cpu topology:
- CPU_POLARIZATION_CHANGE qapi event
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-12-pmorel@linux.ibm.com>
- <579d40ea-50e4-4d84-699b-25268749b138@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <579d40ea-50e4-4d84-699b-25268749b138@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Xg94q_D67M0Hu8twEH7UunvK8lSqgqox
-X-Proofpoint-GUID: SKVYBsm4yHM71CVa7ZbeHtp9VO8Se5C-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-12_11,2023-07-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- phishscore=0 malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0
- mlxscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=972
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2307120144
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,23 +74,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series improves the ISA extension ONE_REG interface in following ways:
+1) Move ONE_REG related code to dedicated source file
+2) Allow multiple ISA extensions to be enabled/disabled in one ioctl
+3) Add more ISA extensions to the ONE_REG interface
 
-On 7/4/23 15:04, Thomas Huth wrote:
-> On 30/06/2023 11.17, Pierre Morel wrote:
->> When the guest asks to change the polarization this change
->> is forwarded to the upper layer using QAPI.
->> The upper layer is supposed to take according decisions concerning
->> CPU provisioning.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   qapi/machine-target.json | 33 +++++++++++++++++++++++++++++++++
->>   hw/s390x/cpu-topology.c  |  2 ++
->>   2 files changed, 35 insertions(+)
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->
-Thanks,
+The series has following dependencies:
+1) PATCH6 depends on
+https://lore.kernel.org/linux-riscv/20230712084134.1648008-1-sameo@rivosinc.com/
+2) PATCH7 depends on
+https://lore.kernel.org/linux-riscv/20230711153743.1970625-1-heiko@sntech.de/
 
-Pierre
+The PATCH1 to PATCH5 of this series don't depend on any patches.
+
+These patches can also be found in the riscv_kvm_onereg_imp_v1 branch at:
+https://github.com/avpatel/linux.git
+
+Anup Patel (7):
+  RISC-V: KVM: Factor-out ONE_REG related code to its own source file
+  RISC-V: KVM: Extend ONE_REG to enable/disable multiple ISA extensions
+  RISC-V: KVM: Allow Zba and Zbs extensions for Guest/VM
+  RISC-V: KVM: Allow Zicntr, Zicsr, Zifencei, and Zihpm for Guest/VM
+  RISC-V: KVM: Sort ISA extensions alphabetically in ONE_REG interface
+  RISC-V: KVM: Allow Zbc, Zbk* and Zk* extensions for Guest/VM
+  RISC-V: KVM: Allow Zvb* and Zvk* extensions for Guest/VM
+
+ arch/riscv/include/asm/kvm_host.h |   6 +
+ arch/riscv/include/uapi/asm/kvm.h |  35 ++
+ arch/riscv/kvm/Makefile           |   1 +
+ arch/riscv/kvm/vcpu.c             | 529 +----------------------
+ arch/riscv/kvm/vcpu_onereg.c      | 695 ++++++++++++++++++++++++++++++
+ 5 files changed, 738 insertions(+), 528 deletions(-)
+ create mode 100644 arch/riscv/kvm/vcpu_onereg.c
+
+-- 
+2.34.1
 
