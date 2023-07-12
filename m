@@ -2,166 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EC01750CF6
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 17:46:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62441750D47
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 17:58:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232824AbjGLPqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 11:46:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58742 "EHLO
+        id S233250AbjGLP6W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 11:58:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231856AbjGLPqv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 11:46:51 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178C21BB
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 08:46:51 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36CFg0r3014260;
-        Wed, 12 Jul 2023 15:46:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=URYayddAAoLBOT2mFubDD+YcUfU1qLeT9suZBiRFF3s=;
- b=NDlLpDIh8Gr/445/yvSCGEcfyv6Sp7d4C3qYw2zrIE+Ekoov3naABwa4iV5qBeJU2vi8
- 9F4VnJjC8lP+QH/N8jVKSuZ4NipPvJo8/P8bDoqpR5UJrfcgAkKG3z7dMB+KO/VVIaZ5
- FdApNGo8gafwvh2GVpoVH3YoIaMtqtFe5ylEdM1gn1gUlZWphnK1VZQzBQ3IO+vCrLp4
- j7HiMuBjc+JhYZ41JfLG34Jh0NSHQjAxCopOSGBCdXKp3Bwlh/u13DAivNSNoVV21MtH
- OWNqDsezOVxM2GkJLfk58k9J6kbF62Ls5QB37sHoGxOeBXvXkiRQ/vYYIggvJ5/1ksDp sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rsxp0sb6c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 15:46:31 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36CFg8n2014959;
-        Wed, 12 Jul 2023 15:45:52 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rsxp0s9kc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 15:45:52 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36C4dLPq017376;
-        Wed, 12 Jul 2023 15:44:15 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3rpye5aqga-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 15:44:15 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36CFiAcp3146246
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Jul 2023 15:44:10 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE80820043;
-        Wed, 12 Jul 2023 15:44:10 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 29BBB20040;
-        Wed, 12 Jul 2023 15:44:10 +0000 (GMT)
-Received: from [9.152.222.242] (unknown [9.152.222.242])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 12 Jul 2023 15:44:10 +0000 (GMT)
-Message-ID: <c8cc5d6c-d0fa-c475-07ec-da6b2894cee4@linux.ibm.com>
-Date:   Wed, 12 Jul 2023 17:44:09 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v21 09/20] machine: adding s390 topology to query-cpu-fast
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-10-pmorel@linux.ibm.com>
- <747a5678-6140-a0ca-b08c-841b2ae00802@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <747a5678-6140-a0ca-b08c-841b2ae00802@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IfSqUGhrUwnpW4IY6TsMkiE8UvSvRSoP
-X-Proofpoint-ORIG-GUID: nJMNVdbHsDfr3eG8FIhWd03cv_9F7FeZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-12_11,2023-07-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 bulkscore=0 mlxscore=0 impostorscore=0 adultscore=0
- clxscore=1015 phishscore=0 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2305260000 definitions=main-2307120141
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231856AbjGLP6V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 11:58:21 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59207A2
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 08:58:20 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c04f5827eso6372333a12.1
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 08:58:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689177500; x=1691769500;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JSfe+iQhaOkty+h2TVJBQr/8bx8KuzjcDDQ8OVQERKU=;
+        b=vRBrZT2z3ZD2dgmquxtGdlOl50FV7kVqDS+Azde/DzjZhiZuwdv2z+9N5FH+ayaA8/
+         CmlWKo7AfJ5aM2hPS6bbWKE7zVFDIAI8I0lwz9VdkrLf8gOaikkGqE+OdwZP6Wf+n+30
+         ZXXLy44528gxLAWnWqzAOGszLF0akTdHqjFufYeAuhWmqOBHzq7vD3m0bwE/s3KOUxJe
+         Mon0wSboS5XgFdZy4J8uI7jhvYuRMOh3r6K/gZbk1NOG5LvHDWNbg6Xd9wBRuXpay18+
+         Wkqk0QYT3786zmXi9O3uhzoE74V/4gw1I2cMrJqKANPHIkd+cT9QdPtkAmtOsRL/P4nL
+         NzGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689177500; x=1691769500;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JSfe+iQhaOkty+h2TVJBQr/8bx8KuzjcDDQ8OVQERKU=;
+        b=FnvuuFzw7Qw/BgokfrAeh2euYLjb8XYT9+LUz/V1zjObYVfPKaDUFoABw87bGn/p6E
+         jQi1SoFPau/GV8DRHviJGdvOGa/KiF6bKImc810FSvQZiH5qkwPXo+wmRgdl6UVrezUA
+         TPQDmShuZHRxhceaszoO3PaiTa5geTVBukK6cnnBS91T/JeOmC1opgky1CI1JAzI7UQL
+         aLTx0/aTtj57Y1VyyAqxLlhpGuAync6kb0IlPAYOoqJT9mfbpQR4Jq2xYLTP4GPpeA8B
+         RrLcaMw9oqIvS5dGOGgiCiZumuHVhq8J1+qT3vlE7CkBFsXK6/ePC8zuvu56BcToNRTE
+         q7zQ==
+X-Gm-Message-State: ABy/qLYGFiEoJSOvEoJRDEl8bbzAteTcMqACD96wV/RNtfOC68K+wN+b
+        A0nT0eN0t3w0B/E5B4/5S+cm2IPeFhM=
+X-Google-Smtp-Source: APBJJlECNnNJUgQwvMg5NrFrIXDTEKM05BVCgydQ4nYR2joo5cvXqtlOpzf/MrJOQPNXY1eediHmPhMmoPE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3d48:0:b0:54f:d3ef:539b with SMTP id
+ k69-20020a633d48000000b0054fd3ef539bmr10145825pga.12.1689177499683; Wed, 12
+ Jul 2023 08:58:19 -0700 (PDT)
+Date:   Wed, 12 Jul 2023 08:58:17 -0700
+In-Reply-To: <20230707114107.73019-1-itazur@amazon.com>
+Mime-Version: 1.0
+References: <20200415023726.GD12547@linux.intel.com> <20230707114107.73019-1-itazur@amazon.com>
+Message-ID: <ZK7NmfKI9xur/Mop@google.com>
+Subject: Re: [PATCH 1/1] KVM: pass through CPUID(0x80000006)
+From:   Sean Christopherson <seanjc@google.com>
+To:     Takahiro Itazuri <itazur@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        Takahiro Itazuri <zulinx86@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Trimmed the Cc to remove folks that no longer directly work on any of this stuff.
 
-On 7/4/23 14:55, Thomas Huth wrote:
-> On 30/06/2023 11.17, Pierre Morel wrote:
->> S390x provides two more topology attributes, entitlement and dedication.
->>
->> Let's add these CPU attributes to the QAPI command query-cpu-fast.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   qapi/machine.json  | 9 ++++++++-
->>   target/s390x/cpu.c | 4 ++++
->>   2 files changed, 12 insertions(+), 1 deletion(-)
->>
->> diff --git a/qapi/machine.json b/qapi/machine.json
->> index 08245beea1..a1920cb78d 100644
->> --- a/qapi/machine.json
->> +++ b/qapi/machine.json
->> @@ -56,10 +56,17 @@
->>   # Additional information about a virtual S390 CPU
->>   #
->>   # @cpu-state: the virtual CPU's state
->> +# @dedicated: the virtual CPU's dedication (since 8.1)
->> +# @entitlement: the virtual CPU's entitlement (since 8.1)
->>   #
->>   # Since: 2.12
->>   ##
->> -{ 'struct': 'CpuInfoS390', 'data': { 'cpu-state': 'CpuS390State' } }
->> +{ 'struct': 'CpuInfoS390',
->> +  'data': { 'cpu-state': 'CpuS390State',
->> +            'dedicated': 'bool',
->> +            'entitlement': 'CpuS390Entitlement'
->
-> Would it make sense to make them optional and only report those if the 
-> topology feature is enabled?
->
->  Thomas
->
-I think you are right, I make them optional, it has no sense if the 
-architecture does support topology.
+On Fri, Jul 07, 2023, Takahiro Itazuri wrote:
+> Please forgive me if this is an absurd question.
+> 
+> Date:   Tue, 14 Apr 2020 19:37:26 -0700
+> From:   Sean Christopherson <sean.j.christopherson@intel.com>
+> >   Return the host's L2 cache and TLB information for CPUID.0x80000006
+> >   instead of zeroing out the entry as part of KVM_GET_SUPPORTED_CPUID.
+> >   This allows a userspace VMM to feed KVM_GET_SUPPORTED_CPUID's output
+> >   directly into KVM_SET_CPUID2 (without breaking the guest).
 
-Thanks,
+Ha, this confused me for a bit.  While past me did technically write this changelog,
+I was just massaging someone else's words.
 
-Pierre
+I'm honestly a bit dubious of the claim that providing a zeroed out 0x80000006
+would break the guest.  I'm pretty sure I chose that phrase based Eric's original
+wording that KVM's "defaults" would be "necessary".
 
+  Return L2 cache and TLB information to guests.
+  They could have been set before, but the defaults that KVM returns will be
+  necessary for usermode that doesn't supply their own CPUID tables.
 
+I don't think it actually matters (see below), it's just a rather odd justification.
+
+> I noticed that CPUID 0x80000005 also returns cache information (L1 Cache
+> and TLB Information) when looking at AMD APM, while it is marked
+> reserved on Intel SDM. What do you think about passing through CPUID
+> 0x80000005 to guests?
+> 
+> To be honest, I'm not sure if it is harmless from security and
+> performance perspectives in the first place.
 >
->> +  }
->> +}
->>     ##
->>   # @CpuInfoFast:
->> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
->> index 74405beb51..01938635eb 100644
->> --- a/target/s390x/cpu.c
->> +++ b/target/s390x/cpu.c
->> @@ -146,6 +146,10 @@ static void s390_query_cpu_fast(CPUState *cpu, 
->> CpuInfoFast *value)
->>       S390CPU *s390_cpu = S390_CPU(cpu);
->>         value->u.s390x.cpu_state = s390_cpu->env.cpu_state;
->> +#if !defined(CONFIG_USER_ONLY)
->> +    value->u.s390x.dedicated = s390_cpu->env.dedicated;
->> +    value->u.s390x.entitlement = s390_cpu->env.entitlement;
->> +#endif
->>   }
->>     /* S390CPUClass::reset() */
->
+> Regard security aspect, I'm a bit concerned that it could help malicious
+> guests to know something to allow cache side channel attacks. However,
+> CPUID 0x80000006 has already passed through L2 Cache and TLB and L3
+> Cache Information. If passing through CPUID 0x80000006 is really fine,
+> I'm guessing it is the case with CPUID 0x80000005 as well.
+
+It's definitely harmless from a security perspective.  Userspace already has
+access to this information as CPUID is NOT a priveleged instructions.  And the
+kernel also publishes this information in sysfs, e.g. /sys/devices/system/cpu/cpuN/cache,
+and AFAIK that's not typically restricted.
+
+KVM must assume that any and all information visible to userspace is also visible
+to the guest, e.g. even if KVM wanted to police CPUID, nothing would prevent
+userspace from providing a paravirtual interface to the guest to enumerate
+cache and TLB topology.
+
+> In terms of performance, as far as I know, some softwares utilizes cache
+> information to achieve better performance. To simply put, by letting
+> guests know cache information, they may gain some benefits. Having said
+> that, if I understand correctly, guests can be scheduled on CPUs that do
+> not belong to the same group of CPUs that they run last time, unless
+> guests are pinned to a specific set of host physical CPUs. In such
+> cases, guests may not benefit from using cache information.
+
+I would be quite surprised if homogeneous, a.k.a. non-hybrid, CPUs ever have
+variable cache/TLB properties across cores.  Hybrid CPUs might be a different
+story, but even then I gotta imagine that userspace software already has problems,
+e.g. userspace processes will encounter variable cache/TLB behavior unless
+userspace is affining all tasks.
+
+Regardless, the decision on whether or not to report cache information via
+KVM_GET_SUPPORTED_CPUID was made long, long ago, as KVM has enumerated CPUID.0x4
+since basically forever.  So really this only affects TLB info, and since KVM
+already spits out 0x80000006, it's just L1 TLB info.
+
+I'm mildly tempted to remove 0x80000006, for similar reasons as commit 45e966fcca03
+("KVM: x86: Do not return host topology information from KVM_GET_SUPPORTED_CPUID"),
+but I suspect that would do more harm than good, e.g. Linux falls back to
+0x80000005 and 0x80000006 when running on AMD without extended topology info.
+
+> If I'm missing something or say something wrong, I'd appreciate it if
+> you could correct me. If it sounds no problem, I'd like to send a patch
+> for it.
+
+I think it makes sense to enumerate 0x80000005.  Reporting 0x80000006 but not
+0x80000005 seems to be the *worst* behavior, so as I see it, the decision is
+really between adding 0x80000005 and removing 0x80000006.  Adding 0x80000005
+appears to be the least risky choice given that KVM has reported 0x80000006 for
+over three years.
