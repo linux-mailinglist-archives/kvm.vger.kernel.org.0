@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 014F6750220
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 10:56:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDA1A750222
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 10:56:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232988AbjGLIz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 04:55:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46950 "EHLO
+        id S232984AbjGLI4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 04:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232943AbjGLIzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 04:55:54 -0400
+        with ESMTP id S232981AbjGLIz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 04:55:56 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FA810F3;
-        Wed, 12 Jul 2023 01:55:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DE21999;
+        Wed, 12 Jul 2023 01:55:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689152148; x=1720688148;
+  t=1689152151; x=1720688151;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0bi82ABbti6fBd5M79OMibwR5D1CvFGn0X38NtvwJRw=;
-  b=SXZWv+664dVTL38AP0f+39HH9N2mnGic1Knw9k7u73/l9GBhzn1FdW6O
-   0UKT+voHoRRZzwbzJiRfDPIAPAJmFvo092aoHgo3YfXQz0h+nUq9ADGje
-   yffOIbypjg42fEIQuS12BKepmUXECI0QsZQ3Jnxu4TO7+LK8P/Vqdh3iX
-   d7JjOyqb2aHXcdSKcgW7A686dzcTN+8RxfekcueHTlPta5LHXT3bwzBNN
-   3W0BnCPFFz87Z/Gj4iwKtMCqUgDhSys13D6dHYUJQgGfWXrnlp2jEnq7x
-   puKKuJYK1e8EZaWfVhkhX+Xn2dgUWMdewyT4yIs/xw9XRCkUzJAwzaFW/
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="344439164"
+  bh=kOFOJ7DYKH+TkC4p/DHkbRzB9d4nwuYwHUYGrapzAoM=;
+  b=R+rdrtLQ/iJPGlcXkUWqlEzVBGIhXRFzKfkgVCAFYO23UGmxwlfI2nam
+   qPINm0/rc530+GD9O4d3zUu5VdNu0p7zsq1+U/zEgZ8sti5W8VvYWg2Br
+   PbMOAsR7vDpA6fuMW/V928Xv0MkklieIDK2cWz/NiO0rAJJwgFH3+B6JR
+   0qoTE4MJ6DJRq3OquEoTzq162X+8UJedH2WsXGwbq+jr8SmjOapymWVgr
+   +6iH9TvWDmwbsqaOzCBrqjB32fCixjbQvv52yycjGVHMbaQVxiCcISqps
+   tjENpWKCwUPfjXQ7OHNwNij6IiONjnRiP1RlTEHqWCQ5z2jCWpa2EcGui
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="344439181"
 X-IronPort-AV: E=Sophos;i="6.01,199,1684825200"; 
-   d="scan'208";a="344439164"
+   d="scan'208";a="344439181"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 01:55:47 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 01:55:51 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="845573371"
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="845573377"
 X-IronPort-AV: E=Sophos;i="6.01,199,1684825200"; 
-   d="scan'208";a="845573371"
+   d="scan'208";a="845573377"
 Received: from mjamatan-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.168.102])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 01:55:44 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 01:55:47 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     peterz@infradead.org, kirill.shutemov@linux.intel.com,
         linux-kernel@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     dave.hansen@intel.com, tglx@linutronix.de, bp@alien8.de,
         mingo@redhat.com, hpa@zytor.com, x86@kernel.org, seanjc@google.com,
         pbonzini@redhat.com, kvm@vger.kernel.org, isaku.yamahata@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, kai.huang@intel.com
-Subject: [PATCH 03/10] x86/tdx: Move FRAME_BEGIN/END to TDX_MODULE_CALL asm macro
-Date:   Wed, 12 Jul 2023 20:55:17 +1200
-Message-ID: <c0206c457f366ab007ab67ca16970cc4fc562877.1689151537.git.kai.huang@intel.com>
+Subject: [PATCH 04/10] x86/tdx: Make macros of TDCALLs consistent with the spec
+Date:   Wed, 12 Jul 2023 20:55:18 +1200
+Message-ID: <ba4b4ff1fe77ca76cca370b2fd4aa57a2d23c86d.1689151537.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1689151537.git.kai.huang@intel.com>
 References: <cover.1689151537.git.kai.huang@intel.com>
@@ -63,73 +63,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, the TDX_MODULE_CALL asm macro and the __tdx_module_call()
-take registers directly as input and a 'struct tdx_module_output' as
-optional output.  This is different from the __tdx_hypercall(), which
-simply uses a structure to carry all input/output.  There's no point to
-leave __tdx_module_call() complicated as it is.
+The TDX spec names all TDCALLs with prefix "TDG".  Currently, the kernel
+doesn't follow such convention for the macros of those TDCALLs but uses
+prefix "TDX_" for all of them.  Although it's arguable whether the TDX
+spec names those TDCALLs properly, it's better for the kernel to follow
+the spec when naming those macros.
 
-As a preparation to simplify the __tdx_module_call() to make it look
-like __tdx_hypercall(), move FRAME_BEGIN/END and RET from the
-__tdx_module_call() to the TDX_MODULE_CALL assembly macro.  This also
-allows more implementation flexibility of the assembly inside the
-TDX_MODULE_CALL macro, e.g., allowing putting an _ASM_EXTABLE() after
-the main body of the assembly.
+Change all macros of TDCALLs to make them consistent with the spec.  As
+a bonus, they get distinguished easily from the host-side SEAMCALLs,
+which all have prefix "TDH".
 
-This is basically based on Peter's code.
+No functional change intended.
 
-Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/coco/tdx/tdcall.S      | 3 ---
- arch/x86/virt/vmx/tdx/tdxcall.S | 5 +++++
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ arch/x86/coco/tdx/tdx.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/coco/tdx/tdcall.S b/arch/x86/coco/tdx/tdcall.S
-index 2eca5f43734f..e5d4b7d8ecd4 100644
---- a/arch/x86/coco/tdx/tdcall.S
-+++ b/arch/x86/coco/tdx/tdcall.S
-@@ -78,10 +78,7 @@
-  * Return status of TDCALL via RAX.
-  */
- SYM_FUNC_START(__tdx_module_call)
--	FRAME_BEGIN
- 	TDX_MODULE_CALL host=0
--	FRAME_END
--	RET
- SYM_FUNC_END(__tdx_module_call)
+diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
+index 5b8056f6c83f..de021df92009 100644
+--- a/arch/x86/coco/tdx/tdx.c
++++ b/arch/x86/coco/tdx/tdx.c
+@@ -15,11 +15,11 @@
+ #include <asm/pgtable.h>
  
- /*
-diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcall.S
-index 3524915d8bd9..b5ab919c7fa8 100644
---- a/arch/x86/virt/vmx/tdx/tdxcall.S
-+++ b/arch/x86/virt/vmx/tdx/tdxcall.S
-@@ -1,5 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <asm/asm-offsets.h>
-+#include <asm/frame.h>
- #include <asm/tdx.h>
+ /* TDX module Call Leaf IDs */
+-#define TDX_GET_INFO			1
+-#define TDX_GET_VEINFO			3
+-#define TDX_GET_REPORT			4
+-#define TDX_ACCEPT_PAGE			6
+-#define TDX_WR				8
++#define TDG_VP_INFO			1
++#define TDG_VP_VEINFO_GET		3
++#define TDG_MR_REPORT			4
++#define TDG_MEM_PAGE_ACCEPT		6
++#define TDG_VM_WR			8
  
- /*
-@@ -18,6 +19,7 @@
-  *            TDX module.
-  */
- .macro TDX_MODULE_CALL host:req
-+	FRAME_BEGIN
+ /* TDCS fields. To be used by TDG.VM.WR and TDG.VM.RD module calls */
+ #define TDCS_NOTIFY_ENABLES		0x9100000000000010
+@@ -123,7 +123,7 @@ int tdx_mcall_get_report0(u8 *reportdata, u8 *tdreport)
+ {
+ 	u64 ret;
+ 
+-	ret = __tdx_module_call(TDX_GET_REPORT, virt_to_phys(tdreport),
++	ret = __tdx_module_call(TDG_MR_REPORT, virt_to_phys(tdreport),
+ 				virt_to_phys(reportdata), TDREPORT_SUBTYPE_0,
+ 				0, NULL);
+ 	if (ret) {
+@@ -184,7 +184,7 @@ static void tdx_parse_tdinfo(u64 *cc_mask)
+ 	 * Guest-Host-Communication Interface (GHCI), section 2.4.2 TDCALL
+ 	 * [TDG.VP.INFO].
+ 	 */
+-	tdx_module_call(TDX_GET_INFO, 0, 0, 0, 0, &out);
++	tdx_module_call(TDG_VP_INFO, 0, 0, 0, 0, &out);
+ 
  	/*
- 	 * R12 will be used as temporary storage for struct tdx_module_output
- 	 * pointer. Since R12-R15 registers are not used by TDCALL/SEAMCALL
-@@ -91,4 +93,7 @@
- .Lno_output_struct:
- 	/* Restore the state of R12 register */
- 	pop %r12
-+
-+	FRAME_END
-+	RET
- .endm
+ 	 * The highest bit of a guest physical address is the "sharing" bit.
+@@ -626,7 +626,7 @@ void tdx_get_ve_info(struct ve_info *ve)
+ 	 * Note, the TDX module treats virtual NMIs as inhibited if the #VE
+ 	 * valid flag is set. It means that NMI=>#VE will not result in a #DF.
+ 	 */
+-	tdx_module_call(TDX_GET_VEINFO, 0, 0, 0, 0, &out);
++	tdx_module_call(TDG_VP_VEINFO_GET, 0, 0, 0, 0, &out);
+ 
+ 	/* Transfer the output parameters */
+ 	ve->exit_reason = out.rcx;
+@@ -768,7 +768,7 @@ static bool try_accept_one(phys_addr_t *start, unsigned long len,
+ 	}
+ 
+ 	tdcall_rcx = *start | page_size;
+-	if (__tdx_module_call(TDX_ACCEPT_PAGE, tdcall_rcx, 0, 0, 0, NULL))
++	if (__tdx_module_call(TDG_MEM_PAGE_ACCEPT, tdcall_rcx, 0, 0, 0, NULL))
+ 		return false;
+ 
+ 	*start += accept_size;
+@@ -805,7 +805,7 @@ static bool tdx_enc_status_changed(unsigned long vaddr, int numpages, bool enc)
+ 
+ 	/*
+ 	 * For shared->private conversion, accept the page using
+-	 * TDX_ACCEPT_PAGE TDX module call.
++	 * TDG_MEM_PAGE_ACCEPT TDX module call.
+ 	 */
+ 	while (start < end) {
+ 		unsigned long len = end - start;
+@@ -870,7 +870,7 @@ void __init tdx_early_init(void)
+ 	cc_set_mask(cc_mask);
+ 
+ 	/* Kernel does not use NOTIFY_ENABLES and does not need random #VEs */
+-	tdx_module_call(TDX_WR, 0, TDCS_NOTIFY_ENABLES, 0, -1ULL, NULL);
++	tdx_module_call(TDG_VM_WR, 0, TDCS_NOTIFY_ENABLES, 0, -1ULL, NULL);
+ 
+ 	/*
+ 	 * All bits above GPA width are reserved and kernel treats shared bit
 -- 
 2.41.0
 
