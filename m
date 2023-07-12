@@ -2,95 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7603774FEF0
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 08:02:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E87F74FF0A
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 08:09:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbjGLGCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 02:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48770 "EHLO
+        id S232014AbjGLGJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 02:09:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231977AbjGLGCl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 02:02:41 -0400
-Received: from mail.208.org (unknown [183.242.55.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706A6E49
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 23:02:39 -0700 (PDT)
-Received: from mail.208.org (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTP id 4R16bH5JygzBR5lL
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 14:02:35 +0800 (CST)
-Authentication-Results: mail.208.org (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)" header.d=208.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
-        content-transfer-encoding:content-type:message-id:user-agent
-        :references:in-reply-to:subject:to:from:date:mime-version; s=
-        dkim; t=1689141755; x=1691733756; bh=XftksNkbaGgeHrSFH4tY5Gx98LB
-        UKIB1AKJqkGcq9Oc=; b=jBGylL5XVKqXlX04z1cI2Nms+NetQG51vXOVl8B89Vt
-        XYGD+HJ5pdPuCRf8N1tdewfYQBdJ3nQO695FT20sCKueGLtD5lO2RrfyjiDZFHZm
-        DiwX35Y7IQUPMg9r0ng83K+2FheVraei2M/mkrp4MY+RBly+x62VxveDf7K4RNHb
-        FZIYJ6fe1OR20ACfpHmP7SlOIdS5PQOQd1zzRvvXVniqY6uE6xizXmpX5/UVcZ6h
-        L9n6ydg/ug7DjDE2ugH5v8LI5Z72U2j2p86U5hSca/izwrBXbJbJQA8u6JSgRgmo
-        uBivVlR1/T37C5Hc7a9qB4/awQYV6CfYFXhVfays6jw==
-X-Virus-Scanned: amavisd-new at mail.208.org
-Received: from mail.208.org ([127.0.0.1])
-        by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id ByL2FDGa8VPu for <kvm@vger.kernel.org>;
-        Wed, 12 Jul 2023 14:02:35 +0800 (CST)
-Received: from localhost (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTPSA id 4R16bH2L4qzBHXhj;
-        Wed, 12 Jul 2023 14:02:35 +0800 (CST)
+        with ESMTP id S231886AbjGLGIz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 02:08:55 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD23210E;
+        Tue, 11 Jul 2023 23:08:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689142100; x=1720678100;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CH+BgLUDKN7wzFrNHeRudgNib9NyLEvOxPXuiPpSf+Q=;
+  b=I6pLDoddjnuooaSOadDHuJnHk65UhirF9md9PjwFW6Jmn2h1KcDepSoq
+   LpnWX77skwWRw++VBx8p5ZRZWMTL86sYlcMtASi2zkILJoLWSXlpRiEc/
+   06Oku44HYpI1rmlcxHs7Nqt1PzdKW/bWwTs3p5kKRzZI7+rxPi5LksjsB
+   hY4sJi0BQzxH7l7r9h+y4brdHo/2tvnyGJXkYAxwjhSorkVvP85RQ6qxg
+   jmR3FKFezIokCrtX88pyoJv1/ZzFhPLEmG8+2GrYNxmcd0kQEV2N1DxQY
+   fxRmHbL0G7uEVTLujLsHD8hw0PCEgPFUwpUsqLcIRmxxYe1i/EVb8Neml
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="354716213"
+X-IronPort-AV: E=Sophos;i="6.01,198,1684825200"; 
+   d="scan'208";a="354716213"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 23:08:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="895473500"
+X-IronPort-AV: E=Sophos;i="6.01,198,1684825200"; 
+   d="scan'208";a="895473500"
+Received: from qianwen-mobl1.ccr.corp.intel.com (HELO [10.238.5.29]) ([10.238.5.29])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 23:08:17 -0700
+Message-ID: <48951fc1-4e98-b32a-af4f-343b7ea2d44d@intel.com>
+Date:   Wed, 12 Jul 2023 14:08:15 +0800
 MIME-Version: 1.0
-Date:   Wed, 12 Jul 2023 14:02:35 +0800
-From:   shijie001@208suo.com
-To:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org
-Cc:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        seanjc@google.com, pbonzini@redhat.com
-Subject: [PATCH] KVM: x86: Fix error & warning in i8254.h
-In-Reply-To: <tencent_EA89B0582F8F8C3CC33C9F7AE407FC956F09@qq.com>
-References: <tencent_EA89B0582F8F8C3CC33C9F7AE407FC956F09@qq.com>
-User-Agent: Roundcube Webmail
-Message-ID: <f1a0806ffdb74240f9bfbba9f4ece732@208suo.com>
-X-Sender: shijie001@208suo.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v14 072/113] KVM: TDX: handle vcpu migration over logical
+ processor
+Content-Language: en-US
+To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com
+References: <cover.1685333727.git.isaku.yamahata@intel.com>
+ <7a57603a0668ec51a7ac324ab3d1a8acb9863e7b.1685333728.git.isaku.yamahata@intel.com>
+From:   "Wen, Qian" <qian.wen@intel.com>
+In-Reply-To: <7a57603a0668ec51a7ac324ab3d1a8acb9863e7b.1685333728.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
-        DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following checkpatch error & warning are removed:
-WARNING: please, no space before tabs
-ERROR: Macros with complex values should be enclosed in parentheses
+On 5/29/2023 12:19 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> For vcpu migration, in the case of VMX, VMCS is flushed on the source pcpu,
+> and load it on the target pcpu.  There are corresponding TDX SEAMCALL APIs,
+> call them on vcpu migration.  The logic is mostly same as VMX except the
+> TDX SEAMCALLs are used.
+> 
+> When shutting down the machine, (VMX or TDX) vcpus needs to be shutdown on
+> each pcpu.  Do the similar for TDX with TDX SEAMCALL APIs.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/main.c    |  32 ++++++-
+>  arch/x86/kvm/vmx/tdx.c     | 168 +++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/tdx.h     |   2 +
+>  arch/x86/kvm/vmx/x86_ops.h |   4 +
+>  4 files changed, 203 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 17fb1515e56a..29ebd171dbe3 100644
 
-Signed-off-by: Jie Shi <shijie001@208suo.com>
----
-  arch/x86/kvm/i8254.h | 4 ++--
-  1 file changed, 2 insertions(+), 2 deletions(-)
+...
 
-diff --git a/arch/x86/kvm/i8254.h b/arch/x86/kvm/i8254.h
-index a768212ba821..89eab61cfc51 100644
---- a/arch/x86/kvm/i8254.h
-+++ b/arch/x86/kvm/i8254.h
-@@ -27,7 +27,7 @@ struct kvm_kpit_state {
-      struct kvm_kpit_channel_state channels[3];
-      u32 flags;
-      bool is_periodic;
--    s64 period;                 /* unit: ns */
-+    s64 period;                /* unit: ns */
-      struct hrtimer timer;
+> @@ -455,6 +606,19 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+>  		return;
+>  	}
+>  
+> +	/*
+> +	 * kvm_free_vcpus()
+> +	 *   -> kvm_unload_vcpu_mmu()
+> +	 *
+> +	 * does vcpu_load() for every vcpu after they already disassociated
+> +	 * from the per cpu list when tdx_vm_teardown(). So we need to
+> +	 * disassociate them again, otherwise the freed vcpu data will be
+> +	 * accessed when do list_{del,add}() on associated_tdvcpus list
+> +	 * later.
+> +	 */
 
-      struct mutex lock;
-@@ -52,7 +52,7 @@ struct kvm_pit {
-  #define KVM_SPEAKER_BASE_ADDRESS    0x61
-  #define KVM_PIT_MEM_LENGTH        4
-  #define KVM_PIT_FREQ            1193181
--#define KVM_MAX_PIT_INTR_INTERVAL   HZ / 100
-+#define KVM_MAX_PIT_INTR_INTERVAL   (HZ / 100)
-  #define KVM_PIT_CHANNEL_MASK        0x3
+Nit: kvm_free_vcpus() and tdx_vm_teardown() are typos? I don't find these functions.
 
-  struct kvm_pit *kvm_create_pit(struct kvm *kvm, u32 flags);
+> +	tdx_disassociate_vp_on_cpu(vcpu);
+> +	WARN_ON_ONCE(vcpu->cpu != -1);
+> +
+>  	if (tdx->tdvpx_pa) {
+>  		for (i = 0; i < tdx_info.nr_tdvpx_pages; i++) {
+>  			if (tdx->tdvpx_pa[i])
