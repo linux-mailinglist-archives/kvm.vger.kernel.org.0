@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93C20750B96
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 16:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 770FB750C29
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 17:17:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232345AbjGLO7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 10:59:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48406 "EHLO
+        id S233505AbjGLPRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 11:17:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232167AbjGLO7G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 10:59:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AAE1BDC
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 07:59:00 -0700 (PDT)
+        with ESMTP id S233545AbjGLPRD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 11:17:03 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 690791BEC
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 08:17:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7A60E61866
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 14:58:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD619C433C7;
-        Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CB69D6186D
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 15:16:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D072C433C9;
+        Wed, 12 Jul 2023 15:16:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689173931;
-        bh=VH+wL17DqfgPv63hT4ATSxSl0qFL3mV5viNg6cOSxjw=;
+        s=k20201202; t=1689175019;
+        bh=DP4HmVHkInoaugeul8virbqx6nBbrBX3X/YM7Z75CFU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KEFfIwoAEYfH9rwi8B0W0DO5c9Of6f0onYAmCWGwlXrC3QKxAByFnjTEuInTqe0sv
-         aFg7+w/dmrrTK01B78594A3osJmVKEpIS7dVqxw3VpD+e8QOjZ6rVZVG8C/dHIXxcb
-         FbGA0yO+zE5HFX6F/cPfUbElvbuDkxhneTqz13eJSiU66WzwPROV8jaezewa/22S50
-         MRCVUvsELESpPOnrVgICfHWGJpR3m6D44rMZL/kIivY9UKR69/OuHylIArr6cFxY+d
-         hvBZeyIZzn+uyLob5UDmgnrVcUUM2JRdwnV7gR2FWh3t/eyhtmKx02AcPOxomRR63g
-         BIABBHiJZ2IPw==
+        b=P6aMbyv6nNDcRM9MjgLoucL+3Fg2rp2eGHpabsvKQJb8S8+CjwTzl2W5I1y5zb6xA
+         d3i8pZ8h6gmI4Po8rPnorUhdSAdIY3zl/BeZzYHz9nDQLF2L2jO2A1e0ylh5xhwDVd
+         hUBVt4SP81x1+x4H5gpiaigTzmP7XlEqUhiDIqP/c0k/5qBqTVRXK8bwAm2RXpqyRo
+         hldgePWItR56b59Yj/lLqNk171ToOLqQ/Vvb9S64AhA1h/n78tkxJZn9xAIYlP5G8+
+         jIVYdJa9YZO7e1ICmLYaG9GwhLGDxPzYo6J2y30MM5J2L67CiGJPgjx4n3WgILau+W
+         3I54AO7nHxc4w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qJbIo-00CUNF-1j;
+        id 1qJbIo-00CUNF-AA;
         Wed, 12 Jul 2023 15:58:50 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 09/27] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-Date:   Wed, 12 Jul 2023 15:57:52 +0100
-Message-Id: <20230712145810.3864793-10-maz@kernel.org>
+Subject: [PATCH 10/27] arm64: Add feature detection for fine grained traps
+Date:   Wed, 12 Jul 2023 15:57:53 +0100
+Message-Id: <20230712145810.3864793-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -68,8 +68,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -78,168 +78,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we're about to implement full support for FEAT_FGT, add the
-full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
+From: Mark Brown <broonie@kernel.org>
 
+In order to allow us to have shared code for managing fine grained traps
+for KVM guests add it as a detected feature rather than relying on it
+being a dependency of other features.
+
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@kernel.org
 ---
- arch/arm64/include/asm/sysreg.h |   2 -
- arch/arm64/tools/sysreg         | 129 ++++++++++++++++++++++++++++++++
- 2 files changed, 129 insertions(+), 2 deletions(-)
+ arch/arm64/kernel/cpufeature.c | 11 +++++++++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index e2357529c633..6d3d16fac227 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -497,8 +497,6 @@
- #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
- 
- #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
--#define SYS_HDFGRTR_EL2			sys_reg(3, 4, 3, 1, 4)
--#define SYS_HDFGWTR_EL2			sys_reg(3, 4, 3, 1, 5)
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
- #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 65866bf819c3..2517ef7c21cf 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2156,6 +2156,135 @@ Field	1	ICIALLU
- Field	0	ICIALLUIS
- EndSysreg
- 
-+Sysreg HDFGRTR_EL2	3	4	3	1	4
-+Field	63	PMBIDR_EL1
-+Field	62	nPMSNEVFR_EL1
-+Field	61	nBRBDATA
-+Field	60	nBRBCTL
-+Field	59	nBRBIDR
-+Field	58	PMCEIDn_EL0
-+Field	57	PMUSERENR_EL0
-+Field	56	TRBTRG_EL1
-+Field	55	TRBSR_EL1
-+Field	54	TRBPTR_EL1
-+Field	53	TRBMAR_EL1
-+Field	52	TRBLIMITR_EL1
-+Field	51	TRBIDR_EL1
-+Field	50	TRBBASER_EL1
-+Res0	49
-+Field	48	TRCVICTLR
-+Field	47	TRCSTATR
-+Field	46	TRCSSCSRn
-+Field	45	TRCSEQSTR
-+Field	44	TRCPRGCTLR
-+Field	43	TRCOSLSR
-+Res0	42
-+Field	41	TRCIMSPECn
-+Field	40	TRCID
-+Res0	39:38
-+Field	37	TRCCNTVRn
-+Field	36	TRCCLAIM
-+Field	35	TRCAUXCTLR
-+Field	34	TRCAUTHSTATUS
-+Field	33	TRC
-+Field	32	PMSLATFR_EL1
-+Field	31	PMSIRR_EL1
-+Field	30	PMSIDR_EL1
-+Field	29	PMSICR_EL1
-+Field	28	PMSFCR_EL1
-+Field	27	PMSEVFR_EL1
-+Field	26	PMSCR_EL1
-+Field	25	PMBSR_EL1
-+Field	24	PMBPTR_EL1
-+Field	23	PMBLIMITR_EL1
-+Field	22	PMMIR_EL1
-+Res0	21:20
-+Field	19	PMSELR_EL0
-+Field	18	PMOVS
-+Field	17	PMINTEN
-+Field	16	PMCNTEN
-+Field	15	PMCCNTR_EL0
-+Field	14	PMCCFILTR_EL0
-+Field	13	PMEVTYPERn_EL0
-+Field	12	PMEVCNTRn_EL0
-+Field	11	OSDLR_EL1
-+Field	10	OSECCR_EL1
-+Field	9	OSLSR_EL1
-+Res0	8
-+Field	7	DBGPRCR_EL1
-+Field	6	DBGAUTHSTATUS_EL1
-+Field	5	DBGCLAIM
-+Field	4	MDSCR_EL1
-+Field	3	DBGWVRn_EL1
-+Field	2	DBGWCRn_EL1
-+Field	1	DBGBVRn_EL1
-+Field	0	DBGBCRn_EL1
-+EndSysreg
-+
-+Sysreg HDFGWTR_EL2	3	4	3	1	5
-+Res0	63
-+Field	62	nPMSNEVFR_EL1
-+Field	61	nBRBDATA
-+Field	60	nBRBCTL
-+Res0	59:58
-+Field	57	PMUSERENR_EL0
-+Field	56	TRBTRG_EL1
-+Field	55	TRBSR_EL1
-+Field	54	TRBPTR_EL1
-+Field	53	TRBMAR_EL1
-+Field	52	TRBLIMITR_EL1
-+Res0	51
-+Field	50	TRBBASER_EL1
-+Field	49	TRFCR_EL1
-+Field	48	TRCVICTLR
-+Res0	47
-+Field	46	TRCSSCSRn
-+Field	45	TRCSEQSTR
-+Field	44	TRCPRGCTLR
-+Res0	43
-+Field	42	TRCOSLAR
-+Field	41	TRCIMSPECn
-+Res0	40:38
-+Field	37	TRCCNTVRn
-+Field	36	TRCCLAIM
-+Field	35	TRCAUXCTLR
-+Res0	34
-+Field	33	TRC
-+Field	32	PMSLATFR_EL1
-+Field	31	PMSIRR_EL1
-+Res0	30
-+Field	29	PMSICR_EL1
-+Field	28	PMSFCR_EL1
-+Field	27	PMSEVFR_EL1
-+Field	26	PMSCR_EL1
-+Field	25	PMBSR_EL1
-+Field	24	PMBPTR_EL1
-+Field	23	PMBLIMITR_EL1
-+Res0	22
-+Field	21	PMCR_EL0
-+Field	20	PMSWINC_EL0
-+Field	19	PMSELR_EL0
-+Field	18	PMOVS
-+Field	17	PMINTEN
-+Field	16	PMCNTEN
-+Field	15	PMCCNTR_EL0
-+Field	14	PMCCFILTR_EL0
-+Field	13	PMEVTYPERn_EL0
-+Field	12	PMEVCNTRn_EL0
-+Field	11	OSDLR_EL1
-+Field	10	OSECCR_EL1
-+Res0	9
-+Field	8	OSLAR_EL1
-+Field	7	DBGPRCR_EL1
-+Res0	6
-+Field	5	DBGCLAIM
-+Field	4	MDSCR_EL1
-+Field	3	DBGWVRn_EL1
-+Field	2	DBGWCRn_EL1
-+Field	1	DBGBVRn_EL1
-+Field	0	DBGBCRn_EL1
-+EndSysreg
-+
- Sysreg	ZCR_EL2	3	4	1	2	0
- Fields	ZCR_ELx
- EndSysreg
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index f9d456fe132d..0768f98c49cc 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2627,6 +2627,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
+ 	},
++	{
++		.desc = "Fine Grained Traps",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_FGT,
++		.sys_reg = SYS_ID_AA64MMFR0_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR0_EL1_FGT_SHIFT,
++		.field_width = 4,
++		.min_field_value = 1,
++		.matches = has_cpuid_feature,
++	},
+ #ifdef CONFIG_ARM64_SME
+ 	{
+ 		.desc = "Scalable Matrix Extension",
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index c80ed4f3cbce..c3f06fdef609 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -26,6 +26,7 @@ HAS_ECV
+ HAS_ECV_CNTPOFF
+ HAS_EPAN
+ HAS_EVT
++HAS_FGT
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
+ HAS_GENERIC_AUTH_ARCH_QARMA5
 -- 
 2.34.1
 
