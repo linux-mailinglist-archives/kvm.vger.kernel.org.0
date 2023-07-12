@@ -2,65 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 631AF74FD74
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 05:09:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A89374FD85
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 05:13:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231978AbjGLDJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 23:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57442 "EHLO
+        id S232014AbjGLDN0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 23:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231646AbjGLDJi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 23:09:38 -0400
+        with ESMTP id S231674AbjGLDNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 23:13:19 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC141739;
-        Tue, 11 Jul 2023 20:09:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68F193;
+        Tue, 11 Jul 2023 20:13:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689131377; x=1720667377;
+  t=1689131597; x=1720667597;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=EqeRPqMBCcZNqe+1FF45GoQNtxIV6ORKDRV/drrKLWg=;
-  b=iR9VlQRGGAwT5jlDylEOLg81ms1QnISmq8EHklyWGtBLLOY9bs7Y8P4B
-   PYPCoyo3VKUFy1tLsNo8/pINTm9d9LTa5cIHKfdOHE4x6pfTmXkG/GdAQ
-   B88THjqCxRWJqZozPta2u8Ldy1fBQ0DPBwhz5Yrs+3Krezgq8GkBNn7bY
-   nouuxWduE/OjsGH/5ZiKJnMZ0IhX5ZUrdZkcu3S79L0W6nTq8wpg1LRDt
-   gje3bBGyXknbXpBs5Jk7lpXPFN7bu01Cleh4pShQTuUbxQ6aMwFOmD7E/
-   Ax357GGxyWgzR8+R8n3YO0UOMeF+pznVwnFPCZ2JRZZdzDr9ge4Es3F7f
+  bh=rS7yhv7p+ymForwhUax28XnYNPqA/QaWercDDj/Ioks=;
+  b=NMssl0hD2jYm1Gh5gbcRvo3G7+z5ZNnUqMffBG56XrJBBFlCfC+CUjnw
+   TQ5FM7cKyJiOuMBnaGUSQ3CT8K1EctBJOiTHeGI5bAp81BGpEi52GeMzF
+   CXH+TAG+xIpq2PqvgY6tTF+bh2bZ8Rz07Hrw2IrUcIOlCXk3jB4FiN5e2
+   NT16nEkxfUM1bRJqs256pGQlyD89eXUxXYm32vnQ1Ya4Ph5jgdidY1P35
+   GbeJK2tsKPqU9Axx4ek0e69SQKYHlUaA5+7mkLRHl1PcOqMP3FBY+dknZ
+   L7ARmtpMbQey6xmv1MPC0PPQUtwAxPyAmYEXvseD7zq4hQ4+rWLjGvIdO
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="395583651"
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="395584217"
 X-IronPort-AV: E=Sophos;i="6.01,198,1684825200"; 
-   d="scan'208";a="395583651"
+   d="scan'208";a="395584217"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 20:09:33 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 20:13:17 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="724708414"
+X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="724708910"
 X-IronPort-AV: E=Sophos;i="6.01,198,1684825200"; 
-   d="scan'208";a="724708414"
+   d="scan'208";a="724708910"
 Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.252.187.60]) ([10.252.187.60])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 20:09:27 -0700
-Message-ID: <ba68a3e3-da28-969e-2ef2-86fd1706dad4@linux.intel.com>
-Date:   Wed, 12 Jul 2023 11:09:25 +0800
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 20:13:12 -0700
+Message-ID: <e26db44c-ec72-085d-13ee-597237ba2134@linux.intel.com>
+Date:   Wed, 12 Jul 2023 11:13:08 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 9/9] iommu: Use fault cookie to store iopf_param
-Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
         Robin Murphy <robin.murphy@arm.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 9/9] iommu: Use fault cookie to store iopf_param
+Content-Language: en-US
+To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
 References: <20230711010642.19707-1-baolu.lu@linux.intel.com>
  <20230711010642.19707-10-baolu.lu@linux.intel.com>
- <BN9PR11MB5276454AD26C2BDC12CAEDE78C31A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230711150249.62917dad@jacob-builder>
 From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <BN9PR11MB5276454AD26C2BDC12CAEDE78C31A@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <20230711150249.62917dad@jacob-builder>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -74,42 +73,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/7/11 14:26, Tian, Kevin wrote:
->> From: Lu Baolu <baolu.lu@linux.intel.com>
->> Sent: Tuesday, July 11, 2023 9:07 AM
->>
+On 2023/7/12 6:02, Jacob Pan wrote:
+> On Tue, 11 Jul 2023 09:06:42 +0800, Lu Baolu<baolu.lu@linux.intel.com>
+> wrote:
+> 
 >> Remove the static iopf_param pointer from struct iommu_fault_param to
 >> save memory.
-> 
-> why is there memory saving? you replace a single pointer with a xarray now...
-
-iopf_param is duplicate with the fault cookie. So replace it with the
-fault cookie to remove duplication and save memory.
-
-> 
->> @@ -303,16 +303,27 @@ int iopf_queue_add_device(struct iopf_queue
->> *queue, struct device *dev)
 >>
->>   	mutex_lock(&queue->lock);
->>   	mutex_lock(&param->lock);
->> -	if (!param->iopf_param) {
->> -		list_add(&iopf_param->queue_list, &queue->devices);
->> -		param->iopf_param = iopf_param;
->> -		ret = 0;
->> +	curr = iommu_set_device_fault_cookie(dev, 0, iopf_param);
->> +	if (IS_ERR(curr)) {
->> +		ret = PTR_ERR(curr);
->> +		goto err_free;
->>   	}
+>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
+>> ---
+>>   include/linux/iommu.h      |  2 --
+>>   drivers/iommu/io-pgfault.c | 47 +++++++++++++++++++++++---------------
+>>   2 files changed, 29 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index ffd6fe1317f4..5fe37a7c5a55 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -551,7 +551,6 @@ struct iommu_fault_param {
+>>    * struct dev_iommu - Collection of per-device IOMMU data
+>>    *
+>>    * @fault_param: IOMMU detected device fault reporting data
+>> - * @iopf_param:	 I/O Page Fault queue and data
+>>    * @fwspec:	 IOMMU fwspec data
+>>    * @iommu_dev:	 IOMMU device this device is linked to
+>>    * @priv:	 IOMMU Driver private data
+>> @@ -564,7 +563,6 @@ struct iommu_fault_param {
+>>   struct dev_iommu {
+>>   	struct mutex lock;
+>>   	struct iommu_fault_param	*fault_param;
+>> -	struct iopf_device_param	*iopf_param;
+>>   	struct iommu_fwspec		*fwspec;
+>>   	struct iommu_device		*iommu_dev;
+>>   	void				*priv;
+>> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+>> index 1749e0869f2e..6a3a4e08e67e 100644
+>> --- a/drivers/iommu/io-pgfault.c
+>> +++ b/drivers/iommu/io-pgfault.c
+>> @@ -158,7 +158,7 @@ int iommu_queue_iopf(struct iommu_fault *fault,
+>> struct device *dev)
+>>   	 * As long as we're holding param->lock, the queue can't be
+>> unlinked
+>>   	 * from the device and therefore cannot disappear.
+>>   	 */
+>> -	iopf_param = param->iopf_param;
+>> +	iopf_param = iommu_get_device_fault_cookie(dev, 0);
+> I am not sure I understand how does it know the cookie type is iopf_param
+> for PASID 0?
 > 
-> So although the new xarray is called a per-pasid storage, here only
-> slot#0 is used for sva which includes a list containing partial req's
-> for many pasid's. It doesn't sound clean...
+> Between IOPF and IOMMUFD use of the cookie, cookie types are different,
+> right?
+> 
 
-Just to make it generic so that IOMMUFD can also use it. IOMMUFD will
-use it to store the per-{device, pasid} object id (and possibly other
-data) so that it can be quickly retrieved in the critical fault
-delivering patch.
+The fault cookie is managed by the code that delivers or handles the
+faults. The sva and IOMMUFD paths are exclusive.
 
 Best regards,
 baolu
