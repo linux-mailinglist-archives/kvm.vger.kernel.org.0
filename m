@@ -2,65 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23B0574FBAB
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 01:02:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1097374FC13
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 02:28:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbjGKXCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jul 2023 19:02:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43984 "EHLO
+        id S230155AbjGLAXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jul 2023 20:23:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232147AbjGKXCB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jul 2023 19:02:01 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DFD1BCE
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:49 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b8a7735231so64507225ad.1
-        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 16:01:49 -0700 (PDT)
+        with ESMTP id S229521AbjGLAXy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jul 2023 20:23:54 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10882171C
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 17:23:52 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b9de7951easo27922625ad.0
+        for <kvm@vger.kernel.org>; Tue, 11 Jul 2023 17:23:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689116509; x=1691708509;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=NZYUXnjHPmQ/WMoe3NgtL+hMKetCK3WyAi/ewwv+qe0=;
-        b=l44qBzgB6Q7SSsjQQ711GNRtQ8qlOMLsmMgf6zreaVte1Im4NUmW6FKj+LT1tEJ8RO
-         hR+9DexXG3PZhGuIm5YgC4YyxlYUsdSIakurMN/gb2LCu+2WXYx03xTMfim8bjxZ0MYJ
-         m05at+g01AIaxdj8VVc8YP/xE43ba1hHeUTyXRsLXEg1grEM7ikivejicwH32E5WoOaK
-         xbHxFXfDCDUskgotNbrIwV9pvIwQPxYbD6bFoYSJVzsadr7oUWIhKGvNKaFOa9dSEjXT
-         lHfnSzEhc0UQqSEf7zRwCljA/cQwTMMzZz+1ywwFNxq2HQZtxYqFqzU8XPhuHaCYEruo
-         KE1w==
+        d=google.com; s=20221208; t=1689121431; x=1691713431;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ds0aEFrJozDV/A3gP0D2y0rC14J5rwEi5Dw5pCEsing=;
+        b=XobwyjGiSSSuciaAIawQSNUHt0xIyY5c+tc38AqJd9cSUoPPK3i91OOeqmZRXtpGju
+         4W045I4+Cq4eSpfqstF1BaYguMjLv3/3evVtAvLGnFbOrsVhgpdqCJTZjTud3C0z9O1F
+         K/4tGswt0yNfVAMPFenELHyuvb6YJyNmXQW7+2zYh2W2gxV5opkJx9wO0HygjWu0Mpa6
+         0z/GHpVXIHwQSMWg/j8dpRcQlDIwpVKE6bQ5h/H3CgSaa9zeqhMztEzQ+mmypGfouQhm
+         Hf/EcVILUAQMD/yvUKZXlxll4tYrMSxgvgfhX5n+VE3jXxPKSXpj2RVSCdTumOtkAHcJ
+         bDPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689116509; x=1691708509;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NZYUXnjHPmQ/WMoe3NgtL+hMKetCK3WyAi/ewwv+qe0=;
-        b=E9EiDpJ1IvmR/W037hxsocnsAjcvfDOPoegmp8bpBylADPCYZJCgYyZu5iXXMM1D8U
-         KgYi7AlmkQLnXtv2DtwTO2lLOPg0DKBqX5PAZqn04NovZWiy5okpcS6jILkLms6Cwscd
-         5q5r37CtJwxWUmtmzJ33ehTkyfiSduBzv6AWQX6lsteK4TO6swWk0y0fN8PWLbGnuflk
-         Ow+ZpRSVn5BWJJAhOWqDNrVzaXdymWBxiVW4j2iHCIxlAiKebqjrEIpNAb8wIN2OyXPR
-         HJeyaXw8SAuT3VeqzcZGCgQwz5uORtV2wF3Su2RWhtBk1Z5afu00zK0J1996CClhJGmq
-         eKpA==
-X-Gm-Message-State: ABy/qLYPoWTZ9hbSrtmapz6k60zHnzEdcr96DCrtFNUNeLw4/IE6Qta7
-        NSoEMiz5QdonR9QyD6xn+V1351KpSZ4=
-X-Google-Smtp-Source: APBJJlHpwQnUAsfgftTMh1px84YuyX4vmpkN3OpQhjOCUnpxZyihOxV+4Zc6ADNt1Gp/Iop1b2qhlEf0Vs8=
+        d=1e100.net; s=20221208; t=1689121431; x=1691713431;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ds0aEFrJozDV/A3gP0D2y0rC14J5rwEi5Dw5pCEsing=;
+        b=Kgnk5jR6uWy7qP3rAYqWBWbW1xtJ/l6/keVVd7NNtI7PDUvTn/YJxBFDQKaASQLQY+
+         xU772W5JUmzBPbjZe9UZnVCSsbLLHr85ttvTmmUBzFzAWaH9d89mIyAdDlLzdr3u5xj8
+         Bs7OrEQ9M9UtclGYbKif3Oo++PrL41PPwrab0GY84ZY8hYape6o2nbjhhA+4RvRHeoMS
+         Jiy65aTr+gTyDBQwQjxbo3TRVotJnSb9rX8lzOfuyBYahbIirwr0GWPSa6LSiYbAQc+O
+         1Lmdz3ls17OamnvUtJ29xeML74l6q9MAqzXlACUoUeMiLdPZn3JqV63IkNJvSZqPDfmi
+         yr/A==
+X-Gm-Message-State: ABy/qLY4Mxq4LNzegEWa4gAd+FB0V2SoL+7pcXp1igl125QBAZB6mlHY
+        EU9bzZ041ZnxL00gtGGARdh/UnFjMzCyN/H7p5nLsScWCWmGacjxTgSVNqLu8lAg5gXAFrdTtn+
+        OXZ4MjO8fUeMWMglqo97Fa1VHSRALNM86EKbzQOsjzq4H6JJkTgiL9YcjAQ==
+X-Google-Smtp-Source: APBJJlFWZiAVE/LORxHqV6F1DJr/fdbicVW3J4ypsK7k2ZFpuiYk2xc1DoJxaBc9RROqQ6BJ15nEO2Kvolg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:a417:b0:1b8:8cd9:5355 with SMTP id
- p23-20020a170902a41700b001b88cd95355mr12083294plq.6.1689116508764; Tue, 11
- Jul 2023 16:01:48 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:903:2441:b0:1b8:a758:3020 with SMTP id
+ l1-20020a170903244100b001b8a7583020mr14074336pls.12.1689121431037; Tue, 11
+ Jul 2023 17:23:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 11 Jul 2023 16:01:31 -0700
-In-Reply-To: <20230711230131.648752-1-seanjc@google.com>
+Date:   Tue, 11 Jul 2023 17:23:47 -0700
 Mime-Version: 1.0
-References: <20230711230131.648752-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230711230131.648752-8-seanjc@google.com>
-Subject: [PATCH 7/7] KVM: selftests: Verify stats fd is usable after VM fd has
- been closed
+Message-ID: <20230712002347.656854-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2023.07.11 - CANCELED
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zheng Zhang <zheng.zhang@email.ucr.edu>,
-        Kees Cook <keescook@chromium.org>,
-        Sean Christopherson <seanjc@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -73,43 +69,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that VM and vCPU binary stats files are usable even after userspace
-has put its last direct reference to the VM.  This is a regression test
-for a UAF bug where KVM didn't gift the stats files a reference to the VM.
+Apologies for the late notice, and for canceling again, which I said I wasn't
+going to do.  I wanted to discuss guest_mem() development this week, but I
+didn't get my prep work done in time.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/kvm_binary_stats_test.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Next week, I want to like to discuss the KVM MC, specifically how we want to
+utilize the 3 hours, as well as coordinating guest_mem() development.  I'll get
+confirmation off-list that we'll have enough of a quorum to have a worthwhile
+discussion on one or both topics.
 
-diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-index 5317e27b77d0..698c1cfa3111 100644
---- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-+++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
-@@ -252,6 +252,14 @@ int main(int argc, char *argv[])
- 			stats_test(vcpu_get_stats_fd(vcpus[i * max_vcpu + j]));
- 		}
- 
-+		/*
-+		 * Close the VM fd and redo the stats tests.  KVM should gift a
-+		 * reference (to the VM) to each stats fd, i.e. stats should
-+		 * still be accessible even after userspace has put its last
-+		 * _direct_ reference to the VM.
-+		 */
-+		kvm_vm_free(vms[i]);
-+
- 		stats_test(vm_stats_fds);
- 		for (j = 0; j < max_vcpu; ++j)
- 			stats_test(vcpu_stats_fds[j]);
-@@ -259,8 +267,6 @@ int main(int argc, char *argv[])
- 		ksft_test_result_pass("vm%i\n", i);
- 	}
- 
--	for (i = 0; i < max_vm; ++i)
--		kvm_vm_free(vms[i]);
- 	free(vms);
- 	free(vcpus);
- 	free(vcpu_stats_fds);
--- 
-2.41.0.255.g8b1d071c50-goog
-
+Future Schedule:
+July 19th - KVM MC format, guest_mem() development
+July 26th - Available 
+August 2nd - Available
+August 9th - Available
