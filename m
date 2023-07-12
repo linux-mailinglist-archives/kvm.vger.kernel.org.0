@@ -2,116 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 782057507C2
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 14:12:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F018C7509B8
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 15:39:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232004AbjGLMMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 08:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33258 "EHLO
+        id S232466AbjGLNjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 09:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232255AbjGLMMF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 08:12:05 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6063E5F;
-        Wed, 12 Jul 2023 05:12:02 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36CBgLvI016373;
-        Wed, 12 Jul 2023 12:12:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=tltQXugxcZeoO8dwlag/RdnQKSKFt0PN5wxaRNpTQLE=;
- b=IFSoiMmyi9a0TZ4NBySuasNEDApH7Xe3fYRELBYvTq9fZIEQkOQVxE5Q93UsZ2qob+J/
- CBtRy9DBg8HY8A/cV+7fM6EbtJdrJMrgrkUeQU+I/UjvGPvB0vAsBUhuZJXheQuWwFW0
- /lednIMbaGXLVgno+J/yFU9oLrjZOGQt5QHheIWz8rQdVCd0nCsk/dNHGIJRoQCVInYb
- sblQz12vpaOpGeEjvGzqXk8ocNyHfKWBT58vutijw63b36Sn7xWZmyov0xGceFa++aCI
- UmhGyEUyXYeum3jyMOMV2XJPWVx035A+ZtU1iXF2Yh2ZGrPAK4HCSwF+bJnMviQ2Wq9l Og== 
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rsuhhrtt5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 12:12:01 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36CBY54Z020388;
-        Wed, 12 Jul 2023 12:06:58 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3rpye59waq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Jul 2023 12:06:58 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36CC6rqw31785322
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Jul 2023 12:06:53 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A8632004B;
-        Wed, 12 Jul 2023 12:06:53 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CC8A220043;
-        Wed, 12 Jul 2023 12:06:52 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 12 Jul 2023 12:06:52 +0000 (GMT)
-Date:   Wed, 12 Jul 2023 14:06:51 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mhartmay@linux.ibm.com,
-        nsg@linux.ibm.com, borntraeger@de.ibm.com, nrb@linux.ibm.com
-Subject: Re: [PATCH v2 2/2] KVM: s390: pv: fix index value of replaced ASCE
-Message-ID: <20230712140651.37d84e5d@p-imbrenda>
-In-Reply-To: <e3daf6b9-c7e9-89f3-b6ab-d8cf89de0b86@linux.ibm.com>
-References: <20230705111937.33472-1-imbrenda@linux.ibm.com>
-        <20230705111937.33472-3-imbrenda@linux.ibm.com>
-        <e3daf6b9-c7e9-89f3-b6ab-d8cf89de0b86@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S232520AbjGLNjb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 09:39:31 -0400
+Received: from mail.208.org (unknown [183.242.55.162])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F05C19B4
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 06:39:28 -0700 (PDT)
+Received: from mail.208.org (email.208.org [127.0.0.1])
+        by mail.208.org (Postfix) with ESMTP id 4R1JkN5lN5zBR7bH
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 21:39:24 +0800 (CST)
+Authentication-Results: mail.208.org (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)" header.d=208.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
+        content-transfer-encoding:content-type:message-id:user-agent
+        :references:in-reply-to:subject:to:from:date:mime-version; s=
+        dkim; t=1689169164; x=1691761165; bh=/UeUJ1f7hroFyIuieneXVutLeIx
+        IgeB0rY2bsGxmm5E=; b=IYaEUMUe1ZFauc6hj1TuFr9o2tMxm0uf6N0RUuw3r14
+        hg2E10eXAEMmw/7DrJKoOkN8iZLlIyNZZexZxV3TEgSo+TxK3YHGJ5gmt4Zee4Gf
+        L4cForHjiIdv4wJ9MtODBe25P8Cf1RcHVFWda4UPLcZhXqK0Sdc4u8d2oTbcBDg/
+        MT0NyhwR+tcEipfApmJcMjZMa4g1RlrEId3iTojMI2iJ4FKzG4h4ZcR0LbBDgHuQ
+        QMAwflO/hUmcGkfYnd0yAAGV1a/kL7K4m8exFn7tWdHnKy0dnPcQSv5Y6RCVEUTR
+        PX7IJjsULm2I1/zqROVnVZCUIS9++XCgZ8tQ46Ujmhw==
+X-Virus-Scanned: amavisd-new at mail.208.org
+Received: from mail.208.org ([127.0.0.1])
+        by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id M_rSBpn42c4M for <kvm@vger.kernel.org>;
+        Wed, 12 Jul 2023 21:39:24 +0800 (CST)
+Received: from localhost (email.208.org [127.0.0.1])
+        by mail.208.org (Postfix) with ESMTPSA id 4R1JkN2dtFzBR7b8;
+        Wed, 12 Jul 2023 21:39:24 +0800 (CST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Date:   Wed, 12 Jul 2023 21:39:24 +0800
+From:   huzhi001@208suo.com
+To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org
+Cc:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] SVM: Fix warnings in svm.h
+In-Reply-To: <tencent_B97FAD99B25D9BCC5AB9EA89BA04061D7B07@qq.com>
+References: <tencent_B97FAD99B25D9BCC5AB9EA89BA04061D7B07@qq.com>
+User-Agent: Roundcube Webmail
+Message-ID: <e541a2b2fe55ade4277f34fa64953683@208suo.com>
+X-Sender: huzhi001@208suo.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Shp0wLu6T1-ef94pjMgPiBBL6MSo6_oc
-X-Proofpoint-ORIG-GUID: Shp0wLu6T1-ef94pjMgPiBBL6MSo6_oc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-12_07,2023-07-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 mlxlogscore=918 clxscore=1015 mlxscore=0 phishscore=0
- adultscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307120108
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Jul 2023 13:58:49 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+The following checkpatch warnings are removed:
+WARNING: Prefer __packed over __attribute__((__packed__))
 
-> On 7/5/23 13:19, Claudio Imbrenda wrote:
-> > The index field of the struct page corresponding to a guest ASCE should
-> > be 0. When replacing the ASCE in s390_replace_asce(), the index of the
-> > new ASCE should also be set to 0.
-> > 
-> > Having the wrong index might lead to the wrong addresses being passed
-> > around when notifying pte invalidations, and eventually to validity
-> > intercepts (VM crash) if the prefix gets unmapped and the notifier gets
-> > called with the wrong address.
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
-> 
-> No fixes tag?
+Signed-off-by: ZhiHu <huzhi001@208suo.com>
+---
+  arch/x86/include/asm/svm.h | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-oops, you're right
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e7c7379d6ac7..7ecebccf8a83 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -119,7 +119,7 @@ enum {
+  };
 
-Fixes: faa2f72cb356 ("KVM: s390: pv: leak the topmost page table when
-destroy fails")
-
-
-> 
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> 
-
+-struct __attribute__ ((__packed__)) vmcb_control_area {
++struct __packed vmcb_control_area {
+      u32 intercepts[MAX_INTERCEPT];
+      u32 reserved_1[15 - MAX_INTERCEPT];
+      u16 pause_filter_thresh;
