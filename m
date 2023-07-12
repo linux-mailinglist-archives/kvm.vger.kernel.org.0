@@ -2,67 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A5E47511A2
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 22:05:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48C377511A7
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 22:06:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232720AbjGLUEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 16:04:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43898 "EHLO
+        id S231836AbjGLUGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 16:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231602AbjGLUEv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 16:04:51 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5271FE4
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 13:04:50 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-55c85b53219so28562a12.0
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 13:04:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1689192290; x=1691784290;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O2bP4FrSa/tMRfra6gyMcKmFEKjFt+SejG9bgvuc104=;
-        b=blCpgqFQrYp3ZwfMlAfta5ZoQm+9hdBurc5h/OVxTVLnT+FmS33fWf2B53pSFgLCc3
-         IDTfJwHMxmMP0lTo0MT0CK1hKF0KObeYFt7EwnmRkS5CiNRje0+uTgpFDyRw48Xl24+T
-         pTWl9j9boIgO7sISR2+FooRd5oAmYs0zSk1yE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689192290; x=1691784290;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O2bP4FrSa/tMRfra6gyMcKmFEKjFt+SejG9bgvuc104=;
-        b=GTk49dxJb6vIUeEvfLjKmjg1j7N3HvOInfK/hpXPrJa7uMpVR9anDOsfyTjzGbs5/C
-         Cta0Eet6tCwgCFruqPPReNEDCRMIZ+kpwE8ySQwhJ+1ZW41MN5gI+obtfhNl8WU4yZ05
-         qYesD1vKijShUa8aY+ZroXDd5CKhe04r7DVJghLgbbJdJetzIKrgZwg1vbQODYtQC9vO
-         Z0qp+IZa5IwsG1GZ0BocOGh6odtvlJfoSDDEN196nk3Gf7IlULghXXg093NAot7e0ApP
-         qPYJJcg4rU6PhS3wpT1hYmVqX/5MMe5B4Skw2ubK3vUmLEId1erjYgSsUOh5wMpOMdhc
-         4RjQ==
-X-Gm-Message-State: ABy/qLa7Se4D8EjdpU9aND570ec+1hKM7w0Dd+78SMF+fE3s8C6baeDa
-        7RO54ay5RAU3/WMUGiNCCzzZ2w==
-X-Google-Smtp-Source: APBJJlEFcbL/I1keeccNKgOeWSTqzmfmg1AA+pifisunZTA888Iovl0kJq6Hck30Ew+Wwubxzpgr1g==
-X-Received: by 2002:a17:90a:bc84:b0:263:7d4a:4d43 with SMTP id x4-20020a17090abc8400b002637d4a4d43mr2537145pjr.1.1689192289698;
-        Wed, 12 Jul 2023 13:04:49 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id 21-20020a17090a035500b00265d023c233sm3613496pjf.6.2023.07.12.13.04.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 13:04:49 -0700 (PDT)
-Date:   Wed, 12 Jul 2023 13:04:48 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zheng Zhang <zheng.zhang@email.ucr.edu>
-Subject: Re: [PATCH 1/7] KVM: Grab a reference to KVM for VM and vCPU stats
- file descriptors
-Message-ID: <202307121303.85C768B3BD@keescook>
-References: <20230711230131.648752-1-seanjc@google.com>
- <20230711230131.648752-2-seanjc@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711230131.648752-2-seanjc@google.com>
+        with ESMTP id S229880AbjGLUGN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 16:06:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B96F1FE6
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 13:06:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 214B6618F8
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 20:06:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84AB0C433C7;
+        Wed, 12 Jul 2023 20:06:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689192371;
+        bh=cHVf3yeITRqxsgrS58hExLzmnwwO0E8oGYcaFus6958=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iAxENWyZywKL1WAKLtVXG4U2ZA0kPkAUMLVlQmxoI5hud4lfpY8qMgPPLjnjmAWuX
+         SFkiuQMMmp16w9oOgxUBg4EsEt3ARlyN1HxV1Pw0IVNXsJT2SxrmkC2UgMZnFpXvtB
+         EXHY2LLqYh+3TJTwXrWu+otMX8Ydq0w78lhdUXAB18XG52uy1WKNF+0SStvUKyGK+1
+         k86/tflefJrULaYJBDWJCp+TRbmwzfBgSgYSPQ85DeKck2GBd24fQyL0hwvtAXc/fa
+         5V17ighNR2SUV2g248JqcFHB3tY0XUQOtAjeXcfW20JZBvkZsJ9Ti2ZAM1zSS2fux+
+         FZHYJpy0Fx4+A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qJg6D-00CajL-5B;
+        Wed, 12 Jul 2023 21:06:09 +0100
+Date:   Wed, 12 Jul 2023 21:06:08 +0100
+Message-ID: <87edlcao9b.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
+In-Reply-To: <b9ccca23-65d5-4ed1-976e-63d51e3457e3@sirena.org.uk>
+References: <20230712145810.3864793-1-maz@kernel.org>
+        <20230712145810.3864793-15-maz@kernel.org>
+        <b9ccca23-65d5-4ed1-976e-63d51e3457e3@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,26 +82,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 04:01:25PM -0700, Sean Christopherson wrote:
-> Grab a reference to KVM prior to installing VM and vCPU stats file
-> descriptors to ensure the underlying VM and vCPU objects are not freed
-> until the last reference to any and all stats fds are dropped.
+On Wed, 12 Jul 2023 18:15:41 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Note, the stats paths manually invoke fd_install() and so don't need to
-> grab a reference before creating the file.
+> On Wed, Jul 12, 2023 at 03:57:57PM +0100, Marc Zyngier wrote:
+>
+> > As we're about to majorly extend the handling of FGT registers,
+> > restructure the code to actually save/restore the registers
+> > as required. This is made easy thanks to the previous addition
+> > of the EL2 registers, allowing us to use the host context for
+> > this purpose.
 > 
-> Fixes: ce55c049459c ("KVM: stats: Support binary stats retrieval for a VCPU")
-> Fixes: fcfe1baeddbf ("KVM: stats: Support binary stats retrieval for a VM")
-> Reported-by: Zheng Zhang <zheng.zhang@email.ucr.edu>
-> Closes: https://lore.kernel.org/all/CAC_GQSr3xzZaeZt85k_RCBd5kfiOve8qXo7a81Cq53LuVQ5r=Q@mail.gmail.com
-> Cc: stable@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > +/*
+> > + * FGT register definitions
+> > + *
+> > + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+> > + * We're not using the generated masks as they are usually ahead of
+> > + * the published ARM ARM, which we use as a reference.
+> > + *
+> > + * Once we get to a point where the two describe the same thing, we'll
+> > + * merge the definitions. One day.
+> > + */
+> 
+> What's the issue here?  The generated definitions should be aligned with
+> what's published in DDI0601.  That AIUI exists in large part due to
+> concerns people were having with the amount of time it can take to fold
+> new features into the ARM, it's official.
 
-Thanks for preparing this! Looks like the common get/put code pattern,
-so I can review this patch, unlike the rest of the series. :)
+For multiple reasons:
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+- What's published as DDI0601 is a list of registers, without any
+  context and no relation to the wider architecture (it is basically
+  the XML dumped as a PDF). That's not enough to implement the
+  architecture as it is missing all the content of the engineering
+  specs, which are not public documents.
+
+- I have no motivation in supporting the latest and greatest. NV is
+  hard enough without all the (still evolving) crop of 8.9/9.4
+  extensions.  As long as what I have is a legal implementation and
+  runs on the HW I have access to, that's good enough for me.
+
+- I want to look at a single document and support what's in there. Not
+  two. Because it is hard enough to follow when you're implementing
+  this crap, and even harder for someone trying to review it.
+
+So I firmly intend to totally ignore most of what's outside of the
+published ARM ARM unless it makes my life so much easier that I can't
+afford not to implement it.
+
+	M.
 
 -- 
-Kees Cook
+Without deviation from the norm, progress is not possible.
