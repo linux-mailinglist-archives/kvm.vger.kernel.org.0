@@ -2,85 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8789E75018B
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 10:31:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A1B37501CD
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 10:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232702AbjGLIbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 04:31:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58660 "EHLO
+        id S232887AbjGLIi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 04:38:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231497AbjGLIbJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 04:31:09 -0400
-Received: from mail.208.org (unknown [183.242.55.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293352702
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 01:26:17 -0700 (PDT)
-Received: from mail.208.org (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTP id 4R19n228kvzBS5qp
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 16:26:14 +0800 (CST)
-Authentication-Results: mail.208.org (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)" header.d=208.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
-        content-transfer-encoding:content-type:message-id:user-agent
-        :references:in-reply-to:subject:to:from:date:mime-version; s=
-        dkim; t=1689150374; x=1691742375; bh=oltV5Rd5AD0T6xUiH4VHdUcjoRX
-        Ryw0tUkvVw8Y4vQY=; b=l0IWnV4ACmHpyX7cI2eWSd4hZuu4q+WvuoJl5Vf0ExK
-        fImaInY2EcoSrQ8NhfTm+6xQHPYEEFNNuw6ztno++J0WaPkCphQrAsRUt2a6xKkM
-        X75ttgsMd5e83BjOcpTsGpeM36bBB1Lu1yXti+h1sBGq1WNFz/sy2B35e0D4FHqO
-        OPa6Iu3DN20plWLY76/lAnJ/mkThpoMv3yclxlDu+SZDENSOBD9CWqeYBVNqshVY
-        0gMjCb64NB9W1G79xz+SP2I+UVG6RkWrVZMEp8cSdOMdB7kM/T9o9ZS6FDiBB5gZ
-        ZpEPbiS+zarATEeE14eblkJnrFB9mUAYwmFn+EszG6A==
-X-Virus-Scanned: amavisd-new at mail.208.org
-Received: from mail.208.org ([127.0.0.1])
-        by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id LR4RsT7fcuh2 for <kvm@vger.kernel.org>;
-        Wed, 12 Jul 2023 16:26:14 +0800 (CST)
-Received: from localhost (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTPSA id 4R19n16GhtzBR5lP;
-        Wed, 12 Jul 2023 16:26:13 +0800 (CST)
-MIME-Version: 1.0
-Date:   Wed, 12 Jul 2023 16:26:13 +0800
-From:   shijie001@208suo.com
-To:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org
-Cc:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Fix warnings in pmu.h
-In-Reply-To: <tencent_C12CFA09493ED8DFE9D60EEBEE92C7E82605@qq.com>
-References: <tencent_C12CFA09493ED8DFE9D60EEBEE92C7E82605@qq.com>
-User-Agent: Roundcube Webmail
-Message-ID: <9ffeb53096b6caf0323e4d7bd452ef76@208suo.com>
-X-Sender: shijie001@208suo.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
-        DKIM_SIGNED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S232486AbjGLIhs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 04:37:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4A21987
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 01:36:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 32F6A60DD5
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 08:36:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 936E1C43391;
+        Wed, 12 Jul 2023 08:36:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689150983;
+        bh=l4Kn5TJNw7wRZQEm7UHDmvbXG/8WcpDSoZhthGLfRuE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=f0CjJVpY1M7J6wrW8dwqoMGBefRQDFZP7/lgdcgjlxvO/iLSzZ2qyZGjEt7/WLwj8
+         VbAg8kyEWcodQDcIeIcU1aGehZqzPrdjYXUHBpHzzy3Ivm01tnI79o3qB9j63rE/0B
+         PEARe0FYbXV2Zr7ctf+alraOt9hl5B/167jUbdsg4EuyPhM5gmzTU44DdRrvo6T+yQ
+         YNcckB0acQQweV0DI4MN6DOKknbPutL5c4AHKltn7/o+628XXszbW7xwF1hzbFcM6/
+         yG2vFh7q+0nh6MFwBbgN4zESEZlTVwQoD12tE5Aq0qDDrwwOxUtT+7wXMYHfuoR6Lj
+         pHz7DKJII0F9g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qJVKf-00CNbK-3G;
+        Wed, 12 Jul 2023 09:36:21 +0100
+Date:   Wed, 12 Jul 2023 09:36:20 +0100
+Message-ID: <868rblwmpn.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     chenxiang <chenxiang66@hisilicon.com>
+Cc:     <oliver.upton@linux.dev>, <james.morse@arm.com>,
+        <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Fix the name of sys_reg_desc related to PMU
+In-Reply-To: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
+References: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: chenxiang66@hisilicon.com, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following checkpatch warning is removed:
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
+On Wed, 12 Jul 2023 08:55:05 +0100,
+chenxiang <chenxiang66@hisilicon.com> wrote:
+> 
+> From: Xiang Chen <chenxiang66@hisilicon.com>
+> 
+> For those PMU system registers defined in sys_reg_descs[], use macro
+> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
+> later two macros call macro PMU_SYS_REG() actually.
+> Currently the input parameter of PMU_SYS_REG() is other macro which is
+> calculation formula of the value of system registers, so for example, if 
+> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually 
+> the name will be as following:
+> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+> 
+> To fix the issue, use the name as a input parameter of PMU_SYS_REG like
+> MTE_REG or EL2_REG.
 
-Signed-off-by: Jie Shi <shijie001@208suo.com>
----
-  arch/x86/kvm/pmu.h | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
+Why is the name relevant? Is this related to tracing?
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 7d9ba301c090..dbc131b378f2 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -249,7 +249,7 @@ static inline bool pmc_is_globally_enabled(struct 
-kvm_pmc *pmc)
+	M.
 
-  void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
-  void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
--int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
-+int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned int pmc, u64 *data);
-  bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int 
-idx);
-  bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
-  int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+-- 
+Without deviation from the norm, progress is not possible.
