@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1DB3750B95
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 16:59:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93C20750B96
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 16:59:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232276AbjGLO7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 10:59:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48394 "EHLO
+        id S232345AbjGLO7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 10:59:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232224AbjGLO7F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 10:59:05 -0400
+        with ESMTP id S232167AbjGLO7G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 10:59:06 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA33B1BD5
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 07:58:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AAE1BDC
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 07:59:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 45DB461843
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7A60E61866
         for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 14:58:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE51C43391;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD619C433C7;
         Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1689173931;
-        bh=d8wIl9lTuWwNMtBBjm2pAq8N/AAPYD5w2LQCFNLPZzk=;
+        bh=VH+wL17DqfgPv63hT4ATSxSl0qFL3mV5viNg6cOSxjw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uBTecaE4NkiVuMY92JmBxuyIpQgUZMxWI0cq3PMOlbSmPXCMNxQcMywQYp9/7cLS1
-         tNNWjS9D3F/9ZFz9qUDF1EeJ0r5TJzQK7BhLEVTM7cgy3qzzKmbo8QGyVSNxn5UjSb
-         dCX+d9B/vXFaFYrl2xSEnptQOk/B1UEw4eTxndYb2nuzts4o4beIUK0Bfs7fywxb96
-         mpVeMJgnZEGqS4Zj749Vb9JVFsMa5TuQcLCxlOpAU/GZAcJ8PvHR+5I9QEOHcnU8WY
-         WinNnv792Ngf9L9WpJ875CGJabdGeZ3P37fOFARtBpIZZ7WYqIkp1stE0AhevoKIM0
-         flFHQ3oYJWmPA==
+        b=KEFfIwoAEYfH9rwi8B0W0DO5c9Of6f0onYAmCWGwlXrC3QKxAByFnjTEuInTqe0sv
+         aFg7+w/dmrrTK01B78594A3osJmVKEpIS7dVqxw3VpD+e8QOjZ6rVZVG8C/dHIXxcb
+         FbGA0yO+zE5HFX6F/cPfUbElvbuDkxhneTqz13eJSiU66WzwPROV8jaezewa/22S50
+         MRCVUvsELESpPOnrVgICfHWGJpR3m6D44rMZL/kIivY9UKR69/OuHylIArr6cFxY+d
+         hvBZeyIZzn+uyLob5UDmgnrVcUUM2JRdwnV7gR2FWh3t/eyhtmKx02AcPOxomRR63g
+         BIABBHiJZ2IPw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qJbIn-00CUNF-OV;
-        Wed, 12 Jul 2023 15:58:49 +0100
+        id 1qJbIo-00CUNF-1j;
+        Wed, 12 Jul 2023 15:58:50 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -56,9 +56,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 08/27] arm64: Fix HFGxTR_EL2 field naming
-Date:   Wed, 12 Jul 2023 15:57:51 +0100
-Message-Id: <20230712145810.3864793-9-maz@kernel.org>
+Subject: [PATCH 09/27] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+Date:   Wed, 12 Jul 2023 15:57:52 +0100
+Message-Id: <20230712145810.3864793-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -78,60 +78,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The HFGxTR_EL2 fields do not always follow the naming described
-in the spec, nor do they match the name of the register they trap
-in the rest of the kernel.
+As we're about to implement full support for FEAT_FGT, add the
+full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
 
-It is a bit sad that they were written by hand despite the availability
-of a machine readable version...
-
-Fixes: cc077e7facbe ("arm64/sysreg: Convert HFG[RW]TR_EL2 to automatic generation")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/arm64/tools/sysreg | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/sysreg.h |   2 -
+ arch/arm64/tools/sysreg         | 129 ++++++++++++++++++++++++++++++++
+ 2 files changed, 129 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index e2357529c633..6d3d16fac227 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -497,8 +497,6 @@
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+ 
+ #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+-#define SYS_HDFGRTR_EL2			sys_reg(3, 4, 3, 1, 4)
+-#define SYS_HDFGWTR_EL2			sys_reg(3, 4, 3, 1, 5)
+ #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+ #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 1ea4a3dc68f8..65866bf819c3 100644
+index 65866bf819c3..2517ef7c21cf 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -2017,7 +2017,7 @@ Field	0	SM
+@@ -2156,6 +2156,135 @@ Field	1	ICIALLU
+ Field	0	ICIALLUIS
  EndSysreg
  
- SysregFields	HFGxTR_EL2
--Field	63	nAMIAIR2_EL1
-+Field	63	nAMAIR2_EL1
- Field	62	nMAIR2_EL1
- Field	61	nS2POR_EL1
- Field	60	nPOR_EL1
-@@ -2032,9 +2032,9 @@ Field	52	nGCS_EL0
- Res0	51
- Field	50	nACCDATA_EL1
- Field	49	ERXADDR_EL1
--Field	48	EXRPFGCDN_EL1
--Field	47	EXPFGCTL_EL1
--Field	46	EXPFGF_EL1
-+Field	48	ERXPFGCDN_EL1
-+Field	47	ERXPFGCTL_EL1
-+Field	46	ERXPFGF_EL1
- Field	45	ERXMISCn_EL1
- Field	44	ERXSTATUS_EL1
- Field	43	ERXCTLR_EL1
-@@ -2049,8 +2049,8 @@ Field	35	TPIDR_EL0
- Field	34	TPIDRRO_EL0
- Field	33	TPIDR_EL1
- Field	32	TCR_EL1
--Field	31	SCTXNUM_EL0
--Field	30	SCTXNUM_EL1
-+Field	31	SCXTNUM_EL0
-+Field	30	SCXTNUM_EL1
- Field	29	SCTLR_EL1
- Field	28	REVIDR_EL1
- Field	27	PAR_EL1
++Sysreg HDFGRTR_EL2	3	4	3	1	4
++Field	63	PMBIDR_EL1
++Field	62	nPMSNEVFR_EL1
++Field	61	nBRBDATA
++Field	60	nBRBCTL
++Field	59	nBRBIDR
++Field	58	PMCEIDn_EL0
++Field	57	PMUSERENR_EL0
++Field	56	TRBTRG_EL1
++Field	55	TRBSR_EL1
++Field	54	TRBPTR_EL1
++Field	53	TRBMAR_EL1
++Field	52	TRBLIMITR_EL1
++Field	51	TRBIDR_EL1
++Field	50	TRBBASER_EL1
++Res0	49
++Field	48	TRCVICTLR
++Field	47	TRCSTATR
++Field	46	TRCSSCSRn
++Field	45	TRCSEQSTR
++Field	44	TRCPRGCTLR
++Field	43	TRCOSLSR
++Res0	42
++Field	41	TRCIMSPECn
++Field	40	TRCID
++Res0	39:38
++Field	37	TRCCNTVRn
++Field	36	TRCCLAIM
++Field	35	TRCAUXCTLR
++Field	34	TRCAUTHSTATUS
++Field	33	TRC
++Field	32	PMSLATFR_EL1
++Field	31	PMSIRR_EL1
++Field	30	PMSIDR_EL1
++Field	29	PMSICR_EL1
++Field	28	PMSFCR_EL1
++Field	27	PMSEVFR_EL1
++Field	26	PMSCR_EL1
++Field	25	PMBSR_EL1
++Field	24	PMBPTR_EL1
++Field	23	PMBLIMITR_EL1
++Field	22	PMMIR_EL1
++Res0	21:20
++Field	19	PMSELR_EL0
++Field	18	PMOVS
++Field	17	PMINTEN
++Field	16	PMCNTEN
++Field	15	PMCCNTR_EL0
++Field	14	PMCCFILTR_EL0
++Field	13	PMEVTYPERn_EL0
++Field	12	PMEVCNTRn_EL0
++Field	11	OSDLR_EL1
++Field	10	OSECCR_EL1
++Field	9	OSLSR_EL1
++Res0	8
++Field	7	DBGPRCR_EL1
++Field	6	DBGAUTHSTATUS_EL1
++Field	5	DBGCLAIM
++Field	4	MDSCR_EL1
++Field	3	DBGWVRn_EL1
++Field	2	DBGWCRn_EL1
++Field	1	DBGBVRn_EL1
++Field	0	DBGBCRn_EL1
++EndSysreg
++
++Sysreg HDFGWTR_EL2	3	4	3	1	5
++Res0	63
++Field	62	nPMSNEVFR_EL1
++Field	61	nBRBDATA
++Field	60	nBRBCTL
++Res0	59:58
++Field	57	PMUSERENR_EL0
++Field	56	TRBTRG_EL1
++Field	55	TRBSR_EL1
++Field	54	TRBPTR_EL1
++Field	53	TRBMAR_EL1
++Field	52	TRBLIMITR_EL1
++Res0	51
++Field	50	TRBBASER_EL1
++Field	49	TRFCR_EL1
++Field	48	TRCVICTLR
++Res0	47
++Field	46	TRCSSCSRn
++Field	45	TRCSEQSTR
++Field	44	TRCPRGCTLR
++Res0	43
++Field	42	TRCOSLAR
++Field	41	TRCIMSPECn
++Res0	40:38
++Field	37	TRCCNTVRn
++Field	36	TRCCLAIM
++Field	35	TRCAUXCTLR
++Res0	34
++Field	33	TRC
++Field	32	PMSLATFR_EL1
++Field	31	PMSIRR_EL1
++Res0	30
++Field	29	PMSICR_EL1
++Field	28	PMSFCR_EL1
++Field	27	PMSEVFR_EL1
++Field	26	PMSCR_EL1
++Field	25	PMBSR_EL1
++Field	24	PMBPTR_EL1
++Field	23	PMBLIMITR_EL1
++Res0	22
++Field	21	PMCR_EL0
++Field	20	PMSWINC_EL0
++Field	19	PMSELR_EL0
++Field	18	PMOVS
++Field	17	PMINTEN
++Field	16	PMCNTEN
++Field	15	PMCCNTR_EL0
++Field	14	PMCCFILTR_EL0
++Field	13	PMEVTYPERn_EL0
++Field	12	PMEVCNTRn_EL0
++Field	11	OSDLR_EL1
++Field	10	OSECCR_EL1
++Res0	9
++Field	8	OSLAR_EL1
++Field	7	DBGPRCR_EL1
++Res0	6
++Field	5	DBGCLAIM
++Field	4	MDSCR_EL1
++Field	3	DBGWVRn_EL1
++Field	2	DBGWCRn_EL1
++Field	1	DBGBVRn_EL1
++Field	0	DBGBCRn_EL1
++EndSysreg
++
+ Sysreg	ZCR_EL2	3	4	1	2	0
+ Fields	ZCR_ELx
+ EndSysreg
 -- 
 2.34.1
 
