@@ -2,146 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FF8175127D
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 23:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 805A8751331
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 00:05:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233165AbjGLVRP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 17:17:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42006 "EHLO
+        id S231593AbjGLWFz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 18:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233027AbjGLVRA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 17:17:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 554AB2D5F
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 14:16:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A262C61949
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 21:15:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70C27C433C8;
-        Wed, 12 Jul 2023 21:15:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689196534;
-        bh=srSlB45+tKsynjd6lCyOzCxBjejSi0aDwrSiQqn1wyY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OiE8UQug9Lz2a6vhipxEPBqS6prjPYc7yMA2qulV1NLKTEryjgF1cpaowmNBIKDJr
-         5kyucBnEjLgZ31kwqimtZY+X6DISdfJQpUSpgMCNtO1JirIW1qnspmNgY92/PnKoHv
-         CUgp0Z++IhVn0Vc6erne+uFpZMTt4tp7PxVSJn+bfL07EuMAuRQD2VjjUlSfc6xMx8
-         uPasvsJ+z+b5mSJ80gTA+oZNLy3tIwc7BTdFapRQmYKf5tc6tVvEBWSQ79u3yyHECZ
-         b8ucBuuUihR0maADZncjMFyT+QuYT4EaujYHYG/SqwAthN9opwUT2Ruro/Pnn9sMAs
-         6/zOwFa76frSQ==
-Date:   Wed, 12 Jul 2023 22:15:27 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
-Message-ID: <2dbb5fd5-a275-432e-832b-7926060c9254@sirena.org.uk>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-15-maz@kernel.org>
- <b9ccca23-65d5-4ed1-976e-63d51e3457e3@sirena.org.uk>
- <87edlcao9b.wl-maz@kernel.org>
+        with ESMTP id S229572AbjGLWFy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 18:05:54 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C0E59B;
+        Wed, 12 Jul 2023 15:05:54 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-666eef03ebdso54789b3a.1;
+        Wed, 12 Jul 2023 15:05:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689199553; x=1691791553;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J75VE/da93k8vRDY9HQXjesLCZCbpKtjsT8bbmwy48o=;
+        b=HJl148y2GoIyq7PncvM7QOJx+P0aj4UJ3mAaRAKEE5W/9T0Q8wezhU6vrZNT0/nKiy
+         rG7Z4mJHxVEmqtvK5sq2YkZQhieDBpXAXjkeuz1ct9fVgq3vNjUFOLBr+Spe5Y29Qx1C
+         OL1V7q2+oDsFGIetFEE1OUZK92E3ujhmdLs5HIRvwnBMrVWpCrLxw2nXQN+FAHm6by6F
+         CvGLEzRPd56RJoQvpnZg8qNSDnAQCKwKTvLsLYya/q4OeiqmuxULOKvbh/C+sKhHuZSq
+         bYgREzUU5RkL40Q5KHpJPG3Fr7KM9EC/W9sczyvukfATHCMYm8ueofAAN3UtWlyinTJz
+         EzEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689199553; x=1691791553;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J75VE/da93k8vRDY9HQXjesLCZCbpKtjsT8bbmwy48o=;
+        b=R06uj/3zA544xDZMXpGWAih2U6dlrIkt7AZFLvIk//kWm0LraHO3Ly2FiAl1XW98E5
+         8LC4xFGTkBOiCjM8M7rTL2uKBicPsrBUWN6LcSkVjFcqvtFjXM5vn0gvOAFVLfarLDVZ
+         Y3swP74Hp//9YNWPcLGI9VybqveDosAWmGIUEsx93BNEORWX+LIBrJIbzrpqQbIPUseE
+         w2REjNEr6HE6dw5a6wugnCxNU88dOoOdSASo0JkZE+NP63FwqjcerI9SYrUW6qNKEj1U
+         3kz7Ir3VoviRighECC40Tx9Ab7u6dhT65cUmpoaCFyk6OigNhBSAh0VzPH1DVbPlclNd
+         aYXA==
+X-Gm-Message-State: ABy/qLZ5JklgHBQhOciMigD5DACGFtqq0hsjekaLbZWEpl59hH8rIx6H
+        hzZhB+TY95rKMl9yV/3XrY4=
+X-Google-Smtp-Source: APBJJlH49hr8yoTtJs1PxgCAs0pn/eHY+ExYa4qd0f7CU3G8/fAb1xWII3ZTNXXBA/yck5fNf053rA==
+X-Received: by 2002:a05:6a00:2e92:b0:682:2152:45df with SMTP id fd18-20020a056a002e9200b00682215245dfmr16450241pfb.9.1689199553291;
+        Wed, 12 Jul 2023 15:05:53 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id g8-20020aa78188000000b006783ee5df8asm4035983pfi.189.2023.07.12.15.05.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 15:05:52 -0700 (PDT)
+Date:   Wed, 12 Jul 2023 15:05:51 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     peterz@infradead.org, kirill.shutemov@linux.intel.com,
+        linux-kernel@vger.kernel.org, dave.hansen@intel.com,
+        tglx@linutronix.de, bp@alien8.de, mingo@redhat.com, hpa@zytor.com,
+        x86@kernel.org, seanjc@google.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, isaku.yamahata@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        isaku.yamahata@gmail.com
+Subject: Re: [PATCH 03/10] x86/tdx: Move FRAME_BEGIN/END to TDX_MODULE_CALL
+ asm macro
+Message-ID: <20230712220551.GF3894444@ls.amr.corp.intel.com>
+References: <cover.1689151537.git.kai.huang@intel.com>
+ <c0206c457f366ab007ab67ca16970cc4fc562877.1689151537.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="LgilXWRWGTBHM5Pp"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87edlcao9b.wl-maz@kernel.org>
-X-Cookie: Dammit Jim, I'm an actor, not a doctor.
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <c0206c457f366ab007ab67ca16970cc4fc562877.1689151537.git.kai.huang@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 12, 2023 at 08:55:17PM +1200,
+Kai Huang <kai.huang@intel.com> wrote:
 
---LgilXWRWGTBHM5Pp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Currently, the TDX_MODULE_CALL asm macro and the __tdx_module_call()
+> take registers directly as input and a 'struct tdx_module_output' as
+> optional output.  This is different from the __tdx_hypercall(), which
+> simply uses a structure to carry all input/output.  There's no point to
+> leave __tdx_module_call() complicated as it is.
+> 
+> As a preparation to simplify the __tdx_module_call() to make it look
+> like __tdx_hypercall(), move FRAME_BEGIN/END and RET from the
+> __tdx_module_call() to the TDX_MODULE_CALL assembly macro.  This also
+> allows more implementation flexibility of the assembly inside the
+> TDX_MODULE_CALL macro, e.g., allowing putting an _ASM_EXTABLE() after
+> the main body of the assembly.
+> 
+> This is basically based on Peter's code.
+> 
+> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/coco/tdx/tdcall.S      | 3 ---
+>  arch/x86/virt/vmx/tdx/tdxcall.S | 5 +++++
+>  2 files changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/coco/tdx/tdcall.S b/arch/x86/coco/tdx/tdcall.S
+> index 2eca5f43734f..e5d4b7d8ecd4 100644
+> --- a/arch/x86/coco/tdx/tdcall.S
+> +++ b/arch/x86/coco/tdx/tdcall.S
+> @@ -78,10 +78,7 @@
+>   * Return status of TDCALL via RAX.
+>   */
+>  SYM_FUNC_START(__tdx_module_call)
+> -	FRAME_BEGIN
+>  	TDX_MODULE_CALL host=0
+> -	FRAME_END
+> -	RET
+>  SYM_FUNC_END(__tdx_module_call)
+>  
+>  /*
+> diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcall.S
+> index 3524915d8bd9..b5ab919c7fa8 100644
+> --- a/arch/x86/virt/vmx/tdx/tdxcall.S
+> +++ b/arch/x86/virt/vmx/tdx/tdxcall.S
+> @@ -1,5 +1,6 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  #include <asm/asm-offsets.h>
+> +#include <asm/frame.h>
+>  #include <asm/tdx.h>
+>  
+>  /*
+> @@ -18,6 +19,7 @@
+>   *            TDX module.
+>   */
+>  .macro TDX_MODULE_CALL host:req
+> +	FRAME_BEGIN
+>  	/*
+>  	 * R12 will be used as temporary storage for struct tdx_module_output
+>  	 * pointer. Since R12-R15 registers are not used by TDCALL/SEAMCALL
+> @@ -91,4 +93,7 @@
+>  .Lno_output_struct:
+>  	/* Restore the state of R12 register */
+>  	pop %r12
+> +
+> +	FRAME_END
+> +	RET
+>  .endm
+> -- 
+> 2.41.0
+> 
 
-On Wed, Jul 12, 2023 at 09:06:08PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > > + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-> > > + * We're not using the generated masks as they are usually ahead of
-> > > + * the published ARM ARM, which we use as a reference.
-
-> > What's the issue here?  The generated definitions should be aligned with
-> > what's published in DDI0601.  That AIUI exists in large part due to
-> > concerns people were having with the amount of time it can take to fold
-> > new features into the ARM, it's official.
-
-> For multiple reasons:
-
-> - What's published as DDI0601 is a list of registers, without any
->   context and no relation to the wider architecture (it is basically
->   the XML dumped as a PDF). That's not enough to implement the
->   architecture as it is missing all the content of the engineering
->   specs, which are not public documents.
-
-Right, it's not the full spec - I was just thinking it was enough to
-cover the use here with finding RES0 bits.  The actual XML is
-downloadable as well, via=20
-
-    https://developer.arm.com/downloads/-/exploration-tools
-
-if that's more convenient (I am not sure why that's not available if you
-go looking for DDI0601), not that that addresses the issue with not
-having the non-XML part of things.  I know the people responsible for
-producing the ARM are actively working on improving the production
-process to address the lag so the ARM is available much more promptly.
-
-> - I have no motivation in supporting the latest and greatest. NV is
->   hard enough without all the (still evolving) crop of 8.9/9.4
->   extensions.  As long as what I have is a legal implementation and
->   runs on the HW I have access to, that's good enough for me.
-
-> - I want to look at a single document and support what's in there. Not
->   two. Because it is hard enough to follow when you're implementing
->   this crap, and even harder for someone trying to review it.
-
-> So I firmly intend to totally ignore most of what's outside of the
-> published ARM ARM unless it makes my life so much easier that I can't
-> afford not to implement it.
-
-That's definitely fair, my concern here is the risk that we might end up
-with issues due to the manual definitions drifting from the generated
-ones without people noticing as things go forwards.  Hopefully that's a
-minor risk.
-
---LgilXWRWGTBHM5Pp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmSvF+4ACgkQJNaLcl1U
-h9Civwf/ZXWGE/hczTCulEMG2U6Wn7o9Ym9bVTemK3dSzhcUr869CF5uYsqOCd8D
-5C8zdI44DKVAVKBP8dKZPuT/AI7WzIW+GY02+xGyqKVkZWl1zczQt4uYfUCKFPnU
-TTBPMYXNxvh3yS7i1NXBhcdvbJebdE8GHRhQyHQNUXrOpv6HjzlqLpMXTGNWvv08
-nEGnatET3TdJl+UkO5B1/sHDJ+hVWacgTeixZJEJ1KBSRg8OFlh+E6gLkRDCj5gU
-IwLXM1KQGrghwT1TIaskC6XxiMhT3HIrIouF2QXOlSoPI3uBULWVMl7KiCPfDPe9
-BYAiQnXnlLtCIzw0ychfACdnUjv50A==
-=X6vv
------END PGP SIGNATURE-----
-
---LgilXWRWGTBHM5Pp--
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
