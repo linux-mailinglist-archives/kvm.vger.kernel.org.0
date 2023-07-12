@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98F3C750B93
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 16:59:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1DB3750B95
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 16:59:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232263AbjGLO7H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 10:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48406 "EHLO
+        id S232276AbjGLO7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 10:59:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232214AbjGLO7E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 10:59:04 -0400
+        with ESMTP id S232224AbjGLO7F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 10:59:05 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4A01BDA
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA33B1BD5
         for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 07:58:58 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 96CE961868
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62856C43395;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 45DB461843
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 14:58:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE51C43391;
         Wed, 12 Jul 2023 14:58:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1689173931;
-        bh=gOk3OWoFOLQUhWPkERnNSXJ0DDK3pSnDGy2b6/Nh01k=;
+        bh=d8wIl9lTuWwNMtBBjm2pAq8N/AAPYD5w2LQCFNLPZzk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ECtoLclg4shj7pqzf3mv5f8r9rDuWXp2/A3Y/hcsDbe2QqNJOVjB9G6cF1/HZAqyQ
-         0maVUMZ6BhbberZPh3m9MrF4J1HdnnVKQqEYd51CAnJZefYCozzBpcZhM4AuhYSi1w
-         h2C5UHZg51HrCER++LwpSif0ILxdYCO1RT95a4iVgKweTs4gpHDI/rAQtXzYCLMm4a
-         6Mjsf3Ml1E2bzM63QQPhgdanUdQQoOdpUlSCDuYIVNJAFVqeGCBSeJOgEVjqzEJaua
-         jw3Z6rICLqUXHKccZOyjuF2NEKrFp45HwuYs5PW8tzcahupUOBhC95iKE6MlAlwK6z
-         KekGrXBm8pxUg==
+        b=uBTecaE4NkiVuMY92JmBxuyIpQgUZMxWI0cq3PMOlbSmPXCMNxQcMywQYp9/7cLS1
+         tNNWjS9D3F/9ZFz9qUDF1EeJ0r5TJzQK7BhLEVTM7cgy3qzzKmbo8QGyVSNxn5UjSb
+         dCX+d9B/vXFaFYrl2xSEnptQOk/B1UEw4eTxndYb2nuzts4o4beIUK0Bfs7fywxb96
+         mpVeMJgnZEGqS4Zj749Vb9JVFsMa5TuQcLCxlOpAU/GZAcJ8PvHR+5I9QEOHcnU8WY
+         WinNnv792Ngf9L9WpJ875CGJabdGeZ3P37fOFARtBpIZZ7WYqIkp1stE0AhevoKIM0
+         flFHQ3oYJWmPA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qJbIn-00CUNF-Ev;
+        id 1qJbIn-00CUNF-OV;
         Wed, 12 Jul 2023 15:58:49 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 07/27] arm64: Add missing BRB/CFP/DVP/CPP instructions
-Date:   Wed, 12 Jul 2023 15:57:50 +0100
-Message-Id: <20230712145810.3864793-8-maz@kernel.org>
+Subject: [PATCH 08/27] arm64: Fix HFGxTR_EL2 field naming
+Date:   Wed, 12 Jul 2023 15:57:51 +0100
+Message-Id: <20230712145810.3864793-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230712145810.3864793-1-maz@kernel.org>
 References: <20230712145810.3864793-1-maz@kernel.org>
@@ -78,32 +78,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HFGITR_EL2 traps a bunch of instructions for which we don't have
-encodings yet. Add them.
+The HFGxTR_EL2 fields do not always follow the naming described
+in the spec, nor do they match the name of the register they trap
+in the rest of the kernel.
 
+It is a bit sad that they were written by hand despite the availability
+of a machine readable version...
+
+Fixes: cc077e7facbe ("arm64/sysreg: Convert HFG[RW]TR_EL2 to automatic generation")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/arm64/include/asm/sysreg.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/tools/sysreg | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 9dfd127be55a..e2357529c633 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -737,6 +737,13 @@
- #define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
- #define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 1ea4a3dc68f8..65866bf819c3 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2017,7 +2017,7 @@ Field	0	SM
+ EndSysreg
  
-+/* Misc instructions */
-+#define OP_BRB_IALL			sys_insn(1, 1, 7, 2, 4)
-+#define OP_BRB_INJ			sys_insn(1, 1, 7, 2, 5)
-+#define OP_CFP_RCTX			sys_insn(1, 3, 7, 3, 4)
-+#define OP_DVP_RCTX			sys_insn(1, 3, 7, 3, 5)
-+#define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
-+
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_ENTP2	(BIT(60))
- #define SCTLR_ELx_DSSBS	(BIT(44))
+ SysregFields	HFGxTR_EL2
+-Field	63	nAMIAIR2_EL1
++Field	63	nAMAIR2_EL1
+ Field	62	nMAIR2_EL1
+ Field	61	nS2POR_EL1
+ Field	60	nPOR_EL1
+@@ -2032,9 +2032,9 @@ Field	52	nGCS_EL0
+ Res0	51
+ Field	50	nACCDATA_EL1
+ Field	49	ERXADDR_EL1
+-Field	48	EXRPFGCDN_EL1
+-Field	47	EXPFGCTL_EL1
+-Field	46	EXPFGF_EL1
++Field	48	ERXPFGCDN_EL1
++Field	47	ERXPFGCTL_EL1
++Field	46	ERXPFGF_EL1
+ Field	45	ERXMISCn_EL1
+ Field	44	ERXSTATUS_EL1
+ Field	43	ERXCTLR_EL1
+@@ -2049,8 +2049,8 @@ Field	35	TPIDR_EL0
+ Field	34	TPIDRRO_EL0
+ Field	33	TPIDR_EL1
+ Field	32	TCR_EL1
+-Field	31	SCTXNUM_EL0
+-Field	30	SCTXNUM_EL1
++Field	31	SCXTNUM_EL0
++Field	30	SCXTNUM_EL1
+ Field	29	SCTLR_EL1
+ Field	28	REVIDR_EL1
+ Field	27	PAR_EL1
 -- 
 2.34.1
 
