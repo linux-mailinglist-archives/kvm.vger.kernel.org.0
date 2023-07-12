@@ -2,136 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E77CE750F08
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 18:53:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52884750F0A
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 18:53:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232776AbjGLQxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 12:53:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51158 "EHLO
+        id S232894AbjGLQx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 12:53:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231237AbjGLQxk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 12:53:40 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F6A61BEC
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 09:53:29 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bd69bb4507eso7866180276.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 09:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689180808; x=1691772808;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuwmCccTzzPRVYbABitkJk2otUQw/JA11EzNmmOq3F8=;
-        b=LY3EnhCMzD5FX+ReAkl8wiSgiqXHx+ha+7COu+SQjXOgfs3EXcRzd8FuOv6s6gMFGY
-         Sx6bXEKZUfyyIdrzMJyxYmejS3qH5NB0y2W7dxHfgnutJE1JBHqB83xDnwmY3vcnpojX
-         JdCErBkT+loA7bbAhxqn2cB8tEam7rho/dMbz2QifbhAm9KZSq6ZyWiCEBL2vaIYP+S2
-         U4Kevd+b1B2218tpwRIAt0LzXPVjxtpwINm2ehnh7y+li0kep8KKUuI5BHxBBwEd0lyg
-         m9UfxX9YZ05wnWp/uxTGjEgSCeWR09MUqGHPChylubjoPz90kTOFbTnO6V59DV80Zf82
-         iaxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689180808; x=1691772808;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuwmCccTzzPRVYbABitkJk2otUQw/JA11EzNmmOq3F8=;
-        b=SHIJklzno13gOBG2fCCoRRTsLUl/Kc2OaGPr/iF6fEUqJA+hOAbuiLM0y9A+s3lciU
-         Mn/QCmOSPAFzn0nKwYk73XlLKrc1PquK7wyWEcTJqAUznWECc5NWb71x1ttm1qPbjJxH
-         f9zP0rhkx1AytH9KIkze9620nb/fiEsxpCXfxHa6YmB01BqO8wICAl2dxKJj2KLQ3vS8
-         U/pDb101QVwX0Tch3K2BusEJFcl+YB/1xvqBwoQUmjoZpTDFRKJQ66zsjpNX3rpHkOKA
-         j7Oo3lRgSJNUw5jN7g0Tf+2v8gJY4GB7HQ5qwrg3MDqPAgYBzIOUEzyZWLXUb6WPJ6aU
-         EBJw==
-X-Gm-Message-State: ABy/qLYQ6qm0SzhxKhavNLOtJtg5gFnMNZDAYuvZ4go+wnPWpF9mIjxt
-        dPwWiJ5kElfNCPwuM2QneOUZEW4eWMg=
-X-Google-Smtp-Source: APBJJlHPzUYAMUevw56rN72xCda5PMJmwguFn3cN/qClrzRT6VtD9MBYOBO1RPRXFRDT8Ob9wSXcO/zDXXw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:aba1:0:b0:c15:cbd1:60da with SMTP id
- v30-20020a25aba1000000b00c15cbd160damr162947ybi.6.1689180808382; Wed, 12 Jul
- 2023 09:53:28 -0700 (PDT)
-Date:   Wed, 12 Jul 2023 09:53:26 -0700
-In-Reply-To: <87y1jn52pp.fsf@redhat.com>
-Mime-Version: 1.0
-References: <202307080326.zDp7E3o0-lkp@intel.com> <87y1jn52pp.fsf@redhat.com>
-Message-ID: <ZK7ahtc2DVx6E/si@google.com>
-Subject: Re: [stable:linux-5.15.y 55/9999] arch/x86/kvm/hyperv.c:2185:5:
- error: stack frame size (1036) exceeds limit (1024) in 'kvm_hv_hypercall'
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kernel test robot <lkp@intel.com>, llvm@lists.linux.dev,
-        oe-kbuild-all@lists.linux.dev,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232600AbjGLQxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 12:53:55 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A2712E;
+        Wed, 12 Jul 2023 09:53:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=HHorMwySluudpbrm2kHEFECtUNJWABsOsPm2V3H84B4=; b=a5FZQOMxmxJy9IfEQ5SA3svsng
+        PI6+f2Lz6iwIDyI7KPVa7oKtuLASYXiVsCOxohgD9xia5150VCwZ8AqN4raTfa4ypwusB0YgCxtXx
+        Z3brASfbg1U8tbyYqifWCpyCpj+TRHPFCmFSR70vrkF96TZoM120DDKRKFVXZFcka+dOj+OHjkfBP
+        fcsT1KuUhep/jKrt+M5rN7GcDeBnWqIucpgz6pJit/VAv0xNytjKIULwuWHiunUS8sqLoimwrNj0N
+        PHz5I+i3S6/nY5wITsJTdZ8QTIxHXUuszU1ro7vuY5UX92iuLgZS//eYBpdnn7e187HlwAH0TKV4T
+        BIIDYtaQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qJd5v-00GtJ8-BO; Wed, 12 Jul 2023 16:53:39 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 24BEC3002CE;
+        Wed, 12 Jul 2023 18:53:37 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0E7072464A14A; Wed, 12 Jul 2023 18:53:37 +0200 (CEST)
+Date:   Wed, 12 Jul 2023 18:53:36 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org,
+        dave.hansen@intel.com, tglx@linutronix.de, bp@alien8.de,
+        mingo@redhat.com, hpa@zytor.com, x86@kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org, isaku.yamahata@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH 07/10] x86/tdx: Extend TDX_MODULE_CALL to support more
+ TDCALL/SEAMCALL leafs
+Message-ID: <20230712165336.GA3115257@hirez.programming.kicks-ass.net>
+References: <cover.1689151537.git.kai.huang@intel.com>
+ <ecfd84af9186aa5368acb40a2740afbf1d0d1b5d.1689151537.git.kai.huang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ecfd84af9186aa5368acb40a2740afbf1d0d1b5d.1689151537.git.kai.huang@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 10, 2023, Vitaly Kuznetsov wrote:
-> kernel test robot <lkp@intel.com> writes:
-> 
-> > Hi Vitaly,
-> >
-> > First bad commit (maybe != root cause):
-> >
-> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git linux-5.15.y
-> > head:   d54cfc420586425d418a53871290cc4a59d33501
-> > commit: cb188e07105f2216f5efbefac95df4b6ce266906 [55/9999] KVM: x86: hyper-v: HVCALL_SEND_IPI_EX is an XMM fast hypercall
-> > config: i386-buildonly-randconfig-r006-20230708 (https://download.01.org/0day-ci/archive/20230708/202307080326.zDp7E3o0-lkp@intel.com/config)
-> > compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-> > reproduce: (https://download.01.org/0day-ci/archive/20230708/202307080326.zDp7E3o0-lkp@intel.com/reproduce)
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <lkp@intel.com>
-> > | Closes: https://lore.kernel.org/oe-kbuild-all/202307080326.zDp7E3o0-lkp@intel.com/
-> >
-> > All errors (new ones prefixed by >>):
-> >
-> >>> arch/x86/kvm/hyperv.c:2185:5: error: stack frame size (1036) exceeds limit (1024) in 'kvm_hv_hypercall' [-Werror,-Wframe-larger-than]
-> >    int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
-> >        ^
-> >    1 error generated.
-> 
-> (sorry for delayed reply)
-> 
-> This used to be a warning (without CONFIG_KVM_WERROR I guess?) :-) E.g.
-> 
-> https://lore.kernel.org/kvm/87zgg6sza8.fsf@redhat.com/#t
-> 
-> where Nathan explained LLVM's behavior:
-> 
-> https://lore.kernel.org/kvm/Yvp87jlVWg0e376v@dev-arch.thelio-3990X/
-> 
-> This was 'fixed' upstream with
-> 
-> commit 7d5e88d301f84a7b64602dbe3640f288223095ea
-> Author: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Date:   Tue Nov 1 15:53:56 2022 +0100
-> 
->     KVM: x86: hyper-v: Use preallocated buffer in 'struct kvm_vcpu_hv' instead of on-stack 'sparse_banks'
->   
-> and personally, I'm not against backporting it to 5.15.y but I seriously
-> doubt it is worth the hassle (i386 KVM + llvm + CONFIG_KVM_WERROR is
-> likely an impossible combo).
-> 
-> Also, there seems to be another build problem with CONFIG_KVM_WERROR I
-> met with clan-16 and the same config:
-> 
-> ../arch/x86/kvm/x86.c:2315:19: error: unused function 'gtod_is_based_on_tsc' [-Werror,-Wunused-function]
-> static inline int gtod_is_based_on_tsc(int mode)
-> 
-> TL;DR: Let's ignore this for 5.15, not worth fixing IMO. Cc: kvm@ to
-> check if anyone thinks differently.
+On Wed, Jul 12, 2023 at 08:55:21PM +1200, Kai Huang wrote:
 
-Ya, ignore it.  KVM_WERROR is off-by-default for 32-bit builds, and all evidence
-suggests that no one uses KVM with 32-bit kernels these days, so I can't imagine
-this negatively affects anyone.
 
-  config KVM_WERROR
-        bool "Compile KVM with -Werror"
-        # KASAN may cause the build to fail due to larger frames
-        default y if X86_64 && !KASAN
+> @@ -72,7 +142,46 @@
+>  	movq %r9,  TDX_MODULE_r9(%rsi)
+>  	movq %r10, TDX_MODULE_r10(%rsi)
+>  	movq %r11, TDX_MODULE_r11(%rsi)
+> -	.endif
+> +	.endif	/* \ret */
+> +
+> +	.if \saved
+> +	.if \ret && \host
+> +	/*
+> +	 * Clear registers shared by guest for VP.ENTER to prevent
+> +	 * speculative use of guest's values, including those are
+> +	 * restored from the stack.
+> +	 *
+> +	 * See arch/x86/kvm/vmx/vmenter.S:
+> +	 *
+> +	 * In theory, a L1 cache miss when restoring register from stack
+> +	 * could lead to speculative execution with guest's values.
+> +	 *
+> +	 * Note: RBP/RSP are not used as shared register.  RSI has been
+> +	 * restored already.
+> +	 *
+> +	 * XOR is cheap, thus unconditionally do for all leafs.
+> +	 */
+> +	xorq %rcx, %rcx
+> +	xorq %rdx, %rdx
+> +	xorq %r8,  %r8
+> +	xorq %r9,  %r9
+> +	xorq %r10, %r10
+> +	xorq %r11, %r11
 
+> +	xorq %r12, %r12
+> +	xorq %r13, %r13
+> +	xorq %r14, %r14
+> +	xorq %r15, %r15
+> +	xorq %rbx, %rbx
+
+^ those are an instant pop below, seems daft to clear them.
+
+> +	xorq %rdi, %rdi
+> +	.endif	/* \ret && \host */
+> +
+> +	/* Restore callee-saved GPRs as mandated by the x86_64 ABI */
+> +	popq	%r15
+> +	popq	%r14
+> +	popq	%r13
+> +	popq	%r12
+> +	popq	%rbx
+> +	.endif	/* \saved */
+>  
+>  	FRAME_END
+>  	RET
+> -- 
+> 2.41.0
+> 
