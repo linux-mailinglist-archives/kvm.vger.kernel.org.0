@@ -2,109 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D755750FD0
-	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 19:40:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E080875105E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jul 2023 20:15:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbjGLRkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 13:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43492 "EHLO
+        id S232026AbjGLSPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 14:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232555AbjGLRjz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 13:39:55 -0400
-X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Jul 2023 10:39:51 PDT
-Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BA7621FD6
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 10:39:51 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-        by smtp.orange.fr with ESMTPA
-        id JdhIqzHAhwgkxJdhIqnn4N; Wed, 12 Jul 2023 19:32:19 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-        s=t20230301; t=1689183139;
-        bh=nj3VwYwdD9E/FLl0FSv5Oeoycz38oa7+CVNBRYtk6gU=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=sIzK5kFXCameantP8myCFIMUhAIs/kwm/GR8eKV5928Vt0RObj7xF/amNA1itdYK7
-         dEyyK0DKI47Hp8FEx7tXsngViYyReKRKDsVAavP49/crWjQH+mqZBQGdeAFMsRuWvn
-         VX0aMBo16mXA7g16tUlBvhQ5dPgbFK6SytFWdfMgA9bolS+nivWCs5Laq4kBkDpGGf
-         JJi5eF9DbEZizZCB8xaslWsRS0/UdNSNzptUXhx0RVTFw2ojxBd6nL9qSJ5oI/oeCc
-         jy36eyHMSJXxC6znJNfGmOUouWa3E7qd+jlSCAW+4Dsz1AcjSga8JyEUGDrLtzAmf9
-         cEeH9y50i5qTQ==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Wed, 12 Jul 2023 19:32:19 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <036435eb-40c2-548a-1cfd-93a364f95634@wanadoo.fr>
-Date:   Wed, 12 Jul 2023 19:32:15 +0200
+        with ESMTP id S230108AbjGLSO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 14:14:59 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213FC121;
+        Wed, 12 Jul 2023 11:14:58 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fb87828386so2167802e87.1;
+        Wed, 12 Jul 2023 11:14:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689185696; x=1689790496;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y5Evk9ENiG1SDXDDuZNxyl9nIkxs8k8T0BFXn0k/GPw=;
+        b=KFzcvPhj+xUk0On2B+D8hxj97/proPpUApbFwYl1Hj4NpT+IYUEjS/MoPhDvIfBBSY
+         eqvJEwc1KSda9kqz4LmQzpDopZkZXFZoiUMt2J8nrmlhJRickc81o7mrYyNouy5S8NKP
+         bOvMTn9iJuq9PnRMC9yhDr9NtD+vc+MS8hxDR4E4xsPvu4S2oR+AMqvOgC4jV+IdT11F
+         GbxZUA4eyZZq0ibywlOUshithLSXXSmbL+G1Hc34eQTJTZUl7nr8LE9P3Xt37FH6aSXF
+         vXlOBBB3TxXUVi4t291WW7YWfSEiOcgaLoaUGTfpmheisurn+YO6nMpXsFiBpDTMD4tG
+         hjeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689185696; x=1689790496;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y5Evk9ENiG1SDXDDuZNxyl9nIkxs8k8T0BFXn0k/GPw=;
+        b=GSd8R5HMLHoc54svxsCmeET39AI9H/+WKaTy7VaP0AxvHFDIQQSFQoNlZdkt8Jdcc9
+         5HFGswaN3yeW9dyoNLM+unefHsaUe5P7tvwFTBQJ8JvMSgv0Njii2z2Bm5Z9WqG1qa4y
+         gwo9alLe/d/VBP988y6uDnFajrNesj4z0V4N8oHvFeoLxnuHgogOWeXWg5FWAqzt6/lh
+         6w6wu3RMDDJVN0ddYgDBmv0yavvyqbF1tAFJMpOrEkSxE/8Qy/w9NIhO/pRjrPCA4ccj
+         PxnDmqo2HO0c5V5rR1lNYyVGScIAZoSviBTCDaU4tiNBQKZNUXBW4d+moxIbmMAOSxXt
+         oNCA==
+X-Gm-Message-State: ABy/qLYzc/qxizLiCkfeKR3NBOuimUGavD/k6eb1XeWNHivQ/uy4AsmH
+        PrA1y/yTTS55sdn0MT/Ak8s=
+X-Google-Smtp-Source: APBJJlEUWLF9SBfWeZVGjHMr9NYb/VhGT59eIjtUZDVu/qKh39sbMAjb2Qa7H5gkipHxmDMCWAhZCQ==
+X-Received: by 2002:a19:f501:0:b0:4fb:8341:43d3 with SMTP id j1-20020a19f501000000b004fb834143d3mr120133lfb.5.1689185695968;
+        Wed, 12 Jul 2023 11:14:55 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id x19-20020ac24893000000b004fa039eb84csm804206lfc.198.2023.07.12.11.14.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 11:14:55 -0700 (PDT)
+Date:   Wed, 12 Jul 2023 21:14:53 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Wang Jianchao <jianchwa@outlook.com>
+Cc:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, arkinjob@outlook.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC 0/3] KVM: x86: introduce pv feature lazy tscdeadline
+Message-ID: <20230712211453.000025f6.zhi.wang.linux@gmail.com>
+In-Reply-To: <BYAPR03MB4133436C792BBF9EC6D77672CD2DA@BYAPR03MB4133.namprd03.prod.outlook.com>
+References: <BYAPR03MB4133436C792BBF9EC6D77672CD2DA@BYAPR03MB4133.namprd03.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] KVM: x86: Fix errors in vmcs12.c
-To:     shijie001@208suo.com, tglx@linutronix.de, mingo@redhat.com
-Cc:     Hpa <hpa@zytor.com>, Kvm <kvm@vger.kernel.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>
-References: <tencent_833CA5C82FF883DD2261815EDE19C9858D0A@qq.com>
- <eec40752bc900473f65ad8f94d160106@208suo.com>
-Content-Language: fr, en-US
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <eec40752bc900473f65ad8f94d160106@208suo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le 12/07/2023 à 10:40, shijie001@208suo.com a écrit :
-> The following checkpatch errors are removed:
-> ERROR: space prohibited before open square bracket '['
-> ERROR: Macros with complex values should be enclosed in parentheses
+On Fri,  7 Jul 2023 14:17:58 +0800
+Wang Jianchao <jianchwa@outlook.com> wrote:
+
+> Hi
 > 
-> Signed-off-by: Jie Shi <shijie001@208suo.com>
-> ---
->   arch/x86/kvm/vmx/vmcs12.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+> This patchset attemps to introduce a new pv feature, lazy tscdeadline.
+> Everytime guest write msr of MSR_IA32_TSC_DEADLINE, a vm-exit occurs
+> and host side handle it. However, a lot of the vm-exit is unnecessary
+> because the timer is often over-written before it expires. 
 > 
-> diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-> index 106a72c923ca..da239ca58f90 100644
-> --- a/arch/x86/kvm/vmx/vmcs12.c
-> +++ b/arch/x86/kvm/vmx/vmcs12.c
-> @@ -4,10 +4,10 @@
->   #include "vmcs12.h"
+> v : write to msr of tsc deadline
+> | : timer armed by tsc deadline
 > 
->   #define VMCS12_OFFSET(x) offsetof(struct vmcs12, x)
-> -#define FIELD(number, name)    [ROL16(number, 6)] = VMCS12_OFFSET(name)
-> +#define FIELD(number, name)[ROL16(number, 6)] = VMCS12_OFFSET(name)
-
-Hi,
-
-Written this way, this is really counter-intuitive.
-I think that the checkpatch warning should be ignored in this case.
-
->   #define FIELD64(number, name)                        \
->       FIELD(number, name),                        \
-> -    [ROL16(number##_HIGH, 6)] = VMCS12_OFFSET(name) + sizeof(u32)
-> +    [ROL16(number##_HIGH, 6)] = (VMCS12_OFFSET(name) + sizeof(u32))
-
-This does not silence the checkpatch warning.
-I think that the checkpatch warning should also be ignored in this case.
-
+>          v v v v v        | | | | |
+> --------------------------------------->  Time  
 > 
->   const unsigned short vmcs12_field_offsets[] = {
->       FIELD(VIRTUAL_PROCESSOR_ID, virtual_processor_id),
+> The timer armed by msr write is over-written before expires and the
+> vm-exit caused by it are wasted. The lazy tscdeadline works as following,
 > 
+>          v v v v v        |       |
+> --------------------------------------->  Time  
+>                           '- arm -'
+>
 
-checkpatch output should always be taken with a grain of salt.
-It just runs some heuristics on what looks improvable, but it is not THE 
-law.
+Interesting patch.
 
-It is just a tool that can help in many cases, but not all.
+I am a little bit confused of the chart above. It seems the write of MSR,
+which is said to cause VM exit, is not reduced in the chart of lazy
+tscdeadline, only the times of arm are getting less. And the benefit of
+lazy tscdeadline is said coming from "less vm exit". Maybe it is better
+to imporve the chart a little bit to help people jump into the idea
+easily?
 
-Here, I think that the code is better as-is.
+> The 1st timer is responsible for arming the next timer. When the armed
+> timer is expired, it will check pending and arm a new timer.
+> 
+> In the netperf test with TCP_RR on loopback, this lazy_tscdeadline can
+> reduce vm-exit obviously.
+> 
+>                          Close               Open
+> --------------------------------------------------------
+> VM-Exit
+>              sum         12617503            5815737
+>             intr      0% 37023            0% 33002
+>            cpuid      0% 1                0% 0
+>             halt     19% 2503932         47% 2780683
+>        msr-write     79% 10046340        51% 2966824
+>            pause      0% 90               0% 84
+>    ept-violation      0% 584              0% 336
+>    ept-misconfig      0% 0                0% 2
+> preemption-timer      0% 29518            0% 34800
+> -------------------------------------------------------
+> MSR-Write
+>             sum          10046455            2966864
+>         apic-icr     25% 2533498         93% 2781235
+>     tsc-deadline     74% 7512945          6% 185629
+> 
+> This patchset is made and tested on 6.4.0, includes 3 patches,
+> 
+> The 1st one adds necessary data structures for this feature
+> The 2nd one adds the specific msr operations between guest and host
+> The 3rd one are the one make this feature works.
+> 
+> Any comment is welcome.
+> 
+> Thanks
+> Jianchao
+> 
+> Wang Jianchao (3)
+> 	KVM: x86: add msr register and data structure for lazy tscdeadline
+> 	KVM: x86: exchange info about lazy_tscdeadline with msr
+> 	KVM: X86: add lazy tscdeadline support to reduce vm-exit of msr-write
+> 
+> 
+>  arch/x86/include/asm/kvm_host.h      |  10 ++++++++
+>  arch/x86/include/uapi/asm/kvm_para.h |   9 +++++++
+>  arch/x86/kernel/apic/apic.c          |  47 ++++++++++++++++++++++++++++++++++-
+>  arch/x86/kernel/kvm.c                |  13 ++++++++++
+>  arch/x86/kvm/cpuid.c                 |   1 +
+>  arch/x86/kvm/lapic.c                 | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+>  arch/x86/kvm/lapic.h                 |   4 +++
+>  arch/x86/kvm/x86.c                   |  26 ++++++++++++++++++++
+>  8 files changed, 229 insertions(+), 9 deletions(-)
 
-
-CJ
