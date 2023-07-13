@@ -2,66 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF2A6751C8B
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 11:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C0A0751C9F
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 11:05:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234219AbjGMJCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 05:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
+        id S232167AbjGMJFU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 05:05:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232357AbjGMJCT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 05:02:19 -0400
+        with ESMTP id S233851AbjGMJE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 05:04:56 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147392D43;
-        Thu, 13 Jul 2023 02:01:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609AE35BC;
+        Thu, 13 Jul 2023 02:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SvFjQgh7iMrGngVir0RKl1OuGXHDDPqcLIw4Qq3ouqo=; b=Z8O9ONkl5y8vJdFIYe/+RdrdE0
-        URpFWy9AVayh4SUvAYwyCgJSzmdK/eGYR+dzAxL8ORuOhVzjb5Q8SDsBSRq/XWEpV7Ctn+oJpthk4
-        3dYqwmZXPs/Lvjewhs5lqdmjGPBcAUkqtYrE+BTqbbe/Zh9cHGZi4QJaD3nUGZ4IGnoi5ZBskicoR
-        1tKJNIZM/WlxMIvDPsvbqKdqMwgE8A4GESceWXs9MmpwkhPD3MCgHEHGmXu3ER0qBQug9pfi/I99u
-        UceBkoaLJh89wEYiPuoF5gGM+ySaIhW9Lp+0G5aAefFFzwxWco3AbQDmjND45FE9eNYzJE/967n0h
-        ele+Q0MQ==;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=ecb3dsTnizPLwQBPga+sFZir+8eVUnbKQ5zrkRJr7LU=; b=wFg5Y+l4Y9PhmrSvFvL4bww7kC
+        GNLtl27AOL0D7JC0UtgKHSPb/v0OfjZAMNCTbJCYNXqSuUy8AUURrue2CqPamV8D0Gr3yQLladZQE
+        zBHmMaflzleVlKasyUWeJLDOFiA1ol/aK7zpzHeJvapMtEAfuoQ+gsENGTBlcQkEA4ufkIk/3ZCcG
+        wYIYCX6Yq5XONoPgiOKT7QCnPQpGEBRGrJNIFHGxs3bS0LBqWNSZPVDtppjDclMirFP+D1oCxKHzK
+        fNOu7phwNuFSwhCR3ZpNi5hecAoF31kPulw4FX3P51I92lkDzbTRCAE7gUMS0sFDWVpGi+dnr9Ldr
+        RBn+egiQ==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qJsCG-00HaMu-C1; Thu, 13 Jul 2023 09:01:12 +0000
+        id 1qJsEW-00HaXc-DP; Thu, 13 Jul 2023 09:03:32 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B7F26300222;
-        Thu, 13 Jul 2023 11:01:10 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0265030058D;
+        Thu, 13 Jul 2023 11:03:32 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 9FB33245CA111; Thu, 13 Jul 2023 11:01:10 +0200 (CEST)
-Date:   Thu, 13 Jul 2023 11:01:10 +0200
+        id DE8D2245CA111; Thu, 13 Jul 2023 11:03:31 +0200 (CEST)
+Date:   Thu, 13 Jul 2023 11:03:31 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
         "Christopherson,, Sean" <seanjc@google.com>,
         "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
         "hpa@zytor.com" <hpa@zytor.com>,
         "mingo@redhat.com" <mingo@redhat.com>,
         "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "sathyanarayanan.kuppuswamy@linux.intel.com" 
         <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH 07/10] x86/tdx: Extend TDX_MODULE_CALL to support more
- TDCALL/SEAMCALL leafs
-Message-ID: <20230713090110.GC3138667@hirez.programming.kicks-ass.net>
+Subject: Re: [PATCH 09/10] x86/virt/tdx: Wire up basic SEAMCALL functions
+Message-ID: <20230713090331.GD3138667@hirez.programming.kicks-ass.net>
 References: <cover.1689151537.git.kai.huang@intel.com>
- <ecfd84af9186aa5368acb40a2740afbf1d0d1b5d.1689151537.git.kai.huang@intel.com>
- <20230712171133.GB3115257@hirez.programming.kicks-ass.net>
- <a36d1f0068154a9acd3fdbed2586dc5b2476e140.camel@intel.com>
+ <41b7e5503a3e6057dc168b3c5a9693651c501d22.1689151537.git.kai.huang@intel.com>
+ <20230712221510.GG3894444@ls.amr.corp.intel.com>
+ <4202b26acdb3fe926dd1a9a46c2c7c35a5d85529.camel@intel.com>
+ <20230713074204.GA3139243@hirez.programming.kicks-ass.net>
+ <d4887818532e1716b5dd8a08819c656ab4e4c5bf.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <a36d1f0068154a9acd3fdbed2586dc5b2476e140.camel@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d4887818532e1716b5dd8a08819c656ab4e4c5bf.camel@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -72,45 +75,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 13, 2023 at 08:09:33AM +0000, Huang, Kai wrote:
-> On Wed, 2023-07-12 at 19:11 +0200, Peter Zijlstra wrote:
-> > On Wed, Jul 12, 2023 at 08:55:21PM +1200, Kai Huang wrote:
-> > > @@ -65,6 +104,37 @@
-> > >  	.endif
-> > >  
-> > >  	.if \ret
-> > > +	.if \saved
-> > > +	/*
-> > > +	 * Restore the structure from stack to saved the output registers
-> > > +	 *
-> > > +	 * In case of VP.ENTER returns due to TDVMCALL, all registers are
-> > > +	 * valid thus no register can be used as spare to restore the
-> > > +	 * structure from the stack (see "TDH.VP.ENTER Output Operands
-> > > +	 * Definition on TDCALL(TDG.VP.VMCALL) Following a TD Entry").
-> > > +	 * For this case, need to make one register as spare by saving it
-> > > +	 * to the stack and then manually load the structure pointer to
-> > > +	 * the spare register.
-> > > +	 *
-> > > +	 * Note for other TDCALLs/SEAMCALLs there are spare registers
-> > > +	 * thus no need for such hack but just use this for all for now.
-> > > +	 */
-> > > +	pushq	%rax		/* save the TDCALL/SEAMCALL return code */
-> > > +	movq	8(%rsp), %rax	/* restore the structure pointer */
-> > > +	movq	%rsi, TDX_MODULE_rsi(%rax)	/* save %rsi */
-> > > +	movq	%rax, %rsi	/* use %rsi as structure pointer */
-> > > +	popq	%rax		/* restore the return code */
-> > > +	popq	%rsi		/* pop the structure pointer */
+On Thu, Jul 13, 2023 at 08:18:09AM +0000, Huang, Kai wrote:
+> On Thu, 2023-07-13 at 09:42 +0200, Peter Zijlstra wrote:
+> > On Thu, Jul 13, 2023 at 03:46:52AM +0000, Huang, Kai wrote:
+> > > On Wed, 2023-07-12 at 15:15 -0700, Isaku Yamahata wrote:
+> > > > > The SEAMCALL ABI is very similar to the TDCALL ABI and leverages much
+> > > > > TDCALL infrastructure.  Wire up basic functions to make SEAMCALLs for
+> > > > > the basic TDX support: __seamcall(), __seamcall_ret() and
+> > > > > __seamcall_saved_ret() which is for TDH.VP.ENTER leaf function.
+> > > > 
+> > > > Hi.  __seamcall_saved_ret() uses struct tdx_module_arg as input and output.  For
+> > > > KVM TDH.VP.ENTER case, those arguments are already in unsigned long
+> > > > kvm_vcpu_arch::regs[].  It's silly to move those values twice.  From
+> > > > kvm_vcpu_arch::regs to tdx_module_args.  From tdx_module_args to real registers.
+> > > > 
+> > > > If TDH.VP.ENTER is the only user of __seamcall_saved_ret(), can we make it to
+> > > > take unsigned long kvm_vcpu_argh::regs[NR_VCPU_REGS]?  Maybe I can make the
+> > > > change with TDX KVM patch series.
+> > > 
+> > > The assembly code assumes the second argument is a pointer to 'struct
+> > > tdx_module_args'.  I don't know how can we change __seamcall_saved_ret() to
+> > > achieve what you said.  We might change the kvm_vcpu_argh::regs[NR_VCPU_REGS] to
+> > > match 'struct tdx_module_args''s layout and manually convert part of "regs" to
+> > > the structure and pass to __seamcall_saved_ret(), but it's too hacky I suppose.
 > > 
-> > Urgghh... At least for the \host case you can simply pop %rsi, no?
-> > VP.ENTER returns with 0 there IIRC.
+> > I suspect the kvm_vcpu_arch::regs layout is given by hardware; so the
+> > only option would be to make tdx_module_args match that. It's a slightly
+> > unfortunate layout, but meh.
+> > 
+> > Then you can simply do:
+> > 
+> > 	__seamcall_saved_ret(leaf, (struct tdx_module_args *)vcpu->arch->regs);
+> > 
+> > 
 > 
-> No VP.ENTER doesn't return 0 for RAX.  Firstly, VP.ENTER can return for many
+> I don't think the layout matches hardware, especially I think there's no
+> "hardware layout" for GPRs that are concerned here.  They are just for KVM
+> itself to save guest's registers when the guest exits to KVM, so that KVM can
+> restore them when returning back to the guest.
 
-No, but it *does* return 0 for: RBX,RSI,RDI,R10-R15.
+Either way around it should be possible to make them match I suppose.
+Ideally we get the callee-clobbered regs first, but if not, I don't
+think that's too big of a problem.
 
-So for \host you can simply do:
 
-	pop	%rsi
-	mov	$0, TDX_MODULE_rsi(%rsi)
-
-and call it a day.
