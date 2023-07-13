@@ -2,63 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA60A751959
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 09:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0C0F7519A1
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 09:18:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234128AbjGMHIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 03:08:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35058 "EHLO
+        id S234069AbjGMHSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 03:18:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234181AbjGMHH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 03:07:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDE3272B;
-        Thu, 13 Jul 2023 00:07:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 702AC61A35;
-        Thu, 13 Jul 2023 07:07:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1DCCC433C7;
-        Thu, 13 Jul 2023 07:07:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689232053;
-        bh=c0yEUSYW3jDU+Bip/M9LxYAfyMmi3Ngn1ODIWEjnvyo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=b6gUMZiiVCVDYqCvJtHwcRPdNqvPw153scobiJcGpIWJO0rBAdLU76aKtG4eyI+IW
-         70eDzeBntwwiCX7DYQHuqGO6vfhd1m0c3IPbZMEdlptwRTGNO2TQg9TqRFtyZOleoL
-         lVcvtz/sYHew6bMRrJl+j9n5sqCuylffp5WQomxaj+R8MSBU/FrxrXtaKYAeaA2eWq
-         B9w9IKubQWlmoC3KiqqmxuZbz6cCwJl5aZ6087wTqG6Rf791LKDK7ryUuGqtFrgrLo
-         4Oc+ZIp6ZQczEhLtb9IyZavqVNR2sT8MEJvX8sO+v9rTN+KAQ23+mUU/cHrfhONIOd
-         GKkQiaSOyk1lA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qJqQF-00ChZk-JE;
-        Thu, 13 Jul 2023 08:07:31 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org,
-        Xiang Chen <chenxiang66@hisilicon.com>
-Subject: [PATCH] KVM: arm64: vgic-v4: Make the doorbell request robust w.r.t preemption
-Date:   Thu, 13 Jul 2023 08:06:57 +0100
-Message-Id: <20230713070657.3873244-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S234161AbjGMHST (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 03:18:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D2910E2
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 00:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689232653;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2LejsROT8ViVogg5eUBhr0atMu0AKpWZYVlQl+igMgI=;
+        b=fpCr9JYgy7w9gES/VJmw9yUH+zft55hT7Ov4wlfl25aJnmD+Zpd2+fRwLwWuI025oTMqX/
+        j7oChCVGu7yBbyCp4YGfFhf0fngP5SssiP2GzCdLP4qO/gxdVypzJiTFsG+d1uBvoFZDZq
+        sJ7fFns6rKYT4gAG9f+LliftaMeNEGE=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-83-76zTrGy1ME6NPfDor3_eKA-1; Thu, 13 Jul 2023 03:17:32 -0400
+X-MC-Unique: 76zTrGy1ME6NPfDor3_eKA-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-635a3b9d24eso2762586d6.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 00:17:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689232651; x=1691824651;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2LejsROT8ViVogg5eUBhr0atMu0AKpWZYVlQl+igMgI=;
+        b=Rx0SdABkuz05R6biLz69ZqN3+jTlnbBMkCihmHxpu9+gW9KorPcnAskKBv18UJpBeC
+         OE9ctk0TtT29bsokXyW1ZrtDd9Qezkds0hPrsxERrP2UlhWSaNje48TpXSOUMPVr0twp
+         GIVPW4YWFHDK3jIneQ3AiKgFgUHKwJoY42iD1ZiJn6lG94BAb7z8HhrdduKags8b/iA0
+         mR6e2LmONDvUqKkpkSd7p1h3CBl1La6+bxi3uRAPkjoBOhtT8JW4tfjAuvt0mbkRAKYJ
+         t7pzecHpuWrfK9Y3HYt8pBkom79Y1eUaUPWssJ8X3t9T25zKro67vvTXGEXVPg42NWfe
+         8cEg==
+X-Gm-Message-State: ABy/qLZd7cvf24W4d69xQQEp+P3Rj3RoyjYfliZtShbzux3odgimewvy
+        PRFUDJdDqL9nyLXNgffmHMQtsobQm/KwFUTkNfonKlzKbKixmsgQ7KRvHugaJPTIOhvo3mCFp9P
+        hxBaE7liCi0yAKa99jrF0
+X-Received: by 2002:a0c:f30d:0:b0:624:3af6:21d2 with SMTP id j13-20020a0cf30d000000b006243af621d2mr567938qvl.13.1689232651802;
+        Thu, 13 Jul 2023 00:17:31 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH0ylf23Un3JPDLz8dfGb4y1DOBv9H5wy1gDTlXzqFZNaiT4razpM88Y+ZPQl79Gmw4hqpkXw==
+X-Received: by 2002:a0c:f30d:0:b0:624:3af6:21d2 with SMTP id j13-20020a0cf30d000000b006243af621d2mr567926qvl.13.1689232651489;
+        Thu, 13 Jul 2023 00:17:31 -0700 (PDT)
+Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id r3-20020a0ccc03000000b0063211e61875sm2849980qvk.14.2023.07.13.00.17.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 00:17:30 -0700 (PDT)
+Message-ID: <9b2cdc37-0b93-ff00-d077-397b8c0c2950@redhat.com>
+Date:   Thu, 13 Jul 2023 09:17:28 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230712114149.1291580-1-nrb@linux.ibm.com>
+ <20230712114149.1291580-3-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v5 2/6] s390x: add function to set DAT mode
+ for all interrupts
+In-Reply-To: <20230712114149.1291580-3-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, stable@vger.kernel.org, chenxiang66@hisilicon.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,138 +83,131 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Xiang reports that VMs occasionally fail to boot on GICv4.1 systems when
-running a preemptible kernel, as it is possible that a vCPU is blocked
-without requesting a doorbell interrupt.
+On 12/07/2023 13.41, Nico Boehr wrote:
+> When toggling DAT or switch address space modes, it is likely that
+> interrupts should be handled in the same DAT or address space mode.
+> 
+> Add a function which toggles DAT and address space mode for all
+> interruptions, except restart interrupts.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   lib/s390x/asm/interrupt.h |  4 ++++
+>   lib/s390x/interrupt.c     | 36 ++++++++++++++++++++++++++++++++++++
+>   lib/s390x/mmu.c           |  5 +++--
+>   3 files changed, 43 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+> index 35c1145f0349..55759002dce2 100644
+> --- a/lib/s390x/asm/interrupt.h
+> +++ b/lib/s390x/asm/interrupt.h
+> @@ -83,6 +83,10 @@ void expect_ext_int(void);
+>   uint16_t clear_pgm_int(void);
+>   void check_pgm_int_code(uint16_t code);
+>   
+> +#define IRQ_DAT_ON	true
+> +#define IRQ_DAT_OFF	false
 
-The issue is that any preemption that occurs between vgic_v4_put() and
-schedule() on the block path will mark the vPE as nonresident and *not*
-request a doorbell irq. This occurs because when the vcpu thread is
-resumed on its way to block, vcpu_load() will make the vPE resident
-again. Once the vcpu actually blocks, we don't request a doorbell
-anymore, and the vcpu won't be woken up on interrupt delivery.
+Just a matter of taste, but IMHO having defines like this for just using 
+them as boolean parameter to one function is a little bit overkill already. 
+I'd rather rename the "bool dat" below into "bool use_dat" and then use 
+"true" and "false" directly as a parameter for that function instead. 
+Anyway, just my 0.02 €.
 
-Fix it by tracking that we're entering WFI, and key the doorbell
-request on that flag. This allows us not to make the vPE resident
-when going through a preempt/schedule cycle, meaning we don't lose
-any state.
+> +void irq_set_dat_mode(bool dat, uint64_t as);
+> +
+>   /* Activate low-address protection */
+>   static inline void low_prot_enable(void)
+>   {
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 3f993a363ae2..9b1bc6ce819d 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -9,6 +9,7 @@
+>    */
+>   #include <libcflat.h>
+>   #include <asm/barrier.h>
+> +#include <asm/mem.h>
+>   #include <asm/asm-offsets.h>
+>   #include <sclp.h>
+>   #include <interrupt.h>
+> @@ -104,6 +105,41 @@ void register_ext_cleanup_func(void (*f)(struct stack_frame_int *))
+>   	THIS_CPU->ext_cleanup_func = f;
+>   }
+>   
+> +/**
+> + * irq_set_dat_mode - Set the DAT mode of all interrupt handlers, except for
+> + * restart.
+> + * This will update the DAT mode and address space mode of all interrupt new
+> + * PSWs.
+> + *
+> + * Since enabling DAT needs initalized CRs and the restart new PSW is often used
 
-Cc: stable@vger.kernel.org
-Fixes: 8e01d9a396e6 ("KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by vcpu_load/put")
-Reported-by: Xiang Chen <chenxiang66@hisilicon.com>
-Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-Tested-by: Xiang Chen <chenxiang66@hisilicon.com>
-Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 2 ++
- arch/arm64/kvm/arm.c              | 6 ++++--
- arch/arm64/kvm/vgic/vgic-v3.c     | 2 +-
- arch/arm64/kvm/vgic/vgic-v4.c     | 7 +++++--
- include/kvm/arm_vgic.h            | 2 +-
- 5 files changed, 13 insertions(+), 6 deletions(-)
+s/initalized/initialized/
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1e768481f62f..914fc9c26e40 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -817,6 +817,8 @@ struct kvm_vcpu_arch {
- #define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
- /* PMUSERENR for the guest EL0 is on physical CPU */
- #define PMUSERENR_ON_CPU	__vcpu_single_flag(sflags, BIT(6))
-+/* WFI instruction trapped */
-+#define IN_WFI			__vcpu_single_flag(sflags, BIT(7))
- 
- /* vcpu entered with HCR_EL2.E2H set */
- #define VCPU_HCR_E2H		__vcpu_single_flag(oflags, BIT(0))
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 236c5f1c9090..cf208d30a9ea 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -725,13 +725,15 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
- 	 */
- 	preempt_disable();
- 	kvm_vgic_vmcr_sync(vcpu);
--	vgic_v4_put(vcpu, true);
-+	vcpu_set_flag(vcpu, IN_WFI);
-+	vgic_v4_put(vcpu);
- 	preempt_enable();
- 
- 	kvm_vcpu_halt(vcpu);
- 	vcpu_clear_flag(vcpu, IN_WFIT);
- 
- 	preempt_disable();
-+	vcpu_clear_flag(vcpu, IN_WFI);
- 	vgic_v4_load(vcpu);
- 	preempt_enable();
- }
-@@ -799,7 +801,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_RELOAD_GICv4, vcpu)) {
- 			/* The distributor enable bits were changed */
- 			preempt_disable();
--			vgic_v4_put(vcpu, false);
-+			vgic_v4_put(vcpu);
- 			vgic_v4_load(vcpu);
- 			preempt_enable();
- 		}
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 49d35618d576..df61ead7c757 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -780,7 +780,7 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
- 	 * done a vgic_v4_put) and when running a nested guest (the
- 	 * vPE was never resident in order to generate a doorbell).
- 	 */
--	WARN_ON(vgic_v4_put(vcpu, false));
-+	WARN_ON(vgic_v4_put(vcpu));
- 
- 	vgic_v3_vmcr_sync(vcpu);
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index c1c28fe680ba..339a55194b2c 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -336,14 +336,14 @@ void vgic_v4_teardown(struct kvm *kvm)
- 	its_vm->vpes = NULL;
- }
- 
--int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db)
-+int vgic_v4_put(struct kvm_vcpu *vcpu)
- {
- 	struct its_vpe *vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
- 
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || !vpe->resident)
- 		return 0;
- 
--	return its_make_vpe_non_resident(vpe, need_db);
-+	return its_make_vpe_non_resident(vpe, !!vcpu_get_flag(vcpu, IN_WFI));
- }
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu)
-@@ -354,6 +354,9 @@ int vgic_v4_load(struct kvm_vcpu *vcpu)
- 	if (!vgic_supports_direct_msis(vcpu->kvm) || vpe->resident)
- 		return 0;
- 
-+	if (vcpu_get_flag(vcpu, IN_WFI))
-+		return 0;
-+
- 	/*
- 	 * Before making the VPE resident, make sure the redistributor
- 	 * corresponding to our current CPU expects us here. See the
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9b91a8135dac..765d801d1ddc 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -446,7 +446,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int irq,
- 
- int vgic_v4_load(struct kvm_vcpu *vcpu);
- void vgic_v4_commit(struct kvm_vcpu *vcpu);
--int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
-+int vgic_v4_put(struct kvm_vcpu *vcpu);
- 
- bool vgic_state_is_nested(struct kvm_vcpu *vcpu);
- 
--- 
-2.34.1
+> + * to initalize CRs, the restart new PSW is never touched to avoid the chicken
+
+dito
+
+> + * and egg situation.
+> + *
+> + * @dat specifies whether to use DAT or not
+> + * @as specifies the address space mode to use - one of AS_PRIM, AS_ACCR,
+> + * AS_SECN or AS_HOME.
+> + */
+> +void irq_set_dat_mode(bool dat, uint64_t as)
+
+why uint64_t for "as" ? "int" should be enough?
+
+(alternatively, you could turn the AS_* defines into a properly named enum 
+and use that type here instead)
+
+  Thomas
+
+> +{
+> +	struct psw* irq_psws[] = {
+> +		OPAQUE_PTR(GEN_LC_EXT_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_SVC_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_PGM_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_MCCK_NEW_PSW),
+> +		OPAQUE_PTR(GEN_LC_IO_NEW_PSW),
+> +	};
+> +	struct psw *psw;
+> +
+> +	assert(as == AS_PRIM || as == AS_ACCR || as == AS_SECN || as == AS_HOME);
+> +
+> +	for (size_t i = 0; i < ARRAY_SIZE(irq_psws); i++) {
+> +		psw = irq_psws[i];
+> +		psw->dat = dat;
+> +		if (dat)
+> +			psw->as = as;
+> +	}
+> +}
+> +
+>   static void fixup_pgm_int(struct stack_frame_int *stack)
+>   {
+>   	/* If we have an error on SIE we directly move to sie_exit */
+> diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
+> index b474d7021d3f..199bd3fbc9c8 100644
+> --- a/lib/s390x/mmu.c
+> +++ b/lib/s390x/mmu.c
+> @@ -12,6 +12,7 @@
+>   #include <asm/pgtable.h>
+>   #include <asm/arch_def.h>
+>   #include <asm/barrier.h>
+> +#include <asm/interrupt.h>
+>   #include <vmalloc.h>
+>   #include "mmu.h"
+>   
+> @@ -41,8 +42,8 @@ static void mmu_enable(pgd_t *pgtable)
+>   	/* enable dat (primary == 0 set as default) */
+>   	enable_dat();
+>   
+> -	/* we can now also use DAT unconditionally in our PGM handler */
+> -	lowcore.pgm_new_psw.mask |= PSW_MASK_DAT;
+> +	/* we can now also use DAT in all interrupt handlers */
+> +	irq_set_dat_mode(IRQ_DAT_ON, AS_PRIM);
+>   }
+>   
+>   /*
 
