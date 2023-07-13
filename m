@@ -2,80 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4030C7519F0
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 09:29:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FFCD751A18
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 09:42:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234029AbjGMH3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 03:29:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50604 "EHLO
+        id S232129AbjGMHm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 03:42:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233860AbjGMH3K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 03:29:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638CFE77
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 00:28:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689233305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=30ZNaaFR/fjAYb5/oeSFvevjx8Dhisn2cnhujT75U2g=;
-        b=QWnqhMkV/a7XVVsOguykQyw+ya1fk1bX/tv7yboWle5hzDNhuzbrQ3ajbSO5bD9f5e7Wg6
-        52/1+jZGuaPNZZJ0K1nv+f8eqkeuKQjMGI0e9KE9sN9nmr2wVm6x92nL2XQmMAbVF/+xuu
-        lyFR6zpYH/L4ZE4KTrbT0Y0Hlfl6dzQ=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-xcn1tOjOPN-qzBWwEwNmIA-1; Thu, 13 Jul 2023 03:28:23 -0400
-X-MC-Unique: xcn1tOjOPN-qzBWwEwNmIA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7677e58c1bfso61520385a.0
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 00:28:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689233302; x=1691825302;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=30ZNaaFR/fjAYb5/oeSFvevjx8Dhisn2cnhujT75U2g=;
-        b=hgkhn2KPTdfXBAzw7TxHiIlbubAQKEqnTV547LYmujL+uX3bAHdWGn1mYBQqOEqn/+
-         dILXmcnFGOYz791fwBIPOtaUlPzUwsotrW4gGgO0lvu6WcyjoAbOZm4RuuC6jTzuhyyT
-         L0MRsU5k0roIwi6f6znGVqOimM1yju5K7T4VyMaqGG1a7RYmn+fFuHDXtPlHvpbHUL4p
-         NDRLIXzBdIifsMKcuAGP1UuIH9pP/EN1h/DqnEfgJq5j4rFhThcZBOjryzsjbGL3X1DL
-         P98/gaWycPdsP6QymOXpUX6xiWyL+kVxNSbj53LRqcIQ06FDKxHgh3oYeutB3biC560o
-         W9cw==
-X-Gm-Message-State: ABy/qLaevZPqdQN2Ln1a9RK1B5vaNokbjZhsu4DUHXXvd63ehFXsXWiA
-        m0dhO0J5d5FI6DB/qD2Lg6tiDXNLQMfgBy56ITDCC6qVTL3gJHuBXpc8Gprjm1E5AmORzdP5VsI
-        FaHM64HCe2end
-X-Received: by 2002:a05:620a:2686:b0:767:797b:4115 with SMTP id c6-20020a05620a268600b00767797b4115mr745224qkp.60.1689233302656;
-        Thu, 13 Jul 2023 00:28:22 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF2gFzkOuSf4lYd58Pk8j/nNj/eJAjGLR+Rj/GXsfdUz61A/I2+7/B41jkUWsJ5AucgeoUorA==
-X-Received: by 2002:a05:620a:2686:b0:767:797b:4115 with SMTP id c6-20020a05620a268600b00767797b4115mr745217qkp.60.1689233302412;
-        Thu, 13 Jul 2023 00:28:22 -0700 (PDT)
-Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id d3-20020a05620a140300b0075b13a89c30sm2712892qkj.3.2023.07.13.00.28.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Jul 2023 00:28:21 -0700 (PDT)
-Message-ID: <3dbe3094-b796-6b78-a97f-130a82780421@redhat.com>
-Date:   Thu, 13 Jul 2023 09:28:19 +0200
+        with ESMTP id S230439AbjGMHm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 03:42:27 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B02AF2108;
+        Thu, 13 Jul 2023 00:42:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=kTKp92nMORKUni0dDHjGU0PJGOsCJq93jIUVcsPJDLw=; b=PG+QC7QZT8c+wHG7QXMZtiU7Iy
+        ns+yBDoctmpQZtLYxx8Jh9fErsXo4fYvBoNvzrEiiSndGFfr/bH5n73gubATb70OgYYjgLd8HEuEg
+        LEEbJCb7EURr0jtB8Iq0U1kOrfZ6StJPQafc/fycSi8g6+wXwkxULR9L6/Oi3RWFjIs5ksIhRUjV+
+        8HPV7UlgLkogadF3uFtCQcSgp4TMw3pco0zEcmU34g+rP3kro6LVtryBS2u4Hs22A6bv9fyLSZNGt
+        eU6AhoJuG27LpS/37Sr6ztYuoP5dgUBegqL2/IzxGH4RBpLZAOjWU0XQ/e3cOCoeTFBzUuDziyXbg
+        m5AQX5xA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qJqxi-00HWIH-GC; Thu, 13 Jul 2023 07:42:06 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id DA6BB300222;
+        Thu, 13 Jul 2023 09:42:04 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id C17F9245CA115; Thu, 13 Jul 2023 09:42:04 +0200 (CEST)
+Date:   Thu, 13 Jul 2023 09:42:04 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH 09/10] x86/virt/tdx: Wire up basic SEAMCALL functions
+Message-ID: <20230713074204.GA3139243@hirez.programming.kicks-ass.net>
+References: <cover.1689151537.git.kai.huang@intel.com>
+ <41b7e5503a3e6057dc168b3c5a9693651c501d22.1689151537.git.kai.huang@intel.com>
+ <20230712221510.GG3894444@ls.amr.corp.intel.com>
+ <4202b26acdb3fe926dd1a9a46c2c7c35a5d85529.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [kvm-unit-tests PATCH v5 3/6] s390x: sie: switch to home space
- mode before entering SIE
-Content-Language: en-US
-To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230712114149.1291580-1-nrb@linux.ibm.com>
- <20230712114149.1291580-4-nrb@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230712114149.1291580-4-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4202b26acdb3fe926dd1a9a46c2c7c35a5d85529.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,91 +73,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/07/2023 13.41, Nico Boehr wrote:
-> This is to prepare for running guests without MSO/MSL, which is
-> currently not possible.
+On Thu, Jul 13, 2023 at 03:46:52AM +0000, Huang, Kai wrote:
+> On Wed, 2023-07-12 at 15:15 -0700, Isaku Yamahata wrote:
+> > > The SEAMCALL ABI is very similar to the TDCALL ABI and leverages much
+> > > TDCALL infrastructure.  Wire up basic functions to make SEAMCALLs for
+> > > the basic TDX support: __seamcall(), __seamcall_ret() and
+> > > __seamcall_saved_ret() which is for TDH.VP.ENTER leaf function.
+> > 
+> > Hi.  __seamcall_saved_ret() uses struct tdx_module_arg as input and output.  For
+> > KVM TDH.VP.ENTER case, those arguments are already in unsigned long
+> > kvm_vcpu_arch::regs[].  It's silly to move those values twice.  From
+> > kvm_vcpu_arch::regs to tdx_module_args.  From tdx_module_args to real registers.
+> > 
+> > If TDH.VP.ENTER is the only user of __seamcall_saved_ret(), can we make it to
+> > take unsigned long kvm_vcpu_argh::regs[NR_VCPU_REGS]?  Maybe I can make the
+> > change with TDX KVM patch series.
 > 
-> We already have code in sie64a to setup a guest primary ASCE before
-> entering SIE, so we can in theory switch to the page tables which
-> translate gpa to hpa.
-> 
-> But the host is running in primary space mode already, so changing the
-> primary ASCE before entering SIE will also affect the host's code and
-> data.
-> 
-> To make this switch useful, the host should run in a different address
-> space mode. Hence, set up and change to home address space mode before
-> installing the guest ASCE.
-> 
-> The home space ASCE is just copied over from the primary space ASCE, so
-> no functional change is intended, also for tests that want to use
-> MSO/MSL. If a test intends to use a different primary space ASCE, it can
-> now just set the guest.asce in the save_area.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   lib/s390x/asm/arch_def.h |  1 +
->   lib/s390x/sie.c          | 18 ++++++++++++++++++
->   2 files changed, 19 insertions(+)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 53279572a9ee..65e1cf58c7e7 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -91,6 +91,7 @@ struct cpu {
->   #define AS_HOME				3
->   
->   #define PSW_MASK_DAT			0x0400000000000000UL
-> +#define PSW_MASK_HOME			0x0000C00000000000UL
->   #define PSW_MASK_IO			0x0200000000000000UL
->   #define PSW_MASK_EXT			0x0100000000000000UL
->   #define PSW_MASK_KEY			0x00F0000000000000UL
-> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> index 9241b4b4a512..ffa8ec91a423 100644
-> --- a/lib/s390x/sie.c
-> +++ b/lib/s390x/sie.c
-> @@ -46,6 +46,8 @@ void sie_handle_validity(struct vm *vm)
->   
->   void sie(struct vm *vm)
->   {
-> +	uint64_t old_cr13;
-> +
->   	if (vm->sblk->sdf == 2)
->   		memcpy(vm->sblk->pv_grregs, vm->save_area.guest.grs,
->   		       sizeof(vm->save_area.guest.grs));
-> @@ -53,6 +55,16 @@ void sie(struct vm *vm)
->   	/* Reset icptcode so we don't trip over it below */
->   	vm->sblk->icptcode = 0;
->   
-> +	/* set up home address space to match primary space */
-> +	old_cr13 = stctg(13);
-> +	lctlg(13, stctg(1));
-> +
-> +	/* switch to home space so guest tables can be different from host */
-> +	psw_mask_set_bits(PSW_MASK_HOME);
-> +
-> +	/* also handle all interruptions in home space while in SIE */
-> +	irq_set_dat_mode(IRQ_DAT_ON, AS_HOME);
-> +
->   	while (vm->sblk->icptcode == 0) {
->   		sie64a(vm->sblk, &vm->save_area);
->   		sie_handle_validity(vm);
-> @@ -60,6 +72,12 @@ void sie(struct vm *vm)
->   	vm->save_area.guest.grs[14] = vm->sblk->gg14;
->   	vm->save_area.guest.grs[15] = vm->sblk->gg15;
->   
-> +	irq_set_dat_mode(IRQ_DAT_ON, AS_PRIM);
-> +	psw_mask_clear_bits(PSW_MASK_HOME);
-> +
-> +	/* restore the old CR 13 */
-> +	lctlg(13, old_cr13);
+> The assembly code assumes the second argument is a pointer to 'struct
+> tdx_module_args'.  I don't know how can we change __seamcall_saved_ret() to
+> achieve what you said.  We might change the kvm_vcpu_argh::regs[NR_VCPU_REGS] to
+> match 'struct tdx_module_args''s layout and manually convert part of "regs" to
+> the structure and pass to __seamcall_saved_ret(), but it's too hacky I suppose.
 
-Wouldn't it be better to always switch to HOME address mode directly in our 
-startup code already (where we enable DAT)? Switching back and forth every 
-time we enter SIE looks confusing to me ... or is there a reason why we 
-should continue to run in primary address mode by default and only switch to 
-home mode here?
+I suspect the kvm_vcpu_arch::regs layout is given by hardware; so the
+only option would be to make tdx_module_args match that. It's a slightly
+unfortunate layout, but meh.
 
-  Thomas
+Then you can simply do:
+
+	__seamcall_saved_ret(leaf, (struct tdx_module_args *)vcpu->arch->regs);
 
 
