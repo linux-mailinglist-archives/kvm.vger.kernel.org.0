@@ -2,298 +2,650 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC3997524A9
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 16:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2228D75249A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 16:07:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234739AbjGMOJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 10:09:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57648 "EHLO
+        id S234317AbjGMOG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 10:06:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234347AbjGMOJ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 10:09:57 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6ED61998;
-        Thu, 13 Jul 2023 07:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689257396; x=1720793396;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nqdEZTgsNGeRzBdlPkYQmuACZnzYsRBxWOC1j3tf6do=;
-  b=VKyMQVjsLjuRpu5e2g5rG4pQ74anyHXPNI1tSTSyFvok3/34LqhpwfL+
-   4kE6KMAbeu5p81m3fKwRVB3avTU2PNsgRWjQ/bZ85hXmvhoHjocUNK3+i
-   1ZBrDt+SxcixChRFbck5oGItvZQHSSKuARGEzTVluoro4h79DHZgxPsLO
-   uU7aatjFGJATDff5LnWdEOTxdGl3YYetPmksIzVl/UTD2BJlu9J0mNNGM
-   kfwnDPVAzaqEruYHHbbVuSglwhTKpXAuWeAm2JxaF/OwKzEOvpRtteOYX
-   XSo4dl37PWgp8w6o+saQiEc/wKV9kAXtbKAZPOlMP1tFfwArn5Rxv8OqO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="428952173"
-X-IronPort-AV: E=Sophos;i="6.01,203,1684825200"; 
-   d="scan'208";a="428952173"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2023 06:32:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="792029413"
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="792029413"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.18.246]) ([10.93.18.246])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2023 06:32:14 -0700
-Message-ID: <a6fd8266-54a8-bb4b-f3d2-643a94e27e9e@intel.com>
-Date:   Thu, 13 Jul 2023 21:32:11 +0800
+        with ESMTP id S234393AbjGMOGx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 10:06:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32AE1998
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 07:06:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689257166;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hmJDfzniq78z/syhqYqv1t2fog9OG8SmxSLLjJ9y5kc=;
+        b=S86YuFAth892kfWFLy8c5fiBFnvlyb/twzUyR7BoQwJyuywvmHug5/pCK4t6ZHzXbQ5CtN
+        Tu/IN2HdnfqSr8MoHsjLnSgmLp5OM3WmFL8BVbKl1EHgK/1uleTJAuVeBcG21O+2XRGb4o
+        cIbumAnb/1L5ZSpvzNb4N4UsHt3c4EU=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-259-X_H2fds0MWC0_V6Kmgk_qw-1; Thu, 13 Jul 2023 10:05:49 -0400
+X-MC-Unique: X_H2fds0MWC0_V6Kmgk_qw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635325b87c9so7724296d6.1
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 07:05:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689257139; x=1689861939;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hmJDfzniq78z/syhqYqv1t2fog9OG8SmxSLLjJ9y5kc=;
+        b=YQQGJYV16k5aAAb81vGIFAX7NTwzsuixot191hc6bByQ9ATpe7j2+TapCC6cBCF9Qr
+         owatRN50maVwkxI7mVzxNCc5Bxa1ziExwVXkymHGmdNOShZYNC7eOj+Nv/ygO2RVlJ8y
+         rCLRtizY8RhlQgCBzg101uVmdSo3IRq39jriYQxY5eIOKwysn7jnu3Yz9S8zA9CyDVyW
+         dGsOFYCcfUZUw+C/lEDe3LWcggRsOjfSKL7jDusevxJ+P4CAa6Mf6EneXFBkNU11yaC3
+         +9NhP2jr8mWeH0ZcDiEIyWVFEHcLJovLQuJ9dvflHNmXYoGBTb6toatdO/K4SoOUhyrQ
+         VykQ==
+X-Gm-Message-State: ABy/qLYJvebXH56Z8MymUaBozz7lY0LPHVg7I+oMYQYvGOAhbh8bkJ4K
+        N3bMzxGBauT/sG6a4bavKkpEMXgDAKshp+J3KDsTxrlh/ABOcAmWwAUzbth3hhqLui5I8GhQKlY
+        7nZW8U/qEvd36
+X-Received: by 2002:a0c:eb4c:0:b0:626:31ad:f873 with SMTP id c12-20020a0ceb4c000000b0062631adf873mr1418002qvq.24.1689257139421;
+        Thu, 13 Jul 2023 07:05:39 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlErGTtXtOMNhui1V083e4Pzi4yfWXwTO7hwRcu/kNSSOUOwT+GI2RlE74NOZ7a7SMiG+q0HTQ==
+X-Received: by 2002:a0c:eb4c:0:b0:626:31ad:f873 with SMTP id c12-20020a0ceb4c000000b0062631adf873mr1417966qvq.24.1689257138918;
+        Thu, 13 Jul 2023 07:05:38 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id y3-20020a0cd983000000b0062df126ca11sm3078629qvj.21.2023.07.13.07.05.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 07:05:38 -0700 (PDT)
+Message-ID: <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
+Date:   Thu, 13 Jul 2023 16:05:33 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Subject: Re: [RFC 0/3] KVM: x86: introduce pv feature lazy tscdeadline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
 Content-Language: en-US
-To:     Wang Jianchao <jianchwa@outlook.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, arkinjob@outlook.com,
-        linux-kernel@vger.kernel.org
-References: <BYAPR03MB4133436C792BBF9EC6D77672CD2DA@BYAPR03MB4133.namprd03.prod.outlook.com>
- <20230712211453.000025f6.zhi.wang.linux@gmail.com>
- <BYAPR03MB4133E3A1487ED160FBB59E0CCD37A@BYAPR03MB4133.namprd03.prod.outlook.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <BYAPR03MB4133E3A1487ED160FBB59E0CCD37A@BYAPR03MB4133.namprd03.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-17-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-17-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75 autolearn=no
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/13/2023 10:50 AM, Wang Jianchao wrote:
-> 
-> 
-> On 2023.07.13 02:14, Zhi Wang wrote:
->> On Fri,  7 Jul 2023 14:17:58 +0800
->> Wang Jianchao <jianchwa@outlook.com> wrote:
->>
->>> Hi
->>>
->>> This patchset attemps to introduce a new pv feature, lazy tscdeadline.
->>> Everytime guest write msr of MSR_IA32_TSC_DEADLINE, a vm-exit occurs
->>> and host side handle it. However, a lot of the vm-exit is unnecessary
->>> because the timer is often over-written before it expires.
->>>
->>> v : write to msr of tsc deadline
->>> | : timer armed by tsc deadline
->>>
->>>           v v v v v        | | | | |
->>> --------------------------------------->  Time
->>>
->>> The timer armed by msr write is over-written before expires and the
->>> vm-exit caused by it are wasted. The lazy tscdeadline works as following,
->>>
->>>           v v v v v        |       |
->>> --------------------------------------->  Time
->>>                            '- arm -'
->>>
->>
->> Interesting patch.
->>
->> I am a little bit confused of the chart above. It seems the write of MSR,
->> which is said to cause VM exit, is not reduced in the chart of lazy
->> tscdeadline, only the times of arm are getting less. And the benefit of
->> lazy tscdeadline is said coming from "less vm exit". Maybe it is better
->> to imporve the chart a little bit to help people jump into the idea
->> easily?
-> 
-> Thanks so much for you comment and sorry for my poor chart.
-> 
-> Let me try to rework the chart.
-> 
-> Before this patch, every time guest start or modify a hrtimer, we need to write the msr of tsc deadline,
-> a vm-exit occurs and host arms a hv or sw timer for it.
-> 
-> 
-> w: write msr
-> x: vm-exit
-> t: hv or sw timer
-> 
-> 
-> Guest
->           w
-> --------------------------------------->  Time
-> Host     x              t
->   
-> 
-> However, in some workload that needs setup timer frequently, msr of tscdeadline is usually overwritten
-> many times before the timer expires. And every time we modify the tscdeadline, a vm-exit ocurrs
-> 
-> 
-> 1. write to msr with t0
-> 
-> Guest
->           w0
-> ---------------------------------------->  Time
-> Host     x0             t0
-> 
->   
-> 2. write to msr with t1
-> Guest
->               w1
-> ------------------------------------------>  Time
-> Host         x1          t0->t1
-> 
-> 
-> 2. write to msr with t2
-> Guest
->                  w2
-> ------------------------------------------>  Time
-> Host            x2          t1->t2
->   
-> 
-> 3. write to msr with t3
-> Guest
->                      w3
-> ------------------------------------------>  Time
-> Host                x3           t2->t3
-> 
-> 
-> 
-> What this patch want to do is to eliminate the vm-exit of x1 x2 and x3 as following,
-> 
-> 
-> Firstly, we have two fields shared between guest and host as other pv features, saying,
->   - armed, the value of tscdeadline that has a timer in host side, only updated by __host__ side
->   - pending, the next value of tscdeadline, only updated by __guest__ side
-> 
-> 
-> 1. write to msr with t0
-> 
->               armed   : t0
->               pending : t0
-> Guest
->           w0
-> ---------------------------------------->  Time
-> Host     x0             t0
-> 
-> vm-exit occurs and arms a timer for t0 in host side
+Hi Marc,
 
-What's the initial value of @armed and @pending?
+On 7/12/23 16:57, Marc Zyngier wrote:
+> Describe the HCR_EL2 register, and associate it with all the sysregs
+> it allows to trap.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/emulate-nested.c | 475 ++++++++++++++++++++++++++++++++
+>  1 file changed, 475 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 5bab2e85d70c..51901e85e43d 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -37,12 +37,47 @@ enum coarse_grain_trap_id {
+>  	 * on their own instead of being part of a combination of
+>  	 * trap controls.
+>  	 */
+> +	CGT_HCR_TID1,
+> +	CGT_HCR_TID2,
+> +	CGT_HCR_TID3,
+> +	CGT_HCR_IMO,
+> +	CGT_HCR_FMO,
+> +	CGT_HCR_TIDCP,
+> +	CGT_HCR_TACR,
+> +	CGT_HCR_TSW,
+> +	CGT_HCR_TPC,
+> +	CGT_HCR_TPU,
+> +	CGT_HCR_TTLB,
+> +	CGT_HCR_TVM,
+> +	CGT_HCR_TDZ,
+> +	CGT_HCR_TRVM,
+> +	CGT_HCR_TLOR,
+> +	CGT_HCR_TERR,
+> +	CGT_HCR_APK,
+> +	CGT_HCR_NV,
+> +	CGT_HCR_NV1,
+> +	CGT_HCR_AT,
+> +	CGT_HCR_FIEN,
+> +	CGT_HCR_TID4,
+> +	CGT_HCR_TICAB,
+> +	CGT_HCR_TOCU,
+> +	CGT_HCR_ENSCXT,
+> +	CGT_HCR_TTLBIS,
+> +	CGT_HCR_TTLBOS,
+>  
+>  	/*
+>  	 * Anything after this point is a combination of trap controls,
+>  	 * which all must be evaluated to decide what to do.
+>  	 */
+>  	__MULTIPLE_CONTROL_BITS__,
+> +	CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
+> +	CGT_HCR_TID2_TID4,
+> +	CGT_HCR_TTLB_TTLBIS,
+> +	CGT_HCR_TTLB_TTLBOS,
+> +	CGT_HCR_TVM_TRVM,
+> +	CGT_HCR_TPU_TICAB,
+> +	CGT_HCR_TPU_TOCU,
+> +	CGT_HCR_NV1_ENSCXT,
+>  
+>  	/*
+>  	 * Anything after this point requires a callback evaluating a
+> @@ -52,6 +87,168 @@ enum coarse_grain_trap_id {
+>  };
+>  
+>  static const struct trap_bits coarse_trap_bits[] = {
+> +	[CGT_HCR_TID1] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_TID1,
+> +		.mask		= HCR_TID1,
+> +		.behaviour	= BEHAVE_FORWARD_READ,
+> +	},
+> +	[CGT_HCR_TID2] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_TID2,
+> +		.mask		= HCR_TID2,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TID3] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_TID3,
+> +		.mask		= HCR_TID3,
+> +		.behaviour	= BEHAVE_FORWARD_READ,
+> +	},
+> +	[CGT_HCR_IMO] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_IMO,
+> +		.mask		= HCR_IMO,
+> +		.behaviour	= BEHAVE_FORWARD_WRITE,
+> +	},
+> +	[CGT_HCR_FMO] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_FMO,
+> +		.mask		= HCR_FMO,
+> +		.behaviour	= BEHAVE_FORWARD_WRITE,
+> +	},
+> +	[CGT_HCR_TIDCP] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TIDCP,
+> +		.mask		= HCR_TIDCP,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TACR] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TACR,
+> +		.mask		= HCR_TACR,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TSW] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TSW,
+> +		.mask		= HCR_TSW,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TPC] = {
+modern revisions now refer to TPCP, maybe worth a comment?
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TPC,
+> +		.mask		= HCR_TPC,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TPU] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TPU,
+> +		.mask		= HCR_TPU,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TTLB] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TTLB,
+> +		.mask		= HCR_TTLB,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TVM] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TVM,
+> +		.mask		= HCR_TVM,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TDZ] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TDZ,
+> +		.mask		= HCR_TDZ,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TRVM] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TRVM,
+> +		.mask		= HCR_TRVM,
+> +		.behaviour	= BEHAVE_FORWARD_READ,
+> +	},
+> +	[CGT_HCR_TLOR] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TLOR,
+> +		.mask		= HCR_TLOR,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TERR] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TERR,
+> +		.mask		= HCR_TERR,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_APK] = {
+> +		.index		= HCR_EL2,
+> +		.value		= 0,
+> +		.mask		= HCR_APK,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_NV] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_NV,
+> +		.mask		= HCR_NV | HCR_NV2,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_NV1] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_NV | HCR_NV1,
+> +		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_AT] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_AT,
+> +		.mask		= HCR_AT,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_FIEN] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_FIEN,
+> +		.mask		= HCR_FIEN,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TID4] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_TID4,
+> +		.mask		= HCR_TID4,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TICAB] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_TICAB,
+> +		.mask		= HCR_TICAB,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TOCU] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= HCR_TOCU,
+> +		.mask		= HCR_TOCU,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_ENSCXT] = {
+> +		.index		= HCR_EL2,
+> +		.value 		= 0,
+> +		.mask		= HCR_ENSCXT,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TTLBIS] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TTLBIS,
+> +		.mask		= HCR_TTLBIS,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+> +	[CGT_HCR_TTLBOS] = {
+> +		.index		= HCR_EL2,
+> +		.value		= HCR_TTLBOS,
+> +		.mask		= HCR_TTLBOS,
+> +		.behaviour	= BEHAVE_FORWARD_ANY,
+> +	},
+>  };
+>  
+>  #define MCB(id, ...)					\
+> @@ -61,6 +258,14 @@ static const struct trap_bits coarse_trap_bits[] = {
+>  		}
+>  
+>  static const enum coarse_grain_trap_id *coarse_control_combo[] = {
+> +	MCB(CGT_HCR_IMO_FMO,		CGT_HCR_IMO, CGT_HCR_FMO),
+> +	MCB(CGT_HCR_TID2_TID4,		CGT_HCR_TID2, CGT_HCR_TID4),
+> +	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
+> +	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
+> +	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
+> +	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
+> +	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
+> +	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
+>  };
+>  
+>  typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
+> @@ -118,6 +323,276 @@ struct encoding_to_trap_config {
+>   * re-injected in the nested hypervisor.
+>   */
+>  static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
+> +	SR_TRAP(SYS_REVIDR_EL1,		CGT_HCR_TID1),
+> +	SR_TRAP(SYS_AIDR_EL1,		CGT_HCR_TID1),
+> +	SR_TRAP(SYS_SMIDR_EL1,		CGT_HCR_TID1),
+> +	SR_TRAP(SYS_CTR_EL0,		CGT_HCR_TID2),
+> +	SR_TRAP(SYS_CCSIDR_EL1,		CGT_HCR_TID2_TID4),
+> +	SR_TRAP(SYS_CCSIDR2_EL1,	CGT_HCR_TID2_TID4),
+> +	SR_TRAP(SYS_CLIDR_EL1,		CGT_HCR_TID2_TID4),
+> +	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
+> +	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
+> +		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
+in the spec I see this upper limit in the FEAT_FGT section. Out of
+curiosity how were you able to convert the sys reg names into this Op0,
+Op1, CRn, CRm, Op2. Is there any ordering logic documented somewhere for
+those group3 regs?
 
->   
-> 2. write to msr with t1
-> 
->               armed   : t0
->               pending : t1
-> 
-> Guest
->               w1
-> ------------------------------------------>  Time
-> Host                     t0
-> 
-> the value of tsc deadline that has been armed, namely t0, is smaller than t1, needn't to write
-> to msr but just update pending
+I checked Table D18-2 and this looks good but I wonder if there isn't
+any more efficient way to review this.
+> +	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
+> +	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
+> +	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
+> +	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
+> +		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
+> +		      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
+> +		      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
+> +		      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
+> +		      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
+> +		      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
+> +		      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
+> +		      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
+> +		      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
+> +		      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
+> +		      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
+> +		      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
+> +		      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
+> +		      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
+> +		      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
+> +		      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
+> +	SR_TRAP(SYS_ACTLR_EL1,		CGT_HCR_TACR),
+> +	SR_TRAP(SYS_DC_ISW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CISW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_IGSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_IGDSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CGSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CGDSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CIGSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CIGDSW,		CGT_HCR_TSW),
+> +	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
+I don't see CVADP?
+> +	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_IGVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_IGDVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CGVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CGDVAC,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CGVAP,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CGDVAP,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CGVADP,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_DC_CGDVADP,		CGT_HCR_TPC),
+> +	SR_TRAP(SYS_IC_IVAU,		CGT_HCR_TPU_TOCU),
+> +	SR_TRAP(SYS_IC_IALLU,		CGT_HCR_TPU_TOCU),
+> +	SR_TRAP(SYS_IC_IALLUIS,		CGT_HCR_TPU_TICAB),
+> +	SR_TRAP(SYS_DC_CVAU,		CGT_HCR_TPU_TOCU),
+> +	SR_TRAP(OP_TLBI_RVAE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVAAE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVALE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVAALE1,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VMALLE1,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VAE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_ASIDE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VAAE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VALE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VAALE1,		CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVAE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVAAE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVALE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVAALE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VMALLE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VAE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_ASIDE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VAAE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VALE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_VAALE1NXS,	CGT_HCR_TTLB),*
+> +	SR_TRAP(OP_TLBI_RVAE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVAAE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVALE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVAALE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VMALLE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VAE1IS,		CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_ASIDE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VAAE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VALE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VAALE1IS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVAAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_RVAALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VMALLE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_ASIDE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VAAE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VAALE1ISNXS,	CGT_HCR_TTLB_TTLBIS),*
+> +	SR_TRAP(OP_TLBI_VMALLE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VAE1OS,		CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_ASIDE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VAAE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VALE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VAALE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVAE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVAAE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVALE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVAALE1OS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VMALLE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_ASIDE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VAAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_VAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVAAE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(OP_TLBI_RVAALE1OSNXS,	CGT_HCR_TTLB_TTLBOS),*
+> +	SR_TRAP(SYS_SCTLR_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_TTBR0_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_TTBR1_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_TCR_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_ESR_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_FAR_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_AFSR0_EL1,		CGT_HCR_TVM_TRVM),*
+Looking at the SFSR0_EL1 MRS/MSR pseudo code I understand TRVM is tested
+on read and
+TVM is tested on write. However CGT_HCR_TVM has FORWARD_ANY behaviour
+while TRVM looks good as FORWARD_READ? Do I miss something.
 
-if t1 < t0, then it triggers the vm exit, right?
-And in this case, I think @armed will be updated to t1. What about 
-pending? will it get updated to t1 or not?
+> +	SR_TRAP(SYS_AFSR1_EL1,		CGT_HCR_TVM_TRVM),*
+same here and below
+> +	SR_TRAP(SYS_MAIR_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_AMAIR_EL1,		CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_CONTEXTIDR_EL1,	CGT_HCR_TVM_TRVM),
+> +	SR_TRAP(SYS_DC_ZVA,		CGT_HCR_TDZ),*
+> +	SR_TRAP(SYS_DC_GVA,		CGT_HCR_TDZ),*
+> +	SR_TRAP(SYS_DC_GZVA,		CGT_HCR_TDZ),*
+> +	SR_TRAP(SYS_LORSA_EL1,		CGT_HCR_TLOR),*
+> +	SR_TRAP(SYS_LOREA_EL1, 		CGT_HCR_TLOR),*
+> +	SR_TRAP(SYS_LORN_EL1, 		CGT_HCR_TLOR),*
+> +	SR_TRAP(SYS_LORC_EL1, 		CGT_HCR_TLOR),*
+> +	SR_TRAP(SYS_LORID_EL1,		CGT_HCR_TLOR),*
+> +	SR_TRAP(SYS_ERRIDR_EL1,		CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERRSELR_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXADDR_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXCTLR_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXFR_EL1,		CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXMISC0_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXMISC1_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXMISC2_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXMISC3_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_ERXSTATUS_EL1,	CGT_HCR_TERR),*
+> +	SR_TRAP(SYS_APIAKEYLO_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APIAKEYHI_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APIBKEYLO_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APIBKEYHI_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APDAKEYLO_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APDAKEYHI_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APDBKEYLO_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APDBKEYHI_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APGAKEYLO_EL1,	CGT_HCR_APK),*
+> +	SR_TRAP(SYS_APGAKEYHI_EL1,	CGT_HCR_APK),*
+> +	/* All _EL2 registers */
+> +	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
+> +		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
+> +	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
+> +		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
+> +	/* All _EL02, _EL12 registers */
+> +	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+> +		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+> +	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+> +		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
+same question as bove, where in the ARM ARM do you find those ranges?
+> +	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),*
+> +	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),*
+> +	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),*
+> +	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),*
+> +	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),*
+> +	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),*
+according to the pseudo code NV2 is not checked
+shouldn't we have a separate CGT? Question also valid for a bunch of ops
+below
+> +	SR_TRAP(OP_AT_S12E0W,		CGT_HCR_NV),*
+> +	SR_TRAP(OP_TLBI_IPAS2E1,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2E1,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2LE1,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2LE1,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVAE2,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVALE2,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE2,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VAE2,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE1,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VALE2,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VMALLS12E1,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2E1NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2E1NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2LE1NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2LE1NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVAE2NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVALE2NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE2NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VAE2NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE1NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VALE2NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VMALLS12E1NXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2E1IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2E1IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2LE1IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2LE1IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVAE2IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVALE2IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE2IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VAE2IS,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE1IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VALE2IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VMALLS12E1IS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2E1ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2E1ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2LE1ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2LE1ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVAE2ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVALE2ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE2ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VAE2ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE1ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VALE2ISNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VMALLS12E1ISNXS,CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE2OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VAE2OS,		CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE1OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VALE2OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VMALLS12E1OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2E1OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2E1OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2LE1OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2LE1OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVAE2OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVALE2OS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE2OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VAE2OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_ALLE1OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VALE2OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_VMALLS12E1OSNXS,CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2E1OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2E1OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_IPAS2LE1OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
+> +	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
+> +	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
 
-> 
-> 3. write to msr with t2
-> 
->               armed   : t0
->               pending : t2
->   
-> Guest
->                  w2
-> ------------------------------------------>  Time
-> Host                      t0
->   
-> Similar with step 2, just update pending field with t2, no vm-exit
-> 
-> 
-> 4.  write to msr with t3
-> 
->               armed   : t0
->               pending : t3
-> 
-> Guest
->                      w3
-> ------------------------------------------>  Time
-> Host                       t0
-> Similar with step 2, just update pending field with t3, no vm-exit
-> 
-> 
-> 5.  t0 expires, arm t3
-> 
->               armed   : t3
->               pending : t3
-> 
-> 
-> Guest
->                              
-> ------------------------------------------>  Time
-> Host                       t0  ------> t3
-> 
-> t0 is fired, it checks the pending field and re-arm a timer based on it.
-> 
-> 
-> Here is the core ideal of this patch ;)
-> 
-> 
-> Thanks
-> Jianchao
-> 
->>
->>> The 1st timer is responsible for arming the next timer. When the armed
->>> timer is expired, it will check pending and arm a new timer.
->>>
->>> In the netperf test with TCP_RR on loopback, this lazy_tscdeadline can
->>> reduce vm-exit obviously.
->>>
->>>                           Close               Open
->>> --------------------------------------------------------
->>> VM-Exit
->>>               sum         12617503            5815737
->>>              intr      0% 37023            0% 33002
->>>             cpuid      0% 1                0% 0
->>>              halt     19% 2503932         47% 2780683
->>>         msr-write     79% 10046340        51% 2966824
->>>             pause      0% 90               0% 84
->>>     ept-violation      0% 584              0% 336
->>>     ept-misconfig      0% 0                0% 2
->>> preemption-timer      0% 29518            0% 34800
->>> -------------------------------------------------------
->>> MSR-Write
->>>              sum          10046455            2966864
->>>          apic-icr     25% 2533498         93% 2781235
->>>      tsc-deadline     74% 7512945          6% 185629
->>>
->>> This patchset is made and tested on 6.4.0, includes 3 patches,
->>>
->>> The 1st one adds necessary data structures for this feature
->>> The 2nd one adds the specific msr operations between guest and host
->>> The 3rd one are the one make this feature works.
->>>
->>> Any comment is welcome.
->>>
->>> Thanks
->>> Jianchao
->>>
->>> Wang Jianchao (3)
->>> 	KVM: x86: add msr register and data structure for lazy tscdeadline
->>> 	KVM: x86: exchange info about lazy_tscdeadline with msr
->>> 	KVM: X86: add lazy tscdeadline support to reduce vm-exit of msr-write
->>>
->>>
->>>   arch/x86/include/asm/kvm_host.h      |  10 ++++++++
->>>   arch/x86/include/uapi/asm/kvm_para.h |   9 +++++++
->>>   arch/x86/kernel/apic/apic.c          |  47 ++++++++++++++++++++++++++++++++++-
->>>   arch/x86/kernel/kvm.c                |  13 ++++++++++
->>>   arch/x86/kvm/cpuid.c                 |   1 +
->>>   arch/x86/kvm/lapic.c                 | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
->>>   arch/x86/kvm/lapic.h                 |   4 +++
->>>   arch/x86/kvm/x86.c                   |  26 ++++++++++++++++++++
->>>   8 files changed, 229 insertions(+), 9 deletions(-)
->>
+CIGDPAE?
+CIPAE?
+CFP/CPP/DVP RCTX?
+> +	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),*
+> +	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
+> +	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
+> +	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
+> +	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
+> +	SR_TRAP(OP_AT_S1E0R, 		CGT_HCR_AT),
+> +	SR_TRAP(OP_AT_S1E0W, 		CGT_HCR_AT),
+> +	SR_TRAP(OP_AT_S1E1RP, 		CGT_HCR_AT),
+> +	SR_TRAP(OP_AT_S1E1WP, 		CGT_HCR_AT),
+> +	SR_TRAP(SYS_ERXPFGF_EL1,	CGT_HCR_FIEN),
+> +	SR_TRAP(SYS_ERXPFGCTL_EL1,	CGT_HCR_FIEN),
+> +	SR_TRAP(SYS_ERXPFGCDN_EL1,	CGT_HCR_FIEN),
+> +	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
+>  };
+>  
+>  static DEFINE_XARRAY(sr_forward_xa);
+Thanks
+
+Eric
 
