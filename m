@@ -2,221 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C33975259D
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 16:53:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7818F752720
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 17:32:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbjGMOwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 10:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57842 "EHLO
+        id S232265AbjGMPce (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 11:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbjGMOwx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 10:52:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2EC19A6;
-        Thu, 13 Jul 2023 07:52:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 29955616F2;
-        Thu, 13 Jul 2023 14:52:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA899C433C7;
-        Thu, 13 Jul 2023 14:52:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689259971;
-        bh=R4Hkl4iroQ+C4d3AaFA6aa52uzI7aPnAyTDDN/lwc78=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RS/6gRgqvF3ybwn8Ovqq43iLhI7Yv15SZZP2U5CNn6IhgXHQH9mo4nByA/g4W736R
-         AkMi1WqcMsHhNrtO7dGPqCwKIYlgvLK+7FW5vJj2elL3FTubJgM81//BHDuM8QqyRP
-         Csacjb3yQ3aRtIn7A1i9sInqtS8VRY/O0QwqwwSlh+wJ04gvPtGAbDZaSnmdfd209l
-         vt3KpAe4HIE13hYrO1C7jusvVYug5pHUh1tQDDmm+XtqhW6CbXRqbqDYOCl1W9QxOQ
-         VXNT8IMNIH9hLd1wzLndR4KoVQB79H/FYLq25P8lOlildm0R+bpsuSo9TwClPA0kLV
-         csu2vX1i0ECSg==
-Date:   Thu, 13 Jul 2023 16:52:34 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-fsdevel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paul Durrant <paul@xen.org>, Oded Gabbay <ogabbay@kernel.org>,
-        Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-        Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>, Fei Li <fei1.li@intel.com>,
-        Benjamin LaHaise <bcrl@kvack.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-fpga@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        linux-usb@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-aio@kvack.org, cgroups@vger.kernel.org, linux-mm@kvack.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org
-Subject: Re: [PATCH 2/2] eventfd: simplify eventfd_signal_mask()
-Message-ID: <20230713-mahnen-drosseln-fa717117e827@brauner>
-References: <20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org>
- <20230713-vfs-eventfd-signal-v1-2-7fda6c5d212b@kernel.org>
- <ZLAK+FA3qgbHW0YK@google.com>
+        with ESMTP id S231764AbjGMPcR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 11:32:17 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021EF2707;
+        Thu, 13 Jul 2023 08:31:48 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36DFH5XX012668;
+        Thu, 13 Jul 2023 15:30:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : subject : cc : message-id : date; s=pp1;
+ bh=M7bR/AAwcrIHtmLFDAbS3L59wYDPg1gKiTx7XoppcMk=;
+ b=oIgR/9s0d64lh2+i06y2sKDCxaKPmRw82VVIPTwfXNKFunYfFDjpi5KJ+gCftsNFLaZE
+ 7ocp8nsccBVmm58TanQL361N8sebOGvGjn8zoAidaIbdVJZUunP4DTUiW1mWKLksg5yl
+ UifqMOhpiKDzJN0jiGd4O1KUG5/as5mbAwGzjuwA6cr64YlQ8MzGbFsRfN7CVEvRYGKV
+ 2oO+gSNKLgohP/IYG1LCn6l+quN0XDsDwZjKGuk2qYJV6GWi38aokgvNqUrlIs0Wu9ns
+ lwhUKsgXVs51HIwtq5OS3w81vn0U43eW86MrjsOURZtxr2SeErr9E87WeyE6Jy0q4BR4 Pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rtksagbga-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jul 2023 15:30:53 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36DFHpYd013705;
+        Thu, 13 Jul 2023 15:30:52 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rtksagbg2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jul 2023 15:30:52 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36DDtoEZ005042;
+        Thu, 13 Jul 2023 15:30:51 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3rqj4rr8ft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jul 2023 15:30:51 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36DFUmu526346134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jul 2023 15:30:49 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D3E0A20043;
+        Thu, 13 Jul 2023 15:30:48 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A4DB720040;
+        Thu, 13 Jul 2023 15:30:48 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.87.199])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Jul 2023 15:30:48 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZLAK+FA3qgbHW0YK@google.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <9b2cdc37-0b93-ff00-d077-397b8c0c2950@redhat.com>
+References: <20230712114149.1291580-1-nrb@linux.ibm.com> <20230712114149.1291580-3-nrb@linux.ibm.com> <9b2cdc37-0b93-ff00-d077-397b8c0c2950@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v5 2/6] s390x: add function to set DAT mode for all interrupts
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Message-ID: <168926224829.12187.2957278869966216471@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Thu, 13 Jul 2023 17:30:48 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vGonXpMmOoyNlYEuwQvo-EubDH5Zqz97
+X-Proofpoint-ORIG-GUID: 6IS-QsscQ9uUxl3I8e91_JrujoJpkcdn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-13_05,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ priorityscore=1501 impostorscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307130132
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 13, 2023 at 07:33:05AM -0700, Sean Christopherson wrote:
-> On Thu, Jul 13, 2023, Christian Brauner wrote:
-> > diff --git a/fs/eventfd.c b/fs/eventfd.c
-> > index dc9e01053235..077be5da72bd 100644
-> > --- a/fs/eventfd.c
-> > +++ b/fs/eventfd.c
-> > @@ -43,9 +43,10 @@ struct eventfd_ctx {
-> >  	int id;
-> >  };
-> >  
-> > -__u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
-> > +bool eventfd_signal_mask(struct eventfd_ctx *ctx, __poll_t mask)
-> >  {
-> >  	unsigned long flags;
-> > +	__u64 n = 1;
-> >  
-> >  	/*
-> >  	 * Deadlock or stack overflow issues can happen if we recurse here
-> > @@ -68,7 +69,7 @@ __u64 eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n, __poll_t mask)
-> >  	current->in_eventfd = 0;
-> >  	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
-> >  
-> > -	return n;
-> > +	return n == 1;
-> >  }
-> 
-> ...
-> 
-> > @@ -58,13 +58,12 @@ static inline struct eventfd_ctx *eventfd_ctx_fdget(int fd)
-> >  	return ERR_PTR(-ENOSYS);
-> >  }
-> >  
-> > -static inline int eventfd_signal(struct eventfd_ctx *ctx)
-> > +static inline bool eventfd_signal(struct eventfd_ctx *ctx)
-> >  {
-> >  	return -ENOSYS;
-> >  }
-> >  
-> > -static inline int eventfd_signal_mask(struct eventfd_ctx *ctx, __u64 n,
-> > -				      unsigned mask)
-> > +static inline bool eventfd_signal_mask(struct eventfd_ctx *ctx, unsigned mask)
-> >  {
-> >  	return -ENOSYS;
-> 
-> This will morph to "true" for what should be an error case.  One option would be
+Quoting Thomas Huth (2023-07-13 09:17:28)
+> On 12/07/2023 13.41, Nico Boehr wrote:
+> > When toggling DAT or switch address space modes, it is likely that
+> > interrupts should be handled in the same DAT or address space mode.
+> >=20
+> > Add a function which toggles DAT and address space mode for all
+> > interruptions, except restart interrupts.
+> >=20
+> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > ---
+> >   lib/s390x/asm/interrupt.h |  4 ++++
+> >   lib/s390x/interrupt.c     | 36 ++++++++++++++++++++++++++++++++++++
+> >   lib/s390x/mmu.c           |  5 +++--
+> >   3 files changed, 43 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+> > index 35c1145f0349..55759002dce2 100644
+> > --- a/lib/s390x/asm/interrupt.h
+> > +++ b/lib/s390x/asm/interrupt.h
+> > @@ -83,6 +83,10 @@ void expect_ext_int(void);
+> >   uint16_t clear_pgm_int(void);
+> >   void check_pgm_int_code(uint16_t code);
+> >  =20
+> > +#define IRQ_DAT_ON   true
+> > +#define IRQ_DAT_OFF  false
+>=20
+> Just a matter of taste, but IMHO having defines like this for just using =
 
-Ewww, that means it did return -ENOSYS before any of this.
+> them as boolean parameter to one function is a little bit overkill alread=
+y.=20
+> I'd rather rename the "bool dat" below into "bool use_dat" and then use=20
+> "true" and "false" directly as a parameter for that function instead.=20
+> Anyway, just my 0.02 \u20ac.
 
-> to have eventfd_signal_mask() return 0/-errno instead of the count, but looking
-> at all the callers, nothing ever actually consumes the result.
-> 
-> KVMGT morphs failure into -EFAULT
-> 
-> 	if (vgpu->msi_trigger && eventfd_signal(vgpu->msi_trigger, 1) != 1)
-> 		return -EFAULT;
-> 
-> but the only caller of that user ignores the return value.
-> 
-> 	if (vgpu_vreg(vgpu, i915_mmio_reg_offset(GEN8_MASTER_IRQ))
-> 			& ~GEN8_MASTER_IRQ_CONTROL)
-> 		inject_virtual_interrupt(vgpu);
-> 
-> The sample driver in samples/vfio-mdev/mtty.c uses a similar pattern: prints an
-> error but otherwise ignores the result.
-> 
-> So why not return nothing?  That will simplify eventfd_signal_mask() a wee bit
-> more, and eliminate that bizarre return value confusion for the ugly stubs, e.g.
+The point of having these defines was to convey the meaning of the paramete=
+r to my reader.
 
-Yeah, it used to return an int in the non-eventfd and a __u64 in the
-eventfd case.
+When I read
 
-> 
-> void eventfd_signal_mask(struct eventfd_ctx *ctx, unsigned mask)
-> {
-> 	unsigned long flags;
-> 
-> 	/*
-> 	 * Deadlock or stack overflow issues can happen if we recurse here
-> 	 * through waitqueue wakeup handlers. If the caller users potentially
-> 	 * nested waitqueues with custom wakeup handlers, then it should
-> 	 * check eventfd_signal_allowed() before calling this function. If
-> 	 * it returns false, the eventfd_signal() call should be deferred to a
-> 	 * safe context.
-> 	 */
-> 	if (WARN_ON_ONCE(current->in_eventfd))
-> 		return;
-> 
-> 	spin_lock_irqsave(&ctx->wqh.lock, flags);
-> 	current->in_eventfd = 1;
-> 	if (ctx->count < ULLONG_MAX)
-> 		ctx->count++;
-> 	if (waitqueue_active(&ctx->wqh))
-> 		wake_up_locked_poll(&ctx->wqh, EPOLLIN | mask);
-> 	current->in_eventfd = 0;
-> 	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
-> }
-> 
-> You could even go further and unify the real and stub versions of eventfd_signal().
+    irq_set_dat_mode(true, AS_HOME);
 
-The reason I didn't make eventfd_signal_mask() return void was that it
-was called from eventfd_signal() which did, I didn't realize the caller
-didn't actually consume the return value.
+it's less clear to me that the first parameter toggles the DAT mode compare=
+d to this:
 
-If we can let both return void it gets simpler.
+    irq_set_dat_mode(IRQ_DAT_ON, AS_HOME);
 
-Thanks for that.
+That being said, here it's pretty clear from the function name what the fir=
+st parameter is, so what's the preferred opinion?
+
+[...]
+> > diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> > index 3f993a363ae2..9b1bc6ce819d 100644
+> > --- a/lib/s390x/interrupt.c
+> > +++ b/lib/s390x/interrupt.c
+> > @@ -9,6 +9,7 @@
+> >    */
+> >   #include <libcflat.h>
+> >   #include <asm/barrier.h>
+> > +#include <asm/mem.h>
+> >   #include <asm/asm-offsets.h>
+> >   #include <sclp.h>
+> >   #include <interrupt.h>
+> > @@ -104,6 +105,41 @@ void register_ext_cleanup_func(void (*f)(struct st=
+ack_frame_int *))
+> >       THIS_CPU->ext_cleanup_func =3D f;
+> >   }
+> >  =20
+> > +/**
+> > + * irq_set_dat_mode - Set the DAT mode of all interrupt handlers, exce=
+pt for
+> > + * restart.
+> > + * This will update the DAT mode and address space mode of all interru=
+pt new
+> > + * PSWs.
+> > + *
+> > + * Since enabling DAT needs initalized CRs and the restart new PSW is =
+often used
+>=20
+> s/initalized/initialized/
+
+Argh, thanks.
+
+*reprioritizes task to look for a spell checker*
+
+>=20
+> > + * to initalize CRs, the restart new PSW is never touched to avoid the=
+ chicken
+>=20
+> dito
+>=20
+> > + * and egg situation.
+> > + *
+> > + * @dat specifies whether to use DAT or not
+> > + * @as specifies the address space mode to use - one of AS_PRIM, AS_AC=
+CR,
+> > + * AS_SECN or AS_HOME.
+> > + */
+> > +void irq_set_dat_mode(bool dat, uint64_t as)
+>=20
+> why uint64_t for "as" ? "int" should be enough?
+>=20
+> (alternatively, you could turn the AS_* defines into a properly named enu=
+m=20
+> and use that type here instead)
+
+Yes, let's just do that.
