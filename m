@@ -2,91 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41460751B9B
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 10:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28875751BC2
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 10:37:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234449AbjGMId1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 04:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
+        id S234568AbjGMIhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 04:37:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234543AbjGMIc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 04:32:56 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDEBC3AB6;
-        Thu, 13 Jul 2023 01:24:22 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36D8KvMv014355;
-        Thu, 13 Jul 2023 08:24:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=4+ns/2SLuFv9QINwuxqttrPjgiHM7ymtDv1Ehbyg0WQ=;
- b=BOyIqIucvIoXHcALwwQhe2lVoI4Hr5GJPf9E2GdW+THXa7Yl56n+MPpwE2rtRbnwqYgY
- pesunQBq4XyV1Uia6SbMCDycWcTIVjeOWyJsaGBPWS6FBMgIPuwS8r2FgoCZT8qOjazG
- KBGcBuNAVl9iOJ2YuMN7+np6hb8x90sYhd4wzdcZrkZSU94nWoYFukEKbRBtVfMhE5J6
- rDDI8XRc3S+PeIeMDWRf8fEqGsI80I7mnsNhFMQdxEn922CEsRP5Yx++SAeJCzOiIs/F
- 9WsPS3hx2/3jFyztB9NlSU7WKKRb0zobf5+iL3gnYlonSohNSkcThlhdpb+GSYKb27Nq nQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rtdp8r35n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jul 2023 08:24:22 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36D8LcCo017719;
-        Thu, 13 Jul 2023 08:24:21 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rtdp8r34s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jul 2023 08:24:21 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36D5tILH028559;
-        Thu, 13 Jul 2023 08:24:19 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3rpy2e35cf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jul 2023 08:24:19 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36D8OF2C22544916
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jul 2023 08:24:15 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A75F12006C;
-        Thu, 13 Jul 2023 08:24:15 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B88E2005A;
-        Thu, 13 Jul 2023 08:24:15 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Jul 2023 08:24:15 +0000 (GMT)
-Date:   Thu, 13 Jul 2023 10:24:13 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v5 2/6] s390x: add function to set DAT
- mode for all interrupts
-Message-ID: <20230713102413.214d37b3@p-imbrenda>
-In-Reply-To: <20230712114149.1291580-3-nrb@linux.ibm.com>
-References: <20230712114149.1291580-1-nrb@linux.ibm.com>
-        <20230712114149.1291580-3-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S234562AbjGMIhT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 04:37:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9601A30D0
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 01:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689236993;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cstQukCc6R5g+iNCjcRka3+OU408qYV+ropA4l/qCyo=;
+        b=WFPjuZ+Cz1aDNkRx3CPqkbIADvV+lxCbdBWbzk5g2qwlqP7cT4W8ap21+wFaHIYTUx5wYJ
+        +6kXchsHDOxeYfVaz3ho4WQqYTtDgXPjq9rBqe2nkGJNHZf+++5wtVaMEH1gJ6beCmHBzW
+        oMr8XQv3eWlKF3oZwwzf1vL44nehWh4=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-266-esioLztkM8Sgc1FSuKvHTQ-1; Thu, 13 Jul 2023 04:29:52 -0400
+X-MC-Unique: esioLztkM8Sgc1FSuKvHTQ-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7659c6caeaeso65090785a.3
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 01:29:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689236991; x=1691828991;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cstQukCc6R5g+iNCjcRka3+OU408qYV+ropA4l/qCyo=;
+        b=KqOL/uofh4Z+uCo6BmgljLOrpLdD4ZSid/f/kgedCbYLRrDEP7zvmWLIQu6BzEAplp
+         fn+HtZp1GvKSgji8MmQKhgzg9raZORsD8YXZoz04rSSrB+NhMxmSguS27KdW9i5SR+dJ
+         fStrXas09OAhIH59En54j4olJ1YikFxs29wGHykuJ8SVMzUZ4Q6H3iRN/GOB1DUoM4D4
+         0PHwYR1+5EPeOmK2OJzPfNZOUzlZCIYE/Yuefckjrt4wm/xO1Gu/OLd1JTGzK8s+1jut
+         xenNJMLBxSVOcU0mQN6O6uRZP0cEImHgUiUtJbuaL6NkYRmV3KDX37nNTsL6g5X58JLi
+         Drjw==
+X-Gm-Message-State: ABy/qLaWan89efwQOf0VjSw8jcw9vhlR+zrLVmI1aQptWAJ4mWjuCTAu
+        dQJMAeoXl4yI/s2ytRZtuPee3FkY6UapbsVa6Wh2qAPLW9hRW0wBRIIzTGdRbtml2zaP2H2x0IO
+        XpTtCDV5oj46M
+X-Received: by 2002:a37:f614:0:b0:767:54fd:65b2 with SMTP id y20-20020a37f614000000b0076754fd65b2mr794384qkj.66.1689236991648;
+        Thu, 13 Jul 2023 01:29:51 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFjcKctmvnzO/YG+UBJmNHVyxS4u/ME5z1qvrE0d4EZS0E5aAnboTMf5vel0S7sL6thtmUlLg==
+X-Received: by 2002:a37:f614:0:b0:767:54fd:65b2 with SMTP id y20-20020a37f614000000b0076754fd65b2mr794378qkj.66.1689236991380;
+        Thu, 13 Jul 2023 01:29:51 -0700 (PDT)
+Received: from [10.33.192.205] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id k5-20020a05620a142500b00767cb046e40sm2721587qkj.94.2023.07.13.01.29.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 01:29:50 -0700 (PDT)
+Message-ID: <1aac769e-7523-a858-8286-35625bfb0145@redhat.com>
+Date:   Thu, 13 Jul 2023 10:29:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [kvm-unit-tests PATCH v5 6/6] s390x: add a test for SIE without
+ MSO/MSL
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230712114149.1291580-1-nrb@linux.ibm.com>
+ <20230712114149.1291580-7-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230712114149.1291580-7-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hNnlZqMGrTWgtkf1xmecBz_WhgCK6zoQ
-X-Proofpoint-ORIG-GUID: EYNk40F78dj8K5a5unAApE3YadlskV4p
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-13_04,2023-07-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 suspectscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
- bulkscore=0 spamscore=0 mlxlogscore=885 phishscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307130069
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,73 +83,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Jul 2023 13:41:45 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-[...]
-
-> +/**
-> + * irq_set_dat_mode - Set the DAT mode of all interrupt handlers, except for
-> + * restart.
-> + * This will update the DAT mode and address space mode of all interrupt new
-> + * PSWs.
+On 12/07/2023 13.41, Nico Boehr wrote:
+> Since we now have the ability to run guests without MSO/MSL, add a test
+> to make sure this doesn't break.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   s390x/Makefile             |   2 +
+>   s390x/sie-dat.c            | 115 +++++++++++++++++++++++++++++++++++++
+>   s390x/snippets/c/sie-dat.c |  58 +++++++++++++++++++
+>   s390x/unittests.cfg        |   3 +
+>   4 files changed, 178 insertions(+)
+>   create mode 100644 s390x/sie-dat.c
+>   create mode 100644 s390x/snippets/c/sie-dat.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index a80db538810e..4921669ee4c3 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -40,6 +40,7 @@ tests += $(TEST_DIR)/panic-loop-pgm.elf
+>   tests += $(TEST_DIR)/migration-sck.elf
+>   tests += $(TEST_DIR)/exittime.elf
+>   tests += $(TEST_DIR)/ex.elf
+> +tests += $(TEST_DIR)/sie-dat.elf
+>   
+>   pv-tests += $(TEST_DIR)/pv-diags.elf
+>   
+> @@ -120,6 +121,7 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
+>   # perquisites (=guests) for the snippet hosts.
+>   # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
+>   $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
+> +$(TEST_DIR)/sie-dat.elf: snippets = $(SNIPPET_DIR)/c/sie-dat.gbin
+>   $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
+>   
+>   $(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-yield.gbin
+> diff --git a/s390x/sie-dat.c b/s390x/sie-dat.c
+> new file mode 100644
+> index 000000000000..b326995dfa85
+> --- /dev/null
+> +++ b/s390x/sie-dat.c
+> @@ -0,0 +1,115 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Tests SIE with paging.
 > + *
-> + * Since enabling DAT needs initalized CRs and the restart new PSW is often used
-> + * to initalize CRs, the restart new PSW is never touched to avoid the chicken
-> + * and egg situation.
+> + * Copyright 2023 IBM Corp.
 > + *
-> + * @dat specifies whether to use DAT or not
-> + * @as specifies the address space mode to use - one of AS_PRIM, AS_ACCR,
-
-please mention here that  as  will not be set if  dat == false
-
-> + * AS_SECN or AS_HOME.
+> + * Authors:
+> + *    Nico Boehr <nrb@linux.ibm.com>
 > + */
-> +void irq_set_dat_mode(bool dat, uint64_t as)
-> +{
-> +	struct psw* irq_psws[] = {
-> +		OPAQUE_PTR(GEN_LC_EXT_NEW_PSW),
-> +		OPAQUE_PTR(GEN_LC_SVC_NEW_PSW),
-> +		OPAQUE_PTR(GEN_LC_PGM_NEW_PSW),
-> +		OPAQUE_PTR(GEN_LC_MCCK_NEW_PSW),
-> +		OPAQUE_PTR(GEN_LC_IO_NEW_PSW),
-> +	};
-> +	struct psw *psw;
-> +
-> +	assert(as == AS_PRIM || as == AS_ACCR || as == AS_SECN || as == AS_HOME);
-> +
-> +	for (size_t i = 0; i < ARRAY_SIZE(irq_psws); i++) {
-> +		psw = irq_psws[i];
-> +		psw->dat = dat;
-> +		if (dat)
-> +			psw->as = as;
-> +	}
-> +}
-> +
->  static void fixup_pgm_int(struct stack_frame_int *stack)
->  {
->  	/* If we have an error on SIE we directly move to sie_exit */
-> diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
-> index b474d7021d3f..199bd3fbc9c8 100644
-> --- a/lib/s390x/mmu.c
-> +++ b/lib/s390x/mmu.c
-> @@ -12,6 +12,7 @@
->  #include <asm/pgtable.h>
->  #include <asm/arch_def.h>
->  #include <asm/barrier.h>
+> +#include <libcflat.h>
+> +#include <vmalloc.h>
+> +#include <asm/pgtable.h>
+> +#include <mmu.h>
+> +#include <asm/page.h>
 > +#include <asm/interrupt.h>
->  #include <vmalloc.h>
->  #include "mmu.h"
->  
-> @@ -41,8 +42,8 @@ static void mmu_enable(pgd_t *pgtable)
->  	/* enable dat (primary == 0 set as default) */
->  	enable_dat();
->  
-> -	/* we can now also use DAT unconditionally in our PGM handler */
-> -	lowcore.pgm_new_psw.mask |= PSW_MASK_DAT;
-> +	/* we can now also use DAT in all interrupt handlers */
-> +	irq_set_dat_mode(IRQ_DAT_ON, AS_PRIM);
->  }
->  
->  /*
+> +#include <alloc_page.h>
+> +#include <sclp.h>
+> +#include <sie.h>
+> +#include <snippet.h>
+> +
+> +static struct vm vm;
+> +static pgd_t *guest_root;
+> +
+> +/* keep in sync with TEST_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
+> +#define GUEST_TEST_PAGE_COUNT 10
+> +
+> +/* keep in sync with TOTAL_PAGE_COUNT in s390x/snippets/c/sie-dat.c */
+> +#define GUEST_TOTAL_PAGE_COUNT 256
+
+I'd maybe put the defines rather in a header a la s390x/snippets/c/sie-dat.h 
+and include that header here and in the snippet C code.
+
+Apart from that, test looks good to me:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
