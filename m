@@ -2,191 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B6BFC752B81
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 22:17:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8226752C12
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 23:23:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233680AbjGMURk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 16:17:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        id S231430AbjGMVXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 17:23:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230506AbjGMURi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 16:17:38 -0400
-X-Greylist: delayed 1112 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 13 Jul 2023 13:17:31 PDT
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D062D64
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 13:17:31 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1qK2SN-0005fS-MT; Thu, 13 Jul 2023 21:58:31 +0200
-Message-ID: <3bd720ec-8f61-d3e9-c998-4873e0c4f778@maciej.szmigiero.name>
-Date:   Thu, 13 Jul 2023 21:58:25 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US, pl-PL
-To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Michal Privoznik <mprivozn@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-References: <20230616092654.175518-1-david@redhat.com>
- <20230616092654.175518-14-david@redhat.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v1 13/15] virtio-mem: Expose device memory via multiple
- memslots if enabled
-In-Reply-To: <20230616092654.175518-14-david@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234209AbjGMVXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 17:23:06 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB282D54
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 14:23:02 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c4f27858e4eso1016410276.1
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 14:23:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689283381; x=1691875381;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SEmAISENfYHTJKgnXdwIxtBUkx7mCSHbnBBJfH7pL2g=;
+        b=u8nkfY1vHs9c5gFN7pdsZSU9AwzMe55h9X7xE08rkWFz7RUmhLWm89CDqXfoZa8NCG
+         m3+0uhS/oEAsoU0SRFOX0kAbfRdmPz3r9Q6k9UhwOFWrg/JRJ2zhgW9y5OWIFctOdPKE
+         DiW8Mf2RWMcMXZaQsYq1B6lctQLt8zs9FeMNW9/VQtiHGFBHD5IxVBLvZjcErv+iI0KW
+         T+9xR57S//vKrTfbaV0cq2M3nm/6Dom3Wo9MQwOMFBYfnioisjaTtbYQYjFVZ82UpEM0
+         omFWgVpd2s4m4pVtieE/yFWVH/aqXbdXBy5vRlorJDXDwruNqsJ4zodjbin0FOOCS4eZ
+         ZzMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689283381; x=1691875381;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SEmAISENfYHTJKgnXdwIxtBUkx7mCSHbnBBJfH7pL2g=;
+        b=X5JgBb3UrmPWwCfNahIHK9OXPPg3JnyebYBcGgpOgodf6dkzwYhMjcswa3tKzDtTTg
+         onWlDD2LvdEl8NBKmLOEH0IjqHZd3W02Pc1ha5p1SdUggamuR6JtK/rSPlm6xGs4TSEA
+         HUT0WnRdmNg3GHQH+Hb4RiwnWC0IPpILrw9FTbq3yHbtiZTx/BdOgRDH4y4ucAidUl4u
+         YZGY+IHPTEyiphkMfMU5AdY8kpZxm1Xo2vDLxvMml98+D0OCkCK2apL+0z8x9uEg0aoS
+         yEynnC5bBU2qUDw7hjwHIxQKVDHIG/23SqTMqnZbQ0AqOuVFjWZzG1wYdeFnHiKQuWZ8
+         aDfQ==
+X-Gm-Message-State: ABy/qLYWrr/NzTA22r1PNWchvTAgeH/4KQSWm0LHyZFrvOaO/DHs48U+
+        OG3bOAqPGQ/hLCDyspi1J8fdG/LI7iE=
+X-Google-Smtp-Source: APBJJlE3/XVfrwiQqHAyGw253Fijs3SxSmSR4x7PtFKj69SSHPH+HO1wN9+aba7au/mGkC1/tN0tCNAkTSY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1741:b0:cb6:bcb4:5465 with SMTP id
+ bz1-20020a056902174100b00cb6bcb45465mr7786ybb.12.1689283381565; Thu, 13 Jul
+ 2023 14:23:01 -0700 (PDT)
+Date:   Thu, 13 Jul 2023 14:22:59 -0700
+In-Reply-To: <20230707084328.2563454-1-suhui@nfschina.com>
+Mime-Version: 1.0
+References: <20230707084328.2563454-1-suhui@nfschina.com>
+Message-ID: <ZLBrM+Dee9okUmvc@google.com>
+Subject: Re: [PATCH] KVM: VMX: Avoid noinstr warning
+From:   Sean Christopherson <seanjc@google.com>
+To:     Su Hui <suhui@nfschina.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.06.2023 11:26, David Hildenbrand wrote:
-> Having large virtio-mem devices that only expose little memory to a VM
-> is currently a problem: we map the whole sparse memory region into the
-> guest using a single memslot, resulting in one gigantic memslot in KVM.
-> KVM allocates metadata for the whole memslot, which can result in quite
-> some memory waste.
+On Fri, Jul 07, 2023, Su Hui wrote:
+> vmlinux.o: warning: objtool: vmx_vcpu_enter_exit+0x2d8:
+> call to vmread_error_trampoline() leaves .noinstr.text section
 > 
-> Assuming we have a 1 TiB virtio-mem device and only expose little (e.g.,
-> 1 GiB) memory, we would create a single 1 TiB memslot and KVM has to
-> allocate metadata for that 1 TiB memslot: on x86, this implies allocating
-> a significant amount of memory for metadata:
-> 
-> (1) RMAP: 8 bytes per 4 KiB, 8 bytes per 2 MiB, 8 bytes per 1 GiB
->      -> For 1 TiB: 2147483648 + 4194304 + 8192 = ~ 2 GiB (0.2 %)
-> 
->      With the TDP MMU (cat /sys/module/kvm/parameters/tdp_mmu) this gets
->      allocated lazily when required for nested VMs
-> (2) gfn_track: 2 bytes per 4 KiB
->      -> For 1 TiB: 536870912 = ~512 MiB (0.05 %)
-> (3) lpage_info: 4 bytes per 2 MiB, 4 bytes per 1 GiB
->      -> For 1 TiB: 2097152 + 4096 = ~2 MiB (0.0002 %)
-> (4) 2x dirty bitmaps for tracking: 2x 1 bit per 4 KiB page
->      -> For 1 TiB: 536870912 = 64 MiB (0.006 %)
-> 
-> So we primarily care about (1) and (2). The bad thing is, that the
-> memory consumption *doubles* once SMM is enabled, because we create the
-> memslot once for !SMM and once for SMM.
-> 
-> Having a 1 TiB memslot without the TDP MMU consumes around:
-> * With SMM: 5 GiB
-> * Without SMM: 2.5 GiB
-> Having a 1 TiB memslot with the TDP MMU consumes around:
-> * With SMM: 1 GiB
-> * Without SMM: 512 MiB
-> 
-> ... and that's really something we want to optimize, to be able to just
-> start a VM with small boot memory (e.g., 4 GiB) and a virtio-mem device
-> that can grow very large (e.g., 1 TiB).
-> 
-> Consequently, using multiple memslots and only mapping the memslots we
-> really need can significantly reduce memory waste and speed up
-> memslot-related operations. Let's expose the sparse RAM memory region using
-> multiple memslots, mapping only the memslots we currently need into our
-> device memory region container.
-> 
-> * With VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we only map the memslots that
->    actually have memory plugged, and dynamically (un)map when
->    (un)plugging memory blocks.
-> 
-> * Without VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we always map the memslots
->    covered by the usable region, and dynamically (un)map when resizing the
->    usable region.
-> 
-> We'll auto-determine the number of memslots to use based on the suggested
-> memslot limit provided by the core. We'll use at most 1 memslot per
-> gigabyte. Note that our global limit of memslots accross all memory devices
-> is currently set to 256: even with multiple large virtio-mem devices, we'd
-> still have a sane limit on the number of memslots used.
-> 
-> The default is a single memslot for now ("multiple-memslots=off"). The
-> optimization must be enabled manually using "multiple-memslots=on", because
-> some vhost setups (e.g., hotplug of vhost-user devices) might be
-> problematic until we support more memslots especially in vhost-user
-> backends.
-> 
-> Note that "multiple-memslots=on" is just a hint that multiple memslots
-> *may* be used for internal optimizations, not that multiple memslots
-> *must* be used. The actual number of memslots that are used is an
-> internal detail: for example, once memslot metadata is no longer an
-> issue, we could simply stop optimizing for that. Migration source and
-> destination can differ on the setting of "multiple-memslots".
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Su Hui <suhui@nfschina.com>
 > ---
->   hw/virtio/virtio-mem-pci.c     |  21 +++
->   hw/virtio/virtio-mem.c         | 265 ++++++++++++++++++++++++++++++++-
->   include/hw/virtio/virtio-mem.h |  23 ++-
->   3 files changed, 304 insertions(+), 5 deletions(-)
+>  arch/x86/kvm/vmx/vmx_ops.h | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
-> index b85c12668d..8b403e7e78 100644
-> --- a/hw/virtio/virtio-mem-pci.c
-> +++ b/hw/virtio/virtio-mem-pci.c
-(...)
-> @@ -790,6 +921,43 @@ static void virtio_mem_system_reset(void *opaque)
->       virtio_mem_unplug_all(vmem);
->   }
->   
-> +static void virtio_mem_prepare_mr(VirtIOMEM *vmem)
-> +{
-> +    const uint64_t region_size = memory_region_size(&vmem->memdev->mr);
-> +
-> +    g_assert(!vmem->mr);
-> +    vmem->mr = g_new0(MemoryRegion, 1);
-> +    memory_region_init(vmem->mr, OBJECT(vmem), "virtio-mem",
-> +                       region_size);
-> +    vmem->mr->align = memory_region_get_alignment(&vmem->memdev->mr);
-> +}
-> +
-> +static void virtio_mem_prepare_memslots(VirtIOMEM *vmem)
-> +{
-> +    const uint64_t region_size = memory_region_size(&vmem->memdev->mr);
-> +    unsigned int idx;
-> +
-> +    g_assert(!vmem->memslots && vmem->nb_memslots);
-> +    vmem->memslots = g_new0(MemoryRegion, vmem->nb_memslots);
-> +
-> +    /* Initialize our memslots, but don't map them yet. */
-> +    for (idx = 0; idx < vmem->nb_memslots; idx++) {
-> +        const uint64_t memslot_offset = idx * vmem->memslot_size;
-> +        uint64_t memslot_size = vmem->memslot_size;
-> +        char name[20];
-> +
-> +        /* The size of the last memslot might be smaller. */
-> +        if (idx == vmem->nb_memslots) {                       ^
-I guess this should be "vmem->nb_memslots - 1" since that's the last
-memslot index.
+> diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+> index ce47dc265f89..54f86ce2ad60 100644
+> --- a/arch/x86/kvm/vmx/vmx_ops.h
+> +++ b/arch/x86/kvm/vmx/vmx_ops.h
+> @@ -112,6 +112,7 @@ static __always_inline unsigned long __vmcs_readl(unsigned long field)
+>  
+>  #else /* !CONFIG_CC_HAS_ASM_GOTO_OUTPUT */
+>  
+> +	instrumentation_begin();
+>  	asm volatile("1: vmread %2, %1\n\t"
+>  		     ".byte 0x3e\n\t" /* branch taken hint */
+>  		     "ja 3f\n\t"
+> @@ -139,6 +140,7 @@ static __always_inline unsigned long __vmcs_readl(unsigned long field)
+>  		     _ASM_EXTABLE_TYPE_REG(1b, 2b, EX_TYPE_ONE_REG, %1)
+>  
+>  		     : ASM_CALL_CONSTRAINT, "=&r"(value) : "r"(field) : "cc");
+> +	instrumentation_end();
 
-> +            memslot_size = region_size - memslot_offset;
-> +        }
-> +
-> +        snprintf(name, sizeof(name), "memslot-%u", idx);
-> +        memory_region_init_alias(&vmem->memslots[idx], OBJECT(vmem), name,
-> +                                 &vmem->memdev->mr, memslot_offset,
-> +                                 memslot_size);
-> +    }
-> +}
-> +
+Tagging the entire thing as instrumentable is not correct, e.g. instrumentation
+isn't magically safe when doing VMREAD immediately after VM-Exit.  Enabling
+instrumentation for VM-Fail paths isn't exactly safe either, but odds are very
+good that the system has major issue if a VMX instruction (other than VMLAUNCH/VMRESUME)
+gets VM-Fail, in which case logging the error takes priority.
 
-Thanks,
-Maciej
+Compile tested only, but I think the below is the least awful solution.  That will
+also allow the CONFIG_CC_HAS_ASM_GOTO_OUTPUT=y case to use vmread_error() instead
+of open coding an equivalent (hence the "PATCH 1/2").
+
+I'll post patches after testing.
+
+Thanks!
+
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Jul 2023 13:45:35 -0700
+Subject: [PATCH 1/2] KVM: VMX: Make VMREAD error path play nice with noinstr
+
+Mark vmread_error_trampoline() as noinstr, and add a second trampoline
+for the CONFIG_CC_HAS_ASM_GOTO_OUTPUT=n case to enable instrumentation
+when handling VM-Fail on VMREAD.  VMREAD is used in various noinstr
+flows, e.g. immediately after VM-Exit, and objtool rightly complains that
+the call to the error trampoline leaves a no-instrumentation section
+without annotating that it's safe to do so.
+
+  vmlinux.o: warning: objtool: vmx_vcpu_enter_exit+0xc9:
+  call to vmread_error_trampoline() leaves .noinstr.text section
+
+Note, strictly speaking, enabling instrumentation in the VM-Fail path
+isn't exactly safe, but if VMREAD fails the kernel/system is likely hosed
+anyways, and logging that there is a fatal error is more important than
+*maybe* encountering slightly unsafe instrumentation.
+
+Reported-by: Su Hui <suhui@nfschina.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmenter.S |  8 ++++----
+ arch/x86/kvm/vmx/vmx.c     | 18 ++++++++++++++----
+ arch/x86/kvm/vmx/vmx_ops.h |  9 ++++++++-
+ 3 files changed, 26 insertions(+), 9 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 07e927d4d099..be275a0410a8 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -303,10 +303,8 @@ SYM_FUNC_START(vmx_do_nmi_irqoff)
+ 	VMX_DO_EVENT_IRQOFF call asm_exc_nmi_kvm_vmx
+ SYM_FUNC_END(vmx_do_nmi_irqoff)
+ 
+-
+-.section .text, "ax"
+-
+ #ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
++
+ /**
+  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
+  * @field:	VMCS field encoding that failed
+@@ -335,7 +333,7 @@ SYM_FUNC_START(vmread_error_trampoline)
+ 	mov 3*WORD_SIZE(%_ASM_BP), %_ASM_ARG2
+ 	mov 2*WORD_SIZE(%_ASM_BP), %_ASM_ARG1
+ 
+-	call vmread_error
++	call vmread_error_trampoline2
+ 
+ 	/* Zero out @fault, which will be popped into the result register. */
+ 	_ASM_MOV $0, 3*WORD_SIZE(%_ASM_BP)
+@@ -357,6 +355,8 @@ SYM_FUNC_START(vmread_error_trampoline)
+ SYM_FUNC_END(vmread_error_trampoline)
+ #endif
+ 
++.section .text, "ax"
++
+ SYM_FUNC_START(vmx_do_interrupt_irqoff)
+ 	VMX_DO_EVENT_IRQOFF CALL_NOSPEC _ASM_ARG1
+ SYM_FUNC_END(vmx_do_interrupt_irqoff)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0ecf4be2c6af..d7cf35edda1b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -441,13 +441,23 @@ do {					\
+ 	pr_warn_ratelimited(fmt);	\
+ } while (0)
+ 
+-void vmread_error(unsigned long field, bool fault)
++noinline void vmread_error(unsigned long field)
+ {
+-	if (fault)
++	vmx_insn_failed("vmread failed: field=%lx\n", field);
++}
++
++#ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
++noinstr void vmread_error_trampoline2(unsigned long field, bool fault)
++{
++	if (fault) {
+ 		kvm_spurious_fault();
+-	else
+-		vmx_insn_failed("vmread failed: field=%lx\n", field);
++	} else {
++		instrumentation_begin();
++		vmread_error(field);
++		instrumentation_end();
++	}
+ }
++#endif
+ 
+ noinline void vmwrite_error(unsigned long field, unsigned long value)
+ {
+diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+index ce47dc265f89..5fa74779a37a 100644
+--- a/arch/x86/kvm/vmx/vmx_ops.h
++++ b/arch/x86/kvm/vmx/vmx_ops.h
+@@ -10,7 +10,7 @@
+ #include "vmcs.h"
+ #include "../x86.h"
+ 
+-void vmread_error(unsigned long field, bool fault);
++void vmread_error(unsigned long field);
+ void vmwrite_error(unsigned long field, unsigned long value);
+ void vmclear_error(struct vmcs *vmcs, u64 phys_addr);
+ void vmptrld_error(struct vmcs *vmcs, u64 phys_addr);
+@@ -31,6 +31,13 @@ void invept_error(unsigned long ext, u64 eptp, gpa_t gpa);
+  * void vmread_error_trampoline(unsigned long field, bool fault);
+  */
+ extern unsigned long vmread_error_trampoline;
++
++/*
++ * The second VMREAD error trampoline, called from the assembly trampoline,
++ * exists primarily to enable instrumentation for the VM-Fail path.
++ */
++void vmread_error_trampoline2(unsigned long field, bool fault);
++
+ #endif
+ 
+ static __always_inline void vmcs_check16(unsigned long field)
+
+base-commit: 255006adb3da71bb75c334453786df781b415f54
+-- 
 
