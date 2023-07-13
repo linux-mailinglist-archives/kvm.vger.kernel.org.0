@@ -2,87 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFC50752757
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 17:36:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C95B7527C6
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 17:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232853AbjGMPgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 11:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39394 "EHLO
+        id S235129AbjGMPyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 11:54:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232637AbjGMPgK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 11:36:10 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE091FF1;
-        Thu, 13 Jul 2023 08:35:47 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36DFWpvB027360;
-        Thu, 13 Jul 2023 15:35:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- from : subject : cc : message-id : date; s=pp1;
- bh=Gc8hpmoTAOu+D/IjBBiPCG2OkjQY1aNNFOMGP3brvN4=;
- b=YTFEKfGPXVjeF99xTKX8xgazQ6MBhPYbNiwAIEgx2Zzy9HLFuiDHZPTXFqmR2ySGMgAb
- RSqAL7/KmBs4CGq2KaEpFYT6LXDLvajHSysbAcNZNxiyJ4e/QH9A4rI11rfdjdB9Vxph
- 1vBl7ilzWnZ58t+UE6SVDC21nJI/XZVFd6H1kYAWVfbMADzQLqTKC6Rj5IEfCLqVkvAi
- Fz7QB9fUBExFxNw6rZOCZ89GEuR5u4OsjJJ9NA2b8tyWdMYxeSgo+iwrcQbXVhvflfn3
- UcHFyMAjf2JgcJ/TMDd9dYvjztWuSmshCjl8w4g9KiRQ0odHvRP0PxO1iRXaNolvRZit kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rtksdgjan-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jul 2023 15:35:46 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36DFHua7007383;
-        Thu, 13 Jul 2023 15:35:46 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rtksdgj6q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jul 2023 15:35:46 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36DDYnUJ008210;
-        Thu, 13 Jul 2023 15:35:41 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3rpye5advw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jul 2023 15:35:41 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36DFZWgh2818706
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jul 2023 15:35:32 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72AC820043;
-        Thu, 13 Jul 2023 15:35:32 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4EB2A2004B;
-        Thu, 13 Jul 2023 15:35:32 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.87.199])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Jul 2023 15:35:32 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230713102413.214d37b3@p-imbrenda>
-References: <20230712114149.1291580-1-nrb@linux.ibm.com> <20230712114149.1291580-3-nrb@linux.ibm.com> <20230713102413.214d37b3@p-imbrenda>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v5 2/6] s390x: add function to set DAT mode for all interrupts
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Message-ID: <168926253197.12187.8091392446597591392@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Thu, 13 Jul 2023 17:35:31 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: R7q0fiEs5RgxsOodx9vuaOFKn-G_9puW
-X-Proofpoint-GUID: S8KUgww9kXgYSqTjVVzcIiSRbuQBk2kB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-13_06,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- bulkscore=0 clxscore=1015 spamscore=0 lowpriorityscore=0 mlxlogscore=757
- mlxscore=0 priorityscore=1501 adultscore=0 impostorscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2307130137
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S231167AbjGMPxt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 11:53:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324182708
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 08:53:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B9DEA61A2A
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 15:53:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01FFFC433C7;
+        Thu, 13 Jul 2023 15:53:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689263623;
+        bh=FLps+MVqzmGKj+5TTEFg4RqzcyNptAzC2ai5uQhXZ+A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KWH+Zh8Ch+x/UVfenxc3CGilrLqAVsiM6tooozdLVrp0Im/+jJdoxIvx4+TX/3lZx
+         f7ZZeabTRaaQZFkaHWqGNuRbzw5vt7ItbQeM8GXkOkK+qaWRILWQciLPnXbR2qQS9r
+         V9MSypBdV3F46/gbR1iustT7cyZOdAVBd2aU50VA/y7bBWp2BhQK7CqV1+2roVISC1
+         vzBB0OCZ/qkw37avlhfNGsVPX+cDVaqNtw8wLw6c+ACbYxv5Vt2SPyARhb0vD7HdH1
+         CwgO3wtETEXI3Fus9F8yNu6wc3fjfMwaXbjsEat85Onkvb+NXmkAu1XX2NNwTmTA2C
+         ycUEgvPb6io4w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qJydQ-00CrA6-Gc;
+        Thu, 13 Jul 2023 16:53:40 +0100
+Date:   Thu, 13 Jul 2023 16:53:40 +0100
+Message-ID: <86sf9rvmd7.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
+In-Reply-To: <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+        <20230712145810.3864793-17-maz@kernel.org>
+        <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -91,30 +82,195 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Claudio Imbrenda (2023-07-13 10:24:13)
-> On Wed, 12 Jul 2023 13:41:45 +0200
-> Nico Boehr <nrb@linux.ibm.com> wrote:
->=20
-> [...]
->=20
-> > +/**
-> > + * irq_set_dat_mode - Set the DAT mode of all interrupt handlers, exce=
-pt for
-> > + * restart.
-> > + * This will update the DAT mode and address space mode of all interru=
-pt new
-> > + * PSWs.
-> > + *
-> > + * Since enabling DAT needs initalized CRs and the restart new PSW is =
-often used
-> > + * to initalize CRs, the restart new PSW is never touched to avoid the=
- chicken
-> > + * and egg situation.
-> > + *
-> > + * @dat specifies whether to use DAT or not
-> > + * @as specifies the address space mode to use - one of AS_PRIM, AS_AC=
-CR,
->=20
-> please mention here that  as  will not be set if  dat =3D=3D false
+Hey Eric,
 
-Right, done.
+Thanks for looking into this, much appreciated given how tedious it
+is.
+
+On Thu, 13 Jul 2023 15:05:33 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 7/12/23 16:57, Marc Zyngier wrote:
+> > Describe the HCR_EL2 register, and associate it with all the sysregs
+> > it allows to trap.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/emulate-nested.c | 475 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 475 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > index 5bab2e85d70c..51901e85e43d 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+
+[...]
+
+> > +	[CGT_HCR_TPC] = {
+> modern revisions now refer to TPCP, maybe worth a comment?
+
+Absolutely.
+
+[...]
+
+> > +	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
+> > +		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
+> in the spec I see this upper limit in the FEAT_FGT section. Out of
+> curiosity how were you able to convert the sys reg names into this Op0,
+> Op1, CRn, CRm, Op2. Is there any ordering logic documented somewhere for
+> those group3 regs?
+
+If you look at the sysreg encoding described on page D18-6308 if
+version J.a of the ARM ARM, you will find a block of 56 contiguous
+encodings ranging from (3, 0, 0, 1, 0), which happens to be
+ID_PFR0_EL1, all the way to a reserved range ending in (3, 0, 0, 7,
+7).
+
+This is the block of register that is controlled by TID3.
+
+> I checked Table D18-2 and this looks good but I wonder if there isn't
+> any more efficient way to review this.
+
+Not that I know of, unfortunately. Even the pseudocode isn't enough
+for this as it doesn't described the trapping of unallocated regions.
+
+> > +	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
+> > +	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
+> > +	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
+> > +	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
+> > +		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
+> > +		      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
+> > +		      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
+> > +		      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
+> > +		      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
+> > +		      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
+> > +		      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
+> > +		      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
+> > +		      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
+> > +		      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
+> > +		      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
+> > +		      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
+> > +		      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
+> > +		      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
+> > +		      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
+> > +		      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
+> > +	SR_TRAP(SYS_ACTLR_EL1,		CGT_HCR_TACR),
+> > +	SR_TRAP(SYS_DC_ISW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CISW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_IGSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_IGDSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CGSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CGDSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CIGSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CIGDSW,		CGT_HCR_TSW),
+> > +	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
+> I don't see CVADP?
+
+Me neither! Good catch!
+
+[...]
+
+> > +	SR_TRAP(SYS_SCTLR_EL1,		CGT_HCR_TVM_TRVM),
+> > +	SR_TRAP(SYS_TTBR0_EL1,		CGT_HCR_TVM_TRVM),
+> > +	SR_TRAP(SYS_TTBR1_EL1,		CGT_HCR_TVM_TRVM),
+> > +	SR_TRAP(SYS_TCR_EL1,		CGT_HCR_TVM_TRVM),
+> > +	SR_TRAP(SYS_ESR_EL1,		CGT_HCR_TVM_TRVM),
+> > +	SR_TRAP(SYS_FAR_EL1,		CGT_HCR_TVM_TRVM),
+> > +	SR_TRAP(SYS_AFSR0_EL1,		CGT_HCR_TVM_TRVM),*
+> Looking at the SFSR0_EL1 MRS/MSR pseudo code I understand TRVM is tested
+> on read and
+> TVM is tested on write. However CGT_HCR_TVM has FORWARD_ANY behaviour
+> while TRVM looks good as FORWARD_READ? Do I miss something.
+
+You're not missing anything. For some reason, I had in my head that
+TVM was trapping both reads and writes, while the spec is clear that
+it only traps writes.
+
+> 
+> > +	SR_TRAP(SYS_AFSR1_EL1,		CGT_HCR_TVM_TRVM),*
+> same here and below
+
+Yup, I need to fix the TVM encoding like this:
+
+@@ -176,7 +176,7 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.index		= HCR_EL2,
+ 		.value		= HCR_TVM,
+ 		.mask		= HCR_TVM,
+-		.behaviour	= BEHAVE_FORWARD_ANY,
++		.behaviour	= BEHAVE_FORWARD_WRITE,
+ 	},
+ 	[CGT_HCR_TDZ] = {
+ 		.index		= HCR_EL2,
+
+[...]
+
+> > +	/* All _EL2 registers */
+> > +	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
+> > +		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
+> > +	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
+> > +		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
+> > +	/* All _EL02, _EL12 registers */
+> > +	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+> > +		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+> > +	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+> > +		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
+> same question as bove, where in the ARM ARM do you find those
+> ranges?
+
+I went over the encoding with a fine comb, and realised that all the
+(3, 4, ...) encodings are EL2, and all the (3, 5, ...) ones are EL02
+and EL12.
+
+I appreciate that this is taking a massive bet on the future, but
+there is no such rule in the ARM ARM as such...
+
+> > +	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),*
+> > +	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),*
+> > +	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),*
+> > +	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),*
+> > +	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),*
+> > +	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),*
+> according to the pseudo code NV2 is not checked
+> shouldn't we have a separate CGT? Question also valid for a bunch of ops
+> below
+
+Hmmm. Yes, this is wrong. Well spotted. I guess I need a
+CGT_HCR_NV_nNV2 for the cases that want that particular condition (NV1
+probably needs a similar fix).
+
+[...]
+
+> CIGDPAE?
+> CIPAE?
+
+These two are part of RME (well, technically MEC, but that an RME
+thing), and I have no plan to support this with NV -- yet.
+
+> CFP/CPP/DVP RCTX?
+
+These are definitely missing. I'll add them.
+
+Thanks again for going through this list, this is awesome work!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
