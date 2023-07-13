@@ -2,99 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 124E8752801
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 18:06:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22353752995
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 19:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231626AbjGMQG5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 12:06:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59710 "EHLO
+        id S229992AbjGMRLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 13:11:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjGMQGz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 12:06:55 -0400
-X-Greylist: delayed 598 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 13 Jul 2023 09:06:50 PDT
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0CA71BEB;
-        Thu, 13 Jul 2023 09:06:50 -0700 (PDT)
-Received: from 8bytes.org (pd9fe94eb.dip0.t-ipconnect.de [217.254.148.235])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.8bytes.org (Postfix) with ESMTPSA id B01B828012A;
-        Thu, 13 Jul 2023 17:50:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-        s=default; t=1689263424;
-        bh=OLJU3SR6cRiJ6OsOAtXZ0G0weObZUi+vKis4ETdMDq8=;
-        h=Date:From:To:Cc:Subject:From;
-        b=B4SXyn6rxFd9d9kM1MadPeDKBKhPsBYAaoYXWfrO24UOMnxYJZSd/JdEWiVrU9STk
-         TQWp1IETI7NzkBQUbpqMHlVfoLmfcvfm9HQuBoWWER/Or3nOyDgjZPsDDtQVuBGgFl
-         vlcNpvTH8qWvk6rQUTSeb42TMNSFpH2w5Uo84C21EMvqYgZJFZ2RU9wAXZ3oJsEKnr
-         OxW6kfRZ5/jzZ9q950rQO7Cmr1e95nwjWl9NzxJc490KUryPqLUDT7sNZZ2Pxdo+dk
-         RcWLY9RE6euw49DkQc7eRezkLnh5Mvgc0yyCTDgemVYtQwZ/JOfvLxpoXOygfBdrTm
-         z2a7cX+z2BGEg==
-Date:   Thu, 13 Jul 2023 17:50:23 +0200
-From:   =?iso-8859-1?Q?J=F6rg_R=F6del?= <joro@8bytes.org>
-To:     linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-sgx@vger.kernel.org
-Cc:     Dhaval Giani <dhaval.giani@gmail.com>
-Subject: [CfP] Confidential Computing Microconference @ LPC 2023
-Message-ID: <ZLAdPyqn8glGgYjT@8bytes.org>
+        with ESMTP id S229788AbjGMRLk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 13:11:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D064FE4D
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 10:10:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689268259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+UPgPFBGvQHuZjwqO9ik4oPicS3MZwipCdBIqa3Pous=;
+        b=LfQNLsC+9rUN6nDXpJh9bJPEa/8hMG5DCXVRj5Oeyu51TyEWDKOjjpur6/cxrmNuUKHOnC
+        NQHilZNg4i3zUNZ+0IOQUEL++nlNjCe8peXyFt+qqE8ei7mHuRT9rAMypsdQRxj5rm6/Ir
+        hPNvo1AGXWYin1KAvmnITOwpIPtXeow=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-371-8VPPKUzcMsKHSJPdeYH04w-1; Thu, 13 Jul 2023 13:10:57 -0400
+X-MC-Unique: 8VPPKUzcMsKHSJPdeYH04w-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-345fdbca2adso4562965ab.2
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 10:10:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689268257; x=1691860257;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+UPgPFBGvQHuZjwqO9ik4oPicS3MZwipCdBIqa3Pous=;
+        b=SoiX7ZNkdMKjKyF0uMz+78dMxKL5iJilZOyLJGBlVoeJ0Iarlm5VidGIaJMN267fqD
+         bOxZ7Ezk33kxvdMRCNM3z0Et7qhPzY/17eSErEQ3unhFcOaqtXi6psGUfF03VZRrYSmh
+         QRIk+E0BbeKwvHNydjq7baOEPN8Bus1hjWUGHcgg9BuhG2uXCd3IblhraaxhHyyYE5XY
+         r+wLwl31nDVq2WkCEW9s0lAyxvt0TjZfHyixyGVcU9iHYY47jEwXpT8MnqUm1ZZVFNML
+         WfK9sKxek9sjhK6wL4LurF7CAbNPzJ7UCadgY/cEWigEASBUlcVXVoOjQ2NdFwzq5hDS
+         UI8w==
+X-Gm-Message-State: ABy/qLZ12T/Kwk1GYB05Czs/XLiRFoj49lz1GOZeubhGOg1/77mhwSTj
+        04EcMB9Ov0JbWlx3fM6zMYNeNhVYWgUtN+UCXRJAVnc8XmDTY18ytNdrNG0J3q5M4MQX/QRA/rB
+        XH3+5el/TnLLM
+X-Received: by 2002:a92:c105:0:b0:345:6ffa:63c5 with SMTP id p5-20020a92c105000000b003456ffa63c5mr1980589ile.32.1689268257119;
+        Thu, 13 Jul 2023 10:10:57 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEYzBd2cy5+vbqrqBW5hcL0Nlt03XvoKU7EVc2Oqt6qt/39DAJLG7+eJes4a+aimrEVLy/slQ==
+X-Received: by 2002:a92:c105:0:b0:345:6ffa:63c5 with SMTP id p5-20020a92c105000000b003456ffa63c5mr1980544ile.32.1689268256865;
+        Thu, 13 Jul 2023 10:10:56 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id el20-20020a0566384d9400b0042b61a5087csm1948085jab.132.2023.07.13.10.10.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 10:10:56 -0700 (PDT)
+Date:   Thu, 13 Jul 2023 11:10:54 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>,
+        linux-mm@kvack.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Fei Li <fei1.li@intel.com>, x86@kernel.org,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Ingo Molnar <mingo@redhat.com>,
+        intel-gfx@lists.freedesktop.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-fpga@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
+        Wu Hao <hao.wu@intel.com>, Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
+        netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Muchun Song <muchun.song@linux.dev>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Benjamin LaHaise <bcrl@kvack.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Xu Yilun <yilun.xu@intel.com>, jaz@semihalf.com
+Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
+Message-ID: <20230713111054.75cdf2b8.alex.williamson@redhat.com>
+In-Reply-To: <20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org>
+References: <20230713-vfs-eventfd-signal-v1-0-7fda6c5d212b@kernel.org>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Thu, 13 Jul 2023 12:05:36 +0200
+Christian Brauner <brauner@kernel.org> wrote:
 
-We are pleased to announce the call for presentations for this years
-Confidential Computing MC at the Linux Plumbers Conference.
+> Hey everyone,
+> 
+> This simplifies the eventfd_signal() and eventfd_signal_mask() helpers
+> by removing the count argument which is effectively unused.
 
-In this microconference we want to discuss ongoing developments around
-Linux support for memory encryption and support for confidential
-computing in general.
+We have a patch under review which does in fact make use of the
+signaling value:
 
-Topics of interest include:
-
-	* Support for unaccepted memory
-
-	* Attestation workflows
-
-	* Confidential Computing threat model
-
-	* Secure VM Service module (SVSM) and paravisor architecture and implementation
-
-	* Live migration of confidential virtual machines
-
-	* ARM64 Confidential Computing
-
-	* RISC-V CoVE
-
-	* Secure IO and device attestation
-
-	* Intel TDX Connect
-
-	* AMD SEV-TIO
-
-Please use the LPC CfP process to submit your proposals. Submissions can
-be made via
-
-	https://lpc.events/event/17/abstracts/
-
-Make sure to select "Confidential Computing MC" as the track and submit
-your session proposal by August 25th. Submissions made after that date
-can not be included into the microconference.
-
-Looking forward to seeing all of you in Richmond, Virginia in November!
+https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
 
 Thanks,
-
-	Joerg
+Alex
 
