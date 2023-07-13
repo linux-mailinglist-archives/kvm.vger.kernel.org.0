@@ -2,120 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C0A0751C9F
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 11:05:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C5F0751CDA
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 11:11:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232167AbjGMJFU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 05:05:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58768 "EHLO
+        id S232359AbjGMJLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 05:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233851AbjGMJE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 05:04:56 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609AE35BC;
-        Thu, 13 Jul 2023 02:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=ecb3dsTnizPLwQBPga+sFZir+8eVUnbKQ5zrkRJr7LU=; b=wFg5Y+l4Y9PhmrSvFvL4bww7kC
-        GNLtl27AOL0D7JC0UtgKHSPb/v0OfjZAMNCTbJCYNXqSuUy8AUURrue2CqPamV8D0Gr3yQLladZQE
-        zBHmMaflzleVlKasyUWeJLDOFiA1ol/aK7zpzHeJvapMtEAfuoQ+gsENGTBlcQkEA4ufkIk/3ZCcG
-        wYIYCX6Yq5XONoPgiOKT7QCnPQpGEBRGrJNIFHGxs3bS0LBqWNSZPVDtppjDclMirFP+D1oCxKHzK
-        fNOu7phwNuFSwhCR3ZpNi5hecAoF31kPulw4FX3P51I92lkDzbTRCAE7gUMS0sFDWVpGi+dnr9Ldr
-        RBn+egiQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qJsEW-00HaXc-DP; Thu, 13 Jul 2023 09:03:32 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0265030058D;
-        Thu, 13 Jul 2023 11:03:32 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id DE8D2245CA111; Thu, 13 Jul 2023 11:03:31 +0200 (CEST)
-Date:   Thu, 13 Jul 2023 11:03:31 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH 09/10] x86/virt/tdx: Wire up basic SEAMCALL functions
-Message-ID: <20230713090331.GD3138667@hirez.programming.kicks-ass.net>
-References: <cover.1689151537.git.kai.huang@intel.com>
- <41b7e5503a3e6057dc168b3c5a9693651c501d22.1689151537.git.kai.huang@intel.com>
- <20230712221510.GG3894444@ls.amr.corp.intel.com>
- <4202b26acdb3fe926dd1a9a46c2c7c35a5d85529.camel@intel.com>
- <20230713074204.GA3139243@hirez.programming.kicks-ass.net>
- <d4887818532e1716b5dd8a08819c656ab4e4c5bf.camel@intel.com>
+        with ESMTP id S233441AbjGMJKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 05:10:52 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702B72708
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 02:10:20 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4R1phR0VHGz18Lrk;
+        Thu, 13 Jul 2023 17:09:27 +0800 (CST)
+Received: from [10.40.193.166] (10.40.193.166) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 13 Jul 2023 17:10:02 +0800
+Subject: Re: [PATCH] KVM: arm64: Fix the name of sys_reg_desc related to PMU
+To:     Marc Zyngier <maz@kernel.org>
+References: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
+ <868rblwmpn.wl-maz@kernel.org>
+ <5c513a72-9ae9-22ca-a9a6-8b3c481e0921@hisilicon.com>
+ <87bkgg9u54.wl-maz@kernel.org>
+CC:     <oliver.upton@linux.dev>, <james.morse@arm.com>,
+        <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>
+From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
+Message-ID: <4cbcc10d-6cd2-d88e-b15d-bd4f1a229251@hisilicon.com>
+Date:   Thu, 13 Jul 2023 17:10:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <87bkgg9u54.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d4887818532e1716b5dd8a08819c656ab4e4c5bf.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Originating-IP: [10.40.193.166]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 13, 2023 at 08:18:09AM +0000, Huang, Kai wrote:
-> On Thu, 2023-07-13 at 09:42 +0200, Peter Zijlstra wrote:
-> > On Thu, Jul 13, 2023 at 03:46:52AM +0000, Huang, Kai wrote:
-> > > On Wed, 2023-07-12 at 15:15 -0700, Isaku Yamahata wrote:
-> > > > > The SEAMCALL ABI is very similar to the TDCALL ABI and leverages much
-> > > > > TDCALL infrastructure.  Wire up basic functions to make SEAMCALLs for
-> > > > > the basic TDX support: __seamcall(), __seamcall_ret() and
-> > > > > __seamcall_saved_ret() which is for TDH.VP.ENTER leaf function.
-> > > > 
-> > > > Hi.  __seamcall_saved_ret() uses struct tdx_module_arg as input and output.  For
-> > > > KVM TDH.VP.ENTER case, those arguments are already in unsigned long
-> > > > kvm_vcpu_arch::regs[].  It's silly to move those values twice.  From
-> > > > kvm_vcpu_arch::regs to tdx_module_args.  From tdx_module_args to real registers.
-> > > > 
-> > > > If TDH.VP.ENTER is the only user of __seamcall_saved_ret(), can we make it to
-> > > > take unsigned long kvm_vcpu_argh::regs[NR_VCPU_REGS]?  Maybe I can make the
-> > > > change with TDX KVM patch series.
-> > > 
-> > > The assembly code assumes the second argument is a pointer to 'struct
-> > > tdx_module_args'.  I don't know how can we change __seamcall_saved_ret() to
-> > > achieve what you said.  We might change the kvm_vcpu_argh::regs[NR_VCPU_REGS] to
-> > > match 'struct tdx_module_args''s layout and manually convert part of "regs" to
-> > > the structure and pass to __seamcall_saved_ret(), but it's too hacky I suppose.
-> > 
-> > I suspect the kvm_vcpu_arch::regs layout is given by hardware; so the
-> > only option would be to make tdx_module_args match that. It's a slightly
-> > unfortunate layout, but meh.
-> > 
-> > Then you can simply do:
-> > 
-> > 	__seamcall_saved_ret(leaf, (struct tdx_module_args *)vcpu->arch->regs);
-> > 
-> > 
-> 
-> I don't think the layout matches hardware, especially I think there's no
-> "hardware layout" for GPRs that are concerned here.  They are just for KVM
-> itself to save guest's registers when the guest exits to KVM, so that KVM can
-> restore them when returning back to the guest.
+Hi Marc,
 
-Either way around it should be possible to make them match I suppose.
-Ideally we get the callee-clobbered regs first, but if not, I don't
-think that's too big of a problem.
 
+åœ¨ 2023/7/13 æ˜ŸæœŸå›› 14:56, Marc Zyngier å†™é“:
+> On Thu, 13 Jul 2023 03:35:39 +0100,
+> "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+>> Hi Marc,
+>>
+>>
+>> åœ¨ 2023/7/12 æ˜ŸæœŸä¸‰ 16:36, Marc Zyngier å†™é“:
+>>> On Wed, 12 Jul 2023 08:55:05 +0100,
+>>> chenxiang <chenxiang66@hisilicon.com> wrote:
+>>>> From: Xiang Chen <chenxiang66@hisilicon.com>
+>>>>
+>>>> For those PMU system registers defined in sys_reg_descs[], use macro
+>>>> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
+>>>> later two macros call macro PMU_SYS_REG() actually.
+>>>> Currently the input parameter of PMU_SYS_REG() is other macro which is
+>>>> calculation formula of the value of system registers, so for example, if
+>>>> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually
+>>>> the name will be as following:
+>>>> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+>>>>
+>>>> To fix the issue, use the name as a input parameter of PMU_SYS_REG like
+>>>> MTE_REG or EL2_REG.
+>>> Why is the name relevant? Is this related to tracing?
+>> I think It is not related to tracing. I find the issue when i want to
+>> know which system reigsters are set
+>> when on live migration and printk the name of sys_reg_desc in function
+>> kvm_sys_reg_set_user,
+>> find the name of some registers are abnormal as followings:
+>>
+>> [  227.145540] kvm_sys_reg_set_user 3427:SYS_FAR_EL1
+>> [  227.158057] kvm_sys_reg_set_user 3427:SYS_PAR_EL1
+>> [  227.170574] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
+>> ((9) << 12) | ((14) << 8) | ((1) << 5))
+>> [  227.188037] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
+>> ((9) << 12) | ((14) << 8) | ((2) << 5))
+>> [  227.205511] kvm_sys_reg_set_user 3427:SYS_MAIR_EL1
+>> [  227.218117] kvm_sys_reg_set_user 3427:SYS_PIRE0_EL1
+> So what is this if not some form of tracing?
+
+Ah, i was misunderstood your question. I thought you aksed whether it is 
+related to kernel tracing
+  (which is already existed in kernel) such as tracepoint or debugfs.
+
+>
+> I agree that it would be good to fix it, at least because the register
+> name is smaller than the encoding, but the commit message should at
+> least mention what this is used for.
+
+Ok, i will modify commit message in next version.
+
+>
+> Thanks,
+>
+> 	M.
+>
 
