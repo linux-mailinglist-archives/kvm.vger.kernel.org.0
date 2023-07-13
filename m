@@ -2,122 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA4DB7514C0
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 01:47:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96F17751548
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 02:28:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232125AbjGLXre (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 19:47:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53466 "EHLO
+        id S232957AbjGMA25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 20:28:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231608AbjGLXrc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 19:47:32 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF441E65
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 16:47:25 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b8af49a5d2so945855ad.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 16:47:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689205645; x=1691797645;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7nUtvGiaimaAY0cZqfNqB77rOB1r7Cx9gcJevlv5Iw=;
-        b=dH1TkkwIH2N3rOv98vFjMjLNR2RzgZXxmQvbeFRMHxFC/oiz1qxPNuXga6xPpLXjvo
-         YYscOCfrhUcI5vrQ/IQMdHShU3Li7MRlpxpTNq2PYQ1OGj0vjymqubLgQztkxs62pGRu
-         lI2TpohTkYwtrRZDNkPZtSruf4F91iAda7vn8NPbIIgULXidctMeUZ1xMWpEzKmLk7FZ
-         M70o/gYhexV2rzlWbmYOnVs+QnfrwDR01qu9qCiM+3iZd8SgFUgMpEp+3gNndOhmRBow
-         +T0Ua51N+3qQ9sqijHhfoCPVp91c54/Dwki66c4p7n54uLSffPzfXMsVk7z4RbS3TD72
-         nHgg==
+        with ESMTP id S229808AbjGMA2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 20:28:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFC91FE9
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 17:28:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689208088;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=voWVlpmm7MeCDv7tg7yl30rZqUK9Zw54JqfyPKuCRLo=;
+        b=gyrGSnIXMga9K2ESqHL5/4xbRGvV4VWGQVy5zfkU5/ZS62x5ZnMQeED3QkTdaFHp2MtspH
+        1pGkrA5fftFZSMJ6Aznguh4ZZ+P4bITrwCMGwFD2XFmxsNV4S6VoHqAsSCe3jUC716rSo4
+        wCEgorlvi4Eva7cK/ghYq8Q83zevyyM=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-230-P3TN92thNCuAqkGVRG86Pg-1; Wed, 12 Jul 2023 20:28:06 -0400
+X-MC-Unique: P3TN92thNCuAqkGVRG86Pg-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1b8a8154fcaso1282685ad.1
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 17:28:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689205645; x=1691797645;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7nUtvGiaimaAY0cZqfNqB77rOB1r7Cx9gcJevlv5Iw=;
-        b=il2o8ML/7L92B8ufaABmNrFc4EE6TgtFi+iUdyK57LimzgFGjtxsa1EPQL+1IfqKsV
-         QuVRKzDuRZSvEiMxkvTx7Mlyj37MxjRSfDcvM0Xy8B65F/kYTgSGwJuUpKyLSuYp3y5L
-         uKG5ZBRxGHWyoi2gbqe9pk9QsG7M4yl4EjXC2f9AMj6TX7czniAxuLqbjBzDERPXitve
-         nxXmIV4mNCCoNzn8+P+Zx3v59thI30vQWelkr3cerUuAC90OGiVF0/o9b9fmVWhA1o9j
-         k2wFbF8Q/9JPJz93W/Sfsk2jaNv9QmBri0I/eE1d+GrdzDUc1/ienV2Ou/0wEg4WkKHh
-         dclQ==
-X-Gm-Message-State: ABy/qLZFDN2IPtsXK+9UrFuJaXdBHVAPXjf44oNOk5ql0PrNZ92gUx1b
-        p/CvVczvP4pNohsN744tYjU8t7DQQ1s=
-X-Google-Smtp-Source: APBJJlG8AVJYisMIvs4i+GAPybPJ3kflUqvW2Anjys1LU6hiE7fvf1/XgKFKGN5opvdzCvacxKCsy6n5hhs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d2cd:b0:1af:f80f:185d with SMTP id
- n13-20020a170902d2cd00b001aff80f185dmr545plc.4.1689205645373; Wed, 12 Jul
- 2023 16:47:25 -0700 (PDT)
-Date:   Wed, 12 Jul 2023 16:47:24 -0700
-In-Reply-To: <4b621470-8c58-264b-1e8b-75cec73cd7b0@gmail.com>
-Mime-Version: 1.0
-References: <20230602005859.784190-1-seanjc@google.com> <168667299355.1927151.1998349801097712999.b4-ty@google.com>
- <abf509a2-ebfd-7b5f-4f7a-fdd4ef60c1de@amazon.com> <ZIoQDbte/uAiit9N@google.com>
- <4b621470-8c58-264b-1e8b-75cec73cd7b0@gmail.com>
-Message-ID: <ZK87jGkrc9/LVsWz@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add "never" option to allow sticky
- disabling of nx_huge_pages
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Luiz Capitulino <luizcap@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Li RongQing <lirongqing@baidu.com>,
-        Yong He <zhuangel570@gmail.com>,
-        Robert Hoo <robert.hoo.linux@gmail.com>,
-        Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1689208085; x=1691800085;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=voWVlpmm7MeCDv7tg7yl30rZqUK9Zw54JqfyPKuCRLo=;
+        b=howPHOCszDgQ8n+VX0DpEBUmRMS+57XxYvjEIoPZA3ayNyh/fNG55mXTtKq6DZHfE+
+         FarLldl90gSfvFmQ+OUG5qa5+UW5SwpeFNzGfMai/oE8/eZYhM5xSvqoHQfKGrtNtScG
+         gQdBHGAKiBTzjEZ/qASbhiKfhci+Tb9wK5fuEUzgyhcA3smKC4QOzJWI5t4bR80OpStH
+         eTOMfZYHVnAcC6Am4NA4NKqR+1LXTMnH7UV6a5tzIzVyAX4msYqDvlky36GqbuDCN0GN
+         i9FKW35kiyxT4kMya3fZ5jfEwR0lmC03dqtPYNHUJSMDs46cqDfwsWLGDrzBB/kMb0MY
+         OD/g==
+X-Gm-Message-State: ABy/qLa0ENpBsoCxfGPlPkmMHOLrwPJaGgM0CM2MGZ/GgxZytZv+7LDB
+        2EBPuSwG/Shz7B4XLYRGsSkqEJG2xFu5l1adgiu37CYm3FbE4GuyPS9pDKJUzP8/mwcLpHcwMWz
+        loRT20BcTlw2e
+X-Received: by 2002:a17:902:f68c:b0:1b5:91:4693 with SMTP id l12-20020a170902f68c00b001b500914693mr266226plg.1.1689208085442;
+        Wed, 12 Jul 2023 17:28:05 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGEjFAvk5eqLeJeEU/3QkGgYzn7vfM7lAYQwnHa5EWYocjBHtJs1x+2EwaaYQfdNtaq2LOoGQ==
+X-Received: by 2002:a17:902:f68c:b0:1b5:91:4693 with SMTP id l12-20020a170902f68c00b001b500914693mr266210plg.1.1689208084952;
+        Wed, 12 Jul 2023 17:28:04 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id io12-20020a17090312cc00b001b9dfa24523sm4531541plb.213.2023.07.12.17.27.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Jul 2023 17:28:03 -0700 (PDT)
+Message-ID: <7f524e2a-e773-4de0-09ed-b18eaec8ff16@redhat.com>
+Date:   Thu, 13 Jul 2023 10:27:57 +1000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v1 0/5] target/arm: Handle psci calls in userspace
+Content-Language: en-US
+To:     Salil Mehta <salil.mehta@huawei.com>,
+        Shaoqin Huang <shahuang@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc:     "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Salil Mehta <salil.mehta@opnsrc.net>
+References: <20230626064910.1787255-1-shahuang@redhat.com>
+ <9df973ede74e4757b510f26cd5786036@huawei.com>
+ <fb5e8d4d-2388-3ab0-aaac-a1dd91e74b08@redhat.com>
+ <539e6a25b89a45839de37fe92b27d0d3@huawei.com>
+From:   Gavin Shan <gshan@redhat.com>
+In-Reply-To: <539e6a25b89a45839de37fe92b27d0d3@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 12, 2023, Like Xu wrote:
-> On 2023/6/15 03:07, Sean Christopherson wrote:
-> > On Wed, Jun 14, 2023, Luiz Capitulino wrote:
-> > > > Applied to kvm-x86 mmu.  I kept the default as "auto" for now, as that can go on
-> > > > top and I don't want to introduce that change this late in the cycle.  If no one
-> > > > beats me to the punch (hint, hint ;-) ), I'll post a patch to make "never" the
-> > > > default for unaffected hosts so that we can discuss/consider that change for 6.6.
-> > > 
-> > > Thanks Sean, I agree with the plan. I could give a try on the patch if you'd like.
-> > 
-> > Yes please, thanks!
+Hi Salil,
+
+On 7/4/23 19:58, Salil Mehta wrote:
+
 > 
-> As a KVM/x86 *feature*, playing with splitting and reconstructing large
-> pages have other potential user scenarios, e.g. for performance test
-> comparisons in a easier approach, not just for itlb_multihit mitigation.
-
-Enabling and disabling dirty logging is a far better tool for that, as it gives
-userspace much more explicit control over what pages are are split/reconstituted,
-and when.
- 
-> On unaffected machines (ICX and later), nx_huge_pages is already "N",
-> and turning it into "never" doesn't help materially in the mitigation
-> implementation, but loses flexibility.
-
-I'm becoming more and more convinced that losing the flexibility is perfectly
-acceptable.  There's a very good argument to be made that mitigating DoS attacks
-from the guest kernel should be done several levels up, e.g. by refusing to create
-VMs for a customer that is bringing down hosts.  As Jim has a pointed out, plugging
-the hole only works if you are 100% confident there are no other holes, and will
-never be other holes.
-
-> IMO, the real issue here is that the kernel thread "kvm-nx-lpage-
-> recovery" is created unconditionally. We also need to be aware of the
-> existence of this commit 084cc29f8bbb ("KVM: x86/MMU: Allow NX huge
-> pages to be disabled on a per-vm basis").
+> Latest Qemu Prototype (Pre RFC V2) (Not in the final shape of the patches)
+> https://github.com/salil-mehta/qemu.git   virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
 > 
-> One of the technical proposals is to defer kvm_vm_create_worker_thread()
-> to kvm_mmu_create() or kvm_init_mmu(), based on
-> kvm->arch.disable_nx_huge_pages, even until guest paging mode is enabled
-> on the first vcpu.
 > 
-> Is this step worth taking ?
+> should work against below kernel changes as confirmed by James,
+> 
+> Latest Kernel Prototype (Pre RFC V2 = RFC V1 + Fixes)
+> https://git.gitlab.arm.com/linux-arm/linux-jm.git   virtual_cpu_hotplug/rfc/v2
+> 
 
-IMO, no.  In hindsight, adding KVM_CAP_VM_DISABLE_NX_HUGE_PAGES was likely a
-mistake; requiring CAP_SYS_BOOT makes it annoyingly difficult to safely use the
-capability.  My preference at this point is to make changes to the NX hugepage
-mitigation only when there is a substantial benefit to an already-deployed usecase.
+I think it'd better to have the discussions through maillist. The threads and all
+follow-up replies can be cached somewhere to avoid lost. Besides, other people may
+be intrested in the same points and can join the discussion directly.
+
+I got a chance to give the RFC patchsets some tests. Not all cases are working
+as expected. I know the patchset is being polished. I'm summarize them as below:
+
+(1) coredump is triggered when the topology is out of range. It's the issue we
+     discussed in private. Here I'm just recapping in case other people also blocked
+     by the issue.
+
+     (a) start VM with the following command lines
+      /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64       \
+      -accel kvm -machine virt,gic-version=host,nvdimm=on -cpu host \
+      -smp cpus=1,maxcpus=2,sockets=1,clusters=1,cores=1,threads=2  \
+      -m 512M,slots=16,maxmem=64G                                   \
+      -object memory-backend-ram,id=mem0,size=512M                  \
+      -numa node,nodeid=0,cpus=0-1,memdev=mem0                      \
+
+     (b) hot add CPU whose topology is out of range
+     (qemu) device_add driver=host-arm-cpu,id=cpu1,core-id=1
+
+
+     It's actually caused by typos in hw/arm/virt.c::virt_cpu_pre_plug() where
+     'ms->possible_cpus->len' needs to be replaced with 'ms->smp.cores'. With this,
+     the hot-added CPU object will be rejected.
+
+(2) I don't think TCG has been tested since it seems not working at all.
+
+     (a) start VM with the following command lines
+     /home/gshan/sandbox/src/qemu/main/build/qemu-system-aarch64     \
+     -machine virt,gic-version=3 -cpu max -m 1024                    \
+     -smp maxcpus=2,cpus=1,sockets=1,clusters=1,cores=1,threads=2    \
+
+     (b) failure while hot-adding CPU
+     (qemu) device_add driver=max-arm-cpu,id=cpu1,thread-id=1
+     Error: cpu(id1=0:0:0:1) with arch-id 1 exists
+
+     The error message is printed by hw/arm/virt.c::virt_cpu_pre_plug() where the
+     specific CPU has been presented. For KVM case, the disabled CPUs are detached
+     from 'ms->possible_cpu->cpus[1].cpu' and destroyed. I think we need to do similar
+     thing for TCG case in hw/arm/virt.c::virt_cpu_post_init(). I'm able to add CPU
+     with the following hunk of changes.
+
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2122,6 +2122,18 @@ static void virt_cpu_post_init(VirtMachineState *vms, MemoryRegion *sysmem)
+                  exit(1);
+              }
+          }
++
++#if 1
++        for (n = 0; n < possible_cpus->len; n++) {
++            cpu = qemu_get_possible_cpu(n);
++            if (!qemu_enabled_cpu(cpu)) {
++                CPUArchId *cpu_slot;
++                cpu_slot = virt_find_cpu_slot(ms, cpu->cpu_index);
++                cpu_slot->cpu = NULL;
++                object_unref(OBJECT(cpu));
++            }
++        }
++#endif
+      }
+  }
+
+(3) Assertion on following the sequence of hot-add, hot-remove and hot-add when TCG mode is enabled.
+
+     (a) Include the hack from (2) and start VM with the following command lines
+     /home/gshan/sandbox/src/qemu/main/build/qemu-system-aarch64     \
+     -machine virt,gic-version=3 -cpu max -m 1024                    \
+     -smp maxcpus=2,cpus=1,sockets=1,clusters=1,cores=1,threads=2    \
+
+     (b) assertion on the sequence of hot-add, hot-remove and hot-add
+     (qemu) device_add driver=max-arm-cpu,id=cpu1,thread-id=1
+     (qemu) device_del cpu1
+     (qemu) device_add driver=max-arm-cpu,id=cpu1,thread-id=1
+     **
+     ERROR:../tcg/tcg.c:669:tcg_register_thread: assertion failed: (n < tcg_max_ctxs)
+     Bail out! ERROR:../tcg/tcg.c:669:tcg_register_thread: assertion failed: (n < tcg_max_ctxs)
+     Aborted (core dumped)
+
+     I'm not sure if x86 has similar issue. It seems the management for TCG contexts, corresponding
+     to variable @tcg_max_ctxs and @tcg_ctxs need some improvements for better TCG context registration
+     and unregistration to accomodate CPU hotplug.
+
+
+Apart from what have been found in the tests, I've started to look into the code changes. I may
+reply with more specific comments. However, it would be ideal to comment on the specific changes
+after the patchset is posted for review. Salil, the plan may have been mentioned by you somewhere.
+As I understood, the QEMU patchset will be posted after James's RFCv2 kernel series is posted.
+Please let me know if my understanding is correct. Again, thanks for your efforts to make vCPU
+hotplug to be supported :)
+
+Thanks,
+Gavin
+
+
+
+     
+
+     
+         
+
