@@ -2,219 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F7257517A4
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 06:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 563AA751889
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 08:07:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233948AbjGMEn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 00:43:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43710 "EHLO
+        id S233395AbjGMGHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 02:07:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233908AbjGMEnX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 00:43:23 -0400
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E722118;
-        Wed, 12 Jul 2023 21:43:09 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 4653F100018;
-        Thu, 13 Jul 2023 07:43:06 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4653F100018
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1689223386;
-        bh=GZsDJxsvZ7S25s8E+UbwVCfAMZkZAWT3goxw3fP22mM=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=RSy8b8KlZtEmzoiCosMgw8Igh0S8157B2Eu48m0x8y4lF9Hy6+rI5rxho1R53/eha
-         gLEoqnumfn/fQRWzSJoQ4+bqLYQ4nO7FhA16MrtNRa+PS8fl+Hla4j2pwcAFkhFlTF
-         eNFYJmiftztIiWVB54lnLbL2ea/uZEdxdbc/NyLMEQfzHFaJ0Pd8X0KLeOz0Tbf6Ya
-         10hlFtPAqu+GgmeCE7qTYwtIenPG4a78vXOd4z7gDgluBZrYjufmQ7J7RiNEqCW95x
-         yhbUfkMsMSWK10aRVvrLxg7dfnFHJDlJjkhnbMtq65bXBsW1WOm1uHRSVE6A/tFy4r
-         o0VGMgzYgG0rg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Thu, 13 Jul 2023 07:43:06 +0300 (MSK)
-Received: from [192.168.0.12] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 13 Jul 2023 07:42:44 +0300
-Message-ID: <cafa9b17-1cb2-543d-8e74-7cf47a92853e@sberdevices.ru>
-Date:   Thu, 13 Jul 2023 07:37:49 +0300
+        with ESMTP id S232286AbjGMGHb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 02:07:31 -0400
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC1891BC6
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 23:07:29 -0700 (PDT)
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-560fba06e7eso647564eaf.3
+        for <kvm@vger.kernel.org>; Wed, 12 Jul 2023 23:07:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689228449; x=1691820449;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ym4Wk39RoN+n/NCXheA5gg8womnq4gmFrZ2biI2hyGg=;
+        b=gz/mmvZ6xYlFXNgg6bwUCYLFqe1hkftzfhmbgbQe3NQNZnbJ9DPcBnWtnuLFMP1NKE
+         aA4KN3Di0s4RoH1PQWZaqnzNE1f8ORLzDX1IEGp62SnLKRMQ3RHxUZuEpsEpbAPns9H+
+         Vzw/IJoEFrbmKuhUNqN3higaTY6fk087RaRCH59Jj7uuLqkiA8Cy8zu35wtaWEaar9rF
+         L1zJOYVaeHKdqf6cCD5LZO2ozNPgqTzdG6NJYx9shl6MRxJZYF/fBFqStCyurMDPK6sH
+         9yqh1f7pqkVSgxfgpyDa2bd7AVkHX4GH8HWV0++2RDT1ztpRGLRQ6U+kQ5zpcVz3rcdE
+         0Ixw==
+X-Gm-Message-State: ABy/qLaXauHF9M0/xSw0djR1huQQNH8wjyqZ4EIyG6NZnHMHh8CJhwvq
+        L60rSB198D4t8WBRiz+iKwmbmt5SG19F/Fn0RZ3UncCbNIuS
+X-Google-Smtp-Source: APBJJlGolIXkPkhx6uLxab7k5qmejxJ0G6h3kGEEo22nHCEhAVhfiKj+4qIpnz96geK0e30ymQ8neh+JBu/Ex7+k8cdx70T0oliE
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v5 13/17] vsock: enable setting SO_ZEROCOPY
-Content-Language: en-US
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
- <20230701063947.3422088-14-AVKrasnov@sberdevices.ru>
- <ZK8pxrbkrH2bEgw7@bullseye>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <ZK8pxrbkrH2bEgw7@bullseye>
+X-Received: by 2002:a05:6870:5b35:b0:1b0:6bf2:f039 with SMTP id
+ ds53-20020a0568705b3500b001b06bf2f039mr886366oab.7.1689228448967; Wed, 12 Jul
+ 2023 23:07:28 -0700 (PDT)
+Date:   Wed, 12 Jul 2023 23:07:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a531410600582572@google.com>
+Subject: [syzbot] [kvm?] WARNING in __load_segment_descriptor
+From:   syzbot <syzbot+5234e75fb68b86fe89e3@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178587 [Jul 12 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 521 521 0c3391dd6036774f2e1052158c81e48587b96e95, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/13 02:50:00 #21606476
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    1c7873e33645 mm: lock newly mapped VMA with corrected orde..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=106f1664a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7ad417033279f15a
+dashboard link: https://syzkaller.appspot.com/bug?extid=5234e75fb68b86fe89e3
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=146864a8a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=134a32bca80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7eb52a4d9cf3/disk-1c7873e3.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b9aa9a9e09e8/vmlinux-1c7873e3.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/782d5e4196e2/bzImage-1c7873e3.xz
+
+The issue was bisected to:
+
+commit 65966aaca18a5cbf42ac22234cb9cbbf60a4d33c
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Thu Feb 16 20:22:54 2023 +0000
+
+    KVM: x86: Assert that the emulator doesn't load CS with garbage in !RM
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16c70f4ca80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=15c70f4ca80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11c70f4ca80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5234e75fb68b86fe89e3@syzkaller.appspotmail.com
+Fixes: 65966aaca18a ("KVM: x86: Assert that the emulator doesn't load CS with garbage in !RM")
+
+kvm_intel: set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5022 at arch/x86/kvm/emulate.c:1648 __load_segment_descriptor+0xf89/0x1200 arch/x86/kvm/emulate.c:1648
+Modules linked in:
+CPU: 0 PID: 5022 Comm: syz-executor486 Not tainted 6.4.0-syzkaller-12454-g1c7873e33645 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
+RIP: 0010:__load_segment_descriptor+0xf89/0x1200 arch/x86/kvm/emulate.c:1648
+Code: 70 00 44 0f b6 7c 24 37 0f b6 7c 24 30 44 89 fe e8 4c f9 70 00 44 38 7c 24 30 0f 84 96 fb ff ff e9 06 f9 ff ff e8 d7 fd 70 00 <0f> 0b 44 0f b6 7c 24 20 e9 43 f2 ff ff e8 c5 fd 70 00 44 0f b6 7c
+RSP: 0018:ffffc90003abf898 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff8880275e5940 RSI: ffffffff8113e3b9 RDI: 0000000000000005
+RBP: ffff8880765e8000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000050
+R13: 0000000000000050 R14: ffff8880765e8030 R15: 0000000000000000
+FS:  00005555566133c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020032008 CR3: 0000000025f5b000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ load_segment_descriptor arch/x86/kvm/emulate.c:1775 [inline]
+ __emulate_int_real+0x561/0x6f0 arch/x86/kvm/emulate.c:2061
+ emulate_int_real+0x7d/0xd0 arch/x86/kvm/emulate.c:2075
+ kvm_inject_realmode_interrupt+0x102/0x340 arch/x86/kvm/x86.c:8435
+ vmx_inject_exception+0x33b/0x470 arch/x86/kvm/vmx/vmx.c:1793
+ kvm_check_and_inject_events arch/x86/kvm/x86.c:10082 [inline]
+ vcpu_enter_guest+0x386/0x6020 arch/x86/kvm/x86.c:10646
+ vcpu_run arch/x86/kvm/x86.c:10951 [inline]
+ kvm_arch_vcpu_ioctl_run+0xa35/0x2820 arch/x86/kvm/x86.c:11172
+ kvm_vcpu_ioctl+0x574/0xe90 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4112
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f281d28c749
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffced680a68 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007ffced680a78 RCX: 00007f281d28c749
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 00007ffced680a70 R08: 0000000000000000 R09: 00007f281d24d2d0
+R10: 0000000000009120 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
 
 
-On 13.07.2023 01:31, Bobby Eshleman wrote:
-> On Sat, Jul 01, 2023 at 09:39:43AM +0300, Arseniy Krasnov wrote:
->> For AF_VSOCK, zerocopy tx mode depends on transport, so this option must
->> be set in AF_VSOCK implementation where transport is accessible (if
->> transport is not set during setting SO_ZEROCOPY: for example socket is
->> not connected, then SO_ZEROCOPY will be enabled, but once transport will
->> be assigned, support of this type of transmission will be checked).
->>
->> To handle SO_ZEROCOPY, AF_VSOCK implementation uses SOCK_CUSTOM_SOCKOPT
->> bit, thus handling SOL_SOCKET option operations, but all of them except
->> SO_ZEROCOPY will be forwarded to the generic handler by calling
->> 'sock_setsockopt()'.
->>
->> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> ---
->>  Changelog:
->>  v4 -> v5:
->>   * This patch is totally reworked. Previous version added check for
->>     PF_VSOCK directly to 'net/core/sock.c', thus allowing to set
->>     SO_ZEROCOPY for AF_VSOCK type of socket. This new version catches
->>     attempt to set SO_ZEROCOPY in 'af_vsock.c'. All other options
->>     except SO_ZEROCOPY are forwarded to generic handler. Only this
->>     option is processed in 'af_vsock.c'. Handling this option includes
->>     access to transport to check that MSG_ZEROCOPY transmission is
->>     supported by the current transport (if it is set, if not - transport
->>     will be checked during 'connect()').
->>
->>  net/vmw_vsock/af_vsock.c | 44 ++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 42 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index da22ae0ef477..8acc77981d01 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -1406,8 +1406,18 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>  			goto out;
->>  		}
->>  
->> -		if (vsock_msgzerocopy_allow(transport))
->> +		if (!vsock_msgzerocopy_allow(transport)) {
->> +			/* If this option was set before 'connect()',
->> +			 * when transport was unknown, check that this
->> +			 * feature is supported here.
->> +			 */
->> +			if (sock_flag(sk, SOCK_ZEROCOPY)) {
->> +				err = -EOPNOTSUPP;
->> +				goto out;
->> +			}
->> +		} else {
->>  			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
->> +		}
->>  
->>  		err = vsock_auto_bind(vsk);
->>  		if (err)
->> @@ -1643,7 +1653,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
->>  	const struct vsock_transport *transport;
->>  	u64 val;
->>  
->> -	if (level != AF_VSOCK)
->> +	if (level != AF_VSOCK && level != SOL_SOCKET)
->>  		return -ENOPROTOOPT;
->>  
->>  #define COPY_IN(_v)                                       \
->> @@ -1666,6 +1676,34 @@ static int vsock_connectible_setsockopt(struct socket *sock,
->>  
->>  	transport = vsk->transport;
->>  
->> +	if (level == SOL_SOCKET) {
->> +		if (optname == SO_ZEROCOPY) {
->> +			int zc_val;
->> +
->> +			/* Use 'int' type here, because variable to
->> +			 * set this option usually has this type.
->> +			 */
->> +			COPY_IN(zc_val);
->> +
->> +			if (zc_val < 0 || zc_val > 1) {
->> +				err = -EINVAL;
->> +				goto exit;
->> +			}
->> +
->> +			if (transport && !vsock_msgzerocopy_allow(transport)) {
->> +				err = -EOPNOTSUPP;
->> +				goto exit;
->> +			}
->> +
->> +			sock_valbool_flag(sk, SOCK_ZEROCOPY,
->> +					  zc_val ? true : false);
->> +			goto exit;
->> +		}
->> +
->> +		release_sock(sk);
->> +		return sock_setsockopt(sock, level, optname, optval, optlen);
->> +	}
->> +
->>  	switch (optname) {
->>  	case SO_VM_SOCKETS_BUFFER_SIZE:
->>  		COPY_IN(val);
->> @@ -2321,6 +2359,8 @@ static int vsock_create(struct net *net, struct socket *sock,
->>  		}
->>  	}
->>  
->> +	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
->> +
-> 
-> I found that because datagrams have !ops->setsockopt this bit causes
-> setsockopt() to fail (the related logic can be found in
-> __sys_setsockopt). Maybe we should only set this for connectibles?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Agree! I'll add this check in the next version
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Thanks, Arseniy
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> 
-> Best,
-> Bobby
-> 
->>  	vsock_insert_unbound(vsk);
->>  
->>  	return 0;
->> -- 
->> 2.25.1
->>
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
