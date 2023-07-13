@@ -2,151 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B97E07521DC
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 14:50:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 956657521CD
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 14:49:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234761AbjGMMuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 08:50:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59046 "EHLO
+        id S234908AbjGMMtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 08:49:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234182AbjGMMuF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 08:50:05 -0400
-Received: from mail.208.org (unknown [183.242.55.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3502D71
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 05:49:32 -0700 (PDT)
-Received: from mail.208.org (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTP id 4R1vY95tpFzBRSTq
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 20:48:29 +0800 (CST)
-Authentication-Results: mail.208.org (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)" header.d=208.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
-        content-transfer-encoding:content-type:message-id:user-agent
-        :references:in-reply-to:subject:to:from:date:mime-version; s=
-        dkim; t=1689252509; x=1691844510; bh=XyMYDjcQC6+dgPnu3BuklwgtWvG
-        Wtys2VxsyHNQ9PoA=; b=h95VI81ggq2q3DfCYRMYuveknTG8eEwq2cag/vN26YP
-        Nvlsri1dzoME6V0xg5YDuwAlCTzVsnWKEOSXgkN94R/df2vcrx/tEj4OQkrkRLh4
-        GDxJwbr0wdbxrioV5RgMOBZ0NVS5KXZV8S4JKea4DnHVC77JaTg/JkVq1Ey8dCzu
-        gqlZF8IjjxnlYWn/RhJfvL1e2gPhy1ep0iTKTgOXoyJESIIUygrggG+GO5rYSDO1
-        9VI5lnC725gRZ5r0CtS40LY0nBSlWaLLvppahNY8RjLtbW9kA30NyMhyrx/EfHGw
-        oVrohJf+HhiGDai66hUENIWxlBwgodgoxp2SG6HOtpw==
-X-Virus-Scanned: amavisd-new at mail.208.org
-Received: from mail.208.org ([127.0.0.1])
-        by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 9PPjiy5mdjMq for <kvm@vger.kernel.org>;
-        Thu, 13 Jul 2023 20:48:29 +0800 (CST)
-Received: from localhost (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTPSA id 4R1vY91vJqzBRRLw;
-        Thu, 13 Jul 2023 20:48:29 +0800 (CST)
+        with ESMTP id S234847AbjGMMtG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 08:49:06 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0472727
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 05:48:34 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so4146885a12.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 05:48:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1689252511; x=1691844511;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fp4jrD0ygkJDJFkWGuFutfJdRI3HLTanG1V2Pol42Cs=;
+        b=EOfdCr6iiOuuTNeK3CwI0fjcEzCrcjSEMhZxpmDwTAsUYUGRmEbN4J3P/KWj+lbnRV
+         H3H5LgYWFSq8LpQAFrnS11hWAMu3jThEZYt1uEjysR4lE8hZvuiScxPUTY1JBowIa1sH
+         VftqMEF/Yo+psGZPwo2ygzyJAfyX6/YNU5gqD7PwrjpSC/q2Jj7Hh7OeyTIzz8v4Gre0
+         5ayG8V3a8n93aKvEbAUwe+GRycP79O7hwW5BbRHfoWtH+/e8CbrsjG15Ty9jiOAg0ZqV
+         J3cKYSb1nQMioih/tQ08tz5SmCDZQ3tEDX52Gy7VadWkcvkw+PQR74HWTkSQywXYs4u7
+         WF9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689252511; x=1691844511;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fp4jrD0ygkJDJFkWGuFutfJdRI3HLTanG1V2Pol42Cs=;
+        b=QFgEpi3g1jn5mcAcAX53OUzIf0pFvK9HDNUpO5f/Cng5kY/OWB7cJq3TzFykhzV5Qm
+         2E9ELqrP0LDKiwMACXLvayAs3lSPtQOkTOd3ubu0KTLg6Mqqb2RpQ5mF/AYd/6UtWzdc
+         +85c14AebwIpzVkofjVi80IgvPUHVAuOqzFwOiOBydezYOr7iKsA/oUWq5r57n5TwkAg
+         pvowNqkZmEIWnZ0Klie7nF7Z6A1rDN+vZ6E/FapaHyiknKdLV78Ko06Y0rXcL8or4sId
+         EROiFKUN2D0yctmqk0AowZ/BQSMabvWvwjXNzHsVbG9qAQfClUQPw2el/UtFCzPXed9e
+         4vvw==
+X-Gm-Message-State: ABy/qLbFNaSWDw0DcOnqeadNETeBdKFMxEQ0EXauD7D8uKhESYhJJ1AS
+        m7bVWY0zQ3wsuYVpHjZfPt/Ymg==
+X-Google-Smtp-Source: APBJJlFXhJzEW2rHuTuVDvIaDHf/V6o0OrzDtrKElPkDaTyWkk0l1GjBgS7jdgy/ld4Qg5h+QAf4TA==
+X-Received: by 2002:a17:907:3fa0:b0:986:38ab:ef99 with SMTP id hr32-20020a1709073fa000b0098638abef99mr7436157ejc.9.1689252511508;
+        Thu, 13 Jul 2023 05:48:31 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a10-20020a1709066d4a00b00992eabc0ad8sm3958509ejt.42.2023.07.13.05.48.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jul 2023 05:48:31 -0700 (PDT)
+Date:   Thu, 13 Jul 2023 14:48:30 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Samuel Ortiz <sameo@rivosinc.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/7] RISC-V: KVM: Allow Zbc, Zbk* and Zk* extensions for
+ Guest/VM
+Message-ID: <20230713-bf041a3bbf91d041db3bd623@orel>
+References: <20230712161047.1764756-1-apatel@ventanamicro.com>
+ <20230712161047.1764756-7-apatel@ventanamicro.com>
 MIME-Version: 1.0
-Date:   Thu, 13 Jul 2023 20:48:29 +0800
-From:   huzhi001@208suo.com
-To:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, seanjc@google.com,
-        pbonzini@redhat.com
-Cc:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] x86: Fix warnings in kvm_emulate.h
-In-Reply-To: <tencent_415AB86AA63A22065D7B022D94B2209BB707@qq.com>
-References: <tencent_415AB86AA63A22065D7B022D94B2209BB707@qq.com>
-User-Agent: Roundcube Webmail
-Message-ID: <a96564ba2d5b643fdbca000f686f2843@208suo.com>
-X-Sender: huzhi001@208suo.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_INVALID,
-        DKIM_SIGNED,RDNS_NONE,SPF_HELO_FAIL,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230712161047.1764756-7-apatel@ventanamicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following checkpatch warnings are removed:
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
+On Wed, Jul 12, 2023 at 09:40:46PM +0530, Anup Patel wrote:
+> We extend the KVM ISA extension ONE_REG interface to allow KVM
+> user space to detect and enable Zbc, Zbk* and Zk* extensions for
+> Guest/VM.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> ---
+>  arch/riscv/include/uapi/asm/kvm.h | 11 +++++++++++
+>  arch/riscv/kvm/vcpu_onereg.c      | 22 ++++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
+>
 
-Signed-off-by: ZhiHu <huzhi001@208suo.com>
----
-  arch/x86/kvm/kvm_emulate.h | 16 ++++++++--------
-  1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index ab65f3a47dfd..652020025457 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -95,14 +95,14 @@ struct x86_emulate_ops {
-       *
-       * @reg: gpr number.
-       */
--    ulong (*read_gpr)(struct x86_emulate_ctxt *ctxt, unsigned reg);
-+    ulong (*read_gpr)(struct x86_emulate_ctxt *ctxt, unsigned int reg);
-      /*
-       * write_gpr: write a general purpose register (rax - r15)
-       *
-       * @reg: gpr number.
-       * @val: value to write.
-       */
--    void (*write_gpr)(struct x86_emulate_ctxt *ctxt, unsigned reg, 
-ulong val);
-+    void (*write_gpr)(struct x86_emulate_ctxt *ctxt, unsigned int reg, 
-ulong val);
-      /*
-       * read_std: Read bytes of standard (non-emulated/special) memory.
-       *           Used for descriptor reading.
-@@ -240,10 +240,10 @@ struct operand {
-          unsigned long *reg;
-          struct segmented_address {
-              ulong ea;
--            unsigned seg;
-+            unsigned int seg;
-          } mem;
--        unsigned xmm;
--        unsigned mm;
-+        unsigned int xmm;
-+        unsigned int mm;
-      } addr;
-      union {
-          unsigned long val;
-@@ -508,7 +508,7 @@ void emulator_invalidate_register_cache(struct 
-x86_emulate_ctxt *ctxt);
-  void emulator_writeback_register_cache(struct x86_emulate_ctxt *ctxt);
-  bool emulator_can_use_gpa(struct x86_emulate_ctxt *ctxt);
-
--static inline ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned 
-nr)
-+static inline ulong reg_read(struct x86_emulate_ctxt *ctxt, unsigned 
-int nr)
-  {
-      if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
-          nr &= NR_EMULATOR_GPRS - 1;
-@@ -520,7 +520,7 @@ static inline ulong reg_read(struct x86_emulate_ctxt 
-*ctxt, unsigned nr)
-      return ctxt->_regs[nr];
-  }
-
--static inline ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned 
-nr)
-+static inline ulong *reg_write(struct x86_emulate_ctxt *ctxt, unsigned 
-int nr)
-  {
-      if (KVM_EMULATOR_BUG_ON(nr >= NR_EMULATOR_GPRS, ctxt))
-          nr &= NR_EMULATOR_GPRS - 1;
-@@ -533,7 +533,7 @@ static inline ulong *reg_write(struct 
-x86_emulate_ctxt *ctxt, unsigned nr)
-      return &ctxt->_regs[nr];
-  }
-
--static inline ulong *reg_rmw(struct x86_emulate_ctxt *ctxt, unsigned 
-nr)
-+static inline ulong *reg_rmw(struct x86_emulate_ctxt *ctxt, unsigned 
-int nr)
-  {
-      reg_read(ctxt, nr);
-      return reg_write(ctxt, nr);
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
