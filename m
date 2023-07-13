@@ -2,338 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43116751681
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 04:51:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7D587516B5
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 05:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233393AbjGMCvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jul 2023 22:51:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60816 "EHLO
+        id S233573AbjGMDW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jul 2023 23:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232177AbjGMCvP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jul 2023 22:51:15 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04olkn2093.outbound.protection.outlook.com [40.92.46.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B3010EC;
-        Wed, 12 Jul 2023 19:51:13 -0700 (PDT)
+        with ESMTP id S233421AbjGMDW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jul 2023 23:22:26 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 535B31FD4;
+        Wed, 12 Jul 2023 20:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689218545; x=1720754545;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2kvcb4+2z69g4NVCqkTN80h/KQfxAdgxTax+cJcRBJ0=;
+  b=X8YPs+vDGUAKInBkGhJF53/qM6r6AZv+uDjQY8uIlUfl7rO0oImLStWX
+   CpZCDqgi+8ymOezsuJCHmETLEt6eRYIWJB6Q+zWf7VX6VtsMewMvXudC7
+   /hHeqrlGGbnuD2d8gejRltt/Gh00a/kpArnttkhufeyM+A/LZsr7BrCKB
+   V4AZEhgxfhtjZ+pwMUk89t9tulib8n91w1rTEKo0GlB3wPAvZx0V4rTXA
+   uOhp/UtFo7jVErMblVhM3kI+aRs2ookqztP1a2ztKe50pJBx+a7QFZUsg
+   DakMM5EJnW+L3nZ+LpKIblSZelFkxQn2w4SY8+81GaQOzR0n85PZXJgsx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="428821606"
+X-IronPort-AV: E=Sophos;i="6.01,201,1684825200"; 
+   d="scan'208";a="428821606"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 20:22:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="866381420"
+X-IronPort-AV: E=Sophos;i="6.01,201,1684825200"; 
+   d="scan'208";a="866381420"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga001.fm.intel.com with ESMTP; 12 Jul 2023 20:22:24 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 12 Jul 2023 20:22:23 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 12 Jul 2023 20:22:23 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 12 Jul 2023 20:22:23 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 12 Jul 2023 20:22:22 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GBzRfny5GKCVQ1l1mVhDBwHessVLUabLw5ihsrdAnZ++4huvEGoI5GhcS34QBH3CsN/9vcCjypegayz0aPwNYmMm8FfbHkETo4vfqzkwhckI//QR846iquSxllXxor29uZZjDRDrBDTuX3w2HTcuMpGenhSzCJ/tes4vVNjRIZihzAsGBjyMqLoWSw5pw2Rs/UPFdSf93AjCJyK0R4eD7HAUNtr4LwpD+qfkH9cYQMBKxdDLIEMT78sWUlElsevhGxvrHT9iGLYlMrHBNJlk9eLq2idCum78Pp8kd2Q2FyDXIslXHWh6uUyZievNhm1VQsyGcub2Ffp0QAl0F/fINA==
+ b=emY/aLOhRXs0OvF0GMi2P89odyJR6EN636judYoQZCxd8qnCq7WFjftSvxzuTb17RaMcxhaswf0zlE3HlfXx1jHi5PX1JdlACxzHGrLIJnDJXRKpKt+3V/kFo1tmWVR+2QjJZf7PejUbTA1xI465R5c4pFdezo/81crFy6lJQ3kt5sYZM5lv/9URDPSXzPTdWOzlHSQbgDLR1Y77696Ebigpjstdms6D6KM0KUKh4g6KCDclHKzGmLPkicIggwC9kW/37Ezv/SaijNV85QyEkj2GPM2sA3P72LYMH3B4F3u44A2GKssnycTxAlwKR27+hOEbTykCkVye0ztz88qmIQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/15EdV7BMBHgbrev1nKI6E/E57sDufhDSx8PjIkZews=;
- b=N/K64AB+7F3ZzzE+2UvKR34ZsO0S0gXWE6Wnz2RPg2V2FGvqnSy4BbKcVQxekGY/GiIcmtSw+79Q8p2UXgre8aZrdLj0aWuWzx4Abu3bzcMKNO+3+XvAiIA51Kg1Vh4i3eofEa/Oa/xSOBiNtcEWT9ao6gwOipaMreCOtiO/EcNssFCLxtabL3cwcnuapn16z7imd/mqxFpKuDFxJ/LnjJBHbBsVHfl9Qo/LG0XUeVu72/fc6+H7PTw/phS5h9pg9Z89pUQ8IJz8hD/hY7wl55oaVn7hSoVore6411U5/18jL9SZUWo5TjJD+sgqol8FvkwPAj4T3fg8Sycfqpnzxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/15EdV7BMBHgbrev1nKI6E/E57sDufhDSx8PjIkZews=;
- b=HqXVBGS+EpmtJ0oKForrKaZnkRZE1Ajt//RVrnS5zwCjQgZh16na1Yoa7uIM5NWJ8kBpoZF5UKUUiRb5NZPRQsWlblOLdQSqZT+8Ys0OVPYPwTILGVv8RSvMnB1IXTb/HXtJGD8urKVfHOgsKXWcGW97/AmGCwGLDop5+a6J3fMtj2MbrNqrymVUBi0oumgqt9TD0j3vonMxrg8HOhHYYFnQ9Hbu357hWdqypZOXRIUDVRrcE/j68KNDELC+I6A8aPnXBcbpthQSRnpprXFoGGKPJ6NJT07nS7Our7ZhCo8Vh19snXq1XdOfqFVPM/3Up9tdbY/KMAgJVqyJAKXPBQ==
-Received: from BYAPR03MB4133.namprd03.prod.outlook.com (2603:10b6:a03:7d::19)
- by BLAPR03MB5540.namprd03.prod.outlook.com (2603:10b6:208:296::13) with
+ bh=VxJ2bFNWbDZEcBLC4w8CaYVQHM335PfBO8xGabmpank=;
+ b=LWohAub1GNMisIMHeUMkjFNz7BWTzS4KdnLYjAkOJrm9xsoJKxr/yrkCdnkZIJBrB9hqy7wJ8jGlnSMlpEvn655tOyVdj/0vxf86IaQw3jt7u9irFIj+lxvlFLymqFoSrZCgxWgxUIEPznM5StxKJDLhIrrxkawMb90K1q0mMEQgAVi3064moBvEDgxx+Bp6ptESEUVSIsRoj55YAxqygUZXDTxLQUCmevNpR87nwONZxQ5tGuzbf2toKM1VRLx33PhHvYR7VyfOjccqKzYOrHpNF8HxcfjJQ1ddfaJfSTV8OOmxbwDctMk0C5M6GWMYb3MkXVic0DDLIEi4EmiDQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SA1PR11MB5876.namprd11.prod.outlook.com (2603:10b6:806:22a::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Thu, 13 Jul
- 2023 02:51:11 +0000
-Received: from BYAPR03MB4133.namprd03.prod.outlook.com
- ([fe80::8e5a:85a7:372b:39c3]) by BYAPR03MB4133.namprd03.prod.outlook.com
- ([fe80::8e5a:85a7:372b:39c3%6]) with mapi id 15.20.6588.022; Thu, 13 Jul 2023
- 02:51:10 +0000
-Subject: Re: [RFC 0/3] KVM: x86: introduce pv feature lazy tscdeadline
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, arkinjob@outlook.com,
-        linux-kernel@vger.kernel.org
-References: <BYAPR03MB4133436C792BBF9EC6D77672CD2DA@BYAPR03MB4133.namprd03.prod.outlook.com>
- <20230712211453.000025f6.zhi.wang.linux@gmail.com>
-From:   Wang Jianchao <jianchwa@outlook.com>
-Message-ID: <BYAPR03MB4133E3A1487ED160FBB59E0CCD37A@BYAPR03MB4133.namprd03.prod.outlook.com>
-Date:   Thu, 13 Jul 2023 10:50:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20230712211453.000025f6.zhi.wang.linux@gmail.com>
-Content-Type: text/plain; charset=utf-8
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.32; Thu, 13 Jul
+ 2023 03:22:20 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6588.024; Thu, 13 Jul 2023
+ 03:22:20 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>
+CC:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 1/9] iommu: Move iommu fault data to linux/iommu.h
+Thread-Topic: [PATCH 1/9] iommu: Move iommu fault data to linux/iommu.h
+Thread-Index: AQHZs5RFjSKO9r3Ol0q1EtvhMNZbRK+0EKaQgAFTYQCAAHy3AIABJTsA
+Date:   Thu, 13 Jul 2023 03:22:20 +0000
+Message-ID: <BN9PR11MB5276C09E743E99D92BB5C1B28C37A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230711010642.19707-1-baolu.lu@linux.intel.com>
+ <20230711010642.19707-2-baolu.lu@linux.intel.com>
+ <BN9PR11MB5276859ED6825C0A496C9C5E8C31A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <38c31fb0-1068-4855-c896-27d6a2bca747@linux.intel.com>
+ <20230712093344.GA507884@myrica>
+In-Reply-To: <20230712093344.GA507884@myrica>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TMN:  [Xi9tgcV33Pp00/w9nDLSeDSzNKKrEnvH]
-X-ClientProxiedBy: TYWPR01CA0021.jpnprd01.prod.outlook.com
- (2603:1096:400:aa::8) To BYAPR03MB4133.namprd03.prod.outlook.com
- (2603:10b6:a03:7d::19)
-X-Microsoft-Original-Message-ID: <f2c8fe5f-c14d-0d3b-3acd-b693b4eff789@outlook.com>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA1PR11MB5876:EE_
+x-ms-office365-filtering-correlation-id: 318f327f-b062-46a3-600f-08db83505e0f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1U1PeRp0Wnc0pnEweibTu6zTRlbJDRchkzEvjPGBztAcM2MHTrAYV75KC5rPd1Y76hGrfmUIklDCQcPvE1mLGXktyDfPDPL0HRGhCm6qvvzVQe5IbNJa1pOuLatm/j56XDJwaTVIq6XlwC6ghaKvep9u8GZZMnpKeXn+4Yt25qcmp2hDMhx7X1SP2q9qkyGTPYT9lBB9BM0WNCa6YtkB1AlcWSNytCYoOt5sDm+vhccB0KI/9hz0pk0PyJ0f6IbuoZ88QJKiysfEHw/OprOEyE3g5Sdkv9VdnLfOsKpPMGv4+IuZIqoECDBOmvQXYywbfWrCQB7POhvGrGQ3AQFFzhZOnM2ovvI7ElJUxhiTO5CaHC4lGYk1rbC0QKePHb80XYWOKW/LOoLOfJ83cKc/UV1P6e20iX6W1on+C5U4PPoh6BQ+qQwk9Hgs1QyNYMi+XcPcbDcuBz53u4aX28wFDH+ENJecp/FoJ+uwcWk7F/Gj7IqFZDUmiCjMIIH1bwFFf9rNMlKQQb9JLQXCJ+I0B2jq5Nz01S8M32F1hBieFuwo29baMrroLoRe6PiCQdcF+2+L9QrvxiABCBIpzGWRuHNSSp8t86RMrBDFuOaBEVQkbtUT8sWJBERs6BWTGEP8
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(396003)(366004)(136003)(376002)(451199021)(83380400001)(41300700001)(66556008)(8676002)(4326008)(8936002)(64756008)(6506007)(55016003)(66446008)(316002)(66476007)(86362001)(26005)(82960400001)(122000001)(5660300002)(33656002)(38100700002)(478600001)(9686003)(52536014)(7696005)(71200400001)(38070700005)(54906003)(66946007)(76116006)(186003)(2906002)(7416002)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?A5nJaSGnCxt8AvFjzHjA3QGN0yMbG6ahYoKr19KAkBOZ4XUhx9nRVhstlCuY?=
+ =?us-ascii?Q?lv4oC+DlyJQI+0Jd395BX/A1ESD6VZgruJigGSDYqsxSjmgk8wUHcPqDp/Ak?=
+ =?us-ascii?Q?qbn/IOszhi1rB5NBHuKLBLSUEa6JgW3llehojlwOhblyLT8pXv3arBdi9nH+?=
+ =?us-ascii?Q?0MVa2EytCFhSovWOWmMOtSIO/A3XPMrPSqbuHRYn4dHMSq6hVtgG3vVv8JSz?=
+ =?us-ascii?Q?DzfdP/H7b50F2UDpotmc/XdRB9F6iLug3gbU8F+rO95IDOX4Nlv0LM/zf4g+?=
+ =?us-ascii?Q?0qL5iFr+0bz+wqQPcuRRKYkdIr6tGVHlbESsxVm4tJbumVUHb6ppwupzO9kc?=
+ =?us-ascii?Q?x1ktheSQYr/ZLDKLNbE4JPD+aVpX3Q2FirYfadMD1x75vjBE0vNrr48veEX8?=
+ =?us-ascii?Q?sKnrBzCWmZFZ//HObsbVG8XzcIyzyZXg1oIKkZTzJzRw2gwta6Bhmsbwf1+M?=
+ =?us-ascii?Q?Gp/uh9bwAKsiHxdEUDWfJxIGZGmAFiz352I6Te31YrYsqvNqX4S0/FIMYXgz?=
+ =?us-ascii?Q?cJPAyBkobbqzAXHXfd+IcnT6fIVjXb8hcjtMkx3yB/RsbvuAul5y5jcv5g6H?=
+ =?us-ascii?Q?/mvfVXZWaRgttKs/rL3mQ7V7zLevmk9dZi6MDfNbw8JuYBnNJuiwJSumXspM?=
+ =?us-ascii?Q?LAq2uLIHauSV658OzJx7WP0CMFR4ncT0H7RPJunari2KrylhI3fLZqCJcQu2?=
+ =?us-ascii?Q?0Ftc/NhsuqRtZveaxxZsB2usZM1ecBMGzfzu/sTm6AGQM0c/6QLxJLR2UNT8?=
+ =?us-ascii?Q?95dtPmN3RXZnujnmSeqMhy9MMlMvBqmVlBDusb/3xL2Y8zfAXvj7c7Yewkc3?=
+ =?us-ascii?Q?uYEkWVGzESjLDR1mN/Q1u8UKWDmO1Yj+1RhQdE+tdDp4F8j0W5bkj7mw6iIu?=
+ =?us-ascii?Q?HTOQ6dO+6EmO8KHsdmwUzYw64aB91zeXHYtuIzUah/ELS0bKuxhIJ9ir9Nov?=
+ =?us-ascii?Q?Dj0NonW/X5l/iOCkACsIrMrD7iqrZoM+Fqjcz5BZaN29+ImGvV6Fg/4stB77?=
+ =?us-ascii?Q?sEuiNv6/hrvCwvw7uT9mQfHmEVLlSjS7rx9UYBFvIzZz/imdNdXWYoFnIcKw?=
+ =?us-ascii?Q?6pYKmxfr4F6WNEJTEIwE4j8nmripdua7bl2Dl0I4c10TYf8FRCbpHSiQfq4X?=
+ =?us-ascii?Q?990Ipi/5sdL4S3aeMuvIH1L/HGSWMYZ3SXvlqe2GMDgQs8GARzDpDcN4IeCU?=
+ =?us-ascii?Q?cwXeSU5nADZffUnCejAjAapaNH8cNkmpMVNUS4b7HTLrl+3er5KWfaNX/QML?=
+ =?us-ascii?Q?47SfQc14ickTAc+zNkQ43n58GaVSk9fttoYlsW5suToU2Wf5C/KRme3CYAKj?=
+ =?us-ascii?Q?7VQjKOloeOXCNzxCfWNefM1ja/b+vfBew0tQ5y8AMsGhfuLNAfmw2cFlvWOu?=
+ =?us-ascii?Q?o8dYW6sAV5Y3Xh9X0d5T/Qf/IDmPX5QZcSDPWzK1Yf2eESkhD/az0aW3aKuD?=
+ =?us-ascii?Q?GKS5lUuEJhThqmQ7DE634Mu2i3p/xV2lC39KvriQOqZPnLFEypw2mlT6/bhL?=
+ =?us-ascii?Q?faJGO2wTnbMY5idl1yajcfoS706Qai8rHBEpAHSTa/eN/2HhoWalONdKDYK9?=
+ =?us-ascii?Q?K+Caea1gX3UBg9v1XrYwGG/8eIlHVi0T5XxYTByt?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR03MB4133:EE_|BLAPR03MB5540:EE_
-X-MS-Office365-Filtering-Correlation-Id: 95c5a117-966a-43de-8793-08db834c0380
-X-MS-Exchange-SLBlob-MailProps: WaIXnCbdHrPfHmnrCCekJJVeItfeyJ7botfuNWkHsHr/e3BNVf24PH10jl22vkgMqym0KWJehoej4V7IpLuu3M+kS6uXKJxbpjJSBl3o1amNgU/qKrKqGMxzYpMkZHpdcNG3fj2kXmk7wC+i9eDgTecvDVc3zobZ01RxuMyhB1kWNkDePd37gMDTnc2DqZT4HlxKqP5otMaZNHlzgxPla0o9m+3k1g6QEeRwqBNtxU5OCyXBIiHd/Eo/4pQjejbLrIbom129pz5pB/a0KPsZ82jgstsbTt7h354o+QMDGh3Tv+uE74PN1JYuzcsikidEG17F3M+Xv2PYiMBnSQX8+4Z7DnzLqUgcfhw6uF8vF48LqUHV5TUYP7ig4A3w3izdyBn37rIKv0hYfar8iXbf6tS03xgUWBu4m2qWFPQvP4tOnkxvP2ruMbbUc2FyMBUHbVo7Aaw/w17Gi/M9hXed/5xBYhzRsd25V7NFqrwAX98W05VKJtSb9rmkrNhd7taYuSaE9MWqGOTmiTpDIHJ9opM9dL0VCfalAelTXD+mW3w1eUTWCh/BAZZrmJbNvsx9izi7jxQdVnBCtkN/KGQV93+d3FVoF2ekUD9pZVnEyrvAZOFLusXFTZ9Z3a6TV6oEicMFq+UMZD4JiHsR7DHVsz5jOjo0jVaEgpQ7yUui4Sc+id/g7f8A9KJn8WprbzaIJfQPmRtqaJAwLuD8j+EpOzutPx8uxU7D0Tbhx0QkQuySy+9Kl8xYqHmDpffI/tywEPhYzidEGrk=
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: j+J4sNhLnoPdtqxRdlBjvwcDIHUFa4VX8o7HbJi3ht4m30yoBYMf5K5NPayBlxw5kLjY4lV347evKeMJE4R4p7OwxkLSgS47ObkDVPatXIbFvdN+3iMZ5/jJkpIFR9E7BIc7EbZ5wwP29THd1ryc5B6uwhDyrk3j+daRW667HGr1Qt8gl/XcEONsBIc8stkX7Hbvx6VV8EvdBffalXY2do9IiD80dLR2nb1fWIkFIUxFNj0vYnvaWn2n6bIqvkboXl/dJ7ZrX2X83AE5vRToxThk8cysreQaRH75ar+JxAdkk7pYDSc9r/axORW/AWK1t7z/a9KZMrE0IZEK8L71Gl5TDfJ5a2dwHAAWq5SpOs64f5MZut6nQMOGpItBGOebx4ntcZiUfS0lmh9BGKE+V/DPBMT4NruVq3mGIWBACHKrGH5lYn3BHVonoqJ6KfgZgfkgr/kVvb8udtf4v1ByR4HNkBKdMFgXORpj07GuM+GMohjEQPTiUKmXIaMih8MYFlafTKKnVQMSDvQ2iOOwbt0Pzqcv548EYTDeP/RBbMJxK0Kdn95xDM6QCI3D/1+C
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?czV6MG5JWEg2SUI5QWtGbjlIT01LSHpuaGs1MS9TNFh4d0xNNWdFd2JnQTRE?=
- =?utf-8?B?MnMwalVkMUtXbzV1NjRIR3AyK1haQ0x0eFp2a01HRDlyNnhzYmNjWGFGbGRl?=
- =?utf-8?B?SjlFOThGUktjWFZ4WVptYkpEMFNDN3U4L0F5Wm5BdUlrWTVSN3U2NzBIaGRM?=
- =?utf-8?B?VTcyb0pWMlI1bWE1L25PdUlZb1Z1NzhnNjgxQXRXM3pCR3gwSC9EQ2FZTlJP?=
- =?utf-8?B?QTRwVnpkcmV6MHUzZVp1WEZGSDJDT2V3T2h5dDFsTkdjd2FRclEzZUkxYXJm?=
- =?utf-8?B?ZUFIeHBBSXlCY3orV2E4Q3Rnd3dJUzcwaW5HTFg0VUU2UHBGOGFEbGVLYmVy?=
- =?utf-8?B?NzIrMDlnOUlscjRvUlV2dko5QWRxU0l1azgzeFFPdFNhK2RtRW1sZjdxSCtq?=
- =?utf-8?B?dVRscWwzS3Q0VWNaY241NUNnUVVDS2ZEcE9ENlVNRUFkUCs1eklKREJ6RHpp?=
- =?utf-8?B?WEFsU2RNOEVrcmNVU3dvN1FMaGR0aTNJTFViRWJaRFFYODZsalJPcXUwQkk2?=
- =?utf-8?B?dHZrTWN3MXdGRS80b3d0aTRqMVM5Tm91d3UybE55cHI1Tkw3aWpuSlhuaFhD?=
- =?utf-8?B?MTNLZE1FQ1FGc01LNWxoRm82MlpVZnhXcGt4OS96YnJoTzMrMUFDOE1aTjkw?=
- =?utf-8?B?MHEycGx3QzVUSjByTGdaQWRhMTMrRzZmVnZmQW55N2txQmJnZjk4c0I2VUxB?=
- =?utf-8?B?WnBmeTdiSzRNK0MzN2ZxdXgrT2ZkOXpuZit2OEdMK2FlSC96S1RLdU1kQ0xV?=
- =?utf-8?B?aXlrN3prRWNkZy9IWFpnNUdNekIraEJZM0luYXpFZDIxV0lFMGpxQWRYL1dq?=
- =?utf-8?B?U3NKZXA0eGlYOW1zM1NnaUJhWTNOTUd4QkUvb2t2SmZYUUJTcUppbjBxYWdH?=
- =?utf-8?B?U0NOSHJNMFBEM2lGMlIwczArK25qVkFXd05uRHpLdkhqYXFYNTEyL2NKdmZr?=
- =?utf-8?B?eFlVT3hia0hPMGdRQ3dkd0N2OGhZWE5xQnNuUFZrV0h5RzljZDBPQ1FEdk0w?=
- =?utf-8?B?UExET0pWZDRUM29vVFdmNlh1WHcwYzNKbjRNYTBXRjlvaldMVG83WUZpSTd0?=
- =?utf-8?B?bVluQzZUcUYybThGMG1DRlE3SjlqZ3ZsV2JBSGl4Z3BQNlp6ODRKZkk0eFYr?=
- =?utf-8?B?UnhCd0RyRkllU0IyYnREM25jZjdxdm9adlJNZi9HZVRSN2ozTlhpTWcvZEJP?=
- =?utf-8?B?bUQ4SEhrQS9OTUxDTURFNTZOUWVUeWczSTB0MTB1Z0owSTBFeXgwSnB2b20y?=
- =?utf-8?B?TWR5bWVGV1N5L3ZOTXhBMkZTNENnVjREVXZ4UTZTckpVT21kY3Jva21ScENu?=
- =?utf-8?B?VkluSUFoZkFHSHU5K0FjdDJEcldiS3IzZlpwdktXMmdaRWdSTzVmTUd3aHlj?=
- =?utf-8?B?NHN0UnBYU2JJc2gzd2NGVk02dlBaZjRvbVgxU1lkY1FQVjJ6YVc3SnVmd05N?=
- =?utf-8?B?aHE2Z2NkRXo4K2hMbWUwd1MrVjh5RFpKeHhSelg3YWZrajh3NTRxQlpZWjda?=
- =?utf-8?B?bEFRNUx3aXlMOWo5L3p0d0Uyc0V3dzFKTWs5TjlxcEZvM3VaUjVGZUo5QzBq?=
- =?utf-8?B?SmlwRjhZODMxdXRVUFBYb2dmUktsanM5ME5XbTc5TVplWTVyVzVBMERWNERF?=
- =?utf-8?Q?y1jvq/uSVjIIG4GzrDW7DwVPc0zRYiFF2VmeInEfrbl4=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95c5a117-966a-43de-8793-08db834c0380
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR03MB4133.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2023 02:51:10.6322
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 318f327f-b062-46a3-600f-08db83505e0f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2023 03:22:20.1258
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR03MB5540
-X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,
-        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2mNzpDHl8wLHuKAWk47ArkiSX+9CYsERf3UAKqYT2Vc9o016UuRxx6HFisO89c2NoLFuwfCrmt5VLhhFpQeebQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5876
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Sent: Wednesday, July 12, 2023 5:34 PM
+>=20
+> On Wed, Jul 12, 2023 at 10:07:22AM +0800, Baolu Lu wrote:
+> > > > +/**
+> > > > + * struct iommu_fault_unrecoverable - Unrecoverable fault data
+> > > > + * @reason: reason of the fault, from &enum iommu_fault_reason
+> > > > + * @flags: parameters of this fault (IOMMU_FAULT_UNRECOV_*
+> values)
+> > > > + * @pasid: Process Address Space ID
+> > > > + * @perm: requested permission access using by the incoming
+> transaction
+> > > > + *        (IOMMU_FAULT_PERM_* values)
+> > > > + * @addr: offending page address
+> > > > + * @fetch_addr: address that caused a fetch abort, if any
+> > > > + */
+> > > > +struct iommu_fault_unrecoverable {
+> > > > +	__u32	reason;
+> > > > +#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 <<
+> 0)
+> > > > +#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 <<
+> 1)
+> > > > +#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 <<
+> 2)
+> > > > +	__u32	flags;
+> > > > +	__u32	pasid;
+> > > > +	__u32	perm;
+> > > > +	__u64	addr;
+> > > > +	__u64	fetch_addr;
+> > > > +};
+> > >
+> > > Currently there is no handler for unrecoverable faults.
+>=20
+> Yes those were meant for guest injection. Another goal was to replace
+> report_iommu_fault(), which also passes unrecoverable faults to host
+> drivers. Three drivers use that API:
+> * usnic just prints the error, which could be done by the IOMMU driver,
+> * remoteproc attempts to recover from the crash,
+> * msm attempts to handle the fault, or at least recover from the crash.
 
+I was not aware of them. Thanks for pointing out.
 
-On 2023.07.13 02:14, Zhi Wang wrote:
-> On Fri,  7 Jul 2023 14:17:58 +0800
-> Wang Jianchao <jianchwa@outlook.com> wrote:
-> 
->> Hi
->>
->> This patchset attemps to introduce a new pv feature, lazy tscdeadline.
->> Everytime guest write msr of MSR_IA32_TSC_DEADLINE, a vm-exit occurs
->> and host side handle it. However, a lot of the vm-exit is unnecessary
->> because the timer is often over-written before it expires. 
->>
->> v : write to msr of tsc deadline
->> | : timer armed by tsc deadline
->>
->>          v v v v v        | | | | |
->> --------------------------------------->  Time  
->>
->> The timer armed by msr write is over-written before expires and the
->> vm-exit caused by it are wasted. The lazy tscdeadline works as following,
->>
->>          v v v v v        |       |
->> --------------------------------------->  Time  
->>                           '- arm -'
->>
-> 
-> Interesting patch.
-> 
-> I am a little bit confused of the chart above. It seems the write of MSR,
-> which is said to cause VM exit, is not reduced in the chart of lazy
-> tscdeadline, only the times of arm are getting less. And the benefit of
-> lazy tscdeadline is said coming from "less vm exit". Maybe it is better
-> to imporve the chart a little bit to help people jump into the idea
-> easily?
+>=20
+> So the first one can be removed, and the others could move over to IOPF
+> (which may need to indicate that the fault is not actually recoverable by
+> the IOMMU) and return IOMMU_PAGE_RESP_INVALID.
 
-Thanks so much for you comment and sorry for my poor chart.
+Yep, presumably we should have just one interface to handle fault.
 
-Let me try to rework the chart.
+>=20
+> > >
+> > > Both Intel/ARM register iommu_queue_iopf() as the device fault handle=
+r.
+> > > It returns -EOPNOTSUPP for unrecoverable faults.
+> > >
+> > > In your series the common iommu_handle_io_pgfault() also only works
+> > > for PRQ.
+> > >
+> > > It kinds of suggest above definitions are dead code, though arm-smmu-=
+v3
+> > > does attempt to set them.
+> > >
+> > > Probably it's right time to remove them.
+> > >
+> > > In the future even if there might be a need of forwarding unrecoverab=
+le
+> > > faults to the user via iommufd, fault reasons reported by the physica=
+l
+> > > IOMMU doesn't make any sense to the guest.
+>=20
+> I guess it depends on the architecture?  The SMMU driver can report only
+> stage-1 faults through iommu_report_device_fault(), which are faults due
+> to a guest misconfiguring the tables assigned to it. At the moment
+> arm_smmu_handle_evt() only passes down stage-1 page table errors, the
+> rest
+> is printed by the host.
 
-Before this patch, every time guest start or modify a hrtimer, we need to write the msr of tsc deadline,
-a vm-exit occurs and host arms a hv or sw timer for it.
+In that case the kernel just needs to notify the vIOMMU an error happened
+along with access permissions (r/w/e/p). vIOMMU can figure out the reason
+itself by walking the stage-1 page table. Likely it will find the same reas=
+on
+as host reports, but that sounds a clearer path in concept.
 
+>=20
+> > > Presumably the vIOMMU
+> > > should walk guest configurations to set a fault reason which makes se=
+nse
+> > > from guest p.o.v.
+> >
+> > I am fine to remove unrecoverable faults data. But it was added by Jean=
+,
+> > so I'd like to know his opinion on this.
+>=20
+> Passing errors to the guest could be a useful diagnostics tool for
+> debugging, once the guest gets more controls over the IOMMU hardware,
+> but
+> it doesn't have a purpose beyond that. It could be the only tool
+> available, though: to avoid a guest voluntarily flooding the host logs by
+> misconfiguring its tables, we may have to disable printing in the host
+> errors that come from guest misconfiguration, in which case there won't b=
+e
+> any diagnostics available for guest bugs.
+>=20
+> For now I don't mind if they're removed, if there is an easy way to
+> reintroduce them later.
+>=20
 
-w: write msr
-x: vm-exit
-t: hv or sw timer
+We can keep whatever is required to satisfy the kernel drivers which
+want to know the fault.
 
-
-Guest
-         w       
---------------------------------------->  Time  
-Host     x              t         
- 
-
-However, in some workload that needs setup timer frequently, msr of tscdeadline is usually overwritten
-many times before the timer expires. And every time we modify the tscdeadline, a vm-exit ocurrs
-
-
-1. write to msr with t0
-
-Guest
-         w0         
----------------------------------------->  Time  
-Host     x0             t0     
-
- 
-2. write to msr with t1
-Guest
-             w1         
------------------------------------------->  Time  
-Host         x1          t0->t1     
-
-
-2. write to msr with t2
-Guest
-                w2         
------------------------------------------->  Time  
-Host            x2          t1->t2     
- 
-
-3. write to msr with t3
-Guest
-                    w3         
------------------------------------------->  Time  
-Host                x3           t2->t3     
-
-
-
-What this patch want to do is to eliminate the vm-exit of x1 x2 and x3 as following,
-
-
-Firstly, we have two fields shared between guest and host as other pv features, saying,
- - armed, the value of tscdeadline that has a timer in host side, only updated by __host__ side
- - pending, the next value of tscdeadline, only updated by __guest__ side
-
-
-1. write to msr with t0
-
-             armed   : t0
-             pending : t0
-Guest
-         w0         
----------------------------------------->  Time  
-Host     x0             t0     
-
-vm-exit occurs and arms a timer for t0 in host side
-
- 
-2. write to msr with t1
-
-             armed   : t0
-             pending : t1
-
-Guest
-             w1         
------------------------------------------->  Time  
-Host                     t0    
-
-the value of tsc deadline that has been armed, namely t0, is smaller than t1, needn't to write
-to msr but just update pending
-
-
-3. write to msr with t2
-
-             armed   : t0
-             pending : t2
- 
-Guest
-                w2         
------------------------------------------->  Time  
-Host                      t0  
- 
-Similar with step 2, just update pending field with t2, no vm-exit
-
-
-4.  write to msr with t3
-
-             armed   : t0
-             pending : t3
-
-Guest
-                    w3         
------------------------------------------->  Time  
-Host                       t0
-Similar with step 2, just update pending field with t3, no vm-exit
-
-
-5.  t0 expires, arm t3
-
-             armed   : t3
-             pending : t3
-
-
-Guest
-                            
------------------------------------------->  Time  
-Host                       t0  ------> t3
-
-t0 is fired, it checks the pending field and re-arm a timer based on it.
-
-
-Here is the core ideal of this patch ;)
-
-
-Thanks
-Jianchao
-
-> 
->> The 1st timer is responsible for arming the next timer. When the armed
->> timer is expired, it will check pending and arm a new timer.
->>
->> In the netperf test with TCP_RR on loopback, this lazy_tscdeadline can
->> reduce vm-exit obviously.
->>
->>                          Close               Open
->> --------------------------------------------------------
->> VM-Exit
->>              sum         12617503            5815737
->>             intr      0% 37023            0% 33002
->>            cpuid      0% 1                0% 0
->>             halt     19% 2503932         47% 2780683
->>        msr-write     79% 10046340        51% 2966824
->>            pause      0% 90               0% 84
->>    ept-violation      0% 584              0% 336
->>    ept-misconfig      0% 0                0% 2
->> preemption-timer      0% 29518            0% 34800
->> -------------------------------------------------------
->> MSR-Write
->>             sum          10046455            2966864
->>         apic-icr     25% 2533498         93% 2781235
->>     tsc-deadline     74% 7512945          6% 185629
->>
->> This patchset is made and tested on 6.4.0, includes 3 patches,
->>
->> The 1st one adds necessary data structures for this feature
->> The 2nd one adds the specific msr operations between guest and host
->> The 3rd one are the one make this feature works.
->>
->> Any comment is welcome.
->>
->> Thanks
->> Jianchao
->>
->> Wang Jianchao (3)
->> 	KVM: x86: add msr register and data structure for lazy tscdeadline
->> 	KVM: x86: exchange info about lazy_tscdeadline with msr
->> 	KVM: X86: add lazy tscdeadline support to reduce vm-exit of msr-write
->>
->>
->>  arch/x86/include/asm/kvm_host.h      |  10 ++++++++
->>  arch/x86/include/uapi/asm/kvm_para.h |   9 +++++++
->>  arch/x86/kernel/apic/apic.c          |  47 ++++++++++++++++++++++++++++++++++-
->>  arch/x86/kernel/kvm.c                |  13 ++++++++++
->>  arch/x86/kvm/cpuid.c                 |   1 +
->>  arch/x86/kvm/lapic.c                 | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
->>  arch/x86/kvm/lapic.h                 |   4 +++
->>  arch/x86/kvm/x86.c                   |  26 ++++++++++++++++++++
->>  8 files changed, 229 insertions(+), 9 deletions(-)
-> 
+But for anything invented for old uAPI (e.g. fault_reason) let's remove
+them and redefine later when introducing the support to the user.
