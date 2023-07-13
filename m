@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01B6D751D71
-	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 11:40:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ACD2751D74
+	for <lists+kvm@lfdr.de>; Thu, 13 Jul 2023 11:40:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234047AbjGMJk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 05:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58814 "EHLO
+        id S234098AbjGMJka (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 05:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231774AbjGMJkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 05:40:25 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19E461FD7;
-        Thu, 13 Jul 2023 02:40:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kxEHiB4D3m9yY/2dDO7P2A7iGOSaPkpw/P8MmEhifuo=; b=lSisNuvY2Y6og/MU4fqubO5ZCZ
-        o0KzISwWjmdnggSiCAUnk+jPi1PksKszWU9pCusCXpYuJyPWkreDmse7Kv2eiepI+jwnn6fyZM+wy
-        xda8dv5rDApk0IOSAqGNjfJuVpxS6/dBkWUyeowaXAnXUiryry72KHG/g4a6i7Iaa7RyYi9OAcwrm
-        Uk58a4HRX/Y+NjdP1dhDA+8Tsjs8WBXSegjYvvuBEWH/L14xE+Qmzw/Xg/WGTEnQiS+qi9PuykmSb
-        v/Wwjg8LVKlAfcc8ECJA9VP5CMYQRJMZjEeUmDv/AOwrK7VPSAeAZyylvZClUFicci9hlNYCTFThN
-        3611ICNQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qJsnx-000140-6y; Thu, 13 Jul 2023 09:40:09 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        with ESMTP id S234048AbjGMJk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 05:40:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A471FD7
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 02:40:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 25A5430007E;
-        Thu, 13 Jul 2023 11:40:08 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 0CA03245CA117; Thu, 13 Jul 2023 11:40:08 +0200 (CEST)
-Date:   Thu, 13 Jul 2023 11:40:07 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH 07/10] x86/tdx: Extend TDX_MODULE_CALL to support more
- TDCALL/SEAMCALL leafs
-Message-ID: <20230713094007.GG3138667@hirez.programming.kicks-ass.net>
-References: <cover.1689151537.git.kai.huang@intel.com>
- <ecfd84af9186aa5368acb40a2740afbf1d0d1b5d.1689151537.git.kai.huang@intel.com>
- <20230712165336.GA3115257@hirez.programming.kicks-ass.net>
- <6489a835da0d21c7637d071b7ef40ae1cda87237.camel@intel.com>
- <20230713084640.GB3138667@hirez.programming.kicks-ass.net>
- <c0861d54af50ef01983703cc24e41118867342b8.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0861d54af50ef01983703cc24e41118867342b8.camel@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 222F461AC6
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 09:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A90FC433C8;
+        Thu, 13 Jul 2023 09:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689241223;
+        bh=8dzXXKWoQtRINTYHzFLdAkNvmmSY8LOSGHUnvmrM8n0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ddGzx0wARW4No4zSWhjNm2t60qqCKLF3b8/cP3KKexfBb3gWfFOYlX+90lVY+qhNP
+         NIUuSY+xPKaU9TsNcJYAtCGSxuaWlhelSarw8S88e3t2PA0VGYs+nq06LsqZpIDc4L
+         O4wfQqnz2dQrwGCce5jgBl0wWVYRqHh4GkotG11J+Qzb2rwLUDQ+1rLW0ImRA6StpY
+         wNl/Gx6dhpPWDKKpUkgxXs+IPWsFhaXROaD5oGrrbVjHjcJsqmBa1LVJHQR+Jb0DTj
+         ZtuhHEnaxgGeaeqVQVfAbh3/xJnxTrHygUFiz3imLvLh8NyVJ8HhQn7G2teKr76K7n
+         s/M7jh9JeLBdQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qJso9-00CkOz-5c;
+        Thu, 13 Jul 2023 10:40:21 +0100
+Date:   Thu, 13 Jul 2023 10:40:20 +0100
+Message-ID: <86wmz4up2z.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
+Cc:     <oliver.upton@linux.dev>, <james.morse@arm.com>,
+        <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Fix the name of sys_reg_desc related to PMU
+In-Reply-To: <4cbcc10d-6cd2-d88e-b15d-bd4f1a229251@hisilicon.com>
+References: <1689148505-13914-1-git-send-email-chenxiang66@hisilicon.com>
+        <868rblwmpn.wl-maz@kernel.org>
+        <5c513a72-9ae9-22ca-a9a6-8b3c481e0921@hisilicon.com>
+        <87bkgg9u54.wl-maz@kernel.org>
+        <4cbcc10d-6cd2-d88e-b15d-bd4f1a229251@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: chenxiang66@hisilicon.com, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,28 +72,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 13, 2023 at 09:34:24AM +0000, Huang, Kai wrote:
-> On Thu, 2023-07-13 at 10:46 +0200, Peter Zijlstra wrote:
-> > On Thu, Jul 13, 2023 at 07:48:20AM +0000, Huang, Kai wrote:
-> > 
-> > > I found below comment in KVM code:
-> > > 
-> > > > +	 * See arch/x86/kvm/vmx/vmenter.S:
-> > > > +	 *
-> > > > +	 * In theory, a L1 cache miss when restoring register from stack
-> > > > +	 * could lead to speculative execution with guest's values.
-> > > 
-> > > And KVM explicitly does XOR for the registers that gets "pop"ed almost
-> > > instantly, so I followed.
-> > > 
-> > > But to be honest I don't quite understand this.  :-)
-> > 
-> > Urgh, I suppose that actually makes sense. Since pop is a load it might
-> > continue speculation with the previous value. Whereas the xor-clear
-> > idiom is impossible to speculate through.
-> > 
-> > Oh well...
-> 
-> Then should I keep those registers that are "pop"ed immediately afterwards?
+On Thu, 13 Jul 2023 10:10:01 +0100,
+"chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+>=20
+> Hi Marc,
+>=20
+>=20
+> =E5=9C=A8 2023/7/13 =E6=98=9F=E6=9C=9F=E5=9B=9B 14:56, Marc Zyngier =E5=
+=86=99=E9=81=93:
+> > On Thu, 13 Jul 2023 03:35:39 +0100,
+> > "chenxiang (M)" <chenxiang66@hisilicon.com> wrote:
+> >> Hi Marc,
+> >>=20
+> >>=20
+> >> =E5=9C=A8 2023/7/12 =E6=98=9F=E6=9C=9F=E4=B8=89 16:36, Marc Zyngier =
+=E5=86=99=E9=81=93:
+> >>> On Wed, 12 Jul 2023 08:55:05 +0100,
+> >>> chenxiang <chenxiang66@hisilicon.com> wrote:
+> >>>> From: Xiang Chen <chenxiang66@hisilicon.com>
+> >>>>=20
+> >>>> For those PMU system registers defined in sys_reg_descs[], use macro
+> >>>> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them,=
+ and
+> >>>> later two macros call macro PMU_SYS_REG() actually.
+> >>>> Currently the input parameter of PMU_SYS_REG() is other macro which =
+is
+> >>>> calculation formula of the value of system registers, so for example=
+, if
+> >>>> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually
+> >>>> the name will be as following:
+> >>>> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+> >>>>=20
+> >>>> To fix the issue, use the name as a input parameter of PMU_SYS_REG l=
+ike
+> >>>> MTE_REG or EL2_REG.
+> >>> Why is the name relevant? Is this related to tracing?
+> >> I think It is not related to tracing. I find the issue when i want to
+> >> know which system reigsters are set
+> >> when on live migration and printk the name of sys_reg_desc in function
+> >> kvm_sys_reg_set_user,
+> >> find the name of some registers are abnormal as followings:
+> >>=20
+> >> [  227.145540] kvm_sys_reg_set_user 3427:SYS_FAR_EL1
+> >> [  227.158057] kvm_sys_reg_set_user 3427:SYS_PAR_EL1
+> >> [  227.170574] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
+> >> ((9) << 12) | ((14) << 8) | ((1) << 5))
+> >> [  227.188037] kvm_sys_reg_set_user 3427:(((3) << 19) | ((0) << 16) |
+> >> ((9) << 12) | ((14) << 8) | ((2) << 5))
+> >> [  227.205511] kvm_sys_reg_set_user 3427:SYS_MAIR_EL1
+> >> [  227.218117] kvm_sys_reg_set_user 3427:SYS_PIRE0_EL1
+> > So what is this if not some form of tracing?
+>=20
+> Ah, i was misunderstood your question. I thought you aksed whether
+> it is related to kernel tracing (which is already existed in kernel)
+> such as tracepoint or debugfs.
 
-Yeah, I suppose so.
+But that's my point: tracepoints such as kvm_sys_access already output
+the name (as well as the encoding), and are likely to be affected by
+this problem.
+
+And that's a much more interesting justification for this change.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
