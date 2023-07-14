@@ -2,60 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E54A1753A52
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 14:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74B1A753AF5
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 14:29:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235548AbjGNMG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 08:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55520 "EHLO
+        id S235519AbjGNM3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 08:29:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230101AbjGNMG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 08:06:26 -0400
-Received: from xry111.site (xry111.site [89.208.246.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1625430C6;
-        Fri, 14 Jul 2023 05:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-        s=default; t=1689336385;
-        bh=LIxcDZcLBMZIdbSr/T45y9VNE4gcQHTHKIV3HlOiko8=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=SKGqOkJkLYk9YnZ7JymlvDgkjG7nCxXejSlIsL2r0J6BZYrxjD45n20MmByEvWZxI
-         G9pbaFrIZsyXAeO7o1YbUOP2UQcJVEPxtIUbu+cDYvXI465sWcvxmlgKvnHDjv8PZR
-         PoFjqjLWnToGdi+qCLRJbIRoTLQOCuWFbuIbhUN4=
-Received: from [192.168.124.11] (unknown [113.140.29.4])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
-        (Client did not present a certificate)
-        (Authenticated sender: xry111@xry111.site)
-        by xry111.site (Postfix) with ESMTPSA id 7B93465CFE;
-        Fri, 14 Jul 2023 08:06:22 -0400 (EDT)
-Message-ID: <6a5ed2266138cc61cbe27577424bb53cda72378d.camel@xry111.site>
-Subject: Re: [PATCH v16 05/30] LoongArch: KVM: Add vcpu related header files
-From:   Xi Ruoyao <xry111@xry111.site>
-To:     WANG Xuerui <kernel@xen0n.name>, bibo mao <maobibo@loongson.cn>,
-        Huacai Chen <chenhuacai@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, hejinyang@loongson.cn,
-        Tianrui Zhao <zhaotianrui@loongson.cn>
-Date:   Fri, 14 Jul 2023 20:06:20 +0800
-In-Reply-To: <d58a20c9-1f52-c398-292b-2d2501a302e6@xen0n.name>
-References: <20230629075538.4063701-1-zhaotianrui@loongson.cn>
-         <20230629075538.4063701-6-zhaotianrui@loongson.cn>
-         <CAAhV-H7P_GSsoo+g5o0BTCzK4fxwH5d2dQOYde-VpcGvn4SXQA@mail.gmail.com>
-         <152f7869-d591-0134-cf9d-b55774a135e8@loongson.cn>
-         <CAAhV-H4N2wdB8n7Pindv9WdVPLPOboK0Ys75SWOkMZU+=NWEbQ@mail.gmail.com>
-         <152fbdd1-a21c-8ee1-d386-ec7f80b0bb97@loongson.cn>
-         <d58a20c9-1f52-c398-292b-2d2501a302e6@xen0n.name>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 
+        with ESMTP id S233758AbjGNM3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 08:29:07 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C721D30EF;
+        Fri, 14 Jul 2023 05:28:36 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-307d58b3efbso1968073f8f.0;
+        Fri, 14 Jul 2023 05:28:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689337715; x=1691929715;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w2t3L/hSRRZjqaV5sSCpUwSvgrFE/dKADUY0Rk/fxFI=;
+        b=T7bnu0TsapNzMAN7yDxEUE5IUGjDIHYFMnBU5NpGaXEZ5RNrEeG2V1wISbJavxoffn
+         l9j/RRVVX2HprRIBqgpVhvLUpayJHUd+IScXgOx/JydlmJVP5mR2+lCMdAyd59o0iSKQ
+         8jKHAPPBF7jDVu1X1m9mNSXUiE1kl2DVXgAdXhfyTkb3cRQ0wtHeD7KV4++VVr3UFL5I
+         DiWEdpCSYo1m5HD/Xev0C1ntqv8mUtNf9uEl5DSo0X9DXTJBg+lz2C0QudejakvzIQUV
+         kqTU6lK3hry14wu1/OfAXb+/Y532cWeMTbpHnFRunT1z0jZL9BWTWATIbuUtnMxeNP5M
+         PPaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689337715; x=1691929715;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w2t3L/hSRRZjqaV5sSCpUwSvgrFE/dKADUY0Rk/fxFI=;
+        b=PaLuoqAWNBudOdX6mXnQECeGXWhF+gOK45XQHjv0J9sQlkzgUGiqwih+Q05cE4SKE9
+         cwUvL2JH6y0uqinuRbo6XXihiCCfnGEkGDRCeSx8M8JNc41WERXumA2lTE2tbVV/hs0v
+         c7SGkAj3SiJ9Px3xKoCF9Gxa2HKIyr+GJpx/52FrKaq5fL3Sz2abFzDO4XhI0RnkAERC
+         agneWz7Wi0Tzy/KGot/8JcL33AdoX4Tu5HI/hjTWtsbCYWDr+1AnsBMI8iJGm9C0O3jd
+         rfoCIjV6br5j3dCI8/E6Cq1zA9icoy9yeVCh9LdmskRR/E6q1ADyM4wmdx7SNNwA1n6o
+         5khQ==
+X-Gm-Message-State: ABy/qLaXKp7jGUc1GOoh/kErmz4TjeFAGGYPqMpyD3GrGD77ShOwdl27
+        m5RPmL8x1K4H/mQnphM7q6c=
+X-Google-Smtp-Source: APBJJlGJF19faVHp44i27HlkJBOfkAmszjhYGp/4H8ehYSJfSoqM9cXLH/Czl0j45GTO2c9r6aP8uA==
+X-Received: by 2002:a5d:5248:0:b0:313:f7a1:3d92 with SMTP id k8-20020a5d5248000000b00313f7a13d92mr3988765wrc.66.1689337714575;
+        Fri, 14 Jul 2023 05:28:34 -0700 (PDT)
+Received: from ?IPV6:2a10:bac0:b000:74c4:b5f4:b227:cd6f:fb3f? ([2a10:bac0:b000:74c4:b5f4:b227:cd6f:fb3f])
+        by smtp.gmail.com with ESMTPSA id q14-20020adfea0e000000b003063a92bbf5sm10700459wrm.70.2023.07.14.05.28.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 05:28:34 -0700 (PDT)
+Message-ID: <f176eabc-5fbe-e993-e207-dcf13ea55f0b@gmail.com>
+Date:   Fri, 14 Jul 2023 15:28:32 +0300
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 04/10] x86/tdx: Make macros of TDCALLs consistent with the
+ spec
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, peterz@infradead.org,
+        kirill.shutemov@linux.intel.com, linux-kernel@vger.kernel.org
+Cc:     dave.hansen@intel.com, tglx@linutronix.de, bp@alien8.de,
+        mingo@redhat.com, hpa@zytor.com, x86@kernel.org, seanjc@google.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org, isaku.yamahata@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <cover.1689151537.git.kai.huang@intel.com>
+ <ba4b4ff1fe77ca76cca370b2fd4aa57a2d23c86d.1689151537.git.kai.huang@intel.com>
+From:   Nikolay Borisov <n.borisov.lkml@gmail.com>
+In-Reply-To: <ba4b4ff1fe77ca76cca370b2fd4aa57a2d23c86d.1689151537.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,38 +79,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2023-07-14 at 18:16 +0800, WANG Xuerui wrote:
-> > > > > As all needed instructions have already upstream in binutils now =
-and
-> > > > > binutils 2.41 will be released soon, I suggest again to introduce
-> > > > > AS_HAS_LVZ_EXTENSION and make KVM depend on AS_HAS_LVZ_EXTENSION.
-> > > > It is a good news that binutils 2.41 has supported LVZ assemble lan=
-guage.
-> > > > we will add AS_HAS_LVZ_EXTENSION support, however KVM need not depe=
-nd on
-> > > > AS_HAS_LVZ_EXTENSION since bintuils 2.41 is not popularly used. yea=
-p we
-> > > > need write beautiful code, also we should write code with pratical =
-usage.
 
-I've raised this for a very early version of this series, but Paolo
-decided using .word here should be fine:
 
-https://lore.kernel.org/all/87268dce-1b5d-0556-7e65-2a75a7893cd1@redhat.com=
-/
+On 12.07.23 г. 11:55 ч., Kai Huang wrote:
+> The TDX spec names all TDCALLs with prefix "TDG".  Currently, the kernel
+> doesn't follow such convention for the macros of those TDCALLs but uses
+> prefix "TDX_" for all of them.  Although it's arguable whether the TDX
+> spec names those TDCALLs properly, it's better for the kernel to follow
+> the spec when naming those macros.
+> 
+> Change all macros of TDCALLs to make them consistent with the spec.  As
+> a bonus, they get distinguished easily from the host-side SEAMCALLs,
+> which all have prefix "TDH".
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>   arch/x86/coco/tdx/tdx.c | 22 +++++++++++-----------
+>   1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
+> index 5b8056f6c83f..de021df92009 100644
+> --- a/arch/x86/coco/tdx/tdx.c
+> +++ b/arch/x86/coco/tdx/tdx.c
+> @@ -15,11 +15,11 @@
+>   #include <asm/pgtable.h>
+>   
+>   /* TDX module Call Leaf IDs */
+> -#define TDX_GET_INFO			1
+> -#define TDX_GET_VEINFO			3
+> -#define TDX_GET_REPORT			4
+> -#define TDX_ACCEPT_PAGE			6
+> -#define TDX_WR				8
+> +#define TDG_VP_INFO			1
+> +#define TDG_VP_VEINFO_GET		3
+> +#define TDG_MR_REPORT			4
+> +#define TDG_MEM_PAGE_ACCEPT		6
+> +#define TDG_VM_WR			8
+>   
+What branch is this patch set based off? Because the existing TDX_GET_* 
+defines are in arch/x86/include/asm/shared/tdx.h due to ff40b5769a50f ?
 
-So in this case we should respect the decision of the KVM reviewer.  If
-this breaks Clang build, we should improve Clang to support using .word
-for hard coding an opcode.
 
-Frankly I'm quite frustrated by "a new architecture needs so many
-feature tests and hacks, here and there" and sometimes I just want to go
-laid-up in bed instead of writing code or porting the distro (Linux From
-Scratch).  But today I just got [a board from another Chinese vendor
-targeting another new architecture] and to me they are doing things even
-worse...  So maybe we are facing some inherent "no silver bullet
-engineering issue".
-
---=20
-Xi Ruoyao <xry111@xry111.site>
-School of Aerospace Science and Technology, Xidian University
+<snip>
