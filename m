@@ -2,207 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14E9B75378F
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 12:11:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C3E7537C4
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 12:17:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235943AbjGNKLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 06:11:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55544 "EHLO
+        id S236122AbjGNKRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 06:17:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236042AbjGNKLC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 06:11:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 644D1359B
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 03:10:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+        with ESMTP id S236113AbjGNKRA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 06:17:00 -0400
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC2422D7B;
+        Fri, 14 Jul 2023 03:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+        t=1689329811; bh=MUuVfpygMgCjNoB7gN0GB11/GGdd69MXDcvHP5s3tIM=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=f4aSnAyMFo6We3UVVj1NzubCIPGSRgGoyXxxzVMvjpBfmPU4JEvlJPOhUpDb7sKx/
+         UZxlSaFjnB0eI8LkK3R+r1BZQ1VPQ8BBXbhdnivkl2mZ8iseHoZ+va6NnS5pLP+4a0
+         7SZYzZWQpMJrVXAm6ueMxJ214iqWLH7WW1w288T8=
+Received: from [100.100.34.13] (unknown [220.248.53.61])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3641461CD8
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 10:10:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93D39C433C8;
-        Fri, 14 Jul 2023 10:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689329456;
-        bh=+/1In3CXHwiwXI4REHPVuSWLDLkcJnvdHWDtDgrkD88=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BKSJupn7Q3v9eo27uP9DJOXtii0v/GcYQJ5Y/fyXiB/c/dgVb/yAilbRajbnIW/RE
-         EABJGGY4DFDUYSyB3s2je2tDWfvKhyGcH9Gs02hHCq4YUsQD7MplUqfdw2WuUFUsVk
-         bvMc2LnZfXuTBTfh03RQD8cVZ6Ww2Y5aPUG/jTHYZQYyF6qkEXZrkELdM15vY4l/H0
-         pT6+L8D4ozKC3JD3f5X1Ggm9lH7czirS7SBVciYZiP6x1JXnX0ga9lq2jbYkdl4DzR
-         dBDucakasgdhGnJ0JN2ECn8Ak512oJOV7Mg8m583QbRqKv3Lw+wl4JGkXUgYDjeJ5W
-         ymfdBGR9js7lQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qKFlF-00D4U3-Sn;
-        Fri, 14 Jul 2023 11:10:54 +0100
-Date:   Fri, 14 Jul 2023 11:10:53 +0100
-Message-ID: <86ilamvm4y.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     eric.auger@redhat.com
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
+        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id C25A560148;
+        Fri, 14 Jul 2023 18:16:50 +0800 (CST)
+Message-ID: <d58a20c9-1f52-c398-292b-2d2501a302e6@xen0n.name>
+Date:   Fri, 14 Jul 2023 18:16:50 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH v16 05/30] LoongArch: KVM: Add vcpu related header files
+Content-Language: en-US
+To:     bibo mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
         Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-In-Reply-To: <86sf9rvmd7.wl-maz@kernel.org>
-References: <20230712145810.3864793-1-maz@kernel.org>
-        <20230712145810.3864793-17-maz@kernel.org>
-        <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
-        <86sf9rvmd7.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75
-        autolearn=ham autolearn_force=no version=3.4.6
+        Xi Ruoyao <xry111@xry111.site>, hejinyang@loongson.cn,
+        Tianrui Zhao <zhaotianrui@loongson.cn>
+References: <20230629075538.4063701-1-zhaotianrui@loongson.cn>
+ <20230629075538.4063701-6-zhaotianrui@loongson.cn>
+ <CAAhV-H7P_GSsoo+g5o0BTCzK4fxwH5d2dQOYde-VpcGvn4SXQA@mail.gmail.com>
+ <152f7869-d591-0134-cf9d-b55774a135e8@loongson.cn>
+ <CAAhV-H4N2wdB8n7Pindv9WdVPLPOboK0Ys75SWOkMZU+=NWEbQ@mail.gmail.com>
+ <152fbdd1-a21c-8ee1-d386-ec7f80b0bb97@loongson.cn>
+From:   WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <152fbdd1-a21c-8ee1-d386-ec7f80b0bb97@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Jul 2023 16:53:40 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
+On 2023/7/14 18:10, bibo mao wrote:
 > 
-> Hey Eric,
 > 
-> Thanks for looking into this, much appreciated given how tedious it
-> is.
+> 在 2023/7/14 17:22, Huacai Chen 写道:
+>> Hi, Bibo,
+>>
+>> On Fri, Jul 14, 2023 at 3:45 PM bibo mao <maobibo@loongson.cn> wrote:
+>>>
+>>>
+>>>
+>>> 在 2023/7/14 15:11, Huacai Chen 写道:
+>>>> Hi, Tianrui,
+>>>>
+>>>> On Thu, Jun 29, 2023 at 3:55 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
+>>>>>
+>>>>> Add LoongArch vcpu related header files, including vcpu csr
+>>>>> information, irq number defines, and some vcpu interfaces.
+>>>>>
+>>>>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>>>>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>>>>> ---
+>>>>>   arch/loongarch/include/asm/insn-def.h  |  55 ++++++
+>>>>>   arch/loongarch/include/asm/kvm_csr.h   | 231 +++++++++++++++++++++++++
+>>>>>   arch/loongarch/include/asm/kvm_vcpu.h  |  97 +++++++++++
+>>>>>   arch/loongarch/include/asm/loongarch.h |  20 ++-
+>>>>>   arch/loongarch/kvm/trace.h             | 168 ++++++++++++++++++
+>>>>>   5 files changed, 566 insertions(+), 5 deletions(-)
+>>>>>   create mode 100644 arch/loongarch/include/asm/insn-def.h
+>>>>>   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
+>>>>>   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
+>>>>>   create mode 100644 arch/loongarch/kvm/trace.h
+>>>>>
+>>>>> diff --git a/arch/loongarch/include/asm/insn-def.h b/arch/loongarch/include/asm/insn-def.h
+>>>>> new file mode 100644
+>>>>> index 000000000000..e285ee108fb0
+>>>>> --- /dev/null
+>>>>> +++ b/arch/loongarch/include/asm/insn-def.h
+>>>>> @@ -0,0 +1,55 @@
+>>>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>>>> +
+>>>>> +#ifndef __ASM_INSN_DEF_H
+>>>>> +#define __ASM_INSN_DEF_H
+>>>>> +
+>>>>> +#include <linux/stringify.h>
+>>>>> +#include <asm/gpr-num.h>
+>>>>> +#include <asm/asm.h>
+>>>>> +
+>>>>> +#define INSN_STR(x)            __stringify(x)
+>>>>> +#define CSR_RD_SHIFT           0
+>>>>> +#define CSR_RJ_SHIFT           5
+>>>>> +#define CSR_SIMM14_SHIFT       10
+>>>>> +#define CSR_OPCODE_SHIFT       24
+>>>> As all needed instructions have already upstream in binutils now and
+>>>> binutils 2.41 will be released soon, I suggest again to introduce
+>>>> AS_HAS_LVZ_EXTENSION and make KVM depend on AS_HAS_LVZ_EXTENSION.
+>>> It is a good news that binutils 2.41 has supported LVZ assemble language.
+>>> we will add AS_HAS_LVZ_EXTENSION support, however KVM need not depend on
+>>> AS_HAS_LVZ_EXTENSION since bintuils 2.41 is not popularly used. yeap we
+>>> need write beautiful code, also we should write code with pratical usage.
+>> 1, For pure upstream: the CI toolchain comes from
+>> https://mirrors.edge.kernel.org/pub/tools/crosstool/. Since binutils
+>> 2.41 will be released soon, CI toolchain will also be updated soon.
+>>
+>> 2, For community distributions, such as Fedora rawhide, Debian
+>> unstable and Arch: they usually choose the latest released version, so
+>> binutils 2.41 will be used quickly.
+>>
+>> 3, For downstream distributions, such as UOS and Kylin: if they choose
+>> kernel as new as 6.6, they may probably choose binutils as new as
+>> 2.41; if they choose an LTS kernel (e.g., 6.1), they should backport
+>> KVM support to the kernel, then they don't have any reason to not
+>> backport LVZ instructions support to binutils.
+> 
+> commit 616500232e632dba8b03981eeccadacf2fbf1c30
+> Author: Huacai Chen <chenhuacai@kernel.org>
+> Date:   Thu Jun 29 20:58:43 2023
+> 
+>      LoongArch: Add vector extensions support
+> 
+>      Introduce AS_HAS_LSX_EXTENSION and AS_HAS_LASX_EXTENSION to avoid non-
+>      vector toolchains complains unsupported instructions.
+>      
+>      Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+> 
+> The vector patch 616500232e63"Add vector extensions support" is merged
+> with any reviewed-by or acked, vector depends on AS_HAS_LSX, so it requires
+> all the patches obey this rule. I just think it bring thing to the wrong
+> way.
 
-FWIW, here are the changes I'm going to squash in that patch. Shout if
-you spot something that looks odd...
+For the record: I've gone through (earlier versions of) the patch but 
+simply didn't have time to do so for that last revision, to confidently 
+give my R-b. As can be seen from the Git history and mailing list 
+archives, my LoongArch time was fully allocated to ClangBuiltLinux (and 
+by extension, LLVM/Clang) at that time. By the time I was able to 
+properly look at this LSX/LASX patch, it was already in loongarch-next, 
+so even if I replied it'd be too late.
 
-Thanks,
-
-	M.
-
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index c4057f4ff72d..f5978b463aca 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -55,7 +55,8 @@ enum coarse_grain_trap_id {
- 	CGT_HCR_TERR,
- 	CGT_HCR_APK,
- 	CGT_HCR_NV,
--	CGT_HCR_NV1,
-+	CGT_HCR_NV_nNV2,
-+	CGT_HCR_NV1_nNV2,
- 	CGT_HCR_AT,
- 	CGT_HCR_FIEN,
- 	CGT_HCR_TID4,
-@@ -89,7 +90,7 @@ enum coarse_grain_trap_id {
- 	CGT_HCR_TVM_TRVM,
- 	CGT_HCR_TPU_TICAB,
- 	CGT_HCR_TPU_TOCU,
--	CGT_HCR_NV1_ENSCXT,
-+	CGT_HCR_NV1_nNV2_ENSCXT,
- 	CGT_MDCR_TPM_TPMCR,
- 	CGT_MDCR_TDE_TDA,
- 	CGT_MDCR_TDE_TDOSA,
-@@ -154,7 +155,7 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= HCR_TSW,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
--	[CGT_HCR_TPC] = {
-+	[CGT_HCR_TPC] = { /* Also called TCPC when FEAT_DPB is implemented */
- 		.index		= HCR_EL2,
- 		.value		= HCR_TPC,
- 		.mask		= HCR_TPC,
-@@ -176,7 +177,7 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.index		= HCR_EL2,
- 		.value		= HCR_TVM,
- 		.mask		= HCR_TVM,
--		.behaviour	= BEHAVE_FORWARD_ANY,
-+		.behaviour	= BEHAVE_FORWARD_WRITE,
- 	},
- 	[CGT_HCR_TDZ] = {
- 		.index		= HCR_EL2,
-@@ -209,12 +210,18 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
- 	[CGT_HCR_NV] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_NV,
-+		.mask		= HCR_NV,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
-+	[CGT_HCR_NV_nNV2] = {
- 		.index		= HCR_EL2,
- 		.value		= HCR_NV,
- 		.mask		= HCR_NV | HCR_NV2,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
--	[CGT_HCR_NV1] = {
-+	[CGT_HCR_NV1_nNV2] = {
- 		.index		= HCR_EL2,
- 		.value		= HCR_NV | HCR_NV1,
- 		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
-@@ -350,7 +357,7 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
- 	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
- 	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
- 	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
--	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
-+	MCB(CGT_HCR_NV1_nNV2_ENSCXT,	CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
- 	MCB(CGT_MDCR_TPM_TPMCR,		CGT_MDCR_TPM, CGT_MDCR_TPMCR),
- 	MCB(CGT_MDCR_TDE_TDA,		CGT_MDCR_TDE, CGT_MDCR_TDA),
- 	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
-@@ -501,6 +508,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
- 	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
- 	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
- 	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
-+	SR_TRAP(SYS_DC_CVADP,		CGT_HCR_TPC),
- 	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
- 	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
- 	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
-@@ -625,7 +633,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
- 		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
- 	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
- 		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
--	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
- 	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
-@@ -698,10 +705,14 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
- 	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
- 	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
--	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
--	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
--	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),
--	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
-+	SR_TRAP(OP_CPP_RCTX, 		CGT_HCR_NV),
-+	SR_TRAP(OP_DVP_RCTX, 		CGT_HCR_NV),
-+	SR_TRAP(OP_CFP_RCTX, 		CGT_HCR_NV),
-+	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV_nNV2),
-+	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1_nNV2),
-+	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1_nNV2),
-+	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1_nNV2),
-+	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_nNV2_ENSCXT),
- 	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
- 	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
- 	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
+And, to make it clear: I'm not opposing your upstreaming effort or 
+"conspiring against you" in any way. With all the replies I'm only 
+trying to explain why some code can be dropped so every upstream dev 
+will have to maintain less code paths and have an easier life.
 
 -- 
-Without deviation from the norm, progress is not possible.
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+
