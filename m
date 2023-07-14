@@ -2,140 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C96D2753EB8
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 17:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD99C753ED9
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 17:29:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235946AbjGNPYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 11:24:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49182 "EHLO
+        id S235986AbjGNP32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 11:29:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236038AbjGNPYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 11:24:51 -0400
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE882D68
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 08:24:48 -0700 (PDT)
-Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3a1d9b64837so1654143b6e.0
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 08:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689348287; x=1691940287;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KKCPDDjyadziwl2/AK/7bwW5AQLCnpdzpQfQJ+yWANU=;
-        b=VkfHth5MNAZHQQpEhdDGh0pq0hoDNb/IkCyvJyfZlohZ7FEqc/tc2UlGQlp5P+ls2k
-         LP4Az77bQs/0UVX1KSsNiwTlKtw8ZJErPfpgp4NpbjjW9RxzvWKdoj5q9JZGtbqYKyMw
-         IkbeE1z0uT48kd4G5uv3BxnFhNNELaU6M+7XHRszPJ3LTmAtfce0FwO0kiq6qtWbZVLj
-         +GaUqzfPkfSAQcQuVfYKAUHYwjH4iU0nqNSXmWkPMWsXsceycWdUU7PI1Bdr+PTPu7X6
-         X/OpA3sg1LJmtBpK2xUftGMYHz3Z91vTuIVh4aBU1pURrsic+RJAvN3CFStnNYgOJO/U
-         rXPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689348287; x=1691940287;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KKCPDDjyadziwl2/AK/7bwW5AQLCnpdzpQfQJ+yWANU=;
-        b=lwum6AEXqehqXa2lfZ+kSMk+4xQjo39WOXTeGSLRLfTrFhyvCVCmx7Jy13oHz8eKNf
-         Kgk3tJ9vNVSzm19FerfGK5S4E5VelG5h0EHlEUmKGw/NpkCfml6YK86K4hxVUTWmPXVB
-         hcJuVmGG2YGakmg9Hgp9HwlHLLytAaw8tfLWOboKZBhazmwqOi0KIsI+TLKRW905/l9m
-         V22DrhJdWh0CIRsGQ3HK3lmK+85KYIHsyzvd0WOU4cUPDotgc0NChUoRbCspaCmtvn+s
-         TAGUKKwGTMmCut3Rhx+uCMCk3A8EXtDhv2VaUSfUcw67hkGXQbXCnKAohjId8BY/7mk9
-         k9Sw==
-X-Gm-Message-State: ABy/qLY2sQinNCme1rbYXsbtkX/XwlNfLcbc5E45FRhu9+kjPI3spqK1
-        j/aC+FCiLG5sjEVSlJ0nzfpD1Q==
-X-Google-Smtp-Source: APBJJlH+MwWcaUVg/7akbj8keBMvf8gq7EKuq9vDRBoNFYJ4+ezTmB048XjMLkW7GX8JAT8v1K03Sg==
-X-Received: by 2002:a05:6808:2226:b0:3a3:eceb:7bbc with SMTP id bd38-20020a056808222600b003a3eceb7bbcmr7147567oib.54.1689348287397;
-        Fri, 14 Jul 2023 08:24:47 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id x19-20020a17090aa39300b00263154aab24sm1230248pjp.57.2023.07.14.08.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 08:24:46 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qKKez-0017NL-5i;
-        Fri, 14 Jul 2023 12:24:45 -0300
-Date:   Fri, 14 Jul 2023 12:24:45 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>,
-        Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>,
-        linux-mm@kvack.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Fei Li <fei1.li@intel.com>, x86@kernel.org,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        intel-gfx@lists.freedesktop.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-fpga@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
-        Wu Hao <hao.wu@intel.com>, Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
-        intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
-        netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Muchun Song <muchun.song@linux.dev>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Benjamin LaHaise <bcrl@kvack.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Xu Yilun <yilun.xu@intel.com>, jaz@semihalf.com
-Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
-Message-ID: <ZLFovYocElAD7gJ0@ziepe.ca>
-References: <20230630155936.3015595-1-jaz@semihalf.com>
- <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
+        with ESMTP id S235711AbjGNP31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 11:29:27 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49E2C1BE3
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 08:29:26 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A3981570;
+        Fri, 14 Jul 2023 08:30:08 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A8563F740;
+        Fri, 14 Jul 2023 08:29:24 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        Suzuki.Poulose@arm.com, andre.przywara@arm.com, maz@kernel.org,
+        oliver.upton@linux.dev, jean-philippe.brucker@arm.com,
+        apatel@ventanamicro.com, kvm@vger.kernel.org
+Subject: [PATCH kvmtool] virtio-net: Don't print the compat warning for the default device
+Date:   Fri, 14 Jul 2023 16:29:09 +0100
+Message-ID: <20230714152909.31723-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 14, 2023 at 09:05:21AM +0200, Christian Brauner wrote:
+Compat messages are there to print a warning when the user creates a virtio
+device for the VM, but the guest doesn't initialize it.
 
-> I have no skin in the game aside from having to drop this conversion
-> which I'm fine to do if there are actually users for this btu really,
-> that looks a lot like abusing an api that really wasn't designed for
-> this.
+This generally works great, except that kvmtool will always create a
+virtio-net device, even if the user hasn't specified one, which means that
+each time kvmtool loads a guest that doesn't probe the network interface,
+the user will get the compat warning. This can get particularly annoying
+when running kvm-unit-tests, which doesn't need to use a network interface,
+and the virtio-net warning is displayed after each test.
 
-Yeah, I think so too. The ACPI thing should use its own FD if it wants
-to feed actual data..
+Let's fix this by skipping the compat message in the case of the
+automatically created virtio-net device. This lets kvmtool keep the compat
+warnings as they are, but removes the false positive.
 
-Jason
+Even if the user is relying on kvmtool creating the default virtio-net
+device, a missing network interface in the guest is very easy to
+discover.
+
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ virtio/net.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/virtio/net.c b/virtio/net.c
+index f09dd0a48b53..77f7c9a7a788 100644
+--- a/virtio/net.c
++++ b/virtio/net.c
+@@ -847,7 +847,7 @@ done:
+ 	return 0;
+ }
+ 
+-static int virtio_net__init_one(struct virtio_net_params *params)
++static int virtio_net__init_one(struct virtio_net_params *params, bool suppress_compat)
+ {
+ 	enum virtio_trans trans = params->kvm->cfg.virtio_transport;
+ 	struct net_dev *ndev;
+@@ -913,7 +913,7 @@ static int virtio_net__init_one(struct virtio_net_params *params)
+ 	if (params->vhost)
+ 		virtio_net__vhost_init(params->kvm, ndev);
+ 
+-	if (compat_id == -1)
++	if (compat_id == -1 && !suppress_compat)
+ 		compat_id = virtio_compat_add_message("virtio-net", "CONFIG_VIRTIO_NET");
+ 
+ 	return 0;
+@@ -925,7 +925,7 @@ int virtio_net__init(struct kvm *kvm)
+ 
+ 	for (i = 0; i < kvm->cfg.num_net_devices; i++) {
+ 		kvm->cfg.net_params[i].kvm = kvm;
+-		r = virtio_net__init_one(&kvm->cfg.net_params[i]);
++		r = virtio_net__init_one(&kvm->cfg.net_params[i], false);
+ 		if (r < 0)
+ 			goto cleanup;
+ 	}
+@@ -943,7 +943,7 @@ int virtio_net__init(struct kvm *kvm)
+ 		str_to_mac(kvm->cfg.guest_mac, net_params.guest_mac);
+ 		str_to_mac(kvm->cfg.host_mac, net_params.host_mac);
+ 
+-		r = virtio_net__init_one(&net_params);
++		r = virtio_net__init_one(&net_params, true);
+ 		if (r < 0)
+ 			goto cleanup;
+ 	}
+-- 
+2.41.0
 
