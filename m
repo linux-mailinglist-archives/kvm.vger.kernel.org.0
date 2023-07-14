@@ -2,163 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95F397536E9
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 11:46:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B8AC753737
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 11:58:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235929AbjGNJqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 05:46:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38576 "EHLO
+        id S235786AbjGNJ6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 05:58:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235774AbjGNJpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:45:44 -0400
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E0002D51;
-        Fri, 14 Jul 2023 02:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-        t=1689327935; bh=je53xgpjUO3Kn0r9UmjMsQwwLu/6ZQ6k+jN6jnhYPJg=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Tjx99n6hXAabeXlajgLHSK2tIIUMoTUEgyrMKx6v/0LeQxOh2tKh2N0y/wYqBZtfd
-         zSIsHQol6LHSTmLwS7Gn7A6XbJgq4S3Er4A/ngl+2PVb1mqECLsPcoyrNvoXw7Zrfr
-         e3A22y4t3TigGm2+Cw5e0KF6ZNtPhn6r6jSY3G0k=
-Received: from [100.100.34.13] (unknown [220.248.53.61])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mailbox.box.xen0n.name (Postfix) with ESMTPSA id E085660148;
-        Fri, 14 Jul 2023 17:45:34 +0800 (CST)
-Message-ID: <81270b55-37c4-d566-8cd7-acc90b490c10@xen0n.name>
-Date:   Fri, 14 Jul 2023 17:45:34 +0800
+        with ESMTP id S235673AbjGNJ6S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 05:58:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C5AD1992
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 02:57:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689328657;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gCu33ziM562YgoYaGWLee8XNj2HHD6OoiAz2SuMASII=;
+        b=DhTcKhzxvjLZ3jmvOA3SU1N7nV3/mvs8/myirNOAawY3rUYTprGsHc5dxNOjCY7eDl7Dhn
+        YrBPcyBnaKAX7RcyA2IkZEXTdQ6ZQct80/yOAA6qj/Z4ywk+KwBR3OcSPtZIApOStSX3W6
+        IJChy5mnsVRT80+HuXk8PtwpMApGqdw=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-445-_akKlupyO2KpkKn1XdJAnw-1; Fri, 14 Jul 2023 05:57:36 -0400
+X-MC-Unique: _akKlupyO2KpkKn1XdJAnw-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6351121aa10so17435416d6.0
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 02:57:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689328655; x=1689933455;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gCu33ziM562YgoYaGWLee8XNj2HHD6OoiAz2SuMASII=;
+        b=Q+JFUSmL3+mfsSI+WBIFSz6KndUqH+4R6UYR+SVeaZ+w4676ECNocTAivqnIThq82w
+         6ht3DGJotkX5tE9qND6O11nftLqm4DTtWh8GJm7dl2o30hRXIDt0+0mQb6LAuzk0uiyk
+         9Ppu0lJrHoQI9TL8C7e72I2dCdo3EIXWwNSvryQAprGZlD8WSRHkIyYWJxTOOQdiskab
+         jXJdS+GyeHnYNdddRduzq68S7Qkq07kwe494p5WZGZX66TKwjvaddYgfqEIaODlZz2Ha
+         E9jDzKJYs4pJoetSQiw3IY1d608QgJx/qUD2FqxNtw1h3cAvBWMQOJ6FDkCQHhtFbdW2
+         IjHg==
+X-Gm-Message-State: ABy/qLby5hY295AExcalc5Gzzu0GKQBFFiNrhBF+fVEU6ny4k/25WRix
+        HodpwZBjtigkFQZ2sHlNraGxGz3mdPpWUEL4S4jH+uKk4sIlDDugvOyofAriHNqENpfxxQczees
+        QxPoUz3mUvmJn
+X-Received: by 2002:ad4:504e:0:b0:628:35b0:e966 with SMTP id m14-20020ad4504e000000b0062835b0e966mr3805648qvq.21.1689328655671;
+        Fri, 14 Jul 2023 02:57:35 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFzMd8R1o7Y2YsrxyRprJ8q0Sa8uedD+jvkqyOU9OZseNveBJ7ue4hLIFSqRa2Cbz6Htb/SZg==
+X-Received: by 2002:ad4:504e:0:b0:628:35b0:e966 with SMTP id m14-20020ad4504e000000b0062835b0e966mr3805623qvq.21.1689328655382;
+        Fri, 14 Jul 2023 02:57:35 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id m10-20020ae9e70a000000b007654bb4a842sm3669537qka.104.2023.07.14.02.57.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 02:57:34 -0700 (PDT)
+Message-ID: <fc99e975-4625-6d1c-f6d0-08ad5af4233a@redhat.com>
+Date:   Fri, 14 Jul 2023 11:57:30 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH v16 05/30] LoongArch: KVM: Add vcpu related header files
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 10/27] arm64: Add feature detection for fine grained traps
 Content-Language: en-US
-To:     Huacai Chen <chenhuacai@kernel.org>, bibo mao <maobibo@loongson.cn>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Xi Ruoyao <xry111@xry111.site>, hejinyang@loongson.cn,
-        Tianrui Zhao <zhaotianrui@loongson.cn>
-References: <20230629075538.4063701-1-zhaotianrui@loongson.cn>
- <20230629075538.4063701-6-zhaotianrui@loongson.cn>
- <CAAhV-H7P_GSsoo+g5o0BTCzK4fxwH5d2dQOYde-VpcGvn4SXQA@mail.gmail.com>
- <152f7869-d591-0134-cf9d-b55774a135e8@loongson.cn>
- <CAAhV-H4N2wdB8n7Pindv9WdVPLPOboK0Ys75SWOkMZU+=NWEbQ@mail.gmail.com>
-From:   WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <CAAhV-H4N2wdB8n7Pindv9WdVPLPOboK0Ys75SWOkMZU+=NWEbQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-11-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-11-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/7/14 17:22, Huacai Chen wrote:
-> Hi, Bibo,
-> 
-> On Fri, Jul 14, 2023 at 3:45 PM bibo mao <maobibo@loongson.cn> wrote:
->>
->>
->>
->> 在 2023/7/14 15:11, Huacai Chen 写道:
->>> Hi, Tianrui,
->>>
->>> On Thu, Jun 29, 2023 at 3:55 PM Tianrui Zhao <zhaotianrui@loongson.cn> wrote:
->>>>
->>>> Add LoongArch vcpu related header files, including vcpu csr
->>>> information, irq number defines, and some vcpu interfaces.
->>>>
->>>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
->>>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->>>> ---
->>>>   arch/loongarch/include/asm/insn-def.h  |  55 ++++++
->>>>   arch/loongarch/include/asm/kvm_csr.h   | 231 +++++++++++++++++++++++++
->>>>   arch/loongarch/include/asm/kvm_vcpu.h  |  97 +++++++++++
->>>>   arch/loongarch/include/asm/loongarch.h |  20 ++-
->>>>   arch/loongarch/kvm/trace.h             | 168 ++++++++++++++++++
->>>>   5 files changed, 566 insertions(+), 5 deletions(-)
->>>>   create mode 100644 arch/loongarch/include/asm/insn-def.h
->>>>   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->>>>   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->>>>   create mode 100644 arch/loongarch/kvm/trace.h
->>>>
->>>> diff --git a/arch/loongarch/include/asm/insn-def.h b/arch/loongarch/include/asm/insn-def.h
->>>> new file mode 100644
->>>> index 000000000000..e285ee108fb0
->>>> --- /dev/null
->>>> +++ b/arch/loongarch/include/asm/insn-def.h
->>>> @@ -0,0 +1,55 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +
->>>> +#ifndef __ASM_INSN_DEF_H
->>>> +#define __ASM_INSN_DEF_H
->>>> +
->>>> +#include <linux/stringify.h>
->>>> +#include <asm/gpr-num.h>
->>>> +#include <asm/asm.h>
->>>> +
->>>> +#define INSN_STR(x)            __stringify(x)
->>>> +#define CSR_RD_SHIFT           0
->>>> +#define CSR_RJ_SHIFT           5
->>>> +#define CSR_SIMM14_SHIFT       10
->>>> +#define CSR_OPCODE_SHIFT       24
->>> As all needed instructions have already upstream in binutils now and
->>> binutils 2.41 will be released soon, I suggest again to introduce
->>> AS_HAS_LVZ_EXTENSION and make KVM depend on AS_HAS_LVZ_EXTENSION.
->> It is a good news that binutils 2.41 has supported LVZ assemble language.
->> we will add AS_HAS_LVZ_EXTENSION support, however KVM need not depend on
->> AS_HAS_LVZ_EXTENSION since bintuils 2.41 is not popularly used. yeap we
->> need write beautiful code, also we should write code with pratical usage.
-> 1, For pure upstream: the CI toolchain comes from
-> https://mirrors.edge.kernel.org/pub/tools/crosstool/. Since binutils
-> 2.41 will be released soon, CI toolchain will also be updated soon.
-> 
-> 2, For community distributions, such as Fedora rawhide, Debian
-> unstable and Arch: they usually choose the latest released version, so
-> binutils 2.41 will be used quickly.
+Hi,
 
-You seem to have missed CLFS for LoongArch [1] and Gentoo [2] ;-)
+On 7/12/23 16:57, Marc Zyngier wrote:
+> From: Mark Brown <broonie@kernel.org>
+>
+> In order to allow us to have shared code for managing fine grained traps
+> for KVM guests add it as a detected feature rather than relying on it
+> being a dependency of other features.
+>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@kernel.org
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-These two distros are also very punctual in adopting new toolchain 
-versions: the maintainer of CLFS for LoongArch is Loongson employee 
-himself (and he's the author of the Fedora LoongArch Remix too), while 
-the Gentoo toolchain team usually follow the upstream release very 
-quickly. (I happen to maintain the Gentoo loong port too, and also am a 
-member of gentoo-toolchain team.)
-
-[1]: https://github.com/sunhaiyong1978/CLFS-for-LoongArch
-[2]: https://wiki.gentoo.org/wiki/Project:LoongArch
-
-> 
-> 3, For downstream distributions, such as UOS and Kylin: if they choose
-> kernel as new as 6.6, they may probably choose binutils as new as
-> 2.41; if they choose an LTS kernel (e.g., 6.1), they should backport
-> KVM support to the kernel, then they don't have any reason to not
-> backport LVZ instructions support to binutils.
-
-I generally agree with Huacai here. If those distros pick bleeding-edge 
-kernel releases then they have no reason to not also bump the toolchain 
-baseline too; otherwise they must be backporting. In which case they either:
-
-a) pull patches from v6.6, so they may as well integrate the binutils 
-patches along the way (trivial compared to kernel backports), or
-b) ask Loongson to provide the patches, in which case you may just give 
-this version of code to them, which can be done (and I assume, has 
-already been done) without any upstream involvement.
-
-All in all I don't see a reason for hardcoding any opcode in this 
-particular time, when everyone involved agrees on moving fast.
-
--- 
-WANG "xen0n" Xuerui
-
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
+Eric
+> ---
+>  arch/arm64/kernel/cpufeature.c | 11 +++++++++++
+>  arch/arm64/tools/cpucaps       |  1 +
+>  2 files changed, 12 insertions(+)
+>
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index f9d456fe132d..0768f98c49cc 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2627,6 +2627,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_cpuid_feature,
+>  		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LRCPC, IMP)
+>  	},
+> +	{
+> +		.desc = "Fine Grained Traps",
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.capability = ARM64_HAS_FGT,
+> +		.sys_reg = SYS_ID_AA64MMFR0_EL1,
+> +		.sign = FTR_UNSIGNED,
+> +		.field_pos = ID_AA64MMFR0_EL1_FGT_SHIFT,
+> +		.field_width = 4,
+> +		.min_field_value = 1,
+> +		.matches = has_cpuid_feature,
+> +	},
+>  #ifdef CONFIG_ARM64_SME
+>  	{
+>  		.desc = "Scalable Matrix Extension",
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index c80ed4f3cbce..c3f06fdef609 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -26,6 +26,7 @@ HAS_ECV
+>  HAS_ECV_CNTPOFF
+>  HAS_EPAN
+>  HAS_EVT
+> +HAS_FGT
+>  HAS_GENERIC_AUTH
+>  HAS_GENERIC_AUTH_ARCH_QARMA3
+>  HAS_GENERIC_AUTH_ARCH_QARMA5
 
