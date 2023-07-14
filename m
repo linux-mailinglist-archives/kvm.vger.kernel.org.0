@@ -2,231 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72493753E65
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 17:07:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 602E3753E91
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 17:15:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235588AbjGNPHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 11:07:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40046 "EHLO
+        id S235866AbjGNPPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 11:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234425AbjGNPHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 11:07:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6F11BD4
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 08:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689347186;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NhAdzRqVaDVvjuIFyaXtqr2FeclLRFcObYE4UtowWCU=;
-        b=U+0VuvfxoT3S8ST/l7iAG75TmlEBk0DoTbAMulGfBBi29UviFa1D8AlSuc4a6FGonL2FRG
-        v73h4mAwpkqzf7Eh9x8cgCWgXjhUwCu9IvBoZKMI1jKGcjGGZ3BblhWjuqAov8ScZyV1ma
-        0Xi3DAGERtfch54tSL1BYq9ulvPDVWo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-186-7ZVukyD6NqKA8fL9AZkJOw-1; Fri, 14 Jul 2023 11:06:24 -0400
-X-MC-Unique: 7ZVukyD6NqKA8fL9AZkJOw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7623d5cb0caso266527285a.3
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 08:06:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689347184; x=1689951984;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NhAdzRqVaDVvjuIFyaXtqr2FeclLRFcObYE4UtowWCU=;
-        b=hhfGdauMz55k3XLsZImYFwdoe8rt+OKCtO6E3tul2JX7F0dFmR7r9UV2SBb2em5HNI
-         AstaBMfQ6BVIXRPn4l6QLpNE4W1FL+1sC7qxwNASc7lY4nZxv0eko0ipTCH9zfd22YU7
-         O4nBP4DO9RKdNmNUfCmoA9pCxhuTX/LflVaA/q8jqulE6melfBdHxvC2SnmfXK91MOf9
-         L0scj/qjBOdoMUIHrB6EZqdKJlMMz8gQFS4HRrEtbRwpJCpNJctNBxxDZcR/I4I8frO5
-         tdLQGnhqN6OXGpG0Pj4YTxy2wry3ZTJDM/QKSq7RFgZpnKWQTSpOrHVCpfL7fTN2M2J8
-         vzzw==
-X-Gm-Message-State: ABy/qLb+REvM1TwRnEajwOUjnd6qurb6IxxsttF4QcuSb0wbsOn4g8E0
-        5gk4vlgkKRskibrOSINwXXkfR9iNmU6HyWLCUp7rAUNkEUzABMXAox12ORiTcvtgoYammc3IXIa
-        Es46hnj2woQwZ
-X-Received: by 2002:a05:620a:1a1a:b0:765:87e1:f60b with SMTP id bk26-20020a05620a1a1a00b0076587e1f60bmr6306963qkb.64.1689347184298;
-        Fri, 14 Jul 2023 08:06:24 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG5wd7LauXlPfX7A79ukkFzMX+DaIH+H6LmRPp7woUZKMmgdgcjGaSdEv63FDRt/trlBlzgMA==
-X-Received: by 2002:a05:620a:1a1a:b0:765:87e1:f60b with SMTP id bk26-20020a05620a1a1a00b0076587e1f60bmr6306938qkb.64.1689347183951;
-        Fri, 14 Jul 2023 08:06:23 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id oq25-20020a05620a611900b00767db6f47bbsm3863390qkn.73.2023.07.14.08.06.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jul 2023 08:06:23 -0700 (PDT)
-Message-ID: <669c82dc-44c1-ef3f-1285-87369c4d7276@redhat.com>
-Date:   Fri, 14 Jul 2023 17:06:18 +0200
+        with ESMTP id S235693AbjGNPPF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 11:15:05 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC79270D;
+        Fri, 14 Jul 2023 08:15:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V0z23b3vjmcHzVnT77w9Mt88VtNF1Gf1vT4GJSj0gmvNPLb/oN2Jgh1jcLIGX1vnFkD00PL90NQqAvK8Tlzom31BJksCcu1u4wm6My/7ZGaWi5rf3Ie0Mr3JAYkXt9FkujDG552L0pegmrN/e2nyT/OMoBbJptt+8fcBbwFYY8FiHlNpo5f2WfPjAyWzf4Sq3QMod6aTFnJE167KTcMCZwe0tX8sM2S+PR0fwKNpbUd83ZOQvqXZwcYgR9J+SKbtkXwfSpBRv/h8HWmYkDHN/98DkFv682E0U6Q1HGofrE8cD+IPb3Dx7drp1mincGTxOf29UJ8/JZB8c+qqi+TEUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kG2CDZxFP+GZKp1g14IF4/etBLecPU9XcI88rHjt1RM=;
+ b=hDRK2+EjFHSlvlCNYAxeO6vkS/UXU7cxEmmMIfPcpedPoYlTfP1pG2RwlfoBzhsjK/nBJMNHXNC4QxJlTPjsIIWlrmyTS4A/V+rFfU8COmfhFiQLv/39NEFODMHrGrwP1w8oxiO2QWFRf9c97YOVFJVLN3pOh6b7Xf4JSoqxgea6lc4QIiQ5+n/HEOnJuAdFU/IthgYgzaa0H4UEEFA6aTxgmRwq8zTyhSmyhRpBCexL9lOAC9sRscafs7tjNxcZcM3SzZh8baM1nEM05G8bpjuUkPLC/v/ZZAkDhEGQwEvPaOIakxchdQQFlZ416wzrgcd26Bh56DcS7s9Zaq/7Gg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kG2CDZxFP+GZKp1g14IF4/etBLecPU9XcI88rHjt1RM=;
+ b=BhjSRdeexkeMKe0NOHbVdE3xweo4Z5tFKRxrq1Ofni0nnec86qVcoJlLS1i5DDD+bPpBAmjcXCYLsLiSQas3WR1/fBm+WV2nveZ49IkKSr3fOhU5vS7UNZ9n8UWn3SuXUgKYlCMckmqkHUmTMiudLJSGO9POyAdNuRn2bhCFpIYoD6WsPuiIDfAF40+n9mVY40IDgJ0tyydMI3Do4LVcNCA1+IDSXKqcpyXMnHIkEYrO4cXqpOfXBsAnrfH91YYy8xqeq3sPnZDoAuy2SnugDY/pPjvIdcl08lNlKdJQE/LLIOA0rcgeJxXpGfdOY6wTojOtkSynrOyJlLq1zgwTLg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MN0PR12MB6342.namprd12.prod.outlook.com (2603:10b6:208:3c1::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Fri, 14 Jul
+ 2023 15:15:02 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::69c1:5d87:c73c:cc55]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::69c1:5d87:c73c:cc55%4]) with mapi id 15.20.6565.028; Fri, 14 Jul 2023
+ 15:15:02 +0000
+Date:   Fri, 14 Jul 2023 12:14:59 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: Re: [PATCH v14 24/26] vfio: Move the IOMMU_CAP_CACHE_COHERENCY check
+ in __vfio_register_dev()
+Message-ID: <ZLFmc3ZXlbE3mw9v@nvidia.com>
+References: <20230711025928.6438-1-yi.l.liu@intel.com>
+ <20230711025928.6438-25-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711025928.6438-25-yi.l.liu@intel.com>
+X-ClientProxiedBy: SJ0PR13CA0187.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c3::12) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-17-maz@kernel.org>
- <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
- <86sf9rvmd7.wl-maz@kernel.org> <86ilamvm4y.wl-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <86ilamvm4y.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75 autolearn=no
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6342:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9802c1c2-1e4a-43ee-f71f-08db847d1870
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vsLKF//5ASr02wdPy4T/XkmGF0gvAZJX/Kl0p56z2CS2zeI8rKLkeCtPrchCjAK34J8fObKpQ3bALVf4wWs1ly2knc7BCG0rjsJxH2Ohldbc1T7QFGtu715E4Iw/bfTTowKppXSSAa7m/FJf4mM6rLjgo/q+/UnStnkX+bD7iAhjEu6auG2Be67t/T1MjRTw1OVPX9MEAA79vDzqDTGk81T1bYWe80Q4haZIiBi3j8SnE41TJgEw3PeXtPWadntXErAe3GY38i9iPjbU5WaM8iA/hA4tLiJBj5ohv5M7qQbkNAy9nN9fhHiWYSUi1Pd1jQSphMTdPh77XYgMoL93xg4f1dcuETahhrf5monhcHExdJHuVT6eDT1JyhsiWftHz5u2EC9d6DA/N5XHv7A4eJQzLqsnFjoKHR0h8UxaYuaVad6STahgCZkLwwE4VJpuNeergxE5ug0JT/fNn6MYDPvIiZICGB4wSwj5VDU0xvEcZ1513qRWoR4yeRe6AocyUacLv3XTUHY8rSbK5o+O+z9lMn6uQZu101JpfwKx2+/bifvVsLPCJn7obu2H8xEJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(366004)(136003)(39860400002)(346002)(451199021)(2906002)(38100700002)(6512007)(83380400001)(186003)(2616005)(26005)(6506007)(5660300002)(86362001)(8676002)(4744005)(36756003)(7416002)(8936002)(6486002)(6666004)(41300700001)(66946007)(66556008)(6916009)(66476007)(316002)(4326008)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kk4P/IN3GdIredgP/+i1tpnILIILqpZ6Mh/KlgavOcXthYi6/QXJWR4mvIal?=
+ =?us-ascii?Q?yIcj4Ln0ei6o5pciYeqadhQoAROwnmZ8zlZgVyPCf0pYpmBNCYMYrWMlgplt?=
+ =?us-ascii?Q?2qT/ZVqsl8KR9vrYREdTydnKXLf6jkjqveDHqDkoIKNc7LWGwBny/Kz2Xs8j?=
+ =?us-ascii?Q?+6wh0u9JmtkfczhjbDR1VIoK90Be1tqNx6HyPyTq5ECICKnyxOdo5GenIHah?=
+ =?us-ascii?Q?60avGziT7/0BjpO+dd7BAp516vef69qwa1dBcCJlct8eev4C4KzDjRkdH5/R?=
+ =?us-ascii?Q?dOe8YMmSiUeAEwrCgaK7QrGy35Ug5UJrUezFC7+coATGt3t5ymS6GeJyhHCM?=
+ =?us-ascii?Q?Wpjbfhu5d+TaUHF3YOkBIqET2coEGFEo3pkb7TTjNTWSJfxYIgN08uVw8Dax?=
+ =?us-ascii?Q?/BQp9vnibMgAtfgZ++qk6aLAGFeS5ZanwX/YaYEkWo6X7Iz8leSM0N1VGT9x?=
+ =?us-ascii?Q?NlDymtVSFuhbeopTBtwmZ1LpZHnKmY8BP//9YoGBbhlOo9tOklhTudrOeAJq?=
+ =?us-ascii?Q?GsS93H2QmAEvvt09gsDK8HDyAig1P72BKbHdx3TjCX5ky/p8jDQNElQK02J+?=
+ =?us-ascii?Q?fM30ApD3RUg4HKq+kJ5+7O9auw3kxCd3vcs72D0rYer5iI2AR3tT7v8d9rDb?=
+ =?us-ascii?Q?wjevMTv11dTptrXF6A9joZazxwwnpz9Gar+nXNvAJAqThVoKm/K7JjgbMoQX?=
+ =?us-ascii?Q?J9uPlFb4KZ/ILa9sgMhq0h9UHgqz5FSA8WH94ik4wG7VidmSrseXwxlJ03KJ?=
+ =?us-ascii?Q?PgVPqsf/utTb2iDKV2V18nu9k1ij7b+niVJHRjcTRw4NY5CjivppgqmGC86D?=
+ =?us-ascii?Q?v6H6TONBpJ+ibep4xrp6z+SoL55LpnZtwDmNkDVg0FCyyak7eFNPrtqijtmg?=
+ =?us-ascii?Q?1pN/XmgEPr8I10JNEtxGEYvtgUNQf2K3/xfaXT7cZJoCksYTexiYBgxGIEVz?=
+ =?us-ascii?Q?gUqEP7h3mYuFzGclSfc84HwCoW4AXBn/6lful91PszuJA+osJ/r5umHO+1tG?=
+ =?us-ascii?Q?ULHB4II70ilbjtuuYS3YhddYICp6k7Iy1Wzc0/JxVaJgp6Rurm+QK70dmta2?=
+ =?us-ascii?Q?PjNkbZcbaAojDiBClM7I56W/XjFhVZ8Y46XaRVokAJjxZam+dzwAC2neQVLu?=
+ =?us-ascii?Q?BVoTZXN9cHmKzqOXRe05Re+gDUXyvSSjRmYuzjQlP7SCTcPY6WLA+yRXQo8L?=
+ =?us-ascii?Q?mx2L/jFKpwYpbgdTWjPjRrD9a+Fo7pci9KXJEz7rHkSFQDW1PTODlUez0FTN?=
+ =?us-ascii?Q?y/t3p5lDbkRftp58aU69tuULaHQdgfJl10NOg+GBrit1uxzsziUWMJSvAsRQ?=
+ =?us-ascii?Q?gLE/4PzaXUaDBUdHpkb2PyaZum+PR2Z6D5Ya2NajYw5mJy+cdlf6DY5+NoXA?=
+ =?us-ascii?Q?PVALteBn4hLFbwcLF6g8HrHhNILTz8EDe3CfpeQR2cd1ruCeaM1iCz0qkcaK?=
+ =?us-ascii?Q?qeVWV2jrpW2aTN2W2YHaA4MhL6d977gBn1f4h7LCfSmo2ybsTjTGK9WWYfGR?=
+ =?us-ascii?Q?gApfDaE9qYORmFAyqj6Eezg/72k2tNP7kGBROA5Iqc+duqGMJyyMXbGJqANk?=
+ =?us-ascii?Q?6puS5rRKwn5U/CF5RtUwRsyC4sv6Bo4buKioQF98?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9802c1c2-1e4a-43ee-f71f-08db847d1870
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2023 15:15:02.1209
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t45ls7ntm5aq3FQr4o4fBdtAcl4iz2somt1Eb6J3jtANT4K0nBb1KPbKqZVonQLc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6342
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Jul 10, 2023 at 07:59:26PM -0700, Yi Liu wrote:
+> The IOMMU_CAP_CACHE_COHERENCY check only applies to the physical devices
+> that are IOMMU-backed. But it is now in the group code. If want to compile
+> vfio_group infrastructure out, this check needs to be moved out of the group
+> code.
+> 
+> Another reason for this change is to fail the device registration for the
+> physical devices that do not have IOMMU if the group code is not compiled
+> as the cdev interface does not support such devices.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c     | 10 ----------
+>  drivers/vfio/vfio_main.c | 11 +++++++++++
+>  2 files changed, 11 insertions(+), 10 deletions(-)
 
-On 7/14/23 12:10, Marc Zyngier wrote:
-> On Thu, 13 Jul 2023 16:53:40 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
->> Hey Eric,
->>
->> Thanks for looking into this, much appreciated given how tedious it
->> is.
-> FWIW, here are the changes I'm going to squash in that patch. Shout if
-> you spot something that looks odd...
->
-> Thanks,
->
-> 	M.
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index c4057f4ff72d..f5978b463aca 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -55,7 +55,8 @@ enum coarse_grain_trap_id {
->  	CGT_HCR_TERR,
->  	CGT_HCR_APK,
->  	CGT_HCR_NV,
-> -	CGT_HCR_NV1,
-> +	CGT_HCR_NV_nNV2,
-> +	CGT_HCR_NV1_nNV2,
->  	CGT_HCR_AT,
->  	CGT_HCR_FIEN,
->  	CGT_HCR_TID4,
-> @@ -89,7 +90,7 @@ enum coarse_grain_trap_id {
->  	CGT_HCR_TVM_TRVM,
->  	CGT_HCR_TPU_TICAB,
->  	CGT_HCR_TPU_TOCU,
-> -	CGT_HCR_NV1_ENSCXT,
-> +	CGT_HCR_NV1_nNV2_ENSCXT,
->  	CGT_MDCR_TPM_TPMCR,
->  	CGT_MDCR_TDE_TDA,
->  	CGT_MDCR_TDE_TDOSA,
-> @@ -154,7 +155,7 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.mask		= HCR_TSW,
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
-> -	[CGT_HCR_TPC] = {
-> +	[CGT_HCR_TPC] = { /* Also called TCPC when FEAT_DPB is implemented */
->  		.index		= HCR_EL2,
->  		.value		= HCR_TPC,
->  		.mask		= HCR_TPC,
-> @@ -176,7 +177,7 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.index		= HCR_EL2,
->  		.value		= HCR_TVM,
->  		.mask		= HCR_TVM,
-> -		.behaviour	= BEHAVE_FORWARD_ANY,
-> +		.behaviour	= BEHAVE_FORWARD_WRITE,
->  	},
->  	[CGT_HCR_TDZ] = {
->  		.index		= HCR_EL2,
-> @@ -209,12 +210,18 @@ static const struct trap_bits coarse_trap_bits[] = {
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
->  	[CGT_HCR_NV] = {
-> +		.index		= HCR_EL2,
-> +		.value		= HCR_NV,
-> +		.mask		= HCR_NV,
-> +		.behaviour	= BEHAVE_FORWARD_ANY,
-> +	},
-> +	[CGT_HCR_NV_nNV2] = {
->  		.index		= HCR_EL2,
->  		.value		= HCR_NV,
->  		.mask		= HCR_NV | HCR_NV2,
->  		.behaviour	= BEHAVE_FORWARD_ANY,
->  	},
-> -	[CGT_HCR_NV1] = {
-> +	[CGT_HCR_NV1_nNV2] = {
->  		.index		= HCR_EL2,
->  		.value		= HCR_NV | HCR_NV1,
->  		.mask		= HCR_NV | HCR_NV1 | HCR_NV2,
-> @@ -350,7 +357,7 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
->  	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
->  	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
->  	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
-> -	MCB(CGT_HCR_NV1_ENSCXT,		CGT_HCR_NV1, CGT_HCR_ENSCXT),
-> +	MCB(CGT_HCR_NV1_nNV2_ENSCXT,	CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
->  	MCB(CGT_MDCR_TPM_TPMCR,		CGT_MDCR_TPM, CGT_MDCR_TPMCR),
->  	MCB(CGT_MDCR_TDE_TDA,		CGT_MDCR_TDE, CGT_MDCR_TDA),
->  	MCB(CGT_MDCR_TDE_TDOSA,		CGT_MDCR_TDE, CGT_MDCR_TDOSA),
-> @@ -501,6 +508,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CVAP,		CGT_HCR_TPC),
-> +	SR_TRAP(SYS_DC_CVADP,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_IVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CIGVAC,		CGT_HCR_TPC),
->  	SR_TRAP(SYS_DC_CIGDVAC,		CGT_HCR_TPC),
-> @@ -625,7 +633,6 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
->  	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
->  		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
-> -	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),
->  	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),
->  	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),
->  	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),
-> @@ -698,10 +705,14 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS,	CGT_HCR_NV),
->  	SR_TRAP(OP_TLBI_RVAE2OSNXS,	CGT_HCR_NV),
->  	SR_TRAP(OP_TLBI_RVALE2OSNXS,	CGT_HCR_NV),
-> -	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1),
-> -	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1),
-> -	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1),
-> -	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_ENSCXT),
-> +	SR_TRAP(OP_CPP_RCTX, 		CGT_HCR_NV),
-> +	SR_TRAP(OP_DVP_RCTX, 		CGT_HCR_NV),
-> +	SR_TRAP(OP_CFP_RCTX, 		CGT_HCR_NV),
-> +	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV_nNV2),
-> +	SR_TRAP(SYS_VBAR_EL1,		CGT_HCR_NV1_nNV2),
-> +	SR_TRAP(SYS_ELR_EL1,		CGT_HCR_NV1_nNV2),
-> +	SR_TRAP(SYS_SPSR_EL1,		CGT_HCR_NV1_nNV2),
-> +	SR_TRAP(SYS_SCXTNUM_EL1,	CGT_HCR_NV1_nNV2_ENSCXT),
->  	SR_TRAP(SYS_SCXTNUM_EL0,	CGT_HCR_ENSCXT),
->  	SR_TRAP(OP_AT_S1E1R, 		CGT_HCR_AT),
->  	SR_TRAP(OP_AT_S1E1W, 		CGT_HCR_AT),
->
-Looks good to me. Feel free to add my
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Thanks
-
-Eric
-
+Jason
