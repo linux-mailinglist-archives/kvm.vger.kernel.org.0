@@ -2,107 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD99C753ED9
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 17:29:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06302753F89
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 18:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235986AbjGNP32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 11:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52166 "EHLO
+        id S235640AbjGNQJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 12:09:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235711AbjGNP31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 11:29:27 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 49E2C1BE3
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 08:29:26 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A3981570;
-        Fri, 14 Jul 2023 08:30:08 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A8563F740;
-        Fri, 14 Jul 2023 08:29:24 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        Suzuki.Poulose@arm.com, andre.przywara@arm.com, maz@kernel.org,
-        oliver.upton@linux.dev, jean-philippe.brucker@arm.com,
-        apatel@ventanamicro.com, kvm@vger.kernel.org
-Subject: [PATCH kvmtool] virtio-net: Don't print the compat warning for the default device
-Date:   Fri, 14 Jul 2023 16:29:09 +0100
-Message-ID: <20230714152909.31723-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.41.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S235274AbjGNQJm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 12:09:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E62635A6
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 09:09:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6CB8861D5E
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 16:09:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9F9C433C7;
+        Fri, 14 Jul 2023 16:09:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689350979;
+        bh=EUHHrFEC5avoJeQwK4fIb7NvmO3f3Kv10+EE0AQ8rm8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KeRQU3cCmTVOtRvjHnkuLnSeBVBN36QxKyrZzR25OsMB9ejoHOM9VHRwG15DwB/ia
+         TDphIbEBRsPTYFZOxY0Iz6DblAbg5zsoiV1Kd8YfuXFDV5NeXo+nG8Esk7DJ6C6nG2
+         ha/3RIathejiOeHlyBzKGtwH9vsobbhIOfcqMbAVL5sKS88dpv4g849zJWKYdEw0m+
+         9KjzmXrSNoTb3RM9zEem63mW+sXKu8uptnXJWvwefjsrfLq7IfkFOd1Pc1I9GWciOp
+         mLMcO0vQjMFwddoCwZ4xnrRpI9gD4u1sR6nWr0l4s5Ki+2Kv02/P5rdwjkv/99M0E5
+         fGkHymcs4h7hw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qKLMP-00D9iv-1C;
+        Fri, 14 Jul 2023 17:09:37 +0100
+Date:   Fri, 14 Jul 2023 17:09:36 +0100
+Message-ID: <86bkgev5j3.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
+In-Reply-To: <a69eda3e-d255-1eb4-c6d2-7ba02ba02468@redhat.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+        <20230712145810.3864793-7-maz@kernel.org>
+        <a69eda3e-d255-1eb4-c6d2-7ba02ba02468@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Compat messages are there to print a warning when the user creates a virtio
-device for the VM, but the guest doesn't initialize it.
+Hey Eric,
 
-This generally works great, except that kvmtool will always create a
-virtio-net device, even if the user hasn't specified one, which means that
-each time kvmtool loads a guest that doesn't probe the network interface,
-the user will get the compat warning. This can get particularly annoying
-when running kvm-unit-tests, which doesn't need to use a network interface,
-and the virtio-net warning is displayed after each test.
+On Fri, 14 Jul 2023 15:47:20 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 7/12/23 16:57, Marc Zyngier wrote:
+> > The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> > related registers. Add their encodings (and only that, because
+> > we really don't care about what these registers actually do at
+> > this stage).
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+> >  1 file changed, 78 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 76289339b43b..9dfd127be55a 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -194,6 +194,84 @@
+> >  #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)*
+> >  #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)*
+> >  
+> > +#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))*
+> > +#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)*
+> > +#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))*
+> > +#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)*
+> > +#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))*
+> > +#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)*
+> > +#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)*
+> > +
+> > +#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)*
+> > +#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)*
+> > +#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)*
+> > +
+> > +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> > +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> I cannot find this one - which is duplicated by the way - in DDI0487Jaa
 
-Let's fix this by skipping the compat message in the case of the
-automatically created virtio-net device. This lets kvmtool keep the compat
-warnings as they are, but removes the false positive.
+Ah, that's one of the sucker I got from peeking at the 2023-03 XML and
+wrote it twice for a good measure. You can see it there:
 
-Even if the user is relying on kvmtool creating the default virtio-net
-device, a missing network interface in the guest is very easy to
-discover.
+https://developer.arm.com/documentation/ddi0601/2023-03/AArch64-Registers/TRCITECR-EL1--Instrumentation-Trace-Control-Register--EL1-
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- virtio/net.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> > +#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))*
+> > +#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))*
+> > +#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)*
+> > +#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)*
+> > +#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)*
+> > +#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)*
+> > +#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)*
+> > +#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)*
+> > +#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)*
+> > +#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)*
+> > +#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)*
+> > +#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)*
+> > +#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)*
+> > +#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)*
+> > +#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)*
+> > +#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)*
+> > +#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)*
+> > +#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)*
+> > +#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)*
+> > +#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)*
+> > +#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)*
+> > +#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)*
+> > +#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)*
+> > +#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)*
+> > +#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)*
+> > +#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)*
+> > +#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)*
+> > +#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)*
+> > +#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)*
+> > +#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)*
+> > +#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)*
+> > +#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)*
+> > +#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)*
+> > +#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)*
+> > +#define SYS_TRCIMSPEC0			sys_reg(2, 1, 0, 0, 7)*
+> > +#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)*
+> > +#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
+> I cannot find this one in D18-1 or elsewhere in DDI0487Jaa
 
-diff --git a/virtio/net.c b/virtio/net.c
-index f09dd0a48b53..77f7c9a7a788 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -847,7 +847,7 @@ done:
- 	return 0;
- }
- 
--static int virtio_net__init_one(struct virtio_net_params *params)
-+static int virtio_net__init_one(struct virtio_net_params *params, bool suppress_compat)
- {
- 	enum virtio_trans trans = params->kvm->cfg.virtio_transport;
- 	struct net_dev *ndev;
-@@ -913,7 +913,7 @@ static int virtio_net__init_one(struct virtio_net_params *params)
- 	if (params->vhost)
- 		virtio_net__vhost_init(params->kvm, ndev);
- 
--	if (compat_id == -1)
-+	if (compat_id == -1 && !suppress_compat)
- 		compat_id = virtio_compat_add_message("virtio-net", "CONFIG_VIRTIO_NET");
- 
- 	return 0;
-@@ -925,7 +925,7 @@ int virtio_net__init(struct kvm *kvm)
- 
- 	for (i = 0; i < kvm->cfg.num_net_devices; i++) {
- 		kvm->cfg.net_params[i].kvm = kvm;
--		r = virtio_net__init_one(&kvm->cfg.net_params[i]);
-+		r = virtio_net__init_one(&kvm->cfg.net_params[i], false);
- 		if (r < 0)
- 			goto cleanup;
- 	}
-@@ -943,7 +943,7 @@ int virtio_net__init(struct kvm *kvm)
- 		str_to_mac(kvm->cfg.guest_mac, net_params.guest_mac);
- 		str_to_mac(kvm->cfg.host_mac, net_params.host_mac);
- 
--		r = virtio_net__init_one(&net_params);
-+		r = virtio_net__init_one(&net_params, true);
- 		if (r < 0)
- 			goto cleanup;
- 	}
+Same thing. You can find it here:
+
+https://developer.arm.com/documentation/ddi0601/2023-03/AArch64-Registers/TRCITEEDCR--Instrumentation-Trace-Extension-External-Debug-Control-Register
+
+> > +#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)*
+> > +#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)*
+> > +#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)*
+> > +#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))*
+> > +#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)*
+> > +#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)*
+> > +#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)*
+> > +#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)*
+> > +#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)*
+> > +#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)*
+> > +#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)*
+> > +#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)*
+> > +#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)*
+> > +#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)*
+> > +#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)*
+> > +#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)*
+> > +#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)*
+> > +#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)*
+> > +#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)*
+> > +#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)*
+> > +#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)*
+> > +#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)*
+> > +#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)*
+> > +
+> > +/* ETM */
+> > +#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+> not able to locate this one either. I see the bit of HDFGWTR_EL2 though
+
+This one lives in the ETM spec:
+
+https://documentation-service.arm.com/static/60017fbb3f22832ff1d6872b
+
+Page 7-342 has the register number, and the encoding is computed as
+per the formula in 4.3.6 "System instructions", page 4-169.
+
+Thanks,
+
+	M.
+
 -- 
-2.41.0
-
+Without deviation from the norm, progress is not possible.
