@@ -2,110 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB53D753459
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 09:54:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1504E753481
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 10:02:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235601AbjGNHwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 03:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45946 "EHLO
+        id S235579AbjGNICg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 04:02:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235568AbjGNHwI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 03:52:08 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58523588;
-        Fri, 14 Jul 2023 00:52:05 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        with ESMTP id S235160AbjGNICO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 04:02:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C359E44B9
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 00:59:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 83D7622163;
-        Fri, 14 Jul 2023 07:52:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1689321124; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fjE7evrec+6fTNNO2iEP5O884klzqzhDg9Mgv82xETg=;
-        b=Lh7vIr6ckxc/iABjsJgQyPX2+F649Ga1fLcw+t6ynF0XPltSHJcY7keOXADImMc/dbsXKp
-        xyUOTHFD9ZSU9WbwlNosGPDYqOHjdKPKebwbu8snAFn0N1/u3gpsb9A2fV2S9P5gnWwuAA
-        c11Id3xw4wVOPXXYVUeNCX9YszdHQ3s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1689321124;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fjE7evrec+6fTNNO2iEP5O884klzqzhDg9Mgv82xETg=;
-        b=QGMxHCNv2iIjqPsDqSpcZCEXodf5ZsEvU0z7mPx0TmyWW116Sni3xmSwhsAgfcnLkU6nOS
-        SUzZMqMdOAUlo3Bw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2D2A413A15;
-        Fri, 14 Jul 2023 07:52:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id sM0TCqT+sGQCQwAAMHmgww
-        (envelope-from <tzimmermann@suse.de>); Fri, 14 Jul 2023 07:52:04 +0000
-From:   Thomas Zimmermann <tzimmermann@suse.de>
-To:     deller@gmx.de, javierm@redhat.com
-Cc:     linux-sh@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-geode@lists.infradead.org, linux-nvidia@lists.surfsouth.com,
-        linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Miguel Ojeda <ojeda@kernel.org>
-Subject: [PATCH v3 18/18] fbdev: Document that framebuffer_alloc() returns zero'ed data
-Date:   Fri, 14 Jul 2023 09:49:44 +0200
-Message-ID: <20230714075155.5686-19-tzimmermann@suse.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230714075155.5686-1-tzimmermann@suse.de>
-References: <20230714075155.5686-1-tzimmermann@suse.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D247A61C58
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 07:59:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BFC5C433C8;
+        Fri, 14 Jul 2023 07:59:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689321566;
+        bh=ykyvyun0QCvrp/NA9j6tIx5hvxfqgpAg7c/Wn4DgfnI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=GOeAhK4TE2E5pCkK0sA8qRC//O3C3Euc/utS9CGGgiqTOZ96o4PycP+coECQkXtgO
+         MctEtgrh8D50FQ0BJ5VeCMfifGUEM8rVe23pD/gkpeerLbEuzqNOoDOgBMgXx1rxfk
+         t8lZZ+y4XdJIft7jXTNtfjSF5S00pqM3specTthA2KVkzNufzV6tb7j1IZ3bmcfVgz
+         uRQE5iiqfe7shdt1ZNZLDNwljXEmn2OvGM01zb56oKV+hrLn0UE2ZacZ+vvW7X7GfU
+         WXQYt3OsIexaXloitTiJ1EjVX/yqQANda9szUVWjyenzgbmBJC+6DHeEwxX3EddiXm
+         2QQLwTYHw2XVw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qKDhz-00D1Si-UW;
+        Fri, 14 Jul 2023 08:59:24 +0100
+Date:   Fri, 14 Jul 2023 08:59:23 +0100
+Message-ID: <86pm4uvs84.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     chenxiang <chenxiang66@hisilicon.com>
+Cc:     <oliver.upton@linux.dev>, <james.morse@arm.com>,
+        <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>
+Subject: Re: [PATCH v2] KVM: arm64: Fix the name of sys_reg_desc related to PMU
+In-Reply-To: <1689305920-170523-1-git-send-email-chenxiang66@hisilicon.com>
+References: <1689305920-170523-1-git-send-email-chenxiang66@hisilicon.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: chenxiang66@hisilicon.com, oliver.upton@linux.dev, james.morse@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linuxarm@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Most fbdev drivers depend on framebuffer_alloc() to initialize the
-allocated memory to 0. Document this guarantee.
+On Fri, 14 Jul 2023 04:38:40 +0100,
+chenxiang <chenxiang66@hisilicon.com> wrote:
+> 
+> From: Xiang Chen <chenxiang66@hisilicon.com>
+> 
+> For those PMU system registers defined in sys_reg_descs[], use macro
+> PMU_SYS_REG() / PMU_PMEVCNTR_EL0 / PMU_PMEVTYPER_EL0 to define them, and
+> later two macros call macro PMU_SYS_REG() actually.
+> Currently the input parameter of PMU_SYS_REG() is another macro which is
+> calculation formula of the value of system registers, so for example, if 
+> we want to "SYS_PMINTENSET_EL1" as the name of sys register, actually 
+> the name we get is as following:
+> (((3) << 19) | ((0) << 16) | ((9) << 12) | ((14) << 8) | ((1) << 5))
+> The name of system register is used in some tracepoints such as 
+> trace_kvm_sys_access(), if not set correctly, we need to analyze the
+> inaccurate name to get the exact name (which also is inconsistent with 
+> other system registers), and also the inaccurate name occupies more space.
+> 
+> To fix the issue, use the name as a input parameter of PMU_SYS_REG like
+> MTE_REG or EL2_REG.
+> 
+> Signed-off-by: Xiang Chen <chenxiang66@hisilicon.com>
 
-v3:
-	* slightly reword the sentence (Miguel)
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
-Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-Cc: Helge Deller <deller@gmx.de>
----
- drivers/video/fbdev/core/fb_info.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+	M.
 
-diff --git a/drivers/video/fbdev/core/fb_info.c b/drivers/video/fbdev/core/fb_info.c
-index 8bdbefdd4b70..4847ebe50d7d 100644
---- a/drivers/video/fbdev/core/fb_info.c
-+++ b/drivers/video/fbdev/core/fb_info.c
-@@ -13,7 +13,8 @@
-  *
-  * Creates a new frame buffer info structure. Also reserves @size bytes
-  * for driver private data (info->par). info->par (if any) will be
-- * aligned to sizeof(long).
-+ * aligned to sizeof(long). The new instances of struct fb_info and
-+ * the driver private data are both cleared to zero.
-  *
-  * Returns the new structure, or NULL if an error occurred.
-  *
 -- 
-2.41.0
-
+Without deviation from the norm, progress is not possible.
