@@ -2,343 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52E45753B77
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 15:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42502753BE4
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 15:37:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235252AbjGNNGM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 09:06:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58586 "EHLO
+        id S235717AbjGNNhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 09:37:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231362AbjGNNGL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 09:06:11 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD08730CA;
-        Fri, 14 Jul 2023 06:06:09 -0700 (PDT)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36ECwupe004785;
-        Fri, 14 Jul 2023 13:05:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=A1ay7Piws9ZMbO7U6oOQ44F1An/UsNr5LHosM87Fibw=;
- b=fnANVVQl6uWYMHpZMvlBxIhWRDBb9ZbE4HNKxYyGa1j8RpnD+CftNF7DI0tnkz3RRGri
- 3bN//pfcktLVktUjJa8WyIO7ZcO7UbVcqhEVjjpHykrYeYl53qWlYiAAN7Oub5rBaLzL
- 2ArRCPZ/wn1jLG+seaAW3gWqbSRTvxeJQDnKrpLqF6spsDg14gGBUYHPkidfKhiUkB5t
- UlMoRaNigmKFXKu0zq/8OdtK0ZL89S1YiQCSFFZfD5hPE/emz2cVjwpinJqiLqY/pLJz
- +FY9kW0tLJ+gDn6MnSbdjiA3sdZ38tQUCNF5jV9OljW0iywdvPHjARL3qXbt2aCv5d2S 7w== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rtpth1fh8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jul 2023 13:05:37 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 36ECXsOe039252;
-        Fri, 14 Jul 2023 13:05:37 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2106.outbound.protection.outlook.com [104.47.58.106])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3rtpvxv6a4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Jul 2023 13:05:36 +0000
+        with ESMTP id S235219AbjGNNhB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 09:37:01 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2086.outbound.protection.outlook.com [40.107.237.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FEB4AA;
+        Fri, 14 Jul 2023 06:37:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dCwaBtr44JyIwtU4Mymbg1jDYuDSntt+tuZLWkz9ZQuJaJ1RheSOEU2o5CAiRl9RY1Fb5iuH7llLVvp/pzTJJBqzIf37S6JoH9b+Rp/ok2KlV7OAMKGfWAxZWO9Inutk1z6kDX5ereSNZkc0i9xe5X4YYMWV5nrb/CTo2qzyXHxKygjLpWZ4g2RzzqQisN5Bp2FjkJ37uG4pz48se8AK8QcffVqAWdTrFbRhmr5HhKOT01SQ+4j52Qr9mcclpy22IQJxcw/aCuMQV+gXt1+6nNpU0isB6gD2K4HL9q4G6RsSBAw+dTvr9FqT+J4+MX7cmhfIqQpKXVMm0qE7NVKW7w==
+ b=THf2kyFg4x4YSSrWUSPUkEhpDZ3l+8wo4nhSStJ34CTqGYG0ywqKVdyMXHQP/GdArm/p2h0oYiv1lSdlWvSL5DGCKhP4FpXZbist/k5ZId+tGbhQzO+ZeP64yHnh7Zo0mwGJeCZBamQLQk/6FYc5aaFs5/qdysj1XmNtnrd66QuxLfQbx1hHdFDqd/2V2npMoTCvzAmRkJkIUjk2EFeSWMAcu/2UhvqqrDfbkpzRHtfynkcfDFOti+dPKnFDX8pa67a7t/siecYesOtWMMBEpawgoM5K7+EeYuLPw40IntSmNi/4P5XHle+s+t8GI+sxUPmsF4XCAg/cY5179zgWfQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A1ay7Piws9ZMbO7U6oOQ44F1An/UsNr5LHosM87Fibw=;
- b=H3SJKHHNZQ2mbapLf5FvmBu3bgc/rRA4yQ6ouTt5ni1cIN5/MQcJovXiVg2fpu9jJLqVAjnmhiJ4fvBCaJVu1GJ3ubwz7L/N2rYyK6K7eqKkHiqRcigmFyvvFLryp5kSkWaNvBUfmjUfNriPRIovSErah/xn6AiScJ/lTzuA/0IC+04Ppd3B+Rlk/f/AMcFM4YGXSq6SK/GtV9QwE9FMhyCxnhI9RcPxKIq1LX2kw8BySCxm2DoZfjrML+YulX+ym5ZNBt644vjm7l7O+En2Db7o/B+bJ5Zdpc307TKt4vSBR/hbZxeiN67f7i837FCRA5DOsZPGzbLODUiQ0noCUw==
+ bh=NTHIkmghNJUKzgjF6AnV911ZQ4AzK2cm4/OvyQXK6d4=;
+ b=QHMMElYfWnN8xU4NGvZcbmIKLqRfGU2/I5U8gp1+5SbfCp8AUmwi8UGEQ76i6p+OTcfLy9SNEejK6JDZebSbMOxRoRpeABoy+Y2qKgOs0U/7OvkKGqCt262kl49dodbOMlNJ3uUmrVSNUH0DO+2Q5WwMnkAF8nsyGcT2DG9PV8qc2jFy6TUn/2oVRAoWTcko0HQY+gkKNYetkgcgmKi0j0UxpHQMDHfetV3GKczf2xDrbWfLtuC7ILMEc6pdaS+/LRKEZSw9d2oZIKFiYHpXMf99wb2AQhMVEdGRQn9+lG5wtjMelXj8K31AXHmoDiMGsIAcY+T8P1Fo+PscW6WPKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A1ay7Piws9ZMbO7U6oOQ44F1An/UsNr5LHosM87Fibw=;
- b=E4/tcpVyJKln37IHX5FmelYgM/zutoUevPEtyCQ4TSdOA98f9TC7uH9gNF0T9/tGhPPBDWX7c+7Hri+lGJ8rCBveW2OfozqbLjAbersyUGigEdbp4CSTex/boBkQ0iUNz2ptQjVEP7+iXnE6tDZPkmVpRUeZ3ZoWaPk2bEXJZkg=
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by PH7PR10MB6154.namprd10.prod.outlook.com (2603:10b6:510:1f5::15) with
+ bh=NTHIkmghNJUKzgjF6AnV911ZQ4AzK2cm4/OvyQXK6d4=;
+ b=Qqjset5OrM8IwEi03ZK8eofZvPeLre7v0qr0+GVUgRDi2w9Uuq8qDDvoH9HCw4ZnxIVhreyBc6Y5LSJiCKrcZ5r8ZDz0k9HFdH0qBVySNC6z6VoOn0TiXoq8EExjo8GojW9jxGDXYEcewBzjsty3ZJ5nTHM43QCC0ZDY7iq711LwBkFSITSGQJOl61+eGu2bSDA79q2lIMqOi+sCSoV4ecXJ3+OFFJqp8t6CUFIVjNWtgFIKF/vH8jxQdRnWfHbN1XaKXMSLCVBe66UQSB/a1Ll+QsSDkiCO/xK8H11CC1vvoNmXvLJkyu/vPF1ymnww+hDHY1qk2cwaTm4tYk5z2g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BL3PR12MB6450.namprd12.prod.outlook.com (2603:10b6:208:3b9::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Fri, 14 Jul
- 2023 13:05:34 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::6db1:c2a8:9ec4:4bbf]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::6db1:c2a8:9ec4:4bbf%4]) with mapi id 15.20.6588.028; Fri, 14 Jul 2023
- 13:05:34 +0000
-Message-ID: <bae58fd3-34b0-641a-a18b-010d48c792f0@oracle.com>
-Date:   Fri, 14 Jul 2023 14:05:27 +0100
-Subject: Re: [PATCH] KVM: SVM: Update destination when updating pi irte
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        "dengqiao.joey" <dengqiao.joey@bytedance.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-References: <3d05fcf1-dad3-826e-03e9-599ced7524b4@oracle.com>
- <20230518035806.938517-1-dengqiao.joey@bytedance.com>
- <2f6210acca81090146bc1decf61996aae2a0bfcf.camel@redhat.com>
- <36295675-2139-266d-4b07-9e029ac88fef@oracle.com>
- <ZJ4HJhQytonABUMl@google.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <ZJ4HJhQytonABUMl@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0561.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:33b::10) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+ 2023 13:36:58 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::69c1:5d87:c73c:cc55]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::69c1:5d87:c73c:cc55%4]) with mapi id 15.20.6565.028; Fri, 14 Jul 2023
+ 13:36:58 +0000
+Date:   Fri, 14 Jul 2023 10:36:55 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: Re: [PATCH v9 09/10] vfio/pci: Copy hot-reset device info to
+ userspace in the devices loop
+Message-ID: <ZLFPd2coVKPcI05G@nvidia.com>
+References: <20230711023126.5531-1-yi.l.liu@intel.com>
+ <20230711023126.5531-10-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711023126.5531-10-yi.l.liu@intel.com>
+X-ClientProxiedBy: SJ0PR03CA0050.namprd03.prod.outlook.com
+ (2603:10b6:a03:33e::25) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BLAPR10MB4835:EE_|PH7PR10MB6154:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c5e0770-0bc7-4f6d-0f7e-08db846b02a0
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL3PR12MB6450:EE_
+X-MS-Office365-Filtering-Correlation-Id: 00c9ee18-a60a-4a33-f74e-08db846f657b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: apdl6lE3I6sG+PUoxPubmxZMZ8zxR+SfNqE9TJmmpJPkRswSgVy7FZ5g6lY4yamOSAGUJMeE8uB2vrfxboZOuPnllX733MTeJD6ILw2E3o7DTTzgws0HCfbsTNIxCv2VPo8JoYVWGoPxQNYV4/TScbJK6+9+8Bi/orYIjbdS9FizHtMiScSP7PHtcLtatvJx/O3nIMhDjXke9yTidZq/jCiLLMK5tMdZvxf7a5OCqicz5mS2pWLdZBLjLRGbO1nTJ/L+nDrNjGLN8+cdlxiqOP3L/WnbSqBFlivEMJu0Skcca6L6jmK5BsL+TxuiEuR4TFavQD+7Pvrj9ivsjdpyy6+JEkjquM5gyBuIIePv+EDLmcqiES4h+jktvsJKEM9DHRrKxd6f9pWDWRV/ttJVP7EcfFKYsAjMfjits2tU47lVhla4yKm9eDIWKRAVux0sIWJ0DSenMc3d6UuyVHjrEq89jbom/DE1QXA8CkERfs7pKsaorTirOt0092T3sO3xMw2k5zJcY4SG0VCsEhsRMcQcmyYSrDsizXQ95PQ37KvR/Y1Ic1/k8zz/Bxfy5ucklE3AuPY9491kHXy96jkdk4UaWyHdUQ9A65RwphcLiskdqFqbTjC2N6hIbHVNusB9
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(376002)(366004)(136003)(346002)(451199021)(6512007)(6486002)(6666004)(83380400001)(186003)(2616005)(36756003)(38100700002)(31696002)(86362001)(26005)(53546011)(6506007)(66556008)(66476007)(4326008)(66946007)(54906003)(41300700001)(6916009)(15650500001)(5660300002)(31686004)(316002)(8936002)(8676002)(2906002)(478600001)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ViqBFCxueFEf/YOj3S3U8w+wRRxHcsZ/2N78ATNjvS8n8WSS6wmI5zIpMkIVAGFJeAPZcMBe0UI7JmoN8ekuAsL2EHrLUnh5pxoBlOO9DYTYdfsJ6ph2e6HejokOWIJdspc6WNEKut2xBm2NJ0Q58Dh7Cgbw3O/yytFO/ad66GV5DYx9o3tQLDR+vl/d5YJBdA/twcWIh2rK3tJiTjNaNWP82tnvRuAlyfj8lulrYTEhTf65j6PKgM5IDjvyYxqxXZqWBqy3VOz/dlxqZIaE/vS1lVHtmU9rMBYi6fwLqgYDQLroAZrXf0RrDkzOHMOEsDPE0AVL9gaCfLzctDlp1nBB3JHErbJzbdqu521QdhOq10U0x4NFac29245UWG8cR2OnH8pOsOHoHIfWeKpvmzynsPVguG8+BKV5jo9MlyOcvs6FDW5Se1VeI4S8Q6VrEU6SwaeUDGOng7NmB8At1vHYLTL1sXwUgbq3WNitt17xcZnLDdjB10BhSJ1MZcvZpUrY+lbAjdNAJGv3t4rGHsa6rxwPFbNDOhXQgFy3oHtBAVrkmD4X6smkbAS0ASDP
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(366004)(39860400002)(346002)(451199021)(478600001)(6486002)(6666004)(186003)(6506007)(26005)(6512007)(2906002)(316002)(41300700001)(66946007)(66556008)(66476007)(4326008)(6916009)(5660300002)(7416002)(8936002)(8676002)(38100700002)(86362001)(36756003)(2616005)(83380400001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OUJKMzl1S2ZXUlhBWXpWT0FtWnV6ZkNOb3BIUEVocDdpWGVCR2hpbmUzWXJG?=
- =?utf-8?B?Z2FwQjFYa0xmN2hvckg2c21ieGhuRmhudlRwZEZHb0lvU092RHR1RmZwZS82?=
- =?utf-8?B?dEdLejB0akRSMERxc2V1dXpNanZUakJKNjZXNElMMGpHNFdENnZORjRkSHQw?=
- =?utf-8?B?RkgvWGduczVUWGJNZVkxU1NCeWlNSXYzN2MvS2xYbkUzK2lvdU1Mckx4WG1y?=
- =?utf-8?B?VW94aUtUZlVWQm12ZzFUUVF3b2FkWjBLYitTOGNTRDhFb2d6c1FTMWdPUXFW?=
- =?utf-8?B?YXNHSDg5ZGpZOWZxczYzSzdjZWdFTW90MURZSWw4ZkRQREIwSmdnelZWVkth?=
- =?utf-8?B?RlNnaE9nYStJMmx1dUFyL2k4cXRENFV0emxmNEJNcm9sUW5HbWhEMmNwRVVT?=
- =?utf-8?B?NFl3SnpmQXVCZVAyQzFZTWI0Z3lING4xUis3YitZUVNSQnN0N0xWRTJ0b214?=
- =?utf-8?B?a0Y5UmFNdDZ1OEtWWm1oQ0VjSzFJSlR5c2VENmpwK051cHBqWmNqUjVJVzBk?=
- =?utf-8?B?RUVvd2VEVFRDTHEwZ3pPZWsvQmxaQ0JRUm9LS1RReURvVDFQK3JHTlF2MkZM?=
- =?utf-8?B?R1RDWUlMcUxZUlM4dy9NejJjK0oxWEJRRkdPVjhDLzEvamhCeDhZWDA4R3Mz?=
- =?utf-8?B?Y0lhb2hrdjJlOFlwWGU2MmZjUTJlU3Y5eDFVL2RZa3BIR0NTWjJvcmxXVFp0?=
- =?utf-8?B?aEhDa2JYcDdJeFB5R3YzWEEwTUkveUtjOTczNFpmWmlXSzlaVkcvcGYyRVR3?=
- =?utf-8?B?WXprK0kybjRQcmV6dzkxbGtTWHNlZDRsK0lIb3R0M284SGhzYm1PcnZZd3pS?=
- =?utf-8?B?SDdyVVE5VUtyUnRiL3YxSEJ3d2hya205aDlNUTNuV3AxYmhubm5wZGZwUlR3?=
- =?utf-8?B?RmdDYjlja2g2QUsxeW8xN0RIaEJrdTZzTWREQ3M4SVhWVnBjUUYwRHhwQW02?=
- =?utf-8?B?ZzBxaGNRRklZU3hZMTBNUXJKejN5OCszdFBFeDVWendnSGJkbGZMU2ZpUG9p?=
- =?utf-8?B?clY4RjJDT2pmc2lWK2tsRG84eFJHYWluMnFQOHNiWkNrSUNob0lOVzRFZ3JO?=
- =?utf-8?B?YmtNb0xlaDNwbnJYYU1IL2Jjby80WmpPaE1qbE9wa0FpZjFVdlg0bHFMTHFV?=
- =?utf-8?B?ZzN1OTNBek9YN3NjQVdNNXRSLzByQ3RtSTB5cEVPcnA0Ui96YXJuUGNBZzBp?=
- =?utf-8?B?NmxMVTJndzBRaDRxNjRqbmEyVFZMcjlYRTZhVjR0UWREcFJmTVlYMEhHNVRB?=
- =?utf-8?B?TWpVWVJKV09IbzVRaFVmcXNzaGYybHF0d3g0cytUU09GRVNSTEJ5OC8zcGdL?=
- =?utf-8?B?WDNkSmxyemxKMVprRk04VmZVenZUam4vbEpSY3BDSHhJOG4yZHRhT1dNYXhT?=
- =?utf-8?B?M090RDN4aXJBT1VlYnRGam9NWDFicUw0SENOUWF1dXg1MDZtZDNUSTVySWI4?=
- =?utf-8?B?dG1DT1F4azhJVGlucm1MY1B6cUhWS3ZxbStINUxsRWdrQzBYV21XbVBNbzk1?=
- =?utf-8?B?TzU0c0lRbG16dFl3VnpjYXQwR3lsUlJYd1ZzUVBnak9qVDZybUV5MnJleVps?=
- =?utf-8?B?NXFucm9KZzIxYTVDODJ4U0JPTHhuenFUeHlsNXlqWHRvbUg5VWwyOWJ1QkRs?=
- =?utf-8?B?WUwzVjRITGFRanhDMGxEa2x3a2FyWGFlM29iTE52TE1yN3RpeTQvbCtkdmxo?=
- =?utf-8?B?UmhIVXMvR3dEVXB6NGVnZWV5cENZQlJGZG5zbzMyYXRPdjdsRks5WGJkR21v?=
- =?utf-8?B?a1l0SmdDRHMrMWg1R1pXWUpPNklrbURCb2FQaldjdnlCN2hNdS95SDBhcmd0?=
- =?utf-8?B?cmd4VkVOQW9VSW5YeFRTcXVTWHp0NkpNaENiUFE2cFN4cWltRDdtOSs5U2VQ?=
- =?utf-8?B?QnFpMnBRbjFhVFpRWjVpMkx5M0hEVk9aeGJOdGExMmoyMFkzT0lpQWMyeUZD?=
- =?utf-8?B?TDRBQVFSK3V6UUFKWkF1SWFBMWR5aTZjUXROSjRrYU5Sdi9wcjQ0QS90Rnd3?=
- =?utf-8?B?MEFId05zRjFwWVZlc3ZpSnlSSWhUMXhERFUwZklpbmZnVDhJeGw5cERVM24y?=
- =?utf-8?B?YSt3V2tGMWliWGdvamhDY1VOQ2ZYQmJyU1FXQVpBc0d1ZmVma3pMU0RORHJz?=
- =?utf-8?B?VzI4c0VEeWx4RmN3U1ZpU21RY3UzbnpzYU8wZitrQ2lGM1JkMUlTeENvMXNh?=
- =?utf-8?B?R3c9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: Z/oDw1vi2BthZc3cOgIp8h1GPWSHVFD331SQS08i+w6WGOdn1BfxqQNOFVYnccFVGpazjiCzkgoGEyaAl+61bkQFCb36kzwpDP3ofUYjdwv+xXHc8RdugNmgw0Hoz1o9J4KVdyBkr1bDN3EpHWv5suyf9opHpsMCnhMXN+xvQDNTKmuy3dW0oExJCJrtrlIdg0BRZLK3/FUsJO/hYbgZoD6GPY4mf12OPOtjQT+KNU1iGqDQxjzVjFJ5DeiK/02kQbcZm+bEKjuKclunhi1k9GokLD4dK+HPQbHYNuhpEH/JNY/lZg6JZNiJmvWGUA9VDWwJQuTFAbg+DFDsZ0dHqviZVlQ+ZxVd59ZK/yLK73dxR0fBByS6rAZgg5AaIrukStX56cbJG4/NEdT88n15mvJKlGqpmMpJ9VAwNvaE6v4yQElxJOY2x3mT+US4o7ejGz2TYioGpnOxpOA6X4EbDrRdqQmbiWfVH1huXWqITHqO+UNvv4a7twzFihgKl3nJinRBXCNmmMSuj29KlRv8aqmL+0vZ8QYooP+/dBDE8BPA8G/aIbBWx88ppM0DMCHTurV8I9MGMt6sbsDlRgBi4ZfQ2VHGU58B5wlVPxGL0pnB5BW9BCCCCoFZDrYxfIf16Y8mrn9SEZqRacePfQe3B/8iK7tJzQJqHwhrkgTbSOe+d92+Q+waGn/KsVXbxcWEe4AYbh4x0hbOCyM8RBgBALX5QCEltplKpGu96RB2qqGwCFLk54dYvJfmpDXRmfENPJDWbryG7GuaftrNFWEkXaGB6GgtkGX2QzDX8gRsLgxyWPKMnT9ROeot6a9vVGH03eajr/gaU2uBVeeEp3rv+iKp3cXGHKyaCzpRHgj0cy9JI79QgFD5a0vIvU4J2cJh
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c5e0770-0bc7-4f6d-0f7e-08db846b02a0
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PSQJIavSu/SaUTctSNjFv2xAflYpkyOhw2T7qxm5wLzMAGsiK0oss58Yw+b9?=
+ =?us-ascii?Q?OTY9nyy8xHGsYlp7iBbyADd4jL3Al2jfjSARqHbyaawr+e5siMfFv5X03G+c?=
+ =?us-ascii?Q?bzgB8RoVLFv4OrsaMY1eOVIIWX6yD9louMD75DFsB4TMPWGvY//nsk/UTlII?=
+ =?us-ascii?Q?yyzA4nfqiU9x9thBfNbthQH9jjiVEtwU4cnHrCn76Gc+jBDO2AW0R04Glv7N?=
+ =?us-ascii?Q?1YUWKtQ/Hifh3sVkkr9SAuUtlOsG4pY5MfNZZjzvn6BojUtVXKFBMZgwTxvb?=
+ =?us-ascii?Q?FsWv85sJ0//r2qYQONcDTElaGM1Jy3a3xPjKJJe3HtW0P0Nc8UphkErRtqif?=
+ =?us-ascii?Q?MaPZ/HcJy9hkCDl6OPy+DAZlXP68d/9gTvkg2IRsJamFEGuqtJW/vNo5iB0h?=
+ =?us-ascii?Q?lOC9Ehj8DsfOyr5UZUx6zSmpio9jiFrFjrEm3a6vIuysBELlJ0pcKNN3WK1b?=
+ =?us-ascii?Q?kDZZyiuOW/Gl1Olsp7onQGqpB7lLfNUxSkOmARHNz13F4Xho/uTJzwH0zsrg?=
+ =?us-ascii?Q?luuoLnVBuThGn74uXWwQ2QSLDENMHTw9E9NIN1830Ka6UDkRXvTf8Zq7duBN?=
+ =?us-ascii?Q?0a4fQRS6hn9xEtMIhDH2IbC6wA8WM3JKTqi6qY97ACYAnADpMbH+qIVCyql6?=
+ =?us-ascii?Q?YfLLOfM08QwRJF6XYblOl48PEO5QGYNd0Q0T8BWa8/3+hBrsBmNdd1iuRIrW?=
+ =?us-ascii?Q?wbOdUlNvkbOep+Hk4MZH4T5/ySt22g93faqzonf0to62G/rI68sDgPJkGL0K?=
+ =?us-ascii?Q?L61ivSmOZ7W4ubM6XH6TbOGKvgoghEgqLCJAt+GvPsYy3WbeHWqHaeW0bgVI?=
+ =?us-ascii?Q?QlzpU8PEhGv4g1SwNjzdItFYVi+Xv6LaVtPuahNDaR+7WDxem3HV5HBjyt0r?=
+ =?us-ascii?Q?NnMw3uCxfo3Pr9K257J/ht0Z6p4p5A3lh9D43MRWe1qfPRfbMuuZ0ZCk+2ZJ?=
+ =?us-ascii?Q?x1w90umTH7zVysSH7RkZexrVBi4gV4x8saqe/2YVTGywAkhnVAHE5Ga3d5xc?=
+ =?us-ascii?Q?x/8PUylXYi/i8vrN8AhD+tK6lSGG5ai6Q7KrMko6u3UOn7tLKKOqK6ITN2D/?=
+ =?us-ascii?Q?TCi1nA/BqXR/2DbCekN014WlfSh9isRLejkE2B7A8rnfbGo7NhvKmFK/tB9Y?=
+ =?us-ascii?Q?GIE5so6TsU1fxxISy188CCfALnZnx6CbzCteB0e4VS7txGrjavLSPkxEmf0l?=
+ =?us-ascii?Q?+GDLDAQk49lombnKmKDx9r/pasKSrP48Y1NDpDUeM2zk0soB4gD8J/02I+cp?=
+ =?us-ascii?Q?9kI8cXkmiB0WaG9Ga6aeTT4jxKZMfm8ABOa9DWHNt+PpUyTPCOq9VpaOvwBi?=
+ =?us-ascii?Q?Nci8lmZ6t4AveqtUvUXNvIzAkZOy/rCrzT40Ny2MpkhNUxStwG1U3u4N4wuO?=
+ =?us-ascii?Q?FnoWJ0z4ihmwabljJ8SRPahDjwhQMRE8zXRIrHjjHJM6+1PST7xfvFZWw9rF?=
+ =?us-ascii?Q?ujxDlUM/T0Wdsm96YnP5iXPfB/h0Y6wtAW3BKn2ppbAQjtca1AK3Vw7CdC98?=
+ =?us-ascii?Q?qHJn6AS1LWdii/fMNTxJBZKRuxBrZe8IGMpri2tGZUyeAM/23byTxKHWrfrJ?=
+ =?us-ascii?Q?jCG646GDnqVUqwLblwi0FsezAXLF5BP78ln6cM3E?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00c9ee18-a60a-4a33-f74e-08db846f657b
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2023 13:05:34.5529
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2023 13:36:58.4678
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qkwqJdA8UFumnmtF/zvKA/4gQR0tJNhR2aolYGAWYTgNS/cRCTNSwCHn7S07bh+8XpUgFbGBZdNgEPX+i+5z9Ke/N+vaMBeHk3n+SNKoz3E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6154
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-14_06,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
- mlxscore=0 spamscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2307140118
-X-Proofpoint-GUID: JvmuxwE0jRlfNpeigKNq0xmJpJ6Xhc7k
-X-Proofpoint-ORIG-GUID: JvmuxwE0jRlfNpeigKNq0xmJpJ6Xhc7k
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 76MTx2tGB5CxP9OrueEu85iRUzsxwZGEHxa3yB46hGFjyYh3vKq3YGoQhX9GvEFa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6450
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Suravee, +Alejandro
+On Mon, Jul 10, 2023 at 07:31:25PM -0700, Yi Liu wrote:
 
-On 29/06/2023 23:35, Sean Christopherson wrote:
-> On Thu, May 18, 2023, Joao Martins wrote:
->> On 18/05/2023 09:19, Maxim Levitsky wrote:
->>> I think that we do need to a flag indicating if the vCPU is currently
->>> running and if yes, then use svm->vcpu.cpu (or put -1 to it when it not
->>> running or something) (currently the vcpu->cpu remains set when vCPU is
->>> put)
->>>
->>> In other words if a vCPU is running, then avic_pi_update_irte should put
->>> correct pCPU number, and if it raced with vCPU put/load, then later should
->>> win and put the correct value.  This can be done either with a lock or
->>> barriers.
->>>
->> If this could be done, it could remove cost from other places and avoid this
->> little dance of the galog (and avoid its usage as it's not the greatest design
->> aspect of the IOMMU). We anyways already need to do IRT flushes in all these
->> things with regards to updating any piece of the IRTE, but we need some care
->> there two to avoid invalidating too much (which is just as expensive and per-VCPU).
-> 
-> ...
-> 
->> But still quite expensive (as many IPIs as vCPUs updated), but it works as
->> intended and guest will immediately see the right vcpu affinity. But I honestly
->> prefer going towards your suggestion (via vcpu.pcpu) if we can have some
->> insurance that vcpu.cpu is safe to use in pi_update_irte if protected against
->> preemption/blocking of the VCPU.
-> 
-> I think we have all the necessary info, and even a handy dandy spinlock to ensure
-> ordering.  Disclaimers: compile tested only, I know almost nothing about the IOMMU
-> side of things, and I don't know if I understood the needs for the !IsRunning cases.
-> 
-I was avoiding grabbing that lock, but now that I think about it it shouldn't do
-much harm.
-
-My only concern has mostly been whether we mark the IRQ isRunning=1 on a vcpu
-that is about to block as then the doorbell rang by the IOMMU won't do anything
-to the guest. But IIUC the physical ID cache read-once should cover that
-
-> Disclaimers aside, this should point the IOMMU at the right pCPU when the target
-> vCPU changes and the new vCPU is actively running.
-> 
-Yeap, it should. I am gonna see if we can test this next week (even if not me,
-but someone from my team)
-
-> ---
->  arch/x86/kvm/svm/avic.c | 44 +++++++++++++++++++++++++++++++++--------
->  1 file changed, 36 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index cfc8ab773025..703ad9af73eb 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -791,6 +791,7 @@ static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
->  	int ret = 0;
->  	unsigned long flags;
->  	struct amd_svm_iommu_ir *ir;
-> +	u64 entry;
+> @@ -1311,29 +1296,17 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+>  	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_fill_devs,
+>  					    &fill, slot);
+>  	mutex_unlock(&vdev->vdev.dev_set->lock);
+> +	if (ret)
+> +		return ret;
 >  
->  	/**
->  	 * In some cases, the existing irte is updated and re-set,
-> @@ -824,6 +825,18 @@ static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
->  	ir->data = pi->ir_data;
->  
->  	spin_lock_irqsave(&svm->ir_list_lock, flags);
-> +
-> +	/*
-> +	 * Update the target pCPU for IOMMU doorbells if the vCPU is running.
-> +	 * If the vCPU is NOT running, i.e. is blocking or scheduled out, KVM
-> +	 * will update the pCPU info when the vCPU awkened and/or scheduled in.
-> +	 * See also avic_vcpu_load().
-> +	 */
-> +	entry = READ_ONCE(*(svm->avic_physical_id_cache));
-> +	if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
-> +		amd_iommu_update_ga(entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK,
-> +				    true, pi->ir_data);
-> +
-
-Ah! Totally forgot about the ID cache from AVIC. And it's already paired with
-barriers Maxim was alluding to. Much better than trying to get a safe read of
-vcpu::cpu.
-
->  	list_add(&ir->node, &svm->ir_list);
->  	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
->  out:
-> @@ -986,10 +999,11 @@ static inline int
->  avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
->  {
->  	int ret = 0;
-> -	unsigned long flags;
->  	struct amd_svm_iommu_ir *ir;
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  
-> +	lockdep_assert_held(&svm->ir_list_lock);
-> +
->  	if (!kvm_arch_has_assigned_device(vcpu->kvm))
->  		return 0;
->  
-> @@ -997,19 +1011,15 @@ avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
->  	 * Here, we go through the per-vcpu ir_list to update all existing
->  	 * interrupt remapping table entry targeting this vcpu.
->  	 */
-> -	spin_lock_irqsave(&svm->ir_list_lock, flags);
+> -	/*
+> -	 * If a device was removed between counting and filling, we may come up
+> -	 * short of fill.max.  If a device was added, we'll have a return of
+> -	 * -EAGAIN above.
+> -	 */
+> -	if (!ret) {
+> -		hdr.count = fill.cur;
+> -		hdr.flags = fill.flags;
+> -	}
 > -
->  	if (list_empty(&svm->ir_list))
-> -		goto out;
-> +		return 0;
+> -reset_info_exit:
+> +	hdr.count = fill.count;
+> +	hdr.flags = fill.flags;
+>  	if (copy_to_user(arg, &hdr, minsz))
+> -		ret = -EFAULT;
+> -
+> -	if (!ret) {
+> -		if (copy_to_user(&arg->devices, devices,
+> -				 hdr.count * sizeof(*devices)))
+> -			ret = -EFAULT;
+> -	}
+> +		return -EFAULT;
 >  
->  	list_for_each_entry(ir, &svm->ir_list, node) {
->  		ret = amd_iommu_update_ga(cpu, r, ir->data);
->  		if (ret)
-> -			break;
-> +			return ret;
->  	}
-> -out:
-> -	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
+> -	kfree(devices);
 > -	return ret;
-> +	return 0;
->  }
->  
->  void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> @@ -1017,6 +1027,7 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	u64 entry;
->  	int h_physical_id = kvm_cpu_get_apicid(cpu);
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> +	unsigned long flags;
->  
->  	lockdep_assert_preemption_disabled();
->  
-> @@ -1033,6 +1044,15 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	if (kvm_vcpu_is_blocking(vcpu))
->  		return;
->  
-> +	/*
-> +	 * Grab the per-vCPU interrupt remapping lock even if the VM doesn't
-> +	 * _currently_ have assigned devices, as that can change.  Holding
-> +	 * ir_list_lock ensures that either svm_ir_list_add() will consume
-> +	 * up-to-date entry information, or that this task will wait until
-> +	 * svm_ir_list_add() completes to set the new target pCPU.
-> +	 */
-> +	spin_lock_irqsave(&svm->ir_list_lock, flags);
-> +
->  	entry = READ_ONCE(*(svm->avic_physical_id_cache));
->  	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
->  
-> @@ -1042,12 +1062,15 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  
->  	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
->  	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, true);
-> +
-> +	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
->  }
->  
->  void avic_vcpu_put(struct kvm_vcpu *vcpu)
->  {
->  	u64 entry;
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> +	unsigned long flags;
->  
->  	lockdep_assert_preemption_disabled();
->  
-> @@ -1057,10 +1080,15 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
->  	if (!(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK))
->  		return;
->  
-> +	spin_lock_irqsave(&svm->ir_list_lock, flags);
-> +
->  	avic_update_iommu_vcpu_affinity(vcpu, -1, 0);
->  
->  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
->  	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
-> +
-> +	spin_unlock_irqrestore(&svm->ir_list_lock, flags);
-> +
->  }
+> +	if (fill.count != fill.devices - arg->devices)
+> +		return -ENOSPC;
 
-Other than that, looks to be good. To some extent we are doing an update_ga()
-just like Dengqiao was doing, but with the right protection both from IR
-perspective and safe read of the VCPU cpu.
+This should be > right? The previous code returned ENOSPC only if
+their were more devices than requested, not less.
+
+Jason
