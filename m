@@ -2,129 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C4A23754501
-	for <lists+kvm@lfdr.de>; Sat, 15 Jul 2023 00:36:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81502754519
+	for <lists+kvm@lfdr.de>; Sat, 15 Jul 2023 00:45:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229796AbjGNWf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 18:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33304 "EHLO
+        id S229950AbjGNWpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 18:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbjGNWf6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 18:35:58 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 935132D75
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 15:35:53 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8b310553bso17333225ad.3
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 15:35:53 -0700 (PDT)
+        with ESMTP id S229879AbjGNWpp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 18:45:45 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2162C30FD;
+        Fri, 14 Jul 2023 15:45:44 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6687466137bso1683694b3a.0;
+        Fri, 14 Jul 2023 15:45:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689374153; x=1691966153;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AqPQXu/AIr+STPlGjrumZEqk7MLinV6fP6qlYwF+Hxk=;
-        b=Tt0V9A0qkpbl5zS0LESlEdwvp+4lS8swsnaM5ygU4p8wmWduWJsTsWiMBUrW9Vh2KL
-         aNiclCU+3JOXB1yiqIKXN6QgR9QdqoTo2RC11ivA+QpKq3HQpnI8PiDAYzg63A260iOT
-         /X8Zs4ITCCFalugl0jsN26LMWffPpuzQBP22vn8lpRSG+H4mTHf3+orEXOoeYZYdfyr2
-         abFsO9FDujBoCuI48/+aMdXB2jBUEMCB+wK+csXPETYbqUkpzTNRqr4u7awtDvgcPp5C
-         u2l7VKka+4qaqK2LwY7H9dgsRxhvzJ+xsqjkh1lzLWjpI9iGg9n1Apbc27ImlTO1X+KO
-         zawA==
+        d=gmail.com; s=20221208; t=1689374743; x=1691966743;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rt6PphGaSWp2+mm0gUhqAdDTRb1FCdl8+rMRxrEr5H4=;
+        b=qeXTqgmpFTwkVy7IzpfccXoIuiWbJ+4Kj3ma4pXJvymox8TVb4aGcn+KOlAktvNMpS
+         SS9fQggp18ftKGAA0c/s1oxcBq0AfhgzY4K/iWmz/cRpX7nEuOCBEbdS1RMUx0DEYGSD
+         f6EutV7cd4XrwJAY+oDY/oUyUQuPraGXdlBun1/8cHhX4JiHv9ijqzIcdevq08yfxZGh
+         9sFqq9A8F98lZ5hTCUXO17abPfcb5KMtfXvz2lOrV2UoUTgvJ9r4YKFImjDZgFOBsv2v
+         YoZ50gE8Acv1vQAWXPszif7967EejGuJBEbD4BTygV5435Lw+wHSpNjTSQ1uAHqY1Kf8
+         o+6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689374153; x=1691966153;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AqPQXu/AIr+STPlGjrumZEqk7MLinV6fP6qlYwF+Hxk=;
-        b=Gd5M+frJUJzUgz8oD7RMq9y/w6K636PPPQTnyLUr7d0oiMRhwDUj44umCJuJOBphwG
-         hXLMnpFX8GIAGScAYKdJBIOgkQXGe6+qcF1/ZQh1TA2M/qAggUK0HRVzcmA7npo8V9mt
-         cUGB5FBeZ8ONgZY47DYeSRiqAXZa1cNVUHidOUZcXmqlTs2Fgn9Y7Tw7Dz09fQmf+H8o
-         56Rm9in8odc+RPGViCtcDlfitJr0cSGjrhy8FchszrKG5HakxdejTVIRAZasjxezDB3q
-         YHd2f6DPEgGnqWHmRL6F3EJuyvEQCAefhqgB81ZzT7fppYTeHXGMq0tWy4XYT4Lkhmvm
-         VwYA==
-X-Gm-Message-State: ABy/qLbTgLL6OCscTllkArZAyprnzKtv2iDwosRcDnuzdRKpBylKTyLY
-        6ptdH+so0e/kk+JLFmSFFQPDmsxhtLs=
-X-Google-Smtp-Source: APBJJlF9Rovb1aladgpgZPHMCXoqG55aen/Zed897i+LVWocHvfN1RJ6IbmpkTUFw7J9N1WkMXgLw6ub6IY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b492:b0:1b9:e338:a90d with SMTP id
- y18-20020a170902b49200b001b9e338a90dmr17230plr.3.1689374153026; Fri, 14 Jul
- 2023 15:35:53 -0700 (PDT)
-Date:   Fri, 14 Jul 2023 22:35:51 +0000
-In-Reply-To: <20230714115715.000026fe.zhi.wang.linux@gmail.com>
-Mime-Version: 1.0
-References: <cover.1687991811.git.isaku.yamahata@intel.com>
- <358fb191b3690a5cbc2c985d3ffc67224df11cf3.1687991811.git.isaku.yamahata@intel.com>
- <ZLB0ytO7y4NOLWpL@google.com> <20230714115715.000026fe.zhi.wang.linux@gmail.com>
-Message-ID: <ZLHNx5jDjla2+4b0@google.com>
-Subject: Re: [RFC PATCH v3 08/11] KVM: Fix set_mem_attr ioctl when error case
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1689374743; x=1691966743;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Rt6PphGaSWp2+mm0gUhqAdDTRb1FCdl8+rMRxrEr5H4=;
+        b=U9pLRldbdX/8vu7SCOs4nv7Nv2hOcGvXQdjuN9Bcf5HKdQvG9vzzkaxsJpNCOpMcjN
+         QOXnSFG8+d96+Co9SSA/C0w4u9wTzTjcg5iFiC9y/cFFPmR3b5WUqpPUHQ4XpsHNJvvZ
+         9nVK1P67JKEb91Nren7/G0zH0JbgPUN1fb89cm/fz9pCWIvwhZlUp9hHeenJLAR5b5TV
+         p0RYTNDZJwrSrIt3xMwrwjgt1xBu5k4R01oOge7zjk7Y0VpO5wEVAkBgS+51INojYqGe
+         wF99xplWFAZHChg8weJKw7PkV4jGZk/Yt3q/psztRPnwbHFgqbVnxJ9mlhxsOKUNygE/
+         b/GA==
+X-Gm-Message-State: ABy/qLY6LjURe45Gg0OG0K3TL+AB22JGaU/UH5th1620gO6q923gjUHC
+        TfbrcPm1/6IKmoUQn2SY4RVUxiZ98+U=
+X-Google-Smtp-Source: APBJJlGknl8/FXvmcINYtf3ns7KY0s8LBYD4T+UAw9SqbCkDqRWjjWyk0G4jwTBF9omW5JwwTDt51w==
+X-Received: by 2002:a05:6a20:12cd:b0:133:5110:344c with SMTP id v13-20020a056a2012cd00b001335110344cmr5429857pzg.8.1689374742554;
+        Fri, 14 Jul 2023 15:45:42 -0700 (PDT)
+Received: from dtor-ws.mtv.corp.google.com ([2620:15c:9d:2:fe13:1555:c84f:8fa3])
+        by smtp.gmail.com with ESMTPSA id jm23-20020a17090304d700b001b9de2b905asm8246120plb.231.2023.07.14.15.45.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jul 2023 15:45:42 -0700 (PDT)
+From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Roxana Bradescu <roxabee@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 1/2] kvm/vfio: ensure kvg instance stays around in kvm_vfio_group_add()
+Date:   Fri, 14 Jul 2023 15:45:32 -0700
+Message-ID: <20230714224538.404793-1-dmitry.torokhov@gmail.com>
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 14, 2023, Zhi Wang wrote:
-> On Thu, 13 Jul 2023 15:03:54 -0700
-> Sean Christopherson <seanjc@google.com> wrote:
-> > +       /*
-> > +        * Reserve memory ahead of time to avoid having to deal with failures
-> > +        * partway through setting the new attributes.
-> > +        */
-> > +       for (i = start; i < end; i++) {
-> > +               r = xa_reserve(&kvm->mem_attr_array, i, GFP_KERNEL_ACCOUNT);
-> > +               if (r)
-> > +                       goto out_unlock;
-> > +       }
-> > +
-> >         KVM_MMU_LOCK(kvm);
-> >         kvm_mmu_invalidate_begin(kvm);
-> >         kvm_mmu_invalidate_range_add(kvm, start, end);
-> >         KVM_MMU_UNLOCK(kvm);
-> >  
-> >         for (i = start; i < end; i++) {
-> > -               if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> > -                                   GFP_KERNEL_ACCOUNT)))
-> > +               r = xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> > +                                   GFP_KERNEL_ACCOUNT));
-> > +               if (KVM_BUG_ON(r, kvm))
-> >                         break;
-> >         }
-> >
-> 
-> IIUC, If an error happenes here, we should bail out and call xa_release()?
-> Or the code below (which is not shown here) still changes the memory attrs
-> partially.
+kvm_vfio_group_add() creates kvg instance, links it to kv->group_list,
+and calls kvm_vfio_file_set_kvm() with kvg->file as an argument after
+dropping kv->lock. If we race group addition and deletion calls, kvg
+instance may get freed by the time we get around to calling
+kvm_vfio_file_set_kvm().
 
-I'm pretty sure we want to continue on.  The VM is dead (killed by KVM_BUG_ON()),
-so the attributes as seen by userspace and/or the VM don't matter.  What does
-matter is that KVM's internal state is consistent, e.g. that KVM doesn't have
-shared SPTEs while the attributes say a GFN is private.  That might not matter
-for teardown, but I can't think of any reason not to tidy up.
+Previous iterations of the code did not reference kvg->file outside of
+the critical section, but used a temporary variable. Still, they had
+similar problem of the file reference being owned by kvg structure and
+potential for kvm_vfio_group_del() dropping it before
+kvm_vfio_group_add() had a chance to complete.
 
-And there can also be other ioctls() in flight.  KVM_REQ_VM_DEAD ensures vCPU
-can't enter the guest, and vm->vm_dead ensures no new ioctls() cant start, but
-neither of those guarantees there aren't other tasks doing KVM things.
+Fix this by moving call to kvm_vfio_file_set_kvm() under the protection
+of kv->lock. We already call it while holding the same lock when vfio
+group is being deleted, so it should be safe here as well.
 
-Regardless, we definitely don't need to do xa_release().  The VM is dead and all
-its memory will be reclaimed soon enough.  And there's no guarantee xa_release()
-will actually be able to free anything, e.g. already processed entries won't be
-freed, nor will any entries that existed _before_ the ioctl() was invoked.  Not
-to mention that the xarray probably isn't consuming much memory, relatively
-speaking.  I.e. in the majority of scenarios, it's likely preferable to get out
-and destroy the VM asap.
+Fixes: 2fc1bec15883 ("kvm: set/clear kvm to/from vfio_group when group add/delete")
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+---
+
+v3: added Alex's reviewed-by
+
+v2: updated commit description with the correct "Fixes" tag (per Alex),
+    expanded commit description to mention issues with the earlier
+    implementation of kvm_vfio_group_add().
+
+ virt/kvm/vfio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index 9584eb57e0ed..cd46d7ef98d6 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -179,10 +179,10 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
+ 	list_add_tail(&kvg->node, &kv->group_list);
+ 
+ 	kvm_arch_start_assignment(dev->kvm);
++	kvm_vfio_file_set_kvm(kvg->file, dev->kvm);
+ 
+ 	mutex_unlock(&kv->lock);
+ 
+-	kvm_vfio_file_set_kvm(kvg->file, dev->kvm);
+ 	kvm_vfio_update_coherency(dev);
+ 
+ 	return 0;
+-- 
+2.41.0.255.g8b1d071c50-goog
+
