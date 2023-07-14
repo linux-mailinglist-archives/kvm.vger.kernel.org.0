@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A4297532F8
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 09:18:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AF007532FB
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 09:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235347AbjGNHSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 03:18:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55252 "EHLO
+        id S235398AbjGNHT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 03:19:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235348AbjGNHSf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 03:18:35 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CCF2D45;
-        Fri, 14 Jul 2023 00:18:33 -0700 (PDT)
+        with ESMTP id S235403AbjGNHTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 03:19:16 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9345B3C01;
+        Fri, 14 Jul 2023 00:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689319113; x=1720855113;
+  t=1689319140; x=1720855140;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=9Cr+l5teQ1mq0jHpBaqwW8YXlqIUC0zccTjsvm332ms=;
-  b=gLQQifvBnx/FOLCByzBelYmIrWesD5bJZw00LgINXc2Bw9OrlB3LZzCj
-   8326Cen8srYzmRQTzgdeqq0drlp1yKGuv9EgcG5+K6mxHnTon63b2tqbP
-   Y4RebUAqHUxfAy0AcE2DN9jvWzg9YuZn9tEJymiPwy36MJNWujzv2vVXp
-   Bd37RW8a3K+eyzqrk7lX/f+8oUTzCmkT2hQvJ7I5o/h8KV42g6Pila6I8
-   s02ZnYqHqWKgRGEuAheEKHVdqBEwrbP3X4H2UQqPYSHrAYOSoD4SnVW25
-   dFzmcFBjUOOP/00IDODfs0/TL/nGL6dVVruxXkN2+hb3+1ALxdxXpha5s
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="396222058"
+  bh=mQjyugDM9ae/+xsV/na3qkdiKTAXgzQ9oL683PGryPA=;
+  b=agEYkOCX/ojDMWCLjs+RukhYKku+B/Z4+erbNDbf5ilm1si4H9+5iDij
+   +Y1/DEN27kSmOG8V/6+Y6/dfgWXSkCGt2JKb5DIWT2Da/MEZgPtbEmoOR
+   T+0enAG2KN3SIkrYrdoIZocWW5zfbaSoVBoucnj/+MSNmytIrk8MazQnD
+   JAj1+QZFNdfc6pu7439ZLNe1dMD+SuJZuLdUa7OlvpKv9PYCMZ3fWD10B
+   lxT6tt/YGk5giYb/4ZEQ795WleUiOXZjYvkneavw7H1bW91ctVCfzLoNR
+   8j2cFBOFIYzMryY22NxThVhlKgOLf6M5dBXmh6fkoIr8Dey3TWYAt1d2Z
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="355349578"
 X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="396222058"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:18:33 -0700
+   d="scan'208";a="355349578"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:19:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="716244152"
+X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="757477345"
 X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="716244152"
+   d="scan'208";a="757477345"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:18:30 -0700
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:18:57 -0700
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, chao.gao@intel.com,
         kai.huang@intel.com, robert.hoo.linux@gmail.com,
         yuan.yao@linux.intel.com, Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v4 04/12] KVM: x86/mmu: Use KVM honors guest MTRRs helper when update mtrr
-Date:   Fri, 14 Jul 2023 14:51:56 +0800
-Message-Id: <20230714065156.20375-1-yan.y.zhao@intel.com>
+Subject: [PATCH v4 05/12] KVM: x86/mmu: zap KVM TDP when noncoherent DMA assignment starts/stops
+Date:   Fri, 14 Jul 2023 14:52:23 +0800
+Message-Id: <20230714065223.20432-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230714064656.20147-1-yan.y.zhao@intel.com>
 References: <20230714064656.20147-1-yan.y.zhao@intel.com>
@@ -60,31 +60,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When guest MTRRs are updated, zap SPTEs and do zap range calcluation if and
-only if KVM's MMU is honoring guest MTRRs, which is the only time that KVM
-incorporates the guest's MTRR type into the final memtype.
+Zap KVM TDP when noncoherent DMA assignment starts (noncoherent dma count
+transitions from 0 to 1) or stops (noncoherent dma count transistions
+from 1 to 0). Before the zap, test if guest MTRR is to be honored after
+the assignment starts or was honored before the assignment stops.
 
-Suggested-by: Chao Gao <chao.gao@intel.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Cc: Kai Huang <kai.huang@intel.com>
+When there's no noncoherent DMA device, EPT memory type is
+((MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT)
+
+When there're noncoherent DMA devices, EPT memory type needs to honor
+guest CR0.CD and MTRR settings.
+
+So, if noncoherent DMA count transitions between 0 and 1, EPT leaf entries
+need to be zapped to clear stale memory type.
+
+This issue might be hidden when the device is statically assigned with
+VFIO adding/removing MMIO regions of the noncoherent DMA devices for
+several times during guest boot, and current KVM MMU will call
+kvm_mmu_zap_all_fast() on the memslot removal.
+
+But if the device is hot-plugged, or if the guest has mmio_always_on for
+the device, the MMIO regions of it may only be added for once, then there's
+no path to do the EPT entries zapping to clear stale memory type.
+
+Therefore do the EPT zapping when noncoherent assignment starts/stops to
+ensure stale entries cleaned away.
+
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/kvm/mtrr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/x86.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mtrr.c b/arch/x86/kvm/mtrr.c
-index 3eb6e7f47e96..a67c28a56417 100644
---- a/arch/x86/kvm/mtrr.c
-+++ b/arch/x86/kvm/mtrr.c
-@@ -320,7 +320,7 @@ static void update_mtrr(struct kvm_vcpu *vcpu, u32 msr)
- 	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
- 	gfn_t start, end;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6693daeb5686..ac9548efa76f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -13164,15 +13164,31 @@ bool noinstr kvm_arch_has_assigned_device(struct kvm *kvm)
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_has_assigned_device);
  
--	if (!tdp_enabled || !kvm_arch_has_noncoherent_dma(vcpu->kvm))
-+	if (!kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
- 		return;
++static void kvm_noncoherent_dma_assignment_start_or_stop(struct kvm *kvm)
++{
++	/*
++	 * Non-coherent DMA assignement and de-assignment will affect
++	 * whether KVM honors guest MTRRs and cause changes in memtypes
++	 * in TDP.
++	 * So, specify the second parameter as true here to indicate
++	 * non-coherent DMAs are/were involved and TDP zap might be
++	 * necessary.
++	 */
++	if (__kvm_mmu_honors_guest_mtrrs(kvm, true))
++		kvm_zap_gfn_range(kvm, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
++}
++
+ void kvm_arch_register_noncoherent_dma(struct kvm *kvm)
+ {
+-	atomic_inc(&kvm->arch.noncoherent_dma_count);
++	if (atomic_inc_return(&kvm->arch.noncoherent_dma_count) == 1)
++		kvm_noncoherent_dma_assignment_start_or_stop(kvm);
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_register_noncoherent_dma);
  
- 	if (!mtrr_is_enabled(mtrr_state) && msr != MSR_MTRRdefType)
+ void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm)
+ {
+-	atomic_dec(&kvm->arch.noncoherent_dma_count);
++	if (!atomic_dec_return(&kvm->arch.noncoherent_dma_count))
++		kvm_noncoherent_dma_assignment_start_or_stop(kvm);
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_unregister_noncoherent_dma);
+ 
 -- 
 2.17.1
 
