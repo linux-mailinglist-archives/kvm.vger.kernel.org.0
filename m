@@ -2,150 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F0A6753E0D
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 16:50:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D08BC753E41
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 16:59:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235672AbjGNOux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 10:50:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57818 "EHLO
+        id S236236AbjGNO7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 10:59:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234562AbjGNOuw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 10:50:52 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on20616.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eab::616])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A372690;
-        Fri, 14 Jul 2023 07:50:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dDbkCIVKS9Rns21VAIKRP+9ZQfz29lP0qT2NoJa+qwEjYWlodyhoTrmLJXQtDGGQhVkSvlq5y+9ztjTi225gDIum02DaiEDx0ZqrYFwJi/mMrXzry1oHbsg4f94B1e+1il5UQtctc3QSy+Zg3UZvP4fVsx4pSdeVXTE+b7livxAVQYsIPABXBHDD63svK6RKFtG8f45vffNznAJfaqnvUXi4ac5c8co57Oc/wnYhnYdvGzyWp5FerpAmHR28R7M3RBygPlX8NZGErh/RgCjvu42ce7k5yHQrg11oON/hYR5jzkYEf1cEGAunnu3rF8z5LtJIIPhvlxDbvVoxEhUXzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=prbNiI7Nns1kor3nHupY3Zwn5oZQAXNVJBENfYeapkI=;
- b=Ouj6FQdvhTpcwlrLLLlyMbC/18nKMNPr2usk8osY2DB4rBgujMMcGOpyd9VrHcIbWUWfARKM5fPIVxHA/2Zz112QlIxcTmUx5ha8OaJbVhknajZFnNNRL1IPW0hu9tXGaoJ19tF8TdbmOEkpqzqt4sVOq8nzxp98PN58tomPLT8cXk2KXrET6z1ZaFwF1DDzx2HwOBT3kP71wRO1+Nj/PZ1qTD0ObwccHcJs3nQ9ZcnVqLlyXevElJObv7967ciDiqW8/Ugm9pnD5UrKGB/wQ/ZSbwyMZX9S4GFwS8l3TRul8JWnLVJDDfpI58OFH0IHOeFZ3OkidpU7vQy7VPrrkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=prbNiI7Nns1kor3nHupY3Zwn5oZQAXNVJBENfYeapkI=;
- b=gO8QRVNm5121LlQjjTa6RrkolofpMcnule5ZWoNUEUMUUyxDwd9osxurLBoq817EvSBIBolP/xHTTXAIs/BQNvkN631J/bPmq5sTj31X77DhC0luqC7gV+0RuK5XlpQQlEcDFXv4YQPp0b1SWLZckKeYaxBq+C6IJtrUngaX68O52dHoRus0nCVyp0uv+SpIE/04p/hlQGTGvMUM4VKEnW77E2MZ4UuAXj/VmDmMb8GduUhaoqG1l6MkvD14BWMIh7DXYJKGVGwnW4ZXLUUvJiIwLmWHgGMDiQALEUielaJmrw+Mdm73IVCIy8hUcOslgbX5IX51Ac9onsPPlXMyjg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB9127.namprd12.prod.outlook.com (2603:10b6:510:2f6::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.27; Fri, 14 Jul
- 2023 14:50:48 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::69c1:5d87:c73c:cc55]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::69c1:5d87:c73c:cc55%4]) with mapi id 15.20.6565.028; Fri, 14 Jul 2023
- 14:50:48 +0000
-Date:   Fri, 14 Jul 2023 11:50:45 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com, joro@8bytes.org,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
-        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
-        clegoate@redhat.com
-Subject: Re: [PATCH v14 23/26] vfio: Add VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT
-Message-ID: <ZLFgxXcPWUO2ftig@nvidia.com>
-References: <20230711025928.6438-1-yi.l.liu@intel.com>
- <20230711025928.6438-24-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711025928.6438-24-yi.l.liu@intel.com>
-X-ClientProxiedBy: SJ0PR05CA0197.namprd05.prod.outlook.com
- (2603:10b6:a03:330::22) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229943AbjGNO7j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 10:59:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCB21991
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 07:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689346740;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OzXAukTZdGWnOTB/+GT4ZdL7CULxJGloPmAknPVgqfk=;
+        b=WJ+KdhYk4FuFnpDMuaaqVI8VClfN6TGv7pZTJ+50KpD5+1EZ/cwvBRkOItJchPlhIk8LP8
+        gGUgh5ZMcpXBNUa0vFey7HpWz0H+fiO2mwN7lsRHWpNjAu6hXLhP49mA53suthj3qu5QUp
+        1Fq0Kn3drUBEqWTijTSSEuMDg0oNhB8=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-438-Lff3yRDAM0yF49vIEAJYJQ-1; Fri, 14 Jul 2023 10:58:58 -0400
+X-MC-Unique: Lff3yRDAM0yF49vIEAJYJQ-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-44361cc4b9aso355623137.0
+        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 07:58:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689346738; x=1689951538;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OzXAukTZdGWnOTB/+GT4ZdL7CULxJGloPmAknPVgqfk=;
+        b=MOlrJ/g2cAni9weE+bCYKtzWMWg8pQRB26u9ADQM87qYqWvMegjOxyb5Odp6+NBHkR
+         OMxt8N1b4pSncZJHaNw1UuvdM0JaGb2cBBuPIWZl8zbRX8nF5D9TxjHe2b/9IL3b5gbG
+         dguhhG42+eMh5xo48QLIqOKYog7AR0VZKSMkK7/kbFDnxQxUrBzBYxAHIO/PgV7OuA8b
+         fln+mVNYWZMagKaQVDiLHU1lbRe601dqfcDXZNC5y5c1FaJAKsiXU7IKHe7AsH//olfk
+         ic9QqBwngN6lwiN7OLC31KP3QAIVPAiyTGVdZlmL+/tpUglKJ+4+LJCKA4aOoSq+Rcg/
+         AdaA==
+X-Gm-Message-State: ABy/qLZHvv2XtIZpCjFj6waOBztPplxbKEdf81tPPvzU/OjmL0+Zqeuf
+        0HnjlFAa5lk/fnEMp72caasxjbbavQCS95XXQLfudbJNFU+fg6MuMyrZhFDs0rODR7gB0bifQQI
+        jtTU9ZIwhkIfW
+X-Received: by 2002:a05:6102:89:b0:443:687a:e518 with SMTP id t9-20020a056102008900b00443687ae518mr2246649vsp.35.1689346738346;
+        Fri, 14 Jul 2023 07:58:58 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHtbML/klMWS+JD7BpSCOZLRnlogXLPpYlrhwPn3T/ZkH5MOKZJ9JbnXEMqJ0TSFh3DBPO+Sg==
+X-Received: by 2002:a05:6102:89:b0:443:687a:e518 with SMTP id t9-20020a056102008900b00443687ae518mr2246630vsp.35.1689346738046;
+        Fri, 14 Jul 2023 07:58:58 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id u14-20020a0c8dce000000b00632191a70a2sm3994458qvb.103.2023.07.14.07.58.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 07:58:57 -0700 (PDT)
+Message-ID: <32e49f7c-2382-fc1d-8725-a4edfbcde66c@redhat.com>
+Date:   Fri, 14 Jul 2023 16:58:52 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB9127:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0000bff4-5322-4d1d-0340-08db8479b61f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: o1M9H59GHM8NGJarC74J7w7G18jHa36EezpEl9vRYjUeSRQgMLjNyQFn5cWmmqUkOOeCXPHiJFUIsRp1O7dbTL0yaazX5dQuOTT/1D8tOwrHcRV55JB9qh+rnoz+KeyUTs4WbFX0Tx23TktAkhMuY0TiOIOX6hqkcsCFskJlFgsPKdS7pX0ZCYf0v64veIALgYyXFDjZ9Ploxe1FRS/GTly35J3zWV3FgMbUfP1V1s5EU8Xuen59UVn7qTwHQghTMqaubRKh9TnMpuZhWpUN3brSNegB2vXFMojVv9Y2XTFATe+BJI0mxR2ipktMPpVdrPcoEbxcRSxbFKvDvedRtqsmlk/tMsmCl/aUV7GB1Q+ZOLsnaM7fTvDoqYvt6z0kGPdNRoD7OxALDpGl4JNNHL/6l0iRZ5Ro5WIafNVJsFejIt2UG+xd8GkaLKtknTSdLk72HP8UA64TOympXl/X29P5wbaJbGZdItk8KSUbmvdX0lr5X4CclztetpqvhwiYZQs6rXmAPUIy/boayok5fyVD9Jcm9H/jZIQ57febaU5YxxiCpXhdEiE3L9bFm+TONsgw076stWhuuqdx9rC7yTT6GtvJgB5vTyIa5HJ/D1Y=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(366004)(39860400002)(396003)(451199021)(41300700001)(66476007)(7416002)(4326008)(66946007)(66556008)(6916009)(478600001)(5660300002)(2906002)(8936002)(8676002)(316002)(6666004)(6486002)(6512007)(26005)(6506007)(86362001)(186003)(83380400001)(36756003)(2616005)(38100700002)(83133001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cH00Gwv9wbWODtYEpMTG58664K4SOwTzfuC0rQW4RJCcFrZ1Y76aqRn9lVNN?=
- =?us-ascii?Q?PzP2GvnYxEkzwoFKnR339J22HI+cpyLiffT+V7oG78qdSoSedr0nyBXg5d3m?=
- =?us-ascii?Q?jFVvH4NfPWml4rXHAyOquZ/KptHEhwHo7hefP9/GGkMMx7S67PzKnspYjDXY?=
- =?us-ascii?Q?O3JYXaM9rsORWgH2TsurzlsJapblJECKvblZV8OWwopTpWYrkK6p81Jaosfw?=
- =?us-ascii?Q?Y8FqRaNyYxWlzqwY+lmCdPcKdmKrCeoSSdsgfaWz99dxM/d5cDuwnfMlONk3?=
- =?us-ascii?Q?wXT9c5IUlv/QhJ2+2Rhjdc4797gIzUtgTR0vrhKiLqUMMAn2jImkpe5ipjOS?=
- =?us-ascii?Q?5HQmmKSDJZY1rDzjJDN0UWboCadw3jcDfxkWn8IzUwXmwtaSDa4GawgD1dZB?=
- =?us-ascii?Q?mxY2IVGAzm0ihyS/u2RIpxSWphW98u3deB7BUJ5eIwPQ8Es4vZWWP2CK+oeX?=
- =?us-ascii?Q?Pr0o7vav8i3jIPCQpQnwKD/+kBmNrJ1vCrI4eZa7KLgElu1mU6Yvxdp33848?=
- =?us-ascii?Q?ep4stG9CCfU+3wxNZ47PWegnqO6yUG531b9hLe78ZKjfep8QXO3lim6UwJbO?=
- =?us-ascii?Q?VzA/AiABG9PEmsJQNcjY8/I03KwZUAuu2kEMs/pCMg2K9RYEBSip5fgSBTMs?=
- =?us-ascii?Q?IlEdaiPqVSwtk/gaXnBrx+k2LKOPwiFoBgacgJiG5T/eKm6yC2WnS031fTpb?=
- =?us-ascii?Q?ix9v4tbP78/v4px9qnck9ouQoU5paxxY8s0GjELBFXOnG6XLHF1xk/RTcA6C?=
- =?us-ascii?Q?Hk48T4fSIGRoFCW3/FWsdoefqmFnSs0Z5GPADgmM1xSHHkM09hEi3csTSq2I?=
- =?us-ascii?Q?ympSMj6pZF3zMKQjoW2+Aq73UwxyJc5rwn3Tcg6J+bgT5eIgwuSdm1j6pKC1?=
- =?us-ascii?Q?nhuoT2DZIroFXmHoJvS29y0eJ3dKNg+49CP0wmx207NN9IDau4crCc2UJ2Bv?=
- =?us-ascii?Q?emcR4d4CYVh/+QgvZUsrZT8jVC+wMP1vqlfYLFo6VGkc01UBbJfn3fc0WJxD?=
- =?us-ascii?Q?Q99pJleZNvMauP/+JMjO1m3sPEV78Iy8ANY25SDAdj6fj6ysh/KyP1PiiZtV?=
- =?us-ascii?Q?xP98WUwqJPUxNEnmN9PS2ZX8VkosEvgQR+J3veq01DrUULldtVrAvaMkWU1K?=
- =?us-ascii?Q?bs+pVQTHWB3c09mCJxM5INkr4k7HK50kgZjQTW03qSvM4/Aauv36Iz+R3eHl?=
- =?us-ascii?Q?L5BUkZoeJ2dySC7EmEadfBlr4JhXHwRRiYBHPr2Ku5n5nz20V0K43SneZnnr?=
- =?us-ascii?Q?y0FBYCo906/V7w9q6osJyg3jaNuXGBwfgR52EK1ANzLrBlDzWwu2GfWO6kpf?=
- =?us-ascii?Q?HABNJwEldtvmQFxyILLHvwsXxVOXUbCc3hO4nzBlArYdsTRk8WIHGm2kiZJJ?=
- =?us-ascii?Q?B4oMjDX6SsPTs1FFGiMgrrgMUX6ng2FWkdE2Oc5s117wPC4vpVsj3vXZdjWG?=
- =?us-ascii?Q?1xYNJMNNX2pEfy5qvwU2DJySKzsidunwrkjXdheuvULxtYYJsWlglwZxtOZS?=
- =?us-ascii?Q?H85X+wCrOiyGz42KTD5btZL8JSZRmMvSPofRodQDPkDcoE5arzxs5LyFwo0L?=
- =?us-ascii?Q?zy7bT8iCpwfobu50FEj0IPmvw7eT+3XCPPTPJMKG?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0000bff4-5322-4d1d-0340-08db8479b61f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2023 14:50:48.6513
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hS/5BBzNz533Q1NIJOuRaQp3Sw7kmYzr26oZDCvcAI6l/uYaZqd30oscmW1TvC+u
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9127
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 16/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-17-maz@kernel.org>
+ <8c32ebdc-a3bc-aabe-5098-3754159d22cd@redhat.com>
+ <86sf9rvmd7.wl-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <86sf9rvmd7.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 07:59:25PM -0700, Yi Liu wrote:
-> This adds ioctl for userspace to attach device cdev fd to and detach
-> from IOAS/hw_pagetable managed by iommufd.
-> 
->     VFIO_DEVICE_ATTACH_IOMMUFD_PT: attach vfio device to IOAS or hw_pagetable
-> 				   managed by iommufd. Attach can be undo
-> 				   by VFIO_DEVICE_DETACH_IOMMUFD_PT or device
-> 				   fd close.
->     VFIO_DEVICE_DETACH_IOMMUFD_PT: detach vfio device from the current attached
-> 				   IOAS or hw_pagetable managed by iommufd.
-> 
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
-> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Tested-by: Terrence Xu <terrence.xu@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/device_cdev.c | 58 ++++++++++++++++++++++++++++++++++++++
->  drivers/vfio/vfio.h        |  5 ++++
->  drivers/vfio/vfio_main.c   | 15 +++++++++-
->  include/uapi/linux/vfio.h  | 44 +++++++++++++++++++++++++++++
->  4 files changed, 121 insertions(+), 1 deletion(-)
+Hi Marc,
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+On 7/13/23 17:53, Marc Zyngier wrote:
+> Hey Eric,
+>
+> Thanks for looking into this, much appreciated given how tedious it
+> is.
+>
+> On Thu, 13 Jul 2023 15:05:33 +0100,
+> Eric Auger <eric.auger@redhat.com> wrote:
+>> Hi Marc,
+>>
+>> On 7/12/23 16:57, Marc Zyngier wrote:
+>>> Describe the HCR_EL2 register, and associate it with all the sysregs
+>>> it allows to trap.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/kvm/emulate-nested.c | 475 ++++++++++++++++++++++++++++++++
+>>>  1 file changed, 475 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+>>> index 5bab2e85d70c..51901e85e43d 100644
+>>> --- a/arch/arm64/kvm/emulate-nested.c
+>>> +++ b/arch/arm64/kvm/emulate-nested.c
+> [...]
+>
+>>> +	[CGT_HCR_TPC] = {
+>> modern revisions now refer to TPCP, maybe worth a comment?
+> Absolutely.
+>
+> [...]
+>
+>>> +	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
+>>> +		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
+>> in the spec I see this upper limit in the FEAT_FGT section. Out of
+>> curiosity how were you able to convert the sys reg names into this Op0,
+>> Op1, CRn, CRm, Op2. Is there any ordering logic documented somewhere for
+>> those group3 regs?
+> If you look at the sysreg encoding described on page D18-6308 if
+> version J.a of the ARM ARM, you will find a block of 56 contiguous
+> encodings ranging from (3, 0, 0, 1, 0), which happens to be
+> ID_PFR0_EL1, all the way to a reserved range ending in (3, 0, 0, 7,
+> 7).
+>
+> This is the block of register that is controlled by TID3.
 
-Jason
+OK thanks
+>
+>> I checked Table D18-2 and this looks good but I wonder if there isn't
+>> any more efficient way to review this.
+> Not that I know of, unfortunately. Even the pseudocode isn't enough
+> for this as it doesn't described the trapping of unallocated regions.
+
+OK
+>
+>>> +	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO),
+>>> +	SR_TRAP(SYS_ICC_ASGI1R_EL1,	CGT_HCR_IMO_FMO),
+>>> +	SR_TRAP(SYS_ICC_SGI1R_EL1,	CGT_HCR_IMO_FMO),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
+>>> +		      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
+>>> +		      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
+>>> +		      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
+>>> +		      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
+>>> +		      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
+>>> +		      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
+>>> +		      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
+>>> +		      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
+>>> +		      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
+>>> +		      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
+>>> +		      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
+>>> +		      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
+>>> +		      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
+>>> +		      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
+>>> +		      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
+>>> +		      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
+>>> +	SR_TRAP(SYS_ACTLR_EL1,		CGT_HCR_TACR),
+>>> +	SR_TRAP(SYS_DC_ISW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CISW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_IGSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_IGDSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CGSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CGDSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CIGSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CIGDSW,		CGT_HCR_TSW),
+>>> +	SR_TRAP(SYS_DC_CIVAC,		CGT_HCR_TPC),
+>> I don't see CVADP?
+> Me neither! Good catch!
+>
+> [...]
+>
+>>> +	SR_TRAP(SYS_SCTLR_EL1,		CGT_HCR_TVM_TRVM),
+>>> +	SR_TRAP(SYS_TTBR0_EL1,		CGT_HCR_TVM_TRVM),
+>>> +	SR_TRAP(SYS_TTBR1_EL1,		CGT_HCR_TVM_TRVM),
+>>> +	SR_TRAP(SYS_TCR_EL1,		CGT_HCR_TVM_TRVM),
+>>> +	SR_TRAP(SYS_ESR_EL1,		CGT_HCR_TVM_TRVM),
+>>> +	SR_TRAP(SYS_FAR_EL1,		CGT_HCR_TVM_TRVM),
+>>> +	SR_TRAP(SYS_AFSR0_EL1,		CGT_HCR_TVM_TRVM),*
+>> Looking at the SFSR0_EL1 MRS/MSR pseudo code I understand TRVM is tested
+>> on read and
+>> TVM is tested on write. However CGT_HCR_TVM has FORWARD_ANY behaviour
+>> while TRVM looks good as FORWARD_READ? Do I miss something.
+> You're not missing anything. For some reason, I had in my head that
+> TVM was trapping both reads and writes, while the spec is clear that
+> it only traps writes.
+>
+>>> +	SR_TRAP(SYS_AFSR1_EL1,		CGT_HCR_TVM_TRVM),*
+>> same here and below
+> Yup, I need to fix the TVM encoding like this:
+>
+> @@ -176,7 +176,7 @@ static const struct trap_bits coarse_trap_bits[] = {
+>  		.index		= HCR_EL2,
+>  		.value		= HCR_TVM,
+>  		.mask		= HCR_TVM,
+> -		.behaviour	= BEHAVE_FORWARD_ANY,
+> +		.behaviour	= BEHAVE_FORWARD_WRITE,
+yes matches my understanding
+>  	},
+>  	[CGT_HCR_TDZ] = {
+>  		.index		= HCR_EL2,
+>
+> [...]
+>
+>>> +	/* All _EL2 registers */
+>>> +	SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
+>>> +		      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
+>>> +		      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
+>>> +	/* All _EL02, _EL12 registers */
+>>> +	SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
+>>> +		      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
+>>> +	SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
+>>> +		      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
+>> same question as bove, where in the ARM ARM do you find those
+>> ranges?
+> I went over the encoding with a fine comb, and realised that all the
+> (3, 4, ...) encodings are EL2, and all the (3, 5, ...) ones are EL02
+> and EL12.
+Oh good catch
+>
+> I appreciate that this is taking a massive bet on the future, but
+> there is no such rule in the ARM ARM as such...
+
+yeah that's unfortunate that rule is not stated anywhere
+>
+>>> +	SR_TRAP(SYS_SP_EL1,		CGT_HCR_NV),*
+>>> +	SR_TRAP(OP_AT_S1E2R,		CGT_HCR_NV),*
+>>> +	SR_TRAP(OP_AT_S1E2W,		CGT_HCR_NV),*
+>>> +	SR_TRAP(OP_AT_S12E1R,		CGT_HCR_NV),*
+>>> +	SR_TRAP(OP_AT_S12E1W,		CGT_HCR_NV),*
+>>> +	SR_TRAP(OP_AT_S12E0R,		CGT_HCR_NV),*
+>> according to the pseudo code NV2 is not checked
+>> shouldn't we have a separate CGT? Question also valid for a bunch of ops
+>> below
+> Hmmm. Yes, this is wrong. Well spotted. I guess I need a
+> CGT_HCR_NV_nNV2 for the cases that want that particular condition (NV1
+> probably needs a similar fix).
+NV1 looks good. There NV2 is checked
+>
+> [...]
+>
+>> CIGDPAE?
+>> CIPAE?
+> These two are part of RME (well, technically MEC, but that an RME
+> thing), and I have no plan to support this with NV -- yet.
+OK
+>
+>> CFP/CPP/DVP RCTX?
+> These are definitely missing. I'll add them.
+>
+> Thanks again for going through this list, this is awesome work!
+you are welcome. This is cumbersome to review but less than writing it I
+suspect ;-)
+
+Eric
+>
+> 	M.
+>
+
