@@ -2,92 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74F717537CB
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 12:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B94C57537EC
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 12:24:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236140AbjGNKSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 06:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
+        id S236164AbjGNKYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 06:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236071AbjGNKSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 06:18:16 -0400
-Received: from out-26.mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C48D2708
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 03:18:14 -0700 (PDT)
-Message-ID: <809f8391-c9e2-4432-12ec-9921360e3c8e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1689329891;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        with ESMTP id S235413AbjGNKYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 06:24:09 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D532728;
+        Fri, 14 Jul 2023 03:24:08 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id DE2461FD60;
+        Fri, 14 Jul 2023 10:24:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1689330246; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=vDi5jHcc6JX2dM3REdw3Ft0fz55Drq20U6og3UsNXvQ=;
-        b=xALtXC8/ROHasKXZMaOLj0zsiUq3d6orGjz1eoTZ1jYoIfLxy+er+4aCKpcbd9XxK/72Fv
-        KRVRN8cp4ei0ETtfaMci8s/7BCxay4Kgtrw1eY/mHz/QrTn8JRVj36+RIQUzGxVU6fdQ+Q
-        u1T/iNhdJHA2X2uvCVp0eGoYlglhYfM=
-Date:   Fri, 14 Jul 2023 18:17:59 +0800
+        bh=9bB3ajJzlHzH/NCavasHXOu44UGyH8PhtuwbaAsRiUs=;
+        b=ZfVUZTYxKgmlcgDz3AHjqL+8kKqOPlM48so6SAp4bPoDCqqDz+3/+UNtLxmMlKTi7krayp
+        P98fFJUBwfL3/ZEjSpwYWcoFDAWmaSZLprBhqZqP0RU9FZezuOmH3c4Tej5E/gtnnmKjK0
+        9VuzaJtqrKln18Yvq2tUKpEvLJSSsc4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1689330246;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9bB3ajJzlHzH/NCavasHXOu44UGyH8PhtuwbaAsRiUs=;
+        b=i9uyf4NbLjtrEiMsl2L+V6st/ysF7iZUMveLAhVTrl60zcT/tjGmmWLGkqqm4zfDOP/ch4
+        ZMBJeoOcV2Ws7pDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8784513A15;
+        Fri, 14 Jul 2023 10:24:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id s3zkH0YisWS7EgAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Fri, 14 Jul 2023 10:24:06 +0000
+Message-ID: <47a3ab8d-5e8c-db2c-fcde-5c2b1bac32aa@suse.de>
+Date:   Fri, 14 Jul 2023 12:24:05 +0200
 MIME-Version: 1.0
-Subject: Re: [v3,18/18] fbdev: Document that framebuffer_alloc() returns
- zero'ed data
-To:     Thomas Zimmermann <tzimmermann@suse.de>, deller@gmx.de,
-        javierm@redhat.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v3 00/18] fbdev: Remove FBINFO_DEFAULT and
+ FBINFO_FLAG_DEFAULT flags
+Content-Language: en-US
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
 Cc:     linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
         linux-hyperv@vger.kernel.org, linux-sh@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, linux-geode@lists.infradead.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        Miguel Ojeda <ojeda@kernel.org>,
-        linux-nvidia@lists.surfsouth.com, linux-omap@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org,
+        deller@gmx.de, linux-staging@lists.linux.dev,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        javierm@redhat.com, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-nvidia@lists.surfsouth.com,
+        linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-geode@lists.infradead.org,
         linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
-References: <20230714075155.5686-19-tzimmermann@suse.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Sui JIngfeng <sui.jingfeng@linux.dev>
-In-Reply-To: <20230714075155.5686-19-tzimmermann@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+References: <20230714075155.5686-1-tzimmermann@suse.de>
+ <CAMuHMdWoeyJPAgPgFi545SJFcaVCgZi1-zW2N5cBeU9BnHgo1w@mail.gmail.com>
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+In-Reply-To: <CAMuHMdWoeyJPAgPgFi545SJFcaVCgZi1-zW2N5cBeU9BnHgo1w@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------ytQioUjfc867nfoK1gzl7Kf7"
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------ytQioUjfc867nfoK1gzl7Kf7
+Content-Type: multipart/mixed; boundary="------------e1VN5UoecP2KMs2cwDKg5iZ3";
+ protected-headers="v1"
+From: Thomas Zimmermann <tzimmermann@suse.de>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-sh@vger.kernel.org, deller@gmx.de,
+ linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, javierm@redhat.com,
+ dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+ linux-nvidia@lists.surfsouth.com, linux-omap@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-geode@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
+Message-ID: <47a3ab8d-5e8c-db2c-fcde-5c2b1bac32aa@suse.de>
+Subject: Re: [PATCH v3 00/18] fbdev: Remove FBINFO_DEFAULT and
+ FBINFO_FLAG_DEFAULT flags
+References: <20230714075155.5686-1-tzimmermann@suse.de>
+ <CAMuHMdWoeyJPAgPgFi545SJFcaVCgZi1-zW2N5cBeU9BnHgo1w@mail.gmail.com>
+In-Reply-To: <CAMuHMdWoeyJPAgPgFi545SJFcaVCgZi1-zW2N5cBeU9BnHgo1w@mail.gmail.com>
 
-On 2023/7/14 15:49, Thomas Zimmermann wrote:
-> Most fbdev drivers depend on framebuffer_alloc() to initialize the
-> allocated memory to 0. Document this guarantee.
->
-> v3:
-> 	* slightly reword the sentence (Miguel)
->
-> Suggested-by: Miguel Ojeda <ojeda@kernel.org>
-> Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
-> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+--------------e1VN5UoecP2KMs2cwDKg5iZ3
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Reviewed-by: Sui Jingfeng <suijingfeng@loongson.cn>
+SGkNCg0KQW0gMTQuMDcuMjMgdW0gMTI6MDQgc2NocmllYiBHZWVydCBVeXR0ZXJob2V2ZW46
+DQo+IEhpIFRob21hcywNCj4gDQo+IE9uIEZyaSwgSnVsIDE0LCAyMDIzIGF0IDk6NTPigK9B
+TSBUaG9tYXMgWmltbWVybWFubiA8dHppbW1lcm1hbm5Ac3VzZS5kZT4gd3JvdGU6DQo+PiBS
+ZW1vdmUgdGhlIHVudXNlZCBmbGFncyBGQklORk9fREVGQVVMVCBhbmQgRkJJTkZPX0ZMQUdf
+REVGQVVMVCBmcm9tDQo+PiBmYmRldiBhbmQgZHJpdmVycywgYXMgYnJpZWZseSBkaXNjdXNz
+ZWQgYXQgWzFdLiBCb3RoIGZsYWdzIHdlcmUgbWF5YmUNCj4+IHVzZWZ1bCB3aGVuIGZiZGV2
+IGhhZCBzcGVjaWFsIGhhbmRsaW5nIGZvciBkcml2ZXIgbW9kdWxlcy4gV2l0aA0KPj4gY29t
+bWl0IDM3NmIzZmY1NGM5YSAoImZiZGV2OiBOdWtlIEZCSU5GT19NT0RVTEUiKSwgdGhleSBh
+cmUgYm90aCAwDQo+PiBhbmQgaGF2ZSBubyBmdXJ0aGVyIGVmZmVjdC4NCj4+DQo+PiBQYXRj
+aGVzIDEgdG8gNyByZW1vdmUgRkJJTkZPX0RFRkFVTFQgZnJvbSBkcml2ZXJzLiBQYXRjaGVz
+IDIgdG8gNQ0KPj4gc3BsaXQgdGhpcyBieSB0aGUgd2F5IHRoZSBmYl9pbmZvIHN0cnVjdCBp
+cyBiZWluZyBhbGxvY2F0ZWQuIEFsbCBmbGFncw0KPj4gYXJlIGNsZWFyZWQgdG8gemVybyBk
+dXJpbmcgdGhlIGFsbG9jYXRpb24uDQo+Pg0KPj4gUGF0Y2hlcyA4IHRvIDE2IGRvIHRoZSBz
+YW1lIGZvciBGQklORk9fRkxBR19ERUZBVUxULiBQYXRjaCA4IGZpeGVzDQo+PiBhbiBhY3R1
+YWwgYnVnIGluIGhvdyBhcmNoL3NoIHVzZXMgdGhlIHRva2VuIGZvciBzdHJ1Y3QgZmJfdmlk
+ZW9tb2RlLA0KPj4gd2hpY2ggaXMgdW5yZWxhdGVkLg0KPj4NCj4+IFBhdGNoIDE3IHJlbW92
+ZXMgYm90aCBmbGFnIGNvbnN0YW50cyBmcm9tIDxsaW51eC9mYi5oPiBhbmQgcGF0Y2ggMTgN
+Cj4+IGRvY3VtZW50cyB0aGUgemVybydlZCBtZW1vcnkgcmV0dXJuZWQgYnkgZnJhbWVidWZm
+ZXJfYWxsb2MoKS4NCj4+DQo+PiB2MzoNCj4+ICAgICAgICAgICogc2g6IGluY2x1ZGUgYm9h
+cmQgbmFtZSBpbiBjb21taXQgbWVzc2FnZSAoQWRyaWFuKQ0KPj4gICAgICAgICAgKiBkb2Nz
+OiByZXdvcmQgdGV4dCAoTWlndWVsKQ0KPiANCj4gVGhhbmtzIGZvciB0aGUgdXBkYXRlIQ0K
+PiANCj4+ICAgIGZiZGV2OiBSZW1vdmUgZmxhZyBGQklORk9fREVGQVVMVCBmcm9tIGZiZGV2
+IGRyaXZlcnMNCj4+ICAgIGZiZGV2OiBSZW1vdmUgZmxhZyBGQklORk9fREVGQVVMVCBmcm9t
+IGZiZGV2IGRyaXZlcnMNCj4+ICAgIGZiZGV2OiBSZW1vdmUgZmxhZyBGQklORk9fREVGQVVM
+VCBmcm9tIGZiZGV2IGRyaXZlcnMNCj4+ICAgIGZiZGV2OiBSZW1vdmUgZmxhZyBGQklORk9f
+REVGQVVMVCBmcm9tIGZiZGV2IGRyaXZlcnMNCg0KSSB3YXNuJ3QgaGFwcHkgYWJvdXQgdGhp
+cyBlaXRoZXIuIEJ1dCBJIGNvdWxkIG5vdCBjb21lIHVwIHdpdGggYSANCmRlc2NyaXB0aW9u
+IHRoYXQgZml0cyBpbnRvIHRoZSA3NC1jaGFyIGxpbWl0IGZvciBlYWNoIGNvbW1pdC4gVGhl
+eSBvbmx5IA0KZGlmZmVyIGluIHRoZSBtZXRob2Qgb2YgbWVtb3J5IGFsbG9jYXRpb24uIERv
+IHlvdSBoYXZlIGFueSBpZGVhcz8NCg0KPiANCj4gRm91ciBwYXRjaGVzIHdpdGggdGhlIGV4
+YWN0IHNhbWUgb25lLWxpbmUgc3VtbWFyeS4gUGxlYXNlIG1ha2UgdGhlbQ0KPiB1bmlxdWUu
+DQo+IA0KPj4gICAgZmJkZXY6IFJlbW92ZSBmbGFnIEZCSU5GT19GTEFHX0RFRkFVTFQgZnJv
+bSBmYmRldiBkcml2ZXJzDQo+PiAgICBmYmRldjogUmVtb3ZlIGZsYWcgRkJJTkZPX0ZMQUdf
+REVGQVVMVCBmcm9tIGZiZGV2IGRyaXZlcnMNCj4gDQo+IFR3byBwYXRjaGVzIHdpdGggdGhl
+IGV4YWN0IHNhbWUgb25lLWxpbmUgc3VtbWFyeS4gUGxlYXNlIG1ha2UgdGhlbQ0KPiB1bmlx
+dWUuDQoNClNhbWUgcHJvYmxlbSBoZXJlLg0KDQpCZXN0IHJlZ2FyZHMNClRob21hcw0KDQo+
+IA0KPiBHcntvZXRqZSxlZXRpbmd9cywNCj4gDQo+ICAgICAgICAgICAgICAgICAgICAgICAg
+ICBHZWVydA0KPiANCg0KLS0gDQpUaG9tYXMgWmltbWVybWFubg0KR3JhcGhpY3MgRHJpdmVy
+IERldmVsb3Blcg0KU1VTRSBTb2Z0d2FyZSBTb2x1dGlvbnMgR2VybWFueSBHbWJIDQpGcmFu
+a2Vuc3RyYXNzZSAxNDYsIDkwNDYxIE51ZXJuYmVyZywgR2VybWFueQ0KR0Y6IEl2byBUb3Rl
+diwgQW5kcmV3IE15ZXJzLCBBbmRyZXcgTWNEb25hbGQsIEJvdWRpZW4gTW9lcm1hbg0KSFJC
+IDM2ODA5IChBRyBOdWVybmJlcmcpDQo=
 
-> Cc: Helge Deller <deller@gmx.de>
-> ---
->   drivers/video/fbdev/core/fb_info.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/video/fbdev/core/fb_info.c b/drivers/video/fbdev/core/fb_info.c
-> index 8bdbefdd4b70..4847ebe50d7d 100644
-> --- a/drivers/video/fbdev/core/fb_info.c
-> +++ b/drivers/video/fbdev/core/fb_info.c
-> @@ -13,7 +13,8 @@
->    *
->    * Creates a new frame buffer info structure. Also reserves @size bytes
->    * for driver private data (info->par). info->par (if any) will be
-> - * aligned to sizeof(long).
-> + * aligned to sizeof(long). The new instances of struct fb_info and
-> + * the driver private data are both cleared to zero.
->    *
->    * Returns the new structure, or NULL if an error occurred.
->    *
+--------------e1VN5UoecP2KMs2cwDKg5iZ3--
+
+--------------ytQioUjfc867nfoK1gzl7Kf7
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmSxIkUFAwAAAAAACgkQlh/E3EQov+A5
+ZBAAlrHgFf58BneZE6hcC+r5o5NXfcPpZXyll0zbPfn6bgz+XFX3WjCIOEeFVAtRj4l1NZP2gLDL
+7XNg57GaZUV+3tu12rPUwqHB/PP8fo4xN1zoUFHh6n/bZ/IPtqK261weN3XdIE0++yBbi9uX0OJw
+sbnYwY9bEjuVCVxhLzZwkvB7OBMd2W4tyY44Dk7zY4Tr5kFLfrU2fPIyaM4i7DDof+JsxDbgeISQ
+lb1J6DuP7jxc23B/dIP1KcbGvuw9IpA6HM5annXZkHPBb0LvAOn5k8RJsCdLsPrMA9csWZO3BPeN
+ilViiWFtO27QGJPFU+vXC/4HWySxkpaAf3fqgFlrLFoQLNg7n37nnIqOdjz+eE3wHkiTd0h2LwVu
+k6gemHqCKMgJwK9bLRFTueMM5lp0GwsC4vpChviNYECfzzTLZKYZHHyWtYeoh/i5VxZezHuk+8io
+i8pcC79dy1b6ahi3hR3yLqwxihfje3jfrNjYPf1woeuEUsMr25eBK2/+mRmIvnFtg19/X14rJbPg
+aipPmZE4z4DiVVhiEbx/6XFlOflHehdn2hw2hyyfXEXNftSgzOV/Jshfga/TCLtbRs3Asg5U81Cd
+l+g39cAV4H0yoCaPnygHuLklnZ7tW2yfrjbwJJoFu65tFJDiV22dChid3jEfYbm9OZJVJPko4Oi7
+y34=
+=brtE
+-----END PGP SIGNATURE-----
+
+--------------ytQioUjfc867nfoK1gzl7Kf7--
