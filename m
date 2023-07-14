@@ -2,207 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AD2F752D2D
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 00:46:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E51C752E71
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 03:03:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232916AbjGMWqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jul 2023 18:46:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39586 "EHLO
+        id S232573AbjGNBDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jul 2023 21:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231234AbjGMWqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jul 2023 18:46:14 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C038271C
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 15:46:13 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b8a7734734so5887405ad.2
-        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 15:46:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689288373; x=1691880373;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jlviYcHwsz3zgb3Z/9cmi+oU98mhelhtL3RDJqVwSjc=;
-        b=xxlwEtmNqK7eSUJEB804Hz+q428CMYwEVKko8eWqMrpf0Ahj2+mrxahB7oMV/O4F5B
-         1XkCBi7KaovT4IE3C8X4aIQGrmiTvatUY/8Xf6/qJc4BcV+GWzNm5A2vdtPdFC8YE3rx
-         uoLxvosGJYNIykJioP74J4N2k9ScDen4Q8n+BhhU2sPI4CDXdMU18dYIhyACkr14SsNW
-         AWL/CQ1xt1A9wb/F3APVRGFN5zyyX+fD3h69y84wsDocJjRjzwR7OdOrYeeKDzvbavxR
-         Zkrgboh6E8Xe+g9wgMutsgOqEsrJyoNdXJjUHU/V46/BOTbRkoMJ4ikKVK6ve7skAqvB
-         SGhQ==
+        with ESMTP id S234655AbjGNBD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jul 2023 21:03:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADC92D61
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 18:02:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689296551;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RCZyb3R24GuDipQIPDZ95wX4wOQwTE4wykLLz/wfDdA=;
+        b=S+yhPLy7T8/KjEXzXxgPBGklx1X+EQzoRnJFfy0xE4Mq4UFxaIddospne+WBPkvSpEKzpp
+        z+IYdUNLVxiKv1ReByIAyF/KDq2FcjVs1muKTnubTONsyeYA/jC0eWuQc8Tmh+GqNVOdf0
+        DjBtSbxfGkJjezZMfMv529DIEFwSHtA=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-434-WFyj1zHbMMmvB1NxxcfbAQ-1; Thu, 13 Jul 2023 21:02:27 -0400
+X-MC-Unique: WFyj1zHbMMmvB1NxxcfbAQ-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-262cf62e9b4so947126a91.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jul 2023 18:02:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689288373; x=1691880373;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jlviYcHwsz3zgb3Z/9cmi+oU98mhelhtL3RDJqVwSjc=;
-        b=VrNxJbcmEi9hokyBj9uQ+V3oemEMGkkKJ8syqrAW87MwYs0cdhy2O0FzRC8vUSBcSu
-         VQVO3Lm2ihv2jwzX3P0crMAkN1gvRLnpWHxL692vBZRoMQfp4paa4W9/myAakNixK3j9
-         TRX9g37IlxzuaYdfBtsDRSLyJ0LA7Dbk1QKhpR8PEZTNXevk4xKlYoIvYRB/heE/1SMj
-         uB2t1DBlCrVNki7A0QvBc+uWMtZosCkqfD4Om0/G4pceSEYSac5VxaU8fzLtkkt7tv5R
-         NDTYmscfAYWr203G/lxYb7Yd2S1cE28SInTsO0D8B/MPAfPyMO4sDEc4yqFTHvxztFVj
-         P1nA==
-X-Gm-Message-State: ABy/qLZS6yWz54XRoa4BE3DgxU0Bk4u/4t1ldWbeiQV+W1Y5iFsGLNLy
-        r0NbkGBUQzP3/qsj/NeVjSyKHe8JrJ83ASfZsQ==
-X-Google-Smtp-Source: APBJJlERPG/+eayyUgcaUIRW0xWDavYekBKC7TcOLS/MzLmlBQovbnx1yFNwnYhI8Hf1GI05Y3XFjgiX1sbGXMahCw==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a17:902:e9c6:b0:1a6:4ce8:3ed5 with
- SMTP id 6-20020a170902e9c600b001a64ce83ed5mr8890plk.4.1689288373014; Thu, 13
- Jul 2023 15:46:13 -0700 (PDT)
-Date:   Thu, 13 Jul 2023 22:46:11 +0000
-In-Reply-To: <ZFWli2/H5M8MZRiY@google.com> (message from Sean Christopherson
- on Fri, 5 May 2023 17:55:39 -0700)
-Mime-Version: 1.0
-Message-ID: <diqzr0pb2zws.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: Rename restrictedmem => guardedmem? (was: Re: [PATCH v10 0/9]
- KVM: mm: fd-based approach for supporting KVM)
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     david@redhat.com, chao.p.peng@linux.intel.com, pbonzini@redhat.com,
-        vkuznets@redhat.com, jmattson@google.com, joro@8bytes.org,
-        mail@maciej.szmigiero.name, vbabka@suse.cz, vannapurve@google.com,
-        yu.c.zhang@linux.intel.com, kirill.shutemov@linux.intel.com,
-        dhildenb@redhat.com, qperret@google.com, tabba@google.com,
-        michael.roth@amd.com, wei.w.wang@intel.com, rppt@kernel.org,
-        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
-        jarkko@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hughd@google.com, brauner@kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1689296546; x=1691888546;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RCZyb3R24GuDipQIPDZ95wX4wOQwTE4wykLLz/wfDdA=;
+        b=QSSRIGpzROsrKWM5GUCScq7JXKIPLKkor01TaQmtNjfhmX7P1zeRvhon2MD2Pdr1za
+         XngVpUkrs5Q5LnpjtrsZdTbeFQ2IirjUI8tQIV8mLJ7hZ4igAWEZeYyF198pPqIHkI4R
+         wAuUKbNJ5ILmO+Qi57wDakj04Vvaws39ntlqfVRlLyuM4KYUVHiBI1OcI1hAy7FTtdW7
+         ysjY+Dpl9iAloRf26E8NJoBJaHBDkG4WxZBr+HhAH9lJfrdKz/snO/Hhxtfb5nyytXRm
+         LTlFW0IDxp05Y4s4LiIkWSj2F7F/aLh0M46asE+/pWcjLLnnIBZzA33kwo4FtcOGFU0K
+         d3ng==
+X-Gm-Message-State: ABy/qLZ1emwaUIcR9zTzzx1lGDM2cXqeJJEZqZGbgTLs56AXXZKnTp+w
+        EkcSkm4sMupTdXrdCvdfEpHu65uRpbo2RJxC9zZCjbfsN2yoIBxpK+kJhESwTXr6m2mef9Zc0Uk
+        lAUH4cH0/C0tD
+X-Received: by 2002:a17:90a:950b:b0:261:1141:b716 with SMTP id t11-20020a17090a950b00b002611141b716mr2709728pjo.33.1689296546061;
+        Thu, 13 Jul 2023 18:02:26 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFSSCf8gGL9MdVrTrliVfiTlZBbSVuaYTkwu2FoRn5pnrMxd9r/+WlBrcYEXoTEJAZF8xXaVA==
+X-Received: by 2002:a17:90a:950b:b0:261:1141:b716 with SMTP id t11-20020a17090a950b00b002611141b716mr2709710pjo.33.1689296545727;
+        Thu, 13 Jul 2023 18:02:25 -0700 (PDT)
+Received: from ?IPV6:2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5? ([2001:8003:e5b0:9f00:dbbc:1945:6e65:ec5])
+        by smtp.gmail.com with ESMTPSA id 12-20020a17090a1a0c00b00263dfe1f8d8sm140821pjk.23.2023.07.13.18.02.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jul 2023 18:02:25 -0700 (PDT)
+Message-ID: <874fdca6-e029-98fe-8e6f-b21dc1eaa467@redhat.com>
+Date:   Fri, 14 Jul 2023 11:02:15 +1000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [RESEND PATCH v5 07/11] KVM: arm64: Define
+ kvm_tlb_flush_vmid_range()
+Content-Language: en-US
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20230621175002.2832640-1-rananta@google.com>
+ <20230621175002.2832640-8-rananta@google.com>
+ <1fe280a7-0f10-e124-00aa-b137df722c33@redhat.com>
+ <CAJHc60xQtjvVsWRE=w-pAioNJW6uh-qKuZz2wp6bkT=X4oCm5A@mail.gmail.com>
+ <60ba5bb4-6fad-0e51-2cd5-845610e6631d@redhat.com>
+ <CAJHc60y6AaAUVy=V6GHTpVhHGO3Bjn1vpTnYpdFiFLjS-vR-uA@mail.gmail.com>
+From:   Gavin Shan <gshan@redhat.com>
+In-Reply-To: <CAJHc60y6AaAUVy=V6GHTpVhHGO3Bjn1vpTnYpdFiFLjS-vR-uA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Raghavendra,
 
-> On Fri, May 05, 2023, Ackerley Tng wrote:
+On 7/14/23 04:47, Raghavendra Rao Ananta wrote:
+> On Wed, Jul 5, 2023 at 5:04 PM Gavin Shan <gshan@redhat.com> wrote:
 >>
->> Hi Sean,
+>> On 7/6/23 04:28, Raghavendra Rao Ananta wrote:
+>>> On Tue, Jul 4, 2023 at 5:31 PM Gavin Shan <gshan@redhat.com> wrote:
+>>>> On 6/22/23 03:49, Raghavendra Rao Ananta wrote:
+>>>>> Implement the helper kvm_tlb_flush_vmid_range() that acts
+>>>>> as a wrapper for range-based TLB invalidations. For the
+>>>>> given VMID, use the range-based TLBI instructions to do
+>>>>> the job or fallback to invalidating all the TLB entries.
+>>>>>
+>>>>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+>>>>> ---
+>>>>>     arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
+>>>>>     arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
+>>>>>     2 files changed, 30 insertions(+)
+>>>>>
+>>>>
+>>>> It may be reasonable to fold this to PATCH[08/11] since kvm_tlb_flush_vmid_range() is
+>>>> only called by ARM64's kvm_arch_flush_remote_tlbs_range(), which is added by PATCH[08/11].
+>>>> In either way, the changes look good to me:
+>>>>
+>>> Ah, the patches 10 and 11 also call kvm_tlb_flush_vmid_range(), so
+>>> probably it's better to keep the definition isolated?
+>>>
 >>
->> Thanks for implementing this POC!
+>> Thanks for your explanation. It's fine to have two separate patches in this
+>> case. I still need to spend some time to look at PATCH[11/11] whose subject
+>> includes typo (intructions -> instructions)
 >>
->> ... snip ...
+> I'm planning to send v6 soon, but I'm happy to wait if you have any
+> other comments on v5 patch-11.
+> Appreciate your help with the reviews.
+> 
+
+I didn't get a chance to look at PATCH[11/11] yet. Please post v6 and I will
+take a look on PATCH[v6 11/11]. Sorry for the delay.
+
+Thanks,
+Gavin
+
+>>>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>>>>
+>>>>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+>>>>> index 4cd6762bda805..1b12295a83595 100644
+>>>>> --- a/arch/arm64/include/asm/kvm_pgtable.h
+>>>>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+>>>>> @@ -682,4 +682,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
+>>>>>      *     kvm_pgtable_prot format.
+>>>>>      */
+>>>>>     enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+>>>>> +
+>>>>> +/**
+>>>>> + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entries
+>>>>> + *
+>>>>> + * @mmu:     Stage-2 KVM MMU struct
+>>>>> + * @addr:    The base Intermediate physical address from which to invalidate
+>>>>> + * @size:    Size of the range from the base to invalidate
+>>>>> + */
+>>>>> +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>>>>> +                             phys_addr_t addr, size_t size);
+>>>>>     #endif      /* __ARM64_KVM_PGTABLE_H__ */
+>>>>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>>>>> index 3d61bd3e591d2..df8ac14d9d3d4 100644
+>>>>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>>>>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>>>>> @@ -631,6 +631,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
+>>>>>         return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+>>>>>     }
+>>>>>
+>>>>> +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>>>>> +                             phys_addr_t addr, size_t size)
+>>>>> +{
+>>>>> +     unsigned long pages, inval_pages;
+>>>>> +
+>>>>> +     if (!system_supports_tlb_range()) {
+>>>>> +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+>>>>> +             return;
+>>>>> +     }
+>>>>> +
+>>>>> +     pages = size >> PAGE_SHIFT;
+>>>>> +     while (pages > 0) {
+>>>>> +             inval_pages = min(pages, MAX_TLBI_RANGE_PAGES);
+>>>>> +             kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval_pages);
+>>>>> +
+>>>>> +             addr += inval_pages << PAGE_SHIFT;
+>>>>> +             pages -= inval_pages;
+>>>>> +     }
+>>>>> +}
+>>>>> +
+>>>>>     #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
+>>>>>
+>>>>>     static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
 >>
->
-> I don't love either approach idea because it means a file created in the =
-context
-> of a VM can outlive the VM itself, and then userspace ends up with a file=
- descriptor
-> that it can't do anything with except close().  I doubt that matters in p=
-ractice
-> though, e.g. when the VM dies, all memory can be freed so that the file e=
-nds up
-> being little more than a shell.  And if we go that route, there's no need=
- to grab
-> a reference to the file during bind, KVM can just grab a longterm referen=
-ce when
-> the file is initially created and then drop it when KVM dies (and nullifi=
-es gmem->kvm).
->
-> ... snip ...
->
-> My preference is to make it a VM-scoped ioctl(), if it ends up being a KV=
-M ioctl()
-> and not a common syscall.  If the file isn't tightly coupled to a single =
-VM, then
-> punching a hole is further complicated by needing to deal with invalidati=
-ng multiple
-> regions that are bound to different @kvm instances.  It's not super compl=
-ex, but
-> AFAICT having the ioctl() be system-scoped doesn't add value, e.g. I don'=
-t think
-> having one VM own the memory will complicate even if/when we get to the p=
-oint where
-> VMs can share "private" memory, and the gmem code would still need to dea=
-l with
-> grabbing a module reference.
+> 
 
-I=E2=80=99d like to follow up on this discussion about a guest_mem file
-outliving the VM and whether to have a VM-scoped ioctl or a KVM ioctl.
-
-Here's a POC of delayed binding of a guest_mem file to a memslot, where
-the guest_mem file outlives the VM [1].
-
-I also hope to raise some points before we do the first integration of
-guest_mem patches!
-
-
-A use case for guest_mem inodes outliving the VM is when the host VMM
-needs to be upgraded. The guest_mem inode is passed between two VMs on
-the same host machine and all memory associated with the inode needs to
-be retained.
-
-To support the above use case, binding of memslots is delayed until
-first use, so that the following inode passing flow can be used:
-
-1. Source (old version of host VMM) process passes guest_mem inodes to
-   destination (new version of host VMM) process via unix sockets.
-2. Destination process initializes memslots identical to source process.
-3. Destination process invokes ioctl to migrate guest_mem inode over to
-   destination process by unbinding all memslots from the source VM and
-   binding them to the destination VM. (The kvm pointer is updated in
-   this process)
-
-Without delayed binding, step 2 will fail since initialization of
-memslots would check and find that the kvm pointer in the guest_mem
-inode points to the kvm in the source process.
-
-
-These two patches contain the meat of the changes required to support
-delayed binding:
-
-https://github.com/googleprodkernel/linux-cc/commit/93b31a006ef2e4dbe1ef0ec=
-5d2534ca30f3bf60c
-https://github.com/googleprodkernel/linux-cc/commit/dd5ac5e53f14a1ef9915c9c=
-1e4cc1006a40b49df
-
-Some things to highlight for the approach set out in these two patches:
-
-1. Previously, closing the guest_mem file in userspace=C2=A0is taken to mea=
-n
-   that all associated memory is to be removed and cleared. With these
-   two patches, each memslot also holds a reference to the file (and
-   therefore inode) and so even if the host VMM closes the fd, the VM
-   will be able to continue to function.
-
-   This is desirable to userspace since closing the file should not be
-   interpreted as a command to clear memory. This is aligned with the
-   way tmpfs=C2=A0files are used with KVM before guest_mem: when the file i=
-s
-   closed in userspace, the memory contents are still mapped and can
-   still be used by the VM. fallocate(PUNCH_HOLE) is how userspace
-   should command memory to be removed, just like munmap() would be used
-   to remove memory from use by KVM.
-
-2. Creating a guest mem file no longer depends on a specific VM and
-   hence the guest_mem creation ioctl can be a system ioctl instead of a
-   VM specific ioctl. This will also address Chao's concern at [3].
-
-
-I also separated cleaning up files vs inodes in
-https://github.com/googleprodkernel/linux-cc/commit/0f5aa18910c515141e57e05=
-c4cc791022047a242,
-which I believe is more aligned with how files and inodes are cleaned up
-in FSes. This alignment makes it easier to extend gmem=C2=A0to hugetlb, for
-one. While working on this, I was also wondering if we should perhaps be
-storing the inode pointer in slot->gmem instead of the file pointer? The
-memory is associated with an inode->mapping rather than the file. Are we
-binding to a userspace handle on the inode (store file pointer), or are
-we really referencing the inode (store inode pointer)?
-
-The branch [1] doesn't handle the bug Sean previously mentioned at [2]:
-Need to take a reference on the KVM module, so that even if guest_mem
-files are not bound to any VM, the KVM module cannot be unloaded. If the
-KVM module can be unloaded while guest_mem files are open, then
-userspace may be able to crash the kernel by invoking guest_mem
-functions that had been unloaded together with KVM.
-
-
-[1] https://github.com/googleprodkernel/linux-cc/tree/gmem-delayed-binding
-[2] https://lore.kernel.org/lkml/ZFWli2%2FH5M8MZRiY@google.com/
-[3] https://lore.kernel.org/lkml/20230509124428.GA217130@chaop.bj.intel.com=
-/
