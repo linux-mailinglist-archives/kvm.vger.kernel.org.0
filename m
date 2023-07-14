@@ -2,96 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C760753753
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 12:02:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 260F275375E
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 12:04:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235620AbjGNKCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 06:02:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48378 "EHLO
+        id S235745AbjGNKEW convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 14 Jul 2023 06:04:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234562AbjGNKCE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 06:02:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DE235B7
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 03:01:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689328869;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ByDDVD7NvmFd68eU5Z++57AQqEgF+MqIckZ78qu/j2w=;
-        b=MZDPnydm2vlDix/QDCp92NlL1TpWyYibZxS4nJ7OXXbConkcX1mLUsitpoPqGn02WLpT4n
-        HU1QZEvhJq8fEuAVoZrTGyERfdZV7xriKSwGLHHYc3aTNehGVcrax00ZKitXliplbh2AJE
-        340I2W3RU+z/I4LGKKyZPg4zvL8XmO4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-127-WsIEY7nLO6-huCVkQjDJFQ-1; Fri, 14 Jul 2023 06:01:07 -0400
-X-MC-Unique: WsIEY7nLO6-huCVkQjDJFQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fb416d7731so9243085e9.2
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 03:01:07 -0700 (PDT)
+        with ESMTP id S231584AbjGNKEV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 06:04:21 -0400
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C127E1989;
+        Fri, 14 Jul 2023 03:04:20 -0700 (PDT)
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-1b730eb017bso1347303fac.1;
+        Fri, 14 Jul 2023 03:04:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689328866; x=1691920866;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ByDDVD7NvmFd68eU5Z++57AQqEgF+MqIckZ78qu/j2w=;
-        b=fyjTaS+cQl2Yk8afkEFWh81VKJDioUvMGWCAb66qDh5at8knGbR5qq106TfVnF2WpM
-         66hHnySsXe9wEr2JKXTY4wnCSDvM74XghFjvEgm3+jlIiF/GzhdCIqemAC1PXSOiM/2q
-         qL8W+br8kG8lmZ/I3HHzQT2gJ78XIoONijy8/plzqTYmbZ/nSeYZvpizKt4i2IhbM8O9
-         9z12ty4e+eriBNy1jGsZTXXGmYddPANm8tmPwHFQ4AAbKW+24Z4zQI57ZYy32n1Odj21
-         45mq5F7s17yUvpoJYzH7wrdzZshVgj8JTxsa94BNtBxZfKVThbNNy5mA6saXNF1FzCCF
-         R/1A==
-X-Gm-Message-State: ABy/qLb3qZ5l2y4/mtbevfO4433owQvA9QxnW1ElgR3/owFn/2Y3aR/T
-        c7wV2BpdQyrooO/scw7kcetJVmuSX+07s4F89yMMxAU3o7dMJtQ9geP0BL24rhoalgFpvBnmits
-        VPQ0K7ekd6qZT12q8A4X4
-X-Received: by 2002:a7b:c4d6:0:b0:3fb:ffef:d058 with SMTP id g22-20020a7bc4d6000000b003fbffefd058mr3305822wmk.0.1689328866469;
-        Fri, 14 Jul 2023 03:01:06 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHXE8cK5NLzeNgnPR7I5WnnP+S9CriZyncawrgO53haG2186lf7f4Na9CvD0LOX1aylIcQTxQ==
-X-Received: by 2002:a7b:c4d6:0:b0:3fb:ffef:d058 with SMTP id g22-20020a7bc4d6000000b003fbffefd058mr3305792wmk.0.1689328866005;
-        Fri, 14 Jul 2023 03:01:06 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70a:4500:8a9e:a24a:133d:86bb? (p200300cbc70a45008a9ea24a133d86bb.dip0.t-ipconnect.de. [2003:cb:c70a:4500:8a9e:a24a:133d:86bb])
-        by smtp.gmail.com with ESMTPSA id f17-20020a7bcd11000000b003fc02218d6csm1037545wmj.25.2023.07.14.03.01.04
+        d=1e100.net; s=20221208; t=1689329059; x=1691921059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cbFWyufa2I/dKrp5bYUBMB1ESShCcC04UZ0ziSB/4oc=;
+        b=WfuT62NAV/KEOKYAM9BHIMuHz6YRXnm7xoKdh+sZy9BOPjP8rgufGPlDP3wS4WSFx4
+         h7WbwjM0kI1vmGswHdrRNY5eqObFdrhpyeePmwzSkCxyCGkNNK5apfe0Z3voHsdHJJT7
+         tb6Wg0LNGs25QAQAkX1XSj9Lv613AXcD2pv8ijii7HM/KEiU5vWBLmIpKnDt7TvPxi9j
+         jSRmulr3xPLJCqwO+J5vysW5lDYIzj+df7ZTVf41ctwTsFcqgHpieUKAnTIIAuUgzyEC
+         qS4C0mddn/PtCJYOIsVReiT5jNn1mRz1CkNrgm0WViRn1vCY19+z6c3ymeQehI9SFa8v
+         1S1A==
+X-Gm-Message-State: ABy/qLasugcuzUO4sK3pOfm7xGhSQJ3QJrvNl2FH27Eqqm1CcAc7M6Zu
+        vOT1Owh1jKH/iaOREVbj2jd+9zh/u3Ruvg==
+X-Google-Smtp-Source: APBJJlHiD3v2u63KmBepFncsWakaeIp+xHYTm685RSMvB9XoC7cFtMO4232Sujt30xadpzbv8+Rh9w==
+X-Received: by 2002:a05:6870:b48b:b0:1b0:7078:58ad with SMTP id y11-20020a056870b48b00b001b0707858admr5618059oap.38.1689329059529;
+        Fri, 14 Jul 2023 03:04:19 -0700 (PDT)
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com. [209.85.210.42])
+        by smtp.gmail.com with ESMTPSA id t2-20020a056870e74200b001a697e75260sm3776688oak.58.2023.07.14.03.04.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jul 2023 03:01:05 -0700 (PDT)
-Message-ID: <34f749c1-db52-f435-f887-f8a9852150d1@redhat.com>
-Date:   Fri, 14 Jul 2023 12:01:04 +0200
+        Fri, 14 Jul 2023 03:04:18 -0700 (PDT)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6b711c3ad1fso1399321a34.0;
+        Fri, 14 Jul 2023 03:04:18 -0700 (PDT)
+X-Received: by 2002:a05:6358:591d:b0:135:43da:b16d with SMTP id
+ g29-20020a056358591d00b0013543dab16dmr4868202rwf.11.1689329058168; Fri, 14
+ Jul 2023 03:04:18 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v1 13/15] virtio-mem: Expose device memory via multiple
- memslots if enabled
-Content-Language: en-US
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Michal Privoznik <mprivozn@redhat.com>,
-        =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-References: <20230616092654.175518-1-david@redhat.com>
- <20230616092654.175518-14-david@redhat.com>
- <3bd720ec-8f61-d3e9-c998-4873e0c4f778@maciej.szmigiero.name>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <3bd720ec-8f61-d3e9-c998-4873e0c4f778@maciej.szmigiero.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+References: <20230714075155.5686-1-tzimmermann@suse.de>
+In-Reply-To: <20230714075155.5686-1-tzimmermann@suse.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 14 Jul 2023 12:04:03 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWoeyJPAgPgFi545SJFcaVCgZi1-zW2N5cBeU9BnHgo1w@mail.gmail.com>
+Message-ID: <CAMuHMdWoeyJPAgPgFi545SJFcaVCgZi1-zW2N5cBeU9BnHgo1w@mail.gmail.com>
+Subject: Re: [PATCH v3 00/18] fbdev: Remove FBINFO_DEFAULT and
+ FBINFO_FLAG_DEFAULT flags
+To:     Thomas Zimmermann <tzimmermann@suse.de>
+Cc:     deller@gmx.de, javierm@redhat.com, linux-sh@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-staging@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        linux-geode@lists.infradead.org, linux-nvidia@lists.surfsouth.com,
+        linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,129 +74,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.07.23 21:58, Maciej S. Szmigiero wrote:
-> On 16.06.2023 11:26, David Hildenbrand wrote:
->> Having large virtio-mem devices that only expose little memory to a VM
->> is currently a problem: we map the whole sparse memory region into the
->> guest using a single memslot, resulting in one gigantic memslot in KVM.
->> KVM allocates metadata for the whole memslot, which can result in quite
->> some memory waste.
->>
->> Assuming we have a 1 TiB virtio-mem device and only expose little (e.g.,
->> 1 GiB) memory, we would create a single 1 TiB memslot and KVM has to
->> allocate metadata for that 1 TiB memslot: on x86, this implies allocating
->> a significant amount of memory for metadata:
->>
->> (1) RMAP: 8 bytes per 4 KiB, 8 bytes per 2 MiB, 8 bytes per 1 GiB
->>       -> For 1 TiB: 2147483648 + 4194304 + 8192 = ~ 2 GiB (0.2 %)
->>
->>       With the TDP MMU (cat /sys/module/kvm/parameters/tdp_mmu) this gets
->>       allocated lazily when required for nested VMs
->> (2) gfn_track: 2 bytes per 4 KiB
->>       -> For 1 TiB: 536870912 = ~512 MiB (0.05 %)
->> (3) lpage_info: 4 bytes per 2 MiB, 4 bytes per 1 GiB
->>       -> For 1 TiB: 2097152 + 4096 = ~2 MiB (0.0002 %)
->> (4) 2x dirty bitmaps for tracking: 2x 1 bit per 4 KiB page
->>       -> For 1 TiB: 536870912 = 64 MiB (0.006 %)
->>
->> So we primarily care about (1) and (2). The bad thing is, that the
->> memory consumption *doubles* once SMM is enabled, because we create the
->> memslot once for !SMM and once for SMM.
->>
->> Having a 1 TiB memslot without the TDP MMU consumes around:
->> * With SMM: 5 GiB
->> * Without SMM: 2.5 GiB
->> Having a 1 TiB memslot with the TDP MMU consumes around:
->> * With SMM: 1 GiB
->> * Without SMM: 512 MiB
->>
->> ... and that's really something we want to optimize, to be able to just
->> start a VM with small boot memory (e.g., 4 GiB) and a virtio-mem device
->> that can grow very large (e.g., 1 TiB).
->>
->> Consequently, using multiple memslots and only mapping the memslots we
->> really need can significantly reduce memory waste and speed up
->> memslot-related operations. Let's expose the sparse RAM memory region using
->> multiple memslots, mapping only the memslots we currently need into our
->> device memory region container.
->>
->> * With VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we only map the memslots that
->>     actually have memory plugged, and dynamically (un)map when
->>     (un)plugging memory blocks.
->>
->> * Without VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we always map the memslots
->>     covered by the usable region, and dynamically (un)map when resizing the
->>     usable region.
->>
->> We'll auto-determine the number of memslots to use based on the suggested
->> memslot limit provided by the core. We'll use at most 1 memslot per
->> gigabyte. Note that our global limit of memslots accross all memory devices
->> is currently set to 256: even with multiple large virtio-mem devices, we'd
->> still have a sane limit on the number of memslots used.
->>
->> The default is a single memslot for now ("multiple-memslots=off"). The
->> optimization must be enabled manually using "multiple-memslots=on", because
->> some vhost setups (e.g., hotplug of vhost-user devices) might be
->> problematic until we support more memslots especially in vhost-user
->> backends.
->>
->> Note that "multiple-memslots=on" is just a hint that multiple memslots
->> *may* be used for internal optimizations, not that multiple memslots
->> *must* be used. The actual number of memslots that are used is an
->> internal detail: for example, once memslot metadata is no longer an
->> issue, we could simply stop optimizing for that. Migration source and
->> destination can differ on the setting of "multiple-memslots".
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>    hw/virtio/virtio-mem-pci.c     |  21 +++
->>    hw/virtio/virtio-mem.c         | 265 ++++++++++++++++++++++++++++++++-
->>    include/hw/virtio/virtio-mem.h |  23 ++-
->>    3 files changed, 304 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
->> index b85c12668d..8b403e7e78 100644
->> --- a/hw/virtio/virtio-mem-pci.c
->> +++ b/hw/virtio/virtio-mem-pci.c
-> (...)
->> @@ -790,6 +921,43 @@ static void virtio_mem_system_reset(void *opaque)
->>        virtio_mem_unplug_all(vmem);
->>    }
->>    
->> +static void virtio_mem_prepare_mr(VirtIOMEM *vmem)
->> +{
->> +    const uint64_t region_size = memory_region_size(&vmem->memdev->mr);
->> +
->> +    g_assert(!vmem->mr);
->> +    vmem->mr = g_new0(MemoryRegion, 1);
->> +    memory_region_init(vmem->mr, OBJECT(vmem), "virtio-mem",
->> +                       region_size);
->> +    vmem->mr->align = memory_region_get_alignment(&vmem->memdev->mr);
->> +}
->> +
->> +static void virtio_mem_prepare_memslots(VirtIOMEM *vmem)
->> +{
->> +    const uint64_t region_size = memory_region_size(&vmem->memdev->mr);
->> +    unsigned int idx;
->> +
->> +    g_assert(!vmem->memslots && vmem->nb_memslots);
->> +    vmem->memslots = g_new0(MemoryRegion, vmem->nb_memslots);
->> +
->> +    /* Initialize our memslots, but don't map them yet. */
->> +    for (idx = 0; idx < vmem->nb_memslots; idx++) {
->> +        const uint64_t memslot_offset = idx * vmem->memslot_size;
->> +        uint64_t memslot_size = vmem->memslot_size;
->> +        char name[20];
->> +
->> +        /* The size of the last memslot might be smaller. */
->> +        if (idx == vmem->nb_memslots) {                       ^
-> I guess this should be "vmem->nb_memslots - 1" since that's the last
-> memslot index.
+Hi Thomas,
 
-Indeed, thanks!
+On Fri, Jul 14, 2023 at 9:53 AM Thomas Zimmermann <tzimmermann@suse.de> wrote:
+> Remove the unused flags FBINFO_DEFAULT and FBINFO_FLAG_DEFAULT from
+> fbdev and drivers, as briefly discussed at [1]. Both flags were maybe
+> useful when fbdev had special handling for driver modules. With
+> commit 376b3ff54c9a ("fbdev: Nuke FBINFO_MODULE"), they are both 0
+> and have no further effect.
+>
+> Patches 1 to 7 remove FBINFO_DEFAULT from drivers. Patches 2 to 5
+> split this by the way the fb_info struct is being allocated. All flags
+> are cleared to zero during the allocation.
+>
+> Patches 8 to 16 do the same for FBINFO_FLAG_DEFAULT. Patch 8 fixes
+> an actual bug in how arch/sh uses the token for struct fb_videomode,
+> which is unrelated.
+>
+> Patch 17 removes both flag constants from <linux/fb.h> and patch 18
+> documents the zero'ed memory returned by framebuffer_alloc().
+>
+> v3:
+>         * sh: include board name in commit message (Adrian)
+>         * docs: reword text (Miguel)
+
+Thanks for the update!
+
+>   fbdev: Remove flag FBINFO_DEFAULT from fbdev drivers
+>   fbdev: Remove flag FBINFO_DEFAULT from fbdev drivers
+>   fbdev: Remove flag FBINFO_DEFAULT from fbdev drivers
+>   fbdev: Remove flag FBINFO_DEFAULT from fbdev drivers
+
+Four patches with the exact same one-line summary. Please make them
+unique.
+
+>   fbdev: Remove flag FBINFO_FLAG_DEFAULT from fbdev drivers
+>   fbdev: Remove flag FBINFO_FLAG_DEFAULT from fbdev drivers
+
+Two patches with the exact same one-line summary. Please make them
+unique.
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-Cheers,
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-David / dhildenb
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
