@@ -2,280 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0692C753312
-	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 09:21:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19F28753315
+	for <lists+kvm@lfdr.de>; Fri, 14 Jul 2023 09:22:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235077AbjGNHVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 03:21:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59142 "EHLO
+        id S235215AbjGNHWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jul 2023 03:22:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235377AbjGNHVs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 03:21:48 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095673586;
-        Fri, 14 Jul 2023 00:21:35 -0700 (PDT)
+        with ESMTP id S235391AbjGNHWM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jul 2023 03:22:12 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773D635B0;
+        Fri, 14 Jul 2023 00:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689319295; x=1720855295;
+  t=1689319326; x=1720855326;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=9kHtvDYDM2RRR9tqpvSAXG8JNF/ruRm/IeraNi3+ZfI=;
-  b=FSqXVHHqIicF/0FBBfP8z/885QPAMeZBVQoGCB8a3qGp+/J03lh8DBxp
-   zmyr84gcjv40m4wZbLP1fHaqi3R5n5XyGq+kmbmT+yLBwdFCv3ZfXVwXg
-   fyRVH4vnG+LptuuXUWymibJL3v4hMI9Rr0gazi7KeMaw5sf1wrbPHys2X
-   GnI48UsR6+fIGaukhY85f9BeQNjnqwjrsgUMvdA5EWbUTqqDaVLJEJzpp
-   5I4E2b6MCy9thDLYmVzvTH5MDcQrp0NPVZIuNN3h4I8g2AWGGx471Ge84
-   YsEPNSXyEFtplk3YSTnwyC5qMqj62p11/DbQIjLhYHzUgIHRg8HLIsFpI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="345727768"
+  bh=JwujvIAhHDIhsRscSy/VyNy1PdDMfjp1hDs4yRNRsl0=;
+  b=HCu/19A1wtQk9Wgv4lBPCu5JKD50QZSEdR6tNF9K/1pswnJ8zEXTDXaj
+   6UoEGtl8mSlajCUv32g3OOukapTw/2v8KAj89tVhbT7dqWfwI58l3bf78
+   DtIzMcQ13OHKsfhdJQwgja+ubBCL8l21pLliJuie8+8f2syXAqWyvDri3
+   HALcR2dh2veBGpVosNFYaNlADolEAHEmmhJa0YKSRq/4u6Bh2zLwOw+H5
+   EsqqnzjqrcB0o2RY0LQWcwTlQC2vxT+Ugyqhl1dQk9eq2pCPLXVQPlJQ8
+   ICKdzv/xpVzPfsR6IGTVBChrhkxpRH3Hci6R9AZShMnuZ8TNiZPG1Q+q/
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="362877539"
 X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="345727768"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:21:31 -0700
+   d="scan'208";a="362877539"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:22:05 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="896316954"
+X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="835937381"
 X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="896316954"
+   d="scan'208";a="835937381"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:21:28 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 00:22:03 -0700
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, chao.gao@intel.com,
         kai.huang@intel.com, robert.hoo.linux@gmail.com,
         yuan.yao@linux.intel.com, Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH v4 09/12] KVM: x86/mmu: serialize vCPUs to zap gfn when guest MTRRs are honored
-Date:   Fri, 14 Jul 2023 14:54:54 +0800
-Message-Id: <20230714065454.20688-1-yan.y.zhao@intel.com>
+Subject: [PATCH v4 10/12] KVM: x86/mmu: fine-grained gfn zap when guest MTRRs are honored
+Date:   Fri, 14 Jul 2023 14:55:30 +0800
+Message-Id: <20230714065530.20748-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230714064656.20147-1-yan.y.zhao@intel.com>
 References: <20230714064656.20147-1-yan.y.zhao@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Serialize concurrent and repeated calls of kvm_zap_gfn_range() from every
-vCPU for CR0.CD toggles and MTRR updates when guest MTRRs are honored.
+When guest MTRRs are honored and CR0.CD toggles, rather than blindly zap
+everything, find out fine-grained ranges to zap according to guest MTRRs.
 
-During guest boot-up, if guest MTRRs are honored by TDP, TDP zaps are
-triggered several times by each vCPU for CR0.CD toggles and MTRRs updates.
-This will take unexpected longer CPU cycles because of the contention of
-kvm->mmu_lock.
+Fine-grained and precise zap ranges allow reduced traversal footprint
+during zap and increased chances for concurrent vCPUs to find and skip
+duplicated ranges to zap.
 
-Therefore, introduce a mtrr_zap_list to remove duplicated zap and an atomic
-mtrr_zapping to allow only one vCPU to do the real zap work at one time.
+Opportunistically fix a typo in a nearby comment.
 
-Cc: Yuan Yao <yuan.yao@linux.intel.com>
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |   4 ++
- arch/x86/kvm/mtrr.c             | 122 +++++++++++++++++++++++++++++++-
- arch/x86/kvm/x86.c              |   5 +-
- arch/x86/kvm/x86.h              |   1 +
- 4 files changed, 130 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mtrr.c | 164 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 162 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 28bd38303d70..8da1517a1513 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1444,6 +1444,10 @@ struct kvm_arch {
- 	 */
- #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
- 	struct kvm_mmu_memory_cache split_desc_cache;
-+
-+	struct list_head mtrr_zap_list;
-+	spinlock_t mtrr_zap_list_lock;
-+	atomic_t mtrr_zapping;
- };
- 
- struct kvm_vm_stat {
 diff --git a/arch/x86/kvm/mtrr.c b/arch/x86/kvm/mtrr.c
-index 64c6daa659c8..996a274cee40 100644
+index 996a274cee40..9fdbdbf874a8 100644
 --- a/arch/x86/kvm/mtrr.c
 +++ b/arch/x86/kvm/mtrr.c
-@@ -25,6 +25,8 @@
- #define IA32_MTRR_DEF_TYPE_FE		(1ULL << 10)
- #define IA32_MTRR_DEF_TYPE_TYPE_MASK	(0xff)
- 
-+static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
-+				   gfn_t gfn_start, gfn_t gfn_end);
- static bool is_mtrr_base_msr(unsigned int msr)
- {
- 	/* MTRR base MSRs use even numbers, masks use odd numbers. */
-@@ -341,7 +343,7 @@ static void update_mtrr(struct kvm_vcpu *vcpu, u32 msr)
- 		var_mtrr_range(var_mtrr_msr_to_range(vcpu, msr), &start, &end);
+@@ -179,7 +179,7 @@ static struct fixed_mtrr_segment fixed_seg_table[] = {
+ 	{
+ 		.start = 0xc0000,
+ 		.end = 0x100000,
+-		.range_shift = 12, /* 12K */
++		.range_shift = 12, /* 4K */
+ 		.range_start = 24,
  	}
+ };
+@@ -747,6 +747,19 @@ struct mtrr_zap_range {
+ 	struct list_head node;
+ };
  
--	kvm_zap_gfn_range(vcpu->kvm, gpa_to_gfn(start), gpa_to_gfn(end));
-+	kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(start), gpa_to_gfn(end));
- }
- 
- static bool var_mtrr_range_is_valid(struct kvm_mtrr_range *range)
-@@ -737,3 +739,121 @@ void kvm_honors_guest_mtrrs_get_cd_memtype(struct kvm_vcpu *vcpu,
- 	}
- }
- EXPORT_SYMBOL_GPL(kvm_honors_guest_mtrrs_get_cd_memtype);
-+
-+struct mtrr_zap_range {
-+	gfn_t start;
-+	/* end is exclusive */
-+	gfn_t end;
-+	struct list_head node;
-+};
-+
-+/*
-+ * Add @range into kvm->arch.mtrr_zap_list and sort the list in
-+ * "length" ascending + "start" descending order, so that
-+ * ranges consuming more zap cycles can be dequeued later and their
-+ * chances of being found duplicated are increased.
-+ */
-+static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
++static void kvm_clear_mtrr_zap_list(struct kvm *kvm)
 +{
 +	struct list_head *head = &kvm->arch.mtrr_zap_list;
-+	u64 len = range->end - range->start;
-+	struct mtrr_zap_range *cur, *n;
-+	bool added = false;
++	struct mtrr_zap_range *tmp, *n;
 +
 +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
-+
-+	if (list_empty(head)) {
-+		list_add(&range->node, head);
-+		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-+		return;
++	list_for_each_entry_safe(tmp, n, head, node) {
++		list_del(&tmp->node);
++		kfree(tmp);
 +	}
++	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
++}
 +
-+	list_for_each_entry_safe(cur, n, head, node) {
-+		u64 cur_len = cur->end - cur->start;
+ /*
+  * Add @range into kvm->arch.mtrr_zap_list and sort the list in
+  * "length" ascending + "start" descending order, so that
+@@ -795,6 +808,67 @@ static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
+ 	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+ }
+ 
++/*
++ * Fixed ranges are only 256 pages in total.
++ * After balancing between reducing overhead of zap multiple ranges
++ * and increasing chances of finding duplicated ranges,
++ * just add fixed mtrr ranges as a whole to the mtrr zap list
++ * if memory type of one of them is not the specified type.
++ */
++static int prepare_zaplist_fixed_mtrr_of_non_type(struct kvm_vcpu *vcpu, u8 type)
++{
++	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
++	struct mtrr_zap_range *range;
++	int index, seg_end;
++	u8 mem_type;
 +
-+		if (len < cur_len)
-+			break;
++	for (index = 0; index < KVM_NR_FIXED_MTRR_REGION; index++) {
++		mem_type = mtrr_state->fixed_ranges[index];
 +
-+		if (len > cur_len)
++		if (mem_type == type)
 +			continue;
 +
-+		if (range->start > cur->start)
-+			break;
++		range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
++		if (!range)
++			return -ENOMEM;
 +
-+		if (range->start < cur->start)
-+			continue;
-+
-+		/* equal len & start, no need to add */
-+		added = true;
-+		kfree(range);
++		seg_end = ARRAY_SIZE(fixed_seg_table) - 1;
++		range->start = gpa_to_gfn(fixed_seg_table[0].start);
++		range->end = gpa_to_gfn(fixed_seg_table[seg_end].end);
++		kvm_add_mtrr_zap_list(vcpu->kvm, range);
 +		break;
 +	}
-+
-+	if (!added)
-+		list_add_tail(&range->node, &cur->node);
-+
-+	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
++	return 0;
 +}
 +
-+static void kvm_zap_mtrr_zap_list(struct kvm *kvm)
++/*
++ * Add var mtrr ranges to the mtrr zap list
++ * if its memory type does not equal to type
++ */
++static int prepare_zaplist_var_mtrr_of_non_type(struct kvm_vcpu *vcpu, u8 type)
 +{
-+	struct list_head *head = &kvm->arch.mtrr_zap_list;
-+	struct mtrr_zap_range *cur = NULL;
-+
-+	spin_lock(&kvm->arch.mtrr_zap_list_lock);
-+
-+	while (!list_empty(head)) {
-+		u64 start, end;
-+
-+		cur = list_first_entry(head, typeof(*cur), node);
-+		start = cur->start;
-+		end = cur->end;
-+		list_del(&cur->node);
-+		kfree(cur);
-+		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-+
-+		kvm_zap_gfn_range(kvm, start, end);
-+
-+		spin_lock(&kvm->arch.mtrr_zap_list_lock);
-+	}
-+
-+	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
-+}
-+
-+static void kvm_zap_or_wait_mtrr_zap_list(struct kvm *kvm)
-+{
-+	if (atomic_cmpxchg_acquire(&kvm->arch.mtrr_zapping, 0, 1) == 0) {
-+		kvm_zap_mtrr_zap_list(kvm);
-+		atomic_set_release(&kvm->arch.mtrr_zapping, 0);
-+		return;
-+	}
-+
-+	while (atomic_read(&kvm->arch.mtrr_zapping))
-+		cpu_relax();
-+}
-+
-+static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
-+				   gfn_t gfn_start, gfn_t gfn_end)
-+{
++	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
 +	struct mtrr_zap_range *range;
++	struct kvm_mtrr_range *tmp;
++	u8 mem_type;
 +
-+	range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
-+	if (!range)
-+		goto fail;
++	list_for_each_entry(tmp, &mtrr_state->head, node) {
++		mem_type = tmp->base & 0xff;
++		if (mem_type == type)
++			continue;
 +
-+	range->start = gfn_start;
-+	range->end = gfn_end;
++		range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
++		if (!range)
++			return -ENOMEM;
 +
-+	kvm_add_mtrr_zap_list(vcpu->kvm, range);
-+
-+	kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
-+	return;
-+
-+fail:
-+	kvm_zap_gfn_range(vcpu->kvm, gfn_start, gfn_end);
++		var_mtrr_range(tmp, &range->start, &range->end);
++		range->start = gpa_to_gfn(range->start);
++		range->end = gpa_to_gfn(range->end);
++		kvm_add_mtrr_zap_list(vcpu->kvm, range);
++	}
++	return 0;
 +}
 +
-+void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
-+}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 32cc8bfaa5f1..bb79154cf465 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -943,7 +943,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
- 
- 	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
- 	    kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
--		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
-+		kvm_honors_guest_mtrrs_zap_on_cd_toggle(vcpu);
+ static void kvm_zap_mtrr_zap_list(struct kvm *kvm)
+ {
+ 	struct list_head *head = &kvm->arch.mtrr_zap_list;
+@@ -853,7 +927,93 @@ static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
+ 	kvm_zap_gfn_range(vcpu->kvm, gfn_start, gfn_end);
  }
- EXPORT_SYMBOL_GPL(kvm_post_set_cr0);
  
-@@ -12310,6 +12310,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.guest_can_read_msr_platform_info = true;
- 	kvm->arch.enable_pmu = enable_pmu;
- 
-+	spin_lock_init(&kvm->arch.mtrr_zap_list_lock);
-+	INIT_LIST_HEAD(&kvm->arch.mtrr_zap_list);
++/*
++ * Zap SPTEs when guest MTRRs are honored and CR0.CD toggles
++ * in fine-grained way according to guest MTRRs.
++ * As guest MTRRs are per-vCPU, they are unchanged across this function.
++ *
++ * when CR0.CD=1, TDP memtype is WB or UC + IPAT;
++ * when CR0.CD=0, TDP memtype is determined by guest MTRRs.
++ *
++ * On CR0.CD toggles, as guest MTRRs remain unchanged,
++ * - if old memtype are new memtype are equal, nothing needs to do;
++ * - if guest default MTRR type equals to memtype in CR0.CD=1,
++ *   only MTRR ranges of non-default-memtype are required to be zapped.
++ * - if guest default MTRR type !equals to memtype in CR0.CD=1,
++ *   everything is zapped because memtypes for almost all guest memory
++ *   are out-dated.
++ * _____________________________________________________________________
++ *| quirk on             | CD=1 to CD=0         | CD=0 to CD=1          |
++ *|                      | old memtype = WB     | new memtype = WB      |
++ *|----------------------|----------------------|-----------------------|
++ *| MTRR enabled         | new memtype =        | old memtype =         |
++ *|                      | guest MTRR type      | guest MTRR type       |
++ *|    ------------------|----------------------|-----------------------|
++ *|    | if default MTRR | zap non-WB guest     | zap non-WB guest      |
++ *|    | type == WB      | MTRR ranges          | MTRR ranges           |
++ *|    |-----------------|----------------------|-----------------------|
++ *|    | if default MTRR | zap all              | zap all               |
++ *|    | type != WB      | as almost all guest MTRR ranges are non-WB   |
++ *|----------------------|----------------------------------------------|
++ *| MTRR disabled        | new memtype = UC     | old memtype = UC      |
++ *| (w/ FEATURE_MTRR)    | zap all              | zap all               |
++ *|----------------------|----------------------|-----------------------|
++ *| MTRR disabled        | new memtype = WB     | old memtype = WB      |
++ *| (w/o FEATURE_MTRR)   | do nothing           | do nothing            |
++ *|______________________|______________________|_______________________|
++ *
++ * _____________________________________________________________________
++ *| quirk off     | CD=1 to CD=0             | CD=0 to CD=1             |
++ *|               | old memtype = UC + IPAT  | new memtype = UC + IPAT  |
++ *|---------------|--------------------------|--------------------------|
++ *| MTRR enabled  | new memtype = guest MTRR | old memtype = guest MTRR |
++ *|               | type (!= UC + IPAT)      | type (!= UC + IPAT)      |
++ *|               | zap all                  | zap all                  |
++ *|---------------|------------------------- |--------------------------|
++ *| MTRR disabled | new memtype = UC         | old memtype = UC         |
++ *| (w/           | (!= UC + IPAT)           | (!= UC + IPAT)           |
++ *| FEATURE_MTRR) | zap all                  | zap all                  |
++ *|---------------|--------------------------|--------------------------|
++ *| MTRR disabled | new memtype = WB         | old memtype = WB         |
++ *| (w/o          | (!= UC + IPAT)           | (!= UC + IPAT)           |
++ *| FEATURE_MTRR) | zap all                  | zap all                  |
++ *|_______________|__________________________|__________________________|
++ *
++ */
+ void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
++	struct kvm_mtrr *mtrr_state = &vcpu->arch.mtrr_state;
++	bool mtrr_enabled = mtrr_is_enabled(mtrr_state);
++	u8 default_mtrr_type;
++	bool cd_ipat;
++	u8 cd_type;
 +
- #if IS_ENABLED(CONFIG_HYPERV)
- 	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
- 	kvm->arch.hv_root_tdp = INVALID_PAGE;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index e7733dc4dccc..56d8755b2560 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -315,6 +315,7 @@ bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
- 					  int page_num);
- void kvm_honors_guest_mtrrs_get_cd_memtype(struct kvm_vcpu *vcpu,
- 					   u8 *type, bool *ipat);
-+void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu);
- bool kvm_vector_hashing_enabled(void);
- void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
- int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
++	kvm_honors_guest_mtrrs_get_cd_memtype(vcpu, &cd_type, &cd_ipat);
++
++	default_mtrr_type = mtrr_enabled ? mtrr_default_type(mtrr_state) :
++			    mtrr_disabled_type(vcpu);
++
++	if (cd_type != default_mtrr_type || cd_ipat)
++		return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
++
++	/*
++	 * If mtrr is not enabled, it will go to zap all above if the default
++	 * type does not equal to cd_type;
++	 * Or it has no need to zap if the default type equals to cd_type.
++	 */
++	if (mtrr_enabled) {
++		if (prepare_zaplist_fixed_mtrr_of_non_type(vcpu, default_mtrr_type))
++			goto fail;
++
++		if (prepare_zaplist_var_mtrr_of_non_type(vcpu, default_mtrr_type))
++			goto fail;
++
++		kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
++	}
++	return;
++fail:
++	kvm_clear_mtrr_zap_list(vcpu->kvm);
++	/* resort to zapping all on failure*/
++	kvm_zap_gfn_range(vcpu->kvm, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
++	return;
+ }
 -- 
 2.17.1
 
