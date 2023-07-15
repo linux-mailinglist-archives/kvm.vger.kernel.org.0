@@ -2,336 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92752754629
-	for <lists+kvm@lfdr.de>; Sat, 15 Jul 2023 04:02:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EFAC7546C2
+	for <lists+kvm@lfdr.de>; Sat, 15 Jul 2023 06:10:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229846AbjGOCCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jul 2023 22:02:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48168 "EHLO
+        id S230146AbjGOEKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Jul 2023 00:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbjGOCCW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jul 2023 22:02:22 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963BAE65
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 19:02:20 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b9ed206018so37045ad.1
-        for <kvm@vger.kernel.org>; Fri, 14 Jul 2023 19:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689386540; x=1689991340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PZ2NAJ4+oBIiW+OiV8ulU7hYAwakFHKUEDvjH+k9O2U=;
-        b=g8qjNa5ck7KlZ8ntqUPa3j9Aq8Hh/bGH5joVpwrIHPSFsDox/Sz7FsC4F2esPmpV3H
-         zZrUe2wuap61a1yLCOK1+eUcJf9sGCek1a8zh3U+IQTZhmB0BkgZ8SaMVwTco6yZQJF0
-         0+idPptqrAvrm4pIZGuBmBvbRAK5zUz5Q+2KxYN8yB66qHlgpobsCOBr9Hvx0osZ1pCQ
-         rMJ5wBYL6lqcBQgIqrRoaFhJlaCNyP/0t53ZiJXC09t6hw5LaQ4vYz8XsO125Jd7BGHI
-         knnSjcC+Cs+6oBJ0QKWFJnQ2uUQi6t5vzn77HGfq+iWxICheWHS3b1X5C96raQDikAne
-         eLJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689386540; x=1689991340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PZ2NAJ4+oBIiW+OiV8ulU7hYAwakFHKUEDvjH+k9O2U=;
-        b=g/Si3WlnysPBwrwgU13a/NrrWzGlfail5ejJyNYK/O8kIcIpd6xy9+HSdMI2R6t6HS
-         M9Pn/fVjPa7DPxc6F7CXJ4cyeleVcHOCWC3pKglE2mDAt4G1qRv0XLWK5vtALqIo4yfo
-         Afa9dRZJyP7Gl3BKiVzUDzu3ZZJa7QhiM9dHvZnUkncBhSWn6IWjp7SNiUnN16Fv0miZ
-         H+bqbNiYnqeoCTYoz4Ki9n0DrUrZMJT+FYXuIXZ1OCgZql//1rEsLNbAB8rSXeyoypD3
-         RobRf5kJWcnD9rdrO3yipNNNAn3yGHkwtSgSkYEPwaT+JunxKtGFwbeZCeTky6GViLbL
-         Cn8w==
-X-Gm-Message-State: ABy/qLYDb5OVN9sM8cm33ADOJKX/LefYFZVhU2SyAynUQnP+Qb+XggPc
-        K+2m82X3/+TpKD6C98qXcZvOLP9hDrynIUKjDFydfw==
-X-Google-Smtp-Source: APBJJlEvwmu9rSjxB6k5eidwiwR/aN58U0Wkj7gKoh0aHQAnjI+UTQtWo8K/wWM8yPDIRphAQCq7Uh9Icwt+EPara3s=
-X-Received: by 2002:a17:902:c652:b0:1ac:8835:b890 with SMTP id
- s18-20020a170902c65200b001ac8835b890mr860418pls.14.1689386539789; Fri, 14 Jul
- 2023 19:02:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230715005405.3689586-1-rananta@google.com>
-In-Reply-To: <20230715005405.3689586-1-rananta@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Fri, 14 Jul 2023 19:02:07 -0700
-Message-ID: <CAJHc60xaKwBxOVPQZ_bg_2U+vf7nvoU9sv1XcYQ55oZe3cMD8w@mail.gmail.com>
-Subject: Re: [PATCH v6 00/11] KVM: arm64: Add support for FEAT_TLBIRANGE
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        with ESMTP id S229490AbjGOEKW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Jul 2023 00:10:22 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764A23594;
+        Fri, 14 Jul 2023 21:10:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689394221; x=1720930221;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=VeYpTK+q+7TAu0eQiuP2mDHSXtmdp5Z6kcrEW0oERM0=;
+  b=kX+JIwvjf1AuRA6lgeMvMMuDARjy4p5T7RswjDV8NipP16D7K+f3k0Fy
+   +ux0xSxAq6oHaUnO7iLOPKQwSOjt2gyclpJPTyU9vAozmMkjdrsedJM5a
+   EfGlNHyy9IpvAC4h2WosZNkwkotnset0fFPJu0nLTFvUef8zHudBb7fr5
+   juyo/VujBCiwqEIL9zYsiZ/no3pJsyQJHmDgIpB5J+5GL7vt0sNrvAq19
+   CIFWUZ+HG7FyFrYYEN2CsCn2kyfH9Qhv6wgbwhu4G5XOifrFBdqm3o4kV
+   bA/an1KA96c0z1DU7YyfxUqdDjiFzaXkdOIz5zovJkhw/sEd7ceapQPLp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="345224646"
+X-IronPort-AV: E=Sophos;i="6.01,207,1684825200"; 
+   d="scan'208";a="345224646"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 21:10:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10771"; a="716537685"
+X-IronPort-AV: E=Sophos;i="6.01,207,1684825200"; 
+   d="scan'208";a="716537685"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga007.jf.intel.com with ESMTP; 14 Jul 2023 21:10:19 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 14 Jul 2023 21:10:19 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 14 Jul 2023 21:10:19 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 14 Jul 2023 21:10:18 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mPs9By50LDlR3YN3NJwww8QgBrxnnJSN66ZeUch6rneAW8BD+76KYEcsF25nflnVqHve652JriXiZrVcS6Lth7Qe7EajR3gUiooBsgIKLytIEpLRagP5q4Jr2UZg9HeyI34tdapWodwbOYd8/Zky7sm5fejZbc2PavyMj5IYuM0TGKNgjabmaO2HqVQSDng0K989KiCC42XSs4WgFHqT6vETl7hwHt8SovN53kdUEN1DeK8CVCX7CunllBEx34w25BQ2anul+yIKP36mijXUxnLHIfKNQUEcfiyliGMtdePpT1aHl4om6AwLD75U76q9Sjte9JCxrq/b95Ig2/d66A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oFs3DdPQLrsEHvF9gSAkFYQpEEWc8SiNDY+/sBxz00w=;
+ b=T39f1Y+B+Lu2AWndB1DQUedJQilDiOGQqY8itHlwywu0nYH7L6ZkEjNvrmwbsuLHUj48j1YEeLYnTmnvVjSmmrWjOPZ+HGLJy2OdmEuF17yC6OYaNIsCh6yB41zFEfLd2LjpxjNRqRdmTlM8E8YvPjHURRMBB1xi2IbZfrzoYSNWr8xKl7iDQWKICTFgZYPXRHM5Yng94v0WVhkeU8VAYFc4Ke3uKOcmN+dEOkB4ZAprkSHz4iedJ72cPhdmcdRYgIy247iyD4XCjQ9ZJTf+kH01gjxMvBwRkdb3DLYWm6aa2EE3peV9pQ6Pz7eKqPqHHii/p+yqxXOuXiK9CberrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by DM4PR11MB5439.namprd11.prod.outlook.com (2603:10b6:5:39b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.28; Sat, 15 Jul
+ 2023 04:10:12 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::806a:6364:af2:1aea]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::806a:6364:af2:1aea%7]) with mapi id 15.20.6588.028; Sat, 15 Jul 2023
+ 04:10:12 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: RE: [PATCH v14 20/26] iommufd: Add iommufd_ctx_from_fd()
+Thread-Topic: [PATCH v14 20/26] iommufd: Add iommufd_ctx_from_fd()
+Thread-Index: AQHZs6PIOvgXPxrjcUyYYNzDk4faQK+5VWmAgADnYgA=
+Date:   Sat, 15 Jul 2023 04:10:11 +0000
+Message-ID: <DS0PR11MB7529DCE581527802A932064CC335A@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230711025928.6438-1-yi.l.liu@intel.com>
+ <20230711025928.6438-21-yi.l.liu@intel.com> <ZLFZr7hOTLktRthU@nvidia.com>
+In-Reply-To: <ZLFZr7hOTLktRthU@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DM4PR11MB5439:EE_
+x-ms-office365-filtering-correlation-id: cb3e3655-ce5d-407f-874b-08db84e96243
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: q09IxGb4z5DYKPMpjxBId/AIvuB174Kv0ccNTqLnrnK8ai5nkaOv6Ln7FJSthahajOXUqNzVsT/uh2aIeOwke9ItjMf5ZCWdbAjT2F1x/9FCioC9wjSJoVAUI9hxBsRUKTxclLw1QG8XBbeu9nHJdF7ajZz4A3Rw2RiVvKK6UrJFf1v7vlXTYkYFLZv/AniwVj+3GfHkVzUuzgbK/yHMPUyN0W3ZDMAQ5IXpwQeC7MEXgUdhcYOtqIJBc5oxXLE+l5SGVKlA5z8BnGCZNnxQAh0ZQbferWxZLGPXT/5eHNyA9Svvfw1A7Xxs1s1K8wL24LvQMBrYyWUMtaCENFDBcp+p22IgQlVyrP37vZJPyC2belueXt//1QgmkRlW4+j1GJuR05GG37EunXmUvA4EhPPMy562HJ8Rju9NPctRNUlDfrVTrDz3Ak1vBIsQGP6B2WXZwq5bI+4/Ld0xy0CILMgAC5oXiwlbXZMfNl7FlLcI0cbr9rt1rfWWnCg3ZZ+G36uhxw4GuXgtf/5prMyxJRAMzMSxuvBqs62hjU+iPkGgMVhS65rsjUYgkeEa8dM51mpwMnZCqvrAwedVl64GcsXmWeV7dbynq4Vks5o2UpRuX6tzyF/jtRg0FgOnP2rd
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(136003)(346002)(376002)(366004)(451199021)(316002)(5660300002)(41300700001)(38100700002)(52536014)(122000001)(8676002)(8936002)(82960400001)(7416002)(86362001)(33656002)(38070700005)(55016003)(2906002)(7696005)(71200400001)(9686003)(478600001)(83380400001)(186003)(26005)(6506007)(4326008)(64756008)(66476007)(66446008)(66556008)(66946007)(76116006)(6916009)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5sylxf1aLHtdbGn9Cutb+DExj27hpogINwPADV3OWb4cJnXlFVNuL/Hui4mH?=
+ =?us-ascii?Q?ZEyo5NYK/Gb447w9f9Q265eGWulHOSt8Da6n6DlVU8DLYzlz4bE/EPGVSfMk?=
+ =?us-ascii?Q?WvRoEjpDhlonGAEPWdNMsWj0Jjb2BnPvyQ1fGw3HlJ0Ij/Rmzu/F4FVw+G00?=
+ =?us-ascii?Q?rx791BQN816SK7MvpmYld+9CeWe6rZhkuzA2uAykL+NIDOmqAv6E4D53ocAc?=
+ =?us-ascii?Q?JTj9Cwfl+Kcd8vfzOca3DYBZPgi32FAhRnooMbuKdj0dL2/w09WbJ7s51B+u?=
+ =?us-ascii?Q?TC40ey13dpfRikrlKigtKcogqA5EQk4usZxSMwNagjV133xrPerCddKhfD1W?=
+ =?us-ascii?Q?wQGSeDOAMnWPreTBNlkv6Ue7HTecE+Rq4kFLZ01owUufniWMscF+1Y4RtgfU?=
+ =?us-ascii?Q?QKNJ2Z54XEouOEahQ+wTJIxsQ4vuTwYOjbcZlPUUonRDiWBp6pJXGoX47Vf9?=
+ =?us-ascii?Q?MpcLXGvh2teoI1O4Bvjdyw/uOvqhdWsTnTS4Kgx/bIDm/DKHGDs4s/N05uP6?=
+ =?us-ascii?Q?bmglYw3TC7KIkmI588icwa5UoVGchs/aEB8SJ5RKGufVpcNFbq55ZusxkFG5?=
+ =?us-ascii?Q?pFfyAxDfEwYbomSTUVCHmgCh5EvVFXk7x3D5S/kKpVaGoFUiKNllF2QO8Pkj?=
+ =?us-ascii?Q?nWqXgp90fN7HnFbsna+cvIAAvtzXROUVTVxptJB9gXtDr2JBbrBo+/0xzHi3?=
+ =?us-ascii?Q?mM96li322TNxdW/f33j9lhPDTLJ0Vznvm7+nLyPUQ4X6D3oaJ+/SVQ/X7CGh?=
+ =?us-ascii?Q?cZrWMSiap7vNg4w6tY+kSsrfYjJDlpBHWCkcX1bukmVr90uYp2fx38TmnErL?=
+ =?us-ascii?Q?hz76dEgUgZsCduo/uS9bHtJz8hEvbx3CmydlvSOhX4ly4pvrDDecWviY+FGm?=
+ =?us-ascii?Q?pjkt3PO7pkz1FHByfchKxdOyWSXK6SJsNS2i5z6btei+EgfayRJmsZEiDyBO?=
+ =?us-ascii?Q?vJj6e8cb7QY4a42Ow0TEGYfLSoc/iSvObwWG4vSnc8FHc/yNrsLfnepHZt/7?=
+ =?us-ascii?Q?YGgoYkoL8X4izJKeC2x3zgHnyEFTJwG0vzIZY6JId9HnismP4ZNmZ3vFa2Cf?=
+ =?us-ascii?Q?wGmHwuSTM64ald1MTysbw6JO8AVFlXCz/2aiOTrTRAuDVxZ6WUyCBa2offm1?=
+ =?us-ascii?Q?LgTMm6F/+l0RhqOWVapqwjek2SNU7tvHPitXelF4CncjUTTnC33iHPc/Gkuy?=
+ =?us-ascii?Q?ssVfb6p2Uzk0Y1EQOab/n5aZ9axvFvU9H2lmzKzXoaEoKDcJTqVeYzyKGhRf?=
+ =?us-ascii?Q?27L6PNhD532qMTcpdku4tBWT9sk4fEr3UtVylJI86X7y4Z1y3EJv6x8AkISv?=
+ =?us-ascii?Q?wG7r6z8wokH6sewv8fogU0l0wv7qDG9cnqEWxV3o11vzKCbvQmHHkDxiKwFF?=
+ =?us-ascii?Q?OknXSewXNlRDvdXvzAhj+UNEg10K69Y3VMKG3jpN8oufnbgGNFgGdV3Bntgg?=
+ =?us-ascii?Q?YcdDNT7e/uWJgzaLaS17ja8YyJAddXBJWtjEb7hL/MRNEIYGndhkKeDJw9do?=
+ =?us-ascii?Q?oCMs5mYkPzrkdPZfaz4jM+Zvt464OvX4OzaqWl3bCnLyVrTg9+7UUa5vZc3i?=
+ =?us-ascii?Q?r4Cosdin/yiqLj6/nCY=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb3e3655-ce5d-407f-874b-08db84e96243
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2023 04:10:11.3450
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: W3bx6b5hHMYw4fGL9k6QJnJ5jVF6gU00UU+kIzzfLOLXig9bH2+pMAKq13AecaFNGLIUQffnwW6wxZjbivaklg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5439
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 14, 2023 at 5:54=E2=80=AFPM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> In certain code paths, KVM/ARM currently invalidates the entire VM's
-> page-tables instead of just invalidating a necessary range. For example,
-> when collapsing a table PTE to a block PTE, instead of iterating over
-> each PTE and flushing them, KVM uses 'vmalls12e1is' TLBI operation to
-> flush all the entries. This is inefficient since the guest would have
-> to refill the TLBs again, even for the addresses that aren't covered
-> by the table entry. The performance impact would scale poorly if many
-> addresses in the VM is going through this remapping.
->
-> For architectures that implement FEAT_TLBIRANGE, KVM can replace such
-> inefficient paths by performing the invalidations only on the range of
-> addresses that are in scope. This series tries to achieve the same in
-> the areas of stage-2 map, unmap and write-protecting the pages.
->
-> As suggested by Oliver in the original v5 of the series [1], I'm
-> reposting the series by including v2 of David Matlack's 'KVM: Add a
-> common API for range-based TLB invalidation' series [2].
->
-> Patches 1-4 includes David M.'s patches 1, 2, 6, and 7 from [2].
->
-> Patch-5 refactors the core arm64's __flush_tlb_range() to be used by
-> other entities.
->
-> Patch-6,7 adds a range-based TLBI mechanism for KVM (VHE and nVHE).
->
-> Patch-8 implements the kvm_arch_flush_remote_tlbs_range() for arm64.
->
-> Patch-9 aims to flush only the memslot that undergoes a write-protect,
-> instead of the entire VM.
->
-> Patch-10 operates on stage2_try_break_pte() to use the range based
-> TLBI instructions when collapsing a table entry. The map path is the
-> immediate consumer of this when KVM remaps a table entry into a block.
->
-> Patch-11 modifies the stage-2 unmap path in which, if the system
-> supports
-> FEAT_TLBIRANGE, the TLB invalidations are skipped during the page-table.
-> walk. Instead it's done in one go after the entire walk is finished.
->
-> The series is based off of upstream v6.5-rc1.
->
-> The performance evaluation was done on a hardware that supports
-> FEAT_TLBIRANGE, on a VHE configuration, using a modified
-> kvm_page_table_test.
-> The modified version updates the guest code in the ADJUST_MAPPINGS case
-> to not only access this page but also to access up to 512 pages
-> backwards
-> for every new page it iterates through. This is done to test the effect
-> of TLBI misses after KVM has handled a fault.
->
-> The series captures the impact in the map and unmap paths as described
-> above.
->
-> $ kvm_page_table_test -m 2 -v 128 -s anonymous_hugetlb_2mb -b $i
->
-> +--------+------------------------------+------------------------------+
-> | mem_sz |    ADJUST_MAPPINGS (s)       |      Unmap VM (s)            |
-> |  (GB)  | Baseline | Baseline + series | Baseline | Baseline + series |
-> +--------+----------|-------------------+------------------------------+
-> |   1    |   3.33   |   3.22            | 0.009     | 0.005            |
-> |   2    |   7.39   |   7.32            | 0.012     | 0.006            |
-> |   4    |  13.49   |  10.50            | 0.017     | 0.008            |
-> |   8    |  21.60   |  21.50            | 0.027     | 0.011            |
-> |  16    |  57.02   |  43.63            | 0.046     | 0.018            |
-> |  32    |  95.92   |  83.26            | 0.087     | 0.030            |
-> |  64    | 199.57   | 165.14            | 0.146     | 0.055            |
-> | 128    | 423.65   | 349.37            | 0.280     | 0.100            |
-> +--------+----------+-------------------+----------+-------------------+
->
-> $ kvm_page_table_test -m 2 -b 128G -s anonymous_hugetlb_2mb -v $i
->
-> +--------+------------------------------+
-> | vCPUs  |    ADJUST_MAPPINGS (s)       |
-> |        | Baseline | Baseline + series |
-> +--------+----------|-------------------+
-> |   1    | 111.44   | 114.63            |
-> |   2    | 102.88   |  74.64            |
-> |   4    | 134.83   |  98.78            |
-> |   8    |  98.81   |  95.01            |
-> |  16    | 127.41   |  99.05            |
-> |  32    | 105.35   |  91.75            |
-> |  64    | 201.13   | 163.63            |
-> | 128    | 423.65   | 349.37            |
-> +--------+----------+-------------------+
->
-> For the ADJUST_MAPPINGS cases, which maps back the 4K table entries to
-> 2M hugepages, the series sees an average improvement of ~15%. For
-> unmapping 2M hugepages, we see a gain of 2x to 3x.
->
-> $ kvm_page_table_test -m 2 -b $i
->
-> +--------+------------------------------+
-> | mem_sz |      Unmap VM (s)            |
-> |  (GB)  | Baseline | Baseline + series |
-> +--------+------------------------------+
-> |   1    |  0.54    |  0.13             |
-> |   2    |  1.07    |  0.25             |
-> |   4    |  2.10    |  0.47             |
-> |   8    |  4.19    |  0.92             |
-> |  16    |  8.35    |  1.92             |
-> |  32    | 16.66    |  3.61             |
-> |  64    | 32.36    |  7.62             |
-> | 128    | 64.65    | 14.39             |
-> +--------+----------+-------------------+
->
-> The series sees an average gain of 4x when the guest backed by
-> PAGE_SIZE (4K) pages.
->
-> Other testing:
->  - Booted on x86_64 and ran KVM selftests.
->  - Build tested for MIPS and RISCV architectures against defconfig.
->
-> Cc: David Matlack <dmatlack@google.com>
->
-> v6:
-This should've been 'v5 (RESEND)' with the link:
-https://lore.kernel.org/all/20230621175002.2832640-1-rananta@google.com/
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, July 14, 2023 10:21 PM
+>=20
+> On Mon, Jul 10, 2023 at 07:59:22PM -0700, Yi Liu wrote:
+> > It's common to get a reference to the iommufd context from a given file
+> > descriptor. So adds an API for it. Existing users of this API are compi=
+led
+> > only when IOMMUFD is enabled, so no need to have a stub for the IOMMUFD
+> > disabled case.
+> >
+> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> > ---
+> >  drivers/iommu/iommufd/main.c | 23 +++++++++++++++++++++++
+> >  include/linux/iommufd.h      |  1 +
+> >  2 files changed, 24 insertions(+)
+> >
+> > diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.=
+c
+> > index 32ce7befc8dd..e99a338d4fdf 100644
+> > --- a/drivers/iommu/iommufd/main.c
+> > +++ b/drivers/iommu/iommufd/main.c
+> > @@ -377,6 +377,29 @@ struct iommufd_ctx *iommufd_ctx_from_file(struct f=
+ile *file)
+> >  }
+> >  EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_file, IOMMUFD);
+> >
+> > +/**
+> > + * iommufd_ctx_from_fd - Acquires a reference to the iommufd context
+> > + * @fd: File descriptor to obtain the reference from
+> > + *
+> > + * Returns a pointer to the iommufd_ctx, otherwise ERR_PTR. On success
+> > + * the caller is responsible to call iommufd_ctx_put().
+> > + */
+> > +struct iommufd_ctx *iommufd_ctx_from_fd(int fd)
+> > +{
+> > +	struct iommufd_ctx *iommufd;
+> > +	struct fd f;
+> > +
+> > +	f =3D fdget(fd);
+> > +	if (!f.file)
+> > +		return ERR_PTR(-EBADF);
+> > +
+> > +	iommufd =3D iommufd_ctx_from_file(f.file);
+> > +
+> > +	fdput(f);
+> > +	return iommufd;
+> > +}
+> > +EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_fd, IOMMUFD);
+>=20
+> This is a little wonky since iommufd_ctx_from_file() also obtains a
+> reference
 
-- Raghavendra
-> Thanks, Gavin for the suggestions:
-> - Adjusted the comment on patch-2 to align with the code.
-> - Fixed checkpatch.pl warning on patch-5.
->
-> v5:
-> https://lore.kernel.org/all/20230606192858.3600174-1-rananta@google.com/
-> Thank you, Marc and Oliver for the comments
-> - Introduced a helper, kvm_tlb_flush_vmid_range(), to handle
->   the decision of using range-based TLBI instructions or
->   invalidating the entire VMID, rather than depending on
->   __kvm_tlb_flush_vmid_range() for it.
-> - kvm_tlb_flush_vmid_range() splits the range-based invalidations
->   if the requested range exceeds MAX_TLBI_RANGE_PAGES.
-> - All the users in need of invalidating the TLB upon a range
->   now depends on kvm_tlb_flush_vmid_range() rather than directly
->   on __kvm_tlb_flush_vmid_range().
-> - stage2_unmap_defer_tlb_flush() introduces a WARN_ON() to
->   track if there's any change in TLBIRANGE or FWB support
->   during the unmap process as the features are based on
->   alternative patching and the TLBI operations solely depend
->   on this check.
-> - Corrected an incorrect hunk being present on v4's patch-3.
-> - Updated the patches changelog and code comments as per the
->   suggestions.
->
-> v4:
-> https://lore.kernel.org/all/20230519005231.3027912-1-rananta@google.com/
-> Thanks again, Oliver for all the comments
-> - Updated the __kvm_tlb_flush_vmid_range() implementation for
->   nVHE to adjust with the modfied __tlb_switch_to_guest() that
->   accepts a new 'bool nsh' arg.
-> - Renamed stage2_put_pte() to stage2_unmap_put_pte() and removed
->   the 'skip_flush' argument.
-> - Defined stage2_unmap_defer_tlb_flush() to check if the PTE
->   flushes can be deferred during the unmap table walk. It's
->   being called from stage2_unmap_put_pte() and
->   kvm_pgtable_stage2_unmap().
-> - Got rid of the 'struct stage2_unmap_data'.
->
-> v3:
-> https://lore.kernel.org/all/20230414172922.812640-1-rananta@google.com/
-> Thanks, Oliver for all the suggestions.
-> - The core flush API (__kvm_tlb_flush_vmid_range()) now checks if
->   the system support FEAT_TLBIRANGE or not, thus elimiating the
->   redundancy in the upper layers.
-> - If FEAT_TLBIRANGE is not supported, the implementation falls
->   back to invalidating all the TLB entries with the VMID, instead
->   of doing an iterative flush for the range.
-> - The kvm_arch_flush_remote_tlbs_range() doesn't return -EOPNOTSUPP
->   if the system doesn't implement FEAT_TLBIRANGE. It depends on
->   __kvm_tlb_flush_vmid_range() to do take care of the decisions
->   and return 0 regardless of the underlying feature support.
-> - __kvm_tlb_flush_vmid_range() doesn't take 'level' as input to
->   calculate the 'stride'. Instead, it always assumes PAGE_SIZE.
-> - Fast unmap path is eliminated. Instead, the existing unmap walker
->   is modified to skip the TLBIs during the walk, and do it all at
->   once after the walk, using the range-based instructions.
->
-> v2:
-> https://lore.kernel.org/all/20230206172340.2639971-1-rananta@google.com/
-> - Rebased the series on top of David Matlack's series for common
->   TLB invalidation API[1].
-> - Implement kvm_arch_flush_remote_tlbs_range() for arm64, by extending
->   the support introduced by [1].
-> - Use kvm_flush_remote_tlbs_memslot() introduced by [1] to flush
->   only the current memslot after write-protect.
-> - Modified the __kvm_tlb_flush_range() macro to accepts 'level' as an
->   argument to calculate the 'stride' instead of just using PAGE_SIZE.
-> - Split the patch that introduces the range-based TLBI to KVM and the
->   implementation of IPA-based invalidation into its own patches.
-> - Dropped the patch that tries to optimize the mmu notifiers paths.
-> - Rename the function kvm_table_pte_flush() to
->   kvm_pgtable_stage2_flush_range(), and accept the range of addresses to
->   flush. [Oliver]
-> - Drop the 'tlb_level' argument for stage2_try_break_pte() and directly
->   pass '0' as 'tlb_level' to kvm_pgtable_stage2_flush_range(). [Oliver]
->
-> v1:
-> https://lore.kernel.org/all/20230109215347.3119271-1-rananta@google.com/
->
-> Thank you.
-> Raghavendra
->
-> [1]: https://lore.kernel.org/all/ZIrONR6cSegiK1e2@linux.dev/
-> [2]:
-> https://lore.kernel.org/linux-arm-kernel/20230126184025.2294823-1-dmatlac=
-k@google.com/
->
-> David Matlack (4):
->   KVM: Rename kvm_arch_flush_remote_tlb() to
->     kvm_arch_flush_remote_tlbs()
->   KVM: arm64: Use kvm_arch_flush_remote_tlbs()
->   KVM: Allow range-based TLB invalidation from common code
->   KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
->
-> Raghavendra Rao Ananta (7):
->   arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
->   KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
->   KVM: arm64: Define kvm_tlb_flush_vmid_range()
->   KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
->   KVM: arm64: Flush only the memslot after write-protect
->   KVM: arm64: Invalidate the table entries upon a range
->   KVM: arm64: Use TLBI range-based intructions for unmap
->
->  arch/arm64/include/asm/kvm_asm.h     |   3 +
->  arch/arm64/include/asm/kvm_host.h    |   6 ++
->  arch/arm64/include/asm/kvm_pgtable.h |  10 +++
->  arch/arm64/include/asm/tlbflush.h    | 109 ++++++++++++++-------------
->  arch/arm64/kvm/Kconfig               |   1 -
->  arch/arm64/kvm/arm.c                 |   6 --
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  11 +++
->  arch/arm64/kvm/hyp/nvhe/tlb.c        |  30 ++++++++
->  arch/arm64/kvm/hyp/pgtable.c         |  90 +++++++++++++++++++---
->  arch/arm64/kvm/hyp/vhe/tlb.c         |  23 ++++++
->  arch/arm64/kvm/mmu.c                 |  15 +++-
->  arch/mips/include/asm/kvm_host.h     |   4 +-
->  arch/mips/kvm/mips.c                 |  12 +--
->  arch/riscv/kvm/mmu.c                 |   6 --
->  arch/x86/include/asm/kvm_host.h      |   7 +-
->  arch/x86/kvm/mmu/mmu.c               |  25 ++----
->  arch/x86/kvm/mmu/mmu_internal.h      |   3 -
->  arch/x86/kvm/x86.c                   |   2 +-
->  include/linux/kvm_host.h             |  20 +++--
->  virt/kvm/Kconfig                     |   3 -
->  virt/kvm/kvm_main.c                  |  35 +++++++--
->  21 files changed, 290 insertions(+), 131 deletions(-)
->
-> --
-> 2.41.0.455.g037347b96a-goog
->
+Yes. that's why need fdput() always.
+
+> Just needs to be like this:
+>=20
+> struct iommufd_ctx *iommufd_ctx_from_fd(int fd)
+> {
+> 	struct file *file;
+>=20
+> 	file =3D fget(fd);
+> 	if (!file)
+> 		return ERR_PTR(-EBADF);
+>=20
+> 	if (file->f_op !=3D &iommufd_fops) {
+> 		fput(file);
+> 		return ERR_PTR(-EBADFD);
+> 	}
+> 	/* fget is the same as iommufd_ctx_get() */
+> 	return file->private_data;
+> }
+> EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_fd, IOMMUFD);
+
+This one looks ok to me. Thanks.
+
+Regards,
+Yi Liu
