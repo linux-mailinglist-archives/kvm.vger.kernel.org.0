@@ -2,184 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78ABA755E6F
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 10:29:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BAFA755E8D
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 10:35:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbjGQI3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 04:29:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45540 "EHLO
+        id S230190AbjGQIe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 04:34:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231300AbjGQI3t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 04:29:49 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E99D61B6
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:29:46 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-3457a3ada84so22440715ab.1
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:29:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google; t=1689582586; x=1692174586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KrEcIar0BkfpmBL+8BCmNKqe2TUSK3LL+WBdNYsOjsM=;
-        b=e52IJgo7nORao0Gl4I5dRpwwbrYRCXZTSuwaC/thRVodGrQS/Ih+iZx/Zsqn89WU3w
-         pQgXUWQS+Vk59/Fh6rrIEqzCQJkEny2i0gy7zEPOvxwj9yUxhnNvrizRbt8YsZpplHpx
-         RjVLFZyrzR9wafddakUgpMo5lLKlNumHP6uiacp/wGVyLbBbCgrHIUP/7snpf7XV2sof
-         jlaeLm95LpwgAuzcjO7UCvT+e3bh2UJ0I6TbCUpKBOZvGLRTw6wJXY5zbY52dacz1/1P
-         iPPOvh8ArwyYCroEOLn3Y8OJKVgd78PUACDF8tTPiPB+Om3hyy+66x8dhT2yU/74h83y
-         v2JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689582586; x=1692174586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KrEcIar0BkfpmBL+8BCmNKqe2TUSK3LL+WBdNYsOjsM=;
-        b=Acs28u5T4bXiF3N0Gv1QDMfZSaRWQWTxa9mSHDgQ0UjgyKKWRO+4T2JuED4761nDK9
-         4e+QSAoywGHHMzENvfwatkW9/oWdraUJTKD8kWYyU+ouslmwwWbTdoNxwOMwc1Ep9ChV
-         yd5Qm0O7yhVPS5QjoKBNgPPNkoQkdYrh5+WQ1x11RCGZ/U6h//nEk0HxeQq5Ocx3pHRX
-         3KCD+/fO6s0g2xbWQWZRTO19UGNfmZUYHRg80lPuGa2VBPlxgiYyxeUxEZ9iYp1cYZPP
-         Hok+sFIA6BalLpSap1SGauNjbXrsFOAVGWMz0JVsqe7ckhbvtdSqqS7oHE1dAHhsvmJp
-         kGbw==
-X-Gm-Message-State: ABy/qLbw2lpS7tb48x0yGz2AutS/tZYmFC7DdeE0vthoknLI9W+Yewnb
-        XE/wTuQ3IA/TIORwZk2nyP3iiwIC0PB2w8AW/PpaAw==
-X-Google-Smtp-Source: APBJJlGE7jn73weZAb7Q+GH4ouydfCd9ILtA9ynYfWdyB1I4k5TGE6qNhhrOJBaOwSkah9YrBoRDKcKZ9t95G975sJc=
-X-Received: by 2002:a92:d4d2:0:b0:345:d470:baa6 with SMTP id
- o18-20020a92d4d2000000b00345d470baa6mr9664500ilm.29.1689582586220; Mon, 17
- Jul 2023 01:29:46 -0700 (PDT)
+        with ESMTP id S229537AbjGQIe5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 04:34:57 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C9AAB;
+        Mon, 17 Jul 2023 01:34:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689582896; x=1721118896;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=p+2MBbp7DfMBY9uUpI0k2O5ka2dgnho/rcp7Fwl0hZs=;
+  b=XarzJTBacxdc2F6QBpkgtPXhCiJgcs3cs8/E7ra5kwCMVRe6If1QhKWH
+   8WKhlhTSBlXGDyYtejqqtuVnBIOlw9qIl8j605ReJns1RosS7T4yLImV7
+   G6tAGHybmcMRaDdaahIvTv4Jo3Jkcj6i4bOb0WGSrsCYt01PpgFVtd87X
+   LHz6ESDg10uevq48mRJPDvsk6piDHOl/m9yFkCd8BFA9qvDFPjjroJi0v
+   iJosZEgfnLOAHFMEKsW5qD7nXn3i9ic6yPWe4en3lCotnqfZfT8lvTp3E
+   Iuxeod+YKlyQMKBiwHG8AaUMJQShPJCPMXWoKnP4uB6PysnZhDHTNPVFI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="365918277"
+X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
+   d="scan'208";a="365918277"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 01:34:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="1053817625"
+X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
+   d="scan'208";a="1053817625"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 01:34:54 -0700
+Message-ID: <5c7de6d5-7706-c4a5-7c41-146db1269aff@intel.com>
+Date:   Mon, 17 Jul 2023 16:34:51 +0800
 MIME-Version: 1.0
-References: <20230630155936.3015595-1-jaz@semihalf.com> <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
-In-Reply-To: <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
-From:   Grzegorz Jaszczyk <jaz@semihalf.com>
-Date:   Mon, 17 Jul 2023 10:29:34 +0200
-Message-ID: <CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
-To:     Christian Brauner <brauner@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>,
-        Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>,
-        linux-mm@kvack.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Fei Li <fei1.li@intel.com>, x86@kernel.org,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Ingo Molnar <mingo@redhat.com>,
-        intel-gfx@lists.freedesktop.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-fpga@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
-        Wu Hao <hao.wu@intel.com>, Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andrew Donnellan <ajd@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
-        intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
-        netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Muchun Song <muchun.song@linux.dev>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Benjamin LaHaise <bcrl@kvack.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Dominik Behr <dbehr@chromium.org>,
-        Marcin Wojtas <mw@semihalf.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [PATCH 3/4] intel_idle: Add support for using intel_idle in a VM
+ guest using just hlt
+To:     arjan@linux.intel.com, linux-pm@vger.kernel.org
+Cc:     artem.bityutskiy@linux.intel.com, rafael@kernel.org,
+        kvm <kvm@vger.kernel.org>, Dan Wu <dan1.wu@intel.com>
+References: <20230605154716.840930-1-arjan@linux.intel.com>
+ <20230605154716.840930-4-arjan@linux.intel.com>
+Content-Language: en-US
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230605154716.840930-4-arjan@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pt., 14 lip 2023 o 09:05 Christian Brauner <brauner@kernel.org> napisa=C5=
-=82(a):
->
-> On Thu, Jul 13, 2023 at 11:10:54AM -0600, Alex Williamson wrote:
-> > On Thu, 13 Jul 2023 12:05:36 +0200
-> > Christian Brauner <brauner@kernel.org> wrote:
-> >
-> > > Hey everyone,
-> > >
-> > > This simplifies the eventfd_signal() and eventfd_signal_mask() helper=
-s
-> > > by removing the count argument which is effectively unused.
-> >
-> > We have a patch under review which does in fact make use of the
-> > signaling value:
-> >
-> > https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
->
-> Huh, thanks for the link.
->
-> Quoting from
-> https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-ja=
-z@semihalf.com/#25266856
->
-> > Reading an eventfd returns an 8-byte value, we generally only use it
-> > as a counter, but it's been discussed previously and IIRC, it's possibl=
-e
-> > to use that value as a notification value.
->
-> So the goal is to pipe a specific value through eventfd? But it is
-> explicitly a counter. The whole thing is written around a counter and
-> each write and signal adds to the counter.
->
-> The consequences are pretty well described in the cover letter of
-> v6 https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
->
-> > Since the eventfd counter is used as ACPI notification value
-> > placeholder, the eventfd signaling needs to be serialized in order to
-> > not end up with notification values being coalesced. Therefore ACPI
-> > notification values are buffered and signalized one by one, when the
-> > previous notification value has been consumed.
->
-> But isn't this a good indication that you really don't want an eventfd
-> but something that's explicitly designed to associate specific data with
-> a notification? Using eventfd in that manner requires serialization,
-> buffering, and enforces ordering.
->
-> I have no skin in the game aside from having to drop this conversion
-> which I'm fine to do if there are actually users for this btu really,
-> that looks a lot like abusing an api that really wasn't designed for
-> this.
++ KVM maillist.
 
-https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-jaz@=
-semihalf.com/
-was posted at the beginig of March and one of the main things we've
-discussed was the mechanism for propagating acpi notification value.
-We've endup with eventfd as the best mechanism and have actually been
-using it from v2. I really do not want to waste this effort, I think
-we are quite advanced with v6 now. Additionally we didn't actually
-modify any part of eventfd support that was in place, we only used it
-in a specific (and discussed beforehand) way.
+On 6/5/2023 11:47 PM, arjan@linux.intel.com wrote:
+...
+>   
+> +static int __init intel_idle_vminit(const struct x86_cpu_id *id)
+> +{
+> +	int retval;
+> +
+> +	cpuidle_state_table = vmguest_cstates;
+> +
+> +	icpu = (const struct idle_cpu *)id->driver_data;
+> +
+> +	pr_debug("v" INTEL_IDLE_VERSION " model 0x%X\n",
+> +		 boot_cpu_data.x86_model);
+> +
+> +	intel_idle_cpuidle_devices = alloc_percpu(struct cpuidle_device);
+> +	if (!intel_idle_cpuidle_devices)
+> +		return -ENOMEM;
+> +
+> +	intel_idle_cpuidle_driver_init(&intel_idle_driver);
+> +
+> +	retval = cpuidle_register_driver(&intel_idle_driver);
+> +	if (retval) {
+> +		struct cpuidle_driver *drv = cpuidle_get_driver();
+> +		printk(KERN_DEBUG pr_fmt("intel_idle yielding to %s\n"),
+> +		       drv ? drv->name : "none");
+> +		goto init_driver_fail;
+> +	}
+> +
+> +	retval = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "idle/intel:online",
+> +				   intel_idle_cpu_online, NULL);
+> +	if (retval < 0)
+> +		goto hp_setup_fail;
+> +
+> +	return 0;
+> +hp_setup_fail:
+> +	intel_idle_cpuidle_devices_uninit();
+> +	cpuidle_unregister_driver(&intel_idle_driver);
+> +init_driver_fail:
+> +	free_percpu(intel_idle_cpuidle_devices);
+> +	return retval;
+> +}
+> +
+>   static int __init intel_idle_init(void)
+>   {
+>   	const struct x86_cpu_id *id;
+> @@ -2074,6 +2195,8 @@ static int __init intel_idle_init(void)
+>   	id = x86_match_cpu(intel_idle_ids);
+>   	if (id) {
+>   		if (!boot_cpu_has(X86_FEATURE_MWAIT)) {
+> +			if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
+> +				return intel_idle_vminit(id);
+
+It leads to below MSR access error on SPR.
+
+[    4.158636] unchecked MSR access error: RDMSR from 0xe2 at rIP: 
+0xffffffffbcaeebed (intel_idle_init_cstates_icpu.constprop.0+0x2dd/0x5a0)
+[    4.174991] Call Trace:
+[    4.179611]  <TASK>
+[    4.183610]  ? ex_handler_msr+0x11e/0x150
+[    4.190624]  ? fixup_exception+0x17e/0x3c0
+[    4.197648]  ? gp_try_fixup_and_notify+0x1d/0xc0
+[    4.205579]  ? exc_general_protection+0x1bb/0x410
+[    4.213620]  ? asm_exc_general_protection+0x26/0x30
+[    4.221624]  ? __pfx_intel_idle_init+0x10/0x10
+[    4.228588]  ? intel_idle_init_cstates_icpu.constprop.0+0x2dd/0x5a0
+[    4.238632]  ? __pfx_intel_idle_init+0x10/0x10
+[    4.246632]  ? __pfx_intel_idle_init+0x10/0x10
+[    4.253616]  intel_idle_vminit.isra.0+0xf5/0x1d0
+[    4.261580]  ? __pfx_intel_idle_init+0x10/0x10
+[    4.269670]  ? __pfx_intel_idle_init+0x10/0x10
+[    4.274605]  do_one_initcall+0x50/0x230
+[    4.279873]  do_initcalls+0xb3/0x130
+[    4.286535]  kernel_init_freeable+0x255/0x310
+[    4.293688]  ? __pfx_kernel_init+0x10/0x10
+[    4.300630]  kernel_init+0x1a/0x1c0
+[    4.305681]  ret_from_fork+0x29/0x50
+[    4.312700]  </TASK>
+
+On Intel SPR, the call site is
+
+intel_idle_vminit()
+   -> intel_idle_cpuidle_driver_init()
+     -> intel_idle_init_cstates_icpu()
+       -> spr_idle_state_table_update()
+         -> rdmsrl(MSR_PKG_CST_CONFIG_CONTROL, msr);
+
+However, current KVM doesn't provide emulation for 
+MSR_PKG_CST_CONFIG_CONTROL. It leads to #GP on accessing.
+
+>   			pr_debug("Please enable MWAIT in BIOS SETUP\n");
+>   			return -ENODEV;
+>   		}
+
