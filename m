@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79E2A756EBD
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 23:06:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCBC756EBE
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 23:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231305AbjGQVGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 17:06:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49148 "EHLO
+        id S231343AbjGQVGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 17:06:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbjGQVGa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230463AbjGQVGa (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 17 Jul 2023 17:06:30 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7505810C4;
-        Mon, 17 Jul 2023 14:06:28 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 0B05512001B;
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B6A10C7;
+        Mon, 17 Jul 2023 14:06:29 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id AF783100014;
         Tue, 18 Jul 2023 00:06:27 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 0B05512001B
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru AF783100014
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
         s=mail; t=1689627987;
-        bh=tkRDIjgwoi7c8HuFjXoUTj2zb+RizwwV2GwfLVc5LoM=;
+        bh=ydsf/FQJHsRd7VM9sT5BCFNwDtuvxxMDFyVsLpjPMoM=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=DIQc9ZlIEx9naGM3kgorMd06oFu39dW10QPSa1CUYFX8wrRg5XVCS9J3fT2mLMOpH
-         Duh0/it+8cVjNXqoKq1KcyPLkQ49zkapiZYJLyBmYeOZAzQgiR0iO4i536qGemscOf
-         fB/X7DCWF6Zi3m3AbNqARb16wULoloKFRrldNZsV8FtnGNU99H70SJsfFEPPZZjkpN
-         e0Zd58tYP8tswwN3ZZj/BKhn3lkel7WQcB4ZPmRjzhK93Yo9HoYVgCOpZPcxH9y5GG
-         3znWRCb5E1C11c6c9Xjg1oTAvvF4XBvjZxwIZB3jvKzMSA23O5PihJX199ElcSBz1u
-         0yYTKZXxOK23A==
+        b=D7k6OrpHzQF+wJs6pKpyovgILTHKOLATgpbvzNYaf49uj6rEgCjI1U4oOxCA9Aglp
+         PZE+2b8Ho/JO2ipGpYAHwZfJckcCq/XWdbt/G19o4VFcMuH22m/owszREODoiG5ieA
+         Dwm+CXcswySVWCMp410awLpkuftHmBFRv+X1GNhvLUq2UowT45OO940MAGLw6vPIxe
+         0t0+e7iK+SFJZC1YdiEJkY37F6yAznUBMbcmLTSPikHp/qdeyEWvFayi8l6dcEfMpA
+         8yS8aqFLl8+RMBbZKbwpFakHa6WC0LRs+o0p1w7jROMir3s54AmP6MCiNNkOwick+q
+         jaBLTVvXOd/5w==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Tue, 18 Jul 2023 00:06:26 +0300 (MSK)
+        Tue, 18 Jul 2023 00:06:27 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 18 Jul 2023 00:06:25 +0300
+ 15.2.1118.30; Tue, 18 Jul 2023 00:06:26 +0300
 From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
@@ -52,9 +52,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>,
         Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [PATCH net-next v1 2/4] vsock/virtio: support to send non-linear skb
-Date:   Tue, 18 Jul 2023 00:00:49 +0300
-Message-ID: <20230717210051.856388-3-AVKrasnov@sberdevices.ru>
+Subject: [PATCH net-next v1 3/4] vsock/virtio: non-linear skb handling for tap
+Date:   Tue, 18 Jul 2023 00:00:50 +0300
+Message-ID: <20230717210051.856388-4-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
 References: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
@@ -73,7 +73,7 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 523 523 523027ce26ed1d9067f7a52a4756a876e54db27c, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-KSMG-AntiSpam-Info: LuaCore: 523 523 523027ce26ed1d9067f7a52a4756a876e54db27c, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;sberdevices.ru:5.0.1,7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiPhishing: Clean
@@ -90,75 +90,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For non-linear skb use its pages from fragment array as buffers in
-virtio tx queue. These pages are already pinned by 'get_user_pages()'
-during such skb creation.
+For tap device new skb is created and data from the current skb is
+copied to it. This adds copying data from non-linear skb to new
+the skb.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- net/vmw_vsock/virtio_transport.c | 40 +++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 6 deletions(-)
+ net/vmw_vsock/virtio_transport_common.c | 31 ++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index e95df847176b..6cbb45bb12d2 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
- 	vq = vsock->vqs[VSOCK_VQ_TX];
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 1a376f808ae6..26a4d10da205 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -106,6 +106,27 @@ virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+ 	return NULL;
+ }
  
- 	for (;;) {
--		struct scatterlist hdr, buf, *sgs[2];
-+		/* +1 is for packet header. */
-+		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
-+		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
- 		int ret, in_sg = 0, out_sg = 0;
- 		struct sk_buff *skb;
- 		bool reply;
-@@ -111,12 +113,38 @@ virtio_transport_send_pkt_work(struct work_struct *work)
- 
- 		virtio_transport_deliver_tap_pkt(skb);
- 		reply = virtio_vsock_skb_reply(skb);
-+		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
-+			    sizeof(*virtio_vsock_hdr(skb)));
-+		sgs[out_sg] = &bufs[out_sg];
-+		out_sg++;
++static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
++						void *dst,
++						size_t len)
++{
++	struct iov_iter iov_iter = { 0 };
++	struct kvec kvec;
++	size_t to_copy;
 +
-+		if (!skb_is_nonlinear(skb)) {
-+			if (skb->len > 0) {
-+				sg_init_one(&bufs[out_sg], skb->data, skb->len);
-+				sgs[out_sg] = &bufs[out_sg];
-+				out_sg++;
-+			}
++	kvec.iov_base = dst;
++	kvec.iov_len = len;
++
++	iov_iter.iter_type = ITER_KVEC;
++	iov_iter.kvec = &kvec;
++	iov_iter.nr_segs = 1;
++
++	to_copy = min_t(size_t, len, skb->len);
++
++	skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
++			       &iov_iter, to_copy);
++}
++
+ /* Packet capture */
+ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ {
+@@ -114,7 +135,6 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ 	struct af_vsockmon_hdr *hdr;
+ 	struct sk_buff *skb;
+ 	size_t payload_len;
+-	void *payload_buf;
+ 
+ 	/* A packet could be split to fit the RX buffer, so we can retrieve
+ 	 * the payload length from the header and the buffer pointer taking
+@@ -122,7 +142,6 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ 	 */
+ 	pkt_hdr = virtio_vsock_hdr(pkt);
+ 	payload_len = pkt->len;
+-	payload_buf = pkt->data;
+ 
+ 	skb = alloc_skb(sizeof(*hdr) + sizeof(*pkt_hdr) + payload_len,
+ 			GFP_ATOMIC);
+@@ -165,7 +184,13 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+ 	skb_put_data(skb, pkt_hdr, sizeof(*pkt_hdr));
+ 
+ 	if (payload_len) {
+-		skb_put_data(skb, payload_buf, payload_len);
++		if (skb_is_nonlinear(pkt)) {
++			void *data = skb_put(skb, payload_len);
++
++			virtio_transport_copy_nonlinear_skb(pkt, data, payload_len);
 +		} else {
-+			struct skb_shared_info *si;
-+			int i;
-+
-+			si = skb_shinfo(skb);
-+
-+			for (i = 0; i < si->nr_frags; i++) {
-+				skb_frag_t *skb_frag = &si->frags[i];
-+				void *va = page_to_virt(skb_frag->bv_page);
++			skb_put_data(skb, pkt->data, payload_len);
++		}
+ 	}
  
--		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
--		sgs[out_sg++] = &hdr;
--		if (skb->len > 0) {
--			sg_init_one(&buf, skb->data, skb->len);
--			sgs[out_sg++] = &buf;
-+				/* We will use 'page_to_virt()' for userspace page here,
-+				 * because virtio layer will call 'virt_to_phys()' later
-+				 * to fill buffer descriptor. We don't touch memory at
-+				 * "virtual" address of this page.
-+				 */
-+				sg_init_one(&bufs[out_sg],
-+					    va + skb_frag->bv_offset,
-+					    skb_frag->bv_len);
-+				sgs[out_sg] = &bufs[out_sg];
-+				out_sg++;
-+			}
- 		}
- 
- 		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+ 	return skb;
 -- 
 2.25.1
 
