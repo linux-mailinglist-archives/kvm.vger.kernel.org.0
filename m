@@ -2,237 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AD6A7561C1
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 13:41:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5550B756224
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 13:58:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbjGQLlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 07:41:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49422 "EHLO
+        id S230029AbjGQL6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 07:58:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbjGQLlg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 07:41:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A87DE49
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:40:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689594047;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yQqyG6oxXaLj0FF/OLRS2ExsXKIdb3iPjfzq0DwkqKY=;
-        b=OYsrpJ7ikAQxSHYkliPDU+oirWqyLXe6Y8LcSQDMkl/UoFQ29zSv31W2KwRt3c1ggrydxi
-        x08/eDSrWcRFH14wuE4sHCJigXKx6g/yLCEiQgeRYGjbvPTs1xh7XPtKAPxoUJcdCwWeWp
-        pJkC80BuMxhRAnwuFhrgbGfxsZb4yDo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-16-bbrEcaK6Nom3nyzErmaU4Q-1; Mon, 17 Jul 2023 07:40:46 -0400
-X-MC-Unique: bbrEcaK6Nom3nyzErmaU4Q-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-767edbf73cbso88077885a.1
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:40:46 -0700 (PDT)
+        with ESMTP id S229496AbjGQL6o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 07:58:44 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9C8E6
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:58:43 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6682909acadso2808211b3a.3
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:58:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689595123; x=1692187123;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ptc8VsW5kzG278uKrrYn+kSA2zDJejBtuWV3SmbYN4=;
+        b=UEgJgw3lOZ1i58bT+zocpkpA6+Vwe4rRTVUSR9UyRe8QbOzm8aUcBFsQW5xzEKfvjW
+         qMqoyloTvGFh668MAgNRDYVmnWF9AwApBUZAfCViY9JmYPlKUUhIGV2/4LKzj9EMTN8J
+         8kKJGocOfI+zO+ZzizsKK/gWr51jA+54c3+u78jup9iCTDziNnMha2vm/IKyfuZXf4cg
+         OpVVLxL/ioKDcJ6Gv71gbESmYzBUwhkq3PrKDhns6GpcfQQHCkyF5IP+Hzlu8ov3YFG+
+         R4+pq538y8azeHoAykxOsTATnLByNZgCwFgMwchyDCOytOGjqiX3Rd2P3Vx7pUjTKI4s
+         hhIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689594046; x=1690198846;
+        d=1e100.net; s=20221208; t=1689595123; x=1692187123;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yQqyG6oxXaLj0FF/OLRS2ExsXKIdb3iPjfzq0DwkqKY=;
-        b=X6utBCIgB58yTHGKDnWgPO+OKOElzx0us6nS6SA/iGCIq/N6i5ZLHrD+6M88D30CRt
-         R2H37r7T+K4I1YPx/WoG1odLWDeSOzxqcAQNoM9pbLHwoqY3yrWF4DvctpfpLGfZrITU
-         PYATjzECdzCxLsiEGmS6gAV/360EGnsIHk9fi0eJQeEJcPIvjek7TF/wXrTNdZo6/rrO
-         4H1S1foK/JlnN56WMczxDZTNOsrTIoWyBN+6YuofC5QWL/1yAoZmIoYXZgAlaURmXbxT
-         hxENFGiX29V58XDFOEXNPKiYdidVOG/THw3H/xL+OtoHGh7L2otnDYs6J00KL9eFrCjq
-         u9pg==
-X-Gm-Message-State: ABy/qLZYBI2kjSVTamHOFiKrLf6Az7Omt3RBcl4S7z2Sm9Aoc6YT7SJX
-        WBSKw/OMIgwWXay+gP3VCaO8wkD+799Pm8CU5a7wp6ty45OeTxuRbU10hK5q/FMn030UlctzNON
-        Mzt8dO+o4+UGb
-X-Received: by 2002:a05:620a:24c8:b0:767:7a4c:1b9e with SMTP id m8-20020a05620a24c800b007677a4c1b9emr9266360qkn.7.1689594046116;
-        Mon, 17 Jul 2023 04:40:46 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGDK1i5Bb5hW3SqNn/8w11DLVrfU0l98wShs1NeCy8lsDEALEXS1SLko5LtJ6r2IMuB1Q1XLw==
-X-Received: by 2002:a05:620a:24c8:b0:767:7a4c:1b9e with SMTP id m8-20020a05620a24c800b007677a4c1b9emr9266330qkn.7.1689594045810;
-        Mon, 17 Jul 2023 04:40:45 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id g7-20020a05620a108700b00767d05117fesm6051154qkk.36.2023.07.17.04.40.39
+        bh=6ptc8VsW5kzG278uKrrYn+kSA2zDJejBtuWV3SmbYN4=;
+        b=KFOWH9G5uk7LZ0gB9RDLfpeG/Gt9rsr5GlIeM93QihHfWScdPvTse7bVOn6KQSqWD7
+         S5aUXgaAfbr6fnrJ40Pb2fXab+Rs7117aaGkw9zmKxIJ5VHVUh2q9gWGKtt+avGaX4es
+         nLp491wF9mKPCGtWo8PdT+11hd09HynFgyz2o6Fv06nE9+jiPLSPDJULsmiqpEya0/rz
+         N3BJcO6g2UQyCJHMBDv6OFfGwxO2meek9YFLcsjRHjqIu2P+tJ+0nnnXhVyGbU6rlL2I
+         G3AafizIXQU2bNHemIap5wukcEYGKAgtYwxClqy5CkmP4M80XPDjMO07OHaYZbRZ2F29
+         AkUw==
+X-Gm-Message-State: ABy/qLbEIMIzi0dmWmJJ46goH4JeHBUhL/b1ROBFWOKJFRToXh09GNio
+        9IeTMe1Vl9n5ZmcrOF5cPQo=
+X-Google-Smtp-Source: APBJJlH3bB1YcJMN82LyrjQnK689s+YEMdx7vLrvV70Z68zIhLP/LdPIJ4DUQaxYx4eNEETqreNVgw==
+X-Received: by 2002:a05:6a00:2484:b0:668:94a2:2ec7 with SMTP id c4-20020a056a00248400b0066894a22ec7mr14597755pfv.25.1689595122911;
+        Mon, 17 Jul 2023 04:58:42 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id ey24-20020a056a0038d800b00666add7f047sm11766634pfb.207.2023.07.17.04.58.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 04:40:45 -0700 (PDT)
-Message-ID: <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com>
-Date:   Mon, 17 Jul 2023 19:40:32 +0800
+        Mon, 17 Jul 2023 04:58:41 -0700 (PDT)
+Message-ID: <c1ac9dae-51d8-f570-db6c-39a161ab6bb9@gmail.com>
+Date:   Mon, 17 Jul 2023 19:58:34 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v6 03/11] KVM: Allow range-based TLB invalidation from
- common code
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [Bug 217379] New: Latency issues in irq_bypass_register_consumer
 Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
-References: <20230715005405.3689586-1-rananta@google.com>
- <20230715005405.3689586-4-rananta@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230715005405.3689586-4-rananta@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org) (KVM HoF)" 
+        <pbonzini@redhat.com>,
+        "Alex Williamson, Red Hat" <alex.williamson@redhat.com>
+References: <bug-217379-28872@https.bugzilla.kernel.org/>
+ <ZE/uDYGhVAJ28LYu@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <ZE/uDYGhVAJ28LYu@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLY,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2/5/2023 12:51 am, Sean Christopherson wrote:
+> On Fri, Apr 28, 2023, bugzilla-daemon@kernel.org wrote:
+>> https://bugzilla.kernel.org/show_bug.cgi?id=217379
+>>
+>>              Bug ID: 217379
+>>             Summary: Latency issues in irq_bypass_register_consumer
+>>             Product: Virtualization
+>>             Version: unspecified
+>>            Hardware: Intel
+>>                  OS: Linux
+>>              Status: NEW
+>>            Severity: normal
+>>            Priority: P3
+>>           Component: kvm
+>>            Assignee: virtualization_kvm@kernel-bugs.osdl.org
+>>            Reporter: zhuangel570@gmail.com
+>>          Regression: No
+>>
+>> We found some latency issue in high-density and high-concurrency scenarios,
+>> we are using cloud hypervisor as vmm for lightweight VM, using VIRTIO net and
+>> block for VM. In our test, we got about 50ms to 100ms+ latency in creating VM
+>> and register irqfd, after trace with funclatency (a tool of bcc-tools,
+>> https://github.com/iovisor/bcc), we found the latency introduced by following
+>> functions:
+>>
+>> - irq_bypass_register_consumer introduce more than 60ms per VM.
+>>    This function was called when registering irqfd, the function will register
+>>    irqfd as consumer to irqbypass, wait for connecting from irqbypass producers,
+>>    like VFIO or VDPA. In our test, one irqfd register will get about 4ms
+>>    latency, and 5 devices with total 16 irqfd will introduce more than 60ms
+>>    latency.
+>>
+>> Here is a simple case, which can emulate the latency issue (the real latency
+>> is lager). The case create 800 VM as background do nothing, then repeatedly
+>> create 20 VM then destroy them after 400ms, every VM will do simple thing,
+>> create in kernel irq chip, and register 15 riqfd (emulate 5 devices and every
+>> device has 3 irqfd), just trace the "irq_bypass_register_consumer" latency, you
+>> will reproduce such kind latency issue. Here is a trace log on Xeon(R) Platinum
+>> 8255C server (96C, 2 sockets) with linux 6.2.20.
+>>
+>> Reproduce Case
+>> https://github.com/zhuangel/misc/blob/main/test/kvm_irqfd_fork/kvm_irqfd_fork.c
+>> Reproduce log
+>> https://github.com/zhuangel/misc/blob/main/test/kvm_irqfd_fork/test.log
+>>
+>> To fix these latencies, I didn't have a graceful method, just simple ideas
+>> is give user a chance to avoid these latencies, like new flag to disable
+>> irqbypass for each irqfd.
+>>
+>> Any suggestion to fix the issue if welcomed.
+> 
+> Looking at the code, it's not surprising that irq_bypass_register_consumer() can
+> exhibit high latencies.  The producers and consumers are stored in simple linked
+> lists, and a single mutex is held while traversing the lists *and* connecting
+> a consumer to a producer (and vice versa).
+> 
+> There are two obvious optimizations that can be done to reduce latency in
+> irq_bypass_register_consumer():
+> 
+>     - Use a different data type to track the producers and consumers so that lookups
+>       don't require a linear walk.  AIUI, the "tokens" used to match producers and
+>       consumers are just kernel pointers, so I _think_ XArray would perform reasonably
+>       well.
+My measurements show that there is little performance gain from optimizing lookups.
 
+> 
+>     - Connect producers and consumers outside of a global mutex.
 
-On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> Make kvm_flush_remote_tlbs_range() visible in common code and create a
-> default implementation that just invalidates the whole TLB.
-> 
-> This paves the way for several future features/cleanups:
-> 
->   - Introduction of range-based TLBI on ARM.
->   - Eliminating kvm_arch_flush_remote_tlbs_memslot()
->   - Moving the KVM/x86 TDP MMU to common code.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  3 +++
->   arch/x86/kvm/mmu/mmu.c          |  9 ++++-----
->   arch/x86/kvm/mmu/mmu_internal.h |  3 ---
->   include/linux/kvm_host.h        |  9 +++++++++
->   virt/kvm/kvm_main.c             | 13 +++++++++++++
->   5 files changed, 29 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index a2d3cfc2eb75..08900afbf2ad 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1804,6 +1804,9 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->   		return -ENOTSUPP;
->   }
->   
-> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages);
-> +
->   #define kvm_arch_pmi_in_guest(vcpu) \
->   	((vcpu) && (vcpu)->arch.handling_intr_from_guest)
->   
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index ec169f5c7dce..aaa5e336703a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -278,16 +278,15 @@ static inline bool kvm_available_flush_remote_tlbs_range(void)
->   	return kvm_x86_ops.flush_remote_tlbs_range;
->   }
->   
-> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> -				 gfn_t nr_pages)
-> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages)
->   {
->   	int ret = -EOPNOTSUPP;
->   
->   	if (kvm_x86_ops.flush_remote_tlbs_range)
->   		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, start_gfn,
-> -								   nr_pages);
-> -	if (ret)
-> -		kvm_flush_remote_tlbs(kvm);
-> +									pages);
-This will be good if parameter pages aligned with parameter kvm.
+In usage scenarios where a large number of VMs are created, it is very awful to 
+have races
+on this global mutex, especially when users on different NUMA nodes are concurrently
+walking this critical path.
 
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> +
-> +	return ret;
->   }
->   
->   static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index d39af5639ce9..86cb83bb3480 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
->   				    struct kvm_memory_slot *slot, u64 gfn,
->   				    int min_level);
->   
-> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> -				 gfn_t nr_pages);
-> -
->   /* Flush the given page (huge or not) of guest memory. */
->   static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t gfn, int level)
->   {
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e3f968b38ae9..a731967b24ff 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
->   void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mode);
->   
->   void kvm_flush_remote_tlbs(struct kvm *kvm);
-> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages);
->   
->   #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
->   int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
-> @@ -1486,6 +1487,14 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->   }
->   #endif
->   
-> +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-> +						   gfn_t gfn, u64 pages)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +#endif
-> +
->   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
->   void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
->   void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d6b050786155..804470fccac7 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
->   }
->   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
->   
-> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages)
-> +{
-> +	if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, pages))
-> +		return;
-> +
-> +	/*
-> +	 * Fall back to a flushing entire TLBs if the architecture range-based
-> +	 * TLB invalidation is unsupported or can't be performed for whatever
-> +	 * reason.
-> +	 */
-> +	kvm_flush_remote_tlbs(kvm);
-> +}
-> +
->   static void kvm_flush_shadow_all(struct kvm *kvm)
->   {
->   	kvm_arch_flush_shadow_all(kvm);
+Wait time to acquire this lock (on 2.70GHz ICX):
+- avg = 117.855314 ms
+- min = 20 ns
+- max = 11428.340.858 ms
 
--- 
-Shaoqin
+Before we optimize this path using rewrites, could we first adopt a conservative 
+approach:
 
+- introduce the KVM_IRQFD_FLAG_NO_BYPASS [*], or
+- introduce module_param_cb(kvm_irq_bypass ...) (644abbb254b1), or
+- introduce extra Kconfig knob for "select IRQ_BYPASS_MANAGER";
+
+[*] 
+https://lore.kernel.org/kvm/bug-217379-28872-KU8tTDkhtT@https.bugzilla.kernel.org%2F/
+
+Any better move ?
+
+> 
+> Unfortunately, because .add_producer() and .add_consumer() can fail, and because
+> connections can be established by adding a consumer _or_ a producer, getting the
+> locking right without a global mutex is quite difficult.  It's certainly doable
+> to move the (dis)connect logic out of a global lock, but it's going to require a
+> dedicated effort, i.e. not something that can be sketched out in a few minutes
+> (I played around with the code for the better part of an hour trying to do just
+> that and kept running into edge case race conditions).
+> 
