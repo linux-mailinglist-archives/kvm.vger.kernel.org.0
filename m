@@ -2,209 +2,520 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 824A2755BC5
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 08:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D51C9755BCF
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 08:36:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjGQGgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 02:36:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37414 "EHLO
+        id S229637AbjGQGgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 02:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjGQGf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 02:35:57 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F0C7E9;
-        Sun, 16 Jul 2023 23:35:56 -0700 (PDT)
+        with ESMTP id S229628AbjGQGgy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 02:36:54 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D17D411F;
+        Sun, 16 Jul 2023 23:36:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689575756; x=1721111756;
+  t=1689575812; x=1721111812;
   h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=zquaZ18KxVBj1ekKnvFAxIJjfrNAKpoCXX7a/6NuXj8=;
-  b=PXI63xFdsNrTMLJEr0nB0cTUg6j9zhOL7tKdeyOuPsbqAqeSj9F5KOv7
-   D3luVZC3Fmmbv2cvnAYSUtbiPSTY3CovYD6SsVjcb0+hnmUHIEXkap9AO
-   wmIJsAoPTteXBYizAXuoBZuY88S6ZBW2xZ3P2eU9fYXDkxvmRwx+hpNHF
-   jWKQgngIFADpE+KcuPMxoDCYGd2kkajsSaXOcaVBKYFtLmPME206M5451
-   /04aQcM3cRzxcOOZUqFVnXdx2iI2mS2YNmwWB1V1IXBusWpriB7FnqBc1
-   RYxfnyhtXhUhNlZwybhABVmguZNcbWQtv7Xqo0QUfkalmiM4NSgwfAsEU
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="355792697"
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bY18qCPsufMD/SYh8dDUbXyJnhUo8RxDLy8XJ3GM06Q=;
+  b=B1QvPGlAq8NtQiuVnBhi5P44nTofdKiW0kJrDMVSwiiBRll+PgY3yRvP
+   xWHF2opHvJrMXHcsYoXs1XjI1eC0WC/TOu/xQR86KD6KH5LFiD4dy6bNI
+   AXHx16AgjEDsVU+lV9SiHryJiE5pAKfU0+gqKaKKL+B/Lrhau3G/Jbe9u
+   QLDTC+xB45geCmY8kTXFakDTeRBRca3rhgqnZGMeI0iM1LOV5vPrVE7ME
+   XO3sxAcV5dSd/d5Iv0XoXMvU5u2XQjrRNrPnhPyk3ZvzV2BUV1Ixkan8s
+   eyx+1M0D9cy8fgzOZ7+Td/5PBdZEmM51vKIByY+urj2OXHkJE1u3vdSMD
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="364730499"
 X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="355792697"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2023 23:35:55 -0700
+   d="scan'208";a="364730499"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2023 23:36:23 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="969753768"
+X-IronPort-AV: E=McAfee;i="6600,9927,10773"; a="793129085"
 X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="969753768"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga006.fm.intel.com with ESMTP; 16 Jul 2023 23:35:54 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="793129085"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP; 16 Jul 2023 23:36:22 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 16 Jul 2023 23:35:54 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ 15.1.2507.27; Sun, 16 Jul 2023 23:36:22 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Sun, 16 Jul 2023 23:35:54 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ 15.1.2507.27 via Frontend Transport; Sun, 16 Jul 2023 23:36:22 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Sun, 16 Jul 2023 23:35:52 -0700
+ 15.1.2507.27; Sun, 16 Jul 2023 23:36:21 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kqvchFGSWQuxsGxPV0wQQ5ifVlaBA5DKiOVNNqOeHZN0ebjCtTlQbOrvdJHxhfe6EGH/t3K/IPgurUs6GcinckKe1GjBqWR+vvI+EmcBw7h+SZzRypmmtENVIUhawrRUrPnkhkWp7zuzFbw2n2+dESoasEVh7Blt9+WxlZ1MvzWixB3PdVhr1gt61tvIsy5stDCwKAeGq5jl2Tz+RmA31YeIhcc65ANTenoYdYrZl6Bcz8by4MaoZ1u/k52vVq+dJ+PdgyQPWLkGuFVNkfPcttlUhjemxvoU6zefskB4DI63WS0LsUxxfkKYPjzSThYDTLwWriO6B8S66MxCsJn/4w==
+ b=KyZ+7NfI0fop7qo8FDYvrsjuY9Et414/bYfvUhjh2jvnNmVHai2OP7XhbWKD02emj0DPMz9sLxkb1+akvfJ0wk8ooKMy00V1N2eQMOn/pbt6nnxP+e/19irukOvCUpHlQBJgDYvsGXnUf1GIKldmRCjSanHfj+IadZDE36VNV/h9Ca3MnBzchmjJK/DAEEjarBYxPd+/aUpSyED6vKlz/+UoemYL5AhAP3SmGQ9GmDd2fhmzax6T86oVVHo0SbfioMI/g0sOBWJgBfsQesmaCdpJkz6IYc6S0zgwpElgW9Zd44IxTa9FJvOMiHkBLvTJZExTDxYOEJNExM+Tiqljhg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zquaZ18KxVBj1ekKnvFAxIJjfrNAKpoCXX7a/6NuXj8=;
- b=IzZsUuHBfyLqcT76lXrfra1NlIqmMoF16KAH8eT4CXsGM0f1GDJB+3Do4Zg4gAmzfdiCxgsDxeXe+hG/+/U0+XdqQcjZMIKobakkzZyZdYDvTseyBADfaDBRCFFrW/dVPAe1tWYbwZirSkKtXcFb6t/Ik+T11yEuhTmka3U8Za+6qJSt0cm35uXOFWMipdhm/PWsJfGlbSQoEcrlmW6ApyCqGlOGG81xGku4HzIsBmZAdY2TAAeiqf3UYStK1J/FtOyYzCIWlV6Aa7bgqQuqPNwbg3pTTq/QhD6d2K7aqdeEE32xV6ktW3NSz+gfaxwDJTwc9qB0dEFH66jW+MtphQ==
+ bh=9oejxg9cYJyVw65rNCkKdr7+2tDhOywFUqxPknZ54Rk=;
+ b=JpgCw2LtWIubKg8msB9j+0wX+yV8Ya3HQ95r2vqmVoSKLsBcboOl430gFEp6+RU/PjhZ5Z9XXFZYTNAlbbwLfkvxnadwPTagdaVzvsouo5JJ6sQ6RKNtkdME/CKrnUv6pguOGQV9RO9g34PMK344hoDw0jirxpsRhMAYQBf71nI4kXdXPKECZNWPgULC0Pv9qBMluaFn+RCSdrV4zhi8YOa+wQjsfxI9jutCgNs+AjX7nuiBkb22evIQ3QlXCrhHhee+YXh8OYHo/p7LhVrsu79apiOLnzsDjiymzlqvZ90/FYlZn4PpNxBQ9AatZLv7nlkHZmvIC633/OrzeDR6PA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SJ1PR11MB6129.namprd11.prod.outlook.com (2603:10b6:a03:488::12) with
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by CH3PR11MB7676.namprd11.prod.outlook.com (2603:10b6:610:127::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.32; Mon, 17 Jul
- 2023 06:35:40 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3729:308d:4f:81c8]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3729:308d:4f:81c8%3]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
- 06:35:40 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "nik.borisov@suse.com" <nik.borisov@suse.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     "Hansen, Dave" <dave.hansen@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Mon, 17 Jul
+ 2023 06:36:20 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::806a:6364:af2:1aea]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::806a:6364:af2:1aea%7]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
+ 06:36:20 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+CC:     "joro@8bytes.org" <joro@8bytes.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH 08/10] x86/tdx: Unify TDX_HYPERCALL and TDX_MODULE_CALL
- assembly
-Thread-Topic: [PATCH 08/10] x86/tdx: Unify TDX_HYPERCALL and TDX_MODULE_CALL
- assembly
-Thread-Index: AQHZtJ1x/DXmlypIv0ScbAwPZVWO1q+6np8AgALp8gA=
-Date:   Mon, 17 Jul 2023 06:35:40 +0000
-Message-ID: <71396c8928a5596be70482a467e9ba612286d659.camel@intel.com>
-References: <cover.1689151537.git.kai.huang@intel.com>
-         <c22a4697cfe90ab4e1de18d27aa48ea2152dbcfa.1689151537.git.kai.huang@intel.com>
-         <b95c4169-88c8-219e-87b7-6c4e058c246a@suse.com>
-In-Reply-To: <b95c4169-88c8-219e-87b7-6c4e058c246a@suse.com>
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Hao, Xudong" <xudong.hao@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>,
+        "Xu, Terrence" <terrence.xu@intel.com>,
+        "Jiang, Yanting" <yanting.jiang@intel.com>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        "clegoate@redhat.com" <clegoate@redhat.com>
+Subject: RE: [PATCH v13 21/22] vfio: Compile vfio_group infrastructure
+ optionally
+Thread-Topic: [PATCH v13 21/22] vfio: Compile vfio_group infrastructure
+ optionally
+Thread-Index: AQHZoDagsdh+fCMUvkyHLuzt/JVGpq+9qlBw
+Date:   Mon, 17 Jul 2023 06:36:19 +0000
+Message-ID: <DS0PR11MB7529C571419F1DB629AB7E92C33BA@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230616093946.68711-1-yi.l.liu@intel.com>
+ <20230616093946.68711-22-yi.l.liu@intel.com>
+In-Reply-To: <20230616093946.68711-22-yi.l.liu@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ1PR11MB6129:EE_
-x-ms-office365-filtering-correlation-id: d5fdbb14-4d9d-4545-7000-08db86900a03
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|CH3PR11MB7676:EE_
+x-ms-office365-filtering-correlation-id: 4fa999b0-8f61-4fcd-846e-08db8690218d
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2ObMsTqpwUKU8d7mpPQD4LydBiGl8lU7KJUO7xB0xJIN1yaUPUWbOKCsEg2JRcNIrfRh+b8Gc6V6Ex5jZZQQeZU6Lk1sI45H7ufO7L3yM8Mp3GUckEF0NZ0UAs19m6Wsc/U8VUG2YwLMeFKElOFQlD2UP0qRNuCiuPOTNPM6tjaHRfSUh1VGPplFmggcFqQsK35RAC6ipZCd1G6mYK8pk9VTvQdt4G514nqUl+vIalb2nsVcCzLunNYvB5WCqcqb3nyklw5yNoR2xRROqFtQk/GXitwVc2wiOVFJ2YLZ/6H/fijRLL2EQPNnUryYdlcmX6yg+ibtphKi0FajAcfd1y0JLfZss/7ULxoN+CzqwbIvTHTcpSckM24geki9pRsBpfAANkCssOK+WghQ25FAf7ml6bDwZtFijcJ4tMCkiyVXozWytKZevN8uN4QCBFOSfjFWEvL6DWMpE4rss4WlXAcuCUkqZcyjqC4YAXfBFqdtLSTAXy1CzRHvwrnmRe3POvVjuML61yHNxJafGDLDGqac1GMf3ILnGM2IdCpNfTZ4e13yHnlFvO/fJ0EJgWn12Mb1K4lc4fua/fBkIDvHPfM7IZbVqqVHbmLAkL583L01dKHXl7E+JjYXid1v6Twr
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(346002)(136003)(376002)(39860400002)(451199021)(122000001)(110136005)(54906003)(82960400001)(38100700002)(6486002)(478600001)(71200400001)(41300700001)(8676002)(5660300002)(8936002)(66946007)(66556008)(66476007)(66446008)(64756008)(4326008)(91956017)(76116006)(316002)(2616005)(186003)(83380400001)(6512007)(6506007)(26005)(86362001)(36756003)(38070700005)(7416002)(2906002)(66899021);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: aXpZidTeW2SpEdo+U+yYRrSNZAX06znUzhOeYJ72F5tMVLtZlvtCuhw/rcibJeRdbAFpYBLYh4hmi5nPCTYGUTOsZBCw5VNfQGy09ePICh7x5KbtjMGjWCti7Ph/fuWtIh7rQGCAnUQeh8WyeDE4dKHJMiesDBawr3UMVMgtvH46Cll+KITnREmqRu3qp0Ie83CqFBlfTDVQIDTUsgcwXKaL4mkHCTO10O+5/V+wXoAT8aMOHNlLwtlxHLlzoI2+zlzJdkLo25nHM2Yr2oyL28YEey+VkG5rx5LWik0ZLCG+IxVb3+DsvMBmrplSeE3IyXSbLXDjvFv8O60UuvRPWNeUlykpb9pP7zWtjLFFOFwiSkHQ+5WjiXdZus1TWOeL4jyN0P87QcsWuHQ6xN9P2I7/BhBJy8MqRj8G1qvOC9wFOq0DtvLPj2XpD3Is0VF/NbAQcrHIXS7RPuEPBd9eO263QlSw3Ur5qC+ZchYsHqvxjgtadlzOCTkQEj08OWvoDjwq8U2fZhoBnUWIWeS7Pr5p7yFvT0AwMwcGVpocGCAt4Qrwpjf2eXzEu0OdXUXVs97ZRr6AZTQdw3kURWLp7Y3MTVYB113n0lgan3CsBLfE/boZpPTNG/75feA4WWcA
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(346002)(396003)(136003)(366004)(451199021)(55016003)(54906003)(110136005)(478600001)(6506007)(26005)(186003)(71200400001)(7696005)(83380400001)(9686003)(5660300002)(86362001)(38100700002)(7416002)(8676002)(52536014)(8936002)(82960400001)(41300700001)(316002)(6636002)(4326008)(2906002)(38070700005)(122000001)(76116006)(66556008)(64756008)(66946007)(33656002)(66476007)(66446008);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WFNRNGJ1ME1HK3pqbGxwWjh3Qm9wMngrVnpPRC9pSFhOUkh3eEl4dFowZi9Y?=
- =?utf-8?B?U2doYU15VTVNM1dYMjNEN3JwWGwvZmNSQWNubUJLaVVLcEZmUzYyNkdVME9h?=
- =?utf-8?B?bVlhQ3FHWnkzQThCMlBzK0loRXpDWkRHc3ZsV041cm0vUDlJazVSYW5NL2U2?=
- =?utf-8?B?VmRuT2xYRmJ5VmsxWE9Ma0pEMGNuM1hqNXNhS0ozN0xaOGJhL1NKUHM0cU5X?=
- =?utf-8?B?VFFhNGp0ZktaWGpobXZEV0NvdWpSeEV2NUV3NExXZldyU2JzcCs2Qzh2elEw?=
- =?utf-8?B?TWxDcWR2eFFUdzdWc25TZThwdElvZVhVS3RWV2dIaUZFZ1ZjL1VGb2p0N3pC?=
- =?utf-8?B?c0N0MlBhY3VjNzJ2anpQRG1VMWp6NlE4VFVycmJaTlJKVkdBemNwL1dScldq?=
- =?utf-8?B?OWNnZjVIZU0wN0pQd2c1aWpaOWFTUit2dk1aUWVWc1FLK1hPNkxrUkM2L3Zz?=
- =?utf-8?B?bkRPS3h5QXpLUGpOMHBtVDhma2F2cm5qVW9nT1duWXZUMHR2OHRwekRMVGRx?=
- =?utf-8?B?N0lKc25YOGszNythNklkRUlVM2xDYW1sK2Izd0JkYlBadW9UcXp1VUJ4RWVP?=
- =?utf-8?B?amRhcmZ0YndWekM4ZjhyMWVIVG1TRk53RVFvNUJRRUZQWGVsR3ZqZUVQQURV?=
- =?utf-8?B?VHVqdE5NNnFBUUpiaFlodVlQZWNFZzlGSVdsUktsK0lzWXZWbkxMUEs3QnBM?=
- =?utf-8?B?OHFkYkg3VVRpQVZncmloOEtTZytQMHdJcFZ4UEdBMklKTHJTTVM5T1NycUNI?=
- =?utf-8?B?MFVIbEhpVWpKODgzbDI2cXc2aE1xSGRiMHYwNGdSTGc4R1BIYmVXdDVrdWd3?=
- =?utf-8?B?Uk9FWVVjcktzMDhrOFJhNjlYdDBMdWRuTE9yWVI2T0RMWnQxQXgvb3l1d253?=
- =?utf-8?B?RGM5SkxEUTdGT1pia3BuMFpkOHIzanZyOUVvQWowMGlMakR0eTdEUXJGQlA4?=
- =?utf-8?B?aUM0Q0l5dDVFanhEZmljVitrUVNnZVBpbTU3dTA1K29ad0VoMVhCQ2J6blhj?=
- =?utf-8?B?T1lxYXYwNTBkakZZS3VNTHN5ay9TaVVERHBFNXo0c3lIQmVrNktUc0RwN0dH?=
- =?utf-8?B?WHlVS1YxenFES1BsZzV2M28wb3dyQUIrVG5QamllQTdQUGtBOFhqdjdxMTNH?=
- =?utf-8?B?aWNaUXRsMEtMaks2bWZqREIyWFgrN2VYVnZ5SllBallzWUU2WTU0U0pVNkJq?=
- =?utf-8?B?NExRRGN3ZStBeWxPSDY2d3gycEJtcmFrZHZYYUFKWUM5Mnp0UzU2bUNGeXg0?=
- =?utf-8?B?V3NFMDRhNDF6L2xGUHp1VExaMUVhcWc5MG14RlhlZzJlQUZBWkZheTNqalVJ?=
- =?utf-8?B?NStoaHRYcFZnWTlWVy9BblovUDlGTEtGQ2FUN0xjSFBPZkthUXBob0pFVEwz?=
- =?utf-8?B?eWNmaTl5blpkNlp1eTdiTmpFKzNNSGhETk00SXZUSUNWK2EvRS9EOVQxSlFr?=
- =?utf-8?B?VGtQcjlJZk9MdzVybllHa3RjMlJ0TFQrbGZBUDU2aU0wQWgxcFVzOFQyVjNH?=
- =?utf-8?B?QUNrM1JYL2tNYklMQ0tHK2hEOVJUUW9sTGVKM3UvZVFhQ1RPR0ZyTVk1MjZZ?=
- =?utf-8?B?U3FzYUY1VGdscnJ5Z3c2MC9rUVNQNk9McFZFVVo2cTNzTVh1M1RyakExdTZO?=
- =?utf-8?B?M0ZERmhMYWhEeEUzU25tTkgwWGd3d2t6ZWF2cVhQZ1YxazFobmJqWW9mK3hI?=
- =?utf-8?B?NFV3RGFycUlJWlAraVJKNldFU0ZTRW1hd1pET2lZWnd1dTNiUFo0LzhCZFJE?=
- =?utf-8?B?cVVoY0xnVFZ1ZlBRM3R5RVJUV1JPb1FkMzc0RVpIbld1R0hlSnlsbjNjUDYv?=
- =?utf-8?B?T09WZ0VkNHROUGtTQldCTTdweGNOempLVzc3dVFicWxHZlg3Z1d5d0lmc0py?=
- =?utf-8?B?WHQxOVlWU3FxZVJTU0lObzYxSlZFb0xpdHlKcVNCa2ZGNjV0WHlQLzlnaWNs?=
- =?utf-8?B?MnhwQTVpZG8zME9ZUkpHMm56Z00vSFdVMS8xMmNQdEpZamF2YzJkdWV5ZFls?=
- =?utf-8?B?bFNsQzBSZ1AzSGN4ak80TVZkVWl6OXU5Q2ZJR0VUWkhVVnpGcTN6OVZRV0ls?=
- =?utf-8?B?SFU4cjl1dHo1MWpDbnF1dmdnaFZ2NytLTEVZSnpLTGxHK21UcVI4VXBGK0tU?=
- =?utf-8?Q?p6SdbMHsDVhaWoNegq91WLYJu?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <488378831795D142989CC13222F13C59@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gBQnRkAwF1T+rDxBLPisJR9NIUXlXzdcntOaRYZvhrAphSnsVVSwPLyiXU71?=
+ =?us-ascii?Q?2QzII6Vwl0AqdddewsnOlalvPvSSRnf7bP/dEqUIz+M/b/dNXeuW+dNOplHV?=
+ =?us-ascii?Q?nOVxmyn9cxyt8CF829tubml6V40Q7SjUvaPwwkvTiEHOsc8Y2Xr/OGJzOgy9?=
+ =?us-ascii?Q?0D/9hJZ3jWWnFAHvoxBCZLTAnc1RVUoznm8VGWKq5VhV6fR6xWg8CFD3kxq7?=
+ =?us-ascii?Q?5SY2ILDaZkQdaRBSGKFyGigww7j9jFu4Ka01r/dFB0MtvtCpSyR1Ml7hrMgH?=
+ =?us-ascii?Q?tvxNkAoYhR5dheHiNTxQYQScLM+rjnFHD7DdXYSTiHNk1icnfthu8Lt0aj2C?=
+ =?us-ascii?Q?gh4Lf+en39EAQ+dijSmk3Hh5A1rNZMuJ5QZ/yg2AllE5hmG3y4kHr+0ORwdy?=
+ =?us-ascii?Q?l1PmHkeTCQz+QqChMCsIhjDekcCdtmMwoXWFy2y+eTqOYS/yZNTUphmCnQxE?=
+ =?us-ascii?Q?QZ2V4HEMV1maw7KYf+jcM3RjaBZDcPyhvFgRxm7xipAqLVoqwemJznZ2DFDG?=
+ =?us-ascii?Q?rR5ueFqkYgQ92SfbHuoaxTUCU37wD5HkeKPNxBXxnh7C+qjjxQPaPdzgPmxN?=
+ =?us-ascii?Q?iAHHcBfcmgUbjF/EPLKLwPXyPejegRj1pEVVpMtYwUC1feI0VMxjcqc6eBML?=
+ =?us-ascii?Q?Z7p2ikWkfyn2qAEbMIF9B4za/tk2EYGpHrwp181SyWHErhT6mRXEwfZrYNih?=
+ =?us-ascii?Q?sAYVF1ccSMZUaEGxmrH/QKDSOkExQQakEUd+5kmun5p1L1CE3I7g2t8sQKkR?=
+ =?us-ascii?Q?dlQIStzlunfvd1IUhyjd/w71zBTnL9CLNIFY+eSfNHx4XuYMxfC7XAEZN+gB?=
+ =?us-ascii?Q?JGiocDU8+A4g++GufQyVfHsYyaaIttutTGfBalzk31kxNF6Cq3OuxbTBOQnL?=
+ =?us-ascii?Q?7oKyPfn3qWY/xu4VkMVZHgfrGMGpwlx2RSf+JFXBQfzhAg3wsqDuCLRWaP54?=
+ =?us-ascii?Q?Wg7JayrMVOzZcmbMgfpH4IkGZC8LP0F/y0aPB14tUH0IvTD80Ko23FgKZJry?=
+ =?us-ascii?Q?ObJ4BJclDJltLPmmqf00lJZO07EpLioYlztquTVSoK95zlb25BF0j2fkq287?=
+ =?us-ascii?Q?TJhGbjwVQqsAyltNGICH3e6Y5T+dyHg5CV8vsRBNVGYFq5Pu1wq9a31+cPvU?=
+ =?us-ascii?Q?hFtWefcPBXdqJ6xGsU3kqVDRScSTghzXDQlDVFc/Wtl786W0VANbhxteV/L2?=
+ =?us-ascii?Q?t07sB0dLfAo2zsdKZddYa4MGnz3/+fT+aprdVGBP/qfAjXBMpJFrmCggQxvA?=
+ =?us-ascii?Q?OwTNsFw9S+hUf0HevAE8Apd/IDQi4zZjq9XGT965Ecrz/+6Vzv754Xjs4Dzh?=
+ =?us-ascii?Q?8P2IaWpa6yratTwNfczV3SKcdIcMSi7fSRaUDLdki3EwFpd9Ke8I4aoDAfJB?=
+ =?us-ascii?Q?KUs+9b3pNrGd3CwYtyJfCG0f2/BO9rKQmUzy95SIPULGbzi3F9T3B1AjlLdP?=
+ =?us-ascii?Q?lK4Eac2sQa3vuP4RCGQULxBYd4KJDICGtvG/yk2CWzU9OLRcxnxDUv06Z7Bz?=
+ =?us-ascii?Q?lc8h5E+CTR9FKRAoOTmSCT0iWi9d7uA6qhtoxhwafFMC0fSKdRvX2+6YXd2c?=
+ =?us-ascii?Q?xTph0pnVw2qqy6N37fjaVkbDws5maEcfkANkQtXX?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5fdbb14-4d9d-4545-7000-08db86900a03
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2023 06:35:40.3965
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4fa999b0-8f61-4fcd-846e-08db8690218d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jul 2023 06:36:19.9012
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4WpNvBoRr9YsVDtAhqXC/JM4HbXz39AWZGn642o/Bmm7q2At0O9YlsQ7TXLtRWrV/GKGGJYCuQeNNRmQDDCiCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6129
+X-MS-Exchange-CrossTenant-userprincipalname: af4ZHCMsqzj7FWQVsG3LLQ57pavgujOC5xJp2R14Lnw5vDguy1lUgTcfOxrg+0rzku/gmPwq6nrMKHRxrLL3GQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7676
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+ID4gKy8qIENhbGxlZCBmcm9tIF9fdGR4X2h5cGVyY2FsbCgpIGZvciB1bnJlY292ZXJhYmxl
-IGZhaWx1cmUgKi8NCj4gPiArc3RhdGljIG5vaW5zdHIgdm9pZCBfX3RkeF9oeXBlcmNhbGxfZmFp
-bGVkKHZvaWQpDQo+ID4gK3sNCj4gPiArCWluc3RydW1lbnRhdGlvbl9iZWdpbigpOw0KPiA+ICsJ
-cGFuaWMoIlREVk1DQUxMIGZhaWxlZC4gVERYIG1vZHVsZSBidWc/Iik7DQo+ID4gK30NCj4gDQo+
-IFNvIHdoYXQncyB0aGUgZGVhbCB3aXRoIHRoaXMgaW5zdHJ1bWVudGF0aW9uIGhlcmUuIFRoZSBp
-bnN0cnVjdGlvbiBpcyANCj4gbm9pbnN0ciwgc28geW91IHdhbnQgdG8gbWFrZSBqdXN0IHRoZSBw
-YW5pYyBjYWxsIGl0c2VsZiBpbnN0cnVtZW50YWJsZT8sIA0KPiBpZiBzbyB3aGVyZSdzIHRoZSBp
-bnN0cnVtZW50YXRpb25fZW5kKCkgY2FsOz9ObyBpbnN0cnVtZW50YXRpb25fZW5kKCkgDQo+IGNh
-bGwuIEFjdHVhbGx5IGlzIHRoaXMgY29tcGxleGl0eSByZWFsbHkgd29ydGggaXQgZm9yIHRoZSBm
-YWlsdXJlIGNhc2U/DQo+IA0KPiBBRkFJQ1MgdGhlcmUgaXMgYSBzaW5nbGUgY2FsbCBzaXRlIGZv
-ciBfX3RkeF9oeXBlcmNhbGxfZmFpbGVkIHNvIHdoeSANCj4gbm9vdCBjYWxsIHBhbmljKCkgZGly
-ZWN0bHkgPw0KDQpXL28gdGhpcyBwYXRjaCwgdGhlIF9fdGR4X2h5cGVyY2FsbF9mYWlsZWQoKSBp
-cyBjYWxsZWQgZnJvbSB0aGUgVERYX0hZUEVSQ0FMTA0KYXNzZW1ibHksIHdoaWNoIGlzIGluIC5u
-b2luc3RyLnRleHQsIGFuZCAnaW5zdHJ1bWVudGF0aW9uX2JlZ2luKCknIHdhcyBuZWVkZWQgdG8N
-CmF2b2lkIHRoZSBidWlsZCB3YXJuaW5nIEkgc3VwcG9zZS4NCg0KSG93ZXZlciBub3cgd2l0aCB0
-aGlzIHBhdGNoIF9fdGR4X2h5cGVyY2FsbF9mYWlsZWQoKSBpcyBjYWxsZWQgZnJvbQ0KX190ZHhf
-aHlwZXJjYWxsKCkgd2hpY2ggaXMgYSBDIGZ1bmN0aW9uIHcvbyAnbm9pbnN0cicgYW5ub3RhdGlv
-biwgdGh1cyBJIGJlbGlldmUNCmluc3RydW1lbnRhdGlvbl9iZWdpbigpIGFuZCAnbm9pbnN0cicg
-YW5ub3RhdGlvbiBhcmUgbm90IG5lZWRlZCBhbnltb3JlLg0KDQpJIGRpZG4ndCBub3RpY2UgdGhp
-cyB3aGlsZSBtb3ZpbmcgdGhpcyBmdW5jdGlvbiBhcm91bmQgYW5kIG15IGtlcm5lbCBidWlsZCB0
-ZXN0DQpkaWRuJ3Qgd2FybiBtZSBhYm91dCB0aGlzLiAgSSdsbCBjaGFuZ2UgaW4gbmV4dCB2ZXJz
-aW9uLg0KDQpJbiBmYWN0LCBwZXJoYXBzIHRoaXMgcGF0Y2ggcGVyaGFwcyBpcyB0b28gYmlnIGZv
-ciByZXZpZXcuICBJIHdpbGwgYWxzbyB0cnkgdG8NCnNwbGl0IGl0IHRvIHNtYWxsZXIgb25lcy4N
-Cg0KPiANCj4gPiArDQo+ID4gK3N0YXRpYyBpbmxpbmUgdTY0IF9fdGR4X2h5cGVyY2FsbChzdHJ1
-Y3QgdGR4X21vZHVsZV9hcmdzICphcmdzKQ0KPiA+ICt7DQo+ID4gKwl1NjQgcmV0Ow0KPiA+ICsN
-Cj4gPiArCWFyZ3MtPnJjeCA9IFREVk1DQUxMX0VYUE9TRV9SRUdTX01BU0s7DQo+ID4gKwlyZXQg
-PSBfX3RkY2FsbF9zYXZlZF9yZXQoVERHX1ZQX1ZNQ0FMTCwgYXJncyk7DQo+ID4gKw0KPiA+ICsJ
-LyoNCj4gPiArCSAqIFJBWCE9MCBpbmRpY2F0ZXMgYSBmYWlsdXJlIG9mIHRoZSBURFZNQ0FMTCBt
-ZWNoYW5pc20gaXRzZWxmIGFuZCB0aGF0DQo+IA0KPiBuaXQ6IFdoeSBtZW50aW9uIHRoZSByZWdp
-c3RlciBleHBsaWNpdGx5LCBqdXN0IHNheSB0aGF0IGlmIA0KPiBfX3RkY2FsbF9zYXZlZF9yZXQg
-cmV0dXJucyBub24temVybyAuLi4uDQoNCk9LIHdpbGwgZG8uICBJIGJhc2ljYWxseSBtb3ZlZCB0
-aGUgY29tbWVudCBmcm9tIGFzc2VtYmx5IHRvIGhlcmUuDQoNCg0KDQo=
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Friday, June 16, 2023 5:40 PM
+>=20
+> vfio_group is not needed for vfio device cdev, so with vfio device cdev
+> introduced, the vfio_group infrastructures can be compiled out if only
+> cdev is needed.
+>=20
+> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Tested-by: Yanting Jiang <yanting.jiang@intel.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Tested-by: Terrence Xu <terrence.xu@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/iommu/iommufd/Kconfig |  4 +-
+>  drivers/vfio/Kconfig          | 15 ++++++
+>  drivers/vfio/Makefile         |  2 +-
+>  drivers/vfio/vfio.h           | 89 ++++++++++++++++++++++++++++++++---
+>  include/linux/vfio.h          | 25 ++++++++--
+>  5 files changed, 123 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfi=
+g
+> index ada693ea51a7..99d4b075df49 100644
+> --- a/drivers/iommu/iommufd/Kconfig
+> +++ b/drivers/iommu/iommufd/Kconfig
+> @@ -14,8 +14,8 @@ config IOMMUFD
+>  if IOMMUFD
+>  config IOMMUFD_VFIO_CONTAINER
+>  	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
+> -	depends on VFIO && !VFIO_CONTAINER
+> -	default VFIO && !VFIO_CONTAINER
+> +	depends on VFIO_GROUP && !VFIO_CONTAINER
+> +	default VFIO_GROUP && !VFIO_CONTAINER
+
+Hi Alex, Jason,
+
+I found a minor nit on the kconfig. The below configuration is valid.
+But user cannot use vfio directly as there is no /dev/vfio/vfio. Although
+user can open /dev/iommu instead. This is not good.
+
+CONFIG_IOMMUFD=3Dy
+CONFIG_VFIO_DEVICE_CDEv=3Dn
+CONFIG_VFIO_GROUP=3Dy
+CONFIG_VFIO_CONTAINER=3Dn
+CONFIG_IOMMUFD_VFIO_CONTAINER=3Dn
+
+So need to have the below change. I'll incorporate this change in
+this series after your ack.
+
+diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
+index 99d4b075df49..d675c96c2bbb 100644
+--- a/drivers/iommu/iommufd/Kconfig
++++ b/drivers/iommu/iommufd/Kconfig
+@@ -14,8 +14,8 @@ config IOMMUFD
+ if IOMMUFD
+ config IOMMUFD_VFIO_CONTAINER
+ 	bool "IOMMUFD provides the VFIO container /dev/vfio/vfio"
+-	depends on VFIO_GROUP && !VFIO_CONTAINER
+-	default VFIO_GROUP && !VFIO_CONTAINER
++	depends on VFIO_GROUP
++	default n
+ 	help
+ 	  IOMMUFD will provide /dev/vfio/vfio instead of VFIO. This relies on
+ 	  IOMMUFD providing compatibility emulation to give the same ioctls.
+diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+index 6bda6dbb4878..ee3bbad6beb8 100644
+--- a/drivers/vfio/Kconfig
++++ b/drivers/vfio/Kconfig
+@@ -6,7 +6,7 @@ menuconfig VFIO
+ 	select INTERVAL_TREE
+ 	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=3Dn
+ 	select VFIO_DEVICE_CDEV if !VFIO_GROUP
+-	select VFIO_CONTAINER if IOMMUFD=3Dn
++	select VFIO_CONTAINER if IOMMUFD_VFIO_CONTAINER=3Dn
+ 	help
+ 	  VFIO provides a framework for secure userspace device drivers.
+ 	  See Documentation/driver-api/vfio.rst for more details.
+
+>  	help
+>  	  IOMMUFD will provide /dev/vfio/vfio instead of VFIO. This relies on
+>  	  IOMMUFD providing compatibility emulation to give the same ioctls.
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index 1cab8e4729de..35ab8ab87688 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -4,6 +4,8 @@ menuconfig VFIO
+>  	select IOMMU_API
+>  	depends on IOMMUFD || !IOMMUFD
+>  	select INTERVAL_TREE
+> +	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=3Dn
+> +	select VFIO_DEVICE_CDEV if !VFIO_GROUP
+>  	select VFIO_CONTAINER if IOMMUFD=3Dn
+
+This should be " select VFIO_CONTAINER if IOMMUFD_VFIO_CONTAINER=3Dn"
+
+Regards,
+Yi Liu
+
+>  	help
+>  	  VFIO provides a framework for secure userspace device drivers.
+> @@ -15,6 +17,7 @@ if VFIO
+>  config VFIO_DEVICE_CDEV
+>  	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
+>  	depends on IOMMUFD
+> +	default !VFIO_GROUP
+>  	help
+>  	  The VFIO device cdev is another way for userspace to get device
+>  	  access. Userspace gets device fd by opening device cdev under
+> @@ -24,9 +27,20 @@ config VFIO_DEVICE_CDEV
+>=20
+>  	  If you don't know what to do here, say N.
+>=20
+> +config VFIO_GROUP
+> +	bool "Support for the VFIO group /dev/vfio/$group_id"
+> +	default y
+> +	help
+> +	   VFIO group support provides the traditional model for accessing
+> +	   devices through VFIO and is used by the majority of userspace
+> +	   applications and drivers making use of VFIO.
+> +
+> +	   If you don't know what to do here, say Y.
+> +
+>  config VFIO_CONTAINER
+>  	bool "Support for the VFIO container /dev/vfio/vfio"
+>  	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> +	depends on VFIO_GROUP
+>  	default y
+>  	help
+>  	  The VFIO container is the classic interface to VFIO for establishing
+> @@ -48,6 +62,7 @@ endif
+>=20
+>  config VFIO_NOIOMMU
+>  	bool "VFIO No-IOMMU support"
+> +	depends on VFIO_GROUP
+>  	help
+>  	  VFIO is built on the ability to isolate devices using the IOMMU.
+>  	  Only with an IOMMU can userspace access to DMA capable devices be
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index 245394aeb94b..57c3515af606 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -2,9 +2,9 @@
+>  obj-$(CONFIG_VFIO) +=3D vfio.o
+>=20
+>  vfio-y +=3D vfio_main.o \
+> -	  group.o \
+>  	  iova_bitmap.o
+>  vfio-$(CONFIG_VFIO_DEVICE_CDEV) +=3D device_cdev.o
+> +vfio-$(CONFIG_VFIO_GROUP) +=3D group.o
+>  vfio-$(CONFIG_IOMMUFD) +=3D iommufd.o
+>  vfio-$(CONFIG_VFIO_CONTAINER) +=3D container.o
+>  vfio-$(CONFIG_VFIO_VIRQFD) +=3D virqfd.o
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index e7a3fe093362..b27a3915e6c9 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -36,6 +36,12 @@ vfio_allocate_device_file(struct vfio_device *device);
+>=20
+>  extern const struct file_operations vfio_device_fops;
+>=20
+> +#ifdef CONFIG_VFIO_NOIOMMU
+> +extern bool vfio_noiommu __read_mostly;
+> +#else
+> +enum { vfio_noiommu =3D false };
+> +#endif
+> +
+>  enum vfio_group_type {
+>  	/*
+>  	 * Physical device with IOMMU backing.
+> @@ -60,6 +66,7 @@ enum vfio_group_type {
+>  	VFIO_NO_IOMMU,
+>  };
+>=20
+> +#if IS_ENABLED(CONFIG_VFIO_GROUP)
+>  struct vfio_group {
+>  	struct device 			dev;
+>  	struct cdev			cdev;
+> @@ -111,6 +118,82 @@ static inline bool vfio_device_is_noiommu(struct vfi=
+o_device
+> *vdev)
+>  	return IS_ENABLED(CONFIG_VFIO_NOIOMMU) &&
+>  	       vdev->group->type =3D=3D VFIO_NO_IOMMU;
+>  }
+> +#else
+> +struct vfio_group;
+> +
+> +static inline int vfio_device_block_group(struct vfio_device *device)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void vfio_device_unblock_group(struct vfio_device *device)
+> +{
+> +}
+> +
+> +static inline int vfio_device_set_group(struct vfio_device *device,
+> +					enum vfio_group_type type)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void vfio_device_remove_group(struct vfio_device *device)
+> +{
+> +}
+> +
+> +static inline void vfio_device_group_register(struct vfio_device *device=
+)
+> +{
+> +}
+> +
+> +static inline void vfio_device_group_unregister(struct vfio_device *devi=
+ce)
+> +{
+> +}
+> +
+> +static inline int vfio_device_group_use_iommu(struct vfio_device *device=
+)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static inline void vfio_device_group_unuse_iommu(struct vfio_device *dev=
+ice)
+> +{
+> +}
+> +
+> +static inline void vfio_df_group_close(struct vfio_device_file *df)
+> +{
+> +}
+> +
+> +static inline struct vfio_group *vfio_group_from_file(struct file *file)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline bool vfio_group_enforced_coherent(struct vfio_group *group=
+)
+> +{
+> +	return true;
+> +}
+> +
+> +static inline void vfio_group_set_kvm(struct vfio_group *group, struct k=
+vm *kvm)
+> +{
+> +}
+> +
+> +static inline bool vfio_device_has_container(struct vfio_device *device)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline int __init vfio_group_init(void)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void vfio_group_cleanup(void)
+> +{
+> +}
+> +
+> +static inline bool vfio_device_is_noiommu(struct vfio_device *vdev)
+> +{
+> +	return false;
+> +}
+> +#endif /* CONFIG_VFIO_GROUP */
+>=20
+>  #if IS_ENABLED(CONFIG_VFIO_CONTAINER)
+>  /**
+> @@ -362,12 +445,6 @@ static inline void vfio_virqfd_exit(void)
+>  }
+>  #endif
+>=20
+> -#ifdef CONFIG_VFIO_NOIOMMU
+> -extern bool vfio_noiommu __read_mostly;
+> -#else
+> -enum { vfio_noiommu =3D false };
+> -#endif
+> -
+>  #ifdef CONFIG_HAVE_KVM
+>  void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *k=
+vm);
+>  void vfio_device_put_kvm(struct vfio_device *device);
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index d6228c839c44..5a1dee983f17 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -43,7 +43,11 @@ struct vfio_device {
+>  	 */
+>  	const struct vfio_migration_ops *mig_ops;
+>  	const struct vfio_log_ops *log_ops;
+> +#if IS_ENABLED(CONFIG_VFIO_GROUP)
+>  	struct vfio_group *group;
+> +	struct list_head group_next;
+> +	struct list_head iommu_entry;
+> +#endif
+>  	struct vfio_device_set *dev_set;
+>  	struct list_head dev_set_list;
+>  	unsigned int migration_flags;
+> @@ -58,8 +62,6 @@ struct vfio_device {
+>  	refcount_t refcount;	/* user count on registered device*/
+>  	unsigned int open_count;
+>  	struct completion comp;
+> -	struct list_head group_next;
+> -	struct list_head iommu_entry;
+>  	struct iommufd_access *iommufd_access;
+>  	void (*put_kvm)(struct kvm *kvm);
+>  #if IS_ENABLED(CONFIG_IOMMUFD)
+> @@ -284,12 +286,29 @@ int vfio_mig_get_next_state(struct vfio_device *dev=
+ice,
+>  /*
+>   * External user API
+>   */
+> +#if IS_ENABLED(CONFIG_VFIO_GROUP)
+>  struct iommu_group *vfio_file_iommu_group(struct file *file);
+>  bool vfio_file_is_group(struct file *file);
+> +bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+> +#else
+> +static inline struct iommu_group *vfio_file_iommu_group(struct file *fil=
+e)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline bool vfio_file_is_group(struct file *file)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool vfio_file_has_dev(struct file *file, struct vfio_devi=
+ce *device)
+> +{
+> +	return false;
+> +}
+> +#endif
+>  bool vfio_file_is_valid(struct file *file);
+>  bool vfio_file_enforced_coherent(struct file *file);
+>  void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
+> -bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+>=20
+>  #define VFIO_PIN_PAGES_MAX_ENTRIES	(PAGE_SIZE/sizeof(unsigned long))
+>=20
+> --
+> 2.34.1
+
