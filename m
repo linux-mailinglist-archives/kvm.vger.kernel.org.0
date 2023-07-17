@@ -2,253 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5355A756951
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 18:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E74D7569B4
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 18:56:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231627AbjGQQhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 12:37:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46048 "EHLO
+        id S229901AbjGQQ4L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 12:56:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbjGQQhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 12:37:18 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37DC3E4F
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 09:37:17 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-3460770afe2so412635ab.1
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 09:37:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689611836; x=1690216636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9uIEdBE5/V8mtrIJ86bMEt1YlGPQReRHT+9wS4K4FB4=;
-        b=OWHrFN2QTW3UJN0pNRFGTth7sEd5Dw7sjggstuUU7FV9QMT2n63OgPRS5VJJVeGyDl
-         Z1aCxXXSSL7lbOeKaqH9uzgIZoOd3a4cSFlQWY8DAAVk2hVhBktYxB3Cjl0Qr6hg0f2N
-         cbxxuZL/fYo6GBCiyMmZc7+utv9P9s70Y7FI287tO+3wr0A+ZGEOlF49j/9FY9aMyq98
-         SQmF6dsU04+/lJBQcBsO5YwCCOp43Pw83PRsVPqbFJUbzaSBmheT5yPv+dkXMPda7xZ+
-         8g2BcY5k4LYQ+33V19zi2oOHswaaMCCFMEfRQKmssQNIZE4Z/gLXt9l18MBgmieiGH90
-         hTug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689611836; x=1690216636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9uIEdBE5/V8mtrIJ86bMEt1YlGPQReRHT+9wS4K4FB4=;
-        b=Rfwh9tQw6B8K3OUd4iHrQrVxwk4WgYM/6ijHvVfqYTbq1zsKA9pg9b2DyS/RDuyyFn
-         ZbXf8Wla7X8PWRj+p00e0YuDCAiEqrzjbbRG1dem24fhV1tcmtFJbzCyFoB2FilsX8wq
-         A+j0XO8C8ZBYAGHlBO22bCkz1Z/5i829K0SSWM0duVe2T7zWzbD9AM/C/6YNlada54W4
-         H2vZ7sdsse4rFoaHgBSzmXnTUqWhZHyxuliHnM5YY2sodDHI5Wtb9UbjsqbLVpA26hkK
-         wNnEVovi6JnhMuOcNeXfcE+9SxtZrfBdqERInrdq2sGD/YTF8a9TvQedavvJPt8WZljh
-         9YWg==
-X-Gm-Message-State: ABy/qLZkfhI3QyOLeAb//Af1xfeWbYTQh7K1dadV1ZjQySWI41KlIauV
-        Q1wC+tUGkiFux4vCECrdpHlEXGnVE5Xc4L2AsN2dYQ==
-X-Google-Smtp-Source: APBJJlGMfnLl/VH8ZDf7IouzF+AemA7yqLQkI7oavRJWnulUuwCOZ3ikGsNQPfEomUZ5dTddNqkXnqp2ix1LaTkk0TQ=
-X-Received: by 2002:a05:6e02:1c2e:b0:348:72eb:150d with SMTP id
- m14-20020a056e021c2e00b0034872eb150dmr599165ilh.21.1689611836063; Mon, 17 Jul
- 2023 09:37:16 -0700 (PDT)
+        with ESMTP id S229848AbjGQQ4I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 12:56:08 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061.outbound.protection.outlook.com [40.107.94.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18C1410C;
+        Mon, 17 Jul 2023 09:56:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AjIItiLwoWZE3t53zzqyDm4YeEHwKMJ0aaaUDibNEE2qXOahzIiYZuytMzSTPN5GPStKuKXswOWmTdY+WVdMceCxR+ea2OwEdNEnSGZoe+0KS7knUDuD/c/17eK7MzEq62Fd3LN7NAEzNKI62PA64MHqwq01RDKRr7U+5qlQYj+gyPTfe+pxB7rx4eLbptqXZ4NHWGkI6cRYx4BYlZcV2WYTfIlp6kjjo2UriGUnZfDHE/ytTn5lbNsT6Ilt2yPaqe4NZ4qi7KEqy1kTXjyX/oPviI5mWwLRg3Yk578RyB07zK/Js2dDaOXI5F/w51Ty/p5PF5BJzyNwEjkZhKQ/rQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2p0AkZhLKYruRO4d0FUnIkMg9Gku/Tg9qnSh+vX8zUs=;
+ b=U7ZzYNm3OdMLF53+A4VLA3ggxo6BLCi2ILvGOrOmSPkOyILET/nhROv4fIDbWIe/KAsgiukLK7sdJ0o06+S3nWNBHP1nSpj1o8vmWczmrdrxcmXIptZM1LS945PG0FczzI60pvM+So17zSzwiU/5FbrW1dBh1H2K8g4PGV5RVIR4FYNhibS0J6fjLzy8mSv14Drb2q7FJu0TBiYQWZpsmsypfYvzjECDW2ys+LgrAsT58Og1Jmvvcodkd79SrONaVMULkwsLjTnMHgYbFEx8BtL+nNFDE7VWcdgXkwtSEeWRoSmn9VViYAJIizejR+aIeDL9DE3PYphoId5ZTb/Dhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2p0AkZhLKYruRO4d0FUnIkMg9Gku/Tg9qnSh+vX8zUs=;
+ b=D7wHH6E70GRBQulseb9i/XHWCnxvjsCmRPRzyg0UuYdYFoE1vKUgOJX9ttV9QLw25bo7xTYbOmu9GpPkaEAfWVb+Sr4qgKiabV1y/sbZOzMz9u4tQiG1ar1j5TjVnUlTlQ6koeSFJX7m1lVBObf9Q58Y7xfUcl1xhw9BIdsdw0w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by DM4PR12MB6279.namprd12.prod.outlook.com (2603:10b6:8:a3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Mon, 17 Jul
+ 2023 16:56:02 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
+ 16:56:01 +0000
+Message-ID: <c8978b1c-2e45-6557-47fd-6f57dda8e433@amd.com>
+Date:   Mon, 17 Jul 2023 09:55:59 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v11 vfio 7/7] vfio/pds: Add Kconfig and documentation
+To:     Simon Horman <simon.horman@corigine.com>,
+        Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com
+References: <20230713003727.11226-1-brett.creeley@amd.com>
+ <20230713003727.11226-8-brett.creeley@amd.com>
+ <ZLJhXRdA2a72Cb5/@corigine.com>
+Content-Language: en-US
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <ZLJhXRdA2a72Cb5/@corigine.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0001.namprd05.prod.outlook.com
+ (2603:10b6:a03:33b::6) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 MIME-Version: 1.0
-References: <20230715005405.3689586-1-rananta@google.com> <20230715005405.3689586-4-rananta@google.com>
- <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com>
-In-Reply-To: <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 17 Jul 2023 09:37:04 -0700
-Message-ID: <CAJHc60zhVco3uTq97vDHMk8cgg1psPtwHT6MN1eKP1Yr18d9cw@mail.gmail.com>
-Subject: Re: [PATCH v6 03/11] KVM: Allow range-based TLB invalidation from
- common code
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DM4PR12MB6279:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8188ff71-c57a-4a65-6110-08db86e6b394
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: e4KtC2pyH8+C8zik2WdwkrZJNs0rHRb2h6BVHno5TPU+b9dEuZ+lRP82Uc43tiL9J+1DxBa/nQIyoXgyCYY1vqmvEuWg6nuNYXiLdt7sYx+IMgnLq8v8dlUsZEZXka7Kuew+JKWVLFyWgNsmcpmfzWsZdKvrGNvEVq2BWrJnIRJ5LflWj7vhWqdRCaVWsFNZ9PDdrk0HjQsGsQf0MfxNpWpxKCnqWcLuu6e6w9TPzoUB2OlD10f8pj5DsWUkz915+X8/QYLVCRNz9bn83/NRWSmvh75AFkHK5JUA3CwzCIg2Fz654nmx2hwVzcrTWXdg1N78T3NBnqvhXanpwQztq5puS0uYkv06GI1kCggOm1VBTdkZfuPv7J7Bqj6GIcrW9AHvcVzMQnp4D+zBQ1Z2ibId9Ol3VpgURazsD1PkOfdTE7UdWueLfAqYOY8ay0DZDLeqAGycgZrKFwsszBUiqh/kCM9JTX/GTOOWkSIebmSp/jTHQMYxBjN2+TdmncNuxImzFkqIXiEzZTmsRoBihsRDVJDMjPDtWDG/Myj7k8Zs2A0NDRu3uagrMCp38SlTE2pwvDnTqqA4Gal5lKErwL6ZUhs+u8ACUv321bfpSvJRiNRfaF3rMw0CiuVVwpYHhcShXwI8kiZYliTvppgGEQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(376002)(136003)(396003)(346002)(451199021)(31686004)(31696002)(2906002)(36756003)(6636002)(6512007)(2616005)(186003)(83380400001)(26005)(6506007)(53546011)(38100700002)(6486002)(110136005)(316002)(4326008)(66946007)(66476007)(66556008)(8936002)(478600001)(5660300002)(41300700001)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ank5aDYwRUhJOWdsdlFZTkRxODhXZ0dqc01zSUk4cEFpZlhlZWpFL3NkVGVK?=
+ =?utf-8?B?T3c0cW40ZkZBQmJGMExEb0E5WUI4MlVnRFdtclc0UkFGM0RqNlJrMXpidWdw?=
+ =?utf-8?B?bXFzNGZadW8vcmZoYjMvOWpWUkRvVWRSYnpPVlg1aXpDd2N3NVpTQVZKMjJY?=
+ =?utf-8?B?ejBGNE9rYklmdDR5bFlKNi9GdkNvaHdrM3VlOWtWbVBmNEtPeE1FRHUya0t2?=
+ =?utf-8?B?cS80cWVnK29udVI3SmlRallZaHFQcmxWYmswZTlDUFoxZXBKcG9CSHRBK0xL?=
+ =?utf-8?B?ZUwwM3ZQZjdKaXhvS1lRN0NOZ3loK3cxYS9DbUdDbFU1bVIyVkdYakJreHZm?=
+ =?utf-8?B?U1pTN1NoUFVmdS9vU3dSV0drV2NoeTFHTjdYUGFXcE90ZWxTT3A3R1lRd0tC?=
+ =?utf-8?B?Nk11allyc2NaTkZQQm43S3lXWVU0RUMzVmdVZDhGblR5cjE4M1BNQ0NkV1RX?=
+ =?utf-8?B?ejlOVkJDUDdGWHIxZHIxWVZXYisvbW93NERDKzc2bWl1ODI5SHN2ZWoxYWo4?=
+ =?utf-8?B?VkRqNENOR2c3Yy9LYzNPY09uVDFVdDlsZTgrcWhRL0JON2F6QkFYTG5hV2FO?=
+ =?utf-8?B?cTZXRzk3WWU2bkdVbWNrc3ExZnluSTYxK1RmWVVUZjJHQklOeHU0MmxzeVZn?=
+ =?utf-8?B?ZmlnNzVUYTluL2ptSDhETWlTWmplS0s0TVkzNnFDM1QyRDFTRFVWYlZkVFN3?=
+ =?utf-8?B?aEFaQnk3K1hKU1d4SlRhRlFIMzBycStjdXVtK3FsZ1YzYU4rTXk5LzNHY2dl?=
+ =?utf-8?B?cCtlblo1eGtGZUJFWnhkcVY2NUduSXh1RXJlSG1xTTNFZGJmUVZmc2pIQ0lx?=
+ =?utf-8?B?Z09wZnFheFJVT21EcjFraWdycFByRWZicEt6V2pNRGJhcDg2K25KUGlsYlQr?=
+ =?utf-8?B?ck1XQ1E3TGh4cUJKbkdjc05RM0dGRThWK1MxYjNsVjUvL2NzMVNDZkp5T21D?=
+ =?utf-8?B?cEZGcGRVK3phZVYrbi9TRXpFTi9qb281UnY3SzludjNjWjYwVStISnRpVWly?=
+ =?utf-8?B?ckJhK015eWV2aEdJQnJhb0JwS09HeEFuZzNicFpmL2ZvcFNKcExhQ3JsS0h6?=
+ =?utf-8?B?SCtLWVF1bm5PdVhTUTdCRGhSZWRxYmVaODJtSFU1dkVwMlJXTllac2JqSmVX?=
+ =?utf-8?B?TTBuZUpkZlczMXlhb1I4b05razNJSWNONDJXeDQwU2V4YkVZbmNsaklqUERk?=
+ =?utf-8?B?L2VkQjgrUXZOM1VzMWFRR0JXNHBOb041cytnTTdQa1hpeVY3ZzcrcWxjRHh0?=
+ =?utf-8?B?Y3ZGMDJUajdHWmx1TUN4anZsQXU2WW1RZmg1Q3pJRS9iRURJTkxEcUNNT1FR?=
+ =?utf-8?B?SWNNckhVWFgxN0N4VVZZMHBqRC85dC8xdGNIK3pGcTJKYk9nOGlqdlhwd1NJ?=
+ =?utf-8?B?NzZYUmJ2dDNudEI0Tk45UEp2ZG4wWnhPZi9HZ0VIc2JGRG9GZkFMV3U0K2Ey?=
+ =?utf-8?B?RnVGV3h1dmgzK3ZJNFRuZTV2UVpjUkVoK3JQM1cwR2VKc3VqSi9mSEc2TUpH?=
+ =?utf-8?B?dW14TGgvQmp2VkhUNTdKUUdmTXh6M3JKSHUvbFBOMFJzUGV4VnhIMGJMR3RR?=
+ =?utf-8?B?WWdMQWhGMWFhNDZPbTlMdkxMWHl1aW9qR1hmTW5VbFl2OWZpWEx2TXZOYTU1?=
+ =?utf-8?B?bm01STRvSTI0SFd2UFhtdWZCV3Q4T05JelYvanFxMTFOc1BsK0c2WG9QNE90?=
+ =?utf-8?B?YTZiZGxEcDlyZ0s0T1NNS0lpRUdvL0NmMzVRMXlIMmtScFE1RkpOTk9qaEJk?=
+ =?utf-8?B?VVh5R0tOT2lRTU9POG5DYVh2d1BEODhQQnVUOGJzT0VZY3BWenhwRmhKUjBv?=
+ =?utf-8?B?bFhYSVVVTUtQZ2JMVG13Ym5sZlc5OXViWVMreTJMNkRjYk5vaG9xNnhERjZB?=
+ =?utf-8?B?YkVLaHNOTVBkYUw0dlpNOWVPeVlxcmFIeFJKS2lrWEo2djNud0NGa0diM0M1?=
+ =?utf-8?B?S2Yxb0VJeVJ6NitWVzY0SFV4UnhDWnRpa1hjTXBTOVF4Zm9YTmtyMDJUUUlv?=
+ =?utf-8?B?emhUNnRtZGVKV3owV0ZtZFUzdlhINWVyOTlyeTFvbHdpNlcyS3l6b2Mrbi9D?=
+ =?utf-8?B?UU40aTJsb2xMdnAzTUtmRXI5SVVyb0RsMWdKcEpmZ0hidnNNYjV0NnVWVGlF?=
+ =?utf-8?Q?wcG5oZD0EvLdkIAJ/+Yuh+5HG?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8188ff71-c57a-4a65-6110-08db86e6b394
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 16:56:01.8037
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7nyLndooszJvFqeqgJXFxHPmb5dTatbi+SX/3P0Pqa0LDhv7Bt730kFAXDVg3v6+sU27/hz3JbA/I4AG29klhA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6279
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 17, 2023 at 4:40=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
->
->
->
-> On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
-> > From: David Matlack <dmatlack@google.com>
-> >
-> > Make kvm_flush_remote_tlbs_range() visible in common code and create a
-> > default implementation that just invalidates the whole TLB.
-> >
-> > This paves the way for several future features/cleanups:
-> >
-> >   - Introduction of range-based TLBI on ARM.
-> >   - Eliminating kvm_arch_flush_remote_tlbs_memslot()
-> >   - Moving the KVM/x86 TDP MMU to common code.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > ---
-> >   arch/x86/include/asm/kvm_host.h |  3 +++
-> >   arch/x86/kvm/mmu/mmu.c          |  9 ++++-----
-> >   arch/x86/kvm/mmu/mmu_internal.h |  3 ---
-> >   include/linux/kvm_host.h        |  9 +++++++++
-> >   virt/kvm/kvm_main.c             | 13 +++++++++++++
-> >   5 files changed, 29 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index a2d3cfc2eb75..08900afbf2ad 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1804,6 +1804,9 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
-ct kvm *kvm)
-> >               return -ENOTSUPP;
-> >   }
-> >
-> > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,=
- u64 pages);
-> > +
-> >   #define kvm_arch_pmi_in_guest(vcpu) \
-> >       ((vcpu) && (vcpu)->arch.handling_intr_from_guest)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ec169f5c7dce..aaa5e336703a 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -278,16 +278,15 @@ static inline bool kvm_available_flush_remote_tlb=
-s_range(void)
-> >       return kvm_x86_ops.flush_remote_tlbs_range;
-> >   }
-> >
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -                              gfn_t nr_pages)
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,=
- u64 pages)
-> >   {
-> >       int ret =3D -EOPNOTSUPP;
-> >
-> >       if (kvm_x86_ops.flush_remote_tlbs_range)
-> >               ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(kvm,=
- start_gfn,
-> > -                                                                nr_pag=
-es);
-> > -     if (ret)
-> > -             kvm_flush_remote_tlbs(kvm);
-> > +                                                                     p=
-ages);
-> This will be good if parameter pages aligned with parameter kvm.
->
-Agreed, but pulling 'pages' above brings the char count to 83. If
-that's acceptable, I'm happy to do it in v7.
+On 7/15/2023 2:05 AM, Simon Horman wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> On Wed, Jul 12, 2023 at 05:37:27PM -0700, Brett Creeley wrote:
+>> Add Kconfig entries and pds-vfio-pci.rst. Also, add an entry in the
+>> MAINTAINERS file for this new driver.
+>>
+>> It's not clear where documentation for vendor specific VFIO
+>> drivers should live, so just re-use the current amd
+>> ethernet location.
+>>
+>> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+>> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+>> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>> ---
+>>   .../ethernet/amd/pds-vfio-pci.rst             | 79 +++++++++++++++++++
+>>   .../device_drivers/ethernet/index.rst         |  1 +
+>>   MAINTAINERS                                   |  7 ++
+>>   drivers/vfio/pci/Kconfig                      |  2 +
+>>   drivers/vfio/pci/pds/Kconfig                  | 19 +++++
+>>   5 files changed, 108 insertions(+)
+>>   create mode 100644 Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
+>>   create mode 100644 drivers/vfio/pci/pds/Kconfig
+>>
+>> diff --git a/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst b/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
+>> new file mode 100644
+>> index 000000000000..7a6bc848a2b2
+>> --- /dev/null
+>> +++ b/Documentation/networking/device_drivers/ethernet/amd/pds-vfio-pci.rst
+>> @@ -0,0 +1,79 @@
+> 
+> ...
+> 
+>> diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
+>> index 94ecb67c0885..804e1f7c461c 100644
+>> --- a/Documentation/networking/device_drivers/ethernet/index.rst
+>> +++ b/Documentation/networking/device_drivers/ethernet/index.rst
+>> @@ -16,6 +16,7 @@ Contents:
+>>      altera/altera_tse
+>>      amd/pds_core
+>>      amd/pds_vdpa
+>> +   amd/pds_vfio
+>>      aquantia/atlantic
+>>      chelsio/cxgb
+>>      cirrus/cs89x0
+> 
+> Sorry for not noticing this, but there seems to be a missmatch
+> between 'amd/pds_vfio' above, and the name of the file in
+> question. Perhaps the file should be renamed pds_vfio.rst?
 
-Thank you.
-Raghavendra
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > +
-> > +     return ret;
-> >   }
-> >
-> >   static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)=
-;
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_int=
-ernal.h
-> > index d39af5639ce9..86cb83bb3480 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm=
-,
-> >                                   struct kvm_memory_slot *slot, u64 gfn=
-,
-> >                                   int min_level);
-> >
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -                              gfn_t nr_pages);
-> > -
-> >   /* Flush the given page (huge or not) of guest memory. */
-> >   static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t g=
-fn, int level)
-> >   {
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index e3f968b38ae9..a731967b24ff 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
-> >   void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mod=
-e);
-> >
-> >   void kvm_flush_remote_tlbs(struct kvm *kvm);
-> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages=
-);
-> >
-> >   #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> >   int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int m=
-in);
-> > @@ -1486,6 +1487,14 @@ static inline int kvm_arch_flush_remote_tlbs(str=
-uct kvm *kvm)
-> >   }
-> >   #endif
-> >
-> > +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-> > +                                                gfn_t gfn, u64 pages)
-> > +{
-> > +     return -EOPNOTSUPP;
-> > +}
-> > +#endif
-> > +
-> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
-> >   void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
-> >   void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d6b050786155..804470fccac7 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
-> >   }
-> >   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
-> >
-> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages=
-)
-> > +{
-> > +     if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, pages))
-> > +             return;
-> > +
-> > +     /*
-> > +      * Fall back to a flushing entire TLBs if the architecture range-=
-based
-> > +      * TLB invalidation is unsupported or can't be performed for what=
-ever
-> > +      * reason.
-> > +      */
-> > +     kvm_flush_remote_tlbs(kvm);
-> > +}
-> > +
-> >   static void kvm_flush_shadow_all(struct kvm *kvm)
-> >   {
-> >       kvm_arch_flush_shadow_all(kvm);
->
-> --
-> Shaoqin
->
+I will take a look at this. I renamed comments/files based on renaming 
+the driver to pds-vfio-pci, but missed this.
+
+Thanks for taking another look. I will get this fixed on v12.
+
+Brett
+
+> 
+> 'make htmldocs' reports:
+> 
+>   .../index.rst:10: WARNING: toctree contains reference to nonexisting document 'device_drivers/ethernet/amd/pds_vfio'
+>   .../amd/pds-vfio-pci.rst: WARNING: document isn't included in any toctree
+> 
+> 
+> 
