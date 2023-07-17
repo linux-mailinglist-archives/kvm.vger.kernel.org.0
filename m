@@ -2,84 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 798C77566DC
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 16:53:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6D9675670A
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 17:01:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbjGQOxd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 10:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37854 "EHLO
+        id S230377AbjGQPBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 11:01:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229948AbjGQOxc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 10:53:32 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F8AE72;
-        Mon, 17 Jul 2023 07:53:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689605611; x=1721141611;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=08bGGgW1l7rlQQS6ONjNOLDr+jtJ5xjVWBt/oOlKRLY=;
-  b=Dugj/fWzjt6WnCJp3buHNGFx2c8LOf2Omc7WMgJ/WX0WISsF1D2yondT
-   30q8epzlHxue6ak1Z7juWKB8DvRbtnIT2nDzE0JvBQJIsg9iaN+fUZlhK
-   SZIAwDbQJgXs8hAUmJEtpnZWSrpk5RIKFb2xrQLKxsezxwe18rrUm7KD8
-   mKZePPnEMBdU8hNkgwYRUaqWydBEc1yg1yKiJKgZTKUaqYKZQcIVCswfZ
-   ACPuIqi3HjZ3kjp+JZNY0Hp29eoXhT4tT0DVz1BccVnbTPowlRFlt76Df
-   NnwtFWP43hkWMsg8zSFHDsVxy6dSxEVjrqp3r/mnxg0mrTUmG0ckgL++0
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="355885111"
-X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="355885111"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 07:53:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="793274914"
-X-IronPort-AV: E=Sophos;i="6.01,211,1684825200"; 
-   d="scan'208";a="793274914"
-Received: from avandeve-mobl1.amr.corp.intel.com (HELO [10.209.118.243]) ([10.209.118.243])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 07:53:29 -0700
-Message-ID: <dc78085a-f9e2-b4ee-b85f-8709dfbe445e@linux.intel.com>
-Date:   Mon, 17 Jul 2023 07:53:28 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 3/4] intel_idle: Add support for using intel_idle in a VM
- guest using just hlt
-Content-Language: en-US
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, linux-pm@vger.kernel.org,
-        artem.bityutskiy@linux.intel.com, kvm <kvm@vger.kernel.org>,
-        Dan Wu <dan1.wu@intel.com>
-References: <20230605154716.840930-1-arjan@linux.intel.com>
- <20230605154716.840930-4-arjan@linux.intel.com>
- <5c7de6d5-7706-c4a5-7c41-146db1269aff@intel.com>
- <747dca0b-7e79-738a-c622-3e2df61849ca@linux.intel.com>
- <CAJZ5v0h4PGFKB0kOL7-odNxNnSn-RxyGfj7atEcNLVfzep6pXw@mail.gmail.com>
-From:   Arjan van de Ven <arjan@linux.intel.com>
-In-Reply-To: <CAJZ5v0h4PGFKB0kOL7-odNxNnSn-RxyGfj7atEcNLVfzep6pXw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230452AbjGQPBW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 11:01:22 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30DEC10DD
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 08:01:13 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8b30f781cso23016835ad.2
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 08:01:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689606072; x=1692198072;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=awVrl5eJJBUaHOpkIdpJlOUxBr+2lb1t7Fi22et+vDI=;
+        b=62TszBwbCrmKp9ce3qtA6ABTpPRoOjs92XedF11+ir17wH+9sGGPreQUypg9ZHT9OQ
+         65JT4vhtqkYYBsYhjSwYNotsEd9glkaJAvE1a8RAcnkolNGg4AjNsnbptWnjWDD+LoFR
+         TZKW5SjoqKJWpx+DmhjhhSu8/RHi01PnzPhzuq/yLURvnHy0LGZNTEM6bjtgte8u2AA0
+         2NWdcfcRiDgLhw52TXs4K2SYatZjuZ5xzxzAN4LHVczRYugtc8ibT+q5WXHaS0JuGWeI
+         hBS2V1W97L9H3Omv1q60lLSfgPSlMJS1/kHYmVTOpd05tftkISveVeSZ5t9IKYTLocAU
+         8fyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689606072; x=1692198072;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=awVrl5eJJBUaHOpkIdpJlOUxBr+2lb1t7Fi22et+vDI=;
+        b=jbu3DYhtaiK2IzzLyO04co/oSWuO5YREVZ3EfRM8ZGUHY4LWzAXvvIw4LIVbSm4fnN
+         sbmoahad7y6eKNr6bvMqhEsGbENSVxToZsDwPZbhJ1ZTGkQpYRy6mXgPuPR8BboU/lec
+         ewaQLN9v4fjXBKjnpnZVtTvtHcR/PAljmhaezf+/NQzJpPiePagtAYNdRp4g7GMr9zHQ
+         +pK/xaJYKHoov81zdsZXO5V13RsEs6xNfgqksQPYCONuK99YjX6i1nKmnNJGzB7sfysA
+         55jsxwEhht35r5Cb+ctpdGdJMBCB6TE4EHwgns3Dyl2ZHUlmeO9xAh0z+E48CKISznbS
+         r0pw==
+X-Gm-Message-State: ABy/qLYq6KdRxkHCCCOYr0/l2g5FHdFTMpZe+eY+aOYu9d0IOmT9aM+J
+        eeN4SMvZm+k4WjqKWpMIbnNQxAMVPa0=
+X-Google-Smtp-Source: APBJJlG7mX5h/W7K/UVdgIbHnqq43NdWdweEZ0CbCSk2I3KtP+ryUEUUBbRSIlrQnLo28Z0z5DH6sB6rlJg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:228a:b0:1b8:9468:c04 with SMTP id
+ b10-20020a170903228a00b001b894680c04mr109688plh.5.1689606072434; Mon, 17 Jul
+ 2023 08:01:12 -0700 (PDT)
+Date:   Mon, 17 Jul 2023 08:01:10 -0700
+In-Reply-To: <b6f80cd4-acf7-bc87-087d-142e8c54b098@amd.com>
+Mime-Version: 1.0
+References: <20230717041903.85480-1-manali.shukla@amd.com> <b6f80cd4-acf7-bc87-087d-142e8c54b098@amd.com>
+Message-ID: <ZLVXtqlOfJsGKMYW@google.com>
+Subject: Re: [PATCH] KVM: SVM: correct the size of spec_ctrl field in VMCB
+ save area
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/17/2023 7:51 AM, Rafael J. Wysocki wrote:
-> On Mon, Jul 17, 2023 at 4:10 PM Arjan van de Ven <arjan@linux.intel.com> wrote:
->>
->>> It leads to below MSR access error on SPR.
->> yeah I have a fix for this but Peter instead wants to delete the whole thing...
->> ... so I'm sort of stuck in two worlds. I'll send the fix today but Rafael will need to
->> chose if he wants to revert or not
-> 
-> I thought that you wanted to fix this rather than to revert, but the
-> latter is entirely fine with me too.
-> 
+On Mon, Jul 17, 2023, Tom Lendacky wrote:
+> On 7/16/23 23:19, Manali Shukla wrote:
+> > Correct the spec_ctrl field in the VMCB save area based on the AMD
+> > Programmer's manual.
+> > 
+> > Originally, the spec_ctrl was listed as u32 with 4 bytes of reserved
 
-I would rather fix of course, and will send the fixes out shorty (final test ongoing)
+Nit, either just "spec_ctrl" or "the spec_ctrl field", specific MSRs and fields
+are essentially proper nouns when used as nouns and not adjectives.
 
+> > area.  The AMD Programmer's Manual now lists the spec_ctrl as 8 bytes
+> > in VMCB save area.
+> > 
+> > The Public Processor Programming reference for Genoa, shows SPEC_CTRL
+> > as 64b register, but the AMD Programmer's Manual lists SPEC_CTRL as
+
+Nit, write out 64-bit (and 32-bit) so that there's zero ambiguity (I paused for
+a few seconds to make sure I was reading it correctly).  64b is perfectly valid,
+but nowhere near as common in the kernel, e.g.
+
+  $ git log | grep -E "\s64b\s" | wc -l
+  160
+  $ git log | grep -E "\s64-bit\s" | wc -l
+  8334
+
+> > 32b register. This discrepancy will be cleaned up in next revision of
+> > the AMD Programmer's Manual.
+> > 
+> > Since remaining bits above bit 7 are reserved bits in SPEC_CTRL MSR
+> > and thus, not being used, the spec_ctrl added as u32 in the VMCB save
+
+Same comment about "the spec_ctrl" here.
+
+> > area is currently not an issue.
+> > 
+> > Fixes: 3dd2775b74c9 ("KVM: SVM: Create a separate mapping for the SEV-ES save area")
+> 
+> The more appropriate Fixes: tag should the be commit that originally
+> introduced the spec_ctrl field:
+> 
+> d00b99c514b3 ("KVM: SVM: Add support for Virtual SPEC_CTRL")
+> 
+> Although because of 3dd2775b74c9, backports to before that might take some
+> manual work.
+
+And
+
+  Cc: stable@vger.kernel.org
+
+to make sure this gets backported.
+
+No need for a v2, I can fixup all the nits when applying.
