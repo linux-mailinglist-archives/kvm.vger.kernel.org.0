@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0333E756050
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 12:23:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F02FC756052
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 12:23:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231164AbjGQKXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 06:23:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38320 "EHLO
+        id S231207AbjGQKXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 06:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231156AbjGQKXF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 06:23:05 -0400
-Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FB5E52
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 03:23:04 -0700 (PDT)
-Received: by mail-wr1-x44a.google.com with SMTP id ffacd0b85a97d-30e6153f0eeso2354605f8f.0
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 03:23:03 -0700 (PDT)
+        with ESMTP id S231156AbjGQKXK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 06:23:10 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A23D1BE
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 03:23:06 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bfae0f532e4so4185523276.2
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 03:23:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689589382; x=1692181382;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CgCaN+mGckAFfG7mTYRYDoN94M9ScWInFeoK4EY52dQ=;
-        b=eeI7fj4MJRXbFVCcu9v33JfJB7bbN34zs7DBgQjkHRepXBoCTI7B+CiFKUVl+sj90C
-         MX+VzfdsfESuNdT2ApiRvndM7sQeYPuBf4IR9F2zg/ziZjnUWGf5yfXJL7FSWXhVvQk2
-         k+7zDts2v+zuz6Sxdwq7INj16h7ayIIQHqp1A03cR71q6RRR1Sp9KGRw9fT51LAUsODs
-         u6iwgaeSercqwi4jFOe2GgLG05AvcnEfOa+4gKWJ+EcAX/AbkRAsFaxErP6x7YDtancg
-         LAZFThRtBGlhYyiWCKkWs2tjI4Km/Sz28X6WqywueBNeNLpaZn0hERd+a6xbillOeV4U
-         vICA==
+        d=google.com; s=20221208; t=1689589385; x=1692181385;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6m73ah1DVsdVA++i2FD7fWY/5U/zHmxaCEfOABOAT1I=;
+        b=E+d6u7bagGYn313L7xU9vf+hfckEtby6XpI4RNJjQotn0tyYMltVlmxNYf4aP5o+xr
+         1AAVK0rRfu4pr9QCs8eVVIQYt4TgBYrxBiY6A9eXMaOvfBEkn5/oYxLgEu1teRgxlhVK
+         jP/ieTcTuQFowfjn2MidaQkFAjdqLBmS2b3fTr2Ek8Wz/SWeGzklIysmnNHgkJq9J+Bd
+         wEdZ8KL1cxxDMN5pN1RTskEoqLgQWDYvOOPFK1Tu3PMs4v6C7mT00X2w1XGz4GRtVh9s
+         K0zzg4uDPsi7fnIOhdApT23Vc5z9XnHKgeMTrzTUFC6H8kjUpqSWE0LIkZniD3EETvHl
+         rquA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689589382; x=1692181382;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CgCaN+mGckAFfG7mTYRYDoN94M9ScWInFeoK4EY52dQ=;
-        b=kUrN1gL12XmHCh22L7k0jSVasucVHccSWIW/Yl0r6LYi8St9a5g3VZkVdBhJPFAF1E
-         B1+bJVN2ZRNhz/y24lTudgqdUaHlK4EAPUQsBnWUahRPDNOg/V+oHAZ7iLgTgZErDin2
-         1lKZ+IDgT3nhUzDKsw4WTDex5JNbZp5OVFKeZAZTx3+QhaT2MXgylO5aM5tNDUtXkCBl
-         JBXGKFFCeHOjxUa+5+GqV77Z4N8UZLG7Ao4AU9cC3W8AzjTFCWlKOztZLTap655DdNgy
-         8FXcdmasjpnP6kTCmpA8Trg2a9Q6gbxOUB7abGvvMvbWjQ/Lggc/+cy22fu+zKbcf5qU
-         APxQ==
-X-Gm-Message-State: ABy/qLa91FAPJr3t0opOiRFM+KRU8XtEWdbz4ENHEOg5JtfhDOAXTyub
-        R7YZRD+J78WPtpcyvp/W013jC0Nkq1pnJ+8OBWNKHYLXlFDpLMl8fBdS2dbUlQybY9gw+Q/RqWT
-        yqhqnPm+axN5U9bijrhW7UyBZyCNnLj3uzzZuhxhiy0ATv757PSgPnNo=
-X-Google-Smtp-Source: APBJJlE/7e1nJg7I/l6LQXVY0SnzM8P70EbYcwya86Mruz3AmAkrLrw/c0iAlFyYa4bUxuD5Xsvq8/X2iw==
+        d=1e100.net; s=20221208; t=1689589385; x=1692181385;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6m73ah1DVsdVA++i2FD7fWY/5U/zHmxaCEfOABOAT1I=;
+        b=cj4R3WUIO7/k66ceLNHwu0y7vz/FKYvRTuhyKiaANzFE7TKPixaR1Xu5TYdA0D6cD5
+         sxO5EuWBWKngCB+cuNd3qMSx0K3IpKj7iz3/pOgEvcFS5fKE6S5zUEezGaTDfAbwUucA
+         bABaPXU+XowvfS+tG2yyrbjeA3hhSVwXOjdDW3kTm+kH6MwoWZ0zZJAOq40DouvXq8vF
+         WG/ra4v67JE/rL3jZDEpMe93dmw/vHakPK/qldfrvxF9rHnY9G8wGzEeJbjoVy70MAgo
+         E7lTjxEJmcJbp0wwrAQ14HYjMTt9mnrDdI5Tth/FsyXr73W8j8vL3J+4MDZPeg3uUiiE
+         L9/w==
+X-Gm-Message-State: ABy/qLZb1gu2bLF6JNdS/YAEkKFSD3wmxgtzaZpIm3KRjcINx9IdAjll
+        rzh2QMMbqyTEHuiGWUnEE9KtxShKzC/FrRBLyaU5lzwYCgkP/Gl51R/tzn81tEas3Rr7H74zv7J
+        N2kkIrMXEw21Iqva2oOZnCjIqkESfaS7fWCW7EWpf2qajk1KpQEmLyvc=
+X-Google-Smtp-Source: APBJJlFX3h2KG9PglQ6lM7KzM8ctojxlqh8xlyE9tsoCoe9MzKquqyColBF8Zl2BSdDsFN6LChe20jsCSA==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a5d:6d4b:0:b0:314:38e4:259d with SMTP id
- k11-20020a5d6d4b000000b0031438e4259dmr83620wri.11.1689589382378; Mon, 17 Jul
- 2023 03:23:02 -0700 (PDT)
-Date:   Mon, 17 Jul 2023 11:22:58 +0100
+ (user=tabba job=sendgmr) by 2002:a25:e755:0:b0:cca:e68d:29aa with SMTP id
+ e82-20020a25e755000000b00ccae68d29aamr64913ybh.12.1689589384703; Mon, 17 Jul
+ 2023 03:23:04 -0700 (PDT)
+Date:   Mon, 17 Jul 2023 11:22:59 +0100
+In-Reply-To: <20230717102300.3092062-1-tabba@google.com>
 Mime-Version: 1.0
+References: <20230717102300.3092062-1-tabba@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230717102300.3092062-1-tabba@google.com>
-Subject: [PATCH kvmtool v1 0/2] Align value generated by get_ram_size() to the
- host's page size
+Message-ID: <20230717102300.3092062-2-tabba@google.com>
+Subject: [PATCH kvmtool v1 1/2] Factor out getting the host page size
 From:   Fuad Tabba <tabba@google.com>
 To:     kvm@vger.kernel.org
 Cc:     julien.thierry.kdev@gmail.com, will@kernel.org, penberg@kernel.org,
@@ -67,28 +68,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Factor out getting the page size of the host into a separate
+function. This will be used in the subsequent patch.
 
-This short patch series ensures that the value returned by
-get_ram_size() is aligned to the host's page size. Without that,
-KVM_SET_USER_MEMORY_REGION could fail when passed an unaligned
-value.
+No functional change intended.
 
-Cheers,
-/fuad
-
-Fixes: 18bd8c3bd2a7 ("kvm tools: Don't use all of host RAM for guests by default")
 Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ builtin-run.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-Fuad Tabba (2):
-  Factor out getting the host page size
-  Align the calculated guest ram size to the host's page size
-
- builtin-run.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
-
-
-base-commit: bd4ba57156dad39349edfb2338bdc2f4ed3c0bae
+diff --git a/builtin-run.c b/builtin-run.c
+index b1a27fd..2801735 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -360,9 +360,21 @@ static void kernel_usage_with_options(void)
+ 		KVM_BINARY_NAME);
+ }
+ 
++static long host_page_size(void)
++{
++	long page_size = sysconf(_SC_PAGE_SIZE);
++
++	if (page_size < 0) {
++		pr_warning("sysconf(_SC_PAGE_SIZE) failed");
++		return 0;
++	}
++
++	return page_size;
++}
++
+ static u64 host_ram_size(void)
+ {
+-	long page_size;
++	long page_size = host_page_size();
+ 	long nr_pages;
+ 
+ 	nr_pages	= sysconf(_SC_PHYS_PAGES);
+@@ -371,12 +383,6 @@ static u64 host_ram_size(void)
+ 		return 0;
+ 	}
+ 
+-	page_size	= sysconf(_SC_PAGE_SIZE);
+-	if (page_size < 0) {
+-		pr_warning("sysconf(_SC_PAGE_SIZE) failed");
+-		return 0;
+-	}
+-
+ 	return (u64)nr_pages * page_size;
+ }
+ 
 -- 
 2.41.0.255.g8b1d071c50-goog
 
