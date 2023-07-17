@@ -2,225 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6898275618F
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 13:28:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 844C37561A1
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 13:35:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjGQL2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 07:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42552 "EHLO
+        id S230024AbjGQLfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 07:35:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbjGQL2j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 07:28:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46246E4C
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:27:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689593276;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cifHTSGxLePrnNdALZCim8wNk8dyI3fwSptrejN9W0Y=;
-        b=hH8aywB18HR0fUMtL7sAtCuiqIdayGaVMYt9aO/J3HCGREN6XDvMQZVw+2j6PoJEqo+rxD
-        cjVYbnYMdwTrjxVnEdeXUKtNxy/phKRDhwo6CdNX60+XiFxdqCtQOokmwA7r4mclM1V8zS
-        tKt0AjkMrB1S5VHP0TFwog4QkyinKBs=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169--cWiY7XwMAO5WoNn_mvrSw-1; Mon, 17 Jul 2023 07:27:55 -0400
-X-MC-Unique: -cWiY7XwMAO5WoNn_mvrSw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-765ad67e690so108145185a.1
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:27:55 -0700 (PDT)
+        with ESMTP id S229461AbjGQLfj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 07:35:39 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D94A6E4C
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:35:38 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-7653bd3ff2fso518310185a.3
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 04:35:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689593738; x=1692185738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Bq8gCHQ3DK7I53K7E6T8jrcN3NhWzfZAuTdue3VyqQA=;
+        b=3vRFiwFEzmUmLb0kPb504rDdmP8xzMBghMG1vWi0o/67gH272jU1EcreMwYuN5JVyk
+         2DaV02Lib8lt+0O2hjavBdmtUNoDfY/OByiotPqnfa9nqZKGCeWF1RtsO9RLyTMhRnp2
+         0vncWmj9pVI3dARu+ONdet5PFCN5GkE20G/S821oKgJmVkFKezCvCj5uIY3C0cQghb/C
+         vHfqrxevlMpzfghkx4q6PjpiB8+RHrMiJZX36/JG8Eb4P6/LEAns+pIV4gQxgK3MClPD
+         o+rH0A/15+tHGhrtsaEoOk5jFGmEdT7XQr0+VrqHQv9VSNbujVf74q3HQZw+3ySlejy1
+         jdhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689593273; x=1690198073;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cifHTSGxLePrnNdALZCim8wNk8dyI3fwSptrejN9W0Y=;
-        b=hY2RmK3oW5GJYdx+YqCYdUBkQkVb36eNlt6es/ltJzpab+LHqq7GGWosX343EbUmGa
-         xTeTnTnxjnTy2zNFpXIgiFF8r8EiPBDaRBkkX7wPZqpK4maUoHCX6FTEtZ6AhpXCmgG8
-         ee9OxVQ0F9JkOKS8xCmormeSQFDNlVjlk3bmj6xQG/iqtFbB5qIaoN1u+/Lj/J9UeIMu
-         iUP3/MeMbQ9jWDHEzHvLCl3tCCIHNNUx25c0f1y5VjQAQovB8RrVJDy2yboNLAAqaDmx
-         KvLSJhuAhLUpl+/r3tDwrbeMxmuHPEEK+bbHjBF11W8It2xmseXLjPxwA3j5f16Q2d1P
-         mVMQ==
-X-Gm-Message-State: ABy/qLY8bf3JrVCe4LcIkUOeYWaJFUsWONgIYj0TvQpuRLDoOwa5XlzF
-        uztQIo5P1/hAtXegzTacL0wJJEFeYK2rWgPuuUN0hTQpYxpM6tt/JP/u/puwqdFSrToVPHGPy3M
-        kokNJgOnDCA8T
-X-Received: by 2002:a05:620a:454a:b0:763:c764:577c with SMTP id u10-20020a05620a454a00b00763c764577cmr16480743qkp.5.1689593273639;
-        Mon, 17 Jul 2023 04:27:53 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEfp5t2DQS/GjyIoS478X8u5KzsdIEDs8/rcKlb51fLewoRgNMtmXWnZggE+f74jG6LdYamWQ==
-X-Received: by 2002:a05:620a:454a:b0:763:c764:577c with SMTP id u10-20020a05620a454a00b00763c764577cmr16480723qkp.5.1689593273369;
-        Mon, 17 Jul 2023 04:27:53 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id z1-20020a05620a100100b0075b2af4a076sm6028544qkj.16.2023.07.17.04.27.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 04:27:53 -0700 (PDT)
-Message-ID: <0e5dd611-b047-5565-cf09-ad8844386b81@redhat.com>
-Date:   Mon, 17 Jul 2023 19:27:29 +0800
+        d=1e100.net; s=20221208; t=1689593738; x=1692185738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Bq8gCHQ3DK7I53K7E6T8jrcN3NhWzfZAuTdue3VyqQA=;
+        b=heoaTIIuq0kY90c0Ez6lhx4VVqAuAI755B9lV77LPL+jZ+NVq8Gb5tWg9xyxOnr1Cs
+         3U77nB0mwsgy6ZIhU4KX3UxC08MEcoaKc/BV5bZFFsheQLrO8Mc8omxpAAVaDJ7P8VG+
+         ZtpZMXoQez9c2UQXpLJ6vDbV8q83TgY1luYnHinErTOTnjx1FYyetYbPQFf08N7GRGHz
+         ZAYt9ecsQRquggKEOzYNLGGQk6sQ3wEItZ3th1OZ+x/rY7ifJ6GjWsNw2frQn9Llvb75
+         +KSeyvK89OaFGDNG9x7G4vT02LJfkJwXevtez9yf4FSRS1oS8iDjxkSVGvgzBOo5NpaN
+         CBmA==
+X-Gm-Message-State: ABy/qLZ1jCB1a549tUEPyvhMUQ/raIBlLeeJCQ+5wLHrEU5YtHZs/f/a
+        ulccjZ6yKLYrxEQ9b1Nrr1EGoWqayy2pASVBuEmmQA==
+X-Google-Smtp-Source: APBJJlH/LLTn2FmYi52ai+ViPiSCHf+jKjw/3VATbUHhbhCEXjffKNAWxqnpjCZn78YpRwUIypSVx9F/Khim0JruDMs=
+X-Received: by 2002:a0c:e605:0:b0:634:e718:2fa5 with SMTP id
+ z5-20020a0ce605000000b00634e7182fa5mr10708869qvm.24.1689593737972; Mon, 17
+ Jul 2023 04:35:37 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v6 02/11] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Zenghui Yu <zenghui.yu@linux.dev>,
-        Gavin Shan <gshan@redhat.com>
-References: <20230715005405.3689586-1-rananta@google.com>
- <20230715005405.3689586-3-rananta@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230715005405.3689586-3-rananta@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20230717102300.3092062-1-tabba@google.com> <20230717102300.3092062-3-tabba@google.com>
+ <20230717110304.GA8137@willie-the-truck>
+In-Reply-To: <20230717110304.GA8137@willie-the-truck>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 17 Jul 2023 12:35:02 +0100
+Message-ID: <CA+EHjTw_9mCR61Mi_m911jDxCF_rk9+_72inF7U-qhtrdgc93Q@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v1 2/2] Align the calculated guest ram size to the
+ host's page size
+To:     Will Deacon <will@kernel.org>
+Cc:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        penberg@kernel.org, alexandru.elisei@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Will,
 
 
-On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> Use kvm_arch_flush_remote_tlbs() instead of
-> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
-> problem, allowing architecture-specific code to provide a non-IPI
-> implementation of remote TLB flushing.
-> 
-> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
-> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
-> two mechanisms.
-> 
-> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> duplicating the generic TLB stats across architectures that implement
-> their own remote TLB flush.
-> 
-> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
-> path, but that is a small cost in comparison to flushing remote TLBs.
-> 
-> In addition, instead of just incrementing remote_tlb_flush_requests
-> stat, the generic interface would also increment the
-> remote_tlb_flush stat.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
-> Acked-by: Oliver Upton <oliver.upton@linux.dev>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->   arch/arm64/include/asm/kvm_host.h | 3 +++
->   arch/arm64/kvm/Kconfig            | 1 -
->   arch/arm64/kvm/mmu.c              | 6 +++---
->   virt/kvm/Kconfig                  | 3 ---
->   virt/kvm/kvm_main.c               | 2 --
->   5 files changed, 6 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8b6096753740..7281222f24ef 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1111,6 +1111,9 @@ int __init kvm_set_ipa_limit(void);
->   #define __KVM_HAVE_ARCH_VM_ALLOC
->   struct kvm *kvm_arch_alloc_vm(void);
->   
-> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> +
->   static inline bool kvm_vm_is_protected(struct kvm *kvm)
->   {
->   	return false;
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index f531da6b362e..6b730fcfee37 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -25,7 +25,6 @@ menuconfig KVM
->   	select MMU_NOTIFIER
->   	select PREEMPT_NOTIFIERS
->   	select HAVE_KVM_CPU_RELAX_INTERCEPT
-> -	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
->   	select KVM_MMIO
->   	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->   	select KVM_XFER_TO_GUEST_WORK
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6db9ef288ec3..0ac721fa27f1 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -161,15 +161,15 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->   }
->   
->   /**
-> - * kvm_flush_remote_tlbs() - flush all VM TLB entries for v7/8
-> + * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
->    * @kvm:	pointer to kvm structure.
->    *
->    * Interface to HYP function to flush all VM TLB entries
->    */
-> -void kvm_flush_remote_tlbs(struct kvm *kvm)
-> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->   {
-> -	++kvm->stat.generic.remote_tlb_flush_requests;
->   	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-> +	return 0;
->   }
->   
->   static bool kvm_is_device_pfn(unsigned long pfn)
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index b74916de5183..484d0873061c 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -62,9 +62,6 @@ config HAVE_KVM_CPU_RELAX_INTERCEPT
->   config KVM_VFIO
->          bool
->   
-> -config HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> -       bool
-> -
->   config HAVE_KVM_INVALID_WAKEUPS
->          bool
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 70e5479797ac..d6b050786155 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -345,7 +345,6 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
->   }
->   EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
->   
-> -#ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
->   void kvm_flush_remote_tlbs(struct kvm *kvm)
->   {
->   	++kvm->stat.generic.remote_tlb_flush_requests;
-> @@ -366,7 +365,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
->   		++kvm->stat.generic.remote_tlb_flush;
->   }
->   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
-> -#endif
->   
->   static void kvm_flush_shadow_all(struct kvm *kvm)
->   {
+On Mon, Jul 17, 2023 at 12:03=E2=80=AFPM Will Deacon <will@kernel.org> wrot=
+e:
+>
+> On Mon, Jul 17, 2023 at 11:23:00AM +0100, Fuad Tabba wrote:
+> > If host_ram_size() * RAM_SIZE_RATIO does not result in a value
+> > aligned to the host page size, it triggers an error in
+> > __kvm_set_memory_region(), called via the
+> > KVM_SET_USER_MEMORY_REGION ioctl, which requires the size to be
+> > page-aligned.
+> >
+> > Fixes: 18bd8c3bd2a7 ("kvm tools: Don't use all of host RAM for guests b=
+y default")
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  builtin-run.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/builtin-run.c b/builtin-run.c
+> > index 2801735..ff8ba0b 100644
+> > --- a/builtin-run.c
+> > +++ b/builtin-run.c
+> > @@ -406,7 +406,7 @@ static u64 get_ram_size(int nr_cpus)
+> >       if (ram_size > available)
+> >               ram_size        =3D available;
+> >
+> > -     return ram_size;
+> > +     return ALIGN(ram_size, host_page_size());
+> >  }
+>
+> I guess we could avoid querying the page size twice if we also factored
+> out a helper to grab _SC_PHYS_PAGES and then did the multiply by
+> RAM_SIZE_RATIO before converting back to bytes.
+>
+> e.g. something like:
+>
+>         available =3D MIN_RAM_SIZE;
+>
+>         nrpages =3D host_ram_nrpages() * RAM_SIZE_RATIO;
+>         if (nrpages)
+>                 available =3D nrpages * host_page_size();
+>
+> and then host_ram_size() just calls the two new helpers.
+>
+> What do you think?
 
--- 
-Shaoqin
+Sounds good to me. I'll respin.
 
+Cheers,
+/fuad
+
+>
+> Will
