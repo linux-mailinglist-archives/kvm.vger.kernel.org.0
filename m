@@ -2,105 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47F8A755F8D
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 11:41:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0333E756050
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 12:23:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231140AbjGQJlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 05:41:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45632 "EHLO
+        id S231164AbjGQKXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 06:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbjGQJla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 05:41:30 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4636419B1;
-        Mon, 17 Jul 2023 02:40:56 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 381E8D75;
-        Mon, 17 Jul 2023 02:41:39 -0700 (PDT)
-Received: from [10.1.27.35] (FVFF763DQ05P.cambridge.arm.com [10.1.27.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A8523F73F;
-        Mon, 17 Jul 2023 02:40:52 -0700 (PDT)
-Message-ID: <0c069be6-d67b-cb2c-9f1e-e65d45eda0f8@arm.com>
-Date:   Mon, 17 Jul 2023 10:40:51 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [RFC] Support for Arm CCA VMs on Linux
-To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc:     linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        James Morse <james.morse@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230714144657.000064ef@Huawei.com>
- <42cbffac-05a8-a279-9bdb-f76354c1a1b1@arm.com>
- <20230714172825.00003e81@Huawei.com>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20230714172825.00003e81@Huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231156AbjGQKXF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 06:23:05 -0400
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FB5E52
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 03:23:04 -0700 (PDT)
+Received: by mail-wr1-x44a.google.com with SMTP id ffacd0b85a97d-30e6153f0eeso2354605f8f.0
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 03:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689589382; x=1692181382;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CgCaN+mGckAFfG7mTYRYDoN94M9ScWInFeoK4EY52dQ=;
+        b=eeI7fj4MJRXbFVCcu9v33JfJB7bbN34zs7DBgQjkHRepXBoCTI7B+CiFKUVl+sj90C
+         MX+VzfdsfESuNdT2ApiRvndM7sQeYPuBf4IR9F2zg/ziZjnUWGf5yfXJL7FSWXhVvQk2
+         k+7zDts2v+zuz6Sxdwq7INj16h7ayIIQHqp1A03cR71q6RRR1Sp9KGRw9fT51LAUsODs
+         u6iwgaeSercqwi4jFOe2GgLG05AvcnEfOa+4gKWJ+EcAX/AbkRAsFaxErP6x7YDtancg
+         LAZFThRtBGlhYyiWCKkWs2tjI4Km/Sz28X6WqywueBNeNLpaZn0hERd+a6xbillOeV4U
+         vICA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689589382; x=1692181382;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CgCaN+mGckAFfG7mTYRYDoN94M9ScWInFeoK4EY52dQ=;
+        b=kUrN1gL12XmHCh22L7k0jSVasucVHccSWIW/Yl0r6LYi8St9a5g3VZkVdBhJPFAF1E
+         B1+bJVN2ZRNhz/y24lTudgqdUaHlK4EAPUQsBnWUahRPDNOg/V+oHAZ7iLgTgZErDin2
+         1lKZ+IDgT3nhUzDKsw4WTDex5JNbZp5OVFKeZAZTx3+QhaT2MXgylO5aM5tNDUtXkCBl
+         JBXGKFFCeHOjxUa+5+GqV77Z4N8UZLG7Ao4AU9cC3W8AzjTFCWlKOztZLTap655DdNgy
+         8FXcdmasjpnP6kTCmpA8Trg2a9Q6gbxOUB7abGvvMvbWjQ/Lggc/+cy22fu+zKbcf5qU
+         APxQ==
+X-Gm-Message-State: ABy/qLa91FAPJr3t0opOiRFM+KRU8XtEWdbz4ENHEOg5JtfhDOAXTyub
+        R7YZRD+J78WPtpcyvp/W013jC0Nkq1pnJ+8OBWNKHYLXlFDpLMl8fBdS2dbUlQybY9gw+Q/RqWT
+        yqhqnPm+axN5U9bijrhW7UyBZyCNnLj3uzzZuhxhiy0ATv757PSgPnNo=
+X-Google-Smtp-Source: APBJJlE/7e1nJg7I/l6LQXVY0SnzM8P70EbYcwya86Mruz3AmAkrLrw/c0iAlFyYa4bUxuD5Xsvq8/X2iw==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a5d:6d4b:0:b0:314:38e4:259d with SMTP id
+ k11-20020a5d6d4b000000b0031438e4259dmr83620wri.11.1689589382378; Mon, 17 Jul
+ 2023 03:23:02 -0700 (PDT)
+Date:   Mon, 17 Jul 2023 11:22:58 +0100
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230717102300.3092062-1-tabba@google.com>
+Subject: [PATCH kvmtool v1 0/2] Align value generated by get_ram_size() to the
+ host's page size
+From:   Fuad Tabba <tabba@google.com>
+To:     kvm@vger.kernel.org
+Cc:     julien.thierry.kdev@gmail.com, will@kernel.org, penberg@kernel.org,
+        alexandru.elisei@arm.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/07/2023 17:28, Jonathan Cameron wrote:
-> On Fri, 14 Jul 2023 16:03:37 +0100
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> 
->> Hi Jonathan
->>
->> On 14/07/2023 14:46, Jonathan Cameron wrote:
->>> On Fri, 27 Jan 2023 11:22:48 +0000
->>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>
->>>
->>> Hi Suzuki,
->>>
->>> Looking at this has been on the backlog for a while from our side and we are finally
->>> getting to it.  So before we dive in and given it's been 6 months, I wanted to check
->>> if you expect to post a new version shortly or if there is a rebased tree available?
->>
->> Thanks for your interest. We have been updating our trees to the latest
->> RMM specification (v1.0-eac2 now) and also rebasing Linux/KVM on top of
->> v6.5-rc1. We will post this as soon as we have all the components ready
->> (and the TF-RMM). At the earliest, this would be around early September.
->>
->> That said, the revised version will have the following changes :
->>    - Changes to the Stage2 management
->>    - Changes to RMM memory management for Realm
->>    - PMU/SVE support
->>
->> Otherwise, most of the changes remain the same (e.g., UABI). Happy to
->> hear feedback on those areas.
-> 
-> Hi Suzuki,
-> 
-> Thanks for the update.  If there is any chance of visibility of changes
-> via a git tree etc that would be great in the meantime.  If not, such is life
-> and I'll try to wait patiently :) + we'll review the existing code.
+Hi,
 
-I am afraid not yet. Thanks for reviewing the changes :-)
+This short patch series ensures that the value returned by
+get_ram_size() is aligned to the host's page size. Without that,
+KVM_SET_USER_MEMORY_REGION could fail when passed an unaligned
+value.
 
-Suzuki
+Cheers,
+/fuad
+
+Fixes: 18bd8c3bd2a7 ("kvm tools: Don't use all of host RAM for guests by default")
+Signed-off-by: Fuad Tabba <tabba@google.com>
+
+Fuad Tabba (2):
+  Factor out getting the host page size
+  Align the calculated guest ram size to the host's page size
+
+ builtin-run.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+
+base-commit: bd4ba57156dad39349edfb2338bdc2f4ed3c0bae
+-- 
+2.41.0.255.g8b1d071c50-goog
 
