@@ -2,146 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2037D755DFC
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 10:13:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78ABA755E6F
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 10:29:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230114AbjGQINI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 04:13:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38422 "EHLO
+        id S230323AbjGQI3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 04:29:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231317AbjGQINE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 04:13:04 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC6E912D
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:13:02 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31427ddd3fbso4022166f8f.0
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:13:02 -0700 (PDT)
+        with ESMTP id S231300AbjGQI3t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 04:29:49 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E99D61B6
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:29:46 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-3457a3ada84so22440715ab.1
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689581581; x=1692173581;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VT24UUIzDMth5tPZL5Y5vTEOs+P0BwYmDWZgKveF0+M=;
-        b=K/iJhKX4wID4O6BHCkqoNDeKizzM0ai2C/JJVSYMd+iQ+t5gkYEyqR8OcId9s6Uw/g
-         +AIOCIIHWgQP5i51DcuabWMLSpL4+g4yBFEaNnFvCFvlOvJtDRtBZSsu4q/eyraIhxnF
-         34lFSWsMuYImH0tASUyIG9UN5kV+zySjXP1wgy3I0PiMTd8SGe0bBTaL1/3m+AIDIUri
-         t2pJXylGN30xSlpLDQiAnrflPN5i2wyDLNiZpxqAYVBhvceI1p6Lvuk8qVu8Vmd37D5M
-         py/+IAtS+moAn/+PGdzK6ETPGkvlELAfB3SP0bODnQ1hd3dVHt1OhCJkizrojhSmGnF9
-         2zag==
+        d=semihalf.com; s=google; t=1689582586; x=1692174586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KrEcIar0BkfpmBL+8BCmNKqe2TUSK3LL+WBdNYsOjsM=;
+        b=e52IJgo7nORao0Gl4I5dRpwwbrYRCXZTSuwaC/thRVodGrQS/Ih+iZx/Zsqn89WU3w
+         pQgXUWQS+Vk59/Fh6rrIEqzCQJkEny2i0gy7zEPOvxwj9yUxhnNvrizRbt8YsZpplHpx
+         RjVLFZyrzR9wafddakUgpMo5lLKlNumHP6uiacp/wGVyLbBbCgrHIUP/7snpf7XV2sof
+         jlaeLm95LpwgAuzcjO7UCvT+e3bh2UJ0I6TbCUpKBOZvGLRTw6wJXY5zbY52dacz1/1P
+         iPPOvh8ArwyYCroEOLn3Y8OJKVgd78PUACDF8tTPiPB+Om3hyy+66x8dhT2yU/74h83y
+         v2JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689581581; x=1692173581;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VT24UUIzDMth5tPZL5Y5vTEOs+P0BwYmDWZgKveF0+M=;
-        b=efE5XpeQBLNnMZCxd2lrZdIPFVlqP6LHFzNnhKeJQ8BfCCZuJuIRjbWByhKPISAkLT
-         FW1WqsOH9qZjBa0uH2p22C7OCLKL563pytXc8LYo7v/cRY84T5HVL1m+1WRKrEOYFkNp
-         xDNyoX3Im79swiIQVYX2EXUMXqyG65dv2ialV1lC1/wyPmrfjTRUhk8IMLYLmmC1q9Fx
-         H+r/H7RiLkqy6LpSLm/7/93xZWJEmU2iE1BFM+XtOY54DnGzY1ZpEG1SIo44McvR4eVe
-         GfBmyBbJx08DTDf6C6NAiz6EhSjxYwgDcxf3RN0prsbwqi4mRt84callI0b1ojuD7ALN
-         9urA==
-X-Gm-Message-State: ABy/qLbhlGBzmi6ZFUv5nwr7P1YCfizLDsVpiF0FjpmJmqfBmr4w7vDX
-        zXIMHEgRM2NVyy2MiAes8BwhXw==
-X-Google-Smtp-Source: APBJJlHUSWcZYlPppSbFTXSEdHwpgpaTrSSog0KcOaUXq6539rjFQxsogmQ3Co+Knjkf78qoCa1SzQ==
-X-Received: by 2002:adf:f206:0:b0:314:34dd:aaec with SMTP id p6-20020adff206000000b0031434ddaaecmr9504790wro.8.1689581581381;
-        Mon, 17 Jul 2023 01:13:01 -0700 (PDT)
-Received: from [192.168.69.115] ([176.176.144.39])
-        by smtp.gmail.com with ESMTPSA id b2-20020a5d4b82000000b0031432c2fb95sm18429372wrt.88.2023.07.17.01.12.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 01:13:00 -0700 (PDT)
-Message-ID: <ef2dddcd-f4dd-da9b-c03f-ccd852bb8543@linaro.org>
-Date:   Mon, 17 Jul 2023 10:12:57 +0200
+        d=1e100.net; s=20221208; t=1689582586; x=1692174586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KrEcIar0BkfpmBL+8BCmNKqe2TUSK3LL+WBdNYsOjsM=;
+        b=Acs28u5T4bXiF3N0Gv1QDMfZSaRWQWTxa9mSHDgQ0UjgyKKWRO+4T2JuED4761nDK9
+         4e+QSAoywGHHMzENvfwatkW9/oWdraUJTKD8kWYyU+ouslmwwWbTdoNxwOMwc1Ep9ChV
+         yd5Qm0O7yhVPS5QjoKBNgPPNkoQkdYrh5+WQ1x11RCGZ/U6h//nEk0HxeQq5Ocx3pHRX
+         3KCD+/fO6s0g2xbWQWZRTO19UGNfmZUYHRg80lPuGa2VBPlxgiYyxeUxEZ9iYp1cYZPP
+         Hok+sFIA6BalLpSap1SGauNjbXrsFOAVGWMz0JVsqe7ckhbvtdSqqS7oHE1dAHhsvmJp
+         kGbw==
+X-Gm-Message-State: ABy/qLbw2lpS7tb48x0yGz2AutS/tZYmFC7DdeE0vthoknLI9W+Yewnb
+        XE/wTuQ3IA/TIORwZk2nyP3iiwIC0PB2w8AW/PpaAw==
+X-Google-Smtp-Source: APBJJlGE7jn73weZAb7Q+GH4ouydfCd9ILtA9ynYfWdyB1I4k5TGE6qNhhrOJBaOwSkah9YrBoRDKcKZ9t95G975sJc=
+X-Received: by 2002:a92:d4d2:0:b0:345:d470:baa6 with SMTP id
+ o18-20020a92d4d2000000b00345d470baa6mr9664500ilm.29.1689582586220; Mon, 17
+ Jul 2023 01:29:46 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH v6 02/11] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+References: <20230630155936.3015595-1-jaz@semihalf.com> <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
+In-Reply-To: <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
+From:   Grzegorz Jaszczyk <jaz@semihalf.com>
+Date:   Mon, 17 Jul 2023 10:29:34 +0200
+Message-ID: <CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
+To:     Christian Brauner <brauner@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>,
+        linux-mm@kvack.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Fei Li <fei1.li@intel.com>, x86@kernel.org,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Ingo Molnar <mingo@redhat.com>,
+        intel-gfx@lists.freedesktop.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-fpga@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
+        Wu Hao <hao.wu@intel.com>, Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
+        netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
         Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Zenghui Yu <zenghui.yu@linux.dev>,
-        Gavin Shan <gshan@redhat.com>
-References: <20230715005405.3689586-1-rananta@google.com>
- <20230715005405.3689586-3-rananta@google.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230715005405.3689586-3-rananta@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Oded Gabbay <ogabbay@kernel.org>,
+        Muchun Song <muchun.song@linux.dev>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Benjamin LaHaise <bcrl@kvack.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Dominik Behr <dbehr@chromium.org>,
+        Marcin Wojtas <mw@semihalf.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghavendra, David,
+pt., 14 lip 2023 o 09:05 Christian Brauner <brauner@kernel.org> napisa=C5=
+=82(a):
+>
+> On Thu, Jul 13, 2023 at 11:10:54AM -0600, Alex Williamson wrote:
+> > On Thu, 13 Jul 2023 12:05:36 +0200
+> > Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > > Hey everyone,
+> > >
+> > > This simplifies the eventfd_signal() and eventfd_signal_mask() helper=
+s
+> > > by removing the count argument which is effectively unused.
+> >
+> > We have a patch under review which does in fact make use of the
+> > signaling value:
+> >
+> > https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
+>
+> Huh, thanks for the link.
+>
+> Quoting from
+> https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-ja=
+z@semihalf.com/#25266856
+>
+> > Reading an eventfd returns an 8-byte value, we generally only use it
+> > as a counter, but it's been discussed previously and IIRC, it's possibl=
+e
+> > to use that value as a notification value.
+>
+> So the goal is to pipe a specific value through eventfd? But it is
+> explicitly a counter. The whole thing is written around a counter and
+> each write and signal adds to the counter.
+>
+> The consequences are pretty well described in the cover letter of
+> v6 https://lore.kernel.org/all/20230630155936.3015595-1-jaz@semihalf.com/
+>
+> > Since the eventfd counter is used as ACPI notification value
+> > placeholder, the eventfd signaling needs to be serialized in order to
+> > not end up with notification values being coalesced. Therefore ACPI
+> > notification values are buffered and signalized one by one, when the
+> > previous notification value has been consumed.
+>
+> But isn't this a good indication that you really don't want an eventfd
+> but something that's explicitly designed to associate specific data with
+> a notification? Using eventfd in that manner requires serialization,
+> buffering, and enforces ordering.
+>
+> I have no skin in the game aside from having to drop this conversion
+> which I'm fine to do if there are actually users for this btu really,
+> that looks a lot like abusing an api that really wasn't designed for
+> this.
 
-On 15/7/23 02:53, Raghavendra Rao Ananta wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> Use kvm_arch_flush_remote_tlbs() instead of
-> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
-> problem, allowing architecture-specific code to provide a non-IPI
-> implementation of remote TLB flushing.
-> 
-> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
-> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
-> two mechanisms.
-> 
-> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> duplicating the generic TLB stats across architectures that implement
-> their own remote TLB flush.
-> 
-> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
-> path, but that is a small cost in comparison to flushing remote TLBs.
-> 
-> In addition, instead of just incrementing remote_tlb_flush_requests
-> stat, the generic interface would also increment the
-> remote_tlb_flush stat.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
-> Acked-by: Oliver Upton <oliver.upton@linux.dev>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> ---
->   arch/arm64/include/asm/kvm_host.h | 3 +++
->   arch/arm64/kvm/Kconfig            | 1 -
->   arch/arm64/kvm/mmu.c              | 6 +++---
->   virt/kvm/Kconfig                  | 3 ---
->   virt/kvm/kvm_main.c               | 2 --
->   5 files changed, 6 insertions(+), 9 deletions(-)
-
-You are doing 2 changes in the same patch:
-
-- Have ARM use kvm_arch_flush_remote_tlbs() instead of
-   HAVE_KVM_ARCH_TLB_FLUSH_ALL,
-- Drop the now unused HAVE_KVM_ARCH_TLB_FLUSH_ALL.
-
-Commits should be atomic, to allow partial
-revert or cherry-pick.
-
-Preferably splitting this patch in 2:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-
-Regards,
-
-Phil.
-
+https://patchwork.kernel.org/project/kvm/patch/20230307220553.631069-1-jaz@=
+semihalf.com/
+was posted at the beginig of March and one of the main things we've
+discussed was the mechanism for propagating acpi notification value.
+We've endup with eventfd as the best mechanism and have actually been
+using it from v2. I really do not want to waste this effort, I think
+we are quite advanced with v6 now. Additionally we didn't actually
+modify any part of eventfd support that was in place, we only used it
+in a specific (and discussed beforehand) way.
