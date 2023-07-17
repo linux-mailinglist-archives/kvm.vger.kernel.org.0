@@ -2,94 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E24807559A6
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 04:35:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B49AC7559A8
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 04:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230509AbjGQCfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jul 2023 22:35:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55924 "EHLO
+        id S231136AbjGQCf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jul 2023 22:35:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230471AbjGQCft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jul 2023 22:35:49 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2096.outbound.protection.outlook.com [40.92.18.96])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19CA5187;
-        Sun, 16 Jul 2023 19:35:48 -0700 (PDT)
+        with ESMTP id S230439AbjGQCfz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jul 2023 22:35:55 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2042.outbound.protection.outlook.com [40.92.18.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA5CEE54;
+        Sun, 16 Jul 2023 19:35:52 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eeaTsF5Ccu3og/Pntzm4Uu+1daf4nprT/lwW1XKZWFwP1r62F/r8EzfqW1dO8oQlKB+TB6r7jvaki2KGLGw4gGfhokTkFRBL0C3raYhsYETaja2qLO2KQY1nn1AKLkyeSEQsReBsZNGAh7K4N2+nT6Q+XZF4uoVrV3Wn7H9mdxXVEZH9l7EOV/VwPBwYKlhQphvKK7PabOMu6fJO7E52egZBQ0WSZZNUDxOWsP3akbvetpmb5kcudZFHcWM9gQPMmxjqF3VbbkRKVbzUXVMl7DdN8dz2zjFPx7klTXP6fqCmejJboKMJHqGdiUR18UV7od7dwJOn027j1E93c7YNOw==
+ b=RGzGaz6yRQv/6l7Mh4hZ3jq3AYBBWXg/Tzh3P8aHjvEZycJ81L+D58V+/O0qeb4MCowJqYxuG8nqo8qH3H1NbgAZz5zxoUOcFOzVQdDKTSi5M9PHjzC0kiYIP8iBOrzk8NR5o2xnBPa0M2XN33L8JPbvSxbJeezH71H5BWeMhZi+vmBBKtpIPyV9DCEdGhKxYzZ5GOycizxErQD4WPJk0YMyfWQMmvLWbZUA1cY1J5OqGZiPf1DTuKE9vjAEu+oISKaAoTlnlg8ug0jn+xBlWTuyg0HO8MIKX9cY73VLpSEEe7ehITy5nyBLBYAO65B5UV1rhHTnr7SwNeUOvz8i3w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BUu4/aGIansB7VuFhF6Ja5PFVk0zDd5wwRpWG4Uo28w=;
- b=nBbFb4axeJ/Dk69KvD8j/zDmFIDSN/B5fpUxi09F91AzTLvbgG2TWmEY+R2KGeUcnFGDh0fCtRm/6ku8fxwVYX1zGss47kiq2/q3Q0mCkesjN7IetK+QzsvK2FU7gX3yo3wM8Pgy5tuUsBcLcCeC1/1EL+eucg/QnF7kzsFn033ObIUbjfL6E/etwm0Nw4pF7OC0PyPPFCdR1O2X5ZV4JFMxUsmdhv2nO+oNf4RoQdovoWhNjOlDUeOL3FnbIKR+8bVqCJd/pPnjWcPPwFfHDw/7zpq+r4T+Ov4STBv6TJDrByQEknORNeHycXvEx8I9IkgU6cMGmEuiiky7lnSpAQ==
+ bh=Dl5dxU7ZwrZInovT+SUPvp4WBcYQp3NwqtzzJoAHNtM=;
+ b=aexZHEJETDvznswYAttq+4tfgQ4MrQkPxknje84gJmw8fUnI8Uz0eaEbmn+J4AddQahzJ1195B7ZX14z2pPdi9aln9snycIl5q8sFaFs8jGLiBGTVvIdt0v9VX4NMFkizOisS1MVSlpUYerNQd5aOqSVUVn/Xk1uIkjaVY3uvFoLY5+vpY+6rtRw+DKpVLofW+PcL+3GyJpOLv/Pqb2fDwfonc4N2fn7vhQruKG838z7aJGp9PMZc4zSxj0EPDY/IfmxX+jpHap1tHXo/1AUbDEjX1tIz1+5A7z8bJp+oF1A44glcdv3pNknIaOb7VLKaudAfZL6T8ICzvEBVIBWeg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BUu4/aGIansB7VuFhF6Ja5PFVk0zDd5wwRpWG4Uo28w=;
- b=OnFy4+DfGgBImTm/+55lKEsiO2Whiy78pmetrS8O/dHyXiZ6y2BkWw7NCWOno/iFY6Z0x4mk2VOB1Jg8BqDViQWiYKQ+JGMcTdetearI2HeDZqehXXu5pM8QHvXOg4T+KT6gvMJ2qAtgDbqh+vN2de45ZEgUU/XREV8eGBzP2uvutyEE0RGuQXZJD/m2CyqFFGTAxJb0FBasU0Jak2JsY168Y0Ma30V1TWnzjWJflQ7nNgQFXDRlHfIi//P88sYHaOl1KKtVMkeaE42H0dW/Jyv4k3xjI/9IVSLzCu4y1W3Raom5wZw+qsjHRmH+NXBF8W84ZQ0ClO2aCn9H3bqvSw==
+ bh=Dl5dxU7ZwrZInovT+SUPvp4WBcYQp3NwqtzzJoAHNtM=;
+ b=fnM+VPd0HiYnasFsyEG2d4XMFTVpkvjL4bsNSBkKCKbSoJcyef40LGvQRUmeepPAuftCgyJkFClnMeQkvnNSfXkpU6gkNnHaq2/MsRPayjjcQ5yazFDMq9nU+Sb5t1F0S+45oibhd7p6yf8GgII3vh37RBAp6yGqDXfyA96vp6V0/dGwhS1POfeFZ+TWzG8MAAgpwvtVxUMn5dueUFQ9pW8o0MApoql0lcNqo9HRWkgNgyfVHlEcuc1Ckpmpywb6R4DMFZzuMa2Uq/Kya6yyeEv6Q6tqxgv22o7kaTRNkB/tne3vmpHqQ7j0JMW84UnJ3EhbpP+RFOOIQBCeEt6Blg==
 Received: from BYAPR03MB4133.namprd03.prod.outlook.com (2603:10b6:a03:7d::19)
  by PH0PR03MB6512.namprd03.prod.outlook.com (2603:10b6:510:be::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.32; Mon, 17 Jul
- 2023 02:35:46 +0000
+ 2023 02:35:50 +0000
 Received: from BYAPR03MB4133.namprd03.prod.outlook.com
  ([fe80::d952:a79b:d824:3b0]) by BYAPR03MB4133.namprd03.prod.outlook.com
  ([fe80::d952:a79b:d824:3b0%4]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
- 02:35:46 +0000
+ 02:35:50 +0000
 From:   Wang Jianchao <jianchwa@outlook.com>
 To:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
         bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
         hpa@zytor.com, kvm@vger.kernel.org
 Cc:     arkinjob@outlook.com, zhi.wang.linux@gmail.com,
         xiaoyao.li@intel.com, linux-kernel@vger.kernel.org
-Subject: [RFC V3 2/6] KVM: x86: exchange info about lazy_tscdeadline with msr
-Date:   Mon, 17 Jul 2023 10:35:19 +0800
-Message-ID: <BYAPR03MB41336B6D3290591092F3A0EACD3BA@BYAPR03MB4133.namprd03.prod.outlook.com>
+Subject: [RFC V3 3/6] x86/apic: switch set_next_event to lazy tscdeadline version
+Date:   Mon, 17 Jul 2023 10:35:20 +0800
+Message-ID: <BYAPR03MB41337FFC875975099BE27A6DCD3BA@BYAPR03MB4133.namprd03.prod.outlook.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1689561323-3695-1-git-send-email-jianchwa@outlook.com>
 References: <1689561323-3695-1-git-send-email-jianchwa@outlook.com>
 Content-Type: text/plain
-X-TMN:  [dsYfPumXbQ7BslJksmc2vPl9tDiNGnt/wTx4e61/i7E=]
+X-TMN:  [6tYgx3S2smJ4YWcptjOPpCbWbsUY6ZUuV35Q4bjQscw=]
 X-ClientProxiedBy: SI2P153CA0023.APCP153.PROD.OUTLOOK.COM (2603:1096:4:190::6)
  To BYAPR03MB4133.namprd03.prod.outlook.com (2603:10b6:a03:7d::19)
-X-Microsoft-Original-Message-ID: <1689561323-3695-3-git-send-email-jianchwa@outlook.com>
+X-Microsoft-Original-Message-ID: <1689561323-3695-4-git-send-email-jianchwa@outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR03MB4133:EE_|PH0PR03MB6512:EE_
-X-MS-Office365-Filtering-Correlation-Id: e16679b7-4076-4bcb-9cb4-08db866e8614
-X-MS-Exchange-SLBlob-MailProps: Cq7lScuPrnqpUrHVo6HYXI9uowj33ZBSsqF9XXx3JwdM1zoaAT1sevltCFgyhfczsjjpgQJUDHuUoy3mgreuMBDDdSvE7mCYMaf5e2MOl75wqKuqTdws8iy1bT2APnZxYZR9Co1Kkn/PWlKezgI21KxmGwfnrYhXn3pJekgVNo/W2VMO3L+flnZ3ZDTaGG/kywp971RwVEr2q1zqfsmVipQUxDdjSDK6ZJAR7RtmpggfDCce/Q4lrvnroUa2K7MLcRxe9LGHilisP5WzfzjLvQzFiDbBSuRdmhFci2dKUShq4goD+7SCVXylXOkqmmnD7pTzdnR8IE28fQbIAuJKSPWWtm0vhp3v6micWL5vke60kBDa5w3exPi4G2nH0EMZxOEjnf+VSw9IfP+4yd3+Q/lGPH0SXxVCcrp7zRimvmXec6ViflLYc6lGkaZvKw5S0Wu5259G1XCz2WiCkg162E3ZqpSfYt/YllQqE1Te/1pamTOCMP8x6EoVkqYjd9PPfSxV4ukMFOnLyZ2btjhv7DndzZnd1J0GXlB2dDYP9leOrPQE6j2XGCaM4QyY4kP5ElbGfgn7nVMpdVX06p9SSnJVgKLzyKkJsD6iv3XlRY+iw0Tq+e0TWe1chVM+lDpHsHhQPNOk51EHC8HVgxkEdU8Ej1xre+xPlSUut2QcajhTd1yECrNrhViMp7W/oyHLSeaqDnTY3Wsm1DhUrOuOO+XfTTv5dg8sjZ2Sx6Dj4nHmWAGpBt4wP9AhjK6C55/jzSZxmaso7Fc=
+X-MS-Office365-Filtering-Correlation-Id: cedf609d-881a-4268-9df7-08db866e88c5
+X-MS-Exchange-SLBlob-MailProps: Cq7lScuPrnqpUrHVo6HYXI9uowj33ZBSMxyGCs8oe2A/oKvmeUs/WsuRNhA6f+yXNNJ7+kusVma9NdcMKeEDFW/IheRXGFPtYBMaXL5zsrJrymBcnfSwbVq+JgAEI4YI4YRqI4jxHKEXu+bBHaxkHx78hwXule29hKMkNXYzOf09UUxuf6HKIRftjv7x/3HU/wIQLVRH6i9pzg4kgWYvkngabTU/+NBzsm4ZhaK+BJ0lkNCZN6t+EIE24HIst//m0PB/Kh8qPJokF/kdHGWWag1x0HUb+g2uJ01njnO/fGehzytm2TcmLAc5ZxJ74dScLwUcz0YueWOCXCNcJux7Aw6OLwl/M8dNgMvLjVHJjCvvE4LdwRpaBERbsGXU/2K85drdzMIKh6mNZTcWKutwofIDFNXcoRV1Y5MKB5fj3k5Nr3A5d6dQm/ziUc4Ps5SPmGc2LA7543ucFMiwAjme7SbFh4yTrntInYm4ao/AJ3e4m7T0ZUyBEdmly9RsBA8/NpBQWgc2bZGB+vNc8Gra8bgOaGJmHJKRjiCrH8lT/WdjbT7hb35M6+cbAWjoxElsfgu7cGW96llkAcb1dEn3HivacpnyPzlPbASq22stkQsU7LyfZeZ+ns12tj391xKjCQp2uBHVMeUJpWyN+RD8iD1fpMOEnQktZKess1IwQXZv77+CHK5UMWuGV+I/Az0YOF+A8G5d7TCO4LkRsfWMQ0QKvAB9Bp/RhJ15Cb9JtZlx5ggee/u8ks5ATcRv4PKFR0/aCHz3fO4=
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AE2p1cdABd8NqaoQELunsTEo4O36jwWqvLn2p1f5PfcXvhzC/wGaQR9My0HsAHQLD3Tn8mM4G3/pqBIRk+XG/yMInUxUW7Ynt8lpoxt+PcxAicYfm06rZMjpFlllVRkArTCySn05zIBbSnoMrwQfwnumHip+Aqe2aXNwYigHbSFBVUxWaf3RVbUYGLS7EAT41DS4oArTAe2LcUogcLvRDCH9ByLTeyNvTnx4uT8lMFHrxH/sMFW0pXAuitOqF1YgJYDZWm9Wim8xvvx2HRMSMW6qyGKIUO/vgydWHEdAyUNCRg+NYqTjSRXoWkuksqp2OjjKppGEj5ASi3Uv4j7xaxOCL5PKBj7BkqqJ+7PHT/5EVL+bHK1lY99CcRLTrKh1mmyM3y+aeDtUrySjT9d+vXhDMDJcX4o3K87LBItEaHFfomhL/nJ/3s41M+4RQBVGE+CZZDzGDX3nQlow1NFn3xRjkmAG9ea2mHxkvsS/nADTmcsdtQ+e9SjT+ONmNDYiDTR0v5FdsQq2cWvmHcCF6Moclv+8IHnqaQNZz8hZu6Th0SDbxh62li6u+k74fehJ
+X-Microsoft-Antispam-Message-Info: dfZIFyKRQwZBG98E4Atc+Iowt4YmaPVC9XbotJZp+E3S3Z6qv3ynA/Hr5h+KfGthL7NOXXeSXif/81MGPnrqPMumCHq8s4+AjXmFmd2iBM5MCFxlGGbAzpHovlYJ/1Lkqcf/wbbBq503U1fMdBpclhIl3DmoWh0uQILnUbXLknqO0Y+8TymwXUUt84VMlbvea3jDQa9nh1APYaDJ8De5Nj2NdXtTume/dVy7bII2kZGeDDJy+UhfNVfzILQ8HYhk03lcRVZmpBYEAFcvfHCPYW8IlUOKFNptQWK1POtYGxZAanL8yNNeTxPoIzlEJHSdlYscMrT4hJ50sy+wkzsoHUgsTKXTy/fB2qTNTzJUBisBOfZhLzE/9SxsiamjEoXyHa8DS1JcrR887GGroAZV2LVyG0qvKfR+cB/XoxbgWFrQMpDJ9/BcStkl3oM0jmC/6KZ3hnz1ReiXijxSca5Wc5tnY0aaSOAcpis6KXauhY7pO7re+qbkGv/rOVpAvX++wVirpOO/74p/f3seeLMExpAcUSvherpWgB2xRfb0b3SZdxXUsDBDgRZhcXLWQeUC
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Pxz8BtPzKUmHu4kbOnNwLAoF3y6HbNn6ubnFGKOuj93b2TRsBbdaU6SXn7c4?=
- =?us-ascii?Q?o4qCcPJxNeUWSH4fOCyE5kfzdDaHLtIXCpmo5NV5stVwnGICnxjHio7UlpEA?=
- =?us-ascii?Q?dOqxe7tKDnjD+2k/42Y3+r91bdtPGL6tt1PSYOSUf7lUmuWvhfZU1KFI9w7w?=
- =?us-ascii?Q?TiTJ7C+3eLKy4fHjxwcT6lipSAYJFVvpEh4OpPF8OYxBaFUlCrT+xwCv7HwY?=
- =?us-ascii?Q?Rpovt9+v2+9qIXg6T/by1iuqlma6Qb37lhhpON6bXbLj9NT2TL7aF8tUtrYN?=
- =?us-ascii?Q?nVnCIemDmaj9HIEgvxcDLVontNTp+003z7qX3k1dyQr3d/G8oFgzJ3CXWOEk?=
- =?us-ascii?Q?K3gaZxLv7XV+Gj8kkH12xGfb+/b6w2urngs5pyJU4qAsysKNQ+CjjH7/eMpI?=
- =?us-ascii?Q?LOg7FfLXXX9a20+AFiqY1X1Xh2pJ4tyPIz/HgFH+ut2hE3ng4ImcQB83CxaG?=
- =?us-ascii?Q?znijira++6JLafugzudEPn73Kv3XG1yGDYbSMm3QYTLwsFW70omR7bQWkEny?=
- =?us-ascii?Q?MRrdgksGW1yiV4vmRWxm7Wh8V7oGHjkWd76/qhfDPDD3rGLeYbJ1DfyRZcub?=
- =?us-ascii?Q?Ow0LEr18l4vzz4+I6A6WRqPIReJf0aWP3/hXLP9bu8jHXMfXzbVpg2Q7Z1rL?=
- =?us-ascii?Q?0X81ElTWqBpaSsiPsG+6YsFlcUhdoT4Vp7gLXjcaiupkyQLhp5OoeA2At1+v?=
- =?us-ascii?Q?v0nPrftZCV1znyxSA9rJUSKyFEbcnv64wIasr6xMqNmwETx+LQpubiq6ZgEB?=
- =?us-ascii?Q?zkZyOHA+FBK2seEZIJWjA13yWcBXd6ExKMxiJyODRAm9jp8jU+mprllvYgYB?=
- =?us-ascii?Q?ZXGBtaDW5/JwKuEgwoy9bANxrJgnRqQhZAUu9qdIYFEFaxPGskI8oriDgCHb?=
- =?us-ascii?Q?xsgGtH6AzabaVkkx/w9O3J9qircnUEaKQyQZzQvm2MT2vZYw9uAH221Mfm3/?=
- =?us-ascii?Q?wVYIOdcU5mr/Kxyh/uSBKamIDa+lGB4ix6f45YxilepUpJKiREMP5VlHv8U1?=
- =?us-ascii?Q?WORuA+eCusTIe9WBOLxxX968ev3R9Hz403BOicMXFb3KX6ir7ql/AM4gextL?=
- =?us-ascii?Q?URv4znBeiYkxdUDFJq4nsJcdlRnNXvP6QhVphHTbAem6qLseoEF6siwgy5M+?=
- =?us-ascii?Q?dA07ydSJYw28G66afd3845v3gh3Sy/vYtAHOSzlSI7JJciiuKBT0CQI6WDI3?=
- =?us-ascii?Q?Sg5pK1LoRDeny1wJBv4VeTv36ANuio3Ibg/Wj/xOf7mbSgSf2UxRJNqXNpA?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qjqPEjy1QsGWKQy5PNCDaR0GV7adgnPEijtrEvoTxBZXjQjY2/WyUoNdUX/5?=
+ =?us-ascii?Q?VUBdGVPV7KmkALJrX/U8WjLBl5eb+U4+HmwgEwOe/xkXHoaD1tJ2VXAYjbeD?=
+ =?us-ascii?Q?2OZv6Jy7VPwjEeGctYgWlBM9pLJT+D0GsLAl8+FfRidSaVlkv7yGDjvGkbX4?=
+ =?us-ascii?Q?O8VdFLvrEA3RFsrYt+UJ5WzyaGXZl8qRoZyZijZBw+vZwezVoyXFEoTS5Llq?=
+ =?us-ascii?Q?n0mUZ2kOlw46hKJB2kzHxUHi+7xQ3yBeLXrjWSUF1JfzON9h5n1k+69CvgYl?=
+ =?us-ascii?Q?qEb25JmvwP1eaCBFPnEM/dfV8ttQlT7KrpHLq8OvoAyomlAUji7Y3D2AFJuM?=
+ =?us-ascii?Q?SAxlREwnWl/Jyz3sNbC23ojjhgLhHJwdXYC3wGm9QdU2tCfA5yf7oiZuoNLL?=
+ =?us-ascii?Q?LewPglxogJTyyaJooNAilkcGh7fhyDxJ6gZ+/lpW2VPs3SFdGBjqdcn9oBjk?=
+ =?us-ascii?Q?9SBaxAXgQiuYlgjMAtJnwXiV6Vm5xAlyh1gKvxgmmULFU3ze7IZnW6DnwH43?=
+ =?us-ascii?Q?uNiW9O6CUTvxWqUJqZYIxUInYjTWTQE57u/XuOcd3K7QVchHax4ZQ3jGKOrG?=
+ =?us-ascii?Q?owKOFa3xhQwE3XHSD1MfCgO/s3oNTbVhDC+zA1lmB9NhhTl+cey9pCzL4jwq?=
+ =?us-ascii?Q?snSXr9Ttgzfc3g88nZA+Z/BAiX93fbEvmkKziGu25wGZnZ3UPczNl2CPyRGB?=
+ =?us-ascii?Q?GA2CA5ScrJZOGzqOkSXBPGRVSfjAugHeql1I5KkziiF1sBFLuvvo/3bJmj5C?=
+ =?us-ascii?Q?oQgE7d6Qoy3VU6q2QbVARkUJFjgA5fnCWEMuy1WeeDxbfi0yHCsOYckGAkKY?=
+ =?us-ascii?Q?U6CRW9i6MYMjWM1anooplmTWs+yLoFXbWhJ16hGaAwT6xaXaz6CtlEtgGi4t?=
+ =?us-ascii?Q?pqlCTTfyzzOqqmWO4XzQfUAUEonKSDHDBJZjZjCzdsn8g6zubMyGsGaShDev?=
+ =?us-ascii?Q?oJ1626LZ8Kex2iFsk+L2AlM41w/3GtH/Tx8Tk/FGRtefeXMGj95fgkC3E3YY?=
+ =?us-ascii?Q?kSVvBoEKIlb+sI+H/aD1EujJpLvllvVocAhEVzrJYBHsF92DhWtV/O1o8hyg?=
+ =?us-ascii?Q?8VFp41rNWuL/Xnht1DUItwXEP9K3AWyIk4nMW49CYc19IX6ScPq0C6LgW/tI?=
+ =?us-ascii?Q?tt15M51T8l8d2J00kr0K2L+euPgKRzn+ppYjKAzw3woK5f0HCmG6x2WJ9cM1?=
+ =?us-ascii?Q?AVaWqnBG96AzF67qOHdMN7w2j33w6G2zg66BD4VXANRu0IRMglNSSCqdfFk?=
  =?us-ascii?Q?=3D?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e16679b7-4076-4bcb-9cb4-08db866e8614
+X-MS-Exchange-CrossTenant-Network-Message-Id: cedf609d-881a-4268-9df7-08db866e88c5
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR03MB4133.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 02:35:46.0541
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 02:35:50.3966
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -105,122 +105,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The lazy tsc deadline hasn't work in this version but just tranmit
-the physical addrss from gust to host sdie.
- - Add data structure in both guest and host side
- - If feature is enabled, set msr of lazy tscdeadline when guest
-   cpu is initialized and clear it when cpu is offlined.
- - Add msr set/get emulation code in host side.
+This is the guest side code of lazy tscdeadline. If the cpuid
+tell us lazy tscdeadline is enabled, swtich .set_next_event to
+lazy tscdeadline version. And Let's explain the core idea here.
+
+Every time guest start or modify a hrtimer, we need to write the
+msr of tsc deadline, a vm-exit occurs and host arms a hv or sw
+timer for it. However, in some workload that needs setup timer
+frequently, msr of tscdeadline is usually overwritten many times
+before the timer expires.
+
+w: write msr         x: vm-exit t:        hv or sw timer
+
+1. write to msr with t1
+Guest
+         w1
+---------------------------------------->  Time
+Host     x1             t1
+...
+
+n. write to msr with tn
+Guest
+                    wn
+------------------------------------------>  Time
+Host                xn         tn-1 -> tn
+
+What this patch want to do is to eliminate the vm-exit of x2 ... xn
+
+Firstly, we have two fields shared between guest and host as other
+pv features, saying,
+ - armed, the value of tscdeadline that has a timer in host side,
+   only updated by HOST side
+ - pending, the next value of tscdeadline, only updated by GUEST
+   side
+
+1. write to msr with t1
+     armed : t1     pending : t1
+Guest
+         w1
+---------------------------------------->  Time
+Host     x1             t1
+
+vm-exit occurs and arms a timer for t1 in host side
+
+2. write to msr with t2
+    armed : t1      pending : t2
+Guest
+             w2
+------------------------------------------>  Time
+Host                     t1
+
+the value of tsc deadline that has been armed, namely t1, is smaller
+than t2, needn't to write to msr but just update pending to t2
+dd
+...
+n.  write to msr with tn
+    armed : t1      pending : tn
+Guest
+                      wn
+------------------------------------------>  Time
+Host                       t1
+
+Similar with step 2, just update pending field with tn, no vm-exit
+
+n+1.  t1 expires, arm tn
+    armed : tn     pending : tn
+Guest
+
+------------------------------------------>  Time
+Host                       t1  ------> tn
+
+When we try to update the tscdeadline, if the 'pending' field is
+smaller, then we know there is a pending timer, needn' to do msr
+write.
 
 Signed-off-by: Li Shujin <arkinjob@outlook.com>
 Signed-off-by: Wang Jianchao <jianchwa@outlook.com>
 ---
- arch/x86/include/asm/kvm_host.h |  6 ++++++
- arch/x86/kernel/kvm.c           | 13 +++++++++++++
- arch/x86/kvm/x86.c              | 13 +++++++++++++
- 3 files changed, 32 insertions(+)
+ arch/x86/kernel/apic/apic.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 28bd383..439e4a7 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -713,6 +713,10 @@ struct kvm_queued_exception {
- 	bool has_payload;
- };
- 
-+struct kvm_host_lazy_tscdeadline {
-+	u64 msr_val;
-+};
+diff --git a/arch/x86/kernel/apic/apic.c b/arch/x86/kernel/apic/apic.c
+index af49e24..5aea74f 100644
+--- a/arch/x86/kernel/apic/apic.c
++++ b/arch/x86/kernel/apic/apic.c
+@@ -62,6 +62,9 @@
+ #include <asm/intel-family.h>
+ #include <asm/irq_regs.h>
+ #include <asm/cpu.h>
++#include <linux/kvm_para.h>
 +
- struct kvm_vcpu_arch {
- 	/*
- 	 * rip and regs accesses must go through
-@@ -944,6 +948,8 @@ struct kvm_vcpu_arch {
- 		struct gfn_to_hva_cache data;
- 	} pv_eoi;
++DECLARE_PER_CPU_DECRYPTED(struct kvm_lazy_tscdeadline, kvm_lazy_tscdeadline);
  
-+	struct kvm_host_lazy_tscdeadline lazy_tscdeadline;
-+
- 	u64 msr_kvm_poll_control;
+ unsigned int num_processors;
  
- 	/* set at EPT violation at this point */
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 1cceac5..91eb333 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -67,6 +67,7 @@ early_param("no-steal-acc", parse_no_stealacc);
- 
- static DEFINE_PER_CPU_DECRYPTED(struct kvm_vcpu_pv_apf_data, apf_reason) __aligned(64);
- DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visible;
-+DEFINE_PER_CPU_DECRYPTED(struct kvm_lazy_tscdeadline, kvm_lazy_tscdeadline) __aligned(64) __visible;
- static int has_steal_clock = 0;
- 
- static int has_guest_poll = 0;
-@@ -379,6 +380,16 @@ static void kvm_guest_cpu_init(void)
- 
- 	if (has_steal_clock)
- 		kvm_register_steal_time();
-+
-+	if (kvm_para_has_feature(KVM_FEATURE_LAZY_TSCDEADLINE)) {
-+		struct kvm_lazy_tscdeadline *ptr = this_cpu_ptr(&kvm_lazy_tscdeadline);
-+		unsigned long pa;
-+
-+		BUILD_BUG_ON(__alignof__(kvm_lazy_tscdeadline) < 4);
-+		memset(ptr, 0, sizeof(*ptr));
-+		pa = slow_virt_to_phys(ptr) | KVM_MSR_ENABLED;
-+		wrmsrl(MSR_KVM_LAZY_TSCDEADLINE, pa);
-+	}
+@@ -495,6 +498,26 @@ static int lapic_next_deadline(unsigned long delta,
+ 	return 0;
  }
  
- static void kvm_pv_disable_apf(void)
-@@ -452,6 +463,8 @@ static void kvm_guest_cpu_offline(bool shutdown)
- 	if (kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL))
- 		wrmsrl(MSR_KVM_MIGRATION_CONTROL, 0);
- 	kvm_pv_disable_apf();
-+	if (kvm_para_has_feature(KVM_FEATURE_LAZY_TSCDEADLINE))
-+		wrmsrl(MSR_KVM_LAZY_TSCDEADLINE, 0);
- 	if (!shutdown)
- 		apf_task_wake_all();
- 	kvmclock_disable();
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a6b9bea..dbbae8f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1551,6 +1551,7 @@ static const u32 emulated_msrs_all[] = {
- 
- 	MSR_K7_HWCR,
- 	MSR_KVM_POLL_CONTROL,
-+	MSR_KVM_LAZY_TSCDEADLINE,
- };
- 
- static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
-@@ -3873,7 +3874,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 		vcpu->arch.msr_kvm_poll_control = data;
- 		break;
-+	case MSR_KVM_LAZY_TSCDEADLINE:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_LAZY_TSCDEADLINE))
-+			return 1;
++static int kvm_lapic_next_deadline(unsigned long delta,
++			       struct clock_event_device *evt)
++{
++	struct kvm_lazy_tscdeadline *lazy_tscddl = this_cpu_ptr(&kvm_lazy_tscdeadline);
++	u64 tsc;
 +
-+		vcpu->arch.lazy_tscdeadline.msr_val = data;
- 
-+		break;
- 	case MSR_IA32_MCG_CTL:
- 	case MSR_IA32_MCG_STATUS:
- 	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
-@@ -4229,6 +4236,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 		msr_info->data = vcpu->arch.msr_kvm_poll_control;
- 		break;
-+	case MSR_KVM_LAZY_TSCDEADLINE:
-+		if (!guest_pv_has(vcpu, KVM_FEATURE_LAZY_TSCDEADLINE))
-+			return 1;
++	tsc =  rdtsc() + (((u64) delta) * TSC_DIVISOR);
++	lazy_tscddl->pending = tsc;
++	/*
++	 * There fence can have two functions:
++	 *  - avoid the wrmsrl is reordered
++	 *  - avoid the reorder of writing to pending and reading from armed
++	 */
++	weak_wrmsr_fence();
++	if (!lazy_tscddl->armed || tsc < lazy_tscddl->armed)
++		wrmsrl(MSR_IA32_TSC_DEADLINE, tsc);
 +
-+		msr_info->data = vcpu->arch.lazy_tscdeadline.msr_val;
-+		break;
- 	case MSR_IA32_P5_MC_ADDR:
- 	case MSR_IA32_P5_MC_TYPE:
- 	case MSR_IA32_MCG_CAP:
++	return 0;
++}
++
+ static int lapic_timer_shutdown(struct clock_event_device *evt)
+ {
+ 	unsigned int v;
+@@ -639,7 +662,12 @@ static void setup_APIC_timer(void)
+ 		levt->name = "lapic-deadline";
+ 		levt->features &= ~(CLOCK_EVT_FEAT_PERIODIC |
+ 				    CLOCK_EVT_FEAT_DUMMY);
+-		levt->set_next_event = lapic_next_deadline;
++		if (kvm_para_available() &&
++		    kvm_para_has_feature(KVM_FEATURE_LAZY_TSCDEADLINE)) {
++			levt->set_next_event = kvm_lapic_next_deadline;
++		} else {
++			levt->set_next_event = lapic_next_deadline;
++		}
+ 		clockevents_config_and_register(levt,
+ 						tsc_khz * (1000 / TSC_DIVISOR),
+ 						0xF, ~0UL);
 -- 
 2.7.4
 
