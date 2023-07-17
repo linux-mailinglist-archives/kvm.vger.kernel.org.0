@@ -2,87 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 276A8756EC2
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 23:06:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF6A756FA7
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 00:12:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbjGQVGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 17:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49162 "EHLO
+        id S230290AbjGQWM0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 18:12:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjGQVGb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 17:06:31 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED25121;
-        Mon, 17 Jul 2023 14:06:29 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 7193512001C;
-        Tue, 18 Jul 2023 00:06:28 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7193512001C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1689627988;
-        bh=+WCTkftOvzPrKMBqiHt1VoahHKl1KwYo/xOW7LbIL4g=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=l7AAznvb2+3tfH7jhXx717h00sLfFJKSuEyAl6vFWLCFLUeet0GIIOTIQFANgmSS8
-         VU3NRBZWe+tHy5sRzVStMGiTMJAS3Jl1/OjuhcVmZKXfJDnaZEFfS/NJb+hf8LVYkM
-         Jyt+3tOIOJP1N8nB3CqZUjBosuzBc2d17DDKtHyYFMklDqoy69UjxMsnmpMXWI/BMA
-         QiwbhylAvtJfAjr9lvhTD/LqU/pmiSQDSDAt9i7v7gaZDDf1ifVZorGc1/XeulFTpf
-         BQnFePHdd6mKqrXJ7UXZZR7YMXESpDwQjZKgGPIlXXZyY7v0lTRZA5b7JVGJcGV/nG
-         XhvjFCLC/Reyw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Tue, 18 Jul 2023 00:06:28 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 18 Jul 2023 00:06:27 +0300
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        with ESMTP id S230203AbjGQWMY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 18:12:24 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E059FC
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 15:12:20 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-68336d06620so5110016b3a.1
+        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 15:12:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1689631939; x=1692223939;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nfZGdLayIsQ4EXLbarw1/OO0pNLBzQdwR1vEqsrzGII=;
+        b=Jk8Ffu+zgnI1CsgL7PShvnMc/G0hm1hbh3TPz5Fbc34BI/VC6K+YvpO0Dtz1Q06LcE
+         vf29m9vckcSQeAqUEVUy2hQg3wChzTMiZjPdUNSWsPB40TqlA/Z3Z90RDeI/5eGEIh5a
+         oHIWxzri1XJMuhuB2UIvkNGwKQM8BtpRM8RbCOHyQCc7eetsY5S+VbcO2iAUIljyLIvn
+         7DgUtRFxxg3tnphZnCaerMskJ/OIgXT3e8pOBne6YWSI+yYb8YG43ww6ejPC+GReMaLK
+         AQZU6DLVDF3nw8hq4CMA6FGa2JzmC2rObjfL+xz46TVHFpF838cUJw0/Qyn0hTY2P629
+         8fnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689631939; x=1692223939;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nfZGdLayIsQ4EXLbarw1/OO0pNLBzQdwR1vEqsrzGII=;
+        b=MkRwW0DupjoMW5BaecWgGnPWp7F35td4MuuLNpn26DaOQnSOSrqrLvXCwc32FY7DhN
+         pTdtkMhoR5kop0rPwpVU52+Cuz6pdpDX4KMWdV+WCJ4A09CIBUEyo2kVqT3oZxL/fIMh
+         qHQNauzhjPWHPyt91AL911R47o/NtEOBySLYDdenQw4QHrZi558+4LrRhHHyy1WkC5mZ
+         KgHFtSQasb8iUAD4m41pafaPWPTUnoeVz3qQ/QhZq1BApVD6fZOISHfDuQGXk67hg80R
+         amKbIWNZq9mwgm1NOHYSduL9Y6wTx48B5CRc3h8DUJLRFs7OA/0oqO5wp1D0BrgspGSi
+         ByeA==
+X-Gm-Message-State: ABy/qLYpjowGYeJmW3vBcAdb9Nuoe1UmTvGrdXj6lWvbi2yniVn+yLRc
+        Kn6q5j65jkPHfkxuUNTexs+izw==
+X-Google-Smtp-Source: APBJJlGZQPlE97VCyl6VDpxaBgXkuk8Xeb/cb5kTAa5gNdx+KBrLI5Ve+dnBz8NdMBvhTebPf2Gh3g==
+X-Received: by 2002:a05:6a00:2307:b0:668:81c5:2f8a with SMTP id h7-20020a056a00230700b0066881c52f8amr19367164pfh.17.1689631939323;
+        Mon, 17 Jul 2023 15:12:19 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id q185-20020a632ac2000000b0055fedbf1938sm278952pgq.31.2023.07.17.15.12.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jul 2023 15:12:18 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qLWS0-002PFZ-GX;
+        Mon, 17 Jul 2023 19:12:16 -0300
+Date:   Mon, 17 Jul 2023 19:12:16 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Grzegorz Jaszczyk <jaz@semihalf.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-usb@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Paul Durrant <paul@xen.org>, Tom Rix <trix@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
-        <avkrasnov@sberdevices.ru>,
-        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [PATCH net-next v1 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Date:   Tue, 18 Jul 2023 00:00:51 +0300
-Message-ID: <20230717210051.856388-5-AVKrasnov@sberdevices.ru>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
-References: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
+        dri-devel@lists.freedesktop.org, Michal Hocko <mhocko@kernel.org>,
+        linux-mm@kvack.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Fei Li <fei1.li@intel.com>, x86@kernel.org,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        intel-gfx@lists.freedesktop.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-fpga@vger.kernel.org, Zhi Wang <zhi.a.wang@intel.com>,
+        Wu Hao <hao.wu@intel.com>, Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andrew Donnellan <ajd@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linuxppc-dev@lists.ozlabs.org, Eric Auger <eric.auger@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>, cgroups@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        virtualization@lists.linux-foundation.org,
+        intel-gvt-dev@lists.freedesktop.org, io-uring@vger.kernel.org,
+        netdev@vger.kernel.org, Tony Krowiak <akrowiak@linux.ibm.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Muchun Song <muchun.song@linux.dev>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Benjamin LaHaise <bcrl@kvack.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Frederic Barrat <fbarrat@linux.ibm.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Xu Yilun <yilun.xu@intel.com>,
+        Dominik Behr <dbehr@chromium.org>,
+        Marcin Wojtas <mw@semihalf.com>
+Subject: Re: [PATCH 0/2] eventfd: simplify signal helpers
+Message-ID: <ZLW8wEzkhBxd0O0L@ziepe.ca>
+References: <20230630155936.3015595-1-jaz@semihalf.com>
+ <20230714-gauner-unsolidarisch-fc51f96c61e8@brauner>
+ <CAH76GKPF4BjJLrzLBW8k12ATaAGADeMYc2NQ9+j0KgRa0pomUw@mail.gmail.com>
+ <20230717130831.0f18381a.alex.williamson@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178666 [Jul 17 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 523 523 523027ce26ed1d9067f7a52a4756a876e54db27c, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/17 13:15:00 #21627216
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230717130831.0f18381a.alex.williamson@redhat.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,357 +132,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds handling of MSG_ZEROCOPY flag on transmission path: if this
-flag is set and zerocopy transmission is possible, then non-linear skb
-will be created and filled with the pages of user's buffer. Pages of
-user's buffer are locked in memory by 'get_user_pages()'. Second thing
-that this patch does is replace type of skb owning: instead of calling
-'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
-change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
-of socket, so to decrease this field correctly proper skb destructor is
-needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
+On Mon, Jul 17, 2023 at 01:08:31PM -0600, Alex Williamson wrote:
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
----
- Changelog:
- v5(big patchset) -> v1:
-  * Refactorings of 'if' conditions.
-  * Remove extra blank line.
-  * Remove 'frag_off' field unneeded init.
-  * Add function 'virtio_transport_fill_skb()' which fills both linear
-    and non-linear skb with provided data.
+> What would that mechanism be?  We've been iterating on getting the
+> serialization and buffering correct, but I don't know of another means
+> that combines the notification with a value, so we'd likely end up with
+> an eventfd only for notification and a separate ring buffer for
+> notification values.
 
- net/vmw_vsock/virtio_transport_common.c | 260 ++++++++++++++++++------
- 1 file changed, 197 insertions(+), 63 deletions(-)
+All FDs do this. You just have to make a FD with custom
+file_operations that does what this wants. The uAPI shouldn't be able
+to tell if the FD is backing it with an eventfd or otherwise. Have the
+kernel return the FD instead of accepting it. Follow the basic design
+of eg mlx5vf_save_fops
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 26a4d10da205..1fb0a0f694c6 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -37,73 +37,115 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
- 	return container_of(t, struct virtio_transport, transport);
- }
- 
--/* Returns a new packet on success, otherwise returns NULL.
-- *
-- * If NULL is returned, errp is set to a negative errno.
-- */
--static struct sk_buff *
--virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
--			   size_t len,
--			   u32 src_cid,
--			   u32 src_port,
--			   u32 dst_cid,
--			   u32 dst_port)
--{
--	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
--	struct virtio_vsock_hdr *hdr;
--	struct sk_buff *skb;
--	void *payload;
--	int err;
-+static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
-+				       size_t max_to_send)
-+{
-+	struct iov_iter *iov_iter;
- 
--	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
--	if (!skb)
--		return NULL;
-+	if (!info->msg)
-+		return false;
- 
--	hdr = virtio_vsock_hdr(skb);
--	hdr->type	= cpu_to_le16(info->type);
--	hdr->op		= cpu_to_le16(info->op);
--	hdr->src_cid	= cpu_to_le64(src_cid);
--	hdr->dst_cid	= cpu_to_le64(dst_cid);
--	hdr->src_port	= cpu_to_le32(src_port);
--	hdr->dst_port	= cpu_to_le32(dst_port);
--	hdr->flags	= cpu_to_le32(info->flags);
--	hdr->len	= cpu_to_le32(len);
-+	iov_iter = &info->msg->msg_iter;
- 
--	if (info->msg && len > 0) {
--		payload = skb_put(skb, len);
--		err = memcpy_from_msg(payload, info->msg, len);
--		if (err)
--			goto out;
-+	/* Data is simple buffer. */
-+	if (iter_is_ubuf(iov_iter))
-+		return true;
- 
--		if (msg_data_left(info->msg) == 0 &&
--		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
--			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-+	if (!iter_is_iovec(iov_iter))
-+		return false;
- 
--			if (info->msg->msg_flags & MSG_EOR)
--				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
--		}
-+	if (iov_iter->iov_offset)
-+		return false;
-+
-+	/* We can't send whole iov. */
-+	if (iov_iter->count > max_to_send)
-+		return false;
-+
-+	return true;
-+}
-+
-+static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
-+					   struct sk_buff *skb,
-+					   struct msghdr *msg,
-+					   bool zerocopy)
-+{
-+	struct ubuf_info *uarg;
-+
-+	if (msg->msg_ubuf) {
-+		uarg = msg->msg_ubuf;
-+		net_zcopy_get(uarg);
-+	} else {
-+		struct iov_iter *iter = &msg->msg_iter;
-+		struct ubuf_info_msgzc *uarg_zc;
-+		int len;
-+
-+		/* Only ITER_IOVEC or ITER_UBUF are allowed and
-+		 * checked before.
-+		 */
-+		if (iter_is_iovec(iter))
-+			len = iov_length(iter->__iov, iter->nr_segs);
-+		else
-+			len = iter->count;
-+
-+		uarg = msg_zerocopy_realloc(sk_vsock(vsk),
-+					    len,
-+					    NULL);
-+		if (!uarg)
-+			return -1;
-+
-+		uarg_zc = uarg_to_msgzc(uarg);
-+		uarg_zc->zerocopy = zerocopy ? 1 : 0;
- 	}
- 
--	if (info->reply)
--		virtio_vsock_skb_set_reply(skb);
-+	skb_zcopy_init(skb, uarg);
- 
--	trace_virtio_transport_alloc_pkt(src_cid, src_port,
--					 dst_cid, dst_port,
--					 len,
--					 info->type,
--					 info->op,
--					 info->flags);
-+	return 0;
-+}
- 
--	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
--		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
--		goto out;
-+static int virtio_transport_fill_skb(struct sk_buff *skb,
-+				     struct virtio_vsock_pkt_info *info,
-+				     size_t len,
-+				     bool zcopy)
-+{
-+	if (zcopy) {
-+		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
-+					      &info->msg->msg_iter,
-+					      len);
-+	} else {
-+		void *payload;
-+		int err;
-+
-+		payload = skb_put(skb, len);
-+		err = memcpy_from_msg(payload, info->msg, len);
-+		if (err)
-+			return -1;
-+
-+		if (msg_data_left(info->msg))
-+			return 0;
-+
-+		return 0;
- 	}
-+}
- 
--	return skb;
-+static void virtio_transport_init_hdr(struct sk_buff *skb,
-+				      struct virtio_vsock_pkt_info *info,
-+				      u32 src_cid,
-+				      u32 src_port,
-+				      u32 dst_cid,
-+				      u32 dst_port,
-+				      size_t len)
-+{
-+	struct virtio_vsock_hdr *hdr;
- 
--out:
--	kfree_skb(skb);
--	return NULL;
-+	hdr = virtio_vsock_hdr(skb);
-+	hdr->type	= cpu_to_le16(info->type);
-+	hdr->op		= cpu_to_le16(info->op);
-+	hdr->src_cid	= cpu_to_le64(src_cid);
-+	hdr->dst_cid	= cpu_to_le64(dst_cid);
-+	hdr->src_port	= cpu_to_le32(src_port);
-+	hdr->dst_port	= cpu_to_le32(dst_port);
-+	hdr->flags	= cpu_to_le32(info->flags);
-+	hdr->len	= cpu_to_le32(len);
- }
- 
- static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
-@@ -214,6 +256,70 @@ static u16 virtio_transport_get_type(struct sock *sk)
- 		return VIRTIO_VSOCK_TYPE_SEQPACKET;
- }
- 
-+static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
-+						  struct virtio_vsock_pkt_info *info,
-+						  size_t payload_len,
-+						  bool zcopy,
-+						  u32 dst_cid,
-+						  u32 dst_port,
-+						  u32 src_cid,
-+						  u32 src_port)
-+{
-+	struct sk_buff *skb;
-+	size_t skb_len;
-+
-+	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
-+
-+	if (!zcopy)
-+		skb_len += payload_len;
-+
-+	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-+	if (!skb)
-+		return NULL;
-+
-+	virtio_transport_init_hdr(skb, info, src_cid, src_port,
-+				  dst_cid, dst_port,
-+				  payload_len);
-+
-+	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
-+	 * owner of skb without check to update 'sk_wmem_alloc'.
-+	 */
-+	if (vsk)
-+		skb_set_owner_w(skb, sk_vsock(vsk));
-+
-+	if (info->msg && payload_len > 0) {
-+		int err;
-+
-+		err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
-+		if (err)
-+			goto out;
-+
-+		if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
-+			struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-+
-+			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-+
-+			if (info->msg->msg_flags & MSG_EOR)
-+				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
-+		}
-+	}
-+
-+	if (info->reply)
-+		virtio_vsock_skb_set_reply(skb);
-+
-+	trace_virtio_transport_alloc_pkt(src_cid, src_port,
-+					 dst_cid, dst_port,
-+					 payload_len,
-+					 info->type,
-+					 info->op,
-+					 info->flags);
-+
-+	return skb;
-+out:
-+	kfree_skb(skb);
-+	return NULL;
-+}
-+
- /* This function can only be used on connecting/connected sockets,
-  * since a socket assigned to a transport is required.
-  *
-@@ -222,10 +328,12 @@ static u16 virtio_transport_get_type(struct sock *sk)
- static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 					  struct virtio_vsock_pkt_info *info)
- {
-+	u32 max_skb_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
- 	u32 src_cid, src_port, dst_cid, dst_port;
- 	const struct virtio_transport *t_ops;
- 	struct virtio_vsock_sock *vvs;
- 	u32 pkt_len = info->pkt_len;
-+	bool can_zcopy = false;
- 	u32 rest_len;
- 	int ret;
- 
-@@ -254,22 +362,48 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
- 		return pkt_len;
- 
-+	if (info->msg) {
-+		/* If zerocopy is not enabled by 'setsockopt()', we behave as
-+		 * there is no MSG_ZEROCOPY flag set.
-+		 */
-+		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
-+			info->msg->msg_flags &= ~MSG_ZEROCOPY;
-+
-+		if (info->msg->msg_flags & MSG_ZEROCOPY)
-+			can_zcopy = virtio_transport_can_zcopy(info, pkt_len);
-+
-+		if (can_zcopy)
-+			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
-+					    (MAX_SKB_FRAGS * PAGE_SIZE));
-+	}
-+
- 	rest_len = pkt_len;
- 
- 	do {
- 		struct sk_buff *skb;
- 		size_t skb_len;
- 
--		skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
-+		skb_len = min(max_skb_len, rest_len);
- 
--		skb = virtio_transport_alloc_skb(info, skb_len,
--						 src_cid, src_port,
--						 dst_cid, dst_port);
-+		skb = virtio_transport_alloc_skb(vsk, info, skb_len, can_zcopy,
-+						 dst_cid, dst_port,
-+						 src_cid, src_port);
- 		if (!skb) {
- 			ret = -ENOMEM;
- 			break;
- 		}
- 
-+		/* This is last skb to send this portion of data. */
-+		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
-+		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
-+			if (virtio_transport_init_zcopy_skb(vsk, skb,
-+							    info->msg,
-+							    can_zcopy)) {
-+				ret = -ENOMEM;
-+				break;
-+			}
-+		}
-+
- 		virtio_transport_inc_tx_pkt(vvs, skb);
- 
- 		ret = t_ops->send_pkt(skb);
-@@ -934,11 +1068,11 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
- 	if (!t)
- 		return -ENOTCONN;
- 
--	reply = virtio_transport_alloc_skb(&info, 0,
--					   le64_to_cpu(hdr->dst_cid),
--					   le32_to_cpu(hdr->dst_port),
-+	reply = virtio_transport_alloc_skb(NULL, &info, 0, false,
- 					   le64_to_cpu(hdr->src_cid),
--					   le32_to_cpu(hdr->src_port));
-+					   le32_to_cpu(hdr->src_port),
-+					   le64_to_cpu(hdr->dst_cid),
-+					   le32_to_cpu(hdr->dst_port));
- 	if (!reply)
- 		return -ENOMEM;
- 
--- 
-2.25.1
-
+Jason
