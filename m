@@ -2,88 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FD25755DBB
-	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 10:03:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C764F755DE6
+	for <lists+kvm@lfdr.de>; Mon, 17 Jul 2023 10:08:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231184AbjGQIDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jul 2023 04:03:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59228 "EHLO
+        id S231283AbjGQIIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jul 2023 04:08:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbjGQIDH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jul 2023 04:03:07 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CF1FE
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:03:06 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31297125334so2494641f8f.0
-        for <kvm@vger.kernel.org>; Mon, 17 Jul 2023 01:03:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689580985; x=1692172985;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mdeNKisayMSQ5sRs+4YAy9k9XF+keSCX7tWfhBgjHBA=;
-        b=um1dfAWYF83hCHFDWU9q5X16U0ZkvtAllcHfOYPsPJVj4C/XZqrYon4dhclBWO3wCi
-         OU8TnrvH1BCSWKz64AQFwd9kkEj/rhGV1pVCS4QtvkSRIgCiFVLMEdJwk7uaao3Q3EP1
-         kKbMkCyGitGdz6FaCwZSwCGBBVuPdN/wMEX1mtah8IlPAejb0iQpAlIC1RrlBQdsIij3
-         6BV6QydUZdZGWXOpy7zWgl0nx9rFoclww9ntKxptH1m5vLHUvET5KwFqWgvG0Ex6nEcI
-         H3MEfjcK2Ra6FSFOYYsLWX8sRpwnFC9+8D+b5AWUbigWk0r23HEc/XHm3k4zPdhrtKDx
-         oXbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689580985; x=1692172985;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdeNKisayMSQ5sRs+4YAy9k9XF+keSCX7tWfhBgjHBA=;
-        b=f7pz95b/QHskJpZV9UrHi93KoxbpnjM+Nrxz2Dg9ajoHONn0GXxuJkdRBsM5LLsxs0
-         4RXre6f3Dbgfou1Heqd5vnYEyd64l0w8pYdKsPHUIEQziI8lDp9iIfvjWOIDywJLREf3
-         4jS58WoxkPovGzl0tOkQ8KD9h/3dlqfpYQ5WrOWVmHVhcjvK1wmLz/a172fI2Vgn22wC
-         +CB2aCloTSz/wr0nxEYkx1kGGxMPMMplvMRxhIIDYcoHPaQK35hNU0B19dTnNnrAkOA3
-         ZNHVa2rD/xW4/mlR0KG36UqgVTR4FVfvPFiyza+8usjnCS8ExNNLb4Y4VdNt5Xq9/jf5
-         Bq0Q==
-X-Gm-Message-State: ABy/qLYFhBDCa365yX/OHPLgU0QyaJrW9LBOA05vSX2IoYo6nBmxO6pW
-        fuq+R2Gwgda1s3MKFRFbBfCBDA==
-X-Google-Smtp-Source: APBJJlHp2U3lsNaGg3z+QFZ4SFIvM4GFG/+ypv5OlkRYMQGlqT7WeNQn71m1g9Emo2JuD0aRaeXNrg==
-X-Received: by 2002:a5d:4389:0:b0:314:11e6:da8a with SMTP id i9-20020a5d4389000000b0031411e6da8amr6847696wrq.1.1689580985136;
-        Mon, 17 Jul 2023 01:03:05 -0700 (PDT)
-Received: from [192.168.69.115] ([176.176.144.39])
-        by smtp.gmail.com with ESMTPSA id x14-20020a5d490e000000b0031423a8f4f7sm18387745wrq.56.2023.07.17.01.03.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jul 2023 01:03:04 -0700 (PDT)
-Message-ID: <606c6242-3585-0a8d-8257-c185c89e800e@linaro.org>
-Date:   Mon, 17 Jul 2023 10:03:01 +0200
+        with ESMTP id S230321AbjGQIIH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jul 2023 04:08:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E19E171F;
+        Mon, 17 Jul 2023 01:07:29 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36H7kg05007367;
+        Mon, 17 Jul 2023 08:07:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=xITvjzT9g3XvstpA3uEElVkGk4s6oFe09DTaR2+xwIg=;
+ b=eyn1bEtW8R3+p25YWN7rnfUVSEY0DLsEvCo5m6EnAuCTT5isZknGPkGfHGY5946x1yoV
+ 5ZJ33oRQ6YK38BN2LoZ5DEO/uxe0ty0587Hlucge/R81UDYkzDcLSqK/yU/IMdooz0Ak
+ +XKLXagnxE83BpjM4YiP9UosNhTNh21wsQ2YOaJ+vbDXb3ahLcwW9z+lQfdwqE29LM3c
+ LOzfLJCdiIpdpyc2WBqOUHpW8lJcyJBBTBxnB9FqLMQDut+ycuzUnu38i6qE+MVfvgQ3
+ 2k7Eqq6Etz8PjiwrTiiWUQPuk+XZ/VQImlQ3y39HWK2VtokZf2nnk9SSkBa/+RfJH5DP mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rw1j7rh5j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jul 2023 08:07:07 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36H7xFOu018439;
+        Mon, 17 Jul 2023 08:07:06 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rw1j7rh52-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jul 2023 08:07:06 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36H3ehHE016244;
+        Mon, 17 Jul 2023 08:07:05 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
+        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3ruk35hpxt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jul 2023 08:07:05 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36H8746S25494034
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jul 2023 08:07:04 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4754758056;
+        Mon, 17 Jul 2023 08:07:04 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4B8458060;
+        Mon, 17 Jul 2023 08:07:00 +0000 (GMT)
+Received: from skywalker.linux.ibm.com (unknown [9.109.212.144])
+        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Jul 2023 08:07:00 +0000 (GMT)
+X-Mailer: emacs 29.0.91 (via feedmail 11-beta-1 I)
+From:   "Aneesh Kumar K.V" <aneesh.kumar@linux.ibm.com>
+To:     Kautuk Consul <kconsul@linux.vnet.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     Kautuk Consul <kconsul@linux.vnet.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: ppc64: Enable ring-based dirty memory tracking
+ on ppc64: enable config options and implement relevant functions
+In-Reply-To: <20230717071208.1134783-1-kconsul@linux.vnet.ibm.com>
+References: <20230717071208.1134783-1-kconsul@linux.vnet.ibm.com>
+Date:   Mon, 17 Jul 2023 13:36:58 +0530
+Message-ID: <87pm4rarml.fsf@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH v6 01/11] KVM: Rename kvm_arch_flush_remote_tlb() to
- kvm_arch_flush_remote_tlbs()
-Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
-References: <20230715005405.3689586-1-rananta@google.com>
- <20230715005405.3689586-2-rananta@google.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230715005405.3689586-2-rananta@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nQNAlqLU-sTEJiZxt1rr2OtNIaj7kE_Q
+X-Proofpoint-ORIG-GUID: zPMtmFIrGic2UyunelEsJMUS4ltseuET
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-17_05,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ priorityscore=1501 suspectscore=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 mlxscore=0 mlxlogscore=761
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307170072
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,28 +96,189 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/7/23 02:53, Raghavendra Rao Ananta wrote:
-> From: David Matlack <dmatlack@google.com>
-> 
-> Rename kvm_arch_flush_remote_tlb() and the associated macro
-> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() and
-> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
-> 
-> Making the name plural matches kvm_flush_remote_tlbs() and makes it more
-> clear that this function can affect more than one remote TLB.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+Kautuk Consul <kconsul@linux.vnet.ibm.com> writes:
+
+> - Enable CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL as ppc64 is weakly
+>   ordered.
+> - Enable CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP because the
+>   kvmppc_xive_native_set_attr is called in the context of an ioctl
+>   syscall and will call kvmppc_xive_native_eq_sync for setting the
+>   KVM_DEV_XIVE_EQ_SYNC attribute which will call mark_dirty_page()
+>   when there isn't a running vcpu. Implemented the
+>   kvm_arch_allow_write_without_running_vcpu to always return true
+>   to allow mark_page_dirty_in_slot to mark the page dirty in the
+>   memslot->dirty_bitmap in this case.
+> - Set KVM_DIRTY_LOG_PAGE_OFFSET for the ring buffer's physical page
+>   offset.
+> - Implement the kvm_arch_mmu_enable_log_dirty_pt_masked function required
+>   for the generic KVM code to call.
+> - Add a check to kvmppc_vcpu_run_hv for checking whether the dirty
+>   ring is soft full.
+> - Implement the kvm_arch_flush_remote_tlbs_memslot function to support
+>   the CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT config option.
+>
+> Test Results
+> ============
+> On testing with live migration it was found that there is around
+> 150-180 ms improvment in overall migration time with this patch.
+>
+> Bare Metal P9 testing with patch:
+> --------------------------------
+> (qemu) info migrate
+> globals:
+> store-global-state: on
+> only-migratable: off
+> send-configuration: on
+> send-section-footer: on
+> decompress-error-check: on
+> clear-bitmap-shift: 18
+> Migration status: completed
+> total time: 20694 ms
+> downtime: 73 ms
+> setup: 23 ms
+> transferred ram: 2604370 kbytes
+> throughput: 1033.55 mbps
+> remaining ram: 0 kbytes
+> total ram: 16777216 kbytes
+> duplicate: 3555398 pages
+> skipped: 0 pages
+> normal: 642026 pages
+> normal bytes: 2568104 kbytes
+> dirty sync count: 3
+> page size: 4 kbytes
+> multifd bytes: 0 kbytes
+> pages-per-second: 32455
+> precopy ram: 2581549 kbytes
+> downtime ram: 22820 kbytes
+>
+> Bare Metal P9 testing without patch:
+> -----------------------------------
+> (qemu) info migrate
+> globals:
+> store-global-state: on
+> only-migratable: off
+> send-configuration: on
+> send-section-footer: on
+> decompress-error-check: on
+> clear-bitmap-shift: 18
+> Migration status: completed
+> total time: 20873 ms
+> downtime: 62 ms
+> setup: 19 ms
+> transferred ram: 2612900 kbytes
+> throughput: 1027.83 mbps
+> remaining ram: 0 kbytes
+> total ram: 16777216 kbytes
+> duplicate: 3553329 pages
+> skipped: 0 pages
+> normal: 644159 pages
+> normal bytes: 2576636 kbytes
+> dirty sync count: 4
+> page size: 4 kbytes
+> multifd bytes: 0 kbytes
+> pages-per-second: 88297
+> precopy ram: 2603645 kbytes
+> downtime ram: 9254 kbytes
+>
+> Signed-off-by: Kautuk Consul <kconsul@linux.vnet.ibm.com>
 > ---
->   arch/mips/include/asm/kvm_host.h | 4 ++--
->   arch/mips/kvm/mips.c             | 2 +-
->   arch/x86/include/asm/kvm_host.h  | 4 ++--
->   include/linux/kvm_host.h         | 4 ++--
->   virt/kvm/kvm_main.c              | 2 +-
->   5 files changed, 8 insertions(+), 8 deletions(-)
+>  Documentation/virt/kvm/api.rst      |  2 +-
+>  arch/powerpc/include/uapi/asm/kvm.h |  2 ++
+>  arch/powerpc/kvm/Kconfig            |  2 ++
+>  arch/powerpc/kvm/book3s.c           | 46 +++++++++++++++++++++++++++++
+>  arch/powerpc/kvm/book3s_hv.c        |  3 ++
+>  include/linux/kvm_dirty_ring.h      |  5 ++++
+>  virt/kvm/dirty_ring.c               |  1 +
+>  7 files changed, 60 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index c0ddd3035462..84c180ccd178 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8114,7 +8114,7 @@ regardless of what has actually been exposed through the CPUID leaf.
+>  8.29 KVM_CAP_DIRTY_LOG_RING/KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+>  ----------------------------------------------------------
+>  
+> -:Architectures: x86, arm64
+> +:Architectures: x86, arm64, ppc64
+>  :Parameters: args[0] - size of the dirty log ring
+>  
+>  KVM is capable of tracking dirty memory using ring buffers that are
+> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
+> index 9f18fa090f1f..f722309ed7fb 100644
+> --- a/arch/powerpc/include/uapi/asm/kvm.h
+> +++ b/arch/powerpc/include/uapi/asm/kvm.h
+> @@ -33,6 +33,8 @@
+>  /* Not always available, but if it is, this is the correct offset.  */
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>  
+> +#define KVM_DIRTY_LOG_PAGE_OFFSET 64
+> +
+>  struct kvm_regs {
+>  	__u64 pc;
+>  	__u64 cr;
+> diff --git a/arch/powerpc/kvm/Kconfig b/arch/powerpc/kvm/Kconfig
+> index 902611954200..c93354ec3bd5 100644
+> --- a/arch/powerpc/kvm/Kconfig
+> +++ b/arch/powerpc/kvm/Kconfig
+> @@ -26,6 +26,8 @@ config KVM
+>  	select IRQ_BYPASS_MANAGER
+>  	select HAVE_KVM_IRQ_BYPASS
+>  	select INTERVAL_TREE
+> +	select HAVE_KVM_DIRTY_RING_ACQ_REL
+> +	select NEED_KVM_DIRTY_RING_WITH_BITMAP
+>  
+>  config KVM_BOOK3S_HANDLER
+>  	bool
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 686d8d9eda3e..01aa4fe2c424 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -32,6 +32,7 @@
+>  #include <asm/mmu_context.h>
+>  #include <asm/page.h>
+>  #include <asm/xive.h>
+> +#include <asm/book3s/64/radix.h>
+>  
+>  #include "book3s.h"
+>  #include "trace.h"
+> @@ -1070,6 +1071,51 @@ int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
+>  
+>  #endif /* CONFIG_KVM_XICS */
+>  
+> +/*
+> + * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+> + * dirty pages.
+> + *
+> + * It write protects selected pages to enable dirty logging for them.
+> + */
+> +void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+> +					     struct kvm_memory_slot *slot,
+> +					     gfn_t gfn_offset,
+> +					     unsigned long mask)
+> +{
+> +	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
+> +	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+> +	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+> +
+> +	while (start < end) {
+> +		pte_t *ptep;
+> +		unsigned int shift;
+> +
+> +		ptep = find_kvm_secondary_pte(kvm, start, &shift);
+> +
+> +		if (radix_enabled())
+> +			__radix_pte_update(ptep, _PAGE_WRITE, 0);
+> +		else
+> +			*ptep = __pte(pte_val(*ptep) & ~(_PAGE_WRITE));
+> +
+> +		start += PAGE_SIZE;
+> +	}
+>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
+I am not sure about that. You are walking partition scoped table here
+and you are checking for hypervisor translation mode and doing pte
+updates. That doesn't look correct.
+
+-aneesh
