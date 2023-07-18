@@ -2,79 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 857BE7583EF
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 19:57:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E780F758430
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 20:08:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232100AbjGRR5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 13:57:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40934 "EHLO
+        id S232528AbjGRSIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 14:08:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230264AbjGRR5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 13:57:16 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF59F7
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 10:57:15 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bb2468257fso18945885ad.0
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 10:57:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689703035; x=1692295035;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cRD9blNIxHluSUPOIYULRJbi8uFOds7uOEZDc3kDErE=;
-        b=mMpImavfY2ADOOfTsM0dULPAztPWwAkAxaN5EBRdgTONlUbuDv0bc/jnql1JEnUeOO
-         bda5Tj4uvdDQ4B+NJ/gmvkMeUhOrHdA5CxK42FliEYPeTWhjOiI8i0+G+nUodHSTQx/g
-         HanMLQr/dHe8w7iHPBOx35pnzrQWodjmfukbs1BbseIHXHWTRnEizqCumzGYhUaGm+dQ
-         jRxPO5RqjGL1hwX87TamgliuO3lsmronneNDvHaIucdFlccgiBcVHg4FAmdI6hkUO0Ji
-         3UXm13B3+3pT+2iToWzn8Ie1OvrVbaXYWR6AEsbzg//AwTK48dHUa2cpqzFIrDJGPtWZ
-         5PWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689703035; x=1692295035;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cRD9blNIxHluSUPOIYULRJbi8uFOds7uOEZDc3kDErE=;
-        b=lChDtjy8eQUvbZdCMMf3iT5yI6Cp8/YsHPWl7ZZqRIMDzkP1mq4VeD+TUiDJqEstsh
-         d8cTQLrUqQ+M+KE98zNT2Mkl5eJmLprpa8TfICVbKLF8u6h2eJ/TwYngEsQmfSVR4ycM
-         nVb8ayJ5afqXHEENZHGyZcxrIF2DdKyXzimFgOFi/IJcCMvDTjUEi7Nb917doffNsU88
-         M3F0/yRe4o4toMCJlyH7PcHUsDafbTA1IY7GqNZ0777gqeNDW4tnK9Gi9Y8nMnGYNSUP
-         xKQsQhavPCRCXPGZBm3RsR1qbF9LTJviEROMYwGVMcAtTJ2149f2I9izl1c29wTfjx7n
-         ltnw==
-X-Gm-Message-State: ABy/qLY60+3PL0XYv0o3DnjE2GKzU70U2J8hVlR6P9WCEssPhYUT6UUH
-        069n7ZJ4vfgTxRG7sD9Ffk1Cng==
-X-Google-Smtp-Source: APBJJlH/DFdDcamBY608z6if+lXRDqfUJnrs4w53GX7UPxfbPo+Y0+UeHJe6ZmJVTzN0SvAK3Kq8RA==
-X-Received: by 2002:a17:902:e549:b0:1b8:aef2:773e with SMTP id n9-20020a170902e54900b001b8aef2773emr17009609plf.46.1689703034916;
-        Tue, 18 Jul 2023 10:57:14 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id iw10-20020a170903044a00b001b89612dc7dsm2167740plb.142.2023.07.18.10.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 10:57:13 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qLowi-002aex-Bi;
-        Tue, 18 Jul 2023 14:57:12 -0300
-Date:   Tue, 18 Jul 2023 14:57:12 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     akpm@linux-foundation.org, ajd@linux.ibm.com,
-        catalin.marinas@arm.com, fbarrat@linux.ibm.com,
-        iommu@lists.linux.dev, jhubbard@nvidia.com, kevin.tian@intel.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        nicolinc@nvidia.com, npiggin@gmail.com, robin.murphy@arm.com,
-        seanjc@google.com, will@kernel.org, x86@kernel.org,
-        zhi.wang.linux@gmail.com
-Subject: Re: [PATCH 1/4] mm_notifiers: Rename invalidate_range notifier
-Message-ID: <ZLbSeO+XjSx1W795@ziepe.ca>
-References: <cover.b4454f7f3d0afbfe1965e8026823cd50a42954b4.1689666760.git-series.apopple@nvidia.com>
- <c0daf0870f7220bbf815713463aff86970a5d0fa.1689666760.git-series.apopple@nvidia.com>
+        with ESMTP id S231139AbjGRSIW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 14:08:22 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482BA1733;
+        Tue, 18 Jul 2023 11:08:19 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 749C912003B;
+        Tue, 18 Jul 2023 21:08:16 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 749C912003B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1689703696;
+        bh=AP2RkCg8oLWIuJk69zdwx+Vd67QvE+Lk+BhlnuORtp4=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=b/BaR9QMsz5py2M7oVj2FgvUZ7eXZ4Xe2mbywYvhVyXMqCvYESPkxVH8pQn2wO16t
+         TWq4nmq9eq+W8+NXWZjBMuLVLYDM6XDYpK8FWp/NZeOduusFJRX6xPoxwiSEcPhI2W
+         69nof87XVH5nZzSlpEjPR5AfojN5XOO1FEYtDXXtystphMggxFOldFs0pQLfXsFZKd
+         EGodKUvs9jtPJS1rN72YqjCKHuobSLQQM0rYLfkwv1VYBLoRtEPFaxHeOqVt4KNNDI
+         lO9eqm7j4YcrYiMcZSvbaj1Au7ptSvFUEnUxFD5IlegpTEbOoGP/1g2qCEinQ3dFFw
+         mVGlCdqV2eZDw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Tue, 18 Jul 2023 21:08:16 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 18 Jul 2023 21:08:15 +0300
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [PATCH net-next v2 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
+Date:   Tue, 18 Jul 2023 21:02:33 +0300
+Message-ID: <20230718180237.3248179-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0daf0870f7220bbf815713463aff86970a5d0fa.1689666760.git-series.apopple@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178700 [Jul 18 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;sberdevices.ru:7.1.1,5.0.1;lore.kernel.org:7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/18 06:43:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/18 06:43:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/18 13:44:00 #21634370
+X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,76 +88,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 05:56:15PM +1000, Alistair Popple wrote:
-> diff --git a/include/asm-generic/tlb.h b/include/asm-generic/tlb.h
-> index b466172..48c81b9 100644
-> --- a/include/asm-generic/tlb.h
-> +++ b/include/asm-generic/tlb.h
-> @@ -456,7 +456,7 @@ static inline void tlb_flush_mmu_tlbonly(struct mmu_gather *tlb)
->  		return;
->  
->  	tlb_flush(tlb);
-> -	mmu_notifier_invalidate_range(tlb->mm, tlb->start, tlb->end);
-> +	mmu_notifier_invalidate_secondary_tlbs(tlb->mm, tlb->start, tlb->end);
->  	__tlb_reset_range(tlb);
+Hello,
 
-Does this compile? I don't see
-"mmu_notifier_invalidate_secondary_tlbs" ?
+this patchset is first of three parts of another big patchset for
+MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-Maybe we don't need to rename this function since you pretty much
-remove it in the next patches?
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
 
-> diff --git a/mm/mmu_notifier.c b/mm/mmu_notifier.c
-> index 50c0dde..34c5a84 100644
-> --- a/mm/mmu_notifier.c
-> +++ b/mm/mmu_notifier.c
-> @@ -207,7 +207,7 @@ mmu_interval_read_begin(struct mmu_interval_notifier *interval_sub)
->  	 *    spin_lock
->  	 *     seq = ++subscriptions->invalidate_seq
->  	 *    spin_unlock
-> -	 *     op->invalidate_range():
-> +	 *     op->invalidate_secondary_tlbs():
+1) virtio and vhost updates (for fragged skbs) <--- this patchset
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/.
+3) Updates for tests and utils.
 
-The later patch should delete this stuff from the comment too, we
-no longer guarantee this relationship?
+This series enables handling of fragged skbs in virtio and vhost parts.
+Newly logic won't be triggered, because SO_ZEROCOPY options is still
+impossible to enable at this moment (next bunch of patches from big
+set above will enable it).
 
-> @@ -560,23 +560,23 @@ mn_hlist_invalidate_end(struct mmu_notifier_subscriptions *subscriptions,
->  	hlist_for_each_entry_rcu(subscription, &subscriptions->list, hlist,
->  				 srcu_read_lock_held(&srcu)) {
->  		/*
-> -		 * Call invalidate_range here too to avoid the need for the
-> -		 * subsystem of having to register an invalidate_range_end
-> -		 * call-back when there is invalidate_range already. Usually a
-> -		 * subsystem registers either invalidate_range_start()/end() or
-> -		 * invalidate_range(), so this will be no additional overhead
-> -		 * (besides the pointer check).
-> +		 * Subsystems should register either invalidate_secondary_tlbs()
-> +		 * or invalidate_range_start()/end() callbacks.
->  		 *
-> -		 * We skip call to invalidate_range() if we know it is safe ie
-> -		 * call site use mmu_notifier_invalidate_range_only_end() which
-> -		 * is safe to do when we know that a call to invalidate_range()
-> -		 * already happen under page table lock.
-> +		 * We call invalidate_secondary_tlbs() here so that subsystems
-> +		 * can use larger range based invalidations. In some cases
-> +		 * though invalidate_secondary_tlbs() needs to be called while
-> +		 * holding the page table lock. In that case call sites use
-> +		 * mmu_notifier_invalidate_range_only_end() and we know it is
-> +		 * safe to skip secondary TLB invalidation as it will have
-> +		 * already been done.
->  		 */
-> -		if (!only_end && subscription->ops->invalidate_range)
-> -			subscription->ops->invalidate_range(subscription,
-> -							    range->mm,
-> -							    range->start,
-> -							    range->end);
-> +		if (!only_end && subscription->ops->invalidate_secondary_tlbs)
-> +			subscription->ops->invalidate_secondary_tlbs(
+I've included changelog to some patches anyway, because there were some
+comments during review of last big patchset from the link above.
 
-More doesn't compile, and the comment has the same issue..
+Head for this patchset is 60cc1f7d0605598b47ee3c0c2b4b6fbd4da50a06
 
-But I think the approach in this series looks fine, it is so much
-cleaner after we remove all the cruft in patch 4, just look at the
-diffstat..
+Link to v1:
+https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
 
-Jason
+Changelog:
+ * see per-patch changelog after ---.
+
+Arseniy Krasnov (4):
+  vsock/virtio/vhost: read data from non-linear skb
+  vsock/virtio: support to send non-linear skb
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
+
+ drivers/vhost/vsock.c                   |  14 +-
+ include/linux/virtio_vsock.h            |   1 +
+ net/vmw_vsock/virtio_transport.c        |  40 +++-
+ net/vmw_vsock/virtio_transport_common.c | 300 ++++++++++++++++++------
+ 4 files changed, 278 insertions(+), 77 deletions(-)
+
+-- 
+2.25.1
+
