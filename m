@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3F8C7579F4
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 12:58:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91D61757A38
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 13:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232022AbjGRK6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 06:58:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55940 "EHLO
+        id S229926AbjGRLPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 07:15:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231901AbjGRK6P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 06:58:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8C0E77;
-        Tue, 18 Jul 2023 03:58:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        with ESMTP id S229619AbjGRLPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 07:15:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ECF910DF
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:14:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689678860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NE5TSk+9F1w0/aZJpgmkiBjq7oSucjlnsOr09RhYOt0=;
+        b=D3BOkQPJFGPvg8ZBtXDhGL5ir2ksWn/7nTVJ4Lc2jPfB9kFZLvVWUAzdKpzGvOyUaRPp+o
+        5nN9r8TY4C/XGOk5eeBzbs+F3b544D45UJ/yq1kePLvkJx+DWKuraDIfaakYgYH0XUUnSg
+        qDsuNNX22abidIpyauVCrn4y2py9LgQ=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-173-9v6ZNktVNeuV6XxC2lvxcg-1; Tue, 18 Jul 2023 07:14:18 -0400
+X-MC-Unique: 9v6ZNktVNeuV6XxC2lvxcg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C711B61514;
-        Tue, 18 Jul 2023 10:58:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626C4C433C8;
-        Tue, 18 Jul 2023 10:58:09 +0000 (UTC)
-Message-ID: <263b3c0f-53cf-14b6-b956-e0f5b03c95b5@xs4all.nl>
-Date:   Tue, 18 Jul 2023 12:58:07 +0200
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2121C3806108;
+        Tue, 18 Jul 2023 11:14:17 +0000 (UTC)
+Received: from gondolin.redhat.com (unknown [10.39.193.57])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1DE8740C6F4C;
+        Tue, 18 Jul 2023 11:14:15 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH for-8.2 0/2] arm/kvm: use kvm_{get,set}_one_reg
+Date:   Tue, 18 Jul 2023 13:14:02 +0200
+Message-ID: <20230718111404.23479-1-cohuck@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v4 11/18] media: Remove flag FBINFO_FLAG_DEFAULT from
- fbdev drivers
-Content-Language: en-US
-To:     Thomas Zimmermann <tzimmermann@suse.de>, deller@gmx.de,
-        javierm@redhat.com, geert@linux-m68k.org, dan.carpenter@linaro.org
-Cc:     linux-sh@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-geode@lists.infradead.org, linux-hyperv@vger.kernel.org,
-        linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>,
-        Andy Walls <awalls@md.metrocast.net>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>
-References: <20230715185343.7193-1-tzimmermann@suse.de>
- <20230715185343.7193-12-tzimmermann@suse.de>
-From:   Hans Verkuil <hverkuil@xs4all.nl>
-In-Reply-To: <20230715185343.7193-12-tzimmermann@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,63 +59,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Thomas,
+The kvm_{get,set}_one_reg functions have been around for a very long
+time, and using them instead of open-coding the ioctl invocations
+saves lines of code, and gives us a tracepoint as well. They cannot
+be used by invocations of the ioctl not acting on a CPUState, but
+that still leaves a lot of conversions in the target/arm code.
 
-On 15/07/2023 20:51, Thomas Zimmermann wrote:
-> The flag FBINFO_FLAG_DEFAULT is 0 and has no effect, as struct
-> fbinfo.flags has been allocated to zero by kzalloc(). So do not
-> set it.
-> 
-> Flags should signal differences from the default values. After cleaning
-> up all occurrences of FBINFO_DEFAULT, the token will be removed.
-> 
-> v2:
-> 	* fix commit message (Miguel)
-> 
-> Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> Cc: Andy Walls <awalls@md.metrocast.net>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Hans Verkuil <hverkuil@xs4all.nl>
-> ---
->  drivers/media/pci/ivtv/ivtvfb.c              | 1 -
->  drivers/media/test-drivers/vivid/vivid-osd.c | 1 -
->  2 files changed, 2 deletions(-)
+target/mips and target/ppc also have some potential for conversions,
+but as I cannot test either (and they are both in 'Odd fixes' anyway),
+I left them alone.
 
-I can take this patches for 6.6, unless you prefer to have this whole series
-merged in one go?
+Survives some testing on a Mt. Snow.
 
-In that case you can use my:
+Cornelia Huck (2):
+  arm/kvm: convert to kvm_set_one_reg
+  arm/kvm: convert to kvm_get_one_reg
 
-Reviewed-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+ target/arm/kvm.c   |  28 +++--------
+ target/arm/kvm64.c | 123 ++++++++++++---------------------------------
+ 2 files changed, 39 insertions(+), 112 deletions(-)
 
-Regards,
-
-	Hans
-
-> 
-> diff --git a/drivers/media/pci/ivtv/ivtvfb.c b/drivers/media/pci/ivtv/ivtvfb.c
-> index 0aeb9daaee4c..23c8c094e791 100644
-> --- a/drivers/media/pci/ivtv/ivtvfb.c
-> +++ b/drivers/media/pci/ivtv/ivtvfb.c
-> @@ -1048,7 +1048,6 @@ static int ivtvfb_init_vidmode(struct ivtv *itv)
->  	/* Generate valid fb_info */
->  
->  	oi->ivtvfb_info.node = -1;
-> -	oi->ivtvfb_info.flags = FBINFO_FLAG_DEFAULT;
->  	oi->ivtvfb_info.par = itv;
->  	oi->ivtvfb_info.var = oi->ivtvfb_defined;
->  	oi->ivtvfb_info.fix = oi->ivtvfb_fix;
-> diff --git a/drivers/media/test-drivers/vivid/vivid-osd.c b/drivers/media/test-drivers/vivid/vivid-osd.c
-> index ec25edc679b3..051f1805a16d 100644
-> --- a/drivers/media/test-drivers/vivid/vivid-osd.c
-> +++ b/drivers/media/test-drivers/vivid/vivid-osd.c
-> @@ -310,7 +310,6 @@ static int vivid_fb_init_vidmode(struct vivid_dev *dev)
->  	/* Generate valid fb_info */
->  
->  	dev->fb_info.node = -1;
-> -	dev->fb_info.flags = FBINFO_FLAG_DEFAULT;
->  	dev->fb_info.par = dev;
->  	dev->fb_info.var = dev->fb_defined;
->  	dev->fb_info.fix = dev->fb_fix;
+-- 
+2.41.0
 
