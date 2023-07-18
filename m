@@ -2,118 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 516BB7576F1
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 10:44:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 318E9757788
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 11:14:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230379AbjGRIod (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 04:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60868 "EHLO
+        id S230195AbjGRJOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 05:14:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbjGRIoc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 04:44:32 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 20AD1ED
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 01:44:31 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 231F92F4;
-        Tue, 18 Jul 2023 01:45:14 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FDF83F67D;
-        Tue, 18 Jul 2023 01:44:29 -0700 (PDT)
-Date:   Tue, 18 Jul 2023 09:44:26 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 1/2] arm64: set sctlr_el1.SPAN
-Message-ID: <ZLZQ6r4-9mVdg4Ry@monolith.localdoman>
-References: <20230617013138.1823-1-namit@vmware.com>
- <20230617013138.1823-2-namit@vmware.com>
- <ZLEj_UnDnE4ZJtnD@monolith.localdoman>
- <94bd19db-7177-9e90-dc1a-de7485ebb18f@redhat.com>
- <57A6ABC7-8A95-4199-92E3-FA4D89D6705F@vmware.com>
- <20230717-52b1cacc323e5105506e5079@orel>
- <20230717-085f1ee1d631f213544fed03@orel>
- <8d4c1105-bf9b-d4b0-a2a3-be306474bf56@arm.com>
- <4C6E9B6F-1879-48FB-98B6-6F271982067D@vmware.com>
+        with ESMTP id S230259AbjGRJOL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 05:14:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8F310F5
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 02:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689671599;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=lrWIzsgWi5PVFNBjLu8rbxMEA2rXGKqAaheIHU+uz9Y=;
+        b=V+L52Io5BuZJYUVJDYZF5e92iYOTyIdRvWWu4R5LqOYQJqWVf6IfMunwKkYGwVv4s23GmC
+        7k0ZFFcia9wbHFbwC9jHQTj35ZZA79x5jDlm2W1wwPVlW2FYgtgIAVikC4e2quaG7P9zRL
+        Bce+irksmoTdEw1UfS/ocRWKunHUHaA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-155-GdB-necKNRWkHIwBndRTSw-1; Tue, 18 Jul 2023 05:13:16 -0400
+X-MC-Unique: GdB-necKNRWkHIwBndRTSw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 940B68D1685;
+        Tue, 18 Jul 2023 09:13:15 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.224.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 048FB1454142;
+        Tue, 18 Jul 2023 09:13:11 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/3] Fix 'Spurious APIC interrupt (vector 0xFF) on CPU#n' issue
+Date:   Tue, 18 Jul 2023 12:13:07 +0300
+Message-Id: <20230718091310.119672-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4C6E9B6F-1879-48FB-98B6-6F271982067D@vmware.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Recently we found an issue which causes these error messages=0D
+to be sometimes logged if the guest has VFIO device attached:=0D
+=0D
+'Spurious APIC interrupt (vector 0xFF) on CPU#0, should never happen'=0D
+=0D
+It was traced to the incorrect APICv inhibition bug which started with=0D
+'KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base'=0D
+(All these issues are now fixed)=0D
+=0D
+However, there are valid cases for the APICv to be inhibited and it should =
+not=0D
+cause spurious interrupts to be injected to the guest.=0D
+=0D
+After some debug, the root cause was found and it is that __kvm_apic_update=
+_irr=0D
+doesn't set irr_pending which later triggers a int->unsigned char conversio=
+n=0D
+bug which leads to the wrong 0xFF injection.=0D
+=0D
+This also leads to an unbounded delay in injecting the interrupt and hurts=
+=0D
+performance.=0D
+=0D
+In addition to that, I also noticed that __kvm_apic_update_irr is not atomi=
+c=0D
+in regard to IRR, which can lead to an even harder to debug bug.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (3):=0D
+  KVM: x86: VMX: __kvm_apic_update_irr must update the IRR atomically=0D
+  KVM: x86: VMX: set irr_pending in kvm_apic_update_irr=0D
+  KVM: x86: check the kvm_cpu_get_interrupt result before using it=0D
+=0D
+ arch/x86/kvm/lapic.c | 23 +++++++++++++++--------=0D
+ arch/x86/kvm/x86.c   | 10 +++++++---=0D
+ 2 files changed, 22 insertions(+), 11 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-On Mon, Jul 17, 2023 at 05:05:06PM +0000, Nadav Amit wrote:
-> Combining the answers to Andrew and Nikos.
-> 
-> On Jul 17, 2023, at 1:53 AM, Nikos Nikoleris <nikos.nikoleris@arm.com> wrote:
-> > 
-> >>> 
-> >>> Would you mind reposting this along with the BSS zeroing patch, the
-> >>> way I proposed we do that, and anything else you've discovered when
-> >>> trying to use the EFI unit tests without QEMU? We'll call that our
-> >>> first non-QEMU EFI support series, since the first EFI series was
-> >>> only targeting QEMU.
-> 
-> I need to rehash the solution that you proposed for BSS (if there is
-> anything special there). I had a different workaround for that issue,
-> because IIRC I had some issues with the zeroing. I’ll give it another
-> 
-> >> 
-> >> Oh, and I meant to mention that, when reposting this patch, maybe we
-> >> can consider managing sctlr in a similar way to the non-efi start path?
-> >> 
-> 
-> I am afraid of turning on random bits on SCTLR. Arguably, the way that
-
-What do you mean by turning on random bits on SCTLR? All the functional
-bits are documented in the architecture. Same goes for RES1 (it's in the
-Glossary).
-
-> the non-efi test sets the default value of SCTLR (with no naming of the
-> different bits) is not very friendly.
-
-That's because as the architecture gets updated, what used to be a RES1 bit
-becomes a functional bit. The only sane way to handle this is to disable
-all the features you don't support, **and** set all the RES1 bits (and
-clear RES0 bits), to disable any newly introduced features you don't know
-about yet which were left enabled by software running at a higher privilege
-level.
-
-You can send a patch if you want to give a name to the bits which have
-become functional since SCTLR_EL1_RES1 was introduced.
-
-Thanks,
-Alex
-
-> 
-> I will have a look on the other bits of SCTLR and see if I can do something
-> quick and simple, but I don’t want to refactor things in a way that might
-> break things.
-> 
-> > 
-> > Nadav, if you are running baremetal, it might be worth checking what EL
-> > you're running in as well. If HW is implementing EL2, EFI will handover
-> > in EL2.
-> 
-> I don’t. I run the test on a different hypervisor. When I enabled the x86
-> tests to run on a different hypervisor years ago, there were many many
-> test and real issues that required me to run KVM-unit-tests on bare
-> metal - and therefore I fixed these tests to run on bare-metal as well.
-> 
-> With ARM, excluding the BSS and the SCTLR issue, I didn’t encounter any
-> additional test issues. So I don’t have the need or time to enable it
-> to run on bare-metal… sorry.
->  
