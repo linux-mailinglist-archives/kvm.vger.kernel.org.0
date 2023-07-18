@@ -2,138 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5D3C757A4C
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 13:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E055757AB6
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 13:42:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231459AbjGRLS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 07:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37110 "EHLO
+        id S231833AbjGRLme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 07:42:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231496AbjGRLSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 07:18:20 -0400
+        with ESMTP id S229884AbjGRLmc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 07:42:32 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4DBB9
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:17:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9655198E
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:41:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689679055;
+        s=mimecast20190719; t=1689680473;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OtPAFim1cDpcp/PLXUaQwLiMk8Vxwyxo/NiSi3JW/f0=;
-        b=TjVjCONXNajXgq5t1XpGWWJwqQE3zgXQjCg0K8E+SWHmIxEnOwq4QE6xQ9T6ov3dnKM26S
-        pFKwtlZH559Cbh0V8UIaezc9Kxd+hXAuJ5ZTu1478VQg1xefgwE42jCOUzfeOHM8W5PPMq
-        rhrvzYxbt/XtWrIZPffGjlRoEzuj9oE=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=6mYqRmobTSmlaJDxzrk7H0sz66Ug53ixgvatsoEizE0=;
+        b=UHvAzZcqo4AqxpTwwtSuu5xbMBQ3L4helNJ1F5zloYwDjGEqcahlHwy0VNv2E9yeLHFdMQ
+        z5qotULip/yWy9HJbDqzopxcIJsmHNPk9WRE82hJa6s/aGkQtvh1L0CD93IyIJlVh7w3rg
+        fMi0xvgoidQFzU9Rn4iVJ6D/XMtB86M=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-360-BTnMQrMBOsmdJH1R6uVhxg-1; Tue, 18 Jul 2023 07:17:34 -0400
-X-MC-Unique: BTnMQrMBOsmdJH1R6uVhxg-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-543c2538071so769016a12.1
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:17:34 -0700 (PDT)
+ us-mta-428-6vws4KHJNL2odPZ4QV-yEg-1; Tue, 18 Jul 2023 07:41:12 -0400
+X-MC-Unique: 6vws4KHJNL2odPZ4QV-yEg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94a34d3e5ebso316136966b.3
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:41:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689679053; x=1692271053;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1689680471; x=1692272471;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OtPAFim1cDpcp/PLXUaQwLiMk8Vxwyxo/NiSi3JW/f0=;
-        b=eHBFto0MRsMw9RFI48QoHciy9UG6oVS54ypGHhq6Hy/xdeZe31BdUUBsfVmSMeTY1F
-         eVwwOV1KC5/Zd4+Ohv5yJ7Z6U17ognJs8kto7CsyMqkHak9itu9BN6SBy68VnOrjge+L
-         EtRiP77elMWKpjI4jNU2xXAly69fDchvdD8qaPJTixdnIPwwMQ/b+Ud3Dd9+t6sG9b/e
-         ClhRDvWgxbjIn/4+JfQDDeJOr7kMl2i4ae8OgEnGpKF6YGTAszD+VU5CEC+tpN6J5LEQ
-         lkRKQtI9NiXgqzEC6Z01cvNS3hnSUuNnwFj9XfHzZevmJYZemTtIdMhF+BszqkltXP1P
-         LQjA==
-X-Gm-Message-State: ABy/qLZ7/XVdd9NtVWP2NDXjPnEA6L3thkM1EZ3+QugJbqiH77C5fMgB
-        9hCvYa+LxJ3sZL+fvKMrWiWaxpZhK4DelywAA7+kQnj1iuH+ZBkNyTe7bNnKnv52jfdnhWFs6g9
-        oTnyYyeQdkc6t
-X-Received: by 2002:a05:6a20:3d07:b0:133:89e:bf1a with SMTP id y7-20020a056a203d0700b00133089ebf1amr12988280pzi.4.1689679053256;
-        Tue, 18 Jul 2023 04:17:33 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGlX4aGknKfPCjhtPs4zbhCwYUKXUWNkmQcI4lBrRW+0354cqKkBfpbN1eJEAJfM+P9UQWRbQ==
-X-Received: by 2002:a05:6a20:3d07:b0:133:89e:bf1a with SMTP id y7-20020a056a203d0700b00133089ebf1amr12988260pzi.4.1689679052990;
-        Tue, 18 Jul 2023 04:17:32 -0700 (PDT)
-Received: from [10.72.112.40] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id k22-20020aa792d6000000b00682868714fdsm1369203pfa.95.2023.07.18.04.17.27
+        bh=6mYqRmobTSmlaJDxzrk7H0sz66Ug53ixgvatsoEizE0=;
+        b=fes8XxjWeWMqrqp3ryu0cXSrdeIwTApbkiw02h4LlJxhSV2CCEpaZyNxI4FMMhnm2w
+         gEFlg6j/Ey3ii71xLPnEm1geamVV3LAY41VLuxDmvMHX2IhubZJQSy8KSqgg7aqSMAPu
+         ipIY7vHqHZr8HvaflHwaC8xX0GOkOqnADQzYzBqpo6+Da5zxnT1mJSp9Mju+218+YCcG
+         6Q4yOkz4cwAoywzJcFOniIYOVd9MTkhh3CVLZGlARybCPrP9QSfR6uunJAOW13y5pGBW
+         uhgTNTbsJu8V2CThmYC67e87xhug6qkRwmB2Yr/NZ2oIvrJVaGCUtB/54fYHjssQZPFT
+         bf2w==
+X-Gm-Message-State: ABy/qLYCEGrjCdY2zEZV7TZ/9UBPz9ISamCzjtgxcxpDrxh5aIdruZ1e
+        TUDrfnFq5VtaHD0UPI4TJfGRQeO2OXHLpn5+2P2IOum5gwz37AenknAUh7sGgsvyHrmsvWRcw9e
+        KMyJIG0meBo+3JSeLnKlG
+X-Received: by 2002:a17:907:1dd3:b0:978:90cc:bf73 with SMTP id og19-20020a1709071dd300b0097890ccbf73mr11470057ejc.48.1689680471333;
+        Tue, 18 Jul 2023 04:41:11 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEFnorFN48cFP8/ErR9y/dfNcwwMKE9ug0uTRlgEY4VxsbZO6jdC8B+PpsJ1lhsYgio3ROSbg==
+X-Received: by 2002:a17:907:1dd3:b0:978:90cc:bf73 with SMTP id og19-20020a1709071dd300b0097890ccbf73mr11470029ejc.48.1689680470983;
+        Tue, 18 Jul 2023 04:41:10 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id k2-20020a170906128200b0098e2eaec394sm904339ejb.101.2023.07.18.04.41.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jul 2023 04:17:32 -0700 (PDT)
-Message-ID: <a8a43069-ca4c-07e6-3b65-de749f295365@redhat.com>
-Date:   Tue, 18 Jul 2023 19:17:26 +0800
+        Tue, 18 Jul 2023 04:41:10 -0700 (PDT)
+Message-ID: <bda79e85-c0bf-8d59-2750-d922a59bb859@redhat.com>
+Date:   Tue, 18 Jul 2023 13:41:08 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v6 10/11] KVM: arm64: Invalidate the table entries upon a
- range
+ Thunderbird/102.12.0
 Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
-References: <20230715005405.3689586-1-rananta@google.com>
- <20230715005405.3689586-11-rananta@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230715005405.3689586-11-rananta@google.com>
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>
+References: <20230718091310.119672-1-mlevitsk@redhat.com>
+ <20230718091310.119672-2-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: x86: VMX: __kvm_apic_update_irr must update the
+ IRR atomically
+In-Reply-To: <20230718091310.119672-2-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 7/18/23 11:13, Maxim Levitsky wrote:
+> +		irr_val = READ_ONCE(*((u32 *)(regs + APIC_IRR + i * 0x10)));
 
+Let's separate out the complicated arithmetic, as it recurs below too:
 
-On 7/15/23 08:54, Raghavendra Rao Ananta wrote:
-> Currently, during the operations such as a hugepage collapse,
-> KVM would flush the entire VM's context using 'vmalls12e1is'
-> TLBI operation. Specifically, if the VM is faulting on many
-> hugepages (say after dirty-logging), it creates a performance
-> penalty for the guest whose pages have already been faulted
-> earlier as they would have to refill their TLBs again.
-> 
-> Instead, leverage kvm_tlb_flush_vmid_range() for table entries.
-> If the system supports it, only the required range will be
-> flushed. Else, it'll fallback to the previous mechanism.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> ---
->   arch/arm64/kvm/hyp/pgtable.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 5d14d5d5819a..5ef098af1736 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -806,7 +806,8 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
->   		 * evicted pte value (if any).
->   		 */
->   		if (kvm_pte_table(ctx->old, ctx->level))
-> -			kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +			kvm_tlb_flush_vmid_range(mmu, ctx->addr,
-> +						kvm_granule_size(ctx->level));
->   		else if (kvm_pte_valid(ctx->old))
->   			kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
->   				     ctx->addr, ctx->level);
+	u32 *p_irr = (u32 *)(regs + APIC_IRR + i * 0x10);
 
--- 
-Shaoqin
+> +			while (!try_cmpxchg(((u32 *)(regs + APIC_IRR + i * 0x10)),
+> +			       &irr_val, irr_val | pir_val));
+> +
+>   			prev_irr_val = irr_val;
+> -			irr_val |= xchg(&pir[i], 0);
+> -			*((u32 *)(regs + APIC_IRR + i * 0x10)) = irr_val;
+> -			if (prev_irr_val != irr_val) {
+> -				max_updated_irr =
+> -					__fls(irr_val ^ prev_irr_val) + vec;
+> -			}
+> +			irr_val |= pir_val;
+> +
+> +			if (prev_irr_val != irr_val)
+> +				max_updated_irr = __fls(irr_val ^ prev_irr_val) + vec;
+
+We can write this a bit more cleanly too, and avoid unnecessary
+try_cmpxchg too:
+
+prev_irr_val = irr_val;
+do
+	irr_val = prev_irr_val | pir_val;
+while (prev_irr_val != irr_val &&
+        !try_cmpxchg(p_irr, &prev_irr_val, irr_val));
+
+if (prev_irr_val != irr_val)
+	max_updated_irr = __fls(irr_val ^ prev_irr_val) + vec;
+
+If this looks okay to you, I'll queue the patches for -rc3 and also Cc 
+them for inclusion in stable kernels.
+
+Paolo
 
