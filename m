@@ -2,84 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 881C6757E33
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:52:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 037CF757E5F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:56:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232556AbjGRNwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 09:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50234 "EHLO
+        id S233019AbjGRN4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 09:56:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232908AbjGRNwO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:52:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A2AF97
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 06:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689688286;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nQE+ECYXertmxQmnjGXdYM0wCD7EJx6wVGHXR+lHouc=;
-        b=OdXepaUGpHUPbFr1rWHiAG0tFYeMsGqo8r4mVbbUMwnyZBTJoZL6aJ9md4aVWkyM2iVOO3
-        9LP7nQe9c+s/0/SxwmGQzRE4ESLZW7euMTk53SqC5GOaEsNbuWukN1JHTs2vCDh/L9mFK9
-        Kl9/t0daJWmYrhwhdDzbsLw4cUnBHG8=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-312-WJafcOn2Nf2A5tvpyYHCZg-1; Tue, 18 Jul 2023 09:51:24 -0400
-X-MC-Unique: WJafcOn2Nf2A5tvpyYHCZg-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6237c937691so53123866d6.0
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 06:51:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689688284; x=1690293084;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nQE+ECYXertmxQmnjGXdYM0wCD7EJx6wVGHXR+lHouc=;
-        b=HEWPfNKNCTQMPM5jdjPgYt7UhxXx3HTAQERRx2ZHiPC8XeqrwlgTaoCmAX1Qcg//rs
-         ANVBa2tF1UqxBcs730BvNKECOCFixPDJjPQZfKKfeQ60cYLiGAtQwWxaNdk1i5VBCOqy
-         NJcQnhuOMdhVoadUS/FhWPbkJ4rL6OpZnSaQMwJ4rpRHcHmy46T/H9lB8V3y4LFdvxGQ
-         Djy/dq/uLU18QJvlWYUYccVwilfjndOCE4dtCHDd+BawuxrHdneLM2aSub2QS2p3dJxj
-         6BcS7j2Kg/SkgasmxiU3KMSxlmSNEHxZCZ2iwQcceHBspuxFXCJGsJ8IUrHCtHJzSYuq
-         l97g==
-X-Gm-Message-State: ABy/qLbYgFxH2dPVZa1CEgaR1By+DbSk6Ocsi/bigNkUkKKS9glew6Nl
-        6y3yDfutTPOeXnFw8EE/bEBC4Gn9ncNBLDAn8DrY5t2doWv3u8GuhAX5sjsi5Dw8nMT+uzSua7M
-        x9j99/7t9UCLE
-X-Received: by 2002:a05:6214:300a:b0:637:2eb:6c23 with SMTP id ke10-20020a056214300a00b0063702eb6c23mr13702739qvb.18.1689688283817;
-        Tue, 18 Jul 2023 06:51:23 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlE8cekRjzkERg8v4oOdF3HpmUKDTKckd6xPnZCWJY9tjq+p9BwONtxIfmhEO75w7E/fQPekxA==
-X-Received: by 2002:a05:6214:300a:b0:637:2eb:6c23 with SMTP id ke10-20020a056214300a00b0063702eb6c23mr13702714qvb.18.1689688283523;
-        Tue, 18 Jul 2023 06:51:23 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-94.retail.telecomitalia.it. [79.46.200.94])
-        by smtp.gmail.com with ESMTPSA id f18-20020a0cf3d2000000b00637873ff0f3sm743721qvm.15.2023.07.18.06.51.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 06:51:23 -0700 (PDT)
-Date:   Tue, 18 Jul 2023 15:51:18 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v1 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Message-ID: <k7rovmw7abzkwhngbqwgg74qgkcvq2ggygo46y6skkxnchgqcj@7yabz52oh4sr>
-References: <20230717210051.856388-1-AVKrasnov@sberdevices.ru>
- <20230717210051.856388-5-AVKrasnov@sberdevices.ru>
+        with ESMTP id S232994AbjGRN4C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 09:56:02 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE26F126;
+        Tue, 18 Jul 2023 06:55:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689688553; x=1721224553;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WAXAV7Ct4CxXqsHOgXGaiFzwO0cD4nG7w8vXlqG7Yds=;
+  b=DsXWy/c1A3d/7OQYMaHCL/eqh+++O2QACWejmbhpJsqboIkiK7oP0S7w
+   mDKhZWzV+807UbbOKpkbyRtRDym0mIR/hB0b8UwglpN0pWrpgrow3Sh9n
+   sgSxgGEzr807FyV/rxMGJJkRVK+YcCZUzCFfqRoSTwmpVwp0VuYvBXuGi
+   dP7UvQawDVzy5WLTLqF9nzsuagIMb8QpWNCKHweO9yYJjSsi2kTjP0z5L
+   kcX4ToSTPf9r5IWOow4EMDRhp8yvM266rO7FUQlykUONzf+OXj2ACB9di
+   DWbc/eIqFNIW8cWkcl0chVTyopOwT6KsUNO7D7ohvnUdIDx376oTgSMPo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="452590525"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="452590525"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:55:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="970250916"
+X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
+   d="scan'208";a="970250916"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by fmsmga006.fm.intel.com with ESMTP; 18 Jul 2023 06:55:52 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
+Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@linux.intel.com, peterx@redhat.com,
+        jasowang@redhat.com, shameerali.kolothum.thodi@huawei.com,
+        lulu@redhat.com, suravee.suthikulpanit@amd.com,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: [PATCH v15 00/26] Add vfio_device cdev for iommufd support
+Date:   Tue, 18 Jul 2023 06:55:25 -0700
+Message-Id: <20230718135551.6592-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230717210051.856388-5-AVKrasnov@sberdevices.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,370 +69,299 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 12:00:51AM +0300, Arseniy Krasnov wrote:
->This adds handling of MSG_ZEROCOPY flag on transmission path: if this
->flag is set and zerocopy transmission is possible, then non-linear skb
->will be created and filled with the pages of user's buffer. Pages of
->user's buffer are locked in memory by 'get_user_pages()'. Second thing
->that this patch does is replace type of skb owning: instead of calling
->'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
->change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
->of socket, so to decrease this field correctly proper skb destructor is
->needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> Changelog:
-> v5(big patchset) -> v1:
->  * Refactorings of 'if' conditions.
->  * Remove extra blank line.
->  * Remove 'frag_off' field unneeded init.
->  * Add function 'virtio_transport_fill_skb()' which fills both linear
->    and non-linear skb with provided data.
->
-> net/vmw_vsock/virtio_transport_common.c | 260 ++++++++++++++++++------
-> 1 file changed, 197 insertions(+), 63 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 26a4d10da205..1fb0a0f694c6 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -37,73 +37,115 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
-> 	return container_of(t, struct virtio_transport, transport);
-> }
->
->-/* Returns a new packet on success, otherwise returns NULL.
->- *
->- * If NULL is returned, errp is set to a negative errno.
->- */
->-static struct sk_buff *
->-virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
->-			   size_t len,
->-			   u32 src_cid,
->-			   u32 src_port,
->-			   u32 dst_cid,
->-			   u32 dst_port)
->-{
->-	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
->-	struct virtio_vsock_hdr *hdr;
->-	struct sk_buff *skb;
->-	void *payload;
->-	int err;
->+static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
->+				       size_t max_to_send)
->+{
->+	struct iov_iter *iov_iter;
->
->-	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->-	if (!skb)
->-		return NULL;
->+	if (!info->msg)
->+		return false;
->
->-	hdr = virtio_vsock_hdr(skb);
->-	hdr->type	= cpu_to_le16(info->type);
->-	hdr->op		= cpu_to_le16(info->op);
->-	hdr->src_cid	= cpu_to_le64(src_cid);
->-	hdr->dst_cid	= cpu_to_le64(dst_cid);
->-	hdr->src_port	= cpu_to_le32(src_port);
->-	hdr->dst_port	= cpu_to_le32(dst_port);
->-	hdr->flags	= cpu_to_le32(info->flags);
->-	hdr->len	= cpu_to_le32(len);
->+	iov_iter = &info->msg->msg_iter;
->
->-	if (info->msg && len > 0) {
->-		payload = skb_put(skb, len);
->-		err = memcpy_from_msg(payload, info->msg, len);
->-		if (err)
->-			goto out;
->+	/* Data is simple buffer. */
->+	if (iter_is_ubuf(iov_iter))
->+		return true;
->
->-		if (msg_data_left(info->msg) == 0 &&
->-		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
->-			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+	if (!iter_is_iovec(iov_iter))
->+		return false;
->
->-			if (info->msg->msg_flags & MSG_EOR)
->-				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->-		}
->+	if (iov_iter->iov_offset)
->+		return false;
->+
->+	/* We can't send whole iov. */
->+	if (iov_iter->count > max_to_send)
->+		return false;
->+
->+	return true;
->+}
->+
->+static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
->+					   struct sk_buff *skb,
->+					   struct msghdr *msg,
->+					   bool zerocopy)
->+{
->+	struct ubuf_info *uarg;
->+
->+	if (msg->msg_ubuf) {
->+		uarg = msg->msg_ubuf;
->+		net_zcopy_get(uarg);
->+	} else {
->+		struct iov_iter *iter = &msg->msg_iter;
->+		struct ubuf_info_msgzc *uarg_zc;
->+		int len;
->+
->+		/* Only ITER_IOVEC or ITER_UBUF are allowed and
->+		 * checked before.
->+		 */
->+		if (iter_is_iovec(iter))
->+			len = iov_length(iter->__iov, iter->nr_segs);
->+		else
->+			len = iter->count;
->+
->+		uarg = msg_zerocopy_realloc(sk_vsock(vsk),
->+					    len,
->+					    NULL);
->+		if (!uarg)
->+			return -1;
->+
->+		uarg_zc = uarg_to_msgzc(uarg);
->+		uarg_zc->zerocopy = zerocopy ? 1 : 0;
-> 	}
->
->-	if (info->reply)
->-		virtio_vsock_skb_set_reply(skb);
->+	skb_zcopy_init(skb, uarg);
->
->-	trace_virtio_transport_alloc_pkt(src_cid, src_port,
->-					 dst_cid, dst_port,
->-					 len,
->-					 info->type,
->-					 info->op,
->-					 info->flags);
->+	return 0;
->+}
->
->-	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
->-		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
->-		goto out;
->+static int virtio_transport_fill_skb(struct sk_buff *skb,
->+				     struct virtio_vsock_pkt_info *info,
->+				     size_t len,
->+				     bool zcopy)
->+{
->+	if (zcopy) {
->+		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
->+					      &info->msg->msg_iter,
->+					      len);
->+	} else {
->+		void *payload;
->+		int err;
->+
->+		payload = skb_put(skb, len);
->+		err = memcpy_from_msg(payload, info->msg, len);
->+		if (err)
->+			return -1;
->+
->+		if (msg_data_left(info->msg))
->+			return 0;
->+
->+		return 0;
-> 	}
->+}
->
->-	return skb;
->+static void virtio_transport_init_hdr(struct sk_buff *skb,
->+				      struct virtio_vsock_pkt_info *info,
->+				      u32 src_cid,
->+				      u32 src_port,
->+				      u32 dst_cid,
->+				      u32 dst_port,
->+				      size_t len)
->+{
->+	struct virtio_vsock_hdr *hdr;
->
->-out:
->-	kfree_skb(skb);
->-	return NULL;
->+	hdr = virtio_vsock_hdr(skb);
->+	hdr->type	= cpu_to_le16(info->type);
->+	hdr->op		= cpu_to_le16(info->op);
->+	hdr->src_cid	= cpu_to_le64(src_cid);
->+	hdr->dst_cid	= cpu_to_le64(dst_cid);
->+	hdr->src_port	= cpu_to_le32(src_port);
->+	hdr->dst_port	= cpu_to_le32(dst_port);
->+	hdr->flags	= cpu_to_le32(info->flags);
->+	hdr->len	= cpu_to_le32(len);
-> }
->
-> static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
->@@ -214,6 +256,70 @@ static u16 virtio_transport_get_type(struct sock *sk)
-> 		return VIRTIO_VSOCK_TYPE_SEQPACKET;
-> }
->
->+static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
->+						  struct virtio_vsock_pkt_info *info,
->+						  size_t payload_len,
->+						  bool zcopy,
->+						  u32 dst_cid,
->+						  u32 dst_port,
->+						  u32 src_cid,
->+						  u32 src_port)
+Existing VFIO provides group-centric user APIs for userspace. Userspace
+opens the /dev/vfio/$group_id first before getting device fd and hence
+getting access to device. This is not the desired model for iommufd. Per
+the conclusion of community discussion[1], iommufd provides device-centric
+kAPIs and requires its consumer (like VFIO) to be device-centric user
+APIs. Such user APIs are used to associate device with iommufd and also
+the I/O address spaces managed by the iommufd.
 
-Before this patch the order of dst_* and src_* fields were reversed
-for virtio_transport_alloc_skb(), why are we changing it?
+This series first introduces a per device file structure to be prepared
+for further enhancement and refactors the kvm-vfio code to be prepared
+for accepting device file from userspace. After this, adds a mechanism for
+blocking device access before iommufd bind. Then refactors the vfio to be
+able to handle cdev paths (e.g. iommufd binding, no-iommufd, [de]attach ioas).
+This refactor includes making the device_open exclusive between the group
+and the cdev path, only allow single device open in cdev path; vfio-iommufd
+code is also refactored to support cdev. e.g. split the vfio_iommufd_bind()
+into two steps. Eventually, adds the cdev support for vfio device and the
+new ioctls, then makes group infrastructure optional as it is not needed
+when vfio device cdev is compiled.
 
-I think putting them back as before (and following the same ordering in
-the new functions as well) makes the patch easier to review and the code
-easier to maintain.
+This series is based on some preparation works done to vfio emulated devices[2]
+and vfio pci hot reset enhancements[3]. Per discussion[4], this series does not
+support cdev for physical devices that do not have IOMMU. Such devices only
+have group-centric user APIs.
+
+This series is a prerequisite for iommu nesting for vfio device[5] [6].
+
+The complete code can be found in below branch, simple tests done to the
+legacy group path and the cdev path. QEMU changes are in upstreaming[7]
+and the complete code can be found at[8]
+
+https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v15
+(config CONFIG_IOMMUFD=y CONFIG_VFIO_DEVICE_CDEV=y)
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+
+[1] https://lore.kernel.org/kvm/BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com/
+[2] https://lore.kernel.org/kvm/20230327093351.44505-1-yi.l.liu@intel.com/ - merged
+[3] https://lore.kernel.org/kvm/20230718105542.4138-1-yi.l.liu@intel.com/
+[4] https://lore.kernel.org/kvm/20230525095939.37ddb8ce.alex.williamson@redhat.com/
+[5] https://lore.kernel.org/linux-iommu/20230511143844.22693-1-yi.l.liu@intel.com/
+[6] https://lore.kernel.org/linux-iommu/20230511145110.27707-1-yi.l.liu@intel.com/#t
+[7] https://lore.kernel.org/qemu-devel/20230712072528.275577-1-zhenzhong.duan@intel.com/
+[8] https://github.com/yiliu1765/qemu/tree/zhenzhong/iommufd_rfcv4
+
+Change log:
+
+v15:
+ - Add Jason's r-b to patch 14, 17, 19, 21, 23, 24 and 26 of cdev v14
+ - Tweak the iommufd_ctx_from_fd() in patch 20 per Jason's suggestion (Jason)
+ - Return -ENOTTY in vfio_df_ioctl_bind_iommufd() stub function (Jason)
+ - Add t-b from Zhenzhong (wrote a selftest app to verify functions of this patchset
+		           by referencing https://github.com/awilliam/tests/)
+
+v14: https://lore.kernel.org/kvm/20230711025928.6438-1-yi.l.liu@intel.com/
+ - Add Jason's r-b to patch 10, 11, 12, 13, 15, 16, 17 and 23 of cdev v12
+ - Refine iommufd_access_detach() (Jason)
+ - Split the device_del() movement to be a separate patch (Jason)
+ - Move kvm !null test into _vfio_device_get_kvm_safe() to save some lines
+   and rename it to be vfio_device_get_kvm_safe() (Jason)
+ - Make VFIO_DEVICE_CDEV depending on !SPAPR_TCE_IOMMU to suit the fact that
+   SPAPR_TCE_IOMMU does not support cdev (Alex)
+ - Add iommufd_ctx_from_fd() to replace vfio_get_iommufd_from_fd() (Jason)
+ - Check cdev only ioctls in vfio_device_fops_unl_ioctl() (Jason)
+ - patch 17, 19, 20 and 21 of v14 is newly added per above review comemnts.
+
+v13: https://lore.kernel.org/kvm/20230616093946.68711-1-yi.l.liu@intel.com/
+ - vfio_device_first_open() and vfio_device_last_close() to be vfio_df_device_first_open()
+   vfio_df_device_last_close() (Alex)
+ - Define struct vfio_device_file::access_granted as u8 and also place the u32 devid to
+   be behind this flag as this structure access is hot, so needs to avoid too much hole
+   in the structure (Alex)
+ - Use u8 instead bool in the struct vfio_device for the flags (Alex)
+ - Define BIND, ATTACH, DETACH ioctl behind VFIO_DEVICE_FEATURE whose offset is 17 (Alex)
+ - Drop patch 20, 21, 22 of v12 (Alex)
+ - Per the patch drop, still needs to detect the physical devices that do not have
+   IOMMU in the cdev registration as cdev does not support such devices. Per the
+   suggestion from Jason, lift the IOMMU_CAP_CACHE_COHERENCY check to be in vfio_main.c
+   so that it can fail the registration of such devices if only cdev is compiled. (Jason, Alex)
+ - Refine the vfio.rst doc, highlight that the cdev device access is stil bound with
+   iommu group. (Alex)
+ - Reaffirm t-b from below folks:
+   Nicolin Chen - Test nesting branch which is based on cdev v12, the test is done on ARM64 (SMMUv3)
+   Matthew Rosato - vfio-pci, vfio-ap, vfio-ccw under container, compat and cdev mode, and nesting
+                    test on SMMUv3 and Intel.
+   Yanting Jiang - regression tests with NIC passthrough on Intel platform
+
+v12: https://lore.kernel.org/kvm/20230602121653.80017-1-yi.l.liu@intel.com/#r
+ - Rename vfio_device_xx() to be vfio_df_xx() if the object is vfio_device_file (Alex)
+ - Refine patch 10 of v11 (Alex)
+ - Add new device ioctls from offset 18 (Alex)
+ - Add a patch to check group->type for noiommu test, no need to check
+   CONFIG_VFIO_NOIOMMU (Alex)
+ - Refine the logic of vfio_device_set_noiommu() per Alex's suggestion. The noiommu
+   taint is moved to __vfio_register_dev(), also add a check on group type before
+   calling vfio_device_set_noiommu() as only physical device can be noiommu device.
+ - Drop noiommu support for cdev, patch 16 of v11 is dropped, the related changes
+   are in patch 17 - 24 of this series.
+
+v11: https://lore.kernel.org/kvm/20230513132827.39066-1-yi.l.liu@intel.com/
+ - Add back the noiommu determination at vfio device registration patch and
+   put it prior to compiling vfio_group code optionally as compiling vfio_group
+   optionaly is the major reason for it.
+ - Fix a typo related to SPAPR (Cédric Le Goater)
+ - Add t-b from Shameerali Kolothum Thodi, tested on HiSilicon D06(ARM64) platform
+   with a NIC pass-through
+
+v10: https://lore.kernel.org/kvm/20230426150321.454465-1-yi.l.liu@intel.com/
+ - Drop patch 03 of v9 as vfio_file_is_group() is still needed by pci hot reset path
+ - Drop 11 of v9 per the change of noiommu support
+ - Move patch 18 of v9 to hot-reset series [3]
+ - vfio_file_has_device_access() is dropped as no usage now (hot-reset does not accept
+   device fd, hence no need for this helper)
+ - Minor change to patch 02, mainly make it back to patch v2 of v6 which is before
+   splitting hot-reset series
+ - Minor change in 10 and 11 due to rebase
+ - Functional changes in patch 19, 20 and 21 per the latest noiommu support
+   policy. noiommu device can be bound to valid iommufd now, this is different
+   from the prior policy in which noiommu device is not allowed to be bound to
+   valid iommufd. So may pay more attention on the three patches, previous r-b
+   and t-b are dropped for these three patches.
+
+v9: https://lore.kernel.org/kvm/20230401151833.124749-1-yi.l.liu@intel.com/
+ - Use smp_load_acquire() in vfio_file_has_device_access() for df->access_granted (Alex)
+ - Fix lock init in patch 16 of v8 (Jon Pan-Doh)
+ - Split patch 20 of v8 (Alex)
+ - Refine noiommu logic in BIND_IOMMUFD (Alex)
+ - Remove dev_cookie in BIND_IOMMUFD ioctl (Alex, Jason)
+ - Remove static_assert in ATTACH/DETACH ioctl handling (Alex)
+ - Remove device->ops->bind_iommufd presence check in BIND_IOMMUFD/ATTACH/DETACH handling (Alex)
+ - Remove VFIO dependecny for VFIO_CONTAINER as VFIO_GROUP should imply it (Alex)
+ - Improve the documentation per suggestions from Alex on patch 24 of v8 (Alex)
+ - Remove WARN_ON(df->group) in vfio_device_group_uses_container() of patch 11
+ - Add r-b from Kevin to patch 18/19 of v8
+ - Add r-b from Jason to patch 03/10/11 of v8
+ - Add t-b from Yanting Jiang and Nicolin Chen
+
+v8: https://lore.kernel.org/kvm/20230327094047.47215-1-yi.l.liu@intel.com/
+ - Add patch 18 to determine noiommu device at vfio_device registration (Jason)
+ - Add patch 19 to name noiommu device with "noiommu-" prefix to be par with
+   group path
+ - Add r-b from Kevin
+ - Add t-b from Terrence
+
+v7: https://lore.kernel.org/kvm/20230316125534.17216-1-yi.l.liu@intel.com/
+ - Split the vfio-pci hot reset changes to be separate patch series (Jason, Kevin)
+ - More polish on no-iommufd support (patch 11 - 13) in cdev path (Kevin)
+ - iommufd_access_detach() in patch 16 is added by Nic for emulated devices (Kevin, Jason)
+
+v6: https://lore.kernel.org/kvm/20230308132903.465159-1-yi.l.liu@intel.com/#t
+ - Add r-b from Jason on patch 01 - 08 and 13 in v5
+ - Based on the prerequisite mini-series which makes vfio emulated devices
+   be prepared to cdev (Jason)
+ - Add the approach to pass a set of device fds to do hot reset ownership
+   check, while the zero-length array approach is also kept. (Jason, Kevin, Alex)
+ - Drop patch 10 of v5, it is reworked by patch 13 and 17 in v6 (Jason)
+ - Store vfio_group pointer in vfio_device_file to check if user is using
+   legacy vfio container (Jason)
+ - Drop the is_cdev_device flag (introduced in patch 14 of v5) as the group
+   pointer stored in vfio_device_file can cover it.
+ - Add iommu_group check in the cdev no-iommu path patch 24 (Kevin)
+ - Add t-b from Terrence, Nicolin and Matthew (thanks for the help, some patches
+   are new in this version, so I just added t-b to the patches that are also
+   in v5 and no big change, for others would add in this version).
+
+v5: https://lore.kernel.org/kvm/20230227111135.61728-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin on patch 08, 13, 14, 15 and 17.
+ - Rename patch 02 to limit the change for KVM facing kAPIs. The vfio pci
+   hot reset path only accepts group file until patch 09. (Kevin)
+ - Update comment around smp_load_acquire(&df->access_granted) (Yan)
+ - Adopt Jason's suggestion on the vfio pci hot reset path, passing zero-length
+   fd array to indicate using bound iommufd_ctx as ownership check. (Jason, Kevin)
+ - Direct read df->access_granted value in vfio_device_cdev_close() (Kevin, Yan, Jason)
+ - Wrap the iommufd get/put into a helper to refine the error path of
+   vfio_device_ioctl_bind_iommufd(). (Yan)
+
+v4: https://lore.kernel.org/kvm/20230221034812.138051-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin on patch 09/10
+ - Add a line in devices/vfio.rst to emphasize user should add group/device to
+   KVM prior to invoke open_device op which may be called in the VFIO_GROUP_GET_DEVICE_FD
+   or VFIO_DEVICE_BIND_IOMMUFD ioctl.
+ - Modify VFIO_GROUP/VFIO_DEVICE_CDEV Kconfig dependency (Alex)
+ - Select VFIO_GROUP for SPAPR (Jason)
+ - Check device fully-opened in PCI hotreset path for device fd (Jason)
+ - Set df->access_granted in the caller of vfio_device_open() since
+   the caller may fail in other operations, but df->access_granted
+   does not allow a true to false change. So it should be set only when
+   the open path is really done successfully. (Yan, Kevin)
+ - Fix missing iommufd_ctx_put() in the cdev path (Yan)
+ - Fix an issue found in testing exclusion between group and cdev path.
+   vfio_device_cdev_close() should check df->access_granted before heading
+   to other operations.
+ - Update vfio.rst for iommufd/cdev
+
+v3: https://lore.kernel.org/kvm/20230213151348.56451-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin on patch 03, 06, 07, 08.
+ - Refine the group and cdev path exclusion. Remove vfio_device:single_open;
+   add vfio_group::cdev_device_open_cnt to achieve exlucsion between group
+   path and cdev path (Kevin, Jason)
+ - Fix a bug in the error handling path (Yan Zhao)
+ - Address misc remarks from Kevin
+
+v2: https://lore.kernel.org/kvm/20230206090532.95598-1-yi.l.liu@intel.com/
+ - Add r-b from Kevin and Eric on patch 01 02 04.
+ - "Split kvm/vfio: Provide struct kvm_device_ops::release() insted of ::destroy()"
+   from this series and got applied. (Alex, Kevin, Jason, Mathhew)
+ - Add kvm_ref_lock to protect vfio_device_file->kvm instead of reusing
+   dev_set->lock as dead-lock is observed with vfio-ap which would try to
+   acquire kvm_lock. This is opposite lock order with kvm_device_release()
+   which holds kvm_lock first and then hold dev_set->lock. (Kevin)
+ - Use a separate ioctl for detaching IOAS. (Alex)
+ - Rename vfio_device_file::single_open to be is_cdev_device (Kevin, Alex)
+ - Move the vfio device cdev code into device_cdev.c and add a VFIO_DEVICE_CDEV
+   kconfig for it. (Kevin, Jason)
+
+v1: https://lore.kernel.org/kvm/20230117134942.101112-1-yi.l.liu@intel.com/
+ - Fix the circular refcount between kvm struct and device file reference. (JasonG)
+ - Address comments from KevinT
+ - Remained the ioctl for detach, needs to Alex's taste
+   (https://lore.kernel.org/kvm/BN9PR11MB5276BE9F4B0613EE859317028CFF9@BN9PR11MB5276.namprd11.prod.outlook.com/)
+
+rfc: https://lore.kernel.org/kvm/20221219084718.9342-1-yi.l.liu@intel.com/
 
 Thanks,
-Stefano
+	Yi Liu
 
->+{
->+	struct sk_buff *skb;
->+	size_t skb_len;
->+
->+	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
->+
->+	if (!zcopy)
->+		skb_len += payload_len;
->+
->+	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
->+	if (!skb)
->+		return NULL;
->+
->+	virtio_transport_init_hdr(skb, info, src_cid, src_port,
->+				  dst_cid, dst_port,
->+				  payload_len);
->+
->+	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
->+	 * owner of skb without check to update 'sk_wmem_alloc'.
->+	 */
->+	if (vsk)
->+		skb_set_owner_w(skb, sk_vsock(vsk));
->+
->+	if (info->msg && payload_len > 0) {
->+		int err;
->+
->+		err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
->+		if (err)
->+			goto out;
->+
->+		if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
->+			struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
->+
->+			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+
->+			if (info->msg->msg_flags & MSG_EOR)
->+				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+		}
->+	}
->+
->+	if (info->reply)
->+		virtio_vsock_skb_set_reply(skb);
->+
->+	trace_virtio_transport_alloc_pkt(src_cid, src_port,
->+					 dst_cid, dst_port,
->+					 payload_len,
->+					 info->type,
->+					 info->op,
->+					 info->flags);
->+
->+	return skb;
->+out:
->+	kfree_skb(skb);
->+	return NULL;
->+}
->+
-> /* This function can only be used on connecting/connected sockets,
->  * since a socket assigned to a transport is required.
->  *
->@@ -222,10 +328,12 @@ static u16 virtio_transport_get_type(struct sock *sk)
-> static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> 					  struct virtio_vsock_pkt_info *info)
-> {
->+	u32 max_skb_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-> 	u32 src_cid, src_port, dst_cid, dst_port;
-> 	const struct virtio_transport *t_ops;
-> 	struct virtio_vsock_sock *vvs;
-> 	u32 pkt_len = info->pkt_len;
->+	bool can_zcopy = false;
-> 	u32 rest_len;
-> 	int ret;
->
->@@ -254,22 +362,48 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
-> 		return pkt_len;
->
->+	if (info->msg) {
->+		/* If zerocopy is not enabled by 'setsockopt()', we behave as
->+		 * there is no MSG_ZEROCOPY flag set.
->+		 */
->+		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
->+			info->msg->msg_flags &= ~MSG_ZEROCOPY;
->+
->+		if (info->msg->msg_flags & MSG_ZEROCOPY)
->+			can_zcopy = virtio_transport_can_zcopy(info, pkt_len);
->+
->+		if (can_zcopy)
->+			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
->+					    (MAX_SKB_FRAGS * PAGE_SIZE));
->+	}
->+
-> 	rest_len = pkt_len;
->
-> 	do {
-> 		struct sk_buff *skb;
-> 		size_t skb_len;
->
->-		skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
->+		skb_len = min(max_skb_len, rest_len);
->
->-		skb = virtio_transport_alloc_skb(info, skb_len,
->-						 src_cid, src_port,
->-						 dst_cid, dst_port);
->+		skb = virtio_transport_alloc_skb(vsk, info, skb_len, can_zcopy,
->+						 dst_cid, dst_port,
->+						 src_cid, src_port);
-> 		if (!skb) {
-> 			ret = -ENOMEM;
-> 			break;
-> 		}
->
->+		/* This is last skb to send this portion of data. */
->+		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
->+		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
->+			if (virtio_transport_init_zcopy_skb(vsk, skb,
->+							    info->msg,
->+							    can_zcopy)) {
->+				ret = -ENOMEM;
->+				break;
->+			}
->+		}
->+
-> 		virtio_transport_inc_tx_pkt(vvs, skb);
->
-> 		ret = t_ops->send_pkt(skb);
->@@ -934,11 +1068,11 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
-> 	if (!t)
-> 		return -ENOTCONN;
->
->-	reply = virtio_transport_alloc_skb(&info, 0,
->-					   le64_to_cpu(hdr->dst_cid),
->-					   le32_to_cpu(hdr->dst_port),
->+	reply = virtio_transport_alloc_skb(NULL, &info, 0, false,
-> 					   le64_to_cpu(hdr->src_cid),
->-					   le32_to_cpu(hdr->src_port));
->+					   le32_to_cpu(hdr->src_port),
->+					   le64_to_cpu(hdr->dst_cid),
->+					   le32_to_cpu(hdr->dst_port));
-> 	if (!reply)
-> 		return -ENOMEM;
->
->-- 
->2.25.1
->
+Nicolin Chen (1):
+  iommufd/device: Add iommufd_access_detach() API
+
+Yi Liu (25):
+  vfio: Allocate per device file structure
+  vfio: Refine vfio file kAPIs for KVM
+  vfio: Accept vfio device file in the KVM facing kAPI
+  kvm/vfio: Prepare for accepting vfio device fd
+  kvm/vfio: Accept vfio device file from userspace
+  vfio: Pass struct vfio_device_file * to vfio_device_open/close()
+  vfio: Block device access via device fd until device is opened
+  vfio: Add cdev_device_open_cnt to vfio_group
+  vfio: Make vfio_df_open() single open for device cdev path
+  vfio-iommufd: Move noiommu compat validation out of
+    vfio_iommufd_bind()
+  vfio-iommufd: Split bind/attach into two steps
+  vfio: Record devid in vfio_device_file
+  vfio-iommufd: Add detach_ioas support for physical VFIO devices
+  vfio-iommufd: Add detach_ioas support for emulated VFIO devices
+  vfio: Move vfio_device_group_unregister() to be the first operation in
+    unregister
+  vfio: Move device_del() before waiting for the last vfio_device
+    registration refcount
+  vfio: Add cdev for vfio_device
+  vfio: Test kvm pointer in _vfio_device_get_kvm_safe()
+  iommufd: Add iommufd_ctx_from_fd()
+  vfio: Avoid repeated user pointer cast in vfio_device_fops_unl_ioctl()
+  vfio: Add VFIO_DEVICE_BIND_IOMMUFD
+  vfio: Add VFIO_DEVICE_[AT|DE]TACH_IOMMUFD_PT
+  vfio: Move the IOMMU_CAP_CACHE_COHERENCY check in
+    __vfio_register_dev()
+  vfio: Compile vfio_group infrastructure optionally
+  docs: vfio: Add vfio device cdev description
+
+ Documentation/driver-api/vfio.rst             | 147 ++++++++++-
+ Documentation/virt/kvm/devices/vfio.rst       |  47 ++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |   1 +
+ drivers/iommu/iommufd/Kconfig                 |   4 +-
+ drivers/iommu/iommufd/device.c                |  74 +++++-
+ drivers/iommu/iommufd/iommufd_private.h       |   2 +
+ drivers/iommu/iommufd/main.c                  |  24 ++
+ drivers/s390/cio/vfio_ccw_ops.c               |   1 +
+ drivers/s390/crypto/vfio_ap_ops.c             |   1 +
+ drivers/vfio/Kconfig                          |  27 ++
+ drivers/vfio/Makefile                         |   3 +-
+ drivers/vfio/device_cdev.c                    | 228 +++++++++++++++++
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c             |   1 +
+ drivers/vfio/group.c                          | 173 ++++++++-----
+ drivers/vfio/iommufd.c                        |  94 ++++---
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |   2 +
+ drivers/vfio/pci/mlx5/main.c                  |   1 +
+ drivers/vfio/pci/vfio_pci.c                   |   1 +
+ drivers/vfio/platform/vfio_amba.c             |   1 +
+ drivers/vfio/platform/vfio_platform.c         |   1 +
+ drivers/vfio/vfio.h                           | 218 ++++++++++++++--
+ drivers/vfio/vfio_main.c                      | 239 ++++++++++++++++--
+ include/linux/iommufd.h                       |   2 +
+ include/linux/vfio.h                          |  46 +++-
+ include/uapi/linux/kvm.h                      |  13 +-
+ include/uapi/linux/vfio.h                     |  71 ++++++
+ samples/vfio-mdev/mbochs.c                    |   1 +
+ samples/vfio-mdev/mdpy.c                      |   1 +
+ samples/vfio-mdev/mtty.c                      |   1 +
+ virt/kvm/vfio.c                               | 137 +++++-----
+ 30 files changed, 1318 insertions(+), 244 deletions(-)
+ create mode 100644 drivers/vfio/device_cdev.c
+
+-- 
+2.34.1
 
