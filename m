@@ -2,101 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5F9F757EE3
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 16:01:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE136757D51
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:23:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233219AbjGROBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 10:01:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58288 "EHLO
+        id S231180AbjGRNXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 09:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233129AbjGROA6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 10:00:58 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932AE1BCD;
-        Tue, 18 Jul 2023 07:00:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689688840; x=1721224840;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=m7F+bfcxslqE8nz+gTY6bLsLBtHdYH/TwQh4VN2/phU=;
-  b=a7Kd2CchCOKP65+qJTCKzfzpD0zqZ9gT8L3reqGMPzhj69T0DeKTEy3p
-   az+/m5K8UeVr6ZIzB23ShZA6YBnw+KDQIOptty6tovheB3yrLH7fN1JIB
-   DnNKY1ca7ytSyL6g3QUQSodsaCCSKvlS+kwREfTIzi+lfmTm4iocYoB3c
-   V3M0mLGK7Qz/wjEG6cZqN1asaE5W2bUcXpjmHMX9NCevBRTIkjBAQ0R3Y
-   bwW15ZebLst4ivfK9+GsxOhXxmAjiBSbuBk88UdEEnBZ0U6KKXnmWfwYo
-   9Jt8gIIRi5U+uRyoAaN7eVZanxLDRZs0ZrQrl5ckLabJUGxALjHp9kfFR
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="363676209"
-X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="363676209"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:59:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="1054291208"
-X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="1054291208"
-Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.123])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:59:02 -0700
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v2 8/8] KVM: x86: Advertise LASS CPUID to user space
-Date:   Tue, 18 Jul 2023 21:18:44 +0800
-Message-Id: <20230718131844.5706-9-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230718131844.5706-1-guang.zeng@intel.com>
-References: <20230718131844.5706-1-guang.zeng@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229774AbjGRNXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 09:23:09 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6952A3
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 06:23:07 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36IDBR77006965
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 13:23:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pp1; bh=DNlui8jtDrLKgQaTpSeid7AK5hxfSWmp7wDbD8c+QaI=;
+ b=Nsm6AFTmF11bf5swc7tZx+cp749XaZ1LPsOWDMOzhMBudJEAdrhKPp464MfIs8Nee/6R
+ TnGeablMVrxNold6wrsoGcB0fyNqe4md0oqiWexLLbuj/NPozcR1UYUFY1uCKwxdmVcw
+ bYwNCUaE/lSknBBjrGEyFuhzpijyRh6hEJabsOgCXdsZrpQkN+Vq0EqSqFcvImrZVe/2
+ VqT1MonONFho625idgA9NNDF5BCRCXprS36jwUIeBsiMlzt7MR/A+rrhjtluxSRqH51v
+ j2HMtyn41djrvvPxzdbgnfk9HKOhGCunqGg7f18bYgt9msz9cyuyVs+Yws88hU1XJfmI Dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwu0s912m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 13:23:06 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36IDCJR7011068
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 13:23:06 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwu0s9122-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jul 2023 13:23:06 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36I6xs3r029098;
+        Tue, 18 Jul 2023 13:23:05 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3rv6smd2s6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jul 2023 13:23:05 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36IDN1Je19923488
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jul 2023 13:23:01 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E66920043;
+        Tue, 18 Jul 2023 13:23:01 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2F3BA20040;
+        Tue, 18 Jul 2023 13:23:01 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Jul 2023 13:23:01 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com
+Subject: [GIT PULL 0/2] KVM: s390: pv: Two small fixes for 6.5
+Date:   Tue, 18 Jul 2023 15:22:58 +0200
+Message-ID: <20230718132300.34947-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dPugcz6UfN47oqdV4XcnRanpEYB3vsB3
+X-Proofpoint-ORIG-GUID: GDITzuyh0prf5qcsxOG8Nj9wxJmgfGuK
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-18_09,2023-07-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=705 mlxscore=0 adultscore=0 spamscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2306200000 definitions=main-2307180119
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linear address space separation (LASS) is an independent mechanism
-to enforce the mode-based protection that can prevent user-mode
-accesses to supervisor-mode addresses, and vice versa. Because the
-LASS protections are applied before paging, malicious software can
-not acquire any paging-based timing information to compromise the
-security of system.
+Hi Paolo,
 
-The CPUID bit definition to support LASS:
-CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6]
+just two small bugfixes for asynchronous destroy.
 
-Advertise LASS to user space to support LASS virtualization.
 
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-Tested-by: Xuelian Guo <xuelian.guo@intel.com>
----
- arch/x86/kvm/cpuid.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+please pull, thanks!
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0c9660a07b23..a7fafe99ffe4 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -646,9 +646,8 @@ void kvm_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
- 
- 	kvm_cpu_cap_mask(CPUID_7_1_EAX,
--		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
--		F(FZRM) | F(FSRS) | F(FSRC) |
--		F(AMX_FP16) | F(AVX_IFMA)
-+		F(AVX_VNNI) | F(AVX512_BF16) | F(LASS) | F(CMPCCXADD) |
-+		F(FZRM) | F(FSRS) | F(FSRC) | F(AMX_FP16) | F(AVX_IFMA)
- 	);
- 
- 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
+Claudio
+
+
+The following changes since commit fdf0eaf11452d72945af31804e2a1048ee1b574c:
+
+  Linux 6.5-rc2 (2023-07-16 15:10:37 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.5-1
+
+for you to fetch changes up to c2fceb59bbda16468bda82b002383bff59de89ab:
+
+  KVM: s390: pv: fix index value of replaced ASCE (2023-07-18 11:21:51 +0200)
+
+----------------------------------------------------------------
+Two fixes for asynchronous destroy
+
+----------------------------------------------------------------
+Claudio Imbrenda (2):
+      KVM: s390: pv: simplify shutdown and fix race
+      KVM: s390: pv: fix index value of replaced ASCE
+
+ arch/s390/kvm/pv.c  | 8 ++++++--
+ arch/s390/mm/gmap.c | 1 +
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
 -- 
-2.27.0
+2.41.0
 
