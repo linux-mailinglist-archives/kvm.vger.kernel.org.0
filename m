@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D13C1757EBA
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:58:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A2CE3757EBC
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:58:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232291AbjGRN6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 09:58:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56260 "EHLO
+        id S232220AbjGRN6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 09:58:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233222AbjGRN6L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:58:11 -0400
+        with ESMTP id S233049AbjGRN6R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 09:58:17 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC4197;
-        Tue, 18 Jul 2023 06:57:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33CB135;
+        Tue, 18 Jul 2023 06:57:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689688669; x=1721224669;
+  t=1689688676; x=1721224676;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7JlSkImz3ShAuDaiIZ+sh4zHfMa5cWhubnsyO0SRRR4=;
-  b=Y7ivL4yyG0JFTPoI81YHAO6nbW0BIraFB0kT6NlX8KQ+qu0R6aRxAp12
-   8V0QfzwBNZfz2fDvH7JhI+7+T1hUplRFtrIdv0qjou+f8KacPxXNTh9TB
-   jWwSpZm1YB3TFBAP2soRPZWLz5IlrTC01uuL7e9r8xWCQVrntsxmYF3uN
-   CRhuPEayY7Gq5lTOpqMiNrBME1h6y8/9Y+8Wtnc7Wy+dbCaQ/432MrAGA
-   Mk7T+nN4LdfyFHOi1f0ayA+xG0QH/43Qj4eBuncBE7wLUBKRJlisNNhoJ
-   ZWK2JvZXtWy4RLnxzFS/0O8SfRwAGAdCgOIdGw7NnJ89bTnGSFyGrhrk9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="452590787"
+  bh=ehYluT/f0F+1shIL+ejEfudcxMv7lj3Qour9CZ02eSM=;
+  b=KQJJRb32pVNs6t5Qx3FNa0nqz6w50+Y5hmkomhyLAyAeY7P+5kNCfeAq
+   oCZErsEXSnkyES+R7batmA9AF/9x1sNs27LlRLMAYKuPc94xvpEenrH5H
+   vl7cLUWScROlSwrONkL6PE5lN1hwsqdee2j4AT5WWRaUuVB/slWFXv82M
+   GpMqngTGmHvBT0Tu2B9hLC7MBht+XBvCqQbj/sgX14S5xKqHUqRc/KUJz
+   vK9vY/VbHwGrXpbSnIkkKo9ZsMBkBsXmHmO6IZZPuhlgrew4ieuMibsRw
+   Y248yZxvjD32NflFMyzHZTr3QGpoWzHrna+xsGqcc2aLQRdxw1pFYvA5i
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="452590803"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="452590787"
+   d="scan'208";a="452590803"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:56:10 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:56:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="970251096"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="970251118"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="970251096"
+   d="scan'208";a="970251118"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Jul 2023 06:56:09 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 18 Jul 2023 06:56:10 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -51,9 +51,9 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com, zhenzhong.duan@intel.com,
         clegoate@redhat.com
-Subject: [PATCH v15 20/26] iommufd: Add iommufd_ctx_from_fd()
-Date:   Tue, 18 Jul 2023 06:55:45 -0700
-Message-Id: <20230718135551.6592-21-yi.l.liu@intel.com>
+Subject: [PATCH v15 21/26] vfio: Avoid repeated user pointer cast in vfio_device_fops_unl_ioctl()
+Date:   Tue, 18 Jul 2023 06:55:46 -0700
+Message-Id: <20230718135551.6592-22-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230718135551.6592-1-yi.l.liu@intel.com>
 References: <20230718135551.6592-1-yi.l.liu@intel.com>
@@ -70,64 +70,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's common to get a reference to the iommufd context from a given file
-descriptor. So adds an API for it. Existing users of this API are compiled
-only when IOMMUFD is enabled, so no need to have a stub for the IOMMUFD
-disabled case.
+This adds a local variable to store the user pointer cast result from arg.
+It avoids the repeated casts in the code when more ioctls are added.
 
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommufd/main.c | 24 ++++++++++++++++++++++++
- include/linux/iommufd.h      |  1 +
- 2 files changed, 25 insertions(+)
+ drivers/vfio/vfio_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
-index 32ce7befc8dd..4bbb20dff430 100644
---- a/drivers/iommu/iommufd/main.c
-+++ b/drivers/iommu/iommufd/main.c
-@@ -377,6 +377,30 @@ struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
- }
- EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_file, IOMMUFD);
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 5f7c3151d8c0..a2744cb64c6d 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -1146,6 +1146,7 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+ {
+ 	struct vfio_device_file *df = filep->private_data;
+ 	struct vfio_device *device = df->device;
++	void __user *uptr = (void __user *)arg;
+ 	int ret;
  
-+/**
-+ * iommufd_ctx_from_fd - Acquires a reference to the iommufd context
-+ * @fd: File descriptor to obtain the reference from
-+ *
-+ * Returns a pointer to the iommufd_ctx, otherwise ERR_PTR. On success
-+ * the caller is responsible to call iommufd_ctx_put().
-+ */
-+struct iommufd_ctx *iommufd_ctx_from_fd(int fd)
-+{
-+	struct file *file;
-+
-+	file = fget(fd);
-+	if (!file)
-+		return ERR_PTR(-EBADF);
-+
-+	if (file->f_op != &iommufd_fops) {
-+		fput(file);
-+		return ERR_PTR(-EBADFD);
-+	}
-+	/* fget is the same as iommufd_ctx_get() */
-+	return file->private_data;
-+}
-+EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_fd, IOMMUFD);
-+
- /**
-  * iommufd_ctx_put - Put back a reference
-  * @ictx: Context to put back
-diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
-index 3a3216cb9482..9657c58813dc 100644
---- a/include/linux/iommufd.h
-+++ b/include/linux/iommufd.h
-@@ -54,6 +54,7 @@ void iommufd_ctx_get(struct iommufd_ctx *ictx);
+ 	/* Paired with smp_store_release() following vfio_df_open() */
+@@ -1158,7 +1159,7 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
  
- #if IS_ENABLED(CONFIG_IOMMUFD)
- struct iommufd_ctx *iommufd_ctx_from_file(struct file *file);
-+struct iommufd_ctx *iommufd_ctx_from_fd(int fd);
- void iommufd_ctx_put(struct iommufd_ctx *ictx);
- bool iommufd_ctx_has_group(struct iommufd_ctx *ictx, struct iommu_group *group);
+ 	switch (cmd) {
+ 	case VFIO_DEVICE_FEATURE:
+-		ret = vfio_ioctl_device_feature(device, (void __user *)arg);
++		ret = vfio_ioctl_device_feature(device, uptr);
+ 		break;
  
+ 	default:
 -- 
 2.34.1
 
