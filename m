@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C81C1757EB9
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:58:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D13C1757EBA
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:58:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233059AbjGRN6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 09:58:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56236 "EHLO
+        id S232291AbjGRN6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 09:58:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233156AbjGRN6D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:58:03 -0400
+        with ESMTP id S233222AbjGRN6L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 09:58:11 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB9519A0;
-        Tue, 18 Jul 2023 06:57:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC4197;
+        Tue, 18 Jul 2023 06:57:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689688663; x=1721224663;
+  t=1689688669; x=1721224669;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YaRGpjj7I+GMXdcc3KIUaOmLLrRW7d35dueJ3AuGdR4=;
-  b=Dbe+DLt23zfnsD8yvXFVJTLWiTV2T7sKLob5j/s2jEG2J6+hsDvwOqXV
-   gxg6nfZXw/vja64NXSkQX26TLO1H1NFnfQLVI9QtuaMY8/JqJkt1eN1WT
-   3smhSxJYDfwlHwITI0EXhUjnBz27ryEhfqVcdBzPK150q05XlYRIIHvaR
-   vbPlMesfXftIb/BcyrPSybOTKUqzlSV2UuFQ28oR5oiqPBDTOaoEBq/VK
-   tWewe7ghxiVBxGIbs/+ukIbg6OFwBO1tVtyw5YqOZvexweeZ8lLut3u+T
-   3bbox71kk8a1dw9LeCUkZ01DU3F5hQDNzPF469oMbqU+A0SCbMOtBE5Nd
+  bh=7JlSkImz3ShAuDaiIZ+sh4zHfMa5cWhubnsyO0SRRR4=;
+  b=Y7ivL4yyG0JFTPoI81YHAO6nbW0BIraFB0kT6NlX8KQ+qu0R6aRxAp12
+   8V0QfzwBNZfz2fDvH7JhI+7+T1hUplRFtrIdv0qjou+f8KacPxXNTh9TB
+   jWwSpZm1YB3TFBAP2soRPZWLz5IlrTC01uuL7e9r8xWCQVrntsxmYF3uN
+   CRhuPEayY7Gq5lTOpqMiNrBME1h6y8/9Y+8Wtnc7Wy+dbCaQ/432MrAGA
+   Mk7T+nN4LdfyFHOi1f0ayA+xG0QH/43Qj4eBuncBE7wLUBKRJlisNNhoJ
+   ZWK2JvZXtWy4RLnxzFS/0O8SfRwAGAdCgOIdGw7NnJ89bTnGSFyGrhrk9
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="452590770"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="452590787"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="452590770"
+   d="scan'208";a="452590787"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:56:09 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 06:56:10 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="970251076"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="970251096"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="970251076"
+   d="scan'208";a="970251096"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Jul 2023 06:56:08 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 18 Jul 2023 06:56:09 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -51,9 +51,9 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com, zhenzhong.duan@intel.com,
         clegoate@redhat.com
-Subject: [PATCH v15 19/26] vfio: Test kvm pointer in _vfio_device_get_kvm_safe()
-Date:   Tue, 18 Jul 2023 06:55:44 -0700
-Message-Id: <20230718135551.6592-20-yi.l.liu@intel.com>
+Subject: [PATCH v15 20/26] iommufd: Add iommufd_ctx_from_fd()
+Date:   Tue, 18 Jul 2023 06:55:45 -0700
+Message-Id: <20230718135551.6592-21-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230718135551.6592-1-yi.l.liu@intel.com>
 References: <20230718135551.6592-1-yi.l.liu@intel.com>
@@ -70,81 +70,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This saves some lines when adding the kvm get logic for the vfio_device
-cdev path.
+It's common to get a reference to the iommufd context from a given file
+descriptor. So adds an API for it. Existing users of this API are compiled
+only when IOMMUFD is enabled, so no need to have a stub for the IOMMUFD
+disabled case.
 
-This also renames _vfio_device_get_kvm_safe() to be vfio_device_get_kvm_safe().
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Tested-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/vfio/group.c     | 7 +------
- drivers/vfio/vfio.h      | 6 +++---
- drivers/vfio/vfio_main.c | 5 ++++-
- 3 files changed, 8 insertions(+), 10 deletions(-)
+ drivers/iommu/iommufd/main.c | 24 ++++++++++++++++++++++++
+ include/linux/iommufd.h      |  1 +
+ 2 files changed, 25 insertions(+)
 
-diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-index 41a09a2df690..5c17ad812313 100644
---- a/drivers/vfio/group.c
-+++ b/drivers/vfio/group.c
-@@ -160,12 +160,7 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
- static void vfio_device_group_get_kvm_safe(struct vfio_device *device)
- {
- 	spin_lock(&device->group->kvm_ref_lock);
--	if (!device->group->kvm)
--		goto unlock;
--
--	_vfio_device_get_kvm_safe(device, device->group->kvm);
--
--unlock:
-+	vfio_device_get_kvm_safe(device, device->group->kvm);
- 	spin_unlock(&device->group->kvm_ref_lock);
+diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+index 32ce7befc8dd..4bbb20dff430 100644
+--- a/drivers/iommu/iommufd/main.c
++++ b/drivers/iommu/iommufd/main.c
+@@ -377,6 +377,30 @@ struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
  }
+ EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_file, IOMMUFD);
  
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index fb8f2fac3d23..c2aa65382592 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -340,11 +340,11 @@ enum { vfio_noiommu = false };
- #endif
- 
- #ifdef CONFIG_HAVE_KVM
--void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm);
-+void vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm);
- void vfio_device_put_kvm(struct vfio_device *device);
- #else
--static inline void _vfio_device_get_kvm_safe(struct vfio_device *device,
--					     struct kvm *kvm)
-+static inline void vfio_device_get_kvm_safe(struct vfio_device *device,
-+					    struct kvm *kvm)
- {
- }
- 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 8a9ebcc6980b..5f7c3151d8c0 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -373,7 +373,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
- EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
- 
- #ifdef CONFIG_HAVE_KVM
--void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
-+void vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
- {
- 	void (*pfn)(struct kvm *kvm);
- 	bool (*fn)(struct kvm *kvm);
-@@ -381,6 +381,9 @@ void _vfio_device_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
- 
- 	lockdep_assert_held(&device->dev_set->lock);
- 
-+	if (!kvm)
-+		return;
++/**
++ * iommufd_ctx_from_fd - Acquires a reference to the iommufd context
++ * @fd: File descriptor to obtain the reference from
++ *
++ * Returns a pointer to the iommufd_ctx, otherwise ERR_PTR. On success
++ * the caller is responsible to call iommufd_ctx_put().
++ */
++struct iommufd_ctx *iommufd_ctx_from_fd(int fd)
++{
++	struct file *file;
 +
- 	pfn = symbol_get(kvm_put_kvm);
- 	if (WARN_ON(!pfn))
- 		return;
++	file = fget(fd);
++	if (!file)
++		return ERR_PTR(-EBADF);
++
++	if (file->f_op != &iommufd_fops) {
++		fput(file);
++		return ERR_PTR(-EBADFD);
++	}
++	/* fget is the same as iommufd_ctx_get() */
++	return file->private_data;
++}
++EXPORT_SYMBOL_NS_GPL(iommufd_ctx_from_fd, IOMMUFD);
++
+ /**
+  * iommufd_ctx_put - Put back a reference
+  * @ictx: Context to put back
+diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
+index 3a3216cb9482..9657c58813dc 100644
+--- a/include/linux/iommufd.h
++++ b/include/linux/iommufd.h
+@@ -54,6 +54,7 @@ void iommufd_ctx_get(struct iommufd_ctx *ictx);
+ 
+ #if IS_ENABLED(CONFIG_IOMMUFD)
+ struct iommufd_ctx *iommufd_ctx_from_file(struct file *file);
++struct iommufd_ctx *iommufd_ctx_from_fd(int fd);
+ void iommufd_ctx_put(struct iommufd_ctx *ictx);
+ bool iommufd_ctx_has_group(struct iommufd_ctx *ictx, struct iommu_group *group);
+ 
 -- 
 2.34.1
 
