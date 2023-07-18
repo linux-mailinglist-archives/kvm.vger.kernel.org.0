@@ -2,127 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E055757AB6
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 13:42:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2043E757BBA
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 14:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbjGRLme (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 07:42:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49254 "EHLO
+        id S230041AbjGRMZu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 08:25:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjGRLmc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 07:42:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9655198E
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:41:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689680473;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6mYqRmobTSmlaJDxzrk7H0sz66Ug53ixgvatsoEizE0=;
-        b=UHvAzZcqo4AqxpTwwtSuu5xbMBQ3L4helNJ1F5zloYwDjGEqcahlHwy0VNv2E9yeLHFdMQ
-        z5qotULip/yWy9HJbDqzopxcIJsmHNPk9WRE82hJa6s/aGkQtvh1L0CD93IyIJlVh7w3rg
-        fMi0xvgoidQFzU9Rn4iVJ6D/XMtB86M=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-428-6vws4KHJNL2odPZ4QV-yEg-1; Tue, 18 Jul 2023 07:41:12 -0400
-X-MC-Unique: 6vws4KHJNL2odPZ4QV-yEg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94a34d3e5ebso316136966b.3
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 04:41:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689680471; x=1692272471;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6mYqRmobTSmlaJDxzrk7H0sz66Ug53ixgvatsoEizE0=;
-        b=fes8XxjWeWMqrqp3ryu0cXSrdeIwTApbkiw02h4LlJxhSV2CCEpaZyNxI4FMMhnm2w
-         gEFlg6j/Ey3ii71xLPnEm1geamVV3LAY41VLuxDmvMHX2IhubZJQSy8KSqgg7aqSMAPu
-         ipIY7vHqHZr8HvaflHwaC8xX0GOkOqnADQzYzBqpo6+Da5zxnT1mJSp9Mju+218+YCcG
-         6Q4yOkz4cwAoywzJcFOniIYOVd9MTkhh3CVLZGlARybCPrP9QSfR6uunJAOW13y5pGBW
-         uhgTNTbsJu8V2CThmYC67e87xhug6qkRwmB2Yr/NZ2oIvrJVaGCUtB/54fYHjssQZPFT
-         bf2w==
-X-Gm-Message-State: ABy/qLYCEGrjCdY2zEZV7TZ/9UBPz9ISamCzjtgxcxpDrxh5aIdruZ1e
-        TUDrfnFq5VtaHD0UPI4TJfGRQeO2OXHLpn5+2P2IOum5gwz37AenknAUh7sGgsvyHrmsvWRcw9e
-        KMyJIG0meBo+3JSeLnKlG
-X-Received: by 2002:a17:907:1dd3:b0:978:90cc:bf73 with SMTP id og19-20020a1709071dd300b0097890ccbf73mr11470057ejc.48.1689680471333;
-        Tue, 18 Jul 2023 04:41:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEFnorFN48cFP8/ErR9y/dfNcwwMKE9ug0uTRlgEY4VxsbZO6jdC8B+PpsJ1lhsYgio3ROSbg==
-X-Received: by 2002:a17:907:1dd3:b0:978:90cc:bf73 with SMTP id og19-20020a1709071dd300b0097890ccbf73mr11470029ejc.48.1689680470983;
-        Tue, 18 Jul 2023 04:41:10 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id k2-20020a170906128200b0098e2eaec394sm904339ejb.101.2023.07.18.04.41.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jul 2023 04:41:10 -0700 (PDT)
-Message-ID: <bda79e85-c0bf-8d59-2750-d922a59bb859@redhat.com>
-Date:   Tue, 18 Jul 2023 13:41:08 +0200
+        with ESMTP id S230231AbjGRMZr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 08:25:47 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A869AE55
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 05:25:46 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36ICFJl8030834;
+        Tue, 18 Jul 2023 12:25:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=u6N+hvd5JoqV6+4Cw4qLWUImJU/KW0gqzHgq23yxHu8=;
+ b=R2a2UjznIDT7IysUT0QC0YPCZEITQ1BNTYC57259yuWAEV8MkCYTHDssF7toxzd1hjRI
+ I03f6iSHfk2Ft5LNrW5PzxL2LVA7D9naB5r4vdWoy9E/QRSUuEGfn7XmNEG4ONXgZ7wZ
+ XAWHjpF4ioMgZ0dQFjhC0WlCOGuqiGnvxdeNpnQq3CD72vGGx3xRiS80btWN74c/aGBh
+ 3jZqQbYM6doJ/+7WmwjJxn6tj2vL6x7rybUxZm+ZdVwyuXgetMfwYPyWWHTB4rIcOdhn
+ 1KkrLvvJDyo6YOLe3REg/u0ZBhV+ratIHGZuoZmEOwYQgcTd4IY9ZLx4TaOa5cPCWb2s qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwtk089h4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jul 2023 12:25:38 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36ICHHxx007461;
+        Tue, 18 Jul 2023 12:25:38 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwtk089gv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jul 2023 12:25:38 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36I8GoxY004183;
+        Tue, 18 Jul 2023 12:25:37 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3rv8g0wpaj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Jul 2023 12:25:37 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36ICPXUU19137142
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jul 2023 12:25:33 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 368FD2004D;
+        Tue, 18 Jul 2023 12:25:33 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E596D20040;
+        Tue, 18 Jul 2023 12:25:31 +0000 (GMT)
+Received: from [9.171.12.30] (unknown [9.171.12.30])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Tue, 18 Jul 2023 12:25:31 +0000 (GMT)
+Message-ID: <d2de100c-621d-126d-42e0-34bfa642cf60@linux.ibm.com>
+Date:   Tue, 18 Jul 2023 14:25:31 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v21 08/20] qapi/s390x/cpu topology: set-cpu-topology qmp
+ command
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Borislav Petkov <bp@alien8.de>
-References: <20230718091310.119672-1-mlevitsk@redhat.com>
- <20230718091310.119672-2-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/3] KVM: x86: VMX: __kvm_apic_update_irr must update the
- IRR atomically
-In-Reply-To: <20230718091310.119672-2-mlevitsk@redhat.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+ <20230630091752.67190-9-pmorel@linux.ibm.com>
+ <23b69647bf18028ce568e5c4b4078b8048b5febc.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <23b69647bf18028ce568e5c4b4078b8048b5febc.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yfdnG2zsVgDmBD9GlVRAjSd2Sr2O1i1X
+X-Proofpoint-GUID: 166wcCJgyBEafcw4iCNkA6n3GaYEbz0r
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-18_09,2023-07-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
+ adultscore=0 clxscore=1015 mlxlogscore=999 mlxscore=0 spamscore=0
+ bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307180110
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/18/23 11:13, Maxim Levitsky wrote:
-> +		irr_val = READ_ONCE(*((u32 *)(regs + APIC_IRR + i * 0x10)));
 
-Let's separate out the complicated arithmetic, as it recurs below too:
+On 7/18/23 09:54, Nina Schoetterl-Glausch wrote:
+> On Fri, 2023-06-30 at 11:17 +0200, Pierre Morel wrote:
+>> The modification of the CPU attributes are done through a monitor
+>> command.
+>>
+>> It allows to move the core inside the topology tree to optimize
+>> the cache usage in the case the host's hypervisor previously
+>> moved the CPU.
+>>
+>> The same command allows to modify the CPU attributes modifiers
+>> like polarization entitlement and the dedicated attribute to notify
+>> the guest if the host admin modified scheduling or dedication of a
+>> vCPU.
+>>
+>> With this knowledge the guest has the possibility to optimize the
+>> usage of the vCPUs.
+>>
+>> The command has a feature unstable for the moment.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-	u32 *p_irr = (u32 *)(regs + APIC_IRR + i * 0x10);
 
-> +			while (!try_cmpxchg(((u32 *)(regs + APIC_IRR + i * 0x10)),
-> +			       &irr_val, irr_val | pir_val));
-> +
->   			prev_irr_val = irr_val;
-> -			irr_val |= xchg(&pir[i], 0);
-> -			*((u32 *)(regs + APIC_IRR + i * 0x10)) = irr_val;
-> -			if (prev_irr_val != irr_val) {
-> -				max_updated_irr =
-> -					__fls(irr_val ^ prev_irr_val) + vec;
-> -			}
-> +			irr_val |= pir_val;
-> +
-> +			if (prev_irr_val != irr_val)
-> +				max_updated_irr = __fls(irr_val ^ prev_irr_val) + vec;
+Thanks,
 
-We can write this a bit more cleanly too, and avoid unnecessary
-try_cmpxchg too:
-
-prev_irr_val = irr_val;
-do
-	irr_val = prev_irr_val | pir_val;
-while (prev_irr_val != irr_val &&
-        !try_cmpxchg(p_irr, &prev_irr_val, irr_val));
-
-if (prev_irr_val != irr_val)
-	max_updated_irr = __fls(irr_val ^ prev_irr_val) + vec;
-
-If this looks okay to you, I'll queue the patches for -rc3 and also Cc 
-them for inclusion in stable kernels.
-
-Paolo
+Pierre
 
