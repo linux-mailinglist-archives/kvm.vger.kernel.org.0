@@ -2,60 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2E0B75821F
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 18:31:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB196758243
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 18:39:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232713AbjGRQbh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 12:31:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44350 "EHLO
+        id S233085AbjGRQjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 12:39:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229724AbjGRQbg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 12:31:36 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6089D10EB
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:31:34 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-345bc4a438fso141175ab.1
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:31:34 -0700 (PDT)
+        with ESMTP id S232196AbjGRQjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 12:39:16 -0400
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B64126
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:39:14 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id e9e14a558f8ab-346099c6f43so179385ab.0
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:39:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689697893; x=1690302693;
+        d=google.com; s=20221208; t=1689698354; x=1690303154;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FOUt0ycfIIC4G92ZHk96f3py83XofJ3hc7BWl3IwSXo=;
-        b=70EYw8mQUne1cNpTuVS0kMr31zvHYUt7jMEY5WFkQMZBfCcJIiLIETbDzK0JXOJ4Nb
-         o7zLGOeq5Y4Kcl59mMGBHYDHb1N2qivCEsecXmwhGzqyIktQtxxQgfZa0nuVzldc1mYK
-         1YVDEGGtjV910sPWe+g+ml5wvq3TqGoCYgLeILNgyRlGhe6eJ3lIRsm7QrAHqbIc16iO
-         xXQvaTZ84vTOaqA9NUMCMXvrhEiThuuMWZhAGrbCWnGHX7sDiEk0cnpqvdzZUB4ghQGY
-         QtT89zT9eN26NqxZPsW6fDAu67sawQDnR4GVx8BwBSuTs2HltUcGsgtm53Amj8OI093n
-         dK0g==
+        bh=GG+/1fcvh5KqnoX850UtmvkXdfZhV+IvDLNUAsjH7cc=;
+        b=TlTJiU5V+Q7OUEoY/0iRtJ7YOl8iw5mA9ajGTVmhWVCDz2388rieiZ0p1hVAdlJRrN
+         z+C5FNBA5Bhs4GTEd0P+XnMXD7aE7cHwEn3Xnw7Fkd2graDraNrbyoqN9RF18Wzf5NzK
+         psVNYtQh5Hax4YUuv9Cq+kXKBwdEQrArluQWO+rjsoSjPkvfh1rFVcDSiCznYvckC93H
+         pC3BUBy5jSxy4ZGJJpWIeM0eonL1pGTFSfffbPGAKWjxUay0BH/zW6QMQ1yKgK7bwicK
+         KXhSZ8truc0Oxx3bbcLYOVk5ujff5zNVB8oqau4fw7lRejIcK87ji4T8ISw4mkz33qRa
+         eSHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689697893; x=1690302693;
+        d=1e100.net; s=20221208; t=1689698354; x=1690303154;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FOUt0ycfIIC4G92ZHk96f3py83XofJ3hc7BWl3IwSXo=;
-        b=BPZBCAGV7GZrgfhHOglGbhfzbxJpYzaWrxWG5b1n4kcRec27KqoxkmgHEAtEb/CGNC
-         i6idtVW+5phYMz8eR5Zg8+xvnKLUurYUh8rEtmNLSppy0RCILsL9OeycUQadbFz/wNeU
-         de/e78fRTPZPNW7BVQHw69O9C+5RRg7FQWGeTrCLsJENxT2W3dKi0Rp1x+MaF15WsUpX
-         APoeXVC6c0pkuQLPTjGUuba3luwO/Ph3QkzMOH+701TM21EcUijigERr+XswWaVLx75N
-         oXwAjbgYDSWKeGMisxEHF9WAIgty8h0jzJD9tPLBWBAc0NS4AIBQVie5syPiRKyiFMIT
-         jxhA==
-X-Gm-Message-State: ABy/qLbtQadkjVeywRSUU5r5sOkxaebkTm3dMucuGhqfLkzvO1su3oms
-        SSHbAQ88BnRt6Oe1T91/wNEKnKClqcw6rM6EIJivxA==
-X-Google-Smtp-Source: APBJJlFqQdwopGyRSQ6vPehJzW/apQ8j3vOGXsWwGhXT5m1KRrmjOL5Jyef2j1KLskn4+6D/a0FXbZ81TqZtnje6akU=
-X-Received: by 2002:a05:6e02:1a0b:b0:33c:a46c:23b3 with SMTP id
- s11-20020a056e021a0b00b0033ca46c23b3mr252894ild.1.1689697893605; Tue, 18 Jul
- 2023 09:31:33 -0700 (PDT)
+        bh=GG+/1fcvh5KqnoX850UtmvkXdfZhV+IvDLNUAsjH7cc=;
+        b=gy+bk3Wb/KH/WjfpOuEsmAjqPRmC30sI2LKaNFRM0NyFQ+aqfY8b+yKO8wCMb7UbSh
+         3kD87X11Jw22EsebkLxkRLqsp2SNUTckFjD8NSfjXTfwkvUIC8gmabLmdCOFTpeGEP1I
+         qIHMaELl+fYENSV3KFFmWbt17w7REdyhqFsEQAzeqZM6YI4rz6qjuwITh62jntZ8pecY
+         JisTNxIqRlKs1PsoxlNQHkywfaI+0ex41Bl2QpGsiyrkRFlcF3PJ0MA09CeGfBk7vlQe
+         wcFhoztdzp4o+q5MnwZZxBoNUZi6chIvn5wZdU5j0OfYJPn6NV/W3t1pJhcJnP2Lm1Wl
+         L7MQ==
+X-Gm-Message-State: ABy/qLYD3q2pcpCTUpVILdk8Xl/YEZcgTB6IiK1xGTEMt1FUPuzaXYGd
+        7t2WTxE9xpJnw5dBRJeVK0EpA6NHB0sK/4clvQNVRg==
+X-Google-Smtp-Source: APBJJlEeclBbyqTcLuu/Vnmge1cXNugZ3jxBkbdI1YXf+AHLvPkW9iPFyexvlRbMwFGOxqLWLSEtQPkPAiZqdo8kXgo=
+X-Received: by 2002:a05:6e02:b2a:b0:346:90d:10c7 with SMTP id
+ e10-20020a056e020b2a00b00346090d10c7mr302973ilu.20.1689698353849; Tue, 18 Jul
+ 2023 09:39:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230715005405.3689586-1-rananta@google.com> <20230715005405.3689586-4-rananta@google.com>
- <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com> <CAJHc60zhVco3uTq97vDHMk8cgg1psPtwHT6MN1eKP1Yr18d9cw@mail.gmail.com>
- <fb52139b-5854-6370-7de3-bd87b31e3148@redhat.com>
-In-Reply-To: <fb52139b-5854-6370-7de3-bd87b31e3148@redhat.com>
+References: <20230715005405.3689586-1-rananta@google.com> <20230715005405.3689586-7-rananta@google.com>
+ <0b2b367e-30c7-672e-f249-e4100c4dff5f@redhat.com>
+In-Reply-To: <0b2b367e-30c7-672e-f249-e4100c4dff5f@redhat.com>
 From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 18 Jul 2023 09:31:20 -0700
-Message-ID: <CAJHc60yYUYnPxdC3PAM_bcd4w2JpMvZFJ6R3mQWXjqt3YMQgUg@mail.gmail.com>
-Subject: Re: [PATCH v6 03/11] KVM: Allow range-based TLB invalidation from
- common code
+Date:   Tue, 18 Jul 2023 09:39:02 -0700
+Message-ID: <CAJHc60whqQ0fnE9_Uv1GRuCYq+_DDyN_Jaw_hOgnRYx-8F7JVg@mail.gmail.com>
+Subject: Re: [PATCH v6 06/11] KVM: arm64: Implement __kvm_tlb_flush_vmid_range()
 To:     Shaoqin Huang <shahuang@redhat.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>,
@@ -78,7 +76,7 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -87,192 +85,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shaoqin,
-
-On Mon, Jul 17, 2023 at 7:49=E2=80=AFPM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
+On Tue, Jul 18, 2023 at 12:50=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com=
+> wrote:
 >
+> Hi Raghavendra,
 >
+> On 7/15/23 08:54, Raghavendra Rao Ananta wrote:
+> > Define  __kvm_tlb_flush_vmid_range() (for VHE and nVHE)
+> > to flush a range of stage-2 page-tables using IPA in one go.
+> > If the system supports FEAT_TLBIRANGE, the following patches
+> > would conviniently replace global TLBI such as vmalls12e1is
+> > in the map, unmap, and dirty-logging paths with ripas2e1is
+> > instead.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_asm.h   |  3 +++
+> >   arch/arm64/kvm/hyp/nvhe/hyp-main.c | 11 +++++++++++
+> >   arch/arm64/kvm/hyp/nvhe/tlb.c      | 30 +++++++++++++++++++++++++++++=
++
+> >   arch/arm64/kvm/hyp/vhe/tlb.c       | 23 +++++++++++++++++++++++
+> >   4 files changed, 67 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/=
+kvm_asm.h
+> > index 7d170aaa2db4..2c27cb8cf442 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -70,6 +70,7 @@ enum __kvm_host_smccc_func {
+> >       __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
+> >       __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
+> >       __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
+> > +     __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_range,
+> >       __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
+> >       __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+> >       __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr,
+> > @@ -229,6 +230,8 @@ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_=
+mmu *mmu, phys_addr_t ipa,
+> >   extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
+> >                                        phys_addr_t ipa,
+> >                                        int level);
+> > +extern void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > +                                     phys_addr_t start, unsigned long =
+pages);
+> >   extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+> >
+> >   extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nv=
+he/hyp-main.c
+> > index a169c619db60..857d9bc04fd4 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > @@ -135,6 +135,16 @@ static void handle___kvm_tlb_flush_vmid_ipa_nsh(st=
+ruct kvm_cpu_context *host_ctx
+> >       __kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
+> >   }
+> >
+> > +static void
+> > +handle___kvm_tlb_flush_vmid_range(struct kvm_cpu_context *host_ctxt)
+> > +{
+> > +     DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> > +     DECLARE_REG(phys_addr_t, start, host_ctxt, 2);
+> > +     DECLARE_REG(unsigned long, pages, host_ctxt, 3);
+> > +
+> > +     __kvm_tlb_flush_vmid_range(kern_hyp_va(mmu), start, pages);
+> > +}
+> > +
+> >   static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_=
+ctxt)
+> >   {
+> >       DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+> > @@ -327,6 +337,7 @@ static const hcall_t host_hcall[] =3D {
+> >       HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+> >       HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
+> >       HANDLE_FUNC(__kvm_tlb_flush_vmid),
+> > +     HANDLE_FUNC(__kvm_tlb_flush_vmid_range),
+> >       HANDLE_FUNC(__kvm_flush_cpu_context),
+> >       HANDLE_FUNC(__kvm_timer_set_cntvoff),
+> >       HANDLE_FUNC(__vgic_v3_read_vmcr),
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tl=
+b.c
+> > index b9991bbd8e3f..09347111c2cd 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+> > @@ -182,6 +182,36 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mm=
+u *mmu,
+> >       __tlb_switch_to_host(&cxt);
+> >   }
+> >
+> > +void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > +                             phys_addr_t start, unsigned long pages)
+> > +{
+> > +     struct tlb_inv_context cxt;
+> > +     unsigned long stride;
+> > +
+> > +     /*
+> > +      * Since the range of addresses may not be mapped at
+> > +      * the same level, assume the worst case as PAGE_SIZE
+> > +      */
+> > +     stride =3D PAGE_SIZE;
+> > +     start =3D round_down(start, stride);
+> > +
+> > +     /* Switch to requested VMID */
+> > +     __tlb_switch_to_guest(mmu, &cxt, false);
+> > +
+> > +     __flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, false=
+);
+> > +
+> > +     dsb(ish);
+> > +     __tlbi(vmalle1is);
+> > +     dsb(ish);
+> > +     isb();
+> > +
+> > +     /* See the comment in __kvm_tlb_flush_vmid_ipa() */
+> > +     if (icache_is_vpipt())
+> > +             icache_inval_all_pou();
+> > +
+> > +     __tlb_switch_to_host(&cxt);
+> > +}
+> > +
+> >   void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+> >   {
+> >       struct tlb_inv_context cxt;
+> > diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.=
+c
+> > index e69da550cdc5..4ed8a1786812 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/tlb.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+> > @@ -138,6 +138,29 @@ void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mm=
+u *mmu,
+> >       dsb(nsh);
+> >       __tlbi(vmalle1);
+> >       dsb(nsh);
+> > +
+> > +     __tlb_switch_to_host(&cxt);
+> > +}
+> > +
+> > +void __kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > +                             phys_addr_t start, unsigned long pages)
+> > +{
+> > +     struct tlb_inv_context cxt;
+> > +     unsigned long stride;
+> > +
+> > +     /*
+> > +      * Since the range of addresses may not be mapped at
+> > +      * the same level, assume the worst case as PAGE_SIZE
+> > +      */
+> > +     stride =3D PAGE_SIZE;
+> > +     start =3D round_down(start, stride);
+> > +
 >
-> On 7/18/23 00:37, Raghavendra Rao Ananta wrote:
-> > On Mon, Jul 17, 2023 at 4:40=E2=80=AFAM Shaoqin Huang <shahuang@redhat.=
-com> wrote:
-> >>
-> >>
-> >>
-> >> On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
-> >>> From: David Matlack <dmatlack@google.com>
-> >>>
-> >>> Make kvm_flush_remote_tlbs_range() visible in common code and create =
-a
-> >>> default implementation that just invalidates the whole TLB.
-> >>>
-> >>> This paves the way for several future features/cleanups:
-> >>>
-> >>>    - Introduction of range-based TLBI on ARM.
-> >>>    - Eliminating kvm_arch_flush_remote_tlbs_memslot()
-> >>>    - Moving the KVM/x86 TDP MMU to common code.
-> >>>
-> >>> No functional change intended.
-> >>>
-> >>> Signed-off-by: David Matlack <dmatlack@google.com>
-> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> >>> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> >>> ---
-> >>>    arch/x86/include/asm/kvm_host.h |  3 +++
-> >>>    arch/x86/kvm/mmu/mmu.c          |  9 ++++-----
-> >>>    arch/x86/kvm/mmu/mmu_internal.h |  3 ---
-> >>>    include/linux/kvm_host.h        |  9 +++++++++
-> >>>    virt/kvm/kvm_main.c             | 13 +++++++++++++
-> >>>    5 files changed, 29 insertions(+), 8 deletions(-)
-> >>>
-> >>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/k=
-vm_host.h
-> >>> index a2d3cfc2eb75..08900afbf2ad 100644
-> >>> --- a/arch/x86/include/asm/kvm_host.h
-> >>> +++ b/arch/x86/include/asm/kvm_host.h
-> >>> @@ -1804,6 +1804,9 @@ static inline int kvm_arch_flush_remote_tlbs(st=
-ruct kvm *kvm)
-> >>>                return -ENOTSUPP;
-> >>>    }
-> >>>
-> >>> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> >>> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gf=
-n, u64 pages);
-> >>> +
-> >>>    #define kvm_arch_pmi_in_guest(vcpu) \
-> >>>        ((vcpu) && (vcpu)->arch.handling_intr_from_guest)
-> >>>
-> >>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> >>> index ec169f5c7dce..aaa5e336703a 100644
-> >>> --- a/arch/x86/kvm/mmu/mmu.c
-> >>> +++ b/arch/x86/kvm/mmu/mmu.c
-> >>> @@ -278,16 +278,15 @@ static inline bool kvm_available_flush_remote_t=
-lbs_range(void)
-> >>>        return kvm_x86_ops.flush_remote_tlbs_range;
-> >>>    }
-> >>>
-> >>> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> >>> -                              gfn_t nr_pages)
-> >>> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gf=
-n, u64 pages)
-> >>>    {
-> >>>        int ret =3D -EOPNOTSUPP;
-> >>>
-> >>>        if (kvm_x86_ops.flush_remote_tlbs_range)
-> >>>                ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(k=
-vm, start_gfn,
-> >>> -                                                                nr_p=
-ages);
-> >>> -     if (ret)
-> >>> -             kvm_flush_remote_tlbs(kvm);
-> >>> +                                                                    =
- pages);
-> >> This will be good if parameter pages aligned with parameter kvm.
-> >>
-> > Agreed, but pulling 'pages' above brings the char count to 83. If
-> > that's acceptable, I'm happy to do it in v7.
-> > Hi Raghavendra,
+> Is there lack of switch VMID to guest?
+>         __tlb_switch_to_guest(mmu, &cxt, false);
 >
-> no need to pulling 'pages' above, just delete one tab, and add some
-> space before the pages, just like the original `nr_pages` position.
->
-Oh yes, that can be done. Thanks!
+Oh right, we should have that (I think I messed up the conflict
+resolution when rebasing the series to 6.5-rc1). Thanks for pointing
+this out! I'll fix it in v7.
 
 - Raghavendra
 > Thanks,
 > Shaoqin
-> > Thank you.
-> > Raghavendra
-> >> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> >>> +
-> >>> +     return ret;
-> >>>    }
-> >>>
-> >>>    static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int ind=
-ex);
-> >>> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_i=
-nternal.h
-> >>> index d39af5639ce9..86cb83bb3480 100644
-> >>> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> >>> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> >>> @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *k=
-vm,
-> >>>                                    struct kvm_memory_slot *slot, u64 =
-gfn,
-> >>>                                    int min_level);
-> >>>
-> >>> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> >>> -                              gfn_t nr_pages);
-> >>> -
-> >>>    /* Flush the given page (huge or not) of guest memory. */
-> >>>    static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_=
-t gfn, int level)
-> >>>    {
-> >>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> >>> index e3f968b38ae9..a731967b24ff 100644
-> >>> --- a/include/linux/kvm_host.h
-> >>> +++ b/include/linux/kvm_host.h
-> >>> @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
-> >>>    void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_=
-mode);
-> >>>
-> >>>    void kvm_flush_remote_tlbs(struct kvm *kvm);
-> >>> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pag=
-es);
-> >>>
-> >>>    #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> >>>    int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, in=
-t min);
-> >>> @@ -1486,6 +1487,14 @@ static inline int kvm_arch_flush_remote_tlbs(s=
-truct kvm *kvm)
-> >>>    }
-> >>>    #endif
-> >>>
-> >>> +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> >>> +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-> >>> +                                                gfn_t gfn, u64 pages=
-)
-> >>> +{
-> >>> +     return -EOPNOTSUPP;
-> >>> +}
-> >>> +#endif
-> >>> +
-> >>>    #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
-> >>>    void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
-> >>>    void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
-> >>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> >>> index d6b050786155..804470fccac7 100644
-> >>> --- a/virt/kvm/kvm_main.c
-> >>> +++ b/virt/kvm/kvm_main.c
-> >>> @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
-> >>>    }
-> >>>    EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
-> >>>
-> >>> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pag=
-es)
-> >>> +{
-> >>> +     if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, pages))
-> >>> +             return;
-> >>> +
-> >>> +     /*
-> >>> +      * Fall back to a flushing entire TLBs if the architecture rang=
-e-based
-> >>> +      * TLB invalidation is unsupported or can't be performed for wh=
-atever
-> >>> +      * reason.
-> >>> +      */
-> >>> +     kvm_flush_remote_tlbs(kvm);
-> >>> +}
-> >>> +
-> >>>    static void kvm_flush_shadow_all(struct kvm *kvm)
-> >>>    {
-> >>>        kvm_arch_flush_shadow_all(kvm);
-> >>
-> >> --
-> >> Shaoqin
-> >>
+>
+> > +     dsb(ishst);
+> > +     __flush_tlb_range_op(ipas2e1is, start, pages, stride, 0, 0, false=
+);
+> > +
+> > +     dsb(ish);
+> > +     __tlbi(vmalle1is);
+> > +     dsb(ish);
+> >       isb();
 > >
+> >       __tlb_switch_to_host(&cxt);
 >
 > --
 > Shaoqin
