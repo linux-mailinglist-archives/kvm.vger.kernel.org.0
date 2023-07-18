@@ -2,142 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 526DD75821D
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 18:31:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2E0B75821F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 18:31:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230389AbjGRQbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 12:31:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44262 "EHLO
+        id S232713AbjGRQbh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 12:31:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229724AbjGRQbX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 12:31:23 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04356E77
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:31:21 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36IGLEkM002012;
-        Tue, 18 Jul 2023 16:31:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=viCJs7dIgQEH5vfIlayD9iQph1ly3ILoOWjMw3Xq/vc=;
- b=PaVDjpXwsvM/yCw/svVnSH35NvZAVP27y10QiGr03Q1i08NUcmu/Kx6ihkwZH3XE7gaa
- 9BslbYdWA9CbyJcanUaGNx/38S9rTld8YPLG8W1+ConaTqWU0D8GMIykXAbJEAFXUgEe
- UnDNLMzAlhE+6+YPh8wJgIXlMN8ilzf3XklMeSHcq4XwQ0jKwM9OINTK3eAPQeXPePcB
- eUNnQkDF34/8VZaRcvvWRQc4WDeoP7Ne9wBG7OavinDCuHzW0ijL4/fYpZCIUx7B5IW/
- XQArndpgU5lBYQUPwW4hWOttDdDzj1kHGSbvnEnvCf6C/N6n81XHNX1ynK9rtHdGgbON EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwx6b879m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 16:31:08 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36IGMKMZ004759;
-        Tue, 18 Jul 2023 16:31:08 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwx6b8794-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 16:31:08 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36IEIGbN029098;
-        Tue, 18 Jul 2023 16:31:07 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3rv6smdhhy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 16:31:07 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36IGV3vL61800766
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jul 2023 16:31:03 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B29A20040;
-        Tue, 18 Jul 2023 16:31:03 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F48020043;
-        Tue, 18 Jul 2023 16:31:02 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.179.14.18])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jul 2023 16:31:01 +0000 (GMT)
-Message-ID: <9c8847ad9d8e07c2e41f9c20716ba3ed6dd6b3dc.camel@linux.ibm.com>
-Subject: Re: [PATCH v21 01/20] s390x/cpu topology: add s390 specifics to CPU
- topology
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Tue, 18 Jul 2023 18:31:01 +0200
-In-Reply-To: <20230630091752.67190-2-pmorel@linux.ibm.com>
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
-         <20230630091752.67190-2-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S229724AbjGRQbg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 12:31:36 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6089D10EB
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:31:34 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-345bc4a438fso141175ab.1
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689697893; x=1690302693;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FOUt0ycfIIC4G92ZHk96f3py83XofJ3hc7BWl3IwSXo=;
+        b=70EYw8mQUne1cNpTuVS0kMr31zvHYUt7jMEY5WFkQMZBfCcJIiLIETbDzK0JXOJ4Nb
+         o7zLGOeq5Y4Kcl59mMGBHYDHb1N2qivCEsecXmwhGzqyIktQtxxQgfZa0nuVzldc1mYK
+         1YVDEGGtjV910sPWe+g+ml5wvq3TqGoCYgLeILNgyRlGhe6eJ3lIRsm7QrAHqbIc16iO
+         xXQvaTZ84vTOaqA9NUMCMXvrhEiThuuMWZhAGrbCWnGHX7sDiEk0cnpqvdzZUB4ghQGY
+         QtT89zT9eN26NqxZPsW6fDAu67sawQDnR4GVx8BwBSuTs2HltUcGsgtm53Amj8OI093n
+         dK0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689697893; x=1690302693;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FOUt0ycfIIC4G92ZHk96f3py83XofJ3hc7BWl3IwSXo=;
+        b=BPZBCAGV7GZrgfhHOglGbhfzbxJpYzaWrxWG5b1n4kcRec27KqoxkmgHEAtEb/CGNC
+         i6idtVW+5phYMz8eR5Zg8+xvnKLUurYUh8rEtmNLSppy0RCILsL9OeycUQadbFz/wNeU
+         de/e78fRTPZPNW7BVQHw69O9C+5RRg7FQWGeTrCLsJENxT2W3dKi0Rp1x+MaF15WsUpX
+         APoeXVC6c0pkuQLPTjGUuba3luwO/Ph3QkzMOH+701TM21EcUijigERr+XswWaVLx75N
+         oXwAjbgYDSWKeGMisxEHF9WAIgty8h0jzJD9tPLBWBAc0NS4AIBQVie5syPiRKyiFMIT
+         jxhA==
+X-Gm-Message-State: ABy/qLbtQadkjVeywRSUU5r5sOkxaebkTm3dMucuGhqfLkzvO1su3oms
+        SSHbAQ88BnRt6Oe1T91/wNEKnKClqcw6rM6EIJivxA==
+X-Google-Smtp-Source: APBJJlFqQdwopGyRSQ6vPehJzW/apQ8j3vOGXsWwGhXT5m1KRrmjOL5Jyef2j1KLskn4+6D/a0FXbZ81TqZtnje6akU=
+X-Received: by 2002:a05:6e02:1a0b:b0:33c:a46c:23b3 with SMTP id
+ s11-20020a056e021a0b00b0033ca46c23b3mr252894ild.1.1689697893605; Tue, 18 Jul
+ 2023 09:31:33 -0700 (PDT)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oQxSeuEKqCgjdqdGVTq6oP4Gb2ndvhHY
-X-Proofpoint-ORIG-GUID: w8rvYo7t5ppFyk_6ZHXbjVJxYhcqUiwW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-18_12,2023-07-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 suspectscore=0 phishscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2306200000 definitions=main-2307180148
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230715005405.3689586-1-rananta@google.com> <20230715005405.3689586-4-rananta@google.com>
+ <199d18de-1214-7683-b87a-03cc7e49719a@redhat.com> <CAJHc60zhVco3uTq97vDHMk8cgg1psPtwHT6MN1eKP1Yr18d9cw@mail.gmail.com>
+ <fb52139b-5854-6370-7de3-bd87b31e3148@redhat.com>
+In-Reply-To: <fb52139b-5854-6370-7de3-bd87b31e3148@redhat.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Tue, 18 Jul 2023 09:31:20 -0700
+Message-ID: <CAJHc60yYUYnPxdC3PAM_bcd4w2JpMvZFJ6R3mQWXjqt3YMQgUg@mail.gmail.com>
+Subject: Re: [PATCH v6 03/11] KVM: Allow range-based TLB invalidation from
+ common code
+To:     Shaoqin Huang <shahuang@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ClJldmlld2VkLWJ5OiBOaW5hIFNjaG9ldHRlcmwtR2xhdXNjaCA8bnNnQGxpbnV4LmlibS5jb20+
-CgpTb21lIG5vdGVzIGJlbG93LgoKVGhlIHMzOTB4LyBwcmVmaXggaW4gdGhlIHRpdGxlIG1pZ2h0
-IHN1Z2dlc3QgdGhhdCB0aGlzIHBhdGNoCmlzIHMzOTAgc3BlY2lmaWMsIGJ1dCBpdCB0b3VjaGVz
-IGNvbW1vbiBmaWxlcy4KCk9uIEZyaSwgMjAyMy0wNi0zMCBhdCAxMToxNyArMDIwMCwgUGllcnJl
-IE1vcmVsIHdyb3RlOgo+IFMzOTAgYWRkcyB0d28gbmV3IFNNUCBsZXZlbHMsIGRyYXdlcnMgYW5k
-IGJvb2tzIHRvIHRoZSBDUFUKPiB0b3BvbG9neS4KPiBUaGUgUzM5MCBDUFUgaGF2ZSBzcGVjaWZp
-YyB0b3BvbG9neSBmZWF0dXJlcyBsaWtlIGRlZGljYXRpb24KClMzOTAgQ1BVcyBoYXZlIHNwZWNp
-ZmljIHRvcG9sb2d5IGZlYXR1cmVzIGxpa2UgZGVkaWNhdGlvbiBhbmQKZW50aXRsZW1lbnQuIFRo
-ZXNlIGluZGljYXRlIHRvIHRoZSBndWVzdCBpbmZvcm1hdGlvbiBvbiBob3N0CnZDUFUgc2NoZWR1
-bGluZyBhbmQgaGVscCB0aGUgZ3Vlc3QgbWFrZSBiZXR0ZXIgc2NoZWR1bGluZyBkZWNpc2lvbnMu
-Cgo+IGFuZCBlbnRpdGxlbWVudCB0byBnaXZlIHRvIHRoZSBndWVzdCBpbmRpY2F0aW9ucyBvbiB0
-aGUgaG9zdAo+IHZDUFVzIHNjaGVkdWxpbmcgYW5kIGhlbHAgdGhlIGd1ZXN0IHRha2UgdGhlIGJl
-c3QgZGVjaXNpb25zCj4gb24gdGhlIHNjaGVkdWxpbmcgb2YgdGhyZWFkcyBvbiB0aGUgdkNQVXMu
-Cj4gCj4gTGV0IHVzIHByb3ZpZGUgdGhlIFNNUCBwcm9wZXJ0aWVzIHdpdGggYm9va3MgYW5kIGRy
-YXdlcnMgbGV2ZWxzCj4gYW5kIFMzOTAgQ1BVIHdpdGggZGVkaWNhdGlvbiBhbmQgZW50aXRsZW1l
-bnQsCj4gCj4gU2lnbmVkLW9mZi1ieTogUGllcnJlIE1vcmVsIDxwbW9yZWxAbGludXguaWJtLmNv
-bT4KPiAtLS0KPiDCoHFhcGkvbWFjaGluZS1jb21tb24uanNvbsKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgfCAyMiArKysrKysrKysrKysrCj4gwqBxYXBpL21hY2hpbmUuanNvbsKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDIxICsrKysrKysrKystLS0KPiDCoGluY2x1ZGUvaHcv
-Ym9hcmRzLmjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDEwICsrKysrLQo+IMKg
-aW5jbHVkZS9ody9xZGV2LXByb3BlcnRpZXMtc3lzdGVtLmggfMKgIDQgKysrCj4gwqB0YXJnZXQv
-czM5MHgvY3B1LmjCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA2ICsrKysK
-PiDCoGh3L2NvcmUvbWFjaGluZS1zbXAuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCA0
-OCArKysrKysrKysrKysrKysrKysrKysrKystLS0KPiAtLQo+IMKgaHcvY29yZS9tYWNoaW5lLmPC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDQgKysrCj4gwqBody9jb3Jl
-L3FkZXYtcHJvcGVydGllcy1zeXN0ZW0uY8KgwqDCoCB8IDEzICsrKysrKysrCj4gwqBody9zMzkw
-eC9zMzkwLXZpcnRpby1jY3cuY8KgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiArKwo+IMKgc29mdG1t
-dS92bC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAg
-NiArKysrCj4gwqB0YXJnZXQvczM5MHgvY3B1LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHzCoCA3ICsrKysrCj4gwqBxYXBpL21lc29uLmJ1aWxkwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDEgKwo+IMKgcWVtdS1vcHRpb25zLmh4wqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNyArKystLQo+IMKgMTMgZmlsZXMg
-Y2hhbmdlZCwgMTM3IGluc2VydGlvbnMoKyksIDE0IGRlbGV0aW9ucygtKQo+IMKgY3JlYXRlIG1v
-ZGUgMTAwNjQ0IHFhcGkvbWFjaGluZS1jb21tb24uanNvbgo+IAo+IGRpZmYgLS1naXQgYS9xYXBp
-L21hY2hpbmUtY29tbW9uLmpzb24gYi9xYXBpL21hY2hpbmUtY29tbW9uLmpzb24KPiBuZXcgZmls
-ZSBtb2RlIDEwMDY0NAo+IGluZGV4IDAwMDAwMDAwMDAuLmJjMGQ3NjgyOWMKPiAtLS0gL2Rldi9u
-dWxsCj4gKysrIGIvcWFwaS9tYWNoaW5lLWNvbW1vbi5qc29uCj4gQEAgLTAsMCArMSwyMiBAQAo+
-ICsjIC0qLSBNb2RlOiBQeXRob24gLSotCj4gKyMgdmltOiBmaWxldHlwZT1weXRob24KPiArIwo+
-ICsjIFRoaXMgd29yayBpcyBsaWNlbnNlZCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHUEws
-IHZlcnNpb24gMiBvcgo+IGxhdGVyLgo+ICsjIFNlZSB0aGUgQ09QWUlORyBmaWxlIGluIHRoZSB0
-b3AtbGV2ZWwgZGlyZWN0b3J5Lgo+ICsKPiArIyMKPiArIyA9IE1hY2hpbmVzIFMzOTAgZGF0YSB0
-eXBlcwoKQ29tbW9uIGRlZmluaXRpb25zIGZvciBtYWNoaW5lLmpzb24gYW5kIG1hY2hpbmUtdGFy
-Z2V0Lmpzb24KCgpbLi4uXQo=
+Hi Shaoqin,
 
+On Mon, Jul 17, 2023 at 7:49=E2=80=AFPM Shaoqin Huang <shahuang@redhat.com>=
+ wrote:
+>
+>
+>
+> On 7/18/23 00:37, Raghavendra Rao Ananta wrote:
+> > On Mon, Jul 17, 2023 at 4:40=E2=80=AFAM Shaoqin Huang <shahuang@redhat.=
+com> wrote:
+> >>
+> >>
+> >>
+> >> On 7/15/23 08:53, Raghavendra Rao Ananta wrote:
+> >>> From: David Matlack <dmatlack@google.com>
+> >>>
+> >>> Make kvm_flush_remote_tlbs_range() visible in common code and create =
+a
+> >>> default implementation that just invalidates the whole TLB.
+> >>>
+> >>> This paves the way for several future features/cleanups:
+> >>>
+> >>>    - Introduction of range-based TLBI on ARM.
+> >>>    - Eliminating kvm_arch_flush_remote_tlbs_memslot()
+> >>>    - Moving the KVM/x86 TDP MMU to common code.
+> >>>
+> >>> No functional change intended.
+> >>>
+> >>> Signed-off-by: David Matlack <dmatlack@google.com>
+> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> >>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> >>> ---
+> >>>    arch/x86/include/asm/kvm_host.h |  3 +++
+> >>>    arch/x86/kvm/mmu/mmu.c          |  9 ++++-----
+> >>>    arch/x86/kvm/mmu/mmu_internal.h |  3 ---
+> >>>    include/linux/kvm_host.h        |  9 +++++++++
+> >>>    virt/kvm/kvm_main.c             | 13 +++++++++++++
+> >>>    5 files changed, 29 insertions(+), 8 deletions(-)
+> >>>
+> >>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/k=
+vm_host.h
+> >>> index a2d3cfc2eb75..08900afbf2ad 100644
+> >>> --- a/arch/x86/include/asm/kvm_host.h
+> >>> +++ b/arch/x86/include/asm/kvm_host.h
+> >>> @@ -1804,6 +1804,9 @@ static inline int kvm_arch_flush_remote_tlbs(st=
+ruct kvm *kvm)
+> >>>                return -ENOTSUPP;
+> >>>    }
+> >>>
+> >>> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> >>> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gf=
+n, u64 pages);
+> >>> +
+> >>>    #define kvm_arch_pmi_in_guest(vcpu) \
+> >>>        ((vcpu) && (vcpu)->arch.handling_intr_from_guest)
+> >>>
+> >>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> >>> index ec169f5c7dce..aaa5e336703a 100644
+> >>> --- a/arch/x86/kvm/mmu/mmu.c
+> >>> +++ b/arch/x86/kvm/mmu/mmu.c
+> >>> @@ -278,16 +278,15 @@ static inline bool kvm_available_flush_remote_t=
+lbs_range(void)
+> >>>        return kvm_x86_ops.flush_remote_tlbs_range;
+> >>>    }
+> >>>
+> >>> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> >>> -                              gfn_t nr_pages)
+> >>> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gf=
+n, u64 pages)
+> >>>    {
+> >>>        int ret =3D -EOPNOTSUPP;
+> >>>
+> >>>        if (kvm_x86_ops.flush_remote_tlbs_range)
+> >>>                ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(k=
+vm, start_gfn,
+> >>> -                                                                nr_p=
+ages);
+> >>> -     if (ret)
+> >>> -             kvm_flush_remote_tlbs(kvm);
+> >>> +                                                                    =
+ pages);
+> >> This will be good if parameter pages aligned with parameter kvm.
+> >>
+> > Agreed, but pulling 'pages' above brings the char count to 83. If
+> > that's acceptable, I'm happy to do it in v7.
+> > Hi Raghavendra,
+>
+> no need to pulling 'pages' above, just delete one tab, and add some
+> space before the pages, just like the original `nr_pages` position.
+>
+Oh yes, that can be done. Thanks!
+
+- Raghavendra
+> Thanks,
+> Shaoqin
+> > Thank you.
+> > Raghavendra
+> >> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> >>> +
+> >>> +     return ret;
+> >>>    }
+> >>>
+> >>>    static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int ind=
+ex);
+> >>> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_i=
+nternal.h
+> >>> index d39af5639ce9..86cb83bb3480 100644
+> >>> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> >>> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> >>> @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *k=
+vm,
+> >>>                                    struct kvm_memory_slot *slot, u64 =
+gfn,
+> >>>                                    int min_level);
+> >>>
+> >>> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> >>> -                              gfn_t nr_pages);
+> >>> -
+> >>>    /* Flush the given page (huge or not) of guest memory. */
+> >>>    static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_=
+t gfn, int level)
+> >>>    {
+> >>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> >>> index e3f968b38ae9..a731967b24ff 100644
+> >>> --- a/include/linux/kvm_host.h
+> >>> +++ b/include/linux/kvm_host.h
+> >>> @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+> >>>    void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_=
+mode);
+> >>>
+> >>>    void kvm_flush_remote_tlbs(struct kvm *kvm);
+> >>> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pag=
+es);
+> >>>
+> >>>    #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+> >>>    int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, in=
+t min);
+> >>> @@ -1486,6 +1487,14 @@ static inline int kvm_arch_flush_remote_tlbs(s=
+truct kvm *kvm)
+> >>>    }
+> >>>    #endif
+> >>>
+> >>> +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> >>> +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> >>> +                                                gfn_t gfn, u64 pages=
+)
+> >>> +{
+> >>> +     return -EOPNOTSUPP;
+> >>> +}
+> >>> +#endif
+> >>> +
+> >>>    #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> >>>    void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
+> >>>    void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
+> >>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> >>> index d6b050786155..804470fccac7 100644
+> >>> --- a/virt/kvm/kvm_main.c
+> >>> +++ b/virt/kvm/kvm_main.c
+> >>> @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+> >>>    }
+> >>>    EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
+> >>>
+> >>> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pag=
+es)
+> >>> +{
+> >>> +     if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, pages))
+> >>> +             return;
+> >>> +
+> >>> +     /*
+> >>> +      * Fall back to a flushing entire TLBs if the architecture rang=
+e-based
+> >>> +      * TLB invalidation is unsupported or can't be performed for wh=
+atever
+> >>> +      * reason.
+> >>> +      */
+> >>> +     kvm_flush_remote_tlbs(kvm);
+> >>> +}
+> >>> +
+> >>>    static void kvm_flush_shadow_all(struct kvm *kvm)
+> >>>    {
+> >>>        kvm_arch_flush_shadow_all(kvm);
+> >>
+> >> --
+> >> Shaoqin
+> >>
+> >
+>
+> --
+> Shaoqin
+>
