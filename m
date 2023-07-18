@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4F1A7579D9
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 12:56:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31EFA7579DC
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 12:56:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbjGRK4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 06:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53690 "EHLO
+        id S231799AbjGRK4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 06:56:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjGRKzv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231592AbjGRKzv (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 18 Jul 2023 06:55:51 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1000C10EB;
-        Tue, 18 Jul 2023 03:55:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 140F310F0;
+        Tue, 18 Jul 2023 03:55:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1689677748; x=1721213748;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GvTsJEYrbjbwvyNF6dh2G0YfWZKd/cpA4xcAI01AMx4=;
-  b=fN3Z/FVhY0IiNcwo8HZyJ43s823ClqONUAWJborq/j8eIG/cZAgTYQxY
-   byICXFLk8WbiW1pSMS+2ytAEJhfXnmxsW7U3a/x+uJ8XfQJKivuHK2y49
-   EZMMjZ4HjPNIcgWQjZYzYzXYMSOIEHJWJN4X1Tl7ODfByT9vqTBNxMsi0
-   VF7mUudz3q8x+8vWunQGapzs68OrZFGO39YcwoZ78bwsdSpALGYcKw1t8
-   pmYWJv7ZOevSRB/0LO6H6y06A0IvYBwvwwEYIWVK0mMyVi4GJPu0J4BV9
-   lhGkEp0ujOiJa3B1rl+8NELU8qKBwM8SGmq4MRJEhkMJobrCnuvoka/ke
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="452553561"
+  bh=2kx4I+YnPJxcdyT5PnLXXnGZK3e6jUr7CMAjY67u6z4=;
+  b=G2zXpV/+tB18bWr4vXSDpfjW+KrA6kPVrlig5q+8JihTsOcUGgXYK2jz
+   qXCLg0ey7hDq3iDjQ8U6G0nAMmHJYpdAAXG0GZbxYXz3TYVVQH2r8bvZi
+   VqHQsEXHRwmnIo0fYOrHYM/5zZjNXmdazsrqez4w8W1WRRvro1Edx8sJB
+   OhCaEaXj0ti8F6QK0wvo65a4QXtul1mKGkWer1X6fDH34J9ePqEZGO5KD
+   hsLNf975XZH2tQC+f7eGfJ6iHNd+Ro8jyvZAIOWTSWBSeLvwwur1RmDhf
+   5d89tiiCz/e0LSkoEctN1PqI/gQ5pByVYndnEcE6LaHjOY9v7DhAHDoLB
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="452553572"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="452553561"
+   d="scan'208";a="452553572"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 03:55:46 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 03:55:47 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="673863808"
+X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="673863811"
 X-IronPort-AV: E=Sophos;i="6.01,214,1684825200"; 
-   d="scan'208";a="673863808"
+   d="scan'208";a="673863811"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga003.jf.intel.com with ESMTP; 18 Jul 2023 03:55:46 -0700
+  by orsmga003.jf.intel.com with ESMTP; 18 Jul 2023 03:55:47 -0700
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com, kevin.tian@intel.com
 Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
@@ -51,9 +51,9 @@ Cc:     joro@8bytes.org, robin.murphy@arm.com, cohuck@redhat.com,
         xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
         yanting.jiang@intel.com, zhenzhong.duan@intel.com,
         clegoate@redhat.com
-Subject: [PATCH v10 05/10] iommufd: Add helper to retrieve iommufd_ctx and devid
-Date:   Tue, 18 Jul 2023 03:55:37 -0700
-Message-Id: <20230718105542.4138-6-yi.l.liu@intel.com>
+Subject: [PATCH v10 06/10] vfio: Mark cdev usage in vfio_device
+Date:   Tue, 18 Jul 2023 03:55:38 -0700
+Message-Id: <20230718105542.4138-7-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230718105542.4138-1-yi.l.liu@intel.com>
 References: <20230718105542.4138-1-yi.l.liu@intel.com>
@@ -69,56 +69,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is needed by the vfio-pci driver to report affected devices in the
-hot-reset for a given device.
+This can be used to differentiate whether to report group_id or devid in
+the revised VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl. At this moment, no
+cdev path yet, so the vfio_device_cdev_opened() helper always returns false.
 
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Tested-by: Yanting Jiang <yanting.jiang@intel.com>
 Tested-by: Terrence Xu <terrence.xu@intel.com>
 Tested-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/iommu/iommufd/device.c | 12 ++++++++++++
- include/linux/iommufd.h        |  3 +++
- 2 files changed, 15 insertions(+)
+ include/linux/vfio.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index 693c2155a5da..cd5d8ab907f9 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -146,6 +146,18 @@ void iommufd_device_unbind(struct iommufd_device *idev)
- }
- EXPORT_SYMBOL_NS_GPL(iommufd_device_unbind, IOMMUFD);
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 2c137ea94a3e..2a45853773a6 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -139,6 +139,11 @@ int vfio_iommufd_emulated_attach_ioas(struct vfio_device *vdev, u32 *pt_id);
+ 	((int (*)(struct vfio_device *vdev, u32 *pt_id)) NULL)
+ #endif
  
-+struct iommufd_ctx *iommufd_device_to_ictx(struct iommufd_device *idev)
++static inline bool vfio_device_cdev_opened(struct vfio_device *device)
 +{
-+	return idev->ictx;
++	return false;
 +}
-+EXPORT_SYMBOL_NS_GPL(iommufd_device_to_ictx, IOMMUFD);
 +
-+u32 iommufd_device_to_id(struct iommufd_device *idev)
-+{
-+	return idev->obj.id;
-+}
-+EXPORT_SYMBOL_NS_GPL(iommufd_device_to_id, IOMMUFD);
-+
- static int iommufd_device_setup_msi(struct iommufd_device *idev,
- 				    struct iommufd_hw_pagetable *hwpt,
- 				    phys_addr_t sw_msi_start)
-diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
-index f241bafa03da..68defed9ea48 100644
---- a/include/linux/iommufd.h
-+++ b/include/linux/iommufd.h
-@@ -25,6 +25,9 @@ void iommufd_device_unbind(struct iommufd_device *idev);
- int iommufd_device_attach(struct iommufd_device *idev, u32 *pt_id);
- void iommufd_device_detach(struct iommufd_device *idev);
- 
-+struct iommufd_ctx *iommufd_device_to_ictx(struct iommufd_device *idev);
-+u32 iommufd_device_to_id(struct iommufd_device *idev);
-+
- struct iommufd_access_ops {
- 	u8 needs_pin_pages : 1;
- 	void (*unmap)(void *data, unsigned long iova, unsigned long length);
+ /**
+  * struct vfio_migration_ops - VFIO bus device driver migration callbacks
+  *
 -- 
 2.34.1
 
