@@ -2,124 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 344AF757D53
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:23:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8121D757DC6
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 15:36:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbjGRNXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 09:23:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57956 "EHLO
+        id S232833AbjGRNgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 09:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjGRNXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:23:09 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85337E0
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 06:23:08 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36IDBKYR006633
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 13:23:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=QR004prEE9kT/cTMpee1lOO8bSTjUwU3efmMhel5tn8=;
- b=Tmq2Bp55OHevBBtqDu6JowMLKbVv+AB2WxIjPTrXu6HCQRW/nISmIH+tOHTS8WO01al1
- COrt41W+3db7JHEkV3aRxk4kbs2T8ER3SgT8U503hfv15K4ulenaON1yNyBdfHHG5jlv
- H1QozwTQalNpqffcZEL6EI92z/6+0MEUT6eLVEk7GDMvGrMRWTi9XgiGXN4E0pMQwC1/
- 14wYZGwwJcPBpN45xRB98g5RFdOi7+0FdLE8sxGf7sI+t2rDvrKzG95+eNYVVxfYvY23
- u2jfqB7WLG5lmhFKGndCUSvB8dePu763L2bhL/nqCfkpkSRjBPkRAr5X2HO+24zA4ibt JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwu0s9138-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 13:23:07 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36IDCwfv013707
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 13:23:07 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwu0s912t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 13:23:07 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36ICMi3j031116;
-        Tue, 18 Jul 2023 13:23:06 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3rv79jjsbt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 13:23:06 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36IDN2xU12780062
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jul 2023 13:23:02 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A4EC20043;
-        Tue, 18 Jul 2023 13:23:02 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C01FF2004D;
-        Tue, 18 Jul 2023 13:23:01 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Jul 2023 13:23:01 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, borntraeger@de.ibm.com
-Subject: [GIT PULL 2/2] KVM: s390: pv: fix index value of replaced ASCE
-Date:   Tue, 18 Jul 2023 15:23:00 +0200
-Message-ID: <20230718132300.34947-3-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230718132300.34947-1-imbrenda@linux.ibm.com>
-References: <20230718132300.34947-1-imbrenda@linux.ibm.com>
+        with ESMTP id S232773AbjGRNgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 09:36:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C690E9
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 06:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689687336;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r2LaaFEmvvvB0xki9wu2GO0q7MFq/vIR8nWYjwGiino=;
+        b=IhwX5hhCfFDxYcuOvowkqeFEZlPq2cTgK+UAJA7JJIShNM/7PZpmASZsVRXTfYooeI11nS
+        BCMpP2kgGvgLKfdQ8BEw4/26Lm4iZV/7kveVIcNhivmpuDhzPz33C9mnXkxyzRj+9lzB6G
+        18SmQ5PyQ/FRoz+Ltr83Ob8eCzpHWEU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-625-87NrImQPOWCenR87xlqKbQ-1; Tue, 18 Jul 2023 09:35:35 -0400
+X-MC-Unique: 87NrImQPOWCenR87xlqKbQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3144bf68a03so3188484f8f.2
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 06:35:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689687333; x=1692279333;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r2LaaFEmvvvB0xki9wu2GO0q7MFq/vIR8nWYjwGiino=;
+        b=ivR9jpSzEx6snOxhMzf0JTQCeYSNhwlJ16N55+4H0Zb1Gy+4Zi4RBBjy/RqNuy5uAH
+         Lh/SGzaXx863oxa5LExRary3hRST9KqRYPnQzCUMb1FwVtuYQEa3fX9ogVzNFkA39PKZ
+         pHSBEW2+8tbQJAu0CpEst0sKLiaGb7isQQ8kDe16k2Gei4V8sRJDOB3qhAwA4Rzg2bOp
+         u03Cvsn9HQwFVzlUW2Qh96s1Wl/q7Y+e/Er0jtWJ7tIOwmXwivLdX1amOJkZUFlajvXM
+         3OA8gFcUMM64LuL2WuUU/5xYRt8CviCmkEmR3e6NW30Xrs5xRt87WiW96km4Ef44q8YV
+         QV2w==
+X-Gm-Message-State: ABy/qLaxmBF4c9vfOPPCzbOSH0WEj04eRk5oWVTdYlXR+J02PCvF/Bcz
+        JHpKmEHvcPA16s7s5gLYk5GtAST+OzMv1WrIty2CzPqnJK9rMnTi9THqu09h+7JzSDQfIQDvbUI
+        DNC7lyCh/+RMG
+X-Received: by 2002:adf:ea10:0:b0:314:35ce:a0e7 with SMTP id q16-20020adfea10000000b0031435cea0e7mr11759514wrm.16.1689687333461;
+        Tue, 18 Jul 2023 06:35:33 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEZWL+9fkZLh/smKE0EoU4uJcDq3ujLvyCnHIQA62ARVRcw+TfSmReG38Mw3lrq4NLZkhkg2w==
+X-Received: by 2002:adf:ea10:0:b0:314:35ce:a0e7 with SMTP id q16-20020adfea10000000b0031435cea0e7mr11759501wrm.16.1689687333166;
+        Tue, 18 Jul 2023 06:35:33 -0700 (PDT)
+Received: from starship ([77.137.131.138])
+        by smtp.gmail.com with ESMTPSA id k22-20020a5d5256000000b0031455482d1fsm2446514wrc.47.2023.07.18.06.35.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 06:35:32 -0700 (PDT)
+Message-ID: <f867061cdc25ee887e43ebf6164733b309ccd631.camel@redhat.com>
+Subject: Re: [PATCH 1/3] KVM: x86: VMX: __kvm_apic_update_irr must update
+ the IRR atomically
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>
+Date:   Tue, 18 Jul 2023 16:35:30 +0300
+In-Reply-To: <bda79e85-c0bf-8d59-2750-d922a59bb859@redhat.com>
+References: <20230718091310.119672-1-mlevitsk@redhat.com>
+         <20230718091310.119672-2-mlevitsk@redhat.com>
+         <bda79e85-c0bf-8d59-2750-d922a59bb859@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LaGlUILWMqz3kiAsZHkPyAq4bKkR2T_w
-X-Proofpoint-ORIG-GUID: MHyILlpn664leQBS1L8KbofSWnHbPnIB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-18_09,2023-07-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=959 mlxscore=0 adultscore=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 phishscore=0 priorityscore=1501
- clxscore=1015 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2306200000 definitions=main-2307180119
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The index field of the struct page corresponding to a guest ASCE should
-be 0. When replacing the ASCE in s390_replace_asce(), the index of the
-new ASCE should also be set to 0.
+У вт, 2023-07-18 у 13:41 +0200, Paolo Bonzini пише:
+> On 7/18/23 11:13, Maxim Levitsky wrote:
+> > +		irr_val = READ_ONCE(*((u32 *)(regs + APIC_IRR + i * 0x10)));
+> 
+> Let's separate out the complicated arithmetic, as it recurs below too:
+> 
+> 	u32 *p_irr = (u32 *)(regs + APIC_IRR + i * 0x10);
 
-Having the wrong index might lead to the wrong addresses being passed
-around when notifying pte invalidations, and eventually to validity
-intercepts (VM crash) if the prefix gets unmapped and the notifier gets
-called with the wrong address.
+No objections at all for this change, I wanted to have a minimal patch.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Fixes: faa2f72cb356 ("KVM: s390: pv: leak the topmost page table when destroy fails")
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-ID: <20230705111937.33472-3-imbrenda@linux.ibm.com>
----
- arch/s390/mm/gmap.c | 1 +
- 1 file changed, 1 insertion(+)
+> 
+> > +			while (!try_cmpxchg(((u32 *)(regs + APIC_IRR + i * 0x10)),
+> > +			       &irr_val, irr_val | pir_val));
+> > +
+> >   			prev_irr_val = irr_val;
+> > -			irr_val |= xchg(&pir[i], 0);
+> > -			*((u32 *)(regs + APIC_IRR + i * 0x10)) = irr_val;
+> > -			if (prev_irr_val != irr_val) {
+> > -				max_updated_irr =
+> > -					__fls(irr_val ^ prev_irr_val) + vec;
+> > -			}
+> > +			irr_val |= pir_val;
+> > +
+> > +			if (prev_irr_val != irr_val)
+> > +				max_updated_irr = __fls(irr_val ^ prev_irr_val) + vec;
+> 
+> We can write this a bit more cleanly too, and avoid unnecessary
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 989ebd0912b4..9c8af31be970 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2853,6 +2853,7 @@ int s390_replace_asce(struct gmap *gmap)
- 	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
- 	if (!page)
- 		return -ENOMEM;
-+	page->index = 0;
- 	table = page_to_virt(page);
- 	memcpy(table, gmap->table, 1UL << (CRST_ALLOC_ORDER + PAGE_SHIFT));
- 
--- 
-2.41.0
+To be honest as far as I see, no matter what to do with this function, it is still
+a bit complicated IMHO:
+
+The root cause of the complexity in this function is that it does two things at the same time -
+copies both the new bits to IRR and also counts the max_irr.
+
+It would be so much cleaner to first copy new bits from PIR to irr (and that can be done
+with 'lock or' or even by setting each bit with atomic bit set (in this way the setting of the bits
+will be pretty much the same as what other users of IRR do (set bit atomically + set irr_pending).
+
+And then let the common code count the max_irr.
+
+I doubt this will affect performance in any way, but I don't have a good way to measure it,
+so I won't be arguing about it.
+
+On the other hand, I am thinking now that maybe I should make the cmpxchg conditional on
+apicv beeing inhibited, as otherwise it works for nothing and actually might affect performance.
+
+This though might in theory cause a race if a sender incorrectly thinks that this's vCPU APICv is
+inhibited or not.
+
+It probalby doesn't matter as the only reason for APICv to be inhibited is that AutoEOI thing which
+should happen just once when the guest boots.
+
+
+I also have another idea - I can make the IPI senders still set bits in the PIR even if APICv is inhibited, 
+then there is no race to worry about although then the bits will always have to be copied from PIR to IRR
+(but then again APICv inhibition is rare).
+
+
+
+> try_cmpxchg too:
+> 
+> prev_irr_val = irr_val;
+> do
+> 	irr_val = prev_irr_val | pir_val;
+> while (prev_irr_val != irr_val &&
+>         !try_cmpxchg(p_irr, &prev_irr_val, irr_val));
+> 
+> if (prev_irr_val != irr_val)
+> 	max_updated_irr = __fls(irr_val ^ prev_irr_val) + vec;
+> 
+> If this looks okay to you, I'll queue the patches for -rc3 and also Cc 
+> them for inclusion in stable kernels.
+
+No objections for this change as well.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Paolo
+> 
+
 
