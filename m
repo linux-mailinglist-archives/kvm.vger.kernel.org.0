@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36911758669
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 23:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A106175888B
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 00:34:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbjGRVDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 17:03:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58534 "EHLO
+        id S231509AbjGRWeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 18:34:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbjGRVDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 17:03:47 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9CDC0;
-        Tue, 18 Jul 2023 14:03:45 -0700 (PDT)
+        with ESMTP id S229573AbjGRWes (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 18:34:48 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB33CBD;
+        Tue, 18 Jul 2023 15:34:47 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hdrCY3j1LOF987MlsQPtIHdoZThiHcH2lk95JRfixczSGZTTxhqvgWV1DrxDrzsEiqF6SxhoR4JTHqWxcY5RG7t5qyR3RKNkjv3AbbPOcVD7m8tWgGQdYKlq+edg8g8S9e5hgRDuRqVniMIUcrdHVoZ4epmxzQN8Ok4NTW4Z5vpvbxMnQdyCBeeERpTcObK5QEpL71Q95+L4SyIkCTxzytd8TZtQex0D+aYBlYkBl9iS7CgVuSREQcs7zSbOCY+j8BM4Qz2YBW+iB++caz0v9r/4qMMLRY/KE8zLkgwgCTAp70aKIK9z+ZPWlAOKSaLwXCAGA4jUyrDPTJYZbhkyGA==
+ b=frYhNuwFTiUkHUp0pVoo49Fh2zSygWpfk/+hESePeINE/E9sgW/n0rClBSg1y+QC0IzBUBEjyIxB5//OLrdZ/Ed6p8SUxnH51B8dP59uNATm8tSsQfG0jEjOSOR82ox/Z9Uxs7eSA01ZSmn7d2ehPTLk80M0bip3cDSb95BJkshOMjOTVG+RYgV5NzUgjjwKEydQ0nXWI53LN+WL60HH0hmJRmWPTQhhpbCwtxAqku6V+gRKKS0e4MZBXqtDbyjcVrOFkZysKcgFeFOprbXDuOYCTu7sqw5pRaCiloMQ54JDUKnXQigrgO0UsN7LDYxLye1LeUOYH4vSSebCX3hZeA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=732s8hCenZ2uI8bN9F3NsEmzykefme6Vz2jBT0usn6M=;
- b=VOWwbZYDO8xXH4iEQkBDxhuYIIb2orgOpGG8fiRo7hgyXCYxuMKQm3BCfQrBc/aiqGMSULcLtd+RwlOsUagxLDhP53iG9Lgcl7biP8u5nGG6gYAWMSNAph1dAtj3ROlJMVwCllmFZvKAMs0bdBQyxHIR9fxSscNyzt4uB1/2Mmq67vc/XsPwMf3odcInficen5RfSUkx/sPc4nVVoRrxyXwSdOsdqIlj/H42RuXXjLyxEJbyKoHQarMQ41r4DB0SS1c5khCoIZLP/U6VxIVgb61C8HE4hgj7xd80Pf2UMdzYepqgJQWYf6mU83aKr/0QDYlgxR0EDEOoiSVhwzc9vA==
+ bh=+QL+QCEmAvI9Or2D2l7WCdz3umSrHHc1RZyajJt49EE=;
+ b=ks6eJzX+0yFvo+5Ypbd79qb0P2Y4tXV0pBS01geEIWvk6lEU6RQ+7JeKsF86VNwubqviUb4GZIyp9OqegpPtwK05JcbtT9TVk9WZM6DaHUyWgOsxsM2VSE7ZEHSlTvay3KTuRRPeuQMKAH1gUCNrWnRQXlO/65HCVrBpQ+ohrCh98vn1Mu5FUKEgQUNeqNIMWOzehIj7a+CN4dYmDwIX4jBEI/ErsF9woqCDKrV7HOSqJlUnDmUba2Qf9ArqcykHmMAGCflo3+bzWwIqpP1/6+QBUdsAcEfipW4AnGMYNctgZ2YsHVA7/aOVZpOpiXBT8TObwwxjM1d3YnMTcLHhpg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=732s8hCenZ2uI8bN9F3NsEmzykefme6Vz2jBT0usn6M=;
- b=ps0rpxzbrabkqzDEpIo2ZtwgdnPTy5mNHsSblF73DvVj8VHC2Tah7jAoOijDotpZhvtzeoqagZ+V47GeawotpZ0ca06W7DgUeOv5ZvzeyONhBNxHG7kgZ8PIzfqU3xmUdZ1Duye/zMNb3m7U9ZZM9X0clqVR/MHtuFSOfbrUxnE=
-Received: from MW2PR16CA0017.namprd16.prod.outlook.com (2603:10b6:907::30) by
- SA0PR12MB4543.namprd12.prod.outlook.com (2603:10b6:806:9d::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.31; Tue, 18 Jul 2023 21:03:43 +0000
-Received: from CO1NAM11FT037.eop-nam11.prod.protection.outlook.com
- (2603:10b6:907:0:cafe::c5) by MW2PR16CA0017.outlook.office365.com
- (2603:10b6:907::30) with Microsoft SMTP Server (version=TLS1_2,
+ bh=+QL+QCEmAvI9Or2D2l7WCdz3umSrHHc1RZyajJt49EE=;
+ b=lrqws8lX08rGB28cIof1xp1kGdrzJjtkhvrMtvKtgCph2WNpn+QDVvjHG5pavqEfRGuBJwHeE+a0xtm8Zf0xWdSXmsgSzpyz2XBowQSqaD99iOrzHy+nX3QL5p6AIaOCJDG9KM3Jk9Lld/mdT7iJVUPS6KRzTP881bZ5gpFXdnU=
+Received: from DM6PR03CA0052.namprd03.prod.outlook.com (2603:10b6:5:100::29)
+ by CH0PR12MB5387.namprd12.prod.outlook.com (2603:10b6:610:d6::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Tue, 18 Jul
+ 2023 22:34:42 +0000
+Received: from DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:100:cafe::58) by DM6PR03CA0052.outlook.office365.com
+ (2603:10b6:5:100::29) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
- Transport; Tue, 18 Jul 2023 21:03:43 +0000
+ Transport; Tue, 18 Jul 2023 22:34:42 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -45,59 +46,71 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT037.mail.protection.outlook.com (10.13.174.91) with Microsoft SMTP
+ DM6NAM11FT113.mail.protection.outlook.com (10.13.173.5) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6588.20 via Frontend Transport; Tue, 18 Jul 2023 21:03:43 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ 15.20.6588.34 via Frontend Transport; Tue, 18 Jul 2023 22:34:42 +0000
+Received: from [10.236.30.70] (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 18 Jul
- 2023 16:03:42 -0500
-Date:   Tue, 18 Jul 2023 16:00:19 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-CC:     <isaku.yamahata@intel.com>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        "Sean Christopherson" <seanjc@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, <chen.bo@intel.com>,
-        Sagi Shahar <sagis@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [RFC PATCH] KVM: x86: Make struct sev_cmd common for
- KVM_MEM_ENC_OP
-Message-ID: <20230718210019.rqdk2azgf546b3qq@amd.com>
-References: <2f296c5a255936b92cffde5e7d6414edfb93f660.1689645293.git.isaku.yamahata@intel.com>
- <20230718193918.rgluetgaiuib662g@amd.com>
- <20230718202930.GB25699@ls.amr.corp.intel.com>
+ 2023 17:34:40 -0500
+Message-ID: <b8eeb557-0a6b-3aff-0f31-1c5e3e965a50@amd.com>
+Date:   Tue, 18 Jul 2023 17:34:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230718202930.GB25699@ls.amr.corp.intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-9-michael.roth@amd.com>
+ <696ea7fe-3294-f21b-3bc0-3f8cc0a718e9@intel.com>
+Content-Language: en-US
+From:   Kim Phillips <kim.phillips@amd.com>
+Subject: Re: [PATCH RFC v9 08/51] x86/speculation: Do not enable Automatic
+ IBRS if SEV SNP is enabled
+In-Reply-To: <696ea7fe-3294-f21b-3bc0-3f8cc0a718e9@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.180.168.240]
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT037:EE_|SA0PR12MB4543:EE_
-X-MS-Office365-Filtering-Correlation-Id: a64cbc83-be74-4b1e-a458-08db87d2783d
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT113:EE_|CH0PR12MB5387:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11c184ce-03f5-410b-282e-08db87df2e12
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E0SkmskceijA87Ofn6P32AIjqXuk9Dqw6CpoAlfIFR7fxMEPFvdvYh1A+IsuqfxKz7pm8FQRkprc/9uCEMgnytmv0hvvkZXnHAfKRHklxrsRbTtpOIoYpgGfbDBaCyVosJxmUZeR27agP243Ac8I5Lh2C7qoGp4KcehJvMpkaeysLokep7+Gktb/0sm359z/fePQr5dEwcWon7dHDwuLPvBAlz0C/ZO5Ln0zHGHl2gBauRnE7VfUNwdhhenkgthSEewjTQhDisCg0LGShPyqAWyw/pcVDhjFljWbmVli9Y3pDbVToMLTj1bM51Nqizg4uWGVAtYnqzzdvTV7fanFl2ZGcR/cIYrlRD2y8lL4/6XAmDTdrXiT5VRMFe322viRBWNLw5a78fMqNUrp0inP9fQ9hl3OsuTrypiTYLOMU9HHhqkTJYo8ijg6TtVzQkwMptp4iVxCU+av3WPXhfueOidgsLOsbA2a2FC2MuyoV8mHqePHdYNNIrOdDJECUhX7kek7ca2zF+kCgtLepq4Keyv+8/XvmjTb/cuc4aNKOU+psbWF6zR+PHCKbDJqjt0EKDaQfT63a88FDN4PhgTf5xrVHh1r3KZ4WDfNGc8X1T/9i5fZz23O1kJq+2Gc5H9tcOV7EmjjR9ODj75boPHRwNKSEy2QFFn0FXgtbxnHJHQGEQC4JoR+MJ+VkvkxrdhAGz5a741QhHv2fCJGyaMtdRiiHaBrMf7FbsI8Pws63Yog+LjPB0cj4yCKlM4y0LG3lKZZRX4+jhQHU9x1yoN2dA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(136003)(396003)(451199021)(82310400008)(40470700004)(36840700001)(46966006)(54906003)(6666004)(478600001)(82740400003)(2616005)(36860700001)(83380400001)(47076005)(426003)(86362001)(40460700003)(40480700001)(2906002)(70586007)(44832011)(16526019)(186003)(1076003)(26005)(356005)(81166007)(336012)(70206006)(41300700001)(4326008)(316002)(6916009)(36756003)(8676002)(5660300002)(8936002)(7416002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: d1YYsrP0hQ/P27PiAe6epnE6OnoMtqCki7F1wqrZsbwM0qyfOKbzc3LE8nJW/YtltaL1u1X9hkkXPAHqCRaHNNGPuS893yHD8vJPUJdF2HvxkDGnZQ28lTU5w2/F8gRzsm4iihymWVzQcELpeeVG9xp6vQwZNCqK2VnRnLg4ASbRVAaAqD4dnnbQY8SLdqJ18t6iXJSw0FzZf1LM3wpanXlqcV5XcMwOWxgZ05HjCKyyY81Q/+EcTApTABsi8DHONzPOdRU1P7/4szdg5lpV3mniRhJOajDdIu+YfhgIETJDTHB4GVKB9YnYehjGbuKPf+uFldviP3JZEc2wsZ3TA9qxDObYSVhoi0e1ibj4dKEnhtpeyWD9gHKovezu6qwjfhwxB4dvJJSfWJpYB6TFQokAhgLAaxoURgRjGKrLDLCppr3caWOjN5/MMnnIwJrwpfUlT6PzU7hiQX3KXYWMoXhtgo7SRZw2hBLiYHAPTOqngCre66S4idqrEob7Zwji6TgHuYGo33hRPzIOOFkf5IEoOzstTwBvegGh5CXOcBXRKtwnAXK7lt4C93m/nVfsaZ7DzOovqo4VE4k5uLQK7uDDxl4JnO6ocNh5kjeqdNMkBa88Uc/f2edgKpaDqEqg2fXbV5t9vaud4tg/SVZA4rkPRr7vK/ZOqrGtrnXRD6Yo2aqhsSmuUxRkJwIiPsjZDkbwix8HGxlUTnAOV6hn4MhQIGKfZxZ2YsT3DSXYBA2ytnN6mkVQGeUnp2UjwcHr/AkJ3SDJxYZvjpFAIyjd1JRCXW4es7Md+mR//cKZqU0=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(136003)(346002)(376002)(451199021)(82310400008)(46966006)(40470700004)(36840700001)(82740400003)(478600001)(81166007)(356005)(26005)(40480700001)(53546011)(966005)(40460700003)(4326008)(83380400001)(426003)(8676002)(44832011)(7416002)(5660300002)(16576012)(2616005)(47076005)(316002)(41300700001)(7406005)(86362001)(31696002)(2906002)(8936002)(36860700001)(31686004)(186003)(16526019)(336012)(70206006)(36756003)(70586007)(54906003)(110136005)(36900700001)(43740500002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 21:03:43.1682
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 22:34:42.2518
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a64cbc83-be74-4b1e-a458-08db87d2783d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11c184ce-03f5-410b-282e-08db87df2e12
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT037.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4543
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5387
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
         T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -106,133 +119,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 01:29:30PM -0700, Isaku Yamahata wrote:
-> On Tue, Jul 18, 2023 at 02:39:18PM -0500,
-> Michael Roth <michael.roth@amd.com> wrote:
+On 6/12/23 10:39 AM, Dave Hansen wrote:
+> On 6/11/23 21:25, Michael Roth wrote:
+>> A hardware limitation prevents the host from enabling Automatic IBRS
+>> when SNP is enabled.  Instead, fall back to retpolines.
 > 
-> > On Mon, Jul 17, 2023 at 06:58:54PM -0700, isaku.yamahata@intel.com wrote:
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > 
-> > > TDX KVM will use KVM_MEM_ENC_OP.  Make struct sev_cmd common both for
-> > > vendor backend, SEV and TDX, with rename.  Make the struct common uABI for
-> > > KVM_MEM_ENC_OP.  TDX backend wants to return 64 bit error code instead of
-> > > 32 bit. To keep ABI for SEV backend, use union to accommodate 64 bit
-> > > member.
-> > > 
-> > > Some data structures for sub-commands could be common.  The current
-> > > candidate would be KVM_SEV{,_ES}_INIT, KVM_SEV_LAUNCH_FINISH,
-> > > KVM_SEV_LAUNCH_UPDATE_VMSA, KVM_SEV_DBG_DECRYPT, and KVM_SEV_DBG_ENCRYPT.
-> > > 
-> > > Only compile tested for SEV code.
-> > > 
-> > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > ---
-> > >  arch/x86/include/asm/kvm_host.h |  2 +-
-> > >  arch/x86/include/uapi/asm/kvm.h | 22 +++++++++++
-> > >  arch/x86/kvm/svm/sev.c          | 68 ++++++++++++++++++---------------
-> > >  arch/x86/kvm/svm/svm.h          |  2 +-
-> > >  arch/x86/kvm/x86.c              | 16 +++++++-
-> > >  5 files changed, 76 insertions(+), 34 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 28bd38303d70..f14c8df707ac 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1706,7 +1706,7 @@ struct kvm_x86_ops {
-> > >  	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
-> > >  #endif
-> > >  
-> > > -	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
-> > > +	int (*mem_enc_ioctl)(struct kvm *kvm, struct kvm_mem_enc_cmd *cmd);
-> > >  	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-> > >  	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-> > >  	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
-> > > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> > > index 1a6a1f987949..c458c38bb0cb 100644
-> > > --- a/arch/x86/include/uapi/asm/kvm.h
-> > > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > > @@ -562,4 +562,26 @@ struct kvm_pmu_event_filter {
-> > >  /* x86-specific KVM_EXIT_HYPERCALL flags. */
-> > >  #define KVM_EXIT_HYPERCALL_LONG_MODE	BIT(0)
-> > >  
-> > > +struct kvm_mem_enc_cmd {
-> > > +	/* sub-command id of KVM_MEM_ENC_OP. */
-> > > +	__u32 id;
-> > > +	/* Auxiliary flags for sub-command. */
-> > > +	__u32 flags;
-> > 
-> > struct kvm_sev_cmd doesn't have this flags field, so this would break for
-> > older userspaces that try to pass it in instead of the struct kvm_mem_enc_cmd
-> > proposed by this patch. Maybe move it to the end of the struct? Or
-> > make it part of a TDX-specific union field.
-> 
-> Please notice the padding. We don't have __packed attribute.
-> 
-> struct kvm_sev_cmd {
->         __u32 id;
->         <<<<< 32bit padding here
->         __u64 data;
->         __u32 error;
->         __u32 sev_fd;
-> };
+> "Hardware limitation"?  As in, it is a documented, architectural
+> restriction?  Or, it's a CPU bug?
 
-Ah, true, I didn't notice that. I guess I don't see issues with the
-proposed format then. This flags field could allow for new fields to be
-added over time without breaking old userspaces, so it seems like we
-still have some flexibility in the future as well.
+It's a documented, architectural restriction:  When Secure Nested Paging
+(SEV-SNP) is enabled, processes running as host are protected, but
+those running with a non-zero ASID, are not.
 
+>> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+>> index f9d060e71c3e..3fba3623ff64 100644
+>> --- a/arch/x86/kernel/cpu/bugs.c
+>> +++ b/arch/x86/kernel/cpu/bugs.c
+>> @@ -1507,7 +1507,12 @@ static void __init spectre_v2_select_mitigation(void)
+>>   
+>>   	if (spectre_v2_in_ibrs_mode(mode)) {
+>>   		if (boot_cpu_has(X86_FEATURE_AUTOIBRS)) {
+>> -			msr_set_bit(MSR_EFER, _EFER_AUTOIBRS);
+>> +			if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+>> +				msr_set_bit(MSR_EFER, _EFER_AUTOIBRS);
+>> +			} else {
+>> +				pr_err("SNP feature available, not enabling AutoIBRS on the host.\n");
+>> +				mode = spectre_v2_select_retpoline();
+>> +			}
 > 
+> I think this would be nicer if you did something like:
 > 
+> 	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> 		setup_clear_cpu_cap(X86_FEATURE_AUTOIBRS);
 > 
-> > But then you might also run into issues if you copy_to_user() with
-> > sizeof(struct kvm_mem_enc_cmd) instead of sizeof(struct kvm_sev_cmd),
-> > since the former might copy an additional 4 bytes more than what userspace
-> > allocated.
-> > 
-> > So maybe only common bits should be copy_to_user()'d by common KVM code,
-> > and the platform-specific fields in the union should be separately copied
-> > by platform code?
-> > 
-> > E.g.
-> > 
-> >   struct kvm_mem_enc_sev_cmd {
-> >       __u32 error;
-> >       __u32 sev_fd;
-> >   }
-> > 
-> >   struct kvm_mem_enc_tdx_cmd {
-> >       __u64 error;
-> >       __u32 flags;
-> >   }
-> > 
-> >   struct kvm_mem_enc_cmd {
-> >       __u32 id;
-> >       __u64 data;
-> >       union {
-> >         struct kvm_mem_enc_sev_cmd sev_cmd;
-> >         struct kvm_mem_enc_tdx_cmd tdx_cmd;
-> >       }
-> >   };
-> > 
-> > But then we'd need to copy_from_user() for common header, then for
-> > platform-specific sub-command metadata like sev_fd, then for the
-> > sub-command-specific parameters themselves.
-> > 
-> > Make me wonder if this warrants a KVM_MEM_ENC_OP2 (or whatever) that
-> > uses the new structure from the start so that legacy constaints aren't
-> > an issue.
-> 
-> I'm fine with a new ioctl and deprecating the existing one.  I'm looking
-> for the least painful way to avoid unnecessary divergence.
-> Not only for creation/attestation, but also for debug, migration, etc in near
-> future.  Thoughts?
+> somewhere _else_ in the code instead of smack-dab in the middle of the
+> mitigation selection.
 
-Based on the above doesn't seem like we need to deprecate just yet. If
-there's some major benefit we'd gain in doing so then maybe, but if
-current approach still allows for backward-compatibility and future
-extension then it doesn't seem like there's much to gain there.
+Good idea.  How about this?:
 
--Mike
+ From 6cf32e8d8426190b1bf1b1e04ceb35bf0bac784b Mon Sep 17 00:00:00 2001
+From: Kim Phillips <kim.phillips@amd.com>
+Date: Mon, 17 Jul 2023 14:08:15 -0500
+Subject: [PATCH] x86/speculation: Do not enable Automatic IBRS if SEV SNP is
+  enabled
 
-> -- 
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+Automatic IBRS provides protection to [1]:
+
+  - Processes running at CPL=0
+  - Processes running as host when Secure Nested Paging (SEV-SNP) is enabled
+
+i.e.,
+
+	(CPL < 3) || ((ASID == 0) && SNP)
+
+Because of this limitation, do not enable Automatic IBRS when SNP is enabled.
+Instead, fall back to retpolines.
+
+Note that the AutoIBRS feature may continue to be used within the guest.
+
+[1] "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
+     Pub. 24593, rev. 3.41, June 2023, Part 1, Section 3.1.7 "Extended Feature
+     Enable Register (EFER)", Automatic IBRS Enable (AIBRSE) Bit.
+
+Link: https://bugzilla.kernel.org/attachment.cgi?id=304652
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+---
+  arch/x86/kernel/cpu/common.c | 3 ++-
+  1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 8cd4126d8253..311c0a6422b5 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -1348,7 +1348,8 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
+  	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
+  	 * flag and protect from vendor-specific bugs via the whitelist.
+  	 */
+-	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
++	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
++	    !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+  		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+  		if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+  		    !(ia32_cap & ARCH_CAP_PBRSB_NO))
+-- 
+2.34.1
