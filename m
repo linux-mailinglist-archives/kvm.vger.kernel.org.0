@@ -2,142 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 662B975818E
-	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 18:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98368758212
+	for <lists+kvm@lfdr.de>; Tue, 18 Jul 2023 18:27:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231130AbjGRQAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 12:00:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52380 "EHLO
+        id S229868AbjGRQ1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 12:27:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbjGRQAe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 12:00:34 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51157A9;
-        Tue, 18 Jul 2023 09:00:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J/plUWTAQcJAW09dnuEzUX7NRn/KIWPV/YqXyRUnBSjHcdet3T19WjissbqB4Q7SWghSB97CCapuZ300BJeofNRUCGuBQ+riJBiHxpefLHHdJkPpP7jd+TxNO/muk8dS8gT2iGFJFNoXqobcz7tlU2IzFehXXPJYAi6IG1jO6TkqnwKU01VR0WcLIxwtLkfKjVhO8fO/D2vEygi+smlmGesJHK303lk45gF9ilvdqjHpKuNjqZPjelnaLdNb4idDFnzOAKJ1mh0x9dne1vMOJ5FGFQ6xY3lhJK2GVc0l4qjbHS953iav/ae3wnbP9LvEbEQNsIyxFefmCFljYvtigA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sTXW8Bz2HuqwbH+pn4C7e1cAkccyWcZB0nBW31yfJis=;
- b=TDvRlfrIIZf0IfZnZkioIxdkZXOSgj/Swrm8e2wmnnxTNwqspqLAlbsLwNO+Ht1Z/XjagB/6wn2k6MEyJoB9JE8dMfecyPpfKUK5rj+o0gAsxmmkYkLFvKry9M51dXnsBIJXhNaccimgr2G3ngWyVK3DHHsBsIQlQhvdxkxQ+ncuc+To8Lv8XpgCwkq1exp5eh2F6kK1kZEjqN1kaVx0xXOtpTzgpgw5WwQLTORv2xgqc5QBxwz16OojuxLRG8Gl8u4QrH+2LAbdbXbo78KUpx+8nVqZ5N/9pd8H+ARWSg2eHjIpc1mV5gTFbvcOCbxujHG/7wbquvYmvwGJPBWE0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sTXW8Bz2HuqwbH+pn4C7e1cAkccyWcZB0nBW31yfJis=;
- b=NQGiLFt6ZruW2fmpUo1LlvcPyu1IutRRGeAjA3pwyK26YbYdBodESJRgX9TnVLSMI2cyudoXUlsg63hrU9qot+tINfi9PLW5AUcQOYwFULynIYlMXr9z/DTjICpVQQnQm7efXjMlMQZCIOLz/rTMRAeDKYW5+W82X5ZAqsz/Pk22LTZZ+YcHBuJ9ozwhBiXbVVEoJ21WPApxbikOijObPXFWIiH3ueumEGp2ihKF8eMPqrykFYubOVgcXbBz9gqrBwmNFBOVUORzTeNoCBSA25jy0W0stt4p3zlBYPkCA02Rx0vqk7VOVBOs8219Oxm2rF4MsGIdbyoH9WYpEGao5Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW4PR12MB7213.namprd12.prod.outlook.com (2603:10b6:303:22a::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.31; Tue, 18 Jul
- 2023 16:00:31 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6588.031; Tue, 18 Jul 2023
- 16:00:31 +0000
-Date:   Tue, 18 Jul 2023 13:00:29 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Roxana Bradescu <roxabee@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm/vfio: ensure kvg instance stays around in
- kvm_vfio_group_add()
-Message-ID: <ZLa3HcDnLyiQNXVf@nvidia.com>
-References: <ZKyEL/4pFicxMQvg@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKyEL/4pFicxMQvg@google.com>
-X-ClientProxiedBy: CH2PR20CA0027.namprd20.prod.outlook.com
- (2603:10b6:610:58::37) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229655AbjGRQ1r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 12:27:47 -0400
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5056EB5
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:27:46 -0700 (PDT)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1b00b0ab0daso4904412fac.0
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 09:27:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689697664; x=1692289664;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oWlwv/U9S1uPk7gi1HJNQOKMPltkS5/fG+7ZDpzLoHs=;
+        b=Ewi7b+ppPTIxEZSoUMpcT21kwifB5POXh/af+BMmaNa5vsF4Sg+sRwExq6/4GSjYjg
+         aDS/SLA8Zph7Ath0h2dVzY/UUCM5UtrrIYvRzTh/dmt5lbqfMC844P3WuqB/9nLoNwnq
+         yAg5kUreRPe9F/Fd7pJsDkCxlL2EXL8yDxRb3fQC/kLCayISQU8YJ89wA4kp0bSRprSX
+         Ra6zTWVxiGUTDUWP/3ywDu8xt0aSS738IuWVJFAdtZgJ7IpkZ+o1Lp2rfOZeNASCiLm7
+         4/570FKYyjQnSQoKeu0VVIxnCmFKPW72+08qJEavbns3gc+HHXlf49piUV1cv9YlRa/X
+         +v8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689697664; x=1692289664;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oWlwv/U9S1uPk7gi1HJNQOKMPltkS5/fG+7ZDpzLoHs=;
+        b=ELTm/xra/CL6/4jHxNaNSYRTh7R6ldwup6xSgkqJRNM98CKRmtlH0pWPLkpJ03AUV/
+         yrBeUSB2X5P9yQC8h+75ZwUWwfcxan3h34mDgnLjkEnAJHx5jCzl/OIAmK0bsFX5gWgO
+         nXSpTDf3d8vqnrvATjYUvfSCttGrfAWyEb0aupI8qvSXb7zGi/afFV96opg2JEOTJVHW
+         5mdmVtnLHoQAXRH+2gWwGJFib8qt/68rWu6wxmn5LJbYtyyJqWV0ya8tHtUYlINpSGKK
+         59qRAzG+7qhhXP4hRtn39FblYKG5zPJBGhElypIrtMxyk7hSysoTMB+e2nQbltfSRhgX
+         toxQ==
+X-Gm-Message-State: ABy/qLYP7n1scBYzUUXbpB43CBBPcP4DmBS0skGNMuPnklVYWeom3vZB
+        AZ9U88YMlf61boQ9O8zhMWLQV6Ugv4o4vfFvEzkDGsjWrXJbfRkC3+g=
+X-Google-Smtp-Source: APBJJlGGpAz9ramES8rNPXckQWwcrcqj9pkNcpQXqm8XkwxA609uSTSSLmlrB0vF4cPU7vEFeGUPOsqFTvo5aG395kw=
+X-Received: by 2002:a05:6870:d20c:b0:19f:2c0e:f865 with SMTP id
+ g12-20020a056870d20c00b0019f2c0ef865mr19458493oac.7.1689697664389; Tue, 18
+ Jul 2023 09:27:44 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB7213:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2fca4c21-60f6-477b-b7c9-08db87a81cb4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +j7mQgJImZgCiEwg4Jiis4FMpDkTEQTi0t1wHJ2wAcvioGT+4oTS/T+EPTrkMgSUYS/SXkPQp+CKO3vRVrOWa5CmXlMmemZs82aDhHwPk855FnyYbYdtSD11J6oht6xQN6Yqd6TpW4zTtqanaVLWX6Xm7EYcCzlQU3SL1Q0pqnTDSjfAy9PSRLaju6xUN3u/Wbtilg4mSeW/i7IudLlO6Ipjg/H2VVJyD6kSWcl5OhhwCXqJ0ghZqmhYWg2ZuyN/AyICD2+FuPhRLzCEhUOQ/hBdgmWqvoet4cFAlE96uiYLNA83YGDfnOV+mZsIf49sE5nq9WxbiZY2tGvESFpLkwaW9IuL7V2qkDmcY0FSl6AgG45csGp/3JWuSSIUG91kfKDbgs5wMGOFyuJ7Z1fnEb/VYPPxooGiPUzJK8AnD3nIzIfNcIYecExVNDstrRsRcpShT3xTOoa2ygGlW4gkU7HIL6cvcgEqBn7pcJkfw7Oxe7ajC7B1UhrAS74mLL2rAmAt6n2LtREaFajljJRnzQPbWVGTllmHmhLGDannDw8RneryOY9HBs3YkYDOMWvX
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(136003)(366004)(396003)(451199021)(478600001)(6486002)(66556008)(54906003)(83380400001)(86362001)(4744005)(2906002)(6506007)(36756003)(186003)(2616005)(316002)(6512007)(38100700002)(26005)(6916009)(66476007)(41300700001)(66946007)(4326008)(8676002)(8936002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?eDqUcSdw7CTn5hMtnvTA9jXE3hYWVesiIMJv6srkejknieaA9ybe1bPwWdRq?=
- =?us-ascii?Q?JHSCGhcipS6taA7ux0PgFGvFl51jSnr1OC+n2kUhpgrlR1IR15UaPkeEHVax?=
- =?us-ascii?Q?njKBc7oMm+w2G1zi0oCiGFURBA47DeYL0gPAPTFpeFZjpdUunBmYrqAyW1sS?=
- =?us-ascii?Q?EXGXJMs2lTp64WowJnLDqBeUg5OzlkNLA9I7yySFSLlS0Dvdq+0d4K/jMe/l?=
- =?us-ascii?Q?7At7sEzcvmYbw7IjkGAYfHThupqyChjgzXxABVz7Rwmsn3v//XD0EkpYeg60?=
- =?us-ascii?Q?bZNyer0nDjbKsiIf8re44neZ9iphBsgYO9b/YFQjwIUtJeyJZaJs9giPsu0Y?=
- =?us-ascii?Q?yWVPnrLvFc84gsOl7SiVFzTgtwQ/dbIU2CvcoF+dbGw2hcBooSEQtZxYCVjl?=
- =?us-ascii?Q?+IkGtpg/Wg+gIVNDqOX0LdX+JUYZjc8Eu+5ibjBLYR9vtNRfv2AB5HDW9baJ?=
- =?us-ascii?Q?xqNTAA3eVomJR7142FmGB8y3fe6It6bOCI3fHri34nSLM4Auf66jskWcIxJF?=
- =?us-ascii?Q?7IWmUAqTOpbPCQ1nm/kb2Pcw2NJmq8oZBqjBS6CdqMhnmWSpDOx43h6sAt1t?=
- =?us-ascii?Q?mpR6pgk1TF3i1bag4uF+TXe+1htsPNdVliaQBTnW4Pa+IV1QE8DrDDkMwUv7?=
- =?us-ascii?Q?MsDt1JKJA+5QVI5I1gtQPZ4RNbttxERjIFk17Yj6u6g1YR2QzIbmHq5DTN4V?=
- =?us-ascii?Q?mGH7HAdedCeqSO6AkVR3y5RkNkAaBB7whieUjRWbdrvRPSJZ0xeBx+XJNlUZ?=
- =?us-ascii?Q?cTR8drtDnfaAjU7b1Th404Pryea7Sli8xEB2JWrJ6887PS50fJm8uBW75Vwd?=
- =?us-ascii?Q?Ie7UxCO6tqKppWIH45U6uZfiNermI1xwUWC6IeWclYrmvBSUzIi+ryxjM0G8?=
- =?us-ascii?Q?I4YIPFlkrMs8uQTuTxmDi3EZo589AWRQzBn6SDJ2sOlwRyZlmHo3Vkb2Urhb?=
- =?us-ascii?Q?LYGYp110Ff1aNTfqyTnKHaKnO8mlOPVq2BQsYMpMUbHsmTr6ovLc3qkGr2k3?=
- =?us-ascii?Q?vy5mqECkct+8UQEmcPziAkjm13TzfpEsNNXQJO1FHao8cuc+oQOeQyh5fnUO?=
- =?us-ascii?Q?ydPjhTSOGbzFBwffTSOth7vdd1E+YYKIhdw+Se1xkdo0pP1wEzLaJa/FoSdx?=
- =?us-ascii?Q?t6XOsBdPfGutqpzLR+Nq0qyBWH3XYH3CCIr1EYn4ZCjMMjwZDQYs5I5I0zAo?=
- =?us-ascii?Q?H7VB4QKW0ubteTSHhh6+04VxF+a0cyBJ47BR/QozuPpR84gdmJ1Hu4T+4nzK?=
- =?us-ascii?Q?esMQJnZ8M7b7CTvoBDpRzik1Xk8FI/0aoTWQjQ5aSPwQv0kO3gKayhMuIuPT?=
- =?us-ascii?Q?CnQ/TQQr7s6A6DkVeY6VmwVX82jeeuLRKKM78eBy0fQwmuCm+3J9RHUGWapQ?=
- =?us-ascii?Q?M8r5CM29qx7mKzYSkO0JslAjjowdpZeJePSpy+mtzIUfW8rABlKHeQfZkP+t?=
- =?us-ascii?Q?oVc+v83hjqdRw9hgQuh8Ctt0iWbuON+WM3DPNJTkVjkDJZdb/3W6tLnGjb0N?=
- =?us-ascii?Q?3lt0w7YC/1Nj4d5fmU18zb/ePRkkNtLZrxl7YAtKbok8l4NgVujtz0bZQdt0?=
- =?us-ascii?Q?Hxw1Se2lARTZChqTvqcbME9NM3x+TXd3DYo9bEi+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2fca4c21-60f6-477b-b7c9-08db87a81cb4
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 16:00:31.1196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4PRI2fiK+J0a2oyzIrrDxbgNqz+0i1pqA2EpH0zcQHJ03h2GpxxsTbstQ+/pe1Xb
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7213
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+References: <20230717152722.1837864-1-jingzhangos@google.com>
+In-Reply-To: <20230717152722.1837864-1-jingzhangos@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Tue, 18 Jul 2023 09:27:32 -0700
+Message-ID: <CAAdAUtiap4sxFT3B7hzT4THbJTO9Hs66O9DFJHF+2cpmq06Czg@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2, 3}
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 10, 2023 at 03:20:31PM -0700, Dmitry Torokhov wrote:
-> kvm_vfio_group_add() creates kvg instance, links it to kv->group_list,
-> and calls kvm_vfio_file_set_kvm() with kvg->file as an argument after
-> dropping kv->lock. If we race group addition and deletion calls, kvg
-> instance may get freed by the time we get around to calling
-> kvm_vfio_file_set_kvm().
-> 
-> Fix this by moving call to kvm_vfio_file_set_kvm() under the protection
-> of kv->lock. We already call it while holding the same lock when vfio
-> group is being deleted, so it should be safe here as well.
-> 
-> Fixes: ba70a89f3c2a ("vfio: Change vfio_group_set_kvm() to vfio_file_set_kvm()")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Please ignore this post of v6 which missed a commit. I'll send out the
+correct v6 soon.
+
+Thanks,
+Jing
+
+On Mon, Jul 17, 2023 at 8:27=E2=80=AFAM Jing Zhang <jingzhangos@google.com>=
+ wrote:
+>
+> This patch series enable userspace writable for below idregs:
+> ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL=
+1.
+>
+> It is based on v6.5-rc1 which contains infrastructure for writable idregs=
+.
+>
+> A selftest is added to verify that KVM handles the writings from user spa=
+ce
+> correctly.
+>
+> A relevant patch from Oliver is picked from [3].
+>
 > ---
->  virt/kvm/vfio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-This looks correct, I don't know of any lock cylces that could form
-with kv->lock at least
-
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
+>
+> * v5 -> v6
+>   - Override the type of field AA64DFR0_EL1_DebugVer to be FTR_LOWER_SAFE=
+ by the
+>     discussion of Oliver and Suraj.
+>
+> * v4 -> v5
+>   - Rebase on v6.4-rc1 which contains infrastructure for writable idregs.
+>   - Use guest ID registers values for the sake of emulation.
+>   - Added a selftest to verify idreg userspace writing.
+>
+> * v3 -> v4
+>   - Rebase on v11 of writable idregs series at [2].
+>
+> * v2 -> v3
+>   - Rebase on v6 of writable idregs series.
+>   - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
+>
+> * v1 -> v2
+>   - Rebase on latest patch series [1] of enabling writable ID register.
+>
+> [1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@goog=
+le.com
+> [2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@goog=
+le.com
+> [3] https://lore.kernel.org/kvmarm/20230623205232.2837077-1-oliver.upton@=
+linux.dev
+>
+> [v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@goog=
+le.com
+> [v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@goo=
+gle.com
+> [v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@goog=
+le.com
+> [v4] https://lore.kernel.org/all/20230607194554.87359-1-jingzhangos@googl=
+e.com
+> [v5] https://lore.kernel.org/all/20230710192430.1992246-1-jingzhangos@goo=
+gle.com
+>
+> ---
+>
+> Jing Zhang (4):
+>   KVM: arm64: Use guest ID register values for the sake of emulation
+>   KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+>   KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2, 3}_EL1
+>   KVM: arm64: selftests: Test for setting ID register from usersapce
+>
+> Oliver Upton (1):
+>   KVM: arm64: Reject attempts to set invalid debug arch version
+>
+>  arch/arm64/kvm/sys_regs.c                     |  80 +++++++--
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/aarch64/set_id_regs.c       | 163 ++++++++++++++++++
+>  3 files changed, 230 insertions(+), 14 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+>
+>
+> base-commit: 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5
+> --
+> 2.41.0.255.g8b1d071c50-goog
+>
