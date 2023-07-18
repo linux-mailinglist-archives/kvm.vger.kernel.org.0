@@ -2,141 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C3627588FC
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 01:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C81FA758923
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 01:48:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbjGRXRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 19:17:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40578 "EHLO
+        id S230063AbjGRXsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 19:48:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbjGRXRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 19:17:17 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DB9E0;
-        Tue, 18 Jul 2023 16:17:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689722236; x=1721258236;
-  h=message-id:date:mime-version:from:subject:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=LKaFukftyjgRVkggmhjfkR3N5wbjbrueS9ivB5r4O8o=;
-  b=KYZK38fo0vmIIz1leaCEWutuE51kt/gwvPW2W1sbZasmTKtWiHgzx8UD
-   gjB57rOKouqDJQNFmpYQlXrMm/WpRybodVozeeUt4lmF0a5EsFCd7SHRz
-   yCMj+1Dj6bSD/4yVwh65MM8onuWl2mBqoaFGBd+jr8uA0eWIYFAnAbJRP
-   q7TZk7CWiqOhRyWoSVdQE39Ew1enWWXq8Gl0ozlVRilbwOuKS5/Ce0CT0
-   UZwch8Q6uyyl/+MIIICQSD5o9yKWEL63afeJOxHOCZfhd5psI1Sfv/sHI
-   1sw9P8wflJ9SbMYJ9EkhS8bguFKZQR8+AD1O/xkudUPi3qXZd5g/cUDK/
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="430095236"
-X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="430095236"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 16:17:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="837450299"
-X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="837450299"
-Received: from unknown (HELO [10.209.37.195]) ([10.209.37.195])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 16:17:11 -0700
-Message-ID: <396d0e29-defc-e207-2cbd-fe7137e798ad@intel.com>
-Date:   Tue, 18 Jul 2023 16:17:11 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-From:   Dave Hansen <dave.hansen@intel.com>
-Subject: Re: [PATCH RFC v9 08/51] x86/speculation: Do not enable Automatic
- IBRS if SEV SNP is enabled
-To:     Kim Phillips <kim.phillips@amd.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-9-michael.roth@amd.com>
- <696ea7fe-3294-f21b-3bc0-3f8cc0a718e9@intel.com>
- <b8eeb557-0a6b-3aff-0f31-1c5e3e965a50@amd.com>
-Content-Language: en-US
-In-Reply-To: <b8eeb557-0a6b-3aff-0f31-1c5e3e965a50@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229780AbjGRXse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 19:48:34 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13B73F1
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 16:48:32 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8ad356f6fso33046855ad.3
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 16:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689724111; x=1692316111;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kNioK2g9uNSVoz4fz3Z0hsZYDZVWPADHE8SV+5umY4Y=;
+        b=osgDTqFdq8IUMbfc5np0SJw5OdVmryzKJlMbpWPj1r+bA24M0IJWiJbXigx+jJyQ5r
+         VlxW0vuMxM/BQlBSs2+AumxHcyWajcOP9JXOkoHqOoO5ZyUcko/ezFKjsqiJkNtv/xwh
+         Y36DMIRI0Q59f7++kPXdwd59QUGKV3Guy/2lgpB3TxpICSaTd3h59fkFiz7MblIecyH8
+         n7z4KTAocelQbqspLYM5QVY6G/2MvezetA6jqdURrMQiYzDhQ6XI2ghHbJziqFDRtHCX
+         N3lBCweEXoqVHi335cB6PiCMKD3JW4ZiPc0eG4mYnlS454U3dCWqPiIky3zkEczL9g5Z
+         g/Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689724111; x=1692316111;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kNioK2g9uNSVoz4fz3Z0hsZYDZVWPADHE8SV+5umY4Y=;
+        b=A4bVP7JFkli9+5qKOOqob5MTFk/hHF1lxnNB0LD75rD97+sBB5O0qdLC+QGAw/vWcI
+         NSvLoMq0Of85+PRjgZxaOvDnbgH+bSYlWZqmQD+zQ0UQx0GYyryP/pQxGmXUBjLIXl6L
+         YrIdZY0uEoVD53RaPeIOhFfalJjyWlWgU9V2CTPvqrrJ4PCvSR4RtGME/pD4clhH+H/X
+         94wC6MSpJxBqV3/lpUGrL9On8KbZgrYIORUIcLEsrCug9WDuVuPx2ISoYswL5FR4lRpj
+         RJURraSYC69WZC6S/ftJ3V0GA2USq5L/i8RBRmphsjh4k4+jX+xM6t4bALEnUZfJkpVJ
+         oaeA==
+X-Gm-Message-State: ABy/qLbKhaxfs5X4d45aWhGpjBVQ6Y96j1hXzBpB5AlOFJ5GoxQ6T2O+
+        YygtRTPG09m72XGe3MYsq7qcPV2ej5c=
+X-Google-Smtp-Source: APBJJlGfvW12PoU1cgYxoig33TTppXu/jdZjVA/UYCNl9+6h2sdMFpEn0Y/2jF1wf15jCGzWeLtg2m+RbUw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ec8c:b0:1b8:95fc:d0f with SMTP id
+ x12-20020a170902ec8c00b001b895fc0d0fmr7816plg.7.1689724111171; Tue, 18 Jul
+ 2023 16:48:31 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 18 Jul 2023 16:44:43 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230718234512.1690985-1-seanjc@google.com>
+Subject: [RFC PATCH v11 00/29]  KVM: guest_memfd() and per-page attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/18/23 15:34, Kim Phillips wrote:
-...
-> Automatic IBRS provides protection to [1]:
-> 
->  - Processes running at CPL=0
->  - Processes running as host when Secure Nested Paging (SEV-SNP) is enabled
-> 
-> i.e.,
-> 
->     (CPL < 3) || ((ASID == 0) && SNP)
-> 
-> Because of this limitation, do not enable Automatic IBRS when SNP is
-> enabled.
+This is the next iteration of implementing fd-based (instead of vma-based)
+memory for KVM guests.  If you want the full background of why we are doing
+this, please go read the v10 cover letter[1].
 
-Gah, I found that hard to parse.  I think it's because you're talking
-about an SEV-SNP host in one part and "SNP" in the other but _meaning_
-SNP host and SNP guest.
+The biggest change from v10 is to implement the backing storage in KVM
+itself, and expose it via a KVM ioctl() instead of a "generic" sycall.
+See link[2] for details on why we pivoted to a KVM-specific approach.
 
-Could I maybe suggest that you folks follow the TDX convention and
-actually add _GUEST and _HOST to the feature name be explicit about
-which side is which?
+Key word is "biggest".  Relative to v10, there are many big changes.
+Highlights below (I can't remember everything that got changed at
+this point).
 
-> Instead, fall back to retpolines.
+Tagged RFC as there are a lot of empty changelogs, and a lot of missing
+documentation.  And ideally, we'll have even more tests before merging.
+There are also several gaps/opens (to be discussed in tomorrow's PUCK).
 
-Now I'm totally lost.
+v11:
+ - Test private<=>shared conversions *without* doing fallocate()
+ - PUNCH_HOLE all memory between iterations of the conversion test so that
+   KVM doesn't retain pages in the guest_memfd
+ - Rename hugepage control to be a very generic ALLOW_HUGEPAGE, instead of
+   giving it a THP or PMD specific name.
+ - Fold in fixes from a lot of people (thank you!)
+ - Zap SPTEs *before* updating attributes to ensure no weirdness, e.g. if
+   KVM handles a page fault and looks at inconsistent attributes
+ - Refactor MMU interaction with attributes updates to reuse much of KVM's
+   framework for mmu_notifiers.
 
-This is talking about falling back to retpolines ... in the kernel.  But
-"Automatic IBRS provides protection to ... CPL < 3", aka. the kernel.
+[1] https://lore.kernel.org/all/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+[2] https://lore.kernel.org/all/ZEM5Zq8oo+xnApW9@google.com
 
-> Note that the AutoIBRS feature may continue to be used within the
-> guest.
+Ackerley Tng (1):
+  KVM: selftests: Test KVM exit behavior for private memory/access
 
-What is this trying to say?
+Chao Peng (7):
+  KVM: Use gfn instead of hva for mmu_notifier_retry
+  KVM: Add KVM_EXIT_MEMORY_FAULT exit
+  KVM: Introduce per-page memory attributes
+  KVM: x86: Disallow hugepages when memory attributes are mixed
+  KVM: x86/mmu: Handle page fault for private memory
+  KVM: selftests: Add KVM_SET_USER_MEMORY_REGION2 helper
+  KVM: selftests: Expand set_memory_region_test to validate
+    guest_memfd()
 
-"AutoIBRS can still be used in a guest since it protects CPL < 3"
+Sean Christopherson (18):
+  KVM: Wrap kvm_gfn_range.pte in a per-action union
+  KVM: Tweak kvm_hva_range and hva_handler_t to allow reusing for gfn
+    ranges
+  KVM: PPC: Drop dead code related to KVM_ARCH_WANT_MMU_NOTIFIER
+  KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
+    CONFIG_KVM_GENERIC_MMU_NOTIFIER
+  KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+  mm: Add AS_UNMOVABLE to mark mapping as completely unmovable
+  security: Export security_inode_init_security_anon() for use by KVM
+  KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing
+    memory
+  KVM: Add transparent hugepage support for dedicated guest memory
+  KVM: Drop superfluous __KVM_VCPU_MULTIPLE_ADDRESS_SPACE macro
+  KVM: Allow arch code to track number of memslot address spaces per VM
+  KVM: x86: Add support for "protected VMs" that can utilize private
+    memory
+  KVM: selftests: Drop unused kvm_userspace_memory_region_find() helper
+  KVM: selftests: Convert lib's mem regions to
+    KVM_SET_USER_MEMORY_REGION2
+  KVM: selftests: Add support for creating private memslots
+  KVM: selftests: Introduce VM "shape" to allow tests to specify the VM
+    type
+  KVM: selftests: Add GUEST_SYNC[1-6] macros for synchronizing more data
+  KVM: selftests: Add basic selftest for guest_memfd()
 
-or
+Vishal Annapurve (3):
+  KVM: selftests: Add helpers to convert guest memory b/w private and
+    shared
+  KVM: selftests: Add helpers to do KVM_HC_MAP_GPA_RANGE hypercalls
+    (x86)
+  KVM: selftests: Add x86-only selftest for private memory conversions
 
-"The AutoIBRS bits can still be twiddled within the guest even though it
-doesn't do any good"
+ Documentation/virt/kvm/api.rst                | 114 ++++
+ arch/arm64/include/asm/kvm_host.h             |   2 -
+ arch/arm64/kvm/Kconfig                        |   2 +-
+ arch/arm64/kvm/mmu.c                          |   2 +-
+ arch/mips/include/asm/kvm_host.h              |   2 -
+ arch/mips/kvm/Kconfig                         |   2 +-
+ arch/mips/kvm/mmu.c                           |   2 +-
+ arch/powerpc/include/asm/kvm_host.h           |   2 -
+ arch/powerpc/kvm/Kconfig                      |   8 +-
+ arch/powerpc/kvm/book3s_hv.c                  |   2 +-
+ arch/powerpc/kvm/powerpc.c                    |   5 +-
+ arch/riscv/include/asm/kvm_host.h             |   2 -
+ arch/riscv/kvm/Kconfig                        |   2 +-
+ arch/riscv/kvm/mmu.c                          |   2 +-
+ arch/x86/include/asm/kvm_host.h               |  17 +-
+ arch/x86/include/uapi/asm/kvm.h               |   3 +
+ arch/x86/kvm/Kconfig                          |  14 +-
+ arch/x86/kvm/debugfs.c                        |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        | 287 +++++++-
+ arch/x86/kvm/mmu/mmu_internal.h               |   4 +
+ arch/x86/kvm/mmu/mmutrace.h                   |   1 +
+ arch/x86/kvm/mmu/tdp_mmu.c                    |   8 +-
+ arch/x86/kvm/vmx/vmx.c                        |  11 +-
+ arch/x86/kvm/x86.c                            |  24 +-
+ include/linux/kvm_host.h                      | 129 +++-
+ include/linux/pagemap.h                       |  11 +
+ include/uapi/linux/kvm.h                      |  50 ++
+ include/uapi/linux/magic.h                    |   1 +
+ mm/compaction.c                               |   4 +
+ mm/migrate.c                                  |   2 +
+ security/security.c                           |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ tools/testing/selftests/kvm/dirty_log_test.c  |   2 +-
+ .../testing/selftests/kvm/guest_memfd_test.c  | 114 ++++
+ .../selftests/kvm/include/kvm_util_base.h     | 141 +++-
+ .../testing/selftests/kvm/include/test_util.h |   5 +
+ .../selftests/kvm/include/ucall_common.h      |  12 +
+ .../selftests/kvm/include/x86_64/processor.h  |  15 +
+ .../selftests/kvm/kvm_page_table_test.c       |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 230 ++++---
+ tools/testing/selftests/kvm/lib/memstress.c   |   3 +-
+ .../selftests/kvm/set_memory_region_test.c    |  99 +++
+ .../kvm/x86_64/private_mem_conversions_test.c | 408 +++++++++++
+ .../kvm/x86_64/private_mem_kvm_exits_test.c   | 115 ++++
+ .../kvm/x86_64/ucna_injection_test.c          |   2 +-
+ virt/kvm/Kconfig                              |  17 +
+ virt/kvm/Makefile.kvm                         |   1 +
+ virt/kvm/dirty_ring.c                         |   2 +-
+ virt/kvm/guest_mem.c                          | 635 ++++++++++++++++++
+ virt/kvm/kvm_main.c                           | 384 +++++++++--
+ virt/kvm/kvm_mm.h                             |  38 ++
+ 51 files changed, 2700 insertions(+), 246 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/guest_memfd_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/private_mem_kvm_exits_test.c
+ create mode 100644 virt/kvm/guest_mem.c
 
-?
 
-> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> index 8cd4126d8253..311c0a6422b5 100644
-> --- a/arch/x86/kernel/cpu/common.c
-> +++ b/arch/x86/kernel/cpu/common.c
-> @@ -1348,7 +1348,8 @@ static void __init cpu_set_bug_bits(struct
-> cpuinfo_x86 *c)
->       * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
->       * flag and protect from vendor-specific bugs via the whitelist.
->       */
-> -    if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
-> +    if ((ia32_cap & ARCH_CAP_IBRS_ALL) || (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
-> +        !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
->          setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
->          if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
->              !(ia32_cap & ARCH_CAP_PBRSB_NO))
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+-- 
+2.41.0.255.g8b1d071c50-goog
 
