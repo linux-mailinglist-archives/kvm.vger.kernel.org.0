@@ -2,87 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C740759EB9
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 21:33:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93341759EA1
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 21:32:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231293AbjGSTda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 15:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56590 "EHLO
+        id S230062AbjGSTck (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 15:32:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbjGSTdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 15:33:20 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA21B268B;
-        Wed, 19 Jul 2023 12:32:51 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id B094112007F;
-        Wed, 19 Jul 2023 22:32:49 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru B094112007F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1689795169;
-        bh=xFK6wvHnDMcWR1WaNUgaOhaKf8/llnzNh96n/+7csqE=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=l0v7DCbAdFJvikgtKrOlNcHeGkfzFDhYfYqHkQNUEfKLwwZ+bxt4xePmrzjHu3s0S
-         qzU+hWYJByGI2Qg95558OZfWegyoumn3Fdxi9iSc+Uk3fru8DVXeDunTIJ6zz+bCSb
-         ebScfgtoTcUgkaY7j2YD+iVuYj4QNogMvW9Tw9PZVTCVGoyZ5APsRMgRuNrb5FLEBd
-         NzbH8gFsDcaCg1fWugYGqE/jVHiHnzlBa7VXqH2pXGXilszx/j5sqiUnPibYCbOhuX
-         YCo7IDkKDnwfBlhwPrNlXQwShZkKr/yKPmRFl7an5Q7/RYqp/OlRVU0hpR/+O+y6gj
-         jU0ZWcbv1GwDA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229765AbjGSTci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 15:32:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2366D199A;
+        Wed, 19 Jul 2023 12:32:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Wed, 19 Jul 2023 22:32:49 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 22:32:48 +0300
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
-        <avkrasnov@sberdevices.ru>,
-        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v2 4/4] vsock/test: MSG_PEEK test for SOCK_SEQPACKET
-Date:   Wed, 19 Jul 2023 22:27:08 +0300
-Message-ID: <20230719192708.1775162-5-AVKrasnov@sberdevices.ru>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
-References: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AA37D617F4;
+        Wed, 19 Jul 2023 19:32:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C165BC433C8;
+        Wed, 19 Jul 2023 19:32:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689795156;
+        bh=5B2uDA9tsswf97AKzHjJwVKSaC/eQwz3Ft+8HwN2cMY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=sKPn8HunIyLND9JEMu4ESWhCtE81F+Kc4q9T+MsHvJe5fiVAGpbXuDRp/BYXpZpLS
+         W6t2CpoThhFjaBKMq9V/vJ4xDtEDO/+QJLKs4qmGj74udh8yjbH1CzdstTCReicUZ8
+         a+GuNCN4+RignvXbuNN79PYXWUJifJtjcjTBO9iPpuJst49Rh/J1yePIbEk1m6saDf
+         mz8tkyzl0u4mUpS4M6IUgiyI4u7WnVW2a2CTTQ6PLdK70OCT8nqJw53A7dhVhXa36m
+         HFuvV439o4y7M4ZqbsSopjve8dD2ar20mZs0A1OecssekbzYQInKUphXz5EvXRa7wO
+         tCq85pkSsXacQ==
+Date:   Wed, 19 Jul 2023 14:32:33 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Sui Jingfeng <sui.jingfeng@linux.dev>
+Cc:     David Airlie <airlied@gmail.com>, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        Sui Jingfeng <suijingfeng@loongson.cn>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Pan Xinhui <Xinhui.Pan@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        Lyude Paul <lyude@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Hawking Zhang <Hawking.Zhang@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        YiPeng Chai <YiPeng.Chai@amd.com>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        Likun Gao <Likun.Gao@amd.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jani Nikula <jani.nikula@intel.com>
+Subject: Re: [PATCH v3 4/9] PCI/VGA: Improve the default VGA device selection
+Message-ID: <20230719193233.GA511659@bhelgaas>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178730 [Jul 19 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/19 15:29:00 #21641898
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711164310.791756-5-sui.jingfeng@linux.dev>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,131 +86,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds MSG_PEEK test for SOCK_SEQPACKET. It works in the same way as
-SOCK_STREAM test, except it also tests MSG_TRUNC flag.
+[+cc linux-pci (please cc in the future since the bulk of this patch
+is in drivers/pci/)]
 
-Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
----
- tools/testing/vsock/vsock_test.c | 58 +++++++++++++++++++++++++++++---
- 1 file changed, 54 insertions(+), 4 deletions(-)
+On Wed, Jul 12, 2023 at 12:43:05AM +0800, Sui Jingfeng wrote:
+> From: Sui Jingfeng <suijingfeng@loongson.cn>
+> 
+> Currently, the strategy of selecting the default boot on a multiple video
+> card coexistence system is not perfect. Potential problems are:
+> 
+> 1) This function is a no-op on non-x86 architectures.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 444a3ff0681f..2ca2cbfa9808 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -257,14 +257,19 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
- 
- #define MSG_PEEK_BUF_LEN 64
- 
--static void test_stream_msg_peek_client(const struct test_opts *opts)
-+static void __test_msg_peek_client(const struct test_opts *opts,
-+				   bool seqpacket)
- {
- 	unsigned char buf[MSG_PEEK_BUF_LEN];
- 	ssize_t send_size;
- 	int fd;
- 	int i;
- 
--	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (seqpacket)
-+		fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
-+	else
-+		fd = vsock_stream_connect(opts->peer_cid, 1234);
-+
- 	if (fd < 0) {
- 		perror("connect");
- 		exit(EXIT_FAILURE);
-@@ -290,7 +295,8 @@ static void test_stream_msg_peek_client(const struct test_opts *opts)
- 	close(fd);
- }
- 
--static void test_stream_msg_peek_server(const struct test_opts *opts)
-+static void __test_msg_peek_server(const struct test_opts *opts,
-+				   bool seqpacket)
- {
- 	unsigned char buf_half[MSG_PEEK_BUF_LEN / 2];
- 	unsigned char buf_normal[MSG_PEEK_BUF_LEN];
-@@ -298,7 +304,11 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- 	ssize_t res;
- 	int fd;
- 
--	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (seqpacket)
-+		fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
-+	else
-+		fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+
- 	if (fd < 0) {
- 		perror("accept");
- 		exit(EXIT_FAILURE);
-@@ -340,6 +350,21 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- 		exit(EXIT_FAILURE);
- 	}
- 
-+	if (seqpacket) {
-+		/* This type of socket supports MSG_TRUNC flag,
-+		 * so check it with MSG_PEEK. We must get length
-+		 * of the message.
-+		 */
-+		res = recv(fd, buf_half, sizeof(buf_half), MSG_PEEK |
-+			   MSG_TRUNC);
-+		if (res != sizeof(buf_peek)) {
-+			fprintf(stderr,
-+				"recv(2) + MSG_PEEK | MSG_TRUNC, exp %zu, got %zi\n",
-+				sizeof(buf_half), res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
- 	res = recv(fd, buf_normal, sizeof(buf_normal), 0);
- 	if (res != sizeof(buf_normal)) {
- 		fprintf(stderr, "recv(2), expected %zu, got %zi\n",
-@@ -356,6 +381,16 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_stream_msg_peek_client(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_client(opts, false);
-+}
-+
-+static void test_stream_msg_peek_server(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_server(opts, false);
-+}
-+
- #define SOCK_BUF_SIZE (2 * 1024 * 1024)
- #define MAX_MSG_SIZE (32 * 1024)
- 
-@@ -1125,6 +1160,16 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_seqpacket_msg_peek_client(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_client(opts, true);
-+}
-+
-+static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
-+{
-+	return __test_msg_peek_server(opts, true);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1200,6 +1245,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_virtio_skb_merge_client,
- 		.run_server = test_stream_virtio_skb_merge_server,
- 	},
-+	{
-+		.name = "SOCK_SEQPACKET MSG_PEEK",
-+		.run_client = test_seqpacket_msg_peek_client,
-+		.run_server = test_seqpacket_msg_peek_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+Which function in particular is a no-op for non-x86?
 
+> 2) It does not take the PCI Bar may get relocated into consideration.
+> 3) It is not effective for the PCI device without a dedicated VRAM Bar.
+> 4) It is device-agnostic, thus it has to waste the effort to iterate all
+>    of the PCI Bar to find the VRAM aperture.
+> 5) It has invented lots of methods to determine which one is the default
+>    boot device, but this is still a policy because it doesn't give the
+>    user a choice to override.
+
+I don't think we need a list of *potential* problems.  We need an
+example of the specific problem this will solve, i.e., what currently
+does not work?
+
+The drm/ast and maybe drm/loongson patches are the only ones that use
+the new callback, so I assume there are real problems with those
+drivers.
+
+CONFIG_DRM_AST is a tristate.  We're talking about identifying the
+boot-time console device.  So if CONFIG_DRM_AST=m, I guess we don't
+get the benefit of the new callback unless the module gets loaded?
+
+> Also honor the comment: "Clients have *TWO* callback mechanisms they
+> can use"
+
+This refers to the existing vga_client_register() function comment:
+
+   * vga_client_register - register or unregister a VGA arbitration client
+   * @pdev: pci device of the VGA client
+   * @set_decode: vga decode change callback
+   *
+   * Clients have two callback mechanisms they can use.
+   *
+   * @set_decode callback: If a client can disable its GPU VGA resource, it
+   * will get a callback from this to set the encode/decode state.
+
+and the fact that struct vga_device currently only contains *one*
+callback function pointer:
+
+  unsigned int (*set_decode)(struct pci_dev *pdev, bool decode);
+
+Adding the .is_primary_gpu() callback does mean there will now be two
+callbacks, as the comment says, but I think it's just confusing to
+mention this in the commit log, so I would just remove it.
+
+> @@ -1509,13 +1543,24 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
+>  	 * cases of hotplugable vga cards.
+>  	 */
+>  
+> -	if (action == BUS_NOTIFY_ADD_DEVICE)
+> +	switch (action) {
+> +	case BUS_NOTIFY_ADD_DEVICE:
+>  		notify = vga_arbiter_add_pci_device(pdev);
+> -	else if (action == BUS_NOTIFY_DEL_DEVICE)
+> +		if (notify)
+> +			vga_arbiter_notify_clients();
+> +		break;
+> +	case BUS_NOTIFY_DEL_DEVICE:
+>  		notify = vga_arbiter_del_pci_device(pdev);
+> +		if (notify)
+> +			vga_arbiter_notify_clients();
+> +		break;
+> +	case BUS_NOTIFY_BOUND_DRIVER:
+> +		vga_arbiter_do_arbitration(pdev);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+
+Changing from if/else to switch makes the patch bigger than necessary
+for no real benefit and obscures what is really changing.
+
+Bjorn
