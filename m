@@ -2,125 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC162759CD6
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 19:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A527E759D17
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 20:08:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjGSRyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 13:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39496 "EHLO
+        id S230031AbjGSSIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 14:08:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjGSRyG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 13:54:06 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2645C1FC1
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:54:05 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5707177ff8aso64378487b3.2
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:54:05 -0700 (PDT)
+        with ESMTP id S229450AbjGSSIr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 14:08:47 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BCEA1FC4
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 11:08:46 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-345bc4a438fso11105ab.1
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 11:08:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689789244; x=1690394044;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+        d=google.com; s=20221208; t=1689790125; x=1690394925;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=0kxZ4Z80lUcSFdp3GgQl/jQwBGNAtEogOtDD6DT+le8=;
-        b=NdNKIYqEldjUUQV4h+XNM1ILmBpma9z9AEdBtYn1qcrFOenwJmBXrHw6mTbkprQj8p
-         r+YtkbikqlLfJdQZIoTiQv/TZpBxRXEg0gSoK35Ky48bcLRFCn0Qj0DsnXRublL7LccU
-         VbZhu6d+zj+n5OuXYLNNjo3SaPP6NC8/yNGWRhVbEHVJlHuLX5Gsll/rQ8aLyHWCbZUs
-         /8pD6jrn0k0jGKj8o91kas/Vof7SZ7T7M6Y8JVFS9L6EnZODlq5wuOfEPi4IxaVWx6IY
-         g0cXiBg3AzBUjksD04dElZ9FVrB9vd1h8Wu2ap7UEulstmwA86OoTJopktyhvQXeMD9s
-         GkBw==
+        bh=Ui7psRwlM+a2Yq2a67GdTfFgGYuP52lm5NF/97EmBNk=;
+        b=k7EVc44FYiypDLV/fHhx/l0W/p55++c1waRmlDHNoXkyDC062iZy4xZNWy13BQ8zUQ
+         eEo0ENPBTHxBXH3b2a3PvvmIQnul68T0DUgrjvYXl/Y4byzhcRl1sn7Y7ow7S0i5YTCt
+         /3iQSGRmTa7D8Zuo9FeljT//bedT5YZ5rlZzhQMjJO3T6SKPqc9xaI4NHiD4ha9529hg
+         ftsePExNxOn7hMagk7Q861cvY5rsiLUF+/LtIDlvzkYXxCpingSUDyfn2bjaygPk7iB8
+         2Gge/K1av5A7Qn88tXinPk6eizF1Or0YwQUXqN2DfP14nOIapipovplnMiexJH5vH1of
+         O9dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689789244; x=1690394044;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20221208; t=1689790125; x=1690394925;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0kxZ4Z80lUcSFdp3GgQl/jQwBGNAtEogOtDD6DT+le8=;
-        b=LIC9xQgup/l8fkmUtWoTtWwcwaIfZMsc1/VeEsxNceSjiDbsuz2+5PWhFSFPf75XFq
-         YZilsf8yjl0xlyatuUUp6FJwWU2QQbFOTnRfmpRFLfzfeTsFyYNbyJHZHqL90PjweDGR
-         DtEAZ/DWKVAxAiEj8mS3RslO/XWFES+X04LqnElAZGkcv0Q/jm3BeP6DShtpUYG7dA89
-         pP0ZKNRNsci/S0+TrbH7+6xUGyBoJn4+ZXAc+ER+1WsCZGGSs8vG+p9ReB58x+AkGHJC
-         ghC9Pg5y+RiqcQVNvI4klS5zaQ0VvOGfFubVPXCS5EyfS8ZUELASlOcDxYnXSvmWNpeX
-         qdOw==
-X-Gm-Message-State: ABy/qLbxriLZDMwCmY/l+oz9jaHBJkgWRlK6n1lL9onMTtZXetScy8u6
-        C2aRfPtfBKki+oWlJJNl5MC8nqdw4HcP
-X-Google-Smtp-Source: APBJJlHzC655GgaoeeexqmchzYWVTbKP9Ygbn4QXSHn76tJOWPJ5nIAjVrvG3mrJnq+Ot9jVn2qgg1kU3KfD
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a81:d00a:0:b0:56d:502:9eb0 with SMTP id
- v10-20020a81d00a000000b0056d05029eb0mr34446ywi.6.1689789244409; Wed, 19 Jul
- 2023 10:54:04 -0700 (PDT)
-Date:   Wed, 19 Jul 2023 17:54:00 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230719175400.647154-1-rananta@google.com>
-Subject: [PATCH] KVM: arm64: Fix CPUHP logic for protected KVM
-From:   Raghavendra Rao Ananta <rananta@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        bh=Ui7psRwlM+a2Yq2a67GdTfFgGYuP52lm5NF/97EmBNk=;
+        b=VMQK2lH7xPcPh7T6PWd+CxfANSc7PJOHxO2EW2CMYMIkG1d3P4EYYCHRlpaCh9jXTC
+         rCkVM7NHkWtIX7tFZ87Vb2bS0tMF08mCW86mbqPoG7Y2Bp8vTotauEEANpdg3A0Gk2EG
+         J7DOoMFI/176rUOsMKb3p2xUwxsnsaQUE+F5tiS4JF5062oQ7vmp9Ql4VTX1D05sCURe
+         pz7jmf44X+HmM51yhctGE6BVWTZjwtSKrrhib5PutMhpxpPhp6r/1alO2kR2+5uiizjd
+         gXPg7yuTLHgWuXmw6hZkqGOJLbWMnDPAEA1zx5CcHdOBdYunhF9VrGnHuIeMFjAlt+TL
+         h53A==
+X-Gm-Message-State: ABy/qLZ3ClQ9fdBBKG5fCdictmS0ak6HxaQ1DyrNSHNjawwPL0+uEKcJ
+        Eu+pnq633nO17+/NKVrmk8hbSs2Pk0I1Gz4QldFHm5vZKAUmJ7VbUgo=
+X-Google-Smtp-Source: APBJJlFsTmlpr7GV+U/70DOIelMDDS0dmLjRhEYxnF8+V5U/pQYyVYDxY16IUVtaOA1aH+mCwhk6nUeUyInLp8cO2V4=
+X-Received: by 2002:a05:6e02:1b07:b0:335:6626:9f38 with SMTP id
+ i7-20020a056e021b0700b0033566269f38mr26261ilv.0.1689790125468; Wed, 19 Jul
+ 2023 11:08:45 -0700 (PDT)
+MIME-Version: 1.0
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 19 Jul 2023 11:08:34 -0700
+Message-ID: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
+Subject: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
+To:     kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For protected kvm, the CPU hotplug 'down' logic currently brings
-down the timer and vGIC, essentially disabling interrupts. However,
-because of how the 'kvm_arm_hardware_enabled' flag is designed, it
-never re-enables them back on the CPU hotplug 'up' path. Hence,
-clean up the logic to maintain the CPU hotplug up/down symmetry.
+Normally, we would restrict guest MSR writes based on guest CPU
+features. However, with IA32_SPEC_CTRL and IA32_PRED_CMD, this is not
+the case.
 
-Fixes: 466d27e48d7c ("KVM: arm64: Simplify the CPUHP logic")
-Reported-by: Oliver Upton <oliver.upton@linux.dev>
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- arch/arm64/kvm/arm.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+For the first non-zero write to IA32_SPEC_CTRL, we check to see that
+the host supports the value written. We don't care whether or not the
+guest supports the value written (as long as it supports the MSR).
+After the first non-zero write, we stop intercepting writes to
+IA32_SPEC_CTRL, so the guest can write any value supported by the
+hardware. This could be problematic in heterogeneous migration pools.
+For instance, a VM that starts on a Cascade Lake host may set
+IA32_SPEC_CTRL.PSFD[bit 7], even if the guest
+CPUID.(EAX=07H,ECX=02H):EDX.PSFD[bit 0] is clear. Then, if that VM is
+migrated to a Skylake host, KVM_SET_MSRS will refuse to set
+IA32_SPEC_CTRL to its current value, because Skylake doesn't support
+PSFD.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c2c14059f6a8..010ebfa69650 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1867,14 +1867,10 @@ static void _kvm_arch_hardware_enable(void *discard)
- 
- int kvm_arch_hardware_enable(void)
- {
--	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
--
- 	_kvm_arch_hardware_enable(NULL);
- 
--	if (!was_enabled) {
--		kvm_vgic_cpu_up();
--		kvm_timer_cpu_up();
--	}
-+	kvm_vgic_cpu_up();
-+	kvm_timer_cpu_up();
- 
- 	return 0;
- }
-@@ -1889,10 +1885,8 @@ static void _kvm_arch_hardware_disable(void *discard)
- 
- void kvm_arch_hardware_disable(void)
- {
--	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
--		kvm_timer_cpu_down();
--		kvm_vgic_cpu_down();
--	}
-+	kvm_timer_cpu_down();
-+	kvm_vgic_cpu_down();
- 
- 	if (!is_protected_kvm_enabled())
- 		_kvm_arch_hardware_disable(NULL);
--- 
-2.41.0.487.g6d72f3e995-goog
+We disable write intercepts IA32_PRED_CMD as long as the guest
+supports the MSR. That's fine for now, since only one bit of PRED_CMD
+has been defined. Hence, guest support and host support are
+equivalent...today. But, are we really comfortable with letting the
+guest set any IA32_PRED_CMD bit that may be defined in the future?
 
+The same question applies to IA32_SPEC_CTRL. Are we comfortable with
+letting the guest write to any bit that may be defined in the future?
+At least the AMD approach with V_SPEC_CTRL prevents the guest from
+clearing any bits set by the host, but on Intel, it's a total
+free-for-all. What happens when a new bit is defined that absolutely
+must be set to 1 all of the time?
