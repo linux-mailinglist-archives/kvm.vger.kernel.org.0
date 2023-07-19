@@ -2,102 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA6347598BB
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 16:42:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B615C7599B2
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 17:27:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbjGSOml (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 10:42:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37678 "EHLO
+        id S230127AbjGSP12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 11:27:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbjGSOmX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 10:42:23 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4145E26B2;
-        Wed, 19 Jul 2023 07:42:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689777722; x=1721313722;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BFqvAUutJF9pxnmNohwquM/IhtEy7DIeB7KfVhQeILE=;
-  b=W/baeReAr6k6NZUod7P0FRBNfj9TiITw5BCRQKe7pXwbZpJtBnG4tRV7
-   M8NLQ5LO0OOU4fOM4zo9+EjnpbNtPwpLMeff5YbhXdMXxksaOo759qOvd
-   jeZXuJld6wpzVm8EX2gChF3X4MfJResSnlPhp/st84NPfemIZUvN5fGu+
-   9Ws+MAqkyZrY0i+7BJsYx6WLNjgz6zbJ76hya9v042VCJgQM1xNCDYG7Y
-   W2yB5l+1PpNTwE9Rx/hCs23LMrlmorZSMD3ZOPX0OAeEGMeMiXCXOSS2Q
-   V/T/E/pY8Fak7dYHCq+rPgUTHZsI7wMKM5t5Q5XlCr+JhMG5TIKEvkgAs
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="346788223"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="346788223"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 07:42:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="867503358"
-Received: from binbinwu-mobl.ccr.corp.intel.com ([10.249.173.69])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 07:41:58 -0700
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
-        kai.huang@intel.com, David.Laight@ACULAB.COM,
-        robert.hu@linux.intel.com, guang.zeng@intel.com,
-        binbin.wu@linux.intel.com
-Subject: [PATCH v10 9/9] KVM: x86: Expose LAM feature to userspace VMM
-Date:   Wed, 19 Jul 2023 22:41:31 +0800
-Message-Id: <20230719144131.29052-10-binbin.wu@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230719144131.29052-1-binbin.wu@linux.intel.com>
-References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+        with ESMTP id S231315AbjGSP10 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 11:27:26 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295C0B7
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:27:25 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36JF8o6p001764;
+        Wed, 19 Jul 2023 15:27:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8oo7A0inLRaxr7LZEN+fwDAqfcY0UW9iU2yfFqBsVIs=;
+ b=U8V9XflZr0+DKC9lbbKpLwuH9hP/YM3Vklbl2wb+I5yxM41qZcwm3PWbBz8VOGbMkbO3
+ tuIfL3sKEebEUq7wuf3H6yVOF2TwoqvNmc4O58Ms/orBEMOR0uGqwwbbpXTy6ThCOyLk
+ wmtBewfoCw8bAqzFVDZhkLF4JR07hW/y+BRIxx6DadIPf8JNicYb2MYuE7/X7HyQq+YD
+ gYpBtNzjOP/jKUTLY537zwN/4qglGWwWices/7mpsFN3aHCp6yj0eOTxYd2DVZQrFuQw
+ na3QWOscEw/6WvltLeV4o43sHSvVRiEuqKR8MwGdmxHlOz4jK5Td2GloivUDpjy0rbiI UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rxf7rx5hq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jul 2023 15:27:12 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36JF9Suv004530;
+        Wed, 19 Jul 2023 15:27:12 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rxf7rx5hg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jul 2023 15:27:12 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36JDLY75004183;
+        Wed, 19 Jul 2023 15:27:11 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3rv8g132a9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jul 2023 15:27:11 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36JFR7uL1311448
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jul 2023 15:27:07 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 971AD20040;
+        Wed, 19 Jul 2023 15:27:07 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3446620043;
+        Wed, 19 Jul 2023 15:27:07 +0000 (GMT)
+Received: from [9.155.200.205] (unknown [9.155.200.205])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed, 19 Jul 2023 15:27:07 +0000 (GMT)
+Message-ID: <d4869bcf-56b8-c273-fa8a-18d6d667626f@linux.ibm.com>
+Date:   Wed, 19 Jul 2023 17:27:06 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v21 00/20] s390x: CPU Topology
+Content-Language: en-US
+To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+ <e5387fc9-f8b0-3905-8b48-88409c251710@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <e5387fc9-f8b0-3905-8b48-88409c251710@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3S-MMX65tSyInQutiASIlpIJzWJTOPj-
+X-Proofpoint-GUID: DazukLw-NYmHn6JaW8TR6dYjJLWBpgku
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-19_10,2023-07-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 adultscore=0 mlxscore=0 phishscore=0
+ bulkscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307190135
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Robert Hoo <robert.hu@linux.intel.com>
 
-LAM feature is enumerated by CPUID.7.1:EAX.LAM[bit 26].
-Expose the feature to userspace as the final step after the following
-supports:
-- CR4.LAM_SUP virtualization
-- CR3.LAM_U48 and CR3.LAM_U57 virtualization
-- Check and untag 64-bit linear address when LAM applies in instruction
-  emulations and VMExit handlers.
+On 7/5/23 12:02, Thomas Huth wrote:
+> On 30/06/2023 11.17, Pierre Morel wrote:
+> ...
+>> Testing
+>> =======
+>>
+>> To use the QEMU patches, you will need Linux V6-rc1 or newer,
+>> or use the following Linux mainline patches:
+>>
+>> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report
+>> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function
+>> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF 
+>> fac..
+>>
+>> Currently this code is for KVM only, I have no idea if it is interesting
+>> to provide a TCG patch. If ever it will be done in another series.
+>>
+>> This series provide 12 avocado tests using Fedora-35 kernel and initrd
+>> image.
+>
+>  Hi Pierre,
+>
+> the new avocado tests currently fail if you run them on a x86 host. 
+> Could you please add a check that they are properly skipped instead if 
+> the environment does not match? I guess a
+>
+>  self.require_accelerator('kvm')
+>
+> should do the job...
+>
+>  Thomas
+>
+Yes, thanks, I add this during initialization of the VM.
 
-Exposing SGX LAM support is not supported yet. SGX LAM support is enumerated
-in SGX's own CPUID and there's no hard requirement that it must be supported
-when LAM is reported in CPUID leaf 0x7.
+Regards,
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Kai Huang <kai.huang@intel.com>
-Tested-by: Xuelian Guo <xuelian.guo@intel.com>
----
- arch/x86/kvm/cpuid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 7ebf3ce1bb5f..21d525b01d45 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -645,7 +645,7 @@ void kvm_set_cpu_caps(void)
- 	kvm_cpu_cap_mask(CPUID_7_1_EAX,
- 		F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
- 		F(FZRM) | F(FSRS) | F(FSRC) |
--		F(AMX_FP16) | F(AVX_IFMA)
-+		F(AMX_FP16) | F(AVX_IFMA) | F(LAM)
- 	);
- 
- 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
--- 
-2.25.1
+Pierre
 
