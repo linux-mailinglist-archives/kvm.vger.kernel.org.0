@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79341758C0E
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:26:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3FBB758C10
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:26:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231154AbjGSD0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 23:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48858 "EHLO
+        id S231193AbjGSD0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 23:26:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230501AbjGSD0X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 23:26:23 -0400
+        with ESMTP id S230484AbjGSD0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 23:26:32 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409361FF2;
-        Tue, 18 Jul 2023 20:26:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF86C2127;
+        Tue, 18 Jul 2023 20:26:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689737161; x=1721273161;
+  t=1689737164; x=1721273164;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=FjO1js6m8X5U2Hjn/Wte4F1bCdmgu0s821wN9N/Sqeo=;
-  b=lzAxPpzCCCn3GRhGZcIQOMk9IOr5ObotQHcUFEnIFrrutslM9DMh+uMI
-   /tkoeAAYDffXb4lp2Sm+ExTyXBoOFrK3i99ETdNTzpNQYBmnRqPWMSSZm
-   KqqIBF71rHu6uPZJSzvmaz9yxuzpfpdfBQEcp3JOyZOTAH+uX1TmWYjsX
-   4dTWXLiS0IL01XqGDUdk9s84Jv+V2p9HFGEO57yygQ0g8Fl4eASKU25w1
-   veSWPhF2l5QlWoUG5uI0pWCm4JHMw3W5k/x0HX54oBfscZtWdIAdE/5db
-   6zuX/dUZsz1erxj0yEmr5JYJaBuYfpCovpKZ7ufsmaaQzYAnCTPaS8+03
+  bh=Zge9RC4suOhS4WSxzkRjdvntcW7BQ3V/JThuasqgeWI=;
+  b=hntBO0iJTXHRRPb4sZZnGbjc6mvapaDkoLOVqumJkqT/rp2iGL4WXCB4
+   0+QQm1qyIeegy84thbCag9Tw8j4aGJ1/eO+rRzSSLWKrLMQ1GRnD1lKaw
+   gicuHghPud5IjUa2qiIY+9vmLeG7vs0eagZWXKVT+biuwF0L4dvaxeLPn
+   1GjlqI2EbSoZt0lcWFggRRWvolgoon5nOilnMON6tW57Ylb00WFTEh+ZW
+   /sVOM+Hc/U+hXzeMu9kyqP+FosvvN2NveVsD7dURXOhggIQyTguN2P2Gg
+   T5B5o7daPiHTo2XuZl/ulVcSCkp3SNeuPAho2TFOI0SsguKP+GIQRrbn6
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346665863"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346665874"
 X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="346665863"
+   d="scan'208";a="346665874"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:26:00 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:26:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="813980283"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="813980290"
 X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="813980283"
+   d="scan'208";a="813980290"
 Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.123])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:58 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:26:01 -0700
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v2 6/8] KVM: VMX: Implement and apply vmx_is_lass_violation() for LASS protection
-Date:   Wed, 19 Jul 2023 10:45:56 +0800
-Message-Id: <20230719024558.8539-7-guang.zeng@intel.com>
+Subject: [PATCH v2 7/8] KVM: x86: Virtualize CR4.LASS
+Date:   Wed, 19 Jul 2023 10:45:57 +0800
+Message-Id: <20230719024558.8539-8-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230719024558.8539-1-guang.zeng@intel.com>
 References: <20230719024558.8539-1-guang.zeng@intel.com>
@@ -63,121 +63,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement and wire up vmx_is_lass_violation() in kvm_x86_ops for VMX.
+Virtualize CR4.LASS[bit 27] under KVM control instead of being guest-owned
+as CR4.LASS generally set once for each vCPU at boot time and won't be
+toggled at runtime. Besides, only if VM has LASS capability enumerated with
+CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6], KVM allows guest software to be able
+to set CR4.LASS.
 
-LASS violation check takes effect in KVM emulation of instruction fetch
-and data access including implicit access when vCPU is running in long
-mode, and also involved in emulation of VMX instruction and SGX ENCLS
-instruction to enforce the mode-based protections before paging.
+Updating cr4_fixed1 to set CR4.LASS bit in the emulated IA32_VMX_CR4_FIXED1
+MSR for guests and allow guests to enable LASS in nested VMX operation as
+well.
 
-But the target memory address of emulation of TLB invalidation and branch
-instructions aren't subject to LASS as exceptions.
+Notes: Setting CR4.LASS to 1 enable LASS in IA-32e mode. It doesn't take
+effect in legacy mode even if CR4.LASS is set.
 
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c |  3 ++-
- arch/x86/kvm/vmx/sgx.c    |  4 ++++
- arch/x86/kvm/vmx/vmx.c    | 35 +++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.h    |  3 +++
- 4 files changed, 44 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h | 2 +-
+ arch/x86/kvm/vmx/vmx.c          | 3 +++
+ arch/x86/kvm/x86.h              | 2 ++
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e35cf0bd0df9..72e78566a3b6 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4985,7 +4985,8 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
- 		 * non-canonical form. This is the only check on the memory
- 		 * destination for long mode!
- 		 */
--		exn = is_noncanonical_address(*ret, vcpu);
-+		exn = is_noncanonical_address(*ret, vcpu) ||
-+		      vmx_is_lass_violation(vcpu, *ret, len, 0);
- 	} else {
- 		/*
- 		 * When not in long mode, the virtual/linear address is
-diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-index 2261b684a7d4..f8de637ce634 100644
---- a/arch/x86/kvm/vmx/sgx.c
-+++ b/arch/x86/kvm/vmx/sgx.c
-@@ -46,6 +46,10 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
- 			((s.base != 0 || s.limit != 0xffffffff) &&
- 			(((u64)*gva + size - 1) > s.limit + 1));
- 	}
-+
-+	if (!fault)
-+		fault = vmx_is_lass_violation(vcpu, *gva, size, 0);
-+
- 	if (fault)
- 		kvm_inject_gp(vcpu, 0);
- 	return fault ? -EINVAL : 0;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 791f0dd48cd9..a881b0518a18 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -125,7 +125,7 @@
+ 			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
+ 			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
+ 			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
+-			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP))
++			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP | X86_CR4_LASS))
+ 
+ #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
+ 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 44fb619803b8..15a7c6e7a25d 100644
+index 15a7c6e7a25d..e74991bed362 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8127,6 +8127,40 @@ static void vmx_vm_destroy(struct kvm *kvm)
- 	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
+@@ -7603,6 +7603,9 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
+ 	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
+ 	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
+ 
++	entry = kvm_find_cpuid_entry_index(vcpu, 0x7, 1);
++	cr4_fixed1_update(X86_CR4_LASS,       eax, feature_bit(LASS));
++
+ #undef cr4_fixed1_update
  }
  
-+bool vmx_is_lass_violation(struct kvm_vcpu *vcpu, unsigned long addr,
-+			   unsigned int size, unsigned int flags)
-+{
-+	const bool is_supervisor_address = !!(addr & BIT_ULL(63));
-+	const bool implicit = !!(flags & X86EMUL_F_IMPLICIT);
-+	const bool fetch = !!(flags & X86EMUL_F_FETCH);
-+	const bool is_wraparound_access = size ? (addr + size - 1) < addr : false;
-+
-+	if (!kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS) || !is_long_mode(vcpu))
-+		return false;
-+
-+	/*
-+	 * INVTLB isn't subject to LASS, e.g. to allow invalidating userspace
-+	 * addresses without toggling RFLAGS.AC.  Branch targets aren't subject
-+	 * to LASS in order to simplifiy far control transfers (the subsequent
-+	 * fetch will enforce LASS as appropriate).
-+	 */
-+	if (flags & (X86EMUL_F_BRANCH | X86EMUL_F_INVTLB))
-+		return false;
-+
-+	if (!implicit && vmx_get_cpl(vcpu) == 3)
-+		return is_supervisor_address;
-+
-+	/* LASS is enforced for supervisor-mode access iff SMAP is enabled. */
-+	if (!fetch && !kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP))
-+		return false;
-+
-+	/* Like SMAP, RFLAGS.AC disables LASS checks in supervisor mode. */
-+	if (!fetch && !implicit && (kvm_get_rflags(vcpu) & X86_EFLAGS_AC))
-+		return false;
-+
-+	return is_wraparound_access ? true : !is_supervisor_address;
-+}
-+
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.name = KBUILD_MODNAME,
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index c544602d07a3..e1295f490308 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -529,6 +529,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+ 		__reserved_bits |= X86_CR4_VMXE;        \
+ 	if (!__cpu_has(__c, X86_FEATURE_PCID))          \
+ 		__reserved_bits |= X86_CR4_PCIDE;       \
++	if (!__cpu_has(__c, X86_FEATURE_LASS))          \
++		__reserved_bits |= X86_CR4_LASS;        \
+ 	__reserved_bits;                                \
+ })
  
-@@ -8266,6 +8300,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.complete_emulated_msr = kvm_complete_insn_gp,
- 
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
-+	.is_lass_violation = vmx_is_lass_violation,
- };
- 
- static unsigned int vmx_handle_intel_pt_intr(void)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 9e66531861cf..c1e541a790bb 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -433,6 +433,9 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
- u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
- u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
- 
-+bool vmx_is_lass_violation(struct kvm_vcpu *vcpu, unsigned long addr,
-+			   unsigned int size, unsigned int flags);
-+
- static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
- 					     int type, bool value)
- {
 -- 
 2.27.0
 
