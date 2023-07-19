@@ -2,325 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FB2A758A86
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 02:58:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 797C8758AC1
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 03:18:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229555AbjGSA5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 20:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
+        id S229800AbjGSBSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 21:18:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbjGSA5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 20:57:25 -0400
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7231BE9
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 17:56:50 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-443571eda4dso2052037137.2
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 17:56:50 -0700 (PDT)
+        with ESMTP id S229450AbjGSBR4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 21:17:56 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B341BC9;
+        Tue, 18 Jul 2023 18:17:55 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b8a462e0b0so39364735ad.3;
+        Tue, 18 Jul 2023 18:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689728200; x=1692320200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HeRmSEZDNVdxpWjzv7/Osg+9CPUqEsv9I0wiblsgUd4=;
-        b=VdgzM4TQqSWkHYBcIjT43vo1IGUFnylfGzIjb86lDNd4VZ3wHn05UpJftwbFi/gP9W
-         4gvqVeVldTMcUrtR5Z8gPQ2mZsWxcBh+fRNYKlPBT+3V2WkCIjmBKOGcakLqJb8w+cTk
-         IyHX5EZCgScdMrp0LIkE/OoicydanL3uf3f7gJY5gAno3UEYHwsVLF46fVYa8odd6w6C
-         vStTMUqGgrSuD2vqLuFOKb+U5Gm5iGn6CZQKQtuKKp4anNCrxhI4H0zsvrBQrZPLdUcD
-         ajyppnqwwmiRt1s2vTNo3NQSHr1ytsh0OWXtufxtCRzaQOmXT4MwQUgIVTJ52jEhheoz
-         QAOA==
+        d=gmail.com; s=20221208; t=1689729475; x=1690334275;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dFOCio/Zfe9p1GfONJpPjKEYD+NkX9/ELuqh7E52mvg=;
+        b=HAtDb+vL7iVnVrTmPPHFbJrX424J4PzNY0HmDcoxOr5X0XtC5WME1g9PEQImowgBmE
+         eArhOXtvvHYX38Ih+X6X9k7+qy/ug6fbuFxrDKMFBxulS+O+svM3ye9Q4QBahMbTIKmv
+         GBCegjLMpcsMGfL9ZD0RBd6ta34Hf7eklbyd9iVnNgKARKCRo6PMQUQfBxmZHFbF1UrX
+         Y2WLdjIJms66+qioMRWZTOmpDmqx/HAMlRqtr8mi28q3cav6iig2X4EnV+bw0Qk9/2y9
+         i5Treeohd0D7I2noquW4xogtn6ShsOrhg1jnEXTc0IbXZ+BoswU3msMYwHbSppRl5Dgd
+         Xmqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689728200; x=1692320200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HeRmSEZDNVdxpWjzv7/Osg+9CPUqEsv9I0wiblsgUd4=;
-        b=EmW3eEW4hM6QLvUO5IAvks0adtHIJyxqpcZQ2sfQOkL6dJUCQthwxfiDrTA1PQn+gB
-         p6ImJZ/bK/VTAzyEdrvs/zUKvn9ZTvuej5X2r70RiNHEI1XrfE5QHYPRY88/kfQ2ClbQ
-         UpPQl2KqIGV/0+7yY+QtjgR/AzKN7RRRLHD+V6wugp2BMUklW6AYD9ZRvMVYjkxa9rpD
-         fDdE8aRBTCFGUdX+Vg8pA3IXfwCPqbonghCNgTIHCaESedID3iYuY5WTRkmEz/USEBc6
-         /xmWwICxX3VYUJVqV0iEYGf1AUP3u1FfCk3m7mYox5qqSJrhHRxA5fGQzWsGNRB81YrV
-         lNRw==
-X-Gm-Message-State: ABy/qLZUL3DJjEFC23hLuPpU1lXWxmp/i1+uN+ta6ms8+1EGsZgWNlX6
-        rziWONDx1iYZS3s/MmzUvKsqK+4oHO3vx2BGkcM=
-X-Google-Smtp-Source: APBJJlE10yeGyDcPi00zfSyh7Kj30G7yDPg7HQVSBFIsWIIVKdCOiTVWEexG3UkKFUAw/nN3a2jjwg2t6jrqvXFtlrk=
-X-Received: by 2002:a67:f7c7:0:b0:443:664f:f15 with SMTP id
- a7-20020a67f7c7000000b00443664f0f15mr9418188vsp.5.1689728200051; Tue, 18 Jul
- 2023 17:56:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230703183145.24779-1-philmd@linaro.org> <20230703183145.24779-9-philmd@linaro.org>
-In-Reply-To: <20230703183145.24779-9-philmd@linaro.org>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Wed, 19 Jul 2023 10:56:14 +1000
-Message-ID: <CAKmqyKO4Dq+WPJr0=+OpNmuMiGGWLOnsFQjuirc8KFra6C6sPA@mail.gmail.com>
-Subject: Re: [PATCH v2 08/16] target/riscv: Move TCG-specific
- cpu_get_tb_cpu_state() to tcg/cpu.c
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc:     qemu-devel@nongnu.org, Palmer Dabbelt <palmer@dabbelt.com>,
+        d=1e100.net; s=20221208; t=1689729475; x=1690334275;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dFOCio/Zfe9p1GfONJpPjKEYD+NkX9/ELuqh7E52mvg=;
+        b=W2bE6IBSsIQDZhWBMjOVFmC2ninuomSp1BQLowreiRPrS8EaJ0NUx87F/45kfo/iNd
+         kUecibCjnDFvcJVFrPihPgwhzkKhXx9IDJx4rgfwE1t2Feheq0lPsXqwd6XlyXNGVqf+
+         FYcKauJHEf/NjeQ+7f2/N8ilCgGGMLYzn7+qt0DSJsu05r95QJw03LHPspb00l2csODz
+         5lz9YmzxSLLAD+PZyZdq5xu2llfSOg0cujBu6kAvD7WW3UM8irs8qoDP7hQmQPQMHSKQ
+         HkO0EtK/xRwygkhyG2s7G0wo5bUHjy3VwCacA0/Q0mQ8be+YxMGojMC1TS/E7tAo1tLe
+         hZkQ==
+X-Gm-Message-State: ABy/qLbOM5X5kLo/d4n5xD4ZkM2fQTIntApsHVd87ljLC7LIeazAH/R/
+        tRE5NpHZanzCYBUp1pjuOhc=
+X-Google-Smtp-Source: APBJJlHLMooADvkzsEJd0Dr4zmRECjLci1WF8vpqqPwXK99fqbAuJNx+LcT4xGDc8m7QZ1HlH3dJew==
+X-Received: by 2002:a17:902:f54d:b0:1b9:f1bd:b18b with SMTP id h13-20020a170902f54d00b001b9f1bdb18bmr1315043plf.6.1689729474705;
+        Tue, 18 Jul 2023 18:17:54 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id 4-20020a170902c14400b001b9bebb7a9dsm2500203plj.90.2023.07.18.18.17.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 18:17:54 -0700 (PDT)
+Date:   Tue, 18 Jul 2023 18:17:52 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Beraldo Leal <bleal@redhat.com>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
-        kvm@vger.kernel.org, qemu-riscv@nongnu.org,
-        Bin Meng <bin.meng@windriver.com>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v4 4/6] KVM: selftests: Add test cases for unsupported
+ PMU event filter input values
+Message-ID: <20230719011752.GD25699@ls.amr.corp.intel.com>
+References: <20230717062343.3743-1-cloudliang@tencent.com>
+ <20230717062343.3743-5-cloudliang@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230717062343.3743-5-cloudliang@tencent.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 4, 2023 at 4:34=E2=80=AFAM Philippe Mathieu-Daud=C3=A9 <philmd@=
-linaro.org> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+On Mon, Jul 17, 2023 at 02:23:41PM +0800,
+Jinrong Liang <ljr.kernel@gmail.com> wrote:
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> Add test cases to verify the handling of unsupported input values for the
+> PMU event filter. The tests cover unsupported "action" values, unsupported
+> "flags" values, and unsupported "nevents" values. All these cases should
+> return an error, as they are currently not supported by the filter.
+> Furthermore, the tests also cover the scenario where setting non-existent
+> fixed counters in the fixed bitmap does not fail.
+> 
+> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 > ---
->  target/riscv/cpu_helper.c    | 84 -------------------------------
->  target/riscv/tcg/cpu.c       | 98 ++++++++++++++++++++++++++++++++++++
->  target/riscv/tcg/meson.build |  1 +
->  3 files changed, 99 insertions(+), 84 deletions(-)
->  create mode 100644 target/riscv/tcg/cpu.c
->
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 597c47bc56..6f8778c6d3 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -64,90 +64,6 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetc=
-h)
->  #endif
->  }
->
-> -void cpu_get_tb_cpu_state(CPURISCVState *env, vaddr *pc,
-> -                          uint64_t *cs_base, uint32_t *pflags)
-> -{
-> -    CPUState *cs =3D env_cpu(env);
-> -    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> -    RISCVExtStatus fs, vs;
-> -    uint32_t flags =3D 0;
-> -
-> -    *pc =3D env->xl =3D=3D MXL_RV32 ? env->pc & UINT32_MAX : env->pc;
-> -    *cs_base =3D 0;
-> -
-> -    if (cpu->cfg.ext_zve32f) {
-> -        /*
-> -         * If env->vl equals to VLMAX, we can use generic vector operati=
-on
-> -         * expanders (GVEC) to accerlate the vector operations.
-> -         * However, as LMUL could be a fractional number. The maximum
-> -         * vector size can be operated might be less than 8 bytes,
-> -         * which is not supported by GVEC. So we set vl_eq_vlmax flag to=
- true
-> -         * only when maxsz >=3D 8 bytes.
-> -         */
-> -        uint32_t vlmax =3D vext_get_vlmax(cpu, env->vtype);
-> -        uint32_t sew =3D FIELD_EX64(env->vtype, VTYPE, VSEW);
-> -        uint32_t maxsz =3D vlmax << sew;
-> -        bool vl_eq_vlmax =3D (env->vstart =3D=3D 0) && (vlmax =3D=3D env=
-->vl) &&
-> -                           (maxsz >=3D 8);
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VILL, env->vill);
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, SEW, sew);
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, LMUL,
-> -                           FIELD_EX64(env->vtype, VTYPE, VLMUL));
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VTA,
-> -                           FIELD_EX64(env->vtype, VTYPE, VTA));
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VMA,
-> -                           FIELD_EX64(env->vtype, VTYPE, VMA));
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VSTART_EQ_ZERO, env->vstar=
-t =3D=3D 0);
-> -    } else {
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VILL, 1);
-> -    }
-> -
-> -#ifdef CONFIG_USER_ONLY
-> -    fs =3D EXT_STATUS_DIRTY;
-> -    vs =3D EXT_STATUS_DIRTY;
-> -#else
-> -    flags =3D FIELD_DP32(flags, TB_FLAGS, PRIV, env->priv);
-> -
-> -    flags |=3D cpu_mmu_index(env, 0);
-> -    fs =3D get_field(env->mstatus, MSTATUS_FS);
-> -    vs =3D get_field(env->mstatus, MSTATUS_VS);
-> -
-> -    if (env->virt_enabled) {
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, VIRT_ENABLED, 1);
-> -        /*
-> -         * Merge DISABLED and !DIRTY states using MIN.
-> -         * We will set both fields when dirtying.
-> -         */
-> -        fs =3D MIN(fs, get_field(env->mstatus_hs, MSTATUS_FS));
-> -        vs =3D MIN(vs, get_field(env->mstatus_hs, MSTATUS_VS));
-> -    }
-> -
-> -    /* With Zfinx, floating point is enabled/disabled by Smstateen. */
-> -    if (!riscv_has_ext(env, RVF)) {
-> -        fs =3D (smstateen_acc_ok(env, 0, SMSTATEEN0_FCSR) =3D=3D RISCV_E=
-XCP_NONE)
-> -             ? EXT_STATUS_DIRTY : EXT_STATUS_DISABLED;
-> -    }
-> -
-> -    if (cpu->cfg.debug && !icount_enabled()) {
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, ITRIGGER, env->itrigger_en=
-abled);
-> -    }
-> -#endif
-> -
-> -    flags =3D FIELD_DP32(flags, TB_FLAGS, FS, fs);
-> -    flags =3D FIELD_DP32(flags, TB_FLAGS, VS, vs);
-> -    flags =3D FIELD_DP32(flags, TB_FLAGS, XL, env->xl);
-> -    flags =3D FIELD_DP32(flags, TB_FLAGS, AXL, cpu_address_xl(env));
-> -    if (env->cur_pmmask !=3D 0) {
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, PM_MASK_ENABLED, 1);
-> -    }
-> -    if (env->cur_pmbase !=3D 0) {
-> -        flags =3D FIELD_DP32(flags, TB_FLAGS, PM_BASE_ENABLED, 1);
-> -    }
-> -
-> -    *pflags =3D flags;
-> -}
-> -
->  void riscv_cpu_update_mask(CPURISCVState *env)
+>  .../kvm/x86_64/pmu_event_filter_test.c        | 26 +++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> index ffcbbf25b29b..63f85f583ef8 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> @@ -32,6 +32,10 @@
+>  #define MAX_FILTER_EVENTS		300
+>  #define MAX_TEST_EVENTS		10
+>  
+> +#define PMU_EVENT_FILTER_INVALID_ACTION		(KVM_PMU_EVENT_DENY + 1)
+> +#define PMU_EVENT_FILTER_INVALID_FLAGS			(KVM_PMU_EVENT_FLAG_MASKED_EVENTS + 1)
+
+flag is a bit mask. Not number. So +1 sounds weird.
+As KVM_PMU_EVENT_FLAGS_VALID_MASK = 1,  this happens to get wanted result, though.
+
+
+> +#define PMU_EVENT_FILTER_INVALID_NEVENTS		(MAX_FILTER_EVENTS + 1)
+> +
+>  /*
+>   * This is how the event selector and unit mask are stored in an AMD
+>   * core performance event-select register. Intel's format is similar,
+> @@ -757,6 +761,8 @@ static int set_pmu_single_event_filter(struct kvm_vcpu *vcpu, uint64_t event,
+>  
+>  static void test_filter_ioctl(struct kvm_vcpu *vcpu)
 >  {
->      target_ulong mask =3D 0, base =3D 0;
-> diff --git a/target/riscv/tcg/cpu.c b/target/riscv/tcg/cpu.c
-> new file mode 100644
-> index 0000000000..2ae6919b80
-> --- /dev/null
-> +++ b/target/riscv/tcg/cpu.c
-> @@ -0,0 +1,98 @@
-> +/*
-> + * RISC-V CPU helpers (TCG specific)
-> + *
-> + * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
-> + * Copyright (c) 2017-2018 SiFive, Inc.
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
+> +	uint8_t nr_fixed_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
+> +	struct __kvm_pmu_event_filter f;
+>  	uint64_t e = ~0ul;
+>  	int r;
+>  
+> @@ -777,6 +783,26 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
+>  					KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
+>  					KVM_PMU_EVENT_ALLOW);
+>  	TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
 > +
-> +#include "qemu/osdep.h"
-> +#include "cpu.h"
-> +#ifndef CONFIG_USER_ONLY
-> +#include "sysemu/cpu-timers.h"
-> +#endif
+> +	f = base_event_filter;
+> +	f.action = PMU_EVENT_FILTER_INVALID_ACTION;
+> +	r = do_vcpu_set_pmu_event_filter(vcpu, &f);
+> +	TEST_ASSERT(r, "Set invalid action is expected to fail");
 > +
-> +void cpu_get_tb_cpu_state(CPURISCVState *env, vaddr *pc,
-> +                          uint64_t *cs_base, uint32_t *pflags)
-> +{
-> +    CPUState *cs =3D env_cpu(env);
-> +    RISCVCPU *cpu =3D RISCV_CPU(cs);
-> +    RISCVExtStatus fs, vs;
-> +    uint32_t flags =3D 0;
+> +	f = base_event_filter;
+> +	f.flags = PMU_EVENT_FILTER_INVALID_FLAGS;
+> +	r = do_vcpu_set_pmu_event_filter(vcpu, &f);
+> +	TEST_ASSERT(r, "Set invalid flags is expected to fail");
 > +
-> +    *pc =3D env->xl =3D=3D MXL_RV32 ? env->pc & UINT32_MAX : env->pc;
-> +    *cs_base =3D 0;
+> +	f = base_event_filter;
+> +	f.nevents = PMU_EVENT_FILTER_INVALID_NEVENTS;
+> +	r = do_vcpu_set_pmu_event_filter(vcpu, &f);
+> +	TEST_ASSERT(r, "Exceeding the max number of filter events should fail");
 > +
-> +    if (cpu->cfg.ext_zve32f) {
-> +        /*
-> +         * If env->vl equals to VLMAX, we can use generic vector operati=
-on
-> +         * expanders (GVEC) to accerlate the vector operations.
-> +         * However, as LMUL could be a fractional number. The maximum
-> +         * vector size can be operated might be less than 8 bytes,
-> +         * which is not supported by GVEC. So we set vl_eq_vlmax flag to=
- true
-> +         * only when maxsz >=3D 8 bytes.
-> +         */
-> +        uint32_t vlmax =3D vext_get_vlmax(cpu, env->vtype);
-> +        uint32_t sew =3D FIELD_EX64(env->vtype, VTYPE, VSEW);
-> +        uint32_t maxsz =3D vlmax << sew;
-> +        bool vl_eq_vlmax =3D (env->vstart =3D=3D 0) && (vlmax =3D=3D env=
-->vl) &&
-> +                           (maxsz >=3D 8);
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VILL, env->vill);
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, SEW, sew);
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, LMUL,
-> +                           FIELD_EX64(env->vtype, VTYPE, VLMUL));
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VTA,
-> +                           FIELD_EX64(env->vtype, VTYPE, VTA));
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VMA,
-> +                           FIELD_EX64(env->vtype, VTYPE, VMA));
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VSTART_EQ_ZERO, env->vstar=
-t =3D=3D 0);
-> +    } else {
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VILL, 1);
-> +    }
-> +
-> +#ifdef CONFIG_USER_ONLY
-> +    fs =3D EXT_STATUS_DIRTY;
-> +    vs =3D EXT_STATUS_DIRTY;
-> +#else
-> +    flags =3D FIELD_DP32(flags, TB_FLAGS, PRIV, env->priv);
-> +
-> +    flags |=3D cpu_mmu_index(env, 0);
-> +    fs =3D get_field(env->mstatus, MSTATUS_FS);
-> +    vs =3D get_field(env->mstatus, MSTATUS_VS);
-> +
-> +    if (env->virt_enabled) {
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, VIRT_ENABLED, 1);
-> +        /*
-> +         * Merge DISABLED and !DIRTY states using MIN.
-> +         * We will set both fields when dirtying.
-> +         */
-> +        fs =3D MIN(fs, get_field(env->mstatus_hs, MSTATUS_FS));
-> +        vs =3D MIN(vs, get_field(env->mstatus_hs, MSTATUS_VS));
-> +    }
-> +
-> +    /* With Zfinx, floating point is enabled/disabled by Smstateen. */
-> +    if (!riscv_has_ext(env, RVF)) {
-> +        fs =3D (smstateen_acc_ok(env, 0, SMSTATEEN0_FCSR) =3D=3D RISCV_E=
-XCP_NONE)
-> +             ? EXT_STATUS_DIRTY : EXT_STATUS_DISABLED;
-> +    }
-> +
-> +    if (cpu->cfg.debug && !icount_enabled()) {
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, ITRIGGER, env->itrigger_en=
-abled);
-> +    }
-> +#endif
-> +
-> +    flags =3D FIELD_DP32(flags, TB_FLAGS, FS, fs);
-> +    flags =3D FIELD_DP32(flags, TB_FLAGS, VS, vs);
-> +    flags =3D FIELD_DP32(flags, TB_FLAGS, XL, env->xl);
-> +    flags =3D FIELD_DP32(flags, TB_FLAGS, AXL, cpu_address_xl(env));
-> +    if (env->cur_pmmask !=3D 0) {
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, PM_MASK_ENABLED, 1);
-> +    }
-> +    if (env->cur_pmbase !=3D 0) {
-> +        flags =3D FIELD_DP32(flags, TB_FLAGS, PM_BASE_ENABLED, 1);
-> +    }
-> +
-> +    *pflags =3D flags;
-> +}
-> diff --git a/target/riscv/tcg/meson.build b/target/riscv/tcg/meson.build
-> index 65670493b1..a615aafd9a 100644
-> --- a/target/riscv/tcg/meson.build
-> +++ b/target/riscv/tcg/meson.build
-> @@ -8,6 +8,7 @@ gen =3D [
->  riscv_ss.add(when: 'CONFIG_TCG', if_true: gen)
->
->  riscv_ss.add(when: 'CONFIG_TCG', if_true: files(
-> +  'cpu.c',
->    'fpu_helper.c',
->    'op_helper.c',
->    'vector_helper.c',
-> --
-> 2.38.1
->
->
+> +	f = base_event_filter;
+> +	f.fixed_counter_bitmap = ~GENMASK_ULL(nr_fixed_counters, 0);
+> +	r = do_vcpu_set_pmu_event_filter(vcpu, &f);
+> +	TEST_ASSERT(!r, "Masking non-existent fixed counters should be allowed");
+>  }
+>  
+>  int main(int argc, char *argv[])
+> -- 
+> 2.39.3
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
