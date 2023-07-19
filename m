@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2C21759EB1
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 21:33:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 743C3759EB4
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 21:33:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbjGSTdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 15:33:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55982 "EHLO
+        id S231241AbjGSTdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 15:33:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231313AbjGSTc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 15:32:59 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F1B2130;
-        Wed, 19 Jul 2023 12:32:49 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 3644512007C;
+        with ESMTP id S229765AbjGSTdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 15:33:05 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D4751FE9;
+        Wed, 19 Jul 2023 12:32:51 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id E741E100015;
         Wed, 19 Jul 2023 22:32:48 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 3644512007C
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru E741E100015
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
         s=mail; t=1689795168;
-        bh=9KIwX5m0AsbY8eFETkFbK8y/WZQO82su8tgmIiM0rvk=;
+        bh=s/sX+uP8NaxFQI1Z6FWK+dZgh9F2MCCqp2PIf9LSW+c=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=jX4mEsn/0ZyN2kghUm/BaXynu7Dkmveb/upEub7xblvz6Cb5qbf+JFmJwbKXz+mOx
-         I5Ni/pCZx0CMKZSXXqKdumXIGAYm4zPLrwMybrgBCy6/fvDWJvNDklpEku1FRuZ+/A
-         ICC4SyUt8ryr8S8Zo9gE5St81TtakaNT+PHwUz+2/fSjpMWkStBFTw/+DRgjpIA5Uk
-         oa1SyvmN2WGkQQ13xeN6uYnoqHIDX3X09xtbpDc2jDgNUcK0c19OyPIEDsSfoBr24A
-         ngRM/l6ObNNX6aqAfRrpyes/8VHWm1eDdzRMhGQUq0UHVtejrckDICtG5pw4LRfMxC
-         NyvyzDMJP0juw==
+        b=oA78sp6p//UjnGcDr2cwb5lWq4pxJlLlc8tZlg7JTYjNhQYuHAFsPrV4/EqPHk/aS
+         fMjxxc/Lv1oiCPZKn75OP8vqms33dHM9OIHsqXr7gS4FHmXqckZEgz+vI4RbOJUlF0
+         mRO21TiqII7I512E48OK8EtRFiKz+yBKgBUWjqrrkAhP3ktGe/aRmZxx2p1GMOTflG
+         T1dh+KvL4CFHpeugaLqGMpl/28rhQX9FNdXiFlJu2vFBdHKdHPUqDnlYoblMMgaXDd
+         hrzDNHJJn62wfHp/KjOpkof2ODyglOIGUJw4JXf1TwaIG59UxJnXcaYr+s+dWdW0a8
+         3/soyQq8lg+6A==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
@@ -36,7 +36,7 @@ Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [1
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 19 Jul 2023 22:32:47 +0300
+ 15.2.1118.30; Wed, 19 Jul 2023 22:32:48 +0300
 From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
@@ -52,9 +52,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>,
         Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v2 2/4] virtio/vsock: support MSG_PEEK for SOCK_SEQPACKET
-Date:   Wed, 19 Jul 2023 22:27:06 +0300
-Message-ID: <20230719192708.1775162-3-AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v2 3/4] vsock/test: rework MSG_PEEK test for SOCK_STREAM
+Date:   Wed, 19 Jul 2023 22:27:07 +0300
+Message-ID: <20230719192708.1775162-4-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
 References: <20230719192708.1775162-1-AVKrasnov@sberdevices.ru>
@@ -73,7 +73,7 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-KSMG-AntiSpam-Info: LuaCore: 524 524 9753033d6953787301affc41bead8ed49c47b39d, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiPhishing: Clean
@@ -90,95 +90,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds support of MSG_PEEK flag for SOCK_SEQPACKET type of socket.
-Difference with SOCK_STREAM is that this callback returns either length
-of the message or error.
+This new version makes test more complicated by adding empty read,
+partial read and data comparisons between MSG_PEEK and normal reads.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
- net/vmw_vsock/virtio_transport_common.c | 63 +++++++++++++++++++++++--
- 1 file changed, 60 insertions(+), 3 deletions(-)
+ tools/testing/vsock/vsock_test.c | 78 ++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 3 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 2ee40574c339..352d042b130b 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -460,6 +460,63 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
- 	return err;
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index ac1bd3ac1533..444a3ff0681f 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -255,9 +255,14 @@ static void test_stream_multiconn_server(const struct test_opts *opts)
+ 		close(fds[i]);
  }
  
-+static ssize_t
-+virtio_transport_seqpacket_do_peek(struct vsock_sock *vsk,
-+				   struct msghdr *msg)
-+{
-+	struct virtio_vsock_sock *vvs = vsk->trans;
-+	struct sk_buff *skb;
-+	size_t total, len;
++#define MSG_PEEK_BUF_LEN 64
 +
-+	spin_lock_bh(&vvs->rx_lock);
-+
-+	if (!vvs->msg_count) {
-+		spin_unlock_bh(&vvs->rx_lock);
-+		return 0;
-+	}
-+
-+	total = 0;
-+	len = msg_data_left(msg);
-+
-+	skb_queue_walk(&vvs->rx_queue, skb) {
-+		struct virtio_vsock_hdr *hdr;
-+
-+		if (total < len) {
-+			size_t bytes;
-+			int err;
-+
-+			bytes = len - total;
-+			if (bytes > skb->len)
-+				bytes = skb->len;
-+
-+			spin_unlock_bh(&vvs->rx_lock);
-+
-+			/* sk_lock is held by caller so no one else can dequeue.
-+			 * Unlock rx_lock since memcpy_to_msg() may sleep.
-+			 */
-+			err = memcpy_to_msg(msg, skb->data, bytes);
-+			if (err)
-+				return err;
-+
-+			spin_lock_bh(&vvs->rx_lock);
-+		}
-+
-+		total += skb->len;
-+		hdr = virtio_vsock_hdr(skb);
-+
-+		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) {
-+			if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOR)
-+				msg->msg_flags |= MSG_EOR;
-+
-+			break;
-+		}
-+	}
-+
-+	spin_unlock_bh(&vvs->rx_lock);
-+
-+	return total;
-+}
-+
- static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
- 						 struct msghdr *msg,
- 						 int flags)
-@@ -554,9 +611,9 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
- 				   int flags)
+ static void test_stream_msg_peek_client(const struct test_opts *opts)
  {
- 	if (flags & MSG_PEEK)
--		return -EOPNOTSUPP;
--
--	return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
-+		return virtio_transport_seqpacket_do_peek(vsk, msg);
-+	else
-+		return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
++	unsigned char buf[MSG_PEEK_BUF_LEN];
++	ssize_t send_size;
+ 	int fd;
++	int i;
+ 
+ 	fd = vsock_stream_connect(opts->peer_cid, 1234);
+ 	if (fd < 0) {
+@@ -265,12 +270,32 @@ static void test_stream_msg_peek_client(const struct test_opts *opts)
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+-	send_byte(fd, 1, 0);
++	for (i = 0; i < sizeof(buf); i++)
++		buf[i] = rand() & 0xFF;
++
++	control_expectln("SRVREADY");
++
++	send_size = send(fd, buf, sizeof(buf), 0);
++
++	if (send_size < 0) {
++		perror("send");
++		exit(EXIT_FAILURE);
++	}
++
++	if (send_size != sizeof(buf)) {
++		fprintf(stderr, "Invalid send size %zi\n", send_size);
++		exit(EXIT_FAILURE);
++	}
++
+ 	close(fd);
  }
- EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+ 
+ static void test_stream_msg_peek_server(const struct test_opts *opts)
+ {
++	unsigned char buf_half[MSG_PEEK_BUF_LEN / 2];
++	unsigned char buf_normal[MSG_PEEK_BUF_LEN];
++	unsigned char buf_peek[MSG_PEEK_BUF_LEN];
++	ssize_t res;
+ 	int fd;
+ 
+ 	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+@@ -279,8 +304,55 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+-	recv_byte(fd, 1, MSG_PEEK);
+-	recv_byte(fd, 1, 0);
++	/* Peek from empty socket. */
++	res = recv(fd, buf_peek, sizeof(buf_peek), MSG_PEEK | MSG_DONTWAIT);
++	if (res != -1) {
++		fprintf(stderr, "expected recv(2) failure, got %zi\n", res);
++		exit(EXIT_FAILURE);
++	}
++
++	if (errno != EAGAIN) {
++		perror("EAGAIN expected");
++		exit(EXIT_FAILURE);
++	}
++
++	control_writeln("SRVREADY");
++
++	/* Peek part of data. */
++	res = recv(fd, buf_half, sizeof(buf_half), MSG_PEEK);
++	if (res != sizeof(buf_half)) {
++		fprintf(stderr, "recv(2) + MSG_PEEK, expected %zu, got %zi\n",
++			sizeof(buf_half), res);
++		exit(EXIT_FAILURE);
++	}
++
++	/* Peek whole data. */
++	res = recv(fd, buf_peek, sizeof(buf_peek), MSG_PEEK);
++	if (res != sizeof(buf_peek)) {
++		fprintf(stderr, "recv(2) + MSG_PEEK, expected %zu, got %zi\n",
++			sizeof(buf_peek), res);
++		exit(EXIT_FAILURE);
++	}
++
++	/* Compare partial and full peek. */
++	if (memcmp(buf_half, buf_peek, sizeof(buf_half))) {
++		fprintf(stderr, "Partial peek data mismatch\n");
++		exit(EXIT_FAILURE);
++	}
++
++	res = recv(fd, buf_normal, sizeof(buf_normal), 0);
++	if (res != sizeof(buf_normal)) {
++		fprintf(stderr, "recv(2), expected %zu, got %zi\n",
++			sizeof(buf_normal), res);
++		exit(EXIT_FAILURE);
++	}
++
++	/* Compare full peek and normal read. */
++	if (memcmp(buf_peek, buf_normal, sizeof(buf_peek))) {
++		fprintf(stderr, "Full peek data mismatch\n");
++		exit(EXIT_FAILURE);
++	}
++
+ 	close(fd);
+ }
  
 -- 
 2.25.1
