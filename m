@@ -2,112 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58FC3758BF9
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:20:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B055758BFC
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:21:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230388AbjGSDUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 23:20:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46532 "EHLO
+        id S230392AbjGSDVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 23:21:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjGSDUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 23:20:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B291BE8
-        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 20:19:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689736774;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jw3hUbCwpEEZZOwhQ/mpq6ERCYwJxt0NIjdJOrCrevI=;
-        b=XTEvFcrwI55DqmSWng72DzPAy8Vlii6xQ7szH/D8FLIoAS1TODvQlxSZMFlC3boTwQD8xl
-        mAk3cHraRAWneRw39dkNqaw/QMKWSHsgWHZudQaGfWexMPYXSyr/Ue6w3NU4ZcIaOjNh1B
-        xcnMH20QsCsZhnXUXWRSyXwL0xbeHwg=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-434-qRwGKdReMFeNvPqK9IguCg-1; Tue, 18 Jul 2023 23:19:28 -0400
-X-MC-Unique: qRwGKdReMFeNvPqK9IguCg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 55F063C01B86;
-        Wed, 19 Jul 2023 03:19:28 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 494714CD0F8;
-        Wed, 19 Jul 2023 03:19:28 +0000 (UTC)
-From:   Shaoqin Huang <shahuang@redhat.com>
-To:     andrew.jones@linux.dev
-Cc:     Shaoqin Huang <shahuang@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1 2/2] arm64: Define name for the bits used in SCTLR_EL1_RES1
-Date:   Tue, 18 Jul 2023 23:19:26 -0400
-Message-Id: <20230719031926.752931-3-shahuang@redhat.com>
-In-Reply-To: <20230719031926.752931-1-shahuang@redhat.com>
-References: <20230719031926.752931-1-shahuang@redhat.com>
+        with ESMTP id S229437AbjGSDVI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 23:21:08 -0400
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2D31BDD;
+        Tue, 18 Jul 2023 20:21:07 -0700 (PDT)
+Received: by mail-ed1-x543.google.com with SMTP id 4fb4d7f45d1cf-51e99584a82so8725061a12.1;
+        Tue, 18 Jul 2023 20:21:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689736865; x=1692328865;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qio6pzOCmaXDOiQChQf7WzygxDgvq1z60uM5r+IDyqY=;
+        b=Y2aUVkMBihFO9W2ebrAbF83gFoTV8pv2h0CasKOz7w2rnrjkU3q4qLMH1WffzyCDvQ
+         TpW9L/jmf9/4ZK8IFVPCCZnwRVemTS1YS9+cLDpx+d3JZDYFOQvxn/QKETpqLfjAQ86X
+         KvPCA9NwvoViVru65MbhLgqzE4TRz18Bd1M3dnpBvZAypWPAZdaZn0SMDBopziEFMkRo
+         tGkRXXtw5KepS72fszxopa4FrxSftLvUF6spR0iTDGJp62Wb731J+4lsQJlY+H5D3J1C
+         U6TOepFXm8jC0sjXeuBmyipIpXKcTMQ4Ngg3+nBeZ69usw6/lIypnvZ0qVQI08jsJWSm
+         75NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689736865; x=1692328865;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qio6pzOCmaXDOiQChQf7WzygxDgvq1z60uM5r+IDyqY=;
+        b=R5HnbtppeGoKbQXFTl4nMX/o/kido3mVdmDm1OlZpQt5X7o/+PyBQwxp6igOFnZ91R
+         eeHjBdukm/AgcmAqxCc31+CcUZMAciJfFEb1NxNusi12pmWgc/R0ENaIJDLJIlKbIVnF
+         BB/OGNVZCkmx3kpcq+Pw0211KLtPdgBtH73IZtNihYMTM9KchtfW1yBzNzclWU4N5KHF
+         BUbD9Dss0zPIXIUnxw5bqH4Al1Hqnd6Hucbe5oM8/7D8h7oPW4pWN17dqjkCn03MGFD+
+         c30XLKih8vqi/x3L0uqdOXI37qaRcEi/+S4yp4AEdrVJMPVESmNgEj+AJXlYsk98i0/6
+         sWEg==
+X-Gm-Message-State: ABy/qLbpV2MS/LaqR3pUB6Gaiume1ELpe21P2lwaBlckV2F8w77xNDEL
+        0TnNSYf0dZf6yzxgHaY+8w9Hvy1bGP4iHxySL5HS6wMGjdezDlBj2j0=
+X-Google-Smtp-Source: APBJJlFwCKXpF3myWTSDWY2nVDhSk8KLhh0BEsHLVhIX9+VFk6oyw1eMiipLY6JReFZ+zCIuS4p/6nl3izKeExS/PEU=
+X-Received: by 2002:aa7:d418:0:b0:51e:2282:e1fc with SMTP id
+ z24-20020aa7d418000000b0051e2282e1fcmr1518758edq.6.1689736865579; Tue, 18 Jul
+ 2023 20:21:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230717062343.3743-1-cloudliang@tencent.com> <20230717062343.3743-5-cloudliang@tencent.com>
+ <20230719011752.GD25699@ls.amr.corp.intel.com>
+In-Reply-To: <20230719011752.GD25699@ls.amr.corp.intel.com>
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+Date:   Wed, 19 Jul 2023 11:20:54 +0800
+Message-ID: <CAFg_LQVA=u+WM3_xK5+KiAz5R=-nZ3jdQbX0jsBmrw7_6+ZWew@mail.gmail.com>
+Subject: Re: [PATCH v4 4/6] KVM: selftests: Add test cases for unsupported PMU
+ event filter input values
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently some fields in SCTLR_EL1 don't define a name and directly used
-in the SCTLR_EL1_RES1, that's not good now since these fields have been
-functional and have a name.
+Isaku Yamahata <isaku.yamahata@gmail.com> =E4=BA=8E2023=E5=B9=B47=E6=9C=881=
+9=E6=97=A5=E5=91=A8=E4=B8=89 09:17=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Mon, Jul 17, 2023 at 02:23:41PM +0800,
+> Jinrong Liang <ljr.kernel@gmail.com> wrote:
+>
+> > From: Jinrong Liang <cloudliang@tencent.com>
+> >
+> > Add test cases to verify the handling of unsupported input values for t=
+he
+> > PMU event filter. The tests cover unsupported "action" values, unsuppor=
+ted
+> > "flags" values, and unsupported "nevents" values. All these cases shoul=
+d
+> > return an error, as they are currently not supported by the filter.
+> > Furthermore, the tests also cover the scenario where setting non-existe=
+nt
+> > fixed counters in the fixed bitmap does not fail.
+> >
+> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> > ---
+> >  .../kvm/x86_64/pmu_event_filter_test.c        | 26 +++++++++++++++++++
+> >  1 file changed, 26 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c=
+ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > index ffcbbf25b29b..63f85f583ef8 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > @@ -32,6 +32,10 @@
+> >  #define MAX_FILTER_EVENTS            300
+> >  #define MAX_TEST_EVENTS              10
+> >
+> > +#define PMU_EVENT_FILTER_INVALID_ACTION              (KVM_PMU_EVENT_DE=
+NY + 1)
+> > +#define PMU_EVENT_FILTER_INVALID_FLAGS                       (KVM_PMU_=
+EVENT_FLAG_MASKED_EVENTS + 1)
+>
+> flag is a bit mask. Not number. So +1 sounds weird.
+> As KVM_PMU_EVENT_FLAGS_VALID_MASK =3D 1,  this happens to get wanted resu=
+lt, though.
 
-According to the ARM DDI 0487J.a, define the name related to these
-fields.
+We need an invalid flags, KVM_PMU_EVENT_FLAGS_VALID_MASK is actually
+equal to KVM_PMU_EVENT_FLAG_MASKED_EVENTS.
 
-Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- lib/arm64/asm/sysreg.h | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+In kvm.h:
 
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index c7f529d..9c68698 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -80,17 +80,26 @@ asm(
- #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
- 
- /* System Control Register (SCTLR_EL1) bits */
-+#define SCTLR_EL1_LSMAOE	_BITUL(29)
-+#define SCTLR_EL1_NTLSMD	_BITUL(28)
- #define SCTLR_EL1_EE		_BITUL(25)
-+#define SCTLR_EL1_SPAN		_BITUL(23)
-+#define SCTLR_EL1_EIS		_BITUL(22)
-+#define SCTLR_EL1_TSCXT		_BITUL(20)
- #define SCTLR_EL1_WXN		_BITUL(19)
- #define SCTLR_EL1_I		_BITUL(12)
-+#define SCTLR_EL1_EOS		_BITUL(11)
-+#define SCTLR_EL1_SED		_BITUL(8)
-+#define SCTLR_EL1_ITD		_BITUL(7)
- #define SCTLR_EL1_SA0		_BITUL(4)
- #define SCTLR_EL1_SA		_BITUL(3)
- #define SCTLR_EL1_C		_BITUL(2)
- #define SCTLR_EL1_A		_BITUL(1)
- #define SCTLR_EL1_M		_BITUL(0)
- 
--#define SCTLR_EL1_RES1	(_BITUL(7) | _BITUL(8) | _BITUL(11) | _BITUL(20) | \
--			 _BITUL(22) | _BITUL(23) | _BITUL(28) | _BITUL(29))
-+#define SCTLR_EL1_RES1	(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
-+			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
-+			 SCTLR_EL1_NTLSMD | SCTLR_EL1_LSMAOE)
- #define INIT_SCTLR_EL1_MMU_OFF	\
- 			SCTLR_EL1_RES1
- 
--- 
-2.39.1
+#define KVM_PMU_EVENT_FLAG_MASKED_EVENTS BIT(0)
+#define KVM_PMU_EVENT_FLAGS_VALID_MASK (KVM_PMU_EVENT_FLAG_MASKED_EVENTS)
 
+How about this modification:
+
+#define PMU_EVENT_FILTER_INVALID_FLAGS
+(KVM_PMU_EVENT_FLAGS_VALID_MASK << 1)
+
+>
+>
+> > +#define PMU_EVENT_FILTER_INVALID_NEVENTS             (MAX_FILTER_EVENT=
+S + 1)
+> > +
+> >  /*
+> >   * This is how the event selector and unit mask are stored in an AMD
+> >   * core performance event-select register. Intel's format is similar,
+> > @@ -757,6 +761,8 @@ static int set_pmu_single_event_filter(struct kvm_v=
+cpu *vcpu, uint64_t event,
+> >
+> >  static void test_filter_ioctl(struct kvm_vcpu *vcpu)
+> >  {
+> > +     uint8_t nr_fixed_counters =3D kvm_cpu_property(X86_PROPERTY_PMU_N=
+R_FIXED_COUNTERS);
+> > +     struct __kvm_pmu_event_filter f;
+> >       uint64_t e =3D ~0ul;
+> >       int r;
+> >
+> > @@ -777,6 +783,26 @@ static void test_filter_ioctl(struct kvm_vcpu *vcp=
+u)
+> >                                       KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
+> >                                       KVM_PMU_EVENT_ALLOW);
+> >       TEST_ASSERT(r =3D=3D 0, "Valid PMU Event Filter is failing");
+> > +
+> > +     f =3D base_event_filter;
+> > +     f.action =3D PMU_EVENT_FILTER_INVALID_ACTION;
+> > +     r =3D do_vcpu_set_pmu_event_filter(vcpu, &f);
+> > +     TEST_ASSERT(r, "Set invalid action is expected to fail");
+> > +
+> > +     f =3D base_event_filter;
+> > +     f.flags =3D PMU_EVENT_FILTER_INVALID_FLAGS;
+> > +     r =3D do_vcpu_set_pmu_event_filter(vcpu, &f);
+> > +     TEST_ASSERT(r, "Set invalid flags is expected to fail");
+> > +
+> > +     f =3D base_event_filter;
+> > +     f.nevents =3D PMU_EVENT_FILTER_INVALID_NEVENTS;
+> > +     r =3D do_vcpu_set_pmu_event_filter(vcpu, &f);
+> > +     TEST_ASSERT(r, "Exceeding the max number of filter events should =
+fail");
+> > +
+> > +     f =3D base_event_filter;
+> > +     f.fixed_counter_bitmap =3D ~GENMASK_ULL(nr_fixed_counters, 0);
+> > +     r =3D do_vcpu_set_pmu_event_filter(vcpu, &f);
+> > +     TEST_ASSERT(!r, "Masking non-existent fixed counters should be al=
+lowed");
+> >  }
+> >
+> >  int main(int argc, char *argv[])
+> > --
+> > 2.39.3
+> >
+>
+> --
+> Isaku Yamahata <isaku.yamahata@gmail.com>
