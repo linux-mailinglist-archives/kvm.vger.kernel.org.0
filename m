@@ -2,216 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26A29758BE7
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:15:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 186A0758BF8
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:20:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230143AbjGSDPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 23:15:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45088 "EHLO
+        id S230368AbjGSDUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 23:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjGSDPD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 23:15:03 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531371BCA;
-        Tue, 18 Jul 2023 20:15:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689736502; x=1721272502;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Mr7BUY4zc60aRuTSv2hIyuXH2IuyI/J0WPMw4qM1y6s=;
-  b=TabfKOZXTj41/LEkgx473uHG8bggOsxcuGtph5eKNYbJLAmE20SSl8h0
-   ygYb8MgB7trdTO2qBP+bfjTTs73jVQ3+dptzmvQL0TSViOlswFxSqRy3O
-   n1yt7iLb/2pECkvYw0WCrzYFbsx1j/fAzDpL7xLKoSR2BB5MYJ3eKDVkw
-   tzvFc282pzI4tfiJcpW23boOBa4bp1wL7LYlRRruR91Fkom63SAFkMtdH
-   SmFdx/5OP1hYJl7PMu77eCTEiPFI60YQSmTc0OLKHASYYF/PhqB8rVQk4
-   O+G8LlvYh3pbKogJn4ZSDg51DAkFQunMTmTtuFcH3ceUmlYcNSLFM/1cF
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="345950649"
-X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="345950649"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:15:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="723846508"
-X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="723846508"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga002.jf.intel.com with ESMTP; 18 Jul 2023 20:15:01 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 18 Jul 2023 20:15:01 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 18 Jul 2023 20:15:00 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 18 Jul 2023 20:15:00 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 18 Jul 2023 20:15:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h6luLG3Jd2GAnoMbMV6EycJacbxGYvcQOpmm6Xx7oalRKOsTSmvfFPcsNBRwx9eYlSUdb9pUDEZ/ZGbxz70mSyHRWKkmHCKEIsfdoLF0RAPadHLcePEfQ9v4tNzgPkFibqlYja/McohcaoSWGgag1fr4xEFXuN605cGGCMdjPRO19OZGZ2Qh4OL5S8wzA58q6rkOCtxuwtvpm/Q7WO4CspHcG4lCnHZoM2toHjQAgoQ+VuXzR1PXC1Xs6v5St7r1+07NJDpRw2FvcNuyWsCKGryXlZSxpWyJKz/aZwx8Uo53SgLHtw0sTCFkotg6O5DS0Jic9VbvvlA5hmkpiCSbZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mr7BUY4zc60aRuTSv2hIyuXH2IuyI/J0WPMw4qM1y6s=;
- b=Adbm6U6/UuKnPrN/d8iO26fJNwEkzr+I6OgpyVWe63yUWtZj8UlWOcXv5+iF1XqiEoJl9OYt0tfsIiyJ4rKRF4NbUtVvUyUbPH8jm95Ct/kIuk+Zh8INckgyvdmeDlnwmE7cXIy4/VqpyfrwMsg1LaLQjiZVHUwmD7ID33LPfS1wDImt3leMuiv1zzpMHUEBQU+7/JOmslbzS6OHEva5mUKwtu5hONqza8i+wTZTvDIzyHCiZLfHUmqe1syhHdm4WYrZNuhsn5btGtwtPFA7hwzPPPvr9R1yAM3vYTyFK5qenRxavzMDoYIOs1mF8F2COoptdZfHhnGreX42p1DYlw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SA1PR11MB6685.namprd11.prod.outlook.com (2603:10b6:806:258::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Wed, 19 Jul
- 2023 03:14:58 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::137b:ec82:a88c:8159]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::137b:ec82:a88c:8159%4]) with mapi id 15.20.6588.031; Wed, 19 Jul 2023
- 03:14:57 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Anshuman Khandual <anshuman.khandual@arm.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>
-CC:     "ajd@linux.ibm.com" <ajd@linux.ibm.com>,
-        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-        "fbarrat@linux.ibm.com" <fbarrat@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
-        "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "npiggin@gmail.com" <npiggin@gmail.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>
-Subject: RE: [PATCH 0/4] Invalidate secondary IOMMU TLB on permission upgrade
-Thread-Topic: [PATCH 0/4] Invalidate secondary IOMMU TLB on permission upgrade
-Thread-Index: AQHZuU1142PTIIcImUGZyGRSe0EPwK/AaNCAgAABeMA=
-Date:   Wed, 19 Jul 2023 03:14:57 +0000
-Message-ID: <BN9PR11MB52765F6D915656C6AFD138FF8C39A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <cover.b4454f7f3d0afbfe1965e8026823cd50a42954b4.1689666760.git-series.apopple@nvidia.com>
- <45fadf89-27ec-07a9-746a-e5d14aba62a3@arm.com>
-In-Reply-To: <45fadf89-27ec-07a9-746a-e5d14aba62a3@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA1PR11MB6685:EE_
-x-ms-office365-filtering-correlation-id: 867b6b25-bdfe-45e2-e2d6-08db880654ae
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: T0YSp+F+3Eu2PvCBmr9TmfVIcYqOZhMSgfbCHGA2inEdLFW/xD0NsmuJk0iJxbBthQi3WVrs6uU5zgKQpqvOeH8PY0Wk+tZ6W78bqNsshgiJhh1AE6nAjPrj5PRhYghLh90EBova4dQwIStBRoZfHXtaWz5JyDfWdNy7DeIO9CT6Qev42gCfvHi+fbOqWuZOzpS1ZCrN1/HxO4gx7Cj6p0nli9fhmnxTUuHvaWbpTAzUKm1b47eUFzMD1iOvKvHX0oEGeVgXiEj+DjiwjlYFDdEcMl793PaQSTo4KSoZwJ8iJ0uE2xlx9UEY64rq6yIY3sCPEsh4l2woFBSn55tKwdmesoT22/XTgHi0qzAYCDeqj/taHJA0xnZ2SCr01L2zmjLFOcGv4y/vOIZ+ARA9CGQYz4gZP8elDlVUp46Z/X9OZZcBmg5pd1DR3UOCT0tpM49R1fX5pQ+TPK4UqcZLTWQMJWDeP1bA1wtHRHGi0In1vL2tGYu3KS6jezqYQvNURgto3I7dBd0Vz8vkUN/2SfQ/c9407r1YI4HFy55MYd+WuCUKeVb/w1nIO2XmifIk2cUfF7Z/xShR9VrgsXKvEBhGx6nFgVe17CiRkXGsPlZrz+pi+2PE4+MuOWLDKJWS
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(396003)(39860400002)(346002)(366004)(451199021)(86362001)(2906002)(8936002)(33656002)(8676002)(4326008)(83380400001)(38070700005)(316002)(41300700001)(7416002)(52536014)(5660300002)(122000001)(38100700002)(66946007)(54906003)(76116006)(64756008)(110136005)(66556008)(66476007)(66446008)(186003)(6506007)(26005)(9686003)(53546011)(82960400001)(478600001)(55016003)(71200400001)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Nzh2YmwyeDJsd0hNMWFCWDJGMmNWZm82c3JUMThITmJ2b0szZHBOWUhObEFE?=
- =?utf-8?B?b2ovb09xakQzcnI5b1BoYksyU0gxYWE5QkpTUnZ6SmhiTFB2b012dHNQeE1W?=
- =?utf-8?B?M3hTWGFqMVpvWE1YZ1RIS3I2SzFjUjZMWmpBSnYrQW1rZmJEY0RIaTNwK010?=
- =?utf-8?B?dmlDajV3NVRBK0FaUVU4Tlhqc1F3WFR5TDJYdnZMeTJTenZyTHh0OUs2TEUz?=
- =?utf-8?B?b0JxTm9OKytVdFF4N0gyMks1WmZ1R0pmZUhlL2dNd3NpWkFJMWxWUUt6V1B4?=
- =?utf-8?B?NHJUZ3VMTmxiMUIxalFLM3pyZU5LMnJRcFlpRVdSeDdqREdzME93YzNla1px?=
- =?utf-8?B?aGZIZGduZm1wMmc2dGVjSDhrSXp6VGM5K1lwaGFrKzQwb2JWbW11OUJIOGs0?=
- =?utf-8?B?dkoxbWlvdmkwSXo1WVRzY2RUZXkrbjMva3ZWRWltZ2wzVlVIak84Ulo4QlNw?=
- =?utf-8?B?RzNuclJ2enNBR1k5Z1RCVko2UmpyV3dkYXNmZWtLWVU3cUpibzhRdmh5T2kz?=
- =?utf-8?B?T0tyVGZBUWZnTjJBUkxaNmVOYXNYcFFTRVowOUNRNDNUbDF5VnBzR29EVndR?=
- =?utf-8?B?UjNHNW5BTWExWUcvanFYUEUvVHMvVkNFR283V0Izdmd0RG12ejBvbnNjSjN6?=
- =?utf-8?B?Z1dBOWZyL3dmVGZKM3lIMmxSN01BVVdaWGVuSmZ2ZVlaQ2x1RFN4YkpXYzZG?=
- =?utf-8?B?UHFxNzlZT21JejBBUEFMNUl6YlI3M0FBVEM1RGkvVlVXeHNCdThLdm5yMTd3?=
- =?utf-8?B?R0dQVU5uZHdZM2k4MFBwaTBQa2wwbFAySzhuQkdScEgzNzQrSFhsZm1pdWR5?=
- =?utf-8?B?ZUFUT1F6cTkvWU41bVJzUnY0enRvMlA2eGxZLzBkV1Bkb01ZYmVmQWVrRGEr?=
- =?utf-8?B?QkE1TEk2N2swNVJJbDhleE5ZMVlNS09xRDBreEJ4QWtqU0VWK1U5d0cwSnpp?=
- =?utf-8?B?SjV3SUVBWE9naitpdXluTnpOaDMyM0Y2K2RBTlAwaXZ1ZUMvL3gxdnVZbDFU?=
- =?utf-8?B?bjkxRC9BWnlkVGpCTXVSNzF4Nzh6ZEhmSFA5ZVpnOG94dDFGU2s0VkJiQjFD?=
- =?utf-8?B?eWlRallEMzR5Y05GanlVUkg1UE83b0o0QXd2Q1dIOE0zcVA5ZTBwaUNwYVV1?=
- =?utf-8?B?NG1xNktIYjFYVlNrOGNRME1MNWoyK3NrcnRYeElZbHJyU1ZhYm56TmQwdnp0?=
- =?utf-8?B?dmpySEtueEZIUkd6cXA3QzcvSkhuUVVXbzZ3MlhFYXh3L1Ryc25ha3U3NWph?=
- =?utf-8?B?S0g2eDNyOU1Ka1Awd3hkd0xTNUFiVFZHNHU3ZXFiN3N4clk5SWhSZURqcHRH?=
- =?utf-8?B?RGxkTGlUaUNTYmJoUWlkUXN6N2NaeTMzWWFYMndDczZNeWJIWjY1Ty9pOURC?=
- =?utf-8?B?TW4vZDdOUWpIM24vbmtwNG1nV3BVM25vUDVDanJrTWF4SnF1dDVqWkJCcUdH?=
- =?utf-8?B?RjBjMUZKL0NJWEpQMkplUURKRkdWR1lXMGM2RHBiTWczWlZSREFHUXRMVGda?=
- =?utf-8?B?NUY1VUxWRXhudFZHajRmOUxXZHRtQTBQRGIxcXp6ZGdSNDFPalVVdEZWYTE4?=
- =?utf-8?B?M09oeDNpUXFJcytnTndQcUwvN0FSRkRoVFVJK1M4TFZxR2ZBWGEwbVM5bDQv?=
- =?utf-8?B?S3JNeUJnUyt3R0JtQjI0VGUvUjVBM3B1aXlSZGs4dmF4SmF0UUpTTE1uVng5?=
- =?utf-8?B?OThBci93RktoelZJR2gwQWZIdXhUUFJDbEgwYzV4dFhpZGU2YzN5eDdHd2xI?=
- =?utf-8?B?L0VFeFJta0N1TzcxSVpMWFBsdlFmeGYrU2pCUENuV0U2OEFVS3hobml5K3Zp?=
- =?utf-8?B?d3A3ZE9Mc3gwQVkxN0lqbkpma21Jb3Eyb0RacEVwR2J6N1JYQU1oWXFSS0hV?=
- =?utf-8?B?cjkyZVB0OFIzK1RBM2ZGMjFjTTNjT29xTk1QSkJXMkN0SVA4V2pBWkFpSXRG?=
- =?utf-8?B?RmNnbGZzeWJqQ1hTNW4wRXVEWEkyRTk2dXZnRmkrZGNqcENoL2t1WVBueDMy?=
- =?utf-8?B?VHpWQ1Z0anRwYk9OaTNPV3BuSVREajcwMVlMNGFJWVFNWmhlSjVEZ1JqRENR?=
- =?utf-8?B?QXA3Wm9tcVRrTGFER1lXd1dBdXF2Z1BmbWJ2R3FrV1dXTVp6MHhhNVhzTmZm?=
- =?utf-8?Q?p5CQk+fst6viX231ttHOSm3Gh?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229437AbjGSDUM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 23:20:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8EA91BDB
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 20:19:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689736770;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=khu8dsP1eNtDOWLTOwMXhcur87DLm12aw9cZwTUOwUM=;
+        b=jVuBFTLx7OACyoUL4eVBV84DJjytHkwA3xXHDGh0c0tKhXBl1KpGDVQW/Jqp5RDfRDNolX
+        yfKECpILyaXY1MrjllwwFoqj6kTHECXtz7lBX8lrVOMkqSF80i8jCjAL2cf57cQDyrC6lZ
+        gsoz5/UbKbF/DzSLc/J/zQyusq5wn7c=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-127-RAjSCbZIPrGg3qdaq6QUbg-1; Tue, 18 Jul 2023 23:19:28 -0400
+X-MC-Unique: RAjSCbZIPrGg3qdaq6QUbg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 125043804504;
+        Wed, 19 Jul 2023 03:19:28 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EB1104CD0F8;
+        Wed, 19 Jul 2023 03:19:27 +0000 (UTC)
+From:   Shaoqin Huang <shahuang@redhat.com>
+To:     andrew.jones@linux.dev
+Cc:     Shaoqin Huang <shahuang@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v1 0/2] arm64: Define name for the original RES1 bit but now functinal bit
+Date:   Tue, 18 Jul 2023 23:19:24 -0400
+Message-Id: <20230719031926.752931-1-shahuang@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 867b6b25-bdfe-45e2-e2d6-08db880654ae
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2023 03:14:57.4974
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dV3VqsZRc9ymbOSUR3lLrH/GnR1I6paXOGPxy8AGLUcL0sEehZuArFguH/KjGDHr42T0oxlMqB7OJP7d8cqDAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6685
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBBbnNodW1hbiBLaGFuZHVhbCA8YW5zaHVtYW4ua2hhbmR1YWxAYXJtLmNvbT4NCj4g
-U2VudDogV2VkbmVzZGF5LCBKdWx5IDE5LCAyMDIzIDExOjA0IEFNDQo+IA0KPiBPbiA3LzE4LzIz
-IDEzOjI2LCBBbGlzdGFpciBQb3BwbGUgd3JvdGU6DQo+ID4gVGhlIG1haW4gY2hhbmdlIGlzIHRv
-IG1vdmUgc2Vjb25kYXJ5IFRMQiBpbnZhbGlkYXRpb24gbW11IG5vdGlmaWVyDQo+ID4gY2FsbGJh
-Y2tzIGludG8gdGhlIGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBUTEIgZmx1c2hpbmcgZnVuY3Rpb25z
-LiBUaGlzDQo+ID4gbWFrZXMgc2Vjb25kYXJ5IFRMQiBpbnZhbGlkYXRpb24gbW9zdGx5IG1hdGNo
-IENQVSBpbnZhbGlkYXRpb24gd2hpbGUNCj4gPiBzdGlsbCBhbGxvd2luZyBlZmZpY2llbnQgcmFu
-Z2UgYmFzZWQgaW52YWxpZGF0aW9ucyBiYXNlZCBvbiB0aGUNCj4gPiBleGlzdGluZyBUTEIgYmF0
-Y2hpbmcgY29kZS4NCj4gPg0KPiA+ID09PT09PT09PT0NCj4gPiBCYWNrZ3JvdW5kDQo+ID4gPT09
-PT09PT09PQ0KPiA+DQo+ID4gVGhlIGFybTY0IGFyY2hpdGVjdHVyZSBzcGVjaWZpZXMgVExCIHBl
-cm1pc3Npb24gYml0cyBtYXkgYmUgY2FjaGVkIGFuZA0KPiA+IHRoZXJlZm9yZSB0aGUgVExCIG11
-c3QgYmUgaW52YWxpZGF0ZWQgZHVyaW5nIHBlcm1pc3Npb24gdXBncmFkZXMuIEZvcg0KPiA+IHRo
-ZSBDUFUgdGhpcyBjdXJyZW50bHkgb2NjdXJzIGluIHRoZSBhcmNoaXRlY3R1cmUgc3BlY2lmaWMN
-Cj4gPiBwdGVwX3NldF9hY2Nlc3NfZmxhZ3MoKSByb3V0aW5lLg0KPiA+DQo+ID4gU2Vjb25kYXJ5
-IFRMQnMgc3VjaCBhcyBpbXBsZW1lbnRlZCBieSB0aGUgU01NVSBJT01NVSBtYXRjaCB0aGUgQ1BV
-DQo+ID4gYXJjaGl0ZWN0dXJlIHNwZWNpZmljYXRpb24gYW5kIG1heSBhbHNvIGNhY2hlIHBlcm1p
-c3Npb24gYml0cyBhbmQNCj4gPiByZXF1aXJlIHRoZSBzYW1lIFRMQiBpbnZhbGlkYXRpb25zLiBU
-aGlzIG1heSBiZSBhY2hpZXZlZCBpbiBvbmUgb2YgdHdvDQo+ID4gd2F5cy4NCj4gPg0KPiA+IFNv
-bWUgU01NVSBpbXBsZW1lbnRhdGlvbnMgaW1wbGVtZW50IGJyb2FkY2FzdCBUTEIgbWFpbnRlbmFu
-Y2UNCj4gPiAoQlRNKS4gVGhpcyBzbm9vcHMgQ1BVIFRMQiBpbnZhbGlkYXRlcyBhbmQgd2lsbCBp
-bnZhbGlkYXRlIGFueQ0KPiA+IHNlY29uZGFyeSBUTEIgYXQgdGhlIHNhbWUgdGltZSBhcyB0aGUg
-Q1BVLiBIb3dldmVyIGltcGxlbWVudGF0aW9ucyBhcmUNCj4gPiBub3QgcmVxdWlyZWQgdG8gaW1w
-bGVtZW50IEJUTS4NCj4gDQo+IFNvLCB0aGUgaW1wbGVtZW50YXRpb25zIHdpdGggQlRNIGRvIG5v
-dCBldmVuIG5lZWQgYSBNTVUgbm90aWZpZXIgY2FsbGJhY2sNCj4gZm9yIHNlY29uZGFyeSBUTEIg
-aW52YWxpZGF0aW9uIHB1cnBvc2UgPyBQZXJoYXBzIG1tdV9ub3RpZmllcl9yZWdpc3RlcigpDQo+
-IGNvdWxkIGFsc28gYmUgc2tpcHBlZCBmb3Igc3VjaCBjYXNlcyBpLmUgd2l0aCBBUk1fU01NVV9G
-RUFUX0JUTQ0KPiBlbmFibGVkID8NCj4gDQoNCk91dCBvZiBjdXJpb3NpdHkuIEhvdyBkb2VzIEJU
-TSB3b3JrIHdpdGggZGV2aWNlIHRsYj8gQ2FuIFNNTVUgdHJhbnNsYXRlDQphIFRMQiBicm9hZGNh
-c3QgcmVxdWVzdCAoYmFzZWQgb24gQVNJRCkgaW50byBhIHNldCBvZiBQQ0kgQVRTIGludmFsaWRh
-dGlvbg0KcmVxdWVzdHMgKGJhc2VkIG9uIFBDSSByZXF1ZXN0b3IgSUQgYW5kIFBBU0lEKSBpbiBo
-YXJkd2FyZT8NCg0KSWYgc29mdHdhcmUgaW50ZXJ2ZW50aW9uIGlzIHJlcXVpcmVkIHRoZW4gaXQg
-bWlnaHQgYmUgdGhlIHJlYXNvbiB3aHkgbW11DQpub3RpZmllciBjYW5ub3QgYmUgc2tpcHBlZC4g
-V2l0aCBCVE0gZW5hYmxlZCBpdCBqdXN0IG1lYW5zIHRoZSBub3RpZmllcg0KY2FsbGJhY2sgY2Fu
-IHNraXAgaW90bGIgaW52YWxpZGF0aW9uLi4uDQo=
+According the talk[1], because the architecture get updated, what used to be a
+RES1 bit becomes a functinal bit. So we can define the name for these bits, this
+also increase the readability.
+
+[1] lore.kernel.org/ZLZQ6r4-9mVdg4Ry@monolith.localdoman
+
+Shaoqin Huang (2):
+  arm64: Replace the SCTLR_EL1 filed definition by _BITUL()
+  arm64: Define name for the bits used in SCTLR_EL1_RES1
+
+ lib/arm64/asm/sysreg.h | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
+
+-- 
+2.39.1
+
