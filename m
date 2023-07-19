@@ -2,160 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17EB8759CB8
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 19:47:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC162759CD6
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 19:54:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230049AbjGSRrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 13:47:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36914 "EHLO
+        id S229657AbjGSRyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 13:54:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjGSRrr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 13:47:47 -0400
+        with ESMTP id S229451AbjGSRyG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 13:54:06 -0400
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A96F1FD6
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:47:44 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5834d9ec5f7so16379127b3.1
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:47:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2645C1FC1
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:54:05 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5707177ff8aso64378487b3.2
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:54:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689788864; x=1692380864;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZrpSlfvy8CWa29HQgq0qreuIOXt/Wldn9lf0s+IQ19g=;
-        b=ArpFLxX4pd+nE6yhxk4kfQsyY2cBj0283wyB2UFD4pQNpbkrc+ZAbqxw+z+OgClanI
-         8Bmj2Z7j2c1NhNgCvBdv83cjgOHHCOOMDHYftHtZeAL3vo412/Xbeep/S+CdApdBGNVE
-         aduoGH7mk12lxFjmYh58eVW/1Ksc0OT9NLaSC1w5eMBSYs+0sTNoL7N0w3aZ0n2P+aH0
-         VnFxLOrHPJ9r2ezOXOfj0cBYblwBN0Ye2w9Cgtba6HWxXo2yyLAo7PNbRfr5GAzKlZhF
-         ic8thdmStV5nJQreXCY0jlMVC8WTwDKkeNH3l7/QHaf5X+Z1Dsac59JBXIEJlOoDRy4l
-         I3Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689788864; x=1692380864;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+        d=google.com; s=20221208; t=1689789244; x=1690394044;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ZrpSlfvy8CWa29HQgq0qreuIOXt/Wldn9lf0s+IQ19g=;
-        b=YXOSJ1hqUjxTVjpAbYfOxIgZdcXUxgWRJL9hlhcAze51sJma2cyzLw2xD2/oFqWG4O
-         twkO2BvjQw9f9+KN8MthjYeac7I0BWJ1/2GGHUjDHkgKH+pkYWf+/0yz0KZUqjoulUvw
-         Y2YWW9uxzUwJVUnllDd9iBih5TgHxtz6/vnEa0uwzpiXD0MzjFz4AJAVdXi1ukqqpitV
-         EmN4NMxSTwg1UPOX5DykbdCD0Pq8uO5z0IfcBOvtZaFmNbC7RiFoUC83yh5sGinY+HZl
-         btQqC2E2wFSHqThonlNJ+hmIBvMNX5I8Lps+m1p9AcaKxWvt96skCBU9rvtEUd0Ez9AW
-         u5ww==
-X-Gm-Message-State: ABy/qLYRyfcu3F00Z5HXVh1HWXY9OmFqMmO3084FRu1lcKIaNQw6NYJ4
-        UXCllxOfLITlJ/L8c2K37tuz68xBbvI=
-X-Google-Smtp-Source: APBJJlFlYUVvIIObTojpJ8UchQ4CwQtQGAVrCh++KpJ7LgJpdZRIA9xQwbGLQUVWTMKWnIrBZUJv99cvfhs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:f509:0:b0:ca3:3341:6315 with SMTP id
- a9-20020a25f509000000b00ca333416315mr42238ybe.0.1689788863726; Wed, 19 Jul
- 2023 10:47:43 -0700 (PDT)
-Date:   Wed, 19 Jul 2023 10:47:41 -0700
-In-Reply-To: <CAGtprH9a2jX-hdww9GPuMrO9noNeXkoqE8oejtVn2vD0AZa3zA@mail.gmail.com>
+        bh=0kxZ4Z80lUcSFdp3GgQl/jQwBGNAtEogOtDD6DT+le8=;
+        b=NdNKIYqEldjUUQV4h+XNM1ILmBpma9z9AEdBtYn1qcrFOenwJmBXrHw6mTbkprQj8p
+         r+YtkbikqlLfJdQZIoTiQv/TZpBxRXEg0gSoK35Ky48bcLRFCn0Qj0DsnXRublL7LccU
+         VbZhu6d+zj+n5OuXYLNNjo3SaPP6NC8/yNGWRhVbEHVJlHuLX5Gsll/rQ8aLyHWCbZUs
+         /8pD6jrn0k0jGKj8o91kas/Vof7SZ7T7M6Y8JVFS9L6EnZODlq5wuOfEPi4IxaVWx6IY
+         g0cXiBg3AzBUjksD04dElZ9FVrB9vd1h8Wu2ap7UEulstmwA86OoTJopktyhvQXeMD9s
+         GkBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689789244; x=1690394044;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0kxZ4Z80lUcSFdp3GgQl/jQwBGNAtEogOtDD6DT+le8=;
+        b=LIC9xQgup/l8fkmUtWoTtWwcwaIfZMsc1/VeEsxNceSjiDbsuz2+5PWhFSFPf75XFq
+         YZilsf8yjl0xlyatuUUp6FJwWU2QQbFOTnRfmpRFLfzfeTsFyYNbyJHZHqL90PjweDGR
+         DtEAZ/DWKVAxAiEj8mS3RslO/XWFES+X04LqnElAZGkcv0Q/jm3BeP6DShtpUYG7dA89
+         pP0ZKNRNsci/S0+TrbH7+6xUGyBoJn4+ZXAc+ER+1WsCZGGSs8vG+p9ReB58x+AkGHJC
+         ghC9Pg5y+RiqcQVNvI4klS5zaQ0VvOGfFubVPXCS5EyfS8ZUELASlOcDxYnXSvmWNpeX
+         qdOw==
+X-Gm-Message-State: ABy/qLbxriLZDMwCmY/l+oz9jaHBJkgWRlK6n1lL9onMTtZXetScy8u6
+        C2aRfPtfBKki+oWlJJNl5MC8nqdw4HcP
+X-Google-Smtp-Source: APBJJlHzC655GgaoeeexqmchzYWVTbKP9Ygbn4QXSHn76tJOWPJ5nIAjVrvG3mrJnq+Ot9jVn2qgg1kU3KfD
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a81:d00a:0:b0:56d:502:9eb0 with SMTP id
+ v10-20020a81d00a000000b0056d05029eb0mr34446ywi.6.1689789244409; Wed, 19 Jul
+ 2023 10:54:04 -0700 (PDT)
+Date:   Wed, 19 Jul 2023 17:54:00 +0000
 Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
- <CAGtprH9a2jX-hdww9GPuMrO9noNeXkoqE8oejtVn2vD0AZa3zA@mail.gmail.com>
-Message-ID: <ZLghvU4QzE0PtfNG@google.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
+Message-ID: <20230719175400.647154-1-rananta@google.com>
+Subject: [PATCH] KVM: arm64: Fix CPUHP logic for protected KVM
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 19, 2023, Vishal Annapurve wrote:
-> On Tue, Jul 18, 2023 at 4:49=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > ...
-> > +static int kvm_gmem_error_page(struct address_space *mapping, struct p=
-age *page)
-> > +{
-> > +       struct list_head *gmem_list =3D &mapping->private_list;
-> > +       struct kvm_memory_slot *slot;
-> > +       struct kvm_gmem *gmem;
-> > +       unsigned long index;
-> > +       pgoff_t start, end;
-> > +       gfn_t gfn;
-> > +
-> > +       filemap_invalidate_lock_shared(mapping);
-> > +
-> > +       start =3D page->index;
-> > +       end =3D start + thp_nr_pages(page);
-> > +
-> > +       list_for_each_entry(gmem, gmem_list, entry) {
-> > +               xa_for_each_range(&gmem->bindings, index, slot, start, =
-end - 1) {
-> > +                       for (gfn =3D start; gfn < end; gfn++) {
-> > +                               if (WARN_ON_ONCE(gfn < slot->base_gfn |=
-|
-> > +                                               gfn >=3D slot->base_gfn=
- + slot->npages))
-> > +                                       continue;
-> > +
-> > +                               /*
-> > +                                * FIXME: Tell userspace that the *priv=
-ate*
-> > +                                * memory encountered an error.
-> > +                                */
-> > +                               send_sig_mceerr(BUS_MCEERR_AR,
-> > +                                               (void __user *)gfn_to_h=
-va_memslot(slot, gfn),
-> > +                                               PAGE_SHIFT, current);
->=20
-> Does it make sense to replicate what happens with MCE handling on
-> tmpfs backed guest memory:
-> 1) Unmap gpa from guest
-> 2) On the next guest EPT fault, exit to userspace to handle/log the
-> mce error for the gpa.
+For protected kvm, the CPU hotplug 'down' logic currently brings
+down the timer and vGIC, essentially disabling interrupts. However,
+because of how the 'kvm_arm_hardware_enabled' flag is designed, it
+never re-enables them back on the CPU hotplug 'up' path. Hence,
+clean up the logic to maintain the CPU hotplug up/down symmetry.
 
-Hmm, yes, that would be much better.  Ah, and kvm_gmem_get_pfn() needs to c=
-heck
-folio_test_hwpoison() and potentially PageHWPoison().  E.g. if the folio is=
- huge,
-KVM needs to restrict the mapping to order-0 (target page isn't poisoned), =
-or
-return KVM_PFN_ERR_HWPOISON (taget page IS poisoned).
+Fixes: 466d27e48d7c ("KVM: arm64: Simplify the CPUHP logic")
+Reported-by: Oliver Upton <oliver.upton@linux.dev>
+Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ arch/arm64/kvm/arm.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
-Alternatively, KVM could punch a hole in kvm_gmem_error_page(), but I don't=
- think
-we want to do that because that would prevent forwarding the #MC to the gue=
-st.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index c2c14059f6a8..010ebfa69650 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1867,14 +1867,10 @@ static void _kvm_arch_hardware_enable(void *discard)
+ 
+ int kvm_arch_hardware_enable(void)
+ {
+-	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+-
+ 	_kvm_arch_hardware_enable(NULL);
+ 
+-	if (!was_enabled) {
+-		kvm_vgic_cpu_up();
+-		kvm_timer_cpu_up();
+-	}
++	kvm_vgic_cpu_up();
++	kvm_timer_cpu_up();
+ 
+ 	return 0;
+ }
+@@ -1889,10 +1885,8 @@ static void _kvm_arch_hardware_disable(void *discard)
+ 
+ void kvm_arch_hardware_disable(void)
+ {
+-	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
+-		kvm_timer_cpu_down();
+-		kvm_vgic_cpu_down();
+-	}
++	kvm_timer_cpu_down();
++	kvm_vgic_cpu_down();
+ 
+ 	if (!is_protected_kvm_enabled())
+ 		_kvm_arch_hardware_disable(NULL);
+-- 
+2.41.0.487.g6d72f3e995-goog
+
