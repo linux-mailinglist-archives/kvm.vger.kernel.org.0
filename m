@@ -2,91 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 708287599F5
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 17:39:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06EB2759A0F
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 17:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231897AbjGSPjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 11:39:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45342 "EHLO
+        id S230248AbjGSPmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 11:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231824AbjGSPjX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 11:39:23 -0400
+        with ESMTP id S229816AbjGSPmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 11:42:40 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2382107
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:39:11 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c4f27858e4eso6392037276.1
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:39:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567CF1B5
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:42:39 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c5fc972760eso6363725276.1
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689781150; x=1692373150;
+        d=google.com; s=20221208; t=1689781358; x=1692373358;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3uTGEOgXGgjS1mpy4uY8Zn88ggwsAyaWY3/MU5WFUXU=;
-        b=zuZWZV29hv7HoMETiCkSKGIHZcpHTMG8TKF9qduMPPS/E1c0SfFLVA6kGEOoP5U9qq
-         U77CuEsLMMxKIxLMFnjtp2hpB+IIMkYXVFGsPC5bapP3nIk/nGTrjqlCGcZf5+xPpr8T
-         q16/aDqhEkgnoKMdGaA5rz+Gt+5uK6D6P1fr5Zm7R4i7YF7l973NWOrr+c3kq7IzyS9M
-         gLZmugAwtecTQMKF7z0UBcPf86RbNReN6ZSKfaBS2Zp8N7kJnMwhsDMUzBHIndlxccW1
-         lnFRHUcOrryTZsXwruMmKL2jJUIvic1/Jzr/kaZBJYZOlvirf0tEwgFNXnc0yrJBGF6s
-         gFpQ==
+        bh=D5fxkTnGgPpXTXRs+pAAOpKveu4sBAlnJ9TAdnEyBnc=;
+        b=lHyhjCYeBP7i/K/0t117SJ2Lo9qZWJUGNdXY0iv+0+zNE60S1cOmziGlbGeN2uN9nn
+         Kqr9JUKTOHvutwoyRE/MiATy7kCuewOpsSoguamfe7GM2cRjdoWR0VIfhY1R1YGuyUxM
+         9Hffie45CBgwONB4rPVioxMTCmiNTYLqyF0n06Gepul95/7RzfNDR5pH+ymsgEWo2M3X
+         r/GLWyPFOWs+tuF4HdxBZlyO+aadFna3rEJGqnWVKRabFngPqsoaAE44fDtAjHS0fhiI
+         rwfp0nTrN5jN3Ypx5SzR1hFHvVcWZBrnmOzcAQkVc9lMyC7Ic53q1T66hW0A6exIngEB
+         J47Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689781150; x=1692373150;
+        d=1e100.net; s=20221208; t=1689781358; x=1692373358;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3uTGEOgXGgjS1mpy4uY8Zn88ggwsAyaWY3/MU5WFUXU=;
-        b=UEf2CVc8oIHtz0MLzsYkBXehBvrbFljfxYFiZmqM+8KNbGRHoDwWMk/YMfqRkkGvbc
-         Ugr6aA5Jr8QCJU7Ue1Ou6TdRvJGG+R74VrJOuijSnghpGF8QOcWRXMgo9IeK50lvy2Hp
-         Br1ocFxSWOuOh+EE2bE6rqQMzI0UzZUgxXOrAchBkmjfGMnnpk+njoCShGRaE2gIBVzP
-         uDjqOrE7PwAItLa6V2OrRTyI7DCQYkcKkrwBdSZgbxgPjmj5rTaZi/5rsnjqUlZ0Bs0D
-         +6N2EELIzBJngpVxqSQeSKTdib2otQdM71GnRwUXTbdncSMP6ehhNrVU9OLTXCCijQJQ
-         NU+Q==
-X-Gm-Message-State: ABy/qLbbY9fzhwGXIrJXiQ3XUqJj1aBmMWQhLH3iI5s7QZrBrve1UaO3
-        DovksayBe4p9cdI2PIKnpo/cRIclHeE=
-X-Google-Smtp-Source: APBJJlHKX/op8BIXr6hrdN4x6RovTyUJBoPmA+F//tB9wdB4uZjaG/yxyF0KPogxnGD6eEZAy2DX7qXfLUE=
+        bh=D5fxkTnGgPpXTXRs+pAAOpKveu4sBAlnJ9TAdnEyBnc=;
+        b=NY8AZy7QhC0Zj0nj4oPZSB7ndxrqfKGXh3FT2KjzlHUe4rFetJ6Y42gGRMRdDQjxi4
+         iAwo5YXC8WtRtQ7bs5w8aOb6LzUzTK3kdea3UlmRR5pmQF6lhEN6+gw75R3BLdfrcKEc
+         FIS7Dhk53FRJoNvhwMvw/7dEQIWgUSW5UJFZHItCN2REkRv7zx0JXtoYYrPD4yXcfuli
+         wyTjkkM3STPGL06bSRXTqprxWwm07s9ZIAbWguxFWZaL/dZA0Q8m1Q7Z0ZFyUP90nKON
+         8IZwaNoKM62VXqagS2VF588Yr3uhpDb0AlxzHPvEqiL1uSOrqx9aoeQV9dESm+rUmT77
+         VVtw==
+X-Gm-Message-State: ABy/qLZKZX7LaVEVk/Zzm1e+WzBylNqDEyOphQpICqppEMy5xHwpcmD4
+        xhhW56TPRHoy0DYTXW0MPIknnMoDIvs=
+X-Google-Smtp-Source: APBJJlEvkfa0YzxhGi1mapD7wqxseWSC9O4G8YQAxUPbYQNHgI3Bi13yP67pEEMYkzOX6AVkNVMrnrNQtRI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:868b:0:b0:c4d:9831:9712 with SMTP id
- z11-20020a25868b000000b00c4d98319712mr26898ybk.0.1689781150625; Wed, 19 Jul
- 2023 08:39:10 -0700 (PDT)
-Date:   Wed, 19 Jul 2023 08:39:09 -0700
-In-Reply-To: <CU66VMG4IKSD.33KF2CEZJ2I1@suppilovahvero>
+ (user=seanjc job=sendgmr) by 2002:a25:230e:0:b0:c4d:4b23:337 with SMTP id
+ j14-20020a25230e000000b00c4d4b230337mr25446ybj.11.1689781358655; Wed, 19 Jul
+ 2023 08:42:38 -0700 (PDT)
+Date:   Wed, 19 Jul 2023 08:42:37 -0700
+In-Reply-To: <20230719083332.4584-1-yan.y.zhao@intel.com>
 Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-2-seanjc@google.com>
- <CU66VMG4IKSD.33KF2CEZJ2I1@suppilovahvero>
-Message-ID: <ZLgDnYJUX/QR9UJi@google.com>
-Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action union
+References: <20230719083332.4584-1-yan.y.zhao@intel.com>
+Message-ID: <ZLgEbalDPD38qHmm@google.com>
+Subject: Re: [PATCH] KVM: allow mapping of compound tail pages for IO or
+ PFNMAP mapping
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, stevensd@chromium.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -99,23 +68,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 19, 2023, Jarkko Sakkinen wrote:
-> On Wed Jul 19, 2023 at 2:44 AM EEST, Sean Christopherson wrote:
-> >  	/* Huge pages aren't expected to be modified without first being zapped. */
-> > -	WARN_ON(pte_huge(range->pte) || range->start + 1 != range->end);
-> > +	WARN_ON(pte_huge(range->arg.pte) || range->start + 1 != range->end);
+On Wed, Jul 19, 2023, Yan Zhao wrote:
+> Allow mapping of tail pages of compound pages for IO or PFNMAP mapping
+> by trying and getting ref count of its head page.
 > 
-> Not familiar with this code. Just checking whether whether instead
-> pr_{warn,err}()
+> For IO or PFNMAP mapping, sometimes it's backed by compound pages.
+> KVM will just return error on mapping of tail pages of the compound pages,
+> as ref count of the tail pages are always 0.
+> 
+> So, rather than check and add ref count of a tail page, check and add ref
+> count of its folio (head page) to allow mapping of the compound tail pages.
+> 
+> This will not break the origial intention to disallow mapping of tail pages
+> of non-compound higher order allocations as the folio of a non-compound
+> tail page is the same as the page itself.
+> 
+> On the other side, put_page() has already converted page to folio before
+> putting page ref.
 
-The "full" WARN is desirable, this is effecitvely an assert on the contract between
-the primary MMU, generic KVM code, and x86's TDP MMU.  The .change_pte() mmu_notifier
-callback doesn't allow for hugepages, i.e. it's a (likely fatal) kernel bug if a
-hugepage is encountered at this point.  Ditto for the "start + 1 == end" check,
-if that fails then generic KVM likely has a fatal bug.
+Is there an actual use case for this?  It's not necessarily a strict requirement,
+but it would be helpful to know if KVM supports this for a specific use case, or
+just because it can.
 
-> combined with return false would be a more graceful option?
+Either way, this needs a selftest, KVM has had way too many bugs in this area.
 
-The return value communicates whether or not a TLB flush is needed, not whether
-or not the operation was successful, i.e. there is no way to cancel the unexpected
-PTE change.
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> ---
+>  virt/kvm/kvm_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 138292a86174..6f2b51ef20f7 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2551,7 +2551,7 @@ static int kvm_try_get_pfn(kvm_pfn_t pfn)
+>  	if (!page)
+>  		return 1;
+>  
+> -	return get_page_unless_zero(page);
+> +	return folio_try_get(page_folio(page));
+>  }
+>  
+>  static int hva_to_pfn_remapped(struct vm_area_struct *vma,
+> 
+> base-commit: 24ff4c08e5bbdd7399d45f940f10fed030dfadda
+> -- 
+> 2.17.1
+> 
