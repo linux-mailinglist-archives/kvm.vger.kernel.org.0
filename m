@@ -2,129 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91407759A4B
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 17:58:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B419759B9A
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 18:56:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231969AbjGSP6D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 11:58:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57398 "EHLO
+        id S230478AbjGSQ4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 12:56:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231963AbjGSP5v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 11:57:51 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9301D1701
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:57:47 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-cb4bb6c7efcso6072786276.2
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689782266; x=1692374266;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/faZ439ffpfGfEHmalSwP2OnuvWR9ATtkot3hlajzjA=;
-        b=QydOtl5a0QKciPatAvzcC5pE/xHdcSn4F+B2Dr0i6sAO8cVMeqjLLthl+4QB5qjs9N
-         xsgye6l5Jk2TKn+pXgeK6kdVm6ihMR0iACTbTKPDhEFWxyOJCn/GSFge6kIwLS+Vn/LL
-         mPFJdCYiApldUtDvCF6Hj5yxdz6h3xDJXrQUNRg7AyM0iHNW5oDsuDY1FWpWHb3PUVIR
-         /k/TtAEVvVT96eSEQJUjeU9bAua0Hh854H7N/tmNwKkNvxDPe8MMoyBTSGqW16YfS3RQ
-         pKi3mPG9IZ8btaafu8HixtkSrX9qRbn/zHAeCapgTWul+X4y3jSaBrBS+/4YJTUzFzpS
-         8qOQ==
+        with ESMTP id S230442AbjGSQ41 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 12:56:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C8A019B4
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 09:55:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689785732;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ybZMnwXlmIEE0ADI9FsKUlcEynrHTdW2zV41y3cU4q8=;
+        b=GywAJTHHLcxJVwUJVakntTMUsC9ImefzxWcs8ba2GGuU7mN0qPIBWmkS6OiMKea8ncFEmX
+        GqmxHuyFFHDhYM5yhA6J+t4roOPPCnCIaXDkG4qsKtkkTzaNZ1kPGNB4hsHV+fZywytjKw
+        m1nR9lV36gw3ZVAxhygmL3U5yVEGzxY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-136-xlkIuctSPCKt3WYmsur1Yg-1; Wed, 19 Jul 2023 12:55:30 -0400
+X-MC-Unique: xlkIuctSPCKt3WYmsur1Yg-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-51836731bfbso4523724a12.3
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 09:55:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689782266; x=1692374266;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/faZ439ffpfGfEHmalSwP2OnuvWR9ATtkot3hlajzjA=;
-        b=EX5AgzSu1s77guqqehsIulXkm+VoTia9R2JFztVTqX60dGWm728ahd4Cv4NMAQAvtJ
-         7i2i6Iz2MfzFnLVVf3f8vhJrLOxpuRG7Wus5LrDNJwY4ANUO45ed7PJHc3WJmyIbySaX
-         w37MCX7MF+set871VLmEiVB6Sm5A2b5qZ9xCtaFpaBtcN6zC05zPWf+RtH+47LjBveOh
-         8/QRV24P5aK/+1VGpWkHSvz0ImxrAavkRXJeaSttpHdoS5QR/Pzje7w+p1IFbejwZTPj
-         62+HqQ/DsnE5DTC9jSf9hDURx4pwhOGVeAC3RPqe7gPHjKNEtRHtJEqLAh0zSQg4dXrp
-         oayQ==
-X-Gm-Message-State: ABy/qLZ0RwWXHG1zijw42R+jMXeuMIAfZpoaa9QKSkSEmYr2Kn3pH+U4
-        Kqk+NfB51rAHnM6gWhxPzwEanVA48TU=
-X-Google-Smtp-Source: APBJJlE9XQIl0IoVuVPe1k8cQspT9EjElMzs8LlRIDRC+ZCEOEyjDm0RUb/SIHyIwR9N1WKEI6y4rVYD0Qg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d117:0:b0:cef:5453:b6da with SMTP id
- i23-20020a25d117000000b00cef5453b6damr24214ybg.7.1689782266583; Wed, 19 Jul
- 2023 08:57:46 -0700 (PDT)
-Date:   Wed, 19 Jul 2023 08:57:44 -0700
-In-Reply-To: <bae58fd3-34b0-641a-a18b-010d48c792f0@oracle.com>
-Mime-Version: 1.0
-References: <3d05fcf1-dad3-826e-03e9-599ced7524b4@oracle.com>
- <20230518035806.938517-1-dengqiao.joey@bytedance.com> <2f6210acca81090146bc1decf61996aae2a0bfcf.camel@redhat.com>
- <36295675-2139-266d-4b07-9e029ac88fef@oracle.com> <ZJ4HJhQytonABUMl@google.com>
- <bae58fd3-34b0-641a-a18b-010d48c792f0@oracle.com>
-Message-ID: <ZLgH+LGl+eC4hFdx@google.com>
-Subject: Re: [PATCH] KVM: SVM: Update destination when updating pi irte
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        "dengqiao.joey" <dengqiao.joey@bytedance.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1689785729; x=1692377729;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ybZMnwXlmIEE0ADI9FsKUlcEynrHTdW2zV41y3cU4q8=;
+        b=DCt/EEz2G/Q+s0iGqu5cNJxjCaDPcum/DrmRhe2ZqqKolnT9rRXkQysmCRDswTnpdH
+         fCz8TAJNPFcz6z0jivmgT6M/bqT7pbNroAQuHLyC4u/2cstDsuBiTfjfdlwUAkuLtwy/
+         OQrb2+3nTFU7By4KNqKl/aN3IoLVZNwpKGvlZyiIwY5vC6SSEwmRkMY1S/cvYCW8VbkG
+         dyNF39QK9y7dvHwmZwppUkZYX85c+IZ8HQT/CN4XguhzQzqbQg0jtJlZw1Z0WefJchUh
+         aXinC9hftCQgfihPLdkipRXOmpGPnNz4OS90KktsyIXel9I87EoF0EERbCCaB+BRLzVm
+         qocQ==
+X-Gm-Message-State: ABy/qLa60nn0wYdUnp3w36eXqPeDuCeHp48fMQInxuJV0dgEy4XTt2FQ
+        cK5KLD22s8VIXEpB35svOrYLqO9DXGSzCP6T9sNMw5o+LTUoQxZOzymQVUipxp/rbQrYy1++jbD
+        UhwV2+zReZ8nR
+X-Received: by 2002:aa7:df12:0:b0:51e:28e6:3838 with SMTP id c18-20020aa7df12000000b0051e28e63838mr2675080edy.17.1689785729746;
+        Wed, 19 Jul 2023 09:55:29 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEE4qOGG9V7ZI8+WFW37awHpPD5aiip3zVhw1ks31Z/kpX3OD6eusNtSgp6OKt44xHjSBz/kg==
+X-Received: by 2002:aa7:df12:0:b0:51e:28e6:3838 with SMTP id c18-20020aa7df12000000b0051e28e63838mr2675066edy.17.1689785729461;
+        Wed, 19 Jul 2023 09:55:29 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id r18-20020aa7d592000000b0051df5eefa20sm2911736edq.76.2023.07.19.09.55.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jul 2023 09:55:28 -0700 (PDT)
+Message-ID: <711f74d6-fe15-6bd4-a9b9-c4f178d95bf3@redhat.com>
+Date:   Wed, 19 Jul 2023 18:55:25 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action
+ union
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-2-seanjc@google.com>
+Content-Language: en-US
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230718234512.1690985-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 14, 2023, Joao Martins wrote:
-> +Suravee, +Alejandro
-> 
-> On 29/06/2023 23:35, Sean Christopherson wrote:
-> > On Thu, May 18, 2023, Joao Martins wrote:
-> >> On 18/05/2023 09:19, Maxim Levitsky wrote:
-> >>> I think that we do need to a flag indicating if the vCPU is currently
-> >>> running and if yes, then use svm->vcpu.cpu (or put -1 to it when it not
-> >>> running or something) (currently the vcpu->cpu remains set when vCPU is
-> >>> put)
-> >>>
-> >>> In other words if a vCPU is running, then avic_pi_update_irte should put
-> >>> correct pCPU number, and if it raced with vCPU put/load, then later should
-> >>> win and put the correct value.  This can be done either with a lock or
-> >>> barriers.
-> >>>
-> >> If this could be done, it could remove cost from other places and avoid this
-> >> little dance of the galog (and avoid its usage as it's not the greatest design
-> >> aspect of the IOMMU). We anyways already need to do IRT flushes in all these
-> >> things with regards to updating any piece of the IRTE, but we need some care
-> >> there two to avoid invalidating too much (which is just as expensive and per-VCPU).
-> > 
-> > ...
-> > 
-> >> But still quite expensive (as many IPIs as vCPUs updated), but it works as
-> >> intended and guest will immediately see the right vcpu affinity. But I honestly
-> >> prefer going towards your suggestion (via vcpu.pcpu) if we can have some
-> >> insurance that vcpu.cpu is safe to use in pi_update_irte if protected against
-> >> preemption/blocking of the VCPU.
-> > 
-> > I think we have all the necessary info, and even a handy dandy spinlock to ensure
-> > ordering.  Disclaimers: compile tested only, I know almost nothing about the IOMMU
-> > side of things, and I don't know if I understood the needs for the !IsRunning cases.
-> > 
-> I was avoiding grabbing that lock, but now that I think about it it shouldn't do
-> much harm.
-> 
-> My only concern has mostly been whether we mark the IRQ isRunning=1 on a vcpu
-> that is about to block as then the doorbell rang by the IOMMU won't do anything
-> to the guest. But IIUC the physical ID cache read-once should cover that
+On 7/19/23 01:44, Sean Christopherson wrote:
+> +	BUILD_BUG_ON(sizeof(gfn_range.arg) != sizeof(gfn_range.arg.raw));
+> +	BUILD_BUG_ON(sizeof(range->arg) != sizeof(range->arg.raw));
 
-Acquiring ir_list_lock in avic_vcpu_{load,put}() when modifying
-AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK is the key to avoiding ordering issues.
-E.g. without the spinlock, READ_ONCE() wouldn't prevent svm_ir_list_add() from
-racing with avic_vcpu_{load,put}() and ultimately shoving stale data into the IRTE.
+I think these should be static assertions near the definition of the 
+structs.  However another possibility is to remove 'raw' and just assign 
+the whole union.
 
-It *should* actually be safe to drop the READ_ONCE() since acquiring/releasing
-the spinlock will prevent multiple loads from observing different values.  I kept
-them mostly to keep the diff small, and to be conservative.
+Apart from this,
 
-The WRITE_ONCE() needs to stay to ensure that hardware doesn't see inconsitent
-information due to store tearing.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-If this patch works, I think it makes sense to follow-up with a cleanup patch to
-drop the READ_ONCE() and add comments explaining why KVM uses WRITE_ONCE() but
-not READ_ONCE().
+Paolo
+
+> +	BUILD_BUG_ON(sizeof(gfn_range.arg) != sizeof(range->arg));
+
+
