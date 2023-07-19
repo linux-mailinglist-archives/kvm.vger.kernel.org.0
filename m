@@ -2,135 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CAA175918E
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 11:28:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1485375939F
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 13:01:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjGSJ2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 05:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39778 "EHLO
+        id S230024AbjGSLBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 07:01:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjGSJ2h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 05:28:37 -0400
+        with ESMTP id S229749AbjGSLBE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 07:01:04 -0400
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8CFB3186;
-        Wed, 19 Jul 2023 02:28:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7124110CC
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 04:01:02 -0700 (PDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 47D4E2F4;
-        Wed, 19 Jul 2023 02:29:18 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 396982F4;
+        Wed, 19 Jul 2023 04:01:45 -0700 (PDT)
 Received: from [10.57.33.122] (unknown [10.57.33.122])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 794C13F67D;
-        Wed, 19 Jul 2023 02:28:31 -0700 (PDT)
-Message-ID: <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
-Date:   Wed, 19 Jul 2023 10:28:29 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D09A3F67D;
+        Wed, 19 Jul 2023 04:00:59 -0700 (PDT)
+Message-ID: <0c26ba18-1d82-b9c0-3643-bd8e4d2f58f4@arm.com>
+Date:   Wed, 19 Jul 2023 12:00:57 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-To:     Salil Mehta <salil.mehta@huawei.com>,
-        "steven.price@arm.com" <steven.price@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Salil Mehta <salil.mehta@opnsrc.net>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Gareth Stockwell <Gareth.Stockwell@arm.com>
-References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-7-maz@kernel.org>
 From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+In-Reply-To: <20230712145810.3864793-7-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Salil
+Hi Marc
 
-Thanks for raising this.
-
-On 19/07/2023 03:35, Salil Mehta wrote:
-> [Reposting it here from Linaro Open Discussion List for more eyes to look at]
+On 12/07/2023 15:57, Marc Zyngier wrote:
+> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> related registers. Add their encodings (and only that, because
+> we really don't care about what these registers actually do at
+> this stage).
 > 
-> Hello,
-> I have recently started to dabble with ARM CCA stuff and check if our
-> recent changes to support vCPU Hotplug in ARM64 can work in the realm
-> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
-> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
-> from the host. This might be required to support vCPU Hotplug feature
-> in the realm world in future. vCPU Hotplug is an important feature to
-> support kata-containers in realm world as it reduces the VM boot time
-> and facilitates dynamic adjustment of vCPUs (which I think should be
-> true even with Realm world as current implementation only makes use
-> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+>   1 file changed, 78 insertions(+)
 > 
-> 
-> As per our recent changes [2], [3] related to support vCPU Hotplug on
-> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
-> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
-> PSCI_CPU_ON should undergo similar policy checks and I think,
-> 
-> 1. Host should *deny* to online the target vCPUs which are NOT plugged
-> 2. This means target REC should be denied by host. Can host call
->     RMI_PSCI_COMPETE in such s case?
-> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 76289339b43b..9dfd127be55a 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -194,6 +194,84 @@
+>   #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
+>   #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
+>   
+> +#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
+> +#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)
+> +#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
+> +#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)
+> +#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
+> +#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)
+> +#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)
+> +
+> +#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)
+> +#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)
+> +#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)
+> +
 
-The Realm exit with EXIT_PSCI already provides the parameters passed
-onto the PSCI request. This happens for all PSCI calls except
-(PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
-the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses 
-the request (wherever applicable).
+Merge conflict alert. The above are being added as part of the BRBE 
+support series from Anshuman [0], though in a slightly different scheme
+for registers with numbers. e.g, SYS_BRBINF_EL1(0) vs SYS_BRBINF0_EL1.
+That series is not merged yet, but might go in this cycle.
 
-However, the RMM spec currently doesn't allow denying the request.
-i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
-We will address this in the RMM spec and get back to you.
+[0] 
+https://lkml.kernel.org/r/20230711082455.215983-1-anshuman.khandual@arm.com
 
-Kind regards
 Suzuki
 
 
-> 4. Failure condition (B5.3.3.2) should be amended with
->     runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
->              post: result == PSCI_DENIED (?)
-> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
->     PSCI_CPU_ON flow (D1.4.1)
->    
-> 
-> I do understand that ARM CCA support is in its infancy stage and
-> discussing about vCPU Hotplug in realm world seem to be a far-fetched
-> idea right now. But specification changes require lot of time and if
-> this change is really required then it should be further discussed
-> within ARM.
-> 
-> Many thanks!
-> 
-> 
-> Bes regards
-> Salil
-> 
-> 
-> References:
-> 
-> [1] https://developer.arm.com/documentation/den0137/latest/
-> [2] https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
-> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git virtual_cpu_hotplug/rfc/v2
-> 
+
+> +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> +#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
+> +#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
+> +#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))
+> +#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)
+> +#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)
+> +#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)
+> +#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)
+> +#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)
+> +#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)
+> +#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)
+> +#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)
+> +#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)
+> +#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)
+> +#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)
+> +#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)
+> +#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)
+> +#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)
+> +#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)
+> +#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)
+> +#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)
+> +#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)
+> +#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)
+> +#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)
+> +#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)
+> +#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)
+> +#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)
+> +#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)
+> +#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)
+> +#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)
+> +#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)
+> +#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)
+> +#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)
+> +#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)
+> +#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)
+> +#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)
+> +#define SYS_TRCIMSPEC0			sys_reg(2, 1, 0, 0, 7)
+> +#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)
+> +#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
+> +#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)
+> +#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)
+> +#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)
+> +#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))
+> +#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)
+> +#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)
+> +#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)
+> +#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)
+> +#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)
+> +#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)
+> +#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)
+> +#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)
+> +#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)
+> +#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)
+> +#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)
+> +#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)
+> +#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)
+> +#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)
+> +#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)
+> +#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)
+> +#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)
+> +#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)
+> +#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)
+> +
+> +/* ETM */
+> +#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
+> +
+>   #define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
+>   #define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
+>   #define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
 
