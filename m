@@ -2,63 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E193759FF0
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 22:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD76E75A010
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 22:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231408AbjGSUhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 16:37:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40046 "EHLO
+        id S230094AbjGSUnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 16:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231297AbjGSUhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 16:37:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E701734;
-        Wed, 19 Jul 2023 13:37:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ct4x5skzs8PALPBz8qK2ftN+HGVLNPB6AD5V5+AkyPY=; b=E76vkvNezGst4usz/FoC67Y/mF
-        Hz/T5KV5GXFZzTizzlUf5x0Isr9Aus4wrC9yP/x131xgzlCj7k9TUiTHLj4XWDOsSKKBWKJdaWJva
-        6hsVg5P2ko5ub7M3j2d5+36+FBCHZKc9wYSGhT8tKF7msGf/nLTj+EvGX6Db26CRnGeZGIzEWL5W8
-        DWlLsz79KeRQOxAqsDuqnqWlSgKGUl5eC499RVxCrUlPtFGN58i2NkAjG3dkpUwhv6gx/0ofErnfH
-        gA8nt3DAiupyGI6SbCG+GwTLo0szhgwd/VGq0OabuN8Ste94x26acNPKhCAWAI6cNUiQICRnBvzvo
-        FmcBfIiA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qMDuu-006Rr1-CA; Wed, 19 Jul 2023 20:37:01 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        with ESMTP id S229480AbjGSUnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 16:43:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1909E;
+        Wed, 19 Jul 2023 13:43:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 228C830049E;
-        Wed, 19 Jul 2023 22:36:59 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 0D2E326AA535C; Wed, 19 Jul 2023 22:36:59 +0200 (CEST)
-Date:   Wed, 19 Jul 2023 22:36:58 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Weijiang Yang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, rppt@kernel.org,
-        binbin.wu@linux.intel.com, rick.p.edgecombe@intel.com,
-        john.allen@amd.com, Chao Gao <chao.gao@intel.com>
-Subject: Re: [PATCH v3 00/21] Enable CET Virtualization
-Message-ID: <20230719203658.GE3529734@hirez.programming.kicks-ass.net>
-References: <20230511040857.6094-1-weijiang.yang@intel.com>
- <ZIufL7p/ZvxjXwK5@google.com>
- <147246fc-79a2-3bb5-f51f-93dfc1cffcc0@intel.com>
- <ZIyiWr4sR+MqwmAo@google.com>
- <c438b5b1-b34d-3e77-d374-37053f4c14fa@intel.com>
- <ZJYF7haMNRCbtLIh@google.com>
- <e44a9a1a-0826-dfa7-4bd9-a11e5790d162@intel.com>
- <ZLg8ezG/XrZH+KGD@google.com>
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 699A46182F;
+        Wed, 19 Jul 2023 20:43:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A388C433C8;
+        Wed, 19 Jul 2023 20:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689799396;
+        bh=Tyjuk2o5/6zWPoP1zMw3/ypWfYVhxYWg4rjX3S4aZtg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=FiAa9y/2tv71wEXdSyAGzNYhBUxM+hvhiaqxmMnzXpP8UcpFHg9j/QVPzqJ1auM37
+         lbHnkX0NYfz7AI9yHQjtRu9TYLXdBTGLfLBfe6m5AW1ZMZ1Db0D8YHv0o/kXURCPBg
+         6o2jg6IJRGYIgt179i38xPkXzaLIsMgsxFnK0fpi91ooT8kKWcS8B/1ovFntmhRFU0
+         Q8BPuImDwnSqp/UoGGhqBPPlkEWcYQ8KgeRMf3mdhJTJhj6Do9nbOMZCXofTjkWIFw
+         Snq6WsZ6LAoKSxoq4zjBx4b7UYqEw6ID5xRozHH9G3pl2v8PjgHJhBEsxoAdXceHil
+         xp9Aiqzk429pA==
+Date:   Wed, 19 Jul 2023 15:43:14 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Sui Jingfeng <sui.jingfeng@linux.dev>
+Cc:     David Airlie <airlied@gmail.com>, linux-fbdev@vger.kernel.org,
+        Sui Jingfeng <suijingfeng@loongson.cn>, kvm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
+        linux-pci@vger.kernel.org
+Subject: Re: [Intel-gfx] [PATCH v3 3/9] PCI/VGA: Switch to
+ aperture_contain_firmware_fb_nonreloc()
+Message-ID: <20230719204314.GA512532@bhelgaas>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZLg8ezG/XrZH+KGD@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+In-Reply-To: <20230711164310.791756-4-sui.jingfeng@linux.dev>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,26 +57,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 19, 2023 at 12:41:47PM -0700, Sean Christopherson wrote:
+[+cc linux-pci; I don't apply or ack PCI patches unless they appear there]
 
-> My understanding is that PL[0-2]_SSP are used only on transitions to the
-> corresponding privilege level from a *different* privilege level.  That means
-> KVM should be able to utilize the user_return_msr framework to load the host
-> values.  Though if Linux ever supports SSS, I'm guessing the core kernel will
-> have some sort of mechanism to defer loading MSR_IA32_PL0_SSP until an exit to
-> userspace, e.g. to avoid having to write PL0_SSP, which will presumably be
-> per-task, on every context switch.
+On Wed, Jul 12, 2023 at 12:43:04AM +0800, Sui Jingfeng wrote:
+> From: Sui Jingfeng <suijingfeng@loongson.cn>
 > 
-> But note my original wording: **If that's necessary**
-> 
-> If nothing in the host ever consumes those MSRs, i.e. if SSS is NOT enabled in
-> IA32_S_CET, then running host stuff with guest values should be ok.  KVM only
-> needs to guarantee that it doesn't leak values between guests.  But that should
-> Just Work, e.g. KVM should load the new vCPU's values if SHSTK is exposed to the
-> guest, and intercept (to inject #GP) if SHSTK is not exposed to the guest.
-> 
-> And regardless of what the mechanism ends up managing SSP MSRs, it should only
-> ever touch PL0_SSP, because Linux never runs anything at CPL1 or CPL2, i.e. will
-> never consume PL{1,2}_SSP.
+> The observation behind this is that we should avoid accessing the global
+> screen_info directly. Call the aperture_contain_firmware_fb_nonreloc()
+> function to implement the detection of whether an aperture contains the
+> firmware FB.
 
-To clarify, Linux will only use SSS in FRED mode -- FRED removes CPL1,2.
+Because it's better to access the global screen_info from
+aperture_contain_firmware_fb_nonreloc()?  The reasoning here is not
+super clear to me.
+
+> This patch helps to decouple the determination from the implementation.
+> Or, in other words, we intend to make the determination opaque to the
+> caller. The determination may choose to be arch-dependent or
+> arch-independent. But vgaarb, as a consumer of the determination,
+> shouldn't care how the does determination is implemented.
+
+"how the determination ..."  (drop the "does")
+
+Are you saying that aperture_contain_firmware_fb_nonreloc() might be
+arch-dependent?  Are there multiple callers?  Or does this just move
+code from one place to a more appropriate place?
+
+> Signed-off-by: Sui Jingfeng <suijingfeng@loongson.cn>
+> ---
+>  drivers/pci/vgaarb.c | 19 ++++---------------
+>  1 file changed, 4 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/pci/vgaarb.c b/drivers/pci/vgaarb.c
+> index bf96e085751d..953daf731b2c 100644
+> --- a/drivers/pci/vgaarb.c
+> +++ b/drivers/pci/vgaarb.c
+> @@ -14,6 +14,7 @@
+>  #define vgaarb_info(dev, fmt, arg...)	dev_info(dev, "vgaarb: " fmt, ##arg)
+>  #define vgaarb_err(dev, fmt, arg...)	dev_err(dev, "vgaarb: " fmt, ##arg)
+>  
+> +#include <linux/aperture.h>
+>  #include <linux/module.h>
+>  #include <linux/kernel.h>
+>  #include <linux/pci.h>
+> @@ -26,7 +27,6 @@
+>  #include <linux/poll.h>
+>  #include <linux/miscdevice.h>
+>  #include <linux/slab.h>
+> -#include <linux/screen_info.h>
+>  #include <linux/vt.h>
+>  #include <linux/console.h>
+>  #include <linux/acpi.h>
+> @@ -558,20 +558,11 @@ void vga_put(struct pci_dev *pdev, unsigned int rsrc)
+>  }
+>  EXPORT_SYMBOL(vga_put);
+>  
+> +/* Select the device owning the boot framebuffer if there is one */
+>  static bool vga_is_firmware_default(struct pci_dev *pdev)
+>  {
+>  #if defined(CONFIG_X86) || defined(CONFIG_IA64)
+> -	u64 base = screen_info.lfb_base;
+> -	u64 size = screen_info.lfb_size;
+>  	struct resource *r;
+> -	u64 limit;
+> -
+> -	/* Select the device owning the boot framebuffer if there is one */
+> -
+> -	if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
+> -		base |= (u64)screen_info.ext_lfb_base << 32;
+> -
+> -	limit = base + size;
+>  
+>  	/* Does firmware framebuffer belong to us? */
+>  	pci_dev_for_each_resource(pdev, r) {
+> @@ -581,10 +572,8 @@ static bool vga_is_firmware_default(struct pci_dev *pdev)
+>  		if (!r->start || !r->end)
+>  			continue;
+>  
+> -		if (base < r->start || limit >= r->end)
+> -			continue;
+> -
+> -		return true;
+> +		if (aperture_contain_firmware_fb_nonreloc(r->start, r->end))
+> +			return true;
+>  	}
+>  #endif
+>  	return false;
+> -- 
+> 2.25.1
+> 
