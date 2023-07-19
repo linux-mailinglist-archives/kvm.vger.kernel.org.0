@@ -2,77 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB7C7758BAB
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:00:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95A5A758BBF
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:04:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbjGSDAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 23:00:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
+        id S230053AbjGSDEc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 23:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230130AbjGSDAG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 23:00:06 -0400
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2FF1BF7;
-        Tue, 18 Jul 2023 20:00:02 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id 4fb4d7f45d1cf-51e48e1f6d1so8685458a12.1;
-        Tue, 18 Jul 2023 20:00:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689735601; x=1692327601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lyxAzC/6KM4h0zRVaEqAvajG/7zLUCUTWAHgPPygpQI=;
-        b=eW2q6v8pGXaemUMU4uVtTrB3myTt/DiflqKebSFELGf/lqIS7dPNau8Kjz8aTchyyn
-         LiWBxV7xsKp/APzQi9nF4L/wxzQm1Q6dvwd9oEZz90e05FGcMgGCcrgiPvCxcqd7gnuH
-         SiRjXQtYO2yALLYmkVsTk2dsYleDG3w4NGge10d9/ki/lJOFQkxGYmKSRYv6m9WkQsvE
-         yb9MdzDfIKVtC74p5xblqXsSNSjC60IWtEze2LUezy8GJu8icxUw7NIjWQ+yK+k+tGZD
-         faODhsThJ9syUbXiEXBnRl8XKINBw/ww0j0hoFlYXS5ISotA51zkXMpsC/+ljPMUQypQ
-         b91A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689735601; x=1692327601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lyxAzC/6KM4h0zRVaEqAvajG/7zLUCUTWAHgPPygpQI=;
-        b=KuvrCDk6e+ZaSMYCICFsoVyCTy942j4cWbDdw82uW9hAXR7HMB5Hkfaq9gGgh4ySQq
-         Vnk29m47y9n02rI0iyxM+siCxspuFhgX7J3jFDvv6kiy6bpeltunVPiIiPJaj7szhIgR
-         REOEdxplMXgEFbk5ZOaqvblRdcWhtkGreooVlFEmjzIbkIZ3eLep+xUfkQvX6vA57870
-         MAO0JC6ug878nUJn5QgFkfiTqG6r2P36Z2f13hVAZCNoEtMjFu8kFIQff4vIYpE/pZ0I
-         KjqVv1E7bQD1avfrac3Qo1/XfLBFdtudNMl7+08VWz85yTQLUpDIRu4fWMoIzFU1O0he
-         lO1w==
-X-Gm-Message-State: ABy/qLYqYAx1hz81sDwArRm8rQ/bbYRBZmuKcft3MjLO8iopYJdb/FCr
-        hHyynWtrr3ZQgZgis7OQw6IhsEnYFxNTCYfCCAFTngGm5bwma38yo4E=
-X-Google-Smtp-Source: APBJJlH74W3Jr5XYXGmOp5HoyOo7KI31ZbAfqc8quP/1JIsWoMhu8uMQaFMsaSxeqnIjPColqZoE8yemRiPWgASYJUU=
-X-Received: by 2002:aa7:d805:0:b0:51d:b89d:9818 with SMTP id
- v5-20020aa7d805000000b0051db89d9818mr1243020edq.12.1689735600924; Tue, 18 Jul
- 2023 20:00:00 -0700 (PDT)
+        with ESMTP id S229461AbjGSDEa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 23:04:30 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1EF2E130;
+        Tue, 18 Jul 2023 20:04:28 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98A182F4;
+        Tue, 18 Jul 2023 20:05:11 -0700 (PDT)
+Received: from [10.162.40.17] (unknown [10.162.40.17])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4BE363F67D;
+        Tue, 18 Jul 2023 20:04:22 -0700 (PDT)
+Message-ID: <45fadf89-27ec-07a9-746a-e5d14aba62a3@arm.com>
+Date:   Wed, 19 Jul 2023 08:34:19 +0530
 MIME-Version: 1.0
-References: <20230717062343.3743-1-cloudliang@tencent.com> <20230717062343.3743-6-cloudliang@tencent.com>
- <20230719012113.GE25699@ls.amr.corp.intel.com>
-In-Reply-To: <20230719012113.GE25699@ls.amr.corp.intel.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Wed, 19 Jul 2023 10:59:49 +0800
-Message-ID: <CAFg_LQUkF6EoPo0WDQaPqyBSjprOsZxkqTQGJtjYdaqUBBeztg@mail.gmail.com>
-Subject: Re: [PATCH v4 5/6] KVM: selftests: Test if event filter meets
- expectations on fixed counters
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/4] Invalidate secondary IOMMU TLB on permission upgrade
+Content-Language: en-US
+To:     Alistair Popple <apopple@nvidia.com>, akpm@linux-foundation.org
+Cc:     ajd@linux.ibm.com, catalin.marinas@arm.com, fbarrat@linux.ibm.com,
+        iommu@lists.linux.dev, jgg@ziepe.ca, jhubbard@nvidia.com,
+        kevin.tian@intel.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, nicolinc@nvidia.com, npiggin@gmail.com,
+        robin.murphy@arm.com, seanjc@google.com, will@kernel.org,
+        x86@kernel.org, zhi.wang.linux@gmail.com
+References: <cover.b4454f7f3d0afbfe1965e8026823cd50a42954b4.1689666760.git-series.apopple@nvidia.com>
+From:   Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <cover.b4454f7f3d0afbfe1965e8026823cd50a42954b4.1689666760.git-series.apopple@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,159 +50,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Isaku Yamahata <isaku.yamahata@gmail.com> =E4=BA=8E2023=E5=B9=B47=E6=9C=881=
-9=E6=97=A5=E5=91=A8=E4=B8=89 09:21=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Jul 17, 2023 at 02:23:42PM +0800,
-> Jinrong Liang <ljr.kernel@gmail.com> wrote:
->
-> > From: Jinrong Liang <cloudliang@tencent.com>
-> >
-> > Add tests to cover that pmu event_filter works as expected when
-> > it's applied to fixed performance counters, even if there is none
-> > fixed counter exists (e.g. Intel guest pmu version=3D1 or AMD guest).
-> >
-> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> > ---
-> >  .../kvm/x86_64/pmu_event_filter_test.c        | 80 +++++++++++++++++++
-> >  1 file changed, 80 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c=
- b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> > index 63f85f583ef8..1872b848f734 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> > @@ -27,6 +27,7 @@
-> >  #define ARCH_PERFMON_BRANCHES_RETIRED                5
-> >
-> >  #define NUM_BRANCHES 42
-> > +#define INTEL_PMC_IDX_FIXED          32
-> >
-> >  /* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
-> >  #define MAX_FILTER_EVENTS            300
-> > @@ -805,6 +806,84 @@ static void test_filter_ioctl(struct kvm_vcpu *vcp=
-u)
-> >       TEST_ASSERT(!r, "Masking non-existent fixed counters should be al=
-lowed");
-> >  }
-> >
-> > +static void intel_run_fixed_counter_guest_code(uint8_t fixed_ctr_idx)
-> > +{
-> > +     for (;;) {
-> > +             wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> > +             wrmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx, 0);
-> > +
-> > +             /* Only OS_EN bit is enabled for fixed counter[idx]. */
-> > +             wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * fixed_ctr=
-_idx));
-> > +             wrmsr(MSR_CORE_PERF_GLOBAL_CTRL,
-> > +                   BIT_ULL(INTEL_PMC_IDX_FIXED + fixed_ctr_idx));
-> > +             __asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES})=
-);
-> > +             wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> > +
-> > +             GUEST_SYNC(rdmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx=
-));
-> > +     }
-> > +}
-> > +
-> > +static uint64_t test_with_fixed_counter_filter(struct kvm_vcpu *vcpu,
-> > +                                            uint32_t action, uint32_t =
-bitmap)
-> > +{
-> > +     struct __kvm_pmu_event_filter f =3D {
-> > +             .action =3D action,
-> > +             .fixed_counter_bitmap =3D bitmap,
-> > +     };
-> > +     do_vcpu_set_pmu_event_filter(vcpu, &f);
-> > +
-> > +     return run_vcpu_to_sync(vcpu);
-> > +}
-> > +
-> > +static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t=
- idx,
-> > +                                     uint8_t nr_fixed_counters)
-> > +{
-> > +     unsigned int i;
-> > +     uint32_t bitmap;
-> > +     uint64_t count;
-> > +
-> > +     TEST_ASSERT(nr_fixed_counters < sizeof(bitmap),
->
-> sizeof(bitmap) * 8?
 
-Thank you for pointing this out. You are correct that we should
-compare the number of fixed counters with the number of bits in the
-bitmap variable, not its byte size. I will update the test as follows:
 
-TEST_ASSERT(nr_fixed_counters < sizeof(bitmap) * 8,
+On 7/18/23 13:26, Alistair Popple wrote:
+> The main change is to move secondary TLB invalidation mmu notifier
+> callbacks into the architecture specific TLB flushing functions. This
+> makes secondary TLB invalidation mostly match CPU invalidation while
+> still allowing efficient range based invalidations based on the
+> existing TLB batching code.
+> 
+> ==========
+> Background
+> ==========
+> 
+> The arm64 architecture specifies TLB permission bits may be cached and
+> therefore the TLB must be invalidated during permission upgrades. For
+> the CPU this currently occurs in the architecture specific
+> ptep_set_access_flags() routine.
+> 
+> Secondary TLBs such as implemented by the SMMU IOMMU match the CPU
+> architecture specification and may also cache permission bits and
+> require the same TLB invalidations. This may be achieved in one of two
+> ways.
+> 
+> Some SMMU implementations implement broadcast TLB maintenance
+> (BTM). This snoops CPU TLB invalidates and will invalidate any
+> secondary TLB at the same time as the CPU. However implementations are
+> not required to implement BTM.
 
-This ensures that nr_fixed_counters does not exceed the number of bits
-that the bitmap variable can represent (i.e., 32 bits).
+So, the implementations with BTM do not even need a MMU notifier callback
+for secondary TLB invalidation purpose ? Perhaps mmu_notifier_register()
+could also be skipped for such cases i.e with ARM_SMMU_FEAT_BTM enabled ?
 
->
-> > +                 "Invalid nr_fixed_counters");
-> > +
-> > +     /*
-> > +      * Check the fixed performance counter can count normally when KV=
-M
-> > +      * userspace doesn't set any pmu filter.
-> > +      */
-> > +     count =3D run_vcpu_to_sync(vcpu);
-> > +     TEST_ASSERT(count, "Unexpected count value: %ld\n", count);
-> > +
-> > +     for (i =3D 0; i < BIT(nr_fixed_counters); i++) {
-> > +             bitmap =3D BIT(i);
-> > +             count =3D test_with_fixed_counter_filter(vcpu, KVM_PMU_EV=
-ENT_ALLOW,
-> > +                                                    bitmap);
-> > +             ASSERT_EQ(!!count, !!(bitmap & BIT(idx)));
-> > +
-> > +             count =3D test_with_fixed_counter_filter(vcpu, KVM_PMU_EV=
-ENT_DENY,
-> > +                                                    bitmap);
-> > +             ASSERT_EQ(!!count, !(bitmap & BIT(idx)));
-> > +     }
-> > +}
-> > +
-> > +static void test_fixed_counter_bitmap(void)
-> > +{
-> > +     uint8_t nr_fixed_counters =3D kvm_cpu_property(X86_PROPERTY_PMU_N=
-R_FIXED_COUNTERS);
-> > +     struct kvm_vm *vm;
-> > +     struct kvm_vcpu *vcpu;
-> > +     uint8_t idx;
-> > +
-> > +     /*
-> > +      * Check that pmu_event_filter works as expected when it's applie=
-d to
-> > +      * fixed performance counters.
-> > +      */
-> > +     for (idx =3D 0; idx < nr_fixed_counters; idx++) {
-> > +             vm =3D vm_create_with_one_vcpu(&vcpu,
-> > +                                          intel_run_fixed_counter_gues=
-t_code);
-> > +             vcpu_args_set(vcpu, 1, idx);
-> > +             __test_fixed_counter_bitmap(vcpu, idx, nr_fixed_counters)=
-;
-> > +             kvm_vm_free(vm);
-> > +     }
-> > +}
-> > +
-> >  int main(int argc, char *argv[])
-> >  {
-> >       void (*guest_code)(void);
-> > @@ -848,6 +927,7 @@ int main(int argc, char *argv[])
-> >       kvm_vm_free(vm);
-> >
-> >       test_pmu_config_disable(guest_code);
-> > +     test_fixed_counter_bitmap();
-> >
-> >       return 0;
-> >  }
-> > --
-> > 2.39.3
-> >
->
-> --
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+BTW, dont see ARM_SMMU_FEAT_BTM being added as a feature any where during
+the probe i.e arm_smmu_device_hw_probe().
+
+> 
+> Implementations without BTM rely on mmu notifier callbacks to send
+> explicit TLB invalidation commands to invalidate SMMU TLB. Therefore
+> either generic kernel code or architecture specific code needs to call
+> the mmu notifier on permission upgrade.
+> 
+> Currently that doesn't happen so devices will fault indefinitely when
+> writing to a PTE that was previously read-only as nothing invalidates
+> the SMMU TLB.
+
+Why does not the current SMMU MMU notifier intercept all invalidation from
+generic MM code and do the required secondary TLB invalidation ? Is there
+a timing issue involved here ? Secondary TLB invalidation does happen but
+after the damage has been done ? Could you please point us to a real world
+bug report taking such indefinite faults as mentioned above ?
+
+> 
+> ========
+> Solution
+> ========
+> 
+> To fix this the series first renames the .invalidate_range() callback
+> to .arch_invalidate_secondary_tlbs() as suggested by Jason and Sean to
+> make it clear this callback is only used for secondary TLBs. That was
+> made possible thanks to Sean's series [1] to remove KVM's incorrect
+> usage.
+> 
+> Based on feedback from Jason [2] the proposed solution to the bug is
+> to move the calls to mmu_notifier_arch_invalidate_secondary_tlbs()
+> closer to the architecture specific TLB invalidation code. This
+> ensures the secondary TLB won't miss invalidations, including the
+> existing invalidation in the ARM64 code to deal with permission
+> upgrade.
+
+ptep_set_access_flags() is the only problematic place where this issue
+is being reported ? If yes, why dont fix that instead of moving these
+into platform specific callbacks ? OR there are other problematic areas
+I might be missing.
+
+> 
+> Currently only ARM64, PowerPC and x86 have IOMMU with secondary TLBs
+> requiring SW invalidation so the notifier is only called for those
+> architectures. It is also not called for invalidation of kernel
+> mappings as no secondary IOMMU implementations can access those and
+> hence it is not required.
+> 
+> [1] - https://lore.kernel.org/all/20230602011518.787006-1-seanjc@google.com/
+> [2] - https://lore.kernel.org/linux-mm/ZJMR5bw8l+BbzdJ7@ziepe.ca/
+> 
+> Alistair Popple (4):
+>   mm_notifiers: Rename invalidate_range notifier
+>   arm64/smmu: Use TLBI ASID when invalidating entire range
+>   mmu_notifiers: Call arch_invalidate_secondary_tlbs() when invalidating TLBs
+>   mmu_notifiers: Don't invalidate secondary TLBs as part of mmu_notifier_invalidate_range_end()
+> 
+>  arch/arm64/include/asm/tlbflush.h               |   5 +-
+>  arch/powerpc/include/asm/book3s/64/tlbflush.h   |   1 +-
+>  arch/powerpc/mm/book3s64/radix_hugetlbpage.c    |   1 +-
+>  arch/powerpc/mm/book3s64/radix_tlb.c            |   6 +-
+>  arch/x86/mm/tlb.c                               |   3 +-
+>  drivers/iommu/amd/iommu_v2.c                    |  10 +-
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c |  29 +++--
+>  drivers/iommu/intel/svm.c                       |   8 +-
+>  drivers/misc/ocxl/link.c                        |   8 +-
+>  include/asm-generic/tlb.h                       |   1 +-
+>  include/linux/mmu_notifier.h                    | 104 ++++-------------
+>  kernel/events/uprobes.c                         |   2 +-
+>  mm/huge_memory.c                                |  29 +----
+>  mm/hugetlb.c                                    |   8 +-
+>  mm/memory.c                                     |   8 +-
+>  mm/migrate_device.c                             |   9 +-
+>  mm/mmu_notifier.c                               |  47 +++-----
+>  mm/rmap.c                                       |  40 +-------
+>  18 files changed, 109 insertions(+), 210 deletions(-)
+> 
+> base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
