@@ -2,123 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D60C3758B68
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 04:35:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 081E6758C02
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229937AbjGSCf2 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 18 Jul 2023 22:35:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54820 "EHLO
+        id S230402AbjGSDZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 23:25:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbjGSCfY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 22:35:24 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEA91BC3;
-        Tue, 18 Jul 2023 19:35:23 -0700 (PDT)
-Received: from lhrpeml500006.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4R5Kc000Dtz67QB0;
-        Wed, 19 Jul 2023 10:32:47 +0800 (CST)
-Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
- lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 19 Jul 2023 03:35:20 +0100
-Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
- lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.027;
- Wed, 19 Jul 2023 03:35:20 +0100
-From:   Salil Mehta <salil.mehta@huawei.com>
-To:     "steven.price@arm.com" <steven.price@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-CC:     Catalin Marinas <catalin.marinas@arm.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Salil Mehta" <salil.mehta@opnsrc.net>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world might
- require ARM spec change?
-Thread-Topic: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-Thread-Index: Adm55YYLPryt1tEKR0alBn01xBiFBw==
-Date:   Wed, 19 Jul 2023 02:35:19 +0000
-Message-ID: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.48.147.181]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229437AbjGSDZp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 23:25:45 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A14A01BDD;
+        Tue, 18 Jul 2023 20:25:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689737144; x=1721273144;
+  h=from:to:cc:subject:date:message-id;
+  bh=xzu1JsQe3trjsrf63B2gfw35C0lOTLELIAwy+luVS1s=;
+  b=XwDmuc7zdqVZxDrYqEKbUQKfQgtYrHrsfkmCu/zy7Txz+8DTUCAjwPfG
+   5BswDjf4h9iJnaEKqxWmWGEeK0jWhPzXkZibiJIDX7Z1qWzL0maWTbk7f
+   9hPlCPKJaZjq1elb1VEjBhqsPJYPDlN2AautSxmFObKGTIXG/0ixZuxax
+   IZ+Je23IgFiMryHVeTE9cKuEY6TSbWYfgOVXNW3c10uNNz4aoHgTayP8w
+   tSTgimmtmty+vxSXgbMbk7cbl/aAi1IX6g5lR6Gfs1nmzGjewpx1Q5xqt
+   23ds/iFnEz9zTfvimFoq8eFtzA3V5bsusxirNx7hgaZmUuhIGeQl0dMKa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346665780"
+X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
+   d="scan'208";a="346665780"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="813980253"
+X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
+   d="scan'208";a="813980253"
+Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.123])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:40 -0700
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Zeng Guang <guang.zeng@intel.com>
+Subject: [PATCH v2 0/8] LASS KVM virtualization support
+Date:   Wed, 19 Jul 2023 10:45:50 +0800
+Message-Id: <20230719024558.8539-1-guang.zeng@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[Reposting it here from Linaro Open Discussion List for more eyes to look at]
+Linear Address Space Separation (LASS)[1] is a new mechanism that
+enforces the same mode-based protections as paging, i.e. SMAP/SMEP
+but without traversing the paging structures. Because the protections
+enforced by LASS are applied before paging, "probes" by malicious
+software will provide no paging-based timing information.
 
-Hello,
-I have recently started to dabble with ARM CCA stuff and check if our
-recent changes to support vCPU Hotplug in ARM64 can work in the realm
-world. I have realized that in the RMM specification[1] PSCI_CPU_ON
-command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
-from the host. This might be required to support vCPU Hotplug feature
-in the realm world in future. vCPU Hotplug is an important feature to
-support kata-containers in realm world as it reduces the VM boot time
-and facilitates dynamic adjustment of vCPUs (which I think should be
-true even with Realm world as current implementation only makes use
-of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+Based on a linear-address organization, LASS partitions 64-bit linear
+address space into two halves, user-mode address (LA[bit 63]=0) and
+supervisor-mode address (LA[bit 63]=1).
 
+LASS aims to prevent any attempt to probe supervisor-mode addresses by
+user mode, and likewise stop any attempt to access (if SMAP enabled) or
+execute user-mode addresses from supervisor mode.
 
-As per our recent changes [2], [3] related to support vCPU Hotplug on
-ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
-user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
-PSCI_CPU_ON should undergo similar policy checks and I think,
+When platform has LASS capability, KVM requires to expose this feature
+to guest VM enumerated by CPUID.(EAX=07H.ECX=1):EAX.LASS[bit 6], and
+allow guest to enable it via CR4.LASS[bit 27] on demand. For instruction
+executed in the guest directly, hardware will perform the check. But KVM
+also needs to behave same as hardware to apply LASS to kinds of guest
+memory accesses when emulating instructions by software.
 
-1. Host should *deny* to online the target vCPUs which are NOT plugged
-2. This means target REC should be denied by host. Can host call
-   RMI_PSCI_COMPETE in such s case? 
-3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
-4. Failure condition (B5.3.3.2) should be amended with
-   runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
-            post: result == PSCI_DENIED (?)
-5. Change would also be required in the flow (D1.4 PSCI flows) depicting 
-   PSCI_CPU_ON flow (D1.4.1)
-  
+KVM will take following LASS violations check on emulation path.
+User-mode access to supervisor space address:
+        LA[bit 63] && (CPL == 3)
+Supervisor-mode access to user space address:
+        Instruction fetch: !LA[bit 63] && (CPL < 3)
+        Data access: !LA[bit 63] && (CR4.SMAP==1) && ((RFLAGS.AC == 0 &&
+                     CPL < 3) || Implicit supervisor access)
 
-I do understand that ARM CCA support is in its infancy stage and
-discussing about vCPU Hotplug in realm world seem to be a far-fetched
-idea right now. But specification changes require lot of time and if
-this change is really required then it should be further discussed
-within ARM. 
+This patch series provide a LASS KVM solution and depends on kernel
+enabling that can be found at [2].
 
-Many thanks!
+We tested the basic function of LASS virtualization including LASS
+enumeration and enabling in non-root and nested environment. As KVM
+unittest framework is not compatible to LASS rule, we use kernel module
+and application test to emulate LASS violation instead. With KVM forced
+emulation mechanism, we also verified the LASS functionality on some
+emulation path with instruction fetch and data access to have same
+behavior as hardware.
 
+How to extend kselftest to support LASS is under investigation and
+experiment.
 
-Bes regards
-Salil
+[1] Intel ISE spec https://cdrdv2.intel.com/v1/dl/getContent/671368
+Chapter Linear Address Space Separation (LASS)
 
+[2] LASS kernel patch series
+https://lore.kernel.org/all/20230609183632.48706-1-alexander.shishkin@linux.intel.com/
 
-References:
+------------------------------------------------------------------------
 
-[1] https://developer.arm.com/documentation/den0137/latest/
-[2] https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
-[3] https://git.gitlab.arm.com/linux-arm/linux-jm.git virtual_cpu_hotplug/rfc/v2
+v1->v2
+1. refactor and optimize the interface of instruction emulation
+   by introducing new set of operation type definition prefixed with
+   "X86EMUL_F_" to distinguish access.
+2. reorganize the patch to make each area of KVM better isolated.
+3. refine LASS violation check design with consideration of wraparound
+   access across address space boundary.
+
+v0->v1
+1. Adapt to new __linearize() API
+2. Function refactor of vmx_check_lass()
+3. Refine commit message to be more precise
+4. Drop LASS kvm cap detection depending
+   on hardware capability
+
+Binbin Wu (4):
+  KVM: x86: Consolidate flags for __linearize()
+  KVM: x86: Use a new flag for branch instructions
+  KVM: x86: Add an emulation flag for implicit system access
+  KVM: x86: Add X86EMUL_F_INVTLB and pass it in em_invlpg()
+
+Zeng Guang (4):
+  KVM: emulator: Add emulation of LASS violation checks on linear
+    address
+  KVM: VMX: Implement and apply vmx_is_lass_violation() for LASS
+    protection
+  KVM: x86: Virtualize CR4.LASS
+  KVM: x86: Advertise LASS CPUID to user space
+
+ arch/x86/include/asm/kvm-x86-ops.h |  3 ++-
+ arch/x86/include/asm/kvm_host.h    |  5 +++-
+ arch/x86/kvm/cpuid.c               |  5 ++--
+ arch/x86/kvm/emulate.c             | 37 ++++++++++++++++++++---------
+ arch/x86/kvm/kvm_emulate.h         |  9 +++++++
+ arch/x86/kvm/vmx/nested.c          |  3 ++-
+ arch/x86/kvm/vmx/sgx.c             |  4 ++++
+ arch/x86/kvm/vmx/vmx.c             | 38 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h             |  3 +++
+ arch/x86/kvm/x86.c                 | 10 ++++++++
+ arch/x86/kvm/x86.h                 |  2 ++
+ 11 files changed, 102 insertions(+), 17 deletions(-)
+
+-- 
+2.27.0
 
