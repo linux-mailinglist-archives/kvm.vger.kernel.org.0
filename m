@@ -2,57 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCC9775A295
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 01:00:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08D1975A28A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 00:54:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230180AbjGSW77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 18:59:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55088 "EHLO
+        id S231349AbjGSWyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 18:54:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbjGSW75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 18:59:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5437610B;
-        Wed, 19 Jul 2023 15:59:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 18BF86185A;
-        Wed, 19 Jul 2023 22:51:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6007C433C8;
-        Wed, 19 Jul 2023 22:51:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689807068;
-        bh=d5+z1ZEyAaAcKeXUkztdUKRNArMaOIqIm8Y7klWaUoM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Kw87m58vIVCFwitWVjfmUAUmlDPnSKOm3YyLm0fF//4cY0ejJvhclPAe4BTet4sg7
-         PZWH4+CT+o6QEdbY79P+Pk+jqO91k95UWJCOQ16AqMSlgIdKvRe/ysJGMPhyyUltoo
-         jF/zr4EPYCO8rXFrFhwXe5xValGJGHuL9lrS5rQEsdtvwikgsd8/FGoJeFja6d2gDW
-         CkczsyZbmaVBbFWrKVOoqlr8xyJ6g0p5bwjSFX3j6K3jaz3s26ustuKdaP5QpFeVp/
-         3PHzhzWa2eUmsdArIm1IO6Fftp4271kbJUXp+8cC2kxDvLrkqUstD5wd8b/8GGYjhJ
-         IvjVGisMM8wJw==
-From:   SeongJae Park <sj@kernel.org>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     akpm@linux-foundation.org, ajd@linux.ibm.com,
-        catalin.marinas@arm.com, fbarrat@linux.ibm.com,
-        iommu@lists.linux.dev, jgg@ziepe.ca, jhubbard@nvidia.com,
-        kevin.tian@intel.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au, nicolinc@nvidia.com, npiggin@gmail.com,
-        robin.murphy@arm.com, seanjc@google.com, will@kernel.org,
-        x86@kernel.org, zhi.wang.linux@gmail.com
-Subject: Re: [PATCH v2 3/5] mmu_notifiers: Call invalidate_range() when invalidating TLBs
-Date:   Wed, 19 Jul 2023 22:51:05 +0000
-Message-Id: <20230719225105.1934-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <8f293bb51a423afa71ddc3ba46e9f323ee9ffbc7.1689768831.git-series.apopple@nvidia.com>
-References: 
+        with ESMTP id S231316AbjGSWyE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 18:54:04 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CC68326B3;
+        Wed, 19 Jul 2023 15:53:32 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.43])
+        by gateway (Coremail) with SMTP id _____8CxLOshabhkHHYHAA--.13769S3;
+        Thu, 20 Jul 2023 06:52:17 +0800 (CST)
+Received: from [10.20.42.43] (unknown [10.20.42.43])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8AxjiMJabhkXiA1AA--.40588S3;
+        Thu, 20 Jul 2023 06:52:17 +0800 (CST)
+Message-ID: <6f2faa2f-f91b-eaae-06bf-25367088645e@loongson.cn>
+Date:   Thu, 20 Jul 2023 06:51:53 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 4/9] PCI/VGA: Improve the default VGA device selection
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Sui Jingfeng <sui.jingfeng@linux.dev>
+Cc:     David Airlie <airlied@gmail.com>, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Pan Xinhui <Xinhui.Pan@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        Lyude Paul <lyude@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Hawking Zhang <Hawking.Zhang@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        YiPeng Chai <YiPeng.Chai@amd.com>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        Likun Gao <Likun.Gao@amd.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jani Nikula <jani.nikula@intel.com>
+References: <20230719193233.GA511659@bhelgaas>
+Content-Language: en-US
+From:   suijingfeng <suijingfeng@loongson.cn>
+In-Reply-To: <20230719193233.GA511659@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: AQAAf8AxjiMJabhkXiA1AA--.40588S3
+X-CM-SenderInfo: xvxlyxpqjiv03j6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+        ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
+        BjDU0xBIdaVrnRJUUUmqb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
+        xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
+        j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxV
+        AFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x02
+        67AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6x
+        ACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q6rW5McIj6I8E
+        87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2
+        IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4c8EcI0En4kS14v26r4a6rW5MxAqzxv2
+        6xkF7I0En4kS14v26Fy26r43JwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxV
+        WrXVW3AwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+        67kF1VAFwI0_Wrv_Gr1UMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Xr0_Ar1lIx
+        AIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+        IxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCT
+        nIWIevJa73UjIFyTuYvjxU7eT5DUUUU
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -61,177 +95,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alistair,
 
-On Wed, 19 Jul 2023 22:18:44 +1000 Alistair Popple <apopple@nvidia.com> wrote:
-
-> The invalidate_range() is going to become an architecture specific mmu
-> notifier used to keep the TLB of secondary MMUs such as an IOMMU in
-> sync with the CPU page tables. Currently it is called from separate
-> code paths to the main CPU TLB invalidations. This can lead to a
-> secondary TLB not getting invalidated when required and makes it hard
-> to reason about when exactly the secondary TLB is invalidated.
-> 
-> To fix this move the notifier call to the architecture specific TLB
-> maintenance functions for architectures that have secondary MMUs
-> requiring explicit software invalidations.
-> 
-> This fixes a SMMU bug on ARM64. On ARM64 PTE permission upgrades
-> require a TLB invalidation. This invalidation is done by the
-> architecutre specific ptep_set_access_flags() which calls
-> flush_tlb_page() if required. However this doesn't call the notifier
-> resulting in infinite faults being generated by devices using the SMMU
-> if it has previously cached a read-only PTE in it's TLB.
-> 
-> Moving the invalidations into the TLB invalidation functions ensures
-> all invalidations happen at the same time as the CPU invalidation. The
-> architecture specific flush_tlb_all() routines do not call the
-> notifier as none of the IOMMUs require this.
-> 
-> Signed-off-by: Alistair Popple <apopple@nvidia.com>
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-
-I found below kernel NULL-dereference issue on latest mm-unstable tree, and
-bisect points me to the commit of this patch, namely
-75c400f82d347af1307010a3e06f3aa5d831d995.
-
-To reproduce, I use 'stress-ng --bigheap $(nproc)'.  The issue happens as soon
-as it starts reclaiming memory.  I didn't dive deep into this yet, but
-reporting this issue first, since you might have an idea already.
+On 2023/7/20 03:32, Bjorn Helgaas wrote:
+> but I think it's just confusing to
+> mention this in the commit log, so I would just remove it.
 
 
-[   69.824805] BUG: kernel NULL pointer dereference, address: 0000000000000498
-[   69.826983] #PF: supervisor read access in kernel mode
-[   69.828716] #PF: error_code(0x0000) - not-present page
-[   69.830249] PGD 0 P4D 0
-[   69.830784] Oops: 0000 [#4] PREEMPT SMP PTI
-[   69.831881] CPU: 2 PID: 201 Comm: kworker/u72:2 Tainted: G      D W          6.5.0-rc1+ #311
-[   69.834221] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-pr4
-[   69.837459] Workqueue: writeback wb_workfn (flush-251:0)
-[   69.839422] RIP: 0010:arch_tlbbatch_flush (include/linux/mmu_notifier.h:497 (discriminator 3) arch/x86/mm/tlb.c:1268 (discriminator 3))
-[ 69.841140] Code: e8 c5 dd d2 00 bf 01 00 00 00 e8 0b df 05 00 65 8b 05 cc 90 f9 63 85 c0 74 4b 65 48c
+Ok, will be done at the next version.
 
-Code starting with the faulting instruction
-===========================================
-   0:   e8 c5 dd d2 00          callq  0xd2ddca
-   5:   bf 01 00 00 00          mov    $0x1,%edi
-   a:   e8 0b df 05 00          callq  0x5df1a
-   f:   65 8b 05 cc 90 f9 63    mov    %gs:0x63f990cc(%rip),%eax        # 0x63f990e2
-  16:   85 c0                   test   %eax,%eax
-  18:   74 4b                   je     0x65
-  1a:   65                      gs
-  1b:   8c                      .byte 0x8c
-[   69.846840] RSP: 0000:ffffbf77007fb048 EFLAGS: 00010286
-[   69.848464] RAX: ffff9bfd81970000 RBX: 0000000000000002 RCX: 0000000000000000
-[   69.851016] RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000000000000
-[   69.853070] RBP: ffffbf77007fb068 R08: 0000000000000001 R09: 0000000000000000
-[   69.855213] R10: ffff9bfd81970f10 R11: 0000000000000000 R12: ffff9bfd81970f10
-[   69.857456] R13: ffff9c1bbd4b28c0 R14: 0000000000000003 R15: ffffe75b88f4a808
-[   69.860213] FS:  0000000000000000(0000) GS:ffff9c1bbd480000(0000) knlGS:0000000000000000
-[   69.862211] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   69.863624] CR2: 0000000000000498 CR3: 00000001112ca000 CR4: 00000000000006e0
-[   69.865907] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   69.868146] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   69.870414] Call Trace:
-[   69.871222]  <TASK>
-[   69.871823] ? show_regs (arch/x86/kernel/dumpstack.c:479)
-[   69.872855] ? __die_body (arch/x86/kernel/dumpstack.c:421)
-[   69.873733] ? __die (arch/x86/kernel/dumpstack.c:435)
-[   69.874576] ? page_fault_oops (arch/x86/mm/fault.c:707)
-[   69.875657] ? search_bpf_extables (kernel/bpf/core.c:751)
-[   69.876854] ? arch_tlbbatch_flush (include/linux/mmu_notifier.h:497 (discriminator 3) arch/x86/mm/tlb.c:1268 (discriminator 3))
-[   69.878146] ? search_exception_tables (kernel/extable.c:64)
-[   69.879931] ? kernelmode_fixup_or_oops (arch/x86/mm/fault.c:762)
-[   69.881284] ? __bad_area_nosemaphore (arch/x86/mm/fault.c:860)
-[   69.882722] ? bad_area_nosemaphore (arch/x86/mm/fault.c:867)
-[   69.884276] ? do_user_addr_fault (arch/x86/mm/fault.c:1458)
-[   69.885800] ? check_preemption_disabled (lib/smp_processor_id.c:42)
-[   69.887428] ? exc_page_fault (arch/x86/include/asm/paravirt.h:695 arch/x86/mm/fault.c:1495 arch/x86/mm/fault.c:1543)
-[   69.888435] ? asm_exc_page_fault (arch/x86/include/asm/idtentry.h:570)
-[   69.889955] ? arch_tlbbatch_flush (include/linux/mmu_notifier.h:497 (discriminator 3) arch/x86/mm/tlb.c:1268 (discriminator 3))
-[   69.891564] ? arch_tlbbatch_flush (arch/x86/include/asm/preempt.h:104 (discriminator 1) arch/x86/mm/tlb.c:1267 (discriminator 1))
-[   69.892779] try_to_unmap_flush_dirty (mm/rmap.c:622 mm/rmap.c:632)
-[   69.893970] shrink_folio_list (mm/vmscan.c:2015)
-[   69.895243] shrink_inactive_list (include/linux/spinlock.h:376 mm/vmscan.c:2616)
-[   69.896816] shrink_lruvec (mm/vmscan.c:2855 mm/vmscan.c:6303)
-[   69.897952] ? rmqueue_bulk (mm/page_alloc.c:2228)
-[   69.899385] shrink_node (mm/vmscan.c:6491 mm/vmscan.c:6524)
-[   69.900447] do_try_to_free_pages (mm/vmscan.c:6705 mm/vmscan.c:6825)
-[   69.901548] try_to_free_pages (mm/vmscan.c:7060)
-[   69.902540] __alloc_pages_slowpath.constprop.0 (include/linux/sched/mm.h:380 mm/page_alloc.c:3716 mm/page_alloc.c:3735 mm/page_alloc.c:4140)
-[   69.904307] ? sched_cpu_deactivate (kernel/sched/core.c:9728)
-[   69.905427] __alloc_pages (mm/page_alloc.c:4525)
-[   69.906735] alloc_pages (mm/mempolicy.c:2284)
-[   69.907604] new_slab (mm/slub.c:1866 mm/slub.c:2009 mm/slub.c:2062)
-[   69.908414] ? chksum_update (crypto/crc32c_generic.c:88)
-[   69.909348] ___slab_alloc (mm/slub.c:3216 (discriminator 3))
-[   69.910093] ? ext4_mb_new_blocks (fs/ext4/mballoc.c:5538 fs/ext4/mballoc.c:6129)
-[   69.911885] ? __enqueue_entity (kernel/sched/fair.c:646)
-[   69.913085] ? x2apic_send_IPI (arch/x86/include/asm/paravirt.h:196 arch/x86/include/asm/paravirt.h:229 arch/x86/include/asm/apic.h:240 arch/x86/kernel/apic/x2apic_phys.c:126 arch/x86/kernel/apic/x2apic_phys.c:48)
-[   69.914143] ? native_smp_send_reschedule (arch/x86/kernel/apic/ipi.c:72)
-[   69.915777] ? sbitmap_find_bit (lib/sbitmap.c:146 lib/sbitmap.c:178 lib/sbitmap.c:199)
-[   69.917011] ? ext4_mb_new_blocks (fs/ext4/mballoc.c:5538 fs/ext4/mballoc.c:6129)
-[   69.917996] __slab_alloc.isra.0 (mm/slub.c:3314)
-[   69.919309] kmem_cache_alloc (mm/slub.c:3367 mm/slub.c:3460 mm/slub.c:3478 mm/slub.c:3485 mm/slub.c:3494)
-[   69.920239] ? ext4_mb_new_blocks (fs/ext4/mballoc.c:5538 fs/ext4/mballoc.c:6129)
-[   69.921291] ext4_mb_new_blocks (fs/ext4/mballoc.c:5538 fs/ext4/mballoc.c:6129)
-[   69.922496] ? ext4_cache_extents (fs/ext4/extents.c:543 (discriminator 2))
-[   69.923591] ext4_ext_map_blocks (fs/ext4/extents.c:4286)
-[   69.925039] ext4_map_blocks (fs/ext4/inode.c:621)
-[   69.926478] ? kmem_cache_alloc (arch/x86/include/asm/jump_label.h:55 include/linux/memcontrol.h:1777 mm/slab.h:522 mm/slab.h:770 mm/slub.c:3470 mm/slub.c:3478 mm/slub.c:3485 mm/slub.c:3494)
-[   69.927813] ? ext4_alloc_io_end_vec (fs/ext4/page-io.c:61)
-[   69.928851] ext4_do_writepages (fs/ext4/inode.c:2159 fs/ext4/inode.c:2212 fs/ext4/inode.c:2677)
-[   69.930008] ? update_sd_lb_stats.constprop.0 (kernel/sched/fair.c:9501 kernel/sched/fair.c:10163)
-[   69.931662] ext4_writepages (fs/ext4/inode.c:2766)
-[   69.932728] do_writepages (mm/page-writeback.c:2553)
-[   69.933403] ? __wb_calc_thresh (mm/page-writeback.c:875)
-[   69.934168] __writeback_single_inode (fs/fs-writeback.c:1603)
-[   69.935101] ? _raw_spin_unlock (arch/x86/include/asm/preempt.h:104 include/linux/spinlock_api_smp.h:143 kernel/locking/spinlock.c:186)
-[   69.936219] writeback_sb_inodes (fs/fs-writeback.c:1896)
-[   69.937408] __writeback_inodes_wb (fs/fs-writeback.c:1966)
-[   69.938612] wb_writeback (fs/fs-writeback.c:2072)
-[   69.939548] wb_workfn (fs/fs-writeback.c:2142 fs/fs-writeback.c:2230 fs/fs-writeback.c:2257)
-[   69.940439] ? __switch_to (arch/x86/include/asm/paravirt.h:300 arch/x86/kernel/process_64.c:583)
-[   69.941694] process_one_work (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 include/trace/events/workqueue.h:108 kernel/workqueue.c:2602)
-[   69.943189] worker_thread (include/linux/list.h:292 kernel/workqueue.c:2749)
-[   69.944403] ? __pfx_worker_thread (kernel/workqueue.c:2691)
-[   69.945491] kthread (kernel/kthread.c:389)
-[   69.946333] ? __pfx_kthread (kernel/kthread.c:342)
-[   69.947109] ret_from_fork (arch/x86/entry/entry_64.S:314)
-[   69.948097]  </TASK>
-[   69.948944] Modules linked in: ppdev input_leds joydev parport_pc parport serio_raw qemu_fw_cfg mac_hi
-[   69.958916] Dumping ftrace buffer:
-[   69.961197]    (ftrace buffer empty)
-[   69.962797] CR2: 0000000000000498
-[   69.964431] ---[ end trace 0000000000000000 ]---
-[   69.966440] RIP: 0010:arch_tlbbatch_flush (include/linux/mmu_notifier.h:497 (discriminator 3) arch/x86/mm/tlb.c:1268 (discriminator 3))
-[ 69.969546] Code: e8 c5 dd d2 00 bf 01 00 00 00 e8 0b df 05 00 65 8b 05 cc 90 f9 63 85 c0 74 4b 65 48c
-
-Code starting with the faulting instruction
-===========================================
-   0:   e8 c5 dd d2 00          callq  0xd2ddca
-   5:   bf 01 00 00 00          mov    $0x1,%edi
-   a:   e8 0b df 05 00          callq  0x5df1a
-   f:   65 8b 05 cc 90 f9 63    mov    %gs:0x63f990cc(%rip),%eax        # 0x63f990e2
-  16:   85 c0                   test   %eax,%eax
-  18:   74 4b                   je     0x65
-  1a:   65                      gs
-  1b:   8c                      .byte 0x8c
-[   69.979017] RSP: 0000:ffffbf770005f6d8 EFLAGS: 00010286
-[   69.981894] RAX: ffff9bfd8090af80 RBX: 0000000000000003 RCX: 0000000000000000
-[   69.985344] RDX: 0000000000000001 RSI: 0000000000000000 RDI: 0000000000000000
-[   69.988499] RBP: ffffbf770005f6f8 R08: 0000000000000001 R09: 0000000000000000
-[   69.991677] R10: ffff9bfd8090be90 R11: 0000000000000000 R12: ffff9bfd8090be90
-[   69.994926] R13: ffff9c1bbd4f28c0 R14: 0000000000000004 R15: ffffe75b84499d08
-[   69.998152] FS:  0000000000000000(0000) GS:ffff9c1bbd480000(0000) knlGS:0000000000000000
-[   70.001874] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   70.004419] CR2: 0000000000000498 CR3: 00000001112ca000 CR4: 00000000000006e0
-[   70.007517] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   70.010951] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
-
-Thanks,
-SJ
-
-[...]
