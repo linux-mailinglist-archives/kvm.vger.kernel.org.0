@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8222758C04
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:25:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 824AD758C05
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 05:25:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbjGSDZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 23:25:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48356 "EHLO
+        id S230416AbjGSDZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 23:25:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230397AbjGSDZr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 23:25:47 -0400
+        with ESMTP id S230396AbjGSDZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 23:25:50 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33AA1BEB;
-        Tue, 18 Jul 2023 20:25:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918E21BF0;
+        Tue, 18 Jul 2023 20:25:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689737146; x=1721273146;
+  t=1689737149; x=1721273149;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=ige1qJhMK8nxK8ysQ4ntbs6E03QAU78QiBh/RtIQ02Q=;
-  b=Ergffhkr0YQU1wxl/aziHES4Sey5imflpl+Jd7drYA0CD4/3i0V43RIi
-   S0Mt/YSuodluDNlfjHtc2rBx7wRqXAV61wzssYuvj/HjPeH+Tb1VVxT+C
-   EJwNr24TQlbjJLxPMdAwRHd5jrr2mYfvwj6fJcGe2ylA/pkDrZOdGLRcj
-   1c2hxiHDh+aW7RUzAIuhHADnAU8VHsyE0XVf7sNoGy74rSc7ZO64t1csE
-   yJXsxQ3cbgC2t+kkWMFCcdUuM0sApDxf4hK4IItjIeD1EwdT99aKWH2c3
-   1tRFr5/HSjzjdGBT3T2IWw6ljcXW1h9YjFcV/osUEJFkMNDcZj38Bq+OZ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346665789"
+  bh=G5f5OxUaGuqF1xaVh2Um4pSh/J282MGxjVg91bM/270=;
+  b=dDido+62IrzZOJPCuyABi54awAWmQjTzmLNWV7i3wxLqW/4/LBz88o9J
+   QtXSC5eI4V8QeOIX+fJV+jNAbcvS2XL+HgUe1wkWwzic6KpUWGo7M7bJF
+   5fGVny4lIfPgpblTV9V8SJXovb/P78pHObyZ6/Y4fErTWJ+XT6vQ8T6ue
+   DNVAG8Liy8DEPhN8vxHANEVuruaBl0QjwFP3EI2ZhcNzBbYOsioaikBgH
+   j0YaQrVFGHJOEPQO+fmSbmVn1kasuTY0/U18WlR8CYtTKpina+noGrDsg
+   9snIwHaArmlGSXHHyoEctjmstbVLLyuGom5Yv/d4K4Wla85w7QgIb0lAB
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="346665798"
 X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="346665789"
+   d="scan'208";a="346665798"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:46 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:49 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="813980258"
+X-IronPort-AV: E=McAfee;i="6600,9927,10775"; a="813980262"
 X-IronPort-AV: E=Sophos;i="6.01,215,1684825200"; 
-   d="scan'208";a="813980258"
+   d="scan'208";a="813980262"
 Received: from arthur-vostro-3668.sh.intel.com ([10.238.200.123])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:43 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 20:25:46 -0700
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -48,9 +48,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Binbin Wu <binbin.wu@linux.intel.com>,
         Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v2 1/8] KVM: x86: Consolidate flags for __linearize()
-Date:   Wed, 19 Jul 2023 10:45:51 +0800
-Message-Id: <20230719024558.8539-2-guang.zeng@intel.com>
+Subject: [PATCH v2 2/8] KVM: x86: Use a new flag for branch instructions
+Date:   Wed, 19 Jul 2023 10:45:52 +0800
+Message-Id: <20230719024558.8539-3-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230719024558.8539-1-guang.zeng@intel.com>
 References: <20230719024558.8539-1-guang.zeng@intel.com>
@@ -66,98 +66,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Binbin Wu <binbin.wu@linux.intel.com>
 
-Consolidate @write and @fetch of __linearize() into a set of flags so that
-additional flags can be added without needing more/new boolean parameters,
-to precisely identify the access type.
+Use the new flag X86EMUL_F_BRANCH instead of X86EMUL_F_FETCH in
+assign_eip(), since strictly speaking it is not behavior of instruction
+fetch.
 
-No functional change intended.
+Another reason is to distinguish instruction fetch and execution of branch
+instruction for feature(s) that handle differently on them.
+
+Branch instruction is not data access instruction, so skip checking against
+execute-only code segment as instruction fetch.
 
 Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Acked-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/x86/kvm/emulate.c     | 21 +++++++++++----------
- arch/x86/kvm/kvm_emulate.h |  4 ++++
- 2 files changed, 15 insertions(+), 10 deletions(-)
+ arch/x86/kvm/emulate.c     | 5 +++--
+ arch/x86/kvm/kvm_emulate.h | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 936a397a08cd..3ddfbc99fa4f 100644
+index 3ddfbc99fa4f..8e706d19ae45 100644
 --- a/arch/x86/kvm/emulate.c
 +++ b/arch/x86/kvm/emulate.c
-@@ -687,8 +687,8 @@ static unsigned insn_alignment(struct x86_emulate_ctxt *ctxt, unsigned size)
- static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
- 				       struct segmented_address addr,
- 				       unsigned *max_size, unsigned size,
--				       bool write, bool fetch,
--				       enum x86emul_mode mode, ulong *linear)
-+				       enum x86emul_mode mode, ulong *linear,
-+				       unsigned int flags)
- {
- 	struct desc_struct desc;
- 	bool usable;
-@@ -717,11 +717,11 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
- 		if (!usable)
- 			goto bad;
- 		/* code segment in protected mode or read-only data segment */
--		if ((((ctxt->mode != X86EMUL_MODE_REAL) && (desc.type & 8))
--					|| !(desc.type & 2)) && write)
-+		if ((((ctxt->mode != X86EMUL_MODE_REAL) && (desc.type & 8)) || !(desc.type & 2)) &&
-+		    (flags & X86EMUL_F_WRITE))
+@@ -721,7 +721,8 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+ 		    (flags & X86EMUL_F_WRITE))
  			goto bad;
  		/* unreadable code segment */
--		if (!fetch && (desc.type & 8) && !(desc.type & 2))
-+		if (!(flags & X86EMUL_F_FETCH) && (desc.type & 8) && !(desc.type & 2))
+-		if (!(flags & X86EMUL_F_FETCH) && (desc.type & 8) && !(desc.type & 2))
++		if (!(flags & (X86EMUL_F_FETCH | X86EMUL_F_BRANCH))
++			&& (desc.type & 8) && !(desc.type & 2))
  			goto bad;
  		lim = desc_limit_scaled(&desc);
  		if (!(desc.type & 8) && (desc.type & 4)) {
-@@ -757,8 +757,8 @@ static int linearize(struct x86_emulate_ctxt *ctxt,
- 		     ulong *linear)
- {
- 	unsigned max_size;
--	return __linearize(ctxt, addr, &max_size, size, write, false,
--			   ctxt->mode, linear);
-+	return __linearize(ctxt, addr, &max_size, size, ctxt->mode, linear,
-+			   write ? X86EMUL_F_WRITE : 0);
- }
- 
- static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
-@@ -771,7 +771,8 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
- 
+@@ -772,7 +773,7 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
  	if (ctxt->op_bytes != sizeof(unsigned long))
  		addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
--	rc = __linearize(ctxt, addr, &max_size, 1, false, true, ctxt->mode, &linear);
-+	rc = __linearize(ctxt, addr, &max_size, 1, ctxt->mode, &linear,
-+			 X86EMUL_F_FETCH);
+ 	rc = __linearize(ctxt, addr, &max_size, 1, ctxt->mode, &linear,
+-			 X86EMUL_F_FETCH);
++			 X86EMUL_F_BRANCH);
  	if (rc == X86EMUL_CONTINUE)
  		ctxt->_eip = addr.ea;
  	return rc;
-@@ -907,8 +908,8 @@ static int __do_insn_fetch_bytes(struct x86_emulate_ctxt *ctxt, int op_size)
- 	 * boundary check itself.  Instead, we use max_size to check
- 	 * against op_size.
- 	 */
--	rc = __linearize(ctxt, addr, &max_size, 0, false, true, ctxt->mode,
--			 &linear);
-+	rc = __linearize(ctxt, addr, &max_size, 0, ctxt->mode, &linear,
-+			 X86EMUL_F_FETCH);
- 	if (unlikely(rc != X86EMUL_CONTINUE))
- 		return rc;
- 
 diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index ab65f3a47dfd..86bbe997162d 100644
+index 86bbe997162d..9fc7d34a4ac1 100644
 --- a/arch/x86/kvm/kvm_emulate.h
 +++ b/arch/x86/kvm/kvm_emulate.h
-@@ -88,6 +88,10 @@ struct x86_instruction_info {
- #define X86EMUL_IO_NEEDED       5 /* IO is needed to complete emulation */
- #define X86EMUL_INTERCEPTED     6 /* Intercepted by nested VMCB/VMCS */
+@@ -91,6 +91,7 @@ struct x86_instruction_info {
+ /* x86-specific emulation flags */
+ #define X86EMUL_F_WRITE			BIT(0)
+ #define X86EMUL_F_FETCH			BIT(1)
++#define X86EMUL_F_BRANCH		BIT(2)
  
-+/* x86-specific emulation flags */
-+#define X86EMUL_F_WRITE			BIT(0)
-+#define X86EMUL_F_FETCH			BIT(1)
-+
  struct x86_emulate_ops {
  	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
- 	/*
 -- 
 2.27.0
 
