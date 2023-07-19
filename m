@@ -2,114 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4382759C72
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 19:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDD9D759CB0
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 19:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjGSRfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 13:35:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58918 "EHLO
+        id S229825AbjGSRrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 13:47:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbjGSRfN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 13:35:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C1A1BF5
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:34:29 -0700 (PDT)
+        with ESMTP id S229450AbjGSRq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 13:46:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DEAF18D
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689788068;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1689788771;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FcSmUlnfPR5r9QDVWlDed1kmwKvJ4NFeMyH/cuBuG7c=;
-        b=Cvh+tragkf+T0rHRmvwpvoEMk9zEO8CgA4qftNJW85sfIdE39bzgvFDQSK4mZ/I4ehg103
-        kQxFnVQau3YdpDyzNPqMiVVCyoBj7IwXQRUaMOEL/TQQ1l4wjAGXFe6XwW8Zwhovi6e2do
-        es0X1RSM+OPpa0IYFwUW50dcFLTOkPw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=yNb73O2isjawz78K1ttGBkIfh5jJDHN2n3NGZYz0Juw=;
+        b=b3GsBT1Dn/KV/2MMfhPbdPkGBeh6sqr488+HUX+hRsSd4uo3KYtGtTV9z7R+rxEqjv6oxF
+        4FT5owl2iBTU9pe/tNlNDbu3+OSmrYSWW7PaC1gsUQZS2KjXZtQc3DDoxbsQmjfVYaJyRN
+        YrPTBIRYeGCr0OlrLdmkDGuJk75cUYU=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-115-SP2z23iUOgyWrvIhmFAeRg-1; Wed, 19 Jul 2023 13:34:27 -0400
-X-MC-Unique: SP2z23iUOgyWrvIhmFAeRg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94a355cf318so419952966b.2
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:34:26 -0700 (PDT)
+ us-mta-580-QVQSFknCNJ-KFx-8bJh9Bg-1; Wed, 19 Jul 2023 13:46:09 -0400
+X-MC-Unique: QVQSFknCNJ-KFx-8bJh9Bg-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-635325b87c9so74264556d6.1
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 10:46:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689788065; x=1692380065;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FcSmUlnfPR5r9QDVWlDed1kmwKvJ4NFeMyH/cuBuG7c=;
-        b=k8fwCTK/S7vZaaBx3zT0OIAqyironrux7hwnOU20bsYVY/o1t0Wh/5M9kDk45kBfcv
-         6PZtWYyqJijqqscKt80ALPppk3DdcIN0d2+yuSWv3Y92X8wqzAjcX/R1r5FR1HFm9PTa
-         8pVsi0OimMnmTY4102lw0PQAChGGHpBLcl0xYt0xfjxuhGP4Z9NVC7qrnSHI9nTa0GC7
-         n3YqafvykO7gJ6feWP6M+6CZQu57rR36WPhhYCQAS+QATpON5ROGd1hqWuyuwB1Fhrg2
-         DAJ8Kiv/fR3qsXC/JdvSNdDowJhEX8Qnf3oNDwBj0RM1uaRk+udmn7lkssOTUY1ddcD5
-         Du/w==
-X-Gm-Message-State: ABy/qLbnR7H/EfDh4mxnqp+BepUfFC2VlOMUFwoNiiviQo11By53mVWM
-        Dd62RldaHag8TzmsqJL1NCKgu3YMeqTFgYXcLz8L0azneemfL0Hr8EwMH4JJkt1BU8E7GzYmTYb
-        LL4o0L1sUD9z4
-X-Received: by 2002:a17:906:2c9:b0:987:6372:c31f with SMTP id 9-20020a17090602c900b009876372c31fmr2869629ejk.37.1689788065625;
-        Wed, 19 Jul 2023 10:34:25 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlE859wKxHT5sx+ykGb2dhB/IoiUODuwlK2Yw9t+Sd2xKiIGoiM0e7JvZWSr4FhhJlM9v/AU5Q==
-X-Received: by 2002:a17:906:2c9:b0:987:6372:c31f with SMTP id 9-20020a17090602c900b009876372c31fmr2869597ejk.37.1689788065328;
-        Wed, 19 Jul 2023 10:34:25 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id gz18-20020a170906f2d200b00991faf3810esm2633958ejb.146.2023.07.19.10.34.23
+        d=1e100.net; s=20221208; t=1689788767; x=1690393567;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yNb73O2isjawz78K1ttGBkIfh5jJDHN2n3NGZYz0Juw=;
+        b=bvqMArPMR0g35E3P9GRBgePie/dSeeheC7oPBHHgnNaL3/HEK0nj+cmAZpGjaFcR4f
+         +R0kBATtNXHZnQ7qjab0MhLkmFbX7EeJ+7/9OywbesoBRdw1deuxH+dejqfGUXNaX/V4
+         MwoY4UE6Mblw9Jsjgq6KgvlDYSStjBqR7Pv5917mFTBjZsqkYoDERR51hw3de7MmFCgE
+         XFb8F/FhatH+b5FUYOqHyzjmdpe9hz9zOmwtAD/bla1N8h87iOJz0CWMa+j0bb6W+F+a
+         BC71P7DWZwE3K+1m+5IOGwJTho5cjkutAGXfTIea4Q8kDkxCr/OKT6ek262Cx1/5JXov
+         xDHQ==
+X-Gm-Message-State: ABy/qLZE7yQ8cYpq638VR6aDrXM83ntDYWMA74vXHW1yKvNK6XRP7k5h
+        FCE+/tzhjXFtABVHYlTRSLubUEam91tIGxGEGRyE1jAwGoroTySXtNayv7fw0kjYl4LcraidlhR
+        ATaqQcRgNVxvDjOu8jyc/
+X-Received: by 2002:a0c:cb8e:0:b0:62b:6f7e:f79 with SMTP id p14-20020a0ccb8e000000b0062b6f7e0f79mr16907440qvk.3.1689788767345;
+        Wed, 19 Jul 2023 10:46:07 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEnUajR8taSGV4qOTfBZ3sumucQDatH1V5L1nfJ8Q1FWmgmEHvG2nspsjdxon+K24j4YwkETA==
+X-Received: by 2002:a0c:cb8e:0:b0:62b:6f7e:f79 with SMTP id p14-20020a0ccb8e000000b0062b6f7e0f79mr16907427qvk.3.1689788767088;
+        Wed, 19 Jul 2023 10:46:07 -0700 (PDT)
+Received: from [192.168.43.95] ([37.169.27.8])
+        by smtp.gmail.com with ESMTPSA id i17-20020a0cab51000000b0062df126ca11sm1626622qvb.21.2023.07.19.10.46.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jul 2023 10:34:24 -0700 (PDT)
-Message-ID: <cd866d4c-839a-8606-2931-063cca4df514@redhat.com>
-Date:   Wed, 19 Jul 2023 19:34:22 +0200
+        Wed, 19 Jul 2023 10:46:06 -0700 (PDT)
+Message-ID: <433bb06d-5eaa-d21f-70c8-02311c06a650@redhat.com>
+Date:   Wed, 19 Jul 2023 19:46:02 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] arm64: Define name for the bits
+ used in SCTLR_EL1_RES1
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Alexander Graf <graf@amazon.de>,
-        Nicholas Piggin <npiggin@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-5-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v11 04/29] KVM: PPC: Drop dead code related to
- KVM_ARCH_WANT_MMU_NOTIFIER
-In-Reply-To: <20230718234512.1690985-5-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Shaoqin Huang <shahuang@redhat.com>, andrew.jones@linux.dev
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org
+References: <20230719031926.752931-1-shahuang@redhat.com>
+ <20230719031926.752931-3-shahuang@redhat.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230719031926.752931-3-shahuang@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -117,37 +86,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/19/23 01:44, Sean Christopherson wrote:
-> Signed-off-by: Sean Christopherson<seanjc@google.com>
+Hi Shaoqin,
+
+On 7/19/23 05:19, Shaoqin Huang wrote:
+> Currently some fields in SCTLR_EL1 don't define a name and directly used
+> in the SCTLR_EL1_RES1, that's not good now since these fields have been
+> functional and have a name.
+>
+> According to the ARM DDI 0487J.a, define the name related to these
+> fields.
+>
+> Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->   arch/powerpc/kvm/powerpc.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 7197c8256668..5cf9e5e3112a 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -634,10 +634,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_SYNC_MMU:
->   #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
->   		r = hv_enabled;
+>  lib/arm64/asm/sysreg.h | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+>
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index c7f529d..9c68698 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -80,17 +80,26 @@ asm(
+>  #define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+>  
+>  /* System Control Register (SCTLR_EL1) bits */
+> +#define SCTLR_EL1_LSMAOE	_BITUL(29)
+> +#define SCTLR_EL1_NTLSMD	_BITUL(28)
+>  #define SCTLR_EL1_EE		_BITUL(25)
+> +#define SCTLR_EL1_SPAN		_BITUL(23)
+> +#define SCTLR_EL1_EIS		_BITUL(22)
+> +#define SCTLR_EL1_TSCXT		_BITUL(20)
+>  #define SCTLR_EL1_WXN		_BITUL(19)
+>  #define SCTLR_EL1_I		_BITUL(12)
+> +#define SCTLR_EL1_EOS		_BITUL(11)
+> +#define SCTLR_EL1_SED		_BITUL(8)
+> +#define SCTLR_EL1_ITD		_BITUL(7)
+>  #define SCTLR_EL1_SA0		_BITUL(4)
+>  #define SCTLR_EL1_SA		_BITUL(3)
+>  #define SCTLR_EL1_C		_BITUL(2)
+>  #define SCTLR_EL1_A		_BITUL(1)
+>  #define SCTLR_EL1_M		_BITUL(0)
+>  
+> -#define SCTLR_EL1_RES1	(_BITUL(7) | _BITUL(8) | _BITUL(11) | _BITUL(20) | \
+> -			 _BITUL(22) | _BITUL(23) | _BITUL(28) | _BITUL(29))
+> +#define SCTLR_EL1_RES1	(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+> +			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+> +			 SCTLR_EL1_NTLSMD | SCTLR_EL1_LSMAOE)
+>  #define INIT_SCTLR_EL1_MMU_OFF	\
+>  			SCTLR_EL1_RES1
+>  
+The change looks good to me (although _BITULL remark still holds).
 
-This could actually be unnecessarily conservative.  Even book3s_pr.c 
-knows how to do unmap and set_spte, so it should be able to support 
-KVM_CAP_SYNC_MMU.  Alex, Nick, do you remember any of this?  This would 
-mean moving KVM_CAP_SYNC_MMU to virt/kvm/kvm_main.c, which is nice.
+Independently on this patch the _RES1 terminology looks odd to me. For
+example ESO bit is RES1 only if FEAT_ExS is not implemented. Maybe I
+misunderstand why it was named that way but to me RES1 means another
+thing. If confirmed we could simply drop SCTLR_EL1_RES1 which is not
+used elsewhere and directly define INIT_SCTLR_EL1_MMU_OF.
 
-Paolo
+Thanks
 
-> -#elif defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> -		r = 1;
->   #else
-> -		r = 0;
-> +#ifndef KVM_ARCH_WANT_MMU_NOTIFIER
-> +		BUILD_BUG();
-> +#endif
-> +		r = 1;
->   #endif
->   		break;
->   #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
+Eric
 
