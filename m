@@ -2,197 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D6F37599F7
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 17:39:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 708287599F5
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 17:39:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbjGSPj1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 11:39:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45366 "EHLO
+        id S231897AbjGSPjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 11:39:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231882AbjGSPjY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 11:39:24 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F46E47
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:39:14 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36JFchVW030031;
-        Wed, 19 Jul 2023 15:39:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Hsz8iEIMnGZA8sKmY8pXiTLJal7GaptU9/1zZPPU1EY=;
- b=qwykmQOaz/ibWXVNGfkW27c1tUFynI+cKs+qx+mAZxsBUKA38FyEJcGTI2Gpvpq6eI7h
- diJiQYjvvUgtH73HRch1B++HSafnL5I/ON8ulz3kkZ/WLkOIqR8TZvRpi98ObAM0io/j
- bkYQnzEekWLwSk1fbfAsHhcokCq5OgDERg9637WxfL4lCQe4jPtpNBbpoZUQJQN+S8Or
- 1YbfmUug8i7r5akVY1m6TE8Mm9FLLfzjlsigZcqTxnCjD9j3aTNNKbsaImp9wqDLhkeQ
- jQGQ+JORRkfEePTUSfgQ6k0qir4tkXMRoptx2J6biqwsbu+nqNYahqaMRxk+pObaMx5q VQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rxjfq889h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jul 2023 15:39:06 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36JFcxoM032128;
-        Wed, 19 Jul 2023 15:39:05 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rxjfq87te-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jul 2023 15:39:05 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36JCqrSg003352;
-        Wed, 19 Jul 2023 15:34:36 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3rv65xjcdx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jul 2023 15:34:36 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36JFYWDe43123152
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jul 2023 15:34:32 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32BD020043;
-        Wed, 19 Jul 2023 15:34:32 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C36862004B;
-        Wed, 19 Jul 2023 15:34:31 +0000 (GMT)
-Received: from [9.155.200.205] (unknown [9.155.200.205])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 19 Jul 2023 15:34:31 +0000 (GMT)
-Message-ID: <3aba5eac-d5d5-80da-e955-864c80065c5d@linux.ibm.com>
-Date:   Wed, 19 Jul 2023 17:34:29 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v21 16/20] tests/avocado: s390x cpu topology entitlement
- tests
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
- <20230630091752.67190-17-pmorel@linux.ibm.com>
- <dfeeeaa1-0994-9e1e-1f10-6c6618daacff@redhat.com>
- <aa1fbe820f23bc487752ee29ee114f5d4185352a.camel@linux.ibm.com>
- <88070b30-36ea-8112-41c4-0d93fc76cf80@redhat.com>
- <dbb17fa6239774d80e697ed771514b345faf5486.camel@linux.ibm.com>
- <ba0767b8-0273-898e-6aaa-1e2318b09304@linux.ibm.com>
- <b4f789852e124549e2b30d25ad1268ed011c7263.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b4f789852e124549e2b30d25ad1268ed011c7263.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RF22WIjhij5Dl1FBBQc_YfNojGD7qWRl
-X-Proofpoint-GUID: mM0Kom8NotsFxPjaAp5RgEAmurf-jJdf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-19_10,2023-07-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 clxscore=1015 malwarescore=0 adultscore=0 mlxscore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 priorityscore=1501 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307190139
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231824AbjGSPjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 11:39:23 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2382107
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:39:11 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c4f27858e4eso6392037276.1
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 08:39:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689781150; x=1692373150;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3uTGEOgXGgjS1mpy4uY8Zn88ggwsAyaWY3/MU5WFUXU=;
+        b=zuZWZV29hv7HoMETiCkSKGIHZcpHTMG8TKF9qduMPPS/E1c0SfFLVA6kGEOoP5U9qq
+         U77CuEsLMMxKIxLMFnjtp2hpB+IIMkYXVFGsPC5bapP3nIk/nGTrjqlCGcZf5+xPpr8T
+         q16/aDqhEkgnoKMdGaA5rz+Gt+5uK6D6P1fr5Zm7R4i7YF7l973NWOrr+c3kq7IzyS9M
+         gLZmugAwtecTQMKF7z0UBcPf86RbNReN6ZSKfaBS2Zp8N7kJnMwhsDMUzBHIndlxccW1
+         lnFRHUcOrryTZsXwruMmKL2jJUIvic1/Jzr/kaZBJYZOlvirf0tEwgFNXnc0yrJBGF6s
+         gFpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689781150; x=1692373150;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3uTGEOgXGgjS1mpy4uY8Zn88ggwsAyaWY3/MU5WFUXU=;
+        b=UEf2CVc8oIHtz0MLzsYkBXehBvrbFljfxYFiZmqM+8KNbGRHoDwWMk/YMfqRkkGvbc
+         Ugr6aA5Jr8QCJU7Ue1Ou6TdRvJGG+R74VrJOuijSnghpGF8QOcWRXMgo9IeK50lvy2Hp
+         Br1ocFxSWOuOh+EE2bE6rqQMzI0UzZUgxXOrAchBkmjfGMnnpk+njoCShGRaE2gIBVzP
+         uDjqOrE7PwAItLa6V2OrRTyI7DCQYkcKkrwBdSZgbxgPjmj5rTaZi/5rsnjqUlZ0Bs0D
+         +6N2EELIzBJngpVxqSQeSKTdib2otQdM71GnRwUXTbdncSMP6ehhNrVU9OLTXCCijQJQ
+         NU+Q==
+X-Gm-Message-State: ABy/qLbbY9fzhwGXIrJXiQ3XUqJj1aBmMWQhLH3iI5s7QZrBrve1UaO3
+        DovksayBe4p9cdI2PIKnpo/cRIclHeE=
+X-Google-Smtp-Source: APBJJlHKX/op8BIXr6hrdN4x6RovTyUJBoPmA+F//tB9wdB4uZjaG/yxyF0KPogxnGD6eEZAy2DX7qXfLUE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:868b:0:b0:c4d:9831:9712 with SMTP id
+ z11-20020a25868b000000b00c4d98319712mr26898ybk.0.1689781150625; Wed, 19 Jul
+ 2023 08:39:10 -0700 (PDT)
+Date:   Wed, 19 Jul 2023 08:39:09 -0700
+In-Reply-To: <CU66VMG4IKSD.33KF2CEZJ2I1@suppilovahvero>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-2-seanjc@google.com>
+ <CU66VMG4IKSD.33KF2CEZJ2I1@suppilovahvero>
+Message-ID: <ZLgDnYJUX/QR9UJi@google.com>
+Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action union
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 19, 2023, Jarkko Sakkinen wrote:
+> On Wed Jul 19, 2023 at 2:44 AM EEST, Sean Christopherson wrote:
+> >  	/* Huge pages aren't expected to be modified without first being zapped. */
+> > -	WARN_ON(pte_huge(range->pte) || range->start + 1 != range->end);
+> > +	WARN_ON(pte_huge(range->arg.pte) || range->start + 1 != range->end);
+> 
+> Not familiar with this code. Just checking whether whether instead
+> pr_{warn,err}()
 
-On 7/19/23 16:13, Nina Schoetterl-Glausch wrote:
-> On Wed, 2023-07-19 at 16:08 +0200, Pierre Morel wrote:
->> On 7/14/23 18:30, Nina Schoetterl-Glausch wrote:
->>> On Wed, 2023-07-12 at 22:11 +0200, Thomas Huth wrote:
->>>> On 12/07/2023 21.37, Nina Schoetterl-Glausch wrote:
->>>>> On Wed, 2023-07-05 at 12:22 +0200, Thomas Huth wrote:
->>>>>> On 30/06/2023 11.17, Pierre Morel wrote:
->>>>>>> This test takes care to check the changes on different
->>>>>>> entitlements
->>>>>>> when the guest requests a polarization change.
->>>>>>>
->>>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>>>> ---
->>>>>>>      tests/avocado/s390_topology.py | 47
->>>>>>> ++++++++++++++++++++++++++++++++++
->>>>>>>      1 file changed, 47 insertions(+)
->>>>>>>
->>>>>>> diff --git a/tests/avocado/s390_topology.py
->>>>>>> b/tests/avocado/s390_topology.py
->>>>>>> index 2cf731cb1d..4855e5d7e4 100644
->>>>>>> --- a/tests/avocado/s390_topology.py
->>>>>>> +++ b/tests/avocado/s390_topology.py
->>>>>>> @@ -240,3 +240,50 @@ def test_polarisation(self):
->>>>>>>              res = self.vm.qmp('query-cpu-polarization')
->>>>>>>              self.assertEqual(res['return']['polarization'],
->>>>>>> 'horizontal')
->>>>>>>              self.check_topology(0, 0, 0, 0, 'medium',
->>>>>>> False)
->>>>>>> +
->>>>>>> +    def test_entitlement(self):
->>>>>>> +        """
->>>>>>> +        This test verifies that QEMU modifies the
->>>>>>> polarization
->>>>>>> +        after a guest request.
->>>>>> ...
->>>>>>> +        self.check_topology(0, 0, 0, 0, 'low', False)
->>>>>>> +        self.check_topology(1, 0, 0, 0, 'medium', False)
->>>>>>> +        self.check_topology(2, 1, 0, 0, 'high', False)
->>>>>>> +        self.check_topology(3, 1, 0, 0, 'high', False)
->>>>>>> +
->>>>>>> +        self.guest_set_dispatching('1');
->>>>>>> +
->>>>>>> +        self.check_topology(0, 0, 0, 0, 'low', False)
->>>>>>> +        self.check_topology(1, 0, 0, 0, 'medium', False)
->>>>>>> +        self.check_topology(2, 1, 0, 0, 'high', False)
->>>>>>> +        self.check_topology(3, 1, 0, 0, 'high', False)
->>>>>>> +
->>>>>>> +        self.guest_set_dispatching('0');
->>>>>>> +
->>>>>>> +        self.check_topology(0, 0, 0, 0, 'low', False)
->>>>>>> +        self.check_topology(1, 0, 0, 0, 'medium', False)
->>>>>>> +        self.check_topology(2, 1, 0, 0, 'high', False)
->>>>>>> +        self.check_topology(3, 1, 0, 0, 'high', False)
->>>>>> Sorry, I think I'm too blind to see it, but what has changed
->>>>>> after
->>>>>> the guest
->>>>>> changed the polarization?
->>>>> Nothing, the values are retained, they're just not active.
->>>>> The guest will see a horizontal polarization until it changes
->>>>> back
->>>>> to
->>>>> vertical.
->>>> But then the comment in front of it ("This test verifies that
->>>> QEMU
->>>> *modifies* the polarization...") does not quite match, does it?
->>> Yeah, it tests that QEMU reports it's own state changed when using
->>> set-cpu-topology.
->>> I think it would be a good idea to get the guests view from the
->>> sysfs,
->>> also.
->>>
->>>>     Thomas
->>>>
->>>>
->> Yes, I think you are right, I rewrite this to check the guest view of
->> the changes.
->>
->> As you said the values are retained when not used by horizontal
->> polarization so it is a non sense to check from host view.
-> I don't think it's bad to check the host view, you can do both.
->
+The "full" WARN is desirable, this is effecitvely an assert on the contract between
+the primary MMU, generic KVM code, and x86's TDP MMU.  The .change_pte() mmu_notifier
+callback doesn't allow for hugepages, i.e. it's a (likely fatal) kernel bug if a
+hugepage is encountered at this point.  Ditto for the "start + 1 == end" check,
+if that fails then generic KVM likely has a fatal bug.
 
-OK, then I do it.
+> combined with return false would be a more graceful option?
 
-Thanks,
-
-Pierre
-
-
+The return value communicates whether or not a TLB flush is needed, not whether
+or not the operation was successful, i.e. there is no way to cancel the unexpected
+PTE change.
