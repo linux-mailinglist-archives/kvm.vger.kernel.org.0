@@ -2,406 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1636F7589DC
-	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 02:03:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 695B6758A36
+	for <lists+kvm@lfdr.de>; Wed, 19 Jul 2023 02:50:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbjGSADT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jul 2023 20:03:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33304 "EHLO
+        id S229806AbjGSAui (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jul 2023 20:50:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjGSADS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jul 2023 20:03:18 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB05A170B;
-        Tue, 18 Jul 2023 17:02:49 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b89e10d356so39926155ad.3;
-        Tue, 18 Jul 2023 17:02:49 -0700 (PDT)
+        with ESMTP id S229475AbjGSAug (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jul 2023 20:50:36 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4EC13E
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 17:50:10 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-403e7472b28so20684421cf.2
+        for <kvm@vger.kernel.org>; Tue, 18 Jul 2023 17:50:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689724967; x=1690329767;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6dwATtru+zCIV4P6k0RhTlVCkucqP8qruCRWju3HKXc=;
-        b=Sh9U0GT9tMhQaQaHqKxZ+4ccxmHMh6Zx56Nfayx9OM4eDoZw0mPo+XxSrVG5vkt1zU
-         fjKBSgO7j80kLplOfDpf2vwCd5ddnFD0zC3/iN6KXGquXfB3oFCUxRj6IdrjhYMWQzP6
-         mBBVTE7AC973skL+1HrUA/coYDKm/qaIk5SR/bgN6vCoIDnNNoxJkrE7mD1vWhv2CkrN
-         IE3Yl+AOx7dDJsG75jNoYYK/L7cLrxHicc/58AgCSczjZ7AbIDQwuEfT6DGvXAS8y61r
-         hA2033X0hPk2mFr3GS8SRtbUZ/aEMMp5boT/HLdPw9u0A4HzrmdsWrrq8+irETEi09aX
-         TelQ==
+        d=bytedance.com; s=google; t=1689727809; x=1692319809;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g4MQh0GVYvXxrf88kEVfj3RWJKvjT6rBvWGaToebS1k=;
+        b=OlP5EF+DSJN59SkgdI1UB5eOS4em/1xb1WNYdfgYt2Ukkjivjm+QbZj65DjHzNYEyI
+         QqIAVHDlSwzvNIMiBTfgbHTKBSZcgGY15vdPnsO9PLqnscYrYHchHIhlFLeibW6jejsZ
+         dvyNtltzAvm8e3K49GaTAs/0qElRdNwn7qFGc4P+0Xzw6n746bakT/97EoDhZqkzDjbG
+         F80kiMG6yPyD/JHuq+ejdvIj6wfg6lEFKl4ldHJHejg/bTLxA0CsA8YLiQFrhZ3yvinl
+         e3AVdlCq6NRI5Rai+WUijlbOZNiluE/zuHqd2kOcGLJ+nJKAqlGjmaAcQRcpR5Wk1yCL
+         d6/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689724967; x=1690329767;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6dwATtru+zCIV4P6k0RhTlVCkucqP8qruCRWju3HKXc=;
-        b=ft3ZZGQ2nddigmuK65J54qg0W0q+wLTHU0noyQXTNEpHx2Qf/pgmJInYfBYZ8y+BsO
-         f0LWqyGqKUX17Qs/gJW1/2qdNgRkvnhcH7JCwWH6/3TV+u6z4mpRPEcyl9Re1X196BFG
-         5oiiIkmOUaQKvMjhulrUkTXj+aYmbQ3qVZlvG30EpVnxtwiiaIsY0NtJo1j/HTQ9i3qq
-         5mUPwiQeGIlfXSWFyONbKndPp+fEGWKR6/gwdcvfu6QmnyESlqrPhIQrlU7fHg3EA790
-         Ha6LQJW1hsYbsYlTMqWqBQncfMR0m1f75XUhxSeCAMBi08l8o965Gt05tYc2lAw8+sXe
-         tzwA==
-X-Gm-Message-State: ABy/qLZ5z/W8qzuk78a1gC8o2S9K1jjczDXwRcK0vhWReLBOrDyg5edY
-        C75TivzDQIquoUSobGoVRffahV0MyZtYZA==
-X-Google-Smtp-Source: APBJJlHDzdCEyxqwCYKJtCOW9Rfqyfvxxv16mH+iCIFk66w7Mp6rsCd2E0VSB/syxd/8qDq4H/C83A==
-X-Received: by 2002:a17:902:d3cc:b0:1b8:1e05:ed09 with SMTP id w12-20020a170902d3cc00b001b81e05ed09mr3164781plb.36.1689724967161;
-        Tue, 18 Jul 2023 17:02:47 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id p12-20020a170902eacc00b001b89466a5f4sm2452666pld.105.2023.07.18.17.02.46
+        d=1e100.net; s=20221208; t=1689727809; x=1692319809;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g4MQh0GVYvXxrf88kEVfj3RWJKvjT6rBvWGaToebS1k=;
+        b=lRAkevUbXJ0iXjZd8K0WLaePdwHW7Ybotv1Tiju0pKphiGvd2//iIOFrp/IPg82J+9
+         3RY9uFROo1MUaFpRO2091HvNnwBDOqUs4Kc3S3MRGu6CjmQ5jwpXeUSVrFvZiD0L0TNn
+         szI+uDUxZAlYz6k+JZjMtggU55DNELWcvhM7vvmOVotRdg6/4FN+QfBIKAOLsStOuZ/I
+         Y9tlRwhFs3dir5UgdI4STRV2PCBvxaqdcjXUVSuRwf3BYxPTjusoaSFZ1W0lRymXX1Z3
+         tv8SMFGUFMN0I7cEM272DjKMAkSyyZDdt67qDscdAyiEA8zmsQTUlrnNeu1taX1pxXHc
+         Sitg==
+X-Gm-Message-State: ABy/qLbBa5AOVBTNu4AwmlrZCNMAruKRFSMjV9fUZff0JzSCFfPFKimY
+        gN3pRvlSHfPi4SFERZ0fd1hBfw==
+X-Google-Smtp-Source: APBJJlFOdkeHFj6qm5QEEQlrf3UOfope2+h9d9vn4lyQAeDaZ7bAUYWfgXAYgxBXdf2oWu12n4kSdw==
+X-Received: by 2002:ac8:5f0b:0:b0:404:e41c:616f with SMTP id x11-20020ac85f0b000000b00404e41c616fmr151778qta.68.1689727809469;
+        Tue, 18 Jul 2023 17:50:09 -0700 (PDT)
+Received: from [172.17.0.7] ([130.44.212.112])
+        by smtp.gmail.com with ESMTPSA id c5-20020a05620a11a500b0076738337cd1sm968696qkk.1.2023.07.18.17.50.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jul 2023 17:02:46 -0700 (PDT)
-Date:   Tue, 18 Jul 2023 17:02:45 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com
-Subject: Re: [PATCH v4 3/6] KVM: selftests: Introduce __kvm_pmu_event_filter
- to improved event filter settings
-Message-ID: <20230719000245.GC25699@ls.amr.corp.intel.com>
-References: <20230717062343.3743-1-cloudliang@tencent.com>
- <20230717062343.3743-4-cloudliang@tencent.com>
+        Tue, 18 Jul 2023 17:50:08 -0700 (PDT)
+From:   Bobby Eshleman <bobby.eshleman@bytedance.com>
+Subject: [PATCH RFC net-next v5 00/14] virtio/vsock: support datagrams
+Date:   Wed, 19 Jul 2023 00:50:04 +0000
+Message-Id: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230717062343.3743-4-cloudliang@tencent.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADwzt2QC/32OwQrCMBBEf6Xk7EpNY2s9CYIf4FU8ZNPRBmkqS
+ QmK9N9Ne/Ag6HF2dt7MSwR4iyC22Ut4RBts75JYLzJhWu2uINskLWQui1ytCmJFMfTmRs3V644
+ KLsG61KXCWqQQ6wBir51pp5jDQA6PYbLuHhf7mLtO4njYT7ePf06itWHo/XPeEuX89qs2Ssopr
+ 2pjKgOUEjt+DmhSLZam72ZcVP8RakIYMLPU2NT1N2Icxzf/7ETBHwEAAA==
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
+Cc:     Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org, Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>
+X-Mailer: b4 0.12.2
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 17, 2023 at 02:23:40PM +0800,
-Jinrong Liang <ljr.kernel@gmail.com> wrote:
+Hey all!
 
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> Add custom "__kvm_pmu_event_filter" structure to improve pmu event
-> filter settings. Simplifies event filter setup by organizing event
-> filter parameters in a cleaner, more organized way.
-> 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../kvm/x86_64/pmu_event_filter_test.c        | 179 +++++++++---------
->  1 file changed, 87 insertions(+), 92 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> index 5ac05e64bec9..ffcbbf25b29b 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> @@ -28,6 +28,10 @@
->  
->  #define NUM_BRANCHES 42
->  
-> +/* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
-> +#define MAX_FILTER_EVENTS		300
-> +#define MAX_TEST_EVENTS		10
-> +
->  /*
->   * This is how the event selector and unit mask are stored in an AMD
->   * core performance event-select register. Intel's format is similar,
-> @@ -69,21 +73,33 @@
->  
->  #define INST_RETIRED EVENT(0xc0, 0)
->  
-> +struct __kvm_pmu_event_filter {
-> +	__u32 action;
-> +	__u32 nevents;
-> +	__u32 fixed_counter_bitmap;
-> +	__u32 flags;
-> +	__u32 pad[4];
-> +	__u64 events[MAX_FILTER_EVENTS];
-> +};
-> +
->  /*
->   * This event list comprises Intel's eight architectural events plus
->   * AMD's "retired branch instructions" for Zen[123] (and possibly
->   * other AMD CPUs).
->   */
-> -static const uint64_t event_list[] = {
-> -	EVENT(0x3c, 0),
-> -	INST_RETIRED,
-> -	EVENT(0x3c, 1),
-> -	EVENT(0x2e, 0x4f),
-> -	EVENT(0x2e, 0x41),
-> -	EVENT(0xc4, 0),
-> -	EVENT(0xc5, 0),
-> -	EVENT(0xa4, 1),
-> -	AMD_ZEN_BR_RETIRED,
-> +static const struct __kvm_pmu_event_filter base_event_filter = {
-> +	.nevents = ARRAY_SIZE(base_event_filter.events),
-> +	.events = {
-> +		EVENT(0x3c, 0),
-> +		INST_RETIRED,
-> +		EVENT(0x3c, 1),
-> +		EVENT(0x2e, 0x4f),
-> +		EVENT(0x2e, 0x41),
-> +		EVENT(0xc4, 0),
-> +		EVENT(0xc5, 0),
-> +		EVENT(0xa4, 1),
-> +		AMD_ZEN_BR_RETIRED,
-> +	},
->  };
->  
->  struct {
-> @@ -225,47 +241,11 @@ static bool sanity_check_pmu(struct kvm_vcpu *vcpu)
->  	return !r;
->  }
->  
-> -static struct kvm_pmu_event_filter *alloc_pmu_event_filter(uint32_t nevents)
-> -{
-> -	struct kvm_pmu_event_filter *f;
-> -	int size = sizeof(*f) + nevents * sizeof(f->events[0]);
-> -
-> -	f = malloc(size);
-> -	TEST_ASSERT(f, "Out of memory");
-> -	memset(f, 0, size);
-> -	f->nevents = nevents;
-> -	return f;
-> -}
-> -
-> -
-> -static struct kvm_pmu_event_filter *
-> -create_pmu_event_filter(const uint64_t event_list[], int nevents,
-> -			uint32_t action, uint32_t flags)
-> -{
-> -	struct kvm_pmu_event_filter *f;
-> -	int i;
-> -
-> -	f = alloc_pmu_event_filter(nevents);
-> -	f->action = action;
-> -	f->flags = flags;
-> -	for (i = 0; i < nevents; i++)
-> -		f->events[i] = event_list[i];
-> -
-> -	return f;
-> -}
-> -
-> -static struct kvm_pmu_event_filter *event_filter(uint32_t action)
-> -{
-> -	return create_pmu_event_filter(event_list,
-> -				       ARRAY_SIZE(event_list),
-> -				       action, 0);
-> -}
-> -
->  /*
->   * Remove the first occurrence of 'event' (if any) from the filter's
->   * event list.
->   */
-> -static void remove_event(struct kvm_pmu_event_filter *f, uint64_t event)
-> +static void remove_event(struct __kvm_pmu_event_filter *f, uint64_t event)
->  {
->  	bool found = false;
->  	int i;
-> @@ -313,66 +293,70 @@ static void test_without_filter(struct kvm_vcpu *vcpu)
->  }
->  
->  static void test_with_filter(struct kvm_vcpu *vcpu,
-> -			     struct kvm_pmu_event_filter *f)
-> +			     struct __kvm_pmu_event_filter *__f)
->  {
-> +	struct kvm_pmu_event_filter *f = (void *)__f;
-> +
->  	vm_ioctl(vcpu->vm, KVM_SET_PMU_EVENT_FILTER, f);
->  	run_vcpu_and_sync_pmc_results(vcpu);
->  }
->  
->  static void test_amd_deny_list(struct kvm_vcpu *vcpu)
->  {
-> -	uint64_t event = EVENT(0x1C2, 0);
-> -	struct kvm_pmu_event_filter *f;
-> +	struct __kvm_pmu_event_filter f = base_event_filter;
->  
-> -	f = create_pmu_event_filter(&event, 1, KVM_PMU_EVENT_DENY, 0);
-> -	test_with_filter(vcpu, f);
-> -	free(f);
-> +	f.action = KVM_PMU_EVENT_DENY;
-> +	f.nevents = 1;
-> +	f.events[0] = EVENT(0x1C2, 0);
-> +	test_with_filter(vcpu, &f);
+This series introduces support for datagrams to virtio/vsock.
 
-This overwrite all members.  We can use designated initializer.
-	struct __kvm_pmu_event_filter f = {
-                .action = KVM_PMU_EVENT_DENY,
-                .nevents = 1,
-                .events = {
-                        EVENT(0x1C2, 0),
-                },
-        };
+It is a spin-off (and smaller version) of this series from the summer:
+  https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
 
-Except this, looks good to me.
-Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Please note that this is an RFC and should not be merged until
+associated changes are made to the virtio specification, which will
+follow after discussion from this series.
 
-Thanks,
+Another aside, the v4 of the series has only been mildly tested with a
+run of tools/testing/vsock/vsock_test. Some code likely needs cleaning
+up, but I'm hoping to get some of the design choices agreed upon before
+spending too much time making it pretty.
 
->  
->  	ASSERT_PMC_COUNTING_INSTRUCTIONS();
->  }
->  
->  static void test_member_deny_list(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-> +	struct __kvm_pmu_event_filter f = base_event_filter;
->  
-> -	test_with_filter(vcpu, f);
-> -	free(f);
-> +	f.action = KVM_PMU_EVENT_DENY;
-> +	test_with_filter(vcpu, &f);
->  
->  	ASSERT_PMC_NOT_COUNTING_INSTRUCTIONS();
->  }
->  
->  static void test_member_allow_list(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
-> +	struct __kvm_pmu_event_filter f = base_event_filter;
->  
-> -	test_with_filter(vcpu, f);
-> -	free(f);
-> +	f.action = KVM_PMU_EVENT_ALLOW;
-> +	test_with_filter(vcpu, &f);
->  
->  	ASSERT_PMC_COUNTING_INSTRUCTIONS();
->  }
->  
->  static void test_not_member_deny_list(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_DENY);
-> +	struct __kvm_pmu_event_filter f = base_event_filter;
-> +
-> +	f.action = KVM_PMU_EVENT_DENY;
->  
-> -	remove_event(f, INST_RETIRED);
-> -	remove_event(f, INTEL_BR_RETIRED);
-> -	remove_event(f, AMD_ZEN_BR_RETIRED);
-> -	test_with_filter(vcpu, f);
-> -	free(f);
-> +	remove_event(&f, INST_RETIRED);
-> +	remove_event(&f, INTEL_BR_RETIRED);
-> +	remove_event(&f, AMD_ZEN_BR_RETIRED);
-> +	test_with_filter(vcpu, &f);
->  
->  	ASSERT_PMC_COUNTING_INSTRUCTIONS();
->  }
->  
->  static void test_not_member_allow_list(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu_event_filter *f = event_filter(KVM_PMU_EVENT_ALLOW);
-> +	struct __kvm_pmu_event_filter f = base_event_filter;
->  
-> -	remove_event(f, INST_RETIRED);
-> -	remove_event(f, INTEL_BR_RETIRED);
-> -	remove_event(f, AMD_ZEN_BR_RETIRED);
-> -	test_with_filter(vcpu, f);
-> -	free(f);
-> +	f.action = KVM_PMU_EVENT_ALLOW;
-> +
-> +	remove_event(&f, INST_RETIRED);
-> +	remove_event(&f, INTEL_BR_RETIRED);
-> +	remove_event(&f, AMD_ZEN_BR_RETIRED);
-> +	test_with_filter(vcpu, &f);
->  
->  	ASSERT_PMC_NOT_COUNTING_INSTRUCTIONS();
->  }
-> @@ -567,19 +551,16 @@ static void run_masked_events_test(struct kvm_vcpu *vcpu,
->  				   const uint64_t masked_events[],
->  				   const int nmasked_events)
->  {
-> -	struct kvm_pmu_event_filter *f;
-> +	struct __kvm_pmu_event_filter f = {
-> +		.nevents = nmasked_events,
-> +		.action = KVM_PMU_EVENT_ALLOW,
-> +		.flags = KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
-> +	};
->  
-> -	f = create_pmu_event_filter(masked_events, nmasked_events,
-> -				    KVM_PMU_EVENT_ALLOW,
-> -				    KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-> -	test_with_filter(vcpu, f);
-> -	free(f);
-> +	memcpy(f.events, masked_events, sizeof(uint64_t) * nmasked_events);
-> +	test_with_filter(vcpu, &f);
->  }
->  
-> -/* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
-> -#define MAX_FILTER_EVENTS	300
-> -#define MAX_TEST_EVENTS		10
-> -
->  #define ALLOW_LOADS		BIT(0)
->  #define ALLOW_STORES		BIT(1)
->  #define ALLOW_LOADS_STORES	BIT(2)
-> @@ -751,17 +732,27 @@ static void test_masked_events(struct kvm_vcpu *vcpu)
->  	run_masked_events_tests(vcpu, events, nevents);
->  }
->  
-> -static int run_filter_test(struct kvm_vcpu *vcpu, const uint64_t *events,
-> -			   int nevents, uint32_t flags)
-> +static int do_vcpu_set_pmu_event_filter(struct kvm_vcpu *vcpu,
-> +					struct __kvm_pmu_event_filter *__f)
->  {
-> -	struct kvm_pmu_event_filter *f;
-> -	int r;
-> +	struct kvm_pmu_event_filter *f = (void *)__f;
->  
-> -	f = create_pmu_event_filter(events, nevents, KVM_PMU_EVENT_ALLOW, flags);
-> -	r = __vm_ioctl(vcpu->vm, KVM_SET_PMU_EVENT_FILTER, f);
-> -	free(f);
-> +	return __vm_ioctl(vcpu->vm, KVM_SET_PMU_EVENT_FILTER, f);
-> +}
-> +
-> +static int set_pmu_single_event_filter(struct kvm_vcpu *vcpu, uint64_t event,
-> +				       uint32_t flags, uint32_t action)
-> +{
-> +	struct __kvm_pmu_event_filter f = {
-> +		.nevents = 1,
-> +		.flags = flags,
-> +		.action = action,
-> +		.events = {
-> +			event,
-> +		},
-> +	};
->  
-> -	return r;
-> +	return do_vcpu_set_pmu_event_filter(vcpu, &f);
->  }
->  
->  static void test_filter_ioctl(struct kvm_vcpu *vcpu)
-> @@ -773,14 +764,18 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
->  	 * Unfortunately having invalid bits set in event data is expected to
->  	 * pass when flags == 0 (bits other than eventsel+umask).
->  	 */
-> -	r = run_filter_test(vcpu, &e, 1, 0);
-> +	r = set_pmu_single_event_filter(vcpu, e, 0, KVM_PMU_EVENT_ALLOW);
->  	TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
->  
-> -	r = run_filter_test(vcpu, &e, 1, KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-> +	r = set_pmu_single_event_filter(vcpu, e,
-> +					KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
-> +					KVM_PMU_EVENT_ALLOW);
->  	TEST_ASSERT(r != 0, "Invalid PMU Event Filter is expected to fail");
->  
->  	e = KVM_PMU_ENCODE_MASKED_ENTRY(0xff, 0xff, 0xff, 0xf);
-> -	r = run_filter_test(vcpu, &e, 1, KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-> +	r = set_pmu_single_event_filter(vcpu, e,
-> +					KVM_PMU_EVENT_FLAG_MASKED_EVENTS,
-> +					KVM_PMU_EVENT_ALLOW);
->  	TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
->  }
->  
-> -- 
-> 2.39.3
-> 
+This series first supports datagrams in a basic form for virtio, and
+then optimizes the sendpath for all datagram transports.
 
+The result is a very fast datagram communication protocol that
+outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
+of multi-threaded workload samples.
+
+For those that are curious, some summary data comparing UDP and VSOCK
+DGRAM (N=5):
+
+	vCPUS: 16
+	virtio-net queues: 16
+	payload size: 4KB
+	Setup: bare metal + vm (non-nested)
+
+	UDP: 287.59 MB/s
+	VSOCK DGRAM: 509.2 MB/s
+
+Some notes about the implementation...
+
+This datagram implementation forces datagrams to self-throttle according
+to the threshold set by sk_sndbuf. It behaves similar to the credits
+used by streams in its effect on throughput and memory consumption, but
+it is not influenced by the receiving socket as credits are.
+
+The device drops packets silently.
+
+As discussed previously, this series introduces datagrams and defers
+fairness to future work. See discussion in v2 for more context around
+datagrams, fairness, and this implementation.
+
+Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+---
+Changes in v5:
+- teach vhost to drop dgram when a datagram exceeds the receive buffer
+  - now uses MSG_ERRQUEUE and depends on Arseniy's zerocopy patch:
+	"vsock: read from socket's error queue"
+- replace multiple ->dgram_* callbacks with single ->dgram_addr_init()
+  callback
+- refactor virtio dgram skb allocator to reduce conflicts w/ zerocopy series
+- add _fallback/_FALLBACK suffix to dgram transport variables/macros
+- add WARN_ONCE() for table_size / VSOCK_HASH issue
+- add static to vsock_find_bound_socket_common
+- dedupe code in vsock_dgram_sendmsg() using module_got var
+- drop concurrent sendmsg() for dgram and defer to future series
+- Add more tests
+  - test EHOSTUNREACH in errqueue
+  - test stream + dgram address collision
+- improve clarity of dgram msg bounds test code
+- Link to v4: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com
+
+Changes in v4:
+- style changes
+  - vsock: use sk_vsock(vsk) in vsock_dgram_recvmsg instead of
+    &sk->vsk
+  - vsock: fix xmas tree declaration
+  - vsock: fix spacing issues
+  - virtio/vsock: virtio_transport_recv_dgram returns void because err
+    unused
+- sparse analysis warnings/errors
+  - virtio/vsock: fix unitialized skerr on destroy
+  - virtio/vsock: fix uninitialized err var on goto out
+  - vsock: fix declarations that need static
+  - vsock: fix __rcu annotation order
+- bugs
+  - vsock: fix null ptr in remote_info code
+  - vsock/dgram: make transport_dgram a fallback instead of first
+    priority
+  - vsock: remove redundant rcu read lock acquire in getname()
+- tests
+  - add more tests (message bounds and more)
+  - add vsock_dgram_bind() helper
+  - add vsock_dgram_connect() helper
+
+Changes in v3:
+- Support multi-transport dgram, changing logic in connect/bind
+  to support VMCI case
+- Support per-pkt transport lookup for sendto() case
+- Fix dgram_allow() implementation
+- Fix dgram feature bit number (now it is 3)
+- Fix binding so dgram and connectible (cid,port) spaces are
+  non-overlapping
+- RCU protect transport ptr so connect() calls never leave
+  a lockless read of the transport and remote_addr are always
+  in sync
+- Link to v2: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com
+
+---
+Bobby Eshleman (13):
+      af_vsock: generalize vsock_dgram_recvmsg() to all transports
+      af_vsock: refactor transport lookup code
+      af_vsock: support multi-transport datagrams
+      af_vsock: generalize bind table functions
+      af_vsock: use a separate dgram bind table
+      virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
+      virtio/vsock: add common datagram send path
+      af_vsock: add vsock_find_bound_dgram_socket()
+      virtio/vsock: add common datagram recv path
+      virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+      vhost/vsock: implement datagram support
+      vsock/loopback: implement datagram support
+      virtio/vsock: implement datagram support
+
+Jiang Wang (1):
+      test/vsock: add vsock dgram tests
+
+ drivers/vhost/vsock.c                   |  64 ++-
+ include/linux/virtio_vsock.h            |  10 +-
+ include/net/af_vsock.h                  |  14 +-
+ include/uapi/linux/virtio_vsock.h       |   2 +
+ net/vmw_vsock/af_vsock.c                | 281 ++++++++++---
+ net/vmw_vsock/hyperv_transport.c        |  13 -
+ net/vmw_vsock/virtio_transport.c        |  26 +-
+ net/vmw_vsock/virtio_transport_common.c | 190 +++++++--
+ net/vmw_vsock/vmci_transport.c          |  60 +--
+ net/vmw_vsock/vsock_loopback.c          |  10 +-
+ tools/testing/vsock/util.c              | 141 ++++++-
+ tools/testing/vsock/util.h              |   6 +
+ tools/testing/vsock/vsock_test.c        | 680 ++++++++++++++++++++++++++++++++
+ 13 files changed, 1320 insertions(+), 177 deletions(-)
+---
+base-commit: 37cadc266ebdc7e3531111c2b3304fa01b2131e8
+change-id: 20230413-b4-vsock-dgram-3b6eba6a64e5
+
+Best regards,
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Bobby Eshleman <bobby.eshleman@bytedance.com>
+
