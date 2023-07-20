@@ -2,68 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61C6175B192
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 16:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CE3875B22A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 17:15:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232321AbjGTOst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 10:48:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37858 "EHLO
+        id S232471AbjGTPPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 11:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232315AbjGTOsq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 10:48:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5157CE60
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 07:48:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D7B4B61864
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 14:48:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 45B24C433CB
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 14:48:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689864524;
-        bh=kly4MbOqddh3u8QKXQaNlXrVGRQYX8LDjxxDS2BsRdU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=i7NrO7OYX8xu2pPLXxVqe7weROb4crjGwqbevcgymxGNdPuMvpmlME9cJ0SFuXpWK
-         2E9JSRfweRfDCah8w2lB3FjFYjqcm+Bb2zI4rxnZWZRjhd8ha76ArOqQROA+jLGoDL
-         NgTCKZJ+G/5tyGXS6irToFySRaLjXey2TVx5zbIrTAkdW72jHE/mVPRrpCPvsHcNdB
-         ATmgrq2kOnuXGKsHlWpR84Y0YXpF12XiFWd09x8/PjX5eyTq/7HuASI8waQWjglSuw
-         R/Azxj8TxB56i/6f5I46wKw4HwBMyPGBC+MJE/63uMPwGpOryIo9S/G2JY/u9wmyNX
-         Xak7y5Dowchww==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 34AF6C4332E; Thu, 20 Jul 2023 14:48:44 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217688] Guest call trace during boot
-Date:   Thu, 20 Jul 2023 14:48:43 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-217688-28872-vCOZoWRX4a@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217688-28872@https.bugzilla.kernel.org/>
-References: <bug-217688-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S232502AbjGTPO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 11:14:59 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C40F2701
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 08:14:50 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c0f35579901so791790276.0
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 08:14:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689866089; x=1690470889;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jyO/GZcznauRS+IxFjefkQ411ageTxV8Pq4vykaVGvo=;
+        b=zTnr2gXYIfqrhSL0WP50qLuqh3ZSH0gfVOnKmqwBvWYCge11/urc6Mcz48DQC5VeI6
+         s/bgjrFlzBMXd0PxaHBdxoR2ZqKrVqjnkCnhcQbbSnTvJYQ3aBe8wGkYdi1iCIBydfGh
+         kDBro1Ztm9Xs7cfFTvZ7Ey8Gxe05PCCIDn4nx9L+2nwHbFPbro9d3jap/zFGaLY9lF26
+         GO0Vu5OUt+nUmBQOwJoSD8n40MC7ZQXlXpaj59Y1nIZxZy5/TzmEdTKZZXkcpmTSKYdO
+         Y0fmzsgj8zCYsvUdMgpPWIv3Ur8RBp8NDUrrxEURomdLy8NcckIjCEtpSXTS4KS2mzFS
+         29+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689866089; x=1690470889;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jyO/GZcznauRS+IxFjefkQ411ageTxV8Pq4vykaVGvo=;
+        b=TUYeWJ8jVNEm1kqfjUDumyUW1Ha6mC4vh0WJOyXYdIGYi7SHp+oLlcvFVXyumOeESI
+         5Ol0a57i58M4OKQw1Hdzr38rZDiTaaWRtebgzQgzgDYSOFRF0OYWNpnK+fbfakU6lTXY
+         BXmjLSNuH72XJ/AhT94b1vPkbtmkG3zKxp8NgCDfLKKT6gTCWQD+8R+fHxDvWuLeTZV2
+         aQ2DeKy5R1oWergqaf2a64FHXG3TlTm23H+StSPH7N1Pe9RK4h6iC/OHoWc3eKAO39r/
+         0b8OYATer6a9ALLAEUPSOwXv38cqFSyC9bK+2zdxl1eWyQkOf6hXhCuIClW47GyEqMC7
+         w8Qg==
+X-Gm-Message-State: ABy/qLYhUokHg6MXQROci6Fd2u/wa3MFbIDWqA13OB0HaNC2fYAs8SoT
+        HduWbq/9p/ZwyN35FBVbOPSjPV7ikoM=
+X-Google-Smtp-Source: APBJJlHgB47FmXfk0Rt+Hyu6ZgRaD/aSiXUWbAQerG5WzFKE3pY5cKaePpzhb9OPvUF/5F0XHeWF4GbW2oc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:a105:0:b0:c65:8983:ac2 with SMTP id
+ z5-20020a25a105000000b00c6589830ac2mr17912ybh.5.1689866089303; Thu, 20 Jul
+ 2023 08:14:49 -0700 (PDT)
+Date:   Thu, 20 Jul 2023 08:14:47 -0700
+In-Reply-To: <83eb5c50-7287-7845-ffc3-a7c58e638ea5@intel.com>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
+ <83eb5c50-7287-7845-ffc3-a7c58e638ea5@intel.com>
+Message-ID: <ZLlLx7wkE6iPTIcI@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,21 +100,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217688
+On Thu, Jul 20, 2023, Xiaoyao Li wrote:
+> On 7/19/2023 7:44 AM, Sean Christopherson wrote:
+> > @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
+> >   	case KVM_GET_STATS_FD:
+> >   		r = kvm_vm_ioctl_get_stats_fd(kvm);
+> >   		break;
+> > +	case KVM_CREATE_GUEST_MEMFD: {
+> > +		struct kvm_create_guest_memfd guest_memfd;
+> > +
+> > +		r = -EFAULT;
+> > +		if (copy_from_user(&guest_memfd, argp, sizeof(guest_memfd)))
+> > +			goto out;
+> > +
+> > +		r = kvm_gmem_create(kvm, &guest_memfd);
+> > +		break;
+> > +	}
+> 
+> Does it need a new CAP to indicate the support of guest_memfd?
 
-Sean Christopherson (seanjc@google.com) changed:
+Yeah, I meant to add that to the TODO list and forgot (obviously).
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |seanjc@google.com
+> This is patch series introduces 3 new CAPs and it seems any one of them can
+> serve as the indicator of guest_memfd.
+> 
+> +#define KVM_CAP_USER_MEMORY2 230
+> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
+> +#define KVM_CAP_VM_TYPES 232
 
---- Comment #2 from Sean Christopherson (seanjc@google.com) ---
-Ya, and
-ttps://lkml.kernel.org/r/CA%2BQYu4qSBdhEgFURu%2BouAf2d_JNPbZgCSUaxCLoGzMqDQ=
-OLWsQ%40mail.gmail.com
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+The number of new caps being added is the main why I didn't just add another one.
+On the other hand, we have room for a few billion caps, so one more isn't a big
+deal.  So yeah, KVM_CAP_GUEST_MEMFD is probably the way to go.
