@@ -2,79 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D442B75B4AA
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 18:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1662E75B539
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 19:09:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231685AbjGTQkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 12:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34522 "EHLO
+        id S231248AbjGTRJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 13:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231169AbjGTQjw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 12:39:52 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEEE30C3
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 09:39:30 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6b9d68a7abaso820096a34.3
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 09:39:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689871168; x=1690475968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hbkr9MsN6GS2zP4ChfBB/zC7lOL9scc+qhxb4xXFEHY=;
-        b=ZsFDGq8cH/dWXxvB9jnW7BB7gCWULwMCvXTzzuLeSz638a3+G9S2UqX/8cmrYcLzN0
-         yvN+TMD76I2EYK0SX1EecmKJmCSn73KXdzTdxnZpEds3ttSrnvy/yeu62hWo01qPw8pq
-         rxUf41TPQ7f0ZU98Dun0XYO9XulNM5WTTdq9SYdP0Bnl4izB0mNiHltWfH9F+2ASloM9
-         dXgh0o8j6e8Nx0+gNnetSdWpBNiRagMqlHoqGcgcE3ykUzYsrj+9Z9Cip/cDdzgsuWoO
-         yM1GYpZAHvwxUrEtih8bv+jp2JLPruSUnsHd12qWtMTjdaHr07WiGTOaq9DvlNfSqIYI
-         dFKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689871168; x=1690475968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hbkr9MsN6GS2zP4ChfBB/zC7lOL9scc+qhxb4xXFEHY=;
-        b=A2pm2g2p6u3Hvo0ixB9IJCkS11BZ214yfGndh1dNQRapxjXRg1FxGxiqQ4fxaCmQbk
-         X2nwaV6Z6oIe7q0kGNHe6J6LqaCbuHmHoMDDKLzI8FQ4c+GnFSIJ4yFeFYvLIQx3Q8tq
-         +RvUtqatkLSXLBqKzp8ahCZJGYGLCM9GwEpm/ocOoOxx1XYyoCiGpl1rAzRGwYTaILJZ
-         Kb3TjEqfR9hImLFc5lNsWLb01kN3feTGiayK9ydIb54syLcnWgnRJKsJ3dXVhIFoK2pK
-         +1G3fCH5MLm0aT8Lzd8nL1SrnnU0err11yo1v+EFnbd3A21W3EPwGdQcUBAEyp/QTvN1
-         OyCQ==
-X-Gm-Message-State: ABy/qLarXtiWLIg/vnK4guAzZJJ1C4fhC8737DpgaVx44PelPxq4aoxa
-        JCujTFNNvfbPsZbwwh+rCdXQnqpjvFNd2Y6uYnM7Cw==
-X-Google-Smtp-Source: APBJJlFzGdOrTTow2+txRV2Vh5nCFjfKe7odZM806Rr1bFcCUvl0DLCd/EZzsZ/T53f5OmkGfZ+OZ09Q8fMBdMsSS0Q=
-X-Received: by 2002:a05:6870:f68e:b0:1b0:649f:e68a with SMTP id
- el14-20020a056870f68e00b001b0649fe68amr24733oab.25.1689871168307; Thu, 20 Jul
- 2023 09:39:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230718164522.3498236-1-jingzhangos@google.com>
- <20230718164522.3498236-4-jingzhangos@google.com> <87o7k77yn5.fsf@redhat.com>
-In-Reply-To: <87o7k77yn5.fsf@redhat.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 20 Jul 2023 09:39:15 -0700
-Message-ID: <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
-Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S231138AbjGTRJb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 13:09:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754A6AA;
+        Thu, 20 Jul 2023 10:09:30 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 04F0B61B54;
+        Thu, 20 Jul 2023 17:09:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 665B4C433C7;
+        Thu, 20 Jul 2023 17:09:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689872969;
+        bh=Hrcx6Pm4TTDsV1NJBZCewGpqN+gICfUVfLzVWI7VTvk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SsMVVFOHjT7S4PNsHRk02MBLl1FrgL/inwUsXdgK/+k42JIe7LyWK6EpPZ75hOdNq
+         lT/iNuMXIUiZuOPt7NOmnfVtRwKn51g3rq9rEtmpovDnzgeUGiXdOASCgTTPmt1A2P
+         G3le7neoP+qLYwtU9Vl9zFD4O6S1sQW580wRhcNcQfkvVU30g6pgQcO6zEfETdNLXd
+         ks5T1yQkUnBHotQFb6xns4kWw22LEVhWA50EonGd9RiHIUl7IrQpIHDDObO9x3Cgja
+         yrNyadHpHiwufGDEHKp07EtYGeEeeH3Eowxx5NMpSnRVJ44Mx3cbJC9YjGhl5+z/85
+         dSjZaghB7wE6A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qMX9b-00Emp0-2b;
+        Thu, 20 Jul 2023 18:09:27 +0100
+Date:   Thu, 20 Jul 2023 18:09:26 +0100
+Message-ID: <86tttytsqh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Reiji Watanabe <reijiw@google.com>, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: Fix hardware enable/disable flows for pKVM
+In-Reply-To: <20230719215725.799162-1-rananta@google.com>
+References: <20230719215725.799162-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, will@kernel.org, tabba@google.com, jingzhangos@google.com, coltonlewis@google.com, reijiw@google.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,61 +72,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Cornelia,
+On Wed, 19 Jul 2023 22:57:25 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> When running in protected mode, the hyp stub is disabled after pKVM is
+> initialized, meaning the host cannot enable/disable the hyp at
+> runtime. As such, kvm_arm_hardware_enabled is always 1 after
+> initialization, and kvm_arch_hardware_enable() never enables the vgic
+> maintenance irq or timer irqs.
+> 
+> Unconditionally enable/disable the vgic + timer irqs in the respective
+> calls, instead relying on the percpu bookkeeping in the generic code
+> to keep track of which cpus have the interrupts unmasked.
+> 
+> Fixes: 466d27e48d7c ("KVM: arm64: Simplify the CPUHP logic")
+> Reported-by: Oliver Upton <oliver.upton@linux.dev>
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/arm.c | 14 ++++----------
+>  1 file changed, 4 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c2c14059f6a8..010ebfa69650 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1867,14 +1867,10 @@ static void _kvm_arch_hardware_enable(void *discard)
+>  
+>  int kvm_arch_hardware_enable(void)
+>  {
+> -	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
+> -
+>  	_kvm_arch_hardware_enable(NULL);
+>  
+> -	if (!was_enabled) {
+> -		kvm_vgic_cpu_up();
+> -		kvm_timer_cpu_up();
+> -	}
+> +	kvm_vgic_cpu_up();
+> +	kvm_timer_cpu_up();
+>  
+>  	return 0;
+>  }
+> @@ -1889,10 +1885,8 @@ static void _kvm_arch_hardware_disable(void *discard)
+>  
+>  void kvm_arch_hardware_disable(void)
+>  {
+> -	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
+> -		kvm_timer_cpu_down();
+> -		kvm_vgic_cpu_down();
+> -	}
+> +	kvm_timer_cpu_down();
+> +	kvm_vgic_cpu_down();
+>  
+>  	if (!is_protected_kvm_enabled())
+>  		_kvm_arch_hardware_disable(NULL);
 
-On Thu, Jul 20, 2023 at 1:52=E2=80=AFAM Cornelia Huck <cohuck@redhat.com> w=
-rote:
->
-> On Tue, Jul 18 2023, Jing Zhang <jingzhangos@google.com> wrote:
->
-> > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-> > from usrespace with this change.
->
-> Typo: s/usrespace/userspace/
-Thanks.
->
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 053d8057ff1e..f33aec83f1b4 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -2008,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
-> >         .set_user =3D set_id_dfr0_el1,
-> >         .visibility =3D aa32_id_visibility,
-> >         .reset =3D read_sanitised_id_dfr0_el1,
-> > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
-> > +       .val =3D GENMASK(63, 0), },
-> >       ID_HIDDEN(ID_AFR0_EL1),
-> >       AA32_ID_SANITISED(ID_MMFR0_EL1),
-> >       AA32_ID_SANITISED(ID_MMFR1_EL1),
-> > @@ -2057,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
-> >         .get_user =3D get_id_reg,
-> >         .set_user =3D set_id_aa64dfr0_el1,
-> >         .reset =3D read_sanitised_id_aa64dfr0_el1,
-> > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
-> > +       .val =3D GENMASK(63, 0), },
-> >       ID_SANITISED(ID_AA64DFR1_EL1),
-> >       ID_UNALLOCATED(5,2),
-> >       ID_UNALLOCATED(5,3),
->
-> How does userspace find out whether a given id reg is actually writable,
-> other than trying to write to it?
->
-No mechanism was provided to userspace to discover if a given idreg or
-any fields of a given idreg is writable. The write to a readonly idreg
-can also succeed (write ignored) without any error if what's written
-is exactly the same as what the idreg holds or if it is a write to
-AArch32 idregs on an AArch64-only system.
-Not sure if it is worth adding an API to return the writable mask for
-idregs, since we want to enable the writable for all allocated
-unhidden idregs eventually.
+Note that this will likely conflict with the preemption disabling
+patch that is on its way to upstream. Otherwise:
 
-Thanks,
-Jing
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
