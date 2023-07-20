@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A621D75BB3A
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 01:33:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C021175BB3D
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 01:33:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjGTXdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 19:33:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42004 "EHLO
+        id S230020AbjGTXd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 19:33:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229867AbjGTXdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229635AbjGTXdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 20 Jul 2023 19:33:16 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AC3272C;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8A19270D;
         Thu, 20 Jul 2023 16:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1689895995; x=1721431995;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MK2XOabpp0+ITG3nb9egYU4kf4/X+3sgx4FRHS80pAI=;
-  b=OiFhvEJNwbaew7mF1TwykVV3bfDHXVA337OETK+MZnBJWhVgOhPbQTCh
-   ntVYTvV8svkDbjXFInNSJJ+ok8UguVMLoO6j5MtCYwazv0hNE1VzWV7Kq
-   rqfLLNWsFjH0N4e9bnSYw7e927Jx19XpdDPbjtp0ugtA4uSzP1ZekMYY7
-   VnOqrxXic1qQNosqQmKFOUKs2xr9s8o5zAQBE7xg14P6CAWGJlJqb3jNZ
-   +eBROtDV+Ga+EoHAd9icwmxfJVQ6i6FDuXPV4vVU4XzFrgCBep5mUpcjC
-   9diYETxg5DU1hK9BZboGxDgDpgjtyGoisjlPPdummapMXMSqMdGrKFXft
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="364355943"
+  bh=2Iou5yV+PtzR5uy8SPV1ytBA3jrafg+2C5na99bH7EU=;
+  b=YnnuP6N0eq3VkuGvDrRPxeY8WZo+ypk9/elMCCuVp8lwinf6Xgprq//r
+   pq9+q8IF+nhwyELwgeDeWkQnc/jBeaqsZCRNi9UnFXjymLSUusfp6pFR4
+   3VGBqI7MIj2p366Nxmjh0GVSDuYubm1HjqK02w/hluydIop+6KmRjpjJW
+   s8n7WrUP11foQw0lGd2aVRUl44VLTAwlUBaHQ9Zchvyj9quuCBKX50gjo
+   75Q5bIlZrgHZ+d34l75ZdQLvNOwi0hID4Oca9fZz6nYiBaEkYLD+EnFaq
+   hMscO5goZYfTd3UlvUzzSTW7eHenbd1eJuI73vLSBNWlEmp9+sXbZ5spb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="364355952"
 X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="364355943"
+   d="scan'208";a="364355952"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
   by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 16:33:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="727891796"
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="727891799"
 X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="727891796"
+   d="scan'208";a="727891799"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 16:33:12 -0700
 From:   isaku.yamahata@intel.com
@@ -52,12 +52,10 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Ackerley Tng <ackerleytng@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Ashish Kalra <ashish.kalra@amd.com>
-Subject: [RFC PATCH v4 06/10] KVM: x86: Export the kvm_zap_gfn_range() for the SNP use
-Date:   Thu, 20 Jul 2023 16:32:52 -0700
-Message-Id: <54a48823a690d2f44bcadd36abc3274e5368903f.1689893403.git.isaku.yamahata@intel.com>
+        Yuan Yao <yuan.yao@linux.intel.com>
+Subject: [RFC PATCH v4 07/10] KVM: x86: Add gmem hook for initializing private memory
+Date:   Thu, 20 Jul 2023 16:32:53 -0700
+Message-Id: <21e488b6ced77c08d9e6718fcf57e100af409c64.1689893403.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1689893403.git.isaku.yamahata@intel.com>
 References: <cover.1689893403.git.isaku.yamahata@intel.com>
@@ -73,71 +71,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: Michael Roth <michael.roth@amd.com>
 
-While resolving the RMP page fault, there may be cases where the page
-level between the RMP entry and TDP does not match and the 2M RMP entry
-must be split into 4K RMP entries. Or a 2M TDP page need to be broken
-into multiple of 4K pages.
+All gmem pages are expected to be 'private' as defined by a particular
+arch/platform. Platforms like SEV-SNP require additional operations to
+move these pages into a private state, so implement a hook that can be
+used to prepare this memory prior to mapping it into a guest.
 
-To keep the RMP and TDP page level in sync, zap the gfn range after
-splitting the pages in the RMP entry. The zap should force the TDP to
-gets rebuilt with the new page level.
+In the case of SEV-SNP, whether or not a 2MB page can be mapped via a
+2MB mapping in the guest's nested page table depends on whether or not
+any subpages within the range have already been initialized as private
+in the RMP table, so this hook will also be used by the KVM MMU to clamp
+the maximum mapping size accordingly.
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
-Link: https://lore.kernel.org/r/20230612042559.375660-39-michael.roth@amd.com
+Link: https://lore.kernel.org/r/20230612042559.375660-2-michael.roth@amd.com
 
 ---
-Changes v3 -> v4:
-- removed redandunt blank line
-
 Changes v2 -> v3:
 - Newly added
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/mmu.h              | 2 --
- arch/x86/kvm/mmu/mmu.c          | 1 +
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  3 +++
+ arch/x86/kvm/mmu/mmu.c             | 12 ++++++++++--
+ 3 files changed, 14 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index c0143906fe6d..a4cb248519cf 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -134,6 +134,7 @@ KVM_X86_OP(msr_filter_changed)
+ KVM_X86_OP(complete_emulated_msr)
+ KVM_X86_OP(vcpu_deliver_sipi_vector)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
++KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
+ 
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_OPTIONAL
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ab7d080bf544..e4f2938bb1fc 100644
+index e4f2938bb1fc..de7f0dffa135 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1842,6 +1842,7 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- void kvm_mmu_zap_all(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
-+void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+@@ -1735,6 +1735,9 @@ struct kvm_x86_ops {
+ 	 * Returns vCPU specific APICv inhibit reasons
+ 	 */
+ 	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
++
++	int (*gmem_prepare)(struct kvm *kvm, struct kvm_memory_slot *slot,
++			    kvm_pfn_t pfn, gfn_t gfn, u8 *max_level);
+ };
  
- int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
- 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 92d5a1924fc1..963c734642f6 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -235,8 +235,6 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 	return -(u32)fault & errcode;
- }
- 
--void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
--
- int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
- 
- int kvm_mmu_post_init_vm(struct kvm *kvm);
+ struct kvm_x86_nested_ops {
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d2ebe26fb822..a73ddb43a2cf 100644
+index a73ddb43a2cf..35bb14363828 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6759,6 +6759,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+@@ -4352,6 +4352,7 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ 				   struct kvm_page_fault *fault)
+ {
+ 	int max_order, r;
++	u8 max_level;
  
- 	return need_tlb_flush;
+ 	if (!kvm_slot_can_be_private(fault->slot))
+ 		return kvm_do_memory_fault_exit(vcpu, fault);
+@@ -4361,8 +4362,15 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ 	if (r)
+ 		return r;
+ 
+-	fault->max_level = min(kvm_max_level_for_order(max_order),
+-			       fault->max_level);
++	max_level = kvm_max_level_for_order(max_order);
++	r = static_call(kvm_x86_gmem_prepare)(vcpu->kvm, fault->slot, fault->pfn,
++					      fault->gfn, &max_level);
++	if (r) {
++		kvm_release_pfn_clean(fault->pfn);
++		return r;
++	}
++
++	fault->max_level = min(max_level, fault->max_level);
+ 	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+ 	return RET_PF_CONTINUE;
  }
-+EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
- 
- static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
- 					   const struct kvm_memory_slot *slot)
 -- 
 2.25.1
 
