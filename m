@@ -2,269 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8978275B985
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 23:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5405375B9C1
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 23:48:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbjGTV2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 17:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
+        id S230291AbjGTVsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 17:48:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbjGTV2O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 17:28:14 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1599D271D;
-        Thu, 20 Jul 2023 14:28:09 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-66872d4a141so892229b3a.1;
-        Thu, 20 Jul 2023 14:28:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689888489; x=1690493289;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Hy/9zTVZrlg7bbFpxkjr0lhxcNTNGSKdXmN/n9YFLY=;
-        b=nXxLfgmBt92XEDE8OP3OcE0nisAlc/Gi9Zse4iq73APm5A373sb6ySF1KTfOUa+QuX
-         ia3Xy59KQUF7gIB0hPoPjhSopV94TeiwDt/LztWRB6Qyz1jHNY1OozvVaE5RMQ9UdGw5
-         PMMWNQSNpVIxaxHNS4LWKSkQHzq5Z3SDiNLSXhdgHAc7DXvTGgH+4VKo2M8xFGbIHCXh
-         337Ve685ARtbWN8k2WWVvoDis4FS9zWIZ1LrAJA1fxWvbDhCuW9Dnu/E9PeGYaOXlPVE
-         kd4H7n4i3GLSfis0TrFmdjayzB65DGsbK8pheZGzu8z8qpliVRrp9gRaSAXgpDekRLO2
-         A4Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689888489; x=1690493289;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9Hy/9zTVZrlg7bbFpxkjr0lhxcNTNGSKdXmN/n9YFLY=;
-        b=Vv5d/iuJtL0/JPAiXPEaIoONslJdTQCxvegD6HWhtsgll2z8xBF+WGEcqpDh3gEzTZ
-         AKEm91N6GG4l91AqGlj6h3+dYnFehMz0FqPZ1nk/iQxqzEyHdWrPo+ikCm90IYh0lbjN
-         gNx3fqeYVqaFiSOHqqNGyI9v6OgkaOHC56uEkCySOD1gdESXAmuwgTsAOpnfq1IkkGUd
-         RQvUbdR1qSBRQs3BCXOjy+ZgEXG8MmBFOK7J/dYFEaH8rPZe+q16tR9+M6X0Hgi9RbEg
-         4924yAtaIVEYyGJoCJcngmaKKgxecgSpgZ5YygBrPlSPQ6icj5ll8kkXWgWF0EzMP3H5
-         AO7A==
-X-Gm-Message-State: ABy/qLagie0wXsFGlrs+hsxFv8ZUM3ZloOFgRfKJgT/DYY0uNqKi3pJ9
-        7xLWNgf0Ojua9Lqb2i7A0mM=
-X-Google-Smtp-Source: APBJJlG/e53j4EpED5Jwtfn4LkeoExV6FWkBmpJOuNFRNxz/SI2h0UOe64NVRwIQoof3O2DGaGflqQ==
-X-Received: by 2002:a05:6a20:2583:b0:135:10fd:31b0 with SMTP id k3-20020a056a20258300b0013510fd31b0mr109795pzd.15.1689888488716;
-        Thu, 20 Jul 2023 14:28:08 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id n2-20020a62e502000000b006826df9e286sm1637942pff.143.2023.07.20.14.28.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 14:28:08 -0700 (PDT)
-Date:   Thu, 20 Jul 2023 14:28:06 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl()
- for guest-specific backing memory
-Message-ID: <20230720212806.GG25699@ls.amr.corp.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-13-seanjc@google.com>
+        with ESMTP id S229452AbjGTVsb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 17:48:31 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A241719;
+        Thu, 20 Jul 2023 14:48:28 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 67FFD120002;
+        Fri, 21 Jul 2023 00:48:27 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 67FFD120002
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1689889707;
+        bh=qisti3W3wpP9r1a7nirVa2nlar29oaY+UwKdINX+jB0=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=LhLrR1UKNGDal3fJTPJ2qswlPqFBaTxttrR2QXYdQzajT1SGeToJCXESR1mL/7dpX
+         nFhdFUMQOUHpv8uO69+xz0gbtc0qE+Cf768mIFL3AW94+Cecux7lqSgXAq0Qoq5xao
+         stBOK61h+w+0GgIe6klgJ/bYuSyyrLmiW6bj0TJZpZTINxL54xdVv9BKnj8MXEkKAb
+         sBoG9NnZn5woceNrt43JiJBZNBmJVNjhwOqBzvU1GkwbFQ+PBbbodv2HGJW0pAAud2
+         z0CZ7TR+K+TIT/uqfmbDqPsK+a93JCuJWFhR+bpgYP/6bvjGyZNZceNLdFq4jFWv/o
+         V+etP7DpWAS1Q==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Fri, 21 Jul 2023 00:48:27 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 21 Jul 2023 00:48:26 +0300
+From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
+        <avkrasnov@sberdevices.ru>,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Subject: [PATCH net-next v3 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
+Date:   Fri, 21 Jul 2023 00:42:41 +0300
+Message-ID: <20230720214245.457298-1-AVKrasnov@sberdevices.ru>
+X-Mailer: git-send-email 2.35.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178763 [Jul 20 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, sberdevices.ru:5.0.1,7.1.1;lore.kernel.org:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/07/20 19:55:00
+X-KSMG-LinksScanning: Clean, bases: 2023/07/20 20:04:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/20 17:17:00 #21648761
+X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 04:44:55PM -0700,
-Sean Christopherson <seanjc@google.com> wrote:
+Hello,
 
-> +static int kvm_gmem_release(struct inode *inode, struct file *file)
-> +{
-> +	struct kvm_gmem *gmem = file->private_data;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm *kvm = gmem->kvm;
-> +	unsigned long index;
-> +
-> +	filemap_invalidate_lock(inode->i_mapping);
-> +
-> +	/*
-> +	 * Prevent concurrent attempts to *unbind* a memslot.  This is the last
-> +	 * reference to the file and thus no new bindings can be created, but
-> +	 * dereferencing the slot for existing bindings needs to be protected
-> +	 * against memslot updates, specifically so that unbind doesn't race
-> +	 * and free the memslot (kvm_gmem_get_file() will return NULL).
-> +	 */
-> +	mutex_lock(&kvm->slots_lock);
-> +
-> +	xa_for_each(&gmem->bindings, index, slot)
-> +		rcu_assign_pointer(slot->gmem.file, NULL);
-> +
-> +	synchronize_rcu();
-> +
-> +	/*
-> +	 * All in-flight operations are gone and new bindings can be created.
-> +	 * Zap all SPTEs pointed at by this file.  Do not free the backing
-> +	 * memory, as its lifetime is associated with the inode, not the file.
-> +	 */
-> +	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
-> +	kvm_gmem_invalidate_end(gmem, 0, -1ul);
-> +
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	list_del(&gmem->entry);
-> +
-> +	filemap_invalidate_unlock(inode->i_mapping);
-> +
-> +	xa_destroy(&gmem->bindings);
-> +	kfree(gmem);
-> +
-> +	kvm_put_kvm(kvm);
-> +
-> +	return 0;
-> +}
+this patchset is first of three parts of another big patchset for
+MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-The lockdep complains with the filemapping lock and the kvm slot lock.
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
 
+1) virtio and vhost updates (for fragged skbs) <--- this patchset
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/.
+3) Updates for tests and utils.
 
-From bc45eb084a761f93a87ba1f6d3a9949c17adeb31 Mon Sep 17 00:00:00 2001
-Message-Id: <bc45eb084a761f93a87ba1f6d3a9949c17adeb31.1689888438.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Thu, 20 Jul 2023 14:16:21 -0700
-Subject: [PATCH] KVM/gmem: Fix locking ordering in kvm_gmem_release()
+This series enables handling of fragged skbs in virtio and vhost parts.
+Newly logic won't be triggered, because SO_ZEROCOPY options is still
+impossible to enable at this moment (next bunch of patches from big
+set above will enable it).
 
-The lockdep complains the locking order.  Fix kvm_gmem_release()
+I've included changelog to some patches anyway, because there were some
+comments during review of last big patchset from the link above.
 
-VM destruction:
-- fput()
-   ...
-   \-kvm_gmem_release()
-     \-filemap_invalidate_lock(inode->i_mapping);
-       lock(&kvm->slots_lock);
+Head for this patchset is 60cc1f7d0605598b47ee3c0c2b4b6fbd4da50a06
 
-slot creation:
-kvm_set_memory_region()
-   mutex_lock(&kvm->slots_lock);
-   __kvm_set_memory_region(kvm, mem);
-    \-kvm_gmem_bind()
-      \-filemap_invalidate_lock(inode->i_mapping);
+Link to v1:
+https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+Link to v2:
+https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
 
-======================================================
-WARNING: possible circular locking dependency detected
-------------------------------------------------------
-...
+Changelog:
+ * See per-patch changelog after ---.
 
-the existing dependency chain (in reverse order) is:
+Arseniy Krasnov (4):
+  vsock/virtio/vhost: read data from non-linear skb
+  vsock/virtio: support to send non-linear skb
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
 
--> #1 (mapping.invalidate_lock#4){+.+.}-{4:4}:
-       ...
-       down_write+0x40/0xe0
-       kvm_gmem_bind+0xd9/0x1b0 [kvm]
-       __kvm_set_memory_region.part.0+0x4fc/0x620 [kvm]
-       __kvm_set_memory_region+0x6b/0x90 [kvm]
-       kvm_vm_ioctl+0x350/0xa00 [kvm]
-       __x64_sys_ioctl+0x95/0xd0
-       do_syscall_64+0x39/0x90
-       entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+ drivers/vhost/vsock.c                   |  14 +-
+ include/linux/virtio_vsock.h            |   1 +
+ include/net/af_vsock.h                  |   3 +
+ net/vmw_vsock/virtio_transport.c        |  80 +++++-
+ net/vmw_vsock/virtio_transport_common.c | 307 +++++++++++++++++++-----
+ 5 files changed, 328 insertions(+), 77 deletions(-)
 
--> #0 (&kvm->slots_lock){+.+.}-{4:4}:
-       ...
-       mutex_lock_nested+0x1b/0x30
-       kvm_gmem_release+0x56/0x1b0 [kvm]
-       __fput+0x115/0x2e0
-       ____fput+0xe/0x20
-       task_work_run+0x5e/0xb0
-       do_exit+0x2dd/0x5b0
-       do_group_exit+0x3b/0xb0
-       __x64_sys_exit_group+0x18/0x20
-       do_syscall_64+0x39/0x90
-       entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(mapping.invalidate_lock#4);
-                               lock(&kvm->slots_lock);
-                               lock(mapping.invalidate_lock#4);
-  lock(&kvm->slots_lock);
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/guest_mem.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index ab91e972e699..772e4631fcd9 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -274,8 +274,6 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	struct kvm *kvm = gmem->kvm;
- 	unsigned long index;
- 
--	filemap_invalidate_lock(inode->i_mapping);
--
- 	/*
- 	 * Prevent concurrent attempts to *unbind* a memslot.  This is the last
- 	 * reference to the file and thus no new bindings can be created, but
-@@ -285,6 +283,8 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	 */
- 	mutex_lock(&kvm->slots_lock);
- 
-+	filemap_invalidate_lock(inode->i_mapping);
-+
- 	xa_for_each(&gmem->bindings, index, slot)
- 		rcu_assign_pointer(slot->gmem.file, NULL);
- 
-@@ -299,12 +299,12 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	kvm_gmem_issue_arch_invalidate(gmem->kvm, file_inode(file), 0, -1ul);
- 	kvm_gmem_invalidate_end(gmem, 0, -1ul);
- 
--	mutex_unlock(&kvm->slots_lock);
--
- 	list_del(&gmem->entry);
- 
- 	filemap_invalidate_unlock(inode->i_mapping);
- 
-+	mutex_unlock(&kvm->slots_lock);
-+
- 	xa_destroy(&gmem->bindings);
- 	kfree(gmem);
- 
 -- 
 2.25.1
 
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
