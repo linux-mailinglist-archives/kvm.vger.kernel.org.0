@@ -2,55 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C006675A433
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 04:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27F0E75A461
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 04:30:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbjGTCAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 22:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53010 "EHLO
+        id S229687AbjGTCaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 22:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjGTCAU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 22:00:20 -0400
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3344C1FF1;
-        Wed, 19 Jul 2023 19:00:19 -0700 (PDT)
-Received: from [IPv6:::1] ([172.56.209.9])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 36K1xg0x448479
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Wed, 19 Jul 2023 18:59:44 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 36K1xg0x448479
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023071101; t=1689818385;
-        bh=eoupgmKtGigZ7T3TSXZvW3ALhw75g3a7HIBawcERwX4=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=JUx2UyLBmtezmWvzz+3zrGX9MPla5oUd+IZiRmPySpDV38uD6RRfgKJsXUn0DRw9U
-         O0sLldd/Wif4pF4HfGAqcm/g2tpm+mTaIB++PZwT6ikVhhZhQEj3cqpAtREHfvbeV0
-         AA00Qd70XXb/2kalPBFzVISpREFmDbGfdEboXjcyGap/BzoGFAU+Refe7btS+MxNsA
-         NKHBROwQ1+xbg5lwXMImdwjoeDeLRgsu05aioclrKRaswugjdMXA8vnRd7qm0vJ63S
-         /xdElnjnHfSMVF+Bd/rWPUImkoUjvFpHCz4hfJxRQ2wd4fVAla+m7So5iJU6qy0eSn
-         43bj+1i/bf2RQ==
-Date:   Wed, 19 Jul 2023 18:59:33 -0700
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, kvm@vger.kernel.org
-CC:     x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/8] LASS KVM virtualization support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20230718131844.5706-1-guang.zeng@intel.com>
-References: <20230718131844.5706-1-guang.zeng@intel.com>
-Message-ID: <6E16A5AF-1970-45FF-8961-85232E920C99@zytor.com>
+        with ESMTP id S229452AbjGTCaD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 22:30:03 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB19E19BC;
+        Wed, 19 Jul 2023 19:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689820203; x=1721356203;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=DU8vs4iLAu1Fb1uQbsgi9y4BR4VcF8dQHc7fzNVp67o=;
+  b=MzoxZ3SFwl+226v1QAXVcVPtO5X6CjSgFCNfebSBv1wnr+CD/R2rOwIC
+   9hSqUWHwfOkTxMIOiYTod4rqygLD9usN130dSJzpwCcYWUrh2TYuVMbzo
+   lX+hzu/33ICDg3+jBEDodG/QLl6xGfbJdDFAo4v8+CiEXnQPqcrv8fGWk
+   3Ko5VzcKSSSmtlrZEyBX2svdDP/iiiKdpA0fdvQFCjVlijSKzsurU3rot
+   uE7UUaIKWzZ0MjvgPGmciRfW3lOIpzob5JIZT1Kjr1gAnkzQ54geW7nRy
+   AAN1KlJD0iIhFxfDwKW+XBgeCSx7LJE0WrgBZ7t/D6KpOYIjwpefVCfPO
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="397487732"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="397487732"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 19:30:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="759390950"
+X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
+   d="scan'208";a="759390950"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga001.jf.intel.com with ESMTP; 19 Jul 2023 19:30:01 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 19 Jul 2023 19:30:00 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 19 Jul 2023 19:30:00 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 19 Jul 2023 19:30:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z4iCgBHFrRMctWLOKY631F5g7LLohvAWXJBCWg9ELbqU7n8lfoDbQRIpUzLqe69kIzUPSas+CSNlWYkmPD+zDUdeG8Y9noMVQry77rndtNDdmtyFVRq6sVqX82bKm21XhFnUn4qc+S7DuekkU1biAEFqQln0U4mk7XRpTfofF6rpAhKJbBHtxNdAErCePCypSv/CYjNARmJaA6XyqU9w9hnGCCVisyqnzhn7ZVEy7UqdrGJJr/XO8Fs3dO91eZYE5kbN8Z6NfURjLQBZT7uWyvdLJVxS/mM7SR3G4SO+j/QOc8F2U/cTZ58c0fjF2k0bi/QAU8qruoS8+Ve9/fTNag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BmQTGJTsP9iugCJBxQ0Hg7QZ3IiO5jkEaSiumdckb+8=;
+ b=b1/BAr0oITIDnsJdqT3BjRMe7K36G0Zjzidz8F/nGO84WChQsYsKgkEVErqv6LLEXKowIKDH04TdZ9ecj9IUfZLlOYSWqKLw+hj3FOGcmNPdcQ8CD+9KynqCrGtYRcQbc4DWg9Y1PR2/kdzHVzRwgTYcJB5JoF/OXuycAz8VvClzSuLCLf51U++ahWl+CzfzAgygKdU42f1IWp+TDTpFptTiobwJ/n7diKOBx3KWr5I93G1oVWNvn/WCtDvxUhBA8P7wn+PdQqbTcyVQCCk3J3gNQK+5UtGWOpt3NDgInPO42zD2r+5g0344C1E2fSgEC/p88W+zsJKZIi0RgGuALQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ DS0PR11MB7804.namprd11.prod.outlook.com (2603:10b6:8:f3::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6609.24; Thu, 20 Jul 2023 02:29:58 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::1b1a:af8e:7514:6f63]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::1b1a:af8e:7514:6f63%2]) with mapi id 15.20.6609.024; Thu, 20 Jul 2023
+ 02:29:57 +0000
+Date:   Thu, 20 Jul 2023 10:03:15 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pbonzini@redhat.com>, <stevensd@chromium.org>
+Subject: Re: [PATCH] KVM: allow mapping of compound tail pages for IO or
+ PFNMAP mapping
+Message-ID: <ZLiV4y5uFJz4GxUr@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20230719083332.4584-1-yan.y.zhao@intel.com>
+ <ZLgEbalDPD38qHmm@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZLgEbalDPD38qHmm@google.com>
+X-ClientProxiedBy: SI2P153CA0034.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::17) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS0PR11MB7804:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1873af08-9839-4d53-35bc-08db88c935ac
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sdfn4mxt4qZFsa04sv/rubj7JO0bn3Wyx8v2sOHBlUgqfPPG2YbaOFbYpfcVGMc+eutcNUzHJoc62nuz/xzGjGMb947K/9L+4fxmsp/jWhNbfHtEiM2y3GJYSwag9IQdJqRIXIEORyvkceoNUZjVxm3hijcqptzIbGnFhQfwy8Xkrd9YHsZ8ZU3Fxxml91aUS37e9wNnFq8rkYZOid9K9NZTLIBLKaOvyNzOcKKl5EKLsHd1AENU3UT8sxRphOEFEiIyDWr/tMbif1NYXefKOJJi8gXga0ZNsTSUSEyKSDIlaGe/4ujUjX83+3BnCmbaBO8h34hRqght+kNZa3PIFUqPSDnky6MdEXSe70+5O7HD3HAP36TpeAa/lsYIjnh4t0VhVzsearESgZY2yZuV+WDlrZBxg8iQZFlQ1bMZkoZKD87qcuYrD/QZ1b013pliw6rtYKxDA9cca7K+V9nPFQ3tmNBuvw7mxo2ZoVv/1sh8WNYzUgfER72nIMO/USt+AKcwnI2ZZoBEI59/r9iEAaYEqEE74QG3eQ4ljqHTXrpU2mtojbs/10VSVsUcTcZt
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(346002)(136003)(396003)(376002)(366004)(451199021)(86362001)(478600001)(83380400001)(3450700001)(186003)(38100700002)(41300700001)(26005)(6916009)(316002)(8936002)(4326008)(8676002)(2906002)(6512007)(66556008)(66946007)(66476007)(6486002)(6666004)(6506007)(82960400001)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ssjMsR50F51Z/6XSq7932vZ4pBcx63R4vUbgoMyL5cG5aKJTctJ6Z//+TuZF?=
+ =?us-ascii?Q?WklCL64LmObjvP+UvA6zHCC5watLHQ3tiaGUXoqubH2x8xJiqaHPOGgaAHv4?=
+ =?us-ascii?Q?y85SPQZJ0mRB5HA6/mUN7qxgWa230qyO9pUkkXcsFnOuJ4UB2mCSlURd5uXQ?=
+ =?us-ascii?Q?ugrdOE3+fBIfAYoQKmYhrzkr7ScIEnawJPkM1Z83K4dzGLokxdrprUmQB0D6?=
+ =?us-ascii?Q?brFXFDaRqQCZVQNvt2u6fsJUi/1pjJ4LRR+6tiszlvfpwC/77escTxNKYaxK?=
+ =?us-ascii?Q?IN+rjeFYyxCLeC7gmOmoPyJR0ShmqDVnKq3M+wEBvTbCDdHhl54XbkVCStuG?=
+ =?us-ascii?Q?jc3xsP3xOPWRWYFAyf0qVIT1PwSqCj424OsSsP0aXfhe4xOh2WSbl4bWghUg?=
+ =?us-ascii?Q?DI1bYVHgFOOKQkPPBxVGjfW+JozmLWiOxwut74jSjzRjI9z8Cn4pTE5p+8TA?=
+ =?us-ascii?Q?SllXi8RgvTidDZpR7dHEl05mAVHk/ZuXgJ7mP2SVTQtyXtQ93bgNvkwN88EG?=
+ =?us-ascii?Q?zgIeR0SV8b5NGuEGVAfVgOX2nCR5svMSY5M+qGEV+bwR5Jx928PnngzBWgWY?=
+ =?us-ascii?Q?fe3BOYmx8cV3v/ouSzyGSWHeDwigX5FC33gxq/Uauh2VUrHcz/vVlQzoCOxY?=
+ =?us-ascii?Q?jh/PSPCEBTnmP+vUYzO9vNecFQPyJCGW3D9rRcHfXJIZB9lfy3IDHrMxqqQV?=
+ =?us-ascii?Q?mp9wPBMcpW/Azrz8w8sTxaxtxwIuXY5Ck01q5sQT+kO1DamjzM5xxMcZar/K?=
+ =?us-ascii?Q?hDjuaDLGmi/Ufd8kMorXdCLg2MTROArNbpZJCL3tfzPlYM7tUWulFv9qFRk4?=
+ =?us-ascii?Q?l4Zg10VSNnuqiohyhmfnRUL45iAGjmoMSQ1Sb7CPLZ8Gx15unVaSkwQpWX+7?=
+ =?us-ascii?Q?ssdvFoX2yJTjnN6ffMc8Q+04BknLbm1BW4KC5inqVxkOuqgoLBNAzrF4QpO2?=
+ =?us-ascii?Q?MSDvKgGZT21sXTpx5ahXPcLwa30UFTxlA3/AmRAZiuuwXpaDOdFpAoMwwR9e?=
+ =?us-ascii?Q?hWiRdUBft0bxmEkEvRlzpN0C49FDpePb+ZBIq7oKQU99hjEnomQe7mZKBYPn?=
+ =?us-ascii?Q?2H43+CQegJ2Zrc8ml3yCDM8fp25BVK2VaezPC8C6I783uFZIMqU+scT0oRzM?=
+ =?us-ascii?Q?A7JIVJ2uByuM5t8kayIoAo+0eW5HJaKStu+rL8yS62YAf1SChfgdqAVs6cam?=
+ =?us-ascii?Q?MxrcpTRPeX/lCz+bXu/y0orP8oAEWJFkvi2llZSAyZv/Ev2iPUz21492VY2E?=
+ =?us-ascii?Q?1VRzLqPSeW4SBrRTZIxCngrzdOKQpSc/yAc3XfnwY3sAhcWCiJz59j3l5ux4?=
+ =?us-ascii?Q?wHocA3qfEVE/xQbvFxhqHvadZA+Drofsnm7evcoTVDwhl8xSO9PCdJgjVVUF?=
+ =?us-ascii?Q?xgRzIHoTt4l7SSYjuzHu3WY+gCfhZH/bGbELW9rFzBjPoMQXwNl1c0M+Zp3I?=
+ =?us-ascii?Q?k86Tb8qyM2Be+A39sSbyNRD1cwwEfAihzOhiywQk94zH9UKORE/JYyfHWCGo?=
+ =?us-ascii?Q?7nOaBGBcGZLsFs5aB7xUo7vJBiM9tWex3X971SaeNnPGAmgOrs4Cx31/hV+H?=
+ =?us-ascii?Q?2VtYMqpL+0R1f/GZayWk/QjkYVrmjETlVEGSljAU?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1873af08-9839-4d53-35bc-08db88c935ac
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 02:29:57.6149
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pfPCNzQajbezMexpwnhj8wEaD0vLseiHt1052ZHViiIGU+OFfBNG+580X3U3LUP6G5SmZEBJmgP8UwF1tkZ3nA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7804
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,111 +147,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On July 18, 2023 6:18:36 AM PDT, Zeng Guang <guang=2Ezeng@intel=2Ecom> wrot=
-e:
->Linear Address Space Separation (LASS)[1] is a new mechanism that
->enforces the same mode-based protections as paging, i=2Ee=2E SMAP/SMEP
->but without traversing the paging structures=2E Because the protections
->enforced by LASS are applied before paging, "probes" by malicious
->software will provide no paging-based timing information=2E
->
->Based on a linear-address organization, LASS partitions 64-bit linear
->address space into two halves, user-mode address (LA[bit 63]=3D0) and
->supervisor-mode address (LA[bit 63]=3D1)=2E
->
->LASS aims to prevent any attempt to probe supervisor-mode addresses by
->user mode, and likewise stop any attempt to access (if SMAP enabled) or
->execute user-mode addresses from supervisor mode=2E
->
->When platform has LASS capability, KVM requires to expose this feature
->to guest VM enumerated by CPUID=2E(EAX=3D07H=2EECX=3D1):EAX=2ELASS[bit 6]=
-, and
->allow guest to enable it via CR4=2ELASS[bit 27] on demand=2E For instruct=
-ion
->executed in the guest directly, hardware will perform the check=2E But KV=
-M
->also needs to behave same as hardware to apply LASS to kinds of guest
->memory accesses when emulating instructions by software=2E
->
->KVM will take following LASS violations check on emulation path=2E
->User-mode access to supervisor space address:
->        LA[bit 63] && (CPL =3D=3D 3)
->Supervisor-mode access to user space address:
->        Instruction fetch: !LA[bit 63] && (CPL < 3)
->        Data access: !LA[bit 63] && (CR4=2ESMAP=3D=3D1) && ((RFLAGS=2EAC =
-=3D=3D 0 &&
->                     CPL < 3) || Implicit supervisor access)
->
->This patch series provide a LASS KVM solution and depends on kernel
->enabling that can be found at
->https://lore=2Ekernel=2Eorg/all/20230609183632=2E48706-1-alexander=2Eshis=
-hkin@linux=2Eintel=2Ecom/
->
->We tested the basic function of LASS virtualization including LASS
->enumeration and enabling in non-root and nested environment=2E As KVM
->unittest framework is not compatible to LASS rule, we use kernel module
->and application test to emulate LASS violation instead=2E With KVM forced
->emulation mechanism, we also verified the LASS functionality on some
->emulation path with instruction fetch and data access to have same
->behavior as hardware=2E
->
->How to extend kselftest to support LASS is under investigation and
->experiment=2E
->
->[1] Intel ISE https://cdrdv2=2Eintel=2Ecom/v1/dl/getContent/671368
->Chapter Linear Address Space Separation (LASS)
->
->------------------------------------------------------------------------
->
->v1->v2
->1=2E refactor and optimize the interface of instruction emulation=20
->   by introducing new set of operation type definition prefixed with
->   "X86EMUL_F_" to distinguish access=2E
->2=2E reorganize the patch to make each area of KVM better isolated=2E
->3=2E refine LASS violation check design with consideration of wraparound
->   access across address space boundary=2E
->
->v0->v1
->1=2E Adapt to new __linearize() API
->2=2E Function refactor of vmx_check_lass()
->3=2E Refine commit message to be more precise
->4=2E Drop LASS kvm cap detection depending
->   on hardware capability
->
->Binbin Wu (4):
->  KVM: x86: Consolidate flags for __linearize()
->  KVM: x86: Use a new flag for branch instructions
->  KVM: x86: Add an emulation flag for implicit system access
->  KVM: x86: Add X86EMUL_F_INVTLB and pass it in em_invlpg()
->
->Zeng Guang (4):
->  KVM: emulator: Add emulation of LASS violation checks on linear
->    address
->  KVM: VMX: Implement and apply vmx_is_lass_violation() for LASS
->    protection
->  KVM: x86: Virtualize CR4=2ELASS
->  KVM: x86: Advertise LASS CPUID to user space
->
-> arch/x86/include/asm/kvm-x86-ops=2Eh |  3 ++-
-> arch/x86/include/asm/kvm_host=2Eh    |  5 +++-
-> arch/x86/kvm/cpuid=2Ec               |  5 ++--
-> arch/x86/kvm/emulate=2Ec             | 37 ++++++++++++++++++++---------
-> arch/x86/kvm/kvm_emulate=2Eh         |  9 +++++++
-> arch/x86/kvm/vmx/nested=2Ec          |  3 ++-
-> arch/x86/kvm/vmx/sgx=2Ec             |  4 ++++
-> arch/x86/kvm/vmx/vmx=2Ec             | 38 ++++++++++++++++++++++++++++++
-> arch/x86/kvm/vmx/vmx=2Eh             |  3 +++
-> arch/x86/kvm/x86=2Ec                 | 10 ++++++++
-> arch/x86/kvm/x86=2Eh                 |  2 ++
-> 11 files changed, 102 insertions(+), 17 deletions(-)
->
+On Wed, Jul 19, 2023 at 08:42:37AM -0700, Sean Christopherson wrote:
+> On Wed, Jul 19, 2023, Yan Zhao wrote:
+> > Allow mapping of tail pages of compound pages for IO or PFNMAP mapping
+> > by trying and getting ref count of its head page.
+> > 
+> > For IO or PFNMAP mapping, sometimes it's backed by compound pages.
+> > KVM will just return error on mapping of tail pages of the compound pages,
+> > as ref count of the tail pages are always 0.
+> > 
+> > So, rather than check and add ref count of a tail page, check and add ref
+> > count of its folio (head page) to allow mapping of the compound tail pages.
+> > 
+> > This will not break the origial intention to disallow mapping of tail pages
+> > of non-compound higher order allocations as the folio of a non-compound
+> > tail page is the same as the page itself.
+> > 
+> > On the other side, put_page() has already converted page to folio before
+> > putting page ref.
+> 
+> Is there an actual use case for this?  It's not necessarily a strict requirement,
+> but it would be helpful to know if KVM supports this for a specific use case, or
+> just because it can.
+Well, the actual use case is a kind of "yes and no".
+In VFIO we now have the concept of "variant drivers" which work with
+specific PCI IDs. The variant drivers can inject device specific
+knowledge into VFIO. I tested this patch by writing a variant driver to
+my e1000e NIC and composing a BAR whose backends are compound pages of 4M in
+length.
 
-Equating this with SMEP/SMAP is backwards=2E
+I guess there might be real use case when the backend pages are in
+ZONE_DEVICE but I haven't spent enough time to setup such kind of
+environment for verification.
 
-LASS is something completely different: it makes it so *user space accesse=
-s* cannot even walk the kernel page tables (specifically, the negative half=
- of the linear address space=2E)
+> Either way, this needs a selftest, KVM has had way too many bugs in this area.
+Sure, I'll try to provide a selftest.
+Thanks for bringing it out!
 
-Such an access with immediately #PF: it is similar to always having U=3D0 =
-in the uppermost level of the page tables, except with LASS enabled the CPU=
- will not even touch the page tables in memory=2E
