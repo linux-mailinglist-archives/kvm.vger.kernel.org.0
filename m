@@ -2,276 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C508C75B757
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 21:02:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A96775B799
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 21:11:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbjGTTCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 15:02:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51514 "EHLO
+        id S230215AbjGTTLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 15:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbjGTTCX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 15:02:23 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054481BF7;
-        Thu, 20 Jul 2023 12:02:14 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b8b318c5a7so8462445ad.3;
-        Thu, 20 Jul 2023 12:02:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689879734; x=1690484534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0MSKcIw1ixdNRcp/f0sV+4F1n8XKG7sdC3dJK2xndKs=;
-        b=HmFZ4aH4Wab+GqCN9TB1hsoxANs59ZGyg6e/EgDXSJq0eYSI/1VDWVlSgNIChLUfV8
-         T/IU56bnENLrhgdM87GnmjNFM0RpmjvZJl2xcorFy1mGsUnDs9zdzDKZrSPzHq2hoIH0
-         vFw+TuHLIpDpLy2T1GRQp+A/ZwejC2JNC9/kx8GgLOzFDvivXFRt8pK7pg/RJqO6epII
-         jU9EDNCAY3cGtv9Kz4M3mnp24C7KZYOlNZNUgyGjPKzywths6r+RNrsvvKuGeUeTpvFE
-         KzSBguxslln865ERYszYEUEyvYxe2xDbUJMXe4XuzyfRHn+tbMW1SUTP9WASXJn7b+Pn
-         qf5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689879734; x=1690484534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0MSKcIw1ixdNRcp/f0sV+4F1n8XKG7sdC3dJK2xndKs=;
-        b=kQXQNlxgIB6OGjSqiTLgzQ66SlvXOgSg9yeQPasHy1tRrZayJg1B67r2rTmhNCOAmJ
-         F7IDmDSz4gavhtL6MebFqP/M+sAWzmLKUSVy2g+DQhBzwMX+L4waW5WrgRwkcsGaRjN2
-         lmgppL5V1MGVzsIiBfnkaj3ci0xKdPZN7MiLjOmKwAgTMjRGsfviV7tIY4XEENMoS0Yh
-         hxTG6v7L00u+xESshFlRqDHAbMXFDBsHVuvpyVwEMYG/Nmxm6sGPl+bZMs4dflKQtKns
-         eNSmFFVH5HDZyZGd6536BENld/2tVAw+6QsZHqba17ZtIAZ8yv7E1uPtYa0O6X5+Jy0O
-         x1bQ==
-X-Gm-Message-State: ABy/qLY98PwLsoc/Y4ODRcX80gnRgU55VdT5rnQlFjk7AH/CUiWpJ3Dn
-        Bwiack4mYzgRdu+vI/tvP00=
-X-Google-Smtp-Source: APBJJlEk/mIAgGdv75eqlacWKafqLMEC8fcDRiP+uJ4q0KoW6Z/oWLHWzhtG4Xil0kxFMatYBl1SNg==
-X-Received: by 2002:a17:902:cec9:b0:1ba:fe63:6622 with SMTP id d9-20020a170902cec900b001bafe636622mr138625plg.32.1689879733690;
-        Thu, 20 Jul 2023 12:02:13 -0700 (PDT)
-Received: from localhost ([192.55.54.50])
-        by smtp.gmail.com with ESMTPSA id d15-20020a170903230f00b001b9de4fb749sm1778146plh.20.2023.07.20.12.02.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 12:02:12 -0700 (PDT)
-Date:   Thu, 20 Jul 2023 12:02:11 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
-Message-ID: <20230720190211.GF25699@ls.amr.corp.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-9-seanjc@google.com>
- <20230720080912.g56zi5hywazrhnam@yy-desk-7060>
+        with ESMTP id S230198AbjGTTLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 15:11:36 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2057.outbound.protection.outlook.com [40.107.223.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18159E;
+        Thu, 20 Jul 2023 12:11:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CKZ7LZO9LXE344xUzv2b7FmbfMnpwRGn65uolrxV3JuDc2gNiE/XFCBmjmlVLlGHpX0GjHVMgI3wwHJSz1mFwPeu+Wt0X4U+3fUqWp+g+lvSZ0lGTqcR9u2tKrKH/pJFOW73e9O1AxrM5+PKZNci+onkT2n6BYJAlU3Ut5qhcl74bm7k8kEuOoDPBMq/QiGnzXYJ/LisjPhObse5G7fUSF4yc0qdrhguQ0lDyL4vJdcPsW94AfcYMKimfNOQb1/UeEjcqMENnnhNWh58/+vANhMDLB2h3GRR6f3hyF8zahxLt/eIEzHRhEW1Pksbk08gFoSk3hC8vS/m+aSVWnNnwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HF08v0YjbDlgUIEEG9sIEHxgjF+Irmaa20Jud8VnW14=;
+ b=oJAuj5QO1/+x9sQSW8+z9nRxDpisJkbFCjc+EmIKtxTjE85iHNsFfqurT3TAGXUmjfy8UN8APg5OEyK7HSZEX5mA/b1kgh/057SRetN6RrOzcCVbuq26wPlzWzz4xOhZC4w2km4R0he2xr5mK0a/nc28u78nJYLqpkZNdOjSTzrRolI71TLN0YCRuVxt+EqqejKPr9enouRDY49XefTd0A+uM2wUOISQZJaCGFgUghsHxKymZ0N9gjvHBVDgV9uRKxgha1JQB0FmuRdgu9J3+bL4bEpF9ZHXg1VvSrG2xOCy40i4nxF8tEINkpL6s8ce0eThtr2Y5NXCXE48V3CHWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HF08v0YjbDlgUIEEG9sIEHxgjF+Irmaa20Jud8VnW14=;
+ b=LRGW3JqjXTFjPOFpjBEI5e535vteKisPXyNjG/1H6eaz4riGNzBWXXdaMt9fmd6LyFWNqFcuoe3FmXIhAns68FxkIaiPVK/UprkCKDWrklR6/84A21cudDUIrjKz22Y+qOJAWKBwOpS0INLm+Oiv5KAe+0Xgsj2kDO1JbFIFBds=
+Received: from BN0PR04CA0194.namprd04.prod.outlook.com (2603:10b6:408:e9::19)
+ by MN2PR12MB4304.namprd12.prod.outlook.com (2603:10b6:208:1d0::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.26; Thu, 20 Jul
+ 2023 19:11:32 +0000
+Received: from BN8NAM11FT087.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e9:cafe::c2) by BN0PR04CA0194.outlook.office365.com
+ (2603:10b6:408:e9::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28 via Frontend
+ Transport; Thu, 20 Jul 2023 19:11:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT087.mail.protection.outlook.com (10.13.177.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6609.28 via Frontend Transport; Thu, 20 Jul 2023 19:11:32 +0000
+Received: from [10.236.30.70] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 20 Jul
+ 2023 14:11:29 -0500
+Message-ID: <a11ba4c9-8f6f-c231-c480-e2f25b8132b8@amd.com>
+Date:   Thu, 20 Jul 2023 14:11:16 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230720080912.g56zi5hywazrhnam@yy-desk-7060>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-9-michael.roth@amd.com>
+ <696ea7fe-3294-f21b-3bc0-3f8cc0a718e9@intel.com>
+ <b8eeb557-0a6b-3aff-0f31-1c5e3e965a50@amd.com>
+ <396d0e29-defc-e207-2cbd-fe7137e798ad@intel.com>
+Content-Language: en-US
+From:   Kim Phillips <kim.phillips@amd.com>
+Subject: Re: [PATCH RFC v9 08/51] x86/speculation: Do not enable Automatic
+ IBRS if SEV SNP is enabled
+In-Reply-To: <396d0e29-defc-e207-2cbd-fe7137e798ad@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT087:EE_|MN2PR12MB4304:EE_
+X-MS-Office365-Filtering-Correlation-Id: bff98c7a-843f-4386-8ead-08db895520f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: p0wQy22Jpw+LxeV1rQEgtQSNHnzR7TfU41AT+LCg0ljqd45B5vf0EWrshMVWfLxzN8eeR/GnNrEIupyWQ1CndzklHM91SR6ViBX0tn9ou+Kk3ik5lpRiO9U6pIXRQXmoEpSyFQYFMRbIsUQhfySeAA9E1jLTdwc7L9Fs92cM7SJixYqx8pUkho52NnBlLLeqxxXYgOcopEY3ksjh8uKy8VX67dMxdT0dl17RsvBiDMFADisLCfQwuzXXKjDJBtICiKzDkrAEUrgO67K+x5ToAvsuRjPbRr1hrP1wUrZJ46xmsILmEbOqc9MOE91A0XAGhuxw7W5MNBMs7+XD14eL6H91T8oXHqnDV0x2ytM4+4UX4kJbXN18KBUJrgZjAHma7SUOGhJO6UJwmUbbeTLRI4Sm1vhAms0TRE9vx5jph4DAmcTOBkz4yR9IxyzcTPrL5ULXBOaZPXGxoLCTP7oWdrBTwwYyxFh4n+GtrVXxhtHaV0iNKXZnvfjGJ/nix7oWX6sRrWifAngHnq/GwjoZBevf/aSj80dWPnT1kuEr/q+bdCgHI+UCz+cssAkiA+rFUgELWHlttCHzAGZ2HxlKij5Usl1HuzHuxk4SgjX1l/sL2BxcMER/sRTbuyY5tbI9NFRjVsF3KLaxFz23QRz5cAa910Yy7hrpfI0rB6nB+FC+Hjah29OkZQKGl0c+rG518EFNYIIzi+tinQTGsXxWVwyLIhx8julwstXq8cbNYAybLwI9vAPfjk3MwTrhYMXhGeQLzuarTdc0bJulLBEJ0xr1AxUaafJ97GBz8fraHLQ=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(39860400002)(396003)(82310400008)(451199021)(40470700004)(36840700001)(46966006)(336012)(186003)(26005)(6666004)(16576012)(316002)(70206006)(70586007)(4326008)(16526019)(40480700001)(966005)(53546011)(41300700001)(5660300002)(54906003)(44832011)(110136005)(31686004)(478600001)(7416002)(7406005)(8936002)(8676002)(2616005)(356005)(47076005)(426003)(36860700001)(40460700003)(83380400001)(2906002)(81166007)(82740400003)(31696002)(36756003)(86362001)(43740500002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:11:32.0621
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bff98c7a-843f-4386-8ead-08db895520f5
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT087.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4304
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 04:09:12PM +0800,
-Yuan Yao <yuan.yao@linux.intel.com> wrote:
-
-> On Tue, Jul 18, 2023 at 04:44:51PM -0700, Sean Christopherson wrote:
-> > From: Chao Peng <chao.p.peng@linux.intel.com>
-> >
-> > In confidential computing usages, whether a page is private or shared is
-> > necessary information for KVM to perform operations like page fault
-> > handling, page zapping etc. There are other potential use cases for
-> > per-page memory attributes, e.g. to make memory read-only (or no-exec,
-> > or exec-only, etc.) without having to modify memslots.
-> >
-> > Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
-> > userspace to operate on the per-page memory attributes.
-> >   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
-> >     a guest memory range.
-> >   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
-> >     memory attributes.
-> >
-> > Use an xarray to store the per-page attributes internally, with a naive,
-> > not fully optimized implementation, i.e. prioritize correctness over
-> > performance for the initial implementation.
-> >
-> > Because setting memory attributes is roughly analogous to mprotect() on
-> > memory that is mapped into the guest, zap existing mappings prior to
-> > updating the memory attributes.  Opportunistically provide an arch hook
-> > for the post-set path (needed to complete invalidation anyways) in
-> > anticipation of x86 needing the hook to update metadata related to
-> > determining whether or not a given gfn can be backed with various sizes
-> > of hugepages.
-> >
-> > It's possible that future usages may not require an invalidation, e.g.
-> > if KVM ends up supporting RWX protections and userspace grants _more_
-> > protections, but again opt for simplicity and punt optimizations to
-> > if/when they are needed.
-> >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
-> > Cc: Fuad Tabba <tabba@google.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > Co-developed-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst |  60 ++++++++++++
-> >  include/linux/kvm_host.h       |  14 +++
-> >  include/uapi/linux/kvm.h       |  14 +++
-> >  virt/kvm/Kconfig               |   4 +
-> >  virt/kvm/kvm_main.c            | 170 +++++++++++++++++++++++++++++++++
-> >  5 files changed, 262 insertions(+)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 34d4ce66e0c8..0ca8561775ac 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6068,6 +6068,56 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
-> >  interface. No error will be returned, but the resulting offset will not be
-> >  applied.
-> >
-> > +4.139 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
-> > +-----------------------------------------
-> > +
-> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> > +:Architectures: x86
-> > +:Type: vm ioctl
-> > +:Parameters: u64 memory attributes bitmask(out)
-> > +:Returns: 0 on success, <0 on error
-> > +
-> > +Returns supported memory attributes bitmask. Supported memory attributes will
-> > +have the corresponding bits set in u64 memory attributes bitmask.
-> > +
-> > +The following memory attributes are defined::
-> > +
-> > +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> > +
-> > +4.140 KVM_SET_MEMORY_ATTRIBUTES
-> > +-----------------------------------------
-> > +
-> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> > +:Architectures: x86
-> > +:Type: vm ioctl
-> > +:Parameters: struct kvm_memory_attributes(in/out)
-> > +:Returns: 0 on success, <0 on error
-> > +
-> > +Sets memory attributes for pages in a guest memory range. Parameters are
-> > +specified via the following structure::
-> > +
-> > +  struct kvm_memory_attributes {
-> > +	__u64 address;
-> > +	__u64 size;
-> > +	__u64 attributes;
-> > +	__u64 flags;
-> > +  };
-> > +
-> > +The user sets the per-page memory attributes to a guest memory range indicated
-> > +by address/size, and in return KVM adjusts address and size to reflect the
-> > +actual pages of the memory range have been successfully set to the attributes.
-> > +If the call returns 0, "address" is updated to the last successful address + 1
-> > +and "size" is updated to the remaining address size that has not been set
-> > +successfully. The user should check the return value as well as the size to
-> > +decide if the operation succeeded for the whole range or not. The user may want
-> > +to retry the operation with the returned address/size if the previous range was
-> > +partially successful.
-> > +
-> > +Both address and size should be page aligned and the supported attributes can be
-> > +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
-> > +
-> > +The "flags" field may be used for future extensions and should be set to 0s.
-> > +
-> >  5. The kvm_run structure
-> >  ========================
-> >
-> > @@ -8494,6 +8544,16 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a
-> >  64-bit bitmap (each bit describing a block size). The default value is
-> >  0, to disable the eager page splitting.
-> >
-> > +8.41 KVM_CAP_MEMORY_ATTRIBUTES
-> > +------------------------------
-> > +
-> > +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> > +:Architectures: x86
-> > +:Type: vm
-> > +
-> > +This capability indicates KVM supports per-page memory attributes and ioctls
-> > +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
-> > +
-> >  9. Known KVM API problems
-> >  =========================
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index e9ca49d451f3..97db63da6227 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -264,6 +264,7 @@ struct kvm_gfn_range {
-> >  	gfn_t end;
-> >  	union {
-> >  		pte_t pte;
-> > +		unsigned long attributes;
-> >  		u64 raw;
-> >  	} arg;
-> >  	bool may_block;
-> > @@ -809,6 +810,9 @@ struct kvm {
-> >
-> >  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
-> >  	struct notifier_block pm_notifier;
-> > +#endif
-> > +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> > +	struct xarray mem_attr_array;
-> >  #endif
-> >  	char stats_id[KVM_STATS_NAME_SIZE];
-> >  };
-> > @@ -2301,4 +2305,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
-> >  /* Max number of entries allowed for each kvm dirty ring */
-> >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
-> >
-> > +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> > +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
-> > +{
-> > +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
-> > +}
-> > +
-> > +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> > +					 struct kvm_gfn_range *range);
+On 7/18/23 6:17 PM, Dave Hansen wrote:
+> On 7/18/23 15:34, Kim Phillips wrote:
+> ...
+>> Automatic IBRS provides protection to [1]:
+>>
+>>   - Processes running at CPL=0
+>>   - Processes running as host when Secure Nested Paging (SEV-SNP) is enabled
+>>
+>> i.e.,
+>>
+>>      (CPL < 3) || ((ASID == 0) && SNP)
+>>
+>> Because of this limitation, do not enable Automatic IBRS when SNP is
+>> enabled.
 > 
-> Used but no definition in this patch, it's defined in next patch 09.
-> How about add weak version in this patch and let ARCHs to overide it ?
+> Gah, I found that hard to parse.  I think it's because you're talking
+> about an SEV-SNP host in one part and "SNP" in the other but _meaning_
+> SNP host and SNP guest.
+> 
+> Could I maybe suggest that you folks follow the TDX convention and
+> actually add _GUEST and _HOST to the feature name be explicit about
+> which side is which?
+> 
+>> Instead, fall back to retpolines.
+> 
+> Now I'm totally lost.
+> 
+> This is talking about falling back to retpolines ... in the kernel.  But
+> "Automatic IBRS provides protection to ... CPL < 3", aka. the kernel.
+> 
+>> Note that the AutoIBRS feature may continue to be used within the
+>> guest.
+> 
+> What is this trying to say?
+> 
+> "AutoIBRS can still be used in a guest since it protects CPL < 3"
+> 
+> or
+> 
+> "The AutoIBRS bits can still be twiddled within the guest even though it
+> doesn't do any good"
+> 
+> ?
 
-It is guarded by CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
+Hopefully the commit text in this version will help answer all your
+questions?:
+
+ From 96dbd72d018287bc5b72f6083884e2125c9d09bc Mon Sep 17 00:00:00 2001
+From: Kim Phillips <kim.phillips@amd.com>
+Date: Mon, 17 Jul 2023 14:08:15 -0500
+Subject: [PATCH] x86/speculation: Do not enable Automatic IBRS if SEV SNP is
+  enabled
+
+Automatic IBRS provides protection to [1]:
+
+  - Processes running at CPL=0
+  - Processes running as host when Secure Nested Paging (SEV-SNP) is enabled
+
+I.e., from the host side (ASID=0, based on host EFER.AutoIBRS)
+If SYSCFG[SNPEn]=0 then:
+      IBRS is enabled for supervisor mode (CPL < 3) only
+
+If SYSCFG[SNPEn]=1 then:
+      IBRS is enabled at all CPLs
+
+ From the guest side (ASID!=0, based on guest EFER.AutoIBRS)
+      IBRS is enabled for supervisor mode (CPL < 3)
+
+Therefore, don't enable Automatic IBRS in host mode if SNP is enabled,
+because it will penalize user-mode indirect branch performance.  Have
+the kernel fall back to retpolines instead.
+
+Note that the AutoIBRS feature may continue to be used within guests,
+where ASID != 0.
+
+[1] "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
+     Pub. 24593, rev. 3.41, June 2023, Part 1, Section 3.1.7 "Extended
+     Feature Enable Register (EFER)" - accessible via Link.
+
+Link: https://bugzilla.kernel.org/attachment.cgi?id=304652
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+---
+  arch/x86/kernel/cpu/common.c | 3 ++-
+  1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 8cd4126d8253..311c0a6422b5 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -1348,7 +1348,8 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
+  	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
+  	 * flag and protect from vendor-specific bugs via the whitelist.
+  	 */
+-	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
++	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
++	    !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+  		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+  		if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+  		    !(ia32_cap & ARCH_CAP_PBRSB_NO))
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.34.1
