@@ -2,64 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D06A75AA0B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 10:58:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7436575AA15
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 10:58:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230143AbjGTI5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 04:57:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37664 "EHLO
+        id S231364AbjGTI6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 04:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230481AbjGTIqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 04:46:10 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3CC2699
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 01:46:08 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-51bece5d935so713974a12.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 01:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689842767; x=1690447567;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CGTq1P2Y1uV5uSC7wiZItX+X++ASwHV6iVLZSdmwnAU=;
-        b=RS4HzSE4/FIoMyzpUm80pmAn2GSXlRLLoeUf57pBtFgGv4q4kDgLx1OtMrUNEdUhnE
-         bzLcxg2U2Ctq4kg3qrL0HgtvN/VcmP9tmqLsWELnZRsqaCtGyGi2COmNCCUQJnOjj8ly
-         wfLKk5czs1Vc05VG+dorbFvr0ki1c6ruj3MKTS32+eV7DvLtK2v99cIW+uTGyvXVp/+5
-         GkQ72jNqB6mAoYddJ5HvKkOVA2yYIKBi+qXN6Nh7T+xOifxRcaTzmehJrZuow3W1UqAx
-         DcqRo5fMWFwH3ataAI8usmWQStdI3v8chmQwGJRIj6V6qILOLvuI1T+EvgWXgBsO84gG
-         JKYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689842767; x=1690447567;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CGTq1P2Y1uV5uSC7wiZItX+X++ASwHV6iVLZSdmwnAU=;
-        b=TCW7EfHb0+Brf+hUcgiSmlMUrr0D4M4ayyizsjUcbLo5wivYcp3wbc1svnfuCkV8D3
-         azidlFKlzIOLxg8Vt+FwDfn6Zx2XUrX+68B3M46QSe0Ugs29y95SSZUKkToBjcQWZ9St
-         /IYDUENG4oSBv+u+5YDd+MNwDfQl+ksmSXpVyMpqxpHnvA/kow8r5N4x8oa1BL6s9gzL
-         DG069eLLkgg9DSsNRKd/LoArNM7pdFkJt7tk2+dHh3rUhQu+L3x3o/REENJsepAINkNt
-         qPN1HIk1X0JjJ2Qug4O6hLrR+D5Cg5q0h9TRIiQgPvvwe+BUq+cAWcqAPSUkyfsvjUbJ
-         vXwA==
-X-Gm-Message-State: ABy/qLbpxgPhZHIesXjq7TXmfF1c3Fh4eMV41PIdlN95uZBNGJ3YdDqI
-        aOHjo7lR+pDbSgJqWOYX/X4KY/DFVEHVv53iPkzG+A==
-X-Google-Smtp-Source: APBJJlEwjaJAfevuHpcWv5n4Qts4yAws1XHwYpL9Za6Uz1R9lQQKUF5EpkqWj05aonOiLrl52X29phf4ttm+xlHS3FI=
-X-Received: by 2002:a05:6402:6d6:b0:51d:9682:e30c with SMTP id
- n22-20020a05640206d600b0051d9682e30cmr1708622edy.5.1689842767305; Thu, 20 Jul
- 2023 01:46:07 -0700 (PDT)
+        with ESMTP id S231316AbjGTIxm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 04:53:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965E62115
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 01:52:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689843174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gwK8AXz7jkXfdRTnSd9jL9yJK/TtFs99GYswlm71JSI=;
+        b=Cx8tmmtlQ8URKH+Jitd3ztpFczqHNxbQ7Wiwn0sDcctS7d3Tf2XICjDkUZEju6v+qfHQPa
+        2EIemam3jUVrUMNubrawevQ/xkG3C9APVWO9XISMh1AzxlaSc3WpzeE0LYlk8FonitlOKH
+        A26xubp14id/TChonZFVdrhHafAjnAE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-546-3OwwNMXhMeira2AVwmr1UA-1; Thu, 20 Jul 2023 04:52:48 -0400
+X-MC-Unique: 3OwwNMXhMeira2AVwmr1UA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C67FD10504C1;
+        Thu, 20 Jul 2023 08:52:47 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 810D240C206F;
+        Thu, 20 Jul 2023 08:52:47 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+In-Reply-To: <20230718164522.3498236-4-jingzhangos@google.com>
+Organization: Red Hat GmbH
+References: <20230718164522.3498236-1-jingzhangos@google.com>
+ <20230718164522.3498236-4-jingzhangos@google.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Thu, 20 Jul 2023 10:52:46 +0200
+Message-ID: <87o7k77yn5.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20230720072903.21390-1-akihiko.odaki@daynix.com>
-In-Reply-To: <20230720072903.21390-1-akihiko.odaki@daynix.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 20 Jul 2023 09:45:56 +0100
-Message-ID: <CAFEAcA9BiXWweNEbMY1Xkso1B5-o3_85eW3QprQjerzM5nAo8g@mail.gmail.com>
-Subject: Re: [PATCH RESEND] accel/kvm: Specify default IPA size for arm64
-To:     Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,79 +74,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Jul 2023 at 08:29, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+On Tue, Jul 18 2023, Jing Zhang <jingzhangos@google.com> wrote:
+
+> All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> from usrespace with this change.
+
+Typo: s/usrespace/userspace/
+
 >
-> libvirt uses "none" machine type to test KVM availability. Before this
-> change, QEMU used to pass 0 as machine type when calling KVM_CREATE_VM.
->
-> The kernel documentation says:
-> > On arm64, the physical address size for a VM (IPA Size limit) is
-> > limited to 40bits by default. The limit can be configured if the host
-> > supports the extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> > KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-> > identifier, where IPA_Bits is the maximum width of any physical
-> > address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
-> > machine type identifier.
-> >
-> > e.g, to configure a guest to use 48bit physical address size::
-> >
-> >     vm_fd = ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(48));
-> >
-> > The requested size (IPA_Bits) must be:
-> >
-> >  ==   =========================================================
-> >   0   Implies default size, 40bits (for backward compatibility)
-> >   N   Implies N bits, where N is a positive integer such that,
-> >       32 <= N <= Host_IPA_Limit
-> >  ==   =========================================================
->
-> > Host_IPA_Limit is the maximum possible value for IPA_Bits on the host
-> > and is dependent on the CPU capability and the kernel configuration.
-> > The limit can be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the
-> > KVM_CHECK_EXTENSION ioctl() at run-time.
-> >
-> > Creation of the VM will fail if the requested IPA size (whether it is
-> > implicit or explicit) is unsupported on the host.
-> https://docs.kernel.org/virt/kvm/api.html#kvm-create-vm
->
-> So if Host_IPA_Limit < 40, such KVM_CREATE_VM will fail, and libvirt
-> incorrectly thinks KVM is not available. This actually happened on M2
-> MacBook Air.
->
-> Fix this by specifying 32 for IPA_Bits as any arm64 system should
-> support the value according to the documentation.
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
-> Resending due to inactivity.
+>  arch/arm64/kvm/sys_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
->  accel/kvm/kvm-all.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 373d876c05..3bd362e346 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2458,7 +2458,11 @@ static int kvm_init(MachineState *ms)
->      KVMState *s;
->      const KVMCapabilityInfo *missing_cap;
->      int ret;
-> +#ifdef TARGET_AARCH64
-> +    int type = 32;
-> +#else
->      int type = 0;
-> +#endif
->      uint64_t dirty_log_manual_caps;
->
->      qemu_mutex_init(&kml_slots_lock);
-> --
-> 2.41.0
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 053d8057ff1e..f33aec83f1b4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2008,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .set_user = set_id_dfr0_el1,
+>  	  .visibility = aa32_id_visibility,
+>  	  .reset = read_sanitised_id_dfr0_el1,
+> -	  .val = ID_DFR0_EL1_PerfMon_MASK, },
+> +	  .val = GENMASK(63, 0), },
+>  	ID_HIDDEN(ID_AFR0_EL1),
+>  	AA32_ID_SANITISED(ID_MMFR0_EL1),
+>  	AA32_ID_SANITISED(ID_MMFR1_EL1),
+> @@ -2057,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .get_user = get_id_reg,
+>  	  .set_user = set_id_aa64dfr0_el1,
+>  	  .reset = read_sanitised_id_aa64dfr0_el1,
+> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
+> +	  .val = GENMASK(63, 0), },
+>  	ID_SANITISED(ID_AA64DFR1_EL1),
+>  	ID_UNALLOCATED(5,2),
+>  	ID_UNALLOCATED(5,3),
 
-I think this was discussed in review the last time around on
-this patch (which is why it wasn't applied), but I don't think
-we should do this with a target ifdef in a common file. We should
-have some kind of target hook for targets to specify what they need
-to do here.
+How does userspace find out whether a given id reg is actually writable,
+other than trying to write to it?
 
-thanks
--- PMM
