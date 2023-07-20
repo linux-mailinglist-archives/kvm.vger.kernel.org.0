@@ -2,97 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CE3875B22A
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 17:15:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F23B575B3C5
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 18:04:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232471AbjGTPPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 11:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52026 "EHLO
+        id S231907AbjGTQEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 12:04:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232502AbjGTPO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 11:14:59 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C40F2701
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 08:14:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c0f35579901so791790276.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 08:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689866089; x=1690470889;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jyO/GZcznauRS+IxFjefkQ411ageTxV8Pq4vykaVGvo=;
-        b=zTnr2gXYIfqrhSL0WP50qLuqh3ZSH0gfVOnKmqwBvWYCge11/urc6Mcz48DQC5VeI6
-         s/bgjrFlzBMXd0PxaHBdxoR2ZqKrVqjnkCnhcQbbSnTvJYQ3aBe8wGkYdi1iCIBydfGh
-         kDBro1Ztm9Xs7cfFTvZ7Ey8Gxe05PCCIDn4nx9L+2nwHbFPbro9d3jap/zFGaLY9lF26
-         GO0Vu5OUt+nUmBQOwJoSD8n40MC7ZQXlXpaj59Y1nIZxZy5/TzmEdTKZZXkcpmTSKYdO
-         Y0fmzsgj8zCYsvUdMgpPWIv3Ur8RBp8NDUrrxEURomdLy8NcckIjCEtpSXTS4KS2mzFS
-         29+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689866089; x=1690470889;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jyO/GZcznauRS+IxFjefkQ411ageTxV8Pq4vykaVGvo=;
-        b=TUYeWJ8jVNEm1kqfjUDumyUW1Ha6mC4vh0WJOyXYdIGYi7SHp+oLlcvFVXyumOeESI
-         5Ol0a57i58M4OKQw1Hdzr38rZDiTaaWRtebgzQgzgDYSOFRF0OYWNpnK+fbfakU6lTXY
-         BXmjLSNuH72XJ/AhT94b1vPkbtmkG3zKxp8NgCDfLKKT6gTCWQD+8R+fHxDvWuLeTZV2
-         aQ2DeKy5R1oWergqaf2a64FHXG3TlTm23H+StSPH7N1Pe9RK4h6iC/OHoWc3eKAO39r/
-         0b8OYATer6a9ALLAEUPSOwXv38cqFSyC9bK+2zdxl1eWyQkOf6hXhCuIClW47GyEqMC7
-         w8Qg==
-X-Gm-Message-State: ABy/qLYhUokHg6MXQROci6Fd2u/wa3MFbIDWqA13OB0HaNC2fYAs8SoT
-        HduWbq/9p/ZwyN35FBVbOPSjPV7ikoM=
-X-Google-Smtp-Source: APBJJlHgB47FmXfk0Rt+Hyu6ZgRaD/aSiXUWbAQerG5WzFKE3pY5cKaePpzhb9OPvUF/5F0XHeWF4GbW2oc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:a105:0:b0:c65:8983:ac2 with SMTP id
- z5-20020a25a105000000b00c6589830ac2mr17912ybh.5.1689866089303; Thu, 20 Jul
- 2023 08:14:49 -0700 (PDT)
-Date:   Thu, 20 Jul 2023 08:14:47 -0700
-In-Reply-To: <83eb5c50-7287-7845-ffc3-a7c58e638ea5@intel.com>
-Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
- <83eb5c50-7287-7845-ffc3-a7c58e638ea5@intel.com>
-Message-ID: <ZLlLx7wkE6iPTIcI@google.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        with ESMTP id S230336AbjGTQEu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 12:04:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E96910FC
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 09:04:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A46D961B59
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 16:04:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD4B6C433C8;
+        Thu, 20 Jul 2023 16:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689869086;
+        bh=/STk+I4XHbAtkpf7FZs+JivKi7EAAEEjumJLtcR8Ll0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=uCqj0YODUyWReHl1caoY5dTg/OwLd6VFMLrkDULP4uJ5Wf+K7vmSCHTI8QQU1J9fN
+         W+O3VV2CYD3lk2/Z6wY7gkV+KNvu3ZfT9uMipDSKPd4mKvtrOKlO6/pHqhuc4SajTy
+         Me8RSXJ6FnVo0kdjSx85W8rTWQYZ1OAp2jZ3CWVRSVLRJEjIj7Z8ZrIWIqVCw6yyKT
+         8dDm/RQdlQgeGv65QMttlu8su0qmFlM2JnXGLiYVFaJk/OpwIQMmB2vtG/uK+KxARB
+         MF65g9zy39nFR7GfCzWRQMaoQP4NQ/ho5wFCfxlJnuRde1Ir/mlFBE8Fhfusie8wnm
+         1AW8He1jO466Q==
+From:   Will Deacon <will@kernel.org>
+To:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        jean-philippe.brucker@arm.com,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        oliver.upton@linux.dev, apatel@ventanamicro.com, maz@kernel.org,
+        andre.przywara@arm.com, Suzuki.Poulose@arm.com
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH kvmtool] virtio-net: Don't print the compat warning for the default device
+Date:   Thu, 20 Jul 2023 17:04:38 +0100
+Message-Id: <168986515165.3086213.4288799069467644194.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230714152909.31723-1-alexandru.elisei@arm.com>
+References: <20230714152909.31723-1-alexandru.elisei@arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,34 +59,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023, Xiaoyao Li wrote:
-> On 7/19/2023 7:44 AM, Sean Christopherson wrote:
-> > @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
-> >   	case KVM_GET_STATS_FD:
-> >   		r = kvm_vm_ioctl_get_stats_fd(kvm);
-> >   		break;
-> > +	case KVM_CREATE_GUEST_MEMFD: {
-> > +		struct kvm_create_guest_memfd guest_memfd;
-> > +
-> > +		r = -EFAULT;
-> > +		if (copy_from_user(&guest_memfd, argp, sizeof(guest_memfd)))
-> > +			goto out;
-> > +
-> > +		r = kvm_gmem_create(kvm, &guest_memfd);
-> > +		break;
-> > +	}
+On Fri, 14 Jul 2023 16:29:09 +0100, Alexandru Elisei wrote:
+> Compat messages are there to print a warning when the user creates a virtio
+> device for the VM, but the guest doesn't initialize it.
 > 
-> Does it need a new CAP to indicate the support of guest_memfd?
-
-Yeah, I meant to add that to the TODO list and forgot (obviously).
-
-> This is patch series introduces 3 new CAPs and it seems any one of them can
-> serve as the indicator of guest_memfd.
+> This generally works great, except that kvmtool will always create a
+> virtio-net device, even if the user hasn't specified one, which means that
+> each time kvmtool loads a guest that doesn't probe the network interface,
+> the user will get the compat warning. This can get particularly annoying
+> when running kvm-unit-tests, which doesn't need to use a network interface,
+> and the virtio-net warning is displayed after each test.
 > 
-> +#define KVM_CAP_USER_MEMORY2 230
-> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
-> +#define KVM_CAP_VM_TYPES 232
+> [...]
 
-The number of new caps being added is the main why I didn't just add another one.
-On the other hand, we have room for a few billion caps, so one more isn't a big
-deal.  So yeah, KVM_CAP_GUEST_MEMFD is probably the way to go.
+Applied to kvmtool (master), thanks!
+
+[1/1] virtio-net: Don't print the compat warning for the default device
+      https://git.kernel.org/will/kvmtool/c/15757e8e6441
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
