@@ -2,93 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79A6975A3D0
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 03:16:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A03475A3E2
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 03:25:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbjGTBQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 21:16:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37742 "EHLO
+        id S229766AbjGTBZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 21:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjGTBQO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 21:16:14 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789C21FFD;
-        Wed, 19 Jul 2023 18:16:12 -0700 (PDT)
+        with ESMTP id S229525AbjGTBZ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 21:25:27 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25DE82103
+        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 18:25:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689815772; x=1721351772;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0X3B3RFBvIohiBDiMK6hMbRCxfxPASWhBjQpW8WFunc=;
-  b=KanBI6GFjg2yvoF3AnNTF8WKdoe+4ab/Nk7tEccronPJsTYxMfeX47/y
-   faX7jODp3AeZJzLq//yTrreJ52426xiKc9UskXC6ySBoVjqY+cMocscbs
-   8M1xrtkUV8rk9UwQrkbtWAU/mYOCjfHdpqL9RpqDmuCgvb4+mCJsaUGGO
-   eCVLOXhr8mjlSVi970PssVsc336ERySTAI6szaxp+ohQBXVgZpkrA02Y7
-   Wi1/PI9eQ9eWCTgMJDsIdTiIi+USE7GoCRPwrOsX679Eem2N8+v6chjxq
-   9thxw89k5YtSPYTkykTkNFEp4+hJL5sn4W8mJ320WAIdz5ByRSraGiK3J
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="364065919"
+  t=1689816322; x=1721352322;
+  h=message-id:date:mime-version:subject:to:references:cc:
+   from:in-reply-to:content-transfer-encoding;
+  bh=qtyB5FWWgjJe+BstO6BqushuEHdhnWeesk3dJhk8/4g=;
+  b=ibegDybYQdLOSJDFWy2RHhaUBN5FpwRfFxRzgl1i5zxt8o5zAq8I2ZGf
+   B96OHzVkCnf/Bax+4wkzPqPrkk70ChuphlP0a8wS/2tOIla816BffgTcp
+   mfj75KeHClaRBb12BTNEaJLiCGj0hMV5PNBy5nbuJDRSklFFDdLnw+iXk
+   W2zKFO/V63C5u8eK1y2rYoayIN7FtSvDBKO68PoF2i8ddKM5/3YXEMSd4
+   lM87Yiwx9v25sF6BEAn5XaOk+i0FBCfJIN5NEpv+sf+Gy7sC0eDRWM7cp
+   jLH/XPgvNg+iwieCoaI2hVzwsQY8D+WDXLr9TgY62WvsXxUKbHpmPx6gZ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="346202248"
 X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="364065919"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:16:11 -0700
+   d="scan'208";a="346202248"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:25:20 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="674516361"
+X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="753892814"
 X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="674516361"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga003.jf.intel.com with ESMTP; 19 Jul 2023 18:15:44 -0700
-Date:   Thu, 20 Jul 2023 09:15:41 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 05/29] KVM: Convert KVM_ARCH_WANT_MMU_NOTIFIER to
- CONFIG_KVM_GENERIC_MMU_NOTIFIER
-Message-ID: <20230720011541.6ti5sygwwfwko6ab@yy-desk-7060>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-6-seanjc@google.com>
- <20230719073115.vuedo2cf3mp27xm4@yy-desk-7060>
- <ZLfv7aRq5W52ezek@google.com>
+   d="scan'208";a="753892814"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:25:18 -0700
+Message-ID: <529cd705-f5c3-a5d1-9999-a3d2ccd09dd6@intel.com>
+Date:   Thu, 20 Jul 2023 09:25:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLfv7aRq5W52ezek@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
+Content-Language: en-US
+To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+References: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
+Cc:     "Gao, Chao" <chao.gao@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
         SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -97,38 +63,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 19, 2023 at 07:15:09AM -0700, Sean Christopherson wrote:
-> On Wed, Jul 19, 2023, Yuan Yao wrote:
-> > On Tue, Jul 18, 2023 at 04:44:48PM -0700, Sean Christopherson wrote:
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index 90a0be261a5c..d2d3e083ec7f 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -255,7 +255,9 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > >  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
-> > >  #endif
-> > >
-> > > -#ifdef KVM_ARCH_WANT_MMU_NOTIFIER
-> > > +struct kvm_gfn_range;
-> >
-> > Not sure why a declaration here, it's defined for ARCHs which defined
-> > KVM_ARCH_WANT_MMU_NOTIFIER before.
->
-> The forward declaration exists to handle cases where CONFIG_KVM=n, specifically
-> arch/powerpc/include/asm/kvm_ppc.h's declaration of hooks to forward calls to
-> uarch modules:
->
-> 	bool (*unmap_gfn_range)(struct kvm *kvm, struct kvm_gfn_range *range);
-> 	bool (*age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-> 	bool (*test_age_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
-> 	bool (*set_spte_gfn)(struct kvm *kvm, struct kvm_gfn_range *range);
->
-> Prior to using a Kconfig, a forward declaration wasn't necessary because
-> arch/powerpc/include/asm/kvm_host.h would #define KVM_ARCH_WANT_MMU_NOTIFIER even
-> if CONFIG_KVM=n.
->
-> Alternatively, kvm_ppc.h could declare the struct.  I went this route mainly to
-> avoid the possibility of someone encountering the same problem on a different
-> architecture.
+On 7/20/2023 2:08 AM, Jim Mattson wrote:
+> Normally, we would restrict guest MSR writes based on guest CPU
+> features. However, with IA32_SPEC_CTRL and IA32_PRED_CMD, this is not
+> the case.
+> 
+> For the first non-zero write to IA32_SPEC_CTRL, we check to see that
+> the host supports the value written. We don't care whether or not the
+> guest supports the value written (as long as it supports the MSR).
+> After the first non-zero write, we stop intercepting writes to
+> IA32_SPEC_CTRL, so the guest can write any value supported by the
+> hardware. This could be problematic in heterogeneous migration pools.
+> For instance, a VM that starts on a Cascade Lake host may set
+> IA32_SPEC_CTRL.PSFD[bit 7], even if the guest
+> CPUID.(EAX=07H,ECX=02H):EDX.PSFD[bit 0] is clear. Then, if that VM is
+> migrated to a Skylake host, KVM_SET_MSRS will refuse to set
+> IA32_SPEC_CTRL to its current value, because Skylake doesn't support
+> PSFD.
+> 
+> We disable write intercepts IA32_PRED_CMD as long as the guest
+> supports the MSR. That's fine for now, since only one bit of PRED_CMD
+> has been defined. Hence, guest support and host support are
+> equivalent...today. But, are we really comfortable with letting the
+> guest set any IA32_PRED_CMD bit that may be defined in the future?
+ >
+> The same question applies to IA32_SPEC_CTRL. Are we comfortable with
+> letting the guest write to any bit that may be defined in the future?
 
-Ah I see, thanks for your explanation!
+My point is we need to fix it, though Chao has different point that 
+sometimes performance may be more important[*]
+
+[*] https://lore.kernel.org/all/ZGdE3jNS11wV+V2w@chao-email/
+
+> At least the AMD approach with V_SPEC_CTRL prevents the guest from
+> clearing any bits set by the host, but on Intel, it's a total
+> free-for-all. What happens when a new bit is defined that absolutely
+> must be set to 1 all of the time?
+
