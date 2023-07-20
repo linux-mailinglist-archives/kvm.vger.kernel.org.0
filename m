@@ -2,556 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0844D75AA14
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 10:58:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D06A75AA0B
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 10:58:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231319AbjGTI6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 04:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37004 "EHLO
+        id S230143AbjGTI5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 04:57:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbjGTIkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 04:40:18 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2076.outbound.protection.outlook.com [40.107.244.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C4CFD;
-        Thu, 20 Jul 2023 01:40:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Cp0sD6v7udW5RFf4udneb36JIpoguD3JuCQrUBGAQNIHTLbYnkKuiyD2ESJ1nwulGkS24XP8HtG9BYXL8/2Ahhc6d6gyj/kQ2JkDg34i2osgwllOBsDAmJ1pKok2y1c/pHqIGxUnIYSx6OTGnVkCj4hgEOqBaUnQECcgvsHDYjWOHQD8RKTJP9+vgDP6r6K8BD0PnMqZFPumGRR+sZFcx+FkEGH/8pJ5foVUtbWlJ1lzSu78FwETLmMDsV9WGhlqt112S+/Ak43d9k5cKFNJLOwc+QH0kAbU8qAZkTCaryKtsdHm1+vVI5r2yu1dTrBU56jXVZRafOMW7TfquWn2YA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MH28H+CAnzGmPruk0vGr9QVHzZtmLOQboUMLWND1YGU=;
- b=BoFDiv66r18UgHbxA5bntoevMyj4UhZtdW/8yCALPOVbgQD480tny8FDpz4Dz1WhJW62opsOnYxxU1EsuF/agYqqGZxFTbGDseJRA/4NnEtJFED5PxmtmP2sVajINsbQcPBsixU1qfblww2+JhKSWO7PWhkxyxAx/T1yCCGcLNsoI0xLqK5T+lQRsIwHQxd8BaprSdxumCTlNvYy1kmrW612IPaoj3DJWhwxeGcK2+EyKXMwtjTxJDPBkww6y+wOZ+xdYREMohKUz0gfaopRHaO3M4vYiIfCyW/+y6JYBJe8Ld0ea+W0GODAymTb5XIUh5hKXhR2bia+I/eEp56eHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MH28H+CAnzGmPruk0vGr9QVHzZtmLOQboUMLWND1YGU=;
- b=mE3VgSkr4Zq62VrFLqFvZqijVQhldVPKcC92Z0aSLYdsNNtBktvQs6cQlPEg/Qdr0FDzk+7paWIeM7kryTPPRTsvUflZBF/1s0zNyJ9XS/IPftLa7MZF/dZMTnArn8jUbLArqzRpDZk7EOuO1Xb3yu9hJgrQ/cHwhffyUwpXzZF5KRo8Iz8MPj7022b3fQOB33X/bSJfLALSljSWQ92xAeu/Ys39HwPH4wbuJ6Q/Et2kTgWA67ZPi26td3jjfh9h7Fm239977wsIlxL3YZI6Eydzjx6g1FFxbnOUwoWDwN0K4wE9tItz1hcu0TamHbtG9b0RQHEHxS68VlleDpAWlQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com (2603:10b6:a03:134::26)
- by PH8PR12MB7025.namprd12.prod.outlook.com (2603:10b6:510:1bc::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Thu, 20 Jul
- 2023 08:40:14 +0000
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::cd5e:7e33:c2c9:fb74]) by BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::cd5e:7e33:c2c9:fb74%7]) with mapi id 15.20.6609.025; Thu, 20 Jul 2023
- 08:40:14 +0000
-From:   Alistair Popple <apopple@nvidia.com>
-To:     akpm@linux-foundation.org
-Cc:     ajd@linux.ibm.com, catalin.marinas@arm.com, fbarrat@linux.ibm.com,
-        iommu@lists.linux.dev, jgg@ziepe.ca, jhubbard@nvidia.com,
-        kevin.tian@intel.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au, nicolinc@nvidia.com, npiggin@gmail.com,
-        robin.murphy@arm.com, seanjc@google.com, will@kernel.org,
-        x86@kernel.org, zhi.wang.linux@gmail.com, sj@kernel.org,
-        Alistair Popple <apopple@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v3 5/5] mmu_notifiers: Rename invalidate_range notifier
-Date:   Thu, 20 Jul 2023 18:39:27 +1000
-Message-Id: <3cbd2a644d56d503b47cfc35868d547f924f880e.1689842332.git-series.apopple@nvidia.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <cover.b24362332ec6099bc8db4e8e06a67545c653291d.1689842332.git-series.apopple@nvidia.com>
-References: <cover.b24362332ec6099bc8db4e8e06a67545c653291d.1689842332.git-series.apopple@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SYBPR01CA0156.ausprd01.prod.outlook.com
- (2603:10c6:10:d::24) To BYAPR12MB3176.namprd12.prod.outlook.com
- (2603:10b6:a03:134::26)
+        with ESMTP id S230481AbjGTIqK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 04:46:10 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3CC2699
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 01:46:08 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-51bece5d935so713974a12.1
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 01:46:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1689842767; x=1690447567;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CGTq1P2Y1uV5uSC7wiZItX+X++ASwHV6iVLZSdmwnAU=;
+        b=RS4HzSE4/FIoMyzpUm80pmAn2GSXlRLLoeUf57pBtFgGv4q4kDgLx1OtMrUNEdUhnE
+         bzLcxg2U2Ctq4kg3qrL0HgtvN/VcmP9tmqLsWELnZRsqaCtGyGi2COmNCCUQJnOjj8ly
+         wfLKk5czs1Vc05VG+dorbFvr0ki1c6ruj3MKTS32+eV7DvLtK2v99cIW+uTGyvXVp/+5
+         GkQ72jNqB6mAoYddJ5HvKkOVA2yYIKBi+qXN6Nh7T+xOifxRcaTzmehJrZuow3W1UqAx
+         DcqRo5fMWFwH3ataAI8usmWQStdI3v8chmQwGJRIj6V6qILOLvuI1T+EvgWXgBsO84gG
+         JKYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689842767; x=1690447567;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CGTq1P2Y1uV5uSC7wiZItX+X++ASwHV6iVLZSdmwnAU=;
+        b=TCW7EfHb0+Brf+hUcgiSmlMUrr0D4M4ayyizsjUcbLo5wivYcp3wbc1svnfuCkV8D3
+         azidlFKlzIOLxg8Vt+FwDfn6Zx2XUrX+68B3M46QSe0Ugs29y95SSZUKkToBjcQWZ9St
+         /IYDUENG4oSBv+u+5YDd+MNwDfQl+ksmSXpVyMpqxpHnvA/kow8r5N4x8oa1BL6s9gzL
+         DG069eLLkgg9DSsNRKd/LoArNM7pdFkJt7tk2+dHh3rUhQu+L3x3o/REENJsepAINkNt
+         qPN1HIk1X0JjJ2Qug4O6hLrR+D5Cg5q0h9TRIiQgPvvwe+BUq+cAWcqAPSUkyfsvjUbJ
+         vXwA==
+X-Gm-Message-State: ABy/qLbpxgPhZHIesXjq7TXmfF1c3Fh4eMV41PIdlN95uZBNGJ3YdDqI
+        aOHjo7lR+pDbSgJqWOYX/X4KY/DFVEHVv53iPkzG+A==
+X-Google-Smtp-Source: APBJJlEwjaJAfevuHpcWv5n4Qts4yAws1XHwYpL9Za6Uz1R9lQQKUF5EpkqWj05aonOiLrl52X29phf4ttm+xlHS3FI=
+X-Received: by 2002:a05:6402:6d6:b0:51d:9682:e30c with SMTP id
+ n22-20020a05640206d600b0051d9682e30cmr1708622edy.5.1689842767305; Thu, 20 Jul
+ 2023 01:46:07 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|PH8PR12MB7025:EE_
-X-MS-Office365-Filtering-Correlation-Id: 05cbfbc1-c0ff-4054-614e-08db88fcefb4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: q1RUZK5rBSPAC260poeKsGZQ67ToNdg7OP+9XBJ6wA39XWmMHi0W3R0vXPnUfYs4jKzzOxx+1kNld+Dxc/BSykJDe1EU4fE7nVGhkjMZJ02jAvf3B/g4/AOwaWoKFmPdDS98SbNh0Uuzq3wNtBKmr8i8lxq+Hjkg/5ibYLg4K6i1iXCaLJSC7HBZIxhSJ4HkAh1+AmpvEPC+fdPaGhzA+znYoOc9Yqehj1B1RKRKTsEQ9aw93AvZb8/rzOwejZvW8RM/n9XkL9JczjsH4nQtnoclbvLSYUzwrTmOTPQNeni0Xio+vILv4t0xE0M8mcBDp+v++6MbRphxqzqQwP+Zz6+XkZr6F4NpJF6fWCISwJIkFRw8lkgJoCL2JZUrmlu8IfVx1Drlnnv5OcR6owGwooICIL0zKlhb1/ntaaaaQV5s6M4UyR7y26hxh2BgUhv4BZKe8cnN6Tmc6FdzcQREYwI1f9JZ6mc5whT91EtsjR6QaTpxVfsh8+bku5uPmF7wsXc7me1BZ8YxJOBw1eV+oY9F6spRQVhv/0Jh7ROghCUBa5RwWGuqD7udsii+7jXyRdninviN8zv5FMusKQLKQgirzieEKqYjjTxByTpSx60=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(396003)(376002)(346002)(39860400002)(451199021)(36756003)(86362001)(38100700002)(186003)(7416002)(478600001)(6506007)(6666004)(26005)(41300700001)(66476007)(66946007)(4326008)(66556008)(6916009)(5660300002)(316002)(2616005)(8936002)(8676002)(83380400001)(6512007)(107886003)(6486002)(30864003)(54906003)(2906002)(473944003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Lu9/xGhECsxFSuPSVe21S4nShrycFRbZjy4S51HrMBfAgHUO2hFR+v33/n7I?=
- =?us-ascii?Q?hk3vfip4UkLaZKXwf0KnCDXHKG4icj08TVmSl42R0+5cTz96zkdnY/EYaTYB?=
- =?us-ascii?Q?3goY1DnRfLUtMWrfTTeILj1UnsiN9ClL3N02SGYqU15ladFrpfr2KGMJUoV1?=
- =?us-ascii?Q?9vFE+sQs6f8NQJt31IqXgemQx7hRZp4ZgOchEvqGhpYlZwWdScNR7OkAkVb5?=
- =?us-ascii?Q?R0/K9168hTO6awdUb1ZKYQoGyFZ3yZjNNNmo3SFXQuW8FgKQgN7P9T26EhxC?=
- =?us-ascii?Q?ihx1Dep9edpNxMSIt2edRaTOrk0Cu7wU/T8FtYNMtGzTj4zxU/w0rSOXvnLQ?=
- =?us-ascii?Q?TfRlccybKUyPaf/kd4pj/JYW0fjV5DIUYS2FG7SWCkjjtG0ylT7PTdbVT02+?=
- =?us-ascii?Q?x13VnhUApIrjDWa+ZeLVM7DWygBuKnAKss3yAeDJQ2t+50CvWR97bemW+dVl?=
- =?us-ascii?Q?w03ObCYRmtom8x0+F6k6xFSnYgD3XFFaZOIHn8xLsnntYfa+wl0i1uPc8/5h?=
- =?us-ascii?Q?jgbjCaRHNy/KK0Dr/SOpPHQfxPc/9hhBNz8DcWaZ9csjrXd28CyOpKd6cOjy?=
- =?us-ascii?Q?d/RIztc19gYDAZDJ6xbjgfZ5qFjnsPLmvfFo2/WTcSrWdS4I8T8VHQ17F4Un?=
- =?us-ascii?Q?9Wp/1I+aJ/A76xPtYZYQ/owUFGUi9Kx2a5OAzs7ktbGRl4xPrRD8006DNwod?=
- =?us-ascii?Q?DeuQbszZ7MDO9gSS7aQRdyT75OHT/4bsDaJbVufmdY6U2uMq2Cv/6x9mapH2?=
- =?us-ascii?Q?a+rqn+fHqFrX8d5Qnv9mQO3URXkM3JppnG/MxxFDgBzsjQjMGV9FNrJ1Zqd1?=
- =?us-ascii?Q?kq5W6yjz6bHjPP1awv+c02hrlixNu9iBqsvVV5tvhKP4tP2OcziEJ4cfgEWp?=
- =?us-ascii?Q?fDP68by2QVtTI/25TyVWcFRxKDW9jZ1JdMX/Furt3DsntPd8h/woEahsQgZ0?=
- =?us-ascii?Q?CoQk2o3eS9ExVBJ7MyLNyWuwGOEFsE10eJiO3G0dXCVaIe8sxv/HdHyBDZ0O?=
- =?us-ascii?Q?VSTf+dc0on7xRfvtR+tCLOBHA7wXtdMUvQrAsudsxcM/kLGK/1lFoelnJljJ?=
- =?us-ascii?Q?/YOCqsCXg94v1wFijvh/aN8Qg2vr6A9tHobHdHKkN5hspc1yFw7dKCS/Yt3Q?=
- =?us-ascii?Q?dbJjBbRlgw78+wV6NoRSrHKAcqdA+X9iv9nHgvqbBc3CyrWbDUeJaVB8thL5?=
- =?us-ascii?Q?Fg4zWfJ2wQfm0NfciKTZZ3Qn3divMnuZH9yBCaZLSMb99DvRfDHrvLJjx8FE?=
- =?us-ascii?Q?GVhFguPCtIxksfK04Ke03AV5O9LB7Q4dkuF2pbOT54xOuRGnjdDhNUVjkDjw?=
- =?us-ascii?Q?tVDT91xX7HmDvk4uzxMdPJ/1Kw4mXm6IbQyqUUXYJU+VqlKO8nZ0uIVH5N7d?=
- =?us-ascii?Q?h98GAD7RkMPW9981OkIXRe1pOrukn5JMDnBj/8IbN4UbnfHDA8nUMmEWzhTV?=
- =?us-ascii?Q?wbytwIGBW80zroEDko62oUuP/R/BY542/1+IlMf6sdScpSzSH2E+TLkxl2pJ?=
- =?us-ascii?Q?5Krl9jd+ewR3z0kNyAe5FURiW6ezi459z3x9NiKir4XMBfH6hztfYVVcVTaZ?=
- =?us-ascii?Q?xP3Y7yOaw0mT2rILsQwojRpB6KmldCvtiJjWw4Nt?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05cbfbc1-c0ff-4054-614e-08db88fcefb4
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3176.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 08:40:14.0687
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tix7EeaDS6l53ammRLs09uuO6zUxjam7jToWa7NELS3yf9S5uR7dpmf3vtRf5ORNgZt1wd3vx0Q3+/eMZ8QQ9A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7025
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20230720072903.21390-1-akihiko.odaki@daynix.com>
+In-Reply-To: <20230720072903.21390-1-akihiko.odaki@daynix.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 20 Jul 2023 09:45:56 +0100
+Message-ID: <CAFEAcA9BiXWweNEbMY1Xkso1B5-o3_85eW3QprQjerzM5nAo8g@mail.gmail.com>
+Subject: Re: [PATCH RESEND] accel/kvm: Specify default IPA size for arm64
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are two main use cases for mmu notifiers. One is by KVM which
-uses mmu_notifier_invalidate_range_start()/end() to manage a software
-TLB.
+On Thu, 20 Jul 2023 at 08:29, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>
+> libvirt uses "none" machine type to test KVM availability. Before this
+> change, QEMU used to pass 0 as machine type when calling KVM_CREATE_VM.
+>
+> The kernel documentation says:
+> > On arm64, the physical address size for a VM (IPA Size limit) is
+> > limited to 40bits by default. The limit can be configured if the host
+> > supports the extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+> > KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+> > identifier, where IPA_Bits is the maximum width of any physical
+> > address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
+> > machine type identifier.
+> >
+> > e.g, to configure a guest to use 48bit physical address size::
+> >
+> >     vm_fd = ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(48));
+> >
+> > The requested size (IPA_Bits) must be:
+> >
+> >  ==   =========================================================
+> >   0   Implies default size, 40bits (for backward compatibility)
+> >   N   Implies N bits, where N is a positive integer such that,
+> >       32 <= N <= Host_IPA_Limit
+> >  ==   =========================================================
+>
+> > Host_IPA_Limit is the maximum possible value for IPA_Bits on the host
+> > and is dependent on the CPU capability and the kernel configuration.
+> > The limit can be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the
+> > KVM_CHECK_EXTENSION ioctl() at run-time.
+> >
+> > Creation of the VM will fail if the requested IPA size (whether it is
+> > implicit or explicit) is unsupported on the host.
+> https://docs.kernel.org/virt/kvm/api.html#kvm-create-vm
+>
+> So if Host_IPA_Limit < 40, such KVM_CREATE_VM will fail, and libvirt
+> incorrectly thinks KVM is not available. This actually happened on M2
+> MacBook Air.
+>
+> Fix this by specifying 32 for IPA_Bits as any arm64 system should
+> support the value according to the documentation.
+>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+> Resending due to inactivity.
+>
+>  accel/kvm/kvm-all.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 373d876c05..3bd362e346 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2458,7 +2458,11 @@ static int kvm_init(MachineState *ms)
+>      KVMState *s;
+>      const KVMCapabilityInfo *missing_cap;
+>      int ret;
+> +#ifdef TARGET_AARCH64
+> +    int type = 32;
+> +#else
+>      int type = 0;
+> +#endif
+>      uint64_t dirty_log_manual_caps;
+>
+>      qemu_mutex_init(&kml_slots_lock);
+> --
+> 2.41.0
 
-The other is to manage hardware TLBs which need to use the
-invalidate_range() callback because HW can establish new TLB entries
-at any time. Hence using start/end() can lead to memory corruption as
-these callbacks happen too soon/late during page unmap.
+I think this was discussed in review the last time around on
+this patch (which is why it wasn't applied), but I don't think
+we should do this with a target ifdef in a common file. We should
+have some kind of target hook for targets to specify what they need
+to do here.
 
-mmu notifier users should therefore either use the start()/end()
-callbacks or the invalidate_range() callbacks. To make this usage
-clearer rename the invalidate_range() callback to
-arch_invalidate_secondary_tlbs() and update documention.
-
-Signed-off-by: Alistair Popple <apopple@nvidia.com>
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
----
- arch/arm64/include/asm/tlbflush.h               |  6 +-
- arch/powerpc/mm/book3s64/radix_hugetlbpage.c    |  2 +-
- arch/powerpc/mm/book3s64/radix_tlb.c            | 10 ++--
- arch/x86/include/asm/tlbflush.h                 |  2 +-
- arch/x86/mm/tlb.c                               |  2 +-
- drivers/iommu/amd/iommu_v2.c                    | 10 ++--
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c | 13 ++---
- drivers/iommu/intel/svm.c                       |  8 +--
- drivers/misc/ocxl/link.c                        |  8 +--
- include/linux/mmu_notifier.h                    | 48 +++++++++---------
- mm/huge_memory.c                                |  4 +-
- mm/hugetlb.c                                    |  7 +--
- mm/mmu_notifier.c                               | 20 ++++++--
- 13 files changed, 76 insertions(+), 64 deletions(-)
-
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index a99349d..84a05a0 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -253,7 +253,7 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
- 	__tlbi(aside1is, asid);
- 	__tlbi_user(aside1is, asid);
- 	dsb(ish);
--	mmu_notifier_invalidate_range(mm, 0, -1UL);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
- }
- 
- static inline void __flush_tlb_page_nosync(struct mm_struct *mm,
-@@ -265,7 +265,7 @@ static inline void __flush_tlb_page_nosync(struct mm_struct *mm,
- 	addr = __TLBI_VADDR(uaddr, ASID(mm));
- 	__tlbi(vale1is, addr);
- 	__tlbi_user(vale1is, addr);
--	mmu_notifier_invalidate_range(mm, uaddr & PAGE_MASK,
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, uaddr & PAGE_MASK,
- 						(uaddr & PAGE_MASK) + PAGE_SIZE);
- }
- 
-@@ -400,7 +400,7 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 		scale++;
- 	}
- 	dsb(ish);
--	mmu_notifier_invalidate_range(vma->vm_mm, start, end);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(vma->vm_mm, start, end);
- }
- 
- static inline void flush_tlb_range(struct vm_area_struct *vma,
-diff --git a/arch/powerpc/mm/book3s64/radix_hugetlbpage.c b/arch/powerpc/mm/book3s64/radix_hugetlbpage.c
-index f3fb49f..17075c7 100644
---- a/arch/powerpc/mm/book3s64/radix_hugetlbpage.c
-+++ b/arch/powerpc/mm/book3s64/radix_hugetlbpage.c
-@@ -39,7 +39,7 @@ void radix__flush_hugetlb_tlb_range(struct vm_area_struct *vma, unsigned long st
- 		radix__flush_tlb_pwc_range_psize(vma->vm_mm, start, end, psize);
- 	else
- 		radix__flush_tlb_range_psize(vma->vm_mm, start, end, psize);
--	mmu_notifier_invalidate_range(vma->vm_mm, start, end);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(vma->vm_mm, start, end);
- }
- 
- void radix__huge_ptep_modify_prot_commit(struct vm_area_struct *vma,
-diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
-index 9724b26..64c11a4 100644
---- a/arch/powerpc/mm/book3s64/radix_tlb.c
-+++ b/arch/powerpc/mm/book3s64/radix_tlb.c
-@@ -752,7 +752,7 @@ void radix__local_flush_tlb_page(struct vm_area_struct *vma, unsigned long vmadd
- 		return radix__local_flush_hugetlb_page(vma, vmaddr);
- #endif
- 	radix__local_flush_tlb_page_psize(vma->vm_mm, vmaddr, mmu_virtual_psize);
--	mmu_notifier_invalidate_range(vma->vm_mm, vmaddr,
-+	mmu_notifier_arch_invalidate_secondary_tlbs(vma->vm_mm, vmaddr,
- 						vmaddr + mmu_virtual_psize);
- }
- EXPORT_SYMBOL(radix__local_flush_tlb_page);
-@@ -989,7 +989,7 @@ void radix__flush_tlb_mm(struct mm_struct *mm)
- 		}
- 	}
- 	preempt_enable();
--	mmu_notifier_invalidate_range(mm, 0, -1UL);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
- }
- EXPORT_SYMBOL(radix__flush_tlb_mm);
- 
-@@ -1023,7 +1023,7 @@ static void __flush_all_mm(struct mm_struct *mm, bool fullmm)
- 			_tlbiel_pid_multicast(mm, pid, RIC_FLUSH_ALL);
- 	}
- 	preempt_enable();
--	mmu_notifier_invalidate_range(mm, 0, -1UL);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
- }
- 
- void radix__flush_all_mm(struct mm_struct *mm)
-@@ -1232,7 +1232,7 @@ static inline void __radix__flush_tlb_range(struct mm_struct *mm,
- 	}
- out:
- 	preempt_enable();
--	mmu_notifier_invalidate_range(mm, start, end);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, start, end);
- }
- 
- void radix__flush_tlb_range(struct vm_area_struct *vma, unsigned long start,
-@@ -1397,7 +1397,7 @@ static void __radix__flush_tlb_range_psize(struct mm_struct *mm,
- 	}
- out:
- 	preempt_enable();
--	mmu_notifier_invalidate_range(mm, start, end);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, start, end);
- }
- 
- void radix__flush_tlb_range_psize(struct mm_struct *mm, unsigned long start,
-diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
-index 0a54323..6ab42ca 100644
---- a/arch/x86/include/asm/tlbflush.h
-+++ b/arch/x86/include/asm/tlbflush.h
-@@ -283,7 +283,7 @@ static inline void arch_tlbbatch_add_pending(struct arch_tlbflush_unmap_batch *b
- {
- 	inc_mm_tlb_gen(mm);
- 	cpumask_or(&batch->cpumask, &batch->cpumask, mm_cpumask(mm));
--	mmu_notifier_invalidate_range(mm, 0, -1UL);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
- }
- 
- static inline void arch_flush_tlb_batched_pending(struct mm_struct *mm)
-diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index 93b2f81..2d25391 100644
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -1037,7 +1037,7 @@ void flush_tlb_mm_range(struct mm_struct *mm, unsigned long start,
- 
- 	put_flush_tlb_info();
- 	put_cpu();
--	mmu_notifier_invalidate_range(mm, start, end);
-+	mmu_notifier_arch_invalidate_secondary_tlbs(mm, start, end);
- }
- 
- 
-diff --git a/drivers/iommu/amd/iommu_v2.c b/drivers/iommu/amd/iommu_v2.c
-index 261352a..2596466 100644
---- a/drivers/iommu/amd/iommu_v2.c
-+++ b/drivers/iommu/amd/iommu_v2.c
-@@ -355,9 +355,9 @@ static struct pasid_state *mn_to_state(struct mmu_notifier *mn)
- 	return container_of(mn, struct pasid_state, mn);
- }
- 
--static void mn_invalidate_range(struct mmu_notifier *mn,
--				struct mm_struct *mm,
--				unsigned long start, unsigned long end)
-+static void mn_arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
-+					struct mm_struct *mm,
-+					unsigned long start, unsigned long end)
- {
- 	struct pasid_state *pasid_state;
- 	struct device_state *dev_state;
-@@ -391,8 +391,8 @@ static void mn_release(struct mmu_notifier *mn, struct mm_struct *mm)
- }
- 
- static const struct mmu_notifier_ops iommu_mn = {
--	.release		= mn_release,
--	.invalidate_range       = mn_invalidate_range,
-+	.release			= mn_release,
-+	.arch_invalidate_secondary_tlbs	= mn_arch_invalidate_secondary_tlbs,
- };
- 
- static void set_pri_tag_status(struct pasid_state *pasid_state,
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-index 2a19784..dbc812a 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-@@ -186,9 +186,10 @@ static void arm_smmu_free_shared_cd(struct arm_smmu_ctx_desc *cd)
- 	}
- }
- 
--static void arm_smmu_mm_invalidate_range(struct mmu_notifier *mn,
--					 struct mm_struct *mm,
--					 unsigned long start, unsigned long end)
-+static void arm_smmu_mm_arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
-+						struct mm_struct *mm,
-+						unsigned long start,
-+						unsigned long end)
- {
- 	struct arm_smmu_mmu_notifier *smmu_mn = mn_to_smmu(mn);
- 	struct arm_smmu_domain *smmu_domain = smmu_mn->domain;
-@@ -247,9 +248,9 @@ static void arm_smmu_mmu_notifier_free(struct mmu_notifier *mn)
- }
- 
- static const struct mmu_notifier_ops arm_smmu_mmu_notifier_ops = {
--	.invalidate_range	= arm_smmu_mm_invalidate_range,
--	.release		= arm_smmu_mm_release,
--	.free_notifier		= arm_smmu_mmu_notifier_free,
-+	.arch_invalidate_secondary_tlbs	= arm_smmu_mm_arch_invalidate_secondary_tlbs,
-+	.release			= arm_smmu_mm_release,
-+	.free_notifier			= arm_smmu_mmu_notifier_free,
- };
- 
- /* Allocate or get existing MMU notifier for this {domain, mm} pair */
-diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-index e95b339..8f6d680 100644
---- a/drivers/iommu/intel/svm.c
-+++ b/drivers/iommu/intel/svm.c
-@@ -219,9 +219,9 @@ static void intel_flush_svm_range(struct intel_svm *svm, unsigned long address,
- }
- 
- /* Pages have been freed at this point */
--static void intel_invalidate_range(struct mmu_notifier *mn,
--				   struct mm_struct *mm,
--				   unsigned long start, unsigned long end)
-+static void intel_arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
-+					struct mm_struct *mm,
-+					unsigned long start, unsigned long end)
- {
- 	struct intel_svm *svm = container_of(mn, struct intel_svm, notifier);
- 
-@@ -256,7 +256,7 @@ static void intel_mm_release(struct mmu_notifier *mn, struct mm_struct *mm)
- 
- static const struct mmu_notifier_ops intel_mmuops = {
- 	.release = intel_mm_release,
--	.invalidate_range = intel_invalidate_range,
-+	.arch_invalidate_secondary_tlbs = intel_arch_invalidate_secondary_tlbs,
- };
- 
- static DEFINE_MUTEX(pasid_mutex);
-diff --git a/drivers/misc/ocxl/link.c b/drivers/misc/ocxl/link.c
-index 4cf4c55..c06c699 100644
---- a/drivers/misc/ocxl/link.c
-+++ b/drivers/misc/ocxl/link.c
-@@ -491,9 +491,9 @@ void ocxl_link_release(struct pci_dev *dev, void *link_handle)
- }
- EXPORT_SYMBOL_GPL(ocxl_link_release);
- 
--static void invalidate_range(struct mmu_notifier *mn,
--			     struct mm_struct *mm,
--			     unsigned long start, unsigned long end)
-+static void arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
-+					struct mm_struct *mm,
-+					unsigned long start, unsigned long end)
- {
- 	struct pe_data *pe_data = container_of(mn, struct pe_data, mmu_notifier);
- 	struct ocxl_link *link = pe_data->link;
-@@ -509,7 +509,7 @@ static void invalidate_range(struct mmu_notifier *mn,
- }
- 
- static const struct mmu_notifier_ops ocxl_mmu_notifier_ops = {
--	.invalidate_range = invalidate_range,
-+	.arch_invalidate_secondary_tlbs = arch_invalidate_secondary_tlbs,
- };
- 
- static u64 calculate_cfg_state(bool kernel)
-diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
-index f2e9edc..6e3c857 100644
---- a/include/linux/mmu_notifier.h
-+++ b/include/linux/mmu_notifier.h
-@@ -187,27 +187,27 @@ struct mmu_notifier_ops {
- 				     const struct mmu_notifier_range *range);
- 
- 	/*
--	 * invalidate_range() is either called between
--	 * invalidate_range_start() and invalidate_range_end() when the
--	 * VM has to free pages that where unmapped, but before the
--	 * pages are actually freed, or outside of _start()/_end() when
--	 * a (remote) TLB is necessary.
-+	 * arch_invalidate_secondary_tlbs() is used to manage a non-CPU TLB
-+	 * which shares page-tables with the CPU. The
-+	 * invalidate_range_start()/end() callbacks should not be implemented as
-+	 * invalidate_secondary_tlbs() already catches the points in time when
-+	 * an external TLB needs to be flushed.
- 	 *
--	 * If invalidate_range() is used to manage a non-CPU TLB with
--	 * shared page-tables, it not necessary to implement the
--	 * invalidate_range_start()/end() notifiers, as
--	 * invalidate_range() already catches the points in time when an
--	 * external TLB range needs to be flushed. For more in depth
--	 * discussion on this see Documentation/mm/mmu_notifier.rst
-+	 * This requires arch_invalidate_secondary_tlbs() to be called while
-+	 * holding the ptl spin-lock and therefore this callback is not allowed
-+	 * to sleep.
- 	 *
--	 * Note that this function might be called with just a sub-range
--	 * of what was passed to invalidate_range_start()/end(), if
--	 * called between those functions.
-+	 * This is called by architecture code whenever invalidating a TLB
-+	 * entry. It is assumed that any secondary TLB has the same rules for
-+	 * when invalidations are required. If this is not the case architecture
-+	 * code will need to call this explicitly when required for secondary
-+	 * TLB invalidation.
- 	 */
--	void (*invalidate_range)(struct mmu_notifier *subscription,
--				 struct mm_struct *mm,
--				 unsigned long start,
--				 unsigned long end);
-+	void (*arch_invalidate_secondary_tlbs)(
-+					struct mmu_notifier *subscription,
-+					struct mm_struct *mm,
-+					unsigned long start,
-+					unsigned long end);
- 
- 	/*
- 	 * These callbacks are used with the get/put interface to manage the
-@@ -396,8 +396,8 @@ extern void __mmu_notifier_change_pte(struct mm_struct *mm,
- 				      unsigned long address, pte_t pte);
- extern int __mmu_notifier_invalidate_range_start(struct mmu_notifier_range *r);
- extern void __mmu_notifier_invalidate_range_end(struct mmu_notifier_range *r);
--extern void __mmu_notifier_invalidate_range(struct mm_struct *mm,
--				  unsigned long start, unsigned long end);
-+extern void __mmu_notifier_arch_invalidate_secondary_tlbs(struct mm_struct *mm,
-+					unsigned long start, unsigned long end);
- extern bool
- mmu_notifier_range_update_to_read_only(const struct mmu_notifier_range *range);
- 
-@@ -483,11 +483,11 @@ mmu_notifier_invalidate_range_end(struct mmu_notifier_range *range)
- 		__mmu_notifier_invalidate_range_end(range);
- }
- 
--static inline void mmu_notifier_invalidate_range(struct mm_struct *mm,
--				  unsigned long start, unsigned long end)
-+static inline void mmu_notifier_arch_invalidate_secondary_tlbs(struct mm_struct *mm,
-+					unsigned long start, unsigned long end)
- {
- 	if (mm_has_notifiers(mm))
--		__mmu_notifier_invalidate_range(mm, start, end);
-+		__mmu_notifier_arch_invalidate_secondary_tlbs(mm, start, end);
- }
- 
- static inline void mmu_notifier_subscriptions_init(struct mm_struct *mm)
-@@ -664,7 +664,7 @@ void mmu_notifier_invalidate_range_end(struct mmu_notifier_range *range)
- {
- }
- 
--static inline void mmu_notifier_invalidate_range(struct mm_struct *mm,
-+static inline void mmu_notifier_arch_invalidate_secondary_tlbs(struct mm_struct *mm,
- 				  unsigned long start, unsigned long end)
- {
- }
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 3ece117..e0420de 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -2120,8 +2120,8 @@ static void __split_huge_pmd_locked(struct vm_area_struct *vma, pmd_t *pmd,
- 	if (is_huge_zero_pmd(*pmd)) {
- 		/*
- 		 * FIXME: Do we want to invalidate secondary mmu by calling
--		 * mmu_notifier_invalidate_range() see comments below inside
--		 * __split_huge_pmd() ?
-+		 * mmu_notifier_arch_invalidate_secondary_tlbs() see comments below
-+		 * inside __split_huge_pmd() ?
- 		 *
- 		 * We are going from a zero huge page write protected to zero
- 		 * small page also write protected so it does not seems useful
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index 9c6e431..e0028cb 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -6676,8 +6676,9 @@ long hugetlb_change_protection(struct vm_area_struct *vma,
- 	else
- 		flush_hugetlb_tlb_range(vma, start, end);
- 	/*
--	 * No need to call mmu_notifier_invalidate_range() we are downgrading
--	 * page table protection not changing it to point to a new page.
-+	 * No need to call mmu_notifier_arch_invalidate_secondary_tlbs() we are
-+	 * downgrading page table protection not changing it to point to a new
-+	 * page.
- 	 *
- 	 * See Documentation/mm/mmu_notifier.rst
- 	 */
-@@ -7321,7 +7322,7 @@ static void hugetlb_unshare_pmds(struct vm_area_struct *vma,
- 	i_mmap_unlock_write(vma->vm_file->f_mapping);
- 	hugetlb_vma_unlock_write(vma);
- 	/*
--	 * No need to call mmu_notifier_invalidate_range(), see
-+	 * No need to call mmu_notifier_arch_invalidate_secondary_tlbs(), see
- 	 * Documentation/mm/mmu_notifier.rst.
- 	 */
- 	mmu_notifier_invalidate_range_end(&range);
-diff --git a/mm/mmu_notifier.c b/mm/mmu_notifier.c
-index 453a156..63c8eb7 100644
---- a/mm/mmu_notifier.c
-+++ b/mm/mmu_notifier.c
-@@ -585,8 +585,8 @@ void __mmu_notifier_invalidate_range_end(struct mmu_notifier_range *range)
- 	lock_map_release(&__mmu_notifier_invalidate_range_start_map);
- }
- 
--void __mmu_notifier_invalidate_range(struct mm_struct *mm,
--				  unsigned long start, unsigned long end)
-+void __mmu_notifier_arch_invalidate_secondary_tlbs(struct mm_struct *mm,
-+					unsigned long start, unsigned long end)
- {
- 	struct mmu_notifier *subscription;
- 	int id;
-@@ -595,9 +595,10 @@ void __mmu_notifier_invalidate_range(struct mm_struct *mm,
- 	hlist_for_each_entry_rcu(subscription,
- 				 &mm->notifier_subscriptions->list, hlist,
- 				 srcu_read_lock_held(&srcu)) {
--		if (subscription->ops->invalidate_range)
--			subscription->ops->invalidate_range(subscription, mm,
--							    start, end);
-+		if (subscription->ops->arch_invalidate_secondary_tlbs)
-+			subscription->ops->arch_invalidate_secondary_tlbs(
-+				subscription, mm,
-+				start, end);
- 	}
- 	srcu_read_unlock(&srcu, id);
- }
-@@ -616,6 +617,15 @@ int __mmu_notifier_register(struct mmu_notifier *subscription,
- 	mmap_assert_write_locked(mm);
- 	BUG_ON(atomic_read(&mm->mm_users) <= 0);
- 
-+	/*
-+	 * Subsystems should only register for invalidate_secondary_tlbs() or
-+	 * invalidate_range_start()/end() callbacks, not both.
-+	 */
-+	if (WARN_ON_ONCE(subscription->ops->arch_invalidate_secondary_tlbs &&
-+				(subscription->ops->invalidate_range_start ||
-+				subscription->ops->invalidate_range_end)))
-+		return -EINVAL;
-+
- 	if (!mm->notifier_subscriptions) {
- 		/*
- 		 * kmalloc cannot be called under mm_take_all_locks(), but we
--- 
-git-series 0.9.1
+thanks
+-- PMM
