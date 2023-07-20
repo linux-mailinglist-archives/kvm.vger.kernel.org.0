@@ -2,101 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A03475A3E2
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 03:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84CBA75A3F7
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 03:31:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbjGTBZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jul 2023 21:25:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39878 "EHLO
+        id S229814AbjGTBbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jul 2023 21:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjGTBZ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jul 2023 21:25:27 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25DE82103
-        for <kvm@vger.kernel.org>; Wed, 19 Jul 2023 18:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689816322; x=1721352322;
-  h=message-id:date:mime-version:subject:to:references:cc:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qtyB5FWWgjJe+BstO6BqushuEHdhnWeesk3dJhk8/4g=;
-  b=ibegDybYQdLOSJDFWy2RHhaUBN5FpwRfFxRzgl1i5zxt8o5zAq8I2ZGf
-   B96OHzVkCnf/Bax+4wkzPqPrkk70ChuphlP0a8wS/2tOIla816BffgTcp
-   mfj75KeHClaRBb12BTNEaJLiCGj0hMV5PNBy5nbuJDRSklFFDdLnw+iXk
-   W2zKFO/V63C5u8eK1y2rYoayIN7FtSvDBKO68PoF2i8ddKM5/3YXEMSd4
-   lM87Yiwx9v25sF6BEAn5XaOk+i0FBCfJIN5NEpv+sf+Gy7sC0eDRWM7cp
-   jLH/XPgvNg+iwieCoaI2hVzwsQY8D+WDXLr9TgY62WvsXxUKbHpmPx6gZ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="346202248"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="346202248"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:25:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10776"; a="753892814"
-X-IronPort-AV: E=Sophos;i="6.01,216,1684825200"; 
-   d="scan'208";a="753892814"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2023 18:25:18 -0700
-Message-ID: <529cd705-f5c3-a5d1-9999-a3d2ccd09dd6@intel.com>
-Date:   Thu, 20 Jul 2023 09:25:14 +0800
+        with ESMTP id S229476AbjGTBbl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jul 2023 21:31:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075A82112;
+        Wed, 19 Jul 2023 18:31:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3A6B96187A;
+        Thu, 20 Jul 2023 01:31:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B390C433C8;
+        Thu, 20 Jul 2023 01:31:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689816694;
+        bh=UDoAwOoTRFMVXMbtpTIjACSb6DxR18kojrUncbeOA18=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Va7hgLXLrKKOJjpAv2HcDzaAhxIkO+JYdw5MfU+6lVXsogaHmRH/WW+YxtrWObKj+
+         2Be8/jJ+YOy9V34SJzjspVfn/yMS6pxozyYmqvt6jWy+Bb0EUnTkXU50EN3h8wA5zl
+         Eh3284/BNRh/C3Pf8LDg3YFy1pX0OfrShi4W8xDCqX99AENT7rzbXFF6vzzKDoiaIR
+         iIHc7E/kJonG4MfyYmTmi0I204S2MwjazVkPt5i5W+ibP5MRCwgSmX7Oj2+QQoncN2
+         mQnhGuWUzFV0Y+/Mu/kw6NsWbVNjpSprEjfV46jHsnPJx+/f8duJVJsoqzj6y6R5Fz
+         FvbxJ2OhkGJUg==
+From:   SeongJae Park <sj@kernel.org>
+To:     Alistair Popple <apopple@nvidia.com>
+Cc:     SeongJae Park <sj@kernel.org>, akpm@linux-foundation.org,
+        ajd@linux.ibm.com, catalin.marinas@arm.com, fbarrat@linux.ibm.com,
+        iommu@lists.linux.dev, jgg@ziepe.ca, jhubbard@nvidia.com,
+        kevin.tian@intel.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, nicolinc@nvidia.com, npiggin@gmail.com,
+        robin.murphy@arm.com, seanjc@google.com, will@kernel.org,
+        x86@kernel.org, zhi.wang.linux@gmail.com
+Subject: Re: [PATCH v2 3/5] mmu_notifiers: Call invalidate_range() when invalidating TLBs
+Date:   Thu, 20 Jul 2023 01:31:31 +0000
+Message-Id: <20230720013131.1880-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <877cqvl7vr.fsf@nvdebian.thelocal>
+References: 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
-References: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
-Cc:     "Gao, Chao" <chao.gao@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/20/2023 2:08 AM, Jim Mattson wrote:
-> Normally, we would restrict guest MSR writes based on guest CPU
-> features. However, with IA32_SPEC_CTRL and IA32_PRED_CMD, this is not
-> the case.
+On Thu, 20 Jul 2023 10:52:59 +1000 Alistair Popple <apopple@nvidia.com> wrote:
+
 > 
-> For the first non-zero write to IA32_SPEC_CTRL, we check to see that
-> the host supports the value written. We don't care whether or not the
-> guest supports the value written (as long as it supports the MSR).
-> After the first non-zero write, we stop intercepting writes to
-> IA32_SPEC_CTRL, so the guest can write any value supported by the
-> hardware. This could be problematic in heterogeneous migration pools.
-> For instance, a VM that starts on a Cascade Lake host may set
-> IA32_SPEC_CTRL.PSFD[bit 7], even if the guest
-> CPUID.(EAX=07H,ECX=02H):EDX.PSFD[bit 0] is clear. Then, if that VM is
-> migrated to a Skylake host, KVM_SET_MSRS will refuse to set
-> IA32_SPEC_CTRL to its current value, because Skylake doesn't support
-> PSFD.
+> SeongJae Park <sj@kernel.org> writes:
 > 
-> We disable write intercepts IA32_PRED_CMD as long as the guest
-> supports the MSR. That's fine for now, since only one bit of PRED_CMD
-> has been defined. Hence, guest support and host support are
-> equivalent...today. But, are we really comfortable with letting the
-> guest set any IA32_PRED_CMD bit that may be defined in the future?
- >
-> The same question applies to IA32_SPEC_CTRL. Are we comfortable with
-> letting the guest write to any bit that may be defined in the future?
+> > Hi Alistair,
+> >
+> > On Wed, 19 Jul 2023 22:18:44 +1000 Alistair Popple <apopple@nvidia.com> wrote:
+> >
+> >> The invalidate_range() is going to become an architecture specific mmu
+> >> notifier used to keep the TLB of secondary MMUs such as an IOMMU in
+> >> sync with the CPU page tables. Currently it is called from separate
+> >> code paths to the main CPU TLB invalidations. This can lead to a
+> >> secondary TLB not getting invalidated when required and makes it hard
+> >> to reason about when exactly the secondary TLB is invalidated.
+> >> 
+> >> To fix this move the notifier call to the architecture specific TLB
+> >> maintenance functions for architectures that have secondary MMUs
+> >> requiring explicit software invalidations.
+> >> 
+> >> This fixes a SMMU bug on ARM64. On ARM64 PTE permission upgrades
+> >> require a TLB invalidation. This invalidation is done by the
+> >> architecutre specific ptep_set_access_flags() which calls
+> >> flush_tlb_page() if required. However this doesn't call the notifier
+> >> resulting in infinite faults being generated by devices using the SMMU
+> >> if it has previously cached a read-only PTE in it's TLB.
+> >> 
+> >> Moving the invalidations into the TLB invalidation functions ensures
+> >> all invalidations happen at the same time as the CPU invalidation. The
+> >> architecture specific flush_tlb_all() routines do not call the
+> >> notifier as none of the IOMMUs require this.
+> >> 
+> >> Signed-off-by: Alistair Popple <apopple@nvidia.com>
+> >> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> >
+> > I found below kernel NULL-dereference issue on latest mm-unstable tree, and
+> > bisect points me to the commit of this patch, namely
+> > 75c400f82d347af1307010a3e06f3aa5d831d995.
+> >
+> > To reproduce, I use 'stress-ng --bigheap $(nproc)'.  The issue happens as soon
+> > as it starts reclaiming memory.  I didn't dive deep into this yet, but
+> > reporting this issue first, since you might have an idea already.
+> 
+> Thanks for the report SJ!
+> 
+> I see the problem - current->mm can (obviously!) be NULL which is what's
+> leading to the NULL dereference. Instead I think on x86 I need to call
+> the notifier when adding the invalidate to the tlbbatch in
+> arch_tlbbatch_add_pending() which is equivalent to what ARM64 does.
+> 
+> The below should fix it. Will do a respin with this.
 
-My point is we need to fix it, though Chao has different point that 
-sometimes performance may be more important[*]
+Thank you for this quick reply!  I confirm this fixes my issue.
 
-[*] https://lore.kernel.org/all/ZGdE3jNS11wV+V2w@chao-email/
 
-> At least the AMD approach with V_SPEC_CTRL prevents the guest from
-> clearing any bits set by the host, but on Intel, it's a total
-> free-for-all. What happens when a new bit is defined that absolutely
-> must be set to 1 all of the time?
+Tested-by: SeongJae Park <sj@kernel.org>
 
+> 
+> ---
+> 
+> diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+> index 837e4a50281a..79c46da919b9 100644
+> --- a/arch/x86/include/asm/tlbflush.h
+> +++ b/arch/x86/include/asm/tlbflush.h
+> @@ -4,6 +4,7 @@
+>  
+>  #include <linux/mm_types.h>
+>  #include <linux/sched.h>
+> +#include <linux/mmu_notifier.h>
+
+Nit.  How about putting it between mm_types.h and sched.h, so that it looks
+alphabetically sorted?
+
+>  
+>  #include <asm/processor.h>
+>  #include <asm/cpufeature.h>
+> @@ -282,6 +283,7 @@ static inline void arch_tlbbatch_add_pending(struct arch_tlbflush_unmap_batch *b
+>  {
+>  	inc_mm_tlb_gen(mm);
+>  	cpumask_or(&batch->cpumask, &batch->cpumask, mm_cpumask(mm));
+> +	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
+>  }
+>  
+>  static inline void arch_flush_tlb_batched_pending(struct mm_struct *mm)
+> diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
+> index 0b990fb56b66..2d253919b3e8 100644
+> --- a/arch/x86/mm/tlb.c
+> +++ b/arch/x86/mm/tlb.c
+> @@ -1265,7 +1265,6 @@ void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+>  
+>  	put_flush_tlb_info();
+>  	put_cpu();
+> -	mmu_notifier_arch_invalidate_secondary_tlbs(current->mm, 0, -1UL);
+>  }
+>  
+>  /*
+> 
+> 
+
+
+Thanks,
+SJ
