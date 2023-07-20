@@ -2,166 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 494F575B851
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 21:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5807575B89D
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 22:21:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbjGTTxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 15:53:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50316 "EHLO
+        id S229819AbjGTUUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 16:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjGTTxH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 15:53:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D78591733
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 12:53:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5CD8961C3D
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 19:53:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E0DC433CC;
-        Thu, 20 Jul 2023 19:53:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689882785;
-        bh=f2zoX/f2BDWXdTqXLQTyx96joLx1NKF0n400nYI5mHs=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=rt1oe06eBVoHzBMd47hKt4olPkaF18XXvn1lyClLZKV6+ZHxv6EpK+TUu9b07DlTT
-         Zca8fuPLdqwjPzJe9xU7W7nlQHTmn1+IuzoXDyJzDc5b4cAutVAPBvBZYKhocIx027
-         K+MjktTzgY4QiuRVnLdG79zzeH+/qZgtDlEcAW2Ovul+iOKkUleYhVAJxseB1x9mOR
-         SjgkUoHScZpkz2XmAtgze6BTT56VqgeixCI2mEGvozqv9lmgVYYbudDiT3orqzpwQ+
-         3LKVCGaSveRlC6eR8TB2o4O7GHx7/QAY3ehnWzXbu6UG1961PabOzPMK9xaksANQNa
-         gkrKkk2S4w12Q==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 48CD5CE03CF; Thu, 20 Jul 2023 12:53:05 -0700 (PDT)
-Date:   Thu, 20 Jul 2023 12:53:05 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        with ESMTP id S229727AbjGTUUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 16:20:16 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DA2E2727
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 13:20:14 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d00bc21a646so390923276.3
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 13:20:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689884413; x=1690489213;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s1/m4T5EZ9UQZdIAs+CFQOUhGGMJn3z6NAlZtvxtssM=;
+        b=mbsHztlENnOTDgeCIXRdF8x4x9OfLSlTRQf7EJhk2yHC8ssudjPjJb663muGwwAUde
+         HXusCSecX8QAy71He4xwRicW2VAZ7RFVOVmJQZun5eygpfocaFcEhJVdz1DXPqrP14f5
+         Q9r/63tqP/iMmto5FytBtXhV7bicbpwNBGhhzc7AVroN6uvn7SvVpiEQCLnIHWcphWhi
+         L6PAVpT/JWEQDmjGRRbXmNFkgwEJImoyKV1xDjpLesAAmXECVa9yb/PUNJmSrVHElsLh
+         RUk/Cxj/0yokxjf+pISM5EmdcaPLl3odQz7EeG720kJEtO6hviZvCg7ubhY+cpI9tJBr
+         NkXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689884413; x=1690489213;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s1/m4T5EZ9UQZdIAs+CFQOUhGGMJn3z6NAlZtvxtssM=;
+        b=Nn48RAooR8+xh/QBUUwy77MSIw/FDo7Bcqg/uxC00KEEHh7gTHY9YTxyV+aOMCpOwU
+         2EMsqAIkfLTyMOJCL2hC2bShZ3oDrCiKXwkPjYauJwM033pDGtJskI1NY2NoMccE19zH
+         J/gjc/b9q4tvjBgGwuZtbVi2xGVpdPXL5Hwu8B6ShM9Zsqcru6syO6X+YxRg8E2UWXjM
+         Y2vYM/kJM2yMo/BA/mefSISEKn3KtYV0/j+M+OozYYRuHTFrQ8/duyWpnIQNaeNKEKAq
+         m7iMriuvHPIaKxrxkpEYa49ETMcsKZRX72WzkdQHaeTjXwuv39F2/GXMvU6BwAGgrUhn
+         ZS3A==
+X-Gm-Message-State: ABy/qLaVl7i5JBcT1JkrHe5p2Kyq3wpApgD2iXQYQIuPUQ3j9SbEhCR9
+        nHpRDN6xPZVjPU6vsZ9GFcU1xo+pKqc=
+X-Google-Smtp-Source: APBJJlHJCm6H269xOtL/2AMirqWxt3kOhxlKiB8lLLwF2CbQnv6wXW7fNhFjFSiI4U52DqkXiLsyKn98s/w=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:4d08:0:b0:c6c:6122:5b69 with SMTP id
+ a8-20020a254d08000000b00c6c61225b69mr236ybb.8.1689884413509; Thu, 20 Jul 2023
+ 13:20:13 -0700 (PDT)
+Date:   Thu, 20 Jul 2023 13:20:11 -0700
+In-Reply-To: <20230720190211.GF25699@ls.amr.corp.intel.com>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-9-seanjc@google.com>
+ <20230720080912.g56zi5hywazrhnam@yy-desk-7060> <20230720190211.GF25699@ls.amr.corp.intel.com>
+Message-ID: <ZLmW+9G6EbKLkOOz@google.com>
+Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Yuan Yao <yuan.yao@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 17/20] rcutorture: Add a test config to torture
- test low RCU_DYNTICKS width
-Message-ID: <24b55289-1c35-41cc-9ad3-baa957f1c9cb@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-18-vschneid@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230720163056.2564824-18-vschneid@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 05:30:53PM +0100, Valentin Schneider wrote:
-> We now have an RCU_EXPORT knob for configuring the size of the dynticks
-> counter: CONFIG_RCU_DYNTICKS_BITS.
+On Thu, Jul 20, 2023, Isaku Yamahata wrote:
+> On Thu, Jul 20, 2023 at 04:09:12PM +0800,
+> Yuan Yao <yuan.yao@linux.intel.com> wrote:
 > 
-> Add a torture config for a ridiculously small counter (2 bits). This is ac
-> opy of TREE4 with the added counter size restriction.
+> > On Tue, Jul 18, 2023 at 04:44:51PM -0700, Sean Christopherson wrote:
+> > > @@ -2301,4 +2305,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> > >  /* Max number of entries allowed for each kvm dirty ring */
+> > >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+> > >
+> > > +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> > > +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
+> > > +{
+> > > +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
+> > > +}
+> > > +
+> > > +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> > > +					 struct kvm_gfn_range *range);
+> > 
+> > Used but no definition in this patch, it's defined in next patch 09.
+> > How about add weak version in this patch and let ARCHs to overide it ?
 > 
-> Link: http://lore.kernel.org/r/4c2cb573-168f-4806-b1d9-164e8276e66a@paulmck-laptop
-> Suggested-by: Paul E. McKenney <paulmck@kernel.org>
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
->  .../selftests/rcutorture/configs/rcu/TREE11   | 19 +++++++++++++++++++
->  .../rcutorture/configs/rcu/TREE11.boot        |  1 +
->  2 files changed, 20 insertions(+)
->  create mode 100644 tools/testing/selftests/rcutorture/configs/rcu/TREE11
->  create mode 100644 tools/testing/selftests/rcutorture/configs/rcu/TREE11.boot
-> 
-> diff --git a/tools/testing/selftests/rcutorture/configs/rcu/TREE11 b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
-> new file mode 100644
-> index 0000000000000..aa7274efd9819
-> --- /dev/null
-> +++ b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
-> @@ -0,0 +1,19 @@
-> +CONFIG_SMP=y
-> +CONFIG_NR_CPUS=8
-> +CONFIG_PREEMPT_NONE=n
-> +CONFIG_PREEMPT_VOLUNTARY=y
-> +CONFIG_PREEMPT=n
-> +CONFIG_PREEMPT_DYNAMIC=n
-> +#CHECK#CONFIG_TREE_RCU=y
-> +CONFIG_HZ_PERIODIC=n
-> +CONFIG_NO_HZ_IDLE=n
-> +CONFIG_NO_HZ_FULL=y
-> +CONFIG_RCU_TRACE=y
-> +CONFIG_RCU_FANOUT=4
-> +CONFIG_RCU_FANOUT_LEAF=3
-> +CONFIG_DEBUG_LOCK_ALLOC=n
-> +CONFIG_DEBUG_OBJECTS_RCU_HEAD=n
-> +CONFIG_RCU_EXPERT=y
-> +CONFIG_RCU_EQS_DEBUG=y
-> +CONFIG_RCU_LAZY=y
-> +CONFIG_RCU_DYNTICKS_BITS=2
+> It is guarded by CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
 
-Why not just add this last line to the existing TREE04 scenario?
-That would ensure that it gets tested regularly without extending the
-time required to run a full set of rcutorture tests.
-
-> diff --git a/tools/testing/selftests/rcutorture/configs/rcu/TREE11.boot b/tools/testing/selftests/rcutorture/configs/rcu/TREE11.boot
-> new file mode 100644
-> index 0000000000000..a8d94caf7d2fd
-> --- /dev/null
-> +++ b/tools/testing/selftests/rcutorture/configs/rcu/TREE11.boot
-> @@ -0,0 +1 @@
-> +rcutree.rcu_fanout_leaf=4 nohz_full=1-N
-> -- 
-> 2.31.1
-> 
+Yep.  I don't love the ordering, e.g. this patch can't even be compile tested
+until later in the series, but I wanted to separate x86 usage from the generic
+support code.
