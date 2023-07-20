@@ -2,288 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6AD75B49B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 18:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D442B75B4AA
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 18:40:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231655AbjGTQhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 12:37:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57094 "EHLO
+        id S231685AbjGTQkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 12:40:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjGTQhK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 12:37:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C688C30DF
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 09:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689870885;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=amrP88Jqmb7M02bSDE9mFh1MFKi+V3yBx6dizqUgPII=;
-        b=UjbraSCbDOty3zOeVEO4DScvsOpidest5WvzhUmstwfJexz/Z0FqW3HAyJ4Akgjd/4pwzH
-        JnK8/MDfl+oi17pWZfwT2xLAVx7FpeS7GHra6ExpUe8PIs5r8hy+QV2MOQcdsrDZS98x6U
-        uriK15V4SZISg6QK2S61Fj5C51zSqx0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613-tiaKu1LnPgWKO7yNg3Rgug-1; Thu, 20 Jul 2023 12:34:43 -0400
-X-MC-Unique: tiaKu1LnPgWKO7yNg3Rgug-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF946800B35;
-        Thu, 20 Jul 2023 16:34:40 +0000 (UTC)
-Received: from vschneid.remote.csb (unknown [10.42.28.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C55AF40C206F;
-        Thu, 20 Jul 2023 16:34:32 +0000 (UTC)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: [RFC PATCH v2 20/20] x86/mm, mm/vmalloc: Defer flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-Date:   Thu, 20 Jul 2023 17:30:56 +0100
-Message-Id: <20230720163056.2564824-21-vschneid@redhat.com>
-In-Reply-To: <20230720163056.2564824-1-vschneid@redhat.com>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
+        with ESMTP id S231169AbjGTQjw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 12:39:52 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEEE30C3
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 09:39:30 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6b9d68a7abaso820096a34.3
+        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 09:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689871168; x=1690475968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hbkr9MsN6GS2zP4ChfBB/zC7lOL9scc+qhxb4xXFEHY=;
+        b=ZsFDGq8cH/dWXxvB9jnW7BB7gCWULwMCvXTzzuLeSz638a3+G9S2UqX/8cmrYcLzN0
+         yvN+TMD76I2EYK0SX1EecmKJmCSn73KXdzTdxnZpEds3ttSrnvy/yeu62hWo01qPw8pq
+         rxUf41TPQ7f0ZU98Dun0XYO9XulNM5WTTdq9SYdP0Bnl4izB0mNiHltWfH9F+2ASloM9
+         dXgh0o8j6e8Nx0+gNnetSdWpBNiRagMqlHoqGcgcE3ykUzYsrj+9Z9Cip/cDdzgsuWoO
+         yM1GYpZAHvwxUrEtih8bv+jp2JLPruSUnsHd12qWtMTjdaHr07WiGTOaq9DvlNfSqIYI
+         dFKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689871168; x=1690475968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hbkr9MsN6GS2zP4ChfBB/zC7lOL9scc+qhxb4xXFEHY=;
+        b=A2pm2g2p6u3Hvo0ixB9IJCkS11BZ214yfGndh1dNQRapxjXRg1FxGxiqQ4fxaCmQbk
+         X2nwaV6Z6oIe7q0kGNHe6J6LqaCbuHmHoMDDKLzI8FQ4c+GnFSIJ4yFeFYvLIQx3Q8tq
+         +RvUtqatkLSXLBqKzp8ahCZJGYGLCM9GwEpm/ocOoOxx1XYyoCiGpl1rAzRGwYTaILJZ
+         Kb3TjEqfR9hImLFc5lNsWLb01kN3feTGiayK9ydIb54syLcnWgnRJKsJ3dXVhIFoK2pK
+         +1G3fCH5MLm0aT8Lzd8nL1SrnnU0err11yo1v+EFnbd3A21W3EPwGdQcUBAEyp/QTvN1
+         OyCQ==
+X-Gm-Message-State: ABy/qLarXtiWLIg/vnK4guAzZJJ1C4fhC8737DpgaVx44PelPxq4aoxa
+        JCujTFNNvfbPsZbwwh+rCdXQnqpjvFNd2Y6uYnM7Cw==
+X-Google-Smtp-Source: APBJJlFzGdOrTTow2+txRV2Vh5nCFjfKe7odZM806Rr1bFcCUvl0DLCd/EZzsZ/T53f5OmkGfZ+OZ09Q8fMBdMsSS0Q=
+X-Received: by 2002:a05:6870:f68e:b0:1b0:649f:e68a with SMTP id
+ el14-20020a056870f68e00b001b0649fe68amr24733oab.25.1689871168307; Thu, 20 Jul
+ 2023 09:39:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20230718164522.3498236-1-jingzhangos@google.com>
+ <20230718164522.3498236-4-jingzhangos@google.com> <87o7k77yn5.fsf@redhat.com>
+In-Reply-To: <87o7k77yn5.fsf@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 20 Jul 2023 09:39:15 -0700
+Message-ID: <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
+Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vunmap()'s issued from housekeeping CPUs are a relatively common source of
-interference for isolated NOHZ_FULL CPUs, as they are hit by the
-flush_tlb_kernel_range() IPIs.
+Hi Cornelia,
 
-Given that CPUs executing in userspace do not access data in the vmalloc
-range, these IPIs could be deferred until their next kernel entry.
+On Thu, Jul 20, 2023 at 1:52=E2=80=AFAM Cornelia Huck <cohuck@redhat.com> w=
+rote:
+>
+> On Tue, Jul 18 2023, Jing Zhang <jingzhangos@google.com> wrote:
+>
+> > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> > from usrespace with this change.
+>
+> Typo: s/usrespace/userspace/
+Thanks.
+>
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 053d8057ff1e..f33aec83f1b4 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2008,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >         .set_user =3D set_id_dfr0_el1,
+> >         .visibility =3D aa32_id_visibility,
+> >         .reset =3D read_sanitised_id_dfr0_el1,
+> > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+> > +       .val =3D GENMASK(63, 0), },
+> >       ID_HIDDEN(ID_AFR0_EL1),
+> >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > @@ -2057,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >         .get_user =3D get_id_reg,
+> >         .set_user =3D set_id_aa64dfr0_el1,
+> >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+> > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+> > +       .val =3D GENMASK(63, 0), },
+> >       ID_SANITISED(ID_AA64DFR1_EL1),
+> >       ID_UNALLOCATED(5,2),
+> >       ID_UNALLOCATED(5,3),
+>
+> How does userspace find out whether a given id reg is actually writable,
+> other than trying to write to it?
+>
+No mechanism was provided to userspace to discover if a given idreg or
+any fields of a given idreg is writable. The write to a readonly idreg
+can also succeed (write ignored) without any error if what's written
+is exactly the same as what the idreg holds or if it is a write to
+AArch32 idregs on an AArch64-only system.
+Not sure if it is worth adding an API to return the writable mask for
+idregs, since we want to enable the writable for all allocated
+unhidden idregs eventually.
 
-This does require a guarantee that nothing in the vmalloc range can be
-accessed in early entry code. vmalloc'd kernel stacks (VMAP_STACK) are
-AFAICT a safe exception, as a task running in userspace needs to enter
-kernelspace to execute do_exit() before its stack can be vfree'd.
-
-XXX: Validation that nothing in the vmalloc range is accessed in .noinstr or
-  somesuch?
-
-Blindly deferring any and all flush of the kernel mappings is a risky move,
-so introduce a variant of flush_tlb_kernel_range() that explicitly allows
-deferral. Use it for vunmap flushes.
-
-Note that while flush_tlb_kernel_range() may end up issuing a full
-flush (including user mappings), this only happens when reaching a
-invalidation range threshold where it is cheaper to do a full flush than to
-individually invalidate each page in the range via INVLPG. IOW, it doesn't
-*require* invalidating user mappings, and thus remains safe to defer until
-a later kernel entry.
-
-Signed-off-by: Valentin Schneider <vschneid@redhat.com>
----
- arch/x86/include/asm/tlbflush.h |  1 +
- arch/x86/mm/tlb.c               | 23 ++++++++++++++++++++---
- mm/vmalloc.c                    | 19 ++++++++++++++-----
- 3 files changed, 35 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
-index 323b971987af7..0b9b1f040c476 100644
---- a/arch/x86/include/asm/tlbflush.h
-+++ b/arch/x86/include/asm/tlbflush.h
-@@ -248,6 +248,7 @@ extern void flush_tlb_mm_range(struct mm_struct *mm, unsigned long start,
- 				unsigned long end, unsigned int stride_shift,
- 				bool freed_tables);
- extern void flush_tlb_kernel_range(unsigned long start, unsigned long end);
-+extern void flush_tlb_kernel_range_deferrable(unsigned long start, unsigned long end);
- 
- static inline void flush_tlb_page(struct vm_area_struct *vma, unsigned long a)
- {
-diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index 631df9189ded4..bb18b35e61b4a 100644
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -10,6 +10,7 @@
- #include <linux/debugfs.h>
- #include <linux/sched/smt.h>
- #include <linux/task_work.h>
-+#include <linux/context_tracking.h>
- 
- #include <asm/tlbflush.h>
- #include <asm/mmu_context.h>
-@@ -1045,6 +1046,11 @@ static void do_flush_tlb_all(void *info)
- 	__flush_tlb_all();
- }
- 
-+static bool do_kernel_flush_defer_cond(int cpu, void *info)
-+{
-+	return !ct_set_cpu_work(cpu, CONTEXT_WORK_TLBI);
-+}
-+
- void flush_tlb_all(void)
- {
- 	count_vm_tlb_event(NR_TLB_REMOTE_FLUSH);
-@@ -1061,12 +1067,13 @@ static void do_kernel_range_flush(void *info)
- 		flush_tlb_one_kernel(addr);
- }
- 
--void flush_tlb_kernel_range(unsigned long start, unsigned long end)
-+static inline void
-+__flush_tlb_kernel_range(smp_cond_func_t cond_func, unsigned long start, unsigned long end)
- {
- 	/* Balance as user space task's flush, a bit conservative */
- 	if (end == TLB_FLUSH_ALL ||
- 	    (end - start) > tlb_single_page_flush_ceiling << PAGE_SHIFT) {
--		on_each_cpu(do_flush_tlb_all, NULL, 1);
-+		on_each_cpu_cond(cond_func, do_flush_tlb_all, NULL, 1);
- 	} else {
- 		struct flush_tlb_info *info;
- 
-@@ -1074,13 +1081,23 @@ void flush_tlb_kernel_range(unsigned long start, unsigned long end)
- 		info = get_flush_tlb_info(NULL, start, end, 0, false,
- 					  TLB_GENERATION_INVALID);
- 
--		on_each_cpu(do_kernel_range_flush, info, 1);
-+		on_each_cpu_cond(cond_func, do_kernel_range_flush, info, 1);
- 
- 		put_flush_tlb_info();
- 		preempt_enable();
- 	}
- }
- 
-+void flush_tlb_kernel_range(unsigned long start, unsigned long end)
-+{
-+	__flush_tlb_kernel_range(NULL, start, end);
-+}
-+
-+void flush_tlb_kernel_range_deferrable(unsigned long start, unsigned long end)
-+{
-+	__flush_tlb_kernel_range(do_kernel_flush_defer_cond, start, end);
-+}
-+
- /*
-  * This can be used from process context to figure out what the value of
-  * CR3 is without needing to do a (slow) __read_cr3().
-diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-index 93cf99aba335b..e08b6c7d22fb6 100644
---- a/mm/vmalloc.c
-+++ b/mm/vmalloc.c
-@@ -439,6 +439,15 @@ void vunmap_range_noflush(unsigned long start, unsigned long end)
- 	__vunmap_range_noflush(start, end);
- }
- 
-+#ifdef CONFIG_CONTEXT_TRACKING_WORK
-+void __weak flush_tlb_kernel_range_deferrable(unsigned long start, unsigned long end)
-+{
-+	flush_tlb_kernel_range(start, end);
-+}
-+#else
-+#define flush_tlb_kernel_range_deferrable(start, end) flush_tlb_kernel_range(start, end)
-+#endif
-+
- /**
-  * vunmap_range - unmap kernel virtual addresses
-  * @addr: start of the VM area to unmap
-@@ -452,7 +461,7 @@ void vunmap_range(unsigned long addr, unsigned long end)
- {
- 	flush_cache_vunmap(addr, end);
- 	vunmap_range_noflush(addr, end);
--	flush_tlb_kernel_range(addr, end);
-+	flush_tlb_kernel_range_deferrable(addr, end);
- }
- 
- static int vmap_pages_pte_range(pmd_t *pmd, unsigned long addr,
-@@ -1746,7 +1755,7 @@ static bool __purge_vmap_area_lazy(unsigned long start, unsigned long end)
- 		list_last_entry(&local_purge_list,
- 			struct vmap_area, list)->va_end);
- 
--	flush_tlb_kernel_range(start, end);
-+	flush_tlb_kernel_range_deferrable(start, end);
- 	resched_threshold = lazy_max_pages() << 1;
- 
- 	spin_lock(&free_vmap_area_lock);
-@@ -1849,7 +1858,7 @@ static void free_unmap_vmap_area(struct vmap_area *va)
- 	flush_cache_vunmap(va->va_start, va->va_end);
- 	vunmap_range_noflush(va->va_start, va->va_end);
- 	if (debug_pagealloc_enabled_static())
--		flush_tlb_kernel_range(va->va_start, va->va_end);
-+		flush_tlb_kernel_range_deferrable(va->va_start, va->va_end);
- 
- 	free_vmap_area_noflush(va);
- }
-@@ -2239,7 +2248,7 @@ static void vb_free(unsigned long addr, unsigned long size)
- 	vunmap_range_noflush(addr, addr + size);
- 
- 	if (debug_pagealloc_enabled_static())
--		flush_tlb_kernel_range(addr, addr + size);
-+		flush_tlb_kernel_range_deferrable(addr, addr + size);
- 
- 	spin_lock(&vb->lock);
- 
-@@ -2304,7 +2313,7 @@ static void _vm_unmap_aliases(unsigned long start, unsigned long end, int flush)
- 	free_purged_blocks(&purge_list);
- 
- 	if (!__purge_vmap_area_lazy(start, end) && flush)
--		flush_tlb_kernel_range(start, end);
-+		flush_tlb_kernel_range_deferrable(start, end);
- 	mutex_unlock(&vmap_purge_lock);
- }
- 
--- 
-2.31.1
-
+Thanks,
+Jing
