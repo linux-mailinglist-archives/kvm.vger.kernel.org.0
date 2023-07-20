@@ -2,251 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2259375B5EA
-	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 19:53:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82B0075B750
+	for <lists+kvm@lfdr.de>; Thu, 20 Jul 2023 21:02:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231977AbjGTRxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jul 2023 13:53:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45518 "EHLO
+        id S229941AbjGTTB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jul 2023 15:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbjGTRw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jul 2023 13:52:58 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531BF1BD
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 10:52:57 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id e9e14a558f8ab-345bc4a438fso8665ab.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jul 2023 10:52:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689875576; x=1690480376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eyJrOl+mRZzvYzgNtRU56geodgE3Is9HDPyopZhcu+Q=;
-        b=c8Vk4ZXRrDEu45HwzCD42QsTN/zf6noJGcf5U0Ket6yJ9sIjya+fnfi9DOtX7r3MgL
-         UTRceI+FY5To/Kl1X3eUlopfAMQghNfA7ozEpUbNvueGh43RyTk1hrz8O7aCl6sv2/Kg
-         j4H8KWK5ylr600ZKi4uxgL+Ifh9M5d4R7exKYvVW/IzGerZrN9/Navx4ay27KnVVf3FO
-         mjYLb2wEMd0y3KjgreaxM2QTLH02zdfplRfvT4O+msbKANDzqBbZB9nvEPUqolEyRY2X
-         SUF8LPOhH8QKQmXbyqWUs9iffrDucvoigQFJmUWyt6c0m0oh5cDy1LVSelfO82f3AOBE
-         YjEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689875576; x=1690480376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eyJrOl+mRZzvYzgNtRU56geodgE3Is9HDPyopZhcu+Q=;
-        b=BIh2hm2boZiDI/4jeVyOB+k86dB9nnakcQCuhkqNJUV4sjP3U1UI0Yv6pH7Zby/Ly1
-         /cud6BJJJqGUfENh8VbEaRD+lG5jdDylD4aKNR9ysMfJv3uS8u0UEza9FMm5E3obQjuS
-         7xooV0yJGPglBh7fKaZ//YnOyp5Q9h9PtgHZbC+L8INIihtEUfQAsUSbOD0LM6bR+K7C
-         lwnB1H+s+j3ELNcCIblmNp6URrt93Kq/ak7PYI+0hHU17IpeqCVndH3tOmXECg6zmOE9
-         w0AwczRhuJumtVFTvJTAPljnXCR/UJMP0OK4bQYy2A2Kt6zG2W5+97NRwsmi4QloXcVR
-         LE1g==
-X-Gm-Message-State: ABy/qLZqtnNn2aOUnNusqS3ycjSD0HMQkuWcdK6toPEAl1KfZdevp5Yl
-        HtQj+L40CpvTC986HAeS3iBP74CfenstspU7DmtOjoBe2w0Izt8xPts=
-X-Google-Smtp-Source: APBJJlHJ+Dl327Sv5TZ9sDsLCs9NTAZBNAiK9+5Ic7a+jmmaFv2KBMl67wti2T3K94mEnNXzVVhaBvyjn6BXHDFL9HY=
-X-Received: by 2002:a05:6e02:12e1:b0:346:1919:7c9b with SMTP id
- l1-20020a056e0212e100b0034619197c9bmr9189iln.26.1689875576095; Thu, 20 Jul
- 2023 10:52:56 -0700 (PDT)
+        with ESMTP id S229519AbjGTTB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jul 2023 15:01:58 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2088.outbound.protection.outlook.com [40.107.243.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15041734;
+        Thu, 20 Jul 2023 12:01:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kn6ylFu0hBaTmvCMott0BU1Cg1pwgEtRSlaQUmcqy1/AzjBSS0Rmc0P9oWQCNloCVdGCUNUYByOxD7mxK0mC+uo2qBDq4i4Doe89sGHvte+qxAIqq266X/rZSQ8tZcHWkAi2RcsIsPhal0NZtbAznBZvZT9omp4Y5O2qc5VwZuLOkWok/+gtlQ5S3jlnjBKHiYc5v+4ea4vKBxmwMyxtyaldz/7M9uy7UUfMy+p+vfwEVZwvKICAOnZiCqTMnpFmIhOmeyX3PCcaZ2kAU3jqR3L0pvzW26yDPSuaakZL8u+mvY/9rK7ILF4mLisnQmpDNuTWHdS+SqBoBElaQfpEXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NxlDtA6ykLJ/Hzdd4vZOfPsUgcO76Ahzqh5cZmSFUH8=;
+ b=WvwZoAmlbg8RMjG95PiyUTMLwomA3d9R+ex39hWBxgg4TK3jpsd5V+KMyZIm3zn1JWMrOur7BGybg5PkcIaFJMxSzoZ2rQ2ucuEsqTBjBWfBFl22oa5Q6Oiu3ffUwsGdrsemQ3A8tmgIYZ6+Jv2mYPBuchgx/U5VUnWtOxDL2VzkDaJA05yfp5JlQlaBYVbXT00X/hFLHYs1rte/rFS3nA8axMZZCkjqoNxbhiUtr1vdC5K9YbkwCOgcuXYm3xNDmP5VWH8GVN96/YxoxCCFITR4nM4LxH4HicG4Y7e8QBqawZqvQAQ3ZUiMUo6URfbGeQ7e+eodtaPXkZ4aOUnw2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NxlDtA6ykLJ/Hzdd4vZOfPsUgcO76Ahzqh5cZmSFUH8=;
+ b=ACgbDlm/LCSaIIVItMNKCg9JhiJ9yYpNn/FLDnyqszg0dmWLBv+h3q5gqFJfsFhsIIydcHYrOrNiFr5+LglvJp90NNAufRiGd0Rml/yiFsSp9LuThQLQMjGxZ+8twNuLBtDk1Des1Bok3y3I+7u/DHGv/MpD+Er5e+2S1WmFNWY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
+ BL1PR12MB5899.namprd12.prod.outlook.com (2603:10b6:208:397::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Thu, 20 Jul
+ 2023 19:01:54 +0000
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::8eef:8dde:e1e1:2494]) by DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::8eef:8dde:e1e1:2494%3]) with mapi id 15.20.6609.026; Thu, 20 Jul 2023
+ 19:01:50 +0000
+Message-ID: <5b30bcce-0b65-9bf9-4eee-dd64d97a95db@amd.com>
+Date:   Thu, 20 Jul 2023 14:01:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.5.1
+Subject: Re: [PATCH kernel 0/9 v6] KVM: SEV: Enable AMD SEV-ES DebugSwap
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20230615063757.3039121-1-aik@amd.com>
+ <a209f165-b9ae-a0b3-743c-9711f5123855@amd.com>
+ <6c5d1e74-0f6d-7c9d-c4e7-a42342ca60aa@amd.com> <ZJWqBO6mPTWyMgMj@google.com>
+ <4338da4e-300b-12f9-609e-d4b1d69eda0b@amd.com> <ZJ9OnJ9dzSmHFirC@google.com>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <ZJ9OnJ9dzSmHFirC@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0088.namprd12.prod.outlook.com
+ (2603:10b6:802:21::23) To DM6PR12MB2843.namprd12.prod.outlook.com
+ (2603:10b6:5:48::24)
 MIME-Version: 1.0
-References: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
- <529cd705-f5c3-a5d1-9999-a3d2ccd09dd6@intel.com> <ZLiUrP9ZFMr/Wf4/@chao-email>
- <CALMp9eTQ5zDpjK+=e+Rhu=zvLv_f0scqkUCif2tveq+ahTAYCg@mail.gmail.com> <ZLjqVszO4AMx9F7T@chao-email>
-In-Reply-To: <ZLjqVszO4AMx9F7T@chao-email>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 20 Jul 2023 10:52:44 -0700
-Message-ID: <CALMp9eSw9g0oRh7rT=Nd5aTwiu_zMz21tRrZG5D_QEfTn1h=HQ@mail.gmail.com>
-Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|BL1PR12MB5899:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3f44fe7-e2a8-4a9d-0d1f-08db8953c63c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: X6J5SmRjJp9VB/Sl3f/0l/nrd98+UzC3AqOyeUypUvZvhLeKdMNCkdvNZ3rj6N0IGCI4srs69kt/3SiaVn+I16OpfZzYrThEo1erY18GDnz4qO52phafl0yK/b60dIdGj667gEPPVKP2EGV7hLwsisHJN9NlOQvFcnpfw5VIvRuVFt9RRzE/trlyJWcAFDLzDwK4wk21JN5H7TJ+qhLaeRdXCRingL+OEZBCAKIH+BxvelO3DieJxQ/1ZYasBkMhhKzFW57UeHyB8bVHgCj2hUiSPRVwBIms8VrPj3ivmIAtaU4F+OJkBD8Zi5gJ5bxMe+t05OePu/aRdLmWwgY2lojl+Q0h3UNpXu2+N4dEg90jJ0QuhlThatE+Y71JdGX3apiBpl9R4+93luuRbUzAjiBbMD370lYSpwihISVCOIky8sp0zrtCoRhZFYLWQHB3ajBcdnBdi7FrQJHQkp9ZfbtTu8L+NrQBHYmemsm9Qm924d7UIq0WVDZMZ2y1Wu0+QSYiX1N4xY1nb1DkFglytfaRElzyDqaC6SyHSgFD4UQy6ToYBOIuVQKYYHMFJn2y7ityv2R4svPqdXfHbOXiJkv71QdPt1MYlXgdgDFWuW5MmVeZWX/CkE+rO0eSII2ka9cjCdjdwyNeaHMj4iMmxQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(376002)(396003)(346002)(136003)(451199021)(31696002)(31686004)(38100700002)(36756003)(4744005)(2906002)(66476007)(8936002)(478600001)(8676002)(2616005)(83380400001)(5660300002)(6486002)(6512007)(53546011)(186003)(26005)(6506007)(6916009)(316002)(4326008)(66946007)(66556008)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZUx4bDFFbWlpZ3Q3N0s5YU1mTG50QTdadE1rZnBvVDJ1VFhNQmdab3ZrMURK?=
+ =?utf-8?B?ZGxzK3hCU2JXUS9mMzZya2krVW4yMnVHeTZBWXBDK1ZKdjQwUHhCbVB3Q0VE?=
+ =?utf-8?B?b1dzalMwTDdpQndlTkFrV2pwYWUxVUVnRUV3YUU4MkNMbGl3cE1ld3c5aTBj?=
+ =?utf-8?B?MkpNaE95SmQzKzJGaHFCbzNkUlVSRTEwQ2pwL0k2K1JjN3hudEVvdnBtekFp?=
+ =?utf-8?B?eGp4NVBlK2ZUWTRZU2NmUVA1djNWVEhnUGVkclVQUitFTmhZUU5VdzBtRDcr?=
+ =?utf-8?B?bU03d2JCWnhXNTNBdGJSVEdlemszeHpHQmpjaFNrOG1kem9SVHpEVDNxeVoz?=
+ =?utf-8?B?OGRCRU1jU3B6cjcyUXNiT1BkWWhnK3pUQ0hKNEJlV2I5Z2cyaG1lem1icWV4?=
+ =?utf-8?B?VHM0cU9NT2FhWUFveWRzZkRSOXpSMUNZeFNjZUkzRE5DWGJiOXFQaE9wVUNS?=
+ =?utf-8?B?QnB3UkFQdkdtUzJlalBZQWpJRHJEK0IyTThXTEg4YS8wa2RMOU1EZldIVDdM?=
+ =?utf-8?B?Ly9QRW5KdStDZGV3SEFyYlA2U1p5K2QydEFranFpQlpFa1ZRS1dZRm8vaFBK?=
+ =?utf-8?B?anBNd1JwajlOZ1g0NmNvVVk0aWMraXUrbUlCSjdZQ2hVaE1CbFB3dkUyejZi?=
+ =?utf-8?B?eVZOY1BjVm44N3lwTmtyY3Z0ajRCSXZJU2V5SDlSbEFWaE5kTUo4ZWcxbHNP?=
+ =?utf-8?B?dmIwSXFYaEZWNXRHZ2NidHd1dGZQSHlHMkhheU50aUNJL1J1QmJXMi9lekE0?=
+ =?utf-8?B?bHpUalpZLzNRWkxqSGRmYW9TWE03LzE3WmVCaitDeEV3OEY0OG1oRjJvZHdm?=
+ =?utf-8?B?T2dGeUEyU0hadkpxTmNKV1pPSEV1cU9hWUNqVDA2czM1K3NlZ2VEVnoxSHNs?=
+ =?utf-8?B?LzBWYXBNZGg2YUVKenZSTS9XWDZlSkdNUDY2Q0lMTXJlaDRBMi9McHFMODFM?=
+ =?utf-8?B?QktSa2xLSGVQRW1FMnZucXhtS1djUEpGNS8ySGRCSGh2dFg5TnRhVGlzTGht?=
+ =?utf-8?B?aVNuYXpwQkJFZlhPWTg5djE2V1RySlFRdm8rVUNNL1VqcnAycGhFT2xIQnJj?=
+ =?utf-8?B?WThWRGNGcWgrcGFwMlRHN1NMemNjWlJ1RUNWWm4xTk9IWnZUbkZqRnVSVk9s?=
+ =?utf-8?B?Z0VpWEVFdlMxVUpNaDMzdjg1OGU1VXE1bUFnaUpwVDZGcDIrbm1SMWtEZ3ht?=
+ =?utf-8?B?RjhSM29aOVNJeUduTTJRdzk1SlJXcVNLeUpwdkd2Yys0S3Z1SmZVa3ZFVENj?=
+ =?utf-8?B?ZzZjNWxHZlQraXJSRWoyUGMxUXZjcUl1MnVpcnZYd2J6LzQ3OU5COWQwUXMr?=
+ =?utf-8?B?RHMwWlNYNUhFQVhkbVBCb1doN0VqNUhHdEJhdjAwOHRHUHpWb2kvSmtEMHAr?=
+ =?utf-8?B?TGs1Z2l3VDFZZGkwNk5SbHFzekFFbEM2L1paSjJuQ2dpMmNJZFVVaUJDV0FC?=
+ =?utf-8?B?SGc4NHhCMHU5Z1FtTmZqWG1BSU9WNEFNK1hIUnRJUzM2dFdlZE1RQ1dYT1RM?=
+ =?utf-8?B?N3RUV2ExRFBsTy9rckw3M1I3VmMvOEczOWpYaU03WmpBQ3JLOHFzUW5UMVkr?=
+ =?utf-8?B?OHphZkRpTmFCK3o0NElUQnZpb25uQlJBT3poWUwzT0dtazlKS3dDSTMwbUdL?=
+ =?utf-8?B?ZUYzdDNYaGgxaWVGN1JOTm45VzkwZHZvMjdnc1pOQzZjTlcwRXFVdkR5dGx5?=
+ =?utf-8?B?cnFnZ1V2eTJNV1UyU0xaT0xCRytUU1Q3dTFOSVBTWGJOOXpuS3JmYUR2ZG0v?=
+ =?utf-8?B?NTBNS2I4ei81b2lndkswdVdWcnNPMDQ3Z2xMVm91VzJRQ2RTb3RGTnNGZHFj?=
+ =?utf-8?B?Vm9uVFRNQ3R2cjBuQVAycGlONWVxMk41VkJVV1QyaXVVdlBlM2VHM2t5TkFV?=
+ =?utf-8?B?Z3V4TGxJcDFiL1ZSWmpvUkFUTG9DenplMXZLOVZ3WkpoREpQalVoaS8wWXFH?=
+ =?utf-8?B?Wk5mc2tUMDhKT29VaHIzNjRyNC9PdHhLckdqNUIzR3RwOTNjeHZSN2ZlcXd0?=
+ =?utf-8?B?cFViWDVDVTNVYTVhRFZUVjV2MmxMUlNLUEVMVFhuQy9VMkVtUHZZeVdTZ0ZN?=
+ =?utf-8?B?SnZ3N29PWStpZkRieWlGRS9uRnJsbHRzNnRtTmdhZ01qcnlIdUJhR2NYMWp5?=
+ =?utf-8?Q?ufXMd0iBq5z5AQJ51Y+wCwEkd?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3f44fe7-e2a8-4a9d-0d1f-08db8953c63c
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2023 19:01:50.5480
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VLA2eWH6/YLY8UfbOhc1Xe33OgkB80I6SZbFshOUEQjWFq2ScrC0qCL9GlMMqSw/gjHiLPRz8fHMcOax5VHztg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5899
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 1:04=E2=80=AFAM Chao Gao <chao.gao@intel.com> wrote=
-:
->
-> On Wed, Jul 19, 2023 at 09:04:58PM -0700, Jim Mattson wrote:
-> >On Wed, Jul 19, 2023 at 6:58=E2=80=AFPM Chao Gao <chao.gao@intel.com> wr=
-ote:
-> >>
-> >> On Thu, Jul 20, 2023 at 09:25:14AM +0800, Xiaoyao Li wrote:
-> >> >On 7/20/2023 2:08 AM, Jim Mattson wrote:
-> >> >> Normally, we would restrict guest MSR writes based on guest CPU
-> >> >> features. However, with IA32_SPEC_CTRL and IA32_PRED_CMD, this is n=
-ot
-> >> >> the case.
-> >>
-> >> This issue isn't specific to the two MSRs. Any MSRs that are not
-> >> intercepted and with some reserved bits for future extenstions may run
-> >> into this issue. Right? IMO, it is a conflict of interests between
-> >> disabling MSR write intercept for less VM-exits and host's control ove=
-r
-> >> the value written to the MSR by guest.
-> >
-> >I've clearly been falling behind in tracking upstream development. I
-> >didn't realize that we passed through any other MSRs that had bits
-> >reserved for future extensions (virtual addresses don't count). It
-> >looks like we've decided to virtualize IA32_FLUSH_CMD as well, even
-> >though Konrad had the good sense to talk me out of it when I first
-> >proposed it. Are there others I'm missing?
->
-> MSR_IA32_XFD{_ERR}, I think
->
-> SDM says:
-> Bit i of either MSR can be set to 1 only if CPUID.(EAX=3D0DH,ECX=3Di):ECX=
-[2]
-> is enumerated as 1 (see Section 13.2). An execution of WRMSR that
-> attempts to set an unsupported bit in either MSR causes a
-> general-protection fault (#GP)
->
-> >
-> >Philosophically, there are three principles potentially in conflict
-> >here: security, correctness, and performance. Userspace should perhaps
-> >be given the option of prioritizing one over the others, but the
-> >default precedence should be security first, correctness second, and
-> >performance last.
->
-> I am not sure about the default precedence. I can name a few other cases
-> in which KVM behavior doesn't align with this precedence.
-> 1. new instructions w/o control bits in CR0/4
 
-We've come a long way since Popek & Goldberg, but that's an example of
-why the x86 architecture still isn't virtualizable. I don't think
-anything can be done about that.
 
-> 2. CR3.LAM_U57/U48 can always be set by guests if KVM doesn't trap CR3
->    writes, e.g., when EPT is enabled. This case is identical to the PSFD
->    case you mentioned below.
+On 30/6/23 16:52, Sean Christopherson wrote:
+> On Fri, Jun 30, 2023, Alexey Kardashevskiy wrote:
+>>
+>>
+>> On 24/6/23 00:19, Sean Christopherson wrote:
+>>> On Fri, Jun 23, 2023, Alexey Kardashevskiy wrote:
+>>>> Sean, do you want me to repost with "v6" in all patches or this will do?
+>>>
+>>> No need on my end.
+>>
+>> Cool. My colleagues are gently asking if this is any closer to getting
+>> pulled or not just yet? :) Thanks,
+> 
+> Just looked through it.  A few nits, but nothing I can't fix when applying.  I'm
+> planning on applying it for 6.6 (pending testing, etc.), though I'm out next week
+> so it'll be a week or three before that actually happens.
 
-LAM is another feature I haven't been following. It's a bit sad that
-the x86 vendors continue to introduce new features that restrict the
-host platforms that can share a migration pool.
+Soo three it is :)
 
-> 3. GBPAGES*
 
-Is there an Intel CPU that isn't well past EOL that doesn't support GBPAGES=
-?
-
-> *: https://lore.kernel.org/all/20230217231022.816138-3-seanjc@google.com/
->
-> >
-> >> We may need something like CR0/CR4 masks and read shadows for all MSRs
-> >> to address this fundamental issue.
-> >
-> >Not *all* MSRs, but some, certainly. That is one possible solution,
-> >but I get the impression that you're not really serious about this
-> >proposal.
->
-> I meant we need a generic mechanism applicable to all MSRs. There are up
-> to 2K MSRs (MSR-bitmap is 4KB). Then adding a mask and read shadow e.g.,
-> 16 Bytes for each MSR needs about 32KB. I don't think it is completely
-> unacceptable because, IIRC, IPI virtualization takes up to 64KB. To
-> reduce the memory consumption, we can even let CPU consume a list of MSR
-> index, mask and read shadow, like VM-entry/exit "MSR-load" count/address.
-
-I assume the quoted IPI virtualization overhead is per-VM. We would
-need a read shadow per vCPU.
-
-> >> >>
-> >> >> For the first non-zero write to IA32_SPEC_CTRL, we check to see tha=
-t
-> >> >> the host supports the value written. We don't care whether or not t=
-he
-> >> >> guest supports the value written (as long as it supports the MSR).
-> >> >> After the first non-zero write, we stop intercepting writes to
-> >> >> IA32_SPEC_CTRL, so the guest can write any value supported by the
-> >> >> hardware. This could be problematic in heterogeneous migration pool=
-s.
-> >> >> For instance, a VM that starts on a Cascade Lake host may set
-> >> >> IA32_SPEC_CTRL.PSFD[bit 7], even if the guest
-> >> >> CPUID.(EAX=3D07H,ECX=3D02H):EDX.PSFD[bit 0] is clear. Then, if that=
- VM is
-> >> >> migrated to a Skylake host, KVM_SET_MSRS will refuse to set
-> >> >> IA32_SPEC_CTRL to its current value, because Skylake doesn't suppor=
-t
-> >> >> PSFD.
-> >>
-> >> It is a guest fault. Can we modify guest kernel in this case?
-> >
-> >The guest should not have set the bit. The hypervisor should not have
-> >allowed it. Both are at fault.
-> >
-> >I'm willing to bet that Intel has a CPU validation suite that includes
-> >such tests as setting reserved bits in MSRs and ensuring that #GP is
-> >raised. Those tests should also work in a VM. If they don't, the
-> >hypervisor is broken.
->
-> I agree hypervisor is broken in this specific case. I just doubt if it
-> is worthwhile to fix this issue i.e., the benefit is significant. I am
-> assuing the benefit of fixing the issue is just guests won't be able to
-> set reserved bits and attempts to do that cause #GP.
-
-I'm not entirely convinced that setting bits in IA32_SPEC_CTRL is (and
-always will be) "safe," from a security perspective. *Clearing* bits
-certainly isn't.
-
-> And is it fair to good citizens that won't set reserved bits but will
-> suffer performance drop caused by the fix?
-
-Is it fair to other tenants of the host to have their data exfiltrated
-by a bad citizen, because KVM didn't control access to the MSR?
-> >
-> >> >>
-> >> >> We disable write intercepts IA32_PRED_CMD as long as the guest
-> >> >> supports the MSR. That's fine for now, since only one bit of PRED_C=
-MD
-> >> >> has been defined. Hence, guest support and host support are
-> >> >> equivalent...today. But, are we really comfortable with letting the
-> >> >> guest set any IA32_PRED_CMD bit that may be defined in the future?
-> >> >>
-> >> >> The same question applies to IA32_SPEC_CTRL. Are we comfortable wit=
-h
-> >> >> letting the guest write to any bit that may be defined in the futur=
-e?
-> >> >
-> >> >My point is we need to fix it, though Chao has different point that s=
-ometimes
-> >> >performance may be more important[*]
-> >> >
-> >> >[*] https://lore.kernel.org/all/ZGdE3jNS11wV+V2w@chao-email/
-> >>
-> >> Maybe KVM can provide options to QEMU. e.g., we can define a KVM quirk=
-.
-> >> Disabling the quirk means always intercept IA32_SPEC_CTRL MSR writes.
-> >
-> >Alternatively, we can check the host value of IA32_SPEC_CTRL on
-> >VM-entry, since we have to read it anyway. If any bits are set that
-> >cannot be cleared in VMX non-root operation without compromising
-> >security, then writes to IA32_SPEC_CTRL should be intercepted.
-> >
-> >> >
-> >> >> At least the AMD approach with V_SPEC_CTRL prevents the guest from
-> >> >> clearing any bits set by the host, but on Intel, it's a total
-> >> >> free-for-all. What happens when a new bit is defined that absolutel=
-y
-> >> >> must be set to 1 all of the time?
-> >>
-> >> I suppose there is no such bit now. For SPR and future CPUs, "virtuali=
-ze
-> >> IA32_SPEC_CTRL" VMX feature can lock some bits to 0 or 1 regardless of
-> >> the value written by guests.
-> >
-> >As your colleague pointed out earlier, IA32_SPEC_CTRL.STIBP[bit 1] is
-> >such a bit. If the host has this bit set and you allow the guest to
-> >clear it, then you have compromised host security.
->
-> If guest can compromise host security, I definitly agree to intercept
-> IA32_SPEC_CTRL MSR.
-
-I believe that when the decision was made to pass through this MSR for
-write, the assumption was that the host wouldn't ever use it (hence
-the host value would be zero). That assumption has not stood the test
-of time.
+-- 
+Alexey
