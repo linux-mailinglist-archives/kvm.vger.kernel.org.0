@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6022775C09A
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 09:59:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E8AA75C13C
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 10:18:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbjGUH7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 03:59:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47642 "EHLO
+        id S231474AbjGUISx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 04:18:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbjGUH7o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 03:59:44 -0400
+        with ESMTP id S231475AbjGUISu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 04:18:50 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A635F270A
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 00:59:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3C5AA
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 01:18:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689926340;
+        s=mimecast20190719; t=1689927482;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=OMiNfezuDp8QZVlAhLlbiIMuGymmCNYB2I4q0EEFUSk=;
-        b=AYwM9D6rtN047z0/QrMrVGjmzMAg+cSfnrqDt01QZWhNVovoFNRQtVmK547WDVsE6tRpbC
-        2SB4iu74jQWgL92+0rx/nShY8caHzyiwhN8/B0+tDNKHpy4oKmGPc+PFgMPIlsu2fCCDBz
-        0+oZaHe9fHm0bMCS64nZh+neZYzgVwQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wWAtfDt+4FFr8z2L0240XKTF6ityOHMPZsX6cXcmsiA=;
+        b=C756oBKR2e53s64qZeV+zKpr1xZ7ILv/jNAx5LeduQAIpBfUfHzHE46TIPgufaQWIvzPcw
+        4TFB9XM8V4/OQxapVtVUmd9qTO2eBrlJBqEe0YdwhKZzu5MI6UeDBy/nDnDKv1hgHd2Vqg
+        xFQis29kWvQFIz1edO6IcrWNiy0c8HY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-626-CuWAOtcxPMabtusX8igC7w-1; Fri, 21 Jul 2023 03:58:57 -0400
-X-MC-Unique: CuWAOtcxPMabtusX8igC7w-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3143a431a01so877109f8f.1
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 00:58:57 -0700 (PDT)
+ us-mta-184-pHkgqcdHOzydZuFLvizZwg-1; Fri, 21 Jul 2023 04:17:57 -0400
+X-MC-Unique: pHkgqcdHOzydZuFLvizZwg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fb40ec952bso8809805e9.0
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 01:17:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689926336; x=1690531136;
+        d=1e100.net; s=20221208; t=1689927476; x=1690532276;
         h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OMiNfezuDp8QZVlAhLlbiIMuGymmCNYB2I4q0EEFUSk=;
-        b=YCfWiCUIAkdpXb6J3dojO5ynspB19G70deQc4FVOs/oweEbu7c9UomumeFkwVXIkJ7
-         HZOnzX9NZQMYWTdeK506EHtE8q02Br/MotXhkZsQr0GwZzteRmimJFxnAL2fkVL/IrcG
-         xl3ATCOtOBj6LbMeKFiI3OwW3EgSUzMXLkyBCGULnxWWRc3PonVTdIRaFo/oK1T6v8EC
-         qSjPb/oJf7q6eJLgVaaks9QWvdRwmxgJzueGLwSPcE+UrPCH/ZaY6chfkprY2pe9wdbU
-         +6m6MmRaArvUv3EnNja8vMl6sb8ZUxoUBfcfrDc/IU8s0zJCz6Az6j8uwoiAoVKV7VBr
-         EEng==
-X-Gm-Message-State: ABy/qLahcTaxye02QMYO0GGPsgvTzPAPdz3h/MlNC3cjyk+h7qQEhZO/
-        xBwlfSEtrqr8ZOQ3Vl6NLEeG4CMIseYfPCztVEOH8r+oDqwQJgdMCfc/423o2nCIdODpWbgp6D0
-        yl//HF5/wT8aU
-X-Received: by 2002:a5d:6103:0:b0:313:e559:2d4c with SMTP id v3-20020a5d6103000000b00313e5592d4cmr798828wrt.45.1689926336423;
-        Fri, 21 Jul 2023 00:58:56 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHidrlV6ut/P6AGZyG//+hfTFRQfLD41RE3t6gFtW0P8dq2RF0fuunZIegUj7e2SS5Snlr4dg==
-X-Received: by 2002:a5d:6103:0:b0:313:e559:2d4c with SMTP id v3-20020a5d6103000000b00313e5592d4cmr798794wrt.45.1689926336070;
-        Fri, 21 Jul 2023 00:58:56 -0700 (PDT)
+        bh=wWAtfDt+4FFr8z2L0240XKTF6ityOHMPZsX6cXcmsiA=;
+        b=dJxA81b+ToGs6DIXvGq6SIWkaLyZ2sRyP0AWI69J03705Nsz73xe3PCsP0xW/25LKp
+         x7xc1NmZrC+JM7fbID2Mqn4eKsI9SnZa2K1ZtfUj2SzpX1ai1CsnZ4ZBMFnDLM0ErZv2
+         8aXCDooW3DOIml4j1XaS2HRbxSHMU6M+t32AKBQjEGIhvqNZSOSs9GOhWb2Z3AvubTnE
+         kOUUkELz3K0xSvBymYHdka02HaOs2AAYHQNT6N3Bm//0tupRYYNBJdd08k4fRr2Jkv3E
+         pV80T6v7Csk7xG1nkjWV5CYdqZLy0apaNgHTxIo/aoakmL/7KTigLA27oE9rQxBmQf9h
+         Hvzw==
+X-Gm-Message-State: ABy/qLaFtushXwW3XC9QcuYVH952orRp6NP2jZncmL1n1befnmz3DDR1
+        xDi7BKkeDzKI08w9s3xqbl0v+pxxrJ/R0OgODHSUnt723KXBYdRPiO+yDzLzeYmRb3MwrG/xGbe
+        DBZ1aL6bXY1e9
+X-Received: by 2002:adf:e44b:0:b0:314:23b:dc56 with SMTP id t11-20020adfe44b000000b00314023bdc56mr932477wrm.71.1689927476496;
+        Fri, 21 Jul 2023 01:17:56 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHEdRURX7Fjh/lMcHTt/3ezRGKcsgd4gH+GjQ+oOshjaOTIibUtlYcUjT+ZyXHohXPiIFUBeg==
+X-Received: by 2002:adf:e44b:0:b0:314:23b:dc56 with SMTP id t11-20020adfe44b000000b00314023bdc56mr932410wrm.71.1689927476191;
+        Fri, 21 Jul 2023 01:17:56 -0700 (PDT)
 Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id i7-20020a05600011c700b00313fd294d6csm3510472wrx.7.2023.07.21.00.58.54
+        by smtp.gmail.com with ESMTPSA id j6-20020a5d6046000000b003143b14848dsm3444226wrt.102.2023.07.21.01.17.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 00:58:55 -0700 (PDT)
+        Fri, 21 Jul 2023 01:17:55 -0700 (PDT)
 From:   Valentin Schneider <vschneid@redhat.com>
-To:     paulmck@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+To:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
         bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     "Paul E . McKenney" <paulmck@kernel.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Masami Hiramatsu <mhiramat@kernel.org>,
         Jonathan Corbet <corbet@lwn.net>,
@@ -106,15 +106,13 @@ Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         Daniel Bristot de Oliveira <bristot@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 17/20] rcutorture: Add a test config to torture
- test low RCU_DYNTICKS width
-In-Reply-To: <5143d0a9-bc02-4b9a-8613-2383bfdee35c@paulmck-laptop>
+Subject: Re: [RFC PATCH v2 16/20] rcu: Make RCU dynticks counter size
+ configurable
+In-Reply-To: <20230720163056.2564824-17-vschneid@redhat.com>
 References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-18-vschneid@redhat.com>
- <24b55289-1c35-41cc-9ad3-baa957f1c9cb@paulmck-laptop>
- <5143d0a9-bc02-4b9a-8613-2383bfdee35c@paulmck-laptop>
-Date:   Fri, 21 Jul 2023 08:58:53 +0100
-Message-ID: <xhsmhmszpu24i.mognet@vschneid.remote.csb>
+ <20230720163056.2564824-17-vschneid@redhat.com>
+Date:   Fri, 21 Jul 2023 09:17:53 +0100
+Message-ID: <xhsmhjzutu18u.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -128,48 +126,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/07/23 21:00, Paul E. McKenney wrote:
-> On Thu, Jul 20, 2023 at 12:53:05PM -0700, Paul E. McKenney wrote:
->> On Thu, Jul 20, 2023 at 05:30:53PM +0100, Valentin Schneider wrote:
->> > diff --git a/tools/testing/selftests/rcutorture/configs/rcu/TREE11 b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
->> > new file mode 100644
->> > index 0000000000000..aa7274efd9819
->> > --- /dev/null
->> > +++ b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
->> > @@ -0,0 +1,19 @@
->> > +CONFIG_SMP=y
->> > +CONFIG_NR_CPUS=8
->> > +CONFIG_PREEMPT_NONE=n
->> > +CONFIG_PREEMPT_VOLUNTARY=y
->> > +CONFIG_PREEMPT=n
->> > +CONFIG_PREEMPT_DYNAMIC=n
->> > +#CHECK#CONFIG_TREE_RCU=y
->> > +CONFIG_HZ_PERIODIC=n
->> > +CONFIG_NO_HZ_IDLE=n
->> > +CONFIG_NO_HZ_FULL=y
->> > +CONFIG_RCU_TRACE=y
->> > +CONFIG_RCU_FANOUT=4
->> > +CONFIG_RCU_FANOUT_LEAF=3
->> > +CONFIG_DEBUG_LOCK_ALLOC=n
->> > +CONFIG_DEBUG_OBJECTS_RCU_HEAD=n
->> > +CONFIG_RCU_EXPERT=y
->> > +CONFIG_RCU_EQS_DEBUG=y
->> > +CONFIG_RCU_LAZY=y
->> > +CONFIG_RCU_DYNTICKS_BITS=2
->>
->> Why not just add this last line to the existing TREE04 scenario?
->> That would ensure that it gets tested regularly without extending the
->> time required to run a full set of rcutorture tests.
+On 20/07/23 17:30, Valentin Schneider wrote:
+> index bdd7eadb33d8f..1ff2aab24e964 100644
+> --- a/kernel/rcu/Kconfig
+> +++ b/kernel/rcu/Kconfig
+> @@ -332,4 +332,37 @@ config RCU_DOUBLE_CHECK_CB_TIME
+>         Say Y here if you need tighter callback-limit enforcement.
+>         Say N here if you are unsure.
 >
-> Please see below for the version of this patch that I am running overnight
-> tests with.  Does this one work for you?
->
+> +config RCU_DYNTICKS_RANGE_BEGIN
+> +	int
+> +	depends on !RCU_EXPERT
+> +	default 31 if !CONTEXT_TRACKING_WORK
 
-Yep that's fine with me. I only went with a separate test file as wasn't
-sure how new test options should be handled (merged into existing tests vs
-new tests created), and didn't want to negatively impact TREE04 or
-TREE06. If merging into TREE04 is preferred, then I'll do just that and
-carry this path moving forwards.
+You'll note that this should be 30 really, because the lower *2* bits are
+taken by the context state (CONTEXT_GUEST has a value of 3).
 
-Thanks!
+This highlights the fragile part of this: the Kconfig values are hardcoded,
+but they depend on CT_STATE_SIZE, CONTEXT_MASK and CONTEXT_WORK_MAX. The
+static_assert() will at least capture any misconfiguration, but having that
+enforced by the actual Kconfig ranges would be less awkward.
+
+Do we currently have a way of e.g. making a Kconfig file depend on and use
+values generated by a C header?
 
