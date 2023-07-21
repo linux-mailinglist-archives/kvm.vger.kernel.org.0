@@ -2,70 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3455E75D434
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 21:19:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 610AC75D4E2
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 21:25:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232120AbjGUTTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 15:19:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
+        id S232263AbjGUTZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 15:25:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232095AbjGUTSw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 15:18:52 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ABD9358C
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:18:48 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-4036bd4fff1so56341cf.0
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:18:48 -0700 (PDT)
+        with ESMTP id S232262AbjGUTZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 15:25:52 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148512D7F
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:25:51 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666ecf9a081so1995070b3a.2
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:25:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689967127; x=1690571927;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CERdqkdwIcQiQxYqC1DaRigA/hWGJStpMLeqtLPt5nM=;
-        b=jSW7UH5S3tzADjP07zcm5QK9xkGHAolPdgkO9EruuGpVksNuhkrednnWP4Loth1tGv
-         JblPeDADT27/egNxibKsdNao5GxAS+lxNKVSxUkPEwjSu6nQhQOabcPqHxUlINQctF66
-         62P+WGinstCJ9oM800Iw5QV3RnfQd6F+RT/fsK5LPmCyF/FCPQ4Z7PPvuBKqg8rwvqp1
-         fucImR9lfIN9xRgRfL3mAkoEa+X4PQLT6LyU7lq/xzP5azeTHbpf7FDllnT7O3VXLECN
-         RMvrukgHd6ada7vRF0MKmN70i3h7xq/6nCwtV/cIcC7INN/sTMyaTGgyBRkjgpsHJY9t
-         QXHw==
+        d=ziepe.ca; s=google; t=1689967550; x=1690572350;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MMsZNxLO6ied/G62NsNmuJtbpPqA/ZDXuniKdHv3YB4=;
+        b=XQzjypm8qf/fouvehrBkEZjx7rraTNYkUvdCKXn1r1gfZnRnhcrrwzmNXN35Uu7gzI
+         8oZahINtXmo9uCfjOT5mfF9tPFqadYED4ml2Rvg4gr4OGGmk2vfi6ALPhCVFDbYVbCVR
+         bizj8weYssavNq2IYvHIenQVmt+p9+kOYvZhgrRMHxTk+VUEpNpnyoTxavBUyIHeBvaf
+         qo1QRc6+YoA80RoGKZsLsD7vsvUGziFJq2u5Wn3UEGI6GwRgyCcJvjby4g2TfS0YmrN7
+         IaJoLwJh5sfemxuaaNtQypWoArXN7KcGOCwTG4BZdi4RfD5EEjDf6oZVJxfS3TMV68DT
+         4znQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689967127; x=1690571927;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CERdqkdwIcQiQxYqC1DaRigA/hWGJStpMLeqtLPt5nM=;
-        b=VCQMaGxM+vC4Llr8RFsD5jxzYoEv3pyrbCzgIfo4z1pP8MaJ67h14Xyt317rKNbiDK
-         IxIg8cgX8B36kLzvaeE3MJ/lrZos0QUSZ7PMmBeC1aLd0tFlHN/7HvtW50G1A6Rq9W6E
-         Pit0FSvT+CL3LPFc3mVt+qjuvtjV/tcOrl/5hZCfH60nMAbOFEXEgkMeFh55k0MbOG+y
-         BODty/KbBDcCjyLXCZJ+q1XHwRiasqMxiQNC6NUczCmF5NFglcbZ3F6A5fPDaoZiZdQh
-         t21KC7vDhVomJr8qy0Zl/oOtJzPhemxW2eyzyohlpBXoCCPREsrqKlNGguGtO3g3IHbK
-         qcRg==
-X-Gm-Message-State: ABy/qLZ0dT4X2iDaNADTC+nWiZ+5iLMTE66ZP007p1eHu7RAjXYYwEcl
-        q9fX3Obf7DaVoaSyLV1fv/uPkFPV6N/ldvsDmS9KUw==
-X-Google-Smtp-Source: APBJJlFv3jPHC+E6LE1/QOXIm2gMb+3RA79/raFjYN7eQyztsMDu2Z/6Gd/GuzmQCz+NREpjI/8tdqKIyiZaEs2TmdQ=
-X-Received: by 2002:ac8:7f56:0:b0:3ef:5f97:258f with SMTP id
- g22-20020ac87f56000000b003ef5f97258fmr45634qtk.16.1689967127432; Fri, 21 Jul
- 2023 12:18:47 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689967550; x=1690572350;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MMsZNxLO6ied/G62NsNmuJtbpPqA/ZDXuniKdHv3YB4=;
+        b=B2bG1efp9doPjZNpHlXa5BTf1rXlVTvHX+/rV6a7NohuU11hhyfee92dbpnqIwDY7i
+         lOGM4AVuKBBYxMV7D43ZsaQMuIQoQRqyq294M+gUK3jY+jNxWP7lK9S+P5+NrBktGk0Z
+         wi1UgiT4OeiekL0qnvJ1QBlJoBmLFTiYDrJaBivIDrJqE5nV3DvoSEVAxSuwyK3vSy0K
+         NFYUy0AheCtYgXcPSfPP8rcnrB5AHjlNXZGntU0Ytpvjvkofu2r4uI3osmRAN4y6urKK
+         psFn/vG0hGvKbWprFQIJcSlI98J4VJyOiS/rJ8AepWQpBJfO3kTY0EykAE+8tcb/UYM0
+         GZKQ==
+X-Gm-Message-State: ABy/qLbqCRJAk2CtFeT0WkRV2aUIEB5dnpL02d/+d8zJvhIV8TPa6QrU
+        l/VpPbHQg9hQooqGygAObbvc7A==
+X-Google-Smtp-Source: APBJJlEp8s38SXROq49pagsC5pVvuYXs5UAkGBJHAYanGZ9PMcBXp3bCvAhBUtgXgds2MFlgz7aUow==
+X-Received: by 2002:a17:90b:2308:b0:262:f06d:c0fc with SMTP id mt8-20020a17090b230800b00262f06dc0fcmr2530695pjb.7.1689967550531;
+        Fri, 21 Jul 2023 12:25:50 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id d5-20020a17090a8d8500b0025bd4db25f0sm2845416pjo.53.2023.07.21.12.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 12:25:49 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qMvl5-003ID1-Uq;
+        Fri, 21 Jul 2023 16:25:47 -0300
+Date:   Fri, 21 Jul 2023 16:25:47 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alistair Popple <apopple@nvidia.com>
+Cc:     akpm@linux-foundation.org, ajd@linux.ibm.com,
+        catalin.marinas@arm.com, fbarrat@linux.ibm.com,
+        iommu@lists.linux.dev, jhubbard@nvidia.com, kevin.tian@intel.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
+        nicolinc@nvidia.com, npiggin@gmail.com, robin.murphy@arm.com,
+        seanjc@google.com, will@kernel.org, x86@kernel.org,
+        zhi.wang.linux@gmail.com, sj@kernel.org
+Subject: Re: [PATCH v3 1/5] arm64/smmu: Use TLBI ASID when invalidating
+ entire range
+Message-ID: <ZLrbu6vk6x7l6xwJ@ziepe.ca>
+References: <cover.b24362332ec6099bc8db4e8e06a67545c653291d.1689842332.git-series.apopple@nvidia.com>
+ <082390057ec33969c81d49d35aa3024d7082b0bd.1689842332.git-series.apopple@nvidia.com>
 MIME-Version: 1.0
-References: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
- <529cd705-f5c3-a5d1-9999-a3d2ccd09dd6@intel.com> <ZLiUrP9ZFMr/Wf4/@chao-email>
- <CALMp9eTQ5zDpjK+=e+Rhu=zvLv_f0scqkUCif2tveq+ahTAYCg@mail.gmail.com>
- <ZLjqVszO4AMx9F7T@chao-email> <CALMp9eSw9g0oRh7rT=Nd5aTwiu_zMz21tRrZG5D_QEfTn1h=HQ@mail.gmail.com>
- <ZLn9hgQy77x0hLil@chao-email> <20230721190114.xznm7xfnuxciufa3@desk>
-In-Reply-To: <20230721190114.xznm7xfnuxciufa3@desk>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 21 Jul 2023 12:18:36 -0700
-Message-ID: <CALMp9eTNM5VZzpSR6zbkjude6kxgBcOriWDoSkjanMmBtksKYw@mail.gmail.com>
-Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <082390057ec33969c81d49d35aa3024d7082b0bd.1689842332.git-series.apopple@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,50 +83,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 21, 2023 at 12:01=E2=80=AFPM Pawan Gupta
-<pawan.kumar.gupta@linux.intel.com> wrote:
->
-> On Fri, Jul 21, 2023 at 11:37:42AM +0800, Chao Gao wrote:
-> > On Thu, Jul 20, 2023 at 10:52:44AM -0700, Jim Mattson wrote:
-> > >> And is it fair to good citizens that won't set reserved bits but wil=
-l
-> > >> suffer performance drop caused by the fix?
-> > >
-> > >Is it fair to other tenants of the host to have their data exfiltrated
-> > >by a bad citizen, because KVM didn't control access to the MSR?
-> >
-> > To be clear, I agree to intercept IA32_SPEC_CTRL MSR if allowing guests
-> > to clear some bits puts host or other tenents at risk.
-> >
-> > >> >As your colleague pointed out earlier, IA32_SPEC_CTRL.STIBP[bit 1] =
-is
-> > >> >such a bit. If the host has this bit set and you allow the guest to
-> > >> >clear it, then you have compromised host security.
-> >
-> > ...
-> >
-> > >>
-> > >> If guest can compromise host security, I definitly agree to intercep=
-t
-> > >> IA32_SPEC_CTRL MSR.
-> > >
-> > >I believe that when the decision was made to pass through this MSR for
-> > >write, the assumption was that the host wouldn't ever use it (hence
-> > >the host value would be zero). That assumption has not stood the test
-> > >of time.
-> >
-> > Could you elaborate on the security risk of guests' clearing
-> > IA32_SPEC_CTRL.STIBP[bit 1] (or any other bit)? +Pawan
->
-> Please note that clearing STIBP bit on one thread does not disable STIBP
-> protection if the sibling has it set:
->
->   Setting bit 1 (STIBP) of the IA32_SPEC_CTRL MSR on a logical processor
->   prevents the predicted targets of indirect branches on any logical
->   processor of that core from being controlled by software that executes
->   (or executed previously) on another logical processor of the same core
->   [1].
+On Thu, Jul 20, 2023 at 06:39:23PM +1000, Alistair Popple wrote:
+> The ARM SMMU has a specific command for invalidating the TLB for an
+> entire ASID. Currently this is used for the IO_PGTABLE API but not for
+> ATS when called from the MMU notifier.
+> 
+> The current implementation of notifiers does not attempt to invalidate
+> such a large address range, instead walking each VMA and invalidating
+> each range individually during mmap removal. However in future SMMU
+> TLB invalidations are going to be sent as part of the normal
+> flush_tlb_*() kernel calls. To better deal with that add handling to
+> use TLBI ASID when invalidating the entire address space.
+> 
+> Signed-off-by: Alistair Popple <apopple@nvidia.com>
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
 
-I stand corrected. For completeness, then, is it true now and
-forevermore that passing IA32_SPEC_CTRL through to the guest for write
-can in no way compromise code running on the sibling thread?
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason
