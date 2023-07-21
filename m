@@ -2,143 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 506F875C3C5
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 11:55:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40E9475C4F6
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 12:47:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbjGUJzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 05:55:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36082 "EHLO
+        id S229744AbjGUKrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 06:47:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231977AbjGUJyk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 05:54:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D493230FF
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 02:53:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689933120;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RjvyrEQM7aXCO6ILKRYhquPIXIYqhL2c7IVe9Axezuc=;
-        b=FmUvidAn1xZGuGSMj6df0t5ZTxQbc9gcQU/LclrBr69WtAgaAQ52JJ2DgVWnXbJZWTUOoM
-        1B4QQIwd3GXe6FxwyWDR2qKkPoZP50ecUPj2n/8HrBPQsfFa1IFW1w6V/Al/FwwnxZjtOa
-        Y3OmKZuvTbB7Hw3Zw4MYcsgF57Qfl/Y=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-262-4I0gsGDEPkWXs6vJjKvo3A-1; Fri, 21 Jul 2023 05:48:34 -0400
-X-MC-Unique: 4I0gsGDEPkWXs6vJjKvo3A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 326F5801CF8;
-        Fri, 21 Jul 2023 09:48:33 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.38])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CEE7640C206F;
-        Fri, 21 Jul 2023 09:48:29 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
+        with ESMTP id S229493AbjGUKr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 06:47:29 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965AB1701;
+        Fri, 21 Jul 2023 03:47:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689936448; x=1721472448;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lqUeKJjFv2Sxri0zg/OC/DAKL78i5iZqhBI02xpLRko=;
+  b=b1gQmxJK0t5qLXwInz2z1vsdJy6AAum1O7lL2lvyHs1DN9MMjcWJh3Ie
+   XiQIolmGnSCp8dS7AHZSNibxy1hVJ/i0RigeqX+3TY4Dchg79d7tNOVZt
+   1zI0mxUUEvbdid5OKYkKK/OjvF3ZXRsYUUBweuFEO96HogAYXug1jV1FM
+   yXeHCATd/WIUfaKFRwUCN6MxORHdPgsDhMt0bhcAg+lXz7IRDf3PKuGMb
+   /1av+6I8NpXxKDEkf4L4OUG5eZRRZANszRY6PuFLljdeBGha5N7Pqp/NZ
+   HY/81IGWCW7Y7bnlpdITKo1unVMFC5S6MTvObMTBR5MjdcpzxEDN4ncJ0
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="365884912"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="365884912"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 03:47:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="724827627"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="724827627"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orsmga002.jf.intel.com with ESMTP; 21 Jul 2023 03:47:13 -0700
+Date:   Fri, 21 Jul 2023 18:45:26 +0800
+From:   Xu Yilun <yilun.xu@intel.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
         Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
- and ID_DFR0_EL1
-In-Reply-To: <86r0p1txun.wl-maz@kernel.org>
-Organization: Red Hat GmbH
-References: <20230718164522.3498236-1-jingzhangos@google.com>
- <20230718164522.3498236-4-jingzhangos@google.com>
- <87o7k77yn5.fsf@redhat.com>
- <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
- <87sf9h8xs0.fsf@redhat.com> <86r0p1txun.wl-maz@kernel.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Fri, 21 Jul 2023 11:48:27 +0200
-Message-ID: <87pm4l8uj8.fsf@redhat.com>
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a
+ per-action union
+Message-ID: <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-2-seanjc@google.com>
+ <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 21 2023, Marc Zyngier <maz@kernel.org> wrote:
+On 2023-07-21 at 14:26:11 +0800, Yan Zhao wrote:
+> On Tue, Jul 18, 2023 at 04:44:44PM -0700, Sean Christopherson wrote:
+> 
+> May I know why KVM now needs to register to callback .change_pte()?
 
-> On Fri, 21 Jul 2023 09:38:23 +0100,
-> Cornelia Huck <cohuck@redhat.com> wrote:
->> 
->> On Thu, Jul 20 2023, Jing Zhang <jingzhangos@google.com> wrote:
->> > No mechanism was provided to userspace to discover if a given idreg or
->> > any fields of a given idreg is writable. The write to a readonly idreg
->> > can also succeed (write ignored) without any error if what's written
->> > is exactly the same as what the idreg holds or if it is a write to
->> > AArch32 idregs on an AArch64-only system.
->> 
->> Hm, I'm not sure that's a good thing for the cases where we want to
->> support mix-and-match userspace and kernels. Userspace may want to know
->> upfront whether it can actually tweak the contents of an idreg or not
->> (for example, in the context of using CPU models for compatibility), so
->> that it can reject or warn about certain configurations that may not
->> turn out as the user expects.
->> 
->> > Not sure if it is worth adding an API to return the writable mask for
->> > idregs, since we want to enable the writable for all allocated
->> > unhidden idregs eventually.
->> 
->> We'd enable any new idregs for writing from the start in the future, I
->> guess?
->> 
->> I see two approaches here:
->> - add an API to get a list of idregs with their writable masks
->> - add a capability "you can write to all idregs whatever you'd expect to
->>   be able to write there architecture wise", which would require to add
->>   support for all idregs prior to exposing that cap
->> 
->> The second option would be the easier one (if we don't manage to break
->> it in the future :)
->
-> I'm not sure the last option is even possible. The architecture keeps
-> allocating new ID registers in the op0==3, op1=={0, 1, 3}, CRn==0,
-> CRm=={0-7}, op2=={0-7} space, so fields that were RES0 until then
-> start having a non-0 value.
->
-> This could lead to a situation where you move from a system that
-> didn't know about ID_AA64MMFR6_EL1.XYZ to a system that advertises it,
-> and for which the XYZ instruction has another behaviour. Bad things
-> follow.
+I can see the original purpose is to "setting a pte in the shadow page
+table directly, instead of flushing the shadow page table entry and then
+getting vmexit to set it"[1].
 
-Hrm :(
+IIUC, KVM is expected to directly make the new pte present for new
+pages in this callback, like for COW.
 
->
-> My preference would be a single ioctl that returns the full list of
-> writeable masks in the ID reg range. It is big, but not crazy big
-> (1536 bytes, if I haven't messed up), and includes the non ID_*_EL1
-> sysreg such as MPIDR_EL1, CTR_EL1, SMIDR_EL1.
->
-> It would allow the VMM to actively write zeroes to any writable ID
-> register it doesn't know about, or for which it doesn't have anything
-> to restore. It is also relatively future proof, as it covers
-> *everything* the architecture has provisioned for the future (by the
-> time that space is exhausted, I hope none of us will still be involved
-> with this crap).
+> As also commented in kvm_mmu_notifier_change_pte(), .change_pte() must be
+> surrounded by .invalidate_range_{start,end}().
+> 
+> While kvm_mmu_notifier_invalidate_range_start() has called kvm_unmap_gfn_range()
+> to zap all leaf SPTEs, and page fault path will not install new SPTEs
+> successfully before kvm_mmu_notifier_invalidate_range_end(),
+> kvm_set_spte_gfn() should not be able to find any shadow present leaf entries to
+> update PFN.
 
-Famous last words :)
+I also failed to figure out how the kvm_set_spte_gfn() could pass
+several !is_shadow_present_pte(iter.old_spte) check then write the new
+pte.
 
-But yes, that should work. This wouldn't be the first ioctl returning a
-long list, and the VMM would just call it once on VM startup to figure
-things out anyway.
 
+[1] https://lore.kernel.org/all/200909222039.n8MKd4TL002696@imap1.linux-foundation.org/
+
+Thanks,
+Yilun
+
+> 
+> Or could we just delete completely
+> "kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);"
+> from kvm_mmu_notifier_change_pte() ?
