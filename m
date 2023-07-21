@@ -2,195 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BE3775C256
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 11:01:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 723E575C25F
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 11:04:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230098AbjGUJBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 05:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
+        id S231177AbjGUJEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 05:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbjGUJBg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 05:01:36 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E5A2D4B;
-        Fri, 21 Jul 2023 02:01:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689930095; x=1721466095;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=pREx1/fBS/r0vl5pRhqETy0r5/HsSvBcZo7/BuIMQ/w=;
-  b=UtTRDWvOTi9xl/l3YaJFDekKLzUsKbBpa+OCnNAGw4U8/+wS6bbidk5u
-   GaW40fsFZcJmQOuu3vnm9Dz85xjoV7YBmoUF64vxuPIkD2GaKpGyjVXRG
-   2ypo3mnulJhcqSFvgQNzWl4n+ItDAqank+4OTqo/Pnrx8wRKHKBzzXhvy
-   JsaCQNAcmB5l+ELMNEAPyQM2HamuKEF+JuzeMCQbUDceux2kmJJKg/wfX
-   08RjmCBJn0oeGbctfNMaWpVR2okZzYpniGyjYF+91Jryobx3pnXr4nu6a
-   GHkq6xDA7VNbpUyrSybEU31J/E7pDh77pGsmF/3hdxRETvxBTKu5HivS2
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="364439928"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="364439928"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 02:01:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="759882157"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="759882157"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga001.jf.intel.com with ESMTP; 21 Jul 2023 02:01:34 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 21 Jul 2023 02:01:33 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 21 Jul 2023 02:01:33 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 21 Jul 2023 02:01:33 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.109)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 21 Jul 2023 02:01:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NmncEhq9qcnlkdyrEitf7DVevKB3TaKC+vQ3x8MXuvOxj/CZ9lLXC7YrcQkwzVKe3KGnZd7mYgnPUrUAMDlz5veYc8xlxY/r8v8GsgRl8WUqXB1Bc3dPeU6aDFSSMCFaVooPW5xuJk6mX3eiKis+61oKpNolju0GsDJj3cC5wqpn9FtYIdYaEPwogHCt14FCBy7Y/xhIyEy7rScYIgwEKN0hDz2S6xrOr37IoQbWW/Vcp3g1qEEhNSl45oboedZoCm1jNg9a516GlRwfSNEDGvrxYjKz8JoopTtQH9PCB5IrKXtfP6UtYKxw9Go+WiS+wTUZfPWy3AhBGGZcMe72ZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GkL/wOJG70kpgOY9/qYctPQSq4X1ExzYRgEcDrmKinQ=;
- b=K4wtBGboa9/HVNwQX0VK2xWWILU+HPvsmWFini/kJuJIOL1tYnCk7kYsvl6bywJHMU5PNxh+PktkCL5QYDY9UHnIRBwgDGe7vNJ/aWZVE0K/qMIGWCpsMaPoAcpJDiZ71WHLWTd9+mukoqroJWYItqFT3LS8SY0hdMPtcxPhpkcx0d40rO2kcK+h2Yc2Jv1t8bKH7jL1P9QcfIj1OZV0jH7aK4IXI3u7fseblKtVxhxG8UO/Ib0s7iBzIADpBxgiA95ZodJrr0NDZ/08iBMBmVEJ6QnqYrTCaOxIBgXONg1IWfP1XVhAHPNsZmpF0XN074tEtwD2u7MwRedDKw6z3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB5214.namprd11.prod.outlook.com (2603:10b6:a03:2df::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.24; Fri, 21 Jul
- 2023 09:01:31 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::137b:ec82:a88c:8159]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::137b:ec82:a88c:8159%4]) with mapi id 15.20.6609.026; Fri, 21 Jul 2023
- 09:01:31 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Brett Creeley <brett.creeley@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>
-CC:     "shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: RE: [PATCH v12 vfio 3/7] vfio/pds: register with the pds_core PF
-Thread-Topic: [PATCH v12 vfio 3/7] vfio/pds: register with the pds_core PF
-Thread-Index: AQHZupFmZY6E6FxIHE6HGVktZmL1O6/D7H6w
-Date:   Fri, 21 Jul 2023 09:01:31 +0000
-Message-ID: <BN9PR11MB527656A2E28090DDA4ED07728C3FA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230719223527.12795-1-brett.creeley@amd.com>
- <20230719223527.12795-4-brett.creeley@amd.com>
-In-Reply-To: <20230719223527.12795-4-brett.creeley@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB5214:EE_
-x-ms-office365-filtering-correlation-id: e4058357-f462-4ae3-8452-08db89c913c3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VuqJd75ugqHnJYYrQFaMENEe2IIlAICnFK0IIPs4Gm1x8O3qMlFJTzuNQtMuEshp5ollX2yY4FDI8P1KJJgRXJfwMq32pdNpOJ6GEPhgWW9ETMko7nmzTyzenA88d61P8XfUvOgupfxPlAWFeCRMTMUPJfX5k2yHAHkeAMRP+W0VZ0APKM+EwpBt0rUPgJdZqKESAJ9CR0XikBK2zEec+XW5cHq2Z9f2hRfiKzIr6yeUdEsl3IHXJBBd7oIPw8UEJg5vWviLtUAvL99oom6+VY0IVcHHIkpbYLSp6sVGpfodPlXPjhZf9DAUvvM7XtUgoODxahNoWnX5yucqwt51BgSa0HR4FWBXIrsRt7TR0M+r2lYoUKMQhaFKKA3SgXrykix0sK8MGswf9wiV//y0uLRJ19Mt2LGfMEcXK5x1rc/sXDuzeGGFBdOd8QkynqaiReoRa7BV8WsGToU/izcuzL/SidGfCnIZVrQP30ya0ltqSodb1ZHeAslch/S/0PelgiqDyhhJc+/0Y0gIgUAwF2rnZeuc5k3SOXlnd1kFCgcdEphRl3cwe1kOyMBjQolOpvr4uusRSf0goq3TX1ueqGyFxLh1I/d9zeDOUv+ch7pymUgqC+lw8DXhjJ7vRJrb
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(346002)(366004)(376002)(39860400002)(451199021)(86362001)(33656002)(38070700005)(2906002)(55016003)(186003)(6506007)(26005)(38100700002)(9686003)(7696005)(82960400001)(122000001)(110136005)(71200400001)(76116006)(66476007)(66946007)(8936002)(8676002)(4326008)(478600001)(66556008)(316002)(41300700001)(64756008)(5660300002)(66446008)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?V+6kqvBiwQEyFyF1WD1YsZP44Alm+g1F0+xue7pqgsUzqw0mUL+PUVr0m1rI?=
- =?us-ascii?Q?csWKwkei8QwAwfXzD1CbNfOoZXsfRy2hUfMts+A+rzTie48ITSa34nfGPcAe?=
- =?us-ascii?Q?pTqPFmGiDUmOptz/puH23aL9R6cbDCrkyBHB5rvD9BlqWrC0X4qNpTRvptGC?=
- =?us-ascii?Q?eUTVEezVENGEQvPhN84jMsVC43CK21jLEjo1/wswVhS5sWKj8Awzv8sy6q6Y?=
- =?us-ascii?Q?YD7arU/A9E+L5uL8l90OyO1G1w3IytD+ZoWJwUnLU1addDlFz7cXc9XIvCvn?=
- =?us-ascii?Q?CnTprOvw4t+jJF/ibal/VC8PlEDMdRmCRzm8Qs2llAoibLY4mlFw54sR4yWU?=
- =?us-ascii?Q?b9YJPCl1phFSapu+QhSA2u5RW2pYozbo9DwSCUEmPx5HZi2aPsrcZPc2ZK06?=
- =?us-ascii?Q?qsSQDaYsMWmLQOpQ41Zd7IF2famtqckV+CTpUGIg/mqSik1H20XZkfyV/uSW?=
- =?us-ascii?Q?bANhrlLuesU0LmFr67hGR0NWZCACgBbVOm2RxELbnaKN8ivIH99O/5c9355s?=
- =?us-ascii?Q?GPUedzfxwyjasqgL6/8paR4fGYbWs7zrMgau6lEFqPZzMPSXe33iqneQnsAH?=
- =?us-ascii?Q?ZMUlZYnZL4aI9wHa80iPmuvnA3pqoxDREnOuSuHOwsuDmbs2qSeiSSBuvBVx?=
- =?us-ascii?Q?0cftynidUk98gZHH72ho4J5oWVR5CmbSEb+B2rDdM9daOFXpIgtvraK6J7ha?=
- =?us-ascii?Q?qriYzMSOEyIHmXK0VXfk3wz6lIQf7sZ4MGERqsM0nuszOwJvpOdu0L53UtLL?=
- =?us-ascii?Q?EL6I+fcSwDEiXGeem4MQa84lA8oR2/5ec+EI7Tr6X36Xpr9o7xmV0uIudLzP?=
- =?us-ascii?Q?iJcAtewHLRYtF0qR+hhWbfTmMWtBB/WJpiOT7OvxLAs51Ciq3sYCTOoxBcHK?=
- =?us-ascii?Q?cjmZZEjxFbx1SqzB8bAp/XVtsFD1SjnnoClsa9HrQQEHUlSFDg3BXpglm2XJ?=
- =?us-ascii?Q?Sly/M4nCq7EpiGnns0MGa/pbAC4/EWF/jOjOVjUCjuizGyfdKzk7Q2y5BBfj?=
- =?us-ascii?Q?2fUIxZ8W4K9NCMFxS8Va/Cpti5ioe5S5d6erVK6eWeu5TQkQZzcil/oA4Jm6?=
- =?us-ascii?Q?t2WyvXrW4iPxw4aI0HjG1ja7FwGG2a0GqlvNA9tRQVku5kQ8nJxS+VCFAlvB?=
- =?us-ascii?Q?/lI1rdBjt026D6DtHn5+q2QJoxFDLtCL8HHgcMHZK9pNp5afQFw6KPLNNVJX?=
- =?us-ascii?Q?EF8P1wKjiZ5zUSwz20QTcIShx+OOFLCR06rdXuaOD/pVMyo2vscliPoZ1Yk9?=
- =?us-ascii?Q?kQC8LeTQkhlVLIojeUc/4du0334BuMna5nwPJqU9f7tejBAx3Mtkir3JbXNe?=
- =?us-ascii?Q?yVT0QMOruouidIBCwf+/7GXV0CCIioiS1Sk4xYaFV3baGUa6cxLTu3LpS7rc?=
- =?us-ascii?Q?QnPix54BoVjFIODDMsvDhMKbGlsV9uJfxvst0qQigv3TTDKH8HQYLeFne1Ci?=
- =?us-ascii?Q?r0sbr7E7X1EuEeOzpAwTs5Hpc+VfDBsLzHox5Tlch/vuRmc07nbv1Fsmgn4B?=
- =?us-ascii?Q?cGp580gALpELSq85xWeRSB6F26L7Hk1S+wy7UBZeWk62ohwqGizluqbR9jK1?=
- =?us-ascii?Q?dLhxm9YZQnt0irKDtHG3nO7TeSLrhvdhDhMNPx5g?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229920AbjGUJEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 05:04:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7065230C0
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 02:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689930240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UkppB3amY8e+ZFUORFAPfGoR63QBz1mTawh0tzwUFzU=;
+        b=cKVgCGTqX5RkPkZcFr6sDz40z5jCOJiMPmPvpIQ8NUjhbk4+LpW1hqUeO1T4gBa61/F7KW
+        Nrgnb4HqdFQyFYKQkAfwaax5FFspxuZ+BBTfBiAAx0Akpg7NGO9HSpPCHt6nh43BkzlTcn
+        sCSNVKyCHw5IGuR8XoXh5QCweuTNsvY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-119-1aRohcc6NJee85VWSOgNag-1; Fri, 21 Jul 2023 05:03:56 -0400
+X-MC-Unique: 1aRohcc6NJee85VWSOgNag-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-992e6840901so208532666b.0
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 02:03:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689930235; x=1690535035;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UkppB3amY8e+ZFUORFAPfGoR63QBz1mTawh0tzwUFzU=;
+        b=LbHsQc8AhN1MsGG4faJJnaYuAcMLSm7JGPqRVeE+u0iqPBCNMsSP/eXRNbTs7Z6tU8
+         HIlwgfxpgGwSd+VE2ARkkgzf2qRwZ3gFNCSYH1CTeR09u1EibpPcCeGq4JoJfhY3wXYp
+         djFUbS651rio5UOyOAB0mi1Xa8gqj0XPwFG/22caQ2RSyjS6KuMLiTs5E91Vkq8hJ42l
+         bJqI81ZNrvUoDwgkgzg6GozRFpJokQsurQjRY8drm9mbH+Fth35h/L6UFi+7OJeDcrxJ
+         nvVvX0nzY7xj7NvFw7siq/zNLfQLcJnZH7VovNgZ3dIHkuQwcyzSrr8hKxV6UBtLKtMV
+         KcLA==
+X-Gm-Message-State: ABy/qLYzatRLK2Tnt6KlxmM4CvaNrZGcTWOfFXFAJkAQBF34nXw00rAr
+        Gpc+6YYtZmt7Rc9DAD2K6/v68XrysusgPD/oLJAzyuvF0kIsc/kaZl22L/EEyvl+n40m9axth9f
+        lb3KV6QtJWefL
+X-Received: by 2002:a17:907:6d8c:b0:98d:abd4:4000 with SMTP id sb12-20020a1709076d8c00b0098dabd44000mr7889157ejc.35.1689930234815;
+        Fri, 21 Jul 2023 02:03:54 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGH6YzYN7wVD16W6bBWRZvka9R57MaW1yVsDxFFu0qfog7UhF1jWQDyj4gC4NTPLd7VWeWUJA==
+X-Received: by 2002:a17:907:6d8c:b0:98d:abd4:4000 with SMTP id sb12-20020a1709076d8c00b0098dabd44000mr7889108ejc.35.1689930234273;
+        Fri, 21 Jul 2023 02:03:54 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id rv7-20020a17090710c700b00993a9a951fasm1915159ejb.11.2023.07.21.02.03.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 02:03:53 -0700 (PDT)
+Message-ID: <47c5f57c-a191-1983-b4ef-6e0c59c0c446@redhat.com>
+Date:   Fri, 21 Jul 2023 11:03:51 +0200
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4058357-f462-4ae3-8452-08db89c913c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2023 09:01:31.6049
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hBbZ38WxeGb3eR+7rc5s2mB2FISHOJjNoGr32Oory/1DtqAP7QksevxwIlXNRtsoxXta55SdwKeFz20lH852Cg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5214
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v11 06/29] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-7-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230718234512.1690985-7-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Brett Creeley <brett.creeley@amd.com>
-> Sent: Thursday, July 20, 2023 6:35 AM
->=20
-> +void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio=
-)
-> +{
-> +	struct pci_dev *pdev =3D pds_vfio_to_pci_dev(pds_vfio);
-> +	int err;
+On 7/19/23 01:44, Sean Christopherson wrote:
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/x86.c       |  2 +-
+>   include/linux/kvm_host.h |  4 ++--
+>   include/uapi/linux/kvm.h | 13 +++++++++++++
+>   virt/kvm/kvm_main.c      | 38 ++++++++++++++++++++++++++++++--------
+>   4 files changed, 46 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a6b9bea62fb8..92e77afd3ffd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12420,7 +12420,7 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+>   	}
+>   
+>   	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+> -		struct kvm_userspace_memory_region m;
+> +		struct kvm_userspace_memory_region2 m;
+>   
+>   		m.slot = id | (i << 16);
+>   		m.flags = 0;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index d2d3e083ec7f..e9ca49d451f3 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1130,9 +1130,9 @@ enum kvm_mr_change {
+>   };
+>   
+>   int kvm_set_memory_region(struct kvm *kvm,
+> -			  const struct kvm_userspace_memory_region *mem);
+> +			  const struct kvm_userspace_memory_region2 *mem);
+>   int __kvm_set_memory_region(struct kvm *kvm,
+> -			    const struct kvm_userspace_memory_region *mem);
+> +			    const struct kvm_userspace_memory_region2 *mem);
+>   void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+>   void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+>   int kvm_arch_prepare_memory_region(struct kvm *kvm,
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f089ab290978..4d4b3de8ac55 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -95,6 +95,16 @@ struct kvm_userspace_memory_region {
+>   	__u64 userspace_addr; /* start of the userspace allocated memory */
+>   };
+>   
+> +/* for KVM_SET_USER_MEMORY_REGION2 */
+> +struct kvm_userspace_memory_region2 {
+> +	__u32 slot;
+> +	__u32 flags;
+> +	__u64 guest_phys_addr;
+> +	__u64 memory_size;
+> +	__u64 userspace_addr;
+> +	__u64 pad[16];
+> +};
 > +
-> +	err =3D pds_client_unregister(pci_physfn(pdev), pds_vfio->client_id);
-> +	if (err)
-> +		dev_err(&pdev->dev, "unregister from DSC failed: %pe\n",
-> +			ERR_PTR(err));
+>   /*
+>    * The bit 0 ~ bit 15 of kvm_userspace_memory_region::flags are visible for
+>    * userspace, other bits are reserved for kvm internal use which are defined
+> @@ -1192,6 +1202,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_COUNTER_OFFSET 227
+>   #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>   #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> +#define KVM_CAP_USER_MEMORY2 230
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> @@ -1466,6 +1477,8 @@ struct kvm_vfio_spapr_tce {
+>   					struct kvm_userspace_memory_region)
+>   #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+>   #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> +#define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
+> +					 struct kvm_userspace_memory_region2)
+>   
+>   /* enable ucontrol for s390 */
+>   struct kvm_s390_ucas_mapping {
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 53346bc2902a..c14adf93daec 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1549,7 +1549,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
+>   	}
+>   }
+>   
+> -static int check_memory_region_flags(const struct kvm_userspace_memory_region *mem)
+> +static int check_memory_region_flags(const struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+>   
+> @@ -1951,7 +1951,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
+>    * Must be called holding kvm->slots_lock for write.
+>    */
+>   int __kvm_set_memory_region(struct kvm *kvm,
+> -			    const struct kvm_userspace_memory_region *mem)
+> +			    const struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	struct kvm_memory_slot *old, *new;
+>   	struct kvm_memslots *slots;
+> @@ -2055,7 +2055,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>   EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
+>   
+>   int kvm_set_memory_region(struct kvm *kvm,
+> -			  const struct kvm_userspace_memory_region *mem)
+> +			  const struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	int r;
+>   
+> @@ -2067,7 +2067,7 @@ int kvm_set_memory_region(struct kvm *kvm,
+>   EXPORT_SYMBOL_GPL(kvm_set_memory_region);
+>   
+>   static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+> -					  struct kvm_userspace_memory_region *mem)
+> +					  struct kvm_userspace_memory_region2 *mem)
+>   {
+>   	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
+>   		return -EINVAL;
+> @@ -4514,6 +4514,7 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>   {
+>   	switch (arg) {
+>   	case KVM_CAP_USER_MEMORY:
+> +	case KVM_CAP_USER_MEMORY2:
+>   	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
+>   	case KVM_CAP_JOIN_MEMORY_REGIONS_WORKS:
+>   	case KVM_CAP_INTERNAL_ERROR_DATA:
+> @@ -4757,6 +4758,14 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+>   	return fd;
+>   }
+>   
+> +#define SANITY_CHECK_MEM_REGION_FIELD(field)					\
+> +do {										\
+> +	BUILD_BUG_ON(offsetof(struct kvm_userspace_memory_region, field) !=		\
+> +		     offsetof(struct kvm_userspace_memory_region2, field));	\
+> +	BUILD_BUG_ON(sizeof_field(struct kvm_userspace_memory_region, field) !=		\
+> +		     sizeof_field(struct kvm_userspace_memory_region2, field));	\
+> +} while (0)
+> +
+>   static long kvm_vm_ioctl(struct file *filp,
+>   			   unsigned int ioctl, unsigned long arg)
+>   {
+> @@ -4779,15 +4788,28 @@ static long kvm_vm_ioctl(struct file *filp,
+>   		r = kvm_vm_ioctl_enable_cap_generic(kvm, &cap);
+>   		break;
+>   	}
+> +	case KVM_SET_USER_MEMORY_REGION2:
+>   	case KVM_SET_USER_MEMORY_REGION: {
+> -		struct kvm_userspace_memory_region kvm_userspace_mem;
+> +		struct kvm_userspace_memory_region2 mem;
+> +		unsigned long size;
+> +
+> +		if (ioctl == KVM_SET_USER_MEMORY_REGION)
+> +			size = sizeof(struct kvm_userspace_memory_region);
+> +		else
+> +			size = sizeof(struct kvm_userspace_memory_region2);
+> +
+> +		/* Ensure the common parts of the two structs are identical. */
+> +		SANITY_CHECK_MEM_REGION_FIELD(slot);
+> +		SANITY_CHECK_MEM_REGION_FIELD(flags);
+> +		SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
+> +		SANITY_CHECK_MEM_REGION_FIELD(memory_size);
+> +		SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
+>   
+>   		r = -EFAULT;
+> -		if (copy_from_user(&kvm_userspace_mem, argp,
+> -						sizeof(kvm_userspace_mem)))
+> +		if (copy_from_user(&mem, argp, size))
+>   			goto out;
+>   
+> -		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
+> +		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
+>   		break;
+>   	}
+>   	case KVM_GET_DIRTY_LOG: {
 
-Why using ERR_PTR() here? it looks a common pattern used cross
-this series.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> @@ -34,12 +34,13 @@ enum pds_core_vif_types {
->=20
->  #define PDS_DEV_TYPE_CORE_STR	"Core"
->  #define PDS_DEV_TYPE_VDPA_STR	"vDPA"
-> -#define PDS_DEV_TYPE_VFIO_STR	"VFio"
-> +#define PDS_DEV_TYPE_VFIO_STR	"vfio"
->  #define PDS_DEV_TYPE_ETH_STR	"Eth"
->  #define PDS_DEV_TYPE_RDMA_STR	"RDMA"
->  #define PDS_DEV_TYPE_LM_STR	"LM"
->=20
->  #define PDS_VDPA_DEV_NAME	 "."
-> PDS_DEV_TYPE_VDPA_STR
-> +#define PDS_LM_DEV_NAME		PDS_CORE_DRV_NAME "."
-> PDS_DEV_TYPE_LM_STR "." PDS_DEV_TYPE_VFIO_STR
->=20
-
-then should the name be changed to PDS_VFIO_LM_DEV_NAME?
-
-Or is mentioning *LM* important? what would be the problem to just
-use "pds_core.vfio"?
