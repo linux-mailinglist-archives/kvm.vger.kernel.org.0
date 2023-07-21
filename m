@@ -2,117 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EDFE75D518
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 21:35:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F14E75D574
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:19:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbjGUTfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 15:35:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54170 "EHLO
+        id S229534AbjGUUTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 16:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbjGUTfk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 15:35:40 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBBAE53
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:35:39 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bb1baf55f5so17169295ad.0
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:35:39 -0700 (PDT)
+        with ESMTP id S229847AbjGUUTR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 16:19:17 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFEB359C
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:04 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d05e334f436so989590276.2
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689968139; x=1690572939;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zzRV4jT/UtNnsNIK2YvG3L4X5UH72+69TP4OaQhmPt4=;
-        b=JfMGnrE+g4/SdXqp/ILAdh8OXvsFjfzKETJHY+EhlewfKhrwUZ7RoTSzKYzg/yardc
-         q8Kxwh36Uh0alOQRzLpTJiv+muY/pM/0QMO13VqRNd6mSkBAuzE8Y6Vf1Vo8IF8VaYFm
-         ZM5I8a2BhNFvQNAEAJURcgSp2m2m3PC2Yx+Rwz8AdVzrHJ2A+N9Y24PPf8Vh2DLA9J7a
-         ys5PbTXsComhwHn7A1jDs56BwRrB4QZzXdF2e88pkpT0JViBziznq2TDlyxDGepnE2RY
-         LEfZFIh6ZBKtXl8gzi+XeNAIQCBJA3i3bAy6V+Bidl2HemJcbdaJ9FaBpp3xBvsdlW4l
-         zL3Q==
+        d=google.com; s=20221208; t=1689970743; x=1690575543;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rLZ3+zgUAeppnqgY3n6NxTe9LV814vORREjktc5U/Sw=;
+        b=hCkJqAtatAST2xTcK9UF+vly76nRQ59L6L1wCKwbjhtj7w4tNGhHjPBovelEM2+gK5
+         lxg4bB9LV+ax71npRTttA7ak1EpyyL8oqv8ER274jfu5H+tSGhzdtdAMP/jUzTun9FhX
+         xqmozPodAe2V1GPggNtO9OU4tel859UGjBVFVOXeBKO7viKomIxtFIkMGEMzRVhN9bx8
+         fmGiP67UFWdVuLym+YVIi+CRQEiL+xOfzhtec91jVP/W7oszjr+kqOCgnkNwD4rOm8Ar
+         6BIkm9IWEaQ+i9nqsAGhRwAurvTHhIw3HgXS2QWQC0S8On8G1FlGlOoIHD1+S7zHoMUE
+         Oumg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689968139; x=1690572939;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zzRV4jT/UtNnsNIK2YvG3L4X5UH72+69TP4OaQhmPt4=;
-        b=ai+NxPFUVRxIMQ/Y37BDXGNBl7yWtfhrz3s1Vgae6RnswdpL7r38WA5hcL3v64P1wq
-         zs105kQ7BLYX1RZv3tyzRfmtGEyiiH8WHfxleHPRWU2I0pLN2gDp5N8WTLEGEkpURQTw
-         hKk4g65bs9e7/kYfZpwNfXN95HAMMmga6Kxzj304nPkSE9l3IwnNEMIEOlBYfNi3hcKj
-         PgB704DIx13O1DfGyMEkCdtVQpiOgHmZrXOKWpjAqd9yU+6YviMtKirpqNPALVFmcT+E
-         28fpnyLYeYGROiTq0mS+x5lieeoRGOkOYdb/zcdypLINytlgWaKXexpNgdUpx7zC88rz
-         4YoA==
-X-Gm-Message-State: ABy/qLZUECPtfvEntP2hqwyPzlPqLAxBdIXIjcHHvyRsmLU9LvMroK9u
-        AJW3n7gPdssjJEGgh9OlD1hOrw==
-X-Google-Smtp-Source: APBJJlErhC+VIXfffdNPDZMSDd2lEyokEWsGZ4siE0VrJXPYSeMfFCGzQlYHv6H7Qp1LgMkojZxgOQ==
-X-Received: by 2002:a17:903:120f:b0:1b8:4b87:20dc with SMTP id l15-20020a170903120f00b001b84b8720dcmr2955939plh.37.1689968139289;
-        Fri, 21 Jul 2023 12:35:39 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id p15-20020a170902e74f00b0019ee045a2b3sm3836250plf.308.2023.07.21.12.35.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 12:35:38 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qMvub-003IJe-Bf;
-        Fri, 21 Jul 2023 16:35:37 -0300
-Date:   Fri, 21 Jul 2023 16:35:37 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] iommu: Prevent RESV_DIRECT devices from blocking
- domains
-Message-ID: <ZLreCUIJoo1TfmVz@ziepe.ca>
-References: <20230713043248.41315-1-baolu.lu@linux.intel.com>
- <20230713043248.41315-2-baolu.lu@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230713043248.41315-2-baolu.lu@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1689970743; x=1690575543;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLZ3+zgUAeppnqgY3n6NxTe9LV814vORREjktc5U/Sw=;
+        b=gPRiBJBlderJg3/ShIbpN8lCGb9nOgR6URO5v5Sv1BsZDp8TxyXAEbkbWwc30IqkOj
+         M7+0JjbWnqR30SW0H8Fms/3/pZ01lc8gq0wxu3sspnkdBoDrkRXmQkidrVRzFWgM/AfH
+         GQBI/GKIGaRHOXU01sBgIiNgOQr6i5NrMHyPej0d67jnFZDJRVMXVNEv21xkNAlAY/Of
+         bXVpJNyC/pRRKKZAycHEv5zwFASpE0SRbfktdS5UKSaYBiP4dpxEQlVyOOfGNUekecuG
+         8UwOrP6/O9hRRg0Qqc4AXCFObtSOjB9AV2Y3nh8i5ZnoqN/iRR7NssCcUyVQXdtdwh9O
+         qUdw==
+X-Gm-Message-State: ABy/qLYJ83oiZiG9/euJfX6ypiPGTpSrC6R7fedVpEL2WsxtAiv+ecE5
+        hGvGNyu+JWrWWnqB7hqtinw99XoeMVc=
+X-Google-Smtp-Source: APBJJlEMevAHotcBOZHYg9Sd6IaWSXrnx1OUggrP2dlEo2/7poLQt+F7AoxS9ZkZBN8T5H6DPt0gBycHwUE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:cf2:ad45:2084 with SMTP id
+ w15-20020a056902100f00b00cf2ad452084mr17704ybt.12.1689970743354; Fri, 21 Jul
+ 2023 13:19:03 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 21 Jul 2023 13:18:40 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
+Message-ID: <20230721201859.2307736-1-seanjc@google.com>
+Subject: [PATCH v4 00/19] x86/reboot: KVM: Clean up "emergency" virt code
+From:   Sean Christopherson <seanjc@google.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 13, 2023 at 12:32:47PM +0800, Lu Baolu wrote:
-> The IOMMU_RESV_DIRECT flag indicates that a memory region must be mapped
-> 1:1 at all times. This means that the region must always be accessible to
-> the device, even if the device is attached to a blocking domain. This is
-> equal to saying that IOMMU_RESV_DIRECT flag prevents devices from being
-> attached to blocking domains.
-> 
-> This also implies that devices that implement RESV_DIRECT regions will be
-> prevented from being assigned to user space since taking the DMA ownership
-> immediately switches to a blocking domain.
-> 
-> The rule of preventing devices with the IOMMU_RESV_DIRECT regions from
-> being assigned to user space has existed in the Intel IOMMU driver for
-> a long time. Now, this rule is being lifted up to a general core rule,
-> as other architectures like AMD and ARM also have RMRR-like reserved
-> regions. This has been discussed in the community mailing list and refer
-> to below link for more details.
-> 
-> Other places using unmanaged domains for kernel DMA must follow the
-> iommu_get_resv_regions() and setup IOMMU_RESV_DIRECT - we do not restrict
-> them in the core code.
-> 
-> Cc: Robin Murphy <robin.murphy@arm.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Link: https://lore.kernel.org/linux-iommu/BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  include/linux/iommu.h |  2 ++
->  drivers/iommu/iommu.c | 37 +++++++++++++++++++++++++++----------
->  2 files changed, 29 insertions(+), 10 deletions(-)
+If there are no objections, my plan is to take this through the KVM tree
+for 6.6.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Instead of having the reboot code blindly try to disable virtualization
+during an emergency, use the existing callback into KVM to disable virt
+as "needed".  In quotes because KVM still somewhat blindly attempts to
+disable virt, e.g. if KVM is loaded but doesn't have active VMs and thus
+hasn't enabled hardware.  That could theoretically be "fixed", but due to
+the callback being invoked from NMI context, I'm not convinced it would
+be worth the complexity.  E.g. false positives would still be possible,
+and KVM would have to play games with the per-CPU hardware_enabled flag
+to ensure there are no false negatives.
 
-Jason
+The callback is currently used only to VMCLEAR the per-CPU list of VMCSes,
+but not using the callback to disable virt isn't intentional.  Arguably, a
+callback should have been used in the initial "disable virt" code added by
+commit d176720d34c7 ("x86: disable VMX on all CPUs on reboot").  And the
+kexec logic added (much later) by commit f23d1f4a1160 ("x86/kexec: VMCLEAR
+VMCSs loaded on all cpus if necessary") simply missed the opportunity to
+use the callback for all virtualization needs.
+
+Once KVM handles disabling virt, move all of the helpers provided by
+virtext.h into KVM proper.
+
+There's one outlier patch, "Make KVM_AMD depend on CPU_SUP_AMD or
+CPU_SUP_HYGON", that I included here because it felt weird to pull in the
+"must be AMD or Hygon" check without KVM demanding that at build time.
+
+v4: 
+ - Collect reviews. [Kai]
+ - Skip VMCLEAR during reboot if CR4.VMXE=0. [Kai]
+ - Call out that disabling virtualization iff there's a callback also
+   avoids an unnecessary NMI shootdown. [Kai]
+ - Move "Disable virtualization during reboot iff callback is
+   registered" patch after "Hoist "disable virt" helpers above \"emergency
+   reboot\"" patch to fix an intermediate build error.
+
+v3:
+ - https://lore.kernel.org/all/20230512235026.808058-1-seanjc@google.com
+ - Massage changelogs to avoid talking about out-of-tree hypervisors. [Kai]
+ - Move #ifdef "KVM" addition later. [Kai]
+
+v2:
+ - https://lore.kernel.org/all/20230310214232.806108-1-seanjc@google.com
+ - Disable task migration when probing basic SVM and VMX support to avoid
+   logging misleading info (wrong CPU) if probing fails.
+
+v1: https://lore.kernel.org/all/20221201232655.290720-1-seanjc@google.com
+
+Sean Christopherson (19):
+  x86/reboot: VMCLEAR active VMCSes before emergency reboot
+  x86/reboot: Harden virtualization hooks for emergency reboot
+  x86/reboot: KVM: Handle VMXOFF in KVM's reboot callback
+  x86/reboot: KVM: Disable SVM during reboot via virt/KVM reboot
+    callback
+  x86/reboot: Assert that IRQs are disabled when turning off
+    virtualization
+  x86/reboot: Hoist "disable virt" helpers above "emergency reboot" path
+  x86/reboot: Disable virtualization during reboot iff callback is
+    registered
+  x86/reboot: Expose VMCS crash hooks if and only if KVM_{INTEL,AMD} is
+    enabled
+  x86/virt: KVM: Open code cpu_has_vmx() in KVM VMX
+  x86/virt: KVM: Move VMXOFF helpers into KVM VMX
+  KVM: SVM: Make KVM_AMD depend on CPU_SUP_AMD or CPU_SUP_HYGON
+  x86/virt: Drop unnecessary check on extended CPUID level in
+    cpu_has_svm()
+  x86/virt: KVM: Open code cpu_has_svm() into kvm_is_svm_supported()
+  KVM: SVM: Check that the current CPU supports SVM in
+    kvm_is_svm_supported()
+  KVM: VMX: Ensure CPU is stable when probing basic VMX support
+  x86/virt: KVM: Move "disable SVM" helper into KVM SVM
+  KVM: x86: Force kvm_rebooting=true during emergency reboot/crash
+  KVM: SVM: Use "standard" stgi() helper when disabling SVM
+  KVM: VMX: Skip VMCLEAR logic during emergency reboots if CR4.VMXE=0
+
+ arch/x86/include/asm/kexec.h   |   2 -
+ arch/x86/include/asm/reboot.h  |   7 ++
+ arch/x86/include/asm/virtext.h | 154 ---------------------------------
+ arch/x86/kernel/crash.c        |  31 -------
+ arch/x86/kernel/reboot.c       |  66 ++++++++++----
+ arch/x86/kvm/Kconfig           |   2 +-
+ arch/x86/kvm/svm/svm.c         |  71 ++++++++++++---
+ arch/x86/kvm/vmx/vmx.c         |  76 ++++++++++++----
+ 8 files changed, 176 insertions(+), 233 deletions(-)
+ delete mode 100644 arch/x86/include/asm/virtext.h
+
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+-- 
+2.41.0.487.g6d72f3e995-goog
+
