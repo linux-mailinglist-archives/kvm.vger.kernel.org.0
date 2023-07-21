@@ -2,123 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D70B75D59B
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:21:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D17875D602
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:54:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231422AbjGUUVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 16:21:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38866 "EHLO
+        id S230289AbjGUUyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 16:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjGUUUz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 16:20:55 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD93C3AA5
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:20:03 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1716595276.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:20:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689970783; x=1690575583;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=f1LNi9Sq5NIBXtzGJVGKttDHRo4VG7MGlit5nvyUtF0=;
-        b=lupqznqfPScgKgAlsl68k2HwQOWYVzqFz7+e39gz+UVj6wvvC+ma4BNLkDyLgMbDCr
-         sXcaIXufKIRqTjEo6kaASseH4LuovJPFo1FpnMySbHlymLZC8toxxIjvN2Aiw4ju6EAG
-         VaD/mWdhEO8ur/DDeO9tEnMiMm8VItIJH8OP+EP+LpWzQ/NrR5L8c8s2LMhTcLypPS2U
-         oBg+8IvkdXfhKuyTvHG3Xef0QbwUQ6ZzSvJM7Mo/H4jFrr/vFd5FgUJyl+qeE3dTtsH5
-         MY6DHfpkgF/82Qh+aTdBRtINfnVpzFGxerBDIxZVXvcHDxqf5FZ0G6Srcd0y+VCH+a4h
-         +9CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689970783; x=1690575583;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f1LNi9Sq5NIBXtzGJVGKttDHRo4VG7MGlit5nvyUtF0=;
-        b=eLENQ9WEon9fIBWwRxHkGXNgtc3PBrJBIWSctWH7FQMtE3SFi6iN5zGT9darXFqBHw
-         qHPU3gNtTAAxiQhrRk4zNhBfpm4VEBVK9ho2ZpcuutvlMukdp9e71TLECABsio9kHgTP
-         hVntd/deyyPZ4p0NMYdLVErOvOlzVPipf2KPZq6fWY438kLCpN/p+7oV5WFuNY3SCKYG
-         UR/AbI4mDCfsnwmMbCom7ja/ytKgfznOjWOpcn7EUhxSiSZx9WSZeo2zaS70SikDUTX5
-         K4jzl63TpRxj4EpUwEAL3A+oIG8i381h8aUSr5ALcl3sk0KygbedsnVbHgZwQtU4tEvd
-         Bu9Q==
-X-Gm-Message-State: ABy/qLahKZSfB+9XAfvPOYzFMPerPhzGHd4lDHp+YzLPl4on/MeSKHhf
-        ESz2hJna5Pi5yrV4G2eCyJcRHvA+gvo=
-X-Google-Smtp-Source: APBJJlGqCihblJf1jaycZ9unQQ6pi+gVUILg04BI7aSdWb1kqkXeAsB0DrslgKJ6+cdV8k8Utd5kIZ2tJk4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:bc2:0:b0:ce9:64b3:80dc with SMTP id
- c2-20020a5b0bc2000000b00ce964b380dcmr18891ybr.1.1689970783817; Fri, 21 Jul
- 2023 13:19:43 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 13:18:59 -0700
-In-Reply-To: <20230721201859.2307736-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230721201859.2307736-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721201859.2307736-20-seanjc@google.com>
-Subject: [PATCH v4 19/19] KVM: VMX: Skip VMCLEAR logic during emergency
- reboots if CR4.VMXE=0
-From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Andrew Cooper <Andrew.Cooper3@citrix.com>,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229642AbjGUUyN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 16:54:13 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDF630CF
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689972852; x=1721508852;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=eq7PCjRPoXEvAGR9BduBGpSkIHwQsL4MnANg4sr1Vh8=;
+  b=PhuhMI+/x51JtrFrUAfXiK/3LpF2bKl0sNdL35Qdo7mZT7TWe7VOsVRq
+   6FOBv/cJraYUQDEhhZrb53CknWn8AMEUaU0WwlTSPVVPkco3ClFunYIfU
+   vF4mvbw+6EMfIsYQLiNcmmOt2gwHeGV8/DbZf4V/mkwcDvL50ox8PdRgV
+   jRDCk+e75Qr5TAo3oD5JlbJSCljYUxMtzoA+vzU4agRL/AJxHsGxIR8ih
+   iYesALtlD6fi9zKnwsJ3ferPTDWmViOvWXVzwIxfL3h3bDi9roarXGa8d
+   lNfvBxi/bkmrs7oVxe3UFy/0ysZdadXjybVTVdyteefTvHmUuxi1bocks
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="433349034"
+X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
+   d="scan'208";a="433349034"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 13:54:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="728227211"
+X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
+   d="scan'208";a="728227211"
+Received: from liyuexin-mobl.amr.corp.intel.com (HELO desk) ([10.255.230.166])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 13:54:11 -0700
+Date:   Fri, 21 Jul 2023 13:54:04 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
+Message-ID: <20230721205404.kqxj3pspexjl6qai@desk>
+References: <CALMp9eRQeZESeCmsiLyxF80Bsgp2r54eSwXC+TvWLQAWghCdZg@mail.gmail.com>
+ <529cd705-f5c3-a5d1-9999-a3d2ccd09dd6@intel.com>
+ <ZLiUrP9ZFMr/Wf4/@chao-email>
+ <CALMp9eTQ5zDpjK+=e+Rhu=zvLv_f0scqkUCif2tveq+ahTAYCg@mail.gmail.com>
+ <ZLjqVszO4AMx9F7T@chao-email>
+ <CALMp9eSw9g0oRh7rT=Nd5aTwiu_zMz21tRrZG5D_QEfTn1h=HQ@mail.gmail.com>
+ <ZLn9hgQy77x0hLil@chao-email>
+ <20230721190114.xznm7xfnuxciufa3@desk>
+ <CALMp9eTNM5VZzpSR6zbkjude6kxgBcOriWDoSkjanMmBtksKYw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eTNM5VZzpSR6zbkjude6kxgBcOriWDoSkjanMmBtksKYw@mail.gmail.com>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bail from vmx_emergency_disable() without processing the list of loaded
-VMCSes if CR4.VMXE=0, i.e. if the CPU can't be post-VMXON.  It should be
-impossible for the list to have entries if VMX is already disabled, and
-even if that invariant doesn't hold, VMCLEAR will #UD anyways, i.e.
-processing the list is pointless even if it somehow isn't empty.
+On Fri, Jul 21, 2023 at 12:18:36PM -0700, Jim Mattson wrote:
+> > Please note that clearing STIBP bit on one thread does not disable STIBP
+> > protection if the sibling has it set:
+> >
+> >   Setting bit 1 (STIBP) of the IA32_SPEC_CTRL MSR on a logical processor
+> >   prevents the predicted targets of indirect branches on any logical
+> >   processor of that core from being controlled by software that executes
+> >   (or executed previously) on another logical processor of the same core
+> >   [1].
+> 
+> I stand corrected. For completeness, then, is it true now and
+> forevermore that passing IA32_SPEC_CTRL through to the guest for write
+> can in no way compromise code running on the sibling thread?
 
-Assuming no existing KVM bugs, this should be a glorified nop.  The
-primary motivation for the change is to avoid having code that looks like
-it does VMCLEAR, but then skips VMXON, which is nonsensical.
+As IA32_SPEC_CTRL is a thread-scope MSR, a malicious guest would be able
+to turn off the mitigation on its own thread only. Looking at the
+current controls in this MSR, I don't see how a malicious guest can
+compromise code running on sibling thread.
 
-Suggested-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 5d21931842a5..0ef5ede9cb7c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -773,12 +773,20 @@ static void vmx_emergency_disable(void)
- 
- 	kvm_rebooting = true;
- 
-+	/*
-+	 * Note, CR4.VMXE can be _cleared_ in NMI context, but it can only be
-+	 * set in task context.  If this races with VMX is disabled by an NMI,
-+	 * VMCLEAR and VMXOFF may #UD, but KVM will eat those faults due to
-+	 * kvm_rebooting set.
-+	 */
-+	if (!(__read_cr4() & X86_CR4_VMXE))
-+		return;
-+
- 	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
- 			    loaded_vmcss_on_cpu_link)
- 		vmcs_clear(v->vmcs);
- 
--	if (__read_cr4() & X86_CR4_VMXE)
--		kvm_cpu_vmxoff();
-+	kvm_cpu_vmxoff();
- }
- 
- static void __loaded_vmcs_clear(void *arg)
--- 
-2.41.0.487.g6d72f3e995-goog
-
+But, I don't think there is a guarantee that future mitigations would
+not allow a malicious guest to compromise code running on sibling. To
+avoid this, care must be taken to add such mitigations to other MSRs
+that are not exported to guests.
