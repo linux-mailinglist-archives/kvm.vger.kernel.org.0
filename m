@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 610AC75D4E2
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 21:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F87B75D4EC
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 21:26:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232263AbjGUTZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 15:25:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46890 "EHLO
+        id S232273AbjGUT0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 15:26:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232262AbjGUTZw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 15:25:52 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148512D7F
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:25:51 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666ecf9a081so1995070b3a.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:25:51 -0700 (PDT)
+        with ESMTP id S230413AbjGUT0b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 15:26:31 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D8C3A84
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:26:19 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-2640a8ceefdso1308823a91.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 12:26:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1689967550; x=1690572350;
+        d=ziepe.ca; s=google; t=1689967579; x=1690572379;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MMsZNxLO6ied/G62NsNmuJtbpPqA/ZDXuniKdHv3YB4=;
-        b=XQzjypm8qf/fouvehrBkEZjx7rraTNYkUvdCKXn1r1gfZnRnhcrrwzmNXN35Uu7gzI
-         8oZahINtXmo9uCfjOT5mfF9tPFqadYED4ml2Rvg4gr4OGGmk2vfi6ALPhCVFDbYVbCVR
-         bizj8weYssavNq2IYvHIenQVmt+p9+kOYvZhgrRMHxTk+VUEpNpnyoTxavBUyIHeBvaf
-         qo1QRc6+YoA80RoGKZsLsD7vsvUGziFJq2u5Wn3UEGI6GwRgyCcJvjby4g2TfS0YmrN7
-         IaJoLwJh5sfemxuaaNtQypWoArXN7KcGOCwTG4BZdi4RfD5EEjDf6oZVJxfS3TMV68DT
-         4znQ==
+        bh=xr6a3wPaSbxEaGpekcRzvtgOYy20EpF6cLmCTWGM/d8=;
+        b=PapxbFN9nlQZ0hbhKVwwawBN6LdJjW3Jxp3CpwEUvmqx8VSIfzvyAWjZmPM7Kc45gi
+         qopDwV5z676Si5veJkfi0qrd8a5xaySsryWYloQnQkx318xKe2pYBW9+lqkzldmdemE1
+         99prBRal3lq3NgQTCz4ZW//9sRY8xNIj5NBo9hLhMiknT0FEv9J2i7fnVBCc6RRf9Znf
+         uwsKZ1RZ5VKXjQYWscKe/M+wHdFj68hEhUuwbDqS0RyuhUHk9xpOWf2qzUNm03raJDUF
+         LRxvhcmz1Sp9N4r1u6RxuFKGIRB8KKPMrUgr5brHzLqEYPIE9mcLBomKV+bnZZ4ylsbl
+         XTPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689967550; x=1690572350;
+        d=1e100.net; s=20221208; t=1689967579; x=1690572379;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MMsZNxLO6ied/G62NsNmuJtbpPqA/ZDXuniKdHv3YB4=;
-        b=B2bG1efp9doPjZNpHlXa5BTf1rXlVTvHX+/rV6a7NohuU11hhyfee92dbpnqIwDY7i
-         lOGM4AVuKBBYxMV7D43ZsaQMuIQoQRqyq294M+gUK3jY+jNxWP7lK9S+P5+NrBktGk0Z
-         wi1UgiT4OeiekL0qnvJ1QBlJoBmLFTiYDrJaBivIDrJqE5nV3DvoSEVAxSuwyK3vSy0K
-         NFYUy0AheCtYgXcPSfPP8rcnrB5AHjlNXZGntU0Ytpvjvkofu2r4uI3osmRAN4y6urKK
-         psFn/vG0hGvKbWprFQIJcSlI98J4VJyOiS/rJ8AepWQpBJfO3kTY0EykAE+8tcb/UYM0
-         GZKQ==
-X-Gm-Message-State: ABy/qLbqCRJAk2CtFeT0WkRV2aUIEB5dnpL02d/+d8zJvhIV8TPa6QrU
-        l/VpPbHQg9hQooqGygAObbvc7A==
-X-Google-Smtp-Source: APBJJlEp8s38SXROq49pagsC5pVvuYXs5UAkGBJHAYanGZ9PMcBXp3bCvAhBUtgXgds2MFlgz7aUow==
-X-Received: by 2002:a17:90b:2308:b0:262:f06d:c0fc with SMTP id mt8-20020a17090b230800b00262f06dc0fcmr2530695pjb.7.1689967550531;
-        Fri, 21 Jul 2023 12:25:50 -0700 (PDT)
+        bh=xr6a3wPaSbxEaGpekcRzvtgOYy20EpF6cLmCTWGM/d8=;
+        b=gvhTonLq5S3ST7zANNnylOPvkIUaiC8+9tVEfNLyKyCWhvbrMaUoXUqMfRSz2L+OIT
+         G4boc9GWnqibk4QGBN49jwZKyj7GcNxztNdCbxpMCCs33S6stA2zu1Sq0j33t+Sd5WIi
+         9yTX2sZRm8feYsDzccYvrPNpCSFAbXcFSIIUjFYt8VJUrgULi35BzHXM2fbq1u9PYeZg
+         VN9U5bP17QK+byE6SmLY1kF8o2ypInVE1MsXb77YZDTGOhZUzxHvI65UlAjXf365/DAP
+         4cASvf0tqiWPiEB+qUrkS2+f9PXPFw3bdL1is9DwNajuyoYil5Mtdi0grvQZUfXs+DzW
+         HLbA==
+X-Gm-Message-State: ABy/qLYotv4ZqpJqE0YJJ48VusHSU+TqbkKhNdjV9trKh9MtspxI12vE
+        a1ITYuaVDa/t/eiHywKDJm/KYQ==
+X-Google-Smtp-Source: APBJJlGqDcvhn/GzUoUrWJEAu6LLTtj6nE8lbyEgpTLg48+TgijhmiTggNpW3leZ2HelRF+2igrYUQ==
+X-Received: by 2002:a17:90a:bb09:b0:260:fd64:a20 with SMTP id u9-20020a17090abb0900b00260fd640a20mr2495306pjr.9.1689967579259;
+        Fri, 21 Jul 2023 12:26:19 -0700 (PDT)
 Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id d5-20020a17090a8d8500b0025bd4db25f0sm2845416pjo.53.2023.07.21.12.25.49
+        by smtp.gmail.com with ESMTPSA id e23-20020a17090ab39700b002609cadc56esm2802248pjr.11.2023.07.21.12.26.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 12:25:49 -0700 (PDT)
+        Fri, 21 Jul 2023 12:26:18 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
         (envelope-from <jgg@ziepe.ca>)
-        id 1qMvl5-003ID1-Uq;
-        Fri, 21 Jul 2023 16:25:47 -0300
-Date:   Fri, 21 Jul 2023 16:25:47 -0300
+        id 1qMvlZ-003IDP-Dp;
+        Fri, 21 Jul 2023 16:26:17 -0300
+Date:   Fri, 21 Jul 2023 16:26:17 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Alistair Popple <apopple@nvidia.com>
 Cc:     akpm@linux-foundation.org, ajd@linux.ibm.com,
@@ -64,41 +64,35 @@ Cc:     akpm@linux-foundation.org, ajd@linux.ibm.com,
         nicolinc@nvidia.com, npiggin@gmail.com, robin.murphy@arm.com,
         seanjc@google.com, will@kernel.org, x86@kernel.org,
         zhi.wang.linux@gmail.com, sj@kernel.org
-Subject: Re: [PATCH v3 1/5] arm64/smmu: Use TLBI ASID when invalidating
- entire range
-Message-ID: <ZLrbu6vk6x7l6xwJ@ziepe.ca>
+Subject: Re: [PATCH v3 2/5] mmu_notifiers: Fixup comment in
+ mmu_interval_read_begin()
+Message-ID: <ZLrb2Xq/ZgDgVPNf@ziepe.ca>
 References: <cover.b24362332ec6099bc8db4e8e06a67545c653291d.1689842332.git-series.apopple@nvidia.com>
- <082390057ec33969c81d49d35aa3024d7082b0bd.1689842332.git-series.apopple@nvidia.com>
+ <06fa82756e4d6458895962a7743cc7f162658a54.1689842332.git-series.apopple@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <082390057ec33969c81d49d35aa3024d7082b0bd.1689842332.git-series.apopple@nvidia.com>
+In-Reply-To: <06fa82756e4d6458895962a7743cc7f162658a54.1689842332.git-series.apopple@nvidia.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 06:39:23PM +1000, Alistair Popple wrote:
-> The ARM SMMU has a specific command for invalidating the TLB for an
-> entire ASID. Currently this is used for the IO_PGTABLE API but not for
-> ATS when called from the MMU notifier.
-> 
-> The current implementation of notifiers does not attempt to invalidate
-> such a large address range, instead walking each VMA and invalidating
-> each range individually during mmap removal. However in future SMMU
-> TLB invalidations are going to be sent as part of the normal
-> flush_tlb_*() kernel calls. To better deal with that add handling to
-> use TLBI ASID when invalidating the entire address space.
+On Thu, Jul 20, 2023 at 06:39:24PM +1000, Alistair Popple wrote:
+> The comment in mmu_interval_read_begin() refers to a function that
+> doesn't exist and uses the wrong call-back name. The op for mmu
+> interval notifiers is mmu_interval_notifier_ops->invalidate() so fix
+> the comment up to reflect that.
 > 
 > Signed-off-by: Alistair Popple <apopple@nvidia.com>
 > ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
+>  mm/mmu_notifier.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
