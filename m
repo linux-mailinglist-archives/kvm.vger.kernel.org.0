@@ -2,133 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB26F75D080
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 19:18:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC66B75D0BA
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 19:37:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbjGURSm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 13:18:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
+        id S229653AbjGURh2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 13:37:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbjGURSd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 13:18:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB48E19AD
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:17:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689959864;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kQftevPX0XUeLPrBO0NAWxPIrge3Hp6/1+H4UC+Ikhg=;
-        b=VStf5y/hye1RcdEkOJkqAKbHVR43PKt9/ox9ZUYzKYIm/mhTqX/hMCEMN7An+5iNRNTRt/
-        MPmsGbjQC9MM91CjxeyY2bUtGT3w6/HnHMLVII81gW94WJgHKr1CTxsQpv8sA1fDuWoiOF
-        Y/UQsAhEuCyPULfBddES4LF4exi/u+k=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-336-T_-XPssWOoyJp58ERY52MA-1; Fri, 21 Jul 2023 13:17:42 -0400
-X-MC-Unique: T_-XPssWOoyJp58ERY52MA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5218b9647a8so1344260a12.1
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:17:41 -0700 (PDT)
+        with ESMTP id S229477AbjGURh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 13:37:26 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2748110
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:37:24 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b8a7734734so13002825ad.2
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:37:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1689961044; x=1690565844;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U27m05eGSBK5TepOrN4F4KtiNak4c4lxWiiYTBxsdZA=;
+        b=co+gfhIz5/NW5vs/2Rt3SPX1epn1hB1tpZFLn7EJfRZv/vmB0L/zAv9yVBCPOdaOrO
+         RGzlooXQCdpc50NBl83SNi6nQaaH+fQ/fTxM6RVbGZyRnnkN9Zf7eYwG3GPZ1U8I4zjN
+         OSKLM6B6WAYvsBOBHcJVbT8bMJS1NHi2EUVLHJwZjJPGY1uMV+afVb0qG34tF8Nhh4Ig
+         6OkaGDlcIVo7SX4JxcMP2ayklLKKcic7n/6a8i45POJX/xxnjerxBog8dN3OzjR7fr/q
+         lu5VolWlSlZHTRV4UukTf6VrjaFvFtGU3sorl3y+z2Q4GC5CPBXTvJWQ/6aRU82MvO6T
+         qM4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689959861; x=1690564661;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kQftevPX0XUeLPrBO0NAWxPIrge3Hp6/1+H4UC+Ikhg=;
-        b=g4ciVm72+oc29bNdqzvQFIyO8qP0o99KzsXQWkO+E3VMKXHzyCziUevSsI8yHRU/IY
-         sIY/UuU5SmyYNXjofItX4zAtCJ8KGcEyCDf7zrZ+MzF9Qeho3oeHL+OLaCfvU1NjJldl
-         zX+SQ5/w1rPZwTy/WUx2++SpU5vsDZ1LHoH+a63MaS7HMZ/lbLOBGqje8JWNKM9jZcZw
-         3vw32mgAExCZHf9Ey551z6JFtV5Gfe2l8C6PaiTCSt77R1LyocF6k1qIGCibqWfjIOfj
-         Kxy8TWiGOaYcIgm+9k0Xk61OZRNywpi/USF9Wsgw7p5nrKTGcRMlrUhg79A+CDKnGBTf
-         w4/g==
-X-Gm-Message-State: ABy/qLYUYNmEy4CDl6LNCZ85XP2bQZkGUwiNlyqBiFKRCUea6u4+jm6l
-        E09CRf+OkHs6yVvN/vp4n01R9T1WD7ZDi5EnwKQvrPdvunX7xDitBmKQ4ftDGqiaAxzNId0qjch
-        vIDXYR9ox22/C
-X-Received: by 2002:aa7:c753:0:b0:51e:1a51:d414 with SMTP id c19-20020aa7c753000000b0051e1a51d414mr1878202eds.32.1689959861043;
-        Fri, 21 Jul 2023 10:17:41 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFyyf9U2FFYwtGg7Nfx7TqscSvBa0fBBUyOLoWSpgQImoylEzXmYhbWs/84TcbA6dVob4NtSg==
-X-Received: by 2002:aa7:c753:0:b0:51e:1a51:d414 with SMTP id c19-20020aa7c753000000b0051e1a51d414mr1878159eds.32.1689959860744;
-        Fri, 21 Jul 2023 10:17:40 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id l9-20020aa7c309000000b0051d87e72159sm2346640edq.13.2023.07.21.10.17.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jul 2023 10:17:40 -0700 (PDT)
-Message-ID: <8ad7a846-64e9-a3f1-4bf1-731a994d62cb@redhat.com>
-Date:   Fri, 21 Jul 2023 19:17:37 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-13-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1689961044; x=1690565844;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U27m05eGSBK5TepOrN4F4KtiNak4c4lxWiiYTBxsdZA=;
+        b=eZMZwvfW/oJEKjusuEkkHBfZG2svpoKIwWvKpqhP8HREB9iMWI2HtTSB+FnBgsmnhE
+         Fc5jgmfFLC/wyHNmzW85PxTRCzN3CyFDBnb4Kmh8Ltedni4sHRjGOjzsibk/KGeF1ist
+         kO6dYwqSrOp4B5aejg/UYgKjvcf1PR92P4hMmCfAWYjIKrNTNsQ0XXZiLdlEjv/CRObh
+         C/NOgb/BPLLpQdNeHJnPGKyLXg5jRpaxUNrc9Ei9u8gZI+pZcDE8Lju4B57zqpFhfj4H
+         jn0DhY1dJazk/FREE8jTL26QSUqmHk3owtRcW/88nTV37dixlFTFwxTtHwQRQrjmhV1V
+         sjVw==
+X-Gm-Message-State: ABy/qLafdCnjm0ZCQLcxsGwty4G9C02uLSNRzkSWW5lk3cY7wq8V8ENR
+        Y5gUrQcQeORfNCAxbAL9zj5Advok/eM=
+X-Google-Smtp-Source: APBJJlH00qM/FbwDSKPdDQa2qPEVgrDIt3MR3RfpZM/V9Gp+JmYa9K6Lghy1uz20fCuZD29KRzZnjnrKSLQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:1c9:b0:1b9:df8f:888c with SMTP id
+ e9-20020a17090301c900b001b9df8f888cmr9478plh.8.1689961044214; Fri, 21 Jul
+ 2023 10:37:24 -0700 (PDT)
+Date:   Fri, 21 Jul 2023 10:37:22 -0700
+In-Reply-To: <20230721143407.2654728-1-amaan.cheval@gmail.com>
+Mime-Version: 1.0
+References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com>
+Message-ID: <ZLrCUkwot/yiVC8T@google.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+From:   Sean Christopherson <seanjc@google.com>
+To:     Amaan Cheval <amaan.cheval@gmail.com>
+Cc:     brak@gameservers.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/19/23 01:44, Sean Christopherson wrote:
-> +	inode = alloc_anon_inode(mnt->mnt_sb);
-> +	if (IS_ERR(inode))
-> +		return PTR_ERR(inode);
-> +
-> +	err = security_inode_init_security_anon(inode, &qname, NULL);
-> +	if (err)
-> +		goto err_inode;
-> +
+On Fri, Jul 21, 2023, Amaan Cheval wrote:
+> I've also run a `function_graph` trace on some of the affected hosts, if you
+> think it might be helpful to have a look at that to see what the host kernel
+> might be doing while the guests are looping on EPT_VIOLATIONs. Nothing obvious
+> stands out to me right now.
 
-I don't understand the need to have a separate filesystem.  If it is to 
-fully setup the inode before it's given a struct file, why not just 
-export anon_inode_make_secure_inode instead of 
-security_inode_init_security_anon?
+It wouldn't hurt to see it.
 
-Paolo
+> We suspected KSM briefly, but ruled that out by turning KSM off and unmerging
+> KSM pages - after doing that, a guest VM still locked up / started looping
+> EPT_VIOLATIONS (like in Brian's original email), so it's unlikely this is KSM specific.
+> 
+> Another interesting observation we made was that when we migrate a guest to a
+> different host, the guest _stays_ locked up and throws EPT violations on the new
+> host as well 
+
+Ooh, that's *very* interesting.  That pretty much rules out memslot and mmu_notifier
+issues.
+
+>- so it's unlikely the issue is in the guest kernel itself (since
+> we see it across guest operating systems), but perhaps the host kernel is
+> messing the state of the guest kernel up in a way that keeps it locked up after
+> migrating as well?
+> 
+> If you have any thoughts on anything else to try, let me know!
+
+Good news and bad news.  Good news: I have a plausible theory as to what might be
+going wrong.  Bad news: if my theory is correct, our princess is in another castle
+(the bug isn't in KVM).
+
+One of the scenario where KVM retries page faults is if KVM asynchronously faults-in
+the host backing page.  If faulting in the page would require I/O, e.g. because
+it's been swapped out, instead of synchronously doing the I/O on the vCPU task,
+KVM uses a workqueue to fault in the page and immediately resumes the guest.
+
+There are a variety of conditions that must be met to try an async page fault, but
+assuming you aren't disable HLT VM-Exit, i.e. aren't letting the guest execute HLT,
+it really just boils down to IRQs being enabled in the guest, which looking at the
+traces is pretty much guaranteed to be true.
+
+What's _supposed_ to happen is that async_pf_execute() successfully faults in the
+page via get_user_pages_remote(), and then KVM installs a mapping for the guest
+either in kvm_arch_async_page_ready() or by resuming the guest and cleanly handling
+the retried guest page fault.
+
+What I suspect is happening is that get_user_pages_remote() fails for some reason,
+i.e. the workqueue doesn't fault in the page, and the vCPU gets stuck trying to
+fault in a page that can't be faulted in for whatever reason.  AFAICT, nothing in
+KVM will actually complain or even surface the problem in tracepoints (yeah, that's
+not good).
+
+Circling back to the bad news, if that's indeed what's happening, it likely means
+there's a bug somewhere else in the stack.  E.g. it could be core mm/, might be
+in the block layer, in swap, possibly in the exact filesystem you're using, etc.
+
+Note, there's also a paravirt extension to async #PFs, where instead of putting
+the vCPU into a synthetic halted state, KVM instead *may* inject a synthetic #PF
+into the guest, e.g. so that the guest can go run a different task while the
+faulting task is blocked.  But this really is just a note, guest enabling of PV
+async #PF shouldn't actually matter, again assuming my theory is correct.
+
+To mostly confirm this is likely what's happening, can you enable all of the async
+#PF tracepoints in KVM?  The exact tracepoints might vary dependending on which kernel
+version you're running, just enable everything with "async" in the name, e.g.
+
+  # ls -1 /sys/kernel/debug/tracing/events/kvm | grep async
+  kvm_async_pf_completed/
+  kvm_async_pf_not_present/
+  kvm_async_pf_ready/
+  kvm_async_pf_repeated_fault/
+  kvm_try_async_get_page/
+
+If kvm_try_async_get_page() is more or less keeping pace with the "pf_taken" stat,
+then this is likely what's happening.
+
+And then to really confirm, this small bpf program will yell if get_user_pages_remote()
+fails when attempting get a single page (which is always the case for KVM's async
+#PF usage).
+
+FWIW, get_user_pages_remote() isn't used all that much, e.g. when running a VM in
+my, KVM is the only user.  So you can likely aggressively instrument
+get_user_pages_remote() via bpf without major problems, or maybe even assume that
+any call is from KVM.
+
+$ tail gup_remote.bt 
+kretfunc:get_user_pages_remote
+{
+        if ( args->nr_pages == 1 && retval != 1 ) {
+                printf("Failed remote gup() on address %lx, ret = %d\n", args->start, retval);
+        }
+}
 
