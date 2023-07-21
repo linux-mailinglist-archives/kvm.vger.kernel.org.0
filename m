@@ -2,128 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C10375D0C7
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 19:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A81D775D0D0
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 19:43:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229876AbjGURlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 13:41:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45894 "EHLO
+        id S229990AbjGURnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 13:43:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230345AbjGURla (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 13:41:30 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 309D930F0
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:41:21 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbc77e76abso18828205e9.1
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:41:20 -0700 (PDT)
+        with ESMTP id S230160AbjGURnF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 13:43:05 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4C5A3586
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:43:00 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d064a458dd5so363000276.1
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:43:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1689961279; x=1690566079;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWngwrMo9tfYsDEwETiHHjHUDWaHKjCLtIZQ2VnXF7c=;
-        b=aTqIdTpVZIP4IVD51tOsAm0tR92i26ku0QRdMxib75xiGv1WuDJToy9b7LZrUOyuWs
-         ug3ZVQs0v1TonuQR2lcsV2mO46xdshqUBhttSnBH7Rrb3XgEEL+nF691T8oB9Z/p7g+Y
-         AAMeANAszmpY1NlEbJPZwpRtpA37I27sbLny0PlZD7HmZHG8bLpB79BpLuV1ukSJVcH5
-         y+gv0xZl7RRfxTHin5Ewyz2/48Hu6+QdHEbqcygrYQXw2d3QR3K0TRSxgMYbs+UmA4d7
-         myGSY6a1NPABafYZVSdxPJPcTrHpkcEO6gmjUqLKlvTu7eZqPpQ7N+4AstkSKRNJTaO2
-         RajA==
+        d=google.com; s=20221208; t=1689961380; x=1690566180;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7DBmD+NWofmGocm5Vnh+WkykM6ONviwwjpnheMJOIK8=;
+        b=Kleh8QpsTsNUhesVcFKaorRemH2b7oCPrjs/EZvvDbSIhnU646cwazqZifDUNyxi+Q
+         5JqV9CUAW8QaG2YIfQCin1qnHve1MgXICSxbyDPLV8MjQRP2Kpasi9pL5sbB8O7UYjBa
+         jgRp3U3UDnkkD6e19TR7wMGjHPVEilwKuPvhlll1BPS6C8DVpWehyFU2WczctGneBM1v
+         8h/JnmhFLy8tlfXVq6NzVrFmSK26MkEiOaRidvtVK6eqi9qhd/VP0gDfCAxADqhE52gi
+         5Uc2vJ9HkSFyp91F1M5r9W96Us+3KtG0sWvhTTO0jFsQ1GbEx81tOU6Kjmmi3SIi/0Fk
+         yy7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689961279; x=1690566079;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oWngwrMo9tfYsDEwETiHHjHUDWaHKjCLtIZQ2VnXF7c=;
-        b=d8QVKhdxySzcRblNctAq6RNvHXB7QgMITg6a1e1ygVb95zSNSQnZx5X/iAPFjdyoZq
-         qhpOFYScsk0j45e0QC0tftX8be8ekK9Z5EsCJxeqxDGIiZi++jjRfTQNA0Ma+0OLT9DE
-         LgGFq9kqIbzplHwYel99QUGcOvUM8oOyZH1v7f0kuFTRV/qKn6mFhs+U5efuqsRJ3tG5
-         XLh7UZYhx2t+MuTh9pg5AhT7X6Ng28eyTA5ALBKTwK7tcS4OR3pldpPSRt4ytWJFhmwF
-         5Ytlfcu3jqqtRpOA2B3VHgA9PcCQxfctWqVz52kGk4MymJSw/ZZSQmeDXHeN3EtJ9dkh
-         76uw==
-X-Gm-Message-State: ABy/qLZZq2CoMimfG1ePZx4zjpH6HUa+hQxFJxDpugfx/3yuXKXD0fiz
-        NCEW8/2l+dc02Md66hSaKpwr7A==
-X-Google-Smtp-Source: APBJJlG69RYuLgM+byfVXHJKxwKW8uCOZZnRcc5dSXYdEn2ESNpecR5PiRno3VUFKC9534g612t9Ug==
-X-Received: by 2002:a05:600c:2102:b0:3fb:d1db:545a with SMTP id u2-20020a05600c210200b003fbd1db545amr1950667wml.15.1689961279465;
-        Fri, 21 Jul 2023 10:41:19 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id u9-20020a05600c210900b003fbcdba1a52sm6476865wml.3.2023.07.21.10.41.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 10:41:18 -0700 (PDT)
-Date:   Fri, 21 Jul 2023 19:41:18 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org, rkanwal@rivosinc.com,
-        anup@brainfault.org, dbarboza@ventanamicro.com,
-        atishp@atishpatra.org, vincent.chen@sifive.com,
-        greentime.hu@sifive.com, frank.chang@sifive.com,
-        jim.shu@sifive.com, Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Weiwei Li <liweiwei@iscas.ac.cn>,
-        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v6 3/5] target/riscv: Create an KVM AIA irqchip
-Message-ID: <20230721-72cb5810011b0a676b359d36@orel>
-References: <20230714084429.22349-1-yongxuan.wang@sifive.com>
- <20230714084429.22349-4-yongxuan.wang@sifive.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714084429.22349-4-yongxuan.wang@sifive.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1689961380; x=1690566180;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7DBmD+NWofmGocm5Vnh+WkykM6ONviwwjpnheMJOIK8=;
+        b=L2OsJ4Rxon7fxaK0wx5kjh/mideOjMsZ7tFPLimdHWe5YrHJMFIdFE6pt9KF2M2j/i
+         FdhrSASYJaMVsCkj82SNOgW+CC6eRjxL5W46bGnbRqwOy7m055cH1ITo51v30Wn5szNY
+         sY2sVcI2QwGQ9hUuTFCrwheT886da3EV9PCaI/VBxXyLSy7G9/YgLdVHdRnpuQ1PPLRB
+         cTPkMM90uLSjHw7JoJxFwJahAd8RWqGLQoFnnlXawJG35vbVIb7CZYW29DGsVJ1sF4M6
+         SPpeaPMyHoU2ieR5vSQc/pMLy1qzfIgS8f4xaL0uOG/1ZXrAFYoR9CUK1i98gZRWFGl7
+         uX2g==
+X-Gm-Message-State: ABy/qLZE2Van7TOJzbGnhVqbF3oTTX3T9EEJIjmZe3rGYXdbulL7Zv1N
+        xkGyf8uwtLa3J5pWhaIeceoSTInrqOA=
+X-Google-Smtp-Source: APBJJlE/aF1pYHHKoAMy1+E4aY5+aL4FeQDb+p2ML0zhZVvr/Ah+OV80Lx1tRjSoeSb0qOhWhlHbRbztBVY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10cd:b0:c1c:df23:44ee with SMTP id
+ w13-20020a05690210cd00b00c1cdf2344eemr19665ybu.0.1689961379855; Fri, 21 Jul
+ 2023 10:42:59 -0700 (PDT)
+Date:   Fri, 21 Jul 2023 10:42:58 -0700
+In-Reply-To: <29baac45-7736-a28c-3b2d-2a6e45171b8b@intel.com>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
+ <fdc155f5-041b-a1b1-15aa-8f970180a13a@intel.com> <29baac45-7736-a28c-3b2d-2a6e45171b8b@intel.com>
+Message-ID: <ZLrDopLH+3vN8rE6@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 14, 2023 at 08:44:25AM +0000, Yong-Xuan Wang wrote:
-> We create a vAIA chip by using the KVM_DEV_TYPE_RISCV_AIA and then set up
-> the chip with the KVM_DEV_RISCV_AIA_GRP_* APIs.
-> 
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> Reviewed-by: Jim Shu <jim.shu@sifive.com>
-> Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  target/riscv/kvm.c       | 160 +++++++++++++++++++++++++++++++++++++++
->  target/riscv/kvm_riscv.h |   6 ++
->  2 files changed, 166 insertions(+)
-> 
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 005e054604..9bc92cedff 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -36,6 +36,7 @@
->  #include "exec/address-spaces.h"
->  #include "hw/boards.h"
->  #include "hw/irq.h"
-> +#include "hw/intc/riscv_imsic.h"
->  #include "qemu/log.h"
->  #include "hw/loader.h"
->  #include "kvm_riscv.h"
-> @@ -43,6 +44,7 @@
->  #include "chardev/char-fe.h"
->  #include "migration/migration.h"
->  #include "sysemu/runstate.h"
-> +#include "hw/riscv/numa.h"
->  
->  static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type,
->                                   uint64_t idx)
-> @@ -1026,3 +1028,161 @@ bool kvm_arch_cpu_check_are_resettable(void)
->  void kvm_arch_accel_class_init(ObjectClass *oc)
->  {
->  }
-> +
-> +char *kvm_aia_mode_str(uint64_t aia_mode)
-> +{
-> +    const char *val;
+On Fri, Jul 21, 2023, Xiaoyao Li wrote:
+> On 7/21/2023 11:05 PM, Xiaoyao Li wrote:
+> > On 7/19/2023 7:44 AM, Sean Christopherson wrote:
+> > > @@ -6255,12 +6298,17 @@ int kvm_init(unsigned vcpu_size, unsigned
+> > > vcpu_align, struct module *module)
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (r)
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_async=
+_pf;
+> > > +=C2=A0=C2=A0=C2=A0 r =3D kvm_gmem_init();
+> > > +=C2=A0=C2=A0=C2=A0 if (r)
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_gmem;
+> > > +
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_chardev_ops.owner =3D module;
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_preempt_ops.sched_in =3D kvm_sched=
+_in;
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_preempt_ops.sched_out =3D kvm_sche=
+d_out;
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_init_debug();
+> > > +=C2=A0=C2=A0=C2=A0 kvm_gmem_init();
+> >=20
+> > why kvm_gmem_init() needs to be called again? by mistake?
+>=20
+> I'm sure it's a mistake.
 
-I just tried compiling this series and see it doesn't with -Werror.
-kvm_aia_mode_str() should return 'const char *' and this 'val' variable
-is unused.
+Yeah, definitely a bug.
 
-Thanks,
-drew
+> I'm testing the gmem QEMU with this series. SW_PROTECTED_VM gets stuck in=
+ a
+> loop in early OVMF code due to two shared page of OVMF get zapped and
+> re-mapped infinitely. Removing the second call of kvm_gmem_init() can sol=
+ve
+> the issue, though I'm not sure about the reason.
+
+Not worth investigating unless you want to satiate your curiosity :-)
