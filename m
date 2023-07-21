@@ -2,126 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D689F75C944
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 16:11:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7A2F75C9D1
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 16:23:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231417AbjGUOLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 10:11:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37170 "EHLO
+        id S229899AbjGUOXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 10:23:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230390AbjGUOLr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 10:11:47 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41E2FD
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 07:11:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so1728886276.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 07:11:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689948704; x=1690553504;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T4SdCBonFvWuf+V0yEJ7nT449w336KZFoWRjXJb2o+8=;
-        b=n0oKwH0dgFAGMVF27nk3YDk+kFnnpdNBuswzKKsDjUoF2nttUcFPQAkqIQGcn0vrbH
-         T/IucMfN+WY88gtSSszC9sE2AOaEvI3LvZ/89ISKL1/4Eui6pr5dnCaRqpMbBbdVWsYv
-         NRptPq/VIq8QeXzcY4lctUyDp4uXHQnVipX3esx5J7htoMXXac4+aNvckJCuvtputXFM
-         Ey6stLIQHLTh6AWzRANZgxRvllCkH15KVd+nBxOMRRXGWHdlimZlTV+Wew5WEIFL+PBk
-         V1aphpXfO/KyTCCCKDLLkTbYJ6wkv8i3EyZqsT8phHQ8tdPzL6w1VMKzFt0jzzKo/WGf
-         WWVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689948704; x=1690553504;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T4SdCBonFvWuf+V0yEJ7nT449w336KZFoWRjXJb2o+8=;
-        b=OW74g0smQ4nFb/JxnXi7ACZ4GrPeJYX+RK7gr+XFjc5z/gfQKrdm4roa1JM5vt2EDu
-         tD5+N8kfmDZVOAUEbYRYOeBcBQtV0e9P4LURdT1oSpPFSQUlNR/RGEl+wOsnWWtHOy2r
-         slkxad5TSJaHErVP6/VGNqflpNjkF1Q+UUkgSrhFdiYbXzHL2nqrVNGorSqGuV+C+t9d
-         k4JLxfPYIjai5Z4vOEMCeZVFU92tOL9tL3Tsr2VOppMhNvXOc/qcdlX9sI2/m6fTutmB
-         /AuWRV+JF03YEbSChLor1yK5jer/e9akBsxE0Vr/KtM/YqZ7/tAzBmzqOCh5MPOjdz9k
-         KoMg==
-X-Gm-Message-State: ABy/qLbxf6DMC5O6tSJkrH0jHn3BtZRyuNWl2cJGNk/LkTgbpKpSddjr
-        ryoVdtTMO3APlGT7/ykiIpKJuMKRU0Q=
-X-Google-Smtp-Source: APBJJlGU/N1c7xh9FsCGTTqaD2PqcnAod11BMYxzm1muKo1ARK3G7tqDbEj8dtVJ1jfB1maibUqj4V2HcNs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ba06:0:b0:c61:7151:6727 with SMTP id
- t6-20020a25ba06000000b00c6171516727mr13809ybg.10.1689948704796; Fri, 21 Jul
- 2023 07:11:44 -0700 (PDT)
-Date:   Fri, 21 Jul 2023 07:11:43 -0700
-In-Reply-To: <f474282d701aca7af00e4f7171445abb5e734c6f.1689893403.git.isaku.yamahata@intel.com>
-Mime-Version: 1.0
-References: <cover.1689893403.git.isaku.yamahata@intel.com> <f474282d701aca7af00e4f7171445abb5e734c6f.1689893403.git.isaku.yamahata@intel.com>
-Message-ID: <ZLqSH/lEbHEnQ9i8@google.com>
-Subject: Re: [RFC PATCH v4 04/10] KVM: x86: Introduce PFERR_GUEST_ENC_MASK to
- indicate fault is private
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230321AbjGUOXW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 10:23:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 255CF1BD;
+        Fri, 21 Jul 2023 07:23:22 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36LE6VuN001098;
+        Fri, 21 Jul 2023 14:23:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=LHzbAf4p3hknDSQFHMo0HLS4YDqB1wYdsh71y9Uf2x8=;
+ b=EFBEIMdi4jLgY0lExoehWOhmEq7k2WeXXsZHPEH4YveOMdo6MzWBJ3BdprXKYNOJmOce
+ vylwYypHP6qdhVUa41Xp9ki5VtNBX/OjmGReRlPSni65mCrMnRYjwfzLdkQyjBOw+C/O
+ mYE93+bseWQcEEUannxldTRZn01MSeOr2p4+ZMcxzr6nv5T/ZU2M0JfAMRvJ+8aHW7vu
+ xhPU9oET9ZKwHuJIY5HcpTUiT2FAUJzBRaLR+oEM0j2hFbI7xE0JyzRbh1MGQuSYtEas
+ meSAgryILFbnAcKLJxN9Uldv8/zeFHkIdL3ChVCjfzvVtt0gAssMrQdPMJY+4Whp0W1X iQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ryc7gdd7h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jul 2023 14:23:21 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36LE824c010329;
+        Fri, 21 Jul 2023 14:23:21 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ryc7gdd76-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jul 2023 14:23:21 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36LCg61i008046;
+        Fri, 21 Jul 2023 14:23:20 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3rv80jmt5u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jul 2023 14:23:20 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36LENHiF44302868
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Jul 2023 14:23:17 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42DB220040;
+        Fri, 21 Jul 2023 14:23:17 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8751120043;
+        Fri, 21 Jul 2023 14:23:16 +0000 (GMT)
+Received: from [9.171.55.243] (unknown [9.171.55.243])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Jul 2023 14:23:16 +0000 (GMT)
+Message-ID: <6dc411a6-95fc-0eb2-e8de-5c141292ea62@linux.ibm.com>
+Date:   Fri, 21 Jul 2023 16:23:16 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 5/6] KVM: s390: interrupt: Fix single-stepping ISKE
+To:     Ilya Leoshkevich <iii@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Freimann <jfreimann@redhat.com>
+References: <20230721120046.2262291-1-iii@linux.ibm.com>
+ <20230721120046.2262291-6-iii@linux.ibm.com>
+Content-Language: en-US
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20230721120046.2262291-6-iii@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _TmKtxLSgvwOrUNQcX9My4iKmrl4PVxn
+X-Proofpoint-ORIG-GUID: 860VH0J45EDEm7hypxFlcxaKa5MzhO6e
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-21_08,2023-07-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxlogscore=782 malwarescore=0 priorityscore=1501
+ suspectscore=0 adultscore=0 mlxscore=0 spamscore=0 clxscore=1015
+ impostorscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2306200000 definitions=main-2307210127
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-s/Introduce/Use
 
-This doesn't "introduce" anything, in the sense that it's an AMD-defined error
-code flag.  That matters because KVM *did* introduce/define PFERR_IMPLICIT_ACCESS.
 
-On Thu, Jul 20, 2023, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+Am 21.07.23 um 13:57 schrieb Ilya Leoshkevich:
+> kvm_s390_skey_check_enable() does not emulate any instructions, rather,
+> it clears CPUSTAT_KSS and arranges for ISKE to run again. Therefore,
+> skip the PER check and let ISKE run happen. Otherwise a debugger will
+> see two single-step events on the same ISKE.
+
+The same would be true for all instruction triggering a keyless mode exit,
+like SSKE, RRBE but also LPSWE with a keyed PSW, no?
 > 
-> Add two PFERR codes to designate that the page fault is private and that
-> it requires looking up memory attributes.  The vendor kvm page fault
-> handler should set PFERR_GUEST_ENC_MASK bit based on their fault
-> information.  It may or may not use the hardware value directly or
-> parse the hardware value to set the bit.
+> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
+
+Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> ---
+>   arch/s390/kvm/intercept.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> For KVM_X86_PROTECTED_VM, ask memory attributes for the fault privateness.
+> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+> index d2f7940c5d03..8793cec066a6 100644
+> --- a/arch/s390/kvm/intercept.c
+> +++ b/arch/s390/kvm/intercept.c
+> @@ -630,8 +630,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+>   		rc = handle_partial_execution(vcpu);
+>   		break;
+>   	case ICPT_KSS:
+> -		rc = kvm_s390_skey_check_enable(vcpu);
+> -		break;
 
-...
+maybe add a comment here: /* Instruction will be redriven, skip the PER check */
+> +		return kvm_s390_skey_check_enable(vcpu);
 
-> +static inline bool kvm_is_fault_private(struct kvm *kvm, gpa_t gpa, u64 error_code)
-> +{
-> +	/*
-> +	 * This is racy with mmu_seq.  If we hit a race, it would result in a
-> +	 * spurious KVM_EXIT_MEMORY_FAULT.
-> +	 */
-> +	if (kvm->arch.vm_type == KVM_X86_SW_PROTECTED_VM)
-> +		return kvm_mem_is_private(kvm, gpa_to_gfn(gpa));
-
-Please synthesize the error code flag for SW-protected VMs, same as TDX, e.g.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 20e289e872eb..de9e0a9c41e6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5751,6 +5751,10 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
-        if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
-                return RET_PF_RETRY;
- 
-+       if (vcpu->kvm->arch.vm_type == KVM_X86_SW_PROTECTED_VM &&
-+           kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(cr2_or_gpa)))
-+               error_code |= PFERR_GUEST_ENC_MASK;
-+
-        r = RET_PF_INVALID;
-        if (unlikely(error_code & PFERR_RSVD_MASK)) {
-                r = handle_mmio_page_fault(vcpu, cr2_or_gpa, direct);
-
-Functionally it's the same, but I want all VM types to have the same source of
-truth for private versus shared, and I really don't want kvm_is_fault_private()
-to exist.
+>   	case ICPT_MCHKREQ:
+>   	case ICPT_INT_ENABLE:
+>   		/*
