@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB33775D7C6
-	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 01:01:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B562275D7C7
+	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 01:01:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231229AbjGUXAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 19:00:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48868 "EHLO
+        id S231319AbjGUXAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 19:00:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231292AbjGUXAk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 19:00:40 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BB83C21
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:26 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1b8af49a5d2so21496695ad.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:26 -0700 (PDT)
+        with ESMTP id S231190AbjGUXAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 19:00:42 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF98B4201
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:28 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1847840276.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689980425; x=1690585225;
+        d=google.com; s=20221208; t=1689980427; x=1690585227;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=PLkSwB6tRh7JnFVgr30kOLaNRpwq5sUpwdYDiH0NxiY=;
-        b=et21q4jW2oI5WQNLlFaRkxQCMVyGGgcs4+y24fpzOsPzXRNvf7yEdkMT1oeo7ANhvJ
-         89Igf1qRGyAKQ6P0v/Jsy786tsOFF6zbVcyHrXg2hQPuH3ZFAM0n0EnkRHve6v6YLzeu
-         sHbdwQAgnkWG/389w1nyDBEF/mC9ixug2JbmyK+nHF3Fln+QoNT0mJkUVcEcSSArQSk2
-         y9Lk5hkiRTxoY6rvX3KGaT5EXH7jrlvsGYgBxuDkkrVrUGWoUXc//TypGfz2EmoutoDZ
-         93WB8lzAm7xfjQzIHUqmH+26nAi1+D0aZWE1PFbuG6EqifzZxZEZXJT9cTXkxzO9cLFC
-         OcSg==
+        bh=usSK3yeb2+dbKuXeDCW9x7zKGJjv9CPmyUgQidtHNNE=;
+        b=y1ewr/kbrOutA8ZR9xcOf7OlMOdxw6k07Xh+KfWIE5JsL+KhmTlZRyCEhNpAHfv87x
+         ie7QOITXavYjalaAjDKeXxQMwYjdQPvh7z+EaFByJvIgPz+DmyjSWp6GSdvQriAwM0Lf
+         p+nf/mRt4XJCGhhorw6p3qGCi5tF/q/MSoiOaW4ofuVk7Hjpw4Z5Myh8bQ87UgCzU6Yc
+         aQLyGCcnbkLKU0sBEkRgdd/xkiOJjKj/Qj/zWLX8yde8ERQtkxMVF/GAz4EnSPdHF0jQ
+         yDpY/QJ4hCBXtx6pyOpZ/f6fjGbs1EKXZQ6ROP6h5PsdVYKo5B7DY+Vzfh+v998P/MiR
+         0kTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689980425; x=1690585225;
+        d=1e100.net; s=20221208; t=1689980427; x=1690585227;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PLkSwB6tRh7JnFVgr30kOLaNRpwq5sUpwdYDiH0NxiY=;
-        b=l4L6ZMD4u6N2AZS5uYK05SFTA8NQygm2fM3KCPepx0T8sQS7tz6lpUVcGAlzPVlmFe
-         VayHPsdK2Nu0Q38c3Q6/Or5zlfsMRm+thAZg5feqSTIL2IRjwXEOKNaeXaR4A0PHVKYx
-         JG5Cj49ril6D5F6RYUfM4IG/KAAvfI8Da7q+LXnIkUGM8YXWJH2xtqAdqUywqeL81ikX
-         odLHjugB/fMKRh9TxaxvU4O7C9vxWLzKhJLzSDMn7CHbUrHLSNzfnogfABkqfzx60hTN
-         ZegswGL1sUvMIi6dNM1hXeqdKb4Kjhxj76zbdkmLUFXAkqkMUulfhfQbJDFe/JKxIuyt
-         ZyJA==
-X-Gm-Message-State: ABy/qLbW6lLU7u3T3UrJR0dScoWZyagRf72od0sJPCo955Mc8Ho3JkU8
-        nwjq1RKebiZWkmDlBh9Inv8s3j2d/VY=
-X-Google-Smtp-Source: APBJJlFoDO1avqLXe9WIEzr7nkCBtmSBVc1vKDbXXCMkXdjvsdLRnnOgrZenL+wNGPEAeAGHDFl7L8POYj8=
+        bh=usSK3yeb2+dbKuXeDCW9x7zKGJjv9CPmyUgQidtHNNE=;
+        b=aoE755+OzWNMI4JGWHWAckYoDaCvpFo5PFMTBJ0AJqPUUbe8T6mb7EN7x7AQf/G+pL
+         wbxiuFZ0kbsykKZRqOk4x03GAjMS3GjKvARhtKCx41j3krB7hlrM5ntH96o6wfeKT15g
+         3kPTJAEC8/qNJX9AoOEdWCZI19QfsMaV0kdfo1fcfkacGiQVDFqYO0maVRKVfopxb4UT
+         /DG1cr+kbtL9zpw1vHSYblivb82bUz+YCZfciPWCu18NXyCBAdkSgXUVT1fAN8DCrHvf
+         vxk9UmaRP/lp6btocL8wsb1wutJWuiYrZRumqHBzP1kug6hx4m6oMLrreLD1cZF2ymeU
+         oq4A==
+X-Gm-Message-State: ABy/qLbNgqiZR84X3MdC9qdllarYHYgkbf7usX5s8MsZGvAruMiQaRh6
+        cZlIRt5IgMtyYGUjvpTxFml62LJwUts=
+X-Google-Smtp-Source: APBJJlGFKU0XvWU3rbDD6SD/1tQ9cIEjxCh2ylxjtv/vyXSNY2TuqHp04chOSWPozToc7GNMJKNkMr+U/LE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f684:b0:1b8:a552:c8c9 with SMTP id
- l4-20020a170902f68400b001b8a552c8c9mr14093plg.13.1689980425184; Fri, 21 Jul
- 2023 16:00:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a5b:bc2:0:b0:ce9:64b3:80dc with SMTP id
+ c2-20020a5b0bc2000000b00ce964b380dcmr21029ybr.1.1689980427316; Fri, 21 Jul
+ 2023 16:00:27 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 16:00:05 -0700
+Date:   Fri, 21 Jul 2023 16:00:06 -0700
 In-Reply-To: <20230721230006.2337941-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230721230006.2337941-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721230006.2337941-9-seanjc@google.com>
-Subject: [PATCH v2 8/9] KVM: x86/mmu: Plumb "struct kvm" all the way to pte_list_remove()
+Message-ID: <20230721230006.2337941-10-seanjc@google.com>
+Subject: [PATCH v2 9/9] KVM: x86/mmu: BUG() in rmap helpers iff CONFIG_BUG_ON_DATA_CORRUPTION=y
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -73,146 +73,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mingwei Zhang <mizhang@google.com>
+Introduce KVM_BUG_ON_DATA_CORRUPTION() and use it in the low-level rmap
+helpers to convert the existing BUG()s to WARN_ON_ONCE() when the kernel
+is built with CONFIG_BUG_ON_DATA_CORRUPTION=n, i.e. does NOT want to BUG()
+on corruption of host kernel data structures.  Environments that don't
+have infrastructure to automatically capture crash dumps, i.e. aren't
+likely to enable CONFIG_BUG_ON_DATA_CORRUPTION=y, are typically better
+served overall by WARN-and-continue behavior (for the kernel, the VM is
+dead regardless), as a BUG() while holding mmu_lock all but guarantees
+the _best_ case scenario is a panic().
 
-Plumb "struct kvm" all the way to pte_list_remove() to allow the usage of
-KVM_BUG() and/or KVM_BUG_ON().  This will allow killing only the offending
-VM instead of doing BUG() if the kernel is built with
-CONFIG_BUG_ON_DATA_CORRUPTION=n, i.e. does NOT want to BUG() if KVM's data
-structures (rmaps) appear to be corrupted.
+Make the BUG()s conditional instead of removing/replacing them entirely as
+there's a non-zero chance (though by no means a guarantee) that the damage
+isn't contained to the target VM, e.g. if no rmap is found for a SPTE then
+KVM may be double-zapping the SPTE, i.e. has already freed the memory the
+SPTE pointed at and thus KVM is reading/writing memory that KVM no longer
+owns.
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
-[sean: tweak changelog]
+Link: https://lore.kernel.org/all/20221129191237.31447-1-mizhang@google.com
+Suggested-by: Mingwei Zhang <mizhang@google.com>
+Cc: David Matlack <dmatlack@google.com>
+Cc: Jim Mattson <jmattson@google.com>
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+ arch/x86/kvm/mmu/mmu.c   | 21 ++++++++++-----------
+ include/linux/kvm_host.h | 19 +++++++++++++++++++
+ 2 files changed, 29 insertions(+), 11 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 933e48a73a9a..b6cc261d7748 100644
+index b6cc261d7748..69f65f7b6158 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -965,7 +965,8 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
- 	return count;
- }
+@@ -977,7 +977,7 @@ static void pte_list_desc_remove_entry(struct kvm *kvm,
+ 	 * when adding an entry and the previous head is full, and heads are
+ 	 * removed (this flow) when they become empty.
+ 	 */
+-	BUG_ON(j < 0);
++	KVM_BUG_ON_DATA_CORRUPTION(j < 0, kvm);
  
--static void pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
-+static void pte_list_desc_remove_entry(struct kvm *kvm,
-+				       struct kvm_rmap_head *rmap_head,
- 				       struct pte_list_desc *desc, int i)
- {
- 	struct pte_list_desc *head_desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-@@ -1001,7 +1002,8 @@ static void pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
- 	mmu_free_pte_list_desc(head_desc);
- }
- 
--static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
-+static void pte_list_remove(struct kvm *kvm, u64 *spte,
-+			    struct kvm_rmap_head *rmap_head)
- {
+ 	/*
+ 	 * Replace the to-be-freed SPTE with the last valid entry from the head
+@@ -1008,14 +1008,13 @@ static void pte_list_remove(struct kvm *kvm, u64 *spte,
  	struct pte_list_desc *desc;
  	int i;
-@@ -1020,7 +1022,8 @@ static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
- 		while (desc) {
- 			for (i = 0; i < desc->spte_count; ++i) {
- 				if (desc->sptes[i] == spte) {
--					pte_list_desc_remove_entry(rmap_head, desc, i);
-+					pte_list_desc_remove_entry(kvm, rmap_head,
-+								   desc, i);
- 					return;
- 				}
+ 
+-	if (!rmap_head->val) {
+-		pr_err("%s: %p 0->BUG\n", __func__, spte);
+-		BUG();
+-	} else if (!(rmap_head->val & 1)) {
+-		if ((u64 *)rmap_head->val != spte) {
+-			pr_err("%s:  %p 1->BUG\n", __func__, spte);
+-			BUG();
+-		}
++	if (KVM_BUG_ON_DATA_CORRUPTION(!rmap_head->val, kvm))
++		return;
++
++	if (!(rmap_head->val & 1)) {
++		if (KVM_BUG_ON_DATA_CORRUPTION((u64 *)rmap_head->val != spte, kvm))
++			return;
++
+ 		rmap_head->val = 0;
+ 	} else {
+ 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+@@ -1029,8 +1028,8 @@ static void pte_list_remove(struct kvm *kvm, u64 *spte,
  			}
-@@ -1035,7 +1038,7 @@ static void kvm_zap_one_rmap_spte(struct kvm *kvm,
- 				  struct kvm_rmap_head *rmap_head, u64 *sptep)
- {
- 	mmu_spte_clear_track_bits(kvm, sptep);
--	pte_list_remove(sptep, rmap_head);
-+	pte_list_remove(kvm, sptep, rmap_head);
- }
- 
- /* Return true if at least one SPTE was zapped, false otherwise */
-@@ -1110,7 +1113,7 @@ static void rmap_remove(struct kvm *kvm, u64 *spte)
- 	slot = __gfn_to_memslot(slots, gfn);
- 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
- 
--	pte_list_remove(spte, rmap_head);
-+	pte_list_remove(kvm, spte, rmap_head);
- }
- 
- /*
-@@ -1758,16 +1761,16 @@ static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
- 	pte_list_add(cache, parent_pte, &sp->parent_ptes);
- }
- 
--static void mmu_page_remove_parent_pte(struct kvm_mmu_page *sp,
-+static void mmu_page_remove_parent_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 				       u64 *parent_pte)
- {
--	pte_list_remove(parent_pte, &sp->parent_ptes);
-+	pte_list_remove(kvm, parent_pte, &sp->parent_ptes);
- }
- 
--static void drop_parent_pte(struct kvm_mmu_page *sp,
-+static void drop_parent_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 			    u64 *parent_pte)
- {
--	mmu_page_remove_parent_pte(sp, parent_pte);
-+	mmu_page_remove_parent_pte(kvm, sp, parent_pte);
- 	mmu_spte_clear_no_track(parent_pte);
- }
- 
-@@ -2482,7 +2485,7 @@ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
- 		if (child->role.access == direct_access)
- 			return;
- 
--		drop_parent_pte(child, sptep);
-+		drop_parent_pte(vcpu->kvm, child, sptep);
- 		kvm_flush_remote_tlbs_sptep(vcpu->kvm, sptep);
+ 			desc = desc->more;
+ 		}
+-		pr_err("%s: %p many->many\n", __func__, spte);
+-		BUG();
++
++		KVM_BUG_ON_DATA_CORRUPTION(true, kvm);
  	}
  }
-@@ -2500,7 +2503,7 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
- 			drop_spte(kvm, spte);
- 		} else {
- 			child = spte_to_child_sp(pte);
--			drop_parent_pte(child, spte);
-+			drop_parent_pte(kvm, child, spte);
  
- 			/*
- 			 * Recursively zap nested TDP SPs, parentless SPs are
-@@ -2531,13 +2534,13 @@ static int kvm_mmu_page_unlink_children(struct kvm *kvm,
- 	return zapped;
- }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d3ac7720da9..cb86108c624d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -865,6 +865,25 @@ static inline void kvm_vm_bugged(struct kvm *kvm)
+ 	unlikely(__ret);					\
+ })
  
--static void kvm_mmu_unlink_parents(struct kvm_mmu_page *sp)
-+static void kvm_mmu_unlink_parents(struct kvm *kvm, struct kvm_mmu_page *sp)
++/*
++ * Note, "data corruption" refers to corruption of host kernel data structures,
++ * not guest data.  Guest data corruption, suspected or confirmed, that is tied
++ * and contained to a single VM should *never* BUG() and potentially panic the
++ * host, i.e. use this variant of KVM_BUG() if and only if a KVM data structure
++ * is corrupted and that corruption can have a cascading effect to other parts
++ * of the hosts and/or to other VMs.
++ */
++#define KVM_BUG_ON_DATA_CORRUPTION(cond, kvm)			\
++({								\
++	bool __ret = !!(cond);					\
++								\
++	if (IS_ENABLED(CONFIG_BUG_ON_DATA_CORRUPTION))		\
++		BUG_ON(__ret);					\
++	else if (WARN_ON_ONCE(__ret && !(kvm)->vm_bugged))	\
++		kvm_vm_bugged(kvm);				\
++	unlikely(__ret);					\
++})
++
+ static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
  {
- 	u64 *sptep;
- 	struct rmap_iterator iter;
- 
- 	while ((sptep = rmap_get_first(&sp->parent_ptes, &iter)))
--		drop_parent_pte(sp, sptep);
-+		drop_parent_pte(kvm, sp, sptep);
- }
- 
- static int mmu_zap_unsync_children(struct kvm *kvm,
-@@ -2576,7 +2579,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 	++kvm->stat.mmu_shadow_zapped;
- 	*nr_zapped = mmu_zap_unsync_children(kvm, sp, invalid_list);
- 	*nr_zapped += kvm_mmu_page_unlink_children(kvm, sp, invalid_list);
--	kvm_mmu_unlink_parents(sp);
-+	kvm_mmu_unlink_parents(kvm, sp);
- 
- 	/* Zapping children means active_mmu_pages has become unstable. */
- 	list_unstable = *nr_zapped;
-@@ -2934,7 +2937,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 			u64 pte = *sptep;
- 
- 			child = spte_to_child_sp(pte);
--			drop_parent_pte(child, sptep);
-+			drop_parent_pte(vcpu->kvm, child, sptep);
- 			flush = true;
- 		} else if (pfn != spte_to_pfn(*sptep)) {
- 			drop_spte(vcpu->kvm, sptep);
+ #ifdef CONFIG_PROVE_RCU
 -- 
 2.41.0.487.g6d72f3e995-goog
 
