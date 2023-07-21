@@ -2,140 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83EDA75D0C2
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 19:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C10375D0C7
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 19:41:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbjGURlV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 13:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45884 "EHLO
+        id S229876AbjGURlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 13:41:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbjGURlT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 13:41:19 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D12DF30D0
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:41:16 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-cab7304dcccso2064189276.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:41:16 -0700 (PDT)
+        with ESMTP id S230345AbjGURla (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 13:41:30 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 309D930F0
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:41:21 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3fbc77e76abso18828205e9.1
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 10:41:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689961276; x=1690566076;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0EsEuc6ZrLkBpjfXrbTj3wl8CGw2RCGPAyUMK4WwkjA=;
-        b=DoHzE6IB/gTaLmkueM9yb30EUG6tzOb2A5AXrz9PQw1Ifq3ks790NG9A8kHnulrV92
-         RNCrZzNkmPOc83fANNDf5nXf1wPVFL2y5FNAhz+fPjDVllxc5Oizeq9OoCoSO3jrCWPO
-         Fdo3zuU1ITNzecPSKDNY0XL2xmTCfJibF/rCjlkemXFUh+Sr371B5TqkScdP+lHN0Bsv
-         l8bJ71cW4eJgHOkXZEVFnapIkfHWHqvRivBGgXBk81wx3rhHxJzYdjltDTwHbRDPypPU
-         FqCvfBjArc5TGgWA7G3s9Jm2aOIc06rnT78obfljmzEALSkpFg35cZZdMznfZTRdtzpx
-         x88Q==
+        d=ventanamicro.com; s=google; t=1689961279; x=1690566079;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oWngwrMo9tfYsDEwETiHHjHUDWaHKjCLtIZQ2VnXF7c=;
+        b=aTqIdTpVZIP4IVD51tOsAm0tR92i26ku0QRdMxib75xiGv1WuDJToy9b7LZrUOyuWs
+         ug3ZVQs0v1TonuQR2lcsV2mO46xdshqUBhttSnBH7Rrb3XgEEL+nF691T8oB9Z/p7g+Y
+         AAMeANAszmpY1NlEbJPZwpRtpA37I27sbLny0PlZD7HmZHG8bLpB79BpLuV1ukSJVcH5
+         y+gv0xZl7RRfxTHin5Ewyz2/48Hu6+QdHEbqcygrYQXw2d3QR3K0TRSxgMYbs+UmA4d7
+         myGSY6a1NPABafYZVSdxPJPcTrHpkcEO6gmjUqLKlvTu7eZqPpQ7N+4AstkSKRNJTaO2
+         RajA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689961276; x=1690566076;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0EsEuc6ZrLkBpjfXrbTj3wl8CGw2RCGPAyUMK4WwkjA=;
-        b=WemsWqpwlRhymfw1/kimYbaLLp0URTnqRIZtSlkzQWHHpOy9lt8kmKME1idwBbbkh4
-         6uz/UHtN9vS8ZI2+wXzJf7ygukGPREvwpBgloBdA68opbGQGElm6ZGM2Trfr9XrWNw68
-         5QDhf3uGzV1xoXWudE+xIjgSMrRH3XVvpPDj53FaZEHNi77SVIUIt2/BjfgZCsG8ykHP
-         6GRMU8HXT5PYjC/wku4mgLrFxPSLLlN6ghXQBrEjsiXjkyG8YxToHtWUJWQtNhtCko+C
-         OFCKy/9RLl++v7LxnYrP9fM9f+U4lbfZCfPgMf8f6Ws8SOWZwEC8BscpE6KcICAGLPE0
-         O7/g==
-X-Gm-Message-State: ABy/qLafpCyYLT7M4E0Mf1NX+3A8BfwH4jF33z0fTrUTYPa3J75dpI1q
-        e5U6eOLCuvapUS8K0yX2NLxy/Ixrc0A=
-X-Google-Smtp-Source: APBJJlFxyzDv1jxbiR1ec3ea79Hb3YohAr96lgMadcKGyfL8Br8SJoCJpXRoXSNCjiu8EtZhgF/6XBpHBow=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:4f41:0:b0:cb6:6c22:d0f8 with SMTP id
- d62-20020a254f41000000b00cb66c22d0f8mr17638ybb.4.1689961276130; Fri, 21 Jul
- 2023 10:41:16 -0700 (PDT)
-Date:   Fri, 21 Jul 2023 10:41:14 -0700
-In-Reply-To: <6118063e-5c91-acc4-129f-3bacc19f25ce@redhat.com>
-Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-10-seanjc@google.com>
- <6118063e-5c91-acc4-129f-3bacc19f25ce@redhat.com>
-Message-ID: <ZLrDOljnluTrt+l+@google.com>
-Subject: Re: [RFC PATCH v11 09/29] KVM: x86: Disallow hugepages when memory
- attributes are mixed
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1689961279; x=1690566079;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oWngwrMo9tfYsDEwETiHHjHUDWaHKjCLtIZQ2VnXF7c=;
+        b=d8QVKhdxySzcRblNctAq6RNvHXB7QgMITg6a1e1ygVb95zSNSQnZx5X/iAPFjdyoZq
+         qhpOFYScsk0j45e0QC0tftX8be8ekK9Z5EsCJxeqxDGIiZi++jjRfTQNA0Ma+0OLT9DE
+         LgGFq9kqIbzplHwYel99QUGcOvUM8oOyZH1v7f0kuFTRV/qKn6mFhs+U5efuqsRJ3tG5
+         XLh7UZYhx2t+MuTh9pg5AhT7X6Ng28eyTA5ALBKTwK7tcS4OR3pldpPSRt4ytWJFhmwF
+         5Ytlfcu3jqqtRpOA2B3VHgA9PcCQxfctWqVz52kGk4MymJSw/ZZSQmeDXHeN3EtJ9dkh
+         76uw==
+X-Gm-Message-State: ABy/qLZZq2CoMimfG1ePZx4zjpH6HUa+hQxFJxDpugfx/3yuXKXD0fiz
+        NCEW8/2l+dc02Md66hSaKpwr7A==
+X-Google-Smtp-Source: APBJJlG69RYuLgM+byfVXHJKxwKW8uCOZZnRcc5dSXYdEn2ESNpecR5PiRno3VUFKC9534g612t9Ug==
+X-Received: by 2002:a05:600c:2102:b0:3fb:d1db:545a with SMTP id u2-20020a05600c210200b003fbd1db545amr1950667wml.15.1689961279465;
+        Fri, 21 Jul 2023 10:41:19 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id u9-20020a05600c210900b003fbcdba1a52sm6476865wml.3.2023.07.21.10.41.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 10:41:18 -0700 (PDT)
+Date:   Fri, 21 Jul 2023 19:41:18 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org, rkanwal@rivosinc.com,
+        anup@brainfault.org, dbarboza@ventanamicro.com,
+        atishp@atishpatra.org, vincent.chen@sifive.com,
+        greentime.hu@sifive.com, frank.chang@sifive.com,
+        jim.shu@sifive.com, Palmer Dabbelt <palmer@dabbelt.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v6 3/5] target/riscv: Create an KVM AIA irqchip
+Message-ID: <20230721-72cb5810011b0a676b359d36@orel>
+References: <20230714084429.22349-1-yongxuan.wang@sifive.com>
+ <20230714084429.22349-4-yongxuan.wang@sifive.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230714084429.22349-4-yongxuan.wang@sifive.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 21, 2023, Paolo Bonzini wrote:
-> On 7/19/23 01:44, Sean Christopherson wrote:
-> > +static bool range_has_attrs(struct kvm *kvm, gfn_t start, gfn_t end,
-> > +			    unsigned long attrs)
-> > +{
-> > +	XA_STATE(xas, &kvm->mem_attr_array, start);
-> > +	unsigned long index;
-> > +	bool has_attrs;
-> > +	void *entry;
-> > +
-> > +	rcu_read_lock();
-> > +
-> > +	if (!attrs) {
-> > +		has_attrs = !xas_find(&xas, end);
-> > +		goto out;
-> > +	}
-> > +
-> > +	has_attrs = true;
-> > +	for (index = start; index < end; index++) {
-> > +		do {
-> > +			entry = xas_next(&xas);
-> > +		} while (xas_retry(&xas, entry));
-> > +
-> > +		if (xas.xa_index != index || xa_to_value(entry) != attrs) {
-> > +			has_attrs = false;
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +out:
-> > +	rcu_read_unlock();
-> > +	return has_attrs;
-> > +}
-> > +
+On Fri, Jul 14, 2023 at 08:44:25AM +0000, Yong-Xuan Wang wrote:
+> We create a vAIA chip by using the KVM_DEV_TYPE_RISCV_AIA and then set up
+> the chip with the KVM_DEV_RISCV_AIA_GRP_* APIs.
 > 
-> Can you move this function to virt/kvm/kvm_main.c?
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> Reviewed-by: Jim Shu <jim.shu@sifive.com>
+> Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  target/riscv/kvm.c       | 160 +++++++++++++++++++++++++++++++++++++++
+>  target/riscv/kvm_riscv.h |   6 ++
+>  2 files changed, 166 insertions(+)
+> 
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index 005e054604..9bc92cedff 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -36,6 +36,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+>  #include "hw/irq.h"
+> +#include "hw/intc/riscv_imsic.h"
+>  #include "qemu/log.h"
+>  #include "hw/loader.h"
+>  #include "kvm_riscv.h"
+> @@ -43,6 +44,7 @@
+>  #include "chardev/char-fe.h"
+>  #include "migration/migration.h"
+>  #include "sysemu/runstate.h"
+> +#include "hw/riscv/numa.h"
+>  
+>  static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type,
+>                                   uint64_t idx)
+> @@ -1026,3 +1028,161 @@ bool kvm_arch_cpu_check_are_resettable(void)
+>  void kvm_arch_accel_class_init(ObjectClass *oc)
+>  {
+>  }
+> +
+> +char *kvm_aia_mode_str(uint64_t aia_mode)
+> +{
+> +    const char *val;
 
-Ah, yeah, that's a good idea.
+I just tried compiling this series and see it doesn't with -Werror.
+kvm_aia_mode_str() should return 'const char *' and this 'val' variable
+is unused.
+
+Thanks,
+drew
