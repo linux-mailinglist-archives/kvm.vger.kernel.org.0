@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF12F75CB05
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 17:09:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8768775CAFD
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 17:09:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231847AbjGUPJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 11:09:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44452 "EHLO
+        id S231793AbjGUPJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 11:09:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231816AbjGUPI6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 11:08:58 -0400
+        with ESMTP id S231827AbjGUPJG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 11:09:06 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD2230D2
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:08:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCD230E3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:08:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689952090;
+        s=mimecast20190719; t=1689952096;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=B0XnA9BE8o3D7MPThucf/ZBJtbCoqYoCMw1W8WX/w6k=;
-        b=EHkYpasJZsFd5iXjGYYJco08SR4fRzI2pdenG1qOmKr026tnnZu0snIEKydQmpBe/xTPMM
-        3i9U3ESpqqF0IAUTgi4AfObTzST4M5bYa+iUKWP+NqGcwhXfr5TvJY4nUBRf7QCbqmh3P4
-        gUbCAHy+zW0tFdC3tEPqLKZ5kSx85rA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=SD81e7NZBdmvFs/0moOEoRHsNzw2ypppSDOfYt+K9oA=;
+        b=HwZSLzxi0P1oAdGrffqa8WSat0EVVskjrWXXVBpZ8+doOSiy6LZnGhz0tGpLx9EuROcd+x
+        HbqZeBdo/ARZ+i1IfjwKh5Xu4Wzj20gsYUL/ulclIRpCYM9j8D2YOfVSOOuErRfbLmutU+
+        +7cbCnryJszXJUl5lmN+702Ri+DIMYs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-Kw2rH-D5MOySXGpzMz54LA-1; Fri, 21 Jul 2023 11:08:08 -0400
-X-MC-Unique: Kw2rH-D5MOySXGpzMz54LA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so11112155e9.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:08:08 -0700 (PDT)
+ us-mta-125-uX6xui6dMjioKXu8znGZTw-1; Fri, 21 Jul 2023 11:08:15 -0400
+X-MC-Unique: uX6xui6dMjioKXu8znGZTw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f41a04a297so10633065e9.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:08:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689952087; x=1690556887;
+        d=1e100.net; s=20221208; t=1689952094; x=1690556894;
         h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0XnA9BE8o3D7MPThucf/ZBJtbCoqYoCMw1W8WX/w6k=;
-        b=YAW3HmvfwoEqzDAS9ZqozWQET7cu1B1ywhGMZrRZMD/vBVdHKS+d2I1VvoFsbPyYF8
-         js8LqnPsSWK+7cdP3nECMJwN6/qEGuEzNDATvvijzdqVdLR6gDkj+aowNASySQVPqUNB
-         e8BJM5ydJQESKiGk/UmR7Lq3Yb8te4saJeGodWNVa+RxbDwlaFJ5AUWAKfY4iue6cbRG
-         w67f9RRAiwKoCa7Ceu3fGBfgMUn5OJv322+ov6E6iiqRK7Gy9bIPJcAI4AZWNXmsvV6V
-         SSieq7LTokzE5al52GD133Ae2PHvbzMePS3S+NBMBfb86fT6XBOSBSU2eVaocHGnyu1E
-         yjSQ==
-X-Gm-Message-State: ABy/qLZRZBULi3hyWphhKco8kBZGNcc5/V1ERVdE+7YcAm1ciOyZniC0
-        1i2qsu78IwvrtOvN/lV/MMZX7E8/Z8mEZS5gnP9j95QxxzSG5HUgfBa3WOlZW2iH5WmclHZBM+4
-        RY0N/q0HOnIG8
-X-Received: by 2002:a5d:65d0:0:b0:311:180d:cf38 with SMTP id e16-20020a5d65d0000000b00311180dcf38mr1610850wrw.24.1689952087593;
-        Fri, 21 Jul 2023 08:08:07 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHaTM5vQ7KW9sCHDc43jdJFwo9+cb7+zAoGs4JK1/FURFo7hfFESg+0SCq3xlf/D0c/gEW3UQ==
-X-Received: by 2002:a5d:65d0:0:b0:311:180d:cf38 with SMTP id e16-20020a5d65d0000000b00311180dcf38mr1610794wrw.24.1689952087302;
-        Fri, 21 Jul 2023 08:08:07 -0700 (PDT)
+        bh=SD81e7NZBdmvFs/0moOEoRHsNzw2ypppSDOfYt+K9oA=;
+        b=QRO6qZtmBmwlRUNDEXOoHkYWoeDW0woPNJceSXgMra56hB4cEsO2/UOEWkCoHYofU+
+         jr8x1KDl0AetTS6iCo8suZZrzxqE/QJ5jpeGYVqYTO0lKNrcwDoD5VKpiCjY1FHK4Byn
+         NqYZy+V/56HJrhy9i+CrFBdvWBYA9VVOIejimBuykIljNDD4/wXdD4/zDZ9EzlSywdgx
+         /UPLgUFzAYgPXLPf5NvLm9VK9j6wsEw3OvXz8fXtPGV0CKN4UOT5ZUO4rac88FXAF6Pb
+         Sp6rh7//LurRwZckKaTUwriQACSDRsohAt67OEOHKvdmXlkFePToM4UaHdXWOCUSg/ET
+         FioQ==
+X-Gm-Message-State: ABy/qLbfpysEe/jx/PdjiOC4btutRWCVkBsD04LooJWM2aRMvXlXIe/g
+        zRS1S5v1sjlMR7jr9eRrYGX45pqC+e09Gdm5qXk0ajVzhIYcn9qcciG3rzdGsfCa7XqBFMtFja2
+        ZvdGzVREcjWmA
+X-Received: by 2002:a7b:c455:0:b0:3fc:627:ea31 with SMTP id l21-20020a7bc455000000b003fc0627ea31mr1714654wmi.38.1689952094107;
+        Fri, 21 Jul 2023 08:08:14 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF9fiPWFBcIAw2j2QV4lTYmt4mtAVTwBGD8BbL2O21cgVm0IYBel5tSTfnfWuFcEvQp7qgXww==
+X-Received: by 2002:a7b:c455:0:b0:3fc:627:ea31 with SMTP id l21-20020a7bc455000000b003fc0627ea31mr1714619wmi.38.1689952093765;
+        Fri, 21 Jul 2023 08:08:13 -0700 (PDT)
 Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id j6-20020adfff86000000b0031274a184d5sm4426018wrr.109.2023.07.21.08.08.05
+        by smtp.gmail.com with ESMTPSA id q7-20020a5d5747000000b0031434936f0dsm4459951wrw.68.2023.07.21.08.08.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 08:08:06 -0700 (PDT)
+        Fri, 21 Jul 2023 08:08:12 -0700 (PDT)
 From:   Valentin Schneider <vschneid@redhat.com>
 To:     paulmck@kernel.org
 Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
@@ -106,82 +106,70 @@ Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
         Daniel Bristot de Oliveira <bristot@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>,
         Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 17/20] rcutorture: Add a test config to torture
- test low RCU_DYNTICKS width
-In-Reply-To: <7d2fdbb7-e574-40e8-8561-40a3873abc88@paulmck-laptop>
+Subject: Re: [RFC PATCH v2 16/20] rcu: Make RCU dynticks counter size
+ configurable
+In-Reply-To: <28d4abb7-8496-45ec-b270-ea2b6164537b@paulmck-laptop>
 References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-18-vschneid@redhat.com>
- <24b55289-1c35-41cc-9ad3-baa957f1c9cb@paulmck-laptop>
- <5143d0a9-bc02-4b9a-8613-2383bfdee35c@paulmck-laptop>
- <xhsmhmszpu24i.mognet@vschneid.remote.csb>
- <7d2fdbb7-e574-40e8-8561-40a3873abc88@paulmck-laptop>
-Date:   Fri, 21 Jul 2023 16:08:04 +0100
-Message-ID: <xhsmhcz0lti97.mognet@vschneid.remote.csb>
+ <20230720163056.2564824-17-vschneid@redhat.com>
+ <xhsmhjzutu18u.mognet@vschneid.remote.csb>
+ <28d4abb7-8496-45ec-b270-ea2b6164537b@paulmck-laptop>
+Date:   Fri, 21 Jul 2023 16:08:10 +0100
+Message-ID: <xhsmhbkg5ti91.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/23 07:07, Paul E. McKenney wrote:
-> On Fri, Jul 21, 2023 at 08:58:53AM +0100, Valentin Schneider wrote:
->> On 20/07/23 21:00, Paul E. McKenney wrote:
->> > On Thu, Jul 20, 2023 at 12:53:05PM -0700, Paul E. McKenney wrote:
->> >> On Thu, Jul 20, 2023 at 05:30:53PM +0100, Valentin Schneider wrote:
->> >> > diff --git a/tools/testing/selftests/rcutorture/configs/rcu/TREE11 b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
->> >> > new file mode 100644
->> >> > index 0000000000000..aa7274efd9819
->> >> > --- /dev/null
->> >> > +++ b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
->> >> > @@ -0,0 +1,19 @@
->> >> > +CONFIG_SMP=y
->> >> > +CONFIG_NR_CPUS=8
->> >> > +CONFIG_PREEMPT_NONE=n
->> >> > +CONFIG_PREEMPT_VOLUNTARY=y
->> >> > +CONFIG_PREEMPT=n
->> >> > +CONFIG_PREEMPT_DYNAMIC=n
->> >> > +#CHECK#CONFIG_TREE_RCU=y
->> >> > +CONFIG_HZ_PERIODIC=n
->> >> > +CONFIG_NO_HZ_IDLE=n
->> >> > +CONFIG_NO_HZ_FULL=y
->> >> > +CONFIG_RCU_TRACE=y
->> >> > +CONFIG_RCU_FANOUT=4
->> >> > +CONFIG_RCU_FANOUT_LEAF=3
->> >> > +CONFIG_DEBUG_LOCK_ALLOC=n
->> >> > +CONFIG_DEBUG_OBJECTS_RCU_HEAD=n
->> >> > +CONFIG_RCU_EXPERT=y
->> >> > +CONFIG_RCU_EQS_DEBUG=y
->> >> > +CONFIG_RCU_LAZY=y
->> >> > +CONFIG_RCU_DYNTICKS_BITS=2
->> >>
->> >> Why not just add this last line to the existing TREE04 scenario?
->> >> That would ensure that it gets tested regularly without extending the
->> >> time required to run a full set of rcutorture tests.
+On 21/07/23 07:10, Paul E. McKenney wrote:
+> On Fri, Jul 21, 2023 at 09:17:53AM +0100, Valentin Schneider wrote:
+>> On 20/07/23 17:30, Valentin Schneider wrote:
+>> > index bdd7eadb33d8f..1ff2aab24e964 100644
+>> > --- a/kernel/rcu/Kconfig
+>> > +++ b/kernel/rcu/Kconfig
+>> > @@ -332,4 +332,37 @@ config RCU_DOUBLE_CHECK_CB_TIME
+>> >         Say Y here if you need tighter callback-limit enforcement.
+>> >         Say N here if you are unsure.
 >> >
->> > Please see below for the version of this patch that I am running overnight
->> > tests with.  Does this one work for you?
+>> > +config RCU_DYNTICKS_RANGE_BEGIN
+>> > +	int
+>> > +	depends on !RCU_EXPERT
+>> > +	default 31 if !CONTEXT_TRACKING_WORK
 >>
->> Yep that's fine with me. I only went with a separate test file as wasn't
->> sure how new test options should be handled (merged into existing tests vs
->> new tests created), and didn't want to negatively impact TREE04 or
->> TREE06. If merging into TREE04 is preferred, then I'll do just that and
->> carry this path moving forwards.
+>> You'll note that this should be 30 really, because the lower *2* bits are
+>> taken by the context state (CONTEXT_GUEST has a value of 3).
+>>
+>> This highlights the fragile part of this: the Kconfig values are hardcoded,
+>> but they depend on CT_STATE_SIZE, CONTEXT_MASK and CONTEXT_WORK_MAX. The
+>> static_assert() will at least capture any misconfiguration, but having that
+>> enforced by the actual Kconfig ranges would be less awkward.
+>>
+>> Do we currently have a way of e.g. making a Kconfig file depend on and use
+>> values generated by a C header?
 >
-> Things worked fine for this one-hour-per-scenario test run on my laptop,
-
-Many thanks for testing!
-
-> except for the CONFIG_SMP=n runs, which all got build errors like the
-> following.
+> Why not just have something like a boolean RCU_DYNTICKS_TORTURE Kconfig
+> option and let the C code work out what the number of bits should be?
+>
+> I suppose that there might be a failure whose frequency depended on
+> the number of bits, which might be an argument for keeping something
+> like RCU_DYNTICKS_RANGE_BEGIN for fault isolation.  But still using
+> RCU_DYNTICKS_TORTURE for normal testing.
+>
+> Thoughts?
 >
 
-Harumph, yes !SMP (and !CONTEXT_TRACKING_WORK) doesn't compile nicely, I'll
-fix that for v3.
+AFAICT if we run tests with the minimum possible width, then intermediate
+values shouldn't have much value.
+
+Your RCU_DYNTICKS_TORTURE suggestion sounds like a saner option than what I
+came up with, as we can let the context tracking code figure out the widths
+itself and not expose any of that to Kconfig.
+
+>                                                       Thanx, Paul
 
