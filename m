@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B562275D7C7
-	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 01:01:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F6D575D7E8
+	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 01:39:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231319AbjGUXAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 19:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49304 "EHLO
+        id S230073AbjGUXjN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 19:39:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231190AbjGUXAm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 19:00:42 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF98B4201
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:28 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1847840276.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:28 -0700 (PDT)
+        with ESMTP id S230121AbjGUXjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 19:39:10 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E33130DD
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:39:02 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8a7734734so14336275ad.2
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689980427; x=1690585227;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=usSK3yeb2+dbKuXeDCW9x7zKGJjv9CPmyUgQidtHNNE=;
-        b=y1ewr/kbrOutA8ZR9xcOf7OlMOdxw6k07Xh+KfWIE5JsL+KhmTlZRyCEhNpAHfv87x
-         ie7QOITXavYjalaAjDKeXxQMwYjdQPvh7z+EaFByJvIgPz+DmyjSWp6GSdvQriAwM0Lf
-         p+nf/mRt4XJCGhhorw6p3qGCi5tF/q/MSoiOaW4ofuVk7Hjpw4Z5Myh8bQ87UgCzU6Yc
-         aQLyGCcnbkLKU0sBEkRgdd/xkiOJjKj/Qj/zWLX8yde8ERQtkxMVF/GAz4EnSPdHF0jQ
-         yDpY/QJ4hCBXtx6pyOpZ/f6fjGbs1EKXZQ6ROP6h5PsdVYKo5B7DY+Vzfh+v998P/MiR
-         0kTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689980427; x=1690585227;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20221208; t=1689982742; x=1690587542;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=usSK3yeb2+dbKuXeDCW9x7zKGJjv9CPmyUgQidtHNNE=;
-        b=aoE755+OzWNMI4JGWHWAckYoDaCvpFo5PFMTBJ0AJqPUUbe8T6mb7EN7x7AQf/G+pL
-         wbxiuFZ0kbsykKZRqOk4x03GAjMS3GjKvARhtKCx41j3krB7hlrM5ntH96o6wfeKT15g
-         3kPTJAEC8/qNJX9AoOEdWCZI19QfsMaV0kdfo1fcfkacGiQVDFqYO0maVRKVfopxb4UT
-         /DG1cr+kbtL9zpw1vHSYblivb82bUz+YCZfciPWCu18NXyCBAdkSgXUVT1fAN8DCrHvf
-         vxk9UmaRP/lp6btocL8wsb1wutJWuiYrZRumqHBzP1kug6hx4m6oMLrreLD1cZF2ymeU
-         oq4A==
-X-Gm-Message-State: ABy/qLbNgqiZR84X3MdC9qdllarYHYgkbf7usX5s8MsZGvAruMiQaRh6
-        cZlIRt5IgMtyYGUjvpTxFml62LJwUts=
-X-Google-Smtp-Source: APBJJlGFKU0XvWU3rbDD6SD/1tQ9cIEjxCh2ylxjtv/vyXSNY2TuqHp04chOSWPozToc7GNMJKNkMr+U/LE=
+        bh=Wxpv5d1dbsB02EOhCUS+N+V6wGKp/ft8bZjDfblFWp0=;
+        b=6+6p+4MOaxtK+Vf0JT9BKKWNZe6ldV4PUn79DslXbhsuAlyt7oSr3ljHaBNqTMv/3U
+         pYZnh3PAlttxfjDl+RD724I/kb1Y3dkipnAzFQkVQDSPVpwSIzsApj4QdWTp5IwI26Nk
+         MPN7sVU5WP6DRFcOhNs1zZia5HJRTrEBZZn6ARyBCrrAkekkkBkYzCqTgdssFDglhcA3
+         xLRY767xHR9Gcm9mtNArlQdI7cH+MfPCp/I9POthmYWAWRDwyAav3e+nWrTearkc04Bw
+         FKgtKGOc7FGX2LW/5ndrexkCl4pAJC8EWXVvT2StRb6J5+CFrEuwuuxQlAR8ijc+81aE
+         3ndg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689982742; x=1690587542;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Wxpv5d1dbsB02EOhCUS+N+V6wGKp/ft8bZjDfblFWp0=;
+        b=h4mtTtDMsgcEPX0U07Ewdgm4BZxo47aDtfMy1fj4qUiNEq8CStZxw5iZxNmxsn69U2
+         iSPotcY9xj5FMg+SrpHP6OKlt43fmt/kEFkv7im7ej786cyG5b67+xZa+rt6L5D97xIv
+         RWkB7YDsgtgHetPt+wtmU/fRJCUWyKB2dJJTZC3BzobmedykljqkYpn/LhGSatGGbyjX
+         jEe6CP/aJ7tKRBubYIJQJyExgQupEK7Zt0sljIaKBdtWkdEBYkHy4rlNjhec5vFJWktm
+         jXqQwueIVGP27dgPR8P9Y5lzoMgLIx/iud+M/onLXM1xK/FbGgcY8UtkOy4wPkxHhFhT
+         ipGQ==
+X-Gm-Message-State: ABy/qLbePVaSSszRSPpNJPM/3JRvRvTMDTutEEWEzrSYUrdN3WTHXtf7
+        qMmRz+3oicuhLZyChUaT/Pwn39EWSgs=
+X-Google-Smtp-Source: APBJJlG1X+RELTKU0r2yW84zpiRaZzYEGvAZUim/uaTx2J52QSwSORgoGNZiIt5eRccKpiTbTQzOmzFGG9o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:bc2:0:b0:ce9:64b3:80dc with SMTP id
- c2-20020a5b0bc2000000b00ce964b380dcmr21029ybr.1.1689980427316; Fri, 21 Jul
- 2023 16:00:27 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:f683:b0:1ba:ff36:e0d7 with SMTP id
+ l3-20020a170902f68300b001baff36e0d7mr13847plg.12.1689982741675; Fri, 21 Jul
+ 2023 16:39:01 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 16:00:06 -0700
-In-Reply-To: <20230721230006.2337941-1-seanjc@google.com>
+Date:   Fri, 21 Jul 2023 16:38:58 -0700
 Mime-Version: 1.0
-References: <20230721230006.2337941-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721230006.2337941-10-seanjc@google.com>
-Subject: [PATCH v2 9/9] KVM: x86/mmu: BUG() in rmap helpers iff CONFIG_BUG_ON_DATA_CORRUPTION=y
+Message-ID: <20230721233858.2343941-1-seanjc@google.com>
+Subject: [PATCH] KVM: VMX: Drop manual TLB flush when migrating vmcs.APIC_ACCESS_ADDR
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mingwei Zhang <mizhang@google.com>,
-        David Matlack <dmatlack@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
         Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
@@ -73,110 +72,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce KVM_BUG_ON_DATA_CORRUPTION() and use it in the low-level rmap
-helpers to convert the existing BUG()s to WARN_ON_ONCE() when the kernel
-is built with CONFIG_BUG_ON_DATA_CORRUPTION=n, i.e. does NOT want to BUG()
-on corruption of host kernel data structures.  Environments that don't
-have infrastructure to automatically capture crash dumps, i.e. aren't
-likely to enable CONFIG_BUG_ON_DATA_CORRUPTION=y, are typically better
-served overall by WARN-and-continue behavior (for the kernel, the VM is
-dead regardless), as a BUG() while holding mmu_lock all but guarantees
-the _best_ case scenario is a panic().
+Remove the superfluous flush of the current TLB in VMX's handling of
+migration of the APIC-access page, as a full TLB flush on all vCPUs will
+have already been performed in response to kvm_unmap_gfn_range() *if*
+there were SPTEs pointing at the APIC-access page.  And if there were no
+valid SPTEs, then there can't possibly be TLB entries to flush.
 
-Make the BUG()s conditional instead of removing/replacing them entirely as
-there's a non-zero chance (though by no means a guarantee) that the damage
-isn't contained to the target VM, e.g. if no rmap is found for a SPTE then
-KVM may be double-zapping the SPTE, i.e. has already freed the memory the
-SPTE pointed at and thus KVM is reading/writing memory that KVM no longer
-owns.
+The extra flush was added by commit fb6c81984313 ("kvm: vmx: Flush TLB
+when the APIC-access address changes"), with the justification of "because
+the SDM says so".  The SDM said, and still says:
 
-Link: https://lore.kernel.org/all/20221129191237.31447-1-mizhang@google.com
-Suggested-by: Mingwei Zhang <mizhang@google.com>
-Cc: David Matlack <dmatlack@google.com>
+ As detailed in Section xx.x.x, an access to the APIC-access page might
+ not cause an APIC-access VM exit if software does not properly invalidate
+ information that may be cached from the EPT paging structures. If EPT was
+ in use on a logical processor at one time with EPTP X, it is recommended
+ that software use the INVEPT instruction with the =E2=80=9Csingle-context=
+=E2=80=9D INVEPT
+ type and with EPTP X in the INVEPT descriptor before a VM entry on the
+ same logical processor that enables EPT with EPTP X and either (a) the
+ "virtualize APIC accesses" VM- execution control was changed from 0 to 1;
+ or (b) the value of the APIC-access address was changed.
+
+But the "recommendation" for (b) is predicated on there actually being
+a valid EPT translation *and* possible TLB entries for the GPA (or guest
+VA when using shadow paging).  It's possible that a different vCPU has
+established a mapping for the new page, but the current vCPU can't have
+entered the guest, i.e. can't have created a TLB entry, between flushing
+the old mappings and changing its vmcs.APIC_ACCESS_ADDR.
+
+kvm_unmap_gfn_range() waits for all vCPUs to ack KVM_REQ_APIC_PAGE_RELOAD,
+and then flushes remote TLBs (which may or may not also pend a request).
+Thus the vCPU is guaranteed to update vmcs.APIC_ACCESS_ADDR before
+re-entering the guest and before it can possibly create new TLB entries.
+
+In other words, KVM does flush in this case, it just does so earlier
+on while handling the page migration.
+
+Note, VMX also flushes if the vCPU is migrated to a new pCPU, i.e. if
+the vCPU is migrated to a pCPU that entered the guest for a different
+vCPU.
+
+Suggested-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 Cc: Jim Mattson <jmattson@google.com>
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 21 ++++++++++-----------
- include/linux/kvm_host.h | 19 +++++++++++++++++++
- 2 files changed, 29 insertions(+), 11 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b6cc261d7748..69f65f7b6158 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -977,7 +977,7 @@ static void pte_list_desc_remove_entry(struct kvm *kvm,
- 	 * when adding an entry and the previous head is full, and heads are
- 	 * removed (this flow) when they become empty.
- 	 */
--	BUG_ON(j < 0);
-+	KVM_BUG_ON_DATA_CORRUPTION(j < 0, kvm);
- 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0ecf4be2c6af..3f868826db7d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6767,8 +6767,10 @@ static void vmx_set_apic_access_page_addr(struct kvm=
+_vcpu *vcpu)
+ 	vmcs_write64(APIC_ACCESS_ADDR, pfn_to_hpa(pfn));
+ 	read_unlock(&vcpu->kvm->mmu_lock);
+=20
+-	vmx_flush_tlb_current(vcpu);
+-
++	/*
++	 * No need for a manual TLB flush at this point, KVM has already done a
++	 * flush if there were SPTEs pointing at the previous page.
++	 */
+ out:
  	/*
- 	 * Replace the to-be-freed SPTE with the last valid entry from the head
-@@ -1008,14 +1008,13 @@ static void pte_list_remove(struct kvm *kvm, u64 *spte,
- 	struct pte_list_desc *desc;
- 	int i;
- 
--	if (!rmap_head->val) {
--		pr_err("%s: %p 0->BUG\n", __func__, spte);
--		BUG();
--	} else if (!(rmap_head->val & 1)) {
--		if ((u64 *)rmap_head->val != spte) {
--			pr_err("%s:  %p 1->BUG\n", __func__, spte);
--			BUG();
--		}
-+	if (KVM_BUG_ON_DATA_CORRUPTION(!rmap_head->val, kvm))
-+		return;
-+
-+	if (!(rmap_head->val & 1)) {
-+		if (KVM_BUG_ON_DATA_CORRUPTION((u64 *)rmap_head->val != spte, kvm))
-+			return;
-+
- 		rmap_head->val = 0;
- 	} else {
- 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-@@ -1029,8 +1028,8 @@ static void pte_list_remove(struct kvm *kvm, u64 *spte,
- 			}
- 			desc = desc->more;
- 		}
--		pr_err("%s: %p many->many\n", __func__, spte);
--		BUG();
-+
-+		KVM_BUG_ON_DATA_CORRUPTION(true, kvm);
- 	}
- }
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9d3ac7720da9..cb86108c624d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -865,6 +865,25 @@ static inline void kvm_vm_bugged(struct kvm *kvm)
- 	unlikely(__ret);					\
- })
- 
-+/*
-+ * Note, "data corruption" refers to corruption of host kernel data structures,
-+ * not guest data.  Guest data corruption, suspected or confirmed, that is tied
-+ * and contained to a single VM should *never* BUG() and potentially panic the
-+ * host, i.e. use this variant of KVM_BUG() if and only if a KVM data structure
-+ * is corrupted and that corruption can have a cascading effect to other parts
-+ * of the hosts and/or to other VMs.
-+ */
-+#define KVM_BUG_ON_DATA_CORRUPTION(cond, kvm)			\
-+({								\
-+	bool __ret = !!(cond);					\
-+								\
-+	if (IS_ENABLED(CONFIG_BUG_ON_DATA_CORRUPTION))		\
-+		BUG_ON(__ret);					\
-+	else if (WARN_ON_ONCE(__ret && !(kvm)->vm_bugged))	\
-+		kvm_vm_bugged(kvm);				\
-+	unlikely(__ret);					\
-+})
-+
- static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_PROVE_RCU
--- 
+ 	 * Do not pin apic access page in memory, the MMU notifier
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+--=20
 2.41.0.487.g6d72f3e995-goog
 
