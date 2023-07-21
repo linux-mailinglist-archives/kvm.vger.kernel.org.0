@@ -2,174 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8768775CAFD
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 17:09:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65C4E75CB12
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 17:11:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231793AbjGUPJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 11:09:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
+        id S231330AbjGUPLA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 11:11:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231827AbjGUPJG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 11:09:06 -0400
+        with ESMTP id S230137AbjGUPK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 11:10:56 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCD230E3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:08:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F34B3A85
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:09:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689952096;
+        s=mimecast20190719; t=1689952187;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SD81e7NZBdmvFs/0moOEoRHsNzw2ypppSDOfYt+K9oA=;
-        b=HwZSLzxi0P1oAdGrffqa8WSat0EVVskjrWXXVBpZ8+doOSiy6LZnGhz0tGpLx9EuROcd+x
-        HbqZeBdo/ARZ+i1IfjwKh5Xu4Wzj20gsYUL/ulclIRpCYM9j8D2YOfVSOOuErRfbLmutU+
-        +7cbCnryJszXJUl5lmN+702Ri+DIMYs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0vmYiJ2McNnP+cgtfjeAKniOHtUlesHHQnwePocmwMM=;
+        b=bhS7A48HhxoUmJv84zLSucHY2BKkc8IciVF5513BZ+2BhO+KQlPepFtGVIvPw7TV/B/3rb
+        pxQOgMTV1S4GpZ96rf3S49zz83yIoGIcw7m4hz5lb19BfsSFV2q/k18QGzc1ADIHDK3vTh
+        xgsr/Slug/6zcx4KoyqJZLxMlJGolOw=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-125-uX6xui6dMjioKXu8znGZTw-1; Fri, 21 Jul 2023 11:08:15 -0400
-X-MC-Unique: uX6xui6dMjioKXu8znGZTw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f41a04a297so10633065e9.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:08:14 -0700 (PDT)
+ us-mta-483-VNmUav5dOySeigamTdDE6g-1; Fri, 21 Jul 2023 11:09:45 -0400
+X-MC-Unique: VNmUav5dOySeigamTdDE6g-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb736a7746so1994248e87.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:09:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689952094; x=1690556894;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SD81e7NZBdmvFs/0moOEoRHsNzw2ypppSDOfYt+K9oA=;
-        b=QRO6qZtmBmwlRUNDEXOoHkYWoeDW0woPNJceSXgMra56hB4cEsO2/UOEWkCoHYofU+
-         jr8x1KDl0AetTS6iCo8suZZrzxqE/QJ5jpeGYVqYTO0lKNrcwDoD5VKpiCjY1FHK4Byn
-         NqYZy+V/56HJrhy9i+CrFBdvWBYA9VVOIejimBuykIljNDD4/wXdD4/zDZ9EzlSywdgx
-         /UPLgUFzAYgPXLPf5NvLm9VK9j6wsEw3OvXz8fXtPGV0CKN4UOT5ZUO4rac88FXAF6Pb
-         Sp6rh7//LurRwZckKaTUwriQACSDRsohAt67OEOHKvdmXlkFePToM4UaHdXWOCUSg/ET
-         FioQ==
-X-Gm-Message-State: ABy/qLbfpysEe/jx/PdjiOC4btutRWCVkBsD04LooJWM2aRMvXlXIe/g
-        zRS1S5v1sjlMR7jr9eRrYGX45pqC+e09Gdm5qXk0ajVzhIYcn9qcciG3rzdGsfCa7XqBFMtFja2
-        ZvdGzVREcjWmA
-X-Received: by 2002:a7b:c455:0:b0:3fc:627:ea31 with SMTP id l21-20020a7bc455000000b003fc0627ea31mr1714654wmi.38.1689952094107;
-        Fri, 21 Jul 2023 08:08:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF9fiPWFBcIAw2j2QV4lTYmt4mtAVTwBGD8BbL2O21cgVm0IYBel5tSTfnfWuFcEvQp7qgXww==
-X-Received: by 2002:a7b:c455:0:b0:3fc:627:ea31 with SMTP id l21-20020a7bc455000000b003fc0627ea31mr1714619wmi.38.1689952093765;
-        Fri, 21 Jul 2023 08:08:13 -0700 (PDT)
-Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id q7-20020a5d5747000000b0031434936f0dsm4459951wrw.68.2023.07.21.08.08.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 08:08:12 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     paulmck@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 16/20] rcu: Make RCU dynticks counter size
- configurable
-In-Reply-To: <28d4abb7-8496-45ec-b270-ea2b6164537b@paulmck-laptop>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-17-vschneid@redhat.com>
- <xhsmhjzutu18u.mognet@vschneid.remote.csb>
- <28d4abb7-8496-45ec-b270-ea2b6164537b@paulmck-laptop>
-Date:   Fri, 21 Jul 2023 16:08:10 +0100
-Message-ID: <xhsmhbkg5ti91.mognet@vschneid.remote.csb>
+        d=1e100.net; s=20221208; t=1689952184; x=1690556984;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0vmYiJ2McNnP+cgtfjeAKniOHtUlesHHQnwePocmwMM=;
+        b=b5eGS3hmgw7n7AiqQu54UTQQLeO8G3/k4Eqd/J04NnIfiv/dFRKJ5/O1UnIhtYhbhl
+         XzUDrsEdrtvYp6QNXUJUrdlEIoy9BTsnO0DOlXI+6IAvPtPpERhgIh+dlt1X0TLhsIdZ
+         I/ZRiF9QoxZxV7OrikQw8da9+a0Gpx74bKlPgdaSLQVH8PyIKWa4I9EL8d9wY9MFVAiA
+         KcLq6NQ5LlzwXa3UZptL0ilT20mrb4gRfaroKb9eUWtLmBNXBvmoGmae3nrzIKJ3LHRj
+         A574BO5Nvezja7813QNWnSqaMDlVRuYPhp7P3rk/fKBtaMpS+IJogCTcux48z2GoidO9
+         cqRA==
+X-Gm-Message-State: ABy/qLbRZ5gH/lhnc9BBHXLh+RblV3X08dC0x35nKBYFW0NOnXUMl8wC
+        K37ZPOY58Y33I+bMdWgpfIjqp8eVkU2uE0d8mOHI5ltNgyM7aRR1i68KDsTyPUjRIwIK91SUamo
+        DPbygDGZhOJKY
+X-Received: by 2002:a05:6512:328d:b0:4fb:9050:1d92 with SMTP id p13-20020a056512328d00b004fb90501d92mr1367617lfe.51.1689952183975;
+        Fri, 21 Jul 2023 08:09:43 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFPJFXvjHxdY0caGfwUnetqbu+BXv0f0ZakHLJfQbsd3FM7efS9VuBluWIt3TKTV7uVBQdwmQ==
+X-Received: by 2002:a05:6512:328d:b0:4fb:9050:1d92 with SMTP id p13-20020a056512328d00b004fb90501d92mr1367563lfe.51.1689952183505;
+        Fri, 21 Jul 2023 08:09:43 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id d17-20020aa7ce11000000b00521d42fb41asm2212963edv.67.2023.07.21.08.09.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 08:09:42 -0700 (PDT)
+Message-ID: <68ce1eff-807c-d637-d992-f83e8af81514@redhat.com>
+Date:   Fri, 21 Jul 2023 17:09:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v11 14/29] KVM: x86/mmu: Handle page fault for private
+ memory
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-15-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230718234512.1690985-15-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/23 07:10, Paul E. McKenney wrote:
-> On Fri, Jul 21, 2023 at 09:17:53AM +0100, Valentin Schneider wrote:
->> On 20/07/23 17:30, Valentin Schneider wrote:
->> > index bdd7eadb33d8f..1ff2aab24e964 100644
->> > --- a/kernel/rcu/Kconfig
->> > +++ b/kernel/rcu/Kconfig
->> > @@ -332,4 +332,37 @@ config RCU_DOUBLE_CHECK_CB_TIME
->> >         Say Y here if you need tighter callback-limit enforcement.
->> >         Say N here if you are unsure.
->> >
->> > +config RCU_DYNTICKS_RANGE_BEGIN
->> > +	int
->> > +	depends on !RCU_EXPERT
->> > +	default 31 if !CONTEXT_TRACKING_WORK
->>
->> You'll note that this should be 30 really, because the lower *2* bits are
->> taken by the context state (CONTEXT_GUEST has a value of 3).
->>
->> This highlights the fragile part of this: the Kconfig values are hardcoded,
->> but they depend on CT_STATE_SIZE, CONTEXT_MASK and CONTEXT_WORK_MAX. The
->> static_assert() will at least capture any misconfiguration, but having that
->> enforced by the actual Kconfig ranges would be less awkward.
->>
->> Do we currently have a way of e.g. making a Kconfig file depend on and use
->> values generated by a C header?
->
-> Why not just have something like a boolean RCU_DYNTICKS_TORTURE Kconfig
-> option and let the C code work out what the number of bits should be?
->
-> I suppose that there might be a failure whose frequency depended on
-> the number of bits, which might be an argument for keeping something
-> like RCU_DYNTICKS_RANGE_BEGIN for fault isolation.  But still using
-> RCU_DYNTICKS_TORTURE for normal testing.
->
-> Thoughts?
->
+On 7/19/23 01:44, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
+> 
+> A KVM_MEM_PRIVATE memslot can include both fd-based private memory and
+> hva-based shared memory. Architecture code (like TDX code) can tell
+> whether the on-going fault is private or not. This patch adds a
+> 'is_private' field to kvm_page_fault to indicate this and architecture
+> code is expected to set it.
+> 
+> To handle page fault for such memslot, the handling logic is different
+> depending on whether the fault is private or shared. KVM checks if
+> 'is_private' matches the host's view of the page (maintained in
+> mem_attr_array).
+>    - For a successful match, private pfn is obtained with
+>      restrictedmem_get_page() and shared pfn is obtained with existing
+>      get_user_pages().
+>    - For a failed match, KVM causes a KVM_EXIT_MEMORY_FAULT exit to
+>      userspace. Userspace then can convert memory between private/shared
+>      in host's view and retry the fault.
+> 
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c          | 82 +++++++++++++++++++++++++++++++--
+>   arch/x86/kvm/mmu/mmu_internal.h |  3 ++
+>   arch/x86/kvm/mmu/mmutrace.h     |  1 +
+>   3 files changed, 81 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index aefe67185637..4cf73a579ee1 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3179,9 +3179,9 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+>   	return level;
+>   }
+>   
+> -int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> -			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> -			      int max_level)
+> +static int __kvm_mmu_max_mapping_level(struct kvm *kvm,
+> +				       const struct kvm_memory_slot *slot,
+> +				       gfn_t gfn, int max_level, bool is_private)
+>   {
+>   	struct kvm_lpage_info *linfo;
+>   	int host_level;
+> @@ -3193,6 +3193,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>   			break;
+>   	}
+>   
+> +	if (is_private)
+> +		return max_level;
+> +
+>   	if (max_level == PG_LEVEL_4K)
+>   		return PG_LEVEL_4K;
+>   
+> @@ -3200,6 +3203,16 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+>   	return min(host_level, max_level);
+>   }
+>   
+> +int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> +			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> +			      int max_level)
+> +{
+> +	bool is_private = kvm_slot_can_be_private(slot) &&
+> +			  kvm_mem_is_private(kvm, gfn);
+> +
+> +	return __kvm_mmu_max_mapping_level(kvm, slot, gfn, max_level, is_private);
+> +}
+> +
+>   void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   {
+>   	struct kvm_memory_slot *slot = fault->slot;
+> @@ -3220,8 +3233,9 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   	 * Enforce the iTLB multihit workaround after capturing the requested
+>   	 * level, which will be used to do precise, accurate accounting.
+>   	 */
+> -	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> -						     fault->gfn, fault->max_level);
+> +	fault->req_level = __kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> +						       fault->gfn, fault->max_level,
+> +						       fault->is_private);
+>   	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+>   		return;
+>   
+> @@ -4304,6 +4318,55 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>   	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
+>   }
+>   
+> +static inline u8 kvm_max_level_for_order(int order)
+> +{
+> +	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
+> +
+> +	MMU_WARN_ON(order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G) &&
+> +		    order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M) &&
+> +		    order != KVM_HPAGE_GFN_SHIFT(PG_LEVEL_4K));
+> +
+> +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
+> +		return PG_LEVEL_1G;
+> +
+> +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
+> +		return PG_LEVEL_2M;
+> +
+> +	return PG_LEVEL_4K;
+> +}
+> +
+> +static int kvm_do_memory_fault_exit(struct kvm_vcpu *vcpu,
+> +				    struct kvm_page_fault *fault)
+> +{
+> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> +	if (fault->is_private)
+> +		vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
+> +	else
+> +		vcpu->run->memory.flags = 0;
+> +	vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
+> +	vcpu->run->memory.size = PAGE_SIZE;
+> +	return RET_PF_USER;
+> +}
+> +
+> +static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
+> +				   struct kvm_page_fault *fault)
+> +{
+> +	int max_order, r;
+> +
+> +	if (!kvm_slot_can_be_private(fault->slot))
+> +		return kvm_do_memory_fault_exit(vcpu, fault);
+> +
+> +	r = kvm_gmem_get_pfn(vcpu->kvm, fault->slot, fault->gfn, &fault->pfn,
+> +			     &max_order);
+> +	if (r)
+> +		return r;
+> +
+> +	fault->max_level = min(kvm_max_level_for_order(max_order),
+> +			       fault->max_level);
+> +	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
+> +	return RET_PF_CONTINUE;
+> +}
+> +
+>   static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   {
+>   	struct kvm_memory_slot *slot = fault->slot;
+> @@ -4336,6 +4399,12 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   			return RET_PF_EMULATE;
+>   	}
+>   
+> +	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn))
+> +		return kvm_do_memory_fault_exit(vcpu, fault);
+> +
+> +	if (fault->is_private)
+> +		return kvm_faultin_pfn_private(vcpu, fault);
+> +
+>   	async = false;
+>   	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
+>   					  fault->write, &fault->map_writable,
+> @@ -5771,6 +5840,9 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+>   			return -EIO;
+>   	}
+>   
+> +	if (r == RET_PF_USER)
+> +		return 0;
+> +
+>   	if (r < 0)
+>   		return r;
+>   	if (r != RET_PF_EMULATE)
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index d39af5639ce9..268b517e88cb 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -203,6 +203,7 @@ struct kvm_page_fault {
+>   
+>   	/* Derived from mmu and global state.  */
+>   	const bool is_tdp;
+> +	const bool is_private;
+>   	const bool nx_huge_page_workaround_enabled;
+>   
+>   	/*
+> @@ -259,6 +260,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>    * RET_PF_RETRY: let CPU fault again on the address.
+>    * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
+>    * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
+> + * RET_PF_USER: need to exit to userspace to handle this fault.
+>    * RET_PF_FIXED: The faulting entry has been fixed.
+>    * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
+>    *
+> @@ -275,6 +277,7 @@ enum {
+>   	RET_PF_RETRY,
+>   	RET_PF_EMULATE,
+>   	RET_PF_INVALID,
+> +	RET_PF_USER,
+>   	RET_PF_FIXED,
+>   	RET_PF_SPURIOUS,
+>   };
+> diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+> index ae86820cef69..2d7555381955 100644
+> --- a/arch/x86/kvm/mmu/mmutrace.h
+> +++ b/arch/x86/kvm/mmu/mmutrace.h
+> @@ -58,6 +58,7 @@ TRACE_DEFINE_ENUM(RET_PF_CONTINUE);
+>   TRACE_DEFINE_ENUM(RET_PF_RETRY);
+>   TRACE_DEFINE_ENUM(RET_PF_EMULATE);
+>   TRACE_DEFINE_ENUM(RET_PF_INVALID);
+> +TRACE_DEFINE_ENUM(RET_PF_USER);
+>   TRACE_DEFINE_ENUM(RET_PF_FIXED);
+>   TRACE_DEFINE_ENUM(RET_PF_SPURIOUS);
+>   
 
-AFAICT if we run tests with the minimum possible width, then intermediate
-values shouldn't have much value.
-
-Your RCU_DYNTICKS_TORTURE suggestion sounds like a saner option than what I
-came up with, as we can let the context tracking code figure out the widths
-itself and not expose any of that to Kconfig.
-
->                                                       Thanx, Paul
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
