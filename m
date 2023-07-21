@@ -2,88 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46D2D75BDA8
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 07:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 046FE75BE55
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 08:09:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229687AbjGUFOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 01:14:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54706 "EHLO
+        id S230037AbjGUGI6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 02:08:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjGUFOf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 01:14:35 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C76B4;
-        Thu, 20 Jul 2023 22:14:30 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id A6AC3120005;
-        Fri, 21 Jul 2023 08:14:28 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A6AC3120005
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1689916468;
-        bh=jXyDCqsfMMXjbO3JqRO7qHqXix6vTOqbxRp8TsbtMa4=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=mj++7i8qQ68Rm3IgAPYBiVJwY1eMgoqndMsEFAgECq6DZo5Jkb7xOB8g2AzqrmWpW
-         wkCMM+7qLrLSaupQTEmmSBa8meSiUCd0rOiQ2nTCg14DlImw5+6BF3HHKCJblvzRcZ
-         EpE9F28SVHKux0JqKTc7MdonutzvED+COn5FIe4p3wF+zEsFSsPkM7yaQlA+gHCIRl
-         Ss3HUIOlxP09mjesACcBc05D4dgFdiOOksUaYJGwdeoUhwUBKiax++M87GXiqU93VR
-         Fc2GBrspigbqsH/4CeiV4YUtdAurnHi46JeT+IyTjJmOH5S5m1uHjfG32FgqrsjaXp
-         0lGetf4XXaLEA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Fri, 21 Jul 2023 08:14:28 +0300 (MSK)
-Received: from [192.168.0.12] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 21 Jul 2023 08:14:27 +0300
-Message-ID: <091c067b-43a0-da7f-265f-30c8c7e62977@sberdevices.ru>
-Date:   Fri, 21 Jul 2023 08:09:03 +0300
+        with ESMTP id S229699AbjGUGIy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 02:08:54 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF44E65;
+        Thu, 20 Jul 2023 23:08:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689919732; x=1721455732;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HRmxOEBLpq+hGP1cUw1x5RwSQJjvLGS0PpFiRHt3IVw=;
+  b=jglNLxz5nu6/Vh5tZIuwS/sFCP2RgtM9qIcDv5EFQqJXckcqGUV/4gZl
+   T8vidjLj7fyycODFbnOZuahTE+vLPl4l2O/9Ox1THuQbkduFsgfbdiCCl
+   avaU68VdOreLfO1xyu1Hyo23puknRatYeq9OTTe+M/beIm+FFXOrUifWz
+   Rv2bPuEVtwIxHPRQ0MTz+3QPMQJY9Q/gTlv2cgegFqesNyGuepqQ550xA
+   9ICn6oKEY49EZ8wQ25XiWxFVqmS1qTC5SAzvE0Z8K/03MSYXGyl93KZFo
+   f5sH7njaKNyZyVhRRpXyJefM2qsJda4fdgn2EAsyjGL/cm0fljJvJqC5a
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="370547507"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="370547507"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848721860"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="848721860"
+Received: from embargo.jf.intel.com ([10.165.9.183])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:40 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        john.allen@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rick.p.edgecombe@intel.com, chao.gao@intel.com,
+        binbin.wu@linux.intel.com, weijiang.yang@intel.com
+Subject: [PATCH v4 00/20] Enable CET Virtualization
+Date:   Thu, 20 Jul 2023 23:03:32 -0400
+Message-Id: <20230721030352.72414-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v3 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Content-Language: en-US
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230720214245.457298-1-AVKrasnov@sberdevices.ru>
- <20230720214245.457298-5-AVKrasnov@sberdevices.ru>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <20230720214245.457298-5-AVKrasnov@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178763 [Jul 20 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_from_domain_doesnt_match_to}, sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/21 02:06:00 #21650757
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,449 +60,230 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Control-flow Enforcement Technology (CET) is a kind of CPU feature used
+to prevent Return/CALL/Jump-Oriented Programming (ROP/COP/JOP) attacks.
+It provides two sub-features(SHSTK,IBT) to defend against ROP/COP/JOP
+style control-flow subversion attacks.
+
+Shadow Stack (SHSTK):
+  A shadow stack is a second stack used exclusively for control transfer
+  operations. The shadow stack is separate from the data/normal stack and
+  can be enabled individually in user and kernel mode. When shadow stack
+  is enabled, CALL pushes the return address on both the data and shadow
+  stack. RET pops the return address from both stacks and compares them.
+  If the return addresses from the two stacks do not match, the processor
+  generates a #CP.
+
+Indirect Branch Tracking (IBT):
+  IBT introduces new instruction(ENDBRANCH)to mark valid target addresses of
+  indirect branches (CALL, JMP etc...). If an indirect branch is executed
+  and the next instruction is _not_ an ENDBRANCH, the processor generates a
+  #CP. These instruction behaves as a NOP on platforms that doesn't support
+  CET.
 
 
-On 21.07.2023 00:42, Arseniy Krasnov wrote:
-> This adds handling of MSG_ZEROCOPY flag on transmission path: if this
-> flag is set and zerocopy transmission is possible (enabled in socket
-> options and transport allows zerocopy), then non-linear skb will be
-> created and filled with the pages of user's buffer. Pages of user's
-> buffer are locked in memory by 'get_user_pages()'. Second thing that
-> this patch does is replace type of skb owning: instead of calling
-> 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
-> change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
-> of socket, so to decrease this field correctly proper skb destructor is
-> needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
-> 
-> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> ---
->  Changelog:
->  v5(big patchset) -> v1:
->   * Refactorings of 'if' conditions.
->   * Remove extra blank line.
->   * Remove 'frag_off' field unneeded init.
->   * Add function 'virtio_transport_fill_skb()' which fills both linear
->     and non-linear skb with provided data.
->  v1 -> v2:
->   * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
->  v2 -> v3:
->   * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
->     provided 'iov_iter' with data could be sent in a zerocopy mode.
->     If this callback is not set in transport - transport allows to send
->     any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
->     then zerocopy is allowed. Reason of this callback is that in case of
->     G2H transmission we insert whole skb to the tx virtio queue and such
->     skb must fit to the size of the virtio queue to be sent in a single
->     iteration (may be tx logic in 'virtio_transport.c' could be reworked
->     as in vhost to support partial send of current skb). This callback
->     will be enabled only for G2H path. For details pls see comment 
->     'Check that tx queue...' below.
-> 
->  include/net/af_vsock.h                  |   3 +
->  net/vmw_vsock/virtio_transport.c        |  39 ++++
->  net/vmw_vsock/virtio_transport_common.c | 257 ++++++++++++++++++------
->  3 files changed, 241 insertions(+), 58 deletions(-)
-> 
-> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> index 0e7504a42925..a6b346eeeb8e 100644
-> --- a/include/net/af_vsock.h
-> +++ b/include/net/af_vsock.h
-> @@ -177,6 +177,9 @@ struct vsock_transport {
->  
->  	/* Read a single skb */
->  	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
-> +
-> +	/* Zero-copy. */
-> +	bool (*msgzerocopy_check_iov)(const struct iov_iter *);
->  };
->  
->  /**** CORE ****/
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index 7bbcc8093e51..23cb8ed638c4 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -442,6 +442,43 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
->  	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->  }
->  
-> +static bool virtio_transport_msgzerocopy_check_iov(const struct iov_iter *iov)
-> +{
-> +	struct virtio_vsock *vsock;
-> +	bool res = false;
-> +
-> +	rcu_read_lock();
-> +
-> +	vsock = rcu_dereference(the_virtio_vsock);
-> +	if (vsock) {
-> +		struct virtqueue *vq;
-> +		int iov_pages;
-> +
-> +		vq = vsock->vqs[VSOCK_VQ_TX];
-> +
-> +		iov_pages = round_up(iov->count, PAGE_SIZE) / PAGE_SIZE;
-> +
-> +		/* Check that tx queue is large enough to keep whole
-> +		 * data to send. This is needed, because when there is
-> +		 * not enough free space in the queue, current skb to
-> +		 * send will be reinserted to the head of tx list of
-> +		 * the socket to retry transmission later, so if skb
-> +		 * is bigger than whole queue, it will be reinserted
-> +		 * again and again, thus blocking other skbs to be sent.
-> +		 * Each page of the user provided buffer will be added
-> +		 * as a single buffer to the tx virtqueue, so compare
-> +		 * number of pages against maximum capacity of the queue.
-> +		 * +1 means buffer for the packet header.
-> +		 */
-> +		if (iov_pages + 1 <= vq->num_max)
+Dependency:
+--------------------------------------------------------------------------
+The first 2 patches are taken over from CET native series[1] in kernel tip.
+They're prerequisites for this KVM patch series as CET user mode xstate and
+some feature bits are defined in the patches. Add this KVM series to kernel
+tree to build qualified host kernel to support guest CET features. Also apply
+QEMU CET enabling patches[2] to build qualified QEMU. These kernel dependent
+patches will be enclosed in KVM series until CET native series is merged in
+mainline tree.
 
-I think this check is actual only for case one we don't have indirect buffer feature.
-With indirect mode whole data to send will be packed into one indirect buffer.
 
-Thanks, Arseniy
+Implementation:
+--------------------------------------------------------------------------
+This series enables full support for guest CET SHSTK/IBT register states,
+i.e., CET register states in below usage models are backed by KVM.
 
-> +			res = true;
-> +	}
-> +
-> +	rcu_read_unlock();
-> +
-> +	return res;
-> +}
-> +
->  static bool virtio_transport_seqpacket_allow(u32 remote_cid);
->  
->  static struct virtio_transport virtio_transport = {
-> @@ -475,6 +512,8 @@ static struct virtio_transport virtio_transport = {
->  		.seqpacket_allow          = virtio_transport_seqpacket_allow,
->  		.seqpacket_has_data       = virtio_transport_seqpacket_has_data,
->  
-> +		.msgzerocopy_check_iov	  = virtio_transport_msgzerocopy_check_iov,
-> +
->  		.notify_poll_in           = virtio_transport_notify_poll_in,
->  		.notify_poll_out          = virtio_transport_notify_poll_out,
->  		.notify_recv_init         = virtio_transport_notify_recv_init,
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 26a4d10da205..e4e3d541aff4 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -37,73 +37,122 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
->  	return container_of(t, struct virtio_transport, transport);
->  }
->  
-> -/* Returns a new packet on success, otherwise returns NULL.
-> - *
-> - * If NULL is returned, errp is set to a negative errno.
-> - */
-> -static struct sk_buff *
-> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-> -			   size_t len,
-> -			   u32 src_cid,
-> -			   u32 src_port,
-> -			   u32 dst_cid,
-> -			   u32 dst_port)
-> -{
-> -	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
-> -	struct virtio_vsock_hdr *hdr;
-> -	struct sk_buff *skb;
-> -	void *payload;
-> -	int err;
-> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
-> +				       size_t max_to_send)
-> +{
-> +	const struct vsock_transport *t;
-> +	struct iov_iter *iov_iter;
->  
-> -	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> -	if (!skb)
-> -		return NULL;
-> +	if (!info->msg)
-> +		return false;
->  
-> -	hdr = virtio_vsock_hdr(skb);
-> -	hdr->type	= cpu_to_le16(info->type);
-> -	hdr->op		= cpu_to_le16(info->op);
-> -	hdr->src_cid	= cpu_to_le64(src_cid);
-> -	hdr->dst_cid	= cpu_to_le64(dst_cid);
-> -	hdr->src_port	= cpu_to_le32(src_port);
-> -	hdr->dst_port	= cpu_to_le32(dst_port);
-> -	hdr->flags	= cpu_to_le32(info->flags);
-> -	hdr->len	= cpu_to_le32(len);
-> +	iov_iter = &info->msg->msg_iter;
->  
-> -	if (info->msg && len > 0) {
-> -		payload = skb_put(skb, len);
-> -		err = memcpy_from_msg(payload, info->msg, len);
-> -		if (err)
-> -			goto out;
-> +	t = vsock_core_get_transport(info->vsk);
->  
-> -		if (msg_data_left(info->msg) == 0 &&
-> -		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
-> -			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-> +	if (t->msgzerocopy_check_iov &&
-> +	    !t->msgzerocopy_check_iov(iov_iter))
-> +		return false;
->  
-> -			if (info->msg->msg_flags & MSG_EOR)
-> -				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
-> -		}
-> +	/* Data is simple buffer. */
-> +	if (iter_is_ubuf(iov_iter))
-> +		return true;
-> +
-> +	if (!iter_is_iovec(iov_iter))
-> +		return false;
-> +
-> +	if (iov_iter->iov_offset)
-> +		return false;
-> +
-> +	/* We can't send whole iov. */
-> +	if (iov_iter->count > max_to_send)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
-> +					   struct sk_buff *skb,
-> +					   struct msghdr *msg,
-> +					   bool zerocopy)
-> +{
-> +	struct ubuf_info *uarg;
-> +
-> +	if (msg->msg_ubuf) {
-> +		uarg = msg->msg_ubuf;
-> +		net_zcopy_get(uarg);
-> +	} else {
-> +		struct iov_iter *iter = &msg->msg_iter;
-> +		struct ubuf_info_msgzc *uarg_zc;
-> +		int len;
-> +
-> +		/* Only ITER_IOVEC or ITER_UBUF are allowed and
-> +		 * checked before.
-> +		 */
-> +		if (iter_is_iovec(iter))
-> +			len = iov_length(iter->__iov, iter->nr_segs);
-> +		else
-> +			len = iter->count;
-> +
-> +		uarg = msg_zerocopy_realloc(sk_vsock(vsk),
-> +					    len,
-> +					    NULL);
-> +		if (!uarg)
-> +			return -1;
-> +
-> +		uarg_zc = uarg_to_msgzc(uarg);
-> +		uarg_zc->zerocopy = zerocopy ? 1 : 0;
->  	}
->  
-> -	if (info->reply)
-> -		virtio_vsock_skb_set_reply(skb);
-> +	skb_zcopy_init(skb, uarg);
->  
-> -	trace_virtio_transport_alloc_pkt(src_cid, src_port,
-> -					 dst_cid, dst_port,
-> -					 len,
-> -					 info->type,
-> -					 info->op,
-> -					 info->flags);
-> +	return 0;
-> +}
->  
-> -	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
-> -		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
-> -		goto out;
-> +static int virtio_transport_fill_skb(struct sk_buff *skb,
-> +				     struct virtio_vsock_pkt_info *info,
-> +				     size_t len,
-> +				     bool zcopy)
-> +{
-> +	if (zcopy) {
-> +		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
-> +					      &info->msg->msg_iter,
-> +					      len);
-> +	} else {
-> +		void *payload;
-> +		int err;
-> +
-> +		payload = skb_put(skb, len);
-> +		err = memcpy_from_msg(payload, info->msg, len);
-> +		if (err)
-> +			return -1;
-> +
-> +		if (msg_data_left(info->msg))
-> +			return 0;
-> +
-> +		return 0;
->  	}
-> +}
->  
-> -	return skb;
-> +static void virtio_transport_init_hdr(struct sk_buff *skb,
-> +				      struct virtio_vsock_pkt_info *info,
-> +				      u32 src_cid,
-> +				      u32 src_port,
-> +				      u32 dst_cid,
-> +				      u32 dst_port,
-> +				      size_t len)
-> +{
-> +	struct virtio_vsock_hdr *hdr;
->  
-> -out:
-> -	kfree_skb(skb);
-> -	return NULL;
-> +	hdr = virtio_vsock_hdr(skb);
-> +	hdr->type	= cpu_to_le16(info->type);
-> +	hdr->op		= cpu_to_le16(info->op);
-> +	hdr->src_cid	= cpu_to_le64(src_cid);
-> +	hdr->dst_cid	= cpu_to_le64(dst_cid);
-> +	hdr->src_port	= cpu_to_le32(src_port);
-> +	hdr->dst_port	= cpu_to_le32(dst_port);
-> +	hdr->flags	= cpu_to_le32(info->flags);
-> +	hdr->len	= cpu_to_le32(len);
->  }
->  
->  static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
-> @@ -214,6 +263,70 @@ static u16 virtio_transport_get_type(struct sock *sk)
->  		return VIRTIO_VSOCK_TYPE_SEQPACKET;
->  }
->  
-> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
-> +						  struct virtio_vsock_pkt_info *info,
-> +						  size_t payload_len,
-> +						  bool zcopy,
-> +						  u32 src_cid,
-> +						  u32 src_port,
-> +						  u32 dst_cid,
-> +						  u32 dst_port)
-> +{
-> +	struct sk_buff *skb;
-> +	size_t skb_len;
-> +
-> +	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
-> +
-> +	if (!zcopy)
-> +		skb_len += payload_len;
-> +
-> +	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> +	if (!skb)
-> +		return NULL;
-> +
-> +	virtio_transport_init_hdr(skb, info, src_cid, src_port,
-> +				  dst_cid, dst_port,
-> +				  payload_len);
-> +
-> +	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
-> +	 * owner of skb without check to update 'sk_wmem_alloc'.
-> +	 */
-> +	if (vsk)
-> +		skb_set_owner_w(skb, sk_vsock(vsk));
-> +
-> +	if (info->msg && payload_len > 0) {
-> +		int err;
-> +
-> +		err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
-> +		if (err)
-> +			goto out;
-> +
-> +		if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
-> +			struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-> +
-> +			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-> +
-> +			if (info->msg->msg_flags & MSG_EOR)
-> +				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
-> +		}
-> +	}
-> +
-> +	if (info->reply)
-> +		virtio_vsock_skb_set_reply(skb);
-> +
-> +	trace_virtio_transport_alloc_pkt(src_cid, src_port,
-> +					 dst_cid, dst_port,
-> +					 payload_len,
-> +					 info->type,
-> +					 info->op,
-> +					 info->flags);
-> +
-> +	return skb;
-> +out:
-> +	kfree_skb(skb);
-> +	return NULL;
-> +}
-> +
->  /* This function can only be used on connecting/connected sockets,
->   * since a socket assigned to a transport is required.
->   *
-> @@ -222,10 +335,12 @@ static u16 virtio_transport_get_type(struct sock *sk)
->  static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  					  struct virtio_vsock_pkt_info *info)
->  {
-> +	u32 max_skb_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
->  	u32 src_cid, src_port, dst_cid, dst_port;
->  	const struct virtio_transport *t_ops;
->  	struct virtio_vsock_sock *vvs;
->  	u32 pkt_len = info->pkt_len;
-> +	bool can_zcopy = false;
->  	u32 rest_len;
->  	int ret;
->  
-> @@ -254,15 +369,30 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
->  		return pkt_len;
->  
-> +	if (info->msg) {
-> +		/* If zerocopy is not enabled by 'setsockopt()', we behave as
-> +		 * there is no MSG_ZEROCOPY flag set.
-> +		 */
-> +		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
-> +			info->msg->msg_flags &= ~MSG_ZEROCOPY;
-> +
-> +		if (info->msg->msg_flags & MSG_ZEROCOPY)
-> +			can_zcopy = virtio_transport_can_zcopy(info, pkt_len);
-> +
-> +		if (can_zcopy)
-> +			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
-> +					    (MAX_SKB_FRAGS * PAGE_SIZE));
-> +	}
-> +
->  	rest_len = pkt_len;
->  
->  	do {
->  		struct sk_buff *skb;
->  		size_t skb_len;
->  
-> -		skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
-> +		skb_len = min(max_skb_len, rest_len);
->  
-> -		skb = virtio_transport_alloc_skb(info, skb_len,
-> +		skb = virtio_transport_alloc_skb(vsk, info, skb_len, can_zcopy,
->  						 src_cid, src_port,
->  						 dst_cid, dst_port);
->  		if (!skb) {
-> @@ -270,6 +400,17 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->  			break;
->  		}
->  
-> +		/* This is last skb to send this portion of data. */
-> +		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
-> +		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
-> +			if (virtio_transport_init_zcopy_skb(vsk, skb,
-> +							    info->msg,
-> +							    can_zcopy)) {
-> +				ret = -ENOMEM;
-> +				break;
-> +			}
-> +		}
-> +
->  		virtio_transport_inc_tx_pkt(vvs, skb);
->  
->  		ret = t_ops->send_pkt(skb);
-> @@ -934,7 +1075,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
->  	if (!t)
->  		return -ENOTCONN;
->  
-> -	reply = virtio_transport_alloc_skb(&info, 0,
-> +	reply = virtio_transport_alloc_skb(NULL, &info, 0, false,
->  					   le64_to_cpu(hdr->dst_cid),
->  					   le32_to_cpu(hdr->dst_port),
->  					   le64_to_cpu(hdr->src_cid),
+                  |
+    User SHSTK    |    User IBT      (user mode)
+--------------------------------------------------
+    Kernel SHSTK  |    Kernel IBT    (kernel mode)
+                  |
+
+KVM cooperates with host kernel to back CET register states in each model.
+In this series, KVM manages guest CET kernel registers(MSRs) by itself and
+relies on host kernel to manage the user mode registers, thus KVM relies on
+capability from host XSS MSR before exposes CET features to guest.
+
+Note, guest supervisor(kernel) SHSTK cannot be fully supported by this series,
+therefore guest SSS_CET bit of CPUID(0x7,1):EDX[bit18] is cleared. Check SDM
+(Vol 1, Section 17.2.3) for details.
+
+
+CET states management:
+--------------------------------------------------------------------------
+CET user mode states, MSR_IA32_{U_CET,PL3_SSP}, depends on {XSAVES,XRSTORS}
+instructions to swap guest and host's states. On vmexit, guest user states
+are saved to guest fpu area and host user mode states are loaded from thread
+context before vCPU returns to userspace, vice-versa on vmentry. See details
+in kvm_{load,put}_guest_fpu(). So CET user mode states management depends on
+CET user mode bit(U_CET bit) set in host XSS MSR.
+
+CET supervisor mode states are grouped into two categories : XSAVE-managed
+and non-XSAVE-managed, the former includes MSR_IA32_PL{0,1,2}_SSP and are
+controlled by CET supervisor mode bit(S_CET bit) in XSS, the later consists
+of MSR_IA32_S_CET and MSR_IA32_INTR_SSP_TBL.
+
+The XSAVE-managed supervisor states theoretically can be handled by enabling
+S_CET bit in host XSS. But given the fact supervisor shadow stack isn't enabled
+in Linux kernel, enabling the control bit just like that for user mode states
+has global side-effects to all threads/tasks running on host, i.e.:
+1) Introducing unnecessary XSAVE operation when switch to non-vCPU userspace
+within current FPU framework.
+2)Forcing allocating additional space for CET supervisor states in each thread
+context regardless whether it's vCPU thread or not.
+
+To avoid these downsides, this series provides a KVM solution to save/reload
+vCPU's supervisor SHSTK states.
+
+VMX introduces new VMCS fields, {GUEST|HOST}_{S_CET,SSP,INTR_SSP_TABL}, to
+facilitate guest/host non-XSAVES-managed states. When VMX CET entry/exit load
+bits are set, guest/host MSR_IA32_{S_CET,INTR_SSP_TBL,SSP} are loaded from
+equivalent fields at vm-exit/entry. With these new fields, such supervisor states
+require no addtional KVM save/reload actions.
+
+
+Tests:
+--------------------------------------------------------------------------
+This series passed basic CET user shadow stack test and kernel IBT test in L1 and
+L2 guest.
+
+The patch series _has_ impact to existing vmx test cases in KVM-unit-tests,the
+failures have been fixed in this patch[3].
+
+All other parts of KVM unit-tests and selftests passed with this series. One new
+selftest app for CET MSRs is posted here[4].
+
+To run user SHSTK test and kernel IBT test in guest , an CET capable
+platform is required, e.g., Sapphire Rapids server, and follow below steps to
+build host/guest kernel properly:
+
+1. Build host kernel: Add this series to kernel tree and build kernel.
+
+2. Build guest kernel: Add full CET _native_ series to kernel tree and opt-in
+CONFIG_X86_KERNEL_IBT and CONFIG_X86_USER_SHADOW_STACK options. Build with CET
+enabled gcc versions(>= 8.5.0).
+
+3. Use patched QEMU to launch a guest.
+
+Check kernel selftest test_shadow_stack_64 output:
+
+[INFO]  new_ssp = 7f8c82100ff8, *new_ssp = 7f8c82101001
+[INFO]  changing ssp from 7f8c82900ff0 to 7f8c82100ff8
+[INFO]  ssp is now 7f8c82101000
+[OK]    Shadow stack pivot
+[OK]    Shadow stack faults
+[INFO]  Corrupting shadow stack
+[INFO]  Generated shadow stack violation successfully
+[OK]    Shadow stack violation test
+[INFO]  Gup read -> shstk access success
+[INFO]  Gup write -> shstk access success
+[INFO]  Violation from normal write
+[INFO]  Gup read -> write access success
+[INFO]  Violation from normal write
+[INFO]  Gup write -> write access success
+[INFO]  Cow gup write -> write access success
+[OK]    Shadow gup test
+[INFO]  Violation from shstk access
+[OK]    mprotect() test
+[SKIP]  Userfaultfd unavailable.
+[OK]    32 bit test
+
+
+Check kernel IBT with dmesg | grep CET:
+
+CET detected: Indirect Branch Tracking enabled
+
+--------------------------------------------------------------------------
+
+Changes in v4:
+1. Overhauled v3 series[5] per community review feedback. [Sean, Chao, Binbin etc.]
+2. Modified CET dependency checks on host side before expose the features.
+3. Added KVM specific solution for save/reload guest CET SHSTK supervisor states.
+4. Rebase on kvm-x86/next [6].
+
+
+[1]: CET native series: https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/log/?h=x86/shstk
+[2]: QEMU patch: https://lore.kernel.org/all/20230720111445.99509-1-weijiang.yang@intel.com/
+[3]: KVM-unit-tests fixup: https://lore.kernel.org/all/20230720115810.104890-1-weijiang.yang@intel.com/ 
+[4]: Selftests for CET MSRs: https://lore.kernel.org/all/20230720120401.105770-1-weijiang.yang@intel.com/ 
+[5]: v3 patchset: https://lore.kernel.org/all/20230511040857.6094-1-weijiang.yang@intel.com/
+[6]: Rebase branch: https://github.com/kvm-x86/linux/releases/tag/kvm-x86-next-2023.06.22
+
+
+Patch 1-2: Native dependent CET patches.
+Patch 3-5: Enable XSS support in KVM.
+Patch 6 :  Prepare patch for XSAVE-managed MSR access
+Patch 7-11:  Common patches to support CET on x86.
+Patch 12-18: VMX specific patches to support CET.
+Patch 19-20: nVMX patches for CET support in nested VM.
+
+-----------------------------------------------------------------------------
+
+Rick Edgecombe (2):
+  x86/cpufeatures: Add CPU feature flags for shadow stacks
+  x86/fpu/xstate: Introduce CET MSR and XSAVES supervisor states
+
+Sean Christopherson (2):
+  KVM:x86: Report XSS as to-be-saved if there are supported features
+  KVM:x86: Load guest FPU state when access XSAVE-managed MSRs
+
+Yang Weijiang (16):
+  KVM:x86: Refresh CPUID on write to guest MSR_IA32_XSS
+  KVM:x86: Initialize kvm_caps.supported_xss
+  KVM:x86: Add fault checks for guest CR4.CET setting
+  KVM:x86: Report KVM supported CET MSRs as to-be-saved
+  KVM:x86: Add common code of CET MSR access
+  KVM:x86: Make guest supervisor states as non-XSAVE managed
+  KVM:x86: Save and reload GUEST_SSP to/from SMRAM
+  KVM:VMX: Introduce CET VMCS fields and control bits
+  KVM:VMX: Emulate read and write to CET MSRs
+  KVM:VMX: Set up interception for CET MSRs
+  KVM:VMX: Save host MSR_IA32_S_CET to VMCS field
+  KVM:x86: Optimize CET supervisor SSP save/reload
+  KVM:x86: Enable CET virtualization for VMX and advertise to userspace
+  KVM:x86: Enable guest CET supervisor xstate bit support
+  KVM:nVMX: Refine error code injection to nested VM
+  KVM:nVMX: Enable CET support for nested VM
+
+ arch/arm64/include/asm/kvm_host.h        |   1 +
+ arch/mips/include/asm/kvm_host.h         |   1 +
+ arch/powerpc/include/asm/kvm_host.h      |   1 +
+ arch/riscv/include/asm/kvm_host.h        |   1 +
+ arch/s390/include/asm/kvm_host.h         |   1 +
+ arch/x86/include/asm/cpufeatures.h       |   2 +
+ arch/x86/include/asm/disabled-features.h |   8 +-
+ arch/x86/include/asm/fpu/types.h         |  16 +-
+ arch/x86/include/asm/fpu/xstate.h        |   6 +-
+ arch/x86/include/asm/kvm_host.h          |   6 +-
+ arch/x86/include/asm/msr-index.h         |   1 +
+ arch/x86/include/asm/vmx.h               |   8 +
+ arch/x86/include/uapi/asm/kvm_para.h     |   1 +
+ arch/x86/kernel/cpu/cpuid-deps.c         |   1 +
+ arch/x86/kernel/fpu/xstate.c             |  90 +++++----
+ arch/x86/kvm/cpuid.c                     |  32 +++-
+ arch/x86/kvm/cpuid.h                     |  10 +
+ arch/x86/kvm/smm.c                       |  17 ++
+ arch/x86/kvm/smm.h                       |   2 +-
+ arch/x86/kvm/vmx/capabilities.h          |  10 +
+ arch/x86/kvm/vmx/nested.c                |  49 ++++-
+ arch/x86/kvm/vmx/nested.h                |   7 +
+ arch/x86/kvm/vmx/vmcs12.c                |   6 +
+ arch/x86/kvm/vmx/vmcs12.h                |  14 +-
+ arch/x86/kvm/vmx/vmx.c                   | 134 ++++++++++++-
+ arch/x86/kvm/vmx/vmx.h                   |   6 +-
+ arch/x86/kvm/x86.c                       | 228 +++++++++++++++++++++--
+ arch/x86/kvm/x86.h                       |  31 +++
+ include/linux/kvm_host.h                 |   1 +
+ virt/kvm/kvm_main.c                      |   1 +
+ 30 files changed, 606 insertions(+), 86 deletions(-)
+
+
+base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+-- 
+2.27.0
+
