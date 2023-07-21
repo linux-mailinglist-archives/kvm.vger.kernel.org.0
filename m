@@ -2,117 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B3E175CADE
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 17:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 704A775CAE9
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 17:06:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbjGUPDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 11:03:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41144 "EHLO
+        id S231714AbjGUPGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 11:06:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229828AbjGUPDt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 11:03:49 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C8619B6
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:03:47 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-ccabb20111dso1948867276.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 08:03:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689951827; x=1690556627;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wGn4OEfk0vlFKfnPCtDfZtJXmjzGnHvHPk0kd4K2tXA=;
-        b=Ioebs51XNQGVx+HNBJD56Sq5VN01fat7uctItv+GLEJ+TONxR28cDNyHCFwj+WROYW
-         rJ6Bp4gf6/SLJ/F8NiWPU0pvVSPXHJtJNW0XeHbBpgQHNFAl/DPRrfpBakuYhOHtW9/q
-         R72bG9sDjZoBH3Iops33gju1DTZ4RGFD3+CujnoNO7nbFIyUZelmRmvnslZzEauowKtQ
-         GCTvI3o2LtyiNZMphqusgubRpB6iqtwwMgc64UgRb+azFcgFCuzEkdztUXVhKeN/v5NW
-         /Lc+XFZUoVQa92AOkSU1WBBzOs5Uf+yJmhmMXfjdP8hE+xocPiThIxKvVEl3YZXDKjNT
-         vukQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689951827; x=1690556627;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wGn4OEfk0vlFKfnPCtDfZtJXmjzGnHvHPk0kd4K2tXA=;
-        b=CjyoIlmACHq7zPFyd0qj2U+nbXZhA9NToBPGVt8MS5VJSHlYgvcEmm3B9qIG1fRolf
-         nsSLIPPFFE7oYKv2sUn6i2djyX4EwOS4E7yhnag8FEQg/rsJvb8JHSluAe63S7PbVbHs
-         xzoVEa3kjyKbLOrdEC09+C9zrxYUvsFMQH8vZ/7UEt3uzxswwNKAb0kzOPbx+xNYT71/
-         0zm5k8Lclfd53c7LqPgYXayCRUk/pIxpFUugu02tzSwyrknXqteXk1uuU/FDsQ/CCoSe
-         PaHgAzmvdVujmto+7b/uOPA2HlbxYX/ENnkAmOYSWiQ1inzq95nB31SptJREp9Gc7wVF
-         /nGw==
-X-Gm-Message-State: ABy/qLbbADt8sYq341VpXn1HDlbh/rAiEU8unImxGZrPaEti3EXfKn4e
-        MPectRZjJaPfOZceeuLkD7uNHpsHjP4=
-X-Google-Smtp-Source: APBJJlFJfUKU5XpPQmS1+W0Z0ow8sVEzJhMr/4/s/4mlG4MeWZohLWBxPcVay/b6xljyRIT8cJuteIPJI3U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:aa05:0:b0:cf0:e2a2:eb3b with SMTP id
- s5-20020a25aa05000000b00cf0e2a2eb3bmr13141ybi.4.1689951827185; Fri, 21 Jul
- 2023 08:03:47 -0700 (PDT)
-Date:   Fri, 21 Jul 2023 08:03:45 -0700
-In-Reply-To: <e84129b1-603b-a6c4-ade5-8cf529929675@linux.intel.com>
-Mime-Version: 1.0
-References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
- <20230719144131.29052-3-binbin.wu@linux.intel.com> <20230720235352.GH25699@ls.amr.corp.intel.com>
- <e84129b1-603b-a6c4-ade5-8cf529929675@linux.intel.com>
-Message-ID: <ZLqeUXerpNlri7Px@google.com>
-Subject: Re: [PATCH v10 2/9] KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to
- check CR3's legality
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        chao.gao@intel.com, kai.huang@intel.com, David.Laight@aculab.com,
-        robert.hu@linux.intel.com, guang.zeng@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231608AbjGUPGO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 11:06:14 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC0B272D;
+        Fri, 21 Jul 2023 08:06:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689951969; x=1721487969;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=m75I2ERfRQTCcOTwNioBlzNNFor8J6AUk5uhhkX1LBE=;
+  b=HV1hDVUXXxHNKGHSLiWMASWpKJTbWXXhsIgybOlfnfS7NGRwiAantlbp
+   HGAwvEtCKk6nYHjCmjD1aa9K19ev5YmtZGVHAGEIXhH1ZqzJ9FuqVfZw7
+   D+ZiEciWJFCgHtTunz+5T1Lio/SHBmLhx9UUimj72t5nLpulGuJ8PHpIk
+   ty3QgV93fCeZHKspp2TuX2grSiV52ixrwsT/krgDdjo1ianUxCXMYT/C3
+   ZD4NLybRXJEUJxiYFtfGuF33s3Lk7O9saW94rSIdT9TuABI3Ei33GKrCJ
+   kFd1GmZtn1FKq/e3zlyaIwRiMC5z83oRT1gTnNW2hToAFo2SX3R6/f5KG
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="430835138"
+X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
+   d="scan'208";a="430835138"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 08:06:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10778"; a="790229682"
+X-IronPort-AV: E=Sophos;i="6.01,222,1684825200"; 
+   d="scan'208";a="790229682"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 08:05:57 -0700
+Message-ID: <fdc155f5-041b-a1b1-15aa-8f970180a13a@intel.com>
+Date:   Fri, 21 Jul 2023 23:05:53 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-13-seanjc@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 21, 2023, Binbin Wu wrote:
-> 
-> 
-> On 7/21/2023 7:53 AM, Isaku Yamahata wrote:
-> > On Wed, Jul 19, 2023 at 10:41:24PM +0800,
-> > Binbin Wu <binbin.wu@linux.intel.com> wrote:
-> > 
-> > > Add and use kvm_vcpu_is_legal_cr3() to check CR3's legality to provide
-> > > a clear distinction b/t CR3 and GPA checks. So that kvm_vcpu_is_legal_cr3()
-> > > can be adjusted according to new feature(s).
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> > > ---
-> > >   arch/x86/kvm/cpuid.h      | 5 +++++
-> > >   arch/x86/kvm/svm/nested.c | 4 ++--
-> > >   arch/x86/kvm/vmx/nested.c | 4 ++--
-> > >   arch/x86/kvm/x86.c        | 4 ++--
-> > >   4 files changed, 11 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> > > index f61a2106ba90..8b26d946f3e3 100644
-> > > --- a/arch/x86/kvm/cpuid.h
-> > > +++ b/arch/x86/kvm/cpuid.h
-> > > @@ -283,4 +283,9 @@ static __always_inline bool guest_can_use(struct kvm_vcpu *vcpu,
-> > >   	return vcpu->arch.governed_features.enabled & kvm_governed_feature_bit(x86_feature);
-> > >   }
-> > > +static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-> > > +{
-> > > +	return kvm_vcpu_is_legal_gpa(vcpu, cr3);
-> > > +}
-> > > +
-> > The remaining user of kvm_vcpu_is_illegal_gpa() is one left.  Can we remove it
-> > by replacing !kvm_vcpu_is_legal_gpa()?
-> 
-> There are still two callsites of kvm_vcpu_is_illegal_gpa() left (basing on
-> Linux 6.5-rc2), in handle_ept_violation() and nested_vmx_check_eptp().
-> But they could be replaced by !kvm_vcpu_is_legal_gpa() and then remove
-> kvm_vcpu_is_illegal_gpa().
-> I am neutral to this.
+On 7/19/2023 7:44 AM, Sean Christopherson wrote:
+> @@ -6255,12 +6298,17 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+>   	if (r)
+>   		goto err_async_pf;
+>   
+> +	r = kvm_gmem_init();
+> +	if (r)
+> +		goto err_gmem;
+> +
+>   	kvm_chardev_ops.owner = module;
+>   
+>   	kvm_preempt_ops.sched_in = kvm_sched_in;
+>   	kvm_preempt_ops.sched_out = kvm_sched_out;
+>   
+>   	kvm_init_debug();
+> +	kvm_gmem_init();
 
-I'm largely neutral on this as well, though I do like the idea of having only
-"legal" APIs.  I think it makes sense to throw together a patch, we can always
-ignore the patch if end we up deciding to keep kvm_vcpu_is_illegal_gpa().
+why kvm_gmem_init() needs to be called again? by mistake?
