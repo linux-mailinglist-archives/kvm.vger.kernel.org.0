@@ -2,151 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E8AA75C13C
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 10:18:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DA1375C1D8
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 10:39:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231474AbjGUISx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 04:18:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
+        id S230264AbjGUIjT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 04:39:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231475AbjGUISu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 04:18:50 -0400
+        with ESMTP id S229786AbjGUIjS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 04:39:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3C5AA
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 01:18:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E632D51
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 01:38:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1689927482;
+        s=mimecast20190719; t=1689928712;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wWAtfDt+4FFr8z2L0240XKTF6ityOHMPZsX6cXcmsiA=;
-        b=C756oBKR2e53s64qZeV+zKpr1xZ7ILv/jNAx5LeduQAIpBfUfHzHE46TIPgufaQWIvzPcw
-        4TFB9XM8V4/OQxapVtVUmd9qTO2eBrlJBqEe0YdwhKZzu5MI6UeDBy/nDnDKv1hgHd2Vqg
-        xFQis29kWvQFIz1edO6IcrWNiy0c8HY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-184-pHkgqcdHOzydZuFLvizZwg-1; Fri, 21 Jul 2023 04:17:57 -0400
-X-MC-Unique: pHkgqcdHOzydZuFLvizZwg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fb40ec952bso8809805e9.0
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 01:17:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689927476; x=1690532276;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWAtfDt+4FFr8z2L0240XKTF6ityOHMPZsX6cXcmsiA=;
-        b=dJxA81b+ToGs6DIXvGq6SIWkaLyZ2sRyP0AWI69J03705Nsz73xe3PCsP0xW/25LKp
-         x7xc1NmZrC+JM7fbID2Mqn4eKsI9SnZa2K1ZtfUj2SzpX1ai1CsnZ4ZBMFnDLM0ErZv2
-         8aXCDooW3DOIml4j1XaS2HRbxSHMU6M+t32AKBQjEGIhvqNZSOSs9GOhWb2Z3AvubTnE
-         kOUUkELz3K0xSvBymYHdka02HaOs2AAYHQNT6N3Bm//0tupRYYNBJdd08k4fRr2Jkv3E
-         pV80T6v7Csk7xG1nkjWV5CYdqZLy0apaNgHTxIo/aoakmL/7KTigLA27oE9rQxBmQf9h
-         Hvzw==
-X-Gm-Message-State: ABy/qLaFtushXwW3XC9QcuYVH952orRp6NP2jZncmL1n1befnmz3DDR1
-        xDi7BKkeDzKI08w9s3xqbl0v+pxxrJ/R0OgODHSUnt723KXBYdRPiO+yDzLzeYmRb3MwrG/xGbe
-        DBZ1aL6bXY1e9
-X-Received: by 2002:adf:e44b:0:b0:314:23b:dc56 with SMTP id t11-20020adfe44b000000b00314023bdc56mr932477wrm.71.1689927476496;
-        Fri, 21 Jul 2023 01:17:56 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHEdRURX7Fjh/lMcHTt/3ezRGKcsgd4gH+GjQ+oOshjaOTIibUtlYcUjT+ZyXHohXPiIFUBeg==
-X-Received: by 2002:adf:e44b:0:b0:314:23b:dc56 with SMTP id t11-20020adfe44b000000b00314023bdc56mr932410wrm.71.1689927476191;
-        Fri, 21 Jul 2023 01:17:56 -0700 (PDT)
-Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id j6-20020a5d6046000000b003143b14848dsm3444226wrt.102.2023.07.21.01.17.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jul 2023 01:17:55 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     "Paul E . McKenney" <paulmck@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        bh=NwNy9iOU1ioDiJtC0wNNa3aEUmMXumdBTFbQ/HwLllU=;
+        b=UofF/vTaAPjNsBSi4TfqmaBxLPGT2d3epR5qoRsv68fi+/Gu4GotRqpPn9C4j/kT2UzxJc
+        HIaqBDsP78gdRttmOs6NfXlJr3nifxiyQ9nqskiEAoLOF3g85Voo3dpssoUN48dRxp9vyF
+        DOLZ7ZRGcajnEnJK54WA+v+1szc56eI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-34-Blr1Gv_KOaS1Li0WyBAPWQ-1; Fri, 21 Jul 2023 04:38:25 -0400
+X-MC-Unique: Blr1Gv_KOaS1Li0WyBAPWQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8C88936D20;
+        Fri, 21 Jul 2023 08:38:24 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.38])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E20A492B02;
+        Fri, 21 Jul 2023 08:38:24 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 16/20] rcu: Make RCU dynticks counter size
- configurable
-In-Reply-To: <20230720163056.2564824-17-vschneid@redhat.com>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-17-vschneid@redhat.com>
-Date:   Fri, 21 Jul 2023 09:17:53 +0100
-Message-ID: <xhsmhjzutu18u.mognet@vschneid.remote.csb>
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>
+Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+In-Reply-To: <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
+Organization: Red Hat GmbH
+References: <20230718164522.3498236-1-jingzhangos@google.com>
+ <20230718164522.3498236-4-jingzhangos@google.com>
+ <87o7k77yn5.fsf@redhat.com>
+ <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Fri, 21 Jul 2023 10:38:23 +0200
+Message-ID: <87sf9h8xs0.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/07/23 17:30, Valentin Schneider wrote:
-> index bdd7eadb33d8f..1ff2aab24e964 100644
-> --- a/kernel/rcu/Kconfig
-> +++ b/kernel/rcu/Kconfig
-> @@ -332,4 +332,37 @@ config RCU_DOUBLE_CHECK_CB_TIME
->         Say Y here if you need tighter callback-limit enforcement.
->         Say N here if you are unsure.
+On Thu, Jul 20 2023, Jing Zhang <jingzhangos@google.com> wrote:
+
+> Hi Cornelia,
 >
-> +config RCU_DYNTICKS_RANGE_BEGIN
-> +	int
-> +	depends on !RCU_EXPERT
-> +	default 31 if !CONTEXT_TRACKING_WORK
+> On Thu, Jul 20, 2023 at 1:52=E2=80=AFAM Cornelia Huck <cohuck@redhat.com>=
+ wrote:
+>>
+>> On Tue, Jul 18 2023, Jing Zhang <jingzhangos@google.com> wrote:
+>>
+>> > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+>> > from usrespace with this change.
+>>
+>> Typo: s/usrespace/userspace/
+> Thanks.
+>>
+>> >
+>> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+>> > ---
+>> >  arch/arm64/kvm/sys_regs.c | 4 ++--
+>> >  1 file changed, 2 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> > index 053d8057ff1e..f33aec83f1b4 100644
+>> > --- a/arch/arm64/kvm/sys_regs.c
+>> > +++ b/arch/arm64/kvm/sys_regs.c
+>> > @@ -2008,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[]=
+ =3D {
+>> >         .set_user =3D set_id_dfr0_el1,
+>> >         .visibility =3D aa32_id_visibility,
+>> >         .reset =3D read_sanitised_id_dfr0_el1,
+>> > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+>> > +       .val =3D GENMASK(63, 0), },
+>> >       ID_HIDDEN(ID_AFR0_EL1),
+>> >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+>> >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+>> > @@ -2057,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[]=
+ =3D {
+>> >         .get_user =3D get_id_reg,
+>> >         .set_user =3D set_id_aa64dfr0_el1,
+>> >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+>> > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+>> > +       .val =3D GENMASK(63, 0), },
+>> >       ID_SANITISED(ID_AA64DFR1_EL1),
+>> >       ID_UNALLOCATED(5,2),
+>> >       ID_UNALLOCATED(5,3),
+>>
+>> How does userspace find out whether a given id reg is actually writable,
+>> other than trying to write to it?
+>>
+> No mechanism was provided to userspace to discover if a given idreg or
+> any fields of a given idreg is writable. The write to a readonly idreg
+> can also succeed (write ignored) without any error if what's written
+> is exactly the same as what the idreg holds or if it is a write to
+> AArch32 idregs on an AArch64-only system.
 
-You'll note that this should be 30 really, because the lower *2* bits are
-taken by the context state (CONTEXT_GUEST has a value of 3).
+Hm, I'm not sure that's a good thing for the cases where we want to
+support mix-and-match userspace and kernels. Userspace may want to know
+upfront whether it can actually tweak the contents of an idreg or not
+(for example, in the context of using CPU models for compatibility), so
+that it can reject or warn about certain configurations that may not
+turn out as the user expects.
 
-This highlights the fragile part of this: the Kconfig values are hardcoded,
-but they depend on CT_STATE_SIZE, CONTEXT_MASK and CONTEXT_WORK_MAX. The
-static_assert() will at least capture any misconfiguration, but having that
-enforced by the actual Kconfig ranges would be less awkward.
+> Not sure if it is worth adding an API to return the writable mask for
+> idregs, since we want to enable the writable for all allocated
+> unhidden idregs eventually.
 
-Do we currently have a way of e.g. making a Kconfig file depend on and use
-values generated by a C header?
+We'd enable any new idregs for writing from the start in the future, I
+guess?
+
+I see two approaches here:
+- add an API to get a list of idregs with their writable masks
+- add a capability "you can write to all idregs whatever you'd expect to
+  be able to write there architecture wise", which would require to add
+  support for all idregs prior to exposing that cap
+
+The second option would be the easier one (if we don't manage to break
+it in the future :)
 
