@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D52875BE5A
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 08:09:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA0D75BE60
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 08:09:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230082AbjGUGJB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 02:09:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46156 "EHLO
+        id S230219AbjGUGJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 02:09:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbjGUGIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 02:08:55 -0400
+        with ESMTP id S230018AbjGUGI5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 02:08:57 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D22292;
-        Thu, 20 Jul 2023 23:08:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D731711;
+        Thu, 20 Jul 2023 23:08:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689919734; x=1721455734;
+  t=1689919736; x=1721455736;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TLsCDwkPypQyoDGr6WA5M8mk+rSbh1ZROOPBD8uLgVM=;
-  b=Q+Y9TnWjyRBrD/wc3at1uonwO1muE6vcB6PAs70p8SmzEEHFtClxx7lT
-   0ZQizZCHMDXmELcX+nUCdzuT9TRfYD+WfQ5YBqNGCkObtbl2Hj4tpSod9
-   eB6Zsrocnqd8Uk2B2l6NPeOpvooCqfZP49t/cQr/iPCImSP2hxxwOHeV3
-   lX2uOd00H9PSVBtDV8ACHeLrLb35Cc0YVM2o3QOaMpveTJB/E4FQS9Gnh
-   70MvNIySnk7yNhZkWIsJbl9UGF02RqupWY8e+XW+hr00enUq5GYZsycb1
-   YU+NMCHGUETiv6Ky56OfoKoQgA6+c0kWb3SZIlUXXPFcVRTOmqZnRqdsC
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="370547533"
+  bh=cPRAjBh+JcqfxChi1axz7cYPe9M4lTZa+vuA83lyP04=;
+  b=EF11m+fMI/p4oBXPIw6WsuhgCp9/zt5bKLnaYLS3NKzbLw66hA/TJC7C
+   V+vkvFhJ2dTJg6OF92oDmuLqXsERPg7R/kxXSAW6OQgVwKEHs4GqZ89H9
+   BCvA3/vB+Q7Ee3xqN6PKG9nx6Pajze57oWxtbe6xVLGFt5kyAMgcZ9Uo5
+   nvMxjYU/LdBC4ja3SMdJmGHRgUaToCGCjK902D2X3uZO3kLKF7OQibCRA
+   STBB084UA+y9nlU9MSwceq+8AY1uoGsRXT+ljp8MQzSN+Q8qQ5o+NuCxO
+   3wwK2lXwm6Bm6/05JNdB8QewV1jFrtwtVC53PJKo0NhpcBUbAKPiwWqON
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="370547554"
 X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="370547533"
+   d="scan'208";a="370547554"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:51 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848721964"
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848721966"
 X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="848721964"
+   d="scan'208";a="848721966"
 Received: from embargo.jf.intel.com ([10.165.9.183])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:40 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:41 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         john.allen@amd.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     rick.p.edgecombe@intel.com, chao.gao@intel.com,
         binbin.wu@linux.intel.com, weijiang.yang@intel.com
-Subject: [PATCH v4 07/20] KVM:x86: Add fault checks for guest CR4.CET setting
-Date:   Thu, 20 Jul 2023 23:03:39 -0400
-Message-Id: <20230721030352.72414-8-weijiang.yang@intel.com>
+Subject: [PATCH v4 08/20] KVM:x86: Report KVM supported CET MSRs as to-be-saved
+Date:   Thu, 20 Jul 2023 23:03:40 -0400
+Message-Id: <20230721030352.72414-9-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230721030352.72414-1-weijiang.yang@intel.com>
 References: <20230721030352.72414-1-weijiang.yang@intel.com>
@@ -62,42 +62,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Check potential faults for CR4.CET setting per Intel SDM.
-CET can be enabled if and only if CR0.WP==1, i.e. setting
-CR4.CET=1 faults if CR0.WP==0 and setting CR0.WP=0 fails
-if CR4.CET==1.
+Add all CET MSRs including the synthesized GUEST_SSP to report list.
+PL{0,1,2}_SSP are independent to host XSAVE management with later
+patches. MSR_IA32_U_CET and MSR_IA32_PL3_SSP are XSAVE-managed on
+host side. MSR_IA32_S_CET/MSR_IA32_INT_SSP_TAB/MSR_KVM_GUEST_SSP
+are not XSAVE-managed.
 
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+When CET IBT/SHSTK are enumerated to guest, both user and supervisor
+modes should be supported for architechtural integrity, i.e., two
+modes are supported as both or neither.
+
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/x86.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/include/uapi/asm/kvm_para.h |  1 +
+ arch/x86/kvm/x86.c                   | 10 ++++++++++
+ arch/x86/kvm/x86.h                   | 10 ++++++++++
+ 3 files changed, 21 insertions(+)
 
+diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+index 6e64b27b2c1e..7af465e4e0bd 100644
+--- a/arch/x86/include/uapi/asm/kvm_para.h
++++ b/arch/x86/include/uapi/asm/kvm_para.h
+@@ -58,6 +58,7 @@
+ #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
+ #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+ #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
++#define MSR_KVM_GUEST_SSP	0x4b564d09
+ 
+ struct kvm_steal_time {
+ 	__u64 steal;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04f0245ad0a2..be76ac6bbb21 100644
+index be76ac6bbb21..59e961a88b75 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -993,6 +993,9 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
- 	    (is_64_bit_mode(vcpu) || kvm_is_cr4_bit_set(vcpu, X86_CR4_PCIDE)))
- 		return 1;
+@@ -1463,6 +1463,9 @@ static const u32 msrs_to_save_base[] = {
  
-+	if (!(cr0 & X86_CR0_WP) && kvm_is_cr4_bit_set(vcpu, X86_CR4_CET))
-+		return 1;
-+
- 	static_call(kvm_x86_set_cr0)(vcpu, cr0);
+ 	MSR_IA32_XFD, MSR_IA32_XFD_ERR,
+ 	MSR_IA32_XSS,
++	MSR_IA32_U_CET, MSR_IA32_S_CET,
++	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
++	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB, MSR_KVM_GUEST_SSP,
+ };
  
- 	kvm_post_set_cr0(vcpu, old_cr0, cr0);
-@@ -1204,6 +1207,9 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 			return 1;
+ static const u32 msrs_to_save_pmu[] = {
+@@ -7215,6 +7218,13 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+ 		if (!kvm_caps.supported_xss)
+ 			return;
+ 		break;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++	case MSR_KVM_GUEST_SSP:
++	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
++		if (!kvm_is_cet_supported())
++			return;
++		break;
+ 	default:
+ 		break;
  	}
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 82e3dafc5453..6e6292915f8c 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -362,6 +362,16 @@ static inline bool kvm_mpx_supported(void)
+ 		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
+ }
  
-+	if ((cr4 & X86_CR4_CET) && !kvm_is_cr0_bit_set(vcpu, X86_CR0_WP))
-+		return 1;
++#define CET_XSTATE_MASK (XFEATURE_MASK_CET_USER)
++/*
++ * Shadow Stack and Indirect Branch Tracking feature enabling depends on
++ * whether host side CET user xstate bit is supported or not.
++ */
++static inline bool kvm_is_cet_supported(void)
++{
++	return (kvm_caps.supported_xss & CET_XSTATE_MASK) == CET_XSTATE_MASK;
++}
 +
- 	static_call(kvm_x86_set_cr4)(vcpu, cr4);
+ extern unsigned int min_timer_period_us;
  
- 	kvm_post_set_cr4(vcpu, old_cr4, cr4);
+ extern bool enable_vmware_backdoor;
 -- 
 2.27.0
 
