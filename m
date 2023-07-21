@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F14E75D574
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:19:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E7E875D576
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:19:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjGUUTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 16:19:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37916 "EHLO
+        id S230496AbjGUUTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 16:19:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229847AbjGUUTR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230093AbjGUUTR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 21 Jul 2023 16:19:17 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFEB359C
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d05e334f436so989590276.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 814F4359D
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:06 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c0d62f4487cso2306081276.0
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689970743; x=1690575543;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rLZ3+zgUAeppnqgY3n6NxTe9LV814vORREjktc5U/Sw=;
-        b=hCkJqAtatAST2xTcK9UF+vly76nRQ59L6L1wCKwbjhtj7w4tNGhHjPBovelEM2+gK5
-         lxg4bB9LV+ax71npRTttA7ak1EpyyL8oqv8ER274jfu5H+tSGhzdtdAMP/jUzTun9FhX
-         xqmozPodAe2V1GPggNtO9OU4tel859UGjBVFVOXeBKO7viKomIxtFIkMGEMzRVhN9bx8
-         fmGiP67UFWdVuLym+YVIi+CRQEiL+xOfzhtec91jVP/W7oszjr+kqOCgnkNwD4rOm8Ar
-         6BIkm9IWEaQ+i9nqsAGhRwAurvTHhIw3HgXS2QWQC0S8On8G1FlGlOoIHD1+S7zHoMUE
-         Oumg==
+        d=google.com; s=20221208; t=1689970746; x=1690575546;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=xY+3Pnlxin9cJMvMOS3842OXvOZxwo3V1XbzLrWDw/E=;
+        b=Lqb3RehZeO7ntuc5ijbgqhf+wouAzLMMAFKmweKe4G70L9uc4Bw2Jl5XydLCvynLja
+         MxugEfg74h0RFAs1g/mPDWIA6CQEQjP/1tCMXpzbUBwwHi1wUVOx7FGGl6cj3EKgt4DI
+         2serW/L/1xq/mdpALeeGTUFcMs8dGf7LsjjD0F7Qj7rNn0+spOMJVHUn7lKygW1pXfr6
+         V4l0GVwRDsM4qqERhw/rUjtXUDV9O3+sw+gB5y+qOA/uO7E4/u1wlbkArtHA17Pz8aqj
+         lI6iYWVldo4NzF+NtwvTmo0m32Ap85XnNI96DTf2N43IXGAmmG5+ay/zpvN3HuCBAR7U
+         b77Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689970743; x=1690575543;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rLZ3+zgUAeppnqgY3n6NxTe9LV814vORREjktc5U/Sw=;
-        b=gPRiBJBlderJg3/ShIbpN8lCGb9nOgR6URO5v5Sv1BsZDp8TxyXAEbkbWwc30IqkOj
-         M7+0JjbWnqR30SW0H8Fms/3/pZ01lc8gq0wxu3sspnkdBoDrkRXmQkidrVRzFWgM/AfH
-         GQBI/GKIGaRHOXU01sBgIiNgOQr6i5NrMHyPej0d67jnFZDJRVMXVNEv21xkNAlAY/Of
-         bXVpJNyC/pRRKKZAycHEv5zwFASpE0SRbfktdS5UKSaYBiP4dpxEQlVyOOfGNUekecuG
-         8UwOrP6/O9hRRg0Qqc4AXCFObtSOjB9AV2Y3nh8i5ZnoqN/iRR7NssCcUyVQXdtdwh9O
-         qUdw==
-X-Gm-Message-State: ABy/qLYJ83oiZiG9/euJfX6ypiPGTpSrC6R7fedVpEL2WsxtAiv+ecE5
-        hGvGNyu+JWrWWnqB7hqtinw99XoeMVc=
-X-Google-Smtp-Source: APBJJlEMevAHotcBOZHYg9Sd6IaWSXrnx1OUggrP2dlEo2/7poLQt+F7AoxS9ZkZBN8T5H6DPt0gBycHwUE=
+        d=1e100.net; s=20221208; t=1689970746; x=1690575546;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xY+3Pnlxin9cJMvMOS3842OXvOZxwo3V1XbzLrWDw/E=;
+        b=KzJwUea2w/OAxzVjOG8OJVsi9l0KJULk3Rve24cn+ofaYW8xnFSgXW/uZuH59HtKQb
+         VzoK7txRTfyiwP706hIIc9deMMu/+UkayTKZytmhX5PZL5EDlZhVipkl5mBoqiM7qpPP
+         g6zoqmIN+0ezDfPYEBiqLbSMMdDUNiWwi9q915rO6fkRyG44/pOlzKm4Hfmiedn6ElaH
+         FrVdpK0i0nc5/twtRqjjxSkV414f9WhmmgDCdnLrMS32j0guesU5UdcIXs506VxyAkHr
+         Bjd5jw0QhRvVuTyruP31mOs4E1XXTe+VgAGt5KiU6qNVAsaMYtLPmuU2SjzE9VGgLwzT
+         ZvoA==
+X-Gm-Message-State: ABy/qLYif9UIQDOvx49D+L5zjyH9fmwV2BLc9FVWrHoDpwSzKMHcFxqr
+        Jahjrxc2xTj4vF9L++8v82LzxEKcCYE=
+X-Google-Smtp-Source: APBJJlGl5vZN06f98oGYYGpQC92l2Mt5+UVa2JPZ8raPJUCa9tUN62sdYqhFV6XvSia8+6L1I1Yz+z97vko=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:cf2:ad45:2084 with SMTP id
- w15-20020a056902100f00b00cf2ad452084mr17704ybt.12.1689970743354; Fri, 21 Jul
- 2023 13:19:03 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:428d:0:b0:c65:7352:4b5 with SMTP id
+ p135-20020a25428d000000b00c65735204b5mr21381yba.0.1689970745731; Fri, 21 Jul
+ 2023 13:19:05 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 13:18:40 -0700
+Date:   Fri, 21 Jul 2023 13:18:41 -0700
+In-Reply-To: <20230721201859.2307736-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230721201859.2307736-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721201859.2307736-1-seanjc@google.com>
-Subject: [PATCH v4 00/19] x86/reboot: KVM: Clean up "emergency" virt code
+Message-ID: <20230721201859.2307736-2-seanjc@google.com>
+Subject: [PATCH v4 01/19] x86/reboot: VMCLEAR active VMCSes before emergency reboot
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -72,95 +75,200 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If there are no objections, my plan is to take this through the KVM tree
-for 6.6.
+VMCLEAR active VMCSes before any emergency reboot, not just if the kernel
+may kexec into a new kernel after a crash.  Per Intel's SDM, the VMX
+architecture doesn't require the CPU to flush the VMCS cache on INIT.  If
+an emergency reboot doesn't RESET CPUs, cached VMCSes could theoretically
+be kept and only be written back to memory after the new kernel is booted,
+i.e. could effectively corrupt memory after reboot.
 
-Instead of having the reboot code blindly try to disable virtualization
-during an emergency, use the existing callback into KVM to disable virt
-as "needed".  In quotes because KVM still somewhat blindly attempts to
-disable virt, e.g. if KVM is loaded but doesn't have active VMs and thus
-hasn't enabled hardware.  That could theoretically be "fixed", but due to
-the callback being invoked from NMI context, I'm not convinced it would
-be worth the complexity.  E.g. false positives would still be possible,
-and KVM would have to play games with the per-CPU hardware_enabled flag
-to ensure there are no false negatives.
+Opportunistically remove the setting of the global pointer to NULL to make
+checkpatch happy.
 
-The callback is currently used only to VMCLEAR the per-CPU list of VMCSes,
-but not using the callback to disable virt isn't intentional.  Arguably, a
-callback should have been used in the initial "disable virt" code added by
-commit d176720d34c7 ("x86: disable VMX on all CPUs on reboot").  And the
-kexec logic added (much later) by commit f23d1f4a1160 ("x86/kexec: VMCLEAR
-VMCSs loaded on all cpus if necessary") simply missed the opportunity to
-use the callback for all virtualization needs.
+Cc: Andrew Cooper <Andrew.Cooper3@citrix.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kexec.h  |  2 --
+ arch/x86/include/asm/reboot.h |  2 ++
+ arch/x86/kernel/crash.c       | 31 -------------------------------
+ arch/x86/kernel/reboot.c      | 22 ++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c        | 10 +++-------
+ 5 files changed, 27 insertions(+), 40 deletions(-)
 
-Once KVM handles disabling virt, move all of the helpers provided by
-virtext.h into KVM proper.
-
-There's one outlier patch, "Make KVM_AMD depend on CPU_SUP_AMD or
-CPU_SUP_HYGON", that I included here because it felt weird to pull in the
-"must be AMD or Hygon" check without KVM demanding that at build time.
-
-v4: 
- - Collect reviews. [Kai]
- - Skip VMCLEAR during reboot if CR4.VMXE=0. [Kai]
- - Call out that disabling virtualization iff there's a callback also
-   avoids an unnecessary NMI shootdown. [Kai]
- - Move "Disable virtualization during reboot iff callback is
-   registered" patch after "Hoist "disable virt" helpers above \"emergency
-   reboot\"" patch to fix an intermediate build error.
-
-v3:
- - https://lore.kernel.org/all/20230512235026.808058-1-seanjc@google.com
- - Massage changelogs to avoid talking about out-of-tree hypervisors. [Kai]
- - Move #ifdef "KVM" addition later. [Kai]
-
-v2:
- - https://lore.kernel.org/all/20230310214232.806108-1-seanjc@google.com
- - Disable task migration when probing basic SVM and VMX support to avoid
-   logging misleading info (wrong CPU) if probing fails.
-
-v1: https://lore.kernel.org/all/20221201232655.290720-1-seanjc@google.com
-
-Sean Christopherson (19):
-  x86/reboot: VMCLEAR active VMCSes before emergency reboot
-  x86/reboot: Harden virtualization hooks for emergency reboot
-  x86/reboot: KVM: Handle VMXOFF in KVM's reboot callback
-  x86/reboot: KVM: Disable SVM during reboot via virt/KVM reboot
-    callback
-  x86/reboot: Assert that IRQs are disabled when turning off
-    virtualization
-  x86/reboot: Hoist "disable virt" helpers above "emergency reboot" path
-  x86/reboot: Disable virtualization during reboot iff callback is
-    registered
-  x86/reboot: Expose VMCS crash hooks if and only if KVM_{INTEL,AMD} is
-    enabled
-  x86/virt: KVM: Open code cpu_has_vmx() in KVM VMX
-  x86/virt: KVM: Move VMXOFF helpers into KVM VMX
-  KVM: SVM: Make KVM_AMD depend on CPU_SUP_AMD or CPU_SUP_HYGON
-  x86/virt: Drop unnecessary check on extended CPUID level in
-    cpu_has_svm()
-  x86/virt: KVM: Open code cpu_has_svm() into kvm_is_svm_supported()
-  KVM: SVM: Check that the current CPU supports SVM in
-    kvm_is_svm_supported()
-  KVM: VMX: Ensure CPU is stable when probing basic VMX support
-  x86/virt: KVM: Move "disable SVM" helper into KVM SVM
-  KVM: x86: Force kvm_rebooting=true during emergency reboot/crash
-  KVM: SVM: Use "standard" stgi() helper when disabling SVM
-  KVM: VMX: Skip VMCLEAR logic during emergency reboots if CR4.VMXE=0
-
- arch/x86/include/asm/kexec.h   |   2 -
- arch/x86/include/asm/reboot.h  |   7 ++
- arch/x86/include/asm/virtext.h | 154 ---------------------------------
- arch/x86/kernel/crash.c        |  31 -------
- arch/x86/kernel/reboot.c       |  66 ++++++++++----
- arch/x86/kvm/Kconfig           |   2 +-
- arch/x86/kvm/svm/svm.c         |  71 ++++++++++++---
- arch/x86/kvm/vmx/vmx.c         |  76 ++++++++++++----
- 8 files changed, 176 insertions(+), 233 deletions(-)
- delete mode 100644 arch/x86/include/asm/virtext.h
-
-
-base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+diff --git a/arch/x86/include/asm/kexec.h b/arch/x86/include/asm/kexec.h
+index 5b77bbc28f96..819046974b99 100644
+--- a/arch/x86/include/asm/kexec.h
++++ b/arch/x86/include/asm/kexec.h
+@@ -205,8 +205,6 @@ int arch_kimage_file_post_load_cleanup(struct kimage *image);
+ #endif
+ #endif
+ 
+-typedef void crash_vmclear_fn(void);
+-extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
+ extern void kdump_nmi_shootdown_cpus(void);
+ 
+ #endif /* __ASSEMBLY__ */
+diff --git a/arch/x86/include/asm/reboot.h b/arch/x86/include/asm/reboot.h
+index 9177b4354c3f..dc201724a643 100644
+--- a/arch/x86/include/asm/reboot.h
++++ b/arch/x86/include/asm/reboot.h
+@@ -25,6 +25,8 @@ void __noreturn machine_real_restart(unsigned int type);
+ #define MRR_BIOS	0
+ #define MRR_APM		1
+ 
++typedef void crash_vmclear_fn(void);
++extern crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
+ void cpu_emergency_disable_virtualization(void);
+ 
+ typedef void (*nmi_shootdown_cb)(int, struct pt_regs*);
+diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
+index cdd92ab43cda..54cd959cb316 100644
+--- a/arch/x86/kernel/crash.c
++++ b/arch/x86/kernel/crash.c
+@@ -48,38 +48,12 @@ struct crash_memmap_data {
+ 	unsigned int type;
+ };
+ 
+-/*
+- * This is used to VMCLEAR all VMCSs loaded on the
+- * processor. And when loading kvm_intel module, the
+- * callback function pointer will be assigned.
+- *
+- * protected by rcu.
+- */
+-crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss = NULL;
+-EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
+-
+-static inline void cpu_crash_vmclear_loaded_vmcss(void)
+-{
+-	crash_vmclear_fn *do_vmclear_operation = NULL;
+-
+-	rcu_read_lock();
+-	do_vmclear_operation = rcu_dereference(crash_vmclear_loaded_vmcss);
+-	if (do_vmclear_operation)
+-		do_vmclear_operation();
+-	rcu_read_unlock();
+-}
+-
+ #if defined(CONFIG_SMP) && defined(CONFIG_X86_LOCAL_APIC)
+ 
+ static void kdump_nmi_callback(int cpu, struct pt_regs *regs)
+ {
+ 	crash_save_cpu(regs, cpu);
+ 
+-	/*
+-	 * VMCLEAR VMCSs loaded on all cpus if needed.
+-	 */
+-	cpu_crash_vmclear_loaded_vmcss();
+-
+ 	/*
+ 	 * Disable Intel PT to stop its logging
+ 	 */
+@@ -133,11 +107,6 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
+ 
+ 	crash_smp_send_stop();
+ 
+-	/*
+-	 * VMCLEAR VMCSs loaded on this cpu if needed.
+-	 */
+-	cpu_crash_vmclear_loaded_vmcss();
+-
+ 	cpu_emergency_disable_virtualization();
+ 
+ 	/*
+diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
+index 3adbe97015c1..3fa4c6717a1d 100644
+--- a/arch/x86/kernel/reboot.c
++++ b/arch/x86/kernel/reboot.c
+@@ -787,6 +787,26 @@ void machine_crash_shutdown(struct pt_regs *regs)
+ }
+ #endif
+ 
++/*
++ * This is used to VMCLEAR all VMCSs loaded on the
++ * processor. And when loading kvm_intel module, the
++ * callback function pointer will be assigned.
++ *
++ * protected by rcu.
++ */
++crash_vmclear_fn __rcu *crash_vmclear_loaded_vmcss;
++EXPORT_SYMBOL_GPL(crash_vmclear_loaded_vmcss);
++
++static inline void cpu_crash_vmclear_loaded_vmcss(void)
++{
++	crash_vmclear_fn *do_vmclear_operation = NULL;
++
++	rcu_read_lock();
++	do_vmclear_operation = rcu_dereference(crash_vmclear_loaded_vmcss);
++	if (do_vmclear_operation)
++		do_vmclear_operation();
++	rcu_read_unlock();
++}
+ 
+ /* This is the CPU performing the emergency shutdown work. */
+ int crashing_cpu = -1;
+@@ -798,6 +818,8 @@ int crashing_cpu = -1;
+  */
+ void cpu_emergency_disable_virtualization(void)
+ {
++	cpu_crash_vmclear_loaded_vmcss();
++
+ 	cpu_emergency_vmxoff();
+ 	cpu_emergency_svm_disable();
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 0ecf4be2c6af..7f692d97a821 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -41,7 +41,7 @@
+ #include <asm/idtentry.h>
+ #include <asm/io.h>
+ #include <asm/irq_remapping.h>
+-#include <asm/kexec.h>
++#include <asm/reboot.h>
+ #include <asm/perf_event.h>
+ #include <asm/mmu_context.h>
+ #include <asm/mshyperv.h>
+@@ -744,7 +744,6 @@ static int vmx_set_guest_uret_msr(struct vcpu_vmx *vmx,
+ 	return ret;
+ }
+ 
+-#ifdef CONFIG_KEXEC_CORE
+ static void crash_vmclear_local_loaded_vmcss(void)
+ {
+ 	int cpu = raw_smp_processor_id();
+@@ -754,7 +753,6 @@ static void crash_vmclear_local_loaded_vmcss(void)
+ 			    loaded_vmcss_on_cpu_link)
+ 		vmcs_clear(v->vmcs);
+ }
+-#endif /* CONFIG_KEXEC_CORE */
+ 
+ static void __loaded_vmcs_clear(void *arg)
+ {
+@@ -8592,10 +8590,9 @@ static void __vmx_exit(void)
+ {
+ 	allow_smaller_maxphyaddr = false;
+ 
+-#ifdef CONFIG_KEXEC_CORE
+ 	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
+ 	synchronize_rcu();
+-#endif
++
+ 	vmx_cleanup_l1d_flush();
+ }
+ 
+@@ -8644,10 +8641,9 @@ static int __init vmx_init(void)
+ 		pi_init_cpu(cpu);
+ 	}
+ 
+-#ifdef CONFIG_KEXEC_CORE
+ 	rcu_assign_pointer(crash_vmclear_loaded_vmcss,
+ 			   crash_vmclear_local_loaded_vmcss);
+-#endif
++
+ 	vmx_check_vmcs12_offsets();
+ 
+ 	/*
 -- 
 2.41.0.487.g6d72f3e995-goog
 
