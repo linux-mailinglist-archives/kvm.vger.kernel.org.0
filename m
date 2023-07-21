@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5E1B75D7BA
-	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 01:00:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD91875D7C1
+	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 01:00:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbjGUXAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 19:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48668 "EHLO
+        id S231218AbjGUXAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 19:00:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231148AbjGUXAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 19:00:17 -0400
+        with ESMTP id S231180AbjGUXAU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 19:00:20 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DD143A93
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:16 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5771e0959f7so25402577b3.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004F03A9D
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:17 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56942442eb0so25847027b3.1
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 16:00:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689980415; x=1690585215;
+        d=google.com; s=20221208; t=1689980417; x=1690585217;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=omheWi+fB4D/RinebRnnTaXxuGsxp/H5OZ8/iJL52gg=;
-        b=vbdN8OctTXpcWhp32zvgNfnvRtfWXnph6+vcUlc57CGOPd/R/4a75ImhrgGJ3xAHn1
-         HaUh6pk8xronY2t50P13VcHS9megjWcRGLgMyQ7QhQfCyyCR28TJ495s7uhFE9oLDv/v
-         BUKnqDhACAN7T+UUwH5DpfGaHlhnS+WA5TMxO/jxbTNz4qzlhXWxxK5UwaB7GT7i4Jjk
-         MisNKnGlVNq6+vnwALgo0EqgsXSHKXoZErQKj4TAW98IFS+aKdGQZ9cgBSAxem3upUdi
-         wSCmNRxyhGEmgLGpYFwC6/jF6+ThqolhHilmyYC0Q4N9SXDCrO8n4iHEdPaFAavMSBM9
-         k6SA==
+        bh=rw5rKXDTTdMh/U/oht/75ukyZlue3elcNBySkPi6QuY=;
+        b=PpIfeEHZR/3QXYPAgxsIW1BsTi+XN0rYNoHNbHiGRDkddmEvrNVaSoZJIwhjJxmtEo
+         xaVUpZxE606Lcp2pwzz636CIk/9JRNIo2A0kndkVSzvqqbesvJ29EW1s4TlfboxmEa24
+         z6d5gTQqhb5rti+bL3hGOh3s/f5pl8dnTrVtbua03qm/CRwf37kxYa5IUWItG1L5vBEd
+         +bto1hbOM/g5DlBo/PDGXL3cOyCLecMog3CVEmdWn+m0Un2ntluHD+Qaf5n6xHVFWSdd
+         es1c3mPo8wUrE5Ov4O1Vatv7b6oO1KRtQh4P+LvzBi/Z/FaBn6a037La5MHyN+7y/Rog
+         meWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689980415; x=1690585215;
+        d=1e100.net; s=20221208; t=1689980417; x=1690585217;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=omheWi+fB4D/RinebRnnTaXxuGsxp/H5OZ8/iJL52gg=;
-        b=dOY5obKyHMy+qe0ZZEXqoaF7ZmgI58NcLj++4JX4Vj+qvJe13hIL+Oy0EdKHgHNgSQ
-         uSnSYPcD0wuDH9lvghKvnuMpB/lQYQMH9yIZhyTyAe6uDwlVuLZxx0BKz0+2sBkpafX5
-         98JETipYeoA8kgQHuF3oEiV575Ug0Lnj3dajy5xY3BLSD7XRqoDrV4jbzqZrgS9OZwCT
-         YHbkQyogJZuc8DeU22WkPzyH5tt9ikpr3SwG1LCWanoHZT38XAYkGCOKJT1MUzx3z5Su
-         Vatg6r2WAS761g+ZV9NruUB5c++d9q7Bmy4JTwGWvPsFjfxaIedqF8Yn06Yjv3KQYRJ8
-         iYXA==
-X-Gm-Message-State: ABy/qLZMXTjqd4GF2BoGG7RPRouhtZgzW7oWAtySYQb9+whmUwyvlDrP
-        Eywv5Ln1Qo1ZUiWcV/3pkNwJ4Qj7klQ=
-X-Google-Smtp-Source: APBJJlED9CgDOHYdLhezvIRO12CxHnBgshIulfAAdeWhiRCGQ3PWOvbdpCPlyTEInQj7kA8j2mFdN/93DVQ=
+        bh=rw5rKXDTTdMh/U/oht/75ukyZlue3elcNBySkPi6QuY=;
+        b=VnSdRgujNJ24rB1ZOzqCiX0ZlCZlRA4arOaxXBubWecLHl5FGVL+RcOmq/YTDSXf+W
+         KJQeCx2UbeJGBkaL/FCyQzpThr7F030rYof1wcVu+WoLGPMbuFh9wl/Yno0nnbANXnod
+         /UQiW6u/xatOxUPjMTywS+0eElyDZAtHzFHzgkBg8I5K93OVUAZplCnekWi42aHPwJ1F
+         IJipge84aM8bQSn+4EgomWFb2rfhCOuFkWdc4zkISfB06Di7YQ7Zkd093P4G1Oz4A0/q
+         PBaO9o34m7x75g/igEqf2QVPHfmVDeVQK2JhCGkCXMt7KKl8+XQta3aNs0Y0ILHSyYD8
+         HYeQ==
+X-Gm-Message-State: ABy/qLYjKsJvcdLgMOCwDNhpLYFDcSw2qpgfm2p+YXbIj6Cc1CUzFmlP
+        ikGwPql7yR+L9EALHUGaxa0+mSrDB4k=
+X-Google-Smtp-Source: APBJJlEC/CpykobkIsxmUL3kCkFNh7T+LsRMpu11FQ6cucjCpLfPOVbszUntyrSk6Rvv/4mm2Kpmg/dfGrg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b668:0:b0:56f:f62b:7a11 with SMTP id
- h40-20020a81b668000000b0056ff62b7a11mr13119ywk.8.1689980415400; Fri, 21 Jul
- 2023 16:00:15 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:4406:0:b0:577:3b0c:5b85 with SMTP id
+ r6-20020a814406000000b005773b0c5b85mr14328ywa.0.1689980417324; Fri, 21 Jul
+ 2023 16:00:17 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 16:00:00 -0700
+Date:   Fri, 21 Jul 2023 16:00:01 -0700
 In-Reply-To: <20230721230006.2337941-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230721230006.2337941-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721230006.2337941-4-seanjc@google.com>
-Subject: [PATCH v2 3/9] KVM: x86/mmu: Rename MMU_WARN_ON() to KVM_MMU_WARN_ON()
+Message-ID: <20230721230006.2337941-5-seanjc@google.com>
+Subject: [PATCH v2 4/9] KVM: x86/mmu: Convert "runtime" WARN_ON() assertions
+ to WARN_ON_ONCE()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,117 +73,443 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename MMU_WARN_ON() to make it super obvious that the assertions are
-all about KVM's MMU, not the primary MMU.
+Convert all "runtime" assertions, i.e. assertions that can be triggered
+while running vCPUs, from WARN_ON() to WARN_ON_ONCE().  Every WARN in the
+MMU that is tied to running vCPUs, i.e. not contained to loading and
+initializing KVM, is likely to fire _a lot_ when it does trigger.  E.g. if
+KVM ends up with a bug that causes a root to be invalidated before the
+page fault handler is invoked, pretty much _every_ page fault VM-Exit
+triggers the WARN.
+
+If a WARN is triggered frequently, the resulting spam usually causes a lot
+of damage of its own, e.g. consumes resources to log the WARN and pollutes
+the kernel log, often to the point where other useful information can be
+lost.  In many case, the damage caused by the spam is actually worse than
+the bug itself, e.g. KVM can almost always recover from an unexpectedly
+invalid root.
+
+On the flip side, warning every time is rarely helpful for debug and
+triage, i.e. a single splat is usually sufficient to point a debugger in
+the right direction, and automated testing, e.g. syzkaller, typically runs
+with warn_on_panic=1, i.e. will never get past the first WARN anyways.
+
+Lastly, when an assertions fails multiple times, the stack traces in KVM
+are almost always identical, i.e. the full splat only needs to be captured
+once.  And _if_ there is value in captruing information about the failed
+assert, a ratelimited printk() is sufficient and less likely to rack up a
+large amount of collateral damage.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 4 ++--
- arch/x86/kvm/mmu/mmu_internal.h | 4 ++--
- arch/x86/kvm/mmu/spte.h         | 8 ++++----
- arch/x86/kvm/mmu/tdp_mmu.c      | 8 ++++----
- 4 files changed, 12 insertions(+), 12 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 48 ++++++++++++++++-----------------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ arch/x86/kvm/mmu/page_track.c   | 16 +++++------
+ arch/x86/kvm/mmu/paging_tmpl.h  |  4 +--
+ arch/x86/kvm/mmu/spte.c         |  4 +--
+ arch/x86/kvm/mmu/tdp_iter.c     |  4 +--
+ arch/x86/kvm/mmu/tdp_mmu.c      | 20 +++++++-------
+ 7 files changed, 49 insertions(+), 49 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b16092d71d3f..c87539dd1ac0 100644
+index c87539dd1ac0..eb6af9c4cf14 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1255,7 +1255,7 @@ static bool spte_clear_dirty(u64 *sptep)
+@@ -485,7 +485,7 @@ static u64 __get_spte_lockless(u64 *sptep)
+  */
+ static void mmu_spte_set(u64 *sptep, u64 new_spte)
  {
- 	u64 spte = *sptep;
- 
--	MMU_WARN_ON(!spte_ad_enabled(spte));
-+	KVM_MMU_WARN_ON(!spte_ad_enabled(spte));
- 	spte &= ~shadow_dirty_mask;
- 	return mmu_spte_update(sptep, spte);
+-	WARN_ON(is_shadow_present_pte(*sptep));
++	WARN_ON_ONCE(is_shadow_present_pte(*sptep));
+ 	__set_spte(sptep, new_spte);
  }
-@@ -1735,7 +1735,7 @@ static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
  
- static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
+@@ -497,7 +497,7 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
  {
--	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
-+	KVM_MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
- 	hlist_del(&sp->hash_link);
- 	list_del(&sp->link);
- 	free_page((unsigned long)sp->spt);
+ 	u64 old_spte = *sptep;
+ 
+-	WARN_ON(!is_shadow_present_pte(new_spte));
++	WARN_ON_ONCE(!is_shadow_present_pte(new_spte));
+ 	check_spte_writable_invariants(new_spte);
+ 
+ 	if (!is_shadow_present_pte(old_spte)) {
+@@ -510,7 +510,7 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+ 	else
+ 		old_spte = __update_clear_spte_slow(sptep, new_spte);
+ 
+-	WARN_ON(spte_to_pfn(old_spte) != spte_to_pfn(new_spte));
++	WARN_ON_ONCE(spte_to_pfn(old_spte) != spte_to_pfn(new_spte));
+ 
+ 	return old_spte;
+ }
+@@ -592,7 +592,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+ 	 * by a refcounted page, the refcount is elevated.
+ 	 */
+ 	page = kvm_pfn_to_refcounted_page(pfn);
+-	WARN_ON(page && !page_count(page));
++	WARN_ON_ONCE(page && !page_count(page));
+ 
+ 	if (is_accessed_spte(old_spte))
+ 		kvm_set_pfn_accessed(pfn);
+@@ -807,7 +807,7 @@ static void update_gfn_disallow_lpage_count(const struct kvm_memory_slot *slot,
+ 	for (i = PG_LEVEL_2M; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
+ 		linfo = lpage_info_slot(gfn, slot, i);
+ 		linfo->disallow_lpage += count;
+-		WARN_ON(linfo->disallow_lpage < 0);
++		WARN_ON_ONCE(linfo->disallow_lpage < 0);
+ 	}
+ }
+ 
+@@ -1202,7 +1202,7 @@ static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
+ 	struct kvm_mmu_page *sp;
+ 
+ 	sp = sptep_to_sp(sptep);
+-	WARN_ON(sp->role.level == PG_LEVEL_4K);
++	WARN_ON_ONCE(sp->role.level == PG_LEVEL_4K);
+ 
+ 	drop_spte(kvm, sptep);
+ 
+@@ -1461,7 +1461,7 @@ static bool kvm_set_pte_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 	u64 new_spte;
+ 	kvm_pfn_t new_pfn;
+ 
+-	WARN_ON(pte_huge(pte));
++	WARN_ON_ONCE(pte_huge(pte));
+ 	new_pfn = pte_pfn(pte);
+ 
+ restart:
+@@ -1823,7 +1823,7 @@ static int mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
+ static inline void clear_unsync_child_bit(struct kvm_mmu_page *sp, int idx)
+ {
+ 	--sp->unsync_children;
+-	WARN_ON((int)sp->unsync_children < 0);
++	WARN_ON_ONCE((int)sp->unsync_children < 0);
+ 	__clear_bit(idx, sp->unsync_child_bitmap);
+ }
+ 
+@@ -1881,7 +1881,7 @@ static int mmu_unsync_walk(struct kvm_mmu_page *sp,
+ 
+ static void kvm_unlink_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+-	WARN_ON(!sp->unsync);
++	WARN_ON_ONCE(!sp->unsync);
+ 	trace_kvm_mmu_sync_page(sp);
+ 	sp->unsync = 0;
+ 	--kvm->stat.mmu_unsync;
+@@ -2056,11 +2056,11 @@ static int mmu_pages_first(struct kvm_mmu_pages *pvec,
+ 	if (pvec->nr == 0)
+ 		return 0;
+ 
+-	WARN_ON(pvec->page[0].idx != INVALID_INDEX);
++	WARN_ON_ONCE(pvec->page[0].idx != INVALID_INDEX);
+ 
+ 	sp = pvec->page[0].sp;
+ 	level = sp->role.level;
+-	WARN_ON(level == PG_LEVEL_4K);
++	WARN_ON_ONCE(level == PG_LEVEL_4K);
+ 
+ 	parents->parent[level-2] = sp;
+ 
+@@ -2082,7 +2082,7 @@ static void mmu_pages_clear_parents(struct mmu_page_path *parents)
+ 		if (!sp)
+ 			return;
+ 
+-		WARN_ON(idx == INVALID_INDEX);
++		WARN_ON_ONCE(idx == INVALID_INDEX);
+ 		clear_unsync_child_bit(sp, idx);
+ 		level++;
+ 	} while (!sp->unsync_children);
+@@ -2203,7 +2203,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+ 			if (ret < 0)
+ 				break;
+ 
+-			WARN_ON(!list_empty(&invalid_list));
++			WARN_ON_ONCE(!list_empty(&invalid_list));
+ 			if (ret > 0)
+ 				kvm_flush_remote_tlbs(kvm);
+ 		}
+@@ -2658,7 +2658,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+ 	kvm_flush_remote_tlbs(kvm);
+ 
+ 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
+-		WARN_ON(!sp->role.invalid || sp->root_count);
++		WARN_ON_ONCE(!sp->role.invalid || sp->root_count);
+ 		kvm_mmu_free_shadow_page(sp);
+ 	}
+ }
+@@ -2853,7 +2853,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+ 				continue;
+ 		}
+ 
+-		WARN_ON(sp->role.level != PG_LEVEL_4K);
++		WARN_ON_ONCE(sp->role.level != PG_LEVEL_4K);
+ 		kvm_unsync_page(kvm, sp);
+ 	}
+ 	if (locked)
+@@ -3006,7 +3006,7 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
+ 	u64 *spte, *start = NULL;
+ 	int i;
+ 
+-	WARN_ON(!sp->role.direct);
++	WARN_ON_ONCE(!sp->role.direct);
+ 
+ 	i = spte_index(sptep) & ~(PTE_PREFETCH_NUM - 1);
+ 	spte = sp->spt + i;
+@@ -3552,7 +3552,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 	 * SPTE to ensure any non-PA bits are dropped.
+ 	 */
+ 	sp = spte_to_child_sp(*root_hpa);
+-	if (WARN_ON(!sp))
++	if (WARN_ON_ONCE(!sp))
+ 		return;
+ 
+ 	if (is_tdp_mmu_page(sp))
+@@ -4167,7 +4167,7 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
+ 		return RET_PF_EMULATE;
+ 
+ 	reserved = get_mmio_spte(vcpu, addr, &spte);
+-	if (WARN_ON(reserved))
++	if (WARN_ON_ONCE(reserved))
+ 		return -EINVAL;
+ 
+ 	if (is_mmio_spte(spte)) {
+@@ -5502,9 +5502,9 @@ void kvm_mmu_unload(struct kvm_vcpu *vcpu)
+ 	struct kvm *kvm = vcpu->kvm;
+ 
+ 	kvm_mmu_free_roots(kvm, &vcpu->arch.root_mmu, KVM_MMU_ROOTS_ALL);
+-	WARN_ON(VALID_PAGE(vcpu->arch.root_mmu.root.hpa));
++	WARN_ON_ONCE(VALID_PAGE(vcpu->arch.root_mmu.root.hpa));
+ 	kvm_mmu_free_roots(kvm, &vcpu->arch.guest_mmu, KVM_MMU_ROOTS_ALL);
+-	WARN_ON(VALID_PAGE(vcpu->arch.guest_mmu.root.hpa));
++	WARN_ON_ONCE(VALID_PAGE(vcpu->arch.guest_mmu.root.hpa));
+ 	vcpu_clear_mmio_info(vcpu, MMIO_GVA_ANY);
+ }
+ 
+@@ -5708,7 +5708,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ 	int r, emulation_type = EMULTYPE_PF;
+ 	bool direct = vcpu->arch.mmu->root_role.direct;
+ 
+-	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
++	if (WARN_ON_ONCE(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
+ 		return RET_PF_RETRY;
+ 
+ 	r = RET_PF_INVALID;
+@@ -6065,7 +6065,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+ 		 * pages.  Skip the bogus page, otherwise we'll get stuck in an
+ 		 * infinite loop if the page gets put back on the list (again).
+ 		 */
+-		if (WARN_ON(sp->role.invalid))
++		if (WARN_ON_ONCE(sp->role.invalid))
+ 			continue;
+ 
+ 		/*
+@@ -6707,7 +6707,7 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+ 	write_lock(&kvm->mmu_lock);
+ restart:
+ 	list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
+-		if (WARN_ON(sp->role.invalid))
++		if (WARN_ON_ONCE(sp->role.invalid))
+ 			continue;
+ 		if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
+ 			goto restart;
+@@ -6725,7 +6725,7 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+ 
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+ {
+-	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
++	WARN_ON_ONCE(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+ 
+ 	gen &= MMIO_SPTE_GEN_MASK;
+ 
 diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 9ea80e4d463c..bb1649669bc9 100644
+index bb1649669bc9..cfe925fefa68 100644
 --- a/arch/x86/kvm/mmu/mmu_internal.h
 +++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -9,9 +9,9 @@
+@@ -9,7 +9,7 @@
  #undef MMU_DEBUG
  
  #ifdef MMU_DEBUG
--#define MMU_WARN_ON(x) WARN_ON(x)
-+#define KVM_MMU_WARN_ON(x) WARN_ON(x)
+-#define KVM_MMU_WARN_ON(x) WARN_ON(x)
++#define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
  #else
--#define MMU_WARN_ON(x) do { } while (0)
-+#define KVM_MMU_WARN_ON(x) do { } while (0)
+ #define KVM_MMU_WARN_ON(x) do { } while (0)
  #endif
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index 0a2ac438d647..fd16918b3a7a 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -94,7 +94,7 @@ static void update_gfn_track(struct kvm_memory_slot *slot, gfn_t gfn,
  
- /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 1279db2eab44..83e6614f3720 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -265,13 +265,13 @@ static inline bool sp_ad_disabled(struct kvm_mmu_page *sp)
+ 	val = slot->arch.gfn_track[mode][index];
  
- static inline bool spte_ad_enabled(u64 spte)
+-	if (WARN_ON(val + count < 0 || val + count > USHRT_MAX))
++	if (WARN_ON_ONCE(val + count < 0 || val + count > USHRT_MAX))
+ 		return;
+ 
+ 	slot->arch.gfn_track[mode][index] += count;
+@@ -117,11 +117,11 @@ void kvm_slot_page_track_add_page(struct kvm *kvm,
+ 				  enum kvm_page_track_mode mode)
  {
--	MMU_WARN_ON(!is_shadow_present_pte(spte));
-+	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
- 	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_DISABLED;
- }
  
- static inline bool spte_ad_need_write_protect(u64 spte)
+-	if (WARN_ON(!page_track_mode_is_valid(mode)))
++	if (WARN_ON_ONCE(!page_track_mode_is_valid(mode)))
+ 		return;
+ 
+-	if (WARN_ON(mode == KVM_PAGE_TRACK_WRITE &&
+-		    !kvm_page_track_write_tracking_enabled(kvm)))
++	if (WARN_ON_ONCE(mode == KVM_PAGE_TRACK_WRITE &&
++			 !kvm_page_track_write_tracking_enabled(kvm)))
+ 		return;
+ 
+ 	update_gfn_track(slot, gfn, mode, 1);
+@@ -155,11 +155,11 @@ void kvm_slot_page_track_remove_page(struct kvm *kvm,
+ 				     struct kvm_memory_slot *slot, gfn_t gfn,
+ 				     enum kvm_page_track_mode mode)
  {
--	MMU_WARN_ON(!is_shadow_present_pte(spte));
-+	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
- 	/*
- 	 * This is benign for non-TDP SPTEs as SPTE_TDP_AD_ENABLED is '0',
- 	 * and non-TDP SPTEs will never set these bits.  Optimize for 64-bit
-@@ -282,13 +282,13 @@ static inline bool spte_ad_need_write_protect(u64 spte)
+-	if (WARN_ON(!page_track_mode_is_valid(mode)))
++	if (WARN_ON_ONCE(!page_track_mode_is_valid(mode)))
+ 		return;
  
- static inline u64 spte_shadow_accessed_mask(u64 spte)
+-	if (WARN_ON(mode == KVM_PAGE_TRACK_WRITE &&
+-		    !kvm_page_track_write_tracking_enabled(kvm)))
++	if (WARN_ON_ONCE(mode == KVM_PAGE_TRACK_WRITE &&
++			 !kvm_page_track_write_tracking_enabled(kvm)))
+ 		return;
+ 
+ 	update_gfn_track(slot, gfn, mode, -1);
+@@ -181,7 +181,7 @@ bool kvm_slot_page_track_is_active(struct kvm *kvm,
  {
--	MMU_WARN_ON(!is_shadow_present_pte(spte));
-+	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
- 	return spte_ad_enabled(spte) ? shadow_accessed_mask : 0;
- }
+ 	int index;
  
- static inline u64 spte_shadow_dirty_mask(u64 spte)
+-	if (WARN_ON(!page_track_mode_is_valid(mode)))
++	if (WARN_ON_ONCE(!page_track_mode_is_valid(mode)))
+ 		return false;
+ 
+ 	if (!slot)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 7a97f769a7cb..a3fc7c1a7f8d 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -633,7 +633,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	if (FNAME(gpte_changed)(vcpu, gw, top_level))
+ 		goto out_gpte_changed;
+ 
+-	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
++	if (WARN_ON_ONCE(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
+ 		goto out_gpte_changed;
+ 
+ 	for_each_shadow_entry(vcpu, fault->addr, it) {
+@@ -830,7 +830,7 @@ static gpa_t FNAME(get_level1_sp_gpa)(struct kvm_mmu_page *sp)
  {
--	MMU_WARN_ON(!is_shadow_present_pte(spte));
-+	KVM_MMU_WARN_ON(!is_shadow_present_pte(spte));
- 	return spte_ad_enabled(spte) ? shadow_dirty_mask : 0;
- }
+ 	int offset = 0;
  
+-	WARN_ON(sp->role.level != PG_LEVEL_4K);
++	WARN_ON_ONCE(sp->role.level != PG_LEVEL_4K);
+ 
+ 	if (PTTYPE == 32)
+ 		offset = sp->role.quadrant << SPTE_LEVEL_BITS;
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 438a86bda9f3..4a599130e9c9 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -61,7 +61,7 @@ static u64 generation_mmio_spte_mask(u64 gen)
+ {
+ 	u64 mask;
+ 
+-	WARN_ON(gen & ~MMIO_SPTE_GEN_MASK);
++	WARN_ON_ONCE(gen & ~MMIO_SPTE_GEN_MASK);
+ 
+ 	mask = (gen << MMIO_SPTE_GEN_LOW_SHIFT) & MMIO_SPTE_GEN_LOW_MASK;
+ 	mask |= (gen << MMIO_SPTE_GEN_HIGH_SHIFT) & MMIO_SPTE_GEN_HIGH_MASK;
+@@ -240,7 +240,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 
+ 	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
+ 		/* Enforced by kvm_mmu_hugepage_adjust. */
+-		WARN_ON(level > PG_LEVEL_4K);
++		WARN_ON_ONCE(level > PG_LEVEL_4K);
+ 		mark_page_dirty_in_slot(vcpu->kvm, slot, gfn);
+ 	}
+ 
+diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
+index d2eb0d4f8710..5bb09f8d9fc6 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.c
++++ b/arch/x86/kvm/mmu/tdp_iter.c
+@@ -41,8 +41,8 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
+ {
+ 	int root_level = root->role.level;
+ 
+-	WARN_ON(root_level < 1);
+-	WARN_ON(root_level > PT64_ROOT_MAX_LEVEL);
++	WARN_ON_ONCE(root_level < 1);
++	WARN_ON_ONCE(root_level > PT64_ROOT_MAX_LEVEL);
+ 
+ 	iter->next_last_level_gfn = next_last_level_gfn;
+ 	iter->root_level = root_level;
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 512163d52194..f881de40f9ef 100644
+index f881de40f9ef..b2068c47f78c 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1548,8 +1548,8 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 		if (!is_shadow_present_pte(iter.old_spte))
- 			continue;
+@@ -475,9 +475,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
  
--		MMU_WARN_ON(kvm_ad_enabled() &&
--			    spte_ad_need_write_protect(iter.old_spte));
-+		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
-+				spte_ad_need_write_protect(iter.old_spte));
+-	WARN_ON(level > PT64_ROOT_MAX_LEVEL);
+-	WARN_ON(level < PG_LEVEL_4K);
+-	WARN_ON(gfn & (KVM_PAGES_PER_HPAGE(level) - 1));
++	WARN_ON_ONCE(level > PT64_ROOT_MAX_LEVEL);
++	WARN_ON_ONCE(level < PG_LEVEL_4K);
++	WARN_ON_ONCE(gfn & (KVM_PAGES_PER_HPAGE(level) - 1));
  
- 		if (!(iter.old_spte & dbit))
- 			continue;
-@@ -1607,8 +1607,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
- 		if (!mask)
- 			break;
+ 	/*
+ 	 * If this warning were to trigger it would indicate that there was a
+@@ -522,9 +522,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 		 * impact the guest since both the former and current SPTEs
+ 		 * are nonpresent.
+ 		 */
+-		if (WARN_ON(!is_mmio_spte(old_spte) &&
+-			    !is_mmio_spte(new_spte) &&
+-			    !is_removed_spte(new_spte)))
++		if (WARN_ON_ONCE(!is_mmio_spte(old_spte) &&
++				 !is_mmio_spte(new_spte) &&
++				 !is_removed_spte(new_spte)))
+ 			pr_err("Unexpected SPTE change! Nonpresent SPTEs\n"
+ 			       "should not be replaced with another,\n"
+ 			       "different nonpresent SPTE, unless one or both\n"
+@@ -661,7 +661,7 @@ static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
+ 	 * should be used. If operating under the MMU lock in write mode, the
+ 	 * use of the removed SPTE should not be necessary.
+ 	 */
+-	WARN_ON(is_removed_spte(old_spte) || is_removed_spte(new_spte));
++	WARN_ON_ONCE(is_removed_spte(old_spte) || is_removed_spte(new_spte));
  
--		MMU_WARN_ON(kvm_ad_enabled() &&
--			    spte_ad_need_write_protect(iter.old_spte));
-+		KVM_MMU_WARN_ON(kvm_ad_enabled() &&
-+				spte_ad_need_write_protect(iter.old_spte));
+ 	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
  
- 		if (iter.level > PG_LEVEL_4K ||
- 		    !(mask & (1UL << (iter.gfn - gfn))))
+@@ -709,7 +709,7 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
+ 							  struct tdp_iter *iter,
+ 							  bool flush, bool shared)
+ {
+-	WARN_ON(iter->yielded);
++	WARN_ON_ONCE(iter->yielded);
+ 
+ 	/* Ensure forward progress has been made before yielding. */
+ 	if (iter->next_last_level_gfn == iter->yielded_gfn)
+@@ -728,7 +728,7 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
+ 
+ 		rcu_read_lock();
+ 
+-		WARN_ON(iter->gfn > iter->next_last_level_gfn);
++		WARN_ON_ONCE(iter->gfn > iter->next_last_level_gfn);
+ 
+ 		iter->yielded = true;
+ 	}
+@@ -1241,7 +1241,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+ 	u64 new_spte;
+ 
+ 	/* Huge pages aren't expected to be modified without first being zapped. */
+-	WARN_ON(pte_huge(range->pte) || range->start + 1 != range->end);
++	WARN_ON_ONCE(pte_huge(range->pte) || range->start + 1 != range->end);
+ 
+ 	if (iter->level != PG_LEVEL_4K ||
+ 	    !is_shadow_present_pte(iter->old_spte))
 -- 
 2.41.0.487.g6d72f3e995-goog
 
