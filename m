@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F57A75D597
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:21:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78E2675D599
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231537AbjGUUVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 16:21:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38920 "EHLO
+        id S231548AbjGUUVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 16:21:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231508AbjGUUUf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 16:20:35 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4A330D6
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1716430276.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:50 -0700 (PDT)
+        with ESMTP id S231466AbjGUUUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 16:20:46 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16953A80
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:55 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1716467276.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689970779; x=1690575579;
+        d=google.com; s=20221208; t=1689970781; x=1690575581;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ufOgL/ovXKIGQEYukNshYDCW2QOagoVOtmN2psRo9c=;
-        b=b12Ttu/+eAKMYYr+ZtWZDhO9f8tIZzhiWDUyfkYKkQAGZ8PdoM7SUfhXHfFjda9SM8
-         wHTbZcaIxbvpo6ZC55UJc/d6aRulVjhV0CUNJrul/2S2FZZweyArAU2EVJUBrcBBXquN
-         vU05kJwjb1NAJHt3dCz+9FG0HhYvLHlgxT/IyC/seKzCxR/UFSkK+WuX3JN2T1Zjexz/
-         cn2JU6UHxz3FopptseYCiqsx2AYAfIKAmTFUMY10/d1txCxH5yYIetLq3/s5ohB7VhvC
-         xsH/zGKExBxyiHcmYi130rGplxqvQDFOSlqz2e7jwYp5AIvNTdYLOF8Ndw+tBLCt7PL8
-         HW5A==
+        bh=vAOLLgTu+0QNT9Om4NpxWB91aAPEeSvRzwHwJVAa2Xs=;
+        b=imhgBKzxrXtouuf5PfcKL7zBn0uz33+q5k8Z0nIhm6BNxLjvMukg2vArkkk5NgTFDM
+         NCaOxaOau0vLfoyQRsInuw+KAa7AslkSTBn6yul+5eiPK0IjOxtTfZI+5BUlLIVKvaaf
+         zctolS0OU9qe/eA0SfoB4J52oxFAqZ+fh+FLtJaIaIPFFG750jsFlZ2Mc9quoQp2Unyu
+         4inyMQQxkm2n98I2kfK3YCgsPjNs4UlB9VWVghYk87tTe4jdkygy4sS2+Mqd1axuaOKZ
+         Y80wBoNxrdfW0VnTAvlYpjVOt8tpfiwmBahTWl8/tfevz/dYYviEbtSr/R7buC1VS27v
+         nuqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689970779; x=1690575579;
+        d=1e100.net; s=20221208; t=1689970781; x=1690575581;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0ufOgL/ovXKIGQEYukNshYDCW2QOagoVOtmN2psRo9c=;
-        b=KlaVsPCkzlemjMB9Jg2d0OpXg/irNWlWhIK7jMNlibrcx9VWQcKx6U93CL01VxqzSU
-         g4zmboNjqPrfthM/4g6ZghVPEPnNLy8Aqc4/CcHtfO3gwHLUFla5saBcg4q2g31U8oCK
-         MAecZRQGojIzESj8FuWqsOhKMFapLqUIVrX4TKmuw5Xe7N7A3fBV+/hFrI36Ea65/LGl
-         aycRb0k0ccpkB5yip0wmoiCrMoemHTlCYHefaGLzqW1qoW2lhf0GZyGauS1UQydpFDZx
-         JuO20NsGe1FCBSTWBVjpg05/C52M+4e3iU7wbPv9ymlBWTMjekGJ1Y+jmqgBTPOPr5qS
-         f8WA==
-X-Gm-Message-State: ABy/qLbqiIFzEsvVR/WQagi8QsrJMlwOUFnimn6BB2p/31wJSmOQORdi
-        OWheBA5RfCTrM5CAS0uK9mbYxe9b5Iw=
-X-Google-Smtp-Source: APBJJlEMRg8khkFQs+v6K4Haj1LsdDQNVMJ0EH61NH5YR90us2W3yxUe/jzK4/gqbgOaQJvbK9pl9eS5wa8=
+        bh=vAOLLgTu+0QNT9Om4NpxWB91aAPEeSvRzwHwJVAa2Xs=;
+        b=Od93Pb3pkhNlAuEXo/0ahg5YF33O5M0/lVESHaeojIWXHt+NacxcXdqOrfFZMAXJ3j
+         2t95HJVyJ2m8aut1vMXxJCGNXnYhnSOhQmw9oyJmuUFYl6u8IIZSyYXdUZlA37z/lfRG
+         Pfmuy4NcaGSJAFw6Ae6FUbN+TSgwKcHKtvmkI00ESTa/rTU6/wWWXcvnKxgY9X+x4Ioi
+         B10GKw/tPbF8WcbgAZGHB95qU0zKIpnvP76YjEdHVyhg8GtZPrWANtx3FO/BnbSG8Igz
+         tf2G2J63sL7blWlX2+rkhaG8I08CoGXybU9pU9vQ5Y/TMd09cNWgkBUTcPpA5Juz+lI0
+         Uf/g==
+X-Gm-Message-State: ABy/qLa+wFmcq4BW2o+PNm7pV7NGJDgcYhhBwutw/bH8Og86xFViMZwW
+        y3kMXWUnbPxkQyxIbru+ecxRRzcQ+3s=
+X-Google-Smtp-Source: APBJJlFg1G379oAP55UGHQ0zEE/xeGlSUtowvWP1iIaOgGSS++UyKOVvNLNpz7tVyRlxXJ14xmaMnRFherI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
  (user=seanjc job=sendgmr) by 2002:a25:81cf:0:b0:c5d:dac2:cb2a with SMTP id
- n15-20020a2581cf000000b00c5ddac2cb2amr18048ybm.13.1689970779472; Fri, 21 Jul
- 2023 13:19:39 -0700 (PDT)
+ n15-20020a2581cf000000b00c5ddac2cb2amr18050ybm.13.1689970781205; Fri, 21 Jul
+ 2023 13:19:41 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 13:18:57 -0700
+Date:   Fri, 21 Jul 2023 13:18:58 -0700
 In-Reply-To: <20230721201859.2307736-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230721201859.2307736-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721201859.2307736-18-seanjc@google.com>
-Subject: [PATCH v4 17/19] KVM: x86: Force kvm_rebooting=true during emergency reboot/crash
+Message-ID: <20230721201859.2307736-19-seanjc@google.com>
+Subject: [PATCH v4 18/19] KVM: SVM: Use "standard" stgi() helper when
+ disabling SVM
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -75,43 +76,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set kvm_rebooting when virtualization is disabled in an emergency so that
-KVM eats faults on virtualization instructions even if kvm_reboot() isn't
-reached.
+Now that kvm_rebooting is guaranteed to be true prior to disabling SVM
+in an emergency, use the existing stgi() helper instead of open coding
+STGI.  In effect, eat faults on STGI if and only if kvm_rebooting==true.
 
-Reviewed-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 2 ++
- arch/x86/kvm/vmx/vmx.c | 2 ++
- 2 files changed, 4 insertions(+)
+ arch/x86/kvm/svm/svm.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 47f9c7156609..8d1b3c801629 100644
+index 8d1b3c801629..4785d780cce3 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -605,6 +605,8 @@ static inline void kvm_cpu_svm_disable(void)
- 
- static void svm_emergency_disable(void)
- {
-+	kvm_rebooting = true;
-+
- 	kvm_cpu_svm_disable();
+@@ -588,17 +588,10 @@ static inline void kvm_cpu_svm_disable(void)
+ 	rdmsrl(MSR_EFER, efer);
+ 	if (efer & EFER_SVME) {
+ 		/*
+-		 * Force GIF=1 prior to disabling SVM to ensure INIT and NMI
+-		 * aren't blocked, e.g. if a fatal error occurred between CLGI
+-		 * and STGI.  Note, STGI may #UD if SVM is disabled from NMI
+-		 * context between reading EFER and executing STGI.  In that
+-		 * case, GIF must already be set, otherwise the NMI would have
+-		 * been blocked, so just eat the fault.
++		 * Force GIF=1 prior to disabling SVM, e.g. to ensure INIT and
++		 * NMI aren't blocked.
+ 		 */
+-		asm_volatile_goto("1: stgi\n\t"
+-				  _ASM_EXTABLE(1b, %l[fault])
+-				  ::: "memory" : fault);
+-fault:
++		stgi();
+ 		wrmsrl(MSR_EFER, efer & ~EFER_SVME);
+ 	}
  }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0e1f3856a9be..5d21931842a5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -771,6 +771,8 @@ static void vmx_emergency_disable(void)
- 	int cpu = raw_smp_processor_id();
- 	struct loaded_vmcs *v;
- 
-+	kvm_rebooting = true;
-+
- 	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
- 			    loaded_vmcss_on_cpu_link)
- 		vmcs_clear(v->vmcs);
 -- 
 2.41.0.487.g6d72f3e995-goog
 
