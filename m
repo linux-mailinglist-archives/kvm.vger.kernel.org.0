@@ -2,87 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 660CB75D15B
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 20:25:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0AFA75D17A
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 20:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbjGUSZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 14:25:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36850 "EHLO
+        id S230521AbjGUSns (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 14:43:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbjGUSZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 14:25:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413E935A1;
-        Fri, 21 Jul 2023 11:25:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A6F5961D90;
-        Fri, 21 Jul 2023 18:25:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 502ECC433CA;
-        Fri, 21 Jul 2023 18:25:39 +0000 (UTC)
-Date:   Fri, 21 Jul 2023 19:25:38 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Alistair Popple <apopple@nvidia.com>
-Cc:     akpm@linux-foundation.org, ajd@linux.ibm.com,
-        fbarrat@linux.ibm.com, iommu@lists.linux.dev, jgg@ziepe.ca,
-        jhubbard@nvidia.com, kevin.tian@intel.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au, nicolinc@nvidia.com, npiggin@gmail.com,
-        robin.murphy@arm.com, seanjc@google.com, will@kernel.org,
-        x86@kernel.org, zhi.wang.linux@gmail.com, sj@kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 5/5] mmu_notifiers: Rename invalidate_range notifier
-Message-ID: <ZLrNotPTZSnmtz7b@arm.com>
-References: <cover.b24362332ec6099bc8db4e8e06a67545c653291d.1689842332.git-series.apopple@nvidia.com>
- <3cbd2a644d56d503b47cfc35868d547f924f880e.1689842332.git-series.apopple@nvidia.com>
+        with ESMTP id S229451AbjGUSnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 14:43:47 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2E9E62;
+        Fri, 21 Jul 2023 11:43:46 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1b9cdef8619so15444115ad.0;
+        Fri, 21 Jul 2023 11:43:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689965026; x=1690569826;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4nnFaTg0IEjUdqid4XZGgfvzwMzdJISJ9KdbrEVQTkc=;
+        b=gN5kqHrGUQ7n9A2IeKWEWJ79xju2TNQX6vnpuKuZ1IIfSnrVMexOaclUCgl5XYI9UC
+         OWPJHMSRSLPOGuaQWwrdrDQpOz4lZbiGO4EDZEZFsRy2fKyNf1F4NSOoFAT9F++Z5YSb
+         u7LZC4s4ZsvhlVum6sFEBuyYQhvICSQiXffsFPFg6/JGW8VM7U3sSg04VvRy6I/EO+3P
+         t34xJxkkxkqevGIeHS3k27dcjQk6GOZUsQmCoPUquHRxofwbxHd+jJVs3J4Kw8dEU/Gt
+         q3MgPq8O7i2YnhPyD/3i/vJhyisTQ/eGAqbmO+WEfT8YSL9kAWHbe56GP5DC6qpaA/FQ
+         cVJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689965026; x=1690569826;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4nnFaTg0IEjUdqid4XZGgfvzwMzdJISJ9KdbrEVQTkc=;
+        b=jKZnQhbR2domw4MFtO1zhrGjOGqXTlwOB7gMmDVnEtkGC0/9XdzEimCVdzrhXV+DoS
+         Fk1XYQ7nNBFHUt7f/U6Q784hv6p96Sk3HKR3VX9dVstPX7I6/cWBQR67eznqw0ykWocg
+         lWyS44jC0MQQdadUoF/8GbZvJeeB3nYulhkufvqyK5sDbjZeXsaFqrQx8LcwM9G/z1ke
+         8+bTjMfDBrEcAiUank0VvXqUwuWV0wxnnllZ/yn+o0k8dtC8G+2aavKeGgYUVaqvLMny
+         0iWuH7yCmD0oxSt3OXJnOpAY4on7XjtKreqKZBxQvXF3hhmKea5Fgt9PNEJSdsgeVIC4
+         OF9A==
+X-Gm-Message-State: ABy/qLYUcoMhxQcxCQ0a2wpC/vywaI7SrPbZ78Rfuz/PBxZiatjFW6s1
+        fd7++RKBGwSeN/cTjeWHLX4=
+X-Google-Smtp-Source: APBJJlHWZaBoDL8lz8FffqgAybCoIF1obzSq2tHKJzpNUhRlifDbg57zIVf8dPuxHagjKCnBWSip6w==
+X-Received: by 2002:a17:902:7c85:b0:1b7:c166:f197 with SMTP id y5-20020a1709027c8500b001b7c166f197mr2272527pll.29.1689965025944;
+        Fri, 21 Jul 2023 11:43:45 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id l1-20020a170903244100b001b3fb2f0296sm3848573pls.120.2023.07.21.11.43.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jul 2023 11:43:45 -0700 (PDT)
+Date:   Fri, 21 Jul 2023 11:43:43 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Subject: Re: [RFC PATCH v4 09/10] KVM: x86: Make struct sev_cmd common for
+ KVM_MEM_ENC_OP
+Message-ID: <20230721184343.GI25699@ls.amr.corp.intel.com>
+References: <cover.1689893403.git.isaku.yamahata@intel.com>
+ <8c0b7babbdd777a33acd4f6b0f831ae838037806.1689893403.git.isaku.yamahata@intel.com>
+ <ZLqbWFnm7jyB8JuY@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3cbd2a644d56d503b47cfc35868d547f924f880e.1689842332.git-series.apopple@nvidia.com>
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+In-Reply-To: <ZLqbWFnm7jyB8JuY@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 06:39:27PM +1000, Alistair Popple wrote:
-> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-> index a99349d..84a05a0 100644
-> --- a/arch/arm64/include/asm/tlbflush.h
-> +++ b/arch/arm64/include/asm/tlbflush.h
-> @@ -253,7 +253,7 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
->  	__tlbi(aside1is, asid);
->  	__tlbi_user(aside1is, asid);
->  	dsb(ish);
-> -	mmu_notifier_invalidate_range(mm, 0, -1UL);
-> +	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
->  }
->  
->  static inline void __flush_tlb_page_nosync(struct mm_struct *mm,
-> @@ -265,7 +265,7 @@ static inline void __flush_tlb_page_nosync(struct mm_struct *mm,
->  	addr = __TLBI_VADDR(uaddr, ASID(mm));
->  	__tlbi(vale1is, addr);
->  	__tlbi_user(vale1is, addr);
-> -	mmu_notifier_invalidate_range(mm, uaddr & PAGE_MASK,
-> +	mmu_notifier_arch_invalidate_secondary_tlbs(mm, uaddr & PAGE_MASK,
->  						(uaddr & PAGE_MASK) + PAGE_SIZE);
->  }
->  
-> @@ -400,7 +400,7 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
->  		scale++;
->  	}
->  	dsb(ish);
-> -	mmu_notifier_invalidate_range(vma->vm_mm, start, end);
-> +	mmu_notifier_arch_invalidate_secondary_tlbs(vma->vm_mm, start, end);
->  }
+On Fri, Jul 21, 2023 at 07:51:04AM -0700,
+Sean Christopherson <seanjc@google.com> wrote:
 
-For arm64:
+> On Thu, Jul 20, 2023, isaku.yamahata@intel.com wrote:
+> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > index aa7a56a47564..32883e520b00 100644
+> > --- a/arch/x86/include/uapi/asm/kvm.h
+> > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > @@ -562,6 +562,39 @@ struct kvm_pmu_event_filter {
+> >  /* x86-specific KVM_EXIT_HYPERCALL flags. */
+> >  #define KVM_EXIT_HYPERCALL_LONG_MODE	BIT(0)
+> >  
+> > +struct kvm_mem_enc_cmd {
+> > +	/* sub-command id of KVM_MEM_ENC_OP. */
+> > +	__u32 id;
+> > +	/*
+> > +	 * Auxiliary flags for sub-command.  If sub-command doesn't use it,
+> > +	 * set zero.
+> > +	 */
+> > +	__u32 flags;
+> > +	/*
+> > +	 * Data for sub-command.  An immediate or a pointer to the actual
+> > +	 * data in process virtual address.  If sub-command doesn't use it,
+> > +	 * set zero.
+> > +	 */
+> > +	__u64 data;
+> > +	/*
+> > +	 * Supplemental error code in the case of error.
+> > +	 * SEV error code from the PSP or TDX SEAMCALL status code.
+> > +	 * The caller should set zero.
+> > +	 */
+> > +	union {
+> > +		struct {
+> > +			__u32 error;
+> > +			/*
+> > +			 * KVM_SEV_LAUNCH_START and KVM_SEV_RECEIVE_START
+> > +			 * require extra data. Not included in struct
+> > +			 * kvm_sev_launch_start or struct kvm_sev_receive_start.
+> > +			 */
+> > +			__u32 sev_fd;
+> > +		};
+> > +		__u64 error64;
+> > +	};
+> > +};
+> 
+> Eww.  Why not just use an entirely different struct for TDX?  I don't see what
+> benefit this provides other than a warm fuzzy feeling that TDX and SEV share a
+> struct.  Practically speaking, KVM will likely take on more work to forcefully
+> smush the two together than if they're separate things.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Ok, let's drop this patch. Keep the ABI different for now.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
