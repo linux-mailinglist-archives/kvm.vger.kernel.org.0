@@ -2,47 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40E9475C4F6
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 12:47:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 428F975C521
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 12:58:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229744AbjGUKrb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 06:47:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44302 "EHLO
+        id S230406AbjGUK6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 06:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjGUKr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 06:47:29 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965AB1701;
-        Fri, 21 Jul 2023 03:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689936448; x=1721472448;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lqUeKJjFv2Sxri0zg/OC/DAKL78i5iZqhBI02xpLRko=;
-  b=b1gQmxJK0t5qLXwInz2z1vsdJy6AAum1O7lL2lvyHs1DN9MMjcWJh3Ie
-   XiQIolmGnSCp8dS7AHZSNibxy1hVJ/i0RigeqX+3TY4Dchg79d7tNOVZt
-   1zI0mxUUEvbdid5OKYkKK/OjvF3ZXRsYUUBweuFEO96HogAYXug1jV1FM
-   yXeHCATd/WIUfaKFRwUCN6MxORHdPgsDhMt0bhcAg+lXz7IRDf3PKuGMb
-   /1av+6I8NpXxKDEkf4L4OUG5eZRRZANszRY6PuFLljdeBGha5N7Pqp/NZ
-   HY/81IGWCW7Y7bnlpdITKo1unVMFC5S6MTvObMTBR5MjdcpzxEDN4ncJ0
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="365884912"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="365884912"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2023 03:47:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="724827627"
-X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="724827627"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orsmga002.jf.intel.com with ESMTP; 21 Jul 2023 03:47:13 -0700
-Date:   Fri, 21 Jul 2023 18:45:26 +0800
-From:   Xu Yilun <yilun.xu@intel.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S231169AbjGUK57 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 06:57:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F4033171E
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 03:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689937033;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JCcb9xtScqAyMOStlm7ewhQnyFA6r02pOvdu3ozJ8ms=;
+        b=CfDUw4n5j9Ub8zU/uGCccEihQ3s/RFlSzrHXicFgigg9iXRpcJsjAkzayq/qzqV7eXWNbF
+        TgYL2U0/RTkrjVJjgxihUYvvc8ehJ/QT0O8zUK7bCf7VwiS31imZHJUAZyB/kGNlg1HGkq
+        JyrMHOhm3ERua6VGu9U+jHpmsjE6Utg=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-198-sHL34bQzOtWj6DCiauOkaQ-1; Fri, 21 Jul 2023 06:57:11 -0400
+X-MC-Unique: sHL34bQzOtWj6DCiauOkaQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-98df34aa83aso336629766b.1
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 03:57:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689937031; x=1690541831;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JCcb9xtScqAyMOStlm7ewhQnyFA6r02pOvdu3ozJ8ms=;
+        b=dAnosz9hbnbwU50CXhqRQgX2oEqXVlsqgQ30FcTjRU8QDG3bVrvOEJ3cB3SLLyetwH
+         OvU2JWSdeBUBE0xcVWKE2QuBE+lQ41cjrfGbTagEGxMK3emLWWQq0Urp417UpDpvtCYA
+         R6jhdJ4q5Bd+ylgrI9NkSC8UR/mT7SUdO34vg7ab7SdOq3RiJ2O4T8X7Ri8PsBtYwvGB
+         laiEcQzFMs16oytLpIJhne4k3INa6WNod4YZzU2ebyYuq1f32EnF1s/igiHTt+PyLJlO
+         58xB1g6dtfvBVZnaaohG5Y4xqJ2HhQJQ1PgTVJscToBkoLm00OmFZSWVlNVBmC/k3gXw
+         PhWw==
+X-Gm-Message-State: ABy/qLYUq2RlXkZRDUlAARX/mYkPtIvetBZ+NDTXox7l5YVdN6+W7LGK
+        tXOZAEeuYqVWzzJph4Y4R9DSDkrbo2xjXtUAm59FGmleY+QILynBXbB+0YJ2QZGRklWsJOOoU4l
+        okamI0GyS/2qy
+X-Received: by 2002:a17:907:d8a:b0:991:d414:d889 with SMTP id go10-20020a1709070d8a00b00991d414d889mr8230231ejc.15.1689937030827;
+        Fri, 21 Jul 2023 03:57:10 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHG8R7IreJRTfdc0Wq/Yo7PIzOhZZy/jcnGLgxDY0N1OVv0CFUqys6sH346KYqEVj6MNTbrkQ==
+X-Received: by 2002:a17:907:d8a:b0:991:d414:d889 with SMTP id go10-20020a1709070d8a00b00991d414d889mr8230204ejc.15.1689937030548;
+        Fri, 21 Jul 2023 03:57:10 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id f21-20020a170906049500b0099364d9f0e9sm2025435eja.102.2023.07.21.03.57.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jul 2023 03:57:09 -0700 (PDT)
+Message-ID: <0c033063-5d20-4522-87e2-80ad3cca3602@redhat.com>
+Date:   Fri, 21 Jul 2023 12:57:07 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
         Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -55,12 +75,12 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Paul Moore <paul@paul-moore.com>,
         James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
+        "Serge E. Hallyn" <serge@hallyn.com>
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.linux.dev, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Fuad Tabba <tabba@google.com>,
@@ -77,58 +97,62 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Liam Merwick <liam.merwick@oracle.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a
- per-action union
-Message-ID: <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
 References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-2-seanjc@google.com>
- <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+ <20230718234512.1690985-9-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230718234512.1690985-9-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-07-21 at 14:26:11 +0800, Yan Zhao wrote:
-> On Tue, Jul 18, 2023 at 04:44:44PM -0700, Sean Christopherson wrote:
+On 7/19/23 01:44, Sean Christopherson wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
 > 
-> May I know why KVM now needs to register to callback .change_pte()?
-
-I can see the original purpose is to "setting a pte in the shadow page
-table directly, instead of flushing the shadow page table entry and then
-getting vmexit to set it"[1].
-
-IIUC, KVM is expected to directly make the new pte present for new
-pages in this callback, like for COW.
-
-> As also commented in kvm_mmu_notifier_change_pte(), .change_pte() must be
-> surrounded by .invalidate_range_{start,end}().
+> In confidential computing usages, whether a page is private or shared is
+> necessary information for KVM to perform operations like page fault
+> handling, page zapping etc. There are other potential use cases for
+> per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> or exec-only, etc.) without having to modify memslots.
 > 
-> While kvm_mmu_notifier_invalidate_range_start() has called kvm_unmap_gfn_range()
-> to zap all leaf SPTEs, and page fault path will not install new SPTEs
-> successfully before kvm_mmu_notifier_invalidate_range_end(),
-> kvm_set_spte_gfn() should not be able to find any shadow present leaf entries to
-> update PFN.
-
-I also failed to figure out how the kvm_set_spte_gfn() could pass
-several !is_shadow_present_pte(iter.old_spte) check then write the new
-pte.
-
-
-[1] https://lore.kernel.org/all/200909222039.n8MKd4TL002696@imap1.linux-foundation.org/
-
-Thanks,
-Yilun
-
+> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> userspace to operate on the per-page memory attributes.
+>    - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>      a guest memory range.
+>    - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>      memory attributes.
 > 
-> Or could we just delete completely
-> "kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);"
-> from kvm_mmu_notifier_change_pte() ?
+> Use an xarray to store the per-page attributes internally, with a naive,
+> not fully optimized implementation, i.e. prioritize correctness over
+> performance for the initial implementation.
+> 
+> Because setting memory attributes is roughly analogous to mprotect() on
+> memory that is mapped into the guest, zap existing mappings prior to
+> updating the memory attributes.  Opportunistically provide an arch hook
+> for the post-set path (needed to complete invalidation anyways) in
+> anticipation of x86 needing the hook to update metadata related to
+> determining whether or not a given gfn can be backed with various sizes
+> of hugepages.
+> 
+> It's possible that future usages may not require an invalidation, e.g.
+> if KVM ends up supporting RWX protections and userspace grants _more_
+> protections, but again opt for simplicity and punt optimizations to
+> if/when they are needed.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
+> Cc: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
