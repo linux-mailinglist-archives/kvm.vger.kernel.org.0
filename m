@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F252F75BE51
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 08:08:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D774975BE6C
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 08:09:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjGUGI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 02:08:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46136 "EHLO
+        id S230332AbjGUGJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 02:09:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbjGUGIy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 02:08:54 -0400
+        with ESMTP id S229821AbjGUGI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 02:08:59 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5629610F3;
-        Thu, 20 Jul 2023 23:08:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2665019A6;
+        Thu, 20 Jul 2023 23:08:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689919733; x=1721455733;
+  t=1689919738; x=1721455738;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=A/gv95RjbJ1ZnOGolXJm9SfRqqkclE9mWMbdAK0FExE=;
-  b=WvAYZkG0NoKdCYBMjyHU2N9VlCmie9nsCDLNLJfHv+h7DbtXpswJjBT4
-   KMCfO9rnWWPTKggmzfDFJjVCM7LxbGUWl8OUpQvwnViOsb8zHsCc9dky5
-   JJnYl44YhQtUaEk4UjowR0wF3/i5wxFeB9mXDC9dZUYd5Ar7yeZXvcArR
-   TUnRqVe4LOmIvk0/Fz4pQrZO/AIHaY9dRh4OV2HHOXPxv9smO4fG/cwmx
-   WIXHg89mrHovJIfY1NqQsEm1dCtKFTQBvDnQbZyYj5SYUY5EA+yNScKDU
-   g62NRMQ66AxfU51lM7bPHvZVAJtL5seK2eCc9CEbUI/7LhYim1gGiBeL+
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="370547512"
+  bh=tsSOF6cYaov4kLpfGw7bY+1WPoPGNDtD70m4QddfAE4=;
+  b=gz2cbFwk9k7de1sTGpaWDZXMGpWhP7HnJgwDweI6RQxi9KiUV3NpArRL
+   5vTCs/LlXL0MTPDhfgXMUod46dzRIiVc6W8gKQ4BqFOJF/508gvj1iDrE
+   +r5MZyfTNB2I63pq5ucCal8G3Of2gRCZlHEwKTnZUK86Aq/4WkNF3s8tI
+   kBI3AJaBwx28kVWN3MD0F4n3EewAvzIUl6saCZ3Alxxqx388PBleEUB4V
+   IEH1fGvHw0RW+LNvkRMmJs4IEt9Et2EWr418IlBRXJSiOC27nWhSjCo6e
+   72gl7yZpvFrPJW4egwNtDJMHE3NtrpqVBE2d4mc4uYFFKl4QpjrABo5K7
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="370547588"
 X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="370547512"
+   d="scan'208";a="370547588"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:51 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:53 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848721890"
+X-IronPort-AV: E=McAfee;i="6600,9927,10777"; a="848721962"
 X-IronPort-AV: E=Sophos;i="6.01,220,1684825200"; 
-   d="scan'208";a="848721890"
+   d="scan'208";a="848721962"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2023 23:08:40 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
@@ -43,10 +43,11 @@ To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         john.allen@amd.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     rick.p.edgecombe@intel.com, chao.gao@intel.com,
-        binbin.wu@linux.intel.com, weijiang.yang@intel.com
-Subject: [PATCH v4 05/20] KVM:x86: Initialize kvm_caps.supported_xss
-Date:   Thu, 20 Jul 2023 23:03:37 -0400
-Message-Id: <20230721030352.72414-6-weijiang.yang@intel.com>
+        binbin.wu@linux.intel.com, weijiang.yang@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v4 06/20] KVM:x86: Load guest FPU state when access XSAVE-managed MSRs
+Date:   Thu, 20 Jul 2023 23:03:38 -0400
+Message-Id: <20230721030352.72414-7-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230721030352.72414-1-weijiang.yang@intel.com>
 References: <20230721030352.72414-1-weijiang.yang@intel.com>
@@ -62,57 +63,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set kvm_caps.supported_xss to host_xss && KVM XSS mask.
-host_xss contains the host supported xstate feature bits for thread
-context switch, KVM_SUPPORTED_XSS includes all KVM enabled XSS feature
-bits, the operation result represents all KVM supported feature bits.
-Since the result is subset of host_xss, the related XSAVE-managed MSRs
-are automatically swapped for guest and host when vCPU exits to
-userspace.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
+Load the guest's FPU state if userspace is accessing MSRs whose values are
+managed by XSAVES. Two MSR access helpers, i.e., kvm_{get,set}_xsave_msr(),
+are designed by a later patch to facilitate access to such kind of MSRs.
+
+If MSRs supported in kvm_caps.supported_xss are passed through to guest,
+the guest MSRs are swapped with host contents before vCPU exits to userspace
+and after it enters kernel again.
+
+Because the modified code is also used for the KVM_GET_MSRS device ioctl(),
+explicitly check @vcpu is non-null before attempting to load guest state.
+The XSS supporting MSRs cannot be retrieved via the device ioctl() without
+loading guest FPU state (which doesn't exist).
+
+Note that guest_cpuid_has() is not queried as host userspace is allowed
+to access MSRs that have not been exposed to the guest, e.g. it might do
+KVM_SET_MSRS prior to KVM_SET_CPUID2.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 1 -
- arch/x86/kvm/x86.c     | 6 +++++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0ecf4be2c6af..c8d9870cfecb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7849,7 +7849,6 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
- 
- 	/* CPUID 0xD.1 */
--	kvm_caps.supported_xss = 0;
- 	if (!cpu_has_vmx_xsaves())
- 		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
- 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 26edb8fa857a..8bdcbcf13146 100644
+index 8bdcbcf13146..04f0245ad0a2 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -225,6 +225,8 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
+@@ -132,6 +132,9 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+ static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
  
-+#define KVM_SUPPORTED_XSS     0
+ static DEFINE_MUTEX(vendor_module_lock);
++static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu);
++static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu);
 +
- u64 __read_mostly host_efer;
- EXPORT_SYMBOL_GPL(host_efer);
+ struct kvm_x86_ops kvm_x86_ops __read_mostly;
  
-@@ -9499,8 +9501,10 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ #define KVM_X86_OP(func)					     \
+@@ -4346,6 +4349,21 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ }
+ EXPORT_SYMBOL_GPL(kvm_get_msr_common);
  
- 	rdmsrl_safe(MSR_EFER, &host_efer);
- 
--	if (boot_cpu_has(X86_FEATURE_XSAVES))
-+	if (boot_cpu_has(X86_FEATURE_XSAVES)) {
- 		rdmsrl(MSR_IA32_XSS, host_xss);
-+		kvm_caps.supported_xss = host_xss & KVM_SUPPORTED_XSS;
++static const u32 xstate_msrs[] = {
++	MSR_IA32_U_CET, MSR_IA32_PL3_SSP,
++};
++
++static bool is_xstate_msr(u32 index)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(xstate_msrs); i++) {
++		if (index == xstate_msrs[i])
++			return true;
 +	}
++	return false;
++}
++
+ /*
+  * Read or write a bunch of msrs. All parameters are kernel addresses.
+  *
+@@ -4356,11 +4374,20 @@ static int __msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs,
+ 		    int (*do_msr)(struct kvm_vcpu *vcpu,
+ 				  unsigned index, u64 *data))
+ {
++	bool fpu_loaded = false;
+ 	int i;
  
- 	kvm_init_pmu_capability(ops->pmu_ops);
+-	for (i = 0; i < msrs->nmsrs; ++i)
++	for (i = 0; i < msrs->nmsrs; ++i) {
++		if (vcpu && !fpu_loaded && kvm_caps.supported_xss &&
++		    is_xstate_msr(entries[i].index)) {
++			kvm_load_guest_fpu(vcpu);
++			fpu_loaded = true;
++		}
+ 		if (do_msr(vcpu, entries[i].index, &entries[i].data))
+ 			break;
++	}
++	if (fpu_loaded)
++		kvm_put_guest_fpu(vcpu);
  
+ 	return i;
+ }
 -- 
 2.27.0
 
