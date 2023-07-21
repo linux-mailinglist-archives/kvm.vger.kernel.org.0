@@ -2,67 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40FFF75C6E0
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 14:28:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12B7175C8FE
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 16:07:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbjGUM25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 08:28:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41918 "EHLO
+        id S230215AbjGUOHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 10:07:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbjGUM24 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 08:28:56 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1F71731
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 05:28:54 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51e6113437cso2508335a12.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 05:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1689942533; x=1690547333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lMGrLA74ax3ZXDdbQTIvZqhbtdK8cEtRGYrB0J/L0kE=;
-        b=a85fv4Tz9nVWuNNi+YAo/HFpozLqoOAh1YqMAiq7X6K3vPucvzi61+FHdM4mP5Q1km
-         KEKiB1fnydjd8groHB84sFPJE8ATy0EPvt6DapSQKLTbtv/QYMd1K/N24Q9geNbLm6Tm
-         zjW3cA+ufAjUgzDh+jwae+bsop1ZWrhFXszOaNWNaVbfbl3AO4ebsh3/iTMRnAG9Ctzq
-         TC4AFjBIwN+sz9mqTr/pPyinvD3ZDu9wAOn02vHNkFy5WyaJtnRXlgCdnXB+YwOEP+6X
-         gDtCphGeKhs6WamZ4YzvRzcoe+pnhBoUhWGIjziGShZcXuaq9YSJlSrHg9DnThAWS7OO
-         AEuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689942533; x=1690547333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lMGrLA74ax3ZXDdbQTIvZqhbtdK8cEtRGYrB0J/L0kE=;
-        b=b8Nqnr6DYmrxctmY7kPFfKAEyFwkW18egXl/dq4qVEUfrlKHMWRS9nO3OLk0tRmY6O
-         XPFZ1z1JXbfkcODx+AAaXfVW4NwoflpmZ3j8tcYU0oXmTHM4JTORzwPme8xMDXRsVXpv
-         iGnKTUlJsuZvLqWNxiFN8jPRrVCjJ6k9cCfIqthLeQCPYGZozujhT+qekb1sKT4cNqn4
-         NxdNpVkMafk9+DKGE/kcgXPkMFsySevWy+SZkiKQhRjPG9AYdLSICZyzGY8fTcwskZ1k
-         xvL52M4zek2ELn1sjTWC//PfdJ1kLB0Tn8E++LQy/Qq0t6jx5fyJX71+pUdbpov/i/WE
-         aNjg==
-X-Gm-Message-State: ABy/qLZU4gqYpx70O+ioLwB3kVajl9eLNdl3JALxb7ouWZXzcDXV0QZ5
-        F9mGWAvRIHclhLoXPz3XmgLpXTJP7LWjatpOTs9OYQ==
-X-Google-Smtp-Source: APBJJlE+XvXwl79hgEmKL02wWnHj3G1UNKKxXi6C+x+rSZ6pERXjKFphu9MMtVcCrsZk65JkK3FF1Cxl8VIUeHuAzz4=
-X-Received: by 2002:aa7:d50f:0:b0:51d:d615:19af with SMTP id
- y15-20020aa7d50f000000b0051dd61519afmr1465566edq.28.1689942533305; Fri, 21
- Jul 2023 05:28:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230721062421.12017-1-akihiko.odaki@daynix.com> <05d4e5ff-dc5c-b2da-7ae8-ac135d4a73c9@linaro.org>
-In-Reply-To: <05d4e5ff-dc5c-b2da-7ae8-ac135d4a73c9@linaro.org>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 21 Jul 2023 13:28:42 +0100
-Message-ID: <CAFEAcA_xTAnZ+CO8L3yhUMht3fL=rspk94z-hmZKgdABLAgBNA@mail.gmail.com>
-Subject: Re: [PATCH v2] accel/kvm: Specify default IPA size for arm64
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc:     Akihiko Odaki <akihiko.odaki@daynix.com>, qemu-devel@nongnu.org,
-        qemu-arm@nongnu.org, kvm@vger.kernel.org,
+        with ESMTP id S229719AbjGUOHP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 10:07:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5D3310A
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 07:07:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 65DAE6195D
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 14:07:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0231C433C7;
+        Fri, 21 Jul 2023 14:07:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689948432;
+        bh=bTZdyxvTtZgnsZIW0qXy4zcErrTkNn0mTmm4UjRN+Vs=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=qESCCl0+iQuLHfyRueHqahM4vVWNdMg3ivuHV7vx8jYnR+7wPhZY8zxBCOR+/Q7B+
+         2IPqxdHva9fDbtK4KqaE5essvLqJZfMMdcrOaEJ3xhA3+GEUDjErJQc6WDsvXH9Xlm
+         O6YzicfTK43iABbFokQ3yq+4TDo36v7PF4hQja1WkvfmXc0aNeDxLQ9vOWQRnGz6oj
+         iqngu9qEVKyMUnuFoOVpmT/28R7PGzE/wwLhLFdaUMMrBB2UKzWO32+2kb4cjenWuF
+         m1LGc9DZmuhDAnlSnF/QuDXgHZ1aW7hzcn+NKl/cPSU3dCp6K2wLYJ+cXIlglx9lqg
+         Rr41b98rrUu8A==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id 503BDCE097F; Fri, 21 Jul 2023 07:07:12 -0700 (PDT)
+Date:   Fri, 21 Jul 2023 07:07:12 -0700
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 17/20] rcutorture: Add a test config to torture
+ test low RCU_DYNTICKS width
+Message-ID: <7d2fdbb7-e574-40e8-8561-40a3873abc88@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-18-vschneid@redhat.com>
+ <24b55289-1c35-41cc-9ad3-baa957f1c9cb@paulmck-laptop>
+ <5143d0a9-bc02-4b9a-8613-2383bfdee35c@paulmck-laptop>
+ <xhsmhmszpu24i.mognet@vschneid.remote.csb>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <xhsmhmszpu24i.mognet@vschneid.remote.csb>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,121 +112,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Jul 2023 at 08:30, Philippe Mathieu-Daud=C3=A9 <philmd@linaro.or=
-g> wrote:
->
-> Hi Akihiko,
->
-> On 21/7/23 08:24, Akihiko Odaki wrote:
-> > libvirt uses "none" machine type to test KVM availability. Before this
-> > change, QEMU used to pass 0 as machine type when calling KVM_CREATE_VM.
-> >
-> > The kernel documentation says:
-> >> On arm64, the physical address size for a VM (IPA Size limit) is
-> >> limited to 40bits by default. The limit can be configured if the host
-> >> supports the extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> >> KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-> >> identifier, where IPA_Bits is the maximum width of any physical
-> >> address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
-> >> machine type identifier.
+On Fri, Jul 21, 2023 at 08:58:53AM +0100, Valentin Schneider wrote:
+> On 20/07/23 21:00, Paul E. McKenney wrote:
+> > On Thu, Jul 20, 2023 at 12:53:05PM -0700, Paul E. McKenney wrote:
+> >> On Thu, Jul 20, 2023 at 05:30:53PM +0100, Valentin Schneider wrote:
+> >> > diff --git a/tools/testing/selftests/rcutorture/configs/rcu/TREE11 b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
+> >> > new file mode 100644
+> >> > index 0000000000000..aa7274efd9819
+> >> > --- /dev/null
+> >> > +++ b/tools/testing/selftests/rcutorture/configs/rcu/TREE11
+> >> > @@ -0,0 +1,19 @@
+> >> > +CONFIG_SMP=y
+> >> > +CONFIG_NR_CPUS=8
+> >> > +CONFIG_PREEMPT_NONE=n
+> >> > +CONFIG_PREEMPT_VOLUNTARY=y
+> >> > +CONFIG_PREEMPT=n
+> >> > +CONFIG_PREEMPT_DYNAMIC=n
+> >> > +#CHECK#CONFIG_TREE_RCU=y
+> >> > +CONFIG_HZ_PERIODIC=n
+> >> > +CONFIG_NO_HZ_IDLE=n
+> >> > +CONFIG_NO_HZ_FULL=y
+> >> > +CONFIG_RCU_TRACE=y
+> >> > +CONFIG_RCU_FANOUT=4
+> >> > +CONFIG_RCU_FANOUT_LEAF=3
+> >> > +CONFIG_DEBUG_LOCK_ALLOC=n
+> >> > +CONFIG_DEBUG_OBJECTS_RCU_HEAD=n
+> >> > +CONFIG_RCU_EXPERT=y
+> >> > +CONFIG_RCU_EQS_DEBUG=y
+> >> > +CONFIG_RCU_LAZY=y
+> >> > +CONFIG_RCU_DYNTICKS_BITS=2
 > >>
-> >> e.g, to configure a guest to use 48bit physical address size::
-> >>
-> >>      vm_fd =3D ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(4=
-8));
-> >>
-> >> The requested size (IPA_Bits) must be:
-> >>
-> >>   =3D=3D   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>    0   Implies default size, 40bits (for backward compatibility)
-> >>    N   Implies N bits, where N is a positive integer such that,
-> >>        32 <=3D N <=3D Host_IPA_Limit
-> >>   =3D=3D   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> Why not just add this last line to the existing TREE04 scenario?
+> >> That would ensure that it gets tested regularly without extending the
+> >> time required to run a full set of rcutorture tests.
 > >
-> >> Host_IPA_Limit is the maximum possible value for IPA_Bits on the host
-> >> and is dependent on the CPU capability and the kernel configuration.
-> >> The limit can be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the
-> >> KVM_CHECK_EXTENSION ioctl() at run-time.
-> >>
-> >> Creation of the VM will fail if the requested IPA size (whether it is
-> >> implicit or explicit) is unsupported on the host.
-> > https://docs.kernel.org/virt/kvm/api.html#kvm-create-vm
-> >
-> > So if Host_IPA_Limit < 40, such KVM_CREATE_VM will fail, and libvirt
-> > incorrectly thinks KVM is not available. This actually happened on M2
-> > MacBook Air.
-> >
-> > Fix this by specifying 32 for IPA_Bits as any arm64 system should
-> > support the value according to the documentation.
-> >
-> > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > ---
-> > V1 -> V2: Introduced an arch hook
-> >
-> >   include/sysemu/kvm.h   | 1 +
-> >   accel/kvm/kvm-all.c    | 2 +-
-> >   target/arm/kvm.c       | 2 ++
-> >   target/i386/kvm/kvm.c  | 2 ++
-> >   target/mips/kvm.c      | 2 ++
-> >   target/ppc/kvm.c       | 2 ++
-> >   target/riscv/kvm.c     | 2 ++
-> >   target/s390x/kvm/kvm.c | 2 ++
-> >   8 files changed, 14 insertions(+), 1 deletion(-)
->
-> My understanding of Peter's suggestion would be smth like:
->
-> -- >8 --
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 115f0cca79..c0af15eb6c 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -201,10 +201,15 @@ typedef struct KVMCapabilityInfo {
->
->   struct KVMState;
->
-> +struct KVMClass {
-> +    AccelClass parent_class;
-> +
-> +    int default_vm_type;
+> > Please see below for the version of this patch that I am running overnight
+> > tests with.  Does this one work for you?
+> 
+> Yep that's fine with me. I only went with a separate test file as wasn't
+> sure how new test options should be handled (merged into existing tests vs
+> new tests created), and didn't want to negatively impact TREE04 or
+> TREE06. If merging into TREE04 is preferred, then I'll do just that and
+> carry this path moving forwards.
 
-The kernel docs say you need to check for the
-KVM_CAP_ARM_VM_IPA_SIZE before you can pass something other
-than zero to the KVM_CREATE_VM ioctl, so this needs to be
-a method, not just a value. (kvm_arm_get_max_vm_ipa_size()
-will do this bit for you.)
+Things worked fine for this one-hour-per-scenario test run on my laptop,
+except for the CONFIG_SMP=n runs, which all got build errors like the
+following.
 
-If the machine doesn't provide a kvm_type method, we
-should default to "largest the host supports", I think.
+							Thanx, Paul
 
-I was wondering if we could have one per-arch
-method for "actually create the VM" that both was
-a place for arm to set the default vm type and
-also let us get the TARGET_S390X and TARGET_PPC
-ifdefs out of this bit of kvm-all.c, but maybe that would
-look just a bit too awkward:
+------------------------------------------------------------------------
 
-     if (kc->create_vm(s, board_sets_kvm_type, board_kvm_type) < 0) {
-         goto err;
-     }
-
-where board_sets_kvm_type is a bool, true if board_kvm_type
-is valid, and board_kvm_type is whatever the board's
-mc->kvm_type method told us.
-
-(Default impl of the method: call KVM_CREATE_VM ioctl
-with retry-on-eintr, printing the simple error message;
-PPC and s390 versions similar but with their arch
-specific extra messages; arm version has a different
-default type if board_sets_kvm_type is false.)
-
-Not trying to do both of those things with one method
-would result in a simpler
-   type =3D kc->get_default_kvm_type(s);
-API.
-
-thanks
--- PMM
+In file included from ./include/linux/container_of.h:5,
+                 from ./include/linux/list.h:5,
+                 from ./include/linux/swait.h:5,
+                 from ./include/linux/completion.h:12,
+                 from ./include/linux/crypto.h:15,
+                 from arch/x86/kernel/asm-offsets.c:9:
+./include/linux/context_tracking_state.h:56:61: error: ‘struct context_tracking’ has no member named ‘state’
+   56 | #define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * BITS_PER_BYTE)
+      |                                                             ^~
+./include/linux/build_bug.h:78:56: note: in definition of macro ‘__static_assert’
+   78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+      |                                                        ^~~~
+./include/linux/context_tracking_state.h:73:1: note: in expansion of macro ‘static_assert’
+   73 | static_assert((CONTEXT_STATE_END + 1 - CONTEXT_STATE_START) +
+      | ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:61:29: note: in expansion of macro ‘CT_STATE_SIZE’
+   61 | #define RCU_DYNTICKS_START (CT_STATE_SIZE - CONFIG_RCU_DYNTICKS_BITS)
+      |                             ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:70:29: note: in expansion of macro ‘RCU_DYNTICKS_START’
+   70 | #define CONTEXT_WORK_END   (RCU_DYNTICKS_START - 1)
+      |                             ^~~~~~~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:74:16: note: in expansion of macro ‘CONTEXT_WORK_END’
+   74 |               (CONTEXT_WORK_END  + 1 - CONTEXT_WORK_START) +
+      |                ^~~~~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:56:61: error: ‘struct context_tracking’ has no member named ‘state’
+   56 | #define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * BITS_PER_BYTE)
+      |                                                             ^~
+./include/linux/build_bug.h:78:56: note: in definition of macro ‘__static_assert’
+   78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+      |                                                        ^~~~
+./include/linux/context_tracking_state.h:73:1: note: in expansion of macro ‘static_assert’
+   73 | static_assert((CONTEXT_STATE_END + 1 - CONTEXT_STATE_START) +
+      | ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:62:29: note: in expansion of macro ‘CT_STATE_SIZE’
+   62 | #define RCU_DYNTICKS_END   (CT_STATE_SIZE - 1)
+      |                             ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:75:16: note: in expansion of macro ‘RCU_DYNTICKS_END’
+   75 |               (RCU_DYNTICKS_END  + 1 - RCU_DYNTICKS_START) ==
+      |                ^~~~~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:56:61: error: ‘struct context_tracking’ has no member named ‘state’
+   56 | #define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * BITS_PER_BYTE)
+      |                                                             ^~
+./include/linux/build_bug.h:78:56: note: in definition of macro ‘__static_assert’
+   78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+      |                                                        ^~~~
+./include/linux/context_tracking_state.h:73:1: note: in expansion of macro ‘static_assert’
+   73 | static_assert((CONTEXT_STATE_END + 1 - CONTEXT_STATE_START) +
+      | ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:61:29: note: in expansion of macro ‘CT_STATE_SIZE’
+   61 | #define RCU_DYNTICKS_START (CT_STATE_SIZE - CONFIG_RCU_DYNTICKS_BITS)
+      |                             ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:75:40: note: in expansion of macro ‘RCU_DYNTICKS_START’
+   75 |               (RCU_DYNTICKS_END  + 1 - RCU_DYNTICKS_START) ==
+      |                                        ^~~~~~~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:56:61: error: ‘struct context_tracking’ has no member named ‘state’
+   56 | #define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * BITS_PER_BYTE)
+      |                                                             ^~
+./include/linux/build_bug.h:78:56: note: in definition of macro ‘__static_assert’
+   78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+      |                                                        ^~~~
+./include/linux/context_tracking_state.h:73:1: note: in expansion of macro ‘static_assert’
+   73 | static_assert((CONTEXT_STATE_END + 1 - CONTEXT_STATE_START) +
+      | ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:76:15: note: in expansion of macro ‘CT_STATE_SIZE’
+   76 |               CT_STATE_SIZE);
+      |               ^~~~~~~~~~~~~
+./include/linux/context_tracking_state.h:73:15: error: expression in static assertion is not an integer
+   73 | static_assert((CONTEXT_STATE_END + 1 - CONTEXT_STATE_START) +
+      |               ^
+./include/linux/build_bug.h:78:56: note: in definition of macro ‘__static_assert’
+   78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+      |                                                        ^~~~
+./include/linux/context_tracking_state.h:73:1: note: in expansion of macro ‘static_assert’
+   73 | static_assert((CONTEXT_STATE_END + 1 - CONTEXT_STATE_START) +
+      | ^~~~~~~~~~~~~
+make[2]: *** [scripts/Makefile.build:116: arch/x86/kernel/asm-offsets.s] Error 1
+make[1]: *** [/home/git/linux-rcu-1/Makefile:1275: prepare0] Error 2
+make[1]: *** Waiting for unfinished jobs....
+  LD      /home/git/linux-rcu-1/tools/objtool/objtool-in.o
+  LINK    /home/git/linux-rcu-1/tools/objtool/objtool
+make: *** [Makefile:234: __sub-make] Error 2
