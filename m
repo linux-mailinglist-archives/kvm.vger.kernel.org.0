@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78E2675D599
-	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D70B75D59B
+	for <lists+kvm@lfdr.de>; Fri, 21 Jul 2023 22:21:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231548AbjGUUVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 16:21:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38758 "EHLO
+        id S231422AbjGUUVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 16:21:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231466AbjGUUUq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jul 2023 16:20:46 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16953A80
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:55 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1716467276.3
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:19:55 -0700 (PDT)
+        with ESMTP id S229566AbjGUUUz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jul 2023 16:20:55 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD93C3AA5
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:20:03 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d00a63fcdefso1716595276.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 13:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689970781; x=1690575581;
+        d=google.com; s=20221208; t=1689970783; x=1690575583;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vAOLLgTu+0QNT9Om4NpxWB91aAPEeSvRzwHwJVAa2Xs=;
-        b=imhgBKzxrXtouuf5PfcKL7zBn0uz33+q5k8Z0nIhm6BNxLjvMukg2vArkkk5NgTFDM
-         NCaOxaOau0vLfoyQRsInuw+KAa7AslkSTBn6yul+5eiPK0IjOxtTfZI+5BUlLIVKvaaf
-         zctolS0OU9qe/eA0SfoB4J52oxFAqZ+fh+FLtJaIaIPFFG750jsFlZ2Mc9quoQp2Unyu
-         4inyMQQxkm2n98I2kfK3YCgsPjNs4UlB9VWVghYk87tTe4jdkygy4sS2+Mqd1axuaOKZ
-         Y80wBoNxrdfW0VnTAvlYpjVOt8tpfiwmBahTWl8/tfevz/dYYviEbtSr/R7buC1VS27v
-         nuqg==
+        bh=f1LNi9Sq5NIBXtzGJVGKttDHRo4VG7MGlit5nvyUtF0=;
+        b=lupqznqfPScgKgAlsl68k2HwQOWYVzqFz7+e39gz+UVj6wvvC+ma4BNLkDyLgMbDCr
+         sXcaIXufKIRqTjEo6kaASseH4LuovJPFo1FpnMySbHlymLZC8toxxIjvN2Aiw4ju6EAG
+         VaD/mWdhEO8ur/DDeO9tEnMiMm8VItIJH8OP+EP+LpWzQ/NrR5L8c8s2LMhTcLypPS2U
+         oBg+8IvkdXfhKuyTvHG3Xef0QbwUQ6ZzSvJM7Mo/H4jFrr/vFd5FgUJyl+qeE3dTtsH5
+         MY6DHfpkgF/82Qh+aTdBRtINfnVpzFGxerBDIxZVXvcHDxqf5FZ0G6Srcd0y+VCH+a4h
+         +9CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689970781; x=1690575581;
+        d=1e100.net; s=20221208; t=1689970783; x=1690575583;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vAOLLgTu+0QNT9Om4NpxWB91aAPEeSvRzwHwJVAa2Xs=;
-        b=Od93Pb3pkhNlAuEXo/0ahg5YF33O5M0/lVESHaeojIWXHt+NacxcXdqOrfFZMAXJ3j
-         2t95HJVyJ2m8aut1vMXxJCGNXnYhnSOhQmw9oyJmuUFYl6u8IIZSyYXdUZlA37z/lfRG
-         Pfmuy4NcaGSJAFw6Ae6FUbN+TSgwKcHKtvmkI00ESTa/rTU6/wWWXcvnKxgY9X+x4Ioi
-         B10GKw/tPbF8WcbgAZGHB95qU0zKIpnvP76YjEdHVyhg8GtZPrWANtx3FO/BnbSG8Igz
-         tf2G2J63sL7blWlX2+rkhaG8I08CoGXybU9pU9vQ5Y/TMd09cNWgkBUTcPpA5Juz+lI0
-         Uf/g==
-X-Gm-Message-State: ABy/qLa+wFmcq4BW2o+PNm7pV7NGJDgcYhhBwutw/bH8Og86xFViMZwW
-        y3kMXWUnbPxkQyxIbru+ecxRRzcQ+3s=
-X-Google-Smtp-Source: APBJJlFg1G379oAP55UGHQ0zEE/xeGlSUtowvWP1iIaOgGSS++UyKOVvNLNpz7tVyRlxXJ14xmaMnRFherI=
+        bh=f1LNi9Sq5NIBXtzGJVGKttDHRo4VG7MGlit5nvyUtF0=;
+        b=eLENQ9WEon9fIBWwRxHkGXNgtc3PBrJBIWSctWH7FQMtE3SFi6iN5zGT9darXFqBHw
+         qHPU3gNtTAAxiQhrRk4zNhBfpm4VEBVK9ho2ZpcuutvlMukdp9e71TLECABsio9kHgTP
+         hVntd/deyyPZ4p0NMYdLVErOvOlzVPipf2KPZq6fWY438kLCpN/p+7oV5WFuNY3SCKYG
+         UR/AbI4mDCfsnwmMbCom7ja/ytKgfznOjWOpcn7EUhxSiSZx9WSZeo2zaS70SikDUTX5
+         K4jzl63TpRxj4EpUwEAL3A+oIG8i381h8aUSr5ALcl3sk0KygbedsnVbHgZwQtU4tEvd
+         Bu9Q==
+X-Gm-Message-State: ABy/qLahKZSfB+9XAfvPOYzFMPerPhzGHd4lDHp+YzLPl4on/MeSKHhf
+        ESz2hJna5Pi5yrV4G2eCyJcRHvA+gvo=
+X-Google-Smtp-Source: APBJJlGqCihblJf1jaycZ9unQQ6pi+gVUILg04BI7aSdWb1kqkXeAsB0DrslgKJ6+cdV8k8Utd5kIZ2tJk4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:81cf:0:b0:c5d:dac2:cb2a with SMTP id
- n15-20020a2581cf000000b00c5ddac2cb2amr18050ybm.13.1689970781205; Fri, 21 Jul
- 2023 13:19:41 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a5b:bc2:0:b0:ce9:64b3:80dc with SMTP id
+ c2-20020a5b0bc2000000b00ce964b380dcmr18891ybr.1.1689970783817; Fri, 21 Jul
+ 2023 13:19:43 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 21 Jul 2023 13:18:58 -0700
+Date:   Fri, 21 Jul 2023 13:18:59 -0700
 In-Reply-To: <20230721201859.2307736-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230721201859.2307736-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230721201859.2307736-19-seanjc@google.com>
-Subject: [PATCH v4 18/19] KVM: SVM: Use "standard" stgi() helper when
- disabling SVM
+Message-ID: <20230721201859.2307736-20-seanjc@google.com>
+Subject: [PATCH v4 19/19] KVM: VMX: Skip VMCLEAR logic during emergency
+ reboots if CR4.VMXE=0
 From:   Sean Christopherson <seanjc@google.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -76,40 +76,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that kvm_rebooting is guaranteed to be true prior to disabling SVM
-in an emergency, use the existing stgi() helper instead of open coding
-STGI.  In effect, eat faults on STGI if and only if kvm_rebooting==true.
+Bail from vmx_emergency_disable() without processing the list of loaded
+VMCSes if CR4.VMXE=0, i.e. if the CPU can't be post-VMXON.  It should be
+impossible for the list to have entries if VMX is already disabled, and
+even if that invariant doesn't hold, VMCLEAR will #UD anyways, i.e.
+processing the list is pointless even if it somehow isn't empty.
 
+Assuming no existing KVM bugs, this should be a glorified nop.  The
+primary motivation for the change is to avoid having code that looks like
+it does VMCLEAR, but then skips VMXON, which is nonsensical.
+
+Suggested-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 8d1b3c801629..4785d780cce3 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -588,17 +588,10 @@ static inline void kvm_cpu_svm_disable(void)
- 	rdmsrl(MSR_EFER, efer);
- 	if (efer & EFER_SVME) {
- 		/*
--		 * Force GIF=1 prior to disabling SVM to ensure INIT and NMI
--		 * aren't blocked, e.g. if a fatal error occurred between CLGI
--		 * and STGI.  Note, STGI may #UD if SVM is disabled from NMI
--		 * context between reading EFER and executing STGI.  In that
--		 * case, GIF must already be set, otherwise the NMI would have
--		 * been blocked, so just eat the fault.
-+		 * Force GIF=1 prior to disabling SVM, e.g. to ensure INIT and
-+		 * NMI aren't blocked.
- 		 */
--		asm_volatile_goto("1: stgi\n\t"
--				  _ASM_EXTABLE(1b, %l[fault])
--				  ::: "memory" : fault);
--fault:
-+		stgi();
- 		wrmsrl(MSR_EFER, efer & ~EFER_SVME);
- 	}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5d21931842a5..0ef5ede9cb7c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -773,12 +773,20 @@ static void vmx_emergency_disable(void)
+ 
+ 	kvm_rebooting = true;
+ 
++	/*
++	 * Note, CR4.VMXE can be _cleared_ in NMI context, but it can only be
++	 * set in task context.  If this races with VMX is disabled by an NMI,
++	 * VMCLEAR and VMXOFF may #UD, but KVM will eat those faults due to
++	 * kvm_rebooting set.
++	 */
++	if (!(__read_cr4() & X86_CR4_VMXE))
++		return;
++
+ 	list_for_each_entry(v, &per_cpu(loaded_vmcss_on_cpu, cpu),
+ 			    loaded_vmcss_on_cpu_link)
+ 		vmcs_clear(v->vmcs);
+ 
+-	if (__read_cr4() & X86_CR4_VMXE)
+-		kvm_cpu_vmxoff();
++	kvm_cpu_vmxoff();
  }
+ 
+ static void __loaded_vmcs_clear(void *arg)
 -- 
 2.41.0.487.g6d72f3e995-goog
 
