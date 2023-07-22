@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC6675D91D
-	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 04:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9BC275D911
+	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 04:23:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231132AbjGVCY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jul 2023 22:24:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51902 "EHLO
+        id S231222AbjGVCX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jul 2023 22:23:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231166AbjGVCXF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231180AbjGVCXF (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 21 Jul 2023 22:23:05 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35181711
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 19:23:03 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c5cea5773e8so2570386276.1
-        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 19:23:03 -0700 (PDT)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 955E21BF4
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 19:23:04 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c6dd0e46a52so2546925276.2
+        for <kvm@vger.kernel.org>; Fri, 21 Jul 2023 19:23:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1689992583; x=1690597383;
+        d=google.com; s=20221208; t=1689992584; x=1690597384;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8R5tRLm4LxOnjTEGwM7a4ioC3VdBYtUr1OruyGFhsg=;
-        b=cfBIBtaMGZEf4AhY6J0548A+CtaTY7s4VELnEIeFABxI92SvaWQW27WRnp+/q887jd
-         b1TjIDORVqU07EPUQ/Q19Kx672JDaqfeiAMzany/gcKSRQRyhlDPKz73ZGnNHtbWJBcs
-         UdVEkbrC7PTnQ3AO+JgNGaP9tE7X1Jr8LevbOQPisjvpV/1GUqvSezpBlGv+V1Pa8Bk/
-         Dz7iMBvzxCmA92YdIR4l8vs0QhvpSPRaa9AWLGqWcLL0gam+6TRFZut+BKtU94QsycPh
-         UUDfnGqhH3nalOxviTCBnCVfFkZB08T951R3KSDpXW/NULcZOSqnOMHnzE4x6FrSPe5l
-         ug3w==
+        bh=akm4rYoa5SWJwDL1p07vXyqImi8p1ZVsCq+MNzl6DtA=;
+        b=gD47/RM4uIWWB198/JeUALJq9RfWDqhNJ9T5fekg0gN1CVJhZjOmQC08507malSUwO
+         o8ec3lTUjSjfYC2IbUqRVy/vilrsVI8K95GVPsWlQt/qMh/hSichPIFf1Wekk8S82QaE
+         aVRm06MJGxxB3ZyI2EnZn9V/QdvXIJ8ab6Dhuw8+FQ47EWQsWa9EmDNplWPwsPvOynXC
+         jScOlOR/WNZmECtmPX+CzDPzHwrYlcah9TbaF8K5Alw1WCy7ukloCqn7xLelXXi0WAXJ
+         ELXUAYxDpW3SIEct6UF/c4gbo3AktDz7eTG5eF/V+xS8z5st6Vf5lBWUrNNu9Q2slUD4
+         LXsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689992583; x=1690597383;
+        d=1e100.net; s=20221208; t=1689992584; x=1690597384;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8R5tRLm4LxOnjTEGwM7a4ioC3VdBYtUr1OruyGFhsg=;
-        b=OVeK91EvdtPZPEqzsIjXsKzrrjUJgbAdAHybPRhv9cRd+8JIbvcdUIJW7iO/PbdUlk
-         qUggnK69VYHYWiI6jJx9vkRJ6SG9by2xSaPabyYyiElRFd+2lJ9Gdg7FMJzxMQCurJyN
-         7vEF2xWOX6ckNOsKQJU100EuTrpWc/qjpd0edqf6QnE5b8aN61kCGhR+nZs3G2Fpl+Ct
-         Ky+N0GefqGH1mOv5luut1+92V4c1eARM4oBhUEvlg4PwuF2YGqg3Y/ExOzcvsk3qdE1/
-         DA+LxzogWRz0+9RvLnW1ob1ix1hSTa7j1u6liJDHdgsZnYXHrFzXbVwJ2D/C8Ln/hgzp
-         yFpg==
-X-Gm-Message-State: ABy/qLbOESOzd15dX2hSNYc+f9Lj2kqhGK9fP18VGF4SCgr6ipj64tPB
-        Uag5mALHsXLUGInE79KpqaWTQVD5bzGO
-X-Google-Smtp-Source: APBJJlHQt1NDcPAocmh72u+0bhsq/dtXjKO55NUZwrSeo0TWR6BjgNiz1KwqJUxErtKe8+mwZ90j9gI+Kx9y
+        bh=akm4rYoa5SWJwDL1p07vXyqImi8p1ZVsCq+MNzl6DtA=;
+        b=kjmB0W6Mgp7Oht+fLQW8jg2Afy2T5vU/GuODe25fxCForMwJ5DRHCiVrtEp3Xz1It6
+         k19gUwIyuLSNNpSp4D8042JfFKulwXNYUd7ZeqLuMwVz1MvyiYYn7j7eRYM0ntGuH//d
+         x/xech6KWNEUtzTHPy08fuX6kVQptYGeKHtxCfrFn+3SAg4p0yc4S2iUTL7ckHyc8lnU
+         SOkwyWaqsFDc/ZKt2t98Nq5OzXInxJpcTL7+XksfnC/qB+YsSabPJ15KOLFszkVQIQpm
+         8ieQSDFeX6u92xVgjw7OVJumt3Atb7RS0PdioaTmRM41UmfeOtNGn6fiRplLA1gIYQU8
+         fsSw==
+X-Gm-Message-State: ABy/qLbxdcOsk0t2/Q0RvnWvy7Kj5rkw0fRXV2LmQoQlhADeWfXUCKcn
+        4MbHERIlxUQfvAvi6m5t8JGesTQn2hU8
+X-Google-Smtp-Source: APBJJlFexiNbjtr9UnRFqoiOgPpMB6cQsXecNSzI+a2TM+h9ESr77gcH7b0vgVuv18SKk9XbnT1XiXcZKWub
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a05:6902:102f:b0:c22:38c2:43de with SMTP
- id x15-20020a056902102f00b00c2238c243demr26408ybt.11.1689992582937; Fri, 21
- Jul 2023 19:23:02 -0700 (PDT)
-Date:   Sat, 22 Jul 2023 02:22:47 +0000
+ (user=rananta job=sendgmr) by 2002:a25:aa05:0:b0:cf0:e2a2:eb3b with SMTP id
+ s5-20020a25aa05000000b00cf0e2a2eb3bmr22446ybi.4.1689992583856; Fri, 21 Jul
+ 2023 19:23:03 -0700 (PDT)
+Date:   Sat, 22 Jul 2023 02:22:48 +0000
 In-Reply-To: <20230722022251.3446223-1-rananta@google.com>
 Mime-Version: 1.0
 References: <20230722022251.3446223-1-rananta@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230722022251.3446223-9-rananta@google.com>
-Subject: [PATCH v7 08/12] KVM: arm64: Define kvm_tlb_flush_vmid_range()
+Message-ID: <20230722022251.3446223-10-rananta@google.com>
+Subject: [PATCH v7 09/12] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>,
@@ -77,76 +77,56 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement the helper kvm_tlb_flush_vmid_range() that acts
-as a wrapper for range-based TLB invalidations. For the
-given VMID, use the range-based TLBI instructions to do
-the job or fallback to invalidating all the TLB entries.
+Implement kvm_arch_flush_remote_tlbs_range() for arm64
+to invalidate the given range in the TLB.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 3 +++
+ arch/arm64/kvm/mmu.c              | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 8294a9a7e566..5e8b1ff07854 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -754,4 +754,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
-  *	   kvm_pgtable_prot format.
-  */
- enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7281222f24ef..52d3ed918893 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1114,6 +1114,9 @@ struct kvm *kvm_arch_alloc_vm(void);
+ #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+ int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+ 
++#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
++int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages);
 +
-+/**
-+ * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entries
-+ *
-+ * @mmu:	Stage-2 KVM MMU struct
-+ * @addr:	The base Intermediate physical address from which to invalidate
-+ * @size:	Size of the range from the base to invalidate
-+ */
-+void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-+				phys_addr_t addr, size_t size);
- #endif	/* __ARM64_KVM_PGTABLE_H__ */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index aa740a974e02..5d14d5d5819a 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -670,6 +670,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
- 	return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+ static inline bool kvm_vm_is_protected(struct kvm *kvm)
+ {
+ 	return false;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0ac721fa27f1..387f2215fde7 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -172,6 +172,13 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+ 	return 0;
  }
  
-+void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-+				phys_addr_t addr, size_t size)
++int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages)
 +{
-+	unsigned long pages, inval_pages;
-+
-+	if (!system_supports_tlb_range()) {
-+		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-+		return;
-+	}
-+
-+	pages = size >> PAGE_SHIFT;
-+	while (pages > 0) {
-+		inval_pages = min(pages, MAX_TLBI_RANGE_PAGES);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval_pages);
-+
-+		addr += inval_pages << PAGE_SHIFT;
-+		pages -= inval_pages;
-+	}
++	kvm_tlb_flush_vmid_range(&kvm->arch.mmu,
++				start_gfn << PAGE_SHIFT, pages << PAGE_SHIFT);
++	return 0;
 +}
 +
- #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
- 
- static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+ static bool kvm_is_device_pfn(unsigned long pfn)
+ {
+ 	return !pfn_is_map_memory(pfn);
 -- 
 2.41.0.487.g6d72f3e995-goog
 
