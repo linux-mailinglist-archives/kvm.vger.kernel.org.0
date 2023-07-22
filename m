@@ -2,47 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77BB375DA91
-	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 09:10:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2091C75DA95
+	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 09:24:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229905AbjGVHKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jul 2023 03:10:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52406 "EHLO
+        id S230127AbjGVHRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jul 2023 03:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229770AbjGVHKF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Jul 2023 03:10:05 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2076.outbound.protection.outlook.com [40.107.93.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AAE1E44;
-        Sat, 22 Jul 2023 00:10:04 -0700 (PDT)
+        with ESMTP id S229770AbjGVHRn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jul 2023 03:17:43 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2065.outbound.protection.outlook.com [40.107.94.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60B03C01;
+        Sat, 22 Jul 2023 00:17:40 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JB/LCbgN8rjfCVTJ+epUVOL7fJRCT/N0JmCSX+PYc4SqJWIhOyIRsCYX3mV2G7bw1iKCxsWS/cH+IyVF2mIuvfs6RXHDOFJAkdIFLbvLRmpDoOOgyz7XRoQj1Zvn4G669JAPdDj4Xq/LZd4kshkGGvV2hX9FmG24s9KTjGEYc2je0troZBnKLZcPkWozzZ7gmNjKzsJPhEWkJSYjoVFDs1GqDt2UDl0ov93QnJf2/7EyUmI/t4Wl7QTVbgq+iIGtdzTbrdhaKF5Y0FJ2WxqcUz2NsScCGjnKylwzxZ+smnei9iimovCGH0I3+n9oynwaqAVvCwPspLyDvo4mGx3XgQ==
+ b=OawMx5wdr1J6B7Jf8hDasnEt5Ppvw4VhNvgouwXuBD8sDcUO9JtGG7BsQz5XlR9NH0EZ/WnHVJB1rBLLazFRyJFQn+ClFgboSTgg2GuMagFSRGepEn38PT5ayml0371qdMPvI6uch1wvoX+8vLlSZB8DWCuEHcdRSu1Z283FenIC2AmEPDPctRl5+KOXO3udKQnsMA1SmHF0ZyJxJlZwTb6WP3G/asgk2DC4zB/oayJstV0MxQ3vmMfPHk0EtFylu1pp8Pg6fnT0AxSFYfPnB/Hwi/8T9cU6/VeugRzCJOAe2oTnJql/GShrcPLV6+w8Ceay5s5U8Vyfzz+G6uPIxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vp7SzpnvTw61ePdZp+GpQQEkoJAisl25W9Xc6mMtZvw=;
- b=X5lwSNJsVyYc2BaUMJ3Ysnx0Wl4DhIfAEV6JcFFBTpZ6N2n0THap4j+nDMmXohVaGRnPfjsFyfi1JKE39db8W0zyPrmeJ9250d5r6C4bQZaEvjJ57IAcpY6fiowDZBXup4f8DA3ALojgZrnaLpeHVhfUJyl/It00ZIUviGWCrzpZxGBzCjSGzJ4oAU3BMs+GJM3hDV3BVzEIo/1FGUd91f7gbcVcXNf8YPLgSnrR9yf8WYLGZ1c0hB24jJdMK1qzGxGnI4ElxqH9t+jn+s60a27WquxA0zcmFzH1/y2oe9vCeE0UGZtHJae/YAmUkISP+6xuLQkMjJvYZIh6T1bNPQ==
+ bh=R6d/nDKUczsxCE46JzS2JY4QmqUp6o79U1ItvpNpxv0=;
+ b=hgaoOtcWI05qtDSOd6p4OsgJwHDle/QpiG4f5mkeLkpZGiPw31Pxgi3AWNubgkK4IZYLe7YtBFFYubuzJaGFusXw6L/6R989rskq5tl0IzkMdWCiphA3c+1oKFuoH13W/ZqWZG1OKBQNMh9VNkiYull/AHlWCSyzskTy6D4752Y0mKDGT0HVrhGJbT8HTdAyWTcRo5L5U3dHxuQHI5/FVgr1WKrBJ8e48QeX+1hqt0EmsjHysjcAWa6K//MC2P31He7a0uq8+aIGNS0TzozLIVAc43ptcVJS5L/9UrgaRtApIguwMOy/JDcT1bt5aTxSUPFJyL6p03PId5WemrWN7w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vp7SzpnvTw61ePdZp+GpQQEkoJAisl25W9Xc6mMtZvw=;
- b=io97K9kscPrxvhfREc5XWLbQe1FLTLi7pSspmScOh2c7M4k/ZwbIqyoqElEOKbufwW91quY/yhuZzik1Dxe7pEDbFLr8BNSjywcfYlmBp5JS2AD8XnxBDscExTV6V+N/MTTGRibh0UTckS3L5s4cY4w8WcTmyUhQo+vQVYYx9ag=
+ bh=R6d/nDKUczsxCE46JzS2JY4QmqUp6o79U1ItvpNpxv0=;
+ b=wPM0BQLGCkfrtCyEgx/8CicWPFgktE33GIb8M6N4civ9GFbYNy7mqnvNxdZSQuM9QIWCzWGlMmZsfhs8SC6vI46xA+NmN44e4at+kJqXhkhxMSuQVIEkVdC7p+gdusr5a2cXR+oNJDZYPuDRAVcMfNSFEAEvdjtUO9iM4CQyR5E=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by DS0PR12MB8271.namprd12.prod.outlook.com (2603:10b6:8:fb::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6609.28; Sat, 22 Jul 2023 07:10:01 +0000
+ by PH7PR12MB7354.namprd12.prod.outlook.com (2603:10b6:510:20d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.28; Sat, 22 Jul
+ 2023 07:17:38 +0000
 Received: from PH0PR12MB7982.namprd12.prod.outlook.com
  ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
  ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6609.029; Sat, 22 Jul 2023
- 07:10:01 +0000
-Message-ID: <ea5cd85a-e29e-d178-5b17-1440be84f5fe@amd.com>
-Date:   Sat, 22 Jul 2023 00:09:58 -0700
+ 07:17:38 +0000
+Message-ID: <259c5f0d-24bf-dfd4-a1c5-102944aecd4f@amd.com>
+Date:   Sat, 22 Jul 2023 00:17:34 -0700
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v12 vfio 3/7] vfio/pds: register with the pds_core PF
+Subject: Re: [PATCH v12 vfio 4/7] vfio/pds: Add VFIO live migration support
 Content-Language: en-US
 To:     "Tian, Kevin" <kevin.tian@intel.com>,
         Brett Creeley <brett.creeley@amd.com>,
@@ -55,75 +56,75 @@ To:     "Tian, Kevin" <kevin.tian@intel.com>,
         <shameerali.kolothum.thodi@huawei.com>
 Cc:     "shannon.nelson@amd.com" <shannon.nelson@amd.com>
 References: <20230719223527.12795-1-brett.creeley@amd.com>
- <20230719223527.12795-4-brett.creeley@amd.com>
- <BN9PR11MB527656A2E28090DDA4ED07728C3FA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20230719223527.12795-5-brett.creeley@amd.com>
+ <BN9PR11MB52761AA921E8A3A831DD4A1A8C3FA@BN9PR11MB5276.namprd11.prod.outlook.com>
 From:   Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <BN9PR11MB527656A2E28090DDA4ED07728C3FA@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB52761AA921E8A3A831DD4A1A8C3FA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0311.namprd04.prod.outlook.com
- (2603:10b6:303:82::16) To PH0PR12MB7982.namprd12.prod.outlook.com
+X-ClientProxiedBy: MW4PR03CA0026.namprd03.prod.outlook.com
+ (2603:10b6:303:8f::31) To PH0PR12MB7982.namprd12.prod.outlook.com
  (2603:10b6:510:28d::5)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS0PR12MB8271:EE_
-X-MS-Office365-Filtering-Correlation-Id: e54747aa-f953-4d28-66a2-08db8a82aaa5
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|PH7PR12MB7354:EE_
+X-MS-Office365-Filtering-Correlation-Id: ce005855-5373-4ca5-56d9-08db8a83ba86
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2Fj8ZS/m0Fb/t0K7GQDtOKMaHJYZwDTlt4aMEie4d/XA9qV5QJIH0j95WJgRRp0xJVlKjzio+zuM45AJt9WhFPGt7CW4j3sfVSLGp2/iRbEvAB5N4aEgWqHfZOKMpu9NyflMYBm5XWJlrInaiNfFzGq+oVL8xaWU4QQQuLG34sEznt0Tm2GbYJjkg+C9x5XuWjtBOzuc7wCNih7DFlnkxVmEMJtwerO5Z+bzi5ectc9bMTY7K9lowQDDB0H4bSNJ3z14aSlOxrEfs4hjjseSMx8a1JQfBtn+lg8cO+cJy+Zt+q0eaMS2EcBRnaWNtYDuV5SJOSaLtNvYmP/3uqy5SN9awmhkjOZpDZwYXBurmYqw93kkG4i+5LP7XG1wnIWK10I48K6rPimkTeuvzJbg1o9BI4bVON7dJkIi76+mkVhsfwiVLaseQjoWQcOZ8Ox4aCQPdExU99P08D5n9i2eKTdTDEaFeTm+ZfTLFVQqphVpNg+DchAkcyhEQOXoFdju4YJibIGCcGE9VPPTrcZYqiL6y2Vp3M9B+CfAdJRStpZdTmHF2eScfddXg5cNTZqhVj8tytRtaEhjifGqBw8hSoBTkX3ZVL5ITbq1mLau4Wjbzxwla2U5saWCdM4FvUIN6WlW9yNRXFLKh4UXLdigtA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(366004)(396003)(39860400002)(136003)(451199021)(53546011)(5660300002)(6506007)(8676002)(41300700001)(26005)(186003)(8936002)(31686004)(31696002)(38100700002)(110136005)(83380400001)(6666004)(6486002)(6512007)(66476007)(66556008)(66946007)(316002)(4326008)(2906002)(478600001)(36756003)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: v+njimFrlFhaZSm0domTUJ/l63glEDySKHpCyoFuaTZ1dzeMOhCrvO3F7fMB/V2fP1jkU0jIQWDkquv/uxgBcBnMSRKtWWlEshYmeuTiWnZKesbPBc8Sb5Qj53QUMUlp/XQ4322yrRoWtO4RC0B7W7i8mZqYcbDo5Jr+VV80MpQI54NFVw100d7IyW0+V71PvoQwU/VZEVOmAZLu1offCNalryKvokY5e93TVzf6ByzHhxGIpFd/PEI+tv+OMfmitU6xnhUHP5JvFjEifmoDo8dxQUBNQF5Kc7OH2kypl4HWVerWbBpQWq3L9LGSJJn4VGM2zYcF2CG/0uluMvE48cfhoe3A1QSDX96ESKRl6Je+zfa7DbrOy3IR10N7lbYwhPgly+EcPRiA8bx2FD3SgfRkYEFWmfUIECsp3RBDYOPfLs10DRB1tOWlsujK/bT1pkXzsbEzqL9Z2gz1L3U1LGoyoWFXMYPenOsloknpkup0KyNiqMnSrb/lpV2YY00ygzsou7+NLRAzH+RIE+iU/EouqtJstBHvW9xElQUo8gH9UJKJ+/dw7gbVHltF51Bdudr3RKlXc2GepfMXSvlmnpV1GURgTqX2Ibdgejl+9NwxtlK2zYua25qjjJBESkfBlTNjwDjNYqf7dfM9+CUQPA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(39860400002)(366004)(396003)(451199021)(316002)(4326008)(66946007)(66476007)(66556008)(38100700002)(6486002)(6512007)(6666004)(31696002)(110136005)(2906002)(478600001)(36756003)(41300700001)(2616005)(31686004)(5660300002)(8936002)(8676002)(186003)(6506007)(83380400001)(26005)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d2JQSUZHUFB0Sk9xSUhEWGtVVVJ5QVhoNEhndE1sN1hPR0dFRVZPVVI0dVRp?=
- =?utf-8?B?MFJTbGRLWVQyOW5xMlg1Y1R0Y1Z5eVhnV2JjTEx3bE5vQTYzNmE1TDQxYStR?=
- =?utf-8?B?RkIyZDE2T0JYZ1duYWFiOW5zTzU5TkFmd1o5SWcxdFlpZlN2ZFkzd2dYUUhw?=
- =?utf-8?B?bWlZVzlRbUNvbXJLVWlaQ0ZxWXhNV3FqMkVhbjdRbnB3ZjNhWWxpdHZ3VDZ0?=
- =?utf-8?B?Vlg3WE1YMWg4NEFlSkxXajdBaldOZVZGaS9hYldzSnlIUGZpVUVJb0dsTmVG?=
- =?utf-8?B?a1l2SEpDYm9VbmRtZnFYczJWN1RCbENMU3hFdzJ1VWZmTXZNb1Q1Zi9qajUv?=
- =?utf-8?B?TlZsbFN4bFkwTnhTazd6V1NqYmJockJOQTJvQnRWN0Y4Tm9tZXlETFlKbjF5?=
- =?utf-8?B?d2gzcGFJbkYrN3cyZzFzeTZOR09NNS84Z3hlY1NYSERqazlFcmhKKzhRN2pW?=
- =?utf-8?B?cEdEU3IweHJ3eXJ4R2g4bW51cWxUL2x4dW4yOXY2ZGFOczZrRjNCajlvelps?=
- =?utf-8?B?ZXhUaTI0NVVUQlB0c2hhREEzcnRLQ2o4alBiWEtDbjlxZ3lGSm84WUpZN280?=
- =?utf-8?B?VW02dnc5MlQ2MzZDR3ZOWXIrMTJWRWsvNkNmZWhoOExGRU1rSzlLN3RNN2Zq?=
- =?utf-8?B?dTVtMzh1b1NuWUdob3BFS0Rud0owNGM4Z25uMnBVTEVBOGpkQTRxQmFYbU83?=
- =?utf-8?B?cXp0YmJxazN2L2JRWW1mRnNxdklVU3NTVkZnWGIzT3JmY2NUWkxmZXhQdU54?=
- =?utf-8?B?dFI0bFNnM0NKM3A5MlFzdEVSa3piZUZaUzV6WFRBTUJzK2swMDFkdTBoMlR5?=
- =?utf-8?B?QUJmVDU3K2NkUHZrSU90cU5vUjd5RXZpS2Q4NlFWci9DTU52ZUVoSFllR2J2?=
- =?utf-8?B?anU4eHRZUCtNSFoyaFJOcmdtWXdnNzFaNFRTWThEUGd2N2M0MXFMa1F0T3BL?=
- =?utf-8?B?SzYvYkM5dVNEbjdrTTQwVHpPNVI4bGFTNVJnYmJPTTZBUWJPK0xNMTJUejBL?=
- =?utf-8?B?VDlWVzh5UFNuUTNlOUgrUTB1Ym8ySzF1RnpEVFZ6Z1RxcVI0bjNmS05YZytV?=
- =?utf-8?B?bXM2ZzBZZzkvU2xFWDVWbUN3STdCenRGUG1TRjgrSmN0ZWhEWDNEdnczbzVS?=
- =?utf-8?B?TEhtUktKQkJ2ZUdZM1VJcm1HY2ljV2FmcFBpSW0yM3pxb2NuUGxOTmI0VXpy?=
- =?utf-8?B?YytCL1ZHUkd4K0JUL09PZCtNTE5rVVBvNndhOHlHSURDQlhBZWU0VTM5N1RE?=
- =?utf-8?B?by93SWRpdnBjOU16M1I4NWlGbk1EMDU2RjhlejhBeXNZZnE1RENya1JoT2tI?=
- =?utf-8?B?TmlXM29ncTR1UFR2VWVoYVlERnVFcW94QS9KaUpOZndxd2J3eHVKakVjTVo1?=
- =?utf-8?B?NXJWVjFocitNYVdwVWdBbmlvekVzVHlhbTIxVDNreWRmeGZDVTJJMTJDVFhK?=
- =?utf-8?B?VzFMTXBSbGdYejVnejcxTlJmQ280Q0pMSXp1bDFweXRHSnNCM1I3MTdPME5L?=
- =?utf-8?B?RUdQUFVCNm0xVHpqV0FZRnNmWlI0YUZnVEMwTHZldlZIQkluUVhqMW9iTHRk?=
- =?utf-8?B?bmE5aEYyd0M1cnVEZUl1U3NvRWc0eDc1eW5jNzlWN0JlZFh6UVF4dm9oZWpO?=
- =?utf-8?B?R0FqSDlTemJ4eTRnNGw2NDRLbllMRFhLam5sNk5Td0lISnFkRW11c3RVNGlT?=
- =?utf-8?B?NkZKa0pibU5KWUMrWnBtbzBrVExiS1FPNTNaV0Z1bHVGeThlTDdEVFZScjZV?=
- =?utf-8?B?bS9UcHl6WXdqSUd2VWhsRVVJTzdFeEo0NStMd2tTOWltVGRKa3V2S0xFbWZ4?=
- =?utf-8?B?dzl5a0xDYzYwTXlaS1hMM2xYamwzaE9IZUl4RzU5OVRIK3lGaTNiNWo3TkNh?=
- =?utf-8?B?Yzg0MDlNR0ljQlcrNFZCYnRqazMwNXFjQlo1eUZrNm9ZemtMc0haVlBPZXBT?=
- =?utf-8?B?QU9xNWloZCtLTndwZmMzS0VHNEZEZFlrTHVaSCtNMW1pZ01kenZ2KzNCQXAz?=
- =?utf-8?B?NGx6NWNZdTVrN3k5dTQydDhUbVZ1RC9FZVlXaFlYeFhkaEtLSmZaUWtoempy?=
- =?utf-8?B?MzZubkxHdnU1VUQrbUdmT0Y3NTVONVJ4TEtNREVoLzZBTkhaUCtuNVJnb2lJ?=
- =?utf-8?Q?HsOT63CcsihJkkZ7V73dO2J8x?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aG0wV1BHZDFKNXUzeEdOVGxmdkQyenFHTEJyaEhORWlwODVVSDVPaFZHM3N4?=
+ =?utf-8?B?QzF0bHM0UklLUXdnbUdNYm56NFdlT205UlhscGdUVWJjZzZvc1JLRktseXJz?=
+ =?utf-8?B?YmVxSW05NWFRL1Y5dE9xbVVjR0ZOeldyQ0dYQW1zRHFyS2xDNFp5TnJMd0dL?=
+ =?utf-8?B?c3pPQXVTbjRHUWJnVVBCTDVJMXBCNmsvT0JTMDM5Mk1qNDQ3YmhiZkc3dks0?=
+ =?utf-8?B?MitFK1poTW1iWWw0dG16YXJmcE9GTWszTUFRYXpZb1RxZVpycEN3WVl0OFB0?=
+ =?utf-8?B?ZENoQ0x0L2xXQnlvMzhyME5TaW02WmxkSlIyeWs2MzRISlZQb1g3ZFp6eDN3?=
+ =?utf-8?B?c21EWTVvRkpRL29nSXovRExLTmhHbmFPdThhZHk3SkRSTXU0L1RISXRObjlq?=
+ =?utf-8?B?SkRwMXpDTy9PZmZZeUJsUk1jdW5mV3RZS0NlN0pSN0lFVnZId1krc2lnMFdQ?=
+ =?utf-8?B?NWgrd3hscjNVa1BCTE01dGM4VnFHVU9tUkgvYUpoWFBVRWVTZFJ1SVMvYlZp?=
+ =?utf-8?B?V1pkVk9zMWllcGsrdTllbi94Q29PS0hMWHRoL2NXeEZlblZNaUdNaDNVdW9s?=
+ =?utf-8?B?cnZMd1U4c2pTeEpGSkZlaG82U3NyYU9ZOHlQa0diQWZ4T1lTTXRQZXNQZ0VL?=
+ =?utf-8?B?M3FaSkV0ZUdoZWltZUlsY1hCbnc2REFUSElCY1FxTmNTWklXeUcvMUNEZks2?=
+ =?utf-8?B?akRGVUVNOC9IeUFydHRzc2E2OWZLQXprb1dEamtYdzVmUHZlcGNqUVRqRVox?=
+ =?utf-8?B?dm00alE2d3FhUFdXb29jajZqYm55MHZ0VUdZdHRqWVZ0L2tJNzNiRzFJZzY4?=
+ =?utf-8?B?YTg5RThNelVWSkszS0Fhck1nbmxpMTlBTk9KU0FNcE9BSVFqMlpwUldGWER0?=
+ =?utf-8?B?b1l6TCtKcnhyMzR2dXF5SXduZzRWdjAzTWkvT0NZcEYwS3QyYnNxaHFySXUv?=
+ =?utf-8?B?cEptRlJ0YzJGUElBeld0QVBpSDY0TVRNaTJpckI1eWwvdEY0Z3cyWHpmSXRr?=
+ =?utf-8?B?elpoUjcxQS8zN21lMzcxbkZaSm95Q0ljMnBTa3NRRTFtQTdZTE9PZmJsRHJM?=
+ =?utf-8?B?WTIxbzFuYzNNelVSTVVIMkQxeFFhUHVSUXFuYjdPVG5qS090ZDVxVGw5eVZI?=
+ =?utf-8?B?K3ZzUG9taUpKQzdmYkhTVXZsM29CZ2J0ODd1YjQ4OWZuYXhOWjQ3bzRYSnlE?=
+ =?utf-8?B?VjRJWU13VEhsOFhITEVWYUJlR2wxWXY1SFlhVFJPTldzS2pQZXhvaVBpQ0Y5?=
+ =?utf-8?B?NGx6REthRi9hVWZhY1RFNG1TcHlUV2twOGRzUElkczQzTkk4ZWxGWjAwenVp?=
+ =?utf-8?B?WVI3NWVGN1FRYjNVbXNjUjFDYlh6WmRPVFNtdW9sc3E3eE5JZHg2cHc5dkZr?=
+ =?utf-8?B?SG5NR0luVEFBbjJWMzQwWldPNWFDaVViaFNwQkNudjZoQ3ZyNG5RdThNK1JY?=
+ =?utf-8?B?UENVamxoSlJHdlQwRmVOSkY0OVJ2VmtDSjZQY1d5eHR0U1VqcXp1aXN0WE15?=
+ =?utf-8?B?L2FxMmpiMGVYdkNNVy9COEJDdW9wRm5jWUpoSzltNVpvdFI0SVJSN3BueW50?=
+ =?utf-8?B?M0o3QVJlMGhVa0Z3RlRGaFhvUTRwZnBwaG10YjI2TkdrZkhxa3Z1bVM5UlBw?=
+ =?utf-8?B?ZmluNGQ3NWZGMGRjRitvd1AzZlJCRGZRMnNBZVdWSFIzdzFMN1hnU2doTjM1?=
+ =?utf-8?B?dU85MWp5Tmo5TTVycjArZ2hSNDZSYk9IbFBNMTRDb1hCdkZKMWRReGZXdzdG?=
+ =?utf-8?B?dmhid1VSZ1YrdDg5OU1rcmZpZHp4VTN2WmJ5bzBReHdkUTJrbGEyTXVCcGxB?=
+ =?utf-8?B?dlhRVFUrSE1NYUNKcFIwMEZoL3d6UzFMMkwyR1BXKyszbWhsbE8ranVMbjFw?=
+ =?utf-8?B?M3FkOC9KWFlVVlV0NkNsckFYWTdoVFhGZ0NnVkFkajFPd0F3S3BERHZ5UVdv?=
+ =?utf-8?B?cTRocWR1QWI4U2xRTURmaDkxOXRuQ0xsSXllSzYyM1V0M25YaHdwU3NvNm5o?=
+ =?utf-8?B?YkJlQk9FT3Y4UTI4WVdrYjY1c0YzRjdwVWdPN0ZRbnFsd2VvYTZueEpUR2cw?=
+ =?utf-8?B?V3ROcXY1M0w2aGtkbmFtVTJHc0UwNXhGY0VVanZpN1BoQWZmWk1JWlB0Rzd4?=
+ =?utf-8?Q?742Ks8T52M/XECcSESF8cv63i?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e54747aa-f953-4d28-66a2-08db8a82aaa5
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce005855-5373-4ca5-56d9-08db8a83ba86
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 07:10:01.7697
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2023 07:17:37.9113
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F+hgPM1HrxX57QCIjqw1JkHyU+2xs6IMe77WNXR9VH+puj16QW++kw7O67bWErOMY4zBM3byOjCIcjjMhoXMhQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8271
+X-MS-Exchange-CrossTenant-UserPrincipalName: kGpwt5poCBk6YHpcw/PnfL+WhKtDpVKou5IGB5zqdJEEbVq6VHEL192zzEq962HXrCbPciqASOg8UmSKWn04Zw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7354
 X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
         T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -132,49 +133,176 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/2023 2:01 AM, Tian, Kevin wrote:
+On 7/21/2023 2:15 AM, Tian, Kevin wrote:
 > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
 > 
 >> From: Brett Creeley <brett.creeley@amd.com>
 >> Sent: Thursday, July 20, 2023 6:35 AM
 >>
->> +void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+>> PDS_LM_CMD_STATUS is added to determine the exact size of the VF
+>> device state data.
+> 
+> based on the description PDS_LM_CMD_STATE_SIZE is clearer.
+
+I will take another look at this and see what makes the most sense.
+
+> 
+>> --- a/drivers/vfio/pci/pds/Makefile
+>> +++ b/drivers/vfio/pci/pds/Makefile
+>> @@ -5,5 +5,6 @@ obj-$(CONFIG_PDS_VFIO_PCI) += pds-vfio-pci.o
+>>
+>>   pds-vfio-pci-y := \
+>>        cmds.o          \
+>> +     lm.o            \
+> 
+> nit. "migration.o" is more readable.
+
+I'd prefer to just leave it lm.o as I don't see a big benefit changing 
+it to migration.o.
+
+> 
+>> +static int pds_vfio_client_adminq_cmd(struct pds_vfio_pci_device *pds_vfio,
+>> +                                   union pds_core_adminq_cmd *req,
+>> +                                   union pds_core_adminq_comp *resp,
+>> +                                   bool fast_poll)
 >> +{
->> +     struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+>> +     union pds_core_adminq_cmd cmd = {};
 >> +     int err;
 >> +
->> +     err = pds_client_unregister(pci_physfn(pdev), pds_vfio->client_id);
->> +     if (err)
->> +             dev_err(&pdev->dev, "unregister from DSC failed: %pe\n",
->> +                     ERR_PTR(err));
+>> +     /* Wrap the client request */
+>> +     cmd.client_request.opcode = PDS_AQ_CMD_CLIENT_CMD;
+>> +     cmd.client_request.client_id = cpu_to_le16(pds_vfio->client_id);
+>> +     memcpy(cmd.client_request.client_cmd, req,
+>> +            sizeof(cmd.client_request.client_cmd));
+>> +
+>> +     err = pdsc_adminq_post(pds_vfio->pdsc, &cmd, resp, fast_poll);
+>> +     if (err && err != -EAGAIN)
+>> +             dev_info(pds_vfio_to_dev(pds_vfio),
+>> +                      "client admin cmd failed: %pe\n", ERR_PTR(err));
 > 
-> Why using ERR_PTR() here? it looks a common pattern used cross
-> this series.
+> dev_err()
+> 
+>> +void pds_vfio_send_host_vf_lm_status_cmd(struct pds_vfio_pci_device
+>> *pds_vfio,
+>> +                                      enum pds_lm_host_vf_status
+>> vf_status)
+>> +{
+>> +     union pds_core_adminq_cmd cmd = {
+>> +             .lm_host_vf_status = {
+>> +                     .opcode = PDS_LM_CMD_HOST_VF_STATUS,
+>> +                     .vf_id = cpu_to_le16(pds_vfio->vf_id),
+>> +                     .status = vf_status,
+>> +             },
+>> +     };
+>> +     struct device *dev = pds_vfio_to_dev(pds_vfio);
+>> +     union pds_core_adminq_comp comp = {};
+>> +     int err;
+>> +
+>> +     dev_dbg(dev, "vf%u: Set host VF LM status: %u", pds_vfio->vf_id,
+>> +             vf_status);
+>> +     if (vf_status != PDS_LM_STA_IN_PROGRESS &&
+>> +         vf_status != PDS_LM_STA_NONE) {
+>> +             dev_warn(dev, "Invalid host VF migration status, %d\n",
+>> +                      vf_status);
+>> +             return;
+>> +     }
+> 
+> WARN_ON() as it's a driver bug if passing in unsupported status code.
 
-Yes, this is intentional. This is more readable than just printing out 
-the error value.
+IMO dev_warn() is good enough here. I don't plan on changing this.
 
 > 
->> @@ -34,12 +34,13 @@ enum pds_core_vif_types {
->>
->>   #define PDS_DEV_TYPE_CORE_STR        "Core"
->>   #define PDS_DEV_TYPE_VDPA_STR        "vDPA"
->> -#define PDS_DEV_TYPE_VFIO_STR        "VFio"
->> +#define PDS_DEV_TYPE_VFIO_STR        "vfio"
->>   #define PDS_DEV_TYPE_ETH_STR "Eth"
->>   #define PDS_DEV_TYPE_RDMA_STR        "RDMA"
->>   #define PDS_DEV_TYPE_LM_STR  "LM"
->>
->>   #define PDS_VDPA_DEV_NAME     "."
->> PDS_DEV_TYPE_VDPA_STR
->> +#define PDS_LM_DEV_NAME              PDS_CORE_DRV_NAME "."
->> PDS_DEV_TYPE_LM_STR "." PDS_DEV_TYPE_VFIO_STR
->>
+>> +
+>> +static struct pds_vfio_lm_file *
+>> +pds_vfio_get_lm_file(const struct file_operations *fops, int flags, u64 size)
+>> +{
+>> +     struct pds_vfio_lm_file *lm_file = NULL;
+>> +     unsigned long long npages;
+>> +     struct page **pages;
+>> +     void *page_mem;
+>> +     const void *p;
+>> +
+>> +     if (!size)
+>> +             return NULL;
+>> +
+>> +     /* Alloc file structure */
+>> +     lm_file = kzalloc(sizeof(*lm_file), GFP_KERNEL);
+>> +     if (!lm_file)
+>> +             return NULL;
+>> +
+>> +     /* Create file */
+>> +     lm_file->filep =
+>> +             anon_inode_getfile("pds_vfio_lm", fops, lm_file, flags);
+>> +     if (!lm_file->filep)
+>> +             goto out_free_file;
+>> +
+>> +     stream_open(lm_file->filep->f_inode, lm_file->filep);
+>> +     mutex_init(&lm_file->lock);
+>> +
+>> +     /* prevent file from being released before we are done with it */
+>> +     get_file(lm_file->filep);
+>> +
+>> +     /* Allocate memory for file pages */
+>> +     npages = DIV_ROUND_UP_ULL(size, PAGE_SIZE);
+>> +     pages = kmalloc_array(npages, sizeof(*pages), GFP_KERNEL);
+>> +     if (!pages)
+>> +             goto out_put_file;
+>> +
+>> +     page_mem = kvzalloc(ALIGN(size, PAGE_SIZE), GFP_KERNEL);
+>> +     if (!page_mem)
+>> +             goto out_free_pages_array;
+>> +
+>> +     p = page_mem - offset_in_page(page_mem);
+>> +     for (unsigned long long i = 0; i < npages; i++) {
+>> +             if (is_vmalloc_addr(p))
+>> +                     pages[i] = vmalloc_to_page(p);
+>> +             else
+>> +                     pages[i] = kmap_to_page((void *)p);
+>> +             if (!pages[i])
+>> +                     goto out_free_page_mem;
+>> +
+>> +             p += PAGE_SIZE;
+>> +     }
+>> +
+>> +     /* Create scatterlist of file pages to use for DMA mapping later */
+>> +     if (sg_alloc_table_from_pages(&lm_file->sg_table, pages, npages, 0,
+>> +                                   size, GFP_KERNEL))
+>> +             goto out_free_page_mem;
+>> +
+>> +     lm_file->size = size;
+>> +     lm_file->pages = pages;
+>> +     lm_file->npages = npages;
+>> +     lm_file->page_mem = page_mem;
+>> +     lm_file->alloc_size = npages * PAGE_SIZE;
+>> +
+>> +     return lm_file;
+>> +
+>> +out_free_page_mem:
+>> +     kvfree(page_mem);
+>> +out_free_pages_array:
+>> +     kfree(pages);
+>> +out_put_file:
+>> +     fput(lm_file->filep);
+>> +     mutex_destroy(&lm_file->lock);
+>> +out_free_file:
+>> +     kfree(lm_file);
+>> +
+>> +     return NULL;
+>> +}
 > 
-> then should the name be changed to PDS_VFIO_LM_DEV_NAME?
+> I wonder whether the logic about migration file can be generalized.
+> It's not very maintainable to have every migration driver implementing
+> their own code for similar functions.
 > 
-> Or is mentioning *LM* important? what would be the problem to just
-> use "pds_core.vfio"?
+> Did I overlook any device specific setup required here?
 
-LM is important for the device. I don't plan to change this.
+There isn't device specific setup, but the other drivers were different 
+enough that it wasn't a straight forward task. I think it might be 
+possible to refactor the drivers to some common functionality here, but 
+IMO this seems like a task that can be further explored once this series 
+is merged.
+
+Thanks for the review.
+
+Brett
