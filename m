@@ -2,137 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EF6975DAE6
-	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 09:53:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E215875DAFC
+	for <lists+kvm@lfdr.de>; Sat, 22 Jul 2023 10:16:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbjGVHxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jul 2023 03:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35852 "EHLO
+        id S229615AbjGVIQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jul 2023 04:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231370AbjGVHxT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Jul 2023 03:53:19 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEFF22708
-        for <kvm@vger.kernel.org>; Sat, 22 Jul 2023 00:53:18 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bb1baf55f5so20598375ad.0
-        for <kvm@vger.kernel.org>; Sat, 22 Jul 2023 00:53:18 -0700 (PDT)
+        with ESMTP id S229456AbjGVIQM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jul 2023 04:16:12 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D812D58;
+        Sat, 22 Jul 2023 01:16:10 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fbc0314a7bso4145828e87.2;
+        Sat, 22 Jul 2023 01:16:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1690012398; x=1690617198;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aiO61RFWQc576A2x8jBmto7Eq50nA+0j/FFgWXdA55I=;
-        b=V7HDO7h9cMJQuoPaix0ohqhZbGjhwfcE21W7k9j8a9RL0z4OSklK3Ozp1/pF/2D5Ze
-         wHNnIBVHARgb9QZGB2Q6IlSnZfLGP8GZiHrn+nGZNrR2P3oibMTlrfeKZ4WjqciR4e8P
-         /Ggu3omGCX/RjZeJdiFvz7mlZjl8FY+URnd1rEh/kdE+S4I0A/TGjQBPjl2kQIo9S+zi
-         eVkh4FJsbOH8ityr79518E4fKiy2YFOIbajqIh6vCNw2GFoGi0KPnlp800B4oLYL00Zh
-         D21ndlGqCOPoqc1A3lECbEpJSGRsNsDnGyCWmO2Bv7jokmk7L2hcOurnqcgQZRb62SpI
-         JNTg==
+        d=gmail.com; s=20221208; t=1690013769; x=1690618569;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TzDFSq9ToW2a8ApBbamX9DH0vv1xgjFWtYbk7I9a3zo=;
+        b=iLHQMkzn513/CX45oKtJQROkuU6hKVIZtEYUjvD8YJbi8M6JmgtmRhQr8qCCfW6sdV
+         fFnJktywfx3lh713VRE/fpTLUGqhM7eTtC4QGaI16YgOTN1N1RTwTfgVP8hfSsogJ4Nh
+         Gq5zI3yjt4KPOpZPg4HVs9+68A9F1c3ow4aYnJy4wxziSVrWyulj/l1Fulkx4BOi3SuC
+         h7jIKRY5ZXAm/vee7nES09uZfZXSOuWR6CM0mm8qUF8fDTKFYxuiIt1hdwjN2Ts2u3wX
+         pF/YDQRQsnvC/hus4QYTvt3uKjLEN801mEl09d9/j82Uc2pBNbhVPFZpqdbQO1RCnAS+
+         HfTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690012398; x=1690617198;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aiO61RFWQc576A2x8jBmto7Eq50nA+0j/FFgWXdA55I=;
-        b=jsdZV5QRozblbGXw+UezkNMc/9UXp91P4PiXQT7fcDlq6Z918vG0P5DzlyzcLWbYhA
-         nsEY1dF3TEMBPy7i7+TKSC/5hjiTPtAM0nrwrkxYWRnVRI3Pxeiba6zL5yoRBT5IkfX2
-         3DZk0m8/qsceOPapkKScN7DEmYcqGc6LeSDpcuKNLD2Om3bSLs+1ZdqQqOKklRW0OX9P
-         7cbSQoBGT+cfJwWP/0ieGWVKOAthire/h7rh0nX90rBLRsh/ABH2LvK8D7BVmx+Rb46y
-         yjkLZH0YangjP375ZrbPIcKOsr9wAaA7NTR0ZmUZtaxY9H2yE5XYrdch0JZKfBx9K2QK
-         ayzA==
-X-Gm-Message-State: ABy/qLaY53E1Igse5GZFPXrLzhIuGBbsAKp4PfX7zDMRfHZ/WwVRvAHD
-        1PfYfG3OuAHqpoUs1glLdh2bjA==
-X-Google-Smtp-Source: APBJJlH+WLlrxfTvRvZc+enH2E5T/jZvDny6NU0Ju91BEn/OlAogHCBmr+50XgDXnw9e0uJ7H2L01A==
-X-Received: by 2002:a17:902:d512:b0:1b6:c229:c350 with SMTP id b18-20020a170902d51200b001b6c229c350mr5599213plg.18.1690012398241;
-        Sat, 22 Jul 2023 00:53:18 -0700 (PDT)
-Received: from alarm.flets-east.jp ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id i17-20020a17090332d100b001b86dd825e7sm4753119plr.108.2023.07.22.00.53.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Jul 2023 00:53:17 -0700 (PDT)
-From:   Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v4 2/2] accel/kvm: Specify default IPA size for arm64
-Date:   Sat, 22 Jul 2023 16:53:06 +0900
-Message-ID: <20230722075308.26560-3-akihiko.odaki@daynix.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230722075308.26560-1-akihiko.odaki@daynix.com>
-References: <20230722075308.26560-1-akihiko.odaki@daynix.com>
+        d=1e100.net; s=20221208; t=1690013769; x=1690618569;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TzDFSq9ToW2a8ApBbamX9DH0vv1xgjFWtYbk7I9a3zo=;
+        b=afzJg4c+UW48CY1ExkWpybNKiZsTkBDgFu09tmZQ0N9kILrpvnt1VvTa59ub5B/Eqc
+         qnf73oYyb2FM2x+V4gUSw3Ex3+s37jb32XkgrSzvTyNCH2A5Afu8pjBtFaJ7weO3LGV3
+         pLPIQVwlxUKxvvv8T5+6Q/RKInRI1dYv+jnyn7pFj6/IN7ZgLgJhFt8vLWM39+qF9Zxv
+         4Tv8Rj0FxuFAEtrPlsrD2ZiZQ7i4IASMUkMtoUNISeRPFMqoANcHqorzKsuxeUAkN9DE
+         TthzCw7W5hvaY2mWnJEQmjCQkpHHkNNA92Q7DNYyOaNUR1PpAHXipzWCPrtnKnrR57dj
+         S/8Q==
+X-Gm-Message-State: ABy/qLaF0YC2gAXV6yCeeWV2OzVG6Pt7YMbYEmdPLj1R9v3qGhTjWxcH
+        ZWNE5mLD1OtDBw7M0YUZqdA=
+X-Google-Smtp-Source: APBJJlF4G37yXBGyU+5UfZllj5K9yoI0tYISBTZQihm07jz0DksXS19CbW3keLZz1+QQUk60QkISJg==
+X-Received: by 2002:ac2:4dbb:0:b0:4fb:772a:af12 with SMTP id h27-20020ac24dbb000000b004fb772aaf12mr2254319lfe.21.1690013768483;
+        Sat, 22 Jul 2023 01:16:08 -0700 (PDT)
+Received: from ?IPV6:2a00:1e88:c228:ec00:1b41:4959:c1a0:b9eb? ([2a00:1e88:c228:ec00:1b41:4959:c1a0:b9eb])
+        by smtp.gmail.com with ESMTPSA id er14-20020a05651248ce00b004fdb27909cesm1097750lfb.5.2023.07.22.01.16.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Jul 2023 01:16:08 -0700 (PDT)
+Message-ID: <051e4091-556c-4592-4a72-4dacf0015da8@gmail.com>
+Date:   Sat, 22 Jul 2023 11:16:05 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH RFC net-next v5 07/14] virtio/vsock: add common datagram
+ send path
+Content-Language: en-US
+To:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>
+Cc:     Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-7-581bd37fdb26@bytedance.com>
+From:   Arseniy Krasnov <oxffffaa@gmail.com>
+In-Reply-To: <20230413-b4-vsock-dgram-v5-7-581bd37fdb26@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before this change, the default KVM type, which is used for non-virt
-machine models, was 0.
 
-The kernel documentation says:
-> On arm64, the physical address size for a VM (IPA Size limit) is
-> limited to 40bits by default. The limit can be configured if the host
-> supports the extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-> identifier, where IPA_Bits is the maximum width of any physical
-> address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
-> machine type identifier.
->
-> e.g, to configure a guest to use 48bit physical address size::
->
->     vm_fd = ioctl(dev_fd, KVM_CREATE_VM, KVM_VM_TYPE_ARM_IPA_SIZE(48));
->
-> The requested size (IPA_Bits) must be:
->
->  ==   =========================================================
->   0   Implies default size, 40bits (for backward compatibility)
->   N   Implies N bits, where N is a positive integer such that,
->       32 <= N <= Host_IPA_Limit
->  ==   =========================================================
 
-> Host_IPA_Limit is the maximum possible value for IPA_Bits on the host
-> and is dependent on the CPU capability and the kernel configuration.
-> The limit can be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the
-> KVM_CHECK_EXTENSION ioctl() at run-time.
->
-> Creation of the VM will fail if the requested IPA size (whether it is
-> implicit or explicit) is unsupported on the host.
-https://docs.kernel.org/virt/kvm/api.html#kvm-create-vm
+On 19.07.2023 03:50, Bobby Eshleman wrote:
+> This commit implements the common function
+> virtio_transport_dgram_enqueue for enqueueing datagrams. It does not add
+> usage in either vhost or virtio yet.
+> 
+> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> ---
+>  net/vmw_vsock/virtio_transport_common.c | 76 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 75 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index ffcbdd77feaa..3bfaff758433 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -819,7 +819,81 @@ virtio_transport_dgram_enqueue(struct vsock_sock *vsk,
+>  			       struct msghdr *msg,
+>  			       size_t dgram_len)
+>  {
+> -	return -EOPNOTSUPP;
+> +	/* Here we are only using the info struct to retain style uniformity
+> +	 * and to ease future refactoring and merging.
+> +	 */
+> +	struct virtio_vsock_pkt_info info_stack = {
+> +		.op = VIRTIO_VSOCK_OP_RW,
+> +		.msg = msg,
+> +		.vsk = vsk,
+> +		.type = VIRTIO_VSOCK_TYPE_DGRAM,
+> +	};
+> +	const struct virtio_transport *t_ops;
+> +	struct virtio_vsock_pkt_info *info;
+> +	struct sock *sk = sk_vsock(vsk);
+> +	struct virtio_vsock_hdr *hdr;
+> +	u32 src_cid, src_port;
+> +	struct sk_buff *skb;
+> +	void *payload;
+> +	int noblock;
+> +	int err;
+> +
+> +	info = &info_stack;
 
-So if Host_IPA_Limit < 40, specifying 0 as the type will fail. This
-actually confused libvirt, which uses "none" machine model to probe the
-KVM availability, on M2 MacBook Air.
+I think 'info' assignment could be moved below, to the place where it is used
+first time.
 
-Fix this by using Host_IPA_Limit as the default type when
-KVM_CAP_ARM_VM_IPA_SIZE is available.
+> +
+> +	if (dgram_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> +		return -EMSGSIZE;
+> +
+> +	t_ops = virtio_transport_get_ops(vsk);
+> +	if (unlikely(!t_ops))
+> +		return -EFAULT;
+> +
+> +	/* Unlike some of our other sending functions, this function is not
+> +	 * intended for use without a msghdr.
+> +	 */
+> +	if (WARN_ONCE(!msg, "vsock dgram bug: no msghdr found for dgram enqueue\n"))
+> +		return -EFAULT;
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- target/arm/kvm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Sorry, but is that possible? I thought 'msg' is always provided by general socket layer (e.g. before
+af_vsock.c code) and can't be NULL for DGRAM. Please correct me if i'm wrong.
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 40f577bfd5..23aeb09949 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -249,7 +249,9 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
- 
- int kvm_arch_get_default_type(MachineState *ms)
- {
--    return 0;
-+    bool fixed_ipa;
-+    int size = kvm_arm_get_max_vm_ipa_size(ms, &fixed_ipa);
-+    return fixed_ipa ? 0 : size;
- }
- 
- int kvm_arch_init(MachineState *ms, KVMState *s)
--- 
-2.41.0
+Also I see, that in af_vsock.c , 'vsock_dgram_sendmsg()' dereferences 'msg' for checking MSG_OOB without any
+checks (before calling transport callback - this function in case of virtio). So I think if we want to keep
+this type of check - such check must be placed in af_vsock.c or somewhere before first dereference of this pointer.
 
+> +
+> +	noblock = msg->msg_flags & MSG_DONTWAIT;
+> +
+> +	/* Use sock_alloc_send_skb to throttle by sk_sndbuf. This helps avoid
+> +	 * triggering the OOM.
+> +	 */
+> +	skb = sock_alloc_send_skb(sk, dgram_len + VIRTIO_VSOCK_SKB_HEADROOM,
+> +				  noblock, &err);
+> +	if (!skb)
+> +		return err;
+> +
+> +	skb_reserve(skb, VIRTIO_VSOCK_SKB_HEADROOM);
+> +
+> +	src_cid = t_ops->transport.get_local_cid();
+> +	src_port = vsk->local_addr.svm_port;
+> +
+> +	hdr = virtio_vsock_hdr(skb);
+> +	hdr->type	= cpu_to_le16(info->type);
+> +	hdr->op		= cpu_to_le16(info->op);
+> +	hdr->src_cid	= cpu_to_le64(src_cid);
+> +	hdr->dst_cid	= cpu_to_le64(remote_addr->svm_cid);
+> +	hdr->src_port	= cpu_to_le32(src_port);
+> +	hdr->dst_port	= cpu_to_le32(remote_addr->svm_port);
+> +	hdr->flags	= cpu_to_le32(info->flags);
+> +	hdr->len	= cpu_to_le32(dgram_len);
+> +
+> +	skb_set_owner_w(skb, sk);
+> +
+> +	payload = skb_put(skb, dgram_len);
+> +	err = memcpy_from_msg(payload, msg, dgram_len);
+> +	if (err)
+> +		return err;
+
+Do we need free allocated skb here ?
+
+> +
+> +	trace_virtio_transport_alloc_pkt(src_cid, src_port,
+> +					 remote_addr->svm_cid,
+> +					 remote_addr->svm_port,
+> +					 dgram_len,
+> +					 info->type,
+> +					 info->op,
+> +					 0);
+> +
+> +	return t_ops->send_pkt(skb);
+>  }
+>  EXPORT_SYMBOL_GPL(virtio_transport_dgram_enqueue);
+>  
+> 
+
+Thanks, Arseniy
