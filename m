@@ -2,221 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 126A575F4BD
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 13:14:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E425D75F4CE
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 13:18:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232367AbjGXLOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 07:14:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39562 "EHLO
+        id S230345AbjGXLSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 07:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbjGXLOb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 07:14:31 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90AF2198E;
-        Mon, 24 Jul 2023 04:13:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690197234; x=1721733234;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YTaq/gvDINGEMieq70WcQfgAkgR6JHSIqAWu7f0pkko=;
-  b=UG2QDGGNlaLiGtzqKjRgdklm0nH1kbN1SnFYIu3xpnLYjarsFrdTxOSW
-   8myf4j5InHGaNODFpkTMuYMvbk//Jf+GR3X7378H22arbjkFlRzxDt7jc
-   qqtG7JnuE7LPUm4Lyeq0+VgazzL+vmI5fatXMtdAN9yRk6+5rcmThO0Jl
-   kiFpqWuvCxLHWJa/lCAVCShO76DZbcLBONhN46exLlzrYuYRCVs6fsLT+
-   BoQ5SAggLGym9gOv9m+Gk9lKvkLn7WojXrGr604+cZ+L7DpgihyDLcUJh
-   vEbYHlMcFWBC0BkRLM5ExUSA6EmA9pIskcrWzcWxeKGtADlnSlZnxmC6k
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="347015080"
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="347015080"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 04:13:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="839415617"
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="839415617"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga002.fm.intel.com with ESMTP; 24 Jul 2023 04:13:51 -0700
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com,
-        baolu.lu@linux.intel.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com
-Subject: [PATCH v4 12/12] iommu/vt-d: Disallow nesting on domains with read-only mappings
-Date:   Mon, 24 Jul 2023 04:13:34 -0700
-Message-Id: <20230724111335.107427-13-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230724111335.107427-1-yi.l.liu@intel.com>
-References: <20230724111335.107427-1-yi.l.liu@intel.com>
+        with ESMTP id S229813AbjGXLSI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 07:18:08 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24B84E65;
+        Mon, 24 Jul 2023 04:17:47 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B206CDE0;
+        Mon, 24 Jul 2023 04:18:29 -0700 (PDT)
+Received: from [10.57.34.62] (unknown [10.57.34.62])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C518B3F5A1;
+        Mon, 24 Jul 2023 04:17:39 -0700 (PDT)
+Message-ID: <cdd08c9e-81d3-a85f-5426-5db738aa73ec@arm.com>
+Date:   Mon, 24 Jul 2023 12:17:40 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 24/47] drm/panfrost: dynamically allocate the
+ drm-panfrost shrinker
+To:     Qi Zheng <zhengqi.arch@bytedance.com>, akpm@linux-foundation.org,
+        david@fromorbit.com, tkhai@ya.ru, vbabka@suse.cz,
+        roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+        paulmck@kernel.org, tytso@mit.edu, cel@kernel.org,
+        senozhatsky@chromium.org, yujie.liu@intel.com,
+        gregkh@linuxfoundation.org, muchun.song@linux.dev
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-25-zhengqi.arch@bytedance.com>
+Content-Language: en-GB
+From:   Steven Price <steven.price@arm.com>
+In-Reply-To: <20230724094354.90817-25-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lu Baolu <baolu.lu@linux.intel.com>
+On 24/07/2023 10:43, Qi Zheng wrote:
+> In preparation for implementing lockless slab shrink, use new APIs to
+> dynamically allocate the drm-panfrost shrinker, so that it can be freed
+> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
+> read-side critical section when releasing the struct panfrost_device.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
-When remapping hardware is configured by system software in scalable mode
-as Nested (PGTT=011b) and with PWSNP field Set in the PASID-table-entry,
-it may Set Accessed bit and Dirty bit (and Extended Access bit if enabled)
-in first-stage page-table entries even when second-stage mappings indicate
-that corresponding first-stage page-table is Read-Only.
+One nit below, but otherwise:
 
-As the result, contents of pages designated by VMM as Read-Only can be
-modified by IOMMU via PML5E (PML4E for 4-level tables) access as part of
-address translation process due to DMAs issued by Guest.
+Reviewed-by: Steven Price <steven.price@arm.com>
 
-Disallow the nested translation when there are read-only pages in the
-corresponding second-stage mappings. And, no read-only pages are allowed
-to be configured in the second-stage table of a nested translation.
+> ---
+>  drivers/gpu/drm/panfrost/panfrost_device.h    |  2 +-
+>  drivers/gpu/drm/panfrost/panfrost_drv.c       |  6 +++-
+>  drivers/gpu/drm/panfrost/panfrost_gem.h       |  2 +-
+>  .../gpu/drm/panfrost/panfrost_gem_shrinker.c  | 32 ++++++++++++-------
+>  4 files changed, 27 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_device.h b/drivers/gpu/drm/panfrost/panfrost_device.h
+> index b0126b9fbadc..e667e5689353 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_device.h
+> +++ b/drivers/gpu/drm/panfrost/panfrost_device.h
+> @@ -118,7 +118,7 @@ struct panfrost_device {
+>  
+>  	struct mutex shrinker_lock;
+>  	struct list_head shrinker_list;
+> -	struct shrinker shrinker;
+> +	struct shrinker *shrinker;
+>  
+>  	struct panfrost_devfreq pfdevfreq;
+>  };
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_drv.c b/drivers/gpu/drm/panfrost/panfrost_drv.c
+> index bbada731bbbd..f705bbdea360 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_drv.c
+> +++ b/drivers/gpu/drm/panfrost/panfrost_drv.c
+> @@ -598,10 +598,14 @@ static int panfrost_probe(struct platform_device *pdev)
+>  	if (err < 0)
+>  		goto err_out1;
+>  
+> -	panfrost_gem_shrinker_init(ddev);
+> +	err = panfrost_gem_shrinker_init(ddev);
+> +	if (err)
+> +		goto err_out2;
+>  
+>  	return 0;
+>  
+> +err_out2:
+> +	drm_dev_unregister(ddev);
+>  err_out1:
+>  	pm_runtime_disable(pfdev->dev);
+>  	panfrost_device_fini(pfdev);
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem.h b/drivers/gpu/drm/panfrost/panfrost_gem.h
+> index ad2877eeeccd..863d2ec8d4f0 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_gem.h
+> +++ b/drivers/gpu/drm/panfrost/panfrost_gem.h
+> @@ -81,7 +81,7 @@ panfrost_gem_mapping_get(struct panfrost_gem_object *bo,
+>  void panfrost_gem_mapping_put(struct panfrost_gem_mapping *mapping);
+>  void panfrost_gem_teardown_mappings_locked(struct panfrost_gem_object *bo);
+>  
+> -void panfrost_gem_shrinker_init(struct drm_device *dev);
+> +int panfrost_gem_shrinker_init(struct drm_device *dev);
+>  void panfrost_gem_shrinker_cleanup(struct drm_device *dev);
+>  
+>  #endif /* __PANFROST_GEM_H__ */
+> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+> index bf0170782f25..9a90dfb5301f 100644
+> --- a/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+> +++ b/drivers/gpu/drm/panfrost/panfrost_gem_shrinker.c
+> @@ -18,8 +18,7 @@
+>  static unsigned long
+>  panfrost_gem_shrinker_count(struct shrinker *shrinker, struct shrink_control *sc)
+>  {
+> -	struct panfrost_device *pfdev =
+> -		container_of(shrinker, struct panfrost_device, shrinker);
+> +	struct panfrost_device *pfdev = shrinker->private_data;
+>  	struct drm_gem_shmem_object *shmem;
+>  	unsigned long count = 0;
+>  
+> @@ -65,8 +64,7 @@ static bool panfrost_gem_purge(struct drm_gem_object *obj)
+>  static unsigned long
+>  panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+>  {
+> -	struct panfrost_device *pfdev =
+> -		container_of(shrinker, struct panfrost_device, shrinker);
+> +	struct panfrost_device *pfdev = shrinker->private_data;
+>  	struct drm_gem_shmem_object *shmem, *tmp;
+>  	unsigned long freed = 0;
+>  
+> @@ -97,13 +95,24 @@ panfrost_gem_shrinker_scan(struct shrinker *shrinker, struct shrink_control *sc)
+>   *
+>   * This function registers and sets up the panfrost shrinker.
+>   */
+> -void panfrost_gem_shrinker_init(struct drm_device *dev)
+> +int panfrost_gem_shrinker_init(struct drm_device *dev)
+>  {
+>  	struct panfrost_device *pfdev = dev->dev_private;
+> -	pfdev->shrinker.count_objects = panfrost_gem_shrinker_count;
+> -	pfdev->shrinker.scan_objects = panfrost_gem_shrinker_scan;
+> -	pfdev->shrinker.seeks = DEFAULT_SEEKS;
+> -	WARN_ON(register_shrinker(&pfdev->shrinker, "drm-panfrost"));
+> +
+> +	pfdev->shrinker = shrinker_alloc(0, "drm-panfrost");
+> +	if (!pfdev->shrinker) {
+> +		WARN_ON(1);
 
-For simplicity the 2nd restriction is not relaxed even when the nesting
-is turned off later due to vIOMMU config change. In concept if the user
-understands this errata and does expect to enable nested translation
-it should never install any RO mapping in stage-2 in the entire VM life
-cycle. Accordingly introduce a single sticky bit to mark the parent role
-on a domain instead of tracking the role with a counter.
+I don't think this WARN_ON is particularly useful - if there's a failed
+memory allocation we should see output from the kernel anyway. And we're
+changing the semantics from "continue just without a shrinker" (which
+argueably justifies the warning) to "probe fails, device doesn't work"
+which will be obvious to the user so I don't feel we need the additional
+warn.
 
-Reference from Sapphire Rapids Specification Update [1], errata details,
-SPR17.
-
-[1] https://www.intel.com/content/www/us/en/content-details/772415/content-details.html
-
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/intel/iommu.c  | 14 ++++++++++++++
- drivers/iommu/intel/iommu.h  |  4 ++++
- drivers/iommu/intel/nested.c | 14 +++++++++++++-
- include/uapi/linux/iommufd.h | 12 +++++++++++-
- 4 files changed, 42 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index ba34827045e6..caaa3a58dc94 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -2138,6 +2138,7 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 	struct dma_pte *first_pte = NULL, *pte = NULL;
- 	unsigned int largepage_lvl = 0;
- 	unsigned long lvl_pages = 0;
-+	unsigned long flags;
- 	phys_addr_t pteval;
- 	u64 attr;
- 
-@@ -2147,6 +2148,18 @@ __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 	if ((prot & (DMA_PTE_READ|DMA_PTE_WRITE)) == 0)
- 		return -EINVAL;
- 
-+	if (!(prot & DMA_PTE_WRITE) && !domain->read_only_mapped) {
-+		spin_lock_irqsave(&domain->lock, flags);
-+		if (domain->set_nested) {
-+			pr_err_ratelimited("No read-only mapping permitted\n");
-+			spin_unlock_irqrestore(&domain->lock, flags);
-+			return -EINVAL;
-+		}
-+
-+		domain->read_only_mapped = true;
-+		spin_unlock_irqrestore(&domain->lock, flags);
-+	}
-+
- 	attr = prot & (DMA_PTE_READ | DMA_PTE_WRITE | DMA_PTE_SNP);
- 	attr |= DMA_FL_PTE_PRESENT;
- 	if (domain->use_first_level) {
-@@ -4758,6 +4771,7 @@ static void *intel_iommu_hw_info(struct device *dev, u32 *length)
- 	if (!vtd)
- 		return ERR_PTR(-ENOMEM);
- 
-+	vtd->flags = IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17;
- 	vtd->cap_reg = iommu->cap;
- 	vtd->ecap_reg = iommu->ecap;
- 	*length = sizeof(*vtd);
-diff --git a/drivers/iommu/intel/iommu.h b/drivers/iommu/intel/iommu.h
-index 5b292213bcb8..2a14fab6ac4f 100644
---- a/drivers/iommu/intel/iommu.h
-+++ b/drivers/iommu/intel/iommu.h
-@@ -592,6 +592,10 @@ struct dmar_domain {
- 					 * otherwise, goes through the second
- 					 * level.
- 					 */
-+	u8 read_only_mapped:1;		/* domain has mappings with read-only
-+					 * permission.
-+					 */
-+	u8 set_nested:1;		/* has other domains nested on it */
- 
- 	spinlock_t lock;		/* Protect device tracking lists */
- 	struct list_head devices;	/* all devices' list */
-diff --git a/drivers/iommu/intel/nested.c b/drivers/iommu/intel/nested.c
-index 2739c0d7880d..50934da613fa 100644
---- a/drivers/iommu/intel/nested.c
-+++ b/drivers/iommu/intel/nested.c
-@@ -142,14 +142,26 @@ struct iommu_domain *intel_nested_domain_alloc(struct iommu_domain *s2_domain,
- 					       const union iommu_domain_user_data *user_data)
- {
- 	const struct iommu_hwpt_vtd_s1 *vtd = (struct iommu_hwpt_vtd_s1 *)user_data;
-+	struct dmar_domain *s2_dmar_domain = to_dmar_domain(s2_domain);
- 	struct dmar_domain *domain;
-+	unsigned long flags;
- 
- 	domain = kzalloc(sizeof(*domain), GFP_KERNEL_ACCOUNT);
- 	if (!domain)
- 		return NULL;
- 
-+	spin_lock_irqsave(&s2_dmar_domain->lock, flags);
-+	if (s2_dmar_domain->read_only_mapped) {
-+		spin_unlock_irqrestore(&s2_dmar_domain->lock, flags);
-+		pr_err_ratelimited("S2 domain has read-only mappings\n");
-+		kfree(domain);
-+		return NULL;
-+	}
-+	s2_dmar_domain->set_nested = true;
-+	spin_unlock_irqrestore(&s2_dmar_domain->lock, flags);
-+
- 	domain->use_first_level = true;
--	domain->s2_domain = to_dmar_domain(s2_domain);
-+	domain->s2_domain = s2_dmar_domain;
- 	domain->s1_pgtbl = vtd->pgtbl_addr;
- 	domain->s1_cfg = *vtd;
- 	domain->domain.ops = &intel_nested_domain_ops;
-diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
-index 0dfb6f3d8dda..2f8f2dab95a7 100644
---- a/include/uapi/linux/iommufd.h
-+++ b/include/uapi/linux/iommufd.h
-@@ -435,10 +435,20 @@ struct iommu_hwpt_alloc {
- };
- #define IOMMU_HWPT_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_HWPT_ALLOC)
- 
-+/**
-+ * enum iommu_hw_info_vtd_flags - Flags for VT-d hw_info
-+ * @IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17: If set, disallow nesting on domains
-+ *                                   with read-only mapping.
-+ *                                   https://www.intel.com/content/www/us/en/content-details/772415/content-details.html
-+ */
-+enum iommu_hw_info_vtd_flags {
-+	IOMMU_HW_INFO_VTD_ERRATA_772415_SPR17 = 1 << 0,
-+};
-+
- /**
-  * struct iommu_hw_info_vtd - Intel VT-d hardware information
-  *
-- * @flags: Must be 0
-+ * @flags: Combination of enum iommu_hw_info_vtd_flags
-  * @__reserved: Must be 0
-  *
-  * @cap_reg: Value of Intel VT-d capability register defined in VT-d spec
--- 
-2.34.1
+> +		return -ENOMEM;
+> +	}
+> +
+> +	pfdev->shrinker->count_objects = panfrost_gem_shrinker_count;
+> +	pfdev->shrinker->scan_objects = panfrost_gem_shrinker_scan;
+> +	pfdev->shrinker->seeks = DEFAULT_SEEKS;
+> +	pfdev->shrinker->private_data = pfdev;
+> +
+> +	shrinker_register(pfdev->shrinker);
+> +
+> +	return 0;
+>  }
+>  
+>  /**
+> @@ -116,7 +125,6 @@ void panfrost_gem_shrinker_cleanup(struct drm_device *dev)
+>  {
+>  	struct panfrost_device *pfdev = dev->dev_private;
+>  
+> -	if (pfdev->shrinker.nr_deferred) {
+> -		unregister_shrinker(&pfdev->shrinker);
+> -	}
+> +	if (pfdev->shrinker)
+> +		shrinker_unregister(pfdev->shrinker);
+>  }
 
