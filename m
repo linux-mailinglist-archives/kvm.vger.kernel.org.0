@@ -2,133 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 79787760061
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 22:16:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BD35760065
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 22:20:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230399AbjGXUQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 16:16:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58028 "EHLO
+        id S229666AbjGXUUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 16:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbjGXUQe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 16:16:34 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2428E1712
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:16:29 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d063bd0bae8so4344099276.0
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:16:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690229788; x=1690834588;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpyeHlxyK/Wxza2B0XbnLOYUqgpeakiOlUVm3eRpM6Q=;
-        b=j6FiLWVW1BEQWGRGDCNKnMdB/uBrkbSbLa1K1EDw/LiBM7C6eVkoRkCUsQ09WI8/Mv
-         Fny2LhZv1neNQ3Jabn3zYbY6YAZITRpwrzXHx4zZI9u5ceWLtCDmcrZMemFoU3tDb+fK
-         QbZ10Y+HN6R5WqhLtydaZX/6MwLGX2RVH/oHsL6aYKs8GIgi9WZA1x9l1MEoJwLIL1vk
-         itEK9g3ya0QTjILKmAA+DLMdCsEqRbStG5n7GR6YMdTn19PRPfIIB/OUkoR8GuYkump5
-         Op2hTrJXwr4NruPzzDOUA9+Du2VRB5PlDnJFULu7iJPUU+tT8iGY+bsTsCFdJfYvGyo6
-         5PLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690229788; x=1690834588;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpyeHlxyK/Wxza2B0XbnLOYUqgpeakiOlUVm3eRpM6Q=;
-        b=JFpEJhg5KEsCmLlOn6ldclsFM0Toiqzdgi9TB87C20/GzhOvD/vPC+neyDMQA0QI7B
-         cCbKSeoYKF3qGDDFTrCeUmsAhEFsQITazzxKHlHjYqMtrbSvTX2YJYC1EgypdKDtDslD
-         MJxv4A8H3zLhAqM0OISQVlJf+8xTz6Ef3iftCKbQ5nAzcrwHgOveqaG1sCL7lJOycdHA
-         A908U+IjAKHjpGnJxComAZKSoGbhUpfsKAAzha+QzK9x7Nk/H0tGK9UzyTf/+lVKaKJu
-         BjsTPGQq4kWkILEOepMesmE+erroYjCgctQQ4lbqgq/9GDQenRZwmxflXPwoBuyGa4e3
-         /OJg==
-X-Gm-Message-State: ABy/qLbn2jeFPEDQbxzYOTF/+PzVsusuSXEgQJyWSbXombvXlMZg/lFi
-        DeeQlkHiXNgnp75sxFWtQoH0CKdlhCs=
-X-Google-Smtp-Source: APBJJlETEm+sUDMdwBxTQh+PqsroqqaXQ8T9Z3RbdwPygXWQyA0h4pdWgzZRNvYOpLPGkfrhzs9fYbXOMr8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:cf2:ad45:2084 with SMTP id
- w15-20020a056902100f00b00cf2ad452084mr67527ybt.12.1690229788310; Mon, 24 Jul
- 2023 13:16:28 -0700 (PDT)
-Date:   Mon, 24 Jul 2023 13:16:26 -0700
-In-Reply-To: <20230718234512.1690985-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com>
-Message-ID: <ZL7cGrJNV3//wsXD@google.com>
-Subject: Re: [RFC PATCH v11 00/29]  KVM: guest_memfd() and per-page attributes
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Kirill Shutemov <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229498AbjGXUUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 16:20:11 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FBB2C6
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:20:10 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36OKJNLM006935;
+        Mon, 24 Jul 2023 20:19:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=PfnL3R+qEZCZVDaIkeGd2c+3Igum6OKlfRNXkvpqkY0=;
+ b=gSkCxi7fiuh9Ci62q5gnVxhmh2f6P9M2NyFx1/Oy3dmj7lb13/nf3BroPd/9MkdfLxyS
+ ojBwIKFFYfxtYymSYtHXrn1vMkjR8xzTmS7M5rbbH+2cRpiYiw/xZJvCbIo0IdaBq/0b
+ 4/53ua5StpncldhIvBQKCv00tUPj0NrbnuKZBG2w8F82kKO85fneSsTWO+MVinLX7Gze
+ To1K3ODZk9PrF3e9t34nLkI4AWWGQWmWNXjoi6iMpE7GsL86menQEnp47JQ9+8awMmoq
+ 9efTCLExMrJltjna8mNY30NbcOEHvDgoQ/x8N2JR4TY2oB3lEt0FU8yZQ1UQx4cW/MaD tA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1yfyha6v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jul 2023 20:19:56 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36OK9mPg032705;
+        Mon, 24 Jul 2023 20:19:55 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1yfyha6h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jul 2023 20:19:55 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36OImboO002132;
+        Mon, 24 Jul 2023 20:19:54 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unj5s2b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jul 2023 20:19:54 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36OKJoAv40305366
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jul 2023 20:19:50 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4893F20040;
+        Mon, 24 Jul 2023 20:19:50 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1497D20043;
+        Mon, 24 Jul 2023 20:19:49 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.57.141])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Jul 2023 20:19:48 +0000 (GMT)
+Message-ID: <0743d96760a7b3d8d79ed1443c26896eac6a1a13.camel@linux.ibm.com>
+Subject: Re: [PATCH v21 02/20] s390x/cpu topology: add topology entries on
+ CPU hotplug
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Mon, 24 Jul 2023 22:19:48 +0200
+In-Reply-To: <20230630091752.67190-3-pmorel@linux.ibm.com>
+References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+         <20230630091752.67190-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Z1gh6oVG4xA0zi_i9CUIXUrgR3h2dohV
+X-Proofpoint-GUID: HUZV-ztbkWY1UQtz6IF0qz6EsRFuX7yu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-24_16,2023-07-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 mlxscore=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 impostorscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307240176
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dropped non-KVM folks from Cc: so as not to bother them too much.
+On Fri, 2023-06-30 at 11:17 +0200, Pierre Morel wrote:
+> The topology information are attributes of the CPU and are
+> specified during the CPU device creation.
+>=20
+> On hot plug we:
+> - calculate the default values for the topology for drawers,
+> =C2=A0 books and sockets in the case they are not specified.
+> - verify the CPU attributes
+> - check that we have still room on the desired socket
+>=20
+> The possibility to insert a CPU in a mask is dependent on the
+> number of cores allowed in a socket, a book or a drawer, the
+> checking is done during the hot plug of the CPU to have an
+> immediate answer.
+>=20
+> If the complete topology is not specified, the core is added
+> in the physical topology based on its core ID and it gets
+> defaults values for the modifier attributes.
+>=20
+> This way, starting QEMU without specifying the topology can
+> still get some advantage of the CPU topology.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 
-On Tue, Jul 18, 2023, Sean Christopherson wrote:
-> This is the next iteration of implementing fd-based (instead of vma-based)
-> memory for KVM guests.  If you want the full background of why we are doing
-> this, please go read the v10 cover letter[1].
-> 
-> The biggest change from v10 is to implement the backing storage in KVM
-> itself, and expose it via a KVM ioctl() instead of a "generic" sycall.
-> See link[2] for details on why we pivoted to a KVM-specific approach.
-> 
-> Key word is "biggest".  Relative to v10, there are many big changes.
-> Highlights below (I can't remember everything that got changed at
-> this point).
-> 
-> Tagged RFC as there are a lot of empty changelogs, and a lot of missing
-> documentation.  And ideally, we'll have even more tests before merging.
-> There are also several gaps/opens (to be discussed in tomorrow's PUCK).
+Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com> if you address
+Thomas' comments.
 
-I've pushed this to
-
-  https://github.com/kvm-x86/linux/tree/guest_memfd
-
-along with Isaku's fix for the lock ordering bug on top.
-
-As discussed at PUCK, I'll apply fixes/tweaks/changes on top until development
-stabilizes, and will only squash/fixup when we're ready to post v12 for broad
-review.
-
-Please "formally" post patches just like you normally would do, i.e. don't *just*
-repond to the buggy mail (though that is also helpful).  Standalone patches make
-it easier for me to manage things via lore/b4.
-
-If you can, put gmem or guest_memfd inside the square braces, e.g.
-
-  [PATCH gmem] KVM: <shortlog>
-
-so that it's obvious the patch is intended for the guest_memfd branch.  For fixes,
-please also be sure to use Fixes: tags and split patches to fix exactly one base
-commit, again to make my life easier.
-
-I'll likely add my own annotations when applying, e.g. [FIXUP] and whatnot, but
-that's purely notes for myself for the future squash/rebase.
-
-Thanks!
