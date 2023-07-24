@@ -2,124 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF091760031
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 22:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79787760061
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 22:16:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230263AbjGXUBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 16:01:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52982 "EHLO
+        id S230399AbjGXUQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 16:16:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbjGXUBi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 16:01:38 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 371FA139
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:01:37 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-4036bd4fff1so71421cf.0
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:01:37 -0700 (PDT)
+        with ESMTP id S230071AbjGXUQe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 16:16:34 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2428E1712
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:16:29 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d063bd0bae8so4344099276.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:16:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690228896; x=1690833696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jl5MeJuJjAxGXKAhFzC6oX05QXNcvphfhbANRVK+qck=;
-        b=GG4r0BC37PIz8ancFPPNMnS3x0H3KAsAkXwF+2c1DahOgfRp5Kofi4JD8MQxHBaBTY
-         9NEH+Lg8Z+jQf9x+gCyIDrMNsBrySBzM0KxuTQ8ysgY9aa+cvRjjpNAob3vX/3lzzGv/
-         zlWFDpnP0ryav0bk7HZ6AW0extqW8tdQAJShZqiY/qhgXW9vn4Ak7YT0+7vh91PLdoo/
-         kpwBQ+5tfIHF/I1MXC6zuBBC70dLRAIwu1kMvpcVVuMWwB0SNlI+1e+cbBFoPEXKPKxP
-         IFdugXOftG6UcKJyaal2BiWDWbta5znvtIiF6M5YKArK5QY3aolsgjpTszR82RDBNGlI
-         5y8Q==
+        d=google.com; s=20221208; t=1690229788; x=1690834588;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CpyeHlxyK/Wxza2B0XbnLOYUqgpeakiOlUVm3eRpM6Q=;
+        b=j6FiLWVW1BEQWGRGDCNKnMdB/uBrkbSbLa1K1EDw/LiBM7C6eVkoRkCUsQ09WI8/Mv
+         Fny2LhZv1neNQ3Jabn3zYbY6YAZITRpwrzXHx4zZI9u5ceWLtCDmcrZMemFoU3tDb+fK
+         QbZ10Y+HN6R5WqhLtydaZX/6MwLGX2RVH/oHsL6aYKs8GIgi9WZA1x9l1MEoJwLIL1vk
+         itEK9g3ya0QTjILKmAA+DLMdCsEqRbStG5n7GR6YMdTn19PRPfIIB/OUkoR8GuYkump5
+         Op2hTrJXwr4NruPzzDOUA9+Du2VRB5PlDnJFULu7iJPUU+tT8iGY+bsTsCFdJfYvGyo6
+         5PLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690228896; x=1690833696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jl5MeJuJjAxGXKAhFzC6oX05QXNcvphfhbANRVK+qck=;
-        b=dUtXD6scpsVw8t368DB+SHpU4lPUpuB4ObP16oBIjq2k0bdsrzqWPHziKNsmrduKlJ
-         8In6ZU14lfvfhuNHqdfQ9CMo/wW/cuMjLtR3B7DnhHOTbWcRXy16nTrI4zmuwY+5fXVB
-         U7Kjn48JAp09GhWKgH7z77vgrv+NMDd4v7at7KtYDGHIkGFW3z8dSBZcaoNoyJp70EEc
-         02WNUabVuBWpX1HQw5WjxyZw+lgSM9oe4GnWtCCq34bTVVL55R8Jgo7NNHsvR60B4CNS
-         wyijYUMLYL1XnmCDLHQWKuqjJv4xieQYxWDpjOUHxbc1DYBNyc10r9pHsR7vuX90mth1
-         9jxQ==
-X-Gm-Message-State: ABy/qLasGzG3xb727yx8RIOuCAfe2xkU7oVVLwOO6a5vl9uYzGmFvai6
-        F4UdlEjVcpAxf0takysntexoHphqY6JKp1h9L8gMG1bAHtafu26u8wg=
-X-Google-Smtp-Source: APBJJlGemP0CkN9ORNU1xUd19yyneWURMHpShwjwAkWDWnU+1Silam/zQvCl/47hWwbUTNLOV+7IrV6rjQtOUi7jWRs=
-X-Received: by 2002:ac8:5716:0:b0:403:f3f5:1a8 with SMTP id
- 22-20020ac85716000000b00403f3f501a8mr551111qtw.12.1690228896233; Mon, 24 Jul
- 2023 13:01:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <ZLiUrP9ZFMr/Wf4/@chao-email> <CALMp9eTQ5zDpjK+=e+Rhu=zvLv_f0scqkUCif2tveq+ahTAYCg@mail.gmail.com>
- <ZLjqVszO4AMx9F7T@chao-email> <CALMp9eSw9g0oRh7rT=Nd5aTwiu_zMz21tRrZG5D_QEfTn1h=HQ@mail.gmail.com>
- <ZLn9hgQy77x0hLil@chao-email> <20230721190114.xznm7xfnuxciufa3@desk>
- <CALMp9eTNM5VZzpSR6zbkjude6kxgBcOriWDoSkjanMmBtksKYw@mail.gmail.com>
- <20230721205404.kqxj3pspexjl6qai@desk> <CALMp9eSqe09RgwTQUe5Qi15E+Q+wm1QhO5P5-ryvF9OzV9gR0w@mail.gmail.com>
- <20230721222904.y3nabprqdk3aa555@desk> <20230724192540.xp4qulsufqmjwki3@desk>
-In-Reply-To: <20230724192540.xp4qulsufqmjwki3@desk>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 24 Jul 2023 13:01:25 -0700
-Message-ID: <CALMp9eSVpdT2v_FzN+Sk=BHamVzLQwRvZvB-GjfMawJ2ZDmdPQ@mail.gmail.com>
-Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1690229788; x=1690834588;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CpyeHlxyK/Wxza2B0XbnLOYUqgpeakiOlUVm3eRpM6Q=;
+        b=JFpEJhg5KEsCmLlOn6ldclsFM0Toiqzdgi9TB87C20/GzhOvD/vPC+neyDMQA0QI7B
+         cCbKSeoYKF3qGDDFTrCeUmsAhEFsQITazzxKHlHjYqMtrbSvTX2YJYC1EgypdKDtDslD
+         MJxv4A8H3zLhAqM0OISQVlJf+8xTz6Ef3iftCKbQ5nAzcrwHgOveqaG1sCL7lJOycdHA
+         A908U+IjAKHjpGnJxComAZKSoGbhUpfsKAAzha+QzK9x7Nk/H0tGK9UzyTf/+lVKaKJu
+         BjsTPGQq4kWkILEOepMesmE+erroYjCgctQQ4lbqgq/9GDQenRZwmxflXPwoBuyGa4e3
+         /OJg==
+X-Gm-Message-State: ABy/qLbn2jeFPEDQbxzYOTF/+PzVsusuSXEgQJyWSbXombvXlMZg/lFi
+        DeeQlkHiXNgnp75sxFWtQoH0CKdlhCs=
+X-Google-Smtp-Source: APBJJlETEm+sUDMdwBxTQh+PqsroqqaXQ8T9Z3RbdwPygXWQyA0h4pdWgzZRNvYOpLPGkfrhzs9fYbXOMr8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:cf2:ad45:2084 with SMTP id
+ w15-20020a056902100f00b00cf2ad452084mr67527ybt.12.1690229788310; Mon, 24 Jul
+ 2023 13:16:28 -0700 (PDT)
+Date:   Mon, 24 Jul 2023 13:16:26 -0700
+In-Reply-To: <20230718234512.1690985-1-seanjc@google.com>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com>
+Message-ID: <ZL7cGrJNV3//wsXD@google.com>
+Subject: Re: [RFC PATCH v11 00/29]  KVM: guest_memfd() and per-page attributes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Kirill Shutemov <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 24, 2023 at 12:26=E2=80=AFPM Pawan Gupta
-<pawan.kumar.gupta@linux.intel.com> wrote:
->
-> On Fri, Jul 21, 2023 at 03:29:04PM -0700, Pawan Gupta wrote:
-> > On Fri, Jul 21, 2023 at 03:18:12PM -0700, Jim Mattson wrote:
-> > > On Fri, Jul 21, 2023 at 1:54=E2=80=AFPM Pawan Gupta
-> > > <pawan.kumar.gupta@linux.intel.com> wrote:
-> > > >
-> > > > On Fri, Jul 21, 2023 at 12:18:36PM -0700, Jim Mattson wrote:
-> > > > > > Please note that clearing STIBP bit on one thread does not disa=
-ble STIBP
-> > > > > > protection if the sibling has it set:
-> > > > > >
-> > > > > >   Setting bit 1 (STIBP) of the IA32_SPEC_CTRL MSR on a logical =
-processor
-> > > > > >   prevents the predicted targets of indirect branches on any lo=
-gical
-> > > > > >   processor of that core from being controlled by software that=
- executes
-> > > > > >   (or executed previously) on another logical processor of the =
-same core
-> > > > > >   [1].
-> > > > >
-> > > > > I stand corrected. For completeness, then, is it true now and
-> > > > > forevermore that passing IA32_SPEC_CTRL through to the guest for =
-write
-> > > > > can in no way compromise code running on the sibling thread?
-> > > >
-> > > > As IA32_SPEC_CTRL is a thread-scope MSR, a malicious guest would be=
- able
-> > > > to turn off the mitigation on its own thread only. Looking at the
-> > > > current controls in this MSR, I don't see how a malicious guest can
-> > > > compromise code running on sibling thread.
-> > >
-> > > Does this imply that where core-shared resources are affected (as wit=
-h
-> > > STIBP), the mitigation is enabled whenever at least one thread
-> > > requests it?
-> >
-> > Let me check with CPU architects.
->
-> For the controls present in IA32_SPEC_CTRL MSR, if atleast one of the
-> thread has the mitigation enabled, current CPUs do not disable core-wide
-> mitigations when core-shared resources are affected.
->
-> This will be the guiding principle for future mitigation controls that
-> may be added to IA32_SPEC_CTRL MSR.
+Dropped non-KVM folks from Cc: so as not to bother them too much.
 
-Excellent. Thank you!
+On Tue, Jul 18, 2023, Sean Christopherson wrote:
+> This is the next iteration of implementing fd-based (instead of vma-based)
+> memory for KVM guests.  If you want the full background of why we are doing
+> this, please go read the v10 cover letter[1].
+> 
+> The biggest change from v10 is to implement the backing storage in KVM
+> itself, and expose it via a KVM ioctl() instead of a "generic" sycall.
+> See link[2] for details on why we pivoted to a KVM-specific approach.
+> 
+> Key word is "biggest".  Relative to v10, there are many big changes.
+> Highlights below (I can't remember everything that got changed at
+> this point).
+> 
+> Tagged RFC as there are a lot of empty changelogs, and a lot of missing
+> documentation.  And ideally, we'll have even more tests before merging.
+> There are also several gaps/opens (to be discussed in tomorrow's PUCK).
+
+I've pushed this to
+
+  https://github.com/kvm-x86/linux/tree/guest_memfd
+
+along with Isaku's fix for the lock ordering bug on top.
+
+As discussed at PUCK, I'll apply fixes/tweaks/changes on top until development
+stabilizes, and will only squash/fixup when we're ready to post v12 for broad
+review.
+
+Please "formally" post patches just like you normally would do, i.e. don't *just*
+repond to the buggy mail (though that is also helpful).  Standalone patches make
+it easier for me to manage things via lore/b4.
+
+If you can, put gmem or guest_memfd inside the square braces, e.g.
+
+  [PATCH gmem] KVM: <shortlog>
+
+so that it's obvious the patch is intended for the guest_memfd branch.  For fixes,
+please also be sure to use Fixes: tags and split patches to fix exactly one base
+commit, again to make my life easier.
+
+I'll likely add my own annotations when applying, e.g. [FIXUP] and whatnot, but
+that's purely notes for myself for the future squash/rebase.
+
+Thanks!
