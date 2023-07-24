@@ -2,155 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE72F75FA1F
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 16:46:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B5A975FA37
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 16:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231517AbjGXOqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 10:46:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59870 "EHLO
+        id S229764AbjGXOwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 10:52:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231245AbjGXOq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 10:46:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B20CD2
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 07:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690209942;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
-        b=Vx9IJ0X8np2tY2tX1y/RfrrNbNZOy9O91ElLKunk6Ax7XYxo6fdmCoXBhkvvQDkq4Cze1n
-        TKqqYnT5d+eT3UK84UIYSHi9+Aez3XBxACcSBziRx/lzvXZwyMwHpjMQgCiJaVgSJe9Oh1
-        aItFbBN1NlwzTjM8W43VUVvJ9Zan5HQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-389-OCP3cFPdOoKFv0hx9OUvnQ-1; Mon, 24 Jul 2023 10:45:41 -0400
-X-MC-Unique: OCP3cFPdOoKFv0hx9OUvnQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fd2e59bc53so8849125e9.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 07:45:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690209940; x=1690814740;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
-        b=GmU+NYwzx+XeSqfSpk/FvSZG9/PHR9d0Tdr3xfQkYRvEX2KbE4CIzoxwuA+GPSBajn
-         ORCFZW+E/wyEdnUt4NSKFoytCKDtSAgpsXB7o29PmU1CF/LKG2TInA4FCuAiFhRrMGr7
-         Ev+GXerew9r0pjcOxx4S6HSRQDEtlnaUXbTlYL27ZyFAdNIyfumRR1Pa/ocl9+iHRxqX
-         HIhB/n8qMlqSGboxWrsA70hSTbzCtezZwqEv6iMKB8IeTNpC7B6k6Xc3z/4FOCbsTGV0
-         kxzoGXYgI5dtdNn+s6NTJOIeopWq4i/pQnOXNXjGJNvustDr1q+PVii7kQKn8rzeg4Gd
-         k0HA==
-X-Gm-Message-State: ABy/qLaqGmxbd/Eu5U1rAFC/weEP4dIJZ1lDJ8YUTnp49H6ge/dr6QKL
-        HYJ3Cn+C2OidwG5RfxtVYNBTWAfAFb2+k3+HB+QbyaI4jhutQGoXdkQ8TVhZArIjOoSInZVB5ZX
-        a2nT/oN5umbj/u48TYtsI
-X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189348wmm.35.1690209940353;
-        Mon, 24 Jul 2023 07:45:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFU13e7JgcAvxxCyZrO9RkA/paTPyvMP1hCPitlW4xzc1kx49CQ/0gLWOB7TPwUbHUV7KIsHg==
-X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189317wmm.35.1690209939969;
-        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
-        by smtp.gmail.com with ESMTPSA id q14-20020a1cf30e000000b003fbe561f6a3sm13332762wmq.37.2023.07.24.07.45.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
-Message-ID: <7614f672-989e-6acf-651f-806a3d96846b@redhat.com>
-Date:   Mon, 24 Jul 2023 16:45:37 +0200
+        with ESMTP id S230166AbjGXOwl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 10:52:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DBF10D7;
+        Mon, 24 Jul 2023 07:52:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6DBB3611F6;
+        Mon, 24 Jul 2023 14:52:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA815C433C8;
+        Mon, 24 Jul 2023 14:52:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690210353;
+        bh=Io85B1vzGj1NiepBNP1CXkgl9j43eYMLYiUZyMtHevU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CJj9nVWeVnJDFBR0XVDtKFcRx4DdPvYzBxJs7NdyqhCdkyJSi7ns/QunyuF5T7ps6
+         XU2A2MDFy7UQQzJsIx/xDqLe0FliBY/Oeg0aB/OquAS8cepo48SytLWwhoRHBnqAgE
+         wTZhFOxngaubHLo/KhuNmg/icDkWf3KABmSQcw7hRGodIB5PblbvuCT6kpl36W6FZr
+         hIH+s80Togjk4lAfltww4D/tmAcJlqIFj1q84XSHWsxVyk2brxNcyWdq/AUnuQb02p
+         QLpBDuBflcJsU3fMXLT8vIMOo2OPS1Po+gVqEtzb2kBqqlYChJ+9nWv8THywbJoX77
+         fSGCA/VpqlDFg==
+Date:   Mon, 24 Jul 2023 16:52:19 +0200
+From:   Frederic Weisbecker <frederic@kernel.org>
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 15/20] context-tracking: Introduce work deferral
+ infrastructure
+Message-ID: <ZL6QI4mV-NKlh4Ox@localhost.localdomain>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-16-vschneid@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 13/27] KVM: arm64: nv: Add FGT registers
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-14-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-14-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230720163056.2564824-16-vschneid@redhat.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Le Thu, Jul 20, 2023 at 05:30:51PM +0100, Valentin Schneider a écrit :
+> +enum ctx_state {
+> +	/* Following are values */
+> +	CONTEXT_DISABLED	= -1,	/* returned by ct_state() if unknown */
+> +	CONTEXT_KERNEL		= 0,
+> +	CONTEXT_IDLE		= 1,
+> +	CONTEXT_USER		= 2,
+> +	CONTEXT_GUEST		= 3,
+> +	CONTEXT_MAX             = 4,
+> +};
+> +
+> +/*
+> + * We cram three different things within the same atomic variable:
+> + *
+> + *                CONTEXT_STATE_END                        RCU_DYNTICKS_END
+> + *                         |       CONTEXT_WORK_END                |
+> + *                         |               |                       |
+> + *                         v               v                       v
+> + *         [ context_state ][ context work ][ RCU dynticks counter ]
+> + *         ^                ^               ^
+> + *         |                |               |
+> + *         |        CONTEXT_WORK_START      |
+> + * CONTEXT_STATE_START              RCU_DYNTICKS_START
 
-On 7/12/23 16:57, Marc Zyngier wrote:
-> Add the 5 registers covering FEAT_FGT. The AMU-related registers
-> are currently left out as we don't have a plan for them. Yet.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 5 +++++
->  arch/arm64/kvm/sys_regs.c         | 5 +++++
->  2 files changed, 10 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8b6096753740..1200f29282ba 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -400,6 +400,11 @@ enum vcpu_sysreg {
->  	TPIDR_EL2,	/* EL2 Software Thread ID Register */
->  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
->  	SP_EL2,		/* EL2 Stack Pointer */
-> +	HFGRTR_EL2,
-> +	HFGWTR_EL2,
-> +	HFGITR_EL2,
-> +	HDFGRTR_EL2,
-> +	HDFGWTR_EL2,
->  	CNTHP_CTL_EL2,
->  	CNTHP_CVAL_EL2,
->  	CNTHV_CTL_EL2,
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3a6f678ca67d..f88cd1390998 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
->  	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+Should the layout be displayed in reverse? Well at least I always picture
+bitmaps in reverse, that's probably due to the direction of the shift arrows.
+Not sure what is the usual way to picture it though...
+
+> + */
+> +
+> +#define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * BITS_PER_BYTE)
+> +
+> +#define CONTEXT_STATE_START 0
+> +#define CONTEXT_STATE_END   (bits_per(CONTEXT_MAX - 1) - 1)
+
+Since you have non overlapping *_START symbols, perhaps the *_END
+are superfluous?
+
+> +
+> +#define RCU_DYNTICKS_BITS  (IS_ENABLED(CONFIG_CONTEXT_TRACKING_WORK) ? 16 : 31)
+> +#define RCU_DYNTICKS_START (CT_STATE_SIZE - RCU_DYNTICKS_BITS)
+> +#define RCU_DYNTICKS_END   (CT_STATE_SIZE - 1)
+> +#define RCU_DYNTICKS_IDX   BIT(RCU_DYNTICKS_START)
+
+Might be the right time to standardize and fix our naming:
+
+CT_STATE_START,
+CT_STATE_KERNEL,
+CT_STATE_USER,
+...
+CT_WORK_START,
+CT_WORK_*,
+...
+CT_RCU_DYNTICKS_START,
+CT_RCU_DYNTICKS_IDX
+
+> +bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
+> +{
+> +	struct context_tracking *ct = per_cpu_ptr(&context_tracking, cpu);
+> +	unsigned int old;
+> +	bool ret = false;
+> +
+> +	preempt_disable();
+> +
+> +	old = atomic_read(&ct->state);
+> +	/*
+> +	 * Try setting the work until either
+> +	 * - the target CPU no longer accepts any more deferred work
+> +	 * - the work has been set
+> +	 *
+> +	 * NOTE: CONTEXT_GUEST intersects with CONTEXT_USER and CONTEXT_IDLE
+> +	 * as they are regular integers rather than bits, but that doesn't
+> +	 * matter here: if any of the context state bit is set, the CPU isn't
+> +	 * in kernel context.
+> +	 */
+> +	while ((old & (CONTEXT_GUEST | CONTEXT_USER | CONTEXT_IDLE)) && !ret)
+
+That may still miss a recent entry to userspace due to the first plain read, ending
+with an undesired interrupt.
+
+You need at least one cmpxchg. Well, of course that stays racy by nature because
+between the cmpxchg() returning CONTEXT_KERNEL and the actual IPI raised and
+received, the remote CPU may have gone to userspace already. But still it limits
+a little the window.
+
+Thanks.
+
+> +		ret = atomic_try_cmpxchg(&ct->state, &old, old | (work << CONTEXT_WORK_START));
+> +
+> +	preempt_enable();
+> +	return ret;
+> +}
+> +#else
+> +static __always_inline void ct_work_flush(unsigned long work) { }
+> +static __always_inline void ct_work_clear(struct context_tracking *ct) { }
+> +#endif
+> +
+>  /*
+>   * Record entry into an extended quiescent state.  This is only to be
+>   * called when not already in an extended quiescent state, that is,
+> @@ -88,7 +133,8 @@ static noinstr void ct_kernel_exit_state(int offset)
+>  	 * next idle sojourn.
+>  	 */
+>  	rcu_dynticks_task_trace_enter();  // Before ->dynticks update!
+> -	seq = ct_state_inc(offset);
+> +	seq = ct_state_inc_clear_work(offset);
+> +
+>  	// RCU is no longer watching.  Better be in extended quiescent state!
+>  	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && (seq & RCU_DYNTICKS_IDX));
+>  }
+> @@ -100,7 +146,7 @@ static noinstr void ct_kernel_exit_state(int offset)
+>   */
+>  static noinstr void ct_kernel_enter_state(int offset)
+>  {
+> -	int seq;
+> +	unsigned long seq;
 >  
->  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
-> @@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
+>  	/*
+>  	 * CPUs seeing atomic_add_return() must see prior idle sojourns,
+> @@ -108,6 +154,7 @@ static noinstr void ct_kernel_enter_state(int offset)
+>  	 * critical section.
+>  	 */
+>  	seq = ct_state_inc(offset);
+> +	ct_work_flush(seq);
+>  	// RCU is now watching.  Better not be in an extended quiescent state!
+>  	rcu_dynticks_task_trace_exit();  // After ->dynticks update!
+>  	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && !(seq & RCU_DYNTICKS_IDX));
+> diff --git a/kernel/time/Kconfig b/kernel/time/Kconfig
+> index bae8f11070bef..fdb266f2d774b 100644
+> --- a/kernel/time/Kconfig
+> +++ b/kernel/time/Kconfig
+> @@ -181,6 +181,11 @@ config CONTEXT_TRACKING_USER_FORCE
+>  	  Say N otherwise, this option brings an overhead that you
+>  	  don't want in production.
 >  
->  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-> +	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
-> +	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
->  	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
->  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-
-Eric
-
+> +config CONTEXT_TRACKING_WORK
+> +	bool
+> +	depends on HAVE_CONTEXT_TRACKING_WORK && CONTEXT_TRACKING_USER
+> +	default y
+> +
+>  config NO_HZ
+>  	bool "Old Idle dynticks config"
+>  	help
+> -- 
+> 2.31.1
+> 
