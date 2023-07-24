@@ -2,62 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC26875FC09
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 18:27:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E350175FC3F
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 18:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjGXQ1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 12:27:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54478 "EHLO
+        id S230232AbjGXQeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 12:34:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231531AbjGXQ1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 12:27:22 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5B36910F5;
-        Mon, 24 Jul 2023 09:27:19 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14C73FEC;
-        Mon, 24 Jul 2023 09:28:02 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11E4F3F5A1;
-        Mon, 24 Jul 2023 09:27:15 -0700 (PDT)
-Message-ID: <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
-Date:   Mon, 24 Jul 2023 17:27:14 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-To:     Salil Mehta <salil.mehta@huawei.com>,
-        "steven.price@arm.com" <steven.price@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Salil Mehta <salil.mehta@opnsrc.net>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Gareth Stockwell <Gareth.Stockwell@arm.com>
-References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
- <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
-Content-Language: en-US
-In-Reply-To: <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        with ESMTP id S229505AbjGXQea (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 12:34:30 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2EED93
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 09:34:29 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58378ae25bfso57056357b3.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 09:34:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690216469; x=1690821269;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vFCy3pvszbR+X811mLdxE7uPbm807D58YR4H47bZEIo=;
+        b=WVDebfufqsTmzu4NcS2X4OPVAafmBt0qkzj/yeI3YSfObAjJFBVOnkXDa9NgbRBYWZ
+         02xRiMrziiriGGrA275Vti/WWguPu/aARKw1nGY4LlpgnyM5djctOPGPBNd25fLuRCBG
+         Q071ME/r/fYYtIxSGL7+G1I6vTIObUisrcQ+54KQYEKi0RvZAUzpqvYjSyLmKG877wk4
+         gY4TN8oq82JsJxhFY0M2LgWnESdXgjkfFinLxTERrV2wS5ih+ib/gyOSA+YNYZcjMmam
+         DqMAlts09Nl0CnpjD0EREFCP9jGVhrA3yjfzpOBIj5Sr6VxxPwCZn+yWIaD+7JxGZnYc
+         JIXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690216469; x=1690821269;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vFCy3pvszbR+X811mLdxE7uPbm807D58YR4H47bZEIo=;
+        b=fZEgbnF0sDj+D5+l397Qa0XDB07eqcv4aofcz9M/+T7d9qb11etENJ57ez8ydlyANV
+         5UuTfW8h0vgk8qV2cx8tuPZ/rfgzWBvE16GLIEUn3H1lUAjexDASSYc56QiZFeYwFY1K
+         KEPNh9pBSfhmgke0U50OpOwBH5rAmPLbrSAp80n1Vv4ApfpNoPQIvIcmLk0wMPHbwt6N
+         kn34nqDQQMlVPDakBgcd34O8PUrDfvye/GQwPBbJuPQYy7uFNKH1pcB7G7zcCgOz3S9I
+         AQWm2kvYSn8zgteyaCDuTUVYbazOntLn8xqVRvXW+opOnyQz51rEIGjHR9XWkNLDElzD
+         u8Zg==
+X-Gm-Message-State: ABy/qLZPdcatybtDa9tdKZ+UntnAEUh9sci1oxllKqdoSZKRruuD4FGp
+        RPNOzC68j9F6Fvqh8BN7D0Tu7DjmuWFD1D2OM9oFfcEkWQrANAY5juy3C+fTdA0oZIM9z/IcC7d
+        Dk5t8N/tSmJjaK0Q3tORNXrTRIP95HlPrt+Fu20ZM0p4V7m7Sjc0A1OqnOA==
+X-Google-Smtp-Source: APBJJlHWlyOWOGxKFp/oV21pzD8Ff/Z/bX4IItcVCrfQUZSEfkmHlnqZv+WaPLmlGsQgYl+LapHQAiocduk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4518:0:b0:56d:1b6:5360 with SMTP id
+ s24-20020a814518000000b0056d01b65360mr69482ywa.5.1690216468909; Mon, 24 Jul
+ 2023 09:34:28 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon, 24 Jul 2023 09:34:26 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
+Message-ID: <20230724163426.13283-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Notes - 2023.07.19 - LPC and guest_memfd
+From:   Sean Christopherson <seanjc@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,95 +68,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Salil
+I forgot to hit "record", so unfortunately there's no video evidence this time
+around :-(
 
-On 19/07/2023 10:28, Suzuki K Poulose wrote:
-> Hi Salil
-> 
-> Thanks for raising this.
-> 
-> On 19/07/2023 03:35, Salil Mehta wrote:
->> [Reposting it here from Linaro Open Discussion List for more eyes to 
->> look at]
->>
->> Hello,
->> I have recently started to dabble with ARM CCA stuff and check if our
->> recent changes to support vCPU Hotplug in ARM64 can work in the realm
->> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
->> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
->> from the host. This might be required to support vCPU Hotplug feature
->> in the realm world in future. vCPU Hotplug is an important feature to
->> support kata-containers in realm world as it reduces the VM boot time
->> and facilitates dynamic adjustment of vCPUs (which I think should be
->> true even with Realm world as current implementation only makes use
->> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
->>
->>
->> As per our recent changes [2], [3] related to support vCPU Hotplug on
->> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
->> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
->> PSCI_CPU_ON should undergo similar policy checks and I think,
->>
->> 1. Host should *deny* to online the target vCPUs which are NOT plugged
->> 2. This means target REC should be denied by host. Can host call
->>     RMI_PSCI_COMPETE in such s case?
->> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
-> 
-> The Realm exit with EXIT_PSCI already provides the parameters passed
-> onto the PSCI request. This happens for all PSCI calls except
-> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
-> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses 
-> the request (wherever applicable).
-> 
-> However, the RMM spec currently doesn't allow denying the request.
-> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
-> We will address this in the RMM spec and get back to you.
+LPC:
+ - Format will utilize flexible timeslots; tentatively planning on ~3 "big"
+   slots of ~40 minutes each, and ~6 "small" slots of 10-15 minutes each.
+ - Schedule will be announced around September 15th (though that may get pushed
+   backed to October 1st).
+ - Schedule is flexibile up until the conference, e.g. if code is merged between
+   September 15th and early November and obviates the need for a discussion.
 
-This is now resolved in RMMv1.0-eac3 spec, available here [0].
+guest_memfd:
+ Topic Branch:
+   - Work will be coordinated through a dedicated topic branch (likely
+     kvm-x86/guest_memfd).
+   - Mostly stable branch; plan is to not rebase it for at least the next month
+   - Fixes (use Fixes: tag!!!) will be applied on top and squashed when the
+     branch is rebased.
+   - TBD will post a series for broader review in a month or so once
+     development has settled down.
 
-This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
-the response doesn't violate the security guarantees by checking the
-state of the target REC.
+ TODO:
+  - Documentation [Sean?]
+  - Changelogs [Sean]
+  - Non-filemap implementation [Paolo]
+  - Hugepage tests (verify KVM actually installs hugepages as expected) 
+  - Memory failure tests (e.g. synthetic #MC injection)
+  - Get Input from IOMMU / VFIO [Paolo]
 
-[0] https://developer.arm.com/documentation/den0137/latest/
+ Opens:
+  - .release_folio and .invalidate_folio versus .evict_inode [Mike]
+  - Fully anonymous inode vs. proper filesystem [Sean / Paolo]
+  - HugeTLB (or something similar) support [Future]
+  - Intrahost migration support [Google GCE]
+  - NUMA support [ TBD - implement fbind() ]
+  - Memory Accounting [Sean - should Just Work, keyword should ]
+  - Page Table Accounting - Should we? [Nikunj]
 
-Kind regards
-Suzuki
-
-
-
-
-> 
-> Kind regards
-> Suzuki
-> 
-> 
->> 4. Failure condition (B5.3.3.2) should be amended with
->>     runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
->>              post: result == PSCI_DENIED (?)
->> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
->>     PSCI_CPU_ON flow (D1.4.1)
->>
->> I do understand that ARM CCA support is in its infancy stage and
->> discussing about vCPU Hotplug in realm world seem to be a far-fetched
->> idea right now. But specification changes require lot of time and if
->> this change is really required then it should be further discussed
->> within ARM.
->>
->> Many thanks!
->>
->>
->> Bes regards
->> Salil
->>
->>
->> References:
->>
->> [1] https://developer.arm.com/documentation/den0137/latest/
->> [2] https://github.com/salil-mehta/qemu.git 
->> virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
->> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git 
->> virtual_cpu_hotplug/rfc/v2
->>
-> 
-
+Recording:
+/facepalm
