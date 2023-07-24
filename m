@@ -2,266 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A05E275ED84
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 10:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B5BB75ED8E
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 10:28:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231582AbjGXI1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 04:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56014 "EHLO
+        id S231600AbjGXI2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 04:28:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231540AbjGXI1e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 04:27:34 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35508E46;
-        Mon, 24 Jul 2023 01:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690187240; x=1721723240;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=5qZ9nZmo4CkM9SPVo/JI6kxqmQd1k6n0+M8WOtBfvQ0=;
-  b=jn6SulXYJodfMYcrkyDB3p4VEI8jY6vAYYteugCN/jvdGpIlUEYkV809
-   3f0MkAbJwH4ZK+ilLIjT5B3xyHitwI17gC6EQyvaoPj6kM+yFlXK+VJb7
-   PRv5LLEDnHvD640EfAcL97iFOjU1tm6oDJVYs20my1QE14Jcb7y9LWA+6
-   IREq98PAFhdVP3vDXGCasf6PbUBdd5ve3K/eeZp1ERWMsjBWfY5x8oLYg
-   FuipqY0RQa/PylUbAWo8lgA/PKW8joKBvzcOkkAuW9Nr3Z4Jti0lghgsK
-   o7RQcnL+sJ1Ht//LitBTRa87cTHbkE5Zjd7q6Cwnt3divWENa0dRJQzCT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="453759073"
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="453759073"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 01:27:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="719581987"
-X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
-   d="scan'208";a="719581987"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga007.jf.intel.com with ESMTP; 24 Jul 2023 01:27:19 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 24 Jul 2023 01:27:19 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 24 Jul 2023 01:27:19 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.106)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 24 Jul 2023 01:27:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XFarcYLGxJOpjn5l9IXEcBYwzJ51RNUOd6V8bcYmnUyOrSkYsmy76OEuwWTMpCjb/suosH+vi+g3D9ubxkjKXK6Zuz8AqpH8gSqs1cAumETHqJHA6hB4on5PxfSLsAB+EeUAcybdhxwH/ERbbMUobj8FmqFE+iCjYNEQ5eioEiF1HCpoAPVd8U18YWHUvJOhR7HWVz7rHYaFWbLEkuR2TWPtjSKCL1ttcHqEaR80fZLdOSicrySKX1741UgVuVWH4snKEoYjbdchAYnRCd42lKbUIx+sVPt/uPOlAZV5AfgbtwtzIqQrtSmT1nmRhZfwtQduL8tryVBIwuWWBsQHvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EEEoToREZUH4RqKa32jZmib4eci9ikYMt/i6+tDFyrA=;
- b=OIjIiA7psDcGiYYtrhGnEsdeh7gB6Mg6oEU2jNrN9BkjJtkajMB3ttFq3FsjGQRuhFvRpUGJkJcIKN5De/rPa2PpjzUJfvwTEM1RyvuaS2dHl3DrNkIsQh32P1J+aIrFPK/UhyTKFfiOLwP+gvrtF0LR47PPfdcVpVW5ePr7W2n1bTtjrMB8IGXiPYTbuotPtUtuTngX96RM2gbdZlmlrzYpaIgVckE5YCyb/bwtDvcEeCi83TFnIaeemb1gpACea1OPT2J5xK7EhpLJ9afGrJCc3HFWwU/d5OG7U+9Y106YHrivRQlwIndnQrCG8sNPyoNPGO3F1ouMg40MX2wK8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by IA0PR11MB7379.namprd11.prod.outlook.com (2603:10b6:208:431::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Mon, 24 Jul
- 2023 08:27:10 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::2803:94a7:314c:3254]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::2803:94a7:314c:3254%7]) with mapi id 15.20.6609.031; Mon, 24 Jul 2023
- 08:27:10 +0000
-Date:   Mon, 24 Jul 2023 16:26:59 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-        <john.allen@amd.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
-        <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v4 10/20] KVM:x86: Make guest supervisor states as
- non-XSAVE managed
-Message-ID: <ZL410xRbInlQMc5y@chao-email>
-References: <20230721030352.72414-1-weijiang.yang@intel.com>
- <20230721030352.72414-11-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230721030352.72414-11-weijiang.yang@intel.com>
-X-ClientProxiedBy: SI2PR01CA0036.apcprd01.prod.exchangelabs.com
- (2603:1096:4:192::22) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S231545AbjGXI2X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 04:28:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423841B0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 01:27:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690187255;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=95yU/Tppmz3W6Wgx0aprDygFp+YkQiriuNqIdtc06vU=;
+        b=H3I8x4k0sPfgZMQY2FkLIv1BQ0ispLPLBq6Vzvn/IWmi9Rg1gHnkaunyw25wPljKcHNQRU
+        /yZfw7SGTFlaGj5heLosV9QRHT1OkidV3NwTXJ1KlBrictnenZ1vMzAJY0zYF+7zm1DaUV
+        hHZXPgBz3NEP7CVHdq0WW4WTVb8zL2M=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-bYRoC5jWPYSiYyPlGVZp1g-1; Mon, 24 Jul 2023 04:27:30 -0400
+X-MC-Unique: bYRoC5jWPYSiYyPlGVZp1g-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb9364b320so3482450e87.3
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 01:27:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690187249; x=1690792049;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=95yU/Tppmz3W6Wgx0aprDygFp+YkQiriuNqIdtc06vU=;
+        b=JksSc4VbYvbZKCoI0MCCq3z2FKMOBJcB8EzI6wmLW5G93ZkNjXxSjKxcLnD9dgfqn6
+         UIqlOyCdXjgBdYj0rVnmT36iw3C3Q/lp0hng7rL2u25mxZf4vNXK7glsaZyGVtAaUvaO
+         50G+DSIH4G4DFhJRG1Krau9/SxkNywjgYx6VR3E+6w6sZot8VseE3j0Uued0h5nausKd
+         zMR6sVaQgucSeoI7i/rlPtvxlwLPdKZvXWFo6B7N6Z1HTt+Hq1UtOFBbZV1bFIp7cgGM
+         rzZFL3l96aXzuZ7vLnXrhqHehvJvdHAm80HhCcDOKW3SkYEfPO/htD2nbEhKxtW7H42s
+         UC4w==
+X-Gm-Message-State: ABy/qLaw1KBTLw6oEfOJlOIKOxofQ81tOXgyZYILVX2neaSWHuF6dQ5x
+        h+TsCJEmakSAaHMxJ7pXH1j8gM1pIEyZ82n7s1EI1xwRaYK1W3Lm+K481kRT9Y9n85nDQoAkp7b
+        HrKaqSyxLqz3dAggSUfXH
+X-Received: by 2002:ac2:505c:0:b0:4f8:5604:4b50 with SMTP id a28-20020ac2505c000000b004f856044b50mr4339170lfm.64.1690187249271;
+        Mon, 24 Jul 2023 01:27:29 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHCEMOq1o4lei/ac0I0Ri//BOpQqln7ql1w8BcwesPNHuyuLe8cISemFtN93mHRCisihMVloA==
+X-Received: by 2002:ac2:505c:0:b0:4f8:5604:4b50 with SMTP id a28-20020ac2505c000000b004f856044b50mr4339142lfm.64.1690187248874;
+        Mon, 24 Jul 2023 01:27:28 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f45:d000:62f2:4df0:704a:e859? (p200300d82f45d00062f24df0704ae859.dip0.t-ipconnect.de. [2003:d8:2f45:d000:62f2:4df0:704a:e859])
+        by smtp.gmail.com with ESMTPSA id s14-20020adfea8e000000b003143be36d99sm12106076wrm.58.2023.07.24.01.27.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 01:27:28 -0700 (PDT)
+Message-ID: <c5944b74-db61-8383-cf15-13a9915ff7e5@redhat.com>
+Date:   Mon, 24 Jul 2023 10:27:27 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|IA0PR11MB7379:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f954858-dd9a-4f97-f0cd-08db8c1fc614
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cWklWIwyGACMC9c/RykzohCzjeA3hME9Hhizyp9DWdRzxmtkog2QMLvpIOQHmQxFrhVJJnCZ4GmQcwT58P6Af82v4XzmO+++8pswBCS7NtbdWnKQYeH/jy5687MrJMlVmzTUttVaAWZmqmxpwAuq2I+U0OkTy1Z4Thr63gGdtXDGdj/oSwwyMqXohuTuYqK0v6JKBhftQNT4ZLohu/fZN1PJIl86ybSZCRe9ZooDGmcu5N4T+CMXvGNomjXsebiJtuaBRoMBd54dfwagGyC6mwqm/dhUCnB1tJlgDah0VNcS0cjyu8TSvOy2/knEnqTkw870PNCIkO+UFey34QWWNGRUJ5p81BiX085EOphNl1MN6CPNnC4Hgpl5O5auUKv3gq+eWXrzo0Ku2d7lJNW456IFuzvYqH1uYLMBgy43Qu+3vRVwRnQiUyMtv3+bz1sRA4bUkFKal9LM8u2Cg97PZIAW85Xmx8xL34lzZcElbqkFOmkru2E2Dyjb5+m76mEAdbtKhYaMAIzxd8siiEAr/BcViPaAp5W0xfqM5nSzUOMOHsyR6EY2wAqVGMusaLiA
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(136003)(39860400002)(376002)(346002)(396003)(451199021)(33716001)(86362001)(82960400001)(38100700002)(66556008)(4326008)(66476007)(6636002)(66946007)(478600001)(6862004)(41300700001)(316002)(8936002)(5660300002)(44832011)(8676002)(6486002)(6512007)(9686003)(6666004)(2906002)(186003)(6506007)(26005)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?d+34aD8b6fPYKNxQ5M/dc38bcwYzsPT44n7/8CU3nyT3pAHo30uj7Woe8lA3?=
- =?us-ascii?Q?g2hsoDbWN/994LZ1G7+eUObuxYWagFYIcBtTfUpYq017VVuPAKsLnreuMdyx?=
- =?us-ascii?Q?+vw3naYOyP5ipp6oC9D/IWsQocrwgXllR30adrLczw0hHv9xy1Ih3NqsxWBr?=
- =?us-ascii?Q?+LKKtQmduqiq+TfYrxoBuJvhTs/UJqIy0OQxxN557gP9+1V/V2QHCJ4E3JlT?=
- =?us-ascii?Q?O4Q8rS/LktBLp6QJuq91wGh/bJBpEvY6Fnf40lOfmGgbZIccEZt2I5RoBJ5A?=
- =?us-ascii?Q?aOlmDFJ84cLWJI1kHkrMH1eUK2pbCtLUnL6ECC3iKyXSGg8j7EYPkwj8WNpt?=
- =?us-ascii?Q?fPkPewLKS/DL9pipXK8k9iK7mjCpZ8RUnPLDhHP8b7Lzk909FkzptxQcBKwe?=
- =?us-ascii?Q?rSxxYzUNXaREyvkIi7NqxqG7htrwPTd/mDa0Fg+KizI92VwUjVGC3Q4hThB7?=
- =?us-ascii?Q?j8yuSd/dSRjMF/324LLCG9kRD0fFYmVGdLWE2pIADsRNvAm+v1TY11199a7C?=
- =?us-ascii?Q?xG1/i4ZiCyLTW+g73486z2wKZgeiddf+zA70Zyuq8f8PWuQ8QXy+WZWlW6Da?=
- =?us-ascii?Q?TZEv6cGm8XdNIwd/OX7v+8vKyql83+azXipHG6DjOMRkpDDcC1vnneYUl5xf?=
- =?us-ascii?Q?LSgpIpBf6yN4hs/zKn7qdUo1/xcH2ZGB+NdOK0QyT60qioVSRx+m396gyOIE?=
- =?us-ascii?Q?SqsAhHIz8KcVhISsVrhXyFTOGO35VrmfHKTV/vOjFVXU/HmLYyi0NcgPj3k+?=
- =?us-ascii?Q?LmbblBAPE3GoYFUmYPMGaUYT2JFiZF2GRaaz8Yo6nKIHyv/WMGHA2urKvUD4?=
- =?us-ascii?Q?LP+z3wbCB3wZHol/YNYoi88qEby02D5tnHnXWfkUF2Zy5sjFXWRhbmjScXcU?=
- =?us-ascii?Q?M5gfs9F3tiu2TL4b11n2K5dxoprIjFeg12/VTqvKklpo24b3xjqjEK2IaC7V?=
- =?us-ascii?Q?GV6o6eRGOveLxxiL4EGRtAfazOTfuQ9Kiorldyb5e86xznccSrZ2wj2PdedN?=
- =?us-ascii?Q?NEWr3VDYDpWb5Ndu1lu8bW+LrMZic4SC4c92gx8940wxPQYkdMK5VXight9+?=
- =?us-ascii?Q?e7NYbRjh5xzcfESK0iTPUF+s1i8wagYwofzK9F02ReW8YmrQh7/xOvjnSs3E?=
- =?us-ascii?Q?QAUHzbrSok69tBMbavO80yx34UYCipJ+cJnclba1s8sMD/hzkoP9TX1ZAPnd?=
- =?us-ascii?Q?oxLB0mfBeFxtmDoMw3LpJ1WdTMCfbGE7NrnOHNCFoEt+8b2eLmtpZL31+/xG?=
- =?us-ascii?Q?BKIukVJ6C0ta7CRzoRf+qN12E6FbH1Mm5d44OKSWq9PlUzLFm6/z+1ScuJLz?=
- =?us-ascii?Q?XsHzQ1QCsOPOpmOHUa9hF8xDLq44/2iauTJojqZih9ahAseQhZu9DVI19k/w?=
- =?us-ascii?Q?vI2H4DH3yMrw8uDI4z+0cDmJhwwZ3vQZvSL4YGYeDqtj07w/Jm22NF6U+eAo?=
- =?us-ascii?Q?KkCkFoeOI487kHvy/qFxgy9k8qaPd+sFDhC4H8VjEYOkvEXUMeS5WdXpQMWi?=
- =?us-ascii?Q?R2ZypjbTm0WQiD6RLK8pc+RZXiEOrnjsm+g6x+cRBPsTv99lXD18tq4wPybd?=
- =?us-ascii?Q?QPJmOya2JjP5UQG/Qfe/myap0QbXJ0cENelvMcLx?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f954858-dd9a-4f97-f0cd-08db8c1fc614
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 08:27:10.0969
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yLCKnZfEMJULRktgKWj66RbcIhq2u59IxqxIpUptMpu8ITVcUGoh/vbFeKFzGyD2VQrY1bqm3iL5i0p67W0i3A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7379
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2 3/6] KVM: s390: interrupt: Fix single-stepping
+ kernel-emulated instructions
+Content-Language: en-US
+To:     Ilya Leoshkevich <iii@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Freimann <jfreimann@redhat.com>
+References: <20230721120046.2262291-1-iii@linux.ibm.com>
+ <20230721120046.2262291-4-iii@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20230721120046.2262291-4-iii@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 11:03:42PM -0400, Yang Weijiang wrote:
->+static void kvm_save_cet_supervisor_ssp(struct kvm_vcpu *vcpu)
->+{
->+	preempt_disable();
-
-what's the purpose of disabling preemption?
-
->+	if (unlikely(guest_can_use(vcpu, X86_FEATURE_SHSTK))) {
->+		rdmsrl(MSR_IA32_PL0_SSP, vcpu->arch.cet_s_ssp[0]);
->+		rdmsrl(MSR_IA32_PL1_SSP, vcpu->arch.cet_s_ssp[1]);
->+		rdmsrl(MSR_IA32_PL2_SSP, vcpu->arch.cet_s_ssp[2]);
->+		/*
->+		 * Omit reset to host PL{1,2}_SSP because Linux will never use
->+		 * these MSRs.
->+		 */
->+		wrmsrl(MSR_IA32_PL0_SSP, 0);
-
-You don't need to reset the MSR because current host doesn't enable SSS
-and leaving guest value in the MSR won't affect host behavior.
-
->+	}
->+	preempt_enable();
->+}
->+
->+static void kvm_reload_cet_supervisor_ssp(struct kvm_vcpu *vcpu)
->+{
->+	preempt_disable();
->+	if (unlikely(guest_can_use(vcpu, X86_FEATURE_SHSTK))) {
->+		wrmsrl(MSR_IA32_PL0_SSP, vcpu->arch.cet_s_ssp[0]);
->+		wrmsrl(MSR_IA32_PL1_SSP, vcpu->arch.cet_s_ssp[1]);
->+		wrmsrl(MSR_IA32_PL2_SSP, vcpu->arch.cet_s_ssp[2]);
->+	}
->+	preempt_enable();
->+}
-
-save/load PLx_SSP in kvm_sched_in/out() and in VCPU_RUN ioctl is sub-optimal.
-
-How about:
-1. expose kvm_save/reload_cet_supervisor_ssp()
-2. reload guest PLx_SSP in {vmx,svm}_prepare_switch_to_guest()
-3. save guest PLx_SSP in vmx_prepare_switch_to_host() and
-   svm_prepare_host_switch()?
-
-this way existing svm/vmx->guest_state_loaded can help to reduce a lot of
-unnecessary PLx_SSP MSR accesses.
-
->+
-> int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> {
-> 	struct kvm_queued_exception *ex = &vcpu->arch.exception;
->@@ -11222,6 +11249,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> 	kvm_sigset_activate(vcpu);
-> 	kvm_run->flags = 0;
-> 	kvm_load_guest_fpu(vcpu);
->+	kvm_reload_cet_supervisor_ssp(vcpu);
+On 21.07.23 13:57, Ilya Leoshkevich wrote:
+> Single-stepping a kernel-emulated instruction that generates an
+> interrupt causes GDB to land on the instruction following it instead of
+> the respective interrupt handler.
 > 
-> 	kvm_vcpu_srcu_read_lock(vcpu);
-> 	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
->@@ -11310,6 +11338,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> 	r = vcpu_run(vcpu);
+> The reason is that kvm_handle_sie_intercept(), after injecting the
+> interrupt, also processes the PER event and arranges a KVM_SINGLESTEP
+> exit. The interrupt is not yet delivered, however, so the userspace
+> sees the next instruction.
 > 
-> out:
->+	kvm_save_cet_supervisor_ssp(vcpu);
-> 	kvm_put_guest_fpu(vcpu);
-> 	if (kvm_run->kvm_valid_regs)
-> 		store_regs(vcpu);
->@@ -12398,9 +12427,17 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
-> 		pmu->need_cleanup = true;
-> 		kvm_make_request(KVM_REQ_PMU, vcpu);
-> 	}
->+
->+	kvm_reload_cet_supervisor_ssp(vcpu);
->+
-> 	static_call(kvm_x86_sched_in)(vcpu, cpu);
-> }
+> Fix by avoiding the KVM_SINGLESTEP exit when there is a pending
+> interrupt. The next __vcpu_run() loop iteration will arrange a
+> KVM_SINGLESTEP exit after delivering the interrupt.
 > 
->+void kvm_arch_sched_out(struct kvm_vcpu *vcpu, int cpu)
->+{
+> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
+> ---
+>   arch/s390/kvm/intercept.c | 17 ++++++++++++++---
+>   1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+> index 7cdd927541b0..d2f7940c5d03 100644
+> --- a/arch/s390/kvm/intercept.c
+> +++ b/arch/s390/kvm/intercept.c
+> @@ -583,6 +583,19 @@ static int handle_pv_notification(struct kvm_vcpu *vcpu)
+>   	return handle_instruction(vcpu);
+>   }
+>   
+> +static bool should_handle_per_ifetch(const struct kvm_vcpu *vcpu, int rc)
+> +{
+> +	/* Process PER, also if the instruction is processed in user space. */
+> +	if (!(vcpu->arch.sie_block->icptstatus & 0x02))
+> +		return false;
+> +	if (rc != 0 && rc != -EOPNOTSUPP)
+> +		return false;
+> +	if (guestdbg_sstep_enabled(vcpu) && vcpu->arch.local_int.pending_irqs)
+> +		/* __vcpu_run() will exit after delivering the interrupt. */
+> +		return false;
+> +	return true;
+> +}
+> +
+>   int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+>   {
+>   	int rc, per_rc = 0;
+> @@ -645,9 +658,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+>   		return -EOPNOTSUPP;
+>   	}
+>   
+> -	/* process PER, also if the instruction is processed in user space */
+> -	if (vcpu->arch.sie_block->icptstatus & 0x02 &&
+> -	    (!rc || rc == -EOPNOTSUPP))
+> +	if (should_handle_per_ifetch(vcpu, rc))
+>   		per_rc = kvm_s390_handle_per_ifetch_icpt(vcpu);
+>   	return per_rc ? per_rc : rc;
+>   }
 
-@cpu its meaning isn't clear and isn't used and ...
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
->+	kvm_save_cet_supervisor_ssp(vcpu);
->+}
->+
-> void kvm_arch_free_vm(struct kvm *kvm)
-> {
-> 	kfree(to_kvm_hv(kvm)->hv_pa_pg);
->diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->index d90331f16db1..b3032a5f0641 100644
->--- a/include/linux/kvm_host.h
->+++ b/include/linux/kvm_host.h
->@@ -1423,6 +1423,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
-> int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu);
-> 
-> void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu);
->+void kvm_arch_sched_out(struct kvm_vcpu *vcpu, int cpu);
-> 
-> void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
-> void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu);
->diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->index 66c1447d3c7f..42f28e8905e1 100644
->--- a/virt/kvm/kvm_main.c
->+++ b/virt/kvm/kvm_main.c
->@@ -5885,6 +5885,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
-> {
-> 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
-> 
->+	kvm_arch_sched_out(vcpu, 0);
+-- 
+Cheers,
 
-passing 0 always looks problematic.
+David / dhildenb
 
-> 	if (current->on_rq) {
-> 		WRITE_ONCE(vcpu->preempted, true);
-> 		WRITE_ONCE(vcpu->ready, true);
->-- 
->2.27.0
->
