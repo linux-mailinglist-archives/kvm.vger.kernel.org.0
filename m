@@ -2,68 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16A5A75F9D6
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 16:26:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE72F75FA1F
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 16:46:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231300AbjGXO0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 10:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52184 "EHLO
+        id S231517AbjGXOqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 10:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230376AbjGXO0c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 10:26:32 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6613E63
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 07:26:29 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bba5563cd6so4247515ad.3
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 07:26:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690208789; x=1690813589;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mL4/hlRXZM4j4GENS2ROMNedOywN4Y40WobkLyw1U40=;
-        b=0JZayPTGquYMXgHedz2hVa/hjidK4VJ6suGY6Orxvr2MZMl6Nut3abBRV+HiLbzZRo
-         F+nvPbzsjDa9VR+zsMB4l7U2NAtdY1VdejY5y0bunyXVFRDhZ9M89dR/8Z+j2vg6mMkZ
-         WEU+ig754rCd8A4KzB8m4nWMV6egaYovtCF1oQFqBTrppB0xdGi3xRjdXn2LTT0+mRsw
-         0v04VoXaAVEtAd5Rrj1mACnYuMS3Oy0p0OmUVW5o/GsRV3hqAvICaaTChRYImZ+0jZGW
-         1+FpiAlKB1e2nIgLaNPm55MdM+vwxadyWPX2OqMmSaSvoYNrLfMRPdDDefvL9Y4OFxkw
-         CgZw==
+        with ESMTP id S231245AbjGXOq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 10:46:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B20CD2
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 07:45:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690209942;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
+        b=Vx9IJ0X8np2tY2tX1y/RfrrNbNZOy9O91ElLKunk6Ax7XYxo6fdmCoXBhkvvQDkq4Cze1n
+        TKqqYnT5d+eT3UK84UIYSHi9+Aez3XBxACcSBziRx/lzvXZwyMwHpjMQgCiJaVgSJe9Oh1
+        aItFbBN1NlwzTjM8W43VUVvJ9Zan5HQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-389-OCP3cFPdOoKFv0hx9OUvnQ-1; Mon, 24 Jul 2023 10:45:41 -0400
+X-MC-Unique: OCP3cFPdOoKFv0hx9OUvnQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fd2e59bc53so8849125e9.1
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 07:45:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690208789; x=1690813589;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mL4/hlRXZM4j4GENS2ROMNedOywN4Y40WobkLyw1U40=;
-        b=MOt13z0pikIRksZj2Ugm2bbBVZ+Kib4tLhuhITLPq2Rw8zmES5C8cAW33Bd1r5Hl5W
-         MQ2sXyJ0ZTYJC4uFUYah/LK9DQZl1E5y3iJuVyCyYAXtWYgh9egNzKIgpY83BXeOw8E4
-         1zMONf0cook3yNjShIM2u/iJn7x+h60VNYss/Zwm6z4NM8syTaaItA7NewdX9tnBY1ff
-         v22f8oY9LJx8MFL3ttKty18pN0AhTFe4Jy04LuKHgyMW6zZ4xaMXV7pNm15Wa1TNsOtJ
-         R+84wF1XcrnfcGktHZpYib6lt/TMUCFbwnRfJU2IWExGUyLs1b0Y7byGOeyNNPnfnF3V
-         Sb5w==
-X-Gm-Message-State: ABy/qLa3FR4qsKeDVwar1U9ifLUyXv3omWH9ScK3GacrqBEJ52RJ/sTh
-        MYzAd3/By3rhwefq2IjFmSLezQn+Bb0=
-X-Google-Smtp-Source: APBJJlGryf2vqymIr3GilpOteVj9nZVBQ61sKgZ8mitLyBvY9O1huvzRXP3Q3flSBlN7RxvTIfN7YBgCWW8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2305:b0:1b7:edcd:8dcf with SMTP id
- d5-20020a170903230500b001b7edcd8dcfmr42791plh.4.1690208789053; Mon, 24 Jul
- 2023 07:26:29 -0700 (PDT)
-Date:   Mon, 24 Jul 2023 07:26:27 -0700
-In-Reply-To: <296c5c68-d03b-65bd-bfb6-41e6046ed389@intel.com>
-Mime-Version: 1.0
-References: <20230721030352.72414-1-weijiang.yang@intel.com>
- <20230721030352.72414-12-weijiang.yang@intel.com> <ZL5AwOBYN1JV7I4W@chao-email>
- <296c5c68-d03b-65bd-bfb6-41e6046ed389@intel.com>
-Message-ID: <ZL6KE5elqCBVIbv7@google.com>
-Subject: Re: [PATCH v4 11/20] KVM:x86: Save and reload GUEST_SSP to/from SMRAM
-From:   Sean Christopherson <seanjc@google.com>
-To:     Weijiang Yang <weijiang.yang@intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com,
-        peterz@infradead.org, john.allen@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com,
-        binbin.wu@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        d=1e100.net; s=20221208; t=1690209940; x=1690814740;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P3cSu1CPZmkSkG2RrSPYOjkXMISXZKOQHcqgGwJVWls=;
+        b=GmU+NYwzx+XeSqfSpk/FvSZG9/PHR9d0Tdr3xfQkYRvEX2KbE4CIzoxwuA+GPSBajn
+         ORCFZW+E/wyEdnUt4NSKFoytCKDtSAgpsXB7o29PmU1CF/LKG2TInA4FCuAiFhRrMGr7
+         Ev+GXerew9r0pjcOxx4S6HSRQDEtlnaUXbTlYL27ZyFAdNIyfumRR1Pa/ocl9+iHRxqX
+         HIhB/n8qMlqSGboxWrsA70hSTbzCtezZwqEv6iMKB8IeTNpC7B6k6Xc3z/4FOCbsTGV0
+         kxzoGXYgI5dtdNn+s6NTJOIeopWq4i/pQnOXNXjGJNvustDr1q+PVii7kQKn8rzeg4Gd
+         k0HA==
+X-Gm-Message-State: ABy/qLaqGmxbd/Eu5U1rAFC/weEP4dIJZ1lDJ8YUTnp49H6ge/dr6QKL
+        HYJ3Cn+C2OidwG5RfxtVYNBTWAfAFb2+k3+HB+QbyaI4jhutQGoXdkQ8TVhZArIjOoSInZVB5ZX
+        a2nT/oN5umbj/u48TYtsI
+X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189348wmm.35.1690209940353;
+        Mon, 24 Jul 2023 07:45:40 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFU13e7JgcAvxxCyZrO9RkA/paTPyvMP1hCPitlW4xzc1kx49CQ/0gLWOB7TPwUbHUV7KIsHg==
+X-Received: by 2002:a05:600c:ca:b0:3fc:8a:7c08 with SMTP id u10-20020a05600c00ca00b003fc008a7c08mr6189317wmm.35.1690209939969;
+        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
+        by smtp.gmail.com with ESMTPSA id q14-20020a1cf30e000000b003fbe561f6a3sm13332762wmq.37.2023.07.24.07.45.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 07:45:39 -0700 (PDT)
+Message-ID: <7614f672-989e-6acf-651f-806a3d96846b@redhat.com>
+Date:   Mon, 24 Jul 2023 16:45:37 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 13/27] KVM: arm64: nv: Add FGT registers
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-14-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-14-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,18 +98,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 24, 2023, Weijiang Yang wrote:
-> 
-> On 7/24/2023 5:13 PM, Chao Gao wrote:
-> > On Thu, Jul 20, 2023 at 11:03:43PM -0400, Yang Weijiang wrote:
-> > > Save GUEST_SSP to SMRAM on SMI and reload it on RSM.
-> > > KVM emulates architectural behavior when guest enters/leaves SMM
-> > > mode, i.e., save registers to SMRAM at the entry of SMM and reload
-> > > them at the exit of SMM. Per SDM, GUEST_SSP is defined as one of
-> > To me, GUEST_SSP is confusing here. From QEMU's perspective, it reads/writes
-> > the SSP register. People may confuse it with the GUEST_SSP in nVMCS field.
-> > I prefer to rename it to MSR_KVM_SSP.
-> 
-> Hmm, looks a bit, I'll change it, thanks!
+Hi Marc,
 
-Please just say "SSP".  The SMRAM field has nothing to do with KVM's synthetic MSR.
+On 7/12/23 16:57, Marc Zyngier wrote:
+> Add the 5 registers covering FEAT_FGT. The AMU-related registers
+> are currently left out as we don't have a plan for them. Yet.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 5 +++++
+>  arch/arm64/kvm/sys_regs.c         | 5 +++++
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8b6096753740..1200f29282ba 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -400,6 +400,11 @@ enum vcpu_sysreg {
+>  	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+>  	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+>  	SP_EL2,		/* EL2 Stack Pointer */
+> +	HFGRTR_EL2,
+> +	HFGWTR_EL2,
+> +	HFGITR_EL2,
+> +	HDFGRTR_EL2,
+> +	HDFGWTR_EL2,
+>  	CNTHP_CTL_EL2,
+>  	CNTHP_CVAL_EL2,
+>  	CNTHV_CTL_EL2,
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 3a6f678ca67d..f88cd1390998 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
+>  	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+>  
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+> @@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
+>  
+>  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> +	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
+> +	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+>  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+
+Eric
+
