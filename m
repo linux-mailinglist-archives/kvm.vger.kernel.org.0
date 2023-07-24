@@ -2,294 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A34375F048
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 11:50:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4854075F1DE
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 12:02:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231419AbjGXJun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 05:50:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46176 "EHLO
+        id S232971AbjGXKCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 06:02:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232280AbjGXJt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 05:49:59 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A788710D1;
-        Mon, 24 Jul 2023 02:47:57 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36O9dMFF005721;
-        Mon, 24 Jul 2023 09:47:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=WHe6yOMNLc/q+wDEOAR8tNydOITsjCcz+eaD2Uu+x7s=;
- b=sDEX2oVLlRCUmxLMo0zkU6WCjAHhiztHKisTUhWTCuMFoywdw2GVWhHbbfYA4ht3dWN0
- nWZSq9DdlNyX+OPmXh+5nJXuMLL5NJtTDwWYYMR8O8Hp6b/aDe/C8BEGxSBjtM9VAbWr
- o5mcb68G4zdVqOeasvU2LnauPegM/EE4dHYlfQvS94Z2RRyW2WgdQG3K+iGT/GdPHXH4
- CAiZfZwFQM8vMNkLjfWaH/Bk5XzMVRJuVIs+SwTT0U60gPy0qqYWN34LYO1sMe2sdV1T
- AJFHZXdMB9P6xNNjXdOo2+31AchxJ9EZvhiNT8VkUiBhRR4CrAar9zfEee8oY9W1SLpe pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1muwkhdp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jul 2023 09:47:39 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36O9dVm9006672;
-        Mon, 24 Jul 2023 09:47:39 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1muwkhdd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jul 2023 09:47:39 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36O8e1Om002065;
-        Mon, 24 Jul 2023 09:47:38 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0temj1fk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jul 2023 09:47:38 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36O9lYOe46596484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Jul 2023 09:47:35 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA5A32004D;
-        Mon, 24 Jul 2023 09:47:34 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1BAD02004B;
-        Mon, 24 Jul 2023 09:47:34 +0000 (GMT)
-Received: from heavy.boeblingen.de.ibm.com (unknown [9.171.11.212])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 24 Jul 2023 09:47:34 +0000 (GMT)
-From:   Ilya Leoshkevich <iii@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Freimann <jfreimann@redhat.com>,
-        Ilya Leoshkevich <iii@linux.ibm.com>
-Subject: [PATCH v3 6/6] KVM: s390: selftests: Add selftest for single-stepping
-Date:   Mon, 24 Jul 2023 11:44:12 +0200
-Message-ID: <20230724094716.91510-7-iii@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230724094716.91510-1-iii@linux.ibm.com>
-References: <20230724094716.91510-1-iii@linux.ibm.com>
+        with ESMTP id S230034AbjGXKBl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 06:01:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D84065B4
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 02:54:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690192425;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=W8BnD/WmjfxcZiGA/dUP3aM2hxnahbkcOcilHinU3gM=;
+        b=KdcIa3LR4CJVBTxXodS/zNWfvoR0k+YIUfdSVN9TWEVFeSg0OYfzoOE5GQubndxVwk3AR7
+        OOQg7kwmZEzkRkdj+tjjuehZrqvaSHGZJ0BOGCoP97/y7ByC7utAJ8xLDKvy7qRPRP0wfn
+        l0V/BQtvPbEbKWMs6xOR8pimWXfouzo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-323-3hdcpRhxM02L7j3eOEfaTQ-1; Mon, 24 Jul 2023 05:53:43 -0400
+X-MC-Unique: 3hdcpRhxM02L7j3eOEfaTQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-31758708b57so811961f8f.1
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 02:53:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690192422; x=1690797222;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W8BnD/WmjfxcZiGA/dUP3aM2hxnahbkcOcilHinU3gM=;
+        b=ThLwHq4TgrmNhqf2o7Q/eKBGBpfT9/U1v9S4wZ6ufgwFis/zWJmX4x2cJ61QtsS8oH
+         Ol+BJZ4qJGoFwvLvJO5VryqzHTPw9YVbU1Qg0pq7yktnSsYqoZCA23SVWnD1Wjrprb5m
+         nziOIXfo0ztlRPUXn8NGx+lsd8gupDhOb3KoPYFQkntgAEwb1lOCRZvSUrtXzZMYBYFT
+         affJyCua942o0h+Z1r3cWgA22vAWvWPK4riTWU4Ka4hOx+Maxq3CcgWLvMcL1D28dcZi
+         3jG+iJHX6bLxPpCDfJasRFRdau4Ty/cRQcdV4wy6tzziUQJqIAL/z5mA5v6pyx+IkkgF
+         oQBQ==
+X-Gm-Message-State: ABy/qLZ+I3P7zLnoi1jAPK4vJsIi7YPI5FTs07XkwUcaC0cR/tEsbvpp
+        dYQGAsvlcCoaWzkVXiAQlTTMUissRFdb6etxIqB2P0kskx7hY672BqzKfMsovhV9oz5F610YGvZ
+        jbTiC6giS9U4tSJAr9iGh
+X-Received: by 2002:a5d:50c7:0:b0:315:99be:6fe4 with SMTP id f7-20020a5d50c7000000b0031599be6fe4mr7650815wrt.69.1690192422001;
+        Mon, 24 Jul 2023 02:53:42 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGxbWUV0xYlSpNLpOV84UuVEJ8ow6uwWgFdY0GnM3+jt3qIuyL2U8kIgBOuTPi71Pe686AN4g==
+X-Received: by 2002:a5d:50c7:0:b0:315:99be:6fe4 with SMTP id f7-20020a5d50c7000000b0031599be6fe4mr7650795wrt.69.1690192421663;
+        Mon, 24 Jul 2023 02:53:41 -0700 (PDT)
+Received: from [192.168.0.3] (ip-109-43-177-165.web.vodafone.de. [109.43.177.165])
+        by smtp.gmail.com with ESMTPSA id m12-20020adff38c000000b003145559a691sm12402548wro.41.2023.07.24.02.53.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 02:53:41 -0700 (PDT)
+Message-ID: <81dd6b4c-200f-bb35-69fa-ed623eb7e6d1@redhat.com>
+Date:   Mon, 24 Jul 2023 11:53:39 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: q4kwdY-dPsnD5OotQVpQ0QvDK5H10kWr
-X-Proofpoint-GUID: Qru8N8vwwc0QV1H3RPiF44tuIxYk6rE6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-24_07,2023-07-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- mlxlogscore=952 phishscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 suspectscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2307240084
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] kvm: Remove KVM_CREATE_IRQCHIP support assumption
+Content-Language: en-US
+To:     Andrew Jones <ajones@ventanamicro.com>, qemu-devel@nongnu.org
+Cc:     pbonzini@redhat.com, mtosatti@redhat.com, peter.maydell@linaro.org,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com,
+        dbarboza@ventanamicro.com, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org, qemu-s390x@nongnu.org
+References: <20230722062115.11950-2-ajones@ventanamicro.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230722062115.11950-2-ajones@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test different variations of single-stepping into interrupts:
+On 22/07/2023 08.21, Andrew Jones wrote:
+> Since Linux commit 00f918f61c56 ("RISC-V: KVM: Skeletal in-kernel AIA
+> irqchip support") checking KVM_CAP_IRQCHIP returns non-zero when the
+> RISC-V platform has AIA. The cap indicates KVM supports at least one
+> of the following ioctls:
+> 
+>    KVM_CREATE_IRQCHIP
+>    KVM_IRQ_LINE
+>    KVM_GET_IRQCHIP
+>    KVM_SET_IRQCHIP
+>    KVM_GET_LAPIC
+>    KVM_SET_LAPIC
+> 
+> but the cap doesn't imply that KVM must support any of those ioctls
+> in particular. However, QEMU was assuming the KVM_CREATE_IRQCHIP
+> ioctl was supported. Stop making that assumption by introducing a
+> KVM parameter that each architecture which supports KVM_CREATE_IRQCHIP
+> sets. Adding parameters isn't awesome, but given how the
+> KVM_CAP_IRQCHIP isn't very helpful on its own, we don't have a lot of
+> options.
+> 
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+> 
+> While this fixes booting guests on riscv KVM with AIA it's unlikely
+> to get merged before the QEMU support for KVM AIA[1] lands, which
+> would also fix the issue. I think this patch is still worth considering
+> though since QEMU's assumption is wrong.
+> 
+> [1] https://lore.kernel.org/all/20230714084429.22349-1-yongxuan.wang@sifive.com/
+> 
+> 
+>   accel/kvm/kvm-all.c    | 5 ++++-
+>   include/sysemu/kvm.h   | 1 +
+>   target/arm/kvm.c       | 3 +++
+>   target/i386/kvm/kvm.c  | 2 ++
+>   target/s390x/kvm/kvm.c | 3 +++
+>   5 files changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 373d876c0580..0f5ff8630502 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -86,6 +86,7 @@ struct KVMParkedVcpu {
+>   };
+>   
+>   KVMState *kvm_state;
+> +bool kvm_has_create_irqchip;
+>   bool kvm_kernel_irqchip;
+>   bool kvm_split_irqchip;
+>   bool kvm_async_interrupts_allowed;
+> @@ -2377,8 +2378,10 @@ static void kvm_irqchip_create(KVMState *s)
+>           if (s->kernel_irqchip_split == ON_OFF_AUTO_ON) {
+>               error_report("Split IRQ chip mode not supported.");
+>               exit(1);
+> -        } else {
+> +        } else if (kvm_has_create_irqchip) {
+>               ret = kvm_vm_ioctl(s, KVM_CREATE_IRQCHIP);
+> +        } else {
+> +            return;
+>           }
+>       }
+>       if (ret < 0) {
 
-- SVC and PGM interrupts;
-- Interrupts generated by ISKE;
-- Interrupts generated by instructions emulated by KVM;
-- Interrupts generated by instructions emulated by userspace.
+I think I'd do this differntly... at the beginning of the function, there is 
+a check for kvm_check_extension(s, KVM_CAP_IRQCHIP) etc. ... I think you 
+could now replace that check with a simple
 
-Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/s390x/debug_test.c  | 160 ++++++++++++++++++
- 2 files changed, 161 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/s390x/debug_test.c
+	if (!kvm_has_create_irqchip) {
+		return;
+	}
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c692cc86e7da..f3306eaa7031 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -166,6 +166,7 @@ TEST_GEN_PROGS_s390x += s390x/resets
- TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += s390x/tprot
- TEST_GEN_PROGS_s390x += s390x/cmma_test
-+TEST_GEN_PROGS_s390x += s390x/debug_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-diff --git a/tools/testing/selftests/kvm/s390x/debug_test.c b/tools/testing/selftests/kvm/s390x/debug_test.c
-new file mode 100644
-index 000000000000..a8fa9fe93b3c
---- /dev/null
-+++ b/tools/testing/selftests/kvm/s390x/debug_test.c
-@@ -0,0 +1,160 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Test KVM debugging features. */
-+#include "kvm_util.h"
-+#include "test_util.h"
-+
-+#include <linux/kvm.h>
-+
-+#define __LC_SVC_NEW_PSW 0x1c0
-+#define __LC_PGM_NEW_PSW 0x1d0
-+#define ICPT_INSTRUCTION 0x04
-+#define IPA0_DIAG 0x8300
-+#define PGM_SPECIFICATION 0x06
-+
-+/* Common code for testing single-stepping interruptions. */
-+extern char int_handler[];
-+asm("int_handler:\n"
-+    "j .\n");
-+
-+static struct kvm_vm *test_step_int_1(struct kvm_vcpu **vcpu, void *guest_code,
-+				      size_t new_psw_off, uint64_t *new_psw)
-+{
-+	struct kvm_guest_debug debug = {};
-+	struct kvm_regs regs;
-+	struct kvm_vm *vm;
-+	char *lowcore;
-+
-+	vm = vm_create_with_one_vcpu(vcpu, guest_code);
-+	lowcore = addr_gpa2hva(vm, 0);
-+	new_psw[0] = (*vcpu)->run->psw_mask;
-+	new_psw[1] = (uint64_t)int_handler;
-+	memcpy(lowcore + new_psw_off, new_psw, 16);
-+	vcpu_regs_get(*vcpu, &regs);
-+	regs.gprs[2] = -1;
-+	vcpu_regs_set(*vcpu, &regs);
-+	debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP;
-+	vcpu_guest_debug_set(*vcpu, &debug);
-+	vcpu_run(*vcpu);
-+
-+	return vm;
-+}
-+
-+static void test_step_int(void *guest_code, size_t new_psw_off)
-+{
-+	struct kvm_vcpu *vcpu;
-+	uint64_t new_psw[2];
-+	struct kvm_vm *vm;
-+
-+	vm = test_step_int_1(&vcpu, guest_code, new_psw_off, new_psw);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_DEBUG);
-+	ASSERT_EQ(vcpu->run->psw_mask, new_psw[0]);
-+	ASSERT_EQ(vcpu->run->psw_addr, new_psw[1]);
-+	kvm_vm_free(vm);
-+}
-+
-+/* Test single-stepping "boring" program interruptions. */
-+extern char test_step_pgm_guest_code[];
-+asm("test_step_pgm_guest_code:\n"
-+    ".insn rr,0x1d00,%r1,%r0 /* dr %r1,%r0 */\n"
-+    "j .\n");
-+
-+static void test_step_pgm(void)
-+{
-+	test_step_int(test_step_pgm_guest_code, __LC_PGM_NEW_PSW);
-+}
-+
-+/*
-+ * Test single-stepping program interruptions caused by DIAG.
-+ * Userspace emulation must not interfere with single-stepping.
-+ */
-+extern char test_step_pgm_diag_guest_code[];
-+asm("test_step_pgm_diag_guest_code:\n"
-+    "diag %r0,%r0,0\n"
-+    "j .\n");
-+
-+static void test_step_pgm_diag(void)
-+{
-+	struct kvm_s390_irq irq = {
-+		.type = KVM_S390_PROGRAM_INT,
-+		.u.pgm.code = PGM_SPECIFICATION,
-+	};
-+	struct kvm_vcpu *vcpu;
-+	uint64_t new_psw[2];
-+	struct kvm_vm *vm;
-+
-+	vm = test_step_int_1(&vcpu, test_step_pgm_diag_guest_code,
-+			     __LC_PGM_NEW_PSW, new_psw);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
-+	ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_INSTRUCTION);
-+	ASSERT_EQ(vcpu->run->s390_sieic.ipa & 0xff00, IPA0_DIAG);
-+	vcpu_ioctl(vcpu, KVM_S390_IRQ, &irq);
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_DEBUG);
-+	ASSERT_EQ(vcpu->run->psw_mask, new_psw[0]);
-+	ASSERT_EQ(vcpu->run->psw_addr, new_psw[1]);
-+	kvm_vm_free(vm);
-+}
-+
-+/*
-+ * Test single-stepping program interruptions caused by ISKE.
-+ * CPUSTAT_KSS handling must not interfere with single-stepping.
-+ */
-+extern char test_step_pgm_iske_guest_code[];
-+asm("test_step_pgm_iske_guest_code:\n"
-+    "iske %r2,%r2\n"
-+    "j .\n");
-+
-+static void test_step_pgm_iske(void)
-+{
-+	test_step_int(test_step_pgm_iske_guest_code, __LC_PGM_NEW_PSW);
-+}
-+
-+/*
-+ * Test single-stepping program interruptions caused by LCTL.
-+ * KVM emulation must not interfere with single-stepping.
-+ */
-+extern char test_step_pgm_lctl_guest_code[];
-+asm("test_step_pgm_lctl_guest_code:\n"
-+    "lctl %c0,%c0,1\n"
-+    "j .\n");
-+
-+static void test_step_pgm_lctl(void)
-+{
-+	test_step_int(test_step_pgm_lctl_guest_code, __LC_PGM_NEW_PSW);
-+}
-+
-+/* Test single-stepping supervisor-call interruptions. */
-+extern char test_step_svc_guest_code[];
-+asm("test_step_svc_guest_code:\n"
-+    "svc 0\n"
-+    "j .\n");
-+
-+static void test_step_svc(void)
-+{
-+	test_step_int(test_step_svc_guest_code, __LC_SVC_NEW_PSW);
-+}
-+
-+/* Run all tests above. */
-+static struct testdef {
-+	const char *name;
-+	void (*test)(void);
-+} testlist[] = {
-+	{ "single-step pgm", test_step_pgm },
-+	{ "single-step pgm caused by diag", test_step_pgm_diag },
-+	{ "single-step pgm caused by iske", test_step_pgm_iske },
-+	{ "single-step pgm caused by lctl", test_step_pgm_lctl },
-+	{ "single-step svc", test_step_svc },
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int idx;
-+
-+	ksft_print_header();
-+	ksft_set_plan(ARRAY_SIZE(testlist));
-+	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
-+		testlist[idx].test();
-+		ksft_test_result_pass("%s\n", testlist[idx].name);
-+	}
-+	ksft_finished();
-+}
--- 
-2.41.0
+The "kvm_vm_enable_cap(s, KVM_CAP_S390_IRQCHIP, 0)" of course has to be 
+moved to the target/s390x/kvm/kvm.c file, too.
+
+  Thomas
+
+
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 115f0cca79d1..84b1bb3dc91e 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -32,6 +32,7 @@
+>   #ifdef CONFIG_KVM_IS_POSSIBLE
+>   
+>   extern bool kvm_allowed;
+> +extern bool kvm_has_create_irqchip;
+>   extern bool kvm_kernel_irqchip;
+>   extern bool kvm_split_irqchip;
+>   extern bool kvm_async_interrupts_allowed;
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index b4c7654f4980..2fa87b495d68 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -250,6 +250,9 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
+>   int kvm_arch_init(MachineState *ms, KVMState *s)
+>   {
+>       int ret = 0;
+> +
+> +    kvm_has_create_irqchip = kvm_check_extension(s, KVM_CAP_IRQCHIP);
+> +
+>       /* For ARM interrupt delivery is always asynchronous,
+>        * whether we are using an in-kernel VGIC or not.
+>        */
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index ebfaf3d24c79..6363e67f092d 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -2771,6 +2771,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>           }
+>       }
+>   
+> +    kvm_has_create_irqchip = kvm_check_extension(s, KVM_CAP_IRQCHIP);
+> +
+>       return 0;
+>   }
+>   
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index a9e5880349d9..c053304adf94 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -391,6 +391,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>       }
+>   
+>       kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
+> +
+> +    kvm_has_create_irqchip = kvm_check_extension(s, KVM_CAP_S390_IRQCHIP);
+> +
+>       return 0;
+>   }
+>   
 
