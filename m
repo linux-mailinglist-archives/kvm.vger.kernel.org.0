@@ -2,265 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38A0375FC81
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 18:48:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBA6F75FCBA
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 18:56:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbjGXQsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 12:48:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
+        id S229655AbjGXQ4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 12:56:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231653AbjGXQsA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 12:48:00 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE92AE65
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 09:47:58 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id e9e14a558f8ab-346258cf060so475ab.0
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 09:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690217278; x=1690822078;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gK3B5wZw1OFgk2DT1iEhz+umMy+9ra8FX/pBQvU+W/w=;
-        b=xY3tx3WTK4KdOY0TvcsLtqmIECu15VlVbTEUqZLznKTrcEQ3qq9MZ8A73xGTPHFhur
-         A/0lC2YaasiB2qtLY96CMo7gEkIDOmPcUEvCDuOPhXiO41+3fvy2/Skq1jEll2CJZ4lB
-         wyvmFXGj4o8we+38ahIX0hi2cof+wdyVSxg0IuxH6YMIzNwMT6/bsiJ/gjrGwSSgyJjB
-         nLN8V8tWusmsM+7/fZZ4n+x9rbksRwiIno10akUtzIy+PPeQIuE7QuixtX1MDApQ0wfG
-         +Jl9ixl11ZsGp2pA/Fh2BIytERW9S4aYDU7b7oeTBewyBL4tWEcTlqqwi4vIUmQP0co3
-         8Khw==
+        with ESMTP id S229464AbjGXQ4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 12:56:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7772FEA
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 09:55:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690217751;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+i0Z9WjluIMP5uW/WBHzltLXbYemxnhhH7IUl23Qdow=;
+        b=CrezZT/7bc+y3KnQGT4mdEyvJ3Xed/Ma2lA7YEmXMPHdnVYT/AK+bB6YnOciWlBlcRlEWz
+        xB1NYm8pY1rINBPI3pOzs8aM6dyijzl1whd8GbxltEYMzSJ3cTSzdeptt2TXliRP4MKDnI
+        Q0uoUnBPrGoTDLv6bN8xNcL4jW9CyxA=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-315-qEPhSs6MMvqKUbOvv5h43A-1; Mon, 24 Jul 2023 12:55:49 -0400
+X-MC-Unique: qEPhSs6MMvqKUbOvv5h43A-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4fbe4f88b67so3935663e87.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 09:55:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690217278; x=1690822078;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1690217748; x=1690822548;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gK3B5wZw1OFgk2DT1iEhz+umMy+9ra8FX/pBQvU+W/w=;
-        b=RsZByS3zXLmuAqHoF8HnJiSPdfFTl3G/CgG+jZI2TLXpvZfNjpGC0WBNry0k2/JFKh
-         lAgwBj+xo0YzhOW/uifyGnPfA0GdH8VxUuyvXCRPCJE3AmHXiWgEGO77T/jRrS/SgBLB
-         MwOLS3l/P4JAtT03cqMGswH+wdiZcSDw0zG1O4arv2IRp5T/MMixL/gFOCg+rc2Q3KPb
-         ZpGk45slk3SIJPQgO1SuF4rL1cvsGJe492GV4yK9YJA3JeqbPNZ+8HqPFsH/QRmUXgeY
-         z43lPnLfS1NbqJ6FO+OhuyarN8IlrPXCyWJKxt+quwvrkWrGtkUAYpaPzDQ5mywDT/66
-         jfNw==
-X-Gm-Message-State: ABy/qLZrrPS+UmEqHmx9YOd38QUVoLymnYdLoqlTRC/ycko3pGXdE795
-        XMlLQGzxHFFQBN5knsSxweRGbiYoZDC39zcO0TSb2g==
-X-Google-Smtp-Source: APBJJlFsPT/IwrE4lZVNtp/1e+lmtgN7VA69U7UflS8F9GMvZ0xsWoBJPqsBR24E0XAF1wZyOEEj+fEvQ3/vP7Be/nQ=
-X-Received: by 2002:a05:6e02:1a0d:b0:348:cfeb:f52 with SMTP id
- s13-20020a056e021a0d00b00348cfeb0f52mr272705ild.7.1690217278012; Mon, 24 Jul
- 2023 09:47:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-13-rananta@google.com>
- <0841aca6-2824-6a1b-a568-119f8bd220de@redhat.com>
-In-Reply-To: <0841aca6-2824-6a1b-a568-119f8bd220de@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 24 Jul 2023 09:47:46 -0700
-Message-ID: <CAJHc60znT5ThqKE3TgTW-0Us3oNv8+KF=81TSK0PbG3tTyJLFQ@mail.gmail.com>
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        bh=+i0Z9WjluIMP5uW/WBHzltLXbYemxnhhH7IUl23Qdow=;
+        b=F3cTmRxvjbf74QZUiP9g8jwyore3QHIXDT9ydHSvLzrUigCpxX4rlhYzEImaSfCx9x
+         6LtJpHSBidzNlDBK3HmP9LC3m4/GeAHdtJ5GwZ5vYIvOR1f8onehRXlcKvxQxT6B87pp
+         5aQrmYwCyDYGrYEKAkqme6Rt7XsoQJCCQ1d8so+EnIehShjXZIV7e3hhSsZXHLOj4DTZ
+         b8LlXNJSfuzI2udtiogSzJ1NMpDDNGy4a+HjJ3JoK8QXnWQQwGF6LtTJRdR38Z08w7uV
+         kBCbWfPInShye8ta1XAhEEb22LtOrD5emBq9invXvYsUJSGUKnkjsHZEYt+aEHMAeR5f
+         gymA==
+X-Gm-Message-State: ABy/qLYLjQrpUZZgw0sU2LDwkhP2tt5ZDSNnqMb7Lfv87Jza6Sr4els5
+        s5mqP69nouvPqybh1NIUiRe4hs4ylj6TrSoc92BJXAHgTm1xN5nn+3/HqdNYHZXiYdPFKj+0dIB
+        YzV8AXGc+/yVf
+X-Received: by 2002:ac2:5dee:0:b0:4fb:99c6:8533 with SMTP id z14-20020ac25dee000000b004fb99c68533mr5480453lfq.33.1690217747934;
+        Mon, 24 Jul 2023 09:55:47 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlESyHT5vseo1Fe9EOmjjndUHiTWba8Rkai6N/Uo2tJlbGYCmmO/8/5WknEFctQ/nYDYCoWt/g==
+X-Received: by 2002:ac2:5dee:0:b0:4fb:99c6:8533 with SMTP id z14-20020ac25dee000000b004fb99c68533mr5480427lfq.33.1690217747520;
+        Mon, 24 Jul 2023 09:55:47 -0700 (PDT)
+Received: from vschneid.remote.csb ([149.12.7.81])
+        by smtp.gmail.com with ESMTPSA id o25-20020a1c7519000000b003fbaade0735sm13965691wmc.19.2023.07.24.09.55.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 09:55:47 -0700 (PDT)
+From:   Valentin Schneider <vschneid@redhat.com>
+To:     Frederic Weisbecker <frederic@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 15/20] context-tracking: Introduce work deferral
+ infrastructure
+In-Reply-To: <ZL6QI4mV-NKlh4Ox@localhost.localdomain>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-16-vschneid@redhat.com>
+ <ZL6QI4mV-NKlh4Ox@localhost.localdomain>
+Date:   Mon, 24 Jul 2023 17:55:44 +0100
+Message-ID: <xhsmh351dtfjj.mognet@vschneid.remote.csb>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 24, 2023 at 2:35=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
+On 24/07/23 16:52, Frederic Weisbecker wrote:
+> Le Thu, Jul 20, 2023 at 05:30:51PM +0100, Valentin Schneider a =C3=A9crit=
+ :
+>> +enum ctx_state {
+>> +	/* Following are values */
+>> +	CONTEXT_DISABLED	=3D -1,	/* returned by ct_state() if unknown */
+>> +	CONTEXT_KERNEL		=3D 0,
+>> +	CONTEXT_IDLE		=3D 1,
+>> +	CONTEXT_USER		=3D 2,
+>> +	CONTEXT_GUEST		=3D 3,
+>> +	CONTEXT_MAX             =3D 4,
+>> +};
+>> +
+>> +/*
+>> + * We cram three different things within the same atomic variable:
+>> + *
+>> + *                CONTEXT_STATE_END                        RCU_DYNTICKS=
+_END
+>> + *                         |       CONTEXT_WORK_END                |
+>> + *                         |               |                       |
+>> + *                         v               v                       v
+>> + *         [ context_state ][ context work ][ RCU dynticks counter ]
+>> + *         ^                ^               ^
+>> + *         |                |               |
+>> + *         |        CONTEXT_WORK_START      |
+>> + * CONTEXT_STATE_START              RCU_DYNTICKS_START
 >
-> Hi Raghavendra,
+> Should the layout be displayed in reverse? Well at least I always picture
+> bitmaps in reverse, that's probably due to the direction of the shift arr=
+ows.
+> Not sure what is the usual way to picture it though...
 >
-> On 7/22/23 10:22, Raghavendra Rao Ananta wrote:
-> > The current implementation of the stage-2 unmap walker traverses
-> > the given range and, as a part of break-before-make, performs
-> > TLB invalidations with a DSB for every PTE. A multitude of this
-> > combination could cause a performance bottleneck on some systems.
-> >
-> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > invalidations until the entire walk is finished, and then
-> > use range-based instructions to invalidate the TLBs in one go.
-> > Condition deferred TLB invalidation on the system supporting FWB,
-> > as the optimization is entirely pointless when the unmap walker
-> > needs to perform CMOs.
-> >
-> > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > now serves the stage-2 unmap walker specifically, rather than
-> > acting generic.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >   arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++----=
--
-> >   1 file changed, 58 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 5ef098af1736..cf88933a2ea0 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_pgta=
-ble_visit_ctx *ctx, kvm_pte_t n
-> >       smp_store_release(ctx->ptep, new);
-> >   }
-> >
-> > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
-ruct kvm_s2_mmu *mmu,
-> > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > +struct stage2_unmap_data {
-> > +     struct kvm_pgtable *pgt;
-> > +     bool defer_tlb_flush_init;
-> > +};
-> > +
-> > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-> > +{
-> > +     /*
-> > +      * If FEAT_TLBIRANGE is implemented, defer the individual
-> > +      * TLB invalidations until the entire walk is finished, and
-> > +      * then use the range-based TLBI instructions to do the
-> > +      * invalidations. Condition deferred TLB invalidation on the
-> > +      * system supporting FWB, as the optimization is entirely
-> > +      * pointless when the unmap walker needs to perform CMOs.
-> > +      */
-> > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > +}
-> > +
-> > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data *unm=
-ap_data)
-> > +{
-> > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap_dat=
-a->pgt);
-> > +
-> > +     /*
-> > +      * Since __stage2_unmap_defer_tlb_flush() is based on alternative
-> > +      * patching and the TLBIs' operations behavior depend on this,
-> > +      * track if there's any change in the state during the unmap sequ=
-ence.
-> > +      */
-> > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush);
-> > +     return defer_tlb_flush;
-> > +}
-> > +
-> > +static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *c=
-tx,
-> > +                             struct kvm_s2_mmu *mmu,
-> > +                             struct kvm_pgtable_mm_ops *mm_ops)
-> >   {
-> > +     struct stage2_unmap_data *unmap_data =3D ctx->arg;
-> > +
-> >       /*
-> > -      * Clear the existing PTE, and perform break-before-make with
-> > -      * TLB maintenance if it was valid.
-> > +      * Clear the existing PTE, and perform break-before-make if it wa=
-s
-> > +      * valid. Depending on the system support, the TLB maintenance fo=
-r
-> > +      * the same can be deferred until the entire unmap is completed.
-> >        */
-> >       if (kvm_pte_valid(ctx->old)) {
-> >               kvm_clear_pte(ctx->ptep);
-> > -             kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ct=
-x->level);
-> > +
-> > +             if (!stage2_unmap_defer_tlb_flush(unmap_data))
-> Why not directly check (unmap_data->defer_tlb_flush_init) here?
->
-(Re-sending the reply as the previous one was formatted as HTML and
-was blocked by many lists)
 
-No particular reason per say, but I was just going with the logic of
-determining if we need to defer the flush and the WARN_ON() parts
-separate.
-Any advantage if we directly check in stage2_unmap_put_pte() that I
-missed or is this purely for readability?
+Surprisingly, I managed to confuse myself with that comment :-)  I think I
+am subconsciously more used to the reverse as well. I've flipped that and
+put "MSB" / "LSB" at either end.
 
-> > +                     kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu,
-> > +                                     ctx->addr, ctx->level);
-> Small indent hint. The ctx->addr can align with __kvm_tlb_flush_vmid_ipa.
+>> + */
+>> +
+>> +#define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * =
+BITS_PER_BYTE)
+>> +
+>> +#define CONTEXT_STATE_START 0
+>> +#define CONTEXT_STATE_END   (bits_per(CONTEXT_MAX - 1) - 1)
 >
-Ah, yes. I'll adjust this if I send out a v8.
+> Since you have non overlapping *_START symbols, perhaps the *_END
+> are superfluous?
+>
 
-Thank you.
-Raghavendra
-> Thanks,
-> Shaoqin
-> >       }
-> >
-> >       mm_ops->put_page(ctx->ptep);
-> > @@ -1070,7 +1108,8 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtab=
-le *pgt, u64 addr, u64 size,
-> >   static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ct=
-x,
-> >                              enum kvm_pgtable_walk_flags visit)
-> >   {
-> > -     struct kvm_pgtable *pgt =3D ctx->arg;
-> > +     struct stage2_unmap_data *unmap_data =3D ctx->arg;
-> > +     struct kvm_pgtable *pgt =3D unmap_data->pgt;
-> >       struct kvm_s2_mmu *mmu =3D pgt->mmu;
-> >       struct kvm_pgtable_mm_ops *mm_ops =3D ctx->mm_ops;
-> >       kvm_pte_t *childp =3D NULL;
-> > @@ -1098,7 +1137,7 @@ static int stage2_unmap_walker(const struct kvm_p=
-gtable_visit_ctx *ctx,
-> >        * block entry and rely on the remaining portions being faulted
-> >        * back lazily.
-> >        */
-> > -     stage2_put_pte(ctx, mmu, mm_ops);
-> > +     stage2_unmap_put_pte(ctx, mmu, mm_ops);
-> >
-> >       if (need_flush && mm_ops->dcache_clean_inval_poc)
-> >               mm_ops->dcache_clean_inval_poc(kvm_pte_follow(ctx->old, m=
-m_ops),
-> > @@ -1112,13 +1151,23 @@ static int stage2_unmap_walker(const struct kvm=
-_pgtable_visit_ctx *ctx,
-> >
-> >   int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 s=
-ize)
-> >   {
-> > +     int ret;
-> > +     struct stage2_unmap_data unmap_data =3D {
-> > +             .pgt =3D pgt,
-> > +             .defer_tlb_flush_init =3D __stage2_unmap_defer_tlb_flush(=
-pgt),
-> > +     };
-> >       struct kvm_pgtable_walker walker =3D {
-> >               .cb     =3D stage2_unmap_walker,
-> > -             .arg    =3D pgt,
-> > +             .arg    =3D &unmap_data,
-> >               .flags  =3D KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABL=
-E_POST,
-> >       };
-> >
-> > -     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     ret =3D kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +     if (stage2_unmap_defer_tlb_flush(&unmap_data))
-> > +             /* Perform the deferred TLB invalidations */
-> > +             kvm_tlb_flush_vmid_range(pgt->mmu, addr, size);
-> > +
-> > +     return ret;
-> >   }
-> >
-> >   struct stage2_attr_data {
+They're only really there to tidy up the GENMASK() further down - it keeps
+the range and index definitions in one hunk. I tried defining that directly
+within the GENMASK() themselves but it got too ugly IMO.
+
+>> +
+>> +#define RCU_DYNTICKS_BITS  (IS_ENABLED(CONFIG_CONTEXT_TRACKING_WORK) ? =
+16 : 31)
+>> +#define RCU_DYNTICKS_START (CT_STATE_SIZE - RCU_DYNTICKS_BITS)
+>> +#define RCU_DYNTICKS_END   (CT_STATE_SIZE - 1)
+>> +#define RCU_DYNTICKS_IDX   BIT(RCU_DYNTICKS_START)
 >
-> --
-> Shaoqin
+> Might be the right time to standardize and fix our naming:
 >
+> CT_STATE_START,
+> CT_STATE_KERNEL,
+> CT_STATE_USER,
+> ...
+> CT_WORK_START,
+> CT_WORK_*,
+> ...
+> CT_RCU_DYNTICKS_START,
+> CT_RCU_DYNTICKS_IDX
+>
+
+Heh, I have actually already done this for v3, though I hadn't touched the
+RCU_DYNTICKS* family. I'll fold that in.
+
+>> +bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
+>> +{
+>> +	struct context_tracking *ct =3D per_cpu_ptr(&context_tracking, cpu);
+>> +	unsigned int old;
+>> +	bool ret =3D false;
+>> +
+>> +	preempt_disable();
+>> +
+>> +	old =3D atomic_read(&ct->state);
+>> +	/*
+>> +	 * Try setting the work until either
+>> +	 * - the target CPU no longer accepts any more deferred work
+>> +	 * - the work has been set
+>> +	 *
+>> +	 * NOTE: CONTEXT_GUEST intersects with CONTEXT_USER and CONTEXT_IDLE
+>> +	 * as they are regular integers rather than bits, but that doesn't
+>> +	 * matter here: if any of the context state bit is set, the CPU isn't
+>> +	 * in kernel context.
+>> +	 */
+>> +	while ((old & (CONTEXT_GUEST | CONTEXT_USER | CONTEXT_IDLE)) && !ret)
+>
+> That may still miss a recent entry to userspace due to the first plain re=
+ad, ending
+> with an undesired interrupt.
+>
+> You need at least one cmpxchg. Well, of course that stays racy by nature =
+because
+> between the cmpxchg() returning CONTEXT_KERNEL and the actual IPI raised =
+and
+> received, the remote CPU may have gone to userspace already. But still it=
+ limits
+> a little the window.
+>
+
+I can make that a 'do {} while ()' instead to force at least one execution
+of the cmpxchg().
+
+This is only about reducing the race window, right? If we're executing this
+just as the target CPU is about to enter userspace, we're going to be in
+racy territory anyway. Regardless, I'm happy to do that change.
+
