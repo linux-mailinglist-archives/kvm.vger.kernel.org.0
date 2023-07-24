@@ -2,131 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20CBC75F58A
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 13:57:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6890D75F5AE
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 14:09:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230091AbjGXL5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 07:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36424 "EHLO
+        id S230210AbjGXMJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 08:09:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjGXL5A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 07:57:00 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CD28E5D;
-        Mon, 24 Jul 2023 04:56:57 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.43])
-        by gateway (Coremail) with SMTP id _____8AxV_EHZ75k5jEJAA--.23479S3;
-        Mon, 24 Jul 2023 19:56:55 +0800 (CST)
-Received: from [10.20.42.43] (unknown [10.20.42.43])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx7yPzZr5koiM5AA--.49373S3;
-        Mon, 24 Jul 2023 19:56:54 +0800 (CST)
-Message-ID: <49618cce-8c3f-7f25-20b1-eecfc3c70cd0@loongson.cn>
-Date:   Mon, 24 Jul 2023 19:56:35 +0800
+        with ESMTP id S229495AbjGXMJM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 08:09:12 -0400
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB77EE61
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 05:09:10 -0700 (PDT)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-57045429f76so51064877b3.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 05:09:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690200550; x=1690805350;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wcj/BMMGz4LUl61IlM0Kx+aVcsh62woNmjsXvHa2RMs=;
+        b=oNI9qzOfvtscXoDQs+fo+kXSoHDhoK8qfuCnMJy49PCo00zbD24EpQQciB6TOvhkYc
+         OHMEtavpI1cmfnroyfbfZJ23LeB4fhszSviAkNK1lpo/JmGec+JVf5D+VB+nQ0tU7k0S
+         NXJXdh7FxBhIyRRajW56Z/dPMc2RPYWV4r+1qUYWWcZn8vn9Hmgm5cti+lpFpkNQr+OY
+         tpZvuHDOx22IbPZddsujtT/vmybxRAYdpHnoeYimrkRqh7LJesANz1MnyR7HeJYpnsqM
+         uY0qin6NvzFXbfbD0qHGgTySZcK4oY6VjY47ihaTnN+EmCSjsFB/o+yAhWX/qdK+Ftyx
+         QYlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690200550; x=1690805350;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wcj/BMMGz4LUl61IlM0Kx+aVcsh62woNmjsXvHa2RMs=;
+        b=L6U2yHYTv6w0IlJRHBVr3so84ivGQQ5wMfYk9+sTphIcKEY8V7D5ebGAiDRGChL1Ef
+         /OVksnA3B29TVg1Zef897iilekR2FoBmLlVyylBE8m2LqtjnzGzR5kfpD5MJMFQhUKwf
+         T5X002OoAbJiS5BcZydfm7UFfNVcT14lh6Vy2xLWvDsnBv/a7R6PDwk0foppyyXgWkoG
+         DNVKJTtU7IRbrF+2HbotqQAP+z3aI2r186PBlT323D6fMufJW5f/ElIc4SpKD/ITV8CG
+         T3hQkpo1n2MzFk3Jl1YjcdNpfQXUEAwCd5HU1+PRkH7uZaSMZjpnHPgrRU6fI/j1eUfb
+         9wcg==
+X-Gm-Message-State: ABy/qLbP3U2A2yUp1pCnBT0goWtJbKlmSMBgyzGWh+4W1cED17+CbbzK
+        amqAANUn63UXzpQRj1pC4NiR7U0JtfP0sfWuzbEyHBugk2BzwtQn
+X-Google-Smtp-Source: APBJJlG8RcFfmNOuAY5i6QWMwPPL9v5SNunLhEYt/bqfevkOIZGWHb1QraKbk6Caz5YiT8/6Y6QIkxPR7DzG6V+0y3A=
+X-Received: by 2002:a25:bc6:0:b0:d05:bf5b:918f with SMTP id
+ 189-20020a250bc6000000b00d05bf5b918fmr5470588ybl.28.1690200549872; Mon, 24
+ Jul 2023 05:09:09 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 4/9] PCI/VGA: Improve the default VGA device selection
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Sui Jingfeng <sui.jingfeng@linux.dev>
-Cc:     David Airlie <airlied@gmail.com>, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian Konig <christian.koenig@amd.com>,
-        Pan Xinhui <Xinhui.Pan@amd.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Karol Herbst <kherbst@redhat.com>,
-        Lyude Paul <lyude@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Hawking Zhang <Hawking.Zhang@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Lijo Lazar <lijo.lazar@amd.com>,
-        YiPeng Chai <YiPeng.Chai@amd.com>,
-        Bokun Zhang <Bokun.Zhang@amd.com>,
-        Likun Gao <Likun.Gao@amd.com>,
-        Ville Syrjala <ville.syrjala@linux.intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        Jani Nikula <jani.nikula@intel.com>
-References: <20230719193233.GA511659@bhelgaas>
-Content-Language: en-US
-From:   suijingfeng <suijingfeng@loongson.cn>
-In-Reply-To: <20230719193233.GA511659@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: AQAAf8Cx7yPzZr5koiM5AA--.49373S3
-X-CM-SenderInfo: xvxlyxpqjiv03j6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7Jw43KrW8JrWxXw17Wr13KFX_yoWfKrX_CF
-        sYvrZrCa15ur1xJFyUtw4fZF1SgrWaqrZ8JFW8Wa9aq34YgasxJrZYgry0qF1SgFWkJr4D
-        W3WUAa13u3s0gosvyTuYvTs0mTUanT9S1TB71UUUUbDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-        s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-        cSsGvfJTRUUUbqAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-        vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-        w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-        W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-        6r4UJVWxJr1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-        6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-        1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWrXVW3AwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUtVW8ZwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Wrv_Gr1UMIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUD1EEUU
-        UUU
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com>
+ <ZLrCUkwot/yiVC8T@google.com>
+In-Reply-To: <ZLrCUkwot/yiVC8T@google.com>
+From:   Amaan Cheval <amaan.cheval@gmail.com>
+Date:   Mon, 24 Jul 2023 17:38:58 +0530
+Message-ID: <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     brak@gameservers.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+> > I've also run a `function_graph` trace on some of the affected hosts, if you
+> > think it might be helpful...
+>
+> It wouldn't hurt to see it.
+>
 
+Here you go:
+https://transfer.sh/SfXSCHp5xI/ept-function-graph.log
 
-I was too hurry reply to you. I'm may miss the point for part of your 
-reviews, Sorry.
+> > Another interesting observation we made was that when we migrate a guest to a
+> > different host, the guest _stays_ locked up and throws EPT violations on the new
+> > host as well
+>
+> Ooh, that's *very* interesting.  That pretty much rules out memslot and mmu_notifier
+> issues.
 
+Good to know, thanks!
 
-On 2023/7/20 03:32, Bjorn Helgaas wrote:
-> CONFIG_DRM_AST is a tristate.  We're talking about identifying the
-> boot-time console device.
+> What I suspect is happening is that get_user_pages_remote() fails for some reason,
+> i.e. the workqueue doesn't fault in the page, and the vCPU gets stuck trying to
+> fault in a page that can't be faulted in for whatever reason.  AFAICT, nothing in
+> KVM will actually complain or even surface the problem in tracepoints (yeah, that's
+> not good).
 
-Yes, my patch will only works *after* the module gets loaded successfully.
+Thanks for the explanation, I did suspect something similar seeing how the page
+faults / EPT_VIOLATIONs tend to loop on the same eip/rip/instruction and address
+(not always, but quite often).
 
-But generally, vgaarb will select a default boot device before my patch taking into effect.
+> To mostly confirm this is likely what's happening, can you enable all of the async
+> #PF tracepoints in KVM?  The exact tracepoints might vary dependending on which kernel
+> version you're running, just enable everything with "async" in the name, e.g.
+>
+>   # ls -1 /sys/kernel/debug/tracing/events/kvm | grep async
+>   kvm_async_pf_completed/
+>   kvm_async_pf_not_present/
+>   kvm_async_pf_ready/
+>   kvm_async_pf_repeated_fault/
+>   kvm_try_async_get_page/
+>
+> If kvm_try_async_get_page() is more or less keeping pace with the "pf_taken" stat,
+> then this is likely what's happening.
 
-I means that vgaarb will select a default boot device by calling vga_arbiter_add_pci_device() function.
+I did this and unfortunately, don't see any of these functions being
+called at all despite
+EPT_VIOLATIONs still being thrown and pf_taken still climbing. (Tried both with
+`trace-cmd -e ...` and using `bpftrace` and none of those functions
+are being called
+during the deadlock/guest being stuck.)
 
+> And then to really confirm, this small bpf program will yell if get_user_pages_remote()
+> fails when attempting get a single page (which is always the case for KVM's async
+> #PF usage).
+>
+> $ tail gup_remote.bt
+> kretfunc:get_user_pages_remote
+> {
+>         if ( args->nr_pages == 1 && retval != 1 ) {
+>                 printf("Failed remote gup() on address %lx, ret = %d\n", args->start, retval);
+>         }
+> }
+>
 
-In practice, I still not notice any obvious problems.
+Our hosts don't have kfunc/kretfunc support (`bpftrace --info` reports
+`kret: no`),
+but I tried just a kprobe to verify that get_user_pages_remote is
+being called at all -
+does not seem like it is, unfortunately:
 
-I'm lack the knowledge about the boot-time console,
+```
+# bpftrace -e 'kprobe:get_user_pages_remote { @[comm] = count(); }'
+Attaching 1 probe...
+^C
+#
+```
 
-what is the potential problems with such a condition?
+So I guess that disproves the async #PF theory? Any other potential causes you
+can think of, or anything we can try on faulting hosts that might help
+illuminate the
+issue further?
 
-
->   So if CONFIG_DRM_AST=m, I guess we don't
-> get the benefit of the new callback unless the module gets loaded?
-
-Yes, my approach will not works until the device driver kernel module 
-gets loaded successfully.
-
-So what's the problem with such a situation, do you see something weird ?
-
+Thanks for your time and help!
