@@ -2,254 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B5A975FA37
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 16:53:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC26875FC09
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 18:27:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229764AbjGXOwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 10:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34326 "EHLO
+        id S231443AbjGXQ1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 12:27:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230166AbjGXOwl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 10:52:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DBF10D7;
-        Mon, 24 Jul 2023 07:52:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6DBB3611F6;
-        Mon, 24 Jul 2023 14:52:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA815C433C8;
-        Mon, 24 Jul 2023 14:52:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690210353;
-        bh=Io85B1vzGj1NiepBNP1CXkgl9j43eYMLYiUZyMtHevU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CJj9nVWeVnJDFBR0XVDtKFcRx4DdPvYzBxJs7NdyqhCdkyJSi7ns/QunyuF5T7ps6
-         XU2A2MDFy7UQQzJsIx/xDqLe0FliBY/Oeg0aB/OquAS8cepo48SytLWwhoRHBnqAgE
-         wTZhFOxngaubHLo/KhuNmg/icDkWf3KABmSQcw7hRGodIB5PblbvuCT6kpl36W6FZr
-         hIH+s80Togjk4lAfltww4D/tmAcJlqIFj1q84XSHWsxVyk2brxNcyWdq/AUnuQb02p
-         QLpBDuBflcJsU3fMXLT8vIMOo2OPS1Po+gVqEtzb2kBqqlYChJ+9nWv8THywbJoX77
-         fSGCA/VpqlDFg==
-Date:   Mon, 24 Jul 2023 16:52:19 +0200
-From:   Frederic Weisbecker <frederic@kernel.org>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 15/20] context-tracking: Introduce work deferral
- infrastructure
-Message-ID: <ZL6QI4mV-NKlh4Ox@localhost.localdomain>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-16-vschneid@redhat.com>
+        with ESMTP id S231531AbjGXQ1W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 12:27:22 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5B36910F5;
+        Mon, 24 Jul 2023 09:27:19 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14C73FEC;
+        Mon, 24 Jul 2023 09:28:02 -0700 (PDT)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 11E4F3F5A1;
+        Mon, 24 Jul 2023 09:27:15 -0700 (PDT)
+Message-ID: <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
+Date:   Mon, 24 Jul 2023 17:27:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+To:     Salil Mehta <salil.mehta@huawei.com>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Salil Mehta <salil.mehta@opnsrc.net>,
+        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Gareth Stockwell <Gareth.Stockwell@arm.com>
+References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+ <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
+Content-Language: en-US
+In-Reply-To: <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230720163056.2564824-16-vschneid@redhat.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le Thu, Jul 20, 2023 at 05:30:51PM +0100, Valentin Schneider a �crit :
-> +enum ctx_state {
-> +	/* Following are values */
-> +	CONTEXT_DISABLED	= -1,	/* returned by ct_state() if unknown */
-> +	CONTEXT_KERNEL		= 0,
-> +	CONTEXT_IDLE		= 1,
-> +	CONTEXT_USER		= 2,
-> +	CONTEXT_GUEST		= 3,
-> +	CONTEXT_MAX             = 4,
-> +};
-> +
-> +/*
-> + * We cram three different things within the same atomic variable:
-> + *
-> + *                CONTEXT_STATE_END                        RCU_DYNTICKS_END
-> + *                         |       CONTEXT_WORK_END                |
-> + *                         |               |                       |
-> + *                         v               v                       v
-> + *         [ context_state ][ context work ][ RCU dynticks counter ]
-> + *         ^                ^               ^
-> + *         |                |               |
-> + *         |        CONTEXT_WORK_START      |
-> + * CONTEXT_STATE_START              RCU_DYNTICKS_START
+Hi Salil
 
-Should the layout be displayed in reverse? Well at least I always picture
-bitmaps in reverse, that's probably due to the direction of the shift arrows.
-Not sure what is the usual way to picture it though...
-
-> + */
-> +
-> +#define CT_STATE_SIZE (sizeof(((struct context_tracking *)0)->state) * BITS_PER_BYTE)
-> +
-> +#define CONTEXT_STATE_START 0
-> +#define CONTEXT_STATE_END   (bits_per(CONTEXT_MAX - 1) - 1)
-
-Since you have non overlapping *_START symbols, perhaps the *_END
-are superfluous?
-
-> +
-> +#define RCU_DYNTICKS_BITS  (IS_ENABLED(CONFIG_CONTEXT_TRACKING_WORK) ? 16 : 31)
-> +#define RCU_DYNTICKS_START (CT_STATE_SIZE - RCU_DYNTICKS_BITS)
-> +#define RCU_DYNTICKS_END   (CT_STATE_SIZE - 1)
-> +#define RCU_DYNTICKS_IDX   BIT(RCU_DYNTICKS_START)
-
-Might be the right time to standardize and fix our naming:
-
-CT_STATE_START,
-CT_STATE_KERNEL,
-CT_STATE_USER,
-...
-CT_WORK_START,
-CT_WORK_*,
-...
-CT_RCU_DYNTICKS_START,
-CT_RCU_DYNTICKS_IDX
-
-> +bool ct_set_cpu_work(unsigned int cpu, unsigned int work)
-> +{
-> +	struct context_tracking *ct = per_cpu_ptr(&context_tracking, cpu);
-> +	unsigned int old;
-> +	bool ret = false;
-> +
-> +	preempt_disable();
-> +
-> +	old = atomic_read(&ct->state);
-> +	/*
-> +	 * Try setting the work until either
-> +	 * - the target CPU no longer accepts any more deferred work
-> +	 * - the work has been set
-> +	 *
-> +	 * NOTE: CONTEXT_GUEST intersects with CONTEXT_USER and CONTEXT_IDLE
-> +	 * as they are regular integers rather than bits, but that doesn't
-> +	 * matter here: if any of the context state bit is set, the CPU isn't
-> +	 * in kernel context.
-> +	 */
-> +	while ((old & (CONTEXT_GUEST | CONTEXT_USER | CONTEXT_IDLE)) && !ret)
-
-That may still miss a recent entry to userspace due to the first plain read, ending
-with an undesired interrupt.
-
-You need at least one cmpxchg. Well, of course that stays racy by nature because
-between the cmpxchg() returning CONTEXT_KERNEL and the actual IPI raised and
-received, the remote CPU may have gone to userspace already. But still it limits
-a little the window.
-
-Thanks.
-
-> +		ret = atomic_try_cmpxchg(&ct->state, &old, old | (work << CONTEXT_WORK_START));
-> +
-> +	preempt_enable();
-> +	return ret;
-> +}
-> +#else
-> +static __always_inline void ct_work_flush(unsigned long work) { }
-> +static __always_inline void ct_work_clear(struct context_tracking *ct) { }
-> +#endif
-> +
->  /*
->   * Record entry into an extended quiescent state.  This is only to be
->   * called when not already in an extended quiescent state, that is,
-> @@ -88,7 +133,8 @@ static noinstr void ct_kernel_exit_state(int offset)
->  	 * next idle sojourn.
->  	 */
->  	rcu_dynticks_task_trace_enter();  // Before ->dynticks update!
-> -	seq = ct_state_inc(offset);
-> +	seq = ct_state_inc_clear_work(offset);
-> +
->  	// RCU is no longer watching.  Better be in extended quiescent state!
->  	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && (seq & RCU_DYNTICKS_IDX));
->  }
-> @@ -100,7 +146,7 @@ static noinstr void ct_kernel_exit_state(int offset)
->   */
->  static noinstr void ct_kernel_enter_state(int offset)
->  {
-> -	int seq;
-> +	unsigned long seq;
->  
->  	/*
->  	 * CPUs seeing atomic_add_return() must see prior idle sojourns,
-> @@ -108,6 +154,7 @@ static noinstr void ct_kernel_enter_state(int offset)
->  	 * critical section.
->  	 */
->  	seq = ct_state_inc(offset);
-> +	ct_work_flush(seq);
->  	// RCU is now watching.  Better not be in an extended quiescent state!
->  	rcu_dynticks_task_trace_exit();  // After ->dynticks update!
->  	WARN_ON_ONCE(IS_ENABLED(CONFIG_RCU_EQS_DEBUG) && !(seq & RCU_DYNTICKS_IDX));
-> diff --git a/kernel/time/Kconfig b/kernel/time/Kconfig
-> index bae8f11070bef..fdb266f2d774b 100644
-> --- a/kernel/time/Kconfig
-> +++ b/kernel/time/Kconfig
-> @@ -181,6 +181,11 @@ config CONTEXT_TRACKING_USER_FORCE
->  	  Say N otherwise, this option brings an overhead that you
->  	  don't want in production.
->  
-> +config CONTEXT_TRACKING_WORK
-> +	bool
-> +	depends on HAVE_CONTEXT_TRACKING_WORK && CONTEXT_TRACKING_USER
-> +	default y
-> +
->  config NO_HZ
->  	bool "Old Idle dynticks config"
->  	help
-> -- 
-> 2.31.1
+On 19/07/2023 10:28, Suzuki K Poulose wrote:
+> Hi Salil
 > 
+> Thanks for raising this.
+> 
+> On 19/07/2023 03:35, Salil Mehta wrote:
+>> [Reposting it here from Linaro Open Discussion List for more eyes to 
+>> look at]
+>>
+>> Hello,
+>> I have recently started to dabble with ARM CCA stuff and check if our
+>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
+>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
+>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
+>> from the host. This might be required to support vCPU Hotplug feature
+>> in the realm world in future. vCPU Hotplug is an important feature to
+>> support kata-containers in realm world as it reduces the VM boot time
+>> and facilitates dynamic adjustment of vCPUs (which I think should be
+>> true even with Realm world as current implementation only makes use
+>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+>>
+>>
+>> As per our recent changes [2], [3] related to support vCPU Hotplug on
+>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
+>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
+>> PSCI_CPU_ON should undergo similar policy checks and I think,
+>>
+>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
+>> 2. This means target REC should be denied by host. Can host call
+>>     RMI_PSCI_COMPETE in such s case?
+>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
+> 
+> The Realm exit with EXIT_PSCI already provides the parameters passed
+> onto the PSCI request. This happens for all PSCI calls except
+> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
+> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses 
+> the request (wherever applicable).
+> 
+> However, the RMM spec currently doesn't allow denying the request.
+> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
+> We will address this in the RMM spec and get back to you.
+
+This is now resolved in RMMv1.0-eac3 spec, available here [0].
+
+This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
+the response doesn't violate the security guarantees by checking the
+state of the target REC.
+
+[0] https://developer.arm.com/documentation/den0137/latest/
+
+Kind regards
+Suzuki
+
+
+
+
+> 
+> Kind regards
+> Suzuki
+> 
+> 
+>> 4. Failure condition (B5.3.3.2) should be amended with
+>>     runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
+>>              post: result == PSCI_DENIED (?)
+>> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
+>>     PSCI_CPU_ON flow (D1.4.1)
+>>
+>> I do understand that ARM CCA support is in its infancy stage and
+>> discussing about vCPU Hotplug in realm world seem to be a far-fetched
+>> idea right now. But specification changes require lot of time and if
+>> this change is really required then it should be further discussed
+>> within ARM.
+>>
+>> Many thanks!
+>>
+>>
+>> Bes regards
+>> Salil
+>>
+>>
+>> References:
+>>
+>> [1] https://developer.arm.com/documentation/den0137/latest/
+>> [2] https://github.com/salil-mehta/qemu.git 
+>> virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
+>> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git 
+>> virtual_cpu_hotplug/rfc/v2
+>>
+> 
+
