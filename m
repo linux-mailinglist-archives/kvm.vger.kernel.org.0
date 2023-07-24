@@ -2,222 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D72E175F8AF
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 15:42:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6348175F8DF
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 15:51:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231758AbjGXNkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 09:40:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42342 "EHLO
+        id S231220AbjGXNuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 09:50:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231753AbjGXNji (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 09:39:38 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB44D1BD1
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 06:37:37 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1bb74752ddbso513600fac.0
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 06:37:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690205804; x=1690810604;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wx68ceSLh8Ks0MxsN/kGGoL4STvpKuDm3iHwiSZh+I=;
-        b=JNRyTwDsuQwOeGmQMv2TkWrWtBVY7yRvShkB7KcN/RfhXSZ3FCPDvUvFKohBmDRj7Q
-         XoWB6gclor3APaveOXsRmXVsFIz8I+z8WJ9AVyTEihFQ80yRsFTh+coVrzEBY2hBehDW
-         FVzJaR35+qUzIhl1EDyvcbl0dUnPnhEm40yFG4izfrShj09i49FIyGjtMLUOQVD4IdW6
-         EEJd6Wu56pdApT1iBZOFjHFAz2P11pnwpL8xzSvjXcEsclKRLvswhsmkpQsilV2pj2HI
-         0vmcZ/G+qU1nytsvCvleGO9LhZ7Rejs1bEPQv4cHonDWJhqP7rO5TPxOJ0ord0MA7tLn
-         /YLQ==
+        with ESMTP id S231646AbjGXNuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 09:50:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A63422C
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 06:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690206412;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6xn9gPQjRRb0V1QRm23HnyLiUiGqmHFZ2cvUJktxsWk=;
+        b=adNxMYI5mThzWxqK8oQvYCp8lq5VmIqAKadMPzKGnOCDMSaB5JJlEMJH2u3D4Kt5pftnNE
+        8pV7qatEmXNJ5nqBS0nWBax6auu8633utgkcEsKLe5FXxRqg6svttxiMO7B7CB+wsL9MZV
+        e73BosVa7Ampw+bDl7qNgDQhw1x+CMI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-V3FYVvSGNt-Lj0TQHi_HBw-1; Mon, 24 Jul 2023 09:46:51 -0400
+X-MC-Unique: V3FYVvSGNt-Lj0TQHi_HBw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-63cfe1c2d35so9812436d6.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 06:46:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690205804; x=1690810604;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1690206411; x=1690811211;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6wx68ceSLh8Ks0MxsN/kGGoL4STvpKuDm3iHwiSZh+I=;
-        b=f+UA4nAgQLDaL5yXtzZ4ohGrJ81mpyYl25cYcafIu89IqKjayacFeRvcCAoChh4riV
-         CA1UKJYrNXz0csWRn5gnID/V0m0pnbLp2eyextTcPDNgXAqckYvavOJhq95xOLgD0uGN
-         XhStyKxDsNDTNIfVTOlnophs9hQ38HyDlyFjQMDwou6Aw2b/ZHW4yb+rZ6Mz8uJfak7h
-         sgUHn1TnlApYjmdHcb8SoOnQqfP+OaYsf7nP0tjl9RMqpIMnFns5rRPqno+oRWeuKQK/
-         dHsP5tCEoL2wu8RMLLfbZJ9raNh7xmywN+/n9kWLb7F9uaiy+l+c/QWhyJ79QZe8V/lG
-         xOVw==
-X-Gm-Message-State: ABy/qLZjJM8WUBhiYshQlXmtJj3bX5qdCcoSCdmEnlzC1er9vHiGNXxA
-        QSwn1H0xA/36uq15SS3ZKE1NpW9P+Oc=
-X-Google-Smtp-Source: APBJJlG7FjCcvQABc2dPjKLoa5tQ+K4vxm84KdF9nc7rm0P/XXOUAiahv5Y3m54sO3pfH3hg5AKkaQ==
-X-Received: by 2002:a05:6871:68e:b0:1b7:2879:a0e with SMTP id l14-20020a056871068e00b001b728790a0emr11360454oao.12.1690205804306;
-        Mon, 24 Jul 2023 06:36:44 -0700 (PDT)
-Received: from wheely.local0.net ([118.102.104.45])
-        by smtp.gmail.com with ESMTPSA id m22-20020aa79016000000b00676bf2d5ab3sm7713474pfo.61.2023.07.24.06.36.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 06:36:43 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests PATCH RFC] arch-run: Support multiple migrations
-Date:   Mon, 24 Jul 2023 23:36:30 +1000
-Message-Id: <20230724133630.263232-1-npiggin@gmail.com>
-X-Mailer: git-send-email 2.40.1
+        bh=6xn9gPQjRRb0V1QRm23HnyLiUiGqmHFZ2cvUJktxsWk=;
+        b=VIU3AoJkLa2p9fvNMQM9Gm3VI6Afbf2z/PO66jxqDOnX6ptTWd7AxnwEihcB2J5D+X
+         p/sw8YOyAEiPT1LgBnwz8S8Cd8iz+5EFRFlrU91Dp811qvIc96wejQt9grmIzf/0iTnT
+         qJsL3KTwE1afika3D7rUjWQkX0JELDWx98K4XQSvu7Gw52GlUrmjis7sp56OlumxGD0g
+         FiURaJWtyd/WYx5CktX1UVopCdzzRfYXIew/u1syDbOSAaxPWA2J84qIlzMMY5hGOg67
+         KffoVW6aSNJqVvJARmNwXA7vti2tJK+g16v4wz0ILsAt1jQf2sl/UmbsOAb3Q4uLLPQH
+         k7SQ==
+X-Gm-Message-State: ABy/qLbYOhwUoulHddUHFD2fErnXlPuloXb8+dm5vdmioJ8ebh1fr06X
+        3geTc+cbMoCCqPWIj5bnSThd7jt8IiU71qAc7VI4eoOe8WbTd8Yq8MccqJClb/oW/9br0MkUEOU
+        eDxEvHBqRqZJ3
+X-Received: by 2002:a0c:f4cf:0:b0:630:21a6:bb44 with SMTP id o15-20020a0cf4cf000000b0063021a6bb44mr7270327qvm.56.1690206411079;
+        Mon, 24 Jul 2023 06:46:51 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG26No1QqlAVxxmnZeRTHRWyhZarVbTKQTqaWhvG6qsLSi8NvGKBb2EOxzJM6QcQZEwT16xWw==
+X-Received: by 2002:a0c:f4cf:0:b0:630:21a6:bb44 with SMTP id o15-20020a0cf4cf000000b0063021a6bb44mr7270310qvm.56.1690206410831;
+        Mon, 24 Jul 2023 06:46:50 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
+        by smtp.gmail.com with ESMTPSA id n13-20020a0ce54d000000b00637873ff0f3sm3595004qvm.15.2023.07.24.06.46.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Jul 2023 06:46:50 -0700 (PDT)
+Message-ID: <236a8b03-673e-b242-88c3-4a97fbaf937a@redhat.com>
+Date:   Mon, 24 Jul 2023 15:46:43 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 07/27] arm64: Add missing BRB/CFP/DVP/CPP instructions
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-8-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230712145810.3864793-8-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It could be nice to migrate more than once in a test case. This patch
-supports multiple migrations by flipping dest file/socket variables to
-source after the migration is complete, ready to start again. Test
-cases may now switch to calling migrate() one or more times as needed.
+Hi Marc,
 
-Only problem here is that the migration command now polls for the
-"EXIT: STATUS" output line to see if the test is finished or wants
-another migration, and x86 doesn't seem to output that line. It does
-print something, but only if !no_test_device, so this will break x86.
-I'm not sure why the exit status isn't printed in that case. Any ideas?
+On 7/12/23 16:57, Marc Zyngier wrote:
+> HFGITR_EL2 traps a bunch of instructions for which we don't have
+> encodings yet. Add them.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9dfd127be55a..e2357529c633 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -737,6 +737,13 @@
+>  #define OP_TLBI_VALE2NXS		sys_insn(1, 4, 9, 7, 5)
+>  #define OP_TLBI_VMALLS12E1NXS		sys_insn(1, 4, 9, 7, 6)
+>  
+> +/* Misc instructions */
+> +#define OP_BRB_IALL			sys_insn(1, 1, 7, 2, 4)
+> +#define OP_BRB_INJ			sys_insn(1, 1, 7, 2, 5)
+> +#define OP_CFP_RCTX			sys_insn(1, 3, 7, 3, 4)
+> +#define OP_DVP_RCTX			sys_insn(1, 3, 7, 3, 5)
+> +#define OP_CPP_RCTX			sys_insn(1, 3, 7, 3, 7)
+> +
+>  /* Common SCTLR_ELx flags. */
+>  #define SCTLR_ELx_ENTP2	(BIT(60))
+>  #define SCTLR_ELx_DSSBS	(BIT(44))
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks,
-Nick
----
- lib/migrate.c         |  8 +++---
- lib/migrate.h         |  1 +
- scripts/arch-run.bash | 59 +++++++++++++++++++++++++++++++++++--------
- 3 files changed, 53 insertions(+), 15 deletions(-)
+Thanks
 
-diff --git a/lib/migrate.c b/lib/migrate.c
-index 527e63ae..b7721659 100644
---- a/lib/migrate.c
-+++ b/lib/migrate.c
-@@ -8,8 +8,10 @@
- #include <libcflat.h>
- #include "migrate.h"
- 
--/* static for now since we only support migrating exactly once per test. */
--static void migrate(void)
-+/*
-+ * Initiate migration and wait for it to complete.
-+ */
-+void migrate(void)
- {
- 	puts("Now migrate the VM, then press a key to continue...\n");
- 	(void)getchar();
-@@ -19,8 +21,6 @@ static void migrate(void)
- /*
-  * Initiate migration and wait for it to complete.
-  * If this function is called more than once, it is a no-op.
-- * Since migrate_cmd can only migrate exactly once this function can
-- * simplify the control flow, especially when skipping tests.
-  */
- void migrate_once(void)
- {
-diff --git a/lib/migrate.h b/lib/migrate.h
-index 3c94e6af..2af06a72 100644
---- a/lib/migrate.h
-+++ b/lib/migrate.h
-@@ -6,4 +6,5 @@
-  * Author: Nico Boehr <nrb@linux.ibm.com>
-  */
- 
-+void migrate(void);
- void migrate_once(void);
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 5e7e4201..6a0a54f5 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -131,28 +131,58 @@ run_migration ()
- 
- 	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
- 	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
-+	migout2=$(mktemp -t mig-helper-stdout2.XXXXXXXXXX)
- 	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
- 	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
- 	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
- 	qmpout1=/dev/null
- 	qmpout2=/dev/null
-+	migcmdline=$@
- 
- 	trap 'kill 0; exit 2' INT TERM
--	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
-+	trap 'rm -f ${migout1} ${migout2} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
- 
--	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
-+	eval "$migcmdline" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
- 		-mon chardev=mon1,mode=control | tee ${migout1} &
-+	live_pid=`jobs -l %+ | grep Running | awk '{print$2}'`
- 
-+	# This starts the first source QEMU in advance of the test reaching the
-+	# migration point, since we expect at least one migration. Subsequent
-+	# sources are started as the test hits migrate keywords.
-+	do_migration || return $?
-+
-+	while ! grep -q -i "EXIT" < ${migout1} ; do
-+		# Wait for EXIT or further migrations
-+		if ! grep -q -i "Now migrate the VM" < ${migout1} ; then
-+			sleep 1
-+		else
-+			do_migration || return $?
-+		fi
-+	done
-+
-+	wait $live_pid
-+	ret=$?
-+
-+	while (( $(jobs -r | wc -l) > 0 )); do
-+		sleep 0.5
-+	done
-+
-+	return $ret
-+}
-+
-+do_migration ()
-+{
- 	# We have to use cat to open the named FIFO, because named FIFO's, unlike
- 	# pipes, will block on open() until the other end is also opened, and that
- 	# totally breaks QEMU...
- 	mkfifo ${fifo}
--	eval "$@" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
--		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) &
--	incoming_pid=`jobs -l %+ | awk '{print$2}'`
-+
-+	eval "$migcmdline" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
-+		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) | tee ${migout2} &
-+	incoming_pid=`jobs -l %+ | grep Running | awk '{print$2}'`
- 
- 	# The test must prompt the user to migrate, so wait for the "migrate" keyword
--	while ! grep -q -i "migrate" < ${migout1} ; do
-+	while ! grep -q -i "Now migrate the VM" < ${migout1} ; do
- 		sleep 1
- 	done
- 
-@@ -172,12 +202,19 @@ run_migration ()
- 	done
- 	qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
- 	echo > ${fifo}
--	wait $incoming_pid
--	ret=$?
-+	rm ${fifo}
- 
--	while (( $(jobs -r | wc -l) > 0 )); do
--		sleep 0.5
--	done
-+	wait $live_pid
-+	ret=$?
-+	live_pid=${incoming_pid}
-+
-+	# Now flip the variables because dest becomes source
-+	tmp=${migout1}
-+	migout1=${migout2}
-+	migout2=${tmp}
-+	tmp=${qmp1}
-+	qmp1=${qmp2}
-+	qmp2=${tmp}
- 
- 	return $ret
- }
--- 
-2.40.1
+Eric
 
