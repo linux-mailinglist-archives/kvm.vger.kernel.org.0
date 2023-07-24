@@ -2,210 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C86DD75F2F9
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 12:23:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 917A775F3AA
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 12:43:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231733AbjGXKXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 06:23:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54282 "EHLO
+        id S232199AbjGXKnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 06:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233385AbjGXKW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 06:22:56 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3702A1FDA
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 03:16:12 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36OAEa7G021628;
-        Mon, 24 Jul 2023 10:16:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=WRtGFJkD+m4CDL0iNdVQRZdqVJEm44c78r1VGHuqMEA=;
- b=VuKBpzMP5v6fgfBjlsCFWSbyqDTlLVmKmngHGoOTo4quuLkKH7bjdovbybBB837lmTrs
- pnYXZrLu1uuaQX89wNle5iwxDtFO3hCbKgAlII0dAcJ0aodHVY2CR8Pna+8gJkmqgGUS
- DwgqjXDkfdwf/qodbi52GD2iYyKlOs7mjEboQMVKjvXA7jXx2YNFS9ZqTdu3aUVvi5RE
- znTXNviwjSo9yxDacTLO+Fe6r9vWUOzJ9h/fAUzCaM1c9D4fAvc6c2ngQW81ToQVjMMD
- SQkbnFrpgv1e9avvaFl52Ski4v74O28i7/tTbf7eohwJCSZl1c2n87X2bcEwhnXbSarX Lw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1me6546t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jul 2023 10:16:01 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36O9hYcZ015015;
-        Mon, 24 Jul 2023 10:16:01 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1me65466-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jul 2023 10:16:00 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36O82F2n014387;
-        Mon, 24 Jul 2023 10:15:59 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0stxjgbs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Jul 2023 10:15:59 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36OAFtGQ20513388
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Jul 2023 10:15:55 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3A9C120067;
-        Mon, 24 Jul 2023 10:15:55 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1092520043;
-        Mon, 24 Jul 2023 10:15:54 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.179.9.136])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 24 Jul 2023 10:15:53 +0000 (GMT)
-Message-ID: <29c6965c8f2c9ec03074656c60966387d213234f.camel@linux.ibm.com>
-Subject: Re: [PATCH v21 01/20] s390x/cpu topology: add s390 specifics to CPU
- topology
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Mon, 24 Jul 2023 12:15:53 +0200
-In-Reply-To: <29268e39-49ba-588a-022d-30b0882fea37@linux.ibm.com>
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
-         <20230630091752.67190-2-pmorel@linux.ibm.com>
-         <9c8847ad9d8e07c2e41f9c20716ba3ed6dd6b3dc.camel@linux.ibm.com>
-         <29268e39-49ba-588a-022d-30b0882fea37@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S232171AbjGXKnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 06:43:16 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45520E6
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 03:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690195395; x=1721731395;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Tzg+2W3QJiH31dz3eqTMCkxS3NEVhVyswtVYF5d0HuY=;
+  b=F57bCwr7WxTHzDu+kRERcSEaQZjtXFme51jFPWOAMzRZ1EK3jdh7tMR4
+   H19HmIquS3QnCq76aI0hYdGazXRvd6ee+ZQLKoRo6q6vVvJfiJnkiwIGE
+   4AlIuzEhQ1pJWl+U9KnG4fy7Vc5M6JVthKdAqBVIUBT51bByILaw8erpk
+   7/1zFaFyMXKGD5aM2KYvgtXT76h2Gm2FIUfm4NWlM4v1mcnrcMEQKzYbe
+   RPevfoBT8Km2mKoynlG4Wthw2FwsrQJnXCmwHgsBYy2kLZktxlClXSWvt
+   kwhEiMQEyTUIgptu5Fjh0K6wiGkESRsjh6/ewDmlRDd7JwXAqfPTy5TJz
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10780"; a="370075369"
+X-IronPort-AV: E=Sophos;i="6.01,228,1684825200"; 
+   d="scan'208";a="370075369"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 03:43:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="869031655"
+Received: from ylei1-mobl.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.255.29.13])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2023 03:43:13 -0700
+From:   Xiong Zhang <xiong.y.zhang@intel.com>
+To:     kvm@vger.kernel.org
+Cc:     seanjc@google.com, like.xu.linux@gmail.com,
+        weijiang.yang@intel.com, zhiyuan.lv@intel.com,
+        zhenyu.z.wang@intel.com, kan.liang@intel.com,
+        Xiong Zhang <xiong.y.zhang@intel.com>
+Subject: [PATCH] Documentation: KVM: Add vPMU implementaion and gap document
+Date:   Mon, 24 Jul 2023 18:41:54 +0800
+Message-Id: <20230724104154.259573-1-xiong.y.zhang@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OWObDLs29L-vdcmLCLFonv9Bsahw4Crm
-X-Proofpoint-ORIG-GUID: cDhDB3ucMEkDcXJ0Iy1oI9R1YwaYWw5m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-24_08,2023-07-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 mlxscore=0 suspectscore=0 phishscore=0 spamscore=0
- impostorscore=0 lowpriorityscore=0 clxscore=1011 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307240089
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2023-07-21 at 13:24 +0200, Pierre Morel wrote:
->=20
-> On 7/18/23 18:31, Nina Schoetterl-Glausch wrote:
-> > Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> >=20
-> > Some notes below.
-> >=20
-> > The s390x/ prefix in the title might suggest that this patch
-> > is s390 specific, but it touches common files.
->=20
->=20
-> Right.
->=20
-> What do you suggest?
->=20
-> I can cut it in two or squash it with patch number 2.
->=20
-> The first idea was to separate the patch to ease the review but the
-> functionality introduced in patch 1 do only make sense with patch 2.
->=20
-> So I would be for squashing the first two patches.
->=20
-> ?
+Add a vPMU implementation and gap document to explain vArch PMU and vLBR
+implementation in kvm, especially the current gap to support host and
+guest perf event coexist.
 
-Oh, I'd just change the title.
+Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+---
+ Documentation/virt/kvm/x86/index.rst |   1 +
+ Documentation/virt/kvm/x86/pmu.rst   | 249 +++++++++++++++++++++++++++
+ 2 files changed, 250 insertions(+)
+ create mode 100644 Documentation/virt/kvm/x86/pmu.rst
 
-CPU topology: extend with s390 specifics
-
-or similar, it was just a nit not to create the impression that the
-patch only touches s390 stuff.
->=20
->=20
-> >=20
-> > On Fri, 2023-06-30 at 11:17 +0200, Pierre Morel wrote:
-> > > S390 adds two new SMP levels, drawers and books to the CPU
-> > > topology.
-> > > The S390 CPU have specific topology features like dedication
-> > S390 CPUs have specific topology features like dedication and
-> > entitlement. These indicate to the guest information on host
-> > vCPU scheduling and help the guest make better scheduling
-> > decisions.
-> >=20
-> > > and entitlement to give to the guest indications on the host
-> > > vCPUs scheduling and help the guest take the best decisions
-> > > on the scheduling of threads on the vCPUs.
-> > >=20
-> > > Let us provide the SMP properties with books and drawers levels
-> > > and S390 CPU with dedication and entitlement,
-> > >=20
-> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > > ---
-> > > =C2=A0=C2=A0qapi/machine-common.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 22 +++++++++++++
-> > > =C2=A0=C2=A0qapi/machine.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 21 =
-++++++++++---
-> > > =C2=A0=C2=A0include/hw/boards.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 10 +++++-
-> > > =C2=A0=C2=A0include/hw/qdev-properties-system.h |=C2=A0 4 +++
-> > > =C2=A0=C2=A0target/s390x/cpu.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 6 +=
-+++
-> > > =C2=A0=C2=A0hw/core/machine-smp.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 48
-> > > ++++++++++++++++++++++++---
-> > > --
-> > > =C2=A0=C2=A0hw/core/machine.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 4 +++
-> > > =C2=A0=C2=A0hw/core/qdev-properties-system.c=C2=A0=C2=A0=C2=A0 | 13 +=
-+++++++
-> > > =C2=A0=C2=A0hw/s390x/s390-virtio-ccw.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 ++
-> > > =C2=A0=C2=A0softmmu/vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 6 ++++
-> > > =C2=A0=C2=A0target/s390x/cpu.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 +=
-++++
-> > > =C2=A0=C2=A0qapi/meson.build=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- |=C2=A0 1 +
-> > > =C2=A0=C2=A0qemu-options.hx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 7 +++--
-> > > =C2=A0=C2=A013 files changed, 137 insertions(+), 14 deletions(-)
-> > > =C2=A0=C2=A0create mode 100644 qapi/machine-common.json
-> > >=20
-> > > diff --git a/qapi/machine-common.json b/qapi/machine-common.json
-> > > new file mode 100644
-> > > index 0000000000..bc0d76829c
-> > > --- /dev/null
-> > > +++ b/qapi/machine-common.json
-> > > @@ -0,0 +1,22 @@
-> > > +# -*- Mode: Python -*-
-> > > +# vim: filetype=3Dpython
-> > > +#
-> > > +# This work is licensed under the terms of the GNU GPL, version
-> > > 2 or
-> > > later.
-> > > +# See the COPYING file in the top-level directory.
-> > > +
-> > > +##
-> > > +# =3D Machines S390 data types
-> > Common definitions for machine.json and machine-target.json
-> >=20
-> >=20
-> > [...]
+diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
+index 9ece6b8dc817..02c1c7b01bf3 100644
+--- a/Documentation/virt/kvm/x86/index.rst
++++ b/Documentation/virt/kvm/x86/index.rst
+@@ -14,5 +14,6 @@ KVM for x86 systems
+    mmu
+    msr
+    nested-vmx
++   pmu
+    running-nested-guests
+    timekeeping
+diff --git a/Documentation/virt/kvm/x86/pmu.rst b/Documentation/virt/kvm/x86/pmu.rst
+new file mode 100644
+index 000000000000..e95e8c88e0e0
+--- /dev/null
++++ b/Documentation/virt/kvm/x86/pmu.rst
+@@ -0,0 +1,249 @@
++﻿.. SPDX-License-Identifier: GPL-2.0
++
++==========================
++PMU virtualization for X86
++==========================
++
++:Author: Xiong Zhang <xiong.y.zhang@intel.com>
++:Copyright: (c) 2023, Intel.  All rights reserved.
++
++.. Contents
++
++1. Overview
++2. Perf Scheduler
++3. Arch PMU virtualization
++4. LBR virtualization
++
++1. Overview
++===========
++
++KVM has supported PMU virtualization on x86 for many years and provides
++MSR based Arch PMU interface to the guest. The major features include
++Arch PMU v2, LBR and PEBS. Users have the same operation to profile
++performance in guest and host.
++KVM is a normal perf subsystem user as other perf subsystem users. When
++the guest access vPMU MSRs, KVM traps it and creates a perf event for it.
++This perf event takes part in perf scheduler to request PMU resources
++and let the guest use these resources.
++
++This document describes the X86 PMU virtualization architecture design
++and opens. It is organized as follows: Next section describes more
++details of Linux perf scheduler as it takes a key role in vPMU
++implementation and allocates PMU resources for guest usage. Then Arch
++PMU virtualization and LBR virtualization are introduced, each feature
++has sections to introduce implementation overview,  the expectation and
++gaps when host and guest perf events coexist.
++
++2. Perf Scheduler
++=================
++
++Perf scheduler's responsibility is choosing which events are active at
++one moment and binding counter with perf event. As processor has limited
++PMU counters and other resource, only limited perf events can be active
++at one moment, the inactive perf event may be active in the next moment,
++perf scheduler has defined rules to control these things.
++
++Usually the following cases cause perf event reschedule:
++1) On a context switch from one task to a different task.
++2) When an event is manually enabled.
++3) A call to perf_event_open() with disabled field of the
++perf_event_attr argument set to 0.
++
++When perf event reschedule is needed on a specific cpu, perf will send
++an IPI to the target cpu, and the IPI handler will activate events
++ordered by event type, and will iterate all the eligible events.
++
++When a perf event is sched out, this event mapped counter is disabled,
++and the counter's setting and count value are saved. When a perf event
++is sched in, perf driver assigns a counter to this event, the counter's
++setting and count values are restored from last saved.
++
++Perf defines four types event, their priority are from high to low:
++a. Per-cpu pinned: the event should be measured on the specified logical
++core whenever it is enabled.
++b. Per-process pinned: the event should be measured whenever it is
++enabled and the process is running on any logical cores.
++c. Per-cpu flexible: the event should measured on the specified logical
++core whenever it is enabled.
++d. Per-process flexible: the event should be measured whenever it is
++enabled and the process is running on any logical cores.
++
++If the event could not be scheduled because no resource is available for
++it, pinned event goes into error state and is excluded from perf
++scheduler, the only way to recover it is re-enable it, flexible event
++goes into inactive state and can be multiplexed with other events if
++needed.
++
++3. Arch PMU virtualization
++==========================
++
++3.1. Overview
++-------------
++
++Once KVM/QEMU expose vcpu's Arch PMU capability into guest, the guest
++PMU driver would access the Arch PMU MSRs (including Fixed and GP
++counter) as the host does. All the guest Arch PMU MSRs accessing are
++interceptable.
++
++When a guest virtual counter is enabled through guest MSR writing, the
++KVM trap will create a kvm perf event through the perf subsystem. The
++kvm perf event's attribute is gotten from the guest virtual counter's
++MSR setting.
++
++When a guest changes the virtual counter's setting later, the KVM trap
++will release the old kvm perf event then create a new kvm perf event
++with the new setting.
++
++When guest read the virtual counter's count number, the kvm trap will
++read kvm perf event's counter value and accumulate it to the previous
++counter value.
++
++When guest no longer access the virtual counter's MSR within a
++scheduling time slice and the virtual counter is disabled, KVM will
++release the kvm perf event.
++  ----------------------------
++  |  Guest                   |
++  |  perf subsystem          |
++  ----------------------------
++       |            ^
++  vMSR |            | vPMI
++       v            |
++  ----------------------------
++  |  vPMU        KVM vCPU    |
++  ----------------------------
++        |          ^
++  Call  |          | Callbacks
++        v          |
++  ---------------------------
++  | Host Linux Kernel       |
++  | perf subsystem          |
++  ---------------------------
++               |       ^
++           MSR |       | PMI
++               v       |
++         --------------------
++	 | PMU        CPU   |
++         --------------------
++
++Each guest virtual counter has a corresponding kvm perf event, and the
++kvm perf event joins host perf scheduler and complies with host perf
++scheduler rule. When kvm perf event is scheduled by host perf scheduler
++and is active, the guest virtual counter could supply the correct value.
++However, if another host perf event comes in and takes over the kvm perf
++event resource, the kvm perf event will be inactive, then the virtual
++counter supplies wrong and meaningless value.
++
++3.2. Host and Guest perf event contention
++-----------------------------------------
++
++Kvm perf event is a per-process pinned event, its priority is second.
++When kvm perf event is active, it can be preempted by host per-cpu
++pinned perf event, or it can preempt host flexible perf events. Such
++preemption can be temporarily prohibited through disabling host IRQ.
++
++The following results are expected when host and guest perf event
++coexist according to perf scheduler rule:
++1). if host per cpu pinned events occupy all the HW resource, kvm perf
++event can not be active as no available resource, the virtual counter
++value is  zero always when the guest read it.
++2). if host per cpu pinned event release HW resource, and kvm perf event
++is inactive, kvm perf event can claim the HW resource and switch into
++active, then the guest can get the correct value from the guest virtual
++counter during kvm perf event is active, but the guest total counter
++value is not correct since counter value is lost during kvm perf event
++is inactive.
++3). if kvm perf event is active, then host per cpu pinned perf event
++becomes active and reclaims kvm perf event resource, kvm perf event will
++be inactive. Finally the virtual counter value is kept unchanged and
++stores previous saved value when the guest reads it. So the guest toatal
++counter isn't correct.
++4). If host flexible perf events occupy all the HW resource, kvm perf
++event can be active and preempts host flexible perf event resource,
++guest can get the correct value from the guest virtual counter.
++5). if kvm perf event is active, then other host flexible perf events
++request to active, kvm perf event still own the resource and active, so
++guest can get the correct value from the guest virtual counter.
++
++3.3. vPMU Arch Gaps
++-------------------
++
++The coexist of host and guest perf events has gap:
++1). when guest accesses PMU MSRs at the first time, KVM will trap it and
++create kvm perf event, but this event may be inactive because the
++contention with host perf event. But guest doesn't notice this and when
++guest read virtual counter, the return value is zero.
++2). when kvm perf event is active, host per-cpu pinned perf event can
++reclaim kvm perf event resource at any time once resource contention
++happens. But guest doesn't notice this neither and guest following
++counter accesses get wrong data.
++So maillist had some discussion titled "Reconsider the current approach
++of vPMU".
++
++https://lore.kernel.org/lkml/810c3148-1791-de57-27c0-d1ac5ed35fb8@gmail.com/
++
++The major suggestion in this discussion is host pass-through some
++counters into guest, but this suggestion is not feasible, the reasons
++are:
++a. processor has several counters, but counters are not equal, some
++event must bind with a specific counter.
++b. if a special counter is passthrough into guest, host can not support
++such event and lose some capability.
++c. if a normal counter is passthrough into guest, guest can support
++general event only, and the guest has limited capability.
++So both host and guest lose capability in pass-through mode.
++
++4. LBR Virtualization
++=====================
++
++4.1. Overview
++-------------
++
++The guest LBR driver would access the LBR MSR (including IA32_DEBUGCTLMSR
++and records MSRs) as host does once KVM/QEMU export vcpu's LBR capability
++into guest,  The first guest access on LBR related MSRs is always
++interceptable. The KVM trap would create a vLBR perf event which enables
++the callstack mode and none of the hardware counters are assigned. The
++host perf would enable and schedule this event as usual.
++
++When vLBR event is scheduled by host perf scheduler and is active, host
++LBR MSRs are owned by guest and are pass-through into guest, guest will
++access them without VM Exit. However, if another host LBR event comes in
++and takes over the LBR facility, the vLBR event will be inactive, and
++guest following accesses to the LBR MSRs will be trapped and meaningless.
++
++As kvm perf event, vLBR event will be released when guest doesn't access
++LBR-related MSRs within a scheduling time slice and guest unset LBR
++enable bit, then the pass-through state of the LBR MSRs will be canceled.
++
++4.2. Host and Guest LBR contention
++----------------------------------
++
++vLBR event is a per-process pinned event, its priority is second. vLBR
++event together with host other LBR event to contend LBR resource,
++according to perf scheduler rule, when vLBR event is active, it can be
++preempted by host per-cpu pinned LBR event, or it can preempt host
++flexible LBR event. Such preemption can be temporarily prohibited
++through disabling host IRQ as perf scheduler uses IPI to change LBR owner.
++
++The following results are expected when host and guest LBR event coexist:
++1) If host per cpu pinned LBR event is active when vm starts, the guest
++vLBR event can not preempt the LBR resource, so the guest can not use
++LBR.
++2). If host flexible LBR events are active when vm starts, guest vLBR
++event can preempt LBR, so the guest can use LBR.
++3). If host per cpu pinned LBR event becomes enabled when guest vLBR
++event is active, the guest vLBR event will lose LBR and the guest can
++not use LBR anymore.
++4). If host flexible LBR event becomes enabled when guest vLBR event is
++active, the guest vLBR event keeps LBR, the guest can still use LBR.
++5). If host per cpu pinned LBR event becomes inactive when guest vLBR
++event is inactive, guest vLBR event can be active and own LBR, the guest
++can use LBR.
++
++4.3. vLBR Arch Gaps
++-------------------
++
++Like vPMU Arch Gap, vLBR event can be preempted by host Per cpu pinned
++event at any time, or vLBR event is inactive at creation, but guest
++can not notice this, so the guest will get meaningless value when the
++vLBR event is inactive.
+-- 
+2.25.1
 
