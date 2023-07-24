@@ -2,171 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C7F675FFFE
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 21:47:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF091760031
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 22:01:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbjGXTrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 15:47:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45654 "EHLO
+        id S230263AbjGXUBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 16:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbjGXTrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 15:47:42 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5084E1729;
-        Mon, 24 Jul 2023 12:47:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UbhKd9UmruTDXkqK6NEBVgIN2mWlTUYefFu4gzk+a0ztviD4ZCAVPstqGenq84zTiHk9a5Q50eRBIRL0z3VCZkLNPKh9kvSdHCQPF935+P7fl7KDw1JitHADu7HBR0WfG7Ciev2nGSvKYLzGVUkOKtQBSGqqmuxhWkV17f3jNc8Pgd8PqWEqMo1CIeXQJClhLpKCYQ1EymoZHRjDhrRQkEtHcPmqgYON5a1Z+GMMgtsfHnP4SKZthgLFmfYMu58Hmap/I+HH4tV9jWAqzavABZE5ubmXHGd+DPqVSMJWrpSjcToGWxo8tl6wFQ0CtD9OpwRl4bOfDFud/SaL7z1MhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JDGlmKoEFytc6HdNUFgcPjErrWTIlcH+ptTAeDSJ/wM=;
- b=mbAr18vqi2+IYIdOuUQgdYiEHmF9ALK1dgrAJVwtKlZvgJLw0W3ejwdjG5LLfQm+nuwkdswwJ3B2FYXLBnhkbGunYBh0fGX9cKhnozwR8mrWzWf4G4xYnB7ywYyidB6oGoMLhz3JEUUB09nY5GydVD1WB+Q+Z0zm+hG/Ob6jvQgnvqbxgo4RcvF0ySb3+N0Of0oUEEEMsgLtbgtJsD96agHf1ZSrYuU12+Fi4pcnVDO/290uE22wI6mzJ23Je/138KqYoZuUeGIvy1gVRf8nwK4/R1hB1itBPicAoLa2S/uXk+zldxwMoa267yKLaoSIP2bQKU1qYW5nGT0qvc/1SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JDGlmKoEFytc6HdNUFgcPjErrWTIlcH+ptTAeDSJ/wM=;
- b=Qx3OQIjyW6Z0HbyVazvCm8ffM1GZPggyj7IzUEEEGP0I18t6qOmgzuTxd2s12cRcjxQvuzsGD5FD0Hf4y9Vkyyfg8qV3DH8lAzJ2j3jnqNKYh0zOIZZx4M59QmaQS8J6kjtxYUb2xlOrO+JLkEzwTYlcvCJT/mjgldFm/DINFQuE/CmOW6c3hAjxRikF1slNeizFHILCMtTl+mdnWzI1s46NMXzGGWsBnH1lueDco6xtsVu8wGdnhQlgfbCt/rDa2xbU2vRQktKV9TLfKjm4QQ6i9x7W3GAczlhERtFzK3nW+zOld6r8TJA5jMKV8EXHrq823tJ8kLoqwzY1ExiS0w==
-Received: from DS7PR03CA0092.namprd03.prod.outlook.com (2603:10b6:5:3b7::7) by
- PH7PR12MB5618.namprd12.prod.outlook.com (2603:10b6:510:134::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Mon, 24 Jul
- 2023 19:47:29 +0000
-Received: from DM6NAM11FT095.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b7:cafe::8) by DS7PR03CA0092.outlook.office365.com
- (2603:10b6:5:3b7::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33 via Frontend
- Transport; Mon, 24 Jul 2023 19:47:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- DM6NAM11FT095.mail.protection.outlook.com (10.13.172.180) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.25 via Frontend Transport; Mon, 24 Jul 2023 19:47:29 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 24 Jul 2023
- 12:47:16 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Mon, 24 Jul 2023 12:47:15 -0700
-Received: from Asurada-Nvidia.nvidia.com (10.127.8.11) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.986.37 via Frontend
- Transport; Mon, 24 Jul 2023 12:47:15 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     <jgg@nvidia.com>, <kevin.tian@intel.com>,
-        <alex.williamson@redhat.com>
-CC:     <yi.l.liu@intel.com>, <joro@8bytes.org>, <will@kernel.org>,
-        <robin.murphy@arm.com>, <shuah@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <iommu@lists.linux.dev>,
-        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <mjrosato@linux.ibm.com>, <farman@linux.ibm.com>
-Subject: [PATCH v8 4/4] vfio: Support IO page table replacement
-Date:   Mon, 24 Jul 2023 12:47:07 -0700
-Message-ID: <182b79f3838f84f220ede6089a0326b6f3f44acf.1690226015.git.nicolinc@nvidia.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1690226015.git.nicolinc@nvidia.com>
-References: <cover.1690226015.git.nicolinc@nvidia.com>
+        with ESMTP id S229798AbjGXUBi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 16:01:38 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 371FA139
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:01:37 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-4036bd4fff1so71421cf.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 13:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690228896; x=1690833696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jl5MeJuJjAxGXKAhFzC6oX05QXNcvphfhbANRVK+qck=;
+        b=GG4r0BC37PIz8ancFPPNMnS3x0H3KAsAkXwF+2c1DahOgfRp5Kofi4JD8MQxHBaBTY
+         9NEH+Lg8Z+jQf9x+gCyIDrMNsBrySBzM0KxuTQ8ysgY9aa+cvRjjpNAob3vX/3lzzGv/
+         zlWFDpnP0ryav0bk7HZ6AW0extqW8tdQAJShZqiY/qhgXW9vn4Ak7YT0+7vh91PLdoo/
+         kpwBQ+5tfIHF/I1MXC6zuBBC70dLRAIwu1kMvpcVVuMWwB0SNlI+1e+cbBFoPEXKPKxP
+         IFdugXOftG6UcKJyaal2BiWDWbta5znvtIiF6M5YKArK5QY3aolsgjpTszR82RDBNGlI
+         5y8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690228896; x=1690833696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jl5MeJuJjAxGXKAhFzC6oX05QXNcvphfhbANRVK+qck=;
+        b=dUtXD6scpsVw8t368DB+SHpU4lPUpuB4ObP16oBIjq2k0bdsrzqWPHziKNsmrduKlJ
+         8In6ZU14lfvfhuNHqdfQ9CMo/wW/cuMjLtR3B7DnhHOTbWcRXy16nTrI4zmuwY+5fXVB
+         U7Kjn48JAp09GhWKgH7z77vgrv+NMDd4v7at7KtYDGHIkGFW3z8dSBZcaoNoyJp70EEc
+         02WNUabVuBWpX1HQw5WjxyZw+lgSM9oe4GnWtCCq34bTVVL55R8Jgo7NNHsvR60B4CNS
+         wyijYUMLYL1XnmCDLHQWKuqjJv4xieQYxWDpjOUHxbc1DYBNyc10r9pHsR7vuX90mth1
+         9jxQ==
+X-Gm-Message-State: ABy/qLasGzG3xb727yx8RIOuCAfe2xkU7oVVLwOO6a5vl9uYzGmFvai6
+        F4UdlEjVcpAxf0takysntexoHphqY6JKp1h9L8gMG1bAHtafu26u8wg=
+X-Google-Smtp-Source: APBJJlGemP0CkN9ORNU1xUd19yyneWURMHpShwjwAkWDWnU+1Silam/zQvCl/47hWwbUTNLOV+7IrV6rjQtOUi7jWRs=
+X-Received: by 2002:ac8:5716:0:b0:403:f3f5:1a8 with SMTP id
+ 22-20020ac85716000000b00403f3f501a8mr551111qtw.12.1690228896233; Mon, 24 Jul
+ 2023 13:01:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT095:EE_|PH7PR12MB5618:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4e1edcef-f7d8-483b-163d-08db8c7ed0ac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wy5zMX7JfdUiUmACQomKrUZCU7UHHktjgypg53f2uWK6QnbNlSHKjzUICp3J5TkonW/PZdhZ8JGgxfQjV6FYyfgrxoZc7QGBoqfk4Kbk/Ykx/9NYiP/OsEVLWU0KeUkVgbKc/ghLDNBRV+Kpo9Z05NXBLoL8g+tw09+HpQ1OxxRhKEBkomjq4R0Xxer7/JMI9X5L4rgk7pgDcqCRa3hZFVNGehIyFPy2sNKj4qimzDfUX9LGojqKVQca0Jx4wjAMs7CLGwNRU50kKeuBSM9ES99vdQWAYWbRHMCCZPSdUdyWnKkWxfBODyALjQV/zT/KugCqVLK2JkkkTepZb6Zan25c9CLlVD0aCIysxfJYzAEd+fvt0zLawP0Uqb3o+EHJW+838G4eCe5ZhGtMp8OiPsgsVZpR9sgp884IqovhuNraBRInJWJEzqRw3p+extGLD6m3i8+PZ0nc4AW4J7dSCsdoxMoP1ta6UlJuzjTPeCQaw6WSjdm2y+1v2G1cUdZG7pCnjfKESUohljXfOrC1l2zOrXvhFAoOgs3MPSgPgMHbIawR9BivxKLLCdaWfyw2J/Pk8kIWvCDneekWCIhzzj2xr18gYzxn5digcR0uYbCC+CLyoFiO3sHWvCDzjOuUtyXOwy+atIdUh2tbsncis49f6Gm69ECUaJUnfmFAKRGSqMku30SgJEYgWPgf2p2aNz11S3pMSa3h+j9uHR2hs7OgriyZqDdvGbM2B3d9YWPLU5BWNT9EJurJ0VjUA0FM
-X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(396003)(376002)(346002)(451199021)(82310400008)(36840700001)(40470700004)(46966006)(7696005)(110136005)(54906003)(478600001)(6666004)(83380400001)(47076005)(36860700001)(36756003)(86362001)(40460700003)(426003)(40480700001)(2906002)(336012)(2616005)(186003)(26005)(82740400003)(7636003)(70206006)(4326008)(356005)(41300700001)(8936002)(70586007)(7416002)(316002)(5660300002)(8676002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 19:47:29.6357
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e1edcef-f7d8-483b-163d-08db8c7ed0ac
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT095.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5618
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <ZLiUrP9ZFMr/Wf4/@chao-email> <CALMp9eTQ5zDpjK+=e+Rhu=zvLv_f0scqkUCif2tveq+ahTAYCg@mail.gmail.com>
+ <ZLjqVszO4AMx9F7T@chao-email> <CALMp9eSw9g0oRh7rT=Nd5aTwiu_zMz21tRrZG5D_QEfTn1h=HQ@mail.gmail.com>
+ <ZLn9hgQy77x0hLil@chao-email> <20230721190114.xznm7xfnuxciufa3@desk>
+ <CALMp9eTNM5VZzpSR6zbkjude6kxgBcOriWDoSkjanMmBtksKYw@mail.gmail.com>
+ <20230721205404.kqxj3pspexjl6qai@desk> <CALMp9eSqe09RgwTQUe5Qi15E+Q+wm1QhO5P5-ryvF9OzV9gR0w@mail.gmail.com>
+ <20230721222904.y3nabprqdk3aa555@desk> <20230724192540.xp4qulsufqmjwki3@desk>
+In-Reply-To: <20230724192540.xp4qulsufqmjwki3@desk>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 24 Jul 2023 13:01:25 -0700
+Message-ID: <CALMp9eSVpdT2v_FzN+Sk=BHamVzLQwRvZvB-GjfMawJ2ZDmdPQ@mail.gmail.com>
+Subject: Re: KVM's sloppiness wrt IA32_SPEC_CTRL and IA32_PRED_CMD
+To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now both the physical path and the emulated path should support an IO page
-table replacement. Call iommufd_device_replace/iommufd_access_replace(),
-when vdev->iommufd_attached is true.
+On Mon, Jul 24, 2023 at 12:26=E2=80=AFPM Pawan Gupta
+<pawan.kumar.gupta@linux.intel.com> wrote:
+>
+> On Fri, Jul 21, 2023 at 03:29:04PM -0700, Pawan Gupta wrote:
+> > On Fri, Jul 21, 2023 at 03:18:12PM -0700, Jim Mattson wrote:
+> > > On Fri, Jul 21, 2023 at 1:54=E2=80=AFPM Pawan Gupta
+> > > <pawan.kumar.gupta@linux.intel.com> wrote:
+> > > >
+> > > > On Fri, Jul 21, 2023 at 12:18:36PM -0700, Jim Mattson wrote:
+> > > > > > Please note that clearing STIBP bit on one thread does not disa=
+ble STIBP
+> > > > > > protection if the sibling has it set:
+> > > > > >
+> > > > > >   Setting bit 1 (STIBP) of the IA32_SPEC_CTRL MSR on a logical =
+processor
+> > > > > >   prevents the predicted targets of indirect branches on any lo=
+gical
+> > > > > >   processor of that core from being controlled by software that=
+ executes
+> > > > > >   (or executed previously) on another logical processor of the =
+same core
+> > > > > >   [1].
+> > > > >
+> > > > > I stand corrected. For completeness, then, is it true now and
+> > > > > forevermore that passing IA32_SPEC_CTRL through to the guest for =
+write
+> > > > > can in no way compromise code running on the sibling thread?
+> > > >
+> > > > As IA32_SPEC_CTRL is a thread-scope MSR, a malicious guest would be=
+ able
+> > > > to turn off the mitigation on its own thread only. Looking at the
+> > > > current controls in this MSR, I don't see how a malicious guest can
+> > > > compromise code running on sibling thread.
+> > >
+> > > Does this imply that where core-shared resources are affected (as wit=
+h
+> > > STIBP), the mitigation is enabled whenever at least one thread
+> > > requests it?
+> >
+> > Let me check with CPU architects.
+>
+> For the controls present in IA32_SPEC_CTRL MSR, if atleast one of the
+> thread has the mitigation enabled, current CPUs do not disable core-wide
+> mitigations when core-shared resources are affected.
+>
+> This will be the guiding principle for future mitigation controls that
+> may be added to IA32_SPEC_CTRL MSR.
 
-Also update the VFIO_DEVICE_ATTACH_IOMMUFD_PT kdoc in the uAPI header.
-
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
----
- drivers/vfio/iommufd.c    | 11 ++++++-----
- include/uapi/linux/vfio.h |  6 ++++++
- 2 files changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-index 4d84904fd927..82eba6966fa5 100644
---- a/drivers/vfio/iommufd.c
-+++ b/drivers/vfio/iommufd.c
-@@ -146,9 +146,9 @@ int vfio_iommufd_physical_attach_ioas(struct vfio_device *vdev, u32 *pt_id)
- 		return -EINVAL;
- 
- 	if (vdev->iommufd_attached)
--		return -EBUSY;
--
--	rc = iommufd_device_attach(vdev->iommufd_device, pt_id);
-+		rc = iommufd_device_replace(vdev->iommufd_device, pt_id);
-+	else
-+		rc = iommufd_device_attach(vdev->iommufd_device, pt_id);
- 	if (rc)
- 		return rc;
- 	vdev->iommufd_attached = true;
-@@ -223,8 +223,9 @@ int vfio_iommufd_emulated_attach_ioas(struct vfio_device *vdev, u32 *pt_id)
- 	lockdep_assert_held(&vdev->dev_set->lock);
- 
- 	if (vdev->iommufd_attached)
--		return -EBUSY;
--	rc = iommufd_access_attach(vdev->iommufd_access, *pt_id);
-+		rc = iommufd_access_replace(vdev->iommufd_access, *pt_id);
-+	else
-+		rc = iommufd_access_attach(vdev->iommufd_access, *pt_id);
- 	if (rc)
- 		return rc;
- 	vdev->iommufd_attached = true;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index fa06e3eb4955..537157ff8670 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -939,6 +939,12 @@ struct vfio_device_bind_iommufd {
-  * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.  This is only
-  * allowed on cdev fds.
-  *
-+ * If a vfio device is currently attached to a valid hw_pagetable, without doing
-+ * a VFIO_DEVICE_DETACH_IOMMUFD_PT, a second VFIO_DEVICE_ATTACH_IOMMUFD_PT ioctl
-+ * passing in another hw_pagetable (hwpt) id is allowed. This action, also known
-+ * as a hw_pagetable replacement, will replace the device's currently attached
-+ * hw_pagetable with a new hw_pagetable corresponding to the given pt_id.
-+ *
-  * Return: 0 on success, -errno on failure.
-  */
- struct vfio_device_attach_iommufd_pt {
--- 
-2.41.0
-
+Excellent. Thank you!
