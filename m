@@ -2,68 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 269CF75ED95
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 10:30:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3043375EE0C
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 10:43:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbjGXIaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 04:30:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57982 "EHLO
+        id S230235AbjGXImx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 04:42:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231551AbjGXIaO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 04:30:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B44131
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 01:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690187367;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6DNzHbGom77n0zpxl+676gi9KyXFJ85R3IBrxW//ask=;
-        b=K8kmA+7dSOblqZadST5t/3eJ4VGRbLlp2oUN00eDKQIGR1spm5Nq6A62il1JjEuSuAsXqS
-        Ayrgda/ypu7909N1w+mpX/4k8cAz65W8GdjoY+PzWfw8++1t+K8fY9y7XvzynL/Nga5U8u
-        zKKZLBt4bcAzaB8KQCQr7xheqKWBmZs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-HwkyBeAJPT2St7bB8gNKiw-1; Mon, 24 Jul 2023 04:29:25 -0400
-X-MC-Unique: HwkyBeAJPT2St7bB8gNKiw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fd2dec82a6so11053555e9.3
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 01:29:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690187365; x=1690792165;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6DNzHbGom77n0zpxl+676gi9KyXFJ85R3IBrxW//ask=;
-        b=Eujhl5iuPswNblDTafeInFFJncnE7obiBhhQcd+ZKacYjYK1xSd7RMwX02GeyGOsGt
-         PDCy+hXyLNKu1XtNMTja8m6MGqeyOsJRjKcALgBfg5KqC5fyvJisA7p2++cyC4ees3jF
-         aktI2Zow26D61uk7jqOg9MU+UUL2SzccfaxsZQ9Qy/esIaHkhV3v7Jrh6UeQPN22hDX4
-         A3+f3AAuIrCSHS40ucsgEKSJGaFUNSRPz6X4axJc69yRa52SgC1h15bX0MYxpa8CTrho
-         VTojOS9iBXDTeffZFm9QAHmxUmJRmOm85yPw8dshw94rJFXR7Uj4yKwy36yyQ4RsEFYp
-         0kqA==
-X-Gm-Message-State: ABy/qLZQOKxyOEa0wUY6O+FDKS1U+caOu88EAu+gitdbt7A3W3pITJVI
-        RLV77XP9TYDLXDLxra1ZVXA4Cx05Wvi2TJXMQR+g481p/oWksXT2eNHqZZlIrY0J+NwRT7rD8mi
-        jlcg7Qs0ImIxD
-X-Received: by 2002:a05:600c:2308:b0:3f7:3991:e12e with SMTP id 8-20020a05600c230800b003f73991e12emr7402833wmo.1.1690187364802;
-        Mon, 24 Jul 2023 01:29:24 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFJflnC/NPtGCRbFCR9C92TkIUPD7R5nWkt94QfcSqyyptU/48AkbkWHtvlGEwx8uIuiIpKVQ==
-X-Received: by 2002:a05:600c:2308:b0:3f7:3991:e12e with SMTP id 8-20020a05600c230800b003f73991e12emr7402823wmo.1.1690187364547;
-        Mon, 24 Jul 2023 01:29:24 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f45:d000:62f2:4df0:704a:e859? (p200300d82f45d00062f24df0704ae859.dip0.t-ipconnect.de. [2003:d8:2f45:d000:62f2:4df0:704a:e859])
-        by smtp.gmail.com with ESMTPSA id n11-20020a7bcbcb000000b003fba92fad35sm12223151wmi.26.2023.07.24.01.29.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 01:29:24 -0700 (PDT)
-Message-ID: <dbf871ad-1768-18d0-318f-86df33df7446@redhat.com>
-Date:   Mon, 24 Jul 2023 10:29:22 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 5/6] KVM: s390: interrupt: Fix single-stepping ISKE
-Content-Language: en-US
-To:     Ilya Leoshkevich <iii@linux.ibm.com>,
+        with ESMTP id S231764AbjGXImo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 04:42:44 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EEEA1B0;
+        Mon, 24 Jul 2023 01:42:40 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36O8ciXG008251;
+        Mon, 24 Jul 2023 08:42:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Tl3gZDNEYEdaaWPNDlvcc/ynd3f2Kaa18xX8M0dcUCs=;
+ b=fWHdsvFvy9bcpo9EMsZBCHLMb8CUxBz/5powdiPN2aMmfFXdHjDfBpxh4japBh2/yAfl
+ 05tx9OB5gja1/Fg9SzXVFxow8+K+SffokMGdWm+dnigVt0tSzhSUZ+ZNj+qa2L5gJ08k
+ Ez0LOluo2Efc4pX+0Y5rKNpXscuxGps2nLIzNcHoSweqKXaO6aRTNgInbjp3n/e6HMr2
+ TWLuu8IGb1MBsSPy5jOE55PfHBI68TMLZWDVxOTNAcK90vWzw9x71R1tvyzQBWHsOz13
+ Ufhgk+ZhYtYaj7DUhw5XKuvzjL3b308G1g9PRKPH2Aw/b2V4nrhDcYpdKsA1vvgFfmd0 yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1na5sd3s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jul 2023 08:42:39 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36O8dmQs015789;
+        Mon, 24 Jul 2023 08:42:38 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s1na5sd3n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jul 2023 08:42:38 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36O8AocI014374;
+        Mon, 24 Jul 2023 08:42:38 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0stxhw8p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Jul 2023 08:42:37 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36O8gUSD41025910
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jul 2023 08:42:30 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71B872004B;
+        Mon, 24 Jul 2023 08:42:30 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A2DD320040;
+        Mon, 24 Jul 2023 08:42:29 +0000 (GMT)
+Received: from [9.171.11.212] (unknown [9.171.11.212])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Jul 2023 08:42:29 +0000 (GMT)
+Message-ID: <5394773f1d872f086625439cc515c50d2374a161.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 1/6] KVM: s390: interrupt: Fix single-stepping into
+ interrupt handlers
+From:   Ilya Leoshkevich <iii@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
@@ -73,54 +71,95 @@ To:     Ilya Leoshkevich <iii@linux.ibm.com>,
 Cc:     Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jens Freimann <jfreimann@redhat.com>
+Date:   Mon, 24 Jul 2023 10:42:29 +0200
+In-Reply-To: <af7be3a9-816c-95dc-22a7-cf62fe245e24@redhat.com>
 References: <20230721120046.2262291-1-iii@linux.ibm.com>
- <20230721120046.2262291-6-iii@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20230721120046.2262291-6-iii@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+         <20230721120046.2262291-2-iii@linux.ibm.com>
+         <af7be3a9-816c-95dc-22a7-cf62fe245e24@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: lH8mSE8-vi8w9qjBzkIvWsWq2c-CVSe-
+X-Proofpoint-GUID: BR_enPOzDeuT2q3BI4IzaoEzZFpnBdDf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-24_06,2023-07-20_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ mlxlogscore=974 bulkscore=0 malwarescore=0 suspectscore=0 impostorscore=0
+ spamscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307240075
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.07.23 13:57, Ilya Leoshkevich wrote:
-> kvm_s390_skey_check_enable() does not emulate any instructions, rather,
-> it clears CPUSTAT_KSS and arranges for ISKE to run again. Therefore,
-> skip the PER check and let ISKE run happen. Otherwise a debugger will
-> see two single-step events on the same ISKE.
-> 
-> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
-> ---
->   arch/s390/kvm/intercept.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index d2f7940c5d03..8793cec066a6 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -630,8 +630,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
->   		rc = handle_partial_execution(vcpu);
->   		break;
->   	case ICPT_KSS:
-> -		rc = kvm_s390_skey_check_enable(vcpu);
-> -		break;
-> +		return kvm_s390_skey_check_enable(vcpu);
->   	case ICPT_MCHKREQ:
->   	case ICPT_INT_ENABLE:
->   		/*
+On Mon, 2023-07-24 at 10:22 +0200, David Hildenbrand wrote:
+> On 21.07.23 13:57, Ilya Leoshkevich wrote:
+> > After single-stepping an instruction that generates an interrupt,
+> > GDB
+> > ends up on the second instruction of the respective interrupt
+> > handler.
+> >=20
+> > The reason is that vcpu_pre_run() manually delivers the interrupt,
+> > and
+> > then __vcpu_run() runs the first handler instruction using the
+> > CPUSTAT_P flag. This causes a KVM_SINGLESTEP exit on the second
+> > handler
+> > instruction.
+> >=20
+> > Fix by delaying the KVM_SINGLESTEP exit until after the manual
+> > interrupt delivery.
+> >=20
+> > Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
+> > ---
+> > =C2=A0 arch/s390/kvm/interrupt.c | 10 ++++++++++
+> > =C2=A0 arch/s390/kvm/kvm-s390.c=C2=A0 |=C2=A0 4 ++--
+> > =C2=A0 2 files changed, 12 insertions(+), 2 deletions(-)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+[...]
+>=20
 
--- 
-Cheers,
+> Can we add a comment like
+>=20
+> /*
+> =C2=A0 * We delivered at least one interrupt and modified the PC. Force a
+> =C2=A0 * singlestep event now.
+> =C2=A0 */
 
-David / dhildenb
+Ok, will do.
 
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (delivered && guestdbg_ss=
+tep_enabled(vcpu)) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0struct kvm_debug_exit_arch *debug_exit =3D &vcpu-
+> > >run->debug.arch;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0debug_exit->addr =3D vcpu->arch.sie_block->gpsw.addr;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0debug_exit->type =3D KVM_SINGLESTEP;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0vcpu->guest_debug |=3D KVM_GUESTDBG_EXIT_PENDING;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+>=20
+> I do wonder if we, instead, want to do this whenever we modify the
+> PSW.
+>=20
+> That way we could catch any PC changes and only have to add checks
+> for=20
+> guestdbg_exit_pending().
+
+Wouldn't this break a corner case where the first instruction of the
+interrupt handler causes the same interrupt?
+
+> But this is simpler and should work as well.
+>=20
+> Acked-by: David Hildenbrand <david@redhat.com>
