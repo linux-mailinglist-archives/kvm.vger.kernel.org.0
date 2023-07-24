@@ -2,198 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8D8075F532
-	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 13:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20CBC75F58A
+	for <lists+kvm@lfdr.de>; Mon, 24 Jul 2023 13:57:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbjGXLen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 07:34:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52764 "EHLO
+        id S230091AbjGXL5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 07:57:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbjGXLeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 07:34:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC6B02695
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 04:33:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690198364;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EXJhrkLdNOLUHGZbbc+F0hjfqb3hPCsrY6WTn8MVyN8=;
-        b=IKMGMDoBf5Q4TRF+J45GToUGxW8KJvD5bGgLyJeeLFh25nplZJDxAd3SInz6BrXVMcuVby
-        hYYnA1MfyF7PRcydtsYPxyA9Zv0hniuCao8nXh20+jsSTaAkzAhJk2Wn0xOxzvlNoVm9B7
-        dKLPBtMs43iUq3LlMZkcsIFwzQ66bYY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-fIbrmWFsNbqrog9nKbrlDw-1; Mon, 24 Jul 2023 07:32:43 -0400
-X-MC-Unique: fIbrmWFsNbqrog9nKbrlDw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31701b27d19so2227290f8f.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 04:32:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690198362; x=1690803162;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EXJhrkLdNOLUHGZbbc+F0hjfqb3hPCsrY6WTn8MVyN8=;
-        b=YDr3CAXrr2lEpl0PFf3jQ2nhJwnEcz4H4SJ1FsPebCs3ClyGZr/9QhXt9EsDjFSLt9
-         pofjeutSHO9cdRFQmqcFo4itzIIa68OU/XUlOMVK3t/7/OO0Eqeev6VtYm//Cmu14gkQ
-         X2S412fV0jXRt9rJzLG0IaoKaBw5yfwpAXZA3j56dwYvmvZcBZdAA3J1JTzHM+w5lOXE
-         Uq4NV5R7iR4gR4lS3012JoXwhUHBOcy9QXgnD5h7EiRZGNQSX91AHExccpmh18qICD/L
-         BYZTAoeJwS5sSXKGP9Pe2elnMoeQx6HVXllFioRxa28qKG5I5wsn5HTWaTM7aXAg+0cP
-         9H4A==
-X-Gm-Message-State: ABy/qLYqfxNW9vnm0XtUNrnmuk3IU63rkM3dNKjNEyfQON5lMX4o9xs3
-        UKpGL6v7jbqkEFBUgyFU0AuxpmYathvd3+DLXefoe3OCpxwuBYPnCJX3LD9HBAZ7g/ydAil0bEI
-        QecqeAU46J89u
-X-Received: by 2002:a5d:4ec5:0:b0:314:98f:2495 with SMTP id s5-20020a5d4ec5000000b00314098f2495mr7489859wrv.12.1690198362016;
-        Mon, 24 Jul 2023 04:32:42 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEI60yM7OEQYltk8pZJRHHkHj4AM6BZ+3LNkwODYxQy3aj86Uaqvq9RfiI7soFJIBmCEAmJvQ==
-X-Received: by 2002:a5d:4ec5:0:b0:314:98f:2495 with SMTP id s5-20020a5d4ec5000000b00314098f2495mr7489803wrv.12.1690198361680;
-        Mon, 24 Jul 2023 04:32:41 -0700 (PDT)
-Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id w7-20020a5d4047000000b00313f61889ecsm12615302wrp.66.2023.07.24.04.32.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 04:32:41 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-trace-kernel@vger.kernel.org" 
-        <linux-trace-kernel@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, bpf <bpf@vger.kernel.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 20/20] x86/mm, mm/vmalloc: Defer
- flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-In-Reply-To: <188AEA79-10E6-4DFF-86F4-FE624FD1880F@vmware.com>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-21-vschneid@redhat.com>
- <188AEA79-10E6-4DFF-86F4-FE624FD1880F@vmware.com>
-Date:   Mon, 24 Jul 2023 12:32:38 +0100
-Message-ID: <xhsmh8rb5tui1.mognet@vschneid.remote.csb>
+        with ESMTP id S229522AbjGXL5A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 07:57:00 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0CD28E5D;
+        Mon, 24 Jul 2023 04:56:57 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.43])
+        by gateway (Coremail) with SMTP id _____8AxV_EHZ75k5jEJAA--.23479S3;
+        Mon, 24 Jul 2023 19:56:55 +0800 (CST)
+Received: from [10.20.42.43] (unknown [10.20.42.43])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx7yPzZr5koiM5AA--.49373S3;
+        Mon, 24 Jul 2023 19:56:54 +0800 (CST)
+Message-ID: <49618cce-8c3f-7f25-20b1-eecfc3c70cd0@loongson.cn>
+Date:   Mon, 24 Jul 2023 19:56:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 4/9] PCI/VGA: Improve the default VGA device selection
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Sui Jingfeng <sui.jingfeng@linux.dev>
+Cc:     David Airlie <airlied@gmail.com>, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Pan Xinhui <Xinhui.Pan@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        Lyude Paul <lyude@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Hawking Zhang <Hawking.Zhang@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        YiPeng Chai <YiPeng.Chai@amd.com>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        Likun Gao <Likun.Gao@amd.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jani Nikula <jani.nikula@intel.com>
+References: <20230719193233.GA511659@bhelgaas>
+Content-Language: en-US
+From:   suijingfeng <suijingfeng@loongson.cn>
+In-Reply-To: <20230719193233.GA511659@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: AQAAf8Cx7yPzZr5koiM5AA--.49373S3
+X-CM-SenderInfo: xvxlyxpqjiv03j6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7Jw43KrW8JrWxXw17Wr13KFX_yoWfKrX_CF
+        sYvrZrCa15ur1xJFyUtw4fZF1SgrWaqrZ8JFW8Wa9aq34YgasxJrZYgry0qF1SgFWkJr4D
+        W3WUAa13u3s0gosvyTuYvTs0mTUanT9S1TB71UUUUbDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+        s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+        cSsGvfJTRUUUbqAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+        vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+        w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+        W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+        6r4UJVWxJr1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+        xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
+        6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+        1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWrXVW3AwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUtVW8ZwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Wrv_Gr1UMIIY
+        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+        v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUD1EEUU
+        UUU
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/07/23 18:15, Nadav Amit wrote:
->> On Jul 20, 2023, at 9:30 AM, Valentin Schneider <vschneid@redhat.com> wr=
-ote:
->>
->> vunmap()'s issued from housekeeping CPUs are a relatively common source =
-of
->> interference for isolated NOHZ_FULL CPUs, as they are hit by the
->> flush_tlb_kernel_range() IPIs.
->>
->> Given that CPUs executing in userspace do not access data in the vmalloc
->> range, these IPIs could be deferred until their next kernel entry.
->
-> So I think there are a few assumptions here that it seems suitable to con=
-firm
-> and acknowledge the major one in the commit log (assuming they hold).
->
-> There is an assumption that VMAP page-tables are not freed. I actually
-> never paid attention to that, but skimming the code it does seem so. To
-> clarify the issue: if page-tables were freed and their pages were reused,
-> there would be a problem that page-walk caches for instance would be used
-> and =E2=80=9Cjunk=E2=80=9D entries from the reused pages would be used. S=
-ee [1].
->
+Hi,
 
-Thanks for looking into this and sharing context. This is an area I don't
-have much experience with, so help is much appreciated!
 
-Indeed, accessing addresses that should be impacted by a TLB flush *before*
-executing the deferred flush is an issue. Deferring sync_core() for
-instruction patching is a similar problem - it's all in the shape of
-"access @addr impacted by @operation during kernel entry, before actually
-executing @operation".
+I was too hurry reply to you. I'm may miss the point for part of your 
+reviews, Sorry.
 
-AFAICT the only reasonable way to go about the deferral is to prove that no
-such access happens before the deferred @operation is done. We got to prove
-that for sync_core() deferral, cf. PATCH 18.
 
-I'd like to reason about it for deferring vunmap TLB flushes:
+On 2023/7/20 03:32, Bjorn Helgaas wrote:
+> CONFIG_DRM_AST is a tristate.  We're talking about identifying the
+> boot-time console device.
 
-What addresses in VMAP range, other than the stack, can early entry code
-access? Yes, the ranges can be checked at runtime, but is there any chance
-of figuring this out e.g. at build-time?
+Yes, my patch will only works *after* the module gets loaded successfully.
 
-> I would also assume the memory-hot-unplug of some sorts is not an issue,
-> (i.e., you cannot have a stale TLB entry pointing to memory that was
-> unplugged).
->
-> I also think that there might be speculative code execution using stale
-> TLB entries that would point to memory that has been reused and perhaps
-> controllable by the user. If somehow the CPU/OS is tricked to use the
-> stale executable TLB entries early enough on kernel entry that might be
-> an issue. I guess it is probably theoretical issue, but it would be helpf=
-ul
-> to confirm.
->
-> In general, deferring TLB flushes can be done safely. This patch, I think,
-> takes it one step forward and allows the reuse of the memory before the T=
-LB
-> flush is actually done. This is more dangerous.
->
-> [1] https://lore.kernel.org/lkml/tip-b956575bed91ecfb136a8300742ecbbf4514=
-71ab@git.kernel.org/
+But generally, vgaarb will select a default boot device before my patch taking into effect.
+
+I means that vgaarb will select a default boot device by calling vga_arbiter_add_pci_device() function.
+
+
+In practice, I still not notice any obvious problems.
+
+I'm lack the knowledge about the boot-time console,
+
+what is the potential problems with such a condition?
+
+
+>   So if CONFIG_DRM_AST=m, I guess we don't
+> get the benefit of the new callback unless the module gets loaded?
+
+Yes, my approach will not works until the device driver kernel module 
+gets loaded successfully.
+
+So what's the problem with such a situation, do you see something weird ?
 
