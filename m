@@ -2,197 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 364A9761882
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 14:40:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37422761896
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 14:45:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232663AbjGYMkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 08:40:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57010 "EHLO
+        id S233187AbjGYMpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 08:45:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229780AbjGYMkI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 08:40:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9A79D
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:39:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690288765;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C0L81qzAix0/zgzaASRrrWq5Ht6GiafQqJmF+ctDLSM=;
-        b=LAOeFqNqAW/IrAclae8uratGgLMpkWxpctkKNC0Mj1XCXnN2sLkpWlwyXkfgOEN3aoeYG4
-        t+aM0pvUhnaNOEbqVAhtBV77jdRtKSiioMsGJB0bcJ8Jz1VnsHNlj9yxqlMvyqmgC0ZTe/
-        B8UlCE/kGqcx1X/6D+GS4Uk/CCYKGM8=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-258-2w0iofWRNbCwBPkyI5Hf4w-1; Tue, 25 Jul 2023 08:39:24 -0400
-X-MC-Unique: 2w0iofWRNbCwBPkyI5Hf4w-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5222d1b5b1cso2769631a12.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:39:24 -0700 (PDT)
+        with ESMTP id S229496AbjGYMpB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 08:45:01 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F499D
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:44:59 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-991ef0b464cso1393552866b.0
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:44:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1690289098; x=1690893898;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DVe5kbgnFh2Y4eGHfjCzHKbLu04TQkYMB7dsKJm3Umo=;
+        b=GpcyljcjU7Qr5dRNNYfizZwrwBd4cnjkvyHTuvC/QsN3XiYBpHJim9y0Fwhwc12FfD
+         aXUdwC4S44xNeyqhfcrwKMKZn14++9A7dS881Sg+Nm6Rp55TRzJuABW3jgcxoetQ82KS
+         rdPHpg0b0w+Cu7zrIR6V80QMY49a17Up7GMpMri0hlbFbJ/e85dQN/8v9LUhnjzptMP2
+         I1rLEsN8NAbBHL6D2Z4ZsHzrPphtmuQjq1BmY4zHbzxWwUm57J72SMevDz7P6ChP9tkh
+         1bWV1k8SOuFyF7PNNO2I0iyrpY/3VczpraJ9h6dwsNUtCnP2hQGAMKzOgSjG1qKB+O+3
+         SQ1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690288763; x=1690893563;
+        d=1e100.net; s=20221208; t=1690289098; x=1690893898;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C0L81qzAix0/zgzaASRrrWq5Ht6GiafQqJmF+ctDLSM=;
-        b=aUghTAqaSERWA/kG+tCJAeIIZME3fzfNmJTOLLY194dyGc2aXQKRoMEI5t+RkZ+dGS
-         jE8u9hPmkZOmWtYDMu4HrMTHBsFY1CAAWoxR2jiQwHS7LU36kN0Wh1fI4OEDlQxo/FtH
-         WHXUsQcD9ombXYrbsMoBuxp6+kOJLaMLuQNSrh3ekEKOAgDvExBky0PZ8G6oQqiobQ11
-         5zRARbWpDTJDsE0iswB5Yf95uAxjxBAgjRRbgbEyWXBY2xAVGkYXLXV0zTilMHW61IWU
-         KR36fLp7+fc2wCJbV7hTlhefY992nWMXjrTKjk23zSj1WwJ4vbiIKmtKPfF9ZnIdBsvM
-         loKw==
-X-Gm-Message-State: ABy/qLZYbNlEMKcCB/uT4KupoAo+FrS/6LZ1pr7/nDUT16qA1EH/Oyod
-        HssLXLZCeZpdpUmJhoohZMfeEzWd1dh4U+J83brO82ksUk01PPk5mGP2NhQEexx7dIA5Y2Gr/b8
-        aW517kfVRIDeh
-X-Received: by 2002:a05:6402:7da:b0:521:d2ab:e4df with SMTP id u26-20020a05640207da00b00521d2abe4dfmr2242339edy.19.1690288763016;
-        Tue, 25 Jul 2023 05:39:23 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEZbT/9sLf9SJUi2km6xKCfsN6lBnNmF8+myjdUi1f+mFGkC/VPgqG8v9x7Cn7VgrIjISJYxQ==
-X-Received: by 2002:a05:6402:7da:b0:521:d2ab:e4df with SMTP id u26-20020a05640207da00b00521d2abe4dfmr2242326edy.19.1690288762712;
-        Tue, 25 Jul 2023 05:39:22 -0700 (PDT)
-Received: from redhat.com ([2.55.164.187])
-        by smtp.gmail.com with ESMTPSA id kg13-20020a17090776ed00b009929ab17be0sm8168056ejc.162.2023.07.25.05.39.19
+        bh=DVe5kbgnFh2Y4eGHfjCzHKbLu04TQkYMB7dsKJm3Umo=;
+        b=XXsyRzMeRT21RKrvxPmqo23HofWs7vCpZfQFocWIWKPuNZuLH60w2E+z2sT3AVVj0Z
+         F1mav36EsvFx4rOTq4ojYIMl4UNi/I0EJcCbHamYIuY8q67JfnBJsol+TX27nLATU1kD
+         8XkvVc4rB9jfbDJOJyshg6goC2Nnw63wob/5G8cwfhPP2yXcD3UoKChYmWKf3U5HTkVs
+         p3Yrp/FfiNPqBaiQRjxwIaOnmKW5BK54vJ2GuuBwkG4Yw3ztVS7gjDOifE32RMBCTPxA
+         wuCen8lWeZqt/XchEjWR3RNdIIIxhbmEksgzJVcY12iz2k4PQj7VPf9iCIWFqde8McfH
+         BM+Q==
+X-Gm-Message-State: ABy/qLb+rbbfRk9GRUbpGWqcl+H1ab32wfhlXGtE9cHHkiXNTVfytUBT
+        quHhVfda0fPj21QB/DB/pJp1JmXsZAVuu1jY30U=
+X-Google-Smtp-Source: APBJJlGRSB+oOdzfbHk1XswFZQ6sXyZlhMpraB1keFiipvJqv7JZBaK38TlZAFpu/NEWGgF+T3sqfA==
+X-Received: by 2002:a17:906:5dd8:b0:99b:4d3d:c9b7 with SMTP id p24-20020a1709065dd800b0099b4d3dc9b7mr2464164ejv.31.1690289098120;
+        Tue, 25 Jul 2023 05:44:58 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id qp7-20020a170907206700b00992b66e54e9sm8134209ejb.214.2023.07.25.05.44.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 05:39:22 -0700 (PDT)
-Date:   Tue, 25 Jul 2023 08:39:17 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Arseniy Krasnov <avkrasnov@sberdevices.ru>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v3 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Message-ID: <20230725083823-mutt-send-email-mst@kernel.org>
-References: <20230720214245.457298-1-AVKrasnov@sberdevices.ru>
- <20230720214245.457298-5-AVKrasnov@sberdevices.ru>
- <091c067b-43a0-da7f-265f-30c8c7e62977@sberdevices.ru>
- <2k3cbz762ua3fmlben5vcm7rs624sktaltbz3ldeevwiguwk2w@klggxj5e3ueu>
- <51022d5f-5b50-b943-ad92-b06f60bef433@sberdevices.ru>
- <3d1d76c9-2fdb-3dfe-222a-b2184cf17708@sberdevices.ru>
- <o6axh6mxd6mxai2zrpax6wa25slns7ysz5xsegntskvfxl53mt@wowjgb3jazt6>
+        Tue, 25 Jul 2023 05:44:57 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 14:44:56 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Haibo Xu <xiaobo55x@gmail.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>, maz@kernel.org,
+        oliver.upton@linux.dev, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v6 06/13] KVM: arm64: selftests: Split get-reg-list test
+ code
+Message-ID: <20230725-f5cf47c63abd8673d22b4936@orel>
+References: <cover.1690273969.git.haibo1.xu@intel.com>
+ <1f25f27d1316bc91e1e31cd3d50a1d20f696759a.1690273969.git.haibo1.xu@intel.com>
+ <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <o6axh6mxd6mxai2zrpax6wa25slns7ysz5xsegntskvfxl53mt@wowjgb3jazt6>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023 at 02:28:02PM +0200, Stefano Garzarella wrote:
-> On Tue, Jul 25, 2023 at 12:16:11PM +0300, Arseniy Krasnov wrote:
-> > 
-> > 
-> > On 25.07.2023 11:46, Arseniy Krasnov wrote:
-> > > 
-> > > 
-> > > On 25.07.2023 11:43, Stefano Garzarella wrote:
-> > > > On Fri, Jul 21, 2023 at 08:09:03AM +0300, Arseniy Krasnov wrote:
-> > > > > 
-> > > > > 
-> > > > > On 21.07.2023 00:42, Arseniy Krasnov wrote:
-> > > > > > This adds handling of MSG_ZEROCOPY flag on transmission path: if this
-> > > > > > flag is set and zerocopy transmission is possible (enabled in socket
-> > > > > > options and transport allows zerocopy), then non-linear skb will be
-> > > > > > created and filled with the pages of user's buffer. Pages of user's
-> > > > > > buffer are locked in memory by 'get_user_pages()'. Second thing that
-> > > > > > this patch does is replace type of skb owning: instead of calling
-> > > > > > 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
-> > > > > > change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
-> > > > > > of socket, so to decrease this field correctly proper skb destructor is
-> > > > > > needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
-> > > > > > 
-> > > > > > Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> > > > > > ---
-> > > > > >  Changelog:
-> > > > > >  v5(big patchset) -> v1:
-> > > > > >   * Refactorings of 'if' conditions.
-> > > > > >   * Remove extra blank line.
-> > > > > >   * Remove 'frag_off' field unneeded init.
-> > > > > >   * Add function 'virtio_transport_fill_skb()' which fills both linear
-> > > > > >     and non-linear skb with provided data.
-> > > > > >  v1 -> v2:
-> > > > > >   * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
-> > > > > >  v2 -> v3:
-> > > > > >   * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
-> > > > > >     provided 'iov_iter' with data could be sent in a zerocopy mode.
-> > > > > >     If this callback is not set in transport - transport allows to send
-> > > > > >     any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
-> > > > > >     then zerocopy is allowed. Reason of this callback is that in case of
-> > > > > >     G2H transmission we insert whole skb to the tx virtio queue and such
-> > > > > >     skb must fit to the size of the virtio queue to be sent in a single
-> > > > > >     iteration (may be tx logic in 'virtio_transport.c' could be reworked
-> > > > > >     as in vhost to support partial send of current skb). This callback
-> > > > > >     will be enabled only for G2H path. For details pls see comment
-> > > > > >     'Check that tx queue...' below.
-> > > > > > 
-> > > > > >  include/net/af_vsock.h                  |   3 +
-> > > > > >  net/vmw_vsock/virtio_transport.c        |  39 ++++
-> > > > > >  net/vmw_vsock/virtio_transport_common.c | 257 ++++++++++++++++++------
-> > > > > >  3 files changed, 241 insertions(+), 58 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> > > > > > index 0e7504a42925..a6b346eeeb8e 100644
-> > > > > > --- a/include/net/af_vsock.h
-> > > > > > +++ b/include/net/af_vsock.h
-> > > > > > @@ -177,6 +177,9 @@ struct vsock_transport {
-> > > > > > 
-> > > > > >      /* Read a single skb */
-> > > > > >      int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
-> > > > > > +
-> > > > > > +    /* Zero-copy. */
-> > > > > > +    bool (*msgzerocopy_check_iov)(const struct iov_iter *);
-> > > > > >  };
-> > > > > > 
-> > > > > >  /**** CORE ****/
-> > > > > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > > > > > index 7bbcc8093e51..23cb8ed638c4 100644
-> > > > > > --- a/net/vmw_vsock/virtio_transport.c
-> > > > > > +++ b/net/vmw_vsock/virtio_transport.c
-> > > > > > @@ -442,6 +442,43 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
-> > > > > >      queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-> > > > > >  }
-> > > > > > 
-> > > > > > +static bool
-> > > > > > virtio_transport_msgzerocopy_check_iov(const struct
-> > > > > > iov_iter *iov)
-> > > > > > +{
-> > > > > > +    struct virtio_vsock *vsock;
-> > > > > > +    bool res = false;
-> > > > > > +
-> > > > > > +    rcu_read_lock();
-> > > > > > +
-> > > > > > +    vsock = rcu_dereference(the_virtio_vsock);
-> > > > > > +    if (vsock) {
+On Tue, Jul 25, 2023 at 04:50:36PM +0800, Haibo Xu wrote:
+> On Tue, Jul 25, 2023 at 4:37â€¯PM Haibo Xu <haibo1.xu@intel.com> wrote:
+> >
+> > From: Andrew Jones <ajones@ventanamicro.com>
+> >
+> > Split the arch-neutral test code out of aarch64/get-reg-list.c into
+> > get-reg-list.c. To do this we invent a new make variable
+> > $(SPLIT_TESTS) which expects common parts to be in the KVM selftests
+> > root and the counterparts to have the same name, but be in
+> > $(ARCH_DIR).
+> >
+> > There's still some work to be done to de-aarch64 the common
+> > get-reg-list.c, but we leave that to the next patch to avoid
+> > modifying too much code while moving it.
+> >
+> > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |  12 +-
+> >  .../selftests/kvm/aarch64/get-reg-list.c      | 367 +----------------
+> >  tools/testing/selftests/kvm/get-reg-list.c    | 377 ++++++++++++++++++
+> >  3 files changed, 398 insertions(+), 358 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index c692cc86e7da..95f180e711d5 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -140,7 +140,6 @@ TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
+> >  TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
+> >  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+> >  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+> > -TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+> >  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
+> >  TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
+> >  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
+> > @@ -152,6 +151,7 @@ TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
+> >  TEST_GEN_PROGS_aarch64 += demand_paging_test
+> >  TEST_GEN_PROGS_aarch64 += dirty_log_test
+> >  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
+> > +TEST_GEN_PROGS_aarch64 += get-reg-list
+> >  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+> >  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+> >  TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
+> > @@ -181,6 +181,8 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
+> >  TEST_GEN_PROGS_riscv += set_memory_region_test
+> >  TEST_GEN_PROGS_riscv += kvm_binary_stats_test
+> >
+> > +SPLIT_TESTS += get-reg-list
+> > +
+> >  TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
+> >  TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+> >  TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+> > @@ -228,11 +230,14 @@ LIBKVM_C_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_C))
+> >  LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+> >  LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+> >  LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+> > +SPLIT_TESTS_TARGETS := $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
+> > +SPLIT_TESTS_OBJS := $(patsubst %, $(ARCH_DIR)/%.o, $(SPLIT_TESTS))
+> >
+> >  TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
+> >  TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
+> >  TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
+> >  TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
+> > +TEST_DEP_FILES += $(patsubst %.o, %.d, $(SPLIT_TESTS_OBJS))
+> >  -include $(TEST_DEP_FILES)
+> >
+> >  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> > @@ -240,7 +245,10 @@ $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
+> >  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
+> >         $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> >
+> > -EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
+> > +$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
+> > +       $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS) -o $@
+> > +
+> > +EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLIT_TESTS_OBJS) cscope.*
+> >
+> >  x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+> >  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
 > 
-> Just noted, what about the following to reduce the indentation?
+> Hi @Andrew Jones,
 > 
->         if (!vsock) {
->             goto out;
->         }
+> After rebasing to v6.5-rc3, some changes are needed to the SPLIT_TESTS
+> target, or the make would fail.
+> Please help have a look.
+>
 
-no {} pls
+I took a look and then remembered why I hate looking at Makefiles... I
+guess it's fine, but it's a pity we need to repeat the $(CC) line.
 
->             ...
->             ...
->     out:
->         rcu_read_unlock();
->         return res;
-
-indentation is quite modest here. Not sure goto is worth it.
-
-
+Thanks,
+drew
