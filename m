@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E560761D4C
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 17:24:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22449761D4D
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 17:24:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232767AbjGYPYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 11:24:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49602 "EHLO
+        id S231630AbjGYPYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 11:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231134AbjGYPYq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 11:24:46 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189DFE42
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:24:44 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-26825239890so1175256a91.0
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:24:44 -0700 (PDT)
+        with ESMTP id S229486AbjGYPYt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 11:24:49 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3579318D
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:24:48 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-26837895fbbso582463a91.3
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:24:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690298683; x=1690903483;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0EgGlOxHFhuNZckylSvtceV9VyyP66yKvo8vXK/g0E=;
-        b=hG2gfIZBfNeeeVvajYhBS4ESuo2co6r81JPN77ML0gi0gG6WHcM88/FWIZQU0QwO9x
-         34e93V1nbPfgA5oG9aRDiie+oL3i/qv0Fm5B8qVig1bqW2uKI9ieAzuvq2byXniq9gdD
-         5Fc/hMjf8fuaVyQlKdvQqmrzJxLUROukfjg2A0k5EERw4EIdFne0QkXv941PR/SvDFLg
-         efVn2AuhuuR8fw+eaMn+lJBhiU93zbR2wnaIadwDxyMw/BlKUB5TQz/eMtgFVkSkEBwg
-         j4RLZRG/bHhVxZfIxzfeSZRh87IPNysQI9g5tFVGkN2fREQhqRVivEGQgyD4LobVwean
-         YHRg==
+        d=ventanamicro.com; s=google; t=1690298687; x=1690903487;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nchzl7R+mDstAf3Tjjho9VJFca/R8akTk4Ves9kU+EU=;
+        b=Ci6b7hvbgMfxyNwdobUZtozr0zE79IL7Fqxocm+a/5FKm/FTriqjMvm1HbsFozBEQv
+         kVCxCg3UWFzHXMR3j//N42IXOXfGl7MNahFlrH1PTL08xGpGPEatWRtkV2LjEQk4ndbu
+         AGIzTKTWaV6o7Nq1ww0jIyDIR3N6NjP8+McGTMV1WC2/6WFf/GOFki7lHVa7u9OrRWnU
+         H40BUmEkG05t4L49SK6obntsG8s708L41pw29mELJMdFmRMOKRWUqgyDEskJm/1ycpSh
+         saqecuh7wEq+7vsj6qULfuN7aolc3eGAZAq6H6jYhVbX1M/U7gTEQMOPTzjwP20JIRJf
+         tuXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690298683; x=1690903483;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b0EgGlOxHFhuNZckylSvtceV9VyyP66yKvo8vXK/g0E=;
-        b=Z8iUEIfEcVpuGMGgMajhDnNV8qh+G81D2IHWbT0T5BD9J9tQdEYhdI8U+/19B4dpO0
-         pwOghgFbYUTAfKFXFb042vs72Wcr6HALfpSyZ+T6hF2OIH8BZkVYRT0xjzI+lNlKDGkf
-         2P8yGdZybSfHLRY4+a4h7R0zvhoafksU45TWr/n2juulaQAbKGkcMDVKAko9SqjeLpth
-         ZblRS4YCeFwPY7nSNi10DUI8aD45soCu95DZtNeMCsOQEf1C2+Pbvgt+xek4vHWaArmv
-         ES2Em9OB31el0dospNuGM3UygoiOr8Wz5Lc1alnOiPioI44CD4LWLDe1GgUL5n66B/8t
-         FiYw==
-X-Gm-Message-State: ABy/qLbdph+mowFvK79izaAfJiRoZNOMLwBG8Ghb0z9oPOMv2DbvFqlR
-        +PIlHE8zXeR7UGgTWyrp3/I7mw==
-X-Google-Smtp-Source: APBJJlGTewQhsMseJ6xKz8TgizoD0mSYJ8TcloYS0d0B922jVC/oY1vM3bbYiNYEJ/JlpLyQNBNGZg==
-X-Received: by 2002:a17:90a:d78f:b0:24e:4b1c:74d2 with SMTP id z15-20020a17090ad78f00b0024e4b1c74d2mr12896653pju.32.1690298683452;
-        Tue, 25 Jul 2023 08:24:43 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690298687; x=1690903487;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nchzl7R+mDstAf3Tjjho9VJFca/R8akTk4Ves9kU+EU=;
+        b=BkKHIQTn8DfVk+Gb8rD8DEeuNPioKmmld/rJoeYpE+NVuX9AQr6jrj5XurlPE+NozG
+         W57quMAjx7eyYdOA/Ey4nHQN4y0/RiEXDaF2WXLTLUeqau58AZhOSOhwsk/vC4RRnZEM
+         jzJNSxf6dMVQU5yzWi9/1onpA+pISu/yKOQPLK/z1lUbfiXYg8VPxsgGCRAbP51Lo72G
+         KYVqMGPlZQKTpnYteo0+eGsfZfVL2qQWtVLha5RmVYR1IzAm0GI2X9+TiQypJJuR6Hiq
+         za+VolamP0KTBjL6fjh8wWDyGRK11GCxPxW9gbj+3NR8j4OTlsQZSj5esWCsG0taX0h/
+         juxQ==
+X-Gm-Message-State: ABy/qLZo6Ex8CXc2nkdfJOkjqiSi4zpYcAA3voYNSwezdyfzWNFoClDv
+        ovLTCAhYGHjbYHg3Nvri51I+GA==
+X-Google-Smtp-Source: APBJJlHgGouwzIzpocZ/fcubMe5CDnPguvdwubeS2dRhYke5dx3+Eg5TfubVq6bfbJUxGzYf65R5hg==
+X-Received: by 2002:a17:90b:1d10:b0:25b:be3a:e6ae with SMTP id on16-20020a17090b1d1000b0025bbe3ae6aemr12650404pjb.18.1690298687498;
+        Tue, 25 Jul 2023 08:24:47 -0700 (PDT)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id g11-20020a17090adb0b00b002683fd66663sm980372pjv.22.2023.07.25.08.24.39
+        by smtp.gmail.com with ESMTPSA id g11-20020a17090adb0b00b002683fd66663sm980372pjv.22.2023.07.25.08.24.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 08:24:43 -0700 (PDT)
+        Tue, 25 Jul 2023 08:24:47 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -56,55 +57,170 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Andrew Jones <ajones@ventanamicro.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [kvmtool PATCH 0/6] RISC-V AIA irqchip and Svnapot support
-Date:   Tue, 25 Jul 2023 20:54:24 +0530
-Message-Id: <20230725152430.3351564-1-apatel@ventanamicro.com>
+Subject: [kvmtool PATCH 1/6] Sync-up header with Linux-6.5-rc3 for KVM RISC-V
+Date:   Tue, 25 Jul 2023 20:54:25 +0530
+Message-Id: <20230725152430.3351564-2-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230725152430.3351564-1-apatel@ventanamicro.com>
+References: <20230725152430.3351564-1-apatel@ventanamicro.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,UPPERCASE_50_75,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The latest KVM in Linux-6.5 has support for:
-1) Svnapot ISA extension support
-2) AIA in-kernel irqchip support
+We sync-up Linux headers to get latest KVM RISC-V headers having
+V, Svnapot, and AIA support.
 
-This series adds corresponding changes in KVMTOOL to use the above
-mentioned features for Guest/VM.
+Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+---
+ include/linux/kvm.h     |  6 ++-
+ riscv/include/asm/kvm.h | 81 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+), 1 deletion(-)
 
-These patches can also be found in the riscv_aia_v1 branch at:
-https://github.com/avpatel/kvmtool.git
-
-Anup Patel (6):
-  Sync-up header with Linux-6.5-rc3 for KVM RISC-V
-  riscv: Add Svnapot extension support
-  riscv: Make irqchip support pluggable
-  riscv: Add IRQFD support for in-kernel AIA irqchip
-  riscv: Use AIA in-kernel irqchip whenever KVM RISC-V supports
-  riscv: Fix guest/init linkage for multilib toolchain
-
- Makefile                            |   3 +
- include/linux/kvm.h                 |   6 +-
- riscv/aia.c                         | 227 ++++++++++++++++++++++++++++
- riscv/fdt.c                         |  15 +-
- riscv/include/asm/kvm.h             |  81 ++++++++++
- riscv/include/kvm/fdt-arch.h        |   8 +-
- riscv/include/kvm/kvm-arch.h        |  38 ++++-
- riscv/include/kvm/kvm-config-arch.h |   3 +
- riscv/irq.c                         | 138 ++++++++++++++++-
- riscv/kvm.c                         |   2 +
- riscv/pci.c                         |  32 ++--
- riscv/plic.c                        |  61 ++++----
- 12 files changed, 563 insertions(+), 51 deletions(-)
- create mode 100644 riscv/aia.c
-
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 737318b..f089ab2 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -1190,6 +1190,8 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+ #define KVM_CAP_PMU_EVENT_MASKED_EVENTS 226
+ #define KVM_CAP_COUNTER_OFFSET 227
++#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
++#define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1442,6 +1444,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
+ 	KVM_DEV_TYPE_ARM_PV_TIME,
+ #define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
++	KVM_DEV_TYPE_RISCV_AIA,
++#define KVM_DEV_TYPE_RISCV_AIA		KVM_DEV_TYPE_RISCV_AIA
+ 	KVM_DEV_TYPE_MAX,
+ };
+ 
+@@ -1613,7 +1617,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_GET_DEBUGREGS         _IOR(KVMIO,  0xa1, struct kvm_debugregs)
+ #define KVM_SET_DEBUGREGS         _IOW(KVMIO,  0xa2, struct kvm_debugregs)
+ /*
+- * vcpu version available with KVM_ENABLE_CAP
++ * vcpu version available with KVM_CAP_ENABLE_CAP
+  * vm version available with KVM_CAP_ENABLE_CAP_VM
+  */
+ #define KVM_ENABLE_CAP            _IOW(KVMIO,  0xa3, struct kvm_enable_cap)
+diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
+index f92790c..930fdc4 100644
+--- a/riscv/include/asm/kvm.h
++++ b/riscv/include/asm/kvm.h
+@@ -15,6 +15,7 @@
+ #include <asm/bitsperlong.h>
+ #include <asm/ptrace.h>
+ 
++#define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
+ 
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+@@ -121,6 +122,8 @@ enum KVM_RISCV_ISA_EXT_ID {
+ 	KVM_RISCV_ISA_EXT_ZICBOZ,
+ 	KVM_RISCV_ISA_EXT_ZBB,
+ 	KVM_RISCV_ISA_EXT_SSAIA,
++	KVM_RISCV_ISA_EXT_V,
++	KVM_RISCV_ISA_EXT_SVNAPOT,
+ 	KVM_RISCV_ISA_EXT_MAX,
+ };
+ 
+@@ -203,6 +206,84 @@ enum KVM_RISCV_SBI_EXT_ID {
+ #define KVM_REG_RISCV_SBI_MULTI_REG_LAST	\
+ 		KVM_REG_RISCV_SBI_MULTI_REG(KVM_RISCV_SBI_EXT_MAX - 1)
+ 
++/* V extension registers are mapped as type 9 */
++#define KVM_REG_RISCV_VECTOR		(0x09 << KVM_REG_RISCV_TYPE_SHIFT)
++#define KVM_REG_RISCV_VECTOR_CSR_REG(name)	\
++		(offsetof(struct __riscv_v_ext_state, name) / sizeof(unsigned long))
++#define KVM_REG_RISCV_VECTOR_REG(n)	\
++		((n) + sizeof(struct __riscv_v_ext_state) / sizeof(unsigned long))
++
++/* Device Control API: RISC-V AIA */
++#define KVM_DEV_RISCV_APLIC_ALIGN		0x1000
++#define KVM_DEV_RISCV_APLIC_SIZE		0x4000
++#define KVM_DEV_RISCV_APLIC_MAX_HARTS		0x4000
++#define KVM_DEV_RISCV_IMSIC_ALIGN		0x1000
++#define KVM_DEV_RISCV_IMSIC_SIZE		0x1000
++
++#define KVM_DEV_RISCV_AIA_GRP_CONFIG		0
++#define KVM_DEV_RISCV_AIA_CONFIG_MODE		0
++#define KVM_DEV_RISCV_AIA_CONFIG_IDS		1
++#define KVM_DEV_RISCV_AIA_CONFIG_SRCS		2
++#define KVM_DEV_RISCV_AIA_CONFIG_GROUP_BITS	3
++#define KVM_DEV_RISCV_AIA_CONFIG_GROUP_SHIFT	4
++#define KVM_DEV_RISCV_AIA_CONFIG_HART_BITS	5
++#define KVM_DEV_RISCV_AIA_CONFIG_GUEST_BITS	6
++
++/*
++ * Modes of RISC-V AIA device:
++ * 1) EMUL (aka Emulation): Trap-n-emulate IMSIC
++ * 2) HWACCEL (aka HW Acceleration): Virtualize IMSIC using IMSIC guest files
++ * 3) AUTO (aka Automatic): Virtualize IMSIC using IMSIC guest files whenever
++ *    available otherwise fallback to trap-n-emulation
++ */
++#define KVM_DEV_RISCV_AIA_MODE_EMUL		0
++#define KVM_DEV_RISCV_AIA_MODE_HWACCEL		1
++#define KVM_DEV_RISCV_AIA_MODE_AUTO		2
++
++#define KVM_DEV_RISCV_AIA_IDS_MIN		63
++#define KVM_DEV_RISCV_AIA_IDS_MAX		2048
++#define KVM_DEV_RISCV_AIA_SRCS_MAX		1024
++#define KVM_DEV_RISCV_AIA_GROUP_BITS_MAX	8
++#define KVM_DEV_RISCV_AIA_GROUP_SHIFT_MIN	24
++#define KVM_DEV_RISCV_AIA_GROUP_SHIFT_MAX	56
++#define KVM_DEV_RISCV_AIA_HART_BITS_MAX		16
++#define KVM_DEV_RISCV_AIA_GUEST_BITS_MAX	8
++
++#define KVM_DEV_RISCV_AIA_GRP_ADDR		1
++#define KVM_DEV_RISCV_AIA_ADDR_APLIC		0
++#define KVM_DEV_RISCV_AIA_ADDR_IMSIC(__vcpu)	(1 + (__vcpu))
++#define KVM_DEV_RISCV_AIA_ADDR_MAX		\
++		(1 + KVM_DEV_RISCV_APLIC_MAX_HARTS)
++
++#define KVM_DEV_RISCV_AIA_GRP_CTRL		2
++#define KVM_DEV_RISCV_AIA_CTRL_INIT		0
++
++/*
++ * The device attribute type contains the memory mapped offset of the
++ * APLIC register (range 0x0000-0x3FFF) and it must be 4-byte aligned.
++ */
++#define KVM_DEV_RISCV_AIA_GRP_APLIC		3
++
++/*
++ * The lower 12-bits of the device attribute type contains the iselect
++ * value of the IMSIC register (range 0x70-0xFF) whereas the higher order
++ * bits contains the VCPU id.
++ */
++#define KVM_DEV_RISCV_AIA_GRP_IMSIC		4
++#define KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS	12
++#define KVM_DEV_RISCV_AIA_IMSIC_ISEL_MASK	\
++		((1U << KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS) - 1)
++#define KVM_DEV_RISCV_AIA_IMSIC_MKATTR(__vcpu, __isel)	\
++		(((__vcpu) << KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS) | \
++		 ((__isel) & KVM_DEV_RISCV_AIA_IMSIC_ISEL_MASK))
++#define KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(__attr)	\
++		((__attr) & KVM_DEV_RISCV_AIA_IMSIC_ISEL_MASK)
++#define KVM_DEV_RISCV_AIA_IMSIC_GET_VCPU(__attr)	\
++		((__attr) >> KVM_DEV_RISCV_AIA_IMSIC_ISEL_BITS)
++
++/* One single KVM irqchip, ie. the AIA */
++#define KVM_NR_IRQCHIPS			1
++
+ #endif
+ 
+ #endif /* __LINUX_KVM_RISCV_H */
 -- 
 2.34.1
 
