@@ -2,217 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE64B7618F2
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 14:54:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20A45761903
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 14:56:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjGYMyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 08:54:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36874 "EHLO
+        id S231896AbjGYM4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 08:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232326AbjGYMyg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 08:54:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC17FDA
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:53:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690289630;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MmWb5Pp2aBYvWbRypNFuJKIythziPszATpLaSdkin2c=;
-        b=JSQk9NkrhQkmeTHXsLpFuL08hj7Q9kNX9E9Na89GeLXkyEo7TuM4Nc+nUiYHNMPrwWlUYz
-        N4MHYg54/8MwBo87SbWp7zD8CqAq2h1hm+lW8JD/jFJZ/ANdUywMUoddmQoMWLibVcvtfy
-        U7H0pM9EJOtdOSDsbfQAoNXU85K2610=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-580-laptNxK2PveZHPmC-WF9OA-1; Tue, 25 Jul 2023 08:53:48 -0400
-X-MC-Unique: laptNxK2PveZHPmC-WF9OA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-993eeb3a950so322592966b.2
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:53:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690289627; x=1690894427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MmWb5Pp2aBYvWbRypNFuJKIythziPszATpLaSdkin2c=;
-        b=kF6nh4LaSD5IzV8TKAs5eByvqfsRCA5i9AciBX2+5BPCiC3atz98sLHdssIBMYfbHb
-         5mxpvLb+7D9XWWqZW08U8WNdUCihnQv15gQZ4MHobZYljBWDVZydH0Onr8/9KejIM8BM
-         CWRRXIbjpkTi1ixV36YfpCWeLEGty2d2ezPzty22JyWOWsLM3HFHDEkHL/JgkhmeIizX
-         LucG/4ks3iSViBTvpWiTDPpBd80dsuNpOZqJMJRDxNicv0RaddoIHFIGk3TT+0T7Cqy8
-         eisxRJvyM0z/+kMsbTgIx31TEaxFP+xRFuvLO/5JG12cdlzyPo+/ltzlDsdYTyF0JecH
-         mkHw==
-X-Gm-Message-State: ABy/qLZHHNwvuBEhaBsPd+2QIaTSqguIrbLHSWsZq6hVuw7wNpcBIViX
-        09U/oI6HmiRXr0yv/KSI6J2NNGCpvbOKZls5qhA7TFarak7j0hon2YE88toMcLgF593kQitbopX
-        OVoTa5IOoodv7
-X-Received: by 2002:a17:906:cc0e:b0:99b:465c:fb9f with SMTP id ml14-20020a170906cc0e00b0099b465cfb9fmr13115191ejb.8.1690289627615;
-        Tue, 25 Jul 2023 05:53:47 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF9hEHB3XaanGeFXLlb0Jn/NAtH89iN4Hg6Yl6csk9/a/jJZiyBsAjb7NfBBPnVzhucf2/x/Q==
-X-Received: by 2002:a17:906:cc0e:b0:99b:465c:fb9f with SMTP id ml14-20020a170906cc0e00b0099b465cfb9fmr13115160ejb.8.1690289627167;
-        Tue, 25 Jul 2023 05:53:47 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.201.198])
-        by smtp.gmail.com with ESMTPSA id k9-20020a1709062a4900b0098748422178sm8162511eje.56.2023.07.25.05.53.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 05:53:46 -0700 (PDT)
-Date:   Tue, 25 Jul 2023 14:53:39 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Arseniy Krasnov <avkrasnov@sberdevices.ru>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v3 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Message-ID: <mul7yiwl2pspfegeanqyezhmw6ol4cxsdshch7ln6w3i2b54bw@7na6bf5kfxwy>
-References: <20230720214245.457298-1-AVKrasnov@sberdevices.ru>
- <20230720214245.457298-5-AVKrasnov@sberdevices.ru>
- <091c067b-43a0-da7f-265f-30c8c7e62977@sberdevices.ru>
- <20230725042544-mutt-send-email-mst@kernel.org>
+        with ESMTP id S230220AbjGYM4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 08:56:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7DCDA
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0C0FwEe0MZI+UCQ63YI2OoRc1+l90j0eqLu70JNuyuA=; b=MTDIdudyJ1RMV9ZTq+fXRtTITK
+        8AKbInuhu7cnt82fAYP88tu1jqvWXyyCWB18T74OUbuLR1AsbGj3okjhndF9xPTWdzF3I1nFJdzQO
+        nZ0qPufvAIxKuujhmX1HanWK+fZL/geNs4c/dW7fE9f/8D1hbVi6e3t5WcTBIBhS7vTcYTMJdkNHR
+        a16YK3VbgnK1Y060QpZsM2dsWn0V9C17QDzeRQ2As+6eI5z8H1BlduOHFiz94xbLLyM5HAh/0mj5V
+        dOX03VQArDSCsuQwygz0kx9UQmS6rLGNXHV2VVVV/uDB848uG3dGepPdKBeaDZppA6kB+XnksCIXC
+        PsYlQb0g==;
+Received: from [2001:8b0:10b:1:7f07:4fc6:8b21:3b6b] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qOHaX-005TrH-Bl; Tue, 25 Jul 2023 12:56:29 +0000
+Message-ID: <9a58e731421edad45dff31e681b83f90c5e9775e.camel@infradead.org>
+Subject: Re: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs
+ hypercall
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>,
+        Metin Kaya <metikaya@amazon.co.uk>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, x86@kernel.org,
+        bp@alien8.de, paul@xen.org, tglx@linutronix.de, mingo@redhat.com,
+        dave.hansen@linux.intel.com, joao.m.martins@oracle.com
+Date:   Tue, 25 Jul 2023 13:56:29 +0100
+In-Reply-To: <ZHEXX/OG6suNGWPN@google.com>
+References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
+         <20230418101306.98263-1-metikaya@amazon.co.uk>
+         <ZHEXX/OG6suNGWPN@google.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-4EbMlPhmDR87TgaZiDNo"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230725042544-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023 at 07:50:53AM -0400, Michael S. Tsirkin wrote:
->On Fri, Jul 21, 2023 at 08:09:03AM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 21.07.2023 00:42, Arseniy Krasnov wrote:
->> > This adds handling of MSG_ZEROCOPY flag on transmission path: if this
->> > flag is set and zerocopy transmission is possible (enabled in socket
->> > options and transport allows zerocopy), then non-linear skb will be
->> > created and filled with the pages of user's buffer. Pages of user's
->> > buffer are locked in memory by 'get_user_pages()'. Second thing that
->> > this patch does is replace type of skb owning: instead of calling
->> > 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
->> > change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
->> > of socket, so to decrease this field correctly proper skb destructor is
->> > needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
->> >
->> > Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->> > ---
->> >  Changelog:
->> >  v5(big patchset) -> v1:
->> >   * Refactorings of 'if' conditions.
->> >   * Remove extra blank line.
->> >   * Remove 'frag_off' field unneeded init.
->> >   * Add function 'virtio_transport_fill_skb()' which fills both linear
->> >     and non-linear skb with provided data.
->> >  v1 -> v2:
->> >   * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
->> >  v2 -> v3:
->> >   * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
->> >     provided 'iov_iter' with data could be sent in a zerocopy mode.
->> >     If this callback is not set in transport - transport allows to send
->> >     any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
->> >     then zerocopy is allowed. Reason of this callback is that in case of
->> >     G2H transmission we insert whole skb to the tx virtio queue and such
->> >     skb must fit to the size of the virtio queue to be sent in a single
->> >     iteration (may be tx logic in 'virtio_transport.c' could be reworked
->> >     as in vhost to support partial send of current skb). This callback
->> >     will be enabled only for G2H path. For details pls see comment
->> >     'Check that tx queue...' below.
->> >
->> >  include/net/af_vsock.h                  |   3 +
->> >  net/vmw_vsock/virtio_transport.c        |  39 ++++
->> >  net/vmw_vsock/virtio_transport_common.c | 257 ++++++++++++++++++------
->> >  3 files changed, 241 insertions(+), 58 deletions(-)
->> >
->> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->> > index 0e7504a42925..a6b346eeeb8e 100644
->> > --- a/include/net/af_vsock.h
->> > +++ b/include/net/af_vsock.h
->> > @@ -177,6 +177,9 @@ struct vsock_transport {
->> >
->> >  	/* Read a single skb */
->> >  	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
->> > +
->> > +	/* Zero-copy. */
->> > +	bool (*msgzerocopy_check_iov)(const struct iov_iter *);
->> >  };
->> >
->> >  /**** CORE ****/
->> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->> > index 7bbcc8093e51..23cb8ed638c4 100644
->> > --- a/net/vmw_vsock/virtio_transport.c
->> > +++ b/net/vmw_vsock/virtio_transport.c
->> > @@ -442,6 +442,43 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
->> >  	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->> >  }
->> >
->> > +static bool virtio_transport_msgzerocopy_check_iov(const struct iov_iter *iov)
->> > +{
->> > +	struct virtio_vsock *vsock;
->> > +	bool res = false;
->> > +
->> > +	rcu_read_lock();
->> > +
->> > +	vsock = rcu_dereference(the_virtio_vsock);
->> > +	if (vsock) {
->> > +		struct virtqueue *vq;
->> > +		int iov_pages;
->> > +
->> > +		vq = vsock->vqs[VSOCK_VQ_TX];
->> > +
->> > +		iov_pages = round_up(iov->count, PAGE_SIZE) / PAGE_SIZE;
->> > +
->> > +		/* Check that tx queue is large enough to keep whole
->> > +		 * data to send. This is needed, because when there is
->> > +		 * not enough free space in the queue, current skb to
->> > +		 * send will be reinserted to the head of tx list of
->> > +		 * the socket to retry transmission later, so if skb
->> > +		 * is bigger than whole queue, it will be reinserted
->> > +		 * again and again, thus blocking other skbs to be sent.
->> > +		 * Each page of the user provided buffer will be added
->> > +		 * as a single buffer to the tx virtqueue, so compare
->> > +		 * number of pages against maximum capacity of the queue.
->> > +		 * +1 means buffer for the packet header.
->> > +		 */
->> > +		if (iov_pages + 1 <= vq->num_max)
->>
->> I think this check is actual only for case one we don't have indirect buffer feature.
->> With indirect mode whole data to send will be packed into one indirect buffer.
->>
->> Thanks, Arseniy
->
->Actually the reverse. With indirect you are limited to num_max.
->Without you are limited to whatever space is left in the
->queue (which you did not check here, so you should).
->
->
->> > +			res = true;
->> > +	}
->> > +
->> > +	rcu_read_unlock();
->
->Just curious:
->is the point of all this RCU dance to allow vsock
->to change from under us? then why is it ok to
->have it change? the virtio_transport_msgzerocopy_check_iov
->will then refer to the old vsock ...
 
-IIRC we introduced the RCU to handle hot-unplug issues:
-commit 0deab087b16a ("vsock/virtio: use RCU to avoid use-after-free on
-the_virtio_vsock")
+--=-4EbMlPhmDR87TgaZiDNo
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When we remove the device, we flush all the works, etc. so we should
-not be in this case (referring the old vsock), except for an irrelevant
-transient as the device is disappearing.
+On Fri, 2023-05-26 at 13:32 -0700, Sean Christopherson wrote:
+> =C2=A0 : Aha!=C2=A0 And QEMU appears to have Xen emulation support.=C2=A0=
+ That means KVM-Unit-Tests
+> =C2=A0 : is an option.=C2=A0 Specifically, extend the "access" test to us=
+e this hypercall instead
+> =C2=A0 : of INVLPG.=C2=A0 That'll verify that the flush is actually being=
+ performed as expteced.
 
-Stefano
+That works. Metin has a better version that actually sets up the
+hypercall page properly and uses it, but that one bails out when Xen
+support isn't present, and doesn't show the failure mode quite so
+clearly. This is the simple version:
 
+From: Metin Kaya <metikaya@amazon.co.uk>
+Subject: [PATCH] x86/access: Use hvm_op/flush_tlbs hypercall instead of inv=
+lpg instruction
+
+Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
+---
+ x86/access.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/x86/access.c b/x86/access.c
+index 83c8221..6fa08c5 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -253,12 +253,31 @@ static void clear_user_mask(pt_element_t *ptep, int l=
+evel, unsigned long virt)
+ 	*ptep &=3D ~PT_USER_MASK;
+ }
+=20
++#define KVM_HYPERCALL_INTEL ".byte 0x0f,0x01,0xc1"
++#define __HYPERVISOR_hvm_op 34
++#define HVMOP_flush_tlbs    5
++
++static inline long hvm_op_flush_tlbs(void)
++{
++	long ret;
++	uint64_t nr =3D __HYPERVISOR_hvm_op;
++	uint64_t op =3D HVMOP_flush_tlbs;
++	uint64_t arg =3D 0;
++
++	asm volatile(KVM_HYPERCALL_INTEL
++		     : "=3Da"(ret)
++		     : "a"(nr), "D" (op), "S" (arg)
++		     : "memory");
++
++	return ret;
++}
++
+ static void set_user_mask(pt_element_t *ptep, int level, unsigned long vir=
+t)
+ {
+ 	*ptep |=3D PT_USER_MASK;
+=20
+ 	/* Flush to avoid spurious #PF */
+-	invlpg((void*)virt);
++	hvm_op_flush_tlbs();
+ }
+=20
+ static unsigned set_cr4_smep(ac_test_t *at, int smep)
+@@ -577,7 +596,7 @@ fault:
+=20
+ static void ac_set_expected_status(ac_test_t *at)
+ {
+-	invlpg(at->virt);
++	hvm_op_flush_tlbs();
+=20
+ 	if (at->ptep)
+ 		at->expected_pte =3D *at->ptep;
+--=20
+2.34.1
+
+
+Run it with Xen support enabled and it works...
+
+$ qemu-system-x86_64 -device isa-debug-exit,iobase=3D0xf4,iosize=3D0x4 -vnc=
+ none -serial stdio -M pc -device pci-testdev --accel kvm,xen-version=3D0x4=
+000a,kernel-irqchip=3Dsplit  -kernel x86/access_test.flat
+enabling apic
+starting test
+
+run
+CR4.PKE not available, disabling PKE tests
+CR4.SMEP not available, disabling SMEP tests
+.............................
+1916935 tests, 0 failures
+
+
+To be sure, run it without Xen support, the hypercall silently fails
+and the test fails....
+
+$ qemu-system-x86_64 -device isa-debug-exit,iobase=3D0xf4,iosize=3D0x4 -vnc=
+ none -serial stdio -M pc -device pci-testdev --accel kvm  -kernel x86/acce=
+ss_test.flat
+enabling apic
+starting test
+
+run
+CR4.PKE not available, disabling PKE tests
+CR4.SMEP not available, disabling SMEP tests
+
+test pte.rw pte.p pde.p: FAIL: pte 2000003 expected 2000023
+Dump mapping: address: 0xffff923400000000
+------L4 I292: 2100027
+------L3 I208: 2101027
+------L2 I0: 2102061
+------L1 I0: 2000003
+
+test pte.user pte.p pde.p: FAIL: pte 2000005 expected 2000025
+Dump mapping: address: 0xffff923400000000
+------L4 I292: 2100027
+------L3 I208: 2101027
+------L2 I0: 2102061
+------L1 I0: 2000005
+
+=E2=80=A6
+
+> Let me be more explicit this time: I am not applying this without a test.=
+=C2=A0 I don't
+> care how trivial a patch may seem, I'm done taking patches without test c=
+overage
+> unless there's a *really* good reason for me to do so.
+
+Understood.
+
+So, we know it *works*, but the above is a one-off and not a
+*regression* test.
+
+It would definitely be nice to have regression tests that cover
+absolutely everything, but adding Xen guest support to the generic KVM-
+Unit-Tests might be considered overkill, because this *particular*
+thing is fairly unlikely to regress? It really is just calling
+kvm_flush_remote_tlbs(), and if that goes wrong we're probably likely
+to notice it anyway.
+
+What do you think?
+
+
+--=-4EbMlPhmDR87TgaZiDNo
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwNzI1MTI1NjI5WjAvBgkqhkiG9w0BCQQxIgQgnpdIjK5V
+rAe4p4tGu/rVTUcgeW7GalP34ZzFAsmryjMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBihNZOo+WwPrWymzvhvY+G7M3foTbtlxHK
+ufq/cOc/u4kmemFM46siLzQZPBtlh1WcWSti/OlqiU9cJo+O4legg7n14D9uuYqUhwCyOEmVYrfD
+14J2YPzyZtIblWFJ+hfS3zIxuDmBRqQ9UyY+Jc7+mTpMlBiYF8ewLNzlGjzgAjI4CFI5xH5nCZSo
+btFJws6CBRHsK/7a05hkqJFJtqjRWUuehVGXpOU0SloxSHH07iY+IB3eFsjXMDuSu2UvAxExN+pm
+zBiVkbiqmvIMKI090y88CRzvt3Z83oU1tSKtIg7Utz1hEKBsyu/IvjyRI5muRyflN9YmGlIbAY8v
+n0drhCxK5lRg9kUDJTW52ldOEyCtz2aGMwUGpsumzFinCFxbSHjbZY7JZAGsKBUe0glcDg3Q3bJO
+3F4Vqw6fzJrVLwL+9/R1wo4F5da6x/Sw492nmsK3vfQwBkd/E1t3yYNEqnbXQQBZT+NxB4uJkPMc
+kSgkwdxGKoW/nS+oLlpeksyDQQXMMPOgRuT0g9tlB/5ut0M9gD309cstY+DtntyWErQ3EnUvlJTY
+fVLz/VQOHf0qEf80yAgnySvTGV1pARGF03uTui4dfBhC6BlckIjOBKo6UrKuXq0MzX2K2qq4PtUC
+3AT1iZ49Mufd5EVJmONxgg4BWnrn5EmgRhXmk/uG5QAAAAAAAA==
+
+
+--=-4EbMlPhmDR87TgaZiDNo--
