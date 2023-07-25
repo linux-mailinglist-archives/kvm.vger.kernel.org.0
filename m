@@ -2,379 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A71676115E
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 12:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A55D5761482
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 13:20:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233343AbjGYKu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 06:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58388 "EHLO
+        id S234397AbjGYLUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 07:20:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233739AbjGYKuE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 06:50:04 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 707D51BE3
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 03:49:58 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-76731802203so493994285a.3
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 03:49:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1690282197; x=1690886997;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9bMmHwdZlQT+P6lJr6em+mpkMjk2rV9wBSh6rSZ0uNY=;
-        b=lG40hefI1rqtX4VPi950MewOISlMiKtqIlP9xcF3XCYAb77PkT3OrAkeFX8sRIBCUH
-         lUMe8arWl2ZGGtvsaPoaznASXmSLSN6smMtBmFXVLMj7SyJkP8I5sTzRpitBh2kvOSpA
-         umt9kEQZvTbov4Lbk9wb/skGslWPm/d8pGPlw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690282197; x=1690886997;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9bMmHwdZlQT+P6lJr6em+mpkMjk2rV9wBSh6rSZ0uNY=;
-        b=RvOnzJuaojc9Q0VMbS1cQUgIqncac96a/dQpxB9g+l1XVM7nWU06/0RHWpmiUnyCbL
-         RH819lmOKtFlWIDUWA9MzRoaljeuo1Jc338K3d+jyQDrKT5h1qZzYlUCyzANIDT/YP2C
-         MaqYBnTO89YKf/w2ZoQkvKl3I8sbAdF7yQxwl3RrG6JpwvhaYMsdY1J7nFOqCiwLv8ED
-         XfswzIMSSqZfxw1K0tRgsplb5xSzZNbDlRlfIj+88muYbQvdihLIa+GAQkIwOVotx/cw
-         uXRg35Cufa/IhRLYvc2Lr+qMNw0GVB710/cr7XD1vVSkLRvh8KHugCEO28GBetiQNmIH
-         MmQg==
-X-Gm-Message-State: ABy/qLbWE4CrUBvBOf9GOCr3MGLJ1YL67NgKmXhgDNRceqHJAu1d/KJw
-        yKYksuZ1suhrqKZcY1tkwPeSWw==
-X-Google-Smtp-Source: APBJJlGXysVwoVyL6xHsATW7iGx9aK7yPIYYidloTa4vCgFYT/KC5iWpTFNx4CxxlyjKdputgHklZg==
-X-Received: by 2002:a05:620a:220c:b0:765:abeb:a13e with SMTP id m12-20020a05620a220c00b00765abeba13emr2067168qkh.60.1690282197400;
-        Tue, 25 Jul 2023 03:49:57 -0700 (PDT)
-Received: from smtpclient.apple ([192.145.116.44])
-        by smtp.gmail.com with ESMTPSA id o7-20020a05620a15c700b00767cd2dbd82sm3601564qkm.15.2023.07.25.03.49.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 03:49:56 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Joel Fernandes <joel@joelfernandes.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [RFC PATCH v2 18/20] context_tracking,x86: Defer kernel text patching IPIs
-Date:   Tue, 25 Jul 2023 06:49:45 -0400
-Message-Id: <6EBAEEED-6F38-472D-BA31-9C61179EFA2F@joelfernandes.org>
-References: <20230720163056.2564824-19-vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        =?utf-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-In-Reply-To: <20230720163056.2564824-19-vschneid@redhat.com>
-To:     Valentin Schneider <vschneid@redhat.com>
-X-Mailer: iPhone Mail (20B101)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_QP_LONG_LINE,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S234383AbjGYLUC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 07:20:02 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 93C89199F;
+        Tue, 25 Jul 2023 04:20:00 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94A5615BF;
+        Tue, 25 Jul 2023 04:20:43 -0700 (PDT)
+Received: from [10.57.89.166] (unknown [10.57.89.166])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E7A7E3F67D;
+        Tue, 25 Jul 2023 04:19:56 -0700 (PDT)
+Message-ID: <8a828ef2-b09b-4322-26fa-eae6cc88753f@arm.com>
+Date:   Tue, 25 Jul 2023 12:19:54 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+To:     Salil Mehta <salil.mehta@huawei.com>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Salil Mehta <salil.mehta@opnsrc.net>,
+        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Gareth Stockwell <Gareth.Stockwell@arm.com>
+References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+ <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
+ <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
+ <93c9c8356e444fb287393a935a8c7899@huawei.com>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <93c9c8356e444fb287393a935a8c7899@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Interesting series Valentin. Some high-level question/comments on this one:
+Hi Salil
 
-> On Jul 20, 2023, at 12:34 PM, Valentin Schneider <vschneid@redhat.com> wro=
-te:
->=20
-> =EF=BB=BFtext_poke_bp_batch() sends IPIs to all online CPUs to synchronize=
+On 25/07/2023 01:05, Salil Mehta wrote:
+> Hi Suzuki,
+> Sorry for replying late as I was on/off last week to undergo some medical test.
+> 
+> 
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Sent: Monday, July 24, 2023 5:27 PM
+>>
+>> Hi Salil
+>>
+>> On 19/07/2023 10:28, Suzuki K Poulose wrote:
+>>> Hi Salil
+>>>
+>>> Thanks for raising this.
+>>>
+>>> On 19/07/2023 03:35, Salil Mehta wrote:
+>>>> [Reposting it here from Linaro Open Discussion List for more eyes to
+>>>> look at]
+>>>>
+>>>> Hello,
+>>>> I have recently started to dabble with ARM CCA stuff and check if our
+>>>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
+>>>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
+>>>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
+>>>> from the host. This might be required to support vCPU Hotplug feature
+>>>> in the realm world in future. vCPU Hotplug is an important feature to
+>>>> support kata-containers in realm world as it reduces the VM boot time
+>>>> and facilitates dynamic adjustment of vCPUs (which I think should be
+>>>> true even with Realm world as current implementation only makes use
+>>>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+>>>>
+>>>>
+>>>> As per our recent changes [2], [3] related to support vCPU Hotplug on
+>>>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
+>>>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
+>>>> PSCI_CPU_ON should undergo similar policy checks and I think,
+>>>>
+>>>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
+>>>> 2. This means target REC should be denied by host. Can host call
+>>>>      RMI_PSCI_COMPETE in such s case?
+>>>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
+>>>
+>>> The Realm exit with EXIT_PSCI already provides the parameters passed
+>>> onto the PSCI request. This happens for all PSCI calls except
+>>> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
+>>> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses
+>>> the request (wherever applicable).
+>>>
+>>> However, the RMM spec currently doesn't allow denying the request.
+>>> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
+>>> We will address this in the RMM spec and get back to you.
+>>
+>> This is now resolved in RMMv1.0-eac3 spec, available here [0].
+>>
+>> This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
+>> the response doesn't violate the security guarantees by checking the
+>> state of the target REC.
+>>
+>> [0] https://developer.arm.com/documentation/den0137/latest/
+> 
+> 
+> Many thanks for taking this up proactively and getting it done as well
+> very efficiently. Really appreciate this!
+> 
+> I acknowledge below new changes part of the newly released RMM
+> Specification [3] (Page-2) (Release Information 1.0-eac3 20-07-2023):
+> 
+> 1. Addition of B2.19 PsciReturnCodePermitted function [3] (Page-126)
+> 2. Addition of 'status' in B3.3.7.2 Failure conditions of the
+>     B3.3.7 RMI_PSCI_COMPLETE command [3] (Page-160)
+> 
+> 
+> Some Further Suggestions:
+> 1. It would be really helpful if PSCI_DENIED can be accommodated somewhere
+>     in the flow diagram (D1.4.1 PSCI_CPU_ON flow) [3] (Page-297) as well.
 
-> them vs the newly patched instruction. CPUs that are executing in userspac=
-e
-> do not need this synchronization to happen immediately, and this is
-> actually harmful interference for NOHZ_FULL CPUs.
+Good point, yes, will get that added.
 
-Does the amount of harm not correspond to practical frequency of text_poke?=20=
+> 2. You would need changes to handle the return value of the PSCI_DENIED
+>     in this below patch [2] as well from ARM CCA series [1]
+> 
 
-How often does instruction patching really happen? If it is very infrequent
-then I am not sure if it is that harmful.
+Of course. Please note that the series [1] is based on RMMv1.0-beta0 and
+we are in the process of rebasing our changes to v1.0-eac3, which
+includes a lot of other changes. The updated series will have all the
+required changes.
 
->=20
-> As the synchronization IPIs are sent using a blocking call, returning from=
-
-> text_poke_bp_batch() implies all CPUs will observe the patched
-> instruction(s), and this should be preserved even if the IPI is deferred.
-> In other words, to safely defer this synchronization, any kernel
-> instruction leading to the execution of the deferred instruction
-> sync (ct_work_flush()) must *not* be mutable (patchable) at runtime.
-
-If it is not infrequent, then are you handling the case where userland
-spends multiple seconds before entering the kernel, and all this while
-the blocking call waits? Perhaps in such situation you want the real IPI
-to be sent out instead of the deferred one?
-
-thanks,
-
- - Joel
+Kind regards
+Suzuki
 
 
->=20
-> This means we must pay attention to mutable instructions in the early entr=
-y
-> code:
-> - alternatives
-> - static keys
-> - all sorts of probes (kprobes/ftrace/bpf/???)
->=20
-> The early entry code leading to ct_work_flush() is noinstr, which gets rid=
+> 
+> @James, Any further thoughts on this?
+> 
+> 
+> References:
+> [1] [RFC PATCH 00/28] arm64: Support for Arm CCA in KVM
+> [2] [RFC PATCH 19/28] KVM: arm64: Validate register access for a Realm VM
+>       https://lore.kernel.org/lkml/20230127112248.136810-1-suzuki.poulose@arm.com/T/#m6c10b9a27c4a724967c1800facacaa9443b38b4c
+> [3] ARM Realm Management Monitor specification(DEN0137 1.0-eac3)
+>      https://developer.arm.com/documentation/den0137/latest/
+>   
+> 
+> Thanks
+> Salil.
+> 
+> 
+>>>> 4. Failure condition (B5.3.3.2) should be amended with
+>>>>      runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
+>>>>               post: result == PSCI_DENIED (?)
+>>>> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
+>>>>      PSCI_CPU_ON flow (D1.4.1)
+>>>>
+>>>> I do understand that ARM CCA support is in its infancy stage and
+>>>> discussing about vCPU Hotplug in realm world seem to be a far-fetched
+>>>> idea right now. But specification changes require lot of time and if
+>>>> this change is really required then it should be further discussed
+>>>> within ARM.
+>>>>
+>>>> Many thanks!
+>>>>
+>>>>
+>>>> Bes regards
+>>>> Salil
+>>>>
+>>>>
+>>>> References:
+>>>>
+>>>> [1] https://developer.arm.com/documentation/den0137/latest/
+>>>> [2] https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
+>>>> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git virtual_cpu_hotplug/rfc/v2
+> 
 
-> of the probes.
->=20
-> Alternatives are safe, because it's boot-time patching (before SMP is
-> even brought up) which is before any IPI deferral can happen.
->=20
-> This leaves us with static keys. Any static key used in early entry code
-> should be only forever-enabled at boot time, IOW __ro_after_init (pretty
-> much like alternatives). Objtool is now able to point at static keys that
-> don't respect this, and all static keys used in early entry code have now
-> been verified as behaving like so.
->=20
-> Leverage the new context_tracking infrastructure to defer sync_core() IPIs=
-
-> to a target CPU's next kernel entry.
->=20
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Nicolas Saenz Julienne <nsaenzju@redhat.com>
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
-> arch/x86/include/asm/context_tracking_work.h |  6 +++--
-> arch/x86/include/asm/text-patching.h         |  1 +
-> arch/x86/kernel/alternative.c                | 24 ++++++++++++++++----
-> arch/x86/kernel/kprobes/core.c               |  4 ++--
-> arch/x86/kernel/kprobes/opt.c                |  4 ++--
-> arch/x86/kernel/module.c                     |  2 +-
-> include/linux/context_tracking_work.h        |  4 ++--
-> 7 files changed, 32 insertions(+), 13 deletions(-)
->=20
-> diff --git a/arch/x86/include/asm/context_tracking_work.h b/arch/x86/inclu=
-de/asm/context_tracking_work.h
-> index 5bc29e6b2ed38..2c66687ce00e2 100644
-> --- a/arch/x86/include/asm/context_tracking_work.h
-> +++ b/arch/x86/include/asm/context_tracking_work.h
-> @@ -2,11 +2,13 @@
-> #ifndef _ASM_X86_CONTEXT_TRACKING_WORK_H
-> #define _ASM_X86_CONTEXT_TRACKING_WORK_H
->=20
-> +#include <asm/sync_core.h>
-> +
-> static __always_inline void arch_context_tracking_work(int work)
-> {
->    switch (work) {
-> -    case CONTEXT_WORK_n:
-> -        // Do work...
-> +    case CONTEXT_WORK_SYNC:
-> +        sync_core();
->        break;
->    }
-> }
-> diff --git a/arch/x86/include/asm/text-patching.h b/arch/x86/include/asm/t=
-ext-patching.h
-> index 29832c338cdc5..b6939e965e69d 100644
-> --- a/arch/x86/include/asm/text-patching.h
-> +++ b/arch/x86/include/asm/text-patching.h
-> @@ -43,6 +43,7 @@ extern void text_poke_early(void *addr, const void *opco=
-de, size_t len);
->  */
-> extern void *text_poke(void *addr, const void *opcode, size_t len);
-> extern void text_poke_sync(void);
-> +extern void text_poke_sync_deferrable(void);
-> extern void *text_poke_kgdb(void *addr, const void *opcode, size_t len);
-> extern void *text_poke_copy(void *addr, const void *opcode, size_t len);
-> extern void *text_poke_copy_locked(void *addr, const void *opcode, size_t l=
-en, bool core_ok);
-> diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.c=
-
-> index 72646d75b6ffe..fcce480e1919e 100644
-> --- a/arch/x86/kernel/alternative.c
-> +++ b/arch/x86/kernel/alternative.c
-> @@ -18,6 +18,7 @@
-> #include <linux/mmu_context.h>
-> #include <linux/bsearch.h>
-> #include <linux/sync_core.h>
-> +#include <linux/context_tracking.h>
-> #include <asm/text-patching.h>
-> #include <asm/alternative.h>
-> #include <asm/sections.h>
-> @@ -1933,9 +1934,24 @@ static void do_sync_core(void *info)
->    sync_core();
-> }
->=20
-> +static bool do_sync_core_defer_cond(int cpu, void *info)
-> +{
-> +    return !ct_set_cpu_work(cpu, CONTEXT_WORK_SYNC);
-> +}
-> +
-> +static void __text_poke_sync(smp_cond_func_t cond_func)
-> +{
-> +    on_each_cpu_cond(cond_func, do_sync_core, NULL, 1);
-> +}
-> +
-> void text_poke_sync(void)
-> {
-> -    on_each_cpu(do_sync_core, NULL, 1);
-> +    __text_poke_sync(NULL);
-> +}
-> +
-> +void text_poke_sync_deferrable(void)
-> +{
-> +    __text_poke_sync(do_sync_core_defer_cond);
-> }
->=20
-> /*
-> @@ -2145,7 +2161,7 @@ static void text_poke_bp_batch(struct text_poke_loc *=
-tp, unsigned int nr_entries
->        text_poke(text_poke_addr(&tp[i]), &int3, INT3_INSN_SIZE);
->    }
->=20
-> -    text_poke_sync();
-> +    text_poke_sync_deferrable();
->=20
->    /*
->     * Second step: update all but the first byte of the patched range.
-> @@ -2207,7 +2223,7 @@ static void text_poke_bp_batch(struct text_poke_loc *=
-tp, unsigned int nr_entries
->         * not necessary and we'd be safe even without it. But
->         * better safe than sorry (plus there's not only Intel).
->         */
-> -        text_poke_sync();
-> +        text_poke_sync_deferrable();
->    }
->=20
->    /*
-> @@ -2228,7 +2244,7 @@ static void text_poke_bp_batch(struct text_poke_loc *=
-tp, unsigned int nr_entries
->    }
->=20
->    if (do_sync)
-> -        text_poke_sync();
-> +        text_poke_sync_deferrable();
->=20
->    /*
->     * Remove and wait for refs to be zero.
-> diff --git a/arch/x86/kernel/kprobes/core.c b/arch/x86/kernel/kprobes/core=
-.c
-> index f7f6042eb7e6c..a38c914753397 100644
-> --- a/arch/x86/kernel/kprobes/core.c
-> +++ b/arch/x86/kernel/kprobes/core.c
-> @@ -735,7 +735,7 @@ void arch_arm_kprobe(struct kprobe *p)
->    u8 int3 =3D INT3_INSN_OPCODE;
->=20
->    text_poke(p->addr, &int3, 1);
-> -    text_poke_sync();
-> +    text_poke_sync_deferrable();
->    perf_event_text_poke(p->addr, &p->opcode, 1, &int3, 1);
-> }
->=20
-> @@ -745,7 +745,7 @@ void arch_disarm_kprobe(struct kprobe *p)
->=20
->    perf_event_text_poke(p->addr, &int3, 1, &p->opcode, 1);
->    text_poke(p->addr, &p->opcode, 1);
-> -    text_poke_sync();
-> +    text_poke_sync_deferrable();
-> }
->=20
-> void arch_remove_kprobe(struct kprobe *p)
-> diff --git a/arch/x86/kernel/kprobes/opt.c b/arch/x86/kernel/kprobes/opt.c=
-
-> index 57b0037d0a996..88451a744ceda 100644
-> --- a/arch/x86/kernel/kprobes/opt.c
-> +++ b/arch/x86/kernel/kprobes/opt.c
-> @@ -521,11 +521,11 @@ void arch_unoptimize_kprobe(struct optimized_kprobe *=
-op)
->           JMP32_INSN_SIZE - INT3_INSN_SIZE);
->=20
->    text_poke(addr, new, INT3_INSN_SIZE);
-> -    text_poke_sync();
-> +    text_poke_sync_deferrable();
->    text_poke(addr + INT3_INSN_SIZE,
->          new + INT3_INSN_SIZE,
->          JMP32_INSN_SIZE - INT3_INSN_SIZE);
-> -    text_poke_sync();
-> +    text_poke_sync_deferrable();
->=20
->    perf_event_text_poke(op->kp.addr, old, JMP32_INSN_SIZE, new, JMP32_INSN=
-_SIZE);
-> }
-> diff --git a/arch/x86/kernel/module.c b/arch/x86/kernel/module.c
-> index b05f62ee2344b..8b4542dc51b6d 100644
-> --- a/arch/x86/kernel/module.c
-> +++ b/arch/x86/kernel/module.c
-> @@ -242,7 +242,7 @@ static int write_relocate_add(Elf64_Shdr *sechdrs,
->                   write, apply);
->=20
->    if (!early) {
-> -        text_poke_sync();
-> +        text_poke_sync_deferrable();
->        mutex_unlock(&text_mutex);
->    }
->=20
-> diff --git a/include/linux/context_tracking_work.h b/include/linux/context=
-_tracking_work.h
-> index fb74db8876dd2..13fc97b395030 100644
-> --- a/include/linux/context_tracking_work.h
-> +++ b/include/linux/context_tracking_work.h
-> @@ -5,12 +5,12 @@
-> #include <linux/bitops.h>
->=20
-> enum {
-> -    CONTEXT_WORK_n_OFFSET,
-> +    CONTEXT_WORK_SYNC_OFFSET,
->    CONTEXT_WORK_MAX_OFFSET
-> };
->=20
-> enum ct_work {
-> -    CONTEXT_WORK_n        =3D BIT(CONTEXT_WORK_n_OFFSET),
-> +    CONTEXT_WORK_SYNC     =3D BIT(CONTEXT_WORK_SYNC_OFFSET),
->    CONTEXT_WORK_MAX      =3D BIT(CONTEXT_WORK_MAX_OFFSET)
-> };
->=20
-> --=20
-> 2.31.1
->=20
