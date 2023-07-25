@@ -2,227 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14374761E9A
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 18:35:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47C8A761EB5
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 18:38:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231145AbjGYQfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 12:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33498 "EHLO
+        id S230402AbjGYQiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 12:38:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229701AbjGYQf3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 12:35:29 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A29C10C9
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:35:28 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id 46e09a7af769-6b9b89627c3so4445239a34.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:35:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690302928; x=1690907728;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j1zn/9mZBEEPMZ3SvwwpvL0Ph7iRqIpCjYP1QEBphQc=;
-        b=e1twazjp0/qMRNnTvnB9YM13KEt7bqPJlbvxQjiAFAWo8WtYTAP3qF+BRKh7TD7iDk
-         WKi802bE4cymQYCrxRB/j2qBqgHPbTna7eAIV8rfdx5Jpc6EBx9zl+zW/Ff1jqGmCSlX
-         N/Pyfu8eIqER6jQqHklAvXCGtLY8gdC9ChUv5XGswA9jeLZWDAze4K0NE6u+4aaKEUA+
-         vlMoVKirBJ6SU1x6mpvkN6olqUmVCLK8p8Z5ql3BEsLz03Iwe4wg9rlIVBtNMfzgB7Cz
-         em3f/GRv5gosLnV3I8IBjQFqudfVQSqeRSkhb9Z1bhRYXEGmt3jaWmwRDq1YXYGWFUrl
-         HcTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690302928; x=1690907728;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j1zn/9mZBEEPMZ3SvwwpvL0Ph7iRqIpCjYP1QEBphQc=;
-        b=bDFRcndhmmgpAVC+KPumPcbikI7fu50XqrVPCuwC3oy16eA/zgmPbL625NHCs9zXEx
-         +Xs/IyMzSY/oUYkWw2y3vG41bFFsPX8EXN3SH8xIzcF6GzPxY+w4NfSBipoUgcw5ZCWu
-         UZk1oXwYs0zeeDy59zvlXQxyTb5IFSNqkkkOjlwhrcuktuUOpqzxNE1lK4zej92Y38M+
-         zl1Qo/7qnWezFg7FaCGR+h4hN7hgxDu2m20U4IKs9v7V1yBlSO4vcYQ7pKRLVtavPdt3
-         6YQbFzbY/3Hw17RK7QTSNnJioMcRnEG3wABhT3dwyUAhwsp2/p/2n4VwjvTydm4NLZXs
-         XIFw==
-X-Gm-Message-State: ABy/qLbTz1vN1rZWshiE6hnOXbLjMckqysAtVO1jKwjnZGZRgUfDY6O5
-        AEryZ7AcGvESsXyZRqYk1vHwJA==
-X-Google-Smtp-Source: APBJJlF0yUUj57hWH9KFX50Gqin4qAY62eeDl7pzUszz6j9MJzFDJP5kc4Jnj86STldIIshcesvCzg==
-X-Received: by 2002:a9d:66c1:0:b0:6b9:8feb:7f1e with SMTP id t1-20020a9d66c1000000b006b98feb7f1emr11464058otm.35.1690302927790;
-        Tue, 25 Jul 2023 09:35:27 -0700 (PDT)
-Received: from [192.168.68.108] (201-69-66-36.dial-up.telesp.net.br. [201.69.66.36])
-        by smtp.gmail.com with ESMTPSA id k25-20020a0568301bf900b006b8a0c7e14asm5029381otb.55.2023.07.25.09.35.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 09:35:27 -0700 (PDT)
-Message-ID: <d06e1004-adac-8c24-167c-c87978340baa@ventanamicro.com>
-Date:   Tue, 25 Jul 2023 13:35:22 -0300
+        with ESMTP id S229850AbjGYQis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 12:38:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895C61BD9
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690303085;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jLj18oLOp3KH/CAHpxuqfsfjyo2yWkCl10MaSaKRkoU=;
+        b=id1xKVunnGBITZUqxjrhXI9DE7fHEgFBTlVJidjUKmnYATS7rF1EC/gsf+SxOO+b9MCNZ7
+        4ekIG16Bt9kkhXyWm0ZS6afq7dwpYKbBi7+0V4iC1+HQQDqhcVJbVzJB+hX7y6JVuhruQ5
+        7D4fBpLYhvtfLE179Ishkq2mU0C0LD0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-130-1Gk68m60OaugU8loWBg99g-1; Tue, 25 Jul 2023 12:38:00 -0400
+X-MC-Unique: 1Gk68m60OaugU8loWBg99g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 27C681044597;
+        Tue, 25 Jul 2023 16:38:00 +0000 (UTC)
+Received: from tpad.localdomain (ovpn-112-3.gru2.redhat.com [10.97.112.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D021492B01;
+        Tue, 25 Jul 2023 16:37:59 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+        id B479B4018E672; Tue, 25 Jul 2023 13:37:32 -0300 (-03)
+Date:   Tue, 25 Jul 2023 13:37:32 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Valentin Schneider <vschneid@redhat.com>,
+        Nadav Amit <namit@vmware.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-trace-kernel@vger.kernel.org" 
+        <linux-trace-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, bpf <bpf@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 20/20] x86/mm, mm/vmalloc: Defer
+ flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
+Message-ID: <ZL/6THDvmC5mVyBI@tpad>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-21-vschneid@redhat.com>
+ <188AEA79-10E6-4DFF-86F4-FE624FD1880F@vmware.com>
+ <xhsmh8rb5tui1.mognet@vschneid.remote.csb>
+ <2284d0db-f94a-e059-7bd0-bab4f112ed35@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2] kvm: Remove KVM_CREATE_IRQCHIP support assumption
-Content-Language: en-US
-To:     Andrew Jones <ajones@ventanamicro.com>, qemu-devel@nongnu.org
-Cc:     pbonzini@redhat.com, mtosatti@redhat.com, peter.maydell@linaro.org,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com, thuth@redhat.com,
-        kvm@vger.kernel.org, qemu-arm@nongnu.org, qemu-s390x@nongnu.org
-References: <20230725122601.424738-2-ajones@ventanamicro.com>
-From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-In-Reply-To: <20230725122601.424738-2-ajones@ventanamicro.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2284d0db-f94a-e059-7bd0-bab4f112ed35@intel.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jul 24, 2023 at 10:40:04AM -0700, Dave Hansen wrote:
+> On 7/24/23 04:32, Valentin Schneider wrote:
+> > AFAICT the only reasonable way to go about the deferral is to prove that no
+> > such access happens before the deferred @operation is done. We got to prove
+> > that for sync_core() deferral, cf. PATCH 18.
+> > 
+> > I'd like to reason about it for deferring vunmap TLB flushes:
+> > 
+> > What addresses in VMAP range, other than the stack, can early entry code
+> > access? Yes, the ranges can be checked at runtime, but is there any chance
+> > of figuring this out e.g. at build-time?
+> 
+> Nadav was touching on a very important point: TLB flushes for addresses
+> are relatively easy to defer.  You just need to ensure that the CPU
+> deferring the flush does an actual flush before it might architecturally
+> consume the contents of the flushed entry.
+> 
+> TLB flushes for freed page tables are another game entirely.  The CPU is
+> free to cache any part of the paging hierarchy it wants at any time.
+
+Depend on CONFIG_PAGE_TABLE_ISOLATION=y, which flushes TLB (and page
+table caches) on user->kernel and kernel->user context switches ?
+
+So freeing a kernel pagetable page does not require interrupting a CPU 
+which is in userspace (therefore does not have visibility into kernel
+pagetables).
+
+> It's also free to set accessed and dirty bits at any time, even for
+> instructions that may never execute architecturally.
+> 
+> That basically means that if you have *ANY* freed page table page
+> *ANYWHERE* in the page table hierarchy of any CPU at any time ... you're
+> screwed.
+> 
+> There's no reasoning about accesses or ordering.  As soon as the CPU
+> does *anything*, it's out to get you.
+> 
+> You're going to need to do something a lot more radical to deal with
+> free page table pages.
 
 
-On 7/25/23 09:26, Andrew Jones wrote:
-> Since Linux commit 00f918f61c56 ("RISC-V: KVM: Skeletal in-kernel AIA
-> irqchip support") checking KVM_CAP_IRQCHIP returns non-zero when the
-> RISC-V platform has AIA. The cap indicates KVM supports at least one
-> of the following ioctls:
-> 
->    KVM_CREATE_IRQCHIP
->    KVM_IRQ_LINE
->    KVM_GET_IRQCHIP
->    KVM_SET_IRQCHIP
->    KVM_GET_LAPIC
->    KVM_SET_LAPIC
-> 
-> but the cap doesn't imply that KVM must support any of those ioctls
-> in particular. However, QEMU was assuming the KVM_CREATE_IRQCHIP
-> ioctl was supported. Stop making that assumption by introducing a
-> KVM parameter that each architecture which supports KVM_CREATE_IRQCHIP
-> sets. Adding parameters isn't awesome, but given how the
-> KVM_CAP_IRQCHIP isn't very helpful on its own, we don't have a lot of
-> options.
-> 
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
 
-Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-
-> 
-> While this fixes booting guests on riscv KVM with AIA it's unlikely
-> to get merged before the QEMU support for KVM AIA[1] lands, which
-> would also fix the issue. I think this patch is still worth considering
-> though since QEMU's assumption is wrong.
-> 
-> [1] https://lore.kernel.org/all/20230714084429.22349-1-yongxuan.wang@sifive.com/
-> 
-> v2:
->    - Move the s390x code to an s390x file. [Thomas]
->    - Drop the KVM_CAP_IRQCHIP check from the top of kvm_irqchip_create(),
->      as it's no longer necessary.
-> 
->   accel/kvm/kvm-all.c    | 16 ++++------------
->   include/sysemu/kvm.h   |  1 +
->   target/arm/kvm.c       |  3 +++
->   target/i386/kvm/kvm.c  |  2 ++
->   target/s390x/kvm/kvm.c | 11 +++++++++++
->   5 files changed, 21 insertions(+), 12 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 373d876c0580..cddcb6eca641 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -86,6 +86,7 @@ struct KVMParkedVcpu {
->   };
->   
->   KVMState *kvm_state;
-> +bool kvm_has_create_irqchip;
->   bool kvm_kernel_irqchip;
->   bool kvm_split_irqchip;
->   bool kvm_async_interrupts_allowed;
-> @@ -2358,17 +2359,6 @@ static void kvm_irqchip_create(KVMState *s)
->       int ret;
->   
->       assert(s->kernel_irqchip_split != ON_OFF_AUTO_AUTO);
-> -    if (kvm_check_extension(s, KVM_CAP_IRQCHIP)) {
-> -        ;
-> -    } else if (kvm_check_extension(s, KVM_CAP_S390_IRQCHIP)) {
-> -        ret = kvm_vm_enable_cap(s, KVM_CAP_S390_IRQCHIP, 0);
-> -        if (ret < 0) {
-> -            fprintf(stderr, "Enable kernel irqchip failed: %s\n", strerror(-ret));
-> -            exit(1);
-> -        }
-> -    } else {
-> -        return;
-> -    }
->   
->       /* First probe and see if there's a arch-specific hook to create the
->        * in-kernel irqchip for us */
-> @@ -2377,8 +2367,10 @@ static void kvm_irqchip_create(KVMState *s)
->           if (s->kernel_irqchip_split == ON_OFF_AUTO_ON) {
->               error_report("Split IRQ chip mode not supported.");
->               exit(1);
-> -        } else {
-> +        } else if (kvm_has_create_irqchip) {
->               ret = kvm_vm_ioctl(s, KVM_CREATE_IRQCHIP);
-> +        } else {
-> +            return;
->           }
->       }
->       if (ret < 0) {
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 115f0cca79d1..84b1bb3dc91e 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -32,6 +32,7 @@
->   #ifdef CONFIG_KVM_IS_POSSIBLE
->   
->   extern bool kvm_allowed;
-> +extern bool kvm_has_create_irqchip;
->   extern bool kvm_kernel_irqchip;
->   extern bool kvm_split_irqchip;
->   extern bool kvm_async_interrupts_allowed;
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index b4c7654f4980..2fa87b495d68 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -250,6 +250,9 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
->   int kvm_arch_init(MachineState *ms, KVMState *s)
->   {
->       int ret = 0;
-> +
-> +    kvm_has_create_irqchip = kvm_check_extension(s, KVM_CAP_IRQCHIP);
-> +
->       /* For ARM interrupt delivery is always asynchronous,
->        * whether we are using an in-kernel VGIC or not.
->        */
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index ebfaf3d24c79..6363e67f092d 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -2771,6 +2771,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->           }
->       }
->   
-> +    kvm_has_create_irqchip = kvm_check_extension(s, KVM_CAP_IRQCHIP);
-> +
->       return 0;
->   }
->   
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index a9e5880349d9..bcc735227f7d 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -391,6 +391,17 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->       }
->   
->       kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
-> +
-> +    kvm_has_create_irqchip = kvm_check_extension(s, KVM_CAP_S390_IRQCHIP);
-> +    if (kvm_has_create_irqchip) {
-> +        int ret = kvm_vm_enable_cap(s, KVM_CAP_S390_IRQCHIP, 0);
-> +
-> +        if (ret < 0) {
-> +            fprintf(stderr, "Enable kernel irqchip failed: %s\n", strerror(-ret));
-> +            exit(1);
-> +        }
-> +    }
-> +
->       return 0;
->   }
->   
