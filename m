@@ -2,213 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB17B7606C5
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 05:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 740E37606CF
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 05:42:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231260AbjGYDkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 23:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39870 "EHLO
+        id S229797AbjGYDmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 23:42:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbjGYDj6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 23:39:58 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C953173D
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 20:39:57 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bb775625e2so19994055ad.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 20:39:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690256396; x=1690861196;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=McUqq8F18rjKUkfgDDmWRJciO+eOkScPdFBftk4eTRU=;
-        b=cPEEBbSJRcPurMMaZ88qjs2nRnjd8rpkZzHjPwOqBd7MuUcYXHXl3uK+WMDecIvYDy
-         lv4RGB1z9jToLOw2agxgQWJzQK9xVsDQNJ2trhAAWMcRW1nZMKkQxgM/OwKdh594Nq5P
-         qGbvxVMJcnMM5DJOn1X6uv/OeD7FSev/dIavmNnWQkzTnZO4dMXuVjYXX9ssYTEqo3+Q
-         jQ0m5rwjrsIO4pVlu1VYvVk3wJBXhRoO4GtqLqpbvhTN08Pd/uQkSgjrgZAstX4x0gA+
-         +gkZ4rjsy4z2CO56Ef6L1LT/hf9lX6khM0N0Xq+g1ZNi/crl7KvJG8xb+ZJhvfGaihz4
-         qp6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690256396; x=1690861196;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=McUqq8F18rjKUkfgDDmWRJciO+eOkScPdFBftk4eTRU=;
-        b=JSCCmRCNMV0Aw/HY7S8SmYWThrJKT63DBmxfEoaKQNuoXVkV2zh0SR2WjReOhnSoCL
-         5K8e5DvIjGGHco1HVi+5gnohBukHWm5F43suW29Dol3PAlBDzTw1J5JAXxkVCUusbxSw
-         iABixaMSvkzVKShY6ojloP00xxU8bG48N1txo3xY7SZOlJapBHm8u1Cpar4tNmlfStMi
-         IoYsmrB6YkwnJNSq+/hiMwGoNsRzZZuyELdfnTfRH3A2dXG9g3+Y4A8ADmZ+jrn2cEMi
-         EO5jXp2CVJHC9VTK2BB1MQDGNu0ytJkSOLT3fJm7+FsdwHe31f91x6IwEAxcz1kTeasv
-         yr0Q==
-X-Gm-Message-State: ABy/qLYHRgWi50KbFnC/L1yadpv84rmNFynzkXR9K/En7riaRVQI9idr
-        yLPBN1yoo7x7XH71vWuHUTq7+HcLaeA=
-X-Google-Smtp-Source: APBJJlHXTVB3ZRTnKN9wcNbUwiYwM3sCLFgNSDI/W9i4+CSkZEYJ2lJn8aE47V2/KEWGSiQMegzH8A==
-X-Received: by 2002:a17:902:ced0:b0:1b8:3936:7b64 with SMTP id d16-20020a170902ced000b001b839367b64mr1690700plg.1.1690256396158;
-        Mon, 24 Jul 2023 20:39:56 -0700 (PDT)
-Received: from wheely.local0.net ([118.102.104.45])
-        by smtp.gmail.com with ESMTPSA id i5-20020a170902c94500b001b809082a69sm9793112pla.235.2023.07.24.20.39.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jul 2023 20:39:55 -0700 (PDT)
-From:   Nicholas Piggin <npiggin@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH 3/3] arch-run: Support multiple migrations
-Date:   Tue, 25 Jul 2023 13:39:37 +1000
-Message-Id: <20230725033937.277156-4-npiggin@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230725033937.277156-1-npiggin@gmail.com>
-References: <20230725033937.277156-1-npiggin@gmail.com>
+        with ESMTP id S229497AbjGYDmG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 23:42:06 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729091725;
+        Mon, 24 Jul 2023 20:42:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1690256521;
+        bh=fqZhhu1PD0i+4g0TKatkfYBNa6Ta8n6gN3J4CmEr6Ls=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=C+5P9aFTM3Wjbzg0OpyrP37MMtgmILxrNCL0SBekDUGnLmL2hbYoY/Whcme+sowb+
+         jj0g8pEh3Ja+StlLshqWdLwAovENk3HP9UoEWOZg5dYPNwU82WAsrEYjqFeIQeIe/Q
+         aWyqJDMnour5OZE732UMTJFRgFodBjF+n6U9w/9phMH2/C6BChsF7G9XJJtu0dFlj8
+         hjM9emqPQqJJDDkxyaLgOk1nc8xDUCmEqzoXxwIw86tbWobOCe5SbyOHqATQBKlgxl
+         aXy3n1WqIiGtc2/Z2uFQC5qdhp/sG1INDLRVaLZ5lkrlMPTpl+l8bbtjUNgJ1GbqDQ
+         jqtHWF6biKMbg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4R92s426wJz4wxy;
+        Tue, 25 Jul 2023 13:42:00 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Alistair Popple <apopple@nvidia.com>, akpm@linux-foundation.org
+Cc:     ajd@linux.ibm.com, catalin.marinas@arm.com, fbarrat@linux.ibm.com,
+        iommu@lists.linux.dev, jgg@ziepe.ca, jhubbard@nvidia.com,
+        kevin.tian@intel.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org,
+        nicolinc@nvidia.com, npiggin@gmail.com, robin.murphy@arm.com,
+        seanjc@google.com, will@kernel.org, x86@kernel.org,
+        zhi.wang.linux@gmail.com, Alistair Popple <apopple@nvidia.com>
+Subject: Re: [PATCH v2 3/5] mmu_notifiers: Call invalidate_range() when
+ invalidating TLBs
+In-Reply-To: <8f293bb51a423afa71ddc3ba46e9f323ee9ffbc7.1689768831.git-series.apopple@nvidia.com>
+References: <cover.de78568883814904b78add6317c263bf5bc20234.1689768831.git-series.apopple@nvidia.com>
+ <8f293bb51a423afa71ddc3ba46e9f323ee9ffbc7.1689768831.git-series.apopple@nvidia.com>
+Date:   Tue, 25 Jul 2023 13:41:59 +1000
+Message-ID: <87y1j4y7w8.fsf@mail.lhotse>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Support multiple migrations by flipping dest file/socket variables to
-source after the migration is complete, ready to start again. A new
-destination is created if the test outputs the migrate line again.
-Test cases may now switch to calling migrate() one or more times.
+Alistair Popple <apopple@nvidia.com> writes:
+> The invalidate_range() is going to become an architecture specific mmu
+> notifier used to keep the TLB of secondary MMUs such as an IOMMU in
+> sync with the CPU page tables. Currently it is called from separate
+> code paths to the main CPU TLB invalidations. This can lead to a
+> secondary TLB not getting invalidated when required and makes it hard
+> to reason about when exactly the secondary TLB is invalidated.
+>
+> To fix this move the notifier call to the architecture specific TLB
+> maintenance functions for architectures that have secondary MMUs
+> requiring explicit software invalidations.
+>
+> This fixes a SMMU bug on ARM64. On ARM64 PTE permission upgrades
+> require a TLB invalidation. This invalidation is done by the
+> architecutre specific ptep_set_access_flags() which calls
+  ^
+  architecture
+  
+> flush_tlb_page() if required. However this doesn't call the notifier
+> resulting in infinite faults being generated by devices using the SMMU
+> if it has previously cached a read-only PTE in it's TLB.
+>
+> Moving the invalidations into the TLB invalidation functions ensures
+> all invalidations happen at the same time as the CPU invalidation. The
+> architecture specific flush_tlb_all() routines do not call the
+> notifier as none of the IOMMUs require this.
+>
+> Signed-off-by: Alistair Popple <apopple@nvidia.com>
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> 
+...
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- lib/migrate.c         |  8 +++----
- lib/migrate.h         |  1 +
- scripts/arch-run.bash | 54 +++++++++++++++++++++++++++++++++++--------
- 3 files changed, 50 insertions(+), 13 deletions(-)
+> diff --git a/arch/powerpc/mm/book3s64/radix_tlb.c b/arch/powerpc/mm/book3s64/radix_tlb.c
+> index 0bd4866..9724b26 100644
+> --- a/arch/powerpc/mm/book3s64/radix_tlb.c
+> +++ b/arch/powerpc/mm/book3s64/radix_tlb.c
+> @@ -752,6 +752,8 @@ void radix__local_flush_tlb_page(struct vm_area_struct *vma, unsigned long vmadd
+>  		return radix__local_flush_hugetlb_page(vma, vmaddr);
+>  #endif
+>  	radix__local_flush_tlb_page_psize(vma->vm_mm, vmaddr, mmu_virtual_psize);
+> +	mmu_notifier_invalidate_range(vma->vm_mm, vmaddr,
+> +						vmaddr + mmu_virtual_psize);
+>  }
+>  EXPORT_SYMBOL(radix__local_flush_tlb_page);
 
-diff --git a/lib/migrate.c b/lib/migrate.c
-index 527e63ae..b7721659 100644
---- a/lib/migrate.c
-+++ b/lib/migrate.c
-@@ -8,8 +8,10 @@
- #include <libcflat.h>
- #include "migrate.h"
- 
--/* static for now since we only support migrating exactly once per test. */
--static void migrate(void)
-+/*
-+ * Initiate migration and wait for it to complete.
-+ */
-+void migrate(void)
- {
- 	puts("Now migrate the VM, then press a key to continue...\n");
- 	(void)getchar();
-@@ -19,8 +21,6 @@ static void migrate(void)
- /*
-  * Initiate migration and wait for it to complete.
-  * If this function is called more than once, it is a no-op.
-- * Since migrate_cmd can only migrate exactly once this function can
-- * simplify the control flow, especially when skipping tests.
-  */
- void migrate_once(void)
- {
-diff --git a/lib/migrate.h b/lib/migrate.h
-index 3c94e6af..2af06a72 100644
---- a/lib/migrate.h
-+++ b/lib/migrate.h
-@@ -6,4 +6,5 @@
-  * Author: Nico Boehr <nrb@linux.ibm.com>
-  */
- 
-+void migrate(void);
- void migrate_once(void);
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 30e535c7..e3155104 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -131,26 +131,55 @@ run_migration ()
- 
- 	migsock=$(mktemp -u -t mig-helper-socket.XXXXXXXXXX)
- 	migout1=$(mktemp -t mig-helper-stdout1.XXXXXXXXXX)
-+	migout2=$(mktemp -t mig-helper-stdout2.XXXXXXXXXX)
- 	qmp1=$(mktemp -u -t mig-helper-qmp1.XXXXXXXXXX)
- 	qmp2=$(mktemp -u -t mig-helper-qmp2.XXXXXXXXXX)
- 	fifo=$(mktemp -u -t mig-helper-fifo.XXXXXXXXXX)
- 	qmpout1=/dev/null
- 	qmpout2=/dev/null
-+	migcmdline=$@
- 
- 	trap 'kill 0; exit 2' INT TERM
--	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
-+	trap 'rm -f ${migout1} ${migout2} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
- 
--	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
-+	eval "$migcmdline" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
- 		-mon chardev=mon1,mode=control | tee ${migout1} &
- 	live_pid=`jobs -l %+ | grep "eval" | awk '{print$2}'`
- 
-+	# This starts the first source QEMU in advance of the test reaching the
-+	# migration point, since we expect at least one migration. Subsequent
-+	# sources are started as the test hits migrate keywords.
-+	do_migration || return $?
-+
-+	while ps -p ${live_pid} > /dev/null ; do
-+		# Wait for EXIT or further migrations
-+		if ! grep -q -i "Now migrate the VM" < ${migout1} ; then
-+			sleep 0.5
-+		else
-+			do_migration || return $?
-+		fi
-+	done
-+
-+	wait ${live_pid}
-+	ret=$?
-+
-+	while (( $(jobs -r | wc -l) > 0 )); do
-+		sleep 0.5
-+	done
-+
-+	return $ret
-+}
-+
-+do_migration ()
-+{
- 	# We have to use cat to open the named FIFO, because named FIFO's, unlike
- 	# pipes, will block on open() until the other end is also opened, and that
- 	# totally breaks QEMU...
- 	mkfifo ${fifo}
--	eval "$@" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
--		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) &
--	incoming_pid=`jobs -l %+ | awk '{print$2}'`
-+
-+	eval "$migcmdline" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
-+		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) | tee ${migout2} &
-+	incoming_pid=`jobs -l %+ | grep Running | awk '{print$2}'`
- 
- 	# The test must prompt the user to migrate, so wait for the "migrate" keyword
- 	while ! grep -q -i "Now migrate the VM" < ${migout1} ; do
-@@ -181,12 +210,19 @@ run_migration ()
- 	done
- 	qmp ${qmp1} '"quit"'> ${qmpout1} 2>/dev/null
- 	echo > ${fifo}
--	wait $incoming_pid
-+	rm ${fifo}
-+
-+	wait ${live_pid}
- 	ret=$?
- 
--	while (( $(jobs -r | wc -l) > 0 )); do
--		sleep 0.5
--	done
-+	# Now flip the variables because dest becomes source
-+	live_pid=${incoming_pid}
-+	tmp=${migout1}
-+	migout1=${migout2}
-+	migout2=${tmp}
-+	tmp=${qmp1}
-+	qmp1=${qmp2}
-+	qmp2=${tmp}
- 
- 	return $ret
- }
--- 
-2.40.1
+I think we can skip calling the notifier there? It's explicitly a local flush.
 
+cheers
