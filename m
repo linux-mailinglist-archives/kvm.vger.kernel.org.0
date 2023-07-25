@@ -2,94 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A09DF7620F3
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 20:05:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4A776211E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 20:15:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232561AbjGYSFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 14:05:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56268 "EHLO
+        id S232167AbjGYSPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 14:15:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232195AbjGYSFe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 14:05:34 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B491FDD
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:05:32 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583c1903ad3so42301967b3.2
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:05:32 -0700 (PDT)
+        with ESMTP id S230509AbjGYSPM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 14:15:12 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1A110EF
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:15:11 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d05e334f436so5631815276.2
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:15:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690308331; x=1690913131;
+        d=google.com; s=20221208; t=1690308910; x=1690913710;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BIo8qHauKdQX+T8FT8wbaojm6/JdQZAwM03PT/kIykI=;
-        b=7nXQcBRpxoTRBB3DVtfi1G3SLzO+8rbX0pZK3GqB/ZiRovVnhgEY5C+Gs70dPcpJKC
-         v8EbJPLKK/PtzLxWiGJ5qeO4LJqB7HN3pWAhYbANBnQSVYoMTUMzCaeCD3zEfSqoM+r2
-         fDpLY03C1R0xadVk8zh9oHGZMZqSmWV+dliNXRuRczTowFXc/oEsFJjHeqmHR0h/7zjV
-         1SaakHlCZawqmTagIefeOP2xnfIobskVh1rmXibU4Cwg3i96EQeqcAc0By/i+P6tJXi9
-         1AMdfmti0ZHyvBS0qJY6Ig052U8rUWQC7aHvZS0sxZXtvMY234BUecIw+5qK/UmUColq
-         VbWA==
+        bh=pAZmELeq2ZhkyDgChb+RthHmv+q1lpfrw6foSOn/8ZY=;
+        b=rldnnWH7w/HourUe/RcpHwlb69EnTTdPK/pDOa8OZfeDJ35pA6WgI3FFvgz7Wjl7x6
+         98M310YVHhmfsVHJyCvBvyNc55l3cU8cn0/4gGT0AfkBYx9Uwj+M/TkJ/eJKoiYntE36
+         Xj8BoGO0yZu8Q5LvMFeprTGpzBWUO4Lzfx2Wb0cSQj5fYvwYd/+vhSArQPxwdvsH9q6W
+         PPWnYjEsWI2CzoXQWQC16CG4zFTZm4P/pBUKSRJOKCAhm8mqCiQIm7W8/bXxHKYWj9z4
+         UjcWrpsMKdV9ZNjmW86cd2ztYi8qdoEAwtj4AbVpQokSZjJk5JZDjGBobeDfhd0+Kd1K
+         4UVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690308331; x=1690913131;
+        d=1e100.net; s=20221208; t=1690308910; x=1690913710;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BIo8qHauKdQX+T8FT8wbaojm6/JdQZAwM03PT/kIykI=;
-        b=LhwVKNKgcIjNRneSQ+PPC7f6BvOSoPiSKPnTbSgREuGnedth/cuMSTCClmWs/1qZHd
-         SKIC2Ir+8UMniV+xVq40p9QjmNMVT4DIpNrPHjCmgGtEt/36N7hpfvbZ5RwzILJ7GHqp
-         UDleMYkanu2+Mj5AbxKB005sZVUFQMNFveOiOWuarUvwWEyK0YqLb3ox8+MO6+256S/7
-         mmunDFBrsGSxmuh41eD6hGWKqz2zPeCLCrgckEPLVljWT61ozdR8/2SraRE3LTWv/wAr
-         px3WzorCY6cdM9IoB/QKa9k8ALUj0wX8v2nDKCPHwO3miy+3A3dJFWybeHbT+1SwN5uI
-         9Rtg==
-X-Gm-Message-State: ABy/qLYvscEpMXyAzq6DQfd03xe7Phtse6r3rLNEKt4YLJYWFeEePHXx
-        O7bwQDPz8jT9kQdL+v/t6wsStSfJGiU=
-X-Google-Smtp-Source: APBJJlG+f5K6Guu8BWDh2M0jvEhmql8458IaH+LCw2ABsy+ZDoDj1Vv7TcavygUx+nDEGvPQs1RCmsWjSr8=
+        bh=pAZmELeq2ZhkyDgChb+RthHmv+q1lpfrw6foSOn/8ZY=;
+        b=fphlnaC1xGDWGZzD7UrFwy9qY6rTSsLkoSNjXKVNteFNOXoxx5+DKlknGu05lZJ1Ut
+         r5f9DXNmAQAeE7RJqIGJVGBDvUBsZMjil6c9Bx5vo5qWvWUi9zOf4gOIPwCdSmTxXROt
+         +DkEQIxnMNzEU5Vkj3wWJ46wld1qr44exMWUOyZZbvEy8lSea4gPF5s4T9KMk46yA+rV
+         7NW/KrurLSdXoF2FY39eqkkwUyZyxW/VbJCoAJcQSxKgLnyh8PyNZyOZxc/fMOdsz8F5
+         d1+VM/ufL90iaHkInQHkPeKi8b6RwCyIXQCoJFE7aWT69gnqRDSK7HC7sq1d5+R3NEs7
+         CVCA==
+X-Gm-Message-State: ABy/qLaF7EeLLdarXtC+JzxXmhee3A87W7YUaRoOMVkuEVdAnHOoGIOq
+        PNQ7yPXE8OniGAuGPCqxFeWZwG0PTMs=
+X-Google-Smtp-Source: APBJJlFXrTcGU/9dXVrt8CbSBDCqA64SFKTYxJj7G92zNc7tdKvKFYWLRqCNhBTcCsblpCzONauc19v8DpM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4509:0:b0:573:5797:4b9e with SMTP id
- s9-20020a814509000000b0057357974b9emr213ywa.1.1690308331572; Tue, 25 Jul 2023
- 11:05:31 -0700 (PDT)
-Date:   Tue, 25 Jul 2023 11:05:29 -0700
-In-Reply-To: <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
+ (user=seanjc job=sendgmr) by 2002:a25:8d83:0:b0:d15:d6da:7e97 with SMTP id
+ o3-20020a258d83000000b00d15d6da7e97mr24208ybl.3.1690308910326; Tue, 25 Jul
+ 2023 11:15:10 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 11:15:08 -0700
+In-Reply-To: <c90d244a6b372322028d0e5b42d60fb1a23476da.camel@intel.com>
 Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-2-seanjc@google.com>
- <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com> <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
-Message-ID: <ZMAO6bhan9l6ybQM@google.com>
-Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action union
+References: <20230721201859.2307736-1-seanjc@google.com> <20230721201859.2307736-20-seanjc@google.com>
+ <c90d244a6b372322028d0e5b42d60fb1a23476da.camel@intel.com>
+Message-ID: <ZMARLNcPwovmOZvg@google.com>
+Subject: Re: [PATCH v4 19/19] KVM: VMX: Skip VMCLEAR logic during emergency
+ reboots if CR4.VMXE=0
 From:   Sean Christopherson <seanjc@google.com>
-To:     Xu Yilun <yilun.xu@intel.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Chao Gao <chao.gao@intel.com>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -101,84 +76,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 21, 2023, Xu Yilun wrote:
-> On 2023-07-21 at 14:26:11 +0800, Yan Zhao wrote:
-> > On Tue, Jul 18, 2023 at 04:44:44PM -0700, Sean Christopherson wrote:
+On Tue, Jul 25, 2023, Kai Huang wrote:
+> On Fri, 2023-07-21 at 13:18 -0700, Sean Christopherson wrote:
+> > Bail from vmx_emergency_disable() without processing the list of loaded
+> > VMCSes if CR4.VMXE=0, i.e. if the CPU can't be post-VMXON.  It should be
+> > impossible for the list to have entries if VMX is already disabled, and
+> > even if that invariant doesn't hold, VMCLEAR will #UD anyways, i.e.
+> > processing the list is pointless even if it somehow isn't empty.
 > > 
-> > May I know why KVM now needs to register to callback .change_pte()?
-> 
-> I can see the original purpose is to "setting a pte in the shadow page
-> table directly, instead of flushing the shadow page table entry and then
-> getting vmexit to set it"[1].
-> 
-> IIUC, KVM is expected to directly make the new pte present for new
-> pages in this callback, like for COW.
-
-Yes.
-
-> > As also commented in kvm_mmu_notifier_change_pte(), .change_pte() must be
-> > surrounded by .invalidate_range_{start,end}().
+> > Assuming no existing KVM bugs, this should be a glorified nop.  The
+> > primary motivation for the change is to avoid having code that looks like
+> > it does VMCLEAR, but then skips VMXON, which is nonsensical.
 > > 
-> > While kvm_mmu_notifier_invalidate_range_start() has called kvm_unmap_gfn_range()
-> > to zap all leaf SPTEs, and page fault path will not install new SPTEs
-> > successfully before kvm_mmu_notifier_invalidate_range_end(),
-> > kvm_set_spte_gfn() should not be able to find any shadow present leaf entries to
-> > update PFN.
+> > Suggested-by: Kai Huang <kai.huang@intel.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 12 ++++++++++--
+> >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 5d21931842a5..0ef5ede9cb7c 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -773,12 +773,20 @@ static void vmx_emergency_disable(void)
+> >  
+> >  	kvm_rebooting = true;
+> >  
+> > +	/*
+> > +	 * Note, CR4.VMXE can be _cleared_ in NMI context, but it can only be
+> > +	 * set in task context.  If this races with VMX is disabled by an NMI,
+> > +	 * VMCLEAR and VMXOFF may #UD, but KVM will eat those faults due to
+> > +	 * kvm_rebooting set.
+> > +	 */
 > 
-> I also failed to figure out how the kvm_set_spte_gfn() could pass
-> several !is_shadow_present_pte(iter.old_spte) check then write the new
-> pte.
+> I am not quite following this comment.  IIUC this code path is only called from
+> NMI context in case of emergency VMX disable.
 
-It can't.  .change_pte() has been dead code on x86 for 10+ years at this point,
-and if my assessment from a few years back still holds true, it's dead code on
-all architectures.
+The CPU that initiates the emergency reboot can invoke the callback from process
+context, only responding CPUs are guaranteed to be handled via NMI shootdown.
+E.g. `reboot -f` will reach this point synchronously.
 
-The only reason I haven't formally proposed dropping the hook is that I don't want
-to risk the patch backfiring, i.e. I don't want to prompt someone to care enough
-to try and fix it.
+> How can it race with "VMX is disabled by an NMI"?
 
-commit c13fda237f08a388ba8a0849785045944bf39834
-Author: Sean Christopherson <seanjc@google.com>
-Date:   Fri Apr 2 02:56:49 2021 +0200
-
-    KVM: Assert that notifier count is elevated in .change_pte()
-    
-    In KVM's .change_pte() notification callback, replace the notifier
-    sequence bump with a WARN_ON assertion that the notifier count is
-    elevated.  An elevated count provides stricter protections than bumping
-    the sequence, and the sequence is guarnateed to be bumped before the
-    count hits zero.
-    
-    When .change_pte() was added by commit 828502d30073 ("ksm: add
-    mmu_notifier set_pte_at_notify()"), bumping the sequence was necessary
-    as .change_pte() would be invoked without any surrounding notifications.
-    
-    However, since commit 6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify
-    with invalidate_range_start and invalidate_range_end"), all calls to
-    .change_pte() are guaranteed to be surrounded by start() and end(), and
-    so are guaranteed to run with an elevated notifier count.
-    
-    Note, wrapping .change_pte() with .invalidate_range_{start,end}() is a
-    bug of sorts, as invalidating the secondary MMU's (KVM's) PTE defeats
-    the purpose of .change_pte().  Every arch's kvm_set_spte_hva() assumes
-    .change_pte() is called when the relevant SPTE is present in KVM's MMU,
-    as the original goal was to accelerate Kernel Samepage Merging (KSM) by
-    updating KVM's SPTEs without requiring a VM-Exit (due to invalidating
-    the SPTE).  I.e. it means that .change_pte() is effectively dead code
-    on _all_ architectures.
-    
-    x86 and MIPS are clearcut nops if the old SPTE is not-present, and that
-    is guaranteed due to the prior invalidation.  PPC simply unmaps the SPTE,
-    which again should be a nop due to the invalidation.  arm64 is a bit
-    murky, but it's also likely a nop because kvm_pgtable_stage2_map() is
-    called without a cache pointer, which means it will map an entry if and
-    only if an existing PTE was found.
-    
-    For now, take advantage of the bug to simplify future consolidation of
-    KVMs's MMU notifier code.   Doing so will not greatly complicate fixing
-    .change_pte(), assuming it's even worth fixing.  .change_pte() has been
-    broken for 8+ years and no one has complained.  Even if there are
-    KSM+KVM users that care deeply about its performance, the benefits of
-    avoiding VM-Exits via .change_pte() need to be reevaluated to justify
-    the added complexity and testing burden.  Ripping out .change_pte()
-    entirely would be a lot easier.
+Somewhat theoretically, a different CPU could panic() and do a shootdown of the
+CPU that is handling `reboot -f`.
