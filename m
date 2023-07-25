@@ -2,163 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C452C7620C9
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 20:00:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A09DF7620F3
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 20:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231953AbjGYSA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 14:00:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52338 "EHLO
+        id S232561AbjGYSFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 14:05:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231530AbjGYSA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 14:00:27 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2055.outbound.protection.outlook.com [40.107.94.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A48BB;
-        Tue, 25 Jul 2023 11:00:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eCGSb5SsjAwZ+FniE3ph98GLjpVd1RYMUpZzS2aMHB21WgDarHCd9UGkDGkh2OAwEa7wNCyHWX98s3fhwkimVn1oq8hzNyOPxcRqosl52oaGQlJoVmeoJ9VggBeV+3rt+VHIVW9ddk2bCCtpjk02h6BsBk46cRGmT7PNdBIXtU2vN+V2+bLq9otPLEDJCNgVpVqSCBI8mO5PAX0N4+axeKQeiZxXfI9wAF/p2qSnb14uNkkUEDSEQffBRsYMfftCSR0Ge7oMksGoYVdJN/gzU28xuVhxNU97NzCsM7N+fDyxOXxRwGnWnxeKZ/hwppuy9UF16SFcdGzt/GzvgbD8MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AVfdPiYMTjsrsgFPFqrzuF/QmuQ/Knj4Hoi8Q3guZqA=;
- b=TwAvK8TvZyfhgAYEImUv+3VKNk4LlGWCSuAgA7TPpVoPNpw3l9CxnjsZp6ZoZ+MVZnXYbfmPpQq7mRK1hsztSKUIgQzrj3gr55jg3OVnOtjjD252waj6oAypmAMac2V7CzhOHF2oGiZgI/0LQ5vNPSeIPJ5PCJa+uBdQtWOwvbycCWjOt9m4dqzDRd5SBTYwUEKG6wcM+qvIpTV5O3Yy23lEEMTeOjjrDX5VxOZT/9dErZgr/AbR1aqShiNXvxFJ48yVvKIitBmxCdDlu85M3hVI609RfebCI6bErkmLnPERFzal3MaESfSjRmitn3qlNP8KECFLiVnV0eMspTk81g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AVfdPiYMTjsrsgFPFqrzuF/QmuQ/Knj4Hoi8Q3guZqA=;
- b=YlUsTqWV8c6KEShtnbP0P1/058ErJOUC78/MeNE9McEKRF6hNy3tD2LwHGruioybHvCA/sfHZywHtEd2h+YryZ6Oo/lKNLBX6QQrRWWq8hWo4cgMfqnmI1NQeYuDkJJpknMiiRnJ/kVuI0h2FEw2CkKmFx0wSkdzAIC8ldcpb4M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by SA0PR12MB4445.namprd12.prod.outlook.com (2603:10b6:806:95::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
- 2023 18:00:23 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6609.029; Tue, 25 Jul 2023
- 18:00:23 +0000
-Message-ID: <1978855f-2e8e-7478-cb28-4f16eb842eab@amd.com>
-Date:   Tue, 25 Jul 2023 11:00:20 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v12 vfio 5/7] vfio/pds: Add support for dirty page
- tracking
-Content-Language: en-US
-To:     Simon Horman <simon.horman@corigine.com>,
-        Brett Creeley <brett.creeley@amd.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        shannon.nelson@amd.com
-References: <20230719223527.12795-1-brett.creeley@amd.com>
- <20230719223527.12795-6-brett.creeley@amd.com>
- <ZMAGkcIPnWs/+Y/B@corigine.com>
-From:   Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <ZMAGkcIPnWs/+Y/B@corigine.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR11CA0092.namprd11.prod.outlook.com
- (2603:10b6:a03:f4::33) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SA0PR12MB4445:EE_
-X-MS-Office365-Filtering-Correlation-Id: 13fc99fd-d558-42e2-ff99-08db8d39046c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ex6tt9fowHlFGQCTcZlHmKc3ZK7ARWODle5bQNkGee8b0V3XYf8tnq643xtzY87o2T/HTFT2o+NgaIyxBB6ln3PleLP56N/DAjfGWtTMCMsItjICcAflWY2p9GCN3nbEJHAXa/e4yrPjBRYUa0wYxSVnuIasZ1Uhn2rUcdgVSVy/5l50s27U3fscOWfzCosZVEF972whKGBnsvg472TbGdlgwULRN19MyZcL/royB+HwrLFfrxwNyGcUvnT2Og7uocZTYxQ6NS8LAXymSxm60ksOwSYdohLKy2wR5BdYgVeOcabSTtffbqiANaIZzHF38WnB0vUz+rkb3gMvZS4sUp/hTG3xg+M1WXypg8QuXfViJQw9lcD0PxlhycvA9JxifFdAMRQuk5WDDE8cV6gGpvGbiK5OH+eQZTpSo+D20UmAM3hS6fAAH42Nebpo9tWgd/CQDi5pokUKEL6IsFZG5+4paiHWgVHhoSo+n2UBk6n3HuqnZffAKvkWCOJbNRWe+wY5WbHUCstgsui/XCO54XCAplNk3hKr2jC7d1z1Z03xWs3qClWxuPngzj1vglJCYjgXj0cswsN0KFc6xs0gsaEn9aifC1iDaZXEJs9NFvc60otZy2tnru2cW+yZsPyeRlofSmeb1cYkU+YHESojLgDsxPTgWlJcEU9E4DzMxGo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(366004)(39860400002)(376002)(136003)(451199021)(53546011)(38100700002)(186003)(6506007)(83380400001)(2616005)(36756003)(4744005)(2906002)(26005)(8676002)(41300700001)(8936002)(5660300002)(31696002)(478600001)(110136005)(6512007)(66476007)(6486002)(66946007)(66556008)(316002)(4326008)(6636002)(31686004)(14143004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cm5uSk1YcVFjUjE4ZnZnUkJLclJFaHVPVXlKOU1ISDk0c3JIY29HMzMrRnBn?=
- =?utf-8?B?VWozdDU4OG9MbG5sN0xCa0lweEJCRzJuWnUrTTFwQmUzR0NQYWhxaE1YSzR6?=
- =?utf-8?B?bmMrczJXTGw2bUVCVDhYVlFQNE1MR2pvcEc1SGhsL1YxYVM5dmhXeWtEcjI3?=
- =?utf-8?B?U0ZhN05HdEN4MWNsVFB1WUpkMW1obnRrVHpwQkg3eTIyM3hsWnFGL2FNQmow?=
- =?utf-8?B?Vi9zb2V4UllKVGhiK1ZhNEZuZXorcVM4ZytoYUsvc3dDbTFUOXZFMXBoRjZE?=
- =?utf-8?B?VVIySmVjM0hJa2hCSlNLU2ZaaFNoVmJBbFVsdTlIcFM4QnMwN3V1RmxBRGZs?=
- =?utf-8?B?SXdXbnRBVXd2ZjdFU2NyWW43YlhzNHZEYk1HOXFENXNycHZ5cW1ybEJnR09R?=
- =?utf-8?B?WE56T2Z5Z1NVNGZGSndLWmFVcWtHV0VjWnhWSmF2dHdiRVZLUW5WaGRGNCts?=
- =?utf-8?B?aE94dXphOUtDRWhlcVZuZTAvRlIvZk5lcDR4b3RzeThYbys0b3RQZ2xZd2Rs?=
- =?utf-8?B?czhBelBGbWsvb01Mc3NNU3cxTjJvcnJrU2FLL0Q3NHhncG1OcEwxaG43RFlM?=
- =?utf-8?B?Qis4RjJ6NENUaUJtVnlwRDF1SkxhOUxzRWhneThIUFZXQ1VhUXlIRXRnUEFw?=
- =?utf-8?B?SXBMMnB6TjMvVmJ4ZVN4RHJEM052aXhodkpESEpuQUV3cXdUNWNTMHprNDJu?=
- =?utf-8?B?TlRaWnZvOUxpU2NRYWVSK0ZDU0FXMVNTUlkzbkpBZm9Za212THFISWhKT3kv?=
- =?utf-8?B?VHArWWNWcVlOYlJMK242QWZoSStjanpvTEMrVTRhWm10Wm1VMW5nTSszbmZR?=
- =?utf-8?B?cVZ1SFpUbHI0ZEpGaVNySmVyUGxyRndPby96NnNCMzZlRGxhQWsxNVdZQ1pN?=
- =?utf-8?B?UENiWjk4WnBIQTFNdGZLek1BMHZzLzJVWXhHY3ZCc3N0RjdjMnRvZjZJa1Fk?=
- =?utf-8?B?Tm5UTk53c25CYXdYaDhzSDBWM0pHcXA1TThLZFBPRTJrQ1dHd0tMWk9pVXRq?=
- =?utf-8?B?OGtNNG1PVlAzTGVNcGExdmc5N2VkQmhuYWhTL2JncUNjaVBKVnVlSTE5M3Rl?=
- =?utf-8?B?eU9oRFFvS3RONGllY1RQVlNmV2Nqb1dQeGhyWU9CNDRnSWdxUmlNbTR0d2R1?=
- =?utf-8?B?TWRReHUrMmY5eXBRQ01WMHVzNU8xWkh0b04vQmorMis0RFFQZFk5bmpxUnY1?=
- =?utf-8?B?eXF4ZUNlMjgrYjJxOTNrVE5oa1NTMWkxYXA5T3A2K2h0Tm9XQ1pvSTFmVnI1?=
- =?utf-8?B?RTBJNnlURHZVR0R2WTRRd09uOHN5RzlsWmpWd2FqRjdYeTI5eGVZWVNUeXlB?=
- =?utf-8?B?ZXNaZWtHUXBQQUkyNVdsblJNS01wSWhqVDE2dnF5ZVZqdmdhNkhic00raG9R?=
- =?utf-8?B?V3I4WkYwMXFZS3NGTWFtR3NmeHdwQ1FxMGtBR0QwUFBQZ1AwU3RyMVBUS3g1?=
- =?utf-8?B?Y29LTk83VDVZT3dLaEwrcGZOZThaVUdoRDZHNVRPcXZycFAxZkExck5VdTZa?=
- =?utf-8?B?WFF4UFdPcndSbjd2bEJkRWhWREM0bWlkUm1sVURIdDVYOU4zUTNMYXVYVHMw?=
- =?utf-8?B?cURDQ3NTRHFWTTRkVkZKSnUvc0tneVhBMjdTL2NjYTNTN2xYQ2VVQXNLU1FV?=
- =?utf-8?B?Uy9HK1BYS2NMOTdad0xYVUhJRzF6dnpKYloxUWV1b3hwRWNlM3VkWmtIb0JF?=
- =?utf-8?B?RlcrcGJJZFp6bWFqQzFLMUhTQlhZN24rRjZNN0VZS1l4UUNOeUJBZ1JaeGcv?=
- =?utf-8?B?U2llNG5GdjhNbUtJYXVNZThRRWFidTBPU1VwMHlkVXhhN2I3cnY4NEVzZG85?=
- =?utf-8?B?SFpJY0poR1pSRnFydmF0QVkzbk5QTEJHS3grU3dLL1dBenVpM3V2RmFYUFV2?=
- =?utf-8?B?c3A1NlRYbkRGd2NaMG1aNW5UME93UHRJb2VUMlNjMlpaaWlsYStNTmFUWGhC?=
- =?utf-8?B?dHpCM2VxMnNtVk5Bd3NZL0lQK2ZZR3M0Ni9wNW8xSHZnNnZqamFYNFc4M1M1?=
- =?utf-8?B?Tm5vbGV6Y2x0Q3MyZzVtVHhXN0o4NzhlTUhWd0g0WGlvS0xHd1RRQUo3b2Z2?=
- =?utf-8?B?eUR0S1NSZjBVcjZUUTN2R1JjUitKRVh4QU1TbDFvQXdlaEdpNmExUGgrZzRS?=
- =?utf-8?Q?TpAnYFhE/iFdUVdh7XLF1lYOH?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13fc99fd-d558-42e2-ff99-08db8d39046c
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 18:00:23.1197
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cH4RL6RmYbSRggVi2mVgTCxWXBotay60KkS2Dv5ZjddjBB/VEPxI82tvuvhYxQ8GP2fu3EY7dht0GgjUJwqv6A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4445
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S232195AbjGYSFe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 14:05:34 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B491FDD
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:05:32 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583c1903ad3so42301967b3.2
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690308331; x=1690913131;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIo8qHauKdQX+T8FT8wbaojm6/JdQZAwM03PT/kIykI=;
+        b=7nXQcBRpxoTRBB3DVtfi1G3SLzO+8rbX0pZK3GqB/ZiRovVnhgEY5C+Gs70dPcpJKC
+         v8EbJPLKK/PtzLxWiGJ5qeO4LJqB7HN3pWAhYbANBnQSVYoMTUMzCaeCD3zEfSqoM+r2
+         fDpLY03C1R0xadVk8zh9oHGZMZqSmWV+dliNXRuRczTowFXc/oEsFJjHeqmHR0h/7zjV
+         1SaakHlCZawqmTagIefeOP2xnfIobskVh1rmXibU4Cwg3i96EQeqcAc0By/i+P6tJXi9
+         1AMdfmti0ZHyvBS0qJY6Ig052U8rUWQC7aHvZS0sxZXtvMY234BUecIw+5qK/UmUColq
+         VbWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690308331; x=1690913131;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIo8qHauKdQX+T8FT8wbaojm6/JdQZAwM03PT/kIykI=;
+        b=LhwVKNKgcIjNRneSQ+PPC7f6BvOSoPiSKPnTbSgREuGnedth/cuMSTCClmWs/1qZHd
+         SKIC2Ir+8UMniV+xVq40p9QjmNMVT4DIpNrPHjCmgGtEt/36N7hpfvbZ5RwzILJ7GHqp
+         UDleMYkanu2+Mj5AbxKB005sZVUFQMNFveOiOWuarUvwWEyK0YqLb3ox8+MO6+256S/7
+         mmunDFBrsGSxmuh41eD6hGWKqz2zPeCLCrgckEPLVljWT61ozdR8/2SraRE3LTWv/wAr
+         px3WzorCY6cdM9IoB/QKa9k8ALUj0wX8v2nDKCPHwO3miy+3A3dJFWybeHbT+1SwN5uI
+         9Rtg==
+X-Gm-Message-State: ABy/qLYvscEpMXyAzq6DQfd03xe7Phtse6r3rLNEKt4YLJYWFeEePHXx
+        O7bwQDPz8jT9kQdL+v/t6wsStSfJGiU=
+X-Google-Smtp-Source: APBJJlG+f5K6Guu8BWDh2M0jvEhmql8458IaH+LCw2ABsy+ZDoDj1Vv7TcavygUx+nDEGvPQs1RCmsWjSr8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:4509:0:b0:573:5797:4b9e with SMTP id
+ s9-20020a814509000000b0057357974b9emr213ywa.1.1690308331572; Tue, 25 Jul 2023
+ 11:05:31 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 11:05:29 -0700
+In-Reply-To: <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
+Mime-Version: 1.0
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-2-seanjc@google.com>
+ <ZLolA2U83tP75Qdd@yzhao56-desk.sh.intel.com> <ZLphxpSTL9Fpn1ye@yilunxu-OptiPlex-7050>
+Message-ID: <ZMAO6bhan9l6ybQM@google.com>
+Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action union
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xu Yilun <yilun.xu@intel.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/25/2023 10:29 AM, Simon Horman wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On Fri, Jul 21, 2023, Xu Yilun wrote:
+> On 2023-07-21 at 14:26:11 +0800, Yan Zhao wrote:
+> > On Tue, Jul 18, 2023 at 04:44:44PM -0700, Sean Christopherson wrote:
+> > 
+> > May I know why KVM now needs to register to callback .change_pte()?
 > 
+> I can see the original purpose is to "setting a pte in the shadow page
+> table directly, instead of flushing the shadow page table entry and then
+> getting vmexit to set it"[1].
 > 
-> On Wed, Jul 19, 2023 at 03:35:25PM -0700, Brett Creeley wrote:
-> 
-> ...
-> 
->> +static void pds_vfio_dirty_free_bitmaps(struct pds_vfio_dirty *dirty)
->> +{
->> +     if (dirty->host_seq.bmp)
->> +             vfree(dirty->host_seq.bmp);
->> +     if (dirty->host_ack.bmp)
->> +             vfree(dirty->host_ack.bmp);
-> 
-> Hi Brett,
-> 
-> I don't think there is a need to guard these vfree calls,
-> as I think they will be no-ops with NULL arguments.
+> IIUC, KVM is expected to directly make the new pte present for new
+> pages in this callback, like for COW.
 
-Another good catch. I will also fix this for v13. Thanks for the review.
+Yes.
 
-Brett
+> > As also commented in kvm_mmu_notifier_change_pte(), .change_pte() must be
+> > surrounded by .invalidate_range_{start,end}().
+> > 
+> > While kvm_mmu_notifier_invalidate_range_start() has called kvm_unmap_gfn_range()
+> > to zap all leaf SPTEs, and page fault path will not install new SPTEs
+> > successfully before kvm_mmu_notifier_invalidate_range_end(),
+> > kvm_set_spte_gfn() should not be able to find any shadow present leaf entries to
+> > update PFN.
+> 
+> I also failed to figure out how the kvm_set_spte_gfn() could pass
+> several !is_shadow_present_pte(iter.old_spte) check then write the new
+> pte.
 
-> 
->> +
->> +     dirty->host_seq.bmp = NULL;
->> +     dirty->host_ack.bmp = NULL;
->> +}
-> 
-> ...
-> 
+It can't.  .change_pte() has been dead code on x86 for 10+ years at this point,
+and if my assessment from a few years back still holds true, it's dead code on
+all architectures.
+
+The only reason I haven't formally proposed dropping the hook is that I don't want
+to risk the patch backfiring, i.e. I don't want to prompt someone to care enough
+to try and fix it.
+
+commit c13fda237f08a388ba8a0849785045944bf39834
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Fri Apr 2 02:56:49 2021 +0200
+
+    KVM: Assert that notifier count is elevated in .change_pte()
+    
+    In KVM's .change_pte() notification callback, replace the notifier
+    sequence bump with a WARN_ON assertion that the notifier count is
+    elevated.  An elevated count provides stricter protections than bumping
+    the sequence, and the sequence is guarnateed to be bumped before the
+    count hits zero.
+    
+    When .change_pte() was added by commit 828502d30073 ("ksm: add
+    mmu_notifier set_pte_at_notify()"), bumping the sequence was necessary
+    as .change_pte() would be invoked without any surrounding notifications.
+    
+    However, since commit 6bdb913f0a70 ("mm: wrap calls to set_pte_at_notify
+    with invalidate_range_start and invalidate_range_end"), all calls to
+    .change_pte() are guaranteed to be surrounded by start() and end(), and
+    so are guaranteed to run with an elevated notifier count.
+    
+    Note, wrapping .change_pte() with .invalidate_range_{start,end}() is a
+    bug of sorts, as invalidating the secondary MMU's (KVM's) PTE defeats
+    the purpose of .change_pte().  Every arch's kvm_set_spte_hva() assumes
+    .change_pte() is called when the relevant SPTE is present in KVM's MMU,
+    as the original goal was to accelerate Kernel Samepage Merging (KSM) by
+    updating KVM's SPTEs without requiring a VM-Exit (due to invalidating
+    the SPTE).  I.e. it means that .change_pte() is effectively dead code
+    on _all_ architectures.
+    
+    x86 and MIPS are clearcut nops if the old SPTE is not-present, and that
+    is guaranteed due to the prior invalidation.  PPC simply unmaps the SPTE,
+    which again should be a nop due to the invalidation.  arm64 is a bit
+    murky, but it's also likely a nop because kvm_pgtable_stage2_map() is
+    called without a cache pointer, which means it will map an entry if and
+    only if an existing PTE was found.
+    
+    For now, take advantage of the bug to simplify future consolidation of
+    KVMs's MMU notifier code.   Doing so will not greatly complicate fixing
+    .change_pte(), assuming it's even worth fixing.  .change_pte() has been
+    broken for 8+ years and no one has complained.  Even if there are
+    KSM+KVM users that care deeply about its performance, the benefits of
+    avoiding VM-Exits via .change_pte() need to be reevaluated to justify
+    the added complexity and testing burden.  Ripping out .change_pte()
+    entirely would be a lot easier.
