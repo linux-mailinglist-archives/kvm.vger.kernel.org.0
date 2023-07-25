@@ -2,122 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0E0476206B
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 19:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6624F7620BB
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 19:58:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230436AbjGYRrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 13:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44918 "EHLO
+        id S231611AbjGYR62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 13:58:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbjGYRrO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 13:47:14 -0400
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E551FD5
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 10:47:12 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-79a2216a22fso775865241.0
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 10:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1690307232; x=1690912032;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tjxGQ97jdZy+msttaE6/InGye12w/eRXu8aDXNaXRhA=;
-        b=mJItfjJo0J8vq8ZI7eQRqgBugJTE/Qjls8F9j5zJT4/6drjQg4QRDl54H4s/m4+/B6
-         OdBZ9Wq1QAC//eamW92We5bVMlBhbiRysXzmrEde6b6WilxsOOxfPGb41E5gLvLxIRQd
-         mG8WW9RKwkhn1rvhmTvmgDcKKzEniO9bQreDA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690307232; x=1690912032;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tjxGQ97jdZy+msttaE6/InGye12w/eRXu8aDXNaXRhA=;
-        b=cGCJGo5HbkrtIEQZ9zCFCzBDjVxqVvO3nKQDWCqEY/ba+6QfNWUXlCXwwLHBwimLvA
-         +hBR6/kaLymU7QMeerelYE2hkU0yhGGrf0k8lkgHmMgNs9wFy6MnmuamLQAw/EAHLtYE
-         O7MNNzGlloTsRNwg3o0pXKPvLCPXUyE8HvazqZVxrbrbBXBOsj6Acg1+kbKc5FTyEigi
-         NGCoCnsuCh92ZX+vPhjpoH2KXKrHKcyFZFU9NzAbbSx2332YdATLWMbMMbrV3/mbMtaq
-         Sy2hVg+XKjpgsdfm8hTiNsWaht2Hl95/dwlyhx8iLIvPWa4xlY4QKYDiSCZiQZKD6v50
-         CgZQ==
-X-Gm-Message-State: ABy/qLbvvToH9lP3TMk34Y1I24fxxuMYwO2tr8MBxzon6h/LFl/Y5ap+
-        6nRIL2JJqhlQEgIJCoKmsNwcog==
-X-Google-Smtp-Source: APBJJlFxF234D/M5tS2Q+/KCUeJ8ymhGYnmYBO9RSoGjcR24zk88rZomSukAB6JnjgPjlb4vStmdHw==
-X-Received: by 2002:a67:b106:0:b0:443:60d7:3925 with SMTP id w6-20020a67b106000000b0044360d73925mr5444114vsl.20.1690307231746;
-        Tue, 25 Jul 2023 10:47:11 -0700 (PDT)
-Received: from [192.168.0.198] (c-98-249-43-138.hsd1.va.comcast.net. [98.249.43.138])
-        by smtp.gmail.com with ESMTPSA id c11-20020a0cf2cb000000b0063d1f967268sm404045qvm.111.2023.07.25.10.47.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 10:47:11 -0700 (PDT)
-Message-ID: <c72c1089-f5ac-9ed2-3412-cdb310cf5b51@joelfernandes.org>
-Date:   Tue, 25 Jul 2023 13:47:09 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [RFC PATCH v2 18/20] context_tracking,x86: Defer kernel text
- patching IPIs
+        with ESMTP id S231578AbjGYR60 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 13:58:26 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2089.outbound.protection.outlook.com [40.107.223.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55210BB;
+        Tue, 25 Jul 2023 10:58:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M/TGjoUgOSBM1t+01pnFjVSA/seYc4gqh48pKaRyhYGNF8WJKLNDXpJSbjV+rC69gQsKVPMGsPYJ/6XiPn9ebZmZaCatwg+ElU7/EJgsRNUFnkzI27UJnpwZU5nU4qvn2+mWl335zpYSmK2nr7Izxt64tddyyIs6baCiby+dfmEBwY55g+Nizdfg/FTQbwUcYnNefd07MGfCw7VMRWscQpCVcVGYw/aaudsLxF0haTh9qZZ64dXc77A1XuzndVbpamXYoysJpxkAKfjYS+PHSVaTxIU1Cr3sG2LQkfiuM0JTCrGGDSXBvAVjnHKVUr9/O56wN97Z+uQsQZpIMllEfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=meRP2K0smH/DP9Od0Zk/9waK66Py2ElJdG7sKwsVBb0=;
+ b=QypZY8NKQtSstavFni5/Zpv0+HCql0PQZtou/M+ittrw7EFpFcaX4uQYFvRy2/jQeUu/suOcAIRKLrWZRc1+/8mKyI/O8Alk+74ywvWYqboHCwDMjJjw0ym9Wy6Jga5q9MmwFfsEeHidPHoxqFi7kqYjyhZTflWKDzoxI9zFvCEF0jRnq9oRX+4CDQYbh19fEuTPznLH5OH6+PS6qXaU3aypLrHOLtnaPIwDeNPEW/x6+ufS5jo13NjJ90O2uFNPauyGEOQj4acbodfJqo3ILYf2BALJUHK+rIYlT44YWkXXeNM7eiwKUHUrP3GT9u92Aq4mMkdYqg/Pw6LZroyZLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=meRP2K0smH/DP9Od0Zk/9waK66Py2ElJdG7sKwsVBb0=;
+ b=bglGT75u6Z+RWMZcIRrUj+eu4Yg+BCZ/NNDDghbPUdQD4b8vRtLS5E1gUTNjDMRUJSWri+VvSCEr9r0Cg1yh7Kv+e+zLRGNCeWPU6HKKcCCgfImlZ6rSG67x0ytFpnCFC8Xrp68J+YVyxx3dUsUyjTDzN6giSC7BHb8DjHC1uoQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by DS7PR12MB6333.namprd12.prod.outlook.com (2603:10b6:8:96::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 17:58:23 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6609.029; Tue, 25 Jul 2023
+ 17:58:22 +0000
+Message-ID: <91d550a7-0759-664d-c31a-4d2b88a4741b@amd.com>
+Date:   Tue, 25 Jul 2023 10:58:19 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v12 vfio 4/7] vfio/pds: Add VFIO live migration support
 Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Valentin Schneider <vschneid@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-References: <20230720163056.2564824-19-vschneid@redhat.com>
- <6EBAEEED-6F38-472D-BA31-9C61179EFA2F@joelfernandes.org>
- <20230725133936.GM3765278@hirez.programming.kicks-ass.net>
-From:   Joel Fernandes <joel@joelfernandes.org>
-In-Reply-To: <20230725133936.GM3765278@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+To:     Simon Horman <simon.horman@corigine.com>,
+        Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        shannon.nelson@amd.com
+References: <20230719223527.12795-1-brett.creeley@amd.com>
+ <20230719223527.12795-5-brett.creeley@amd.com>
+ <ZMAHAE9dnMzKzFgW@corigine.com>
+From:   Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <ZMAHAE9dnMzKzFgW@corigine.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR11CA0093.namprd11.prod.outlook.com
+ (2603:10b6:a03:f4::34) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS7PR12MB6333:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d89620d-6257-424f-efa2-08db8d38bc87
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BQxm3lFQsoZA3QZHgTtoiNlIAqn2hdD6CXpX0FI8dwWGV2ePIzArkiQeKz6c/+UXFN5VWZOFHRbUuWXDmEtJLPxHGfA2E4H0UplsBh0Iwbll9CU6knKNIODC2o8tcKkVCxWOcPCuXETEj7iY7KF2iGPY+nPZPchxsXV6lxb8Unz4+rTZYOm6t+XgjBRJQWxWHd0aOXxRRwx+wvx86bFbZtmr5ompsPFsakHiWdq+Doyy7Q5S6CRNhnOGZFLBemiBulr48dIYcQ0SMeJL7mo96injNuWww2QhkklnKQGgRcmVryCnnlGzpWmuvl4zL3aP66ypyywm7vwndgh/xX3qgko/X/GyEa3TvFT6r46gLnw7GftxE4+8eDAPxaYu2zVdguXCvx+76WdIRjhSTorTSgifjgglkO6T1uD4MEHci6mIK4E5SWm39lHRFESh9HaeKkTZpqgF9ChDbaHQRKOyIVwkQukvkS+wxlta5truAFLCE5QO46Mg6TwpeX5OgMTYvSGlaUNdJ2hu5StBFB0NNOUn0cF5/oGe2XH1V3P4q0uR2sJ7Ywwiz/L1sJQomLby4CbucNnphxyK0eOn5PDWAd2f7ODX/iJuNjs6UAUToQlT6Lh9DlXZJRMZdxc5z7cVYuVH9Cz2GBYbqopaEboXhQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(451199021)(4744005)(66946007)(66556008)(66476007)(2616005)(36756003)(83380400001)(31696002)(38100700002)(6512007)(478600001)(110136005)(966005)(6486002)(186003)(53546011)(26005)(6506007)(6666004)(6636002)(31686004)(41300700001)(5660300002)(316002)(2906002)(4326008)(8676002)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TE1PS25YM216dGhHSmhzc0tLc3g1ZkgyNjhRVE5TYXBZb3V6VXdnWTFXWkM0?=
+ =?utf-8?B?SVlMVUlYNWkwVldjdDFmMjBQSXRMNEFFbW5hZlpkakhDWnZ5N2RWK0E1WDZT?=
+ =?utf-8?B?OGFSb0xhYkdMY0xWemVncEE2OEl2bmNmaTZrOFlUL3dFT3BPOTluSnZtMXpU?=
+ =?utf-8?B?blRKTFRJUXJzMnRQdjJrWVkrZldSc1NaVU5zcFJUUGJubkdPU3dIbVNaaFk4?=
+ =?utf-8?B?amgwRHdRTUJ0c0Mrck1HUXRTWENTVFp3L1FURzlCUkZ6eU1UaGl3ampxbXpF?=
+ =?utf-8?B?a1lnOUFudEFUR01YWXpnVVBRb0hFYXhjcnRJUjRMeUw5NWtmdzNGeVdHZjVC?=
+ =?utf-8?B?OGlldVZ5dnVGZmhrY0dwRkllNEY2c2E1cEVKVG90VW1mK1NjVzN3V29Rd2Zi?=
+ =?utf-8?B?dXB2YTducEZiVUF5UEVmZkoxNUlYaE1Ob1lzMHpBWkQyTU9SSjFrdU8rODI0?=
+ =?utf-8?B?ZGVrVmUvdVA5L1RhUGtTb0VJYzRicURmU1k1aE01a3QvUDdsM0VMZzNrMHNF?=
+ =?utf-8?B?OTA5NktwT2Vwb0pPd3RGY3VyQmJGOEp2ZEdieUZqR0ZrWENrNUlicktGV2pW?=
+ =?utf-8?B?clR5QktZTkZLVTFEbGtkWTRLQ2JmZnJCbys0S1o1ZXdiWVhFdFJSUHkxMnNa?=
+ =?utf-8?B?Q1RRckZSRDVGNUV5SHlZa2JQc3hBRGhEUXE5TmNiaFc4d0dQNlJ6QVQyNEtJ?=
+ =?utf-8?B?dDdHbFJHM0JVcVZEZTFMK3QxNVBPKzJtSTFYcld0VXFqQWhrdE1zemxEa3h5?=
+ =?utf-8?B?WG9DczByL0xrczVITmc5U0J1WlZ2QWhBcjVxcVVra0llRFVVbjdpN0t6Y05t?=
+ =?utf-8?B?S3pqN0h2TGtQdHUyOXJjbnB6RGF3SlIyd2NENmpnTmlzOFo0Q01lOEtpYmdV?=
+ =?utf-8?B?MDhSeVJ5TnJUaExVa1lxQm8wa0xpd0NsYUl6NjRQVWhyZTl2N25EZmF0eXcy?=
+ =?utf-8?B?N3lVUlF2Vm9JdzdGVkpaK0ZrOEZUOFZrSnkxRUFFQmFnRnp2NkQ1WlloazA5?=
+ =?utf-8?B?c3NuWFVQQmRHRzBLL0d6NzJMOXF0ZFBtWVRzci9lWHVOcjhCVVlHQkhLRExE?=
+ =?utf-8?B?VGhNUHZuVUNjYW5zdjNJVHNvejk2cWRGeUFyYnZWVCtOMk1lS3RWcjNYWmdl?=
+ =?utf-8?B?VkxGeTh0NjNmNW1lcTZ1RUVMTmwyRGthSkcvWjVxZmovYzRGSW9PYzgyd2dO?=
+ =?utf-8?B?bXNMdVpuSlh5TUE5QStVdjlKOUhaeDBxTEczRmxjcXlmbWRoM3c2YTNFcDJN?=
+ =?utf-8?B?Zlo0SER1TEFhanZ3Ti93TFNSTkNGTWpDaVVPWTRITHcvYkNqOEhBRURLcG1X?=
+ =?utf-8?B?K1haK1N2UWNBc3hYcHhsUC80T2hvc1A5WFdwQ0NnVHN0V2xXUXI5ZUxtWDdL?=
+ =?utf-8?B?Tk4zRFBscFZUbVhOcWxWUFhoVGlXTTNlUW1YOUM4djRKVks1RkRzTldDQlNv?=
+ =?utf-8?B?czJQMkdlcUl2SjdYbGx1T0h6aXU0QzV3K2QySjlPblZyK2VXSk5YcUhLbktl?=
+ =?utf-8?B?OG0rU2VSY1dacTE5OEtCQnVqR2g3Tlp1Z0s1VkZHaXFiQ0diaTlOM3JFa2tr?=
+ =?utf-8?B?SnhWcGkzZncxRjRvK0ZSQm1oWTNrZjZwL0EyMkpsTkorZ2hrSFdsUVVoaFdm?=
+ =?utf-8?B?YU9lQlhZWXl2d0t1NFBRcExSQkl0UjdGdjhqSTBjM3dXMkdzWkNZeWx4ZXMw?=
+ =?utf-8?B?SkNRbkNQaGVoZGV4N1lEb2FRRDRGSEZ0WjFDMGsvR09EemlNZmJiZFBETjRl?=
+ =?utf-8?B?cnoxOEpQLzZmMys4ZGJhUkt1MGhTdFlnTHl4cjNjTWl3cnh4R2MxY0lNMVZv?=
+ =?utf-8?B?SmRWdkp2Rk4zTnFRQmc5K1QveHpGa3MzdG4xazBhRllsTWlqaERualdvN25U?=
+ =?utf-8?B?WXJBM1UwVjRyL1dUa25vRG4yQ292UHhaelJCbWMwank0bEJ3aGNHdmkzTDZi?=
+ =?utf-8?B?anJFN0IvYWd4aXNuVWtxR0lNSG1BNkRnL3ZjS2ZvQUJyS0k0ZDNoUHArbDZK?=
+ =?utf-8?B?Y294ekE3b0RYVDBzWGg5aC9aRDJ5RFdBQ1VPS2V2bnllR2JEVytuNVlGekpo?=
+ =?utf-8?B?U29zWkhMOWNUc2llLzdNa3RwRTFQMVAwUlJPY2VJbzhGQ0ZVNXhocHk0Ym9G?=
+ =?utf-8?Q?axIIB6iHQeY5C0kNHICLnBhUc?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d89620d-6257-424f-efa2-08db8d38bc87
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 17:58:22.5662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N7MnBbgPisGyyPBOD9cUbrXKjXO5+P++DzAwXXIxVNy0ny/926V9gOlFqYoHZ9H9xeRIvrDS1EVSK5ZA13obfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6333
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -126,51 +131,30 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 7/25/23 09:39, Peter Zijlstra wrote:
-> On Tue, Jul 25, 2023 at 06:49:45AM -0400, Joel Fernandes wrote:
->> Interesting series Valentin. Some high-level question/comments on this one:
->>
->>> On Jul 20, 2023, at 12:34 PM, Valentin Schneider <vschneid@redhat.com> wrote:
->>>
->>> ﻿text_poke_bp_batch() sends IPIs to all online CPUs to synchronize
->>> them vs the newly patched instruction. CPUs that are executing in userspace
->>> do not need this synchronization to happen immediately, and this is
->>> actually harmful interference for NOHZ_FULL CPUs.
->>
->> Does the amount of harm not correspond to practical frequency of text_poke? 
->> How often does instruction patching really happen? If it is very infrequent
->> then I am not sure if it is that harmful.
+On 7/25/2023 10:31 AM, Simon Horman wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Well, it can happen quite a bit, also from things people would not
-> typically 'expect' it.
 > 
-> For instance, the moment you create the first per-task perf event we
-> frob some jump-labels (and again some second after the last one goes
-> away).
+> On Wed, Jul 19, 2023 at 03:35:24PM -0700, Brett Creeley wrote:
 > 
-> The same for a bunch of runtime network configurations.
-
-Ok cool. I guess I still have memories of that old ARM device I had
-where modifications to kernel text was forbidden by hardware (was a
-security feature). That was making kprobes unusable...
-
->>> As the synchronization IPIs are sent using a blocking call, returning from
->>> text_poke_bp_batch() implies all CPUs will observe the patched
->>> instruction(s), and this should be preserved even if the IPI is deferred.
->>> In other words, to safely defer this synchronization, any kernel
->>> instruction leading to the execution of the deferred instruction
->>> sync (ct_work_flush()) must *not* be mutable (patchable) at runtime.
->>
->> If it is not infrequent, then are you handling the case where userland
->> spends multiple seconds before entering the kernel, and all this while
->> the blocking call waits? Perhaps in such situation you want the real IPI
->> to be sent out instead of the deferred one?
+> ...
 > 
-> Please re-read what Valentin wrote -- nobody is waiting on anything.
+>> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
+> 
+> ...
+> 
+>> +static int pds_vfio_get_save_file(struct pds_vfio_pci_device *pds_vfio)
+>> +{
+>> +     struct device *dev = &pds_vfio->vfio_coredev.pdev->dev;
+>> +     struct pds_vfio_lm_file *lm_file;
+>> +     int err;
+>> +     u64 size;
+> 
+> Hi Brett,
+> 
+> please use reverse xmas tree - longest line to shortest -
+> for these local variable declarations.
+> 
+> https://github.com/ecree-solarflare/xmastree is your friend here.
 
-Makes sense. To be fair I received his email 3 minutes before yours ;-).
-But thank you both for clarifying!
-
- - Joel
-
-
+Ah, good catch and thanks for the reference. Will fix on v13.
