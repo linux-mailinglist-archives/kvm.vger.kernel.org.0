@@ -2,183 +2,331 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05862760D9D
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 10:53:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A7B7760DE9
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 11:03:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230265AbjGYIxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 04:53:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37960 "EHLO
+        id S232888AbjGYJDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 05:03:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231789AbjGYIwp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 04:52:45 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C728127;
-        Tue, 25 Jul 2023 01:50:50 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b7441bfa9eso66814571fa.0;
-        Tue, 25 Jul 2023 01:50:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690275048; x=1690879848;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/9E3/WWnB3oqCCKicWHSv17L65rJSzN/sd8dp6vx1FQ=;
-        b=YLNBowiTU69Ja/HCaBea3FPTx+ls86SNtFC7ONC0KOg1J7cu8IZFnZLwwk4n2zDxjI
-         XcekrqM13pSQl1pAaXQNtLR6GwEWBCVKYp+eWbbv63yKHgnMaptHCzfDRz9bt6v7u/9M
-         gDLGiBuH3dKnyH5ENURz+/XYHBCcShB5X7tICrtdjKdBrGStkjmgtVg05s7GKhG4rPwh
-         CZTU62ahmVHuQRO2FlyKtsdFUKXxwTy4ZHKMsgmx3hHO8ezOMuRNWqyTNBtA19xQvwKS
-         sDWM93WmkQ7KG7S045C7WLtYgGtDJ0fb0ixTPKfHbyOsrhBClBQgrBqntgbAZeC3Z8oK
-         oImQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690275048; x=1690879848;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/9E3/WWnB3oqCCKicWHSv17L65rJSzN/sd8dp6vx1FQ=;
-        b=RMt7w1H2nRBzx2KWiVopWU5wkZoPIpzMYlHGwo+C1Rl5wKAtby4VR2CyhNr0gnQqff
-         vOcrNPSmvIRHzYfHQMtoWJ/lXjc14XB+ZWh8Bd0mDD5VTJniqz7CXWS/sTbE/mbX4btc
-         Lz841/8RgK/97amTXeY86YvT9F1LYYDkjC1L2Xlc+bqKJ41cTOn7flB3sPdW9n8U/aZb
-         2eYCELH1FUXBRC6tFGYbyo2dysckw1Ya2jWWC+/+9xtx8A7TYzKPtGZ/3T9rAVgO+Tjt
-         aGHxGz7W5FWg9Xt37KTvfRbKuMGcvFEvqrtnDpW71VF3prtJQaiScFnh5xD2DftOCLUy
-         jStQ==
-X-Gm-Message-State: ABy/qLaRz4M/wlZj4O4w7O4dJdQgkrkz6i6kAFYuGZcTNF+OLnyUFDT9
-        kEqzdJ2jH6I0nKMcexo0DhnxhRC/er+pdYekaus=
-X-Google-Smtp-Source: APBJJlGBlJjhXA317NVJI8YZATKyklEw0tkXtLszo383gTFM/xNrJUX6GWwD9HJEgK2Q2+0j7hQmt2LxipqVhYinjTg=
-X-Received: by 2002:a2e:8e31:0:b0:2b6:a0c8:fde3 with SMTP id
- r17-20020a2e8e31000000b002b6a0c8fde3mr748982ljk.6.1690275048115; Tue, 25 Jul
- 2023 01:50:48 -0700 (PDT)
+        with ESMTP id S233176AbjGYJDU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 05:03:20 -0400
+Received: from out-63.mta1.migadu.com (out-63.mta1.migadu.com [IPv6:2001:41d0:203:375::3f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 360A91FFF
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 02:03:05 -0700 (PDT)
+Message-ID: <3648ca69-d65e-8431-135a-a5738586bc25@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690275782;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jkjBh/Kp2KZsbd5A9bxpjAJZxN02Eft+lFTspqPnOCk=;
+        b=C86+NnAgVOWWduY0bypLj9pEd8+f7K2hQWQRdMiOl+4lNoex/sNqQF/OzRY+XF6R/pQj3x
+        RJfrwmBw/U62Xz7gGIQfDrsff33dmTRFy6JUY2ZoASoV8vvmjWXkOHfSOC62P8ONIDS3dq
+        14Z/qjc5TC07VTaeF50qDKBsNsdzhz4=
+Date:   Tue, 25 Jul 2023 17:02:47 +0800
 MIME-Version: 1.0
-References: <cover.1690273969.git.haibo1.xu@intel.com> <1f25f27d1316bc91e1e31cd3d50a1d20f696759a.1690273969.git.haibo1.xu@intel.com>
-In-Reply-To: <1f25f27d1316bc91e1e31cd3d50a1d20f696759a.1690273969.git.haibo1.xu@intel.com>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Tue, 25 Jul 2023 16:50:36 +0800
-Message-ID: <CAJve8okJ-HYpsOrqH4Zvn7OBtwXWa4JumC+ZsMfHKB-deVYd2A@mail.gmail.com>
-Subject: Re: [PATCH v6 06/13] KVM: arm64: selftests: Split get-reg-list test code
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     ajones@ventanamicro.com, maz@kernel.org, oliver.upton@linux.dev,
-        seanjc@google.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Shuah Khan <shuah@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kselftest@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 03/47] mm: shrinker: add infrastructure for dynamically
+ allocating shrinker
+To:     Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-4-zhengqi.arch@bytedance.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230724094354.90817-4-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023 at 4:37=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wrot=
-e:
+
+
+On 2023/7/24 17:43, Qi Zheng wrote:
+> Currently, the shrinker instances can be divided into the following three
+> types:
 >
-> From: Andrew Jones <ajones@ventanamicro.com>
+> a) global shrinker instance statically defined in the kernel, such as
+>     workingset_shadow_shrinker.
 >
-> Split the arch-neutral test code out of aarch64/get-reg-list.c into
-> get-reg-list.c. To do this we invent a new make variable
-> $(SPLIT_TESTS) which expects common parts to be in the KVM selftests
-> root and the counterparts to have the same name, but be in
-> $(ARCH_DIR).
+> b) global shrinker instance statically defined in the kernel modules, such
+>     as mmu_shrinker in x86.
 >
-> There's still some work to be done to de-aarch64 the common
-> get-reg-list.c, but we leave that to the next patch to avoid
-> modifying too much code while moving it.
+> c) shrinker instance embedded in other structures.
 >
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> For case a, the memory of shrinker instance is never freed. For case b,
+> the memory of shrinker instance will be freed after synchronize_rcu() when
+> the module is unloaded. For case c, the memory of shrinker instance will
+> be freed along with the structure it is embedded in.
+>
+> In preparation for implementing lockless slab shrink, we need to
+> dynamically allocate those shrinker instances in case c, then the memory
+> can be dynamically freed alone by calling kfree_rcu().
+>
+> So this commit adds the following new APIs for dynamically allocating
+> shrinker, and add a private_data field to struct shrinker to record and
+> get the original embedded structure.
+>
+> 1. shrinker_alloc()
+>
+> Used to allocate shrinker instance itself and related memory, it will
+> return a pointer to the shrinker instance on success and NULL on failure.
+>
+> 2. shrinker_free_non_registered()
+>
+> Used to destroy the non-registered shrinker instance.
+
+At least I don't like this name. I know you want to tell others
+this function only should be called when shrinker has not been
+registed but allocated. Maybe shrinker_free() is more simple.
+And and a comment to tell the users when to use it.
+
+>
+> 3. shrinker_register()
+>
+> Used to register the shrinker instance, which is same as the current
+> register_shrinker_prepared().
+>
+> 4. shrinker_unregister()
+>
+> Used to unregister and free the shrinker instance.
+>
+> In order to simplify shrinker-related APIs and make shrinker more
+> independent of other kernel mechanisms, subsequent submissions will use
+> the above API to convert all shrinkers (including case a and b) to
+> dynamically allocated, and then remove all existing APIs.
+>
+> This will also have another advantage mentioned by Dave Chinner:
+>
+> ```
+> The other advantage of this is that it will break all the existing
+> out of tree code and third party modules using the old API and will
+> no longer work with a kernel using lockless slab shrinkers. They
+> need to break (both at the source and binary levels) to stop bad
+> things from happening due to using uncoverted shrinkers in the new
+> setup.
+> ```
+>
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |  12 +-
->  .../selftests/kvm/aarch64/get-reg-list.c      | 367 +----------------
->  tools/testing/selftests/kvm/get-reg-list.c    | 377 ++++++++++++++++++
->  3 files changed, 398 insertions(+), 358 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
+>   include/linux/shrinker.h |   6 +++
+>   mm/shrinker.c            | 113 +++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 119 insertions(+)
 >
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftes=
-ts/kvm/Makefile
-> index c692cc86e7da..95f180e711d5 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -140,7 +140,6 @@ TEST_GEN_PROGS_EXTENDED_x86_64 +=3D x86_64/nx_huge_pa=
-ges_test
->  TEST_GEN_PROGS_aarch64 +=3D aarch64/aarch32_id_regs
->  TEST_GEN_PROGS_aarch64 +=3D aarch64/arch_timer
->  TEST_GEN_PROGS_aarch64 +=3D aarch64/debug-exceptions
-> -TEST_GEN_PROGS_aarch64 +=3D aarch64/get-reg-list
->  TEST_GEN_PROGS_aarch64 +=3D aarch64/hypercalls
->  TEST_GEN_PROGS_aarch64 +=3D aarch64/page_fault_test
->  TEST_GEN_PROGS_aarch64 +=3D aarch64/psci_test
-> @@ -152,6 +151,7 @@ TEST_GEN_PROGS_aarch64 +=3D access_tracking_perf_test
->  TEST_GEN_PROGS_aarch64 +=3D demand_paging_test
->  TEST_GEN_PROGS_aarch64 +=3D dirty_log_test
->  TEST_GEN_PROGS_aarch64 +=3D dirty_log_perf_test
-> +TEST_GEN_PROGS_aarch64 +=3D get-reg-list
->  TEST_GEN_PROGS_aarch64 +=3D kvm_create_max_vcpus
->  TEST_GEN_PROGS_aarch64 +=3D kvm_page_table_test
->  TEST_GEN_PROGS_aarch64 +=3D memslot_modification_stress_test
-> @@ -181,6 +181,8 @@ TEST_GEN_PROGS_riscv +=3D kvm_page_table_test
->  TEST_GEN_PROGS_riscv +=3D set_memory_region_test
->  TEST_GEN_PROGS_riscv +=3D kvm_binary_stats_test
->
-> +SPLIT_TESTS +=3D get-reg-list
+> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+> index 961cb84e51f5..296f5e163861 100644
+> --- a/include/linux/shrinker.h
+> +++ b/include/linux/shrinker.h
+> @@ -70,6 +70,8 @@ struct shrinker {
+>   	int seeks;	/* seeks to recreate an obj */
+>   	unsigned flags;
+>   
+> +	void *private_data;
 > +
->  TEST_PROGS +=3D $(TEST_PROGS_$(ARCH_DIR))
->  TEST_GEN_PROGS +=3D $(TEST_GEN_PROGS_$(ARCH_DIR))
->  TEST_GEN_PROGS_EXTENDED +=3D $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
-> @@ -228,11 +230,14 @@ LIBKVM_C_OBJ :=3D $(patsubst %.c, $(OUTPUT)/%.o, $(=
-LIBKVM_C))
->  LIBKVM_S_OBJ :=3D $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
->  LIBKVM_STRING_OBJ :=3D $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
->  LIBKVM_OBJS =3D $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
-> +SPLIT_TESTS_TARGETS :=3D $(patsubst %, $(OUTPUT)/%, $(SPLIT_TESTS))
-> +SPLIT_TESTS_OBJS :=3D $(patsubst %, $(ARCH_DIR)/%.o, $(SPLIT_TESTS))
->
->  TEST_GEN_OBJ =3D $(patsubst %, %.o, $(TEST_GEN_PROGS))
->  TEST_GEN_OBJ +=3D $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
->  TEST_DEP_FILES =3D $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
->  TEST_DEP_FILES +=3D $(patsubst %.o, %.d, $(LIBKVM_OBJS))
-> +TEST_DEP_FILES +=3D $(patsubst %.o, %.d, $(SPLIT_TESTS_OBJS))
->  -include $(TEST_DEP_FILES)
->
->  $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-> @@ -240,7 +245,10 @@ $(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
->  $(TEST_GEN_OBJ): $(OUTPUT)/%.o: %.c
->         $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
->
-> -EXTRA_CLEAN +=3D $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope=
-.*
-> +$(SPLIT_TESTS_TARGETS): %: %.o $(SPLIT_TESTS_OBJS)
-> +       $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $^ $(LDLIBS=
-) -o $@
+>   	/* These are for internal use */
+>   	struct list_head list;
+>   #ifdef CONFIG_MEMCG
+> @@ -98,6 +100,10 @@ struct shrinker {
+>   
+>   unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>   			  int priority);
+> +struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+> +void shrinker_free_non_registered(struct shrinker *shrinker);
+> +void shrinker_register(struct shrinker *shrinker);
+> +void shrinker_unregister(struct shrinker *shrinker);
+>   
+>   extern int __printf(2, 3) prealloc_shrinker(struct shrinker *shrinker,
+>   					    const char *fmt, ...);
+> diff --git a/mm/shrinker.c b/mm/shrinker.c
+> index 0a32ef42f2a7..d820e4cc5806 100644
+> --- a/mm/shrinker.c
+> +++ b/mm/shrinker.c
+> @@ -548,6 +548,119 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>   	return freed;
+>   }
+>   
+> +struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...)
+> +{
+> +	struct shrinker *shrinker;
+> +	unsigned int size;
+> +	va_list __maybe_unused ap;
+> +	int err;
 > +
-> +EXTRA_CLEAN +=3D $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) $(SPLI=
-T_TESTS_OBJS) cscope.*
->
->  x :=3D $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
->  $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+> +	shrinker = kzalloc(sizeof(struct shrinker), GFP_KERNEL);
+> +	if (!shrinker)
+> +		return NULL;
+> +
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +	va_start(ap, fmt);
+> +	shrinker->name = kvasprintf_const(GFP_KERNEL, fmt, ap);
+> +	va_end(ap);
+> +	if (!shrinker->name)
+> +		goto err_name;
+> +#endif
 
-Hi @Andrew Jones,
+So why not introduce another helper to handle this and declare it
+as a void function when !CONFIG_SHRINKER_DEBUG? Something like the
+following:
 
-After rebasing to v6.5-rc3, some changes are needed to the SPLIT_TESTS
-target, or the make would fail.
-Please help have a look.
+#ifdef CONFIG_SHRINKER_DEBUG
+static int shrinker_debugfs_name_alloc(struct shrinker *shrinker, const 
+char *fmt,
+                                        va_list vargs)
 
-Regards,
-Haibo
+{
+     shrinker->name = kvasprintf_const(GFP_KERNEL, fmt, vargs);
+     return shrinker->name ? 0 : -ENOMEM;
+}
+#else
+static int shrinker_debugfs_name_alloc(struct shrinker *shrinker, const 
+char *fmt,
+                                        va_list vargs)
+{
+     return 0;
+}
+#endif
+
+> +	shrinker->flags = flags;
+> +
+> +	if (flags & SHRINKER_MEMCG_AWARE) {
+> +		err = prealloc_memcg_shrinker(shrinker);
+> +		if (err == -ENOSYS)
+> +			shrinker->flags &= ~SHRINKER_MEMCG_AWARE;
+> +		else if (err == 0)
+> +			goto done;
+> +		else
+> +			goto err_flags;
+> +	}
+> +
+> +	/*
+> +	 * The nr_deferred is available on per memcg level for memcg aware
+> +	 * shrinkers, so only allocate nr_deferred in the following cases:
+> +	 *  - non memcg aware shrinkers
+> +	 *  - !CONFIG_MEMCG
+> +	 *  - memcg is disabled by kernel command line
+> +	 */
+> +	size = sizeof(*shrinker->nr_deferred);
+> +	if (flags & SHRINKER_NUMA_AWARE)
+> +		size *= nr_node_ids;
+> +
+> +	shrinker->nr_deferred = kzalloc(size, GFP_KERNEL);
+> +	if (!shrinker->nr_deferred)
+> +		goto err_flags;
+> +
+> +done:
+> +	return shrinker;
+> +
+> +err_flags:
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +	kfree_const(shrinker->name);
+> +	shrinker->name = NULL;
+
+This could be shrinker_debugfs_name_free()
+
+> +err_name:
+> +#endif
+> +	kfree(shrinker);
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(shrinker_alloc);
+> +
+> +void shrinker_free_non_registered(struct shrinker *shrinker)
+> +{
+> +#ifdef CONFIG_SHRINKER_DEBUG
+> +	kfree_const(shrinker->name);
+> +	shrinker->name = NULL;
+
+This could be shrinker_debugfs_name_free()
+
+> +#endif
+> +	if (shrinker->flags & SHRINKER_MEMCG_AWARE) {
+> +		down_write(&shrinker_rwsem);
+> +		unregister_memcg_shrinker(shrinker);
+> +		up_write(&shrinker_rwsem);
+> +	}
+> +
+> +	kfree(shrinker->nr_deferred);
+> +	shrinker->nr_deferred = NULL;
+> +
+> +	kfree(shrinker);
+> +}
+> +EXPORT_SYMBOL(shrinker_free_non_registered);
+> +
+> +void shrinker_register(struct shrinker *shrinker)
+> +{
+> +	down_write(&shrinker_rwsem);
+> +	list_add_tail(&shrinker->list, &shrinker_list);
+> +	shrinker->flags |= SHRINKER_REGISTERED;
+> +	shrinker_debugfs_add(shrinker);
+> +	up_write(&shrinker_rwsem);
+> +}
+> +EXPORT_SYMBOL(shrinker_register);
+> +
+> +void shrinker_unregister(struct shrinker *shrinker)
+
+You have made all shrinkers to be dynamically allocated, so
+we should prevent users from allocating shrinkers statically and
+use this function to unregister it. It is better to add a
+flag like SHRINKER_ALLOCATED which is set in shrinker_alloc(),
+and check whether it is set in shrinker_unregister(), if not
+maybe a warning should be added to tell the users what happened.
+
+> +{
+> +	struct dentry *debugfs_entry;
+> +	int debugfs_id;
+> +
+> +	if (!shrinker || !(shrinker->flags & SHRINKER_REGISTERED))
+> +		return;
+> +
+> +	down_write(&shrinker_rwsem);
+> +	list_del(&shrinker->list);
+> +	shrinker->flags &= ~SHRINKER_REGISTERED;
+> +	if (shrinker->flags & SHRINKER_MEMCG_AWARE)
+> +		unregister_memcg_shrinker(shrinker);
+> +	debugfs_entry = shrinker_debugfs_detach(shrinker, &debugfs_id);
+
+In the internal of this function, you also could use
+shrinker_debugfs_name_free().
+
+Thanks.
+
+> +	up_write(&shrinker_rwsem);
+> +
+> +	shrinker_debugfs_remove(debugfs_entry, debugfs_id);
+> +
+> +	kfree(shrinker->nr_deferred);
+> +	shrinker->nr_deferred = NULL;
+> +
+> +	kfree(shrinker);
+> +}
+> +EXPORT_SYMBOL(shrinker_unregister);
+> +
+>   /*
+>    * Add a shrinker callback to be called from the vm.
+>    */
+
