@@ -2,121 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4A776211E
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 20:15:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 266D976247C
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 23:31:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232167AbjGYSPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 14:15:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32846 "EHLO
+        id S231439AbjGYVa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 17:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230509AbjGYSPM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 14:15:12 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1A110EF
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:15:11 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d05e334f436so5631815276.2
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:15:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690308910; x=1690913710;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pAZmELeq2ZhkyDgChb+RthHmv+q1lpfrw6foSOn/8ZY=;
-        b=rldnnWH7w/HourUe/RcpHwlb69EnTTdPK/pDOa8OZfeDJ35pA6WgI3FFvgz7Wjl7x6
-         98M310YVHhmfsVHJyCvBvyNc55l3cU8cn0/4gGT0AfkBYx9Uwj+M/TkJ/eJKoiYntE36
-         Xj8BoGO0yZu8Q5LvMFeprTGpzBWUO4Lzfx2Wb0cSQj5fYvwYd/+vhSArQPxwdvsH9q6W
-         PPWnYjEsWI2CzoXQWQC16CG4zFTZm4P/pBUKSRJOKCAhm8mqCiQIm7W8/bXxHKYWj9z4
-         UjcWrpsMKdV9ZNjmW86cd2ztYi8qdoEAwtj4AbVpQokSZjJk5JZDjGBobeDfhd0+Kd1K
-         4UVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690308910; x=1690913710;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pAZmELeq2ZhkyDgChb+RthHmv+q1lpfrw6foSOn/8ZY=;
-        b=fphlnaC1xGDWGZzD7UrFwy9qY6rTSsLkoSNjXKVNteFNOXoxx5+DKlknGu05lZJ1Ut
-         r5f9DXNmAQAeE7RJqIGJVGBDvUBsZMjil6c9Bx5vo5qWvWUi9zOf4gOIPwCdSmTxXROt
-         +DkEQIxnMNzEU5Vkj3wWJ46wld1qr44exMWUOyZZbvEy8lSea4gPF5s4T9KMk46yA+rV
-         7NW/KrurLSdXoF2FY39eqkkwUyZyxW/VbJCoAJcQSxKgLnyh8PyNZyOZxc/fMOdsz8F5
-         d1+VM/ufL90iaHkInQHkPeKi8b6RwCyIXQCoJFE7aWT69gnqRDSK7HC7sq1d5+R3NEs7
-         CVCA==
-X-Gm-Message-State: ABy/qLaF7EeLLdarXtC+JzxXmhee3A87W7YUaRoOMVkuEVdAnHOoGIOq
-        PNQ7yPXE8OniGAuGPCqxFeWZwG0PTMs=
-X-Google-Smtp-Source: APBJJlFXrTcGU/9dXVrt8CbSBDCqA64SFKTYxJj7G92zNc7tdKvKFYWLRqCNhBTcCsblpCzONauc19v8DpM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8d83:0:b0:d15:d6da:7e97 with SMTP id
- o3-20020a258d83000000b00d15d6da7e97mr24208ybl.3.1690308910326; Tue, 25 Jul
- 2023 11:15:10 -0700 (PDT)
-Date:   Tue, 25 Jul 2023 11:15:08 -0700
-In-Reply-To: <c90d244a6b372322028d0e5b42d60fb1a23476da.camel@intel.com>
-Mime-Version: 1.0
-References: <20230721201859.2307736-1-seanjc@google.com> <20230721201859.2307736-20-seanjc@google.com>
- <c90d244a6b372322028d0e5b42d60fb1a23476da.camel@intel.com>
-Message-ID: <ZMARLNcPwovmOZvg@google.com>
-Subject: Re: [PATCH v4 19/19] KVM: VMX: Skip VMCLEAR logic during emergency
- reboots if CR4.VMXE=0
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Chao Gao <chao.gao@intel.com>,
-        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230433AbjGYVax (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 17:30:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A59B2136;
+        Tue, 25 Jul 2023 14:30:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CC72D6190B;
+        Tue, 25 Jul 2023 21:30:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF6E2C433C7;
+        Tue, 25 Jul 2023 21:30:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690320631;
+        bh=V6TKiwei04nE3RMXlxgDm9GDIfoUHRbLAP5mFRrxSIg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=dkhLGLiaFpp+WjJG779pBjcd3WWJVUu7utaxHvlhcCRdyzKeXxkvnWXgNVYfPoCrC
+         00BYWkOLqS5AK4f/ex7wJFl3qsWzUCOOkzfm/Cyzl5oIfUQ7DqrXlAmvuyPuwBxUPA
+         ONK4jTWRuMX1h4/Bl/vemPvweN7BSgbtdFdQORDKSnKMkr6ISQfqIHvsO7IiH5p3gK
+         EJ70gqs8zlRPzntbZNEBREXXUhMcG42MjKUkPsZq0UCfuSLS4q/5yJ/zJbBJjWnurM
+         FpnEVIVkuBSlkaZ72zuAYKfS4WzIJUU8X8YsdtvLqIitYGOEVk1jXey/IJMQ/mNsx1
+         gAFGaUQUp5rTQ==
+Date:   Tue, 25 Jul 2023 16:30:29 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     suijingfeng <suijingfeng@loongson.cn>
+Cc:     Sui Jingfeng <sui.jingfeng@linux.dev>,
+        David Airlie <airlied@gmail.com>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-fbdev@vger.kernel.org,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian Konig <christian.koenig@amd.com>,
+        Pan Xinhui <Xinhui.Pan@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Karol Herbst <kherbst@redhat.com>,
+        Lyude Paul <lyude@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Hawking Zhang <Hawking.Zhang@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Lijo Lazar <lijo.lazar@amd.com>,
+        YiPeng Chai <YiPeng.Chai@amd.com>,
+        Bokun Zhang <Bokun.Zhang@amd.com>,
+        Likun Gao <Likun.Gao@amd.com>,
+        Ville Syrjala <ville.syrjala@linux.intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jani Nikula <jani.nikula@intel.com>
+Subject: Re: [PATCH v3 4/9] PCI/VGA: Improve the default VGA device selection
+Message-ID: <20230725213029.GA666158@bhelgaas>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5fbc1ec7-fb61-7e4d-960c-81cc11b706f5@loongson.cn>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023, Kai Huang wrote:
-> On Fri, 2023-07-21 at 13:18 -0700, Sean Christopherson wrote:
-> > Bail from vmx_emergency_disable() without processing the list of loaded
-> > VMCSes if CR4.VMXE=0, i.e. if the CPU can't be post-VMXON.  It should be
-> > impossible for the list to have entries if VMX is already disabled, and
-> > even if that invariant doesn't hold, VMCLEAR will #UD anyways, i.e.
-> > processing the list is pointless even if it somehow isn't empty.
-> > 
-> > Assuming no existing KVM bugs, this should be a glorified nop.  The
-> > primary motivation for the change is to avoid having code that looks like
-> > it does VMCLEAR, but then skips VMXON, which is nonsensical.
-> > 
-> > Suggested-by: Kai Huang <kai.huang@intel.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 12 ++++++++++--
-> >  1 file changed, 10 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 5d21931842a5..0ef5ede9cb7c 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -773,12 +773,20 @@ static void vmx_emergency_disable(void)
-> >  
-> >  	kvm_rebooting = true;
-> >  
-> > +	/*
-> > +	 * Note, CR4.VMXE can be _cleared_ in NMI context, but it can only be
-> > +	 * set in task context.  If this races with VMX is disabled by an NMI,
-> > +	 * VMCLEAR and VMXOFF may #UD, but KVM will eat those faults due to
-> > +	 * kvm_rebooting set.
-> > +	 */
+On Mon, Jul 24, 2023 at 08:16:18PM +0800, suijingfeng wrote:
+> On 2023/7/20 03:32, Bjorn Helgaas wrote:
+> > > 2) It does not take the PCI Bar may get relocated into consideration.
+> > > 3) It is not effective for the PCI device without a dedicated VRAM Bar.
+> > > 4) It is device-agnostic, thus it has to waste the effort to iterate all
+> > >     of the PCI Bar to find the VRAM aperture.
+> > > 5) It has invented lots of methods to determine which one is the default
+> > >     boot device, but this is still a policy because it doesn't give the
+> > >     user a choice to override.
+> > I don't think we need a list of*potential*  problems.  We need an
+> > example of the specific problem this will solve, i.e., what currently
+> > does not work?
 > 
-> I am not quite following this comment.  IIUC this code path is only called from
-> NMI context in case of emergency VMX disable.
+> 
+> This version do allow the arbitration service works on non-x86 arch,
+> which also allow me remove a arch-specific workaround.
+> I will give more detail at the next version.
 
-The CPU that initiates the emergency reboot can invoke the callback from process
-context, only responding CPUs are guaranteed to be handled via NMI shootdown.
-E.g. `reboot -f` will reach this point synchronously.
+Yes.  This part I think we want.
 
-> How can it race with "VMX is disabled by an NMI"?
+> But I want to provide one more drawback of vgaarb here:
+> 
+> (6) It does not works for non VGA-compatible PCI(e) display controllers.
+> 
+> Because, currently, vgaarb deal with PCI VGA compatible devices only.
+> 
+> See another my patch set [1] for more elaborate discussion.
+> 
+> It also ignore PCI_CLASS_NOT_DEFINED_VGA as Maciej puts it[2].
+> 
+> While my approach do not required the display controller to be
+> VGA-compatible to enjoy the arbitration service.
 
-Somewhat theoretically, a different CPU could panic() and do a shootdown of the
-CPU that is handling `reboot -f`.
+I think vgaarb is really only for dealing with the problem of the
+legacy VGA address space routing.  For example, there may be VGA
+devices that require the [pci 0xa0000-0xbffff] range but they don't
+describe that via a BAR.  There may also be VGA option ROMs that
+depend on that range so they can initialize the device.
+
+The [pci 0xa0000-0xbffff] range can only be routed to one device at a
+time, and vgaarb is what takes care of that by manipulating the VGA
+Enable bits in bridges.
+
+I don't think we should extend vgaarb to deal with non-VGA GPUs in
+general, i.e., I don't think it should be concerned with devices and
+option ROMs that do not require the [pci 0xa0000-0xbffff] range.
+
+I think a strict reading of the PCI Class Code spec would be that only
+devices with Programming Interface 0000 0000b can depend on that
+legacy range.
+
+If that's what vgaarb currently enforces, great.  If it currently
+deals with more than just 0000 0000b devices, and there's some value
+in restricting it to only 0000 0000b, we could try that, but I would
+suggest doing that in a tiny patch all by itself.  Then if we trip
+over a problem, it's easy to bisect and revert it.
+
+> [1] https://patchwork.freedesktop.org/patch/546690/?series=120548&rev=1
+> 
+> [2] https://lkml.org/lkml/2023/6/18/315
+> 
