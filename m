@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 248C6762677
+	by mail.lfdr.de (Postfix) with ESMTP id D4113762679
 	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:24:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232621AbjGYWYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 18:24:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39372 "EHLO
+        id S232682AbjGYWY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 18:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232697AbjGYWWV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 18:22:21 -0400
+        with ESMTP id S232741AbjGYWWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 18:22:35 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7924F4EC5;
-        Tue, 25 Jul 2023 15:17:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949D14ED8;
+        Tue, 25 Jul 2023 15:17:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690323471; x=1721859471;
+  t=1690323475; x=1721859475;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7lKJ6bOIOJBVCdWzKOJhecQyu0qSSTJAZTUYFEWCbkQ=;
-  b=l5w4VWLpwj9Bs4aZIcmRFTodHtJl8UPAP5oHF34FmxwzBRyDaAZNP2dr
-   uDf423V+FgKTXcl7Ru/nA75jSf6K0xJHjnFUyWjrBUMsXKfK9V5xsbKok
-   tm6wdzs1UHo6hzT5CPS4iKyKZ4hSwZKqXDFVo0+JFfwRMYWHOkyw3J/j+
-   n+RkSNUzQRV9vGGAPFYZwCRpZuaypcaF9WUNzWiaLFPx6SiCw6l7Rk1tN
-   9jzk9WSo/+b2Txj4znjPWLTGl8EsJmiX/zsTUGS2HWaEE2vPfTKvlf2bP
-   qv/LmWdtbibDULT346bBEfLjax+4HSTN6DbuIEIvzSc4laNQo8/TgzmMw
+  bh=TyobtdtuH/YAqwgdKL24pQLPaZbJ8c3URiYLS/2JpXE=;
+  b=TcR8N+XFJNBs/EU6I2QyvKNg3FyLVVSlwdzHYxkevqeeUXPDoCYoCDtK
+   jAoUZfBw/H4pBH/uOMZ3Ucl7H5t8nA2GcxZpcjhDEF90tjqtXoobLJOpQ
+   5X1RZV2K+qUXFWbOdunxH2DXmiWZA+Teh4Fm4jNBFZisqT4v58S3jWpBd
+   ztWJbtAD8qNRnX3hyO8mNL0svRu7g7QxMOp/LxAU/WQsUC6Kn0RCPGbXq
+   QwhSX7bX2i91idmkLgQgbcS9qQyS9gLYKNrp2XzuKao+WQlBG5gBTxb6Q
+   boTM2ivlP6aJ1olHlaUwHrQrPga1qFhKBeAg2U33DzlbhqdoNwGGWzWJD
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882669"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882675"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="367882669"
+   d="scan'208";a="367882675"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:00 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:01 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001876"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001879"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="840001876"
+   d="scan'208";a="840001879"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:00 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v15 086/115] KVM: TDX: handle ept violation/misconfig exit
-Date:   Tue, 25 Jul 2023 15:14:37 -0700
-Message-Id: <b5989acb056eb58f9923f78ad8d548334e9737d1.1690322424.git.isaku.yamahata@intel.com>
+Subject: [PATCH v15 087/115] KVM: TDX: handle EXCEPTION_NMI and EXTERNAL_INTERRUPT
+Date:   Tue, 25 Jul 2023 15:14:38 -0700
+Message-Id: <65e113025130e082a409d12b58f4282c2801d46b.1690322424.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1690322424.git.isaku.yamahata@intel.com>
 References: <cover.1690322424.git.isaku.yamahata@intel.com>
@@ -68,102 +68,60 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-On EPT violation, call a common function, __vmx_handle_ept_violation() to
-trigger x86 MMU code.  On EPT misconfiguration, exit to ring 3 with
-KVM_EXIT_UNKNOWN.  because EPT misconfiguration can't happen as MMIO is
-trigged by TDG.VP.VMCALL. No point to set a misconfiguration value for the
-fast path.
+Because guest TD state is protected, exceptions in guest TDs can't be
+intercepted.  TDX VMM doesn't need to handle exceptions.
+tdx_handle_exit_irqoff() handles NMI and machine check.  Ignore NMI and
+machine check and continue guest TD execution.
+
+For external interrupt, increment stats same to the VMX case.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-v14 -> v15:
-- use PFERR_GUEST_ENC_MASK to tell the fault is private
+ arch/x86/kvm/vmx/tdx.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/kvm/vmx/common.h |  3 +++
- arch/x86/kvm/vmx/tdx.c    | 46 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 49 insertions(+)
-
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-index aaab1d407207..e4fec792a3ae 100644
---- a/arch/x86/kvm/vmx/common.h
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -87,6 +87,9 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
- 	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
- 
-+	if (kvm_is_private_gpa(vcpu->kvm, gpa))
-+		error_code |= PFERR_GUEST_ENC_MASK;
-+
- 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
- }
- 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 0d92253ea40e..1a41e12f0942 100644
+index 1a41e12f0942..45b521e05ceb 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1136,6 +1136,48 @@ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
- 	__vmx_deliver_posted_interrupt(vcpu, &tdx->pi_desc, vector);
+@@ -798,6 +798,25 @@ void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 		vmx_handle_exception_irqoff(vcpu, tdexit_intr_info(vcpu));
  }
  
-+static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
++static int tdx_handle_exception(struct kvm_vcpu *vcpu)
 +{
-+	unsigned long exit_qual;
++	u32 intr_info = tdexit_intr_info(vcpu);
 +
-+	if (kvm_is_private_gpa(vcpu->kvm, tdexit_gpa(vcpu))) {
-+		/*
-+		 * Always treat SEPT violations as write faults.  Ignore the
-+		 * EXIT_QUALIFICATION reported by TDX-SEAM for SEPT violations.
-+		 * TD private pages are always RWX in the SEPT tables,
-+		 * i.e. they're always mapped writable.  Just as importantly,
-+		 * treating SEPT violations as write faults is necessary to
-+		 * avoid COW allocations, which will cause TDAUGPAGE failures
-+		 * due to aliasing a single HPA to multiple GPAs.
-+		 */
-+#define TDX_SEPT_VIOLATION_EXIT_QUAL	EPT_VIOLATION_ACC_WRITE
-+		exit_qual = TDX_SEPT_VIOLATION_EXIT_QUAL;
-+	} else {
-+		exit_qual = tdexit_exit_qual(vcpu);
-+		if (exit_qual & EPT_VIOLATION_ACC_INSTR) {
-+			pr_warn("kvm: TDX instr fetch to shared GPA = 0x%lx @ RIP = 0x%lx\n",
-+				tdexit_gpa(vcpu), kvm_rip_read(vcpu));
-+			vcpu->run->exit_reason = KVM_EXIT_EXCEPTION;
-+			vcpu->run->ex.exception = PF_VECTOR;
-+			vcpu->run->ex.error_code = exit_qual;
-+			return 0;
-+		}
-+	}
++	if (is_nmi(intr_info) || is_machine_check(intr_info))
++		return 1;
 +
-+	trace_kvm_page_fault(vcpu, tdexit_gpa(vcpu), exit_qual);
-+	return __vmx_handle_ept_violation(vcpu, tdexit_gpa(vcpu), exit_qual);
++	kvm_pr_unimpl("unexpected exception 0x%x(exit_reason 0x%llx qual 0x%lx)\n",
++		intr_info,
++		to_tdx(vcpu)->exit_reason.full, tdexit_exit_qual(vcpu));
++	return -EFAULT;
 +}
 +
-+static int tdx_handle_ept_misconfig(struct kvm_vcpu *vcpu)
++static int tdx_handle_external_interrupt(struct kvm_vcpu *vcpu)
 +{
-+	WARN_ON_ONCE(1);
-+
-+	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
-+	vcpu->run->hw.hardware_exit_reason = EXIT_REASON_EPT_MISCONFIG;
-+
-+	return 0;
++	++vcpu->stat.irq_exits;
++	return 1;
 +}
 +
- int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ static int tdx_handle_triple_fault(struct kvm_vcpu *vcpu)
  {
- 	union tdx_exit_reason exit_reason = to_tdx(vcpu)->exit_reason;
-@@ -1196,6 +1238,10 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
+ 	vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+@@ -1238,6 +1257,10 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
  	WARN_ON_ONCE(fastpath != EXIT_FASTPATH_NONE);
  
  	switch (exit_reason.basic) {
-+	case EXIT_REASON_EPT_VIOLATION:
-+		return tdx_handle_ept_violation(vcpu);
-+	case EXIT_REASON_EPT_MISCONFIG:
-+		return tdx_handle_ept_misconfig(vcpu);
- 	case EXIT_REASON_OTHER_SMI:
- 		/*
- 		 * If reach here, it's not a Machine Check System Management
++	case EXIT_REASON_EXCEPTION_NMI:
++		return tdx_handle_exception(vcpu);
++	case EXIT_REASON_EXTERNAL_INTERRUPT:
++		return tdx_handle_external_interrupt(vcpu);
+ 	case EXIT_REASON_EPT_VIOLATION:
+ 		return tdx_handle_ept_violation(vcpu);
+ 	case EXIT_REASON_EPT_MISCONFIG:
 -- 
 2.25.1
 
