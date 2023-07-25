@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F2A1761BFC
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 16:39:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E12D6761BE9
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 16:39:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233364AbjGYOjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 10:39:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
+        id S233083AbjGYOjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 10:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233247AbjGYOjU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 10:39:20 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DDFA1999;
-        Tue, 25 Jul 2023 07:39:17 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PE8EMO023252;
-        Tue, 25 Jul 2023 14:39:17 GMT
+        with ESMTP id S229728AbjGYOjH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 10:39:07 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CFD791;
+        Tue, 25 Jul 2023 07:39:06 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PEcTIw013718;
+        Tue, 25 Jul 2023 14:39:05 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=wu3B0hpZD/zo6Hxv6q5CzIkc7w68SW69q6uSI+uwjHQ=;
- b=IOtdaDbznB6oSz3/XE3h5w0X338v/ZfPQE+g+ubjsfVeAlbsUJKPveKheMEwKCLq9ZpX
- Hc85nFQ2S065ctrIVV36QhBQq8ra2G1ff4rqMeg+2mtuFp2t7OqTI35nEsJk5i8YNGHr
- WRMhoTgqmBwohuC+BQZait3ku6zzGWURcCGVCBM3JBGDAZNDwsMev8NZCq2p9C34kfpA
- XKLsfYNbRobn6S8zcS+OFIhv6LPXvEK8bQcH6g9Yj7uT83x4lQLGi7nbIdBcidjCnsvy
- AH3q+40daWSx8x10f6EYejbBnR0CVnxy1hJTowQxsII5QW2OKN/HPFqNfmp6WcPcXYjB 2w== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=VodDcnSOOysiMyOIQzqXtdqePv7Hk8EfmnYNad2Oyrc=;
+ b=fHTkBTsnzao4c6E3X2jLUEpCRHIjg8DoRJFcAW2frODiu/33G1C0VDr/aCm5QvMlttO6
+ fFm6AMIOm8rp6p2yE2Fd1jLJJ6YkZJp9ju/zoijsHxy8H+RtbKnFLutmNRnm9ZuiaYVe
+ J9HwE1KPUIuQex22zz5eh3o6kJdMpeFrQ3IC7SD2xmYNEpJjeY5HoAAU9jjxC4W94yQa
+ +4Ghdqy5Oj1p3iDnh/DaT/uaFhiXWiRI0SvedP0LEL2iw2L5KQ5wteh/mi1fAWzDYjjL
+ nLoZ8ZK5UkFrFApU7Ysn+lpoURr9GQ/FKixEzrtpfa9o2E9L+9mnJBOP3G/yvbSIGg3j /A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2942ch7w-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2063cq7v-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 14:39:16 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PE8nCM027253;
-        Tue, 25 Jul 2023 14:39:15 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2942cgsw-1
+        Tue, 25 Jul 2023 14:39:05 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PEcXV5014046;
+        Tue, 25 Jul 2023 14:39:04 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2063cq6k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 14:39:13 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PEF0Ca001872;
+        Tue, 25 Jul 2023 14:39:04 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PETnOL026206;
         Tue, 25 Jul 2023 14:39:03 GMT
 Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unjcb5e-1
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0serw56a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 25 Jul 2023 14:39:03 +0000
 Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PEd0LH59900386
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PEd0MT60096960
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 25 Jul 2023 14:39:00 GMT
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 896B82004E;
+        by IMSVA (Postfix) with ESMTP id C513F2004B;
         Tue, 25 Jul 2023 14:39:00 +0000 (GMT)
 Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 529B02004B;
+        by IMSVA (Postfix) with ESMTP id 8F9BC20063;
         Tue, 25 Jul 2023 14:39:00 +0000 (GMT)
 Received: from heavy.boeblingen.de.ibm.com (unknown [9.155.200.166])
         by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -68,24 +69,25 @@ Cc:     David Hildenbrand <david@redhat.com>,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jens Freimann <jfreimann@redhat.com>,
         Ilya Leoshkevich <iii@linux.ibm.com>
-Subject: [PATCH v4 0/6] KVM: s390: interrupt: Fix stepping into interrupt handlers
-Date:   Tue, 25 Jul 2023 16:37:15 +0200
-Message-ID: <20230725143857.228626-1-iii@linux.ibm.com>
+Subject: [PATCH v4 1/6] KVM: s390: interrupt: Fix single-stepping into interrupt handlers
+Date:   Tue, 25 Jul 2023 16:37:16 +0200
+Message-ID: <20230725143857.228626-2-iii@linux.ibm.com>
 X-Mailer: git-send-email 2.41.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7C6GiDpNvidE8ZGQM6E6D548frGwKcnx
-X-Proofpoint-GUID: GrZXOqHWfQPyNrsjmOl2dINRIpGEh5Pg
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+In-Reply-To: <20230725143857.228626-1-iii@linux.ibm.com>
+References: <20230725143857.228626-1-iii@linux.ibm.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BJh1FJ0qtXFG_c3yWbFgAluzm_zrWmsV
+X-Proofpoint-ORIG-GUID: 8pD9uM82gKsmcI29Cas5HY76aumOErIq
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0 phishscore=0
- mlxlogscore=916 clxscore=1015 impostorscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307250128
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2306200000 definitions=main-2307250128
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -96,45 +98,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-v3: https://lore.kernel.org/kvm/20230724094716.91510-1-iii@linux.ibm.com/
-v3 -> v4: Restore the per_event() macro (Claudio).
+After single-stepping an instruction that generates an interrupt, GDB
+ends up on the second instruction of the respective interrupt handler.
 
-v2: https://lore.kernel.org/lkml/20230721120046.2262291-1-iii@linux.ibm.com/
-v2 -> v3: Add comments, improve the commit messages (Christian, David).
-          Add R-bs.
-          Patches that need review: [4/6], [6/6].
+The reason is that vcpu_pre_run() manually delivers the interrupt, and
+then __vcpu_run() runs the first handler instruction using the
+CPUSTAT_P flag. This causes a KVM_SINGLESTEP exit on the second handler
+instruction.
 
-v1: https://lore.kernel.org/lkml/20230629083452.183274-1-iii@linux.ibm.com/
-v1 -> v2: Fix three more issues.
-          Add selftests (Claudio).
+Fix by delaying the KVM_SINGLESTEP exit until after the manual
+interrupt delivery.
 
-Hi,
+Acked-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
+---
+ arch/s390/kvm/interrupt.c | 14 ++++++++++++++
+ arch/s390/kvm/kvm-s390.c  |  4 ++--
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-I tried to compare the behavior of KVM and TCG by diffing instruction
-traces, and found five issues in KVM related to stepping into interrupt
-handlers.
-
-Best regards,
-Ilya
-
-Ilya Leoshkevich (6):
-  KVM: s390: interrupt: Fix single-stepping into interrupt handlers
-  KVM: s390: interrupt: Fix single-stepping into program interrupt
-    handlers
-  KVM: s390: interrupt: Fix single-stepping kernel-emulated instructions
-  KVM: s390: interrupt: Fix single-stepping userspace-emulated
-    instructions
-  KVM: s390: interrupt: Fix single-stepping keyless mode exits
-  KVM: s390: selftests: Add selftest for single-stepping
-
- arch/s390/kvm/intercept.c                     |  38 ++++-
- arch/s390/kvm/interrupt.c                     |  14 ++
- arch/s390/kvm/kvm-s390.c                      |  27 ++-
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/s390x/debug_test.c  | 160 ++++++++++++++++++
- 5 files changed, 229 insertions(+), 11 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/s390x/debug_test.c
-
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 9bd0a873f3b1..85e39f472bb4 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -1392,6 +1392,7 @@ int __must_check kvm_s390_deliver_pending_interrupts(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
+ 	int rc = 0;
++	bool delivered = false;
+ 	unsigned long irq_type;
+ 	unsigned long irqs;
+ 
+@@ -1465,6 +1466,19 @@ int __must_check kvm_s390_deliver_pending_interrupts(struct kvm_vcpu *vcpu)
+ 			WARN_ONCE(1, "Unknown pending irq type %ld", irq_type);
+ 			clear_bit(irq_type, &li->pending_irqs);
+ 		}
++		delivered |= !rc;
++	}
++
++	/*
++	 * We delivered at least one interrupt and modified the PC. Force a
++	 * singlestep event now.
++	 */
++	if (delivered && guestdbg_sstep_enabled(vcpu)) {
++		struct kvm_debug_exit_arch *debug_exit = &vcpu->run->debug.arch;
++
++		debug_exit->addr = vcpu->arch.sie_block->gpsw.addr;
++		debug_exit->type = KVM_SINGLESTEP;
++		vcpu->guest_debug |= KVM_GUESTDBG_EXIT_PENDING;
+ 	}
+ 
+ 	set_intercept_indicators(vcpu);
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index d1e768bcfe1d..0c6333b108ba 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4611,7 +4611,7 @@ static int vcpu_pre_run(struct kvm_vcpu *vcpu)
+ 
+ 	if (!kvm_is_ucontrol(vcpu->kvm)) {
+ 		rc = kvm_s390_deliver_pending_interrupts(vcpu);
+-		if (rc)
++		if (rc || guestdbg_exit_pending(vcpu))
+ 			return rc;
+ 	}
+ 
+@@ -4738,7 +4738,7 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	do {
+ 		rc = vcpu_pre_run(vcpu);
+-		if (rc)
++		if (rc || guestdbg_exit_pending(vcpu))
+ 			break;
+ 
+ 		kvm_vcpu_srcu_read_unlock(vcpu);
 -- 
 2.41.0
 
