@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA90E76268D
+	by mail.lfdr.de (Postfix) with ESMTP id 1D0EE76268B
 	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:24:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232944AbjGYWYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 18:24:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39372 "EHLO
+        id S232922AbjGYWYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 18:24:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233032AbjGYWXU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 18:23:20 -0400
+        with ESMTP id S233036AbjGYWXV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 18:23:21 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 661D455AF;
-        Tue, 25 Jul 2023 15:18:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4044A55B8;
+        Tue, 25 Jul 2023 15:18:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690323519; x=1721859519;
+  t=1690323521; x=1721859521;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RpcCPxBgvrrF2LrPG1804injK1mZCQv/0KkU30+BTQU=;
-  b=D8aLsDUI+CF5OUHRmelLNC9kgu5ww4Okvi9JDVMlLJZEKDe2PLzLlAu7
-   WTee/a2VoB/kgAmR7QrCJaMKnmfF/CpFGIkNhUdeY6IqJW413KLsBE7OX
-   Lg1gs1lIIPA2h2WjeHZEYjvdAoeAKiRnNCghVfDE4ZFmLlC5bI1tEaoAo
-   6a5foJrZK5q2UVzUinkBSqpnY5rEb7OJ6HE4uaOl2sOQ/nHlSw+C61ED6
-   SiD6yMAylEIsIhnPEg34aB/9q65w1JNLJ/2F/Cn5EOwqE0yYznTlpMhqQ
-   Me/7ZjPvjDINUjp8jugELdkw0HQ8TqjJH4kkAysBFemC3eG9+H8J3pFAb
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882727"
+  bh=/ls1BzqS9FKY4HkJaupcxI2ZIkdzdAwcHI/XSkpQbg0=;
+  b=SyqGjzF7TLfl/BvUJXcAGQCeogsNq9YkdRa/iry2rRk+9vODAQCaTS+O
+   82xDaYQTiXccEj4wDDAJKdZOteTiBr6BPX+50M0MQjk/CkQj6E/pRRUBP
+   bJCA8WYYGoIX2z4mhWSIPM4EvqW+n5R4fBgAiVhObHZY33aMT+KHj+REZ
+   3JpcNE5ZC9uK3dxz6BePx4abE/Gzmj7RSCngY3n1kFUTAo5UI2T04YXUS
+   gEKNQW0HdZyvbjKss8V75BTDweNczw6KQnr/PyvZxPBCDhzo5n1e2DJ7f
+   aptoB+B9mWUWXec+aqhpJRcGyBzUoznmOO1Ayc+f8KQS9GMeY1pEpfGih
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882732"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="367882727"
+   d="scan'208";a="367882732"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:05 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:06 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001923"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001927"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="840001923"
+   d="scan'208";a="840001927"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:05 -0700
 From:   isaku.yamahata@intel.com
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v15 098/115] KVM: TDX: Handle MSR MTRRCap and MTRRDefType access
-Date:   Tue, 25 Jul 2023 15:14:49 -0700
-Message-Id: <08fc4e86a10adeac0379b8dd364d2ee96b467dce.1690322424.git.isaku.yamahata@intel.com>
+Subject: [PATCH v15 099/115] KVM: TDX: Handle MSR IA32_FEAT_CTL MSR and IA32_MCG_EXT_CTL
+Date:   Tue, 25 Jul 2023 15:14:50 -0700
+Message-Id: <ab4630745760a4c9b2345d70d39963c7aac452d6.1690322424.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1690322424.git.isaku.yamahata@intel.com>
 References: <cover.1690322424.git.isaku.yamahata@intel.com>
@@ -68,165 +68,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Handle MTRRCap RO MSR to return all features are unsupported and handle
-MTRRDefType MSR to accept only E=1,FE=0,type=writeback.
-enable MTRR, disable Fixed range MTRRs, default memory type=writeback
+MCE and MCA is advertised via cpuid based on the TDX module spec.  Guest
+kernel can access IA32_FEAT_CTL for checking if LMCE is enabled by platform
+and IA32_MCG_EXT_CTL to enable LMCE.  Make TDX KVM handle them.  Otherwise
+guest MSR access to them with TDG.VP.VMCALL<MSR> on VE results in GP in
+guest.
 
-TDX virtualizes that cpuid to report MTRR to guest TD and TDX enforces
-guest CR0.CD=0. If guest tries to set CR0.CD=1, it results in #GP.  While
-updating MTRR requires to set CR0.CD=1 (and other cache flushing
-operations).  It means guest TD can't update MTRR.  Virtualize MTRR as
-all features disabled and default memory type as writeback.
+Because LMCE is disabled with qemu by default, "-cpu lmce=on" to qemu
+command line is needed to reproduce it.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 99 ++++++++++++++++++++++++++++++++++--------
- 1 file changed, 82 insertions(+), 17 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 98bdcfc06283..3775db455f29 100644
+index 3775db455f29..77052f49481a 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -544,18 +544,7 @@ u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 	if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
- 		return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
- 
--	/*
--	 * TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback.
--	 * TODO: implement MTRR MSR emulation so that
--	 * MTRRCap: SMRR=0: SMRR interface unsupported
--	 *          WC=0: write combining unsupported
--	 *          FIX=0: Fixed range registers unsupported
--	 *          VCNT=0: number of variable range regitsers = 0
--	 * MTRRDefType: E=1, FE=0, type=writeback only. Don't allow other value.
--	 *              E=1: enable MTRR
--	 *              FE=0: disable fixed range MTRRs
--	 *              type: default memory type=writeback
--	 */
-+	/* TDX enforces CR0.CD = 0 and KVM MTRR emulation enforces writeback. */
- 	return MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
- }
- 
-@@ -1786,7 +1775,9 @@ bool tdx_has_emulated_msr(u32 index, bool write)
- 	case MSR_IA32_UCODE_REV:
- 	case MSR_IA32_ARCH_CAPABILITIES:
- 	case MSR_IA32_POWER_CTL:
-+	case MSR_MTRRcap:
- 	case MSR_IA32_CR_PAT:
-+	case MSR_MTRRdefType:
- 	case MSR_IA32_TSC_DEADLINE:
- 	case MSR_IA32_MISC_ENABLE:
- 	case MSR_PLATFORM_INFO:
-@@ -1828,16 +1819,47 @@ bool tdx_has_emulated_msr(u32 index, bool write)
- 
+@@ -1806,6 +1806,7 @@ bool tdx_has_emulated_msr(u32 index, bool write)
+ 		default:
+ 			return true;
+ 		}
++	case MSR_IA32_FEAT_CTL:
+ 	case MSR_IA32_APICBASE:
+ 	case MSR_EFER:
+ 		return !write;
+@@ -1820,6 +1821,20 @@ bool tdx_has_emulated_msr(u32 index, bool write)
  int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  {
--	if (tdx_has_emulated_msr(msr->index, false))
--		return kvm_get_msr_common(vcpu, msr);
--	return 1;
-+	switch (msr->index) {
-+	case MSR_MTRRcap:
+ 	switch (msr->index) {
++	case MSR_IA32_FEAT_CTL:
 +		/*
-+		 * Override kvm_mtrr_get_msr() which hardcodes the value.
-+		 * Report SMRR = 0, WC = 0, FIX = 0 VCNT = 0 to disable MTRR
-+		 * effectively.
++		 * MCE and MCA are advertised via cpuid. guest kernel could
++		 * check if LMCE is enabled or not.
 +		 */
-+		msr->data = 0;
++		msr->data = FEAT_CTL_LOCKED;
++		if (vcpu->arch.mcg_cap & MCG_LMCE_P)
++			msr->data |= FEAT_CTL_LMCE_ENABLED;
 +		return 0;
-+	default:
-+		if (tdx_has_emulated_msr(msr->index, false))
-+			return kvm_get_msr_common(vcpu, msr);
-+		return 1;
-+	}
- }
- 
++	case MSR_IA32_MCG_EXT_CTL:
++		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
++			return 1;
++		msr->data = vcpu->arch.mcg_ext_ctl;
++		return 0;
+ 	case MSR_MTRRcap:
+ 		/*
+ 		 * Override kvm_mtrr_get_msr() which hardcodes the value.
+@@ -1838,6 +1853,11 @@ int tdx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  int tdx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  {
--	if (tdx_has_emulated_msr(msr->index, true))
-+	switch (msr->index) {
-+	case MSR_MTRRdefType:
-+		/*
-+		 * Allow writeback only for all memory.
-+		 * Because it's reported that fixed range MTRR isn't supported
-+		 * and VCNT=0, enforce MTRRDefType.FE = 0 and don't care
-+		 * variable range MTRRs. Only default memory type matters.
-+		 *
-+		 * bit 11 E: MTRR enable/disable
-+		 * bit 12 FE: Fixed-range MTRRs enable/disable
-+		 * (E, FE) = (1, 1): enable MTRR and Fixed range MTRR
-+		 * (E, FE) = (1, 0): enable MTRR, disable Fixed range MTRR
-+		 * (E, FE) = (0, *): disable all MTRRs.  all physical memory
-+		 *                   is UC
-+		 */
-+		if (msr->data != ((1 << 11) | MTRR_TYPE_WRBACK))
+ 	switch (msr->index) {
++	case MSR_IA32_MCG_EXT_CTL:
++		if (!msr->host_initiated && !(vcpu->arch.mcg_cap & MCG_LMCE_P))
 +			return 1;
- 		return kvm_set_msr_common(vcpu, msr);
--	return 1;
-+	default:
-+		if (tdx_has_emulated_msr(msr->index, true))
-+			return kvm_set_msr_common(vcpu, msr);
-+		return 1;
-+	}
- }
- 
- static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
-@@ -2596,6 +2618,45 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 	return ret;
- }
- 
-+static int tdx_vcpu_init_mtrr(struct kvm_vcpu *vcpu)
-+{
-+	struct msr_data msr;
-+	int ret;
-+	int i;
-+
-+	/*
-+	 * To avoid confusion with reporting VNCT = 0, explicitly disable
-+	 * vaiale-range reisters.
-+	 */
-+	for (i = 0; i < KVM_NR_VAR_MTRR; i++) {
-+		/* phymask */
-+		msr = (struct msr_data) {
-+			.host_initiated = true,
-+			.index = 0x200 + 2 * i + 1,
-+			.data = 0,	/* valid = 0 to disable. */
-+		};
-+		ret = kvm_set_msr_common(vcpu, &msr);
-+		if (ret)
-+			return -EINVAL;
-+	}
-+
-+	/* Set MTRR to use writeback on reset. */
-+	msr = (struct msr_data) {
-+		.host_initiated = true,
-+		.index = MSR_MTRRdefType,
-+		/*
-+		 * Set E(enable MTRR)=1, FE(enable fixed range MTRR)=0, default
-+		 * type=writeback on reset to avoid UC.  Note E=0 means all
-+		 * memory is UC.
-+		 */
-+		.data = (1 << 11) | MTRR_TYPE_WRBACK,
-+	};
-+	ret = kvm_set_msr_common(vcpu, &msr);
-+	if (ret)
-+		return -EINVAL;
-+	return 0;
-+}
-+
- int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- {
- 	struct msr_data apic_base_msr;
-@@ -2633,6 +2694,10 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
- 	if (kvm_set_apic_base(vcpu, &apic_base_msr))
- 		return -EINVAL;
- 
-+	ret = tdx_vcpu_init_mtrr(vcpu);
-+	if (ret)
-+		return ret;
-+
- 	ret = tdx_td_vcpu_init(vcpu, (u64)cmd.data);
- 	if (ret)
- 		return ret;
++		vcpu->arch.mcg_ext_ctl = msr->data;
++		return 0;
+ 	case MSR_MTRRdefType:
+ 		/*
+ 		 * Allow writeback only for all memory.
 -- 
 2.25.1
 
