@@ -2,191 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EF51761CD4
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 17:03:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E29F761CE3
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 17:06:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbjGYPDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 11:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60604 "EHLO
+        id S231183AbjGYPGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 11:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231371AbjGYPCu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 11:02:50 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C4635A2
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:01:47 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4R9Kr04P0Cz6GD6B;
-        Tue, 25 Jul 2023 22:57:04 +0800 (CST)
-Received: from A2006125610.china.huawei.com (10.202.227.178) by
- lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 25 Jul 2023 16:01:19 +0100
-From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To:     <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-CC:     <peter.maydell@linaro.org>, <ricarkol@google.com>,
-        <kvm@vger.kernel.org>, <jonathan.cameron@huawei.com>,
-        <linuxarm@huawei.com>
-Subject: [RFC PATCH] arm/kvm: Enable support for KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-Date:   Tue, 25 Jul 2023 16:00:02 +0100
-Message-ID: <20230725150002.621-1-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
+        with ESMTP id S230376AbjGYPGM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 11:06:12 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE5A1BD9;
+        Tue, 25 Jul 2023 08:06:08 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PEVtNi016560;
+        Tue, 25 Jul 2023 15:06:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1k7YwFZNMVYDvJZvEifx7yBWa4+icSlxnWV0CPZiZac=;
+ b=pKXiovDCyQAdoG20wyaeM6gvT1sR90NL2db/pejt5mP5MoD4LLZaSZZybK2+nrdRgRum
+ uW41S7GDdmRXuIWRm8cdcQEbwwiTGfoWnWroxpzjq5HoIUm7skIFJvhwvNhNSzxbvx0k
+ 98Io5FwL4VvcGYEeufaXyLSzkdv+YZtn5rde8y7t8/vwbTcEGb88M/uCCv6VCcVBg+RR
+ C9euamSQzp4W8XtPIMGaPVgY5tTCeOXJQHBQOhIkQCjR3r7Y+MFnb7u4eK6I60fe4XyF
+ lQPCc8/Wxfs+Xw4XKl2o4VTLSVPpuB/X7yySrFiI4xS+/nong595mHFYk7gLuQ3tN3k8 8g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2g7wsbp9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 15:06:06 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PEW9Du018651;
+        Tue, 25 Jul 2023 15:05:36 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2g7wsaww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 15:05:36 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PDevFx001981;
+        Tue, 25 Jul 2023 15:05:13 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0temvwgc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 15:05:12 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PF595e26083968
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Jul 2023 15:05:09 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD76B2004D;
+        Tue, 25 Jul 2023 15:05:09 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4679420040;
+        Tue, 25 Jul 2023 15:05:09 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Jul 2023 15:05:09 +0000 (GMT)
+Date:   Tue, 25 Jul 2023 17:04:52 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Ilya Leoshkevich <iii@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v4 2/6] KVM: s390: interrupt: Fix single-stepping into
+ program interrupt handlers
+Message-ID: <20230725170452.5d856439@p-imbrenda>
+In-Reply-To: <20230725143857.228626-3-iii@linux.ibm.com>
+References: <20230725143857.228626-1-iii@linux.ibm.com>
+        <20230725143857.228626-3-iii@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.202.227.178]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.2 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: nW2NeXFKM4wkwjsnsUGCNTJHtYXKsnKO
+X-Proofpoint-GUID: aPhtxfBj8DcinikJd-sl8aJQZzpLAVbd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ suspectscore=0 impostorscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307250133
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that we have Eager Page Split support added for ARM in the kernel[0],
-enable it in Qemu. This adds,
- -eager-split-size to Qemu options to set the eager page split chunk size.
- -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
+On Tue, 25 Jul 2023 16:37:17 +0200
+Ilya Leoshkevich <iii@linux.ibm.com> wrote:
 
-The chunk size specifies how many pages to break at a time, using a
-single allocation. Bigger the chunk size, more pages need to be
-allocated ahead of time.
+> Currently, after single-stepping an instruction that generates a
+> specification exception, GDB ends up on the instruction immediately
+> following it.
+> 
+> The reason is that vcpu_post_run() injects the interrupt and sets
+> KVM_GUESTDBG_EXIT_PENDING, causing a KVM_SINGLESTEP exit. The
+> interrupt is not delivered, however, therefore userspace sees the
+> address of the next instruction.
+> 
+> Fix by letting the __vcpu_run() loop go into the next iteration,
+> where vcpu_pre_run() delivers the interrupt and sets
+> KVM_GUESTDBG_EXIT_PENDING.
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
 
-Notes:
- - I am not sure whether we need to call kvm_vm_check_extension() for
-   KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE or not as kernel seems to disable
-   eager page size by default and it will return zero always.
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-  -ToDo: Update qemu-options.hx
-
-[0]: https://lore.kernel.org/all/168426111477.3193133.10748106199843780930.b4-ty@linux.dev/
-
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- include/sysemu/kvm_int.h |  1 +
- target/arm/kvm.c         | 73 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 74 insertions(+)
-
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 511b42bde5..03a1660d40 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -116,6 +116,7 @@ struct KVMState
-     uint64_t kvm_dirty_ring_bytes;  /* Size of the per-vcpu dirty ring */
-     uint32_t kvm_dirty_ring_size;   /* Number of dirty GFNs per ring */
-     bool kvm_dirty_ring_with_bitmap;
-+    uint64_t kvm_eager_split_size; /* Eager Page Splitting chunk size */
-     struct KVMDirtyRingReaper reaper;
-     NotifyVmexitOption notify_vmexit;
-     uint32_t notify_window;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b4c7654f49..985d901062 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -30,6 +30,7 @@
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "hw/irq.h"
-+#include "qapi/visitor.h"
- #include "qemu/log.h"
- 
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-@@ -247,6 +248,23 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
-     return ret > 0 ? ret : 40;
- }
- 
-+static bool kvm_arm_eager_split_size_valid(uint64_t req_size, uint32_t sizes)
-+{
-+    int i;
-+
-+    for (i = 0; i < sizeof(uint32_t) * BITS_PER_BYTE; i++) {
-+        if (!(sizes & (1 << i))) {
-+            continue;
-+        }
-+
-+        if (req_size == (1 << i)) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     int ret = 0;
-@@ -280,6 +298,21 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
-+    if (s->kvm_eager_split_size) {
-+        uint32_t sizes;
-+
-+        sizes = kvm_vm_check_extension(s, KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES);
-+        if (!sizes) {
-+            error_report("Eager Page Split not supported on host");
-+        } else if (!kvm_arm_eager_split_size_valid(s->kvm_eager_split_size,
-+                                                   sizes)) {
-+            error_report("Eager Page Split requested chunk size not valid");
-+        } else if (kvm_vm_enable_cap(s, KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE, 0,
-+                                     s->kvm_eager_split_size)) {
-+            error_report("Failed to set Eager Page Split chunk size");
-+        }
-+    }
-+
-     kvm_arm_init_debug(s);
- 
-     return ret;
-@@ -1062,6 +1095,46 @@ bool kvm_arch_cpu_check_are_resettable(void)
-     return true;
- }
- 
-+static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,
-+                                          const char *name, void *opaque,
-+                                          Error **errp)
-+{
-+    KVMState *s = KVM_STATE(obj);
-+    uint64_t value = s->kvm_eager_split_size;
-+
-+    visit_type_size(v, name, &value, errp);
-+}
-+
-+static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
-+                                          const char *name, void *opaque,
-+                                          Error **errp)
-+{
-+    KVMState *s = KVM_STATE(obj);
-+    uint64_t value;
-+
-+    if (s->fd != -1) {
-+        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
-+        return;
-+    }
-+
-+    if (!visit_type_size(v, name, &value, errp)) {
-+        return;
-+    }
-+
-+    if (value & (value - 1)) {
-+        error_setg(errp, "early-split-size must be a power of two.");
-+        return;
-+    }
-+
-+    s->kvm_eager_split_size = value;
-+}
-+
- void kvm_arch_accel_class_init(ObjectClass *oc)
- {
-+    object_class_property_add(oc, "eager-split-size", "size",
-+                              kvm_arch_get_eager_split_size,
-+                              kvm_arch_set_eager_split_size, NULL, NULL);
-+
-+    object_class_property_set_description(oc, "eager-split-size",
-+        "Configure Eager Page Split chunk size for hugepages. (default: 0, disabled)");
- }
--- 
-2.34.1
+> ---
+>  arch/s390/kvm/intercept.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+> index 954d39adf85c..e54496740859 100644
+> --- a/arch/s390/kvm/intercept.c
+> +++ b/arch/s390/kvm/intercept.c
+> @@ -228,6 +228,21 @@ static int handle_itdb(struct kvm_vcpu *vcpu)
+>  
+>  #define per_event(vcpu) (vcpu->arch.sie_block->iprcc & PGM_PER)
+>  
+> +static bool should_handle_per_event(const struct kvm_vcpu *vcpu)
+> +{
+> +	if (!guestdbg_enabled(vcpu) || !per_event(vcpu))
+> +		return false;
+> +	if (guestdbg_sstep_enabled(vcpu) &&
+> +	    vcpu->arch.sie_block->iprcc != PGM_PER) {
+> +		/*
+> +		 * __vcpu_run() will exit after delivering the concurrently
+> +		 * indicated condition.
+> +		 */
+> +		return false;
+> +	}
+> +	return true;
+> +}
+> +
+>  static int handle_prog(struct kvm_vcpu *vcpu)
+>  {
+>  	psw_t psw;
+> @@ -242,7 +257,7 @@ static int handle_prog(struct kvm_vcpu *vcpu)
+>  	if (kvm_s390_pv_cpu_is_protected(vcpu))
+>  		return -EOPNOTSUPP;
+>  
+> -	if (guestdbg_enabled(vcpu) && per_event(vcpu)) {
+> +	if (should_handle_per_event(vcpu)) {
+>  		rc = kvm_s390_handle_per_event(vcpu);
+>  		if (rc)
+>  			return rc;
 
