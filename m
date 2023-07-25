@@ -2,195 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCEEE762054
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 19:38:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B699376205B
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 19:41:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230063AbjGYRiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 13:38:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41498 "EHLO
+        id S232039AbjGYRlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 13:41:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232365AbjGYRiB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 13:38:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3A41BD5
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 10:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690306634;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5L2q7c9oU0+boxm9QA+HwbxhhMCIqRyTv6FR1XEv67U=;
-        b=R9s6cGmmmM+zvBfXcvm1UVQuRhJGPcaPgA0Vorv2l5YgaSfBBP1LPTuFY1P+i2hQZ75A3p
-        fqbydjkBzyInpfv2DQCNUOvTYpoIoQ0gTNFUil9t2Gw8H663Om6AedkKPo2EKSnK85mhOw
-        vnsQYKnqpAZx1mD4DzNsQqb7Z/vfNpY=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-272-E-Rmr-m7MSekcjlIaNtF6Q-1; Tue, 25 Jul 2023 13:37:13 -0400
-X-MC-Unique: E-Rmr-m7MSekcjlIaNtF6Q-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-63cfe46bbb6so30316046d6.2
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 10:37:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690306632; x=1690911432;
+        with ESMTP id S231254AbjGYRlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 13:41:37 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40031B7
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 10:41:36 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-403ea0a50f7so44449001cf.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 10:41:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=joelfernandes.org; s=google; t=1690306895; x=1690911695;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5L2q7c9oU0+boxm9QA+HwbxhhMCIqRyTv6FR1XEv67U=;
-        b=BhjYm8dx7Mv8i2B+2fWote5K3vl7mARYEGvHqMRTml5jxf49eBBrbZ2fw1ObuFbZQt
-         F0dhxS5sf7MrYV0ZX4xDc6zCofVw76tfN027LH0bK3dUKvs1Y16rtgxi7E/cPXh9EXKX
-         ykGcNanjG4uuBwzEumkx3ffd2Bx9JLSA4IEsUJ44DCHC0nsTXF1/W96WEMtMB2Ax3tPE
-         0stezxwpDVNQJqtPdiq0mpBpsWeUWQfQkIWBoHzFrWL+myDKsBJnVIEiZcJFIMjrZp4n
-         CqCJw8wBPid1+4W9ndHl4IU1iuksfYDJQuakQDZBM0kIXUDuW4vMZpc91yxi3dYZ4oSY
-         HkMQ==
-X-Gm-Message-State: ABy/qLYGt9NGDZBKkuZZMYCNcrHSiU/vaz+8un6JsTAfXbf1C6PdKZVp
-        EfJztnY31unVTjMUzYX/Eq2C+yPv8ZiGo2q2+mbEUn/KXZRyQPN2ORoJvJMYyU2sFF1KMN5J1bh
-        O1qi7hAmbyPsn
-X-Received: by 2002:a05:6214:1631:b0:626:1fe8:bba4 with SMTP id e17-20020a056214163100b006261fe8bba4mr2787863qvw.10.1690306632776;
-        Tue, 25 Jul 2023 10:37:12 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlElrjGoC9TMBus9hMJ9Xc8AYoEJxm5MhSIGHQadsTQRKyHVviSuNuhFx2v5MSJ/lSZHeq+CHA==
-X-Received: by 2002:a05:6214:1631:b0:626:1fe8:bba4 with SMTP id e17-20020a056214163100b006261fe8bba4mr2787848qvw.10.1690306632495;
-        Tue, 25 Jul 2023 10:37:12 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
-        by smtp.gmail.com with ESMTPSA id e17-20020a0caa51000000b0063ce736180bsm3135199qvb.112.2023.07.25.10.37.08
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WJvVodEb8nnJEl20cUTyJdImyktiXScfem+69qgqo3Q=;
+        b=e5ID1UqXliZ+Zyl9RyCsKE4cEfBV1Yk3CrsZNrSv5V3zn6E8LT99TL1D17Nwe6Lqiv
+         nW/9bnXAFTLNnHj1mEGcktsTtyeTL09GQF65dj1XCRs8uhbyeGqbtPrqeu2zjjCtPw6E
+         CGqFZ4KvpaNSKdpjWcT/8chMGtdRtPBD4m7d8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690306895; x=1690911695;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJvVodEb8nnJEl20cUTyJdImyktiXScfem+69qgqo3Q=;
+        b=UH44iq1pTwWnUWnsc0O93f3/c2T6HMpoUd1HtNCzw/o4RcWZrFEdiaYIFaCSNgw6uJ
+         9PNYm56Mm20fSmN3u0boDx3nrYFykKg7CCQ7BeQ6AZwrh63eVmpuom0SoLeKY6YzxBPi
+         GBs1XeIQte+HiSKZcHzHHdzCLyYTE3JF9fCFm36jbxfwdwGS7k7detXeSV1A0C/S5EAq
+         CUGFCMZEb9B6/JC3yttwhl6ZMg9BoiAaiqS065wxJSND5k2zENqnBUBFGfQcQ3ius7QR
+         W6aIHlew711j7keOSz+SSPLMgmKubHCixuWHNRy8eXSvpzl3Uuo7wlfb3xlEbMuW8CE/
+         794Q==
+X-Gm-Message-State: ABy/qLbiuuCvw2XpAUxWeA6UgRHcsmgdBhKgUgMqHuwNadBlfuWOpCEF
+        JGMU7zh2w9pDvM/2owGPEbxx5w==
+X-Google-Smtp-Source: APBJJlHBHpNnHoYZv15+3LbjPWhNhvppPgE8W+pmrg9pYJauopPMXA+KIqGV321IR1oTEDcTpImI2Q==
+X-Received: by 2002:a05:622a:1742:b0:403:b6a9:b8f9 with SMTP id l2-20020a05622a174200b00403b6a9b8f9mr3981171qtk.36.1690306895263;
+        Tue, 25 Jul 2023 10:41:35 -0700 (PDT)
+Received: from [192.168.0.198] (c-98-249-43-138.hsd1.va.comcast.net. [98.249.43.138])
+        by smtp.gmail.com with ESMTPSA id z4-20020a05622a124400b004054b7cc490sm3480130qtx.73.2023.07.25.10.41.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 10:37:11 -0700 (PDT)
-Message-ID: <9739cab9-c058-ec5f-ac15-7d708aef4e85@redhat.com>
-Date:   Tue, 25 Jul 2023 19:37:05 +0200
+        Tue, 25 Jul 2023 10:41:34 -0700 (PDT)
+Message-ID: <1e254a35-d0c2-8d41-f020-21694945911a@joelfernandes.org>
+Date:   Tue, 25 Jul 2023 13:41:32 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 19/27] KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+ Thunderbird/102.12.0
+Subject: Re: [RFC PATCH v2 18/20] context_tracking,x86: Defer kernel text
+ patching IPIs
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-20-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-20-maz@kernel.org>
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+References: <20230720163056.2564824-19-vschneid@redhat.com>
+ <6EBAEEED-6F38-472D-BA31-9C61179EFA2F@joelfernandes.org>
+ <xhsmhtttsru2s.mognet@vschneid.remote.csb>
+From:   Joel Fernandes <joel@joelfernandes.org>
+In-Reply-To: <xhsmhtttsru2s.mognet@vschneid.remote.csb>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 7/12/23 16:58, Marc Zyngier wrote:
-> Describe the CNTHCTL_EL2 register, and associate it with all the sysregs
-> it allows to trap.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/emulate-nested.c | 37 ++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 25e4842ac334..c07c0f3361d7 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -98,9 +98,11 @@ enum coarse_grain_trap_id {
->  
->  	/*
->  	 * Anything after this point requires a callback evaluating a
-> -	 * complex trap condition. Hopefully we'll never need this...
-> +	 * complex trap condition. Ugly stuff.
->  	 */
->  	__COMPLEX_CONDITIONS__,
-> +	CGT_CNTHCTL_EL1PCTEN = __COMPLEX_CONDITIONS__,
-> +	CGT_CNTHCTL_EL1PTEN,
->  };
->  
->  static const struct trap_bits coarse_trap_bits[] = {
-> @@ -358,9 +360,37 @@ static const enum coarse_grain_trap_id *coarse_control_combo[] = {
->  
->  typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
->  
-> +static u64 get_sanitized_cnthctl(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 val = __vcpu_sys_reg(vcpu, CNTHCTL_EL2);
-> +
-> +	if (!vcpu_el2_e2h_is_set(vcpu))
-> +		val = (val & (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN)) << 10;
-> +
-> +	return val;
-don't you want to return only bits 10 & 11 to match the other condition?
-
-I would add a comment saying that When FEAT_VHE is implemented and
-HCR_EL2.E2H == 1:
-
-sanitized_cnthctl[11:10] = [EL1PTEN, EL1PCTEN]
-otherwise
-sanitized_cnthctl[11:10] = [EL1PCEN, EL1PCTEN]
-
-> +}
-> +
-> +static enum trap_behaviour check_cnthctl_el1pcten(struct kvm_vcpu *vcpu)
-> +{
-> +	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCTEN << 10))
-> +		return BEHAVE_HANDLE_LOCALLY;
-> +
-> +	return BEHAVE_FORWARD_ANY;
-> +}
-> +
-> +static enum trap_behaviour check_cnthctl_el1pten(struct kvm_vcpu *vcpu)
-or pcen. This is a bit confusing to see EL1PCEN below. But this is due
-to above sanitized CNTHCTL. Worth a comment to me.
-> +{
-> +	if (get_sanitized_cnthctl(vcpu) & (CNTHCTL_EL1PCEN << 10))
-> +		return BEHAVE_HANDLE_LOCALLY;
-> +
-> +	return BEHAVE_FORWARD_ANY;
-> +}
-> +
->  #define CCC(id, fn)	[id - __COMPLEX_CONDITIONS__] = fn
->  
->  static const complex_condition_check ccc[] = {
-> +	CCC(CGT_CNTHCTL_EL1PCTEN, check_cnthctl_el1pcten),
-> +	CCC(CGT_CNTHCTL_EL1PTEN, check_cnthctl_el1pten),
->  };
->  
->  /*
-> @@ -855,6 +885,11 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initdata = {
->  	SR_TRAP(SYS_TRBPTR_EL1, 	CGT_MDCR_E2TB),
->  	SR_TRAP(SYS_TRBSR_EL1, 		CGT_MDCR_E2TB),
->  	SR_TRAP(SYS_TRBTRG_EL1,		CGT_MDCR_E2TB),
-> +	SR_TRAP(SYS_CNTP_TVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
-> +	SR_TRAP(SYS_CNTP_CVAL_EL0,	CGT_CNTHCTL_EL1PTEN),
-> +	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
-> +	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
-> +	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
->  };
->  
->  static DEFINE_XARRAY(sr_forward_xa);
-Otherwise looks good to me
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 
-Eric
+On 7/25/23 09:36, Valentin Schneider wrote:
+> On 25/07/23 06:49, Joel Fernandes wrote:
+>> Interesting series Valentin. Some high-level question/comments on this one:
+>>
+>>> On Jul 20, 2023, at 12:34 PM, Valentin Schneider <vschneid@redhat.com> wrote:
+>>>
+>>> ﻿text_poke_bp_batch() sends IPIs to all online CPUs to synchronize
+>>> them vs the newly patched instruction. CPUs that are executing in userspace
+>>> do not need this synchronization to happen immediately, and this is
+>>> actually harmful interference for NOHZ_FULL CPUs.
+>>
+>> Does the amount of harm not correspond to practical frequency of text_poke?
+>> How often does instruction patching really happen? If it is very infrequent
+>> then I am not sure if it is that harmful.
+>>
+> 
+> Being pushed over a latency threshold *once* is enough to impact the
+> latency evaluation of your given system/application.
+> 
+> It's mainly about shielding the isolated, NOHZ_FULL CPUs from whatever the
+> housekeeping CPUs may be up to (flipping static keys, loading kprobes,
+> using ftrace...) - frequency of the interference isn't such a big part of
+> the reasoning.
 
+Makes sense.
+
+>>> As the synchronization IPIs are sent using a blocking call, returning from
+>>> text_poke_bp_batch() implies all CPUs will observe the patched
+>>> instruction(s), and this should be preserved even if the IPI is deferred.
+>>> In other words, to safely defer this synchronization, any kernel
+>>> instruction leading to the execution of the deferred instruction
+>>> sync (ct_work_flush()) must *not* be mutable (patchable) at runtime.
+>>
+>> If it is not infrequent, then are you handling the case where userland
+>> spends multiple seconds before entering the kernel, and all this while
+>> the blocking call waits? Perhaps in such situation you want the real IPI
+>> to be sent out instead of the deferred one?
+>>
+> 
+> The blocking call only waits for CPUs for which it queued a CSD. Deferred
+> calls do not queue a CSD thus do not impact the waiting at all. See
+> smp_call_function_many_cond().
+
+Ah I see you are using on_each_cpu_cond(). I should have gone through
+the other patch before making noise.
+
+thanks,
+
+ - Joel
 
