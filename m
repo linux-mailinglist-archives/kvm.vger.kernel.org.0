@@ -2,149 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB1917606A5
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 05:28:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FD07606C2
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 05:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbjGYD2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 23:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36012 "EHLO
+        id S229722AbjGYDju (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 23:39:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230177AbjGYD2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 23:28:33 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E269C172A
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 20:28:10 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-682a5465e9eso1181690b3a.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 20:28:10 -0700 (PDT)
+        with ESMTP id S229522AbjGYDjt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 23:39:49 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B311720
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 20:39:48 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1b9d80e33fbso28643985ad.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 20:39:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690255690; x=1690860490;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6wY4cILkEhsrpRf+mNddP0nleKOSU9sayj8Z5h0ToXM=;
-        b=PknHptOa2Z8+2vaclzexjcjHcgGTKnQ0JRJ89LK+GvkJZyUzNmFYDaw4LaxhrbAB97
-         Qlt49eA21cgLfip1YkLzQvNHl9NRE1uu+H3yLMzr5GUQw2R94ASja3LKRc7K2/IuJ877
-         /rUQws3HOX4h/pSV0QLIC/txctttQBZDy4goWlpNGxYwzk8J6CttdGDNpskz9IiWFE6E
-         W06R7YBvAlwN2Ll/k0WZ+e8J2UJKgy2rlagtK3lUaqPgpyCrwLsDTNoP/0MXBrAUaLK4
-         fe8VXE6m3BmotnBeZ7KmASyzpGnPX5FsNzpJdMUNn5TjD0dfcmx5lygJuqraNOT+sjor
-         yB3A==
+        d=gmail.com; s=20221208; t=1690256387; x=1690861187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OxaQz8/dLUNQNqi3QcL8AYfrflhdJ7sgQboufy3/A+o=;
+        b=KhNu4YQP6ZPTI26YT1NmhHtBFTMWY9KjsBVT5XdGpp9q9vSOtRztr10kkLsKIkIdEA
+         AjrMKv4ORu6ukKIP7NdeJZ8W4LQabEz9QLQ/AjtGuB1gIgF/UuXVGSHLm9jghmkXxI4U
+         tbFm2BOz3J8nWUQLHBwZEHrD1yKYoXTTHLS+ph5+HwIllX3E6HV1JNJxZ9RRtSN3Vl2K
+         uOj8M5TClaMcL7wd3Gr34qQwFRDSwn8crkTRIf0RFGJUmsnucZXNrivbFjPRwGNxvFTJ
+         lCCo2DJuGGh7M4moYNMbPcB08YygDuzs6FBlbZqO1OChJMC3kaggkQQuWvdDFQGHU6Gq
+         kQlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690255690; x=1690860490;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wY4cILkEhsrpRf+mNddP0nleKOSU9sayj8Z5h0ToXM=;
-        b=DVRR+QKeWr5iGfTVGV7aD1auuv4T5Ucjozbyp0lihcLbtM3OJbQ5fVsszq/I4Wb/nh
-         HAhsKAZo7RQ/qd/aFtqs++G0y7hQi/zcd+H4u5uCF52iZeIoozNiZsABGhHXXi/UTyAE
-         RgznJnm5+IUPtWsrW/KU94asioD3qAjboY9xWj0LEFC0yFBQmWnnFyV1uGeZGonFcsov
-         CcVCOz7e2puLcqJcK4FekHiIm9rmm0oPHdNW6VkcuWF3q/y48QYNUU3N/0viZDJPtVKD
-         VINIpaYyWDQ0mx/cjIhaNA4Q+Mo2/G0cJ5UQPco2/c3/o4SQ3wKtMWoI8pgTaX8FExBC
-         T1+A==
-X-Gm-Message-State: ABy/qLYBhdJfE4I4qHDjUSqA8W3BXM7fYfbfm5Gpc+EZP6sW7FPPIJk3
-        Zdb1/OqPt5kVxySC70FNNSJIUg==
-X-Google-Smtp-Source: APBJJlHvnzRChS6v/nee9rDGEWxm9C29UVXVwYKOSH3HP5ue/guAsHAKmcdiSeukVqd30tCkGAz2cw==
-X-Received: by 2002:a05:6a00:cd1:b0:677:bb4c:c321 with SMTP id b17-20020a056a000cd100b00677bb4cc321mr15272930pfv.0.1690255690395;
-        Mon, 24 Jul 2023 20:28:10 -0700 (PDT)
-Received: from ?IPV6:fdbd:ff1:ce00:1c25:884:3ed:e1db:b610? ([240e:694:e21:b::2])
-        by smtp.gmail.com with ESMTPSA id s3-20020aa78283000000b00682a9325ffcsm8407714pfm.5.2023.07.24.20.27.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jul 2023 20:28:10 -0700 (PDT)
-Message-ID: <bbd36d96-b6b8-08c3-1092-e3d0b255134a@bytedance.com>
-Date:   Tue, 25 Jul 2023 11:27:55 +0800
+        d=1e100.net; s=20221208; t=1690256387; x=1690861187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OxaQz8/dLUNQNqi3QcL8AYfrflhdJ7sgQboufy3/A+o=;
+        b=fGEU2uRI5P8JiWcIyF71RY8IeADkNl7EYp9qvf7BA6yofQS1xnpjAjzPRdfLSgKAFQ
+         qoBw6uPJpmnk2tvNeHXqKS94OuSVzcfoBXmVYscv+phyKvlhnU0ivNJEJvv66LPQ6+Qt
+         VOUef/RF4N06WcGNhEOH3DqGNhJjm3SxPXKnNvwfrKDIZpYR+AYELVhatiGlRsgkrLHX
+         4gOJSfq8BSOoXrQaH4dpBcCzIirEAnMuTf2kw9NKH5FRDEn+u8RvZl288H/KTjfO1gZO
+         Q98AZQERMb5oC1mdQ/rOxCwklZJxAVVYvJaibRc6szztnRXPJuwIKEgJ8OUWxlQFEzEi
+         ryew==
+X-Gm-Message-State: ABy/qLattAudPMBLf75zVX8Z3Fm9sUd+YpU7vftWQJC0gg7C0wyMd3TW
+        VZqAv5TIVLlzu+kBjBGPZLs9H8/AzyA=
+X-Google-Smtp-Source: APBJJlGXKceh8dnRLA5IcWKDRWLGwQm7IqO+MWrKEL6RTxngP9u2ZyWQQlP3JDy8Ok0aLfhcGDi7Iw==
+X-Received: by 2002:a17:902:9a89:b0:1bb:7996:b267 with SMTP id w9-20020a1709029a8900b001bb7996b267mr6223851plp.17.1690256387242;
+        Mon, 24 Jul 2023 20:39:47 -0700 (PDT)
+Received: from wheely.local0.net ([118.102.104.45])
+        by smtp.gmail.com with ESMTPSA id i5-20020a170902c94500b001b809082a69sm9793112pla.235.2023.07.24.20.39.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 20:39:46 -0700 (PDT)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Nico Boehr <nrb@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 0/3] migration: fixes and multiple migration
+Date:   Tue, 25 Jul 2023 13:39:34 +1000
+Message-Id: <20230725033937.277156-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v2 01/47] mm: vmscan: move shrinker-related code into a
- separate file
-Content-Language: en-US
-To:     Muchun Song <muchun.song@linux.dev>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
-        tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
-        Christian Brauner <brauner@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        yujie.liu@intel.com, Greg KH <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        x86@kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-2-zhengqi.arch@bytedance.com>
- <97E80C37-8872-4C5A-A027-A0B35F39152A@linux.dev>
- <d2621ad0-8b99-9154-5ff5-509dec2f32a3@bytedance.com>
- <6FE62F56-1B4E-4E2A-BEA9-0DA6907A2FA9@linux.dev>
-From:   Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <6FE62F56-1B4E-4E2A-BEA9-0DA6907A2FA9@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Spent too long looking at bash code after posting previous RFC, but
+got it into shape.
 
+The first 2 seem to be real bugs you can trigger by making a test
+case fail. Third IMO is pretty solid now but no users yet so I can
+keep it around and resubmit with a user some time later.
 
-On 2023/7/25 11:23, Muchun Song wrote:
-> 
-> 
->> On Jul 25, 2023, at 11:09, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
->>
->>
->>
->> On 2023/7/25 10:35, Muchun Song wrote:
->>>> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
->>>>
->>>> The mm/vmscan.c file is too large, so separate the shrinker-related
->>>> code from it into a separate file. No functional changes.
->>>>
->>>> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
->>>> ---
->>>> include/linux/shrinker.h |   3 +
->>>> mm/Makefile              |   4 +-
->>>> mm/shrinker.c            | 707 +++++++++++++++++++++++++++++++++++++++
->>>> mm/vmscan.c              | 701 --------------------------------------
->>>> 4 files changed, 712 insertions(+), 703 deletions(-)
->>>> create mode 100644 mm/shrinker.c
->>>>
->>>> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
->>>> index 224293b2dd06..961cb84e51f5 100644
->>>> --- a/include/linux/shrinker.h
->>>> +++ b/include/linux/shrinker.h
->>>> @@ -96,6 +96,9 @@ struct shrinker {
->>>>   */
->>>> #define SHRINKER_NONSLAB (1 << 3)
->>>>
->>>> +unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
->>>> +    int priority);
->>> A good cleanup, vmscan.c is so huge.
->>> I'd like to introduce a new header in mm/ directory and contains those
->>> declarations of functions (like this and other debug function in
->>> shrinker_debug.c) since they are used internally across mm.
->>
->> How about putting them in the mm/internal.h file?
-> 
-> Either is fine to me.
+Thanks,
+Nick
 
-OK, will do in the next version.
+Nicholas Piggin (3):
+  migration: Fix test harness hang on fifo
+  migration: Fix test harness hang if source does not reach migration
+    point
+  arch-run: Support multiple migrations
 
-> 
->>
->>> Thanks.
-> 
-> 
+ lib/migrate.c         |  8 +++---
+ lib/migrate.h         |  1 +
+ scripts/arch-run.bash | 65 ++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 60 insertions(+), 14 deletions(-)
+
+-- 
+2.40.1
+
