@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A6AC76261B
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:19:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D842762614
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:19:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231453AbjGYWTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 18:19:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33714 "EHLO
+        id S232024AbjGYWSg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 18:18:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbjGYWR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 18:17:28 -0400
+        with ESMTP id S230172AbjGYWRB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 18:17:01 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16641FEC;
-        Tue, 25 Jul 2023 15:16:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A4735AE;
+        Tue, 25 Jul 2023 15:15:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690323369; x=1721859369;
+  t=1690323355; x=1721859355;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OIrsaq2bp9o27ZsGmX41LNMKR7WNeny0bQMTCvxkndI=;
-  b=gXBZmvjenWwuH0+/LXc2VRWS9o1uUSHoQ7hZ0euR20wzddZXyZcqI8vx
-   2UfFRyzwOvHXAnlCdlh1TeW25Id2w7Js/kp/YrgZrcs7GsZmX4fJx538f
-   Zd267X9e/r49rvqwdBuxwk1z+mNWR4p0I0k4PKX/5xdZkwfwShISqS2eX
-   htveO2CCn/pEuWIIeZvYxpZAJ1xbgqKheWePiusrQOlUGAg6AB9Rn3bdg
-   CXYDI4NXiZT9wO+C9t49qaL6z3hfgyRbBcstCeigK5kcPFke7kJDSmqAh
-   +OjUd2ZWNTVF6QIN02P32G2xyLdE6JHPF7L3f0ftBab1qDL9VO2mRfrc+
+  bh=Hj/RhaVxVsjToTdYzzQ8a7zYXVh5dwSrMRchhmWHVrU=;
+  b=FC1r0XgkUEpEYCLS6W5+Mq8mTAr4J5KfyV0dPweclPYaEbqbFEGJHAYk
+   Ote/s56dmollY/XTmElZfNurSSCCguqqmSlkHvOgaDTXK97mKeDkXzS8j
+   NTVr5G6ZYGf2yLOTW45XURhVmX2iaGCjxUME2+CVfpES5mDHtc1llR9e5
+   eHCGTffEzUipxNik3KR2Jr0ONwMVrKJDavFv8ce8PPVKCRobsAePl+Hg1
+   Bxiz+AlWPCDD6WtUyOZitG82/kGcUzNILyhaVGP5TiHsTLe7wdWmTs2Zm
+   YqciRevjDNeAyD3AIZa40jDW8ZEg2vJajM8s932tAScnzRcyrv5f+829f
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="357863207"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="357863212"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="357863207"
+   d="scan'208";a="357863212"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:15:33 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="1056938882"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="1056938889"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="1056938882"
+   d="scan'208";a="1056938889"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
   by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:15:32 -0700
 From:   isaku.yamahata@intel.com
@@ -47,10 +47,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v15 031/115] KVM: Allow page-sized MMU caches to be initialized with custom 64-bit values
-Date:   Tue, 25 Jul 2023 15:13:42 -0700
-Message-Id: <98d098febd95c11ea5e27cb651a634926eb38f31.1690322424.git.isaku.yamahata@intel.com>
+        hang.yuan@intel.com, tina.zhang@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v15 032/115] KVM: x86/mmu: Replace hardcoded value 0 for the initial value for SPTE
+Date:   Tue, 25 Jul 2023 15:13:43 -0700
+Message-Id: <cf29f3771e021b85077403fea17f36a0c3a87ede.1690322424.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1690322424.git.isaku.yamahata@intel.com>
 References: <cover.1690322424.git.isaku.yamahata@intel.com>
@@ -67,73 +68,161 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add support to MMU caches for initializing a page with a custom 64-bit
-value, e.g. to pre-fill an entire page table with non-zero PTE values.
-The functionality will be used by x86 to support Intel's TDX, which needs
-to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
-faults from getting reflected into the guest (Intel's EPT Violation #VE
-architecture made the less than brilliant decision of having the per-PTE
-behavior be opt-out instead of opt-in).
+The TDX support will need the "suppress #VE" bit (bit 63) set as the
+initial value for SPTE.  To reduce code change size, introduce a new macro
+SHADOW_NONPRESENT_VALUE for the initial value for the shadow page table
+entry (SPTE) and replace hard-coded value 0 for it.  Initialize shadow page
+tables with their value.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+The plan is to unconditionally set the "suppress #VE" bit for both AMD and
+Intel as: 1) AMD hardware uses the bit 63 as NX for present SPTE and
+ignored for non-present SPTE; 2) for conventional VMX guests, KVM never
+enables the "EPT-violation #VE" in VMCS control and "suppress #VE" bit is
+ignored by hardware.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- include/linux/kvm_types.h |  1 +
- virt/kvm/kvm_main.c       | 16 ++++++++++++++--
- 2 files changed, 15 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c         | 20 +++++++++++++++-----
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ arch/x86/kvm/mmu/spte.h        |  2 ++
+ arch/x86/kvm/mmu/tdp_mmu.c     | 14 +++++++-------
+ 4 files changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 6f4737d5046a..4932bc90a0a0 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -93,6 +93,7 @@ struct gfn_to_pfn_cache {
- struct kvm_mmu_memory_cache {
- 	gfp_t gfp_zero;
- 	gfp_t gfp_custom;
-+	u64 init_value;
- 	struct kmem_cache *kmem_cache;
- 	int capacity;
- 	int nobjs;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 60ed0f613bce..14b1fa9fe644 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -378,12 +378,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
- static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
- 					       gfp_t gfp_flags)
- {
-+	void *page;
-+
- 	gfp_flags |= mc->gfp_zero;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index f76cf14acb7f..8183b52d7a19 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -579,9 +579,9 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
  
- 	if (mc->kmem_cache)
- 		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
--	else
--		return (void *)__get_free_page(gfp_flags);
-+
-+	page = (void *)__get_free_page(gfp_flags);
-+	if (page && mc->init_value)
-+		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
-+	return page;
+ 	if (!is_shadow_present_pte(old_spte) ||
+ 	    !spte_has_volatile_bits(old_spte))
+-		__update_clear_spte_fast(sptep, 0ull);
++		__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
+ 	else
+-		old_spte = __update_clear_spte_slow(sptep, 0ull);
++		old_spte = __update_clear_spte_slow(sptep, SHADOW_NONPRESENT_VALUE);
+ 
+ 	if (!is_shadow_present_pte(old_spte))
+ 		return old_spte;
+@@ -615,7 +615,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+  */
+ static void mmu_spte_clear_no_track(u64 *sptep)
+ {
+-	__update_clear_spte_fast(sptep, 0ull);
++	__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
  }
  
- int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
-@@ -398,6 +403,13 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
- 		if (WARN_ON_ONCE(!capacity))
- 			return -EIO;
+ static u64 mmu_spte_get_lockless(u64 *sptep)
+@@ -1976,7 +1976,8 @@ static bool kvm_sync_page_check(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
  
-+		/*
-+		 * Custom init values can be used only for page allocations,
-+		 * and obviously conflict with __GFP_ZERO.
-+		 */
-+		if (WARN_ON_ONCE(mc->init_value && (mc->kmem_cache || mc->gfp_zero)))
-+			return -EIO;
+ static int kvm_sync_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
+ {
+-	if (!sp->spt[i])
++	/* sp->spt[i] has initial value of shadow page table allocation */
++	if (sp->spt[i] == SHADOW_NONPRESENT_VALUE)
+ 		return 0;
+ 
+ 	return vcpu->arch.mmu->sync_spte(vcpu, sp, i);
+@@ -6173,7 +6174,16 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+ 	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+ 
+-	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
++	/*
++	 * When X86_64, initial SEPT entries are initialized with
++	 * SHADOW_NONPRESENT_VALUE.  Otherwise zeroed.  See
++	 * mmu_memory_cache_alloc_obj().
++	 */
++	if (IS_ENABLED(CONFIG_X86_64))
++		vcpu->arch.mmu_shadow_page_cache.init_value =
++			SHADOW_NONPRESENT_VALUE;
++	if (!vcpu->arch.mmu_shadow_page_cache.init_value)
++		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+ 
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 42d48b1ec7b3..e616a7a781a4 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -892,7 +892,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+ 	gpa_t pte_gpa;
+ 	gfn_t gfn;
+ 
+-	if (WARN_ON_ONCE(!sp->spt[i]))
++	if (WARN_ON_ONCE(sp->spt[i] == SHADOW_NONPRESENT_VALUE))
+ 		return 0;
+ 
+ 	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 1279db2eab44..a99eb7d4ae5d 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -148,6 +148,8 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
+ 
+ #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
+ 
++#define SHADOW_NONPRESENT_VALUE	0ULL
 +
- 		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
- 		if (!mc->objects)
- 			return -ENOMEM;
+ extern u64 __read_mostly shadow_host_writable_mask;
+ extern u64 __read_mostly shadow_mmu_writable_mask;
+ extern u64 __read_mostly shadow_nx_mask;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 70052f59cfdf..465bb01c16a1 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -630,7 +630,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+ 	 * here since the SPTE is going from non-present to non-present.  Use
+ 	 * the raw write helper to avoid an unnecessary check on volatile bits.
+ 	 */
+-	__kvm_tdp_mmu_write_spte(iter->sptep, 0);
++	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
+ 
+ 	return 0;
+ }
+@@ -767,8 +767,8 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			continue;
+ 
+ 		if (!shared)
+-			tdp_mmu_iter_set_spte(kvm, &iter, 0);
+-		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
++			tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
++		else if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
+ 			goto retry;
+ 	}
+ }
+@@ -824,8 +824,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
+ 		return false;
+ 
+-	tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
+-			 sp->gfn, sp->role.level + 1);
++	tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
++			 SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1);
+ 
+ 	return true;
+ }
+@@ -859,7 +859,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		    !is_last_spte(iter.old_spte, iter.level))
+ 			continue;
+ 
+-		tdp_mmu_iter_set_spte(kvm, &iter, 0);
++		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
+ 		flush = true;
+ 	}
+ 
+@@ -1253,7 +1253,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+ 	 * invariant that the PFN of a present * leaf SPTE can never change.
+ 	 * See handle_changed_spte().
+ 	 */
+-	tdp_mmu_iter_set_spte(kvm, iter, 0);
++	tdp_mmu_iter_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
+ 
+ 	if (!pte_write(range->arg.pte)) {
+ 		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
 -- 
 2.25.1
 
