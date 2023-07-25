@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BF3E7626A1
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EFEC7626A9
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:25:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233073AbjGYWZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 18:25:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39358 "EHLO
+        id S233088AbjGYWZ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 18:25:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233338AbjGYWXs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 18:23:48 -0400
+        with ESMTP id S233380AbjGYWXw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 18:23:52 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AD35B98;
-        Tue, 25 Jul 2023 15:19:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35F1C26B6;
+        Tue, 25 Jul 2023 15:19:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690323559; x=1721859559;
+  t=1690323569; x=1721859569;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gDn2qlctsRhiSfk4B8miWiyBiv/7pxkEkr9nT08qBkA=;
-  b=VMGFzLP9e0eojrafTnWibvpuRZTXPhgZtd/BCw8SP1UKncmMSXPMolK2
-   GxWnyqA1LD280x51Ww3eo1/gSNU4Urt944Ol+dJv2LnjVbxTFtXW9GZBx
-   RbLMnfwhBHcBCvBD/0060MGkUQZJCD0g8AIybc54Af4Zc9MMpNuwcjjXk
-   J6o6G9Wgwmgd051mXJ3awdYeclg+i8Ogc5lhC5vs1/3fcqEQJDoXQKI22
-   XkX+n79rrOFaFMT1Wzh/OLCd48Jx8/k6uXUIcJPolF0R0rIO0iDZF8iTX
-   BYYeh/0oitTd5M9jGy/xgoW4vG7OaTFqO07vruUNj7+NLQIxmKGDJUzSR
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882795"
+  bh=oacKdQeMh8QuirRSr8ipRHm85rmLeDu5QPcTK7AXcqY=;
+  b=PqQffRyldbnRumqqjYLFc4M1uBnuIfa5rDEBDQN2uQO06gmo0CMTFlqY
+   B0V0ULRV3IjsxZ8OWtpbb3rr0m7T9Qf9bJzS3avWM6mfaaGB/9gpZ64nZ
+   aFjUMp31P+7qHg1XPQ+TovhvERSxKcVpGN6WekmFFZsDxBlIHr38h+xXj
+   BXGRsxbRmbag6l3AcnFdj2a6EGEejXZO0dIK601po+mgxoLQWn5SansEf
+   YZk8nHFe2jUFcXaYYZNCw8szkHUwAr3gutMrDwQ4POu8KmroCH1Zvb9dq
+   KwwnBfy70bA7emS69CARyekmn5s+lMB0z+qHyOedv+F+od4vHJ5YTKbFv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882800"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="367882795"
+   d="scan'208";a="367882800"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001974"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001978"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="840001974"
+   d="scan'208";a="840001978"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:11 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:16:12 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -48,9 +48,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
         hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v15 112/115] KVM: x86: design documentation on TDX support of x86 KVM TDP MMU
-Date:   Tue, 25 Jul 2023 15:15:03 -0700
-Message-Id: <45841e343e180b72dade7114a7f18030fcae784c.1690322424.git.isaku.yamahata@intel.com>
+Subject: [PATCH v15 113/115] RFC: KVM: x86: Add x86 callback to check cpuid
+Date:   Tue, 25 Jul 2023 15:15:04 -0700
+Message-Id: <8787693c245ceeeada515fcca5ef78da3a1a7343.1690322424.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1690322424.git.isaku.yamahata@intel.com>
 References: <cover.1690322424.git.isaku.yamahata@intel.com>
@@ -68,474 +68,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add a high level design document on TDX changes to TDP MMU.
+The x86 backend should check the consistency of KVM_SET_CPUID2 because it
+has its constraint.  Add a callback for it.  The backend code will come as
+another patch.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Link: https://lore.kernel.org/lkml/ZDiGpCkXOcCm074O@google.com/
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/x86/index.rst       |   1 +
- Documentation/virt/kvm/x86/tdx-tdp-mmu.rst | 443 +++++++++++++++++++++
- 2 files changed, 444 insertions(+)
- create mode 100644 Documentation/virt/kvm/x86/tdx-tdp-mmu.rst
+ arch/x86/include/asm/kvm-x86-ops.h | 2 ++
+ arch/x86/include/asm/kvm_host.h    | 1 +
+ arch/x86/kvm/cpuid.c               | 6 +++++-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
-index 851e99174762..63a78bd41b16 100644
---- a/Documentation/virt/kvm/x86/index.rst
-+++ b/Documentation/virt/kvm/x86/index.rst
-@@ -16,4 +16,5 @@ KVM for x86 systems
-    msr
-    nested-vmx
-    running-nested-guests
-+   tdx-tdp-mmu
-    timekeeping
-diff --git a/Documentation/virt/kvm/x86/tdx-tdp-mmu.rst b/Documentation/virt/kvm/x86/tdx-tdp-mmu.rst
-new file mode 100644
-index 000000000000..49d103720272
---- /dev/null
-+++ b/Documentation/virt/kvm/x86/tdx-tdp-mmu.rst
-@@ -0,0 +1,443 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Design of TDP MMU for TDX support
-+=================================
-+This document describes a (high level) design for TDX support of KVM TDP MMU of
-+x86 KVM.
-+
-+In this document, we use "TD" or "guest TD" to differentiate it from the current
-+"VM" (Virtual Machine), which is supported by KVM today.
-+
-+
-+Background of TDX
-+=================
-+TD private memory is designed to hold TD private content, encrypted by the CPU
-+using the TD ephemeral key.  An encryption engine holds a table of encryption
-+keys, and an encryption key is selected for each memory transaction based on a
-+Host Key Identifier (HKID).  By design, the host VMM does not have access to the
-+encryption keys.
-+
-+In the first generation of MKTME, HKID is "stolen" from the physical address by
-+allocating a configurable number of bits from the top of the physical address.
-+The HKID space is partitioned into shared HKIDs for legacy MKTME accesses and
-+private HKIDs for SEAM-mode-only accesses.  We use 0 for the shared HKID on the
-+host so that MKTME can be opaque or bypassed on the host.
-+
-+During TDX non-root operation (i.e. guest TD), memory accesses can be qualified
-+as either shared or private, based on the value of a new SHARED bit in the Guest
-+Physical Address (GPA).  The CPU translates shared GPAs using the usual VMX EPT
-+(Extended Page Table) or "Shared EPT" (in this document), which resides in the
-+host VMM memory.  The Shared EPT is directly managed by the host VMM - the same
-+as with the current VMX.  Since guest TDs usually require I/O, and the data
-+exchange needs to be done via shared memory, thus KVM needs to use the current
-+EPT functionality even for TDs.
-+
-+The CPU translates private GPAs using a separate Secure EPT.  The Secure EPT
-+pages are encrypted and integrity-protected with the TD's ephemeral private key.
-+Secure EPT can be managed _indirectly_ by the host VMM, using the TDX interface
-+functions (SEAMCALLs), and thus conceptually Secure EPT is a subset of EPT
-+because not all functionalities are available.
-+
-+Since the execution of such interface functions takes much longer time than
-+accessing memory directly, in KVM we use the existing TDP code to mirror the
-+Secure EPT for the TD. And we think there are at least two options today in
-+terms of the timing for executing such SEAMCALLs:
-+
-+1. synchronous, i.e. while walking the TDP page tables, or
-+2. post-walk, i.e. record what needs to be done to the real Secure EPT during
-+   the walk, and execute SEAMCALLs later.
-+
-+The option 1 seems to be more intuitive and simpler, but the Secure EPT
-+concurrency rules are different from the ones of the TDP or EPT. For example,
-+MEM.SEPT.RD acquire shared access to the whole Secure EPT tree of the target
-+
-+Secure EPT(SEPT) operations
-+---------------------------
-+Secure EPT is an Extended Page Table for GPA-to-HPA translation of TD private
-+HPA.  A Secure EPT is designed to be encrypted with the TD's ephemeral private
-+key. SEPT pages are allocated by the host VMM via Intel TDX functions, but their
-+content is intended to be hidden and is not architectural.
-+
-+Unlike the conventional EPT, the CPU can't directly read/write its entry.
-+Instead, TDX SEAMCALL API is used.  Several SEAMCALLs correspond to operation on
-+the EPT entry.
-+
-+* TDH.MEM.SEPT.ADD():
-+
-+  Add a secure EPT page from the secure EPT tree.  This corresponds to updating
-+  the non-leaf EPT entry with present bit set
-+
-+* TDH.MEM.SEPT.REMOVE():
-+
-+  Remove the secure page from the secure EPT tree.  There is no corresponding
-+  to the EPT operation.
-+
-+* TDH.MEM.SEPT.RD():
-+
-+  Read the secure EPT entry.  This corresponds to reading the EPT entry as
-+  memory.  Please note that this is much slower than direct memory reading.
-+
-+* TDH.MEM.PAGE.ADD() and TDH.MEM.PAGE.AUG():
-+
-+  Add a private page to the secure EPT tree.  This corresponds to updating the
-+  leaf EPT entry with present bit set.
-+
-+* THD.MEM.PAGE.REMOVE():
-+
-+  Remove a private page from the secure EPT tree.  There is no corresponding
-+  to the EPT operation.
-+
-+* TDH.MEM.RANGE.BLOCK():
-+
-+  This (mostly) corresponds to clearing the present bit of the leaf EPT entry.
-+  Note that the private page is still linked in the secure EPT.  To remove it
-+  from the secure EPT, TDH.MEM.SEPT.REMOVE() and TDH.MEM.PAGE.REMOVE() needs to
-+  be called.
-+
-+* TDH.MEM.TRACK():
-+
-+  Increment the TLB epoch counter. This (mostly) corresponds to EPT TLB flush.
-+  Note that the private page is still linked in the secure EPT.  To remove it
-+  from the secure EPT, tdh_mem_page_remove() needs to be called.
-+
-+
-+Adding private page
-+-------------------
-+The procedure of populating the private page looks as follows.
-+
-+1. TDH.MEM.SEPT.ADD(512G level)
-+2. TDH.MEM.SEPT.ADD(1G level)
-+3. TDH.MEM.SEPT.ADD(2M level)
-+4. TDH.MEM.PAGE.AUG(4K level)
-+
-+Those operations correspond to updating the EPT entries.
-+
-+Dropping private page and TLB shootdown
-+---------------------------------------
-+The procedure of dropping the private page looks as follows.
-+
-+1. TDH.MEM.RANGE.BLOCK(4K level)
-+
-+   This mostly corresponds to clear the present bit in the EPT entry.  This
-+   prevents (or blocks) TLB entry from creating in the future.  Note that the
-+   private page is still linked in the secure EPT tree and the existing cache
-+   entry in the TLB isn't flushed.
-+
-+2. TDH.MEM.TRACK(range) and TLB shootdown
-+
-+   This mostly corresponds to the EPT TLB shootdown.  Because all vcpus share
-+   the same Secure EPT, all vcpus need to flush TLB.
-+
-+   * TDH.MEM.TRACK(range) by one vcpu.  It increments the global internal TLB
-+     epoch counter.
-+
-+   * send IPI to remote vcpus
-+   * Other vcpu exits to VMM from guest TD and then re-enter. TDH.VP.ENTER().
-+   * TDH.VP.ENTER() checks the TLB epoch counter and If its TLB is old, flush
-+     TLB.
-+
-+   Note that only single vcpu issues tdh_mem_track().
-+
-+   Note that the private page is still linked in the secure EPT tree, unlike the
-+   conventional EPT.
-+
-+3. TDH.MEM.PAGE.PROMOTE, TDH.MEM.PAGEDEMOTE(), TDH.MEM.PAGE.RELOCATE(), or
-+   TDH.MEM.PAGE.REMOVE()
-+
-+   There is no corresponding operation to the conventional EPT.
-+
-+   * When changing page size (e.g. 4K <-> 2M) TDH.MEM.PAGE.PROMOTE() or
-+     TDH.MEM.PAGE.DEMOTE() is used.  During those operation, the guest page is
-+     kept referenced in the Secure EPT.
-+
-+   * When migrating page, TDH.MEM.PAGE.RELOCATE().  This requires both source
-+     page and destination page.
-+   * when destroying TD, TDH.MEM.PAGE.REMOVE() removes the private page from the
-+     secure EPT tree.  In this case TLB shootdown is not needed because vcpus
-+     don't run any more.
-+
-+The basic idea for TDX support
-+==============================
-+Because shared EPT is the same as the existing EPT, use the existing logic for
-+shared EPT.  On the other hand, secure EPT requires additional operations
-+instead of directly reading/writing of the EPT entry.
-+
-+On EPT violation, The KVM mmu walks down the EPT tree from the root, determines
-+the EPT entry to operate, and updates the entry. If necessary, a TLB shootdown
-+is done.  Because it's very slow to directly walk secure EPT by TDX SEAMCALL,
-+TDH.MEM.SEPT.RD(), the mirror of secure EPT is created and maintained.  Add
-+hooks to KVM MMU to reuse the existing code.
-+
-+EPT violation on shared GPA
-+---------------------------
-+(1) EPT violation on shared GPA or zapping shared GPA
-+    ::
-+
-+        walk down shared EPT tree (the existing code)
-+                |
-+                |
-+                V
-+        shared EPT tree (CPU refers.)
-+
-+(2) update the EPT entry. (the existing code)
-+
-+    TLB shootdown in the case of zapping.
-+
-+
-+EPT violation on private GPA
-+----------------------------
-+(1) EPT violation on private GPA or zapping private GPA
-+    ::
-+
-+        walk down the mirror of secure EPT tree (mostly same as the existing code)
-+            |
-+            |
-+            V
-+        mirror of secure EPT tree (KVM MMU software only. reuse of the existing code)
-+
-+(2) update the (mirrored) EPT entry. (mostly same as the existing code)
-+
-+(3) call the hooks with what EPT entry is changed
-+    ::
-+
-+           |
-+        NEW: hooks in KVM MMU
-+           |
-+           V
-+        secure EPT root(CPU refers)
-+
-+(4) the TDX backend calls necessary TDX SEAMCALLs to update real secure EPT.
-+
-+The major modification is to add hooks for the TDX backend for additional
-+operations and to pass down which EPT, shared EPT, or private EPT is used, and
-+twist the behavior if we're operating on private EPT.
-+
-+The following depicts the relationship.
-+::
-+
-+                    KVM                             |       TDX module
-+                     |                              |           |
-+        -------------+----------                    |           |
-+        |                      |                    |           |
-+        V                      V                    |           |
-+     shared GPA           private GPA               |           V
-+  CPU shared EPT pointer  KVM private EPT pointer   |  CPU secure EPT pointer
-+        |                      |                    |           |
-+        |                      |                    |           |
-+        V                      V                    |           V
-+  shared EPT                private EPT<-------mirror----->Secure EPT
-+        |                      |                    |           |
-+        |                      \--------------------+------\    |
-+        |                                           |      |    |
-+        V                                           |      V    V
-+  shared guest page                                 |    private guest page
-+                                                    |
-+                                                    |
-+                              non-encrypted memory  |    encrypted memory
-+                                                    |
-+
-+shared EPT: CPU and KVM walk with shared GPA
-+            Maintained by the existing code
-+private EPT: KVM walks with private GPA
-+             Maintained by the twisted existing code
-+secure EPT: CPU walks with private GPA.
-+            Maintained by TDX module with TDX SEAMCALLs via hooks
-+
-+
-+Tracking private EPT page
-+=========================
-+Shared EPT pages are managed by struct kvm_mmu_page.  They are linked in a list
-+structure.  When necessary, the list is traversed to operate on.  Private EPT
-+pages have different characteristics.  For example, private pages can't be
-+swapped out.  When shrinking memory, we'd like to traverse only shared EPT pages
-+and skip private EPT pages.  Likewise, page migration isn't supported for
-+private pages (yet).  Introduce an additional list to track shared EPT pages and
-+track private EPT pages independently.
-+
-+At the beginning of EPT violation, the fault handler knows fault GPA, thus it
-+knows which EPT to operate on, private or shared.  If it's private EPT,
-+an additional task is done.  Something like "if (private) { callback a hook }".
-+Since the fault handler has deep function calls, it's cumbersome to hold the
-+information of which EPT is operating.  Options to mitigate it are
-+
-+1. Pass the information as an argument for the function call.
-+2. Record the information in struct kvm_mmu_page somehow.
-+3. Record the information in vcpu structure.
-+
-+Option 2 was chosen.  Because option 1 requires modifying all the functions.  It
-+would affect badly to the normal case.  Option 3 doesn't work well because in
-+some cases, we need to walk both private and shared EPT.
-+
-+The role of the EPT page can be utilized and one bit can be curved out from
-+unused bits in struct kvm_mmu_page_role.  When allocating the EPT page,
-+initialize the information. Mostly struct kvm_mmu_page is available because
-+we're operating on EPT pages.
-+
-+
-+The conversion of private GPA and shared GPA
-+============================================
-+A page of a given GPA can be assigned to only private GPA xor shared GPA at one
-+time.  (This is the restriction by KVM implementation to avoid doubling guest
-+memory usage.  Not by TDX architecture.)  The GPA can't be accessed
-+simultaneously via both private GPA and shared GPA.  On guest startup, all the
-+GPAs are assigned as private.  Guest converts the range of GPA to shared (or
-+private) from private (or shared) by MapGPA hypercall.  MapGPA hypercall takes
-+the start GPA and the size of the region.  If the given start GPA is shared
-+(shared bit set), VMM converts the region into shared (if it's already shared,
-+nop).
-+
-+If the guest TD triggers an EPT violation on the already converted region,
-+i.e. EPT violation on private(or shared) GPA when page is shared(or private),
-+the access won't be allowed.  KVM_EXIT_MEMORY_FAULT is triggered.  The user
-+space VMM will decide how to handle it.
-+
-+If the guest access private (or shared) GPA after the conversion to shared (or
-+private), the following sequence will be observed
-+
-+1. MapGPA(shared GPA: shared bit set) hypercall
-+2. KVM cause KVM_TDX_EXIT with hypercall to the user space VMM.
-+3. The user space VMM converts the GPA with KVM_SET_MEMORY_ATTRIBUTES(shared).
-+4. The user space VMM resumes vcpu execution with KVM_VCPU_RUN
-+5. Guest TD accesses private GPA (shared bit cleared)
-+6. KVM gets EPT violation on private GPA (shared bit cleared)
-+7. KVM finds the GPA was set to be shared in the xarray while the faulting GPA
-+   is private (shared bit cleared)
-+8. KVM_EXIT_MEMORY_FAULT.  User space VMM, e.g. qemu, decide what to do.
-+   Typically requests KVM conversion of GPA without MapGPA hypercall.
-+9. KVM converts GPA from shared to private with
-+   KVM_SET_MEMORY_ATTRIBUTES(private)
-+10. Resume vcpu execution
-+
-+At step 9, user space VMM may think such memory access is due to race, let vcpu
-+resume without conversion with the expectation that other vcpu issues MapGPA.
-+Or user space VMM may think such memory access is doubtful and the guest is
-+trying to attack VMM.  It may throttle vcpu execution as mitigation or finally
-+kill such a guest.  Or user space VMM may think it's a bug of the guest TD, kill
-+the guest TD.
-+
-+This sequence is not efficient.  Guest TD shouldn't access private (or shared)
-+GPA after converting GPA to shared (or private).  Although KVM can handle it,
-+it's sub-optimal and won't be optimized.
-+
-+The original TDP MMU and race condition
-+=======================================
-+Because vcpus share the EPT, once the EPT entry is zapped, we need to shootdown
-+TLB.  Send IPI to remote vcpus.  Remote vcpus flush their down TLBs.  Until TLB
-+shootdown is done, vcpus may reference the zapped guest page.
-+
-+TDP MMU uses read lock of mmu_lock to mitigate vcpu contention.  When read lock
-+is obtained, it depends on the atomic update of the EPT entry.  (On the other
-+hand legacy MMU uses write lock.)  When vcpu is populating/zapping the EPT entry
-+with a read lock held, other vcpu may be populating or zapping the same EPT
-+entry at the same time.
-+
-+To avoid the race condition, the entry is frozen.  It means the EPT entry is set
-+to the special value, REMOVED_SPTE which clears the present bit.  And then after
-+TLB shootdown, update the EPT entry to the final value.
-+
-+Concurrent zapping
-+------------------
-+1. read lock
-+2. freeze the EPT entry (atomically set the value to REMOVED_SPTE)
-+   If other vcpu froze the entry, restart page fault.
-+3. TLB shootdown
-+
-+   * send IPI to remote vcpus
-+   * TLB flush (local and remote)
-+
-+   For each entry update, TLB shootdown is needed because of the
-+   concurrency.
-+4. atomically set the EPT entry to the final value
-+5. read unlock
-+
-+Concurrent populating
-+---------------------
-+In the case of populating the non-present EPT entry, atomically update the EPT
-+entry.
-+
-+1. read lock
-+
-+2. atomically update the EPT entry
-+   If other vcpu frozen the entry or updated the entry, restart page fault.
-+
-+3. read unlock
-+
-+In the case of updating the present EPT entry (e.g. page migration), the
-+operation is split into two.  Zapping the entry and populating the entry.
-+
-+1. read lock
-+2. zap the EPT entry.  follow the concurrent zapping case.
-+3. populate the non-present EPT entry.
-+4. read unlock
-+
-+Non-concurrent batched zapping
-+------------------------------
-+In some cases, zapping the ranges is done exclusively with a write lock held.
-+In this case, the TLB shootdown is batched into one.
-+
-+1. write lock
-+2. zap the EPT entries by traversing them
-+3. TLB shootdown
-+4. write unlock
-+
-+For Secure EPT, TDX SEAMCALLs are needed in addition to updating the mirrored
-+EPT entry.
-+
-+TDX concurrent zapping
-+----------------------
-+Add a hook for TDX SEAMCALLs at the step of the TLB shootdown.
-+
-+1. read lock
-+2. freeze the EPT entry(set the value to REMOVED_SPTE)
-+3. TLB shootdown via a hook
-+
-+   * TLB.MEM.RANGE.BLOCK()
-+   * TLB.MEM.TRACK()
-+   * send IPI to remote vcpus
-+
-+4. set the EPT entry to the final value
-+5. read unlock
-+
-+TDX concurrent populating
-+-------------------------
-+TDX SEAMCALLs are required in addition to operating the mirrored EPT entry.  The
-+frozen entry is utilized by following the zapping case to avoid the race
-+condition.  A hook can be added.
-+
-+1. read lock
-+2. freeze the EPT entry
-+3. hook
-+
-+   * TDH_MEM_SEPT_ADD() for non-leaf or TDH_MEM_PAGE_AUG() for leaf.
-+
-+4. set the EPT entry to the final value
-+5. read unlock
-+
-+Without freezing the entry, the following race can happen.  Suppose two vcpus
-+are faulting on the same GPA and the 2M and 4K level entries aren't populated
-+yet.
-+
-+* vcpu 1: update 2M level EPT entry
-+* vcpu 2: update 4K level EPT entry
-+* vcpu 2: TDX SEAMCALL to update 4K secure EPT entry => error
-+* vcpu 1: TDX SEAMCALL to update 2M secure EPT entry
-+
-+
-+TDX non-concurrent batched zapping
-+----------------------------------
-+For simplicity, the procedure of concurrent populating is utilized.  The
-+procedure can be optimized later.
-+
-+
-+Co-existing with unmapping guest private memory
-+===============================================
-+TODO.  This needs to be addressed.
-+
-+
-+Restrictions or future work
-+===========================
-+The following features aren't supported yet at the moment.
-+
-+* optimizing non-concurrent zap
-+* Large page
-+* Page migration
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index ba9cc4ac9093..aaa7db45d809 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -20,6 +20,8 @@ KVM_X86_OP(hardware_disable)
+ KVM_X86_OP(hardware_unsetup)
+ KVM_X86_OP_OPTIONAL_RET0(offline_cpu)
+ KVM_X86_OP(has_emulated_msr)
++/* TODO: Once all backend implemented this op, remove _OPTIONAL_RET0. */
++KVM_X86_OP_OPTIONAL_RET0(vcpu_check_cpuid)
+ KVM_X86_OP(vcpu_after_set_cpuid)
+ KVM_X86_OP(is_vm_type_supported)
+ KVM_X86_OP_OPTIONAL(max_vcpus);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 291d36a668e5..304c01945115 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1590,6 +1590,7 @@ struct kvm_x86_ops {
+ 	void (*hardware_unsetup)(void);
+ 	int (*offline_cpu)(void);
+ 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
++	int (*vcpu_check_cpuid)(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2, int nent);
+ 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
+ 
+ 	bool (*is_vm_type_supported)(unsigned long vm_type);
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 09b83f7c228d..de10a2de1dd5 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -123,6 +123,7 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ {
+ 	struct kvm_cpuid_entry2 *best;
+ 	u64 xfeatures;
++	int r;
+ 
+ 	/*
+ 	 * The existing code assumes virtual address is 48-bit or 57-bit in the
+@@ -150,7 +151,10 @@ static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+ 	if (!xfeatures)
+ 		return 0;
+ 
+-	return fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, xfeatures);
++	r = fpu_enable_guest_xfd_features(&vcpu->arch.guest_fpu, xfeatures);
++	if (r)
++		return r;
++	return static_call(kvm_x86_vcpu_check_cpuid)(vcpu, entries, nent);
+ }
+ 
+ /* Check whether the supplied CPUID data is equal to what is already set for the vCPU. */
 -- 
 2.25.1
 
