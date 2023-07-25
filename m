@@ -2,128 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4F7F761F5C
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 18:47:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DEFE761FDB
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 19:12:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232596AbjGYQrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 12:47:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40064 "EHLO
+        id S231340AbjGYRM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 13:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232326AbjGYQrB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 12:47:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED2AC2D49
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:45:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690303503;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wvn6KHlfQDuo3hpCXTqrMNakv6fvts1e1JRxx8Q4D20=;
-        b=c51loiJUUpM8MkmT3uYhpuA4tFb85+NU3aVSgq5LJFefKBaM89baX9s6JwUv1VGiOnEyQI
-        Vb3bru2q4hE0I4s2FqqoKQoQv6+2FZJfWddEjNMSEouwuOIhdY0jbXliPbjtBWJl1BEmDj
-        R4z+FjPahvjed3r/GiDJCR2GsRC9G7o=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-30-gzoL-KYLNWWE8RqLGVHdCA-1; Tue, 25 Jul 2023 12:45:01 -0400
-X-MC-Unique: gzoL-KYLNWWE8RqLGVHdCA-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-4fb76659d54so4927869e87.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:45:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690303500; x=1690908300;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wvn6KHlfQDuo3hpCXTqrMNakv6fvts1e1JRxx8Q4D20=;
-        b=T14pgg4c1X2txWnshvxzKmS8RcCBMe7WYONaPGYWYFtggh3DQ4YLgraWFh9BJKx0fc
-         1f+8xR3ziAdue30o1Y2Xcn4I6f8DFkWpGSgblgrCvFJpL9FIF+nkzHvwmDFZeQ2e6357
-         ptrWxY2nWXAr+u2vfwnFnQQa2UzMJv/hKLX0lAZYUw9gqbzWXGLoWfK4382RQ4ai5o5X
-         dI485Ny3BXeDGIQ2odDR4qeA2EwlNdGlDONG24Eqr7OYFFn6kTGDO9sFikRokBqxCUcb
-         JYR3I9KlLFwX7e0V958iGMDMa9z6jdJEMurqVajMzYXoCHgSCrn2lA3MMZm9GEVO9j8m
-         sFoQ==
-X-Gm-Message-State: ABy/qLYGkdnOAxqDc1uglXIK+KHNnDkjCEt3WswVmdknw0U50CgNhQ29
-        210zrjGhuIHg8GzFArtNI22+TqpP/yUndWGxbm1BXYD4v7oJTj+ho2ncLGL0lfAnC3VS7lItzD2
-        Nf3YS1NY3EkZa
-X-Received: by 2002:ac2:5239:0:b0:4fc:6e21:ff50 with SMTP id i25-20020ac25239000000b004fc6e21ff50mr7111887lfl.55.1690303500073;
-        Tue, 25 Jul 2023 09:45:00 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEby/vcaKSjGkDJ1lyXqDzRuHrqzwbjpqloRTr9TiHpIvTT/1kpST/4Zd3MSPrUL8HU9FBzgQ==
-X-Received: by 2002:ac2:5239:0:b0:4fc:6e21:ff50 with SMTP id i25-20020ac25239000000b004fc6e21ff50mr7111854lfl.55.1690303499680;
-        Tue, 25 Jul 2023 09:44:59 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
-        by smtp.gmail.com with ESMTPSA id t2-20020adfeb82000000b0031759e6b43fsm9082752wrn.39.2023.07.25.09.44.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Jul 2023 09:44:59 -0700 (PDT)
-Message-ID: <b8189658-4fa9-d3b9-8d24-bf04781ad0cd@redhat.com>
-Date:   Tue, 25 Jul 2023 18:44:57 +0200
+        with ESMTP id S230076AbjGYRM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 13:12:26 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A558C1718;
+        Tue, 25 Jul 2023 10:12:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690305145; x=1721841145;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fq0MiyGtfdmEy3j11xkXHlesEoaC2GKhOtTrGN15RYs=;
+  b=QAHjsUaHOriLvxDau9WpfAXbQoPdZr6Ws3ztbkKz3v/ju1OVCccak5YO
+   APcUwkkbVNmqp1onD9nPZ88T9kcgWtadBX/BJxfp106jyJDFVZaYFRMHy
+   SE1VbAQvR1knQCRxgYaD/2Yf3Z8OHh8ycI+Cfranw6K6/wYXlk2ryFtbg
+   Y13JQvkOyKvhPxz0GZfxhRxJN3QzUy6mVSFBmyAli2Upl5iUp4fYiCDoT
+   6t+j1VMvLUwTwu5R1DToj8gLuXZLezld/HSR+BV47mnlrjeX7L1cOyeC9
+   koo8mFRmbYtoZEJi5Kj7/VCg3dcQaY6SxhndKcgyZ7F3IiZiFgKGVhJg9
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="366675112"
+X-IronPort-AV: E=Sophos;i="6.01,230,1684825200"; 
+   d="scan'208";a="366675112"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 10:12:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="720114234"
+X-IronPort-AV: E=Sophos;i="6.01,230,1684825200"; 
+   d="scan'208";a="720114234"
+Received: from chrisper-mobl.amr.corp.intel.com (HELO [10.209.69.88]) ([10.209.69.88])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 10:12:22 -0700
+Message-ID: <abdc2626-d776-e3be-81b5-eca669b6becc@intel.com>
+Date:   Tue, 25 Jul 2023 10:12:21 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH 17/27] KVM: arm64: nv: Expose FEAT_EVT to nested guests
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v2 20/20] x86/mm, mm/vmalloc: Defer
+ flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-18-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230712145810.3864793-18-maz@kernel.org>
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Valentin Schneider <vschneid@redhat.com>,
+        Nadav Amit <namit@vmware.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-trace-kernel@vger.kernel.org" 
+        <linux-trace-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>, bpf <bpf@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-21-vschneid@redhat.com>
+ <188AEA79-10E6-4DFF-86F4-FE624FD1880F@vmware.com>
+ <xhsmh8rb5tui1.mognet@vschneid.remote.csb>
+ <2284d0db-f94a-e059-7bd0-bab4f112ed35@intel.com> <ZL/6THDvmC5mVyBI@tpad>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <ZL/6THDvmC5mVyBI@tpad>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 7/25/23 09:37, Marcelo Tosatti wrote:
+>> TLB flushes for freed page tables are another game entirely.  The CPU is
+>> free to cache any part of the paging hierarchy it wants at any time.
+> Depend on CONFIG_PAGE_TABLE_ISOLATION=y, which flushes TLB (and page
+> table caches) on user->kernel and kernel->user context switches ?
 
+Well, first of all, CONFIG_PAGE_TABLE_ISOLATION doesn't flush the TLB at
+all on user<->kernel switches when PCIDs are enabled.
 
-On 7/12/23 16:58, Marc Zyngier wrote:
-> Now that we properly implement FEAT_EVT (as we correctly forward
-> traps), expose it to guests.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Second, even if it did, the CPU is still free to cache any portion of
+the paging hierarchy at any time.  Without LASS[1], userspace can even
+_compel_ walks of the kernel portion of the address space, and we don't
+have any infrastructure to tell if a freed kernel page is exposed in the
+user copy of the page tables with PTI.
 
-Eric
-> ---
->  arch/arm64/kvm/nested.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 315354d27978..7f80f385d9e8 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
->  		break;
->  
->  	case SYS_ID_AA64MMFR2_EL1:
-> -		val &= ~(NV_FTR(MMFR2, EVT)	|
-> -			 NV_FTR(MMFR2, BBM)	|
-> +		val &= ~(NV_FTR(MMFR2, BBM)	|
->  			 NV_FTR(MMFR2, TTL)	|
->  			 GENMASK_ULL(47, 44)	|
->  			 NV_FTR(MMFR2, ST)	|
+Third, (also ignoring PCIDs) there are plenty of instructions between
+kernel entry and the MOV-to-CR3 that can flush the TLB.  All those
+instructions architecturally permitted to speculatively set Accessed or
+Dirty bits in any part of the address space.  If they run into a free
+page table page, things get ugly.
+
+These accesses are not _likely_.  There probably isn't a predictor out
+there that's going to see a:
+
+	movq    %rsp, PER_CPU_VAR(cpu_tss_rw + TSS_sp2)
+
+and go off trying to dirty memory in the vmalloc() area.  But we'd need
+some backward *and* forward-looking guarantees from our intrepid CPU
+designers to promise that this kind of thing is safe yesterday, today
+and tomorrow.  I suspect such a guarantee is going to be hard to obtain.
+
+1. https://lkml.kernel.org/r/20230110055204.3227669-1-yian.chen@intel.com
+
 
