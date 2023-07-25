@@ -2,148 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67D22761A27
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:39:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2535761A35
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:42:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbjGYNjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 09:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35534 "EHLO
+        id S231310AbjGYNma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 09:42:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbjGYNjn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:39:43 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6D2BE;
-        Tue, 25 Jul 2023 06:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=AqhhXygkgYbNIUoMbam6nKKv+65xhkGjy3g6V0cI3YE=; b=hU0juKjhnKQNMPcWxGTglXF1kD
-        xBeNXFwO6bnr7cRSGSRHFONAWDnx+6524lg/8FLjxvB00LuNdyZOyZfcpfPUYsI9/m4/wxx3XADTa
-        IhO/K2oW4GRTfGIQ608wBXqm9GjRT1kOVe8WYSkXmy8R6Xy4Kmol7TQFesj4k3+2Ucyms3qwYaJY7
-        jLJUnGnJNEcVrXPXgDy1IK44aIJfxkS+/FqW0+yWhU8qeyJh4cu9RXzeK/Gb1Zl8copgtkKLHoxDF
-        JMGM13VNEgUa451vGA877Yf6lodJWN7+QQiNx8EG7C7Z5r9rUdrUihkgPelx/JvMdyFS4IfyITpst
-        ZPZuwbig==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qOIGH-004AGP-0U;
-        Tue, 25 Jul 2023 13:39:38 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C0A9B300095;
-        Tue, 25 Jul 2023 15:39:36 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A54B92CCD6B85; Tue, 25 Jul 2023 15:39:36 +0200 (CEST)
-Date:   Tue, 25 Jul 2023 15:39:36 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Joel Fernandes <joel@joelfernandes.org>
-Cc:     Valentin Schneider <vschneid@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 18/20] context_tracking,x86: Defer kernel text
- patching IPIs
-Message-ID: <20230725133936.GM3765278@hirez.programming.kicks-ass.net>
-References: <20230720163056.2564824-19-vschneid@redhat.com>
- <6EBAEEED-6F38-472D-BA31-9C61179EFA2F@joelfernandes.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+        with ESMTP id S231276AbjGYNm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 09:42:29 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2045.outbound.protection.outlook.com [40.107.96.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C401BF9;
+        Tue, 25 Jul 2023 06:42:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eRoI4/8VunNQhvRDqeFGG+nav21zmlRcfEPyYfrhQC/4Rs4/Z5fpj5mkKNPFDQr4AX4jq+5zwLC+hIKosNdf/bK9LtRI5fiWej0rs9AXZgtR0Sct3GPX9TOgJXmeHZJB+e0Kzct6U84PlQ3ovtwaNhNjyQz+C77pSEGAyTGn0CnnaaD+szv42ML40kZj7g/eHRgdCYm6ua7qmhSkskdHi2JYl2AhBZAofOUkFBB10DyQ0kLsNzoW/F6t2/ekxtRQLybPIfocW2HvvjV2TfsBa4xQkLXwJ5VzlHKTk0cVgWTrg9rDGpHrB1RGa9vjRGBHrWkHR61gZU9g/CVJ3aPSvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VyyDarhn0EZOYCN+tIdqU4Xq964oX7IdVcVrjs3dUuI=;
+ b=fsPkjnTvJpDo/M0Np4AfXQZjitWz4+NIMkiOtrtI2N9Q05xSSsXcjHR2rC+tKXp68JInKEkrfu0xH9w/cYnHkW9fytl5tiB8GgJ+/avcJ62ssPWfx+3CYc8kyKuD8dh7kd2RcuBNKcH4Ots6cUCZHdPO55z8lFtZdGtVXnHqG6kGxaXAeGpWtMcTInIqMV4XvPdrmpygzo9UnCe1h0GsYMvGw+T7WmsF1QVo2W8M3mahWVb6ji697zh3ECKGLPA1xrb0chglFWCmQkC+rpBMjxucsuM1nBRVXuaBy5W8WtnwXY9PvinhXs5RQ3oQXpEmLScAmnz699/za9gSLyhvzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VyyDarhn0EZOYCN+tIdqU4Xq964oX7IdVcVrjs3dUuI=;
+ b=TBcCSAbkEQ136vesp9E+6H0MFq/p2crCSeoyb8wlDmayJg35Em+Qbt1ASu0r0HrtKVIcjp0NUr1iLQYm8j4m9ImgrROC6QIZzKp6LGJIAehI7bsPsk9pbp7Ux1PsrTZC052lK2MEEzR988u3/RvExkfsNyrFr2dEVAYlXSOkiLIeEBVF0zJ617cXOXygrWX1IfK1rDaTucyjaS5Omjv697IKE4BNZBc0p2YTR7NM4VrfLUlHrsWaKY2FgQxH6C/40ClmfAykZ23ZnZ3ObFJHLywAGyYLLBRkw17rETJa74hd0oS8mV0qRo9b8b6sqmVtokicK/KSAhqA634y1W+d7g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB3176.namprd12.prod.outlook.com (2603:10b6:a03:134::26)
+ by PH8PR12MB7327.namprd12.prod.outlook.com (2603:10b6:510:215::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
+ 2023 13:42:19 +0000
+Received: from BYAPR12MB3176.namprd12.prod.outlook.com
+ ([fe80::c833:9a5c:258e:3351]) by BYAPR12MB3176.namprd12.prod.outlook.com
+ ([fe80::c833:9a5c:258e:3351%4]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
+ 13:42:18 +0000
+From:   Alistair Popple <apopple@nvidia.com>
+To:     akpm@linux-foundation.org
+Cc:     jgg@ziepe.ca, npiggin@gmail.com, catalin.marinas@arm.com,
+        jhubbard@nvidia.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, nicolinc@nvidia.com, robin.murphy@arm.com,
+        seanjc@google.com, will@kernel.org, zhi.wang.linux@gmail.com,
+        mpe@ellerman.id.au, linuxppc-dev@lists.ozlabs.org,
+        rtummala@nvidia.com, kevin.tian@intel.com, iommu@lists.linux.dev,
+        x86@kernel.org, fbarrat@linux.ibm.com, ajd@linux.ibm.com,
+        chaitanya.kumar.borah@intel.com, tvrtko.ursulin@linux.intel.com,
+        intel-gfx@lists.freedesktop.org,
+        Alistair Popple <apopple@nvidia.com>
+Subject: [PATCH v4 0/5] Invalidate secondary IOMMU TLB on permission upgrade
+Date:   Tue, 25 Jul 2023 23:42:02 +1000
+Message-Id: <cover.1eca029b8603ef4eebe5b41eae51facfc5920c41.1690292440.git-series.apopple@nvidia.com>
+X-Mailer: git-send-email 2.39.2
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6EBAEEED-6F38-472D-BA31-9C61179EFA2F@joelfernandes.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-ClientProxiedBy: SY5P282CA0145.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:205::9) To BYAPR12MB3176.namprd12.prod.outlook.com
+ (2603:10b6:a03:134::26)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3176:EE_|PH8PR12MB7327:EE_
+X-MS-Office365-Filtering-Correlation-Id: bfa33fd3-bddb-42b6-9968-08db8d14f707
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4yr+8pL7Xtf5U4AuATof+mgWpUUvzYMXQGSqJZrzSWVIlmaR0/qH64As4e2lh6E4lLn187KReFEn/Ti4Li+tK60gCHD5hCHdPA0ea3JE2Ha9fuVMGJ+s9CHi8V24em2E2TXKUsNdEVBkgujSE2f7GdtQIOhJ8dYkaVfUfT6o14ix24KflNRBQ4QyNdzmf3SO/vUds+3JB/fPgOQSWvbtXn0/Lhg0s8w6EHlXKKNVsC9r1IBnsT8mwUZKQ0MoH23omylcFXX/5XLpDBav2Orj6ESXHx6l0cwWSfHC3E1oBP7FYkT2WnbXXtYZ4JSxBNYucykqEecHDoNGtWCgwDFaDP9bhZ8EpfQNjZizF6s4W3tKIWsSgFygznK/ryUvWu4LXzTkgdt52cWSCnN/j2E/3xpU7CcZH1YwyyGvBekYbGpDelRJ1S9pJKSjQhzIcdeRfz4tYP/WjMF7Ffen3k02HyK1TFZyy4F7+0iJrEEx+YJq95IOnDYEWS/O6J2w2F6k0NW0dAQjQl4sE9TxiMMGC6SOmQWgqKI13ZLcz9CgoDuBSXzgYnVnC3tNneCvjy0PsPum126h9OIAvQLqPTlNprldufP5bkXMtxh0EKDVOUzFC6e4dv/FMIdhShnhrAZ9P95zQdeHqi6IPvfmUABe+w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3176.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(376002)(396003)(366004)(451199021)(6512007)(966005)(66899021)(186003)(2616005)(26005)(6506007)(107886003)(316002)(41300700001)(66556008)(36756003)(6486002)(66476007)(7416002)(5660300002)(66946007)(38100700002)(2906002)(4326008)(6916009)(8676002)(8936002)(83380400001)(478600001)(86362001)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZGPd82TY9cWOGJ98hYIVe4gAbqdlGukOP9KCiGTIw1S+6tM+W8keTK+FpWOz?=
+ =?us-ascii?Q?fPGux4+NfdvCbXPM5pkgIA+XMkvcGRnktKN80qUmhc6oHjbzU7yb1l8Pxi+n?=
+ =?us-ascii?Q?zdaMsPrj88DaYXZA6maOjfa8FrvCGNbYXeYGT7UVb3KUOPveZaEbBZ61Sx7Z?=
+ =?us-ascii?Q?BQqFwpLH15NCdrccPcIvAXOn9ZPJ/DrJxgsMtj427NhrpWgYw5PZxvpJWuGg?=
+ =?us-ascii?Q?/eOXdGO1FianH3BeanGIJeidxS8M+M7RJAPBoklsjqHo0LXwdbC61fzWzx3D?=
+ =?us-ascii?Q?pu1YDpraf8bvzG8fZRvfzJUHmwPxCl+OUkkglnACtUFA+oN+qkbg5lStTKL0?=
+ =?us-ascii?Q?vFUHrJpNnMMdIplylTtcNLXnZ0bhkDF7u+ALuCWUZ2GsbYI1AQY9H71RHf2p?=
+ =?us-ascii?Q?5SiytSVUVIRwWl/yhpALJfEnM6ZNI3CAsOc2dpUnL6Wmr/5Fnv3idXlg6JUx?=
+ =?us-ascii?Q?ilEOYPgsKxQA7bwUQDWV7C8TW2rg6v3bWZoA1Xlj/RqLPF4cK9+b1K3tTXEh?=
+ =?us-ascii?Q?uW/n6hXc8031SSLkWSJb/XiIp6XQYyoiMohqHLYfKNn+ZmJymIZXkra3JhNA?=
+ =?us-ascii?Q?FBDELM7ohADrqyNL9nqaG9ROwxNUQtDQPtjd0/kw0LOlK28G/4XzqqpbMaZu?=
+ =?us-ascii?Q?IBjbrB0d+wLED/CDlJx82pgETpAa04kk6BxP6aZeOQ+uGdZ3xxkM5X6lSUVl?=
+ =?us-ascii?Q?mvMsk987752MaMfZODKlMTeEbSpXqY8YsIEpGG+B7mPU/lNLFsFQW7U+FkGo?=
+ =?us-ascii?Q?vkyNqdTRZ//e/QVt0z45H75C54bXmdwbp9HBI5zIYX/MqvsmI8VDViq6NIpz?=
+ =?us-ascii?Q?A9MSzs2jWT+DxhSNP13nR57CqZ9jqWEV6y9EA30IQRRHjyCrQszSiKLw0dX6?=
+ =?us-ascii?Q?rHXt7wkJCpDnfFk+MjEYVG/jE79kL/f3PjKqVtlFzWpeMU/Ies4Wuvm9fOx9?=
+ =?us-ascii?Q?uAXEBtRupQ+aQKl+MOmUnYtccv93OorolhEuxx8a6I7ShbvjWpZ+HO4OQwv/?=
+ =?us-ascii?Q?QZZYu1haqRiXWs+tW2elsiVmGptLqfK5qbWBNZ2CwLpao1sD3wkK8MaEnaRl?=
+ =?us-ascii?Q?N4mXMPVF0SezoFL/WjOSZgvASU8Xym6XGgw3AgKoCNrrLsjpy3SlBjK46Xl3?=
+ =?us-ascii?Q?XUS0wJ0c+7OdFFzRoQH3LUbpmV9rEg6WTpE20jLAGbH38qjCe7jwA/0BYBM8?=
+ =?us-ascii?Q?5vc9Rc/o69oXhid5c3FiRLPQEfMw+dwS7SbIrt+2Rp0S/SEYfmiroelqmgy+?=
+ =?us-ascii?Q?HsZy3ZMuJv1E/dgxEgQQtBUTdRLsRiw3quJvdA4Q0ajkM0kndIQht//xsu/1?=
+ =?us-ascii?Q?JS5AGZYaF+Ks7j5UZLfYqzu+SzlAEgyauyS0Rmjuw3lf8tK22J+kfvdCzu5n?=
+ =?us-ascii?Q?uc+hqrxdaqluFpqfjJky4VtpkrzCptp45r9w5736ZNmOUzyuDaHfzlEqtaGU?=
+ =?us-ascii?Q?UyO5p0ikwzTKSx6S+OHiHR8ToztkQO7KuiX1K1llG/AGlHrxez++3fsLvnV+?=
+ =?us-ascii?Q?KMVjaYv4YkTRuhrEugeCVLkFKyp1ZxMohm2iCchwQoj6coY4kIgLDbGZKHNC?=
+ =?us-ascii?Q?b5yxzwYa1MgdmtU8nujGztwKH9Et/GKC+kIgJI6a?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfa33fd3-bddb-42b6-9968-08db8d14f707
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3176.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 13:42:18.7391
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0Dh2Il8UKoz1k5InVFSyoYVHRUBMdJnFLOzvAjWKBh+o2JYBMaPiwIHje4Q4wTRdr8Ru/EPgtFwpzHPHbVR6jQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7327
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023 at 06:49:45AM -0400, Joel Fernandes wrote:
-> Interesting series Valentin. Some high-level question/comments on this one:
-> 
-> > On Jul 20, 2023, at 12:34 PM, Valentin Schneider <vschneid@redhat.com> wrote:
-> > 
-> > ﻿text_poke_bp_batch() sends IPIs to all online CPUs to synchronize
-> > them vs the newly patched instruction. CPUs that are executing in userspace
-> > do not need this synchronization to happen immediately, and this is
-> > actually harmful interference for NOHZ_FULL CPUs.
-> 
-> Does the amount of harm not correspond to practical frequency of text_poke? 
-> How often does instruction patching really happen? If it is very infrequent
-> then I am not sure if it is that harmful.
+The main change is to move secondary TLB invalidation mmu notifier
+callbacks into the architecture specific TLB flushing functions. This
+makes secondary TLB invalidation mostly match CPU invalidation while
+still allowing efficient range based invalidations based on the
+existing TLB batching code.
 
-Well, it can happen quite a bit, also from things people would not
-typically 'expect' it.
+Changes for v4:
 
-For instance, the moment you create the first per-task perf event we
-frob some jump-labels (and again some second after the last one goes
-away).
+ - Fixed a NULL pointer dereference when registering the first
+   notifier with mmu_interval_notifier_insert() instead of
+   mmu_notifier_register() - Thanks Dan and Chaitanya for the bug
+   reports.
 
-The same for a bunch of runtime network configurations.
+ - Collected Acked/Reviewed tags.
 
-> > As the synchronization IPIs are sent using a blocking call, returning from
-> > text_poke_bp_batch() implies all CPUs will observe the patched
-> > instruction(s), and this should be preserved even if the IPI is deferred.
-> > In other words, to safely defer this synchronization, any kernel
-> > instruction leading to the execution of the deferred instruction
-> > sync (ct_work_flush()) must *not* be mutable (patchable) at runtime.
-> 
-> If it is not infrequent, then are you handling the case where userland
-> spends multiple seconds before entering the kernel, and all this while
-> the blocking call waits? Perhaps in such situation you want the real IPI
-> to be sent out instead of the deferred one?
+ - Don't call the notifier from radix__local_flush_tlb_page() on
+   PowerPC.
 
-Please re-read what Valentin wrote -- nobody is waiting on anything.
+Changes for v3:
+
+ - On x86 call the invalidation when adding pending TLB invalidates
+   rather than when flushing the batch. This is because the mm is
+   required. It also matches what happens on ARM64. Fixes a bug
+   reported by SeongJae Park (thanks!)
+
+Changes for v2:
+
+ - Rebased on linux-next commit 906fa30154ef ("mm/rmap: correct stale
+   comment of rmap_walk_anon and rmap_walk_file") to fix a minor
+   integration conflict with "arm64: support batched/deferred tlb
+   shootdown during page reclamation/migration". This series will need
+   to be applied after the conflicting patch.
+
+ - Reordered the function rename until the end of the series as many
+   places that were getting renamed ended up being removed anyway.
+
+ - Fixed a couple of build issues which broke bisection.
+
+ - Added a minor patch to fix up a stale/incorrect comment.
+
+==========
+Background
+==========
+
+The arm64 architecture specifies TLB permission bits may be cached and
+therefore the TLB must be invalidated during permission upgrades. For
+the CPU this currently occurs in the architecture specific
+ptep_set_access_flags() routine.
+
+Secondary TLBs such as implemented by the SMMU IOMMU match the CPU
+architecture specification and may also cache permission bits and
+require the same TLB invalidations. This may be achieved in one of two
+ways.
+
+Some SMMU implementations implement broadcast TLB maintenance
+(BTM). This snoops CPU TLB invalidates and will invalidate any
+secondary TLB at the same time as the CPU. However implementations are
+not required to implement BTM.
+
+Implementations without BTM rely on mmu notifier callbacks to send
+explicit TLB invalidation commands to invalidate SMMU TLB. Therefore
+either generic kernel code or architecture specific code needs to call
+the mmu notifier on permission upgrade.
+
+Currently that doesn't happen so devices will fault indefinitely when
+writing to a PTE that was previously read-only as nothing invalidates
+the SMMU TLB.
+
+========
+Solution
+========
+
+To fix this the series first renames the .invalidate_range() callback
+to .arch_invalidate_secondary_tlbs() as suggested by Jason and Sean to
+make it clear this callback is only used for secondary TLBs. That was
+made possible thanks to Sean's series [1] to remove KVM's incorrect
+usage.
+
+Based on feedback from Jason [2] the proposed solution to the bug is
+to move the calls to mmu_notifier_arch_invalidate_secondary_tlbs()
+closer to the architecture specific TLB invalidation code. This
+ensures the secondary TLB won't miss invalidations, including the
+existing invalidation in the ARM64 code to deal with permission
+upgrade.
+
+Currently only ARM64, PowerPC and x86 have IOMMU with secondary TLBs
+requiring SW invalidation so the notifier is only called for those
+architectures. It is also not called for invalidation of kernel
+mappings as no secondary IOMMU implementations can access those and
+hence it is not required.
+
+[1] - https://lore.kernel.org/all/20230602011518.787006-1-seanjc@google.com/
+[2] - https://lore.kernel.org/linux-mm/ZJMR5bw8l+BbzdJ7@ziepe.ca/
+
+Alistair Popple (5):
+  arm64/smmu: Use TLBI ASID when invalidating entire range
+  mmu_notifiers: Fixup comment in mmu_interval_read_begin()
+  mmu_notifiers: Call invalidate_range() when invalidating TLBs
+  mmu_notifiers: Don't invalidate secondary TLBs as part of mmu_notifier_invalidate_range_end()
+  mmu_notifiers: Rename invalidate_range notifier
+
+ arch/arm64/include/asm/tlbflush.h               |   5 +-
+ arch/powerpc/include/asm/book3s/64/tlbflush.h   |   1 +-
+ arch/powerpc/mm/book3s64/radix_hugetlbpage.c    |   1 +-
+ arch/powerpc/mm/book3s64/radix_tlb.c            |   4 +-
+ arch/x86/include/asm/tlbflush.h                 |   2 +-
+ arch/x86/mm/tlb.c                               |   2 +-
+ drivers/iommu/amd/iommu_v2.c                    |  10 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c |  29 +++--
+ drivers/iommu/intel/svm.c                       |   8 +-
+ drivers/misc/ocxl/link.c                        |   8 +-
+ include/asm-generic/tlb.h                       |   1 +-
+ include/linux/mmu_notifier.h                    | 104 ++++-------------
+ kernel/events/uprobes.c                         |   2 +-
+ mm/huge_memory.c                                |  29 +----
+ mm/hugetlb.c                                    |   8 +-
+ mm/memory.c                                     |   8 +-
+ mm/migrate_device.c                             |   9 +-
+ mm/mmu_notifier.c                               |  50 +++-----
+ mm/rmap.c                                       |  40 +-------
+ 19 files changed, 110 insertions(+), 211 deletions(-)
+
+base-commit: 906fa30154ef42f93d28d7322860e76c6ae392ac
+-- 
+git-series 0.9.1
