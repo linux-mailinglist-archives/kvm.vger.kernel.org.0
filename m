@@ -2,62 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 92056761DD0
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 17:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC3DD761DFA
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 18:04:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231819AbjGYP4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 11:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37520 "EHLO
+        id S229873AbjGYQE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 12:04:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230283AbjGYP4r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 11:56:47 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95642212F
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:56:35 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-cf4cb742715so6434521276.2
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 08:56:35 -0700 (PDT)
+        with ESMTP id S229583AbjGYQEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 12:04:16 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0072F211B
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:04:01 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-573cacf4804so72158947b3.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 09:04:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690300594; x=1690905394;
+        d=google.com; s=20221208; t=1690301041; x=1690905841;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=192puc/qm0mn1nvHJQQuZAuevgCM+LQ+IAyFRTMu9UI=;
-        b=oZHJ5tW0tbTnU+JGXamk16o2P6x09kfVHnHealC4waOtd6uXLmoIBdHIRK87U6tn0V
-         O7wXly7QjyM+RqIH00hD9j1PbLvZ5JX0+cSSJRodxGhdLozQ2FNv3xhpnZ+sOcMNjHpe
-         n2JcqSB6sFrK/WeSbuokR9t4Fic7FZrd8pfhMgNmPv+Bl5wmLR/a+DIc0biujeuW0iHU
-         M9Eyd0CSXzzqdiUe7RZx6meZy/OfW3ddKDQaS7Hl0QGSh7UAkW1TPUEOfqbrzXVHdP06
-         8jVzjfcMBdqEJqqK0+gT7/L/6GDvRN7t9iuWU/pmK/HDM13UVjs+VuNn0FQw2or4fDn6
-         1Z7g==
+        bh=JzfMU5Qs8JliFSPK4e1C5em4CWxZCGfzp6e2iymS9Yg=;
+        b=dW59zwmrsLAamcGnirE6A1LfKT51T61DtWDAOhx4/cSvK3sOAiDmr+BlK4XiPthtzP
+         CN9MlQi3HhBVcH71uuUqq+M14CfwGnGPEE/BpfevOBdEFKHG7J0iaICViLaRAky8BhEp
+         HFcQ65KDccgqhPQn/ChYInnlcEfq7qr0Ma/Jgkr7SmWI+05vO/bEbUCWl8Rn7I2emovI
+         UeVOyMZohBruEuz8fBipp3NgVzf/qbnB/hnqT0XX1CDCZ3KOl7DJQE2yXx50QpLL6+Az
+         IlluRAj7yyIarMAgzXmFlQrKZdiqjqFyPfBBVM/tbJmItA4hkVu10uPsnU/tUYfyPMpN
+         N63Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690300594; x=1690905394;
+        d=1e100.net; s=20221208; t=1690301041; x=1690905841;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=192puc/qm0mn1nvHJQQuZAuevgCM+LQ+IAyFRTMu9UI=;
-        b=WgiTRPHz8vkpFOX1TWMag5gWssWISCyZNKyU5EK2JrnegSv4CdJ/KvXmvRV2S1cUH4
-         3Bt9rVneaOmE1wgGThUvnBEjdas5vcXfG2FsCIhfnAd5PcU9nAABcw7Z3OFGlkNVKohW
-         8h7XEuAUB9u0JoFqhTf+4PjL9vrCAuuR3NcJCXrLfhyxgl65PPCg8Mowg5nBQLaMuOdG
-         E3Dqe7StZyxgRUefEv32616DpzVBhbyN4/aBhG+nobyeCtBaHTr/33pszrAaYNPnQM2S
-         jwDLQYAQsd0ykOeBPhIAv7vs+TzvdneUZjOkaAm5+PxTFygXhqVrxxOxdt5JY6d2lw/L
-         Q4BA==
-X-Gm-Message-State: ABy/qLag3sYYcZ680RdmXtlHdigrhryi6ZwkEaAo0uUzTgwPyfHvpdk5
-        g68VomHjju5DwY+8lIlNFUWY7JXiZ0M=
-X-Google-Smtp-Source: APBJJlEAyggedsH1gCoghZnma/qZapoi1yuUBu5b3Q+lCrrgQv4F06/B9A6hcBih6sdIzQsURAg3KiFRP8M=
+        bh=JzfMU5Qs8JliFSPK4e1C5em4CWxZCGfzp6e2iymS9Yg=;
+        b=AkPXgxCZHgrtLGmDSiK16IwyR436RnDU4Q7ur86sYAYIGe5WqIzo4ZQKgCCtkvwnOS
+         RqC0uteDOkto5oSdAPk0IyXaGXS4YrJaPGWne6qHPgspzZ1p4Ez0l1dIGLXw4sRx+s4R
+         ojvJvRVBQnFcJBBL/uE2dDA5nSYgb+xcDJVWeaurZqd70OXzuS+S4Hnn5F2PpQKqBdN5
+         6rSxwvpthPmBz7YDuR2rUglZcmGakpk07Qq4smTmTkd809d1jYi8wiUhk+XdY4pFEuaW
+         oRdYzvo1b9xb9WYd9/Is7Oqfl3ex6/4fcu2Juj/Z6SB+YMYQpEZFzPVGXGkda56TDI6p
+         m30g==
+X-Gm-Message-State: ABy/qLZary7B+yntbsw5jZhR8xfzhDUXBmnQ//jHtvbVXfO7zmqRIuFs
+        t/efXwhPJWp0dyXarpRGqwKTjQqLtwg=
+X-Google-Smtp-Source: APBJJlH1niyzp4cjBeRls9BsaNe03YLK4iKuUQJEO3t7N9JW3OW9U+d5kcfXqA22KUPE/pwVy1vkIiRVphQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:cc82:0:b0:d0d:cce3:d32d with SMTP id
- l124-20020a25cc82000000b00d0dcce3d32dmr41470ybf.6.1690300594623; Tue, 25 Jul
- 2023 08:56:34 -0700 (PDT)
-Date:   Tue, 25 Jul 2023 08:56:32 -0700
-In-Reply-To: <20230725103945.wfa5zdupen3oo6xl@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a25:46d4:0:b0:cf9:3564:33cc with SMTP id
+ t203-20020a2546d4000000b00cf9356433ccmr81585yba.13.1690301041144; Tue, 25 Jul
+ 2023 09:04:01 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 09:03:59 -0700
+In-Reply-To: <DS0PR11MB637386533A4A10667BA6DF03DC03A@DS0PR11MB6373.namprd11.prod.outlook.com>
 Mime-Version: 1.0
-References: <20230722012350.2371049-1-seanjc@google.com> <20230722012350.2371049-4-seanjc@google.com>
- <20230725103945.wfa5zdupen3oo6xl@linux.intel.com>
-Message-ID: <ZL/wsIVpcpKs/9Nq@google.com>
-Subject: Re: [PATCH 3/5] KVM: x86/mmu: Harden TDP MMU iteration against root
- w/o shadow page
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
+ <DS0PR11MB637386533A4A10667BA6DF03DC03A@DS0PR11MB6373.namprd11.prod.outlook.com>
+Message-ID: <ZL/yb4wL4Nhf9snZ@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Reima Ishii <ishiir@g.ecc.u-tokyo.ac.jp>
+To:     Wei W Wang <wei.w.wang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -69,52 +106,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023, Yu Zhang wrote:
-> On Fri, Jul 21, 2023 at 06:23:48PM -0700, Sean Christopherson wrote:
-> > Explicitly check that tdp_iter_start() is handed a valid shadow page
-> > to harden KVM against bugs where
-> 
-> Sorry, where? 
-
-Gah, I must have seen something shiny when writing the changelog.
-
-> It's not about guest using an invisible GFN, it's about a KVM bug, right?
-
-Yes, the intent is to guard against a KVM bug, e.g. if KVM managed to get into
-the TDP MMU with an invalid root, or a root belonging to a shadow MMU.  I'll fix
-the changelog in v2.
-
-> > Opportunistically stop the TDP MMU iteration instead of continuing on
-> > with garbage if the incoming root is bogus.  Attempting to walk a garbage
-> > root is more likely to caused major problems than doing nothing.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_iter.c | 11 ++++++-----
-> >  1 file changed, 6 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-> > index d2eb0d4f8710..bd30ebfb2f2c 100644
-> > --- a/arch/x86/kvm/mmu/tdp_iter.c
-> > +++ b/arch/x86/kvm/mmu/tdp_iter.c
-> > @@ -39,13 +39,14 @@ void tdp_iter_restart(struct tdp_iter *iter)
-> >  void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
-> >  		    int min_level, gfn_t next_last_level_gfn)
-> >  {
-> > -	int root_level = root->role.level;
-> > -
-> > -	WARN_ON(root_level < 1);
-> > -	WARN_ON(root_level > PT64_ROOT_MAX_LEVEL);
-> > +	if (WARN_ON_ONCE(!root || (root->role.level < 1) ||
-> > +			 (root->role.level > PT64_ROOT_MAX_LEVEL))) {
-> > +		iter->valid = false;
-> > +		return;
+On Tue, Jul 25, 2023, Wei W Wang wrote:
+> On Wednesday, July 19, 2023 7:45 AM, Sean Christopherson wrote:
+> > +int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > +		     gfn_t gfn, kvm_pfn_t *pfn, int *max_order) {
+> > +	pgoff_t index = gfn - slot->base_gfn + slot->gmem.pgoff;
+> > +	struct kvm_gmem *gmem;
+> > +	struct folio *folio;
+> > +	struct page *page;
+> > +	struct file *file;
+> > +
+> > +	file = kvm_gmem_get_file(slot);
+> > +	if (!file)
+> > +		return -EFAULT;
+> > +
+> > +	gmem = file->private_data;
+> > +
+> > +	if (WARN_ON_ONCE(xa_load(&gmem->bindings, index) != slot)) {
+> > +		fput(file);
+> > +		return -EIO;
 > > +	}
-> >  
+> > +
+> > +	folio = kvm_gmem_get_folio(file_inode(file), index);
+> > +	if (!folio) {
+> > +		fput(file);
+> > +		return -ENOMEM;
+> > +	}
+> > +
+> > +	page = folio_file_page(folio, index);
+> > +
+> > +	*pfn = page_to_pfn(page);
+> > +	*max_order = compound_order(compound_head(page));
 > 
-> I saw many usages of WARN_ON_ONCE() and WARN_ON() in KVM. And just wonder,
-> is there any criteria for KVM when to use which?
+> Maybe better to check if caller provided a buffer to get the max_order:
+> if (max_order)
+> 	*max_order = compound_order(compound_head(page));
+> 
+> This is what the previous version did (restrictedmem_get_page),
+> so that callers who only want to get a pfn don't need to define
+> an unused "order" param.
 
-Heh, already a step ahead of you :-)
-
-https://lore.kernel.org/all/20230721230006.2337941-5-seanjc@google.com
+My preference would be to require @max_order.  I can kinda sorta see why a generic
+implementation (restrictedmem) would make the param optional, but with gmem being
+KVM-internal I think it makes sense to require the param.  Even if pKVM doesn't
+_currently_ need/want the order of the backing allocation, presumably that's because
+hugepage support is still on the TODO list, not because pKVM fundamentally doesn't
+need to know the order of the backing allocation.
