@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18E707625A3
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:04:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 998547625A0
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:04:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbjGYWEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 18:04:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47828 "EHLO
+        id S232077AbjGYWEA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 18:04:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232065AbjGYWDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 18:03:09 -0400
+        with ESMTP id S232084AbjGYWDM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 18:03:12 -0400
 Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F303A84
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 15:02:44 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c79a5565aso2793530a12.3
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 15:02:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C17523A8F
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 15:02:46 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5635233876bso3130477a12.0
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 15:02:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690322555; x=1690927355;
+        d=google.com; s=20221208; t=1690322557; x=1690927357;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WsBS7k8bBReIl/gHH9kbfcLhxHw1lqqyuWyKVcuOGx4=;
-        b=e5iRB7HbY0HCZBIgKoiJvs6hXr3F1dZh9Vqp9ysCQoH4sFqmNeYyYZIoneskM/b2UZ
-         KRkXQ+0os9CNXTLr9DJf6yZFGc8ncDPoU8RdJTOOtu4LLMMTgu9t7khqF1FmcdG4ncBR
-         74QSRxpYBnaMb68bqn8yyfjfCd3XanDr7a+bEZ5/nhcEkV2aKsbvrCvijBq42VBcToy2
-         PAlp/Q/RAKe+DE6ULklvTY5fxMlO+aAc23Da+F9mZ0dqqAPib3BzgS3on/B8V0BRwmUW
-         /3VSEF4rSux0iZeMUEO4EeFL7xWfnd2GGMgsZW09mJhdy7kKGI9Cny5iyLqEnSOKreef
-         jL6A==
+        bh=QxayR1+38ThkDfjx5nIpGHvep+dFsgWVyrdLG8WNAS0=;
+        b=iZXgv14xbs4ypE0+fJCZnqh6DPaH9qYrLol9WIcmwWp9hJrEMB06yc5oOt9YfjO/bh
+         HwRybOKK0CbqEO25+XKNEteQEuanv0yjHGEUjLY9Jv8zD2Uc+5BvWqkDWJoQxKNQMvRn
+         aqEfOTamPizEtwUdoyCGVEjqUSUYybSHYXzGVlNbam8Z9CGf0X3DxLb84YUre7PTpAcC
+         Gs9C1FtJwVZ3eXrYO4wb83CPg2gEu/80AkOqMw2s9hLCli3wEAZt2UuvCT9wVOCiIeHf
+         Lz/y69FzGU3OUSPJxChwBoTtdLRRvtEyvQx/DxGJZPrBEXoQjHHOp0inaCBkWv1QukPO
+         /vEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690322555; x=1690927355;
+        d=1e100.net; s=20221208; t=1690322557; x=1690927357;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WsBS7k8bBReIl/gHH9kbfcLhxHw1lqqyuWyKVcuOGx4=;
-        b=S/oq0PIqUyXVKDChFTscv7i0K2s+8ONDUak+wy39rbGb+iPubIOJUE5BG900Qbhin8
-         CGP1euAXSF2H6fi8nRzcdCi/+7+A0p77yzkywgMGWMcLYCIiZNmk+jTMx8B8F/K5lHXe
-         hSSZH+v+5SaZ7oME6WRDCCIerLo2RGJKhRD99ecHRF+EgaJx39gFJucgnnuVj1l/R2Ro
-         n+mmij8GqjedWEyoLa3UQq2QHTn+8CSdvQ3EUyjkAr5jcK18LNDVhlU6hUHQsZB3DovE
-         Y4u6bCfc9vHCGlEvX1/BQ+AHsIMSjz37t3mPwCO9uLehQbPrQMI+4QWN0aKqzKVqn9T8
-         qwqg==
-X-Gm-Message-State: ABy/qLbj7shVJNCfy49Lj1+slwD6Zff3Hn7CG1oFE2JcWLoYyNhmQrtB
-        x2Yoog+2vkPKSiz5qxjkIvKvzhEgiIYR
-X-Google-Smtp-Source: APBJJlHRoMNVyyg+IsDkk5apOFRfJvxDaF0jUd2p0D/mElXiKebhnUs6z5/HZPfO4XBZUEbbn1+u1HIQjkK8
+        bh=QxayR1+38ThkDfjx5nIpGHvep+dFsgWVyrdLG8WNAS0=;
+        b=YYESxJlgwqGkmqEF/OE/5lh5lb7ktHM+8x3ewZdewNsAj1KGSxvGSks+JCkTbK1bV3
+         SKcZWk2ytd7d+20XpoedI3fFYJzrXsMXA4h6IpYS50gKiQR08JyuaxyRX6/RgB/6PlM7
+         n1FG89KYZ9y6Jqq3d9nf+hupqnvYZGfO9i/rvLfA5vjmdSDV8wKn6pCiH1NuuF8Eo8MP
+         71nT4mr8VAC0g3IoBWKOuEKxgU+hS5gq0siXMgWqR9L+lAo4JEU2xcwnF7eTPcVvh5RY
+         yhOKAkAgq0cNNmEandWJJupGjiV3INVxx4Ujr506xUjLewpHtTV3MlCbjrThgTb8mTzI
+         zMyg==
+X-Gm-Message-State: ABy/qLZl8HTBAlGKqKmfDmveiqjI5GyGi+g2D5pS/CYw6bsvoMr1VFoJ
+        0SKK8kZa9P62wR1RYKdHLEHL4O0gWYqn
+X-Google-Smtp-Source: APBJJlHydqjh4hj3f5qsFPJ5aCYtVe+HgpKU8v5JOp0jYz5cex35w2qZKEsoSH46FkLUXlFVI1PI8xvFMtmX
 X-Received: from afranji.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:47f1])
- (user=afranji job=sendgmr) by 2002:a63:7d1a:0:b0:55b:4887:9e99 with SMTP id
- y26-20020a637d1a000000b0055b48879e99mr2179pgc.1.1690322554792; Tue, 25 Jul
- 2023 15:02:34 -0700 (PDT)
-Date:   Tue, 25 Jul 2023 22:01:17 +0000
+ (user=afranji job=sendgmr) by 2002:a63:6f86:0:b0:55a:12cf:3660 with SMTP id
+ k128-20020a636f86000000b0055a12cf3660mr2082pgc.1.1690322556693; Tue, 25 Jul
+ 2023 15:02:36 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 22:01:18 +0000
 In-Reply-To: <20230725220132.2310657-1-afranji@google.com>
 Mime-Version: 1.0
 References: <20230725220132.2310657-1-afranji@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230725220132.2310657-25-afranji@google.com>
-Subject: [PATCH v4 24/28] KVM: selftests: Expose _vm_vaddr_alloc
+Message-ID: <20230725220132.2310657-26-afranji@google.com>
+Subject: [PATCH v4 25/28] KVM: selftests: TDX: Add support for TDG.MEM.PAGE.ACCEPT
 From:   Ryan Afranji <afranji@google.com>
 To:     linux-kselftest@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
@@ -80,45 +80,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Ackerley Tng <ackerleytng@google.com>
 
-vm_vaddr_alloc always allocates memory in memslot 0. This allows users
-of this function to choose which memslot to allocate virtual memory
-in.
-
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-Change-Id: I2755287f0c0c2983d278094776a3c51d1c9ce448
+Change-Id: I93d3c84735df06b300a84c7c7bb66a3128354739
 Signed-off-by: Ryan Afranji <afranji@google.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util_base.h | 3 +++
- tools/testing/selftests/kvm/lib/kvm_util.c          | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h | 2 ++
+ tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c     | 5 +++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index d793355599e1..4d02d1e6eb53 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -511,6 +511,9 @@ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
- void vm_populate_vaddr_bitmap(struct kvm_vm *vm);
- vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
-+vm_vaddr_t _vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
-+			   vm_paddr_t paddr_min, uint32_t data_memslot,
-+			   bool encrypt);
- vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
- vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
- 			    enum kvm_mem_region_type type);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 7db9437505d7..bed218c4f8b4 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1393,7 +1393,7 @@ vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
-  * a unique set of pages, with the minimum real allocation being at least
-  * a page.
-  */
--static vm_vaddr_t
-+vm_vaddr_t
- _vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
- 		vm_paddr_t paddr_min, uint32_t data_memslot, bool encrypt)
- {
+diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+index db4cc62abb5d..b71bcea40b5c 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+@@ -6,6 +6,7 @@
+ #include "kvm_util_base.h"
+ 
+ #define TDG_VP_INFO 1
++#define TDG_MEM_PAGE_ACCEPT 6
+ 
+ #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
+ #define TDG_VP_VMCALL_MAP_GPA 0x10001
+@@ -38,5 +39,6 @@ uint64_t tdg_vp_info(uint64_t *rcx, uint64_t *rdx,
+ 		     uint64_t *r8, uint64_t *r9,
+ 		     uint64_t *r10, uint64_t *r11);
+ uint64_t tdg_vp_vmcall_map_gpa(uint64_t address, uint64_t size, uint64_t *data_out);
++uint64_t tdg_mem_page_accept(uint64_t gpa, uint8_t level);
+ 
+ #endif // SELFTEST_TDX_TDX_H
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+index 061a5c0bef34..d8c4ab635c06 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+@@ -236,3 +236,8 @@ uint64_t tdg_vp_vmcall_map_gpa(uint64_t address, uint64_t size, uint64_t *data_o
+ 		*data_out = args.r11;
+ 	return ret;
+ }
++
++uint64_t tdg_mem_page_accept(uint64_t gpa, uint8_t level)
++{
++	return __tdx_module_call(TDG_MEM_PAGE_ACCEPT, gpa | level, 0, 0, 0, NULL);
++}
 -- 
 2.41.0.487.g6d72f3e995-goog
 
