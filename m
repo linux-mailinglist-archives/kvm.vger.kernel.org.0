@@ -2,95 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD497761A4A
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:45:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B04C0761A80
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:49:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231408AbjGYNpW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 09:45:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39908 "EHLO
+        id S231772AbjGYNtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 09:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbjGYNpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:45:20 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928F51718
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 06:44:47 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PDacrR007779;
-        Tue, 25 Jul 2023 13:44:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=krRXWeR8kg4F4ZIKVb6eM/NqYTdVDVMrBkM8dcEKD04=;
- b=qgKfaAKlsDxPO27CSQLMfUGZ89xdFgBcGqH+mGD4QndGDHxeiR2UyKYLjnp/+iAT0ROK
- At6FcE8YBPC5ZIpCU1YoRU0fG+XdATaeMlkODJ54a94+leHMR7yC/WOsLsvi21i5PuCY
- CKXHxy8BmKI98SsQiPYPh64U0N2DIAM85JHBZhUhrWjoIlYD9pj1ZfMqbC6s/Utd9uY9
- tjLIujVE1wgsQmP0zKny5izZPKFEIywct6PBMK2NS0vAd3LgOn2gwFL8wbuENbVqK2XK
- v95haJ7TAvKj0El3N8jE1NXFVpsjgHo36x4Fcp2T1bnVKZJUqIo9i8CtSJoBRsovnUNn Ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s20jtm4er-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 13:43:59 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PDafJH007999;
-        Tue, 25 Jul 2023 13:43:59 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s20jtm4ee-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 13:43:58 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PCSZUC016601;
-        Tue, 25 Jul 2023 13:43:57 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0v513ry9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 13:43:57 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PDhrwL56492486
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jul 2023 13:43:54 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D940720043;
-        Tue, 25 Jul 2023 13:43:53 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A7902004B;
-        Tue, 25 Jul 2023 13:43:53 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jul 2023 13:43:53 +0000 (GMT)
-Message-ID: <03b689ee0652d4a77607958a21241256e273e85e.camel@linux.ibm.com>
-Subject: Re: [PATCH v21 05/20] s390x/cpu topology: resetting the
- Topology-Change-Report
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Tue, 25 Jul 2023 15:43:53 +0200
-In-Reply-To: <20230630091752.67190-6-pmorel@linux.ibm.com>
-References: <20230630091752.67190-1-pmorel@linux.ibm.com>
-         <20230630091752.67190-6-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        with ESMTP id S231705AbjGYNtf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 09:49:35 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256392D45
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 06:49:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690292963; x=1721828963;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vzmyew1zHaAjyohrBlKaReRdxmqxZXs2iL/nx5P57NQ=;
+  b=LY/Ot1snu/jd6bZgbdtJPw6MJGr3c0/VaQSWsPAM0X8vBpwHHPUFzp6W
+   gy85eIdRJXyWGIZU92uIjPuvWDWJEqnqcq9GhiACbN6wO/PL/cA3F81K0
+   jd4o9rXiJ50H9KyTzXuDpYxywuEmDMmCJNI5KzF087j1322gjhbV5pnHi
+   6YBuQiCdL6e79pcFewjae3Jp/KwyMBaF0XKJImqP2P069/S1hCooKgczP
+   5uhwmRk0iLFO2AypVC205CA9H1yquYl86qm/xJvZXEpbetIvNoG6EkZ1i
+   mYfjrXkftUhVl1KJycDiBTDCyU0AhZV/LLEnK8+Kg3rJdEIW5KWzo7DDx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="347332863"
+X-IronPort-AV: E=Sophos;i="6.01,230,1684825200"; 
+   d="scan'208";a="347332863"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 06:49:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="726119837"
+X-IronPort-AV: E=Sophos;i="6.01,230,1684825200"; 
+   d="scan'208";a="726119837"
+Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 25 Jul 2023 06:49:19 -0700
+Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qOIPe-000AeK-1G;
+        Tue, 25 Jul 2023 13:49:18 +0000
+Date:   Tue, 25 Jul 2023 21:48:22 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Xiong Zhang <xiong.y.zhang@intel.com>, kvm@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, seanjc@google.com,
+        like.xu.linux@gmail.com, weijiang.yang@intel.com,
+        zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com, kan.liang@intel.com,
+        Xiong Zhang <xiong.y.zhang@intel.com>
+Subject: Re: [PATCH] Documentation: KVM: Add vPMU implementaion and gap
+ document
+Message-ID: <202307252116.sD1ngIZF-lkp@intel.com>
+References: <20230724104154.259573-1-xiong.y.zhang@intel.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bpkmBespUAWWyPTE3LDAw2-8QIl23sxW
-X-Proofpoint-GUID: qNyJkbBT7hnqqoq5BjuHATP6BbAl9-DE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
- priorityscore=1501 impostorscore=0 phishscore=0 mlxscore=0 bulkscore=0
- malwarescore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2307250119
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724104154.259573-1-xiong.y.zhang@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,12 +67,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2023-06-30 at 11:17 +0200, Pierre Morel wrote:
-> During a subsystem reset the Topology-Change-Report is cleared
-> by the machine.
-> Let's ask KVM to clear the Modified Topology Change Report (MTCR)
-> bit of the SCA in the case of a subsystem reset.
->=20
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Hi Xiong,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on mst-vhost/linux-next linus/master v6.5-rc3 next-20230725]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Xiong-Zhang/Documentation-KVM-Add-vPMU-implementaion-and-gap-document/20230724-184443
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20230724104154.259573-1-xiong.y.zhang%40intel.com
+patch subject: [PATCH] Documentation: KVM: Add vPMU implementaion and gap document
+reproduce: (https://download.01.org/0day-ci/archive/20230725/202307252116.sD1ngIZF-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307252116.sD1ngIZF-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Documentation/virt/kvm/x86/pmu.rst:104: WARNING: Unexpected indentation.
+>> Documentation/virt/kvm/x86/pmu.rst:104: WARNING: Unexpected section title or transition.
+
+vim +104 Documentation/virt/kvm/x86/pmu.rst
+
+   100	
+   101	When guest no longer access the virtual counter's MSR within a
+   102	scheduling time slice and the virtual counter is disabled, KVM will
+   103	release the kvm perf event.
+ > 104	  ----------------------------
+   105	  |  Guest                   |
+   106	  |  perf subsystem          |
+   107	  ----------------------------
+   108	       |            ^
+   109	  vMSR |            | vPMI
+   110	       v            |
+   111	  ----------------------------
+   112	  |  vPMU        KVM vCPU    |
+   113	  ----------------------------
+   114	        |          ^
+   115	  Call  |          | Callbacks
+   116	        v          |
+   117	  ---------------------------
+   118	  | Host Linux Kernel       |
+   119	  | perf subsystem          |
+   120	  ---------------------------
+   121	               |       ^
+   122	           MSR |       | PMI
+   123	               v       |
+   124	         --------------------
+   125		 | PMU        CPU   |
+   126	         --------------------
+   127	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
