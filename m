@@ -2,133 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B291D761AE4
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 16:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F2A1761BFC
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 16:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232174AbjGYOEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 10:04:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53208 "EHLO
+        id S233364AbjGYOjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 10:39:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232176AbjGYOER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 10:04:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68319102
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 07:03:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690293812;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uGwtpv4sQ6tMlJnBprHpZy+A2shb5owm6FTDMaQEmXQ=;
-        b=Gae9QPUwd73L4jPVSlLXrZewzxhzQ96wh5ezwgeJwXs9IVEcGk3LaIliP1VHKvLqes32c0
-        NtqYS7QztlGnQAyWGGARz0r8tMzeAtJ4RcOdIRaDq5ShduSO77p2NsM8Gc66MuoQqBZhtm
-        e0k+RuUrIF++J3Rool0Z99JWEMUHQoc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-6Rm8MmKNOHWhykYVvveAzQ-1; Tue, 25 Jul 2023 10:03:26 -0400
-X-MC-Unique: 6Rm8MmKNOHWhykYVvveAzQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3fd2e59bc53so14941415e9.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 07:03:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690293799; x=1690898599;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uGwtpv4sQ6tMlJnBprHpZy+A2shb5owm6FTDMaQEmXQ=;
-        b=hFzKmcZEl9FWh7svmvanJ/1+Cskcpx1kfKkPzABSSLhwQPe6u27eODoi4ROhXsalUm
-         uYtKfdsWbaDuzo1eXjB4tAuTik6QbCbLxBsjLXN9Jf7gg22hK+Lmwpo7nc3FEm/b9Ph3
-         9v5r8HCOZ3HadfDrLrow2mV4qlVxTL//7wVZVCcnEsSQuxSyiL7id4MRAe6nRe+b9w3W
-         /Mx5ckJCidk06+eoZF2/GxR/bg1E/aMWRn3ejbb5OZ4Saesi0hZjgatlQyOp2i0HOkNJ
-         Mq5ViS7CEk08BN8dxoYCmLwjc6qsGgTi5Nno9+bu3UMLN9HvfI9c3KN0Eh4yr4qyIUPQ
-         ieHg==
-X-Gm-Message-State: ABy/qLamKtQbSPQ5Kezc9r4jMocSwoxibnsPN6PBf7WGLcG4Dz2jWmVI
-        PY5urlLa6Re+BQTDeakjtBrlGOYj06Nfv3h6vI3FtWMTLwvsLYGvGQ1EKSirNNLYXxxyTT5th6C
-        DjlXn0JGcQdvj
-X-Received: by 2002:a05:600c:2981:b0:3fb:b890:128b with SMTP id r1-20020a05600c298100b003fbb890128bmr9613811wmd.27.1690293798852;
-        Tue, 25 Jul 2023 07:03:18 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGWt7E0uSkTs/ryo2PFkVv/T+3yWUu9tffF3NSN1ZjOzS6i3uoLFxbI/VM6mSJfkjz65gbRPQ==
-X-Received: by 2002:a05:600c:2981:b0:3fb:b890:128b with SMTP id r1-20020a05600c298100b003fbb890128bmr9613787wmd.27.1690293798543;
-        Tue, 25 Jul 2023 07:03:18 -0700 (PDT)
-Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id s15-20020a05600c044f00b003fbc89af035sm13424142wmb.17.2023.07.25.07.03.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 07:03:18 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@intel.com>
-Cc:     Nadav Amit <namit@vmware.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-trace-kernel@vger.kernel.org" 
-        <linux-trace-kernel@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>, bpf <bpf@vger.kernel.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 20/20] x86/mm, mm/vmalloc: Defer
- flush_tlb_kernel_range() targeting NOHZ_FULL CPUs
-In-Reply-To: <20230725132155.GJ3765278@hirez.programming.kicks-ass.net>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-21-vschneid@redhat.com>
- <188AEA79-10E6-4DFF-86F4-FE624FD1880F@vmware.com>
- <xhsmh8rb5tui1.mognet@vschneid.remote.csb>
- <2284d0db-f94a-e059-7bd0-bab4f112ed35@intel.com>
- <20230725132155.GJ3765278@hirez.programming.kicks-ass.net>
-Date:   Tue, 25 Jul 2023 15:03:15 +0100
-Message-ID: <xhsmhr0owrsv0.mognet@vschneid.remote.csb>
+        with ESMTP id S233247AbjGYOjU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 10:39:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DDFA1999;
+        Tue, 25 Jul 2023 07:39:17 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PE8EMO023252;
+        Tue, 25 Jul 2023 14:39:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=wu3B0hpZD/zo6Hxv6q5CzIkc7w68SW69q6uSI+uwjHQ=;
+ b=IOtdaDbznB6oSz3/XE3h5w0X338v/ZfPQE+g+ubjsfVeAlbsUJKPveKheMEwKCLq9ZpX
+ Hc85nFQ2S065ctrIVV36QhBQq8ra2G1ff4rqMeg+2mtuFp2t7OqTI35nEsJk5i8YNGHr
+ WRMhoTgqmBwohuC+BQZait3ku6zzGWURcCGVCBM3JBGDAZNDwsMev8NZCq2p9C34kfpA
+ XKLsfYNbRobn6S8zcS+OFIhv6LPXvEK8bQcH6g9Yj7uT83x4lQLGi7nbIdBcidjCnsvy
+ AH3q+40daWSx8x10f6EYejbBnR0CVnxy1hJTowQxsII5QW2OKN/HPFqNfmp6WcPcXYjB 2w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2942ch7w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 14:39:16 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PE8nCM027253;
+        Tue, 25 Jul 2023 14:39:15 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2942cgsw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 14:39:13 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PEF0Ca001872;
+        Tue, 25 Jul 2023 14:39:03 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unjcb5e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 14:39:03 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PEd0LH59900386
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Jul 2023 14:39:00 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 896B82004E;
+        Tue, 25 Jul 2023 14:39:00 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 529B02004B;
+        Tue, 25 Jul 2023 14:39:00 +0000 (GMT)
+Received: from heavy.boeblingen.de.ibm.com (unknown [9.155.200.166])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Jul 2023 14:39:00 +0000 (GMT)
+From:   Ilya Leoshkevich <iii@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Freimann <jfreimann@redhat.com>,
+        Ilya Leoshkevich <iii@linux.ibm.com>
+Subject: [PATCH v4 0/6] KVM: s390: interrupt: Fix stepping into interrupt handlers
+Date:   Tue, 25 Jul 2023 16:37:15 +0200
+Message-ID: <20230725143857.228626-1-iii@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 7C6GiDpNvidE8ZGQM6E6D548frGwKcnx
+X-Proofpoint-GUID: GrZXOqHWfQPyNrsjmOl2dINRIpGEh5Pg
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ spamscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0 phishscore=0
+ mlxlogscore=916 clxscore=1015 impostorscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307250128
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -136,56 +96,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+v3: https://lore.kernel.org/kvm/20230724094716.91510-1-iii@linux.ibm.com/
+v3 -> v4: Restore the per_event() macro (Claudio).
 
-Sorry, I missed out Dave's email, so now I'm taking my time to page (hah!)
-all of this.
+v2: https://lore.kernel.org/lkml/20230721120046.2262291-1-iii@linux.ibm.com/
+v2 -> v3: Add comments, improve the commit messages (Christian, David).
+          Add R-bs.
+          Patches that need review: [4/6], [6/6].
 
-On 25/07/23 15:21, Peter Zijlstra wrote:
-> On Mon, Jul 24, 2023 at 10:40:04AM -0700, Dave Hansen wrote:
->
->> TLB flushes for freed page tables are another game entirely.  The CPU is
->> free to cache any part of the paging hierarchy it wants at any time.
->> It's also free to set accessed and dirty bits at any time, even for
->> instructions that may never execute architecturally.
->>
->> That basically means that if you have *ANY* freed page table page
->> *ANYWHERE* in the page table hierarchy of any CPU at any time ... you're
->> screwed.
->>
->> There's no reasoning about accesses or ordering.  As soon as the CPU
->> does *anything*, it's out to get you.
->>
+v1: https://lore.kernel.org/lkml/20230629083452.183274-1-iii@linux.ibm.com/
+v1 -> v2: Fix three more issues.
+          Add selftests (Claudio).
 
-OK, I feel like I need to go back do some more reading now, but I think I
-get the difference. Thanks for spelling it out.
+Hi,
 
->> You're going to need to do something a lot more radical to deal with
->> free page table pages.
->
-> Ha! IIRC the only thing we can reasonably do there is to have strict
-> per-cpu page-tables such that NOHZ_FULL CPUs can be isolated. That is,
-> as long we the per-cpu tables do not contain -- and have never contained
-> -- a particular table page, we can avoid flushing it. Because if it
-> never was there, it also couldn't have speculatively loaded it.
->
-> Now, x86 doesn't really do per-cpu page tables easily (otherwise we'd
-> have done them ages ago) and doing them is going to be *major* surgery
-> and pain.
->
-> Other than that, we must take the TLBI-IPI when freeing
-> page-table-pages.
->
->
-> But yeah, I think Nadav is right, vmalloc.c never frees page-tables (or
-> at least, I couldn't find it in a hurry either), but if we're going to
-> be doing this, then that file must include a very prominent comment
-> explaining it must never actually do so either.
->
+I tried to compare the behavior of KVM and TCG by diffing instruction
+traces, and found five issues in KVM related to stepping into interrupt
+handlers.
 
-I also couldn't find any freeing of the page-table-pages, I'll do another
-pass and sharpen my quill for a big fat comment.
+Best regards,
+Ilya
 
-> Not being able to free page-tables might be a 'problem' if we're going
-> to be doing more of HUGE_VMALLOC, because that means it becomes rather
-> hard to swizzle from small to large pages.
+Ilya Leoshkevich (6):
+  KVM: s390: interrupt: Fix single-stepping into interrupt handlers
+  KVM: s390: interrupt: Fix single-stepping into program interrupt
+    handlers
+  KVM: s390: interrupt: Fix single-stepping kernel-emulated instructions
+  KVM: s390: interrupt: Fix single-stepping userspace-emulated
+    instructions
+  KVM: s390: interrupt: Fix single-stepping keyless mode exits
+  KVM: s390: selftests: Add selftest for single-stepping
+
+ arch/s390/kvm/intercept.c                     |  38 ++++-
+ arch/s390/kvm/interrupt.c                     |  14 ++
+ arch/s390/kvm/kvm-s390.c                      |  27 ++-
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/s390x/debug_test.c  | 160 ++++++++++++++++++
+ 5 files changed, 229 insertions(+), 11 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/s390x/debug_test.c
+
+-- 
+2.41.0
 
