@@ -2,159 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6624F7620BB
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 19:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB5A7620CE
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 20:01:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231611AbjGYR62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 13:58:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50694 "EHLO
+        id S231997AbjGYSBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 14:01:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231578AbjGYR60 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 13:58:26 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2089.outbound.protection.outlook.com [40.107.223.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55210BB;
-        Tue, 25 Jul 2023 10:58:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M/TGjoUgOSBM1t+01pnFjVSA/seYc4gqh48pKaRyhYGNF8WJKLNDXpJSbjV+rC69gQsKVPMGsPYJ/6XiPn9ebZmZaCatwg+ElU7/EJgsRNUFnkzI27UJnpwZU5nU4qvn2+mWl335zpYSmK2nr7Izxt64tddyyIs6baCiby+dfmEBwY55g+Nizdfg/FTQbwUcYnNefd07MGfCw7VMRWscQpCVcVGYw/aaudsLxF0haTh9qZZ64dXc77A1XuzndVbpamXYoysJpxkAKfjYS+PHSVaTxIU1Cr3sG2LQkfiuM0JTCrGGDSXBvAVjnHKVUr9/O56wN97Z+uQsQZpIMllEfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=meRP2K0smH/DP9Od0Zk/9waK66Py2ElJdG7sKwsVBb0=;
- b=QypZY8NKQtSstavFni5/Zpv0+HCql0PQZtou/M+ittrw7EFpFcaX4uQYFvRy2/jQeUu/suOcAIRKLrWZRc1+/8mKyI/O8Alk+74ywvWYqboHCwDMjJjw0ym9Wy6Jga5q9MmwFfsEeHidPHoxqFi7kqYjyhZTflWKDzoxI9zFvCEF0jRnq9oRX+4CDQYbh19fEuTPznLH5OH6+PS6qXaU3aypLrHOLtnaPIwDeNPEW/x6+ufS5jo13NjJ90O2uFNPauyGEOQj4acbodfJqo3ILYf2BALJUHK+rIYlT44YWkXXeNM7eiwKUHUrP3GT9u92Aq4mMkdYqg/Pw6LZroyZLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=meRP2K0smH/DP9Od0Zk/9waK66Py2ElJdG7sKwsVBb0=;
- b=bglGT75u6Z+RWMZcIRrUj+eu4Yg+BCZ/NNDDghbPUdQD4b8vRtLS5E1gUTNjDMRUJSWri+VvSCEr9r0Cg1yh7Kv+e+zLRGNCeWPU6HKKcCCgfImlZ6rSG67x0ytFpnCFC8Xrp68J+YVyxx3dUsUyjTDzN6giSC7BHb8DjHC1uoQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by DS7PR12MB6333.namprd12.prod.outlook.com (2603:10b6:8:96::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
- 2023 17:58:23 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::6872:1500:b609:f9cf]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::6872:1500:b609:f9cf%5]) with mapi id 15.20.6609.029; Tue, 25 Jul 2023
- 17:58:22 +0000
-Message-ID: <91d550a7-0759-664d-c31a-4d2b88a4741b@amd.com>
-Date:   Tue, 25 Jul 2023 10:58:19 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v12 vfio 4/7] vfio/pds: Add VFIO live migration support
-Content-Language: en-US
-To:     Simon Horman <simon.horman@corigine.com>,
-        Brett Creeley <brett.creeley@amd.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        shannon.nelson@amd.com
-References: <20230719223527.12795-1-brett.creeley@amd.com>
- <20230719223527.12795-5-brett.creeley@amd.com>
- <ZMAHAE9dnMzKzFgW@corigine.com>
-From:   Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <ZMAHAE9dnMzKzFgW@corigine.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR11CA0093.namprd11.prod.outlook.com
- (2603:10b6:a03:f4::34) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+        with ESMTP id S229828AbjGYSBC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 14:01:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943A91BE
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:00:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690308015;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xe7YC8PFiFz0x9zHH/WNZAVHTrl6dN5xMKZiMTBXnw4=;
+        b=jNf2IrBFblPV09EyBv1wb5OBFkqa0BRYRG2TB1oojO0bNtz5eA04DaykusqznxKG1Na95B
+        9h3X5D4xbjDcE5YwhUY0y4It816+gSqvxef100iaCRRAuoKcpx6pzVcMklWyVTaqVibY+C
+        JOUPPwqDZAlmqrpTlce0IxgE7qKMpzY=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-F6pUP6_QPIeG5DachHZZ8g-1; Tue, 25 Jul 2023 14:00:13 -0400
+X-MC-Unique: F6pUP6_QPIeG5DachHZZ8g-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7873f24e7edso396372439f.3
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 11:00:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690308012; x=1690912812;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Xe7YC8PFiFz0x9zHH/WNZAVHTrl6dN5xMKZiMTBXnw4=;
+        b=jHwlwUzKojgbCxFWShH+wraAQgHmmX1ao+1YZAiyUSap4qv0d4ZV3414NG7iTG8ueK
+         +T+72n+cwwF8lSVLIh1KiOBMu5eFElRm+8HIef/rKjw0e9Sp2txhpRsFTkc92eQ3TFq1
+         ZF1kVUUPLaLJD9QE8HN2z3DYS3d5TWol8s5JEnkSyiQtwvLTX7/ElAtCRApYFULnjGsz
+         fOMWvqckILiXbbCSbIdREtoKY6nmqzZ8KF5DDnlhF2ZkgYFYPtzUM+DN6d5NRxb6xcRX
+         ALzVO7Db1WOgKDxngNSDA+sbeEM43Q5j0ljuRD1TistYrn5gKb2UzOHmSUeH95jwwscI
+         EH4g==
+X-Gm-Message-State: ABy/qLbB0Icr6DQfSKzPxA9AjsX8AX7W/wc41zOJOpdp9U5YKz22BJRo
+        VKk5ePfIdqKUVpkavxKDSmWbO4hiFFWp6DTbV2e25Git3JQnKwxCKsB4Mpa2FfaW3zaN/TgI1jv
+        bW4met7nDnMG2
+X-Received: by 2002:a05:6602:2152:b0:783:39e9:e05c with SMTP id y18-20020a056602215200b0078339e9e05cmr4017863ioy.19.1690308012385;
+        Tue, 25 Jul 2023 11:00:12 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEswRuWsSRte35iym9JYqbkB3ZMjf8sbcpiuOxEhMW7ciOh8iPue7ZHMMRIzwaONt5+B6ZTvQ==
+X-Received: by 2002:a05:6602:2152:b0:783:39e9:e05c with SMTP id y18-20020a056602215200b0078339e9e05cmr4017834ioy.19.1690308012106;
+        Tue, 25 Jul 2023 11:00:12 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id j13-20020a5e9e4d000000b0078bb0ff8a33sm2828643ioq.44.2023.07.25.11.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 11:00:11 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 12:00:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, kevin.tian@intel.com, joro@8bytes.org,
+        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        xudong.hao@intel.com, yan.y.zhao@intel.com, terrence.xu@intel.com,
+        yanting.jiang@intel.com, zhenzhong.duan@intel.com,
+        clegoate@redhat.com
+Subject: Re: [PATCH v15 00/26] Add vfio_device cdev for iommufd support
+Message-ID: <20230725120009.2ff17e77.alex.williamson@redhat.com>
+In-Reply-To: <20230724130922.5bf567ef.alex.williamson@redhat.com>
+References: <20230718135551.6592-1-yi.l.liu@intel.com>
+        <ZLbEigQvwSZFiCqv@nvidia.com>
+        <20230724130922.5bf567ef.alex.williamson@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS7PR12MB6333:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d89620d-6257-424f-efa2-08db8d38bc87
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BQxm3lFQsoZA3QZHgTtoiNlIAqn2hdD6CXpX0FI8dwWGV2ePIzArkiQeKz6c/+UXFN5VWZOFHRbUuWXDmEtJLPxHGfA2E4H0UplsBh0Iwbll9CU6knKNIODC2o8tcKkVCxWOcPCuXETEj7iY7KF2iGPY+nPZPchxsXV6lxb8Unz4+rTZYOm6t+XgjBRJQWxWHd0aOXxRRwx+wvx86bFbZtmr5ompsPFsakHiWdq+Doyy7Q5S6CRNhnOGZFLBemiBulr48dIYcQ0SMeJL7mo96injNuWww2QhkklnKQGgRcmVryCnnlGzpWmuvl4zL3aP66ypyywm7vwndgh/xX3qgko/X/GyEa3TvFT6r46gLnw7GftxE4+8eDAPxaYu2zVdguXCvx+76WdIRjhSTorTSgifjgglkO6T1uD4MEHci6mIK4E5SWm39lHRFESh9HaeKkTZpqgF9ChDbaHQRKOyIVwkQukvkS+wxlta5truAFLCE5QO46Mg6TwpeX5OgMTYvSGlaUNdJ2hu5StBFB0NNOUn0cF5/oGe2XH1V3P4q0uR2sJ7Ywwiz/L1sJQomLby4CbucNnphxyK0eOn5PDWAd2f7ODX/iJuNjs6UAUToQlT6Lh9DlXZJRMZdxc5z7cVYuVH9Cz2GBYbqopaEboXhQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(451199021)(4744005)(66946007)(66556008)(66476007)(2616005)(36756003)(83380400001)(31696002)(38100700002)(6512007)(478600001)(110136005)(966005)(6486002)(186003)(53546011)(26005)(6506007)(6666004)(6636002)(31686004)(41300700001)(5660300002)(316002)(2906002)(4326008)(8676002)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TE1PS25YM216dGhHSmhzc0tLc3g1ZkgyNjhRVE5TYXBZb3V6VXdnWTFXWkM0?=
- =?utf-8?B?SVlMVUlYNWkwVldjdDFmMjBQSXRMNEFFbW5hZlpkakhDWnZ5N2RWK0E1WDZT?=
- =?utf-8?B?OGFSb0xhYkdMY0xWemVncEE2OEl2bmNmaTZrOFlUL3dFT3BPOTluSnZtMXpU?=
- =?utf-8?B?blRKTFRJUXJzMnRQdjJrWVkrZldSc1NaVU5zcFJUUGJubkdPU3dIbVNaaFk4?=
- =?utf-8?B?amgwRHdRTUJ0c0Mrck1HUXRTWENTVFp3L1FURzlCUkZ6eU1UaGl3ampxbXpF?=
- =?utf-8?B?a1lnOUFudEFUR01YWXpnVVBRb0hFYXhjcnRJUjRMeUw5NWtmdzNGeVdHZjVC?=
- =?utf-8?B?OGlldVZ5dnVGZmhrY0dwRkllNEY2c2E1cEVKVG90VW1mK1NjVzN3V29Rd2Zi?=
- =?utf-8?B?dXB2YTducEZiVUF5UEVmZkoxNUlYaE1Ob1lzMHpBWkQyTU9SSjFrdU8rODI0?=
- =?utf-8?B?ZGVrVmUvdVA5L1RhUGtTb0VJYzRicURmU1k1aE01a3QvUDdsM0VMZzNrMHNF?=
- =?utf-8?B?OTA5NktwT2Vwb0pPd3RGY3VyQmJGOEp2ZEdieUZqR0ZrWENrNUlicktGV2pW?=
- =?utf-8?B?clR5QktZTkZLVTFEbGtkWTRLQ2JmZnJCbys0S1o1ZXdiWVhFdFJSUHkxMnNa?=
- =?utf-8?B?Q1RRckZSRDVGNUV5SHlZa2JQc3hBRGhEUXE5TmNiaFc4d0dQNlJ6QVQyNEtJ?=
- =?utf-8?B?dDdHbFJHM0JVcVZEZTFMK3QxNVBPKzJtSTFYcld0VXFqQWhrdE1zemxEa3h5?=
- =?utf-8?B?WG9DczByL0xrczVITmc5U0J1WlZ2QWhBcjVxcVVra0llRFVVbjdpN0t6Y05t?=
- =?utf-8?B?S3pqN0h2TGtQdHUyOXJjbnB6RGF3SlIyd2NENmpnTmlzOFo0Q01lOEtpYmdV?=
- =?utf-8?B?MDhSeVJ5TnJUaExVa1lxQm8wa0xpd0NsYUl6NjRQVWhyZTl2N25EZmF0eXcy?=
- =?utf-8?B?N3lVUlF2Vm9JdzdGVkpaK0ZrOEZUOFZrSnkxRUFFQmFnRnp2NkQ1WlloazA5?=
- =?utf-8?B?c3NuWFVQQmRHRzBLL0d6NzJMOXF0ZFBtWVRzci9lWHVOcjhCVVlHQkhLRExE?=
- =?utf-8?B?VGhNUHZuVUNjYW5zdjNJVHNvejk2cWRGeUFyYnZWVCtOMk1lS3RWcjNYWmdl?=
- =?utf-8?B?VkxGeTh0NjNmNW1lcTZ1RUVMTmwyRGthSkcvWjVxZmovYzRGSW9PYzgyd2dO?=
- =?utf-8?B?bXNMdVpuSlh5TUE5QStVdjlKOUhaeDBxTEczRmxjcXlmbWRoM3c2YTNFcDJN?=
- =?utf-8?B?Zlo0SER1TEFhanZ3Ti93TFNSTkNGTWpDaVVPWTRITHcvYkNqOEhBRURLcG1X?=
- =?utf-8?B?K1haK1N2UWNBc3hYcHhsUC80T2hvc1A5WFdwQ0NnVHN0V2xXUXI5ZUxtWDdL?=
- =?utf-8?B?Tk4zRFBscFZUbVhOcWxWUFhoVGlXTTNlUW1YOUM4djRKVks1RkRzTldDQlNv?=
- =?utf-8?B?czJQMkdlcUl2SjdYbGx1T0h6aXU0QzV3K2QySjlPblZyK2VXSk5YcUhLbktl?=
- =?utf-8?B?OG0rU2VSY1dacTE5OEtCQnVqR2g3Tlp1Z0s1VkZHaXFiQ0diaTlOM3JFa2tr?=
- =?utf-8?B?SnhWcGkzZncxRjRvK0ZSQm1oWTNrZjZwL0EyMkpsTkorZ2hrSFdsUVVoaFdm?=
- =?utf-8?B?YU9lQlhZWXl2d0t1NFBRcExSQkl0UjdGdjhqSTBjM3dXMkdzWkNZeWx4ZXMw?=
- =?utf-8?B?SkNRbkNQaGVoZGV4N1lEb2FRRDRGSEZ0WjFDMGsvR09EemlNZmJiZFBETjRl?=
- =?utf-8?B?cnoxOEpQLzZmMys4ZGJhUkt1MGhTdFlnTHl4cjNjTWl3cnh4R2MxY0lNMVZv?=
- =?utf-8?B?SmRWdkp2Rk4zTnFRQmc5K1QveHpGa3MzdG4xazBhRllsTWlqaERualdvN25U?=
- =?utf-8?B?WXJBM1UwVjRyL1dUa25vRG4yQ292UHhaelJCbWMwank0bEJ3aGNHdmkzTDZi?=
- =?utf-8?B?anJFN0IvYWd4aXNuVWtxR0lNSG1BNkRnL3ZjS2ZvQUJyS0k0ZDNoUHArbDZK?=
- =?utf-8?B?Y294ekE3b0RYVDBzWGg5aC9aRDJ5RFdBQ1VPS2V2bnllR2JEVytuNVlGekpo?=
- =?utf-8?B?U29zWkhMOWNUc2llLzdNa3RwRTFQMVAwUlJPY2VJbzhGQ0ZVNXhocHk0Ym9G?=
- =?utf-8?Q?axIIB6iHQeY5C0kNHICLnBhUc?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d89620d-6257-424f-efa2-08db8d38bc87
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 17:58:22.5662
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N7MnBbgPisGyyPBOD9cUbrXKjXO5+P++DzAwXXIxVNy0ny/926V9gOlFqYoHZ9H9xeRIvrDS1EVSK5ZA13obfQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6333
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 24 Jul 2023 13:09:22 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
+> On Tue, 18 Jul 2023 13:57:46 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> 
+> > On Tue, Jul 18, 2023 at 06:55:25AM -0700, Yi Liu wrote:  
+> > > Existing VFIO provides group-centric user APIs for userspace. Userspace
+> > > opens the /dev/vfio/$group_id first before getting device fd and hence
+> > > getting access to device. This is not the desired model for iommufd. Per
+> > > the conclusion of community discussion[1], iommufd provides device-centric
+> > > kAPIs and requires its consumer (like VFIO) to be device-centric user
+> > > APIs. Such user APIs are used to associate device with iommufd and also
+> > > the I/O address spaces managed by the iommufd.
+> > > 
+> > > This series first introduces a per device file structure to be prepared
+> > > for further enhancement and refactors the kvm-vfio code to be prepared
+> > > for accepting device file from userspace. After this, adds a mechanism for
+> > > blocking device access before iommufd bind. Then refactors the vfio to be
+> > > able to handle cdev paths (e.g. iommufd binding, no-iommufd, [de]attach ioas).
+> > > This refactor includes making the device_open exclusive between the group
+> > > and the cdev path, only allow single device open in cdev path; vfio-iommufd
+> > > code is also refactored to support cdev. e.g. split the vfio_iommufd_bind()
+> > > into two steps. Eventually, adds the cdev support for vfio device and the
+> > > new ioctls, then makes group infrastructure optional as it is not needed
+> > > when vfio device cdev is compiled.
+> > > 
+> > > This series is based on some preparation works done to vfio emulated devices[2]
+> > > and vfio pci hot reset enhancements[3]. Per discussion[4], this series does not
+> > > support cdev for physical devices that do not have IOMMU. Such devices only
+> > > have group-centric user APIs.
+> > > 
+> > > This series is a prerequisite for iommu nesting for vfio device[5] [6].
+> > > 
+> > > The complete code can be found in below branch, simple tests done to the
+> > > legacy group path and the cdev path. QEMU changes are in upstreaming[7]
+> > > and the complete code can be found at[8]
+> > > 
+> > > https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_v15
+> > > (config CONFIG_IOMMUFD=y CONFIG_VFIO_DEVICE_CDEV=y)    
+> > 
+> > Alex, if you are still good with this lets make this into a shared
+> > branch, do you want to do it or would you like a PR from me?  
+> 
+> Sorry, was out much of last week.  Yes, my intent would be to put this
+> both in a shared branch and my next branch for v6.6.  Given this is
+> mostly vfio, it seems like it'd make sense for me to provide that
+> branch but I may not get to it until tomorrow.  Thanks,
 
-On 7/25/2023 10:31 AM, Simon Horman wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> On Wed, Jul 19, 2023 at 03:35:24PM -0700, Brett Creeley wrote:
-> 
-> ...
-> 
->> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
-> 
-> ...
-> 
->> +static int pds_vfio_get_save_file(struct pds_vfio_pci_device *pds_vfio)
->> +{
->> +     struct device *dev = &pds_vfio->vfio_coredev.pdev->dev;
->> +     struct pds_vfio_lm_file *lm_file;
->> +     int err;
->> +     u64 size;
-> 
-> Hi Brett,
-> 
-> please use reverse xmas tree - longest line to shortest -
-> for these local variable declarations.
-> 
-> https://github.com/ecree-solarflare/xmastree is your friend here.
+Both series are applied to my next branch for v6.6 and I've also
+published them to the v6.6/vfio/cdev branch[1].  Thanks for all the
+work and collaboration on this effort!
 
-Ah, good catch and thanks for the reference. Will fix on v13.
+Alex
+
+[1]https://github.com/awilliam/linux-vfio/tree/v6.6/vfio/cdev
+
