@@ -2,137 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 841307604BB
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 03:34:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F237E76049D
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 03:13:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbjGYBeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jul 2023 21:34:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49974 "EHLO
+        id S229735AbjGYBNw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jul 2023 21:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbjGYBeS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jul 2023 21:34:18 -0400
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2134.outbound.protection.outlook.com [40.107.7.134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F12171E
-        for <kvm@vger.kernel.org>; Mon, 24 Jul 2023 18:34:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LL8G1yMLDQ6udxEclClOyZOQKf1YLhBuv8vLlSjfa4CFudCPSTTJaVyEkLhEH0BdfeNVycynMAY2z4KOICQtCsRI3Di0j5W/GSBmBODZuN+QS7pWB5l4J8bMBtFH/gVThv6UrISxwnHJyolqqzI0pV/TBxsItfwOpU5ohirWhhVXp9+mPNsKUjnsdI8Av3bpWXeEQcYpQwcrKrL9m2I0RrtOt6yEss+dVi07O5sSX4bi+Ag+0NcSeaxMpP7c8D9HoQqdjjtcRMpzB5dzwxd9rz5+noAhwZA7mpDfWOVaMkiDUjyPuqpE4f5InWOdZISxg1GOkzASOURkjAbGP5FJPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JJpkXDrrYtPjmOG9U550vpmdXL2p3locVChjL8bTHik=;
- b=jD4SD1oK35/RlhenFAq0YGm4oXaJmYOyHDwToL6tcOlOAm/a1LC5fDS+imUJPbEjwBOL5z+TXhyRooM2XqDl0lkqx9K6zmKg4btMS5e9/4A6unozlERNB3viNMQ1snSIhKu5CCB75l0Zd516jMyGrcdj4Cett1Z9RFqwmfMeH0dPMAq1whG56XcbUrDkLCuASpvkD2Das3QnrFn5Q8OJXq5ny2dGR0d1C7ndbwqenR1Hz9tJ7q9BZ7vf+ScGhmVBWqECUOA0ZG5Goi3U7jXCuhhLDgos4MvFnxUn/QDt1zKjvYjnmmrM75Fol8nU0Q2EskjDR6w+SXjhcpLd3+bV1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 147.33.15.5) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=vscht.cz;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=vscht.cz; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vscht.cz; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JJpkXDrrYtPjmOG9U550vpmdXL2p3locVChjL8bTHik=;
- b=d0kuYr/vIXPZvUhVu193oeml4j0Cj4JoC4Z90eDC8fVGzFfQYcjrLqN668swUDqYXdTPZlyE28Gnv/5DYwfaUoDrnzuObQAz/i7kBo1xh5FLOEJ5L+7y9lA5h743JoBh/rBmPCxdFbnAxD8R3fu/9RnfQ3//eiGhYGE/2vrrXVk=
-Received: from DUZPR01CA0117.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4bc::23) by AM8PR05MB7538.eurprd05.prod.outlook.com
- (2603:10a6:20b:1d1::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
- 2023 01:34:13 +0000
-Received: from DB5EUR01FT052.eop-EUR01.prod.protection.outlook.com
- (2603:10a6:10:4bc:cafe::79) by DUZPR01CA0117.outlook.office365.com
- (2603:10a6:10:4bc::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31 via Frontend
- Transport; Tue, 25 Jul 2023 01:34:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 147.33.15.5)
- smtp.mailfrom=vscht.cz; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=vscht.cz;
-Received-SPF: Pass (protection.outlook.com: domain of vscht.cz designates
- 147.33.15.5 as permitted sender) receiver=protection.outlook.com;
- client-ip=147.33.15.5; helo=ns.vscht.cz; pr=C
-Received: from ns.vscht.cz (147.33.15.5) by
- DB5EUR01FT052.mail.protection.outlook.com (10.152.5.248) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.25 via Frontend Transport; Tue, 25 Jul 2023 01:34:12 +0000
-Received: from smtp-rtr.vscht.cz (smtp-rtr.vscht.cz [147.33.10.25])
-        by ns.vscht.cz (8.14.7/8.14.7) with ESMTP id 36P1YBq4023184
-        (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO)
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 03:34:11 +0200
-Received: from proxy51.vscht.cz (proxy51.vscht.cz [147.33.10.51])
-        by smtp-rtr.vscht.cz (Postfix) with ESMTPS id 870E6600049
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 03:34:11 +0200 (CEST)
-X-ASG-Debug-ID: 1690248845-15854f4f7732abf0002-HEqcsx
-Received: from mailex.vscht.cz (cln96.vscht.cz [147.33.90.96]) by proxy51.vscht.cz with ESMTP id 9gubpGo209MD9ux2 (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Tue, 25 Jul 2023 03:34:06 +0200 (CEST)
-X-Barracuda-Envelope-From: khailoy@vscht.cz
-X-Barracuda-Effective-Source-IP: cln96.vscht.cz[147.33.90.96]
-X-Barracuda-Apparent-Source-IP: 147.33.90.96
-Received: from cln95.vscht.cz (147.33.90.95) by cln96.vscht.cz (147.33.90.96)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 25 Jul
- 2023 03:06:04 +0200
-Received: from cln95.vscht.cz ([147.33.90.95]) by cln95.vscht.cz
- ([147.33.90.95]) with mapi id 15.01.2507.027; Tue, 25 Jul 2023 03:06:04 +0200
-From:   Khailo Yelyzaveta <Yelyzaveta.Khailo@vscht.cz>
-Subject: =?ks_c_5601-1987?B?u/W3zr/uILjevcPB9rChILW1wvjH373AtM+02Q==?=
-Thread-Topic: =?ks_c_5601-1987?B?u/W3zr/uILjevcPB9rChILW1wvjH373AtM+02Q==?=
-X-ASG-Orig-Subj: =?ks_c_5601-1987?B?u/W3zr/uILjevcPB9rChILW1wvjH373AtM+02Q==?=
-Thread-Index: AQHZvpQv6NC01zuLpUKjaBoHBqcCOg==
-Date:   Tue, 25 Jul 2023 01:06:04 +0000
-Message-ID: <9a077352f3e94cef8280a3fc0c7e9730@vscht.cz>
-Accept-Language: ru-UA, cs-CZ, en-US
-Content-Language: aa
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [147.33.93.20]
-Content-Type: text/plain; charset="ks_c_5601-1987"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229459AbjGYBNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jul 2023 21:13:51 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CDA07DF;
+        Mon, 24 Jul 2023 18:13:48 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8CxtPDLIb9kBX8JAA--.24167S3;
+        Tue, 25 Jul 2023 09:13:47 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxbSPGIb9kHvg5AA--.41852S3;
+        Tue, 25 Jul 2023 09:13:42 +0800 (CST)
+Message-ID: <5cb437f8-2e33-55b2-d5e4-2c5757af8b44@loongson.cn>
+Date:   Tue, 25 Jul 2023 09:13:42 +0800
 MIME-Version: 1.0
-X-Barracuda-Connect: cln96.vscht.cz[147.33.90.96]
-X-Barracuda-Start-Time: 1690248846
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://147.33.10.51:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at vscht.cz
-X-Barracuda-Scan-Msg-Size: 271
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Spam-Score: 2.02
-X-Barracuda-Spam-Status: No, SCORE=2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=6.0 tests=BSF_SC0_MV0028, EMPTY_TO_HEADER, MISSING_HEADERS, MISSING_HEADERS_2, NUMERIC_HTTP_ADDR, TO_CC_NONE
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.111829
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
-        0.01 EMPTY_TO_HEADER        Custom rule EMPTY_TO_HEADER
-        0.00 MISSING_HEADERS        Missing To: header
-        0.00 NUMERIC_HTTP_ADDR      URI: Uses a numeric IP address in URL
-        0.00 TO_CC_NONE             No To: or Cc: header
-        1.21 MISSING_HEADERS_2      Missing To: header
-        0.80 BSF_SC0_MV0028         Custom Rule BSF_SC0_MV0028
-To:     Undisclosed recipients:;
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB5EUR01FT052:EE_|AM8PR05MB7538:EE_
-X-MS-Office365-Filtering-Correlation-Id: f7de4dbd-62c4-4809-1a02-08db8caf4036
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: afy2gb95XN8t9+4hOXnvw0+mMtOocPCe4RFARmmoRoKFDGcsbIARrtjjUBgLctsTzMZYkpEWlvJBtPELKmv14ESUwyfAxeFPOvZTgoaRqjpi2m/HpRtg1SCZOpiQTTKu8m9Zl6IJlSm4tapb/NoQOcIkERcEIgJJrGdoL8yVNk0OM1bXqfQT8NkJT6rueme/bxA1jaeSvdwf6ZyjUYZpTlSCb44T2bk3npHjeVA8d/tOMFoROyqdMBGBELSxcLk+J0yVliutabIcrCH/XE/QlTVY7hG5lIp88t0s0Woxo4FjEHVHO8+byE2xtZUTsbJI4E6yrHve+CgQ86Utfm8i+VM59X5d1Zdb661McMSahcQ3ERpsPTCSePyrbTsYMskZTLh6GhXaOJk+O15gQpXZ9RHUb+8fZuAV6ZikaifmjGta+PbEDInJ14J65hsMTCLgx1itfB+WQfTSOMXLyxueSEn1FwD/yrdSM74mfxbSYNDSEjuZf/k4CnIG1xDrTDvHlQhetSOyDqvJkL9ndlH+/9Nm9SJ+RRxcYnky7QUN5uDbM1ShM4aa28XfW/7XCtltbrGPMRj99lbu0gm1VoNw61RvvxS10QyIAJ9SDvHdOjru/9kImKE7JRbtk/4fFnI7S82UyTsbbP99bMAOsMCeSu/mkIdx7hHIULo8p7P9TGsF6o6D3dx1XpN02O00NB6nX77fNG7TsaAlVVzrsCkcN+YKeZQHrtx6VWZgN1wr4XpCW1dFQOd/WMcFydzLgz+r
-X-Forefront-Antispam-Report: CIP:147.33.15.5;CTRY:CZ;LANG:ko;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ns.vscht.cz;PTR:ns.vscht.cz;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(376002)(39850400004)(451199021)(82310400008)(109986019)(40470700004)(46966006)(36840700001)(36756003)(224303003)(558084003)(2906002)(66899021)(40480700001)(47076005)(336012)(186003)(426003)(36860700001)(26005)(574094003)(7596003)(7636003)(356005)(7696005)(24736004)(478600001)(108616005)(40460700003)(70206006)(70586007)(8936002)(956004)(2616005)(786003)(316002)(45080400002)(82740400003)(41300700001)(5660300002)(10412655002);DIR:OUT;SFP:1102;
-X-OriginatorOrg: vscht.cz
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 01:34:12.6728
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7de4dbd-62c4-4809-1a02-08db8caf4036
-X-MS-Exchange-CrossTenant-Id: a5085469-d927-486a-966e-f350bf2fe08a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a5085469-d927-486a-966e-f350bf2fe08a;Ip=[147.33.15.5];Helo=[ns.vscht.cz]
-X-MS-Exchange-CrossTenant-AuthSource: DB5EUR01FT052.eop-EUR01.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR05MB7538
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+Content-Language: en-US
+To:     Salil Mehta <salil.mehta@huawei.com>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Salil Mehta <salil.mehta@opnsrc.net>,
+        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
+References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+ <2fa14ef5-b2f7-459d-8b84-114d36ba3cf7@loongson.cn>
+ <d13c4cb44a2b4b42a8b534c38c402a1d@huawei.com>
+From:   bibo mao <maobibo@loongson.cn>
+In-Reply-To: <d13c4cb44a2b4b42a8b534c38c402a1d@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8CxbSPGIb9kHvg5AA--.41852S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3JFyktw1rZFy5Gw4rKFW7trc_yoW7tryxpF
+        WrGFs0grWkJr40kw4vvFy5uFWYvrW8Jay2qrn3try8ua4DAFn7Cr4S9a15uF9xZF1xCFyI
+        vF1avr97ua45XFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUd529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+        6r4j6r4UJwAaw2AFwI0_Jw0_GFyle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+        Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_
+        WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+        CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48J
+        MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r4a6rW5MI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1l
+        IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUeVpB3UUUU
+        U==
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCn6/obDUICAgIG0qKioqKioqQHNudS5hYy5rcjxodHRwczovLzU1NTY4MzRzbnUtYWMta3Iu
-d2VlYmx5LmNvbS8+ICwNCg0KTWljcm9zb2Z0IFRlYW1zwMcgv6y29MOzv6G8rSC6uLO9IDews8DH
-ILv1ILjevcPB9rChIMDWvcC0z7TZLg0KDQpzZW5kZXI6IGEqKioqKioqQHNudS5hYy5rcjxodHRw
-czovLzU1NTY4MzRzbnUtYWMta3Iud2VlYmx5LmNvbS8+DQoNCrjevcPB9iDA0LHiPGh0dHBzOi8v
-NTU1NjgzNHNudS1hYy1rci53ZWVibHkuY29tLz4NCg0KsPy4rsDaDQoNCg==
+
+
+在 2023/7/25 08:56, Salil Mehta 写道:
+> Hi Bibo,
+> 
+>> From: bibo mao <maobibo@loongson.cn>
+>> Sent: Tuesday, July 25, 2023 1:29 AM
+>> To: Salil Mehta <salil.mehta@huawei.com>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>; Marc Zyngier <maz@kernel.org>; Will Deacon
+>> <will@kernel.org>; christoffer.dall@arm.com; oliver.upton@linux.dev;
+>> mark.rutland@arm.com; pbonzini@redhat.com; Salil Mehta
+>> <salil.mehta@opnsrc.net>; andrew.jones@linux.dev; yuzenghui
+>> <yuzenghui@huawei.com>; kvmarm@lists.cs.columbia.edu; linux-arm-
+>> kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+>> kvm@vger.kernel.org; qemu-devel@nongnu.org; james.morse@arm.com;
+>> steven.price@arm.com; Suzuki K Poulose <suzuki.poulose@arm.com>; Jean-
+>> Philippe Brucker <jean-philippe@linaro.org>; kvmarm@lists.linux.dev; linux-
+>> coco@lists.linux.dev
+>> Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+>> might require ARM spec change?
+>>
+>> Is vcpu hotplug supported in arm virt-machine now?
+> 
+> Not yet. We are working on it. Please check the RFCs being tested.
+> 
+> 
+> [1] Pre-RFC V2 Changes: Support of Virtual CPU Hotplug for ARMv8 Arch  (WIP)
+>     https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
+> [2] [RFC PATCH 00/32] ACPI/arm64: add support for virtual cpuhotplug  
+>     https://git.gitlab.arm.com/linux-arm/linux-jm.git virtual_cpu_hotplug/rfc/v2
+>     
+>     
+>> There is arm64 vcpu hotplug patch in qemu mailing list, however it is not merged.
+>> I do not know why it is not merged.
+> 
+> 
+> I think you are referring to patches [3], [4]? Please follow the discussion
+> for details. 
+yeap, we reference the patch [3], [4] and benefit from them greatly -:)
+
+The patch for LoongArch vcpu hotplug link is:
+https://lore.kernel.org/qemu-devel/cover.1689837093.git.lixianglai@loongson.cn/T/#t
+
+
+Regards
+Bibo Mao
+
+> 
+> 
+> [3] [PATCH RFC 00/22] Support of Virtual CPU Hotplug for ARMv8 Arch
+>     https://lore.kernel.org/all/20200613213629.21984-1-salil.mehta@huawei.com/
+> [4] [PATCH RFC 0/4] Changes to Support *Virtual* CPU Hotplug for ARM64
+>     https://lore.kernel.org/all/20200625133757.22332-1-salil.mehta@huawei.com/#r
+> 
+> 
+> In summary, there were some ARM64 Architecture constraints which were being
+> violated in the earlier patches of the kernel [4] so we had to re-think of the
+> kernel changes. The Qemu part mostly remains same with some new introductions
+> of Guest HVC/SMC hyper call exit handling in user space etc. for policy checks
+> in VMM/Qemu. 
+> 
+> 
+> You can follow the KVMForum conference presentations [5], [6] delivered in the
+> year 2020 and 2023 to get hold of more details related to this.
+> 
+> 
+> [5] KVMForum 2023: Challenges Revisited in Supporting Virt CPU Hotplug on architectures that don't Support CPU Hotplug (like ARM64)
+>     https://kvm-forum.qemu.org/2023/talk/9SMPDQ/
+> [6] KVMForum 2020: Challenges in Supporting Virtual CPU Hotplug on SoC Based Systems (like ARM64)
+>     https://kvmforum2020.sched.com/event/eE4m
+> 
+> 
+> 
+>> I ask this question because we propose
+>> similar patch about LoongArch system in qemu mailing list, and kernel need not be
+>> modified for vcpu hotplug.
+> 
+> 
+> Could you please share the link of your patches so that we can have a look and
+> draw a comparison?
+> 
+> 
+> Thanks
+> Salil.
+> 
+>>
+>> Regards
+>> Bibo, mao
+>>
+>> 在 2023/7/19 10:35, Salil Mehta 写道:
+>>> [Reposting it here from Linaro Open Discussion List for more eyes to look
+>> at]
+>>>
+>>> Hello,
+>>> I have recently started to dabble with ARM CCA stuff and check if our
+>>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
+>>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
+>>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
+>>> from the host. This might be required to support vCPU Hotplug feature
+>>> in the realm world in future. vCPU Hotplug is an important feature to
+>>> support kata-containers in realm world as it reduces the VM boot time
+>>> and facilitates dynamic adjustment of vCPUs (which I think should be
+>>> true even with Realm world as current implementation only makes use
+>>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+>>>
+>>>
+>>> As per our recent changes [2], [3] related to support vCPU Hotplug on
+>>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
+>>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
+>>> PSCI_CPU_ON should undergo similar policy checks and I think,
+>>>
+>>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
+>>> 2. This means target REC should be denied by host. Can host call
+>>>    RMI_PSCI_COMPETE in such s case?
+>>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
+>>> 4. Failure condition (B5.3.3.2) should be amended with
+>>>    runnable pre: target_rec.flags.runnable == NOT_RUNNABLE (?)
+>>>             post: result == PSCI_DENIED (?)
+>>> 5. Change would also be required in the flow (D1.4 PSCI flows) depicting
+>>>    PSCI_CPU_ON flow (D1.4.1)
+>>>
+>>>
+>>> I do understand that ARM CCA support is in its infancy stage and
+>>> discussing about vCPU Hotplug in realm world seem to be a far-fetched
+>>> idea right now. But specification changes require lot of time and if
+>>> this change is really required then it should be further discussed
+>>> within ARM.
+>>>
+>>> Many thanks!
+>>>
+>>>
+>>> Bes regards
+>>> Salil
+>>>
+>>>
+>>> References:
+>>>
+>>> [1] https://developer.arm.com/documentation/den0137/latest/
+>>> [2] https://github.com/salil-mehta/qemu.git virt-cpuhp-armv8/rfc-v1-port11052023.dev-1
+>>> [3] https://git.gitlab.arm.com/linux-arm/linux-jm.git virtual_cpu_hotplug/rfc/v2
+
