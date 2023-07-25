@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25C1A76266F
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8070576260B
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 00:18:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232531AbjGYWWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 18:22:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39938 "EHLO
+        id S230038AbjGYWR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 18:17:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232538AbjGYWVx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 18:21:53 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A7E54C13;
-        Tue, 25 Jul 2023 15:17:32 -0700 (PDT)
+        with ESMTP id S232235AbjGYWQO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 18:16:14 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB43430EA;
+        Tue, 25 Jul 2023 15:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690323452; x=1721859452;
+  t=1690323351; x=1721859351;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TZ+z91imsScQD0p1/VsSa1GqbET/iM4ZKqAoChx+Rzg=;
-  b=lQGYEr3YZjBYd+SF5p4667Qd1kzbKVltuGj6HfYHh8bu8EGXK4w9uVCZ
-   sxgw7snhwzIlPucE7KrhdcnSBj5wNxnHWkP4DTMBhHS05zS1EPUJDddNA
-   6XNPyZmPrYZVBdkeMv4gI6dZ1wIp6WmjxC2uxxCKgbcIVQXh9sU671bJs
-   zMF4GV4RSBqkqdceDZ4ARruNcEeelf8Iaip8gTrY9WtZGDiQ40MbEqAgk
-   fAzre1yDwWCd73ohRkvYVWswI8xv5YQICOYZKiQ+84xNW1l1rGawIW8uQ
-   nR1so/I/YJO8K8W4OmrVBxDBUWQBiYdIM0HshzXBQRvqhTdde6FS9QxlU
+  bh=Wvj0sNH9JtePwrau64elH2rCIjd14dw+JkGIDo/IbFM=;
+  b=Qyx0cowZ3xtSX3QO0zhDTKnQotr9aki1CNjId3JEKoUUMArM0RO65jf+
+   YXI3LG6HarqQDw8YE6P0cBOdPzSGDhyW/XM9whv88l2ydLtNF4e7bHHxi
+   tgWeikVh9QwStZDpWt88uuUMjKKZcfofRBGiEMmVoO+a4OvqbaSyHF78v
+   D2VW0p6QfYbpomBQjU7uZ4Ie6kmHsC0W5eEiYtepse7ID48B0nBC+Tp+P
+   ZpCevIqyt3MDYsf6beMikhHnCl9mCqTtlkbXlN9xTuChK4CoOBpXvQ10/
+   gbYwWfJxgBQeSPp1z3BmFgvxeItknJ9rrQJoxOuB73SExwPCLKj5eNmQr
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="357863354"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="367882511"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="357863354"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:15:49 -0700
+   d="scan'208";a="367882511"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:15:49 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="1056938979"
+X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="840001771"
 X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="1056938979"
+   d="scan'208";a="840001771"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:15:48 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 15:15:49 -0700
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -47,10 +47,11 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         David Matlack <dmatlack@google.com>,
         Kai Huang <kai.huang@intel.com>,
         Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        hang.yuan@intel.com, tina.zhang@intel.com
-Subject: [PATCH v15 057/115] [MARKER] The start of TDX KVM patch series: TD finalization
-Date:   Tue, 25 Jul 2023 15:14:08 -0700
-Message-Id: <7823fd77e8fda53cf5af956449222f5a04d96271.1690322424.git.isaku.yamahata@intel.com>
+        hang.yuan@intel.com, tina.zhang@intel.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v15 058/115] KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
+Date:   Tue, 25 Jul 2023 15:14:09 -0700
+Message-Id: <6a4c029af70d41b63bcee3d6a1f0c2377f6eb4bd.1690322424.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1690322424.git.isaku.yamahata@intel.com>
 References: <cover.1690322424.git.isaku.yamahata@intel.com>
@@ -58,47 +59,116 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-This empty commit is to mark the start of patch series of TD finalization.
+Introduce a helper to directly (pun intended) fault-in a TDP page
+without having to go through the full page fault path.  This allows
+TDX to get the resulting pfn and also allows the RET_PF_* enums to
+stay in mmu.c where they belong.
 
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- Documentation/virt/kvm/intel-tdx-layer-status.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+v14 -> v15:
+- Remove loop in kvm_mmu_map_tdp_page() and return error code based on
+  RET_FP_xxx value to avoid potential infinite loop.  The caller should
+  loop on -EAGAIN instead now.
+---
+ arch/x86/kvm/mmu.h     |  3 +++
+ arch/x86/kvm/mmu/mmu.c | 58 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+)
 
-diff --git a/Documentation/virt/kvm/intel-tdx-layer-status.rst b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-index c4d67dd9ddf8..46ae049b6b85 100644
---- a/Documentation/virt/kvm/intel-tdx-layer-status.rst
-+++ b/Documentation/virt/kvm/intel-tdx-layer-status.rst
-@@ -11,6 +11,7 @@ What qemu can do
- - TDX VM TYPE is exposed to Qemu.
- - Qemu can create/destroy guest of TDX vm type.
- - Qemu can create/destroy vcpu of TDX vm type.
-+- Qemu can populate initial guest memory image.
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 801e3d6b572d..1bca16217da3 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -174,6 +174,9 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+ 	__kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
+ }
  
- Patch Layer status
- ------------------
-@@ -20,8 +21,8 @@ Patch Layer status
- * TDX architectural definitions:        Applied
- * TD VM creation/destruction:           Applied
- * TD vcpu creation/destruction:         Applied
--* TDX EPT violation:                    Applying
--* TD finalization:                      Not yet
-+* TDX EPT violation:                    Applied
-+* TD finalization:                      Applying
- * TD vcpu enter/exit:                   Not yet
- * TD vcpu interrupts/exit/hypercall:    Not yet
++int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
++			 int max_level);
++
+ /*
+  * Check if a given access (described through the I/D, W/R and U/S bits of a
+  * page fault error code pfec) causes a permission fault with the given PTE
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4e9343e759f6..7ef66d8a785b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4673,6 +4673,64 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	return direct_page_fault(vcpu, fault);
+ }
  
++int kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
++			 int max_level)
++{
++	int r;
++	struct kvm_page_fault fault = (struct kvm_page_fault) {
++		.addr = gpa,
++		.error_code = error_code,
++		.exec = error_code & PFERR_FETCH_MASK,
++		.write = error_code & PFERR_WRITE_MASK,
++		.present = error_code & PFERR_PRESENT_MASK,
++		.rsvd = error_code & PFERR_RSVD_MASK,
++		.user = error_code & PFERR_USER_MASK,
++		.prefetch = false,
++		.is_tdp = true,
++		.is_private = error_code & PFERR_GUEST_ENC_MASK,
++		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(vcpu->kvm),
++	};
++
++	WARN_ON_ONCE(!vcpu->arch.mmu->root_role.direct);
++	fault.gfn = gpa_to_gfn(fault.addr) & ~kvm_gfn_shared_mask(vcpu->kvm);
++	fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
++
++	r = mmu_topup_memory_caches(vcpu, false);
++	if (r)
++		return r;
++
++	fault.max_level = max_level;
++	fault.req_level = PG_LEVEL_4K;
++	fault.goal_level = PG_LEVEL_4K;
++
++#ifdef CONFIG_X86_64
++	if (tdp_mmu_enabled)
++		r = kvm_tdp_mmu_page_fault(vcpu, &fault);
++	else
++#endif
++		r = direct_page_fault(vcpu, &fault);
++
++	if (is_error_noslot_pfn(fault.pfn) || vcpu->kvm->vm_bugged)
++		return -EFAULT;
++
++	switch (r) {
++	case RET_PF_RETRY:
++		return -EAGAIN;
++
++	case RET_PF_FIXED:
++	case RET_PF_SPURIOUS:
++		return 0;
++
++	case RET_PF_CONTINUE:
++	case RET_PF_EMULATE:
++	case RET_PF_INVALID:
++	case RET_PF_USER:
++	default:
++		return -EIO;
++	}
++}
++EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
++
+ static void nonpaging_init_context(struct kvm_mmu *context)
+ {
+ 	context->page_fault = nonpaging_page_fault;
 -- 
 2.25.1
 
