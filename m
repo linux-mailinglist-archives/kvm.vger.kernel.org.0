@@ -2,98 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 932B2761AA0
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:53:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0633E76181E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 14:19:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231778AbjGYNxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 09:53:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46714 "EHLO
+        id S233408AbjGYMTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 08:19:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbjGYNxl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:53:41 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2DF1FC4;
-        Tue, 25 Jul 2023 06:53:39 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PDcGth015433;
-        Tue, 25 Jul 2023 13:53:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=kXZ9dUThnLfDHQ7dnAvekKphlAndGEx98WbuUTxGCH4=;
- b=izeabIeanVmrJQdSmfvdysr/NFb185w5BsmvFtNVGxW9kfaRh7Lddey2NSntagLN7U3I
- K2skFaQegJmAySOuMufwD1+L8GOQ4Iv8Jcn0D1Q8q778x1gUE15axRjmWDla9HEf9IYU
- Ys/odZ/QpRmadGkr3t5vWLnIxwFGx6RCc5l7cjZFuMpnc5u7Fjnva5SccVLZyhGJITAB
- 6DoR44H3hcaqFGbC7hrGaI0CNO78d7ptXspgTXsnFiz8DyhjHr5LinpsW0BsZO2e6JuU
- O/hNv9QsCSDNyzIFIki7YKIecMDFpRcu4jC9nimX66uFJWlgm87bgFPsMhaG5n/7HY4S tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2f5e11tw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 13:53:39 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PDcTBi016768;
-        Tue, 25 Jul 2023 13:53:39 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2f5e11tk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 13:53:38 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PC3Jov001872;
-        Tue, 25 Jul 2023 13:53:38 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unjc12h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 13:53:37 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PDrZhi51773900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jul 2023 13:53:35 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0859320040;
-        Tue, 25 Jul 2023 13:53:35 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A45952004D;
-        Tue, 25 Jul 2023 13:53:34 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jul 2023 13:53:34 +0000 (GMT)
-Date:   Tue, 25 Jul 2023 14:04:36 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Ilya Leoshkevich <iii@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 3/6] KVM: s390: interrupt: Fix single-stepping
- kernel-emulated instructions
-Message-ID: <20230725140436.723a00ea@p-imbrenda>
-In-Reply-To: <20230724094716.91510-4-iii@linux.ibm.com>
-References: <20230724094716.91510-1-iii@linux.ibm.com>
-        <20230724094716.91510-4-iii@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S232511AbjGYMTm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 08:19:42 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9304E172A
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:19:39 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-992acf67388so804063666b.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 05:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1690287578; x=1690892378;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nYrCQRR/69uqvDwM5fk4fzz23/zdzo0otjNSbYd4kR4=;
+        b=KECCAYKlu20hKqsaQ4cOSf/3XzAD8hYrj/Rq2i3xcScjjDq9v7gLd/Vebx9XKJy70R
+         L3ZHAfde1TfZJEfYJIz+7y538pVaLD4BXAl5n6z457PNa/O8z0wxZ9+i2S+kce2NKO3+
+         w4E62Zd36jyq63Hfa7x4SywHmX21aimGeLl9n+LUL/rBSkf+wXxvirER3kdFMqhX4gdY
+         KX458aMnUL9L8s21mq1nbCCgrK9bRnN0kUduRFISzfKl1AYfFovoZjMr5tROPR0jGJib
+         /iidJKWqni07Uk3c0D31vyZQpAUyis2tLLxy9k9amz0x0mwsMa2S5YzWVqKCj+BuB1gf
+         Ppyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690287578; x=1690892378;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nYrCQRR/69uqvDwM5fk4fzz23/zdzo0otjNSbYd4kR4=;
+        b=in3TRl2+Mp7IPhUPgjn4Sx3KGxtR9RperpBGMhp2wB9Gi0Kuh0zOmKplYGpNB1XVTN
+         4g83x+Wwr03DLiTjrd519CWGWm3OFapW5gpiT6mJxXsjVRr3W/2caMVt5gJlUFrhTVRN
+         JCqWbMLVjYDQFJ7SNmfI4nth78ZE9xb8sy5YHYnXBVOFRHgcipjeDU4tWbCOOAvBsbl4
+         UO54CfnI7dpK/2G1YeVPcICxHjY/niStJddZMrj7PL8bhPVnJySoy5fGE2Qr3ZsL84D6
+         kpOL8UNMMavUqW/8VNZz935cYTpv9u/bwXVY2Kdfh64P9Dzgv527gPkcimWBCKTTi0EX
+         UJsQ==
+X-Gm-Message-State: ABy/qLZrauXg979FqxLi/Be/Ofg7SX3BOULH7oboNl1Ly4vfFcqw76AA
+        L1qx3pCLKUy7nuefFKmeDrGYTCIiNfhnFdZdpK0=
+X-Google-Smtp-Source: APBJJlHCHvLtlmTSM3H9bL/uWGD5Lv9NiCDBzeiIz5nwstqRlZHtUf3IkveyPLYhqClhO5SYVEDC6Q==
+X-Received: by 2002:a17:906:74d6:b0:993:d7f3:f055 with SMTP id z22-20020a17090674d600b00993d7f3f055mr11899478ejl.11.1690287577659;
+        Tue, 25 Jul 2023 05:19:37 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id e27-20020a170906375b00b00988f168811bsm8205127ejc.135.2023.07.25.05.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 05:19:37 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 14:19:36 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
+        peter.maydell@linaro.org, pasic@linux.ibm.com,
+        borntraeger@linux.ibm.com, dbarboza@ventanamicro.com,
+        kvm@vger.kernel.org, qemu-arm@nongnu.org, qemu-s390x@nongnu.org
+Subject: Re: [PATCH] kvm: Remove KVM_CREATE_IRQCHIP support assumption
+Message-ID: <20230725-539b009b8e15994408dbb47b@orel>
+References: <20230722062115.11950-2-ajones@ventanamicro.com>
+ <81dd6b4c-200f-bb35-69fa-ed623eb7e6d1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: T8clp0a3oTGz12mUwqSMIG8cYZZyVJZc
-X-Proofpoint-ORIG-GUID: rDKEaOeIaq1N02a_yC8TpQTmN34-Yn-Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- phishscore=0 adultscore=0 mlxscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307250119
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <81dd6b4c-200f-bb35-69fa-ed623eb7e6d1@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,64 +73,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Jul 2023 11:44:09 +0200
-Ilya Leoshkevich <iii@linux.ibm.com> wrote:
-
-> Single-stepping a kernel-emulated instruction that generates an
-> interrupt causes GDB to land on the instruction following it instead of
-> the respective interrupt handler.
+On Mon, Jul 24, 2023 at 11:53:39AM +0200, Thomas Huth wrote:
+> On 22/07/2023 08.21, Andrew Jones wrote:
+> > Since Linux commit 00f918f61c56 ("RISC-V: KVM: Skeletal in-kernel AIA
+> > irqchip support") checking KVM_CAP_IRQCHIP returns non-zero when the
+> > RISC-V platform has AIA. The cap indicates KVM supports at least one
+> > of the following ioctls:
+> > 
+> >    KVM_CREATE_IRQCHIP
+> >    KVM_IRQ_LINE
+> >    KVM_GET_IRQCHIP
+> >    KVM_SET_IRQCHIP
+> >    KVM_GET_LAPIC
+> >    KVM_SET_LAPIC
+> > 
+> > but the cap doesn't imply that KVM must support any of those ioctls
+> > in particular. However, QEMU was assuming the KVM_CREATE_IRQCHIP
+> > ioctl was supported. Stop making that assumption by introducing a
+> > KVM parameter that each architecture which supports KVM_CREATE_IRQCHIP
+> > sets. Adding parameters isn't awesome, but given how the
+> > KVM_CAP_IRQCHIP isn't very helpful on its own, we don't have a lot of
+> > options.
+> > 
+> > Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> > ---
+> > 
+> > While this fixes booting guests on riscv KVM with AIA it's unlikely
+> > to get merged before the QEMU support for KVM AIA[1] lands, which
+> > would also fix the issue. I think this patch is still worth considering
+> > though since QEMU's assumption is wrong.
+> > 
+> > [1] https://lore.kernel.org/all/20230714084429.22349-1-yongxuan.wang@sifive.com/
+> > 
+> > 
+> >   accel/kvm/kvm-all.c    | 5 ++++-
+> >   include/sysemu/kvm.h   | 1 +
+> >   target/arm/kvm.c       | 3 +++
+> >   target/i386/kvm/kvm.c  | 2 ++
+> >   target/s390x/kvm/kvm.c | 3 +++
+> >   5 files changed, 13 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > index 373d876c0580..0f5ff8630502 100644
+> > --- a/accel/kvm/kvm-all.c
+> > +++ b/accel/kvm/kvm-all.c
+> > @@ -86,6 +86,7 @@ struct KVMParkedVcpu {
+> >   };
+> >   KVMState *kvm_state;
+> > +bool kvm_has_create_irqchip;
+> >   bool kvm_kernel_irqchip;
+> >   bool kvm_split_irqchip;
+> >   bool kvm_async_interrupts_allowed;
+> > @@ -2377,8 +2378,10 @@ static void kvm_irqchip_create(KVMState *s)
+> >           if (s->kernel_irqchip_split == ON_OFF_AUTO_ON) {
+> >               error_report("Split IRQ chip mode not supported.");
+> >               exit(1);
+> > -        } else {
+> > +        } else if (kvm_has_create_irqchip) {
+> >               ret = kvm_vm_ioctl(s, KVM_CREATE_IRQCHIP);
+> > +        } else {
+> > +            return;
+> >           }
+> >       }
+> >       if (ret < 0) {
 > 
-> The reason is that kvm_handle_sie_intercept(), after injecting the
-> interrupt, also processes the PER event and arranges a KVM_SINGLESTEP
-> exit. The interrupt is not yet delivered, however, so the userspace
-> sees the next instruction.
+> I think I'd do this differntly... at the beginning of the function, there is
+> a check for kvm_check_extension(s, KVM_CAP_IRQCHIP) etc. ... I think you
+> could now replace that check with a simple
 > 
-> Fix by avoiding the KVM_SINGLESTEP exit when there is a pending
-> interrupt. The next __vcpu_run() loop iteration will arrange a
-> KVM_SINGLESTEP exit after delivering the interrupt.
+> 	if (!kvm_has_create_irqchip) {
+> 		return;
+> 	}
 > 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+> The "kvm_vm_enable_cap(s, KVM_CAP_S390_IRQCHIP, 0)" of course has to be
+> moved to the target/s390x/kvm/kvm.c file, too.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Actually, once we've moved the s390 cap enablement to the s390 file we can
+just drop the whole if-else chain. We don't want the
+if (!kvm_has_create_irqchip) at the top because we want to try
+kvm_arch_irqchip_create() even when kvm_has_create_irqchip is false, and
+we don't need to check KVM_CREATE_IRQCHIP for kvm_arch_irqchip_create()
+either. Keeping the check, as it is above in this v1, of
+kvm_has_create_irqchip for KVM_CREATE_IRQCHIP is still necessary, though.
 
-> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
-> ---
->  arch/s390/kvm/intercept.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index 7cdd927541b0..d2f7940c5d03 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -583,6 +583,19 @@ static int handle_pv_notification(struct kvm_vcpu *vcpu)
->  	return handle_instruction(vcpu);
->  }
->  
-> +static bool should_handle_per_ifetch(const struct kvm_vcpu *vcpu, int rc)
-> +{
-> +	/* Process PER, also if the instruction is processed in user space. */
-> +	if (!(vcpu->arch.sie_block->icptstatus & 0x02))
-> +		return false;
-> +	if (rc != 0 && rc != -EOPNOTSUPP)
-> +		return false;
-> +	if (guestdbg_sstep_enabled(vcpu) && vcpu->arch.local_int.pending_irqs)
-> +		/* __vcpu_run() will exit after delivering the interrupt. */
-> +		return false;
-> +	return true;
-> +}
-> +
->  int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
->  {
->  	int rc, per_rc = 0;
-> @@ -645,9 +658,7 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
->  		return -EOPNOTSUPP;
->  	}
->  
-> -	/* process PER, also if the instruction is processed in user space */
-> -	if (vcpu->arch.sie_block->icptstatus & 0x02 &&
-> -	    (!rc || rc == -EOPNOTSUPP))
-> +	if (should_handle_per_ifetch(vcpu, rc))
->  		per_rc = kvm_s390_handle_per_ifetch_icpt(vcpu);
->  	return per_rc ? per_rc : rc;
->  }
-
+Thanks,
+drew
