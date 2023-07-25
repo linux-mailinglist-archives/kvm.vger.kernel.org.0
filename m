@@ -2,64 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B04C0761A80
-	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35EE8761AA7
+	for <lists+kvm@lfdr.de>; Tue, 25 Jul 2023 15:53:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbjGYNtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jul 2023 09:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43624 "EHLO
+        id S231823AbjGYNxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jul 2023 09:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231705AbjGYNtf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:49:35 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256392D45
-        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 06:49:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690292963; x=1721828963;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vzmyew1zHaAjyohrBlKaReRdxmqxZXs2iL/nx5P57NQ=;
-  b=LY/Ot1snu/jd6bZgbdtJPw6MJGr3c0/VaQSWsPAM0X8vBpwHHPUFzp6W
-   gy85eIdRJXyWGIZU92uIjPuvWDWJEqnqcq9GhiACbN6wO/PL/cA3F81K0
-   jd4o9rXiJ50H9KyTzXuDpYxywuEmDMmCJNI5KzF087j1322gjhbV5pnHi
-   6YBuQiCdL6e79pcFewjae3Jp/KwyMBaF0XKJImqP2P069/S1hCooKgczP
-   5uhwmRk0iLFO2AypVC205CA9H1yquYl86qm/xJvZXEpbetIvNoG6EkZ1i
-   mYfjrXkftUhVl1KJycDiBTDCyU0AhZV/LLEnK8+Kg3rJdEIW5KWzo7DDx
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="347332863"
-X-IronPort-AV: E=Sophos;i="6.01,230,1684825200"; 
-   d="scan'208";a="347332863"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2023 06:49:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="726119837"
-X-IronPort-AV: E=Sophos;i="6.01,230,1684825200"; 
-   d="scan'208";a="726119837"
-Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jul 2023 06:49:19 -0700
-Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qOIPe-000AeK-1G;
-        Tue, 25 Jul 2023 13:49:18 +0000
-Date:   Tue, 25 Jul 2023 21:48:22 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Xiong Zhang <xiong.y.zhang@intel.com>, kvm@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, seanjc@google.com,
-        like.xu.linux@gmail.com, weijiang.yang@intel.com,
-        zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com, kan.liang@intel.com,
-        Xiong Zhang <xiong.y.zhang@intel.com>
-Subject: Re: [PATCH] Documentation: KVM: Add vPMU implementaion and gap
- document
-Message-ID: <202307252116.sD1ngIZF-lkp@intel.com>
-References: <20230724104154.259573-1-xiong.y.zhang@intel.com>
+        with ESMTP id S231768AbjGYNxo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jul 2023 09:53:44 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E7A1FCB;
+        Tue, 25 Jul 2023 06:53:42 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PDjmeY026957;
+        Tue, 25 Jul 2023 13:53:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=78rMFBFyiuc9LBSHU36B7CLJjjtRu8K9aWsYFWMdRfg=;
+ b=lNnxsdr6oDMuO3yScGlcxdCuIjUEZnBhe1CAOXy54FnjkGxEpW0cTm9+6coLlWajM7S9
+ /XKA8Hhur0NJrn8ZkxBmHiegiUkeMxnI4WzscKcYXXWi5mN4eUlgLB4KMHI6L4ocTJ8o
+ EPVs8r1B4l21ZGSZJaquBVsdcDsj+rkp8jujpjvko5LdhseStnfa6kb2RyHhpRP2cC7x
+ X7AMnX7xJGaUDcBG1p81aWP783ebW8g7G9epiun3ogsdO4IpYTdSCZEUl7hFKT4GTHx6
+ cjTYQnxmMYD92IVpajqFcwJTltIqFcvI/NJ24rwe872G9mlM9CDOIyHPsD2BJE5LkaJc 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2cgxwhxt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 13:53:41 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36PDmqil010451;
+        Tue, 25 Jul 2023 13:53:41 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s2cgxwhxf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 13:53:41 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36PBWEFU002375;
+        Tue, 25 Jul 2023 13:53:40 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0txjv8ef-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Jul 2023 13:53:39 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36PDrae824838694
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Jul 2023 13:53:36 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B581C20043;
+        Tue, 25 Jul 2023 13:53:36 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6925520049;
+        Tue, 25 Jul 2023 13:53:36 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Jul 2023 13:53:36 +0000 (GMT)
+Date:   Tue, 25 Jul 2023 15:53:25 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Ilya Leoshkevich <iii@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v3 6/6] KVM: s390: selftests: Add selftest for
+ single-stepping
+Message-ID: <20230725155325.513ee076@p-imbrenda>
+In-Reply-To: <20230724094716.91510-7-iii@linux.ibm.com>
+References: <20230724094716.91510-1-iii@linux.ibm.com>
+        <20230724094716.91510-7-iii@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724104154.259573-1-xiong.y.zhang@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aFFbTVgWxVqwkJrH4TD0hfV8YyRmFNDz
+X-Proofpoint-ORIG-GUID: TCaJJjIXbbN5zi9BcLZhqr3f7V3PWWWh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
+ suspectscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0
+ priorityscore=1501 phishscore=0 bulkscore=0 malwarescore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307250119
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,64 +101,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Xiong,
+On Mon, 24 Jul 2023 11:44:12 +0200
+Ilya Leoshkevich <iii@linux.ibm.com> wrote:
 
-kernel test robot noticed the following build warnings:
+> Test different variations of single-stepping into interrupts:
+> 
+> - SVC and PGM interrupts;
+> - Interrupts generated by ISKE;
+> - Interrupts generated by instructions emulated by KVM;
+> - Interrupts generated by instructions emulated by userspace.
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on mst-vhost/linux-next linus/master v6.5-rc3 next-20230725]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+thank you for writing this selftest!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Xiong-Zhang/Documentation-KVM-Add-vPMU-implementaion-and-gap-document/20230724-184443
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20230724104154.259573-1-xiong.y.zhang%40intel.com
-patch subject: [PATCH] Documentation: KVM: Add vPMU implementaion and gap document
-reproduce: (https://download.01.org/0day-ci/archive/20230725/202307252116.sD1ngIZF-lkp@intel.com/reproduce)
+> 
+> Signed-off-by: Ilya Leoshkevich <iii@linux.ibm.com>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307252116.sD1ngIZF-lkp@intel.com/
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-All warnings (new ones prefixed by >>):
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../testing/selftests/kvm/s390x/debug_test.c  | 160 ++++++++++++++++++
+>  2 files changed, 161 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/s390x/debug_test.c
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c692cc86e7da..f3306eaa7031 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -166,6 +166,7 @@ TEST_GEN_PROGS_s390x += s390x/resets
+>  TEST_GEN_PROGS_s390x += s390x/sync_regs_test
+>  TEST_GEN_PROGS_s390x += s390x/tprot
+>  TEST_GEN_PROGS_s390x += s390x/cmma_test
+> +TEST_GEN_PROGS_s390x += s390x/debug_test
+>  TEST_GEN_PROGS_s390x += demand_paging_test
+>  TEST_GEN_PROGS_s390x += dirty_log_test
+>  TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
+> diff --git a/tools/testing/selftests/kvm/s390x/debug_test.c b/tools/testing/selftests/kvm/s390x/debug_test.c
+> new file mode 100644
+> index 000000000000..a8fa9fe93b3c
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/s390x/debug_test.c
+> @@ -0,0 +1,160 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Test KVM debugging features. */
+> +#include "kvm_util.h"
+> +#include "test_util.h"
+> +
+> +#include <linux/kvm.h>
+> +
+> +#define __LC_SVC_NEW_PSW 0x1c0
+> +#define __LC_PGM_NEW_PSW 0x1d0
+> +#define ICPT_INSTRUCTION 0x04
+> +#define IPA0_DIAG 0x8300
+> +#define PGM_SPECIFICATION 0x06
+> +
+> +/* Common code for testing single-stepping interruptions. */
+> +extern char int_handler[];
+> +asm("int_handler:\n"
+> +    "j .\n");
+> +
+> +static struct kvm_vm *test_step_int_1(struct kvm_vcpu **vcpu, void *guest_code,
+> +				      size_t new_psw_off, uint64_t *new_psw)
+> +{
+> +	struct kvm_guest_debug debug = {};
+> +	struct kvm_regs regs;
+> +	struct kvm_vm *vm;
+> +	char *lowcore;
+> +
+> +	vm = vm_create_with_one_vcpu(vcpu, guest_code);
+> +	lowcore = addr_gpa2hva(vm, 0);
+> +	new_psw[0] = (*vcpu)->run->psw_mask;
+> +	new_psw[1] = (uint64_t)int_handler;
+> +	memcpy(lowcore + new_psw_off, new_psw, 16);
+> +	vcpu_regs_get(*vcpu, &regs);
+> +	regs.gprs[2] = -1;
+> +	vcpu_regs_set(*vcpu, &regs);
+> +	debug.control = KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP;
+> +	vcpu_guest_debug_set(*vcpu, &debug);
+> +	vcpu_run(*vcpu);
+> +
+> +	return vm;
+> +}
+> +
+> +static void test_step_int(void *guest_code, size_t new_psw_off)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t new_psw[2];
+> +	struct kvm_vm *vm;
+> +
+> +	vm = test_step_int_1(&vcpu, guest_code, new_psw_off, new_psw);
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_DEBUG);
+> +	ASSERT_EQ(vcpu->run->psw_mask, new_psw[0]);
+> +	ASSERT_EQ(vcpu->run->psw_addr, new_psw[1]);
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +/* Test single-stepping "boring" program interruptions. */
+> +extern char test_step_pgm_guest_code[];
+> +asm("test_step_pgm_guest_code:\n"
+> +    ".insn rr,0x1d00,%r1,%r0 /* dr %r1,%r0 */\n"
+> +    "j .\n");
+> +
+> +static void test_step_pgm(void)
+> +{
+> +	test_step_int(test_step_pgm_guest_code, __LC_PGM_NEW_PSW);
+> +}
+> +
+> +/*
+> + * Test single-stepping program interruptions caused by DIAG.
+> + * Userspace emulation must not interfere with single-stepping.
+> + */
+> +extern char test_step_pgm_diag_guest_code[];
+> +asm("test_step_pgm_diag_guest_code:\n"
+> +    "diag %r0,%r0,0\n"
+> +    "j .\n");
+> +
+> +static void test_step_pgm_diag(void)
+> +{
+> +	struct kvm_s390_irq irq = {
+> +		.type = KVM_S390_PROGRAM_INT,
+> +		.u.pgm.code = PGM_SPECIFICATION,
+> +	};
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t new_psw[2];
+> +	struct kvm_vm *vm;
+> +
+> +	vm = test_step_int_1(&vcpu, test_step_pgm_diag_guest_code,
+> +			     __LC_PGM_NEW_PSW, new_psw);
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_S390_SIEIC);
+> +	ASSERT_EQ(vcpu->run->s390_sieic.icptcode, ICPT_INSTRUCTION);
+> +	ASSERT_EQ(vcpu->run->s390_sieic.ipa & 0xff00, IPA0_DIAG);
+> +	vcpu_ioctl(vcpu, KVM_S390_IRQ, &irq);
+> +	vcpu_run(vcpu);
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_DEBUG);
+> +	ASSERT_EQ(vcpu->run->psw_mask, new_psw[0]);
+> +	ASSERT_EQ(vcpu->run->psw_addr, new_psw[1]);
+> +	kvm_vm_free(vm);
+> +}
+> +
+> +/*
+> + * Test single-stepping program interruptions caused by ISKE.
+> + * CPUSTAT_KSS handling must not interfere with single-stepping.
+> + */
+> +extern char test_step_pgm_iske_guest_code[];
+> +asm("test_step_pgm_iske_guest_code:\n"
+> +    "iske %r2,%r2\n"
+> +    "j .\n");
+> +
+> +static void test_step_pgm_iske(void)
+> +{
+> +	test_step_int(test_step_pgm_iske_guest_code, __LC_PGM_NEW_PSW);
+> +}
+> +
+> +/*
+> + * Test single-stepping program interruptions caused by LCTL.
+> + * KVM emulation must not interfere with single-stepping.
+> + */
+> +extern char test_step_pgm_lctl_guest_code[];
+> +asm("test_step_pgm_lctl_guest_code:\n"
+> +    "lctl %c0,%c0,1\n"
+> +    "j .\n");
+> +
+> +static void test_step_pgm_lctl(void)
+> +{
+> +	test_step_int(test_step_pgm_lctl_guest_code, __LC_PGM_NEW_PSW);
+> +}
+> +
+> +/* Test single-stepping supervisor-call interruptions. */
+> +extern char test_step_svc_guest_code[];
+> +asm("test_step_svc_guest_code:\n"
+> +    "svc 0\n"
+> +    "j .\n");
+> +
+> +static void test_step_svc(void)
+> +{
+> +	test_step_int(test_step_svc_guest_code, __LC_SVC_NEW_PSW);
+> +}
+> +
+> +/* Run all tests above. */
+> +static struct testdef {
+> +	const char *name;
+> +	void (*test)(void);
+> +} testlist[] = {
+> +	{ "single-step pgm", test_step_pgm },
+> +	{ "single-step pgm caused by diag", test_step_pgm_diag },
+> +	{ "single-step pgm caused by iske", test_step_pgm_iske },
+> +	{ "single-step pgm caused by lctl", test_step_pgm_lctl },
+> +	{ "single-step svc", test_step_svc },
+> +};
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int idx;
+> +
+> +	ksft_print_header();
+> +	ksft_set_plan(ARRAY_SIZE(testlist));
+> +	for (idx = 0; idx < ARRAY_SIZE(testlist); idx++) {
+> +		testlist[idx].test();
+> +		ksft_test_result_pass("%s\n", testlist[idx].name);
+> +	}
+> +	ksft_finished();
+> +}
 
->> Documentation/virt/kvm/x86/pmu.rst:104: WARNING: Unexpected indentation.
->> Documentation/virt/kvm/x86/pmu.rst:104: WARNING: Unexpected section title or transition.
-
-vim +104 Documentation/virt/kvm/x86/pmu.rst
-
-   100	
-   101	When guest no longer access the virtual counter's MSR within a
-   102	scheduling time slice and the virtual counter is disabled, KVM will
-   103	release the kvm perf event.
- > 104	  ----------------------------
-   105	  |  Guest                   |
-   106	  |  perf subsystem          |
-   107	  ----------------------------
-   108	       |            ^
-   109	  vMSR |            | vPMI
-   110	       v            |
-   111	  ----------------------------
-   112	  |  vPMU        KVM vCPU    |
-   113	  ----------------------------
-   114	        |          ^
-   115	  Call  |          | Callbacks
-   116	        v          |
-   117	  ---------------------------
-   118	  | Host Linux Kernel       |
-   119	  | perf subsystem          |
-   120	  ---------------------------
-   121	               |       ^
-   122	           MSR |       | PMI
-   123	               v       |
-   124	         --------------------
-   125		 | PMU        CPU   |
-   126	         --------------------
-   127	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
