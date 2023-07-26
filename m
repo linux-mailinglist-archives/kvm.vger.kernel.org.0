@@ -2,143 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62216763DD3
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 19:39:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCEA9763DF2
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 19:54:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbjGZRjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 13:39:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
+        id S230195AbjGZRyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 13:54:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjGZRjC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 13:39:02 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2087.outbound.protection.outlook.com [40.107.220.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3C6268C;
-        Wed, 26 Jul 2023 10:38:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RVq2pITEePFrze0O5ItbXDdggmiQznGNe3/sWI37q/aRtJhd9UlyIw5Mtu2OcqDFNGB6AHjyPaHC2i36bti91CD+Wt1LKDDBKuX/kPBrmzvlGV9uqLJU0lqGPr3+MAEXolkbBmNJal22d3agdjh4zAFm2T2qKTdnnf496K56GoIEljRYVlRNGmi33c5QQT789k7iop7wus/y0x7zrjzNTMyohBd4QrRVg/OVTZw9VR0SB5zmxeZlES71S5oFtT1s9XrGS10a39bK2QIT1sBmiGXOik4BQB2Zu4sg12PG6an2FRRIfl5/kni4jnVN6/7AzV1nX6r+6jWIS6++BXfXzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6R9Q1aIWYbfpfJHLcAPtpLnd1OxtRZ44gjxL5/d/5YA=;
- b=RDXJJ8gfMhu3XycxqHq2XH7sYNQ/7Z8g/4B1qIQLYStldOTe38tCrNhcRWbgoAK9tJQJ0wJ8o7MaeP+1SA5WZDw0Zv1jvLomUqwr6YqZtVskp6x2yMf2n2YxAN/NUksXhaSJCzlWeIGXJMnYdF7gCL3oJp1CM2Wbm2BSOVw2TfRyUVdAAFvLGlrltKTQviJRBic4uHfIBNhy3rizo20Dd5Lb2eGUcGO+YtE8kulVlCH2+B0VRRsta1F8C1+8LPwvpQL4M/Yf45o6Sw0zgiszbLq4/bpl2jsfaBKnOl3ylxLGCHi35gXg++FLP5ORJMEvtTAT/TLon/57SqZBPVjKog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6R9Q1aIWYbfpfJHLcAPtpLnd1OxtRZ44gjxL5/d/5YA=;
- b=kHNFe0NtBao47ECMesvB1UWH82e6utr4gI7EOFHsH2rT7lH813eClbTrzJgvHMH0WfREYaAGtnNRASLcnEKv5Teb0Lj+w8Z4E0PEoGztIVqPYfGRj0Geb3cyzOwnUXmyIBGhnpWtUmwx6n1TiYNfTj+gd71X6HFmm2Q/cy+k1893vVnWvx5drdhaGXdqpP/ShkSNcSwO1lGG6s+ucPlFZ7nCbf/qpvnk2tvisY9hcl/9DvQqny3SdrYMhuSKQgo1eKsE6R4RfCiPTvpIwTu3poTHNonjB+zTVinXQFap2XWwF4+PkdFPNKeNeG/W1MoxOAH0btQxEP2doaXH9zXcwg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB7726.namprd12.prod.outlook.com (2603:10b6:8:130::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Wed, 26 Jul
- 2023 17:38:57 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 17:38:57 +0000
-Date:   Wed, 26 Jul 2023 14:38:56 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Nicolin Chen <nicolinc@nvidia.com>, kevin.tian@intel.com,
-        yi.l.liu@intel.com, joro@8bytes.org, will@kernel.org,
-        robin.murphy@arm.com, shuah@kernel.org,
-        linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        mjrosato@linux.ibm.com, farman@linux.ibm.com
-Subject: Re: [PATCH v8 1/4] vfio: Do not allow !ops->dma_unmap in
- vfio_pin/unpin_pages()
-Message-ID: <ZMFaMCpLHi2S6UOi@nvidia.com>
-References: <cover.1690226015.git.nicolinc@nvidia.com>
- <064227abb779063c328fd79afc7c74dabdf2489e.1690226015.git.nicolinc@nvidia.com>
- <20230726113349.3dc1382c.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726113349.3dc1382c.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR07CA0023.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::33) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7726:EE_
-X-MS-Office365-Filtering-Correlation-Id: fdc09748-01a8-4b44-3c7b-08db8dff30b0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bAPOY/pIEdQCYCR4MCmH1kGuKr7PvT4wzFiK+osjYajrg4oBNV+ibGll+yTL0nUz7TUn+q852VqQfhDHo47DbPyxk5/EkWb/uAMfgD6LpNyGKb8SYouHUhid0b2jtyfKHl4R4Zitca0T2I9Tng4XWCi6HkvsyxBsL4r5Eotg278wRZyVqa25wSkruycicFVR6mI19JRxB/O0oj0Ps7KHkf7kPd/AEpaRDfy3KXQLjQD0pEAnTjbWI2DoMlRl5RNDzueJkG/dxKPK9L7lflXMTuKiU5p9HjaEs1rFH5NchlwYBtZXebhF2UCFYdAKZ6iBbJ+g0mZJfb9vkU9ndX5xysHxG1kY4Kqw3yVT+FoOESOALQVmczdxjyYGVN02/d7jrt8zlbMcztf4yIOmtVXj8LQkLgDcndo6qdqeckYDfFyEc0xeMf+7Iu/W6mnQPcY5j/pp2Ao79UGiRGOUd2VRr/cmNQrU1dWimZSF0ZIQABMcKcc5MUD22suF60X1uaUgxOx1UZ9m9xbI+gAOs1CicbVoYO1ggrDRl/E/k5JxYN6zUbD0qHyYegYKTFIUJeXf
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(396003)(366004)(346002)(376002)(451199021)(186003)(6506007)(6486002)(6512007)(478600001)(26005)(4744005)(6916009)(8936002)(66556008)(66476007)(7416002)(2906002)(5660300002)(8676002)(38100700002)(36756003)(41300700001)(4326008)(316002)(86362001)(2616005)(66946007)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/p+bc06i+D2u0t4Bzpf5Y0V4jY1qhToDMgQ7u00zpVRj64GdqxmI8CdnaUAY?=
- =?us-ascii?Q?PDzcDluV9/WI9+8nYm/SdNc+pTDpCmoBQJEfX88NkDddzyjAN3aTX/IaKS0c?=
- =?us-ascii?Q?SPqWiWDb/04AafwKd4hnLQjntI/MRomIBxdLTzu6SqvCycoa350r2aICnvFr?=
- =?us-ascii?Q?BXkMu+50gJ1dHbAWSJDUVPQxVU2jDE7K8uZpUCFUTGjdgl5+FaeUHFZweYPJ?=
- =?us-ascii?Q?ig9FGc8xAkL91dd4mZDdjrn20Hl7ff/58cYtFC8pxQ96Ue6a6iXjw3xTj9SK?=
- =?us-ascii?Q?apIvWQThCwzHYjcoCOkMq2IzEolMZG9AMpoW7RX+PmOzJz+ZdCblFXkmno9T?=
- =?us-ascii?Q?sOM45/sC0qIZ3LwOe/RC0aLuWBEFN5F0fXuDyP51f20MK67yzSoY78P8DV8r?=
- =?us-ascii?Q?97jQjVLpDuznhioP/Cqeu0zRBgWER0oe99S53kAyg80ZsI+NKDGBl2C/t+YM?=
- =?us-ascii?Q?qo5aV/M1tuo5Zb6qUd6NMc0AdqWuIvPEB8bHCJpkBJWGcnFz0hVxZUgWTybU?=
- =?us-ascii?Q?Exw74hqEX25xyG5bBDmV+pG1NCcUPO4/fxstUEOfUL2U0ZzNykjZJ6F6ba3I?=
- =?us-ascii?Q?dVVX5Db1NezlHYbH9Wnz5mmidVzMaG6xbIkfnwIKIjKGzjZAYLUTQoPoE/Q6?=
- =?us-ascii?Q?zIv5I9btIi1ZBFsSGgwdmih1x0cS87DqDK9CtBDyVi3nwnncNNBEMYOwj6ZF?=
- =?us-ascii?Q?br0soXtlqmE8+AVB2YaC+r743JCdrPZpRvAxglb0vCP61b/CLBz2GXHu27SP?=
- =?us-ascii?Q?pMeV6W5CXF3dQhA3i5eSf8W6jDJFiKmpnnHxi7JA+Yxl9J+5M24V8RviHUkl?=
- =?us-ascii?Q?J7DDFBXSj+JpbfwQzLqt60eiPe+4m8Bvy/bTN/Opup1buA80ypZO5UqgLADt?=
- =?us-ascii?Q?vFb2TTLOHZeMJgetTvN4+9hQWf74aj4wkqABdEDazDNAZZVU/DhRfyo6/DHv?=
- =?us-ascii?Q?2siiEV1drLjcYf6FPKKc7R876KW2N45oDwMiXZvd+jGJMJr994kdVFLZ9rCz?=
- =?us-ascii?Q?8KKUf5WN6G3sXuxOVdTSExiPEits43Mr24FAG2Fq/L9pF+yJsYBDPK1ePVOo?=
- =?us-ascii?Q?9kM7UM5PcGffwa7U2mNvzcWb/X+KqTySIRZAdn248tt3LW7CU9VI44HsnE8m?=
- =?us-ascii?Q?an5l5PgDcF+x54oi4Em7dZSKpYGNuYG8oexbCFyBAzuj2YWX+hErOG+vz1Zl?=
- =?us-ascii?Q?nrDsWdt5pmJSZgAOd30wgM9xb9ZE+yEQWBZy3liuFEmsFXZ6q1G3rU3cNuet?=
- =?us-ascii?Q?PBiVcsCVjUZ5M5M7VxhfeVCW3Y6L0w1qtulhZNvKRaE0R3WtOlR7LRsbJS0E?=
- =?us-ascii?Q?anwJtTKhW/rPLl7IMbs0ERHkAuXBMCresrd1pAySukDrhfdlkAL3GKXtlmhP?=
- =?us-ascii?Q?yxNTW03HvZURm7oV7rH1UwHadkZmZKbN4RUzNvGTWcJbA9vCY8+WxMm+iHvP?=
- =?us-ascii?Q?mHkzRlYW6pWj0RVW7y9Wvn9L4xHmtsUdbGo3WZf85jasKkawgDy9gYLhNwMA?=
- =?us-ascii?Q?1KvSQZlRddQKDXSI1b1GOpaWhN2CKs4+E9re7VmmcxAL/i+WauBa38f3g/Of?=
- =?us-ascii?Q?3OUEcgDHbMO7gYt36eAhrusWvyWNijSKNzYK+Q3k?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fdc09748-01a8-4b44-3c7b-08db8dff30b0
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 17:38:57.7336
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: timEHOnTyU6dpZg795gJAAG2INYJ8dstuQZBNeLNrdnC10Z55ZntVLRpVhIr24bN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7726
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229716AbjGZRyt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 13:54:49 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D41BB121
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 10:54:48 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58440eb872aso664007b3.3
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 10:54:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690394088; x=1690998888;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xG7APS0bpzhflq+N7hw4kFiKO+WKlxLTJZYGvt3CQHo=;
+        b=r3AoAVVwXCnsICUvyscGekoz3oFfjq5LSawP9P+x/3dZsCgHaSvF+83M857+TS1rEG
+         msMIiWcmh08qrR/m5y8BaUaPileeNeV/4WZI+ptttwX0j/L0hJ9ewnfs/7EEEk8RQtRP
+         0bZQ6SwNrVPA0eq6uqfF728qbXKaNRYp+O/ZbUovxA7JEeWLDRHSZn2BaYRjea/4bbdU
+         3OZSU6rQ+azh0Mq9Qu/L51DJfQLBXnbMGl9HmbH0E9EHsUdrZK8Dm//Dz7sR9io08858
+         DefwI3nbwgWdvs7KmCxb5ZksLySaaoxrhK5CHX9dv2YZIcrTuad2+PGbluXzKd2JCfz3
+         0IiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690394088; x=1690998888;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xG7APS0bpzhflq+N7hw4kFiKO+WKlxLTJZYGvt3CQHo=;
+        b=MTPOljApI1+gWRd7xs6Z5qXCaG+jk7pIDGnKH/Q6Y7pe7l7UdfsSv23UB39FbooWl5
+         71ozqjkMSeY+btutRm2Lod2PrpVOkYtINjqqpuoi0d3o84qmWc5N6AD/d49pV2g8QN56
+         rM/bAfEC1theAMt9HgORUQQxQhBMdxOgj6CNewgeF15E93wTtS11kDp6zk63/9wpITa1
+         FftpX3zt0R3SDb/QWVlSaVb/fpQjuI3L/9edHuKP7b0+CXflXaPBs1AXwk7JtHttkg9O
+         diXYxCPiFmcb1x34dQrAiKyamBrfvtEhoOWmOjbuqwE10PfKmtC12O4MrPQ/Cvuqal1m
+         dLdA==
+X-Gm-Message-State: ABy/qLY/EveKx14tRI5qaD8seEMEjQMrvNWs/OrBwvDLPmLaLbBirqJb
+        wEnm6QI22y8I0yQS5buC6m9kpFBiwjw=
+X-Google-Smtp-Source: APBJJlGi+bgYJFCAeVVB9sjIVs2iwu4W7+o1j0GHGwfINh+9Bc60TY6drK/2Hsi6kKa275N2EWDhJKUSd/0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ad16:0:b0:584:41a6:6cd8 with SMTP id
+ l22-20020a81ad16000000b0058441a66cd8mr25083ywh.8.1690394088151; Wed, 26 Jul
+ 2023 10:54:48 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 10:54:46 -0700
+In-Reply-To: <a9b7df8f-77db-d8dc-efab-9ae7e9ef6922@amd.com>
+Mime-Version: 1.0
+References: <20230726024133.GA434307@L-PF27918B-1352.> <a9b7df8f-77db-d8dc-efab-9ae7e9ef6922@amd.com>
+Message-ID: <ZMFd5kkehlkIfnBA@google.com>
+Subject: Re: [Question] int3_selftest() generates a #UD instead of a #BP when
+ create a SEV VM
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Wu Zongyong <wuzongyong@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 26, 2023 at 11:33:49AM -0600, Alex Williamson wrote:
-> On Mon, 24 Jul 2023 12:47:04 -0700
-> Nicolin Chen <nicolinc@nvidia.com> wrote:
-> 
-> > A driver that doesn't implement ops->dma_unmap shouldn't be allowed to do
-> > vfio_pin/unpin_pages(), though it can use vfio_dma_rw() to access an iova
-> > range. Deny !ops->dma_unmap cases in vfio_pin/unpin_pages().
+On Wed, Jul 26, 2023, Tom Lendacky wrote:
+> On 7/25/23 21:41, Wu Zongyong wrote:
+> > Hi,
 > > 
-> > Suggested-by: Kevin Tian <kevin.tian@intel.com>
-> > Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> > Reviewed-by: Yi Liu <yi.l.liu@intel.com>
-> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> > ---
-> >  drivers/vfio/vfio_main.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
+> > I try to boot a SEV VM (just SEV, no SEV-ES and no SEV-SNP) with a
+> > firmware written by myself.
+> > 
+> > But when the linux kernel executed the int3_selftest(), a #UD generated
+> > instead of a #BP.
+> > 
+> > The stack is as follows.
+> > 
+> >      [    0.141804] invalid opcode: 0000 [#1] PREEMPT SMP^M
+> >      [    0.141804] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.3.0+ #37^M
+> >      [    0.141804] RIP: 0010:int3_selftest_ip+0x0/0x2a^M
+> >      [    0.141804] Code: eb bc 66 90 0f 1f 44 00 00 48 83 ec 08 48 c7 c7 90 0d 78 83 c7 44 24 04 00 00 00 00 e8 23 fe ac fd 85 c0 75 22 48 8d 7c 24 04 <cc> 90 90 90 90 83 7c 24 04 01 75 13 48 c7 c7 90 0d 78 83 e8 42 fc^M
+> >      [    0.141804] RSP: 0000:ffffffff82803f18 EFLAGS: 00010246^M
+> >      [    0.141804] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000007ffffffe^M
+> >      [    0.141804] RDX: ffffffff82fd4938 RSI: 0000000000000296 RDI: ffffffff82803f1c^M
+> >      [    0.141804] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000fffeffff^M
+> >      [    0.141804] R10: ffffffff82803e08 R11: ffffffff82f615a8 R12: 00000000ff062350^M
+> >      [    0.141804] R13: 000000001fddc20a R14: 000000000090122c R15: 0000000002000000^M
+> >      [    0.141804] FS:  0000000000000000(0000) GS:ffff88801f200000(0000) knlGS:0000000000000000^M
+> >      [    0.141804] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
+> >      [    0.141804] CR2: ffff888004c00000 CR3: 000800000281f000 CR4: 00000000003506f0^M
+> >      [    0.141804] Call Trace:^M
+> >      [    0.141804]  <TASK>^M
+> >      [    0.141804]  alternative_instructions+0xe/0x100^M
+> >      [    0.141804]  check_bugs+0xa7/0x110^M
+> >      [    0.141804]  start_kernel+0x320/0x430^M
+> >      [    0.141804]  secondary_startup_64_no_verify+0xd3/0xdb^M
+> >      [    0.141804]  </TASK>^M
+> >      [    0.141804] Modules linked in:^M
+> >      [    0.141804] ---[ end trace 0000000000000000 ]--
+> > 
+> > I'm curious how this happend. I cannot find any condition that would
+> > cause the int3 instruction generate a #UD according to the AMD's spec.
+
+One possibility is that the value from memory that gets executed diverges from the
+value that is read out be the #UD handler, e.g. due to patching (doesn't seem to
+be the case in this test), stale cache/tlb entries, etc.
+
+> > BTW, it worked nomarlly with qemu and ovmf.
 > 
-> I assume these go through iommufd.
+> Does this happen every time you boot the guest with your firmware? What
+> processor are you running on?
 
-Yep, I think it is next up, thanks
-
-Jason
+And have you ruled out KVM as the culprit?  I.e. verified that KVM is NOT injecting
+a #UD.  That obviously shouldn't happen, but it should be easy to check via KVM
+tracepoints.
