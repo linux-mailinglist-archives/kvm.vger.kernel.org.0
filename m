@@ -2,36 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E71762E6C
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2159762E7E
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:47:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232010AbjGZHql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 03:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37854 "EHLO
+        id S231893AbjGZHrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 03:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231347AbjGZHqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 03:46:10 -0400
-Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [IPv6:2001:41d0:1004:224b::28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C3E4ED4
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:41:43 -0700 (PDT)
+        with ESMTP id S231837AbjGZHrO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 03:47:14 -0400
+Received: from out-26.mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB1183C2A;
+        Wed, 26 Jul 2023 00:42:17 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690357301;
+        t=1690357335;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1INRpyFGosC7x9b2U65MfTc+prZG/Zt8kNIAIpUXzvc=;
-        b=rJayuXz/AZIoTh/aJ821z2UtGYXRhf7SaFISnV6xdmFmcSOAugz50dRL7nxfhIEtCQbOTg
-        iIpArugvYTdRT1OJGdpeURT9QNHUnNNwNxIZAZlJQKpbcVUfBLkRuPek5FTrtrIzUA92Qs
-        V5aiV1ZbRn27rBgCbBkAjrHv7ewFxNg=
+        bh=Ekk4aAWFJ4+PlEX4rrtlrp4hyCRFU3jGz4GFExFiN/4=;
+        b=LFo7zp7M+/SxvVshzDJAkc4p4tV6E2GJDNPazCKrtnnFX7LZc9vNkPXQlbkMtTxwpTMldW
+        wmyQAQreYZza1uKi7E+g//lo6ktN/ymSykPq/iHUJ0FDx8RsRCRPcKGyvxypKIP4obmT3h
+        BmWZ270GHRn0AZA6RUZrPZSNu4KiSUs=
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 32/47] ext4: dynamically allocate the ext4-es shrinker
+Subject: Re: [PATCH v2 33/47] jbd2,ext4: dynamically allocate the jbd2-journal
+ shrinker
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-33-zhengqi.arch@bytedance.com>
-Date:   Wed, 26 Jul 2023 15:40:52 +0800
+In-Reply-To: <20230724094354.90817-34-zhengqi.arch@bytedance.com>
+Date:   Wed, 26 Jul 2023 15:41:34 +0800
 Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
         Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
@@ -52,9 +53,9 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <866DDDA8-3F7E-4E7A-BA8D-D6DA1707E106@linux.dev>
+Message-Id: <042841CB-2C3C-4028-85E5-D3B8BCAAE7F7@linux.dev>
 References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-33-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-34-zhengqi.arch@bytedance.com>
 To:     Qi Zheng <zhengqi.arch@bytedance.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -72,9 +73,9 @@ X-Mailing-List: kvm@vger.kernel.org
 > On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
 > 
 > In preparation for implementing lockless slab shrink, use new APIs to
-> dynamically allocate the ext4-es shrinker, so that it can be freed
+> dynamically allocate the jbd2-journal shrinker, so that it can be freed
 > asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
-> read-side critical section when releasing the struct ext4_sb_info.
+> read-side critical section when releasing the struct journal_s.
 > 
 > Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
