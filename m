@@ -2,45 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 107DE762EBC
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB2D6762ECA
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:52:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232801AbjGZHuh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 03:50:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39668 "EHLO
+        id S232361AbjGZHwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 03:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232183AbjGZHt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 03:49:27 -0400
-Received: from out-38.mta0.migadu.com (out-38.mta0.migadu.com [91.218.175.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED1955A6
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:44:18 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
+        with ESMTP id S232146AbjGZHwO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 03:52:14 -0400
+Received: from out-27.mta0.migadu.com (out-27.mta0.migadu.com [91.218.175.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4AC3AB1
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:46:15 -0700 (PDT)
+Message-ID: <2eb5ac60-d03f-c770-144c-67c23337a899@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690357456;
+        t=1690357574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YERirZpLP4FYzC9W9Cuhwy4vJFALDqDsk3pczk62JOQ=;
-        b=kOMq/HUlDvH603KrUUEza/PyymEgyIbW/Pmz8Heb+hJF3i5dVIkpDD+1wHWXrClPqGAw2s
-        a+xs9b+zND6HNviDHK0RhcBhFdy5suPaPW4D1t29z7ZNacrVxFACfaaCFl7IiD41gZEpbX
-        ZxOTECTjTAugfJjk//XKlUEVfOYnzaA=
+        bh=6QEBEdTPSAaW2OQqcLE7rLGuRZIVN6+LeTsJ4l/CyeM=;
+        b=PIFD02mpMzjRcZ3366WsMtp53hA717Gy3vvuYw5Rhd/AopVnoI+xS2zEoD80dtXmig5iVU
+        e+udj9BpG++3X4I7Xha4OWZFfxbVXmw3wbp6r/NHzIwAOXaSD+OnSfxRqvRN624pP6oj8J
+        xGsejw6XWW8uEiG+p7ecCRE5blMqFKA=
+Date:   Wed, 26 Jul 2023 15:45:56 +0800
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 39/47] zsmalloc: dynamically allocate the mm-zspool
- shrinker
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-40-zhengqi.arch@bytedance.com>
-Date:   Wed, 26 Jul 2023 15:43:36 +0800
-Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
-        tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
-        Christian Brauner <brauner@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
-        yujie.liu@intel.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+Subject: Re: [PATCH v2 40/47] fs: super: dynamically allocate the s_shrink
+To:     Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
         kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-erofs@lists.ozlabs.org,
         linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
@@ -51,12 +40,19 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         linux-bcache@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <D4BCB662-30A7-430C-965F-DC993F9E061A@linux.dev>
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org
 References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-40-zhengqi.arch@bytedance.com>
-To:     Qi Zheng <zhengqi.arch@bytedance.com>
+ <20230724094354.90817-41-zhengqi.arch@bytedance.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <20230724094354.90817-41-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
@@ -70,15 +66,12 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
-> 
+On 2023/7/24 17:43, Qi Zheng wrote:
 > In preparation for implementing lockless slab shrink, use new APIs to
-> dynamically allocate the mm-zspool shrinker, so that it can be freed
-> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
-> read-side critical section when releasing the struct zs_pool.
-> 
+> dynamically allocate the s_shrink, so that it can be freed asynchronously
+> using kfree_rcu(). Then it doesn't need to wait for RCU read-side critical
+> section when releasing the struct super_block.
+>
 > Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
 Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-
-
