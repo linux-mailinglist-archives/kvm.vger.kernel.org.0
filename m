@@ -2,136 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70100763D31
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 19:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAB01763D3F
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 19:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231881AbjGZRE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 13:04:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
+        id S232100AbjGZRIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 13:08:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjGZRE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 13:04:58 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2075.outbound.protection.outlook.com [40.107.93.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75219E73;
-        Wed, 26 Jul 2023 10:04:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VeW3t6uHt2kKXssaoVegJXi1o8cVtwK+x//H7dFJuBgGkdXm+A5D4vm/5lbHX0EAhen9CPJur4aPMJVoHVFa+mRGzyAWBtN6q1XkghRlgLKZ33co4+V3tYrBs4LwXrKjxtlQTcqxg1rzWLKe0Rv5BmdqP11pfOWQAmAt4XTNPOhRyWcF7Dr7Lezqe1EUs0zywV0HhXxfGMvU0Fmn2l0DufCSATojqi8hrOhUvHQjasb3py7RJ22TGto5BA89EGJ9mPocjT48U7rRtnrLgLLPF/lcJIX9mwo1VW8h9G30d1VRQxavsz06upEM03K6Nm034amRdBFP73UdGi7DpQeIgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mldf4yAQ2arIuQ1yfb3bn/uWFZ4vIC5fQhERUvNrbH0=;
- b=S4u8DPtSDDrMpCZyqU7x/ydZcB/VQmRbFjvdLmzFT/UCfBabQEYOcatSyTTc4Lx/YZDHwPW97ytA1xHZDmfz+dAQSUEz9MWsAydnnRhiq5a4PT6IZ1TmPTyM91lBQ5A5A9qzaZTIFVMd82qh6zaoDRT6ORepMx6Pdtkcw58FuMDBfWAIBoq9vX4dTsk0O/t4wLAz6zEqpicZWzmEjxDdp8Gz1KD6ozHo6aQeRatbsG3OXDmFfjZ4tNkk5O0XEYceAp8PB/UUlyYTCi4v1aAt589VoQ4LbZDDBm3qtf71lVzaQCFiyYFP7Yeci7r6NMIFJEaTbg/dLigeK0L04b1fUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mldf4yAQ2arIuQ1yfb3bn/uWFZ4vIC5fQhERUvNrbH0=;
- b=bp8SaoxwyUXIAgKW7MzISVV0HmWsbbzhG1/bmf6ZmipZToaVsuxnulHV5wQMZvdjvWQZOrQB8VPYWgDbNZhj7D/BeHhys30PAtq7PrL3MJPDAOmamgEVTf3luTMPV3IeAi4r1yC/WSbS3K3RDSBVy1n/dQQW30kPLiQYWbgDZXouzAXyT3FskPANY/yZEUoVCRLdNhhKFLFW3dk1nAh4EusfIx4vXUnk5tv7Yt25YcLtRY84lvebYGRz2x1i4fQSfqhdBHIeWD7Jp6hrNJVGtNiQlbfS23zdamQhyiyJT4h1BRRKrRGdqQTz5C2uVlmNBa8X7k53iuoQOA5B2nnaIQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH0PR12MB5060.namprd12.prod.outlook.com (2603:10b6:610:e3::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
- 2023 17:04:55 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 17:04:55 +0000
-Date:   Wed, 26 Jul 2023 14:04:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     kevin.tian@intel.com, alex.williamson@redhat.com,
-        yi.l.liu@intel.com, joro@8bytes.org, will@kernel.org,
-        robin.murphy@arm.com, shuah@kernel.org,
-        linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        mjrosato@linux.ibm.com, farman@linux.ibm.com
-Subject: Re: [PATCH v8 4/4] vfio: Support IO page table replacement
-Message-ID: <ZMFSNgZgGVV4LXDC@nvidia.com>
-References: <cover.1690226015.git.nicolinc@nvidia.com>
- <182b79f3838f84f220ede6089a0326b6f3f44acf.1690226015.git.nicolinc@nvidia.com>
+        with ESMTP id S230109AbjGZRIM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 13:08:12 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7C479B;
+        Wed, 26 Jul 2023 10:08:10 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-686efb9ee3cso34628b3a.3;
+        Wed, 26 Jul 2023 10:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690391290; x=1690996090;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jyXhagd27xsfagA4mpBvlczZOCwL70cnZ1O+Bi2yCeM=;
+        b=WiRpf8xXnnPC2cDTySvVbHxkgThqpZ0c6oaaRYfTClFXawhCqp+jOW55lULpKEqU8M
+         LO2CWdxcXYpZjZSoAaKs1dPRwlsf1EsGR6j710vfmVhImIBT7opyYJmwXzvYLD2FXwTM
+         +dBEmqmarjHESBn3nXrpsFRKFOZvlAYnbsh5PrCC/4E1TQMTX2L37yhBsMmGPa5fSqf2
+         7M5lKKi8ANw/XpxFBsFXmr98MzXGSL72Af98+FFSXEek7e1CulNPIycG8n3+lWVDCaJC
+         AORitu/f+aJuVUu3bRMeQCg5RIAwvGrauvxQAsn2W9lieKqA/D9XqARHu1H/qaxRCIRX
+         9v0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690391290; x=1690996090;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jyXhagd27xsfagA4mpBvlczZOCwL70cnZ1O+Bi2yCeM=;
+        b=aQP4LPcwMvugw4MMBBMt9vLQ0tMaUoCXipOSpKXi4pQ93YJZSScDieat00f0OLzF1s
+         nPC4j0qM4RuQWBTqGx55tC4H/5owBLj9nj8cMqkIQqjuniEk3kfUGun5tRSBXTmB75m2
+         QZ4mdjfkJKRHEEvZJjqB+jIT15V62vwABp8tOSQsh5Jmg98AWIrhqMmaZ4vcMi3SGcsT
+         rIpGOBox8dzxlDZFMmspIxAq/M+U8pU/yA+7YgMHRgS0+/MQcB5arSzERu6lOBYiB8Ll
+         oQTz6JmeEPMmjNA77sw2BeApbl68WpiXh1fT71cy2SsOPEexIx3Q+hPvBZ68omGDlQSG
+         TIPg==
+X-Gm-Message-State: ABy/qLZScavji0eS3BA+Bc/H7v87fWGr1GW29Y8GcvwICDi86eQ/+p7j
+        wbCQE+Fiao06cHpO/iVbdALOLktOkGtU/TBN
+X-Google-Smtp-Source: APBJJlHoUxrL7Gb3vH3wGr3Zh4JL6JMMrXCYEcjaAvIOxbH/nVhdWi3v0nrKCkDeyj1henERh81tDA==
+X-Received: by 2002:aa7:88c6:0:b0:682:a6c5:6f28 with SMTP id k6-20020aa788c6000000b00682a6c56f28mr3411995pff.32.1690391290004;
+        Wed, 26 Jul 2023 10:08:10 -0700 (PDT)
+Received: from localhost (c-73-190-126-111.hsd1.wa.comcast.net. [73.190.126.111])
+        by smtp.gmail.com with ESMTPSA id x17-20020aa793b1000000b0064f51ee5b90sm12014pff.62.2023.07.26.10.08.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 10:08:09 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 17:08:08 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Arseniy Krasnov <oxffffaa@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v5 07/14] virtio/vsock: add common datagram
+ send path
+Message-ID: <ZMFS+MlAPTso6wjQ@bullseye>
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-7-581bd37fdb26@bytedance.com>
+ <051e4091-556c-4592-4a72-4dacf0015da8@gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <182b79f3838f84f220ede6089a0326b6f3f44acf.1690226015.git.nicolinc@nvidia.com>
-X-ClientProxiedBy: MN2PR18CA0013.namprd18.prod.outlook.com
- (2603:10b6:208:23c::18) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5060:EE_
-X-MS-Office365-Filtering-Correlation-Id: e58e757b-627b-4fe9-aa0d-08db8dfa6f42
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6x7rJqb0CdM5fOcvjxJotgyUYyDr1JkcnyPolPy8ToefgUjmiSTowZHJhJC0v/RuWz7ZxC8Yw7qPmOOUYpfqKB683pzB6B4zxohCsI7XrnVs1BeA+7WiMDkrfmyP704XIgtQsxV3m/wee8dhvpi94YAV+THGXAoQJTGIRlFmoM6xkD3/4y8N9ju3z03/P/rmG7465pZeE7/4QZw1zZPb073EKZTzZiFVa7xo/BZ2G2HK8zjyqFbTw07CIQffTDfwINiN4g8EBfGdHg01TWJzjjUko7+sU22rQNwmqOGt3I1dqNbg7md42ijmE6WjrAVvZaGXIAlJAktTKuzjfNzAFD9/KO0VnEXQ3t/uHGrDjMcJ69/x5jiVBZ+sDoKDxgjStXVepyviAMhg50Ii7OlsB5wHO7yMQIkPiGNw7/Rb4JX1kCSTgTxdLLdKeq3SNSixReJaHQYoxOjiUFpvRCmPnBhEHqLZpGyHV6rs35eKUiPpPL17vE4CGJ+sCf6pzmiTPZhk4ZK/gBqOV6NPqm17/4v/pI4yeKy7iPr9gF8bFS4+YHIhKfzWPPlga+a7YeLT
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(366004)(39860400002)(396003)(451199021)(36756003)(86362001)(2906002)(4744005)(37006003)(478600001)(38100700002)(83380400001)(26005)(186003)(6506007)(2616005)(8676002)(6512007)(5660300002)(6862004)(6486002)(41300700001)(7416002)(4326008)(316002)(6636002)(66556008)(8936002)(66946007)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rOt0tT8ze3Xyfn3SXYU8bjnNgtTUtFzgbBVRg3yKyK2HZxgL0XVmjw0/Y4l/?=
- =?us-ascii?Q?EFg7OI9xBTfyIf06Lfw6bFPURdY/ZAe6t0maLrQIRlTMlHFNOL1veVA7nHx3?=
- =?us-ascii?Q?IC7jl4QAvoIkpWGkckL36cCOBHpuiZKNJtkpSjFy8khYOcH10NrgCeFahJQ/?=
- =?us-ascii?Q?UHiqf/sxzkOBLEHEkXbZ5SMhDC16WDGylnYrC1Vkonb00qG/mod70Aw9bXd6?=
- =?us-ascii?Q?c+j3MoIXk6heR4m53qkdrMLhm55avjYlP4FilM/Ec+Txnb5E1IO5ODsAJ5wL?=
- =?us-ascii?Q?2Uiiu1YlIu/7rLK+GqGI+NRBVYNgEkhFdKAR0n2oGdedGvSEloxjFmzWeCcu?=
- =?us-ascii?Q?aZYahjYY8r01IJJPlKjHXb94KWOmZmd//P3seyvXTsxpwgvZD2JYTT5Hoqc2?=
- =?us-ascii?Q?OthCdUZs9yRfza/U9jgcJyzdhaOZNmjxnYY5OOCnOx9aBYNEZoiNDfufSQD+?=
- =?us-ascii?Q?DVXLapeYidWk8yNDxu0p0W2KRyw3912pC+N2szvGPPUEMz1qIBdtRf1lb/jW?=
- =?us-ascii?Q?N3u4T7JwHJmzC/fpGA+CoTHtsgmRGsJD9fQy7ZQdhDbQb6XMHi2LAAvznhaw?=
- =?us-ascii?Q?Lu8c7QczSHP5H94U2Upgv7xwwnzk1lMRcp+IeW0+nBIg0fx+x51iFHdd1jk+?=
- =?us-ascii?Q?74M7LX42ow83YrGRCDyb9qefKuXFckFzdAksG40M9aSZZZeCjc8Vv9I7mIEp?=
- =?us-ascii?Q?3vTJ8oqstRNSuOQl+dduyWVgf7uSOaEr18yn7keOVefj0NklKVLwZYdF2+Is?=
- =?us-ascii?Q?Tql3+QvoAfzwapIwVN7wbuOKhj9NDougXR7n79J4Zc3tKa4CZOzMeaVbLaGH?=
- =?us-ascii?Q?qNKzMuK1IkVjdT1XEwSOiptOiCia63uVFWbI4usJ5YRa/C65gpzbMGK66KqG?=
- =?us-ascii?Q?xr+XFYGNhLfaxdx2CkMJr+NsZuE4KPbquRlGnYVagpyTGT7ctRaxD47ZRVzS?=
- =?us-ascii?Q?rYVEpBajNJ6Ic8G3UmZ1b1OUIiDXFuMY8HGZlrKVKgCAvMy3/omkisCRKcbu?=
- =?us-ascii?Q?QnPPt7vYNYPtbHhLh0aczRChD63v/5gpD+latl9JLzl4lGkpGnLR3j6joW8e?=
- =?us-ascii?Q?B5S/1DtjNVkHg+muFum+fdH7WRN+u4eTdtMHnQEl5IK7s4cxOFL7JlZBPIjV?=
- =?us-ascii?Q?dthvF3kpAXsypHNQDfiVYaaP9CJJI6kZFoS8+3zcsJQeGnpgWUXNCrFokBvA?=
- =?us-ascii?Q?PqNbNHc0NTaKhcpSShO+vG09Lg7NAiX8kLd5wkwCYFXQBLxiZ1zudPtip3rz?=
- =?us-ascii?Q?ZOuh8z0ZPL0QPDExBY5EEJ3/wkfNqZSD415Xj8/Vbc9W4OdlLs5OXI+ygsAx?=
- =?us-ascii?Q?92+UZmH4l5JP75llk49bBHlk5MSHuHd1YiIr28Ywc91TBTo7phXN0Ln9tnbN?=
- =?us-ascii?Q?OgVpZQt7Q20GxAGw1zlQr/qI5QDw8ULE7n7N5y9E2oZx+2YQS9x//0KgvXjl?=
- =?us-ascii?Q?2DQL5dCTe/Tt9DrELHQHV94lwg04L7xm0emBkaryQzDLaDH43NS+hMdEeS8s?=
- =?us-ascii?Q?OnwVBs0q+6bj8Lul+osxZ5Y0JMrCvzFBm7I4E4tyogF8Kv2YCBqruSTp5nYe?=
- =?us-ascii?Q?1/n/tQ+owTpP+pNvHEvi5Q9cNidJdTOM6OVM5y3/?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e58e757b-627b-4fe9-aa0d-08db8dfa6f42
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 17:04:55.2432
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ae/0RwLHBJjJHiffRzirBiGQ6RraNXgLlCzClUocZN/z7hhy7Ok8/DZJhCD64RsB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5060
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+In-Reply-To: <051e4091-556c-4592-4a72-4dacf0015da8@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 24, 2023 at 12:47:07PM -0700, Nicolin Chen wrote:
-> Now both the physical path and the emulated path should support an IO page
-> table replacement. Call iommufd_device_replace/iommufd_access_replace(),
-> when vdev->iommufd_attached is true.
+On Sat, Jul 22, 2023 at 11:16:05AM +0300, Arseniy Krasnov wrote:
 > 
-> Also update the VFIO_DEVICE_ATTACH_IOMMUFD_PT kdoc in the uAPI header.
 > 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> ---
->  drivers/vfio/iommufd.c    | 11 ++++++-----
->  include/uapi/linux/vfio.h |  6 ++++++
->  2 files changed, 12 insertions(+), 5 deletions(-)
+> On 19.07.2023 03:50, Bobby Eshleman wrote:
+> > This commit implements the common function
+> > virtio_transport_dgram_enqueue for enqueueing datagrams. It does not add
+> > usage in either vhost or virtio yet.
+> > 
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > ---
+> >  net/vmw_vsock/virtio_transport_common.c | 76 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 75 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index ffcbdd77feaa..3bfaff758433 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -819,7 +819,81 @@ virtio_transport_dgram_enqueue(struct vsock_sock *vsk,
+> >  			       struct msghdr *msg,
+> >  			       size_t dgram_len)
+> >  {
+> > -	return -EOPNOTSUPP;
+> > +	/* Here we are only using the info struct to retain style uniformity
+> > +	 * and to ease future refactoring and merging.
+> > +	 */
+> > +	struct virtio_vsock_pkt_info info_stack = {
+> > +		.op = VIRTIO_VSOCK_OP_RW,
+> > +		.msg = msg,
+> > +		.vsk = vsk,
+> > +		.type = VIRTIO_VSOCK_TYPE_DGRAM,
+> > +	};
+> > +	const struct virtio_transport *t_ops;
+> > +	struct virtio_vsock_pkt_info *info;
+> > +	struct sock *sk = sk_vsock(vsk);
+> > +	struct virtio_vsock_hdr *hdr;
+> > +	u32 src_cid, src_port;
+> > +	struct sk_buff *skb;
+> > +	void *payload;
+> > +	int noblock;
+> > +	int err;
+> > +
+> > +	info = &info_stack;
+> 
+> I think 'info' assignment could be moved below, to the place where it is used
+> first time.
+> 
+> > +
+> > +	if (dgram_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> > +		return -EMSGSIZE;
+> > +
+> > +	t_ops = virtio_transport_get_ops(vsk);
+> > +	if (unlikely(!t_ops))
+> > +		return -EFAULT;
+> > +
+> > +	/* Unlike some of our other sending functions, this function is not
+> > +	 * intended for use without a msghdr.
+> > +	 */
+> > +	if (WARN_ONCE(!msg, "vsock dgram bug: no msghdr found for dgram enqueue\n"))
+> > +		return -EFAULT;
+> 
+> Sorry, but is that possible? I thought 'msg' is always provided by general socket layer (e.g. before
+> af_vsock.c code) and can't be NULL for DGRAM. Please correct me if i'm wrong.
+> 
+> Also I see, that in af_vsock.c , 'vsock_dgram_sendmsg()' dereferences 'msg' for checking MSG_OOB without any
+> checks (before calling transport callback - this function in case of virtio). So I think if we want to keep
+> this type of check - such check must be placed in af_vsock.c or somewhere before first dereference of this pointer.
+> 
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+There is some talk about dgram sockets adding additional messages types
+in the future that help with congestion control. Those messages won't
+come from the socket layer, so msghdr will be null. Since there is no
+other function for sending datagrams, it seemed likely that this
+function would be reworked for that purpose. I felt that adding this
+check was a direct way to make it explicit that this function is
+currently designed only for the socket-layer caller.
 
-Jason
+Perhaps a comment would suffice?
+
+> > +
+> > +	noblock = msg->msg_flags & MSG_DONTWAIT;
+> > +
+> > +	/* Use sock_alloc_send_skb to throttle by sk_sndbuf. This helps avoid
+> > +	 * triggering the OOM.
+> > +	 */
+> > +	skb = sock_alloc_send_skb(sk, dgram_len + VIRTIO_VSOCK_SKB_HEADROOM,
+> > +				  noblock, &err);
+> > +	if (!skb)
+> > +		return err;
+> > +
+> > +	skb_reserve(skb, VIRTIO_VSOCK_SKB_HEADROOM);
+> > +
+> > +	src_cid = t_ops->transport.get_local_cid();
+> > +	src_port = vsk->local_addr.svm_port;
+> > +
+> > +	hdr = virtio_vsock_hdr(skb);
+> > +	hdr->type	= cpu_to_le16(info->type);
+> > +	hdr->op		= cpu_to_le16(info->op);
+> > +	hdr->src_cid	= cpu_to_le64(src_cid);
+> > +	hdr->dst_cid	= cpu_to_le64(remote_addr->svm_cid);
+> > +	hdr->src_port	= cpu_to_le32(src_port);
+> > +	hdr->dst_port	= cpu_to_le32(remote_addr->svm_port);
+> > +	hdr->flags	= cpu_to_le32(info->flags);
+> > +	hdr->len	= cpu_to_le32(dgram_len);
+> > +
+> > +	skb_set_owner_w(skb, sk);
+> > +
+> > +	payload = skb_put(skb, dgram_len);
+> > +	err = memcpy_from_msg(payload, msg, dgram_len);
+> > +	if (err)
+> > +		return err;
+> 
+> Do we need free allocated skb here ?
+> 
+
+Yep, thanks.
+
+> > +
+> > +	trace_virtio_transport_alloc_pkt(src_cid, src_port,
+> > +					 remote_addr->svm_cid,
+> > +					 remote_addr->svm_port,
+> > +					 dgram_len,
+> > +					 info->type,
+> > +					 info->op,
+> > +					 0);
+> > +
+> > +	return t_ops->send_pkt(skb);
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtio_transport_dgram_enqueue);
+> >  
+> > 
+> 
+> Thanks, Arseniy
+
+Thanks for the review!
+
+Best,
+Bobby
