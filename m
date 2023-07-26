@@ -2,230 +2,488 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCD5A762F71
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 10:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D67F762F89
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 10:20:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231978AbjGZIQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 04:16:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58758 "EHLO
+        id S232973AbjGZIU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 04:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231942AbjGZIQU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 04:16:20 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B37D2D63;
-        Wed, 26 Jul 2023 01:06:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690358803; x=1721894803;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=lYYLsKwE/7FCMx5+2B9ScqFLeyQNePS6kXATSCcGwBA=;
-  b=Iw5/RkNWTqHK6/jHqEjcgz3memyix3pIo11PVBro8eqc1ru+LkCkgYjP
-   6PPmAjif9WDFLJ3PZE7caqQsauxcdmAuI1BJTjjATZHM3tMDXpWgCJHgI
-   /vKIBS0cACehMeROIB9/Obwk7rOToaMskqVhbWdWnTMg30LrEPD45EZ5Y
-   LP3b7f3wBMvv6KAiNdi9BZtcRojmQ3J+URyguAw8z9x5pTTnhqJPgF3ig
-   kAkLbLTVk+GmWX4aIPBXekuHirkcPC8pCofgaIIaiRTAZ6hvH12FJy9OG
-   xa7lQ5jEJGY8i2zvnQm4DiBZHle/DrZtUEiltGR6BeOw24q9N9ebUGRyi
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="352849887"
-X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="352849887"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 01:06:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10782"; a="726423313"
-X-IronPort-AV: E=Sophos;i="6.01,231,1684825200"; 
-   d="scan'208";a="726423313"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga002.jf.intel.com with ESMTP; 26 Jul 2023 01:06:42 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 26 Jul 2023 01:06:36 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 26 Jul 2023 01:06:35 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 26 Jul 2023 01:06:35 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.102)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 26 Jul 2023 01:06:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B6vWdznIEvxyseYHNq4TorcV39ReRX1lVlXDYqdOyakl89WrN2uG6++iTQa17W5dHDluR4aVY/uPtetUuNIGR/EjvcD4n3+Ae5KOqdoETQGht/mWxy30pVAyKgAkorobiUQ+yzmZF+yXBPu4dZFpCd9HiysXEHGfYwWRjdWwyDe9UZ18hal3Iy2IDxk6RVwNRoJ/doQc55wfDdVD0T0qaqenxbS08ikaYFo6T1c7rrGhYTKd7bVtf7EzjgzrODsBnuWUWV3zl7Ct50VIjC+9iK4L/wi8BtnHzfrStzfU3IGciEv1z+vYzhB4zWOiuuj1CNiKTrkfj0Xwx7TVDqqGKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sj4777tfc0aTtRcvyW6uQy3ZwI/6j3af2D8dvbiNv18=;
- b=CZ9mVA7teaUMbI5xCHscmC/4T6HrZM2Q1vWTIY7B2i+Fg8+yObQHS0TNCvAKNUtAYN4y4AvDvuzi6kydpp2FrOkdewci2iJ+HkJtKTqRtIw+HX1IzGIJk3AB7T6ICjq5ayA1LmqJ3kQW2WiWPscXjg7S7xtvykg1FFxsKtQZ/2LxownBnmBO1keqouMo5V6OASNkqaQuM4kTFEciNCtY3l2dOiRHUdtGlfNeLZvLwK96h/+yxoTcwUGIN1Q+uNZrcsMXUVojcbKX75CT/nEKS+XDg44zDkoEM7KzvalyzaLVNRg3CPlyxsUpfb7sh6YwADZwYR1m54XPfh7pwXqWcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by IA1PR11MB6514.namprd11.prod.outlook.com (2603:10b6:208:3a2::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
- 2023 08:06:32 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::2803:94a7:314c:3254]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::2803:94a7:314c:3254%7]) with mapi id 15.20.6609.032; Wed, 26 Jul 2023
- 08:06:32 +0000
-Date:   Wed, 26 Jul 2023 16:06:22 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-        <john.allen@amd.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
-        <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v4 13/20] KVM:VMX: Emulate read and write to CET MSRs
-Message-ID: <ZMDT/r4sEfMj5Bmu@chao-email>
-References: <20230721030352.72414-1-weijiang.yang@intel.com>
- <20230721030352.72414-14-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230721030352.72414-14-weijiang.yang@intel.com>
-X-ClientProxiedBy: SG2P153CA0041.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::10)
- To PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+        with ESMTP id S231167AbjGZITy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 04:19:54 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BAE121
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 01:08:54 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-686be28e1a8so468619b3a.0
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 01:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1690358934; x=1690963734;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rPtpzUEslahCE2fhb6v9FLtKmqwh/pul7nSSkK8nPUc=;
+        b=3FtP6nyx+rPcvJcblHl1Mu2LvC6NkDi8xEgEFylBPkAlQaYADspiGMJ27o0GgAuj9z
+         McDVZgCUGviszUiy5R0bXahfbrRAfjxnAxmHNnPbaM1LXdSCHnASLGDwytdN0by6FDcI
+         RpceDu/PcRlhyfyf4mYkuokxgwLuCVwRBZl0phBMBuXEmpOfHBU9f5yCZoh2dEO+7TTN
+         DCOxQvb0O++5gEaT2a05V97Ei89pJv+cbAW7+SqulKGKTdXaXFuVtxE2YrWoJBaFXRhx
+         fYB72/J5kZ33VcSsegtqBeEJQacLBG5vKC0M6tbbiCEw9x2oLmMOMSwg9ysSaFAgqAI5
+         sgYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690358934; x=1690963734;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rPtpzUEslahCE2fhb6v9FLtKmqwh/pul7nSSkK8nPUc=;
+        b=K+BjPGOYjHmxdU/z+Ww1WyusYyGOZnYcgSm8h/38hk/BrjlpSnk1wC5YXwbksq62Sr
+         6yjv0VyzUoQ07IyOYHQ0T8j4N95oqlmwPccF50BbeT2c14IOU/RgUHkamyZGw0JqDc4S
+         0JclhKbmWTLkCTanw4JAxJS+lEsb9N59Ftzd2XO0YMzRft9+jkaF4lWPxT6tx4Ndftm0
+         kRWaLf2zcTb0Uh7yHW6bTN289LVzO4Y9+kPlthYtEcKTz08WU5ZXTSPxY+icNpcKrld6
+         czLXNRvVnpHWirNBjpgFv4qTYkGfwKeejcWqRZP9/Wx7AeoXsvDbwhL+YXmzk5T7pCUo
+         hadQ==
+X-Gm-Message-State: ABy/qLbCQO0ZJPG8GWaRJQBZFbKTU/4pHETq/8ukq3YyqWlyzqFET9j/
+        GHU/OaSW/iaJ4yI4oDPm4rHntw==
+X-Google-Smtp-Source: APBJJlGxMb49Gcu6ThVo/6V+1HjCftCctRIBl06nDIbsd9lTZYFUn832db0oPfgPkp12tATT7U4xCA==
+X-Received: by 2002:a05:6a20:1058:b0:138:dbff:f52b with SMTP id gt24-20020a056a20105800b00138dbfff52bmr934336pzc.22.1690358933657;
+        Wed, 26 Jul 2023 01:08:53 -0700 (PDT)
+Received: from dread.disaster.area (pa49-186-119-116.pa.vic.optusnet.com.au. [49.186.119.116])
+        by smtp.gmail.com with ESMTPSA id w2-20020a170902e88200b001a24cded097sm12426907plg.236.2023.07.26.01.08.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 01:08:53 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qOZZi-00Afxb-0y;
+        Wed, 26 Jul 2023 18:08:50 +1000
+Date:   Wed, 26 Jul 2023 18:08:50 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+        roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+        paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+        cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+        gregkh@linuxfoundation.org, muchun.song@linux.dev,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2 44/47] mm: shrinker: make global slab shrink lockless
+Message-ID: <ZMDUkoIXUlTkCSYL@dread.disaster.area>
+References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-45-zhengqi.arch@bytedance.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|IA1PR11MB6514:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3e4f219-1011-484a-33db-08db8daf3900
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BNe7N0P9/mv9kQXQ4rMxErFnWR9dTBvziu+ueyOjcU8hjlNW8/It/eu35R/reiUw2ZPHK0vJj0+1TAypzZcCYdkV2IFRpEcdfvILrRxsctJ2FFUZqZt5sRT8P/Qw/NHlXMvBmAxvW0/DxqE2eZz2b52hH8jKWaLmUpqDVS4bdl3Ym3us8x8bWg7S8m6xY6RLwyApwllVdryoxLVEFL5MkLWhWrE62ptFS0Rv/hEKyUagsEkRt9Bvx1fWVzM/o1Cb6+U1XmKs2/jApJNGZ4zxE9JPNgyGaXuLgOK3/yH6hisPws8toUQVUIzCJaS8HHsgkyn5NSjrzBstvcqtj2S8q0T0BtDoKylV9XqRq0ezH5gHsHROGtJBegweIZNlRE8k7BXGxM/0l/l46DJeivK0Dv/BhU1yrwrQQ49H5MpzT30d/PBLdIfpG20SX5Ski//Mxt5dCy2SzA1gBYvOJJ+ydE442cvt1PpiZ3TEYaJQMTTN2q583xzFJynTx0yDdB7wYRJBu1FjGj1VmUqPaUupN2RDHcdWBrc1+ctgxrm0sjoBdQSAu1qwbT8pObQfn/J7
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(39860400002)(376002)(136003)(396003)(346002)(366004)(451199021)(44832011)(6862004)(8676002)(8936002)(41300700001)(5660300002)(316002)(4326008)(6636002)(2906002)(33716001)(66476007)(66556008)(66946007)(26005)(6486002)(6666004)(186003)(478600001)(9686003)(6506007)(6512007)(86362001)(83380400001)(82960400001)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WFa61eoMpZLkDobtfUG6inXPZxi4aET9em65yoF762y23T+sj+avg3gcKD1E?=
- =?us-ascii?Q?cebCMb6bd5Yh52WRNWNVWSZCDXQa+9o7nVGT+rWI0t1k9jptckTB5BRJ0LpT?=
- =?us-ascii?Q?H87377rVBkTTDqch+HcBavBOcoeQnxFWbTVnqg2bhwIbfMJs54CdWjp4klia?=
- =?us-ascii?Q?zGSDSMQVZSvMC5dlo4+GVumTn5kKPxtH9qLlZkvnpzn+Vfm3N37SxE3iqJEx?=
- =?us-ascii?Q?Jvda5yuPTrC+7oKXbpnLvIlnqHQe3tzBBryP9pG2uhZ70ngBGNmAOS06jqPo?=
- =?us-ascii?Q?fnnWpsmibQ2oANgS/p9kU3XulFBDBGSbAJZOH0RzfbK6uLONjb/ablheIt+6?=
- =?us-ascii?Q?ZJQDQqiVcYRgs4ZysmZP6tybGbEbFc1YbrlRA7BakLiujqcQJ5xppqP5eYNH?=
- =?us-ascii?Q?3kRm+zUdlqlPry4in6KSMJqMH12AjGX8dcKRgE0FDfaGOEV12bCFsblEUqdp?=
- =?us-ascii?Q?hAhzyhUMdIbvItHaDi9Gf+CMKhKRl3FShZfMeXKSzIcJYJWS4KCw/5xTz74f?=
- =?us-ascii?Q?vOMOF9SAB1kqQ1a6QyAU1PGkc/j00ljw8ijE545KRfh/1nq3Yn6vk30zfUKt?=
- =?us-ascii?Q?/hXFS9UVFvtOOfcjRhNqlKojC57tNSjXdRyjlsSI7GiGtT4Krc3n5FqQawVu?=
- =?us-ascii?Q?wNWFrZ+Vyo1ikzaVl06JZ4TpIaa8OpGVvKR3SSunLmCdBnZYHMSYIZa8Vxta?=
- =?us-ascii?Q?1CmaOK5Rt5sVXy1mbx4I2kUpZRzHCyDflJA0zf8A0yIN1auaIYTqUHuhm3Tz?=
- =?us-ascii?Q?VzYtRZSbL9VPCTasYWeVmfiQPOuM3ZoRqru4zJY256/DnbkHj7Hp5sF7C7Yo?=
- =?us-ascii?Q?lPe1V9dq1QaNXdF75SarhFXjkiFzKKofVtA+91iuq+9rTDjXjDytaXFgb36L?=
- =?us-ascii?Q?y7rx2Lc6oYi90i8ChwZoFxVwjbm8G1lAN8Fw4HHOhy1IlBkcTYjuvXu8HcwQ?=
- =?us-ascii?Q?42MpIaXDy8ZUWYF2KB5+JbRAELfGMktEisJOBopRyWbqaEK0OOfYBaNyjcBs?=
- =?us-ascii?Q?vpai1Gg9HJq1BZ4lIS2w61OS3tfWuSi/7Y8Ow3a0RiHHQoIQ50NJaYNRVBe5?=
- =?us-ascii?Q?OIwcge9YjLf9jBY27VBGKyonAn3MP0n6+kd3X62Duo2F7rOJdDx1T9wBO+rN?=
- =?us-ascii?Q?NJc9x5/Xw96fuyac2mcRFf7DjdHGNAEWnNkhM8wxg8pjZZqdC7YXNtrLbwov?=
- =?us-ascii?Q?+TXV2+C6RL5L6txZmNIFOtfKWGdpNT31pKaJE395iqCbqZahA2cvoCzJRJ68?=
- =?us-ascii?Q?kWmIrpMTGp/TWU9Dd0jdPz4y6kD9pnE8gPxXU2Tm80iQqRQdQnJVI2HPERxC?=
- =?us-ascii?Q?rf3n92NQsoCkpzB5xD+DxbczwfSNT9IWURWtCVXom+yTUo4kKQUx5YUNmfI8?=
- =?us-ascii?Q?bS2dAbSNwaJukJmj3syPX28CE4Mm7GnGjYhmfHQxwGUxc/gUkxLkBfZDKVzk?=
- =?us-ascii?Q?bvhieDlgkn34Xid1VjrxKBGydEUq4uTgNKy8MuG4PdUURzUfRP8GrNS4KUMC?=
- =?us-ascii?Q?UhDJM3w8dC1muQy4ysIPAUhVvyk7oGKrWW/0d+U4sNIqOFZpDJkekNAhUq+D?=
- =?us-ascii?Q?DahS5XgI3pi9SVwozxlS78Q4rzBwfLmw6tWd7lAx?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3e4f219-1011-484a-33db-08db8daf3900
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 08:06:32.1084
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Mo9XVuwTrTfg5cRp5zNv5Mpd8fDdIk9XC8q7hPsKKMlJrwsiQEFIblU7TWMEPIBe1WaAl89fWWvZc32Il7y24w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6514
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724094354.90817-45-zhengqi.arch@bytedance.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 11:03:45PM -0400, Yang Weijiang wrote:
->Add VMX specific emulation for CET MSR read and write.
->IBT feature is only available on Intel platforms now and the
->virtualization interface to the control fields is vensor
->specific, so split this part from the common code.
->
->Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
->---
-> arch/x86/kvm/vmx/vmx.c | 40 ++++++++++++++++++++++++++++++++++++++++
-> arch/x86/kvm/x86.c     |  7 -------
-> 2 files changed, 40 insertions(+), 7 deletions(-)
->
->diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->index c8d9870cfecb..b29817ec6f2e 100644
->--- a/arch/x86/kvm/vmx/vmx.c
->+++ b/arch/x86/kvm/vmx/vmx.c
->@@ -2093,6 +2093,21 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> 		else
-> 			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
-> 		break;
->+	case MSR_IA32_U_CET:
->+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
->+		return kvm_get_msr_common(vcpu, msr_info);
+On Mon, Jul 24, 2023 at 05:43:51PM +0800, Qi Zheng wrote:
+> The shrinker_rwsem is a global read-write lock in shrinkers subsystem,
+> which protects most operations such as slab shrink, registration and
+> unregistration of shrinkers, etc. This can easily cause problems in the
+> following cases.
+> 
+> 1) When the memory pressure is high and there are many filesystems
+>    mounted or unmounted at the same time, slab shrink will be affected
+>    (down_read_trylock() failed).
+> 
+>    Such as the real workload mentioned by Kirill Tkhai:
+> 
+>    ```
+>    One of the real workloads from my experience is start
+>    of an overcommitted node containing many starting
+>    containers after node crash (or many resuming containers
+>    after reboot for kernel update). In these cases memory
+>    pressure is huge, and the node goes round in long reclaim.
+>    ```
+> 
+> 2) If a shrinker is blocked (such as the case mentioned
+>    in [1]) and a writer comes in (such as mount a fs),
+>    then this writer will be blocked and cause all
+>    subsequent shrinker-related operations to be blocked.
+> 
+> Even if there is no competitor when shrinking slab, there may still be a
+> problem. The down_read_trylock() may become a perf hotspot with frequent
+> calls to shrink_slab(). Because of the poor multicore scalability of
+> atomic operations, this can lead to a significant drop in IPC
+> (instructions per cycle).
+> 
+> We used to implement the lockless slab shrink with SRCU [2], but then
+> kernel test robot reported -88.8% regression in
+> stress-ng.ramfs.ops_per_sec test case [3], so we reverted it [4].
+> 
+> This commit uses the refcount+RCU method [5] proposed by Dave Chinner
+> to re-implement the lockless global slab shrink. The memcg slab shrink is
+> handled in the subsequent patch.
+> 
+> For now, all shrinker instances are converted to dynamically allocated and
+> will be freed by kfree_rcu(). So we can use rcu_read_{lock,unlock}() to
+> ensure that the shrinker instance is valid.
+> 
+> And the shrinker instance will not be run again after unregistration. So
+> the structure that records the pointer of shrinker instance can be safely
+> freed without waiting for the RCU read-side critical section.
+> 
+> In this way, while we implement the lockless slab shrink, we don't need to
+> be blocked in unregister_shrinker().
+> 
+> The following are the test results:
+> 
+> stress-ng --timeout 60 --times --verify --metrics-brief --ramfs 9 &
+> 
+> 1) Before applying this patchset:
+> 
+> setting to a 60 second run per stressor
+> dispatching hogs: 9 ramfs
+> stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+>                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+> ramfs            735238     60.00     12.37    363.70     12253.05        1955.08
+> for a 60.01s run time:
+>    1440.27s available CPU time
+>      12.36s user time   (  0.86%)
+>     363.70s system time ( 25.25%)
+>     376.06s total time  ( 26.11%)
+> load average: 10.79 4.47 1.69
+> passed: 9: ramfs (9)
+> failed: 0
+> skipped: 0
+> successful run completed in 60.01s (1 min, 0.01 secs)
+> 
+> 2) After applying this patchset:
+> 
+> setting to a 60 second run per stressor
+> dispatching hogs: 9 ramfs
+> stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+>                           (secs)    (secs)    (secs)   (real time) (usr+sys time)
+> ramfs            746677     60.00     12.22    367.75     12443.70        1965.13
+> for a 60.01s run time:
+>    1440.26s available CPU time
+>      12.21s user time   (  0.85%)
+>     367.75s system time ( 25.53%)
+>     379.96s total time  ( 26.38%)
+> load average: 8.37 2.48 0.86
+> passed: 9: ramfs (9)
+> failed: 0
+> skipped: 0
+> successful run completed in 60.01s (1 min, 0.01 secs)
+> 
+> We can see that the ops/s has hardly changed.
+> 
+> [1]. https://lore.kernel.org/lkml/20191129214541.3110-1-ptikhomirov@virtuozzo.com/
+> [2]. https://lore.kernel.org/lkml/20230313112819.38938-1-zhengqi.arch@bytedance.com/
+> [3]. https://lore.kernel.org/lkml/202305230837.db2c233f-yujie.liu@intel.com/
+> [4]. https://lore.kernel.org/all/20230609081518.3039120-1-qi.zheng@linux.dev/
+> [5]. https://lore.kernel.org/lkml/ZIJhou1d55d4H1s0@dread.disaster.area/
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> ---
+>  include/linux/shrinker.h | 19 +++++++---
+>  mm/shrinker.c            | 75 ++++++++++++++++++++++++++--------------
+>  mm/shrinker_debug.c      | 52 +++++++++++++++++++++-------
+>  3 files changed, 104 insertions(+), 42 deletions(-)
+> 
+> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+> index 36977a70bebb..335da93cccee 100644
+> --- a/include/linux/shrinker.h
+> +++ b/include/linux/shrinker.h
+> @@ -4,6 +4,7 @@
+>  
+>  #include <linux/atomic.h>
+>  #include <linux/types.h>
+> +#include <linux/refcount.h>
+>  
+>  #define SHRINKER_UNIT_BITS	BITS_PER_LONG
+>  
+> @@ -86,6 +87,10 @@ struct shrinker {
+>  	long batch;	/* reclaim batch size, 0 = default */
+>  	int seeks;	/* seeks to recreate an obj */
+>  	unsigned flags;
+> +	bool registered;
+> +
+> +	refcount_t refcount;
+> +	struct rcu_head rcu;
+>  
+>  	void *private_data;
+>  
+> @@ -106,14 +111,13 @@ struct shrinker {
+>  #define DEFAULT_SEEKS 2 /* A good number if you don't know better. */
+>  
+>  /* Flags */
+> -#define SHRINKER_REGISTERED	(1 << 0)
+> -#define SHRINKER_NUMA_AWARE	(1 << 1)
+> -#define SHRINKER_MEMCG_AWARE	(1 << 2)
+> +#define SHRINKER_NUMA_AWARE	(1 << 0)
+> +#define SHRINKER_MEMCG_AWARE	(1 << 1)
+>  /*
+>   * It just makes sense when the shrinker is also MEMCG_AWARE for now,
+>   * non-MEMCG_AWARE shrinker should not have this flag set.
+>   */
+> -#define SHRINKER_NONSLAB	(1 << 3)
+> +#define SHRINKER_NONSLAB	(1 << 2)
+>  
+>  unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>  			  int priority);
+> @@ -122,6 +126,13 @@ void shrinker_free_non_registered(struct shrinker *shrinker);
+>  void shrinker_register(struct shrinker *shrinker);
+>  void shrinker_unregister(struct shrinker *shrinker);
+>  
+> +static inline bool shrinker_try_get(struct shrinker *shrinker)
+> +{
+> +	return READ_ONCE(shrinker->registered) &&
+> +	       refcount_inc_not_zero(&shrinker->refcount);
+> +}
 
-kvm_get_msr_common() is called for the "default" case. so this can be dropped.
+Why do we care about shrinker->registered here? If we don't set
+the refcount to 1 until we have fully initialised everything, then
+the shrinker code can key entirely off the reference count and
+none of the lookup code needs to care about whether the shrinker is
+registered or not.
 
->+	case MSR_IA32_S_CET:
->+	case MSR_KVM_GUEST_SSP:
->+	case MSR_IA32_INT_SSP_TAB:
->+		if (kvm_get_msr_common(vcpu, msr_info))
->+			return 1;
->+		if (msr_info->index == MSR_KVM_GUEST_SSP)
->+			msr_info->data = vmcs_readl(GUEST_SSP);
->+		else if (msr_info->index == MSR_IA32_S_CET)
->+			msr_info->data = vmcs_readl(GUEST_S_CET);
->+		else if (msr_info->index == MSR_IA32_INT_SSP_TAB)
->+			msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
->+		break;
-> 	case MSR_IA32_DEBUGCTLMSR:
-> 		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> 		break;
->@@ -2402,6 +2417,31 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> 		else
-> 			vmx->pt_desc.guest.addr_a[index / 2] = data;
-> 		break;
->+#define VMX_CET_CONTROL_MASK		(~GENMASK_ULL(9, 6))
+> +void shrinker_put(struct shrinker *shrinker);
+> +
+>  #ifdef CONFIG_SHRINKER_DEBUG
+>  extern int shrinker_debugfs_add(struct shrinker *shrinker);
+>  extern struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
+> diff --git a/mm/shrinker.c b/mm/shrinker.c
+> index 8a1fe844f1a4..8e3334749552 100644
+> --- a/mm/shrinker.c
+> +++ b/mm/shrinker.c
+> @@ -2,10 +2,13 @@
+>  #include <linux/memcontrol.h>
+>  #include <linux/rwsem.h>
+>  #include <linux/shrinker.h>
+> +#include <linux/rculist.h>
+> +#include <linux/spinlock.h>
+>  #include <trace/events/vmscan.h>
+>  
+>  LIST_HEAD(shrinker_list);
+>  DECLARE_RWSEM(shrinker_rwsem);
+> +DEFINE_SPINLOCK(shrinker_lock);
+>  
+>  #ifdef CONFIG_MEMCG
+>  static int shrinker_nr_max;
+> @@ -450,6 +453,18 @@ static unsigned long do_shrink_slab(struct shrink_control *shrinkctl,
+>  	return freed;
+>  }
+>  
+> +void shrinker_put(struct shrinker *shrinker)
+> +{
+> +	if (refcount_dec_and_test(&shrinker->refcount)) {
+> +		spin_lock(&shrinker_lock);
+> +		list_del_rcu(&shrinker->list);
+> +		spin_unlock(&shrinker_lock);
+> +
+> +		kfree(shrinker->nr_deferred);
+> +		kfree_rcu(shrinker, rcu);
+> +	}
+> +}
 
-bits9-6 are reserved for both intel and amd. Shouldn't this check be
-done in the common code?
+Urk, no.
 
->+#define CET_LEG_BITMAP_BASE(data)	((data) >> 12)
->+#define CET_EXCLUSIVE_BITS		(CET_SUPPRESS | CET_WAIT_ENDBR)
+We want the shrinker_free() code to block waiting for the shrinker
+reference count to go to zero, because the shrinkers can reference
+structures that are associated with the path that is freeing the
+shrinker.
 
->+	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
->+		return kvm_set_msr_common(vcpu, msr_info);
+i.e. we do not want to free the superblock of a filesystem whilst
+the shrinker is still running, but the way you've done this is that
+the shrinker can run whilst the structure that contains it has been
+torn down.
 
-this hunk can be dropped as well.
+This should use a completion, then it is always safe under
+rcu_read_lock().  This also gets rid of the shrinker_lock spin lock,
+which only exists because we can't take a blocking lock under
+rcu_read_lock(). i.e:
 
->+		break;
->+	case MSR_IA32_U_CET:
->+	case MSR_IA32_S_CET:
->+	case MSR_KVM_GUEST_SSP:
->+	case MSR_IA32_INT_SSP_TAB:
->+		if ((msr_index == MSR_IA32_U_CET ||
->+		     msr_index == MSR_IA32_S_CET) &&
->+		    ((data & ~VMX_CET_CONTROL_MASK) ||
->+		     !IS_ALIGNED(CET_LEG_BITMAP_BASE(data), 4) ||
->+		     (data & CET_EXCLUSIVE_BITS) == CET_EXCLUSIVE_BITS))
->+			return 1;
 
-how about
+void shrinker_put(struct shrinker *shrinker)
+{
+	if (refcount_dec_and_test(&shrinker->refcount))
+		complete(&shrinker->done);
+}
 
-	case MSR_IA32_U_CET:
-	case MSR_IA32_S_CET:
-		if ((data & ~VMX_CET_CONTROL_MASK) || ...
-			...
+void shrinker_free()
+{
+	.....
+	refcount_dec(&shrinker->refcount);
+	wait_for_completion(&shrinker->done);
+	/*
+	 * lookups on the shrinker will now all fail as refcount has
+	 * fallen to zero. We can now remove it from the lists and
+	 * free it.
+	 */
+	down_write(shrinker_rwsem);
+	list_del_rcu(&shrinker->list);
+	up_write(&shrinker_rwsem);
+	call_rcu(shrinker->rcu_head, shrinker_free_rcu_cb);
+}
 
-	case MSR_KVM_GUEST_SSP:
-	case MSR_IA32_INT_SSP_TAB:
+....
+
+> @@ -686,11 +711,14 @@ EXPORT_SYMBOL(shrinker_free_non_registered);
+>  
+>  void shrinker_register(struct shrinker *shrinker)
+>  {
+> -	down_write(&shrinker_rwsem);
+> -	list_add_tail(&shrinker->list, &shrinker_list);
+> -	shrinker->flags |= SHRINKER_REGISTERED;
+> +	refcount_set(&shrinker->refcount, 1);
+> +
+> +	spin_lock(&shrinker_lock);
+> +	list_add_tail_rcu(&shrinker->list, &shrinker_list);
+> +	spin_unlock(&shrinker_lock);
+> +
+>  	shrinker_debugfs_add(shrinker);
+> -	up_write(&shrinker_rwsem);
+> +	WRITE_ONCE(shrinker->registered, true);
+>  }
+>  EXPORT_SYMBOL(shrinker_register);
+
+This just looks wrong - you are trying to use WRITE_ONCE() as a
+release barrier to indicate that the shrinker is now set up fully.
+That's not necessary - the refcount is an atomic and along with the
+rcu locks they should provides all the barriers we need. i.e.
+
+void shrinker_register(struct shrinker *shrinker)
+{
+	down_write(&shrinker_rwsem);
+	list_add_tail_rcu(&shrinker->list, &shrinker_list);
+	shrinker->flags |= SHRINKER_REGISTERED;
+	shrinker_debugfs_add(shrinker);
+	up_write(&shrinker_rwsem);
+
+	/*
+	 * now the shrinker is fully set up, take the first
+	 * reference to it to indicate that lookup operations are
+	 * now allowed to use it via shrinker_try_get().
+	 */
+	refcount_set(&shrinker->refcount, 1);
+}
+
+> diff --git a/mm/shrinker_debug.c b/mm/shrinker_debug.c
+> index f1becfd45853..c5573066adbf 100644
+> --- a/mm/shrinker_debug.c
+> +++ b/mm/shrinker_debug.c
+> @@ -5,6 +5,7 @@
+>  #include <linux/seq_file.h>
+>  #include <linux/shrinker.h>
+>  #include <linux/memcontrol.h>
+> +#include <linux/rculist.h>
+>  
+>  /* defined in vmscan.c */
+>  extern struct rw_semaphore shrinker_rwsem;
+> @@ -161,17 +162,21 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+>  {
+>  	struct dentry *entry;
+>  	char buf[128];
+> -	int id;
+> -
+> -	lockdep_assert_held(&shrinker_rwsem);
+> +	int id, ret = 0;
+>  
+>  	/* debugfs isn't initialized yet, add debugfs entries later. */
+>  	if (!shrinker_debugfs_root)
+>  		return 0;
+>  
+> +	down_write(&shrinker_rwsem);
+> +	if (shrinker->debugfs_entry)
+> +		goto fail;
+> +
+>  	id = ida_alloc(&shrinker_debugfs_ida, GFP_KERNEL);
+> -	if (id < 0)
+> -		return id;
+> +	if (id < 0) {
+> +		ret = id;
+> +		goto fail;
+> +	}
+>  	shrinker->debugfs_id = id;
+>  
+>  	snprintf(buf, sizeof(buf), "%s-%d", shrinker->name, id);
+> @@ -180,7 +185,8 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+>  	entry = debugfs_create_dir(buf, shrinker_debugfs_root);
+>  	if (IS_ERR(entry)) {
+>  		ida_free(&shrinker_debugfs_ida, id);
+> -		return PTR_ERR(entry);
+> +		ret = PTR_ERR(entry);
+> +		goto fail;
+>  	}
+>  	shrinker->debugfs_entry = entry;
+>  
+> @@ -188,7 +194,10 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
+>  			    &shrinker_debugfs_count_fops);
+>  	debugfs_create_file("scan", 0220, entry, shrinker,
+>  			    &shrinker_debugfs_scan_fops);
+> -	return 0;
+> +
+> +fail:
+> +	up_write(&shrinker_rwsem);
+> +	return ret;
+>  }
+>  
+>  int shrinker_debugfs_rename(struct shrinker *shrinker, const char *fmt, ...)
+> @@ -243,6 +252,11 @@ struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
+>  	shrinker->name = NULL;
+>  
+>  	*debugfs_id = entry ? shrinker->debugfs_id : -1;
+> +	/*
+> +	 * Ensure that shrinker->registered has been set to false before
+> +	 * shrinker->debugfs_entry is set to NULL.
+> +	 */
+> +	smp_wmb();
+>  	shrinker->debugfs_entry = NULL;
+>  
+>  	return entry;
+> @@ -266,14 +280,26 @@ static int __init shrinker_debugfs_init(void)
+>  	shrinker_debugfs_root = dentry;
+>  
+>  	/* Create debugfs entries for shrinkers registered at boot */
+> -	down_write(&shrinker_rwsem);
+> -	list_for_each_entry(shrinker, &shrinker_list, list)
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+> +		if (!shrinker_try_get(shrinker))
+> +			continue;
+> +		rcu_read_unlock();
+> +
+>  		if (!shrinker->debugfs_entry) {
+> -			ret = shrinker_debugfs_add(shrinker);
+> -			if (ret)
+> -				break;
+> +			/* Paired with smp_wmb() in shrinker_debugfs_detach() */
+> +			smp_rmb();
+> +			if (READ_ONCE(shrinker->registered))
+> +				ret = shrinker_debugfs_add(shrinker);
+>  		}
+> -	up_write(&shrinker_rwsem);
+> +
+> +		rcu_read_lock();
+> +		shrinker_put(shrinker);
+> +
+> +		if (ret)
+> +			break;
+> +	}
+> +	rcu_read_unlock();
+>  
+>  	return ret;
+>  }
+
+And all this churn and complexity can go away because the
+shrinker_rwsem is still used to protect shrinker_register()
+entirely....
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
