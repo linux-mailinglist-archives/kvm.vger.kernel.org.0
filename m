@@ -2,51 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78FD9762C2B
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 08:58:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0660762C4D
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232255AbjGZG6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 02:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
+        id S232004AbjGZHBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 03:01:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232233AbjGZG62 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 02:58:28 -0400
-Received: from out-50.mta1.migadu.com (out-50.mta1.migadu.com [IPv6:2001:41d0:203:375::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A1B2D63;
-        Tue, 25 Jul 2023 23:58:14 -0700 (PDT)
+        with ESMTP id S232087AbjGZHAa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 03:00:30 -0400
+Received: from out-21.mta0.migadu.com (out-21.mta0.migadu.com [91.218.175.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C84AA10CB
+        for <kvm@vger.kernel.org>; Tue, 25 Jul 2023 23:59:36 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690354693;
+        t=1690354775;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vJECzEbg6AvUr2F/gs+Gdm9ozTbMv8VDjSGrHUhWzDY=;
-        b=h66bJdZfshf2g1RLUpKqwxN7lHNgmJn36kolmPZUX2Aqc09HU6VbZ+x+Z0DjP9YGQTMTaE
-        Bmqs9Mr+MJHT0UpOpBW+6O4BcvF6xaU81Xxo7qywI9w5gMUx1fYGe1bTsluzGucfJTYdAa
-        elPkOC38C2T6cXpSojcQr4ueQ4x5eAU=
+        bh=Uv3CnAnXFWAb1Qfc6DYGZ2zStBaDmHQahM10yM3E8NM=;
+        b=jD53phpyWPV1m6lZJFSij23z5l3BtMZ3Nm78UJiIwyWe54WQrTuB+sE65oVwbOCaOC4LVW
+        IQLhspnZBS8xdLdXGppCnRW57Ryb0UwsUR0bMOKoxDhTEU7CwRK7a6TaSyxs47bGtrMftD
+        EYhZrEwmNT7OG6AMmxQHn4AvJzBEbco=
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 13/47] nfs: dynamically allocate the nfs-acl shrinker
+Subject: Re: [PATCH v2 14/47] nfsd: dynamically allocate the nfsd-filecache
+ shrinker
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-14-zhengqi.arch@bytedance.com>
-Date:   Wed, 26 Jul 2023 14:57:20 +0800
+In-Reply-To: <20230724094354.90817-15-zhengqi.arch@bytedance.com>
+Date:   Wed, 26 Jul 2023 14:59:06 +0800
 Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
         Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
         Christian Brauner <brauner@kernel.org>,
         "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        yujie.liu@intel.com, Greg KH <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        x86@kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-erofs@lists.ozlabs.org,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
         linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
         linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
         dm-devel@redhat.com, linux-raid@vger.kernel.org,
         linux-bcache@vger.kernel.org,
@@ -54,9 +53,9 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <344A2B0E-8A25-494A-A8E1-5C75441B965D@linux.dev>
+Message-Id: <864F467A-C237-44F9-9271-945146948336@linux.dev>
 References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-14-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-15-zhengqi.arch@bytedance.com>
 To:     Qi Zheng <zhengqi.arch@bytedance.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -73,7 +72,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 > On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
 > 
-> Use new APIs to dynamically allocate the nfs-acl shrinker.
+> Use new APIs to dynamically allocate the nfsd-filecache shrinker.
 > 
 > Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
