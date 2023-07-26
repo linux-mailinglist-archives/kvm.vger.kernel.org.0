@@ -2,118 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 912C4763F53
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 21:16:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A826E763F81
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 21:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229461AbjGZTQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 15:16:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56528 "EHLO
+        id S231536AbjGZT0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 15:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230355AbjGZTQH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 15:16:07 -0400
-Received: from newman.cs.utexas.edu (newman.cs.utexas.edu [128.83.139.110])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F258D2719
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 12:16:03 -0700 (PDT)
-X-AuthUser: ysohail
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cs.utexas.edu;
-        s=default; t=1690398961;
-        bh=d9AHuy6GF4k2dbeYTPVke4RlDooCQdQSYfKs+mOspVk=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=Zk+MxWZxZ/23oNaAMmiyheE+n3JcJfx7pDhas4aQS7YsuL6iuMg3zp0nL6oMafNLu
-         WnEEm0KBtQnCgm6qi17dR1tXVnnvMEvXx5RNTx0kL63UKBy5K5ucTjVSB7VsQWlFx5
-         WyxU17ztzER5JVMTikcGfQq2kjAnSUzu4ot+HMfU=
-Received: from [192.168.0.202] (71-138-92-128.lightspeed.hstntx.sbcglobal.net [71.138.92.128])
-        (authenticated bits=0)
-        by newman.cs.utexas.edu (8.14.4/8.14.4/Debian-4.1ubuntu1.1) with ESMTP id 36QJG0jC023258
-        (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT);
-        Wed, 26 Jul 2023 14:16:01 -0500
-Message-ID: <27f998f5-748b-c356-9bb6-813573c758e5@cs.utexas.edu>
-Date:   Wed, 26 Jul 2023 14:16:00 -0500
+        with ESMTP id S231546AbjGZT0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 15:26:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C4D2720
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 12:25:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690399549;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b470bquDvAWwTJ3wEUm2l/rKWbtahDTcrXgZvkuAUQM=;
+        b=QzZxSmdtkR0Ld42nFtYsbFdrxsMrwL7GhdmeFKCGfPmG4I9QtPkSfr6Cj77qxmY2DPlUY4
+        zjxnniK8t1jOIqVhhSUCP2NMygk0CF1AhJbcY/bHeC1Q4EpmhH7ZDh8AGmJ2+mRPBcCPnQ
+        P3hjplMFlzoYFs0p/IkBH17L5gyAh7E=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-668-HYiWqIlxMC6xgdhpXH21HA-1; Wed, 26 Jul 2023 15:25:47 -0400
+X-MC-Unique: HYiWqIlxMC6xgdhpXH21HA-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-78705f0e3feso8668439f.1
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 12:25:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690399547; x=1691004347;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b470bquDvAWwTJ3wEUm2l/rKWbtahDTcrXgZvkuAUQM=;
+        b=Vx+DX4FGcvDUYtr7wQdSj1InFBC6j6CqbF7XYrgGZo1jfHu6n0nypGls46pn1uic7b
+         sUKUGGiVQ9ydLoCqdQcZ2/WjOmvvjjmI9WN4NJyHuQJF2cnRjUmlfUkE33DiVjMFPlzm
+         KjF1t1Zb5d+UeDqfnUKAN3tAOL24o+9efhxETpJW+HMWnP1f6580io8a6T5io5KVPFyg
+         kSpuQDmTMScwldOG8+kJsLND/LXi5O3E0UvAl8Fr+fnSeryAPfWQQXY9sOCX/Fvpfkmu
+         rFpE3oA7BIGdVA2wZ/55ec976TA3EaGP6FdeEVuW3xglSS2YAVktxx3O/2+lxuhP/4Uj
+         pb9Q==
+X-Gm-Message-State: ABy/qLYwWCmW1OyseJoYHXFqgKRiLT4igCuWZukkwWS9uX47DaLSeUF6
+        7aumc+5xV1HrVAKnL3tBWvzsNkI7sYD/eq5I0iTLSIC4w4BTySW+6ifIb/NZz71Upe66Oop95QZ
+        GgdgxDnpI08Sq
+X-Received: by 2002:a05:6602:10f:b0:783:57a0:612c with SMTP id s15-20020a056602010f00b0078357a0612cmr3115861iot.10.1690399547027;
+        Wed, 26 Jul 2023 12:25:47 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHKSNJk//D8TxnhZOZHTizZXe3HvjTavmKRr+BZbiNXoTGUO8viZnZraxYCP7ylJPTA66TjGg==
+X-Received: by 2002:a05:6602:10f:b0:783:57a0:612c with SMTP id s15-20020a056602010f00b0078357a0612cmr3115848iot.10.1690399546796;
+        Wed, 26 Jul 2023 12:25:46 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id e26-20020a5d925a000000b0078335414ddesm5258050iol.26.2023.07.26.12.25.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 12:25:46 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 13:25:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Brett Creeley <bcreeley@amd.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        simon.horman@corigine.com, shannon.nelson@amd.com
+Subject: Re: [PATCH v13 vfio 0/7] pds-vfio-pci driver
+Message-ID: <20230726132544.69e52844.alex.williamson@redhat.com>
+In-Reply-To: <95fa9f2d-a529-4d79-167f-eaee1ed0ac4f@amd.com>
+References: <20230725214025.9288-1-brett.creeley@amd.com>
+        <ZMEhCrZDNLSrWP/5@nvidia.com>
+        <20230726125051.424ed592.alex.williamson@redhat.com>
+        <95fa9f2d-a529-4d79-167f-eaee1ed0ac4f@amd.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: KVM_EXIT_FAIL_ENTRY with hardware_entry_failure_reason = 7
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <7b5f626c-9f48-15e2-8f7a-1178941db048@cs.utexas.edu>
- <ZMFVLiC3YvPY3bSP@google.com>
-Content-Language: en-US
-From:   Yahya Sohail <ysohail@cs.utexas.edu>
-In-Reply-To: <ZMFVLiC3YvPY3bSP@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.3.9 (newman.cs.utexas.edu [128.83.139.110]); Wed, 26 Jul 2023 14:16:01 -0500 (CDT)
-X-Virus-Scanned: clamav-milter 0.103.8 at newman
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/26/23 12:17, Sean Christopherson wrote:
->> If so, what fields in the kvm_run struct should I check that could cause such
->> an issue?
+On Wed, 26 Jul 2023 12:05:13 -0700
+Brett Creeley <bcreeley@amd.com> wrote:
+
+> On 7/26/2023 11:50 AM, Alex Williamson wrote:
+> > Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> > 
+> > 
+> > On Wed, 26 Jul 2023 10:35:06 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> >> On Tue, Jul 25, 2023 at 02:40:18PM -0700, Brett Creeley wrote:
+> >>  
+> >>> Note: This series is based on the latest linux-next tree. I did not base
+> >>> it on the Alex Williamson's vfio/next because it has not yet pulled in
+> >>> the latest changes which include the pds_vdpa driver. The pds_vdpa
+> >>> driver has conflicts with the pds-vfio-pci driver that needed to be
+> >>> resolved, which is why this series is based on the latest linux-next
+> >>> tree.  
+> >>
+> >> This is not the right way to handle this, Alex cannot apply a series
+> >> against linux-next.
+> >>
+> >> If you can't make a shared branch and the conflicts are too
+> >> significant to forward to Linus then you have to wait for the next
+> >> cycle.  
+> > 
+> > Brett, can you elaborate on what's missing from my next branch vs
+> > linux-next?
+> > 
+> > AFAICT the pds_vdpa driver went into mainline via a8d70602b186 ("Merge
+> > tag 'for_linus' of
+> > git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost") during the
+> > v6.5 merge window and I'm not spotting anything in linux-next obviously
+> > relevant to pds-vfio-pci since then.
+> > 
+> > There's a debugfs fix on the list, but that's sufficiently trivial to
+> > fixup on merge if necessary.  This series also applies cleanly vs my
+> > current next branch.  Was the issue simply that I hadn't updated my
+> > next branch (done yesterday) since the v6.5 merge window?  You can
+> > always send patches vs mainline.  Thanks,  
 > 
-> Heh, all of them.  I'm only somewhat joking.  Root causing "invalid control field"
-> errors on bare metal is painfully difficult, bordering on impossible if you don't
-> have something to give you a hint as to what might be going wrong.
+> Yeah, this was exactly it. Your vfio/next branch didn't have the 
+> pds_vdpa series in it yet, which also included some changes to the 
+> header files used by the pds-vfio-pci series, which is where the 
+> conflicts are.
 
-I suppose that's what I was expecting, but was hoping it could be 
-narrowed down a bit. Could the values of the CPU control registers or 
-other special registers set with KVM_SET_SREGS also cause this error 
-(with hardware_entry_failure_reason = 7)? I'd expect this not to be 
-possible because I don't think the CPU registers are part of the VMCS, 
-but I'm not very familiar with VMX.
+Ok, so let's put this back on the table as a candidate for v6.6.
 
-I do know that the emulator I'm copying state from likely doesn't 
-consider all bits in the control fields, so it's possible that they're 
-in an invalid state. When I ran the model before with the value for cr0 
-copied out of the emulator I also got KVM_EXIT_FAIL_ENTRY, but with a 
-different value for hardware_entry_failure_reason = 0x80000021. I fixed 
-this by changing the value of cr0 to be (hopefully) valid.
+> Should I rebase my series on your vfio/next branch and resend?
 
-> If you can, try running a nested setup, i.e. run a normal Linux guest as your L1
-> VM (L0 is bare metal), and then run your problematic x86 emulator VM within that
-> L1 guest (that's your L2).  Then, in L0 (your bare metal host), enable the
-> kvm_nested_vmenter_failed tracepoint.
-> 
-> The kvm_nested_vmenter_failed tracepoint logs all VM-Enter failures that _KVM_
-> detects when L1 attempts a nested VM-Enter from L1 to L2.  If you're at all lucky,
-> KVM in L0 (acting a the CPU from L1's perspective) will detect the invalid state
-> and explicitly log which consistency check failed.
+It doesn't seem necessary, I think rebasing my next branch to v6.5-rc3
+made it effectively equivalent to linux-next for the purposes of this
+driver.  It applies cleanly, so I think we can continue review from
+this.  Thanks,
 
-I did this and had an interesting result. Instead of exiting with 
-KVM_EXIT_FAIL_ENTRY, it exited with KVM_EXIT_UNkNOWN, and 
-hardware_exit_reason = 0. I also didn't get anything logged from the 
-kvm_nested_vmenter_failed trace point. When I checked the value of rip 
-after KVM_RUN, it was the same as the starting value, so it probably 
-failed without executing any instructions.
+Alex
 
-I then tried setting the kvm_nested_vmexit tracepoint to see if I could 
-get any more information about the vmexit. When the vmexit occurred, I 
-got a line in the log that looked like this:
-
-CPU 3/KVM-9310    [013] ....  6076.453278: kvm_nested_vmexit: vcpu 3 
-reason EPT_VIOLATION rip 0x103c00 info1 0x0000000000000781 info2 
-0x000000008000030d intr_info 0x00000000 error_code 0x00000000
-
-It appears this occurred due to an EPT_VIOLATION. I have some questions:
-I believe an EPT_VIOLATION is caused by trying to access physical memory 
-that is not mapped. Is that correct? Also, could this be the same error 
-that causes the KVM_EXIT_FAIL_ENTRY when running the VM as L1, or must 
-that be a separate issue?
-
-I know that the paging code of the emulator the state is from is a 
-little suspect (in fact, one of my reasons to get this VM working in KVM 
-is to help debug the emulator), and it is possible that the page tables 
-of the VM are not setup properly and are mapping linear addresses to 
-unexpected physical addresses and causing an EPT_VIOLATION. I'll have to 
-look into that further.
-
-Thanks for the help,
-Yahya Sohail
