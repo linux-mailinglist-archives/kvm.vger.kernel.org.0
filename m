@@ -2,84 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F26DD762D1F
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:20:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26002762D3C
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:25:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232570AbjGZHUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 03:20:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52916 "EHLO
+        id S232628AbjGZHY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 03:24:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231887AbjGZHTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 03:19:37 -0400
-Received: from out-59.mta0.migadu.com (out-59.mta0.migadu.com [IPv6:2001:41d0:1004:224b::3b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DEC04213
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:16:37 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690355795;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D9nV4Gkwsjrr4/95UoI7nAR6TO/qI/lblnfLq6UsstM=;
-        b=GN2j9vh2yOL79kRSdyksTtnS6NLSWm3pqace0LlbvJbsUtBuOWKaOFqFI1x2Gwlrwmnstj
-        qq8J0QgybstmeW5uMSmzXD5PGEe4vfK3am0PPA/1MT9BMOHcQr+Msowj7sFjpB4siS73jQ
-        C2Exy1Nss1FPxGRLcy6vcv7TsLEuQ08=
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 22/47] drm/i915: dynamically allocate the i915_gem_mm
- shrinker
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-23-zhengqi.arch@bytedance.com>
-Date:   Wed, 26 Jul 2023 15:15:47 +0800
-Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
-        tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
-        Christian Brauner <brauner@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        yujie.liu@intel.com, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <82139544-DF2B-42FB-A323-5E4F0598EF4E@linux.dev>
-References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-23-zhengqi.arch@bytedance.com>
-To:     Qi Zheng <zhengqi.arch@bytedance.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S232461AbjGZHYY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 03:24:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C96271B
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:23:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6D86261729
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 07:23:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C34B2C433C8;
+        Wed, 26 Jul 2023 07:23:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690356195;
+        bh=fmrn9UYFnmy/BlVFYQWful2ZOWT+l1dO2Wcn620jXPM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=sMCaYV0ger/LEDrEhXwkYp3dfHsbZNWzAtR2ETbexSSWR6QVuSnyd5sINbh/XB56+
+         uUOIIaRV7ccoo6z1GB3WMBDBupLLUXQGFNmxUYYZd32mt+oxuoVguQ0BBTvikyUUme
+         ALwBITRgLSjg4tA3Zg4xnbsHzf9+1oO7s3+qBQgKuKeBVIBK4P8g6qMAebDhuzzZO8
+         glLbl1L0e/eIVphXXxU/ZeiA+/+pNNtZHb3ybE42olYEK1NNY1E9Vw57jvvKYDqRBG
+         uehfJw8LF8ekCPZes1x2/5kQdLKsGNcspU3w5jXNI/rnYZOSligpe0eOXderbv1whw
+         kBv3z5/CNkn8Q==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qOYrZ-00Gwev-AW;
+        Wed, 26 Jul 2023 08:23:13 +0100
+Date:   Wed, 26 Jul 2023 08:23:09 +0100
+Message-ID: <87y1j3qgpu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
+In-Reply-To: <fd0d93ae-1ae5-b53e-ccb7-04d78f7c31d9@redhat.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+        <20230712145810.3864793-15-maz@kernel.org>
+        <fd0d93ae-1ae5-b53e-ccb7-04d78f7c31d9@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
+On Tue, 25 Jul 2023 17:39:52 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> In preparation for implementing lockless slab shrink, use new APIs to
-> dynamically allocate the i915_gem_mm shrinker, so that it can be freed
-> asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
-> read-side critical section when releasing the struct drm_i915_private.
+> Hi Marc,
 > 
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> On 7/12/23 16:57, Marc Zyngier wrote:
+> > As we're about to majorly extend the handling of FGT registers,
+> > restructure the code to actually save/restore the registers
+> > as required. This is made easy thanks to the previous addition
+> > of the EL2 registers, allowing us to use the host context for
+> > this purpose.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 55 +++++++++++++------------
+> >  2 files changed, 49 insertions(+), 27 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 028049b147df..85908aa18908 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -333,6 +333,27 @@
+> >  				 BIT(18) |		\
+> >  				 GENMASK(16, 15))
+> >  
+> > +/*
+> > + * FGT register definitions
+> > + *
+> > + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+> > + * We're not using the generated masks as they are usually ahead of
+> > + * the published ARM ARM, which we use as a reference.
+> > + *
+> > + * Once we get to a point where the two describe the same thing, we'll
+> > + * merge the definitions. One day.
+> > + */
+> > +#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
+> > +#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+> > +#define __HFGRTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
+> > +
+> > +#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
+> > +				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+> > +				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
+> > +				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+> > +#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
+> > +#define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
+> > +
+> >  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+> >  #define HPFAR_MASK	(~UL(0xf))
+> >  /*
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index 4bddb8541bec..9781e79a5127 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+> >  	}
+> >  }
+> >  
+> > -static inline bool __hfgxtr_traps_required(void)
+> > -{
+> > -	if (cpus_have_final_cap(ARM64_SME))
+> > -		return true;
+> > -
+> > -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> > -		return true;
+> >  
+> > -	return false;
+> > -}
+> >  
+> > -static inline void __activate_traps_hfgxtr(void)
+> > +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+> >  {
+> > +	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+> >  	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
+> > +	u64 r_val, w_val;
+> > +
+> > +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> > +		return;
+> > +
+> > +	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
+> > +	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
+> >  
+> >  	if (cpus_have_final_cap(ARM64_SME)) {
+> >  		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
+> > @@ -98,26 +97,30 @@ static inline void __activate_traps_hfgxtr(void)
+> >  	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+> >  		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
+> >  
+> > -	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
+> > -	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
+> > +
+> > +	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+> I don't get why you do
+> 
+> & ~HFGxTR_EL2_nACCDATA_EL1 as this latter also has a negative polarity. 
+> 
+> Please could you explain what is special with this bit/add a comment?
 
-Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+Nothing is really special with this bit.
 
+But it is currently always cleared (we blindly write a big fat zero),
+and I wanted to explicitly show all the instructions for which we
+enable trapping for (ACCDATA_EL1 being the only one that is currently
+documented in the ARM ARM, although there are more already).
 
+So the construct I came up with is the above, initialising the
+register value with the nMASK bits (i.e. not trapping the
+corresponding instructions), and then clearing the bit for the stuff
+we want to trap. Maybe adding something like:
+
+/* Default to no trapping anything but ACCDATA_EL1 */
+
+would help?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
