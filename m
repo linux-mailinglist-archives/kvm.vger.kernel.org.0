@@ -2,135 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6528A76384B
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 16:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 178AA7638FE
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 16:25:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233191AbjGZOFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 10:05:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34286 "EHLO
+        id S234514AbjGZOZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 10:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231787AbjGZOFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 10:05:22 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA982132
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 07:05:21 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bb982d2572so19016665ad.0
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 07:05:21 -0700 (PDT)
+        with ESMTP id S234193AbjGZOZE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 10:25:04 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA707170D
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 07:25:01 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5840614b107so33874337b3.1
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 07:25:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690380321; x=1690985121;
+        d=google.com; s=20221208; t=1690381501; x=1690986301;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PdewSqbu0kfeZ5E3lYwpUZYvX+SwKUd0gKg6LQczZgM=;
-        b=5ZkzP+PZ8Zg+ooETP3j1Malqu4lrJVYLDxfQ1+HWqij6/F3aiyjzra61SwRftFJofT
-         NT0Wik6Xa4RzqgfqeAdeylLSCiF+0ytzUBh3QJjmza7gN5aS/JB9UXcAVJe3zoCTInJf
-         LioLJ2hnBgPVA24dNVPOeJZwLsHzUXbs9kirneMmHQE9E6hyZks0/zJNO/VS02uSPpgV
-         0KneUR4j5gll0JPppwh4OnHRuQNsHsdCfBWhDywQDoG7eFP/4lMHScJsWn6ePWvkfgxY
-         ageziXTOcUU02Jpe1DkTcQPgNfkDo5K8j52aTkqhWE55GgUOKevC1kMqbBKE9wh8qd6g
-         NEzA==
+        bh=mt8/YY3u8LjsBjr8d6/ke2ZW25YHueLUKLJjDJYMc8s=;
+        b=KwMaCkiB4xAqGBUh9OF2kV0ZTXZJ9t/BQNvELYTboh2nFXRCb/O6mzI5Rf4+JkOSUf
+         GbfKDvzjuzeoTYk+8UzFDnEFGCf4Xp/4j132VlBFiOap0dqwF0d+IWavL7GkLuWIPxaf
+         FtFh1NcigPTHGOQymzspNYZcGJWMeYjGrAKFBYQg3vkICZKAIWBqnifvNeqq77Udkh7Z
+         xGehHXpHV6lJVR2/PB6tUzMEDhiwA5lq38Ga3ndr8/43j3+UY7kRIeUxbAwefFFreB6b
+         OU07H0FnfDMXq+of8q/ygEkV9SZmVl7edMM6TzYoGxGd/1xqW6Xr5wUrtaTzZVCwe9dk
+         Dlpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690380321; x=1690985121;
+        d=1e100.net; s=20221208; t=1690381501; x=1690986301;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PdewSqbu0kfeZ5E3lYwpUZYvX+SwKUd0gKg6LQczZgM=;
-        b=MlJUUUMYJzF46E5jbWM/JsvbTYsn6aatX35WJQ39NOqEJH/CqxqivqXVWVcSC3Acgx
-         8lOqr7lq2VaaGBSMAgswTS8mEgk9mR+UWc+KqJUqLhDCJUcDfShE/PmpojA0L5ASiSDy
-         NNS9CcVizuzUsp27FmWiFbzRtsglgO/CwmXjMlWZarmz6OJSPGRV6ru6yFJ/vcNew8MW
-         yVogUz5BgPYa4HVk9aNy7KjTUJrYxkTCbHpcrquccH+Qb5d8yt5o6ee35pgcyOj+XhuY
-         OD9hmIG/MKJYwJ/e9crwUHDMQ5cLKEYc8rNX4rYpe6zL5JvNA5jGhRWMZEizFLRL+9Ma
-         BiAw==
-X-Gm-Message-State: ABy/qLZmeG1/Y9Ey9ZDYHd/2kBkvBNgs/FnPdXsIfq0wBQkegDLD0Ylw
-        vnZzgU2pWDlg3zY9IqTiUZ9gXBB6cYI=
-X-Google-Smtp-Source: APBJJlH2ZV14iDS02gMqFKuTo7m8yR7AGDQ8PsYFtYhjoxWYaPBOKUuYD11G/99fkFgWTJ8CGJyJZuuQb4E=
+        bh=mt8/YY3u8LjsBjr8d6/ke2ZW25YHueLUKLJjDJYMc8s=;
+        b=UJa+5oovMtlutvBWzvPIjAV7G0bvAZ8UXofKpEF7yGLq3uK/46uOPJi3pX/rucESAT
+         bsDK7DGfNoKvZbQqdAG7Vsuzr15R7VhnmUXffXTo7Nvy/oGpUCasNvldKPh4ucKOSG+2
+         vRmAH/hT3ASBepi7nX8Mb5BUNXE4D6swVtcmqH+Q+biSEhqR1xqZt6d3b/teBW5rFpUW
+         6CQpBk7X1B9sS2kaBWFNcWX8b5Kh/6mtuCbAV6ul60TCn0dTltPDQ9B2lltIJ8MRSYlo
+         EUAyc9Q3urcwEleg73Lhct3EEEx0xTJy6ANXs3ETGSpWwu4Lo3jdpHJzGhKNat37xquu
+         ZN3Q==
+X-Gm-Message-State: ABy/qLakxiIw7H0jcS+UqrdLvO05nTIUrZtk4ZJq4zeL58COtITimQ+B
+        xf7+HUWczpwk55ZFUvn/riODFHfetN8=
+X-Google-Smtp-Source: APBJJlHpunM1lrfEfJpa6UtG2AaqQE17ubaKuYzputooU8ueGDVFO/y80053uMgFIUrJA+dTGv8yhoGEgv0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d4cd:b0:1bb:83ec:841 with SMTP id
- o13-20020a170902d4cd00b001bb83ec0841mr9968plg.6.1690380320500; Wed, 26 Jul
- 2023 07:05:20 -0700 (PDT)
-Date:   Wed, 26 Jul 2023 07:05:18 -0700
-In-Reply-To: <ZMDdp1A7DOsRNeTd@chao-email>
+ (user=seanjc job=sendgmr) by 2002:a81:ac60:0:b0:576:de5f:95e1 with SMTP id
+ z32-20020a81ac60000000b00576de5f95e1mr20181ywj.1.1690381501073; Wed, 26 Jul
+ 2023 07:25:01 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 07:24:59 -0700
+In-Reply-To: <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
 Mime-Version: 1.0
-References: <20230721030352.72414-1-weijiang.yang@intel.com>
- <20230721030352.72414-16-weijiang.yang@intel.com> <ZMDdp1A7DOsRNeTd@chao-email>
-Message-ID: <ZMEoHgAm29baVbdp@google.com>
-Subject: Re: [PATCH v4 15/20] KVM:VMX: Save host MSR_IA32_S_CET to VMCS field
+References: <20230718234512.1690985-1-seanjc@google.com> <110f1aa0-7fcd-1287-701a-89c2203f0ac2@amd.com>
+ <ZL6uMk/8UeuGj8CP@google.com> <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
+Message-ID: <ZMEsuyqHhp1DAVdR@google.com>
+Subject: Re: [RFC PATCH v11 00/29] KVM: guest_memfd() and per-page attributes
 From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        peterz@infradead.org, john.allen@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com,
-        binbin.wu@linux.intel.com
+To:     "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 26, 2023, Chao Gao wrote:
-> On Thu, Jul 20, 2023 at 11:03:47PM -0400, Yang Weijiang wrote:
-> >Save host MSR_IA32_S_CET to VMCS field as host constant state.
-> >Kernel IBT is supported now and the setting in MSR_IA32_S_CET
-> >is static after post-boot except in BIOS call case, but vCPU
-> >won't execute such BIOS call path currently, so it's safe to
-> >make the MSR as host constant.
-> >
-> >Suggested-by: Sean Christopherson <seanjc@google.com>
-> >Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> >---
-> > arch/x86/kvm/vmx/capabilities.h | 4 ++++
-> > arch/x86/kvm/vmx/vmx.c          | 8 ++++++++
-> > 2 files changed, 12 insertions(+)
-> >
-> >diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> >index d0abee35d7ba..b1883f6c08eb 100644
-> >--- a/arch/x86/kvm/vmx/capabilities.h
-> >+++ b/arch/x86/kvm/vmx/capabilities.h
-> >@@ -106,6 +106,10 @@ static inline bool cpu_has_load_perf_global_ctrl(void)
-> > 	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> > }
+On Wed, Jul 26, 2023, Nikunj A. Dadhania wrote:
+> Hi Sean,
+> 
+> On 7/24/2023 10:30 PM, Sean Christopherson wrote:
+> >>   Starting an SNP guest with 40G memory with memory interleave between
+> >>   Node2 and Node3
+> >>
+> >>   $ numactl -i 2,3 ./bootg_snp.sh
+> >>
+> >>     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+> >>  242179 root      20   0   40.4g  99580  51676 S  78.0   0.0   0:56.58 qemu-system-x86
+> >>
+> >>   -> Incorrect process resident memory and shared memory is reported
 > > 
-> >+static inline bool cpu_has_load_cet_ctrl(void)
-> >+{
-> >+	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_CET_STATE);
+> > I don't know that I would call these "incorrect".  Shared memory definitely is
+> > correct, because by definition guest_memfd isn't shared.  RSS is less clear cut;
+> > gmem memory is resident in RAM, but if we show gmem in RSS then we'll end up with
+> > scenarios where RSS > VIRT, which will be quite confusing for unaware users (I'm
+> > assuming the 40g of VIRT here comes from QEMU mapping the shared half of gmem
+> > memslots).
 > 
-> VM_ENTRY_LOAD_CET_STATE is to load guest state. Strictly speaking, you
-> should check VM_EXIT_LOAD_HOST_CET_STATE though I believe CPUs will
-> support both or none.
+> I am not sure why will RSS exceed the VIRT, it should be at max 40G (assuming all the
+> memory is private)
 
-No need, pairs are now handled by setup_vmcs_config().  See commit f5a81d0eb01e
-("KVM: VMX: Sanitize VM-Entry/VM-Exit control pairs at kvm_intel load time"), and
-then patch 17 does:
+And also assuming that (a) userspace mmap()'d the shared side of things 1:1 with
+private memory and (b) that the shared mappings have not been populated.   Those
+assumptions will mostly probably hold true for QEMU, but kernel correctness
+shouldn't depend on assumptions about one specific userspace application.
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3eb4fe9c9ab6..3f2f966e327d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2641,6 +2641,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-                { VM_ENTRY_LOAD_IA32_EFER,              VM_EXIT_LOAD_IA32_EFER },
-                { VM_ENTRY_LOAD_BNDCFGS,                VM_EXIT_CLEAR_BNDCFGS },
-                { VM_ENTRY_LOAD_IA32_RTIT_CTL,          VM_EXIT_CLEAR_IA32_RTIT_CTL },
-+               { VM_ENTRY_LOAD_CET_STATE,              VM_EXIT_LOAD_CET_STATE },
-        };
-
-> 
-> >+}
-> > static inline bool cpu_has_vmx_mpx(void)
-> > {
-> > 	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_BNDCFGS;
-> >diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> >index 85cb7e748a89..cba24acf1a7a 100644
-> >--- a/arch/x86/kvm/vmx/vmx.c
-> >+++ b/arch/x86/kvm/vmx/vmx.c
-> >@@ -109,6 +109,8 @@ module_param(enable_apicv, bool, S_IRUGO);
-> > bool __read_mostly enable_ipiv = true;
-> > module_param(enable_ipiv, bool, 0444);
+> >>   /proc/<qemu pid>/smaps
+> >>   7f528be00000-7f5c8be00000 rw-p 00000000 00:01 26629                      /memfd:memory-backend-memfd-shared (deleted)
+> >>   7f5c90200000-7f5c90220000 rw-s 00000000 00:01 44033                      /memfd:rom-backend-memfd-shared (deleted)
+> >>   7f5c90400000-7f5c90420000 rw-s 00000000 00:01 44032                      /memfd:rom-backend-memfd-shared (deleted)
+> >>   7f5c90800000-7f5c90b7c000 rw-s 00000000 00:01 1025                       /memfd:rom-backend-memfd-shared (deleted)
 > > 
-> >+static u64 __read_mostly host_s_cet;
-> 
-> caching host's value is to save an MSR read on vCPU creation?
+> > This is all expected, and IMO correct.  There are no userspace mappings, and so
+> > not accounting anything is working as intended.
+> Doesn't sound that correct, if 10 SNP guests are running each using 10GB, how
+> would we know who is using 100GB of memory?
 
-Yep.  And probably more importantly, to document that the host value is static,
-i.e. that KVM doesn't need to refresh S_CET before every VM-Enter/VM-Exit sequence.
+It's correct with respect to what the interfaces show, which is how much memory
+is *mapped* into userspace.
+
+As I said (or at least tried to say) in my first reply, I am not against exposing
+memory usage to userspace via stats, only that it's not obvious to me that the
+existing VMA-based stats are the most appropriate way to surface this information.
