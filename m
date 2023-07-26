@@ -2,120 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7F91764025
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 22:07:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC87F764069
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 22:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjGZUHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 16:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47614 "EHLO
+        id S231259AbjGZUW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 16:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbjGZUH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 16:07:28 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F76E1BF6
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 13:07:27 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56942442eb0so2090437b3.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 13:07:27 -0700 (PDT)
+        with ESMTP id S229778AbjGZUW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 16:22:27 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E3B2701
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 13:22:24 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d05883d850fso141307276.3
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 13:22:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690402046; x=1691006846;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BLwoLcOpwq60cWR6YSdxWHtgLvvLoNY8bFuxQjkGWsM=;
-        b=P/d/F8jJR05hj5EI8P6MyGL5CFUWRd5x2ky0+RuPnM8Eym5U0dCd9PTQHzhB8NSH5w
-         n21Y0otHktEWR6E9g0ekLXcEn4X584PrypKndjevw9zFmneBMQ2v1tttiGSpSyeaFyl4
-         i30nhiDWOCjsCOkFAH+1s/NLQUAua6dJeop1Z1mDSZOSX+1yemtIEpdSNpJ3Sp0jYtQR
-         uaQOqRTvUkDztBwqVUSjVPy5y1AOx6UGIimEPA4k84TlJMcuJhwcEBi2/pKxLC04TJOo
-         9PAFEaOpDBsqZJjxOwZgkh9IV0XKuSx+czeM4s1ui5aErLuEr0KkNpRK3MHfFZ1soj5W
-         eRUQ==
+        d=google.com; s=20221208; t=1690402944; x=1691007744;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wk8YN2z9DygnTN7wIkQ/drKhQeRLfAOWaFSkpwIJ9VA=;
+        b=eM8gatpIFAPsVcHsvCyPq5hyC8MsN3TVlS3mNniSEUN+A8XGjxiS8F6dC4aFmL513/
+         OKqKBd4JNqQZqMKS0xCiGe+t5AXNUTDm2VuHrYqk4zFosWdPFjPIB6URfw5vd93IMKdx
+         lKXXLluLhbwl+YjfsuqRPKzKU2+mG/aerZ1RHkgGlaQ2XngSQ4QWGzUzw8Bk02VhX6BY
+         iemdbo75Y0mm9KaGC6Z479jAT6buL5FMFb75fU2ROzDvErIFsnjLxci0m6st5PC1U67q
+         6FdRgc7HGPP7DF/FaK/f0cWfoJ+ZjAfbcmtP5i/qUasNowuJ11SfJCK8qdGxq6HB8Y5C
+         RWCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690402046; x=1691006846;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BLwoLcOpwq60cWR6YSdxWHtgLvvLoNY8bFuxQjkGWsM=;
-        b=NPuuvuJJIMWyeFviqpVyY9kl0fKTTJjLQiMNiqNASVenTaK9L7D6Sw1YBErXRCvPdL
-         6GNgjSyq1hHjPtQTHPUwzgGpa9PT4crjwpSVKfFiHuYvB9nNzlQhwuzN97mRbylk/pI+
-         vEB6Iql4igx6u6hRowqV9YBS8vZV57+60S/kNU4kRBAbRwnCSccW2aR0+JDSTyz8oRch
-         4X8AGGAQ/tVUjWxdVoga2mRUvPTdy33WLvvkL9U1cy7d1Br8S2eetL7QFhkvDtwhTYr5
-         +BfGZnbyUh5azDr8ufE701ohjXalzRDJnGMvMXCftDkmKyeUv9gDv11tezCu5lgTEfuM
-         9vAg==
-X-Gm-Message-State: ABy/qLY6556aKcN91pQ4VmeO7Ivrv+gBDIbxxtNj6Ys1ysyF24T4KzgY
-        70ToInnHT1alSa2/M0SS62VhzhUQ9xc=
-X-Google-Smtp-Source: APBJJlH8/GyGkBf92DERFRII5C2IjhJb0a2LQMw+Y0isUHXc2/wOuBJ0poY017e+upfxfx/6iJUok+WwZcU=
+        d=1e100.net; s=20221208; t=1690402944; x=1691007744;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wk8YN2z9DygnTN7wIkQ/drKhQeRLfAOWaFSkpwIJ9VA=;
+        b=SNnkZxeyLsRwzlqVwl8D7lvWUTmzwDXcthYdU68KyN36Zh+NpR6IEnBoQ435Kii3dq
+         J4jM4PWvWt8FGtBeqJ677RoAlXgl61vmpZgjR/WIpaJYkYS7uBAl+muNvlHnqliiFPBM
+         h3u4EV0HXYKFZAE4Lf29okBp8DJ2IwOGlY5kbkx0ibs0Rz2pzZF7qpLBZxVkZgKiHEjY
+         DcPE6adAnydy+M9EsQck60jSEi8mfx8IGqePLrOET5TSORy1A5EkPhcTQ1VlXAsi2RJV
+         A1a6a3Dfn0QSQvXPsb4DtGgUUGVcH3VnLofC2U1XvCRQEXIAjSEZfTKswl7GvGkISZ4o
+         q92g==
+X-Gm-Message-State: ABy/qLZcITu27lx6gP7tDFjNhJnmXKdpFpCCF9fiwMWEZ5hsza4zzlM8
+        V/aRydM+SRcaPjvNbL46wM8PNKaeMaw=
+X-Google-Smtp-Source: APBJJlHa4e7bNU/FXY+wuV4M+6WYSA4uQsVmjVu+paqFG49PZpexPl+XQpMgzwVCSNNiruIZErv3dNdZQXc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ed08:0:b0:57a:118a:f31 with SMTP id
- k8-20020a81ed08000000b0057a118a0f31mr26090ywm.7.1690402046811; Wed, 26 Jul
- 2023 13:07:26 -0700 (PDT)
-Date:   Wed, 26 Jul 2023 13:07:25 -0700
-In-Reply-To: <9a58e731421edad45dff31e681b83f90c5e9775e.camel@infradead.org>
+ (user=seanjc job=sendgmr) by 2002:a25:cf48:0:b0:d06:1a77:7d2 with SMTP id
+ f69-20020a25cf48000000b00d061a7707d2mr18632ybg.13.1690402944082; Wed, 26 Jul
+ 2023 13:22:24 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 13:22:22 -0700
+In-Reply-To: <711f74d6-fe15-6bd4-a9b9-c4f178d95bf3@redhat.com>
 Mime-Version: 1.0
-References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
- <20230418101306.98263-1-metikaya@amazon.co.uk> <ZHEXX/OG6suNGWPN@google.com> <9a58e731421edad45dff31e681b83f90c5e9775e.camel@infradead.org>
-Message-ID: <ZMF8/SUw5ebkDhde@google.com>
-Subject: Re: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-2-seanjc@google.com>
+ <711f74d6-fe15-6bd4-a9b9-c4f178d95bf3@redhat.com>
+Message-ID: <ZMGAfvzEkVphWPdZ@google.com>
+Subject: Re: [RFC PATCH v11 01/29] KVM: Wrap kvm_gfn_range.pte in a per-action union
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Metin Kaya <metikaya@amazon.co.uk>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, x86@kernel.org, bp@alien8.de, paul@xen.org,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        joao.m.martins@oracle.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023, David Woodhouse wrote:
-> On Fri, 2023-05-26 at 13:32 -0700, Sean Christopherson wrote:
-> > =C2=A0 : Aha!=C2=A0 And QEMU appears to have Xen emulation support.=C2=
-=A0 That means KVM-Unit-Tests
-> > =C2=A0 : is an option.=C2=A0 Specifically, extend the "access" test to =
-use this hypercall instead
-> > =C2=A0 : of INVLPG.=C2=A0 That'll verify that the flush is actually bei=
-ng performed as expteced.
->=20
-> That works. Metin has a better version that actually sets up the
-> hypercall page properly and uses it, but that one bails out when Xen
-> support isn't present, and doesn't show the failure mode quite so
-> clearly. This is the simple version:
+On Wed, Jul 19, 2023, Paolo Bonzini wrote:
+> On 7/19/23 01:44, Sean Christopherson wrote:
+> > +	BUILD_BUG_ON(sizeof(gfn_range.arg) != sizeof(gfn_range.arg.raw));
+> > +	BUILD_BUG_ON(sizeof(range->arg) != sizeof(range->arg.raw));
+> 
+> I think these should be static assertions near the definition of the
+> structs.  However another possibility is to remove 'raw' and just assign the
+> whole union.
 
-IIUC, y'all have already written both tests, so why not post both?  I certa=
-inly
-won't object to more tests if they provide different coverage.
+Duh, and use a named union.  I think when I first proposed this I forgot that
+a single value would be passed between kvm_hva_range *and* kvm_gfn_range, and so
+created an anonymous union without thinking about the impliciations.
 
-> > Let me be more explicit this time: I am not applying this without a tes=
-t.=C2=A0 I don't
-> > care how trivial a patch may seem, I'm done taking patches without test=
- coverage
-> > unless there's a *really* good reason for me to do so.
->=20
-> Understood.
->=20
-> So, we know it *works*, but the above is a one-off and not a
-> *regression* test.
->=20
-> It would definitely be nice to have regression tests that cover
-> absolutely everything, but adding Xen guest support to the generic KVM-
-> Unit-Tests might be considered overkill, because this *particular*
-> thing is fairly unlikely to regress? It really is just calling
-> kvm_flush_remote_tlbs(), and if that goes wrong we're probably likely
-> to notice it anyway.
->=20
-> What do you think?
+A named union is _much_ cleaner.  I'll post a complete version of the below
+snippet as a standalone non-RFC patch.
 
-I'm a-ok with just having basic test coverage.  We don't have anywhere near=
- 100%
-(or even 10%...) coverage of KVM's TLB management, so it would be ridiculou=
-s to
-require that for Xen PV.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d3ac7720da9..9125d0ab642d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -256,11 +256,15 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+ #endif
+ 
+ #ifdef KVM_ARCH_WANT_MMU_NOTIFIER
++union kvm_mmu_notifier_arg {
++       pte_t pte;
++};
++
+ struct kvm_gfn_range {
+        struct kvm_memory_slot *slot;
+        gfn_t start;
+        gfn_t end;
+-       pte_t pte;
++       union kvm_mmu_notifier_arg arg;
+        bool may_block;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index dfbaafbe3a00..f84ef9399aee 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -526,7 +526,7 @@ typedef void (*on_unlock_fn_t)(struct kvm *kvm);
+ struct kvm_hva_range {
+        unsigned long start;
+        unsigned long end;
+-       pte_t pte;
++       union kvm_mmu_notifier_arg arg;
+        hva_handler_t handler;
+        on_lock_fn_t on_lock;
+        on_unlock_fn_t on_unlock;
+@@ -547,6 +547,8 @@ static void kvm_null_fn(void)
+ }
+ #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
+ 
++static const union kvm_mmu_notifier_arg KVM_NO_ARG;
++
+ /* Iterate over each memslot intersecting [start, last] (inclusive) range */
+ #define kvm_for_each_memslot_in_hva_range(node, slots, start, last)         \
+        for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
+@@ -591,7 +593,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+                         * bother making these conditional (to avoid writes on
+                         * the second or later invocation of the handler).
+                         */
+-                       gfn_range.pte = range->pte;
++                       gfn_range.arg = range->arg;
+                        gfn_range.may_block = range->may_block;
+ 
+                        /*
 
-I'd definitely love to change that, and raise the bar for test coverage in =
-general,
-but that'll take time (and effort).
