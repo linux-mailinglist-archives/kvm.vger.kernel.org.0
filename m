@@ -2,44 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D361D762E4C
-	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E71762E6C
+	for <lists+kvm@lfdr.de>; Wed, 26 Jul 2023 09:46:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231967AbjGZHpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 03:45:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36984 "EHLO
+        id S232010AbjGZHql (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 03:46:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231824AbjGZHoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 03:44:12 -0400
-Received: from out-38.mta1.migadu.com (out-38.mta1.migadu.com [95.215.58.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EA8746A0
-        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:39:55 -0700 (PDT)
+        with ESMTP id S231347AbjGZHqK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 03:46:10 -0400
+Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [IPv6:2001:41d0:1004:224b::28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C3E4ED4
+        for <kvm@vger.kernel.org>; Wed, 26 Jul 2023 00:41:43 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690357193;
+        t=1690357301;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l8aJXSNw5+elc1iE01vL5l3NT4M+siQK80IPjT8jgIg=;
-        b=eGqsf3Kk+wnqjw4p+oAcS2NZWo54D2sWzelRyzyU4NPUv0q8nn2S8BOMGAPnmnxcfiOTkk
-        SKKt5tpkWGMdRMREQoEzpDPmf2FxPGibaSJmfDS71vzjSCkQXyzoliP1NPeTVqbA/vFWi5
-        npjPE4PA44NIs8OFJIOh1TEq9vI5PX4=
+        bh=1INRpyFGosC7x9b2U65MfTc+prZG/Zt8kNIAIpUXzvc=;
+        b=rJayuXz/AZIoTh/aJ821z2UtGYXRhf7SaFISnV6xdmFmcSOAugz50dRL7nxfhIEtCQbOTg
+        iIpArugvYTdRT1OJGdpeURT9QNHUnNNwNxIZAZlJQKpbcVUfBLkRuPek5FTrtrIzUA92Qs
+        V5aiV1ZbRn27rBgCbBkAjrHv7ewFxNg=
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 31/47] mbcache: dynamically allocate the mbcache
- shrinker
+Subject: Re: [PATCH v2 32/47] ext4: dynamically allocate the ext4-es shrinker
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230724094354.90817-32-zhengqi.arch@bytedance.com>
-Date:   Wed, 26 Jul 2023 15:39:06 +0800
+In-Reply-To: <20230724094354.90817-33-zhengqi.arch@bytedance.com>
+Date:   Wed, 26 Jul 2023 15:40:52 +0800
 Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
         Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
         Christian Brauner <brauner@kernel.org>,
         "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
         yujie.liu@intel.com, gregkh@linuxfoundation.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
         kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
@@ -54,9 +52,9 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <9A3DA627-8ADC-429E-B751-C1BD6362967A@linux.dev>
+Message-Id: <866DDDA8-3F7E-4E7A-BA8D-D6DA1707E106@linux.dev>
 References: <20230724094354.90817-1-zhengqi.arch@bytedance.com>
- <20230724094354.90817-32-zhengqi.arch@bytedance.com>
+ <20230724094354.90817-33-zhengqi.arch@bytedance.com>
 To:     Qi Zheng <zhengqi.arch@bytedance.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -74,9 +72,9 @@ X-Mailing-List: kvm@vger.kernel.org
 > On Jul 24, 2023, at 17:43, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
 > 
 > In preparation for implementing lockless slab shrink, use new APIs to
-> dynamically allocate the mbcache shrinker, so that it can be freed
+> dynamically allocate the ext4-es shrinker, so that it can be freed
 > asynchronously using kfree_rcu(). Then it doesn't need to wait for RCU
-> read-side critical section when releasing the struct mb_cache.
+> read-side critical section when releasing the struct ext4_sb_info.
 > 
 > Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
