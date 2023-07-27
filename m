@@ -2,104 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8447765072
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 11:57:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB6737650DC
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:20:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232163AbjG0J5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 05:57:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39958 "EHLO
+        id S233644AbjG0KU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 06:20:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233216AbjG0J5C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 05:57:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5688B1B8
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 02:55:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690451754;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7Et2+usQK1JlDG0GanNGbBu0x99mo/WvwuZuG01uDXE=;
-        b=bJ/o5qNJKJVYlVOedhiuob13/ZsfP4GqKXPle4TQSH18Z2rsuD8uhqBJdbdkQ5Lc9rE3Cj
-        ngDZyUt3lS+RM9BUfdHxUhvnzJGEnXUkrxizn9biHmISWuOkr4gvANXH1+/6JN96bZ2JZ9
-        pX/ANYEwz01vmwpA0eZZuO6kYW+ENt4=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-dlBDvexKM1KbwVfNG8FutA-1; Thu, 27 Jul 2023 05:55:52 -0400
-X-MC-Unique: dlBDvexKM1KbwVfNG8FutA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S233571AbjG0KUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 06:20:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A385619AF;
+        Thu, 27 Jul 2023 03:20:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 09ADD3C11CC0;
-        Thu, 27 Jul 2023 09:55:52 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C455740C2063;
-        Thu, 27 Jul 2023 09:55:51 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Gavin Shan <gshan@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH for-8.2 2/2] arm/kvm: convert to kvm_get_one_reg
-In-Reply-To: <4a990b57-800c-6799-8c23-4488069ffb76@redhat.com>
-Organization: Red Hat GmbH
-References: <20230718111404.23479-1-cohuck@redhat.com>
- <20230718111404.23479-3-cohuck@redhat.com>
- <db578c20-22d9-3b76-63e7-d99b891f6d36@redhat.com>
- <878rb5g0f0.fsf@redhat.com>
- <4a990b57-800c-6799-8c23-4488069ffb76@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Thu, 27 Jul 2023 11:55:50 +0200
-Message-ID: <875y6565ll.fsf@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 38C6E61DED;
+        Thu, 27 Jul 2023 10:20:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9266C433C8;
+        Thu, 27 Jul 2023 10:20:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690453251;
+        bh=Uv0jglg4XDxm5uiOcl1Fs0VDdmS3vnj5J06IHksC3j0=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=VjGCTE5fXWQGMkstr5mWfG/olGcukHbx9MJ5gIHM1kJfwo/BiFcjiuEaiA2TxQad6
+         b/CL9D78jYHhDiLBxLD9gCBB6CtR9Pngnq1E4RM+cWQl1ITCzXzhPBEMorh0UStJGb
+         V5QypMia7H1mT7Yv9W7oIRfkDRB1G3xJIxfo7Y/Lymzj+mXx3lcBAFmRFbWxhh8lk9
+         h4N9LjcMkMC3/ZfJEah0qCVly/fWQ4ostsbFgLI1m7GG/WQbkHJ87BAgn9cUsNUERW
+         XrnUyEDaK9+tFU+Iukly/qv+tfC9IZiVkgJJJYsmEkH+2gmJEivzAz4IAcCpkEsNUW
+         WY8rxT9ubVHrA==
+Message-ID: <ba0868b2-9f90-3d81-1c91-8810057fb3ce@kernel.org>
+Date:   Thu, 27 Jul 2023 19:20:46 +0900
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 28/49] dm zoned: dynamically allocate the dm-zoned-meta
+ shrinker
+Content-Language: en-US
+To:     Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        Muchun Song <songmuchun@bytedance.com>,
+        akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
+        muchun.song@linux.dev
+References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+ <20230727080502.77895-29-zhengqi.arch@bytedance.com>
+ <baaf7de4-9a0e-b953-2b6a-46e60c415614@kernel.org>
+ <56ee1d92-28ee-81cb-9c41-6ca7ea6556b0@bytedance.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <56ee1d92-28ee-81cb-9c41-6ca7ea6556b0@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25 2023, Gavin Shan <gshan@redhat.com> wrote:
+On 7/27/23 17:55, Qi Zheng wrote:
+>>>           goto err;
+>>>       }
+>>>   +    zmd->mblk_shrinker->count_objects = dmz_mblock_shrinker_count;
+>>> +    zmd->mblk_shrinker->scan_objects = dmz_mblock_shrinker_scan;
+>>> +    zmd->mblk_shrinker->seeks = DEFAULT_SEEKS;
+>>> +    zmd->mblk_shrinker->private_data = zmd;
+>>> +
+>>> +    shrinker_register(zmd->mblk_shrinker);
+>>
+>> I fail to see how this new shrinker API is better... Why isn't there a
+>> shrinker_alloc_and_register() function ? That would avoid adding all this code
+>> all over the place as the new API call would be very similar to the current
+>> shrinker_register() call with static allocation.
+> 
+> In some registration scenarios, memory needs to be allocated in advance.
+> So we continue to use the previous prealloc/register_prepared()
+> algorithm. The shrinker_alloc_and_register() is just a helper function
+> that combines the two, and this increases the number of APIs that
+> shrinker exposes to the outside, so I choose not to add this helper.
 
-> On 7/24/23 18:48, Cornelia Huck wrote:
->> On Mon, Jul 24 2023, Gavin Shan <gshan@redhat.com> wrote:
->>>
->>> On 7/18/23 21:14, Cornelia Huck wrote:
->>>> We can neaten the code by switching the callers that work on a
->>>> CPUstate to the kvm_get_one_reg function.
->>>>
->>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>>> ---
->>>>    target/arm/kvm.c   | 15 +++---------
->>>>    target/arm/kvm64.c | 57 ++++++++++++----------------------------------
->>>>    2 files changed, 18 insertions(+), 54 deletions(-)
->>>>
->>>
->>> The replacements look good to me. However, I guess it's worty to apply
->>> the same replacements for target/arm/kvm64.c since we're here?
->>>
->>> [gshan@gshan arm]$ pwd
->>> /home/gshan/sandbox/q/target/arm
->>> [gshan@gshan arm]$ git grep KVM_GET_ONE_REG
->>> kvm64.c:    err = ioctl(fd, KVM_GET_ONE_REG, &idreg);
->>> kvm64.c:    return ioctl(fd, KVM_GET_ONE_REG, &idreg);
->>> kvm64.c:        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &reg);
->> 
->> These are the callers that don't work on a CPUState (all in initial
->> feature discovery IIRC), so they need to stay that way.
->> 
->
-> Right, All these ioctl commands are issued when CPUState isn't around. However, there
-> are two wrappers read_sys_{reg32, reg64}(). The ioctl call in kvm_arm_sve_get_vls()
-> can be replaced by read_sys_reg64(). I guess it'd better to do this in a separate
-> patch if you agree.
+And that results in more code in many places instead of less code + a simple
+inline helper in the shrinker header file... So not adding that super simple
+helper is not exactly the best choice in my opinion.
 
-Yes, we could do that, but I'm not sure how much it adds to the
-code... in any case, I agree that this would be a separate patch.
+-- 
+Damien Le Moal
+Western Digital Research
 
