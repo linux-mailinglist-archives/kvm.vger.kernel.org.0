@@ -2,316 +2,466 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABEA7764A47
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:08:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7578C764C16
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:20:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232328AbjG0IId (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 04:08:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44014 "EHLO
+        id S234502AbjG0IU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 04:20:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233961AbjG0IIN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 04:08:13 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DE844B5;
-        Thu, 27 Jul 2023 01:04:22 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe0c566788so1197704e87.0;
-        Thu, 27 Jul 2023 01:04:22 -0700 (PDT)
+        with ESMTP id S234555AbjG0ITc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 04:19:32 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A98422B
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 01:11:32 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-66d6a9851f3so167342b3a.0
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 01:11:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690445054; x=1691049854;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cGFm1yCSFddb2U6pFJa1ekT2q99QXapQbICr7xQFL6Q=;
-        b=NaN/cBwLyXcOxi/0/n/O3CQXbGg4eFDpcsKE90ntjRuaWvKgVhHlqXtdLPkouPCijv
-         4smfSR9Qmx7XcrA6DLjeWyDtztD9vxQDcK7cU8kxKucscZUzJmS59wHATdOtTcyeDNW2
-         +PuxTscYHTrXmNcChtg7clL40ejdKhoaxJJIPYEpZwk1hJvUq0SXuqbILOYmkUK0UtDQ
-         N2ARD9gZ0EysaWmmwSfhLGmLHKg+3n2YVKEqZmSNsHo8q84htg+zKA6Ew4GwNSFwY4DP
-         wzvgJPno9AWSrlJbMza4oVM5s69Ecp9A/AST8dyq07UMD8tT+b0C0zo0kSIS+jjid6zP
-         7vww==
+        d=bytedance.com; s=google; t=1690445148; x=1691049948;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qdw/R1TEr1q6uUENoD+Woah5iYuWx4u9kScfP8x1rxA=;
+        b=UUJaeFKAdq/JSi5KDicB1qh4QBmRcV8RkxHtwurNfyrC9pvt0PpJjH65AQH5l7q+9C
+         LBSbbXBKaKVPiOBm5Fcd7UwqnCv/nEH/yt0y5LrhuYjiTeYJnf52fAGE42aPOuO3ed4I
+         CH7E03GStk9tqzsUMP9cj27lKTUxq4yf7rn8YSn3a1/cGCpMeTGgVRRuuMbsr0zMmRBv
+         oFevVOT5MMhRX1z1WtEnmwtuG+UoVxDf5GDWIQJoDIkeB0n3AbOwh1FoMsy9IWleLQsE
+         a2RKQ5yrgmmGdYoGmSpmONZKAmN9Gsyqp+HtxmVjQ9FehgBv4a+hpgIRjC2ZmCuobuW+
+         eCOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690445054; x=1691049854;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cGFm1yCSFddb2U6pFJa1ekT2q99QXapQbICr7xQFL6Q=;
-        b=d+Nuogrq8gsdSpevgbn+RtvT7CtPLybyWuruOtruiD5BnUJeDwOdPjAifNeJK4mZ/n
-         QH0VGvhwKoMgKtXCKcseFMqDWKUkFj4yrr5XRgNA68x4V9+im+kTTFROftz+LVODQEzS
-         sYV49KnwJz8Z9Q7zV8Y9J8H3B9UgxfwGANCqur9LUu2hLBc2iYK7zu0tsc5DijUv7HZa
-         B4wDtSttpll6eLB8L2XRN4X+S4KthnapzbiIhkzFLqP3BQRCbGFUIdx1aRXrEQsPvkOC
-         a42x/lMBip1jFfs6pmDqGKh1+hlzy0GS824wJ6ouVYlFOpcTZTH8qyC5ZGrqmMW9/oMi
-         eAAw==
-X-Gm-Message-State: ABy/qLZ68ipC6aeFASJ51LVWKSMi3oBaHtoz2vAfGQanPNO7Gs4HXBKR
-        ZxK7bmmUEYiigqG3XLr8TRU6urx9nw4jGA==
-X-Google-Smtp-Source: APBJJlF7MqWM+A8HbDTNrG5idX2O2DITz9XFWgYIRgRC9SHcB8tcCD4qkf8cHNUzO7ZLz6SVbgsmgw==
-X-Received: by 2002:a05:6512:3b99:b0:4fd:d016:c2e8 with SMTP id g25-20020a0565123b9900b004fdd016c2e8mr1276836lfv.43.1690445054321;
-        Thu, 27 Jul 2023 01:04:14 -0700 (PDT)
-Received: from [192.168.0.112] ([77.220.140.242])
-        by smtp.gmail.com with ESMTPSA id h26-20020a19701a000000b004fa52552c82sm191076lfc.155.2023.07.27.01.04.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 01:04:13 -0700 (PDT)
-Message-ID: <9bc7db9c-1848-ee6c-58c2-d3ef8f153db5@gmail.com>
-Date:   Thu, 27 Jul 2023 11:04:12 +0300
+        d=1e100.net; s=20221208; t=1690445148; x=1691049948;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qdw/R1TEr1q6uUENoD+Woah5iYuWx4u9kScfP8x1rxA=;
+        b=WMXkXaDkUInIPhxbJgnSiIg+EIiC5g8VckjjGiiVJuK1WKWJC/g5Dnm0fIA+zFnoCj
+         ib1mr19HjjU3p1FCgaVsMX/pX85EM16JDM8/avPl5cejew+hdQy8B7nHintmf3r5uu3w
+         OTWawm3g6+JmZGxT9jSn3MmShbMRwGQnxPxKm23MNvb8jE4f2tejd9LFzE9v1bkYixFm
+         Qf0P5zhX+KkrNDxitzuZX/MG0NlD0gA+kpTVxei3UIM/FBRSqEeBO7qwCdfpDF+3GsJl
+         59yR8Jinguq9vIsAyvYVH+9rB1joihihmnyKt/VbNL/S4+29v55lTK8yTy1I+dWkN7i0
+         JlrA==
+X-Gm-Message-State: ABy/qLaVBOuVx3giweDASIWGRFxNU8hdfJI8pBiEXwgHxMc+6OxGL+Us
+        zZekmnMkDWQRzXFFk/mPD2Dzmw==
+X-Google-Smtp-Source: APBJJlHb1kgnpQXfb8RS/UAhh8zGcgdqY4J3wYE+oXj/zAg8rYeLxmGzIhYoi+ua72NIH6S8sFTnXQ==
+X-Received: by 2002:a05:6a20:1595:b0:137:30db:bc1e with SMTP id h21-20020a056a20159500b0013730dbbc1emr5685837pzj.3.1690445147652;
+        Thu, 27 Jul 2023 01:05:47 -0700 (PDT)
+Received: from C02DW0BEMD6R.bytedance.net ([203.208.167.147])
+        by smtp.gmail.com with ESMTPSA id j8-20020aa78d08000000b006828e49c04csm885872pfe.75.2023.07.27.01.05.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 01:05:47 -0700 (PDT)
+From:   Qi Zheng <zhengqi.arch@bytedance.com>
+To:     akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
+        muchun.song@linux.dev
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        Qi Zheng <zhengqi.arch@bytedance.com>
+Subject: [PATCH v3 00/49] use refcount+RCU method to implement lockless slab shrink
+Date:   Thu, 27 Jul 2023 16:04:13 +0800
+Message-Id: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC net-next v5 11/14] vhost/vsock: implement datagram
- support
-Content-Language: en-US
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        bpf@vger.kernel.org
-References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
- <20230413-b4-vsock-dgram-v5-11-581bd37fdb26@bytedance.com>
- <b15d237e-31b5-40ae-83fc-e71649febd2b@gmail.com> <ZMFd+Jd/LrfpJsVA@bullseye>
-From:   Arseniy Krasnov <oxffffaa@gmail.com>
-In-Reply-To: <ZMFd+Jd/LrfpJsVA@bullseye>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi all,
 
+1. Background
+=============
 
-On 26.07.2023 20:55, Bobby Eshleman wrote:
-> On Sat, Jul 22, 2023 at 11:42:38AM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 19.07.2023 03:50, Bobby Eshleman wrote:
->>> This commit implements datagram support for vhost/vsock by teaching
->>> vhost to use the common virtio transport datagram functions.
->>>
->>> If the virtio RX buffer is too small, then the transmission is
->>> abandoned, the packet dropped, and EHOSTUNREACH is added to the socket's
->>> error queue.
->>>
->>> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->>> ---
->>>  drivers/vhost/vsock.c    | 62 +++++++++++++++++++++++++++++++++++++++++++++---
->>>  net/vmw_vsock/af_vsock.c |  5 +++-
->>>  2 files changed, 63 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>> index d5d6a3c3f273..da14260c6654 100644
->>> --- a/drivers/vhost/vsock.c
->>> +++ b/drivers/vhost/vsock.c
->>> @@ -8,6 +8,7 @@
->>>   */
->>>  #include <linux/miscdevice.h>
->>>  #include <linux/atomic.h>
->>> +#include <linux/errqueue.h>
->>>  #include <linux/module.h>
->>>  #include <linux/mutex.h>
->>>  #include <linux/vmalloc.h>
->>> @@ -32,7 +33,8 @@
->>>  enum {
->>>  	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
->>>  			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->>> -			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
->>> +			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET) |
->>> +			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
->>>  };
->>>  
->>>  enum {
->>> @@ -56,6 +58,7 @@ struct vhost_vsock {
->>>  	atomic_t queued_replies;
->>>  
->>>  	u32 guest_cid;
->>> +	bool dgram_allow;
->>>  	bool seqpacket_allow;
->>>  };
->>>  
->>> @@ -86,6 +89,32 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
->>>  	return NULL;
->>>  }
->>>  
->>> +/* Claims ownership of the skb, do not free the skb after calling! */
->>> +static void
->>> +vhost_transport_error(struct sk_buff *skb, int err)
->>> +{
->>> +	struct sock_exterr_skb *serr;
->>> +	struct sock *sk = skb->sk;
->>> +	struct sk_buff *clone;
->>> +
->>> +	serr = SKB_EXT_ERR(skb);
->>> +	memset(serr, 0, sizeof(*serr));
->>> +	serr->ee.ee_errno = err;
->>> +	serr->ee.ee_origin = SO_EE_ORIGIN_NONE;
->>> +
->>> +	clone = skb_clone(skb, GFP_KERNEL);
->>
->> May for skb which is error carrier we can use 'sock_omalloc()', not 'skb_clone()' ? TCP uses skb
->> allocated by this function as carriers of error structure. I guess 'skb_clone()' also clones data of origin,
->> but i think that there is no need in data as we insert it to error queue of the socket.
->>
->> What do You think?
-> 
-> IIUC skb_clone() is often used in this scenario so that the user can
-> retrieve the error-causing packet from the error queue.  Is there some
-> reason we shouldn't do this?
-> 
-> I'm seeing that the serr bits need to occur on the clone here, not the
-> original. I didn't realize the SKB_EXT_ERR() is a skb->cb cast. I'm not
-> actually sure how this passes the test case since ->cb isn't cloned.
-> 
->>
->>> +	if (!clone)
->>> +		return;
->>
->> What will happen here 'if (!clone)' ? skb will leak as it was removed from queue?
->>
-> 
-> Ah yes, true.
-> 
->>> +
->>> +	if (sock_queue_err_skb(sk, clone))
->>> +		kfree_skb(clone);
->>> +
->>> +	sk->sk_err = err;
->>> +	sk_error_report(sk);
->>> +
->>> +	kfree_skb(skb);
->>> +}
->>> +
->>>  static void
->>>  vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>  			    struct vhost_virtqueue *vq)
->>> @@ -160,9 +189,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>  		hdr = virtio_vsock_hdr(skb);
->>>  
->>>  		/* If the packet is greater than the space available in the
->>> -		 * buffer, we split it using multiple buffers.
->>> +		 * buffer, we split it using multiple buffers for connectible
->>> +		 * sockets and drop the packet for datagram sockets.
->>>  		 */
->>>  		if (payload_len > iov_len - sizeof(*hdr)) {
->>> +			if (le16_to_cpu(hdr->type) == VIRTIO_VSOCK_TYPE_DGRAM) {
->>> +				vhost_transport_error(skb, EHOSTUNREACH);
->>> +				continue;
->>> +			}
->>> +
->>>  			payload_len = iov_len - sizeof(*hdr);
->>>  
->>>  			/* As we are copying pieces of large packet's buffer to
->>> @@ -394,6 +429,7 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
->>>  	return val < vq->num;
->>>  }
->>>  
->>> +static bool vhost_transport_dgram_allow(u32 cid, u32 port);
->>>  static bool vhost_transport_seqpacket_allow(u32 remote_cid);
->>>  
->>>  static struct virtio_transport vhost_transport = {
->>> @@ -410,7 +446,8 @@ static struct virtio_transport vhost_transport = {
->>>  		.cancel_pkt               = vhost_transport_cancel_pkt,
->>>  
->>>  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
->>> -		.dgram_allow              = virtio_transport_dgram_allow,
->>> +		.dgram_allow              = vhost_transport_dgram_allow,
->>> +		.dgram_addr_init          = virtio_transport_dgram_addr_init,
->>>  
->>>  		.stream_enqueue           = virtio_transport_stream_enqueue,
->>>  		.stream_dequeue           = virtio_transport_stream_dequeue,
->>> @@ -443,6 +480,22 @@ static struct virtio_transport vhost_transport = {
->>>  	.send_pkt = vhost_transport_send_pkt,
->>>  };
->>>  
->>> +static bool vhost_transport_dgram_allow(u32 cid, u32 port)
->>> +{
->>> +	struct vhost_vsock *vsock;
->>> +	bool dgram_allow = false;
->>> +
->>> +	rcu_read_lock();
->>> +	vsock = vhost_vsock_get(cid);
->>> +
->>> +	if (vsock)
->>> +		dgram_allow = vsock->dgram_allow;
->>> +
->>> +	rcu_read_unlock();
->>> +
->>> +	return dgram_allow;
->>> +}
->>> +
->>>  static bool vhost_transport_seqpacket_allow(u32 remote_cid)
->>>  {
->>>  	struct vhost_vsock *vsock;
->>> @@ -799,6 +852,9 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
->>>  	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
->>>  		vsock->seqpacket_allow = true;
->>>  
->>> +	if (features & (1ULL << VIRTIO_VSOCK_F_DGRAM))
->>> +		vsock->dgram_allow = true;
->>> +
->>>  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
->>>  		vq = &vsock->vqs[i];
->>>  		mutex_lock(&vq->mutex);
->>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>> index e73f3b2c52f1..449ed63ac2b0 100644
->>> --- a/net/vmw_vsock/af_vsock.c
->>> +++ b/net/vmw_vsock/af_vsock.c
->>> @@ -1427,9 +1427,12 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->>>  		return prot->recvmsg(sk, msg, len, flags, NULL);
->>>  #endif
->>>  
->>> -	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
->>> +	if (unlikely(flags & MSG_OOB))
->>>  		return -EOPNOTSUPP;
->>>  
->>> +	if (unlikely(flags & MSG_ERRQUEUE))
->>> +		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
->>> +
->>
->> Sorry, but I get build error here, because SOL_VSOCK in undefined. I think it should be added to
->> include/linux/socket.h and to uapi files also for future use in userspace.
->>
-> 
-> Strange, I built each patch individually without issue. My base is
-> netdev/main with your SOL_VSOCK patch applied. I will look today and see
-> if I'm missing something.
+We used to implement the lockless slab shrink with SRCU [1], but then kernel
+test robot reported -88.8% regression in stress-ng.ramfs.ops_per_sec test
+case [2], so we reverted it [3].
 
-I see, this is difference, because i'm trying to run this patchset on the last net-next (as it is
-supposed to be merged to net-next). I guess You should add this define anyway when You be ready to
-be merged to net-next (I really don't know which SOL_VSOCK will be merged first - "Your" or "my" :) )
+This patch series aims to re-implement the lockless slab shrink using the
+refcount+RCU method proposed by Dave Chinner [4].
 
-Thanks, Arseniy
+[1]. https://lore.kernel.org/lkml/20230313112819.38938-1-zhengqi.arch@bytedance.com/
+[2]. https://lore.kernel.org/lkml/202305230837.db2c233f-yujie.liu@intel.com/
+[3]. https://lore.kernel.org/all/20230609081518.3039120-1-qi.zheng@linux.dev/
+[4]. https://lore.kernel.org/lkml/ZIJhou1d55d4H1s0@dread.disaster.area/
 
-> 
->> Also Stefano Garzarella <sgarzare@redhat.com> suggested to add define something like VSOCK_RECVERR,
->> in the same way as IP_RECVERR, and use it as last parameter of 'sock_recv_errqueue()'.
->>
-> 
-> Got it, thanks.
-> 
->>>  	transport = vsk->transport;
->>>  
->>>  	/* Retrieve the head sk_buff from the socket's receive queue. */
->>>
->>
->> Thanks, Arseniy
-> 
-> Thanks,
-> Bobby
+2. Implementation
+=================
+
+Currently, the shrinker instances can be divided into the following three types:
+
+a) global shrinker instance statically defined in the kernel, such as
+   workingset_shadow_shrinker.
+
+b) global shrinker instance statically defined in the kernel modules, such as
+   mmu_shrinker in x86.
+
+c) shrinker instance embedded in other structures.
+
+For case a, the memory of shrinker instance is never freed. For case b, the
+memory of shrinker instance will be freed after synchronize_rcu() when the
+module is unloaded. For case c, the memory of shrinker instance will be freed
+along with the structure it is embedded in.
+
+In preparation for implementing lockless slab shrink, we need to dynamically
+allocate those shrinker instances in case c, then the memory can be dynamically
+freed alone by calling kfree_rcu().
+
+This patchset adds the following new APIs for dynamically allocating shrinker,
+and add a private_data field to struct shrinker to record and get the original
+embedded structure.
+
+1. shrinker_alloc()
+2. shrinker_register()
+3. shrinker_free()
+
+In order to simplify shrinker-related APIs and make shrinker more independent of
+other kernel mechanisms, this patchset uses the above APIs to convert all
+shrinkers (including case a and b) to dynamically allocated, and then remove all
+existing APIs. This will also have another advantage mentioned by Dave Chinner:
+
+```
+The other advantage of this is that it will break all the existing out of tree
+code and third party modules using the old API and will no longer work with a
+kernel using lockless slab shrinkers. They need to break (both at the source and
+binary levels) to stop bad things from happening due to using uncoverted
+shrinkers in the new setup.
+```
+
+Then we free the shrinker by calling call_rcu(), and use rcu_read_{lock,unlock}()
+to ensure that the shrinker instance is valid. And the shrinker::refcount
+mechanism ensures that the shrinker instance will not be run again after
+unregistration. So the structure that records the pointer of shrinker instance
+can be safely freed without waiting for the RCU read-side critical section.
+
+In this way, while we implement the lockless slab shrink, we don't need to be
+blocked in unregister_shrinker() to wait RCU read-side critical section.
+
+PATCH 1: fix memory leak in binder_init()
+PATCH 2: move some shrinker-related function declarations to mm/internal.h
+PATCH 3: move shrinker-related code into a separate file
+PATCH 4: remove redundant shrinker_rwsem in debugfs operations
+PATCH 5: add infrastructure for dynamically allocating shrinker
+PATCH 6 ~ 23: dynamically allocate the shrinker instances in case a and b
+PATCH 24 ~ 42: dynamically allocate the shrinker instances in case c
+PATCH 43: remove old APIs
+PATCH 44: introduce pool_shrink_rwsem to implement private synchronize_shrinkers()
+PATCH 45: add a secondary array for shrinker_info::{map, nr_deferred}
+PATCH 46 ~ 47: implement the lockless slab shrink
+PATCH 48 ~ 49: convert shrinker_rwsem to mutex
+
+3. Testing
+==========
+
+3.1 slab shrink stress test
+---------------------------
+
+We can reproduce the down_read_trylock() hotspot through the following script:
+
+```
+
+DIR="/root/shrinker/memcg/mnt"
+
+do_create()
+{
+    mkdir -p /sys/fs/cgroup/memory/test
+    echo 4G > /sys/fs/cgroup/memory/test/memory.limit_in_bytes
+    for i in `seq 0 $1`;
+    do
+        mkdir -p /sys/fs/cgroup/memory/test/$i;
+        echo $$ > /sys/fs/cgroup/memory/test/$i/cgroup.procs;
+        mkdir -p $DIR/$i;
+    done
+}
+
+do_mount()
+{
+    for i in `seq $1 $2`;
+    do
+        mount -t tmpfs $i $DIR/$i;
+    done
+}
+
+do_touch()
+{
+    for i in `seq $1 $2`;
+    do
+        echo $$ > /sys/fs/cgroup/memory/test/$i/cgroup.procs;
+        dd if=/dev/zero of=$DIR/$i/file$i bs=1M count=1 &
+    done
+}
+
+case "$1" in
+  touch)
+    do_touch $2 $3
+    ;;
+  test)
+    do_create 4000
+    do_mount 0 4000
+    do_touch 0 3000
+    ;;
+  *)
+    exit 1
+    ;;
+esac
+```
+
+Save the above script, then run test and touch commands. Then we can use the
+following perf command to view hotspots:
+
+perf top -U -F 999
+
+1) Before applying this patchset:
+
+  40.44%  [kernel]            [k] down_read_trylock
+  17.59%  [kernel]            [k] up_read
+  13.64%  [kernel]            [k] pv_native_safe_halt
+  11.90%  [kernel]            [k] shrink_slab
+   8.21%  [kernel]            [k] idr_find
+   2.71%  [kernel]            [k] _find_next_bit
+   1.36%  [kernel]            [k] shrink_node
+   0.81%  [kernel]            [k] shrink_lruvec
+   0.80%  [kernel]            [k] __radix_tree_lookup
+   0.50%  [kernel]            [k] do_shrink_slab
+   0.21%  [kernel]            [k] list_lru_count_one
+   0.16%  [kernel]            [k] mem_cgroup_iter
+
+2) After applying this patchset:
+
+  60.17%  [kernel]           [k] shrink_slab
+  20.42%  [kernel]           [k] pv_native_safe_halt
+   3.03%  [kernel]           [k] do_shrink_slab
+   2.73%  [kernel]           [k] shrink_node
+   2.27%  [kernel]           [k] shrink_lruvec
+   2.00%  [kernel]           [k] __rcu_read_unlock
+   1.92%  [kernel]           [k] mem_cgroup_iter
+   0.98%  [kernel]           [k] __rcu_read_lock
+   0.91%  [kernel]           [k] osq_lock
+   0.63%  [kernel]           [k] mem_cgroup_calculate_protection
+   0.55%  [kernel]           [k] shrinker_put
+   0.46%  [kernel]           [k] list_lru_count_one
+
+We can see that the first perf hotspot becomes shrink_slab, which is what we
+expect.
+
+3.2 registeration and unregisteration stress test
+-------------------------------------------------
+
+Run the command below to test:
+
+stress-ng --timeout 60 --times --verify --metrics-brief --ramfs 9 &
+
+1) Before applying this patchset:
+
+setting to a 60 second run per stressor
+dispatching hogs: 9 ramfs
+stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+                          (secs)    (secs)    (secs)   (real time) (usr+sys time)
+ramfs            735238     60.00     12.37    363.70     12253.05        1955.08
+for a 60.01s run time:
+   1440.27s available CPU time
+     12.36s user time   (  0.86%)
+    363.70s system time ( 25.25%)
+    376.06s total time  ( 26.11%)
+load average: 10.79 4.47 1.69
+passed: 9: ramfs (9)
+failed: 0
+skipped: 0
+successful run completed in 60.01s (1 min, 0.01 secs)
+
+2) After applying this patchset:
+
+setting to a 60 second run per stressor
+dispatching hogs: 9 ramfs
+stressor       bogo ops real time  usr time  sys time   bogo ops/s     bogo ops/s
+                          (secs)    (secs)    (secs)   (real time) (usr+sys time)
+ramfs            746698     60.00     12.45    376.16     12444.02        1921.47
+for a 60.01s run time:
+   1440.28s available CPU time
+     12.44s user time   (  0.86%)
+    376.16s system time ( 26.12%)
+    388.60s total time  ( 26.98%)
+load average: 9.01 3.85 1.49
+passed: 9: ramfs (9)
+failed: 0
+skipped: 0
+successful run completed in 60.01s (1 min, 0.01 secs)
+
+We can see that the ops/s has hardly changed.
+
+This series is based on next-20230726.
+
+Comments and suggestions are welcome.
+
+Thanks,
+Qi
+
+Changelog in v2 -> v3:
+ - add the patch that [PATCH v3 07/49] depends on
+ - move some shrinker-related function declarations to mm/internal.h
+   (suggested by Muchun Song)
+ - combine shrinker_free_non_registered() and shrinker_unregister() into
+   shrinker_free() (suggested by Dave Chinner)
+ - add missing __init and fix return value in bch_btree_cache_alloc()
+   (pointed by Muchun Song)
+ - remove unnecessary WARN_ON() (pointed by Steven Price)
+ - go back to use completion to implement lockless slab shrink
+   (pointed by Dave Chinner)
+ - collect Acked-bys and Reviewed-bys
+ - rebase onto the next-20230726.
+
+Changelog in v1 -> v2:
+ - implement the new APIs and convert all shrinkers to use it.
+   (suggested by Dave Chinner)
+ - fix UAF in PATCH [05/29] (pointed by Steven Price)
+ - add a secondary array for shrinker_info::{map, nr_deferred}
+ - re-implement the lockless slab shrink
+   (Since unifying the processing of global and memcg slab shrink needs to
+    modify the startup sequence (As I mentioned in https://lore.kernel.org/lkml/38b14080-4ce5-d300-8a0a-c630bca6806b@bytedance.com/),
+    I finally choose to process them separately.)
+ - collect Acked-bys
+
+Qi Zheng (49):
+  binder: fix memory leak in binder_init()
+  mm: move some shrinker-related function declarations to mm/internal.h
+  mm: vmscan: move shrinker-related code into a separate file
+  mm: shrinker: remove redundant shrinker_rwsem in debugfs operations
+  mm: shrinker: add infrastructure for dynamically allocating shrinker
+  kvm: mmu: dynamically allocate the x86-mmu shrinker
+  binder: dynamically allocate the android-binder shrinker
+  drm/ttm: dynamically allocate the drm-ttm_pool shrinker
+  xenbus/backend: dynamically allocate the xen-backend shrinker
+  erofs: dynamically allocate the erofs-shrinker
+  f2fs: dynamically allocate the f2fs-shrinker
+  gfs2: dynamically allocate the gfs2-glock shrinker
+  gfs2: dynamically allocate the gfs2-qd shrinker
+  NFSv4.2: dynamically allocate the nfs-xattr shrinkers
+  nfs: dynamically allocate the nfs-acl shrinker
+  nfsd: dynamically allocate the nfsd-filecache shrinker
+  quota: dynamically allocate the dquota-cache shrinker
+  ubifs: dynamically allocate the ubifs-slab shrinker
+  rcu: dynamically allocate the rcu-lazy shrinker
+  rcu: dynamically allocate the rcu-kfree shrinker
+  mm: thp: dynamically allocate the thp-related shrinkers
+  sunrpc: dynamically allocate the sunrpc_cred shrinker
+  mm: workingset: dynamically allocate the mm-shadow shrinker
+  drm/i915: dynamically allocate the i915_gem_mm shrinker
+  drm/msm: dynamically allocate the drm-msm_gem shrinker
+  drm/panfrost: dynamically allocate the drm-panfrost shrinker
+  dm: dynamically allocate the dm-bufio shrinker
+  dm zoned: dynamically allocate the dm-zoned-meta shrinker
+  md/raid5: dynamically allocate the md-raid5 shrinker
+  bcache: dynamically allocate the md-bcache shrinker
+  vmw_balloon: dynamically allocate the vmw-balloon shrinker
+  virtio_balloon: dynamically allocate the virtio-balloon shrinker
+  mbcache: dynamically allocate the mbcache shrinker
+  ext4: dynamically allocate the ext4-es shrinker
+  jbd2,ext4: dynamically allocate the jbd2-journal shrinker
+  nfsd: dynamically allocate the nfsd-client shrinker
+  nfsd: dynamically allocate the nfsd-reply shrinker
+  xfs: dynamically allocate the xfs-buf shrinker
+  xfs: dynamically allocate the xfs-inodegc shrinker
+  xfs: dynamically allocate the xfs-qm shrinker
+  zsmalloc: dynamically allocate the mm-zspool shrinker
+  fs: super: dynamically allocate the s_shrink
+  mm: shrinker: remove old APIs
+  drm/ttm: introduce pool_shrink_rwsem
+  mm: shrinker: add a secondary array for shrinker_info::{map,
+    nr_deferred}
+  mm: shrinker: make global slab shrink lockless
+  mm: shrinker: make memcg slab shrink lockless
+  mm: shrinker: hold write lock to reparent shrinker nr_deferred
+  mm: shrinker: convert shrinker_rwsem to mutex
+
+ arch/x86/kvm/mmu/mmu.c                        |  18 +-
+ drivers/android/binder.c                      |   1 +
+ drivers/android/binder_alloc.c                |  35 +-
+ drivers/android/binder_alloc.h                |   1 +
+ drivers/gpu/drm/i915/gem/i915_gem_shrinker.c  |  30 +-
+ drivers/gpu/drm/i915/i915_drv.h               |   2 +-
+ drivers/gpu/drm/msm/msm_drv.c                 |   4 +-
+ drivers/gpu/drm/msm/msm_drv.h                 |   4 +-
+ drivers/gpu/drm/msm/msm_gem_shrinker.c        |  34 +-
+ drivers/gpu/drm/panfrost/panfrost_device.h    |   2 +-
+ drivers/gpu/drm/panfrost/panfrost_drv.c       |   6 +-
+ drivers/gpu/drm/panfrost/panfrost_gem.h       |   2 +-
+ .../gpu/drm/panfrost/panfrost_gem_shrinker.c  |  30 +-
+ drivers/gpu/drm/ttm/ttm_pool.c                |  38 +-
+ drivers/md/bcache/bcache.h                    |   2 +-
+ drivers/md/bcache/btree.c                     |  27 +-
+ drivers/md/bcache/sysfs.c                     |   3 +-
+ drivers/md/dm-bufio.c                         |  26 +-
+ drivers/md/dm-cache-metadata.c                |   2 +-
+ drivers/md/dm-zoned-metadata.c                |  28 +-
+ drivers/md/raid5.c                            |  25 +-
+ drivers/md/raid5.h                            |   2 +-
+ drivers/misc/vmw_balloon.c                    |  38 +-
+ drivers/virtio/virtio_balloon.c               |  25 +-
+ drivers/xen/xenbus/xenbus_probe_backend.c     |  18 +-
+ fs/btrfs/super.c                              |   2 +-
+ fs/erofs/utils.c                              |  20 +-
+ fs/ext4/ext4.h                                |   2 +-
+ fs/ext4/extents_status.c                      |  22 +-
+ fs/f2fs/super.c                               |  32 +-
+ fs/gfs2/glock.c                               |  20 +-
+ fs/gfs2/main.c                                |   6 +-
+ fs/gfs2/quota.c                               |  26 +-
+ fs/gfs2/quota.h                               |   3 +-
+ fs/jbd2/journal.c                             |  27 +-
+ fs/kernfs/mount.c                             |   2 +-
+ fs/mbcache.c                                  |  23 +-
+ fs/nfs/nfs42xattr.c                           |  87 +-
+ fs/nfs/super.c                                |  20 +-
+ fs/nfsd/filecache.c                           |  22 +-
+ fs/nfsd/netns.h                               |   4 +-
+ fs/nfsd/nfs4state.c                           |  20 +-
+ fs/nfsd/nfscache.c                            |  31 +-
+ fs/proc/root.c                                |   2 +-
+ fs/quota/dquot.c                              |  18 +-
+ fs/super.c                                    |  38 +-
+ fs/ubifs/super.c                              |  22 +-
+ fs/xfs/xfs_buf.c                              |  25 +-
+ fs/xfs/xfs_buf.h                              |   2 +-
+ fs/xfs/xfs_icache.c                           |  26 +-
+ fs/xfs/xfs_mount.c                            |   4 +-
+ fs/xfs/xfs_mount.h                            |   2 +-
+ fs/xfs/xfs_qm.c                               |  26 +-
+ fs/xfs/xfs_qm.h                               |   2 +-
+ include/linux/fs.h                            |   2 +-
+ include/linux/jbd2.h                          |   2 +-
+ include/linux/memcontrol.h                    |  12 +-
+ include/linux/shrinker.h                      |  67 +-
+ kernel/rcu/tree.c                             |  22 +-
+ kernel/rcu/tree_nocb.h                        |  20 +-
+ mm/Makefile                                   |   4 +-
+ mm/huge_memory.c                              |  69 +-
+ mm/internal.h                                 |  41 +
+ mm/shrinker.c                                 | 770 ++++++++++++++++++
+ mm/shrinker_debug.c                           |  45 +-
+ mm/vmscan.c                                   | 701 ----------------
+ mm/workingset.c                               |  27 +-
+ mm/zsmalloc.c                                 |  28 +-
+ net/sunrpc/auth.c                             |  19 +-
+ 69 files changed, 1534 insertions(+), 1234 deletions(-)
+ create mode 100644 mm/shrinker.c
+
+-- 
+2.30.2
+
