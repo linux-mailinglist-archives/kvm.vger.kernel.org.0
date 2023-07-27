@@ -2,320 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF1E7649D0
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:04:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1A03764A32
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:07:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233673AbjG0ID6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 04:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39812 "EHLO
+        id S233756AbjG0IHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 04:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233834AbjG0IDK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 04:03:10 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD0B30E1;
-        Thu, 27 Jul 2023 01:00:59 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4fe0e201f87so812903e87.0;
-        Thu, 27 Jul 2023 01:00:59 -0700 (PDT)
+        with ESMTP id S229946AbjG0IHD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 04:07:03 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C09E2D63;
+        Thu, 27 Jul 2023 01:03:32 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9bb097c1bso9558391fa.0;
+        Thu, 27 Jul 2023 01:03:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690444857; x=1691049657;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SYuNrpoI3tnEVZetpa88DTMlv509VYX8D7ZfjFNqJc8=;
-        b=f3hONDETJDJayvYdgBF26/EZZXfBSU0NRORubQOS9i3huzuff+3KyZqvpNOoZhmt+x
-         8yl01+C7oQJmCr+n3SganiYiSlTo6bl9/NKdDFkEBOc8ycw85YYFcAyKsm1ShkpcC1hI
-         A22fuyHdJR/r7A7f8oWlQI+5oZGzG0/JEHKIcCI4fNBCa+Ecgcr3NXuXPpiOFKBEe6HV
-         h0cjzJJexDiQp8ah84jnexD/8DHK9OSM2Y9WzGXTEGg/ddXIxzDVdwfLEE1ShPRhA7Gx
-         cMELtbizghsC4SD7AfnKLyMZ2WWM23XI6mhUJzKEeQOaBgqu/JRf0oVAcn8tFosg0oxf
-         fijw==
+        d=gmail.com; s=20221208; t=1690445011; x=1691049811;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IbW7gI8a3h2DtRGdUF2rMRbdoxwlm6QKOTYcrosHNBs=;
+        b=EhWPo4MEPNAXO7A/UJ1EqCuxFIfcR01vvsKQKmIGV1QV+PnLkZKyDmrGCWc+YSi8F4
+         lOoP/2TG2yqIkudRF+0iwzcAiI4gYrGIXkrX2ypVZg5665I4MaFS0/JewGu3SragA9ZT
+         5MMrRSRaiadbCTjTK2fkDiXv4WVm47Lq8FpnWAYYd/ACP/WlVO3XmtZsl/pZbFqPf0b2
+         oD7jcmyAOXanzOz3WPIR9RjWSlsU+kHdWN2xj9/t0mPEwXDWsmkFWB2TLEw+rYroWyfk
+         JSYzeWSnH3jpGSR5Jdl0Xb+ZTJFqjSpaWRccdiCSuVgMsf/pJ52xuDTBWSauQNGq2+gn
+         Mztg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690444857; x=1691049657;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SYuNrpoI3tnEVZetpa88DTMlv509VYX8D7ZfjFNqJc8=;
-        b=krsb5UutjmTcKVTyph/tkAa0E/7Plm0Ds7Riv29yOIptqacZ5om+XYjJAJDNTUQJFP
-         Z842vU+gCexGfL/SwBR/+rpQGvO23KmY9q4lo8N7PM5NxkA5xihXWF7lAor889MFz7l/
-         opHj0U7sPXIJp1KtzoFxpLXRrtCDnHxZ+KINjDohaLJO7ElaGzdiAyJni48P6husm24n
-         9X/Sy36K6Z7E0wrL8ehzGAUgYmdO8tT5tDNhUOM0Kwb1ftwT8Sv2HqR/FHNLaJoNBAG/
-         kiZtPiLo+SiOjxOmRqrQBWTT51Un2i5yfsGUS6xZHTPeo80kS5zMTFW4oF8h63HnYMLm
-         mK0w==
-X-Gm-Message-State: ABy/qLZuLNy9vJDVKasebwvPcxEPvPjGV8AxpiGKMVUtjhdnsHKSWxSo
-        Eo2JOywPHP29bV2kkLmhODkTH5zQE4C6og==
-X-Google-Smtp-Source: APBJJlGLewj36BuCLnyGxR7iDd/1f8k7t03VaSoFL3cDG+Y8tcH1QGv8vZQEJ3nZwJtMohkOxFSIvw==
-X-Received: by 2002:a05:6512:110b:b0:4f8:5ede:d453 with SMTP id l11-20020a056512110b00b004f85eded453mr597991lfg.23.1690444857187;
-        Thu, 27 Jul 2023 01:00:57 -0700 (PDT)
-Received: from [192.168.0.112] ([77.220.140.242])
-        by smtp.gmail.com with ESMTPSA id h11-20020ac25d6b000000b004fa4323ec97sm189589lft.301.2023.07.27.01.00.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 01:00:56 -0700 (PDT)
-Message-ID: <acd54194-d397-e721-28e4-73a69257a2a9@gmail.com>
-Date:   Thu, 27 Jul 2023 11:00:55 +0300
+        d=1e100.net; s=20221208; t=1690445011; x=1691049811;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IbW7gI8a3h2DtRGdUF2rMRbdoxwlm6QKOTYcrosHNBs=;
+        b=P3ZE6CZ3+YM19zLaB4ZMjMGu72ez+G6dxKsXq8Skmhe2QYf3mVXp66OGDPsQZgZjKY
+         xDvkXNEkC8ROnopLDWjh5STMjCUdfqZ1AdqRE8xWQUDVuHxivxtMjG3EBDwPziFgW/Bt
+         HgLx43RD/FkoyvuM2uLu+p0c9fRlhmWr8OtPsLbj26gZTsRnGqpwuKfZ7ueIvlvs/byc
+         QgLOL3WlyRcQ39PyDTgNPH5OExGbhodJAhrNM/BIXCexRd3b07/Q/N7vlKg4hHs5Cxm3
+         oLhO2dfyBL3JarGJ/zeECXaGxIWFOz///hcfvvpE9g35Yxn3EGZKLbzmiOlE6n1gtc/c
+         muyw==
+X-Gm-Message-State: ABy/qLbuIcRFnC0vS61Ju3nMcDa4biCGHOBzEd476etE2I68yBQPyXUt
+        hVP3sjmZ+11O0eipRpP2AQZkhlmdB4eLWcYOOn4=
+X-Google-Smtp-Source: APBJJlFOyEp3aH4nbnnFb6F1FGxJyzCBCXxMiO4szu4Qz6wRbHan22QnDkvyGS9SlOqBnnv2QBJiOI+MWs7hY8+gz/A=
+X-Received: by 2002:a2e:b1d3:0:b0:2b6:da88:a2d0 with SMTP id
+ e19-20020a2eb1d3000000b002b6da88a2d0mr1085078lja.47.1690445010411; Thu, 27
+ Jul 2023 01:03:30 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC net-next v5 11/14] vhost/vsock: implement datagram
- support
-Content-Language: en-US
-To:     Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Bryan Tan <bryantan@vmware.com>,
-        Vishnu Dasa <vdasa@vmware.com>,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        bpf@vger.kernel.org
-References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
- <20230413-b4-vsock-dgram-v5-11-581bd37fdb26@bytedance.com>
- <b15d237e-31b5-40ae-83fc-e71649febd2b@gmail.com> <ZMFd+Jd/LrfpJsVA@bullseye>
-From:   Arseniy Krasnov <oxffffaa@gmail.com>
-In-Reply-To: <ZMFd+Jd/LrfpJsVA@bullseye>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+From:   Yikebaer Aizezi <yikebaer61@gmail.com>
+Date:   Thu, 27 Jul 2023 16:03:18 +0800
+Message-ID: <CALcu4rbFrU4go8sBHk3FreP+qjgtZCGcYNpSiEXOLm==qFv7iQ@mail.gmail.com>
+Subject: WARNING in kvm_arch_vcpu_ioctl_run
+To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, jarkko@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sgx@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello, I'm sorry for the mistake in my previous email. I forgot to add
+a subject. This is my second attempt to send the message.
 
+When using Healer to fuzz the latest Linux kernel, the following crash
+was triggered.
 
-On 26.07.2023 20:55, Bobby Eshleman wrote:
-> On Sat, Jul 22, 2023 at 11:42:38AM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 19.07.2023 03:50, Bobby Eshleman wrote:
->>> This commit implements datagram support for vhost/vsock by teaching
->>> vhost to use the common virtio transport datagram functions.
->>>
->>> If the virtio RX buffer is too small, then the transmission is
->>> abandoned, the packet dropped, and EHOSTUNREACH is added to the socket's
->>> error queue.
->>>
->>> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->>> ---
->>>  drivers/vhost/vsock.c    | 62 +++++++++++++++++++++++++++++++++++++++++++++---
->>>  net/vmw_vsock/af_vsock.c |  5 +++-
->>>  2 files changed, 63 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>> index d5d6a3c3f273..da14260c6654 100644
->>> --- a/drivers/vhost/vsock.c
->>> +++ b/drivers/vhost/vsock.c
->>> @@ -8,6 +8,7 @@
->>>   */
->>>  #include <linux/miscdevice.h>
->>>  #include <linux/atomic.h>
->>> +#include <linux/errqueue.h>
->>>  #include <linux/module.h>
->>>  #include <linux/mutex.h>
->>>  #include <linux/vmalloc.h>
->>> @@ -32,7 +33,8 @@
->>>  enum {
->>>  	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
->>>  			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->>> -			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
->>> +			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET) |
->>> +			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
->>>  };
->>>  
->>>  enum {
->>> @@ -56,6 +58,7 @@ struct vhost_vsock {
->>>  	atomic_t queued_replies;
->>>  
->>>  	u32 guest_cid;
->>> +	bool dgram_allow;
->>>  	bool seqpacket_allow;
->>>  };
->>>  
->>> @@ -86,6 +89,32 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
->>>  	return NULL;
->>>  }
->>>  
->>> +/* Claims ownership of the skb, do not free the skb after calling! */
->>> +static void
->>> +vhost_transport_error(struct sk_buff *skb, int err)
->>> +{
->>> +	struct sock_exterr_skb *serr;
->>> +	struct sock *sk = skb->sk;
->>> +	struct sk_buff *clone;
->>> +
->>> +	serr = SKB_EXT_ERR(skb);
->>> +	memset(serr, 0, sizeof(*serr));
->>> +	serr->ee.ee_errno = err;
->>> +	serr->ee.ee_origin = SO_EE_ORIGIN_NONE;
->>> +
->>> +	clone = skb_clone(skb, GFP_KERNEL);
->>
->> May for skb which is error carrier we can use 'sock_omalloc()', not 'skb_clone()' ? TCP uses skb
->> allocated by this function as carriers of error structure. I guess 'skb_clone()' also clones data of origin,
->> but i think that there is no need in data as we insert it to error queue of the socket.
->>
->> What do You think?
-> 
-> IIUC skb_clone() is often used in this scenario so that the user can
-> retrieve the error-causing packet from the error queue.  Is there some
-> reason we shouldn't do this?
-> 
-> I'm seeing that the serr bits need to occur on the clone here, not the
-> original. I didn't realize the SKB_EXT_ERR() is a skb->cb cast. I'm not
-> actually sure how this passes the test case since ->cb isn't cloned.
+HEAD commit: fdf0eaf11452d72945af31804e2a1048ee1b574c (tag: v6.5-rc2)
 
-Ah yes, sorry, You are right, I just confused this case with zerocopy completion
-handling - there we allocate "empty" skb which carries completion metadata in its
-'cb' field.
+git tree: upstream
 
-Hm, but can't we just reinsert current skb (update it's 'cb' as 'sock_exterr_skb')
-to error queue of the socket without cloning it ?
+console output:
+https://drive.google.com/file/d/1FiemC_AWRT-6EGscpQJZNzYhXZty6BVr/view?usp=drive_link
+kernel config: https://drive.google.com/file/d/1fgPLKOw7QbKzhK6ya5KUyKyFhumQgunw/view?usp=drive_link
+C reproducer: https://drive.google.com/file/d/1SiLpYTZ7Du39ubgf1k1BIPlu9ZvMjiWZ/view?usp=drive_link
+Syzlang reproducer:
+https://drive.google.com/file/d/1eWSmwvNGOlZNU-0-xsKhUgZ4WG2VLZL5/view?usp=drive_link
+Similar report:
+https://groups.google.com/g/syzkaller-bugs/c/C2ud-S1Thh0/m/z4iI7l_dAgAJ
 
-Thanks, Arseniy
+If you fix this issue, please add the following tag to the commit:
+Reported-by: Yikebaer Aizezi <yikebaer61@gmail.com>
 
-> 
->>
->>> +	if (!clone)
->>> +		return;
->>
->> What will happen here 'if (!clone)' ? skb will leak as it was removed from queue?
->>
-> 
-> Ah yes, true.
-> 
->>> +
->>> +	if (sock_queue_err_skb(sk, clone))
->>> +		kfree_skb(clone);
->>> +
->>> +	sk->sk_err = err;
->>> +	sk_error_report(sk);
->>> +
->>> +	kfree_skb(skb);
->>> +}
->>> +
->>>  static void
->>>  vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>  			    struct vhost_virtqueue *vq)
->>> @@ -160,9 +189,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>  		hdr = virtio_vsock_hdr(skb);
->>>  
->>>  		/* If the packet is greater than the space available in the
->>> -		 * buffer, we split it using multiple buffers.
->>> +		 * buffer, we split it using multiple buffers for connectible
->>> +		 * sockets and drop the packet for datagram sockets.
->>>  		 */
->>>  		if (payload_len > iov_len - sizeof(*hdr)) {
->>> +			if (le16_to_cpu(hdr->type) == VIRTIO_VSOCK_TYPE_DGRAM) {
->>> +				vhost_transport_error(skb, EHOSTUNREACH);
->>> +				continue;
->>> +			}
->>> +
->>>  			payload_len = iov_len - sizeof(*hdr);
->>>  
->>>  			/* As we are copying pieces of large packet's buffer to
->>> @@ -394,6 +429,7 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
->>>  	return val < vq->num;
->>>  }
->>>  
->>> +static bool vhost_transport_dgram_allow(u32 cid, u32 port);
->>>  static bool vhost_transport_seqpacket_allow(u32 remote_cid);
->>>  
->>>  static struct virtio_transport vhost_transport = {
->>> @@ -410,7 +446,8 @@ static struct virtio_transport vhost_transport = {
->>>  		.cancel_pkt               = vhost_transport_cancel_pkt,
->>>  
->>>  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
->>> -		.dgram_allow              = virtio_transport_dgram_allow,
->>> +		.dgram_allow              = vhost_transport_dgram_allow,
->>> +		.dgram_addr_init          = virtio_transport_dgram_addr_init,
->>>  
->>>  		.stream_enqueue           = virtio_transport_stream_enqueue,
->>>  		.stream_dequeue           = virtio_transport_stream_dequeue,
->>> @@ -443,6 +480,22 @@ static struct virtio_transport vhost_transport = {
->>>  	.send_pkt = vhost_transport_send_pkt,
->>>  };
->>>  
->>> +static bool vhost_transport_dgram_allow(u32 cid, u32 port)
->>> +{
->>> +	struct vhost_vsock *vsock;
->>> +	bool dgram_allow = false;
->>> +
->>> +	rcu_read_lock();
->>> +	vsock = vhost_vsock_get(cid);
->>> +
->>> +	if (vsock)
->>> +		dgram_allow = vsock->dgram_allow;
->>> +
->>> +	rcu_read_unlock();
->>> +
->>> +	return dgram_allow;
->>> +}
->>> +
->>>  static bool vhost_transport_seqpacket_allow(u32 remote_cid)
->>>  {
->>>  	struct vhost_vsock *vsock;
->>> @@ -799,6 +852,9 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
->>>  	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
->>>  		vsock->seqpacket_allow = true;
->>>  
->>> +	if (features & (1ULL << VIRTIO_VSOCK_F_DGRAM))
->>> +		vsock->dgram_allow = true;
->>> +
->>>  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
->>>  		vq = &vsock->vqs[i];
->>>  		mutex_lock(&vq->mutex);
->>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>> index e73f3b2c52f1..449ed63ac2b0 100644
->>> --- a/net/vmw_vsock/af_vsock.c
->>> +++ b/net/vmw_vsock/af_vsock.c
->>> @@ -1427,9 +1427,12 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->>>  		return prot->recvmsg(sk, msg, len, flags, NULL);
->>>  #endif
->>>  
->>> -	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
->>> +	if (unlikely(flags & MSG_OOB))
->>>  		return -EOPNOTSUPP;
->>>  
->>> +	if (unlikely(flags & MSG_ERRQUEUE))
->>> +		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
->>> +
->>
->> Sorry, but I get build error here, because SOL_VSOCK in undefined. I think it should be added to
->> include/linux/socket.h and to uapi files also for future use in userspace.
->>
-> 
-> Strange, I built each patch individually without issue. My base is
-> netdev/main with your SOL_VSOCK patch applied. I will look today and see
-> if I'm missing something.
-> 
->> Also Stefano Garzarella <sgarzare@redhat.com> suggested to add define something like VSOCK_RECVERR,
->> in the same way as IP_RECVERR, and use it as last parameter of 'sock_recv_errqueue()'.
->>
-> 
-> Got it, thanks.
-> 
->>>  	transport = vsk->transport;
->>>  
->>>  	/* Retrieve the head sk_buff from the socket's receive queue. */
->>>
->>
->> Thanks, Arseniy
-> 
-> Thanks,
-> Bobby
+kvm: vcpu 129: requested lapic timer restore with starting count
+register 0x390=4241646265 (4241646265 ns) > initial count (296265111
+ns). Using initial count to start timer.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1977 at arch/x86/kvm/x86.c:11098
+kvm_arch_vcpu_ioctl_run+0x152f/0x1830 arch/x86/kvm/x86.c:11098
+Modules linked in:
+CPU: 0 PID: 1977 Comm: syz-executor Not tainted 6.5.0-rc2 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+RIP: 0010:kvm_arch_vcpu_ioctl_run+0x152f/0x1830 arch/x86/kvm/x86.c:11098
+Code: fd ff ff e8 83 ca 67 00 44 89 ee 48 c7 c7 80 8e 42 89 c6 05 e3
+40 1e 0c 01 e8 2d 22 33 00 0f 0b e9 ed fc ff ff e8 61 ca 67 00 <0f> 0b
+e9 ff fb ff ff e8 55 ca 67 00 80 3d c0 40 1e 0c 00 0f 85 19
+RSP: 0018:ffffc900072dfcd8 EFLAGS: 00010212
+RAX: 00000000000006a9 RBX: ffff88801852c000 RCX: ffffc90002bd9000
+RDX: 0000000000040000 RSI: ffffffff81114ddf RDI: ffff88810e5d0880
+RBP: ffff888018995180 R08: 0000000000000000 R09: fffffbfff1f4f5b0
+R10: ffffffff8fa7ad87 R11: 0000000000000001 R12: ffff8880189951ac
+R13: 0000000000000000 R14: ffff8880189959a8 R15: ffff888018995268
+FS:  00007feb64c14640(0000) GS:ffff888063e00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000000002a8 CR3: 0000000114888000 CR4: 0000000000752ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ kvm_vcpu_ioctl+0x4de/0xcc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4112
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x173/0x1e0 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x47959d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 b4 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007feb64c14068 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000059c0a0 RCX: 000000000047959d
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000008
+RBP: 000000000059c0a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000059c0ac
+R13: 000000000000000b R14: 0000000000437250 R15: 00007feb64bf4000
+ </TASK>
+
+Modules linked in:
+CPU: 0 PID: 1977 Comm: syz-executor Not tainted 6.5.0-rc2 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+RIP: 0010:kvm_arch_vcpu_ioctl_run+0x152f/0x1830 arch/x86/kvm/x86.c:11098
+Code: fd ff ff e8 83 ca 67 00 44 89 ee 48 c7 c7 80 8e 42 89 c6 05 e3
+40 1e 0c 01 e8 2d 22 33 00 0f 0b e9 ed fc ff ff e8 61 ca 67 00 <0f> 0b
+e9 ff fb ff ff e8 55 ca 67 00 80 3d c0 40 1e 0c 00 0f 85 19
+RSP: 0018:ffffc900072dfcd8 EFLAGS: 00010212
+RAX: 00000000000006a9 RBX: ffff88801852c000 RCX: ffffc90002bd9000
+RDX: 0000000000040000 RSI: ffffffff81114ddf RDI: ffff88810e5d0880
+RBP: ffff888018995180 R08: 0000000000000000 R09: fffffbfff1f4f5b0
+R10: ffffffff8fa7ad87 R11: 0000000000000001 R12: ffff8880189951ac
+R13: 0000000000000000 R14: ffff8880189959a8 R15: ffff888018995268
+FS:  00007feb64c14640(0000) GS:ffff888063e00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000000002a8 CR3: 0000000114888000 CR4: 0000000000752ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ kvm_vcpu_ioctl+0x4de/0xcc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4112
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x173/0x1e0 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x47959d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 b4 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007feb64c14068 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000059c0a0 RCX: 000000000047959d
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000008
+RBP: 000000000059c0a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000059c0ac
+R13: 000000000000000b R14: 0000000000437250 R15: 00007feb64bf4000
+ </TASK>
+Kernel panic - not syncing: kernel: panic_on_warn set ...
+CPU: 0 PID: 1977 Comm: syz-executor Not tainted 6.5.0-rc2 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x92/0xf0 lib/dump_stack.c:106
+ panic+0x570/0x620 kernel/panic.c:340
+ check_panic_on_warn+0x8e/0x90 kernel/panic.c:236
+ __warn+0xee/0x340 kernel/panic.c:673
+ __report_bug lib/bug.c:199 [inline]
+ report_bug+0x25d/0x460 lib/bug.c:219
+ handle_bug+0x3c/0x70 arch/x86/kernel/traps.c:324
+ exc_invalid_op+0x14/0x40 arch/x86/kernel/traps.c:345
+ asm_exc_invalid_op+0x16/0x20 arch/x86/include/asm/idtentry.h:568
+RIP: 0010:kvm_arch_vcpu_ioctl_run+0x152f/0x1830 arch/x86/kvm/x86.c:11098
+Code: fd ff ff e8 83 ca 67 00 44 89 ee 48 c7 c7 80 8e 42 89 c6 05 e3
+40 1e 0c 01 e8 2d 22 33 00 0f 0b e9 ed fc ff ff e8 61 ca 67 00 <0f> 0b
+e9 ff fb ff ff e8 55 ca 67 00 80 3d c0 40 1e 0c 00 0f 85 19
+RSP: 0018:ffffc900072dfcd8 EFLAGS: 00010212
+RAX: 00000000000006a9 RBX: ffff88801852c000 RCX: ffffc90002bd9000
+RDX: 0000000000040000 RSI: ffffffff81114ddf RDI: ffff88810e5d0880
+RBP: ffff888018995180 R08: 0000000000000000 R09: fffffbfff1f4f5b0
+R10: ffffffff8fa7ad87 R11: 0000000000000001 R12: ffff8880189951ac
+R13: 0000000000000000 R14: ffff8880189959a8 R15: ffff888018995268
+ kvm_vcpu_ioctl+0x4de/0xcc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4112
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x173/0x1e0 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x47959d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 b4 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007feb64c14068 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000059c0a0 RCX: 000000000047959d
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000008
+RBP: 000000000059c0a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000059c0ac
+R13: 000000000000000b R14: 0000000000437250 R15: 00007feb64bf4000
+ </TASK>
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Kernel Offset: disabled
+Rebooting in 1 seconds..
