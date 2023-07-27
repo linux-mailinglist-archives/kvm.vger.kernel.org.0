@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25FC676544A
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 14:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E549B76544E
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 14:48:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231874AbjG0MrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 08:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46266 "EHLO
+        id S233367AbjG0MsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 08:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjG0MrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 08:47:16 -0400
+        with ESMTP id S231533AbjG0MsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 08:48:15 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA761AD;
-        Thu, 27 Jul 2023 05:47:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22DE01737;
+        Thu, 27 Jul 2023 05:48:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3000261E72;
-        Thu, 27 Jul 2023 12:47:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AC35C433C8;
-        Thu, 27 Jul 2023 12:47:14 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ADAB261E46;
+        Thu, 27 Jul 2023 12:48:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 202DFC433C7;
+        Thu, 27 Jul 2023 12:48:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690462034;
-        bh=GxVozBEKY8+AgHwSE2aDgYeiystb2UmWZSF2Ki+IdPI=;
+        s=k20201202; t=1690462094;
+        bh=Pu9LHy5Agl5sYHbCRsbjf8k1I59T+epDRHYNCSx4JE0=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=s78n/svgO7+UM0yNRY3p5OT2wujOITJUxA4UH6cAxnqsGDudO9d5T405eVaV8vliM
-         AviLXTghhTyY253xBzJs6DtLsMnOH6TNAYu/vYxCKAua4fmEuNFYRseNOUZirRkgNJ
-         C29fWQ9X7GGWLJ/t4YYnL2fpLq9c3Su9HP8A1/MCQKWY5s/wiMOkGsJruIw6ntkRCc
-         Ad8w0Y+jNYV9yK3cpR4mcafHcG/IEl9wC5vI758B1ALPWZW2TDs1e5j3XoBI4/aj3Q
-         FErPMCfNe3VUSgK0pA53vcHVBHdQSk790Zhq2zMiXs5rDfm5wK+CpmbIG6e6Ik0wsS
-         ozurfT0/w+Vsg==
+        b=rn6scYsMbV5/hnnmtH8oiCUC5rXbFb89YKEg3KCSLdeCqTZUujSry/ysohED3t+2u
+         cdfOKE6NXYMs1bFJof86Rn5DZA/mfyKpSQ88AN44Iccn1W80m0+AnBT2B/pbUJxK1H
+         MGHOEF471C9WrJUb0oEtOee5FsAhQmy0iXfcg0zEM72UwbCzP1tir6jqOchmmXqdVF
+         VGNx/XrxqZH8KLaTgJNBT0yvwJ2DvfvphuGCIcCyEskOlYPsDcgZvYb37uNuF58D5c
+         etiPcMpzK00oopTRBCOQaNOwSJcEJFmnXOhwLnSLJyv3a/+qFDR9oYMWCAdnAh7AmC
+         u7xA8rkxb3xRA==
 Received: from [104.132.45.102] (helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qP0OZ-00HMI7-8N;
-        Thu, 27 Jul 2023 13:47:07 +0100
-Date:   Thu, 27 Jul 2023 13:47:06 +0100
-Message-ID: <87o7jxr06t.wl-maz@kernel.org>
+        id 1qP0Pb-00HMJJ-W9;
+        Thu, 27 Jul 2023 13:48:12 +0100
+Date:   Thu, 27 Jul 2023 13:48:11 +0100
+Message-ID: <87mszhr050.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
@@ -60,10 +60,10 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
         Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v7 08/12] KVM: arm64: Define kvm_tlb_flush_vmid_range()
-In-Reply-To: <20230722022251.3446223-9-rananta@google.com>
+Subject: Re: [PATCH v7 09/12] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+In-Reply-To: <20230722022251.3446223-10-rananta@google.com>
 References: <20230722022251.3446223-1-rananta@google.com>
-        <20230722022251.3446223-9-rananta@google.com>
+        <20230722022251.3446223-10-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -83,77 +83,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 22 Jul 2023 03:22:47 +0100,
+On Sat, 22 Jul 2023 03:22:48 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Implement the helper kvm_tlb_flush_vmid_range() that acts
-> as a wrapper for range-based TLB invalidations. For the
-> given VMID, use the range-based TLBI instructions to do
-> the job or fallback to invalidating all the TLB entries.
+> Implement kvm_arch_flush_remote_tlbs_range() for arm64
+> to invalidate the given range in the TLB.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
 > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
->  2 files changed, 30 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/mmu.c              | 7 +++++++
+>  2 files changed, 10 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 8294a9a7e566..5e8b1ff07854 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -754,4 +754,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
->   *	   kvm_pgtable_prot format.
->   */
->  enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
-> +
-> +/**
-> + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entries
-> + *
-> + * @mmu:	Stage-2 KVM MMU struct
-> + * @addr:	The base Intermediate physical address from which to invalidate
-> + * @size:	Size of the range from the base to invalidate
-> + */
-> +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> +				phys_addr_t addr, size_t size);
->  #endif	/* __ARM64_KVM_PGTABLE_H__ */
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index aa740a974e02..5d14d5d5819a 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -670,6 +670,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
->  	return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 7281222f24ef..52d3ed918893 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1114,6 +1114,9 @@ struct kvm *kvm_arch_alloc_vm(void);
+>  #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+>  int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
 >  
-> +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
-> +				phys_addr_t addr, size_t size)
-> +{
-> +	unsigned long pages, inval_pages;
-> +
-> +	if (!system_supports_tlb_range()) {
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +		return;
-> +	}
-> +
-> +	pages = size >> PAGE_SHIFT;
-> +	while (pages > 0) {
-> +		inval_pages = min(pages, MAX_TLBI_RANGE_PAGES);
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval_pages);
-> +
-> +		addr += inval_pages << PAGE_SHIFT;
-> +		pages -= inval_pages;
-> +	}
-> +}
-> +
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages);
 
-This really shouldn't live in pgtable.c. This code gets linked into
-the EL2 object. What do you think happens if, for some reason, this
-gets called *from EL2*?
-
-Furthermore, this doesn't deal with page tables at all. Why isn't
-mmu.c a convenient place for it, as an integral part of
-kvm_arch_flush_remote_tlbs_range?
+As per the other patches, these prototypes should be global and not
+arch-specific.
 
 	M.
 
