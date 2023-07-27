@@ -2,132 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87A27765149
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:33:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4518765180
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:40:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234018AbjG0KdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 06:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60276 "EHLO
+        id S233545AbjG0Kkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 06:40:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234072AbjG0Kcw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 06:32:52 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE751710
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:32:26 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-2680edb9767so163337a91.0
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:32:26 -0700 (PDT)
+        with ESMTP id S231927AbjG0KkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 06:40:16 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64E526BA
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:40:15 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-63d2b7d77bfso5754926d6.3
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:40:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690453945; x=1691058745;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4VsKgOIlO7JTMbURB3u+V7Qr/QzOpc+0Bt56AjhAYAM=;
-        b=Zr/NhsMbDbdIdSqoueTQTw00LusmUmyLrdR7MeDx+ZO5Q+75jdmzv373GL0Ee5CtKr
-         W6fluKiuFJCg5ZU3kW0Km101UvphMU1vBCY7hDEO6TFqab4XzqrIV8fVDPR2Owpqim7U
-         N3OX4eAxVQVjc5z6Zvv7YweV9TAIgzv2mVUZoaytYD45Z4tHHiC7Kn023GaYmi5v6RKy
-         g9n+r/2KPb5qfD2ZK/MDUQIwCLsfUVl7c4q/2XRu1uefpNinWMEwlZLohyik+zojbFUF
-         urJtl81vW3ulTBjRT5ht+WLfC03kh8PaMNuzZ2kESl6uu5dT49u0KrVoAN4kKuQ8SPSD
-         k2iA==
+        d=google.com; s=20221208; t=1690454415; x=1691059215;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sndfUp5VQwyYdDkfd9c4UQTPXsXPqaVmv/x1Ijy8DrI=;
+        b=BRo0MX+z2r1SS6yWvALim/6/nbcuIraz/dvlfYWOZ9asJfVrKNdNm2FzRqaxLf+dSr
+         gd8iH6tStNBkd23/w31KCfLL9pbPEeNVyPTR03aUqTDZY6wZTMoqJSnBUDPOFUCLZI8l
+         DGkcMHGLOMeyEEgRm2q9vaf0Y5Q5Azvv1tkZ/xFOCXwAaoOvebuUDqbcoCdnlpWZyTyX
+         q38zkUOHeP0Tt+nEWAcZ8JszB60VlCahpErQX1nO7BawFSz3QtUcVh1o5Am/iWB313H6
+         H0uJV9FuYrV0GCIZde+45ERDs3S4qD78OMMR7S/b1svm4zQQyj/BCkUn3DI2PJoOlxx+
+         Zjrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690453945; x=1691058745;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VsKgOIlO7JTMbURB3u+V7Qr/QzOpc+0Bt56AjhAYAM=;
-        b=WNT6vSf4hmWuo8nn2jqp0F9IWxgbEUfNS5qN5ELP0Yrq5qBINIJU0NyrW23lVMUFcq
-         Nk1D2kuWmMBlwgSmTWpbFyuxvvpNnhBM+4IE5fmbFQdx+Ihz71JhQgalgsDivQxCz/O2
-         yMZBsObsovSdxJDyi3ET+J9xlmSttfUgy/J44OCgY4fV6eFMV/dDY8Zag20YR+Z25GlY
-         ueHtIEpIq5DpoATA/bFtZ/k1ip/wYvEpd++c7GQvAWe85rChd/RbGwU8Hj3SJhTW149F
-         7trBdYH/MD78NhZJCDEkI3r0X1cTvlVJx8dDZKGmI5YpUFT9fKUC+cTC8iRMi68JDvz4
-         lpJg==
-X-Gm-Message-State: ABy/qLYrzzbgCCx6Up9FiAN9OiLnnwac+xGxw5tkUOjbQgusVNwwHib6
-        UllRp2lVQlKNonf5Iw+UQEIUyA==
-X-Google-Smtp-Source: APBJJlGmzPZn88CMJAqpsojyTb97uikW28yo5O3pi8rH8SDlSH8BwjASuoOudfeGFyxgCSRxAf0mLA==
-X-Received: by 2002:a17:90a:1b06:b0:263:2312:60c2 with SMTP id q6-20020a17090a1b0600b00263231260c2mr4299433pjq.3.1690453945653;
-        Thu, 27 Jul 2023 03:32:25 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id 8-20020a17090a018800b0026309d57724sm2755058pjc.39.2023.07.27.03.32.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jul 2023 03:32:25 -0700 (PDT)
-Message-ID: <cc819e13-cb25-ddaa-e0e3-7328f5ea3a4f@bytedance.com>
-Date:   Thu, 27 Jul 2023 18:32:10 +0800
+        d=1e100.net; s=20221208; t=1690454415; x=1691059215;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sndfUp5VQwyYdDkfd9c4UQTPXsXPqaVmv/x1Ijy8DrI=;
+        b=Ba+3Xdn/+EtJ8LNiFh8wx7sQxmcN4LqC/DfLsK2OQzO+wwlrwAr/r1VSGurqJYTxJS
+         0uiJBrHk0JLy45cQgNJaFH4c292IT5RNe6TClqeRfdwjjJ65HriKVRhzMHyWM8AMP+EX
+         v+TNkUNXNwsjbVYTg16Yg7/67Bkb6qw4OFSERWV5hJDsL3uA2RUJHjLxM2wfnGhiYvJU
+         oigM+EfySsFK/HDgR4w6z81Kf7tE1e7EdunpAUIUn7OdauhTHZI+qSNlb0KFx52a2H4a
+         3psVlghlyrdvLYSseDJgN6jtfVzg9HiKpFzaYE9pDXjcpF5ebJlkQkSFhXyaDSwgqfnL
+         5Qgw==
+X-Gm-Message-State: ABy/qLZVwY9YewDZ5jFkXdPnlrOS3q2XeF/WRzlT4sPjO6xG2b+wCHr5
+        UdxUVNUVJp3LnJ9MYy59kemKWHBhysjMBIbDczylCA==
+X-Google-Smtp-Source: APBJJlE+0dXFxcWiQX8kiDXJfKau+LxjypHc8uOGBYfuDsHhoPcJDBpq4NHTu2yqyvhkPVt07nS69cNqQCueoayyUeg=
+X-Received: by 2002:a05:6214:12b:b0:63d:218:c83f with SMTP id
+ w11-20020a056214012b00b0063d0218c83fmr4306083qvs.36.1690454414736; Thu, 27
+ Jul 2023 03:40:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v3 28/49] dm zoned: dynamically allocate the dm-zoned-meta
- shrinker
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Muchun Song <songmuchun@bytedance.com>,
-        akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
-        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
-        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
-        yujie.liu@intel.com, gregkh@linuxfoundation.org,
-        muchun.song@linux.dev
-References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
- <20230727080502.77895-29-zhengqi.arch@bytedance.com>
- <baaf7de4-9a0e-b953-2b6a-46e60c415614@kernel.org>
- <56ee1d92-28ee-81cb-9c41-6ca7ea6556b0@bytedance.com>
- <ba0868b2-9f90-3d81-1c91-8810057fb3ce@kernel.org>
-From:   Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <ba0868b2-9f90-3d81-1c91-8810057fb3ce@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
+In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Thu, 27 Jul 2023 11:39:38 +0100
+Message-ID: <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Sean,
 
+<snip>
+...
 
-On 2023/7/27 18:20, Damien Le Moal wrote:
-> On 7/27/23 17:55, Qi Zheng wrote:
->>>>            goto err;
->>>>        }
->>>>    +    zmd->mblk_shrinker->count_objects = dmz_mblock_shrinker_count;
->>>> +    zmd->mblk_shrinker->scan_objects = dmz_mblock_shrinker_scan;
->>>> +    zmd->mblk_shrinker->seeks = DEFAULT_SEEKS;
->>>> +    zmd->mblk_shrinker->private_data = zmd;
->>>> +
->>>> +    shrinker_register(zmd->mblk_shrinker);
->>>
->>> I fail to see how this new shrinker API is better... Why isn't there a
->>> shrinker_alloc_and_register() function ? That would avoid adding all this code
->>> all over the place as the new API call would be very similar to the current
->>> shrinker_register() call with static allocation.
->>
->> In some registration scenarios, memory needs to be allocated in advance.
->> So we continue to use the previous prealloc/register_prepared()
->> algorithm. The shrinker_alloc_and_register() is just a helper function
->> that combines the two, and this increases the number of APIs that
->> shrinker exposes to the outside, so I choose not to add this helper.
-> 
-> And that results in more code in many places instead of less code + a simple
-> inline helper in the shrinker header file... So not adding that super simple
+> @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
+>         case KVM_GET_STATS_FD:
+>                 r = kvm_vm_ioctl_get_stats_fd(kvm);
+>                 break;
+> +       case KVM_CREATE_GUEST_MEMFD: {
+> +               struct kvm_create_guest_memfd guest_memfd;
+> +
+> +               r = -EFAULT;
+> +               if (copy_from_user(&guest_memfd, argp, sizeof(guest_memfd)))
+> +                       goto out;
+> +
+> +               r = kvm_gmem_create(kvm, &guest_memfd);
+> +               break;
+> +       }
 
-It also needs to be exported to the driver for use.
+I'm thinking line of sight here, by having this as a vm ioctl (rather
+than a system iocl), would it complicate making it possible in the
+future to share/donate memory between VMs?
 
-> helper is not exactly the best choice in my opinion.
-
-Hm, either one is fine for me. If no one else objects, I can add this
-helper. ;)
-
-> 
+Cheers,
+/fuad
