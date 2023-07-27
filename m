@@ -2,320 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE830764D19
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:30:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3536E764BF8
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:20:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234589AbjG0Iao (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 04:30:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39740 "EHLO
+        id S234207AbjG0IUd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 04:20:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235167AbjG0I3r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 04:29:47 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52217AD0A
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 01:16:38 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-686f6231bdeso114258b3a.1
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 01:16:38 -0700 (PDT)
+        with ESMTP id S231154AbjG0IR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 04:17:26 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 480485FC6;
+        Thu, 27 Jul 2023 01:10:11 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4fe0bb9500aso1142038e87.1;
+        Thu, 27 Jul 2023 01:10:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690445746; x=1691050546;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V+VUr/yqCBhRzWtIhjCO81y0MQsQ8/nBil0vz0xF6BE=;
-        b=TaRPl345AKbrAIMueUHfPwp1x6uI6QP6FYTf0gbRl5pBKvfKuQ+QWduLyPJpV8ScsL
-         Q5TivksWMgrstH3HdJCskaPbEKYgZ24uChwqAdIFrOrWwAa2WQwZ8NT8kZyVgbNoH85T
-         do2ODt4uNF4INjJdWRp+atPQdybcUxTwq7Q7CB0q5LWN8BolV4yvFIRahlHyro/xVHih
-         Vepy/KyZesG0IyAMF6CRgG8Mi1ITRqBiZ02IP7raj5LrBsVY5eCkMeBoD4m40xyPsJDZ
-         tcd1kL8KzTvRLgjfGcyP08MdoeQiDGrvVHZmsG1n2bLc4Z4qfZKKlhoGJ8kGn6E5dkaY
-         Cwmw==
+        d=gmail.com; s=20221208; t=1690445363; x=1691050163;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xiUxgezQ5qkaa0qvpV7WRHRt1+Z+nieJXbLHqjI/O3A=;
+        b=H2fID3UP9XooW3VhY5Axw7dEGEJFmttljx7Sfy9BQHD0WL0rZG5uAQrtzvH8I2Hj0A
+         VsDsdkFkAVoBX9GBJEDxmtwCc6AeDOmrI74AWy5CiG52nL8tg/ze2+Op6jr98MfYcZwP
+         YFifZerd/SGlEUR/W6PRWZE8jhkZkAm8Zk9XWUTpLVu9kvn9PAERmPAmicpDQcFseHbc
+         AM09nJI8IJOh4WD701FsWK4t/HTnkbQD8nGwTKOoyFylOvJ8oI2+5GpGn/RqXDBG4w95
+         nv+0fewb0OQYCZlIraM5WDcVpUIzSHhDh60pbmLi/8u0k4rPf1LRHbmHcewD1KlyOzoZ
+         b8TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690445746; x=1691050546;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V+VUr/yqCBhRzWtIhjCO81y0MQsQ8/nBil0vz0xF6BE=;
-        b=NVmyfINaLBrD5rxJBp2lG3aqOTzLoZyobIP1afa57LdzfHUbi9alf8UcxcPMeNfQKo
-         0THVuTZibGtQ/nFF7hpeUdoa11ZjCqgzUrRH6bNRZLu2cB/xhCkszGKyxR67jGYuOvEn
-         benlOOLgz82WMOZgUTC5IOqYmWo0ZyPPO9wYvBbEKPZl+gzGtLX9T/Vwjrj/t44iJYcM
-         z++NKtHDE/oZ6Apw2uBu7ifNY46Mkucayy4fqpA9wpoGAYRAMWzPTxll6GwNRtJGkUiP
-         egjAwn+yRA4JB0RzQIDWqDe0zwT9UxsspqiCXQFqih9EHmshDjWypo4UIKY2kht+Tcj8
-         8xBQ==
-X-Gm-Message-State: ABy/qLZ1kodJvN8CGuLjsgSb0ENgdbYHFvH3Xh7sVt0r/9xpzJ1X/97H
-        Rkq87LiXuszOaYiZ7WSW9t7ngw==
-X-Google-Smtp-Source: APBJJlEPnp3RDXXbUxyHg3EG2jnu2Scq2lS38vCuYEIB7nQxuybwzYpkjm+dcqMi61BwYttNjNAkLg==
-X-Received: by 2002:aa7:84d0:0:b0:686:bf43:60fa with SMTP id x16-20020aa784d0000000b00686bf4360famr5267613pfn.0.1690445746275;
-        Thu, 27 Jul 2023 01:15:46 -0700 (PDT)
-Received: from C02DW0BEMD6R.bytedance.net ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id j8-20020aa78d08000000b006828e49c04csm885872pfe.75.2023.07.27.01.15.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 01:15:45 -0700 (PDT)
-From:   Qi Zheng <zhengqi.arch@bytedance.com>
-To:     akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
-        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
-        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
-        yujie.liu@intel.com, gregkh@linuxfoundation.org,
-        muchun.song@linux.dev
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Qi Zheng <zhengqi.arch@bytedance.com>
-Subject: [PATCH v3 49/49] mm: shrinker: convert shrinker_rwsem to mutex
-Date:   Thu, 27 Jul 2023 16:05:02 +0800
-Message-Id: <20230727080502.77895-50-zhengqi.arch@bytedance.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
-References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+        d=1e100.net; s=20221208; t=1690445363; x=1691050163;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xiUxgezQ5qkaa0qvpV7WRHRt1+Z+nieJXbLHqjI/O3A=;
+        b=InKE8Io7jIx/CHTo+WqjaHjC3GySw9X0mAnEzDc0c6CKLJXhbP3EK1ljHNh87gQSdm
+         3LBzf9J0rBzqr1Lp7u4J2IgOd/8UlAdTUZlSgtnrEpMwVpoftfvSuDEunbmXa1KtSd/W
+         hHtkAVWKA29qfMf8ARuPsbxDt6tsjzB4Ipun9h6juyZvmDcTuZK33sHdHIrrlIpDUT5a
+         ytCo+ROEPCMQN4sYeV7zQJcf58igaNKQ1Xktgqja3IXUVX+e0WqR/yBLkwVdwiZT5/00
+         X3iu9h9RAfyeNt9HYAuJ0SHa09hyesH2q9xgIgwijkutnIlKN9ZC3IO40OMcUNsxNaaL
+         +MhQ==
+X-Gm-Message-State: ABy/qLZ30B77z2uyZqVxmaQ2Mab9aDn6tzsuGZgKEyILB1C1ZMSUa71s
+        +xPeCAd0A7k8ypWtPrgkFjI=
+X-Google-Smtp-Source: APBJJlH865Tp8uBcV1iKrM/p9GDkWXd8sduKWaW615rgpOcY27CSHvxDYR2EfMZ71In5Apukj3zxQQ==
+X-Received: by 2002:a05:6512:12c3:b0:4f9:5ca5:f1a6 with SMTP id p3-20020a05651212c300b004f95ca5f1a6mr1408395lfg.17.1690445363111;
+        Thu, 27 Jul 2023 01:09:23 -0700 (PDT)
+Received: from [192.168.0.112] ([77.220.140.242])
+        by smtp.gmail.com with ESMTPSA id o1-20020ac24941000000b004faeedbb2a0sm194192lfi.78.2023.07.27.01.09.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 01:09:22 -0700 (PDT)
+Message-ID: <f04d2aa5-32d8-cdc4-3b51-f15b0f42a1e8@gmail.com>
+Date:   Thu, 27 Jul 2023 11:09:21 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH RFC net-next v5 13/14] virtio/vsock: implement datagram
+ support
+Content-Language: en-US
+To:     Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-13-581bd37fdb26@bytedance.com>
+ <adeed3a8-68fe-bdb7-e4a1-48044dbe5436@gmail.com> <ZMFetBpO0OdzXtnK@bullseye>
+From:   Arseniy Krasnov <oxffffaa@gmail.com>
+In-Reply-To: <ZMFetBpO0OdzXtnK@bullseye>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now there are no readers of shrinker_rwsem, so we can simply replace it
-with mutex lock.
 
-Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
----
- drivers/md/dm-cache-metadata.c |  2 +-
- fs/super.c                     |  2 +-
- mm/shrinker.c                  | 28 ++++++++++++++--------------
- mm/shrinker_debug.c            | 14 +++++++-------
- 4 files changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/md/dm-cache-metadata.c b/drivers/md/dm-cache-metadata.c
-index acffed750e3e..9e0c69958587 100644
---- a/drivers/md/dm-cache-metadata.c
-+++ b/drivers/md/dm-cache-metadata.c
-@@ -1828,7 +1828,7 @@ int dm_cache_metadata_abort(struct dm_cache_metadata *cmd)
- 	 * Replacement block manager (new_bm) is created and old_bm destroyed outside of
- 	 * cmd root_lock to avoid ABBA deadlock that would result (due to life-cycle of
- 	 * shrinker associated with the block manager's bufio client vs cmd root_lock).
--	 * - must take shrinker_rwsem without holding cmd->root_lock
-+	 * - must take shrinker_mutex without holding cmd->root_lock
- 	 */
- 	new_bm = dm_block_manager_create(cmd->bdev, DM_CACHE_METADATA_BLOCK_SIZE << SECTOR_SHIFT,
- 					 CACHE_MAX_CONCURRENT_LOCKS);
-diff --git a/fs/super.c b/fs/super.c
-index 68b3877af941..fdde72e2a357 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -54,7 +54,7 @@ static char *sb_writers_name[SB_FREEZE_LEVELS] = {
-  * One thing we have to be careful of with a per-sb shrinker is that we don't
-  * drop the last active reference to the superblock from within the shrinker.
-  * If that happens we could trigger unregistering the shrinker from within the
-- * shrinker path and that leads to deadlock on the shrinker_rwsem. Hence we
-+ * shrinker path and that leads to deadlock on the shrinker_mutex. Hence we
-  * take a passive reference to the superblock to avoid this from occurring.
-  */
- static unsigned long super_cache_scan(struct shrinker *shrink,
-diff --git a/mm/shrinker.c b/mm/shrinker.c
-index a12dede5d21f..3d44a335ef3c 100644
---- a/mm/shrinker.c
-+++ b/mm/shrinker.c
-@@ -8,7 +8,7 @@
- #include "internal.h"
- 
- LIST_HEAD(shrinker_list);
--DECLARE_RWSEM(shrinker_rwsem);
-+DEFINE_MUTEX(shrinker_mutex);
- 
- #ifdef CONFIG_MEMCG
- static int shrinker_nr_max;
-@@ -80,7 +80,7 @@ int alloc_shrinker_info(struct mem_cgroup *memcg)
- 	int nid, ret = 0;
- 	int array_size = 0;
- 
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 	array_size = shrinker_unit_size(shrinker_nr_max);
- 	for_each_node(nid) {
- 		info = kvzalloc_node(sizeof(*info) + array_size, GFP_KERNEL, nid);
-@@ -91,7 +91,7 @@ int alloc_shrinker_info(struct mem_cgroup *memcg)
- 			goto err;
- 		rcu_assign_pointer(memcg->nodeinfo[nid]->shrinker_info, info);
- 	}
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- 
- 	return ret;
- 
-@@ -104,7 +104,7 @@ static struct shrinker_info *shrinker_info_protected(struct mem_cgroup *memcg,
- 						     int nid)
- {
- 	return rcu_dereference_protected(memcg->nodeinfo[nid]->shrinker_info,
--					 lockdep_is_held(&shrinker_rwsem));
-+					 lockdep_is_held(&shrinker_mutex));
- }
- 
- static struct shrinker_info *shrinker_info_rcu(struct mem_cgroup *memcg,
-@@ -161,7 +161,7 @@ static int expand_shrinker_info(int new_id)
- 	if (!root_mem_cgroup)
- 		goto out;
- 
--	lockdep_assert_held(&shrinker_rwsem);
-+	lockdep_assert_held(&shrinker_mutex);
- 
- 	new_size = shrinker_unit_size(new_nr_max);
- 	old_size = shrinker_unit_size(shrinker_nr_max);
-@@ -224,7 +224,7 @@ static int shrinker_memcg_alloc(struct shrinker *shrinker)
- 	if (mem_cgroup_disabled())
- 		return -ENOSYS;
- 
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 	id = idr_alloc(&shrinker_idr, shrinker, 0, 0, GFP_KERNEL);
- 	if (id < 0)
- 		goto unlock;
-@@ -238,7 +238,7 @@ static int shrinker_memcg_alloc(struct shrinker *shrinker)
- 	shrinker->id = id;
- 	ret = 0;
- unlock:
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- 	return ret;
- }
- 
-@@ -248,7 +248,7 @@ static void shrinker_memcg_remove(struct shrinker *shrinker)
- 
- 	BUG_ON(id < 0);
- 
--	lockdep_assert_held(&shrinker_rwsem);
-+	lockdep_assert_held(&shrinker_mutex);
- 
- 	idr_remove(&shrinker_idr, id);
- }
-@@ -299,7 +299,7 @@ void reparent_shrinker_deferred(struct mem_cgroup *memcg)
- 		parent = root_mem_cgroup;
- 
- 	/* Prevent from concurrent shrinker_info expand */
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 	for_each_node(nid) {
- 		child_info = shrinker_info_protected(memcg, nid);
- 		parent_info = shrinker_info_protected(parent, nid);
-@@ -312,7 +312,7 @@ void reparent_shrinker_deferred(struct mem_cgroup *memcg)
- 			}
- 		}
- 	}
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- }
- #else
- static int shrinker_memcg_alloc(struct shrinker *shrinker)
-@@ -708,11 +708,11 @@ void shrinker_register(struct shrinker *shrinker)
- 		return;
- 	}
- 
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 	list_add_tail_rcu(&shrinker->list, &shrinker_list);
- 	shrinker->flags |= SHRINKER_REGISTERED;
- 	shrinker_debugfs_add(shrinker);
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- 
- 	init_completion(&shrinker->done);
- 	/*
-@@ -745,7 +745,7 @@ void shrinker_free(struct shrinker *shrinker)
- 		wait_for_completion(&shrinker->done);
- 	}
- 
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 	if (shrinker->flags & SHRINKER_REGISTERED) {
- 		/*
- 		 * Lookups on the shrinker are over and will fail in the future,
-@@ -760,7 +760,7 @@ void shrinker_free(struct shrinker *shrinker)
- 
- 	if (shrinker->flags & SHRINKER_MEMCG_AWARE)
- 		shrinker_memcg_remove(shrinker);
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- 
- 	if (debugfs_entry)
- 		shrinker_debugfs_remove(debugfs_entry, debugfs_id);
-diff --git a/mm/shrinker_debug.c b/mm/shrinker_debug.c
-index 506257585408..368fa0484a44 100644
---- a/mm/shrinker_debug.c
-+++ b/mm/shrinker_debug.c
-@@ -7,7 +7,7 @@
- #include <linux/memcontrol.h>
- 
- /* defined in vmscan.c */
--extern struct rw_semaphore shrinker_rwsem;
-+extern struct mutex shrinker_mutex;
- extern struct list_head shrinker_list;
- 
- static DEFINE_IDA(shrinker_debugfs_ida);
-@@ -163,7 +163,7 @@ int shrinker_debugfs_add(struct shrinker *shrinker)
- 	char buf[128];
- 	int id;
- 
--	lockdep_assert_held(&shrinker_rwsem);
-+	lockdep_assert_held(&shrinker_mutex);
- 
- 	/* debugfs isn't initialized yet, add debugfs entries later. */
- 	if (!shrinker_debugfs_root)
-@@ -220,7 +220,7 @@ int shrinker_debugfs_rename(struct shrinker *shrinker, const char *fmt, ...)
- 	if (!new)
- 		return -ENOMEM;
- 
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 
- 	old = shrinker->name;
- 	shrinker->name = new;
-@@ -238,7 +238,7 @@ int shrinker_debugfs_rename(struct shrinker *shrinker, const char *fmt, ...)
- 			shrinker->debugfs_entry = entry;
- 	}
- 
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- 
- 	kfree_const(old);
- 
-@@ -251,7 +251,7 @@ struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
- {
- 	struct dentry *entry = shrinker->debugfs_entry;
- 
--	lockdep_assert_held(&shrinker_rwsem);
-+	lockdep_assert_held(&shrinker_mutex);
- 
- 	shrinker_debugfs_name_free(shrinker);
- 
-@@ -279,14 +279,14 @@ static int __init shrinker_debugfs_init(void)
- 	shrinker_debugfs_root = dentry;
- 
- 	/* Create debugfs entries for shrinkers registered at boot */
--	down_write(&shrinker_rwsem);
-+	mutex_lock(&shrinker_mutex);
- 	list_for_each_entry(shrinker, &shrinker_list, list)
- 		if (!shrinker->debugfs_entry) {
- 			ret = shrinker_debugfs_add(shrinker);
- 			if (ret)
- 				break;
- 		}
--	up_write(&shrinker_rwsem);
-+	mutex_unlock(&shrinker_mutex);
- 
- 	return ret;
- }
--- 
-2.30.2
+On 26.07.2023 20:58, Bobby Eshleman wrote:
+> On Sat, Jul 22, 2023 at 11:45:29AM +0300, Arseniy Krasnov wrote:
+>>
+>>
+>> On 19.07.2023 03:50, Bobby Eshleman wrote:
+>>> This commit implements datagram support for virtio/vsock by teaching
+>>> virtio to use the general virtio transport ->dgram_addr_init() function
+>>> and implementation a new version of ->dgram_allow().
+>>>
+>>> Additionally, it drops virtio_transport_dgram_allow() as an exported
+>>> symbol because it is no longer used in other transports.
+>>>
+>>> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>>> ---
+>>>  include/linux/virtio_vsock.h            |  1 -
+>>>  net/vmw_vsock/virtio_transport.c        | 24 +++++++++++++++++++++++-
+>>>  net/vmw_vsock/virtio_transport_common.c |  6 ------
+>>>  3 files changed, 23 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>>> index b3856b8a42b3..d0a4f08b12c1 100644
+>>> --- a/include/linux/virtio_vsock.h
+>>> +++ b/include/linux/virtio_vsock.h
+>>> @@ -211,7 +211,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
+>>>  u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
+>>>  bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
+>>>  bool virtio_transport_stream_allow(u32 cid, u32 port);
+>>> -bool virtio_transport_dgram_allow(u32 cid, u32 port);
+>>>  void virtio_transport_dgram_addr_init(struct sk_buff *skb,
+>>>  				      struct sockaddr_vm *addr);
+>>>  
+>>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>> index ac2126c7dac5..713718861bd4 100644
+>>> --- a/net/vmw_vsock/virtio_transport.c
+>>> +++ b/net/vmw_vsock/virtio_transport.c
+>>> @@ -63,6 +63,7 @@ struct virtio_vsock {
+>>>  
+>>>  	u32 guest_cid;
+>>>  	bool seqpacket_allow;
+>>> +	bool dgram_allow;
+>>>  };
+>>>  
+>>>  static u32 virtio_transport_get_local_cid(void)
+>>> @@ -413,6 +414,7 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
+>>>  	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>>>  }
+>>>  
+>>> +static bool virtio_transport_dgram_allow(u32 cid, u32 port);
+>>
+>> May be add body here? Without prototyping? Same for loopback and vhost.
+>>
+> 
+> Sounds okay with me, but this seems to go against the pattern
+> established by seqpacket. Any reason why?
 
+Stefano Garzarella <sgarzare@redhat.com> commented my patch with the same approach:
+
+https://lore.kernel.org/netdev/lex6l5suez7azhirt22lidndtjomkbagfbpvvi5p7c2t7klzas@4l2qly7at37c/
+
+Thanks, Arseniy
+
+
+> 
+>>>  static bool virtio_transport_seqpacket_allow(u32 remote_cid);
+>>>  
+>>>  static struct virtio_transport virtio_transport = {
+>>> @@ -430,6 +432,7 @@ static struct virtio_transport virtio_transport = {
+>>>  
+>>>  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+>>>  		.dgram_allow              = virtio_transport_dgram_allow,
+>>> +		.dgram_addr_init          = virtio_transport_dgram_addr_init,
+>>>  
+>>>  		.stream_dequeue           = virtio_transport_stream_dequeue,
+>>>  		.stream_enqueue           = virtio_transport_stream_enqueue,
+>>> @@ -462,6 +465,21 @@ static struct virtio_transport virtio_transport = {
+>>>  	.send_pkt = virtio_transport_send_pkt,
+>>>  };
+>>>  
+>>> +static bool virtio_transport_dgram_allow(u32 cid, u32 port)
+>>> +{
+>>> +	struct virtio_vsock *vsock;
+>>> +	bool dgram_allow;
+>>> +
+>>> +	dgram_allow = false;
+>>> +	rcu_read_lock();
+>>> +	vsock = rcu_dereference(the_virtio_vsock);
+>>> +	if (vsock)
+>>> +		dgram_allow = vsock->dgram_allow;
+>>> +	rcu_read_unlock();
+>>> +
+>>> +	return dgram_allow;
+>>> +}
+>>> +
+>>>  static bool virtio_transport_seqpacket_allow(u32 remote_cid)
+>>>  {
+>>>  	struct virtio_vsock *vsock;
+>>> @@ -655,6 +673,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>>  	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+>>>  		vsock->seqpacket_allow = true;
+>>>  
+>>> +	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
+>>> +		vsock->dgram_allow = true;
+>>> +
+>>>  	vdev->priv = vsock;
+>>>  
+>>>  	ret = virtio_vsock_vqs_init(vsock);
+>>> @@ -747,7 +768,8 @@ static struct virtio_device_id id_table[] = {
+>>>  };
+>>>  
+>>>  static unsigned int features[] = {
+>>> -	VIRTIO_VSOCK_F_SEQPACKET
+>>> +	VIRTIO_VSOCK_F_SEQPACKET,
+>>> +	VIRTIO_VSOCK_F_DGRAM
+>>>  };
+>>>  
+>>>  static struct virtio_driver virtio_vsock_driver = {
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 96118e258097..77898f5325cd 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -783,12 +783,6 @@ bool virtio_transport_stream_allow(u32 cid, u32 port)
+>>>  }
+>>>  EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
+>>>  
+>>> -bool virtio_transport_dgram_allow(u32 cid, u32 port)
+>>> -{
+>>> -	return false;
+>>> -}
+>>> -EXPORT_SYMBOL_GPL(virtio_transport_dgram_allow);
+>>> -
+>>>  int virtio_transport_connect(struct vsock_sock *vsk)
+>>>  {
+>>>  	struct virtio_vsock_pkt_info info = {
+>>>
+>>
+>> Thanks, Arseniy
+> 
+> Thanks,
+> Bobby
