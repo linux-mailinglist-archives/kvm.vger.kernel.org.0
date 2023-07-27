@@ -2,175 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF5417659B1
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 19:13:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2220765A51
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 19:32:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231624AbjG0RNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 13:13:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45744 "EHLO
+        id S231357AbjG0Rcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 13:32:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232340AbjG0RNT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 13:13:19 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B3230F5
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 10:13:10 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bba9a0da10so8097315ad.2
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 10:13:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690477989; x=1691082789;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F7oDMpfc0bW6NSyfuHNNNYlN2HFPFEuCSHvjU51+NBs=;
-        b=uR617wLpg6qNB677nCTpj/mRcHCn7jeMQ6T975dwFWafb05LBOA5GXBHggNBovfIzX
-         O/7M392ccdTOGZqesE1qC7szLmXDUVbpTkdUSAnDKesUZGTHf6YrHw7iRdcLemcslWSD
-         KrRYixDmKkhke5BhBNDcGGoexHbctICnVSugeNNjkFTNcd3g+7vTx3m4xPX98nUwGt3/
-         mWhf+uFvINzhg7lFN3O3GR8jmx04AReHHh1Ek1sP09ZwG+oxGwlWe7n39MiREf5a36wi
-         QECqs1dJt2n4+euTMFmAQH0Oiz0RKLy4HgS6MVL8RVa78gxf6JRosPxL/mvaakJouVeF
-         ho3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690477989; x=1691082789;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F7oDMpfc0bW6NSyfuHNNNYlN2HFPFEuCSHvjU51+NBs=;
-        b=ZyrEozyn6NYymxGy+OYLUl4Zc/gHKKm2+//1xUoeMvW/xkAKUHso/AO4HMYY1buHoF
-         qRe7jxelSXTksBoIMS6BsLv5LoxXjl37grw1tEO84y1OPJLONB9UcS9PD7/u+KASgYNL
-         dCT5jbg/ghpdRikYvTeNLYf0idfvmQkCTDd3KKmX8oxW47xoRALsLYz7t1tts4tW2eWg
-         mmP2wfjGAXBb1Gh30B2EtbDbTiecA46F9PyXvjRriLz8mQOKCsTEG4GtWjikHDdncj/Y
-         6QixTu3wiuSJ+k9mfjgw5etoNdac068zYmDwtiVSiBBgBNElTZf0cf3vbswmejmm/bFm
-         d6hw==
-X-Gm-Message-State: ABy/qLaGmnxF7SrNrXT0BESp5+BpF35bM6Uqd/M0NWaXuuBxu3o6Fsxp
-        HKE9+XKjgy0CZvgxAVmyvAz+B0Eigiw=
-X-Google-Smtp-Source: APBJJlEiCX9DyxliShqr2xPxTiyej7fUi+PkS+4LO77eNeghg1Fiv4b0fvD5YH2w9mP2/cy4q9w9vNXHRRI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:22c6:b0:1b5:2b14:5f2c with SMTP id
- y6-20020a17090322c600b001b52b145f2cmr24803plg.4.1690477989357; Thu, 27 Jul
- 2023 10:13:09 -0700 (PDT)
-Date:   Thu, 27 Jul 2023 10:13:07 -0700
-In-Reply-To: <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com>
-Mime-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
- <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com>
-Message-ID: <ZMKlo+Fe8n/eLQ82@google.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Sean Christopherson <seanjc@google.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230386AbjG0Rci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 13:32:38 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095B42D67
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 10:32:36 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36RH9LTN018402;
+        Thu, 27 Jul 2023 17:31:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=g3a2bhNqgnlAVrlDmF+421W4rV27G9n1h1IOHywgeUE=;
+ b=NC+mPVPyc6RJLA8Jt1PXvjEjqHh7QkZ+44qeEGYXV4vU3dlZDdZX/ARiW8yYsFylz+wY
+ lUSwkdF8I+hQ9nEWuq/01kGaz6fh1zT8WqvzgOKZMzsloy63Q5KaUkUVeycEzWEiO8aM
+ oobyT0ROnMBUx804cVLrAC6bknTygvdrQZ49whbN4hbDnJQuWEqHi25pR53DUicBOgQx
+ LzHpZNjvDEiYE/W7xFlxiSiiwCeFm1cX9tGQttO9MKv5Cf0UGgproydfWkC1ay99SIAI
+ lqGBbfdLayCefz+zcsq7jHpB4TaHJ5050epxPJjYGIeagqZKGLF26MqqUXDl4TG4BRPr NA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3vqpgmjn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 17:31:29 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36RHUgfK029981;
+        Thu, 27 Jul 2023 17:31:28 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3vqpgmjg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 17:31:28 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36RGqbAR026189;
+        Thu, 27 Jul 2023 17:31:27 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0sesfu7p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 17:31:27 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36RHVN8Q19464806
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jul 2023 17:31:24 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D834B20049;
+        Thu, 27 Jul 2023 17:31:23 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8DFF120040;
+        Thu, 27 Jul 2023 17:31:23 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Jul 2023 17:31:23 +0000 (GMT)
+Message-ID: <c77a22b26120b29899c327dd8b95ad2fc2145b62.camel@linux.ibm.com>
+Subject: Re: [PATCH v21 03/20] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Thu, 27 Jul 2023 19:31:23 +0200
+In-Reply-To: <20230630091752.67190-4-pmorel@linux.ibm.com>
+References: <20230630091752.67190-1-pmorel@linux.ibm.com>
+         <20230630091752.67190-4-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: QL6wqWdzYRLWpw9JH2I31XfVr9BeNWcS
+X-Proofpoint-GUID: WhT_qCi530ioRHnrottdIQzSKjmBtENL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_07,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 mlxscore=0 malwarescore=0 priorityscore=1501 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307270154
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023, Fuad Tabba wrote:
-> Hi Sean,
-> 
-> <snip>
-> ...
-> 
-> > @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
-> >         case KVM_GET_STATS_FD:
-> >                 r = kvm_vm_ioctl_get_stats_fd(kvm);
-> >                 break;
-> > +       case KVM_CREATE_GUEST_MEMFD: {
-> > +               struct kvm_create_guest_memfd guest_memfd;
-> > +
-> > +               r = -EFAULT;
-> > +               if (copy_from_user(&guest_memfd, argp, sizeof(guest_memfd)))
-> > +                       goto out;
-> > +
-> > +               r = kvm_gmem_create(kvm, &guest_memfd);
-> > +               break;
-> > +       }
-> 
-> I'm thinking line of sight here, by having this as a vm ioctl (rather
-> than a system iocl), would it complicate making it possible in the
-> future to share/donate memory between VMs?
+On Fri, 2023-06-30 at 11:17 +0200, Pierre Morel wrote:
+> On interception of STSI(15.1.x) the System Information Block
+> (SYSIB) is built from the list of pre-ordered topology entries.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  MAINTAINERS                      |   1 +
+>  qapi/machine-target.json         |  14 ++
+>  include/hw/s390x/cpu-topology.h  |  25 +++
+>  include/hw/s390x/sclp.h          |   1 +
+>  target/s390x/cpu.h               |  76 ++++++++
+>  hw/s390x/cpu-topology.c          |   4 +-
+>  target/s390x/kvm/kvm.c           |   5 +-
+>  target/s390x/kvm/stsi-topology.c | 310 +++++++++++++++++++++++++++++++
+>  target/s390x/kvm/meson.build     |   3 +-
+>  9 files changed, 436 insertions(+), 3 deletions(-)
+>  create mode 100644 target/s390x/kvm/stsi-topology.c
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 0b03ac5a9b..b8d3e8815c 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1702,6 +1702,7 @@ M: Pierre Morel <pmorel@linux.ibm.com>
+>  S: Supported
+>  F: include/hw/s390x/cpu-topology.h
+>  F: hw/s390x/cpu-topology.c
+> +F: target/s390x/kvm/stsi-topology.c
+> =20
+>  X86 Machines
+>  ------------
+> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> index 3362f8dc3f..8ea4834e63 100644
+> --- a/qapi/machine-target.json
+> +++ b/qapi/machine-target.json
+> @@ -361,3 +361,17 @@
+>                     'TARGET_MIPS',
+>                     'TARGET_LOONGARCH64',
+>                     'TARGET_RISCV' ] } }
+> +
+> +##
+> +# @CpuS390Polarization:
+> +#
+> +# An enumeration of cpu polarization that can be assumed by a virtual
+> +# S390 CPU
+> +#
+> +# Since: 8.1
+> +##
+> +{ 'enum': 'CpuS390Polarization',
+> +  'prefix': 'S390_CPU_POLARIZATION',
+> +  'data': [ 'horizontal', 'vertical' ],
+> +    'if': { 'all': [ 'TARGET_S390X' , 'CONFIG_KVM' ] }
+> +}
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topol=
+ogy.h
+> index 9164ac00a7..193b33a2fc 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -15,10 +15,35 @@
+>  #include "hw/boards.h"
+>  #include "qapi/qapi-types-machine-target.h"
+> =20
+> +#define S390_TOPOLOGY_CPU_IFL   0x03
+> +
+> +typedef union s390_topology_id {
+> +    uint64_t id;
+> +    struct {
+> +        uint8_t sentinel;
+> +        uint8_t drawer;
+> +        uint8_t book;
+> +        uint8_t socket;
+> +        uint8_t dedicated;
+> +        uint8_t entitlement;
+> +        uint8_t type;
+> +        uint8_t origin;
 
-Maybe, but I hope not?
+The order here is not quite right according to the PoP. Type should be
+higher, after socket, such that all cpus of the same type in a socket
+are stored as a block.
+Also entitlement and dedication need to be inverted, e.g such that
+dedicated cpus are shown before non dedicated ones.
 
-There would still be a primary owner of the memory, i.e. the memory would still
-need to be allocated in the context of a specific VM.  And the primary owner should
-be able to restrict privileges, e.g. allow a different VM to read but not write
-memory.
+> +    };
+> +} s390_topology_id;
+> +
 
-My current thinking is to (a) tie the lifetime of the backing pages to the inode,
-i.e. allow allocations to outlive the original VM, and (b) create a new file each
-time memory is shared/donated with a different VM (or other entity in the kernel).
+[...]
 
-That should make it fairly straightforward to provide different permissions, e.g.
-track them per-file, and I think should also avoid the need to change the memslot
-binding logic since each VM would have it's own view/bindings.
+> +/**
+> + * s390_topology_empty_list:
+> + *
+> + * Clear all entries in the S390Topology list except the sentinel.
 
-Copy+pasting a relevant snippet from a lengthier response in a different thread[*]:
+The comment is out of date.
 
-  Conceptually, I think KVM should to bind to the file.  The inode is effectively
-  the raw underlying physical storage, while the file is the VM's view of that
-  storage. 
-  
-  Practically, I think that gives us a clean, intuitive way to handle intra-host
-  migration.  Rather than transfer ownership of the file, instantiate a new file
-  for the target VM, using the gmem inode from the source VM, i.e. create a hard
-  link.  That'd probably require new uAPI, but I don't think that will be hugely
-  problematic.  KVM would need to ensure the new VM's guest_memfd can't be mapped
-  until KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM (which would also need to verify the
-  memslots/bindings are identical), but that should be easy enough to enforce.
-  
-  That way, a VM, its memslots, and its SPTEs are tied to the file, while allowing
-  the memory and the *contents* of memory to outlive the VM, i.e. be effectively
-  transfered to the new target VM.  And we'll maintain the invariant that each
-  guest_memfd is bound 1:1 with a single VM.
-  
-  As above, that should also help us draw the line between mapping memory into a
-  VM (file), and freeing/reclaiming the memory (inode).
-  
-  There will be extra complexity/overhead as we'll have to play nice with the
-  possibility of multiple files per inode, e.g. to zap mappings across all files
-  when punching a hole, but the extra complexity is quite small, e.g. we can use
-  address_space.private_list to keep track of the guest_memfd instances associated
-  with the inode.
-  
-  Setting aside TDX and SNP for the moment, as it's not clear how they'll support
-  memory that is "private" but shared between multiple VMs, I think per-VM files
-  would work well for sharing gmem between two VMs.  E.g. would allow a give page
-  to be bound to a different gfn for each VM, would allow having different permissions
-  for each file (e.g. to allow fallocate() only from the original owner).
+> + */
+> +static void s390_topology_empty_list(S390TopologyList *topology_list)
+> +{
+> +    S390TopologyEntry *entry =3D NULL;
+> +    S390TopologyEntry *tmp =3D NULL;
+> +
+> +    QTAILQ_FOREACH_SAFE(entry, topology_list, next, tmp) {
+> +        QTAILQ_REMOVE(topology_list, entry, next);
+> +        g_free(entry);
+> +    }
+> +}
+> +
+> +/**
+> + * insert_stsi_15_1_x:
+> + * cpu: the CPU doing the call for which we set CC
+> + * sel2: the selector 2, containing the nested level
+> + * addr: Guest logical address of the guest SysIB
+> + * ar: the access register number
+> + *
+> + * Create a list head for the Topology entries and initialize it.
+> + * Insert the first entry as a sentinelle.
+> + *
+> + * Emulate STSI 15.1.x, that is, perform all necessary checks and
+> + * fill the SYSIB.
+> + * In case the topology description is too long to fit into the SYSIB,
+> + * set CC=3D3 and abort without writing the SYSIB.
+> + */
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, uint64_t addr, uint8_t a=
+r)
+> +{
+> +    S390TopologyList topology_list;
+> +    S390TopologyEntry *entry;
+> +    SysIB sysib =3D {0};
+> +    int length;
+> +
+> +    if (!s390_has_topology() || sel2 < 2 || sel2 > SCLP_READ_SCP_INFO_MN=
+EST) {
+> +        setcc(cpu, 3);
+> +        return;
+> +    }
+> +
+> +    QTAILQ_INIT(&topology_list);
+> +    entry =3D g_malloc0(sizeof(S390TopologyEntry));
+> +    entry->id.sentinel =3D 0xff;
+> +    QTAILQ_INSERT_HEAD(&topology_list, entry, next);
+> +
+> +    s390_topology_fill_list_sorted(&topology_list);
+> +
+> +    length =3D setup_stsi(&topology_list, &sysib.sysib_151x, sel2);
+> +
+> +    if (!length) {
+> +        setcc(cpu, 3);
+> +        return;
+> +    }
+> +
+> +    sysib.sysib_151x.length =3D cpu_to_be16(length);
+> +    s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, length);
+> +    setcc(cpu, 0);
+> +
+> +    s390_topology_empty_list(&topology_list);
+> +}
+> diff --git a/target/s390x/kvm/meson.build b/target/s390x/kvm/meson.build
+> index 37253f75bf..bcf014ba87 100644
+> --- a/target/s390x/kvm/meson.build
+> +++ b/target/s390x/kvm/meson.build
+> @@ -1,6 +1,7 @@
+> =20
+>  s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
+> -  'kvm.c'
+> +  'kvm.c',
+> +  'stsi-topology.c'
+>  ), if_false: files(
+>    'stubs.c'
+>  ))
 
-[*] https://lore.kernel.org/all/ZLGiEfJZTyl7M8mS@google.com
