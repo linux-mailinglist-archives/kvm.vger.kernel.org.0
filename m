@@ -2,126 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4518765180
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD5B27651B0
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:53:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233545AbjG0Kkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 06:40:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35736 "EHLO
+        id S232797AbjG0KxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 06:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231927AbjG0KkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 06:40:16 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64E526BA
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:40:15 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-63d2b7d77bfso5754926d6.3
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:40:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690454415; x=1691059215;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=sndfUp5VQwyYdDkfd9c4UQTPXsXPqaVmv/x1Ijy8DrI=;
-        b=BRo0MX+z2r1SS6yWvALim/6/nbcuIraz/dvlfYWOZ9asJfVrKNdNm2FzRqaxLf+dSr
-         gd8iH6tStNBkd23/w31KCfLL9pbPEeNVyPTR03aUqTDZY6wZTMoqJSnBUDPOFUCLZI8l
-         DGkcMHGLOMeyEEgRm2q9vaf0Y5Q5Azvv1tkZ/xFOCXwAaoOvebuUDqbcoCdnlpWZyTyX
-         q38zkUOHeP0Tt+nEWAcZ8JszB60VlCahpErQX1nO7BawFSz3QtUcVh1o5Am/iWB313H6
-         H0uJV9FuYrV0GCIZde+45ERDs3S4qD78OMMR7S/b1svm4zQQyj/BCkUn3DI2PJoOlxx+
-         Zjrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690454415; x=1691059215;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sndfUp5VQwyYdDkfd9c4UQTPXsXPqaVmv/x1Ijy8DrI=;
-        b=Ba+3Xdn/+EtJ8LNiFh8wx7sQxmcN4LqC/DfLsK2OQzO+wwlrwAr/r1VSGurqJYTxJS
-         0uiJBrHk0JLy45cQgNJaFH4c292IT5RNe6TClqeRfdwjjJ65HriKVRhzMHyWM8AMP+EX
-         v+TNkUNXNwsjbVYTg16Yg7/67Bkb6qw4OFSERWV5hJDsL3uA2RUJHjLxM2wfnGhiYvJU
-         oigM+EfySsFK/HDgR4w6z81Kf7tE1e7EdunpAUIUn7OdauhTHZI+qSNlb0KFx52a2H4a
-         3psVlghlyrdvLYSseDJgN6jtfVzg9HiKpFzaYE9pDXjcpF5ebJlkQkSFhXyaDSwgqfnL
-         5Qgw==
-X-Gm-Message-State: ABy/qLZVwY9YewDZ5jFkXdPnlrOS3q2XeF/WRzlT4sPjO6xG2b+wCHr5
-        UdxUVNUVJp3LnJ9MYy59kemKWHBhysjMBIbDczylCA==
-X-Google-Smtp-Source: APBJJlE+0dXFxcWiQX8kiDXJfKau+LxjypHc8uOGBYfuDsHhoPcJDBpq4NHTu2yqyvhkPVt07nS69cNqQCueoayyUeg=
-X-Received: by 2002:a05:6214:12b:b0:63d:218:c83f with SMTP id
- w11-20020a056214012b00b0063d0218c83fmr4306083qvs.36.1690454414736; Thu, 27
- Jul 2023 03:40:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
-In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 27 Jul 2023 11:39:38 +0100
-Message-ID: <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
+        with ESMTP id S229801AbjG0KxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 06:53:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6A0B4;
+        Thu, 27 Jul 2023 03:53:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A524C61E17;
+        Thu, 27 Jul 2023 10:53:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC10C433C7;
+        Thu, 27 Jul 2023 10:53:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690455183;
+        bh=Kf3PoZcaGR2gkOy5bI0LwvtY2SC896CCkSXbSLWkFBc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jPiusiKewOUry6ypAvPniDaxOhUSPXIOCXtTsmNNz+/7gz1EFs7E8kzftW2B4RaoB
+         cjQ1HUyrhUcWgfrvkf+Vxpa/PRNM1vtXi8BIA8Hn9EXNo/cR3/WvZaW+dQM8fHLZmZ
+         VVCwZmVHCM7nJ80nDfcS+mKecRzQlNH/Yl8WEHhsCulky2Ia7ezh8YBkfb2O22fY1m
+         opNlycFD/nAxb6Qb8w9vsszetxEoy9mV2HE2PvX457L+jGtKCOeEklSA4wdsTxf0oT
+         bSgbizad+4N4QYmI8SK9TxqZ/GFtZs53ijAxdu4PdAOOm/xLWZ+fFl4HLASo9h7uiF
+         qBZ5GfHonID0A==
+Received: from [104.132.45.102] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qOyc8-00HKTs-J2;
+        Thu, 27 Jul 2023 11:53:00 +0100
+Date:   Thu, 27 Jul 2023 11:53:00 +0100
+Message-ID: <87sf99r5gz.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
+        Zenghui Yu <yuzenghui@huawei.com>,
         Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v7 05/12] KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
+In-Reply-To: <20230722022251.3446223-6-rananta@google.com>
+References: <20230722022251.3446223-1-rananta@google.com>
+        <20230722022251.3446223-6-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.102
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+On Sat, 22 Jul 2023 03:22:44 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> From: David Matlack <dmatlack@google.com>
+> 
+> Move kvm_arch_flush_remote_tlbs_memslot() to common code and drop
+> "arch_" from the name. kvm_arch_flush_remote_tlbs_memslot() is just a
+> range-based TLB invalidation where the range is defined by the memslot.
+> Now that kvm_flush_remote_tlbs_range() can be called from common code we
+> can just use that and drop a bunch of duplicate code from the arch
+> directories.
+> 
+> Note this adds a lockdep assertion for slots_lock being held when
+> calling kvm_flush_remote_tlbs_memslot(), which was previously only
+> asserted on x86. MIPS has calls to kvm_flush_remote_tlbs_memslot(),
+> but they all hold the slots_lock, so the lockdep assertion continues to
+> hold true.
+> 
+> Also drop the CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT ifdef gating
+> kvm_flush_remote_tlbs_memslot(), since it is no longer necessary.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> ---
+>  arch/arm64/kvm/arm.c     |  6 ------
+>  arch/mips/kvm/mips.c     | 10 ++--------
+>  arch/riscv/kvm/mmu.c     |  6 ------
+>  arch/x86/kvm/mmu/mmu.c   | 16 +---------------
+>  arch/x86/kvm/x86.c       |  2 +-
+>  include/linux/kvm_host.h |  7 +++----
+>  virt/kvm/kvm_main.c      | 18 ++++++++++++++++--
+>  7 files changed, 23 insertions(+), 42 deletions(-)
+>
 
-<snip>
-...
+[...]
 
-> @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
->         case KVM_GET_STATS_FD:
->                 r = kvm_vm_ioctl_get_stats_fd(kvm);
->                 break;
-> +       case KVM_CREATE_GUEST_MEMFD: {
-> +               struct kvm_create_guest_memfd guest_memfd;
-> +
-> +               r = -EFAULT;
-> +               if (copy_from_user(&guest_memfd, argp, sizeof(guest_memfd)))
-> +                       goto out;
-> +
-> +               r = kvm_gmem_create(kvm, &guest_memfd);
-> +               break;
-> +       }
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 804470fccac7..58213cc4b9b9 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -379,6 +379,20 @@ void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 pages)
+>  	kvm_flush_remote_tlbs(kvm);
+>  }
+>  
+> +void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
+> +				   const struct kvm_memory_slot *memslot)
+> +{
+> +	/*
+> +	 * All current use cases for flushing the TLBs for a specific memslot
+> +	 * related to dirty logging, and many do the TLB flush out of mmu_lock.
 
-I'm thinking line of sight here, by having this as a vm ioctl (rather
-than a system iocl), would it complicate making it possible in the
-future to share/donate memory between VMs?
+I appreciate this is a copy paste of an existing comment, but I can't
+parse it. My command of the English language is notoriously
+approximate, but it feels that something is missing in the first
+sentence, such as a verb.
 
-Cheers,
-/fuad
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
