@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02329765102
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5271476510C
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:26:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234168AbjG0KZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 06:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55106 "EHLO
+        id S234285AbjG0K0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 06:26:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231978AbjG0KYz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 06:24:55 -0400
+        with ESMTP id S233972AbjG0KZo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 06:25:44 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 288CF1BC3;
-        Thu, 27 Jul 2023 03:24:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC40930FC;
+        Thu, 27 Jul 2023 03:25:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B1B1861E12;
-        Thu, 27 Jul 2023 10:24:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AF45C433C7;
-        Thu, 27 Jul 2023 10:24:44 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D82061E0A;
+        Thu, 27 Jul 2023 10:25:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71561C433C8;
+        Thu, 27 Jul 2023 10:25:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690453484;
-        bh=4dJnTdxPpOs7yn6/yYmeAXblymyOHLLkN8KCdq9mBq8=;
+        s=k20201202; t=1690453528;
+        bh=FJXkSwPbNKQ95t2XWfcMnomXfcixhy3pOfTMwv/ZpIY=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=p/QjlPu21Qli95UDAiPYEux9bfi/bCv7dlTpizjIkk0xlBrhH9IQdL59/OqNGEwMs
-         /Phd0+mL9qShJHtdNVoxdgFeiBMgt225WmcUUZYZuTexJb0wJQP8lTuyVFWsWZZEfT
-         QtCuDtVSLScJWgBArzU/3bBcqw++uyt0av/ISu8ZbO0VRvhC5zLU3xlzFVYq2NgyLE
-         7HUm9Gx5qBpoPF+DaJ6tV/mHONfGUn7uDiI0cBbgkQwqJRIH8x61oR3BrbfIg25/U1
-         JZb+158uamEu5ywUmKeXuHrBV3Z5gZOmtHoSEBU68Kam5pVUYv7FmWFMBdRNtwgj/l
-         UutD2auIY9BVw==
+        b=d34o//Y1Y5dfRtLOi0HwE+uJT9nrmc86QQYqcYJdz/AHsxhgaNQsqF7UP/xrRQ2NT
+         w8XAntI7jmFAiqr/E/wpvRSLxf8uYhHIRwLomfc5yXPAGjUbx3beZtQNZ3NO8/bGfM
+         SO5/yPRn5VmsYTc7wQYtVoHKkQRyfoXt+XI6wnSciqBudTsm5vTNHzV6U0EoZJ9zvp
+         VEjRTroyGZQkKHhywR4iNOZS+o9Xy/q3CaBfdzJcrSXh3BtJWUfXdfO3scRNsBFKo2
+         oEg05/s96neKp6o3O5RgRJGeS0EgRhuiHLkhrd/kdMqtGtukWh7A6507mmz3a6kWSD
+         rjB0xXlHJI8dA==
 Received: from [104.132.45.102] (helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qOyAj-00HK4x-J8;
-        Thu, 27 Jul 2023 11:24:41 +0100
-Date:   Thu, 27 Jul 2023 11:24:41 +0100
-Message-ID: <87v8e5r6s6.wl-maz@kernel.org>
+        id 1qOyBR-00HK5u-Rg;
+        Thu, 27 Jul 2023 11:25:26 +0100
+Date:   Thu, 27 Jul 2023 11:25:25 +0100
+Message-ID: <87tttpr6qy.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
@@ -58,21 +58,18 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
-        "=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?=" <philmd@linaro.org>,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
-In-Reply-To: <20230722022251.3446223-2-rananta@google.com>
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v7 02/12] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+In-Reply-To: <20230722022251.3446223-3-rananta@google.com>
 References: <20230722022251.3446223-1-rananta@google.com>
-        <20230722022251.3446223-2-rananta@google.com>
+        <20230722022251.3446223-3-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 104.132.45.102
-X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, philmd@linaro.org, shahuang@redhat.com
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,53 +82,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 22 Jul 2023 03:22:40 +0100,
+On Sat, 22 Jul 2023 03:22:41 +0100,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
->=20
-> From: David Matlack <dmatlack@google.com>
->=20
-> Rename kvm_arch_flush_remote_tlb() and the associated macro
-> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() and
-> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
->=20
-> Making the name plural matches kvm_flush_remote_tlbs() and makes it more
-> clear that this function can affect more than one remote TLB.
->=20
-> No functional change intended.
->=20
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> 
+> Stop depending on CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL and opt to
+> standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> duplicating the generic TLB stats across architectures that implement
+> their own remote TLB flush.
+> 
+> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
+> path, but that is a small cost in comparison to flushing remote TLBs.
+
+Well, there is no such thing as a "remote TLB" anyway. We either have
+a non-shareable or inner-shareable invalidation. The notion of remote
+would imply that we track who potentially has a TLB, which we
+obviously don't.
+
+More x86 nonsense...
+
+>
+> In addition, instead of just incrementing remote_tlb_flush_requests
+> stat, the generic interface would also increment the
+> remote_tlb_flush stat.
+> 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  arch/mips/include/asm/kvm_host.h | 4 ++--
->  arch/mips/kvm/mips.c             | 2 +-
->  arch/x86/include/asm/kvm_host.h  | 4 ++--
->  include/linux/kvm_host.h         | 4 ++--
->  virt/kvm/kvm_main.c              | 2 +-
->  5 files changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm=
-_host.h
-> index 04cedf9f8811..9b0ad8f3bf32 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct kvm_vcpu =
-*vcpu, int cpu) {}
->  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-> =20
-> -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
-> -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/Kconfig            | 1 -
+>  arch/arm64/kvm/mmu.c              | 6 +++---
+>  3 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8b6096753740..7281222f24ef 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1111,6 +1111,9 @@ int __init kvm_set_ipa_limit(void);
+>  #define __KVM_HAVE_ARCH_VM_ALLOC
+>  struct kvm *kvm_arch_alloc_vm(void);
+>  
 > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
 > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
 
-How about making this prototype global? I don't see a point in having
-it per-architecture, specially as you are adding arm64 to that mix in
-the following patch.
+See my earlier comment about making this prototype global.
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
