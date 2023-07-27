@@ -2,152 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB04D765BA2
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 20:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E089765BD0
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 21:03:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231646AbjG0SsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 14:48:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36336 "EHLO
+        id S231776AbjG0TDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 15:03:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231407AbjG0SsF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 14:48:05 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2082.outbound.protection.outlook.com [40.107.223.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2122619BF;
-        Thu, 27 Jul 2023 11:47:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KTf/4GMXOwFwemAqpHY+w/jXXEgTW8SX2oG4ML+NM/8+YIgmxSMTKmPmqpz+1TGa8LgmBY+FUA94tPVCYvjL58n+1DpkCwxWnJe+bUhGxyWj/ntJScSFaTP8BX7L71E4R3lPKkvfWal5xoQUSJy7WWJAHpfKarATet2WOyts1mAsZSyu0OJXod7unbA+0t9HJa6huv9ZO7zSKS3AKK1vJAOKsZ9aDmjpKeSCZfd+r1O9iKj3qcvCU5XXrAqOqYtZJurJc8w9UMiRB0z4xPYOqvfIF0deao0jPfrlCobDLjb2sfECJ5pP/Z6SYzOdcT88wkZ99jLiu3RYqKeXxWAZIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rUA4cqdattcKG88D6+HIEJThMwIy/+V6TxlWcXMUVeI=;
- b=DHHPJD1AYhSpjOI6DoDCdtqW1FNWNgQNemKRkWb8b+tIvvgZei+XPlPhNDsu7S/+zbQS1GsKcr4l0FBVs3aIAOKCIlR68E+frRxqLhraaTCx6I99ZMLVtVHAIh2M0jJZkUXrb+I12zA7bqISZDgx1yznXEWW5tw5AuVqBfiV3N63G7nAMBAOzh6HOhnYUzW+WTswpbPUTua5RLGyv/DcIjaU1UYGIJtq5Ua0IUF9PMEL4CiLSWhmxYmo6+6A4Mp8GVGZVo5Zb4zRm2wn5BsU2vQOrtNUcISOHdz18EIeNj3By1HNCCIOGCdipPc9dugPjhclLyi+PCuUN9wffOb7CQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rUA4cqdattcKG88D6+HIEJThMwIy/+V6TxlWcXMUVeI=;
- b=t5RpHZHv7XEdwoc8Hqgsp1jbWOKeCOQ9b5ENVTTpJf0b02fbfWeXXvpnoEab9UQMUf9zdV+CfJ8hqfP0YxzzONE8Aj2knbaXT1M9DmtR+UtM3R6GZ/aas8XHOJusKWi2GIkHMvw6WQC9nAb3Z4tldko8OQNYvy9u6a3wnxWwLbTI6DeDyO/5MTdXU9FkF1NctxOgvFAMkLtG9iowXsZTbhaHIV0xfzUu2WpzhixW271p4+TLHZafQWSSksRCYeYI+l/anGCAYhQx0hS5DP0cdmy+eHqvFFjbZNmj+XPhykh1a3KnquytDJ5Fgk7OhpDFOgruaYqLpAuUjq0J9hYlMw==
-Received: from MW4PR04CA0082.namprd04.prod.outlook.com (2603:10b6:303:6b::27)
- by MW4PR12MB5625.namprd12.prod.outlook.com (2603:10b6:303:168::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
- 2023 18:47:44 +0000
-Received: from CO1NAM11FT114.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:6b:cafe::45) by MW4PR04CA0082.outlook.office365.com
- (2603:10b6:303:6b::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29 via Frontend
- Transport; Thu, 27 Jul 2023 18:47:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CO1NAM11FT114.mail.protection.outlook.com (10.13.174.103) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.29 via Frontend Transport; Thu, 27 Jul 2023 18:47:44 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 27 Jul 2023
- 11:47:34 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Thu, 27 Jul 2023 11:47:34 -0700
-Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
- Transport; Thu, 27 Jul 2023 11:47:33 -0700
-Date:   Thu, 27 Jul 2023 11:47:32 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     <kevin.tian@intel.com>, <yi.l.liu@intel.com>, <joro@8bytes.org>,
-        <will@kernel.org>, <robin.murphy@arm.com>,
-        <alex.williamson@redhat.com>, <shuah@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <iommu@lists.linux.dev>,
-        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <mjrosato@linux.ibm.com>, <farman@linux.ibm.com>
-Subject: Re: [PATCH v9 3/6] iommufd: Add iommufd_access_change_ioas helper
-Message-ID: <ZMK7xNR+PaBek+Ou@Asurada-Nvidia>
-References: <cover.1690440730.git.nicolinc@nvidia.com>
- <5d7d275ff12c1c991ac80392b19f1ebf5214177d.1690440730.git.nicolinc@nvidia.com>
- <ZMKB0XrtGIvR3lzB@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZMKB0XrtGIvR3lzB@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT114:EE_|MW4PR12MB5625:EE_
-X-MS-Office365-Filtering-Correlation-Id: 54e41b4f-b4a2-4139-f0c3-08db8ed1f719
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2IxtQtVHZ9n3we05HBPYam4bQqBaRMkAT/+/7m94U+T7uoJg95sDXjUL0/TX9spE3/qsftA7VUZZmczGUM9u4jFrX/KD7PrtiRLwV19apqVtVfPi8HcLCLBlpfYeWACpUWR9FneQ/gewsYVCZJy4FrNXwQXhCKOKPrBszCMreySIVxz2tZhyIf0m81HHbyEPMqOF1957hd+FoTtwxo+2QbYo53V7T4vyKMxyQfCIP6TDFiaBlgR1OWVlC7FceeLlgg60+c2rPN9zSmLGuFVZUjPWuCcfb0oDa1/9dsaml5tI5/4IIQORP2lDUtjBsF/5cHl7CrQlRCTu6EClmz7XLNq6PNPkw6VYTnKWn+n463prLgaJByYNzHg5m9RxFfKq2uFU8JMRskKncYITcOWaklXfsQnfoMd1ijMSgm99MFvijIKegquFGCDRl43e0352nmLzM14JAE/n9EIKqSiloBjbdmiaQMZIXL9Vhi/k6deFqEv4t+sZYJrGfDt6WDWDHx8VCwrRYivh/+u8st+d3Re22eEFNJ76ZfVIoSWuz41wsie5mhaapQFbV0x4QtiseGTnwgfOrEU3AoqH+yTzLsZsqrLEg9nT0cH5DCKfUGvPl1IZm+S3lPYMy+oBuf+qxoT8N1bdyx8pCbEGyWENlQulCATKPyuqF3lkB0kIZCpeSvmj2c+od69KjWU2+NohFRIUfaGptcsmtawFjRNhpHKsh7VNWfWJ9X9Tn3ZGWfY=
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(346002)(39860400002)(396003)(451199021)(82310400008)(40470700004)(36840700001)(46966006)(36860700001)(6862004)(8676002)(5660300002)(83380400001)(47076005)(336012)(186003)(26005)(86362001)(33716001)(8936002)(7416002)(4326008)(6636002)(316002)(70206006)(41300700001)(9686003)(478600001)(356005)(82740400003)(70586007)(426003)(54906003)(40480700001)(2906002)(40460700003)(7636003)(55016003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 18:47:44.7101
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54e41b4f-b4a2-4139-f0c3-08db8ed1f719
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT114.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5625
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229873AbjG0TDV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 15:03:21 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E41210B
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 12:03:20 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d052f49702dso1214882276.3
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 12:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690484600; x=1691089400;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Og4MB+QUlTN92g1kEiXmx1dOUDtTzF+MON+MST5kvTs=;
+        b=MR1h0dJrgmsudEu/zhKSOxOUDNi45xqymydSeB6izb6kk9TlZcsysQm9pCQVHaPfMy
+         sC1WsbxuJuvId8j9LEXNnq76s0W9P1FRRLIc03SlWUW8HgzYiYU//iQlqi+we8clQJOd
+         0P5mOGN6bnPWtJ9POVuAArvPjjoigcSNMnN3Vh02NXLOIWhcDb2atC762SDq28slggdl
+         BJ3D7mBngPPJFmzX6i3nFeEBwJFCNl5ky8wioz060xf4eMHeunF6T/yPWH95EjlwTQHu
+         wHJw8bw00w0a56teyDYvFeYtEcLgvEdTIEu5TbXiMGmpQ7CTx1A2VO5ah/h856qlHAqc
+         SzJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690484600; x=1691089400;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Og4MB+QUlTN92g1kEiXmx1dOUDtTzF+MON+MST5kvTs=;
+        b=h4i/4oUjIZB9nyOHSH/gYy3DX/wjoH78nDgWqsXMRzIgPMPb5gxkKcRaPCzKpdA1bE
+         oHyFTHWrTIONrfe0uI0/2ZyeImUPpqjFtmxvWlfRlopy3WI4My9bsJMd3Ctifn5Punir
+         CBb8JVV8VXNKFA6bXnf3Mjm8wX4rdCmhNGnFzfNCwWrt8do1eUHhfcknNrkWQGkWHdjW
+         tkFJF8kI0TbEReghlK+ZenVzMevvaKPKeJrNhN42Hwe1oZ/kpLKwxlzW4nP0oXSAzYH/
+         a2BhZDyrhbQL9ahpBHeQpvHZawuj0070CC8y0iuPMOg8ysr99LbFby9oQwhVFhvWsfIP
+         Pq1Q==
+X-Gm-Message-State: ABy/qLb47oAahDrbDTBfwvaBU/uEcHFmBaACzK3Hvl9575XIjfgNsdhP
+        B2Ryg/w/ij6QkFeJQuigRXYFcj1l3bg=
+X-Google-Smtp-Source: APBJJlFm/LS2E8PBmjnXqFyLVbmPObNaRmmegsrt3s2bja0WuvYbYAwo60KPZcrejUcPOHjprovctF9Rz/4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ce4b:0:b0:d05:7ba4:67f9 with SMTP id
+ x72-20020a25ce4b000000b00d057ba467f9mr1446ybe.3.1690484599851; Thu, 27 Jul
+ 2023 12:03:19 -0700 (PDT)
+Date:   Thu, 27 Jul 2023 12:03:18 -0700
+In-Reply-To: <14c0e28b-1a90-5d61-6758-7a25bd317405@gmail.com>
+Mime-Version: 1.0
+References: <20230607224520.4164598-1-aaronlewis@google.com>
+ <ZMGhJAMqtFa6sTkl@google.com> <14c0e28b-1a90-5d61-6758-7a25bd317405@gmail.com>
+Message-ID: <ZMK/dluS5ALq1NYj@google.com>
+Subject: Re: [PATCH v3 0/5] Add printf and formatted asserts in the guest
+From:   Sean Christopherson <seanjc@google.com>
+To:     JinrongLiang <ljr.kernel@gmail.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 11:40:17AM -0300, Jason Gunthorpe wrote:
-> On Thu, Jul 27, 2023 at 12:23:08AM -0700, Nicolin Chen wrote:
+On Thu, Jul 27, 2023, JinrongLiang wrote:
+>=20
+> =E5=9C=A8 2023/7/27 06:41, Sean Christopherson =E5=86=99=E9=81=93:
+> > Side topic, if anyone lurking out there wants an easy (but tedious and =
+boring)
+> > starter project, we should convert all tests to the newfangled formatti=
+ng and
+> > drop GUEST_ASSERT_N entirely.  Once all tests are converted, GUEST_ASSE=
+RT_FMT()
+> > and REPORT_GUEST_ASSERT_FMT can drop the "FMT" postfix.
+>=20
+> I'd be happy to get the job done.
+>=20
+> However, before I proceed, could you please provide a more detailed examp=
+le
+> or further guidance on the desired formatting and the specific changes yo=
+u
+> would like to see?
 
-> > +	if (new_ioas) {
-> > +		rc = iopt_add_access(&new_ioas->iopt, access);
-> > +		if (rc) {
-> > +			iommufd_put_object(&new_ioas->obj);
-> > +			access->ioas = cur_ioas;
-> > +			return rc;
-> > +		}
-> > +		iommufd_ref_to_users(&new_ioas->obj);
-> 
-> Kevin's suggestion to just open code the refcount_inc here
+Hrm, scratch that request.  I was thinking we could convert tests one-by-on=
+e, but
+that won't work well because to do a one-by-one conversions, tests that use
+GUEST_ASSERT_EQ() would need to first convert to e.g. GUEST_ASSERT_EQ_FMT()=
+ and
+then convert back, which would be a silly amount of churn just to a void a =
+single
+selftests-wide patch.
 
-Will replace this iommufd_ref_to_users with a refcount_inc in v10.
-
-> And have a wrapper func that does:
-> 
-> iommufd_access_change_ioas_id(struct iommufd_access *access, u32 id)
-> {
-> 	struct iommufd_ioas *ioas = iommufd_get_ioas(ictx, ioas_id);
-> 	int rc;
-> 
-> 	if (IS_ERR(ioas))
-> 		return PTR_ERR(ioas);
-> 	rc = iommufd_access_change_ioas(access, ioas);
-> 	iommufd_put_object(&ioas->obj);
-> 	return rc;
-> }
-> 
-> Does looks cleaner
-
-I see. So we can drop iommufd_put_object(&new_ioas->obj) in
-iommufd_access_change_ioas().
-
-> Then we delete iommufd_ref_to_users() as there are no users (once all
-> the branches are merged).
-
-Ack.
-
-Nicolin
+It probably makes sense to just convert everything as part of this series. =
+ There
+are quite a few asserts that need a message, but not *that* many.
