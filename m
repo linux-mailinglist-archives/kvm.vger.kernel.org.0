@@ -2,109 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB6737650DC
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:20:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A73C765104
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 12:25:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233644AbjG0KU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 06:20:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
+        id S234034AbjG0KZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 06:25:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233571AbjG0KUy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 06:20:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A385619AF;
-        Thu, 27 Jul 2023 03:20:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 38C6E61DED;
-        Thu, 27 Jul 2023 10:20:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9266C433C8;
-        Thu, 27 Jul 2023 10:20:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690453251;
-        bh=Uv0jglg4XDxm5uiOcl1Fs0VDdmS3vnj5J06IHksC3j0=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=VjGCTE5fXWQGMkstr5mWfG/olGcukHbx9MJ5gIHM1kJfwo/BiFcjiuEaiA2TxQad6
-         b/CL9D78jYHhDiLBxLD9gCBB6CtR9Pngnq1E4RM+cWQl1ITCzXzhPBEMorh0UStJGb
-         V5QypMia7H1mT7Yv9W7oIRfkDRB1G3xJIxfo7Y/Lymzj+mXx3lcBAFmRFbWxhh8lk9
-         h4N9LjcMkMC3/ZfJEah0qCVly/fWQ4ostsbFgLI1m7GG/WQbkHJ87BAgn9cUsNUERW
-         XrnUyEDaK9+tFU+Iukly/qv+tfC9IZiVkgJJJYsmEkH+2gmJEivzAz4IAcCpkEsNUW
-         WY8rxT9ubVHrA==
-Message-ID: <ba0868b2-9f90-3d81-1c91-8810057fb3ce@kernel.org>
-Date:   Thu, 27 Jul 2023 19:20:46 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 28/49] dm zoned: dynamically allocate the dm-zoned-meta
- shrinker
-Content-Language: en-US
-To:     Qi Zheng <zhengqi.arch@bytedance.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Muchun Song <songmuchun@bytedance.com>,
-        akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
-        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
-        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
-        yujie.liu@intel.com, gregkh@linuxfoundation.org,
-        muchun.song@linux.dev
-References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
- <20230727080502.77895-29-zhengqi.arch@bytedance.com>
- <baaf7de4-9a0e-b953-2b6a-46e60c415614@kernel.org>
- <56ee1d92-28ee-81cb-9c41-6ca7ea6556b0@bytedance.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <56ee1d92-28ee-81cb-9c41-6ca7ea6556b0@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234033AbjG0KZA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 06:25:00 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF5C1FFA
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:24:54 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-348dfefd1a4so2729935ab.1
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 03:24:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1690453493; x=1691058293;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GfEVzfDMM3KV/MRFcXCu/fGQgJk4J1J61XVMjT70iMs=;
+        b=cHmrInueGEngMD7UYGmB+iSXoktK/awClLPYSSKF/pxXfwAGRn+ArthLC/yhmHpuJB
+         LswL/BReQY7IL6c2/yJXWuk09AYNEeR2QJscAvtNifHzohRaMFnzh7JCCOs+E/qsZn5n
+         TS7CmIir0KqXVnwtD7qWEC8ZpYvZMPqiD2NQ3Vn+58/3ZCWF2Spok7iS6cAIvZaQ3h8H
+         yMZJIHYAKXPamwly2j9kdO7kitEsCGSBFTRscnmDvQltEnV0RpJAfcpbrmq5R22FK8Q+
+         slnlFFAe9ukcL6dPVpCUHcvwdNNeIatrHV5mkFebfpIzyIR6/kQjINlH/Qjb8WoywZcp
+         WcCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690453493; x=1691058293;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GfEVzfDMM3KV/MRFcXCu/fGQgJk4J1J61XVMjT70iMs=;
+        b=TtT0erQkNJqBdIn6LbPyHjRqujaVpgjtQjHBwGFkZp0CKX/ySOa66RFAW00mYaH5gV
+         TFR3TbRGbLiF9SeE3v5wSHg8mKjOBCp0bKpt9lhppajHZgkn6jMFuJ2H1JM6SgFTP5cU
+         Qml2aDtnbAPAaU0TNp17lYQbWNM3DnQ0bznik09bHEHczOL+OUA7qTZM316uMziF3Y+w
+         vlTviS+NBKHSfcgsPKGF1TIK6zG5YGKN9XXvpEU+yZBrvFFFeKAsYQjlAIMaBbv/J1Oa
+         hGP8ASNGbZckTi/9IDOeeRCs84Egxj8vYeMmJbQiGb0gjnqkURWb7nQ83y5wz23mFjEX
+         paDw==
+X-Gm-Message-State: ABy/qLZ+VnJ3IOQ9DarOd505Ei/NQeZKNXdg8Jx9JLDiCnmatXJOqv36
+        /KJJL/qyVT17EL5R2f0PAq6tqg==
+X-Google-Smtp-Source: APBJJlGmpqtL4QEdAiDixYp4kNbQW1CQ9NkC8foOTmxv9KtWAPuVL9V2HinYgjq9XtD2a/1AO9/O7w==
+X-Received: by 2002:a05:6e02:1a6a:b0:345:fbdc:bb78 with SMTP id w10-20020a056e021a6a00b00345fbdcbb78mr5294262ilv.29.1690453493285;
+        Thu, 27 Jul 2023 03:24:53 -0700 (PDT)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id u8-20020a17090341c800b001b882880550sm1230139ple.282.2023.07.27.03.24.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 03:24:53 -0700 (PDT)
+From:   Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To:     qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+Cc:     rkanwal@rivosinc.com, anup@brainfault.org,
+        dbarboza@ventanamicro.com, ajones@ventanamicro.com,
+        atishp@atishpatra.org, vincent.chen@sifive.com,
+        greentime.hu@sifive.com, frank.chang@sifive.com,
+        jim.shu@sifive.com, Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Weiwei Li <liweiwei@iscas.ac.cn>,
+        Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH v7 2/5] target/riscv: check the in-kernel irqchip support
+Date:   Thu, 27 Jul 2023 10:24:34 +0000
+Message-Id: <20230727102439.22554-3-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230727102439.22554-1-yongxuan.wang@sifive.com>
+References: <20230727102439.22554-1-yongxuan.wang@sifive.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/27/23 17:55, Qi Zheng wrote:
->>>           goto err;
->>>       }
->>>   +    zmd->mblk_shrinker->count_objects = dmz_mblock_shrinker_count;
->>> +    zmd->mblk_shrinker->scan_objects = dmz_mblock_shrinker_scan;
->>> +    zmd->mblk_shrinker->seeks = DEFAULT_SEEKS;
->>> +    zmd->mblk_shrinker->private_data = zmd;
->>> +
->>> +    shrinker_register(zmd->mblk_shrinker);
->>
->> I fail to see how this new shrinker API is better... Why isn't there a
->> shrinker_alloc_and_register() function ? That would avoid adding all this code
->> all over the place as the new API call would be very similar to the current
->> shrinker_register() call with static allocation.
-> 
-> In some registration scenarios, memory needs to be allocated in advance.
-> So we continue to use the previous prealloc/register_prepared()
-> algorithm. The shrinker_alloc_and_register() is just a helper function
-> that combines the two, and this increases the number of APIs that
-> shrinker exposes to the outside, so I choose not to add this helper.
+We check the in-kernel irqchip support when using KVM acceleration.
 
-And that results in more code in many places instead of less code + a simple
-inline helper in the shrinker header file... So not adding that super simple
-helper is not exactly the best choice in my opinion.
+Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Reviewed-by: Jim Shu <jim.shu@sifive.com>
+Reviewed-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+---
+ target/riscv/kvm.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
+diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+index 9d8a8982f9..005e054604 100644
+--- a/target/riscv/kvm.c
++++ b/target/riscv/kvm.c
+@@ -914,7 +914,15 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+ 
+ int kvm_arch_irqchip_create(KVMState *s)
+ {
+-    return 0;
++    if (kvm_kernel_irqchip_split()) {
++        error_report("-machine kernel_irqchip=split is not supported on RISC-V.");
++        exit(1);
++    }
++
++    /*
++     * We can create the VAIA using the newer device control API.
++     */
++    return kvm_check_extension(s, KVM_CAP_DEVICE_CTRL);
+ }
+ 
+ int kvm_arch_process_async_events(CPUState *cs)
 -- 
-Damien Le Moal
-Western Digital Research
+2.17.1
 
