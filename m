@@ -2,149 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 731A7764A38
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:07:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABEA7764A47
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 10:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233781AbjG0IHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 04:07:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43360 "EHLO
+        id S232328AbjG0IId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 04:08:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233771AbjG0IHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 04:07:10 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF4B30FE;
-        Thu, 27 Jul 2023 01:04:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690445041; x=1721981041;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=B9t+GiJiXHZAobjyBO9plDWdykr1KhrnNLkEy76VKV8=;
-  b=hEFebK49iaKRdRyB0UpkYF0b+HtlgaKza5hEmUTfbz5Gh+cjY2sYOAvK
-   V6g3li8n+Zb/FUrmsSpCeKbccqgSk/X6jpaH1e01MelZvHIrfdc02zp/I
-   h6k9FB7IsmMGHEFa3L78va4r7oJevvZtOVb7ZHVACgAbCgey8T2zfkLsO
-   efvdFhNpO5osSZ1RI1rJQS9Cm8ArRpi80RrqOF+LlpB1DMH45e/ZuQaP6
-   /GBTi5goZ3iaBZRRw+xuDfu39TdrutGmydnEVt4BF0rLeETEwbR9E5X6x
-   zhaIh4Y12JUhbVNvE2bbjpgbABNhr74TrXLVUvtm9roSdFAydxCn5haEh
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="399180617"
-X-IronPort-AV: E=Sophos;i="6.01,234,1684825200"; 
-   d="scan'208";a="399180617"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2023 01:03:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="850768108"
-X-IronPort-AV: E=Sophos;i="6.01,234,1684825200"; 
-   d="scan'208";a="850768108"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga004.jf.intel.com with ESMTP; 27 Jul 2023 01:03:41 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 27 Jul 2023 01:03:40 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 27 Jul 2023 01:03:40 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 27 Jul 2023 01:03:40 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 27 Jul 2023 01:03:40 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lNXL73zI0QpOnmRUvTvrv/I/UpiOsxv+6UEV/7YfUtq85Rb4APCmiQtTxZ10wsHMjnW3ptdHuTQ4Jl5M0PxjVXHqXCKvXzRVx/amigA63Np7lO5wJCRWhWoNPpqldRuMM5Q2WoDNJ+GY4B193+9ObR+dwxFvBpBsEB4XiBg4UxgH8R6lnPbWTY0TiLDUz2Hops+STAw6x7T+75z+aCbdx6Ohu021AU/Sg45eI0DHeHHNwfr+PD8oLAzieT2EGgLDPcW6Mt692MG4X4dvLOenYZhIi0E0RXimx7hBY9LhIRTMGs//M43V08UzZ2u8NYzmxlCn3tsXvfC4vMJgzFheMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RsVVBq3F72rxbXJOUIGc9XxHpauxfM3gDoh65kGFXLs=;
- b=ZFq1x9gVHbJFnwBS875Vjd8yBBZUEnEZouLVG6p8fgj+KdTU1pMPnoVzQp47skVPrUcwXzlNKKhqOhld8fiQRu3Vg60Yb1Irk23IDIR24H8bVsgn+ZHsyNDAsQpIkQuE5H0dWuGKP7FxxFb7XGNgHaItdRhatb+d0zL3HSVu7/AYt5J2kSSc8c3Uuf98vuMiC6Up7sm6PobhEPrPeeAuzdutYSWQS89Kisumn/xIncVqanv3rSO/O1cIX4jYfHkxDxzUiSvl571lmVzNhqSrj8RihR4MxneKKgEU3IrbITcjUsB67WlW/P7seL9VtPGVO+PShKM6CVtLTguM7dqi+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by DM4PR11MB7327.namprd11.prod.outlook.com (2603:10b6:8:105::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Thu, 27 Jul
- 2023 08:03:33 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::2803:94a7:314c:3254]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::2803:94a7:314c:3254%7]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
- 08:03:32 +0000
-Date:   Thu, 27 Jul 2023 16:03:21 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-        <john.allen@amd.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
-        <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v4 18/20] KVM:x86: Enable guest CET supervisor xstate bit
- support
-Message-ID: <ZMIkyaPk7Af2elam@chao-email>
-References: <20230721030352.72414-1-weijiang.yang@intel.com>
- <20230721030352.72414-19-weijiang.yang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230721030352.72414-19-weijiang.yang@intel.com>
-X-ClientProxiedBy: SI2PR06CA0014.apcprd06.prod.outlook.com
- (2603:1096:4:186::11) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S233961AbjG0IIN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 04:08:13 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DE844B5;
+        Thu, 27 Jul 2023 01:04:22 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fe0c566788so1197704e87.0;
+        Thu, 27 Jul 2023 01:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690445054; x=1691049854;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cGFm1yCSFddb2U6pFJa1ekT2q99QXapQbICr7xQFL6Q=;
+        b=NaN/cBwLyXcOxi/0/n/O3CQXbGg4eFDpcsKE90ntjRuaWvKgVhHlqXtdLPkouPCijv
+         4smfSR9Qmx7XcrA6DLjeWyDtztD9vxQDcK7cU8kxKucscZUzJmS59wHATdOtTcyeDNW2
+         +PuxTscYHTrXmNcChtg7clL40ejdKhoaxJJIPYEpZwk1hJvUq0SXuqbILOYmkUK0UtDQ
+         N2ARD9gZ0EysaWmmwSfhLGmLHKg+3n2YVKEqZmSNsHo8q84htg+zKA6Ew4GwNSFwY4DP
+         wzvgJPno9AWSrlJbMza4oVM5s69Ecp9A/AST8dyq07UMD8tT+b0C0zo0kSIS+jjid6zP
+         7vww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690445054; x=1691049854;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cGFm1yCSFddb2U6pFJa1ekT2q99QXapQbICr7xQFL6Q=;
+        b=d+Nuogrq8gsdSpevgbn+RtvT7CtPLybyWuruOtruiD5BnUJeDwOdPjAifNeJK4mZ/n
+         QH0VGvhwKoMgKtXCKcseFMqDWKUkFj4yrr5XRgNA68x4V9+im+kTTFROftz+LVODQEzS
+         sYV49KnwJz8Z9Q7zV8Y9J8H3B9UgxfwGANCqur9LUu2hLBc2iYK7zu0tsc5DijUv7HZa
+         B4wDtSttpll6eLB8L2XRN4X+S4KthnapzbiIhkzFLqP3BQRCbGFUIdx1aRXrEQsPvkOC
+         a42x/lMBip1jFfs6pmDqGKh1+hlzy0GS824wJ6ouVYlFOpcTZTH8qyC5ZGrqmMW9/oMi
+         eAAw==
+X-Gm-Message-State: ABy/qLZ68ipC6aeFASJ51LVWKSMi3oBaHtoz2vAfGQanPNO7Gs4HXBKR
+        ZxK7bmmUEYiigqG3XLr8TRU6urx9nw4jGA==
+X-Google-Smtp-Source: APBJJlF7MqWM+A8HbDTNrG5idX2O2DITz9XFWgYIRgRC9SHcB8tcCD4qkf8cHNUzO7ZLz6SVbgsmgw==
+X-Received: by 2002:a05:6512:3b99:b0:4fd:d016:c2e8 with SMTP id g25-20020a0565123b9900b004fdd016c2e8mr1276836lfv.43.1690445054321;
+        Thu, 27 Jul 2023 01:04:14 -0700 (PDT)
+Received: from [192.168.0.112] ([77.220.140.242])
+        by smtp.gmail.com with ESMTPSA id h26-20020a19701a000000b004fa52552c82sm191076lfc.155.2023.07.27.01.04.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jul 2023 01:04:13 -0700 (PDT)
+Message-ID: <9bc7db9c-1848-ee6c-58c2-d3ef8f153db5@gmail.com>
+Date:   Thu, 27 Jul 2023 11:04:12 +0300
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DM4PR11MB7327:EE_
-X-MS-Office365-Filtering-Correlation-Id: db9f87c4-59a5-4224-0cb8-08db8e77f88b
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: n2c5t6D+BExfjNa/iBMPtaJJ3ej0vWcxrXCBkQey7NaGmcRouOyOi6ELKfarzdcqZeMLhD48AUiGdGz0Ey/JkfGEnpliQL1Pyc22tRylG0rEKQbsLrmWN5nSADbzZE2F8R6A9a0dbcptsTdK1o0q1HiOoX5hmjjYRo7kp5sF12XioXFGpfBrJn4R5+PpE13mel5jkun8mFIeQxO7wqKZmYRBZhWxwmSRGISNdbMInG8YW5s9qGuvdPPuqzbjS223eTh731XVXSw/E8IK1NT/baEwwEZS5WvanuVV/xnC3vf39cIUtemKEJWaLygPk32HCL/GNElx5J+aDi5o/Zo5PC0rBtjugTszv5RfeW/F0Md/3sKNpogJfThpmzaRChtdUIa25RwwtLR0zWcAhA/MpzcuwbFUrbAy+wQXKEBWEspXxvzYJlLESIdfIW4Hy1TiXfeYuRg8/x+n6xVAB3CrcK79w+Itu06AbFpNjx9aBEJMHnKcGWx0uj4VVKkC4hoeSCIrvo/L5bQPVRilAG5SXBSNofE9CUf7G6P0ijZk2HK/LN707z5Oz9xEjTO6PvcD
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(346002)(396003)(366004)(376002)(39860400002)(136003)(451199021)(6506007)(26005)(478600001)(82960400001)(186003)(6666004)(6486002)(66556008)(6636002)(66476007)(4326008)(6512007)(9686003)(38100700002)(66946007)(4744005)(5660300002)(44832011)(33716001)(41300700001)(316002)(2906002)(6862004)(8676002)(8936002)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fIzXwwt5o5BHqJUHKpH98F77UnkhJQEqBx71Pp1VsIKRCjqLHTs8yzReX6qy?=
- =?us-ascii?Q?HhEtXtBM5wyKDTpvf5PN2NDGYpbKbkniAeLhzirjeacEgS7mBwQOYCid6QzQ?=
- =?us-ascii?Q?pMTxJYO4LDqByloRjFekcCqpRTLzeQW1zeRUBqWdWvTfjT2WkTPmWT7aERKm?=
- =?us-ascii?Q?CTcYSt9sjodrjr1sIdCXm++FU1uHT59LaoIGSgDOwjfITjSFHicL/DwWtN0I?=
- =?us-ascii?Q?7wqcgjDwDhN/ExKrwgMjmOpgBT3Ke1exr3qQaIXlTs2bJ2qAN+cakCLT8ibq?=
- =?us-ascii?Q?Mzk7VPn9qSOQwSPCxenlFsNkfDZ/6pjfNC4trBS5BGdeVwIUylLQWIATwDvM?=
- =?us-ascii?Q?22tLMp1iY+qrRo7JcZUq4ODrfc1AhZT8wDOYIt5qZtD31POfbavH/KOLfjPA?=
- =?us-ascii?Q?q1f3HCiVDgzkphWQ1q3nTaVNrldyElX/cDDFANLSMuxvkCtT75uvw1feyWzj?=
- =?us-ascii?Q?iO5RWUYtYGuiTVfoqNpYqZ3Rc9hUG1WykldIzyosazsjdIXbvXCTgbK2PXWy?=
- =?us-ascii?Q?Yc7aHE7OFklae2HHQi355EYaZ9C49ItwuS1KqgYekET+Yoha5PIq+A5hMsnJ?=
- =?us-ascii?Q?rwQeKuhUT7N5Vn4le6aZUvKcUbew1AnDnDwE+KIkdye0HCIxO8IbiezpyWUK?=
- =?us-ascii?Q?YsTuwQlXpoyTONw7U0m1xXrwFFiO6ICIQjHCRXbVnAIbSCV6kH4e0jhzM5wR?=
- =?us-ascii?Q?8toBOSd1LloGOIOvC9fTYpK2Z24haXUHL8dwX7V3fLrpmjQhxGVvCgtLwx3P?=
- =?us-ascii?Q?vpMQseP/H7+NWyu3kBN3QdjDzCfi0eUE2Cp+oh3EU1/NIke7jHuYLfL2zLcy?=
- =?us-ascii?Q?xRy+TCRQF4wF9fQLMLiegFPYFEF+foh4jxIG6JgYqfF2nMGDuWuEIaM6/9g1?=
- =?us-ascii?Q?mQHeoNmUNhrSwlxComUKtpvBtkC/B6RI+tPdD18y9zTIU1dvOyXv0lX3dCpz?=
- =?us-ascii?Q?Pe0oMPElngA7+Mq6f5v+Cp3jR3jVzDAiqwwYV0Lop4IZFeo/tMlEKQqNRUHZ?=
- =?us-ascii?Q?BNGomuI9TKBF4ftRh1bY2RSj6/OT5zQXUUByHrfwo0FDS9xbrFgfcj3cMNVx?=
- =?us-ascii?Q?tjg4XsrDdqAmPlbyuk0ZT8ytzfqy153pSqsFZgsJ43ycpEYMBc4SlPN8tE8R?=
- =?us-ascii?Q?ylPT3by9ecuu/9Kd5GvvHE9fI50iSxW5+vKezDcOymLceQoWOdsMc6Cq76lM?=
- =?us-ascii?Q?8R/4Y4wvkgGmlbHKpOqV4mP25e9kK5uawx5DZ7+Caj5imZEaKlP9qEW41I4F?=
- =?us-ascii?Q?0woSzlD5FlhTFiyUTLhs3l50dJsUGJPNXMo3WSWTIh4BFNM+1UMhHVP7nveh?=
- =?us-ascii?Q?+xXzsiWceocNCgdWuVEg+XWl7sMr/JRQeWaL6x1fcctVKHv7aIkCE8lEfv0l?=
- =?us-ascii?Q?7qR5tpdl73m9d9+KYjO2qSj9ihyaHKwdMH2WbQgig9IMwWslMlpnMiKkNhk0?=
- =?us-ascii?Q?1DrkcJxXPiL0IXOz9NcLX/qcIQh/+ENC4DEG6piIR/N5Eg8iT91SuN5VVZY2?=
- =?us-ascii?Q?1XJhoqX4Z+nlCmXYCv0bv6WcO+DZSE/pxO+ZRCKTn8pVQymq0bJPYgzwm/yL?=
- =?us-ascii?Q?LBZHIerJiyfakSXRkxAlAZvh7yN6Yc3nbYcHyzRI?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: db9f87c4-59a5-4224-0cb8-08db8e77f88b
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 08:03:32.6047
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lvCQNtgbW2BQIRePrHxoDukXgOnfeTKptqyiuvWJ8t0AmRP6ofiFgyBO/zzHiedoNPi6zVlR5aPW2Z8lc5j0vA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7327
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH RFC net-next v5 11/14] vhost/vsock: implement datagram
+ support
+Content-Language: en-US
+To:     Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-11-581bd37fdb26@bytedance.com>
+ <b15d237e-31b5-40ae-83fc-e71649febd2b@gmail.com> <ZMFd+Jd/LrfpJsVA@bullseye>
+From:   Arseniy Krasnov <oxffffaa@gmail.com>
+In-Reply-To: <ZMFd+Jd/LrfpJsVA@bullseye>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -152,16 +96,222 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 11:03:50PM -0400, Yang Weijiang wrote:
+
+
+On 26.07.2023 20:55, Bobby Eshleman wrote:
+> On Sat, Jul 22, 2023 at 11:42:38AM +0300, Arseniy Krasnov wrote:
+>>
+>>
+>> On 19.07.2023 03:50, Bobby Eshleman wrote:
+>>> This commit implements datagram support for vhost/vsock by teaching
+>>> vhost to use the common virtio transport datagram functions.
+>>>
+>>> If the virtio RX buffer is too small, then the transmission is
+>>> abandoned, the packet dropped, and EHOSTUNREACH is added to the socket's
+>>> error queue.
+>>>
+>>> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>>> ---
+>>>  drivers/vhost/vsock.c    | 62 +++++++++++++++++++++++++++++++++++++++++++++---
+>>>  net/vmw_vsock/af_vsock.c |  5 +++-
+>>>  2 files changed, 63 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>> index d5d6a3c3f273..da14260c6654 100644
+>>> --- a/drivers/vhost/vsock.c
+>>> +++ b/drivers/vhost/vsock.c
+>>> @@ -8,6 +8,7 @@
+>>>   */
+>>>  #include <linux/miscdevice.h>
+>>>  #include <linux/atomic.h>
+>>> +#include <linux/errqueue.h>
+>>>  #include <linux/module.h>
+>>>  #include <linux/mutex.h>
+>>>  #include <linux/vmalloc.h>
+>>> @@ -32,7 +33,8 @@
+>>>  enum {
+>>>  	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
+>>>  			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+>>> -			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
+>>> +			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET) |
+>>> +			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
+>>>  };
+>>>  
+>>>  enum {
+>>> @@ -56,6 +58,7 @@ struct vhost_vsock {
+>>>  	atomic_t queued_replies;
+>>>  
+>>>  	u32 guest_cid;
+>>> +	bool dgram_allow;
+>>>  	bool seqpacket_allow;
+>>>  };
+>>>  
+>>> @@ -86,6 +89,32 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
+>>>  	return NULL;
+>>>  }
+>>>  
+>>> +/* Claims ownership of the skb, do not free the skb after calling! */
+>>> +static void
+>>> +vhost_transport_error(struct sk_buff *skb, int err)
+>>> +{
+>>> +	struct sock_exterr_skb *serr;
+>>> +	struct sock *sk = skb->sk;
+>>> +	struct sk_buff *clone;
+>>> +
+>>> +	serr = SKB_EXT_ERR(skb);
+>>> +	memset(serr, 0, sizeof(*serr));
+>>> +	serr->ee.ee_errno = err;
+>>> +	serr->ee.ee_origin = SO_EE_ORIGIN_NONE;
+>>> +
+>>> +	clone = skb_clone(skb, GFP_KERNEL);
+>>
+>> May for skb which is error carrier we can use 'sock_omalloc()', not 'skb_clone()' ? TCP uses skb
+>> allocated by this function as carriers of error structure. I guess 'skb_clone()' also clones data of origin,
+>> but i think that there is no need in data as we insert it to error queue of the socket.
+>>
+>> What do You think?
 > 
-> u64 __read_mostly host_efer;
-> EXPORT_SYMBOL_GPL(host_efer);
->@@ -9638,6 +9639,7 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> 	if (boot_cpu_has(X86_FEATURE_XSAVES)) {
-> 		rdmsrl(MSR_IA32_XSS, host_xss);
-> 		kvm_caps.supported_xss = host_xss & KVM_SUPPORTED_XSS;
+> IIUC skb_clone() is often used in this scenario so that the user can
+> retrieve the error-causing packet from the error queue.  Is there some
+> reason we shouldn't do this?
+> 
+> I'm seeing that the serr bits need to occur on the clone here, not the
+> original. I didn't realize the SKB_EXT_ERR() is a skb->cb cast. I'm not
+> actually sure how this passes the test case since ->cb isn't cloned.
+> 
+>>
+>>> +	if (!clone)
+>>> +		return;
+>>
+>> What will happen here 'if (!clone)' ? skb will leak as it was removed from queue?
+>>
+> 
+> Ah yes, true.
+> 
+>>> +
+>>> +	if (sock_queue_err_skb(sk, clone))
+>>> +		kfree_skb(clone);
+>>> +
+>>> +	sk->sk_err = err;
+>>> +	sk_error_report(sk);
+>>> +
+>>> +	kfree_skb(skb);
+>>> +}
+>>> +
+>>>  static void
+>>>  vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>>  			    struct vhost_virtqueue *vq)
+>>> @@ -160,9 +189,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>>  		hdr = virtio_vsock_hdr(skb);
+>>>  
+>>>  		/* If the packet is greater than the space available in the
+>>> -		 * buffer, we split it using multiple buffers.
+>>> +		 * buffer, we split it using multiple buffers for connectible
+>>> +		 * sockets and drop the packet for datagram sockets.
+>>>  		 */
+>>>  		if (payload_len > iov_len - sizeof(*hdr)) {
+>>> +			if (le16_to_cpu(hdr->type) == VIRTIO_VSOCK_TYPE_DGRAM) {
+>>> +				vhost_transport_error(skb, EHOSTUNREACH);
+>>> +				continue;
+>>> +			}
+>>> +
+>>>  			payload_len = iov_len - sizeof(*hdr);
+>>>  
+>>>  			/* As we are copying pieces of large packet's buffer to
+>>> @@ -394,6 +429,7 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
+>>>  	return val < vq->num;
+>>>  }
+>>>  
+>>> +static bool vhost_transport_dgram_allow(u32 cid, u32 port);
+>>>  static bool vhost_transport_seqpacket_allow(u32 remote_cid);
+>>>  
+>>>  static struct virtio_transport vhost_transport = {
+>>> @@ -410,7 +446,8 @@ static struct virtio_transport vhost_transport = {
+>>>  		.cancel_pkt               = vhost_transport_cancel_pkt,
+>>>  
+>>>  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+>>> -		.dgram_allow              = virtio_transport_dgram_allow,
+>>> +		.dgram_allow              = vhost_transport_dgram_allow,
+>>> +		.dgram_addr_init          = virtio_transport_dgram_addr_init,
+>>>  
+>>>  		.stream_enqueue           = virtio_transport_stream_enqueue,
+>>>  		.stream_dequeue           = virtio_transport_stream_dequeue,
+>>> @@ -443,6 +480,22 @@ static struct virtio_transport vhost_transport = {
+>>>  	.send_pkt = vhost_transport_send_pkt,
+>>>  };
+>>>  
+>>> +static bool vhost_transport_dgram_allow(u32 cid, u32 port)
+>>> +{
+>>> +	struct vhost_vsock *vsock;
+>>> +	bool dgram_allow = false;
+>>> +
+>>> +	rcu_read_lock();
+>>> +	vsock = vhost_vsock_get(cid);
+>>> +
+>>> +	if (vsock)
+>>> +		dgram_allow = vsock->dgram_allow;
+>>> +
+>>> +	rcu_read_unlock();
+>>> +
+>>> +	return dgram_allow;
+>>> +}
+>>> +
+>>>  static bool vhost_transport_seqpacket_allow(u32 remote_cid)
+>>>  {
+>>>  	struct vhost_vsock *vsock;
+>>> @@ -799,6 +852,9 @@ static int vhost_vsock_set_features(struct vhost_vsock *vsock, u64 features)
+>>>  	if (features & (1ULL << VIRTIO_VSOCK_F_SEQPACKET))
+>>>  		vsock->seqpacket_allow = true;
+>>>  
+>>> +	if (features & (1ULL << VIRTIO_VSOCK_F_DGRAM))
+>>> +		vsock->dgram_allow = true;
+>>> +
+>>>  	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++) {
+>>>  		vq = &vsock->vqs[i];
+>>>  		mutex_lock(&vq->mutex);
+>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>> index e73f3b2c52f1..449ed63ac2b0 100644
+>>> --- a/net/vmw_vsock/af_vsock.c
+>>> +++ b/net/vmw_vsock/af_vsock.c
+>>> @@ -1427,9 +1427,12 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>>>  		return prot->recvmsg(sk, msg, len, flags, NULL);
+>>>  #endif
+>>>  
+>>> -	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+>>> +	if (unlikely(flags & MSG_OOB))
+>>>  		return -EOPNOTSUPP;
+>>>  
+>>> +	if (unlikely(flags & MSG_ERRQUEUE))
+>>> +		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
+>>> +
+>>
+>> Sorry, but I get build error here, because SOL_VSOCK in undefined. I think it should be added to
+>> include/linux/socket.h and to uapi files also for future use in userspace.
+>>
+> 
+> Strange, I built each patch individually without issue. My base is
+> netdev/main with your SOL_VSOCK patch applied. I will look today and see
+> if I'm missing something.
 
->+		kvm_caps.supported_xss |= XFEATURE_MASK_CET_KERNEL;
+I see, this is difference, because i'm trying to run this patchset on the last net-next (as it is
+supposed to be merged to net-next). I guess You should add this define anyway when You be ready to
+be merged to net-next (I really don't know which SOL_VSOCK will be merged first - "Your" or "my" :) )
 
-Hardware may not support S_CET state management via XSAVES. we need to
-consult CPUID.0xD.1[bit12].
+Thanks, Arseniy
+
+> 
+>> Also Stefano Garzarella <sgarzare@redhat.com> suggested to add define something like VSOCK_RECVERR,
+>> in the same way as IP_RECVERR, and use it as last parameter of 'sock_recv_errqueue()'.
+>>
+> 
+> Got it, thanks.
+> 
+>>>  	transport = vsk->transport;
+>>>  
+>>>  	/* Retrieve the head sk_buff from the socket's receive queue. */
+>>>
+>>
+>> Thanks, Arseniy
+> 
+> Thanks,
+> Bobby
