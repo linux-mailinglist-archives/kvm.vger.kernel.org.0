@@ -2,170 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF8376570C
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 17:10:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C800765624
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 16:43:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234446AbjG0PKe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 11:10:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        id S233953AbjG0OnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 10:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233478AbjG0PKa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 11:10:30 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930D5F2;
-        Thu, 27 Jul 2023 08:10:29 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36RF3bbe011168;
-        Thu, 27 Jul 2023 15:10:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=TvyUNc4PpxuphZI8Dz+N40X3M041nOe9C1YSCSFypqQ=;
- b=nxPYKrdZT5otiwbJFuUEEeQlh3XPHUPIs8T/TLaKogbTbI9odH2d0kvhskXTO4JaBzkh
- O90dbrSgp3cyG0Iig/TjR72kTQ3VOdcupMVPsd2a0W/h2d38j/q4SZMoUCpa8OsN9Dgv
- fCnBwgx5Q9Bh69XoltgLLeKjlVOwc6mRAkeMOvySdWLmlZyoG6M7V7C9PKfuSm6UnHg/
- 7kRvHCROpGYaYK8k6ruaeQ8oTmMVmL8Nzn9tZNvtK2rEaAcrfiy3KJ1rtBL9zqkih715
- dX2gw73ooaXNvUCQUm4S0N64avD/biZ4vPbXPqwpjnik/cx0654IqwysNfRaOvnD7gjO Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3tw1rjgr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jul 2023 15:10:27 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36RF47bj013774;
-        Thu, 27 Jul 2023 15:08:45 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3tw1rd9u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jul 2023 15:08:44 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36RCqGuj016588;
-        Thu, 27 Jul 2023 15:07:36 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0v51nv8t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jul 2023 15:07:36 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36RF7XQG29229496
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jul 2023 15:07:33 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 834A120043;
-        Thu, 27 Jul 2023 15:07:33 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 42E6F2004D;
-        Thu, 27 Jul 2023 15:07:33 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Jul 2023 15:07:33 +0000 (GMT)
-Date:   Thu, 27 Jul 2023 16:42:12 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Steffen Eiden <seiden@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Michael Mueller <mimu@linux.vnet.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: Re: [PATCH 1/3] s390: uv: UV feature check utility
-Message-ID: <20230727164212.0c6cc310@p-imbrenda>
-In-Reply-To: <20230727122053.774473-2-seiden@linux.ibm.com>
-References: <20230727122053.774473-1-seiden@linux.ibm.com>
-        <20230727122053.774473-2-seiden@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S231339AbjG0OnI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 10:43:08 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97E49271F;
+        Thu, 27 Jul 2023 07:43:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nkR2LiVQOEvJIIaNwhbEdOg601rCh7Mgancil57tQuCn3XNn4pIBn4E8OO7y+Npy4iHDsCSD+uCq2FOycUsDbK6POD4eI/hRH7OJ+1CHxSGC0mUZypSTxELomz2mMXwtPHGlLi5gA64JWh1iEWXAJ+IEY6MyNiXK5npK+FQ9u/tJ97ibjj7pWA+F1NEMpfRoA04E3m9zc53/Fe3x0gZY4oWscSOILXQXzZg1fa7q66ui7ec1c6dh34gBS48kyGOWTyBEgECWnIfJbiQaa1ZXZw10onURWZt09C5oGA9EBGJ/XUrbgu21yG+94oXRPmwsViuLvX/GbU8+lNrS8IaB4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=urp2sM6/MOc9vQITmqHRR3ge1K3bYRAMuquvSoLP68w=;
+ b=gjwaFDg57+1fRYZQ2NuzyIkO2ci4vWX/bXSpRDUI+a+IxEbdKiYrqtcC+pFSjRSPdP/ToGxPUx39yD/B1i8Nitv7uDn2Ng/VZHh6ESqHwtZ8gY9HNb4WTc+0uVwla+BaZfg+gwU9xOeTs95rQhn5AxX+Hrduz12Rn27Q/TesTpRd1JlNBYNdh0w7f8nC5JdUWrRvvRGuM7noXqBwrMQIDwHeHs98U9gkQNJ+huqE4TWmb770yV0U0rH9blAr1Ho0UeoDO6ogWnLpQSSYjBcSxYMo877mRb6PhtYSCy92pq1KcUmXgmqktPJfjuKmVXeEyH5CfQQkGFq5hH17jZr65g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=urp2sM6/MOc9vQITmqHRR3ge1K3bYRAMuquvSoLP68w=;
+ b=TEybk1o0MLIkPqC/PLXJsTFQL5r0XihIMuZI/d6AbjID2jfpRH67adoNP7uHapF3A/qppPGEanBWHwqdfq0AwN/nl6z8QLWQoP8ndYQbPO6qz8vplI9S+apAMEbxjfdY/k/WM4qlCAiCds7gOR4Ks0HKa+x2ILtr6gSatZ3tZw5Cpkjuno1Tuu/MVw72T3Ay3Xe8nAdwemtrHRiTIm5L+lQuF5ntVlrxxxLNDT9eIcSrO2yzv4KXhOSo+2JAifykfLvGJIsr26rzUyabhcgBWHT2i6z8NjuRAPuvMn9TRjelbp+JrO8sfoLDQ2H7nRp1WE5WMFisG728cPus9qHWlw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB5783.namprd12.prod.outlook.com (2603:10b6:510:1d2::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Thu, 27 Jul
+ 2023 14:43:05 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
+ 14:43:05 +0000
+Date:   Thu, 27 Jul 2023 11:43:03 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 2/4] iommu: Add new iommu op to get iommu hardware
+ information
+Message-ID: <ZMKCd5S9VpNGf631@nvidia.com>
+References: <20230724105936.107042-1-yi.l.liu@intel.com>
+ <20230724105936.107042-3-yi.l.liu@intel.com>
+ <BN9PR11MB527625066E23A1C4968905D68C01A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527625066E23A1C4968905D68C01A@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: YT3PR01CA0058.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:82::7) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: V59a0JJ5VuA4O9Na0lssC8IyXd_9JIys
-X-Proofpoint-GUID: kXS50J0EJO2jmUaGIMqwHOQ0tNKrqJr9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-27_07,2023-07-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 adultscore=0 spamscore=0 impostorscore=0 phishscore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307270135
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5783:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6b74851-dec6-4dd0-09f4-08db8eafc959
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: upD4ceA9ZK33wxIgAgEa1zHNcYDxhSLL8G4DU7U2WKT3ifhbUzUqWk1FAbSMpfeS6/twMotuPL5eMaGZCzhdwyYJlwfQyXUMJVna65twbl1ORhzAlQyhEDS70VC+mEFYRqktNK3HflSBYoecL42Unss+2DDdvhIAyKqsDMFywdsyPcAuOoJLxjmXJb3VL+4paK2u7Xiyem7+dW4Q4ZIeHYvziC1AJgj5Q/tsNeYyyOOcPyFvMbDbOmbNRlmzggC8XmjqIoIIWU4jEWhMn2KTpjL2WVGm5oCR/2jAK4ti03q5RLadG0Eacw6oYQYyJYni53Bvo81/8mfLXxyiA9VPZ+d47IHJZc3ORc3tH2cCLgPvptzNxLqtO3C4LS7nRUAr5aXMRhGLoIhKe285DGYYqpdgOz8uBuL6faW5sFuUZBuKbfnrMsVRwpr3kbWRaKHXf5gcipWUmAkpkInizxOoC36kZ8KE7ZwUY2aOoYIqxlvgC88Dp7PJ3uQCVymlXLSIokbWcBo6hREjsnFF3QGHpePmchxi26wLjKsIhEtNGAFkGs9N3NhdV3QqanuHIZN7
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(39860400002)(376002)(396003)(451199021)(186003)(6512007)(6486002)(478600001)(54906003)(83380400001)(86362001)(6506007)(66476007)(316002)(2906002)(26005)(2616005)(41300700001)(4326008)(8936002)(66556008)(8676002)(66946007)(5660300002)(6916009)(36756003)(38100700002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KGve0Ce8hSfwG0NiqE3FGjH5jfb+24ov0TsZQxmTbpZ02aY+mAKdABN8BNRl?=
+ =?us-ascii?Q?ZTY4gaIaeAaAmg40OJH4llIfDOdYxDh9gmzzJeTT0PooM+HGcjbAh0WjYVNP?=
+ =?us-ascii?Q?Z8NkIj8piblPCfJlgYlBufm6UBh5SN/ueo+9/GFpec65TRln5wPxuIaP6EOM?=
+ =?us-ascii?Q?e71GW86o0mK24QCTnv8mFd8xyWilKcqr6epND30nBpCmYomF8QshmRpII4iE?=
+ =?us-ascii?Q?1DGGk9f5TNh2ZNceszwLxb75tby6FPpkofA8zbFzyZqZhcQzfLAmivE1ybWv?=
+ =?us-ascii?Q?qoMb1QbxBIPbd2c1yr+i46DBI/Y8Euz6bUt7qfXLBoK4E32KQH2Xbky9WgTY?=
+ =?us-ascii?Q?X03otjsmqVcQBf3h0kFM0k7+CxxYu6Lry3w/W9uuIbMyaPrPc7nF3EKVpVk/?=
+ =?us-ascii?Q?4K+2S0HQ5zwMSaiYN0c5LpZW/843+ky2cGUWZ0AVyOlKhILPltMxGHB9X0bu?=
+ =?us-ascii?Q?W1ZM2SkdnPNVh+hw2Ma+nr5f8RWrSa+A1uRJcESt9FPC74cHrE3yFLV8c/uS?=
+ =?us-ascii?Q?VrdFnvBFEC3yqtoFJKj0oNK2Ku+jnOZ6HF+mNPb/aE7NPHx+WKHnDzWOso8O?=
+ =?us-ascii?Q?IUxWxZhkPWz+c1N+IzZvukbTJUStl6OmQQxDTaZ1VF+vA3DZYHJnMrwMh0ii?=
+ =?us-ascii?Q?jLrk7bY8NUakpZtUeh9EwoaU8NvDMvgFNUuJ1hSPNYHs8UARGHuPfvwaooSD?=
+ =?us-ascii?Q?xWhZooJkX5L32GVC+68xjC15FlABDAwJu6ZymJZ2YeSu6s3kYwskvkh0Au/+?=
+ =?us-ascii?Q?gVKrbTeHszNNJohPPMLqpczY7XuDD5KNR5DY9/DGWXLbfeJeVFHuTskzwz2d?=
+ =?us-ascii?Q?hddw+LZ6W80Jvs1zigmNaQNfUZZ2crTNaDgi4zV/wV051W2Kgw3pjWzlrk40?=
+ =?us-ascii?Q?sqWYXIdtA7ncbx5EDcWE1LfgVWCbpPlbcFq6O5KkLsYKMCsEOOoqMhNIZCrv?=
+ =?us-ascii?Q?zPyx5rSiJmOF4wqiDxKoLr13Hug0ZJlOUwKHPBWm4KD8Zb4hZfYSNh/TNqM2?=
+ =?us-ascii?Q?ulBqAhSCEnhwRa1eSb50hNcdr0W3X/slcO1BTW1HMDduZjZbWZ3WtM4tPhJv?=
+ =?us-ascii?Q?gL+wTYfV7HrLRDt+ilUJnEgal7VSMyS/fdYi8gtaWmBW4/KuOT6bGt8ennpS?=
+ =?us-ascii?Q?JCEVk4X5JFu7L9PQ/8sMO9iLHb6kSJ8LWdI1XBYdEILUv95w5ZLoUaq28gSA?=
+ =?us-ascii?Q?EL7ybg3p4kp2mRwxVpz89SgW5aIRTnst+Kl0fDvjRMgCyZpHAajH8qhSacmN?=
+ =?us-ascii?Q?Cirzj4CdEq2uZNRRcV3rLS1EnZTH0LASNTNYoda7oLDr5VyjmHw0dZKOqNC3?=
+ =?us-ascii?Q?cMdd4J4TJlxlqlASG3hZZwAjSxGwiv8fm4geaQZ/gnPQ37YGLjJrE6OhrWtY?=
+ =?us-ascii?Q?IocFIi8i3cYKqBKx0RPH21e3U08b2NnIdI6m3tR9osjF/VNRyJu4zM5SRQw3?=
+ =?us-ascii?Q?5DNWt5in50LRziM06BJfmAu0P/qqF1RFMcHDPaP3uXMx+Mphgi35Dpg0P/KU?=
+ =?us-ascii?Q?bdtA2yyGZK0lzH+HBUSVnKMq3Di1X68DMtXYVXffAzTafGDLNOY4aRnUPfMa?=
+ =?us-ascii?Q?akvDB859oGJBX6ZrWkpHMGYKIfe41XRB49M1HzgQ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6b74851-dec6-4dd0-09f4-08db8eafc959
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 14:43:05.4362
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uKGQtzbhn39Ur9EVSGnYtWc9SJ2Tu0W0DSSagbXveHL6IVyGzReaQ1n+m624d1Mf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5783
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Jul 2023 14:20:51 +0200
-Steffen Eiden <seiden@linux.ibm.com> wrote:
-
-> Introduces a function to check the existence of an UV feature.
-> Refactor feature bit checks to use the new function.
+On Thu, Jul 27, 2023 at 07:57:57AM +0000, Tian, Kevin wrote:
+> > From: Liu, Yi L <yi.l.liu@intel.com>
+> > Sent: Monday, July 24, 2023 7:00 PM
+> > 
+> > @@ -252,11 +258,20 @@ struct iommu_iotlb_gather {
+> >   * @remove_dev_pasid: Remove any translation configurations of a specific
+> >   *                    pasid, so that any DMA transactions with this pasid
+> >   *                    will be blocked by the hardware.
+> > + * @hw_info_type: One of enum iommu_hw_info_type defined in
+> > + *                include/uapi/linux/iommufd.h. It is used to tag the type
+> > + *                of data returned by .hw_info callback. The drivers that
+> > + *                support .hw_info callback should define a unique type
+> > + *                in include/uapi/linux/iommufd.h. For the drivers that do
+> > + *                not implement .hw_info callback, this field is
+> > + *                IOMMU_HW_INFO_TYPE_NONE which is 0. Hence, such drivers
+> > + *                do not need to care this field.
 > 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  arch/s390/include/asm/uv.h | 5 +++++
->  arch/s390/kernel/uv.c      | 2 +-
->  arch/s390/kvm/kvm-s390.c   | 2 +-
->  arch/s390/mm/fault.c       | 2 +-
->  4 files changed, 8 insertions(+), 3 deletions(-)
+> every time looking at this field the same question came out why it is required
+> (and looks I forgot your previous response).
 > 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index d6bb2f4f78d1..338845402324 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -397,6 +397,11 @@ struct uv_info {
->  
->  extern struct uv_info uv_info;
->  
-> +static inline bool uv_has_feature(u8 feature_bit)
-> +{
-> +	return test_bit_inv(feature_bit, &uv_info.uv_feature_indications);
-> +}
-> +
->  #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
->  extern int prot_virt_guest;
->  
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index d8b25cda5471..c82a667d2113 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -249,7 +249,7 @@ static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_str
->  	 * shared page from a different protected VM will automatically also
->  	 * transfer its ownership.
->  	 */
-> -	if (test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications))
-> +	if (uv_has_feature(BIT_UV_FEAT_MISC))
->  		return false;
->  	if (uvcb->cmd == UVC_CMD_UNPIN_PAGE_SHARED)
->  		return false;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 17b81659cdb2..339e3190f6dc 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2402,7 +2402,7 @@ static int kvm_s390_cpus_to_pv(struct kvm *kvm, u16 *rc, u16 *rrc)
->  	struct kvm_vcpu *vcpu;
->  
->  	/* Disable the GISA if the ultravisor does not support AIV. */
-> -	if (!test_bit_inv(BIT_UV_FEAT_AIV, &uv_info.uv_feature_indications))
-> +	if (!uv_has_feature(BIT_UV_FEAT_AIV))
->  		kvm_s390_gisa_disable(kvm);
->  
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
-> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-> index b65144c392b0..b8ef42fac2c4 100644
-> --- a/arch/s390/mm/fault.c
-> +++ b/arch/s390/mm/fault.c
-> @@ -824,7 +824,7 @@ void do_secure_storage_access(struct pt_regs *regs)
->  	 * reliable without the misc UV feature so we need to check
->  	 * for that as well.
->  	 */
-> -	if (test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications) &&
-> +	if (uv_has_feature(BIT_UV_FEAT_MISC) &&
->  	    !test_bit_inv(61, &regs->int_parm_long)) {
->  		/*
->  		 * When this happens, userspace did something that it
+> e.g. why cannot the type be returned in @hw_info():
+> 
+> 	void *(*hw_info)(struct device *dev, u32 *length, int *type);
 
+u32 *type
+ 
+> NULL callback implies IOMMU_HW_INFO_TYPE_NONE.
+
+If every one of these queries has its own type it makes sense
+
+Though, is it not possible that we can have a type for the entire
+driver?
+
+Jason
