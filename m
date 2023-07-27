@@ -2,125 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A4B07658EE
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 18:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70DB17658F5
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 18:41:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233593AbjG0Qj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 12:39:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51350 "EHLO
+        id S229771AbjG0QlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 12:41:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232135AbjG0Qj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 12:39:56 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEE32D4F
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 09:39:54 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c7bb27977so994721a12.0
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 09:39:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690475994; x=1691080794;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=08PPmSmbVOI5lp9VMb7/YRIHpnsubNB5bxPFF/tGfQM=;
-        b=O3VZNy1xI6kpXEi28VVpZj98iHJw8jkNqum1WsxYb9mFxYKvkMhyFMvT3sBxtnCPuz
-         SDWBqXgWnDc17jVqffzqjHLrZfkoSx9ZmemZszDZHhxDp2c2z/7SG1gnFLmqFKxDp3FH
-         3rfP0Ct33uL6CjFYQlSrEvJ9XP5oBf9RYxsmueBUAVTZHhgjtoAxYiprxvzQgtfevo1i
-         Ijo6mIUMJuJH3cEYhdauKp5dv1Ybs62fqWL6UmvqRJcPfTMKk+YevVlgVg/BQoI5SdBE
-         9AnvZUseK2/UCtOKfh+LOPosSSS9UL5b9EbcntVYG2BrYXznAG9pAjumML+FXVYsFN/X
-         PbjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690475994; x=1691080794;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=08PPmSmbVOI5lp9VMb7/YRIHpnsubNB5bxPFF/tGfQM=;
-        b=dxVAB4s7XtYE4QfyGyMEDfxYmNu2J5OwAwdmY/7eJTdMn9OTixrSysWFoQ0ipJut8y
-         biIHgLRHcC+bzCgscy0+uGEhfmoUNtJLTBH4Vv17lFzDduDR3yJbEB03W7U8lUShRXAx
-         vZC1l42q25VUgCWqSXbfHg6iKGkNCg7y1420tc2dlcU01FlOCPPxB4TZleTVBLq5MmXP
-         HqLFQYV7/soQ8zCooo4kwhvZlZUKthBSu1Igo6xI+NaMS+Of7n7+fYz2s3ZdiOQwz9m+
-         1pag1NlJARTmDEjca1eZbpkCmI2cbRZ30VA9/fKnnWg9U5+Eos6ta/COjx6bzvf7azrZ
-         rdkw==
-X-Gm-Message-State: ABy/qLY6Wl0IQEMeNdcN4YNp/BcDh9UQm34qAZLCGNFkFRL6RCviz+XM
-        4zePZH+SXNAInKJtwF09qM/ai6HOPXY=
-X-Google-Smtp-Source: APBJJlHBNR0jKPx+QW2JInhAKi0CXKbJ2026DppquRyRjvZ/o18U/ifcCZ7KgDESP6rCXBZ5VAjN4P6RPUk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:a746:0:b0:563:4dac:e580 with SMTP id
- w6-20020a63a746000000b005634dace580mr25609pgo.9.1690475994353; Thu, 27 Jul
- 2023 09:39:54 -0700 (PDT)
-Date:   Thu, 27 Jul 2023 09:39:53 -0700
-In-Reply-To: <20230725091611.GA3766257@hirez.programming.kicks-ass.net>
-Mime-Version: 1.0
-References: <20230721201859.2307736-1-seanjc@google.com> <20230721201859.2307736-15-seanjc@google.com>
- <20230724212150.GH3745454@hirez.programming.kicks-ass.net>
- <ZL7vs9zMatFRl6IH@google.com> <20230725091611.GA3766257@hirez.programming.kicks-ass.net>
-Message-ID: <ZMKd2cT2fw4ZiJQp@google.com>
-Subject: Re: [PATCH v4 14/19] KVM: SVM: Check that the current CPU supports
- SVM in kvm_is_svm_supported()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Andrew Cooper <Andrew.Cooper3@citrix.com>,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229895AbjG0Qk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 12:40:58 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6EDA13598;
+        Thu, 27 Jul 2023 09:40:36 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD37CD75;
+        Thu, 27 Jul 2023 09:41:18 -0700 (PDT)
+Received: from [10.57.89.117] (unknown [10.57.89.117])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 716303F5A1;
+        Thu, 27 Jul 2023 09:40:32 -0700 (PDT)
+Message-ID: <1cb495f2-fb0d-5a93-5a7f-d717bf3ef97a@arm.com>
+Date:   Thu, 27 Jul 2023 17:40:30 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
+ might require ARM spec change?
+To:     Salil Mehta <salil.mehta@huawei.com>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        Salil Mehta <salil.mehta@opnsrc.net>,
+        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Gareth Stockwell <Gareth.Stockwell@arm.com>
+References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
+ <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
+ <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
+ <93c9c8356e444fb287393a935a8c7899@huawei.com>
+ <8a828ef2-b09b-4322-26fa-eae6cc88753f@arm.com>
+ <ef506b02d6774a7d87f6b2d941427333@huawei.com>
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ef506b02d6774a7d87f6b2d941427333@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023, Peter Zijlstra wrote:
-> On Mon, Jul 24, 2023 at 02:40:03PM -0700, Sean Christopherson wrote:
-> > On Mon, Jul 24, 2023, Peter Zijlstra wrote:
-> > > On Fri, Jul 21, 2023 at 01:18:54PM -0700, Sean Christopherson wrote:
-> > > > Check "this" CPU instead of the boot CPU when querying SVM support so that
-> > > > the per-CPU checks done during hardware enabling actually function as
-> > > > intended, i.e. will detect issues where SVM isn't support on all CPUs.
-> > > 
-> > > Is that a realistic concern?
-> > 
-> > It's not a concern in the sense that it should never happen, but I know of at
-> > least one example where VMX on Intel completely disappeared[1].  The "compatibility"
-> > checks are really more about the entire VMX/SVM feature set, the base VMX/SVM
-> > support check is just an easy and obvious precursor to the full compatibility
-> > checks.
-> > 
-> > Of course, SVM doesn't currently have compatibility checks on the full SVM feature
-> > set, but that's more due to lack of a forcing function than a desire to _not_ have
-> > them.  Intel CPUs have a pesky habit of bugs, ucode updates, and/or in-field errors
-> > resulting in VMX features randomly appearing or disappearing.  E.g. there's an
-> > ongoing buzilla (sorry) issue[2] where a user is only able to load KVM *after* a
-> > suspend+resume cycle, because TSC scaling only shows up on one socket immediately
-> > after boot, which is then somehow resolved by suspend+resume.
-> > 
-> > [1] 009bce1df0bb ("x86/split_lock: Don't write MSR_TEST_CTRL on CPUs that aren't whitelisted")
-> > [2] https://bugzilla.kernel.org/show_bug.cgi?id=217574
+On 27/07/2023 15:24, Salil Mehta wrote:
+> Hi Suzuki,
 > 
-> Is that using late loading of ucode?
-
-Not sure, though I don't think that is relevant for this particular bug.
-
-> Anything that changes *any* feature flag must be early ucode load, there is
-> no other possible way since einux does feature enumeration early, and
-> features are fixed thereafter.
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Sent: Tuesday, July 25, 2023 12:20 PM
+>>
+>> Hi Salil
+>>
+>> On 25/07/2023 01:05, Salil Mehta wrote:
+>>> Hi Suzuki,
+>>> Sorry for replying late as I was on/off last week to undergo some medical test.
+>>>
+>>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>> Sent: Monday, July 24, 2023 5:27 PM
+>>>>
+>>>> Hi Salil
+>>>>
+>>>> On 19/07/2023 10:28, Suzuki K Poulose wrote:
+>>>>> Hi Salil
+>>>>>
+>>>>> Thanks for raising this.
+>>>>>
+>>>>> On 19/07/2023 03:35, Salil Mehta wrote:
+>>>>>> [Reposting it here from Linaro Open Discussion List for more eyes to look at]
+>>>>>>
+>>>>>> Hello,
+>>>>>> I have recently started to dabble with ARM CCA stuff and check if our
+>>>>>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
+>>>>>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
+>>>>>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
+>>>>>> from the host. This might be required to support vCPU Hotplug feature
+>>>>>> in the realm world in future. vCPU Hotplug is an important feature to
+>>>>>> support kata-containers in realm world as it reduces the VM boot time
+>>>>>> and facilitates dynamic adjustment of vCPUs (which I think should be
+>>>>>> true even with Realm world as current implementation only makes use
+>>>>>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
+>>>>>>
+>>>>>>
+>>>>>> As per our recent changes [2], [3] related to support vCPU Hotplug on
+>>>>>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
+>>>>>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
+>>>>>> PSCI_CPU_ON should undergo similar policy checks and I think,
+>>>>>>
+>>>>>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
+>>>>>> 2. This means target REC should be denied by host. Can host call
+>>>>>>       RMI_PSCI_COMPETE in such s case?
+>>>>>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
+>>>>>
+>>>>> The Realm exit with EXIT_PSCI already provides the parameters passed
+>>>>> onto the PSCI request. This happens for all PSCI calls except
+>>>>> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
+>>>>> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses
+>>>>> the request (wherever applicable).
+>>>>>
+>>>>> However, the RMM spec currently doesn't allow denying the request.
+>>>>> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
+>>>>> We will address this in the RMM spec and get back to you.
+>>>>
+>>>> This is now resolved in RMMv1.0-eac3 spec, available here [0].
+>>>>
+>>>> This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
+>>>> the response doesn't violate the security guarantees by checking the
+>>>> state of the target REC.
+>>>>
+>>>> [0] https://developer.arm.com/documentation/den0137/latest/
+>>>
+>>>
+>>> Many thanks for taking this up proactively and getting it done as well
+>>> very efficiently. Really appreciate this!
+>>>
+>>> I acknowledge below new changes part of the newly released RMM
+>>> Specification [3] (Page-2) (Release Information 1.0-eac3 20-07-2023):
+>>>
+>>> 1. Addition of B2.19 PsciReturnCodePermitted function [3] (Page-126)
+>>> 2. Addition of 'status' in B3.3.7.2 Failure conditions of the
+>>>      B3.3.7 RMI_PSCI_COMPLETE command [3] (Page-160)
+>>>
+>>>
+>>> Some Further Suggestions:
+>>> 1. It would be really helpful if PSCI_DENIED can be accommodated somewhere
+>>>      in the flow diagram (D1.4.1 PSCI_CPU_ON flow) [3] (Page-297) as well.
+>>
+>> Good point, yes, will get that added.
 > 
-> This is one of the many reasons late loading is a trainwreck.
 > 
-> Doing suspend/resume probably re-loads the firmware
+> Great. Thanks!
+> 
+> 
+>>> 2. You would need changes to handle the return value of the PSCI_DENIED
+>>>      in this below patch [2] as well from ARM CCA series [1]
+>>>
+>>
+>> Of course. Please note that the series [1] is based on RMMv1.0-beta0 and
+>> we are in the process of rebasing our changes to v1.0-eac3, which
+>> includes a lot of other changes. The updated series will have all the
+>> required changes.
+> 
+> 
+> Ok. When are you planning to post this new series with v1.0-eac3 changes?
 
-Ya, it does.
+Please see :
 
-> and re-does the feature enumeration -- I didn't check.
+https://lkml.kernel.org/r/42cbffac-05a8-a279-9bdb-f76354c1a1b1@arm.com
 
-The reported ucode revision is the same before and after resume, and is consistent
-across all CPUs.  KVM does the per-CPU feature enumeration (for sanity checks)
-everytime userspace attempts to load KVM (the module), so the timing of the ucode
-patch load _shouldn't_ matter.
+Suzuki
 
-The user is running quite old ucode for their system, so the current theory is that
-old buggy ucode is to blame.
