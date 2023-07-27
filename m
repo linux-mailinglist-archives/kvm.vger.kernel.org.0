@@ -2,209 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB2E57642A1
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 01:36:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B61F1764302
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 02:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230154AbjGZXgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jul 2023 19:36:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51978 "EHLO
+        id S230480AbjG0AiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jul 2023 20:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbjGZXgh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jul 2023 19:36:37 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2043.outbound.protection.outlook.com [40.107.237.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D28A2704;
-        Wed, 26 Jul 2023 16:36:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MseCSPCwLdR4x5RGvqsg5bpceB1SaY45aHNRy0d6MCQbZReNLuW/wOjkbzBC3TqtXMTXYOOLBr9my2iX0FqQzd9LDenlncXH0qJEy8wYRE953G8cuM0dliBrsArv8C9nrbMnDafXmTTJ1jsBXGCo3D0llbTTnQJil7y2kDHsvd8E8Cc9kaGksT9QWvg1WB/Fz0wW2bFuQwRMs7CGvOmHGTxy0OPenxf7d3i0rg6BhYNMlkOgphRPSd8YvkyKzFDVgHVTgnX2gP7t5Giy512IEWGIgtHA3iYZQJzwSW7Osv4JvIqHBg4dmrCpICyLPi9j+L4RyqNasDfbVH14egh9jA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q123L5DRk9AV6doEXSYTbJiKI8xth446L65K48JaDjU=;
- b=i2R2S3BdlXCses4b6bN9myJJt+h7toATokRlow8qD9NEh/VvE7wonHk1msbX4AcaAVCZcGA7WyikhFjyx8c00DMLZKzDREVPeKFVIH50yilLbebo9aszjt6/2Xquiq7X6BRDczFGlUUi5ZTa0lsYtmOMeRUAkLK5Z2utyTKlwAdBemX15yrcn1R8LiFedNJ0uvrmRZmz/gltbU5Od0hxMsjku2ayg6KL8Jj4Rzvz1lZlVqaRd6FWcB12RxvN5+l+NTLzSO8ycXB1dtMbWw5uMtd6nQ++MV87gCwjrqSZ+H1RUuXuvsZ7vcIjKCUmgKeNMStJUKb2qjD1Sn6Stlsh5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q123L5DRk9AV6doEXSYTbJiKI8xth446L65K48JaDjU=;
- b=VDt85/3hQ3KMj6eg/vOnQEOhnGp8j1+vt7i96Y29TAFaZK1CGQo3uRWpdcKZ6C8eV6Ns+A14ZDCozbipZ1Fh6EI0PlpgfTmHQ8vH2zrhbhZObahFV6bQ/G/55RcWq4+e9ZYy1bTfzGSUrsJGrfBuD/blVNciQAZ01eEzK+9imvPnUWrJS5bHJ3aq72g46aSRy7NG6jxes6EgYPR3X6GZ8SQMO9L6zokVDlheTKD6+gptcw+iy5dihCpO2DyWpulHBNbcrHxllkCxGW01+QArMTGQinknsTGegnYXoz+G1jPRxIUXTYx8/Ea8sK+LYuprHmp3tVt/7HgZ77IeZwGxxw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB5671.namprd12.prod.outlook.com (2603:10b6:806:23b::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
- 2023 23:36:33 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 23:36:33 +0000
-Date:   Wed, 26 Jul 2023 20:36:31 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Nicolin Chen <nicolinc@nvidia.com>
-Cc:     kevin.tian@intel.com, alex.williamson@redhat.com,
-        yi.l.liu@intel.com, joro@8bytes.org, will@kernel.org,
-        robin.murphy@arm.com, shuah@kernel.org,
-        linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        mjrosato@linux.ibm.com, farman@linux.ibm.com
-Subject: Re: [PATCH v8 2/4] iommufd: Add iommufd_access_replace() API
-Message-ID: <ZMGt/4CCCmUB85HX@nvidia.com>
-References: <cover.1690226015.git.nicolinc@nvidia.com>
- <5dfe3e9a9d511919cb105459ca9d96f013daadb4.1690226015.git.nicolinc@nvidia.com>
- <ZMEt+SMFBMKT3AoT@nvidia.com>
- <ZMGHFI4KB4XTG9EH@Asurada-Nvidia>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMGHFI4KB4XTG9EH@Asurada-Nvidia>
-X-ClientProxiedBy: YT4PR01CA0364.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:fd::28) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229954AbjG0AiC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jul 2023 20:38:02 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7545119BF;
+        Wed, 26 Jul 2023 17:38:01 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bbc2e1c6b2so2701025ad.3;
+        Wed, 26 Jul 2023 17:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690418281; x=1691023081;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ATN7YAlsVZEJporVO50g2aQeIWoActMrVk97ztgwhKo=;
+        b=mEHu84UG0JCx6PjN43cEokYue0X1BsIq+1lT8qqreA9qCCoE85OhqPIA1n32XncHLo
+         mlm7TypRofs/9imuJukupCkb5MRl7l/1D5FNTZhsFMvsKMFsEgr9Jt320+d1f9y2g/0P
+         DpZAMd4fsdp8KbTPipAK+517AVyGB41Qob1yp83ldlFI01GjW1uaBjHzcVkEffI4Opnb
+         yvvRenDe26KN9bVJ1RM9i/wuN2OdKn2aBGToVcSsggYJ6aHJdc73/TYJgrbfQYFNXGtr
+         VdoWgdeOYY6g9WreuXQLIBAPG8I7ZdS48DO0pGgcWeraQ6tFjuIJ3v+X1jgKjRxlv+WY
+         Xk+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690418281; x=1691023081;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ATN7YAlsVZEJporVO50g2aQeIWoActMrVk97ztgwhKo=;
+        b=gjt0i4Z4sCtwoslnL19frfgEJRcbGtPxFW+3DfP/mHXxrt22J1o5dQAe8VD3pu0P5C
+         mDA8aNY1oC9y7bye8EanZtzTtxAlRCj6w9iOjGc717JLPeRblRqtJ+MMYyQSPa8ofZKT
+         YIJ5vE1dSxn+6zAEpishv+1DNWf+o35zkPpA4th7IsxIjEf139h2wVRG/hR4OBogM2Au
+         bSXqoQ8kt9/2lSRHXHXtokSgdqbupI/9SXloS67bHdXSpyOGvWo6qX1gj4MaUaQVW3k4
+         GDmQryKIrDPdrG1Xhp//TlxNxuf9wiW9H9a0Nsl1wKTALA58hgQBoju24vVDivMThHHm
+         rhvA==
+X-Gm-Message-State: ABy/qLaacNQYvyaB6qfV4popNDfa/+9ufuHGnTn2JKCe/kQW/Cypwa8k
+        zq144GELGpXORfLP7BHmGw0=
+X-Google-Smtp-Source: APBJJlGqM1dx3AW8MZ9SKEPfOeMJLPVLdXzJ8/yaPStsQ8rRnWHSGj8+BHndAGRWRU0M6kZaxA9B1A==
+X-Received: by 2002:a17:902:d2cc:b0:1bb:dc48:644a with SMTP id n12-20020a170902d2cc00b001bbdc48644amr395035plc.49.1690418280789;
+        Wed, 26 Jul 2023 17:38:00 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id jh3-20020a170903328300b001b50cbc0b4fsm161140plb.111.2023.07.26.17.38.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 17:38:00 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 17:37:59 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        linux-coco@lists.linux.dev,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>
+Subject: Re: [RFC PATCH v4 09/10] KVM: x86: Make struct sev_cmd common for
+ KVM_MEM_ENC_OP
+Message-ID: <20230727003759.GA2021422@ls.amr.corp.intel.com>
+References: <cover.1689893403.git.isaku.yamahata@intel.com>
+ <8c0b7babbdd777a33acd4f6b0f831ae838037806.1689893403.git.isaku.yamahata@intel.com>
+ <ZLqbWFnm7jyB8JuY@google.com>
+ <9e8a98ad-1f8d-a09c-3173-71c5c3ab5ed4@intel.com>
+ <ZL/r6Vca8WkFVaic@google.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB5671:EE_
-X-MS-Office365-Filtering-Correlation-Id: 169aab3d-d585-4343-96a8-08db8e312518
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Zm/yBTzvB12YiPtjwvOZTS4Nmzauvwzr42+0GB19C1dGHQOinzjsW4HPCGtHA7qThRohG4NKqdP+6FIaKglfTR4NtzeJdYp6yt0MXidoaTnLukJA70YYDTc/m4OFhR2Lg/NrOQfEVgdoF1RdmmuTtLbb4jGUeSixCEV54XE8LuT90ChtF+jl5jjW6fQ55OZyAGAVqqW0irT5KNhEKqLH6yFYELuvauxIttcQNYyPxvU7PCawXi80gWdqVktcMocLk8HeHBZfNF9K9Ccijjh7j/NKXIaZtM1CCs2FNIrYZ1Ww68LysbuIdA5t4tDX7aonV8IUbMDgkvP07oKCWXoJ8qbcjGgFGDC3rb/HgFUcfRm20gOL2ALnBE4lxsSysnbsCYAMeYAfGHB262/t/zCOiZfF3VfG3hn1e2U6LEvYGOYhmKW5SUFnNPzgecsuF2b/GtIe+FfNVoq2XkQ8khjzytfX5NhBK42BTFgemqg/Uu/RaJJOGPdQXbWbGJxcfi6vbfkyCfA8KtnJFo2NTa3wuZT4X1z0+3oUQ8kPzee4eXX640GUNNHqg97E7OFAmk+V
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(366004)(136003)(396003)(39860400002)(451199021)(26005)(6862004)(6506007)(2906002)(186003)(6636002)(38100700002)(316002)(83380400001)(41300700001)(66556008)(5660300002)(2616005)(66946007)(66476007)(8676002)(7416002)(36756003)(8936002)(86362001)(37006003)(6486002)(6512007)(478600001)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BysifGco2RxAHbSpoCMQ7s1xODQhAc4TDgiigqwIR6PvwJfB/NmuOZJ6tmOP?=
- =?us-ascii?Q?y6h3G4M/+MAgDD7SICf5Pxz5wfISy6HZQ4xgi26ZIZi8ErVvzZ0CjzT7dFJ8?=
- =?us-ascii?Q?a1bEKTKhTyMRNnqMdMLcyF2GicX64cn+wuzbquYNw46x9WCpOOUeO46Ut50W?=
- =?us-ascii?Q?rcHgPUI0vrVIylDdm/Tb7vA3REUbGypVAKixhGRlNKjLt4Ek5cEPrbKKuFJW?=
- =?us-ascii?Q?rtjF5pKUVg05sn0eH/jsBxxEbbJU9IkBthmrhbWbWMa/pbGNOSXAhesEBtC1?=
- =?us-ascii?Q?bzIXe5/o4lZ78iGXv/O/Ky6wj25THAh+cSQhtwicCuzpya3B0QVvunGNrmK4?=
- =?us-ascii?Q?/eQPTvXH90DvOKCT2f9Xabi2srTWt+XXrFfmDjlT5SYkzorqsoaa3CKJdq2o?=
- =?us-ascii?Q?yQD/1TnopvY3xwMbf/4nXV4jC6NnxVizZOyXyb/KzP0neKf/hCs07PLil/0l?=
- =?us-ascii?Q?grTzHYfaL1JjX7oTjSY/Og8YObrU/UFmh7kpjLtKa7RFrDkwEuJ5gjiV1Z6t?=
- =?us-ascii?Q?mrHPKMwkoGEZ2hMUfpOLVj93SNSWrxZbje2nWuUlKO/G1IIVjg1Rkd2IynxP?=
- =?us-ascii?Q?Ra3LmfxcsO3okrcLyoTueFxi6Pb932nYzluvILyx8H/sGz6VUXUIaFNWZ+yE?=
- =?us-ascii?Q?Naw+TSgBMAFax0ffFCZ+pSQDmJ9hzRKwx0LJOe3Q/WpQNH7BP83HhGYp5GPY?=
- =?us-ascii?Q?Oc1SyFkQC1J+U9Wav61l3wP75e4KDzo6wLFDC1p/1Hqliyb7SvSQE1/acxIU?=
- =?us-ascii?Q?eN895JlbBrwjqjm+F4EW6uUdKcyibmj0HoZuINBoi1tHeRTa6UZ5Y1Hg+9x8?=
- =?us-ascii?Q?cQJbd9QmkPuM+EQImHMLFwn95IbO9I/VaFMHgnHY2qeoJxf71FNuUlm0lZ4U?=
- =?us-ascii?Q?qDPAN3z4dpl0EisHStcPwQIxw8Z9Gia2Sim/9DTD8Yu6WlZzi5p88isp7lyb?=
- =?us-ascii?Q?LGUvb5Fftyenuh7B1nyNkn41LDu6QcvewANRqR8A8aT8vbWmLZPx4DEPFO4N?=
- =?us-ascii?Q?p71z4/G0QKB8VStxT0FrIcRVaQj3JILGqMRVCnI93jmu3tIv/xNVo5xpsWWu?=
- =?us-ascii?Q?5mCy4vDphQLf1BkYcSyBXxqBpDkJP0NqGRFJkAOIy7fh29UtQbB+wCvdnFwz?=
- =?us-ascii?Q?V3k2iVd49ElsWgNcJFhnvLXUSY9Kg18XMccd5luyjDhb9RTB0Y2enAJHzHk+?=
- =?us-ascii?Q?L7pmv/47p1J0AwDXCqZQXjVQmC4Txz1QWiGXY2Y5u7lkA+jtw+1S7dz0SHn5?=
- =?us-ascii?Q?8jCFSBleYR6epImoGVzpQAgPrzLr4xWoFpijVwbYd7lxUsUWvXBPttf7CrsF?=
- =?us-ascii?Q?8f0PDkmz+RBAwD381fSKst9JnkK6JJCXvK3wuaLpcT4fhtZewmp+mZawCaBh?=
- =?us-ascii?Q?2ifQyRrX/nsUJcHIJRCRbfjwTgwYQf0S5dkD2LIRkhPsk4NQmfewqSJZiNp/?=
- =?us-ascii?Q?WYp0/I1r1gud7ASlEOG/cHEPmE81M+O9YU4kW0MmmDe6VTkg8M8BziN2n7o8?=
- =?us-ascii?Q?ratCKKyL3gECDXzppLzbKRTAg2Zn4H75hh8MsgOMcW6Xm9UiM3P5fLwRiQ50?=
- =?us-ascii?Q?eR8XkmWCjQqCaJ3iQ+gJVjiPksZmiIAyUgjzA3Ct?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 169aab3d-d585-4343-96a8-08db8e312518
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 23:36:33.1679
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VOWdYIb6SWsHhBmI09/pQbhirp/RNOhtdpRJL+nJNxBK16mNusBuTIPYO4Ipi1El
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5671
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZL/r6Vca8WkFVaic@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 26, 2023 at 01:50:28PM -0700, Nicolin Chen wrote:
-> 
-> > >  	rc = iopt_add_access(&new_ioas->iopt, access);
-> > >  	if (rc) {
-> > > -		mutex_unlock(&access->ioas_lock);
-> > >  		iommufd_put_object(&new_ioas->obj);
-> > > +		if (cur_ioas)
-> > > +			WARN_ON(iommufd_access_change_pt(access,
-> > > +							 cur_ioas->obj.id));
+On Tue, Jul 25, 2023 at 08:36:09AM -0700,
+Sean Christopherson <seanjc@google.com> wrote:
+
+> On Tue, Jul 25, 2023, Xiaoyao Li wrote:
+> > On 7/21/2023 10:51 PM, Sean Christopherson wrote:
+> > > On Thu, Jul 20, 2023, isaku.yamahata@intel.com wrote:
+> > > > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > > > index aa7a56a47564..32883e520b00 100644
+> > > > --- a/arch/x86/include/uapi/asm/kvm.h
+> > > > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > > > @@ -562,6 +562,39 @@ struct kvm_pmu_event_filter {
+> > > >   /* x86-specific KVM_EXIT_HYPERCALL flags. */
+> > > >   #define KVM_EXIT_HYPERCALL_LONG_MODE	BIT(0)
+> > > > +struct kvm_mem_enc_cmd {
+> > > > +	/* sub-command id of KVM_MEM_ENC_OP. */
+> > > > +	__u32 id;
+> > > > +	/*
+> > > > +	 * Auxiliary flags for sub-command.  If sub-command doesn't use it,
+> > > > +	 * set zero.
+> > > > +	 */
+> > > > +	__u32 flags;
+> > > > +	/*
+> > > > +	 * Data for sub-command.  An immediate or a pointer to the actual
+> > > > +	 * data in process virtual address.  If sub-command doesn't use it,
+> > > > +	 * set zero.
+> > > > +	 */
+> > > > +	__u64 data;
+> > > > +	/*
+> > > > +	 * Supplemental error code in the case of error.
+> > > > +	 * SEV error code from the PSP or TDX SEAMCALL status code.
+> > > > +	 * The caller should set zero.
+> > > > +	 */
+> > > > +	union {
+> > > > +		struct {
+> > > > +			__u32 error;
+> > > > +			/*
+> > > > +			 * KVM_SEV_LAUNCH_START and KVM_SEV_RECEIVE_START
+> > > > +			 * require extra data. Not included in struct
+> > > > +			 * kvm_sev_launch_start or struct kvm_sev_receive_start.
+> > > > +			 */
+> > > > +			__u32 sev_fd;
+> > > > +		};
+> > > > +		__u64 error64;
+> > > > +	};
+> > > > +};
+> > > 
+> > > Eww.  Why not just use an entirely different struct for TDX?  I don't see what
+> > > benefit this provides other than a warm fuzzy feeling that TDX and SEV share a
+> > > struct.  Practically speaking, KVM will likely take on more work to forcefully
+> > > smush the two together than if they're separate things.
 > > 
-> > We've already dropped our ref to cur_ioas, so this is also racy with
-> > destroy.
+> > generalizing the struct of KVM_MEM_ENC_OP should be the first step.
 > 
-> Would it be better by calling iommufd_access_detach() that holds
-> the same mutex in the iommufd_access_destroy_object()? We could
-> also unwrap the detach and delay the refcount_dec, as you did in
-> your attaching patch.
+> It's not just the one structure though.  The "data" field is a pointer to yet
+> another layer of commands, and SEV has a rather big pile of those.  Making
+> kvm_mem_enc_cmd common is just putting lipstick on a pig since the vast majority
+> of the structures associated with the ioctl() would still be vendor specific.
 
-It is better just to integrate it with this algorithm so we don't have
-the refcounting issues, like I did
-
-
+>   struct kvm_sev_launch_start
+>   struct kvm_sev_launch_update_data
+>   struct kvm_sev_launch_secret
+>   struct kvm_sev_launch_measure
+>   struct kvm_sev_guest_status
+>   struct kvm_sev_dbg
+>   struct kvm_sev_attestation_report
+>   struct kvm_sev_send_start
+>   struct kvm_sev_send_update_data
+>   struct kvm_sev_receive_start
+>   struct kvm_sev_receive_update_data
 > 
-> > This is what I came up with:
-> > 
-> > diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-> > index 57c0e81f5073b2..e55d6e902edb98 100644
-> > --- a/drivers/iommu/iommufd/device.c
-> > +++ b/drivers/iommu/iommufd/device.c
-> > @@ -758,64 +758,101 @@ void iommufd_access_destroy(struct iommufd_access *access)
-> >  }
-> >  EXPORT_SYMBOL_NS_GPL(iommufd_access_destroy, IOMMUFD);
-> >  
-> > -void iommufd_access_detach(struct iommufd_access *access)
-> > +static int iommufd_access_change_ioas(struct iommufd_access *access,
-> > +				      struct iommufd_ioas *new_ioas)
-> >  {
-> >  	struct iommufd_ioas *cur_ioas = access->ioas;
-> > +	int rc;
-> > +
-> > +	lockdep_assert_held(&access->ioas_lock);
-> > +
-> > +	/* We are racing with a concurrent detach, bail */
-> > +	if (access->ioas_unpin)
-> > +		return -EBUSY;
+> FWIW, I really dislike KVM's uAPI for KVM_MEM_ENC_OP.  The above structures are
+> all basically copied verbatim from PSP firmware structures, i.e. the commands and
+> their payloads are tightly coupled to "hardware" and essentially have no abstraction
+> whatsoever.   But that ship has already sailed, and practically speaking trying to
+> provide a layer of abstraction might not of worked very well anyways.
 > 
-> I think this should check access->ioas too? I mean:
+> In other words, unless there's an obvious and easy way path to convergence, I
+> recommend you don't spend much time/effort on trying to share code with TDX.
 
-> 
-> +	/* We are racing with a concurrent detach, bail */
-> +	if (!access->ioas && access->ioas_unpin)
-> +		return -EBUSY;
+I think we can easily unify vcpu initialization, populating/measure initial
+memory, completing guest creation, and guest memory access for debug.
 
-Oh, yes, that should basically be 'cur_ioas != access->ioas_unpin' -
-ie any difference means we are racing with the unmap call.
+KVM_SEV_LAUNCH_UPDATE_VMSA <-> KVM_TDX_INIT_VCPU
+KVM_SEV_LAUNCH_UPDATE_DATA and KVM_SEV_LAUNCH_MEASURE <-> KVM_INIT_MEM_REGION
+KVM_SEV_LAUNCH_FINISH <-> KVM_TDX_FINALIZE_VM
+KVM_SEV_DBG_DECRYPT, KVM_SEV_DBG_ENCRYPT: KVM common API for access protected guest memory
 
-> > +	if (new_ioas) {
-> > +		rc = iopt_add_access(&new_ioas->iopt, access);
-> > +		if (rc) {
-> > +			iommufd_put_object(&new_ioas->obj);
-> > +			access->ioas = cur_ioas;
-> > +			return rc;
-> > +		}
-> > +		iommufd_ref_to_users(&new_ioas->obj);
-> > +	}
-> > +
-> > +	access->ioas = new_ioas;
-> > +	access->ioas_unpin = new_ioas;
-> >  	iopt_remove_access(&cur_ioas->iopt, access);
-> 
-> There was a bug in my earlier version, having the same flow by
-> calling iopt_add_access() prior to iopt_remove_access(). But,
-> doing that would override the access->iopt_access_list_id and
-> it would then get unset by the following iopt_remove_access().
 
-Ah, I was wondering about that order but didn't check it.
+Here's my assessment. For now I don't address migration.
 
-Maybe we just need to pass the ID into iopt_remove_access and keep the
-right version on the stack.
+For creating confidential guest:
 
-> So, I came up with this version calling an iopt_remove_access()
-> prior to iopt_add_access(), which requires an add-back the old
-> ioas upon an failure at iopt_add_access(new_ioas).
+- Get the capability of underlying platform
+  KVM_TDX_CAPABILITY: no sev correspondence.
 
-That is also sort of reasonable if the refcounting is organized like
-this does.
+- Initialize VM as confidential VM
+  struct kvm_sev_launch_start
+  KVM_SEV{,_ES}_INIT, and KVM_SEV_LAUNCH_START:
+  KVM_TDX_INIT_VM
+  They take vendor specific data.
 
-Jason
+
+- Initialize vcpu
+  KVM_SEV_LAUNCH_UPDATE_VMSA: no extra argument
+  KVM_TDX_INIT_VCPU:          no extra argument
+
+
+- populate initial memory + measurement
+  KVM_SEV_LAUNCH_UPDATE_DATA and KVM_SEV_LAUNCH_MEASURE,
+  struct kvm_sev_launch_update_data {
+        __u64 uaddr;
+        __u32 len;
+  };
+  struct kvm_sev_launch_measure {
+        __u64 uaddr;
+        __u32 len;
+  };
+  => GPA is calculated from uaddr.
+
+  KVM_INIT_MEM_REGION:
+  struct kvm_tdx_init_mem_region {
+        __u64 source_addr;      // uaddr
+        __u64 gpa;
+        __u64 nr_pages;
+  };
+
+  I think those can same structure. Or prefault or prepopulating
+  e.g.
+  struct {
+        __u64 uaddr;
+        __u64 gpa;
+        __u64 len;
+  #define FLAG_MEASURE    BIT(0)
+  #define FLAG_GPA        BIT(1)  // GPA is valid or calculated from uaddr
+        __u64 flags;
+  };
+  
+
+- Complete initialization. Make the guest ready to run vcpu
+  KVM_SEV_LAUNCH_FINISH: no argument
+  KVM_TDX_FINALIZE_VM:   no argument
+
+- KVM_SEV_LAUNCH_SECRET: no TDX correspondence
+  struct kvm_sev_launch_secret
+
+
+For guest debug
+
+- KVM_SEV_DBG_DECRYPT, KVM_SEV_DBG_ENCRYPT: struct kvm_sev_dbg
+  This is to read/write guest memory for debug. We can easily have a common
+  API.
+
+- KVM_SEV_GUEST_STATUS
+  struct kvm_sev_guest_status
+  No TDX correspondence
+
+Thanks,
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
