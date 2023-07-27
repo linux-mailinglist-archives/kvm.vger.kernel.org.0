@@ -2,175 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70DB17658F5
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 18:41:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6620F76593F
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 18:53:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229771AbjG0QlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 12:41:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
+        id S232300AbjG0QxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 12:53:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229895AbjG0Qk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 12:40:58 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6EDA13598;
-        Thu, 27 Jul 2023 09:40:36 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD37CD75;
-        Thu, 27 Jul 2023 09:41:18 -0700 (PDT)
-Received: from [10.57.89.117] (unknown [10.57.89.117])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 716303F5A1;
-        Thu, 27 Jul 2023 09:40:32 -0700 (PDT)
-Message-ID: <1cb495f2-fb0d-5a93-5a7f-d717bf3ef97a@arm.com>
-Date:   Thu, 27 Jul 2023 17:40:30 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [Question - ARM CCA] vCPU Hotplug Support in ARM Realm world
- might require ARM spec change?
-To:     Salil Mehta <salil.mehta@huawei.com>,
-        "steven.price@arm.com" <steven.price@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "james.morse@arm.com" <james.morse@arm.com>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
-        "oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Salil Mehta <salil.mehta@opnsrc.net>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Gareth Stockwell <Gareth.Stockwell@arm.com>
-References: <9cb24131a09a48e9a622e92bf8346c9d@huawei.com>
- <7da93c6e-1cbf-8840-282e-f115197b80c4@arm.com>
- <0d268afa-c04b-7a4e-be5e-2362d3dfa64d@arm.com>
- <93c9c8356e444fb287393a935a8c7899@huawei.com>
- <8a828ef2-b09b-4322-26fa-eae6cc88753f@arm.com>
- <ef506b02d6774a7d87f6b2d941427333@huawei.com>
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ef506b02d6774a7d87f6b2d941427333@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232554AbjG0Qw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 12:52:57 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B582D7D
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 09:52:55 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d1ebc896bd7so1090163276.2
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 09:52:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690476775; x=1691081575;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WsySOxfW+9cLK59nPUktjlvVqp+91KMZ0gu0oOBMYls=;
+        b=ncAeo22G2nfV3c53Tf7GUNv0YxUbW3b5uCm01t2pNmO0SMGLFldBXysMP/iwRODsaU
+         y3jznLgcAVZA5jGfjHX+ywAoxYx8T8TgD8dhDBnh9QlVj2HzBb4zE3rcgrWeCl/iHfFB
+         4Yaui9MCJIol033J4aWUARq9UXAhRRwFcgH06SqxTw9lx5pGQSAHyOOwvfyea7vqWSwh
+         CHg0ybtnoWhtSlfeV2cP0FiyEprHgLyFO2xEa+Qx88aQJC7h8X+SwlK724zBPzqDimbh
+         BS9OhBwLR3o8lbbXUFXzmmhJTAxZ3HIEFhvECh1gKQ0fTP9+ta2r1A7Yl74sQSsv9KFj
+         9ugw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690476775; x=1691081575;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WsySOxfW+9cLK59nPUktjlvVqp+91KMZ0gu0oOBMYls=;
+        b=dnvPpSJsSD+HKELIcHsrQ7t1hLwCvyebKy+hSOWVON9G0c2t8DuuTO/YjHUh80yLtL
+         Ft5B1WGYwH01kUJZBkWYiQ+2MpMVQZnD5svfxVqjSl4WwrsXTznxwXas0hFgVeIBBEbb
+         m1lUuYNFJZVZqK6MMOkjEAOD4H8uTmy/sssHdXjm5dN/pXeZSreOTwJ8F4glfrXjChL+
+         397Yc3bbo0IXEze/TRNhivpRdMLSgjf6xe6RMpHqx9OkP59z8OIZx+OEE7uHz7st4rD8
+         Pc+mFI/p+Q1ZHHN4BRe79ioZfTe5V4E6J39pBmAMlcTj5bTETs5UNVw5GGMetbUXf8lf
+         t7hw==
+X-Gm-Message-State: ABy/qLbKFEQ9eEA9A+BwH6zvXEfuoiw8NPCW0FClliPFzFnx/RVVmar/
+        S+bhMbUnlVg5opyLEzu6BU/i3ZH88JM=
+X-Google-Smtp-Source: APBJJlGyP/KYscXFnhAsV1pI2R0yeiv1E213sDogZ3EBC+D1vyBfUWAIjsBwUnj3tbUuPl3BVeINCk4yZtQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:2905:0:b0:d07:cb52:a3cf with SMTP id
+ p5-20020a252905000000b00d07cb52a3cfmr35145ybp.5.1690476775015; Thu, 27 Jul
+ 2023 09:52:55 -0700 (PDT)
+Date:   Thu, 27 Jul 2023 09:52:53 -0700
+In-Reply-To: <7d4a5084-5e1e-22dd-c203-99f46850145a@cs.utexas.edu>
+Mime-Version: 1.0
+References: <7b5f626c-9f48-15e2-8f7a-1178941db048@cs.utexas.edu>
+ <ZMFVLiC3YvPY3bSP@google.com> <27f998f5-748b-c356-9bb6-813573c758e5@cs.utexas.edu>
+ <ZMF5O6Tq1UTQHvX0@google.com> <7d4a5084-5e1e-22dd-c203-99f46850145a@cs.utexas.edu>
+Message-ID: <ZMKg5WosmBu78Vgv@google.com>
+Subject: Re: KVM_EXIT_FAIL_ENTRY with hardware_entry_failure_reason = 7
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yahya Sohail <ysohail@cs.utexas.edu>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/07/2023 15:24, Salil Mehta wrote:
-> Hi Suzuki,
+On Wed, Jul 26, 2023, Yahya Sohail wrote:
+> On 7/26/23 14:51, Sean Christopherson wrote:
+> > On Wed, Jul 26, 2023, Yahya Sohail wrote:
+> > > On 7/26/23 12:17, Sean Christopherson wrote:
+> > > I do know that the emulator I'm copying state from likely doesn't consider
+> > > all bits in the control fields, so it's possible that they're in an invalid
+> > > state. When I ran the model before with the value for cr0 copied out of the
+> > > emulator I also got KVM_EXIT_FAIL_ENTRY, but with a different value for
+> > > hardware_entry_failure_reason = 0x80000021. I fixed this by changing the
+> > > value of cr0 to be (hopefully) valid.
+> > 
+> > What were the before and after values of CR0?
 > 
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Sent: Tuesday, July 25, 2023 12:20 PM
->>
->> Hi Salil
->>
->> On 25/07/2023 01:05, Salil Mehta wrote:
->>> Hi Suzuki,
->>> Sorry for replying late as I was on/off last week to undergo some medical test.
->>>
->>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Sent: Monday, July 24, 2023 5:27 PM
->>>>
->>>> Hi Salil
->>>>
->>>> On 19/07/2023 10:28, Suzuki K Poulose wrote:
->>>>> Hi Salil
->>>>>
->>>>> Thanks for raising this.
->>>>>
->>>>> On 19/07/2023 03:35, Salil Mehta wrote:
->>>>>> [Reposting it here from Linaro Open Discussion List for more eyes to look at]
->>>>>>
->>>>>> Hello,
->>>>>> I have recently started to dabble with ARM CCA stuff and check if our
->>>>>> recent changes to support vCPU Hotplug in ARM64 can work in the realm
->>>>>> world. I have realized that in the RMM specification[1] PSCI_CPU_ON
->>>>>> command(B5.3.3) does not handles the PSCI_DENIED return code(B5.4.2),
->>>>>> from the host. This might be required to support vCPU Hotplug feature
->>>>>> in the realm world in future. vCPU Hotplug is an important feature to
->>>>>> support kata-containers in realm world as it reduces the VM boot time
->>>>>> and facilitates dynamic adjustment of vCPUs (which I think should be
->>>>>> true even with Realm world as current implementation only makes use
->>>>>> of the PSCI_ON/OFF to realize the Hotplug look-like effect?)
->>>>>>
->>>>>>
->>>>>> As per our recent changes [2], [3] related to support vCPU Hotplug on
->>>>>> ARM64, we handle the guest exits due to SMC/HVC Hypercall in the
->>>>>> user-space i.e. VMM/Qemu. In realm world, REC Exits to host due to
->>>>>> PSCI_CPU_ON should undergo similar policy checks and I think,
->>>>>>
->>>>>> 1. Host should *deny* to online the target vCPUs which are NOT plugged
->>>>>> 2. This means target REC should be denied by host. Can host call
->>>>>>       RMI_PSCI_COMPETE in such s case?
->>>>>> 3. The *return* value (B5.3.3.1.3 Output values) should be PSCI_DENIED
->>>>>
->>>>> The Realm exit with EXIT_PSCI already provides the parameters passed
->>>>> onto the PSCI request. This happens for all PSCI calls except
->>>>> (PSCI_VERSION and PSCI_FEAUTRES). The hyp could forward these exits to
->>>>> the VMM and could invoke the RMI_PSCI_COMPLETE only when the VMM blesses
->>>>> the request (wherever applicable).
->>>>>
->>>>> However, the RMM spec currently doesn't allow denying the request.
->>>>> i.e., without RMI_PSCI_COMPLETE, the REC cannot be scheduled back in.
->>>>> We will address this in the RMM spec and get back to you.
->>>>
->>>> This is now resolved in RMMv1.0-eac3 spec, available here [0].
->>>>
->>>> This allows the host to DENY a PSCI_CPU_ON request. The RMM ensures that
->>>> the response doesn't violate the security guarantees by checking the
->>>> state of the target REC.
->>>>
->>>> [0] https://developer.arm.com/documentation/den0137/latest/
->>>
->>>
->>> Many thanks for taking this up proactively and getting it done as well
->>> very efficiently. Really appreciate this!
->>>
->>> I acknowledge below new changes part of the newly released RMM
->>> Specification [3] (Page-2) (Release Information 1.0-eac3 20-07-2023):
->>>
->>> 1. Addition of B2.19 PsciReturnCodePermitted function [3] (Page-126)
->>> 2. Addition of 'status' in B3.3.7.2 Failure conditions of the
->>>      B3.3.7 RMI_PSCI_COMPLETE command [3] (Page-160)
->>>
->>>
->>> Some Further Suggestions:
->>> 1. It would be really helpful if PSCI_DENIED can be accommodated somewhere
->>>      in the flow diagram (D1.4.1 PSCI_CPU_ON flow) [3] (Page-297) as well.
->>
->> Good point, yes, will get that added.
-> 
-> 
-> Great. Thanks!
-> 
-> 
->>> 2. You would need changes to handle the return value of the PSCI_DENIED
->>>      in this below patch [2] as well from ARM CCA series [1]
->>>
->>
->> Of course. Please note that the series [1] is based on RMMv1.0-beta0 and
->> we are in the process of rebasing our changes to v1.0-eac3, which
->> includes a lot of other changes. The updated series will have all the
->> required changes.
-> 
-> 
-> Ok. When are you planning to post this new series with v1.0-eac3 changes?
+> Before, CR0 was 0x80000000.
 
-Please see :
+Yeah, CR0.PG=1 with CR0.PE=0 (paging without protected mode) is invalid.  But
+KVM fails to reject this combination from userspace without the series/patch I
+linked earlier.  That would explain why the VM-Enter fails instead of KVM rejecting
+KVM_SET_SREGS.
 
-https://lkml.kernel.org/r/42cbffac-05a8-a279-9bdb-f76354c1a1b1@arm.com
+https://lore.kernel.org/all/20230613203037.1968489-1-seanjc@google.com
 
-Suzuki
+> It appears the paging bit was not set even after
+> I "fixed" cr0. I have now made sure the paging bit and the fixed bits are
+> properly set in CR0. CR0 is now equal to 0x8393870b
 
+How did you get that value?   AFAICT, it's not outright illegal, but only because
+the CPU ignores reserved bits in CR0[31:0], as opposed to rejecting them.
+
+> That being said, I'm still not sure how to go about debugging the
+> VM_EXIT_FAIL_ENTRY with hardware_entry_failure_reason = 0x80000021. The
+> entry in the tracepoint log (see above) of L0 (when running the VM as L2)
+> does not seem to be very helpful (unlike the invalid CR0 messages I got
+> before when CR0 was invalid). Is there any more information that can be
+> gleaned from this log entry?
+
+Probably not.
+
+> Any other way to get more information as to what piece of state is invalid?
+
+Enable /sys/module/kvm_intel/parameters/dump_invalid_vmcs, then KVM will print
+out most (all?) VMCS fields on the failed VM-Entry.  From there you'll have to
+hunt through guest state to figure out which fields, or combinations of fields,
+is invalid.
