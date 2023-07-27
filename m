@@ -2,80 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F03FA7657EC
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 17:42:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 181847657F2
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 17:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233382AbjG0Pm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 11:42:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48438 "EHLO
+        id S233426AbjG0PnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 11:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231638AbjG0Pm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 11:42:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F1F2736
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 08:42:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CCA0561EC2
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 15:42:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34DE2C433CA;
-        Thu, 27 Jul 2023 15:42:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690472536;
-        bh=4KKGe8/tL2e7AyuNIyEcxwJSBh1LF8WzR7yHl+lFyDs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=kPjEDml6qyUkAUkLyK1muIzmzWolQgw0SxPcAGUeGRVDr4ZXSCQEW5OWgZCqE/ta2
-         gZUh/NPr9hbsDRPPqK7PmFP3vJKcjt9f10pXaTQ3FKDMuA+VzcMImnflWHF0BLE2y7
-         LCVpseuM/MVnb4AdGrlODvBytCBubgpG4ZNDE1SKjOEQwz09tvaXYxOeadHHzZBtA+
-         Ro/xbd6uavv3lEkNskU3XNwv/8MzaYYIEBr/raLeGaGVtpv9bYvI9ohk0PF3gATq6p
-         oo90fZIyp/l9LHbgmOqh831caDuSYTBHvsPTLcKEb+mpMt6lQfX0OaxmWpj91RDnbL
-         4q8LTVfD3lVQg==
-Received: from disco-boy.misterjones.org ([217.182.43.188] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qP381-00HOsQ-R9;
-        Thu, 27 Jul 2023 16:42:13 +0100
+        with ESMTP id S231578AbjG0PnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 11:43:16 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DD0B4
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 08:43:14 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-3177163aa97so1159086f8f.0
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 08:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690472593; x=1691077393;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hEX2yXanu6lI6E29oJscX+qcEyz7+geVl0H0uFbsIWY=;
+        b=hvd1QyVrBZDYC1iVAlTK2lIxwDqf3WPN47mB29iOitO2K9J2D1T5tREezyINzni2N7
+         8jgHYX+s84S1LwmsB9fHcR3RjzljyFeT9d5TDQ3cOxrMDYvuI7CQZLmvNSxxwVwvn4aB
+         /dS8y16OfiLNnqjVBCYQSVVuhSx75YMHceuNTKWp+INE1J+si8nGgDHKJuEw0G0o3Y1k
+         SEGbpexUuzsQcY/Bi96Pi+L5A3ykGVe3quuVDwt7hVTmZbYR7qG5XgLkkOH9s3YRWuPo
+         8BK7wFSBWZOJOR2l9fvRNAcoctJRaIWdkRi7hFNKAcX0+Egcjy4UootkNgG/YwoaJMkI
+         qPOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690472593; x=1691077393;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hEX2yXanu6lI6E29oJscX+qcEyz7+geVl0H0uFbsIWY=;
+        b=EZqvA40TmfZaIf8yZVCWxml7VMkPqOVmw7KqTTL0IsvMMmrzbHtcAe6xwqoWknceTm
+         ec7Otfyi2Cy9P4Keoqv3XU6thjYCYfW220h/zqdvsor5CQy2tz1lqScP3l7QZ2FbXJxV
+         5IDIJVnTSYsbv2IUnHoI+nwTTBlnqIAATFN1EvTZl2bWn2AwOqsBxK9S3HefHHFu1cN8
+         4U9h0EXcLYwG9e60dTn8XeKglaXHGTlQAZQDuvYI+JiVTjvt1eoYN9en7mAEUMPONjYS
+         5s6hzk6qpR+2TV6B1MCeRozudWR7isum9RcAiZfs0dQVAyi/+8MifPafHTpGuVOq2BoO
+         MNOA==
+X-Gm-Message-State: ABy/qLaVbzO/u340s2B2kuidwIDJRDqi8XZEQpFYDFs7Jy0DgKuRLaBp
+        tvJDM8hlTx5+UQQ6WfICq83W/v6NhLIw4uUEk2vOaw==
+X-Google-Smtp-Source: APBJJlGpR3oAOSauh2N1BylSzmAfP6iFM60UW3z8HrfrOSG1YRXj7cF+fMCUIZdImPCWGjSV53Y7DxtIkoaY2MsAyzI=
+X-Received: by 2002:a5d:6706:0:b0:315:a043:5e03 with SMTP id
+ o6-20020a5d6706000000b00315a0435e03mr2363865wru.55.1690472593068; Thu, 27 Jul
+ 2023 08:43:13 -0700 (PDT)
 MIME-Version: 1.0
-Date:   Thu, 27 Jul 2023 16:42:08 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: Re: [PATCH 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
-In-Reply-To: <0c26ba18-1d82-b9c0-3643-bd8e4d2f58f4@arm.com>
-References: <20230712145810.3864793-1-maz@kernel.org>
- <20230712145810.3864793-7-maz@kernel.org>
- <0c26ba18-1d82-b9c0-3643-bd8e4d2f58f4@arm.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <6e855aa9b49000edd555c75d206cc777@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 217.182.43.188
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, anshuman.khandual@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+References: <20230725150002.621-1-shameerali.kolothum.thodi@huawei.com>
+In-Reply-To: <20230725150002.621-1-shameerali.kolothum.thodi@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 27 Jul 2023 16:43:02 +0100
+Message-ID: <CAFEAcA_3+=m8nt6_eJMiEpxyGcSAXJRC5LWMVvU3f9CHAxKzCw@mail.gmail.com>
+Subject: Re: [RFC PATCH] arm/kvm: Enable support for KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, ricarkol@google.com,
+        kvm@vger.kernel.org, jonathan.cameron@huawei.com,
+        linuxarm@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -84,59 +67,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-07-19 12:00, Suzuki K Poulose wrote:
-> Hi Marc
-> 
-> On 12/07/2023 15:57, Marc Zyngier wrote:
->> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
->> related registers. Add their encodings (and only that, because
->> we really don't care about what these registers actually do at
->> this stage).
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>   arch/arm64/include/asm/sysreg.h | 78 
->> +++++++++++++++++++++++++++++++++
->>   1 file changed, 78 insertions(+)
->> 
->> diff --git a/arch/arm64/include/asm/sysreg.h 
->> b/arch/arm64/include/asm/sysreg.h
->> index 76289339b43b..9dfd127be55a 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -194,6 +194,84 @@
->>   #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
->>   #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
->>   +#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 
->> 2) | 0))
->> +#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)
->> +#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 
->> 2) | 1))
->> +#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)
->> +#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 
->> 2) | 2))
->> +#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)
->> +#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)
->> +
->> +#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)
->> +#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)
->> +#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)
->> +
-> 
-> Merge conflict alert. The above are being added as part of the BRBE
-> support series from Anshuman [0], though in a slightly different
-> scheme
-> for registers with numbers. e.g, SYS_BRBINF_EL1(0) vs SYS_BRBINF0_EL1.
-> That series is not merged yet, but might go in this cycle.
+On Tue, 25 Jul 2023 at 16:01, Shameer Kolothum
+<shameerali.kolothum.thodi@huawei.com> wrote:
+>
+> Now that we have Eager Page Split support added for ARM in the kernel[0],
+> enable it in Qemu. This adds,
+>  -eager-split-size to Qemu options to set the eager page split chunk size.
+>  -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
 
-Thanks for the heads up!
+It looks from the code like you've added a new sub-option
+to -accel, not a new global option. This is the right thing,
+but your commit message should document the actual option syntax
+to avoid confusion.
 
-I'm pretty confident that this will not conflict too badly, as the
-#defines are different. But I can always drag a prefix of Anshuman's
-series into the KVM tree and resolve it there.
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
+>
+> Notes:
+>  - I am not sure whether we need to call kvm_vm_check_extension() for
+>    KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE or not as kernel seems to disable
+>    eager page size by default and it will return zero always.
+>
+>   -ToDo: Update qemu-options.hx
+>
+> [0]: https://lore.kernel.org/all/168426111477.3193133.10748106199843780930.b4-ty@linux.dev/
 
-Cheers,
+Speaking of confusion, this message says "It's an optimization used
+in Google Cloud since 2016 on x86, and for the last couple of months
+on ARM." so I'm not sure why we've ended up with an Arm-specific
+KVM_CAP and code in target/arm/kvm.c rather than something more
+generic ?
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+If this is going to arrive for other architectures in the future
+we should probably think about whether some of this code should
+be generic, not arm-specific.
+
+Also this seems to be an obscure tuning parameter -- it could
+use good documentation so users have some idea when it can help.
+
+As a more specific case of that: the kernel patchset says it
+makes Arm do the same thing that x86 already does, and split
+the huge pages automatically based on use of the dirty log.
+If the kernel can do this automatically and we never felt
+the need to provide a manual tuning knob for x86, do we even
+need to expose the Arm manual control via QEMU?
+
+Other than that, I have a few minor coding things below.
+
+> +static bool kvm_arm_eager_split_size_valid(uint64_t req_size, uint32_t sizes)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < sizeof(uint32_t) * BITS_PER_BYTE; i++) {
+> +        if (!(sizes & (1 << i))) {
+> +            continue;
+> +        }
+> +
+> +        if (req_size == (1 << i)) {
+> +            return true;
+> +        }
+> +    }
+
+We know req_size is a power of 2 here, so if you also explicitly
+rule out 0 then you can do
+     return sizes & (1 << ctz64(req_size));
+rather than having to loop through. (Need to rule out 0
+because otherwise ctz64() returns 64 and the shift is UB.)
+
+> +
+> +    return false;
+> +}
+> +
+>  int kvm_arch_init(MachineState *ms, KVMState *s)
+>  {
+>      int ret = 0;
+> @@ -280,6 +298,21 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>          }
+>      }
+>
+> +    if (s->kvm_eager_split_size) {
+> +        uint32_t sizes;
+> +
+> +        sizes = kvm_vm_check_extension(s, KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES);
+> +        if (!sizes) {
+> +            error_report("Eager Page Split not supported on host");
+> +        } else if (!kvm_arm_eager_split_size_valid(s->kvm_eager_split_size,
+> +                                                   sizes)) {
+> +            error_report("Eager Page Split requested chunk size not valid");
+> +        } else if (kvm_vm_enable_cap(s, KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE, 0,
+> +                                     s->kvm_eager_split_size)) {
+> +            error_report("Failed to set Eager Page Split chunk size");
+> +        }
+> +    }
+> +
+>      kvm_arm_init_debug(s);
+>
+>      return ret;
+> @@ -1062,6 +1095,46 @@ bool kvm_arch_cpu_check_are_resettable(void)
+>      return true;
+>  }
+>
+> +static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +    uint64_t value = s->kvm_eager_split_size;
+> +
+> +    visit_type_size(v, name, &value, errp);
+> +}
+> +
+> +static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
+> +                                          const char *name, void *opaque,
+> +                                          Error **errp)
+> +{
+> +    KVMState *s = KVM_STATE(obj);
+> +    uint64_t value;
+> +
+> +    if (s->fd != -1) {
+> +        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
+> +        return;
+> +    }
+> +
+> +    if (!visit_type_size(v, name, &value, errp)) {
+> +        return;
+> +    }
+> +
+> +    if (value & (value - 1)) {
+
+"if (!is_power_of_2(value))" is a clearer way to write this.
+
+> +        error_setg(errp, "early-split-size must be a power of two.");
+> +        return;
+> +    }
+> +
+> +    s->kvm_eager_split_size = value;
+> +}
+> +
+>  void kvm_arch_accel_class_init(ObjectClass *oc)
+>  {
+> +    object_class_property_add(oc, "eager-split-size", "size",
+> +                              kvm_arch_get_eager_split_size,
+> +                              kvm_arch_set_eager_split_size, NULL, NULL);
+> +
+> +    object_class_property_set_description(oc, "eager-split-size",
+> +        "Configure Eager Page Split chunk size for hugepages. (default: 0, disabled)");
+>  }
+> --
+
+thanks
+-- PMM
