@@ -2,170 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C800765624
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 16:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 841FD765708
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 17:10:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbjG0OnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 10:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
+        id S234424AbjG0PK2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 11:10:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231339AbjG0OnI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 10:43:08 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97E49271F;
-        Thu, 27 Jul 2023 07:43:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nkR2LiVQOEvJIIaNwhbEdOg601rCh7Mgancil57tQuCn3XNn4pIBn4E8OO7y+Npy4iHDsCSD+uCq2FOycUsDbK6POD4eI/hRH7OJ+1CHxSGC0mUZypSTxELomz2mMXwtPHGlLi5gA64JWh1iEWXAJ+IEY6MyNiXK5npK+FQ9u/tJ97ibjj7pWA+F1NEMpfRoA04E3m9zc53/Fe3x0gZY4oWscSOILXQXzZg1fa7q66ui7ec1c6dh34gBS48kyGOWTyBEgECWnIfJbiQaa1ZXZw10onURWZt09C5oGA9EBGJ/XUrbgu21yG+94oXRPmwsViuLvX/GbU8+lNrS8IaB4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=urp2sM6/MOc9vQITmqHRR3ge1K3bYRAMuquvSoLP68w=;
- b=gjwaFDg57+1fRYZQ2NuzyIkO2ci4vWX/bXSpRDUI+a+IxEbdKiYrqtcC+pFSjRSPdP/ToGxPUx39yD/B1i8Nitv7uDn2Ng/VZHh6ESqHwtZ8gY9HNb4WTc+0uVwla+BaZfg+gwU9xOeTs95rQhn5AxX+Hrduz12Rn27Q/TesTpRd1JlNBYNdh0w7f8nC5JdUWrRvvRGuM7noXqBwrMQIDwHeHs98U9gkQNJ+huqE4TWmb770yV0U0rH9blAr1Ho0UeoDO6ogWnLpQSSYjBcSxYMo877mRb6PhtYSCy92pq1KcUmXgmqktPJfjuKmVXeEyH5CfQQkGFq5hH17jZr65g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=urp2sM6/MOc9vQITmqHRR3ge1K3bYRAMuquvSoLP68w=;
- b=TEybk1o0MLIkPqC/PLXJsTFQL5r0XihIMuZI/d6AbjID2jfpRH67adoNP7uHapF3A/qppPGEanBWHwqdfq0AwN/nl6z8QLWQoP8ndYQbPO6qz8vplI9S+apAMEbxjfdY/k/WM4qlCAiCds7gOR4Ks0HKa+x2ILtr6gSatZ3tZw5Cpkjuno1Tuu/MVw72T3Ay3Xe8nAdwemtrHRiTIm5L+lQuF5ntVlrxxxLNDT9eIcSrO2yzv4KXhOSo+2JAifykfLvGJIsr26rzUyabhcgBWHT2i6z8NjuRAPuvMn9TRjelbp+JrO8sfoLDQ2H7nRp1WE5WMFisG728cPus9qHWlw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5783.namprd12.prod.outlook.com (2603:10b6:510:1d2::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Thu, 27 Jul
- 2023 14:43:05 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.026; Thu, 27 Jul 2023
- 14:43:05 +0000
-Date:   Thu, 27 Jul 2023 11:43:03 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 2/4] iommu: Add new iommu op to get iommu hardware
- information
-Message-ID: <ZMKCd5S9VpNGf631@nvidia.com>
-References: <20230724105936.107042-1-yi.l.liu@intel.com>
- <20230724105936.107042-3-yi.l.liu@intel.com>
- <BN9PR11MB527625066E23A1C4968905D68C01A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527625066E23A1C4968905D68C01A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: YT3PR01CA0058.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:82::7) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S234278AbjG0PK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 11:10:26 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABA36FD;
+        Thu, 27 Jul 2023 08:10:25 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36RF3bT2011115;
+        Thu, 27 Jul 2023 15:10:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jYolTo5yzhUDm4bH36rF7ixNA0wJ58vXdRhnf1d7LFQ=;
+ b=p9enl8WXIn9Gfi/Feikvcn6Mm5cSLu5F1DD3VKIETqKPJC20fSv3g3uPVE1RpK52kqsE
+ 4qFXWkIkaDQ39XccOA3T+XwLmdPGsF9Bw6NZZxSnem9/HffQ3EHs3GYbkb6tmUUpCUOH
+ l+wolXl6ofvyNBXrYIhdNYLHr6tqWnRuTYfNWVl+MWMQYhWgCki8IUFaF7eNpkLGWekx
+ utzWRWwB9g9RriSS04HHRKzsqRWnsZ+0Wos/p8NXOjwotM5wI9La/IWZl2bpRvT3siIs
+ 3cX3g9KAVYe37HXMbpp0EMYIH6ye7968+HjJe9quahsZowxW0Ces3rd3so7hie9vlI1U mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3tw1rjae-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 15:10:23 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36RF4DN7014300;
+        Thu, 27 Jul 2023 15:08:39 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3tw1rd67-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 15:08:39 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36REXUfH002379;
+        Thu, 27 Jul 2023 15:07:34 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unjx2mv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 15:07:34 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36RF7V3i18678350
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jul 2023 15:07:31 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF5A420040;
+        Thu, 27 Jul 2023 15:07:31 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 845F12004B;
+        Thu, 27 Jul 2023 15:07:31 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Jul 2023 15:07:31 +0000 (GMT)
+Date:   Thu, 27 Jul 2023 17:02:23 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Steffen Eiden <seiden@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Michael Mueller <mimu@linux.vnet.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+Subject: Re: [PATCH 2/3] KVM: s390: Add UV feature negotiation
+Message-ID: <20230727170223.387c9cf6@p-imbrenda>
+In-Reply-To: <20230727122053.774473-3-seiden@linux.ibm.com>
+References: <20230727122053.774473-1-seiden@linux.ibm.com>
+        <20230727122053.774473-3-seiden@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5783:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6b74851-dec6-4dd0-09f4-08db8eafc959
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: upD4ceA9ZK33wxIgAgEa1zHNcYDxhSLL8G4DU7U2WKT3ifhbUzUqWk1FAbSMpfeS6/twMotuPL5eMaGZCzhdwyYJlwfQyXUMJVna65twbl1ORhzAlQyhEDS70VC+mEFYRqktNK3HflSBYoecL42Unss+2DDdvhIAyKqsDMFywdsyPcAuOoJLxjmXJb3VL+4paK2u7Xiyem7+dW4Q4ZIeHYvziC1AJgj5Q/tsNeYyyOOcPyFvMbDbOmbNRlmzggC8XmjqIoIIWU4jEWhMn2KTpjL2WVGm5oCR/2jAK4ti03q5RLadG0Eacw6oYQYyJYni53Bvo81/8mfLXxyiA9VPZ+d47IHJZc3ORc3tH2cCLgPvptzNxLqtO3C4LS7nRUAr5aXMRhGLoIhKe285DGYYqpdgOz8uBuL6faW5sFuUZBuKbfnrMsVRwpr3kbWRaKHXf5gcipWUmAkpkInizxOoC36kZ8KE7ZwUY2aOoYIqxlvgC88Dp7PJ3uQCVymlXLSIokbWcBo6hREjsnFF3QGHpePmchxi26wLjKsIhEtNGAFkGs9N3NhdV3QqanuHIZN7
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(39860400002)(376002)(396003)(451199021)(186003)(6512007)(6486002)(478600001)(54906003)(83380400001)(86362001)(6506007)(66476007)(316002)(2906002)(26005)(2616005)(41300700001)(4326008)(8936002)(66556008)(8676002)(66946007)(5660300002)(6916009)(36756003)(38100700002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KGve0Ce8hSfwG0NiqE3FGjH5jfb+24ov0TsZQxmTbpZ02aY+mAKdABN8BNRl?=
- =?us-ascii?Q?ZTY4gaIaeAaAmg40OJH4llIfDOdYxDh9gmzzJeTT0PooM+HGcjbAh0WjYVNP?=
- =?us-ascii?Q?Z8NkIj8piblPCfJlgYlBufm6UBh5SN/ueo+9/GFpec65TRln5wPxuIaP6EOM?=
- =?us-ascii?Q?e71GW86o0mK24QCTnv8mFd8xyWilKcqr6epND30nBpCmYomF8QshmRpII4iE?=
- =?us-ascii?Q?1DGGk9f5TNh2ZNceszwLxb75tby6FPpkofA8zbFzyZqZhcQzfLAmivE1ybWv?=
- =?us-ascii?Q?qoMb1QbxBIPbd2c1yr+i46DBI/Y8Euz6bUt7qfXLBoK4E32KQH2Xbky9WgTY?=
- =?us-ascii?Q?X03otjsmqVcQBf3h0kFM0k7+CxxYu6Lry3w/W9uuIbMyaPrPc7nF3EKVpVk/?=
- =?us-ascii?Q?4K+2S0HQ5zwMSaiYN0c5LpZW/843+ky2cGUWZ0AVyOlKhILPltMxGHB9X0bu?=
- =?us-ascii?Q?W1ZM2SkdnPNVh+hw2Ma+nr5f8RWrSa+A1uRJcESt9FPC74cHrE3yFLV8c/uS?=
- =?us-ascii?Q?VrdFnvBFEC3yqtoFJKj0oNK2Ku+jnOZ6HF+mNPb/aE7NPHx+WKHnDzWOso8O?=
- =?us-ascii?Q?IUxWxZhkPWz+c1N+IzZvukbTJUStl6OmQQxDTaZ1VF+vA3DZYHJnMrwMh0ii?=
- =?us-ascii?Q?jLrk7bY8NUakpZtUeh9EwoaU8NvDMvgFNUuJ1hSPNYHs8UARGHuPfvwaooSD?=
- =?us-ascii?Q?xWhZooJkX5L32GVC+68xjC15FlABDAwJu6ZymJZ2YeSu6s3kYwskvkh0Au/+?=
- =?us-ascii?Q?gVKrbTeHszNNJohPPMLqpczY7XuDD5KNR5DY9/DGWXLbfeJeVFHuTskzwz2d?=
- =?us-ascii?Q?hddw+LZ6W80Jvs1zigmNaQNfUZZ2crTNaDgi4zV/wV051W2Kgw3pjWzlrk40?=
- =?us-ascii?Q?sqWYXIdtA7ncbx5EDcWE1LfgVWCbpPlbcFq6O5KkLsYKMCsEOOoqMhNIZCrv?=
- =?us-ascii?Q?zPyx5rSiJmOF4wqiDxKoLr13Hug0ZJlOUwKHPBWm4KD8Zb4hZfYSNh/TNqM2?=
- =?us-ascii?Q?ulBqAhSCEnhwRa1eSb50hNcdr0W3X/slcO1BTW1HMDduZjZbWZ3WtM4tPhJv?=
- =?us-ascii?Q?gL+wTYfV7HrLRDt+ilUJnEgal7VSMyS/fdYi8gtaWmBW4/KuOT6bGt8ennpS?=
- =?us-ascii?Q?JCEVk4X5JFu7L9PQ/8sMO9iLHb6kSJ8LWdI1XBYdEILUv95w5ZLoUaq28gSA?=
- =?us-ascii?Q?EL7ybg3p4kp2mRwxVpz89SgW5aIRTnst+Kl0fDvjRMgCyZpHAajH8qhSacmN?=
- =?us-ascii?Q?Cirzj4CdEq2uZNRRcV3rLS1EnZTH0LASNTNYoda7oLDr5VyjmHw0dZKOqNC3?=
- =?us-ascii?Q?cMdd4J4TJlxlqlASG3hZZwAjSxGwiv8fm4geaQZ/gnPQ37YGLjJrE6OhrWtY?=
- =?us-ascii?Q?IocFIi8i3cYKqBKx0RPH21e3U08b2NnIdI6m3tR9osjF/VNRyJu4zM5SRQw3?=
- =?us-ascii?Q?5DNWt5in50LRziM06BJfmAu0P/qqF1RFMcHDPaP3uXMx+Mphgi35Dpg0P/KU?=
- =?us-ascii?Q?bdtA2yyGZK0lzH+HBUSVnKMq3Di1X68DMtXYVXffAzTafGDLNOY4aRnUPfMa?=
- =?us-ascii?Q?akvDB859oGJBX6ZrWkpHMGYKIfe41XRB49M1HzgQ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6b74851-dec6-4dd0-09f4-08db8eafc959
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2023 14:43:05.4362
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uKGQtzbhn39Ur9EVSGnYtWc9SJ2Tu0W0DSSagbXveHL6IVyGzReaQ1n+m624d1Mf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5783
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Qp5wO5ICRaUKx-8UkOufRRhXUiUZCbFr
+X-Proofpoint-GUID: R8xUXexyzwsrcU3CSVDKPnDU8XnJhPij
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_07,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 adultscore=0 spamscore=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307270135
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 07:57:57AM +0000, Tian, Kevin wrote:
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Monday, July 24, 2023 7:00 PM
-> > 
-> > @@ -252,11 +258,20 @@ struct iommu_iotlb_gather {
-> >   * @remove_dev_pasid: Remove any translation configurations of a specific
-> >   *                    pasid, so that any DMA transactions with this pasid
-> >   *                    will be blocked by the hardware.
-> > + * @hw_info_type: One of enum iommu_hw_info_type defined in
-> > + *                include/uapi/linux/iommufd.h. It is used to tag the type
-> > + *                of data returned by .hw_info callback. The drivers that
-> > + *                support .hw_info callback should define a unique type
-> > + *                in include/uapi/linux/iommufd.h. For the drivers that do
-> > + *                not implement .hw_info callback, this field is
-> > + *                IOMMU_HW_INFO_TYPE_NONE which is 0. Hence, such drivers
-> > + *                do not need to care this field.
+On Thu, 27 Jul 2023 14:20:52 +0200
+Steffen Eiden <seiden@linux.ibm.com> wrote:
+
+> Add a uv_feature list for pv-guests to the kvm cpu-model.
+> The feature bits 'AP-interpretation for secure guests' and
+> 'AP-interrupt for secure guests' are available.
 > 
-> every time looking at this field the same question came out why it is required
-> (and looks I forgot your previous response).
+> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h |  2 +
+>  arch/s390/include/uapi/asm/kvm.h | 24 +++++++++++
+>  arch/s390/kvm/kvm-s390.c         | 70 ++++++++++++++++++++++++++++++++
+>  3 files changed, 96 insertions(+)
 > 
-> e.g. why cannot the type be returned in @hw_info():
-> 
-> 	void *(*hw_info)(struct device *dev, u32 *length, int *type);
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 2bbc3d54959d..7ae57ac352b2 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -817,6 +817,8 @@ struct kvm_s390_cpu_model {
+>  	__u64 *fac_list;
+>  	u64 cpuid;
+>  	unsigned short ibc;
+> +	/* subset of available uv features for pv-guests enabled by user space */
+> +	struct kvm_s390_vm_cpu_uv_feat uv_feat_guest;
+>  };
+>  
+>  typedef int (*crypto_hook)(struct kvm_vcpu *vcpu);
+> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
+> index a73cf01a1606..7ea7e4fbd37e 100644
+> --- a/arch/s390/include/uapi/asm/kvm.h
+> +++ b/arch/s390/include/uapi/asm/kvm.h
+> @@ -159,6 +159,30 @@ struct kvm_s390_vm_cpu_subfunc {
+>  	__u8 reserved[1728];
+>  };
+>  
+> +#define KVM_S390_VM_CPU_PROCESSOR_UV_FEAT_GUEST	6
+> +#define KVM_S390_VM_CPU_MACHINE_UV_FEAT_GUEST	7
+> +
+> +#define KVM_S390_VM_CPU_UV_FEAT_NR_BITS	64
+> +struct kvm_s390_vm_cpu_uv_feat {
+> +	union {
+> +		struct {
+> +			__u64 res0 : 4;
+> +			__u64 ap : 1;		/* bit 4 */
+> +			__u64 ap_intr : 1;	/* bit 5 */
 
-u32 *type
- 
-> NULL callback implies IOMMU_HW_INFO_TYPE_NONE.
+I would put padding here for completeness, and maybe a static assert
+for the size of struct kvm_s390_vm_cpu_uv_feat
 
-If every one of these queries has its own type it makes sense
+> +		};
+> +		__u64 feat;
+> +	};
+> +};
+> +
+> +#define KVM_S390_VM_CPU_UV_FEAT_GUEST_MASK \
+> +(((struct kvm_s390_vm_cpu_uv_feat) {	\
+> +	.ap = 1,		\
+> +	.ap_intr = 1,		\
+> +}).feat)
 
-Though, is it not possible that we can have a type for the entire
-driver?
+please indent the body of the macro, and add tabs on the right so that
+the \ are aligned
 
-Jason
+> +
+> +#define KVM_S390_VM_CPU_UV_FEAT_GUEST_DEFAULT \
+> +((struct kvm_s390_vm_cpu_uv_feat) { })
+
+please indent the body of the macro
+
+> +
+>  /* kvm attributes for crypto */
+>  #define KVM_S390_VM_CRYPTO_ENABLE_AES_KW	0
+>  #define KVM_S390_VM_CRYPTO_ENABLE_DEA_KW	1
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 339e3190f6dc..50c8b85b89ac 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1531,6 +1531,32 @@ static int kvm_s390_set_processor_subfunc(struct kvm *kvm,
+>  	return 0;
+>  }
+>  
+> +static int kvm_s390_set_uv_feat(struct kvm *kvm, struct kvm_device_attr *attr)
+> +{
+> +	struct kvm_s390_vm_cpu_uv_feat data = {};
+> +	unsigned long filter =
+> +		uv_info.uv_feature_indications &
+
+I think this can go in the previous line?
+
+> +		(unsigned long)KVM_S390_VM_CPU_UV_FEAT_GUEST_MASK;
+
+the cast is not necessary
+
+without the cast the whole thing can fit in one line
+
+> +
+> +	if (copy_from_user(&data, (void __user *)attr->addr, sizeof(data)))
+> +		return -EFAULT;
+> +	if (!bitmap_subset((unsigned long *)&data, &filter,
+> +			   KVM_S390_VM_CPU_UV_FEAT_NR_BITS))
+
+this also fits in one line :)
+
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +	if (kvm->created_vcpus) {
+> +		mutex_unlock(&kvm->lock);
+> +		return -EBUSY;
+> +	}
+> +	kvm->arch.model.uv_feat_guest = data;
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	VM_EVENT(kvm, 3, "SET: guest uv feat: 0x%16.16llx", data.feat);
+> +
+> +	return 0;
+> +}
+> +
+>  static int kvm_s390_set_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
+>  {
+>  	int ret = -ENXIO;
+> @@ -1545,6 +1571,9 @@ static int kvm_s390_set_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
+>  	case KVM_S390_VM_CPU_PROCESSOR_SUBFUNC:
+>  		ret = kvm_s390_set_processor_subfunc(kvm, attr);
+>  		break;
+> +	case KVM_S390_VM_CPU_PROCESSOR_UV_FEAT_GUEST:
+> +		ret = kvm_s390_set_uv_feat(kvm, attr);
+> +		break;
+>  	}
+>  	return ret;
+>  }
+> @@ -1777,6 +1806,37 @@ static int kvm_s390_get_machine_subfunc(struct kvm *kvm,
+>  	return 0;
+>  }
+>  
+> +static int kvm_s390_get_processor_uv_feat(struct kvm *kvm,
+> +					  struct kvm_device_attr *attr)
+> +{
+> +	struct kvm_s390_vm_cpu_uv_feat *src = &kvm->arch.model.uv_feat_guest;
+> +
+> +	if (copy_to_user((void __user *)attr->addr, src, sizeof(*src)))
+> +		return -EFAULT;
+> +	VM_EVENT(kvm, 3, "GET: guest  uv feat: 0x%16.16llx",
+> +		 kvm->arch.model.uv_feat_guest.feat);
+
+this can actually fit in one line
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_s390_get_machine_uv_feat(struct kvm *kvm,
+> +					struct kvm_device_attr *attr)
+> +{
+> +	struct kvm_s390_vm_cpu_uv_feat data = {
+> +		.feat = uv_info.uv_feature_indications &
+> +			KVM_S390_VM_CPU_UV_FEAT_GUEST_MASK
+
+this can fit in one line
+
+> +	};
+> +
+> +	BUILD_BUG_ON(sizeof(struct kvm_s390_vm_cpu_uv_feat) !=
+> +		     sizeof(uv_info.uv_feature_indications));
+> +	if (copy_to_user((void __user *)attr->addr, &data,
+> +			 sizeof(struct kvm_s390_vm_cpu_uv_feat)))
+
+why not sizeof(data) ?
+
+(also, it can fit in one line)
+
+> +		return -EFAULT;
+> +	VM_EVENT(kvm, 3, "GET: guest  uv feat: 0x%16.16llx", data.feat);
+> +
+> +	return 0;
+> +}
+> +
+>  static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
+>  {
+>  	int ret = -ENXIO;
+> @@ -1800,6 +1860,12 @@ static int kvm_s390_get_cpu_model(struct kvm *kvm, struct kvm_device_attr *attr)
+>  	case KVM_S390_VM_CPU_MACHINE_SUBFUNC:
+>  		ret = kvm_s390_get_machine_subfunc(kvm, attr);
+>  		break;
+> +	case KVM_S390_VM_CPU_PROCESSOR_UV_FEAT_GUEST:
+> +		ret = kvm_s390_get_processor_uv_feat(kvm, attr);
+> +		break;
+> +	case KVM_S390_VM_CPU_MACHINE_UV_FEAT_GUEST:
+> +		ret = kvm_s390_get_machine_uv_feat(kvm, attr);
+> +		break;
+>  	}
+>  	return ret;
+>  }
+> @@ -1952,6 +2018,8 @@ static int kvm_s390_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>  		case KVM_S390_VM_CPU_MACHINE_FEAT:
+>  		case KVM_S390_VM_CPU_MACHINE_SUBFUNC:
+>  		case KVM_S390_VM_CPU_PROCESSOR_SUBFUNC:
+> +		case KVM_S390_VM_CPU_MACHINE_UV_FEAT_GUEST:
+> +		case KVM_S390_VM_CPU_PROCESSOR_UV_FEAT_GUEST:
+>  			ret = 0;
+>  			break;
+>  		default:
+> @@ -3292,6 +3360,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm->arch.model.cpuid = kvm_s390_get_initial_cpuid();
+>  	kvm->arch.model.ibc = sclp.ibc & 0x0fff;
+>  
+> +	kvm->arch.model.uv_feat_guest = KVM_S390_VM_CPU_UV_FEAT_GUEST_DEFAULT;
+> +
+>  	kvm_s390_crypto_init(kvm);
+>  
+>  	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)) {
+
