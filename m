@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F1E97648F4
-	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 09:40:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D5AA7648F6
+	for <lists+kvm@lfdr.de>; Thu, 27 Jul 2023 09:40:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231460AbjG0Hj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jul 2023 03:39:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
+        id S231215AbjG0HkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jul 2023 03:40:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232716AbjG0Hjk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jul 2023 03:39:40 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880A5F5
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 00:31:51 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-686b879f605so447454b3a.1
-        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 00:31:51 -0700 (PDT)
+        with ESMTP id S232816AbjG0Hjm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jul 2023 03:39:42 -0400
+Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0567D3C21
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 00:31:55 -0700 (PDT)
+Received: by mail-oo1-xc34.google.com with SMTP id 006d021491bc7-56584266c41so505797eaf.2
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 00:31:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1690443111; x=1691047911;
+        d=daynix-com.20221208.gappssmtp.com; s=20221208; t=1690443113; x=1691047913;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=26LP4jR8UCRhJyh1M0qdx1yDCFp8JOR+j4jZMhaZd5Y=;
-        b=FMXUAO4Yoxbd/c3ZDAJO2Eft2gOvbLIXf4hOBH5Dj9DW3gt3d58iYHeQbhg3l1Hpmg
-         I19AscWEwJNXso/G1WZ6tivdoRArUDtLLbJ6rH6XmR1/n+H4xd7fhr11URWhGi2HuOoM
-         YRIhUGNyDTY6U/j1ShMhaPgpHYqhrjN5joKZ+zuJf4vgAeLVFubAD1fgso1+zLlpEBIl
-         aQP0NIhtn5cgY5kVQCeKUcrAVL5klU7kvwre68iLoq9uUIhKDR+roXkSeTWsG2Nj05w3
-         m2v2Gg9ffatEkLhmzvEW8yEulbHU6UGF2Novf97q8cExbXPUMqDh0NstuyISfzWG1n6w
-         OJdQ==
+        bh=WUXy3jNQsy5PFGPCh7DZInihQgiJWpSfcmP70S5aNLc=;
+        b=ErRkuXIDzI8EHN9RJalhLqdArv/g31OAVXPGZTxhgwm4bIExhwd4UPvDSRIJztk0ij
+         8dWy86F8eEhs10cJ1ENhkeakq42mIoofDOZdQOKp1dEds0/JRCqiJ6HhOsJMRH/UQnvu
+         XZ3bA41tzhxdLnEh+dDQKRh2JsZUz6k7Ciz62r5xlvsrQU86dTcuykBVsw2e58Qcwso8
+         oeC7DWP3Eel+hhwJofaR9D77yQAaLpOYeISbfXP02vDpcNchsJN0ZtkS9B/TzAEhitnB
+         vv0Vtdgo+pg0o+ZyyM+7Ds0RSgM1M0+ZdxfW0PJGJ0PUhPfSAH1XNeC+9zU3Pp0HHl/8
+         hjXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690443111; x=1691047911;
+        d=1e100.net; s=20221208; t=1690443113; x=1691047913;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=26LP4jR8UCRhJyh1M0qdx1yDCFp8JOR+j4jZMhaZd5Y=;
-        b=Bc/N2wiUW2glADLdfoX67hIqoX2Isf1tuNiifVvCXcvuA8kkbbA8/wVd/el4w5sxew
-         XURrR12mqU7WnQxKeNf+sbdLubKiVtI1MHLBFiLVf01ZDt5y9ygw+31R60MqyhlJGnBo
-         ndyOi2eSd/0tb0HYKzIZt4H4aWDN3obDaS3J1G/Ake1zXpO6kzK1MiJsJyYRKy01Ejkc
-         +kFN2bqpv/2YA5BxwCtcJWELGkJV2STPxYwVX39bBj4tLU58CUBRBNYogA5AR1kNTSKe
-         W1vidJ+boJFC9v/ezQtPHtrxP5Ykqfb6eOZymzG8BdmGpgmlhReDu6DsVVtkKf6/N35J
-         hZSw==
-X-Gm-Message-State: ABy/qLYhXBEsvtIjuB8YA09qlpraHmt3bDV3ckfNLpLOvoBa06IkzHZJ
-        hQxoKqxr3fKlvPhQnjudoDMY5g==
-X-Google-Smtp-Source: APBJJlF9vyB/rMKDG8kcKzWzhp8EQUmef9v7mW4IywNdEUOM/7FJYAMVAQcRxxvO32/savSwOQjPaA==
-X-Received: by 2002:a05:6a20:1610:b0:137:53d1:3e2 with SMTP id l16-20020a056a20161000b0013753d103e2mr4116444pzj.41.1690443111088;
-        Thu, 27 Jul 2023 00:31:51 -0700 (PDT)
+        bh=WUXy3jNQsy5PFGPCh7DZInihQgiJWpSfcmP70S5aNLc=;
+        b=lVPdrmr7+KxOVbs9cmGPbov09roP9fdL4s60nShCfv63jcOv15Lfov6u4qU7bNdmOW
+         7R2tTZWLKE1x7suhCmTfjtTmFsc/QvevpedJmb3yek3o/s2ZrckxaZDpZMnV3jLeqU1z
+         Xk5dkGQRrlkdL7ohYwDwjfWmKynMfjyj0egjEjv+vOP9mtl0ePA/ONg5AOJGIMmSdXov
+         PTJZk8dgzVFJhp36psBApAjxiEbap4U0gxrXL+2Yh4Q+eJmjVwkSws1GzcbT45UPTjo+
+         Gz38tTiHLNsjBTTwT9tzb/Gw9QgOjN9kIC6urqr8is2UAzWStBWncDV7wwWHCBYDOVdF
+         kCuw==
+X-Gm-Message-State: ABy/qLZYXkN6MGnKdCnBP95CnCJEf1eZtTg8dRtu8EVI27Krp+p/+gfa
+        2yKfd1Z3w5ZsGZpGlqd50E8GMA==
+X-Google-Smtp-Source: APBJJlFEta7887wC+EH2MCZzxvk/JmjxY935l/UatI0IUcVcQUEaVDafFfiot8/j0cB4J/3Md+iDSQ==
+X-Received: by 2002:a05:6358:e4a7:b0:135:a52c:1d93 with SMTP id by39-20020a056358e4a700b00135a52c1d93mr1995699rwb.28.1690443113170;
+        Thu, 27 Jul 2023 00:31:53 -0700 (PDT)
 Received: from alarm.flets-east.jp ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id d9-20020aa78689000000b0064fa2fdfa9esm802002pfo.81.2023.07.27.00.31.49
+        by smtp.gmail.com with ESMTPSA id d9-20020aa78689000000b0064fa2fdfa9esm802002pfo.81.2023.07.27.00.31.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jul 2023 00:31:50 -0700 (PDT)
+        Thu, 27 Jul 2023 00:31:52 -0700 (PDT)
 From:   Akihiko Odaki <akihiko.odaki@daynix.com>
 Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Peter Maydell <peter.maydell@linaro.org>,
         Richard Henderson <richard.henderson@linaro.org>,
         Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v5 3/6] mips: Report an error when KVM_VM_MIPS_VZ is unavailable
-Date:   Thu, 27 Jul 2023 16:31:28 +0900
-Message-ID: <20230727073134.134102-4-akihiko.odaki@daynix.com>
+Subject: [PATCH v5 4/6] accel/kvm: Use negative KVM type for error propagation
+Date:   Thu, 27 Jul 2023 16:31:29 +0900
+Message-ID: <20230727073134.134102-5-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230727073134.134102-1-akihiko.odaki@daynix.com>
 References: <20230727073134.134102-1-akihiko.odaki@daynix.com>
@@ -73,27 +73,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On MIPS, QEMU requires KVM_VM_MIPS_VZ type for KVM. Report an error in
-such a case as other architectures do when an error occurred during KVM
-type decision.
+On MIPS, kvm_arch_get_default_type() returns a negative value when an
+error occurred so handle the case. Also, let other machines return
+negative values when errors occur and declare returning a negative
+value as the correct way to propagate an error that happened when
+determining KVM type.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- target/mips/kvm.c | 1 +
- 1 file changed, 1 insertion(+)
+ accel/kvm/kvm-all.c | 5 +++++
+ hw/arm/virt.c       | 2 +-
+ hw/ppc/spapr.c      | 2 +-
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index e98aad01bd..e22e24ed97 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -1278,6 +1278,7 @@ int kvm_arch_get_default_type(MachineState *machine)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index d591b5079c..94a62efa3c 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2527,6 +2527,11 @@ static int kvm_init(MachineState *ms)
+         type = kvm_arch_get_default_type(ms);
      }
- #endif
  
-+    error_report("KVM_VM_MIPS_VZ type is not available");
-     return -1;
++    if (type < 0) {
++        ret = -EINVAL;
++        goto err;
++    }
++
+     do {
+         ret = kvm_ioctl(s, KVM_CREATE_VM, type);
+     } while (ret == -EINTR);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 8a4c663735..161f3ffbf7 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2977,7 +2977,7 @@ static int virt_kvm_type(MachineState *ms, const char *type_str)
+                      "require an IPA range (%d bits) larger than "
+                      "the one supported by the host (%d bits)",
+                      requested_pa_size, max_vm_pa_size);
+-        exit(1);
++        return -1;
+     }
+     /*
+      * We return the requested PA log size, unless KVM only supports
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 54dbfd7fe9..1b522e8e40 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3104,7 +3104,7 @@ static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+     }
+ 
+     error_report("Unknown kvm-type specified '%s'", vm_type);
+-    exit(1);
++    return -1;
  }
  
+ /*
 -- 
 2.41.0
 
