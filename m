@@ -2,132 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A64C1767315
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 19:16:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78C8C76732F
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 19:23:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231279AbjG1RQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 13:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
+        id S231135AbjG1RXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 13:23:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbjG1RQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 13:16:56 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2048.outbound.protection.outlook.com [40.107.237.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A870B5;
-        Fri, 28 Jul 2023 10:16:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bzwNQXy23fOw5ThNtRLTCQ3/l/rEhjcLEL6409nMbsWeY7iYUFIMkGMI9rjYEFo3YEIUomkoSgLiJ9zSPFu49ovH0ZLY7hR9mAdhj5k69OIWbRWdcDJ+PbdeHvW6BuAdX+WqBUcO5quUCiWDh9akSfcnQJmZhzXN9pU3TOZ3WpqvtslNsZVmUA0HALkg8tTJOF6sDLjQUnWmrRuRfed4vUzngCUQn7yvb7f/bGpZcFE9K2XS6+deolOv/4Y+7u0kThk0im1SFvFyvOoBBvy1r+F+I6K3YfLtoPy8f7mI59Au9yayIcG0tT9ByysScFAs5vVoGqb5LrZb/6sLecH3lQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xo+rL2FRDTJ6JU+Q+po61nE7D30fa0gmXmKP4dKN6Gs=;
- b=YqeQPI5aMw5X+w/U2J5S6EOQQDKJKcEPUy1jnT25lDWaPiSAtxzKt++Jo6ds04wzOAFp4H6G53o2IXYRiw8dApQ0DXbXMET+bFuGcTPvdvaCAhulb9A31nGu2fKthBbMkZebqsJ+rh/i5dmXYoj9MxXywrvBlQDLctQxLNWzT9LwzFTkXnc7qZJcQ/odIgqtp+afntQO/SGao7dkO0R6rmz4MCpIUgkFKp/k5jllbidS0hfSMOzf27CxzemYDyb8Cp0EyR9UQM1zi5tKP6WtI3kQF9DBRJb6VENC49kAkH1LObU9HjMqecH/8UgHO8ZC6m2I+DsjDqXkcDpwKyLx4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xo+rL2FRDTJ6JU+Q+po61nE7D30fa0gmXmKP4dKN6Gs=;
- b=fDlWd5LjgRzsZV8YgUN+mmjHDDBrQLK4+piJ+qvdVJGnL0BTizoU6aHVQMO3514nZhTgdFyCANnek7uQjEIv/mko+phFKD+Og3q0aTvjZ1FrqxH0VBW//bvq+GlP9lvcBDs0XD92EIUvkpgo1hmNUcpHClxLXIATK3m/OYX6PG/nsNWVM9/S3glG2Mq77SLcKqTskvPhEzxgfsmhhw+Nr7+EpFVeQSjQlI1pUIrEMKPifpnMqV7f9DE4z8h7JirYot0PFtJTni1AU1XjSLxDN4wyuu07UHjxgqkHcRCgoUYbP2XMkdexdhjJJMVBQsc8LIPWESq90BffSdM6CE44ig==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW3PR12MB4539.namprd12.prod.outlook.com (2603:10b6:303:59::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
- 2023 17:16:52 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.034; Fri, 28 Jul 2023
- 17:16:52 +0000
-Date:   Fri, 28 Jul 2023 14:16:50 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v3 07/17] iommufd: Add IOMMU_RESV_IOVA_RANGES
-Message-ID: <ZMP4AhdE6RaXXgZH@nvidia.com>
-References: <20230724110406.107212-1-yi.l.liu@intel.com>
- <20230724110406.107212-8-yi.l.liu@intel.com>
- <BN9PR11MB5276AAD6B3785DC247E4F35F8C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276AAD6B3785DC247E4F35F8C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: CH2PR14CA0042.namprd14.prod.outlook.com
- (2603:10b6:610:56::22) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230157AbjG1RXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 13:23:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BECFC
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 10:22:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690564972;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IKJRceVcUKrNQDrK7aoEas9zsEEXxPktnwifXagrkq4=;
+        b=VtlD2SphDE2pOfPYBcCaogfZG6G1Kf3ypAtuChR4ErUo7CEFTgXEkPkADsbAaRpzCJDHZd
+        W1R3OyxisTCjNybag5DXW9qcLEzPfA7ZShnvbwJxNa7H9QQ8d2ouaajVGygvrY6TbXHRWi
+        +jk2iZwc0ClAvxBT7FGjZBAYBZMVfFQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-Z809lyK2PZ2FsvYmbKPRPw-1; Fri, 28 Jul 2023 13:22:49 -0400
+X-MC-Unique: Z809lyK2PZ2FsvYmbKPRPw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-317421b94a4so1167498f8f.3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 10:22:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690564968; x=1691169768;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IKJRceVcUKrNQDrK7aoEas9zsEEXxPktnwifXagrkq4=;
+        b=WTGHg6W0+TFXrNRRX00sf6KgtDsdEe/JhmE2Dky1IRKTDZOMge5dotyvWgExtZaiHJ
+         tmotCraVyB9IFcs+t0J+J/EMdcQq9HgbEFwUWfmmpolvOJ8VOpgxx1V8HtPn5UEjibPT
+         qGhjLX0ZbR0XWBUHdeUTCU0zU/YSzzh4+WGy5Jtpgz813mNzFjBlrIkZj00zPy/FH8vh
+         iDEV5MFSaGqF/Zh5y0Gb+qVR13hnXSsxbJDnsPc2fLU/9SPdYHShcHZcUoPJvp7Czuzf
+         od5Ou2DveVwEle4+VGeiuc3Amlgg4M4wuJhJdEd4L3/JFAFVKu5TZlk95ul4BFhyZotv
+         QqMg==
+X-Gm-Message-State: ABy/qLYA1+fNtPPEeN6kwqz6h0RdfbcFTYNLZMqCo33LSRW65mFdcl0R
+        2ec0kNQ9nZ0Sed8rQA3M+TZN4DdnJp2//S6mEYM6qNw35Q5RVov8UZ7bhHwUS0EhcT6gI6kskZc
+        UFa2mE6NIyIxY
+X-Received: by 2002:a05:6000:cd:b0:313:f399:6cea with SMTP id q13-20020a05600000cd00b00313f3996ceamr2397520wrx.4.1690564968179;
+        Fri, 28 Jul 2023 10:22:48 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFfjDcEL2bxwzWB0WuuKEw2SMYRtpbPpJIjJe51Xa171Bn6C8SOHMg3uxabkTC9j/2+shDEdA==
+X-Received: by 2002:a05:6000:cd:b0:313:f399:6cea with SMTP id q13-20020a05600000cd00b00313f3996ceamr2397500wrx.4.1690564967791;
+        Fri, 28 Jul 2023 10:22:47 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:368:50e0:e390:42c6:ce16:9d04? ([2a01:e0a:368:50e0:e390:42c6:ce16:9d04])
+        by smtp.gmail.com with ESMTPSA id r5-20020a056000014500b00314367cf43asm5244845wrx.106.2023.07.28.10.22.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jul 2023 10:22:46 -0700 (PDT)
+Message-ID: <33b99895-8727-756f-549b-3ee6b751b691@redhat.com>
+Date:   Fri, 28 Jul 2023 19:22:45 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW3PR12MB4539:EE_
-X-MS-Office365-Filtering-Correlation-Id: b38f3ec5-d54a-4480-2e11-08db8f8e6faa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LB35rtaFvGlc4dxvQ53xX8h2O2i80DJZd5mQ/Mx/PYPjkTPPZjVpHkNzTB6795y8vonoAU0wPlWmN1zmrm5oRTr1+5894oBMsYVOyzu+kK5bCEW1mGcbZqDmdjGV21V6RVQfv4L266kfcgn01UcsQDrn/9PP3q4YjjKcE+73cyq1E3ybshUZpnw5DWiqC+zCtwUohuwO7HvwCV72wIQJcFH/bBTovILOVEm+ckqnLwNLKsFN/GTr/vn/Ew4+2EHomiTUFtHpDT28HthoOFbVTXPRruG6Je5mWxJck1clzg3p13McLcxNCTBoTGIHXOJS5qS2k6OANQjBxMpq+l/jO7Fp2iVj2/nCMa1JZKoEg2j5rjk0sDt2POFm90Kkkxf+xGNcu0qQQDobzMj4VbqPIa+StFWiLnE4FAhTBAXf79uQ7/yVPANTTNenpBJlwku2qkvId8xyex+5jfPDvTFsb+lgmgqakS1bYkYEGWiRjEz5W6+hYN3b+04i6OaYwzI94ldpLHYDht9A2irw2SnPifdCSKmCAY3dlFlAvidZBPrULzScbBm6FK6MHzz9imLL
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(39860400002)(136003)(346002)(396003)(451199021)(316002)(26005)(8936002)(6506007)(41300700001)(66556008)(54906003)(4326008)(66476007)(66946007)(6916009)(6512007)(478600001)(8676002)(6486002)(38100700002)(36756003)(2616005)(2906002)(86362001)(186003)(5660300002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZqqAeMdpB3hxnoSlVlejJ40ANiXyRXDxjpUMr21qN1jUkGZHQCGARqxec932?=
- =?us-ascii?Q?4rUREIu+bdTW7eaTYf6K8FqtOBPWoD5w2hhbq0+pM2DvGFc/RGn0EOD3GZGz?=
- =?us-ascii?Q?JBYMBiFjUotuqXlz4AQeceSGRiGnZ8hoT72QViDO2AwuuHtxmR8OS7LclNa+?=
- =?us-ascii?Q?FH4JOqlvBitEN5EL6ZmITeGvYZSFub9p5yjdyVU7ClxqU3AAb4OScKElUah6?=
- =?us-ascii?Q?an1zs1fwJ4oTA2cvUkgifcTlzKPMPFmjj6pn+sXAuGJpWZulGX8p86F7Xb0c?=
- =?us-ascii?Q?oM4yerSUkYToW0rvmGltS5IE3mM+DJBA8uDqXHdkbVG5fsNSHppAYE5t3iqW?=
- =?us-ascii?Q?DwivSroCm6X6QrWddmJyT/tmVY/T1Xq+FjN4tWlPoDMDzsV7fammwMfkLV47?=
- =?us-ascii?Q?ydcFEvRE2+vVTImlpVcQUXs6aWcIZJ+k1wtUlxJKBHv0WrEUq3/eIAiEc/oy?=
- =?us-ascii?Q?mgwO8d8b0+dQPRXpZmTQawCqK2VWoqx8QQS97eQ9hI58Gt4s33JGC+fUrefm?=
- =?us-ascii?Q?V1tw3O+UKHLxVrmx2ab5xdI2KypfwK4JGOwwHkjYE5sAL+ZC/a+5pyj45BbQ?=
- =?us-ascii?Q?65dX/I3fNhtEE0T42KpQP/OVXTGzC2zGBBRGXwXUe7iNT/w6Cm35OWTSoQqC?=
- =?us-ascii?Q?ls+t5SA1RGzFM6ZmfrjGB0YskHOcuWelUKgdrIYlm/o9uDnI4WJUjw5CZOKy?=
- =?us-ascii?Q?dCsULCvO+Vs0nlIvgnMbFixrWtKLT5kFnQlh/K20MJmPFcmZu+PneE9BkTkV?=
- =?us-ascii?Q?3ZbrZSZmVKYp9VlZztFuCu2nl5oCnI60IDDR4E99uhEvbAuQxTZOVlQqT2d2?=
- =?us-ascii?Q?BGxOSh0Mqof+v//K54+GEFJyEY7dPpwMdhu5ttB453fpJYQ4PutaUGUFjTxr?=
- =?us-ascii?Q?EDcQ38xOqjVLUwxtdOkCWAMDS9fjWOs6JzPNspUtg8Usj7TQGZJWOQMjkPkH?=
- =?us-ascii?Q?3eMMP5qf5PhsH+5Sz/oihBh+RFQQ1xRl+xjkxyHVjQlL1KjuqtZy393ld95e?=
- =?us-ascii?Q?+8sVPwHIkE134r5KcyUe2dV1GZ+XJd1HxlCjmEZLUlw8Uall7CjuI7fqlD1I?=
- =?us-ascii?Q?K7Zg75vww4gkuxhf7FV62+hKb9+cBbMZScI6lmnHCfCyncX86g7MRAHKNK6H?=
- =?us-ascii?Q?dLeMiCmtWu//ikmpnAPluA2sEjl53DQ767juutmS0u6Dq5JrMpPlD/YiUc/0?=
- =?us-ascii?Q?L4DvHg5BZf1Hu5C+3GnNhJJM5G0oWCnoCqDT8Udbje+9t2tMbvrCdPpAhCWT?=
- =?us-ascii?Q?72zI3l3CtIGH3VmfiwCL3HQ79VfLzBEwdptf0ZhBqE5ju7ruhfnubSiJtc39?=
- =?us-ascii?Q?oh4Vh873KZYyH8c2H8Os05DgbDheBQgCPSKkLwhUjR2Zfn6K59sqsM9qjgB1?=
- =?us-ascii?Q?FtpKXNpoX2XfdF9GcSh/vrK76XYzbmDOW2awjjy19Qmqlv3+QVO7vyK05p1O?=
- =?us-ascii?Q?g62F10dU8dLRiFZUEq1B3eFP6+QPG0N0AIw3135SqMcfQCHfauFN4znlgvFv?=
- =?us-ascii?Q?vit1xq+oDABV9rSsJloGKeOC36B6TsWYiH+MoDs+OKd3QNV9ZHYnGBY7X3EH?=
- =?us-ascii?Q?BgDnKhJRUyglS41aKQLw9VVg/CrGAdu0FX7iv0dP?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b38f3ec5-d54a-4480-2e11-08db8f8e6faa
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 17:16:52.7280
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gql+hcNuQ1MElFkPsAYyrzhqGCw4NcGUBpOtLfRcc8snw3KcxN+fz5LEQEdhZK0u
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4539
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 14/27] KVM: arm64: Restructure FGT register switching
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230712145810.3864793-1-maz@kernel.org>
+ <20230712145810.3864793-15-maz@kernel.org>
+ <fd0d93ae-1ae5-b53e-ccb7-04d78f7c31d9@redhat.com>
+ <87y1j3qgpu.wl-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <87y1j3qgpu.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -135,30 +101,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 10:07:58AM +0000, Tian, Kevin wrote:
-> > From: Liu, Yi L <yi.l.liu@intel.com>
-> > Sent: Monday, July 24, 2023 7:04 PM
-> > 
-> > This reports device's reserved IOVA regions to userspace. This is needed
-> > in the nested translation as userspace owns stage-1 HWPT, and userspace
-> > needs to exclude the reserved IOVA regions in the stage-1 HWPT hence
-> > exclude
-> > them in the device's DMA address space.
-> > 
-> > This can also be used to figure out allowed IOVAs of an IOAS.
-> 
-> We may need a special type to mark SW_MSI since it requires identity
-> mapping in stage-1 instead of being reserved.
+Hi Marc,
 
-Only the kernel can do this, so there is no action for user space to
-take beyond knowing that is is not mappable IOVA.
+On 7/26/23 09:23, Marc Zyngier wrote:
+> On Tue, 25 Jul 2023 17:39:52 +0100,
+> Eric Auger <eric.auger@redhat.com> wrote:
+>> Hi Marc,
+>>
+>> On 7/12/23 16:57, Marc Zyngier wrote:
+>>> As we're about to majorly extend the handling of FGT registers,
+>>> restructure the code to actually save/restore the registers
+>>> as required. This is made easy thanks to the previous addition
+>>> of the EL2 registers, allowing us to use the host context for
+>>> this purpose.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
+>>>  arch/arm64/kvm/hyp/include/hyp/switch.h | 55 +++++++++++++------------
+>>>  2 files changed, 49 insertions(+), 27 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>>> index 028049b147df..85908aa18908 100644
+>>> --- a/arch/arm64/include/asm/kvm_arm.h
+>>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>>> @@ -333,6 +333,27 @@
+>>>  				 BIT(18) |		\
+>>>  				 GENMASK(16, 15))
+>>>  
+>>> +/*
+>>> + * FGT register definitions
+>>> + *
+>>> + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
+>>> + * We're not using the generated masks as they are usually ahead of
+>>> + * the published ARM ARM, which we use as a reference.
+>>> + *
+>>> + * Once we get to a point where the two describe the same thing, we'll
+>>> + * merge the definitions. One day.
+>>> + */
+>>> +#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
+>>> +#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
+>>> +#define __HFGRTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
+>>> +
+>>> +#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
+>>> +				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
+>>> +				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
+>>> +				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
+>>> +#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
+>>> +#define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
+>>> +
+>>>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>>>  #define HPFAR_MASK	(~UL(0xf))
+>>>  /*
+>>> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+>>> index 4bddb8541bec..9781e79a5127 100644
+>>> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+>>> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+>>> @@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>>>  	}
+>>>  }
+>>>  
+>>> -static inline bool __hfgxtr_traps_required(void)
+>>> -{
+>>> -	if (cpus_have_final_cap(ARM64_SME))
+>>> -		return true;
+>>> -
+>>> -	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+>>> -		return true;
+>>>  
+>>> -	return false;
+>>> -}
+>>>  
+>>> -static inline void __activate_traps_hfgxtr(void)
+>>> +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>>>  {
+>>> +	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+>>>  	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
+>>> +	u64 r_val, w_val;
+>>> +
+>>> +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+>>> +		return;
+>>> +
+>>> +	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
+>>> +	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
+>>>  
+>>>  	if (cpus_have_final_cap(ARM64_SME)) {
+>>>  		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
+>>> @@ -98,26 +97,30 @@ static inline void __activate_traps_hfgxtr(void)
+>>>  	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+>>>  		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
+>>>  
+>>> -	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
+>>> -	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
+>>> +
+>>> +	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+>> I don't get why you do
+>>
+>> & ~HFGxTR_EL2_nACCDATA_EL1 as this latter also has a negative polarity. 
+>>
+>> Please could you explain what is special with this bit/add a comment?
+> Nothing is really special with this bit.
+>
+> But it is currently always cleared (we blindly write a big fat zero),
+> and I wanted to explicitly show all the instructions for which we
+> enable trapping for (ACCDATA_EL1 being the only one that is currently
+> documented in the ARM ARM, although there are more already).
+>
+> So the construct I came up with is the above, initialising the
+> register value with the nMASK bits (i.e. not trapping the
+> corresponding instructions), and then clearing the bit for the stuff
+> we want to trap. Maybe adding something like:
+>
+> /* Default to no trapping anything but ACCDATA_EL1 */
+>
+> would help?
+thank you for the explanation. Yes it does.
 
-The merit for "SW_MSI" may be to inform the rest of the system about
-the IOVA of the ITS page, but with the current situation that isn't
-required since only the kernel needs that information.
+Eric
+>
+> Thanks,
+>
+> 	M.
+>
 
-I think the long term way forward is to somehow arrange for the SW_MSI
-to not become mapped when creating the parent HWPT and instead cause
-the ITS page to be mapped through some explicit IOCTL.
-
-Jason
