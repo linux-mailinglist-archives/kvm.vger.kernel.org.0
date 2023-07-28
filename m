@@ -2,169 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E54277673B0
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 19:45:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78D677673B3
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 19:45:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232546AbjG1RpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 13:45:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39356 "EHLO
+        id S229679AbjG1RpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 13:45:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229679AbjG1RpA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 13:45:00 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D140C10CB;
-        Fri, 28 Jul 2023 10:44:58 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UR8U3K12yE2JP/0SyyBEvYWoUPJlM+qrhaEPhp+TqYyRyMMh8m5ulCBn8mT/eJUXc1EpRJL9xaqJ/gitumryBLRMowKOmySVVU1bzGBWsQ1DSISAhZZcWbhQoqOu5Lrs1dYWdocoxXmU48sreF6xyvgshyH1eR1H5lk/vhHNpEBEKf6EdLVHWsmtn9sfR09W2UESfncwOKh4oSy5sdXrB0pFu6wzDkZPrd3YEZaRrCSiglKLNqGZpLLFIsUB/vtn4zze6LBfOmIkibNdDULP1af4O+rhPesBC1zNOSkG11RDPV9Hhb22in+4gm6scPM4XbumOpWAN78QB/qLYvQO6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WYEVtr6GvMf4zoSXv94IFXgiiOXFWFa0gWy2SxQMWvM=;
- b=JGUkYqJGyhP9REQ5URElODr+atBNVVy4K/AeSHOimacXohJYPPRwqMJoxrT45zd0nUA5Q53hIIVM8umxNmTF57earAbChO2xYBLJDVVNGFMyWCx5QaydH/wGDxw6oeau7/Gesv7ftT7dXqyXeEa6A1wdGT2vE26Q49Gl9TNPpt+mVdsc1I8gfu42hc1S24zLnfEmrwP+QS+e7ZgokQ4Pf1KyjVWAlZgnnh9jLvD7bxO9EkUaV/Ar3ROrS5RqB1SscRWb7EbXAIvDpyMKN595+z6R5WUejjL56eizNyoblo8ReDiqKV2bzT4KviAMambriN7hM8mVcM3BjgsTol5J2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WYEVtr6GvMf4zoSXv94IFXgiiOXFWFa0gWy2SxQMWvM=;
- b=BtYuLnNlF8nrrPH8kHS0iRFRu/b1MCUVWgLjGO/0kRc/nAEwDaqxjZhropgaKekKL0R4IbJPLKKnuzOgbdiv5yopcGmEFhPrfZmmjlJlw5FA6qtNfXej3cRQRAHwRMNBQ07eSm/g+X3o/9AlssMCGJRJknI4vPGbwAmq7hQsEAm1OxJlHYvGidD1Q+hsXwMrILKS1I2I9+DFqmwKU/XxPtUuFtiJWZnFk5tRitC45D5vA1KtRgwLxml+dZYlPIaoyXtZpK/uZYe1Z8a21k9Y4ctC++pjOKsHrYeoFJ6sxuhcWsegCtvlzHD1VTt9WM4KI2PNZFUknkUGnUQRi0ug1w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CY8PR12MB7657.namprd12.prod.outlook.com (2603:10b6:930:9d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
- 2023 17:44:57 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.034; Fri, 28 Jul 2023
- 17:44:56 +0000
-Date:   Fri, 28 Jul 2023 14:44:54 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
-        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
-        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com
-Subject: Re: [PATCH v3 07/17] iommufd: Add IOMMU_RESV_IOVA_RANGES
-Message-ID: <ZMP+lvbhAwEbhjx/@nvidia.com>
-References: <20230724110406.107212-1-yi.l.liu@intel.com>
- <20230724110406.107212-8-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724110406.107212-8-yi.l.liu@intel.com>
-X-ClientProxiedBy: YT3PR01CA0119.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:85::24) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229882AbjG1RpS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 13:45:18 -0400
+Received: from newman.cs.utexas.edu (newman.cs.utexas.edu [128.83.139.110])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AD03AB4
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 10:45:13 -0700 (PDT)
+X-AuthUser: ysohail
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cs.utexas.edu;
+        s=default; t=1690566311;
+        bh=X4lAta4mJ8SekyIvKTiNJG9DhKP9T6+34mJfE29GbyQ=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=H4fPuZefmLDZLy3Y7W4yPOG/do8FIdG/gRLIrBOs4EeYcKpoNaoi+aMUGrSHllcbw
+         jMf0/Zmm7pfFQd5nJENVmaIfZoRIq/IMPe1gnBpLlhVSxy4K5OoLXqO8egu38ilOpn
+         kirJsXmtAa3TKB22K7amM/z6FilMqBMLI0f/zv4w=
+Received: from [192.168.0.202] (71-138-92-128.lightspeed.hstntx.sbcglobal.net [71.138.92.128])
+        (authenticated bits=0)
+        by newman.cs.utexas.edu (8.14.4/8.14.4/Debian-4.1ubuntu1.1) with ESMTP id 36SHjAUE026222
+        (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT);
+        Fri, 28 Jul 2023 12:45:10 -0500
+Message-ID: <6bc819fd-18e4-8472-be7d-14db6e059e9a@cs.utexas.edu>
+Date:   Fri, 28 Jul 2023 12:45:10 -0500
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7657:EE_
-X-MS-Office365-Filtering-Correlation-Id: f173542c-e5d5-44cb-fcba-08db8f925b81
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9KlR+wU5GMsUNMrf0MTuKxKw3LrHwQ8jkJOfLGlwdkkAlMNIFz+ILF1zyCT6ZgRWkyVNq5YRmtPokoZV2tj9rCLKvm36+igzz7r7GbFwmzJrPy0tcUfvYgzZhgXPblImq2IJCINtahNh04v70XGRhkJg5o41UUZxZmn6hkonyLOTDsOFOhdJsvgultkDjzwNFdcuhz54uz6DdyxDTH7M9DdaiLu4B65aokkEHawErbzxKdZVUfu12ng+iB/LFdzcHiTFyySzLLuVIXg4GCVa7VHhfuaUmIOREY1WdYuj//DUXVgDz6MLXCHX6EY7Puo7iAClMEvA387ZZdNYUquqbdza0a94HApg6aLh7Ol6NA2uqyP548p2I55kCM7nDmjL11WTobOaX7kIi0rFnGshgAT69QQRMZqa/qPyy4MUMIPqbfTjz6bjHkk+a4dHz9dvKoruIgcXWcNB+GoLvZg2Go+gx6YXHaZEd7t6H4BDrwDMajaCMvJqKgkPSoYrUYQ/9qcu+c32/RiQ2lzKf01PaxaDbJuhISXYwS9FHMoHOptfJZ57PfMyhBp66kGcPMht
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(39860400002)(136003)(366004)(346002)(451199021)(5660300002)(41300700001)(26005)(86362001)(66556008)(38100700002)(478600001)(6512007)(4326008)(8676002)(6916009)(8936002)(36756003)(186003)(316002)(66946007)(66476007)(6506007)(7416002)(2616005)(83380400001)(6486002)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RMu2YQtgEod8sPhYeUa+XNL/38LfWTIi/OrSysIxS7kt/fZ47RCNA4v7HFlu?=
- =?us-ascii?Q?nTDYjGkKgb2m9SyZl3+Z+Gu/sIiUn0ir87dn/OdeCiz7thOgyAs4cXKJ5ulC?=
- =?us-ascii?Q?zyW/ItEwD2pUzxwkV+2FsSHa3hngE+ewB59q4g9Flse7BurYEXU6Y9uXFlDx?=
- =?us-ascii?Q?EwQQ9lwAgCmU5pLvc2Nifst25MUOuge1tcQv7l14LYgnM20E/whhBX69+fOE?=
- =?us-ascii?Q?p+J6Vv1U8TIVn3Atr1CwOQTT5hqyiw3j83lX9Rr+QSjJHD7E9KrfylF/IXto?=
- =?us-ascii?Q?RU9TQXTtaou/lS1zBWEvNguap4mpF5z2FsSrlE1CtOrF3DM8jqx69mTm9WNa?=
- =?us-ascii?Q?AAZoDjEfWbHEJTlSkM5fV61Wk/efFAMI5wZFTiOD7uez19z7H4KZhtBXr701?=
- =?us-ascii?Q?xYMhoISETFBmPzshGZ3oIU4h/jdslHKYdCK6HWIggr6n3VjKahPH3WNwiOyn?=
- =?us-ascii?Q?H6U3Y3mjzb78QA0ZHboNufHf21a6/a4FSs7QgeJryPeNycKzvq70Z3WIgttZ?=
- =?us-ascii?Q?iBwJwuGg6Fe44PS8SMq20CNpCHndwJcdakfkzRE+sJup4HrpVTcsIc4C6rSk?=
- =?us-ascii?Q?kd4/crIEvM1hFB3tPBfMfNgAifjaeIjyGTyBK+J+MvFh3eqc0R6Nm8jhK6+d?=
- =?us-ascii?Q?jkvrCLt1/ocDT+/fuJf9zGAA0Rq+/K4mhkUOdyk9Q2u7hYgmc9x7s2f088To?=
- =?us-ascii?Q?rkCMkCGTQsuZDQyV3qfrtijb4GNne5oNt5DYARMdkUtGXtYu7COIUmrxJbmb?=
- =?us-ascii?Q?nS4kvu/+6Fv3tgAuaKjfHiB77vDADEAdgzBiyoznoSfOgdxxMZjdsYehp4i7?=
- =?us-ascii?Q?l5jKUjSfq20m+PAIuOyLDMJ4KLWnXrqoFdPJxEUr2ZTTFB6pgNrLph2dQGqO?=
- =?us-ascii?Q?9nXKRvBxWTmwcy6gF/d0qPDjj2bqaLI7ZIZ2eCRVBuWvGpkiKsRXhehC0CDE?=
- =?us-ascii?Q?oknjZNFejxZGusk0rESptRfnsfw6TQ+pOY2H4jnXI7qyX7dTONwZ0vM4wxIx?=
- =?us-ascii?Q?fOYE5d3Ac8ijEUeDmaJWdgCNRHKiyPHkqubiixkInsSgN42oUDIA3lxozXsJ?=
- =?us-ascii?Q?HlG0u9Na7qQHl1NzBDedXZXaBnCMtZjxqe0jyC4AOMk4e5oYtonnaH54ZJcd?=
- =?us-ascii?Q?mbI5zYY+UVMQ/9ozBXJiQJjfO0Yy3iR1lFVIRQ1enLy2d07gttfHNzFJQzbx?=
- =?us-ascii?Q?2bzeuQ2TfUXfe5GsTOZ2CP0y6UCHJcgLBWlELr/fAbCxnarw28Lse0z2xqsA?=
- =?us-ascii?Q?whUJGHZpfx9FquhjeiI7KicZt6E5vSDcAhThDqBRDeZ/XxRHAp/Rb/P1JNCJ?=
- =?us-ascii?Q?OI2LpmHZp+xwS5WMIYywezDfOdiT7xiARUo1MDtmt3eiVlrRIMLoYb7mwLlq?=
- =?us-ascii?Q?0orxOKbHYv1zj4a9a1Q6iJoScxvp5PWVi14ZbvQCbJy8Pg+ebp86wzf8NzYS?=
- =?us-ascii?Q?yOuAhJnWQ+1fd7bGJbWDrtpahTQXUQ2a2qvyIEG2ZBWt3UtyA9z0ihBksfFA?=
- =?us-ascii?Q?3wpEMn61AcdpcNV8b81LadruQN4u2Jlatjs3aV4KE7m+sLBtQ2Mhm/Cb0qtF?=
- =?us-ascii?Q?+Eg+y8U56jIyvCWG9tdf6XbqLU6rDGRHG2BOujuV?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f173542c-e5d5-44cb-fcba-08db8f925b81
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 17:44:56.8769
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VCCi7zHihjPrGIGEvjCVspsus5hdRkHPkUAJ045LWTWmmAYixOkZ/QYTWvkik5P9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7657
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: KVM_EXIT_FAIL_ENTRY with hardware_entry_failure_reason = 7
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+References: <7b5f626c-9f48-15e2-8f7a-1178941db048@cs.utexas.edu>
+ <ZMFVLiC3YvPY3bSP@google.com>
+ <27f998f5-748b-c356-9bb6-813573c758e5@cs.utexas.edu>
+ <ZMF5O6Tq1UTQHvX0@google.com>
+ <7d4a5084-5e1e-22dd-c203-99f46850145a@cs.utexas.edu>
+ <ZMKg5WosmBu78Vgv@google.com>
+From:   Yahya Sohail <ysohail@cs.utexas.edu>
+In-Reply-To: <ZMKg5WosmBu78Vgv@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.3.9 (newman.cs.utexas.edu [128.83.139.110]); Fri, 28 Jul 2023 12:45:11 -0500 (CDT)
+X-Virus-Scanned: clamav-milter 0.103.8 at newman
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 24, 2023 at 04:03:56AM -0700, Yi Liu wrote:
 
-> +/**
-> + * struct iommu_resv_iova_ranges - ioctl(IOMMU_RESV_IOVA_RANGES)
-> + * @size: sizeof(struct iommu_resv_iova_ranges)
-> + * @dev_id: device to read resv iova ranges for
-> + * @num_iovas: Input/Output total number of resv ranges for the device
-> + * @__reserved: Must be 0
-> + * @resv_iovas: Pointer to the output array of struct iommu_resv_iova_range
-> + *
-> + * Query a device for ranges of reserved IOVAs. num_iovas will be set to the
-> + * total number of iovas and the resv_iovas[] will be filled in as space
-> + * permits.
-> + *
-> + * On input num_iovas is the length of the resv_iovas array. On output it is
-> + * the total number of iovas filled in. The ioctl will return -EMSGSIZE and
-> + * set num_iovas to the required value if num_iovas is too small. In this
-> + * case the caller should allocate a larger output array and re-issue the
-> + * ioctl.
-> + *
-> + * Under nested translation, userspace should query the reserved IOVAs for a
-> + * given device, and report it to the stage-1 I/O page table owner to exclude
-> + * the reserved IOVAs. The reserved IOVAs can also be used to figure out the
-> + * allowed IOVA ranges for the IOAS that the device is attached to. For detail
-> + * see ioctl IOMMU_IOAS_IOVA_RANGES.
+On 7/27/23 11:52, Sean Christopherson wrote:
+> On Wed, Jul 26, 2023, Yahya Sohail wrote:
+>> It appears the paging bit was not set even after
+>> I "fixed" cr0. I have now made sure the paging bit and the fixed bits are
+>> properly set in CR0. CR0 is now equal to 0x8393870b
+> 
+> How did you get that value?   AFAICT, it's not outright illegal, but only because
+> the CPU ignores reserved bits in CR0[31:0], as opposed to rejecting them.
 
-I'm not sure I like this, the other APIs here work with the *allowed*
-IOVAs, which is the inverse of this one which works with the
-*disallowed* IOVAs.
+Turns out that cr0 value was still erroneous. Not certain what happened, 
+but I think I may have interpreted a hex number as a decimal number at 
+some point while computing it. I've updated cr0 to be 0xe0000011. I got 
+this value by reading the default value of the cr0 register by calling 
+KVM_GET_SREGS on a newly created VM and then setting the bits I need to 
+be enabled. The issue continues to persist.
 
-It means we can't take the output of this API and feed it into
-IOMMUFD_CMD_IOAS_ALLOW_IOVAS.. Though I suppose qemu isn't going to do
-this anyhow.
+> Enable /sys/module/kvm_intel/parameters/dump_invalid_vmcs, then KVM will print
+> out most (all?) VMCS fields on the failed VM-Entry.  From there you'll have to
+> hunt through guest state to figure out which fields, or combinations of fields,
+> is invalid.
 
-On the other hand, it is kind of hard to intersect an allowed list of
-multiple idevs into a single master list.
+I get the following output in my log:
+*** Guest State ***
+CR0: actual=0x0000000080000031, shadow=0x00000000e0000011, 
+gh_mask=fffffffffffffff7
+CR4: actual=0x0000000000002060, shadow=0x0000000000000020, 
+gh_mask=fffffffffffef871
+CR3 = 0x0000000010000000
+PDPTR0 = 0x0000000000000000  PDPTR1 = 0x0000000000000000
+PDPTR2 = 0x0000000000000000  PDPTR3 = 0x0000000000000000
+RSP = 0x0000000002000031  RIP = 0x0000000000103c00
+RFLAGS=0x00000002         DR7 = 0x0000000000000400
+Sysenter RSP=0000000000000000 CS:RIP=0000:0000000000000000
+CS:   sel=0x0010, attr=0x0a09b, limit=0x000fffff, base=0x0000000000000000
+DS:   sel=0x0018, attr=0x08093, limit=0x000fffff, base=0x0000000000000000
+SS:   sel=0x0018, attr=0x08093, limit=0x000fffff, base=0x0000000000000000
+ES:   sel=0x0018, attr=0x08093, limit=0x000fffff, base=0x0000000000000000
+FS:   sel=0x0000, attr=0x10001, limit=0x00000000, base=0x0000000000000000
+GS:   sel=0x0000, attr=0x10001, limit=0x00000000, base=0x0000000000000000
+GDTR:                           limit=0x00001031, base=0x001f000000000200
+LDTR: sel=0x0000, attr=0x10000, limit=0x000003e8, base=0x000003e8000081a4
+IDTR:                           limit=0x00000000, base=0x0000000000000000
+TR:   sel=0x0000, attr=0x10021, limit=0x01211091, base=0x0000000000010304
+EFER =     0x0000000000000500  PAT = 0x0007040600070406
+DebugCtl = 0x0000000000000000  DebugExceptions = 0x0000000000000000
+BndCfgS = 0x0000000000000000
+Interruptibility = 00000000  ActivityState = 00000000
+*** Host State ***
+RIP = 0xffffffffc09a444f  RSP = 0xffffa3aa0d2fbd50
+CS=0010 SS=0018 DS=0000 ES=0000 FS=0000 GS=0000 TR=0040
+FSBase=00007feb463e9740 GSBase=ffff93bb3dd80000 TRBase=fffffe000033d000
+GDTBase=fffffe000033b000 IDTBase=fffffe0000000000
+CR0=0000000080050033 CR3=0000000547886004 CR4=00000000007726e0
+Sysenter RSP=fffffe000033d000 CS:RIP=0010:ffffffff910016e0
+EFER = 0x0000000000000d01  PAT = 0x0407050600070106
+*** Control State ***
+PinBased=0000007f CPUBased=b5986dfa SecondaryExec=00032ce2
+EntryControls=0001d3ff ExitControls=00abefff
+ExceptionBitmap=00060042 PFECmask=00000000 PFECmatch=00000000
+VMEntry: intr_info=80000044 errcode=00000000 ilen=00000000
+VMExit: intr_info=00000000 errcode=00000000 ilen=00000000
+         reason=80000021 qualification=0000000000000000
+IDTVectoring: info=00000000 errcode=00000000
+TSC Offset = 0xfffda9968024bdbc
+EPT pointer = 0x0000000103f1905e
+PLE Gap=00000080 Window=00001000
+Virtual processor ID = 0x0021
 
-As it is, userspace will have to aggregate the list, sort it, merge
-adjacent overlapping reserved ranges then invert the list to get an
-allowed list. This is not entirely simple..
+For the control registers, the value I set is shown as shadow not 
+actual. What does that mean?
 
-Did you already write an algorithm to do this in qemu someplace?
+Additionally, I consulted the Intel manual for the meaning of the 
+0x80000021 error code, and it appears it is caused by not meeting one or 
+more of the requirements for guest state set in Volume 3 Section 27.3.1 
+of the Intel manual. I noticed that there are certain requirements for 
+tr and ldtr registers even though they are not really used in IA-32e 
+mode (see Volume 3 Section 27.3.1.2). I've tried setting them as follows 
+to meet those requirements, but that didn't seem to do anything:
+   state->sregs.tr.type = 0b11;
+   state->sregs.tr.s = 0;
+   state->sregs.tr.present = 1;
+   state->sregs.tr.g = 1;
+   state->sregs.tr.limit = 0xFFFFF;
+   state->sregs.tr.unusable = 0;
+   state->sregs.tr.selector = 0b100;
+   state->sregs.ldt.unusable = 1;
 
-Anyhow, this should be split out from this series. It seems simple
-enough to merge it now if someone can confirm what qemu needs.
+Does that look correct?
 
-Jason
+I suppose my best course of action now is to go through each check in 
+Volume 3 Section 27.3.1 and check each one individually.
+
+Thanks,
+Yahya Sohail
