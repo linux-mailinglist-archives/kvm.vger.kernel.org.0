@@ -2,229 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC9AE766521
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 09:19:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC89E766529
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 09:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234125AbjG1HT0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 03:19:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50436 "EHLO
+        id S234124AbjG1HU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 03:20:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234077AbjG1HTR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 03:19:17 -0400
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15ADD3C26
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 00:19:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1690528749; x=1722064749;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=MXR6P+beYHZGM0ya0cd8W4+wE6OLY1Busb8UzFqnnyU=;
-  b=u1MOtJUCfRF76+Q78k9Lnh0Xu77w2pcTNzMe8Vpt3jSI00gCmpbWIQ19
-   vlEAAfeyR7PtVSp0VCBWPYgMUfYFIEY0wHpVUEhPGb55jr6tT4lA3Kx+X
-   rNyHovSFfqtrOHjbA97JrpQIJu7TrAMo0DuTBH6fK8MWKmPosAxKCAZF2
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.01,236,1684800000"; 
-   d="scan'208";a="19133024"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 07:19:05 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 65BAAAA968;
-        Fri, 28 Jul 2023 07:19:04 +0000 (UTC)
-Received: from EX19D008UEC001.ant.amazon.com (10.252.135.232) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 28 Jul 2023 07:19:02 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19D008UEC001.ant.amazon.com (10.252.135.232) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 28 Jul 2023 07:19:02 +0000
-Received: from dev-dsk-metikaya-1c-d447d167.eu-west-1.amazon.com
- (10.13.250.103) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30 via Frontend Transport; Fri, 28 Jul 2023 07:19:01 +0000
-From:   Metin Kaya <metikaya@amazon.co.uk>
-To:     <pbonzini@redhat.com>, <kvm@vger.kernel.org>
-CC:     <metikaya@amazon.co.uk>, <dwmw@amazon.co.uk>
-Subject: [kvm-unit-tests PATCH] x86/access: Use HVMOP_flush_tlbs hypercall instead of invlpg() for Xen
-Date:   Fri, 28 Jul 2023 07:18:57 +0000
-Message-ID: <20230728071857.29991-1-metikaya@amazon.co.uk>
-X-Mailer: git-send-email 2.40.1
+        with ESMTP id S234103AbjG1HU5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 03:20:57 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1207A268B
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 00:20:52 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36S78bUS030331
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:20:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : from
+ : subject : to : cc : message-id : date; s=pp1;
+ bh=zbW1kxB5xGfrzduZfU2s5JmaSPAxx0vdgH8rNwJneCI=;
+ b=SVtUNfh5W+c5WY/hwc3O+XQA3myulHFFjhOqUEp4eqq93H85jRetRPC4psBnLXggCM6E
+ Vsj85I6EtmrDHhxPit0Q01WvstYYurmXjD1nDOTil6bynxki+SYDL13kjPXFFdn+7htb
+ 1Axj8nwDg2p818+iLc3dI+Ioa0UJT07ZtE3D/4elLKMjfgQXp8N4Zjp95lPINiETiWRZ
+ pld1+TNJoH5SgJaIhs/E/m0IFbexW9ptKFW3QY/s6qWYzyk/VioY0q6hSrETNuu4ibA/
+ q5+lI4vGnzwbVz2J3pHNw1amO76IWXPkuIrYx+fCteDLcD63E7vMHPK8Z/V+2Iz5VjgR dQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s487v9bu7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:20:51 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36S7HTSh020442
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:20:50 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s487v9btw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Jul 2023 07:20:50 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36S7FdIY003634;
+        Fri, 28 Jul 2023 07:20:50 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0txkkyc2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Jul 2023 07:20:49 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36S7KlxO1114666
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Jul 2023 07:20:48 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E533E20040;
+        Fri, 28 Jul 2023 07:20:47 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 791EB20049;
+        Fri, 28 Jul 2023 07:20:47 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.77.129])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 28 Jul 2023 07:20:47 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
-        T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230725033937.277156-2-npiggin@gmail.com>
+References: <20230725033937.277156-1-npiggin@gmail.com> <20230725033937.277156-2-npiggin@gmail.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] migration: Fix test harness hang on fifo
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Message-ID: <169052884609.15205.8053450658195913694@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Fri, 28 Jul 2023 09:20:46 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OPcetDqKKTfTwpN9Gcv1dk5Be6S7MIm8
+X-Proofpoint-ORIG-GUID: U6WD9d0hYQFAiL0LKGlKtQ7-i9U3FZZ4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 bulkscore=0 mlxlogscore=581 phishscore=0
+ lowpriorityscore=0 adultscore=0 clxscore=1015 spamscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307280063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QEMU has ability of running guests under Xen starting from v8.0 [1].
+Quoting Nicholas Piggin (2023-07-25 05:39:35)
+> If the test fails before migration is complete, the input fifo for the
+> destination machine is not written to and that can leave cat waiting
+> for input.
+>=20
+> Clear that condition in the error handler so the harness doesn't hang
+> in this case.
+>=20
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 
-And a patch is submitted to Linux/KVM to add hvm_op/HVMOP_flush_tlbs
-hypercall support to KVM [2].
-
-Hence, prefer HVMOP_flush_tlbs hypercall over invlpg instruction in Xen
-environment *if* KVM has hvm_op/HVMOP_flush_tlbs hypercall implemented.
-
-Also fix trivial formatting warnings for casting in invlpg() calls.
-
-[1] https://qemu-project.gitlab.io/qemu/system/i386/xen.html
-[2] https://lore.kernel.org/all/20230418101306.98263-1-metikaya@amazon.co.uk
-
-Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
----
- x86/access.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 89 insertions(+), 3 deletions(-)
-
-diff --git a/x86/access.c b/x86/access.c
-index 70d81bf02d9d..0a858f807dde 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -4,6 +4,7 @@
- #include "asm/page.h"
- #include "x86/vm.h"
- #include "access.h"
-+#include "alloc_page.h"
- 
- #define true 1
- #define false 0
-@@ -250,12 +251,90 @@ static void set_cr0_wp(int wp)
- 	}
- }
- 
-+uint8_t *hypercall_page;
-+
-+#define __HYPERVISOR_hvm_op	34
-+#define HVMOP_flush_tlbs	5
-+
-+static inline int do_hvm_op_flush_tlbs(void)
-+{
-+	long res = 0, _a1 = (long)(HVMOP_flush_tlbs), _a2 = (long)(NULL);
-+
-+	asm volatile ("call *%[offset]"
-+#if defined(__x86_64__)
-+		      : "=a" (res), "+D" (_a1), "+S" (_a2)
-+#else
-+		      : "=a" (res), "+b" (_a1), "+c" (_a2)
-+#endif
-+		      : [offset] "r" (hypercall_page + (__HYPERVISOR_hvm_op * 32))
-+		      : "memory");
-+
-+	if (res)
-+		printf("hvm_op/HVMOP_flush_tlbs failed: %ld.", res);
-+
-+	return (int)res;
-+}
-+
-+#define XEN_CPUID_FIRST_LEAF    0x40000000
-+#define XEN_CPUID_SIGNATURE_EBX 0x566e6558 /* "XenV" */
-+#define XEN_CPUID_SIGNATURE_ECX 0x65584d4d /* "MMXe" */
-+#define XEN_CPUID_SIGNATURE_EDX 0x4d4d566e /* "nVMM" */
-+
-+static void init_hypercalls(void)
-+{
-+	struct cpuid c;
-+	u32 base;
-+	bool found = false;
-+
-+	for (base = XEN_CPUID_FIRST_LEAF; base < XEN_CPUID_FIRST_LEAF + 0x10000;
-+			base += 0x100) {
-+		c = cpuid(base);
-+		if ((c.b == XEN_CPUID_SIGNATURE_EBX) &&
-+		    (c.c == XEN_CPUID_SIGNATURE_ECX) &&
-+		    (c.d == XEN_CPUID_SIGNATURE_EDX) &&
-+		    ((c.a - base) >= 2)) {
-+			found = true;
-+			break;
-+		}
-+	}
-+	if (!found) {
-+		printf("Using native invlpg instruction\n");
-+		return;
-+	}
-+
-+	hypercall_page = alloc_pages_flags(0, AREA_ANY | FLAG_DONTZERO);
-+	if (!hypercall_page)
-+		report_abort("failed to allocate hypercall page");
-+
-+	memset(hypercall_page, 0xc3, PAGE_SIZE);
-+
-+	c = cpuid(base + 2);
-+	wrmsr(c.b, (u64)hypercall_page);
-+	barrier();
-+
-+	if (hypercall_page[0] == 0xc3)
-+		report_abort("Hypercall page not initialised correctly\n");
-+
-+	/*
-+	 * Fall back to invlpg instruction if HVMOP_flush_tlbs hypercall is
-+	 * unsupported.
-+	 */
-+	if (do_hvm_op_flush_tlbs()) {
-+		printf("Using native invlpg instruction\n");
-+		free_page(hypercall_page);
-+		hypercall_page = NULL;
-+		return;
-+	}
-+
-+	printf("Using Xen HVMOP_flush_tlbs hypercall\n");
-+}
-+
- static void clear_user_mask(pt_element_t *ptep, int level, unsigned long virt)
- {
- 	*ptep &= ~PT_USER_MASK;
- 
- 	/* Flush to avoid spurious #PF */
--	invlpg((void*)virt);
-+	hypercall_page ? do_hvm_op_flush_tlbs() : invlpg((void *)virt);
- }
- 
- static void set_user_mask(pt_element_t *ptep, int level, unsigned long virt)
-@@ -263,7 +342,7 @@ static void set_user_mask(pt_element_t *ptep, int level, unsigned long virt)
- 	*ptep |= PT_USER_MASK;
- 
- 	/* Flush to avoid spurious #PF */
--	invlpg((void*)virt);
-+	hypercall_page ? do_hvm_op_flush_tlbs() : invlpg((void *)virt);
- }
- 
- static unsigned set_cr4_smep(ac_test_t *at, int smep)
-@@ -583,7 +662,7 @@ fault:
- static void __ac_set_expected_status(ac_test_t *at, bool flush)
- {
- 	if (flush)
--		invlpg(at->virt);
-+		hypercall_page ? do_hvm_op_flush_tlbs() : invlpg((void *)at->virt);
- 
- 	if (at->ptep)
- 		at->expected_pte = *at->ptep;
-@@ -1243,6 +1322,10 @@ void ac_test_run(int pt_levels, bool force_emulation)
- 	printf("run\n");
- 	tests = successes = 0;
- 
-+	setup_vm();
-+
-+	init_hypercalls();
-+
- 	shadow_cr0 = read_cr0();
- 	shadow_cr4 = read_cr4();
- 	shadow_cr3 = read_cr3();
-@@ -1318,6 +1401,9 @@ void ac_test_run(int pt_levels, bool force_emulation)
- 		successes += ac_test_cases[i](&pt_env);
- 	}
- 
-+	if (hypercall_page)
-+		free_page(hypercall_page);
-+
- 	printf("\n%d tests, %d failures\n", tests, tests - successes);
- 
- 	report(successes == tests, "%d-level paging tests%s", pt_levels,
--- 
-2.40.1
-
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
