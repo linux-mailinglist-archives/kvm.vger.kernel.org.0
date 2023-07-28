@@ -2,172 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 39B7A766556
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 09:29:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1706D766565
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 09:32:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234190AbjG1H3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 03:29:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57692 "EHLO
+        id S234289AbjG1HcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 03:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232323AbjG1H3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 03:29:05 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1CFF7;
-        Fri, 28 Jul 2023 00:29:04 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36S78hMZ012830;
-        Fri, 28 Jul 2023 07:29:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=KD/IaudLrc/SdyptorgWHKK1OUhVZbXzclV+/0kR1Iw=;
- b=jTQbtHsFnQTlAcI1fT0AEOhIY14Mv+cdPZViticwJVgeKaoNoG723ncnPrra2WkYIsBD
- 0NBtcbX7FC/9AG9G/fLOT3lnOk4mcWP97jOk0Lq8txLikN0kDqtznbECTY0LxG0zKtQ1
- s8mlD1aN5TUh6u8Ta5QJtoQ/ARs+mlNbTkkcnT4jWGjuentYCQzoJG7f/7BU2fcQcwJb
- Z6GEvlLMe84MZADq4pJenSNjTV/zcXv9DfdpAgEHIa4WtFvepec1e29k3qh6zVYDDHIh
- 8TazdFEiXyCbQyyoP3sJuxtzNxa9BkNV844/gdfkguFrOFAlIJAG6zG0UZq93gWp7g/e 4g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s47ew2m5t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jul 2023 07:29:03 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36S7SncM004463;
-        Fri, 28 Jul 2023 07:29:02 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s47ew2m5p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jul 2023 07:29:02 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36S605B0016574;
-        Fri, 28 Jul 2023 07:29:02 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0v51ukby-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jul 2023 07:29:02 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36S7SxU352363546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jul 2023 07:28:59 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F1EA20043;
-        Fri, 28 Jul 2023 07:28:59 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD76820040;
-        Fri, 28 Jul 2023 07:28:58 +0000 (GMT)
-Received: from [9.152.224.114] (unknown [9.152.224.114])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jul 2023 07:28:58 +0000 (GMT)
-Message-ID: <7fadab86-2b7c-b934-fcfa-61046c0778b6@linux.ibm.com>
-Date:   Fri, 28 Jul 2023 09:28:58 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] KVM: s390: fix sthyi error handling
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Mete Durlu <meted@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230727182939.2050744-1-hca@linux.ibm.com>
+        with ESMTP id S232217AbjG1HcE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 03:32:04 -0400
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B4D2733
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 00:32:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1690529523; x=1722065523;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=8ejy6P2bBd0LhwiqvIcJEfKf41A6QsV8xDWjh4JMxWw=;
+  b=bdWZh2pZvc/t99tUZ1vmnDhDTL2FETW0ACiRIvhcmymm+s7j53LVu1pP
+   qxuNZng3Nk6OciGOoIHe0UnxTJ4kiDXDcbayjMmJIYMlHzIMB438Wzg9R
+   JPF0egrMNChSpPkZ4rbmpbrIBzbvR9PNmArPE/YUAY3HsbotU9mb2AtbL
+   k=;
+X-IronPort-AV: E=Sophos;i="6.01,236,1684800000"; 
+   d="scan'208";a="19134859"
+Subject: RE: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
+Thread-Topic: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 07:32:01 +0000
+Received: from EX19D020EUA003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id 85D9F8046C;
+        Fri, 28 Jul 2023 07:31:58 +0000 (UTC)
+Received: from EX19D043EUB002.ant.amazon.com (10.252.61.125) by
+ EX19D020EUA003.ant.amazon.com (10.252.50.116) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 28 Jul 2023 07:31:58 +0000
+Received: from EX19D043EUB001.ant.amazon.com (10.252.61.24) by
+ EX19D043EUB002.ant.amazon.com (10.252.61.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 28 Jul 2023 07:31:57 +0000
+Received: from EX19D043EUB001.ant.amazon.com ([fe80::e881:f31d:88bf:58d8]) by
+ EX19D043EUB001.ant.amazon.com ([fe80::e881:f31d:88bf:58d8%4]) with mapi id
+ 15.02.1118.030; Fri, 28 Jul 2023 07:31:57 +0000
+From:   "Kaya, Metin" <metikaya@amazon.co.uk>
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "paul@xen.org" <paul@xen.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>
+Thread-Index: AQHZv/zTJE/XNJFp4kq8iGiflPNh7K/NhPIAgAFDMOA=
+Date:   Fri, 28 Jul 2023 07:31:57 +0000
+Message-ID: <617829a3b166423486bcb69884cc8894@amazon.co.uk>
+References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
+         <20230418101306.98263-1-metikaya@amazon.co.uk>
+         <ZHEXX/OG6suNGWPN@google.com>
+         <9a58e731421edad45dff31e681b83f90c5e9775e.camel@infradead.org>
+         <ZMF8/SUw5ebkDhde@google.com>
+ <bbe3f0721e9f2965858b407afe638000f6b0d021.camel@infradead.org>
+In-Reply-To: <bbe3f0721e9f2965858b407afe638000f6b0d021.camel@infradead.org>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20230727182939.2050744-1-hca@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aisIPqm_0FrR8F7lvHu63PYejsrYVLsh
-X-Proofpoint-ORIG-GUID: CF5JzXhY-R8Kch-pXJH1ziWNbjIb2ns2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 adultscore=0 spamscore=0 bulkscore=0
- impostorscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2306200000 definitions=main-2307280063
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.252.51.153]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
+        T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 27.07.23 um 20:29 schrieb Heiko Carstens:
-> Commit 9fb6c9b3fea1 ("s390/sthyi: add cache to store hypervisor info")
-> added cache handling for store hypervisor info. This also changed the
-> possible return code for sthyi_fill().
-> 
-> Instead of only returning a condition code like the sthyi instruction would
-> do, it can now also return a negative error value (-ENOMEM). handle_styhi()
-> was not changed accordingly. In case of an error, the negative error value
-> would incorrectly injected into the guest PSW.
-> 
-> Add proper error handling to prevent this, and update the comment which
-> describes the possible return values of sthyi_fill().
-
-To me it looks like this can only happen if page allocation fails? This should
-not happen in normal cases (and return -ENOMEM would likely kill the guest as
-QEMU would stop).
-But if it happens we better stop.
-
-
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-
-
-> 
-> Fixes: 9fb6c9b3fea1 ("s390/sthyi: add cache to store hypervisor info")
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-> ---
->   arch/s390/kernel/sthyi.c  | 6 +++---
->   arch/s390/kvm/intercept.c | 9 ++++++---
->   2 files changed, 9 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/s390/kernel/sthyi.c b/arch/s390/kernel/sthyi.c
-> index 4d141e2c132e..2ea7f208f0e7 100644
-> --- a/arch/s390/kernel/sthyi.c
-> +++ b/arch/s390/kernel/sthyi.c
-> @@ -459,9 +459,9 @@ static int sthyi_update_cache(u64 *rc)
->    *
->    * Fills the destination with system information returned by the STHYI
->    * instruction. The data is generated by emulation or execution of STHYI,
-> - * if available. The return value is the condition code that would be
-> - * returned, the rc parameter is the return code which is passed in
-> - * register R2 + 1.
-> + * if available. The return value is either a negative error value or
-> + * the condition code that would be returned, the rc parameter is the
-> + * return code which is passed in register R2 + 1.
->    */
->   int sthyi_fill(void *dst, u64 *rc)
->   {
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index 954d39adf85c..341abafb96e4 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -389,8 +389,8 @@ static int handle_partial_execution(struct kvm_vcpu *vcpu)
->    */
->   int handle_sthyi(struct kvm_vcpu *vcpu)
->   {
-> -	int reg1, reg2, r = 0;
-> -	u64 code, addr, cc = 0, rc = 0;
-> +	int reg1, reg2, cc = 0, r = 0;
-> +	u64 code, addr, rc = 0;
->   	struct sthyi_sctns *sctns = NULL;
->   
->   	if (!test_kvm_facility(vcpu->kvm, 74))
-> @@ -421,7 +421,10 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
->   		return -ENOMEM;
->   
->   	cc = sthyi_fill(sctns, &rc);
-> -
-> +	if (cc < 0) {
-> +		free_page((unsigned long)sctns);
-> +		return cc;
-> +	}
->   out:
->   	if (!cc) {
->   		if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+T24gVGh1LCBKdWwgMjcsIDIwMjMgYXQgMTowNCBQTSwgRGF2aWQgV29vZGhvdXNlIHdyb3RlOg0K
+PiBPbiBXZWQsIDIwMjMtMDctMjYgYXQgMTM6MDcgLTA3MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24g
+d3JvdGU6DQo+ID4gT24gVHVlLCBKdWwgMjUsIDIwMjMsIERhdmlkIFdvb2Rob3VzZSB3cm90ZToN
+Cj4gPiA+IE9uIEZyaSwgMjAyMy0wNS0yNiBhdCAxMzozMiAtMDcwMCwgU2VhbiBDaHJpc3RvcGhl
+cnNvbiB3cm90ZToNCj4gPiA+ID4gICA6IEFoYSEgIEFuZCBRRU1VIGFwcGVhcnMgdG8gaGF2ZSBY
+ZW4gZW11bGF0aW9uIHN1cHBvcnQuICBUaGF0IG1lYW5zIEtWTS1Vbml0LVRlc3RzDQo+ID4gPiA+
+ICAgOiBpcyBhbiBvcHRpb24uICBTcGVjaWZpY2FsbHksIGV4dGVuZCB0aGUgImFjY2VzcyIgdGVz
+dCB0byB1c2UgdGhpcyBoeXBlcmNhbGwgaW5zdGVhZA0KPiA+ID4gPiAgIDogb2YgSU5WTFBHLiAg
+VGhhdCdsbCB2ZXJpZnkgdGhhdCB0aGUgZmx1c2ggaXMgYWN0dWFsbHkgYmVpbmcgcGVyZm9ybWVk
+IGFzIGV4cHRlY2VkLg0KPiA+ID4NCj4gPiA+IFRoYXQgd29ya3MuIE1ldGluIGhhcyBhIGJldHRl
+ciB2ZXJzaW9uIHRoYXQgYWN0dWFsbHkgc2V0cyB1cCB0aGUNCj4gPiA+IGh5cGVyY2FsbCBwYWdl
+IHByb3Blcmx5IGFuZCB1c2VzIGl0LCBidXQgdGhhdCBvbmUgYmFpbHMgb3V0IHdoZW4gWGVuDQo+
+ID4gPiBzdXBwb3J0IGlzbid0IHByZXNlbnQsIGFuZCBkb2Vzbid0IHNob3cgdGhlIGZhaWx1cmUg
+bW9kZSBxdWl0ZSBzbw0KPiA+ID4gY2xlYXJseS4gVGhpcyBpcyB0aGUgc2ltcGxlIHZlcnNpb246
+DQo+ID4NCj4gPiBJSVVDLCB5J2FsbCBoYXZlIGFscmVhZHkgd3JpdHRlbiBib3RoIHRlc3RzLCBz
+byB3aHkgbm90IHBvc3QgYm90aD8gIEkgY2VydGFpbmx5DQo+ID4gd29uJ3Qgb2JqZWN0IHRvIG1v
+cmUgdGVzdHMgaWYgdGhleSBwcm92aWRlIGRpZmZlcmVudCBjb3ZlcmFnZS4NCj4NCj4gWWVhaCwg
+aXQganVzdCBuZWVkZWQgY2xlYW5pbmcgdXAuDQo+DQo+IFRoaXMgaXMgd2hhdCB3ZSBoYXZlOyBN
+ZXRpbiB3aWxsIHN1Ym1pdCBpdCBmb3IgcmVhbCBhZnRlciBhIGxpdHRsZSBtb3JlDQo+IHBvbGlz
+aGluZy4gSXQgbW9kaWZpZXMgdGhlIGV4aXN0aW5nIGFjY2VzcyB0ZXN0IHNvIHRoYXQgKmlmKiBp
+dCdzIHJ1bg0KPiBpbiBhIFhlbiBlbnZpcm9ubWVudCwgYW5kICppZiogdGhlIEhWTU9QX2ZsdXNo
+X3RsYnMgY2FsbCByZXR1cm5zDQo+IHN1Y2Nlc3MgaW5zdGVhZCBvZiAtRU5PU1lTLCBpdCdsbCB1
+c2UgdGhhdCBpbnN0ZWFkIG9mIGludmxwZy4NCg0KUGF0Y2ggaXMgcG9zdGVkIHRvIGt2bS11bml0
+LXRlc3RzOiBodHRwczovL21hcmMuaW5mby8/bD1rdm0mbT0xNjkwNTI4NjcwMjQxOTEmdz0yDQoN
+Cj4gSW4gaXRzZWxmLCB0aGF0IGRvZXNuJ3QgZ2l2ZSB1cyBhbiBhdXRvbWF0aWMgcmVncmVzc2lv
+biB0ZXN0cywgYmVjYXVzZQ0KPiB5b3Ugc3RpbGwgbmVlZCB0byBydW4gaXQgbWFudWFsbHkg4oCU
+IGFzIGJlZm9yZSwNCj4gIHFlbXUtc3lzdGVtLXg4Nl82NCAtZGV2aWNlIGlzYS1kZWJ1Zy1leGl0
+LGlvYmFzZT0weGY0LGlvc2l6ZT0weDQgLXZuYyBub25lIC1zZXJpYWwgc3RkaW8gLWRldmljZSBw
+Y2ktdGVzdGRldiAtLWFjY2VsIGt2bSx4ZW4tdmVyc2lvbj0weDQwMDBhLGtlcm5lbC1pcnFjaGlw
+PXNwbGl0ICAta2VybmVsIH4vYWNjZXNzX3Rlc3QuZmxhdA0KPg0KPiBJZiB3ZSByZWFsbHkgd2Fu
+dCB0bywgd2UgY2FuIGxvb2sgYXQgbWFraW5nIGl0IHJ1biB0aGF0IHdheSB3aGVuIHFlbXUNCj4g
+YW5kIHRoZSBob3N0IGtlcm5lbCBzdXBwb3J0IFhlbiBndWVzdHMuLi4/DQoNCg==
