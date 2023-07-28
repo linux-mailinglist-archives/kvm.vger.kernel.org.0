@@ -2,70 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42EE0767754
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 23:01:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79130767756
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 23:01:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231391AbjG1VBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 17:01:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51128 "EHLO
+        id S232939AbjG1VBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 17:01:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232490AbjG1VBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 17:01:32 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C3B4489
+        with ESMTP id S231405AbjG1VBh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 17:01:37 -0400
+Received: from mailrelay3-1.pub.mailoutpod2-cph3.one.com (mailrelay3-1.pub.mailoutpod2-cph3.one.com [IPv6:2a02:2350:5:402::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D63D448D
         for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 14:01:31 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6b9b52724ccso2186379a34.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 14:01:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690578090; x=1691182890;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aFtwvHzLUf5NSAoO+eWuJDzHkMB9r0GqcjuVDz6J8fc=;
-        b=pAaNQW24ZWjKwIrSX3bM+7any3SzG9Dcg/xEkCSEiBAO5Ntnzn3EE6uuAmnjYdYk2Q
-         JfXb2u/mScYaWtJ7UbstMvTt90gKUK00vEIE/7fEwWVS519+pNY7gykuXFiuo2u7mgDZ
-         gq1aJA9eVriNzZkkpARBuIMhujzWmaGhhlKLKBt6G1j5nn+7maMTkKREjauCd3WOvy5M
-         mAGOySSIB7YmRlxoBEGH8gqkIYhzzrgRw6aEFswVc2xoEaQnpegUBaLbXK2WnMHwerfK
-         WEn7hz/+LSdn6NJz+e/93Xs+yrtRm7Zl6LTyphS0QAkh7chyXjjTRNg7h6WaVbihrOcp
-         aGFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690578090; x=1691182890;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aFtwvHzLUf5NSAoO+eWuJDzHkMB9r0GqcjuVDz6J8fc=;
-        b=TyrF1r6UNnBy8K71/iGccqrZjtpFNXcF5gPlMCoWI5AkqiFqLOFKGh/4jEOfmH7LfY
-         TTd2dbIOCAIMZ84XHmKgpPTmEXqBLRkVjgO+s7J3/lbFSWLZP8yRvUg42OML90h9izzo
-         xEMIRANtqJQA2rgUsCC0Z3xGU+yZqjNhSBWfqmwX0W0kAomL+bbsDKFs07cfeojSJ72M
-         MBiesXcEipYay3R6a0K179vLlGHmBTNG9ijvXCOm10KtwcvZBTCAo4kQKQidim1wwy92
-         Uas8aonuD4AGMOzi2hjs3sEdOdtIjNwygwu4DXbdJw0tFZNXejWJBUd2DfOqD13dFTCF
-         ITLg==
-X-Gm-Message-State: ABy/qLbxpAdAhJQDkmP5dLSO6EjeHsl/qRTjwQ7KcIoZ09WC3VrrndIp
-        xL++Zl7Trw5LnyNOB0YwsHRZhQ==
-X-Google-Smtp-Source: APBJJlGFxN5w1wqhoG4W9fTYv9xNGtBCO8MiWkbh5KrryNE8D3Qf7sgMmcNODSyqTqQRMmSPsaELMw==
-X-Received: by 2002:a05:6830:1e71:b0:6bb:1c21:c52e with SMTP id m17-20020a0568301e7100b006bb1c21c52emr3676325otr.15.1690578090156;
-        Fri, 28 Jul 2023 14:01:30 -0700 (PDT)
-Received: from grind.. (201-69-66-36.dial-up.telesp.net.br. [201.69.66.36])
-        by smtp.gmail.com with ESMTPSA id n11-20020a9d740b000000b006b9c87b7035sm1987769otk.18.2023.07.28.14.01.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 14:01:29 -0700 (PDT)
-From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        d=ravnborg.org; s=rsa1;
+        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+         from:date:from;
+        bh=2M7I6GspW66DQLncO4JKL/r3gVWBlh/Z61h7j/4ZXwQ=;
+        b=VmorxddsvliAc2zCAOdnHcnfpXk3HL6FA27GlnhkXSDoGE0taO0g/r11MTt0+sI0kBn9KF5g/nrJO
+         YBHws5h7tg8z3vU2AXdiQl9zEYuH8U/rlDvV9qOR0LqdOqrOTT8Q280NatZ58QFneNl5qS40d2PF4M
+         EUS5sJGrrFwpIycoYicR9+NrqKdO9dYIH7hOkxrBCPEzDbnuW5lyt3OSZ3qejIsC5BlnWolgnIV57W
+         oWgE09YqMgvptwaf+e3S6UG3fSVu9ZZWZQL0aj4IVi0oMKAI1oKRsI8Jyw+i3pIMQPCcYbWIvLP5Ea
+         2ZNE/tlQONtqNXH1lFqn6N8xJ+w3WZQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+        d=ravnborg.org; s=ed1;
+        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+         from:date:from;
+        bh=2M7I6GspW66DQLncO4JKL/r3gVWBlh/Z61h7j/4ZXwQ=;
+        b=dkD1HMHNc3u2lokBeS9EgDAhIVt0/YZ+STE3czXIeWa0urEuoYnPhcLDxQzwHTeu678MjBdhgtiY7
+         JMYlTDXDg==
+X-HalOne-ID: eaf56fd1-2d89-11ee-8d0f-b90637070a9d
+Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
+        by mailrelay3 (Halon) with ESMTPSA
+        id eaf56fd1-2d89-11ee-8d0f-b90637070a9d;
+        Fri, 28 Jul 2023 21:01:29 +0000 (UTC)
+Date:   Fri, 28 Jul 2023 23:01:27 +0200
+From:   Sam Ravnborg <sam@ravnborg.org>
+To:     Helge Deller <deller@gmx.de>
+Cc:     Thomas Zimmermann <tzimmermann@suse.de>, javierm@redhat.com,
+        linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-geode@lists.infradead.org, linux-omap@vger.kernel.org,
         kvm@vger.kernel.org
-Cc:     anup@brainfault.org, atishp@atishpatra.org,
-        ajones@ventanamicro.com,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Subject: [PATCH v2 1/1] RISC-V: KVM: provide UAPI for host SATP mode
-Date:   Fri, 28 Jul 2023 18:01:22 -0300
-Message-ID: <20230728210122.175229-2-dbarboza@ventanamicro.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230728210122.175229-1-dbarboza@ventanamicro.com>
-References: <20230728210122.175229-1-dbarboza@ventanamicro.com>
+Subject: Re: [PATCH 00/47] fbdev: Use I/O helpers
+Message-ID: <20230728210127.GA1156027@ravnborg.org>
+References: <20230728182234.10680-1-tzimmermann@suse.de>
+ <c1a4b7c9-50f2-c43f-277d-c2af9ccc0b50@gmx.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c1a4b7c9-50f2-c43f-277d-c2af9ccc0b50@gmx.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,88 +63,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM userspaces need to be aware of the host SATP to allow them to
-advertise it back to the guest OS.
+Hi Helge,
 
-Since this information is used to build the guest FDT we can't wait for
-the SATP reg to be readable. We just need to read the SATP mode, thus
-we can use the existing 'satp_mode' global that represents the SATP reg
-with MODE set and both ASID and PPN cleared. E.g. for a 32 bit host
-running with sv32 satp_mode is 0x80000000, for a 64 bit host running
-sv57 satp_mode is 0xa000000000000000, and so on.
+On Fri, Jul 28, 2023 at 08:46:59PM +0200, Helge Deller wrote:
+> On 7/28/23 18:39, Thomas Zimmermann wrote:
+> > Most fbdev drivers operate on I/O memory.
+> 
+> Just nitpicking here:
+> What is I/O memory?
+> Isn't it either memory, or I/O ?
+> I mean, I would never think of the cfb* draw functions under I/O.
+> 
+> > And most of those use the
+> > default implementations for file I/O and console drawing. Convert all
+> > these low-hanging fruits to the fb_ops initializer macro and Kconfig
+> > token for fbdev I/O helpers.
+> 
+> I do see the motivation for your patch, but I think the
+> macro names are very misleading.
+> 
+> You have:
+> #define __FB_DEFAULT_IO_OPS_RDWR \
+>         .fb_read        = fb_io_read, \
+>         .fb_write       = fb_io_write
+> 
+> #define __FB_DEFAULT_IO_OPS_DRAW \
+>         .fb_fillrect    = cfb_fillrect, \
+>         .fb_copyarea    = cfb_copyarea, \
+>         .fb_imageblit   = cfb_imageblit
+> 
+> #define __FB_DEFAULT_IO_OPS_MMAP \
+>         .fb_mmap        = NULL /* default implementation */
+> 
+> #define FB_DEFAULT_IO_OPS \
+>         __FB_DEFAULT_IO_OPS_RDWR, \
+>         __FB_DEFAULT_IO_OPS_DRAW, \
+>         __FB_DEFAULT_IO_OPS_MMAP
+> 
+> I think FB_DEFAULT_IO_OPS is OK for read/write/mmap.
+> But I would suggest to split out __FB_DEFAULT_IO_OPS_DRAW.
+> Something like:
+> #define FB_DEFAULT_IO_OPS \
+>         __FB_DEFAULT_IO_OPS_RDWR, \
+>         __FB_DEFAULT_IO_OPS_MMAP
 
-Add a new userspace virtual config register 'satp_mode' to allow
-userspace to read the current SATP mode the host is using with
-GET_ONE_REG API before spinning the vcpu.
 
-'satp_mode' can't be changed via KVM, so SET_ONE_REG is allowed as long
-as userspace writes the existing 'satp_mode'.
+> #define FB_DEFAULT_CFB_OPS \
+>         .fb_fillrect    = cfb_fillrect, \
+>         .fb_copyarea    = cfb_copyarea, \
+>         .fb_imageblit   = cfb_imageblit
 
-Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
----
- arch/riscv/include/asm/csr.h      | 2 ++
- arch/riscv/include/uapi/asm/kvm.h | 1 +
- arch/riscv/kvm/vcpu_onereg.c      | 7 +++++++
- 3 files changed, 10 insertions(+)
+The prefix cfb, I have recently learned, equals color frame buffer.
+They are named such for purely historical reasons.
 
-diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-index 7bac43a3176e..777cb8299551 100644
---- a/arch/riscv/include/asm/csr.h
-+++ b/arch/riscv/include/asm/csr.h
-@@ -54,6 +54,7 @@
- #ifndef CONFIG_64BIT
- #define SATP_PPN	_AC(0x003FFFFF, UL)
- #define SATP_MODE_32	_AC(0x80000000, UL)
-+#define SATP_MODE_SHIFT	31
- #define SATP_ASID_BITS	9
- #define SATP_ASID_SHIFT	22
- #define SATP_ASID_MASK	_AC(0x1FF, UL)
-@@ -62,6 +63,7 @@
- #define SATP_MODE_39	_AC(0x8000000000000000, UL)
- #define SATP_MODE_48	_AC(0x9000000000000000, UL)
- #define SATP_MODE_57	_AC(0xa000000000000000, UL)
-+#define SATP_MODE_SHIFT	60
- #define SATP_ASID_BITS	16
- #define SATP_ASID_SHIFT	44
- #define SATP_ASID_MASK	_AC(0xFFFF, UL)
-diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-index 9c35e1427f73..992c5e407104 100644
---- a/arch/riscv/include/uapi/asm/kvm.h
-+++ b/arch/riscv/include/uapi/asm/kvm.h
-@@ -55,6 +55,7 @@ struct kvm_riscv_config {
- 	unsigned long marchid;
- 	unsigned long mimpid;
- 	unsigned long zicboz_block_size;
-+	unsigned long satp_mode;
- };
- 
- /* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index 0dc2c2cecb45..85773e858120 100644
---- a/arch/riscv/kvm/vcpu_onereg.c
-+++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -152,6 +152,9 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
- 	case KVM_REG_RISCV_CONFIG_REG(mimpid):
- 		reg_val = vcpu->arch.mimpid;
- 		break;
-+	case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-+		reg_val = satp_mode >> SATP_MODE_SHIFT;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -234,6 +237,10 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
- 		else
- 			return -EBUSY;
- 		break;
-+	case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-+		if (reg_val != (satp_mode >> SATP_MODE_SHIFT))
-+			return -EINVAL;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
--- 
-2.41.0
+What is important is where the data are copied as we have two
+implementations of for example copyarea - one using system memory, the
+other using IO memory.
 
+The naming FB_DEFAULT_IO_OPS says this is the defaults to IO memory
+operations, which tell what they do and avoid the strange cfb acronym.
+
+Reserve cfb for color frame buffers only - and maybe in the end rename
+the three cfbcopyarea, cfbfillrect, cfbimgblt to use the io prefix.
+Which is much simpler to do after this series - and nice extra benefit.
+
+I hope this properly explains why I like the current naming and
+acked it when the macros were introduced.
+
+	Sam
