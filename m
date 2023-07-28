@@ -2,137 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 242B7767153
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 18:00:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF56A767163
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 18:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236616AbjG1QA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 12:00:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47378 "EHLO
+        id S236735AbjG1QCx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 12:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234529AbjG1QA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 12:00:26 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E0D110;
-        Fri, 28 Jul 2023 09:00:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S232874AbjG1QCu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 12:02:50 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B772F3;
+        Fri, 28 Jul 2023 09:02:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 846536217D;
-        Fri, 28 Jul 2023 16:00:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95828C433C8;
-        Fri, 28 Jul 2023 16:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690560024;
-        bh=hYf2rKT66EA0CLZn0dh5++ZEnZG97g1m9o59RcdzOUI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Td4BxKeLp8QaPwWqHQy6Fx8W2LrPCrYUlu1FHCBUsHZ8/LXjVoR3VvSXxZEnMOk+8
-         i337flH1gYWa/tB98k96VkLHwDSJ+1PwC98Kzs1DyywIpuw5G7NXMPM3FLfSrU1/tC
-         cBI6M2GLk95RDUgycJ7+eBXJGEKJyIkwRBbAKoJNmRJunmbvtQI5nDCnoXjP/MQf1D
-         3yLjOHYu0p2S53UnrI14nFrYm+1xXZxoO7U7N+5vLDMvCBs59Sf7pwbG6y4K8qb+UV
-         73axdh7/A0S74p9M6VVrD8rFpNpgPlupr2+Ne5VA9RxvXeOoCAEAAxKv1+S9w1/tRQ
-         v+JeeohU1wfFw==
-Date:   Fri, 28 Jul 2023 11:00:14 -0500
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 13/20] context_tracking: Make context_tracking_key
- __ro_after_init
-Message-ID: <20230728160014.vjxikkoo4rieng55@treble>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-14-vschneid@redhat.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9DB191F854;
+        Fri, 28 Jul 2023 16:02:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1690560167; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CvY0+v4nvg0O0BVEhEc8BmZfYzpPNCFFCMaJmCODeHg=;
+        b=LuP/9ao2mrKjhPvKezWW1/W17SEYJs2q92vl0M2JCYXcddXuljTTEbIYow9womJUw6LJrg
+        qzowp5BeJWVnf+lzn5JU5UBXET439G9aZl2Cej4L8DEUkkS2Xabj9scGTntFuX4nFsk5BK
+        jGFVo1NW+KmbJNwVJQIyJlgnQrU5Tm8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1690560167;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CvY0+v4nvg0O0BVEhEc8BmZfYzpPNCFFCMaJmCODeHg=;
+        b=PJkmStLEQ4tX3u5n/JqYexTLZ62i3tFelBIXmZgBwUht8ehxcz9TNcF+IDGXx4zqKelWMj
+        1J0IPH/P9l/ZmiCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0504113276;
+        Fri, 28 Jul 2023 16:02:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vp1JAKfmw2ReUwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 28 Jul 2023 16:02:47 +0000
+Message-ID: <692b09f7-70d9-1119-7fe2-3e7396ec259d@suse.cz>
+Date:   Fri, 28 Jul 2023 18:02:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230720163056.2564824-14-vschneid@redhat.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v11 10/29] mm: Add AS_UNMOVABLE to mark mapping as
+ completely unmovable
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-11-seanjc@google.com>
+ <20230725102403.xywjqlhyqkrzjok6@box.shutemov.name>
+ <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <ZL/Fa4W2Ne9EVxoh@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 05:30:49PM +0100, Valentin Schneider wrote:
-> objtool now warns about it:
+On 7/25/23 14:51, Matthew Wilcox wrote:
+> On Tue, Jul 25, 2023 at 01:24:03PM +0300, Kirill A . Shutemov wrote:
+>> On Tue, Jul 18, 2023 at 04:44:53PM -0700, Sean Christopherson wrote:
+>> > diff --git a/mm/compaction.c b/mm/compaction.c
+>> > index dbc9f86b1934..a3d2b132df52 100644
+>> > --- a/mm/compaction.c
+>> > +++ b/mm/compaction.c
+>> > @@ -1047,6 +1047,10 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+>> >  		if (!mapping && (folio_ref_count(folio) - 1) > folio_mapcount(folio))
+>> >  			goto isolate_fail_put;
+>> >  
+>> > +		/* The mapping truly isn't movable. */
+>> > +		if (mapping && mapping_unmovable(mapping))
+>> > +			goto isolate_fail_put;
+>> > +
+>> 
+>> I doubt that it is safe to dereference mapping here. I believe the folio
+>> can be truncated from under us and the mapping freed with the inode.
+>> 
+>> The folio has to be locked to dereference mapping safely (given that the
+>> mapping is still tied to the folio).
 > 
->   vmlinux.o: warning: objtool: enter_from_user_mode+0x4e: Non __ro_after_init static key "context_tracking_key" in .noinstr section
->   vmlinux.o: warning: objtool: enter_from_user_mode+0x50: Non __ro_after_init static key "context_tracking_key" in .noinstr section
->   vmlinux.o: warning: objtool: syscall_enter_from_user_mode+0x60: Non __ro_after_init static key "context_tracking_key" in .noinstr section
->   vmlinux.o: warning: objtool: syscall_enter_from_user_mode+0x62: Non __ro_after_init static key "context_tracking_key" in .noinstr section
->   [...]
+> There's even a comment to that effect later on in the function:
+
+Hmm, well spotted. But it wouldn't be so great if we now had to lock every
+inspected page (and not just dirty pages), just to check the AS_ bit.
+
+But I wonder if this is leftover from previous versions. Are the guest pages
+even PageLRU currently? (and should they be, given how they can't be swapped
+out or anything?) If not, isolate_migratepages_block will skip them anyway.
+
 > 
-> The key can only be enabled (and not disabled) in the __init function
-> ct_cpu_tracker_user(), so mark it as __ro_after_init.
+>                         /*
+>                          * Only pages without mappings or that have a
+>                          * ->migrate_folio callback are possible to migrate
+>                          * without blocking. However, we can be racing with
+>                          * truncation so it's necessary to lock the page
+>                          * to stabilise the mapping as truncation holds
+>                          * the page lock until after the page is removed
+>                          * from the page cache.
+>                          */
 > 
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+> (that could be reworded to make it clear how dangerous dereferencing
+> ->mapping is without the lock ... and it does need to be changed to say
+> "folio lock" instead of "page lock", so ...)
 
-It's best to avoid temporarily introducing warnings.  Bots will
-rightfully complain about that.  This patch and the next one should come
-before the objtool patches.
+> How does this look?
+> 
+>                         /*
+>                          * Only folios without mappings or that have
+>                          * a ->migrate_folio callback are possible to
+>                          * migrate without blocking. However, we can
+>                          * be racing with truncation, which can free
+>                          * the mapping.  Truncation holds the folio lock
+>                          * until after the folio is removed from the page
+>                          * cache so holding it ourselves is sufficient.
+>                          */
+> 
 
-Also it would be helpful for the commit log to have a brief
-justification for the patch beyond "fix the objtool warning".  Something
-roughly like:
-
-  Soon, runtime-mutable text won't be allowed in .noinstr sections, so
-  that a code patching IPI to a userspace-bound CPU can be safely
-  deferred to the next kernel entry.
-
-  'context_tracking_key' is only enabled in __init ct_cpu_tracker_user().
-  Mark it as __ro_after_init.
-
--- 
-Josh
