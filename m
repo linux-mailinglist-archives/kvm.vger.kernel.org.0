@@ -2,117 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1706D766565
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 09:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5078D76656C
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 09:34:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234289AbjG1HcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 03:32:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59442 "EHLO
+        id S234309AbjG1Hen (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 03:34:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232217AbjG1HcE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 03:32:04 -0400
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55B4D2733
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 00:32:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1690529523; x=1722065523;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=8ejy6P2bBd0LhwiqvIcJEfKf41A6QsV8xDWjh4JMxWw=;
-  b=bdWZh2pZvc/t99tUZ1vmnDhDTL2FETW0ACiRIvhcmymm+s7j53LVu1pP
-   qxuNZng3Nk6OciGOoIHe0UnxTJ4kiDXDcbayjMmJIYMlHzIMB438Wzg9R
-   JPF0egrMNChSpPkZ4rbmpbrIBzbvR9PNmArPE/YUAY3HsbotU9mb2AtbL
-   k=;
-X-IronPort-AV: E=Sophos;i="6.01,236,1684800000"; 
-   d="scan'208";a="19134859"
-Subject: RE: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
-Thread-Topic: [PATCH v3] KVM: x86/xen: Implement hvm_op/HVMOP_flush_tlbs hypercall
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2023 07:32:01 +0000
-Received: from EX19D020EUA003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id 85D9F8046C;
-        Fri, 28 Jul 2023 07:31:58 +0000 (UTC)
-Received: from EX19D043EUB002.ant.amazon.com (10.252.61.125) by
- EX19D020EUA003.ant.amazon.com (10.252.50.116) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 28 Jul 2023 07:31:58 +0000
-Received: from EX19D043EUB001.ant.amazon.com (10.252.61.24) by
- EX19D043EUB002.ant.amazon.com (10.252.61.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 28 Jul 2023 07:31:57 +0000
-Received: from EX19D043EUB001.ant.amazon.com ([fe80::e881:f31d:88bf:58d8]) by
- EX19D043EUB001.ant.amazon.com ([fe80::e881:f31d:88bf:58d8%4]) with mapi id
- 15.02.1118.030; Fri, 28 Jul 2023 07:31:57 +0000
-From:   "Kaya, Metin" <metikaya@amazon.co.uk>
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-        "paul@xen.org" <paul@xen.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>
-Thread-Index: AQHZv/zTJE/XNJFp4kq8iGiflPNh7K/NhPIAgAFDMOA=
-Date:   Fri, 28 Jul 2023 07:31:57 +0000
-Message-ID: <617829a3b166423486bcb69884cc8894@amazon.co.uk>
-References: <138f584bd86fe68aa05f20db3de80bae61880e11.camel@infradead.org>
-         <20230418101306.98263-1-metikaya@amazon.co.uk>
-         <ZHEXX/OG6suNGWPN@google.com>
-         <9a58e731421edad45dff31e681b83f90c5e9775e.camel@infradead.org>
-         <ZMF8/SUw5ebkDhde@google.com>
- <bbe3f0721e9f2965858b407afe638000f6b0d021.camel@infradead.org>
-In-Reply-To: <bbe3f0721e9f2965858b407afe638000f6b0d021.camel@infradead.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.252.51.153]
+        with ESMTP id S231910AbjG1Hem (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 03:34:42 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C21C2D5B
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 00:34:41 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36S7KPRH018527
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:34:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : from
+ : subject : to : cc : message-id : date; s=pp1;
+ bh=hCwiY1IMUywcveOupUFDd4svOOXeqE8WoJ55Pc9Y0/s=;
+ b=HdB2FDCp35OaWe2hi8EZxSpzUFYhTssLRCG+GK84pCOHjU3tZB59g6EsTFrTGwuyfuVX
+ tnMfHfV7cW0t+2ChPq+R1VPvw+fmHOrdYgbrikfkLKtVCIPDc83BkoFtPjazpVZ1r8tw
+ RPkaxXuHqbTj5KcdSK13VcvRF/W4TnnNsWDrPMQgaijEuxV9dbTqB4uk3jBOBnmi6iFO
+ O1rQmL7/JnT0033pB7jTFl4BWewJ9pA0jaMoIVOicmwxH78LYG1EjmW/o5xYdIfjfVyW
+ fxxFVBPzJ4kOd07vwRJPKlyVNfcJKwqwXSORFqruEt1ER0LqZLKsnyjWHfd56aIPrS2B 5g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s4932gj27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:34:38 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36S7FfeB001607
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:34:28 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s4932ghnd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Jul 2023 07:34:27 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36S54ZwU002079;
+        Fri, 28 Jul 2023 07:34:19 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0tenm5s9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Jul 2023 07:34:19 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36S7YHhM42074644
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Jul 2023 07:34:17 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB9B520043;
+        Fri, 28 Jul 2023 07:34:17 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6964E20040;
+        Fri, 28 Jul 2023 07:34:17 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.77.129])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 28 Jul 2023 07:34:16 +0000 (GMT)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
-        T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230725033937.277156-3-npiggin@gmail.com>
+References: <20230725033937.277156-1-npiggin@gmail.com> <20230725033937.277156-3-npiggin@gmail.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 2/3] migration: Fix test harness hang if source does not reach migration point
+To:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+Message-ID: <169052965551.15205.2179571087904012453@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Fri, 28 Jul 2023 09:34:15 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: F15Tvgd13ZdKae6JjlrCUvlbL6svVf6m
+X-Proofpoint-GUID: m-1DeTpiuoN48VyYTPV6D7Y5eeTxNSG_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ mlxlogscore=999 clxscore=1015 spamscore=0 impostorscore=0 suspectscore=0
+ bulkscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307280068
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVGh1LCBKdWwgMjcsIDIwMjMgYXQgMTowNCBQTSwgRGF2aWQgV29vZGhvdXNlIHdyb3RlOg0K
-PiBPbiBXZWQsIDIwMjMtMDctMjYgYXQgMTM6MDcgLTA3MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24g
-d3JvdGU6DQo+ID4gT24gVHVlLCBKdWwgMjUsIDIwMjMsIERhdmlkIFdvb2Rob3VzZSB3cm90ZToN
-Cj4gPiA+IE9uIEZyaSwgMjAyMy0wNS0yNiBhdCAxMzozMiAtMDcwMCwgU2VhbiBDaHJpc3RvcGhl
-cnNvbiB3cm90ZToNCj4gPiA+ID4gICA6IEFoYSEgIEFuZCBRRU1VIGFwcGVhcnMgdG8gaGF2ZSBY
-ZW4gZW11bGF0aW9uIHN1cHBvcnQuICBUaGF0IG1lYW5zIEtWTS1Vbml0LVRlc3RzDQo+ID4gPiA+
-ICAgOiBpcyBhbiBvcHRpb24uICBTcGVjaWZpY2FsbHksIGV4dGVuZCB0aGUgImFjY2VzcyIgdGVz
-dCB0byB1c2UgdGhpcyBoeXBlcmNhbGwgaW5zdGVhZA0KPiA+ID4gPiAgIDogb2YgSU5WTFBHLiAg
-VGhhdCdsbCB2ZXJpZnkgdGhhdCB0aGUgZmx1c2ggaXMgYWN0dWFsbHkgYmVpbmcgcGVyZm9ybWVk
-IGFzIGV4cHRlY2VkLg0KPiA+ID4NCj4gPiA+IFRoYXQgd29ya3MuIE1ldGluIGhhcyBhIGJldHRl
-ciB2ZXJzaW9uIHRoYXQgYWN0dWFsbHkgc2V0cyB1cCB0aGUNCj4gPiA+IGh5cGVyY2FsbCBwYWdl
-IHByb3Blcmx5IGFuZCB1c2VzIGl0LCBidXQgdGhhdCBvbmUgYmFpbHMgb3V0IHdoZW4gWGVuDQo+
-ID4gPiBzdXBwb3J0IGlzbid0IHByZXNlbnQsIGFuZCBkb2Vzbid0IHNob3cgdGhlIGZhaWx1cmUg
-bW9kZSBxdWl0ZSBzbw0KPiA+ID4gY2xlYXJseS4gVGhpcyBpcyB0aGUgc2ltcGxlIHZlcnNpb246
-DQo+ID4NCj4gPiBJSVVDLCB5J2FsbCBoYXZlIGFscmVhZHkgd3JpdHRlbiBib3RoIHRlc3RzLCBz
-byB3aHkgbm90IHBvc3QgYm90aD8gIEkgY2VydGFpbmx5DQo+ID4gd29uJ3Qgb2JqZWN0IHRvIG1v
-cmUgdGVzdHMgaWYgdGhleSBwcm92aWRlIGRpZmZlcmVudCBjb3ZlcmFnZS4NCj4NCj4gWWVhaCwg
-aXQganVzdCBuZWVkZWQgY2xlYW5pbmcgdXAuDQo+DQo+IFRoaXMgaXMgd2hhdCB3ZSBoYXZlOyBN
-ZXRpbiB3aWxsIHN1Ym1pdCBpdCBmb3IgcmVhbCBhZnRlciBhIGxpdHRsZSBtb3JlDQo+IHBvbGlz
-aGluZy4gSXQgbW9kaWZpZXMgdGhlIGV4aXN0aW5nIGFjY2VzcyB0ZXN0IHNvIHRoYXQgKmlmKiBp
-dCdzIHJ1bg0KPiBpbiBhIFhlbiBlbnZpcm9ubWVudCwgYW5kICppZiogdGhlIEhWTU9QX2ZsdXNo
-X3RsYnMgY2FsbCByZXR1cm5zDQo+IHN1Y2Nlc3MgaW5zdGVhZCBvZiAtRU5PU1lTLCBpdCdsbCB1
-c2UgdGhhdCBpbnN0ZWFkIG9mIGludmxwZy4NCg0KUGF0Y2ggaXMgcG9zdGVkIHRvIGt2bS11bml0
-LXRlc3RzOiBodHRwczovL21hcmMuaW5mby8/bD1rdm0mbT0xNjkwNTI4NjcwMjQxOTEmdz0yDQoN
-Cj4gSW4gaXRzZWxmLCB0aGF0IGRvZXNuJ3QgZ2l2ZSB1cyBhbiBhdXRvbWF0aWMgcmVncmVzc2lv
-biB0ZXN0cywgYmVjYXVzZQ0KPiB5b3Ugc3RpbGwgbmVlZCB0byBydW4gaXQgbWFudWFsbHkg4oCU
-IGFzIGJlZm9yZSwNCj4gIHFlbXUtc3lzdGVtLXg4Nl82NCAtZGV2aWNlIGlzYS1kZWJ1Zy1leGl0
-LGlvYmFzZT0weGY0LGlvc2l6ZT0weDQgLXZuYyBub25lIC1zZXJpYWwgc3RkaW8gLWRldmljZSBw
-Y2ktdGVzdGRldiAtLWFjY2VsIGt2bSx4ZW4tdmVyc2lvbj0weDQwMDBhLGtlcm5lbC1pcnFjaGlw
-PXNwbGl0ICAta2VybmVsIH4vYWNjZXNzX3Rlc3QuZmxhdA0KPg0KPiBJZiB3ZSByZWFsbHkgd2Fu
-dCB0bywgd2UgY2FuIGxvb2sgYXQgbWFraW5nIGl0IHJ1biB0aGF0IHdheSB3aGVuIHFlbXUNCj4g
-YW5kIHRoZSBob3N0IGtlcm5lbCBzdXBwb3J0IFhlbiBndWVzdHMuLi4/DQoNCg==
+Quoting Nicholas Piggin (2023-07-25 05:39:36)
+> After starting the test, the harness waits polling for "migrate" in the
+> output. If the test does not print for some reason, the harness hangs.
+>=20
+> Test that the pid is still alive while polling to fix this hang.
+>=20
+> While here, wait for the full string "Now migrate the VM", which I think
+> makes it more obvious to read and could avoid an unfortunate collision
+> with some debugging output in a test case.
+>=20
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+
+Thanks for attempting to fix this!
+
+> ---
+>  scripts/arch-run.bash | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 518607f4..30e535c7 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -142,6 +142,7 @@ run_migration ()
+> =20
+>         eval "$@" -chardev socket,id=3Dmon1,path=3D${qmp1},server=3Don,wa=
+it=3Doff \
+>                 -mon chardev=3Dmon1,mode=3Dcontrol | tee ${migout1} &
+> +       live_pid=3D`jobs -l %+ | grep "eval" | awk '{print$2}'`
+
+Pardon my ignorance, but why would $! not work here?
