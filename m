@@ -2,175 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A5B47666D5
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 10:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53351766727
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 10:31:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234869AbjG1IUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 04:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56284 "EHLO
+        id S234905AbjG1Ib3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 04:31:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234867AbjG1ITW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 04:19:22 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC4543C0C
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 01:19:15 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6748a616e17so437615b3a.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 01:19:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1690532355; x=1691137155;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0Vz5i3f1KwBqEHtOj3kkD+u+idA4hMEDLOXYQ/Zmb7I=;
-        b=L2+elQ31DoTndDMbULUpYhAiCoRfDRGWwRsLhePlw7WW3kXFI6RoGNteAO7MNCCxPK
-         FYWrT0NCxgniYdOvtk354oC7lAaEYLaI5+6nbBgCsJS7Z9F7PQNW+ZUGwlLgRq4XIWCd
-         IlyzJlPUeNX37jF32KJvYLJePzYsZ7ze/fbSuG8EqYw256JXY3KCKzS1wluS9KcnHJgS
-         wVJn5VLovDZDoJav6s/8z2Nev3fZMa4BKzS6r7L/dPmXUhh82k37p3M1JnHGLMc145hK
-         MLBcl9i8u/Uj6MSDKzSJ+fdKEdHQ4PpsFlNhyTOhfKom9VA3y6JlxMc/+2lHqKKi6hTK
-         U83g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690532355; x=1691137155;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Vz5i3f1KwBqEHtOj3kkD+u+idA4hMEDLOXYQ/Zmb7I=;
-        b=fdb5T6bGSar+hs6XNH/oASJXEzFMcvgfxpM0V4k4UeG/ZJM7WZTSRP3fPJSLUWECiM
-         Rjrbl/jinfSNred2/mKCT6jaFZb3P7P+QlhL4kobf5g0C00BeYpsYHC/j+jxG9AKydX5
-         s+0DIvCMzDT1sPy8O4vm4LyNNrmkI5clGMq4wgMrA4O7nVobo6CwWZdnKZV4L7eFHkSa
-         r4E78u6vboTItNhgQJZvoJBT0k/IZp7HiWUxPzSuyLuJfnla+qiVb0Etji6w4SZk2KCJ
-         TZxNmKAAJ49FThLrlawo4Am4mqFJEsdxJ98YBSsbSyqaPEjOybHtwqzWJfzCxJYykNcW
-         HU4A==
-X-Gm-Message-State: ABy/qLakKNW0IYK8wm7HNbmoZJrlA5KMqVJMtsXxkhsef3GhSDaCR8Cs
-        lbuuZQ3P9vtNh3B6AzURPxa+nw==
-X-Google-Smtp-Source: APBJJlFUUUMvBrf6ibd1LKjgOpEN2XEkSNdXdEqaA3c50PeJDSflhjqiMTE27IMY1LDD8QpZTvY8yg==
-X-Received: by 2002:a05:6a21:329f:b0:134:76d6:7f7 with SMTP id yt31-20020a056a21329f00b0013476d607f7mr2068612pzb.4.1690532355159;
-        Fri, 28 Jul 2023 01:19:15 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id j63-20020a638b42000000b005637030d00csm2862658pge.30.2023.07.28.01.19.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 01:19:14 -0700 (PDT)
-Message-ID: <99d0958d-8446-6fe9-a0fb-f562cb04c7c8@bytedance.com>
-Date:   Fri, 28 Jul 2023 16:19:01 +0800
+        with ESMTP id S234979AbjG1Ia4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 04:30:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102AE3AA3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 01:30:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6A30B6205C
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 08:30:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1516C43391;
+        Fri, 28 Jul 2023 08:30:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690533000;
+        bh=yZcmhkVMMz+kdgiMr/eWhQGJ2beGySESdCvZqQcaZy8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=gqjS58jiIRcP+SC5UPgIH3fZINNtlflJLzew5gWXkmMFb9ZjjmdESFOfjj3+o6qJr
+         VBP8lQ+KYTb/E1vBGscZJMh+oz0fPfKUloLjAzJ4rKeSRWpQJPw99W7SYOHGVlDOe2
+         0Uv0bAkE0a8w/i7GnLvnrCHz5Yzf1VBIcqtJFklXpNiySaROnrPBySu7DyZXvjRsz0
+         d8pzNE38Y0KAbDMRJpt7ATeDQTN74SIk+w4CA1wutY5n/Y+1+t7bY2t1EmMD7r1tww
+         3SQcieo7iTsc6pcoOHOS4lCplnxPWG9irGztu7GoZOpOail5psvMcTWnhJ0zNpF3JJ
+         t4CFedxQv3BKg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qPIrG-0000EO-6L;
+        Fri, 28 Jul 2023 09:29:58 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 00/26] KVM: arm64: NV trap forwarding infrastructure
+Date:   Fri, 28 Jul 2023 09:29:26 +0100
+Message-Id: <20230728082952.959212-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v3 04/49] mm: shrinker: remove redundant shrinker_rwsem in
- debugfs operations
-Content-Language: en-US
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
-        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
-        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
-        yujie.liu@intel.com, gregkh@linuxfoundation.org,
-        muchun.song@linux.dev, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, x86@kernel.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Muchun Song <songmuchun@bytedance.com>
-References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
- <20230727080502.77895-5-zhengqi.arch@bytedance.com>
- <ZMN4mjsF1QEsvW7D@corigine.com>
-From:   Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <ZMN4mjsF1QEsvW7D@corigine.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Simon,
+As people are getting tired of seeing the full NV series, I've
+extracted some of the easy stuff which I'm targeting for 6.6.
 
-On 2023/7/28 16:13, Simon Horman wrote:
-> On Thu, Jul 27, 2023 at 04:04:17PM +0800, Qi Zheng wrote:
->> The debugfs_remove_recursive() will wait for debugfs_file_put() to return,
->> so the shrinker will not be freed when doing debugfs operations (such as
->> shrinker_debugfs_count_show() and shrinker_debugfs_scan_write()), so there
->> is no need to hold shrinker_rwsem during debugfs operations.
->>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
->> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
->> ---
->>   mm/shrinker_debug.c | 14 --------------
->>   1 file changed, 14 deletions(-)
->>
->> diff --git a/mm/shrinker_debug.c b/mm/shrinker_debug.c
->> index 3ab53fad8876..f1becfd45853 100644
->> --- a/mm/shrinker_debug.c
->> +++ b/mm/shrinker_debug.c
->> @@ -55,11 +55,6 @@ static int shrinker_debugfs_count_show(struct seq_file *m, void *v)
->>   	if (!count_per_node)
->>   		return -ENOMEM;
->>   
->> -	ret = down_read_killable(&shrinker_rwsem);
->> -	if (ret) {
->> -		kfree(count_per_node);
->> -		return ret;
->> -	}
->>   	rcu_read_lock();
-> 
-> Hi Qi Zheng,
-> 
-> As can be seen in the next hunk, this function returns 'ret'.
-> However, with this change 'ret' is uninitialised unless
-> signal_pending() returns non-zero in the while loop below.
+This implements the so called "trap forwarding" infrastructure, which
+gets used when we take a trap from an L2 guest and that the L1 guest
+wants to see the trap for itself.
 
-Thanks for your feedback, the 'ret' should be initialized to 0,
-will fix it.
+Most of the series is pretty boring stuff, mostly a long list of
+encodings which are mapped to a set of trap bits. I swear they are
+correct. Sort of (then are much more correct now that Eric has gone
+through them all with a fine comb).
 
-Thanks,
-Qi
+The interesting bit is around how we compute the trap result, which is
+pretty complex due to the layers of crap the architecture has piled
+over the years (a single op can be trapped by multiple coarse grained
+trap bits, or a fine grained trap bit, which may itself be conditioned
+by another control bit -- madness).
 
-> 
-> This is flagged in a clan-16 W=1 build.
-> 
->   mm/shrinker_debug.c:87:11: warning: variable 'ret' is used uninitialized whenever 'do' loop exits because its condition is false [-Wsometimes-uninitialized]
->           } while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
->                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   mm/shrinker_debug.c:92:9: note: uninitialized use occurs here
->           return ret;
->                  ^~~
->   mm/shrinker_debug.c:87:11: note: remove the condition if it is always true
->           } while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
->                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                    1
->   mm/shrinker_debug.c:77:7: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->                   if (!memcg_aware) {
->                       ^~~~~~~~~~~~
->   mm/shrinker_debug.c:92:9: note: uninitialized use occurs here
->           return ret;
->                  ^~~
->   mm/shrinker_debug.c:77:3: note: remove the 'if' if its condition is always false
->                   if (!memcg_aware) {
->                   ^~~~~~~~~~~~~~~~~~~
->   mm/shrinker_debug.c:52:9: note: initialize the variable 'ret' to silence this warning
->           int ret, nid;
->                  ^
->                   = 0
-> 
->>   
->>   	memcg_aware = shrinker->flags & SHRINKER_MEMCG_AWARE;
->> @@ -92,7 +87,6 @@ static int shrinker_debugfs_count_show(struct seq_file *m, void *v)
->>   	} while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
->>   
->>   	rcu_read_unlock();
->> -	up_read(&shrinker_rwsem);
->>   
->>   	kfree(count_per_node);
->>   	return ret;
-> 
-> ...
+This also results in some rework of both the FGT stuff (for which I
+carry a patch from Mark) and newly introduced the HCRX support.
+
+With that (and the rest of the NV series[0]), FGT gets exposed to guests
+and the trapping seems to work as expected.
+
+* From v1 [1]:
+
+  - Lots of fixups all over the map (too many to mention) after Eric's
+    fantastic reviewing effort. Hopefully the result is easier to
+    understand and less wrong
+
+  - Amended Mark's patch to use the ARM64_CPUID_FIELDS() macro
+
+  - Collected RBs, with thanks.
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-6.6-WIP
+[1] https://lore.kernel.org/all/20230712145810.3864793-1-maz@kernel.org/
+
+Marc Zyngier (25):
+  arm64: Add missing VA CMO encodings
+  arm64: Add missing ERX*_EL1 encodings
+  arm64: Add missing DC ZVA/GVA/GZVA encodings
+  arm64: Add TLBI operation encodings
+  arm64: Add AT operation encodings
+  arm64: Add debug registers affected by HDFGxTR_EL2
+  arm64: Add missing BRB/CFP/DVP/CPP instructions
+  arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+  KVM: arm64: Correctly handle ACCDATA_EL1 traps
+  KVM: arm64: Add missing HCR_EL2 trap bits
+  KVM: arm64: nv: Add FGT registers
+  KVM: arm64: Restructure FGT register switching
+  KVM: arm64: nv: Add trap forwarding infrastructure
+  KVM: arm64: nv: Add trap forwarding for HCR_EL2
+  KVM: arm64: nv: Expose FEAT_EVT to nested guests
+  KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+  KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+  KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+  KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
+  KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
+  KVM: arm64: nv: Add SVC trap forwarding
+  KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
+  KVM: arm64: nv: Expose FGT to nested guests
+  KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+  KVM: arm64: nv: Add support for HCRX_EL2
+
+Mark Brown (1):
+  arm64: Add feature detection for fine grained traps
+
+ arch/arm64/include/asm/kvm_arm.h        |   50 +
+ arch/arm64/include/asm/kvm_host.h       |    7 +
+ arch/arm64/include/asm/kvm_nested.h     |    2 +
+ arch/arm64/include/asm/sysreg.h         |  270 +++-
+ arch/arm64/kernel/cpufeature.c          |    7 +
+ arch/arm64/kvm/arm.c                    |    4 +
+ arch/arm64/kvm/emulate-nested.c         | 1731 +++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c            |   12 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  127 +-
+ arch/arm64/kvm/nested.c                 |   11 +-
+ arch/arm64/kvm/sys_regs.c               |   15 +
+ arch/arm64/kvm/trace_arm.h              |   19 +
+ arch/arm64/tools/cpucaps                |    1 +
+ arch/arm64/tools/sysreg                 |  129 ++
+ 14 files changed, 2345 insertions(+), 40 deletions(-)
+
+-- 
+2.34.1
+
