@@ -2,118 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 930F876634C
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 06:44:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB5547663B9
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 07:46:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbjG1Eot (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 00:44:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48828 "EHLO
+        id S233446AbjG1FqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 01:46:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233324AbjG1Eof (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 00:44:35 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0FA3A92;
-        Thu, 27 Jul 2023 21:44:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WZV8b+dQK94sf3ur23uyFm3gLwYVKEJeUqaLAscTqGfsHa6GmtasAPu/O25GDnvHMZYE/oHFMsgYp7ZZ0e7zzxr+eeFyirqRwteteSGRrjux+Jwq5VfyIB6GjIpxhNUqylaML2b6jhdn35CQTyIBj5uX65bI5u2VjYNYlYgDBtX9ASj/wqkJ3Qdzl36sYilW0ImveaqCba2JIr5xmdpJPK5SnhHcxhJO1mBmZEsP6dguxAJzpV0ZeAAj0o8683RL9bsVkwltG80eBaeEY31kIICnEZllj1faaGAX0S/1OZSiKkbN8Db8R8sj7A/h0hX+06ZP9RHa2P6J91DtF5tlLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cO+HdEFRgc+fGIm0mnRjW78mYR10GWTU281tj5iX7rM=;
- b=ABNtpHGLWUF7v9XXYaP77N2C4b3Qj90MjW0DRb/LoXQLpFGplHnJ4sx9FEwaQvwesHzSIRt1elcHpoz2Luu+dtkSvurF0Vse5iZJfJyDRA7QWGcH1/LP2uJbgWwMd/wQIhRF1GC4gQeYAY386nUlj8rd7o/UeMgc7Z2apgRnifwzNV55pOaX11FOjohOAskrcozwPKvIaLXYf/cHQ8RaEwYlHc5m2hn5qOwaxDU0gRngEgC1ca2yuGOOgyWHj1cfSBqdArusl99rVLM1Bf4YXQhZHcCXyoWR+5v9dgKSw6/CGpX96a5lIuNgoihve1gMKV7iuD9L+Sd6LbAGC2LDzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cO+HdEFRgc+fGIm0mnRjW78mYR10GWTU281tj5iX7rM=;
- b=frWQjZK9ckHV0AouQ4zU/AFzEhL6mLTg3Y9LxAVMgeouhcRqlFAPZrCPLWvg+aFRjfnz/wmLOV3ixuZdkG+r6X/1nJRLjcC6L9hd1nNTOkiveJVGHzCVx18UhImmG3r5MmuyMnZQVdtGuEK1bYu0MVk7r3fo9q0QDVPcT99xI64n51nbSQQ0waQ+QXCV4OatRJAs16SGM0r+d82gDBkNi2lbXBHRiduu6m6v4Zp0AG5I24YLqU+ZkX6gvG9FItc9dJFi3zFH/A8c2ENZ+NU4l0ZrgZ8YPJ3b2xxy+HZvv/lHnOVR6Py52R0oIGNG/cCJhxXcWUXxEy9Wi82lP3/WaQ==
-Received: from CYZPR05CA0038.namprd05.prod.outlook.com (2603:10b6:930:a3::29)
- by DM4PR12MB6280.namprd12.prod.outlook.com (2603:10b6:8:a2::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
- 2023 04:44:24 +0000
-Received: from CY4PEPF0000EDD2.namprd03.prod.outlook.com
- (2603:10b6:930:a3:cafe::6f) by CYZPR05CA0038.outlook.office365.com
- (2603:10b6:930:a3::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.5 via Frontend
- Transport; Fri, 28 Jul 2023 04:44:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CY4PEPF0000EDD2.mail.protection.outlook.com (10.167.241.206) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.22 via Frontend Transport; Fri, 28 Jul 2023 04:44:24 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 27 Jul 2023
- 21:44:17 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.37; Thu, 27 Jul 2023 21:44:16 -0700
-Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
- Transport; Thu, 27 Jul 2023 21:44:16 -0700
-Date:   Thu, 27 Jul 2023 21:44:14 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-CC:     "jgg@nvidia.com" <jgg@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>
-Subject: Re: [PATCH v10 3/6] iommufd: Add iommufd_access_change_ioas(_id)
- helpers
-Message-ID: <ZMNHnmydMM1zExZW@Asurada-Nvidia>
-References: <cover.1690488745.git.nicolinc@nvidia.com>
- <ad75a1f7f0b4d5b6d35238b4ae7b41db1410110c.1690488745.git.nicolinc@nvidia.com>
- <BN9PR11MB527660F2932964A47396D1E88C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZMNF5vTTp2IRMsWH@Asurada-Nvidia>
- <BN9PR11MB5276C3F296F27696AFD92D0F8C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S233414AbjG1FqI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 01:46:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC38B35B0
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 22:45:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690523120;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oAXmH+qYY8bjmfYawJukNpxQ9bW1VMYi2zFEUqTpT64=;
+        b=D+2zr3X6/pAk4+jmBJeQnbQwMsvJb/F06DMUvbCsyOwpBabgqKt3yb7kG+MhZ65unEFhOP
+        xsntZlqA4kjJp8omrheZ9P8oRR6uSokwxUH+FC9PNSYgfHqojg6cjTDVh77fpKjf/EyiJ7
+        /vg7qz9CKUvpNV+aym4DM1aQpdC20PM=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-630-x3014GwLOFuQEdfQ5sboAQ-1; Fri, 28 Jul 2023 01:45:18 -0400
+X-MC-Unique: x3014GwLOFuQEdfQ5sboAQ-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-521dd050a78so1087208a12.0
+        for <kvm@vger.kernel.org>; Thu, 27 Jul 2023 22:45:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690523117; x=1691127917;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oAXmH+qYY8bjmfYawJukNpxQ9bW1VMYi2zFEUqTpT64=;
+        b=Sr9cqktXGpP6/kuhp8JBYonHTkEye9/pfPZ8oqyY+E9Wo3u4IL3WjRP1IrGicAnKpr
+         TIf/jeQlKOz3yPXmJ1/wFNk8iuT2fNhq7XyYGDG4pPJBMyZfbxs/r/+km64aErySSC8z
+         Oljbu05osyp7fzVG+V5E8asCWVvAc+Ghn8YKcJuofTGIgoOQpNQqxxlHaee4BQqC2xCD
+         VwF6ojLlbY/H+a9AsXQEh5oBukUwrPBnD7+u00oZ58nvU+uXbBOYHzy51hIT3K89ZPKM
+         0s9/Z+li8tbSQyX4pY+PsKeZA9yn2zpGOFuGWI4M3c72mUnKwx2NGfIfZ+72v/t+U0JI
+         v/DA==
+X-Gm-Message-State: ABy/qLZwzVx/LRK1PzGHLF6wpiZYLqDPWZOuUQXej7c9ssWahcCZSnQe
+        G57TCc9rU7MCpF+Sx2NkldMYvt2TWK2TgtfBJ9qzUd0mlwkbn8M0JShhnL+IDSWjnj1W/zdlU+u
+        cdjDFtyC/iB1I
+X-Received: by 2002:a05:6402:1b1a:b0:522:5932:57ec with SMTP id by26-20020a0564021b1a00b00522593257ecmr857292edb.41.1690523117664;
+        Thu, 27 Jul 2023 22:45:17 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFBXUrFKZkaaBFtalSQoz0QArd65X5FID0AfhTTUMyGnaIqLIFeqt+FaMOPM4wBS7TieKmTsQ==
+X-Received: by 2002:a05:6402:1b1a:b0:522:5932:57ec with SMTP id by26-20020a0564021b1a00b00522593257ecmr857285edb.41.1690523117382;
+        Thu, 27 Jul 2023 22:45:17 -0700 (PDT)
+Received: from redhat.com ([2.52.14.22])
+        by smtp.gmail.com with ESMTPSA id f26-20020a056402069a00b005224d960e66sm1384975edy.96.2023.07.27.22.45.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 22:45:15 -0700 (PDT)
+Date:   Fri, 28 Jul 2023 01:45:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v4 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
+ preparations
+Message-ID: <20230728012845-mutt-send-email-mst@kernel.org>
+References: <20230727222627.1895355-1-AVKrasnov@sberdevices.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276C3F296F27696AFD92D0F8C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD2:EE_|DM4PR12MB6280:EE_
-X-MS-Office365-Filtering-Correlation-Id: cd70e105-c776-4a02-9c3b-08db8f255151
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I1wUtZkaja0CxmVv7lFDspaD0pihNxFGIvNEvfL0zFI05yy4WYAD/VVSrIsQsB9GhUN354rbyyjyON+kIydHQhHe+CBc0TLJRTCShf0fMKjGM5CWTGPc1sh5xca5TizDzpLnnakMggPk9S7frzTw3rpc2MNuf68CRx+w5Uq8UHRA6fc6Xvm8wzm+OVya1Czk5PmTUA2bvJ+CwrHqbceLEfyqD329s+iUSKLS/ysyb+kMnsEutV5h9MvAkgEFLaR1O5vATDPLnQslO3yuVQhDo6MZdV2gRLRPjLzC6ZpMME9ohZSogcgDo9i+FWvUjE+p850BQyDIbPKeCFT3XLGhcvqOwy9Y+zD8U06ubzIvC8oYwSx5rkyQ716w/ezYGMY49uyO2avYerBzyxplHr+nWYgTf62/5SvX9UXYc5Yhlclh1iuNpIFM6mE8w+ClRIFrK2pW9NCkTaiioOsOAPYjVgUi6S60PqefmtpZn4PxnMc2/7xxZK4Lt8ph+O106XgTFfPt+P/3pc1cTbmpT2E38elnJ/gwob9fhyENLFlYSOzg8IotxhesXItUwpdqQ50fJl8sh7MxuYdOmN5lUHsoFpue38voj8ySST0j2hXYi0UL9rvRw+lbew8hvYq1tX6mn5IpIEPbuw2gS6CseksU6PcCMg40chU2CEFwXnAcu19k5PlwHyB8BUJVXgBLDyjJIbDQzzqFrvsdSj62fAlH+e/DBeSLv/nB0urKP1qi47N1o91PoWjZ60cyiuKMf+3b
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(39860400002)(396003)(346002)(451199021)(82310400008)(46966006)(36840700001)(40470700004)(86362001)(7416002)(33716001)(2906002)(40460700003)(40480700001)(55016003)(426003)(47076005)(83380400001)(186003)(36860700001)(336012)(26005)(9686003)(7636003)(478600001)(356005)(54906003)(4326008)(82740400003)(6916009)(8936002)(70586007)(316002)(70206006)(8676002)(41300700001)(5660300002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 04:44:24.2828
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd70e105-c776-4a02-9c3b-08db8f255151
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EDD2.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6280
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+In-Reply-To: <20230727222627.1895355-1-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -121,41 +87,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 04:41:18AM +0000, Tian, Kevin wrote:
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > Sent: Friday, July 28, 2023 12:37 PM
-> >
-> > On Fri, Jul 28, 2023 at 04:23:03AM +0000, Tian, Kevin wrote:
-> > > > From: Nicolin Chen <nicolinc@nvidia.com>
-> > > > Sent: Friday, July 28, 2023 4:25 AM
-> > > >
-> > > > +static int iommufd_access_change_ioas(struct iommufd_access *access,
-> > > > +                                   struct iommufd_ioas *new_ioas)
-> > > > +{
-> > > > +     u32 iopt_access_list_id = access->iopt_access_list_id;
-> > > > +     struct iommufd_ioas *cur_ioas = access->ioas;
-> > > > +     int rc;
-> > > > +
-> > > > +     lockdep_assert_held(&access->ioas_lock);
-> > > > +
-> > > > +     /* We are racing with a concurrent detach, bail */
-> > > > +     if (cur_ioas != access->ioas_unpin)
-> > > > +             return -EBUSY;
-> > > > +
-> > > > +     if (IS_ERR(new_ioas))
-> > > > +             return PTR_ERR(new_ioas);
-> > >
-> > > iommufd_access_change_ioas_id() already checks errors.
-> >
-> > I've thought about that: given that iommufd_access_change_ioas
-> > is a standalone API, though it's not used anywhere else at the
-> > moment, it might be safer to have this check again. Otherwise,
-> > we would need a line of comments saying that "caller must make
-> > sure that the input new_ioas is not holding an error code" or
-> > so?
-> >
+On Fri, Jul 28, 2023 at 01:26:23AM +0300, Arseniy Krasnov wrote:
+> Hello,
 > 
-> I don't think it's a common practice for the caller to pass in
-> an error pointer when it already knows it's an error...
+> this patchset is first of three parts of another big patchset for
+> MSG_ZEROCOPY flag support:
+> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-OK. I will just drop it then.
+overall looks good. Two points I'd like to see addressed:
+- what's the performance with all these changes - still same?
+- most systems have a copybreak scheme where buffers
+  smaller than a given size are copied directly.
+  This will address regression you see with small buffers -
+  but need to find that value. we know it's between 4k and 32k :)
+
+
+> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+> suggested to split it for three parts to simplify review and merging:
+> 
+> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
+> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+>    tx completions) and update for Documentation/.
+> 3) Updates for tests and utils.
+> 
+> This series enables handling of fragged skbs in virtio and vhost parts.
+> Newly logic won't be triggered, because SO_ZEROCOPY options is still
+> impossible to enable at this moment (next bunch of patches from big
+> set above will enable it).
+> 
+> I've included changelog to some patches anyway, because there were some
+> comments during review of last big patchset from the link above.
+> 
+> Head for this patchset is 9d0cd5d25f7d45bce01bbb3193b54ac24b3a60f3
+> 
+> Link to v1:
+> https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+> Link to v2:
+> https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
+> Link to v3:
+> https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
+> 
+> Changelog:
+>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
+>  * See per-patch changelog after ---.
+> 
+> Arseniy Krasnov (4):
+>   vsock/virtio/vhost: read data from non-linear skb
+>   vsock/virtio: support to send non-linear skb
+>   vsock/virtio: non-linear skb handling for tap
+>   vsock/virtio: MSG_ZEROCOPY flag support
+> 
+>  drivers/vhost/vsock.c                   |  14 +-
+>  include/linux/virtio_vsock.h            |   6 +
+>  net/vmw_vsock/virtio_transport.c        |  79 +++++-
+>  net/vmw_vsock/virtio_transport_common.c | 312 ++++++++++++++++++------
+>  4 files changed, 330 insertions(+), 81 deletions(-)
+> 
+> -- 
+> 2.25.1
+
