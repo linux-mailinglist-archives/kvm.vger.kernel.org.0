@@ -2,29 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53797766F1A
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 16:15:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 200CC766F6D
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 16:26:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236965AbjG1OPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 10:15:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42010 "EHLO
+        id S237035AbjG1O0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 10:26:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236969AbjG1OPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 10:15:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1003A94
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:15:07 -0700 (PDT)
+        with ESMTP id S236048AbjG1O0B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 10:26:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD3B3E62
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 07:26:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7B8F36213B
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 14:15:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA60DC433C8;
-        Fri, 28 Jul 2023 14:15:02 +0000 (UTC)
-Date:   Fri, 28 Jul 2023 15:15:00 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C03F62165
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 14:26:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4603C433C7;
+        Fri, 28 Jul 2023 14:25:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690554359;
+        bh=/9vvNU1VSXlGRnp/R9YCm5AuRUMeGBksbhRSA27Htpg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PThclFdDmMHZaBceyAlh2uEe9xLJfAXHEhZcmGYDbxIoQAlRP5R5xotHjMTPcl8V+
+         1+7pcGzq71ZnR3WAJUDJKefH3429NsUZZX49XWl7jL5zyJmdPofrqsHuosP7Cj8q01
+         ldE1RWidZQ9qE69iOykN90LjuTgdH0V8dLbzy9/Bs3ez2lkwhsGLeYs9q5aV7GZdit
+         1hfmIkP4aPMoNLEBqp4cfTG49NMiUrDrR6oI8jwzROAMSbKwxiUIgitLPHQZviM+gx
+         Jz8gyptBSl72e7s0JUDlqdSXJ2gGYOOXLm9UMCbsnR8irwCAJIQaMqh3zLd7O9UVEj
+         gJ2XK5TpKFmgQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qPOPl-0006xt-5a;
+        Fri, 28 Jul 2023 15:25:57 +0100
+Date:   Fri, 28 Jul 2023 15:25:56 +0100
+Message-ID: <86bkfwt8nf.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         Eric Auger <eric.auger@redhat.com>,
@@ -41,28 +58,49 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 08/26] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-Message-ID: <ZMPNZKXHgbgAWj1v@arm.com>
+Subject: Re: [PATCH v2 04/26] arm64: Add TLBI operation encodings
+In-Reply-To: <ZMPNBOQFxsrEJNS6@arm.com>
 References: <20230728082952.959212-1-maz@kernel.org>
- <20230728082952.959212-9-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728082952.959212-9-maz@kernel.org>
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        <20230728082952.959212-5-maz@kernel.org>
+        <ZMPNBOQFxsrEJNS6@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 09:29:34AM +0100, Marc Zyngier wrote:
-> As we're about to implement full support for FEAT_FGT, add the
-> full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
+On Fri, 28 Jul 2023 15:13:24 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> On Fri, Jul 28, 2023 at 09:29:30AM +0100, Marc Zyngier wrote:
+> > Add all the TLBI encodings that are usable from Non-Secure.
+> > 
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> I trust you they are all correct, haven't checked against the Arm
+> ARM ;).
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+The XML is my forever friend... ;-)
+
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
