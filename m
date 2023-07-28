@@ -2,158 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84CED7668D6
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 11:27:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 407B57668DC
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 11:28:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235284AbjG1J1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 05:27:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43298 "EHLO
+        id S235600AbjG1J23 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 05:28:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235537AbjG1J0s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 05:26:48 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FF43ABB;
-        Fri, 28 Jul 2023 02:23:50 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36S9ED57013004;
-        Fri, 28 Jul 2023 09:23:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=63rTwmkr2qVe7KwT+feKFWstRl3xj4aK8vxWIKymnG4=;
- b=dY+fjPtwCIOK66MKYAh3WK4z7yb9royeyKifUXEIWzjgELJvFaPIqMUUDTSx0oEtJ1GX
- sL1F/Vb5jtaxPPTvgvneZP5JLJHW54UOQy7kucvIuwyczmcCG/GcGkmbsH3cZ3FEE6G6
- L3JIW3DyXnykQTd3fLjjoAumXRkhAGnY1fveYcnbDG9xIuM/GCi8a4bizmSTU07FrVl6
- wOUrLNTpMAdQZ3gNEetik3ReKMWotKE/rkjxlH5yKNumlxBHnDLt0heOCrlfmw7bR0td
- Uiser6rqDGDNr1SHT1EwhimFTKsMHH6tEgQHL8Qo+0aEmXeeCmX+ZNlL+tBQepNn+leY oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s4av287te-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jul 2023 09:23:49 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36S9Eb65013823;
-        Fri, 28 Jul 2023 09:23:49 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s4av287tb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jul 2023 09:23:49 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36S96S1h001973;
-        Fri, 28 Jul 2023 09:23:48 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0tenmt9f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jul 2023 09:23:48 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36S9NhIs22217188
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jul 2023 09:23:43 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5171120040;
-        Fri, 28 Jul 2023 09:23:43 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ED48D2004B;
-        Fri, 28 Jul 2023 09:23:42 +0000 (GMT)
-Received: from a46lp73.lnxne.boe (unknown [9.152.108.100])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jul 2023 09:23:42 +0000 (GMT)
-From:   Steffen Eiden <seiden@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        with ESMTP id S235124AbjG1J2D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 05:28:03 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374284C0D
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 02:25:28 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-52227884855so2737605a12.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 02:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690536326; x=1691141126;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MyDeksRVqGtJNd0fe/itajI8E9fXoiZCjVyZ7emrXms=;
+        b=yZlBBa+QgG6A3izqrAvYrZmjNARnJqe9UVJDDaWeo1ngnmOt9VRY93kWsBg3OxlgJ6
+         BNgAnv6T/0ObsR7NeaCjk+WNJnmyD7Q59yeCq15kUZEqjsFvHdvXA60zH7S6F25/qIjt
+         fm8Sg5o5MpunPrL/BqoXYGZy7msDjit8jc0wg2EmQ6Q8Th8F7S82AjrHRl+/FMq8bTJh
+         sEoAOBkEqP29Krhf8xqYypp/joUWh9VUOF8DEcZIisv2V3iWTfC6qxmMhKHNjRW9HI9T
+         TolK5KmZ7NzIlhfQCguxbwjQDJpXunGMqxws18N6XaE4FtdLuzrmk4BalRM99UvIXMiI
+         LjuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690536326; x=1691141126;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MyDeksRVqGtJNd0fe/itajI8E9fXoiZCjVyZ7emrXms=;
+        b=EtrAQcdIwfZGcGHYygXWugUk9E/JstomS0i/EtyyV4q1o+EMFnnTSz+Dfq5EGGaUNo
+         83+TgG5OPqH7TS1+PDfAYKUW2Ub4twBbniTlsc4YDNRwME4pBTFiI9UiY5N8XoENB4o0
+         fBHGwAauAoqiyjuGt5WsU+wVNJUpGV+FaKHLu2U7X9JzXLE4iobzcbL2AlG379RbTztO
+         0ovYRmSPFsQO2ynsIaQFniEc8AnGUi5HpmlfZnt/7mcHF0kTXKtiDCm2Mod5d1+04X6w
+         4Cylnhay9N6mu6JTCH0bEb+TgZlvSqb/DPGiPFzLFpRfiWYc8igtS85Pt9crZR8rOcVO
+         +7Tg==
+X-Gm-Message-State: ABy/qLYBCZld3fK2wUoda/N1SU08YYDtBCNHfHAtyZVSWqlSueehURh0
+        taUCSDbKqsVdBuuh8T8V3iiIaQ==
+X-Google-Smtp-Source: APBJJlG4DNtaaix3llwTkCcLiQNG9ALlnJv6ynH+2HDeVn6HzB3Xx8i5ieUEd323eDEBkV9C48RmSw==
+X-Received: by 2002:a17:906:8454:b0:994:1fee:3065 with SMTP id e20-20020a170906845400b009941fee3065mr1975862ejy.15.1690536326590;
+        Fri, 28 Jul 2023 02:25:26 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id n12-20020a170906688c00b00992c92af6f4sm1857653ejr.144.2023.07.28.02.25.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jul 2023 02:25:26 -0700 (PDT)
+Date:   Fri, 28 Jul 2023 09:25:22 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Fuad Tabba <tabba@google.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
         David Hildenbrand <david@redhat.com>,
-        Michael Mueller <mimu@linux.vnet.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: [PATCH v2 3/3] KVM: s390: pv:  Allow AP-instructions for pv guests
-Date:   Fri, 28 Jul 2023 11:23:41 +0200
-Message-Id: <20230728092341.1131787-4-seiden@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230728092341.1131787-1-seiden@linux.ibm.com>
-References: <20230728092341.1131787-1-seiden@linux.ibm.com>
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH v11 06/29] KVM: Introduce KVM_SET_USER_MEMORY_REGION2
+Message-ID: <ZMOJgnyzzUNIx+Tn@google.com>
+References: <20230718234512.1690985-1-seanjc@google.com>
+ <20230718234512.1690985-7-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -6JNCO13xaNZtrM78yplKHeDftIjaaij
-X-Proofpoint-GUID: dQ61UrzSNg9TfuWsMkg0KnpQ-8Zb-wwE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 phishscore=0
- mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307280082
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718234512.1690985-7-seanjc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduces new feature bits and enablement flags for AP and AP IRQ
-support.
+On Tuesday 18 Jul 2023 at 16:44:49 (-0700), Sean Christopherson wrote:
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -95,6 +95,16 @@ struct kvm_userspace_memory_region {
+>  	__u64 userspace_addr; /* start of the userspace allocated memory */
+>  };
+>  
+> +/* for KVM_SET_USER_MEMORY_REGION2 */
+> +struct kvm_userspace_memory_region2 {
+> +	__u32 slot;
+> +	__u32 flags;
+> +	__u64 guest_phys_addr;
+> +	__u64 memory_size;
+> +	__u64 userspace_addr;
+> +	__u64 pad[16];
 
-Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
----
- arch/s390/include/asm/uv.h | 12 +++++++++++-
- arch/s390/kvm/pv.c         |  6 ++++--
- 2 files changed, 15 insertions(+), 3 deletions(-)
+Should we replace that pad[16] with:
 
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index 338845402324..913ccfaa9d76 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -99,6 +99,8 @@ enum uv_cmds_inst {
- enum uv_feat_ind {
- 	BIT_UV_FEAT_MISC = 0,
- 	BIT_UV_FEAT_AIV = 1,
-+	BIT_UV_FEAT_AP = 4,
-+	BIT_UV_FEAT_AP_INTR = 5,
- };
- 
- struct uv_cb_header {
-@@ -159,7 +161,15 @@ struct uv_cb_cgc {
- 	u64 guest_handle;
- 	u64 conf_base_stor_origin;
- 	u64 conf_virt_stor_origin;
--	u64 reserved30;
-+	u8  reserved30[6];
-+	union {
-+		struct {
-+			u16 reserved : 14;
-+			u16 ap_instr_intr : 1;
-+			u16 ap_allow_instr : 1;
-+		};
-+		u16 raw;
-+	} flags;
- 	u64 guest_stor_origin;
- 	u64 guest_stor_len;
- 	u64 guest_sca;
-diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-index bf1fdc7bf89e..61d7712466c3 100644
---- a/arch/s390/kvm/pv.c
-+++ b/arch/s390/kvm/pv.c
-@@ -561,12 +561,14 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
- 	uvcb.conf_base_stor_origin =
- 		virt_to_phys((void *)kvm->arch.pv.stor_base);
- 	uvcb.conf_virt_stor_origin = (u64)kvm->arch.pv.stor_var;
-+	uvcb.flags.ap_allow_instr = kvm->arch.model.uv_feat_guest.ap;
-+	uvcb.flags.ap_instr_intr = kvm->arch.model.uv_feat_guest.ap_intr;
- 
- 	cc = uv_call_sched(0, (u64)&uvcb);
- 	*rc = uvcb.header.rc;
- 	*rrc = uvcb.header.rrc;
--	KVM_UV_EVENT(kvm, 3, "PROTVIRT CREATE VM: handle %llx len %llx rc %x rrc %x",
--		     uvcb.guest_handle, uvcb.guest_stor_len, *rc, *rrc);
-+	KVM_UV_EVENT(kvm, 3, "PROTVIRT CREATE VM: handle %llx len %llx rc %x rrc %x flags %04x",
-+		     uvcb.guest_handle, uvcb.guest_stor_len, *rc, *rrc, uvcb.flags.raw);
- 
- 	/* Outputs */
- 	kvm->arch.pv.handle = uvcb.guest_handle;
--- 
-2.40.1
+	__u64 size;
 
+where 'size' is the size of the structure as seen by userspace? This is
+used in other UAPIs (see struct sched_attr for example) and is a bit
+more robust for future extensions (e.g. an 'old' kernel can correctly
+reject a newer version of the struct with additional fields it doesn't
+know about if that makes sense, etc).
