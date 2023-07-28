@@ -2,75 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34022767277
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 18:54:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33766767283
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 18:56:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234254AbjG1QyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 12:54:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52000 "EHLO
+        id S234730AbjG1Q4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 12:56:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237501AbjG1Qxz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 12:53:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037884C01
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 09:51:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690563077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KVxtwXqYr8lrv0pmMCjil7p6P48PJ9MKO6jsFNT5N+o=;
-        b=fXbsfKFixTtlBAtU38YooLz7HvNe///nds07ELEGCsFP/c6fuNvY9F1KfEwYfKCrb7qiBf
-        dvZkLUovFpLr+YnyYgcm0N0TCkn5l5lxQlmoj6enwxjFSyFL+kyJritTX0s4KxbbOma7xm
-        1KHNoCBlXyu/xoUcTyIxKayjVpUn3fM=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-237-LuCB8J1nNh6Imyt8_c1wUA-1; Fri, 28 Jul 2023 12:51:15 -0400
-X-MC-Unique: LuCB8J1nNh6Imyt8_c1wUA-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-786a1843eedso160407139f.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 09:51:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690563074; x=1691167874;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KVxtwXqYr8lrv0pmMCjil7p6P48PJ9MKO6jsFNT5N+o=;
-        b=LdxxvRc7JmreDsIXMPthxomfrOZxIKHonUwqfU43/0r+yOy73SIwgsja1tPlp9TgL8
-         UPrq3qZ7km7wXaN5DfS5oPLvwdO3xjvyaqlxVpO5KSJjtoEI830FCyVhxei9Wrd+kVn0
-         /ry+OzAcBkS48j58FufPV4pMQ8f3s7DzGcCn0VTrgj7VXxLhXQDivZGhc9xdQ0Bir0up
-         j3fWQclFQlFJI6khFpD9iDJrBekUVcnrMXNUSJqMG16RvguwpBo75fKOXmXS+K+9CzFc
-         uvbGVdGr6n83JfxmFqvU+m9HL6QX3290YpCqHG/zv9yQSdEhJQzwHsj/zy0Oyb9qNnJi
-         CwEA==
-X-Gm-Message-State: ABy/qLbpbFTSd9EK6H74tKqTHAg8SkEEsk62xo5kVDaE0h5kqpkJ2yCa
-        9pGY+j5CWGJ5R+O7fUI0E4LXRJJ+YdvXngVyJlcMeZG13JW2l1r2Qh1lyPG3dt9vtVYQ/nL/Caq
-        roBnm8wDBftPqtOvpGizs
-X-Received: by 2002:a05:6e02:1211:b0:348:db55:290d with SMTP id a17-20020a056e02121100b00348db55290dmr76795ilq.29.1690563074270;
-        Fri, 28 Jul 2023 09:51:14 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHx8OkN9zaqxrtONmiknfLTK+wDzrvGE+O4rEMNsPsKok21alG7LNji9XT0sUKq+vkOMsdwMw==
-X-Received: by 2002:a05:6e02:1211:b0:348:db55:290d with SMTP id a17-20020a056e02121100b00348db55290dmr76784ilq.29.1690563074012;
-        Fri, 28 Jul 2023 09:51:14 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id b5-20020a92db05000000b00345ffd35a29sm1277309iln.68.2023.07.28.09.51.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 09:51:13 -0700 (PDT)
-Date:   Fri, 28 Jul 2023 10:51:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Normand Leclerc <leclercnorm@sympatico.ca>
-Cc:     kvm@vger.kernel.org
-Subject: Re: KVM PCI Passthrough IRQ issues
-Message-ID: <20230728105111.3b0f89ac.alex.williamson@redhat.com>
-In-Reply-To: <BA42560B-B6B1-44B6-994E-AA9B48E9F5E0@sympatico.ca>
-References: <BA42560B-B6B1-44B6-994E-AA9B48E9F5E0@sympatico.ca>
-Organization: Red Hat
+        with ESMTP id S234807AbjG1Q4W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 12:56:22 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2066.outbound.protection.outlook.com [40.107.96.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFE310E;
+        Fri, 28 Jul 2023 09:56:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BvooR/N7rdWUHVDFIL+1w2vyJ06JnEwbD8jmnsE88/zhfb67/3hIyPEs8rpoEWPB3kkLsk0T1n2Yq7+u4AMEQYhqdbS9O0IhSDAuNHc9GArKXI9V6mFVLQ3iJWsSPtUHMjCRJWh7fY/AVpKIs523jCCphGJxcYvY7zjopa15Gt1FvvUeACbFhcqIK90EA0VNVyoiYC2Nfufnl9ylagiSOsTMUerL9qn26lABFJnPStwTHxZKlIuJG9gqxUi05mcMRzMhII6Q91m5ELZbaDntThzgup3E7jaGORBT7A069c7URy1l92Q3c+RkaOYh5PAQwAzLt05QlCQp3OBgHlz71A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EjV/6iomirVjc5Do5NAIrR7FXiJ27OKexlcGCkZXYGo=;
+ b=GhO3bOn1nUtYtu6WRAlWRaetMGWO9igFu5K10geQLf39pZUZoweJjdtMfZP3UCwHYo4Cnwq9GxKw7Z0es07Qk0bROl9q9FocycjwK+wynBtA88rddLc0e4JLYPhp3awhfb2cG+weERyb0FxIQtMjicDOEskYEj+djMTDmtuWfSSrlTcU+oRD1r0r/pjzl9k1kkI/mmAUXXPhtKa6v+/LKqbqAbuWe8wqLFecQwPSHrrwa4DI/dd/4YMwsJdcJhs8dBJlm4racpeBJDKmAKclx/UysyRXJqZSZF4f68FxccIjgK+lLVLf9XLKDtM+DQgWwRMtrdJJVHGTkbW4CYFblA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EjV/6iomirVjc5Do5NAIrR7FXiJ27OKexlcGCkZXYGo=;
+ b=TTfKd/qajr3BSHvNfZOgXTR96OtlpZcOH7NZKmucsCDRbkcvBrly+pUBiV2EZVHA+QOfSyIm34X94Kko4b6bjMQPxq2vdbCsV+EYUiVncCrKqgwcw0oL3R1Tt41nPejV+ph1rZYvU8VJTWBEnAnookSmY3C4gahDcw+6s6cd1/Lq3v02RK17NJnPTja/E6E0oSF2VdENhZ46aIWm9avNhVP0NCNzeHN+OQd427WiHLFxzLzKl0JwNVS/BvuU0JC5qKMS8WqDIMms86/qFrPUfyE3vpBjAPpLqvp4uoyHhLwzvHmLaaYY0qh18wCLe0sNoRm0TMZiBV/zotJm/7pPVA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MW5PR12MB5622.namprd12.prod.outlook.com (2603:10b6:303:198::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
+ 2023 16:56:07 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.034; Fri, 28 Jul 2023
+ 16:56:07 +0000
+Date:   Fri, 28 Jul 2023 13:56:05 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v3 01/17] iommu: Add new iommu op to create domains owned
+ by userspace
+Message-ID: <ZMPzJd6iIFk/51Om@nvidia.com>
+References: <20230724110406.107212-1-yi.l.liu@intel.com>
+ <20230724110406.107212-2-yi.l.liu@intel.com>
+ <BN9PR11MB52765C4F05F7632829B53BAC8C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52765C4F05F7632829B53BAC8C06A@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: CH2PR18CA0058.namprd18.prod.outlook.com
+ (2603:10b6:610:55::38) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW5PR12MB5622:EE_
+X-MS-Office365-Filtering-Correlation-Id: e1174413-e063-48e3-c67c-08db8f8b8968
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IjThefBqzupc7qJklkzU62ZtalAS+iY1sFTo+upMlozIGM9dbSv7nmVCU2z/3ZT467zN2cFtnf5eQXfAjHZ+v28gWHcFZwioT6cAMOrrURWiXy1Y/B+akGaYcT7AMqeubV6c/V3rShOzX7q9Od5ANogSdOFId7X71dydw2s8jlvAXrqw6j9s9oEQe2RpY9nm+f3W7fB5mhJfynP0LCbenXtZUNaw8aR0RvRxZm08c8vHLB/oj6VjRB41pvZw4cxDnKPhtjWCxlhoYw8mAqoYKXLll6sETAHbYyxtQ/chAMEbUbuRi4FswTgDnQjl65fkgChcpNSyh3Ri+QYh6c7EVSuclW5Td5qnnqLfg5M2TVvyzou0AHUOKawUAknLLvfnDsi5e5VrCQV1BSjjR9clP7nA0+SLhpUSMv5FXCWlUtJgylSdoIvge4R5OXvx590b/EAayMKuyPMJ8K7D+j+14IP5YxYxAVSxF5oKVfDpeMLEqpKX86j8Tqqzq256GOlxh28wwIexTqpdtELgHmFXSKj254yXgZwTT/B8e1GAPg9dz8tsv8zvRYO/r/7B3knC
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(366004)(376002)(346002)(136003)(451199021)(478600001)(54906003)(6486002)(6512007)(6506007)(66476007)(2616005)(6916009)(26005)(2906002)(66556008)(316002)(8936002)(7416002)(5660300002)(8676002)(41300700001)(66946007)(38100700002)(86362001)(36756003)(83380400001)(4326008)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4Nj39GOBwjVhYB4vYEUTY8lWJsGe+X8NWJPcGpygaHNTyyug0eViO+HSQAUK?=
+ =?us-ascii?Q?0OvKl+atoxiNqgnEkbFjidNLUTjwQcKAXXAsWHt2Le9CCXoYPW7Cyddpq1KJ?=
+ =?us-ascii?Q?DHVZhZSXS5GErvdTq8X82KTdggKrPRxF7ZCp5sMDNvoERkaWTQ5MmEQutiuQ?=
+ =?us-ascii?Q?csmUDOx6XDQrvfFmlso4lh0jPtwwPSYyDhItz9O48glm/6eF4w5ydH9pqVFl?=
+ =?us-ascii?Q?NmnZHTSRiZw50oJcF+4AIlpncr03bNE0eVu+T56QtVwPQeKqNdDgmfgPu5mk?=
+ =?us-ascii?Q?5uq3fwI6vah9SxxqVn4FXbcKdOgvN0fChStSbZO7amIKjKhQCZyn/+/6ABUi?=
+ =?us-ascii?Q?jy4KxeF83Zu5SiSyX+uOUB1nQ05HG3lWENobRoXkI2V+N88z7JCFt/muSylW?=
+ =?us-ascii?Q?1ctTUEsZsTFESr6m97mqkm74vyEBrrPcdZrnzQYFwpciF6U9KYkc4/qndoSI?=
+ =?us-ascii?Q?cKNLE3jW1V0IDz3ZHRjj8iH7flLVEy9sEvZMI1tebfV1SboBiTg8DdWl9KpK?=
+ =?us-ascii?Q?hTejn+LYdSrGRTZOsOTJspXO0Q1eP4oc2uSCJVcc1BMxd0bifrlnYQKN3n6B?=
+ =?us-ascii?Q?FWXyyfUlk7xMTF5pVPbPMMU7lCNQZiCY2Nii1MLdb25rx1w9rOvpIbDkEUTF?=
+ =?us-ascii?Q?dw7ctlatbJ28DSwROwDkPgGsh+foG2X9PDlCWS0F65NquAln/3HBGQn8e5mK?=
+ =?us-ascii?Q?4bGnW6TR8qO2YcIRWUtn9WyKFI4+3ImKrLfB6/+/fQeWpOjsuhIz93wBP8hL?=
+ =?us-ascii?Q?qI24hP3SbxzQoDTMg98W39+RQRQ2DuXTxz6L5+m0M5SjoTvgV1CbU0xqfAGp?=
+ =?us-ascii?Q?D9KTbNpl+ZO6rP9lQoxnH4hRCwzcuxg6swv4UvmhjYSqHMUsYpjKoOXTuvzC?=
+ =?us-ascii?Q?IeaN0Q5JVXoYhe0WZ+fme6qYvkFp1x4t93sHZfontTMUxrRWZvbK9jbz2OE9?=
+ =?us-ascii?Q?8YQrsCNUCEz/YJ9zMCPfmd197qrrRDF0VqIffQpmwmHsIRGYLW0XqYwBbKdL?=
+ =?us-ascii?Q?5+qEHqoKiH/EAGVWIltU7nkegO/fBQj6Y7rLK55UQh4W9XAicbGtPpw8tTsM?=
+ =?us-ascii?Q?p2E5kyCEjMvM1w9JUVyrtQoVlw2qppuoWzHVl0YI2DZXN4v1XfKiTLIaVWMu?=
+ =?us-ascii?Q?ij/RuQ3MqjY3cFVd03jDFLAJbKkEeSCguEfgeVvPgpwCsszZjPqQFqYiVaVm?=
+ =?us-ascii?Q?mikHph95qPVrFdKcWD0KIFSOKLM231TzjPmpDMaB/HGOGLOSx+C1TT2pe1Qg?=
+ =?us-ascii?Q?YgT0xnutuwxAvXebWLbZOhgdGQHorSkWhoPlstAog5p882L0GR3cXesi5jXt?=
+ =?us-ascii?Q?3CM035UEARs6iS4vVku0HIRf6ktC0Z9OuQaTcprEUXVqxDWc7RJbyhWvGNMu?=
+ =?us-ascii?Q?KImay7WGvw9FVkpFpzMrT70Ix1UJdb3fVe2jheUGgYqDKypcMWuie8+zBa5q?=
+ =?us-ascii?Q?xSzIheVj+hs3ckVjiBb9QpMOX1+2FYb+dYUDP+Pc2Tkp/6zGg/gPOWF3/hN8?=
+ =?us-ascii?Q?YlGOhfA95p6hQ9m7Hq2cLcUKNWi1qWR3FQplxG4CkAEymCHxVEaRweX1wKqV?=
+ =?us-ascii?Q?H4b1Tvxw2UoAKi7MrcmJYYHpEYRX/izimYbmGvey?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1174413-e063-48e3-c67c-08db8f8b8968
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 16:56:07.4230
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XmPLEXr8/2pst9rMM6IusVDzs7Ti7L4uBZbNvLgV9buU9C4WVfjJ2c930QYBGq3W
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR12MB5622
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,98 +136,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Jul 2023 06:20:36 -0400
-Normand Leclerc <leclercnorm@sympatico.ca> wrote:
+On Fri, Jul 28, 2023 at 09:37:21AM +0000, Tian, Kevin wrote:
+> > From: Yi Liu <yi.l.liu@intel.com>
+> > Sent: Monday, July 24, 2023 7:04 PM
+> >
+> > + * @domain_alloc_user: allocate a user iommu domain corresponding to
+> > the input
+> > + *                     @hwpt_type that is defined as enum iommu_hwpt_type in the
+> > + *                     include/uapi/linux/iommufd.h. A returning domain will be
+> > + *                     set to an IOMMU_DOMAIN_NESTED type, upon valid
+> > @user_data
+> > + *                     and @parent that is a kernel-managed domain. Otherwise,
+> > + *                     it will be set to an IOMMU_DOMAIN_UNMANAGED type.
+> > Return
+> > + *                     ERR_PTR on allocation failure.
+> 
+> "If @user_data is valid and @parent points to a kernel-managed domain,
+> the returning domain is set to IOMMU_DOMAIN_NESTED type. Otherwise
+> it is set to IOMMU_DOMAIN_UNMANAGED type."
 
-> Hi,
->=20
-> I have a CameraLink capture card of which I do not have Linux
-> drivers.  I wanted to used it in Windows 11 under KVM.
->=20
-> I have managed to have the card recognized in the OS, installed
-> drivers and the system does see the clock and data valid; great!  But
-> this doesn=E2=80=99t happen without hickups; KVM has to be started twice.
-> The first time KVM starts, the driver tells me that there is not
-> enough ressources for the API.
->=20
-> Even though the card seems to be working well, I cannot capture
-> anything.  The software is not able to fully use the card.
->=20
-> The system is:
-> AMD Ryzen 7950x3d
-> ASROCK Steel Legend x670e
-> Teledyne XTIUM-CL MX4 (capture card)
-> Archlinux system (Linux omega 6.4.6-artix1-1 #1 SMP PREEMPT_DYNAMIC
-> Wed, 26 Jul 2023 13:47:50 +0000 x86_64 GNU/Linux)
->=20
-> lspci after boot for the card:
->=20
-> 01:00.0 Memory controller [0580]: Coreco Inc Device [11ec:f81b]
->         Flags: fast devsel, IRQ 255, IOMMU group 12
->         Memory at fb000000 (32-bit, non-prefetchable) [disabled]
-> [size=3D16M] Capabilities: [80] Power Management version 3
->         Capabilities: [90] MSI: Enable- Count=3D1/1 Maskable- 64bit+
->         Capabilities: [c0] Express Endpoint, MSI 00
->         Capabilities: [100] Advanced Error Reporting
->         Capabilities: [150] Device Serial Number
-> 00-00-00-00-00-00-00-00 Capabilities: [300] Secondary PCI Express
->=20
->=20
-> After vfio driver assignment:
->=20
-> 01:00.0 Memory controller [0580]: Coreco Inc Device [11ec:f81b]
->         Flags: fast devsel, IRQ 255, IOMMU group 12
->         Memory at fb000000 (32-bit, non-prefetchable) [disabled]
-> [size=3D16M] Capabilities: [80] Power Management version 3
->         Capabilities: [90] MSI: Enable- Count=3D1/1 Maskable- 64bit+
->         Capabilities: [c0] Express Endpoint, MSI 00
->         Capabilities: [100] Advanced Error Reporting
->         Capabilities: [150] Device Serial Number
-> 00-00-00-00-00-00-00-00 Capabilities: [300] Secondary PCI Express
->         Kernel driver in use: vfio-pci
->=20
-> Starting KVM first time (second time is the same):
->=20
-> 01:00.0 Memory controller [0580]: Coreco Inc Device [11ec:f81b]
->         Flags: fast devsel, IRQ 135, IOMMU group 12
->         Memory at fb000000 (32-bit, non-prefetchable) [disabled]
-> [size=3D16M] Capabilities: [80] Power Management version 3
->         Capabilities: [90] MSI: Enable- Count=3D1/1 Maskable- 64bit+
->         Capabilities: [c0] Express Endpoint, MSI 00
->         Capabilities: [100] Advanced Error Reporting
->         Capabilities: [150] Device Serial Number
-> 00-00-00-00-00-00-00-00 Capabilities: [300] Secondary PCI Express
->         Kernel driver in use: vfio-pci
->=20
-> First time KVM starts, lsirq does not show IRQ 135; second time, it
-> does.
->=20
-> If kernel has not been started with irqpoll, I get the infamous
-> =E2=80=9Cnobody cared=E2=80=9D message and irq135 gets disabled.  Running=
- kernel with
-> irqpoll, lsirq shows a whole bunch on interrupts (probably at each
-> frame the grabber sees).
->=20
-> It is as if the interrupt assigned to the card is not what KVM is
-> using to pass down to the guest Windows machine.  The interrupt does
-> not get to the capture card=E2=80=99s software and it fails.
+ "If @user_data is valid and @parent points to a kernel-managed domain,
+ then the returned domain must be the IOMMU_DOMAIN_NESTED type. Otherwise
+ the returned domain is IOMMU_DOMAIN_UNMANAGED."
 
-The "irqpoll" option the kernel suggests for spurious interrupts really
-doesn't work with device assignment.  It sounds like INTx disable
-and/or status reporting is broken on this device.  The device supports
-MSI, but clearly doesn't seem to be using it.  You can read a bit about
-how vfio interrupts work and how you might make Windows use MSI here:
+Notice the detail that this API expects the driver to set the type and
+fully initialize the domain, including the generic iommu_domain
+struct, which is different than alloc_domain.
 
-http://vfio.blogspot.com/2014/09/vfio-interrupts-and-how-to-coax-windows.ht=
-ml
+When we implement this in drivers we should tidy this so all the alloc
+flows fully initialize the domain internally.
 
-Another option is to use the nointxmask=3D1 option of the vfio-pci module
-which will register the legacy INTx interrupt of the device as
-exclusive.  This removes our dependency on working INTx disable and
-status reporting, but it comes at the cost of sometimes being very
-difficult to configure.  You might need to install the card into a
-different slot or potentially even disable other drivers for devices
-that try to share the interrupt line with this device.  Thanks,
-
-Alex
-
+Jason
