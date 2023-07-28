@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DACCD7674BB
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 20:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DE8976749E
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 20:23:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236433AbjG1SXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 14:23:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35166 "EHLO
+        id S231190AbjG1SXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 14:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbjG1SXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 14:23:53 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED2D44B7;
-        Fri, 28 Jul 2023 11:23:30 -0700 (PDT)
+        with ESMTP id S233675AbjG1SXS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 14:23:18 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B9F4C18;
+        Fri, 28 Jul 2023 11:22:51 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id AEE6621901;
+        by smtp-out2.suse.de (Postfix) with ESMTPS id EB1CF1F891;
         Fri, 28 Jul 2023 18:22:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1690568556; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=krPLtCHBWZV4GSxmPsUPOQj8RciLwOtiAQlgYF3SAFM=;
-        b=Jxe+PaXVoNfWBxIE7HSYMUhFGg26nHLu5dLpxyKu523BG7kylR+IJhEzXzuvKmfNCN/arQ
-        8teJ0KQZr10TzqrCSibmqa2ZPaAInS4qiDBE9AcGS5iKhwVU1MicoA31YwIV/tw9vmf50e
-        llXAx8hz8CmtEVpDRKpZVJliPQJcCvo=
+        bh=/qXJ5rNWBP71LPKEnNowQIlNK4XWcoFcTQC5NoNWKHw=;
+        b=DKGZ9mjMhM5MRJsxIGSkwd8dC7VBPq+vfUpeqOKE+D4TUT7cQHLr3a6HW1O2KlAzDOuoMG
+        ctduWFviwRhfLmKjY4QyXaRaFiF93UO2bVKDbeDRSv+op7whPK8UanNLyFEynVQHtX1eqB
+        huoKIkQxQmYtnGqpKFg4MlP3XmI0M7Y=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1690568556;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=krPLtCHBWZV4GSxmPsUPOQj8RciLwOtiAQlgYF3SAFM=;
-        b=aMd54Ip9ZCfjREKUslC9Go/L9PkeGNWdTmHvNDDDEojVoM39kx/eUUkqwggfA5zAgWSEnT
-        y9530DbN5vL0a7Bg==
+        bh=/qXJ5rNWBP71LPKEnNowQIlNK4XWcoFcTQC5NoNWKHw=;
+        b=mLbs0lI03+YzCo4+UKN4xjuMOKp4ZOuzgBFrMee2bN6/j3yk4Kodb73dV/LIkd8BCkxZ8R
+        E5sitXt+sfG8LlCw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6F9B0139BD;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B18AB13276;
         Fri, 28 Jul 2023 18:22:36 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id CCNRGmwHxGQ3CwAAMHmgww
+        id OL4+KmwHxGQ3CwAAMHmgww
         (envelope-from <tzimmermann@suse.de>); Fri, 28 Jul 2023 18:22:36 +0000
 From:   Thomas Zimmermann <tzimmermann@suse.de>
 To:     deller@gmx.de, javierm@redhat.com, sam@ravnborg.org
@@ -54,12 +54,10 @@ Cc:     linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org,
         linux-arm-kernel@lists.infradead.org,
         linux-geode@lists.infradead.org, linux-omap@vger.kernel.org,
-        kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>
-Subject: [PATCH 01/47] media/vivid: Use fbdev I/O helpers
-Date:   Fri, 28 Jul 2023 18:39:44 +0200
-Message-ID: <20230728182234.10680-2-tzimmermann@suse.de>
+        kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>
+Subject: [PATCH 02/47] fbdev/acornfb: Use fbdev I/O helpers
+Date:   Fri, 28 Jul 2023 18:39:45 +0200
+Message-ID: <20230728182234.10680-3-tzimmermann@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230728182234.10680-1-tzimmermann@suse.de>
 References: <20230728182234.10680-1-tzimmermann@suse.de>
@@ -83,48 +81,45 @@ The macro and token set the currently selected values, so there is
 no functional change.
 
 Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: Hans Verkuil <hverkuil@xs4all.nl>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
 ---
- drivers/media/test-drivers/vivid/Kconfig     | 4 +---
- drivers/media/test-drivers/vivid/vivid-osd.c | 4 +---
+ drivers/video/fbdev/Kconfig   | 4 +---
+ drivers/video/fbdev/acornfb.c | 4 +---
  2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/media/test-drivers/vivid/Kconfig b/drivers/media/test-drivers/vivid/Kconfig
-index 318799d317ba..0e8ee4b9ea85 100644
---- a/drivers/media/test-drivers/vivid/Kconfig
-+++ b/drivers/media/test-drivers/vivid/Kconfig
-@@ -3,11 +3,9 @@ config VIDEO_VIVID
- 	tristate "Virtual Video Test Driver"
- 	depends on VIDEO_DEV && !SPARC32 && !SPARC64 && FB
- 	depends on HAS_DMA
-+	select FB_IO_HELPERS
- 	select FONT_SUPPORT
- 	select FONT_8x16
+diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
+index c0b0419e98b6..2b1dd3700df6 100644
+--- a/drivers/video/fbdev/Kconfig
++++ b/drivers/video/fbdev/Kconfig
+@@ -139,9 +139,7 @@ config FB_ARMCLCD
+ config FB_ACORN
+ 	bool "Acorn VIDC support"
+ 	depends on (FB = y) && ARM && ARCH_ACORN
 -	select FB_CFB_FILLRECT
 -	select FB_CFB_COPYAREA
 -	select FB_CFB_IMAGEBLIT
- 	select VIDEOBUF2_VMALLOC
- 	select VIDEOBUF2_DMA_CONTIG
- 	select VIDEO_V4L2_TPG
-diff --git a/drivers/media/test-drivers/vivid/vivid-osd.c b/drivers/media/test-drivers/vivid/vivid-osd.c
-index 051f1805a16d..e04b34a67e3a 100644
---- a/drivers/media/test-drivers/vivid/vivid-osd.c
-+++ b/drivers/media/test-drivers/vivid/vivid-osd.c
-@@ -246,12 +246,10 @@ static int vivid_fb_blank(int blank_mode, struct fb_info *info)
++	select FB_IO_HELPERS
+ 	help
+ 	  This is the frame buffer device driver for the Acorn VIDC graphics
+ 	  hardware found in Acorn RISC PCs and other ARM-based machines.  If
+diff --git a/drivers/video/fbdev/acornfb.c b/drivers/video/fbdev/acornfb.c
+index 8fec21dfca09..8710a2f40d27 100644
+--- a/drivers/video/fbdev/acornfb.c
++++ b/drivers/video/fbdev/acornfb.c
+@@ -605,13 +605,11 @@ acornfb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
  
- static const struct fb_ops vivid_fb_ops = {
- 	.owner = THIS_MODULE,
-+	FB_DEFAULT_IO_OPS,
- 	.fb_check_var   = vivid_fb_check_var,
- 	.fb_set_par     = vivid_fb_set_par,
- 	.fb_setcolreg   = vivid_fb_setcolreg,
--	.fb_fillrect    = cfb_fillrect,
--	.fb_copyarea    = cfb_copyarea,
--	.fb_imageblit   = cfb_imageblit,
- 	.fb_cursor      = NULL,
- 	.fb_ioctl       = vivid_fb_ioctl,
- 	.fb_pan_display = vivid_fb_pan_display,
+ static const struct fb_ops acornfb_ops = {
+ 	.owner		= THIS_MODULE,
++	FB_IO_DEFAULT_OPS,
+ 	.fb_check_var	= acornfb_check_var,
+ 	.fb_set_par	= acornfb_set_par,
+ 	.fb_setcolreg	= acornfb_setcolreg,
+ 	.fb_pan_display	= acornfb_pan_display,
+-	.fb_fillrect	= cfb_fillrect,
+-	.fb_copyarea	= cfb_copyarea,
+-	.fb_imageblit	= cfb_imageblit,
+ };
+ 
+ /*
 -- 
 2.41.0
 
