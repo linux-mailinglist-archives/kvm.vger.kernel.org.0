@@ -2,47 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 704FB767725
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 22:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52200767743
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 22:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbjG1UlC convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 28 Jul 2023 16:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46080 "EHLO
+        id S230137AbjG1U4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 16:56:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjG1UlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 16:41:01 -0400
-Received: from cmx-mtlrgo001.bell.net (mta-mtl-001.bell.net [209.71.208.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B1AE4F
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 13:40:59 -0700 (PDT)
-X-RG-CM-BuS: 0
-X-RG-CM-SC: 0
-X-RG-CM: Clean
-X-Originating-IP: [74.15.145.5]
-X-RG-Env-Sender: leclercnorm@sympatico.ca
-X-RG-Rigid: 64C35282000C691F
-X-CM-Envelope: MS4xfKCXW02mfGjtP6v78kGp4nPQKSMCQilM3qvyxntT0vDewZnWLvvXZYkQ4pQd8qPCcuRcZ1aqIsr/Vrel01fnLa0wAhkoUzhFmXznBSZpGKJDnFYvPoR3
- UUTA+VZQ5I0CLmOC2VI+L8CjAfMQ3j4hasuVEEknwrXyDj+IDNkN9/HE7wvtpK86+2JZ02+9bh608xWVxS/Q/SoFj5Je04tjkUbVf4hM2xijHREG5gXawiGz
-X-CM-Analysis: v=2.4 cv=W7Nb6Tak c=1 sm=1 tr=0 ts=64c427da
- a=vMtcqUOSM9xK0Dyo5NtYyw==:117 a=vMtcqUOSM9xK0Dyo5NtYyw==:17
- a=IkcTkHD0fZMA:10 a=20KFwNOVAAAA:8 a=k_m-kdumAAAA:8 a=T6pNkRvUAAAA:8
- a=7yWcpKF2QZYQEeKRZowA:9 a=QEXdDO2ut3YA:10 a=QAyeqAmZ3dQA:10
- a=2aFmp3DG3lfw9CblUY6y:22 a=hgMNUkviuzi0Hbumswsj:22
-Received: from smtpclient.apple (74.15.145.5) by cmx-mtlrgo001.bell.net (5.8.814) (authenticated as leclercnorm@sympatico.ca)
-        id 64C35282000C691F; Fri, 28 Jul 2023 16:40:58 -0400
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-From:   Normand Leclerc <leclercnorm@sympatico.ca>
-Mime-Version: 1.0 (1.0)
-Subject: Re: KVM PCI Passthrough IRQ issues
-Date:   Fri, 28 Jul 2023 16:40:47 -0400
-Message-Id: <A80D8450-19EB-4CA1-A9D6-A87E427B8452@sympatico.ca>
-References: <20230728105111.3b0f89ac.alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org
-In-Reply-To: <20230728105111.3b0f89ac.alex.williamson@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-X-Mailer: iPad Mail (20F75)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        with ESMTP id S229511AbjG1U4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 16:56:11 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8664EE69
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 13:56:10 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36SKgAQA008800
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : from : subject : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=52ff/PDZvnbK5aQIIcI1xBfFc213TT4UZerjJ98aAT8=;
+ b=pdRbEayDPysL4yW7AuMSTYCNpxaG6R5GeN9A6DLs0DLIODnWm+1IKtBgaZ0ShO9Bp/j8
+ hIj0CbAVOyKYX2xm81lHRsUmlM3s4EQTCjCFUp2ZIx/rp13ZTYDgZmgrqCCgMKr6fcUU
+ 0kLU3gaObiPqkrH9Ti4rHpxolpJWRs+bKWLuzwEp/Iq+lh7R9e84QqCHb75fxK0HIOyo
+ IN/X9YVgIEpYxzGuCXm2n3OzfoJpED8Ctjus4Jkp+EGilgt3fHm0OgStPBd9zsvfh/In
+ dqqBbTBKK7y7l9c8gyJVSVTDN1Cx0NSbunfzeeINiQLeO1eAxWJkgX5A/rZmsdA4gk8f Ng== 
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s4m7mh6je-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:09 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36SJ2mll001858
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:08 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unk9020-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:08 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36SKu7qX61997328
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:07 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0D17520040
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:07 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 80E562004B
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:06 +0000 (GMT)
+Received: from [9.43.126.41] (unknown [9.43.126.41])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:56:06 +0000 (GMT)
+Message-ID: <709807bb-d563-42d3-9e18-a2dd38bdc6db@linux.vnet.ibm.com>
+Date:   Sat, 29 Jul 2023 02:26:05 +0530
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+To:     kvm@vger.kernel.org
+Content-Language: en-US
+From:   Kowshik Jois B S <kowsjois@linux.vnet.ibm.com>
+Subject: Test Mail
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kNQU8ZEiOX6dfQ3QQRhB8rF8bIzcZEZB
+X-Proofpoint-GUID: kNQU8ZEiOX6dfQ3QQRhB8rF8bIzcZEZB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-27_10,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
+ mlxscore=0 bulkscore=0 adultscore=0 spamscore=0 malwarescore=0
+ impostorscore=0 mlxlogscore=468 priorityscore=1501 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307280188
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -50,119 +82,5 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-
-Thanks for the good information.  Tried forcing MSI in windows; didn’t work but the nointxmask worked like a charm.
-
-Not sure why; I didn’t see any shared inrterrupt in lspci….  And moving to another PCIe slot seems to be less and less posible as motherboard manufacturers are replacing them with NVME slots.  You have to spend a lot of money to get a workstation motherboard if you want more than 1 usable PCIe slot; my motherboard has 2 but the second one is for SLI only and won’t work by its own (tried to put the card in, PC won’t boot).
-
-Thanks again for the help!
-
-
-Best regards,
-Norm
-
-Sent from my ENIAC
-
-> On Jul 28, 2023, at 12:50 PM, Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> ﻿On Fri, 28 Jul 2023 06:20:36 -0400
-> Normand Leclerc <leclercnorm@sympatico.ca> wrote:
-> 
->> Hi,
->> 
->> I have a CameraLink capture card of which I do not have Linux
->> drivers.  I wanted to used it in Windows 11 under KVM.
->> 
->> I have managed to have the card recognized in the OS, installed
->> drivers and the system does see the clock and data valid; great!  But
->> this doesn’t happen without hickups; KVM has to be started twice.
->> The first time KVM starts, the driver tells me that there is not
->> enough ressources for the API.
->> 
->> Even though the card seems to be working well, I cannot capture
->> anything.  The software is not able to fully use the card.
->> 
->> The system is:
->> AMD Ryzen 7950x3d
->> ASROCK Steel Legend x670e
->> Teledyne XTIUM-CL MX4 (capture card)
->> Archlinux system (Linux omega 6.4.6-artix1-1 #1 SMP PREEMPT_DYNAMIC
->> Wed, 26 Jul 2023 13:47:50 +0000 x86_64 GNU/Linux)
->> 
->> lspci after boot for the card:
->> 
->> 01:00.0 Memory controller [0580]: Coreco Inc Device [11ec:f81b]
->>        Flags: fast devsel, IRQ 255, IOMMU group 12
->>        Memory at fb000000 (32-bit, non-prefetchable) [disabled]
->> [size=16M] Capabilities: [80] Power Management version 3
->>        Capabilities: [90] MSI: Enable- Count=1/1 Maskable- 64bit+
->>        Capabilities: [c0] Express Endpoint, MSI 00
->>        Capabilities: [100] Advanced Error Reporting
->>        Capabilities: [150] Device Serial Number
->> 00-00-00-00-00-00-00-00 Capabilities: [300] Secondary PCI Express
->> 
->> 
->> After vfio driver assignment:
->> 
->> 01:00.0 Memory controller [0580]: Coreco Inc Device [11ec:f81b]
->>        Flags: fast devsel, IRQ 255, IOMMU group 12
->>        Memory at fb000000 (32-bit, non-prefetchable) [disabled]
->> [size=16M] Capabilities: [80] Power Management version 3
->>        Capabilities: [90] MSI: Enable- Count=1/1 Maskable- 64bit+
->>        Capabilities: [c0] Express Endpoint, MSI 00
->>        Capabilities: [100] Advanced Error Reporting
->>        Capabilities: [150] Device Serial Number
->> 00-00-00-00-00-00-00-00 Capabilities: [300] Secondary PCI Express
->>        Kernel driver in use: vfio-pci
->> 
->> Starting KVM first time (second time is the same):
->> 
->> 01:00.0 Memory controller [0580]: Coreco Inc Device [11ec:f81b]
->>        Flags: fast devsel, IRQ 135, IOMMU group 12
->>        Memory at fb000000 (32-bit, non-prefetchable) [disabled]
->> [size=16M] Capabilities: [80] Power Management version 3
->>        Capabilities: [90] MSI: Enable- Count=1/1 Maskable- 64bit+
->>        Capabilities: [c0] Express Endpoint, MSI 00
->>        Capabilities: [100] Advanced Error Reporting
->>        Capabilities: [150] Device Serial Number
->> 00-00-00-00-00-00-00-00 Capabilities: [300] Secondary PCI Express
->>        Kernel driver in use: vfio-pci
->> 
->> First time KVM starts, lsirq does not show IRQ 135; second time, it
->> does.
->> 
->> If kernel has not been started with irqpoll, I get the infamous
->> “nobody cared” message and irq135 gets disabled.  Running kernel with
->> irqpoll, lsirq shows a whole bunch on interrupts (probably at each
->> frame the grabber sees).
->> 
->> It is as if the interrupt assigned to the card is not what KVM is
->> using to pass down to the guest Windows machine.  The interrupt does
->> not get to the capture card’s software and it fails.
-> 
-> The "irqpoll" option the kernel suggests for spurious interrupts really
-> doesn't work with device assignment.  It sounds like INTx disable
-> and/or status reporting is broken on this device.  The device supports
-> MSI, but clearly doesn't seem to be using it.  You can read a bit about
-> how vfio interrupts work and how you might make Windows use MSI here:
-> 
-> http://vfio.blogspot.com/2014/09/vfio-interrupts-and-how-to-coax-windows.html
-> 
-> Another option is to use the nointxmask=1 option of the vfio-pci module
-> which will register the legacy INTx interrupt of the device as
-> exclusive.  This removes our dependency on working INTx disable and
-> status reporting, but it comes at the cost of sometimes being very
-> difficult to configure.  You might need to install the card into a
-> different slot or potentially even disable other drivers for devices
-> that try to share the interrupt line with this device.  Thanks,
-> 
-> Alex
-> 
-> 
-> -- 
-> This message has been scanned for viruses and
-> dangerous content by MailScanner, and is
-> believed to be clean.
-> 
+Please Ignore
 
