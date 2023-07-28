@@ -2,132 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7488C76785F
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 00:05:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DB33767925
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 01:49:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232597AbjG1WFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 18:05:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42666 "EHLO
+        id S235626AbjG1Xty (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 19:49:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbjG1WFd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 18:05:33 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CA32D5F;
-        Fri, 28 Jul 2023 15:05:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hdyXHCNmm6/5wN+6xDZf0F3DJhdGMtE6XIr7LH2nzps=; b=az3KeLxLnSrbQBwqv9/MzZharB
-        XC/CzNA7Lp/jBX3ELKZoMfPLCFD8prlAFh1YU6kTTR2u17rl3JCqKw+pZowYM57qF6CPwb00aYwbX
-        eBlOmmPr3eFJZvJ3MNy7wcBD1eLVBS3i3DtUJ6AGEt73k06W+rlctva3nopCF/GRvmg/r8r5tbF7O
-        C32CVvNlLVubSVgvWVqJMelwfY8fE7Qt5yAo/bwDQe3SH7hyQ8VuLBLRIOfhU9Y5qwznNbklKqYBC
-        W2pdV/Qoi7PugEUAq/+LeaTyGX125ueR/+JE2wvqq6Ku1Y6Jh+zFpOm1GQ5vj30Dzwphepn9MNOWV
-        SueCznBA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qPVZT-008Vei-2P;
-        Fri, 28 Jul 2023 22:04:27 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7209330057C;
-        Sat, 29 Jul 2023 00:04:26 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 5144C2C973624; Sat, 29 Jul 2023 00:04:26 +0200 (CEST)
-Date:   Sat, 29 Jul 2023 00:04:26 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 10/20] jump_label,module: Don't alloc
- static_key_mod for __ro_after_init keys
-Message-ID: <20230728220426.GB3934165@hirez.programming.kicks-ass.net>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-11-vschneid@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230720163056.2564824-11-vschneid@redhat.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229639AbjG1Xtw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 19:49:52 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC3D1422C
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 16:49:51 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d087ffcc43cso2484224276.3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 16:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690588191; x=1691192991;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DKuAUegaPzT2dlDDYBmBZr79HoAY+aEQdI3dh05x1do=;
+        b=IHEo6B7QLOdOilVB5wc5aR/qpiIxDS03sgjaJUTOEJcD6VD61l9Lyy1JFy0LvDREO9
+         FET/mL7wXo598iMXAYeEqcLFLCCp57wbjR6HQuS/Z6C8ADSCjceP4yMfaJ0tw5prWMpw
+         2JpFGadvMn3PBiCc1JpOjLxl0DRKoktbH5ffR03xZ2bIslQYsbWKZJgcD5gYCPO52zSQ
+         ocflUPkWAdb02Gk8/JK/K6DzWKS2jMQiF6lIZbbL++1gc6dI2CLX3tg77py5Pn+4uX8u
+         D3qoNkTvtsuMxx9C3YzhpWTEXn2pzd+VXCFWoYJGeOpR8t2hXl7ej8sAr35DOqbhVSgd
+         mMsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690588191; x=1691192991;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DKuAUegaPzT2dlDDYBmBZr79HoAY+aEQdI3dh05x1do=;
+        b=cB5yUc65gGTcvZZrBa7rWPnPotN8DPKuYNynNz8NqqrPe9Knvx/s6QaxbfFdMdRV1+
+         cPnekGFDXdB6vfMazXWB9nlYfXaPqOwdBug6sUjSPo0HCfaIN57Xtfz64t2uhfxIzkDM
+         Onx/noL09QkvxNPG649WG1soOS3n02qEizbG9pvTNI9HRVP47k2WXj0LVElvXxMr4lyj
+         vU7NO1EmwLzCrJGRee3/wUbXKL1Loxm31JCDumL5nNatHEpCbB0ErT8ThcXXvo2aCrFC
+         roV0LVTVwxN4ogrHULkIvdF9HPibCsHCWtJOnx6XRTATBSJyHlgcdTB2qeJAg/+cMAZg
+         NKUQ==
+X-Gm-Message-State: ABy/qLZovLZTwsx7eAmwOOYJ3MfQV16+K9TlbLVFaLUZzTxdFHyD+JG7
+        LYRDPznp8nUtLBA2N/EOlTaUPCFgiQQ=
+X-Google-Smtp-Source: APBJJlGAkeWqd8KJHMn6lV6CBNP775TxKkAeVKZcTh6dZof9dTQs+DyK7ozs4XGf3NiPP8Svy1OAk6NS0so=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ae49:0:b0:d29:d655:2690 with SMTP id
+ g9-20020a25ae49000000b00d29d6552690mr11054ybe.10.1690588191184; Fri, 28 Jul
+ 2023 16:49:51 -0700 (PDT)
+Date:   Fri, 28 Jul 2023 16:49:42 -0700
+In-Reply-To: <20230615063757.3039121-1-aik@amd.com>
+Mime-Version: 1.0
+References: <20230615063757.3039121-1-aik@amd.com>
+X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
+Message-ID: <169058576410.1024559.1052772292093755719.b4-ty@google.com>
+Subject: Re: [PATCH kernel 0/9] KVM: SEV: Enable AMD SEV-ES DebugSwap
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Alexey Kardashevskiy <aik@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 20, 2023 at 05:30:46PM +0100, Valentin Schneider wrote:
-> From: Peter Zijlstra <peterz@infradead.org>
+On Thu, 15 Jun 2023 16:37:48 +1000, Alexey Kardashevskiy wrote:
+> This is to use another AMD SEV-ES hardware assisted register swap,
+> more detail in 6/9. In the process it's been suggested to fix other
+> things, here is the attempt, with the great help of amders.
 > 
-> When a static_key is marked ro_after_init, its state will never change
-> (after init), therefore jump_label_update() will never need to iterate
-> the entries, and thus module load won't actually need to track this --
-> avoiding the static_key::next write.
+> The previous conversation is here:
+> https://lore.kernel.org/r/20230411125718.2297768-1-aik@amd.com
 > 
-> Therefore, mark these keys such that jump_label_add_module() might
-> recognise them and avoid the modification.
-> 
-> Use the special state: 'static_key_linked(key) && !static_key_mod(key)'
-> to denote such keys.
-> 
-> Link: http://lore.kernel.org/r/20230705204142.GB2813335@hirez.programming.kicks-ass.net
-> NOT-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
-> @Peter: I've barely touched this patch, it's just been writing a comment
-> and fixing benign compilation issues, so credit's all yours really!
+> [...]
 
-Ah, it works? Excellent! You can remove the NOT from the SoB then ;-)
+Finally applied to kvm-x86 svm, thanks!  Though I was *really* tempted to see
+just how snarky the pings would get at week 5+ ;-)
+
+[1/9] KVM: SEV: move set_dr_intercepts/clr_dr_intercepts from the header
+      https://github.com/kvm-x86/linux/commit/b265ee7bae11
+[2/9] KVM: SEV: Move SEV's GP_VECTOR intercept setup to SEV
+      https://github.com/kvm-x86/linux/commit/29de732cc95c
+[3/9] KVM: SVM: Rewrite sev_es_prepare_switch_to_guest()'s comment about swap types
+      https://github.com/kvm-x86/linux/commit/f8d808ed1ba0
+[4/9] KVM: SEV-ES: explicitly disable debug
+      https://github.com/kvm-x86/linux/commit/2837dd00f8fc
+[5/9] KVM: SVM/SEV/SEV-ES: Rework intercepts
+      https://github.com/kvm-x86/linux/commit/5aefd3a05fe1
+[6/9] KVM: SEV: Enable data breakpoints in SEV-ES
+      https://github.com/kvm-x86/linux/commit/fb71b1298709
+[7/9] KVM: SEV-ES: Eliminate #DB intercept when DebugSwap enabled
+      https://github.com/kvm-x86/linux/commit/8b54cc7e1817
+[8/9] KVM: SVM: Don't defer NMI unblocking until next exit for SEV-ES guests
+      https://github.com/kvm-x86/linux/commit/c54268e1036f
+[9/9] KVM: SVM: Don't try to pointlessly single-step SEV-ES guests for NMI window
+      https://github.com/kvm-x86/linux/commit/e11f81043a12
+
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
