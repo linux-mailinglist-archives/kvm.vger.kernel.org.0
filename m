@@ -2,180 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6270766689
-	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 10:12:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18CF47666A1
+	for <lists+kvm@lfdr.de>; Fri, 28 Jul 2023 10:14:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234845AbjG1IMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 04:12:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51198 "EHLO
+        id S234707AbjG1IN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 04:13:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234535AbjG1ILe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 04:11:34 -0400
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1AD10E;
-        Fri, 28 Jul 2023 01:11:31 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 76AD3100004;
-        Fri, 28 Jul 2023 11:11:30 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76AD3100004
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1690531890;
-        bh=7xjggaRnRosCBX2aIuVU9Xtjjt90LbPMaiwfpvmSaBU=;
-        h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-        b=quZZsbNFFWIIiHki+jG1xiRM9j1T9djGPPhNWufAzT9rcu/wPqC0SaFcRtaWhwKLG
-         kPbmN6j/DIGc6ek1v48TOVMVESxLF6v3NqFrEHTyiYwW8YmQF22tipC1H9PHWElRGV
-         vF/mmMYwQVl7rilr/KI3o+7n1zWRVLTtFZCCGBgv2PYN+HtyrJMdzZZSPucS0OEzdG
-         iRZpcUOJux9gpULB9E5/4btoHwna7W4pylE//DohkPONqeUAk7fcwZWy/YiJJUNBLY
-         3zYBxRgU0AnJcTIqH63NZ40H00yaeKrPHgpyvUUanZqWaExzu1uqTfD12aHzpBiCAO
-         ydDlRJ6bPc39w==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Fri, 28 Jul 2023 11:11:30 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 28 Jul 2023 11:11:06 +0300
-Message-ID: <0d0e9b6e-fbdb-fd63-3f93-8a7249711dfc@sberdevices.ru>
-Date:   Fri, 28 Jul 2023 11:05:56 +0300
+        with ESMTP id S234772AbjG1INi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 04:13:38 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0861E3A94;
+        Fri, 28 Jul 2023 01:13:30 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fu7do9vqFCgFsADyZ82hNoY/UZLzKuhqMcOnUosc7CU1gRARx52ZsmX/k3jQqqfWApVRnBmUWRhAjuU7NmXABoUauEcu+4BsFWL+iQvWctsSSd3J+OEl1nuojXV5LqlwQAV4O6Aa5FX6RS4QMHq9VxdUVQf3CIB3Lf+dyRKu2d6M6EqS2PnnmZOCYOXwHbqBewL1o/bOMaDqYjze38jxmFhs/Iv+br8SfT+8RW8ik5NSR8vaP81ZQYcdY76GopywsKtifA+tCByL5Om2pzeazLJ3uYUIjt8/7ob+IWLXdba180/f4usweAh8S07h9TWD5tHXBCqcmjq5lBKUTlV0hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yGPNEOQFiqYcBK63/Om9x23uvQtVmgPahFvNarchGnw=;
+ b=bxOPErCsni0aI6FEntZiPQijAIZDy0MW/IxPv639d8y+dZggkTNWOyuFAO/9SE+UgdXasAOUI3wVhzoH+CfaRJmbUIFqJoyEp9Ec5EP+Ir4UV9u4lZPJYEk9+IPq0p73BQdCtzT9xPvZQzKBaCZlGR3snCZTKSywAEhwAMI82788Emd6bxTcZGrPNH2SHdPb+Dy204vWYszNsqa4acgNtWNqodXyDEw0y7myqVcOxLuUrUTT8tRFt3FWyIgK8HDGppCS6jE0eN7Yc4E+jmEmxhvNTLrtTDOkbhwL/D9jHujspqJpRHY4R5d2byBVhKMu4+i1d28V1eeoN8H1OIizYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yGPNEOQFiqYcBK63/Om9x23uvQtVmgPahFvNarchGnw=;
+ b=m3prTWSXX6KZUhayrV91IRjMJI7ZwF62Kyc+RHKQ5wKJ5j5qAOm8WKXmDTLOzJZexS3MUHCg9Gn6vzAl1zOiXhoEipR2XxPt79A2JuBf25BGhqZ1DaFob4yfuccZFIJJgpycnIR7kUl05XAEhKT1pLB12AmPPln4yziKR08YR+A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SJ0PR13MB5269.namprd13.prod.outlook.com (2603:10b6:a03:3e1::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Fri, 28 Jul
+ 2023 08:13:25 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6631.026; Fri, 28 Jul 2023
+ 08:13:24 +0000
+Date:   Fri, 28 Jul 2023 10:13:14 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
+        muchun.song@linux.dev, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, x86@kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v3 04/49] mm: shrinker: remove redundant shrinker_rwsem
+ in debugfs operations
+Message-ID: <ZMN4mjsF1QEsvW7D@corigine.com>
+References: <20230727080502.77895-1-zhengqi.arch@bytedance.com>
+ <20230727080502.77895-5-zhengqi.arch@bytedance.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230727080502.77895-5-zhengqi.arch@bytedance.com>
+X-ClientProxiedBy: AM0PR02CA0114.eurprd02.prod.outlook.com
+ (2603:10a6:20b:28c::11) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v4 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
- preparations
-Content-Language: en-US
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230727222627.1895355-1-AVKrasnov@sberdevices.ru>
- <20230728012845-mutt-send-email-mst@kernel.org>
- <eeefef14-2c92-a7a6-e58e-77dccbe38282@sberdevices.ru>
-In-Reply-To: <eeefef14-2c92-a7a6-e58e-77dccbe38282@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/07/23 10:45:00
-X-KSMG-LinksScanning: Clean, bases: 2023/07/23 10:46:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5269:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8611e466-4b59-4307-f46d-08db8f4283c5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pwW465vo9hI5eC/8Ntm80OiPZIBHfs3VML+30ACZ6q1gKIiw07bi63fgQFFRLxhjeMOvYXvKDQCbhdJXvkJtuvlV+CXofrjYF/nUT4dPDX7q3opgHQdml0n1/4JWskU89OGJAciXmkpGNxgq9ry3pQOnhUiBe/rX017qs0avdKvOdhPtlbR+VQVKZn19geR1qa1unKg72RhRR53/MXIMsfQLudax4C3TSjl+Giz2dgx40XXbX34DzfbwIhH5bpBtGAGLaj3zSQAl3qvuVXHTkg909IcoX6oZGllYm2+Eps+5dhGhNgPCU1/7AU4O5pm4wOrjGhtYfZoZ9N02ekDRjKTQ4lquadIeum0uy/WYwMrctBR3EpkOJHSBHPG5+OYlhSGKYRuhxcaOuJyq9NPyXaRtIwoJbm2SQ2E3gbw5UzfYNh4+Zsdlyyf2fqz/nfuTulgnbDZUN06bw3dCKQlgorH/+ohWbaa1SQLbJzCxvKZOx/MJCh1pBm/F2VBIa/so2tKi49EA+ktn349EbCy+bMhrGONwPCzwf2MNJSruQNMUKPHUtE6Ber7adMWlIhvkRQnideoRjxmflS1kiPiAMuBzpM3AyXXbMb1u0RgXupI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39840400004)(136003)(376002)(346002)(366004)(451199021)(316002)(6486002)(6666004)(6512007)(38100700002)(66946007)(66476007)(66556008)(4326008)(6916009)(478600001)(83380400001)(44832011)(2616005)(36756003)(2906002)(86362001)(41300700001)(6506007)(186003)(7416002)(7406005)(8676002)(8936002)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?EwJcBo/2mvzDAcZlwWvTX9INa/Cd4/lFcnamw+5KB2J69OYpKA3aGp5Wd/XF?=
+ =?us-ascii?Q?Vjt1Q6FMtfkPT96kdcb4hxokRaLTkBreJ1T36jkKBbExivpNKSZ6veIvC/M4?=
+ =?us-ascii?Q?jrCBhciqYx3+6CIDSXOzrvyFcFGYL2Yoe1VQGDJ7NdDD5l0XwHG+93LniBR0?=
+ =?us-ascii?Q?AC3/KSBGGJTCJ06zamH3IV6dDULUlTJhzm/pIZUJ/EWtK7yxw+go6gb+7bsb?=
+ =?us-ascii?Q?GNmIfq+OCxbfIvLSus5tHnhiHP5OesDtsNHLDznFWUW/G/Lmo/+J1OFJzmoH?=
+ =?us-ascii?Q?RITysfiVBMj55kz7cS+ZPLvGIfm8kdkhOghNhMN3NBBLtXwtGwJo5omwrNVG?=
+ =?us-ascii?Q?J1vTaUl7LcWFEq2X1SOaK8K4/6Ia3JWLxWKLRxy3Ww4uBVp7+2i/SZa9mFbj?=
+ =?us-ascii?Q?frtZCGrY28gP1W0cOaS0pH73V5HmSCYk5cbij51ERGBgOpga0ADx0XHxbFwQ?=
+ =?us-ascii?Q?O5taUvqZVD+YUBO09GBwkxw/rXt9bZ3p+tl0GkMzDw3rMPNo5Iiqs8Q7YLtl?=
+ =?us-ascii?Q?QnIGVeXrT9dOvCPEFdcCjIdtTYbOTjdDHfbAbXIwEN2LEHFDx51xljpLnzoj?=
+ =?us-ascii?Q?q6JlISd8nfmBNuAE82FX2Lfg9cjoTaEPWWoVPZG72vP0TPQGCo5rg+N5xg5+?=
+ =?us-ascii?Q?RA9dMJEpTUcVArKtlxNThUjNr/lXLQD2djxQG4SygkFdNSbOIg+Py5fn4KMQ?=
+ =?us-ascii?Q?VM6sDlWNOXcbgtJIHGGZNj7fiUlUPxTpownfc1c4LE42xLPnRHtGXEP9gqSA?=
+ =?us-ascii?Q?snUmINmb3Px4hk0VdGXyakeqY6tNY5w5AGS+MUD7tSY9rFxMbnhmArg+UUZE?=
+ =?us-ascii?Q?i73ij7qu7+jTmwf34+LrI95qmZ0ttNUbtvojB+anPSnSbsSmKyG6GOyDgdDj?=
+ =?us-ascii?Q?1Q8qS+/Pk+qDjwjSV6oDR5KDVg31OLrvNp/zYuvlMlX0IhekWbiJFuhZcDzF?=
+ =?us-ascii?Q?AQLPFRIatsy4f+ShA4r06BfxUfqS9AM3xlDQDA/TuaCkS65hHcKnjG7ssGxV?=
+ =?us-ascii?Q?6wo/p/ORe67hNfAjMWhnJoVU5KB1cJ8ra6ei3E+v+SkG6SmMGtAv/0oPpPuU?=
+ =?us-ascii?Q?fk42VugnI0lugCDN1EQawQHpI+ocrjKTtJgfvf65Gj0bxKANcxVQOqbjWLID?=
+ =?us-ascii?Q?8oXHR6mTmC6ENdB5NHmG42BWQJwcowGxu+i9mU8n3S1/1JXFgKAEOfbrQd/5?=
+ =?us-ascii?Q?Cs8GeKBlj4ogqJ9DEvux/7uYG9mSmkqZBCtfXbYeCmm8POr37MhzLWkvTMRO?=
+ =?us-ascii?Q?TNw+7pHndTN8XIIottGRIXCDjsLjJkNK37QoW2iOVxgkXOaCDs4v/ZPvu2BS?=
+ =?us-ascii?Q?yItjrzpQ7Wv/V/T0mShaQr35yWensUSLg8kwArBLTM+1TpeUjQvlRTRa2QEM?=
+ =?us-ascii?Q?eBhHGQssV3+tngbS/tmYBR8K+ByZIKYtpZzqEUrHnOGBWuMmBorzNjocuLAI?=
+ =?us-ascii?Q?0pmuEP2b4mk3PLcri7AeHoHgZmpbghkq4M/UOwzgrfPl8rOdOFcanX9cAkZ6?=
+ =?us-ascii?Q?9QPpEusH9TeQH4ecp7Cjadc8dwuN5sJzzuVBs840pTrx8rCTXZtCWFBrdxH1?=
+ =?us-ascii?Q?GQ8aV1bM3szxVEZWi1L9tiLEBSSbrR18uuwppQLJFRySYRV8eMAQc/EPvB84?=
+ =?us-ascii?Q?YOmbXUzPIyQOL7toNCW5V83Ij8+QcxN+t1bzFJsRVsd7LA7EUFd9DTAbDPkv?=
+ =?us-ascii?Q?1A2tGA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8611e466-4b59-4307-f46d-08db8f4283c5
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2023 08:13:24.7088
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZO18g4iU6cCBfbXbdk05XK2h3U98gv1o0RvG8C19b61bZGM6zcodErQeQen1aIioiwU32nm1ls4To/v/MA7i5mi21rgU93wTSzMKCF+aMJ4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5269
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jul 27, 2023 at 04:04:17PM +0800, Qi Zheng wrote:
+> The debugfs_remove_recursive() will wait for debugfs_file_put() to return,
+> so the shrinker will not be freed when doing debugfs operations (such as
+> shrinker_debugfs_count_show() and shrinker_debugfs_scan_write()), so there
+> is no need to hold shrinker_rwsem during debugfs operations.
+> 
+> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+> ---
+>  mm/shrinker_debug.c | 14 --------------
+>  1 file changed, 14 deletions(-)
+> 
+> diff --git a/mm/shrinker_debug.c b/mm/shrinker_debug.c
+> index 3ab53fad8876..f1becfd45853 100644
+> --- a/mm/shrinker_debug.c
+> +++ b/mm/shrinker_debug.c
+> @@ -55,11 +55,6 @@ static int shrinker_debugfs_count_show(struct seq_file *m, void *v)
+>  	if (!count_per_node)
+>  		return -ENOMEM;
+>  
+> -	ret = down_read_killable(&shrinker_rwsem);
+> -	if (ret) {
+> -		kfree(count_per_node);
+> -		return ret;
+> -	}
+>  	rcu_read_lock();
 
+Hi Qi Zheng,
 
-On 28.07.2023 11:00, Arseniy Krasnov wrote:
-> 
-> 
-> On 28.07.2023 08:45, Michael S. Tsirkin wrote:
->> On Fri, Jul 28, 2023 at 01:26:23AM +0300, Arseniy Krasnov wrote:
->>> Hello,
->>>
->>> this patchset is first of three parts of another big patchset for
->>> MSG_ZEROCOPY flag support:
->>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
->>
->> overall looks good. Two points I'd like to see addressed:
-> 
-> Thanks!
-> 
->> - what's the performance with all these changes - still same?
-> 
-> Yes, I perform quick tests and seems result are same. This is because last
-> implemented logic when I compare size of payload against 'num_max' is
-> for "emergency" case and not triggered in default environment. Anyway, I'll
-> perform retest at least in nested guest case.
+As can be seen in the next hunk, this function returns 'ret'.
+However, with this change 'ret' is uninitialised unless
+signal_pending() returns non-zero in the while loop below.
 
-"default environment" is vanilla Qemu where queue size is 128 elements. To test
-this logic i rebuild Qemu with for example queue of 8 elements.
+This is flagged in a clan-16 W=1 build.
 
-Thanks, Arseniy
+ mm/shrinker_debug.c:87:11: warning: variable 'ret' is used uninitialized whenever 'do' loop exits because its condition is false [-Wsometimes-uninitialized]
+         } while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
+                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ mm/shrinker_debug.c:92:9: note: uninitialized use occurs here
+         return ret;
+                ^~~
+ mm/shrinker_debug.c:87:11: note: remove the condition if it is always true
+         } while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
+                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  1
+ mm/shrinker_debug.c:77:7: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+                 if (!memcg_aware) {
+                     ^~~~~~~~~~~~
+ mm/shrinker_debug.c:92:9: note: uninitialized use occurs here
+         return ret;
+                ^~~
+ mm/shrinker_debug.c:77:3: note: remove the 'if' if its condition is always false
+                 if (!memcg_aware) {
+                 ^~~~~~~~~~~~~~~~~~~
+ mm/shrinker_debug.c:52:9: note: initialize the variable 'ret' to silence this warning
+         int ret, nid;
+                ^
+                 = 0
 
-> 
->> - most systems have a copybreak scheme where buffers
->>   smaller than a given size are copied directly.
->>   This will address regression you see with small buffers -
->>   but need to find that value. we know it's between 4k and 32k :)
-> 
-> I see, You suggest to find this value and add this check for decision to
-> use zerocopy or copy ?
-> 
-> Thanks, Arseniy
-> 
->>
->>
->>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
->>> suggested to split it for three parts to simplify review and merging:
->>>
->>> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
->>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
->>>    tx completions) and update for Documentation/.
->>> 3) Updates for tests and utils.
->>>
->>> This series enables handling of fragged skbs in virtio and vhost parts.
->>> Newly logic won't be triggered, because SO_ZEROCOPY options is still
->>> impossible to enable at this moment (next bunch of patches from big
->>> set above will enable it).
->>>
->>> I've included changelog to some patches anyway, because there were some
->>> comments during review of last big patchset from the link above.
->>>
->>> Head for this patchset is 9d0cd5d25f7d45bce01bbb3193b54ac24b3a60f3
->>>
->>> Link to v1:
->>> https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
->>> Link to v2:
->>> https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
->>> Link to v3:
->>> https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
->>>
->>> Changelog:
->>>  * Patchset rebased and tested on new HEAD of net-next (see hash above).
->>>  * See per-patch changelog after ---.
->>>
->>> Arseniy Krasnov (4):
->>>   vsock/virtio/vhost: read data from non-linear skb
->>>   vsock/virtio: support to send non-linear skb
->>>   vsock/virtio: non-linear skb handling for tap
->>>   vsock/virtio: MSG_ZEROCOPY flag support
->>>
->>>  drivers/vhost/vsock.c                   |  14 +-
->>>  include/linux/virtio_vsock.h            |   6 +
->>>  net/vmw_vsock/virtio_transport.c        |  79 +++++-
->>>  net/vmw_vsock/virtio_transport_common.c | 312 ++++++++++++++++++------
->>>  4 files changed, 330 insertions(+), 81 deletions(-)
->>>
->>> -- 
->>> 2.25.1
->>
+>  
+>  	memcg_aware = shrinker->flags & SHRINKER_MEMCG_AWARE;
+> @@ -92,7 +87,6 @@ static int shrinker_debugfs_count_show(struct seq_file *m, void *v)
+>  	} while ((memcg = mem_cgroup_iter(NULL, memcg, NULL)) != NULL);
+>  
+>  	rcu_read_unlock();
+> -	up_read(&shrinker_rwsem);
+>  
+>  	kfree(count_per_node);
+>  	return ret;
+
+...
