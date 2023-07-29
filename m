@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F246C7679B6
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:37:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A8B67679B9
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:38:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236353AbjG2Aht (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:37:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58490 "EHLO
+        id S236189AbjG2AiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 20:38:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235836AbjG2AhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:37:18 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04B046BE
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:00 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bba5626342so24247885ad.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:00 -0700 (PDT)
+        with ESMTP id S236332AbjG2Ahq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 20:37:46 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0F249F9
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:03 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bba5563cd6so17176175ad.3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591019; x=1691195819;
+        d=google.com; s=20221208; t=1690591022; x=1691195822;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ELXU1ozQzdRVu6Pw/o2mcwSfwjzxGjCFC9TkVEz9ZVQ=;
-        b=JXtcg+1ByHrhsMnwuvWSktPaXMMguvcz07wHpELDSVv6jhZ3yrEl0JvsbHqBi5Lg2x
-         OmX5Eimu/ODFnq3VaAjn8vXO1K17rz8y6EpesxllWzQRPUfsavJkfM4At0ImL4pderV8
-         fvgM9Bge1BI96MVbtQDXU+64v48qE3nq1HyrYE9zFRgPRHo+Wg2XKMo2Sc5iGJCqFUhY
-         FPfQU4uIVpdGn2QFHpgCsDRaEnqFriANA72+NhczhR8B6xGQYtfwAurIWtQuSJ8qMWVA
-         Ml4BO52nX87ezdWgvfx/qbYHGyhUaBoVsxUYpnpeEXRxWOxYM7y18KJ85RhTqqTsk3lN
-         JNRw==
+        bh=jA1UVJV2mTAx+a2Lkx0I6MPmHbvMTggN8U6YXQ/WoPE=;
+        b=K4d3Yo027UjIWQLKdsJ+4pJ5JAFOzUO0KRpjGWvQAJC1C3ucZprPSO1EmmSKjHL5RL
+         mjMb4Wl4ok7XoJJ1UpvXExKrZiS4rMu1JU2JGycw5Xxs2iEvXPyGUoNKsTKzfJGYhbPU
+         LgRlUQInLmq2DH5Uyogf+21W7XUb6ldLqjMT1xd34fC8sn4mYbNS+bx1bJKHKYjbaUdK
+         7AmwiB3Jjx2+vUvKZ15nrKoZsoW4PVfdu+/S0+ZWTbol8JYhHE2XH87j8WOQEjM0KOrB
+         unEKPbBvWYwlhSNsm+dRFNpapqFmKqvp2geugj636QFuzYT5UZl84xpkYXOlHRd0ByML
+         cS8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591019; x=1691195819;
+        d=1e100.net; s=20221208; t=1690591022; x=1691195822;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ELXU1ozQzdRVu6Pw/o2mcwSfwjzxGjCFC9TkVEz9ZVQ=;
-        b=XNm0RNCxsTfrNvsQ6SJvlof75+vS/6LKVpH7W+ru+DO0Ki6MG0apMR/A61NFIaEwGF
-         CB4PDnAhcf73aiCVUu92ky98o3BDTQPKywGyw+cQzuqppZ6fERtVD5quSFAGWKBKRB0h
-         VuDB5C3LwbfSnzo58hl9Nk+23Ff8YiskIVZP5dIGsNy2jts45d0KKNKyXt2JfTPNcxNj
-         Ccz2Slygiii/NBRuwH4EiyVLdOWMK/YZSJu0pPM+uOZKZtMIfPcBUtXf2gVCIUBmYmUg
-         di5q4Ixiy8+IYtGVJX2+LIw2k0O/+FAR2pZwXrNyS+9TztwwQW2melq1CbTX1tJTObgk
-         Hjhg==
-X-Gm-Message-State: ABy/qLZqMrz8JeCVLctqaJT6SN/duPZPueBEYx+KyhgTf/PvWtNbDP2Q
-        mpmrkscJqT5XNOzENvHOG7+sy5Gkg1M=
-X-Google-Smtp-Source: APBJJlFaQWpQ9EmvDFhoqjrlvd9ghhe4hfSspLAxYVt7vmgNKcaTBWdjzzZ7FvjaiMwdSLF+VQ/4xTSUS1M=
+        bh=jA1UVJV2mTAx+a2Lkx0I6MPmHbvMTggN8U6YXQ/WoPE=;
+        b=eoKtXVuUutrK0X2hu5ERtNt7Y2B6AgOwXPpAO4wBVCHH7T1T2yBuXkE/cQU2kVQpiW
+         TkSRf2Xt+L7RyO1F+3N8KxhgaeL4DDVSDufhrB4m8cxEj06kqOj23WjO//UycQ82iDAB
+         usLifDqy3kWw0Qq/vfyS2y+00537UCIKbz3psqljsfj+woEWQaPD/IjbCcHqHvZ2TZxA
+         A2FW9sYc/tBoxINVYKVdkBTrGzLE5j+8KhX1A91RG1vISr5gcLWP3ij1TGdKTxIi6UU9
+         +JpFcz2CfBMnyR2b1yZPirXszaV3skHgqkJNhHxs96qycotf9Ci3leBoawdi0oO9AMDd
+         3Y5g==
+X-Gm-Message-State: ABy/qLbgARsuPwp2gbRj145SgCiGKl0mSiYDMSZzExN1H2pmLf6myMU+
+        HvGFwtQ8R7KyMdgmR3e33+NJ7rfr+hc=
+X-Google-Smtp-Source: APBJJlHBrL+TeZGSt6drIsgYNE5M3L5vEoG966oFy1TYmHeiItdpMHlHz7MHdTn/QgLjI5xFk+55OLkG/EQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:fa0d:b0:1bb:a13a:c21e with SMTP id
- la13-20020a170902fa0d00b001bba13ac21emr11796plb.10.1690591019608; Fri, 28 Jul
- 2023 17:36:59 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:903:2309:b0:1b3:bfa6:d064 with SMTP id
+ d9-20020a170903230900b001b3bfa6d064mr13000plh.1.1690591021464; Fri, 28 Jul
+ 2023 17:37:01 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:36:16 -0700
+Date:   Fri, 28 Jul 2023 17:36:17 -0700
 In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-8-seanjc@google.com>
-Subject: [PATCH v4 07/34] KVM: selftests: Add string formatting options to ucall
+Message-ID: <20230729003643.1053367-9-seanjc@google.com>
+Subject: [PATCH v4 08/34] KVM: selftests: Add formatted guest assert support
+ in ucall framework
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -70,93 +71,147 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Aaron Lewis <aaronlewis@google.com>
+Add printf-based GUEST_ASSERT macros and accompanying host-side support to
+provide an assert-specific versions of GUEST_PRINTF().  To make it easier
+to parse assert messages, for humans and bots alike, preserve/use the same
+layout as host asserts, e.g. in the example below, the reported expression,
+file, line number, and message are from the guest assertion, not the host
+reporting of the assertion.
 
-Add more flexibility to guest debugging and testing by adding
-GUEST_PRINTF() and GUEST_ASSERT_FMT() to the ucall framework.
+The call stack still captures the host reporting, but capturing the guest
+stack is a less pressing concern, i.e. can be done in the future, and an
+optimal solution would capture *both* the host and guest stacks, i.e.
+capturing the host stack isn't an outright bug.
 
-Add a sized buffer to the ucall structure to hold the formatted string,
-i.e. to allow the guest to easily resolve the string, and thus avoid the
-ugly pattern of the host side having to make assumptions about the desired
-format, as well as having to pass around a large number of parameters.
+  Running soft int test
+  ==== Test Assertion Failure ====
+    x86_64/svm_nested_soft_inject_test.c:39: regs->rip != (unsigned long)l2_guest_code_int
+    pid=214104 tid=214104 errno=4 - Interrupted system call
+       1	0x0000000000401b35: run_test at svm_nested_soft_inject_test.c:191
+       2	0x00000000004017d2: main at svm_nested_soft_inject_test.c:212
+       3	0x0000000000415b03: __libc_start_call_main at libc-start.o:?
+       4	0x000000000041714f: __libc_start_main_impl at ??:?
+       5	0x0000000000401660: _start at ??:?
+    Expected IRQ at RIP 0x401e50, received IRQ at 0x401e50
 
-The buffer size was chosen to accommodate most use cases, and based on
-similar usage.  E.g. printf() uses the same size buffer in
-arch/x86/boot/printf.c.  And 1KiB ought to be enough for anybody.
+Don't bother sharing code between ucall_assert() and ucall_fmt(), as
+forwarding the variable arguments would either require using macros or
+building a va_list, i.e. would make the code less readable and/or require
+just as much copy+paste code anyways.
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-[sean: massage changelog, wrap macro param in ()]
+Gate the new macros with a flag so that tests can more or less be switched
+over one-by-one.  The slow conversion won't be perfect, e.g. library code
+won't pick up the flag, but the only asserts in library code are of the
+vanilla GUEST_ASSERT() variety, i.e. don't print out variables.
+
+Add a temporary alias to GUEST_ASSERT_1() to fudge around ARM's
+arch_timer.h header using GUEST_ASSERT_1(), thus thwarting any attempt to
+convert tests one-by-one.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/ucall_common.h        |  7 +++++++
- tools/testing/selftests/kvm/lib/ucall_common.c  | 17 +++++++++++++++++
- 2 files changed, 24 insertions(+)
+ .../selftests/kvm/include/ucall_common.h      | 48 +++++++++++++++++++
+ .../testing/selftests/kvm/lib/ucall_common.c  | 22 +++++++++
+ 2 files changed, 70 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index bcbb362aa77f..b5548aeba9f0 100644
+index b5548aeba9f0..4ce11c15285a 100644
 --- a/tools/testing/selftests/kvm/include/ucall_common.h
 +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -13,15 +13,18 @@ enum {
- 	UCALL_NONE,
- 	UCALL_SYNC,
- 	UCALL_ABORT,
-+	UCALL_PRINTF,
- 	UCALL_DONE,
- 	UCALL_UNHANDLED,
- };
- 
- #define UCALL_MAX_ARGS 7
-+#define UCALL_BUFFER_LEN 1024
- 
- struct ucall {
- 	uint64_t cmd;
- 	uint64_t args[UCALL_MAX_ARGS];
-+	char buffer[UCALL_BUFFER_LEN];
- 
- 	/* Host virtual address of this struct. */
- 	struct ucall *hva;
-@@ -32,6 +35,7 @@ void ucall_arch_do_ucall(vm_vaddr_t uc);
- void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
+@@ -36,6 +36,8 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
  
  void ucall(uint64_t cmd, int nargs, ...);
-+void ucall_fmt(uint64_t cmd, const char *fmt, ...);
+ void ucall_fmt(uint64_t cmd, const char *fmt, ...);
++void ucall_assert(uint64_t cmd, const char *exp, const char *file,
++		  unsigned int line, const char *fmt, ...);
  uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
  void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
  int ucall_nr_pages_required(uint64_t page_size);
-@@ -47,8 +51,11 @@ int ucall_nr_pages_required(uint64_t page_size);
- #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
- 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
- #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
-+#define GUEST_PRINTF(_fmt, _args...) ucall_fmt(UCALL_PRINTF, _fmt, ##_args)
- #define GUEST_DONE()		ucall(UCALL_DONE, 0)
+@@ -63,6 +65,50 @@ enum guest_assert_builtin_args {
+ 	GUEST_ASSERT_BUILTIN_NARGS
+ };
  
-+#define REPORT_GUEST_PRINTF(ucall) pr_info("%s", (ucall).buffer)
++#ifdef USE_GUEST_ASSERT_PRINTF
++#define ____GUEST_ASSERT(_condition, _exp, _fmt, _args...)				\
++do {											\
++	if (!(_condition))								\
++		ucall_assert(UCALL_ABORT, _exp, __FILE__, __LINE__, _fmt, ##_args);	\
++} while (0)
 +
- enum guest_assert_builtin_args {
- 	GUEST_ERROR_STRING,
- 	GUEST_FILE,
++#define __GUEST_ASSERT(_condition, _fmt, _args...)				\
++	____GUEST_ASSERT(_condition, #_condition, _fmt, ##_args)
++
++#define GUEST_ASSERT(_condition)						\
++	__GUEST_ASSERT(_condition, #_condition)
++
++#define GUEST_FAIL(_fmt, _args...)						\
++	ucall_assert(UCALL_ABORT, "Unconditional guest failure",		\
++		     __FILE__, __LINE__, _fmt, ##_args)
++
++#define GUEST_ASSERT_EQ(a, b)							\
++do {										\
++	typeof(a) __a = (a);							\
++	typeof(b) __b = (b);							\
++	____GUEST_ASSERT(__a == __b, #a " == " #b, "%#lx != %#lx (%s != %s)",	\
++			 (unsigned long)(__a), (unsigned long)(__b), #a, #b);	\
++} while (0)
++
++#define GUEST_ASSERT_NE(a, b)							\
++do {										\
++	typeof(a) __a = (a);							\
++	typeof(b) __b = (b);							\
++	____GUEST_ASSERT(__a != __b, #a " != " #b, "%#lx == %#lx (%s == %s)",	\
++			 (unsigned long)(__a), (unsigned long)(__b), #a, #b);	\
++} while (0)
++
++#define REPORT_GUEST_ASSERT(ucall)						\
++	test_assert(false, (const char *)(ucall).args[GUEST_ERROR_STRING],	\
++		    (const char *)(ucall).args[GUEST_FILE],			\
++		    (ucall).args[GUEST_LINE], "%s", (ucall).buffer)
++
++/* FIXME: Drop this alias once the param-based guest asserts are gone. */
++#define GUEST_ASSERT_1(_condition, arg1) \
++	__GUEST_ASSERT(_condition, "arg1 = 0x%lx", arg1)
++
++#else
++
+ #define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...)		\
+ do {									\
+ 	if (!(_condition))						\
+@@ -129,4 +175,6 @@ do {									\
+ #define REPORT_GUEST_ASSERT_N(ucall, fmt, args...)	\
+ 	__REPORT_GUEST_ASSERT((ucall), fmt, ##args)
+ 
++#endif /* USE_GUEST_ASSERT_PRINTF */
++
+ #endif /* SELFTEST_KVM_UCALL_COMMON_H */
 diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-index 77ada362273d..b507db91139b 100644
+index b507db91139b..816a3fa109bf 100644
 --- a/tools/testing/selftests/kvm/lib/ucall_common.c
 +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-@@ -75,6 +75,23 @@ static void ucall_free(struct ucall *uc)
+@@ -75,6 +75,28 @@ static void ucall_free(struct ucall *uc)
  	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
  }
  
-+void ucall_fmt(uint64_t cmd, const char *fmt, ...)
++void ucall_assert(uint64_t cmd, const char *exp, const char *file,
++		  unsigned int line, const char *fmt, ...)
 +{
 +	struct ucall *uc;
 +	va_list va;
 +
 +	uc = ucall_alloc();
 +	uc->cmd = cmd;
++
++	WRITE_ONCE(uc->args[GUEST_ERROR_STRING], (uint64_t)(exp));
++	WRITE_ONCE(uc->args[GUEST_FILE], (uint64_t)(file));
++	WRITE_ONCE(uc->args[GUEST_LINE], line);
 +
 +	va_start(va, fmt);
 +	guest_vsnprintf(uc->buffer, UCALL_BUFFER_LEN, fmt, va);
@@ -167,7 +222,7 @@ index 77ada362273d..b507db91139b 100644
 +	ucall_free(uc);
 +}
 +
- void ucall(uint64_t cmd, int nargs, ...)
+ void ucall_fmt(uint64_t cmd, const char *fmt, ...)
  {
  	struct ucall *uc;
 -- 
