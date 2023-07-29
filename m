@@ -2,288 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E764767A61
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:54:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69A0E767A8C
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:16:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237012AbjG2Ayl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:54:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46378 "EHLO
+        id S237072AbjG2BQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 21:16:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236986AbjG2Axw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:53:52 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D124C19
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:53:11 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bba9a0da10so18263445ad.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:53:11 -0700 (PDT)
+        with ESMTP id S233297AbjG2BQO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 21:16:14 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D2D33AA9
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:16:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d27ac992539so1150974276.3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591931; x=1691196731;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=scefrr3SIufw6sNZG0VjXNno2RViLSFvpYi41J7nSSE=;
-        b=x5RzGi3sYi9BiTkBJxkYuke/eRiSqxxn6e8LLPx+jc0R1g87xw23xc1uTMjhHPOhUj
-         51SR01z5k7qEZgwqE7HuF/7KW+s8T8fdPQsjvQ7vgqnc7jblmNVQ5XVZSEeB1s2dZOtE
-         mSuV919P1mcYTdRWKawEg7mkLNFRbUIAMMlAJjIiyEC6+Y4fwbaCJRCSqUD939LeJL3+
-         K06Khr/NfX9YrBf/pgpC1WLGKhooduG1EbwFzsoxeHbhUnt1T/Xg+MjLnVhYgGr0nOQ5
-         tY3nn+OuNMHlBrmhxoQ34+vkxNMy1DSh8xo1E1iaPsNl2Umkqub1UjtNMBdpuirs9YRA
-         EcRA==
+        d=google.com; s=20221208; t=1690593372; x=1691198172;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nJkpJZhQugJruq9ZGSna/diiNivrwzOkBsEj4Xcrf14=;
+        b=3jil1H5CD9WwizZiZJ5IA2BD9pbWShS/TS6cFpS6ArxZOsfmKXhUSZrAsq/cLYuygd
+         bEPFvXQRgI6MX1uxLhUPOv8mdq+Ji9kI3+yI6qlEl3xXLVi1ikhnTyWnXjAj577Wfomi
+         rE72n/3qt7uBML4Yd4I3/EV8DNVwZmJfz+d3jCH4+IY5Jhl+AWU8NHe04wWTEzxvSaSy
+         53dV5rfFQr5Gf0hpmexY89nHB07Y+gu7tPGJcG9bEKgQPwsvUR69Oeq2lAFF9iEFwdAh
+         sWlWa72ygUDmrEm+2OKA8ZAWyq54Zjh2R0V8uFE1O7e+UHlgOR8ZpuxsX/B9/KErDsMj
+         bElg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591931; x=1691196731;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=scefrr3SIufw6sNZG0VjXNno2RViLSFvpYi41J7nSSE=;
-        b=PgHv0dRduyxmqQyYp4Ig6yZoH6N54hZi95vO4k6Gina1ia4TVm+W1Dyu7Kn86zE7Ya
-         BShS91T7rGCJgo4CBE1H/59Rk3x/1GdfsDMvKvUixDjBq2Dty1syQ7dYOeNDr5h1Pc2Z
-         Efi05PSh2HCilnkH/rhtydXa2IR/6IXkGb8Y4J1FbUVy8fYe9hbGpg/jsFye6BA7g6ws
-         qe4oBi6CkGcsNBI/Trx7DR6YLHtA7PF71I68ytbdEIkV9D1Bqac+znoTm++93ASOShMM
-         7ok6GkAEEpsFq60ZZ3Hl4B27AdXVLxDHCTbmX4oY04RnyoHrFAzLkruPNouYWi9pov4u
-         tzIg==
-X-Gm-Message-State: ABy/qLaMybXgIOBeQ4tCJDL3MqyV4pd/cclMTDMAMiAloD6/oD/71bdL
-        rW1SvnOB0DzjFGn16elAVjXAO6BTbSw=
-X-Google-Smtp-Source: APBJJlFdKpDKSf4oUz2CUbPZ6BWw60qvC2qZQ71C6Ase8j60mH9EApUOPtfLZAvqBe2m00AFHwRsWu7gRTw=
+        d=1e100.net; s=20221208; t=1690593372; x=1691198172;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nJkpJZhQugJruq9ZGSna/diiNivrwzOkBsEj4Xcrf14=;
+        b=eJyxfu//9Gryt7nGRqjhe1x1n3eo+uDDVNzUWWnjA6yPsZVbxgCHOO7CJaedOWsq6D
+         cLwAnFoEawN8aTXM88+aKzbJitHfK6j2ru/sFxkSDYz/OAO7X50QksA8nlLWu4pEmCwA
+         zUa2N3pvzX58d7VDqz82imj7BxBOhwwApBw1q6Pk+uOjb32WWZ/esb2euhTQQIxPK5Ue
+         ygxk/2PwNeZuUfa9Pv3s/Y2qaPKCSwxS6/M0Goh/tbLnqHcPGlSpKwN8mbLJXNGlo8W1
+         Ri7pYIS006bbaQlDC1lmKU2LQhnjNStn1iqywtUiijqZYTQmy32xp3TDoBKAndxU9HdY
+         YhKw==
+X-Gm-Message-State: ABy/qLY3L5oWDmlEaJ+F3dzFEVfkhN51YTLgNjkpD3bbOCHe8c8Qhscg
+        yeZknu0yDpzs2bMKfBjalqKvhTXF/Xc=
+X-Google-Smtp-Source: APBJJlE5y3tnSBUxwgbG35HIdFij0gOVki64ZS/mUze8Vn96kzV+ZHOPTnqEU8nYD2+QEzghV3TRCFGVFMg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e748:b0:1b5:61d3:dae5 with SMTP id
- p8-20020a170902e74800b001b561d3dae5mr14358plf.1.1690591931517; Fri, 28 Jul
- 2023 17:52:11 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:7401:0:b0:d06:cbd:1f3e with SMTP id
+ p1-20020a257401000000b00d060cbd1f3emr16966ybc.3.1690593372414; Fri, 28 Jul
+ 2023 18:16:12 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:52:00 -0700
-In-Reply-To: <20230729005200.1057358-1-seanjc@google.com>
+Date:   Fri, 28 Jul 2023 18:15:47 -0700
 Mime-Version: 1.0
-References: <20230729005200.1057358-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729005200.1057358-6-seanjc@google.com>
-Subject: [PATCH v2 5/5] KVM: x86/mmu: Use dummy root, backed by zero page, for
- !visible guest roots
+Message-ID: <20230729011608.1065019-1-seanjc@google.com>
+Subject: [PATCH v2 00/21] KVM: x86: Add "governed" X86_FEATURE framework
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Reima Ishii <ishiir@g.ecc.u-tokyo.ac.jp>
+        Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When attempting to allocate a shadow root for a !visible guest root gfn,
-e.g. that resides in MMIO space, load a dummy root that is backed by the
-zero page instead of immediately synthesizing a triple fault shutdown
-(using the zero page ensures any attempt to translate memory will generate
-a !PRESENT fault and thus VM-Exit).
+Add a framework to manage and cache KVM-governed features, i.e. CPUID
+based features that require explicit KVM enabling and/or need to be
+queried semi-frequently by KVM.  The idea originally came up in the
+context of the architectural LBRs series as a way to avoid querying
+guest CPUID in hot paths without needing a dedicated flag, but as
+evidenced by the shortlog, the most common usage is to handle the ever-
+growing list of SVM features that are exposed to L1.
 
-Unless the vCPU is racing with memslot activity, KVM will inject a page
-fault due to not finding a visible slot in FNAME(walk_addr_generic), i.e.
-the end result is mostly same, but critically KVM will inject a fault only
-*after* KVM runs the vCPU with the bogus root.
+The first six patches are fixes and cleanups related to TSC scaling.
+nSVM has WARN_ONs that can be triggered by userspace at will, and the
+code is a bit crusty.  They aren't directly related to the governed
+stuff, I stumbled upon the issues they fix when staring at the patch to
+convert "TSC scaling enabled".  I included them here mainly to avoid
+code conflicts.  I'm hoping all of this can go into 6.6, e.g. so that CET
+support can build on guest_can_use(), but I can always grab the TSC
+patches for 6.6 if the governed stuff needs more time.
 
-Waiting to inject a fault until after running the vCPU fixes a bug where
-KVM would bail from nested VM-Enter if L1 tried to run L2 with TDP enabled
-and a !visible root.  Even though a bad root will *probably* lead to
-shutdown, (a) it's not guaranteed and (b) the CPU won't read the
-underlying memory until after VM-Enter succeeds.  E.g. if L1 runs L2 with
-a VMX preemption timer value of '0', then architecturally the preemption
-timer VM-Exit is guaranteed to occur before the CPU executes any
-instruction, i.e. before the CPU needs to translate a GPA to a HPA (so
-long as there are no injected events with higher priority than the
-preemption timer).
+Note, I still don't like the name "governed", but no one has suggested
+anything else, let alone anything better :-)
 
-If KVM manages to get to FNAME(fetch) with a dummy root, e.g. because
-userspace created a memslot between installing the dummy root and handling
-the page fault, simply unload the MMU to allocate a new root and retry the
-instruction.  Use KVM_REQ_MMU_FREE_OBSOLETE_ROOTS to drop the root, as
-invoking kvm_mmu_free_roots() while holding mmu_lock would deadlock, and
-conceptually the dummy root has indeeed become obsolete.  The only
-difference versus existing usage of KVM_REQ_MMU_FREE_OBSOLETE_ROOTS is
-that the root has become obsolete due to memslot *creation*, not memslot
-deletion or movement.
+v2:
+ - Add patches to clean up TSC scaling.
+ - Add a comment explaining the virtual VMLOAD/VMLAVE vs. SYSENTER on
+   Intel madness.
+ - Use a governed feature for X86_FEATURE_VMX.
+ - Incorporate KVM capabilities into the main check-and-set helper. [Chao]
 
-Reported-by: Reima Ishii <ishiir@g.ecc.u-tokyo.ac.jp>
-Cc Yu Zhang <yu.c.zhang@linux.intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c          | 47 ++++++++++++++++-----------------
- arch/x86/kvm/mmu/mmu_internal.h | 10 +++++++
- arch/x86/kvm/mmu/paging_tmpl.h  | 11 ++++++++
- arch/x86/kvm/mmu/spte.h         |  3 +++
- 4 files changed, 47 insertions(+), 24 deletions(-)
+v1: https://lore.kernel.org/all/20230217231022.816138-1-seanjc@google.com
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index dd8cc46551b2..565988c81b57 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3620,7 +3620,9 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
- 					   &invalid_list);
- 
- 	if (free_active_root) {
--		if (root_to_sp(mmu->root.hpa)) {
-+		if (kvm_mmu_is_dummy_root(mmu->root.hpa)) {
-+			/* Nothing to cleanup for dummy roots. */
-+		} else if (root_to_sp(mmu->root.hpa)) {
- 			mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
- 		} else if (mmu->pae_root) {
- 			for (i = 0; i < 4; ++i) {
-@@ -3668,19 +3670,6 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
- }
- EXPORT_SYMBOL_GPL(kvm_mmu_free_guest_mode_roots);
- 
--
--static int mmu_check_root(struct kvm_vcpu *vcpu, gfn_t root_gfn)
--{
--	int ret = 0;
--
--	if (!kvm_vcpu_is_visible_gfn(vcpu, root_gfn)) {
--		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
--		ret = 1;
--	}
--
--	return ret;
--}
--
- static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
- 			    u8 level)
- {
-@@ -3818,8 +3807,10 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	root_pgd = kvm_mmu_get_guest_pgd(vcpu, mmu);
- 	root_gfn = root_pgd >> PAGE_SHIFT;
- 
--	if (mmu_check_root(vcpu, root_gfn))
--		return 1;
-+	if (!kvm_vcpu_is_visible_gfn(vcpu, root_gfn)) {
-+		mmu->root.hpa = kvm_mmu_get_dummy_root();
-+		return 0;
-+	}
- 
- 	/*
- 	 * On SVM, reading PDPTRs might access guest memory, which might fault
-@@ -3831,8 +3822,8 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 			if (!(pdptrs[i] & PT_PRESENT_MASK))
- 				continue;
- 
--			if (mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
--				return 1;
-+			if (!kvm_vcpu_is_visible_gfn(vcpu, pdptrs[i] >> PAGE_SHIFT))
-+				pdptrs[i] = 0;
- 		}
- 	}
- 
-@@ -3999,7 +3990,7 @@ static bool is_unsync_root(hpa_t root)
- {
- 	struct kvm_mmu_page *sp;
- 
--	if (!VALID_PAGE(root))
-+	if (!VALID_PAGE(root) || kvm_mmu_is_dummy_root(root))
- 		return false;
- 
- 	/*
-@@ -4405,6 +4396,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- {
- 	int r;
- 
-+	/* Dummy roots are used only for shadowing bad guest roots. */
-+	if (WARN_ON_ONCE(kvm_mmu_is_dummy_root(vcpu->arch.mmu->root.hpa)))
-+		return RET_PF_RETRY;
-+
- 	if (page_fault_handle_page_track(vcpu, fault))
- 		return RET_PF_EMULATE;
- 
-@@ -4642,9 +4637,8 @@ static bool fast_pgd_switch(struct kvm *kvm, struct kvm_mmu *mmu,
- 			    gpa_t new_pgd, union kvm_mmu_page_role new_role)
- {
- 	/*
--	 * For now, limit the caching to 64-bit hosts+VMs in order to avoid
--	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
--	 * later if necessary.
-+	 * Limit reuse to 64-bit hosts+VMs without "special" roots in order to
-+	 * avoid having to deal with PDPTEs and other complexities.
- 	 */
- 	if (VALID_PAGE(mmu->root.hpa) && !root_to_sp(mmu->root.hpa))
- 		kvm_mmu_free_roots(kvm, mmu, KVM_MMU_ROOT_CURRENT);
-@@ -5557,14 +5551,19 @@ static bool is_obsolete_root(struct kvm *kvm, hpa_t root_hpa)
- 
- 	/*
- 	 * When freeing obsolete roots, treat roots as obsolete if they don't
--	 * have an associated shadow page.  This does mean KVM will get false
-+	 * have an associated shadow page, as it's impossible to determine if
-+	 * such roots are fresh or stale.  This does mean KVM will get false
- 	 * positives and free roots that don't strictly need to be freed, but
- 	 * such false positives are relatively rare:
- 	 *
--	 *  (a) only PAE paging and nested NPT has roots without shadow pages
-+	 *  (a) only PAE paging and nested NPT have roots without shadow pages
-+	 *      (or any shadow paging flavor with a dummy root, see note below)
- 	 *  (b) remote reloads due to a memslot update obsoletes _all_ roots
- 	 *  (c) KVM doesn't track previous roots for PAE paging, and the guest
- 	 *      is unlikely to zap an in-use PGD.
-+	 *
-+	 * Note!  Dummy roots are unique in that they are obsoleted by memslot
-+	 * _creation_!  See also FNAME(fetch).
- 	 */
- 	sp = root_to_sp(root_hpa);
- 	return !sp || is_obsolete_sp(kvm, sp);
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index d39af5639ce9..3ca986450393 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -44,6 +44,16 @@ extern bool dbg;
- #define INVALID_PAE_ROOT	0
- #define IS_VALID_PAE_ROOT(x)	(!!(x))
- 
-+static inline hpa_t kvm_mmu_get_dummy_root(void)
-+{
-+	return my_zero_pfn(0) << PAGE_SHIFT;
-+}
-+
-+static inline bool kvm_mmu_is_dummy_root(hpa_t shadow_page)
-+{
-+	return is_zero_pfn(shadow_page >> PAGE_SHIFT);
-+}
-+
- typedef u64 __rcu *tdp_ptep_t;
- 
- struct kvm_mmu_page {
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 122bfc0124d3..caf7623e5f91 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -646,6 +646,17 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
- 		goto out_gpte_changed;
- 
-+	/*
-+	 * Load a new root and retry the faulting instruction in the extremely
-+	 * unlikely scenario that the guest root gfn became visible between
-+	 * loading a dummy root and handling the resulting page fault, e.g. if
-+	 * userspace create a memslot in the interim.
-+	 */
-+	if (unlikely(kvm_mmu_is_dummy_root(vcpu->arch.mmu->root.hpa))) {
-+		kvm_make_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu);
-+		goto out_gpte_changed;
-+	}
-+
- 	for_each_shadow_entry(vcpu, fault->addr, it) {
- 		gfn_t table_gfn;
- 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 9f8e8cda89e8..ac8ad12f9698 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -238,6 +238,9 @@ static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
- 
- static inline struct kvm_mmu_page *root_to_sp(hpa_t root)
- {
-+	if (kvm_mmu_is_dummy_root(root))
-+		return NULL;
-+
- 	/*
- 	 * The "root" may be a special root, e.g. a PAE entry, treat it as a
- 	 * SPTE to ensure any non-PA bits are dropped.
+Sean Christopherson (21):
+  KVM: nSVM: Check instead of asserting on nested TSC scaling support
+  KVM: nSVM: Load L1's TSC multiplier based on L1 state, not L2 state
+  KVM: nSVM: Use the "outer" helper for writing multiplier to
+    MSR_AMD64_TSC_RATIO
+  KVM: SVM: Clean up preemption toggling related to MSR_AMD64_TSC_RATIO
+  KVM: x86: Always write vCPU's current TSC offset/ratio in vendor hooks
+  KVM: nSVM: Skip writes to MSR_AMD64_TSC_RATIO if guest state isn't
+    loaded
+  KVM: x86: Add a framework for enabling KVM-governed x86 features
+  KVM: x86/mmu: Use KVM-governed feature framework to track "GBPAGES
+    enabled"
+  KVM: VMX: Recompute "XSAVES enabled" only after CPUID update
+  KVM: VMX: Check KVM CPU caps, not just VMX MSR support, for XSAVE
+    enabling
+  KVM: VMX: Rename XSAVES control to follow KVM's preferred "ENABLE_XYZ"
+  KVM: x86: Use KVM-governed feature framework to track "XSAVES enabled"
+  KVM: nVMX: Use KVM-governed feature framework to track "nested VMX
+    enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "NRIPS enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "TSC scaling
+    enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "vVM{SAVE,LOAD}
+    enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "LBRv enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "Pause Filter
+    enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "vGIF enabled"
+  KVM: nSVM: Use KVM-governed feature framework to track "vNMI enabled"
+  KVM: x86: Disallow guest CPUID lookups when IRQs are disabled
+
+ arch/x86/include/asm/kvm_host.h  | 23 ++++++++-
+ arch/x86/include/asm/vmx.h       |  2 +-
+ arch/x86/kvm/cpuid.c             | 34 ++++++++++++++
+ arch/x86/kvm/cpuid.h             | 46 ++++++++++++++++++
+ arch/x86/kvm/governed_features.h | 21 +++++++++
+ arch/x86/kvm/mmu/mmu.c           | 20 ++------
+ arch/x86/kvm/svm/nested.c        | 57 ++++++++++++----------
+ arch/x86/kvm/svm/svm.c           | 81 ++++++++++++++++++--------------
+ arch/x86/kvm/svm/svm.h           | 18 ++-----
+ arch/x86/kvm/vmx/capabilities.h  |  2 +-
+ arch/x86/kvm/vmx/hyperv.c        |  2 +-
+ arch/x86/kvm/vmx/nested.c        | 13 ++---
+ arch/x86/kvm/vmx/nested.h        |  2 +-
+ arch/x86/kvm/vmx/vmx.c           | 81 +++++++++++++++-----------------
+ arch/x86/kvm/vmx/vmx.h           |  3 +-
+ arch/x86/kvm/x86.c               |  9 ++--
+ 16 files changed, 261 insertions(+), 153 deletions(-)
+ create mode 100644 arch/x86/kvm/governed_features.h
+
+
+base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
 -- 
 2.41.0.487.g6d72f3e995-goog
 
