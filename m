@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 354A6767AA6
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:17:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1D06767AAE
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:18:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237440AbjG2BRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 21:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36686 "EHLO
+        id S237531AbjG2BR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 21:17:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237498AbjG2BRe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 21:17:34 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2CCE46B4
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:02 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-585fb08172bso500917b3.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:02 -0700 (PDT)
+        with ESMTP id S237501AbjG2BRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 21:17:35 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F039559F
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:06 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bbf8cb6250so2424785ad.2
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690593396; x=1691198196;
+        d=google.com; s=20221208; t=1690593398; x=1691198198;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y5BOuAmsGu5bKSoLgi0ClRVcqN8jZYDkPjN1Ef5oXFc=;
-        b=druYUWwg+Cc+LP91WMNQ9dRoa7w6GYwh9GZqzIigWMkFkWk8Uj2z1giZell+k87Zn0
-         PFHW1nx+OjdSmtIXMvUq6mrlU8oB2wAeof8STbQvZWoMNx5gf8Lt5GvTkCThnHdv0Y9T
-         /yX2rIr0Mn2tNKO4ALpLcsmIl6OZBZrXr2jTpRAv2xGZNeWVyxPcrsmnOuGl08UbY+PG
-         MfgsDWIzS5xT5XQyiD5zK2CSnjjONty8UTFlbmujMRzDVveGUy0vsXRBUgQjHFYmmUH3
-         xrzZLdJPPEXJ04vuzw/WnBBvgfEs8hokIWiBtaH7Oo5volw8JS5CRBSvj1lzdZrSYM+T
-         tdrA==
+        bh=ZBstFzzUxVyW0UD2LT3q1n62xfHDtx4xPYrvh1DuKtE=;
+        b=AWA3eueKfdIcRemXTjYfiddcMtJI0gM8qgAv12KCTw4HqUU0shQMSFOxKJIqy4vXKo
+         o6PGd++MfofA37Ilb4CdFRIImOYn0LHj5TT/u1y6lKa9cwtHyqNqTYJcxTPFrFc5HcMg
+         EzkaGymUsTaNE6uXUIiX2/rTAeuI23PlQHZzCKwbbJLVpdsqh7sHcY7VRZn0qolmfCBn
+         sXyDMqpc2/A4JbuFGUtM7AmJ5Kvx2y7QHKtKaD736u9Q81xpRZHnJtwpiSI05j1+W0Hx
+         gPZA0p3nGewQVfW/euy/AuhF4Bt3UH3aB9Rmw0+o18MlQzaEbSF8ZXWj2V8m1ocyJGws
+         Bj/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690593396; x=1691198196;
+        d=1e100.net; s=20221208; t=1690593398; x=1691198198;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Y5BOuAmsGu5bKSoLgi0ClRVcqN8jZYDkPjN1Ef5oXFc=;
-        b=iL8cUrd6JclY9MAiCBi1aL2GwwZyVdDaou6WW4z8cjgsm9J2CLHMzbmOuM6CIpJ8o1
-         qDaMby3IwHG15zpZzGYx02nZ6O/CQF1CtmxTFe9TqmMfsqtxDZa0fk5/7nhWUoB+/e8z
-         JrgyY6YWu1H0xcOpXaKQqsxb/IC1a5jrVnGJc6RN0bl50f98PyuqLgFIPZyCWZ3bGBWl
-         u77w5eRBK++bZbPqireUr7/UXiUB+624OSgCVv4xll3KMLuyE0TOo9LvXsbABqYFn8rd
-         EjXdfoScgQoVXDxYUvhWmlHEOCNcnGiTh+wDmlv0x6WaQ+Vd7Kqn5bU5hHt8lbDAiTgN
-         Pq2w==
-X-Gm-Message-State: ABy/qLbHvN57O+pnGCLs6ewa+STFDbNlxCtKf9NoyFwlACdMaGEhX9E0
-        7RWTC/7IOBsloW5vX1ixcZYgy3swm/4=
-X-Google-Smtp-Source: APBJJlEVY2XTgkED7EmJfSyPFRPcLkJ6OIqU6YgZjXhcx6LZTqLNwNhp9SBmAEfpbJhi88U4IVidPoNquCA=
+        bh=ZBstFzzUxVyW0UD2LT3q1n62xfHDtx4xPYrvh1DuKtE=;
+        b=aTlbJfcZoxNEkMj9O+qxcdSMW184AiKYcI3gI4MJqF2XcYxHxsBT4Bs93qufqww+Ut
+         nLBq6cgxehnhUhkZNsF8giJrIvQQ4Bnkp4/D4nOi0V5+OdV1d9N/EdlAI7MMMy4PuEV6
+         DpK/PGT03K6Q4jQS5gX/ERyl/AYZaMPAH/nG3qn7qb7bTNxMxfk7h1jbXMI++E1bxkiq
+         2iNnPtoRv+vXyrITcRUF4t2KT15NQmGUkuTB2JyAs0Jt3KFIvmvHSfqQm0HCq/xLcnwK
+         OCSoOmDZWV79vC3SCr6EAWoatGdGGLWqCtDsvdqEmyeP2pcL5epsYhm5DAbgZ5QqCCL1
+         TUhQ==
+X-Gm-Message-State: ABy/qLbt04qwrNDy+050S47SoF5MtAWpkpC6SJcUXKcVUdXmFXT1/iBU
+        t2M5iyGB08mu8QtBFk9nDEFlllhsbo0=
+X-Google-Smtp-Source: APBJJlE9gJP2mXJxfkwEVOlLCgzzX3TWKCeVQjYElvF6CgWBwkyCaatBW6oKGQdFMvEvR4lm9CkyS6Qtl1s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:db8d:0:b0:d18:73fc:40af with SMTP id
- g135-20020a25db8d000000b00d1873fc40afmr18262ybf.5.1690593396223; Fri, 28 Jul
- 2023 18:16:36 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:e542:b0:1b8:c666:207a with SMTP id
+ n2-20020a170902e54200b001b8c666207amr13470plf.9.1690593398073; Fri, 28 Jul
+ 2023 18:16:38 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 18:15:59 -0700
+Date:   Fri, 28 Jul 2023 18:16:00 -0700
 In-Reply-To: <20230729011608.1065019-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729011608.1065019-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729011608.1065019-13-seanjc@google.com>
-Subject: [PATCH v2 12/21] KVM: x86: Use KVM-governed feature framework to
- track "XSAVES enabled"
+Message-ID: <20230729011608.1065019-14-seanjc@google.com>
+Subject: [PATCH v2 13/21] KVM: nVMX: Use KVM-governed feature framework to
+ track "nested VMX enabled"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -72,147 +72,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the governed feature framework to track if XSAVES is "enabled", i.e.
-if XSAVES can be used by the guest.  Add a comment in the SVM code to
-explain the very unintuitive logic of deliberately NOT checking if XSAVES
-is enumerated in the guest CPUID model.
+Track "VMX exposed to L1" via a governed feature flag instead of using a
+dedicated helper to provide the same functionality.  The main goal is to
+drive convergence between VMX and SVM with respect to querying features
+that are controllable via module param (SVM likes to cache nested
+features), avoiding the guest CPUID lookups at runtime is just a bonus
+and unlikely to provide any meaningful performance benefits.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
  arch/x86/kvm/governed_features.h |  1 +
- arch/x86/kvm/svm/svm.c           | 17 ++++++++++++++---
- arch/x86/kvm/vmx/vmx.c           | 32 ++++++++++++++++++--------------
- arch/x86/kvm/x86.c               |  4 ++--
- 4 files changed, 35 insertions(+), 19 deletions(-)
+ arch/x86/kvm/vmx/nested.c        |  7 ++++---
+ arch/x86/kvm/vmx/vmx.c           | 21 ++++++---------------
+ arch/x86/kvm/vmx/vmx.h           |  1 -
+ 4 files changed, 11 insertions(+), 19 deletions(-)
 
 diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-index b29c15d5e038..b896a64e4ac3 100644
+index b896a64e4ac3..22446614bf49 100644
 --- a/arch/x86/kvm/governed_features.h
 +++ b/arch/x86/kvm/governed_features.h
-@@ -6,6 +6,7 @@ BUILD_BUG()
- #define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
+@@ -7,6 +7,7 @@ BUILD_BUG()
  
  KVM_GOVERNED_X86_FEATURE(GBPAGES)
-+KVM_GOVERNED_X86_FEATURE(XSAVES)
+ KVM_GOVERNED_X86_FEATURE(XSAVES)
++KVM_GOVERNED_X86_FEATURE(VMX)
  
  #undef KVM_GOVERNED_X86_FEATURE
  #undef KVM_GOVERNED_FEATURE
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 64092df06f94..d5f8cb402eb7 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4204,9 +4204,20 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	struct kvm_cpuid_entry2 *best;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 22e08d30baef..c5ec0ef51ff7 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -6426,7 +6426,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+ 	vmx = to_vmx(vcpu);
+ 	vmcs12 = get_vmcs12(vcpu);
  
--	vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
--				    boot_cpu_has(X86_FEATURE_XSAVE) &&
--				    boot_cpu_has(X86_FEATURE_XSAVES);
-+	/*
-+	 * SVM doesn't provide a way to disable just XSAVES in the guest, KVM
-+	 * can only disable all variants of by disallowing CR4.OSXSAVE from
-+	 * being set.  As a result, if the host has XSAVE and XSAVES, and the
-+	 * guest has XSAVE enabled, the guest can execute XSAVES without
-+	 * faulting.  Treat XSAVES as enabled in this case regardless of
-+	 * whether it's advertised to the guest so that KVM context switches
-+	 * XSS on VM-Enter/VM-Exit.  Failure to do so would effectively give
-+	 * the guest read/write access to the host's XSS.
-+	 */
-+	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
-+	    boot_cpu_has(X86_FEATURE_XSAVES) &&
-+	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
-+		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
+-	if (nested_vmx_allowed(vcpu) &&
++	if (guest_can_use(vcpu, X86_FEATURE_VMX) &&
+ 	    (vmx->nested.vmxon || vmx->nested.smm.vmxon)) {
+ 		kvm_state.hdr.vmx.vmxon_pa = vmx->nested.vmxon_ptr;
+ 		kvm_state.hdr.vmx.vmcs12_pa = vmx->nested.current_vmptr;
+@@ -6567,7 +6567,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 		if (kvm_state->flags & ~KVM_STATE_NESTED_EVMCS)
+ 			return -EINVAL;
+ 	} else {
+-		if (!nested_vmx_allowed(vcpu))
++		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
+ 			return -EINVAL;
  
- 	/* Update nrips enabled cache */
- 	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
+ 		if (!page_address_valid(vcpu, kvm_state->hdr.vmx.vmxon_pa))
+@@ -6601,7 +6601,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 
+ 	if ((kvm_state->flags & KVM_STATE_NESTED_EVMCS) &&
+-		(!nested_vmx_allowed(vcpu) || !vmx->nested.enlightened_vmcs_enabled))
++	    (!guest_can_use(vcpu, X86_FEATURE_VMX) ||
++	     !vmx->nested.enlightened_vmcs_enabled))
+ 			return -EINVAL;
+ 
+ 	vmx_leave_nested(vcpu);
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a0a47be2feed..3100ed62615c 100644
+index 3100ed62615c..fdf932cfc64d 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4518,16 +4518,19 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
-  * based on a single guest CPUID bit, with a dedicated feature bit.  This also
-  * verifies that the control is actually supported by KVM and hardware.
-  */
--#define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting) \
--({									 \
--	bool __enabled;							 \
--									 \
--	if (cpu_has_vmx_##name()) {					 \
--		__enabled = guest_cpuid_has(&(vmx)->vcpu,		 \
--					    X86_FEATURE_##feat_name);	 \
--		vmx_adjust_secondary_exec_control(vmx, exec_control,	 \
--			SECONDARY_EXEC_##ctrl_name, __enabled, exiting); \
--	}								 \
-+#define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting)	\
-+({												\
-+	struct kvm_vcpu *__vcpu = &(vmx)->vcpu;							\
-+	bool __enabled;										\
-+												\
-+	if (cpu_has_vmx_##name()) {								\
-+		if (kvm_is_governed_feature(X86_FEATURE_##feat_name))				\
-+			__enabled = guest_can_use(__vcpu, X86_FEATURE_##feat_name);		\
-+		else										\
-+			__enabled = guest_cpuid_has(__vcpu, X86_FEATURE_##feat_name);		\
-+		vmx_adjust_secondary_exec_control(vmx, exec_control, SECONDARY_EXEC_##ctrl_name,\
-+						  __enabled, exiting);				\
-+	}											\
- })
+@@ -1894,17 +1894,6 @@ static void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu)
+ 	vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
+ }
  
- /* More macro magic for ENABLE_/opt-in versus _EXITING/opt-out controls. */
-@@ -4587,10 +4590,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
- 	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
- 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
+-/*
+- * nested_vmx_allowed() checks whether a guest should be allowed to use VMX
+- * instructions and MSRs (i.e., nested VMX). Nested VMX is disabled for
+- * all guests if the "nested" module option is off, and can also be disabled
+- * for a single guest by disabling its VMX cpuid bit.
+- */
+-bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
+-{
+-	return nested && guest_cpuid_has(vcpu, X86_FEATURE_VMX);
+-}
+-
+ /*
+  * Userspace is allowed to set any supported IA32_FEATURE_CONTROL regardless of
+  * guest CPUID.  Note, KVM allows userspace to set "VMX in SMX" to maintain
+@@ -2032,7 +2021,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
+ 		break;
+ 	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+-		if (!nested_vmx_allowed(vcpu))
++		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
+ 			return 1;
+ 		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+ 				    &msr_info->data))
+@@ -2340,7 +2329,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+ 		if (!msr_info->host_initiated)
+ 			return 1; /* they are read-only */
+-		if (!nested_vmx_allowed(vcpu))
++		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
+ 			return 1;
+ 		return vmx_set_vmx_msr(vcpu, msr_index, data);
+ 	case MSR_IA32_RTIT_CTL:
+@@ -7727,13 +7716,15 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+ 		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
  
--	if (cpu_has_vmx_xsaves())
--		vmx_adjust_secondary_exec_control(vmx, &exec_control,
--						  SECONDARY_EXEC_ENABLE_XSAVES,
--						  vcpu->arch.xsaves_enabled, false);
-+	vmx_adjust_sec_exec_feature(vmx, &exec_control, xsaves, XSAVES);
- 
- 	/*
- 	 * RDPID is also gated by ENABLE_RDTSCP, turn on the control if either
-@@ -4609,6 +4609,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
- 						  SECONDARY_EXEC_ENABLE_RDTSCP,
- 						  rdpid_or_rdtscp_enabled, false);
- 	}
++	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
 +
- 	vmx_adjust_sec_exec_feature(vmx, &exec_control, invpcid, INVPCID);
- 
- 	vmx_adjust_sec_exec_exiting(vmx, &exec_control, rdrand, RDRAND);
-@@ -7722,6 +7723,9 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 				    boot_cpu_has(X86_FEATURE_XSAVE) &&
- 				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
- 				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES);
-+	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
-+	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
-+		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
- 
  	vmx_setup_uret_msrs(vmx);
  
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5a14378ed4e1..201fa957ce9a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1012,7 +1012,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
- 		if (vcpu->arch.xcr0 != host_xcr0)
- 			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
+ 	if (cpu_has_secondary_exec_ctrls())
+ 		vmcs_set_secondary_exec_control(vmx,
+ 						vmx_secondary_exec_control(vmx));
  
--		if (vcpu->arch.xsaves_enabled &&
-+		if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
- 		    vcpu->arch.ia32_xss != host_xss)
- 			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
- 	}
-@@ -1043,7 +1043,7 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
- 		if (vcpu->arch.xcr0 != host_xcr0)
- 			xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
+-	if (nested_vmx_allowed(vcpu))
++	if (guest_can_use(vcpu, X86_FEATURE_VMX))
+ 		vmx->msr_ia32_feature_control_valid_bits |=
+ 			FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
+ 			FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
+@@ -7742,7 +7733,7 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 			~(FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
+ 			  FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX);
  
--		if (vcpu->arch.xsaves_enabled &&
-+		if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
- 		    vcpu->arch.ia32_xss != host_xss)
- 			wrmsrl(MSR_IA32_XSS, host_xss);
- 	}
+-	if (nested_vmx_allowed(vcpu))
++	if (guest_can_use(vcpu, X86_FEATURE_VMX))
+ 		nested_vmx_cr_fixed1_bits_update(vcpu);
+ 
+ 	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index cde902b44d97..c2130d2c8e24 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -374,7 +374,6 @@ struct kvm_vmx {
+ 	u64 *pid_table;
+ };
+ 
+-bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+ 			struct loaded_vmcs *buddy);
+ int allocate_vpid(void);
 -- 
 2.41.0.487.g6d72f3e995-goog
 
