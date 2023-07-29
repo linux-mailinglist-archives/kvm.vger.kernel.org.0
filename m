@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBBF2767AB1
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:18:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3D78767AB4
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237450AbjG2BSX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 21:18:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36580 "EHLO
+        id S237464AbjG2BS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 21:18:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237493AbjG2BRs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232660AbjG2BRs (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 28 Jul 2023 21:17:48 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AAF24EE0
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:19 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bbb97d27d6so18433165ad.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:19 -0700 (PDT)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 647914EE8
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:21 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so2440385276.2
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:17:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690593410; x=1691198210;
+        d=google.com; s=20221208; t=1690593412; x=1691198212;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=y7cEpFM3GtEXX/RC2xjBSh+vjkWowYW5UIIx0dKpIJc=;
-        b=N7UCx11biKYErqs/Sg1mCGYKNalKl+tIeARjD04Bwez6xhq6l8wVRALyxSOrQ1QQmO
-         UTH9da3+mLMaP/KNOX/DxomZdnmpDv8Ay78AL76fWZzMDViUXtO0dFAhtRyLjra1Q/bb
-         zoFxZP72VGejWtujQoQLPQkymjrudLkYNZepOq1DNNlgVdBTdi0EqxjsqJwGM3e+lOT7
-         LC2YLaJp8QrH+VQ/QHgMwFqy+Zu18ZYlIiZrNedoN8UlOirdkNhxINBuTR6vcyBap8NG
-         +ZDNYYxueYkJUbiNOLasE5Z1m92P3Cmwk58uRzZZJSoe7nuD/V/CYxdpsA01S0tb90Yy
-         3E8A==
+        bh=VgunzukDjbHa3GZgUyAC0qt2xyD/roymvALt+6M5c/I=;
+        b=oaLMtNoaDWLDjp7EXIcXnG7Ta8UVIB2jBzIDDVrwenl3iwfmCnZ/cJ2/73VgIR/qyc
+         osC30NnMKZIrDgCTIPJKM8UJ5BR4tu4pKbB3e8aLCi7PR1j0Kt0QEOkmTEGzlhU9pFrj
+         nQrc3ad1YG2CBMJjxUAcbD0q1GMSefgfF+hTdEB7ae0p8nm/CjL1fLIEf3gj/xHG9tX+
+         AEzIDs5tvNgA6AStrqBdBFfdqIUWrBnPRCSYH0KcfGxNlJ2buNJ5msJYAfE1DssmAgos
+         EsoxekFuAQsCcWvNz5MZAx6kJpa5nrJOfanbYJfn8dmO0WM3+5daH4FKNVxgd9a3bSpw
+         AuIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690593410; x=1691198210;
+        d=1e100.net; s=20221208; t=1690593412; x=1691198212;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=y7cEpFM3GtEXX/RC2xjBSh+vjkWowYW5UIIx0dKpIJc=;
-        b=UizO2rffSnXiolNS3L5Fsy4//a8NnGAk1066t+YlYcVHPc7DOrmEVKJMkaqrRObl5q
-         nHFcc1YziX662bH+1nCrRAMx4+Ky5UdKgR6Jfq3DM9RIgYJP1tqtkcIFLxafiTCwhL75
-         1ABuK/xCWgrZpT8ChtF/QMGrBe+gy92nvRK2MIsqE+tuPN4Rh8hCK6Dha+xxX3gs8MLM
-         tSzrE+nK9ZJGjgmCzP6QTOtRyrMaxX6DxxrN9CHVnUJCiT7lL8PVqOrnGzKYwg6Ujsaw
-         cUJpPBiKItjIG0gsEPABq09KtKIFe0UMBK8oRvvcY1MXTv8adNE+M+81eaVKhAc8mIXe
-         mAyQ==
-X-Gm-Message-State: ABy/qLYHh46Ih8eU1zrK2RTltkStrN6FD6wpQUdWPe7VaW6H2lJxPahx
-        xPxTm4KGRsAHBu0MjHtNqmCUbUIXLaA=
-X-Google-Smtp-Source: APBJJlGEmLTrDBb0wzCi6yfLs0uVwHwFBXdROMbG5VP85WcFNJ0YDR99ZLURDrRr5KN6KCJU+MuP6PjhuuE=
+        bh=VgunzukDjbHa3GZgUyAC0qt2xyD/roymvALt+6M5c/I=;
+        b=YlUiZeIUSP9TrolH1HLEipD9rvi+K1ivHjMdjDK1BUvWHb09MARk3tFJzi7ILhMs7m
+         HzMvYcKy6E8TCBi/qdVlZgtm09CKtNym6Sn1iPL5/bGpfb/tTWxRj6Es89yJCxe2GCYl
+         N6j0HFgUktlrf/ZREGL2V12Xg166URXYxw7HYfJWhhD0slU5SpRDfrv4/CJZfYZCbaqk
+         kzGa23UXVhgOcxc4qKPnzjM+qqnpf5/1H+rIs8DAOXMkPczUuwN219selx0v85povWos
+         fwOpykOUd5CNgV4hDpVcCDCA5fFe3behk1JlGOglg8RzNRZoxFswA7iWlkcQssv78b7G
+         0A2A==
+X-Gm-Message-State: ABy/qLZVkbwpSSaqcVTlYJIwse7VmegcPQ8GxoAJaDfeQP64qEWkIGuJ
+        ozCdM3ZU5NDMQxRmQQzgeeyzYzUn0nI=
+X-Google-Smtp-Source: APBJJlGdPQGKpEIdAZ91PoH47O0lYVhM4CXCmURb6ZKMnYKkb5R9ts2YU1hH2lp49FG/KDCfOyaxpvo4fcE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2291:b0:1b5:2b14:5f2c with SMTP id
- b17-20020a170903229100b001b52b145f2cmr14342plh.4.1690593409416; Fri, 28 Jul
- 2023 18:16:49 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:2c5:0:b0:d09:3919:35c with SMTP id
+ 188-20020a2502c5000000b00d093919035cmr17449ybc.11.1690593412338; Fri, 28 Jul
+ 2023 18:16:52 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 18:16:06 -0700
+Date:   Fri, 28 Jul 2023 18:16:07 -0700
 In-Reply-To: <20230729011608.1065019-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729011608.1065019-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729011608.1065019-20-seanjc@google.com>
-Subject: [PATCH v2 19/21] KVM: nSVM: Use KVM-governed feature framework to
- track "vGIF enabled"
+Message-ID: <20230729011608.1065019-21-seanjc@google.com>
+Subject: [PATCH v2 20/21] KVM: nSVM: Use KVM-governed feature framework to
+ track "vNMI enabled"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -72,92 +72,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Track "virtual GIF exposed to L1" via a governed feature flag instead of
+Track "virtual NMI exposed to L1" via a governed feature flag instead of
 using a dedicated bit/flag in vcpu_svm.
 
-Note, checking KVM's capabilities instead of the "vgif" param means that
-the code isn't strictly equivalent, as vgif_enabled could have been set
+Note, checking KVM's capabilities instead of the "vnmi" param means that
+the code isn't strictly equivalent, as vnmi_enabled could have been set
 if nested=false where as that the governed feature cannot.  But that's a
 glorified nop as the feature/flag is consumed only by paths that are
+gated by nSVM being enabled.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
  arch/x86/kvm/governed_features.h | 1 +
- arch/x86/kvm/svm/nested.c        | 3 ++-
  arch/x86/kvm/svm/svm.c           | 3 +--
- arch/x86/kvm/svm/svm.h           | 5 +++--
- 4 files changed, 7 insertions(+), 5 deletions(-)
+ arch/x86/kvm/svm/svm.h           | 5 +----
+ 3 files changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-index 9afd34f30599..368696c2e96b 100644
+index 368696c2e96b..423a73395c10 100644
 --- a/arch/x86/kvm/governed_features.h
 +++ b/arch/x86/kvm/governed_features.h
-@@ -14,6 +14,7 @@ KVM_GOVERNED_X86_FEATURE(V_VMSAVE_VMLOAD)
- KVM_GOVERNED_X86_FEATURE(LBRV)
+@@ -15,6 +15,7 @@ KVM_GOVERNED_X86_FEATURE(LBRV)
  KVM_GOVERNED_X86_FEATURE(PAUSEFILTER)
  KVM_GOVERNED_X86_FEATURE(PFTHRESHOLD)
-+KVM_GOVERNED_X86_FEATURE(VGIF)
+ KVM_GOVERNED_X86_FEATURE(VGIF)
++KVM_GOVERNED_X86_FEATURE(VNMI)
  
  #undef KVM_GOVERNED_X86_FEATURE
  #undef KVM_GOVERNED_FEATURE
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index ac03b2bc5b2c..dd496c9e5f91 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -660,7 +660,8 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
- 	 * exit_int_info, exit_int_info_err, next_rip, insn_len, insn_bytes.
- 	 */
- 
--	if (svm->vgif_enabled && (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK))
-+	if (guest_can_use(vcpu, X86_FEATURE_VGIF) &&
-+	    (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK))
- 		int_ctl_vmcb12_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
- 	else
- 		int_ctl_vmcb01_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index be3a11f00f4e..6d9bb4453f2d 100644
+index 6d9bb4453f2d..89cc9f4f3ddc 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4235,8 +4235,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 
+@@ -4236,8 +4236,7 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_PAUSEFILTER);
  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_PFTHRESHOLD);
+ 	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VGIF);
 -
--	svm->vgif_enabled = vgif && guest_cpuid_has(vcpu, X86_FEATURE_VGIF);
-+	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VGIF);
+-	svm->vnmi_enabled = vnmi && guest_cpuid_has(vcpu, X86_FEATURE_VNMI);
++	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VNMI);
  
- 	svm->vnmi_enabled = vnmi && guest_cpuid_has(vcpu, X86_FEATURE_VNMI);
+ 	svm_recalc_instruction_intercepts(vcpu, svm);
  
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index fb438439b61e..6eb5877cc6c3 100644
+index 6eb5877cc6c3..06400cfe2244 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -22,6 +22,7 @@
- #include <asm/svm.h>
- #include <asm/sev-common.h>
- 
-+#include "cpuid.h"
- #include "kvm_cache_regs.h"
- 
- #define __sme_page_pa(x) __sme_set(page_to_pfn(x) << PAGE_SHIFT)
-@@ -259,7 +260,6 @@ struct vcpu_svm {
+@@ -259,9 +259,6 @@ struct vcpu_svm {
+ 	unsigned long soft_int_next_rip;
  	bool soft_int_injected;
  
- 	/* optional nested SVM features that are enabled for this guest  */
--	bool vgif_enabled                 : 1;
- 	bool vnmi_enabled                 : 1;
- 
+-	/* optional nested SVM features that are enabled for this guest  */
+-	bool vnmi_enabled                 : 1;
+-
  	u32 ldr_reg;
-@@ -485,7 +485,8 @@ static inline bool svm_is_intercept(struct vcpu_svm *svm, int bit)
+ 	u32 dfr_reg;
+ 	struct page *avic_backing_page;
+@@ -537,7 +534,7 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
  
- static inline bool nested_vgif_enabled(struct vcpu_svm *svm)
+ static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
  {
--	return svm->vgif_enabled && (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK);
-+	return guest_can_use(&svm->vcpu, X86_FEATURE_VGIF) &&
-+	       (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK);
+-	return svm->vnmi_enabled &&
++	return guest_can_use(&svm->vcpu, X86_FEATURE_VNMI) &&
+ 	       (svm->nested.ctl.int_ctl & V_NMI_ENABLE_MASK);
  }
  
- static inline struct vmcb *get_vgif_vmcb(struct vcpu_svm *svm)
 -- 
 2.41.0.487.g6d72f3e995-goog
 
