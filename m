@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EDA4C767D9B
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 11:19:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BE03767DA0
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 11:21:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbjG2JTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Jul 2023 05:19:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47248 "EHLO
+        id S229980AbjG2JVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Jul 2023 05:21:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbjG2JTY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Jul 2023 05:19:24 -0400
+        with ESMTP id S229667AbjG2JVB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Jul 2023 05:21:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D0F2D60
-        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 02:19:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11CFD2D4D
+        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 02:21:01 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DB8F560B51
-        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 09:19:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E6E5C433C7;
-        Sat, 29 Jul 2023 09:19:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A1DD860AF2
+        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 09:21:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07735C433C7;
+        Sat, 29 Jul 2023 09:20:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690622360;
-        bh=FX07c1aB+2Wb3InFYiIfVDpSZ+Ap+3iMqLoJ5Y9kWWE=;
+        s=k20201202; t=1690622460;
+        bh=P33vJ7HFQ9LW1t2/TFPJKDm8qe/Qk9uj/WuqEOWZA9g=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=TWfouKzodPdEEIVYeXt2c8ZjPKeIAK+FPc474vAhrzvUOBDLEO5APKiAF8WCtCEer
-         ZqBRuD+YSBWZ45rOuxGxQ7NiPDBaMSLZaqn6vpcCSqFVndVGT4oLiXZZkQRfZ8pbuy
-         3p1CShzwLoAabzOstDHx2rRnjE9lrySq5rJ3g0aiqzDtSEF+Tr5otoK4D5bHBrN853
-         WIkDhgVaX4K56hdxC0U8q5TL2xBWn0IvJ3L8lmTHSJq37yGxAjt6iHMUBDJh5n9/Nk
-         k7jXz12W3OF3iSr6KeRWCPDEKCYaNwSmwL7aUqIa3RJF9sOZPZxIcnhItg3Mk+VCOp
-         ghfdQsyaZn4IQ==
+        b=oIK1MiJU9ysWVx4EXsWKfhl5/ZVcCJis7mYDGTKf7Fr/CDf5/dDzeYEAaGtDgdX7W
+         1P4yE6A82aMR1rMPvETU6EK2kJmUNffiniKHz+Ks2WTRSUWyw7TGyXEu5dWzdRWQAl
+         lfFwcS2MgzLGnjYTeVRUg+NqgEcq5hFZMlyoAmNXMU2AztaI2paXddroIqplUJ+5rO
+         GaiiYlyGDGGhIELtNiKzrTqHOxk0Ub/lNtwSwk5J+mIzkwn0zKZiv1fsqSGH1r1OH6
+         xUtHWzQwjy1WOkn6eBhIhuvJf7Hd45GHQdcGH4u5CAAuEK7/ih5Z/+Byf36niW3z8p
+         cVHdrHvzOSMjw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qPg6X-000KMP-NK;
-        Sat, 29 Jul 2023 10:19:17 +0100
-Date:   Sat, 29 Jul 2023 10:19:17 +0100
-Message-ID: <87fs57qdm2.wl-maz@kernel.org>
+        id 1qPg89-000KNu-Kp;
+        Sat, 29 Jul 2023 10:20:57 +0100
+Date:   Sat, 29 Jul 2023 10:20:57 +0100
+Message-ID: <87edkrqdja.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -58,11 +58,11 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 14/26] KVM: arm64: nv: Add trap forwarding infrastructure
-In-Reply-To: <ZMQJ+7VPbGVnz0kP@linux.dev>
+Subject: Re: [PATCH v2 19/26] KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+In-Reply-To: <ZMQNTKAlxQe61JUe@linux.dev>
 References: <20230728082952.959212-1-maz@kernel.org>
-        <20230728082952.959212-15-maz@kernel.org>
-        <ZMQJ+7VPbGVnz0kP@linux.dev>
+        <20230728082952.959212-20-maz@kernel.org>
+        <ZMQNTKAlxQe61JUe@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -82,161 +82,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Jul 2023 19:33:31 +0100,
+On Fri, 28 Jul 2023 19:47:40 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Fri, Jul 28, 2023 at 09:29:40AM +0100, Marc Zyngier wrote:
+> Hey Marc,
+> 
+> On Fri, Jul 28, 2023 at 09:29:45AM +0100, Marc Zyngier wrote:
 > 
 > [...]
 > 
-> > +/*
-> > + * Bit assignment for the trap controls. We use a 64bit word with the
-> > + * following layout for each trapped sysreg:
-> > + *
-> > + * [9:0]	enum trap_group (10 bits)
-> > + * [13:10]	enum fgt_group_id (4 bits)
-> > + * [19:14]	bit number in the FGT register (6 bits)
-> > + * [20]		trap polarity (1 bit)
-> > + * [62:21]	Unused (42 bits)
-> > + * [63]		RES0 - Must be zero, as lost on insertion in the xarray
-> > + */
-> > +union trap_config {
-> > +	u64	val;
-> > +	struct {
-> > +		unsigned long	cgt:10;	/* Coarse trap id */
-> > +		unsigned long	fgt:4;	/* Fing Grained Trap id */
-> > +		unsigned long	bit:6;	/* Bit number */
-> > +		unsigned long	pol:1;	/* Polarity */
-> > +		unsigned long	unk:42;	/* Unknown */
-> > +		unsigned long	mbz:1;	/* Must Be Zero */
-> > +	};
-> > +};
+> > @@ -943,6 +1025,27 @@ void __init populate_nv_trap_config(void)
+> >  	kvm_info("nv: %ld coarse grained trap handlers\n",
+> >  		 ARRAY_SIZE(encoding_to_cgt));
 > 
-> Correct me if I'm wrong, but I don't think the compiler is going to
-> whine if any of these bitfields are initialized with a larger value than
-> can be represented... Do you think some BUILD_BUG_ON() is in order to
-> ensure that trap_group fits in ::cgt?
-> 
-> 	BUILD_BUG_ON(__NR_TRAP_IDS__ >= BIT(10));
+> It might make sense to skip insertion of the FGT trap controls if the
+> system doesn't have FGT in the first place.
 
-Indeed. This might also apply to ::fgt, and I want to add some sanity
-checks to verify that the whole union isn't larger than a 'void *', as
-we rely on that.
+Yup, good point.
 
 > 
-> > +struct encoding_to_trap_config {
-> > +	const u32			encoding;
-> > +	const u32			end;
-> > +	const union trap_config		tc;
-> > +};
+> > +	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+> > +		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
+> > +		union trap_config tc;
 > > +
-> > +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
-> > +	{								\
-> > +		.encoding	= sr_start,				\
-> > +		.end		= sr_end,				\
-> > +		.tc		= {					\
-> > +			.cgt		= trap_id,			\
-> > +		},							\
-> > +	}
+> > +		tc = get_trap_config(fgt->encoding);
 > > +
-> > +#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
-> > +
-> > +/*
-> > + * Map encoding to trap bits for exception reported with EC=0x18.
-> > + * These must only be evaluated when running a nested hypervisor, but
-> > + * that the current context is not a hypervisor context. When the
-> > + * trapped access matches one of the trap controls, the exception is
-> > + * re-injected in the nested hypervisor.
-> > + */
-> > +static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
-> > +};
-> > +
-> > +static DEFINE_XARRAY(sr_forward_xa);
-> > +
-> > +static union trap_config get_trap_config(u32 sysreg)
-> > +{
-> > +	return (union trap_config) {
-> > +		.val = xa_to_value(xa_load(&sr_forward_xa, sysreg)),
-> > +	};
+> > +		WARN(tc.fgt,
+> > +		     "Duplicate FGT for sys_reg(%d, %d, %d, %d, %d)\n",
+> > +		     sys_reg_Op0(fgt->encoding),
+> > +		     sys_reg_Op1(fgt->encoding),
+> > +		     sys_reg_CRn(fgt->encoding),
+> > +		     sys_reg_CRm(fgt->encoding),
+> > +		     sys_reg_Op2(fgt->encoding));
 > 
-> Should we be checking for NULL here? AFAICT, the use of sentinel values
-> in the trap_group enum would effectively guarantee each trap_config has
-> a nonzero value.
+> Same comment here, we should just bail.
 
-if xa_load() returns NULL, xa_to_value() will still give us a 0, which
-is an indication of a sysreg that isn't present in the trap
-configuration. This can happen if we trap something that isn't yet
-supported in NV, which is quite common. This allows us to use features
-on the host without having to immediately write the same support for
-NV guests.
-
-But this is obviously a temporary situation. At some point, I'll
-become a total bastard and demand that people treat NV as a first
-class citizen. One day ;-).
-
-> 
-> > +}
-> > +
-> > +void __init populate_nv_trap_config(void)
-> > +{
-> > +	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
-> > +		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-> > +		void *prev;
-> > +
-> > +		prev = xa_store_range(&sr_forward_xa, cgt->encoding, cgt->end,
-> > +				      xa_mk_value(cgt->tc.val), GFP_KERNEL);
-> > +		WARN_ON(prev);
-> 
-> Returning the error here and failing the overall KVM initialization
-> seems to be the safest option. The WARN is still handy, though.
-
-Yeah, this has found a number of bugs initially. Happy to fail the
-initialisation after we've iterated over all the array (nothing is
-more annoying than fixing a bunch of errors iteratively).
-
-> 
-> > +	}
-> > +
-> > +	kvm_info("nv: %ld coarse grained trap handlers\n",
-> > +		 ARRAY_SIZE(encoding_to_cgt));
-> > +
-> > +}
-> > +
-> > +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-> > +					 const struct trap_bits *tb)
-> > +{
-> > +	enum trap_behaviour b = BEHAVE_HANDLE_LOCALLY;
-> > +	u64 val;
-> > +
-> > +	val = __vcpu_sys_reg(vcpu, tb->index);
-> > +	if ((val & tb->mask) == tb->value)
-> > +		b |= tb->behaviour;
-> > +
-> > +	return b;
-> > +}
-> > +
-> > +static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu *vcpu,
-> > +						       const enum trap_group id,
-> > +						       enum trap_behaviour b)
-> > +{
-> > +	switch (id) {
-> > +		const enum trap_group *cgids;
-> > +
-> > +	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
-> > +		if (likely(id != __RESERVED__))
-> > +			b |= get_behaviour(vcpu, &coarse_trap_bits[id]);
-> > +		break;
-> > +	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
-> > +		/* Yes, this is recursive. Don't do anything stupid. */
-> > +		cgids = coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
-> > +		for (int i = 0; cgids[i] != __RESERVED__; i++)
-> > +			b |= __do_compute_trap_behaviour(vcpu, cgids[i], b);
-> 
-> Would it make sense to WARN here if one of the child trap ids was in the
-> recursive range?
-
-This might be needed at some point, but we can probably tighten it for
-now.
+Yup. I'll also turn it into a kvm_err() instead, as WARN() is too
+noisy (nobody needs the same stack trace 200 times).
 
 Thanks,
 
