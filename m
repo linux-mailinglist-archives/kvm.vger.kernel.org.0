@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 650DA7679E0
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:40:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B30B47679E2
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:40:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236479AbjG2AkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:40:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58888 "EHLO
+        id S236837AbjG2Ak1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 20:40:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236467AbjG2Ajn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:39:43 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F6C4ECB
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:19 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bbf8cb6250so2217985ad.2
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:19 -0700 (PDT)
+        with ESMTP id S236621AbjG2Ajx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 20:39:53 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C1E4EFD
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:25 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d1ebc896bd7so2489862276.2
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591060; x=1691195860;
+        d=google.com; s=20221208; t=1690591062; x=1691195862;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=MF+bXwxuzawTID7VRrTPOhSciVZgdU/b6cmoH5k6//k=;
-        b=3XTnvyalsgYeWNIfRKpoVdZ9znRrqsMtDLiXzSBNXaL9ulyyhk9kCqs4X/p4w5FS6j
-         Pnv8yfYZMfdH2C/ay8U7ENPGEFJhc7w/CuemxdRRz8eH86xSNifWP5ZwzANBP9/oB3HR
-         3sWZhNhDLBgeMvHiiHeOED7DQdTXZjwa5JfxyvUZpfD5ac2/IpwN7YHxBboIFfGzXvwu
-         rcJeMPbFvOsf9vMaE1lIRBQYFMqbPiazr3IJt7WvHcHc9CpIVXngyazah+wdv3GVsiVp
-         hpSJlgpGel/1zstInYMbykQhPKknMzf1f8cRcpRQ06xGV39obcipHA+c6rQln+Jb9MQN
-         WYZA==
+        bh=uqgzEcKwgDl6AmVuFP39+si1T3Ya5yGv/aLgXdHyXDE=;
+        b=fvI3egsPRdl7x5TIjH2EOrD2f/T/HclIL2aPO34GGiSzGBfdKdwjZp9XOdOAfFV8De
+         GaIg88nJGpbUijVUqQfVh711UtHGpq+25x5CvLvNnNO3IoPjD9jcqBPgKr2KOMAHNnur
+         sd5TKdQxtbsVsfSJGVH+CfR8faEfr/z3bWeqvcqfnC8AtS4FqO2XnqnvANwkVYlTPXaK
+         tqt1jtFPvLLM7FXra00twXW1xp6756sf8zJNZuMVsgXomcI0pvusFdGrQ4cq54QQn85s
+         YcZ0QQ4IH7klbQ/xFgqvH//siGtJktYv2CFC7ukfKe6FPmsnWvYDyMp3atHnSZ/wqL4V
+         BRug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591060; x=1691195860;
+        d=1e100.net; s=20221208; t=1690591062; x=1691195862;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MF+bXwxuzawTID7VRrTPOhSciVZgdU/b6cmoH5k6//k=;
-        b=Pd0y5dQ3ZiPrPC1PqM/1QRsvKfxsD+speqztTKGY3vTLzYgDAXWDb0QUdiwWbvNxUk
-         Es35Kmlu0Fc64kK2k1grHqVEc+M9vy/XhI+PX0+tEkfD3ZkRnzgGlEv9Aw+KNRV/JKWu
-         1QqAzOMzcmuuFCB6lF0DEiRQ97ZsUPIh8xVSWSQyU8XiQF9vFFZW42TD5a9gpbgpR8Zm
-         EXnUUBUkxCIowa8Kplan+l4Z31hSHSgJJ1Xi1HLT7j/2yNsvO4RMfw+Ujp/CkflwsyxS
-         nupnTPIB7wVVFqvV5o8AOOqqwa+KOCwjmOu6lzHOo+CLwKhTX1v+g9apAAv+sd3IxJiz
-         zR2Q==
-X-Gm-Message-State: ABy/qLYaXhG59soprsWOMY6zw12kOpVbbXZXgtUfDrkQ8XJj+N23JtZ/
-        s6pq7EJHSykl5nPIaWuRxGkxmGv3iwA=
-X-Google-Smtp-Source: APBJJlFmabRF0RxzQGT8BcVKXP0SGH0X5me+cEjliMepzv+strLs30XZHxwmIQzJ9Engiax0UKUvH6M/avo=
+        bh=uqgzEcKwgDl6AmVuFP39+si1T3Ya5yGv/aLgXdHyXDE=;
+        b=RB9bKQK1ZBCCg/+iq7v9qNGU7WvhviTXOTx6jG0MaYFV+27PnIIhpAUnB0NfE15x9u
+         OvB2s87mZt/+XRNveFD1kTxS5UbH084zKPhj5jyt6L7cW7/EwMWQh1wWPfWsxwbwRVNe
+         XGTuwFsUm2iB9pUyeqQ9hUN1jzn4Gu9XM8TY863rexhrVeeeDb83XwPdziwXb7OSyr7e
+         fPhs83wdIJTP1E4ZmR69Y2ro1E3BXh4xCkDpuzMjhX2HVzjC0zi2xeYiGT5Mr7aP5vno
+         q8C8CJ4mU7b8Gr3l4Zio2X4C0kpUx1CmfSSSlhQnUNJ42g2mi7lz2CfF3jQVOjkX7C9z
+         Fb2A==
+X-Gm-Message-State: ABy/qLY3No9K2XKj1bBJBe//oYLcVu2MsTIsNJcfNw4lems6vYk/zmcr
+        sOYVRFudEzoX1do1hRx/GmvOFRhwZtQ=
+X-Google-Smtp-Source: APBJJlFp9nYWKpggRzizNGYb14R0ndrG6M0izrvCDXNzuc4knf79MqpcnRtOW+PdyQ9R6qKjQkDx4s+6iCg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:eccc:b0:1ba:1704:89d1 with SMTP id
- a12-20020a170902eccc00b001ba170489d1mr13265plh.10.1690591060423; Fri, 28 Jul
- 2023 17:37:40 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:dc94:0:b0:c10:8d28:d3ae with SMTP id
+ y142-20020a25dc94000000b00c108d28d3aemr17101ybe.8.1690591062181; Fri, 28 Jul
+ 2023 17:37:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:36:37 -0700
+Date:   Fri, 28 Jul 2023 17:36:38 -0700
 In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-29-seanjc@google.com>
-Subject: [PATCH v4 28/34] KVM: selftests: Convert x86's TSC MSRs test to use
- printf guest asserts
+Message-ID: <20230729003643.1053367-30-seanjc@google.com>
+Subject: [PATCH v4 29/34] KVM: selftests: Convert the x86 userspace I/O test
+ to printf guest assert
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -78,36 +78,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert x86's TSC MSRs test, and it's liberal use of GUEST_ASSERT_EQ(), to
-use printf-based guest assert reporting.
+Convert x86's userspace I/O test to use printf-based guest asserts.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ .../testing/selftests/kvm/x86_64/userspace_io_test.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
-index 9265965bd2cd..cf9114f70e1c 100644
---- a/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c
-@@ -4,6 +4,8 @@
-  *
-  * Copyright (C) 2020, Red Hat, Inc.
-  */
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_io_test.c b/tools/testing/selftests/kvm/x86_64/userspace_io_test.c
+index 0cb51fa42773..2c5d2a18d184 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_io_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_io_test.c
+@@ -1,4 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
 +#define USE_GUEST_ASSERT_PRINTF 1
 +
+ #include <fcntl.h>
  #include <stdio.h>
- #include <string.h>
- #include "kvm_util.h"
-@@ -84,7 +86,7 @@ static void run_vcpu(struct kvm_vcpu *vcpu, int stage)
- 		ksft_test_result_pass("stage %d passed\n", stage + 1);
- 		return;
+ #include <stdlib.h>
+@@ -20,8 +22,8 @@ static void guest_ins_port80(uint8_t *buffer, unsigned int count)
+ 		end = (unsigned long)buffer + 8192;
+ 
+ 	asm volatile("cld; rep; insb" : "+D"(buffer), "+c"(count) : "d"(0x80) : "memory");
+-	GUEST_ASSERT_1(count == 0, count);
+-	GUEST_ASSERT_2((unsigned long)buffer == end, buffer, end);
++	GUEST_ASSERT_EQ(count, 0);
++	GUEST_ASSERT_EQ((unsigned long)buffer, end);
+ }
+ 
+ static void guest_code(void)
+@@ -43,7 +45,9 @@ static void guest_code(void)
+ 	memset(buffer, 0, sizeof(buffer));
+ 	guest_ins_port80(buffer, 8192);
+ 	for (i = 0; i < 8192; i++)
+-		GUEST_ASSERT_2(buffer[i] == 0xaa, i, buffer[i]);
++		__GUEST_ASSERT(buffer[i] == 0xaa,
++			       "Expected '0xaa', got '0x%x' at buffer[%u]",
++			       buffer[i], i);
+ 
+ 	GUEST_DONE();
+ }
+@@ -91,7 +95,7 @@ int main(int argc, char *argv[])
+ 	case UCALL_DONE:
+ 		break;
  	case UCALL_ABORT:
--		REPORT_GUEST_ASSERT_2(uc, "values: %#lx, %#lx");
+-		REPORT_GUEST_ASSERT_2(uc, "argN+1 = 0x%lx, argN+2 = 0x%lx");
 +		REPORT_GUEST_ASSERT(uc);
  	default:
- 		TEST_ASSERT(false, "Unexpected exit: %s",
- 			    exit_reason_str(vcpu->run->exit_reason));
+ 		TEST_FAIL("Unknown ucall %lu", uc.cmd);
+ 	}
 -- 
 2.41.0.487.g6d72f3e995-goog
 
