@@ -2,70 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A21B767B43
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:38:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AAEA767B4B
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:42:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237747AbjG2Biu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 21:38:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47900 "EHLO
+        id S237718AbjG2BmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 21:42:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237581AbjG2BiN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 21:38:13 -0400
+        with ESMTP id S237587AbjG2BmF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 21:42:05 -0400
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164FA4EDD
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:37:30 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bb98659f3cso18398745ad.3
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:37:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53575FDF
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:41:16 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bbb97d27d6so18495435ad.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:41:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690594600; x=1691199400;
+        d=google.com; s=20221208; t=1690594875; x=1691199675;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=DwvbUo0YFwD2y5U7V+bjb1xFYzZ0nLkltBIeETbMd6E=;
-        b=Ge68nujbq9a2/5qupOk7vKqq3XlDn5p8ntiVpmK47hZYN+/QS4qy0wLj6mzi//Ln3N
-         bjIWafKzZtkd8LQqhjRdZON3HDXB5fCK9FhlneYcw4v+xtAWX9E4CPS0ddxUxM1BU+ou
-         uqsJv3tEk+OkpS9BfP1CupF2QdoKOH02fs1K3Ib89GUvvYmRfPRX9GXq8Qk6hWUr/tNP
-         U7vyKG8jPeUgErUAu/w48/FjAGWgL+fFw7j74vkaZbaqjcBqf1vC9GEbvdtcM9pxV6mC
-         P1Ioi1DZwQV+4ATKOYarBouEJgAG/V3mHWk+Hvgxt1vW2YDRiU63dl0VSgEIpd2po20a
-         NDdA==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=etHIErEcW2Snp48GMQTn4g9bxzrUdUzMcla8D7qkAKU=;
+        b=NYiDMaTVhIAWqq2Ku68RdD957FUpBniR7RICpd5Ta09Re7OeUgl3W+OEMsjWPdln08
+         CJUpUT+gN+e7y12/Jmtw9OK/yUGfFrF0aCGTfISkVXFlrfzCfe6JEhpxpQxcSfXu4Zar
+         QFlbWgnGGbV2L7tbZ3Ml+7OSARYS6BW1hrXOYGgW8AR729AU438PBsH8dUTu0xLfuOVM
+         /cZ/Guv0sEuG/xN+qbxm8Fmks6OZNOYfX087Ejj0cZXQc84D35YWo4l9+6yMV7vnh9WY
+         GTn0ni7vkbyhH3Fjlt9O2wGe37ppCa/NiCE1vyOifDl+V3vRrHTZmlxHlaajqNl/WpeH
+         cGvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690594600; x=1691199400;
+        d=1e100.net; s=20221208; t=1690594875; x=1691199675;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DwvbUo0YFwD2y5U7V+bjb1xFYzZ0nLkltBIeETbMd6E=;
-        b=fiyM1hwU2lYGDMoWXn9I4dkak1Aro1f10UuA0fxKTBF1NSf4xEIGf2cYaMXlTEV9Ta
-         F+uHwIlqNgvTps8w/TzuA1o0w3zr9G+Q3cqMWZWMN3SVnOWWHR10ebXrOc66pVTRXNav
-         jwgQaJc057C+mPTns4kBBd+bIzWBcymkMkONkkAQdpw4yN1ivpOzCeYJs5Bkbsy8Z2oP
-         a+eJE22v8O3JZ0p90aiwfqiHKU2xbVJakAnoCV3s/+nrduIgWwBuED16zAia27esVeo2
-         pouHdES0Y782ZzvA5zvZFjqVo301mnz/5jxJtNhL+FGkt1XJumjULdUIBRSzZPBwjgxs
-         7OPw==
-X-Gm-Message-State: ABy/qLbBOPX+2PGqCwZbfUnc1Mh7eHjf6AnnIeuxRpYOrD1HxwcIOy05
-        ADn4BPCzpgDZ2Vuo64G0JTaUMigDO6M=
-X-Google-Smtp-Source: APBJJlEZ24/UIUc9lE3mpH4b4NTm9trjEBiNa0Xf1jgeOJ+PFmgDRd7JQ2suy7GGPER95kXMryrtDNI0qhM=
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=etHIErEcW2Snp48GMQTn4g9bxzrUdUzMcla8D7qkAKU=;
+        b=SM4iKqk/RJbRj/7bNWppv6MvqbpXCL4jigbfTclQBaKwmB4UnhgRBeaYtuoxo9KM8o
+         HaDpMqLv2lDMsPUFXzlqqEcdTin7UBgVZD03m9StxLQcYDZdWhtsuZISgx3i/ZK9ORht
+         6hXEiNypUt3JNG7FJH8c4BOGp/TMb6apCZ4fwtiVCs4ytpEYSw6zBiybf3sjnOBYfbNI
+         Gku5cHkssd9ib7n9pd4TJbtlI0VmY6iG+4D0PEAfOn7QEcJcbqPergIasRLABjbyyqpu
+         vWbPEEPdzlpf7lQIqLeheWRzQX2CYSDUbyyjZAgOvGjO54rfDch84XTExwbJXDtMrXi2
+         VX1g==
+X-Gm-Message-State: ABy/qLZ5Wl8R8s4WvrQt4AvRnzsCNOoXwMB6Wj9oaxfNN5ISuw6Y3C+D
+        oR1bcUQG3SQP9Tj9Aj/c8DVHenLkiOk=
+X-Google-Smtp-Source: APBJJlEgel2xyk023tQstWnd108PwEKYO8pRsbSFOhwxNCzG4vrLLyhebl7F/zmViiPb+nRZMMcJ8NjGMt4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da83:b0:1b3:c62d:71b5 with SMTP id
- j3-20020a170902da8300b001b3c62d71b5mr12428plx.0.1690594599204; Fri, 28 Jul
- 2023 18:36:39 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 18:35:35 -0700
-In-Reply-To: <20230729013535.1070024-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:2445:b0:1bb:c7bc:ce9a with SMTP id
+ l5-20020a170903244500b001bbc7bcce9amr13831pls.10.1690594873732; Fri, 28 Jul
+ 2023 18:41:13 -0700 (PDT)
+Date:   Fri, 28 Jul 2023 18:41:12 -0700
+In-Reply-To: <20230726135945.260841-1-mlevitsk@redhat.com>
 Mime-Version: 1.0
-References: <20230729013535.1070024-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729013535.1070024-30-seanjc@google.com>
-Subject: [PATCH v4 29/29] drm/i915/gvt: Drop final dependencies on KVM
- internal details
+References: <20230726135945.260841-1-mlevitsk@redhat.com>
+Message-ID: <ZMRuON4m1qZZWWip@google.com>
+Subject: Re: [PATCH v2 0/3] Fix 'Spurious APIC interrupt (vector 0xFF) on
+ CPU#n' issue
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Yongwei Ma <yongwei.ma@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -76,52 +71,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Open code gpa_to_gfn() in kvmgt_page_track_write() and drop KVMGT's
-dependency on kvm_host.h, i.e. include only kvm_page_track.h.  KVMGT
-assumes "gfn == gpa >> PAGE_SHIFT" all over the place, including a few
-lines below in the same function with the same gpa, i.e. there's no
-reason to use KVM's helper for this one case.
+On Wed, Jul 26, 2023, Maxim Levitsky wrote:
+> Maxim Levitsky (3):
+>   KVM: x86: VMX: __kvm_apic_update_irr must update the IRR atomically
+>   KVM: x86: VMX: set irr_pending in kvm_apic_update_irr
+>   KVM: x86: check the kvm_cpu_get_interrupt result before using it
+> 
+>  arch/x86/kvm/lapic.c | 25 +++++++++++++++++--------
+>  arch/x86/kvm/x86.c   | 10 +++++++---
+>  2 files changed, 24 insertions(+), 11 deletions(-)
 
-No functional change intended.
-
-Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
-Tested-by: Yongwei Ma <yongwei.ma@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- drivers/gpu/drm/i915/gvt/gvt.h   | 3 ++-
- drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-index 2d65800d8e93..53a0a42a50db 100644
---- a/drivers/gpu/drm/i915/gvt/gvt.h
-+++ b/drivers/gpu/drm/i915/gvt/gvt.h
-@@ -34,10 +34,11 @@
- #define _GVT_H_
- 
- #include <uapi/linux/pci_regs.h>
--#include <linux/kvm_host.h>
- #include <linux/vfio.h>
- #include <linux/mdev.h>
- 
-+#include <asm/kvm_page_track.h>
-+
- #include "i915_drv.h"
- #include "intel_gvt.h"
- 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index eb50997dd369..aaed3969f204 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1585,7 +1585,7 @@ static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
- 
- 	mutex_lock(&info->vgpu_lock);
- 
--	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
-+	if (kvmgt_gfn_is_write_protected(info, gpa >> PAGE_SHIFT))
- 		intel_vgpu_page_track_handler(info, gpa,
- 						     (void *)val, len);
- 
--- 
-2.41.0.487.g6d72f3e995-goog
-
+Paolo, are you still planning on taking these directly?  I can also grab them
+and send them your way next week.  I have a couple of (not super urgent, but
+kinda urgent) fixes for 6.5 that I'm planning on sending a PULL request for, just
+didn't get around to that today.
