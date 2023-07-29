@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 428D2767A53
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 573D8767A60
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:54:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235240AbjG2AyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:54:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46024 "EHLO
+        id S237186AbjG2Aye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 20:54:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237110AbjG2Axa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:53:30 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DC6949EA
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:53:04 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bbbc4ae328so20294965ad.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:53:04 -0700 (PDT)
+        with ESMTP id S237163AbjG2Axo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 20:53:44 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0154649FC
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:53:09 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-55c79a5565aso1682432a12.3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:53:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591922; x=1691196722;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lIsPLR75IfB3JQf8Z+33pDlT1yw0PZd301tVrP5gvCM=;
-        b=7KdGmMY5gKQGXEht2MsoPWA9VQxDB6g9aeZPGnmi8UB6DI3xtFVBM18gkZXW/z2TdV
-         exnwvwBF7mluV4f39UE9b1r9i0aY4XbPDNhz5KPdG9yWBra6DITJTWp6HlZrSYtq1dxm
-         mhKQysvgDZRdO8j+0kRrEbHrjxNj8y7kLNPI5UCtQS+poddT1ka1hPZY+OzgLEN1N2dx
-         mZjzyx8/YekRbA4omz2PWpqFavfTZpv6wAT31EfvVbJoJNjhoV2BqJhmAxMjZ+N9P5Lr
-         bRbWsQk61VBfePCSa8u1k2d19uDvEwGMiACuIzmWjddSPjKy+9vIQzCZIzgv43AmEKLA
-         9QBQ==
+        d=google.com; s=20221208; t=1690591924; x=1691196724;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=PY67CjTOwz6KI4T0Lj9P5q66c/RjGwxRUJSEeS4GRlE=;
+        b=oP9v3B7eglFdcVwjdKlFHcGD/0WUKiEfzvXaqLmMq67/t5PI5rmXtEhnqO+qWDCBXT
+         8FzhRhkE38yBETpK7GgAQZckPVoBi5pk10zSmcsgkwe862bauk7/NWdF59MvxE56Qw3G
+         p/2FID9Ss66U/c6ARkkYrTXVscaZp3OJiSo9+6hL0XPXYl9UBGQm4g0vjbH7kSVlxB9c
+         XvgHyvzGenaPkhH5gSxLYI3XGBTXWeldnWkwsPjQRm84nedB0avi3XH3KmVl7+8RjvUi
+         RhVT7ILzlGGno1LYjXEfN7KbcEt7o+KxLGqP3UAoEE2ppbvEIMwxjcUaK5KqOLDH2coV
+         WMiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591922; x=1691196722;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIsPLR75IfB3JQf8Z+33pDlT1yw0PZd301tVrP5gvCM=;
-        b=Xhw4pe6GuyelQi0JZQiIfEwk5te0ySbeppS5eu7SxxXW60nmp0m27y5Uizu+gfRh8i
-         upORcVKf8bHeDLD3pMrpVl2+5nr3N732OpBigAEf4x5ESQLEIs7+DuFZZwePbkP+TrRm
-         Bvo1trN9QSJeNFS0rZx9vzY3sAemyFWuJTV4k0iw4nGW//x+LryDqZsnwB8WKZEwlt9c
-         TxvYRwHNbXxDD5kkCCEMoyrpfZnMHnhwJjJ0vITCn8Nj53h+IS03fC6iUQUZ+F4NfVC8
-         Or1OrpRPDTJs6xktBbMgRy9rgDpOfBR6JCbshI0qmRioC7WF3dlnGkzz7i+Rcx6wkjm9
-         5p8Q==
-X-Gm-Message-State: ABy/qLaugHDPZ/J9mGLP678gILy1DdMWbYfHPci7eQNKnNx/kW7FBKsF
-        EUYfzIx6Z1J4spvgHKOSW9KXfvW6Ito=
-X-Google-Smtp-Source: APBJJlEIGuf+haG75LZZltT1PSibJXhfNYwW3//NWO3PB616EzVgSvfA/VC0dlZt1FVbZU1DVrYdouho+YY=
+        d=1e100.net; s=20221208; t=1690591924; x=1691196724;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PY67CjTOwz6KI4T0Lj9P5q66c/RjGwxRUJSEeS4GRlE=;
+        b=BqsYe4SemDbYFdlwNSGtqYPxt+aKcd2fFNtgT4243N/bzcAgx06w0x1CgIYS8wkS88
+         Vk2QTC1+HVMES9WnAKdzOTBHsdMYGOMJpzO1y+RXnmmg4qyX+oeHNDyY6gIZ1YWu1zvZ
+         ojKrsZPxJKgiAhEzDrSVlRbDb3CLAceiaofb0vU9swHSM4GF+rxLanbu0RCn0FdPuVZs
+         mgjPITUeRwv7UIo3MHaZ54eKBrfEOBgN4O2njCe2s7SGi1oolOWS5tDNL2ioNUgFiKvD
+         gHLElq/1mSs0Zjnhzh6Y2Aqw6sogg0jhGnHmIkFUtJNAB9RTnLpaH9o8mDUXiGo+aA9Y
+         s8pw==
+X-Gm-Message-State: ABy/qLZOiUBwhW+3Lowcm0yrDJeOh58UsGHmbaRzNohk60L0kdna8p4+
+        0UG5M1iLwToCKFNRWGZt5/mViokKb20=
+X-Google-Smtp-Source: APBJJlF347Yo8riIzrmRAqsgc5lfXe93YMWyAqqG1o07lKwl1IWvB4Q+y7XoUngD7GrhK94Kxz7o35NIq/I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e80a:b0:1b8:5541:9d4d with SMTP id
- u10-20020a170902e80a00b001b855419d4dmr13713plg.6.1690591922733; Fri, 28 Jul
- 2023 17:52:02 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:e892:b0:1b9:c027:b5b8 with SMTP id
+ w18-20020a170902e89200b001b9c027b5b8mr12917plg.12.1690591924329; Fri, 28 Jul
+ 2023 17:52:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:51:55 -0700
+Date:   Fri, 28 Jul 2023 17:51:56 -0700
+In-Reply-To: <20230729005200.1057358-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230729005200.1057358-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729005200.1057358-1-seanjc@google.com>
-Subject: [PATCH v2 0/5] KVM: x86/mmu: Don't synthesize triple fault on bad root
+Message-ID: <20230729005200.1057358-2-seanjc@google.com>
+Subject: [PATCH v2 1/5] KVM: x86/mmu: Add helper to convert root hpa to shadow page
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -60,7 +63,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RISK_FREE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
         USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -69,57 +72,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rework the handling of !visible guest root gfns to wait until the guest
-actually tries to access memory before synthesizing a fault.  KVM currently
-just immediately synthesizes triple fault, which causes problems for nVMX
-and nSVM as immediately injecting a fault causes KVM to try and forward the
-fault to L1 (as a VM-Exit) before completing nested VM-Enter, e.g. if L1
-runs L2 with a "bad" nested TDP root.
+Add a dedicated helper for converting a root hpa to a shadow page in
+anticipation of using a "dummy" root to handle the scenario where KVM
+needs to load a valid shadow root (from hardware's perspective), but
+the guest doesn't have a visible root to shadow.  Similar to PAE roots,
+the dummy root won't have an associated kvm_mmu_page and will need special
+handling when finding a shadow page given a root.
 
-To get around the conundrum of not wanting to shadow garbage, load a dummy
-root, backed by the zero page, into CR3/EPTP/nCR3, and then inject an
-appropriate page fault when the guest (likely) hits a !PRESENT fault.
+Opportunistically retrieve the root shadow page in kvm_mmu_sync_roots()
+*after* verifying the root is unsync (the dummy root can never be unsync).
 
-Note, KVM's behavior is still not strictly correct with respect to x86
-architecture, the primary goal is purely to prevent triggering KVM's WARN
-at will.  No real world guest intentionally loads CR3 (or EPTP or nCR3)
-with a GPA that points at MMIO and expects it to work (and KVM has a long
-and storied history of punting on emulated MMIO corner cases).
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c     | 28 +++++++++++++---------------
+ arch/x86/kvm/mmu/spte.h    |  9 +++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c |  2 +-
+ 3 files changed, 23 insertions(+), 16 deletions(-)
 
-I didn't Cc any of this for stable because syzkaller is really the only
-thing that I expect to care, and the whole dummy root thing isn't exactly
-risk free.  If someone _really_ wants to squash the WARN in LTS kernels,
-the way to do that would be to exempt triple fault shutdown VM-Exits from
-the sanity checks in nVMX and nSVM, i.e. sweep the problem under the rug.
-
-I have a KUT test for this that'll I'll post next week (I said that about
-v1 and then forgot).
-
-v2: 
- - Finish writing the changelog for patch 3. [Yu]
- - Use KVM_REQ_MMU_FREE_OBSOLETE_ROOTS instead of directly unloading
-   all roots. [Yu]
-
-v1: https://lore.kernel.org/all/20230722012350.2371049-1-seanjc@google.com
-
-Sean Christopherson (5):
-  KVM: x86/mmu: Add helper to convert root hpa to shadow page
-  KVM: x86/mmu: Harden new PGD against roots without shadow pages
-  KVM: x86/mmu: Harden TDP MMU iteration against root w/o shadow page
-  KVM: x86/mmu: Disallow guest from using !visible slots for page tables
-  KVM: x86/mmu: Use dummy root, backed by zero page, for !visible guest
-    roots
-
- arch/x86/kvm/mmu/mmu.c          | 94 ++++++++++++++++++---------------
- arch/x86/kvm/mmu/mmu_internal.h | 10 ++++
- arch/x86/kvm/mmu/paging_tmpl.h  | 18 ++++++-
- arch/x86/kvm/mmu/spte.h         | 12 +++++
- arch/x86/kvm/mmu/tdp_iter.c     | 11 ++--
- arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
- 6 files changed, 98 insertions(+), 49 deletions(-)
-
-
-base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index ec169f5c7dce..1eadfcde30be 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3574,11 +3574,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 	if (!VALID_PAGE(*root_hpa))
+ 		return;
+ 
+-	/*
+-	 * The "root" may be a special root, e.g. a PAE entry, treat it as a
+-	 * SPTE to ensure any non-PA bits are dropped.
+-	 */
+-	sp = spte_to_child_sp(*root_hpa);
++	sp = root_to_sp(*root_hpa);
+ 	if (WARN_ON(!sp))
+ 		return;
+ 
+@@ -3624,7 +3620,7 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 					   &invalid_list);
+ 
+ 	if (free_active_root) {
+-		if (to_shadow_page(mmu->root.hpa)) {
++		if (root_to_sp(mmu->root.hpa)) {
+ 			mmu_free_root_page(kvm, &mmu->root.hpa, &invalid_list);
+ 		} else if (mmu->pae_root) {
+ 			for (i = 0; i < 4; ++i) {
+@@ -3648,6 +3644,7 @@ EXPORT_SYMBOL_GPL(kvm_mmu_free_roots);
+ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+ {
+ 	unsigned long roots_to_free = 0;
++	struct kvm_mmu_page *sp;
+ 	hpa_t root_hpa;
+ 	int i;
+ 
+@@ -3662,8 +3659,8 @@ void kvm_mmu_free_guest_mode_roots(struct kvm *kvm, struct kvm_mmu *mmu)
+ 		if (!VALID_PAGE(root_hpa))
+ 			continue;
+ 
+-		if (!to_shadow_page(root_hpa) ||
+-			to_shadow_page(root_hpa)->role.guest_mode)
++		sp = root_to_sp(root_hpa);
++		if (!sp || sp->role.guest_mode)
+ 			roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
+ 	}
+ 
+@@ -4018,7 +4015,7 @@ static bool is_unsync_root(hpa_t root)
+ 	 * requirement isn't satisfied.
+ 	 */
+ 	smp_rmb();
+-	sp = to_shadow_page(root);
++	sp = root_to_sp(root);
+ 
+ 	/*
+ 	 * PAE roots (somewhat arbitrarily) aren't backed by shadow pages, the
+@@ -4048,11 +4045,12 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+ 
+ 	if (vcpu->arch.mmu->cpu_role.base.level >= PT64_ROOT_4LEVEL) {
+ 		hpa_t root = vcpu->arch.mmu->root.hpa;
+-		sp = to_shadow_page(root);
+ 
+ 		if (!is_unsync_root(root))
+ 			return;
+ 
++		sp = root_to_sp(root);
++
+ 		write_lock(&vcpu->kvm->mmu_lock);
+ 		mmu_sync_children(vcpu, sp, true);
+ 		write_unlock(&vcpu->kvm->mmu_lock);
+@@ -4382,7 +4380,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+ 				struct kvm_page_fault *fault)
+ {
+-	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
++	struct kvm_mmu_page *sp = root_to_sp(vcpu->arch.mmu->root.hpa);
+ 
+ 	/* Special roots, e.g. pae_root, are not backed by shadow pages. */
+ 	if (sp && is_obsolete_sp(vcpu->kvm, sp))
+@@ -4564,7 +4562,7 @@ static inline bool is_root_usable(struct kvm_mmu_root_info *root, gpa_t pgd,
+ {
+ 	return (role.direct || pgd == root->pgd) &&
+ 	       VALID_PAGE(root->hpa) &&
+-	       role.word == to_shadow_page(root->hpa)->role.word;
++	       role.word == root_to_sp(root->hpa)->role.word;
+ }
+ 
+ /*
+@@ -4638,7 +4636,7 @@ static bool fast_pgd_switch(struct kvm *kvm, struct kvm_mmu *mmu,
+ 	 * having to deal with PDPTEs. We may add support for 32-bit hosts/VMs
+ 	 * later if necessary.
+ 	 */
+-	if (VALID_PAGE(mmu->root.hpa) && !to_shadow_page(mmu->root.hpa))
++	if (VALID_PAGE(mmu->root.hpa) && !root_to_sp(mmu->root.hpa))
+ 		kvm_mmu_free_roots(kvm, mmu, KVM_MMU_ROOT_CURRENT);
+ 
+ 	if (VALID_PAGE(mmu->root.hpa))
+@@ -4686,7 +4684,7 @@ void kvm_mmu_new_pgd(struct kvm_vcpu *vcpu, gpa_t new_pgd)
+ 	 */
+ 	if (!new_role.direct)
+ 		__clear_sp_write_flooding_count(
+-				to_shadow_page(vcpu->arch.mmu->root.hpa));
++				root_to_sp(vcpu->arch.mmu->root.hpa));
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_new_pgd);
+ 
+@@ -5555,7 +5553,7 @@ static bool is_obsolete_root(struct kvm *kvm, hpa_t root_hpa)
+ 	 *  (c) KVM doesn't track previous roots for PAE paging, and the guest
+ 	 *      is unlikely to zap an in-use PGD.
+ 	 */
+-	sp = to_shadow_page(root_hpa);
++	sp = root_to_sp(root_hpa);
+ 	return !sp || is_obsolete_sp(kvm, sp);
+ }
+ 
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 1279db2eab44..9f8e8cda89e8 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -236,6 +236,15 @@ static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
+ 	return to_shadow_page(__pa(sptep));
+ }
+ 
++static inline struct kvm_mmu_page *root_to_sp(hpa_t root)
++{
++	/*
++	 * The "root" may be a special root, e.g. a PAE entry, treat it as a
++	 * SPTE to ensure any non-PA bits are dropped.
++	 */
++	return spte_to_child_sp(root);
++}
++
+ static inline bool is_mmio_spte(u64 spte)
+ {
+ 	return (spte & shadow_mmio_mask) == shadow_mmio_value &&
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 512163d52194..046ac2589611 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -689,7 +689,7 @@ static inline void tdp_mmu_iter_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+ 		else
+ 
+ #define tdp_mmu_for_each_pte(_iter, _mmu, _start, _end)		\
+-	for_each_tdp_pte(_iter, to_shadow_page(_mmu->root.hpa), _start, _end)
++	for_each_tdp_pte(_iter, root_to_sp(_mmu->root.hpa), _start, _end)
+ 
+ /*
+  * Yield if the MMU lock is contended or this thread needs to return control
 -- 
 2.41.0.487.g6d72f3e995-goog
 
