@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34781767A9F
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:17:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D75B8767AA0
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:17:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237435AbjG2BRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 21:17:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36596 "EHLO
+        id S237447AbjG2BRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 21:17:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237376AbjG2BQq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 21:16:46 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E65F949EC
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:16:29 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-584126c65d1so29402387b3.3
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:16:29 -0700 (PDT)
+        with ESMTP id S236568AbjG2BQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 21:16:49 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BFB64ED3
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:16:31 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-585f04ffa3eso6612087b3.0
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 18:16:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690593388; x=1691198188;
+        d=google.com; s=20221208; t=1690593390; x=1691198190;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=OeX+CuubSaKKTeg9YUHiYCwLGztaZPXmiwSd5vwTnGo=;
-        b=tczXnxVR/+BbWdcXZzl16Zjac9Ua038CcCQZlGqLyrjqqJA8FnbTg//UO8FJYiqmLY
-         bTheeO1XRmDgq5B0p1UTPzDHqUoZePinMfEwTVlLSLupYGg3UtaMSrQDuZLMBmksB1kY
-         /ZibaeRhEWniSleStOuqcs+QbMglMUexLC3HWcSWhg+imS8D1XTSRDYw4VIGfDXngXiF
-         yA0MLBkGp6BTuyJco3d6fa58/C31vKQ9PpcZId1xL2u3XuuFJTkdwby9axhAZX5MSkMf
-         On5p9uy1VV3x+9bGcxgT7AO/fPmQ/vrmqcVD70Oe05qaAKI7xSOLVWDn9TNpD53phozU
-         DXTA==
+        bh=dha0R9DASOGG7XsDxaLGGX3ibqnbBc/BGtiYIStTeKk=;
+        b=R3Co0mWiKnMv23E+s2+bqRdZmHQ84c/0b2b0fBo6EJQu6wPbygTYbxo36RI0+IgysS
+         XDCFUpUFfWR+ehZJdSP1sSsQQ9o3WOEV2VplPcfel3Ge0mrZ7/rRUgtg0mGGWpuk13bp
+         xfpe9jYKGXATKIbGI1hcpa59d19+f3EeNTKaIxoidXs9dYUzDY55tDOFOu/O7QyxycyU
+         grN9DnbNhrA+O05bNUzvKfg77yWa464N+cFEO0gvI7NSnuVmeOezegM5mUJyeYF6ioP/
+         yksWReHMBzO/z9PT19qKsWocLXdvMQ0NUXoNe7RDBZd6t5rF0HgB/41Nmvvda1pWzJEt
+         8aZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690593388; x=1691198188;
+        d=1e100.net; s=20221208; t=1690593390; x=1691198190;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OeX+CuubSaKKTeg9YUHiYCwLGztaZPXmiwSd5vwTnGo=;
-        b=BhS43nymZhHCNCE3TCYN9/pS2S0DwGsP/UpxqjuJIk889p2fS56zRcgJmi1+ICWUv6
-         mzlKx8odD01X7wJgi1ad+Tlv0iVEHRXZXu2KiPaxXa9B4EnHMuMHfL3FQ78SgEUXuS7T
-         eD1pQZZPLDPhQ4vRT+WmH06KhkjLTzDhTWRMANJdAzJMW1IAXOUtoIhLtBuPpXC9Nuu+
-         oFlkU9zIJk8EEfG8PXewlzA705frBYhF2T2IyQpIjy2H/M4fp87qwPKWh+vZEA2dl2PR
-         XVA0Afsz741MJGJVGYMaq7s9ijv8wBHfLmbH5/BRUKhTwcC45otRZO2Oguov6Oolkdlt
-         IAkg==
-X-Gm-Message-State: ABy/qLaI3QT3k/aUiF2XWXLBmLOVJQB7GXh+epJgdcMPPwhdEdmkVKoQ
-        oG9YmBoCEqGuWeHAxh9f5LiKd8ulbCU=
-X-Google-Smtp-Source: APBJJlGBvNCfyxKuG1R4NNoZpfFF1I/ljW+Qw9NESSIYSbL8hQok5yLiRGghpWLn+saGaQJuw1Daom1ZinM=
+        bh=dha0R9DASOGG7XsDxaLGGX3ibqnbBc/BGtiYIStTeKk=;
+        b=FLSqztAJmEzpSSznU+FLv7JVC2Rwx+pauLyQ8e52nog88LPCcnh5rROqt+BWBf5YOg
+         1JqR5KlohAV3boyzQhu3ohfh3Dam5AKnh6UxxwnB+0/wiZd16GVne8FhB+cjAmcjWSdb
+         S4QR1EI9uWm67EEFIwEVvuQvsVWJM8Wh/C6d7ZQal/S9Q6tWxIM8X5vv3AoJaJW90IPj
+         XKzbYZajm4YSBF+1K+k+ORlkF1iVspTpbyFy2LVqB7sUwoCzT8j+cHn5V1jGjlBlllIS
+         4yPOn0whAOVNeTEqdfH/w8J8aAIuPzLeW43mFmKysrHJIzw+m1EAwmaigiypfwuU7Xrr
+         9dQw==
+X-Gm-Message-State: ABy/qLZgyJezS2iBFwNuS3jDRy/kjNmhkrlJr4MOzGlEGZ2LsYpVfEeA
+        oGffFxvUW/083uKxV2g4Tjm5J9ddWQw=
+X-Google-Smtp-Source: APBJJlEGQMMVjnj7NPVOTcIR9PA0hrdPRQ5dUv8FmgzbAmnbcIC8v/BGIjyYqfdJwtH6n+7jy0APZwofMcI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c094:0:b0:c6a:caf1:e601 with SMTP id
- c142-20020a25c094000000b00c6acaf1e601mr18754ybf.13.1690593388698; Fri, 28 Jul
- 2023 18:16:28 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:a784:0:b0:577:d5b:7ce3 with SMTP id
+ e126-20020a81a784000000b005770d5b7ce3mr27415ywh.9.1690593390450; Fri, 28 Jul
+ 2023 18:16:30 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 18:15:55 -0700
+Date:   Fri, 28 Jul 2023 18:15:56 -0700
 In-Reply-To: <20230729011608.1065019-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729011608.1065019-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729011608.1065019-9-seanjc@google.com>
-Subject: [PATCH v2 08/21] KVM: x86/mmu: Use KVM-governed feature framework to
- track "GBPAGES enabled"
+Message-ID: <20230729011608.1065019-10-seanjc@google.com>
+Subject: [PATCH v2 09/21] KVM: VMX: Recompute "XSAVES enabled" only after
+ CPUID update
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,115 +65,75 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the governed feature framework to track whether or not the guest can
-use 1GiB pages, and drop the one-off helper that wraps the surprisingly
-non-trivial logic surrounding 1GiB page usage in the guest.
+Recompute whether or not XSAVES is enabled for the guest only if the
+guest's CPUID model changes instead of redoing the computation every time
+KVM generates vmcs01's secondary execution controls.  The boot_cpu_has()
+and cpu_has_vmx_xsaves() checks should never change after KVM is loaded,
+and if they do the kernel/KVM is hosed.
 
-No functional change intended.
+Opportunistically add a comment explaining _why_ XSAVES is effectively
+exposed to the guest if and only if XSAVE is also exposed to the guest.
+
+Practically speaking, no functional change intended (KVM will do fewer
+computations, but should still get the see the same xsaves_enabled value
+whenever KVM looks at it).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c             | 17 +++++++++++++++++
- arch/x86/kvm/governed_features.h |  2 ++
- arch/x86/kvm/mmu/mmu.c           | 20 +++-----------------
- 3 files changed, 22 insertions(+), 17 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index ef826568c222..f74d6c404551 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -312,11 +312,28 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	struct kvm_cpuid_entry2 *best;
-+	bool allow_gbpages;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index ca6194b0e35e..307d73749185 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4587,19 +4587,10 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
+ 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
  
- 	BUILD_BUG_ON(KVM_NR_GOVERNED_FEATURES > KVM_MAX_NR_GOVERNED_FEATURES);
- 	bitmap_zero(vcpu->arch.governed_features.enabled,
- 		    KVM_MAX_NR_GOVERNED_FEATURES);
- 
-+	/*
-+	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
-+	 * hardware.  The hardware page walker doesn't let KVM disable GBPAGES,
-+	 * i.e. won't treat them as reserved, and KVM doesn't redo the GVA->GPA
-+	 * walk for performance and complexity reasons.  Not to mention KVM
-+	 * _can't_ solve the problem because GVA->GPA walks aren't visible to
-+	 * KVM once a TDP translation is installed.  Mimic hardware behavior so
-+	 * that KVM's is at least consistent, i.e. doesn't randomly inject #PF.
-+	 * If TDP is disabled, honor *only* guest CPUID as KVM has full control
-+	 * and can install smaller shadow pages if the host lacks 1GiB support.
-+	 */
-+	allow_gbpages = tdp_enabled ? boot_cpu_has(X86_FEATURE_GBPAGES) :
-+				      guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES);
-+	if (allow_gbpages)
-+		kvm_governed_feature_set(vcpu, X86_FEATURE_GBPAGES);
-+
- 	best = kvm_find_cpuid_entry(vcpu, 1);
- 	if (best && apic) {
- 		if (cpuid_entry_has(best, X86_FEATURE_TSC_DEADLINE_TIMER))
-diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-index 40ce8e6608cd..b29c15d5e038 100644
---- a/arch/x86/kvm/governed_features.h
-+++ b/arch/x86/kvm/governed_features.h
-@@ -5,5 +5,7 @@ BUILD_BUG()
- 
- #define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
- 
-+KVM_GOVERNED_X86_FEATURE(GBPAGES)
-+
- #undef KVM_GOVERNED_X86_FEATURE
- #undef KVM_GOVERNED_FEATURE
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ec169f5c7dce..7b9104b054bc 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4808,28 +4808,13 @@ static void __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
- 	}
- }
- 
--static bool guest_can_use_gbpages(struct kvm_vcpu *vcpu)
--{
--	/*
--	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
--	 * hardware.  The hardware page walker doesn't let KVM disable GBPAGES,
--	 * i.e. won't treat them as reserved, and KVM doesn't redo the GVA->GPA
--	 * walk for performance and complexity reasons.  Not to mention KVM
--	 * _can't_ solve the problem because GVA->GPA walks aren't visible to
--	 * KVM once a TDP translation is installed.  Mimic hardware behavior so
--	 * that KVM's is at least consistent, i.e. doesn't randomly inject #PF.
--	 */
--	return tdp_enabled ? boot_cpu_has(X86_FEATURE_GBPAGES) :
--			     guest_cpuid_has(vcpu, X86_FEATURE_GBPAGES);
--}
+-	if (cpu_has_vmx_xsaves()) {
+-		/* Exposing XSAVES only when XSAVE is exposed */
+-		bool xsaves_enabled =
+-			boot_cpu_has(X86_FEATURE_XSAVE) &&
+-			guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+-			guest_cpuid_has(vcpu, X86_FEATURE_XSAVES);
 -
- static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
- 					struct kvm_mmu *context)
- {
- 	__reset_rsvds_bits_mask(&context->guest_rsvd_check,
- 				vcpu->arch.reserved_gpa_bits,
- 				context->cpu_role.base.level, is_efer_nx(context),
--				guest_can_use_gbpages(vcpu),
-+				guest_can_use(vcpu, X86_FEATURE_GBPAGES),
- 				is_cr4_pse(context),
- 				guest_cpuid_is_amd_or_hygon(vcpu));
- }
-@@ -4906,7 +4891,8 @@ static void reset_shadow_zero_bits_mask(struct kvm_vcpu *vcpu,
- 	__reset_rsvds_bits_mask(shadow_zero_check, reserved_hpa_bits(),
- 				context->root_role.level,
- 				context->root_role.efer_nx,
--				guest_can_use_gbpages(vcpu), is_pse, is_amd);
-+				guest_can_use(vcpu, X86_FEATURE_GBPAGES),
-+				is_pse, is_amd);
+-		vcpu->arch.xsaves_enabled = xsaves_enabled;
+-
++	if (cpu_has_vmx_xsaves())
+ 		vmx_adjust_secondary_exec_control(vmx, &exec_control,
+ 						  SECONDARY_EXEC_XSAVES,
+-						  xsaves_enabled, false);
+-	}
++						  vcpu->arch.xsaves_enabled, false);
  
- 	if (!shadow_me_mask)
- 		return;
+ 	/*
+ 	 * RDPID is also gated by ENABLE_RDTSCP, turn on the control if either
+@@ -7722,8 +7713,15 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+-	/* xsaves_enabled is recomputed in vmx_compute_secondary_exec_control(). */
+-	vcpu->arch.xsaves_enabled = false;
++	/*
++	 * XSAVES is effectively enabled if and only if XSAVE is also exposed
++	 * to the guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
++	 * set if and only if XSAVE is supported.
++	 */
++	vcpu->arch.xsaves_enabled = cpu_has_vmx_xsaves() &&
++				    boot_cpu_has(X86_FEATURE_XSAVE) &&
++				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
++				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES);
+ 
+ 	vmx_setup_uret_msrs(vmx);
+ 
 -- 
 2.41.0.487.g6d72f3e995-goog
 
