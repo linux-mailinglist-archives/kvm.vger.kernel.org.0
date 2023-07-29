@@ -2,127 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BE03767DA0
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 11:21:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7558B767E3C
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 12:36:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbjG2JVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Jul 2023 05:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47640 "EHLO
+        id S230094AbjG2Kg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Jul 2023 06:36:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbjG2JVB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 29 Jul 2023 05:21:01 -0400
+        with ESMTP id S229500AbjG2Kgz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Jul 2023 06:36:55 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11CFD2D4D
-        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 02:21:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC4071AB
+        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 03:36:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A1DD860AF2
-        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 09:21:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07735C433C7;
-        Sat, 29 Jul 2023 09:20:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 351A460B81
+        for <kvm@vger.kernel.org>; Sat, 29 Jul 2023 10:36:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F2DAC433C8;
+        Sat, 29 Jul 2023 10:36:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690622460;
-        bh=P33vJ7HFQ9LW1t2/TFPJKDm8qe/Qk9uj/WuqEOWZA9g=;
+        s=k20201202; t=1690627013;
+        bh=tKVN2G1cuJUpxsAHow1SabWBXXoO3++OSgz/dI7q9eo=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=oIK1MiJU9ysWVx4EXsWKfhl5/ZVcCJis7mYDGTKf7Fr/CDf5/dDzeYEAaGtDgdX7W
-         1P4yE6A82aMR1rMPvETU6EK2kJmUNffiniKHz+Ks2WTRSUWyw7TGyXEu5dWzdRWQAl
-         lfFwcS2MgzLGnjYTeVRUg+NqgEcq5hFZMlyoAmNXMU2AztaI2paXddroIqplUJ+5rO
-         GaiiYlyGDGGhIELtNiKzrTqHOxk0Ub/lNtwSwk5J+mIzkwn0zKZiv1fsqSGH1r1OH6
-         xUtHWzQwjy1WOkn6eBhIhuvJf7Hd45GHQdcGH4u5CAAuEK7/ih5Z/+Byf36niW3z8p
-         cVHdrHvzOSMjw==
+        b=IvXEdUeTXNOiGhPmRbR5EMgfTgOV9x8zqRWQgLxYAYmdL00Oyc377SCenp+N0Nbe9
+         u000KLYW9Begd2BIVtWAgzIq8DexOf94tfJFKvmUsA/BHgaB1l6nlKBP9MAfCsU0f8
+         MtsP5t9QM530cVKBWX7G+pgOT+W/nS7r8ccGETARqN2tXrtfTrZ2GHymeekPoMtWhT
+         4xtqL0bHRhLA++Umcw3bNlhksy1EQbMnNE6kJ74H/42Xaj3bi2mrX2rD1eJqlYAova
+         FFV4QhQ8qsPrdyJ9ts1jDnGnbeaNJfXPV+RQwpwNu+cO+V2ISus821FBU5QMlPrpp1
+         eg4D/BdoYhbBw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qPg89-000KNu-Kp;
-        Sat, 29 Jul 2023 10:20:57 +0100
-Date:   Sat, 29 Jul 2023 10:20:57 +0100
-Message-ID: <87edkrqdja.wl-maz@kernel.org>
+        id 1qPhJa-000Kr9-OR;
+        Sat, 29 Jul 2023 11:36:50 +0100
+Date:   Sat, 29 Jul 2023 11:36:50 +0100
+Message-ID: <87cz0bqa0t.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
         Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 19/26] KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
-In-Reply-To: <ZMQNTKAlxQe61JUe@linux.dev>
-References: <20230728082952.959212-1-maz@kernel.org>
-        <20230728082952.959212-20-maz@kernel.org>
-        <ZMQNTKAlxQe61JUe@linux.dev>
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>
+Subject: Re: [PATCH v6 3/6] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+In-Reply-To: <87pm4l8uj8.fsf@redhat.com>
+References: <20230718164522.3498236-1-jingzhangos@google.com>
+        <20230718164522.3498236-4-jingzhangos@google.com>
+        <87o7k77yn5.fsf@redhat.com>
+        <CAAdAUthM6JJ0tEqWELcW48E235EbcjZQSDLF9OQUZ_kUtqh3Ng@mail.gmail.com>
+        <87sf9h8xs0.fsf@redhat.com>
+        <86r0p1txun.wl-maz@kernel.org>
+        <87pm4l8uj8.fsf@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: cohuck@redhat.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Jul 2023 19:47:40 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, 21 Jul 2023 10:48:27 +0100,
+Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> Hey Marc,
+> On Fri, Jul 21 2023, Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Fri, Jul 28, 2023 at 09:29:45AM +0100, Marc Zyngier wrote:
+> > On Fri, 21 Jul 2023 09:38:23 +0100,
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >> 
+> >> On Thu, Jul 20 2023, Jing Zhang <jingzhangos@google.com> wrote:
+> >> > No mechanism was provided to userspace to discover if a given idreg or
+> >> > any fields of a given idreg is writable. The write to a readonly idreg
+> >> > can also succeed (write ignored) without any error if what's written
+> >> > is exactly the same as what the idreg holds or if it is a write to
+> >> > AArch32 idregs on an AArch64-only system.
+> >> 
+> >> Hm, I'm not sure that's a good thing for the cases where we want to
+> >> support mix-and-match userspace and kernels. Userspace may want to know
+> >> upfront whether it can actually tweak the contents of an idreg or not
+> >> (for example, in the context of using CPU models for compatibility), so
+> >> that it can reject or warn about certain configurations that may not
+> >> turn out as the user expects.
+> >> 
+> >> > Not sure if it is worth adding an API to return the writable mask for
+> >> > idregs, since we want to enable the writable for all allocated
+> >> > unhidden idregs eventually.
+> >> 
+> >> We'd enable any new idregs for writing from the start in the future, I
+> >> guess?
+> >> 
+> >> I see two approaches here:
+> >> - add an API to get a list of idregs with their writable masks
+> >> - add a capability "you can write to all idregs whatever you'd expect to
+> >>   be able to write there architecture wise", which would require to add
+> >>   support for all idregs prior to exposing that cap
+> >> 
+> >> The second option would be the easier one (if we don't manage to break
+> >> it in the future :)
+> >
+> > I'm not sure the last option is even possible. The architecture keeps
+> > allocating new ID registers in the op0==3, op1=={0, 1, 3}, CRn==0,
+> > CRm=={0-7}, op2=={0-7} space, so fields that were RES0 until then
+> > start having a non-0 value.
+> >
+> > This could lead to a situation where you move from a system that
+> > didn't know about ID_AA64MMFR6_EL1.XYZ to a system that advertises it,
+> > and for which the XYZ instruction has another behaviour. Bad things
+> > follow.
 > 
-> [...]
+> Hrm :(
 > 
-> > @@ -943,6 +1025,27 @@ void __init populate_nv_trap_config(void)
-> >  	kvm_info("nv: %ld coarse grained trap handlers\n",
-> >  		 ARRAY_SIZE(encoding_to_cgt));
+> >
+> > My preference would be a single ioctl that returns the full list of
+> > writeable masks in the ID reg range. It is big, but not crazy big
+> > (1536 bytes, if I haven't messed up), and includes the non ID_*_EL1
+> > sysreg such as MPIDR_EL1, CTR_EL1, SMIDR_EL1.
+> >
+> > It would allow the VMM to actively write zeroes to any writable ID
+> > register it doesn't know about, or for which it doesn't have anything
+> > to restore. It is also relatively future proof, as it covers
+> > *everything* the architecture has provisioned for the future (by the
+> > time that space is exhausted, I hope none of us will still be involved
+> > with this crap).
 > 
-> It might make sense to skip insertion of the FGT trap controls if the
-> system doesn't have FGT in the first place.
+> Famous last words :)
+> 
+> But yes, that should work. This wouldn't be the first ioctl returning a
+> long list, and the VMM would just call it once on VM startup to figure
+> things out anyway.
 
-Yup, good point.
+To be clear, see below for what I had in mind. It is of course
+untested, and is probably overlooking a number of details, but you'll
+hopefully get my drift. I think this has some benefit over the
+per-sysreg ioctl, as it covers everything in one go, and is guaranteed
+to be exhaustive (until the architecture grows another range of ID
+crap).
 
-> 
-> > +	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
-> > +		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
-> > +		union trap_config tc;
-> > +
-> > +		tc = get_trap_config(fgt->encoding);
-> > +
-> > +		WARN(tc.fgt,
-> > +		     "Duplicate FGT for sys_reg(%d, %d, %d, %d, %d)\n",
-> > +		     sys_reg_Op0(fgt->encoding),
-> > +		     sys_reg_Op1(fgt->encoding),
-> > +		     sys_reg_CRn(fgt->encoding),
-> > +		     sys_reg_CRm(fgt->encoding),
-> > +		     sys_reg_Op2(fgt->encoding));
-> 
-> Same comment here, we should just bail.
+Note that we don't necessarily need to restrict ourselves to a single
+range either. We could also return some other ranges depending on
+additional parameters (Oliver mentioned offline the case of the
+PCMEIDx_EL0 registers).
 
-Yup. I'll also turn it into a kvm_err() instead, as WARN() is too
-noisy (nobody needs the same stack trace 200 times).
-
-Thanks,
+Thank,
 
 	M.
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2ca2973abe66..fa79f3651423 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3589,3 +3589,91 @@ int __init kvm_sys_reg_table_init(void)
+ 
+ 	return 0;
+ }
++
++/*
++ * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
++ * Feature Register 2"):
++ *
++ * "The Feature ID space is defined as the System register space in
++ * AArch64 with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7},
++ * op2=={0-7}."
++ *
++ * This covers all R/O registers that indicate anything useful feature
++ * wise, including the ID registers.
++ */
++
++/* Userspace-visible definitions */
++#define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
++#define __ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)		\
++	({								\
++		__u64 __op1 = op1 & 3;					\
++		__op1 -= (__op1 == 3);					\
++		((ARM64_SYS_REG_SHIFT_MASK(3, OP0) |			\
++		  ARM64_SYS_REG_SHIFT_MASK(__op1, OP1) |		\
++		  ARM64_SYS_REG_SHIFT_MASK(0, CRN) |			\
++		  ARM64_SYS_REG_SHIFT_MASK(crm & 7, CRM) |		\
++		  ARM64_SYS_REG_SHIFT_MASK(op2, OP2)) -			\
++		 (ARM64_SYS_REG_SHIFT_MASK(3, OP0) |			\
++		  ARM64_SYS_REG_SHIFT_MASK(0, OP1) |			\
++		  ARM64_SYS_REG_SHIFT_MASK(0, CRN) |			\
++		  ARM64_SYS_REG_SHIFT_MASK(0, CRM) |			\
++		  ARM64_SYS_REG_SHIFT_MASK(0, OP2)));			\
++	})
++
++#define ARM64_FEATURE_ID_SPACE_INDEX(r)					\
++	__ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(r),			\
++				     sys_reg_Op1(r),			\
++				     sys_reg_CRn(r),			\
++				     sys_reg_CRm(r),			\
++				     sys_reg_Op2(r))
++
++struct feature_id_writeable_masks {
++	u64	mask[ARM64_FEATURE_ID_SPACE_SIZE];
++};
++
++static bool is_feature_id_reg(u32 encoding)
++{
++	return (sys_reg_Op0(encoding) == 3 &&
++		(sys_reg_Op1(encoding) < 2 || sys_reg_Op1(encoding) == 3) &&
++		sys_reg_CRn(encoding) == 0 &&
++		sys_reg_CRm(encoding) <= 7);
++}
++
++int kvm_get_writeable_feature_regs(struct kvm *kvm, u64 __user *masks)
++{
++	/* Wipe the whole thing first */
++	for (int i = 0; i < ARM64_FEATURE_ID_SPACE_SIZE; i++)
++		if (put_user(0, masks + i))
++			return -EFAULT;
++
++	for (int i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
++		const struct sys_reg_desc *reg = &sys_reg_descs[i];
++		u32 encoding = reg_to_encoding(reg);
++		u64 val;
++
++		if (!is_feature_id_reg(encoding) || !reg->set_user)
++			continue;
++
++		/*
++		 * For ID registers, we return the writable mask.
++		 * Other feature registers return a full 64bit mask.
++		 * That's not necessarily compliant with a given
++		 * revision of the architecture, but the RES0/RES1
++		 * definitions allow us to do that
++		 */
++		if (is_id_reg(encoding)) {
++			if (!reg->val)
++				continue;
++
++			val = reg->val;
++		} else {
++			val = ~0UL;
++		}
++
++		if (put_user(val,
++			     (masks + ARM64_FEATURE_ID_SPACE_INDEX(encoding))))
++			return -EFAULT;
++	}
++
++	return 0;
++}
+
+
 
 -- 
 Without deviation from the norm, progress is not possible.
