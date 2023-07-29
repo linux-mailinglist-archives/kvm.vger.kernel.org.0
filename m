@@ -2,172 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE96B767B66
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 03:58:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE9D0767BEC
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 05:33:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232366AbjG2B6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 21:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
+        id S236535AbjG2DdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 23:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjG2B6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 21:58:02 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2050.outbound.protection.outlook.com [40.107.94.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E9ED4222;
-        Fri, 28 Jul 2023 18:58:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jL0nIA70sACzjov2SYq2hUEXz9NHfO9WwoY3i1DqXU+BLqBrJvdJZA5bMECfWGTO3RN3tUzhhlwktfeTq9kkjKkw1S+JbwJm6FcocTVZg3SiBo03KbYmB9peB62PiQvch0BHjeWeaCMW9aAqZ8RyhrSGHpz9+TXEmoBqkNKILfCd/nbbtvvHKFv6pAASUh+rbbLhlsi7wXsLOeFCPdKAuc5PRNPB/gFuETQycegbVjZIuU8nxIRwrRLbc/z5RDHg9rZdb3hiIu8wNYbJjaFTi+G+ExkmpCBfOnvOyVjwkfRgwHTyeYiyUfQFUZ82qL5sOPqHkgONS3FA/vxv401rRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tvL+De0sdhb9vC+b2xMp9INYd2gOrUUC2SZWHuvaClU=;
- b=A6HLa/P2REVG2TExYzmM7cA95iusfL3KeSwPZSGWY/Z0S+1xG9rzCLmGy74mL44B5wduQc82WUr6ewRb+KTRPGff8ZCh1YytUm6EN+F1h+L2Uaq5NikCDUghYn0l3Oae86LTJvZaZL0XBSdnleE2G7FxLXwoMFWKuCKmDTMWe0kCwrY1zxYlAoD2kg15+he/32Av+2gkNMRivEn7i+pSr7auj9stEsL625g/8zBPVdmeweXpP/udV6pEmhZpTfFJX939ELLAIC/PkoJjLOEeUS84yKaJJbBXp0L5+RiLDlOJf1hARmydDUvT6d43ehlcTE59av6F3fFVPAE5wSOn4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tvL+De0sdhb9vC+b2xMp9INYd2gOrUUC2SZWHuvaClU=;
- b=Ahy272i4dwLJC+S4TKUnwZ4MJQHxemXyrKgzVe16yWH86LsjQvlycz+SOSUac2nPlHdCGHbQhFN8SEnS6og+eIwN4hAURKj0mRBtNpyg3A9YT3QpRw4ZrPdLeDwZDvMjIR0wVmn7F6ubWDQbSNDunUoGULt1/SFKJfEZD0qpPig=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
- PH8PR12MB6722.namprd12.prod.outlook.com (2603:10b6:510:1cd::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Sat, 29 Jul
- 2023 01:57:55 +0000
-Received: from DM6PR12MB2843.namprd12.prod.outlook.com
- ([fe80::8eef:8dde:e1e1:2494]) by DM6PR12MB2843.namprd12.prod.outlook.com
- ([fe80::8eef:8dde:e1e1:2494%3]) with mapi id 15.20.6631.026; Sat, 29 Jul 2023
- 01:57:54 +0000
-Message-ID: <2b41fef5-8e77-74b6-e43f-3da4929734b7@amd.com>
-Date:   Sat, 29 Jul 2023 11:57:40 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.5.1
-Subject: Re: [PATCH kernel 0/9] KVM: SEV: Enable AMD SEV-ES DebugSwap
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20230615063757.3039121-1-aik@amd.com>
- <169058576410.1024559.1052772292093755719.b4-ty@google.com>
-From:   Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <169058576410.1024559.1052772292093755719.b4-ty@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SYBPR01CA0003.ausprd01.prod.outlook.com (2603:10c6:10::15)
- To DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24)
+        with ESMTP id S236496AbjG2DdF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 23:33:05 -0400
+X-Greylist: delayed 723 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 28 Jul 2023 20:33:02 PDT
+Received: from ustc.edu.cn (email.ustc.edu.cn [IPv6:2001:da8:d800::8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B92C5106
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 20:33:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mail.ustc.edu.cn; s=dkim; h=Received:Message-ID:Date:
+        MIME-Version:User-Agent:From:To:Cc:Subject:Content-Type:
+        Content-Transfer-Encoding; bh=zgkAdu+bRUAzX1goJastFrFu1/KsEZ+L3N
+        tJb7mZ3+8=; b=lTKJNTAPtgpqnFHFQKNforLCcm7cYgcy+zeeB9hsHHMQWwCzFJ
+        PehIw216PCxch7xyHTbE0jFxes1sFVSBiDEpn0j3IrU0D1VfUKnxlAbvvLn99o/4
+        ITRV1uJV7LsM/kPSSb0wGihLI0/117fD60RKSH+gCsT+8wtROBvRxZaDA=
+Received: from [192.168.199.152] (unknown [180.158.176.68])
+        by newmailweb.ustc.edu.cn (Coremail) with SMTP id LkAmygC3vAw3hMRkVCzAAA--.25069S2;
+        Sat, 29 Jul 2023 11:15:03 +0800 (CST)
+Message-ID: <8eb933fd-2cf3-d7a9-32fe-2a1d82eac42a@mail.ustc.edu.cn>
+Date:   Sat, 29 Jul 2023 11:15:04 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|PH8PR12MB6722:EE_
-X-MS-Office365-Filtering-Correlation-Id: cca56653-13f6-4f0e-9c7b-08db8fd73955
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hZI0xx7Hpf0nbOoD9hX5tzq+19TbaGpXk3apa4bqytWZQtcHj+k3oiP/SzyaBdGtGRGcKnc1yUUGuIPdKOUXQjETd0TXf+CH69/jpkRqhNZQge2KGFR7UOsLcLGOm+rGS10iQ6UTFlaxQ9bATEjow6Cf7Ipet+fQKvVvo6URy4yWKkRTNURgOdb5ESQ6IBlCKLPRwABE4KXjGvci8/feXrIsx+Hgrx1Dl5ODoTG/Ky7k2qpvgttsYkKzZcUJWQuKmLwtU+23x0a11tpjSyW/FPtClsivqQHT05ILYtUhe+n5AnVXVOFe3WArGUl6eXD10Gvgq6Tqn7bRxch/ofE4ERfE2juJStzOOgWJ7ViUwFNs+QBujia4nVFO8TC24dAjyPxFAro3AKkfXjkJjkj7Tyb8ZYBDyhc5ZWRWle+dB+f7KJVaPSIqkCQXphAlXXCDo3HLEkD3oKgTSFFaQmGJ45itkSfDUm6xmCMaVYx3FYNPIxnoW/zxYste+mnIcQpRr6kVGnI5qACklnTv2kj3KQxo4I71jsCmoM6d2BeixJnCAWX2d71+5ZWIjRpQlw5/99LOtltaOk1dwAXOBwFpFXCM5rYRIr3xl4FdLo+iqlGFEEargCWRY0+5hCYCTC6sWDDGNmkzT/8Ax0EzVzu9xY0OjwlrkDztrzmrXYogz7k=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(451199021)(31686004)(83380400001)(478600001)(31696002)(5660300002)(8676002)(8936002)(36756003)(2906002)(41300700001)(2616005)(38100700002)(66946007)(4326008)(66556008)(66476007)(6506007)(316002)(6512007)(53546011)(966005)(6666004)(6486002)(186003)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXp3NTlkeW0zOE1ISldIVkxiSmplSmU0NFBDdnZIdFdXSDhDQkR0N1JxTmdP?=
- =?utf-8?B?KzhiV1p6QTlrY1hpSmFiRElaWG52WDJjL0tZbGd0WThsZU5IYVFVUEF6T2hL?=
- =?utf-8?B?MUhqYXB4NlpqSThNZzkxdGFNQ2VqdzY2L2kwSTFKOUVpT3NJaXdYMEFoOWQ0?=
- =?utf-8?B?anZ1RVpIK0llQnRrUG9Ybm5ON0xIRHVaQUVFOG5JMHdYdjcxb3RiUWY4bVd2?=
- =?utf-8?B?cjlrUVpVcUJaK1V4SUNna1B0ak1ISUw4blFKZ3ZXc21EMDJveS9FeGJBL3g2?=
- =?utf-8?B?REtLS0xiL3BEWk1mME1kYVZSZEdlRHBwcGdrY1JLRi9PNEx6NzRpOGpTYzVQ?=
- =?utf-8?B?ODVDYSt2Mnk5U3hrRFlDQ1dhdWZPUEp0YVdJRTlscktsaEYxZzdYaDZJMWVj?=
- =?utf-8?B?c3EyMnhMdU40ZUJkNVh5ZkVuK2NpNEYydkFNV2NWWkhzSWNHWlZvVFdWd1VX?=
- =?utf-8?B?cGIxcEFIY1A5dTJ3S0dhNzdVQUtTaHZFQTBzS3J6MUVZWG5JRVovbEsya2pu?=
- =?utf-8?B?QUswM1ozNkpVL2FOcERtdjZGTVYwTFp5NktCSlJxcHZsWnBiZDN5Snpvdmxw?=
- =?utf-8?B?R1RGS2lLN0p0ZHJFMXFhbE10L2xQOUFDbUFGbHRLa1c0djNnTG5VbjRLaW5J?=
- =?utf-8?B?Vy9Gc09rb2xGWFBDelZzVmU4eHoxYzd1WXJaVUtGTm8xSk8vS09pR1ZFdFk4?=
- =?utf-8?B?dDRzbE0za2REenV3Q3NmQmRwWW5UaGZnSk1PaHA1SlovTzdPVmQ0Q0N0bXBB?=
- =?utf-8?B?cmcwNlNRL0orY2JBeFNvcGVmaVoxQXVWMEk4K1JRbHNib2hUOCttaGtaYThC?=
- =?utf-8?B?YkNQYjkwellZZDEyTVM2MWxibDlWZkxJNkhmQjZNbWRtYXlQWENOSysrSThh?=
- =?utf-8?B?VWFQdENmV1Q3R1ZpeHNBYW5EaVZvSUhsRnZ3L2g1dVdEMDVDSHlEcHJ6UGlq?=
- =?utf-8?B?SVc4djVUMXNMMFY5N1RaMEpXNjcyNmEzaTNrZ1laQkhOVUU0dG5oVjVBTkNB?=
- =?utf-8?B?L1BrZ1Jyd0E1MTNZdDg2UTQ1UU5iekxsZWk1aW5ic1VFSzh4TkJYWTdPSUdE?=
- =?utf-8?B?SXZjajNudWpONzNubDV2VUhQRnRnL3JQUzhOam5aVDJWNHRHbDQ5UGdhSkVT?=
- =?utf-8?B?NHVjY3I3RW1jaEhPOWtCWE0wZXVUc2g0ZVNOc3psQ3BiOGJ3bTZpT1o0RTBo?=
- =?utf-8?B?c043TUFCNTYwQ3V1d01lMUh3QnRDUGtRZUdJWE9wUGJST1FVRDl1VERiTk9n?=
- =?utf-8?B?Zk9ZTVc5MlJtYndONWx0dXN1K0FIbWE2aThPTnpTRFA4WFNZbVQ5d2NXYi85?=
- =?utf-8?B?cnIzWHNhMU1aWkF1UGtsb2F4WGZtNms1aXltRWlXSTRVeEhTZmY4eDh2d0NL?=
- =?utf-8?B?elhvSjAxcWV6SklydURuVDNLendtWnpmbjNsVU4rV2U5aEFvQnlSTmhxekVy?=
- =?utf-8?B?bVFBU2J4bU1Xb05IUVpDMEpvU2lXeGhNRnFGbXJkeFVpZXhpbk4yQldkV3FY?=
- =?utf-8?B?M3RqOWJ2N1FLUWQzQUhDOStKY0R2V0t4YzBCVVlmVmxsNTZzd1ZYb2x6YXFH?=
- =?utf-8?B?bTJreUtmY2JVbkVpdkhGWTFiKzE4ME4zMFNSRzdqcXlrb1U2T1g3OWUwZCtC?=
- =?utf-8?B?VXBuN2pVMkZGMW9vZ25yYjBZUG5tdCtBRnRhcW00SnA2MGo2VzRNVkhNa01W?=
- =?utf-8?B?WHNvcDhUVjhiSlFPd3Z3MC9hMG5RRlM1RXJPVncrbGUvN3luODVCTVg2dTdu?=
- =?utf-8?B?UlZuQ2ZpWlYyQUcyZkt6NXlockhKZ1FMQWcrMWVwRDM2V0NlUEhsTE5Ic2ps?=
- =?utf-8?B?TWlsclRWTVhzNFVVL05MUGhJZVRVWU1FQWoxQkZ6aXFobVNoM2RadjFRT0M1?=
- =?utf-8?B?cFpxVG1TYWhhVWJUM3dyRDRVQm5BeGVWeFFoQlhPNmRkcU5HamgxMVcreDVi?=
- =?utf-8?B?ZExDMnc0Wk1SMGExanIrcVllRHRGOVY5T0owN1Nycjh3cTFJMFFlTkhhTnFi?=
- =?utf-8?B?bmlBWWJ6VVUrMTdsb1pPZ3U5S05paERrNTZFa2JpM0pBU3l4ZTBKZW1aMUNj?=
- =?utf-8?B?NXlmbng3YklBOUt5Wm9BRUlhOU1vZWpySWxtU2g3dFJvbXczUjZpR2tLbUlQ?=
- =?utf-8?Q?4r85qRd1FJn7R1FDNUj+tKj/L?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cca56653-13f6-4f0e-9c7b-08db8fd73955
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2023 01:57:54.8515
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xfDszr2i4bgtG1u8fA+Vw8SaUvj9VWI/gD8C6XmHHUZDk/Hg78XW2JKomlC4LNrKiEnjBe4yrPZJrh5ZAREdeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6722
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla Thunderbird
+From:   wuzongyong <wuzongyo@mail.ustc.edu.cn>
+To:     linux-kernel@vger.kernel.org, thomas.lendacky@amd.com,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     linux-coco@lists.linux.dev
+Subject: [Question] int3 instruction generates a #UD in SEV VM
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: LkAmygC3vAw3hMRkVCzAAA--.25069S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3GF4xWw43WryfCF4xJF48Crg_yoW3JF1fpr
+        4rAw43GFW8Gw18ArWUWF1UtryUtF1UAa1DJr1UAF1UJFyUWw1qqr1Uur429FnrJr4fZFy3
+        t34Dta12vry7CaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyIb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
+        jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+        C2z280aVCY1x0267AKxVWxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+        F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+        4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCF04k20xvY0x0EwIxGrwCFx2Iq
+        xVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r
+        106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AK
+        xVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7
+        xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWU
+        JVW8JbIYCTnIWIevJa73UjIFyTuYvjxUgg_TUUUUU
+X-CM-SenderInfo: pzx200xj1rqzxdloh3xvwfhvlgxou0/
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
+I am writing a firmware in Rust to support SEV based on project td-shim[1].
+But when I create a SEV VM (just SEV, no SEV-ES and no SEV-SNP) with the firmware,
+the linux kernel crashed because the int3 instruction in int3_selftest() cause a
+#UD.
+The stack is as follows:
+    [    0.141804] invalid opcode: 0000 [#1] PREEMPT SMP^M
+    [    0.141804] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.3.0+ #37^M
+    [    0.141804] RIP: 0010:int3_selftest_ip+0x0/0x2a^M
+    [    0.141804] Code: eb bc 66 90 0f 1f 44 00 00 48 83 ec 08 48 c7 c7 90 0d 78 83
+c7 44 24 04 00 00 00 00 e8 23 fe ac fd 85 c0 75 22 48 8d 7c 24 04 <cc>
+90 90 90 90 83 7c 24 04 01 75 13 48 c7 c7 90 0d 78 83 e8 42 fc^M
+    [    0.141804] RSP: 0000:ffffffff82803f18 EFLAGS: 00010246^M
+    [    0.141804] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000007ffffffe^M
+    [    0.141804] RDX: ffffffff82fd4938 RSI: 0000000000000296 RDI: ffffffff82803f1c^M
+    [    0.141804] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000fffeffff^M
+    [    0.141804] R10: ffffffff82803e08 R11: ffffffff82f615a8 R12: 00000000ff062350^M
+    [    0.141804] R13: 000000001fddc20a R14: 000000000090122c R15: 0000000002000000^M
+    [    0.141804] FS:  0000000000000000(0000) GS:ffff88801f200000(0000) knlGS:0000000000000000^M
+    [    0.141804] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
+    [    0.141804] CR2: ffff888004c00000 CR3: 000800000281f000 CR4: 00000000003506f0^M
+    [    0.141804] Call Trace:^M
+    [    0.141804]  <TASK>^M
+    [    0.141804]  alternative_instructions+0xe/0x100^M
+    [    0.141804]  check_bugs+0xa7/0x110^M
+    [    0.141804]  start_kernel+0x320/0x430^M
+    [    0.141804]  secondary_startup_64_no_verify+0xd3/0xdb^M
+    [    0.141804]  </TASK>^M
+    [    0.141804] Modules linked in:^M
+    [    0.141804] ---[ end trace 0000000000000000 ]--
 
+Then I tried to figure out the problem and do some test with qemu & OVMF in SEV.
+But the behaviour is also weird when I create SEV VM with qemu & OVMF.
 
-On 29/7/23 09:49, Sean Christopherson wrote:
-> On Thu, 15 Jun 2023 16:37:48 +1000, Alexey Kardashevskiy wrote:
->> This is to use another AMD SEV-ES hardware assisted register swap,
->> more detail in 6/9. In the process it's been suggested to fix other
->> things, here is the attempt, with the great help of amders.
->>
->> The previous conversation is here:
->> https://lore.kernel.org/r/20230411125718.2297768-1-aik@amd.com
->>
->> [...]
-> 
-> Finally applied to kvm-x86 svm, thanks!  Though I was *really* tempted to see
-> just how snarky the pings would get at week 5+ ;-)
+I found the int3 instruction always generated a #UD if I put a int3 instruction before
+gen_pool_create() in mce_gen_pool_create(). But if I put the int3 instruction after the
+gen_pool_create() in mce_gen_pool_create(), the int3 instruction generated a #BP rightly.
 
-Thanks!
-Here is a gist what it could look like:
-https://www.spinics.net/lists/kvm-ppc/msg20903.html :)
+    // linux/arch/x86/kernel/cpu/mce/genpool.c
+    static int mce_gen_pool_create(void)
+    {
+        struct gen_pool *tmpp;
+        int ret = -ENOMEM;
+   
+        asm volatile ("int3\n\t"); // generated a # UD
+        tmpp = gen_pool_create(ilog2(sizeof(struct mce_evt_list)), -1);
+        asm volatile ("int3\n\t"); // generated a #BP
+        ...
+    }
 
+The stack is as follows when I put the int3 instruction before gen_pool_create().
 
-> 
-> [1/9] KVM: SEV: move set_dr_intercepts/clr_dr_intercepts from the header
->        https://github.com/kvm-x86/linux/commit/b265ee7bae11
-> [2/9] KVM: SEV: Move SEV's GP_VECTOR intercept setup to SEV
->        https://github.com/kvm-x86/linux/commit/29de732cc95c
-> [3/9] KVM: SVM: Rewrite sev_es_prepare_switch_to_guest()'s comment about swap types
->        https://github.com/kvm-x86/linux/commit/f8d808ed1ba0
-> [4/9] KVM: SEV-ES: explicitly disable debug
->        https://github.com/kvm-x86/linux/commit/2837dd00f8fc
-> [5/9] KVM: SVM/SEV/SEV-ES: Rework intercepts
->        https://github.com/kvm-x86/linux/commit/5aefd3a05fe1
-> [6/9] KVM: SEV: Enable data breakpoints in SEV-ES
->        https://github.com/kvm-x86/linux/commit/fb71b1298709
-> [7/9] KVM: SEV-ES: Eliminate #DB intercept when DebugSwap enabled
->        https://github.com/kvm-x86/linux/commit/8b54cc7e1817
-> [8/9] KVM: SVM: Don't defer NMI unblocking until next exit for SEV-ES guests
->        https://github.com/kvm-x86/linux/commit/c54268e1036f
-> [9/9] KVM: SVM: Don't try to pointlessly single-step SEV-ES guests for NMI window
->        https://github.com/kvm-x86/linux/commit/e11f81043a12
-> 
-> --
-> https://github.com/kvm-x86/linux/tree/next
-> https://github.com/kvm-x86/linux/tree/fixes
+    [    0.094846] invalid opcode: 0000 [#1] PREEMPT SMP^M
+    [    0.094994] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.3.0+ #101^M
+    [    0.094994] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 2/2/2022^M
+    [    0.094994] RIP: 0010:mcheck_cpu_init+0x4e/0x150^M
+    [    0.094994] Code: 84 c0 0f 89 97 00 00 00 48 8b 45 28 f6 c4 40 0f 84 8a 00 00 00 e8 c2
+e6 ff ff 48 89 ef e8 8a e2 ff ff 85 c0 0f 88 94 00 00 00 <cc> e8 dc 05 00 00 85 c0 75 76
+80 0d a1 90 0a 02 20 0f b6 45 01 3c^M
+    [    0.094994] RSP: 0000:ffffffff92803ef8 EFLAGS: 00010246^M
+    [    0.094994] RAX: 0000000000000000 RBX: 0000000000000058 RCX: 00000000ffffffff^M
+    [    0.094994] RDX: 0000000000000002 RSI: 00000000000000ff RDI: ffffffff930ed860^M
+    [    0.094994] RBP: ffffffff930ed860 R08: 0000000000000000 R09: 0000000000000000^M
+    [    0.094994] R10: 0000000000000000 R11: 0000000000000254 R12: 0000000000000207^M
+    [    0.094994] R13: 000000001f9ec018 R14: 000000001fe85928 R15: 0000000000000001^M
+    [    0.094994] FS:  0000000000000000(0000) GS:ffff8ae0dca00000(0000) knlGS:0000000000000000^M
+    [    0.094994] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
+    [    0.094994] CR2: ffff8ae0dac01000 CR3: 000800001881f000 CR4: 00000000003506f0^M
+    [    0.094994] Call Trace:^M
+    [    0.094994]  <TASK>^M
+    [    0.094994]  identify_cpu+0x2cb/0x500^M
+    [    0.094994]  identify_boot_cpu+0x10/0xb0^M
+    [    0.094994]  check_bugs+0xf/0x110^M
+    [    0.094994]  start_kernel+0x320/0x430^M
+    [    0.094994]  secondary_startup_64_no_verify+0xd3/0xdb^M
+    [    0.094994]  </TASK>^M
+    [    0.094994] Modules linked in:^M
+    [    0.094995] ---[ end trace 0000000000000000 ]---^
 
--- 
-Alexey
+The stack is as follows when I put the int3 instruction after gen_pool_create().
+    [    0.095585] int3: 0000 [#1] PREEMPT SMP^M
+    [    0.095590] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.3.0+ #101^M
+    [    0.095593] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 2/2/2022^M
+    [    0.095594] RIP: 0010:mcheck_cpu_init+0x4f/0x150^M
+    [    0.095597] Code: c0 0f 89 97 00 00 00 48 8b 45 28 f6 c4 40 0f 84 8a 00 00 00 e8 c2 e6
+ff ff 48 89 ef e8 8a e2 ff ff 85 c0 0f 88 94 00 00 00 cc <e8> dc 05 00 00 85 c0 75 76 80 
+0d a1 90 0a 02 20 0f b6 45 01 3c 02^M
+    [    0.095598] RSP: 0000:ffffffff86803ef8 EFLAGS: 00000246^M
+    [    0.095599] RAX: 0000000000000000 RBX: 0000000000000058 RCX: 00000000ffffffff^M
+    [    0.095600] RDX: 0000000000000002 RSI: 00000000000000ff RDI: ffffffff870ed860^M
+    [    0.095601] RBP: ffffffff870ed860 R08: 0000000000000000 R09: 0000000000000000^M
+    [    0.095601] R10: 0000000000000000 R11: 0000000000000254 R12: 0000000000000207^M
+    [    0.095602] R13: 000000001f9ec018 R14: 000000001fe85928 R15: 0000000000000001^M
+    [    0.095604] FS:  0000000000000000(0000) GS:ffff901e5ca00000(0000) knlGS:0000000000000000^M
+    [    0.095605] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
+    [    0.095606] CR2: ffff901e5ac01000 CR3: 000800001881f000 CR4: 00000000003506f0^M
+    [    0.095606] Call Trace:^M
+    [    0.095611]  <TASK>^M
+    [    0.095612]  identify_cpu+0x2cb/0x500^M
+    [    0.095615]  identify_boot_cpu+0x10/0xb0^M
+    [    0.095618]  check_bugs+0xf/0x110^M
+    [    0.095620]  start_kernel+0x320/0x430^M
+    [    0.095622]  secondary_startup_64_no_verify+0xd3/0xdb^M
+    [    0.095625]  </TASK>^M
+    [    0.095625] Modules linked in:^M
+    [    0.096577] ---[ end trace 0000000000000000 ]---^
+BTW, if a create a normal VM without SEV by qemu & OVMF, the int3 instruction always generates a
+#BP.
+So I am confused now about the behaviour of int3 instruction, could anyone help to explain the behaviour?
+Any suggestion is appreciated!
+
+[1] https://github.com/confidential-containers/td-shim
+
+Thanks,
+Wu Zongyo
+
