@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69B447679D1
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:39:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99E8C7679D3
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:39:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236694AbjG2Ajb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:39:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59042 "EHLO
+        id S236718AbjG2Ajf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 20:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236346AbjG2Ail (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:38:41 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012DF49E3
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:52 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bbb97d27d6so18295185ad.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:52 -0700 (PDT)
+        with ESMTP id S236552AbjG2Air (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 20:38:47 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED4449E8
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:54 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d0fff3cf2d7so2562485276.2
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591046; x=1691195846;
+        d=google.com; s=20221208; t=1690591048; x=1691195848;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BLQZx+pdtuh57o1wL4zXWuuQZRskZOiKVGsasrVHJ/k=;
-        b=nnPTjTg5f/WzRDY0G2F5g9I/MpwEw80DlkwGP2Q2BChxakWYZQ2XnR8JayKvBVdnKQ
-         CKM3viDb8jPmE5GbrYha5aGJnTTlWFTmcIwmJivT3eDJTxFD2URsQENK6Eh81rE2xWMX
-         RZ6ITjibLuUEHo6PcwrfwHDxR4zT0ua5AfnmwXcHoZWyfmSg6BKa2ZB33/ML8XAQvrii
-         QVgpwwc2XmC0hCNaWSi8QIWcL1JJXowfEhL7mHg+gIk9DRqso5bgtfBwOHN/w13q7zh2
-         P+wiqOsuQFN2OQWzT2ZZ47jXKsfPKtt9IpQyAyPKY3qGjr0jtZBF7Ch+Qk2dIeOH50IR
-         vSMw==
+        bh=w199spolidmz1fyWW2Lr4cL/pHW9KEOboysIoigRNpA=;
+        b=DrhecqVPQeLMP91ubgEGu6G/jHyWR4//Lad7FZiEySEklpS4P1wiOZupUHqW/ZjTAY
+         Qc2O+aSQCxUoaI2hSjEjV6ICPMoEYiI/GB3LLTYh8g6SG83BAN4KuJG0rOSqKHyJQ6+k
+         paUMofkHmyHbueb3IEOlz7jeH0HHA+RoEI9CWRflI8qxBnLZeDeBhpL76Rd0pFtN6BFv
+         V8G7CP4W7qnDGSWeKWVac5kpCNXWOdfPOm0KSvSo4TZgIjbmMLsl4KYqh5wpnE4g/fxP
+         UZIo3ILZlXQ8MTNA4ijFkX0NpuTKiC4UU3mKTPYa6sQJtt/aDbT7apbEJQfp0Nikwdi0
+         8MKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591046; x=1691195846;
+        d=1e100.net; s=20221208; t=1690591048; x=1691195848;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BLQZx+pdtuh57o1wL4zXWuuQZRskZOiKVGsasrVHJ/k=;
-        b=M6szxeY/up+cUq0nW2y5YjwMIV4jIeJUr/6lH2QzAamBy0U7Km2OKxA6gqnh/COLhQ
-         FRrRgBeBL7waK1oFcUx3v5Fd5hkL4rTTLUONkTod+XJqHnQs7ThWPbzKCGeo4lHN7r7r
-         CnsHELFgDflJsLBh11IscrqEhIPN/6AzvX0gcrjJzeaqUO6EpMfl9hTxIJ+vxGvamTWE
-         goPTDXYQovc8Ln8gr+R4xNrNCHxknMPBVbxD5n35Zmw/PAIs08oP0GOBdWF5I6udMxvz
-         wI/mfV+PsKIvALpIcoRNMDp21yBI184caEv7MLEQZk8wigVYOeXwoLJD1isDQiOkYDRl
-         x7hQ==
-X-Gm-Message-State: ABy/qLbUMb/tjzrkUg3Oc8VuMDTY985tjfhDLAA34U6rG+YgaovDkyP6
-        vPQymP+k+pOAKLsZ109FhxQ70KcaoqU=
-X-Google-Smtp-Source: APBJJlFlrrUE1tksLhPAq+kwjI0L4IaBgwLyAp0oEOf6o8ykeMtkOh9QkcD45fcBdHtiq3t7HikG7TyuqI0=
+        bh=w199spolidmz1fyWW2Lr4cL/pHW9KEOboysIoigRNpA=;
+        b=TkWc47mrznN2R+gbLbE8bzkrp/VXtTR2SNdRdFRLfwxj5gj4e5yFO/NU9sIQbFM91u
+         4SzbFF0+jGothqhESZOZ0KidgA7bOPjP6qQLHQ0Z1vo/IDsKRuL614uKSU1yJx6DVmmA
+         +PvxDjGfFd2TTvvB0JBPLLrPxi6oMe6waDsR0XyRlS5nZNG2dOExFu+fKQfcBlLFyq/5
+         6/+Bcg670RXTj/RK9WiVtdS5SqchL/13uevjU0dV7nTJLWy9/L7umEFjsUobn2uAA04J
+         krbFtIU2hYQd/MGe8dwFH2bZZK7BXqoJ+dGk+KG9yotZamqCtgJdidKQ89N5VgfJhG4b
+         J7PA==
+X-Gm-Message-State: ABy/qLZdVqKoompniVPXol8nFtITD0F9VDkifvfl1GJlNNrQUsC44ZUq
+        a97Vpn3sTiwkposi+ZjF7PG3qAMaDSE=
+X-Google-Smtp-Source: APBJJlEkIujTI85kXI9jRFQI7RC5mYrZ6Cg6VIZeTCAXQQnRxYdIDgUz9r2skvpYxnizApg4b/YiqoDb0dM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da83:b0:1b3:c62d:71b5 with SMTP id
- j3-20020a170902da8300b001b3c62d71b5mr12053plx.0.1690591046611; Fri, 28 Jul
- 2023 17:37:26 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:4d4:0:b0:d1a:4d0e:c11c with SMTP id
+ 203-20020a2504d4000000b00d1a4d0ec11cmr16550ybe.11.1690591048693; Fri, 28 Jul
+ 2023 17:37:28 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:36:30 -0700
+Date:   Fri, 28 Jul 2023 17:36:31 -0700
 In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-22-seanjc@google.com>
-Subject: [PATCH v4 21/34] KVM: selftests: Convert the Hyper-V extended
- hypercalls test to printf asserts
+Message-ID: <20230729003643.1053367-23-seanjc@google.com>
+Subject: [PATCH v4 22/34] KVM: selftests: Convert the Hyper-V feature test to
+ printf style GUEST_ASSERT
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -78,35 +78,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert x86's Hyper-V extended hypercalls test to use printf-based
-GUEST_ASSERT_EQ().
+Convert x86's Hyper-V feature test to use print-based guest asserts.
+Opportunistically use the EQ and NE variants in a few places to capture
+additional information.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c  | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .../selftests/kvm/x86_64/hyperv_features.c    | 31 +++++++++++++------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-index 73af44d2167f..0107d54a1a08 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
-@@ -8,6 +8,7 @@
-  * Copyright 2022 Google LLC
-  * Author: Vipin Sharma <vipinsh@google.com>
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 78606de9385d..41a6beff78c4 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -4,6 +4,8 @@
+  *
+  * Tests for Hyper-V features enablement
   */
 +#define USE_GUEST_ASSERT_PRINTF 1
++
+ #include <asm/kvm_para.h>
+ #include <linux/kvm_para.h>
+ #include <stdint.h>
+@@ -53,16 +55,21 @@ static void guest_msr(struct msr_data *msr)
+ 		vector = rdmsr_safe(msr->idx, &msr_val);
  
- #include "kvm_util.h"
- #include "processor.h"
-@@ -84,7 +85,7 @@ int main(void)
+ 	if (msr->fault_expected)
+-		GUEST_ASSERT_3(vector == GP_VECTOR, msr->idx, vector, GP_VECTOR);
++		__GUEST_ASSERT(vector == GP_VECTOR,
++			       "Expected #GP on %sMSR(0x%x), got vector '0x%x'",
++			       msr->idx, msr->write ? "WR" : "RD", vector);
+ 	else
+-		GUEST_ASSERT_3(!vector, msr->idx, vector, 0);
++		__GUEST_ASSERT(!vector,
++			       "Expected success on %sMSR(0x%x), got vector '0x%x'",
++			       msr->idx, msr->write ? "WR" : "RD", vector);
  
- 	switch (get_ucall(vcpu, &uc)) {
- 	case UCALL_ABORT:
--		REPORT_GUEST_ASSERT_2(uc, "arg1 = %ld, arg2 = %ld");
-+		REPORT_GUEST_ASSERT(uc);
- 		break;
- 	case UCALL_DONE:
- 		break;
+ 	if (vector || is_write_only_msr(msr->idx))
+ 		goto done;
+ 
+ 	if (msr->write)
+-		GUEST_ASSERT_3(msr_val == msr->write_val, msr->idx,
+-			       msr_val, msr->write_val);
++		__GUEST_ASSERT(!vector,
++			       "WRMSR(0x%x) to '0x%llx', RDMSR read '0x%llx'",
++			       msr->idx, msr->write_val, msr_val);
+ 
+ 	/* Invariant TSC bit appears when TSC invariant control MSR is written to */
+ 	if (msr->idx == HV_X64_MSR_TSC_INVARIANT_CONTROL) {
+@@ -82,7 +89,7 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
+ 	u64 res, input, output;
+ 	uint8_t vector;
+ 
+-	GUEST_ASSERT(hcall->control);
++	GUEST_ASSERT_NE(hcall->control, 0);
+ 
+ 	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
+ 	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
+@@ -96,10 +103,14 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
+ 
+ 	vector = __hyperv_hypercall(hcall->control, input, output, &res);
+ 	if (hcall->ud_expected) {
+-		GUEST_ASSERT_2(vector == UD_VECTOR, hcall->control, vector);
++		__GUEST_ASSERT(vector == UD_VECTOR,
++			       "Expected #UD for control '%u', got vector '0x%x'",
++			       hcall->control, vector);
+ 	} else {
+-		GUEST_ASSERT_2(!vector, hcall->control, vector);
+-		GUEST_ASSERT_2(res == hcall->expect, hcall->expect, res);
++		__GUEST_ASSERT(!vector,
++			       "Expected no exception for control '%u', got vector '0x%x'",
++			       hcall->control, vector);
++		GUEST_ASSERT_EQ(res, hcall->expect);
+ 	}
+ 
+ 	GUEST_DONE();
+@@ -495,7 +506,7 @@ static void guest_test_msrs_access(void)
+ 
+ 		switch (get_ucall(vcpu, &uc)) {
+ 		case UCALL_ABORT:
+-			REPORT_GUEST_ASSERT_3(uc, "MSR = %lx, arg1 = %lx, arg2 = %lx");
++			REPORT_GUEST_ASSERT(uc);
+ 			return;
+ 		case UCALL_DONE:
+ 			break;
+@@ -665,7 +676,7 @@ static void guest_test_hcalls_access(void)
+ 
+ 		switch (get_ucall(vcpu, &uc)) {
+ 		case UCALL_ABORT:
+-			REPORT_GUEST_ASSERT_2(uc, "arg1 = %lx, arg2 = %lx");
++			REPORT_GUEST_ASSERT(uc);
+ 			return;
+ 		case UCALL_DONE:
+ 			break;
 -- 
 2.41.0.487.g6d72f3e995-goog
 
