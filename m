@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D426E767A21
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48C08767A25
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:50:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236871AbjG2Ati (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:49:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41374 "EHLO
+        id S230010AbjG2Atk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 20:49:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236917AbjG2AtW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:49:22 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D165449C
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:48:43 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bbb97d27d6so18320195ad.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:48:43 -0700 (PDT)
+        with ESMTP id S237004AbjG2AtX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 20:49:23 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CEE44AE
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:48:46 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d1851c52f3dso2422798276.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:48:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591659; x=1691196459;
+        d=google.com; s=20221208; t=1690591661; x=1691196461;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hf66Tg9z6eVGNOq7lITDvOc5Z8kagkKjdF0cIF19+es=;
-        b=zUDVdE4s613ECH4ZKVOZpSs/h2tRe54frXNJRURqJl+8Ioud7FLFpSGd152eUfIe5F
-         xPlxDaq0772s0mVBoDJQk5nL4DAEn1P9/YTIRGqB5ythke/tuxa1B3kUdub1M6GRfARi
-         SWYZuWo87quC1VB4Vf6nzVK80CxCjKJd5jxmW7cFtzuojyVIaQxKGnDaTbkIyqK4wvi7
-         e6N4JtHwrsCpnvh2Jub/ZvB9cJudmmIjBl8RbquwbYbzqg34fwECoUAQdeP07wsO7TJg
-         EoaamLDm4yNiiCYHJxSmV0FlFoYljDv21lPnWdjd5txWiXVKzQWEDTuos8ytThOSce33
-         OFNA==
+        bh=RfXXcqZt8v+vEMviQaB4ha8ro96aOmyFYUDExhL33FE=;
+        b=D+29wkyjLypapSHoJge1mpaMfPBHgyoydIEBosT6gdt3ZIvLSr9lW379+2twDS+9NN
+         x8d9jNCpmbUF5qFqVmqFdk+q9BOi6GRROVAhUNufVZHuH6xCedDb3S1GXzaf2+a6ZkYX
+         WcXffBZ+IgjsHuqASHKxYMFPAvTTogbstpNmvwdmcZfL5QGGqsYFEVkYc1tStEL2L7sv
+         dyx2fHZlILnrsMXJcxTxFXr21doH+/dcswCPHamiZcg0CTfh3gRu70ahmuRwaMmXANTi
+         8kjx7ldkDSK4tsFuKQyxCI2MgK/iVhypCHeoILCPx/DAHwGdTB54OBNagVdOVid8O9KI
+         lAUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591659; x=1691196459;
+        d=1e100.net; s=20221208; t=1690591661; x=1691196461;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Hf66Tg9z6eVGNOq7lITDvOc5Z8kagkKjdF0cIF19+es=;
-        b=XNZC0iPcVb/1TiEa/pRA94U0UlBVDkcudS4tUylgo5r/ThbYVeuXOsUt2iDNd+oHi1
-         KnYbXSCOzCNoWiaAV+PwF00bbqNvegOmN++/cYG4dR1WtvfGaXuGidQLu5353OtMoB2q
-         0IXNuXkWzu/iG+3nHHIzZ+QKdGaOu2ZQO4tRLqFvFdhVD0/smvyGRyTDX/qr92/Ba3Hy
-         pn8m5dT30mkHnQezWkeNsFvUvHSXwBbugdlG6B+ZVlxToRlsnFVmFfn52GGK1jEx9LXE
-         ufzX+DeMANJVPy06mq6qllw6OIfQu7CdpHCXx3GgsNBU0mh4zcLVsCRrrCaPYVqJwUzl
-         uDtA==
-X-Gm-Message-State: ABy/qLb3iYfswYwGeyJcmDldn/kYgjfH7x5DltDJF/C1bsk/GAKfWdra
-        XbfWuWmouYu74JrC34hwehDOxad+TvQ=
-X-Google-Smtp-Source: APBJJlFZSuUMKPPrvoE2ynK0duyoGM6nzTda9N0M8pKiwM4XCb33H5djCKpyMcK75B3Q4hg2sCX7qCMfWrE=
+        bh=RfXXcqZt8v+vEMviQaB4ha8ro96aOmyFYUDExhL33FE=;
+        b=WLIfaKCxGzFbq7v4FwmDpjm1g1Yro5Fn0u/Kyp9BoepXEX8RBqb3+Arf4vkS4wW7MJ
+         9VoFHpBQx7WMlhXtAAdA/Kig5DzoPNC5O14zMvpS/TA1+X4MBpKIXrJ3CwnMtBVCVz3f
+         JQ9UttuaviDnxOlsFCJ07aF5BlMlRh0nIo1ytBIofCDp3zaQAd0rG3BcTNdzcoUQEFqf
+         NGm3jv6/7sbL0GDdTWfXwkSLHOAVkue1YrWfh9OJO8naJpYoeOpgP6h7BNBtq+e55CFA
+         THNTskdDhcSUxwqNavXlxwVpsrZqRdaHq7bcB/xswrHAhNFodCYG/SeQyI4j086qalMY
+         pofg==
+X-Gm-Message-State: ABy/qLZL5imQM2o0Jh6j1Nt1iDdkZ8fqt9Q6V5s2a0sZ3+5hX5lcYY0A
+        w7GabYwjOt/AOukMU4X+d10zBx8GA2E=
+X-Google-Smtp-Source: APBJJlERmrEreSp3KWVd66uKyABQJknJ32dmGyLRrH0CXCcgkp0WqemQ/bWIBdjSnDq4poF74oFl4nwqsdI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d2d2:b0:1b9:e8e5:b0a4 with SMTP id
- n18-20020a170902d2d200b001b9e8e5b0a4mr11360plc.8.1690591659099; Fri, 28 Jul
- 2023 17:47:39 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:100f:b0:cf9:3564:33cc with SMTP id
+ w15-20020a056902100f00b00cf9356433ccmr24322ybt.13.1690591660993; Fri, 28 Jul
+ 2023 17:47:40 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:47:18 -0700
+Date:   Fri, 28 Jul 2023 17:47:19 -0700
 In-Reply-To: <20230729004722.1056172-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729004722.1056172-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729004722.1056172-9-seanjc@google.com>
-Subject: [PATCH v3 08/12] KVM: x86/mmu: Bug the VM if a vCPU ends up in long
- mode without PAE enabled
+Message-ID: <20230729004722.1056172-10-seanjc@google.com>
+Subject: [PATCH v3 09/12] KVM: x86/mmu: Replace MMU_DEBUG with proper
+ KVM_PROVE_MMU Kconfig
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -66,74 +66,78 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Promote the ASSERT(), which is quite dead code in KVM, into a KVM_BUG_ON()
-for KVM's sanity check that CR4.PAE=1 if the vCPU is in long mode when
-performing a walk of guest page tables.  The sanity is quite cheap since
-neither EFER nor CR4.PAE requires a VMREAD, especially relative to the
-cost of walking the guest page tables.
-
-More importantly, the sanity check would have prevented the true badness
-fixed by commit 112e66017bff ("KVM: nVMX: add missing consistency checks
-for CR0 and CR4").  The missed consistency check resulted in some versions
-of KVM corrupting the on-stack guest_walker structure due to KVM thinking
-there are 4/5 levels of page tables, but wiring up the MMU hooks to point
-at the paging32 implementation, which only allocates space for two levels
-of page tables in "struct guest_walker32".
-
-Queue a page fault for injection if the assertion fails, as both callers,
-FNAME(gva_to_gpa) and FNAME(walk_addr_generic), assume that walker.fault
-contains sane info on a walk failure.  E.g. not populating the fault info
-could result in KVM consuming and/or exposing uninitialized stack data
-before the vCPU is kicked out to userspace, which doesn't happen until
-KVM checks for KVM_REQ_VM_DEAD on the next enter.
-
-Move the check below the initialization of "pte_access" so that the
-aforementioned to-be-injected page fault doesn't consume uninitialized
-stack data.  The information _shouldn't_ reach the guest or userspace,
-but there's zero downside to being paranoid in this case.
+Replace MMU_DEBUG, which requires manually modifying KVM to enable the
+macro, with a proper Kconfig, KVM_PROVE_MMU.  Now that pgprintk() and
+rmap_printk() are gone, i.e. the macro guards only KVM_MMU_WARN_ON() and
+won't flood the kernel logs, enabling the option for debug kernels is both
+desirable and feasible.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/paging_tmpl.h | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ arch/x86/kvm/Kconfig            | 13 +++++++++++++
+ arch/x86/kvm/mmu/mmu.c          |  2 +-
+ arch/x86/kvm/mmu/mmu_internal.h |  4 +---
+ 3 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index a3fc7c1a7f8d..f8d358226ac6 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -338,7 +338,6 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	}
- #endif
- 	walker->max_level = walker->level;
--	ASSERT(!(is_long_mode(vcpu) && !is_pae(vcpu)));
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 89ca7f4c1464..4e5a282cc518 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -138,6 +138,19 @@ config KVM_XEN
  
- 	/*
- 	 * FIXME: on Intel processors, loads of the PDPTE registers for PAE paging
-@@ -348,6 +347,17 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	nested_access = (have_ad ? PFERR_WRITE_MASK : 0) | PFERR_USER_MASK;
+ 	  If in doubt, say "N".
  
- 	pte_access = ~0;
++config KVM_PROVE_MMU
++	bool "Prove KVM MMU correctness"
++	depends on DEBUG_KERNEL
++	depends on KVM
++	depends on EXPERT
++	help
++	  Enables runtime assertions in KVM's MMU that are too costly to enable
++	  in anything remotely resembling a production environment, e.g. this
++	  gates code that verifies a to-be-freed page table doesn't have any
++	  present SPTEs.
 +
-+	/*
-+	 * Queue a page fault for injection if this assertion fails, as callers
-+	 * assume that walker.fault contains sane info on a walk failure.  I.e.
-+	 * avoid making the situation worse by inducing even worse badness
-+	 * between when the assertion fails and when KVM kicks the vCPU out to
-+	 * userspace (because the VM is bugged).
-+	 */
-+	if (KVM_BUG_ON(is_long_mode(vcpu) && !is_pae(vcpu), vcpu->kvm))
-+		goto error;
++	  If in doubt, say "N".
 +
- 	++walker->level;
+ config KVM_EXTERNAL_WRITE_TRACKING
+ 	bool
  
- 	do {
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d46f77734f30..21ced900c3e9 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1695,7 +1695,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 
+ static void kvm_mmu_check_sptes_at_free(struct kvm_mmu_page *sp)
+ {
+-#ifdef MMU_DEBUG
++#ifdef CONFIG_KVM_PROVE_MMU
+ 	int i;
+ 
+ 	for (i = 0; i < SPTE_ENT_PER_PAGE; i++) {
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index cfe925fefa68..40e74db6a7d5 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -6,9 +6,7 @@
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_host.h>
+ 
+-#undef MMU_DEBUG
+-
+-#ifdef MMU_DEBUG
++#ifdef CONFIG_KVM_PROVE_MMU
+ #define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
+ #else
+ #define KVM_MMU_WARN_ON(x) do { } while (0)
 -- 
 2.41.0.487.g6d72f3e995-goog
 
