@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 555407679D7
-	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:39:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D194F7679D9
+	for <lists+kvm@lfdr.de>; Sat, 29 Jul 2023 02:39:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236596AbjG2Ajv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jul 2023 20:39:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58904 "EHLO
+        id S236625AbjG2Ajx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jul 2023 20:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236519AbjG2Aiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jul 2023 20:38:55 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F84949F6
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:02 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583b256faf5so45066967b3.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:02 -0700 (PDT)
+        with ESMTP id S236607AbjG2Ai5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jul 2023 20:38:57 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7404ED9
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:04 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-56942442eb0so29272937b3.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jul 2023 17:38:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690591052; x=1691195852;
+        d=google.com; s=20221208; t=1690591054; x=1691195854;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=x4HKEzKPUNSBzX9E0pO5Q/S6phjiWeOhLiSfPQ8QooI=;
-        b=3J4eqVLdR3ykoPJRa1CUqiAo7FXGwSPiLo4xvH7nk6TpWaa/JGpNhmBWPw3KGYxRL0
-         9qMYcdR0/u6TUawhaqgYIaxBi5b32u3oPLpRlG7qWlPPXPZunewy09jWcWhC5Cl19DL7
-         zBgBnw4cSdRNiEkbsjo5Gcp2bAEBX0lBRSqsq7y6cBmpf20gsU/X+fWwZZk0O0I+ym7u
-         pJ0NqE4APMBHTdZkdJxn5Xpo8lTIwyoI4uNBVqd4epT2ornrp+APUS9uMhgYVKkxnoLv
-         zYejQkImQ3xyT5zUPKO72TgnNFsAd3LxTmVwJsnOtP65P8WX4nYqjQ+E8aENux/RDqvj
-         E9gQ==
+        bh=HaBkctuCpzeNsmYq2ZMyhzuleSw3w1r0yLS5/ARfwFU=;
+        b=0BjQf8mxVqLf9olUxXGMC1K/Q8Umy+UDlIwiZvN5AhzF5GaReKUy2Smdqy+iC5mqmM
+         ddDy5dpIo98KTcMschBba1bUW0oSSa5ow8PFtOdZWlvKFfDHrcvUc/hSjwq40Te0l75V
+         Jeo8+Q6V4F9oYBmvmUeWeDX3lXivT5TjTHwjtbtfK2clS4pfKJuUWfRg4l8sqNbXSV/C
+         G1DPyKNYjO22H4sI7oX2eTOF8JqH+iK8F/uA89XJwOSL2AkvzC/C6/GN8GBo7JvDLMkM
+         CWDHxcTfxWUbMrn4oFs1vnjHlFD3MOa0DBObIs3gjiXioSIH1IiFBp0AUYsF6OdcW031
+         WYOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690591052; x=1691195852;
+        d=1e100.net; s=20221208; t=1690591054; x=1691195854;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=x4HKEzKPUNSBzX9E0pO5Q/S6phjiWeOhLiSfPQ8QooI=;
-        b=SLMs+98VKKLPvUwKq6v/GImlJwGDJMcz4xVPZQ8sonMVWJlJh8t3Eh1tWL6GrmBJLh
-         W3nsj8ZbT+pES9s70jt6KtBZ96T0b7MTIU5G6DyDYT2tG6v81v40rA4wfyR3j4Tlbg0Z
-         AROeixmg76s4bWupfQP4/Uj0cpos00OXIPHX8KmdVaIoFPdKy5RA4Bw1OZEREvwMTMoG
-         ktaz23pyO0C1EtxUCkS6sP8IY/MtMhusoo2yrveVxvQyIUOU3f6MaEK+Fs3rB06eIFm4
-         VP9VARVuTgG777wh/TOgVXWyzNcMWLzCG3jr0IZlRR0BPBQ0pMoxDmAIUcgpoYC/yGGB
-         wxlQ==
-X-Gm-Message-State: ABy/qLbOme4fqeSWQrlkCdAmziod385lbNTw6rfD56zfDmk1N9QY9Efh
-        NX9ossVHmKJfRlPrGLV3PvJAX1C9AUE=
-X-Google-Smtp-Source: APBJJlEzrltnG1bwndm5pPHC3kHPtaj+RzjLvULD33K65TOP6Fq4kMafYhL6vJSstsfRiau2YYzr8Mp1Vdw=
+        bh=HaBkctuCpzeNsmYq2ZMyhzuleSw3w1r0yLS5/ARfwFU=;
+        b=Pn5jhXZAKsK7GROfyop5zJyB3q64E0svaOPcZ0b/rAlUUHDNMxFaGqjDBBATwuheDC
+         /wHomUNIrosBMcTF/nO0fKbQdZnp20lT/DTli840Jh3eY4eDhnivCfzfR+qbDFr592Tc
+         qeDILlRD02i5egETaoXfWx+fLQXKp/Fki4rBCTz/iwVq8iyazk31JBNHT8/Kka30E9wB
+         DTjm/28JbDd7ez9wJQCrrDBRgtoH5biPW5ohMLDoR/5fFNu7Z3JpAljKVRhAIohTwUoR
+         6/NJVP5bC6y6OZv05tRkehda5pjFb8B4lGnGs6gW8XkeSS2dr2X2+V+LMAas3ey6Fw0p
+         Wrug==
+X-Gm-Message-State: ABy/qLYHlPuAZnC+qEzazIz0N9XyDCI6hQvQ8NVVl2cxJSmQlXmAN93C
+        xEET7KRKtJYEPu/p0WFh0BIztsW/nK4=
+X-Google-Smtp-Source: APBJJlGJseaUzNmHDQp72UkoB0v5EChLeNnkGTMKsOKAgx227d/kK9tEZTDaSnghq3o8QtMG4vQKRKA0Bx0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b665:0:b0:56c:f903:8678 with SMTP id
- h37-20020a81b665000000b0056cf9038678mr39663ywk.2.1690591052589; Fri, 28 Jul
- 2023 17:37:32 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:ae68:0:b0:577:3b0c:5b85 with SMTP id
+ g40-20020a81ae68000000b005773b0c5b85mr25198ywk.0.1690591054389; Fri, 28 Jul
+ 2023 17:37:34 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 28 Jul 2023 17:36:33 -0700
+Date:   Fri, 28 Jul 2023 17:36:34 -0700
 In-Reply-To: <20230729003643.1053367-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230729003643.1053367-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.487.g6d72f3e995-goog
-Message-ID: <20230729003643.1053367-25-seanjc@google.com>
-Subject: [PATCH v4 24/34] KVM: selftests: Convert the MONITOR/MWAIT test to
- use printf guest asserts
+Message-ID: <20230729003643.1053367-26-seanjc@google.com>
+Subject: [PATCH v4 25/34] KVM: selftests: Convert x86's nested exceptions test
+ to printf guest asserts
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -71,93 +71,44 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert x86's MONITOR/MWAIT test to use printf-based guest asserts.  Add a
-macro to handle reporting failures to reduce the amount of copy+paste
-needed for MONITOR vs. MWAIT.
+Convert x86's nested exceptions test to printf-based guest asserts, and
+use REPORT_GUEST_ASSERT() instead of TEST_FAIL() so that output is
+formatted correctly.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/x86_64/monitor_mwait_test.c | 37 +++++++++++--------
- 1 file changed, 22 insertions(+), 15 deletions(-)
+ tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c b/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
-index 72812644d7f5..960fecab3742 100644
---- a/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/monitor_mwait_test.c
+diff --git a/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c b/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
+index 5f074a6da90c..4a29f59a76be 100644
+--- a/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
 @@ -1,4 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
+ // SPDX-License-Identifier: GPL-2.0-only
 +#define USE_GUEST_ASSERT_PRINTF 1
 +
- #include <fcntl.h>
- #include <stdio.h>
- #include <stdlib.h>
-@@ -16,14 +18,25 @@ enum monitor_mwait_testcases {
- 	MWAIT_DISABLED = BIT(2),
- };
+ #define _GNU_SOURCE /* for program_invocation_short_name */
  
-+/*
-+ * If both MWAIT and its quirk are disabled, MONITOR/MWAIT should #UD, in all
-+ * other scenarios KVM should emulate them as nops.
-+ */
-+#define GUEST_ASSERT_MONITOR_MWAIT(insn, testcase, vector)		\
-+do {									\
-+	bool fault_wanted = ((testcase) & MWAIT_QUIRK_DISABLED) &&	\
-+			    ((testcase) & MWAIT_DISABLED);		\
-+									\
-+	if (fault_wanted)						\
-+		__GUEST_ASSERT((vector) == UD_VECTOR,			\
-+			       "Expected #UD on " insn " for testcase '0x%x', got '0x%x'", vector); \
-+	else								\
-+		__GUEST_ASSERT(!(vector),				\
-+			       "Expected success on " insn " for testcase '0x%x', got '0x%x'", vector); \
-+} while (0)
-+
- static void guest_monitor_wait(int testcase)
- {
--	/*
--	 * If both MWAIT and its quirk are disabled, MONITOR/MWAIT should #UD,
--	 * in all other scenarios KVM should emulate them as nops.
--	 */
--	bool fault_wanted = (testcase & MWAIT_QUIRK_DISABLED) &&
--			    (testcase & MWAIT_DISABLED);
- 	u8 vector;
- 
- 	GUEST_SYNC(testcase);
-@@ -33,16 +46,10 @@ static void guest_monitor_wait(int testcase)
- 	 * intercept checks, so the inputs for MONITOR and MWAIT must be valid.
- 	 */
- 	vector = kvm_asm_safe("monitor", "a"(guest_monitor_wait), "c"(0), "d"(0));
--	if (fault_wanted)
--		GUEST_ASSERT_2(vector == UD_VECTOR, testcase, vector);
--	else
--		GUEST_ASSERT_2(!vector, testcase, vector);
-+	GUEST_ASSERT_MONITOR_MWAIT("MONITOR", testcase, vector);
- 
- 	vector = kvm_asm_safe("mwait", "a"(guest_monitor_wait), "c"(0), "d"(0));
--	if (fault_wanted)
--		GUEST_ASSERT_2(vector == UD_VECTOR, testcase, vector);
--	else
--		GUEST_ASSERT_2(!vector, testcase, vector);
-+	GUEST_ASSERT_MONITOR_MWAIT("MWAIT", testcase, vector);
- }
- 
- static void guest_code(void)
-@@ -85,7 +92,7 @@ int main(int argc, char *argv[])
- 			testcase = uc.args[1];
- 			break;
- 		case UCALL_ABORT:
--			REPORT_GUEST_ASSERT_2(uc, "testcase = %lx, vector = %ld");
-+			REPORT_GUEST_ASSERT(uc);
- 			goto done;
- 		case UCALL_DONE:
- 			goto done;
+ #include "test_util.h"
+@@ -180,9 +182,7 @@ static void assert_ucall_vector(struct kvm_vcpu *vcpu, int vector)
+ 			    "Expected L2 to ask for %d, L2 says it's done", vector);
+ 		break;
+ 	case UCALL_ABORT:
+-		TEST_FAIL("%s at %s:%ld (0x%lx != 0x%lx)",
+-			  (const char *)uc.args[0], __FILE__, uc.args[1],
+-			  uc.args[2], uc.args[3]);
++		REPORT_GUEST_ASSERT(uc);
+ 		break;
+ 	default:
+ 		TEST_FAIL("Expected L2 to ask for %d, got unexpected ucall %lu", vector, uc.cmd);
 -- 
 2.41.0.487.g6d72f3e995-goog
 
