@@ -2,130 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03AB876A02D
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 20:17:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 313E976A043
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 20:23:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbjGaSRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 14:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47816 "EHLO
+        id S230134AbjGaSXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 14:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjGaSRo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 14:17:44 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C6EC93;
-        Mon, 31 Jul 2023 11:17:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6695B6127C;
-        Mon, 31 Jul 2023 18:17:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51B5FC433C7;
-        Mon, 31 Jul 2023 18:16:55 +0000 (UTC)
-Date:   Mon, 31 Jul 2023 14:16:26 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Dan Carpenter <dan.carpenter@linaro.org>
-Cc:     Valentin Schneider <vschneid@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 06/20] tracing/filters: Optimise scalar vs
- cpumask filtering when the user mask is a single CPU
-Message-ID: <20230731141626.1b180ab1@gandalf.local.home>
-In-Reply-To: <b7cf996a-f443-402c-8e13-c5f25a964184@kadam.mountain>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
-        <20230720163056.2564824-7-vschneid@redhat.com>
-        <20230729155547.35719a1f@rorschach.local.home>
-        <04f20e58-6b24-4f44-94e2-0d12324a30e4@kadam.mountain>
-        <20230731115453.395d20c6@gandalf.local.home>
-        <b7cf996a-f443-402c-8e13-c5f25a964184@kadam.mountain>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S231426AbjGaSW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 14:22:58 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1F3E49
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:22:57 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4fe0eb0ca75so7692439e87.2
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:22:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1690827775; x=1691432575;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q6BmQQ8xDHQ3qzVuwILJuAltF2TxUquAINpFxWwuR3w=;
+        b=RTUp1GcE9TWV1qTvNE1C02wFkvp/rEJhtk+51nISvyjgPTusv53crdnWdpbT2WDNpC
+         9czQGReCauWeNFu8mJtHkId8ASDjhvZWALHZh+SyhEMqoUTqhxssydzxa6uZBKj0qYrD
+         vcyzEEjHdxO76TNZyKc9O24YAUeb5rdAfQi7xglRc7Oz8U/VK20seE+TqLxPiIUEF2AF
+         p2ypuV+xtoforGGsa/Lt/KyL8w4KTS3XdMdpYfXyMrVCX/d56Us0p1xCWIGjqH506lyL
+         NZbaDWWhUfPFLWX9TmHQaEyEA1UmGoVZusjLFfEFIf7D4qJ0RegD+CSe3GcPeA3rkzoJ
+         xi6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690827775; x=1691432575;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q6BmQQ8xDHQ3qzVuwILJuAltF2TxUquAINpFxWwuR3w=;
+        b=XCfO4QnrtSWrZXNXAYI3+yzh5zKLX5VzVN7gbBooHa4cQ6Gw6DAEyI72cfyJ8Zu0P3
+         I+I4QyX0yZ5fJxXdfIOt0wz8gCFKUVT6O2z5Ge0GAMr1QmRKei4ftPDG6JgJBI6Glr4k
+         T8SkAXFWl0jEmiQzvqM6siyaTGwHpDwgGnq/twan2tVlcVEtKyIKWdLcVWHZBsZNVFaQ
+         Fl+pHLi6yVIpMf28yvfcSXO/a3APcTw51OWfXwdhCSyvEC1NQmCJbJ8AR7x53PUxnS3o
+         LD9+pnHEPa3m8YumRovOzVBDkWmlcMWLNiWq0SLjAywXicaWRr/v0CLxlQJXinVc3Wfl
+         Pxrg==
+X-Gm-Message-State: ABy/qLaRJCPnEMwkzPfLHzxuJ/W/0Zn6HVsodaZ0jCCfXf4Bw5yKZ2Aw
+        KRs98u/0+8xG0eu2WM9g+a/L3rzSxjHyWQJr+xE=
+X-Google-Smtp-Source: APBJJlE51QtfiG+1ENPBZcz/MTN10/l7Xyhmr/3dD4Lp00ivZz+NffJEl0iYsoUxrdAsUIsDuqY10A==
+X-Received: by 2002:ac2:5e34:0:b0:4fe:3e89:fcb1 with SMTP id o20-20020ac25e34000000b004fe3e89fcb1mr383296lfg.68.1690827775288;
+        Mon, 31 Jul 2023 11:22:55 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id u7-20020a170906408700b0098de7d28c34sm6476150ejj.193.2023.07.31.11.22.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 11:22:54 -0700 (PDT)
+Date:   Mon, 31 Jul 2023 20:22:54 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [PATCH v4 09/34] KVM: selftests: Add a selftest for guest prints
+ and formatted asserts
+Message-ID: <20230731-4335e61b2b2688a925025a9c@orel>
+References: <20230729003643.1053367-1-seanjc@google.com>
+ <20230729003643.1053367-10-seanjc@google.com>
+ <20230731-91b64a6b787ba7e23b285785@orel>
+ <ZMfpgu8bHH0jA8Si@google.com>
+ <ZMftM3qz/VqalbPg@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMftM3qz/VqalbPg@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 31 Jul 2023 19:03:04 +0300
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
-
-> > > > Nit, the above can be written as:
-> > > > 
-> > > > 			pred->op = pret->op != OP_BAND ? : OP_EQ;
-> > > >     
+On Mon, Jul 31, 2023 at 10:19:47AM -0700, Sean Christopherson wrote:
+> On Mon, Jul 31, 2023, Sean Christopherson wrote:
+> > On Mon, Jul 31, 2023, Andrew Jones wrote:
+> > > diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+> > > index 4cf69fa8bfba..4adf526dc378 100644
+> > > --- a/tools/testing/selftests/kvm/include/ucall_common.h
+> > > +++ b/tools/testing/selftests/kvm/include/ucall_common.h
+> > > @@ -6,8 +6,19 @@
+> > >   */
+> > >  #ifndef SELFTEST_KVM_UCALL_COMMON_H
+> > >  #define SELFTEST_KVM_UCALL_COMMON_H
+> > > +#include <linux/kvm.h>
+> > >  #include "test_util.h"
+> > >  
+> > > +#if defined(__aarch64__)
+> > > +#define UCALL_EXIT_REASON      KVM_EXIT_MMIO
+> > > +#elif defined(__x86_64__)
+> > > +#define UCALL_EXIT_REASON      KVM_EXIT_IO
+> > > +#elif defined(__s390x__)
+> > > +#define UCALL_EXIT_REASON      KVM_EXIT_S390_SIEIC
+> > > +#elif defined(__riscv)
+> > > +#define UCALL_EXIT_REASON      KVM_EXIT_RISCV_SBI
+> > > +#endif
+> > > +
+> > >  /* Common ucalls */
+> > >  enum {
+> > >         UCALL_NONE,
 > > > 
-> > > Heh.  Those are not equivalent.  The right way to write this is:  
+> > > and then compiled the test for riscv and it passed. I also ran all other
+> > > riscv tests successfully.
 > > 
-> > You mean because of my typo?  
+> > Can I have your SoB for the ucall_common.h patch?  I'll write a changelog and fold
+> > in a separate prep patch for that change.
 > 
-> No, I hadn't seen the s/pred/pret/ typo.  Your code does:
-> 
-> 	if (pred->op != OP_BAND)
-> 		pred->op = true;
-> 	else
-> 		pred->op OP_EQ;
+> On second thought, I take that back.  I think it makes more sense to add a ucall.h
+> for each arch and #define the exit type there.  All then move all of the
+> ucall_arch_do_ucall() implementations to ucall.h (except maybe x86 while it has
+> the horrific save/restore GPRs hack...).  That way the #define is colocated with
+> the code that generates the exit reason.
 
-Ah, for some reason I was thinking the ? : just was just a nop, but I guess
-it is to assign the cond value :-/
+Yup, feel free to just take the above as inspiration and create a
+different patch. If you decide you want an s-o-b for the above, though,
+then here's one
 
-But of course every place I've done that, it was the condition value I
-wanted, which was the same as the value being assigned.
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
 
 Thanks,
-
--- Steve
-
+drew
