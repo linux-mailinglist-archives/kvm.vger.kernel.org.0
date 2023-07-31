@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C67F8769C5A
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:25:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D7FD769C5B
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233325AbjGaQZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:25:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58368 "EHLO
+        id S233207AbjGaQ0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:26:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbjGaQZu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:25:50 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E751A19AC
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:33 -0700 (PDT)
+        with ESMTP id S233025AbjGaQZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:25:55 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413E919A5
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690820733; x=1722356733;
+  t=1690820739; x=1722356739;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Kl0SGGt7OdcIiPqVNrEI2K05JRMW2feCGQzusuuxZsU=;
-  b=ZSaeIIX8vVJPb6dR9lChMuNLK0ZDDBoc/La/u7JWVwjnRuo07H0CkrX6
-   St6L9uxfEILQ1cIZy8MbINgUCNKmWvhC7zJ0eMYqtTtRCef6aFWoC4UNQ
-   LHq+Dm3Rg8bIINKUYF8UD8BhJYLfZmpllrYvBH4JAaAYMQCaL4b5x3SHu
-   beyMvFvH1sAtEfEYqlI667Pm0ZNYKIsGO1cKt6qjBeD1pqV/PiUDs3nvo
-   xjiuV7umh55Cnjo5hD7XDMC4JRULXRL8N7r5cB8vclM0sRS923ZygFFbD
-   Qw72wHGLiDItIYAXeJYJswXyaJ5Vt9unokEI7FImoPkLb7nx/ujIcNrC8
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993482"
+  bh=vc/AA0VTFSVygJctuEuxWBeG2HxDcS51m4hly05CELA=;
+  b=GUPLHFSHSkscfc67A30+H4NptkD4P86sE6btL89ZnMGR1Bsae0t84xVY
+   +GW7ug1mCTxt2zz6FwnZ/zlTW9ku9ZxpxhVC3m65Sk8eihzZkEcg/iKFM
+   Vz8eLE+CUVEYSiNj2PJTnsJDNt2UYKcv+6GsKQLkDdGlYWTjtFEUA0kCV
+   72ZGoh4cDxBKqHxnviPh5CFIS9pFLf+zFmAiv1JMTl2SkkVFvFpbzHIOY
+   Arg2EV19vBZEMsipi6WBlAhqKbgS0uO8O8Nv3yoYJVMMfHEi5Y/9Iw+wt
+   TV46U5zhAXuDAZO0U8FHd3P102jmD2cS6fzxtt66YA1aad3hMwHG5Q8Qk
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993494"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="353993482"
+   d="scan'208";a="353993494"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:33 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984213"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984252"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="757984213"
+   d="scan'208";a="757984252"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:29 -0700
+  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:33 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,9 +55,9 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         xiaoyao.li@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 09/19] i386/kvm: Create gmem fd for KVM_X86_SW_PROTECTED_VM
-Date:   Mon, 31 Jul 2023 12:21:51 -0400
-Message-Id: <20230731162201.271114-10-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 10/19] kvm: Introduce support for memory_attributes
+Date:   Mon, 31 Jul 2023 12:21:52 -0400
+Message-Id: <20230731162201.271114-11-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
@@ -73,92 +73,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Register a memory listener for KVM_X86_SW_PROVTED_VM. It creates gmem
-for the backend who sets the private property.
+Introcude the helper functions to set the attributes of a range of
+memory to private and shared.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- include/exec/memory.h |  1 +
- target/i386/kvm/kvm.c | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+ accel/kvm/kvm-all.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm.h |  3 +++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index e119d3ce1a1d..ddf0e14970b0 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -814,6 +814,7 @@ struct IOMMUMemoryRegion {
- #define MEMORY_LISTENER_PRIORITY_MIN            0
- #define MEMORY_LISTENER_PRIORITY_ACCEL          10
- #define MEMORY_LISTENER_PRIORITY_DEV_BACKEND    10
-+#define MEMORY_LISTENER_PRIORITY_ACCEL_HIGH     20
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 7b1818334ba7..6dd22fa4fd6f 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -105,6 +105,7 @@ bool kvm_msi_use_devid;
+ bool kvm_has_guest_debug;
+ static int kvm_sstep_flags;
+ static bool kvm_immediate_exit;
++static uint64_t kvm_supported_memory_attributes;
+ static hwaddr kvm_max_slot_size = ~0;
  
- /**
-  * struct MemoryListener: callbacks structure for updates to the physical memory map
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 7971f0fd74b1..df3a5f89396e 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -37,6 +37,7 @@
- #include "hyperv-proto.h"
- 
- #include "exec/gdbstub.h"
-+#include "exec/ramblock.h"
- #include "qemu/host-utils.h"
- #include "qemu/main-loop.h"
- #include "qemu/ratelimit.h"
-@@ -2591,8 +2592,41 @@ static void register_smram_listener(Notifier *n, void *unused)
-                                  &smram_address_space, 1, "kvm-smram");
+ static const KVMCapabilityInfo kvm_required_capabilites[] = {
+@@ -1343,6 +1344,44 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
+     kvm_max_slot_size = max_slot_size;
  }
  
-+static void kvm_x86_sw_protected_vm_region_add(MemoryListener *listenr,
-+                                       MemoryRegionSection *section)
++static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
 +{
-+    MemoryRegion *mr = section->mr;
-+    Object *owner = memory_region_owner(mr);
-+    int fd;
++    struct kvm_memory_attributes attrs;
++    int r;
 +
-+    if (owner && object_dynamic_cast(owner, TYPE_MEMORY_BACKEND) &&
-+        object_property_get_bool(owner, "private", NULL) &&
-+        mr->ram_block && mr->ram_block->gmem_fd < 0) {
-+        struct kvm_create_guest_memfd gmem = {
-+            .size = memory_region_size(mr),
-+            /* TODO: to decide whether KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is supported */
-+            .flags = KVM_GUEST_MEMFD_ALLOW_HUGEPAGE,
-+        };
++    attrs.attributes = attr;
++    attrs.address = start;
++    attrs.size = size;
++    attrs.flags = 0;
 +
-+        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_GUEST_MEMFD, &gmem);
-+        if (fd < 0) {
-+            error_report("%s: error creating gmem: %s\n", __func__, strerror(-fd));
-+            exit(1);
-+        }
-+        memory_region_set_gmem_fd(mr, fd);
++    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
++    if (r) {
++        warn_report("%s: failed to set memory (0x%lx+%#zx) with attr 0x%lx error '%s'",
++                     __func__, start, size, attr, strerror(errno));
 +    }
++    return r;
 +}
 +
-+static MemoryListener kvm_x86_sw_protected_vm_memory_listener = {
-+    .name = "kvm_x86_sw_protected_vm_memory_listener",
-+    .region_add = kvm_x86_sw_protected_vm_region_add,
-+    /* Higher than KVM memory listener = 10. */
-+    .priority = MEMORY_LISTENER_PRIORITY_ACCEL_HIGH,
-+};
-+
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-+    X86MachineState *x86ms = X86_MACHINE(ms);
-     uint64_t identity_base = 0xfffbc000;
-     uint64_t shadow_mem;
-     int ret;
-@@ -2617,6 +2651,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         return ret;
-     }
- 
-+    if (x86ms->vm_type == KVM_X86_SW_PROTECTED_VM) {
-+        memory_listener_register(&kvm_x86_sw_protected_vm_memory_listener, &address_space_memory);
++int kvm_set_memory_attributes_private(hwaddr start, hwaddr size)
++{
++    if (!(kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
++        error_report("KVM doesn't support PRIVATE memory attribute\n");
++        return -EINVAL;
 +    }
 +
-     if (!kvm_check_extension(s, KVM_CAP_IRQ_ROUTING)) {
-         error_report("kvm: KVM_CAP_IRQ_ROUTING not supported by KVM");
-         return -ENOTSUP;
++    return kvm_set_memory_attributes(start, size, KVM_MEMORY_ATTRIBUTE_PRIVATE);
++}
++
++int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size)
++{
++    if (!(kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
++        error_report("KVM doesn't support PRIVATE memory attribute\n");
++        return -EINVAL;
++    }
++
++    return kvm_set_memory_attributes(start, size, 0);
++}
++
+ /* Called with KVMMemoryListener.slots_lock held */
+ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                              MemoryRegionSection *section, bool add)
+@@ -2556,6 +2595,10 @@ static int kvm_init(MachineState *ms)
+     }
+     s->as = g_new0(struct KVMAs, s->nr_as);
+ 
++    if (kvm_check_extension(s, KVM_CAP_MEMORY_ATTRIBUTES)) {
++        kvm_supported_memory_attributes = kvm_ioctl(s, KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES, 0);
++    }
++
+     if (object_property_find(OBJECT(current_machine), "kvm-type")) {
+         g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
+                                                             "kvm-type",
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 115f0cca79d1..49c896d8a512 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -580,4 +580,7 @@ bool kvm_arch_cpu_check_are_resettable(void);
+ bool kvm_dirty_ring_enabled(void);
+ 
+ uint32_t kvm_dirty_ring_size(void);
++
++int kvm_set_memory_attributes_private(hwaddr start, hwaddr size);
++int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size);
+ #endif
 -- 
 2.34.1
 
