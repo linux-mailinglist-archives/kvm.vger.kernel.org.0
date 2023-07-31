@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2457876A373
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 23:55:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1759076A37F
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 23:57:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231653AbjGaVzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 17:55:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33200 "EHLO
+        id S231650AbjGaV50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 17:57:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231623AbjGaVzR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 17:55:17 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E66D1B6
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 14:55:16 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c475c6da6so2984987a12.2
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 14:55:16 -0700 (PDT)
+        with ESMTP id S231478AbjGaV5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 17:57:25 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EDB133
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 14:57:23 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bba9a0da10so34927465ad.2
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 14:57:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690840516; x=1691445316;
+        d=google.com; s=20221208; t=1690840643; x=1691445443;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mxm0zlWAhsdwPNs5iJKIB42nBu2Sipk2tDe8KMVu/ek=;
-        b=ytmpshOAB12qGqTyFlWk5nuibqbjszjzG8HlzRak1nXLBRIW7mqhUOB3pdnUEqnw9p
-         ULxnWPLZRD2mRlVyB/5q0bX5aw1YvfLLdUMnRf4zI7SyNr0EH4R4tqZ2ZiseNI/YvKYQ
-         OZ7Y8CSXug8EnjUACyUdgtTfIF4qmkOQgAhYTbRl3Yf5EpZjTT6Y30q2mELLLrGNzfAI
-         TWHiUWWZhxH6y1Ge+v/UQbVXBXj23ItOQKCwVAD9/GNOUpV5F9QWb/vBOmkWUJSZ5ia8
-         2yt2+GgEWjOZeaHfuSn3YEhuGE3VZrD7PEIEAsa/FVk3PFxtUHAMyfY0BGbbF9GkdiQc
-         vKOA==
+        bh=q7XDjhCYt7FGRw55Y+SxXkLDr9VBzRKTPxUQEL1DO0A=;
+        b=0r14oa0yxeLPoDTcrUFQsdRmJ1MzKa5X6LsW73dNl1PU/OSY0zRi/GXEUUtRuunzke
+         BEXFYTKK9dhr/btpqKk9/KxGb46VF7nLnK8mdvlEa2Vqw6gx1jzqrm22oIwqY9XYoVAB
+         o6tMTCDy9zYK4CsNQNKSC8DRFIK6HeIcOJBJcWQcv4dx4BpPRccobsOEqeM2JlWM0c+x
+         tRilDqJw0H63lLGsTpxmR4Bilf75D9M09hSNVeFdNixjCrNPPDkxBE6WoQW7XXZ0GnKM
+         oLzZ0TTXsq0m1tiYsjmkycSmFXfux5P5Y7E/la2Cz24A5F+xCBn6/y1+P7bnaB9/Ug+S
+         oKIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690840516; x=1691445316;
+        d=1e100.net; s=20221208; t=1690840643; x=1691445443;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mxm0zlWAhsdwPNs5iJKIB42nBu2Sipk2tDe8KMVu/ek=;
-        b=lDss5B6WXX7spjPnn+hAtss7eVi9KZT3TIwWya7mYvyMHTtR+lVS5YYbl5fcjRQQrF
-         Zl0DykVuoJwpSr2J4drOnzkiWbJ0Pnx5aoj/K+tP+RYPEh/ClC7CgQvRKuj1/wGMWSdS
-         1II7vRKDFURtapM7xKIf8im1xRMnTZkcSDp7p5t3x/V355qUvy2rihv8Ou4mq0MlYmt3
-         hxxuMkA0BHrJemtmcSBD7g3ShErdxKrsmatVeTscGHMuUebXExHLaLfQRoYV87GepOXE
-         S76JHkOk/o3BGZoBGinmuXXpioc/QFLNbr1cnvBL1HyLHo/+5NGKutcn45DbliMzM9Bk
-         U2eA==
-X-Gm-Message-State: ABy/qLbBh2jPyok9ViTJ50AWHb0NbdUH9TcrHsUfK7+c82r/zVjZM4rh
-        0mSaMOPIdyuIg501BMPFUrUoPovkshI=
-X-Google-Smtp-Source: APBJJlHx/oZJ65GqvDqk2V7Za+tbO1+mKQOFTUapwiCiODu7Ma2pbwshPhgFtt7G52AjT0XsLIyUCa+03cU=
+        bh=q7XDjhCYt7FGRw55Y+SxXkLDr9VBzRKTPxUQEL1DO0A=;
+        b=JT5MxU6qIPbZVtjB1y4BReLmK1TA8GCGHLeDsozS15FprzXRu2DblKWRgLbyy+OYtf
+         2zOl13Y2Aj68VVURI0F8g+z6TX5zKjRFqD1zsYaNta08Q1PzgAG/d+6uolA7I139n8FF
+         dMGwntepGAHBdYNkxqGEs/zlsERKE5pT+6CP+gvf9xi8jkvB1566nyX2L0prJjPttF4I
+         M5+i1qxgK4N+/B3nAC8Tve8cyBNmtSRbF85v+cUvjTdn28pQad71DisTSDNB5EeO8r0w
+         xkW2sIvHzDZgFYVWowcQlf9qKxVwyR5pTE3VeaiQYKbTbzV+d+ntIcJWpHSt58WnkZt6
+         BZ5Q==
+X-Gm-Message-State: ABy/qLZ+ii50q4byAwi/EZd6tUp7sWinCmQrsnX9F0dHvxZeft9ox8YS
+        QDby9S09ayl8FjqMk7zq/a65ld4eWOk=
+X-Google-Smtp-Source: APBJJlEt1EFA1GYHjWvxsA4wpLnQLY4u9T6tmKWhLJwuz8A3I/H56oGiC/ODlllK4HuoyYxAZYF+nbSducE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2309:b0:1b3:bfa6:d064 with SMTP id
- d9-20020a170903230900b001b3bfa6d064mr49693plh.1.1690840515767; Mon, 31 Jul
- 2023 14:55:15 -0700 (PDT)
-Date:   Mon, 31 Jul 2023 14:55:14 -0700
-In-Reply-To: <20230722022251.3446223-5-rananta@google.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:2291:b0:1b5:2b14:5f2c with SMTP id
+ b17-20020a170903229100b001b52b145f2cmr50366plh.4.1690840643199; Mon, 31 Jul
+ 2023 14:57:23 -0700 (PDT)
+Date:   Mon, 31 Jul 2023 14:57:21 -0700
+In-Reply-To: <20230722022251.3446223-1-rananta@google.com>
 Mime-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-5-rananta@google.com>
-Message-ID: <ZMgtwp/YCZciRvdr@google.com>
-Subject: Re: [PATCH v7 04/12] KVM: Allow range-based TLB invalidation from
- common code
+References: <20230722022251.3446223-1-rananta@google.com>
+Message-ID: <ZMguQayWzKU3/8o5@google.com>
+Subject: Re: [PATCH v7 00/12] KVM: arm64: Add support for FEAT_TLBIRANGE
 From:   Sean Christopherson <seanjc@google.com>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Oliver Upton <oliver.upton@linux.dev>,
@@ -70,8 +69,7 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
         linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
-        Shaoqin Huang <shahuang@redhat.com>
+        kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -85,21 +83,29 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Sat, Jul 22, 2023, Raghavendra Rao Ananta wrote:
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index ec169f5c7dce..eb88d25f9896 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -278,16 +278,15 @@ static inline bool kvm_available_flush_remote_tlbs_range(void)
->  	return kvm_x86_ops.flush_remote_tlbs_range;
->  }
->  
-> -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> -				 gfn_t nr_pages)
-> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn, u64 pages)
+>  arch/arm64/include/asm/kvm_asm.h     |   3 +
+>  arch/arm64/include/asm/kvm_host.h    |   6 ++
+>  arch/arm64/include/asm/kvm_pgtable.h |  10 +++
+>  arch/arm64/include/asm/tlbflush.h    | 109 ++++++++++++++-------------
+>  arch/arm64/kvm/Kconfig               |   1 -
+>  arch/arm64/kvm/arm.c                 |   6 --
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  11 +++
+>  arch/arm64/kvm/hyp/nvhe/tlb.c        |  30 ++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         |  90 +++++++++++++++++++---
+>  arch/arm64/kvm/hyp/vhe/tlb.c         |  27 +++++++
+>  arch/arm64/kvm/mmu.c                 |  15 +++-
+>  arch/mips/include/asm/kvm_host.h     |   4 +-
+>  arch/mips/kvm/mips.c                 |  12 +--
+>  arch/riscv/kvm/mmu.c                 |   6 --
+>  arch/x86/include/asm/kvm_host.h      |   7 +-
+>  arch/x86/kvm/mmu/mmu.c               |  25 ++----
+>  arch/x86/kvm/mmu/mmu_internal.h      |   3 -
+>  arch/x86/kvm/x86.c                   |   2 +-
+>  include/linux/kvm_host.h             |  20 +++--
+>  virt/kvm/Kconfig                     |   3 -
+>  virt/kvm/kvm_main.c                  |  35 +++++++--
+>  21 files changed, 294 insertions(+), 131 deletions(-)
 
-Please keep "nr_pages", I have a very strong preference for that over just "pages"
-as the "nr_" makes it super obvious that it's a single number, as opposed to an
-array of pages or something.
-
-And it doesn't truly matter, but IMO the gfn_t type is more appropriate since
-the gfn and the number of pages need to have the same type.
+Unless I've missed something, nothing in this series conflicts with anything that's
+on the horizon for x86, so feel free to take this through the ARM tree once we've
+emerged from behind the bikeshed :-)
