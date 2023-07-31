@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5C4768D16
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:05:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1CAE768D17
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:05:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230438AbjGaHF2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:05:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
+        id S231338AbjGaHFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:05:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231292AbjGaHFL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231293AbjGaHFL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 31 Jul 2023 03:05:11 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32442D7C;
-        Mon, 31 Jul 2023 00:03:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6804E30C2;
+        Mon, 31 Jul 2023 00:03:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690787006; x=1722323006;
+  t=1690787007; x=1722323007;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=noUm+C4jbhw0mC8rdAqNdlrDhDQPWQ7nu1SRrIUqW1s=;
-  b=YqjGgIpxHd+MyCCKsj/PXXANmFffEjhIol5/Iwsj97J/WB5+w4bjgnfN
-   A448lQRdmWSHBAqncR6wPqQIwvjj7B4Kg6cJ7+QwkytIEpaVUWFtUAd5t
-   xMq9T1ReaTc8L2I/u6ROhDRYnIZKC/xoXosrmo6V6cEQ9e4ize5YXEKeO
-   oxNg1iE7mOgmo5RhOGZegwFldHSrw5YWLM3aIjipGOyqH5kkbXVdQnOg1
-   IcGOgwkd9Jj1x9Hh/fV1cZa9LkfLQljQ0OEH23/9zrKems8agx+/ikx1L
-   0tEaNr+uCZOzefE1Ofef1EO2HfQJHLrMUYU8Xp31I0vnGIL1GINsjhtid
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649423"
+  bh=X4MZTo9+yUn1bPdeMYVQLWvNe1DyIq6KwUj9R7l5YRg=;
+  b=QocNXTlIXc34bawMb/E6KEk5BOVfTXd5aiGhQ8x+s6OXgz3JN+pMLZDe
+   f0zoordHLjPtlYLmo2qSnu5I8JuVFADeMcZADUIEObyOPDlIgXJ2bj+0X
+   y/kXP2Dz7kBDK1G7S4DGi1lGfJYJq5nOnQqWZoQzaw7k7OAxApxk6wbfQ
+   gXCZEU5IqEki7e+b2zytPuA+AtINAMMpbE91HcN+Xag4SKVD4tQ8aKjIG
+   4lZ02HJUxwCytys+rVfeko6TqwCUwusgUPTPNGp5Njp5iYnHBz5RQaHEV
+   V2M1D6x7Tn4GDJuIdOqLA+mcjg5fKxlc22Dg18NT+XZYHX6FnfElLqDMu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649458"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="371649423"
+   d="scan'208";a="371649458"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:14 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:15 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="871543485"
+   d="scan'208";a="871543489"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:15 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:16 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 24/36] x86/idtentry: Incorporate definitions/declarations of the FRED external interrupt handler type
-Date:   Sun, 30 Jul 2023 23:33:05 -0700
-Message-Id: <20230731063317.3720-25-xin3.li@intel.com>
+Subject: [PATCH v9 25/36] x86/traps: Add a system interrupt handler table for system interrupt dispatch
+Date:   Sun, 30 Jul 2023 23:33:06 -0700
+Message-Id: <20230731063317.3720-26-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731063317.3720-1-xin3.li@intel.com>
 References: <20230731063317.3720-1-xin3.li@intel.com>
@@ -125,220 +125,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-FRED operates differently from IDT in terms of interrupt handling.
-Instead of directly dispatching an interrupt to its handler based
-on the interrupt vector, FRED requires the software to dispatch
-an event to its handler based on both the event's type and vector.
-Therefore, an event dispatch framework must be implemented to
-facilitate the event-to-handler dispatch process.
+From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-The FRED event dispatch framework assumes control once an event is
-delivered, starting from two FRED entry points, after which several
-event dispatch tables are introduced to facilitate the dispatching.
-The first level dispatching is event type based, and two tables need
-to be defined, one for ring 3 event dispatching, and the other for
-ring 0. The second level dispatching is event vector based, and
-several tables need to be defined, e.g., an exception handler table
-for exception dispatching.
+On x86, external interrupts can be categorized into two groups:
+  1) System interrupts
+  2) External device interrupts
 
-Handlers in these tables are typically noinstr. However for external
-interrupt dispatching, irqentry_{enter,exit}() and
-instrumentation_{begin,end}() can be extracted from respective interrupt
-handler to the dispatch framework. As a result, FRED external interrupt
-handlers don't need to be noinstr.
+All external device interrupts are directed to the common_interrupt(),
+which, in turn, dispatches these external device interrupts using a
+per-CPU external device interrupt dispatch table vector_irq.
 
-Incorporate definitions/declarations of FRED external interrupt handler
-types into the IDT entry macros.
+To handle system interrupts, a system interrupt handler table needs to
+be introduced. This table enables the direct dispatching of a system
+interrupt to its corresponding handler. As a result, a software-based
+dispatch function will be implemented as:
 
-It is probably better to rename idtentry as event_entry.
+  void external_interrupt(struct pt_regs *regs)
+  {
+    u8 vector = regs->vector;
+    if (is_system_interrupt(vector))
+      system_interrupt_handlers[vector_to_sysvec(vector)](regs);
+    else /* external device interrupt */
+      common_interrupt(regs);
+  }
 
+Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+Co-developed-by: Xin Li <xin3.li@intel.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
 
 Changes since v8:
-* Put IDTENTRY changes in a separate patch (Thomas Gleixner).
----
- arch/x86/include/asm/idtentry.h | 91 +++++++++++++++++++++++++++++----
- 1 file changed, 82 insertions(+), 9 deletions(-)
+* Remove junk code that assumes no local APIC on x86_64 (Thomas Gleixner).
 
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index 6817c0f8e323..e67d111bf932 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -167,17 +167,22 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
- 
- /**
-  * DECLARE_IDTENTRY_IRQ - Declare functions for device interrupt IDT entry
-- *			  points (common/spurious)
-+ *			  points (common/spurious) and their corresponding
-+ *			  software based dispatch handlers in the non-noinstr
-+ *			  text section
-  * @vector:	Vector number (ignored for C)
-  * @func:	Function name of the entry point
-  *
-- * Maps to DECLARE_IDTENTRY_ERRORCODE()
-+ * Maps to DECLARE_IDTENTRY_ERRORCODE(), plus a dispatch function prototype
-  */
- #define DECLARE_IDTENTRY_IRQ(vector, func)				\
--	DECLARE_IDTENTRY_ERRORCODE(vector, func)
-+	DECLARE_IDTENTRY_ERRORCODE(vector, func);			\
-+	void dispatch_##func(struct pt_regs *regs, unsigned long error_code)
- 
- /**
-  * DEFINE_IDTENTRY_IRQ - Emit code for device interrupt IDT entry points
-+ *			 and their corresponding software based dispatch
-+ *			 handlers in the non-noinstr text section
-  * @func:	Function name of the entry point
-  *
-  * The vector number is pushed by the low level entry stub and handed
-@@ -187,6 +192,11 @@ __visible noinstr void func(struct pt_regs *regs, unsigned long error_code)
-  * irq_enter/exit_rcu() are invoked before the function body and the
-  * KVM L1D flush request is set. Stack switching to the interrupt stack
-  * has to be done in the function body if necessary.
-+ *
-+ * dispatch_func() is a software based dispatch handler in the non-noinstr
-+ * text section, assuming the irqentry_{enter,exit}() and
-+ * instrumentation_{begin,end}() helpers are invoked in the external
-+ * interrupt dispatch framework before and after dispatch_func().
-  */
- #define DEFINE_IDTENTRY_IRQ(func)					\
- static void __##func(struct pt_regs *regs, u32 vector);			\
-@@ -204,31 +214,68 @@ __visible noinstr void func(struct pt_regs *regs,			\
- 	irqentry_exit(regs, state);					\
- }									\
- 									\
-+__visible void dispatch_##func(struct pt_regs *regs,			\
-+			       unsigned long error_code)		\
-+{									\
-+	u32 vector = (u32)(u8)error_code;				\
-+									\
-+	kvm_set_cpu_l1tf_flush_l1d();					\
-+	run_irq_on_irqstack_cond(__##func, regs, vector);		\
-+}									\
-+									\
- static noinline void __##func(struct pt_regs *regs, u32 vector)
- 
-+/*
-+ * Define a function type system_interrupt_handler as the element type of
-+ * the table system_interrupt_handlers.
-+ *
-+ * System interrupt handlers don't take any interrupt vector number, or
-+ * any interrupt error code as arguments, as a system interrupt handler
-+ * is defined to handle a specific interrupt vector, and no error code
-+ * is defined for external interrupts. It takes only one argument of type
-+ * struct pt_regs *.
-+ */
-+#define DECLARE_SYSTEM_INTERRUPT_HANDLER(f) \
-+	void f (struct pt_regs *regs)
-+#define DEFINE_SYSTEM_INTERRUPT_HANDLER(f) \
-+	__visible DECLARE_SYSTEM_INTERRUPT_HANDLER(f)
-+typedef DECLARE_SYSTEM_INTERRUPT_HANDLER((*system_interrupt_handler));
-+
- /**
-  * DECLARE_IDTENTRY_SYSVEC - Declare functions for system vector entry points
-+ *			     and their corresponding software based dispatch
-+ *			     handlers in the non-noinstr text section
-  * @vector:	Vector number (ignored for C)
-  * @func:	Function name of the entry point
-  *
-- * Declares three functions:
-+ * Declares four functions:
-  * - The ASM entry point: asm_##func
-  * - The XEN PV trap entry point: xen_##func (maybe unused)
-  * - The C handler called from the ASM entry point
-+ * - The C handler used in the system interrupt handler table
-  *
-- * Maps to DECLARE_IDTENTRY().
-+ * Maps to DECLARE_IDTENTRY(), plus a dispatch table function prototype
-  */
- #define DECLARE_IDTENTRY_SYSVEC(vector, func)				\
--	DECLARE_IDTENTRY(vector, func)
-+	DECLARE_IDTENTRY(vector, func);					\
-+	DECLARE_SYSTEM_INTERRUPT_HANDLER(dispatch_table_##func)
- 
- /**
-  * DEFINE_IDTENTRY_SYSVEC - Emit code for system vector IDT entry points
-+ *			    and their corresponding software based dispatch
-+ *			    handlers in the non-noinstr text section
-  * @func:	Function name of the entry point
-  *
-  * irqentry_enter/exit() and irq_enter/exit_rcu() are invoked before the
-  * function body. KVM L1D flush request is set.
-  *
-- * Runs the function on the interrupt stack if the entry hit kernel mode
-+ * Runs the function on the interrupt stack if the entry hit kernel mode.
-+ *
-+ * dispatch_table_func() is used to fill the system interrupt handler table
-+ * for system interrupts dispatching, assuming the irqentry_{enter,exit}()
-+ * and instrumentation_{begin,end}() helpers are invoked in the external
-+ * interrupt dispatch framework before and after dispatch_table_func(),
-+ * thus in the non-noinstr text section.
-  */
- #define DEFINE_IDTENTRY_SYSVEC(func)					\
- static void __##func(struct pt_regs *regs);				\
-@@ -244,11 +291,19 @@ __visible noinstr void func(struct pt_regs *regs)			\
- 	irqentry_exit(regs, state);					\
- }									\
- 									\
-+DEFINE_SYSTEM_INTERRUPT_HANDLER(dispatch_table_##func)			\
-+{									\
-+	kvm_set_cpu_l1tf_flush_l1d();					\
-+	run_sysvec_on_irqstack_cond(__##func, regs);			\
-+}									\
-+									\
- static noinline void __##func(struct pt_regs *regs)
- 
- /**
-  * DEFINE_IDTENTRY_SYSVEC_SIMPLE - Emit code for simple system vector IDT
-- *				   entry points
-+ *				   entry points and their corresponding
-+ *				   software based dispatch handlers in
-+ *				   the non-noinstr text section
-  * @func:	Function name of the entry point
-  *
-  * Runs the function on the interrupted stack. No switch to IRQ stack and
-@@ -256,6 +311,12 @@ static noinline void __##func(struct pt_regs *regs)
-  *
-  * Only use for 'empty' vectors like reschedule IPI and KVM posted
-  * interrupt vectors.
-+ *
-+ * dispatch_table_func() is used to fill the system interrupt handler table
-+ * for system interrupts dispatching, assuming the irqentry_{enter,exit}()
-+ * and instrumentation_{begin,end}() helpers are invoked in the external
-+ * interrupt dispatch framework before and after dispatch_table_func(),
-+ * thus in the non-noinstr text section.
-  */
- #define DEFINE_IDTENTRY_SYSVEC_SIMPLE(func)				\
- static __always_inline void __##func(struct pt_regs *regs);		\
-@@ -273,6 +334,14 @@ __visible noinstr void func(struct pt_regs *regs)			\
- 	irqentry_exit(regs, state);					\
- }									\
- 									\
-+DEFINE_SYSTEM_INTERRUPT_HANDLER(dispatch_table_##func)			\
-+{									\
-+	__irq_enter_raw();						\
-+	kvm_set_cpu_l1tf_flush_l1d();					\
-+	__##func (regs);						\
-+	__irq_exit_raw();						\
-+}									\
-+									\
- static __always_inline void __##func(struct pt_regs *regs)
- 
- /**
-@@ -647,7 +716,11 @@ DECLARE_IDTENTRY_SYSVEC(X86_PLATFORM_IPI_VECTOR,	sysvec_x86_platform_ipi);
+Changes since v5:
+* Initialize system_interrupt_handlers with dispatch_table_spurious_interrupt()
+  instead of NULL to get rid of any NULL check (Peter Zijlstra).
+---
+ arch/x86/kernel/traps.c | 50 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index 49dd92458eb0..e430a8c47931 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -1488,6 +1488,56 @@ DEFINE_IDTENTRY_SW(iret_error)
+ }
  #endif
  
- #ifdef CONFIG_SMP
--DECLARE_IDTENTRY(RESCHEDULE_VECTOR,			sysvec_reschedule_ipi);
-+/*
-+ * Use DECLARE_IDTENTRY_SYSVEC instead of DECLARE_IDTENTRY to add a
-+ * software based dispatch handler declaration for RESCHEDULE_VECTOR.
-+ */
-+DECLARE_IDTENTRY_SYSVEC(RESCHEDULE_VECTOR,		sysvec_reschedule_ipi);
- DECLARE_IDTENTRY_SYSVEC(REBOOT_VECTOR,			sysvec_reboot);
- DECLARE_IDTENTRY_SYSVEC(CALL_FUNCTION_SINGLE_VECTOR,	sysvec_call_function_single);
- DECLARE_IDTENTRY_SYSVEC(CALL_FUNCTION_VECTOR,		sysvec_call_function);
++#ifdef CONFIG_X86_64
++
++static void dispatch_table_spurious_interrupt(struct pt_regs *regs)
++{
++	dispatch_spurious_interrupt(regs, regs->vector);
++}
++
++#define SYSV(x,y) [(x) - FIRST_SYSTEM_VECTOR] = y
++
++static system_interrupt_handler system_interrupt_handlers[NR_SYSTEM_VECTORS] = {
++	[0 ... NR_SYSTEM_VECTORS-1]		= dispatch_table_spurious_interrupt,
++#ifdef CONFIG_SMP
++	SYSV(RESCHEDULE_VECTOR,			dispatch_table_sysvec_reschedule_ipi),
++	SYSV(CALL_FUNCTION_VECTOR,		dispatch_table_sysvec_call_function),
++	SYSV(CALL_FUNCTION_SINGLE_VECTOR,	dispatch_table_sysvec_call_function_single),
++	SYSV(REBOOT_VECTOR,			dispatch_table_sysvec_reboot),
++#endif
++
++#ifdef CONFIG_X86_THERMAL_VECTOR
++	SYSV(THERMAL_APIC_VECTOR,		dispatch_table_sysvec_thermal),
++#endif
++
++#ifdef CONFIG_X86_MCE_THRESHOLD
++	SYSV(THRESHOLD_APIC_VECTOR,		dispatch_table_sysvec_threshold),
++#endif
++
++#ifdef CONFIG_X86_MCE_AMD
++	SYSV(DEFERRED_ERROR_VECTOR,		dispatch_table_sysvec_deferred_error),
++#endif
++
++#ifdef CONFIG_X86_LOCAL_APIC
++	SYSV(LOCAL_TIMER_VECTOR,		dispatch_table_sysvec_apic_timer_interrupt),
++	SYSV(X86_PLATFORM_IPI_VECTOR,		dispatch_table_sysvec_x86_platform_ipi),
++# ifdef CONFIG_HAVE_KVM
++	SYSV(POSTED_INTR_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_ipi),
++	SYSV(POSTED_INTR_WAKEUP_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_wakeup_ipi),
++	SYSV(POSTED_INTR_NESTED_VECTOR,		dispatch_table_sysvec_kvm_posted_intr_nested_ipi),
++# endif
++# ifdef CONFIG_IRQ_WORK
++	SYSV(IRQ_WORK_VECTOR,			dispatch_table_sysvec_irq_work),
++# endif
++	SYSV(SPURIOUS_APIC_VECTOR,		dispatch_table_sysvec_spurious_apic_interrupt),
++	SYSV(ERROR_APIC_VECTOR,			dispatch_table_sysvec_error_interrupt),
++#endif
++};
++
++#undef SYSV
++
++#endif /* CONFIG_X86_64 */
++
+ void __init trap_init(void)
+ {
+ 	/* Init cpu_entry_area before IST entries are set up */
 -- 
 2.34.1
 
