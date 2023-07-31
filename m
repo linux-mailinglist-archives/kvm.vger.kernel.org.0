@@ -2,372 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 192D876A1E3
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 22:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D22E576A205
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 22:36:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231138AbjGaUar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 16:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50140 "EHLO
+        id S230269AbjGaUgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 16:36:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230443AbjGaUai (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 16:30:38 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF4E1BC1
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 13:30:36 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-583da2ac09fso59663477b3.1
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 13:30:36 -0700 (PDT)
+        with ESMTP id S230136AbjGaUgM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 16:36:12 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 196B71BC9
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 13:36:06 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-407db3e9669so19811cf.1
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 13:36:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690835435; x=1691440235;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=cl1BnUfPmVzl1tOFjFD2R2afts0tDe1uk4lLZPQquBw=;
-        b=lKj9qHCfwbG9BK+ATtd2u8yVjuuqKFMyGX/gQ5SC9h5Z7P9XMgFbLmM4p1XiWI5aDJ
-         5WXWsuRGg28QTyf05QBHna/+bAiTjv1B7NSZrOX1eXas4fKB8WWeJxK3j5Lme96h3E+L
-         rdFG3TtqehHZB8huZSU/eK3IfD3y2gUjyqSVaLqlUh7fY/5Xs3u3f2Sz1L7dzDEx2YAx
-         VlyB7yVsjN043F3/1ky2EjAnzkiujSGJHnejU6+Afb1K0ADXkDSF4RMpB+X7NqvV9ZW8
-         hQH8CgRN/Zeo3zJKDLVzdd/VTWTedlCBPMm9F/0s4uPak8CVoPENE8i6Iv22CrXQKrtN
-         AGZA==
+        d=google.com; s=20221208; t=1690835765; x=1691440565;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8WbRt22akgzv4PmYRoTv7Z60VgxgxYtdGWVmvWN3QQU=;
+        b=S48GXM2S/zOssa/4HGYWA/fi14zXxpeMV2F4C7CVir22G8F1rsCFPMpbbATKKTGtDB
+         64U04V9zqc3NX/KcDqqznzevwdH+LBQzjjWkXhUJhWjREYzmjnwgZfC3FYc5IrYNUBlm
+         LY/EUvpLCfaeKdgtW8bCez7DItwI3/PYoIvy7INGK7YD0YSomsBbivsNBTVfKNu4nBdo
+         xivL5QLBIY+NVve5Wz1jLiXbHQ5tlLXN7oYO0s/LfS46XwncPU8xO8zWDxBIMO3Easl+
+         guS7RQ3/hKev8L86c/bpFnn92PLQF1TIWg60T0w21WW/l5BAv1hI0kYaSnXEA5R3MsmC
+         +C9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690835435; x=1691440235;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cl1BnUfPmVzl1tOFjFD2R2afts0tDe1uk4lLZPQquBw=;
-        b=U/gHTaJaC7urrljj0G15fJvUuq5cuyf+Iiu32yVvSYQTKsmEw1+j+gxbO80u7lEWz3
-         eXGBNkT+3XQFtQlAeE096o2Gbypvt8QvuDRgTgPmLf5RsyOnSfVDTob9Buq5H3zZYRnp
-         3OijzghkJKwJnZgnMjYKd0D91RINvrEHxEVzxaxhtNju8XakzpikYMg2w8SevGHRbuNK
-         9IacxDiDNpo9LN/RE3cH2x1GLqxcrKJJjupCm0anD7qBgcALJqmFJFWNvNtpVODV3Tec
-         JQeuJVOoqaty2+AwZm9o7EGgCQAxheiI/eFOYShromrLTOabi+nm0jykvIjN54+tl2cR
-         MyFg==
-X-Gm-Message-State: ABy/qLa6tO7cgWskkaRo6aC/n2l1oKlJN6p7OQawlKgr45XpPKxb/2e9
-        DGlzSBHRz8/7ddFb0oS7TLgGbtI7nd8=
-X-Google-Smtp-Source: APBJJlFZ60XZgMm9Bsfl4dWvQtDujZbM7ddrj6WAQOImQuMyuOjnCtlM/DEpxrUvr9OhY6TMj49TH+Z5RZ0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:eb14:0:b0:583:abae:56ab with SMTP id
- n20-20020a81eb14000000b00583abae56abmr83225ywm.7.1690835435651; Mon, 31 Jul
- 2023 13:30:35 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 31 Jul 2023 13:30:26 -0700
-In-Reply-To: <20230731203026.1192091-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230731203026.1192091-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230731203026.1192091-4-seanjc@google.com>
-Subject: [PATCH v4.1 3/3] KVM: selftests: Add a selftest for guest prints and
- formatted asserts
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        d=1e100.net; s=20221208; t=1690835765; x=1691440565;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8WbRt22akgzv4PmYRoTv7Z60VgxgxYtdGWVmvWN3QQU=;
+        b=T/c7jmhIQ5gXioA3Bb1OuDRCxowCuO+McMsDduXpW4jNuvvBIvDnQTBzHvxrCM4EF+
+         MLWQ4f8YSp6i9+MJ0x6fD6KQITTmcnjGMuaPVYmgBbi6trTO8B1iN3ras9mugjbpjwuP
+         M0n9+51bF3/hRBN9yUF74qrx3OgbYv85Ufg7z+Wn4ixL6o5WkwrhMvhZrIKX+AEO2PsJ
+         9K47kY+Kw99bieB3hFi70Y+U23z7h7Mz9pC3bl+hVQUOqh9kmoJVwKJIYt4VTBHd1Fh+
+         9OV4shNRpH72fWCI0RPn9n9UbsK3ubpmUXSQQlAWK3WtrvIaYlTkXgKd/VPWglnU8egD
+         qxYQ==
+X-Gm-Message-State: ABy/qLY5/U+iJkdwlF5/Y+K1w6AoPw6CokB/7W1Mxkuwt95LudaLEhMt
+        74dTkDLWIAWHNEuYJoKh1Ugjv18oXNI24r27vsJDBQ==
+X-Google-Smtp-Source: APBJJlEmoOsErptso+JLUNi7GHGxX5qEgT6biVyV0lbNK73KMKgCiYEb0JJeNHAmZZOJJPW+PoidP5ENk119vh3duf0=
+X-Received: by 2002:ac8:7f02:0:b0:407:4aa8:c5ba with SMTP id
+ f2-20020ac87f02000000b004074aa8c5bamr366494qtk.14.1690835765004; Mon, 31 Jul
+ 2023 13:36:05 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230729004144.1054885-1-seanjc@google.com>
+In-Reply-To: <20230729004144.1054885-1-seanjc@google.com>
+From:   Yu Zhao <yuzhao@google.com>
+Date:   Mon, 31 Jul 2023 14:35:29 -0600
+Message-ID: <CAOUHufaK1zibYzOxUGWgYatLnts+fOG6X8fBAwtGA_S6cdDxMw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Wrap kvm_{gfn,hva}_range.pte in a per-action union
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Anup Patel <anup@brainfault.org>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Aaron Lewis <aaronlewis@google.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Aaron Lewis <aaronlewis@google.com>
+On Fri, Jul 28, 2023 at 6:41=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Wrap kvm_{gfn,hva}_range.pte in a union so that future notifier events ca=
+n
+> pass event specific information up and down the stack without needing to
+> constantly expand and churn the APIs.  Lockless aging of SPTEs will pass
+> around a bitmap, and support for memory attributes will pass around the
+> new attributes for the range.
+>
+> Add a "KVM_NO_ARG" placeholder to simplify handling events without an
+> argument (creating a dummy union variable is midly annoying).
+>
+> Opportunstically drop explicit zero-initialization of the "pte" field, as
+> omitting the field (now a union) has the same effect.
+>
+> Cc: Yu Zhao <yuzhao@google.com>
+> Link: https://lore.kernel.org/all/CAOUHufagkd2Jk3_HrVoFFptRXM=3DhX2CV8f+M=
+-dka-hJU4bP8kw@mail.gmail.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Add a test to exercise the various features in KVM selftest's local
-snprintf() and compare them to LIBC's snprintf() to ensure they behave
-the same.
-
-This is not an exhaustive test.  KVM's local snprintf() does not
-implement all the features LIBC does, e.g. KVM's local snprintf() does
-not support floats or doubles, so testing for those features were
-excluded.
-
-Testing was added for the features that are expected to work to
-support a minimal version of printf() in the guest.
-
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-[sean: use UCALL_EXIT_REASON, enable for all architectures]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   4 +
- .../testing/selftests/kvm/guest_print_test.c  | 221 ++++++++++++++++++
- 2 files changed, 225 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/guest_print_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index f65889f5a083..77026907968f 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -123,6 +123,7 @@ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-+TEST_GEN_PROGS_x86_64 += guest_print_test
- TEST_GEN_PROGS_x86_64 += hardware_disable_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86_64 += kvm_page_table_test
-@@ -153,6 +154,7 @@ TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
-+TEST_GEN_PROGS_aarch64 += guest_print_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_aarch64 += kvm_page_table_test
- TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
-@@ -169,6 +171,7 @@ TEST_GEN_PROGS_s390x += s390x/tprot
- TEST_GEN_PROGS_s390x += s390x/cmma_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
-+TEST_GEN_PROGS_s390x += guest_print_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390x += kvm_page_table_test
- TEST_GEN_PROGS_s390x += rseq_test
-@@ -177,6 +180,7 @@ TEST_GEN_PROGS_s390x += kvm_binary_stats_test
- 
- TEST_GEN_PROGS_riscv += demand_paging_test
- TEST_GEN_PROGS_riscv += dirty_log_test
-+TEST_GEN_PROGS_riscv += guest_print_test
- TEST_GEN_PROGS_riscv += kvm_create_max_vcpus
- TEST_GEN_PROGS_riscv += kvm_page_table_test
- TEST_GEN_PROGS_riscv += set_memory_region_test
-diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
-new file mode 100644
-index 000000000000..267e01d057fb
---- /dev/null
-+++ b/tools/testing/selftests/kvm/guest_print_test.c
-@@ -0,0 +1,221 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * A test for GUEST_PRINTF
-+ *
-+ * Copyright 2022, Google, Inc. and/or its affiliates.
-+ */
-+#define USE_GUEST_ASSERT_PRINTF 1
-+
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+struct guest_vals {
-+	uint64_t a;
-+	uint64_t b;
-+	uint64_t type;
-+};
-+
-+static struct guest_vals vals;
-+
-+/* GUEST_PRINTF()/GUEST_ASSERT_FMT() does not support float or double. */
-+#define TYPE_LIST					\
-+TYPE(test_type_i64,  I64,  "%ld",   int64_t)		\
-+TYPE(test_type_u64,  U64u, "%lu",   uint64_t)		\
-+TYPE(test_type_x64,  U64x, "0x%lx", uint64_t)		\
-+TYPE(test_type_X64,  U64X, "0x%lX", uint64_t)		\
-+TYPE(test_type_u32,  U32u, "%u",    uint32_t)		\
-+TYPE(test_type_x32,  U32x, "0x%x",  uint32_t)		\
-+TYPE(test_type_X32,  U32X, "0x%X",  uint32_t)		\
-+TYPE(test_type_int,  INT,  "%d",    int)		\
-+TYPE(test_type_char, CHAR, "%c",    char)		\
-+TYPE(test_type_str,  STR,  "'%s'",  const char *)	\
-+TYPE(test_type_ptr,  PTR,  "%p",    uintptr_t)
-+
-+enum args_type {
-+#define TYPE(fn, ext, fmt_t, T) TYPE_##ext,
-+	TYPE_LIST
-+#undef TYPE
-+};
-+
-+static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-+		     const char *expected_assert);
-+
-+#define BUILD_TYPE_STRINGS_AND_HELPER(fn, ext, fmt_t, T)		     \
-+const char *PRINTF_FMT_##ext = "Got params a = " fmt_t " and b = " fmt_t;    \
-+const char *ASSERT_FMT_##ext = "Expected " fmt_t ", got " fmt_t " instead";  \
-+static void fn(struct kvm_vcpu *vcpu, T a, T b)				     \
-+{									     \
-+	char expected_printf[UCALL_BUFFER_LEN];				     \
-+	char expected_assert[UCALL_BUFFER_LEN];				     \
-+									     \
-+	snprintf(expected_printf, UCALL_BUFFER_LEN, PRINTF_FMT_##ext, a, b); \
-+	snprintf(expected_assert, UCALL_BUFFER_LEN, ASSERT_FMT_##ext, a, b); \
-+	vals = (struct guest_vals){ (uint64_t)a, (uint64_t)b, TYPE_##ext };  \
-+	sync_global_to_guest(vcpu->vm, vals);				     \
-+	run_test(vcpu, expected_printf, expected_assert);		     \
-+}
-+
-+#define TYPE(fn, ext, fmt_t, T) \
-+		BUILD_TYPE_STRINGS_AND_HELPER(fn, ext, fmt_t, T)
-+	TYPE_LIST
-+#undef TYPE
-+
-+static void guest_code(void)
-+{
-+	while (1) {
-+		switch (vals.type) {
-+#define TYPE(fn, ext, fmt_t, T)							\
-+		case TYPE_##ext:						\
-+			GUEST_PRINTF(PRINTF_FMT_##ext, vals.a, vals.b);		\
-+			__GUEST_ASSERT(vals.a == vals.b,			\
-+				       ASSERT_FMT_##ext, vals.a, vals.b);	\
-+			break;
-+		TYPE_LIST
-+#undef TYPE
-+		default:
-+			GUEST_SYNC(vals.type);
-+		}
-+
-+		GUEST_DONE();
-+	}
-+}
-+
-+/*
-+ * Unfortunately this gets a little messy because 'assert_msg' doesn't
-+ * just contains the matching string, it also contains additional assert
-+ * info.  Fortunately the part that matches should be at the very end of
-+ * 'assert_msg'.
-+ */
-+static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
-+{
-+	int len_str = strlen(assert_msg);
-+	int len_substr = strlen(expected_assert_msg);
-+	int offset = len_str - len_substr;
-+
-+	TEST_ASSERT(len_substr <= len_str,
-+		    "Expected '%s' to be a substring of '%s'\n",
-+		    assert_msg, expected_assert_msg);
-+
-+	TEST_ASSERT(strcmp(&assert_msg[offset], expected_assert_msg) == 0,
-+		    "Unexpected mismatch. Expected: '%s', got: '%s'",
-+		    expected_assert_msg, &assert_msg[offset]);
-+}
-+
-+static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-+		     const char *expected_assert)
-+{
-+	struct kvm_run *run = vcpu->run;
-+	struct ucall uc;
-+
-+	while (1) {
-+		vcpu_run(vcpu);
-+
-+		TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
-+			    "Unexpected exit reason: %u (%s),\n",
-+			    run->exit_reason, exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			TEST_FAIL("Unknown 'args_type' = %lu", uc.args[1]);
-+			break;
-+		case UCALL_PRINTF:
-+			TEST_ASSERT(strcmp(uc.buffer, expected_printf) == 0,
-+				    "Unexpected mismatch. Expected: '%s', got: '%s'",
-+				    expected_printf, uc.buffer);
-+			break;
-+		case UCALL_ABORT:
-+			ucall_abort(uc.buffer, expected_assert);
-+			break;
-+		case UCALL_DONE:
-+			return;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+static void guest_code_limits(void)
-+{
-+	char test_str[UCALL_BUFFER_LEN + 10];
-+
-+	memset(test_str, 'a', sizeof(test_str));
-+	test_str[sizeof(test_str) - 1] = 0;
-+
-+	GUEST_PRINTF("%s", test_str);
-+}
-+
-+static void test_limits(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code_limits);
-+	run = vcpu->run;
-+	vcpu_run(vcpu);
-+
-+	TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
-+		    "Unexpected exit reason: %u (%s),\n",
-+		    run->exit_reason, exit_reason_str(run->exit_reason));
-+
-+	TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_ABORT,
-+		    "Unexpected ucall command: %lu,  Expected: %u (UCALL_ABORT)\n",
-+		    uc.cmd, UCALL_ABORT);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	test_type_i64(vcpu, -1, -1);
-+	test_type_i64(vcpu, -1,  1);
-+	test_type_i64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_i64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+
-+	test_type_u64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_u64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+	test_type_x64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_x64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+	test_type_X64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_X64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+
-+	test_type_u32(vcpu, 0x90abcdef, 0x90abcdef);
-+	test_type_u32(vcpu, 0x90abcdef, 0x90abcdee);
-+	test_type_x32(vcpu, 0x90abcdef, 0x90abcdef);
-+	test_type_x32(vcpu, 0x90abcdef, 0x90abcdee);
-+	test_type_X32(vcpu, 0x90abcdef, 0x90abcdef);
-+	test_type_X32(vcpu, 0x90abcdef, 0x90abcdee);
-+
-+	test_type_int(vcpu, -1, -1);
-+	test_type_int(vcpu, -1,  1);
-+	test_type_int(vcpu,  1,  1);
-+
-+	test_type_char(vcpu, 'a', 'a');
-+	test_type_char(vcpu, 'a', 'A');
-+	test_type_char(vcpu, 'a', 'b');
-+
-+	test_type_str(vcpu, "foo", "foo");
-+	test_type_str(vcpu, "foo", "bar");
-+
-+	test_type_ptr(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-+	test_type_ptr(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-+
-+	kvm_vm_free(vm);
-+
-+	test_limits();
-+
-+	return 0;
-+}
--- 
-2.41.0.585.gd2178a4bd4-goog
-
+Acked-by: Yu Zhao <yuzhao@google.com>
