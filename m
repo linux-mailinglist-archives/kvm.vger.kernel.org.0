@@ -2,140 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE25D76A3DB
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 00:02:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE64176A3F5
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 00:11:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231744AbjGaWCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 18:02:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38198 "EHLO
+        id S231821AbjGaWLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 18:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231424AbjGaWCT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 18:02:19 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B583E49
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 15:02:17 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bba2318546so42906975ad.1
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 15:02:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690840937; x=1691445737;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sZXwDT7lSpqyD7OTKZuyX3OzGyE3jIs1AadqKpDkW4k=;
-        b=tOj5Wt8YaFbV9ywN8nWXCNvxhO7wQxvdH1VuIunjBBAFvrIRXATc1vv1fhcuEb/L70
-         6vI9iaVn3df/+UxPaojvO5Rgor46IcxGgiooU1s5haTR0pdIPEwSRwcvZPAXGyFiH3bw
-         yaFnfDJ4DE+SoVu9fyI8CWeoD2XZ2V0l7OrojyOM4pj17/rkfyxy9wlEneag46uAQUZ6
-         FYmKPIhBnvgFvsP3VgHD5an3SyGSlka7JM5wUfGW++JWly0Ywc3x1k5DWdL3frlpoAfc
-         VHK8LiITN+JKqZJy9ty314CUeJBBEZGXdkDUPtSeoOOnQYNH5vnTVmuxi6DPv/+A/NJk
-         VRXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690840937; x=1691445737;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZXwDT7lSpqyD7OTKZuyX3OzGyE3jIs1AadqKpDkW4k=;
-        b=DBrxE8ZXieaJmEdV1XU2i5SR4Y04s8+ToJXYymr6232j5cQe5DT8XuAOkNvkzsqFyX
-         upHr5Kak6e2yZAHtCXllgxhIvwixRO02DllAEaUz90NDVeae4OiOptOULHKW1PeL7QHY
-         OG80MnQnCI2xhkL/BDuox5WzJ12+pT7lbBShTEJ2GYKsCbs1cwzaiIMQ2H5bS3VxB0Cq
-         rDvyZYOjOo5HACoqbH06hSkQHXqoIi/kQrQ/GPGEcw+DSK0t7isAhySWFL89lPQv5oe6
-         ZyM1RdcZYUEvWPukAyHXfmI/4m6i6yHoHlkl9SNagyTXUPD8XRNnL3KQTzRx10CmhHom
-         UK3g==
-X-Gm-Message-State: ABy/qLbpSeTxb785yGfTpt4mZ0IfngXXTrQ7TrkY8LvV8ZwnG0WAALhw
-        xC4LUwMpoLHDeBtHSLdpxv2LLg==
-X-Google-Smtp-Source: APBJJlG/7TIXArFl9nzqfXiuLGmMf5q7GAr+Ricr4oDD2rfNy25Ng3+2Iw3hd1zL6TZ5ztIEFXv3mQ==
-X-Received: by 2002:a17:902:cec7:b0:1bc:6c8:cded with SMTP id d7-20020a170902cec700b001bc06c8cdedmr8032979plg.67.1690840936879;
-        Mon, 31 Jul 2023 15:02:16 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id f16-20020a170902ce9000b001b016313b1dsm9052782plg.86.2023.07.31.15.02.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 15:02:16 -0700 (PDT)
-Date:   Mon, 31 Jul 2023 22:02:12 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: Re: [PATCH v2 5/6] KVM: Documentation: Add the missing description
- for mmu_valid_gen into kvm_mmu_page
-Message-ID: <ZMgvZA+4FhtWB4Dl@google.com>
-References: <20230626182016.4127366-1-mizhang@google.com>
- <20230626182016.4127366-6-mizhang@google.com>
- <ZJsKsQNWVq4zNmGk@google.com>
+        with ESMTP id S231804AbjGaWLs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 18:11:48 -0400
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0580B1981;
+        Mon, 31 Jul 2023 15:11:41 -0700 (PDT)
+Received: from [192.168.105.249] ([75.104.94.137])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 36VM7txf3103048
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Mon, 31 Jul 2023 15:08:00 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 36VM7txf3103048
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2023071101; t=1690841375;
+        bh=X+M4w9IgqyGhFftvL0ts+Txt2pH1wocbrviAaT7WSp0=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=XFcw8mHtRsl4TcZ5Z+9TuwZ7pfjvdNqSpwDLDpFsAfd/pRi+FbwrTEcqslERWxffC
+         cgFKch7rqXk7xeaKLgEYkT1cKGAy6lNFxl6xQJ0fbNDJ7sv9zpYGWXBRa8N2lEo5DR
+         G/GCfDVd/qzoFF9SUxuA7hRU/ROGNY4q6TBtRqRfJXYuVJskDXCrkKAQal43XsJ7PX
+         PlycbEss3tGY6NKNX7yE7ihX3QPEQjBg9VfjApas+qZFkVyB7AoO2WWrlZ+j8SXiEq
+         CQq7y33RknpAiyzIOPtVrS0p+SqzFZP4pjxOjHk1xtmUQ70RjsXjOD9F2NjeIVYHD8
+         KsFoANCn7EDLw==
+Message-ID: <da169e64-9dad-18a8-611b-57ff74006285@zytor.com>
+Date:   Mon, 31 Jul 2023 15:07:47 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJsKsQNWVq4zNmGk@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v9 29/36] x86/fred: FRED entry/exit and dispatch code
+Content-Language: en-US
+To:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        "K . Y . Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        "Liam R . Howlett" <Liam.Howlett@Oracle.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Breno Leitao <leitao@debian.org>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Brian Gerst <brgerst@gmail.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Alexander Potapenko <glider@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Ze Gao <zegao2021@gmail.com>, Fei Li <fei1.li@intel.com>,
+        Conghui <conghui.chen@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Yantengsi <siyanteng@loongson.cn>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Sathvika Vasireddy <sv@linux.ibm.com>
+References: <20230731064119.3870-1-xin3.li@intel.com>
+From:   "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <20230731064119.3870-1-xin3.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 27, 2023, Sean Christopherson wrote:
-> On Mon, Jun 26, 2023, Mingwei Zhang wrote:
-> > Add the description for mmu_valid_gen into kvm_mmu_page description.
-> > mmu_valid_gen is used in shadow MMU for fast zapping. Update the doc to
-> > reflect that.
-> > 
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > Reviewed-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  Documentation/virt/kvm/x86/mmu.rst | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-> > index 97d695207e11..cc4bd190c93d 100644
-> > --- a/Documentation/virt/kvm/x86/mmu.rst
-> > +++ b/Documentation/virt/kvm/x86/mmu.rst
-> > @@ -208,6 +208,10 @@ Shadow pages contain the following information:
-> >      The page is not backed by a guest page table, but its first entry
-> >      points to one.  This is set if NPT uses 5-level page tables (host
-> >      CR4.LA57=1) and is shadowing L1's 4-level NPT (L1 CR4.LA57=1).
-> > +  mmu_valid_gen:
-> > +    Used by comparing against kvm->arch.mmu_valid_gen to check whether the
-> 
-> This needs to explain what the generation is, and where it comes from.
-> 
->   The MMU generation of this page, used to effect a "fast" zap of all MMU pages
->   across all roots.  To zap all pages in all roots without blocking vCPUs, e.g.
->   when deleting a memslot, KVM updates the per-VM valid MMU generation to mark
->   all existing pages and roots invalid/obsolete.  Obsolete pages can't be used,
->   e.g. vCPUs must load a new, valid root before re-entering the guest.
-> 
->   The MMU generation is only ever '0' or '1', as slots_lock must be held until
->   all obsolete pages are zapped and freed, i.e. there is exactly one valid
->   generation and (at most) one invalid generation.
-> 
->   Note, the TDP MMU doesn't use mmu_gen as non-root TDP MMU pages are reachable
->   only from their owning root, whereas all pages for shadow MMUs are reachable
->   via the hash map.  The TDP MMU uses role.invalid to track obsolete roots.
+On 7/30/23 23:41, Xin Li wrote:
+> +static DEFINE_FRED_HANDLER(fred_other_default)
+> +{
+> +	regs->vector = X86_TRAP_UD;
+> +	fred_emulate_fault(regs);
+> +}
+> +
+> +static DEFINE_FRED_HANDLER(fred_syscall)
+> +{
+> +	regs->orig_ax = regs->ax;
+> +	regs->ax = -ENOSYS;
+> +	do_syscall_64(regs, regs->orig_ax);
+> +}
+> +
+> +#if IS_ENABLED(CONFIG_IA32_EMULATION)
+> +/*
+> + * Emulate SYSENTER if applicable. This is not the preferred system
+> + * call in 32-bit mode under FRED, rather int $0x80 is preferred and
+> + * exported in the vdso.
+> + */
+> +static DEFINE_FRED_HANDLER(fred_sysenter)
+> +{
+> +	regs->orig_ax = regs->ax;
+> +	regs->ax = -ENOSYS;
+> +	do_fast_syscall_32(regs);
+> +}
+> +#else
+> +#define fred_sysenter fred_other_default
+> +#endif
+> +
+> +static DEFINE_FRED_HANDLER(fred_other)
+> +{
+> +	static const fred_handler user_other_handlers[FRED_NUM_OTHER_VECTORS] =
+> +	{
+> +		/*
+> +		 * Vector 0 of the other event type is not used
+> +		 * per FRED spec 5.0.
+> +		 */
+> +		[0]		= fred_other_default,
+> +		[FRED_SYSCALL]	= fred_syscall,
+> +		[FRED_SYSENTER]	= fred_sysenter
+> +	};
+> +
+> +	user_other_handlers[regs->vector](regs);
+> +}
 
-Sean, thanks for the detailed explanation. I will pick the most of the
-content and get into the next version.
-> 
-> And then big bonus points if you add
-> 
->   Page Role
->   =========
-> 
-> to explain the purpose of the role, and how/when it's used in the shadow MMU versus
-> the TDP MMU.  The shadow MMU's use of a hash map is a fundemental aspect that really
-> should be documented here.
-> 
-> > +    shadow page is obsolete thus a convenient variable for fast zapping.
-> > +    Note that TDP MMU does not use mmu_valid_gen.
-> >    gfn:
-> >      Either the guest page table containing the translations shadowed by this
-> >      page, or the base page frame for linear translations.  See role.direct.
-> > -- 
-> > 2.41.0.162.gfafddb0af9-goog
-> > 
+OK, this is wrong.
+
+Dispatching like fred_syscall() is only valid for syscall64, which means 
+you have to check regs->l is set in addition to the correct regs->vector 
+to determine validity.
+
+Similarly, sysenter is only valid if regs->l is clear.
+
+The best way is probably to drop the dispatch table here and just do an 
+if ... else if ... else statement; gcc is smart enough that it will 
+combine the vector test and the L bit test into a single mask and 
+compare. This also allows stubs to be inlined.
+
+However, emulating #UD on events other than wrong mode of SYSCALL and 
+SYSENTER may be a bad idea. It would probably be better to invoke 
+fred_bad_event() in that case.
+
+Something like this:
+
++static DEFINE_FRED_HANDLER(fred_other_default)
++{
++	regs->vector = X86_TRAP_UD;
++	fred_emulate_fault(regs);
++}
+
+1) rename this to fred_emulate_ud (since that is what it actually does.)
+
+... then ...
+
+	/* The compiler can fold these into a single test */
+
+	if (likely(regs->vector == FRED_SYSCALL && regs->l)) {
+		fred_syscall64(regs);
+	} else if (likely(regs->vector == FRED_SYSENTER && !regs->l)) {
+		fred_sysenter32(regs);
+	} else if (regs->vector == FRED_SYSCALL ||
+		   regs->vector == FRED_SYSENTER) {
+		/* Invalid SYSCALL or SYSENTER instruction */
+		fred_emulate_ud(regs);
+	} else {
+		/* Unknown event */
+		fred_bad_event(regs);
+	}
+
+... or the SYSCALL64 and SYSENTER32 can be inlined with the appropriate 
+comment (gcc will do so regardless.)
+
+	-hpa
+
+
+
+	-hpa
