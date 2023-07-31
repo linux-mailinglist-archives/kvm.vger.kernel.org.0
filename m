@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2BE4768CC0
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:02:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74150768CBE
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:02:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230510AbjGaHCf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:02:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42804 "EHLO
+        id S230479AbjGaHCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:02:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230438AbjGaHCM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 03:02:12 -0400
+        with ESMTP id S230470AbjGaHCO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 03:02:14 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65720E68;
-        Mon, 31 Jul 2023 00:02:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F11E7B;
+        Mon, 31 Jul 2023 00:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690786931; x=1722322931;
+  t=1690786932; x=1722322932;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+L7aUhS6u+4qwVp6754zs3SWJDqRpOJYTCoF5qb+V6E=;
-  b=gJMz/dMGuP1m4jyrrNIs7kDXMReMW9GUsFuYhSD2sJqUi6ZG/9ZhOFMN
-   uoGJex+I/vUGt3g9RPzC+SsBOUA5iwGeUPhsxRyMXVluNflpzvyCjrOYj
-   K52IVUxWJoxxRVpf6Camsuev/Hew9nlYyyNN8yQ32DyDgKRcbDdplwtmo
-   UhkgqDFdBhkN2+S6xsZmL7OsGnGWn5uLyDTPajfqMCk9Cxe4/7fW+5XuN
-   0zYLbWfmk2XzXlFKuq4r+QIY8bywrp7IrIIFJFNxjgXPLuEKM6ImglCJ0
-   gOLbrPKuUArGjHNXsbE8oqgdW/w7/jVLPuZkkFcM9DbeobaD1Yc6Gfs/4
+  bh=lZsnH9xZ+sSI0HJfWdXFi2jVveN7fME2POBe5mQbKKE=;
+  b=J0LdpU5rSmCuBwzkdRgVcfNkCXN4YDZW9i6UpATzZXkMhv3H3dFMbCdL
+   u+CgWOHx4YPkeXuXx6fqMo9KGymbbBnaY6mut4yWQWO/B40B+qroLttVa
+   ShuknVTU1EOwSB0+ih+HfernHtcZhNmBbB27+FxFeoEz0Ge0wGV76Tz3R
+   BmJONRngwVM15yn6k9QjIc/42TGDnty9o1DnAnM9V0B5NzNbUQWxvmDsu
+   JMA5/10NjT5i4UMF6NO4TvZdeWkc3mbYcuuy0Grcs3yIBQNkqTf8gPZLh
+   fZZwOzrJFPuK4aeuajYFSiK7W+1PdMiFwJ+yE1HY3XNplW9ecEwOVqU5a
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371648963"
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371648999"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="371648963"
+   d="scan'208";a="371648999"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:00 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:01 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="871543395"
+   d="scan'208";a="871543400"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:01 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:02 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 11/36] x86/fred: Reserve space for the FRED stack frame
-Date:   Sun, 30 Jul 2023 23:32:52 -0700
-Message-Id: <20230731063317.3720-12-xin3.li@intel.com>
+Subject: [PATCH v9 12/36] x86/fred: Update MSR_IA32_FRED_RSP0 during task switch
+Date:   Sun, 30 Jul 2023 23:32:53 -0700
+Message-Id: <20230731063317.3720-13-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731063317.3720-1-xin3.li@intel.com>
 References: <20230731063317.3720-1-xin3.li@intel.com>
@@ -127,46 +127,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-When using FRED, reserve space at the top of the stack frame, just
-like i386 does.
+MSR_IA32_FRED_RSP0 is used during ring 3 event delivery, and needs to
+be updated to point to the top of next task stack during task switch.
+
+Update MSR_IA32_FRED_RSP0 with WRMSR instruction for now, and will use
+WRMSRNS/WRMSRLIST for performance once it gets upstreamed.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/thread_info.h | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/switch_to.h | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
-index d63b02940747..089cab875cba 100644
---- a/arch/x86/include/asm/thread_info.h
-+++ b/arch/x86/include/asm/thread_info.h
-@@ -31,7 +31,9 @@
-  * In vm86 mode, the hardware frame is much longer still, so add 16
-  * bytes to make room for the real-mode segments.
-  *
-- * x86_64 has a fixed-length stack frame.
-+ * x86-64 has a fixed-length stack frame, but it depends on whether
-+ * or not FRED is enabled. Future versions of FRED might make this
-+ * dynamic, but for now it is always 2 words longer.
-  */
+diff --git a/arch/x86/include/asm/switch_to.h b/arch/x86/include/asm/switch_to.h
+index f42dbf17f52b..6c911fd400b2 100644
+--- a/arch/x86/include/asm/switch_to.h
++++ b/arch/x86/include/asm/switch_to.h
+@@ -70,9 +70,16 @@ static inline void update_task_stack(struct task_struct *task)
  #ifdef CONFIG_X86_32
- # ifdef CONFIG_VM86
-@@ -39,8 +41,12 @@
- # else
- #  define TOP_OF_KERNEL_STACK_PADDING 8
- # endif
--#else
--# define TOP_OF_KERNEL_STACK_PADDING 0
-+#else /* x86-64 */
-+# ifdef CONFIG_X86_FRED
-+#  define TOP_OF_KERNEL_STACK_PADDING (2*8)
-+# else
-+#  define TOP_OF_KERNEL_STACK_PADDING 0
-+# endif
+ 	this_cpu_write(cpu_tss_rw.x86_tss.sp1, task->thread.sp0);
+ #else
+-	/* Xen PV enters the kernel on the thread stack. */
+-	if (cpu_feature_enabled(X86_FEATURE_XENPV))
++	if (cpu_feature_enabled(X86_FEATURE_FRED)) {
++		/*
++		 * Will use WRMSRNS/WRMSRLIST for performance once it's upstreamed.
++		 */
++		wrmsrl(MSR_IA32_FRED_RSP0,
++		       (unsigned long)task_stack_page(task) + THREAD_SIZE);
++	} else if (cpu_feature_enabled(X86_FEATURE_XENPV)) {
++		/* Xen PV enters the kernel on the thread stack. */
+ 		load_sp0(task_top_of_stack(task));
++	}
  #endif
+ }
  
- /*
 -- 
 2.34.1
 
