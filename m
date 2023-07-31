@@ -2,185 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90FDB76A05C
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 20:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4579C76A06A
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 20:30:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231604AbjGaS0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 14:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53780 "EHLO
+        id S231856AbjGaSaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 14:30:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbjGaS0X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 14:26:23 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32DD9E79
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:26:22 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-348c7075afcso12485ab.1
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:26:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690827981; x=1691432781;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6LZEdaDlAMdQP6JhmjsArIuxox1zxEtjjTY2SzD6PsU=;
-        b=5fgkkTfZTjvrkPsV2OAsWS7fGDKlkOo6NBkGxlUad6Djf9YF4mNXTcZwmQCCLJ1nBy
-         ytvPZa3KoE6pLMDaS1L4gdmZaOfNzKXtsa1fikLeZSNL0jSNWYpUTY8GHiEMpPSUIhEf
-         GKZr2wZjg6oExHWyVPblSGkoydBcnRJu278I6bHizaXll85ZaXfkAb9ISQ34veJLXVin
-         H4LgRU66ITkpG1C45xmAlPZe5ifFrojIcI163nCjGKu3BAHmTrdfA2g91PJ4XmMzNAwE
-         6qNdJbd/ZgVe0FTRRBae2q8TCC7NnJ6KmTDr6JnJgqJf5rkyLUFJCut3v7Lu9kIPHxwj
-         tGnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690827981; x=1691432781;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6LZEdaDlAMdQP6JhmjsArIuxox1zxEtjjTY2SzD6PsU=;
-        b=IYLSuUikl+cZrY9Vv1QVVBBo9+w2rDDNeG/79I9uBsCEIUJHgMaK+3KNLrxDRni9G5
-         kv8Hklyi8Rb1S8x3psZNYhJsXE9gL+7xNpk6sRpDRGUIAiEi2HeBKKdkQd5K7hchaUfI
-         A6+5VpUedkCS8FwhQekDeFGmeXXPF0SzYhcCc58Au9J9xcW3wTKzOJIMnPY8819Ot8ke
-         m124LmrI8WrXohwbcP23MGuKtKYjOOyFo6Pt7YzL5TDA1lxWa7VRVM4WIrGH3n5I42mC
-         Gu7eBahdvhRyHwBvQs8fyn15ireHmUNkE6fn9AZMAryLFVAajGlhXPjTB+ljwuhLEiMs
-         PMsg==
-X-Gm-Message-State: ABy/qLZmVV9XffLwOtJGJz+mpsDA3FAdBzyCW/JXRQiUFEfDbjd7BRlU
-        ZNB/We5z/2ltB9vW2d6KB0p2ix8daq0z+uPERUQeA9nxTBz5AXg9GU9sr2jZ
-X-Google-Smtp-Source: APBJJlHJ2q+Ibhsyd21GC77gr96XZana1MhNnQDJBDO6Init3JyGxBHBc9FYe6705xtGHxT1vNNwqYdqSlhzUk4wwtA=
-X-Received: by 2002:a05:6e02:16c5:b0:345:dcdf:206b with SMTP id
- 5-20020a056e0216c500b00345dcdf206bmr693992ilx.25.1690827981339; Mon, 31 Jul
- 2023 11:26:21 -0700 (PDT)
+        with ESMTP id S229707AbjGaSaA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 14:30:00 -0400
+Received: from out-103.mta1.migadu.com (out-103.mta1.migadu.com [IPv6:2001:41d0:203:375::67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A8D10E4
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:29:59 -0700 (PDT)
+Date:   Mon, 31 Jul 2023 18:29:54 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1690828198;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NeX+BTQhkz1hkGfxaYW5m3HOmH/qPCvTm2ZC5kk5axY=;
+        b=PXJ5ihB3HjR3iQoLymxlbHr5/RsJ1YRGvzpt728eEEVabWE2GREe+S2Q/QDowGAi0Ipe+2
+        wZRo8XZKrJyJVcmb2D3dnRsmiuF2xDywb+C01K/C9DkVJ7nQ6SLL779lzEUs1VVshVQIkD
+        1QY+kFgAs1spyll4MAzb5yPL6UmopxQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KVM: x86/tsc: Don't sync user changes to TSC with
+ KVM-initiated change
+Message-ID: <ZMf9ovBFpGNEOG3c@linux.dev>
+References: <20230731080758.29482-1-likexu@tencent.com>
 MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-13-rananta@google.com>
- <87jzulqz0v.wl-maz@kernel.org>
-In-Reply-To: <87jzulqz0v.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 31 Jul 2023 11:26:09 -0700
-Message-ID: <CAJHc60zGzAqWw2iZwNEG_bWERXkz_io7ae-K_tf_kh6xcOBxLA@mail.gmail.com>
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731080758.29482-1-likexu@tencent.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 6:12=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
-:
->
-> On Sat, 22 Jul 2023 03:22:51 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > The current implementation of the stage-2 unmap walker traverses
-> > the given range and, as a part of break-before-make, performs
-> > TLB invalidations with a DSB for every PTE. A multitude of this
-> > combination could cause a performance bottleneck on some systems.
-> >
-> > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > invalidations until the entire walk is finished, and then
-> > use range-based instructions to invalidate the TLBs in one go.
-> > Condition deferred TLB invalidation on the system supporting FWB,
-> > as the optimization is entirely pointless when the unmap walker
-> > needs to perform CMOs.
-> >
-> > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > now serves the stage-2 unmap walker specifically, rather than
-> > acting generic.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++-----
-> >  1 file changed, 58 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.=
-c
-> > index 5ef098af1736..cf88933a2ea0 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_pgta=
-ble_visit_ctx *ctx, kvm_pte_t n
-> >       smp_store_release(ctx->ptep, new);
-> >  }
-> >
-> > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, st=
-ruct kvm_s2_mmu *mmu,
-> > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > +struct stage2_unmap_data {
-> > +     struct kvm_pgtable *pgt;
-> > +     bool defer_tlb_flush_init;
-> > +};
-> > +
-> > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-> > +{
-> > +     /*
-> > +      * If FEAT_TLBIRANGE is implemented, defer the individual
-> > +      * TLB invalidations until the entire walk is finished, and
-> > +      * then use the range-based TLBI instructions to do the
-> > +      * invalidations. Condition deferred TLB invalidation on the
-> > +      * system supporting FWB, as the optimization is entirely
-> > +      * pointless when the unmap walker needs to perform CMOs.
-> > +      */
-> > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > +}
-> > +
-> > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data *unm=
-ap_data)
-> > +{
-> > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap_dat=
-a->pgt);
-> > +
-> > +     /*
-> > +      * Since __stage2_unmap_defer_tlb_flush() is based on alternative
-> > +      * patching and the TLBIs' operations behavior depend on this,
-> > +      * track if there's any change in the state during the unmap sequ=
-ence.
-> > +      */
-> > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush);
-> > +     return defer_tlb_flush;
->
-> I really don't understand what you're testing here. The ability to
-> defer TLB invalidation is a function of the system capabilities
-> (range+FWB) and a single flag that is only set on the host for pKVM.
->
-> How could that change in the middle of the life of the system? if
-> further begs the question about the need for the unmap_data data
-> structure.
->
-> It looks to me that we could simply pass the pgt pointer around and be
-> done with it. Am I missing something obvious?
->
-From one of the previous comments [1] (used in a different context),
-I'm given to understand that since these feature checks are governed
-by alternative patching, they can potentially change (at runtime?). Is
-that not the case and I have misunderstood the idea in comment [1]
-entirely? Is it solely used for optimization purposes and set only
-once?
-If that's the case, I can get rid of the WARN_ON() and unmap_data.
+On Mon, Jul 31, 2023 at 04:07:58PM +0800, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> Add kvm->arch.user_changed_tsc to avoid synchronizing user changes to
+> the TSC with the KVM-initiated change in kvm_arch_vcpu_postcreate() by
+> conditioning this mess on userspace having written the TSC at least
+> once already.
+> 
+> Here lies UAPI baggage: user-initiated TSC write with a small delta
+> (1 second) of virtual cycle time against real time is interpreted as an
+> attempt to synchronize the CPU. In such a scenario, the vcpu's tsc_offset
+> is not configured as expected, resulting in significant guest service
+> response latency, which is observed in our production environment.
 
-- Raghavendra
+The changelog reads really weird, because it is taken out of context
+when it isn't a comment over the affected code. Furthermore, 'our
+production environment' is a complete black box to the rest of the
+community, it would be helpful spelling out exactly what the use case
+is.
 
-[1]: https://lore.kernel.org/all/ZGPPj1AXS0Uah2Ug@linux.dev/
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Suggested changelog:
+
+  KVM interprets writes to the TSC with values within 1 second of each
+  other as an attempt to synchronize the TSC for all vCPUs in the VM,
+  and uses a common offset for all vCPUs in a VM. For brevity's sake
+  let's just ignore what happens on systems with an unstable TSC.
+
+  While this may seem odd, it is imperative for VM save/restore, as VMMs
+  such as QEMU have long resorted to saving the TSCs (by value) from all
+  vCPUs in the VM at approximately the same time. Of course, it is
+  impossible to synchronize all the vCPU ioctls to capture the exact
+  instant in time, hence KVM fudges it a bit on the restore side.
+
+  This has been useful for the 'typical' VM lifecycle, where in all
+  likelihood the VM goes through save/restore a considerable amount of
+  time after VM creation. Nonetheless, there are some use cases that
+  need to restore a VM snapshot that was created very shortly after boot
+  (<1 second). Unfortunately the TSC sync code makes no distinction
+  between kernel and user-initiated writes, which leads to the target VM
+  synchronizing on the TSC offset from creation instead of the
+  user-intended value.
+
+  Avoid synchronizing user-initiated changes to the guest TSC with the
+  KVM initiated change in kvm_arch_vcpu_postcreate() by conditioning the
+  logic on userspace having written the TSC at least once.
+
+I'll also note that the whole value-based TSC sync scheme is in
+desperate need of testing.
+
+-- 
+Thanks,
+Oliver
