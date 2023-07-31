@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E26D768CA9
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:02:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DADB768CB2
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230486AbjGaHCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:02:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42652 "EHLO
+        id S230469AbjGaHCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbjGaHCG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 03:02:06 -0400
+        with ESMTP id S230411AbjGaHCI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 03:02:08 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F220186;
-        Mon, 31 Jul 2023 00:02:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678551A5;
+        Mon, 31 Jul 2023 00:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690786925; x=1722322925;
+  t=1690786926; x=1722322926;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+857ZiZ3kYB9kvyULHXUrCarfExj5Gil+GQ461ib92M=;
-  b=NE4em+KwgK+XoH/U7xVPtrVo6rpE0Dy4VRKTigLSgq2pLWRSRYyeqyT3
-   zk9R/n0uB1yqFlMwabpgzPknIwroSMZGdFeDA9P4INOL8lZO5uj4+qg2f
-   uQ/q13Nh8u59aehP0x2GChul1f6nXuab2LXKaekVEnDfUUDvH0mJu0f5d
-   ASibBM4CfGnxm+gbGWJnjDnaUsNuPOpwEn/sFWJtYmoPslM9l6j6HiXTF
-   opnY/E8H8M2V1fd8NhPA6NqaSybSK9paXNHhujmFdTHmlW4D82ybYB/+5
-   tUQCzMUtQCMjk6gvtq/d9eg1cI5o+9RYcg4N9LdnCIjRevhybKUFqivzN
+  bh=ks9fQ3QR6UqRMocjQpLz+yk1iYvQPVTbiFl2BDd8yPg=;
+  b=FJ6c1HRtn6LGcysL1uA2OSv4/K/7VnmXSE4ZnZBZEB0V525Psxg8LIv4
+   HOpM0/sVyOWNFp/HyGernH33Igw9EAl/Q2pfGd0MxnSI94zfhoRUoYwp8
+   hOgFT9uL9oRdAj1es5CPJ2G8OSpn+hdeis4R2kPAkuPnDpMEfGWCJolfl
+   9lZGt1aCgWf5le/dHhWxQHlFcByLDuL4Gm7fk/u8NJxL3vJag3ZUMljFJ
+   /Kvn1OxuVWCQ7+hvGGplMMzqwsDHSOeTx239IuWfskJp1MTvhyedufhRI
+   BVzKxQEt6YDroTIG/Hy4n1cFSbxd91MSzl8hMdt1VAyvZmVkOZBv/Os3C
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371648781"
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371648821"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="371648781"
+   d="scan'208";a="371648821"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:01:55 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:01:56 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="871543364"
+   d="scan'208";a="871543368"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:01:56 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:01:57 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 06/36] x86/objtool: Teach objtool about ERETU and ERETS
-Date:   Sun, 30 Jul 2023 23:32:47 -0700
-Message-Id: <20230731063317.3720-7-xin3.li@intel.com>
+Subject: [PATCH v9 07/36] x86/cpu: Add X86_CR4_FRED macro
+Date:   Sun, 30 Jul 2023 23:32:48 -0700
+Message-Id: <20230731063317.3720-8-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731063317.3720-1-xin3.li@intel.com>
 References: <20230731063317.3720-1-xin3.li@intel.com>
@@ -127,46 +127,83 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Update the objtool decoder to know about the ERETU and ERETS
-instructions (type INSN_CONTEXT_SWITCH).
+Add X86_CR4_FRED macro for the FRED bit in %cr4. This bit should be a
+pinned bit, not to be changed after initialization.
+
+CR4 macros are defined in arch/x86/include/uapi/asm/processor-flags.h,
+which is uapi, and thus cannot depend on CONFIG_X86_64.
+
+Using _BITUL() causes build errors on 32 bits, and there is no
+guarantee that user space applications (e.g. something like Qemu)
+might not want to use this declaration even when building for i386 or
+x32.
+
+However, %cr4 is a machine word (unsigned long), so to avoid build
+warnings on 32 bits, explicitly cast the value to unsigned long,
+truncating upper 32 bits.
+
+The other alternative would be to use CONFIG_X86_64 around the
+definition of cr4_pinned_mask. It is probably not desirable to make
+cr4_pinned_mask non-const.
+
+Another option, which may be preferable, to be honest: explicitly
+enumerate the CR4 bits which *may* be changed (a whitelist), instead
+of the ones that may not. That would be a separate, pre-FRED, patch,
+and would automatically resolve this problem as a side effect.
+
+The following flags probably should have been in this set all along,
+as they are all controls affecting the kernel runtime environment as
+opposed to user space:
+
+X86_CR4_DE, X86_CR4_PAE, X86_CR4_PSE, X86_CR4_MCE, X86_CR4_PGE,
+X86_CR4_OSFXSR, X86_CR4_OSXMMEXCPT, X86_CR4_LA57, X86_CR4_PCIDE,
+X86_CR4_LAM_SUP
+
+Possibly X86_CR4_VMXE as well, which seems harmless even if KVM is
+not loaded; X86_CR4_PKE can be fixed as long as the PKE configuration
+registers are at least initialized to disabled.
+
+It is relatively simple to do an audit of which flags are allowed to
+be modified at runtime and whitelist only those. There is no reason
+why we should allow bits in CR4 to be toggled by default.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- tools/objtool/arch/x86/decode.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ arch/x86/include/uapi/asm/processor-flags.h | 2 ++
+ arch/x86/kernel/cpu/common.c                | 5 +++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/tools/objtool/arch/x86/decode.c b/tools/objtool/arch/x86/decode.c
-index 2e1caabecb18..a486485cff20 100644
---- a/tools/objtool/arch/x86/decode.c
-+++ b/tools/objtool/arch/x86/decode.c
-@@ -509,11 +509,20 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
+diff --git a/arch/x86/include/uapi/asm/processor-flags.h b/arch/x86/include/uapi/asm/processor-flags.h
+index d898432947ff..ce08c2ca70b5 100644
+--- a/arch/x86/include/uapi/asm/processor-flags.h
++++ b/arch/x86/include/uapi/asm/processor-flags.h
+@@ -138,6 +138,8 @@
+ #define X86_CR4_CET		_BITUL(X86_CR4_CET_BIT)
+ #define X86_CR4_LAM_SUP_BIT	28 /* LAM for supervisor pointers */
+ #define X86_CR4_LAM_SUP		_BITUL(X86_CR4_LAM_SUP_BIT)
++#define X86_CR4_FRED_BIT	32 /* enable FRED kernel entry */
++#define X86_CR4_FRED		_BITULL(X86_CR4_FRED_BIT)
  
- 		if (op2 == 0x01) {
+ /*
+  * x86-64 Task Priority Register, CR8
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 0ba1067f4e5f..331b06d19f7f 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -402,8 +402,9 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
  
--			if (modrm == 0xca)
--				insn->type = INSN_CLAC;
--			else if (modrm == 0xcb)
--				insn->type = INSN_STAC;
--
-+			switch (insn_last_prefix_id(&ins)) {
-+			case INAT_PFX_REPE:
-+			case INAT_PFX_REPNE:
-+				if (modrm == 0xca)
-+					/* eretu/erets */
-+					insn->type = INSN_CONTEXT_SWITCH;
-+				break;
-+			default:
-+				if (modrm == 0xca)
-+					insn->type = INSN_CLAC;
-+				else if (modrm == 0xcb)
-+					insn->type = INSN_STAC;
-+				break;
-+			}
- 		} else if (op2 >= 0x80 && op2 <= 0x8f) {
+ /* These bits should not change their value after CPU init is finished. */
+ static const unsigned long cr4_pinned_mask =
+-	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
+-	X86_CR4_FSGSBASE | X86_CR4_CET;
++	(unsigned long)
++	(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
++	 X86_CR4_FSGSBASE | X86_CR4_CET | X86_CR4_FRED);
+ static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
+ static unsigned long cr4_pinned_bits __ro_after_init;
  
- 			insn->type = INSN_JUMP_CONDITIONAL;
 -- 
 2.34.1
 
