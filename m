@@ -2,53 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6917B76952B
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 13:47:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D4ED7694B1
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 13:21:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbjGaLrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 07:47:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49450 "EHLO
+        id S230183AbjGaLVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 07:21:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231517AbjGaLrb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 07:47:31 -0400
-Received: from mgamail.intel.com (unknown [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8BB5E52;
-        Mon, 31 Jul 2023 04:47:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690804050; x=1722340050;
-  h=from:to:cc:subject:date:message-id;
-  bh=BuF2V2QBl8j3/eWUrzyOnJ939tHmLzmjmmYv3gOvdPY=;
-  b=bBs2dApMTONX+CQ3cehD3N92FZ9GgielIGlF1RFiPF9lnolkBgYhHf0Q
-   AtQB5paTaRX6yMojFJ3n4JanHEmExk9cLBl9163a92F46Cv9WNYdxD0O+
-   /xPaXTR+uECC4PVf5YtfBAyOTJ/OUdu+S5m9J+2Sqd56Z/ZhZyf/MlRzC
-   GpfV8FszuAeEC1+3zsti6HNRY3qMGDYYt4JdAn3fJB3w3R3oS4xOXYDW4
-   X9Ou98yW3gat7Ga5L+q5H8snIMPgzowt6NV5D328QVb3ZiadlCBXbYsag
-   +AHFeTmRjX2fdGePg/4p8dON8QInYC4rYch5WS8UqnpJ1iBrPJ7lv6Utd
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="372624147"
-X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="372624147"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 04:47:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="763357271"
-X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="763357271"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 04:47:28 -0700
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org
-Cc:     zhenyuw@linux.intel.com, zhi.a.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH] drm/i915/gvt: Fix bug in getting msg length in AUX CH registers handler
-Date:   Mon, 31 Jul 2023 19:20:33 +0800
-Message-Id: <20230731112033.7275-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        with ESMTP id S231965AbjGaLVm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 07:21:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8484D1712
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 04:20:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690802453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=47HAhqvJlrFOjF3d3mT+sXNh9SqjQbM0s/wrTjkOtJg=;
+        b=Epsu1sHEHyXjWzUEAKGS76KcvpmP0zgHZKHyeS3Uk0D1M89ucFcH63fE+oAzmmMlAl4TX9
+        NhTld9OR1/83XP3n8hiPKGCc0yfR3k9Z/X8zzZdGArCrpP9Fv8Z5URcWG1ZSERmjtoE2Yd
+        6BevUJaiMR7ZWf7fS9a0PZ43lyukJD8=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-68-vHFPTVzRNNqmLNfRjc4oeQ-1; Mon, 31 Jul 2023 07:20:52 -0400
+X-MC-Unique: vHFPTVzRNNqmLNfRjc4oeQ-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-63d10736c4aso33223576d6.3
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 04:20:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690802452; x=1691407252;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=47HAhqvJlrFOjF3d3mT+sXNh9SqjQbM0s/wrTjkOtJg=;
+        b=Aa58O5bnfTViiNB7iRvd6FG0NCH2M0V0D7u5dMrJPhaGlZAgUk146YFVdVVeQ4xi7H
+         NvC6UcGnyveyvfsQ+T3imnV8cNqG0xoJ8rrCucFopWSwXIg+WQnnO4+fynjLoEiIdrNd
+         bsYtIkno3mw7TlLU7BhGhUT7CJvYKCjV5HU9bhQCOyIHtiAXL9HKkhZGnC6WdPeSIlEt
+         LYfn1MzdrTWfNinWh0nzCcUXJjU2ovFT4HTgK6XYJUCCmtMl74BTLehA47QYpVU0OgdE
+         9tU6HKgNcKXGtxe1G7B1OwMnInN4/g4P37n2g7oQRIO8U5V0uxZ2S/04ERZumMQ0xXKE
+         vqSQ==
+X-Gm-Message-State: ABy/qLZYIsELggliqpxJYjEB1G4vGMDGkFUPfvCWIIzNzvfrpl5PlPXy
+        OH0pAI8RTEWAUVR11mJzyTv1Y+D6oW8bClVyGi6QCXyVNfTq8ApidaM66yw7d4SPkOMuvSCRCv/
+        bvgwg5MxpbeVN
+X-Received: by 2002:a0c:e14d:0:b0:634:20f:471c with SMTP id c13-20020a0ce14d000000b00634020f471cmr6609348qvl.14.1690802451987;
+        Mon, 31 Jul 2023 04:20:51 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGQmknuNkpt4OdqMMs+lcZsPQfXQHCOzlkWOeCIE2fDz4iRThyIeyibV6Yi3WqcRw7uGfKfaw==
+X-Received: by 2002:a0c:e14d:0:b0:634:20f:471c with SMTP id c13-20020a0ce14d000000b00634020f471cmr6609334qvl.14.1690802451661;
+        Mon, 31 Jul 2023 04:20:51 -0700 (PDT)
+Received: from vschneid.remote.csb ([149.12.7.81])
+        by smtp.gmail.com with ESMTPSA id n2-20020a0ce542000000b0061b5dbf1994sm3583834qvm.146.2023.07.31.04.20.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 04:20:51 -0700 (PDT)
+From:   Valentin Schneider <vschneid@redhat.com>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 06/20] tracing/filters: Optimise scalar vs
+ cpumask filtering when the user mask is a single CPU
+In-Reply-To: <20230729155547.35719a1f@rorschach.local.home>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-7-vschneid@redhat.com>
+ <20230729155547.35719a1f@rorschach.local.home>
+Date:   Mon, 31 Jul 2023 12:20:41 +0100
+Message-ID: <xhsmh1qgos4xi.mognet@vschneid.remote.csb>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,33 +127,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Msg length should be obtained from value written to AUX_CH_CTL register
-rather than from enum type of the register.
+On 29/07/23 15:55, Steven Rostedt wrote:
+> On Thu, 20 Jul 2023 17:30:42 +0100
+> Valentin Schneider <vschneid@redhat.com> wrote:
+>
+>> Steven noted that when the user-provided cpumask contains a single CPU,
+>> then the filtering function can use a scalar as input instead of a
+>> full-fledged cpumask.
+>>
+>> When the mask contains a single CPU, directly re-use the unsigned field
+>> predicate functions. Transform '&' into '==' beforehand.
+>>
+>> Suggested-by: Steven Rostedt <rostedt@goodmis.org>
+>> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+>> ---
+>>  kernel/trace/trace_events_filter.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/kernel/trace/trace_events_filter.c b/kernel/trace/trace_events_filter.c
+>> index 2fe65ddeb34ef..54d642fabb7f1 100644
+>> --- a/kernel/trace/trace_events_filter.c
+>> +++ b/kernel/trace/trace_events_filter.c
+>> @@ -1750,7 +1750,7 @@ static int parse_pred(const char *str, void *data,
+>>               * then we can treat it as a scalar input.
+>>               */
+>>              single = cpumask_weight(pred->mask) == 1;
+>> -		if (single && field->filter_type == FILTER_CPUMASK) {
+>> +		if (single && field->filter_type != FILTER_CPU) {
+>>                      pred->val = cpumask_first(pred->mask);
+>>                      kfree(pred->mask);
+>>              }
+>> @@ -1761,6 +1761,11 @@ static int parse_pred(const char *str, void *data,
+>>                              FILTER_PRED_FN_CPUMASK;
+>>              } else if (field->filter_type == FILTER_CPU) {
+>>                      pred->fn_num = FILTER_PRED_FN_CPU_CPUMASK;
+>> +		} else if (single) {
+>> +			pred->op = pred->op == OP_BAND ? OP_EQ : pred->op;
+>
+> Nit, the above can be written as:
+>
+>                       pred->op = pret->op != OP_BAND ? : OP_EQ;
+>
 
-Commit 0cad796a2269  ("drm/i915: Use REG_BIT() & co. for AUX CH registers")
-incorrectly calculates the msg_length from reg type and yields below
-warning in intel_gvt_i2c_handle_aux_ch_write():
-"i915 0000:00:02.0: drm_WARN_ON(msg_length != 4)".
+That's neater, thanks!
 
-Fixes: 0cad796a2269 ("drm/i915: Use REG_BIT() & co. for AUX CH registers")
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- drivers/gpu/drm/i915/gvt/edid.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/gpu/drm/i915/gvt/edid.c b/drivers/gpu/drm/i915/gvt/edid.c
-index 2a0438f12a14..af9afdb53c7f 100644
---- a/drivers/gpu/drm/i915/gvt/edid.c
-+++ b/drivers/gpu/drm/i915/gvt/edid.c
-@@ -491,7 +491,7 @@ void intel_gvt_i2c_handle_aux_ch_write(struct intel_vgpu *vgpu,
- 		return;
- 	}
- 
--	msg_length = REG_FIELD_GET(DP_AUX_CH_CTL_MESSAGE_SIZE_MASK, reg);
-+	msg_length = REG_FIELD_GET(DP_AUX_CH_CTL_MESSAGE_SIZE_MASK, value);
- 
- 	// check the msg in DATA register.
- 	msg = vgpu_vreg(vgpu, offset + 4);
--- 
-2.17.1
+> -- Steve
+>
+>
+>> +			pred->fn_num = select_comparison_fn(pred->op, field->size, false);
+>> +			if (pred->op == OP_NE)
+>> +				pred->not = 1;
+>>              } else {
+>>                      switch (field->size) {
+>>                      case 8:
 
