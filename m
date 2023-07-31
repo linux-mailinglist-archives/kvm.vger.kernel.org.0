@@ -2,76 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C49B4769C8B
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:32:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EDED769CDF
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:38:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232045AbjGaQcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:32:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36134 "EHLO
+        id S231244AbjGaQiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:38:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232406AbjGaQcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:32:09 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60F51998
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:32:05 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-99bdcade7fbso611860866b.1
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:32:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690821124; x=1691425924;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hSWRC6XbP9Lzf2RUR+88p43812yGhT9wGIsBh6+Oxe8=;
-        b=pHF/+dHlLBTHSunlTT0kqJJKOAYyTNCCrVLhGoh/d9Z0Z6d6tEHiqRD5gFOESCytHz
-         XuKCFfy08U3uhycytlJow93aji4SuOYJOtM0Z0IlSvv9n2x8PN+eLmr6lM+OVXwE/9j2
-         OqR727EBGzws1u38N1S7RzJIe/SsGnmUmcbSLOg9rwEthSQSdsB/3Kz7nfZgXvCwY1K0
-         j7JrjU6uYf0n9WR0ylnrEQJuLe0QHvVeTsKhCSnlfdUdN1ZpPE1WjMrZchsYgMnlNBZ9
-         ZftcyixKNTam1oA+YmaAHzVZP0Gkue3lt7Am7WAIweR2KnzbRluSlcrPs3Rj7C0JS06Y
-         69tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690821124; x=1691425924;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSWRC6XbP9Lzf2RUR+88p43812yGhT9wGIsBh6+Oxe8=;
-        b=NE8G8CgrNqeohqTCvxxq/cOtwaWyH3Lk2bCim8orv0lEO/TqikYvxJAOhIn/YfnbkX
-         LpG9PYnFulQ555OuF1suGbaMxB9Vs37uedTw2TG4ZDabsE6fgo6XJ2kuT5Pw1buXzoBZ
-         Cw1ZPZjOpCfKGxRw6CoJNSSs62bc58ue8X6+Z5NMRgQIkx9vZSyleQudevpxlLRb53sd
-         WpOgDjpSdhMKnqaSKu5F1VDyNofdllkhanpD29vtSJXEjjx8CaYxdAhqXxK7kofgfSIv
-         CwMr0qEx547+kl1otvCQu0I2kCwiugL5nlvP9Rh+i/6oOZg1LnZlBBdLMo3ECZ444MO1
-         EIqg==
-X-Gm-Message-State: ABy/qLbycEUGQ3EHmK13EGJvGOZSPiV2Vheh+EywA6GeYQR+u1SG4oY5
-        +qwTDqF/7oVNBkqwUhHYXQ8MyQ==
-X-Google-Smtp-Source: APBJJlELCwb2ZaGhlBAwWr1JohEHQiHCPrJ54oEHYYkr8uhp41hA+eoLldKwEfbFpDKCDf1sS4vIUg==
-X-Received: by 2002:a17:906:224b:b0:99b:8c6f:f3af with SMTP id 11-20020a170906224b00b0099b8c6ff3afmr279982ejr.12.1690821124338;
-        Mon, 31 Jul 2023 09:32:04 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id lz19-20020a170906fb1300b0099bd1a78ef5sm6367295ejb.74.2023.07.31.09.32.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 09:32:04 -0700 (PDT)
-Date:   Mon, 31 Jul 2023 18:32:03 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH v4 09/34] KVM: selftests: Add a selftest for guest prints
- and formatted asserts
-Message-ID: <20230731-91b64a6b787ba7e23b285785@orel>
-References: <20230729003643.1053367-1-seanjc@google.com>
- <20230729003643.1053367-10-seanjc@google.com>
+        with ESMTP id S233454AbjGaQhs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:37:48 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476E61BF4;
+        Mon, 31 Jul 2023 09:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690821431; x=1722357431;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=49RgyO4aXFLQmhq6aGUugMt8PqBLQ2mg1p/4/wrpoK0=;
+  b=DOeSYiiXH/V+RoRayyYxr6t41cgaVU5RDn33CrPV9nOo3yK5vRtqy3TE
+   0m7BvC9LeVVWRedi200IfpeyAneX8t8OxNrC14yw/VRye+pf+LFHDQFs3
+   ZpSXq6X1gKBUX0c5b/630XsytCGHOEdvYjA/T6iuNESQRELrgco1mviVm
+   TuzPDvDXnyJHuk91meXKQFTAtuqw2x/oOffTodIHtbk9eyjo9YqZT5pbZ
+   k+Bowf1jwXzPiintnHRYcgYHxFkcNfoi1t5ubpw7I7/2l6e53KhE5Lm2O
+   B5mzi5TRwprdgU3/cEQmfDAXz1nwiCYIPdRmioHZk/zPZuWHRCkQJCvDZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="348664988"
+X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
+   d="scan'208";a="348664988"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:36:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="1059052767"
+X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
+   d="scan'208";a="1059052767"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga005.fm.intel.com with ESMTP; 31 Jul 2023 09:36:48 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 31 Jul 2023 09:36:47 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 31 Jul 2023 09:36:47 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 31 Jul 2023 09:36:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WWRC9EXycQCHI1JwtNptAUhovI9AGMTKtc0WufcHZ0HU+Kd3v1W2M7LfVyTiGrBMMoz34TiOG7TFoybw1iHfp1TzzzSRDog3vJTzmS6nDU4vRJ3w+BIpXkESBekcp1guDdi4/pPnZ2OXPr2CUbM24AArTFBRrGnLqR4xQ4n7BwmDBXPMuDmrHDO6JDUkQhLBeOekBJw1ivyVwCvogkNdOm5kNjdCeBNXnX7GADCbgy1S82O4jtjIVNIVE3RaW8u4zJzsVy7dnSmDpgqVeh4ghfQMvHEbkbeZp1j1OmNdiIi9r2Xh+CbNf3VaJvHpd220/+TzzU8hfu60Bs76jxzYlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hZM3IZCj9KuMzD5OWVeNhHThYuQ7QseQN4yi6Sx4pnc=;
+ b=NvFx83XXc30MW/mCM132CM1zAOiNqtGcjnP1IkOpXdTw+4zsKHlGcBSov4/SjFFTuCPUNtWZjDxJ6CK4aDuCmuDWp9WynRUJdG4WIQCvYKw1x1MlWb4nXZIb0jYDWQTC+TJMY8swiJisxD4pUK9cUs3F8vlag5VnnvzwZHLHmGfHHeroNncOkTnBTzhYWHpaMNnv133dJczG1+SqUaEVhYKAPFo6UJV0c8gOZKv6SencstvZg9KlJhYD5cb+itbLLjZ8nO0F5k0+ycPdS+RS+HTmIe6BDajx64QyDwS5UAPwXZss0SSIcRxYUUI6zAvBSoYWeAqY6suP7gI4doEWRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by SA0PR11MB4766.namprd11.prod.outlook.com (2603:10b6:806:92::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Mon, 31 Jul
+ 2023 16:36:45 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::50e4:2cb8:4529:af04]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::50e4:2cb8:4529:af04%7]) with mapi id 15.20.6631.043; Mon, 31 Jul 2023
+ 16:36:44 +0000
+From:   "Li, Xin3" <xin3.li@intel.com>
+To:     Masami Hiramatsu <mhiramat@kernel.org>
+CC:     "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "K . Y . Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        "Cui, Dexuan" <decui@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Gross, Jurgen" <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        "Steven Rostedt" <rostedt@goodmis.org>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        "Liam R . Howlett" <Liam.Howlett@Oracle.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Breno Leitao <leitao@debian.org>,
+        "Nikunj A Dadhania" <nikunj@amd.com>,
+        Brian Gerst <brgerst@gmail.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Alexander Potapenko <glider@google.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Ze Gao <zegao2021@gmail.com>, "Li, Fei1" <fei1.li@intel.com>,
+        Conghui <conghui.chen@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "Jiapeng Chong" <jiapeng.chong@linux.alibaba.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "Ostrovsky, Boris" <boris.ostrovsky@oracle.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Yantengsi <siyanteng@loongson.cn>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Sathvika Vasireddy <sv@linux.ibm.com>
+Subject: RE: [PATCH v9 05/36] x86/opcode: Add ERETU, ERETS instructions to
+ x86-opcode-map
+Thread-Topic: [PATCH v9 05/36] x86/opcode: Add ERETU, ERETS instructions to
+ x86-opcode-map
+Thread-Index: AQHZw3zoe8WDZngsCk2Vpcje4URgCq/Tn9qAgABzJoA=
+Date:   Mon, 31 Jul 2023 16:36:44 +0000
+Message-ID: <SA1PR11MB67348E503BDAA548E84D5BA1A805A@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20230731063317.3720-1-xin3.li@intel.com>
+        <20230731063317.3720-6-xin3.li@intel.com>
+ <20230731184309.9888dfd44fa1a5fd69c779cd@kernel.org>
+In-Reply-To: <20230731184309.9888dfd44fa1a5fd69c779cd@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|SA0PR11MB4766:EE_
+x-ms-office365-filtering-correlation-id: 9e043996-a3d9-43fb-3271-08db91e45399
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qgTFPD0vvh/pbLUzfCEsk1qklqAy5mmnjClGG+j6+RZYPOdQ6vUr+v1QvUNsYId3nEC9G+v8iQ6f6z/bzVOu7mHtbmnIMmB6vBI1mjAArv3fX22N5clBlt+0RS+FjYXhSZUqkRLSMg5xklhFXBdEe4PfwXA10EG2rtgR7ee3Lo9h7Esut9uowIA4gadE+LQs0C0n5kWwwsZiGoTS+spwUIpYsmC7xtF821zf/iDFEnVNsxMllvpw1c0gCSQklMW+bDFedxYM4d56yl6oEgg1AP+IwdoUZm7vUc+3HadIxKXr03pokbBuam6dPR0Fg030gIhO+GCoBc3ymbe0kZQ4FOBefhUuxwn+BEGQF9KQSFYKs5Ccq9AEBmASymHbB1TAEtWVh7mjVYhTrBvuE6sql1mnc95pWD9Jjegvp7nBvrT/JAagDOv3Se/zvxCh1Gid1+lCwhesyBD2j0EOZO6HGnN8h5pR7UEQFVsTPo/TGMryw0v6P3XEMvVTV0rEybgGeJzjT8RFZlU1txdlIyEDDJ3h02EREXYXHqwSob5u8zINwhoGv75Z6mGtRYlAApQLFJ9cxV3uQ5lVe3TzwR2Pfcm6J5jBpRKMEfO/HvI5uNVt9U2ccB3bK13G3eveiKf1
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(346002)(376002)(39860400002)(136003)(396003)(451199021)(52536014)(76116006)(2906002)(66476007)(66946007)(64756008)(66446008)(66556008)(6916009)(4326008)(7416002)(7406005)(7366002)(5660300002)(4744005)(54906003)(41300700001)(316002)(7696005)(71200400001)(8936002)(6506007)(26005)(8676002)(186003)(82960400001)(122000001)(478600001)(38100700002)(33656002)(38070700005)(9686003)(55016003)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Jg6NUDMD0WiuAZY7n6ciD1OJk4KhYlkc6r78IR5Wz/DgIHaGvaNLAt/7FULz?=
+ =?us-ascii?Q?KJcc6w5H6Aicghx0005zjkkPhgFUIw0CSgxK7gjZx42z06HX5flgwpgjHa/i?=
+ =?us-ascii?Q?08LjhDmmnrnIbEzqAvESI4GeKVLbNl4YJclqyWVRfxZu08eiVXMCf8JD855P?=
+ =?us-ascii?Q?ju2v5wbuGhzefwD+O3aBrcWvRPn0oO0rD0les4YPLFGXEg46Kfu9LwtWOUIy?=
+ =?us-ascii?Q?3V7fjTzIiXMJlKXKwMwv5NsKzrbe5YwAgp3ttZ8PJvtyD/3woq0bBSq6petC?=
+ =?us-ascii?Q?PrmbXlAQjicmN7B0ZV8XxXbqj0T65qlLsDvXAS7/TZzJOsmKfAOdYdwla9ty?=
+ =?us-ascii?Q?VPmZwmp17XTjYONkiuXY1favscSTzwD7Fxr5JRgkpaAprswf7V9tjZ1On9K2?=
+ =?us-ascii?Q?L3JDbPrJNg/KR9a30KFuMIdci15V+AcGYkZemxZzvKVj5bPuH+IZ2/O20JVO?=
+ =?us-ascii?Q?dG5DS1+vo/oK0Vrm4lPkY1ZLhQbH9jLXfrVKomoY2yDZ8twfCyVDQ8BmM4BA?=
+ =?us-ascii?Q?YQAW9AybsspK1bjJKCo4qm5fWCtKCsmGvrp8SmNkMyy2VMC57bdDLo2CoThC?=
+ =?us-ascii?Q?Hz/tJVdB7d4XGDzPgIkMJy/kKjINS5LECL2459mwrP2ukbKBRuW26FPTH66C?=
+ =?us-ascii?Q?j3KToUDiBSxeBHdJIKd4+HHWFcbn6BIemO4j1JBwjn9emZuW2O2jG1yN6Ies?=
+ =?us-ascii?Q?Hsa86fQcMlNIBtVCkb7ooO7AskBqt4opcmdIgonsRo42JEofP3mIqKW5TTs7?=
+ =?us-ascii?Q?2v2GAouSARGUpq1vHJxItAvZ8Ua/eUXJ+XkpApDPLtH+20p8w1aPYWyUCKL4?=
+ =?us-ascii?Q?rxO1wJVkxZoMsOflF0+UscndLrGxDeNDCW/lW8jKG8iqjPtNT7gVTPD4UFv9?=
+ =?us-ascii?Q?C3iX2JUc0yKFphKV4lH+b7aIAsSXnSQfU2GdyxEk85LCSfim9DKFtTwzy3v+?=
+ =?us-ascii?Q?suu/FRkcuYJtuN4g1VpGXYPpryMgntY3vCSm4e8V6Ma7bIoEcJiEP78PB91P?=
+ =?us-ascii?Q?f4f/pb0ts8pfVro0r63Qjr5eXz/nr148HM0ruSxInUabyT6ZmzAZfDYJkQgC?=
+ =?us-ascii?Q?cdZP5jy4NOh5NNp1K6/mzifxCmykPfU17S/IRgf6XPdHkO/lpQ8NfPhl+PCN?=
+ =?us-ascii?Q?nVKUjJYkd5UcEKIvdeDjO6JpPX2fpgNMQQjWLBIregIzUyUil8RF+8kz8knq?=
+ =?us-ascii?Q?XP48sjWETMxXz8xCB7AdWwSX0KR7okaDBQJTo+wG7EOQE2FPSjtUMnkbp32s?=
+ =?us-ascii?Q?gkCiIWAGOooQYpHXhfG8IxnhDz8Ptf1KW5xA3kg8lTQAkjO7jVTRFDaCbv1N?=
+ =?us-ascii?Q?qwEIIvO7K3M6Qd7MnF86E2gwpBOzc/yR9jCMDPjnXjJC/3BrmSZOaXwbOspJ?=
+ =?us-ascii?Q?M86JLgf9pGPaARPJvbTalHKT9glkWd3z5YSPONrsDyAbkA+YDlcI0CEpqf7j?=
+ =?us-ascii?Q?lD1kwOyfOxL2tUNsHcxSnE1bTHgs/AzdW5TsNWtIAd2zxfFthjmcaIZ+2Roo?=
+ =?us-ascii?Q?zR2S2A60RIezp7v9mRUJn4r9woSfMKL9nmM/fneHfZtRg/kiQ+JZoxPm+UvV?=
+ =?us-ascii?Q?xzmC7DBqYan8Ws+ocnU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230729003643.1053367-10-seanjc@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e043996-a3d9-43fb-3271-08db91e45399
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2023 16:36:44.4107
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eACxot9jVLCzFTNdkJoROJ/GJ+sWbF1GUMo0C1rvQmcEmybjwGoVg/Fb1sRrv5XYnoliRwnENsFGv/RWXLrJ7g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4766
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,329 +221,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 05:36:18PM -0700, Sean Christopherson wrote:
-> From: Aaron Lewis <aaronlewis@google.com>
-> 
-> Add a test to exercise the various features in KVM selftest's local
-> snprintf() and compare them to LIBC's snprintf() to ensure they behave
-> the same.
-> 
-> This is not an exhaustive test.  KVM's local snprintf() does not
-> implement all the features LIBC does, e.g. KVM's local snprintf() does
-> not support floats or doubles, so testing for those features were
-> excluded.
-> 
-> Testing was added for the features that are expected to work to
-> support a minimal version of printf() in the guest.
-> 
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/guest_print_test.c  | 223 ++++++++++++++++++
->  2 files changed, 224 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/guest_print_test.c
+> > Add instruction opcodes used by FRED ERETU/ERETS to x86-opcode-map.
+> >
+> > Opcode numbers are per FRED spec v5.0.
+> >
+> > Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+> > Tested-by: Shan Kang <shan.kang@intel.com>
+> > Signed-off-by: Xin Li <xin3.li@intel.com>
+>=20
+> This looks good to me. (ERETS has the opcode F2 0F 01 CA, ERETU has the o=
+pcode
+> F3 0F 01 CA)
+>=20
+> Reviewed-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+>=20
+> Thank you,
 
-I added this diff to this patch
+Thanks! Will add your RB.
+  Xin
 
-diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
-index 3a9a5db9794e..602a23ea9f01 100644
---- a/tools/testing/selftests/kvm/guest_print_test.c
-+++ b/tools/testing/selftests/kvm/guest_print_test.c
-@@ -115,7 +115,7 @@ static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-        while (1) {
-                vcpu_run(vcpu);
- 
--               TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+               TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
-                            "Unexpected exit reason: %u (%s),\n",
-                            run->exit_reason,
-                            exit_reason_str(run->exit_reason));
-@@ -161,7 +161,7 @@ static void test_limits(void)
-        run = vcpu->run;
-        vcpu_run(vcpu);
- 
--       TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+       TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
-                    "Unexpected exit reason: %u (%s),\n",
-                    run->exit_reason,
-                    exit_reason_str(run->exit_reason));
-diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index 4cf69fa8bfba..4adf526dc378 100644
---- a/tools/testing/selftests/kvm/include/ucall_common.h
-+++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -6,8 +6,19 @@
-  */
- #ifndef SELFTEST_KVM_UCALL_COMMON_H
- #define SELFTEST_KVM_UCALL_COMMON_H
-+#include <linux/kvm.h>
- #include "test_util.h"
- 
-+#if defined(__aarch64__)
-+#define UCALL_EXIT_REASON      KVM_EXIT_MMIO
-+#elif defined(__x86_64__)
-+#define UCALL_EXIT_REASON      KVM_EXIT_IO
-+#elif defined(__s390x__)
-+#define UCALL_EXIT_REASON      KVM_EXIT_S390_SIEIC
-+#elif defined(__riscv)
-+#define UCALL_EXIT_REASON      KVM_EXIT_RISCV_SBI
-+#endif
-+
- /* Common ucalls */
- enum {
-        UCALL_NONE,
-
-
-and then compiled the test for riscv and it passed. I also ran all other
-riscv tests successfully.
-
-Thanks,
-drew
-
-
-
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index f65889f5a083..f2a8b3262f17 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -123,6 +123,7 @@ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
->  TEST_GEN_PROGS_x86_64 += demand_paging_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-> +TEST_GEN_PROGS_x86_64 += guest_print_test
->  TEST_GEN_PROGS_x86_64 += hardware_disable_test
->  TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_x86_64 += kvm_page_table_test
-> diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
-> new file mode 100644
-> index 000000000000..777838d42427
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/guest_print_test.c
-> @@ -0,0 +1,223 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * A test for GUEST_PRINTF
-> + *
-> + * Copyright 2022, Google, Inc. and/or its affiliates.
-> + */
-> +#define USE_GUEST_ASSERT_PRINTF 1
-> +
-> +#include <fcntl.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +
-> +struct guest_vals {
-> +	uint64_t a;
-> +	uint64_t b;
-> +	uint64_t type;
-> +};
-> +
-> +static struct guest_vals vals;
-> +
-> +/* GUEST_PRINTF()/GUEST_ASSERT_FMT() does not support float or double. */
-> +#define TYPE_LIST					\
-> +TYPE(test_type_i64,  I64,  "%ld",   int64_t)		\
-> +TYPE(test_type_u64,  U64u, "%lu",   uint64_t)		\
-> +TYPE(test_type_x64,  U64x, "0x%lx", uint64_t)		\
-> +TYPE(test_type_X64,  U64X, "0x%lX", uint64_t)		\
-> +TYPE(test_type_u32,  U32u, "%u",    uint32_t)		\
-> +TYPE(test_type_x32,  U32x, "0x%x",  uint32_t)		\
-> +TYPE(test_type_X32,  U32X, "0x%X",  uint32_t)		\
-> +TYPE(test_type_int,  INT,  "%d",    int)		\
-> +TYPE(test_type_char, CHAR, "%c",    char)		\
-> +TYPE(test_type_str,  STR,  "'%s'",  const char *)	\
-> +TYPE(test_type_ptr,  PTR,  "%p",    uintptr_t)
-> +
-> +enum args_type {
-> +#define TYPE(fn, ext, fmt_t, T) TYPE_##ext,
-> +	TYPE_LIST
-> +#undef TYPE
-> +};
-> +
-> +static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-> +		     const char *expected_assert);
-> +
-> +#define BUILD_TYPE_STRINGS_AND_HELPER(fn, ext, fmt_t, T)		     \
-> +const char *PRINTF_FMT_##ext = "Got params a = " fmt_t " and b = " fmt_t;    \
-> +const char *ASSERT_FMT_##ext = "Expected " fmt_t ", got " fmt_t " instead";  \
-> +static void fn(struct kvm_vcpu *vcpu, T a, T b)				     \
-> +{									     \
-> +	char expected_printf[UCALL_BUFFER_LEN];				     \
-> +	char expected_assert[UCALL_BUFFER_LEN];				     \
-> +									     \
-> +	snprintf(expected_printf, UCALL_BUFFER_LEN, PRINTF_FMT_##ext, a, b); \
-> +	snprintf(expected_assert, UCALL_BUFFER_LEN, ASSERT_FMT_##ext, a, b); \
-> +	vals = (struct guest_vals){ (uint64_t)a, (uint64_t)b, TYPE_##ext };  \
-> +	sync_global_to_guest(vcpu->vm, vals);				     \
-> +	run_test(vcpu, expected_printf, expected_assert);		     \
-> +}
-> +
-> +#define TYPE(fn, ext, fmt_t, T) \
-> +		BUILD_TYPE_STRINGS_AND_HELPER(fn, ext, fmt_t, T)
-> +	TYPE_LIST
-> +#undef TYPE
-> +
-> +static void guest_code(void)
-> +{
-> +	while (1) {
-> +		switch (vals.type) {
-> +#define TYPE(fn, ext, fmt_t, T)							\
-> +		case TYPE_##ext:						\
-> +			GUEST_PRINTF(PRINTF_FMT_##ext, vals.a, vals.b);		\
-> +			__GUEST_ASSERT(vals.a == vals.b,			\
-> +				       ASSERT_FMT_##ext, vals.a, vals.b);	\
-> +			break;
-> +		TYPE_LIST
-> +#undef TYPE
-> +		default:
-> +			GUEST_SYNC(vals.type);
-> +		}
-> +
-> +		GUEST_DONE();
-> +	}
-> +}
-> +
-> +/*
-> + * Unfortunately this gets a little messy because 'assert_msg' doesn't
-> + * just contains the matching string, it also contains additional assert
-> + * info.  Fortunately the part that matches should be at the very end of
-> + * 'assert_msg'.
-> + */
-> +static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
-> +{
-> +	int len_str = strlen(assert_msg);
-> +	int len_substr = strlen(expected_assert_msg);
-> +	int offset = len_str - len_substr;
-> +
-> +	TEST_ASSERT(len_substr <= len_str,
-> +		    "Expected '%s' to be a substring of '%s'\n",
-> +		    assert_msg, expected_assert_msg);
-> +
-> +	TEST_ASSERT(strcmp(&assert_msg[offset], expected_assert_msg) == 0,
-> +		    "Unexpected mismatch. Expected: '%s', got: '%s'",
-> +		    expected_assert_msg, &assert_msg[offset]);
-> +}
-> +
-> +static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
-> +		     const char *expected_assert)
-> +{
-> +	struct kvm_run *run = vcpu->run;
-> +	struct ucall uc;
-> +
-> +	while (1) {
-> +		vcpu_run(vcpu);
-> +
-> +		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +			    "Unexpected exit reason: %u (%s),\n",
-> +			    run->exit_reason,
-> +			    exit_reason_str(run->exit_reason));
-> +
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_SYNC:
-> +			TEST_FAIL("Unknown 'args_type' = %lu", uc.args[1]);
-> +			break;
-> +		case UCALL_PRINTF:
-> +			TEST_ASSERT(strcmp(uc.buffer, expected_printf) == 0,
-> +				    "Unexpected mismatch. Expected: '%s', got: '%s'",
-> +				    expected_printf, uc.buffer);
-> +			break;
-> +		case UCALL_ABORT:
-> +			ucall_abort(uc.buffer, expected_assert);
-> +			break;
-> +		case UCALL_DONE:
-> +			return;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
-> +	}
-> +}
-> +
-> +static void guest_code_limits(void)
-> +{
-> +	char test_str[UCALL_BUFFER_LEN + 10];
-> +
-> +	memset(test_str, 'a', sizeof(test_str));
-> +	test_str[sizeof(test_str) - 1] = 0;
-> +
-> +	GUEST_PRINTF("%s", test_str);
-> +}
-> +
-> +static void test_limits(void)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_run *run;
-> +	struct kvm_vm *vm;
-> +	struct ucall uc;
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code_limits);
-> +	run = vcpu->run;
-> +	vcpu_run(vcpu);
-> +
-> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +		    "Unexpected exit reason: %u (%s),\n",
-> +		    run->exit_reason,
-> +		    exit_reason_str(run->exit_reason));
-> +
-> +	TEST_ASSERT(get_ucall(vcpu, &uc) == UCALL_ABORT,
-> +		    "Unexpected ucall command: %lu,  Expected: %u (UCALL_ABORT)\n",
-> +		    uc.cmd, UCALL_ABORT);
-> +
-> +	kvm_vm_free(vm);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> +
-> +	test_type_i64(vcpu, -1, -1);
-> +	test_type_i64(vcpu, -1,  1);
-> +	test_type_i64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-> +	test_type_i64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-> +
-> +	test_type_u64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-> +	test_type_u64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-> +	test_type_x64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-> +	test_type_x64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-> +	test_type_X64(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-> +	test_type_X64(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-> +
-> +	test_type_u32(vcpu, 0x90abcdef, 0x90abcdef);
-> +	test_type_u32(vcpu, 0x90abcdef, 0x90abcdee);
-> +	test_type_x32(vcpu, 0x90abcdef, 0x90abcdef);
-> +	test_type_x32(vcpu, 0x90abcdef, 0x90abcdee);
-> +	test_type_X32(vcpu, 0x90abcdef, 0x90abcdef);
-> +	test_type_X32(vcpu, 0x90abcdef, 0x90abcdee);
-> +
-> +	test_type_int(vcpu, -1, -1);
-> +	test_type_int(vcpu, -1,  1);
-> +	test_type_int(vcpu,  1,  1);
-> +
-> +	test_type_char(vcpu, 'a', 'a');
-> +	test_type_char(vcpu, 'a', 'A');
-> +	test_type_char(vcpu, 'a', 'b');
-> +
-> +	test_type_str(vcpu, "foo", "foo");
-> +	test_type_str(vcpu, "foo", "bar");
-> +
-> +	test_type_ptr(vcpu, 0x1234567890abcdef, 0x1234567890abcdef);
-> +	test_type_ptr(vcpu, 0x1234567890abcdef, 0x1234567890abcdee);
-> +
-> +	kvm_vm_free(vm);
-> +
-> +	test_limits();
-> +
-> +	return 0;
-> +}
-> -- 
-> 2.41.0.487.g6d72f3e995-goog
-> 
