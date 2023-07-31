@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A34F5769C67
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FB9B769C68
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbjGaQ0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:26:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59270 "EHLO
+        id S233357AbjGaQ04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:26:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233400AbjGaQ0k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:26:40 -0400
+        with ESMTP id S233413AbjGaQ0n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:26:43 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476111FEB
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:26:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3D0210B
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:26:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690820775; x=1722356775;
+  t=1690820779; x=1722356779;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=heHOwr2oExdov2YnZXE+amN8spk5BZtW366haLX5N0Q=;
-  b=Qn/YeCaA2SQTSc/rdKz4ZhebpM4wYUvgv1f2o8jg1YUBJ1CIePacOMr/
-   V307U0vD9pbV4izwUtEattgvoTOOzRX4M7/EUZkJ1XGwyg/vJ8RYRtxb0
-   TYLzd1oSUwBF0F5JeM0D/Xv2YdYLuhoy8c9Xy0mYOTr6F8KP4Ddrxq2a7
-   Bn5Cx002NInt5Jadolpf73mQoXRcFKOyGYw4sjGEg0/L20b1lkvAUhrrd
-   HOrRFUr8FQw6YmuYHJR8XOy7a4ZRYD6DcQhCw6QF0Gf0tPk9TTyKhOqVm
-   /Ska7pBjh2CxR+gLZ7YbNywLDvwFYMoEXctyMYYkeM07HteZhFARahg1v
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993597"
+  bh=aoypxCuYdLER3/LcqIyTOOIsOC8SNNr7NYzaoP86WMg=;
+  b=nCVW3S2SpvTyp9MFU3PqULuQ0G/lDRcvDnOFcEaMBXswJHW1N9rVp2Kh
+   72E+EiEhUjeiktzHCBM4jG5+PEU8nPLwkMy8AOBjKQocjZfwVholIpvua
+   m4EZd5HgKaGyyyEfYGv7grrW85GFkr3MHMle3yy2cRHG+IYOUaEemYeU8
+   Ye5k0nYi6lEX9vfQcymtwyJ5YKDJahWsQkHrXTOKRDTrTSCcprZi4B/IP
+   oockhfrAAAGDHCr5RjZZWJwK66RTP/bMWcSI90zLGR+I3O53124ZsJMDi
+   gg55WsgXxx2izBaPIVLSMqcMr1Io50O25qoOYTZScjYfxwHCpXewCxKIt
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993622"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="353993597"
+   d="scan'208";a="353993622"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:26:06 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:26:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984384"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984415"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="757984384"
+   d="scan'208";a="757984415"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:26:01 -0700
+  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:26:06 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,9 +55,9 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         xiaoyao.li@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 16/19] trace/kvm: Add trace for page convertion between shared and private
-Date:   Mon, 31 Jul 2023 12:21:58 -0400
-Message-Id: <20230731162201.271114-17-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 17/19] pci-host/q35: Move PAM initialization above SMRAM initialization
+Date:   Mon, 31 Jul 2023 12:21:59 -0400
+Message-Id: <20230731162201.271114-18-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
@@ -75,35 +75,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
+In mch_realize(), process PAM initialization before SMRAM initialization so
+that later patch can skill all the SMRAM related with a single check.
+
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c    | 1 +
- accel/kvm/trace-events | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ hw/pci-host/q35.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 72d50b923bf2..c9f3aab5e587 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -3048,6 +3048,7 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
-     ram_addr_t offset;
-     int ret = -1;
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 91c46df9ae31..ac1518a94ee4 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -575,6 +575,16 @@ static void mch_realize(PCIDevice *d, Error **errp)
+     /* setup pci memory mapping */
+     pc_pci_as_mapping_init(mch->system_memory, mch->pci_address_space);
  
-+    trace_kvm_convert_memory(start, size, to_private ? "shared_to_private" : "private_to_shared");
-     section = memory_region_find(get_system_memory(), start, size);
-     if (!section.mr) {
-         return ret;
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index 80694683acea..4935c9c5cf0b 100644
---- a/accel/kvm/trace-events
-+++ b/accel/kvm/trace-events
-@@ -25,4 +25,4 @@ kvm_dirty_ring_reaper(const char *s) "%s"
- kvm_dirty_ring_reap(uint64_t count, int64_t t) "reaped %"PRIu64" pages (took %"PRIi64" us)"
- kvm_dirty_ring_reaper_kick(const char *reason) "%s"
- kvm_dirty_ring_flush(int finished) "%d"
++    /* PAM */
++    init_pam(&mch->pam_regions[0], OBJECT(mch), mch->ram_memory,
++             mch->system_memory, mch->pci_address_space,
++             PAM_BIOS_BASE, PAM_BIOS_SIZE);
++    for (i = 0; i < ARRAY_SIZE(mch->pam_regions) - 1; ++i) {
++        init_pam(&mch->pam_regions[i + 1], OBJECT(mch), mch->ram_memory,
++                 mch->system_memory, mch->pci_address_space,
++                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
++    }
++
+     /* if *disabled* show SMRAM to all CPUs */
+     memory_region_init_alias(&mch->smram_region, OBJECT(mch), "smram-region",
+                              mch->pci_address_space, MCH_HOST_BRIDGE_SMRAM_C_BASE,
+@@ -641,15 +651,6 @@ static void mch_realize(PCIDevice *d, Error **errp)
+ 
+     object_property_add_const_link(qdev_get_machine(), "smram",
+                                    OBJECT(&mch->smram));
 -
-+kvm_convert_memory(uint64_t start, uint64_t size, const char *msg) "start 0x%" PRIx64 " size 0x%" PRIx64 " %s"
+-    init_pam(&mch->pam_regions[0], OBJECT(mch), mch->ram_memory,
+-             mch->system_memory, mch->pci_address_space,
+-             PAM_BIOS_BASE, PAM_BIOS_SIZE);
+-    for (i = 0; i < ARRAY_SIZE(mch->pam_regions) - 1; ++i) {
+-        init_pam(&mch->pam_regions[i + 1], OBJECT(mch), mch->ram_memory,
+-                 mch->system_memory, mch->pci_address_space,
+-                 PAM_EXPAN_BASE + i * PAM_EXPAN_SIZE, PAM_EXPAN_SIZE);
+-    }
+ }
+ 
+ uint64_t mch_mcfg_base(void)
 -- 
 2.34.1
 
