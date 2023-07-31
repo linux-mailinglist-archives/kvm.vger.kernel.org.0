@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67D04768CD8
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:03:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5667768CD4
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:03:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbjGaHDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:03:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44042 "EHLO
+        id S230449AbjGaHDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:03:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231174AbjGaHDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231172AbjGaHDY (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 31 Jul 2023 03:03:24 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10C4810CC;
-        Mon, 31 Jul 2023 00:02:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1C91712;
+        Mon, 31 Jul 2023 00:02:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690786937; x=1722322937;
+  t=1690786938; x=1722322938;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YTgEgmA3f1uzY8PacyZ6XmpZcGIgDW5/dB0vDrivilc=;
-  b=lAVTQf24ixp5T1w9ciVKyDsB92RZPT15jaNOCW4k825EFYeIZmxtPpwh
-   GsXDKyGUj3YeNW7L4oaXlqCpvfgY8pgfU2PMLxy8BJiXS5OXYuLFF6Jt7
-   FC7VnxL8Y4gKw9QqLv5vbg8aEKosOPRYYkWCLHUeTxIXtSOhwll0MHYvD
-   Kyssu0T9v0NN+mgoutjpYdUfOsPT/NBiml87e7/aQ+B6j88oFu8m1jHuT
-   kj5lWZDS+bqh3T8/sN+EbYiPX7Hu2AUWBT93d1w/j03ABzUsGqs9ph7v5
-   Hbt1PXYiaA7qHsOeo33C1/qkxjZjkXBKc/9rK71b15jSkiCJkWrdGJEQ3
+  bh=R/F68dINSJ894CWgsWAeNvE3sYeHzSDBLZY+Pavzuys=;
+  b=lKSYGrEu8T1GGKWNCOhRk0Xue8TyAjY+4Iev4p1UGDxMGV2/jmlBWAcS
+   MmCPCT+dzXqJh3kDhnzMoELkhvcbpkbNgo/BlgKf65ja3dDt+tlDZ2daw
+   T5OuyrfJR6tesxvz29mSMEqoEtDPCBNxmFqrvlHQ/SwTKKgYLmTsDtryc
+   +sVWotjcqC/axyEkzJEysDA62kHSTrKseXTlbzpTIrlDFcN0AFyYJFyYb
+   OrMzr30KnKALnEpnLRWc9Cy/MtGV0erQNxiE3Htyfe6RoEiOczlfrhkTa
+   gckTFOy1ORX5/nMcEkhjrZW3D0tEh86VSuGdFnBZsqo2siHNxFcPDsq+h
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649104"
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649144"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="371649104"
+   d="scan'208";a="371649144"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:04 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:06 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="871543430"
+   d="scan'208";a="871543437"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:05 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:06 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 15/36] x86/fred: No ESPFIX needed when FRED is enabled
-Date:   Sun, 30 Jul 2023 23:32:56 -0700
-Message-Id: <20230731063317.3720-16-xin3.li@intel.com>
+Subject: [PATCH v9 16/36] x86/fred: Allow single-step trap and NMI when starting a new task
+Date:   Sun, 30 Jul 2023 23:32:57 -0700
+Message-Id: <20230731063317.3720-17-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731063317.3720-1-xin3.li@intel.com>
 References: <20230731063317.3720-1-xin3.li@intel.com>
@@ -127,42 +127,79 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Because FRED always restores the full value of %rsp, ESPFIX is
-no longer needed when it's enabled.
+Entering a new task is logically speaking a return from a system call
+(exec, fork, clone, etc.). As such, if ptrace enables single stepping
+a single step exception should be allowed to trigger immediately upon
+entering user space. This is not optional.
+
+NMI should *never* be disabled in user space. As such, this is an
+optional, opportunistic way to catch errors.
+
+Allow single-step trap and NMI when starting a new task, thus once
+the new task enters user space, single-step trap and NMI are both
+enabled immediately.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/espfix_64.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kernel/espfix_64.c b/arch/x86/kernel/espfix_64.c
-index 16f9814c9be0..48d133a54f45 100644
---- a/arch/x86/kernel/espfix_64.c
-+++ b/arch/x86/kernel/espfix_64.c
-@@ -106,6 +106,10 @@ void __init init_espfix_bsp(void)
- 	pgd_t *pgd;
- 	p4d_t *p4d;
- 
-+	/* FRED systems don't need ESPFIX */
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		return;
+Changes since v8:
+* Use high-order 48 bits above the lowest 16 bit SS only when FRED
+  is enabled (Thomas Gleixner).
+---
+ arch/x86/kernel/process_64.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
+index 6d5fed29f552..0b47871a6141 100644
+--- a/arch/x86/kernel/process_64.c
++++ b/arch/x86/kernel/process_64.c
+@@ -56,6 +56,7 @@
+ #include <asm/resctrl.h>
+ #include <asm/unistd.h>
+ #include <asm/fsgsbase.h>
++#include <asm/fred.h>
+ #ifdef CONFIG_IA32_EMULATION
+ /* Not included via unistd.h */
+ #include <asm/unistd_32_ia32.h>
+@@ -507,8 +508,18 @@ void x86_gsbase_write_task(struct task_struct *task, unsigned long gsbase)
+ static void
+ start_thread_common(struct pt_regs *regs, unsigned long new_ip,
+ 		    unsigned long new_sp,
+-		    unsigned int _cs, unsigned int _ss, unsigned int _ds)
++		    u16 _cs, u16 _ss, u16 _ds)
+ {
++	/*
++	 * Paranoia: High-order 48 bits above the lowest 16 bit SS are
++	 * discarded by the legacy IRET instruction on all Intel, AMD,
++	 * and Cyrix/Centaur/VIA CPUs, thus can be set unconditionally,
++	 * even when FRED is not enabled. But we choose the safer side
++	 * to use these bits only when FRED is enabled.
++	 */
++	const unsigned long ssx_flags = cpu_feature_enabled(X86_FEATURE_FRED) ?
++		(FRED_SSX_SOFTWARE_INITIATED | FRED_SSX_NMI) : 0;
 +
- 	/* Install the espfix pud into the kernel page directory */
- 	pgd = &init_top_pgt[pgd_index(ESPFIX_BASE_ADDR)];
- 	p4d = p4d_alloc(&init_mm, pgd, ESPFIX_BASE_ADDR);
-@@ -129,6 +133,10 @@ void init_espfix_ap(int cpu)
- 	void *stack_page;
- 	pteval_t ptemask;
+ 	WARN_ON_ONCE(regs != current_pt_regs());
  
-+	/* FRED systems don't need ESPFIX */
-+	if (cpu_feature_enabled(X86_FEATURE_FRED))
-+		return;
-+
- 	/* We only have to do this once... */
- 	if (likely(per_cpu(espfix_stack, cpu)))
- 		return;		/* Already initialized */
+ 	if (static_cpu_has(X86_BUG_NULL_SEG)) {
+@@ -522,11 +533,11 @@ start_thread_common(struct pt_regs *regs, unsigned long new_ip,
+ 	loadsegment(ds, _ds);
+ 	load_gs_index(0);
+ 
+-	regs->ip		= new_ip;
+-	regs->sp		= new_sp;
+-	regs->cs		= _cs;
+-	regs->ss		= _ss;
+-	regs->flags		= X86_EFLAGS_IF;
++	regs->ip	= new_ip;
++	regs->sp	= new_sp;
++	regs->csx	= _cs;
++	regs->ssx	= _ss | ssx_flags;
++	regs->flags	= X86_EFLAGS_IF | X86_EFLAGS_FIXED;
+ }
+ 
+ void
 -- 
 2.34.1
 
