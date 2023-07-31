@@ -2,182 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D4ED7694B1
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 13:21:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 502BC76954B
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 13:54:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbjGaLVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 07:21:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34642 "EHLO
+        id S231992AbjGaLy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 07:54:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231965AbjGaLVm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 07:21:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8484D1712
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 04:20:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690802453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=47HAhqvJlrFOjF3d3mT+sXNh9SqjQbM0s/wrTjkOtJg=;
-        b=Epsu1sHEHyXjWzUEAKGS76KcvpmP0zgHZKHyeS3Uk0D1M89ucFcH63fE+oAzmmMlAl4TX9
-        NhTld9OR1/83XP3n8hiPKGCc0yfR3k9Z/X8zzZdGArCrpP9Fv8Z5URcWG1ZSERmjtoE2Yd
-        6BevUJaiMR7ZWf7fS9a0PZ43lyukJD8=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-68-vHFPTVzRNNqmLNfRjc4oeQ-1; Mon, 31 Jul 2023 07:20:52 -0400
-X-MC-Unique: vHFPTVzRNNqmLNfRjc4oeQ-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-63d10736c4aso33223576d6.3
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 04:20:52 -0700 (PDT)
+        with ESMTP id S230514AbjGaLyY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 07:54:24 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27F01A4
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 04:54:22 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-521e046f6c7so11643a12.1
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 04:54:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690804461; x=1691409261;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gz0q8+TIeyvXDOgRq+KfnkJDaIgp0/SlphpP3zWMP/E=;
+        b=XRNsIN1avnppiien8YxCEWFle10nCOmQ+kwurgqaTXK0d2hjk8sJ+Ez1rQAOq3cAGX
+         b/Kd3eGu49FAfCui72UHxLWSCtAf6qJDx2di4Zfl60Y14XySIsSPy8mV+P76SFt+BpLa
+         eHR3EWbi1KvWolPrA9VVohRqCOM6koDVX1cOGBtK+4ThU6XoZW/v4FnWXP+OVQ25lfwI
+         DmErcvzFD3HDVpRQKPSzNEc+GltK8yySRKypZw9dKIx5BHmSu0cS9vqhQuG1LoLcpD06
+         TaZg0uTME4TA9uAedn2CS7DEBVPlsDhIgYO19YgP/80uUvbfqMV0RObGTudCVNhI7IwJ
+         1s4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690802452; x=1691407252;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=47HAhqvJlrFOjF3d3mT+sXNh9SqjQbM0s/wrTjkOtJg=;
-        b=Aa58O5bnfTViiNB7iRvd6FG0NCH2M0V0D7u5dMrJPhaGlZAgUk146YFVdVVeQ4xi7H
-         NvC6UcGnyveyvfsQ+T3imnV8cNqG0xoJ8rrCucFopWSwXIg+WQnnO4+fynjLoEiIdrNd
-         bsYtIkno3mw7TlLU7BhGhUT7CJvYKCjV5HU9bhQCOyIHtiAXL9HKkhZGnC6WdPeSIlEt
-         LYfn1MzdrTWfNinWh0nzCcUXJjU2ovFT4HTgK6XYJUCCmtMl74BTLehA47QYpVU0OgdE
-         9tU6HKgNcKXGtxe1G7B1OwMnInN4/g4P37n2g7oQRIO8U5V0uxZ2S/04ERZumMQ0xXKE
-         vqSQ==
-X-Gm-Message-State: ABy/qLZYIsELggliqpxJYjEB1G4vGMDGkFUPfvCWIIzNzvfrpl5PlPXy
-        OH0pAI8RTEWAUVR11mJzyTv1Y+D6oW8bClVyGi6QCXyVNfTq8ApidaM66yw7d4SPkOMuvSCRCv/
-        bvgwg5MxpbeVN
-X-Received: by 2002:a0c:e14d:0:b0:634:20f:471c with SMTP id c13-20020a0ce14d000000b00634020f471cmr6609348qvl.14.1690802451987;
-        Mon, 31 Jul 2023 04:20:51 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGQmknuNkpt4OdqMMs+lcZsPQfXQHCOzlkWOeCIE2fDz4iRThyIeyibV6Yi3WqcRw7uGfKfaw==
-X-Received: by 2002:a0c:e14d:0:b0:634:20f:471c with SMTP id c13-20020a0ce14d000000b00634020f471cmr6609334qvl.14.1690802451661;
-        Mon, 31 Jul 2023 04:20:51 -0700 (PDT)
-Received: from vschneid.remote.csb ([149.12.7.81])
-        by smtp.gmail.com with ESMTPSA id n2-20020a0ce542000000b0061b5dbf1994sm3583834qvm.146.2023.07.31.04.20.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 04:20:51 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 06/20] tracing/filters: Optimise scalar vs
- cpumask filtering when the user mask is a single CPU
-In-Reply-To: <20230729155547.35719a1f@rorschach.local.home>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-7-vschneid@redhat.com>
- <20230729155547.35719a1f@rorschach.local.home>
-Date:   Mon, 31 Jul 2023 12:20:41 +0100
-Message-ID: <xhsmh1qgos4xi.mognet@vschneid.remote.csb>
+        d=1e100.net; s=20221208; t=1690804461; x=1691409261;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gz0q8+TIeyvXDOgRq+KfnkJDaIgp0/SlphpP3zWMP/E=;
+        b=ifIZWRuvOAAjhHsY1B3eAeGzL6FPtxy5cEm2K8nsCQKK1jdOkmpRyOCsFAwgRnUVXh
+         Ud+S02qURryGcOkODnbahKQBTlfiRYXaT/TRgljm8BOlq8DQgwBNVBa3NWE+pEDa2x+i
+         FuE9totonw6p5vqG2Bz6IsPpoiufJmnfPZyjYtxc35ndDpajEE0oZjbGTvP1bhzowYmg
+         Ux243HU75LCmv33L+6no98G1sfKjEGACIYpafrdGt2wnnJ7O8xGQbbzdtjStQ1FuixG+
+         cpy/l5hJZZNaUbui53nAHNOwqeSmcGVMujLQv+EjqI2Yv3Tc/ykLvx2klwn27s007pwx
+         bo/A==
+X-Gm-Message-State: ABy/qLYwpGkRbgpnYQYipr7joTXRBynPWtwhuMmUXXVIlM8Q8AvNBu/J
+        beNMbH3kEv7tCrYnQ4j+IR/7vUjKdUEtzPXP3PFsEA==
+X-Google-Smtp-Source: APBJJlH9ttptvP7TRn9A19ifvlq3YB7zBN0BwZYm9jpsOz2Ht0ztBRLCTPm1vh9MkDMgZpKHpde9CgVynyUPQZ/Yfsc=
+X-Received: by 2002:a50:f69e:0:b0:522:3c11:1780 with SMTP id
+ d30-20020a50f69e000000b005223c111780mr155438edn.0.1690804460991; Mon, 31 Jul
+ 2023 04:54:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+References: <20230728181907.1759513-1-reijiw@google.com> <20230728181907.1759513-3-reijiw@google.com>
+ <ZMQckrDB7tg9gPfw@linux.dev>
+In-Reply-To: <ZMQckrDB7tg9gPfw@linux.dev>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 31 Jul 2023 04:54:04 -0700
+Message-ID: <CAAeT=FyC42s=kcS3QTC6A-s6EZjhoQL7XJyxWCb5YyisJrQvdg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] KVM: arm64: PMU: Disallow vPMU on non-uniform
+ PMUVer systems
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/07/23 15:55, Steven Rostedt wrote:
-> On Thu, 20 Jul 2023 17:30:42 +0100
-> Valentin Schneider <vschneid@redhat.com> wrote:
->
->> Steven noted that when the user-provided cpumask contains a single CPU,
->> then the filtering function can use a scalar as input instead of a
->> full-fledged cpumask.
->>
->> When the mask contains a single CPU, directly re-use the unsigned field
->> predicate functions. Transform '&' into '==' beforehand.
->>
->> Suggested-by: Steven Rostedt <rostedt@goodmis.org>
->> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
->> ---
->>  kernel/trace/trace_events_filter.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/kernel/trace/trace_events_filter.c b/kernel/trace/trace_events_filter.c
->> index 2fe65ddeb34ef..54d642fabb7f1 100644
->> --- a/kernel/trace/trace_events_filter.c
->> +++ b/kernel/trace/trace_events_filter.c
->> @@ -1750,7 +1750,7 @@ static int parse_pred(const char *str, void *data,
->>               * then we can treat it as a scalar input.
->>               */
->>              single = cpumask_weight(pred->mask) == 1;
->> -		if (single && field->filter_type == FILTER_CPUMASK) {
->> +		if (single && field->filter_type != FILTER_CPU) {
->>                      pred->val = cpumask_first(pred->mask);
->>                      kfree(pred->mask);
->>              }
->> @@ -1761,6 +1761,11 @@ static int parse_pred(const char *str, void *data,
->>                              FILTER_PRED_FN_CPUMASK;
->>              } else if (field->filter_type == FILTER_CPU) {
->>                      pred->fn_num = FILTER_PRED_FN_CPU_CPUMASK;
->> +		} else if (single) {
->> +			pred->op = pred->op == OP_BAND ? OP_EQ : pred->op;
->
-> Nit, the above can be written as:
->
->                       pred->op = pret->op != OP_BAND ? : OP_EQ;
->
+Hi Oliver,
 
-That's neater, thanks!
+> This doesn't actually disallow userspace from configuring a vPMU, it
+> only hides the KVM cap. kvm_host_pmu_init() will still insert the host
+> PMU instance in the list of valid PMUs, and there doesn't appear to be
+> any check against the static key anywhere on that path.
 
-> -- Steve
->
->
->> +			pred->fn_num = select_comparison_fn(pred->op, field->size, false);
->> +			if (pred->op == OP_NE)
->> +				pred->not = 1;
->>              } else {
->>                      switch (field->size) {
->>                      case 8:
+In v6.5-rc3, which I used as the base, or even in v6.5-rc4,
+it appears kvm_reset_vcpu() checks against the static key.
+So, the initial KVM_ARM_VCPU_INIT with vPMU configured will
+fail on the systems.  Or am I missing something ? (Or is that
+going to be removed by other patches that are already queued?)
 
+But, right, it still insert the host PMU instance in the list,
+which is unnecessary.
+
+> I actually prefer where we flip the static key, as PMU context switching
+> depends on both KVM support as well as the PMU driver coming up successfully.
+> Instead, you could hoist the check against the sanitised PMU version into
+> kvm_host_pmu_init(), maybe something like:
+
+Thank you, it looks better.  I will fix this in v3.
+
+Thank you,
+Reiji
+
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 560650972478..f6a0e558472f 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -672,8 +672,11 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+>  {
+>         struct arm_pmu_entry *entry;
+>
+> -       if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
+> -           pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
+> +       /*
+> +        * Check the sanitised PMU version for the system, as KVM does not
+> +        * support implementations where PMUv3 exists on a subset of CPUs.
+> +        */
+> +       if (!pmuv3_implemented(kvm_arm_pmu_get_pmuver_limit()))
+>                 return;
+>
+>         mutex_lock(&arm_pmus_lock);
+>
+> --
+> Thanks,
+> Oliver
