@@ -2,85 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B5F76997D
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 16:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D727769981
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 16:30:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231721AbjGaO2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 10:28:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39862 "EHLO
+        id S230135AbjGaOaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 10:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231974AbjGaO1w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 10:27:52 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B91133
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 07:27:40 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RF0r933TnzLp00;
-        Mon, 31 Jul 2023 22:24:57 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 22:27:36 +0800
-Subject: Re: [PATCH v2 09/26] arm64: Add feature detection for fine grained
- traps
-To:     Marc Zyngier <maz@kernel.org>
-CC:     <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-References: <20230728082952.959212-1-maz@kernel.org>
- <20230728082952.959212-10-maz@kernel.org>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <31dfcc8e-3917-0d1f-983d-169387f1f10f@huawei.com>
-Date:   Mon, 31 Jul 2023 22:27:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <20230728082952.959212-10-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229741AbjGaOaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 10:30:04 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE15CD
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 07:30:03 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bb83eb84e5so48906475ad.1
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 07:30:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690813802; x=1691418602;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ObUdgROJ4Fh6eGJrzpfR0YhkAzW7v0vw5c8AAWfwu6Y=;
+        b=Tk9LoTMTTsEQqNvFWItA11F7gfp/gOQ/YnVlWInA1K44dlehN3cr8tbgER2TDsioQD
+         M8EKZjZr+uxZAvdq1pAthJlrk/hQVImPC0csEHGHRru6EtYPWYFaQ1dK9ZYypfOlkYZM
+         7OIjHkZVMJra3SF3JYr8YPdSWXFrA8YESyjxZmccUc+UwE9tzenDvdDMhSQdogJ02/9V
+         CODm8eN5WRLPtikUqG1VqppGe4N7ikOXJ7q/qqEsdshtoH2o29FkfUssxpWVO2u68lNC
+         MRbdwHNMeLCe6r6iXAovuJbi9j/lZYb8wTzl0/MUSRwZ40jvN1IAyn8Za88mB4OVqXi4
+         rKsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690813802; x=1691418602;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ObUdgROJ4Fh6eGJrzpfR0YhkAzW7v0vw5c8AAWfwu6Y=;
+        b=Jy8kiu8nZb8MlRpyPzv5kZL7ZzCkBjuENWs57mZvKl/lvkhi1xsROSFgRJQ7cQJtdQ
+         hXO7QuZLfw3+37RmWKtbs3ngKFfqGNcOMj1YwB6pbz0XWrLw0/PeozXn1RzqGc9VJvOq
+         wUWTulVO+Z7Btixicn8wniruc99Z1PcjbhC40p+I8GA6tpkxe7ZymVcLPNAYiU6zeOp3
+         /3b609hmWmKwRWufLEZV+/m2qZNRxQnczXY1500x46QvaObfxf3hOqY84jNt4BvGmTDX
+         Qa9Cx/JNgW2rooBpXg3RazbAN28ac7NH9Anw6aIWbH3YNj0m5NCUOe3JigKij1Z87xei
+         MtYQ==
+X-Gm-Message-State: ABy/qLYw8kt88yIY8JkdAfPc1h/ia9Hox/I5ByS5FaRSSI1iyhyeIwrv
+        F/8axPOQmuUozTsOgEsYktU4HYda914=
+X-Google-Smtp-Source: APBJJlFJCgvQUS3lYgpzxhrJr8+EP6qWlgqSSdZQQWXDlb76ZJKxLdFvbGJeFc6OC4VTdbe4FKDPaZCJ5V8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ce84:b0:1b8:2cee:946b with SMTP id
+ f4-20020a170902ce8400b001b82cee946bmr43357plg.11.1690813802190; Mon, 31 Jul
+ 2023 07:30:02 -0700 (PDT)
+Date:   Mon, 31 Jul 2023 07:30:00 -0700
+In-Reply-To: <8eb933fd-2cf3-d7a9-32fe-2a1d82eac42a@mail.ustc.edu.cn>
+Mime-Version: 1.0
+References: <8eb933fd-2cf3-d7a9-32fe-2a1d82eac42a@mail.ustc.edu.cn>
+Message-ID: <ZMfFaF2M6Vrh/QdW@google.com>
+Subject: Re: [Question] int3 instruction generates a #UD in SEV VM
+From:   Sean Christopherson <seanjc@google.com>
+To:     wuzongyong <wuzongyo@mail.ustc.edu.cn>
+Cc:     linux-kernel@vger.kernel.org, thomas.lendacky@amd.com,
+        kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/7/28 16:29, Marc Zyngier wrote:
-> From: Mark Brown <broonie@kernel.org>
-> 
-> In order to allow us to have shared code for managing fine grained traps
-> for KVM guests add it as a detected feature rather than relying on it
-> being a dependency of other features.
-> 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> [maz: converted to ARM64_CPUID_FIELDS()]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20230301-kvm-arm64-fgt-v4-1-1bf8d235ac1f@kernel.org
-> ---
->  arch/arm64/kernel/cpufeature.c | 7 +++++++
->  arch/arm64/tools/cpucaps       | 1 +
->  2 files changed, 8 insertions(+)
+On Sat, Jul 29, 2023, wuzongyong wrote:
+> Hi,
+> I am writing a firmware in Rust to support SEV based on project td-shim[1].
+> But when I create a SEV VM (just SEV, no SEV-ES and no SEV-SNP) with the firmware,
+> the linux kernel crashed because the int3 instruction in int3_selftest() cause a
+> #UD.
 
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+...
+
+> BTW, if a create a normal VM without SEV by qemu & OVMF, the int3 instruction always generates a
+> #BP.
+> So I am confused now about the behaviour of int3 instruction, could anyone help to explain the behaviour?
+> Any suggestion is appreciated!
+
+Have you tried my suggestions from the other thread[*]?
+
+  : > > I'm curious how this happend. I cannot find any condition that would
+  : > > cause the int3 instruction generate a #UD according to the AMD's spec.
+  : 
+  : One possibility is that the value from memory that gets executed diverges from the
+  : value that is read out be the #UD handler, e.g. due to patching (doesn't seem to
+  : be the case in this test), stale cache/tlb entries, etc.
+  : 
+  : > > BTW, it worked nomarlly with qemu and ovmf.
+  : > 
+  : > Does this happen every time you boot the guest with your firmware? What
+  : > processor are you running on?
+  : 
+  : And have you ruled out KVM as the culprit?  I.e. verified that KVM is NOT injecting
+  : a #UD.  That obviously shouldn't happen, but it should be easy to check via KVM
+  : tracepoints.
+
+[*] https://lore.kernel.org/all/ZMFd5kkehlkIfnBA@google.com
