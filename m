@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5667768CD4
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:03:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF08768CF2
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:04:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbjGaHDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:03:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44048 "EHLO
+        id S231245AbjGaHET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:04:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231172AbjGaHDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 03:03:24 -0400
+        with ESMTP id S231221AbjGaHDv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 03:03:51 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1C91712;
-        Mon, 31 Jul 2023 00:02:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6699B1BDF;
+        Mon, 31 Jul 2023 00:02:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690786938; x=1722322938;
+  t=1690786948; x=1722322948;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=R/F68dINSJ894CWgsWAeNvE3sYeHzSDBLZY+Pavzuys=;
-  b=lKSYGrEu8T1GGKWNCOhRk0Xue8TyAjY+4Iev4p1UGDxMGV2/jmlBWAcS
-   MmCPCT+dzXqJh3kDhnzMoELkhvcbpkbNgo/BlgKf65ja3dDt+tlDZ2daw
-   T5OuyrfJR6tesxvz29mSMEqoEtDPCBNxmFqrvlHQ/SwTKKgYLmTsDtryc
-   +sVWotjcqC/axyEkzJEysDA62kHSTrKseXTlbzpTIrlDFcN0AFyYJFyYb
-   OrMzr30KnKALnEpnLRWc9Cy/MtGV0erQNxiE3Htyfe6RoEiOczlfrhkTa
-   gckTFOy1ORX5/nMcEkhjrZW3D0tEh86VSuGdFnBZsqo2siHNxFcPDsq+h
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649144"
+  bh=1h9fTPNcW28O8bu/nclSFH4GxPR5CW0Rl9/PbASKNuY=;
+  b=QxWDADlZ9vCgE4aVAKNS/AeTeBChHMPRiv2UfhInUOBOBiZRn9VcrOxU
+   NHOLWKuWC0OTEMbis8lTw1C/lC80oHjsZEWMp8e7mJsyzpezjU8G9isfG
+   OORGn5H11MMLUE9v8uxtzjOXWmwFV3mr2fuoDG6db6cD6ErgasS1Ts56/
+   qD9BebHbfTWG1/dANuykxcrK/9ujx5szNraRUeYuKB6lOplGjwItjInP7
+   btstGsDPnCwGSS+wdMbCkn1cVeP6Lf/De6ZVyyA/GGrXSE282riN/ndDr
+   L1J54GrEjgTaQqvl2lRLkMmlDOWv0bCxGOg+fGxTunwjzjCFANWCIYWEY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649178"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="371649144"
+   d="scan'208";a="371649178"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:06 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:07 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="871543437"
+   d="scan'208";a="871543443"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:06 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:07 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 16/36] x86/fred: Allow single-step trap and NMI when starting a new task
-Date:   Sun, 30 Jul 2023 23:32:57 -0700
-Message-Id: <20230731063317.3720-17-xin3.li@intel.com>
+Subject: [PATCH v9 17/36] x86/fred: Define a common function type fred_handler
+Date:   Sun, 30 Jul 2023 23:32:58 -0700
+Message-Id: <20230731063317.3720-18-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731063317.3720-1-xin3.li@intel.com>
 References: <20230731063317.3720-1-xin3.li@intel.com>
@@ -125,81 +125,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+FRED event delivery establishes a full supervisor context by saving
+the essential information about an event to a FRED stack frame, e.g.,
+the faulting linear address of a #PF is saved as event data of a FRED
+stack frame. Thus a struct pt_regs has all the needed data to handle
+an event and it's the only input argument of a FRED event handler.
 
-Entering a new task is logically speaking a return from a system call
-(exec, fork, clone, etc.). As such, if ptrace enables single stepping
-a single step exception should be allowed to trigger immediately upon
-entering user space. This is not optional.
+Define fred_handler, a common function type used in the FRED event
+dispatch framework, which makes it easier to find the entry points
+(via grep), allows the prototype to change if necessary without
+requiring changing changes everywhere, and makes sure that all the
+entry points have the proper decorations (currently noinstr, but
+could change in the future.)
 
-NMI should *never* be disabled in user space. As such, this is an
-optional, opportunistic way to catch errors.
-
-Allow single-step trap and NMI when starting a new task, thus once
-the new task enters user space, single-step trap and NMI are both
-enabled immediately.
-
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
+ arch/x86/include/asm/fred.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Changes since v8:
-* Use high-order 48 bits above the lowest 16 bit SS only when FRED
-  is enabled (Thomas Gleixner).
----
- arch/x86/kernel/process_64.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index 6d5fed29f552..0b47871a6141 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -56,6 +56,7 @@
- #include <asm/resctrl.h>
- #include <asm/unistd.h>
- #include <asm/fsgsbase.h>
-+#include <asm/fred.h>
- #ifdef CONFIG_IA32_EMULATION
- /* Not included via unistd.h */
- #include <asm/unistd_32_ia32.h>
-@@ -507,8 +508,18 @@ void x86_gsbase_write_task(struct task_struct *task, unsigned long gsbase)
- static void
- start_thread_common(struct pt_regs *regs, unsigned long new_ip,
- 		    unsigned long new_sp,
--		    unsigned int _cs, unsigned int _ss, unsigned int _ds)
-+		    u16 _cs, u16 _ss, u16 _ds)
- {
-+	/*
-+	 * Paranoia: High-order 48 bits above the lowest 16 bit SS are
-+	 * discarded by the legacy IRET instruction on all Intel, AMD,
-+	 * and Cyrix/Centaur/VIA CPUs, thus can be set unconditionally,
-+	 * even when FRED is not enabled. But we choose the safer side
-+	 * to use these bits only when FRED is enabled.
-+	 */
-+	const unsigned long ssx_flags = cpu_feature_enabled(X86_FEATURE_FRED) ?
-+		(FRED_SSX_SOFTWARE_INITIATED | FRED_SSX_NMI) : 0;
+diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
+index d76e681a806f..b45c1bea5b7f 100644
+--- a/arch/x86/include/asm/fred.h
++++ b/arch/x86/include/asm/fred.h
+@@ -68,6 +68,19 @@
+ #define FRED_SSX_64_BIT_MODE_BIT	57
+ #define FRED_SSX_64_BIT_MODE		_BITUL(FRED_SSX_64_BIT_MODE_BIT)
+ 
++/*
++ * FRED event delivery establishes a full supervisor context by
++ * saving the essential information about an event to a FRED
++ * stack frame, e.g., the faulting linear address of a #PF is
++ * saved as event data of a FRED #PF stack frame. Thus a struct
++ * pt_regs has all the needed data to handle an event and it's
++ * the only input argument of a FRED event handler.
++ *
++ * FRED handlers need to be placed in the noinstr text section.
++ */
++#define DECLARE_FRED_HANDLER(f) void f (struct pt_regs *regs)
++#define DEFINE_FRED_HANDLER(f) noinstr DECLARE_FRED_HANDLER(f)
 +
- 	WARN_ON_ONCE(regs != current_pt_regs());
+ #ifdef CONFIG_X86_FRED
  
- 	if (static_cpu_has(X86_BUG_NULL_SEG)) {
-@@ -522,11 +533,11 @@ start_thread_common(struct pt_regs *regs, unsigned long new_ip,
- 	loadsegment(ds, _ds);
- 	load_gs_index(0);
- 
--	regs->ip		= new_ip;
--	regs->sp		= new_sp;
--	regs->cs		= _cs;
--	regs->ss		= _ss;
--	regs->flags		= X86_EFLAGS_IF;
-+	regs->ip	= new_ip;
-+	regs->sp	= new_sp;
-+	regs->csx	= _cs;
-+	regs->ssx	= _ss | ssx_flags;
-+	regs->flags	= X86_EFLAGS_IF | X86_EFLAGS_FIXED;
+ #ifndef __ASSEMBLY__
+@@ -97,6 +110,8 @@ static __always_inline unsigned long fred_event_data(struct pt_regs *regs)
+ 	return fred_info(regs)->edata;
  }
  
- void
++typedef DECLARE_FRED_HANDLER((*fred_handler));
++
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif /* CONFIG_X86_FRED */
 -- 
 2.34.1
 
