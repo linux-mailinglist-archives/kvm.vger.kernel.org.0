@@ -2,135 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B68E769FCE
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 19:54:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 023CC769FF0
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 20:02:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231150AbjGaRyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 13:54:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
+        id S231515AbjGaSCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 14:02:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230204AbjGaRya (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 13:54:30 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 854DDDC
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:54:29 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-686be28e1a8so3184809b3a.0
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:54:29 -0700 (PDT)
+        with ESMTP id S231485AbjGaSCM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 14:02:12 -0400
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5215171A
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:02:05 -0700 (PDT)
+Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-40c72caec5cso31701cf.0
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 11:02:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690826069; x=1691430869;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ye1hBUjkNRk39gbDG705nkaSiiZ5DkFSScU/cjrv98U=;
-        b=yD59vn9kqIM2hU9m6M6C5eYC4+NgiocCNfCOTTv2AfStv9/CAubB/d7o5PgACopPv8
-         8uWIzKfh1TGzdd/7w4E1rL5mrr6gAN9Dl40sy7HmU5fW2avaWsp9viSmnLI2TZ1cAGXW
-         wADO2+xJ10Sic7OVzGWoB0L9ACqz3C8cbNVTl0Xl9LfFDCXkF/QzlSXhskTo5QMuHEXY
-         I0p4bB03w3aKxnzVvRx74a3sX6VtB5HXT4eL/v3LWM49QN23Y2+YmY4OSyqS9Z+X8OBp
-         5xxacTaZB9U2+LoCB9PE06OBW/AhKDIg8fuxZjsKhmTj88yw237yz2K2+Um/mroMWROR
-         MRqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690826069; x=1691430869;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1690826525; x=1691431325;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ye1hBUjkNRk39gbDG705nkaSiiZ5DkFSScU/cjrv98U=;
-        b=FT5Zc7VoNN4jP1mi5uE0k2m0apFW5Jmn0VZcAckzXHWcodtP/Rhrw18s2O59IEdvI1
-         FGIceUifXZAD5aODfiAoaPlHSejaD7jNIQw0GxFwhsfQqbMeo9hBwpLwY0Ie5nWpP9mK
-         w84ATmPAKo4AV+1KujG5heDUKkwMLEFZ4N1+pYE0BO+k+qA76FQQHRJUFw/5Q4ykxvC7
-         TuuE9pOhN+U4yu0/Lwwyw7a1dOcRT1kInArwjyAWX134PUsCBp0xCmZj7++8RLh0GR+G
-         A50AOGWxXkHyLxEQ28lYMfYvKK8i5rPFd/GtCM9cDnDvDZQ5xct9RUZhg7Ulch54zvZZ
-         jW5Q==
-X-Gm-Message-State: ABy/qLazSTtNL49FvyBWs2TNACxzmBWXMvs82LRm6UgBe2aUs7BUWm/s
-        jqx1Gd43xIq/NJe/MTaaxj0dbw==
-X-Google-Smtp-Source: APBJJlEbEnRkq29IMUQ+Kip8yG6iM7uCvIqvaT6P3hXS9+YRDB58ekn1I7Jthg7ZpOUWG0IsWJ7r7w==
-X-Received: by 2002:a05:6a21:7182:b0:133:b3a9:90d with SMTP id wq2-20020a056a21718200b00133b3a9090dmr10372183pzb.36.1690826068797;
-        Mon, 31 Jul 2023 10:54:28 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id q23-20020a637517000000b0055b4307963dsm2001743pgc.23.2023.07.31.10.54.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 10:54:27 -0700 (PDT)
-Date:   Mon, 31 Jul 2023 17:54:22 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, Xu Yilun <yilun.xu@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>
-Subject: Re: [PATCH v2 2/6] KVM: Documentation: Update the field name gfns
- and its description in kvm_mmu_page
-Message-ID: <ZMf1TkrUjP6+/VSC@google.com>
-References: <20230626182016.4127366-1-mizhang@google.com>
- <20230626182016.4127366-3-mizhang@google.com>
- <ec65c77a-3499-6278-f352-9bbe25a44b96@infradead.org>
+        bh=X0gCxxFfGpH7+EO1EgURYZAY2bdhrbnISyF1lBRoK6A=;
+        b=qZXJd0+ffo+L4HQlrADJFOpNsrtneEkEjKGaCenKWHHQEco9dlSNxersD+gpofApiW
+         o02MZh+LdJtBnpNbTaunNFo/yrUZVDlYroTi00ctwRDARSeVylQBSOGLLV6g3BPsFik1
+         4KZESg4WwqRH2heMDI/gKOTA96YxqAHdeR6cwsxRS352/fhcTvniO25FMpqKBC+vkbG+
+         7U3kQrA7UwBFicH5pD7tews8lYXa8aG2Rtx/WHVJ50zWYGSnD/DEpHGm5+dNWqrCjKzK
+         vrB7i6HMlTdlHH7oSEErO/ezx1jdtNdTdwaGk/ao8HCv4z3XUdYfTfahIP4mt6yralea
+         cWuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690826525; x=1691431325;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X0gCxxFfGpH7+EO1EgURYZAY2bdhrbnISyF1lBRoK6A=;
+        b=AqktUBnD5EMua5Ur9TlaxVyOu00JLazLaUjgQlTSzxXXsqNO8JW6UV7zxlU7xzEma6
+         Zr4LdsM8vH2nUVm072sjcmxxenjWSL98uVlNtIGR8/g8CUTMMAmTMPvHlQxjTg6C2zHQ
+         IbySqp8hXjtoyDZBWTQBWiNzLug4D0ENSwBRuKvdsNAWZdkAoDoOS0FyA2opCXUO3BIy
+         0l1+/wWJXuiZ6WSrgcm0Dmv2I2KHHLXbONZiqWer6hIwI7Q4w7c5iUodwiwGqiy/AmKp
+         Znd9NxD8xCZKQQsuG6Clqo+LXEba19ln7uGmSwf+f3hXKncGdgI0+kt+vz8tpuLUhYrN
+         5Xfg==
+X-Gm-Message-State: ABy/qLbx8+L76pOEGh+GNdzn3p2yUTsM83neeTdkaJmF+YS56XOYIGJu
+        lYal7NK3gTzQ4u4Z0Un7HFFcWA08Jn0pbbxXShqHMw==
+X-Google-Smtp-Source: APBJJlEBpxAr+gWpuQ40S4Mxoz6DvPL1ZVwppPhat0hf9uVLuJsVRwWK349Eb3xEO5XCaxjIBjS+YDqgeGbyrEVO6AI=
+X-Received: by 2002:a05:622a:104d:b0:403:9572:e37f with SMTP id
+ f13-20020a05622a104d00b004039572e37fmr425212qte.22.1690826524611; Mon, 31 Jul
+ 2023 11:02:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec65c77a-3499-6278-f352-9bbe25a44b96@infradead.org>
+References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-9-rananta@google.com>
+ <87o7jxr06t.wl-maz@kernel.org> <87lef1qzim.wl-maz@kernel.org>
+In-Reply-To: <87lef1qzim.wl-maz@kernel.org>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 31 Jul 2023 11:01:53 -0700
+Message-ID: <CAJHc60xC-Bs-0uoqkytDVcwHTxVnW7eyVxfHhO0mRrupVbdaYg@mail.gmail.com>
+Subject: Re: [PATCH v7 08/12] KVM: arm64: Define kvm_tlb_flush_vmid_range()
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 26, 2023, Randy Dunlap wrote:
-> Hi--
-> 
-> On 6/26/23 11:20, Mingwei Zhang wrote:
-> > Update the field 'gfns' in kvm_mmu_page to 'shadowed_translation' to be
-> > consistent with the code. Also update the corresponding 'gfns' in the
-> > comments. The more detailed description of 'shadowed_translation' is
-> > already inlined in the data structure definition, so no need to duplicate
-> > the text but simply just update the names.
-> > 
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > Reviewed-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  Documentation/virt/kvm/x86/mmu.rst | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/x86/mmu.rst b/Documentation/virt/kvm/x86/mmu.rst
-> > index 561efa8ec7d7..4c9044b4dc6c 100644
-> > --- a/Documentation/virt/kvm/x86/mmu.rst
-> > +++ b/Documentation/virt/kvm/x86/mmu.rst
-> > @@ -221,11 +221,12 @@ Shadow pages contain the following information:
-> >      at __pa(sp2->spt).  sp2 will point back at sp1 through parent_pte.
-> >      The spt array forms a DAG structure with the shadow page as a node, and
-> >      guest pages as leaves.
-> > -  gfns:
-> > -    An array of 512 guest frame numbers, one for each present pte.  Used to
-> > -    perform a reverse map from a pte to a gfn. When role.direct is set, any
-> > +  shadowed_translation:
-> > +    An array of 512 shadow translation entries, one for each present pte. Used
-> > +    to perform a reverse map from a pte to a gfn. When role.direct is set, any
-> >      element of this array can be calculated from the gfn field when used, in
-> > -    this case, the array of gfns is not allocated. See role.direct and gfn.
-> > +    this case, the array of shadowed_translation is not allocated. See
-> 
-> I cannot parse the before version nor the after version of this sentence (new version):
-> 
->                                                   When role.direct is set, any
->     element of this array can be calculated from the gfn field when used, in
->     this case, the array of shadowed_translation is not allocated.
-> 
-> 
+On Thu, Jul 27, 2023 at 6:01=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Thu, 27 Jul 2023 13:47:06 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Sat, 22 Jul 2023 03:22:47 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > >
+> > > Implement the helper kvm_tlb_flush_vmid_range() that acts
+> > > as a wrapper for range-based TLB invalidations. For the
+> > > given VMID, use the range-based TLBI instructions to do
+> > > the job or fallback to invalidating all the TLB entries.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_pgtable.h | 10 ++++++++++
+> > >  arch/arm64/kvm/hyp/pgtable.c         | 20 ++++++++++++++++++++
+> > >  2 files changed, 30 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/includ=
+e/asm/kvm_pgtable.h
+> > > index 8294a9a7e566..5e8b1ff07854 100644
+> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > @@ -754,4 +754,14 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_pro=
+t(kvm_pte_t pte);
+> > >   *    kvm_pgtable_prot format.
+> > >   */
+> > >  enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> > > +
+> > > +/**
+> > > + * kvm_tlb_flush_vmid_range() - Invalidate/flush a range of TLB entr=
+ies
+> > > + *
+> > > + * @mmu:   Stage-2 KVM MMU struct
+> > > + * @addr:  The base Intermediate physical address from which to inva=
+lidate
+> > > + * @size:  Size of the range from the base to invalidate
+> > > + */
+> > > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > > +                           phys_addr_t addr, size_t size);
+> > >  #endif     /* __ARM64_KVM_PGTABLE_H__ */
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtabl=
+e.c
+> > > index aa740a974e02..5d14d5d5819a 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -670,6 +670,26 @@ static bool stage2_has_fwb(struct kvm_pgtable *p=
+gt)
+> > >     return !(pgt->flags & KVM_PGTABLE_S2_NOFWB);
+> > >  }
+> > >
+> > > +void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+> > > +                           phys_addr_t addr, size_t size)
+> > > +{
+> > > +   unsigned long pages, inval_pages;
+> > > +
+> > > +   if (!system_supports_tlb_range()) {
+> > > +           kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> > > +           return;
+> > > +   }
+> > > +
+> > > +   pages =3D size >> PAGE_SHIFT;
+> > > +   while (pages > 0) {
+> > > +           inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
+> > > +           kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval=
+_pages);
+> > > +
+> > > +           addr +=3D inval_pages << PAGE_SHIFT;
+> > > +           pages -=3D inval_pages;
+> > > +   }
+> > > +}
+> > > +
+> >
+> > This really shouldn't live in pgtable.c. This code gets linked into
+> > the EL2 object. What do you think happens if, for some reason, this
+> > gets called *from EL2*?
+>
+> Ah, actually, nothing too bad would happen, as we convert the
+> kvm_call_hyp() into a function call.
+>
+> But still, we don't need two copies of this stuff, and it can live in
+> mmu.c.
+>
+But since we have a couple of references in pgtable.c to
+kvm_tlb_flush_vmid_range(), wouldn't that be an (linking) issue if we
+moved the definition to mmu.c?
 
-Sorry for the late reply.  Why is it not parsed? It just means that when
-role.direct is set, do not use gfns. The gfn can be calculated from the
-base address + offset. The base address here is the 'gfn' field in
-kvm_mmu_page.
+ld: error: undefined symbol: __kvm_nvhe_kvm_tlb_flush_vmid_range
+>>> referenced by pgtable.c:1148 (./arch/arm64/kvm/hyp/nvhe/../pgtable.c:11=
+48)
+>>>               arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o:(__kvm_nvhe_kvm_pgtabl=
+e_stage2_unmap) in archive vmlinux.a
+...
 
-> > +    role.direct and gfn.
-> >    root_count:
-> >      A counter keeping track of how many hardware registers (guest cr3 or
-> >      pdptrs) are now pointing at the page.  While this counter is nonzero, the
-> 
-> -- 
-> ~Randy
+Or is there some other way to make it work?
+
+- Raghavendra
+
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
