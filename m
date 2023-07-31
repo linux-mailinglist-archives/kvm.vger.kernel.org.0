@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 516E8769C59
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:25:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C67F8769C5A
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:25:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230265AbjGaQZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:25:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58230 "EHLO
+        id S233325AbjGaQZw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:25:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbjGaQZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:25:43 -0400
-Received: from mgamail.intel.com (unknown [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE27199C
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:29 -0700 (PDT)
+        with ESMTP id S232048AbjGaQZu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:25:50 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E751A19AC
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690820729; x=1722356729;
+  t=1690820733; x=1722356733;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Ta4InYtMSOxVmVlrTdpkepm14awSYjV/tD5ZIXGmuAY=;
-  b=kDxbga/cGJLjLlMyQL+4k4AF4LpwZuCEGauH2F0h8KWj1flaSc2r0+J4
-   JCH78JcqPyiizFz0qc61hK0IigIYemXgWAqv+kg/OZopwAhyfMyhihB9j
-   1wAwdxGb+CM25LcI+uUWuJG/K9K+fyc/A2ATjkDiZDa3WMa6z+8cEG46T
-   kIm4+vkwRLlpT8Kj4ackiklh4HyFwvm5nQGG6qWYfxPJgLWEbSN58lfgO
-   Ckqcjql3jToSYqI+6m4OPL3Yba+AuWW+dETwvo3+odyhcq73nUJDavQ2j
-   haAqJWgIzWdtsjJ6NW1whg9biJiE5vSecymTD2IswF4BeIdl63c0OVsOx
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993467"
+  bh=Kl0SGGt7OdcIiPqVNrEI2K05JRMW2feCGQzusuuxZsU=;
+  b=ZSaeIIX8vVJPb6dR9lChMuNLK0ZDDBoc/La/u7JWVwjnRuo07H0CkrX6
+   St6L9uxfEILQ1cIZy8MbINgUCNKmWvhC7zJ0eMYqtTtRCef6aFWoC4UNQ
+   LHq+Dm3Rg8bIINKUYF8UD8BhJYLfZmpllrYvBH4JAaAYMQCaL4b5x3SHu
+   beyMvFvH1sAtEfEYqlI667Pm0ZNYKIsGO1cKt6qjBeD1pqV/PiUDs3nvo
+   xjiuV7umh55Cnjo5hD7XDMC4JRULXRL8N7r5cB8vclM0sRS923ZygFFbD
+   Qw72wHGLiDItIYAXeJYJswXyaJ5Vt9unokEI7FImoPkLb7nx/ujIcNrC8
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993482"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="353993467"
+   d="scan'208";a="353993482"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:29 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:33 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984187"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984213"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="757984187"
+   d="scan'208";a="757984213"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:24 -0700
+  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:29 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,9 +55,9 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         xiaoyao.li@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 08/19] HostMem: Add private property to indicate to use kvm gmem
-Date:   Mon, 31 Jul 2023 12:21:50 -0400
-Message-Id: <20230731162201.271114-9-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 09/19] i386/kvm: Create gmem fd for KVM_X86_SW_PROTECTED_VM
+Date:   Mon, 31 Jul 2023 12:21:51 -0400
+Message-Id: <20230731162201.271114-10-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
@@ -73,87 +73,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Register a memory listener for KVM_X86_SW_PROVTED_VM. It creates gmem
+for the backend who sets the private property.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- backends/hostmem.c       | 18 ++++++++++++++++++
- include/sysemu/hostmem.h |  2 +-
- qapi/qom.json            |  4 ++++
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ include/exec/memory.h |  1 +
+ target/i386/kvm/kvm.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 747e7838c031..dbdbb0aafd45 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -461,6 +461,20 @@ static void host_memory_backend_set_reserve(Object *o, bool value, Error **errp)
-     }
-     backend->reserve = value;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e119d3ce1a1d..ddf0e14970b0 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -814,6 +814,7 @@ struct IOMMUMemoryRegion {
+ #define MEMORY_LISTENER_PRIORITY_MIN            0
+ #define MEMORY_LISTENER_PRIORITY_ACCEL          10
+ #define MEMORY_LISTENER_PRIORITY_DEV_BACKEND    10
++#define MEMORY_LISTENER_PRIORITY_ACCEL_HIGH     20
+ 
+ /**
+  * struct MemoryListener: callbacks structure for updates to the physical memory map
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 7971f0fd74b1..df3a5f89396e 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -37,6 +37,7 @@
+ #include "hyperv-proto.h"
+ 
+ #include "exec/gdbstub.h"
++#include "exec/ramblock.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/ratelimit.h"
+@@ -2591,8 +2592,41 @@ static void register_smram_listener(Notifier *n, void *unused)
+                                  &smram_address_space, 1, "kvm-smram");
  }
-+
-+static bool host_memory_backend_get_private(Object *o, Error **errp)
+ 
++static void kvm_x86_sw_protected_vm_region_add(MemoryListener *listenr,
++                                       MemoryRegionSection *section)
 +{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
++    MemoryRegion *mr = section->mr;
++    Object *owner = memory_region_owner(mr);
++    int fd;
 +
-+    return backend->private;
++    if (owner && object_dynamic_cast(owner, TYPE_MEMORY_BACKEND) &&
++        object_property_get_bool(owner, "private", NULL) &&
++        mr->ram_block && mr->ram_block->gmem_fd < 0) {
++        struct kvm_create_guest_memfd gmem = {
++            .size = memory_region_size(mr),
++            /* TODO: to decide whether KVM_GUEST_MEMFD_ALLOW_HUGEPAGE is supported */
++            .flags = KVM_GUEST_MEMFD_ALLOW_HUGEPAGE,
++        };
++
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_GUEST_MEMFD, &gmem);
++        if (fd < 0) {
++            error_report("%s: error creating gmem: %s\n", __func__, strerror(-fd));
++            exit(1);
++        }
++        memory_region_set_gmem_fd(mr, fd);
++    }
 +}
 +
-+static void host_memory_backend_set_private(Object *o, bool value, Error **errp)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(o);
++static MemoryListener kvm_x86_sw_protected_vm_memory_listener = {
++    .name = "kvm_x86_sw_protected_vm_memory_listener",
++    .region_add = kvm_x86_sw_protected_vm_region_add,
++    /* Higher than KVM memory listener = 10. */
++    .priority = MEMORY_LISTENER_PRIORITY_ACCEL_HIGH,
++};
 +
-+    backend->private = value;
-+}
- #endif /* CONFIG_LINUX */
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
++    X86MachineState *x86ms = X86_MACHINE(ms);
+     uint64_t identity_base = 0xfffbc000;
+     uint64_t shadow_mem;
+     int ret;
+@@ -2617,6 +2651,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         return ret;
+     }
  
- static bool
-@@ -541,6 +555,10 @@ host_memory_backend_class_init(ObjectClass *oc, void *data)
-         host_memory_backend_get_reserve, host_memory_backend_set_reserve);
-     object_class_property_set_description(oc, "reserve",
-         "Reserve swap space (or huge pages) if applicable");
-+    object_class_property_add_bool(oc, "private",
-+        host_memory_backend_get_private, host_memory_backend_set_private);
-+    object_class_property_set_description(oc, "private",
-+        "Use KVM gmem private memory");
- #endif /* CONFIG_LINUX */
-     /*
-      * Do not delete/rename option. This option must be considered stable
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 39326f1d4f9c..d88970395618 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -65,7 +65,7 @@ struct HostMemoryBackend {
-     /* protected */
-     uint64_t size;
-     bool merge, dump, use_canonical_path;
--    bool prealloc, is_mapped, share, reserve;
-+    bool prealloc, is_mapped, share, reserve, private;
-     uint32_t prealloc_threads;
-     ThreadContext *prealloc_context;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-diff --git a/qapi/qom.json b/qapi/qom.json
-index 7f92ea43e8e1..e0b2044e3d20 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -605,6 +605,9 @@
- # @reserve: if true, reserve swap space (or huge pages) if applicable
- #     (default: true) (since 6.1)
- #
-+# @private: if true, use KVM gmem private memory
-+#           (default: false) (since 8.1)
-+#
- # @size: size of the memory region in bytes
- #
- # @x-use-canonical-path-for-ramblock-id: if true, the canonical path
-@@ -631,6 +634,7 @@
-             '*prealloc-context': 'str',
-             '*share': 'bool',
-             '*reserve': 'bool',
-+            '*private': 'bool',
-             'size': 'size',
-             '*x-use-canonical-path-for-ramblock-id': 'bool' } }
- 
++    if (x86ms->vm_type == KVM_X86_SW_PROTECTED_VM) {
++        memory_listener_register(&kvm_x86_sw_protected_vm_memory_listener, &address_space_memory);
++    }
++
+     if (!kvm_check_extension(s, KVM_CAP_IRQ_ROUTING)) {
+         error_report("kvm: KVM_CAP_IRQ_ROUTING not supported by KVM");
+         return -ENOTSUP;
 -- 
 2.34.1
 
