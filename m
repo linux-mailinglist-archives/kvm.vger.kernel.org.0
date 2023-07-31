@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75E9F768D76
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:13:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8123B768D83
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231372AbjGaHMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:12:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50020 "EHLO
+        id S230161AbjGaHNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:13:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231124AbjGaHMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 03:12:16 -0400
+        with ESMTP id S231382AbjGaHMS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 03:12:18 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CCF53C13;
-        Mon, 31 Jul 2023 00:10:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B6D359F;
+        Mon, 31 Jul 2023 00:10:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690787416; x=1722323416;
+  t=1690787423; x=1722323423;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QJo+FdezOu/7r5CtwRnG6EayDGJs/agjxSi0oClRDik=;
-  b=EpL73frxbIyK4PWC9dg1wWHyD3sDjHmz5im5yHjY1peTwyx5RfHV3aTG
-   4p79kW5D5+PmQNgFAuts919Fc5pZzobSGCthBXuBZ8G0vduAiwGKTa5HV
-   OsxMH1NOBoRX4cBTuVP03cNFV9NRXpsf7QZIPbESet/od5WY3kd2+iaRv
-   3VYjCp4eI/4j1CdN+SIAZHg4q4JPhyAbXx7xB6WQsRXY0SkOsGV1r1/hc
-   UG62zJPrcoUgYYWva+kKLsXv9wTHEKbABvv3UPQ68U6h2CXylN9M3utm4
-   SFmP0PAZ7ZpGleYywH3HKxo4HoW6XXUH6FpG14o1HtQS9Ky2BxNru2u4d
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="432750124"
+  bh=0k0T0+NBS4NOJOU0xtkOh6eqcDmcObEt/EaW35o1kMc=;
+  b=UmQcSKwC3EMO/CubajJwt74gKWtWPL2GtqkG7H0gEJjykDP0/RDhoKYA
+   Yb3RrQ4mtTk4ZLVopP21ijWMa76BBNi91KKFFJwigYbUMfVqRmb/ogTQJ
+   5fg8A/U2G5EMVVTuA53zuJxde8DJYz793K4tL8DCeSHkr4gZJlpmlp16T
+   GabUCG55V92LbT7zldScIL8B+UYHcI62wauioi0k6Q3Y7T4BEJ8IojW7K
+   pm8cq5Em/M5N0TsCXdVMV40h/GxS+xD6LEOMrjwv9I2MacxQ4HD8/XrIs
+   6347JJ8/Kc7x70rx7ISjM15HnXA9ZiwwT7IaIqAh+oVieIpcJQJpFu3XN
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="432750163"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="432750124"
+   d="scan'208";a="432750163"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:10:12 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:10:13 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="798157781"
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="798157785"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="798157781"
+   d="scan'208";a="798157785"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga004.fm.intel.com with ESMTP; 31 Jul 2023 00:10:07 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 31 Jul 2023 00:10:08 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -107,9 +107,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 31/36] x86/traps: Export external_interrupt() for handling IRQ in IRQ induced VM exits
-Date:   Sun, 30 Jul 2023 23:41:28 -0700
-Message-Id: <20230731064133.3881-2-xin3.li@intel.com>
+Subject: [PATCH v9 32/36] x86/fred: Export fred_entrypoint_kernel() for handling NMI in NMI induced VM exits
+Date:   Sun, 30 Jul 2023 23:41:29 -0700
+Message-Id: <20230731064133.3881-3-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731064133.3881-1-xin3.li@intel.com>
 References: <20230731064133.3881-1-xin3.li@intel.com>
@@ -125,30 +125,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Export external_interrupt() for handling IRQ in IRQ induced VM exits.
+Export fred_entrypoint_kernel() for handling NMI in NMI induced VM exits.
 
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/traps.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/x86/entry/entry_64_fred.S | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index 90fdfcccee7a..6143ad56008e 100644
---- a/arch/x86/kernel/traps.c
-+++ b/arch/x86/kernel/traps.c
-@@ -1560,6 +1560,11 @@ int external_interrupt(struct pt_regs *regs)
- 	return 0;
- }
+diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
+index d24bf7f10ac8..12063267d2ac 100644
+--- a/arch/x86/entry/entry_64_fred.S
++++ b/arch/x86/entry/entry_64_fred.S
+@@ -4,6 +4,7 @@
+  */
  
-+#if IS_ENABLED(CONFIG_KVM_INTEL)
-+/* For KVM VMX to handle IRQs in IRQ induced VM exits. */
-+EXPORT_SYMBOL_GPL(external_interrupt);
-+#endif
-+
- #endif /* CONFIG_X86_64 */
+ #include <asm/asm.h>
++#include <asm/export.h>
+ #include <asm/fred.h>
  
- void __init trap_init(void)
+ #include "calling.h"
+@@ -54,3 +55,4 @@ SYM_CODE_START_NOALIGN(fred_entrypoint_kernel)
+ 	FRED_EXIT
+ 	ERETS
+ SYM_CODE_END(fred_entrypoint_kernel)
++EXPORT_SYMBOL(fred_entrypoint_kernel)
 -- 
 2.34.1
 
