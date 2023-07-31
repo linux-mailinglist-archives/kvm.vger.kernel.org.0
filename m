@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48276769C56
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:25:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E40DD769C57
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:25:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233305AbjGaQZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:25:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57746 "EHLO
+        id S233187AbjGaQZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:25:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230420AbjGaQZV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:25:21 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754A61723
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:15 -0700 (PDT)
+        with ESMTP id S230032AbjGaQZY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:25:24 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62BB31722
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690820715; x=1722356715;
+  t=1690820720; x=1722356720;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nzxnw5G/eoYdNN3k9mPcm6LNL3IW0dYwkL/0HXSYmE8=;
-  b=e8KODpqx6tWgyIaP/kN5yWKhPOVvc52th4IZCuITMV26U655WyzjC6Jz
-   GKmlUBqU8DjDsLzRedC3+A038E+KtJgxCxKogsxWJNRqQvXKI/9Cle82X
-   JrolCNsog1GT4WXJNXlgLyFRPUp3wn3qHZhti0Vk+l4DyFztV1ubFRCh+
-   gn96cYaWnsxQvAMVsA/gbMRjf0kFT3mEHfIHW8H4vmDG+Gos+BjAR46c1
-   TApIz5y72vIte8F0BdB2uYRCkG7/cOKfrVekRveOf8zvClS5rPCf06JjL
-   h+pQYZhuU4NNLzHNnhl6/F+QI0X53o049jPZuStfDZKjEM22ubK+zIccN
+  bh=KrHq5Q0AGZhu0U92WRZt5YMhM+0kmJOGaYAi4j7AhxI=;
+  b=PB0hh+4DYg6oDCjKN5xmRcvGLqwvvThyLn4Ma4aM6yOrwuM39EeFt8yW
+   3CbidbBiViHkT6udrtN42mRu8q9aDmOHIra3zHkIyT4czIBXIh+HGPtPB
+   XLJ34A+ddnyZKQqPcI4/WQ8T152O2YexHT228dzfvBCGlC8PRR28wDbKH
+   5BchE3znxAX/E9k9Aab38N8/6/0UGhFSd8Lrwf/Fd6t8i7AjRqDqGs8bX
+   YyrFTOQvMPHP3ksulo9BYVn0nGLdycxaVFj7dqpeNRWq6wu7yxHvBEnIt
+   RHWySxvfmAVh36yDIu6/diaBQ2/6QVrLwTYrrJEUNgPqsKv6xRYGdLoZO
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993431"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993443"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="353993431"
+   d="scan'208";a="353993443"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:15 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:19 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984084"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984123"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="757984084"
+   d="scan'208";a="757984123"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:10 -0700
+  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:15 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,9 +55,9 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         xiaoyao.li@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 05/19] kvm: Enable KVM_SET_USER_MEMORY_REGION2 for memslot
-Date:   Mon, 31 Jul 2023 12:21:47 -0400
-Message-Id: <20230731162201.271114-6-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 06/19] i386/pc: Drop pc_machine_kvm_type()
+Date:   Mon, 31 Jul 2023 12:21:48 -0400
+Message-Id: <20230731162201.271114-7-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
@@ -73,151 +73,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Chao Peng <chao.p.peng@linux.intel.com>
+pc_machine_kvm_type() was introduced by commit e21be724eaf5 ("i386/xen:
+add pc_machine_kvm_type to initialize XEN_EMULATE mode") to do Xen
+specific initialization by utilizing kvm_type method.
 
-Switch to KVM_SET_USER_MEMORY_REGION2 when supported by KVM.
+commit eeedfe6c6316 ("hw/xen: Simplify emulated Xen platform init")
+moves the Xen specific initialization to pc_basic_device_init().
 
-With KVM_SET_USER_MEMORY_REGION2, QEMU can set up memory region that
-backen'ed both by hva-based shared memory and gmem fd based private
-memory.
+There is no need to keep the PC specific kvm_type() implementation
+anymore. On the other hand, later patch will implement kvm_type()
+method for all x86/i386 machines to support KVM_X86_SW_PROTECTED_VM.
 
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-Codeveloped-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c      | 57 +++++++++++++++++++++++++++++++++-------
- accel/kvm/trace-events   |  2 +-
- include/sysemu/kvm_int.h |  2 ++
- 3 files changed, 51 insertions(+), 10 deletions(-)
+ hw/i386/pc.c         | 5 -----
+ include/hw/i386/pc.h | 3 ---
+ 2 files changed, 8 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index d8eee405de24..7b1818334ba7 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -288,35 +288,68 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
- static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 3109d5e0e035..abeadd903827 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1794,11 +1794,6 @@ static void pc_machine_initfn(Object *obj)
+     cxl_machine_init(obj, &pcms->cxl_devices_state);
+ }
+ 
+-int pc_machine_kvm_type(MachineState *machine, const char *kvm_type)
+-{
+-    return 0;
+-}
+-
+ static void pc_machine_reset(MachineState *machine, ShutdownCause reason)
  {
-     KVMState *s = kvm_state;
--    struct kvm_userspace_memory_region mem;
-+    struct kvm_userspace_memory_region2 mem;
-+    static int cap_user_memory2 = -1;
-     int ret;
+     CPUState *cs;
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index d54e8b1101e4..c98d628a76f3 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -296,15 +296,12 @@ extern const size_t pc_compat_1_5_len;
+ extern GlobalProperty pc_compat_1_4[];
+ extern const size_t pc_compat_1_4_len;
  
-+    if (cap_user_memory2 == -1) {
-+        cap_user_memory2 = kvm_check_extension(s, KVM_CAP_USER_MEMORY2);
-+    }
-+
-+    if (!cap_user_memory2 && slot->fd >= 0) {
-+        error_report("%s, KVM doesn't support gmem!", __func__);
-+        exit(1);
-+    }
-+
-     mem.slot = slot->slot | (kml->as_id << 16);
-     mem.guest_phys_addr = slot->start_addr;
-     mem.userspace_addr = (unsigned long)slot->ram;
-     mem.flags = slot->flags;
-+    mem.gmem_fd = slot->fd;
-+    mem.gmem_offset = slot->ofs;
- 
--    if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-+    if (slot->memory_size && !new && (slot->flags ^ slot->old_flags) & KVM_MEM_READONLY) {
-         /* Set the slot size to 0 before setting the slot to the desired
-          * value. This is needed based on KVM commit 75d61fbc. */
-         mem.memory_size = 0;
--        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-+
-+        if (cap_user_memory2) {
-+            ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION2, &mem);
-+        } else {
-+            ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-+	    }
-         if (ret < 0) {
-             goto err;
-         }
-     }
-     mem.memory_size = slot->memory_size;
--    ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-+    if (cap_user_memory2) {
-+        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION2, &mem);
-+    } else {
-+        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
-+    }
-     slot->old_flags = mem.flags;
- err:
-     trace_kvm_set_user_memory(mem.slot >> 16, (uint16_t)mem.slot, mem.flags,
-                               mem.guest_phys_addr, mem.memory_size,
--                              mem.userspace_addr, ret);
-+                              mem.userspace_addr, mem.gmem_fd,
-+			      mem.gmem_offset, ret);
-     if (ret < 0) {
--        error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
--                     " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
--                     __func__, mem.slot, slot->start_addr,
--                     (uint64_t)mem.memory_size, strerror(errno));
-+        if (cap_user_memory2) {
-+                error_report("%s: KVM_SET_USER_MEMORY_REGION2 failed, slot=%d,"
-+                        " start=0x%" PRIx64 ", size=0x%" PRIx64 ","
-+                        " flags=0x%" PRIx32 ","
-+                        " gmem_fd=%" PRId32 ", gmem_offset=0x%" PRIx64 ": %s",
-+                        __func__, mem.slot, slot->start_addr,
-+                (uint64_t)mem.memory_size, mem.flags,
-+                        mem.gmem_fd, (uint64_t)mem.gmem_offset,
-+                        strerror(errno));
-+        } else {
-+                error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
-+                            " start=0x%" PRIx64 ", size=0x%" PRIx64 ": %s",
-+                __func__, mem.slot, slot->start_addr,
-+                (uint64_t)mem.memory_size, strerror(errno));
-+        }
-     }
-     return ret;
- }
-@@ -472,6 +505,9 @@ static int kvm_mem_flags(MemoryRegion *mr)
-     if (readonly && kvm_readonly_mem_allowed) {
-         flags |= KVM_MEM_READONLY;
-     }
-+    if (memory_region_can_be_private(mr)) {
-+        flags |= KVM_MEM_PRIVATE;
-+    }
-     return flags;
- }
- 
-@@ -1402,6 +1438,9 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-         mem->ram_start_offset = ram_start_offset;
-         mem->ram = ram;
-         mem->flags = kvm_mem_flags(mr);
-+        mem->fd = mr->ram_block->gmem_fd;
-+        mem->ofs = (uint8_t*)ram - mr->ram_block->host;
-+
-         kvm_slot_init_dirty_bitmap(mem);
-         err = kvm_set_user_memory_region(kml, mem, true);
-         if (err) {
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index 14ebfa1b991c..80694683acea 100644
---- a/accel/kvm/trace-events
-+++ b/accel/kvm/trace-events
-@@ -15,7 +15,7 @@ kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
- kvm_irqchip_release_virq(int virq) "virq %d"
- kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%" PRIx64 " val=0x%x assign: %d size: %d match: %d"
- kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
--kvm_set_user_memory(uint16_t as, uint16_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "AddrSpace#%d Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
-+kvm_set_user_memory(uint16_t as, uint16_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, uint32_t fd, uint64_t fd_offset, int ret) "AddrSpace#%d Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " gmem_fd=%d" " gmem_fd_offset=0x%" PRIx64 " ret=%d"
- kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
- kvm_resample_fd_notify(int gsi) "gsi %d"
- kvm_dirty_ring_full(int id) "vcpu %d"
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 511b42bde5c4..48220c0793ac 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -30,6 +30,8 @@ typedef struct KVMSlot
-     int as_id;
-     /* Cache of the offset in ram address space */
-     ram_addr_t ram_start_offset;
-+    int fd;
-+    hwaddr ofs;
- } KVMSlot;
- 
- typedef struct KVMMemoryUpdate {
+-int pc_machine_kvm_type(MachineState *machine, const char *vm_type);
+-
+ #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+     static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *data) \
+     { \
+         MachineClass *mc = MACHINE_CLASS(oc); \
+         optsfn(mc); \
+         mc->init = initfn; \
+-        mc->kvm_type = pc_machine_kvm_type; \
+     } \
+     static const TypeInfo pc_machine_type_##suffix = { \
+         .name       = namestr TYPE_MACHINE_SUFFIX, \
 -- 
 2.34.1
 
