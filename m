@@ -2,153 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA07576A2FE
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 23:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAB5276A30C
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 23:37:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbjGaVhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 17:37:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51016 "EHLO
+        id S231282AbjGaVhx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 17:37:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230130AbjGaVg7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 17:36:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78A4B1FC7;
-        Mon, 31 Jul 2023 14:36:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F2C2D612E8;
-        Mon, 31 Jul 2023 21:36:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3F96C433C8;
-        Mon, 31 Jul 2023 21:36:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690839397;
-        bh=O6qxnqR2UAHIQWX1X+EfPZX7oeDEWTWYBmPMSon4/nE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MEMWPQTNbSMkn+e0CZ1BGodCS5gupvgQ6CLcver682e8pWcF72x1wyA/dPjWgo/2k
-         V5AGy4Tch89afNrbmK4+iF3BTc5+7qoZTzKd35MBSdq3cqbe/9929MwUR2dmqfXi4q
-         qZt/WxnDvxbJKx5pXnfdCBDINSxWC+cdsa0cc1DueOrkGjIjeWW1phpArFKEX8WBGf
-         U7Fa1RRvj1RODi0dYgbzik4qgX6k1DYeilEQJT+wCDYpDeAniKHTPhhA4v1HN6P2xW
-         DNQvcQezBxRziM73g8DIm/9dxwX+vfzzYKXg5f0bC0qbkunq9N2+aAqoqhNUYWkGII
-         GLsq7mH2CGTUg==
-Date:   Mon, 31 Jul 2023 16:36:31 -0500
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        with ESMTP id S230320AbjGaVhv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 17:37:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD66519AF
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 14:36:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690839405;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FxwBtWb2NqDjMd/Gm9nSEVdpJkuNP2kDTv/kmcJ88Js=;
+        b=Vus3eM7CcS5emnUo77Db0vayWKh6CO8+df7mzQbIzrGEnuA/5suiqPbRAPJTfARHoSz4mT
+        49lAq+PIOiBiiDPqWvqd3c8CoJygFTVAm6H6BnXoORDw8AHfpmAhR2rvWyzwH16yPrSIw3
+        KYJ0bL51QsxInMshxCIMmdY+X8fsmVg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-486-YZ6NrpHsNzaLeqmleDJtWw-1; Mon, 31 Jul 2023 17:36:44 -0400
+X-MC-Unique: YZ6NrpHsNzaLeqmleDJtWw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3fa8cd898e0so32228375e9.3
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 14:36:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690839403; x=1691444203;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FxwBtWb2NqDjMd/Gm9nSEVdpJkuNP2kDTv/kmcJ88Js=;
+        b=RGkzq00se8uxzJPXaQ7yddK5CmqHKjXPOZ0mSMgCLEPJVo6pv6QXcghp201piaEn0k
+         Gr0AV159n76ErkXSrwt6cuSA79ePAY47PcOyUHhUMONJ5ilp1IRUgba1RLf+YEmwjM4t
+         fppl0gk6a/m6tQhHx3KZwlKtZGS+eWElDjFnWWD3FaGGpO7DMiOcvDBdLtgcueFHJ6yh
+         6sw8N5OIlG1lxeEs2qh6ig8TN+s9kTdcUnNjTr45iimboqQ9hhLsjP2dkLCQFUW/vil7
+         KJaFZLkgX2MTRMx2ybvPsFqrr1536th9ggoNDLgqaSSA8KoOdzaubYRxKr1tN8C4zG0o
+         gGPQ==
+X-Gm-Message-State: ABy/qLb/jEAcTDYdI0QWjQ5TxueMo4R22dUtAKrenW2ia1Te+j712kfl
+        iV1jcwZB1K7dHoO/jps/Oaki8lROtqorq4Do1CVRR/cMsDvmp/fe930QwRu7LGJJVfB5DvEzsvY
+        unGiPvGLHPPLo
+X-Received: by 2002:a7b:c846:0:b0:3fc:d5:dc14 with SMTP id c6-20020a7bc846000000b003fc00d5dc14mr852172wml.5.1690839403237;
+        Mon, 31 Jul 2023 14:36:43 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF7RG8Yb4RDMpMwdBG53sHWSQe2vNDzyN1XUD3Ta5ran1L6plqz/LKwn/wWJeuUE2ENowVk3w==
+X-Received: by 2002:a7b:c846:0:b0:3fc:d5:dc14 with SMTP id c6-20020a7bc846000000b003fc00d5dc14mr852165wml.5.1690839402951;
+        Mon, 31 Jul 2023 14:36:42 -0700 (PDT)
+Received: from redhat.com ([2.52.21.81])
+        by smtp.gmail.com with ESMTPSA id b9-20020a05600c11c900b003fc01f7a42dsm12341696wmi.8.2023.07.31.14.36.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 14:36:42 -0700 (PDT)
+Date:   Mon, 31 Jul 2023 17:36:37 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Zqiang <qiang.zhang1211@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Uladzislau Rezki <urezki@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Jason Baron <jbaron@akamai.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        Nicolas Saenz Julienne <nsaenz@kernel.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Dan Carpenter <error27@gmail.com>,
-        Chuang Wang <nashuiliang@gmail.com>,
-        Yang Jihong <yangjihong1@huawei.com>,
-        Petr Mladek <pmladek@suse.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
-        Julian Pidancet <julian.pidancet@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
-        Yair Podemsky <ypodemsk@redhat.com>
-Subject: Re: [RFC PATCH v2 11/20] objtool: Flesh out warning related to
- pv_ops[] calls
-Message-ID: <20230731213631.pywytiwdqgtgx4ps@treble>
-References: <20230720163056.2564824-1-vschneid@redhat.com>
- <20230720163056.2564824-12-vschneid@redhat.com>
- <20230728153334.myvh5sxppvjzd3oz@treble>
- <xhsmh8raws53o.mognet@vschneid.remote.csb>
+        Markus Armbruster <armbru@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 04/19] memory: Introduce
+ memory_region_can_be_private()
+Message-ID: <20230731173607-mutt-send-email-mst@kernel.org>
+References: <20230731162201.271114-1-xiaoyao.li@intel.com>
+ <20230731162201.271114-5-xiaoyao.li@intel.com>
+ <ZMgma0cRi/lkTKSz@x1n>
+ <ZMgo3mGKtoQ7QsB+@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <xhsmh8raws53o.mognet@vschneid.remote.csb>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <ZMgo3mGKtoQ7QsB+@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023 at 12:16:59PM +0100, Valentin Schneider wrote:
-> You're quite right - fabricating an artificial warning with a call to __flush_tlb_local():
+On Mon, Jul 31, 2023 at 02:34:22PM -0700, Sean Christopherson wrote:
+> On Mon, Jul 31, 2023, Peter Xu wrote:
+> > On Mon, Jul 31, 2023 at 12:21:46PM -0400, Xiaoyao Li wrote:
+> > > +bool memory_region_can_be_private(MemoryRegion *mr)
+> > > +{
+> > > +    return mr->ram_block && mr->ram_block->gmem_fd >= 0;
+> > > +}
+> > 
+> > This is not really MAP_PRIVATE, am I right?  If so, is there still chance
+> > we rename it (it seems to be also in the kernel proposal all across..)?
 > 
->   vmlinux.o: warning: objtool: pv_ops[1]: indirect call to native_flush_tlb_local() leaves .noinstr.text section
->   vmlinux.o: warning: objtool: __flush_tlb_all_noinstr+0x4: call to {dynamic}() leaves .noinstr.text section
+> Yes and yes.
 > 
-> Interestingly the second one doesn't seem to have triggered the "pv_ops"
-> bit of call_dest_name. Seems like any call to insn_reloc(NULL, x) will
-> return NULL.
-
-Yeah, that's weird.
-
-> Trickling down the file yields:
+> > I worry it can be very confusing in the future against MAP_PRIVATE /
+> > MAP_SHARED otherwise.
 > 
->   vmlinux.o: warning: objtool: pv_ops[1]: indirect call to native_flush_tlb_local() leaves .noinstr.text section
->   vmlinux.o: warning: objtool: __flush_tlb_all_noinstr+0x4: call to pv_ops[0]() leaves .noinstr.text section
-> 
-> In my case (!PARAVIRT_XXL) pv_ops should look like:
->   [0]: .cpu.io_delay
->   [1]: .mmu.flush_tlb_user()
-> 
-> so pv_ops[1] looks right. Seems like pv_call_dest() gets it right because
-> it uses arch_dest_reloc_offset().
-> 
-> If I use the above to fix up validate_call(), would we still need
-> pv_call_dest() & co?
+> Heh, it's already quite confusing at times.  I'm definitely open to naming that
+> doesn't collide with MAP_{PRIVATE,SHARED}, especially if someone can come with a
+> naming scheme that includes a succinct way to describe memory that is shared
+> between two or more VMs, but is accessible to _only_ those VMs.
 
-The functionality in pv_call_dest() is still needed because it goes
-through all the possible targets for the .mmu.flush_tlb_user() pointer
--- xen_flush_tlb() and native_flush_tlb_local() -- and makes sure
-they're noinstr.
-
-Ideally it would only print a single warning for this case, something
-like:
-
-  vmlinux.o: warning: objtool: __flush_tlb_all_noinstr+0x4: indirect call to native_flush_tlb_local() leaves .noinstr.text section
-
-I left out "pv_ops[1]" because it's already long enough :-)
-
-It would need a little bit of code shuffling.  But it's really a
-preexisting problem so don't feel compelled to fix it with this patch
-set.
+Standard solution is a technology specific prefix.
+protect_shared, encrypt_shared etc.
 
 -- 
-Josh
+MST
+
