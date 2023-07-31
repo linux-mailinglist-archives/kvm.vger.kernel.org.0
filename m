@@ -2,81 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9510769F11
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 19:14:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4AEA769F54
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 19:21:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbjGaROm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 13:14:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41324 "EHLO
+        id S232926AbjGaRVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 13:21:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234519AbjGaRN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 13:13:56 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA7B2D77
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:10:44 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bba48b0bd2so29780985ad.3
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:10:44 -0700 (PDT)
+        with ESMTP id S231582AbjGaRUi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 13:20:38 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB03E1732
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:19:49 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d10792c7582so3585264276.3
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:19:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690823444; x=1691428244;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cNU9dnqwA33bWSRJZJl5nat2xoj0PX9l4djIhWRICY0=;
-        b=AExM9wKjRd/rozndMc8/4u2f60z+wSuwW8JYQ5+smlCcf0YHGMQPEQUruPl0XPdpzG
-         2ANYb/cud4zqE7BmXkuxWogufbwwBUBW4jtUYheiJbLy347xk+Afw/1ceVgCHA0LHODj
-         9spWt30S40RXAxlTtye35UhbLu9x8QoLFElUirVMrhuzUHclPpqo/nHiaJMAQDEtsVEs
-         1COUGxlA09DFT+T/DCkbqufIfgkHZgD1zV9r0H2yLNFvLH5XUeopDRBtPT/iyugE04mc
-         Q+YLmQpojd1DaUY60zBjo/GAzcFPW9Oz/7cwYv4OxIENQUV+MDaNWsOZb8yHrEv/QwOI
-         fKJw==
+        d=google.com; s=20221208; t=1690823989; x=1691428789;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdb7QzlYcOc7UWmxcegrKrVqMfFsYHZFCwi2LL3my64=;
+        b=zBusOqyPc9Ltaaqmju2VylABq68z3gA0yH658LtIHqnM7muXRoiPK7Z+lJWtWm/VN7
+         8whOaU6x9OiXazWcYr8fAVYmvIyO6TYz06QaVHcaE8EQS9KLvJWFds1kXHPR5gfyol/T
+         hwExr3eIMCbASZqYoMXC5wv7UZF1Mp2U4BBszuz1saEchMHIrtLN7I0wmDOtomAyfGK4
+         Jb/4sUIrkAMy5yEhhybvRPtzSFoc+rBWIZvDZCJzlFd/cD+b3RLT1Lug7yCp0xC4QWhy
+         NI1FLe1nSeay7t1G8coFkWiO2qxxWysi0sKSxyJbI8pSaEUs+h67fGOJLF0xb0FIQUeT
+         6ssw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690823444; x=1691428244;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cNU9dnqwA33bWSRJZJl5nat2xoj0PX9l4djIhWRICY0=;
-        b=GPmZaaYiAEWdao+HwQDvV30jmYEST/2NNyeUkLtVP2cmT3ofvEkLjE8vIqkeOsuvgB
-         2/wq2IM+nNFVlYbUFTAQobS2cOhkwqO5h6KNr61G7mqlVd1rKIq3h6a06yMiLNiVhZ29
-         hr4h+xsfW2j91aNq9ZpqwAvYMexX+nzM6hFgmcjF+lfovSPAm5IbEEuGVgN1kiRiD6Lf
-         Lt0oOwEHtmdtIH9NX6HR7+q69fqiStvFT3ZoiDlFpRPCJItTw/JbFvFUnlyAyf0DOaLY
-         Wz76zvUmQ0y9OF+ScrVobA5J/CYhqOpnIB1I02Stazntd8aCqIQSEibB4hPTEwO3Cz+y
-         I0hg==
-X-Gm-Message-State: ABy/qLY+fS8UJKVQBqTgzNFr9PYBqshmji9DpnQTkBi6cSLENWqpjnZc
-        2/t3+4Hn7tCfV0VrQjlPROU=
-X-Google-Smtp-Source: APBJJlFD9DjtwDzTWlKNlEtUB9FGJ9bPLRBijCv/B1JFsGrtf/eJQit+5cEu0lwMuIBS7GtAxPzEyQ==
-X-Received: by 2002:a17:902:c411:b0:1b8:a67f:1c0f with SMTP id k17-20020a170902c41100b001b8a67f1c0fmr15203176plk.39.1690823443711;
-        Mon, 31 Jul 2023 10:10:43 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id m24-20020a170902bb9800b001b87bedcc6fsm8829093pls.93.2023.07.31.10.10.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 10:10:43 -0700 (PDT)
-Date:   Mon, 31 Jul 2023 10:10:41 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Peter Xu <peterx@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 00/19] QEMU gmem implemention
-Message-ID: <20230731171041.GB1807130@ls.amr.corp.intel.com>
-References: <20230731162201.271114-1-xiaoyao.li@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        d=1e100.net; s=20221208; t=1690823989; x=1691428789;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gdb7QzlYcOc7UWmxcegrKrVqMfFsYHZFCwi2LL3my64=;
+        b=Wq8o1XTLy0RqA+rmSQnhnCz2Gi/zSt3qSjv00+Agw89+LCZbh5KM1XF+mW0EgQpheR
+         rDQonqOkKXSTe9iSoOmebuJRRRVFPPOF1kD3iKRx0lAEmPEOhW6oNh+j6psokyfdflGQ
+         fkeL9LfmZgT9UoyL0NRYlAyH/lsNnFpqcIxx/mP+lyx1PlN9mK4RDm59H8z6hbY0oY7d
+         rF5O270NJwTKRmcunT9fJMQUj2QL7jnDbYheedTeqfL1jVMJOuOPeBc7QuxaiLnkDCdw
+         WCUi5zLtpRYW4VLDrqnVl2mN1pbBLc+lOiRsj89TrEqMYxQyy/LK2catq+mT2947a002
+         QOng==
+X-Gm-Message-State: ABy/qLYolbuXqtNjZI+q7YdQGvuF/VvwFOyriO7mCC4kVVBgojvnfnkG
+        Q0Npd6hqdoQG1eIudpMy7X8bmxHVAd8=
+X-Google-Smtp-Source: APBJJlGDPfFjSpxr1qlDSkpPLfZlx10bTCXz+EMu9wyIQgv1N0AgtgkGqemxSj6OVMzULEQvuuVcsCXfoZ4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:abe3:0:b0:d22:4059:b2bd with SMTP id
+ v90-20020a25abe3000000b00d224059b2bdmr62850ybi.1.1690823989036; Mon, 31 Jul
+ 2023 10:19:49 -0700 (PDT)
+Date:   Mon, 31 Jul 2023 10:19:47 -0700
+In-Reply-To: <ZMfpgu8bHH0jA8Si@google.com>
+Mime-Version: 1.0
+References: <20230729003643.1053367-1-seanjc@google.com> <20230729003643.1053367-10-seanjc@google.com>
+ <20230731-91b64a6b787ba7e23b285785@orel> <ZMfpgu8bHH0jA8Si@google.com>
+Message-ID: <ZMftM3qz/VqalbPg@google.com>
+Subject: Re: [PATCH v4 09/34] KVM: selftests: Add a selftest for guest prints
+ and formatted asserts
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        "Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=" <philmd@linaro.org>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,51 +75,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023 at 12:21:42PM -0400,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-
-> This is the first RFC version of enabling KVM gmem[1] as the backend for
-> private memory of KVM_X86_PROTECTED_VM.
+On Mon, Jul 31, 2023, Sean Christopherson wrote:
+> On Mon, Jul 31, 2023, Andrew Jones wrote:
+> > diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+> > index 4cf69fa8bfba..4adf526dc378 100644
+> > --- a/tools/testing/selftests/kvm/include/ucall_common.h
+> > +++ b/tools/testing/selftests/kvm/include/ucall_common.h
+> > @@ -6,8 +6,19 @@
+> >   */
+> >  #ifndef SELFTEST_KVM_UCALL_COMMON_H
+> >  #define SELFTEST_KVM_UCALL_COMMON_H
+> > +#include <linux/kvm.h>
+> >  #include "test_util.h"
+> >  
+> > +#if defined(__aarch64__)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_MMIO
+> > +#elif defined(__x86_64__)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_IO
+> > +#elif defined(__s390x__)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_S390_SIEIC
+> > +#elif defined(__riscv)
+> > +#define UCALL_EXIT_REASON      KVM_EXIT_RISCV_SBI
+> > +#endif
+> > +
+> >  /* Common ucalls */
+> >  enum {
+> >         UCALL_NONE,
+> > 
+> > and then compiled the test for riscv and it passed. I also ran all other
+> > riscv tests successfully.
 > 
-> It adds the support to create a specific KVM_X86_PROTECTED_VM type VM,
-> and introduces 'private' property for memory backend. When the vm type
-> is KVM_X86_PROTECTED_VM and memory backend has private enabled as below,
-> it will call KVM gmem ioctl to allocate private memory for the backend.
-> 
->     $qemu -object memory-backend-ram,id=mem0,size=1G,private=on \
->           -machine q35,kvm-type=sw-protected-vm,memory-backend=mem0 \
-> 	  ...
-> 
-> Unfortunately this patch series fails the boot of OVMF at very early
-> stage due to triple fault because KVM doesn't support emulate string IO
-> to private memory. We leave it as an open to be discussed.
-> 
-> There are following design opens that need to be discussed:
-> 
-> 1. how to determine the vm type?
-> 
->    a. like this series, specify the vm type via machine property
->       'kvm-type'
->    b. check the memory backend, if any backend has 'private' property
->       set, the vm-type is set to KVM_X86_PROTECTED_VM.
+> Can I have your SoB for the ucall_common.h patch?  I'll write a changelog and fold
+> in a separate prep patch for that change.
 
-Hi Xiaoyao.  Because qemu has already confidential guest support, we should
-utilize it.  Say,
-qemu  \
-  -object sw-protected, id=swp0, <more options for KVM_X86_SW_PROTECTED_VM> \
-  -machine confidential-guest-support=swp0
-
-
-
-> 2. whether 'private' property is needed if we choose 1.b as design 
-> 
->    with 1.b, QEMU can decide whether the memory region needs to be
->    private (allocates gmem fd for it) or not, on its own.
-
-
-Memory region property (how to create KVM memory slot) should be independent
-from underlying VM type.  Some (e.g. TDX) may require KVM private memory slot,
-some may not.  Leave the decision to its vm type backend.  They can use qemu
-memory listener.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+On second thought, I take that back.  I think it makes more sense to add a ucall.h
+for each arch and #define the exit type there.  All then move all of the
+ucall_arch_do_ucall() implementations to ucall.h (except maybe x86 while it has
+the horrific save/restore GPRs hack...).  That way the #define is colocated with
+the code that generates the exit reason.
