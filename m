@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67E8E768CCA
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:03:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62CEB768CCF
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 09:03:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbjGaHDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 03:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42936 "EHLO
+        id S231196AbjGaHDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 03:03:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbjGaHCR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 03:02:17 -0400
+        with ESMTP id S231135AbjGaHDX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 03:03:23 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A9FE184;
-        Mon, 31 Jul 2023 00:02:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF1DE7B;
+        Mon, 31 Jul 2023 00:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690786934; x=1722322934;
+  t=1690786937; x=1722322937;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=90z+Db4H8sAaozlh1y54siqgX9Yc5fCU6uoHEAi25BE=;
-  b=Ayh6kAJ3XqvBJ/mtAVxKzE+igNID/C9D+m58DZHwdkigg0qxcR4cLiIz
-   Ae7EqFTgibZypG+m2/VkqHL3iSbF40Ea0LlQ0F7+JPKqL7B4xMM4Dr4gr
-   /YCibwM3fE5n1/dV8yPeseudDS5GvaB+lxuU2IQkurKycW9GHEmCNRHxy
-   1dRhVciB5sHkov+DMfF8LMQriwPrSvYrZFEewjrqngvFNWuJnRhOVAO/2
-   joBN8kexk45Swjmfd2qcvqMK98ZVj6fWsN4xF0edxWJJlMjoBhP3sAHVx
-   4NSQGiSvcxLadG6V+ASy+F+QP2tPLVS2ADGdDJnRCte3fyoe12ZC0l5fa
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649035"
+  bh=sycVsd87zmfA3yJCdcgOgrxd4mm6nSq5VT1UdIRGngQ=;
+  b=Sb11QzFc6ceq0l6D2+ruUClNO8ujAszWBJDj6SztcYOU1DfsTYSJv42N
+   okTd5WK5y1TjFX3HdMy4gJ0pvccjcIuK4WXCl5uvbKFMaos440Jq9SGLI
+   AdkwaP3FXrq2DhhHYUQNfgE0GYyBsvl3XnFUeP3KWtbXppxLQApZguX0T
+   v7hAcwpjwjwndNX6kVO1qYkmARBsrdmABgb4rD1bk7TvhNDznKBI0zler
+   hxTSo91zpuelReQhxkAJMLFrmOabj2QQ1YirIZgSQ+jowleKi5L8gPKsz
+   0yOQLD+OyLNzzHxNXXbQvfpxbir9n6oaMNFFTN/5rPWSM0p423iALYeaz
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="371649068"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="371649035"
+   d="scan'208";a="371649068"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:02 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 00:02:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="871543416"
+   d="scan'208";a="871543425"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:03 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 31 Jul 2023 00:02:04 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,13 +106,14 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH v9 13/36] x86/fred: Let ret_from_fork_asm() jmp to fred_exit_user when FRED is enabled
-Date:   Sun, 30 Jul 2023 23:32:54 -0700
-Message-Id: <20230731063317.3720-14-xin3.li@intel.com>
+Subject: [PATCH v9 14/36] x86/fred: Disallow the swapgs instruction when FRED is enabled
+Date:   Sun, 30 Jul 2023 23:32:55 -0700
+Message-Id: <20230731063317.3720-15-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731063317.3720-1-xin3.li@intel.com>
 References: <20230731063317.3720-1-xin3.li@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -127,34 +128,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Let ret_from_fork_asm() jmp to fred_exit_user when FRED is enabled,
-otherwise the existing IDT code is chosen.
+The FRED architecture establishes the full supervisor/user through:
+1) FRED event delivery from ring 3 swaps the value of the GS base
+   address and that of the IA32_KERNEL_GS_BASE MSR.
+2) ERETU swaps the value of the GS base address and that of the
+   IA32_KERNEL_GS_BASE MSR.
+3) LKGS is already upstreamed and automatically enabled with FRED to
+   load the GS base address directly into the IA32_KERNEL_GS_BASE MSR
+   instead of the GS segment’s descriptor cache.
+
+As a result, there is no need to SWAPGS away from the kernel GS base,
+i.e., the swapgs instruction is no longer needed when FRED is enabled,
+thus is disallowed. Otherwise it causes #UD.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/entry/entry_64.S | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index 43606de22511..8069151176f2 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -309,7 +309,13 @@ SYM_CODE_START(ret_from_fork_asm)
- 	 * and unwind should work normally.
- 	 */
- 	UNWIND_HINT_REGS
-+
-+#ifdef CONFIG_X86_FRED
-+	ALTERNATIVE "jmp swapgs_restore_regs_and_return_to_usermode", \
-+		    "jmp fred_exit_user", X86_FEATURE_FRED
-+#else
- 	jmp	swapgs_restore_regs_and_return_to_usermode
-+#endif
- SYM_CODE_END(ret_from_fork_asm)
- .popsection
+Changes since v8:
+* Explain why writing directly to the IA32_KERNEL_GS_BASE MSR is
+  doing the right thing (Thomas Gleixner).
+---
+ arch/x86/kernel/process_64.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
+index 265ab8fcb146..6d5fed29f552 100644
+--- a/arch/x86/kernel/process_64.c
++++ b/arch/x86/kernel/process_64.c
+@@ -166,7 +166,8 @@ static noinstr unsigned long __rdgsbase_inactive(void)
  
+ 	lockdep_assert_irqs_disabled();
+ 
+-	if (!cpu_feature_enabled(X86_FEATURE_XENPV)) {
++	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
++	    !cpu_feature_enabled(X86_FEATURE_XENPV)) {
+ 		native_swapgs();
+ 		gsbase = rdgsbase();
+ 		native_swapgs();
+@@ -191,7 +192,8 @@ static noinstr void __wrgsbase_inactive(unsigned long gsbase)
+ {
+ 	lockdep_assert_irqs_disabled();
+ 
+-	if (!cpu_feature_enabled(X86_FEATURE_XENPV)) {
++	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
++	    !cpu_feature_enabled(X86_FEATURE_XENPV)) {
+ 		native_swapgs();
+ 		wrgsbase(gsbase);
+ 		native_swapgs();
 -- 
 2.34.1
 
