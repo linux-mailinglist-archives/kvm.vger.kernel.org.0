@@ -2,191 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4F257697E6
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 15:45:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D28857697F7
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 15:47:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbjGaNpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 09:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39916 "EHLO
+        id S230255AbjGaNrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 09:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjGaNpt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 09:45:49 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2068.outbound.protection.outlook.com [40.107.101.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8601708;
-        Mon, 31 Jul 2023 06:45:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VpuYT1bL5Qm2pgix6w+VdJwveRDCtWdr2fH9g7Zg4gF2cztsZ4x+ZZivip6pDHOQoRGgXcB/wMAPpLm4DxdMFYd0drZO9S0H08WpKStul7xKmhXoJRZFnkT9E6JZ5QRLISYe9dbCom3T1sJznwBGy3s3KZFyAthvRrd/hM6UASKCJwFW5KP8O4Vri6qJjiy53Ssq/8YRpiUuzPvqtHuxyxbw+PrXCL/c3Pd+IYVhHEFW66BSOhJTr2nnkqT9VjADw8RE4546Vzd26im+RVwEHdhX3ux0FxfAmcurWLh+RO2CirzXaEiQgtzcSX9vu0VTK3oMlUdIEPpCGHk3C4BH2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ypMOjGT02ipmvSQ23b2W/DRhdpWskRtwVBJmDklsyEU=;
- b=IAWh7KcKAkTHSFfPVslMno9WZ8r06qgO53nsJ6uK4UYJ0dMQgPb0rWjSb/QjtmWgw4oRbdymjlNwPvf6OJwh4qIC6coxhBBmoxZJiqmsMThGAF0hBwiHgNkmP6hTYY3AAR6QJ7gkDBNKz9N78H8S3M9xvbqvbTCYeJ3fhtLouFYBW8lQTp3A2ZaB7U0ClqwiEap+jxMyI5TuopbF2UJ04ZQp/uFcMl4Zgqtz0bXblXvsHggudizJ0kBYang74RCxlTucN+B5gvR7Nu7nHCworrCa34b0usHs1HVfsPk9TW+D16vGjoZawQ0a102WWCnqx4dbBiOuFETKhVPiz+UAWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ypMOjGT02ipmvSQ23b2W/DRhdpWskRtwVBJmDklsyEU=;
- b=kDpolg44/+IAaZZFjjZSWsdqfGp5YqFzVdmUU7ic2kzJHRpz0bnbzVTN1J1BPtEEvR3eUib81cVTwwJMzwGje3RVAbZeQIpu2fpNJW5dOk/3gayEE2ha8ti/qSPGwKRiwp8OufOrlGbbSBzyD/RgQzFNI64gkc0RnEqXNeQAHpfSGOYZUAgvK2730OINXUnhV8GPU/PqC4Fpp1USJobKB4ojCQX0cbg3+y33FccxGeXVBZeL8Z2CDh/Suvj9ygl28+j9FUDKiFfJQqdW1b8NaC+2dHREw4ZlGVFpRT05i0f1Rqo42Qn3QIZYSc2SRN/QBGZabP6BCNxTWVGF4Im7UQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB7670.namprd12.prod.outlook.com (2603:10b6:8:105::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Mon, 31 Jul
- 2023 13:45:45 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.043; Mon, 31 Jul 2023
- 13:45:45 +0000
-Date:   Mon, 31 Jul 2023 10:45:43 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 2/4] iommu: Add new iommu op to get iommu hardware
- information
-Message-ID: <ZMe7B8s1tzLsZmIz@nvidia.com>
-References: <20230724105936.107042-1-yi.l.liu@intel.com>
- <20230724105936.107042-3-yi.l.liu@intel.com>
- <BN9PR11MB527625066E23A1C4968905D68C01A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZMKCd5S9VpNGf631@nvidia.com>
- <DS0PR11MB7529F6D703B42835B0F8A92FC305A@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB7529F6D703B42835B0F8A92FC305A@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: CH2PR02CA0005.namprd02.prod.outlook.com
- (2603:10b6:610:4e::15) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S230265AbjGaNra (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 09:47:30 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C442F1722
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 06:47:27 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-63d058b9cafso30656796d6.2
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 06:47:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690811247; x=1691416047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ysw1GJ5iZ7+m9LB1vMcTeerNVDEGAKXkHz9rft3ciOM=;
+        b=u9OhuV2WeoVUb538U+P/2QFmsHVbKcdA/KLYVytDxihcyMcOvBA0XVLiSr5cHMTN7D
+         ikj7mVuN1iyhE73lkkm8FfLEjE5ponkqPZ1y3+LCm2IQAtu7oocrn6C54yzZ80W11Wvd
+         rTxv00vYMpAR9z70F7m74ztY1F98dotGILfOawWW2zQkC0L0yO2AbJIKpEccIjfjgMtN
+         rNOX3yDynA64SAgdgBRMMmYQcMR8X+2qNSp+2Yj5dtqRRJG2EoqS4Y/SRDVJ6nLIVtfR
+         4bdQAAHnMSoPJgm+FGVRTm8lI3EITt2Y96aOx0NZdkMIARTZMJb3A2kQXkT2avpiLvYZ
+         6BKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690811247; x=1691416047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ysw1GJ5iZ7+m9LB1vMcTeerNVDEGAKXkHz9rft3ciOM=;
+        b=aKfiz7/axjcbtmj+bBkmy5K/4TB+fCnxN29cjJWwQXXzmKf5mt0l5RKwAi8coQxywJ
+         oVLPRABEblULWkxhF3Gsbzfiq5vLyvHqO4+4JX0yPzkQwPLQPMyRgPFezZ5mZGOxdlng
+         J1xKS4WE35sDJZjP26pNfAHmahr4H4RoBlAkAdmUqWcccPf3X/pmi2NfsYDybpiR8Jms
+         wSkE89+pziKcyVtlmmRHUCSpczQbNqNYdQ8ZTtiexAAWKnomWbzixOPUU5BXa6zWy2AX
+         WoPxHVRFBU13nssF2lSa0p/j+K2FuSZpmpAUh267Mojh9kGkVZAAtb27zJh7CiZNOZu3
+         aHxg==
+X-Gm-Message-State: ABy/qLYZ9ykDX4H5QqpAFvErgBOWToL6WSjltEcQS31Ke+o6WfwLwGfo
+        qULwxl6kwE/9MUZJNIk8TxZxmDNLM9LjKHNgGu8DHA==
+X-Google-Smtp-Source: APBJJlF7tr3MB9wkYayUG07mtX0571x6EwPIiCT72OesCKkjWW/DHZdN3DzN9958IW7gK2WOAN/2LmnIZ4GFimGLnSQ=
+X-Received: by 2002:ad4:5884:0:b0:632:2e63:d34b with SMTP id
+ dz4-20020ad45884000000b006322e63d34bmr9450921qvb.14.1690811246768; Mon, 31
+ Jul 2023 06:47:26 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB7670:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02d07d1d-ba14-4147-cd23-08db91cc708a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sd3DAKKctcFeEvoyRx8QOpHfX7OF+WQj5zOJsqc0FGrkkUQHCj4AS0dcgrGLZBBlpmOOTIlOKkCY9T8lVKZ8XavEeqUTrY2A2wontejB51ZcQGuuE5yRxvYYrnxwaiVyfIGaEeXz0ymbo/WEjsXGln44sA5iGUAjmE+wwF7VdU6ZxgfEnccSV+xU9YPnIvqjxFZbceR4rL1r3tkDOhEbatIGLtITGPM6TJzcx27ERGt9nlW4A9HjmZ+k41Ena7y8AuT3LuyKZqDN3S/JhKeC16XRbo0LuSLTNd7MUZmNXZRP92cpr/oELzMRYKc6orZ6bTjuPrxkmM6NZknjXCcPpbaOy/wQjQo3/l3lcJ75vE/pFdx9Vh+kfWJlQWCKGMG1KERBPrq5LjMdSMIlwHmSv/qA4hPEBBGUvB2hvrUT9oH++UW93kaKjXaAzYCh1XoXF0DLa1gZtBCd8xg9vtJgQ1ZLPJr9znJ75JzlFbBP+LMeyOMlMmYNbQom5U2rAgtov2yfcqom2yKkPOLGWjEJjds0bptMw44464+epqZfYoOVWVTbcqBAonVZMhxbAnwQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(366004)(136003)(39860400002)(451199021)(66476007)(86362001)(8676002)(8936002)(316002)(6916009)(4326008)(5660300002)(7416002)(41300700001)(54906003)(66556008)(66946007)(478600001)(38100700002)(2906002)(36756003)(6512007)(6486002)(6506007)(26005)(83380400001)(186003)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iZBS+X1K5AMcNst0Z5nck1k48e32Sv6cRKaZHSL8CXIUWdXinxOkO2hXZA5o?=
- =?us-ascii?Q?cogGV1C13xX/bh0hCg809ZRQhlX3oWF2nHcZ8lcaYz6QPtxmw9kk3HGl9kfT?=
- =?us-ascii?Q?RTiIEFbyDzMf74qT/voiG2RxsbbVyoS9jkhX1wn79vTaOi68sScb2J+Peqm4?=
- =?us-ascii?Q?WomEH02YtH154Yt0+A2CiSx86kdqWcMrAyHm2uzpy0ODpjVhoSkFswsbmJuS?=
- =?us-ascii?Q?hMhPuTK4Yx80QvBFDs9OkzKTXUK58Q0FY0LGvYiavk2i4rwh5Da2ZUdLA4R7?=
- =?us-ascii?Q?dhe5JPjrL84RGiLInv+AqZbEaE8Wl7f2Q29fJGbXSU2SdonDPM/cXkGllizr?=
- =?us-ascii?Q?z47Mq9L7Rhlu+D/ZHeGgEr6IigSnoOWC8NZWWivo4B2cV0mzTm7YjDp1dU8n?=
- =?us-ascii?Q?AbOia725jwUjLVXiFUbU9w9tGb49z0oig0xFEK+5CiSj4Gz4TKMe2wzT0bsl?=
- =?us-ascii?Q?ZlNdLKNrz6qWxyfZuUi5R24u8LW42eWD2v8uBgJD3mwB21YLyAZcoxtgQ4Wt?=
- =?us-ascii?Q?Ap6KkP/APpn2j1v+ZnJ39dsY7Tzj49tyYzYth8KF/RzqJn+oqvQ7z929HtDg?=
- =?us-ascii?Q?dXkXRqFqaHIXE2pLjqj9InO7Jh8BPAopb2Crr0ml/F8sDdsgB+MnP+b/S8jq?=
- =?us-ascii?Q?u4C0sfcAB7LFWuM33U1+cIpkfUouCfPk3kBSmoOqycNKNE9TelrcVVpQYGWY?=
- =?us-ascii?Q?t0y4YwOmLr8AKES7L+A+9jAkQpH5612iUSo3uGPbIFC4rT4JqmG6YHtxu3Np?=
- =?us-ascii?Q?bAmEAdVRmpcoY76tB+WTEJoztOa5x0dEf/Wadx/3yGtzMZLBCuCT6qGRjHm1?=
- =?us-ascii?Q?h5qqI3265BdGXFI+de63VLTus90JE7F0HhrVVhX0qeEx8rgFzcz2JxnnC/ZP?=
- =?us-ascii?Q?grxwctX6iarjBSNYn8M9pHfM0ux5T9fM0IT42yO0oFEfq0xDqXq28XVUHONN?=
- =?us-ascii?Q?3UGRgG4LtGW2nIObqtndMUQZ6Si/Jft+vW2YqhG3jP3o+b4wBz+aliR02sGh?=
- =?us-ascii?Q?3eXmCF9iLSan7nni5dn9/mTjerDEwQDVJKz0HsQF0otcAA2cugP2HusZdVBg?=
- =?us-ascii?Q?8fS2ivpihnG388x52SWYCPBIeNvsDHBYjzAmAmYkHxuf8kNiyPwXB+dWnJ2+?=
- =?us-ascii?Q?wAwNz6rYRfV1Cl5L52BnDrdgV0OzhOu0b7mNhutCAJPp2VaLnDTxgaGRdYOq?=
- =?us-ascii?Q?FtL4A8cCUZeI2HfQua/gAFcs7lpFu1nQJOc+8Mdj/YD3C4858EfdVirIvVR/?=
- =?us-ascii?Q?aot8SlS69dO4s6MRgiLHEGPxgnUa5qcx4xFQbuSwjXC4He1FD+kdDMzHIaD2?=
- =?us-ascii?Q?xHXe2AxCw4yqLWrkflrUnOQIwlRydYKvNGxPX3UKo4/2onqb4rPa8msH6Yd1?=
- =?us-ascii?Q?2HWxOwGmLHup4H9P3JUUs5CALcmkqvJtRTxoWa9R2/HoxmTUNrKQ4u2kXQ6T?=
- =?us-ascii?Q?PjvamuGOpNTx9PCqpw1fiMTLNFu6KyaAj9O6yIPlcX7Hl4Y8953zhJNzpRy6?=
- =?us-ascii?Q?mBkMuJVqsdOq3wAi+Jd9nRIxSfdNwkySsa+x/w6WqsXSk+YmBGDugLtUCp1V?=
- =?us-ascii?Q?/KnVHVRjuzvayUOwgiPpQ7PwTgZf2TA33f81tbXW?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02d07d1d-ba14-4147-cd23-08db91cc708a
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2023 13:45:45.4371
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eFEBNLYYab7F7Ar4NLFlhuaOSNNJrC7hZLJUxN593KmLlTK1lFnMPcdZfArCueUd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7670
-X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20230718234512.1690985-1-seanjc@google.com> <20230718234512.1690985-13-seanjc@google.com>
+ <CA+EHjTzP2fypgkJbRpSPrKaWytW7v8ANEifofMnQCkdvYaX6Eg@mail.gmail.com> <ZMKlo+Fe8n/eLQ82@google.com>
+In-Reply-To: <ZMKlo+Fe8n/eLQ82@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 31 Jul 2023 14:46:50 +0100
+Message-ID: <CA+EHjTzySXapdQbv8ocueboBR4LnM9WGV4bLOAfipB1saQ6OjQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Ackerley Tng <ackerleytng@google.com>,
+        Maciej Szmigiero <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Wang <wei.w.wang@intel.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023 at 08:33:55AM +0000, Liu, Yi L wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Thursday, July 27, 2023 10:43 PM
-> > 
-> > On Thu, Jul 27, 2023 at 07:57:57AM +0000, Tian, Kevin wrote:
-> > > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Sent: Monday, July 24, 2023 7:00 PM
-> > > >
-> > > > @@ -252,11 +258,20 @@ struct iommu_iotlb_gather {
-> > > >   * @remove_dev_pasid: Remove any translation configurations of a specific
-> > > >   *                    pasid, so that any DMA transactions with this pasid
-> > > >   *                    will be blocked by the hardware.
-> > > > + * @hw_info_type: One of enum iommu_hw_info_type defined in
-> > > > + *                include/uapi/linux/iommufd.h. It is used to tag the type
-> > > > + *                of data returned by .hw_info callback. The drivers that
-> > > > + *                support .hw_info callback should define a unique type
-> > > > + *                in include/uapi/linux/iommufd.h. For the drivers that do
-> > > > + *                not implement .hw_info callback, this field is
-> > > > + *                IOMMU_HW_INFO_TYPE_NONE which is 0. Hence, such drivers
-> > > > + *                do not need to care this field.
-> > >
-> > > every time looking at this field the same question came out why it is required
-> > > (and looks I forgot your previous response).
-> > >
-> 
-> The major reason is that not every driver implements the hw_info
-> callback.
-> 
-> > > e.g. why cannot the type be returned in @hw_info():
-> > >
-> > > 	void *(*hw_info)(struct device *dev, u32 *length, int *type);
-> > 
-> > u32 *type
-> > 
-> > > NULL callback implies IOMMU_HW_INFO_TYPE_NONE.
-> > 
-> > If every one of these queries has its own type it makes sense
-> > 
-> > Though, is it not possible that we can have a type for the entire
-> > driver?
-> 
-> Not quite sure if I got your point. Is it acceptable to define the
-> callabck in the current version? or Kevin's suggestion makes
-> more sense?
+Hi Sean,
 
-I'm trying to remember if there is a reason we need unique types for
-the domain and the invalidation or if we can get bye with a single
-type just for the whole iommu driver.
+On Thu, Jul 27, 2023 at 6:13=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Jul 27, 2023, Fuad Tabba wrote:
+> > Hi Sean,
+> >
+> > <snip>
+> > ...
+> >
+> > > @@ -5134,6 +5167,16 @@ static long kvm_vm_ioctl(struct file *filp,
+> > >         case KVM_GET_STATS_FD:
+> > >                 r =3D kvm_vm_ioctl_get_stats_fd(kvm);
+> > >                 break;
+> > > +       case KVM_CREATE_GUEST_MEMFD: {
+> > > +               struct kvm_create_guest_memfd guest_memfd;
+> > > +
+> > > +               r =3D -EFAULT;
+> > > +               if (copy_from_user(&guest_memfd, argp, sizeof(guest_m=
+emfd)))
+> > > +                       goto out;
+> > > +
+> > > +               r =3D kvm_gmem_create(kvm, &guest_memfd);
+> > > +               break;
+> > > +       }
+> >
+> > I'm thinking line of sight here, by having this as a vm ioctl (rather
+> > than a system iocl), would it complicate making it possible in the
+> > future to share/donate memory between VMs?
+>
+> Maybe, but I hope not?
+>
+> There would still be a primary owner of the memory, i.e. the memory would=
+ still
+> need to be allocated in the context of a specific VM.  And the primary ow=
+ner should
+> be able to restrict privileges, e.g. allow a different VM to read but not=
+ write
+> memory.
+>
+> My current thinking is to (a) tie the lifetime of the backing pages to th=
+e inode,
+> i.e. allow allocations to outlive the original VM, and (b) create a new f=
+ile each
+> time memory is shared/donated with a different VM (or other entity in the=
+ kernel).
+>
+> That should make it fairly straightforward to provide different permissio=
+ns, e.g.
+> track them per-file, and I think should also avoid the need to change the=
+ memslot
+> binding logic since each VM would have it's own view/bindings.
+>
+> Copy+pasting a relevant snippet from a lengthier response in a different =
+thread[*]:
+>
+>   Conceptually, I think KVM should to bind to the file.  The inode is eff=
+ectively
+>   the raw underlying physical storage, while the file is the VM's view of=
+ that
+>   storage.
 
-I suppose if we ever want to to "virtio-iommu invalidation" we'd want
-to use a new type for it?
+I'm not aware of any implementation of sharing memory between VMs in
+KVM before (afaik, since there was no need for one). The following is
+me thinking out loud, rather than any strong opinions on my part.
 
-Jason
+If an allocation can outlive the original VM, then why associate it
+with that (or a) VM to begin with? Wouldn't it be more flexible if it
+were a system-level construct, which is effectively what it was in
+previous iterations of this? This doesn't rule out binding to the
+file, and keeping the inode as the underlying physical storage.
+
+The binding of a VM to a guestmem object could happen implicitly with
+KVM_SET_USER_MEMORY_REGION2, or we could have a new ioctl specifically
+for handling binding.
+
+Cheers,
+/fuad
+
+
+>   Practically, I think that gives us a clean, intuitive way to handle int=
+ra-host
+>   migration.  Rather than transfer ownership of the file, instantiate a n=
+ew file
+>   for the target VM, using the gmem inode from the source VM, i.e. create=
+ a hard
+>   link.  That'd probably require new uAPI, but I don't think that will be=
+ hugely
+>   problematic.  KVM would need to ensure the new VM's guest_memfd can't b=
+e mapped
+>   until KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM (which would also need to verify=
+ the
+>   memslots/bindings are identical), but that should be easy enough to enf=
+orce.
+>
+>   That way, a VM, its memslots, and its SPTEs are tied to the file, while=
+ allowing
+>   the memory and the *contents* of memory to outlive the VM, i.e. be effe=
+ctively
+>   transfered to the new target VM.  And we'll maintain the invariant that=
+ each
+>   guest_memfd is bound 1:1 with a single VM.
+>
+>   As above, that should also help us draw the line between mapping memory=
+ into a
+>   VM (file), and freeing/reclaiming the memory (inode).
+>
+>   There will be extra complexity/overhead as we'll have to play nice with=
+ the
+>   possibility of multiple files per inode, e.g. to zap mappings across al=
+l files
+>   when punching a hole, but the extra complexity is quite small, e.g. we =
+can use
+>   address_space.private_list to keep track of the guest_memfd instances a=
+ssociated
+>   with the inode.
+>
+>   Setting aside TDX and SNP for the moment, as it's not clear how they'll=
+ support
+>   memory that is "private" but shared between multiple VMs, I think per-V=
+M files
+>   would work well for sharing gmem between two VMs.  E.g. would allow a g=
+ive page
+>   to be bound to a different gfn for each VM, would allow having differen=
+t permissions
+>   for each file (e.g. to allow fallocate() only from the original owner).
+>
+> [*] https://lore.kernel.org/all/ZLGiEfJZTyl7M8mS@google.com
+>
