@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D7FD769C5B
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 127BF769C5C
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233207AbjGaQ0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:26:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
+        id S233313AbjGaQ0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:26:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233025AbjGaQZz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:25:55 -0400
+        with ESMTP id S233331AbjGaQZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:25:59 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413E919A5
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819A61996
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:25:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690820739; x=1722356739;
+  t=1690820743; x=1722356743;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=vc/AA0VTFSVygJctuEuxWBeG2HxDcS51m4hly05CELA=;
-  b=GUPLHFSHSkscfc67A30+H4NptkD4P86sE6btL89ZnMGR1Bsae0t84xVY
-   +GW7ug1mCTxt2zz6FwnZ/zlTW9ku9ZxpxhVC3m65Sk8eihzZkEcg/iKFM
-   Vz8eLE+CUVEYSiNj2PJTnsJDNt2UYKcv+6GsKQLkDdGlYWTjtFEUA0kCV
-   72ZGoh4cDxBKqHxnviPh5CFIS9pFLf+zFmAiv1JMTl2SkkVFvFpbzHIOY
-   Arg2EV19vBZEMsipi6WBlAhqKbgS0uO8O8Nv3yoYJVMMfHEi5Y/9Iw+wt
-   TV46U5zhAXuDAZO0U8FHd3P102jmD2cS6fzxtt66YA1aad3hMwHG5Q8Qk
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993494"
+  bh=2F3BNnQpA+emsmbBfMLeFksuw4ODRYROEr7ulTUvnvs=;
+  b=PjRxEv873NQpIBd3mCkYAc6poyW7GjYsUTAu+eLOYlQd8LCW/KB4gLzW
+   gx+KNhOe+BK7xia+v0oVd7QpzFMHfkOxFJ881HHAPWUFFg53trq09ZdVP
+   HuZ6URaPWuYGq+Vwi/WbeeAtCvAwRjVAwfoxJ7h5Q58PpZvAyB+zE3g2a
+   QOks7u2VMSayT6XuTmmLDoVJSttq6Ym5Wq+QDp82gHywVVGxgwWxHX28J
+   eZZNNqSYPvlyqBjz+3g9WFpHxgLMCh49eGe341gyl68ZgGXUJBnDuAIfc
+   hoJMFX87pxu68oASVyfJ4JSF8fvhRXqhIv8KoXj/opPFukje1WSkbC7LU
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993510"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="353993494"
+   d="scan'208";a="353993510"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:38 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:25:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984252"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984276"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="757984252"
+   d="scan'208";a="757984276"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:33 -0700
+  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:38 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,9 +55,9 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         xiaoyao.li@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 10/19] kvm: Introduce support for memory_attributes
-Date:   Mon, 31 Jul 2023 12:21:52 -0400
-Message-Id: <20230731162201.271114-11-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 11/19] kvm/memory: Introduce the infrastructure to set the default shared/private value
+Date:   Mon, 31 Jul 2023 12:21:53 -0400
+Message-Id: <20230731162201.271114-12-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
@@ -73,95 +73,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introcude the helper functions to set the attributes of a range of
-memory to private and shared.
+Introduce new flags for MemoryRegion to indicate the default attribute,
+private or not. And update the attribute if default private.
 
+Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
- include/sysemu/kvm.h |  3 +++
- 2 files changed, 46 insertions(+)
+ accel/kvm/kvm-all.c   | 10 ++++++++++
+ include/exec/memory.h |  6 ++++++
+ softmmu/memory.c      | 13 +++++++++++++
+ 3 files changed, 29 insertions(+)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 7b1818334ba7..6dd22fa4fd6f 100644
+index 6dd22fa4fd6f..f9b5050b8885 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -105,6 +105,7 @@ bool kvm_msi_use_devid;
- bool kvm_has_guest_debug;
- static int kvm_sstep_flags;
- static bool kvm_immediate_exit;
-+static uint64_t kvm_supported_memory_attributes;
- static hwaddr kvm_max_slot_size = ~0;
+@@ -1487,6 +1487,16 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                     strerror(-err));
+             abort();
+         }
++
++        if (memory_region_is_default_private(mr)) {
++            err = kvm_set_memory_attributes_private(start_addr, slot_size);
++            if (err) {
++                error_report("%s: failed to set memory attribute private: %s\n",
++                             __func__, strerror(-err));
++                exit(1);
++            }
++        }
++
+         start_addr += slot_size;
+         ram_start_offset += slot_size;
+         ram += slot_size;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index ddf0e14970b0..759f797b6acd 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -235,6 +235,9 @@ typedef struct IOMMUTLBEvent {
+ /* RAM is an mmap-ed named file */
+ #define RAM_NAMED_FILE (1 << 9)
  
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-@@ -1343,6 +1344,44 @@ void kvm_set_max_memslot_size(hwaddr max_slot_size)
-     kvm_max_slot_size = max_slot_size;
++/* RAM is default private */
++#define RAM_DEFAULT_PRIVATE     (1 << 10)
++
+ static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+                                        IOMMUNotifierFlag flags,
+                                        hwaddr start, hwaddr end,
+@@ -1689,6 +1692,9 @@ bool memory_region_is_protected(MemoryRegion *mr);
+  */
+ bool memory_region_can_be_private(MemoryRegion *mr);
+ 
++void memory_region_set_default_private(MemoryRegion *mr);
++bool memory_region_is_default_private(MemoryRegion *mr);
++
+ /**
+  * memory_region_get_iommu: check whether a memory region is an iommu
+  *
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 336c76ede660..af6aa3c1e3c9 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1860,6 +1860,19 @@ bool memory_region_can_be_private(MemoryRegion *mr)
+     return mr->ram_block && mr->ram_block->gmem_fd >= 0;
  }
  
-+static int kvm_set_memory_attributes(hwaddr start, hwaddr size, uint64_t attr)
++bool memory_region_is_default_private(MemoryRegion *mr)
 +{
-+    struct kvm_memory_attributes attrs;
-+    int r;
-+
-+    attrs.attributes = attr;
-+    attrs.address = start;
-+    attrs.size = size;
-+    attrs.flags = 0;
-+
-+    r = kvm_vm_ioctl(kvm_state, KVM_SET_MEMORY_ATTRIBUTES, &attrs);
-+    if (r) {
-+        warn_report("%s: failed to set memory (0x%lx+%#zx) with attr 0x%lx error '%s'",
-+                     __func__, start, size, attr, strerror(errno));
-+    }
-+    return r;
++    return mr->ram_block && mr->ram_block->gmem_fd >= 0 &&
++        (mr->ram_block->flags & RAM_DEFAULT_PRIVATE);
 +}
 +
-+int kvm_set_memory_attributes_private(hwaddr start, hwaddr size)
++void memory_region_set_default_private(MemoryRegion *mr)
 +{
-+    if (!(kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
-+        error_report("KVM doesn't support PRIVATE memory attribute\n");
-+        return -EINVAL;
++    if (mr->ram_block && mr->ram_block->gmem_fd >= 0) {
++        mr->ram_block->flags |= RAM_DEFAULT_PRIVATE;
 +    }
-+
-+    return kvm_set_memory_attributes(start, size, KVM_MEMORY_ATTRIBUTE_PRIVATE);
 +}
 +
-+int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size)
-+{
-+    if (!(kvm_supported_memory_attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
-+        error_report("KVM doesn't support PRIVATE memory attribute\n");
-+        return -EINVAL;
-+    }
-+
-+    return kvm_set_memory_attributes(start, size, 0);
-+}
-+
- /* Called with KVMMemoryListener.slots_lock held */
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
-@@ -2556,6 +2595,10 @@ static int kvm_init(MachineState *ms)
-     }
-     s->as = g_new0(struct KVMAs, s->nr_as);
- 
-+    if (kvm_check_extension(s, KVM_CAP_MEMORY_ATTRIBUTES)) {
-+        kvm_supported_memory_attributes = kvm_ioctl(s, KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES, 0);
-+    }
-+
-     if (object_property_find(OBJECT(current_machine), "kvm-type")) {
-         g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
-                                                             "kvm-type",
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 115f0cca79d1..49c896d8a512 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -580,4 +580,7 @@ bool kvm_arch_cpu_check_are_resettable(void);
- bool kvm_dirty_ring_enabled(void);
- 
- uint32_t kvm_dirty_ring_size(void);
-+
-+int kvm_set_memory_attributes_private(hwaddr start, hwaddr size);
-+int kvm_set_memory_attributes_shared(hwaddr start, hwaddr size);
- #endif
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+ {
+     uint8_t mask = mr->dirty_log_mask;
 -- 
 2.34.1
 
