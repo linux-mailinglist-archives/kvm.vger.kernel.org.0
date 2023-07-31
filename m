@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 158EB769C65
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A34F5769C67
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 18:26:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233401AbjGaQ0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 12:26:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
+        id S230340AbjGaQ0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 12:26:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjGaQ0a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 12:26:30 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77851BE6
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:26:09 -0700 (PDT)
+        with ESMTP id S233400AbjGaQ0k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 12:26:40 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476111FEB
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 09:26:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690820769; x=1722356769;
+  t=1690820775; x=1722356775;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GSbcff0w9eBcLKQoepD8WEW33V5SkOKmuZmwcCsYEA0=;
-  b=SlMpFOkoV2LU7GqQxNn4PM/Cyo9NjOE4I8o05F3Pq+G4lI328PbR3Q11
-   /Ja/2uaf0BTQiTyO2VlnsuPWPPOU8vXmdl90UxvmuP5JEkE0EPzyf3qEc
-   f7dxO0Rj9/agNsU0Gp7+a2poSQ1O+J8NODZkXLEvUIUywGKpJQKF6yylA
-   xv8gr3OO3vonMzjzhAvBvuR66Mt6DnD8EF3zw2XtJTm0GlcV39Gl1URqP
-   ruYaCzCjvS3pGKTA0SdFNkAF5Ijr7o+aRh/Sg412hy6nwspm2P+M6QNTs
-   0CWeJ8AJRn/qfqjSDHFizpzIcy5ndvdT4sR6CGLRdGWItlYMP7FTE0a3T
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993571"
+  bh=heHOwr2oExdov2YnZXE+amN8spk5BZtW366haLX5N0Q=;
+  b=Qn/YeCaA2SQTSc/rdKz4ZhebpM4wYUvgv1f2o8jg1YUBJ1CIePacOMr/
+   V307U0vD9pbV4izwUtEattgvoTOOzRX4M7/EUZkJ1XGwyg/vJ8RYRtxb0
+   TYLzd1oSUwBF0F5JeM0D/Xv2YdYLuhoy8c9Xy0mYOTr6F8KP4Ddrxq2a7
+   Bn5Cx002NInt5Jadolpf73mQoXRcFKOyGYw4sjGEg0/L20b1lkvAUhrrd
+   HOrRFUr8FQw6YmuYHJR8XOy7a4ZRYD6DcQhCw6QF0Gf0tPk9TTyKhOqVm
+   /Ska7pBjh2CxR+gLZ7YbNywLDvwFYMoEXctyMYYkeM07HteZhFARahg1v
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="353993597"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="353993571"
+   d="scan'208";a="353993597"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:26:01 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 09:26:06 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984336"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="757984384"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="757984336"
+   d="scan'208";a="757984384"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:25:56 -0700
+  by orsmga008.jf.intel.com with ESMTP; 31 Jul 2023 09:26:01 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -55,9 +55,9 @@ Cc:     Markus Armbruster <armbru@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         xiaoyao.li@intel.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: [RFC PATCH 15/19] kvm: handle KVM_EXIT_MEMORY_FAULT
-Date:   Mon, 31 Jul 2023 12:21:57 -0400
-Message-Id: <20230731162201.271114-16-xiaoyao.li@intel.com>
+Subject: [RFC PATCH 16/19] trace/kvm: Add trace for page convertion between shared and private
+Date:   Mon, 31 Jul 2023 12:21:58 -0400
+Message-Id: <20230731162201.271114-17-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230731162201.271114-1-xiaoyao.li@intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
@@ -73,92 +73,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Chao Peng <chao.p.peng@linux.intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Currently only KVM_MEMORY_EXIT_FLAG_PRIVATE in flags is valid when
-KVM_EXIT_MEMORY_FAULT happens. It indicates userspace needs to do
-the memory conversion on the RAMBlock to turn the memory into desired
-attribute, i.e., private/shared.
-
-Note, KVM_EXIT_MEMORY_FAULT makes sense only when the RAMBlock has
-gmem memory backend.
-
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- accel/kvm/kvm-all.c | 52 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ accel/kvm/kvm-all.c    | 1 +
+ accel/kvm/trace-events | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f9b5050b8885..72d50b923bf2 100644
+index 72d50b923bf2..c9f3aab5e587 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -3040,6 +3040,48 @@ static void kvm_eat_signals(CPUState *cpu)
-     } while (sigismember(&chkset, SIG_IPI));
- }
+@@ -3048,6 +3048,7 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
+     ram_addr_t offset;
+     int ret = -1;
  
-+static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
-+{
-+    MemoryRegionSection section;
-+    void *addr;
-+    RAMBlock *rb;
-+    ram_addr_t offset;
-+    int ret = -1;
-+
-+    section = memory_region_find(get_system_memory(), start, size);
-+    if (!section.mr) {
-+        return ret;
-+    }
-+
-+    if (memory_region_can_be_private(section.mr)) {
-+        if (to_private) {
-+            ret = kvm_set_memory_attributes_private(start, size);
-+        } else {
-+            ret = kvm_set_memory_attributes_shared(start, size);
-+        }
-+
-+        if (ret) {
-+            return ret;
-+        }
-+
-+        addr = memory_region_get_ram_ptr(section.mr) +
-+               section.offset_within_region;
-+        rb = qemu_ram_block_from_host(addr, false, &offset);
-+        /*
-+         * With KVM_SET_MEMORY_ATTRIBUTES by kvm_set_memory_attributes(),
-+         * operation on underlying file descriptor is only for releasing
-+         * unnecessary pages.
-+         */
-+        ram_block_convert_range(rb, offset, size, to_private);
-+    } else {
-+        warn_report("Convert non guest-memfd backed memory region (0x%"HWADDR_PRIx" ,+ 0x%"HWADDR_PRIx") to %s",
-+                    start, size, to_private ? "private" : "shared");
-+    }
-+
-+    memory_region_unref(section.mr);
-+    return ret;
-+}
-+
- int kvm_cpu_exec(CPUState *cpu)
- {
-     struct kvm_run *run = cpu->kvm_run;
-@@ -3198,6 +3240,16 @@ int kvm_cpu_exec(CPUState *cpu)
-                 break;
-             }
-             break;
-+        case KVM_EXIT_MEMORY_FAULT:
-+            if (run->memory.flags & ~KVM_MEMORY_EXIT_FLAG_PRIVATE) {
-+                error_report("KVM_EXIT_MEMORY_FAULT: Unknown flag 0x%" PRIx64,
-+                             (uint64_t)run->memory.flags);
-+                ret = -1;
-+                break;
-+            }
-+            ret = kvm_convert_memory(run->memory.gpa, run->memory.size,
-+                                     run->memory.flags & KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+            break;
-         default:
-             DPRINTF("kvm_arch_handle_exit\n");
-             ret = kvm_arch_handle_exit(cpu, run);
++    trace_kvm_convert_memory(start, size, to_private ? "shared_to_private" : "private_to_shared");
+     section = memory_region_find(get_system_memory(), start, size);
+     if (!section.mr) {
+         return ret;
+diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
+index 80694683acea..4935c9c5cf0b 100644
+--- a/accel/kvm/trace-events
++++ b/accel/kvm/trace-events
+@@ -25,4 +25,4 @@ kvm_dirty_ring_reaper(const char *s) "%s"
+ kvm_dirty_ring_reap(uint64_t count, int64_t t) "reaped %"PRIu64" pages (took %"PRIi64" us)"
+ kvm_dirty_ring_reaper_kick(const char *reason) "%s"
+ kvm_dirty_ring_flush(int finished) "%d"
+-
++kvm_convert_memory(uint64_t start, uint64_t size, const char *msg) "start 0x%" PRIx64 " size 0x%" PRIx64 " %s"
 -- 
 2.34.1
 
