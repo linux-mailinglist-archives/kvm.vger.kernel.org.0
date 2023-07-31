@@ -2,114 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4AEA769F54
-	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 19:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DE4E769F60
+	for <lists+kvm@lfdr.de>; Mon, 31 Jul 2023 19:22:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232926AbjGaRVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 13:21:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
+        id S233957AbjGaRWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 13:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231582AbjGaRUi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 13:20:38 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB03E1732
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:19:49 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d10792c7582so3585264276.3
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:19:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690823989; x=1691428789;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gdb7QzlYcOc7UWmxcegrKrVqMfFsYHZFCwi2LL3my64=;
-        b=zBusOqyPc9Ltaaqmju2VylABq68z3gA0yH658LtIHqnM7muXRoiPK7Z+lJWtWm/VN7
-         8whOaU6x9OiXazWcYr8fAVYmvIyO6TYz06QaVHcaE8EQS9KLvJWFds1kXHPR5gfyol/T
-         hwExr3eIMCbASZqYoMXC5wv7UZF1Mp2U4BBszuz1saEchMHIrtLN7I0wmDOtomAyfGK4
-         Jb/4sUIrkAMy5yEhhybvRPtzSFoc+rBWIZvDZCJzlFd/cD+b3RLT1Lug7yCp0xC4QWhy
-         NI1FLe1nSeay7t1G8coFkWiO2qxxWysi0sKSxyJbI8pSaEUs+h67fGOJLF0xb0FIQUeT
-         6ssw==
+        with ESMTP id S233961AbjGaRVy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 13:21:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD171BEA
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:21:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690824062;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8NfShcrH5vNeU09yfaTlylFugR/gu1+MgjXGX+9Q5ac=;
+        b=LMoAJ+pM9MEEPOrRC9JdUH/4a+sIWt++2GkINyIZ7fvj634xw9jjMMPRXLKYUh8j11edKA
+        LS5s79y8GjdsO6yZzQsIxoRdY/149y0hZhtFYp6p87t4kFFh8zSl73ipoLJjlyXNnvEG7I
+        F5OGbuec1Ndqd6s6ey8gCPCbhou5EIo=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-115-k3SqBqbNMs-GkDyxWeupew-1; Mon, 31 Jul 2023 13:21:01 -0400
+X-MC-Unique: k3SqBqbNMs-GkDyxWeupew-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-57320c10635so57097407b3.3
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 10:21:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690823989; x=1691428789;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gdb7QzlYcOc7UWmxcegrKrVqMfFsYHZFCwi2LL3my64=;
-        b=Wq8o1XTLy0RqA+rmSQnhnCz2Gi/zSt3qSjv00+Agw89+LCZbh5KM1XF+mW0EgQpheR
-         rDQonqOkKXSTe9iSoOmebuJRRRVFPPOF1kD3iKRx0lAEmPEOhW6oNh+j6psokyfdflGQ
-         fkeL9LfmZgT9UoyL0NRYlAyH/lsNnFpqcIxx/mP+lyx1PlN9mK4RDm59H8z6hbY0oY7d
-         rF5O270NJwTKRmcunT9fJMQUj2QL7jnDbYheedTeqfL1jVMJOuOPeBc7QuxaiLnkDCdw
-         WCUi5zLtpRYW4VLDrqnVl2mN1pbBLc+lOiRsj89TrEqMYxQyy/LK2catq+mT2947a002
-         QOng==
-X-Gm-Message-State: ABy/qLYolbuXqtNjZI+q7YdQGvuF/VvwFOyriO7mCC4kVVBgojvnfnkG
-        Q0Npd6hqdoQG1eIudpMy7X8bmxHVAd8=
-X-Google-Smtp-Source: APBJJlGDPfFjSpxr1qlDSkpPLfZlx10bTCXz+EMu9wyIQgv1N0AgtgkGqemxSj6OVMzULEQvuuVcsCXfoZ4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:abe3:0:b0:d22:4059:b2bd with SMTP id
- v90-20020a25abe3000000b00d224059b2bdmr62850ybi.1.1690823989036; Mon, 31 Jul
- 2023 10:19:49 -0700 (PDT)
-Date:   Mon, 31 Jul 2023 10:19:47 -0700
-In-Reply-To: <ZMfpgu8bHH0jA8Si@google.com>
-Mime-Version: 1.0
-References: <20230729003643.1053367-1-seanjc@google.com> <20230729003643.1053367-10-seanjc@google.com>
- <20230731-91b64a6b787ba7e23b285785@orel> <ZMfpgu8bHH0jA8Si@google.com>
-Message-ID: <ZMftM3qz/VqalbPg@google.com>
-Subject: Re: [PATCH v4 09/34] KVM: selftests: Add a selftest for guest prints
- and formatted asserts
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        "Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?=" <philmd@linaro.org>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1690824060; x=1691428860;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8NfShcrH5vNeU09yfaTlylFugR/gu1+MgjXGX+9Q5ac=;
+        b=hBxgaUykgzBaf2qRLssaA+EEQhoKwzk8kC47dLp/Bfvz1kAyagCvKFiS5q0wTHdH/P
+         bw4dKSGCnNaS+pRtHk0vJLKiu5K0wxWwby8+oiF3Zzl3aVzBQ256OXxaeqjnztmoteXH
+         wtvmmoQSOfe/ca7s4cM6NRQj/j9V+iRMvWG7ELDh9sBJwQh0YjUqbepONQviNhu7Jevd
+         7OcuvVxxXjVZIKm7vDaG41e7ta1hAgibGu8e1Dc4HeuHt9a2Gf5x9F/NtnzI98fhggm2
+         b4KGSOKu3uJY9m6fNNaGdhGr6lETKiQ1Ar75w6U9swtOEIDefvWK3AIJ1W9FUcLEbACa
+         nLZg==
+X-Gm-Message-State: ABy/qLYTk4FYfnWXFP2UjdZvaalvaEczv31YjbICgd+tdcR+0vfAuDxk
+        Mxw7skQYT8rUhXDobWjm8AY2y1f6iOIW3qjifbf9gfuYB1wEVmwC9h1MlbkC35wiHwlRH17glUp
+        kKCl2nmB3fUQc
+X-Received: by 2002:a81:c24f:0:b0:583:4304:75a4 with SMTP id t15-20020a81c24f000000b00583430475a4mr10696726ywg.29.1690824060510;
+        Mon, 31 Jul 2023 10:21:00 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFbVJszIfUaYg4Uc4+wm7XQPO4r+bpFj464rdlreCyyKuJOaZIruagzYqntofPsjWen070/Bg==
+X-Received: by 2002:a81:c24f:0:b0:583:4304:75a4 with SMTP id t15-20020a81c24f000000b00583430475a4mr10696647ywg.29.1690824059920;
+        Mon, 31 Jul 2023 10:20:59 -0700 (PDT)
+Received: from vschneid.remote.csb ([149.12.7.81])
+        by smtp.gmail.com with ESMTPSA id 10-20020ac8208a000000b00401f7f23ab6sm3744764qtd.85.2023.07.31.10.20.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 10:20:59 -0700 (PDT)
+From:   Valentin Schneider <vschneid@redhat.com>
+To:     Dan Carpenter <dan.carpenter@linaro.org>,
+        Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 06/20] tracing/filters: Optimise scalar vs
+ cpumask filtering when the user mask is a single CPU
+In-Reply-To: <b7cf996a-f443-402c-8e13-c5f25a964184@kadam.mountain>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-7-vschneid@redhat.com>
+ <20230729155547.35719a1f@rorschach.local.home>
+ <04f20e58-6b24-4f44-94e2-0d12324a30e4@kadam.mountain>
+ <20230731115453.395d20c6@gandalf.local.home>
+ <b7cf996a-f443-402c-8e13-c5f25a964184@kadam.mountain>
+Date:   Mon, 31 Jul 2023 18:20:49 +0100
+Message-ID: <xhsmhy1iwq9ou.mognet@vschneid.remote.csb>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023, Sean Christopherson wrote:
-> On Mon, Jul 31, 2023, Andrew Jones wrote:
-> > diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> > index 4cf69fa8bfba..4adf526dc378 100644
-> > --- a/tools/testing/selftests/kvm/include/ucall_common.h
-> > +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> > @@ -6,8 +6,19 @@
-> >   */
-> >  #ifndef SELFTEST_KVM_UCALL_COMMON_H
-> >  #define SELFTEST_KVM_UCALL_COMMON_H
-> > +#include <linux/kvm.h>
-> >  #include "test_util.h"
-> >  
-> > +#if defined(__aarch64__)
-> > +#define UCALL_EXIT_REASON      KVM_EXIT_MMIO
-> > +#elif defined(__x86_64__)
-> > +#define UCALL_EXIT_REASON      KVM_EXIT_IO
-> > +#elif defined(__s390x__)
-> > +#define UCALL_EXIT_REASON      KVM_EXIT_S390_SIEIC
-> > +#elif defined(__riscv)
-> > +#define UCALL_EXIT_REASON      KVM_EXIT_RISCV_SBI
-> > +#endif
-> > +
-> >  /* Common ucalls */
-> >  enum {
-> >         UCALL_NONE,
-> > 
-> > and then compiled the test for riscv and it passed. I also ran all other
-> > riscv tests successfully.
-> 
-> Can I have your SoB for the ucall_common.h patch?  I'll write a changelog and fold
-> in a separate prep patch for that change.
+On 31/07/23 19:03, Dan Carpenter wrote:
+> On Mon, Jul 31, 2023 at 11:54:53AM -0400, Steven Rostedt wrote:
+>> On Mon, 31 Jul 2023 15:07:52 +0300
+>> Dan Carpenter <dan.carpenter@linaro.org> wrote:
+>>
+>> > On Sat, Jul 29, 2023 at 03:55:47PM -0400, Steven Rostedt wrote:
+>> > > > @@ -1761,6 +1761,11 @@ static int parse_pred(const char *str, void=
+ *data,
+>> > > >                                FILTER_PRED_FN_CPUMASK;
+>> > > >                } else if (field->filter_type =3D=3D FILTER_CPU) {
+>> > > >                        pred->fn_num =3D FILTER_PRED_FN_CPU_CPUMASK;
+>> > > > +		} else if (single) {
+>> > > > +			pred->op =3D pred->op =3D=3D OP_BAND ? OP_EQ : pred->op;
+>> > >
+>> > > Nit, the above can be written as:
+>> > >
+>> > >                  pred->op =3D pret->op !=3D OP_BAND ? : OP_EQ;
+>> > >
+>> >
+>> > Heh.  Those are not equivalent.  The right way to write this is:
+>>
+>> You mean because of my typo?
+>
+> No, I hadn't seen the s/pred/pret/ typo.  Your code does:
+>
+>       if (pred->op !=3D OP_BAND)
+>               pred->op =3D true;
+>       else
+>               pred->op OP_EQ;
+>
+> Realy we should probably trigger a static checker warning any time
+> someone does a compare operations as part of a "x =3D comparison ?: bar;
+> Years ago, someone asked me to do that with regards to error codes like:
+>
+>       return ret < 0 ?: -EINVAL;
+>
+> but I don't remember the results.
+>
 
-On second thought, I take that back.  I think it makes more sense to add a ucall.h
-for each arch and #define the exit type there.  All then move all of the
-ucall_arch_do_ucall() implementations to ucall.h (except maybe x86 while it has
-the horrific save/restore GPRs hack...).  That way the #define is colocated with
-the code that generates the exit reason.
+FWIW this is caught by GCC:
+
+     error: the omitted middle operand in ?: will always be =E2=80=98true=
+=E2=80=99, suggest explicit middle operand [-Werror=3Dparentheses]
+     pred->op =3D pred->op !=3D OP_BAND ? : OP_EQ;
+
+
+> regards,
+> dan carpenter
+
