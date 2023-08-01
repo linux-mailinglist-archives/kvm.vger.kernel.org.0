@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74E5E76AC59
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB40176AC64
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:08:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232622AbjHAJIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:08:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37786 "EHLO
+        id S231950AbjHAJIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:08:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232960AbjHAJIU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:08:20 -0400
+        with ESMTP id S232968AbjHAJIV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:08:21 -0400
 Received: from mgamail.intel.com (unknown [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34564EFE;
-        Tue,  1 Aug 2023 02:06:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D235241;
+        Tue,  1 Aug 2023 02:06:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1690880772; x=1722416772;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BTa7pFRtc5hN79memTk6tlfkpBhDUr274mj/lMgq9SQ=;
-  b=k8ymMUnwrlWuKHlLJTJiqP0MmNuNrfoeCxaXahRbWW18/fNDazT5k2q0
-   oP5JOcovBW2DyakYS0ZH4tUelN27zE9yZNOJcxNNhA3otIo05Hak+zLw5
-   IcvkNl+mNdSu+QVm6SUDC69S8ihSK0B3S9b4SKNb5i1E6fulZv7K0taHD
-   HirwX11kw7g2ka1LmhT/ELBNC0/ZJf251t2v9h/eqg+WdDGDYZjEDEYny
-   SDMCsQc6U19D7lg2XX3WPqKNwdelGCWgUbjx2zb31Mnu1eQETBh44Mr+E
-   s2v7oIkk01731xLCwjGVLyWjWWhJM2cWYZcDY1c9o29E9er3+gNVHlHQ7
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="366713454"
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Aa5CvA7MmnPHyksJQgqEteFVOvaio1lA17Ke5qS+vL0=;
+  b=TeKJeL09lRyNMh9np7dJphOGhvm7/hKmwoPDqiYSGbjPlDfIAI4A+nkV
+   j9ut8EzGwL2ILHE+igV0Lc+8XUIUnGbuVVo7rj4u1Pin07vEsWmfrbpLo
+   ym59JUW5u0CIqqpBdocVd7Qe0lujlMjIuNgha7Hn2cuLur/ICdLIqUX5z
+   xamcbFx7NP8TxITQ0bHvwoYOCb18foB1J6rnnvjSS86g3Y0Sv83226rz2
+   kaSpwgBp7XWv/r8uRGuNPGTmWjG6crgFs/cIle2vI80IyetnKCjv+GsfQ
+   pV1ZwuAB+m4qG4U4FzqYACsFWXo+qa52DbLjTXQePhefEzK6SbkIJ8RLN
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="366713486"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="366713454"
+   d="scan'208";a="366713486"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:04:27 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:04:29 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="722420705"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="722420715"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="722420705"
+   d="scan'208";a="722420715"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by orsmga007.jf.intel.com with ESMTP; 01 Aug 2023 02:04:25 -0700
+  by orsmga007.jf.intel.com with ESMTP; 01 Aug 2023 02:04:27 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,10 +106,12 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH RESEND v9 27/36] x86/traps: Add external_interrupt() to dispatch external interrupts
-Date:   Tue,  1 Aug 2023 01:35:44 -0700
-Message-Id: <20230801083553.8468-1-xin3.li@intel.com>
+Subject: [PATCH RESEND v9 28/36] x86/idtentry: Incorporate declaration/definition of the FRED exception handler type
+Date:   Tue,  1 Aug 2023 01:35:45 -0700
+Message-Id: <20230801083553.8468-2-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230801083553.8468-1-xin3.li@intel.com>
+References: <20230801083553.8468-1-xin3.li@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -122,70 +124,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
+The existing IDT exception C-handlers of X86_TRAP_TS, X86_TRAP_NP,
+X86_TRAP_SS, X86_TRAP_GP, X86_TRAP_AC and X86_TRAP_CP take an error
+code as the second argument, thus their FRED version handlers simply
+call the corresponding existing IDT handlers with orig_ax from the
+pt_regs structure as the second argument.
 
-external_interrupt() dispatches all external interrupts: it checks if an
-external interrupt is a system interrupt, if yes it dipatches it through
-the system_interrupt_handlers table, otherwise to
-dispatch_common_interrupt().
-
-Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
-Co-developed-by: Xin Li <xin3.li@intel.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
+ arch/x86/include/asm/idtentry.h | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-Changes since v8:
-* Reword the patch description, which was confusing (Thomas Gleixner).
-
-Changes since v5:
-* Initialize system_interrupt_handlers with dispatch_table_spurious_interrupt()
-  instead of NULL to get rid of a branch (Peter Zijlstra).
----
- arch/x86/include/asm/traps.h |  2 ++
- arch/x86/kernel/traps.c      | 18 ++++++++++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
-index cba3e4dfc329..48daa78ee88c 100644
---- a/arch/x86/include/asm/traps.h
-+++ b/arch/x86/include/asm/traps.h
-@@ -66,4 +66,6 @@ static inline void sysvec_setup_fred(unsigned int vector, system_interrupt_handl
- 	alloc_intr_gate(vector, asm_##func);				\
- }
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index e67d111bf932..3b743c3fbe91 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -11,6 +11,7 @@
+ #include <linux/entry-common.h>
+ #include <linux/hardirq.h>
  
-+int external_interrupt(struct pt_regs *regs);
-+
- #endif /* _ASM_X86_TRAPS_H */
-diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index 9040c7f01c93..90fdfcccee7a 100644
---- a/arch/x86/kernel/traps.c
-+++ b/arch/x86/kernel/traps.c
-@@ -1542,6 +1542,24 @@ void set_sysvec_handler(unsigned int i, system_interrupt_handler func)
- 	system_interrupt_handlers[i] = func;
- }
++#include <asm/fred.h>
+ #include <asm/irq_stack.h>
  
-+int external_interrupt(struct pt_regs *regs)
-+{
-+	unsigned int vector = regs->vector;
-+	unsigned int sysvec = vector - FIRST_SYSTEM_VECTOR;
-+
-+	if (unlikely(vector < FIRST_EXTERNAL_VECTOR)) {
-+		pr_err("invalid external interrupt vector %d\n", vector);
-+		return -EINVAL;
-+	}
-+
-+	if (sysvec < NR_SYSTEM_VECTORS)
-+		system_interrupt_handlers[sysvec](regs);
-+	else
-+		dispatch_common_interrupt(regs, vector);
-+
-+	return 0;
-+}
-+
- #endif /* CONFIG_X86_64 */
+ /**
+@@ -67,13 +68,16 @@ static __always_inline void __##func(struct pt_regs *regs)
  
- void __init trap_init(void)
+ /**
+  * DECLARE_IDTENTRY_ERRORCODE - Declare functions for simple IDT entry points
++ *				and their corresponding software based
++ *				dispatch handler
+  *				Error code pushed by hardware
+  * @vector:	Vector number (ignored for C)
+  * @func:	Function name of the entry point
+  *
+- * Declares three functions:
++ * Declares four functions:
+  * - The ASM entry point: asm_##func
+  * - The XEN PV trap entry point: xen_##func (maybe unused)
++ * - The C handler called from the FRED event dispatch framework
+  * - The C handler called from the ASM entry point
+  *
+  * Same as DECLARE_IDTENTRY, but has an extra error_code argument for the
+@@ -82,14 +86,19 @@ static __always_inline void __##func(struct pt_regs *regs)
+ #define DECLARE_IDTENTRY_ERRORCODE(vector, func)			\
+ 	asmlinkage void asm_##func(void);				\
+ 	asmlinkage void xen_asm_##func(void);				\
++	__visible DECLARE_FRED_HANDLER(fred_##func);			\
+ 	__visible void func(struct pt_regs *regs, unsigned long error_code)
+ 
+ /**
+  * DEFINE_IDTENTRY_ERRORCODE - Emit code for simple IDT entry points
++ *			       and their corresponding software based
++ *			       dispatch handler
+  *			       Error code pushed by hardware
+  * @func:	Function name of the entry point
+  *
+- * Same as DEFINE_IDTENTRY, but has an extra error_code argument
++ * Same as DEFINE_IDTENTRY, but has an extra error_code argument. The
++ * fred_func() simply calls func() with passing orig_ax as its second
++ * argument.
+  */
+ #define DEFINE_IDTENTRY_ERRORCODE(func)					\
+ static __always_inline void __##func(struct pt_regs *regs,		\
+@@ -106,6 +115,11 @@ __visible noinstr void func(struct pt_regs *regs,			\
+ 	irqentry_exit(regs, state);					\
+ }									\
+ 									\
++__visible DEFINE_FRED_HANDLER(fred_##func)				\
++{									\
++	func(regs, regs->orig_ax);					\
++}									\
++									\
+ static __always_inline void __##func(struct pt_regs *regs,		\
+ 				     unsigned long error_code)
+ 
 -- 
 2.34.1
 
