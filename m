@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCA2076AC4A
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:07:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74E5E76AC59
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:08:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232626AbjHAJHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:07:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59906 "EHLO
+        id S232622AbjHAJIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:08:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230458AbjHAJGe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:06:34 -0400
-Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D1D268E;
-        Tue,  1 Aug 2023 02:04:39 -0700 (PDT)
+        with ESMTP id S232960AbjHAJIU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:08:20 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34564EFE;
+        Tue,  1 Aug 2023 02:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690880680; x=1722416680;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0Vsn6bDzpRkXYLGAG2NP2KMCccOE1uQI/p8GcVukrL0=;
-  b=FAwc90R7Hl6CO0L01vtGx9leGNOC90Hrjte+OXOQoCcvXFKLIK8medzr
-   T+FVZSYWcxbCoO31fhv76VexlIjSMRoWNgrWKVR1/T32lGQIuZbLZaxtS
-   +hNl124tW5WTCax3Y68dZMjuslob5NXfo06636yJtkLDKFz2B9jUw8sd+
-   OotZjvgwbyS9VNkmxiOu97jb4+p72wuP+pj6/hS83WHVszV5e0+AFszNG
-   44uEMjviPdLS6aEUc5532mRBLNdNg+Qe/EF8KKfZU1tGzRMo/fq2PU3D7
-   lMcoGxbfumdbIMjVAqLfC+Wyqy1f/9bWA/3MEjv46tlQsdXhmGxunlVzD
+  t=1690880772; x=1722416772;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BTa7pFRtc5hN79memTk6tlfkpBhDUr274mj/lMgq9SQ=;
+  b=k8ymMUnwrlWuKHlLJTJiqP0MmNuNrfoeCxaXahRbWW18/fNDazT5k2q0
+   oP5JOcovBW2DyakYS0ZH4tUelN27zE9yZNOJcxNNhA3otIo05Hak+zLw5
+   IcvkNl+mNdSu+QVm6SUDC69S8ihSK0B3S9b4SKNb5i1E6fulZv7K0taHD
+   HirwX11kw7g2ka1LmhT/ELBNC0/ZJf251t2v9h/eqg+WdDGDYZjEDEYny
+   SDMCsQc6U19D7lg2XX3WPqKNwdelGCWgUbjx2zb31Mnu1eQETBh44Mr+E
+   s2v7oIkk01731xLCwjGVLyWjWWhJM2cWYZcDY1c9o29E9er3+gNVHlHQ7
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082939"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="366713454"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="433082939"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:02:15 -0700
+   d="scan'208";a="366713454"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:04:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975217094"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="722420705"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="975217094"
+   d="scan'208";a="722420705"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:02:14 -0700
+  by orsmga007.jf.intel.com with ESMTP; 01 Aug 2023 02:04:25 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,186 +106,86 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH RESEND v9 26/36] x86/traps: Add sysvec_install() to install a system interrupt handler
-Date:   Tue,  1 Aug 2023 01:33:08 -0700
-Message-Id: <20230801083318.8363-27-xin3.li@intel.com>
+Subject: [PATCH RESEND v9 27/36] x86/traps: Add external_interrupt() to dispatch external interrupts
+Date:   Tue,  1 Aug 2023 01:35:44 -0700
+Message-Id: <20230801083553.8468-1-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230801083318.8363-1-xin3.li@intel.com>
-References: <20230801083318.8363-1-xin3.li@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add sysvec_install() to install a system interrupt handler into both
-the IDT and system_interrupt_handlers. The latter is used to dispatch
-system interrupts to their respective handlers when FRED is enabled.
+From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
+external_interrupt() dispatches all external interrupts: it checks if an
+external interrupt is a system interrupt, if yes it dipatches it through
+the system_interrupt_handlers table, otherwise to
+dispatch_common_interrupt().
+
+Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+Co-developed-by: Xin Li <xin3.li@intel.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
 
 Changes since v8:
-* Introduce a macro sysvec_install() to derive the asm handler name from
-  a C handler, which simplifies the code and avoids an ugly typecast
-  (Thomas Gleixner).
+* Reword the patch description, which was confusing (Thomas Gleixner).
+
+Changes since v5:
+* Initialize system_interrupt_handlers with dispatch_table_spurious_interrupt()
+  instead of NULL to get rid of a branch (Peter Zijlstra).
 ---
- arch/x86/include/asm/traps.h     | 19 +++++++++++++++++++
- arch/x86/kernel/cpu/acrn.c       |  5 +++--
- arch/x86/kernel/cpu/mshyperv.c   | 16 ++++++++--------
- arch/x86/kernel/kvm.c            |  2 +-
- arch/x86/kernel/traps.c          |  6 ++++++
- drivers/xen/events/events_base.c |  3 ++-
- 6 files changed, 39 insertions(+), 12 deletions(-)
+ arch/x86/include/asm/traps.h |  2 ++
+ arch/x86/kernel/traps.c      | 18 ++++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
 diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
-index 47ecfff2c83d..cba3e4dfc329 100644
+index cba3e4dfc329..48daa78ee88c 100644
 --- a/arch/x86/include/asm/traps.h
 +++ b/arch/x86/include/asm/traps.h
-@@ -47,4 +47,23 @@ void __noreturn handle_stack_overflow(struct pt_regs *regs,
- 				      struct stack_info *info);
- #endif
+@@ -66,4 +66,6 @@ static inline void sysvec_setup_fred(unsigned int vector, system_interrupt_handl
+ 	alloc_intr_gate(vector, asm_##func);				\
+ }
  
-+#ifdef CONFIG_X86_64
-+inline void set_sysvec_handler(unsigned int i, system_interrupt_handler func);
-+
-+static inline void sysvec_setup_fred(unsigned int vector, system_interrupt_handler func)
-+{
-+	BUG_ON(vector < FIRST_SYSTEM_VECTOR);
-+	set_sysvec_handler(vector - FIRST_SYSTEM_VECTOR, func);
-+}
-+#else
-+static inline void sysvec_setup_fred(unsigned int vector, system_interrupt_handler func)
-+{
-+}
-+#endif
-+
-+#define sysvec_install(vector, func) {					\
-+	sysvec_setup_fred(vector, func);				\
-+	alloc_intr_gate(vector, asm_##func);				\
-+}
++int external_interrupt(struct pt_regs *regs);
 +
  #endif /* _ASM_X86_TRAPS_H */
-diff --git a/arch/x86/kernel/cpu/acrn.c b/arch/x86/kernel/cpu/acrn.c
-index 485441b7f030..a879b4b87740 100644
---- a/arch/x86/kernel/cpu/acrn.c
-+++ b/arch/x86/kernel/cpu/acrn.c
-@@ -18,6 +18,7 @@
- #include <asm/hypervisor.h>
- #include <asm/idtentry.h>
- #include <asm/irq_regs.h>
-+#include <asm/traps.h>
- 
- static u32 __init acrn_detect(void)
- {
-@@ -26,8 +27,8 @@ static u32 __init acrn_detect(void)
- 
- static void __init acrn_init_platform(void)
- {
--	/* Setup the IDT for ACRN hypervisor callback */
--	alloc_intr_gate(HYPERVISOR_CALLBACK_VECTOR, asm_sysvec_acrn_hv_callback);
-+	/* Install system interrupt handler for ACRN hypervisor callback */
-+	sysvec_install(HYPERVISOR_CALLBACK_VECTOR, sysvec_acrn_hv_callback);
- 
- 	x86_platform.calibrate_tsc = acrn_get_tsc_khz;
- 	x86_platform.calibrate_cpu = acrn_get_tsc_khz;
-diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-index c7969e806c64..134830a7f575 100644
---- a/arch/x86/kernel/cpu/mshyperv.c
-+++ b/arch/x86/kernel/cpu/mshyperv.c
-@@ -28,6 +28,7 @@
- #include <asm/i8259.h>
- #include <asm/apic.h>
- #include <asm/timer.h>
-+#include <asm/traps.h>
- #include <asm/reboot.h>
- #include <asm/nmi.h>
- #include <clocksource/hyperv_timer.h>
-@@ -480,19 +481,18 @@ static void __init ms_hyperv_init_platform(void)
- 	 */
- 	x86_platform.apic_post_init = hyperv_init;
- 	hyperv_setup_mmu_ops();
--	/* Setup the IDT for hypervisor callback */
--	alloc_intr_gate(HYPERVISOR_CALLBACK_VECTOR, asm_sysvec_hyperv_callback);
- 
--	/* Setup the IDT for reenlightenment notifications */
-+	/* Install system interrupt handler for hypervisor callback */
-+	sysvec_install(HYPERVISOR_CALLBACK_VECTOR, sysvec_hyperv_callback);
-+
-+	/* Install system interrupt handler for reenlightenment notifications */
- 	if (ms_hyperv.features & HV_ACCESS_REENLIGHTENMENT) {
--		alloc_intr_gate(HYPERV_REENLIGHTENMENT_VECTOR,
--				asm_sysvec_hyperv_reenlightenment);
-+		sysvec_install(HYPERV_REENLIGHTENMENT_VECTOR, sysvec_hyperv_reenlightenment);
- 	}
- 
--	/* Setup the IDT for stimer0 */
-+	/* Install system interrupt handler for stimer0 */
- 	if (ms_hyperv.misc_features & HV_STIMER_DIRECT_MODE_AVAILABLE) {
--		alloc_intr_gate(HYPERV_STIMER0_VECTOR,
--				asm_sysvec_hyperv_stimer0);
-+		sysvec_install(HYPERV_STIMER0_VECTOR, sysvec_hyperv_stimer0);
- 	}
- 
- # ifdef CONFIG_SMP
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 1cceac5984da..12c799412c5d 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -829,7 +829,7 @@ static void __init kvm_guest_init(void)
- 
- 	if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT) && kvmapf) {
- 		static_branch_enable(&kvm_async_pf_enabled);
--		alloc_intr_gate(HYPERVISOR_CALLBACK_VECTOR, asm_sysvec_kvm_asyncpf_interrupt);
-+		sysvec_install(HYPERVISOR_CALLBACK_VECTOR, sysvec_kvm_asyncpf_interrupt);
- 	}
- 
- #ifdef CONFIG_SMP
 diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index e430a8c47931..9040c7f01c93 100644
+index 9040c7f01c93..90fdfcccee7a 100644
 --- a/arch/x86/kernel/traps.c
 +++ b/arch/x86/kernel/traps.c
-@@ -1536,6 +1536,12 @@ static system_interrupt_handler system_interrupt_handlers[NR_SYSTEM_VECTORS] = {
+@@ -1542,6 +1542,24 @@ void set_sysvec_handler(unsigned int i, system_interrupt_handler func)
+ 	system_interrupt_handlers[i] = func;
+ }
  
- #undef SYSV
- 
-+void set_sysvec_handler(unsigned int i, system_interrupt_handler func)
++int external_interrupt(struct pt_regs *regs)
 +{
-+	BUG_ON(i >= NR_SYSTEM_VECTORS);
-+	system_interrupt_handlers[i] = func;
++	unsigned int vector = regs->vector;
++	unsigned int sysvec = vector - FIRST_SYSTEM_VECTOR;
++
++	if (unlikely(vector < FIRST_EXTERNAL_VECTOR)) {
++		pr_err("invalid external interrupt vector %d\n", vector);
++		return -EINVAL;
++	}
++
++	if (sysvec < NR_SYSTEM_VECTORS)
++		system_interrupt_handlers[sysvec](regs);
++	else
++		dispatch_common_interrupt(regs, vector);
++
++	return 0;
 +}
 +
  #endif /* CONFIG_X86_64 */
  
  void __init trap_init(void)
-diff --git a/drivers/xen/events/events_base.c b/drivers/xen/events/events_base.c
-index c7715f8bd452..16d51338e1f8 100644
---- a/drivers/xen/events/events_base.c
-+++ b/drivers/xen/events/events_base.c
-@@ -45,6 +45,7 @@
- #include <asm/irq.h>
- #include <asm/io_apic.h>
- #include <asm/i8259.h>
-+#include <asm/traps.h>
- #include <asm/xen/cpuid.h>
- #include <asm/xen/pci.h>
- #endif
-@@ -2249,7 +2250,7 @@ static __init void xen_alloc_callback_vector(void)
- 		return;
- 
- 	pr_info("Xen HVM callback vector for event delivery is enabled\n");
--	alloc_intr_gate(HYPERVISOR_CALLBACK_VECTOR, asm_sysvec_xen_hvm_callback);
-+	sysvec_install(HYPERVISOR_CALLBACK_VECTOR, sysvec_xen_hvm_callback);
- }
- #else
- void xen_setup_callback_vector(void) {}
 -- 
 2.34.1
 
