@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B12CE76AEB0
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8659376AFCA
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:50:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233232AbjHAJkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:40:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39736 "EHLO
+        id S233718AbjHAJuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:50:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233364AbjHAJkb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:40:31 -0400
+        with ESMTP id S233569AbjHAJty (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:49:54 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A628526A2;
-        Tue,  1 Aug 2023 02:38:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F2D127;
+        Tue,  1 Aug 2023 02:49:24 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BD0A661507;
-        Tue,  1 Aug 2023 09:38:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB53CC433C8;
-        Tue,  1 Aug 2023 09:38:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0D4C8614FC;
+        Tue,  1 Aug 2023 09:49:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A251C433C8;
+        Tue,  1 Aug 2023 09:49:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1690882702;
-        bh=vqAY7YW61xy0z3vOVjce1a/HQl5XRFWSPk2PWz99NJM=;
+        s=korg; t=1690883363;
+        bh=H3ZC1kUIui+w/WasGPqsvFTpiAI3fLlRwG41WoG6CCM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bfl8VgUeiUYchKskqEjNe8zHy915IwyoSzzn7bjSV7gyaZXb2QcWambr7Gdp2mBSZ
-         7cFE3/HoSidKcXkZfyQmJApm3MaLSuINMe0/Fq6Rf3AbD+toYxtlRux8YE5vIgIevf
-         nf0CCp0q7rmqmd6UrP3F+XLRZxq3AKCHyt65Do+Y=
+        b=dxZ7IsDveHIwIrXjWNf1kI2+qG6LIK0+gQniB4FgcXNadUsJDI3JxdKbxjnHWCl36
+         Pv7Uk18hfXsOGX8h+2Mji1UmVBKJSlE/ByLiUJtDZ+osXlniuEHP+YMcvtp08jD49l
+         IsbjIH2sfOd3bH+x2jjtIM8x0G7jppFTNSWQFquw=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         patches@lists.linux.dev, Aaron Lewis <aaronlewis@google.com>,
         kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 6.1 200/228] selftests/rseq: Play nice with binaries statically linked against glibc 2.35+
-Date:   Tue,  1 Aug 2023 11:20:58 +0200
-Message-ID: <20230801091930.106383753@linuxfoundation.org>
+Subject: [PATCH 6.4 209/239] selftests/rseq: Play nice with binaries statically linked against glibc 2.35+
+Date:   Tue,  1 Aug 2023 11:21:13 +0200
+Message-ID: <20230801091933.368989826@linuxfoundation.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230801091922.799813980@linuxfoundation.org>
-References: <20230801091922.799813980@linuxfoundation.org>
+In-Reply-To: <20230801091925.659598007@linuxfoundation.org>
+References: <20230801091925.659598007@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -86,7 +86,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/tools/testing/selftests/rseq/rseq.c
 +++ b/tools/testing/selftests/rseq/rseq.c
-@@ -32,9 +32,17 @@
+@@ -34,9 +34,17 @@
  #include "../kselftest.h"
  #include "rseq.h"
  
@@ -105,9 +105,9 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +static const unsigned int *libc_rseq_size_p = &__rseq_size;
 +static const unsigned int *libc_rseq_flags_p = &__rseq_flags;
  
- /* Offset from the thread pointer to the rseq area.  */
+ /* Offset from the thread pointer to the rseq area. */
  ptrdiff_t rseq_offset;
-@@ -108,9 +116,17 @@ int rseq_unregister_current_thread(void)
+@@ -155,9 +163,17 @@ unsigned int get_rseq_feature_size(void)
  static __attribute__((constructor))
  void rseq_init(void)
  {
