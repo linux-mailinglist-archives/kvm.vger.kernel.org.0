@@ -2,171 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C37F76A7B6
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 05:59:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0455176A7CA
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 06:14:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231209AbjHAD66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 23:58:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
+        id S230169AbjHAEOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 00:14:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjHAD64 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 23:58:56 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FBAA1986;
-        Mon, 31 Jul 2023 20:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690862334; x=1722398334;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rf1RJnpMm93lZ/jrloipo0pLJA+ksmkm9cipBPjZse0=;
-  b=egOuF2a9+H18nr5hRdHW9UCfGNGg541UMQXcr3/lbwZmQRv8mVUZ3p8/
-   fbAiHg+VpH0cTSpR7bhGHC5bq1uPnvXhgimMiTQBkzMveprD4+HooTJA4
-   QAiCv17Qfie1TB8CHNk8ay9nyGiLd+n1NLXFBc0hU1aoToqgT1aj6d4Lx
-   2jJ/UkZ+jg962X8MS3TkV4m65JBUNDpjhX6S19BsBp+CWel/aD8q8uUnD
-   SkW+q8bu6A8brjWoXon4zl8NmmTi1LYUVDo/dzjoybhy6al4jnl8Xxz5w
-   OebornOFV5i6LlrnW8T/UBip+J0lDwFpGcrsDTc6YkRyD535QbXio++tq
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="400140311"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="400140311"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 20:58:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="678545488"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="678545488"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga003.jf.intel.com with ESMTP; 31 Jul 2023 20:58:53 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 31 Jul 2023 20:58:53 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 31 Jul 2023 20:58:53 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 31 Jul 2023 20:58:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Rrp78N6vwvNG1SFUj9+R8laTTH+KQFzaQHyLym3NTS+nJ91BRsTyL5GT/ORf4tubpYpxoieU59B2UhzSkqGXaGd7A2tlthOXJWMOzrKXPpDnrNumkZ+CoKOvX4WUj5eNpo+d2U83XcHvkWvGw2grfZXTBHel+0LsMoXKaA5tzRjB4BbNlBC6PMVwweadLh/nX3UTwD1kenH3dxo0/xEN1QVCem8eqh07HLg8s7WCKAOV57gpf5GEepYYdWTsaUaHsRzXM/2SOjP0biEPskSCK9UfW/+5u2RObiMXHWWN0aRtiBk3qhLZz8AvPMjV1M7zYw1I3IU7v9LRPWQ0KxQKiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/1+7EE6ZwwoGEGZeuHltn2HLXQbT9chhV7ECxdYgNf8=;
- b=TkYhPTC93ZXbQBm2laKGygymGkQ5AhAFxBHF5uam8K2mTUNGvDc2FrC+Dc3hJfCN0lsQsD6qhY3Ab6eKs7nIDJFP49j+2PQRdYUG6M6m5QgHBMoZyGdxYRYm83BkLn8WpNeQSBoWCq3uuKrRiIp7GHocgcNB63XwihH3fBiN39bbHRzcac2qaT4ZV8sPd+9EHF5PfvMoUdWicSfiFdkK4jygIKqcE/ABZB8pTrTZeFaNtF7ohWfTfClXE4JwddylZkPe+hehxzgGe6DtctmYpDcn+viVHmGaSL7v7p7q/pwgty+6yH1cAJVDEt4h09eZpgmh8FvK36zGT11F2IfvWQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by DS0PR11MB8069.namprd11.prod.outlook.com (2603:10b6:8:12c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.42; Tue, 1 Aug
- 2023 03:58:51 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::b556:42c4:772f:d47e]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::b556:42c4:772f:d47e%7]) with mapi id 15.20.6609.032; Tue, 1 Aug 2023
- 03:58:51 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: RE: [PATCH v4 2/4] iommu: Add new iommu op to get iommu hardware
- information
-Thread-Topic: [PATCH v4 2/4] iommu: Add new iommu op to get iommu hardware
- information
-Thread-Index: AQHZvh38uw2j1Ty0jkmb0/Y/kPed8q/NQ+CAgABxL4CABeBmMIAAWOiAgADotQA=
-Date:   Tue, 1 Aug 2023 03:58:50 +0000
-Message-ID: <DS0PR11MB75295BB6AE592AA6625C9F13C30AA@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230724105936.107042-1-yi.l.liu@intel.com>
- <20230724105936.107042-3-yi.l.liu@intel.com>
- <BN9PR11MB527625066E23A1C4968905D68C01A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZMKCd5S9VpNGf631@nvidia.com>
- <DS0PR11MB7529F6D703B42835B0F8A92FC305A@DS0PR11MB7529.namprd11.prod.outlook.com>
- <ZMe7B8s1tzLsZmIz@nvidia.com>
-In-Reply-To: <ZMe7B8s1tzLsZmIz@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|DS0PR11MB8069:EE_
-x-ms-office365-filtering-correlation-id: 2891c3fb-96ff-401f-03c7-08db92439dc2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: h6D5VVNRMTuFu7D5wWSVARQFfB9JJgCnLR/2Sl408YUu2jh2hBBJUEN7sMN3pVitNWmBR30J2kSoTOACvFFX/7d5X91MOE9Lc7gAUpaw20YFkxS7bcTNsnfe2BHlQib5Njx+b15lAyT+2VcHjXHZSVwrWNu1QTk/rxfn+/yWkKT4xuv/d+bVe5lVvmRfpZ5hi59pGyD7/QkfdClHQgm3Pdy9nf25o/Bxyk340C1EU+esoAXta38XMJaQMxpusWEEyERRAOQtxj3ezbPijZF2kjXBJEsGLbX+Gx9zQPTm0PVeyCmfp5SFIjVpdYOtdmUgR7tVh0YB5/zjsA65wGgZ2CmhO7zPBBxNCy7mWT9r4yxKQSuhPlKHtjKFpsMtOqPh9QexW9IpEvZNBWrn9vFXQmawVMquoFKMDzmCuxOKqN8hhOwE4PlinCBlmH6l+JgGFXq+h/BUq/3bjeuhkWs6TPJEJF9VdYrLbO7dLvmqwRZC+gndaPU92ktH/NQby+3gBsSN1EsRyoeIaZEr2dpFBZW6K9xNntu1aQLGqD/n2IfydGAf7w/sdhdYydx/WT/EOojjVDeAKEkIEdNuh9wFq0Y9Nav0TRA55Bamvx/Dbln+hnTLGuLfz8ja8QfUCP+M7Ok4GcOcKeau1noKb9s+hg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(366004)(39860400002)(376002)(136003)(396003)(451199021)(966005)(9686003)(7696005)(55016003)(6506007)(26005)(83380400001)(186003)(76116006)(33656002)(66946007)(52536014)(66556008)(7416002)(54906003)(122000001)(82960400001)(38070700005)(41300700001)(38100700002)(86362001)(66476007)(316002)(5660300002)(66446008)(6916009)(4326008)(8676002)(8936002)(64756008)(2906002)(71200400001)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?jlnHFBTouHptFqwlK4vEWsfKztoHbIttJIwa7XzEAE3njv6lwyxKITQsFU3Q?=
- =?us-ascii?Q?mTg9NZR5cwucLAm+t9GSS8LVlnnvglUr61zp6kGj5+Ik07MNX5vvAGvoF4US?=
- =?us-ascii?Q?wtDtrsSDY9XUYLbS7VJTaqUJYJfrhSP8ftQqrFZzEyNw0lJselsZP6gn8j8R?=
- =?us-ascii?Q?QOg7CTT8tOS6sG+pnyr2UibKnJ0WeFlRCu2cgaoXU+qvjK/CU/Y4Y0T91bKi?=
- =?us-ascii?Q?syZgjBkfu/E4zqw2bigMv0AwmrDIG2F3tCEzCvqMv0fQdploSqr5Z0Xtcn3B?=
- =?us-ascii?Q?KIcjEUUMPhopNzGHgYoBMrVDk0GIRwHvh+QISXXpEEbfMIDypgMI3hTdFopP?=
- =?us-ascii?Q?ZC8yNnh6tkWJM7VPucV5YjmrcIcPUm/WXeFSYDUM+iz8Nb+oB0aMiGV9Y7KW?=
- =?us-ascii?Q?xM0pPGFaeZAbRxKf6lSkb8nzIKi3KETy/XtLVCSQQSNnNJrqcMSDRzC8K66W?=
- =?us-ascii?Q?xN4OXNGnKM346HRy9QiD/4r4LWGd8AluqRfs4EB3t9tmIZicaGw7B9Gfwzx9?=
- =?us-ascii?Q?qRghvzETRo0bKDTFc1GBWSJ9c1xs0HgunGr28v+qJzMUF9Y3R7SWMqHo/DZe?=
- =?us-ascii?Q?cgwmlNT+3pAqltz8nmJHpY/nZyLjNAAGQSuFPZT/4M2kG5l4SSErH5QPpJPM?=
- =?us-ascii?Q?+Nw4qx7PPy920GTwpURnfcHL27JQwwKhsWxlp3xjBrTDErA+8ga4rFn9Nmjw?=
- =?us-ascii?Q?E6Ue3XVIm8JJJKdJJOK1/2tXyECtvD9r7IO9OHhMSs+nU+usAzo3YTNkZmM5?=
- =?us-ascii?Q?r1IEBd2jhOPopTWzDNNm74IAHdksUY15p8MGN2gwJyzMvGWMXWPdPddLxYzu?=
- =?us-ascii?Q?Mt9Hxgs47pZJcikv123RShZfkq8eWsI4np6MU/h1ynM2iZ8lPNav7JcKKpD/?=
- =?us-ascii?Q?KnW+MLzmtb+Sh1y0G4W0nFk1tKR11Td4MP18Si/cdTmO2X4SK8d9nWB6sJfh?=
- =?us-ascii?Q?VmoccBQPTKBj6iASgIL1ncRcR60ICq2fJKLPJPc93/mD9d/sh8t+K89G6rT7?=
- =?us-ascii?Q?cVE8xXRqqs3rfsMbSgDCl5gNMWEIXS9380c/o03g13HjlXZqpbSCBtTgPKP7?=
- =?us-ascii?Q?OYhpAEUhAwrzRy2Tq1ZQVeo9vFlG5RDk2+FTxclujEB9irjSCSOMYv7gwvs2?=
- =?us-ascii?Q?L/3IvYqALP4Hn4oi5KhuUdp6g9P7v2PXGSruXy7kSaITJJjxBnNsyVLdXNyL?=
- =?us-ascii?Q?VegGKLxe+mrT72MSGsMY71D3VmtrMhAVpc59i5I3HcYywVJCOcMn62BQm8oM?=
- =?us-ascii?Q?1hUwJi1u0PW1rXvkQ6VVXN3QjT6WoXSw8PQwmq4VtC3QqQLhjnsN9ieeQGO0?=
- =?us-ascii?Q?GPSlRBembCFYO9tQjoaz4R+OCkyhtoe38Z4m5e92saVF641Ddoiexdh0zFYc?=
- =?us-ascii?Q?PQVw1EoX5pBd+CyWaddRsVkizNB63lQr5/wrSRZWhrIb6Zk/TE9GfcktIvVO?=
- =?us-ascii?Q?IzuBmIe2zBfysJwYh2OzIDfDPRn9UKFuEDV5xuDV8GEMT79CskyjDM8J4qI2?=
- =?us-ascii?Q?PneuJnwdNS2S4Gbqi9rWdsFgSxIJ0FahVoWU8BBGOA6vGHiU/+yY3T6nIXNO?=
- =?us-ascii?Q?LcE3XNHWmpV/ZndnSxc=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229662AbjHAEOQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 00:14:16 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A866DE49;
+        Mon, 31 Jul 2023 21:14:14 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-686daaa5f1fso3635342b3a.3;
+        Mon, 31 Jul 2023 21:14:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690863254; x=1691468054;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+Qr+Vl6m/WbbDISDjD1yyCZ2hR5HHEvke4EmXEj2Uw=;
+        b=pIz+Kd+2aIGkwz0drO4/9pu9r8QDYtL8kmf1bgJ0EtiKl8D5Dq1pruHje/mBtmcd7D
+         95ay4nhbosIOs7YbjYOFSwpwuKb2x/raH71dbfEbl0ighvQVE/QyedPwMsDk6k8l+GUT
+         VyFMj5qNklAfs0B/ns7Az9lYDYDNXEg/FDmaidwfHjueT5L2gRFBdFZA9WczyFgAqPfT
+         EeeVGL/C19UAdymTIwSQ0NtZxCdNlHGXtANr3/6EwVv13cD4tg07pnYk78ptn7Q4Cb0Y
+         k6uCS9G9oWyxUPltKR8NmVNyvB5UiQRcoUMlDu8wDpTeD0umyjYoMhMLjR+K5eFUG7gl
+         ODcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690863254; x=1691468054;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D+Qr+Vl6m/WbbDISDjD1yyCZ2hR5HHEvke4EmXEj2Uw=;
+        b=kEyqBqwc5KJWS+IHCXPN8zlWs9uxc8gvKXQXjuzdEUM8FRwH0TyxA883+4KKcaSY4R
+         RxCgA/QFbakBUiiyUNecttbQyA8QAfM7f4JhlmYqCAUU48amDZFNt4v8nCdeW17GUEvk
+         1s8758jWsY2dqpZ/+4tVahO+ip0Wgu227F36h3oAX/M78R83tioCaMT375F93eYxf0jr
+         B4CReaMDY/ctHVUkImWKN3jS1OoYXBYIZUAbVt++kEAJgGH4F5ecubephq7/dn2P9mik
+         SwMLGs17Yy/L0FxIdGGi0VR69UA2vNnWjTfLPQ8kiL7mEg6U1MiqbMmQHcWxPR87opi/
+         bGaw==
+X-Gm-Message-State: ABy/qLYkf8ZJNO4rE8ukyM3Ipwfg5NUjQVPB+7BxlHmkSaG5GUgl/eDi
+        rpBZ9PzbI/qAi/dyxg7+mOGWE/Z6cqgWGWdr
+X-Google-Smtp-Source: APBJJlFF11RaQc5lCvP2a1aXSvPrjsc4P1ZZLbtnwCzQ2n4om5Ert1Viv7o7AR3/b8EanH052/XDqw==
+X-Received: by 2002:a05:6a21:498e:b0:12f:dc60:2b9e with SMTP id ax14-20020a056a21498e00b0012fdc602b9emr11084938pzc.48.1690863253921;
+        Mon, 31 Jul 2023 21:14:13 -0700 (PDT)
+Received: from localhost (c-67-166-91-86.hsd1.wa.comcast.net. [67.166.91.86])
+        by smtp.gmail.com with ESMTPSA id d7-20020aa78147000000b0068718aadda7sm5242014pfn.108.2023.07.31.21.14.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 21:14:13 -0700 (PDT)
+Date:   Tue, 1 Aug 2023 04:14:12 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Arseniy Krasnov <oxffffaa@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v5 13/14] virtio/vsock: implement datagram
+ supporty
+Message-ID: <ZMiGlMj70xd95dTK@bullseye>
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-13-581bd37fdb26@bytedance.com>
+ <adeed3a8-68fe-bdb7-e4a1-48044dbe5436@gmail.com>
+ <ZMFetBpO0OdzXtnK@bullseye>
+ <f04d2aa5-32d8-cdc4-3b51-f15b0f42a1e8@gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2891c3fb-96ff-401f-03c7-08db92439dc2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2023 03:58:51.0088
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tSgZzTI4kpBWO7wh569P/DiZwD5BXopfB/paNJ2wWiL/QFW1S1t1Phqc7jv/4SW19Jhv6j7qfHI+dfIQc+3jzA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8069
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f04d2aa5-32d8-cdc4-3b51-f15b0f42a1e8@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -174,92 +94,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Monday, July 31, 2023 9:46 PM
->=20
-> On Mon, Jul 31, 2023 at 08:33:55AM +0000, Liu, Yi L wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Thursday, July 27, 2023 10:43 PM
-> > >
-> > > On Thu, Jul 27, 2023 at 07:57:57AM +0000, Tian, Kevin wrote:
-> > > > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > Sent: Monday, July 24, 2023 7:00 PM
-> > > > >
-> > > > > @@ -252,11 +258,20 @@ struct iommu_iotlb_gather {
-> > > > >   * @remove_dev_pasid: Remove any translation configurations of a=
- specific
-> > > > >   *                    pasid, so that any DMA transactions with t=
-his pasid
-> > > > >   *                    will be blocked by the hardware.
-> > > > > + * @hw_info_type: One of enum iommu_hw_info_type defined in
-> > > > > + *                include/uapi/linux/iommufd.h. It is used to ta=
-g the type
-> > > > > + *                of data returned by .hw_info callback. The dri=
-vers that
-> > > > > + *                support .hw_info callback should define a uniq=
-ue type
-> > > > > + *                in include/uapi/linux/iommufd.h. For the drive=
-rs that do
-> > > > > + *                not implement .hw_info callback, this field is
-> > > > > + *                IOMMU_HW_INFO_TYPE_NONE which is 0. Hence, suc=
-h drivers
-> > > > > + *                do not need to care this field.
-> > > >
-> > > > every time looking at this field the same question came out why it =
-is required
-> > > > (and looks I forgot your previous response).
-> > > >
-> >
-> > The major reason is that not every driver implements the hw_info
-> > callback.
-> >
-> > > > e.g. why cannot the type be returned in @hw_info():
-> > > >
-> > > > 	void *(*hw_info)(struct device *dev, u32 *length, int *type);
-> > >
-> > > u32 *type
-> > >
-> > > > NULL callback implies IOMMU_HW_INFO_TYPE_NONE.
-> > >
-> > > If every one of these queries has its own type it makes sense
-> > >
-> > > Though, is it not possible that we can have a type for the entire
-> > > driver?
-> >
-> > Not quite sure if I got your point. Is it acceptable to define the
-> > callabck in the current version? or Kevin's suggestion makes
-> > more sense?
->=20
-> I'm trying to remember if there is a reason we need unique types for
-> the domain and the invalidation or if we can get bye with a single
-> type just for the whole iommu driver.
+On Thu, Jul 27, 2023 at 11:09:21AM +0300, Arseniy Krasnov wrote:
+> 
+> 
+> On 26.07.2023 20:58, Bobby Eshleman wrote:
+> > On Sat, Jul 22, 2023 at 11:45:29AM +0300, Arseniy Krasnov wrote:
+> >>
+> >>
+> >> On 19.07.2023 03:50, Bobby Eshleman wrote:
+> >>> This commit implements datagram support for virtio/vsock by teaching
+> >>> virtio to use the general virtio transport ->dgram_addr_init() function
+> >>> and implementation a new version of ->dgram_allow().
+> >>>
+> >>> Additionally, it drops virtio_transport_dgram_allow() as an exported
+> >>> symbol because it is no longer used in other transports.
+> >>>
+> >>> Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> >>> ---
+> >>>  include/linux/virtio_vsock.h            |  1 -
+> >>>  net/vmw_vsock/virtio_transport.c        | 24 +++++++++++++++++++++++-
+> >>>  net/vmw_vsock/virtio_transport_common.c |  6 ------
+> >>>  3 files changed, 23 insertions(+), 8 deletions(-)
+> >>>
+> >>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> >>> index b3856b8a42b3..d0a4f08b12c1 100644
+> >>> --- a/include/linux/virtio_vsock.h
+> >>> +++ b/include/linux/virtio_vsock.h
+> >>> @@ -211,7 +211,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
+> >>>  u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
+> >>>  bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
+> >>>  bool virtio_transport_stream_allow(u32 cid, u32 port);
+> >>> -bool virtio_transport_dgram_allow(u32 cid, u32 port);
+> >>>  void virtio_transport_dgram_addr_init(struct sk_buff *skb,
+> >>>  				      struct sockaddr_vm *addr);
+> >>>  
+> >>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> >>> index ac2126c7dac5..713718861bd4 100644
+> >>> --- a/net/vmw_vsock/virtio_transport.c
+> >>> +++ b/net/vmw_vsock/virtio_transport.c
+> >>> @@ -63,6 +63,7 @@ struct virtio_vsock {
+> >>>  
+> >>>  	u32 guest_cid;
+> >>>  	bool seqpacket_allow;
+> >>> +	bool dgram_allow;
+> >>>  };
+> >>>  
+> >>>  static u32 virtio_transport_get_local_cid(void)
+> >>> @@ -413,6 +414,7 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
+> >>>  	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+> >>>  }
+> >>>  
+> >>> +static bool virtio_transport_dgram_allow(u32 cid, u32 port);
+> >>
+> >> May be add body here? Without prototyping? Same for loopback and vhost.
+> >>
+> > 
+> > Sounds okay with me, but this seems to go against the pattern
+> > established by seqpacket. Any reason why?
+> 
+> Stefano Garzarella <sgarzare@redhat.com> commented my patch with the same approach:
+> 
+> https://lore.kernel.org/netdev/lex6l5suez7azhirt22lidndtjomkbagfbpvvi5p7c2t7klzas@4l2qly7at37c/
+> 
+> Thanks, Arseniy
+> 
 
-I see. Seems like your comment is more related to the below patches.
+Gotcha, sounds good.
 
-https://lore.kernel.org/linux-iommu/20230724110406.107212-2-yi.l.liu@intel.=
-com/
-https://lore.kernel.org/linux-iommu/20230724110406.107212-10-yi.l.liu@intel=
-.com/
-https://lore.kernel.org/linux-iommu/20230724111335.107427-2-yi.l.liu@intel.=
-com/
-https://lore.kernel.org/linux-iommu/20230724111335.107427-8-yi.l.liu@intel.=
-com/
-
-I think we unique types fort the domain and invalidation.
-E.g. IOMMU_HWPT_TYPE_VTD_S1. The reason is that different vendors have
-different stage1 format, and require different user parameters to allocate.
-So needs to define unique types.
-
-> I suppose if we ever want to to "virtio-iommu invalidation" we'd want
-> to use a new type for it?
-
-Yes. needed in the domain allocation path as well. IIRC, there was a
-discussion on whether have a general cache invalidation data structure
-or not[1], and the conclusion was to have separate invalidation data
-structures instead of a generic structure for all types of stage1 page tabl=
-es.
-
-[1] https://lore.kernel.org/linux-iommu/20230309134217.GA1673607@myrica/
-
-Regards,
-Yi Liu
+Thanks,
+Bobby
+> 
+> > 
+> >>>  static bool virtio_transport_seqpacket_allow(u32 remote_cid);
+> >>>  
+> >>>  static struct virtio_transport virtio_transport = {
+> >>> @@ -430,6 +432,7 @@ static struct virtio_transport virtio_transport = {
+> >>>  
+> >>>  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> >>>  		.dgram_allow              = virtio_transport_dgram_allow,
+> >>> +		.dgram_addr_init          = virtio_transport_dgram_addr_init,
+> >>>  
+> >>>  		.stream_dequeue           = virtio_transport_stream_dequeue,
+> >>>  		.stream_enqueue           = virtio_transport_stream_enqueue,
+> >>> @@ -462,6 +465,21 @@ static struct virtio_transport virtio_transport = {
+> >>>  	.send_pkt = virtio_transport_send_pkt,
+> >>>  };
+> >>>  
+> >>> +static bool virtio_transport_dgram_allow(u32 cid, u32 port)
+> >>> +{
+> >>> +	struct virtio_vsock *vsock;
+> >>> +	bool dgram_allow;
+> >>> +
+> >>> +	dgram_allow = false;
+> >>> +	rcu_read_lock();
+> >>> +	vsock = rcu_dereference(the_virtio_vsock);
+> >>> +	if (vsock)
+> >>> +		dgram_allow = vsock->dgram_allow;
+> >>> +	rcu_read_unlock();
+> >>> +
+> >>> +	return dgram_allow;
+> >>> +}
+> >>> +
+> >>>  static bool virtio_transport_seqpacket_allow(u32 remote_cid)
+> >>>  {
+> >>>  	struct virtio_vsock *vsock;
+> >>> @@ -655,6 +673,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+> >>>  	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+> >>>  		vsock->seqpacket_allow = true;
+> >>>  
+> >>> +	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
+> >>> +		vsock->dgram_allow = true;
+> >>> +
+> >>>  	vdev->priv = vsock;
+> >>>  
+> >>>  	ret = virtio_vsock_vqs_init(vsock);
+> >>> @@ -747,7 +768,8 @@ static struct virtio_device_id id_table[] = {
+> >>>  };
+> >>>  
+> >>>  static unsigned int features[] = {
+> >>> -	VIRTIO_VSOCK_F_SEQPACKET
+> >>> +	VIRTIO_VSOCK_F_SEQPACKET,
+> >>> +	VIRTIO_VSOCK_F_DGRAM
+> >>>  };
+> >>>  
+> >>>  static struct virtio_driver virtio_vsock_driver = {
+> >>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> >>> index 96118e258097..77898f5325cd 100644
+> >>> --- a/net/vmw_vsock/virtio_transport_common.c
+> >>> +++ b/net/vmw_vsock/virtio_transport_common.c
+> >>> @@ -783,12 +783,6 @@ bool virtio_transport_stream_allow(u32 cid, u32 port)
+> >>>  }
+> >>>  EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
+> >>>  
+> >>> -bool virtio_transport_dgram_allow(u32 cid, u32 port)
+> >>> -{
+> >>> -	return false;
+> >>> -}
+> >>> -EXPORT_SYMBOL_GPL(virtio_transport_dgram_allow);
+> >>> -
+> >>>  int virtio_transport_connect(struct vsock_sock *vsk)
+> >>>  {
+> >>>  	struct virtio_vsock_pkt_info info = {
+> >>>
+> >>
+> >> Thanks, Arseniy
+> > 
+> > Thanks,
+> > Bobby
