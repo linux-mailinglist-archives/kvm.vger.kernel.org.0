@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6170176AC26
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECDF676AC2C
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:06:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232648AbjHAJF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:05:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59848 "EHLO
+        id S232360AbjHAJGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232596AbjHAJFY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:05:24 -0400
+        with ESMTP id S232273AbjHAJF0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:05:26 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442823593;
-        Tue,  1 Aug 2023 02:03:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6496C35AA;
+        Tue,  1 Aug 2023 02:03:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690880631; x=1722416631;
+  t=1690880636; x=1722416636;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=j/3qauZAla4FAGFWojUuQZ7eYbLWgN4OkDYWsZA4A8I=;
-  b=WWJ04qUcQKfVI1K7GlaXZe/VsNkamUrUI1njPAYKarueLZmgyHtgAfFk
-   hhlUwd34zKNnbHqTdjqjscl4n7fQasIGem+aI5rv9cpEhOMIErEz4V+En
-   wGH42k+9S7iXBL27MV2U4oKHtq+n90tVqRMK227SvSJXv3UqBQzNsfEGB
-   oza/w/P1Qyvj1v062S/tXxxfjFWahDXixlW+u7oBolspakbpRto+SwTLY
-   dZop+G1LTaFuR3ku1mzy04xDo6ABb7AEsfAPxguJEyGUDHfy/qnRkFm3s
-   lHmIVqdDJKebt2U86+pWxATPTuvHoJufX4kcBp5XuIm7Ga4HrGvQVxf6K
+  bh=CDXH8O7ex78Bl5bAFBaH8EJ8EpWaGJ2TaZytElzEDrs=;
+  b=B+HivqwdQ93oUN2UMpmPYuQPfRbehC/LQo4fNvcaxKzDePg3kQBrGuST
+   hUG7EUIphjzqhEfdzpfrjpOukWmyP32LXXVDKJXWJsSx7oqq0Vm/qVnDL
+   Bi+o+CcZQmOiYdrCWji9wE7tKfYkJDpyPysPYg8J4nhDkOEd9pe00nsQv
+   h05YKPNGK+RcOgeeWWaEEMmByvA4o71hRXflB14fff9wthic+EwxtoU23
+   pdWFc9sdPgBI1+B2jFGQHF2SJr5DsGF5qc/ljdhEMsFqDS5dxpeywoPd+
+   SwkFJ68af/xF/gBf0HHjQ9W1VBaXAhQU5GwGfODfshctg5/vhcK9YvzNw
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082676"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082714"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="433082676"
+   d="scan'208";a="433082714"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:02:08 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:02:09 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975217066"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975217069"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="975217066"
+   d="scan'208";a="975217069"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:02:07 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:02:08 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH RESEND v9 19/36] x86/fred: Add a debug fault entry stub for FRED
-Date:   Tue,  1 Aug 2023 01:33:01 -0700
-Message-Id: <20230801083318.8363-20-xin3.li@intel.com>
+Subject: [PATCH RESEND v9 20/36] x86/fred: Add a NMI entry stub for FRED
+Date:   Tue,  1 Aug 2023 01:33:02 -0700
+Message-Id: <20230801083318.8363-21-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801083318.8363-1-xin3.li@intel.com>
 References: <20230801083318.8363-1-xin3.li@intel.com>
@@ -126,139 +126,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add a debug fault entry stub for FRED.
+On a FRED system, NMIs nest both with themselves and faults, transient
+information is saved into the stack frame, and NMI unblocking only
+happens when the stack frame indicates that so should happen.
 
-On a FRED system, the debug trap status information (DR6) is passed
-on the stack, to avoid the problem of transient state. Furthermore,
-FRED transitions avoid a lot of ugly corner cases the handling of which
-can, and should be, skipped.
-
-The FRED debug trap status information saved on the stack differs from DR6
-in both stickiness and polarity; it is exactly what debug_read_clear_dr6()
-returns, and exc_debug_user()/exc_debug_kernel() expect.
+Thus, the NMI entry stub for FRED is really quite small...
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
-
-Changes since v1:
-* call irqentry_nmi_{enter,exit}() in both IDT and FRED debug fault kernel
-  handler (Peter Zijlstra).
----
  arch/x86/include/asm/fred.h |  1 +
- arch/x86/kernel/traps.c     | 56 +++++++++++++++++++++++++++----------
- 2 files changed, 42 insertions(+), 15 deletions(-)
+ arch/x86/kernel/nmi.c       | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
 diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-index fb8e7b4f2d38..ad7b79130b1e 100644
+index ad7b79130b1e..2a7c47dfd733 100644
 --- a/arch/x86/include/asm/fred.h
 +++ b/arch/x86/include/asm/fred.h
 @@ -112,6 +112,7 @@ static __always_inline unsigned long fred_event_data(struct pt_regs *regs)
  
  typedef DECLARE_FRED_HANDLER((*fred_handler));
  
-+DECLARE_FRED_HANDLER(fred_exc_debug);
++DECLARE_FRED_HANDLER(fred_exc_nmi);
+ DECLARE_FRED_HANDLER(fred_exc_debug);
  DECLARE_FRED_HANDLER(fred_exc_page_fault);
  
- #endif /* __ASSEMBLY__ */
-diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index 4a817d20ce3b..b10464966a81 100644
---- a/arch/x86/kernel/traps.c
-+++ b/arch/x86/kernel/traps.c
-@@ -47,6 +47,7 @@
- #include <asm/debugreg.h>
- #include <asm/realmode.h>
- #include <asm/text-patching.h>
+diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
+index a0c551846b35..f803e2bcd024 100644
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -34,6 +34,7 @@
+ #include <asm/cache.h>
+ #include <asm/nospec-branch.h>
+ #include <asm/sev.h>
 +#include <asm/fred.h>
- #include <asm/ftrace.h>
- #include <asm/traps.h>
- #include <asm/desc.h>
-@@ -1021,21 +1022,9 @@ static bool notify_debug(struct pt_regs *regs, unsigned long *dr6)
- 	return false;
- }
  
--static __always_inline void exc_debug_kernel(struct pt_regs *regs,
--					     unsigned long dr6)
-+static __always_inline void debug_kernel_common(struct pt_regs *regs,
-+						unsigned long dr6)
- {
--	/*
--	 * Disable breakpoints during exception handling; recursive exceptions
--	 * are exceedingly 'fun'.
--	 *
--	 * Since this function is NOKPROBE, and that also applies to
--	 * HW_BREAKPOINT_X, we can't hit a breakpoint before this (XXX except a
--	 * HW_BREAKPOINT_W on our stack)
--	 *
--	 * Entry text is excluded for HW_BP_X and cpu_entry_area, which
--	 * includes the entry stack is excluded for everything.
--	 */
--	unsigned long dr7 = local_db_save();
- 	irqentry_state_t irq_state = irqentry_nmi_enter(regs);
- 	instrumentation_begin();
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/nmi.h>
+@@ -643,6 +644,24 @@ void nmi_backtrace_stall_check(const struct cpumask *btp)
  
-@@ -1063,7 +1052,8 @@ static __always_inline void exc_debug_kernel(struct pt_regs *regs,
- 	 * Catch SYSENTER with TF set and clear DR_STEP. If this hit a
- 	 * watchpoint at the same time then that will still be handled.
- 	 */
--	if ((dr6 & DR_STEP) && is_sysenter_singlestep(regs))
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
-+	    (dr6 & DR_STEP) && is_sysenter_singlestep(regs))
- 		dr6 &= ~DR_STEP;
+ #endif
  
- 	/*
-@@ -1091,7 +1081,25 @@ static __always_inline void exc_debug_kernel(struct pt_regs *regs,
- out:
- 	instrumentation_end();
- 	irqentry_nmi_exit(regs, irq_state);
-+}
- 
-+static __always_inline void exc_debug_kernel(struct pt_regs *regs,
-+					     unsigned long dr6)
++#ifdef CONFIG_X86_FRED
++DEFINE_FRED_HANDLER(fred_exc_nmi)
 +{
 +	/*
-+	 * Disable breakpoints during exception handling; recursive exceptions
-+	 * are exceedingly 'fun'.
-+	 *
-+	 * Since this function is NOKPROBE, and that also applies to
-+	 * HW_BREAKPOINT_X, we can't hit a breakpoint before this (XXX except a
-+	 * HW_BREAKPOINT_W on our stack)
-+	 *
-+	 * Entry text is excluded for HW_BP_X and cpu_entry_area, which
-+	 * includes the entry stack is excluded for everything.
++	 * With FRED, CR2 and DR6 are pushed atomically on faults,
++	 * so we don't have to worry about saving and restoring them.
++	 * Breakpoint faults nest, so assume it is OK to leave DR7
++	 * enabled.
 +	 */
-+	unsigned long dr7 = local_db_save();
++	irqentry_state_t irq_state = irqentry_nmi_enter(regs);
 +
-+	debug_kernel_common(regs, dr6);
- 	local_db_restore(dr7);
- }
- 
-@@ -1180,6 +1188,24 @@ DEFINE_IDTENTRY_DEBUG_USER(exc_debug)
- {
- 	exc_debug_user(regs, debug_read_clear_dr6());
- }
++	inc_irq_stat(__nmi_count);
++	default_do_nmi(regs);
 +
-+# ifdef CONFIG_X86_FRED
-+DEFINE_FRED_HANDLER(fred_exc_debug)
-+{
-+	/*
-+	 * The FRED debug information saved onto stack differs from
-+	 * DR6 in both stickiness and polarity; it is exactly what
-+	 * debug_read_clear_dr6() returns.
-+	 */
-+	unsigned long dr6 = fred_event_data(regs);
-+
-+	if (user_mode(regs))
-+		exc_debug_user(regs, dr6);
-+	else
-+		debug_kernel_common(regs, dr6);
++	irqentry_nmi_exit(regs, irq_state);
 +}
-+# endif /* CONFIG_X86_FRED */
++#endif
 +
- #else
- /* 32 bit does not have separate entry points. */
- DEFINE_IDTENTRY_RAW(exc_debug)
+ void stop_nmi(void)
+ {
+ 	ignore_nmis++;
 -- 
 2.34.1
 
