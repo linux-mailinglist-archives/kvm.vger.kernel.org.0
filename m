@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0213176B87B
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:20:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E34076B87D
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:20:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234590AbjHAPUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 11:20:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43858 "EHLO
+        id S232705AbjHAPUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 11:20:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233797AbjHAPUY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 11:20:24 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C724C1FC0
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:20:23 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-686bc3f123eso5797653b3a.1
-        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 08:20:23 -0700 (PDT)
+        with ESMTP id S234009AbjHAPU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 11:20:26 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393A61BFD
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:20:26 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-55bf2bf1cdeso5615391a12.3
+        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 08:20:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690903223; x=1691508023;
+        d=google.com; s=20221208; t=1690903225; x=1691508025;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6FyTW1VsL4amGRSIg6wJqneP5gVog8VOaALdC61uAQM=;
-        b=C0ZfPq3efOpnuDcjVLErVLMbvOkEBdQvbm4wQodeYlarW1FXMlMZid16hWYooPNHQg
-         FySrGsafcV+pPcCeKbUiDJXzjc+1S4iffzB2PNPF7P3pEZ3/wA5J+oaXkexLLPEDBUTL
-         4EbZMcSnQSuQmvmJ6DxOhJX+twsw+aZlzTQC9E+KUFYuYNTgTVQW5bHIrFlpSZD2kjZ5
-         av1L2nNW80E8q9U4tCNyRXzWHt6OcoUQIt2DkunjdDA1YmF5bZUXBsYOnM4bsG7d7J2p
-         OG0u8sL+1JVv9F0pgL21R5NOmzp+v1VmtztLqjLVQiyX4m33EH5jpctaIwsxb62NEABX
-         /P6A==
+        bh=f1iJwrUwzrr4LImgyPThesTLhstaE6VPmgVvDL2bXp0=;
+        b=5gd7OaRBrRYmMMIOxe18B8NXMNA1PK1Vvk4zSEoSg9JQcQOfWjTweZXq40eI9c+L1N
+         Pjiy2HD7ipih05DuZXxzwty4Zw4J8+YSCFDSyWhYQhA/eRCTC3NQm/LNPt3/lxoIqT/H
+         yEdDVYoCx3+f6eh5fJ3LuJn0o/Km7f1yoe+NQ9khAuuY1oAei/RTPdKYNFD0OwONNvvb
+         kbXnJ3CRoz/wqDo4SV2g5RL02zHpUNdBV4qR9IumhIJdoJlaT5U/0IAW7sgDaA00TRO2
+         /GMyXkKsKtW8TNrQmuN0DxVxyEryPcHsKqI8SVdchgkvx3neZaCiwBlrlr7BGR0ut5s5
+         DjDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690903223; x=1691508023;
+        d=1e100.net; s=20221208; t=1690903226; x=1691508026;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6FyTW1VsL4amGRSIg6wJqneP5gVog8VOaALdC61uAQM=;
-        b=bP160wYAEyEZpFXXveKSAvRQ5mjTRTuIljIfgg0nT6LUQqoe+cGEwqcotjcCMKk8V9
-         /whh2lPwPJEqfZK9BZtvOUOP+q06+oNnARUUcebfxU47LuNS6CpStVfRYhWyx9tqJR5R
-         sBkinvmRH+snaWMDq+lVLjJHu6jMUnCRqvfqD4Bj7ClvuNhWQDc/dB8HxO7zc+G1X/tg
-         q5iLEKKK7fE4fNnNIaJyZ+wYpeTrby4DMHMequoHTazObydAltYxubpFAx3C1EpK20uB
-         jvKJ/nOEEJNBJNfSbqZ9YeyQqwGGOITh2INdrBb1WZCKnouFoTIssRii4sbGlew4XOf9
-         Pyyw==
-X-Gm-Message-State: ABy/qLZSO3RPqnaINQ9JKk8DH57pe504T9o78bCJ+Quazjf05XpF59gG
-        dyGYotD9aZ11jIhUecVqP0McABZJD1hIxvQs2ebftns6s2Ip3F/VvCnMdecYl1yXYl62TIW3sVV
-        oCTzHybCVey8a8h+VRjpSSpAByIgiUh9e7tVTdlpS0FbZCNpaLloZJFn5UYO1VCzMtka3j/s=
-X-Google-Smtp-Source: APBJJlEL3UUpI4AI77yIqdcAOJwFOq1i8j3nPTDlAWpLoDzAvhrkuZEeOT3azEun/jvOMdCuFYFKd2z4TNq9i2f2Qg==
+        bh=f1iJwrUwzrr4LImgyPThesTLhstaE6VPmgVvDL2bXp0=;
+        b=Rt74/rEXL8unWAalaJuUNIJzH7dIlqkR3bny3SBjxVIlKQ+QxahUt+zYFbx/YSuK+v
+         8s7YKZ8cWhFQGelLfapFmBrLiAXiKEF+9COYjvpQTGDWjDX/x70EozNXWNGPHPgiqUST
+         iDshLwWF6Wxr6Xdy0XaJ2e+wtZss8HFVosNRpFk8RDeNXRLMKGwdjJrNOrSTuFku/4It
+         F1CV1VG4pwyRtrvFVP2UHeQ21bO6OMtSVhtktxD0HtQ2nZ0JzbNXXUIkGr6pqNLqV4/9
+         6xpe9o21chxxpU/4tpeLVrkGOkFskrtSGUuSKGCpkoZYUBuk6WUZxDp9EmHhfe2n9/Br
+         fmpg==
+X-Gm-Message-State: ABy/qLaI9HQSRuyTvxGjvNQ85aRFbASTZH4losD8GQtS8SXbjjGOZGc3
+        37bgvJC6jisGXMwI6+GF6qsGdcQBYh5BZgEMkMdtWZDQ4jOj6uwQ5V0cU2aSq+23sKLUDP2vwMX
+        anNNSJmhcJ+e74NUT2Cv4b8nlRoRkrgS4VV6EZTb6XuejEasNvCh/j5+98Mx0DTrF5+6P0w4=
+X-Google-Smtp-Source: APBJJlGHdElaUhiJW+cJ/Bn2gO8XjYZHEO/Zt8CW/zpfo34kurpBDGJ2kXAnPcGIqggba9Ii19yPInx1FB+5h5bOeg==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6a00:80a:b0:682:f33:fa97 with SMTP
- id m10-20020a056a00080a00b006820f33fa97mr109865pfk.6.1690903222997; Tue, 01
- Aug 2023 08:20:22 -0700 (PDT)
-Date:   Tue,  1 Aug 2023 08:20:02 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a63:6dcf:0:b0:563:8dc4:c851 with SMTP
+ id i198-20020a636dcf000000b005638dc4c851mr62368pgc.9.1690903225626; Tue, 01
+ Aug 2023 08:20:25 -0700 (PDT)
+Date:   Tue,  1 Aug 2023 08:20:03 -0700
 In-Reply-To: <20230801152007.337272-1-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20230801152007.337272-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230801152007.337272-7-jingzhangos@google.com>
-Subject: [PATCH v7 06/10] KVM: arm64: Bump up the default KVM sanitised debug
- version to v8p8
+Message-ID: <20230801152007.337272-8-jingzhangos@google.com>
+Subject: [PATCH v7 07/10] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
 From:   Jing Zhang <jingzhangos@google.com>
 To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         ARMLinux <linux-arm-kernel@lists.infradead.org>,
@@ -80,40 +79,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Oliver Upton <oliver.upton@linux.dev>
+All valid fields in ID_AA64PFR0_EL1 are writable from usrespace
+with this change.
 
-Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
-it is safe to bump up the default KVM sanitised debug version to v8p8.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2183cd3af472..5a886ccb33fa 100644
+index 5a886ccb33fa..0a406058abb9 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1489,8 +1489,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
- {
- 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
- 
--	/* Limit debug to ARMv8.0 */
--	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
- 
- 	/*
- 	 * Only initialize the PMU version if the vCPU was configured with one.
-@@ -1550,6 +1549,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	if (kvm_vcpu_has_pmu(vcpu))
- 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
- 
-+	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
-+
- 	return val;
- }
- 
+@@ -2041,7 +2041,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  .get_user = get_id_reg,
+ 	  .set_user = set_id_reg,
+ 	  .reset = read_sanitised_id_aa64pfr0_el1,
+-	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
++	  .val = GENMASK(63, 0), },
+ 	ID_SANITISED(ID_AA64PFR1_EL1),
+ 	ID_UNALLOCATED(4,2),
+ 	ID_UNALLOCATED(4,3),
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
