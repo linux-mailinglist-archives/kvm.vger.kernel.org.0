@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0693276B745
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 16:23:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDD2476B744
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 16:23:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234628AbjHAOXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 10:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
+        id S234617AbjHAOXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 10:23:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232408AbjHAOXe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232246AbjHAOXe (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Aug 2023 10:23:34 -0400
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D422125;
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E184810FD;
         Tue,  1 Aug 2023 07:23:32 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 1558C10001D;
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 73CF4120017;
         Tue,  1 Aug 2023 17:23:31 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 1558C10001D
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 73CF4120017
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
         s=mail; t=1690899811;
-        bh=xqPpn0dnX0/HAUZejDb3RPtDZduneTW/LI1q4+pg6sk=;
+        bh=aoZdDQ/3Ig4eVm/2+lIxfpYEQW/u4NLnWkC8fXi/GUU=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=Ljp4qYVR+jUoJ96zP19ctHH+kORhoGppE+THWG/ieHOHMwt/ml84TOV8FQDs4A/zn
-         0CjhUHIzdrC2BITusHo+W6a6EaVCLwURg/hJy2SSXGkw7CEppEaWACz5shhvtrXjle
-         1tF7oWxG74LZXt2OjBkpfrusf+aPXjNoZM0rdSrSQ0P9IvlO+y1W60ioDd4kjD7SwH
-         R2YxZrhVpUL0AQYPeO7OI98W3PsAwrJYDRKWjIxS1UVVXGPBAwN1HcDJ9z1YNQWdSq
-         Inwwydr4VnRjgegdBFaDgpTM/AxbTA+rGISHcExEXm2b3FOmQ0BG5IoO5p4vgl0z7y
-         MwuwSVn5AYooQ==
+        b=CfE9tUfHgvtH6tVMZCP3SBfqnB2kktaDmSD8gs40ryKb2XPd+HTKeIhylFglbG8Gs
+         qqmCvf0pzDIyz9vroXDJ/iuyaXGWQ7qHGRuMTyH6iEI9rYnxNfXkiGzNuSlWIY/+4f
+         bNgn8VurwHB/hqw16yi1ge5O0Kso4FUk5QCtwyf5PjIRxee86YPqCwzSAQ/TunGQ+I
+         hG4RSdRvWCn1ZMO0Gw4YM0FakUH1Aa/CAeqvllCkcnwmh7DL18JL+Mq6sBlzJ0cf0s
+         LCV43a+Qic9wBLhD9nMNFqOWd+Vv5Lz+DKQl5WWLdTe3aj+3GD+kRDLP5gCbu7rZOY
+         ACX8NVvv7kK4w==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Tue,  1 Aug 2023 17:23:30 +0300 (MSK)
+        Tue,  1 Aug 2023 17:23:31 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -52,9 +52,9 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@sberdevices.ru>,
         Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned socket
-Date:   Tue, 1 Aug 2023 17:17:26 +0300
-Message-ID: <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v1 2/2] test/vsock: shutdowned socket test
+Date:   Tue, 1 Aug 2023 17:17:27 +0300
+Message-ID: <20230801141727.481156-3-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
 References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
@@ -90,29 +90,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
-shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
-flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
+This adds two tests for 'shutdown()' call. It checks that SIGPIPE is
+sent when MSG_NOSIGNAL is not set and vice versa. Both flags SHUT_WR
+and SHUT_RD are tested.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
- net/vmw_vsock/af_vsock.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/testing/vsock/vsock_test.c | 138 +++++++++++++++++++++++++++++++
+ 1 file changed, 138 insertions(+)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 020cf17ab7e4..013b65241b65 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
- 			err = total_written;
- 	}
- out:
-+	if (sk->sk_type == SOCK_STREAM)
-+		err = sk_stream_error(sk, msg->msg_flags, err);
-+
- 	release_sock(sk);
- 	return err;
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index 90718c2fd4ea..21d40a8d881c 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -19,6 +19,7 @@
+ #include <time.h>
+ #include <sys/mman.h>
+ #include <poll.h>
++#include <signal.h>
+ 
+ #include "timeout.h"
+ #include "control.h"
+@@ -1170,6 +1171,133 @@ static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
+ 	return test_msg_peek_server(opts, true);
  }
+ 
++static bool have_sigpipe;
++
++static void sigpipe(int signo)
++{
++	have_sigpipe = true;
++}
++
++static void test_stream_check_sigpipe(int fd)
++{
++	ssize_t res;
++
++	have_sigpipe = false;
++
++	res = send(fd, "A", 1, 0);
++	if (res != -1) {
++		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
++		exit(EXIT_FAILURE);
++	}
++
++	if (!have_sigpipe) {
++		fprintf(stderr, "SIGPIPE expected\n");
++		exit(EXIT_FAILURE);
++	}
++
++	have_sigpipe = false;
++
++	res = send(fd, "A", 1, MSG_NOSIGNAL);
++	if (res != -1) {
++		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
++		exit(EXIT_FAILURE);
++	}
++
++	if (have_sigpipe) {
++		fprintf(stderr, "SIGPIPE not expected\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void test_stream_shutwr_client(const struct test_opts *opts)
++{
++	int fd;
++
++	struct sigaction act = {
++		.sa_handler = sigpipe,
++	};
++
++	sigaction(SIGPIPE, &act, NULL);
++
++	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	if (fd < 0) {
++		perror("connect");
++		exit(EXIT_FAILURE);
++	}
++
++	if (shutdown(fd, SHUT_WR)) {
++		perror("shutdown");
++		exit(EXIT_FAILURE);
++	}
++
++	test_stream_check_sigpipe(fd);
++
++	control_writeln("CLIENTDONE");
++
++	close(fd);
++}
++
++static void test_stream_shutwr_server(const struct test_opts *opts)
++{
++	int fd;
++
++	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	if (fd < 0) {
++		perror("accept");
++		exit(EXIT_FAILURE);
++	}
++
++	control_expectln("CLIENTDONE");
++
++	close(fd);
++}
++
++static void test_stream_shutrd_client(const struct test_opts *opts)
++{
++	int fd;
++
++	struct sigaction act = {
++		.sa_handler = sigpipe,
++	};
++
++	sigaction(SIGPIPE, &act, NULL);
++
++	fd = vsock_stream_connect(opts->peer_cid, 1234);
++	if (fd < 0) {
++		perror("connect");
++		exit(EXIT_FAILURE);
++	}
++
++	control_expectln("SHUTRDDONE");
++
++	test_stream_check_sigpipe(fd);
++
++	control_writeln("CLIENTDONE");
++
++	close(fd);
++}
++
++static void test_stream_shutrd_server(const struct test_opts *opts)
++{
++	int fd;
++
++	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
++	if (fd < 0) {
++		perror("accept");
++		exit(EXIT_FAILURE);
++	}
++
++	if (shutdown(fd, SHUT_RD)) {
++		perror("shutdown");
++		exit(EXIT_FAILURE);
++	}
++
++	control_writeln("SHUTRDDONE");
++	control_expectln("CLIENTDONE");
++
++	close(fd);
++}
++
+ static struct test_case test_cases[] = {
+ 	{
+ 		.name = "SOCK_STREAM connection reset",
+@@ -1250,6 +1378,16 @@ static struct test_case test_cases[] = {
+ 		.run_client = test_seqpacket_msg_peek_client,
+ 		.run_server = test_seqpacket_msg_peek_server,
+ 	},
++	{
++		.name = "SOCK_STREAM SHUT_WR",
++		.run_client = test_stream_shutwr_client,
++		.run_server = test_stream_shutwr_server,
++	},
++	{
++		.name = "SOCK_STREAM SHUT_RD",
++		.run_client = test_stream_shutrd_client,
++		.run_server = test_stream_shutrd_server,
++	},
+ 	{},
+ };
+ 
 -- 
 2.25.1
 
