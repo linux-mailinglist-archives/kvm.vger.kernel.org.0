@@ -2,60 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53F8076BBD1
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 19:58:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 521E576BC16
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 20:14:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232255AbjHAR60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 13:58:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53380 "EHLO
+        id S231534AbjHASOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 14:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233283AbjHAR6K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 13:58:10 -0400
+        with ESMTP id S231490AbjHASOI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 14:14:08 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E6219A0
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 10:58:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCB61723;
+        Tue,  1 Aug 2023 11:14:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=rfKodFpuUvMf8xRxS1F9RNhEDLvbGFAcnQWQWwOY7tc=; b=d0gSji5iVq/dhOJJq3mlDgWSEF
-        W5CC2OZsHD5r1nN/ukFweI2QrtYfk2hzeZjq/QRMRjjgKAK7cAUf8KHvrZFUSWWqui9CyVhnYQESN
-        bPy6J3vGoLulgVnlgFHsGq+x/AKzbGDYb34LdIga8k+r4wWjewLB1xKdyFel0oaIdUTeXKCIvBy32
-        G5+y5hUkXxR8myGfDLsB+dVjhpibxSdZ62cJYUmt5KVjfBF1zYWGSiVPYyV8CeslqdPDHNgmGh9WB
-        hJM/lm4ffbZXEte6WV8JatCGMRK0IsSMHRXZhHI/vQGiXbplfwvNtkOb7cKh79jLZYyyKyZ+mIwBQ
-        IoOo+dzA==;
-Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WCvORc63Xc/jlm9uhOtZxAQJTdnogdSx3B9Dg3F/tt8=; b=EG3k5D0X6i7MCDl7fPlu0Os/T9
+        P3DWozrpKZNiiTwIBKQbwpm6VZvqHcqh7vAhLujXPTORzLj8CF/HM4qZkvrXeBx7bFnKTsYO3WqWE
+        bfWAfHbPGIYvejU5QbtqQx0o+6xAJQHWzVYVP8KX85kXbMgunY/JYMFk92i3U5+HepWLcYPvoEiBw
+        5zkkL3cy2U7+suRvx85VDiz+0m0G0BqTaOpB8ACt4WMUTt9BOyTdUC1F3BdlG3LcB4+k7LUJeTGaS
+        sHJ2p05k/d1NF2jIFFJjlyNPNnnPCFx1SmRwdSU4C1BrS2bJZ1eskX0IZPg16ydkyxbSIuEmbP+8P
+        iQLxh1XQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qQtd2-00EpEM-0s;
-        Tue, 01 Aug 2023 17:57:52 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qQtcz-000bxm-1j;
-        Tue, 01 Aug 2023 18:57:49 +0100
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     qemu-devel@nongnu.org
-Cc:     Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Peter Maydell <peter.maydell@linaro.org>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Anthony PERARD <anthony.perard@citrix.com>,
-        David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH for-8.1 3/3] hw/xen: prevent guest from binding loopback event channel to itself
-Date:   Tue,  1 Aug 2023 18:57:47 +0100
-Message-Id: <20230801175747.145906-4-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230801175747.145906-1-dwmw2@infradead.org>
-References: <20230801175747.145906-1-dwmw2@infradead.org>
+        id 1qQtre-00EpOw-2F;
+        Tue, 01 Aug 2023 18:12:58 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7A4593002D3;
+        Tue,  1 Aug 2023 20:12:55 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 5C6BC201C57DC; Tue,  1 Aug 2023 20:12:55 +0200 (CEST)
+Date:   Tue, 1 Aug 2023 20:12:55 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     Valentin Schneider <vschneid@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org, x86@kernel.org, rcu@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Zqiang <qiang.zhang1211@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Uladzislau Rezki <urezki@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Jason Baron <jbaron@akamai.com>,
+        Kees Cook <keescook@chromium.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        Nicolas Saenz Julienne <nsaenz@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Chuang Wang <nashuiliang@gmail.com>,
+        Yang Jihong <yangjihong1@huawei.com>,
+        Petr Mladek <pmladek@suse.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, Song Liu <song@kernel.org>,
+        Julian Pidancet <julian.pidancet@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Yair Podemsky <ypodemsk@redhat.com>
+Subject: Re: [RFC PATCH v2 11/20] objtool: Flesh out warning related to
+ pv_ops[] calls
+Message-ID: <20230801181255.GE11704@hirez.programming.kicks-ass.net>
+References: <20230720163056.2564824-1-vschneid@redhat.com>
+ <20230720163056.2564824-12-vschneid@redhat.com>
+ <20230728153334.myvh5sxppvjzd3oz@treble>
+ <xhsmh8raws53o.mognet@vschneid.remote.csb>
+ <20230731213631.pywytiwdqgtgx4ps@treble>
+ <20230731214612.GC51835@hirez.programming.kicks-ass.net>
+ <20230801160636.ko3oc4cwycwejyxy@treble>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230801160636.ko3oc4cwycwejyxy@treble>
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,41 +114,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Tue, Aug 01, 2023 at 11:06:36AM -0500, Josh Poimboeuf wrote:
+> On Mon, Jul 31, 2023 at 11:46:12PM +0200, Peter Zijlstra wrote:
+> > > Ideally it would only print a single warning for this case, something
+> > > like:
+> > > 
+> > >   vmlinux.o: warning: objtool: __flush_tlb_all_noinstr+0x4: indirect call to native_flush_tlb_local() leaves .noinstr.text section
+> > 
+> > But then what for the case where there are multiple implementations and
+> > more than one isn't noinstr?
+> 
+> The warning would be in the loop in pv_call_dest(), so it would
+> potentially print multiple warnings, one for each potential dest.
+> 
+> > IIRC that is where these double prints came from. One is the callsite
+> > (always one) and the second is the offending implementation (but there
+> > could be more).
+> 
+> It's confusing to warn about the call site and the destination in two
+> separate warnings.  That's why I'm proposing combining them into a
+> single warning (which still could end up as multiple warnings if there
+> are multiple affected dests).
+> 
+> > > I left out "pv_ops[1]" because it's already long enough :-)
+> > 
+> > The index number is useful when also looking at the assembler, which
+> > IIRC is an indexed indirect call.
+> 
+> Ok, so something like so?
+> 
+>   vmlinux.o: warning: objtool: __flush_tlb_all_noinstr+0x4: indirect call to pv_ops[1] (native_flush_tlb_local) leaves .noinstr.text section
 
-Fuzzing showed that a guest could bind an interdomain port to itself, by
-guessing the next port to be allocated and putting that as the 'remote'
-port number. By chance, that works because the newly-allocated port has
-type EVTCHNSTAT_unbound. It shouldn't.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Reviewed-by: Paul Durrant <paul@xen.org>
----
- hw/i386/kvm/xen_evtchn.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/hw/i386/kvm/xen_evtchn.c b/hw/i386/kvm/xen_evtchn.c
-index 0e9c108614..a731738411 100644
---- a/hw/i386/kvm/xen_evtchn.c
-+++ b/hw/i386/kvm/xen_evtchn.c
-@@ -1408,8 +1408,15 @@ int xen_evtchn_bind_interdomain_op(struct evtchn_bind_interdomain *interdomain)
-         XenEvtchnPort *rp = &s->port_table[interdomain->remote_port];
-         XenEvtchnPort *lp = &s->port_table[interdomain->local_port];
- 
--        if (rp->type == EVTCHNSTAT_unbound && rp->type_val == 0) {
--            /* It's a match! */
-+        /*
-+         * The 'remote' port for loopback must be an unbound port allocated for
-+         * communication with the local domain (as indicated by rp->type_val
-+         * being zero, not PORT_INFO_TYPEVAL_REMOTE_QEMU), and must *not* be
-+         * the port that was just allocated for the local end.
-+         */
-+        if (interdomain->local_port != interdomain->remote_port &&
-+            rp->type == EVTCHNSTAT_unbound && rp->type_val == 0) {
-+
-             rp->type = EVTCHNSTAT_interdomain;
-             rp->type_val = interdomain->local_port;
- 
--- 
-2.40.1
-
+Sure, that all would work I suppose.
