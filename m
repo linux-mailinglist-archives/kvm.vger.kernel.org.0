@@ -2,117 +2,357 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6E2B76AAA7
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 10:15:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E62376ABB2
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:02:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232159AbjHAIP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 04:15:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35826 "EHLO
+        id S232396AbjHAJCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:02:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231433AbjHAIPY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 04:15:24 -0400
-Received: from out-98.mta0.migadu.com (out-98.mta0.migadu.com [91.218.175.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32FBDA0
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 01:15:23 -0700 (PDT)
-Date:   Tue, 1 Aug 2023 01:15:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1690877721;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=NJXyz71UWN5dEwNYPmqB5WKFGNITeZh3IOXfm4I58G8=;
-        b=LKm9NtDDL7/mKj+tI/Q7boBV8oKLR2SJK+3i/cYV17JrtOSZxLDRVSIytuqRGkt05Qo22D
-        dawkO6zHH5lLzJ0sfdxIh90ctEexT1l2Ho84xGlyUhYKOIB/OrIVO9p52tAdaFm/duJdC4
-        TOHnvPQA+oZCwtRzYaZ6nknghqN5tA8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, rananta@google.com, tabba@google.com,
-        arnd@arndb.de, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 6.5, part #2
-Message-ID: <ZMi/EkSLgRymQZzN@thinky-boi>
+        with ESMTP id S232227AbjHAJCC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:02:02 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89238173A;
+        Tue,  1 Aug 2023 02:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690880514; x=1722416514;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VNTVJuExdWzMgMIJDnYnYchd3KTTE96ZhRNNSfTQvuI=;
+  b=Y5g5BMG2urrfx2UdjI6zPWzQrWvk1yj5Wrmsy2KPt3swW/g2XUQl7rUu
+   nHd+tIbOde4Y/WIWE7wIXB7GBnqMq8qZRuzW3y12ceEIaai9xcHMKyClA
+   8YbSjWREaqGvl+DTcyza19725/y68VoHX0ey72abqC9kmnaKiZ3J/3fLf
+   Ve5bBctS55HGPszRiDLq76kc6sYEnVWVX4MAQUMcCe3ae+Nf4dut7tvja
+   lx5TxRusx7XAq/DbrZTfI1YJ+QPJWi4nlkXGrqOfjWqC6AXQZhLehcKek
+   X60a3RoYE6k9AgkXROmBNTML2t+mBGMqHvFd6BuzM9vvI4OT+gBuO1MeW
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082047"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="433082047"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:01:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975216940"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="975216940"
+Received: from unknown (HELO fred..) ([172.25.112.68])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:01:50 -0700
+From:   Xin Li <xin3.li@intel.com>
+To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        "K . Y . Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Xin Li <xin3.li@intel.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        "Liam R . Howlett" <Liam.Howlett@Oracle.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Breno Leitao <leitao@debian.org>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Brian Gerst <brgerst@gmail.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Alexander Potapenko <glider@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Ze Gao <zegao2021@gmail.com>, Fei Li <fei1.li@intel.com>,
+        Conghui <conghui.chen@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Yantengsi <siyanteng@loongson.cn>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Sathvika Vasireddy <sv@linux.ibm.com>
+Subject: [PATCH RESEND v9 00/36] x86: enable FRED for x86-64
+Date:   Tue,  1 Aug 2023 01:32:42 -0700
+Message-Id: <20230801083318.8363-1-xin3.li@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Resend because the mail system failed to deliver some messages yesterday.
 
-Second batch of fixes for 6.5 here. As usual, details are in the tag but
-of particular interest is the fix for AmpereOne systems, as VMs fail to
-boot when setting up the MMU (yikes).
+This patch set enables the Intel flexible return and event delivery
+(FRED) architecture for x86-64.
 
-Please pull.
+The FRED architecture defines simple new transitions that change
+privilege level (ring transitions). The FRED architecture was
+designed with the following goals:
+
+1) Improve overall performance and response time by replacing event
+   delivery through the interrupt descriptor table (IDT event
+   delivery) and event return by the IRET instruction with lower
+   latency transitions.
+
+2) Improve software robustness by ensuring that event delivery
+   establishes the full supervisor context and that event return
+   establishes the full user context.
+
+The new transitions defined by the FRED architecture are FRED event
+delivery and, for returning from events, two FRED return instructions.
+FRED event delivery can effect a transition from ring 3 to ring 0, but
+it is used also to deliver events incident to ring 0. One FRED
+instruction (ERETU) effects a return from ring 0 to ring 3, while the
+other (ERETS) returns while remaining in ring 0. Collectively, FRED
+event delivery and the FRED return instructions are FRED transitions.
+
+Search for the latest FRED spec in most search engines with this search pattern:
+
+  site:intel.com FRED (flexible return and event delivery) specification
+
+As of now there is no publicly avaiable CPU supporting FRED, thus the Intel
+Simics® Simulator is used as software development and testing vehicles. And
+it can be downloaded from:
+  https://www.intel.com/content/www/us/en/developer/articles/tool/simics-simulator.html
+
+To enable FRED, the Simics package 8112 QSP-CPU needs to be installed with CPU
+model configured as:
+	$cpu_comp_class = "x86-experimental-fred"
+
+
+Changes since v8:
+* Move the FRED initialization patch after all required changes are in
+  place (Thomas Gleixner).
+* Don't do syscall early out in fred_entry_from_user() before there are
+  proper performance numbers and justifications (Thomas Gleixner).
+* Add the control exception handler to the FRED exception handler table
+  (Thomas Gleixner).
+* Introduce a macro sysvec_install() to derive the asm handler name from
+  a C handler, which simplifies the code and avoids an ugly typecast
+  (Thomas Gleixner).
+* Remove junk code that assumes no local APIC on x86_64 (Thomas Gleixner).
+* Put IDTENTRY changes in a separate patch (Thomas Gleixner).
+* Use high-order 48 bits above the lowest 16 bit SS only when FRED is
+  enabled (Thomas Gleixner).
+* Explain why writing directly to the IA32_KERNEL_GS_BASE MSR is
+  doing the right thing (Thomas Gleixner).
+* Reword some patch descriptions (Thomas Gleixner).
+* Add a new macro VMX_DO_FRED_EVENT_IRQOFF for FRED instead of
+  refactoring VMX_DO_EVENT_IRQOFF (Sean Christopherson).
+* Do NOT use a trampoline, just LEA+PUSH the return RIP, PUSH the error
+  code, and jump to the FRED kernel entry point for NMI or call
+  external_interrupt() for IRQs (Sean Christopherson).
+* Call external_interrupt() only when FRED is enabled, and convert the
+  non-FRED handling to external_interrupt() after FRED lands (Sean
+  Christopherson).
+* Use __packed instead of __attribute__((__packed__)) (Borislav Petkov).
+* Put all comments above the members, like the rest of the file does
+  (Borislav Petkov).
+* Reflect the FRED spec 5.0 change that ERETS and ERETU add 8 to %rsp
+  before popping the return context from the stack.
+* Reflect stack frame definition changes from FRED spec 3.0 to 5.0.
+* Add ENDBR to the FRED_ENTER asm macro after kernel IBT is added to
+  FRED base line in FRED spec 5.0.
+* Add a document which briefly introduces FRED features.
+* Remove 2 patches, "allow FRED systems to use interrupt vectors
+  0x10-0x1f" and "allow dynamic stack frame size", from this patch set,
+  as they are "optimizations" only.
+* Send 2 patches, "header file for event types" and "do not modify the
+  DPL bits for a null selector", as pre-FRED patches.
+
+Changes since v7:
+* Always call external_interrupt() for VMX IRQ handling on x86_64, thus avoid
+  re-entering the noinstr code.
+* Create a FRED stack frame when FRED is compiled-in but not enabled, which
+  uses some extra stack space but simplifies the code.
+* Add a log message when FRED is enabled.
+
+Changes since v6:
+* Add a comment to explain why it is safe to write to a previous FRED stack
+  frame. (Lai Jiangshan).
+* Export fred_entrypoint_kernel(), required when kvm-intel built as a module.
+* Reserve a REDZONE for CALL emulation and Align RSP to a 64-byte boundary
+  before pushing a new FRED stack frame.
+* Replace pt_regs csx flags prefix FRED_CSL_ with FRED_CSX_.
+
+Changes since v5:
+* Initialize system_interrupt_handlers with dispatch_table_spurious_interrupt()
+  instead of NULL to get rid of a branch (Peter Zijlstra).
+* Disallow #DB inside #MCE for robustness sake (Peter Zijlstra).
+* Add a comment for FRED stack level settings (Lai Jiangshan).
+* Move the NMI bit from an invalid stack frame, which caused ERETU to fault,
+  to the fault handler's stack frame, thus to unblock NMI ASAP if NMI is blocked
+  (Lai Jiangshan).
+* Refactor VMX_DO_EVENT_IRQOFF to handle IRQ/NMI in IRQ/NMI induced VM exits
+  when FRED is enabled (Sean Christopherson).
+
+Changes since v4:
+* Do NOT use the term "injection", which in the KVM context means to
+  reinject an event into the guest (Sean Christopherson).
+* Add the explanation of why to execute "int $2" to invoke the NMI handler
+  in NMI caused VM exits (Sean Christopherson).
+* Use cs/ss instead of csx/ssx when initializing the pt_regs structure
+  for calling external_interrupt(), otherwise it breaks i386 build.
+
+Changes since v3:
+* Call external_interrupt() to handle IRQ in IRQ caused VM exits.
+* Execute "int $2" to handle NMI in NMI caused VM exits.
+* Rename csl/ssl of the pt_regs structure to csx/ssx (x for extended)
+  (Andrew Cooper).
+
+Changes since v2:
+* Improve comments for changes in arch/x86/include/asm/idtentry.h.
+
+Changes since v1:
+* call irqentry_nmi_{enter,exit}() in both IDT and FRED debug fault kernel
+  handler (Peter Zijlstra).
+* Initialize a FRED exception handler to fred_bad_event() instead of NULL
+  if no FRED handler defined for an exception vector (Peter Zijlstra).
+* Push calling irqentry_{enter,exit}() and instrumentation_{begin,end}()
+  down into individual FRED exception handlers, instead of in the dispatch
+  framework (Peter Zijlstra).
+
+H. Peter Anvin (Intel) (22):
+  x86/fred: Add Kconfig option for FRED (CONFIG_X86_FRED)
+  x86/fred: Disable FRED support if CONFIG_X86_FRED is disabled
+  x86/cpufeatures: Add the cpu feature bit for FRED
+  x86/opcode: Add ERETU, ERETS instructions to x86-opcode-map
+  x86/objtool: Teach objtool about ERETU and ERETS
+  x86/cpu: Add X86_CR4_FRED macro
+  x86/cpu: Add MSR numbers for FRED configuration
+  x86/fred: Make unions for the cs and ss fields in struct pt_regs
+  x86/fred: Add a new header file for FRED definitions
+  x86/fred: Reserve space for the FRED stack frame
+  x86/fred: Update MSR_IA32_FRED_RSP0 during task switch
+  x86/fred: Let ret_from_fork_asm() jmp to fred_exit_user when FRED is
+    enabled
+  x86/fred: Disallow the swapgs instruction when FRED is enabled
+  x86/fred: No ESPFIX needed when FRED is enabled
+  x86/fred: Allow single-step trap and NMI when starting a new task
+  x86/fred: Add a page fault entry stub for FRED
+  x86/fred: Add a debug fault entry stub for FRED
+  x86/fred: Add a NMI entry stub for FRED
+  x86/traps: Add a system interrupt handler table for system interrupt
+    dispatch
+  x86/traps: Add external_interrupt() to dispatch external interrupts
+  x86/fred: FRED entry/exit and dispatch code
+  x86/fred: FRED initialization code
+
+Xin Li (14):
+  Documentation/x86/64: Add documentation for FRED
+  x86/fred: Define a common function type fred_handler
+  x86/fred: Add a machine check entry stub for FRED
+  x86/fred: Add a double fault entry stub for FRED
+  x86/entry: Remove idtentry_sysvec from entry_{32,64}.S
+  x86/idtentry: Incorporate definitions/declarations of the FRED
+    external interrupt handler type
+  x86/traps: Add sysvec_install() to install a system interrupt handler
+  x86/idtentry: Incorporate declaration/definition of the FRED exception
+    handler type
+  x86/fred: Fixup fault on ERETU by jumping to fred_entrypoint_user
+  x86/traps: Export external_interrupt() for handling IRQ in IRQ induced
+    VM exits
+  x86/fred: Export fred_entrypoint_kernel() for handling NMI in NMI
+    induced VM exits
+  KVM: VMX: Add VMX_DO_FRED_EVENT_IRQOFF for IRQ/NMI handling
+  x86/syscall: Split IDT syscall setup code into idt_syscall_init()
+  x86/fred: Disable FRED by default in its early stage
+
+ .../admin-guide/kernel-parameters.txt         |   4 +
+ Documentation/arch/x86/x86_64/fred.rst        | 102 ++++++++
+ Documentation/arch/x86/x86_64/index.rst       |   1 +
+ arch/x86/Kconfig                              |   9 +
+ arch/x86/entry/Makefile                       |   5 +-
+ arch/x86/entry/entry_32.S                     |   4 -
+ arch/x86/entry/entry_64.S                     |  14 +-
+ arch/x86/entry/entry_64_fred.S                |  58 +++++
+ arch/x86/entry/entry_fred.c                   | 220 ++++++++++++++++++
+ arch/x86/entry/vsyscall/vsyscall_64.c         |   2 +-
+ arch/x86/include/asm/asm-prototypes.h         |   1 +
+ arch/x86/include/asm/cpufeatures.h            |   1 +
+ arch/x86/include/asm/disabled-features.h      |   8 +-
+ arch/x86/include/asm/extable_fixup_types.h    |   4 +-
+ arch/x86/include/asm/fred.h                   | 157 +++++++++++++
+ arch/x86/include/asm/idtentry.h               | 115 ++++++++-
+ arch/x86/include/asm/msr-index.h              |  13 +-
+ arch/x86/include/asm/ptrace.h                 |  57 ++++-
+ arch/x86/include/asm/switch_to.h              |  11 +-
+ arch/x86/include/asm/thread_info.h            |  12 +-
+ arch/x86/include/asm/traps.h                  |  23 ++
+ arch/x86/include/uapi/asm/processor-flags.h   |   2 +
+ arch/x86/kernel/Makefile                      |   1 +
+ arch/x86/kernel/cpu/acrn.c                    |   5 +-
+ arch/x86/kernel/cpu/common.c                  |  47 +++-
+ arch/x86/kernel/cpu/mce/core.c                |  15 ++
+ arch/x86/kernel/cpu/mshyperv.c                |  16 +-
+ arch/x86/kernel/espfix_64.c                   |   8 +
+ arch/x86/kernel/fred.c                        |  67 ++++++
+ arch/x86/kernel/irqinit.c                     |   7 +-
+ arch/x86/kernel/kvm.c                         |   2 +-
+ arch/x86/kernel/nmi.c                         |  19 ++
+ arch/x86/kernel/process_64.c                  |  31 ++-
+ arch/x86/kernel/traps.c                       | 153 ++++++++++--
+ arch/x86/kvm/vmx/vmenter.S                    |  88 +++++++
+ arch/x86/kvm/vmx/vmx.c                        |  19 +-
+ arch/x86/lib/x86-opcode-map.txt               |   2 +-
+ arch/x86/mm/extable.c                         |  79 +++++++
+ arch/x86/mm/fault.c                           |  18 +-
+ drivers/xen/events/events_base.c              |   3 +-
+ tools/arch/x86/include/asm/cpufeatures.h      |   1 +
+ .../arch/x86/include/asm/disabled-features.h  |   8 +-
+ tools/arch/x86/include/asm/msr-index.h        |  13 +-
+ tools/arch/x86/lib/x86-opcode-map.txt         |   2 +-
+ tools/objtool/arch/x86/decode.c               |  19 +-
+ 45 files changed, 1348 insertions(+), 98 deletions(-)
+ create mode 100644 Documentation/arch/x86/x86_64/fred.rst
+ create mode 100644 arch/x86/entry/entry_64_fred.S
+ create mode 100644 arch/x86/entry/entry_fred.c
+ create mode 100644 arch/x86/include/asm/fred.h
+ create mode 100644 arch/x86/kernel/fred.c
 
 -- 
-Thanks,
-Oliver
+2.34.1
 
-The following changes since commit 9d2a55b403eea26cab7c831d8e1c00ef1e6a6850:
-
-  KVM: arm64: Fix the name of sys_reg_desc related to PMU (2023-07-14 23:34:05 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.5-2
-
-for you to fetch changes up to 74158a8cad79d2f5dcf71508993664c5cfcbfa3c:
-
-  KVM: arm64: Skip instruction after emulating write to TCR_EL1 (2023-07-28 17:11:23 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.5, part #2
-
- - Fixes for the configuration of SVE/SME traps when hVHE mode is in use
-
- - Allow use of pKVM on systems with FF-A implementations that are v1.0
-   compatible
-
- - Request/release percpu IRQs (arch timer, vGIC maintenance) correctly
-   when pKVM is in use
-
- - Fix function prototype after __kvm_host_psci_cpu_entry() rename
-
- - Skip to the next instruction when emulating writes to TCR_EL1 on
-   AmpereOne systems
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      KVM: arm64: fix __kvm_host_psci_cpu_entry() prototype
-
-Fuad Tabba (7):
-      KVM: arm64: Factor out code for checking (h)VHE mode into a macro
-      KVM: arm64: Use the appropriate feature trap register for SVE at EL2 setup
-      KVM: arm64: Disable SME traps for (h)VHE at setup
-      KVM: arm64: Helper to write to appropriate feature trap register based on mode
-      KVM: arm64: Use the appropriate feature trap register when activating traps
-      KVM: arm64: Fix resetting SVE trap values on reset for hVHE
-      KVM: arm64: Fix resetting SME trap values on reset for (h)VHE
-
-Oliver Upton (3):
-      KVM: arm64: Allow pKVM on v1.0 compatible FF-A implementations
-      KVM: arm64: Rephrase percpu enable/disable tracking in terms of hyp
-      KVM: arm64: Skip instruction after emulating write to TCR_EL1
-
-Raghavendra Rao Ananta (1):
-      KVM: arm64: Fix hardware enable/disable flows for pKVM
-
- arch/arm64/include/asm/el2_setup.h      | 44 ++++++++++++++++--------
- arch/arm64/include/asm/kvm_asm.h        |  2 +-
- arch/arm64/include/asm/kvm_emulate.h    | 21 +++++++++---
- arch/arm64/kvm/arm.c                    | 61 +++++++++++++++------------------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  1 +
- arch/arm64/kvm/hyp/nvhe/ffa.c           | 15 +++++++-
- arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
- 7 files changed, 90 insertions(+), 56 deletions(-)
