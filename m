@@ -2,180 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9D0976A5A6
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 02:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D536D76A68C
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 03:45:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230519AbjHAAnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 20:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S231186AbjHABpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 21:45:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbjHAAnI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 20:43:08 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0CF199E
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 17:43:06 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-40a47e8e38dso74191cf.1
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 17:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690850585; x=1691455385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wz5PQDI2T5JD79/VqNSh8cAHB4+Dq2pKqfYEsmYHYJc=;
-        b=MFYDUohPKYqzUjmRdIik4Kf/M1i09cRnmwx/ISJELixqxj8gzvM0dEKMXyxYAMFbw3
-         ReLM/cPUTz05PxclkqkBgVsoeT/7EH3dALymU5TM8n9AYViSu4kpjQw8g9TlIr5lYEdx
-         STtN0tXmEUrwz4qA3H7UDuyRNjk2yzkj4bwdACzU8bzIwG8V1u6MRimG2rWhgHRiWHYy
-         eXQ8o14YblAtdc0/rR4R99744OZdbLElco3n3qUL5oyzjog5namRFGU6L/NVq+oZEqqn
-         QLVsLJdbOWotDUgFVkV6iklP9yVqIk7HEQLLekRiuMLcq+3DzGurl/ToVlHLeESVGYUY
-         hxxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690850585; x=1691455385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wz5PQDI2T5JD79/VqNSh8cAHB4+Dq2pKqfYEsmYHYJc=;
-        b=edPrvJy1UMwmqMCTTM99hpCPBpHv7WeSgO/QFZT3fQ8dYPR8ZYxlo85N0VhmgR6hdP
-         skDFFgNlrxZQmmNBbWB4MuCK9AYBGfM2QTXaNIHlolVaOeznGpPzscXymF2pT7ytP4J2
-         Ies9OV4d6cEfEGOQG9lY7VjLfR5GtyK/8eNAAmlBUD5w4xj3WyV17oRflhTJkJiVHZxQ
-         PqmaRsiL65hZ0DzTG/dKVkpYTweSbR5X0qIfAZeaerijAPvZ0H+GafGZwQKnk8yzyALc
-         omo7p92yh2Rw52y+W+YbpgzoCYIFwn0T0sPRrn+OHvd1VpIUnD1Y63WRcXuzOqahQboY
-         Dgbw==
-X-Gm-Message-State: ABy/qLZqBzZb3swxP9Vc4vSxMyGv8JWYKCsvfTVM2GO3vCxUUMfDg2QF
-        1PwKV7iEv6XMHJQSvKo5syA04UZx9/Kx11O8cHdJfg==
-X-Google-Smtp-Source: APBJJlGp1HM0IIW5HWYh0WPnS7cydIdnyyIPn3xHA78fZgN1YFWKwQ3DKE5js9J5XfPxG82YjMXnoKhazzIIIJsIP5M=
-X-Received: by 2002:a05:622a:1447:b0:3f4:f0fd:fe7e with SMTP id
- v7-20020a05622a144700b003f4f0fdfe7emr530327qtx.3.1690850585401; Mon, 31 Jul
- 2023 17:43:05 -0700 (PDT)
+        with ESMTP id S229510AbjHABpv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 21:45:51 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC27E1988
+        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 18:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690854349; x=1722390349;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=q3HqSAdiGDjuRHnjIkqW8UXAdbng499ewzU4TwytHbE=;
+  b=CXDsEq4T9CK7asCUsTrLhAPd9cxJ3MCAGHLs+Asy3nrtbds2vtktJ4eB
+   Kqn6CGIKvSktqKArVFMcrNoXHNi/5tmUqPIr13L9e5Pu4/V/2jnI1+X0z
+   HUS/NfO2spFSpAGwHuVndfCDVxPee09yt33N0wDVDdP55aQQh8GfCVOHD
+   ugejS6w4PJTluwbM/Uu5zHOZ8Fe1wWtznWVB7zK4hrggqxK+EIsvMkftN
+   f+z4aNYXf/61/xQtkLadqOymVD4gc+1anvR/jxgKqK1ea3lUkZjY4X0wG
+   LBXjhrquJ4MD4zHt1c2ySZQKJs8q98v/DYjH9IDF0WQLHXBFgHf/9+Zj4
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="372798282"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="372798282"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 18:45:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="798465973"
+X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
+   d="scan'208";a="798465973"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 18:45:44 -0700
+Message-ID: <9b3a3e88-21f4-bfd2-a9c3-60a25832e698@intel.com>
+Date:   Tue, 1 Aug 2023 09:45:41 +0800
 MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-2-rananta@google.com>
- <87v8e5r6s6.wl-maz@kernel.org> <CAJHc60wtc2Usei3hKj1ykVRvBZFFCBOHMi9HCxnNvGK2dPFApA@mail.gmail.com>
- <ZMgqueePlmKvgUId@google.com>
-In-Reply-To: <ZMgqueePlmKvgUId@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 31 Jul 2023 17:42:54 -0700
-Message-ID: <CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
-Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
-        Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [RFC PATCH 00/19] QEMU gmem implemention
+Content-Language: en-US
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20230731162201.271114-1-xiaoyao.li@intel.com>
+ <ZMfmkCQImgsinE6T@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ZMfmkCQImgsinE6T@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023 at 2:42=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Jul 31, 2023, Raghavendra Rao Ananta wrote:
-> > On Thu, Jul 27, 2023 at 3:24=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
-rote:
-> > >
-> > > On Sat, 22 Jul 2023 03:22:40 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > From: David Matlack <dmatlack@google.com>
-> > > >
-> > > > Rename kvm_arch_flush_remote_tlb() and the associated macro
-> > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() an=
-d
-> > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
-> > > >
-> > > > Making the name plural matches kvm_flush_remote_tlbs() and makes it=
- more
-> > > > clear that this function can affect more than one remote TLB.
-> > > >
-> > > > No functional change intended.
-> > > >
-> > > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> > > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > > > ---
-> > > >  arch/mips/include/asm/kvm_host.h | 4 ++--
-> > > >  arch/mips/kvm/mips.c             | 2 +-
-> > > >  arch/x86/include/asm/kvm_host.h  | 4 ++--
-> > > >  include/linux/kvm_host.h         | 4 ++--
-> > > >  virt/kvm/kvm_main.c              | 2 +-
-> > > >  5 files changed, 8 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/a=
-sm/kvm_host.h
-> > > > index 04cedf9f8811..9b0ad8f3bf32 100644
-> > > > --- a/arch/mips/include/asm/kvm_host.h
-> > > > +++ b/arch/mips/include/asm/kvm_host.h
-> > > > @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct kvm=
-_vcpu *vcpu, int cpu) {}
-> > > >  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {=
-}
-> > > >  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)=
- {}
-> > > >
-> > > > -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
-> > > > -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
-> > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> > > > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> > >
-> > > How about making this prototype global? I don't see a point in having
-> > > it per-architecture, specially as you are adding arm64 to that mix in
-> > > the following patch.
-> > >
-> > We can make it global, but I'm not sure what was the intention of the
-> > original author. My guess is that he was following the same style that
-> > we have for some of the other kvm_arch_*() functions
-> > (kvm_arch_free_vm() for example)?
->
-> Heh, KVM has a *lot* of code that was written with questionable style.  I=
- agree
-> with Marc, I can't think of a single reason not to have the definition in=
- common
-> code.  Declaring the function doesn't preclude a "static inline" implemen=
-tation,
-> and we could even keep the prototype under an #ifdef, e.g.
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9d3ac7720da9..5ac64f933547 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlb(struct =
-kvm *kvm)
->  {
->         return -ENOTSUPP;
->  }
-> +#else
-> +int kvm_arch_flush_remote_tlb(struct kvm *kvm);
->  #endif
->
->  #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
->
-Thanks for the suggestions; I can go with a common declaration. Along
-with that, do we want to keep defining
-__KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS in the arch code that supports it or
-convert it into a CONFIG_?
+On 8/1/2023 12:51 AM, Daniel P. Berrangé wrote:
+> On Mon, Jul 31, 2023 at 12:21:42PM -0400, Xiaoyao Li wrote:
+>> This is the first RFC version of enabling KVM gmem[1] as the backend for
+>> private memory of KVM_X86_PROTECTED_VM.
+>>
+>> It adds the support to create a specific KVM_X86_PROTECTED_VM type VM,
+>> and introduces 'private' property for memory backend. When the vm type
+>> is KVM_X86_PROTECTED_VM and memory backend has private enabled as below,
+>> it will call KVM gmem ioctl to allocate private memory for the backend.
+>>
+>>      $qemu -object memory-backend-ram,id=mem0,size=1G,private=on \
+>>            -machine q35,kvm-type=sw-protected-vm,memory-backend=mem0 \
+>> 	  ...
+>>
+>> Unfortunately this patch series fails the boot of OVMF at very early
+>> stage due to triple fault because KVM doesn't support emulate string IO
+>> to private memory. We leave it as an open to be discussed.
+>>
+>> There are following design opens that need to be discussed:
+>>
+>> 1. how to determine the vm type?
+>>
+>>     a. like this series, specify the vm type via machine property
+>>        'kvm-type'
+>>     b. check the memory backend, if any backend has 'private' property
+>>        set, the vm-type is set to KVM_X86_PROTECTED_VM.
+>>
+>> 2. whether 'private' property is needed if we choose 1.b as design
+>>
+>>     with 1.b, QEMU can decide whether the memory region needs to be
+>>     private (allocates gmem fd for it) or not, on its own.
+>>
+>> 3. What is KVM_X86_SW_PROTECTED_VM going to look like? What's the
+>>     purose of it and what's the requirement on it. I think it's the
+>>     questions for KVM folks than QEMU folks.
+>>
+>> Any other idea/open/question is welcomed.
+>>
+>>
+>> Beside, TDX QEMU implemetation is based on this series to provide
+>> private gmem for TD private memory, which can be found at [2].
+>> And it can work corresponding KVM [3] to boot TDX guest.
+> 
+> We already have a general purpose configuration mechanism for
+> confidential guests.  The -machine argument has a property
+> confidential-guest-support=$OBJECT-ID, for pointing to an
+> object that implements the TYPE_CONFIDENTIAL_GUEST_SUPPORT
+> interface in QEMU. This is implemented with SEV, PPC PEF
+> mode, and s390 protvirt.
+> 
+> I would expect TDX to follow this same design ie
+> 
+>      qemu-system-x86_64 \
+>        -object tdx-guest,id=tdx0,..... \
+>        -machine q35,confidential-guest-support=tdx0 \
+>        ...
+> 
+> and not require inventing the new 'kvm-type' attribute at least.
 
-- Raghavendra
+yes.
+
+TDX is initialized exactly as the above.
+
+This RFC series introduces the 'kvm-type' for KVM_X86_SW_PROTECTED_VM. 
+It's my fault that forgot to list the option of introducing 
+sw_protected_vm object with CONFIDENTIAL_GUEST_SUPPORT interface.
+Thanks for Isaku to raise it 
+https://lore.kernel.org/qemu-devel/20230731171041.GB1807130@ls.amr.corp.intel.com/
+
+we can specify KVM_X86_SW_PROTECTED_VM this way:
+
+qemu  \
+   -object sw-protected,id=swp0,... \
+   -machine confidential-guest-support=swp0 \
+   ...
+
+> For the memory backend though, I'm not so sure - possibly that
+> might be something that still wants an extra property to identify
+> the type of memory to allocate, since we use memory-backend-ram
+> for a variety of use cases.  Or it could be an entirely new object
+> type such as "memory-backend-gmem"
+
+What I want to discuss is whether providing the interface to users to 
+allow them configuring which memory is/can be private. For example, QEMU 
+can do it internally. If users wants a confidential guest, QEMU 
+allocates private gmem for normal RAM automatically.
+
+
