@@ -2,96 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 052DD76BF77
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 23:46:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A841C76C067
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 00:26:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231593AbjHAVqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 17:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54488 "EHLO
+        id S232292AbjHAW0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 18:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229985AbjHAVqL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 17:46:11 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB091FDA
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 14:46:10 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-31765aee31bso5495551f8f.1
-        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 14:46:10 -0700 (PDT)
+        with ESMTP id S232305AbjHAW0h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 18:26:37 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2090F1BCF
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 15:26:36 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-1bbaa549bcbso5014467fac.3
+        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 15:26:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690926369; x=1691531169;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QBJ9WpbYJ/9qOaI7YWlwMfT+OlnFuNzR3c7GpYDGEyY=;
-        b=PTWbpTp5jpO9QVEY//FoVDp9MyVOi1s3eaWW2v9LHdseq8sUDKYDN2xvI6wmQqXe84
-         Q2bHqmk9dlN2pdK+42rXWMUoGlm+UG5pY21oCFkeC34zJmirsqhfYHNPaZskY5UL/R8p
-         oOjwoqzcMPZ3wp8Z0xmv5X23Rp/9ybrOoc56daS7XzZjcFFYQbIE2ZcLva45HK+GH+83
-         aKlUuk/f3VZ498WxyA8+uqMsqf/kgrXvN/Q7+kGugeUID67K5s/5RLT27GXKTEjxXPSG
-         wI52K7fvRNHJduX+pBRopySDrgerXFWO4UoHKL39Lab5UMAvKGwZBuG5zjyXiVYNwMDi
-         0rVQ==
+        d=ventanamicro.com; s=google; t=1690928795; x=1691533595;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aLZCqoRQcOktEsLifQk+vjPW/U/cqKGOg9FG7whue7A=;
+        b=PxPmoTcCHw88abd1Yceck0AHNGjXgPVAhecUPv8Y8c8TM3VhwZNxfIKcx2KDlNWAkl
+         /2V6X/4VqccEMmtzyEKyW7B5nwbLoMLiacX8H3qtK3FMi7aHz92wwHX2cg215mvLa79U
+         6IOD2tE2h1pTk0M0oJM9o12Hd+3CHZlVFZqaxX/gdfuCvsY9hs7SdRRuuubOlktwMbj6
+         zeAMVWw+G3gAmRWzuCGd7ullnbVJDxmRodxJUJjmDR0+0KhCeCYABDGDveuqZGAFVUe1
+         HyHCkpdZwpIibmxyiL0CA3iz9+E7GryimZRztQlF5Qzbq1ItNUG/62kuyw8L4dR3qFso
+         tRfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690926369; x=1691531169;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBJ9WpbYJ/9qOaI7YWlwMfT+OlnFuNzR3c7GpYDGEyY=;
-        b=ZY2RaK7x/y45A1C/ioJjGHpZOkBgdDnQHwRHlqwl8A/A2aIkD4vMixeqGhWS4Mkvs7
-         Nn8+EOkbtR0Q9ZfYDSKgiRLGlVUwIQz18qTI/ghmZL/TcW7Hlqhs+yji0cgdwXz4E/W0
-         moikBwVNiCX3OXjsnPIePCYHULAsENTjbOl5h0/fpxVXwtOVh1v/0xgPp84/vWAt1qiI
-         d0gByMxP0xBEC6cSRJ95+tCKjmWg9XMwotdfSPio+RkazEA80W0OS2u3CBEoaAbFnhXi
-         uymWtYk3ihPl0/FaF2K3qUUg8Yj9dY0x5X8QsbFta//qj0Vwjnm50nB20auyoLthlCt+
-         mzvA==
-X-Gm-Message-State: ABy/qLZingiLtn0yHuV9aVMksybwasBR23SEiTRbZpMLjphvoBzC/YPa
-        TCP08EVhrQt6/LLAVtYhoRgXkg==
-X-Google-Smtp-Source: APBJJlGlOALsCc5aS8SVhmHPl504oepavvxMjaNckYhr1oXtbiuKXAOQdX6os7LZQQg73XZLcDPvzg==
-X-Received: by 2002:adf:e88f:0:b0:314:35e2:e28d with SMTP id d15-20020adfe88f000000b0031435e2e28dmr3015966wrm.13.1690926369066;
-        Tue, 01 Aug 2023 14:46:09 -0700 (PDT)
-Received: from [192.168.69.115] ([176.176.174.59])
-        by smtp.gmail.com with ESMTPSA id s6-20020a5d6a86000000b003143add4396sm17072761wru.22.2023.08.01.14.46.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Aug 2023 14:46:08 -0700 (PDT)
-Message-ID: <07c4b978-4ad9-c9ff-38d1-d24f4c701dd6@linaro.org>
-Date:   Tue, 1 Aug 2023 23:46:05 +0200
+        d=1e100.net; s=20221208; t=1690928795; x=1691533595;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aLZCqoRQcOktEsLifQk+vjPW/U/cqKGOg9FG7whue7A=;
+        b=QNfCxGrDHhYPATMAUrHu/K2z9xE2RjH4E1lx0dfm+WhSZqdntCyYxpOEMVbzqikNHg
+         Ka1j3+sq+hKLBCI2vdXh/sCuy2z1cSM6Qy3UH4a+gft7jSyDaDkZjT+PJNpa/o+sQrri
+         wc0wmsTVO/KRqv+QLvGIwpUKqUWf8yD4P6FPsG9tPN9LSwyrVGlovzohjBA0buEEcJy5
+         wRPnnFuVoe+ZPVU2ufYBKMDQ/cBt7Ro0ThPElaqyS6jTMwMjqeYTjR1KFxSkKFiTC4i8
+         fstJBlKnAHAIVErSdSXDQzgMmAx+3hVY0z3Wpqem+SEpU24znGGBpj8hJLqvm/ddZ8B3
+         CJJA==
+X-Gm-Message-State: ABy/qLZBiQFjsN/H/337l9N9XBR1ZcTRzKF4t1Yasvd9KZsaSG2PmPlh
+        lSE/ESVgUFdsohDTy7evGbbMpg==
+X-Google-Smtp-Source: APBJJlHT8CdaBi3LBcyMTRdJqroBd6BY6285JRx0YFJlO7dcIHPSMS7xrAPH/GEFLSAMLKP80G7AmQ==
+X-Received: by 2002:a05:6871:a5:b0:1bb:4bad:ebce with SMTP id u37-20020a05687100a500b001bb4badebcemr18624551oaa.27.1690928795375;
+        Tue, 01 Aug 2023 15:26:35 -0700 (PDT)
+Received: from grind.. ([187.11.154.63])
+        by smtp.gmail.com with ESMTPSA id e15-20020a9d6e0f000000b006b94904baf5sm5422429otr.74.2023.08.01.15.26.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 15:26:35 -0700 (PDT)
+From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     anup@brainfault.org, atishp@atishpatra.org,
+        ajones@ventanamicro.com,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Subject: [PATCH v2 0/9] RISC-V: KVM: change get_reg/set_reg error codes
+Date:   Tue,  1 Aug 2023 19:26:20 -0300
+Message-ID: <20230801222629.210929-1-dbarboza@ventanamicro.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH for-8.1] Misc Xen-on-KVM fixes
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, qemu-devel@nongnu.org
-Cc:     Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Anthony PERARD <anthony.perard@citrix.com>
-References: <20230801175747.145906-1-dwmw2@infradead.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230801175747.145906-1-dwmw2@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/8/23 19:57, David Woodhouse wrote:
-> A few minor fixes for the Xen emulation support. One was just merged, but
-> there are three outstanding.
-> 
-> David Woodhouse (3):
->        hw/xen: fix off-by-one in xen_evtchn_set_gsi()
->        i386/xen: consistent locking around Xen singleshot timers
->        hw/xen: prevent guest from binding loopback event channel to itself
-> 
->   hw/i386/kvm/xen_evtchn.c  | 15 +++++++++++----
->   target/i386/kvm/xen-emu.c | 36 ++++++++++++++++++++++++++----------
->   2 files changed, 37 insertions(+), 14 deletions(-)
+Hi,
 
-Thanks, since the series is reviewed, I'm queuing via misc-fixes.
+In this new version 3 new patches (6, 7, 8) were added by Andrew's
+request during the v1 review.
+
+We're now avoiding throwing an -EBUSY error if a reg write is done after
+the vcpu started spinning if the value being written is the same as KVM
+already uses. This follows the design choice made in patch 3, allowing
+for userspace 'lazy write' of registers.
+
+I decided to add 3 patches instead of one because the no-op check made
+in patches 6 and 8 aren't just a matter of doing reg_val = host_val.
+They can be squashed in a single patch if required.
+
+Please check the version 1 cover-letter [1] for the motivation behind
+this work. Patches were based on top of riscv_kvm_queue.
+
+Changes from v1:
+- patches 6,7, 8 (new):
+  - make reg writes a no-op, regardless of vcpu->arch.ran_atleast_once
+    state, if the value being written is the same as the host
+- v1 link: https://lore.kernel.org/kvm/20230731120420.91007-1-dbarboza@ventanamicro.com/
+
+[1] https://lore.kernel.org/kvm/20230731120420.91007-1-dbarboza@ventanamicro.com/
+
+Daniel Henrique Barboza (9):
+  RISC-V: KVM: return ENOENT in *_one_reg() when reg is unknown
+  RISC-V: KVM: use ENOENT in *_one_reg() when extension is unavailable
+  RISC-V: KVM: do not EOPNOTSUPP in set_one_reg() zicbo(m|z)
+  RISC-V: KVM: do not EOPNOTSUPP in set KVM_REG_RISCV_TIMER_REG
+  RISC-V: KVM: use EBUSY when !vcpu->arch.ran_atleast_once
+  RISC-V: KVM: avoid EBUSY when writing same ISA val
+  RISC-V: KVM: avoid EBUSY when writing the same machine ID val
+  RISC-V: KVM: avoid EBUSY when writing the same isa_ext val
+  docs: kvm: riscv: document EBUSY in KVM_SET_ONE_REG
+
+ Documentation/virt/kvm/api.rst |  2 +
+ arch/riscv/kvm/aia.c           |  4 +-
+ arch/riscv/kvm/vcpu_fp.c       | 12 +++---
+ arch/riscv/kvm/vcpu_onereg.c   | 68 +++++++++++++++++++++++-----------
+ arch/riscv/kvm/vcpu_sbi.c      | 16 ++++----
+ arch/riscv/kvm/vcpu_timer.c    | 11 +++---
+ 6 files changed, 71 insertions(+), 42 deletions(-)
+
+-- 
+2.41.0
 
