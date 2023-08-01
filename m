@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CB1476B0FC
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 12:16:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFC0776B199
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 12:19:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234111AbjHAKQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 06:16:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
+        id S234186AbjHAKTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 06:19:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233911AbjHAKQF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233924AbjHAKQF (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Aug 2023 06:16:05 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B366A10FE;
-        Tue,  1 Aug 2023 03:15:53 -0700 (PDT)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2207B10CA;
+        Tue,  1 Aug 2023 03:15:51 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A584D1F8B8;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E60DE21E2D;
         Tue,  1 Aug 2023 10:15:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1690884949; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MzAleRsuTCySPFe84A+gXPJ1xRk+2PmMs0rpvmxAVJo=;
-        b=lAPv0D567zasVy86iHOljiwTIv64Dzhh36jOkApFb1oFSNvI5/K/BCMPspr+gKUp2v6VoB
-        jK500NR9ySEpsw4+u2YrNkkEhWr848Jia3HPjVMp7LMZePWOoIg9vKTTTvvUUfJPVbtUp9
-        oGHEHo1AGeBN89pdlH7XmtTjveZANzY=
+        bh=9kPVFB/FWCYmgOzFJO0/9icFAJgmXM6i+x0H1dAm3OY=;
+        b=CFTq+68z9hB2H8rnMrs9KkeV1hVtKLWmYi3JOQlj8QmDg2HcHq+B/0XUzSE4ZLQI1xYMoQ
+        +EHfTzukdT6VidVHQObf+6Qb5iqvkkDZH+MaWhcBSn0ylz/5g3ilwaRrH1oNCDAtA1J/TA
+        fmBcITOjtyV7CB4vpiFZgo5SEhfOv4g=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1690884949;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MzAleRsuTCySPFe84A+gXPJ1xRk+2PmMs0rpvmxAVJo=;
-        b=Vl3b/zMLLtgQUpsVJZEksprXzq+mwmqic3uWTNf09XfoJXCPQ1d8FgLmKK/RgMiG5C/M/N
-        C9jKQOfFNMhQg8Cw==
+        bh=9kPVFB/FWCYmgOzFJO0/9icFAJgmXM6i+x0H1dAm3OY=;
+        b=Hs6BwvnOK3ekASev7S2vxeqVFZ41mfCN1LeFxVvqNqBBJg+6/1xxv8jdlqlaFPCq6skEDc
+        9yH00yLVA/y84SDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6F137139C8;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AB52E139BD;
         Tue,  1 Aug 2023 10:15:49 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id eIDyGVXbyGQBXQAAMHmgww
+        id oJntKFXbyGQBXQAAMHmgww
         (envelope-from <tzimmermann@suse.de>); Tue, 01 Aug 2023 10:15:49 +0000
 From:   Thomas Zimmermann <tzimmermann@suse.de>
 To:     deller@gmx.de, javierm@redhat.com, sam@ravnborg.org
@@ -54,10 +54,11 @@ Cc:     linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org,
         linux-arm-kernel@lists.infradead.org,
         linux-geode@lists.infradead.org, linux-omap@vger.kernel.org,
-        kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>
-Subject: [PATCH v2 10/47] fbdev/fm2fb: Use fbdev I/O helpers
-Date:   Tue,  1 Aug 2023 12:13:15 +0200
-Message-ID: <20230801101541.900-11-tzimmermann@suse.de>
+        kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>,
+        Timur Tabi <timur@kernel.org>
+Subject: [PATCH v2 11/47] fbdev/fsl-diu-fb: Use fbdev I/O helpers
+Date:   Tue,  1 Aug 2023 12:13:16 +0200
+Message-ID: <20230801101541.900-12-tzimmermann@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230801101541.900-1-tzimmermann@suse.de>
 References: <20230801101541.900-1-tzimmermann@suse.de>
@@ -86,43 +87,47 @@ v2:
 Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
 Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 Acked-by: Helge Deller <deller@gmx.de>
+Cc: Timur Tabi <timur@kernel.org>
 ---
- drivers/video/fbdev/Kconfig | 4 +---
- drivers/video/fbdev/fm2fb.c | 4 +---
+ drivers/video/fbdev/Kconfig      | 4 +---
+ drivers/video/fbdev/fsl-diu-fb.c | 4 +---
  2 files changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
-index be7c99154d32..fe62de330326 100644
+index fe62de330326..d225bd2d47a9 100644
 --- a/drivers/video/fbdev/Kconfig
 +++ b/drivers/video/fbdev/Kconfig
-@@ -269,9 +269,7 @@ config FB_AMIGA_AGA
- config FB_FM2
- 	bool "Amiga FrameMaster II/Rainbow II support"
- 	depends on (FB = y) && ZORRO
+@@ -1661,10 +1661,8 @@ config PXA3XX_GCU
+ config FB_FSL_DIU
+ 	tristate "Freescale DIU framebuffer support"
+ 	depends on FB && FSL_SOC
++	select FB_IOMEM_HELPERS
+ 	select FB_MODE_HELPERS
 -	select FB_CFB_FILLRECT
 -	select FB_CFB_COPYAREA
 -	select FB_CFB_IMAGEBLIT
-+	select FB_IOMEM_HELPERS
+ 	select PPC_LIB_RHEAP
  	help
- 	  This is the frame buffer device driver for the Amiga FrameMaster
- 	  card from BSC (exhibited 1992 but not shipped as a CBM product).
-diff --git a/drivers/video/fbdev/fm2fb.c b/drivers/video/fbdev/fm2fb.c
-index 4dcb9dd79bf8..25d2e716edf2 100644
---- a/drivers/video/fbdev/fm2fb.c
-+++ b/drivers/video/fbdev/fm2fb.c
-@@ -167,11 +167,9 @@ static int fm2fb_blank(int blank, struct fb_info *info);
+ 	  Framebuffer driver for the Freescale SoC DIU
+diff --git a/drivers/video/fbdev/fsl-diu-fb.c b/drivers/video/fbdev/fsl-diu-fb.c
+index c62b48f27ba9..7fbd9f069ac2 100644
+--- a/drivers/video/fbdev/fsl-diu-fb.c
++++ b/drivers/video/fbdev/fsl-diu-fb.c
+@@ -1451,13 +1451,11 @@ static int fsl_diu_release(struct fb_info *info, int user)
  
- static const struct fb_ops fm2fb_ops = {
- 	.owner		= THIS_MODULE,
+ static const struct fb_ops fsl_diu_ops = {
+ 	.owner = THIS_MODULE,
 +	FB_DEFAULT_IOMEM_OPS,
- 	.fb_setcolreg	= fm2fb_setcolreg,
- 	.fb_blank	= fm2fb_blank,
--	.fb_fillrect	= cfb_fillrect,
--	.fb_copyarea	= cfb_copyarea,
--	.fb_imageblit	= cfb_imageblit,
- };
- 
-     /*
+ 	.fb_check_var = fsl_diu_check_var,
+ 	.fb_set_par = fsl_diu_set_par,
+ 	.fb_setcolreg = fsl_diu_setcolreg,
+ 	.fb_pan_display = fsl_diu_pan_display,
+-	.fb_fillrect = cfb_fillrect,
+-	.fb_copyarea = cfb_copyarea,
+-	.fb_imageblit = cfb_imageblit,
+ 	.fb_ioctl = fsl_diu_ioctl,
+ 	.fb_open = fsl_diu_open,
+ 	.fb_release = fsl_diu_release,
 -- 
 2.41.0
 
