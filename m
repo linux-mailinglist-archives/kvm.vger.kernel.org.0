@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA44076ABCA
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:03:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5412176ABC2
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232278AbjHAJDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:03:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60416 "EHLO
+        id S230459AbjHAJD2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:03:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232343AbjHAJCS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232349AbjHAJCS (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 1 Aug 2023 05:02:18 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAFA2133;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 085F0213C;
         Tue,  1 Aug 2023 02:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690880522; x=1722416522;
+  t=1690880523; x=1722416523;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tXI/C++YYSo9nyQMGnRVNwF3YsuprVE9KCho8shF7bg=;
-  b=jPHzGkVNmkxGysETGlvT76GokNjDWLuUXoZ4aaAiCXXiGiN8TSigDVrM
-   uf4uevTfUMBBISzDFLEZeWDQyKtpWK/bxdwf0WTIFjE9Iizi7vNqIY4GH
-   Tp+KGxskE9YVlowT0FZtFM08q/JHua2iVjJdnbDdOOrRCkwlu3zxQi2D3
-   h7VxlHojTCZHHbNd6/aWMJM5HDwu/KR9Jr7aqWvSDMEXr9EtyGwkHHuzM
-   oU6sjMqAkIrduI9Idd0318nY8PuP5+jdA2y8QaATSykCMBTwtnhcRUJms
-   OJMNQSJaqht8G3yMdXTESBTbmigIohXOiEzLM+XPnt/h+AwDe4FP7RD6p
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082168"
+  bh=F/SemwGNBG6weEZopYj3iIwsf6sy0XGLv5PanieJeUc=;
+  b=dPP6xqQb3UM1JvCDFEjkyH1pxJI9p6J+WEF4KKogruxiTexRvgP+VroF
+   14bFOo848wqHcjsFaOo3dDYteXdN/oNYkFWAO3si4BpM+CzQAZUE1uneE
+   ByP7ghTc5GzzMvad3h+II8vTx7RLC4JelZQbSHETwF53gWBgaEDMHClfc
+   +A+PguiHDeSNcswt5kLwOEEgvpV3AZOgH15/8NLzogU4Gg+JfqLIipTeX
+   tOaacYYJpGN8kz86QyHGYGFD7A55TNzee/DKFjbXT97/iUcpXi3qh+Vte
+   wyO6xF5aoDs5FkytsV8BhrYt6Uc1WGyBoXgFjZDQsaPOmNxwdwuP7oOUk
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082200"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="433082168"
+   d="scan'208";a="433082200"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:01:54 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:01:55 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975216959"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975216963"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="975216959"
+   d="scan'208";a="975216963"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:01:53 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:01:54 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH RESEND v9 04/36] x86/cpufeatures: Add the cpu feature bit for FRED
-Date:   Tue,  1 Aug 2023 01:32:46 -0700
-Message-Id: <20230801083318.8363-5-xin3.li@intel.com>
+Subject: [PATCH RESEND v9 05/36] x86/opcode: Add ERETU, ERETS instructions to x86-opcode-map
+Date:   Tue,  1 Aug 2023 01:32:47 -0700
+Message-Id: <20230801083318.8363-6-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801083318.8363-1-xin3.li@intel.com>
 References: <20230801083318.8363-1-xin3.li@intel.com>
@@ -126,40 +126,44 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add the CPU feature bit for FRED.
+Add instruction opcodes used by FRED ERETU/ERETS to x86-opcode-map.
+
+Opcode numbers are per FRED spec v5.0.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/asm/cpufeatures.h       | 1 +
- tools/arch/x86/include/asm/cpufeatures.h | 1 +
- 2 files changed, 2 insertions(+)
+ arch/x86/lib/x86-opcode-map.txt       | 2 +-
+ tools/arch/x86/lib/x86-opcode-map.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index cb8ca46213be..fd3ddd5c0283 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -317,6 +317,7 @@
- #define X86_FEATURE_FZRM		(12*32+10) /* "" Fast zero-length REP MOVSB */
- #define X86_FEATURE_FSRS		(12*32+11) /* "" Fast short REP STOSB */
- #define X86_FEATURE_FSRC		(12*32+12) /* "" Fast short REP {CMPSB,SCASB} */
-+#define X86_FEATURE_FRED		(12*32+17) /* Flexible Return and Event Delivery */
- #define X86_FEATURE_LKGS		(12*32+18) /* "" Load "kernel" (userspace) GS */
- #define X86_FEATURE_AMX_FP16		(12*32+21) /* "" AMX fp16 Support */
- #define X86_FEATURE_AVX_IFMA            (12*32+23) /* "" Support for VPMADD52[H,L]UQ */
-diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
-index cb8ca46213be..fd3ddd5c0283 100644
---- a/tools/arch/x86/include/asm/cpufeatures.h
-+++ b/tools/arch/x86/include/asm/cpufeatures.h
-@@ -317,6 +317,7 @@
- #define X86_FEATURE_FZRM		(12*32+10) /* "" Fast zero-length REP MOVSB */
- #define X86_FEATURE_FSRS		(12*32+11) /* "" Fast short REP STOSB */
- #define X86_FEATURE_FSRC		(12*32+12) /* "" Fast short REP {CMPSB,SCASB} */
-+#define X86_FEATURE_FRED		(12*32+17) /* Flexible Return and Event Delivery */
- #define X86_FEATURE_LKGS		(12*32+18) /* "" Load "kernel" (userspace) GS */
- #define X86_FEATURE_AMX_FP16		(12*32+21) /* "" AMX fp16 Support */
- #define X86_FEATURE_AVX_IFMA            (12*32+23) /* "" Support for VPMADD52[H,L]UQ */
+diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
+index 5168ee0360b2..7a269e269dc0 100644
+--- a/arch/x86/lib/x86-opcode-map.txt
++++ b/arch/x86/lib/x86-opcode-map.txt
+@@ -1052,7 +1052,7 @@ EndTable
+ 
+ GrpTable: Grp7
+ 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
+-1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
++1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
+ 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
+ 3: LIDT Ms
+ 4: SMSW Mw/Rv
+diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
+index 5168ee0360b2..7a269e269dc0 100644
+--- a/tools/arch/x86/lib/x86-opcode-map.txt
++++ b/tools/arch/x86/lib/x86-opcode-map.txt
+@@ -1052,7 +1052,7 @@ EndTable
+ 
+ GrpTable: Grp7
+ 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
+-1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
++1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
+ 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
+ 3: LIDT Ms
+ 4: SMSW Mw/Rv
 -- 
 2.34.1
 
