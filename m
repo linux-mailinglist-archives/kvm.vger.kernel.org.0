@@ -2,148 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E90A76B5F3
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 15:34:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E22EE76B617
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 15:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234305AbjHANey (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 09:34:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
+        id S231712AbjHANmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 09:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234258AbjHANew (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 09:34:52 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 973E02106;
-        Tue,  1 Aug 2023 06:34:51 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 371DRKG7001250;
-        Tue, 1 Aug 2023 13:34:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cK429b0FcGCFUk2aLPITRcBVYx+mW7Fievvdn9e9caU=;
- b=jrcixVzVPyZAbdsJbhRjESSnSHUu7pPAjoXR6E1+tg7rI9M5uFGvR5UIxyVvU7R3D123
- cAor0PFvH76boHAYFIhn9BIxBBEQsmEt+rJ1oSVzyImIO66OgP7X1K93Eu/SggDG9EGX
- zKsqfFeqYR/80IH4Cjb8e1vmFlBtbWQScBp/FPhdKU84pTQy4pjZvBg4GwSoKjOERQ1Q
- JqbN8GYUwftJcbmfeUznv463Kt+zmVxSig1XATEKAUVmKr/trgtFcBjwhqfUM0qzmHdW
- vYtQFsyzu09iE8JKHhGgh6wLt0thAiVc+/cCiw+MmcXHSOoWcsyvAXDKK7Os9WoJqpwQ Xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s72xwrapp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Aug 2023 13:34:50 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 371DSHnD005549;
-        Tue, 1 Aug 2023 13:34:50 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s72xwrakf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Aug 2023 13:34:49 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 371D1W5A014545;
-        Tue, 1 Aug 2023 13:34:47 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s5ft1bhue-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 01 Aug 2023 13:34:47 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 371DYiQq19726912
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 1 Aug 2023 13:34:44 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE6D02004D;
-        Tue,  1 Aug 2023 13:34:44 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55A8620043;
-        Tue,  1 Aug 2023 13:34:44 +0000 (GMT)
-Received: from [9.171.20.151] (unknown [9.171.20.151])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue,  1 Aug 2023 13:34:44 +0000 (GMT)
-Message-ID: <b5c1b495-cd59-e42e-a902-50f5fef0fad0@linux.ibm.com>
-Date:   Tue, 1 Aug 2023 15:34:44 +0200
+        with ESMTP id S230472AbjHANmm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 09:42:42 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A90E10DB;
+        Tue,  1 Aug 2023 06:42:40 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 6C225120015;
+        Tue,  1 Aug 2023 16:42:38 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 6C225120015
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1690897358;
+        bh=leUECNb8m0aTy27Ms8IWUwmaM7nT+VfrQeB1YRQ7PRE=;
+        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+        b=UyvC5thzyDUMbLNyNgezSMelIBa4AdyRq33D36Oz2MgRg7aZtgsruG9uNAKNxyvGp
+         KizF7dCVBi+ANgYqRF7qLhQQ65Da6ZfW7rnz9beyjFyhMdhQoE06Q3YatpNzx9KblD
+         731+VtzcdyptnsKUp3UACtbZDcJtoTrHDwVP0e4KP/MLJbs9PdMC/vKkHQSz6xPcPE
+         arGWV/hO+P2j8d4y2hkHliNA3dHIgo4TXt/GfGTzviTaQDi3Y9XYKWtewo1E8xJDxU
+         u0VcAp14ZD+Kgp9zbeevgEiR5TuUXKU6QGdTzSBCJ3WV/mq5K7Kg1s10r9wpCS7/u3
+         sNk+Twy36uCeA==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Tue,  1 Aug 2023 16:42:38 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 1 Aug 2023 16:42:34 +0300
+Message-ID: <1c9f9851-2228-c92b-ce3d-6a84d44e6628@sberdevices.ru>
+Date:   Tue, 1 Aug 2023 16:36:55 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 1/2] KVM: s390: add stat counter for shadow gmap events
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        borntraeger@linux.ibm.com, imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230510121822.546629-1-nrb@linux.ibm.com>
- <20230510121822.546629-2-nrb@linux.ibm.com>
- <e0b2195a-6f60-6a49-cf3f-4a528eb2df43@redhat.com>
- <169089049005.9734.15826596498609647664@t14-nrb>
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v5 4/4] vsock/virtio: MSG_ZEROCOPY flag support
 Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <169089049005.9734.15826596498609647664@t14-nrb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230730085905.3420811-1-AVKrasnov@sberdevices.ru>
+ <20230730085905.3420811-5-AVKrasnov@sberdevices.ru>
+ <8a7772a50a16fbbcb82fc0c5e09f9e31f3427e3d.camel@redhat.com>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <8a7772a50a16fbbcb82fc0c5e09f9e31f3427e3d.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cQv0XrRboZ4ou3iJ2lmyQ3Wkk-Vg6061
-X-Proofpoint-ORIG-GUID: QQ_78cMSH7Tiy63XkRAEQKFCznVfLBlM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-01_09,2023-08-01_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- mlxscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 spamscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308010123
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/1/23 13:48, Nico Boehr wrote:
-> Quoting David Hildenbrand (2023-07-27 09:37:21)
+
+
+On 01.08.2023 16:34, Paolo Abeni wrote:
+> On Sun, 2023-07-30 at 11:59 +0300, Arseniy Krasnov wrote:
+>> +static int virtio_transport_fill_skb(struct sk_buff *skb,
+>> +				     struct virtio_vsock_pkt_info *info,
+>> +				     size_t len,
+>> +				     bool zcopy)
+>> +{
+>> +	if (zcopy) {
+>> +		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
+>> +					      &info->msg->msg_iter,
+>> +					      len);
+>> +	} else {
+> 
+> 
+> No need for an else statement after 'return'
+> 
+>> +		void *payload;
+>> +		int err;
+>> +
+>> +		payload = skb_put(skb, len);
+>> +		err = memcpy_from_msg(payload, info->msg, len);
+>> +		if (err)
+>> +			return -1;
+>> +
+>> +		if (msg_data_left(info->msg))
+>> +			return 0;
+>> +
+> 
+> This path does not update truesize, evem if it increases the skb len...
+
+Thanks, I'll fix it.
+
+> 
+>> +		return 0;
+>> +	}
+>> +}
+> 
 > [...]
->>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->>> index 2bbc3d54959d..d35e03e82d3d 100644
->>> --- a/arch/s390/include/asm/kvm_host.h
->>> +++ b/arch/s390/include/asm/kvm_host.h
->>> @@ -777,6 +777,12 @@ struct kvm_vm_stat {
->>>        u64 inject_service_signal;
->>>        u64 inject_virtio;
->>>        u64 aen_forward;
->>> +     u64 gmap_shadow_acquire;
->>> +     u64 gmap_shadow_r1_te;
->>> +     u64 gmap_shadow_r2_te;
->>> +     u64 gmap_shadow_r3_te;
->>> +     u64 gmap_shadow_sg_te;
->>> +     u64 gmap_shadow_pg_te;
->>
->> Is "te" supposed to stand for "table entry" ?
 > 
-> Yes.
+>> @@ -214,6 +251,70 @@ static u16 virtio_transport_get_type(struct sock *sk)
+>>  		return VIRTIO_VSOCK_TYPE_SEQPACKET;
+>>  }
+>>  
+>> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
+>> +						  struct virtio_vsock_pkt_info *info,
+>> +						  size_t payload_len,
+>> +						  bool zcopy,
+>> +						  u32 src_cid,
+>> +						  u32 src_port,
+>> +						  u32 dst_cid,
+>> +						  u32 dst_port)
+>> +{
+>> +	struct sk_buff *skb;
+>> +	size_t skb_len;
+>> +
+>> +	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
+>> +
+>> +	if (!zcopy)
+>> +		skb_len += payload_len;
+>> +
+>> +	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>> +	if (!skb)
+>> +		return NULL;
+>> +
+>> +	virtio_transport_init_hdr(skb, info, src_cid, src_port,
+>> +				  dst_cid, dst_port,
+>> +				  payload_len);
+>> +
+>> +	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
+>> +	 * owner of skb without check to update 'sk_wmem_alloc'.
+>> +	 */
+>> +	if (vsk)
+>> +		skb_set_owner_w(skb, sk_vsock(vsk));
 > 
->> If so, I'd suggest to just call this gmap_shadow_pg_entry etc.
+> ... which can lead to bad things(TM) if the skb goes trough some later
+> non trivial processing, due to the above skb_set_owner_w().
 > 
-> Janosch, since you suggested the current naming, are you OK with _entry?
+> Additionally can be the following condition be true:
+> 
+> 	vsk == NULL && (info->msg && payload_len > 0) && zcopy
+> 
+> ???
 
-Sure
+No, vsk == NULL only when we reset connection, in that case both info->msg == NULL and payload_len == 0,
+as this is control message without any data.
 
 > 
-> [...]
->>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
->>> index 8d6b765abf29..beb3be037722 100644
->>> --- a/arch/s390/kvm/vsie.c
->>> +++ b/arch/s390/kvm/vsie.c
->>> @@ -1221,6 +1221,7 @@ static int acquire_gmap_shadow(struct kvm_vcpu *vcpu,
->>>        if (IS_ERR(gmap))
->>>                return PTR_ERR(gmap);
->>>        gmap->private = vcpu->kvm;
->>> +     vcpu->kvm->stat.gmap_shadow_acquire++;
->>
->>
->> Do you rather want to have events for
->>
->> gmap_shadow_reuse (if gmap_shadow_valid() succeeded in that function)
->> gmap_shadow_create (if we have to create a new one via gmap_shadow)
->>
->> ?
+> If so it looks like skb can go through __zerocopy_sg_from_iter() even
+> without a prior skb_set_owner_w()...
 > 
-> Yeah, good suggestion. I'll add that.
+> 
+> Cheers,
+> 
+> Paolo
+>
 
+Thanks, Arseniy
+ 
