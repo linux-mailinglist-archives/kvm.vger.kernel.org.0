@@ -2,130 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58EB876BDB5
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 21:27:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C19576BDE9
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 21:38:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230190AbjHAT1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 15:27:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54410 "EHLO
+        id S229781AbjHATin (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 15:38:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232210AbjHAT1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 15:27:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02ECEAC
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 12:26:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690917949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wSvNrFp0NYCS/oIN6QKA9aBM8ubANQEi3P7nUmYukh0=;
-        b=MIqhAWGR0SHDpdZZRb6qu+dr/LpsKfJIs0+1bwirVSz2CcUZNmd00xWGjVKZxOQbZdHBFi
-        tnwEHDwqQI5W30oXofShMQtB5WX5H80fZ2HoaSnRtqevhf2W8c8Kht7WERmBDMM3PssJpc
-        ur2su4uJ2Oj7pqLqW4+8zB7mjzQBY2o=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-654-QGNxz7-rMZuKksCb0Ucr3g-1; Tue, 01 Aug 2023 15:24:55 -0400
-X-MC-Unique: QGNxz7-rMZuKksCb0Ucr3g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8AE063815F66
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 19:24:45 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EAD0240C1258;
-        Tue,  1 Aug 2023 19:24:44 +0000 (UTC)
-Date:   Tue, 1 Aug 2023 15:24:43 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, sgarzare@redhat.com
-Subject: Re: VFIO_IOMMU_GET_INFO capability struct alignment
-Message-ID: <20230801192443.GB1414936@fedora>
-References: <20230801153846.GA1371443@fedora>
- <20230801101730.607d96ab.alex.williamson@redhat.com>
+        with ESMTP id S230200AbjHATim (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 15:38:42 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF0A1BD2;
+        Tue,  1 Aug 2023 12:38:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=XUuRgq2k+Zj7Cps3kG/jmE/mhHsCYkzavBA/LPVkFBs=; b=Wz9WQRmaRg/E+Ch1uLomywiHG9
+        Kctv8SAbWFkSD80DO0V85EHiSrP184T3HkcHveFUbE/hX7nSLfTXDNYyRyhponOVPU1isCpY9mFva
+        iRdqC0gGuYKtFBoNmtODHcFboqDDS8xZv2WJMwpm0pDqTcoku+Kjiq3cyuxxzstnMLd/O0qXMW4KQ
+        ap+/QwD7ELm1eY77mkO0113XZ+jEX62ePbeCXzB85T+I57Tn9vkKbNNNdbeD6BJ6BbGCr6iuoF6Y3
+        7FvWtffJxNd09NM6KgUsS1YCWz7YNUM4ao/o2+m+6193b3GAcjPnaQpuWYOpNg0UyYizdoWAjoH6B
+        tocYya/g==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qQvBo-00AdLA-Kn; Tue, 01 Aug 2023 19:37:52 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3C3FC3002D3;
+        Tue,  1 Aug 2023 21:37:51 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id DAE66201BD3C3; Tue,  1 Aug 2023 21:37:50 +0200 (CEST)
+Date:   Tue, 1 Aug 2023 21:37:50 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org, Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Tony Luck <tony.luck@intel.com>,
+        "K . Y . Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Breno Leitao <leitao@debian.org>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Brian Gerst <brgerst@gmail.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Alexander Potapenko <glider@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Ze Gao <zegao2021@gmail.com>, Fei Li <fei1.li@intel.com>,
+        Conghui <conghui.chen@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Yantengsi <siyanteng@loongson.cn>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Sathvika Vasireddy <sv@linux.ibm.com>
+Subject: Re: [PATCH RESEND v9 33/36] KVM: VMX: Add VMX_DO_FRED_EVENT_IRQOFF
+ for IRQ/NMI handling
+Message-ID: <20230801193750.GA119080@hirez.programming.kicks-ass.net>
+References: <20230801083553.8468-1-xin3.li@intel.com>
+ <20230801083553.8468-7-xin3.li@intel.com>
+ <ZMlWe5TgS6HM98Mg@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="pgpGrWVkZzo7+5tC"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230801101730.607d96ab.alex.williamson@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZMlWe5TgS6HM98Mg@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Aug 01, 2023 at 07:01:15PM +0000, Sean Christopherson wrote:
+> The spec I have from May 2022 says the NMI bit colocated with CS, not SS.  And
+> the cover letter's suggestion to use a search engine to find the spec ain't
+> exactly helpful, that just gives me the same "May 2022 Revision 3.0" spec.  So
+> either y'all have a spec that I can't find, or this is wrong.
 
---pgpGrWVkZzo7+5tC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+https://intel.com/sdm
 
-On Tue, Aug 01, 2023 at 10:17:30AM -0600, Alex Williamson wrote:
-> On Tue, 1 Aug 2023 11:38:46 -0400
-> Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > Hi,
-> > It appears that ioctl(VFIO_IOMMU_GET_INFO) can produce misaligned
-> > capability structures. Userspace workarounds exist but I wanted to ask
-> > whether the kernel can align capability structures to save all userspace
-> > programs the trouble?
-> >=20
-> > The issue is:
-> >=20
-> >   struct vfio_iommu_type1_info_dma_avail {
-> >           struct vfio_info_cap_header header;              /*     0    =
- 8 */
-> >           __u32                      avail;                /*     8    =
- 4 */
-> >  =20
-> >           /* size: 12, cachelines: 1, members: 2 */
-> >           /* last cacheline: 12 bytes */
-> >   };
-> >=20
-> > Once this capability is added, the next capability will be 4-byte
-> > aligned but not 8-byte aligned. If there are __u64 fields in the next
-> > capability, then they will be misaligned.
-> >=20
-> > This was noticed when investigating a bug in userspace code that uses
-> > ioctl(VFIO_IOMMU_GET_INFO):
-> > https://gitlab.com/pci-driver/pci-driver/-/merge_requests/2#note_149573=
-4084
-> >=20
-> > One possible solution is to modify vfio_info_cap_add() so that
-> > capability structures are always rounded up to 8 bytes. This does not
-> > break the uapi because capability structure offsets are described at
-> > runtime via the cap_offset and header->next fields. Existing userspace
-> > programs would continue to work and all programs would find that
-> > capability structures are now aligned.
->=20
-> Yes, I think the helpers should automatically align each added
-> capability.  Thanks,
-
-Thanks, I will give it a try and post a patch.
-
-Stefan
-
---pgpGrWVkZzo7+5tC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmTJW/sACgkQnKSrs4Gr
-c8g7rwf/e0PFzwRvPdZyNPyn5CLYAm6s17FJvQ+8QBym8ddJOQO0anZHH2gTbfd0
-GZMXHMJMPODVS+FW+CDHF/DtafgNZGrRw3pKAL5Q0Qvdzzm0QKefpMwPfU9ksedB
-FIRq6NfVFB73LJvE8NLjkSlTnZCFLxiDtNCIDCE3rD/avd6v1RRB40/qxSUDhJ3B
-I0NwlnmxUGtr7AlpuN9NA40EJFy2lOd/fFtBXRYn5QqUislwnnJoHvEj1bWLeYN7
-tKF0uPbu55z0Pnlk+NIovp6rYQG70C/5J7O1/0/Owk88/C7KxWJuT33jTP/DyZHH
-YUQIZil6VUKPSAKY2+rLTm0Yl8bDww==
-=+x6C
------END PGP SIGNATURE-----
-
---pgpGrWVkZzo7+5tC--
-
+is a useful shorthand I've recently been told about. On that page is
+also "Flexible Return and Event Delivery Specification", when clicked it
+will gift you a FRED v5.0 PDF.
