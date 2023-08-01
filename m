@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E10076ABD6
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:03:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38F7476ABDC
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:03:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232412AbjHAJDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59850 "EHLO
+        id S232437AbjHAJDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232476AbjHAJCx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:02:53 -0400
+        with ESMTP id S232496AbjHAJC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:02:56 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5351A2D41;
-        Tue,  1 Aug 2023 02:02:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 139CB1FF5;
+        Tue,  1 Aug 2023 02:02:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690880535; x=1722416535;
+  t=1690880538; x=1722416538;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ks9fQ3QR6UqRMocjQpLz+yk1iYvQPVTbiFl2BDd8yPg=;
-  b=I1loXoeE3vzkjwBPhU2sYpo5+qnRfwc6Og74gZvtkUr590rQAr353XX7
-   hsYwU03p/mAF+0QWv5SNFC+i457wFUd+Sq43pR8VYtB3onnBOPEXsDKk0
-   JJC6K+Oz+/PuaQNjD734bZSrALKbP/g0p22ehRiv0HrDI/GyCIQ7btKH7
-   8dXrSZ7a6ULfk/q0OvzSiJSOhy30AV3oD5Gc2ARiDZGejreAX4JQ9WcoZ
-   2Xn1fVhGBZHGHTZi+RpaRSzKr0cP+zzgfhcVU4mTniwPZ7HPF5jmEKI3N
-   BQqEZwZ2mzxVUSK7p6u6g6Bd+EcdszJa6U96dPhrQsIfvQl+StdC7tqj5
+  bh=4BQfFZvfF2FO6NJuqP2rESZLyKeNKRqaVIW2rUp/ej0=;
+  b=EwTLWwdhFuaQuVjzQFP3BrfPgz9gPbMn0hDPHSWZGbllMCBXYfn3mf1G
+   1yYbCckrcWiDmEDey3V7yh3xQu/7CtGQ9X2IvvejHKAY6ipmZTedFyJDi
+   u1lqBlc47IlLRVcKtsg1MlPE+Fj9z5BKTnVu4tDV5lhh5p9SIJgUrA3/9
+   ntqVUd0iVTj6rODU+sK78CQCBbegE1GcWtMe2sT3BE5Wpmq72W9hd/Ika
+   yJXNjCQC7Czy7ZJr7kknCTkCYpVqTnUhAkqDn0c9bSzlSRBabkJ/MAAc2
+   CWuFL4/I6SqODcBzPWA7P53jbxUlVAh7hBZn8UwCbquCmrgypmxqroq2W
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082266"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082299"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="433082266"
+   d="scan'208";a="433082299"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:01:57 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:01:58 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975216979"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975216988"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="975216979"
+   d="scan'208";a="975216988"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:01:56 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:01:57 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH RESEND v9 07/36] x86/cpu: Add X86_CR4_FRED macro
-Date:   Tue,  1 Aug 2023 01:32:49 -0700
-Message-Id: <20230801083318.8363-8-xin3.li@intel.com>
+Subject: [PATCH RESEND v9 08/36] x86/cpu: Add MSR numbers for FRED configuration
+Date:   Tue,  1 Aug 2023 01:32:50 -0700
+Message-Id: <20230801083318.8363-9-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801083318.8363-1-xin3.li@intel.com>
 References: <20230801083318.8363-1-xin3.li@intel.com>
@@ -126,83 +126,67 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add X86_CR4_FRED macro for the FRED bit in %cr4. This bit should be a
-pinned bit, not to be changed after initialization.
+Add MSR numbers for the FRED configuration registers.
 
-CR4 macros are defined in arch/x86/include/uapi/asm/processor-flags.h,
-which is uapi, and thus cannot depend on CONFIG_X86_64.
-
-Using _BITUL() causes build errors on 32 bits, and there is no
-guarantee that user space applications (e.g. something like Qemu)
-might not want to use this declaration even when building for i386 or
-x32.
-
-However, %cr4 is a machine word (unsigned long), so to avoid build
-warnings on 32 bits, explicitly cast the value to unsigned long,
-truncating upper 32 bits.
-
-The other alternative would be to use CONFIG_X86_64 around the
-definition of cr4_pinned_mask. It is probably not desirable to make
-cr4_pinned_mask non-const.
-
-Another option, which may be preferable, to be honest: explicitly
-enumerate the CR4 bits which *may* be changed (a whitelist), instead
-of the ones that may not. That would be a separate, pre-FRED, patch,
-and would automatically resolve this problem as a side effect.
-
-The following flags probably should have been in this set all along,
-as they are all controls affecting the kernel runtime environment as
-opposed to user space:
-
-X86_CR4_DE, X86_CR4_PAE, X86_CR4_PSE, X86_CR4_MCE, X86_CR4_PGE,
-X86_CR4_OSFXSR, X86_CR4_OSXMMEXCPT, X86_CR4_LA57, X86_CR4_PCIDE,
-X86_CR4_LAM_SUP
-
-Possibly X86_CR4_VMXE as well, which seems harmless even if KVM is
-not loaded; X86_CR4_PKE can be fixed as long as the PKE configuration
-registers are at least initialized to disabled.
-
-It is relatively simple to do an audit of which flags are allowed to
-be modified at runtime and whitelist only those. There is no reason
-why we should allow bits in CR4 to be toggled by default.
-
+Originally-by: Megha Dey <megha.dey@intel.com>
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/include/uapi/asm/processor-flags.h | 2 ++
- arch/x86/kernel/cpu/common.c                | 5 +++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/msr-index.h       | 13 ++++++++++++-
+ tools/arch/x86/include/asm/msr-index.h | 13 ++++++++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/uapi/asm/processor-flags.h b/arch/x86/include/uapi/asm/processor-flags.h
-index d898432947ff..ce08c2ca70b5 100644
---- a/arch/x86/include/uapi/asm/processor-flags.h
-+++ b/arch/x86/include/uapi/asm/processor-flags.h
-@@ -138,6 +138,8 @@
- #define X86_CR4_CET		_BITUL(X86_CR4_CET_BIT)
- #define X86_CR4_LAM_SUP_BIT	28 /* LAM for supervisor pointers */
- #define X86_CR4_LAM_SUP		_BITUL(X86_CR4_LAM_SUP_BIT)
-+#define X86_CR4_FRED_BIT	32 /* enable FRED kernel entry */
-+#define X86_CR4_FRED		_BITULL(X86_CR4_FRED_BIT)
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index a00a53e15ab7..111fb76f6dbe 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -36,8 +36,19 @@
+ #define EFER_FFXSR		(1<<_EFER_FFXSR)
+ #define EFER_AUTOIBRS		(1<<_EFER_AUTOIBRS)
  
- /*
-  * x86-64 Task Priority Register, CR8
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 0ba1067f4e5f..331b06d19f7f 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -402,8 +402,9 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
+-/* Intel MSRs. Some also available on other CPUs */
++/* FRED MSRs */
++#define MSR_IA32_FRED_RSP0	0x1cc /* Level 0 stack pointer */
++#define MSR_IA32_FRED_RSP1	0x1cd /* Level 1 stack pointer */
++#define MSR_IA32_FRED_RSP2	0x1ce /* Level 2 stack pointer */
++#define MSR_IA32_FRED_RSP3	0x1cf /* Level 3 stack pointer */
++#define MSR_IA32_FRED_STKLVLS	0x1d0 /* Exception stack levels */
++#define MSR_IA32_FRED_SSP0	MSR_IA32_PL0_SSP /* Level 0 shadow stack pointer */
++#define MSR_IA32_FRED_SSP1	0x1d1 /* Level 1 shadow stack pointer */
++#define MSR_IA32_FRED_SSP2	0x1d2 /* Level 2 shadow stack pointer */
++#define MSR_IA32_FRED_SSP3	0x1d3 /* Level 3 shadow stack pointer */
++#define MSR_IA32_FRED_CONFIG	0x1d4 /* Entrypoint and interrupt stack level */
  
- /* These bits should not change their value after CPU init is finished. */
- static const unsigned long cr4_pinned_mask =
--	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
--	X86_CR4_FSGSBASE | X86_CR4_CET;
-+	(unsigned long)
-+	(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
-+	 X86_CR4_FSGSBASE | X86_CR4_CET | X86_CR4_FRED);
- static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
- static unsigned long cr4_pinned_bits __ro_after_init;
++/* Intel MSRs. Some also available on other CPUs */
+ #define MSR_TEST_CTRL				0x00000033
+ #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT	29
+ #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT		BIT(MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT)
+diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
+index 3aedae61af4f..565cade0785a 100644
+--- a/tools/arch/x86/include/asm/msr-index.h
++++ b/tools/arch/x86/include/asm/msr-index.h
+@@ -36,8 +36,19 @@
+ #define EFER_FFXSR		(1<<_EFER_FFXSR)
+ #define EFER_AUTOIBRS		(1<<_EFER_AUTOIBRS)
  
+-/* Intel MSRs. Some also available on other CPUs */
++/* FRED MSRs */
++#define MSR_IA32_FRED_RSP0	0x1cc /* Level 0 stack pointer */
++#define MSR_IA32_FRED_RSP1	0x1cd /* Level 1 stack pointer */
++#define MSR_IA32_FRED_RSP2	0x1ce /* Level 2 stack pointer */
++#define MSR_IA32_FRED_RSP3	0x1cf /* Level 3 stack pointer */
++#define MSR_IA32_FRED_STKLVLS	0x1d0 /* Exception stack levels */
++#define MSR_IA32_FRED_SSP0	MSR_IA32_PL0_SSP /* Level 0 shadow stack pointer */
++#define MSR_IA32_FRED_SSP1	0x1d1 /* Level 1 shadow stack pointer */
++#define MSR_IA32_FRED_SSP2	0x1d2 /* Level 2 shadow stack pointer */
++#define MSR_IA32_FRED_SSP3	0x1d3 /* Level 3 shadow stack pointer */
++#define MSR_IA32_FRED_CONFIG	0x1d4 /* Entrypoint and interrupt stack level */
+ 
++/* Intel MSRs. Some also available on other CPUs */
+ #define MSR_TEST_CTRL				0x00000033
+ #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT	29
+ #define MSR_TEST_CTRL_SPLIT_LOCK_DETECT		BIT(MSR_TEST_CTRL_SPLIT_LOCK_DETECT_BIT)
 -- 
 2.34.1
 
