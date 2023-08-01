@@ -2,42 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C19576BDE9
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 21:38:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B634A76BE17
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 21:49:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbjHATin (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 15:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59742 "EHLO
+        id S231354AbjHATtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 15:49:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230200AbjHATim (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 15:38:42 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF0A1BD2;
-        Tue,  1 Aug 2023 12:38:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=XUuRgq2k+Zj7Cps3kG/jmE/mhHsCYkzavBA/LPVkFBs=; b=Wz9WQRmaRg/E+Ch1uLomywiHG9
-        Kctv8SAbWFkSD80DO0V85EHiSrP184T3HkcHveFUbE/hX7nSLfTXDNYyRyhponOVPU1isCpY9mFva
-        iRdqC0gGuYKtFBoNmtODHcFboqDDS8xZv2WJMwpm0pDqTcoku+Kjiq3cyuxxzstnMLd/O0qXMW4KQ
-        ap+/QwD7ELm1eY77mkO0113XZ+jEX62ePbeCXzB85T+I57Tn9vkKbNNNdbeD6BJ6BbGCr6iuoF6Y3
-        7FvWtffJxNd09NM6KgUsS1YCWz7YNUM4ao/o2+m+6193b3GAcjPnaQpuWYOpNg0UyYizdoWAjoH6B
-        tocYya/g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qQvBo-00AdLA-Kn; Tue, 01 Aug 2023 19:37:52 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3C3FC3002D3;
-        Tue,  1 Aug 2023 21:37:51 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id DAE66201BD3C3; Tue,  1 Aug 2023 21:37:50 +0200 (CEST)
-Date:   Tue, 1 Aug 2023 21:37:50 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
+        with ESMTP id S229500AbjHATtE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 15:49:04 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F44A2116
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 12:49:02 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bbb97d27d6so42581225ad.1
+        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 12:49:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690919342; x=1691524142;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ymMuGbXslfyJGs4W/pBqFuGxl9xUvy7q5fX4QbBoOtQ=;
+        b=CydE6ofDFbki4OoGOG75dPf8HjmzdP4bx8vverzkUAQVtD69mMn7n68FWR8AAp7DXQ
+         w+dl1y5zJGShPu6hUhv3xWgs0RLuDKkU1QeFVeAkGndzTQF4ejZ1rYTen/R2bDlQiGdt
+         p2JE4NI74wSzCDPayw3C3EPUnZHQ6AwVPX7+Hr/id3ZzAXZ75VD1wArInmjbenyfG79V
+         cEByprzGAc4WBhBRZXFreyy3tDtKJhpsG+vPyPTXY7LVerieG5d/K0kioNLl2WhELfBY
+         ntCCC/ISdhA9syO12Y1PCPSKi59/fx8iNJKpcw07IuHVOLESRbk7CVIj2E7rNQ0Q4Awv
+         rGdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690919342; x=1691524142;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ymMuGbXslfyJGs4W/pBqFuGxl9xUvy7q5fX4QbBoOtQ=;
+        b=ZadZkFi/QWso2HvObdVpF/+QpPf61MxrCReOPiR3DKi1pXeMdE5PFuT48JTDLC7Qaz
+         GdCu+RcxMgnYp/OkkGmjtpNCpCsg3iAKapjBbrKEivypksbMfYRuHS25MUAnkXweiEIa
+         678sq6QNl+QZYH5B6wi4o4X9XahzCuU6htWhKQZbTbrWNsfoaCpWYlbbwnQkFvc9BP6J
+         ysCnVtw9DKnQZna1wEsG81n1M5gddxjCTevf04/WCKxddJHSLXgdpdhjvqWw4He4h7Zm
+         WBR8CH35ifFn2UCgELgLxzSqOnTLlVi28uxuWTNl+vhsPpGMuu4IS+zZIN/bOX+NpPTg
+         W7jA==
+X-Gm-Message-State: ABy/qLYq9tIwv0yJCZyZTlbtb/EaSvgSto3cBiGxXSj61LC3cpGe2OXf
+        9A6PJnvpPHfjvBXPJiX8IVjKIS7tYdk=
+X-Google-Smtp-Source: APBJJlHzs/CPjAfxg4yY07jd2lFS2uJwEiSQkwxUoufms67SS+axZJeOfATbgdLU+XSQqEOfpNJp/uAu49A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:f683:b0:1b8:a54c:61ef with SMTP id
+ l3-20020a170902f68300b001b8a54c61efmr67559plg.9.1690919341844; Tue, 01 Aug
+ 2023 12:49:01 -0700 (PDT)
+Date:   Tue, 1 Aug 2023 19:49:00 +0000
+In-Reply-To: <20230801193750.GA119080@hirez.programming.kicks-ass.net>
+Mime-Version: 1.0
+References: <20230801083553.8468-1-xin3.li@intel.com> <20230801083553.8468-7-xin3.li@intel.com>
+ <ZMlWe5TgS6HM98Mg@google.com> <20230801193750.GA119080@hirez.programming.kicks-ass.net>
+Message-ID: <ZMlhrHv1c9P6HQXw@google.com>
+Subject: Re: [PATCH RESEND v9 33/36] KVM: VMX: Add VMX_DO_FRED_EVENT_IRQOFF
+ for IRQ/NMI handling
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-edac@vger.kernel.org,
         linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
@@ -102,34 +119,31 @@ Cc:     Xin Li <xin3.li@intel.com>, linux-doc@vger.kernel.org,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: Re: [PATCH RESEND v9 33/36] KVM: VMX: Add VMX_DO_FRED_EVENT_IRQOFF
- for IRQ/NMI handling
-Message-ID: <20230801193750.GA119080@hirez.programming.kicks-ass.net>
-References: <20230801083553.8468-1-xin3.li@intel.com>
- <20230801083553.8468-7-xin3.li@intel.com>
- <ZMlWe5TgS6HM98Mg@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMlWe5TgS6HM98Mg@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 01, 2023 at 07:01:15PM +0000, Sean Christopherson wrote:
-> The spec I have from May 2022 says the NMI bit colocated with CS, not SS.  And
-> the cover letter's suggestion to use a search engine to find the spec ain't
-> exactly helpful, that just gives me the same "May 2022 Revision 3.0" spec.  So
-> either y'all have a spec that I can't find, or this is wrong.
+On Tue, Aug 01, 2023, Peter Zijlstra wrote:
+> On Tue, Aug 01, 2023 at 07:01:15PM +0000, Sean Christopherson wrote:
+> > The spec I have from May 2022 says the NMI bit colocated with CS, not SS.  And
+> > the cover letter's suggestion to use a search engine to find the spec ain't
+> > exactly helpful, that just gives me the same "May 2022 Revision 3.0" spec.  So
+> > either y'all have a spec that I can't find, or this is wrong.
+> 
+> https://intel.com/sdm
+> 
+> is a useful shorthand I've recently been told about.
 
-https://intel.com/sdm
+Hallelujah!
 
-is a useful shorthand I've recently been told about. On that page is
-also "Flexible Return and Event Delivery Specification", when clicked it
-will gift you a FRED v5.0 PDF.
+> On that page is also "Flexible Return and Event Delivery Specification", when
+> clicked it will gift you a FRED v5.0 PDF.
+
+Worked for me, too.  Thanks!
