@@ -2,135 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 790EC76A697
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 03:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11FC376A6AB
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 04:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231142AbjHABzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 31 Jul 2023 21:55:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45956 "EHLO
+        id S229671AbjHACCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 31 Jul 2023 22:02:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjHABzi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 31 Jul 2023 21:55:38 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44654199A
-        for <kvm@vger.kernel.org>; Mon, 31 Jul 2023 18:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690854937; x=1722390937;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eQdIzvbewvwesb8c3esY+r02/rqLnE+EOFZ+QULBn5w=;
-  b=HJY86Po1kkBpxAYsSiYE8zFr4WlIiXVI9u9V0LgS3lQj8xjUDqdrRL69
-   YT2zcDZbTYstCvJB8XdfzTP3XiOtPeOkroADkULfDZ+qSw1uTUmElq2Bn
-   DR4rZxv3qbdr2dP+lOobE55JOlELmL0GscdbG05u7G7md8Xqf6L1U4SRL
-   2nCEy0ZdkRX0LC1VDFLxLsIxW5RUluxpV/+mhEeWEeld5l0jlHZULUY3x
-   mL6MCstU3BeIawRoF9IXMVy3DTe4dNIJUMKg1os+/VnGLI4QvTj7gbsBd
-   3WM3JzD107P37LNudEVo/Q8+ij/BpcFbxnFv4cxixXZBweeUApxlNsmho
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="368074443"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="368074443"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 18:55:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="678514344"
-X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="678514344"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 18:55:30 -0700
-Message-ID: <70746276-b748-aa5e-4a25-9399496c32e4@intel.com>
-Date:   Tue, 1 Aug 2023 09:55:28 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Subject: Re: [RFC PATCH 00/19] QEMU gmem implemention
-Content-Language: en-US
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        with ESMTP id S230122AbjHACCL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 31 Jul 2023 22:02:11 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F84E19B4;
+        Mon, 31 Jul 2023 19:02:09 -0700 (PDT)
+Received: from loongson.cn (unknown [10.2.5.185])
+        by gateway (Coremail) with SMTP id _____8BxnuugZ8hkI8gNAA--.30325S3;
+        Tue, 01 Aug 2023 10:02:08 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxHCOeZ8hkPHJDAA--.25753S2;
+        Tue, 01 Aug 2023 10:02:06 +0800 (CST)
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+To:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Vishal Annapurve <vannapurve@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
         Peter Xu <peterx@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-References: <20230731162201.271114-1-xiaoyao.li@intel.com>
- <20230731171041.GB1807130@ls.amr.corp.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20230731171041.GB1807130@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn,
+        zhaotianrui@loongson.cn
+Subject: [PATCH v1 0/4] selftests: kvm: Add LoongArch support
+Date:   Tue,  1 Aug 2023 10:02:02 +0800
+Message-Id: <20230801020206.1957986-1-zhaotianrui@loongson.cn>
+X-Mailer: git-send-email 2.39.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8BxHCOeZ8hkPHJDAA--.25753S2
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+        ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+        nUUI43ZEXa7xR_UUUUUUUUU==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/1/2023 1:10 AM, Isaku Yamahata wrote:
-> On Mon, Jul 31, 2023 at 12:21:42PM -0400,
-> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-> 
->> This is the first RFC version of enabling KVM gmem[1] as the backend for
->> private memory of KVM_X86_PROTECTED_VM.
->>
->> It adds the support to create a specific KVM_X86_PROTECTED_VM type VM,
->> and introduces 'private' property for memory backend. When the vm type
->> is KVM_X86_PROTECTED_VM and memory backend has private enabled as below,
->> it will call KVM gmem ioctl to allocate private memory for the backend.
->>
->>      $qemu -object memory-backend-ram,id=mem0,size=1G,private=on \
->>            -machine q35,kvm-type=sw-protected-vm,memory-backend=mem0 \
->> 	  ...
->>
->> Unfortunately this patch series fails the boot of OVMF at very early
->> stage due to triple fault because KVM doesn't support emulate string IO
->> to private memory. We leave it as an open to be discussed.
->>
->> There are following design opens that need to be discussed:
->>
->> 1. how to determine the vm type?
->>
->>     a. like this series, specify the vm type via machine property
->>        'kvm-type'
->>     b. check the memory backend, if any backend has 'private' property
->>        set, the vm-type is set to KVM_X86_PROTECTED_VM.
-> 
-> Hi Xiaoyao.  Because qemu has already confidential guest support, we should
-> utilize it.  Say,
-> qemu  \
->    -object sw-protected, id=swp0, <more options for KVM_X86_SW_PROTECTED_VM> \
->    -machine confidential-guest-support=swp0
+This patch series base on the Linux LoongArch KVM patch:
+Based-on: <20230720062813.4126751-1-zhaotianrui@loongson.cn>
 
-thanks for pointing out this option. I thought of it and forgot to list 
-it as option.
+We add LoongArch support into KVM selftests and there are some KVM
+test cases we have passed:
+  kvm_create_max_vcpus
+  demand_paging_test
+  kvm_page_table_test
+  set_memory_region_test
+  memslot_modification_stress_test
+  memslot_perf_test
 
-It seems better and I'll go this direction if no one has different opinion.
+The test results:
+1..6
+selftests: kvm: kvm_create_max_vcpus
+  KVM_CAP_MAX_VCPU_ID: 256
+  KVM_CAP_MAX_VCPUS: 256
+  Testing creating 256 vCPUs, with IDs 0...255.
+  ok 1 selftests: kvm: kvm_create_max_vcpus
 
-> 
->> 2. whether 'private' property is needed if we choose 1.b as design
->>
->>     with 1.b, QEMU can decide whether the memory region needs to be
->>     private (allocates gmem fd for it) or not, on its own.
-> 
-> 
-> Memory region property (how to create KVM memory slot) should be independent
-> from underlying VM type.  Some (e.g. TDX) may require KVM private memory slot,
-> some may not.  Leave the decision to its vm type backend.  They can use qemu
-> memory listener.
+selftests: kvm: demand_paging_test
+  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+  guest physical test memory: [0xfbfffc000, 0xfffffc000)
+  Finished creating vCPUs and starting uffd threads
+  Started all vCPUs
+  All vCPU threads joined
+  Total guest execution time: 0.787727423s
+  Overall demand paging rate: 83196.291111 pgs/sec
+  ok 2 selftests: kvm: demand_paging_test
 
-As I replied to Daniel, the topic is whether 'private' property is 
-needed. Is it essential to let users decide which memory can be private? 
-It seems OK that QEMU can make the decision based on VM type.
+selftests: kvm: kvm_page_table_test
+  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+  Testing memory backing src type: anonymous
+  Testing memory backing src granularity: 0x4000
+  Testing memory size(aligned): 0x40000000
+  Guest physical test memory offset: 0xfbfffc000
+  Host  virtual  test memory offset: 0xffb011c000
+  Number of testing vCPUs: 1
+  Started all vCPUs successfully
+  KVM_CREATE_MAPPINGS: total execution time: -3.-672213074s
+  KVM_UPDATE_MAPPINGS: total execution time: -4.-381650744s
+  KVM_ADJUST_MAPPINGS: total execution time: -4.-434860241s
+  ok 3 selftests: kvm: kvm_page_table_test
+
+selftests: kvm: set_memory_region_test
+  Allowed number of memory slots: 256
+  Adding slots 0..255, each memory region with 2048K size
+  ok 4 selftests: kvm: set_memory_region_test
+
+selftests: kvm: memslot_modification_stress_test
+  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+  guest physical test memory: [0xfbfffc000, 0xfffffc000)
+  Finished creating vCPUs
+  Started all vCPUs
+  All vCPU threads joined
+  ok 5 selftests: kvm: memslot_modification_stress_test
+
+selftests: kvm: memslot_perf_test
+  Testing map performance with 1 runs, 5 seconds each
+  Test took 0.003797735s for slot setup + 5.012294023s all iterations
+  Done 369 iterations, avg 0.013583452s each
+  Best runtime result was 0.013583452s per iteration (with 369 iterations)
+
+  Testing unmap performance with 1 runs, 5 seconds each
+  Test took 0.003841196s for slot setup + 5.001802893s all iterations
+  Done 341 iterations, avg 0.014668043s each
+  Best runtime result was 0.014668043s per iteration (with 341 iterations)
+
+  Testing unmap chunked performance with 1 runs, 5 seconds each
+  Test took 0.003784356s for slot setup + 5.000265398s all iterations
+  Done 7376 iterations, avg 0.000677910s each
+  Best runtime result was 0.000677910s per iteration (with 7376 iterations)
+
+  Testing move active area performance with 1 runs, 5 seconds each
+  Test took 0.003828075s for slot setup + 5.000021760s all iterations
+  Done 85449 iterations, avg 0.000058514s each
+  Best runtime result was 0.000058514s per iteration (with 85449 iterations)
+
+  Testing move inactive area performance with 1 runs, 5 seconds each
+  Test took 0.003809146s for slot setup + 5.000024149s all iterations
+  Done 181908 iterations, avg 0.000027486s each
+  Best runtime result was 0.000027486s per iteration (with 181908 iterations)
+
+  Testing RW performance with 1 runs, 5 seconds each
+  Test took 0.003780596s for slot setup + 5.001116175s all iterations
+  Done 391 iterations, avg 0.012790578s each
+  Best runtime result was 0.012790578s per iteration (with 391 iterations)
+  Best slot setup time for the whole test area was 0.003780596s
+  ok 6 selftests: kvm: memslot_perf_test
+
+changes for v1:
+1. Add kvm selftests header files for LoongArch.
+2. Add processor tests for LoongArch KVM.
+3. Add ucall tests for LoongArch KVM.
+4. Add LoongArch tests into makefile.
+
+Tianrui Zhao (4):
+  selftests: kvm: Add kvm selftests header files for LoongArch
+  selftests: kvm: Add processor tests for LoongArch KVM
+  selftests: kvm: Add ucall tests for LoongArch KVM
+  selftests: kvm: Add LoongArch tests into makefile
+
+ tools/testing/selftests/kvm/Makefile          |  11 +
+ .../selftests/kvm/include/kvm_util_base.h     |   5 +
+ .../kvm/include/loongarch/processor.h         |  28 ++
+ .../selftests/kvm/include/loongarch/sysreg.h  |  89 +++++
+ .../selftests/kvm/lib/loongarch/exception.S   |  27 ++
+ .../selftests/kvm/lib/loongarch/processor.c   | 367 ++++++++++++++++++
+ .../selftests/kvm/lib/loongarch/ucall.c       |  44 +++
+ 7 files changed, 571 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/sysreg.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+
+-- 
+2.39.1
+
