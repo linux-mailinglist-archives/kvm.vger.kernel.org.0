@@ -2,99 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2947276ACD7
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:23:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9879F76B04A
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 12:05:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232876AbjHAJXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52244 "EHLO
+        id S232125AbjHAKFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 06:05:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232230AbjHAJXW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:23:22 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92E130EC
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 02:22:10 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99bc0a20b54so860556366b.1
-        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 02:22:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1690881728; x=1691486528;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Myyg/9EMvFaXxS0MQuf9oic0JS5pwyGRhUlLiVOQ7cg=;
-        b=DGWQ06MMOa/673UDiUbHWfvDEjjljcO9pgXIH6f6q3vLvc/6vEnY+ydAuN/HHflZw7
-         AEtTWAMYn2GMKYtLMtMn0sNzJhSMyTGc72izAJnHuEBYp/kviEPOsfYW3tBXsZLz1PSf
-         nBrWKS8QWxWdlC0S2oc2b2Naf7e+9rX/TpPlLu7KyDtKBI9F9Zrx84HkFyoZTBPXk8MP
-         Jvt8JbrfF2AGM7+dLEe7fEc5iLz5MqPpWIp8f/uPfCunfiL1nnGJHq3jtELhLSbKLAGm
-         mh24x/4jIeOLx+JlPwlkhpN6AUwtg2z4cOQAKda5EfZUA7TbLlBc8zPbXNEKZ6KENpoz
-         nQIQ==
+        with ESMTP id S231326AbjHAKFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 06:05:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39AB01B6
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 03:04:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690884256;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vaJhNgT5dHi6t1An3LbLPUe2A1bthkbgPOCCUSxNbas=;
+        b=dUDxarKc062Pq+c9YpwuF4QxYd35MVHFwO0c6157RXGufGWjsOQjArf8bCKm0OAz7a/+0m
+        InIGdzukKj+r1A2CPygbm9T0fYu+caowse+uuby9duRz8APD7oyI62ETpTEY2w78e03pGw
+        M42coEnK4/evZi8mpX0MsCt2+Mm3RJA=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-564-Zvn2MJuzPaGeJu07OU5rSw-1; Tue, 01 Aug 2023 06:04:15 -0400
+X-MC-Unique: Zvn2MJuzPaGeJu07OU5rSw-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4fe369ab20fso1887931e87.2
+        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 03:04:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690881728; x=1691486528;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Myyg/9EMvFaXxS0MQuf9oic0JS5pwyGRhUlLiVOQ7cg=;
-        b=JDQG8Wke8AdbIKqbkkfSJkmx6X299fyF6hJFmC97PncseN/9RCszpQZSDEy/ip4GJR
-         RFPoEJYbyG9PQBmlG4ru4GMDj8jy8uJQGy1j4gRAQqO6aWk5nZ4rS9dZnEjdW4LQjTd0
-         42XlsmLD/XGZ12rGWFlStOuBV3upZ9R5PpZdFmleUeBqnlJIS/2j/TVmeV710sLsnkXc
-         MQ0cKGSyvFHcpxKTr3JWWyTFU1/f0IthvZK9YnHoMvnToOISe2vTEne/oR6YbLsQPqYI
-         pJU0Sj04NdmL5DKFzYPoJAUDYAffbOrl08duY9VsCdjOtbpQjp9x8slfoPHz6hdvWGVA
-         er+w==
-X-Gm-Message-State: ABy/qLa+Ef6PBk2aInz2l5luzpVoYBsKdHcidF55ZKFFLiCLjQbsRY8t
-        frHAzz7Qg0f7aVJFcBegpaUleA==
-X-Google-Smtp-Source: APBJJlGm6uA+LAnVlBtxIfLwMvjWRv2Gwia6HLAVmhzKy7IakWIq/kLqxEYhBEJoOBpXfLEql9cNOA==
-X-Received: by 2002:a17:906:768d:b0:993:e691:6dd5 with SMTP id o13-20020a170906768d00b00993e6916dd5mr1914773ejm.7.1690881728816;
-        Tue, 01 Aug 2023 02:22:08 -0700 (PDT)
-Received: from localhost (212-5-140-29.ip.btc-net.bg. [212.5.140.29])
-        by smtp.gmail.com with ESMTPSA id x20-20020a1709065ad400b00988be3c1d87sm7375676ejs.116.2023.08.01.02.22.08
+        d=1e100.net; s=20221208; t=1690884253; x=1691489053;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vaJhNgT5dHi6t1An3LbLPUe2A1bthkbgPOCCUSxNbas=;
+        b=U1NnE8xOBUx64djXnYPnpz47EagQZA/lcHwSNht45bZhdHX5MuE0Cy0toP1dz/Ah0z
+         LIzxLhlTOJiJw3yH8H3+rv7Ae62hfPCaPsS4oxeMlsf8jgxWxjPNZ+xiQs5Bjyjjpxfw
+         TEK6aT5wjEszgalj/ANfxyJqIghOwX7V1Ls/SbjxiQzyA35FJJRDgnrMQLJB3oJ0ac3v
+         48fVmfqMY6J4zzMVGrDu2gl8M1U18z7FrfmQb/m88aShaTwIpJf8HmsrhF9MWqToxZMu
+         q6m1aPIhSa24UXIf1Luo0tlok2OAcvnzKjkfwssE+Ncmgnn1f74YtP81LHJJ0VAkRdvX
+         qrwQ==
+X-Gm-Message-State: ABy/qLa+SfQpi0xaMDAFz9m0W5DkXO0+pTL00+T50mD36/z+B21+N0bb
+        8PhjWW4ZA3iCfIhHjOUQgeYXMpoOg98tsGm8czM49aXCmXJmF1siRVxvSjl8c8Fd0FZOHC9Wjv0
+        bBfyhLS+7yBqxMIe0mCIo
+X-Received: by 2002:a19:384d:0:b0:4fb:97e8:bc1c with SMTP id d13-20020a19384d000000b004fb97e8bc1cmr1492004lfj.54.1690884253248;
+        Tue, 01 Aug 2023 03:04:13 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHIMBqHeRkBCm6nslrtM9AMG9RrucErnURFZ2c6xFE6xjh94OXTXJ09I/LZG5OemVMUT9K0YQ==
+X-Received: by 2002:a19:384d:0:b0:4fb:97e8:bc1c with SMTP id d13-20020a19384d000000b004fb97e8bc1cmr1491993lfj.54.1690884252900;
+        Tue, 01 Aug 2023 03:04:12 -0700 (PDT)
+Received: from starship ([77.137.131.138])
+        by smtp.gmail.com with ESMTPSA id se9-20020a170906ce4900b0099364d9f0e6sm7425255ejb.117.2023.08.01.03.04.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 02:22:08 -0700 (PDT)
-Date:   Tue, 1 Aug 2023 11:22:07 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH v4.1 2/3] KVM: selftests: Add #define of expected KVM
- exit reason for ucall
-Message-ID: <20230801-121c649de93d2bcd54af14c4@orel>
-References: <20230731203026.1192091-1-seanjc@google.com>
- <20230731203026.1192091-3-seanjc@google.com>
+        Tue, 01 Aug 2023 03:04:12 -0700 (PDT)
+Message-ID: <8c7dfba9353a0dc1f2d68dd7db92ab9c5faedc29.camel@redhat.com>
+Subject: Re: [Bug] AMD nested: commit broke VMware
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     jwarren@tutanota.com, Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>, Kvm <kvm@vger.kernel.org>
+Date:   Tue, 01 Aug 2023 13:04:10 +0300
+In-Reply-To: <NakHQwK--3-9@tutanota.com>
+References: <NWb_YOE--3-9@tutanota.com>
+         <357d135f9ed65f4e2970c82ae4e855547db70ad1.camel@redhat.com>
+         <CALMp9eTyx1Y0yc7G0c0BsAig=Amv4DYtcNnWPmD-9JHP=ChZiw@mail.gmail.com>
+         <CALMp9eSq1r87=jGWc1z85L-QGCTF-jpWgHEQxJ4sVCqCU_0KQQ@mail.gmail.com>
+         <5e18e1424868eec10f6dc396b88b65283b57278a.camel@redhat.com>
+         <ZHdcjFPJJwl9RoxF@google.com>
+         <CALMp9eTti7gSNKgR=h__SsoKynaR1tR2nHhuk_6tse-3FHJ7mw@mail.gmail.com-NWmRa0I----9>
+         <NakHQwK--3-9@tutanota.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230731203026.1192091-3-seanjc@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023 at 01:30:25PM -0700, Sean Christopherson wrote:
-> Define the expected architecture specific exit reason for a successful
-> ucall so that common tests can assert that a ucall occurred without the
-> test needing to implement arch specific code.
+У вт, 2023-08-01 у 10:49 +0200, jwarren@tutanota.com пише:
+> Hi
+> Are there any thoughts on this?
 > 
-> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/include/aarch64/ucall.h | 2 ++
->  tools/testing/selftests/kvm/include/riscv/ucall.h   | 2 ++
->  tools/testing/selftests/kvm/include/s390x/ucall.h   | 2 ++
->  tools/testing/selftests/kvm/include/x86_64/ucall.h  | 2 ++
->  4 files changed, 8 insertions(+)
->
+> PS As I see it, that commit didn't fix any real problem (up to 5.15 nothing was broken that required it), but did break nested VMWare Workstation/ESXi for people that use it (yes, it's vmware's code bug, but doubt they will fix it).
+> 
+> 
+> May 31, 2023, 15:34 by jmattson@google.com:
+> 
+> > On Wed, May 31, 2023 at 7:41 AM Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > > On Wed, May 31, 2023, Maxim Levitsky wrote:
+> > > > У вт, 2023-05-30 у 13:34 -0700, Jim Mattson пише:
+> > > > > On Tue, May 30, 2023 at 1:10 PM Jim Mattson <jmattson@google.com> wrote:
+> > > > > > On Mon, May 29, 2023 at 6:44 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+> > > > > > > У пн, 2023-05-29 у 14:58 +0200, jwarren@tutanota.com пише:
+> > > > > > > > I don't know what would be the best case here, maybe put a quirk
+> > > > > > > > there, so it doesn't break "userspace".  Committer's email is dead,
+> > > > > > > > so I'm writing here.
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > I have to say that I know about this for long time, because some time
+> > > > > > > ago I used  to play with VMware player in a VM on AMD on my spare time,
+> > > > > > > on weekends (just doing various crazy things with double nesting,
+> > > > > > > running win98 nested, vfio stuff, etc, etc).
+> > > > > > > 
+> > > > > > > I didn't report it because its a bug in VMWARE - they set a bit in the
+> > > > > > > tlb_control without checking CPUID's FLUSHBYASID which states that KVM
+> > > > > > > doesn't support setting this bit.
+> > > > > > 
+> > > > > > I am pretty sure that bit 1 is supposed to be ignored on hardware
+> > > > > > without FlushByASID, but I'll have to see if I can dig up an old APM
+> > > > > > to verify that.
+> > > > > 
+> > > > > I couldn't find an APM that old, but even today's APM does not specify
+> > > > > that any checks are performed on the TLB_CONTROL field by VMRUN.
+> > > > > 
+> > > > > While Intel likes to fail VM-entry for illegal VMCS state, AMD prefers
+> > > > > to massage the VMCB to render any illegal VMCB state legal. For
+> > > > > example, rather than fail VM-entry for a non-canonical address, AMD is
+> > > > > inclined to drop the high bits and sign-extend the low bits, so that
+> > > > > the address is canonical.
+> > > > > 
+> > > > > I'm willing to bet that modern CPUs continue to ignore the TLB_CONTROL
+> > > > > bits that were noted "reserved" in version 3.22 of the manual, and
+> > > > > that Krish simply manufactured the checks in commit 174a921b6975
+> > > > > ("nSVM: Check for reserved encodings of TLB_CONTROL in nested VMCB"),
+> > > > > without cause.
+> > > 
+> > > Ya.  The APM even provides a definition of "reserved" that explicitly calls out
+> > > the different reserved qualifiers.  The only fields/values that KVM can actively
+> > > enforce are things tagged MBZ.
+> > > 
+> > >  reserved
+> > >  Fields marked as reserved may be used at some future time.
+> > >  To preserve compatibility with future processors, reserved fields require special handling when
+> > >  read or written by software. Software must not depend on the state of a reserved field (unless
+> > >  qualified as RAZ), nor upon the ability of such fields to return a previously written state.
+> > >  If a field is marked reserved without qualification, software must not change the state of that field;
+> > >  it must reload that field with the same value returned from a prior read.
+> > >  Reserved fields may be qualified as IGN, MBZ, RAZ, or SBZ (see definitions).
+> > > 
+> > > > > > > Supporting FLUSHBYASID would fix this, and make nesting faster too,
+> > > > > > > but it is far from a trivial job.
+> > > > > > > 
+> > > > > > > I hope that I will find time to do this soon.
+> > > 
+> > > ...
+> > > 
+> > > > Shall we revert the offending patch then?
+> > > 
+> > > Yes please.
+> > > 
+> > 
+> > It's not quite that simple.
+> > 
+> > The vmcb12 TLB_CONTROL field needs to be sanitized on its way into the
+> > vmcb02 (perhaps in nested_copy_vmcb_control_to_cache()?). Bits 63:2
+> > should be cleared. Also, if the guest CPUID does not advertise support
+> > for FlushByASID, then bit 1 should be cleared. Note that the vmcb12
+> > TLB_CONTROL field itself must not be modified, since the APM
+> > specifically states, "The VMRUN instruction reads, but does not
+> > change, the value of the TLB_CONTROL field."
+> > 
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+I will prepare a patch for this hopefully this week. 
+Jim mentioned that a revert is not full solution for this.
+
+Best regards,
+	Maxim Levitsky
+
