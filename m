@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 102D076AC34
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:06:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67C3B76AC36
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 11:06:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232664AbjHAJGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 05:06:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60462 "EHLO
+        id S232674AbjHAJGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 05:06:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232641AbjHAJF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 05:05:58 -0400
+        with ESMTP id S232565AbjHAJF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 05:05:59 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2F83C33;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E9B3C3D;
         Tue,  1 Aug 2023 02:04:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1690880658; x=1722416658;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dQPbDjEqQWsCazdenr4wm1/cp/YJX7zOnAx3X5niG4Q=;
-  b=i+qMSTofigtvuDV7T7c6SrRXh+uq0c2c4WS4tdcxPSbBhwyTZ3n/eDFV
-   wX8IErQoXQ0Sw4gjz1qEqlam9TATnNv0fMexkbyJh3qkOk/OAzHt/ELqt
-   Rq4noDNq2ABQJ2G544iYXj0gtroENWW07CsVUapOxHp1ZFFhGdCXKawRG
-   hHoMRLABmuRXfls1B6+4ZmMNYSi3knkE8jSG6l+CU3yW2KI76MmER2+ou
-   0uG+cRF3UVha0rjV4Da7lUyHpq0r47TRI/Jmtja2EnvzfJ6rXltFW3LFh
-   C5fAjqSAI683Btyeu9J2ikB/oOPUhySywAC13UKQap4holM2TvqEk/A5y
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082747"
+  bh=QeZUtDgMAPwFIrdo9TmaG72+ignP6GGIZpxe8B2aw6k=;
+  b=Ywoci1Nx767Qty2t1CqBpNGNVjPof5Bi8up/OSJlMMO8yy2nT9hpW/1D
+   NwvWsUC4s03u01/O7/CWLr1Q5vo5PyrjZ+lc7KMTyjyCZNGgiAggFjGpJ
+   Xp28tf4lpso00bEqh08+ZptdsqcHWaFKIMcOEovyuovWJDgsOZqeI3qaW
+   ZZlg0+D6GpCDvX8EeJuzYiI6Afc76xKrihKyo37g7tw+rMifAhDZRYy5f
+   ++7jQ+0t9C2VcZ54LsNZqi2+hBqYahdaWu1DuTvWGjRBRpZM4bywlc/u5
+   JOdZGKrm7qNF2M7kUwge+gItcwJ9xcZqMisC+di0XZyjcgH3EJwsq2tav
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="433082781"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="433082747"
+   d="scan'208";a="433082781"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:02:10 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 02:02:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975217074"
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="975217078"
 X-IronPort-AV: E=Sophos;i="6.01,246,1684825200"; 
-   d="scan'208";a="975217074"
+   d="scan'208";a="975217078"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:02:09 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 01 Aug 2023 02:02:10 -0700
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-edac@vger.kernel.org, linux-hyperv@vger.kernel.org,
@@ -106,9 +106,9 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Yantengsi <siyanteng@loongson.cn>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         Sathvika Vasireddy <sv@linux.ibm.com>
-Subject: [PATCH RESEND v9 21/36] x86/fred: Add a machine check entry stub for FRED
-Date:   Tue,  1 Aug 2023 01:33:03 -0700
-Message-Id: <20230801083318.8363-22-xin3.li@intel.com>
+Subject: [PATCH RESEND v9 22/36] x86/fred: Add a double fault entry stub for FRED
+Date:   Tue,  1 Aug 2023 01:33:04 -0700
+Message-Id: <20230801083318.8363-23-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230801083318.8363-1-xin3.li@intel.com>
 References: <20230801083318.8363-1-xin3.li@intel.com>
@@ -124,64 +124,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a machine check entry stub for FRED.
+The IDT event delivery of a double fault pushes an error code into the
+orig_ax member of the pt_regs structure, and the error code is passed
+as the second argument of its C-handler exc_double_fault(), although
+the pt_regs structure is already passed as the first argument.
+
+The existing IDT double fault asm entry code does the following
+
+  movq ORIG_RAX(%rsp), %rsi	/* get error code into 2nd argument*/
+  movq $-1, ORIG_RAX(%rsp)	/* no syscall to restart */
+
+to set the orig_ax member to -1 just before calling the C-handler.
+
+X86_TRAP_TS, X86_TRAP_NP, X86_TRAP_SS, X86_TRAP_GP, X86_TRAP_AC and
+X86_TRAP_CP are all handled in the same way because the IDT event
+delivery pushes an error code into their stack frame for them.
+
+The commit d99015b1abbad ("x86: move entry_64.S register saving out of
+the macros") introduced the changes to set orig_ax to -1, but I can't
+see why. Our tests with FRED seem fine if orig_ax is left unchanged
+instead of set to -1. It's probably cleaner and simpler to remove the
+second argument from exc_double_fault() while leave orig_ax unchanged
+to pass the error code inside the first argument, at least on native
+x86_64. That would be a separate, pre-FRED, patch.
+
+For now just add a double fault entry stub for FRED, which simply
+calls the existing exc_double_fault().
 
 Tested-by: Shan Kang <shan.kang@intel.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
-
-Changes since v5:
-* Disallow #DB inside #MCE for robustness sake (Peter Zijlstra).
----
- arch/x86/include/asm/fred.h    |  1 +
- arch/x86/kernel/cpu/mce/core.c | 15 +++++++++++++++
- 2 files changed, 16 insertions(+)
+ arch/x86/include/asm/fred.h | 1 +
+ arch/x86/kernel/traps.c     | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-index 2a7c47dfd733..f559dd9dc4f2 100644
+index f559dd9dc4f2..bd701ac87528 100644
 --- a/arch/x86/include/asm/fred.h
 +++ b/arch/x86/include/asm/fred.h
-@@ -115,6 +115,7 @@ typedef DECLARE_FRED_HANDLER((*fred_handler));
- DECLARE_FRED_HANDLER(fred_exc_nmi);
+@@ -116,6 +116,7 @@ DECLARE_FRED_HANDLER(fred_exc_nmi);
  DECLARE_FRED_HANDLER(fred_exc_debug);
  DECLARE_FRED_HANDLER(fred_exc_page_fault);
-+DECLARE_FRED_HANDLER(fred_exc_machine_check);
+ DECLARE_FRED_HANDLER(fred_exc_machine_check);
++DECLARE_FRED_HANDLER(fred_exc_double_fault);
  
  #endif /* __ASSEMBLY__ */
  
-diff --git a/arch/x86/kernel/cpu/mce/core.c b/arch/x86/kernel/cpu/mce/core.c
-index b8ad5a5b4026..98456e20f155 100644
---- a/arch/x86/kernel/cpu/mce/core.c
-+++ b/arch/x86/kernel/cpu/mce/core.c
-@@ -52,6 +52,7 @@
- #include <asm/mce.h>
- #include <asm/msr.h>
- #include <asm/reboot.h>
-+#include <asm/fred.h>
- 
- #include "internal.h"
- 
-@@ -2118,6 +2119,20 @@ DEFINE_IDTENTRY_MCE_USER(exc_machine_check)
- 	exc_machine_check_user(regs);
- 	local_db_restore(dr7);
+diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
+index b10464966a81..49dd92458eb0 100644
+--- a/arch/x86/kernel/traps.c
++++ b/arch/x86/kernel/traps.c
+@@ -555,6 +555,13 @@ DEFINE_IDTENTRY_DF(exc_double_fault)
+ 	instrumentation_end();
  }
-+
+ 
 +#ifdef CONFIG_X86_FRED
-+DEFINE_FRED_HANDLER(fred_exc_machine_check)
++DEFINE_FRED_HANDLER(fred_exc_double_fault)
 +{
-+	unsigned long dr7;
-+
-+	dr7 = local_db_save();
-+	if (user_mode(regs))
-+		exc_machine_check_user(regs);
-+	else
-+		exc_machine_check_kernel(regs);
-+	local_db_restore(dr7);
++	exc_double_fault(regs, regs->orig_ax);
 +}
 +#endif
- #else
- /* 32bit unified entry point */
- DEFINE_IDTENTRY_RAW(exc_machine_check)
++
+ DEFINE_IDTENTRY(exc_bounds)
+ {
+ 	if (notify_die(DIE_TRAP, "bounds", regs, 0,
 -- 
 2.34.1
 
