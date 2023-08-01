@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 495EF76B188
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 12:18:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2355F76B162
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 12:17:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234210AbjHAKRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 06:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38998 "EHLO
+        id S233911AbjHAKRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 06:17:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233993AbjHAKQL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 06:16:11 -0400
+        with ESMTP id S234011AbjHAKQN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 06:16:13 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530591FD0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C976D2102;
         Tue,  1 Aug 2023 03:15:58 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8DEB421E4C;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CC91D21DD9;
         Tue,  1 Aug 2023 10:15:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1690884954; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+t8C88koksqF6KSs9sogLD3BYWxCWZjhCADfdukAIV0=;
-        b=TpRTTIPkTybynn/8cK9ZjvFjXYAbi99mRtYWYGveV0n5WPMl4AHVdPJkqA1/rnbaE7XdvG
-        EqcPAid0S5LS6KHZ9rNcGkNYOTDe6ZBasVt9S3jw85fy7ptbYi4NR7h2ed3MChZi2f+p0w
-        bBkAVSLojSORQpdI7ocY/2BaXiHcGgA=
+        bh=qz2SQPWL/6friOzjydZG2VJ40JoMcSLLPqaFWJyZ7kA=;
+        b=rCEfiQ1ZuZStsLFNSI9wtffR8Mdhp3D0jXrGl8/IJbXEMLYIhJnYuux9FoPn3adsh5fRSZ
+        +nqMQiT+s6nsSGzkOAl6rU6PWsD5wANGvbSYDgnuKWrizumtim9MEj3KrmvqKz1rtsKUU1
+        oYbdNf66YLwlgDyaNFtU695WV4Iq7So=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1690884954;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+t8C88koksqF6KSs9sogLD3BYWxCWZjhCADfdukAIV0=;
-        b=516yCv01LMOkE/fPYNLn2eNMyH67yu544G/dxA8bP+tdT03xzmTAFvksiyJURt7reQb7N9
-        W4Hvo2af4IyvXoBQ==
+        bh=qz2SQPWL/6friOzjydZG2VJ40JoMcSLLPqaFWJyZ7kA=;
+        b=1v+riM6vkNQKs2QxNs3Zh5tnNfy7zocp+XXO11ZBk04Fh0QcUD12qUEMBoqlfzutJ6NyEo
+        aAwXNV/eAEPCc8DA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 55997139BD;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9318D139BD;
         Tue,  1 Aug 2023 10:15:54 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id WPcKFFrbyGQBXQAAMHmgww
+        id KO2zIlrbyGQBXQAAMHmgww
         (envelope-from <tzimmermann@suse.de>); Tue, 01 Aug 2023 10:15:54 +0000
 From:   Thomas Zimmermann <tzimmermann@suse.de>
 To:     deller@gmx.de, javierm@redhat.com, sam@ravnborg.org
@@ -55,9 +55,9 @@ Cc:     linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-geode@lists.infradead.org, linux-omap@vger.kernel.org,
         kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>
-Subject: [PATCH v2 29/47] fbdev/omapfb: Use fbdev I/O helpers
-Date:   Tue,  1 Aug 2023 12:13:34 +0200
-Message-ID: <20230801101541.900-30-tzimmermann@suse.de>
+Subject: [PATCH v2 30/47] fbdev/platinumfb: Use fbdev I/O helpers
+Date:   Tue,  1 Aug 2023 12:13:35 +0200
+Message-ID: <20230801101541.900-31-tzimmermann@suse.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230801101541.900-1-tzimmermann@suse.de>
 References: <20230801101541.900-1-tzimmermann@suse.de>
@@ -87,44 +87,44 @@ Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
 Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 Acked-by: Helge Deller <deller@gmx.de>
 ---
- drivers/video/fbdev/omap/Kconfig       | 4 +---
- drivers/video/fbdev/omap/omapfb_main.c | 4 +---
+ drivers/video/fbdev/Kconfig      | 4 +---
+ drivers/video/fbdev/platinumfb.c | 4 +---
  2 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/video/fbdev/omap/Kconfig b/drivers/video/fbdev/omap/Kconfig
-index a6548283451f..f01278238d50 100644
---- a/drivers/video/fbdev/omap/Kconfig
-+++ b/drivers/video/fbdev/omap/Kconfig
-@@ -3,9 +3,7 @@ config FB_OMAP
- 	tristate "OMAP frame buffer support"
- 	depends on FB
- 	depends on ARCH_OMAP1 || (ARM && COMPILE_TEST)
+diff --git a/drivers/video/fbdev/Kconfig b/drivers/video/fbdev/Kconfig
+index a792364419ce..3e249e5188e9 100644
+--- a/drivers/video/fbdev/Kconfig
++++ b/drivers/video/fbdev/Kconfig
+@@ -321,9 +321,7 @@ config FB_CONTROL
+ config FB_PLATINUM
+ 	bool "Apple \"platinum\" display support"
+ 	depends on (FB = y) && PPC_PMAC && PPC32
 -	select FB_CFB_FILLRECT
 -	select FB_CFB_COPYAREA
 -	select FB_CFB_IMAGEBLIT
 +	select FB_IOMEM_HELPERS
+ 	select FB_MACMODES
  	help
- 	  Frame buffer driver for OMAP based boards.
+ 	  This driver supports a frame buffer for the "platinum" graphics
+diff --git a/drivers/video/fbdev/platinumfb.c b/drivers/video/fbdev/platinumfb.c
+index b1fd86fe3f65..cb6fcc64c8e2 100644
+--- a/drivers/video/fbdev/platinumfb.c
++++ b/drivers/video/fbdev/platinumfb.c
+@@ -98,13 +98,11 @@ static int platinum_var_to_par(struct fb_var_screeninfo *var,
  
-diff --git a/drivers/video/fbdev/omap/omapfb_main.c b/drivers/video/fbdev/omap/omapfb_main.c
-index 783bbe026207..f28cb90947a3 100644
---- a/drivers/video/fbdev/omap/omapfb_main.c
-+++ b/drivers/video/fbdev/omap/omapfb_main.c
-@@ -1216,13 +1216,11 @@ static int omapfb_mmap(struct fb_info *info, struct vm_area_struct *vma)
-  */
- static struct fb_ops omapfb_ops = {
- 	.owner		= THIS_MODULE,
+ static const struct fb_ops platinumfb_ops = {
+ 	.owner =	THIS_MODULE,
 +	FB_DEFAULT_IOMEM_OPS,
- 	.fb_open        = omapfb_open,
- 	.fb_release     = omapfb_release,
- 	.fb_setcolreg	= omapfb_setcolreg,
- 	.fb_setcmap	= omapfb_setcmap,
+ 	.fb_check_var	= platinumfb_check_var,
+ 	.fb_set_par	= platinumfb_set_par,
+ 	.fb_setcolreg	= platinumfb_setcolreg,
+ 	.fb_blank	= platinumfb_blank,
 -	.fb_fillrect	= cfb_fillrect,
 -	.fb_copyarea	= cfb_copyarea,
 -	.fb_imageblit	= cfb_imageblit,
- 	.fb_blank       = omapfb_blank,
- 	.fb_ioctl	= omapfb_ioctl,
- 	.fb_check_var	= omapfb_check_var,
+ };
+ 
+ /*
 -- 
 2.41.0
 
