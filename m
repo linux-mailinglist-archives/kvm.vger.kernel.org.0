@@ -2,86 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9A8D76B8FB
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:48:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78A8676B92B
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235003AbjHAPs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 11:48:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33290 "EHLO
+        id S235031AbjHAPyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 11:54:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234996AbjHAPsz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 11:48:55 -0400
+        with ESMTP id S235019AbjHAPys (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 11:54:48 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D28581B7
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:48:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B09A1B7
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:53:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690904890;
+        s=mimecast20190719; t=1690905238;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fzL/Ybnx3HfszMfs/mHvvF2PskJxWsEeOJHTJUi83hM=;
-        b=Ev/J7IEWhdKCLzltrRijan/Rbwtpd0RusL83keJ0vYiCPn/LYZFNyql1jUkoVVJVeSGctT
-        uaIGa9vn6r6bezfHID7lneiitiHd9vzYZqV4ajHO9DbzaK+Lwuyhgof2sbFtktmlXCHNmj
-        soidk7A1XQI6QAfffeeLhDfszh0Dk4Y=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-695-RhnKlp0COAK2OKWiyIfs6w-1; Tue, 01 Aug 2023 11:48:08 -0400
-X-MC-Unique: RhnKlp0COAK2OKWiyIfs6w-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-637948b24bdso14909916d6.1
-        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 08:48:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690904887; x=1691509687;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fzL/Ybnx3HfszMfs/mHvvF2PskJxWsEeOJHTJUi83hM=;
-        b=WMowi7aUu+n9xkfOOmBwDNBnb/siG9OCebXweVKQnJrufgPQhj2hU8L7opwicZ3H6H
-         jLtqjkaBsfZwDqLAtG67i+uiBMQWHu60V87uzFx5LnDsxf25txRUT5jZDh48uGh0vvxn
-         wC94x8FVm+DbAdIEzdlb+UKWvHmHpbj4nzdzlo/DW1uW0OUpfAkuHTGuYPOycGwzM2jG
-         GDqMsNWEhAvc9Xgo/i9B5CoQxd/oVeXYgL4NrMOs+Iaq+RkIepVP9a0LnkYcUhEClvQu
-         fZ9RMBpLnvmGaK6UVfpA18F13K7P+m3kM0DPqTX7GEp0vEuidd4OEBhcb5/SrAJ5TV5m
-         /mIg==
-X-Gm-Message-State: ABy/qLYrO2Cdm2RIqz+EYB6/BS+XKpk6otu4fIBLGiW0UyQmLbigAjuA
-        YT6U/KB7gIlsrOqlV1QnLM2k/eqp6uFLhdjjxe6W91lkPDMRfttPz+Efci3/8OKABK2NsCP0vJ6
-        LAwKOqUwXhqVu
-X-Received: by 2002:a05:6214:f6d:b0:63d:2a0b:3f83 with SMTP id iy13-20020a0562140f6d00b0063d2a0b3f83mr13483337qvb.6.1690904887777;
-        Tue, 01 Aug 2023 08:48:07 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEkIpicp2puvI5rez9Bp+zxcAl/7L3rx/USJUT9iEBbnLJ3LmasmjZqlKMQch/r6bJKu79nfw==
-X-Received: by 2002:a05:6214:f6d:b0:63d:2a0b:3f83 with SMTP id iy13-20020a0562140f6d00b0063d2a0b3f83mr13483311qvb.6.1690904887526;
-        Tue, 01 Aug 2023 08:48:07 -0700 (PDT)
-Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
-        by smtp.gmail.com with ESMTPSA id h16-20020a0cf410000000b0063d119034a3sm4695385qvl.94.2023.08.01.08.48.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 08:48:07 -0700 (PDT)
-Date:   Tue, 1 Aug 2023 11:48:03 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        liubo <liubo254@huawei.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/8] mm/gup: reintroduce FOLL_NUMA as
- FOLL_HONOR_NUMA_FAULT
-Message-ID: <ZMkpM95vdc9wgs9T@x1n>
-References: <20230801124844.278698-1-david@redhat.com>
- <20230801124844.278698-2-david@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6ii4XAGrPtq5rfz/6VphDSYMVOAoJKA+/p4wdrDYiew=;
+        b=MFi7VTGtCBeWW/lvpEzf4yZxYVQ3vIVunIeS167QGNJv7Im9HjWc8YXg3Glfnlv+0s8Gfo
+        wLdW9zAIdI2U9iz2XiEsHQ2Px2Yp+eIce8TxekbblVET63z2Dj3iKL4dyDENRqoZIJpUNR
+        +V3fp9WK6QgtbTNXtGHzYXJcsw0zjzc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-145-6uWu9M3XOamg6JMuPLV17g-1; Tue, 01 Aug 2023 11:53:55 -0400
+X-MC-Unique: 6uWu9M3XOamg6JMuPLV17g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4E3A0185A78F;
+        Tue,  1 Aug 2023 15:53:55 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ACDE61454148;
+        Tue,  1 Aug 2023 15:53:54 +0000 (UTC)
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: [PATCH] vfio/type1: fix cap_migration information leak
+Date:   Tue,  1 Aug 2023 11:53:52 -0400
+Message-ID: <20230801155352.1391945-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230801124844.278698-2-david@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,29 +57,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 01, 2023 at 02:48:37PM +0200, David Hildenbrand wrote:
-> @@ -2240,6 +2244,12 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
->  		gup_flags |= FOLL_UNLOCKABLE;
->  	}
->  
-> +	/*
-> +	 * For now, always trigger NUMA hinting faults. Some GUP users like
-> +	 * KVM really require it to benefit from autonuma.
-> +	 */
-> +	gup_flags |= FOLL_HONOR_NUMA_FAULT;
+Fix an information leak where an uninitialized hole in struct
+vfio_iommu_type1_info_cap_migration on the stack is exposed to userspace.
 
-Since at it, do we want to not set it for FOLL_REMOTE, which still sounds
-like a good thing to have?
+The definition of struct vfio_iommu_type1_info_cap_migration contains a hole as
+shown in this pahole(1) output:
 
-Other than that, looks good here.
+  struct vfio_iommu_type1_info_cap_migration {
+          struct vfio_info_cap_header header;              /*     0     8 */
+          __u32                      flags;                /*     8     4 */
 
-Side note: when I was looking at the flags again just to check the
-interactions over numa balancing, I found FOLL_NOFAULT and I highly suspect
-that's not needed, instead it just wants to use follow_page[_mask]() with
-some proper gup flags passed over.. but that's off topic.
+          /* XXX 4 bytes hole, try to pack */
 
-Thanks,
+          __u64                      pgsize_bitmap;        /*    16     8 */
+          __u64                      max_dirty_bitmap_size; /*    24     8 */
 
+          /* size: 32, cachelines: 1, members: 4 */
+          /* sum members: 28, holes: 1, sum holes: 4 */
+          /* last cacheline: 32 bytes */
+  };
+
+The cap_mig variable is filled in without initializing the hole:
+
+  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+                         struct vfio_info_cap *caps)
+  {
+      struct vfio_iommu_type1_info_cap_migration cap_mig;
+
+      cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+      cap_mig.header.version = 1;
+
+      cap_mig.flags = 0;
+      /* support minimum pgsize */
+      cap_mig.pgsize_bitmap = (size_t)1 << __ffs(iommu->pgsize_bitmap);
+      cap_mig.max_dirty_bitmap_size = DIRTY_BITMAP_SIZE_MAX;
+
+      return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
+  }
+
+The structure is then copied to a temporary location on the heap. At this point
+it's already too late and ioctl(VFIO_IOMMU_GET_INFO) copies it to userspace
+later:
+
+  int vfio_info_add_capability(struct vfio_info_cap *caps,
+                   struct vfio_info_cap_header *cap, size_t size)
+  {
+      struct vfio_info_cap_header *header;
+
+      header = vfio_info_cap_add(caps, size, cap->id, cap->version);
+      if (IS_ERR(header))
+          return PTR_ERR(header);
+
+      memcpy(header + 1, cap + 1, size - sizeof(*header));
+
+      return 0;
+  }
+
+This issue was found by code inspection.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index ebe0ad31d0b0..d662aa9d1b4b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -2732,7 +2732,7 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
+ static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
+ 					   struct vfio_info_cap *caps)
+ {
+-	struct vfio_iommu_type1_info_cap_migration cap_mig;
++	struct vfio_iommu_type1_info_cap_migration cap_mig = {};
+ 
+ 	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
+ 	cap_mig.header.version = 1;
 -- 
-Peter Xu
+2.41.0
 
