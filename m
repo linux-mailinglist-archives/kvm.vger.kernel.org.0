@@ -2,131 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7B2176B4E0
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 14:38:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54DDE76B50E
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 14:49:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232489AbjHAMiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 08:38:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42308 "EHLO
+        id S232482AbjHAMtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 08:49:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230244AbjHAMiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 08:38:16 -0400
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F70C1
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 05:38:14 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1qQodf-00GXS6-3W; Tue, 01 Aug 2023 14:38:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=hDKGQF7V2LpMS3kWl/pd7z6kPfWidZ4pHAFKe8+TPDE=; b=BI9wKATudmqEW80BfA17xknHMN
-        GW3f1UV1ypEq5fkLxKeHS6Zc7G4s4A37TVXU3DLQZpJhBzfaByH9+Ml2dSrZ7KDdOuNMELH4APHXh
-        oMw4eushhF4ponvTJt7BCmmP3jniHaw+1tDnURyaSkK6ey3e5jOADtRHvOaCJUxr/L2H+VrwcsB5v
-        Jtext8fuQjX18lcgZqA+k5JbCU61TeFbgAUoRMXIUEWFzZCsOTPFEaICm7MmZOdWd1GceUVX8WBB7
-        1ymhXCYKAgTKX9B9XB4+NsUpn/6gdR+djfmiKuR9EMK/iHMrtLCDBAcw5a5M5DGU5Oqtz/nPEkyfz
-        liXXQJjA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1qQode-0001nH-De; Tue, 01 Aug 2023 14:38:10 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1qQodU-0005rW-Fd; Tue, 01 Aug 2023 14:38:00 +0200
-Message-ID: <7e24e0b1-d265-2ac0-d411-4d6f4f0c1383@rbox.co>
-Date:   Tue, 1 Aug 2023 14:37:59 +0200
+        with ESMTP id S232273AbjHAMtm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 08:49:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 743801FDA
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 05:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690894133;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RHFvfXcP0yrcIaYOdQEvaIRqqVbMZney2Vh1PcaD7Io=;
+        b=NlkJ6Kvm1W3Ng8Ah0sjWyBkWWQbnmudasPFUDnPqnTwbZTTN8cQ5TBC8QQH8P2+7dqtzuR
+        D/D702p2WUcQBHkERApl0QNnLY5RCT2haBTJXIGm725Wd0TL3zGa5LTL50uHWQ1WDF12dV
+        QwzhrEu3aYo7L2PLallYYaIWfNzBIyw=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-46-92PRgIToNqSHCN5sbvkKmg-1; Tue, 01 Aug 2023 08:48:50 -0400
+X-MC-Unique: 92PRgIToNqSHCN5sbvkKmg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8876C3C14AA4;
+        Tue,  1 Aug 2023 12:48:49 +0000 (UTC)
+Received: from t14s.fritz.box (unknown [10.39.193.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B7B1EC585A0;
+        Tue,  1 Aug 2023 12:48:45 +0000 (UTC)
+From:   David Hildenbrand <david@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        liubo <liubo254@huawei.com>, Peter Xu <peterx@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2 0/8] smaps / mm/gup: fix gup_can_follow_protnone fallout
+Date:   Tue,  1 Aug 2023 14:48:36 +0200
+Message-ID: <20230801124844.278698-1-david@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU
- issues
-Content-Language: pl-PL, en-GB
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
-References: <20230728001606.2275586-1-mhal@rbox.co>
- <20230728001606.2275586-2-mhal@rbox.co> <ZMhIlj+nUAXeL91B@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <ZMhIlj+nUAXeL91B@google.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/1/23 01:49, Sean Christopherson wrote:
-> On Fri, Jul 28, 2023, Michal Luczaj wrote:
->> Both __set_sregs() and kvm_vcpu_ioctl_x86_set_vcpu_events() assume they
->> have exclusive rights to structs they operate on. While this is true when
->> coming from an ioctl handler (caller makes a local copy of user's data),
->> sync_regs() breaks this contract; a pointer to a user-modifiable memory
->> (vcpu->run->s.regs) is provided. This can lead to a situation when incoming
->> data is checked and/or sanitized only to be re-set by a user thread running
->> in parallel.
-> 
-> LOL, the really hilarious part is that the guilty,
-> 
->   Fixes: 01643c51bfcf ("KVM: x86: KVM_CAP_SYNC_REGS")
-> 
-> also added this comment...
-> 
->   /* kvm_sync_regs struct included by kvm_run struct */
->   struct kvm_sync_regs {
-> 	/* Members of this structure are potentially malicious.
-> 	 * Care must be taken by code reading, esp. interpreting,
-> 	 * data fields from them inside KVM to prevent TOCTOU and
-> 	 * double-fetch types of vulnerabilities.
-> 	 */
-> 	struct kvm_regs regs;
-> 	struct kvm_sregs sregs;
-> 	struct kvm_vcpu_events events;
->   };
-> 
-> though Radim did remove something so maybe the comment isn't as ironic as it looks.
-> 
->     [Removed wrapper around check for reserved kvm_valid_regs. - Radim]
->     Signed-off-by: Radim Krčmář <rkrcmar@redhat.com>
-> 
-> Anyways...
+This is agains mm/mm-unstable, but everything except patch #7 and #8
+should apply on current master. Especially patch #1 and #2 should go
+upstream first, so we can let the other stuff mature a bit longer.
 
-Nah, from what I can see, it wasn't Radim's tweak that introduced the
-TOCTOUs[1].
 
-[1] https://lore.kernel.org/kvm/20180202210434.GC27896@flask/
+Next attempt to handle the fallout of 474098edac26
+("mm/gup: replace FOLL_NUMA by gup_can_follow_protnone()") where I
+accidentially missed that follow_page() and smaps implicitly kept the
+FOLL_NUMA flag clear by not setting it if FOLL_FORCE is absent, to
+not trigger faults on PROT_NONE-mapped PTEs.
 
->> A note: when servicing kvm_run->kvm_dirty_regs, changes made by
->> __set_sregs()/kvm_vcpu_ioctl_x86_set_vcpu_events() to on-stack copies of
->> vcpu->run.s.regs will not be reflected back in vcpu->run.s.regs. Is this
->> ok?
-> 
-> I would be amazed if anyone cares.  Given the justification and the author,
-> 
->     This reduces ioctl overhead which is particularly important when userspace
->     is making synchronous guest state modifications (e.g. when emulating and/or
->     intercepting instructions).
->     
->     Signed-off-by: Ken Hofsass <hofsass@google.com>
-> 
-> I am pretty sure this was added to optimize a now-abandoned Google effort to do
-> emulation in uesrspace.  I bring that up because I was going to suggest that we
-> might be able to get away with a straight revert, as QEMU doesn't use the flag
-> and AFAICT neither does our VMM, but there are a non-zero number of hits in e.g.
-> github, so sadly I think we're stuck with the feature :-(
+Patch #1 fixes the known issues by reintroducing FOLL_NUMA as
+FOLL_HONOR_NUMA_FAULT and decoupling it from FOLL_FORCE.
 
-All right, so assuming the revert is not happening and the API is not misused
-(i.e. unless vcpu->run->kvm_valid_regs is set, no one is expecting up to date
-values in vcpu->run->s.regs), is assignment copying
+Patch #2 is a cleanup that I think actually fixes some corner cases, so
+I added a Fixes: tag.
 
-	struct kvm_vcpu_events events = vcpu->run->s.regs.events;
+Patch #3 makes KVM explicitly set FOLL_HONOR_NUMA_FAULT in the single
+case where it is required, and documents the situation.
 
-the right approach or should it be a memcpy(), like in ioctl handlers?
+Patch #4 then stops implicitly setting FOLL_HONOR_NUMA_FAULT. But note that
+for FOLL_WRITE we always implicitly honor NUMA hinting faults.
 
-thanks,
-Michal
+Patch #5 and patch #6 cleanup some comments.
+
+Patch #7 improves the KVM functional tests such that patch #8 can
+actually check for one of the known issues: KSM no longer working on
+PROT_NONE mappings on x86-64 with CONFIG_NUMA_BALANCING.
+
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: liubo <liubo254@huawei.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Hugh Dickins <hughd@google.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Mel Gorman <mgorman@suse.de>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+
+David Hildenbrand (8):
+  mm/gup: reintroduce FOLL_NUMA as FOLL_HONOR_NUMA_FAULT
+  smaps: use vm_normal_page_pmd() instead of follow_trans_huge_pmd()
+  kvm: explicitly set FOLL_HONOR_NUMA_FAULT in hva_to_pfn_slow()
+  mm/gup: don't implicitly set FOLL_HONOR_NUMA_FAULT
+  pgtable: improve pte_protnone() comment
+  mm/huge_memory: remove stale NUMA hinting comment from
+    follow_trans_huge_pmd()
+  selftest/mm: ksm_functional_tests: test in mmap_and_merge_range() if
+    anything got merged
+  selftest/mm: ksm_functional_tests: Add PROT_NONE test
+
+ fs/proc/task_mmu.c                            |   3 +-
+ include/linux/mm.h                            |  21 +++-
+ include/linux/mm_types.h                      |   9 ++
+ include/linux/pgtable.h                       |  16 ++-
+ mm/gup.c                                      |  23 +++-
+ mm/huge_memory.c                              |   3 +-
+ .../selftests/mm/ksm_functional_tests.c       | 106 ++++++++++++++++--
+ virt/kvm/kvm_main.c                           |  13 ++-
+ 8 files changed, 164 insertions(+), 30 deletions(-)
+
+-- 
+2.41.0
 
