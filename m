@@ -2,183 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CABFC76B865
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:19:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD0D876B872
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:20:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232800AbjHAPTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 11:19:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43228 "EHLO
+        id S233838AbjHAPUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 11:20:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229819AbjHAPTi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 11:19:38 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2041.outbound.protection.outlook.com [40.107.243.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C95F116;
-        Tue,  1 Aug 2023 08:19:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hKGu1bzCMgA7RHDt0/HlITuKuzniad9wifov+H1kej8Jyx8Dkdv4YiQ9hUar4Fwz5wVF++AdHdO7bJnYgoLFpE2l5cIX+0qDLJZeQ9dR5Y7zpd0HnQOQLklOeCf/DfapABIlhLaefZ3oECy8fE5YSonSgJBFiM9l3sJE5oQ5OEOCTWdAuwKeeYa3yTeg2NzUGZMdSQncm7BT6JIlJCZd42I8PMwIbJyI0HyfCeOt4rwP5auI1Q60J2KFrd7TzlBL4SY6Aa4jydzji5ZXGo9gfGuUwwZLhKIGUV3nbnNwe1yvuALBmSQzBMdhdeMdixjKTIGLTvN/Cf3Pd7xKxLaTaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YDtZqHpdLbYNvlJIgo+PVsAHqUQQtVqk7o3qc7Xs43k=;
- b=nCIdNFMGw5vnB04fbuM5vfDNseiF9+e0HrkPOmsEkjmx4tD/iw6Gr/qQuGINMoB3bkLjkQ8Bppo9cGNiYf/0gkmXLvzAb+0YP+mrUjMh3P/2i1U0sNvnd31ywuDA9PrkKZiwQOYgWlnXKBtlbUV+q2LEXnSZ3POTFA+y/jvR4sIiYXGRjxqqtaCR0VD6Et7LYgakrRWWJlysk77Cr1+lYe06CvwtJTXl9aDNnwFxKaHjy5W7bIfNc3Ko1BR+NzOlw7Ztidso5XDNlJxwd3UY6539ouAFmuhNKwvzawkjPRMl/y1X5FohA5A47nZ/j35hNguvXUrN3xrvisWuhSbf4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YDtZqHpdLbYNvlJIgo+PVsAHqUQQtVqk7o3qc7Xs43k=;
- b=H+J1FCLKCXX3NzARB3VbqIb4Mut6JJp6v7qQD1pSr3SEUL3ielvKTXPfhkckUa7AEQG7CGSVYZpVkrVsT9bJ/DAMPNhHtRIkEjf+B58tLlGCLptI7mTyG9tSHMzE6cZelXVwxeJ0lMwnwboxGsS7peVoZ4a4JVcc5Qlsaiat8xA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
- by MW4PR12MB7335.namprd12.prod.outlook.com (2603:10b6:303:22b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.39; Tue, 1 Aug
- 2023 15:19:34 +0000
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::1be:2aa7:e47c:e73e]) by BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::1be:2aa7:e47c:e73e%4]) with mapi id 15.20.6631.042; Tue, 1 Aug 2023
- 15:19:34 +0000
-Date:   Tue, 1 Aug 2023 10:19:23 -0500
-From:   John Allen <john.allen@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, weijiang.yang@intel.com,
-        rick.p.edgecombe@intel.com, x86@kernel.org,
-        thomas.lendacky@amd.com, bp@alien8.de
-Subject: Re: [RFC PATCH v2 4/6] KVM: SVM: Save shadow stack host state on
- VMRUN
-Message-ID: <ZMkie3B7obtTTpLu@johallen-workstation>
-References: <20230524155339.415820-1-john.allen@amd.com>
- <20230524155339.415820-5-john.allen@amd.com>
- <ZJYKksVIORhPtD6T@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJYKksVIORhPtD6T@google.com>
-X-ClientProxiedBy: YQBPR0101CA0186.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:f::29) To BL1PR12MB5995.namprd12.prod.outlook.com
- (2603:10b6:208:39b::20)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|MW4PR12MB7335:EE_
-X-MS-Office365-Filtering-Correlation-Id: 42ab3158-2f15-425e-5d11-08db92a2b5fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZB4evB0XSUn3Ynei5NLF3Xf7bexvNogo3NMWPQCyVZ4i2DxiqSq0ORhENCsnvFYFaKjZiIIHlXg3slf2+R+bM8J0Q6hEvG/gkIwPmUNG1d56wCGAt2yGEjU73l4S/asWmkJugOzeWe40MPEoHbj//esaTA1yMMmxRVeUDYB2WcRiXvkJVqWBXVJGBugoY+Quupjp4YaYzdi7vMJ2JuNBKFjBKeub1voOwYhlA2NJ/GURWZG8wmcjDPaAJCCtI5pigEOyF0QQjgjS9LjgffNOHMQAqcDIEHGzZBgW80tlHuYZFGBUZKIDM8lymxNedMoD9PZiV25KoU9tvc/dYSFoYeEUgjHfIoxliPkMfTSjnfwOpCjkXQP1wHyWINnbESP9kGZmC5RKQMSPH/O3BGKam3C+rxXUVhKR3OXjZ7QnWMo/O8py13v2raoDemOv/d3I7gWbaaV2QDFENlUWO2tixh+bwbthiqx2iOy9wtY5GH5C897+SDFhmwwHFXlJTaN4VaJfF9kK2ZNcIXz/IjCvkzYl7ePMbLPLBAZl2HOAWn1xBBjGZt4wdIpptdN+k1j6
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(451199021)(44832011)(9686003)(6512007)(6486002)(26005)(6506007)(83380400001)(186003)(66946007)(66556008)(33716001)(41300700001)(86362001)(38100700002)(66476007)(5660300002)(6916009)(4326008)(8676002)(8936002)(316002)(2906002)(6666004)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?i32/Dihzi/BP0KhLYx43zXW6bD2t/zozwUlBSh5/gS2NVuhQNIi1R9YTy9Sj?=
- =?us-ascii?Q?Imz/BiewqrkHypv4tqUjdqbRuFHotl8WZMh53BN9+WtHVCSvBTbUetz+Yupx?=
- =?us-ascii?Q?vI6w7im1dyVxIz2vYs3bUjDpZzUhn5nmNChZ5wlN6c5zYsGHLZDRk+63wORb?=
- =?us-ascii?Q?JNANBkcMlCIEdnOJIZPaOiBTRI5TSlBOqzTiumdfG00YNK7yR6x92rhftTgx?=
- =?us-ascii?Q?Vdbz4Vh5jGL+u2GYc5wHAwyIzsBl4iGzA1uceub/CRwnCSYI5wIEu24c/Low?=
- =?us-ascii?Q?DDV+MfOaGN688YL5s/4lQtaj4PZMtMwbFeJRFY+EKoLgbkpkIF0MnOMEF6b4?=
- =?us-ascii?Q?17sAuFShagka6FM6I8zTchBifVfRstKhO3qCoxHZ3aHnVA6+pYijICqzwzsF?=
- =?us-ascii?Q?//c92bRv+t/lyVJXJm/ryGY+15FJzxhcE2FMmz+bXSMUgmikemNWG3jqrRtr?=
- =?us-ascii?Q?Wykw41HcjXXcrwU30y3RBwMei39MLSjP7Qi999pX8AH3M+QFg/CqySD2E3pu?=
- =?us-ascii?Q?wv7plNjCDl/MBMA13zgM2HiYPwTK+bIi1kw5DNPpTJavkzZNF50HnfviEDvy?=
- =?us-ascii?Q?mqeElB2ZP6shQZKrvqi1MMyJibiyjXHMFnrYnEQQ1nG8KxhGpJ6BOnMevEoi?=
- =?us-ascii?Q?hPQxSTl1BRUhp7UrIijT8QCfZyTuQB00roh9ebSu2Ah+6cEtXpsCmH7xlTA9?=
- =?us-ascii?Q?6P14f0kCNQ7FGG5/dYKqicIcSmf6mttgPaHmo7PNSYMC+65ZD2VCTPlp08e0?=
- =?us-ascii?Q?2zNW9SvIuxli6Gy3+HipgE9NgHKaXDZseaGAMYDAzbtWaCXHfgQVkuCJZeOt?=
- =?us-ascii?Q?a4+2v5i4wemsRYuCUS04GWFqZTdz3zQ1Q0c5GWa29+/DGjChuNDssc4qcstV?=
- =?us-ascii?Q?3HDtewNTS5Za8jR3b4pQtInCXIXq1uAuqNH0I9MxG9hLcFdjsW1w5quTrsT6?=
- =?us-ascii?Q?vLfOkYEp3qrdLSi/+hB74H4l7TaMf0I/f4fu1DG7wFjJ+UKQVjFh7RN+knJ7?=
- =?us-ascii?Q?PpJt2P2cwX68mHbNGoG3qlndUkluU+yFOFY4GQr6GFIX3Ce9Tj1NyoaCi7hm?=
- =?us-ascii?Q?AM226+AiF5cCv2WwpV+4ZTuorXwvsYzRGJMrQj3ADkGELUE/qM0rRXs6SnmX?=
- =?us-ascii?Q?URQiYASYFkDjm5SSrhAwMJd2rOg/9oH8f+Dld2EO595TwW6N6MtaVwP2ZuwL?=
- =?us-ascii?Q?W+1z2IqRLXbns3Hm1GpMihRyTpORDYfM9HHZePb0HZ+Eh1K9Yd27aXRbRoff?=
- =?us-ascii?Q?A77/dBTYN45HQy8LizjJMfFQ2ldP5dtYP6fwKvFKW/u9FU2Yyer1aca8zYKa?=
- =?us-ascii?Q?L7OCcT0g1K8degmz7RC6vSAXn0U8RnHGGHDXY4cku12iQZhYOrcs3XdCtZzE?=
- =?us-ascii?Q?SPM7XJjO29QTlfpC5Jxy8qC16R2JZAG99pNqnyoczCxssd6B+Ek8dIYAPiyr?=
- =?us-ascii?Q?VOkrEaBc423bVn+TDsA7dyjMDWy1gcSxg0Y2hDyd72WP5nNursEDfjM7V6bP?=
- =?us-ascii?Q?ypb519s17NL537q8ukaY+r+l30E3eCGTA3AYFYnh9EGVJnERnMCwlF4XOeOo?=
- =?us-ascii?Q?E4hSZBMwpyZRRy2vz2/DCrGwb23EJ5ocsHptOy6P?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42ab3158-2f15-425e-5d11-08db92a2b5fc
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2023 15:19:34.0585
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y1xy+yXsu/Xu9VVe4tzGbeOBQOp0NRgsGel/I3oWhmpB/PYTNq7xGM2KMnk+YKm31vLym4rJWBusAXdmV+f2Qg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7335
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+        with ESMTP id S233797AbjHAPUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 11:20:15 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B36A1FC3
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:20:12 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d390abf3319so562775276.0
+        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 08:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690903211; x=1691508011;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9bccqF6ZETP6L8iCBAyZklNgWPnV99usCe2NbK3B7qU=;
+        b=ni12vwrh4WCyCOzKlXXO+IyaWmPJIcRzAgoQsvsnGMs2wj7MJfruA43KZbkSsda12h
+         GR1ZwNeGk0z7aWVT9P/e8VvlOTyYaGRKSJP8dDLq2m/jMoMLJalDZXftU2oUL7s98ws4
+         BdSxyKpKgIsO1MnuRdqXsW2naV/FmLSbL+gtr7GIcmVZI1xHKg9L96WSEpBEEhax/pUh
+         Q71yVF65mgCp9lMt5f+0hvoCCc2ilGayVZGBiBPofVEN+jYqcoSQ4mm2W+5dmEOC3qaX
+         3yj0jm4eumJBnSio/SvZ2R86AZoJkSTVJNgLMYi7nWXKKDaP+vWMwDG3GoH+XdIrwBWw
+         5m2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690903211; x=1691508011;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9bccqF6ZETP6L8iCBAyZklNgWPnV99usCe2NbK3B7qU=;
+        b=PAi5s0tvXrdwLLOXdzGXlnh+BdILkzGttzF4UbMBZNauyhnoyk8lUtvqsIFyVPvdv7
+         C0rBMwIHBTD1z7D47aeYvhsogb46iRpjnjUq5qwbhD3T7cJ3X4v927OpUbMc7PHH0j6c
+         ZPbK0VkwXyI1hSgmScgj3UMCw3nEOKHRxz15s8csTwC2R5GO3eUFS5baILWwwgU0S4NL
+         unuFmKtJHT8cHW1JbnTQX8FtLEJGe4OWfdgNi2UO2W8xEB8ukRMTPl6WZEfvKd236o84
+         0DOQFjso6R7dNvzpmAjt/+aLAo08WT8RLnok9wFPK9lpcB34dbnIsBidJsxuq+54vE5L
+         tP9Q==
+X-Gm-Message-State: ABy/qLaKuixZmDrmsJ4ef4otYv06qe4f4lZdo7HvGMEAfDND4FAJD6c9
+        Y3sG7tN9KmEbCFXvjuECdeNxpXq3Zg4cyV1fEd4tXI+ki6MX31mX9FEXiEg/0bsG5bjDXiAwI57
+        cDxuooXbkJdOJg9tsdWp+GZhKi1fSF7UeHbsdtZRb21bd9clqJwFXfjOsiPS9PnnGNDPNXqk=
+X-Google-Smtp-Source: APBJJlE0Wc30ZjJoWXKkO+YDWTlvYE845ycMEBcUTKdlvCemAbv8pSUYmrcxJ54JJWoniJy4wnFQXWxFzyQzHR5teg==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a05:6902:70b:b0:c6c:6122:5b69 with
+ SMTP id k11-20020a056902070b00b00c6c61225b69mr106675ybt.8.1690903211311; Tue,
+ 01 Aug 2023 08:20:11 -0700 (PDT)
+Date:   Tue,  1 Aug 2023 08:19:56 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
+Message-ID: <20230801152007.337272-1-jingzhangos@google.com>
+Subject: [PATCH v7 00/10] Enable writable for idregs DFR0,PFR0, MMFR{0,1,2,3}
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 23, 2023 at 02:11:46PM -0700, Sean Christopherson wrote:
-> On Wed, May 24, 2023, John Allen wrote:
-> > When running as an SEV-ES guest, the PL0_SSP, PL1_SSP, PL2_SSP, PL3_SSP,
-> > and U_CET fields in the VMCB save area are type B, meaning the host
-> > state is automatically loaded on a VMEXIT, but is not saved on a VMRUN.
-> > The other shadow stack MSRs, S_CET, SSP, and ISST_ADDR are type A,
-> > meaning they are loaded on VMEXIT and saved on VMRUN. Manually save the
-> > type B host MSR values before VMRUN.
-> > 
-> > Signed-off-by: John Allen <john.allen@amd.com>
-> > ---
-> >  arch/x86/kvm/svm/sev.c | 13 +++++++++++++
-> >  1 file changed, 13 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index c25aeb550cd9..03dd68bddd51 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -3028,6 +3028,19 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
-> >  
-> >  	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
-> >  	hostsa->xss = host_xss;
-> > +
-> > +	if (boot_cpu_has(X86_FEATURE_SHSTK)) {
-> > +		/*
-> > +		 * MSR_IA32_U_CET, MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP,
-> > +		 * MSR_IA32_PL2_SSP, and MSR_IA32_PL3_SSP are restored on
-> > +		 * VMEXIT, save the current host values.
-> > +		 */
-> > +		rdmsrl(MSR_IA32_U_CET, hostsa->u_cet);
-> > +		rdmsrl(MSR_IA32_PL0_SSP, hostsa->vmpl0_ssp);
-> > +		rdmsrl(MSR_IA32_PL1_SSP, hostsa->vmpl1_ssp);
-> > +		rdmsrl(MSR_IA32_PL2_SSP, hostsa->vmpl2_ssp);
-> > +		rdmsrl(MSR_IA32_PL3_SSP, hostsa->vmpl3_ssp);
-> 
-> Heh, can you send a patch to fix the names for the PLx_SSP fields?  They should
-> be ->plN_ssp, not ->vmplN_ssp.
+This patch series enable userspace writable for below idregs:
+ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL1.
+A vm ioctl is added to get feature ID register writable masks from userspace.
+A selftest is added to verify that KVM handles the writings from user space
+correctly.
+A relevant patch from Oliver is picked from [3].
+It is based on v6.5-rc4 which contains infrastructure for writable idregs.
 
-Yes, I will include a patch to address this in the next version of the
-series.
+---
 
-> 
-> As for the values themselves, the kernel doesn't support Supervisor Shadow Stacks
-> (SSS), so PL0-2_SSP are guaranteed to be zero.  And if/when SSS support is added,
-> I doubt the kernel will ever use PL1_SSP or PL2_SSP, so those can probably be
-> ignored entirely, and PL0_SSP might be constant per task?  In other words, I don't
-> see any reason to try and track the host values for support that doesn't exist,
-> just do what VMX does for BNDCFGS and yell if the MSRs are non-zero.  Though for
-> SSS it probably makes sense for KVM to refuse to load (KVM continues on for BNDCFGS
-> because it's a pretty safe assumption that the kernel won't regain MPX supported).
-> 
-> E.g. in rough pseudocode
-> 
-> 	if (boot_cpu_has(X86_FEATURE_SHSTK)) {
-> 		rdmsrl(MSR_IA32_PLx_SSP, host_plx_ssp);
-> 
-> 		if (WARN_ON_ONCE(host_pl0_ssp || host_pl1_ssp || host_pl2_ssp))
-> 			return -EIO;
-> 	}
+* v6 -> v7
+  - Rebase on v6.5-rc4.
+  - Add a vm ioctl to get feature ID register writable masks from userspace.
+  - Split the change for debug version in ID_{AA64}DFR0_EL1.
+  - Addressed some bugs in selftest.
 
-The function in question returns void and wouldn't be able to return a
-failure code to callers. We would have to rework this path in order to
-fail in this way. Is it sufficient to just WARN_ON_ONCE here or is there
-some other way we can cause KVM to fail to load here?
+* v5 -> v6
+  - Override the type of field AA64DFR0_EL1_DebugVer to be FTR_LOWER_SAFE by the
+    discussion of Oliver and Suraj.
+
+* v4 -> v5
+  - Rebase on v6.5-rc1 which contains infrastructure for writable idregs.
+  - Use guest ID registers values for the sake of emulation.
+  - Added a selftest to verify idreg userspace writing.
+
+* v3 -> v4
+  - Rebase on v11 of writable idregs series at [2].
+
+* v2 -> v3
+  - Rebase on v6 of writable idregs series.
+  - Enable writable for ID_AA64PFR0_EL1 and ID_AA64MMFR{0, 1, 2}_EL1.
+
+* v1 -> v2
+  - Rebase on latest patch series [1] of enabling writable ID register.
+
+[1] https://lore.kernel.org/all/20230402183735.3011540-1-jingzhangos@google.com
+[2] https://lore.kernel.org/all/20230602005118.2899664-1-jingzhangos@google.com
+[3] https://lore.kernel.org/kvmarm/20230623205232.2837077-1-oliver.upton@linux.dev
+
+[v1] https://lore.kernel.org/all/20230326011950.405749-1-jingzhangos@google.com
+[v2] https://lore.kernel.org/all/20230403003723.3199828-1-jingzhangos@google.com
+[v3] https://lore.kernel.org/all/20230405172146.297208-1-jingzhangos@google.com
+[v4] https://lore.kernel.org/all/20230607194554.87359-1-jingzhangos@google.com
+[v5] https://lore.kernel.org/all/20230710192430.1992246-1-jingzhangos@google.com
+[v6] https://lore.kernel.org/all/20230718164522.3498236-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (8):
+  KVM: arm64: Allow userspace to get the writable masks for feature ID
+    registers
+  KVM: arm64: Document KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS
+  KVM: arm64: Use guest ID register values for the sake of emulation
+  KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+  KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+  KVM: arm64: Refactor helper Macros for idreg desc
+  KVM: arm64: Enable writable for ID_AA64MMFR{0, 1, 2, 3}_EL1
+  KVM: arm64: selftests: Test for setting ID register from usersapce
+
+Oliver Upton (2):
+  KVM: arm64: Reject attempts to set invalid debug arch version
+  KVM: arm64: Bump up the default KVM sanitised debug version to v8p8
+
+ Documentation/virt/kvm/api.rst                |  26 +++
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/include/uapi/asm/kvm.h             |  25 +++
+ arch/arm64/kvm/arm.c                          |   3 +
+ arch/arm64/kvm/sys_regs.c                     | 191 ++++++++++++------
+ include/uapi/linux/kvm.h                      |   2 +
+ tools/arch/arm64/include/uapi/asm/kvm.h       |  25 +++
+ tools/include/uapi/linux/kvm.h                |   2 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/set_id_regs.c       | 191 ++++++++++++++++++
+ 10 files changed, 408 insertions(+), 60 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
+
+
+base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
+-- 
+2.41.0.585.gd2178a4bd4-goog
 
