@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA66F76B878
-	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:20:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0213176B87B
+	for <lists+kvm@lfdr.de>; Tue,  1 Aug 2023 17:20:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234141AbjHAPU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 11:20:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43860 "EHLO
+        id S234590AbjHAPUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 11:20:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234237AbjHAPUX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 11:20:23 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 328852113
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:20:22 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bba9a0da10so40413945ad.2
-        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 08:20:22 -0700 (PDT)
+        with ESMTP id S233797AbjHAPUY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 11:20:24 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C724C1FC0
+        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 08:20:23 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-686bc3f123eso5797653b3a.1
+        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 08:20:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690903221; x=1691508021;
+        d=google.com; s=20221208; t=1690903223; x=1691508023;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5CnHym/u4lCc+2ZRHUcKoPxTfNqi1z6j2L8Et7c5ypg=;
-        b=ITQmxLoYmO8h9hfwALbwL2rbBiAv0WLTDqVVXqQ68Kx3CrRI2YuJDvikKqxD98orlv
-         asBoUJOWDE/bC378g+AcV7451TxIqgjUWQoongTCjB6tBtusYCGinPnTxb8547akp1iy
-         7xfjc5EQNTUSFk/UM3dVuwC9GH3YS8wLhgVdHaJ1rj+9Z0dOK9ZsPNHXPZkaJ+wIm1zI
-         pflTA6JfCQ5Cn1EKiIj4ULclDADFcWUGls/+h1FWcEC574Su2y04w9J8m81XMUW0eBGx
-         whjUwbBD1KqWHEUQm8NzZIKN4o6U5CQYuyrnQnuU87g9I+ZajU9x2fLC8hsIjBTegaEa
-         FOvg==
+        bh=6FyTW1VsL4amGRSIg6wJqneP5gVog8VOaALdC61uAQM=;
+        b=C0ZfPq3efOpnuDcjVLErVLMbvOkEBdQvbm4wQodeYlarW1FXMlMZid16hWYooPNHQg
+         FySrGsafcV+pPcCeKbUiDJXzjc+1S4iffzB2PNPF7P3pEZ3/wA5J+oaXkexLLPEDBUTL
+         4EbZMcSnQSuQmvmJ6DxOhJX+twsw+aZlzTQC9E+KUFYuYNTgTVQW5bHIrFlpSZD2kjZ5
+         av1L2nNW80E8q9U4tCNyRXzWHt6OcoUQIt2DkunjdDA1YmF5bZUXBsYOnM4bsG7d7J2p
+         OG0u8sL+1JVv9F0pgL21R5NOmzp+v1VmtztLqjLVQiyX4m33EH5jpctaIwsxb62NEABX
+         /P6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690903221; x=1691508021;
+        d=1e100.net; s=20221208; t=1690903223; x=1691508023;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5CnHym/u4lCc+2ZRHUcKoPxTfNqi1z6j2L8Et7c5ypg=;
-        b=ZRbqrIyQpHdgEDUsd9sJchaJa9bIkIV1wAhBOeQj0st0+r4pjN8JOsJ7AW5vpGj2sI
-         2y3A4smMT+yPgj7EA3kmqM+t6sUZ4cEcXor09Y/2Bv7548Ma8Qh8nY5dSswJLWxfosLB
-         jtcFI3OqqQ/8087abRtNFopzylkmFzZISyi53Ow995jVZphgCDnUrtilVz4yTkJZiq3J
-         1V1kK0txzSieUJ6XJpmhSqlSULXC4+PmdJ4zdyAeffEKL8zPMlCHA1VPRvwFChO7I78V
-         agpMPPMrEO/f0qJlhN9E0hEy2ojeM7pZmBj/yLXm58LUZECA6rFo8EEeBfJOemegshWd
-         2JRw==
-X-Gm-Message-State: ABy/qLap23Gqzqg+EnWmOR/r3N+dEwl8TZvIOodAikI6lnWuxgg7zNy3
-        QUDeWkYqHuG3Pk85ujayNXA0KGeMkIg7e6Q/MV9Gs8Vgp61BAv+O1aUzCO/ELJ5F+Iz3ER6SYbg
-        9laM+AkicEz1asj93UahhDHkidNrX3lFDCDdf8ZRKdGc1slt4j4elBLRJJCEHl0tm8+RY3jE=
-X-Google-Smtp-Source: APBJJlEnPwgkTgMCnI54ZmtyPE3ZmqrSTb8N+c2ZmA4uLAPIPk28sPLKkYPRVyGSa7M9V2JcblPYsgrU4Lh3MjT/iQ==
+        bh=6FyTW1VsL4amGRSIg6wJqneP5gVog8VOaALdC61uAQM=;
+        b=bP160wYAEyEZpFXXveKSAvRQ5mjTRTuIljIfgg0nT6LUQqoe+cGEwqcotjcCMKk8V9
+         /whh2lPwPJEqfZK9BZtvOUOP+q06+oNnARUUcebfxU47LuNS6CpStVfRYhWyx9tqJR5R
+         sBkinvmRH+snaWMDq+lVLjJHu6jMUnCRqvfqD4Bj7ClvuNhWQDc/dB8HxO7zc+G1X/tg
+         q5iLEKKK7fE4fNnNIaJyZ+wYpeTrby4DMHMequoHTazObydAltYxubpFAx3C1EpK20uB
+         jvKJ/nOEEJNBJNfSbqZ9YeyQqwGGOITh2INdrBb1WZCKnouFoTIssRii4sbGlew4XOf9
+         Pyyw==
+X-Gm-Message-State: ABy/qLZSO3RPqnaINQ9JKk8DH57pe504T9o78bCJ+Quazjf05XpF59gG
+        dyGYotD9aZ11jIhUecVqP0McABZJD1hIxvQs2ebftns6s2Ip3F/VvCnMdecYl1yXYl62TIW3sVV
+        oCTzHybCVey8a8h+VRjpSSpAByIgiUh9e7tVTdlpS0FbZCNpaLloZJFn5UYO1VCzMtka3j/s=
+X-Google-Smtp-Source: APBJJlEL3UUpI4AI77yIqdcAOJwFOq1i8j3nPTDlAWpLoDzAvhrkuZEeOT3azEun/jvOMdCuFYFKd2z4TNq9i2f2Qg==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:902:da83:b0:1b3:c62d:71b5 with
- SMTP id j3-20020a170902da8300b001b3c62d71b5mr60476plx.0.1690903221091; Tue,
- 01 Aug 2023 08:20:21 -0700 (PDT)
-Date:   Tue,  1 Aug 2023 08:20:01 -0700
+ (user=jingzhangos job=sendgmr) by 2002:a05:6a00:80a:b0:682:f33:fa97 with SMTP
+ id m10-20020a056a00080a00b006820f33fa97mr109865pfk.6.1690903222997; Tue, 01
+ Aug 2023 08:20:22 -0700 (PDT)
+Date:   Tue,  1 Aug 2023 08:20:02 -0700
 In-Reply-To: <20230801152007.337272-1-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20230801152007.337272-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <20230801152007.337272-6-jingzhangos@google.com>
-Subject: [PATCH v7 05/10] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+Message-ID: <20230801152007.337272-7-jingzhangos@google.com>
+Subject: [PATCH v7 06/10] KVM: arm64: Bump up the default KVM sanitised debug
+ version to v8p8
 From:   Jing Zhang <jingzhangos@google.com>
 To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         ARMLinux <linux-arm-kernel@lists.infradead.org>,
@@ -79,36 +80,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-from usrespace with this change.
+From: Oliver Upton <oliver.upton@linux.dev>
 
+Since ID_AA64DFR0_EL1 and ID_DFR0_EL1 are now writable from userspace,
+it is safe to bump up the default KVM sanitised debug version to v8p8.
+
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7fcbc317f100..2183cd3af472 100644
+index 2183cd3af472..5a886ccb33fa 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2006,7 +2006,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .set_user = set_id_dfr0_el1,
- 	  .visibility = aa32_id_visibility,
- 	  .reset = read_sanitised_id_dfr0_el1,
--	  .val = ID_DFR0_EL1_PerfMon_MASK, },
-+	  .val = GENMASK(63, 0), },
- 	ID_HIDDEN(ID_AFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR0_EL1),
- 	AA32_ID_SANITISED(ID_MMFR1_EL1),
-@@ -2055,7 +2055,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  .get_user = get_id_reg,
- 	  .set_user = set_id_aa64dfr0_el1,
- 	  .reset = read_sanitised_id_aa64dfr0_el1,
--	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
-+	  .val = GENMASK(63, 0), },
- 	ID_SANITISED(ID_AA64DFR1_EL1),
- 	ID_UNALLOCATED(5,2),
- 	ID_UNALLOCATED(5,3),
+@@ -1489,8 +1489,7 @@ static u64 read_sanitised_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+ 
+-	/* Limit debug to ARMv8.0 */
+-	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, IMP);
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+ 
+ 	/*
+ 	 * Only initialize the PMU version if the vCPU was configured with one.
+@@ -1550,6 +1549,8 @@ static u64 read_sanitised_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 	if (kvm_vcpu_has_pmu(vcpu))
+ 		val |= SYS_FIELD_PREP(ID_DFR0_EL1, PerfMon, perfmon);
+ 
++	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_DFR0_EL1, CopDbg, Debugv8p8);
++
+ 	return val;
+ }
+ 
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
