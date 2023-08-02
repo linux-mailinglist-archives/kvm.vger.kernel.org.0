@@ -2,92 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A54376DA65
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:04:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BC1E76DA75
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:13:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233768AbjHBWE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 18:04:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54642 "EHLO
+        id S232753AbjHBWNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 18:13:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233736AbjHBWEx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 18:04:53 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0523E1990
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:04:53 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bb982d2603so2977075ad.3
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:04:53 -0700 (PDT)
+        with ESMTP id S231196AbjHBWN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 18:13:27 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B94126AF
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:13:27 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c79a5565aso383625a12.3
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691013892; x=1691618692;
+        d=google.com; s=20221208; t=1691014407; x=1691619207;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3L++u9EqbCU4ZOlfdhCMgX3M04LeaNXIW3H7M8hugcY=;
-        b=oxkpla1xmaEMJq7ReMkgKq/10/5JuSCX53MEyrss0daoRCpMtftcRCiIMKToqk2OSo
-         3Q7Qmk9MlOrGKQpaYUjCHlmxbFtX0tXI5Kd5uftcQIq7BWNDQtgYweFAyXhqyLf7aYCi
-         RJ/Pf6PJ59fi03ExFylkMS6nle0zRJw9LFiI10yUlQvgoOJKnq9QpXLxJAQJDvTsRBqt
-         gl+JYhOBSYtmbJg0oxKlCst7AubddXpQyCtY6Sw6vPCyMG5vz95fgqRQCZ8GpHmgLRpt
-         ZiznfJgH6E8UaB7ANK0BBCLOfZRo8m2FJuDFmUaoI2fOBjbeSNeNFZuF10VzWePldeqN
-         /7ug==
+        bh=oNrunTw9g/scAXlACL1Yy6BuHYu8UXiywBffDHO0ySM=;
+        b=oRnUg49TyqQtCpG9mB1+Zt8T8V0fo6eI5r3czuLbiC4L4rdWaAvVrHBVtqTeJ90E9Y
+         B5mZ5FxEswdpGVKmbD8pwI9bFz4V/mbheFZjzkgcOl/c5u2L4vsnneSqeIgWAP8/lQI3
+         K34qOuv/PzRLXUwq2elOGYB7F92GhrDe+DtfEWHBkMakUjcspHZ8f6JEMNK1zQ9wuHBz
+         e1B2WnP1p9aoj/wxzD9TsVHQB621qb0zo19xWV98Sv2YUL8E4eyA30M5eo4U916dAc/p
+         X3aJpDamXtAC63JzSAXYnBsVQdUH92Yy4Se4/Lf7hhcWQoOgRWe+WrTk8vAfPtRpUjwE
+         +ONw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691013892; x=1691618692;
+        d=1e100.net; s=20221208; t=1691014407; x=1691619207;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3L++u9EqbCU4ZOlfdhCMgX3M04LeaNXIW3H7M8hugcY=;
-        b=Kxp7A/Imr52NhGFxXx2ve4s6+c0xcGVFpmMAJNw7nNKdV6n0tYTzmNJaqSCaPbPoFn
-         4l/ISHUxgzL44Co01UhHYIkdlv5eg90Rba5/UH8EFYnoBWcmJP4oFaNdxGwA1xs0IMRV
-         VHDUnvKwNpPgBAKkEbEj0zmAd0xYYsX1MF86uCWu14bk/IbOSxfpXsAsySxc18cZT4Hw
-         +YjFZPuCXWnfzgyelRI5J+rIW5FdxoXHcPOs0b/6Bb062iZLsN1IANTRawOCZC2vqrzI
-         UuUTQ+TH7evMF5gLdF5PsOEMY6TcYZDuJgR4wtnWYJxe6HjcesBzwgsoUm0hqcaH7WuK
-         ub0w==
-X-Gm-Message-State: ABy/qLaW5ZRyz93PdE8iuZnvnPqe4sS3QXur1m9Ujd5bB9qIfidqUyus
-        OTH1oFC2ZdVblxQGw4wzITT3Rilp5Sc=
-X-Google-Smtp-Source: APBJJlHuUEUcQ4YT4c09eWMKZ89bpytuR2PPEP/5ikB/nJ2D/iOYGrKUYsS+s/nR5STs2XsjJelChZULcps=
+        bh=oNrunTw9g/scAXlACL1Yy6BuHYu8UXiywBffDHO0ySM=;
+        b=TQDcdq3xnnL1iWsZsW3+Jrg7GxzhfKJib+WvJTP006xqjqSkQxGCsqvoaTTeuSIenD
+         tisHdMUx8a32merqfxnktOIROyU8ZhPR4bxwEEp2yRhbtu4wE9JmzhRuqh91Z6pd1QC8
+         ZI3/9DfW7a/GnDlRsAuBwpe+tupoFazD9J+i4GI7g+3gqsI3lQm3u2+EnsHs4goW4IEa
+         oWJBhZkYG6hP2hQirKC9JcQhQiGsjZr6u1j9CAmNCYp/HGR+r3STlhIDcbCCGJRk4U+q
+         pd9KkUB5qLNa27vvP3g5u0KmYPwMcjckBkuNlHLubfLJhrKnvbguxwKaFvES7umRTdkt
+         TCzA==
+X-Gm-Message-State: ABy/qLY1gZa8gZ8uqklvk9JnWN52K4QPROST2LDG1p+Wmb1Z2vLeHfL9
+        xTOo1Br0eHcPHsmNpACv6WRDWv64dy4=
+X-Google-Smtp-Source: APBJJlHYYJG7D9hZiA9amsdCWObbBIYwdulg2VqDtGhU7hg3L7bAfjSx7kf9waosJHPo/esHNLPSDeRdLuI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d2c8:b0:1bc:f6d:b2f1 with SMTP id
- n8-20020a170902d2c800b001bc0f6db2f1mr72209plc.5.1691013892602; Wed, 02 Aug
- 2023 15:04:52 -0700 (PDT)
-Date:   Wed,  2 Aug 2023 15:01:42 -0700
-In-Reply-To: <20230712075910.22480-1-thuth@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e5c1:b0:1b7:edcd:8dcf with SMTP id
+ u1-20020a170902e5c100b001b7edcd8dcfmr104418plf.4.1691014406820; Wed, 02 Aug
+ 2023 15:13:26 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 15:13:25 -0700
+In-Reply-To: <20230726044652.2169513-1-jingzhangos@google.com>
 Mime-Version: 1.0
-References: <20230712075910.22480-1-thuth@redhat.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <169101245511.1754469.7852701829984104093.b4-ty@google.com>
-Subject: Re: [PATCH 0/4] Use TAP in some more x86 KVM selftests
+References: <20230726044652.2169513-1-jingzhangos@google.com>
+Message-ID: <ZMrVBWg+c3PSUilR@google.com>
+Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication
+ support in KVM guest
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     linux-kselftest@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="utf-8"
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Jul 2023 09:59:06 +0200, Thomas Huth wrote:
-> Here's a follow-up from my RFC series last year:
+On Tue, Jul 25, 2023, Jing Zhang wrote:
+> Add a selftest to verify the support for pointer authentication in KVM
+> guest.
 > 
->  https://lore.kernel.org/lkml/20221004093131.40392-1-thuth@redhat.com/T/
-> 
-> Basic idea of this series is now to use the kselftest_harness.h
-> framework to get TAP output in the tests, so that it is easier
-> for the user to see what is going on, and e.g. to be able to
-> detect whether a certain test is part of the test binary or not
-> (which is useful when tests get extended in the course of time).
-> 
-> [...]
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 
-Applied patch 1 to kvm-x86 selftests, thanks!
+...
 
-[1/4] KVM: selftests: Rename the ASSERT_EQ macro
-      https://github.com/kvm-x86/linux/commit/6d85f51a1f08
+> +	/* Shouldn't be here unless the pac_corruptor didn't do its work */
+> +	GUEST_SYNC(FAIL);
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+FYI, I'm fast tracking guest printf support along with a pile of GUEST_ASSERT()
+changes through kvm-x86/selftests[*].  At a glance, this test can probably use
+e.g. GUEST_FAIL() to make things easier to debug.
+
+[*] https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.com
