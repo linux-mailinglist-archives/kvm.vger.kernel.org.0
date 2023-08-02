@@ -2,82 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 350C676DAD2
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:29:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA4BB76DAE3
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:44:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231781AbjHBW3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 18:29:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37166 "EHLO
+        id S231439AbjHBWoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 18:44:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbjHBW2p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 18:28:45 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C9B44BB
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:27:59 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bbc06f830aso2563155ad.0
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:27:59 -0700 (PDT)
+        with ESMTP id S229882AbjHBWog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 18:44:36 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02D2211C
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:44:34 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bb98659f3cso2907095ad.3
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:44:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691015278; x=1691620078;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=diAn+FKr0zNwv+Q0FyEJsNfox3GjhgMx9VJ8FYcl68k=;
-        b=b+4GnyMp4cySJ8LvGAQJAvfv+x8FmX9W+RN3TYE/+lDoM8ZbQZtEVrJwzKqO693s3r
-         kqHixRM1hPLcOFMGlH6id60RvuwrGl3C8xbOAU6i5Vmgg8LCDKytjhePJaN8emz2Nl6b
-         F8gOt0YtqFkuhe5M+j4p9xL14jtzsj1weHHel8P7kZlrNODd92BzKM0JN8Vpk8kVl4wH
-         emZMi4GD7tB3uMPWPZZZP0qj3iPpdPEHWdxH8mJquMsiyTL/eauEEa5y45HWv7/hh2Ti
-         6kMV67ynWsH3uDI13UrZQasodF9f+u6cQs84ZQEUW5cAxzQGM0enukMIhS98nHdgBzee
-         MOeQ==
+        d=google.com; s=20221208; t=1691016274; x=1691621074;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xMuR5EiinHFoNrMaaPJwbYiKuZcp1klr2wXsm/Nte/E=;
+        b=c6UTu50EZKn5y0gAF3wjm25qcQfqapqE1Vo3sJC2wM4S4HmvbaZAynRqldlmf8pDWU
+         BgAyh0sDqGRLSW8FC67Z1WxaahxEuuE1BmtmxJ7QhFeRGRxen1NPU1Rc97gO/7CXtcIj
+         IUuFQPaqiaGsc2B8s1htZ1dOTqCUzwxpQtrbE4wlzd1/CUGSDgHBbc/Rbwyq8GRsynGK
+         huoKIVHd3th86h9P6u6gyMUPegT67HL0kGH5afaykWjZn5w3Rxz1hHQouXPwBu5f5GHH
+         J7bRAhjFMlcl9yd/Lt9jiaWe7GDaG3WIjw/N2WeFU+oOLAomLvoIwTjL1zpw8qb2ecj0
+         YfhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691015278; x=1691620078;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=diAn+FKr0zNwv+Q0FyEJsNfox3GjhgMx9VJ8FYcl68k=;
-        b=PH9AdmPjsgiGHnfD/Lz30oggRvqqvzgckXWhzslOEVFLbZWQSqilB0NDVmv73mQgmx
-         8o2DhWqQQh+rp/loWGpoQ+FIFq+hvTNcEb7Xwcpnuzq0BtB9dwlV/fkljLpbioXMI+bp
-         rkWOuRYABCjU6bwsnyQvCmvKWv+bcYWqBBnR+Rxf8MjDSrxkBTZmY3cOgDhdk19TcY1i
-         kbqxyurmiEvPymr0bhGDFttlRhoNOz8dMIohNa6At0oblu78rIJhJ9Gfgkp3CkOIiWda
-         g7PYqa1rILt0A82FNgF4QcBBX1tD/DZw+NmcYO+JuOZcP+/EILNtR9f4GZuvXKGOhf3M
-         gvFQ==
-X-Gm-Message-State: ABy/qLbC59vnmG2HxI4YRCBSt5GmKjNYuH6ipY1TwZ1g4WTCLn9Nq+M7
-        eK3CKwRxZ9TcCiR6eF4VmvXwGevOeXAz5A==
-X-Google-Smtp-Source: APBJJlFJk2qUGcY8yfvQufY0guAPyuz7ZM1+yh+At2xeYTF+hZtFPVyavvUs2veqwUXF9r/gwWqMug==
-X-Received: by 2002:a17:902:e5c5:b0:1b2:676d:1143 with SMTP id u5-20020a170902e5c500b001b2676d1143mr23438318plf.15.1691015278245;
-        Wed, 02 Aug 2023 15:27:58 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id z18-20020a170903019200b001bba7aab838sm12891445plg.162.2023.08.02.15.27.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 15:27:57 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 15:27:56 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Peter Xu <peterx@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 19/19] i386: Disable SMM mode for X86_SW_PROTECTED_VM
-Message-ID: <20230802222756.GD1807130@ls.amr.corp.intel.com>
-References: <20230731162201.271114-1-xiaoyao.li@intel.com>
- <20230731162201.271114-20-xiaoyao.li@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230731162201.271114-20-xiaoyao.li@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        d=1e100.net; s=20221208; t=1691016274; x=1691621074;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xMuR5EiinHFoNrMaaPJwbYiKuZcp1klr2wXsm/Nte/E=;
+        b=T8WhtBWUlXgYCc45U8wp8o7SMjcppBK86Dmc9fQb16FYRFxKWqYOn1BOUsw0/in8v9
+         Dp+573tdqfh+X7kNYJOGNWZ9AXy97n9ZsIbbmjHaZ7Y6gg00IReAHraxmqMmMOi9aD37
+         UnLIirDWuj524Xq/srJnzch7GRouFQtWyS07YBQTZgY+sRqUpeGcRYUczj/myMIPT6yz
+         uxL5d5XN3dJvIWZSniGEZHiq1c7M00PHyj7LfL9f6OP6eiZgBALM0Oiqn+gtp3nvLuq9
+         llN2+rjsQrFTmjNgRtV1VqARfrDFVxwuSQ45q2M1cdkba58NthVVhaeeE2DnFbRWyAoP
+         odYg==
+X-Gm-Message-State: ABy/qLaDMo256fhMEedTVK8CDcGLcIc4scHau+IwHXbDoRDOkhjSHvEA
+        raRbiYqCbbKv/NnicOPPpU+dnULxFRc=
+X-Google-Smtp-Source: APBJJlGjna/BNEZIOqnpmIKb0vhY4kEqii1Zq8G5DClZNdG/CKfPd9E2Bwh3hwwA2v3lEo6gD2nUj0zAlWw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:1d1:b0:1ac:3f51:fa64 with SMTP id
+ e17-20020a17090301d100b001ac3f51fa64mr99044plh.13.1691016274443; Wed, 02 Aug
+ 2023 15:44:34 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 15:44:32 -0700
+In-Reply-To: <20230608032425.59796-4-npiggin@gmail.com>
+Mime-Version: 1.0
+References: <20230608032425.59796-1-npiggin@gmail.com> <20230608032425.59796-4-npiggin@gmail.com>
+Message-ID: <ZMrcUKBldWBCQ9R2@google.com>
+Subject: Re: [PATCH v3 3/6] KVM: PPC: selftests: add support for powerpc
+From:   Sean Christopherson <seanjc@google.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Michael Ellerman <mpe@ellerman.id.au>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,32 +67,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 31, 2023 at 12:22:01PM -0400,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
-
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  target/i386/kvm/kvm.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index a96640512dbc..62f237068a3a 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -2654,6 +2654,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  
->      if (x86ms->vm_type == KVM_X86_SW_PROTECTED_VM) {
->          memory_listener_register(&kvm_x86_sw_protected_vm_memory_listener, &address_space_memory);
+On Thu, Jun 08, 2023, Nicholas Piggin wrote:
+> diff --git a/tools/testing/selftests/kvm/lib/powerpc/ucall.c b/tools/testing/selftests/kvm/lib/powerpc/ucall.c
+> new file mode 100644
+> index 000000000000..ce0ddde45fef
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/powerpc/ucall.c
+> @@ -0,0 +1,30 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * ucall support. A ucall is a "hypercall to host userspace".
+> + */
+> +#include "kvm_util.h"
+> +#include "hcall.h"
 > +
-> +        if (x86ms->smm == ON_OFF_AUTO_AUTO) {
-> +            x86ms->smm = ON_OFF_AUTO_OFF;
-> +        } else if (x86ms->smm == ON_OFF_AUTO_ON) {
-> +            error_report("X86_SW_PROTECTED_VM doesn't support SMM");
-> +            return -EINVAL;
-> +        }
->      }
->  
+> +void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+> +{
+> +}
+> +
+> +void ucall_arch_do_ucall(vm_vaddr_t uc)
+> +{
+> +	hcall2(H_UCALL, UCALL_R4_UCALL, (uintptr_t)(uc));
+> +}
 
-If we use confidential guest support, this check should go to there.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+FYI, the ucall stuff will silently conflict with treewide (where KVM selftests is
+the treechanges that I've queued[*].  It probably makes sense for the initial PPC
+support to go through the KVM tree anyways, so I'd be more than happy to grab this
+series via kvm-x86/selftests if you're willing to do the code changes (should be
+minor, knock wood).  Alternatively, the immutable tag I'm planning on creating
+could be merged into the PPC tree, but that seems like overkill.
+
+Either way, please Cc me on the next version (assuming there is a next version),
+if only so that I can give you an early heads up if/when the next treewide change
+alongs ;-)
+
+[*] https://lore.kernel.org/all/169101267140.1755771.17089576255751273053.b4-ty@google.com
