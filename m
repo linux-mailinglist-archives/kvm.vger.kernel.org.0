@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C16B476DBB6
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:43:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D45C76DBB9
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232235AbjHBXnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 19:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42854 "EHLO
+        id S232654AbjHBXnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 19:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbjHBXnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 19:43:16 -0400
-Received: from out-93.mta1.migadu.com (out-93.mta1.migadu.com [95.215.58.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E12CC30D2
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:43:14 -0700 (PDT)
+        with ESMTP id S232163AbjHBXnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 19:43:18 -0400
+Received: from out-83.mta1.migadu.com (out-83.mta1.migadu.com [95.215.58.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E4430CF
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:43:17 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1691019793;
+        t=1691019795;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CCGiJIitYS9LBhCJMP27suzb8NPZMZLEDXoULheuJww=;
-        b=tZoCDY70e5C9iqjLQ3IeTTszh5svvHYZnNZ1ov1vi0WLt0sz0rB4wMYT/1xbvd9DNLie/N
-        ihFN3/DuBvQ/0gipXsP0/h14z82cUIY9VX+2+YBbqkq+S0vreRHxBilAtHTMcFDI5kPYXc
-        oCQ6GO6Ussi+wGQXVrKnNcvSmmPQNGc=
+        bh=9ep7omgEDp84//Mtf9U1LKts+nIskxE/RsUlqUe8Znc=;
+        b=eRqgNr40GUXqEt+b7Hxa4+v0r71zv9AW5HFrRoKHLXcwHY0PfYQ/rmQgQobfY1Z6BCCaWn
+        4BVGyOLVpgZPkP9ZhtBQXr+vKajABsPEGky/Q39X6a3v6wsK5I+DP/8YrXzr7f7kI2Hp25
+        L6PCxLICFjPxCX+SjYqi968AFv7wqYE=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool v3 01/17] Import arm-smccc.h from Linux 6.5-rc1
-Date:   Wed,  2 Aug 2023 23:42:39 +0000
-Message-ID: <20230802234255.466782-2-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool v3 02/17] aarch64: Copy cputype.h from Linux 6.5-rc1
+Date:   Wed,  2 Aug 2023 23:42:40 +0000
+Message-ID: <20230802234255.466782-3-oliver.upton@linux.dev>
 In-Reply-To: <20230802234255.466782-1-oliver.upton@linux.dev>
 References: <20230802234255.466782-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -53,261 +53,207 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Copy in the SMCCC definitions from the kernel, which will be used to
-implement SMCCC handling in userspace.
+cputype.h has some helpful definitions for working with mpidrs and
+affinity masks.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- include/linux/arm-smccc.h | 240 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 240 insertions(+)
- create mode 100644 include/linux/arm-smccc.h
+ arm/aarch64/include/asm/cputype.h | 186 ++++++++++++++++++++++++++++++
+ 1 file changed, 186 insertions(+)
+ create mode 100644 arm/aarch64/include/asm/cputype.h
 
-diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+diff --git a/arm/aarch64/include/asm/cputype.h b/arm/aarch64/include/asm/cputype.h
 new file mode 100644
-index 000000000000..3663c31ba52c
+index 000000000000..698665ab41ae
 --- /dev/null
-+++ b/include/linux/arm-smccc.h
-@@ -0,0 +1,240 @@
++++ b/arm/aarch64/include/asm/cputype.h
+@@ -0,0 +1,186 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Copyright (c) 2015, Linaro Limited
++ * Copyright (C) 2012 ARM Ltd.
 + */
-+#ifndef __LINUX_ARM_SMCCC_H
-+#define __LINUX_ARM_SMCCC_H
++#ifndef __ASM_CPUTYPE_H
++#define __ASM_CPUTYPE_H
 +
-+#include <linux/const.h>
++#define INVALID_HWID		ULONG_MAX
 +
-+/*
-+ * This file provides common defines for ARM SMC Calling Convention as
-+ * specified in
-+ * https://developer.arm.com/docs/den0028/latest
-+ *
-+ * This code is up-to-date with version DEN 0028 C
-+ */
++#define MPIDR_UP_BITMASK	(0x1 << 30)
++#define MPIDR_MT_BITMASK	(0x1 << 24)
++#define MPIDR_HWID_BITMASK	UL(0xff00ffffff)
 +
-+#define ARM_SMCCC_STD_CALL	        _AC(0,U)
-+#define ARM_SMCCC_FAST_CALL	        _AC(1,U)
-+#define ARM_SMCCC_TYPE_SHIFT		31
++#define MPIDR_LEVEL_BITS_SHIFT	3
++#define MPIDR_LEVEL_BITS	(1 << MPIDR_LEVEL_BITS_SHIFT)
++#define MPIDR_LEVEL_MASK	((1 << MPIDR_LEVEL_BITS) - 1)
 +
-+#define ARM_SMCCC_SMC_32		0
-+#define ARM_SMCCC_SMC_64		1
-+#define ARM_SMCCC_CALL_CONV_SHIFT	30
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << MPIDR_LEVEL_BITS_SHIFT)
 +
-+#define ARM_SMCCC_OWNER_MASK		0x3F
-+#define ARM_SMCCC_OWNER_SHIFT		24
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
 +
-+#define ARM_SMCCC_FUNC_MASK		0xFFFF
++#define MIDR_REVISION_MASK	0xf
++#define MIDR_REVISION(midr)	((midr) & MIDR_REVISION_MASK)
++#define MIDR_PARTNUM_SHIFT	4
++#define MIDR_PARTNUM_MASK	(0xfff << MIDR_PARTNUM_SHIFT)
++#define MIDR_PARTNUM(midr)	\
++	(((midr) & MIDR_PARTNUM_MASK) >> MIDR_PARTNUM_SHIFT)
++#define MIDR_ARCHITECTURE_SHIFT	16
++#define MIDR_ARCHITECTURE_MASK	(0xf << MIDR_ARCHITECTURE_SHIFT)
++#define MIDR_ARCHITECTURE(midr)	\
++	(((midr) & MIDR_ARCHITECTURE_MASK) >> MIDR_ARCHITECTURE_SHIFT)
++#define MIDR_VARIANT_SHIFT	20
++#define MIDR_VARIANT_MASK	(0xf << MIDR_VARIANT_SHIFT)
++#define MIDR_VARIANT(midr)	\
++	(((midr) & MIDR_VARIANT_MASK) >> MIDR_VARIANT_SHIFT)
++#define MIDR_IMPLEMENTOR_SHIFT	24
++#define MIDR_IMPLEMENTOR_MASK	(0xffU << MIDR_IMPLEMENTOR_SHIFT)
++#define MIDR_IMPLEMENTOR(midr)	\
++	(((midr) & MIDR_IMPLEMENTOR_MASK) >> MIDR_IMPLEMENTOR_SHIFT)
 +
-+#define ARM_SMCCC_IS_FAST_CALL(smc_val)	\
-+	((smc_val) & (ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT))
-+#define ARM_SMCCC_IS_64(smc_val) \
-+	((smc_val) & (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT))
-+#define ARM_SMCCC_FUNC_NUM(smc_val)	((smc_val) & ARM_SMCCC_FUNC_MASK)
-+#define ARM_SMCCC_OWNER_NUM(smc_val) \
-+	(((smc_val) >> ARM_SMCCC_OWNER_SHIFT) & ARM_SMCCC_OWNER_MASK)
++#define MIDR_CPU_MODEL(imp, partnum) \
++	((_AT(u32, imp)		<< MIDR_IMPLEMENTOR_SHIFT) | \
++	(0xf			<< MIDR_ARCHITECTURE_SHIFT) | \
++	((partnum)		<< MIDR_PARTNUM_SHIFT))
 +
-+#define ARM_SMCCC_CALL_VAL(type, calling_convention, owner, func_num) \
-+	(((type) << ARM_SMCCC_TYPE_SHIFT) | \
-+	((calling_convention) << ARM_SMCCC_CALL_CONV_SHIFT) | \
-+	(((owner) & ARM_SMCCC_OWNER_MASK) << ARM_SMCCC_OWNER_SHIFT) | \
-+	((func_num) & ARM_SMCCC_FUNC_MASK))
++#define MIDR_CPU_VAR_REV(var, rev) \
++	(((var)	<< MIDR_VARIANT_SHIFT) | (rev))
 +
-+#define ARM_SMCCC_OWNER_ARCH		0
-+#define ARM_SMCCC_OWNER_CPU		1
-+#define ARM_SMCCC_OWNER_SIP		2
-+#define ARM_SMCCC_OWNER_OEM		3
-+#define ARM_SMCCC_OWNER_STANDARD	4
-+#define ARM_SMCCC_OWNER_STANDARD_HYP	5
-+#define ARM_SMCCC_OWNER_VENDOR_HYP	6
-+#define ARM_SMCCC_OWNER_TRUSTED_APP	48
-+#define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
-+#define ARM_SMCCC_OWNER_TRUSTED_OS	50
-+#define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
++#define MIDR_CPU_MODEL_MASK (MIDR_IMPLEMENTOR_MASK | MIDR_PARTNUM_MASK | \
++			     MIDR_ARCHITECTURE_MASK)
 +
-+#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
++#define ARM_CPU_IMP_ARM			0x41
++#define ARM_CPU_IMP_APM			0x50
++#define ARM_CPU_IMP_CAVIUM		0x43
++#define ARM_CPU_IMP_BRCM		0x42
++#define ARM_CPU_IMP_QCOM		0x51
++#define ARM_CPU_IMP_NVIDIA		0x4E
++#define ARM_CPU_IMP_FUJITSU		0x46
++#define ARM_CPU_IMP_HISI		0x48
++#define ARM_CPU_IMP_APPLE		0x61
++#define ARM_CPU_IMP_AMPERE		0xC0
 +
-+#define ARM_SMCCC_QUIRK_NONE		0
-+#define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
++#define ARM_CPU_PART_AEM_V8		0xD0F
++#define ARM_CPU_PART_FOUNDATION		0xD00
++#define ARM_CPU_PART_CORTEX_A57		0xD07
++#define ARM_CPU_PART_CORTEX_A72		0xD08
++#define ARM_CPU_PART_CORTEX_A53		0xD03
++#define ARM_CPU_PART_CORTEX_A73		0xD09
++#define ARM_CPU_PART_CORTEX_A75		0xD0A
++#define ARM_CPU_PART_CORTEX_A35		0xD04
++#define ARM_CPU_PART_CORTEX_A55		0xD05
++#define ARM_CPU_PART_CORTEX_A76		0xD0B
++#define ARM_CPU_PART_NEOVERSE_N1	0xD0C
++#define ARM_CPU_PART_CORTEX_A77		0xD0D
++#define ARM_CPU_PART_NEOVERSE_V1	0xD40
++#define ARM_CPU_PART_CORTEX_A78		0xD41
++#define ARM_CPU_PART_CORTEX_A78AE	0xD42
++#define ARM_CPU_PART_CORTEX_X1		0xD44
++#define ARM_CPU_PART_CORTEX_A510	0xD46
++#define ARM_CPU_PART_CORTEX_A710	0xD47
++#define ARM_CPU_PART_CORTEX_A715	0xD4D
++#define ARM_CPU_PART_CORTEX_X2		0xD48
++#define ARM_CPU_PART_NEOVERSE_N2	0xD49
++#define ARM_CPU_PART_CORTEX_A78C	0xD4B
 +
-+#define ARM_SMCCC_VERSION_1_0		0x10000
-+#define ARM_SMCCC_VERSION_1_1		0x10001
-+#define ARM_SMCCC_VERSION_1_2		0x10002
-+#define ARM_SMCCC_VERSION_1_3		0x10003
++#define APM_CPU_PART_POTENZA		0x000
 +
-+#define ARM_SMCCC_1_3_SVE_HINT		0x10000
++#define CAVIUM_CPU_PART_THUNDERX	0x0A1
++#define CAVIUM_CPU_PART_THUNDERX_81XX	0x0A2
++#define CAVIUM_CPU_PART_THUNDERX_83XX	0x0A3
++#define CAVIUM_CPU_PART_THUNDERX2	0x0AF
++/* OcteonTx2 series */
++#define CAVIUM_CPU_PART_OCTX2_98XX	0x0B1
++#define CAVIUM_CPU_PART_OCTX2_96XX	0x0B2
++#define CAVIUM_CPU_PART_OCTX2_95XX	0x0B3
++#define CAVIUM_CPU_PART_OCTX2_95XXN	0x0B4
++#define CAVIUM_CPU_PART_OCTX2_95XXMM	0x0B5
++#define CAVIUM_CPU_PART_OCTX2_95XXO	0x0B6
 +
-+#define ARM_SMCCC_VERSION_FUNC_ID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0)
++#define BRCM_CPU_PART_BRAHMA_B53	0x100
++#define BRCM_CPU_PART_VULCAN		0x516
 +
-+#define ARM_SMCCC_ARCH_FEATURES_FUNC_ID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 1)
++#define QCOM_CPU_PART_FALKOR_V1		0x800
++#define QCOM_CPU_PART_FALKOR		0xC00
++#define QCOM_CPU_PART_KRYO		0x200
++#define QCOM_CPU_PART_KRYO_2XX_GOLD	0x800
++#define QCOM_CPU_PART_KRYO_2XX_SILVER	0x801
++#define QCOM_CPU_PART_KRYO_3XX_SILVER	0x803
++#define QCOM_CPU_PART_KRYO_4XX_GOLD	0x804
++#define QCOM_CPU_PART_KRYO_4XX_SILVER	0x805
 +
-+#define ARM_SMCCC_ARCH_SOC_ID						\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 2)
++#define NVIDIA_CPU_PART_DENVER		0x003
++#define NVIDIA_CPU_PART_CARMEL		0x004
 +
-+#define ARM_SMCCC_ARCH_WORKAROUND_1					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x8000)
++#define FUJITSU_CPU_PART_A64FX		0x001
 +
-+#define ARM_SMCCC_ARCH_WORKAROUND_2					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x7fff)
++#define HISI_CPU_PART_TSV110		0xD01
 +
-+#define ARM_SMCCC_ARCH_WORKAROUND_3					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   0, 0x3fff)
++#define APPLE_CPU_PART_M1_ICESTORM	0x022
++#define APPLE_CPU_PART_M1_FIRESTORM	0x023
++#define APPLE_CPU_PART_M1_ICESTORM_PRO	0x024
++#define APPLE_CPU_PART_M1_FIRESTORM_PRO	0x025
++#define APPLE_CPU_PART_M1_ICESTORM_MAX	0x028
++#define APPLE_CPU_PART_M1_FIRESTORM_MAX	0x029
++#define APPLE_CPU_PART_M2_BLIZZARD	0x032
++#define APPLE_CPU_PART_M2_AVALANCHE	0x033
 +
-+#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
++#define AMPERE_CPU_PART_AMPERE1		0xAC3
 +
-+/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-+#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
++#define MIDR_CORTEX_A53 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A53)
++#define MIDR_CORTEX_A57 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A57)
++#define MIDR_CORTEX_A72 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A72)
++#define MIDR_CORTEX_A73 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A73)
++#define MIDR_CORTEX_A75 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A75)
++#define MIDR_CORTEX_A35 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A35)
++#define MIDR_CORTEX_A55 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A55)
++#define MIDR_CORTEX_A76	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A76)
++#define MIDR_NEOVERSE_N1 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N1)
++#define MIDR_CORTEX_A77	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A77)
++#define MIDR_NEOVERSE_V1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_V1)
++#define MIDR_CORTEX_A78	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78)
++#define MIDR_CORTEX_A78AE	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78AE)
++#define MIDR_CORTEX_X1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X1)
++#define MIDR_CORTEX_A510 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A510)
++#define MIDR_CORTEX_A710 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A710)
++#define MIDR_CORTEX_A715 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A715)
++#define MIDR_CORTEX_X2 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X2)
++#define MIDR_NEOVERSE_N2 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N2)
++#define MIDR_CORTEX_A78C	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78C)
++#define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
++#define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
++#define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
++#define MIDR_OCTX2_98XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_98XX)
++#define MIDR_OCTX2_96XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_96XX)
++#define MIDR_OCTX2_95XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XX)
++#define MIDR_OCTX2_95XXN MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXN)
++#define MIDR_OCTX2_95XXMM MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXMM)
++#define MIDR_OCTX2_95XXO MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXO)
++#define MIDR_CAVIUM_THUNDERX2 MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX2)
++#define MIDR_BRAHMA_B53 MIDR_CPU_MODEL(ARM_CPU_IMP_BRCM, BRCM_CPU_PART_BRAHMA_B53)
++#define MIDR_BRCM_VULCAN MIDR_CPU_MODEL(ARM_CPU_IMP_BRCM, BRCM_CPU_PART_VULCAN)
++#define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
++#define MIDR_QCOM_FALKOR MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR)
++#define MIDR_QCOM_KRYO MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO)
++#define MIDR_QCOM_KRYO_2XX_GOLD MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_2XX_GOLD)
++#define MIDR_QCOM_KRYO_2XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_2XX_SILVER)
++#define MIDR_QCOM_KRYO_3XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_3XX_SILVER)
++#define MIDR_QCOM_KRYO_4XX_GOLD MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_4XX_GOLD)
++#define MIDR_QCOM_KRYO_4XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_4XX_SILVER)
++#define MIDR_NVIDIA_DENVER MIDR_CPU_MODEL(ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_DENVER)
++#define MIDR_NVIDIA_CARMEL MIDR_CPU_MODEL(ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_CARMEL)
++#define MIDR_FUJITSU_A64FX MIDR_CPU_MODEL(ARM_CPU_IMP_FUJITSU, FUJITSU_CPU_PART_A64FX)
++#define MIDR_HISI_TSV110 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_TSV110)
++#define MIDR_APPLE_M1_ICESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM)
++#define MIDR_APPLE_M1_FIRESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM)
++#define MIDR_APPLE_M1_ICESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_PRO)
++#define MIDR_APPLE_M1_FIRESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_PRO)
++#define MIDR_APPLE_M1_ICESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_MAX)
++#define MIDR_APPLE_M1_FIRESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX)
++#define MIDR_APPLE_M2_BLIZZARD MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD)
++#define MIDR_APPLE_M2_AVALANCHE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE)
++#define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
 +
-+/* KVM "vendor specific" services */
-+#define ARM_SMCCC_KVM_FUNC_FEATURES		0
-+#define ARM_SMCCC_KVM_FUNC_PTP			1
-+#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
-+#define ARM_SMCCC_KVM_NUM_FUNCS			128
-+
-+#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_FEATURES)
-+
-+#define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
-+
-+/*
-+ * ptp_kvm is a feature used for time sync between vm and host.
-+ * ptp_kvm module in guest kernel will get service from host using
-+ * this hypercall ID.
-+ */
-+#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-+			   ARM_SMCCC_SMC_32,				\
-+			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-+			   ARM_SMCCC_KVM_FUNC_PTP)
-+
-+/* ptp_kvm counter type ID */
-+#define KVM_PTP_VIRT_COUNTER			0
-+#define KVM_PTP_PHYS_COUNTER			1
-+
-+/* Paravirtualised time calls (defined by ARM DEN0057A) */
-+#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-+			   0x20)
-+
-+#define ARM_SMCCC_HV_PV_TIME_ST					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-+			   0x21)
-+
-+/* TRNG entropy source calls (defined by ARM DEN0098) */
-+#define ARM_SMCCC_TRNG_VERSION					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x50)
-+
-+#define ARM_SMCCC_TRNG_FEATURES					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x51)
-+
-+#define ARM_SMCCC_TRNG_GET_UUID					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x52)
-+
-+#define ARM_SMCCC_TRNG_RND32					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_32,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x53)
-+
-+#define ARM_SMCCC_TRNG_RND64					\
-+	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-+			   ARM_SMCCC_SMC_64,			\
-+			   ARM_SMCCC_OWNER_STANDARD,		\
-+			   0x53)
-+
-+/*
-+ * Return codes defined in ARM DEN 0070A
-+ * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
-+ */
-+#define SMCCC_RET_SUCCESS			0
-+#define SMCCC_RET_NOT_SUPPORTED			-1
-+#define SMCCC_RET_NOT_REQUIRED			-2
-+#define SMCCC_RET_INVALID_PARAMETER		-3
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <linux/types.h>
-+
-+enum arm_smccc_conduit {
-+	SMCCC_CONDUIT_NONE,
-+	SMCCC_CONDUIT_SMC,
-+	SMCCC_CONDUIT_HVC,
-+};
-+
-+/**
-+ * struct arm_smccc_res - Result from SMC/HVC call
-+ * @a0-a3 result values from registers 0 to 3
-+ */
-+struct arm_smccc_res {
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+};
-+
-+/**
-+ * struct arm_smccc_1_2_regs - Arguments for or Results from SMC/HVC call
-+ * @a0-a17 argument values from registers 0 to 17
-+ */
-+struct arm_smccc_1_2_regs {
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+	unsigned long a4;
-+	unsigned long a5;
-+	unsigned long a6;
-+	unsigned long a7;
-+	unsigned long a8;
-+	unsigned long a9;
-+	unsigned long a10;
-+	unsigned long a11;
-+	unsigned long a12;
-+	unsigned long a13;
-+	unsigned long a14;
-+	unsigned long a15;
-+	unsigned long a16;
-+	unsigned long a17;
-+};
-+
-+#endif /*__ASSEMBLY__*/
-+#endif /*__LINUX_ARM_SMCCC_H*/
++#endif
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
