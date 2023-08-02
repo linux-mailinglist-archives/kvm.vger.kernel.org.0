@@ -2,90 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BC1E76DA75
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:13:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F15BA76DA7A
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:16:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232753AbjHBWNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 18:13:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58694 "EHLO
+        id S233768AbjHBWQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 18:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbjHBWN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 18:13:27 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B94126AF
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:13:27 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c79a5565aso383625a12.3
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:13:27 -0700 (PDT)
+        with ESMTP id S231651AbjHBWQq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 18:16:46 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9972B26BD
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:16:45 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so253710276.2
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:16:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691014407; x=1691619207;
+        d=google.com; s=20221208; t=1691014605; x=1691619405;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oNrunTw9g/scAXlACL1Yy6BuHYu8UXiywBffDHO0ySM=;
-        b=oRnUg49TyqQtCpG9mB1+Zt8T8V0fo6eI5r3czuLbiC4L4rdWaAvVrHBVtqTeJ90E9Y
-         B5mZ5FxEswdpGVKmbD8pwI9bFz4V/mbheFZjzkgcOl/c5u2L4vsnneSqeIgWAP8/lQI3
-         K34qOuv/PzRLXUwq2elOGYB7F92GhrDe+DtfEWHBkMakUjcspHZ8f6JEMNK1zQ9wuHBz
-         e1B2WnP1p9aoj/wxzD9TsVHQB621qb0zo19xWV98Sv2YUL8E4eyA30M5eo4U916dAc/p
-         X3aJpDamXtAC63JzSAXYnBsVQdUH92Yy4Se4/Lf7hhcWQoOgRWe+WrTk8vAfPtRpUjwE
-         +ONw==
+        bh=RUKe0tndPE8THtppbQ2T+ebrmbNyYQbFqdjBVqfHPSc=;
+        b=38kWKGnIr9nG7NEImMKN/kYSbzmt49a74eU6F0kFCbveiePdOPvNcSEILmD2Jrj89V
+         5s3HlMArUkW/HBVjC+BKGdl78VEbeZGDRzpzebvzFmuEnfdGuYFrCh3LXUe2ON7XsDcJ
+         XDSLeSHsdI1bdoXHmvcO1jlgRNqVX9i7F64mW3dIaLVO9uUlcnnTV8K4Ciie8zUrBEma
+         T3UfOaEFJQ/Gp4fnvYg3Li6J3QtmUyuB1OzkNZ28bLiFkz/bN6RFDN4Eyei9qrn/QWZT
+         hpTPIOVK7oPnJ3vimIJk7oKHDviRjKFyB8E7Hn/7QR0uMlBKyc9mGCI06sxNJxlvAPN5
+         ZCXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691014407; x=1691619207;
+        d=1e100.net; s=20221208; t=1691014605; x=1691619405;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oNrunTw9g/scAXlACL1Yy6BuHYu8UXiywBffDHO0ySM=;
-        b=TQDcdq3xnnL1iWsZsW3+Jrg7GxzhfKJib+WvJTP006xqjqSkQxGCsqvoaTTeuSIenD
-         tisHdMUx8a32merqfxnktOIROyU8ZhPR4bxwEEp2yRhbtu4wE9JmzhRuqh91Z6pd1QC8
-         ZI3/9DfW7a/GnDlRsAuBwpe+tupoFazD9J+i4GI7g+3gqsI3lQm3u2+EnsHs4goW4IEa
-         oWJBhZkYG6hP2hQirKC9JcQhQiGsjZr6u1j9CAmNCYp/HGR+r3STlhIDcbCCGJRk4U+q
-         pd9KkUB5qLNa27vvP3g5u0KmYPwMcjckBkuNlHLubfLJhrKnvbguxwKaFvES7umRTdkt
-         TCzA==
-X-Gm-Message-State: ABy/qLY1gZa8gZ8uqklvk9JnWN52K4QPROST2LDG1p+Wmb1Z2vLeHfL9
-        xTOo1Br0eHcPHsmNpACv6WRDWv64dy4=
-X-Google-Smtp-Source: APBJJlHYYJG7D9hZiA9amsdCWObbBIYwdulg2VqDtGhU7hg3L7bAfjSx7kf9waosJHPo/esHNLPSDeRdLuI=
+        bh=RUKe0tndPE8THtppbQ2T+ebrmbNyYQbFqdjBVqfHPSc=;
+        b=Cj1jJ5F3pOyi+mnVbAQhta7TbE1wozoFBWMBaXmH/LwXe6R5bO6CuXR05R7VSpO1nh
+         dh34JoHPqB3vaOOfhoqO0Ij6yPAyQR6E2DRGYrMaOXcRybuZb0B0cqbyKIaS0SeHxlWp
+         psD5d+F5mryKzU5qkn28RN/yuKxPnB3TvMSZVVcgz9CTpREIhTbJ/0uCe9Rx8rmwTtUv
+         0XWYQVhwEYcStlizvqRYuGu0rhy9bQiZY+dvjAN04LGUBmAyygCNTgVdp3pqX3S/Maz5
+         m83hsjPR1lXm6EIIVx1sJ5YK3ws7zfq44SrONmoervuTQF3G+oTZoTPAZk953+96KT3R
+         6f4Q==
+X-Gm-Message-State: ABy/qLZRU1MyXDGxm9tfiQsukC4OfG6GSm43ePiJmJMNxnZK4f1i4z1A
+        lBuFeZDjorayZnEzqgngiy7e/kcNG30=
+X-Google-Smtp-Source: APBJJlHy/PqtmZyQAWZYe0P365x5lyVjJbw50xRf2ugSL9QxHVv9uASQitOtxhGFeAyfSZaX2h+IOYFbSyM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e5c1:b0:1b7:edcd:8dcf with SMTP id
- u1-20020a170902e5c100b001b7edcd8dcfmr104418plf.4.1691014406820; Wed, 02 Aug
- 2023 15:13:26 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 15:13:25 -0700
-In-Reply-To: <20230726044652.2169513-1-jingzhangos@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:aaae:0:b0:d04:d397:352d with SMTP id
+ t43-20020a25aaae000000b00d04d397352dmr130484ybi.4.1691014604767; Wed, 02 Aug
+ 2023 15:16:44 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 15:16:43 -0700
+In-Reply-To: <cover.1690364259.git.haibo1.xu@intel.com>
 Mime-Version: 1.0
-References: <20230726044652.2169513-1-jingzhangos@google.com>
-Message-ID: <ZMrVBWg+c3PSUilR@google.com>
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication
- support in KVM guest
+References: <cover.1690364259.git.haibo1.xu@intel.com>
+Message-ID: <ZMrVrXlvu/FJEayx@google.com>
+Subject: Re: [PATCH 0/4] RISCV: Add kvm Sstc timer selftest
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
+To:     Haibo Xu <haibo1.xu@intel.com>
+Cc:     xiaobo55x@gmail.com, ajones@ventanamicro.com,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
+        Shuah Khan <shuah@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Vipin Sharma <vipinsh@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Vishal Annapurve <vannapurve@google.com>,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        kvm-riscv@lists.infradead.org
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 25, 2023, Jing Zhang wrote:
-> Add a selftest to verify the support for pointer authentication in KVM
-> guest.
+On Thu, Jul 27, 2023, Haibo Xu wrote:
+> The sstc_timer selftest is used to validate Sstc timer functionality
+> in a guest, which sets up periodic timer interrupts and check the
+> basic interrupt status upon its receipt.
 > 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> This KVM selftest was ported from aarch64 arch_timer and tested
+> with Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+> 
+> Haibo Xu (4):
+>   tools: riscv: Add header file csr.h
+>   KVM: riscv: selftests: Add exception handling support
+>   KVM: riscv: selftests: Add guest helper to get vcpu id
+>   KVM: riscv: selftests: Add sstc_timer test
 
-...
-
-> +	/* Shouldn't be here unless the pac_corruptor didn't do its work */
-> +	GUEST_SYNC(FAIL);
-
-FYI, I'm fast tracking guest printf support along with a pile of GUEST_ASSERT()
-changes through kvm-x86/selftests[*].  At a glance, this test can probably use
-e.g. GUEST_FAIL() to make things easier to debug.
+FYI, patch 4 will conflict with the in-flight guest printf changes[*], as will
+reworking the existing arch_timer test.  My plan is to create an immutable tag
+later this week (waiting to make sure nothing explodes).  I highly recommend basing
+v2 on top of that.
 
 [*] https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.com
