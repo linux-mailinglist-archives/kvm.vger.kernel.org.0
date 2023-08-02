@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B7976DB02
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:53:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FAB776DB23
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:00:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231331AbjHBWxe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 18:53:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47514 "EHLO
+        id S229632AbjHBXAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 19:00:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230146AbjHBWxd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 18:53:33 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A5DF1713
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:53:21 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bbd2761f1bso3543315ad.2
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:53:21 -0700 (PDT)
+        with ESMTP id S232013AbjHBXAd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 19:00:33 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE51810C7
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:00:32 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-686daaa5f1fso245852b3a.3
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 16:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691016801; x=1691621601;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+rWczut5E+c7+k9ca3L6xWg9snmsSn9OBlNNsSEH6Y4=;
-        b=MIlrxKBHC0TNDZsfAeLiVDU4zHyn67wCDnYvBy7zfmtLny8BbGZO0y5b/KYbfy5V3J
-         XJf+z7EAd7DXeNGHU+MXrr12bAqG+Xu+lKQ2Ker8z53PXOUksp4ZR4QGJG4sPzuHlaT9
-         tZr1XaEI+PdtlDnpHwYm5F2jeQdUwXgqm3zSxLJPf0bZzVacUDl7VtWokGgV6/y77VwQ
-         4kQFyIzbf/I49qdHsJlLii2JyBVUrUSrgluivMZqxLXVpIAyoUwNl+P8937emXDVfR1M
-         3edI/npOTpAxvLd2K6zcHWfXSAaEpvoRIovuv1ENJMP/i/QLXkYbUPxlz4b41KV+3FVR
-         eHxw==
+        d=gmail.com; s=20221208; t=1691017232; x=1691622032;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJnNH7WPlbwS2WClazkQnfqZCkMxIFmtb2LvCA2s5hY=;
+        b=PRZiS5O8wBcvvUzqrOvMaeZ5T5OZh46aUekP+3vLtexyWIPeY3PMmAXL1qammA5ns3
+         ef4yQcyLaDxmyAFlxciDobRB7RXjrBgBHl5JamD0X18Sghu+7oVi9KZkcniq+QNJqvHO
+         mem/xL+Ir845sbxCDDk47TYrwXQz/FVGhC/xrcGogaXPzgmKu+65IIVs0GsL/3LhA3wa
+         PYCzFCmQP66Fugr/Zg5N1mgkBeATJPb56JLNu8tLT4GLS0nScwfLKZAGsCLEehAZOvmW
+         Q3+kpyL3DA2XBjkGXljrZXUXUpPsgXkKE+bHlttcLS7ofJrU7VXfpBgJZNWrZlNDe0eg
+         F0sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691016801; x=1691621601;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+rWczut5E+c7+k9ca3L6xWg9snmsSn9OBlNNsSEH6Y4=;
-        b=NrTjI/6HfQ79LRUrTAxF1vt1OFDdQS8OhnGLkMlYQmoVjaXNSh1rKqHRmFTie5lqWX
-         fsy/hn2Jwy+Tp0solrsr2CGzXUdJ9hMWypZIOmS99Us8xxKHZSQ7HRBwe4XeEPFqxqcY
-         ZAzJW9kAo0lepYiCJbHjXB0hMimFjdKsA2eqX2khhRJNRrBwXAwKbvkUfRRXdmoVgG0C
-         9WCP0KYdSeQ58pIPN1iziSLshgaeaC3sY1XAb2AdQTLb8aHm/bAYw3hsjMm6PEKfs0f8
-         sB/Kjxg2j22ld+z+1xZomX9b1zcFpC1if/O8g6cd1uNb7V/j6nx298JHO+8sEDQag8+e
-         JKaA==
-X-Gm-Message-State: ABy/qLar1aH7m2z4ISiL/6yJYFJzyKn8Yh1oDdtjVJ1KWMQU2VW6fZtM
-        hiV3Tixw6TH1PFs518wy9YI=
-X-Google-Smtp-Source: APBJJlFWJWv7Q/ttPBQ+d4tEcYgX+BEoNN8e2Kkay8S7mNyJkvLSzVCdME6KV6v8TRydMaqFNn/MNQ==
-X-Received: by 2002:a17:902:8697:b0:1b5:219a:cbbd with SMTP id g23-20020a170902869700b001b5219acbbdmr13697862plo.3.1691016800740;
-        Wed, 02 Aug 2023 15:53:20 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691017232; x=1691622032;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WJnNH7WPlbwS2WClazkQnfqZCkMxIFmtb2LvCA2s5hY=;
+        b=dEtda2Gkk5o63JNBC/vpiGA2lzQKyRbo1AkP1xvH/psvXYNwTYtSTizBLDRc+c5hr4
+         64LK0dnM2qe4O4khHHMk5FkNxCgfO3OtinDEqpakICOhl5G29f/dcDteV3dcyGXtC85f
+         oRk3MMgMaEnOLUB8uc92KUwUuqt8Ch4acOInlUl4+FEIaPo47iJoY7Mzh6Mo5I0YJ0FM
+         kPRLtES4MksxCPmSuzX6yFj069vTwCRu3GPFWtkppSPL5FztpY9cwU3/KBV3dL6k8fqZ
+         SJ/tiaqyWb5CrgIElE1ox/zjWa/R0H6Wh8lYGrDZhpUnZYiB2XVufCUfKxPsTlW78em0
+         PvVw==
+X-Gm-Message-State: ABy/qLYID5KmihWBipcQZrvjiqiL/W1A3fb3ooiH48RVyLQE7uB+x1B2
+        GCbLU8nGoer6Wc+UqKx6M0o=
+X-Google-Smtp-Source: APBJJlHayr7+GgVEbAQkj1il9BK+TyTIl/mdfB4GgsJzblb3tZ5qdjU+FPXKHwje4fqyzjGJDBDQBg==
+X-Received: by 2002:a05:6a00:16c1:b0:67e:e019:3a28 with SMTP id l1-20020a056a0016c100b0067ee0193a28mr18795785pfc.16.1691017232330;
+        Wed, 02 Aug 2023 16:00:32 -0700 (PDT)
 Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id w5-20020a1709029a8500b001b03cda6389sm12938265plp.10.2023.08.02.15.53.19
+        by smtp.gmail.com with ESMTPSA id g3-20020aa78743000000b0068725ff9befsm7372004pfo.207.2023.08.02.16.00.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 15:53:20 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 15:53:18 -0700
+        Wed, 02 Aug 2023 16:00:31 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 16:00:30 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        David Hildenbrand <david@redhat.com>,
         Igor Mammedov <imammedo@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -68,19 +67,14 @@ Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
         Chao Peng <chao.p.peng@linux.intel.com>,
         Michael Roth <michael.roth@amd.com>, isaku.yamahata@gmail.com,
         qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 08/19] HostMem: Add private property to indicate to
- use kvm gmem
-Message-ID: <20230802225318.GE1807130@ls.amr.corp.intel.com>
+Subject: Re: [RFC PATCH 06/19] i386/pc: Drop pc_machine_kvm_type()
+Message-ID: <20230802230030.GF1807130@ls.amr.corp.intel.com>
 References: <20230731162201.271114-1-xiaoyao.li@intel.com>
- <20230731162201.271114-9-xiaoyao.li@intel.com>
- <f8e40f1a-729b-f520-299a-4132e371be61@redhat.com>
- <2addfff0-88bf-59aa-f2f3-8129366a006d@intel.com>
- <a154c33d-b24d-b713-0dc0-027d54f2340f@redhat.com>
+ <20230731162201.271114-7-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a154c33d-b24d-b713-0dc0-027d54f2340f@redhat.com>
+In-Reply-To: <20230731162201.271114-7-xiaoyao.li@intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -91,124 +85,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 04:14:29PM +0200,
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, Jul 31, 2023 at 12:21:48PM -0400,
+Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 
-> On 02.08.23 10:03, Xiaoyao Li wrote:
-> > On 8/2/2023 1:21 AM, David Hildenbrand wrote:
-> > > On 31.07.23 18:21, Xiaoyao Li wrote:
-> > > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > 
-> > > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > > ---
-> > > >    backends/hostmem.c       | 18 ++++++++++++++++++
-> > > >    include/sysemu/hostmem.h |  2 +-
-> > > >    qapi/qom.json            |  4 ++++
-> > > >    3 files changed, 23 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/backends/hostmem.c b/backends/hostmem.c
-> > > > index 747e7838c031..dbdbb0aafd45 100644
-> > > > --- a/backends/hostmem.c
-> > > > +++ b/backends/hostmem.c
-> > > > @@ -461,6 +461,20 @@ static void
-> > > > host_memory_backend_set_reserve(Object *o, bool value, Error **errp)
-> > > >        }
-> > > >        backend->reserve = value;
-> > > >    }
-> > > > +
-> > > > +static bool host_memory_backend_get_private(Object *o, Error **errp)
-> > > > +{
-> > > > +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-> > > > +
-> > > > +    return backend->private;
-> > > > +}
-> > > > +
-> > > > +static void host_memory_backend_set_private(Object *o, bool value,
-> > > > Error **errp)
-> > > > +{
-> > > > +    HostMemoryBackend *backend = MEMORY_BACKEND(o);
-> > > > +
-> > > > +    backend->private = value;
-> > > > +}
-> > > >    #endif /* CONFIG_LINUX */
-> > > >    static bool
-> > > > @@ -541,6 +555,10 @@ host_memory_backend_class_init(ObjectClass *oc,
-> > > > void *data)
-> > > >            host_memory_backend_get_reserve,
-> > > > host_memory_backend_set_reserve);
-> > > >        object_class_property_set_description(oc, "reserve",
-> > > >            "Reserve swap space (or huge pages) if applicable");
-> > > > +    object_class_property_add_bool(oc, "private",
-> > > > +        host_memory_backend_get_private,
-> > > > host_memory_backend_set_private);
-> > > > +    object_class_property_set_description(oc, "private",
-> > > > +        "Use KVM gmem private memory");
-> > > >    #endif /* CONFIG_LINUX */
-> > > >        /*
-> > > >         * Do not delete/rename option. This option must be considered
-> > > > stable
-> > > > diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-> > > > index 39326f1d4f9c..d88970395618 100644
-> > > > --- a/include/sysemu/hostmem.h
-> > > > +++ b/include/sysemu/hostmem.h
-> > > > @@ -65,7 +65,7 @@ struct HostMemoryBackend {
-> > > >        /* protected */
-> > > >        uint64_t size;
-> > > >        bool merge, dump, use_canonical_path;
-> > > > -    bool prealloc, is_mapped, share, reserve;
-> > > > +    bool prealloc, is_mapped, share, reserve, private;
-> > > >        uint32_t prealloc_threads;
-> > > >        ThreadContext *prealloc_context;
-> > > >        DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-> > > > diff --git a/qapi/qom.json b/qapi/qom.json
-> > > > index 7f92ea43e8e1..e0b2044e3d20 100644
-> > > > --- a/qapi/qom.json
-> > > > +++ b/qapi/qom.json
-> > > > @@ -605,6 +605,9 @@
-> > > >    # @reserve: if true, reserve swap space (or huge pages) if applicable
-> > > >    #     (default: true) (since 6.1)
-> > > >    #
-> > > > +# @private: if true, use KVM gmem private memory
-> > > > +#           (default: false) (since 8.1)
-> > > > +#
-> > > 
-> > > But that's not what any of this does.
-> > > 
-> > > This patch only adds a property and doesn't even explain what it intends
-> > > to achieve with that.
-> > > 
-> > > How will it be used from a user? What will it affect internally? What
-> > > will it modify in regards of the memory backend?
-> > 
-> > How it will be used is in the next patch, patch 09.
-> > 
-> > for kvm_x86_sw_protected_vm type VM, it will allocate private gmem with
-> > KVM ioctl if the memory backend has property "private" on.
+> pc_machine_kvm_type() was introduced by commit e21be724eaf5 ("i386/xen:
+> add pc_machine_kvm_type to initialize XEN_EMULATE mode") to do Xen
+> specific initialization by utilizing kvm_type method.
 > 
-> It feels wired up the wrong way.
+> commit eeedfe6c6316 ("hw/xen: Simplify emulated Xen platform init")
+> moves the Xen specific initialization to pc_basic_device_init().
 > 
-> When creating/initializing the memory backend, we should also take care of
-> allocating the gmem_fd, for example, by doing some gmem allocation callback,
-> ideally *internally* creating the RAM memory region / RAMBlock.
+> There is no need to keep the PC specific kvm_type() implementation
+> anymore. On the other hand, later patch will implement kvm_type()
+> method for all x86/i386 machines to support KVM_X86_SW_PROTECTED_VM.
 > 
-> And we should fail if that is impossible (gmem does not apply to the VM) or
-> creating the gmem_fd failed for other reason.
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  hw/i386/pc.c         | 5 -----
+>  include/hw/i386/pc.h | 3 ---
+>  2 files changed, 8 deletions(-)
 > 
-> Like passing a RAM_GMEM flag to memory_region_init_ram_flags_nomigrate() in
-> ram_backend_memory_alloc(), to then handle it internally, failing if there
-> is an error.
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 3109d5e0e035..abeadd903827 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1794,11 +1794,6 @@ static void pc_machine_initfn(Object *obj)
+>      cxl_machine_init(obj, &pcms->cxl_devices_state);
+>  }
+>  
+> -int pc_machine_kvm_type(MachineState *machine, const char *kvm_type)
+> -{
+> -    return 0;
+> -}
+> -
+>  static void pc_machine_reset(MachineState *machine, ShutdownCause reason)
+>  {
+>      CPUState *cs;
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d54e8b1101e4..c98d628a76f3 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -296,15 +296,12 @@ extern const size_t pc_compat_1_5_len;
+>  extern GlobalProperty pc_compat_1_4[];
+>  extern const size_t pc_compat_1_4_len;
+>  
+> -int pc_machine_kvm_type(MachineState *machine, const char *vm_type);
+> -
+>  #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+>      static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *data) \
+>      { \
+>          MachineClass *mc = MACHINE_CLASS(oc); \
+>          optsfn(mc); \
+>          mc->init = initfn; \
+> -        mc->kvm_type = pc_machine_kvm_type; \
+>      } \
+>      static const TypeInfo pc_machine_type_##suffix = { \
+>          .name       = namestr TYPE_MACHINE_SUFFIX, \
+> -- 
+> 2.34.1
+> 
 
-KVM gmem is tied to VM. not before creating VM. We have to delay of the
-allocation of kvm gmem until VM initialization.
+It seems strange for MachineClass to have kvm_type(). Probably AccelClass.
+(struct KVMAccelClass?)
 
-Hmm, one options is to move gmem_fd from RAMBlock to KVMSlot.  Handle the
-allocation of KVM gmem (issuing KVM gmem ioctl) there. i.e. in
-kvm_set_phys_mem() or kvm_region_add() (or whatever functions of KVM memory
-listener).  Maybe we can drop ram_block_convert_range() and can have KVM
-specific logic instead.
+Anyway this is independent clean up.
 
-We still need a way for user to specify which guest memory region is subject
-to KVM gmem, though.
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
