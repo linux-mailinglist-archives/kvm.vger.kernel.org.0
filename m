@@ -2,158 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EE9B76C6F5
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 09:35:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F2C276C73B
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 09:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232864AbjHBHf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 03:35:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39402 "EHLO
+        id S231909AbjHBHnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 03:43:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232804AbjHBHfV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 03:35:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1642F1BF6;
-        Wed,  2 Aug 2023 00:35:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 92E6F61841;
-        Wed,  2 Aug 2023 07:34:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99A9DC433C7;
-        Wed,  2 Aug 2023 07:34:56 +0000 (UTC)
-Message-ID: <364ea644-1b2c-472a-92da-9435f2795a89@xs4all.nl>
-Date:   Wed, 2 Aug 2023 09:34:55 +0200
+        with ESMTP id S233316AbjHBHmd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 03:42:33 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F651EA
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 00:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690962032; x=1722498032;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GwPiwjg0i2K9L8XD5Q2aQMXQ75PL3dJWZdYCk5VsBtM=;
+  b=HDGq3wWZhX1niSxdGJ72jV3FKa7sGS+jbV0UkOyd/M8//6wDydUL4orp
+   aKqOvlmkAng0A62s0Uu916X5ta0iXYUF/bowv2Yr1vJzDBt9Q5pcxpuPF
+   pPdlp8UQr8hfNDOPAf5+KbjooVMB5T3/k70Ka4UGx68/2C3TVHHx1Q1lG
+   15EQeqp9fn5sAIZIrC/bK7OACCVQU4nNJ5KMcqHXzGwn0wMFIQq3nX4fx
+   UCEMR8kwFUqhfvSdAlTyTT6TQP4K0v4rHRydc+68Ta44TGUlNqdsVOeGI
+   fObSffy0VxImMpCXYsbRVCN0E3ngA8fL02W8Tt5/JSJvy8gvmli7Itxkt
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="368405930"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="368405930"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 00:40:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="872363597"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 00:40:32 -0700
+Message-ID: <7653b2aa-14f7-b1a2-f0fc-cd3b3c012e8d@intel.com>
+Date:   Wed, 2 Aug 2023 15:40:27 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 01/47] media/vivid: Use fbdev I/O helpers
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.13.0
+Subject: Re: [PATCH] KVM: x86: Advertise AMX-COMPLEX CPUID to userspace
 Content-Language: en-US
-To:     Thomas Zimmermann <tzimmermann@suse.de>, deller@gmx.de,
-        javierm@redhat.com, sam@ravnborg.org
-Cc:     linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-geode@lists.infradead.org, linux-omap@vger.kernel.org,
-        kvm@vger.kernel.org, Mauro Carvalho Chehab <mchehab@kernel.org>
-References: <20230801101541.900-1-tzimmermann@suse.de>
- <20230801101541.900-2-tzimmermann@suse.de>
- <ee03c6c9-4e6a-2732-0416-43fd5418c950@xs4all.nl>
- <0f2521b6-3d72-923c-df89-d94ca7f2fe52@suse.de>
-From:   Hans Verkuil <hverkuil@xs4all.nl>
-In-Reply-To: <0f2521b6-3d72-923c-df89-d94ca7f2fe52@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+To:     Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com
+References: <20230802022954.193843-1-tao1.su@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20230802022954.193843-1-tao1.su@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/08/2023 18:54, Thomas Zimmermann wrote:
-> Hi
+On 8/2/2023 10:29 AM, Tao Su wrote:
+> Latest Intel platform GraniteRapids-D introduces AMX-COMPLEX, which adds
+> two instructions to perform matrix multiplication of two tiles containing
+> complex elements and accumulate the results into a packed single precision
+> tile.
 > 
-> Am 01.08.23 um 13:22 schrieb Hans Verkuil:
->> On 01/08/2023 12:13, Thomas Zimmermann wrote:
->>> Set struct fb_ops and with FB_DEFAULT_IO_OPS, fbdev's initializer
->>> for I/O memory. Sets the callbacks to the cfb_ and fb_io_ functions.
->>> Select the correct modules with Kconfig's FB_IO_HELPERS token.
->>>
->>> The macro and token set the currently selected values, so there is
->>> no functional change.
->>>
->>> v2:
->>>     * updated to use _IOMEM_ tokens
->>>
->>> Signed-off-by: Thomas Zimmermann <tzimmermann@suse.de>
->>> Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
->>> Acked-by: Helge Deller <deller@gmx.de>
->>> Cc: Hans Verkuil <hverkuil@xs4all.nl>
->>> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
->>> ---
->>>   drivers/media/test-drivers/vivid/Kconfig     | 4 +---
->>>   drivers/media/test-drivers/vivid/vivid-osd.c | 4 +---
->>>   2 files changed, 2 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/drivers/media/test-drivers/vivid/Kconfig b/drivers/media/test-drivers/vivid/Kconfig
->>> index 318799d317ba..5b08a5ad291e 100644
->>> --- a/drivers/media/test-drivers/vivid/Kconfig
->>> +++ b/drivers/media/test-drivers/vivid/Kconfig
->>> @@ -3,11 +3,9 @@ config VIDEO_VIVID
->>>       tristate "Virtual Video Test Driver"
->>>       depends on VIDEO_DEV && !SPARC32 && !SPARC64 && FB
->>>       depends on HAS_DMA
->>> +    select FB_IOMEM_HELPERS
->>>       select FONT_SUPPORT
->>>       select FONT_8x16
->>> -    select FB_CFB_FILLRECT
->>> -    select FB_CFB_COPYAREA
->>> -    select FB_CFB_IMAGEBLIT
->>>       select VIDEOBUF2_VMALLOC
->>>       select VIDEOBUF2_DMA_CONTIG
->>>       select VIDEO_V4L2_TPG
->>> diff --git a/drivers/media/test-drivers/vivid/vivid-osd.c b/drivers/media/test-drivers/vivid/vivid-osd.c
->>> index 051f1805a16d..5c931b94a7b5 100644
->>> --- a/drivers/media/test-drivers/vivid/vivid-osd.c
->>> +++ b/drivers/media/test-drivers/vivid/vivid-osd.c
->>> @@ -246,12 +246,10 @@ static int vivid_fb_blank(int blank_mode, struct fb_info *info)
->>>     static const struct fb_ops vivid_fb_ops = {
->>>       .owner = THIS_MODULE,
->>> +    FB_DEFAULT_IOMEM_OPS,
->>
->> This macro also sets fb_read and fb_write ops here, in addition to the
->> cfb_* ops, based on this patch:
->>
->> https://lore.kernel.org/all/20230729193157.15446-2-tzimmermann@suse.de/#Z2e.:20230729193157.15446-2-tzimmermann::40suse.de:1include:linux:fb.h
->>
->> But those two ops were never set in this driver before.
->>
->> It's been ages since I last worked with this, so I can't tell whether that's
->> good or bad, all I know is that it makes what appears to be a functional change.
->>
->> Can you explain a bit more? Am I missing something?
+> AMX-COMPLEX is enumerated via CPUID.(EAX=7,ECX=1):EDX[bit 8]
 > 
-> That change is intentional and welcome. If no fb_read/fb_write pointers are given fbdev uses them as their default. See
+> Since there are no new VMX controls or additional host enabling required
+> for guests to use this feature, advertise the CPUID to userspace.
 > 
-> 
-> https://elixir.bootlin.com/linux/v6.5-rc1/source/drivers/video/fbdev/core/fbmem.c#L773
-> 
-> and below. Once all drivers set these pointers explicitly, we can drop the default and make the helpers optional and modular. For the drivers in this patchset there's no functional change.
+> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
 
-Ah, that explains it!
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
-I wonder if it wouldn't be a good idea to include that information in the commit log.
-
-In any case, for this patch:
-
-Reviewed-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-
-Regards,
-
-	Hans
-
+> ---
+>   arch/x86/kvm/cpuid.c         | 3 ++-
+>   arch/x86/kvm/reverse_cpuid.h | 1 +
+>   2 files changed, 3 insertions(+), 1 deletion(-)
 > 
-> Best regards
-> Thomas
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 7f4d13383cf2..883ec8d5a77f 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -647,7 +647,8 @@ void kvm_set_cpu_caps(void)
+>   	);
+>   
+>   	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
+> -		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI)
+> +		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI) |
+> +		F(AMX_COMPLEX)
+>   	);
+>   
+>   	kvm_cpu_cap_mask(CPUID_D_1_EAX,
+> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+> index 56cbdb24400a..b81650678375 100644
+> --- a/arch/x86/kvm/reverse_cpuid.h
+> +++ b/arch/x86/kvm/reverse_cpuid.h
+> @@ -43,6 +43,7 @@ enum kvm_only_cpuid_leafs {
+>   /* Intel-defined sub-features, CPUID level 0x00000007:1 (EDX) */
+>   #define X86_FEATURE_AVX_VNNI_INT8       KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
+>   #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
+> +#define X86_FEATURE_AMX_COMPLEX         KVM_X86_FEATURE(CPUID_7_1_EDX, 8)
+>   #define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
+>   
+>   /* CPUID level 0x80000007 (EDX). */
 > 
->>
->> Regards,
->>
->>     Hans
->>
->>>       .fb_check_var   = vivid_fb_check_var,
->>>       .fb_set_par     = vivid_fb_set_par,
->>>       .fb_setcolreg   = vivid_fb_setcolreg,
->>> -    .fb_fillrect    = cfb_fillrect,
->>> -    .fb_copyarea    = cfb_copyarea,
->>> -    .fb_imageblit   = cfb_imageblit,
->>>       .fb_cursor      = NULL,
->>>       .fb_ioctl       = vivid_fb_ioctl,
->>>       .fb_pan_display = vivid_fb_pan_display,
->>
-> 
+> base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
 
