@@ -2,168 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7233176C31F
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 04:53:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F17B876C376
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 05:20:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231559AbjHBCxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 22:53:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44088 "EHLO
+        id S231953AbjHBDUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 23:20:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231355AbjHBCxO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 22:53:14 -0400
-Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131CF10C
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 19:53:12 -0700 (PDT)
-Received: by mail-vk1-xa2b.google.com with SMTP id 71dfb90a1353d-486c9cd3b6aso1011522e0c.1
-        for <kvm@vger.kernel.org>; Tue, 01 Aug 2023 19:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690944791; x=1691549591;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=b6/35ZoKcBhfJYY+Rmmtzdcbq9J4zFITai0RFdfSbKg=;
-        b=GFFHVZxFzhErjyxupkWSnu/vaA8M1Nq7no8oPjk3qW1UIOCo5AKVjDfmJmi7ayFaJT
-         vD+t4WD8+T+AY+agUnbVx89OBhk72U57EV0jFQh59gUK2/8m0ECt2ipZPB6NB9jfn+AT
-         uhA31zLtxJP9fnwh50y3A0ZU+eBGnS8ZTf73tOKuiy1L/zKm8tXzYYlUw3c2kSZZtYvg
-         jxlkGpCX7CEiIxgKaDbdUUFG1+NOX3u0Lp6yCLmU5YrWrVAdmDXu7T/zHJEtdhs2mXB4
-         496KGV/XVZnw7gRe8On02O4wSFzzDh7AS7ti2PNiDd+lFX0Yn46zQeAwJf1ZHkks4KDu
-         pi6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690944791; x=1691549591;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b6/35ZoKcBhfJYY+Rmmtzdcbq9J4zFITai0RFdfSbKg=;
-        b=DuMxOOastkEb3NSei0aS8lr1hNNUgfS7HfFxDQraskRCS6YJdCnuF9a3wkgVnpcyGU
-         BAM2a/g8PLzcPikuvPWiHqgAwQHFW8ZAzOXtre/w3UPhiB7WvrbCgKC08FL12vZMShKB
-         ucGrSmul7H2NjRjG4y/bxE4PAlRSM/9qgVjiobI0RQJ6RcE4+aYclDKNxUDJosRNEswq
-         yxllHNCc6IOzpfMkWGJJZyjYVKCZDpk5RS0R+EPBudLiQqsJBgRwRU86e7/Ew4o4E9Gi
-         kzTKTbFO7UEgoaP1ENaKuzAMvv+e8ubp2NK9SYes9eCf4nAeW2regSe4hBlS0OKTzp4p
-         dBlg==
-X-Gm-Message-State: ABy/qLYl4Ox+oI8XON0QOGceyGq1Zw/hwSnxxC7bul8RHukU8u3L0sKo
-        dEzAMi0QgdkzlDynefNLdHeTjleqWPg25QEB9bh6XQ==
-X-Google-Smtp-Source: APBJJlE1gCA8tKH5sYTEP/FZeFFoep4cuyxkMCDwNwtcVmaE3u/k2C0/DAImLXlO/nZL9KA/7Dms2iGYeM3LrVk5CUs=
-X-Received: by 2002:a1f:c304:0:b0:471:7996:228f with SMTP id
- t4-20020a1fc304000000b004717996228fmr3664338vkf.7.1690944791082; Tue, 01 Aug
- 2023 19:53:11 -0700 (PDT)
+        with ESMTP id S231129AbjHBDUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 23:20:13 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFAD1708;
+        Tue,  1 Aug 2023 20:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690946412; x=1722482412;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=wP5cpI1WxpDaK0+2mD5lWz2GGol38mq2b5g+itsFQmM=;
+  b=BNUaEWNtwA5kRtj4ge4ZZNrHo/jHg2W2Y8MR46LBD+N7RoO52sApbppv
+   SbrV9gOx/Vh1pxaRLbMIdwWef1LSZEv5wBCsEaE+uOwfBwrSh+7TbdFe/
+   V2e7H0TourM0SowiSSMMCpcN4aSCNtIY7a7K9kdwlI1XxXFNa+wIa9qxU
+   jcBZTiomEw69XufTUBCTneDnK0UJwFNZGmY6VV9yMcooLXw51unzWPbO0
+   XNvH/KlUzfT3eK8HLnCc1nTEqc36PoV6R9zVFNqHsPHiBv7fQ69FbF7sj
+   ZNLz1zv8wjHAmxsdz5oI8gOuqKuIvf90Q3ZncJUPHeo0C0IQyCuZcjlsv
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="433308233"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="433308233"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 20:20:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="819020866"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="819020866"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.213.137]) ([10.254.213.137])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 20:20:08 -0700
+Message-ID: <077966f0-d2fe-d85e-268a-a4f14c1870f1@linux.intel.com>
+Date:   Wed, 2 Aug 2023 11:20:06 +0800
 MIME-Version: 1.0
-References: <20230801091925.659598007@linuxfoundation.org>
-In-Reply-To: <20230801091925.659598007@linuxfoundation.org>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Wed, 2 Aug 2023 08:22:59 +0530
-Message-ID: <CA+G9fYsv5dFJfjNq7O+CW3J9jEV0zDQiOR+8dyacwhpDih0xJw@mail.gmail.com>
-Subject: Re: [PATCH 6.4 000/239] 6.4.8-rc1 review
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     stable@vger.kernel.org, patches@lists.linux.dev,
-        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
-        patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
-        jonathanh@nvidia.com, f.fainelli@gmail.com,
-        sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de,
-        conor@kernel.org, Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] iommu: Consolidate pasid dma ownership check
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <20230801063125.34995-1-baolu.lu@linux.intel.com>
+ <20230801063125.34995-2-baolu.lu@linux.intel.com>
+ <BN9PR11MB5276D196F9BFB06D0E59AEF28C0AA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <36fb3548-7206-878e-d095-195c2feb24f1@linux.intel.com>
+ <BN9PR11MB5276B0865C9D8DC9060BF1A08C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Language: en-US
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB5276B0865C9D8DC9060BF1A08C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 1 Aug 2023 at 15:11, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> This is the start of the stable review cycle for the 6.4.8 release.
-> There are 239 patches in this series, all will be posted as a response
-> to this one.  If anyone has any issues with these being applied, please
-> let me know.
->
-> Responses should be made by Thu, 03 Aug 2023 09:18:38 +0000.
-> Anything received after that time might be too late.
->
-> The whole patch series can be found in one patch at:
->         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/patch-6.4.8-rc1.gz
-> or in the git tree and branch at:
->         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-6.4.y
-> and the diffstat can be found below.
->
-> thanks,
->
-> greg k-h
+On 2023/8/2 9:39, Tian, Kevin wrote:
+>> From: Baolu Lu<baolu.lu@linux.intel.com>
+>> Sent: Tuesday, August 1, 2023 3:44 PM
+>>
+>> On 2023/8/1 15:03, Tian, Kevin wrote:
+>>>>    /**
+>>>>     * iommu_device_use_default_domain() - Device driver wants to handle
+>>>> device
+>>>>     *                                     DMA through the kernel DMA API.
+>>>> @@ -3052,14 +3063,14 @@ int
+>> iommu_device_use_default_domain(struct
+>>>> device *dev)
+>>>>
+>>>>    	mutex_lock(&group->mutex);
+>>>>    	if (group->owner_cnt) {
+>>>> -		if (group->owner || !iommu_is_default_domain(group) ||
+>>>> -		    !xa_empty(&group->pasid_array)) {
+>>>> +		if (group->owner || !iommu_is_default_domain(group)) {
+>>>>    			ret = -EBUSY;
+>>>>    			goto unlock_out;
+>>>>    		}
+>>>>    	}
+>>>>
+>>>>    	group->owner_cnt++;
+>>>> +	assert_pasid_dma_ownership(group);
+>>> Old code returns error if pasid_xrrary is not empty.
+>>>
+>>> New code continues to take ownership with a warning.
+>>>
+>>> this is a functional change. Is it intended or not?
+>> If iommu_device_use_default_domain() is called with pasid_array not
+>> empty, there must be a bug somewhere in the device driver. We should
+>> WARN it instead of returning an error. Probably this is a functional
+>> change? If so, I can add this in the commit message.
+>>
+> IMHO we should WARN*and*  return an error.
 
-Following kselftest build regression found,
+Okay, fine to me. Will make this in the next version.
 
-    selftests/rseq: Play nice with binaries statically linked against
-glibc 2.35+
-    commit 3bcbc20942db5d738221cca31a928efc09827069 upstream.
-
-
-    To allow running rseq and KVM's rseq selftests as statically linked
-    binaries, initialize the various "trampoline" pointers to point directly
-    at the expect glibc symbols, and skip the dlysm() lookups if the rseq
-    size is non-zero, i.e. the binary is statically linked *and* the libc
-    registered its own rseq.
-
-    Define weak versions of the symbols so as not to break linking against
-    libc versions that don't support rseq in any capacity.
-
-    The KVM selftests in particular are often statically linked so that they
-    can be run on targets with very limited runtime environments, i.e. test
-    machines.
-
-    Fixes: 233e667e1ae3 ("selftests/rseq: Uplift rseq selftests for
-compatibility with glibc-2.35")
-    Cc: Aaron Lewis <aaronlewis@google.com>
-    Cc: kvm@vger.kernel.org
-    Cc: stable@vger.kernel.org
-    Signed-off-by: Sean Christopherson <seanjc@google.com>
-    Message-Id: <20230721223352.2333911-1-seanjc@google.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-
-Build log:
-----
-x86_64-linux-gnu-gcc -O2 -Wall -g -I./ -isystem
-/home/tuxbuild/.cache/tuxmake/builds/1/build/usr/include
--L/home/tuxbuild/.cache/tuxmake/builds/1/build/kselftest/rseq
--Wl,-rpath=./   -shared -fPIC rseq.c -lpthread -ldl -o
-/home/tuxbuild/.cache/tuxmake/builds/1/build/kselftest/rseq/librseq.so
-rseq.c:41:1: error: unknown type name '__weak'
-   41 | __weak ptrdiff_t __rseq_offset;
-      | ^~~~~~
-rseq.c:41:18: error: expected '=', ',', ';', 'asm' or '__attribute__'
-before '__rseq_offset'
-   41 | __weak ptrdiff_t __rseq_offset;
-      |                  ^~~~~~~~~~~~~
-rseq.c:42:7: error: expected ';' before 'unsigned'
-   42 | __weak unsigned int __rseq_size;
-      |       ^~~~~~~~~
-      |       ;
-rseq.c:43:7: error: expected ';' before 'unsigned'
-   43 | __weak unsigned int __rseq_flags;
-      |       ^~~~~~~~~
-      |       ;
-rseq.c:45:47: error: '__rseq_offset' undeclared here (not in a
-function); did you mean 'rseq_offset'?
-   45 | static const ptrdiff_t *libc_rseq_offset_p = &__rseq_offset;
-      |                                               ^~~~~~~~~~~~~
-      |                                               rseq_offset
-make[3]: Leaving directory 'tools/testing/selftests/rseq'
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-Links:
- - https://storage.tuxsuite.com/public/linaro/lkft/builds/2TNSVjRCfcIaJWQNkPwDQ9jn2ls/build.log
- - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.4.y/build/v6.4.7-240-g2c273bf138a4/testrun/18770115/suite/kselftest-rseq/test/shardfile-rseq/details/
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
+Best regards,
+baolu
