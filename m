@@ -2,51 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F39E776DB7D
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:28:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6551B76DB81
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230488AbjHBX2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 19:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35948 "EHLO
+        id S231953AbjHBX3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 19:29:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjHBX2R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 19:28:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05B04E4F;
-        Wed,  2 Aug 2023 16:28:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E8EB61B7F;
-        Wed,  2 Aug 2023 23:28:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3031C433C7;
-        Wed,  2 Aug 2023 23:28:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691018895;
-        bh=nhWlDoBroZnLqL2p7qonO6/FNtiNV5czfDfLuSPQnQM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=k69LJczbkLd6JK8AoOtoqQZMCYBU6tHbpqBwWU0WMusxaXzNh2LMLKIRGA3YEJNCk
-         HolTMn+Jr1nUMyv9P1fTFE+BDe41EbbHjYz1Tf2MnlqYi1vKwH+V33Vtq/gxibL9Ay
-         STkoZZ37HTMwVV0WTmynxyAdZE8GXt2TOaBvGK8Aoyzm8SHjfD0H0THnOfKKj/LVyx
-         11fjb87SgX8bdXtX4/YsdVvfZ5Ran3A3/iSHNpthmsu1EnTLPYcvkB2YY7cH0WyNvs
-         sGZYHgDSKMz8rN+P4QzAL2pVU0bdf9mzkU7dTfv6O4hpbg4ICVeaPypRq7fnbVpsIl
-         meFdHsxGyRDHw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qRLGG-001VrN-Ot;
-        Thu, 03 Aug 2023 00:28:12 +0100
-Date:   Thu, 03 Aug 2023 00:28:12 +0100
-Message-ID: <86fs5158j7.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        with ESMTP id S231604AbjHBX3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 19:29:06 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02EC72695
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:29:05 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b52875b8d9so68115ad.0
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 16:29:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691018944; x=1691623744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V4Cpxp6Pku565KQX/OGtqaeqvGA0IKhVwq6ynNOZ9r0=;
+        b=fFTplzOAgW5+YW0+6iv4fkiN86H6j11X1pwoSxH+UbZ6p7iYCmpU0kuNqQBfel9T5G
+         TeHCwy18VTn4JwR0FocGU0dkHDSQ01w0aCShr72E11WRUJ0CH751ArFGzoZUkTYgcDou
+         gpT/KoBW3YaVs/k6v5HBuDGdwQ8fJdnUpJjdrS7LEtN9Uwz7yeQN9HB4kn1GVc0KUKqc
+         DmlFiExHRsSljlkGVAJKSI7bbzKb2/ECq55k51gfA8LRkuFLjGvgB4kOf7KBZm79RD0a
+         40vexDUVr9QAtQr7cD7Kllq93RNs7LMjDkavplv45/IYcQbfxyQND1D7JcDZaz5TIdZ5
+         l/ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691018944; x=1691623744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V4Cpxp6Pku565KQX/OGtqaeqvGA0IKhVwq6ynNOZ9r0=;
+        b=lOE1BYWOSytbCGdw4XzB5HKCELF7GgVjfiSU7OSQjNJpM/q2q+h/NI+HoBWDxAGCuy
+         KejSDVMSKZDNe3Vad+5TARWARQT0JNHHTeRdVbDNoJy8lZ4QR1JeGT2u9xcZlFK80Aw7
+         nWoKZ8SqAyn+IrI1DWI3z04rJbEKvTz6li0KvUWY6AiWaoM2yRekpYJsj5JJIwTSriYH
+         PQbv3C5djG9Rs/yKSq9dUr0QnE9O9t0Tsd3aLH5q3vK9IlMXyxgoSZY36IbbiTaymrk9
+         Mlc4/ZlHFQ06pftdLhybd86UDUtaPb1FRfZlyoJE/o9MD1JsWnNBiUCDcbgtFfn/+oTF
+         ZSuw==
+X-Gm-Message-State: ABy/qLaBBTFWFI06UrAmZmoTcI1utlf5xeSUW96LwbPRlgaM6hbzYlmU
+        3UOSvh82RyGe/Cj1vN30xgNNSD4zz5kVPCrfs6Rp6Q==
+X-Google-Smtp-Source: APBJJlG1dr/uy6dgVj2w+3yAHutiDqre/zphK0p3aHVqG2DYCooyBFbGflKhgzehlkYIwCQRRRLEXuzHej99+96ASLI=
+X-Received: by 2002:a17:902:c40f:b0:1b0:53dc:1f78 with SMTP id
+ k15-20020a170902c40f00b001b053dc1f78mr966525plk.28.1691018944272; Wed, 02 Aug
+ 2023 16:29:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-3-rananta@google.com>
+ <87tttpr6qy.wl-maz@kernel.org> <ZMgsjx8dwKd4xBGe@google.com> <877cqdqw12.wl-maz@kernel.org>
+In-Reply-To: <877cqdqw12.wl-maz@kernel.org>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Wed, 2 Aug 2023 16:28:52 -0700
+Message-ID: <CAJHc60xAUVt5fbhEkOqeC-VF8SWVOt3si=1yxVVAUW=+Hu_wNg@mail.gmail.com>
+Subject: Re: [PATCH v7 02/12] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>,
         Anup Patel <anup@brainfault.org>,
@@ -59,140 +72,60 @@ Cc:     Oliver Upton <oliver.upton@linux.dev>,
         linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
-In-Reply-To: <CAJHc60zGzAqWw2iZwNEG_bWERXkz_io7ae-K_tf_kh6xcOBxLA@mail.gmail.com>
-References: <20230722022251.3446223-1-rananta@google.com>
-        <20230722022251.3446223-13-rananta@google.com>
-        <87jzulqz0v.wl-maz@kernel.org>
-        <CAJHc60zGzAqWw2iZwNEG_bWERXkz_io7ae-K_tf_kh6xcOBxLA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 31 Jul 2023 19:26:09 +0100,
-Raghavendra Rao Ananta <rananta@google.com> wrote:
->=20
-> On Thu, Jul 27, 2023 at 6:12=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
-te:
-> >
-> > On Sat, 22 Jul 2023 03:22:51 +0100,
-> > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > >
-> > > The current implementation of the stage-2 unmap walker traverses
-> > > the given range and, as a part of break-before-make, performs
-> > > TLB invalidations with a DSB for every PTE. A multitude of this
-> > > combination could cause a performance bottleneck on some systems.
-> > >
-> > > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > > invalidations until the entire walk is finished, and then
-> > > use range-based instructions to invalidate the TLBs in one go.
-> > > Condition deferred TLB invalidation on the system supporting FWB,
-> > > as the optimization is entirely pointless when the unmap walker
-> > > needs to perform CMOs.
-> > >
-> > > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > > now serves the stage-2 unmap walker specifically, rather than
-> > > acting generic.
-> > >
-> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++---=
---
-> > >  1 file changed, 58 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtabl=
-e.c
-> > > index 5ef098af1736..cf88933a2ea0 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_pg=
-table_visit_ctx *ctx, kvm_pte_t n
-> > >       smp_store_release(ctx->ptep, new);
-> > >  }
-> > >
-> > > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, =
-struct kvm_s2_mmu *mmu,
-> > > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > > +struct stage2_unmap_data {
-> > > +     struct kvm_pgtable *pgt;
-> > > +     bool defer_tlb_flush_init;
-> > > +};
-> > > +
-> > > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt)
-> > > +{
-> > > +     /*
-> > > +      * If FEAT_TLBIRANGE is implemented, defer the individual
-> > > +      * TLB invalidations until the entire walk is finished, and
-> > > +      * then use the range-based TLBI instructions to do the
-> > > +      * invalidations. Condition deferred TLB invalidation on the
-> > > +      * system supporting FWB, as the optimization is entirely
-> > > +      * pointless when the unmap walker needs to perform CMOs.
-> > > +      */
-> > > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > > +}
-> > > +
-> > > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data *u=
-nmap_data)
-> > > +{
-> > > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap_d=
-ata->pgt);
-> > > +
-> > > +     /*
-> > > +      * Since __stage2_unmap_defer_tlb_flush() is based on alternati=
-ve
-> > > +      * patching and the TLBIs' operations behavior depend on this,
-> > > +      * track if there's any change in the state during the unmap se=
-quence.
-> > > +      */
-> > > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush);
-> > > +     return defer_tlb_flush;
-> >
-> > I really don't understand what you're testing here. The ability to
-> > defer TLB invalidation is a function of the system capabilities
-> > (range+FWB) and a single flag that is only set on the host for pKVM.
-> >
-> > How could that change in the middle of the life of the system? if
-> > further begs the question about the need for the unmap_data data
-> > structure.
-> >
-> > It looks to me that we could simply pass the pgt pointer around and be
-> > done with it. Am I missing something obvious?
-> >
-> From one of the previous comments [1] (used in a different context),
-> I'm given to understand that since these feature checks are governed
-> by alternative patching, they can potentially change (at runtime?). Is
-> that not the case and I have misunderstood the idea in comment [1]
-> entirely? Is it solely used for optimization purposes and set only
-> once?
-
-Alternative patching, just like the static branches used to implement
-the capability stuff, is a one way street. At the point where KVM is
-initialised, these configurations are set in stone, and there is no
-going back.
-
-> If that's the case, I can get rid of the WARN_ON() and unmap_data.
-
-yes, please.
+Sure, I'll change it to kvm_arch_flush_vm_tlbs() in v8.
 
 Thanks,
+Raghavendra
 
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
+On Wed, Aug 2, 2023 at 8:55=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Mon, 31 Jul 2023 22:50:07 +0100,
+> Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Thu, Jul 27, 2023, Marc Zyngier wrote:
+> > > On Sat, 22 Jul 2023 03:22:41 +0100,
+> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > >
+> > > > Stop depending on CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL and opt to
+> > > > standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> > > > duplicating the generic TLB stats across architectures that impleme=
+nt
+> > > > their own remote TLB flush.
+> > > >
+> > > > This adds an extra function call to the ARM64 kvm_flush_remote_tlbs=
+()
+> > > > path, but that is a small cost in comparison to flushing remote TLB=
+s.
+> > >
+> > > Well, there is no such thing as a "remote TLB" anyway. We either have
+> > > a non-shareable or inner-shareable invalidation. The notion of remote
+> > > would imply that we track who potentially has a TLB, which we
+> > > obviously don't.
+> >
+> > Maybe kvm_arch_flush_vm_tlbs()?  The "remote" part is misleading even o=
+n x86 when
+> > running on Hyper-V, as the flush may be done via a single hypercall and=
+ by kicking
+> > "remote" vCPUs.
+>
+> Yup, this would be much better.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
