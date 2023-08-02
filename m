@@ -2,79 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED09276D60F
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 19:50:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FFB976D629
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 19:54:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234092AbjHBRu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 13:50:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39872 "EHLO
+        id S234241AbjHBRyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 13:54:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbjHBRtx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 13:49:53 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D87170D
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 10:49:13 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1bb571ea965so5559438fac.0
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 10:49:13 -0700 (PDT)
+        with ESMTP id S229777AbjHBRxp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 13:53:45 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB3610E7
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 10:52:47 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d061f324d64so70181276.1
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 10:52:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690998552; x=1691603352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jkqdJMsvnVrRBo60+NUWMzNrzTaghjxAkAcp9NTjI7U=;
-        b=qYZLszf+G832APU0iLQ9SDhHuPTE3ItqB1h1SOE36kWmrQQh/dmguNVkGU45Hq9yf8
-         5Js/rXDP2hz8lYlp/9XADzFOJco2hlateqHcVjgHvYC4GYJf0t8UwSqdjPywq3+AycOG
-         DLfaBn4hqTCglB9+hqaHj82XmSBWOK9qQy7g0rsnvV8MmKA9ddPuNhmHC1zRbfrv7eXd
-         Tl3vbF0u8sTrlLURWVKPy9WenP7SMBeciiCChg/IuMi68UstzQEuAv1tqf7zvQ6jkoaS
-         qIBqUxNkywVThWo0kz0nOjX4udk2CB6WnKuY7oDVs9biFODpN2r212df2uGyWVwLI6NH
-         B4Xg==
+        d=google.com; s=20221208; t=1690998766; x=1691603566;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o9xLasiI1QpQmYZlmA61fAHENI9Lul/s9FI/EIn/JnY=;
+        b=kOI8w41LlihPT323Aq8Ap+JNEARPFDRYIBgdN37uOB98GoEeveuvvuEy91n5k0sVkS
+         5GGA1ICR3Wg942ugEZ8BDKaG1sZjPEViLN77pn0Phe1tiYxCn4i0rBWrtQl5EulGjIWf
+         Y2Uo3FAAiA7cWKwrIcfxnOwImDLOzUPevkph95szugiXyike4mMUBJN917f49tOzwV7T
+         IXqHLOSH0IefJQx87mMR2k3fNaJZhxV80sOhKP/cMEt2IlicNPofUNkpHufvccQzS/JA
+         39eS7V00GqOGen/HZuaxqIoNiTojE4tlE1BpjOLXJ/7cTTjccowApjC/asvpHVK0T/g9
+         ePRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690998552; x=1691603352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jkqdJMsvnVrRBo60+NUWMzNrzTaghjxAkAcp9NTjI7U=;
-        b=e3Wz4OobqxU9BnKeanUnczVgF3Lk/amb03kdrlcItXq7CLVO/hZrxgDXPBuFzOl+Zl
-         O9JKRbYH3hp5CgI6Dh/4nckLBDoqEFIy44jxyZmRV6K+8GUi2SZ0wZ3RDHW91U6/A5Wv
-         dp3F2B/EbE0Lp0r5PJyfsQtadvmdmzZ6J17tmb2pa7VL4pLGfnRCg21f9c60k+aaGexb
-         xmQQsWWkKdnhOU1svvxmXx8vGSgna7O5aFIUsB/n9kjjETviE93djZcvgTeq9iiAiJ56
-         oG1XPFZP2kA1JsKE9IzKpj4m44LTQQInN3+8VFN0Gaswj7jxEeaYnzjCpFwDW5ZmZwOF
-         7NtQ==
-X-Gm-Message-State: ABy/qLavwaaAyuFvo5cJirqYQpsy88Rxnu4a60YeoDX6/XD18t4OJO4j
-        uNLzJGIzOJUynwZvumqC/hQBVz6YQeeV4/8CYnTFGw==
-X-Google-Smtp-Source: APBJJlF+hW45L4zt+hV6v1CvORUlP0mnh2MB6RDtiOS9QHnRZhAqJKTZsof6tHpAhnXoQnSabSlwJi5om+C3bOdNWqI=
-X-Received: by 2002:a05:6870:f102:b0:1ba:63b2:899d with SMTP id
- k2-20020a056870f10200b001ba63b2899dmr18481008oac.32.1690998552110; Wed, 02
- Aug 2023 10:49:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230801152007.337272-1-jingzhangos@google.com>
- <20230801152007.337272-2-jingzhangos@google.com> <ZMmdnou5Pk/9V1Gs@linux.dev>
- <CAAdAUtj-6tk53TE6p0TYBfmFghj94g+Sg2KK_80Gar18kJ=5OA@mail.gmail.com> <ZMqMofRCmB14XUZr@linux.dev>
-In-Reply-To: <ZMqMofRCmB14XUZr@linux.dev>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 2 Aug 2023 10:48:59 -0700
-Message-ID: <CAAdAUtiemHnLK-y4AmEa53bw4ZhvRsebQWAMjV5dTSxEG0BUJA@mail.gmail.com>
-Subject: Re: [PATCH v7 01/10] KVM: arm64: Allow userspace to get the writable
- masks for feature ID registers
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        d=1e100.net; s=20221208; t=1690998766; x=1691603566;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o9xLasiI1QpQmYZlmA61fAHENI9Lul/s9FI/EIn/JnY=;
+        b=NihOVXINiMo4++QnwXNkdqs6TXjsixQP95JUiFbv4Q4tRGLq60OBkrSN964gNw3rqu
+         Wm6a/bLz77yzvIrEXf6O/3G/OH6GwEWtSx+Fp6waSsPxO4Y8QSMo6/vfwfohEHf62tTZ
+         usQgT7hgY5TP3hPSx9EZ+m4o9IBBrp4FONTGzUONPpkQAUkjfpPz6BAR4rGaNHA8thCt
+         75AoIqqppqyMinSI0a/oosE4wlF+CYa9xm95vgxscTbNU/alPV+0HqdhiJ0dy9ae1GYY
+         s9eh5xHpBftef1UVnEvdR/R8Z3I0aXHzCs3bTk4wSVSZqKuqdfpjfQD5QmLMclPEYdtp
+         Lgmg==
+X-Gm-Message-State: ABy/qLbRcFRxeq2mDMbtYq3trdRxSPivXnRfIFRfDz+uxLhzl4Q24N0E
+        Mx6dbg3DeGSXvK1o2pfTEmHtgRH4wGg=
+X-Google-Smtp-Source: APBJJlFeirc5L28TZbXdrADjrqG+IT1wrE5WO9H36XSSa1s2/jxjkcC+67jmu1JmFzGpSwrJIPlOsMF0wow=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:db8d:0:b0:d18:73fc:40af with SMTP id
+ g135-20020a25db8d000000b00d1873fc40afmr113950ybf.5.1690998766485; Wed, 02 Aug
+ 2023 10:52:46 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 10:52:45 -0700
+In-Reply-To: <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
+Mime-Version: 1.0
+References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com>
+ <ZLrCUkwot/yiVC8T@google.com> <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
+ <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+ <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
+Message-ID: <ZMqX7TJavsx8WEY2@google.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+From:   Sean Christopherson <seanjc@google.com>
+To:     Amaan Cheval <amaan.cheval@gmail.com>
+Cc:     brak@gameservers.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,61 +68,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 2, 2023 at 10:04=E2=80=AFAM Oliver Upton <oliver.upton@linux.de=
-v> wrote:
->
-> On Wed, Aug 02, 2023 at 08:55:43AM -0700, Jing Zhang wrote:
-> > > > +#define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
-> > > > +
-> > > > +struct feature_id_writable_masks {
-> > > > +     __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> > > > +};
-> > >
-> > > This UAPI is rather difficult to extend in the future. We may need to
-> > > support describing the masks of multiple ranges of registers in the
-> > > future. I was thinking something along the lines of:
-> > >
-> > >         enum reg_mask_range_idx {
-> > >                 FEATURE_ID,
-> > >         };
-> > >
-> > >         struct reg_mask_range {
-> > >                 __u64 idx;
-> > >                 __u64 *masks;
-> > >                 __u64 rsvd[6];
-> > >         };
-> > >
-> > Since have the way to map sysregs encoding to the index in the mask
-> > array, we can extend the UAPI by just adding a size field in struct
-> > feature_id_writable_masks like below:
-> > struct feature_id_writable_masks {
-> >          __u64 size;
-> >          __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> > };
-> > The 'size' field can be used as input for the size of 'mask' array and
-> > output for the number of masks actually read in.
-> > This way, we can freely add more ranges without breaking anything in us=
-erspace.
-> > WDYT?
->
-> Sorry, 'index' is a bit overloaded in this context. The point I was
-> trying to get across is that we might want to describe a completely
-> different range of registers than the feature ID registers in the
-> future. Nonetheless, we shouldn't even presume the shape of future
-> extensions to the ioctl.
->
->         struct reg_mask_range {
->                 __u64 addr;     /* pointer to mask array */
->                 __u64 rsvd[7];
->         };
->
-> Then in KVM we should require ::rsvd be zero and fail the ioctl
-> otherwise.
-Got it. Will add the ::rsvd for future expansion.
+On Wed, Aug 02, 2023, Amaan Cheval wrote:
+> > LOL, NUMA autobalancing.  I have a longstanding hatred of that feature.  I'm sure
+> > there are setups where it adds value, but from my perspective it's nothing but
+> > pain and misery.
+> 
+> Do you think autobalancing is increasing the odds of some edge-case race
+> condition, perhaps?
+> I find it really curious that numa_balancing definitely affects this issue, but
+> particularly when thp=0. Is it just too many EPT entries to install
+> when transparent hugepages is disabled, increasing the likelihood of
+> a race condition / lock contention of some sort?
 
-Thanks,
-Jing
->
-> --
-> Thanks,
-> Oliver
+NUMA balancing works by zapping PTEs[*] in userspace page tables for mappings to
+remote memory, and then migrating the data to local memory on the resulting page
+fault.  When that memory is being used to back a KVM guest, zapping the userspace
+(primary) PTEs triggers an mmu_notifier event that in turn saps KVM's PTEs, a.k.a.
+SPTEs (which used to mean Shadow PTEs, but we're retroactively redefining SPTE to
+also mean Secondary PTEs so that it's correct when shadow paging isn't being used).
+
+If NUMA balancing is going nuclear and constantly zapping PTEs, the resulting
+mmu_notifier events could theoretically stall a vCPU indefinitely.  The reason I
+dislike NUMA balancing is that it's all too easy to end up with subtle bugs
+and/or misconfigured setups where the NUMA balancing logic zaps PTEs/SPTEs without
+actuablly being able to move the page in the end, i.e. it's (IMO) too easy for
+NUMA balancing to get false positives when determining whether or not to try and
+migrate a page.
+
+That said, it's definitely very unexpected that NUMA balancing would be zapping
+SPTEs to the point where a vCPU can't make forward progress.   It's theoretically
+possible that that's what's happening, but quite unlikely, especially since it
+sounds like you're seeing issues even with NUMA balancing disabled.
+
+More likely is that there is a bug somewhere that results in the mmu_notifier
+event refcount staying incorrectly eleveated, but that type of bug shouldn't follow
+the VM across a live migration...
+
+[*] Not technically a full zap of the PTE, it's just marked PROT_NONE, i.e.
+    !PRESET, but on the KVM side of things it does manifest as a full zap of the
+    SPTE.
+
+> > > They still remain locked up, but that might be because the original cause of the
+> > > looping EPT_VIOLATIONs corrupted/crashed them in an unrecoverable way (are there
+> > > any ways you can think of that that might happen)?
+> >
+> > Define "remain locked up".  If the vCPUs are actively running in the guest and
+> > making forward progress, i.e. not looping on VM-Exits on a single RIP, then they
+> > aren't stuck from KVM's perspective.
+> 
+> Right, the traces look like they're not stuck (i.e. no looping on the same
+> RIP). By "remain locked up" I mean that the VM is unresponsive on both the
+> console and services (such as ssh) used to connect to it.
+> 
+> > But that doesn't mean the guest didn't take punitive action when a vCPU was
+> > effectively stalled indefinitely by KVM, e.g. from the guest's perspective the
+> > stuck vCPU will likely manifest as a soft lockup, and that could lead to a panic()
+> > if the guest is a Linux kernel running with softlockup_panic=1.
+> 
+> So far we haven't had any guest kernels with softlockup_panic=1 have this issue,
+> so it's hard to confirm, but it makes sense that the guest took punitive action
+> in response to being stalled.
+> 
+> Any thoughts on how we might reproduce the issue or trace it down better?
+
+Before going further, can you confirm that this earlier statement is correct?
+
+ : Another interesting observation we made was that when we migrate a guest to a
+ : different host, the guest _stays_ locked up and throws EPT violations on the new
+ : host as well
+
+Specifically, after migration, is the vCPU still fully stuck on EPT violations,
+i.e. not making forward progress from KVM's perspective?  Or is the guest "stuck"
+after migration purely because the guest itself gave up?
