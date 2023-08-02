@@ -2,49 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DF5076D226
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 17:36:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BB2F76D305
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 17:55:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235290AbjHBPgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 11:36:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
+        id S234618AbjHBPzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 11:55:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235248AbjHBPgV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 11:36:21 -0400
-X-Greylist: delayed 68 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Aug 2023 08:35:41 PDT
-Received: from outbound-smtp02.blacknight.com (outbound-smtp02.blacknight.com [81.17.249.8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B9E30DD
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 08:35:41 -0700 (PDT)
-Received: from mail.blacknight.com (pemlinmail01.blacknight.ie [81.17.254.10])
-        by outbound-smtp02.blacknight.com (Postfix) with ESMTPS id 17991BACEE
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:35:22 +0100 (IST)
-Received: (qmail 28242 invoked from network); 2 Aug 2023 15:35:21 -0000
-Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.20.191])
-  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 2 Aug 2023 15:35:21 -0000
-Date:   Wed, 2 Aug 2023 16:35:19 +0100
-From:   Mel Gorman <mgorman@techsingularity.net>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        liubo <liubo254@huawei.com>, Peter Xu <peterx@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 5/8] pgtable: improve pte_protnone() comment
-Message-ID: <20230802153519.ryds4omveq5zbtex@techsingularity.net>
-References: <20230801124844.278698-1-david@redhat.com>
- <20230801124844.278698-6-david@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-In-Reply-To: <20230801124844.278698-6-david@redhat.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        with ESMTP id S233405AbjHBPzC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 11:55:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B6C198A;
+        Wed,  2 Aug 2023 08:54:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 45586619D9;
+        Wed,  2 Aug 2023 15:54:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4222C433C7;
+        Wed,  2 Aug 2023 15:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690991658;
+        bh=CG7zRefX3vIt6QnpDyTwXaNQXmqFTUj9YMbM/HH75A0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=d8goIOTrUwi6bz/hFXw/xgAPyKfedzSYI+8GscwiW+tk8X1vQfN9RoaEx7Wd+cZ3t
+         8T3UVktGFblRsP6mQnD6+knUpp4KO/+zZfDwZmD0RhvemS/YDOQayojvRsnELfXQ0T
+         /pfE3VxAvD/pOCC/dudtI6dA5vx31U68ofpyFoPJX3M5xG98QEjJLQABi2DSZvu8yW
+         h8n3JiQhSLptcmtD9seypjNp0fXMIiDboCwxMo5q44zQ1se/GfJLnrqG2o2XBmLTj0
+         vFZfkTIhUeI1xWJ6335xw0GNFy9x+eYeDkeoTXFKAq+ptse9HMlvDiUaX+8V4a8TW1
+         HBrpcfxcWbpog==
+Received: from [104.132.1.99] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qREAx-001Prr-LD;
+        Wed, 02 Aug 2023 16:54:16 +0100
+Date:   Wed, 02 Aug 2023 16:54:10 +0100
+Message-ID: <878ratqw2l.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v7 01/12] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
+In-Reply-To: <CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+References: <20230722022251.3446223-1-rananta@google.com>
+        <20230722022251.3446223-2-rananta@google.com>
+        <87v8e5r6s6.wl-maz@kernel.org>
+        <CAJHc60wtc2Usei3hKj1ykVRvBZFFCBOHMi9HCxnNvGK2dPFApA@mail.gmail.com>
+        <ZMgqueePlmKvgUId@google.com>
+        <CAJHc60xM+KsUKxtoqORnpzrRke4T-sob2uLJRMvBKwruipxnpw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 104.132.1.99
+X-SA-Exim-Rcpt-To: rananta@google.com, seanjc@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, philmd@linaro.org, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -53,19 +89,108 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 01, 2023 at 02:48:41PM +0200, David Hildenbrand wrote:
-> Especially the "For PROT_NONE VMAs, the PTEs are not marked
-> _PAGE_PROTNONE" is wrong: doing an mprotect(PROT_NONE) will end up
-> marking all PTEs on x86 as _PAGE_PROTNONE, making pte_protnone()
-> indicate "yes".
-> 
-> So let's improve the comment, so it's easier to grasp which semantics
-> pte_protnone() actually has.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Tue, 01 Aug 2023 01:42:54 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Mon, Jul 31, 2023 at 2:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Mon, Jul 31, 2023, Raghavendra Rao Ananta wrote:
+> > > On Thu, Jul 27, 2023 at 3:24=E2=80=AFAM Marc Zyngier <maz@kernel.org>=
+ wrote:
+> > > >
+> > > > On Sat, 22 Jul 2023 03:22:40 +0100,
+> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > > >
+> > > > > From: David Matlack <dmatlack@google.com>
+> > > > >
+> > > > > Rename kvm_arch_flush_remote_tlb() and the associated macro
+> > > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB to kvm_arch_flush_remote_tlbs() =
+and
+> > > > > __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS respectively.
+> > > > >
+> > > > > Making the name plural matches kvm_flush_remote_tlbs() and makes =
+it more
+> > > > > clear that this function can affect more than one remote TLB.
+> > > > >
+> > > > > No functional change intended.
+> > > > >
+> > > > > Signed-off-by: David Matlack <dmatlack@google.com>
+> > > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> > > > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > > > > ---
+> > > > >  arch/mips/include/asm/kvm_host.h | 4 ++--
+> > > > >  arch/mips/kvm/mips.c             | 2 +-
+> > > > >  arch/x86/include/asm/kvm_host.h  | 4 ++--
+> > > > >  include/linux/kvm_host.h         | 4 ++--
+> > > > >  virt/kvm/kvm_main.c              | 2 +-
+> > > > >  5 files changed, 8 insertions(+), 8 deletions(-)
+> > > > >
+> > > > > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include=
+/asm/kvm_host.h
+> > > > > index 04cedf9f8811..9b0ad8f3bf32 100644
+> > > > > --- a/arch/mips/include/asm/kvm_host.h
+> > > > > +++ b/arch/mips/include/asm/kvm_host.h
+> > > > > @@ -896,7 +896,7 @@ static inline void kvm_arch_sched_in(struct k=
+vm_vcpu *vcpu, int cpu) {}
+> > > > >  static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)=
+ {}
+> > > > >  static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcp=
+u) {}
+> > > > >
+> > > > > -#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> > > > > -int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+> > > > > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > > > > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> > > >
+> > > > How about making this prototype global? I don't see a point in havi=
+ng
+> > > > it per-architecture, specially as you are adding arm64 to that mix =
+in
+> > > > the following patch.
+> > > >
+> > > We can make it global, but I'm not sure what was the intention of the
+> > > original author. My guess is that he was following the same style that
+> > > we have for some of the other kvm_arch_*() functions
+> > > (kvm_arch_free_vm() for example)?
+> >
+> > Heh, KVM has a *lot* of code that was written with questionable style. =
+ I agree
+> > with Marc, I can't think of a single reason not to have the definition =
+in common
+> > code.  Declaring the function doesn't preclude a "static inline" implem=
+entation,
+> > and we could even keep the prototype under an #ifdef, e.g.
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 9d3ac7720da9..5ac64f933547 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlb(struc=
+t kvm *kvm)
+> >  {
+> >         return -ENOTSUPP;
+> >  }
+> > +#else
+> > +int kvm_arch_flush_remote_tlb(struct kvm *kvm);
+> >  #endif
+> >
+> >  #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+> >
+> Thanks for the suggestions; I can go with a common declaration. Along
+> with that, do we want to keep defining
+> __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS in the arch code that supports it or
+> convert it into a CONFIG_?
 
-Acked-by: Mel Gorman <mgorman@techsingularity.net>
+This isn't something that a user can select, more something that is an
+architectural decision. Maybe in a later patch if there is a consensus
+around that, but probably not as part of this series.
 
--- 
-Mel Gorman
-SUSE Labs
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
