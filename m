@@ -2,209 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D418576DB9C
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:34:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1DED76DBA9
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbjHBXeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 19:34:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39840 "EHLO
+        id S231286AbjHBXgP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 19:36:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbjHBXeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 19:34:03 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E335530C0
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:34:00 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bc0308d1e2so68625ad.0
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 16:34:00 -0700 (PDT)
+        with ESMTP id S230376AbjHBXgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 19:36:14 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E8F2D4B
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:36:12 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58440eb872aso2945547b3.3
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 16:36:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691019240; x=1691624040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vc6C3YLRbpQi2AL32H49CSJKRRKMAivDlEx5K2+EnSw=;
-        b=xf/IJNr/83ysKxnLoIpURXqtW5k4S78Gh5tHb3m0g2cM656O5cPNqbgVhIX2RxNi81
-         rwN3s+1UASkz3bkOQsKt/jfKJPUdzGRFa2ffYFtxNksgXsGw9O+9OKdHnIY5qvM4LBWh
-         SO1LP5+sgpcVIpZxoTkUG2YUN21gRCZKcROF8+jYm9Oz49kUtlbb/rvbWBZj7GBNX8w0
-         4wDDyENbZdXj4phELOLafcq19/Iy+WmF5GW/WIxs4naY1ZHw9AH8dTs/Xqsb0FZL+KGI
-         5+YVJJNiMt5dFlAPlHT/6ZhE+J9D0mljI4Zs6eq8RwKcYhSzORWMDh2dDSPiSsB1zI2l
-         W0ew==
+        d=google.com; s=20221208; t=1691019372; x=1691624172;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JLJZGGChmwgNECG5B92/paJ//T4VwugbEM4LTKjjkEI=;
+        b=IfgOn5L28DOKx2CxEwNAwL53Pb5rVRldcU0FSXIJwNT2esht+pMPHYoV/KbaGfL+5O
+         HPmv8/J8MSLzK5iYcmsbRPuu+RAptfj5ZSTZIJ9/R+q5DEEm3wXHEumvikodKGQMmEGk
+         BXwWw+2LUbeooMDdXS3rk5WWRyLMIh2bAiG64FfY0Dy1hxdMjwAFg3OhtRjrUmV01pUS
+         demn9boMbxhU00piz9CRA5Chf6aG/NlXBsoGMoX3Nanmyb8Ndk9ApCx9qUcv9WOI75+b
+         EvAeVhLmnP6pTuqqn5ySUOULqHo3BG4UwrNlwJD7QePdiY6Kwx26mDP5L5WTJHRw0l32
+         9p/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691019240; x=1691624040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vc6C3YLRbpQi2AL32H49CSJKRRKMAivDlEx5K2+EnSw=;
-        b=faoWhfvy86YtCHUFfkSDTxdEkNzRsKT7jBqmYUa9UZI3glAEHerLimHVFW/W3QAUFL
-         yGJ2i+6bxFhiUFPsn5j/33PPkH/vGXig+srpude2/bRCfXhI6ZeH/YgTDpu3N5Dt+ACA
-         NpIfMw6RwaCzsII7xOzS9Z/AHwDg1gHsQOzsqX2ycRt9c3eCKqpZng843ccr2ZxMhsA0
-         fJ9c3v3JsX8WFwbsGmLEhxHsWYW+oym8muQGgbfdYyH9duLdvnMa/WxB9I+tdYQFnPnT
-         kSFIANyqWoAF8skjZFOVAVA28nXtp9rQT9V+iNdQaUoFOk0rxbFm1o8SP6y/TO46wAPf
-         qqrw==
-X-Gm-Message-State: AOJu0Yw6oczGpVPI3mwqGDgB7HRCQ31+4Knjmr/2EvN5vOG753K57u0G
-        MZ/slA1sr9bZQWtUsv7islyeQiTjkWCjlgtUuexT3w==
-X-Google-Smtp-Source: AGHT+IHW4A1mLYKXPi0AX+HzRbUtlH1BLHQ/AL7bLTbxnxnSwM+iSVI/MQBnIBN/qF4PUit3MoTRa1yu+rP1rkdZcH0=
-X-Received: by 2002:a17:903:5ce:b0:1bc:3321:4105 with SMTP id
- kf14-20020a17090305ce00b001bc33214105mr289379plb.2.1691019240198; Wed, 02 Aug
- 2023 16:34:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-13-rananta@google.com>
- <87jzulqz0v.wl-maz@kernel.org> <CAJHc60zGzAqWw2iZwNEG_bWERXkz_io7ae-K_tf_kh6xcOBxLA@mail.gmail.com>
- <86fs5158j7.wl-maz@kernel.org>
-In-Reply-To: <86fs5158j7.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Wed, 2 Aug 2023 16:33:48 -0700
-Message-ID: <CAJHc60ww4X89SU+ttddjZUjOFS+D_s9Z+2xE1WaVCR-w7hEF9g@mail.gmail.com>
-Subject: Re: [PATCH v7 12/12] KVM: arm64: Use TLBI range-based intructions for unmap
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1691019372; x=1691624172;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JLJZGGChmwgNECG5B92/paJ//T4VwugbEM4LTKjjkEI=;
+        b=TnnVMD/3/Joi4d6J1PV2DOgHdbOaf07Cj5cyAGYC4v8S1hb2oRokPS+4cf5aYGFx7M
+         a9mj4fi1Z2Uh8jMq+ODvnou4UYmnoNJ3q3s/XRnix+0XgUbAS7yDo0UNe82uM7zNEMdc
+         pWKQxmLn4IAvP6ziKYEED43yoOURFOk71n6TfVG2Q6JhdE1p/x6wBNUOGnLNgPtTA9Sl
+         DV2R5pRL5gD99F4MVAYLkrm4860+JSU2lkbtvPyN9wu6qkCaY9MjJ8pvIP2XS9/EzLuH
+         ButsUjKrST1paBc28o1e2AEtiz6KFujtuJZ4BSTnFimsUGXTZXsa188L7CBT321+sHZd
+         040Q==
+X-Gm-Message-State: ABy/qLbn44SSNJsQaSbejONik81meNerVFftbXvL2t9Gn/oZ3eJk0kRM
+        4s8yDuflrQR+K7+uHXY2EI6c/wh6cds=
+X-Google-Smtp-Source: APBJJlF1AcC9oVjYW4JuQ/vs6R4exCKdnWbmbtAwzRv6GP0aLCrbRyC9LI2OJBYqZRNWawGGUzhyN+P2JdA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:721:b0:573:8316:8d04 with SMTP id
+ bt1-20020a05690c072100b0057383168d04mr175453ywb.4.1691019371897; Wed, 02 Aug
+ 2023 16:36:11 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 16:36:10 -0700
+In-Reply-To: <20230802022954.193843-1-tao1.su@linux.intel.com>
+Mime-Version: 1.0
+References: <20230802022954.193843-1-tao1.su@linux.intel.com>
+Message-ID: <ZMroatylDm1b5+WJ@google.com>
+Subject: Re: [PATCH] KVM: x86: Advertise AMX-COMPLEX CPUID to userspace
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tao Su <tao1.su@linux.intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, xiaoyao.li@intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 2, 2023 at 4:28=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Mon, 31 Jul 2023 19:26:09 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > On Thu, Jul 27, 2023 at 6:12=E2=80=AFAM Marc Zyngier <maz@kernel.org> w=
-rote:
-> > >
-> > > On Sat, 22 Jul 2023 03:22:51 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > The current implementation of the stage-2 unmap walker traverses
-> > > > the given range and, as a part of break-before-make, performs
-> > > > TLB invalidations with a DSB for every PTE. A multitude of this
-> > > > combination could cause a performance bottleneck on some systems.
-> > > >
-> > > > Hence, if the system supports FEAT_TLBIRANGE, defer the TLB
-> > > > invalidations until the entire walk is finished, and then
-> > > > use range-based instructions to invalidate the TLBs in one go.
-> > > > Condition deferred TLB invalidation on the system supporting FWB,
-> > > > as the optimization is entirely pointless when the unmap walker
-> > > > needs to perform CMOs.
-> > > >
-> > > > Rename stage2_put_pte() to stage2_unmap_put_pte() as the function
-> > > > now serves the stage-2 unmap walker specifically, rather than
-> > > > acting generic.
-> > > >
-> > > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/pgtable.c | 67 +++++++++++++++++++++++++++++++-=
-----
-> > > >  1 file changed, 58 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgta=
-ble.c
-> > > > index 5ef098af1736..cf88933a2ea0 100644
-> > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > @@ -831,16 +831,54 @@ static void stage2_make_pte(const struct kvm_=
-pgtable_visit_ctx *ctx, kvm_pte_t n
-> > > >       smp_store_release(ctx->ptep, new);
-> > > >  }
-> > > >
-> > > > -static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx=
-, struct kvm_s2_mmu *mmu,
-> > > > -                        struct kvm_pgtable_mm_ops *mm_ops)
-> > > > +struct stage2_unmap_data {
-> > > > +     struct kvm_pgtable *pgt;
-> > > > +     bool defer_tlb_flush_init;
-> > > > +};
-> > > > +
-> > > > +static bool __stage2_unmap_defer_tlb_flush(struct kvm_pgtable *pgt=
-)
-> > > > +{
-> > > > +     /*
-> > > > +      * If FEAT_TLBIRANGE is implemented, defer the individual
-> > > > +      * TLB invalidations until the entire walk is finished, and
-> > > > +      * then use the range-based TLBI instructions to do the
-> > > > +      * invalidations. Condition deferred TLB invalidation on the
-> > > > +      * system supporting FWB, as the optimization is entirely
-> > > > +      * pointless when the unmap walker needs to perform CMOs.
-> > > > +      */
-> > > > +     return system_supports_tlb_range() && stage2_has_fwb(pgt);
-> > > > +}
-> > > > +
-> > > > +static bool stage2_unmap_defer_tlb_flush(struct stage2_unmap_data =
-*unmap_data)
-> > > > +{
-> > > > +     bool defer_tlb_flush =3D __stage2_unmap_defer_tlb_flush(unmap=
-_data->pgt);
-> > > > +
-> > > > +     /*
-> > > > +      * Since __stage2_unmap_defer_tlb_flush() is based on alterna=
-tive
-> > > > +      * patching and the TLBIs' operations behavior depend on this=
-,
-> > > > +      * track if there's any change in the state during the unmap =
-sequence.
-> > > > +      */
-> > > > +     WARN_ON(unmap_data->defer_tlb_flush_init !=3D defer_tlb_flush=
-);
-> > > > +     return defer_tlb_flush;
-> > >
-> > > I really don't understand what you're testing here. The ability to
-> > > defer TLB invalidation is a function of the system capabilities
-> > > (range+FWB) and a single flag that is only set on the host for pKVM.
-> > >
-> > > How could that change in the middle of the life of the system? if
-> > > further begs the question about the need for the unmap_data data
-> > > structure.
-> > >
-> > > It looks to me that we could simply pass the pgt pointer around and b=
-e
-> > > done with it. Am I missing something obvious?
-> > >
-> > From one of the previous comments [1] (used in a different context),
-> > I'm given to understand that since these feature checks are governed
-> > by alternative patching, they can potentially change (at runtime?). Is
-> > that not the case and I have misunderstood the idea in comment [1]
-> > entirely? Is it solely used for optimization purposes and set only
-> > once?
->
-> Alternative patching, just like the static branches used to implement
-> the capability stuff, is a one way street. At the point where KVM is
-> initialised, these configurations are set in stone, and there is no
-> going back.
->
-Understood.
-> > If that's the case, I can get rid of the WARN_ON() and unmap_data.
->
-> yes, please.
->
-Sure, I'll get rid of the WARN_ON and 'struct stage2_unmap_data' in v8.
+On Wed, Aug 02, 2023, Tao Su wrote:
+> Latest Intel platform GraniteRapids-D introduces AMX-COMPLEX, which adds
+> two instructions to perform matrix multiplication of two tiles containing
+> complex elements and accumulate the results into a packed single precision
+> tile.
+> 
+> AMX-COMPLEX is enumerated via CPUID.(EAX=7,ECX=1):EDX[bit 8]
+> 
+> Since there are no new VMX controls or additional host enabling required
+> for guests to use this feature, advertise the CPUID to userspace.
 
-Thanks,
-Raghavendra
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Nit, I would rather justify this (last paragraph) with something like:
+
+  Advertise AMX_COMPLEX if it's supported in hardware.  There are no VMX
+  controls for the feature, i.e. the instructions can't be interecepted, and
+  KVM advertises base AMX in CPUID if AMX is supported in hardware, even if
+  KVM doesn't advertise AMX as being supported in XCR0, e.g. because the
+  process didn't opt-in to allocating tile data.
+
+If the above is accurate and there are no objections, I'll fixup the changelog
+when applying.
+
+Side topic, this does make me wonder if advertising AMX when XTILE_DATA isn't
+permitted is a bad idea.  But no one has complained, and chasing down all the
+dependent AMX features would get annoying, so I'm inclined to keep the status quo.
