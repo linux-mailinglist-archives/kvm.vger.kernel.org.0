@@ -2,91 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1DED76DBA9
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:36:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA5AB76DBB1
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:42:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbjHBXgP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 19:36:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
+        id S231953AbjHBXmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 19:42:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230376AbjHBXgO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 19:36:14 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E8F2D4B
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:36:12 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58440eb872aso2945547b3.3
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 16:36:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691019372; x=1691624172;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLJZGGChmwgNECG5B92/paJ//T4VwugbEM4LTKjjkEI=;
-        b=IfgOn5L28DOKx2CxEwNAwL53Pb5rVRldcU0FSXIJwNT2esht+pMPHYoV/KbaGfL+5O
-         HPmv8/J8MSLzK5iYcmsbRPuu+RAptfj5ZSTZIJ9/R+q5DEEm3wXHEumvikodKGQMmEGk
-         BXwWw+2LUbeooMDdXS3rk5WWRyLMIh2bAiG64FfY0Dy1hxdMjwAFg3OhtRjrUmV01pUS
-         demn9boMbxhU00piz9CRA5Chf6aG/NlXBsoGMoX3Nanmyb8Ndk9ApCx9qUcv9WOI75+b
-         EvAeVhLmnP6pTuqqn5ySUOULqHo3BG4UwrNlwJD7QePdiY6Kwx26mDP5L5WTJHRw0l32
-         9p/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691019372; x=1691624172;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLJZGGChmwgNECG5B92/paJ//T4VwugbEM4LTKjjkEI=;
-        b=TnnVMD/3/Joi4d6J1PV2DOgHdbOaf07Cj5cyAGYC4v8S1hb2oRokPS+4cf5aYGFx7M
-         a9mj4fi1Z2Uh8jMq+ODvnou4UYmnoNJ3q3s/XRnix+0XgUbAS7yDo0UNe82uM7zNEMdc
-         pWKQxmLn4IAvP6ziKYEED43yoOURFOk71n6TfVG2Q6JhdE1p/x6wBNUOGnLNgPtTA9Sl
-         DV2R5pRL5gD99F4MVAYLkrm4860+JSU2lkbtvPyN9wu6qkCaY9MjJ8pvIP2XS9/EzLuH
-         ButsUjKrST1paBc28o1e2AEtiz6KFujtuJZ4BSTnFimsUGXTZXsa188L7CBT321+sHZd
-         040Q==
-X-Gm-Message-State: ABy/qLbn44SSNJsQaSbejONik81meNerVFftbXvL2t9Gn/oZ3eJk0kRM
-        4s8yDuflrQR+K7+uHXY2EI6c/wh6cds=
-X-Google-Smtp-Source: APBJJlF1AcC9oVjYW4JuQ/vs6R4exCKdnWbmbtAwzRv6GP0aLCrbRyC9LI2OJBYqZRNWawGGUzhyN+P2JdA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:721:b0:573:8316:8d04 with SMTP id
- bt1-20020a05690c072100b0057383168d04mr175453ywb.4.1691019371897; Wed, 02 Aug
- 2023 16:36:11 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 16:36:10 -0700
-In-Reply-To: <20230802022954.193843-1-tao1.su@linux.intel.com>
-Mime-Version: 1.0
-References: <20230802022954.193843-1-tao1.su@linux.intel.com>
-Message-ID: <ZMroatylDm1b5+WJ@google.com>
-Subject: Re: [PATCH] KVM: x86: Advertise AMX-COMPLEX CPUID to userspace
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tao Su <tao1.su@linux.intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, xiaoyao.li@intel.com
+        with ESMTP id S230088AbjHBXmc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 19:42:32 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2081.outbound.protection.outlook.com [40.107.101.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5D330C2;
+        Wed,  2 Aug 2023 16:42:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DedJCHnK4kS6g8wt6Ri1khKO249Uevc+uuBXRIR4wuXHlh7Z8RptIunx3E4YXeTT67LNNgqMm3nNWXFbos3Lq8A8tTLk5WA9J7rAoNr0I/KiIOhzlVjxE7KWhUkhPV16w4P3eqrFnBDVqE1oLJH17jgI2EltfRNImICv1KJBxdPmRKQwps03reojM9aodCgqDIjppnXUqtqjbzUBoyCn+3+m1yctBqtXv1LDMQdm7PHbSUSGHcz1GrUZRK5CrUpoLjj/mZlPJ/XsAsZ+ggSH8MHhVlKJHFLAMnKynNUS+fbp70szaDvcty3k6nesqjNtxTg2yFBEEkhoUvfExb/nxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oVb7sAyH4v5D3Y404hctFhh+GmDP/xe0ddmv1wqVr/Q=;
+ b=JMnQuKdBCNVDiGgDCMHHkxJwj+hyJnOAup/HPLwnq0Pk51imamGNvAcEU02g8F0Y+/ORCFYji4ae6404Nr/lfmfBZF7EUpJ6ub41uGk4+eLjQIr21pGDhx/cszB70DbqowVnYO0veNX/qtw0E6K5+grItMwEB65HGpO0RvbL/XTlxscOHP63oURihg4hhrOwmHM/lUtZUovuxL+HLBhBNheirwmpmJDLAj7rZo+U93ibzIk8GSCBjkLOGXEaiCHNnFPPnRYUzLUheJSaHoRWvV3ZLZ3e6v1o7xUW9mHtclTFqO7WsDCXYzI0u5qJNVdjx/0Mr9F1qmZoblQBZTfg9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oVb7sAyH4v5D3Y404hctFhh+GmDP/xe0ddmv1wqVr/Q=;
+ b=tvG/3LBCBM+5tBMPAzo+G0xr/UQJ40XahH1eC41WwTpcpdEtuU1aQJutgvcT0vH45f36DYNJdvHWHJuSQdpfBu+n45TOStdHRxLEp5jVI44vwLcsqC5Y0cmtydOLkeQx9vcAhr/tcVRm3j3bFlY9YC67BhUS2+kdttom23f3juM+5iIL6ANlQdZ1j0jvC3HCb+pIbUJQJGN1zM+1XG7Wek5LDko3Xv10RGuos0nGq6Tr9WSog4GLyGzeo6HfzOpn1sZyTI6fEqRZVo4S6hlVPFZIZAulhCyhizL3JcZXW9LEsF4O0WgdrSYkTt9b/krG5dlqRgCsPNubcTHwAD8AIQ==
+Received: from SN7P220CA0007.NAMP220.PROD.OUTLOOK.COM (2603:10b6:806:123::12)
+ by MN0PR12MB5931.namprd12.prod.outlook.com (2603:10b6:208:37e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 23:42:26 +0000
+Received: from SN1PEPF0002636D.namprd02.prod.outlook.com
+ (2603:10b6:806:123:cafe::99) by SN7P220CA0007.outlook.office365.com
+ (2603:10b6:806:123::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.19 via Frontend
+ Transport; Wed, 2 Aug 2023 23:42:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002636D.mail.protection.outlook.com (10.167.241.138) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Wed, 2 Aug 2023 23:42:25 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 2 Aug 2023
+ 16:42:13 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 2 Aug 2023
+ 16:42:13 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Wed, 2 Aug 2023 16:42:11 -0700
+Date:   Wed, 2 Aug 2023 16:42:10 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v3 08/17] iommufd: IOMMU_HWPT_ALLOC allocation with user
+ data
+Message-ID: <ZMrp0ofsx8M6fT/S@Asurada-Nvidia>
+References: <20230724110406.107212-1-yi.l.liu@intel.com>
+ <20230724110406.107212-9-yi.l.liu@intel.com>
+ <ZMQBLTm+U+5bgC/Z@nvidia.com>
+ <BN9PR11MB5276C84452E56AB03B819D208C05A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZMe0IQksFgV6yKTB@nvidia.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Disposition: inline
+In-Reply-To: <ZMe0IQksFgV6yKTB@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636D:EE_|MN0PR12MB5931:EE_
+X-MS-Office365-Filtering-Correlation-Id: 339fe851-1e63-463d-f0ba-08db93b22016
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nP28xwqz7fjq7ZL5v4xFkvWSL7rOwwmM0ZwU3MyMJ4QtNRKlb0SFj3jBDQ2l5ukVpjtWcY07CQGIVdV09Y9ge7AW1vuqtWOIv+bLuedaDBa8ANjIoOGqE7Cb3pwiDIC1xyIx8pbzqA4rPcEID9KNa8krDFCrVi3vG9gVyTqG284Jgmby01/l0MDZnf3tnIkdPnme92eq7uNWqm0zBLaeSxnhE/lu6S3FAmjhwsYiVcN0CuHorZ+VEgjWeIbvlbIx3fqGwV8Ik8djdraswfQQw7YcpC3eubdiznmghWEktRIYIyZs1J1pKGg6MrRlhpWz4X3NK/zbPcgM+DDxHg8RRk7nhmU16oFF8FnD/LHZg3SgyJuVmnKk54ur1X8LbcPVV/oFxBDLtPNa0+YFSzPVz3l+7MU1dh+pASftii3zrO0VQUJZWFzz+Qk6LR1QM5+Wz0R9S18dqI6ilIUgiWHhLX1S4kFBlhsjZWWNF/AeMnwCiDggchKIpkfpLr64cs5q5D8N3fk///bZ1U+0XToa4BNA/UkMS4KbxDQ10cwfkd6VWiyyKGCl516kKo42yJnY+CcpiRey5+IMKrpdOrx9w9/tCuYhhoNfOFfKASzVFRgmqpZpW+Z+bCv+xj6YvX8JwjkroyMHx8yGOycY5DpbTXnIx5CL2gbLGTG3D1KprqGgfGz7C/ix7xPoyFVrS5883ZpRswl9pq365zE2O9b8uisBvBc1HuFwF2taTKDNHpA=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(136003)(376002)(396003)(451199021)(82310400008)(36840700001)(40470700004)(46966006)(40480700001)(55016003)(336012)(186003)(40460700003)(9686003)(316002)(478600001)(86362001)(7636003)(54906003)(70206006)(70586007)(33716001)(6636002)(4326008)(82740400003)(356005)(26005)(41300700001)(6862004)(8936002)(8676002)(7416002)(426003)(47076005)(83380400001)(36860700001)(5660300002)(66899021)(2906002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 23:42:25.3486
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 339fe851-1e63-463d-f0ba-08db93b22016
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF0002636D.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5931
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 02, 2023, Tao Su wrote:
-> Latest Intel platform GraniteRapids-D introduces AMX-COMPLEX, which adds
-> two instructions to perform matrix multiplication of two tiles containing
-> complex elements and accumulate the results into a packed single precision
-> tile.
+On Mon, Jul 31, 2023 at 10:16:17AM -0300, Jason Gunthorpe wrote:
+ 
+> > Ideally expanding uAPI structure size should come with new flag bits.
 > 
-> AMX-COMPLEX is enumerated via CPUID.(EAX=7,ECX=1):EDX[bit 8]
+> Flags or some kind of 'zero is the same behavior as a smaller struct'
+> scheme.
 > 
-> Since there are no new VMX controls or additional host enabling required
-> for guests to use this feature, advertise the CPUID to userspace.
+> This patch is doing the zero option:
+> 
+>  	__u32 __reserved;
+> +	__u32 hwpt_type;
+> +	__u32 data_len;
+> +	__aligned_u64 data_uptr;
+>  };
+> 
+> hwpt_type == 0 means default type
+> data_len == 0 means no data
+> data_uptr is ignored (zero is safe)
+> 
+> So there is no need to change it
 
-Nit, I would rather justify this (last paragraph) with something like:
+TEST_LENGTH passing ".size = sizeof(struct _struct) - 1" expects a
+-EINVAL error code from "if (ucmd.user_size < op->min_size)" check
+in the iommufd_fops_ioctl(). This has been working when min_size is
+exactly the size of the structure.
 
-  Advertise AMX_COMPLEX if it's supported in hardware.  There are no VMX
-  controls for the feature, i.e. the instructions can't be interecepted, and
-  KVM advertises base AMX in CPUID if AMX is supported in hardware, even if
-  KVM doesn't advertise AMX as being supported in XCR0, e.g. because the
-  process didn't opt-in to allocating tile data.
+When the size of the structure becomes larger than min_size, i.e.
+the passing size above is larger than min_size, it bypasses that
+min_size sanity and goes down to an ioctl handler with a potential
+risk. And actually, the size range can be [min_size, struct_size),
+making it harder for us to sanitize with the existing code.
 
-If the above is accurate and there are no objections, I'll fixup the changelog
-when applying.
+I wonder what's the generic way of sanitizing this case? And, it
+seems that TEST_LENGTH needs some rework to test min_size only?
 
-Side topic, this does make me wonder if advertising AMX when XTILE_DATA isn't
-permitted is a bad idea.  But no one has complained, and chasing down all the
-dependent AMX features would get annoying, so I'm inclined to keep the status quo.
+Thanks
+Nic
