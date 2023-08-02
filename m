@@ -2,168 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C2C876C266
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 03:41:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB4D976C26F
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 03:46:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231701AbjHBBlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 1 Aug 2023 21:41:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45724 "EHLO
+        id S230343AbjHBBq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 1 Aug 2023 21:46:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231674AbjHBBlH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 1 Aug 2023 21:41:07 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA95359D;
-        Tue,  1 Aug 2023 18:40:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690940447; x=1722476447;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=vKpHpvSJe2DUmvKBcJ2VLpczF7I6MWATZTGYOdi6dFU=;
-  b=akpu3p4Yjr1Wg3LJsuN6HA5kXxDFI4D8LXpZMW/meGMTR4Mt7ipc6gT8
-   geFah8c3sbITyIFxQG9shH9Xql/jIdtuku5S918QwYx1mGC3mHWKnijzt
-   3evebSiBZkjnFo62P2oodydvfgL9XZEIEm1idXPSKCXggw2pErZueFqIs
-   bEAkDpFk1aPHUL03TnGzm5M38Ki7AjRdcWhzVGRtsaxNbB5PQBtgI16l/
-   SjXSUdVwLVCx2jPfMNr29DlOm1pacd6B21LAlUt1mVxoZpqY3Lke2mxSW
-   BnniH7FAPntyQzAIfRqc5wvnI3dxwxtPKFdrZKbZpt0rTNujFnEQc3qt1
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="369453383"
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="369453383"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 18:39:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="798891244"
-X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="798891244"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga004.fm.intel.com with ESMTP; 01 Aug 2023 18:39:10 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 18:39:09 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 1 Aug 2023 18:39:09 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 18:39:09 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 1 Aug 2023 18:39:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ABmdN24BzVNCkTnW6SiN/gsjKWnrp1DY8GRewZ9WQWls1ngxf13gMSIjhUNv/agePMfAguNNPr4JatOkRsQL6VD8MJOS4H1IRbDIS0gv7xW+RjN5uteYFNrmYbg8tRbkXEJs/6QRfl74R4w7u4bULh1ZWQCGP1fdDwMyJmBtwtl9ouf2t7jc2DXMws+SG5ghY1g6JDiuxG6Kdoh1LhnuJjOAGFv4PUTqIgH7ugoyU9Ljy/SmuLk/O4Opwaj9Xu0QZbWEZSvq5d0jW6Vq6eCxNxni5tdQRieZKVY3+8Us8d5HFFEuhI4N2DZ2qe+aHbtMfkU35wOLTzwhUVZkujVebA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vKpHpvSJe2DUmvKBcJ2VLpczF7I6MWATZTGYOdi6dFU=;
- b=O1lK+3q7wFFRQBmOq54b3tKcKDwsXaLjjDtfKDnH+Ekd8U3glK51f9iNjeYdAzUbofuhohqwsN2MvfppIC38tI+IlTgDt7kJjJr4yiyAPPzpMfzMoRfO5IGYlMrvjhPzZC5729hrz+2mGhywGhuAcYMonFzf7LddvpNjmRmmwRI+lnn8LwUo2HW+q7KxIaCjR3CfFbS6W+v9x4TQ9mFh9H0SDei3W8+no7UddiKJL2Wor6Z/AzhpvPPe2+jRlU8fizzgph1nw0Mo2BVxoFsyjkeBF39ugymBswQgYpolPkk8/Mnr2T3Mxb38P9sC0xsQ59TJM/KZXJXMlcEbmkeP3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH0PR11MB5657.namprd11.prod.outlook.com (2603:10b6:510:ee::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
- 2023 01:39:02 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::dcf3:7bac:d274:7bed]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::dcf3:7bac:d274:7bed%4]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
- 01:39:01 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Will Deacon" <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Jason Gunthorpe" <jgg@ziepe.ca>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>
-CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 1/2] iommu: Consolidate pasid dma ownership check
-Thread-Topic: [PATCH 1/2] iommu: Consolidate pasid dma ownership check
-Thread-Index: AQHZxEIhfIdukOyCd0Ww2obftm7IEq/VAaVQgAANsACAASweIA==
-Date:   Wed, 2 Aug 2023 01:39:01 +0000
-Message-ID: <BN9PR11MB5276B0865C9D8DC9060BF1A08C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230801063125.34995-1-baolu.lu@linux.intel.com>
- <20230801063125.34995-2-baolu.lu@linux.intel.com>
- <BN9PR11MB5276D196F9BFB06D0E59AEF28C0AA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <36fb3548-7206-878e-d095-195c2feb24f1@linux.intel.com>
-In-Reply-To: <36fb3548-7206-878e-d095-195c2feb24f1@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB5657:EE_
-x-ms-office365-filtering-correlation-id: 1f877808-84b7-4c4b-a314-08db92f93fdf
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6++UBDmwie5B+P+Hyd8UxU2j+dt4Ysf/zO14gkbWJ0UMYOVp0+maNy4SB+MG3Fl6weuhlJH3fNc6BylZIvkz6Za3hbEuGoj4D2Bv4kJIsPKo/N5PFa+GrGCzlo0SgDZLcHXhAeS9cCvZkGIS7GcdjrIwo+0onx40FUlpHy9tP+/LQ9E7guREYKkgDmayI913G5AzHy9K3PlSUmQ82fTQS/8hWLyJgRzEZK+xfBv4QCCVEkJ9fBbix0xMMsfOzA1aeQW74nXn8KqLGKD2Qw5DZeidnk65NSTOrWIwCAzSepQcqOYBVXaqIFKaI1uVlTT8F545EhWrcA9SKvRGJW7OZVr2IU5FnLWxpSZ7TnpVsC0m170hdl2z1wbN2oCCf+0tq5y8VtOYAD8hHbmStcB/sSfZD2Z2sVofAlGlFv7wL2jyqtegTXMueivoux+GUs0b0F0j2Fh5qy/k98rJKWypKqFRIshVmVx7JAwBrXmHTazTigFfEP8saQIROhBFV8n/rLUNul/64WNsQWlJ4dimc0M5kQwpk1gPfn3JwPD4WyZJIRPOmEQ7cl+f32yqY6BkIboMbgS7MoJUipmX3FgV7DufPJWfhB5fQmUpd5Zngnh+Mwdo+DRuBy2FwBYizgiN
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(366004)(136003)(396003)(346002)(451199021)(55016003)(186003)(9686003)(316002)(86362001)(478600001)(122000001)(54906003)(110136005)(38100700002)(76116006)(71200400001)(66946007)(66556008)(66476007)(66446008)(33656002)(64756008)(7696005)(4326008)(82960400001)(6506007)(53546011)(41300700001)(26005)(52536014)(8676002)(5660300002)(8936002)(2906002)(38070700005)(7416002)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dndJVzM3anNmT1F3bVlDeEx2VTg0dms5SDAzeWsrcWdMazl6d0tpSk9XM0dR?=
- =?utf-8?B?TUFwM2h5YUhjNTBzNktrYlpudHlUVklIYnJFN2lVazlPaGVMK1FvMnpwNXpZ?=
- =?utf-8?B?cU1GNGJRVzhuMERRbXVLSUNzcU1Bem1iV0VvNFdndk5MUm4wc3pNeFdiOWtx?=
- =?utf-8?B?QlJrdTgvdVpxbzN2MnVBYmZQbTJTNVhQbU5aSXhUVU9rTkZ6dUlYczJxUmE4?=
- =?utf-8?B?WTNRNmR1anBQbjhXaHB1dmRlb3hyaUZqejJ2YmZPUjZ5WmxLNnBTNFZ1Tlhr?=
- =?utf-8?B?NU43d1lRNHgyWmZ3ZzgxRTR3cFpxK2UxbFpwRWxVMVNmWXJBZzI5dEJFOURB?=
- =?utf-8?B?OElFaGFHQWpraGVUdXk4M1NIU00rVnZBSFppVlZyclFJVG81cXY5MUpLZVZq?=
- =?utf-8?B?NUlhWUpuVkNTTkRPK0FDUG1pUlZGVmdsbjZlaUVDWC9OZGVDampkWG82bit4?=
- =?utf-8?B?a2lscGwvL0VtT1U4aE9NbjA0aW5NdzltdnZuSy92R1JBeFVYdlZ6czBzVzlB?=
- =?utf-8?B?cnRjaVY5d3dHM1MzVEs0R0V2T0JYc1lqTWJTRlZGdnExQkoyYmxCbENUSU81?=
- =?utf-8?B?Q0dsMkRFR3RZWERKRVlsSXZXSUltZ2ZKdDNyZWtJYzlYRzBPOTJvWlZqbUFR?=
- =?utf-8?B?Mlk5ci83M2NLRVBkMVpFa0tSSmdYcWhDWFJmWURRL1ZsL3VMTVVpSStXMkRC?=
- =?utf-8?B?S2s0eTZ6YjRuemEwSXdNWFhlcDVZY2ZCbGZVNzVOa1Y1VCtuV3ExTzhoK3hX?=
- =?utf-8?B?aUp0VldZRmc1dkowTklPUjJLSnJJT3V6VmRheCtyMDM1elgzOFRKbFdiYSsv?=
- =?utf-8?B?SVpVNGVzczJJZmxvU1VaNW02Y2ZzRW1XV2lGKzYvYW5ZMFZTRU9NdVdPcWtp?=
- =?utf-8?B?cHBFa0VXWWhZVm5sZWc2b012Z3lsSlNua0xORjRUZlIva0J3M2hNc1lBQ0Ra?=
- =?utf-8?B?ZDNXUWUxc0trS0hIRjR1cjZOVEdXUWFHbEtmV1BheGd3ek1vU045VVFzSllO?=
- =?utf-8?B?dzJMUXhuR3hkSmxwVkwrMWRPWGFhbXN4Mk40R3Ivem93TEJacXZyMFJjK2Ju?=
- =?utf-8?B?VkRzNVNFUE0wY3c4UDFPRzFkSEQwWHhKVStjU085bW9YeU1yemo1WCtSclps?=
- =?utf-8?B?UHk4WkQ4WUpmVHJOQ2VycCt5UXJJV2twUkYwNk9RMXd1S0ZJQWwyaXU4RXgv?=
- =?utf-8?B?QkwwT09HSEEvRnJWV2hNRGw5TFBZeWk5TXEvNG1UUGNsL1dpclpLSGJnWWpB?=
- =?utf-8?B?dERTckRMcEthNzNyeFNzQlZMSTRVdnFYUjNhMHZiU2NjeFBRY0xmd3N2NWVu?=
- =?utf-8?B?Um4xUTFBdk9XazI2V0pYWG9iR3JzUk04V1MyaTczTTFnM3h1TDN4M2c5WVVo?=
- =?utf-8?B?QTZ2NUQrdXljc2JKQU9GenRybEZBOVlGK2NxTmxwOTBrb01QaCtCMkZCZFE3?=
- =?utf-8?B?cE1hSEc2SjJidEZVSTR1d3RrWDJXT0RVOFFiZW1XRXlNeWRnanBDRjkwRlM4?=
- =?utf-8?B?NUMwZ3l4UXFXdU9XRGpkL3pWVUJ3RnMxNWRMamU4OUdpWHE0WUpyZDEzTTdP?=
- =?utf-8?B?Ny9zU0Zja3QrRHNhMzAxdCtVZG1YTTdaQk9TVTBBZ1hGd2tpV3labWd5eHBJ?=
- =?utf-8?B?RTBQUkJHbFRwZ3A0NnBtUFEwWm5mZUtndWJ4dXovektpMUpVQWNmMzF6Vk9z?=
- =?utf-8?B?NHRNTjQzdmhuK3dlQzBoT3BleHdQTkRiOFF4Y3M1N1VCYllwb2phYlJndVFT?=
- =?utf-8?B?M25HTDlwVzB6aTZ5cVFUaTNMeHZqcjFYaWlySWFMTUxmcEppcWYvbVBDN0du?=
- =?utf-8?B?K0VXdTFNRUprK29Ka3RWemRpNHMyN0grb1MyTFJxczVwbEhXMlhqREFVa1pB?=
- =?utf-8?B?ZEg2NVhUQTU3VHdhK25CbGd3a1cvM0dKK1BwUmJjMS9uYU9HN1ZQMnFKYVVH?=
- =?utf-8?B?VU5pcHFFVThVMnYwRnhCTFF4Y3V6KzJuYmY5SXdJVnRvWGhGdmEreDQrQ1RP?=
- =?utf-8?B?T3lXYittdXQ5U05mTFlnTDNuc05CcHM5RS9COEhpUW9na1ExWXowUFRHRVlZ?=
- =?utf-8?B?ZG4rMUVrcS9OT09wSzJRZ3I1cGRKUjhHbjJHUlMvWk5pK1FxTW13cEZmUDhE?=
- =?utf-8?Q?rsSU9NPEW1LQMYxUy5ev8cOf6?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S230104AbjHBBqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 1 Aug 2023 21:46:55 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA9294;
+        Tue,  1 Aug 2023 18:46:54 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b974031aeaso97925271fa.0;
+        Tue, 01 Aug 2023 18:46:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690940812; x=1691545612;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FsKmz+eFUseyOKOPFhHpD42XS/KyMD4dBoKs0nMOLag=;
+        b=qZ1PxoU6psOoiqgWciXycfTg7aRkhjzQINjFhE8vrzCJb/acfBSQyviRScHN2RW4Nd
+         yTMYCYLXT16fZmikAhihVP2s9ZtEwBX0zz5MsZTS4fNws4FoR1vOAXeJkhIH6BmCZgwx
+         UDFuKeKMMuezMHadiYghS7cF6em50lYSuq/KuUFWwx31vjk0I/IQVMhkm+yj209IYDoJ
+         uL0bIqwj5UJ/UXzLat8kXw6zton6VpByLjwtE+ej0aJ3gryxMqipzjpnyazeuMasqnLH
+         yFtjzU2UQ+ikvpI2Fz/1FYnvvQb7QOPBaowdmritXeVpFPBCLtfRhh8rKWKUb13t1lgM
+         YJyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690940812; x=1691545612;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FsKmz+eFUseyOKOPFhHpD42XS/KyMD4dBoKs0nMOLag=;
+        b=CZEdUuBdJp9TL7gvicWwhtl3OkZ7b3lvMcQqluu0B5BbfjCq0hFj9Bgk62MGTB5cTo
+         Z/viAdHqJP4a56lGajc+Fu/0sdnTZ6iwoM0D1On6wQUueDSp5+YLVWtasH6n/pbyKIJD
+         kMiypcWL7LqzKJ3FQ0qKYmF8ySKqKK+kNSDxaNfdtPtO0p+78ZHf9HaROHFurDapEazt
+         W5721ms2ZZVny89TtK0wH0nwkP1x3STkmRle9g/tI7rbxEZckZjHc4T3NGnf3Pz/hwhv
+         SXQkbjV+1tGqoc33yMU1zILPSP1fEOYmE++6a3U+RsKpcQWUulpbeJVxU8EffRjwlo2U
+         8jDw==
+X-Gm-Message-State: ABy/qLZe/WKdCllWA0g+kzjN3tqz6qErSh4znWTsZ0ks4NUbDbi5YcJJ
+        CazYSqWnUVEF1Y5S84Zivj1+rldxMrMPD9l4WBk=
+X-Google-Smtp-Source: APBJJlGpyW4icM5vduUDmRPyj4J0OKEZQ1GS7gn8mocY4HjaKL/EDbWZm1gkZYGYFt/8z3LfnCwUmTTOXg7llJFGfHk=
+X-Received: by 2002:a2e:8e92:0:b0:2b9:edcd:8770 with SMTP id
+ z18-20020a2e8e92000000b002b9edcd8770mr4011571ljk.43.1690940811662; Tue, 01
+ Aug 2023 18:46:51 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f877808-84b7-4c4b-a314-08db92f93fdf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 01:39:01.9178
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SVx11qo49sxuvNAFcEc7f3RR8t7Rx3SHxL5nnLbtksmM5AcN3vtnjdKEDwwRKf/bXjbEYcDRYlzBQx+SGaCxvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5657
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+References: <cover.1690364259.git.haibo1.xu@intel.com> <7e9d2d5518375083f10c92a3d1acd98914f69fd8.1690364259.git.haibo1.xu@intel.com>
+ <20230728-21d0e3ecb0d8916fd9d9bceb@orel>
+In-Reply-To: <20230728-21d0e3ecb0d8916fd9d9bceb@orel>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Wed, 2 Aug 2023 09:46:40 +0800
+Message-ID: <CAJve8o=jukVQ96uUKYwA=TOQyJngj9rGOZGYWo+bGWd_LOC=0g@mail.gmail.com>
+Subject: Re: [PATCH 2/4] KVM: riscv: selftests: Add exception handling support
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -171,27 +84,344 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBCYW9sdSBMdSA8YmFvbHUubHVAbGludXguaW50ZWwuY29tPg0KPiBTZW50OiBUdWVz
-ZGF5LCBBdWd1c3QgMSwgMjAyMyAzOjQ0IFBNDQo+IA0KPiBPbiAyMDIzLzgvMSAxNTowMywgVGlh
-biwgS2V2aW4gd3JvdGU6DQo+ID4+ICAgLyoqDQo+ID4+ICAgICogaW9tbXVfZGV2aWNlX3VzZV9k
-ZWZhdWx0X2RvbWFpbigpIC0gRGV2aWNlIGRyaXZlciB3YW50cyB0byBoYW5kbGUNCj4gPj4gZGV2
-aWNlDQo+ID4+ICAgICogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRE1BIHRo
-cm91Z2ggdGhlIGtlcm5lbCBETUEgQVBJLg0KPiA+PiBAQCAtMzA1MiwxNCArMzA2MywxNCBAQCBp
-bnQNCj4gaW9tbXVfZGV2aWNlX3VzZV9kZWZhdWx0X2RvbWFpbihzdHJ1Y3QNCj4gPj4gZGV2aWNl
-ICpkZXYpDQo+ID4+DQo+ID4+ICAgCW11dGV4X2xvY2soJmdyb3VwLT5tdXRleCk7DQo+ID4+ICAg
-CWlmIChncm91cC0+b3duZXJfY250KSB7DQo+ID4+IC0JCWlmIChncm91cC0+b3duZXIgfHwgIWlv
-bW11X2lzX2RlZmF1bHRfZG9tYWluKGdyb3VwKSB8fA0KPiA+PiAtCQkgICAgIXhhX2VtcHR5KCZn
-cm91cC0+cGFzaWRfYXJyYXkpKSB7DQo+ID4+ICsJCWlmIChncm91cC0+b3duZXIgfHwgIWlvbW11
-X2lzX2RlZmF1bHRfZG9tYWluKGdyb3VwKSkgew0KPiA+PiAgIAkJCXJldCA9IC1FQlVTWTsNCj4g
-Pj4gICAJCQlnb3RvIHVubG9ja19vdXQ7DQo+ID4+ICAgCQl9DQo+ID4+ICAgCX0NCj4gPj4NCj4g
-Pj4gICAJZ3JvdXAtPm93bmVyX2NudCsrOw0KPiA+PiArCWFzc2VydF9wYXNpZF9kbWFfb3duZXJz
-aGlwKGdyb3VwKTsNCj4gPiBPbGQgY29kZSByZXR1cm5zIGVycm9yIGlmIHBhc2lkX3hycmFyeSBp
-cyBub3QgZW1wdHkuDQo+ID4NCj4gPiBOZXcgY29kZSBjb250aW51ZXMgdG8gdGFrZSBvd25lcnNo
-aXAgd2l0aCBhIHdhcm5pbmcuDQo+ID4NCj4gPiB0aGlzIGlzIGEgZnVuY3Rpb25hbCBjaGFuZ2Uu
-IElzIGl0IGludGVuZGVkIG9yIG5vdD8NCj4gDQo+IElmIGlvbW11X2RldmljZV91c2VfZGVmYXVs
-dF9kb21haW4oKSBpcyBjYWxsZWQgd2l0aCBwYXNpZF9hcnJheSBub3QNCj4gZW1wdHksIHRoZXJl
-IG11c3QgYmUgYSBidWcgc29tZXdoZXJlIGluIHRoZSBkZXZpY2UgZHJpdmVyLiBXZSBzaG91bGQN
-Cj4gV0FSTiBpdCBpbnN0ZWFkIG9mIHJldHVybmluZyBhbiBlcnJvci4gUHJvYmFibHkgdGhpcyBp
-cyBhIGZ1bmN0aW9uYWwNCj4gY2hhbmdlPyBJZiBzbywgSSBjYW4gYWRkIHRoaXMgaW4gdGhlIGNv
-bW1pdCBtZXNzYWdlLg0KPiANCg0KSU1ITyB3ZSBzaG91bGQgV0FSTiAqYW5kKiByZXR1cm4gYW4g
-ZXJyb3IuDQo=
+On Fri, Jul 28, 2023 at 5:37=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Thu, Jul 27, 2023 at 03:20:06PM +0800, Haibo Xu wrote:
+> > Add the infrastructure for exception handling in riscv selftests.
+> > Currently, the guest_unexp_trap handler was used by default, which
+> > aborts the test. Customized handlers can be enabled by calling
+> > vm_install_exception_handler(vector) or vm_install_interrupt_handler().
+> >
+> > The code is inspired from that of x86/arm64.
+> >
+> > Signed-off-by: Haibo Xu <haibo1.xu@intel.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../selftests/kvm/include/riscv/processor.h   |  49 +++++++++
+> >  .../selftests/kvm/lib/riscv/handlers.S        | 101 ++++++++++++++++++
+> >  .../selftests/kvm/lib/riscv/processor.c       |  57 ++++++++++
+> >  4 files changed, 208 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/lib/riscv/handlers.S
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
+ests/kvm/Makefile
+> > index c692cc86e7da..70f3a5ba991e 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -52,6 +52,7 @@ LIBKVM_s390x +=3D lib/s390x/diag318_test_handler.c
+> >  LIBKVM_s390x +=3D lib/s390x/processor.c
+> >  LIBKVM_s390x +=3D lib/s390x/ucall.c
+> >
+> > +LIBKVM_riscv +=3D lib/riscv/handlers.S
+> >  LIBKVM_riscv +=3D lib/riscv/processor.c
+> >  LIBKVM_riscv +=3D lib/riscv/ucall.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/to=
+ols/testing/selftests/kvm/include/riscv/processor.h
+> > index d00d213c3805..9ea6e7bedc61 100644
+> > --- a/tools/testing/selftests/kvm/include/riscv/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+> > @@ -9,6 +9,7 @@
+> >
+> >  #include "kvm_util.h"
+> >  #include <linux/stringify.h>
+> > +#include <asm/csr.h>
+> >
+> >  static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t idx,
+> >                                   uint64_t  size)
+> > @@ -38,6 +39,54 @@ static inline uint64_t __kvm_reg_id(uint64_t type, u=
+int64_t idx,
+> >                                            KVM_REG_RISCV_TIMER_REG(name=
+), \
+> >                                            KVM_REG_SIZE_U64)
+> >
+> > +struct ex_regs {
+> > +     unsigned long ra;
+> > +     unsigned long sp;
+> > +     unsigned long gp;
+> > +     unsigned long tp;
+> > +     unsigned long t0;
+> > +     unsigned long t1;
+> > +     unsigned long t2;
+> > +     unsigned long s0;
+> > +     unsigned long s1;
+> > +     unsigned long a0;
+> > +     unsigned long a1;
+> > +     unsigned long a2;
+> > +     unsigned long a3;
+> > +     unsigned long a4;
+> > +     unsigned long a5;
+> > +     unsigned long a6;
+> > +     unsigned long a7;
+> > +     unsigned long s2;
+> > +     unsigned long s3;
+> > +     unsigned long s4;
+> > +     unsigned long s5;
+> > +     unsigned long s6;
+> > +     unsigned long s7;
+> > +     unsigned long s8;
+> > +     unsigned long s9;
+> > +     unsigned long s10;
+> > +     unsigned long s11;
+> > +     unsigned long t3;
+> > +     unsigned long t4;
+> > +     unsigned long t5;
+> > +     unsigned long t6;
+> > +     unsigned long epc;
+> > +     unsigned long status;
+> > +     unsigned long cause;
+> > +};
+> > +
+> > +#define VECTOR_NUM  2
+> > +#define EC_NUM  32
+> > +#define EC_MASK  (EC_NUM - 1)
+>
+> nit: My personal preference is to use something like NR_VECTORS and
+> NR_EXCEPTIONS for these, since *_NUM type names are ambiguous with
+> named indices.
+>
+> > +
+> > +void vm_init_trap_vector_tables(struct kvm_vm *vm);
+> > +void vcpu_init_trap_vector_tables(struct kvm_vcpu *vcpu);
+>
+> I think we should use a common name for these prototypes that the other
+> architectures agree to and then put them in a common header. My vote for
+> the naming is,
+>
+>   void vm_init_vector_tables(struct kvm_vm *vm);
+>   void vcpu_init_vector_tables(struct kvm_vcpu *vcpu);
+>
+> > +
+> > +typedef void(*handler_fn)(struct ex_regs *);
+> > +void vm_install_exception_handler(struct kvm_vm *vm, int ec, handler_f=
+n handler);
+>
+> I'd also put this typedef and prototype in a common header
+> (with s/ec/vector/ to what you have here)
+>
+> > +void vm_install_interrupt_handler(struct kvm_vm *vm, handler_fn handle=
+r);
+>
+> I guess this one can stay risc-v specific for now since no other arch is
+> using it.
+>
+> > +
+> >  /* L3 index Bit[47:39] */
+> >  #define PGTBL_L3_INDEX_MASK                  0x0000FF8000000000ULL
+> >  #define PGTBL_L3_INDEX_SHIFT                 39
+> > diff --git a/tools/testing/selftests/kvm/lib/riscv/handlers.S b/tools/t=
+esting/selftests/kvm/lib/riscv/handlers.S
+> > new file mode 100644
+> > index 000000000000..ce0b1d5415b9
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/riscv/handlers.S
+> > @@ -0,0 +1,101 @@
+> > +// SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * Copyright (c) 2023 Intel Corporation
+> > + */
+> > +
+> > +#include <asm/csr.h>
+>
+> General note for all the asm below, please format with the first operand
+> aligned, so
+>
+> <tab>op<tab>operand1, operand2, ...
+>
+> > +
+> > +.macro save_context
+> > +     addi sp, sp, (-8*34)
+> > +
+> > +     sd x1, 0(sp)
+> > +     sd x2, 8(sp)
+> > +     sd x3, 16(sp)
+> > +     sd x4, 24(sp)
+> > +     sd x5, 32(sp)
+> > +     sd x6, 40(sp)
+> > +     sd x7, 48(sp)
+> > +     sd x8, 56(sp)
+> > +     sd x9, 64(sp)
+> > +     sd x10, 72(sp)
+> > +     sd x11, 80(sp)
+> > +     sd x12, 88(sp)
+> > +     sd x13, 96(sp)
+> > +     sd x14, 104(sp)
+> > +     sd x15, 112(sp)
+> > +     sd x16, 120(sp)
+> > +     sd x17, 128(sp)
+> > +     sd x18, 136(sp)
+> > +     sd x19, 144(sp)
+> > +     sd x20, 152(sp)
+> > +     sd x21, 160(sp)
+> > +     sd x22, 168(sp)
+> > +     sd x23, 176(sp)
+> > +     sd x24, 184(sp)
+> > +     sd x25, 192(sp)
+> > +     sd x26, 200(sp)
+> > +     sd x27, 208(sp)
+> > +     sd x28, 216(sp)
+> > +     sd x29, 224(sp)
+> > +     sd x30, 232(sp)
+> > +     sd x31, 240(sp)
+> > +
+> > +     csrr s0, CSR_SEPC
+> > +     csrr s1, CSR_SSTATUS
+> > +     csrr s2, CSR_SCAUSE
+> > +     sd s0, 248(sp)
+> > +     sd s1, 256(sp)
+> > +     sd s2, 264(sp)
+> > +.endm
+>
+> Let's create a restore_context macro too in order to maintain balance.
+>
+> > +
+> > +.balign 4
+> > +.global exception_vectors
+> > +exception_vectors:
+> > +     save_context
+> > +     move a0, sp
+> > +     la ra, ret_from_exception
+> > +     tail route_exception
+> > +
+> > +.global ret_from_exception
+> > +ret_from_exception:
+> > +     ld s2, 264(sp)
+> > +     ld s1, 256(sp)
+> > +     ld s0, 248(sp)
+> > +     csrw CSR_SCAUSE, s2
+> > +     csrw CSR_SSTATUS, s1
+> > +     csrw CSR_SEPC, s0
+> > +
+> > +     ld x31, 240(sp)
+> > +     ld x30, 232(sp)
+> > +     ld x29, 224(sp)
+> > +     ld x28, 216(sp)
+> > +     ld x27, 208(sp)
+> > +     ld x26, 200(sp)
+> > +     ld x25, 192(sp)
+> > +     ld x24, 184(sp)
+> > +     ld x23, 176(sp)
+> > +     ld x22, 168(sp)
+> > +     ld x21, 160(sp)
+> > +     ld x20, 152(sp)
+> > +     ld x19, 144(sp)
+> > +     ld x18, 136(sp)
+> > +     ld x17, 128(sp)
+> > +     ld x16, 120(sp)
+> > +     ld x15, 112(sp)
+> > +     ld x14, 104(sp)
+> > +     ld x13, 96(sp)
+> > +     ld x12, 88(sp)
+> > +     ld x11, 80(sp)
+> > +     ld x10, 72(sp)
+> > +     ld x9, 64(sp)
+> > +     ld x8, 56(sp)
+> > +     ld x7, 48(sp)
+> > +     ld x6, 40(sp)
+> > +     ld x5, 32(sp)
+> > +     ld x4, 24(sp)
+> > +     ld x3, 16(sp)
+> > +     ld x2, 8(sp)
+> > +     ld x1, 0(sp)
+> > +
+> > +     addi sp, sp, (8*34)
+> > +     sret
+> > diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/=
+testing/selftests/kvm/lib/riscv/processor.c
+> > index d146ca71e0c0..f1b0be58a5dc 100644
+> > --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> > @@ -13,6 +13,8 @@
+> >
+> >  #define DEFAULT_RISCV_GUEST_STACK_VADDR_MIN  0xac0000
+> >
+> > +static vm_vaddr_t exception_handlers;
+> > +
+> >  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+> >  {
+> >       return (v + vm->page_size) & ~(vm->page_size - 1);
+> > @@ -367,3 +369,58 @@ void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned=
+ int num, ...)
+> >  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+> >  {
+> >  }
+> > +
+> > +struct handlers {
+> > +     handler_fn exception_handlers[VECTOR_NUM][EC_NUM];
+> > +};
+> > +
+> > +void route_exception(struct ex_regs *regs)
+> > +{
+> > +     struct handlers *handlers =3D (struct handlers *)exception_handle=
+rs;
+> > +     int vector =3D 0, ec;
+> > +
+> > +     ec =3D regs->cause & ~CAUSE_IRQ_FLAG;
+> > +     if (ec >=3D EC_NUM)
+> > +             goto guest_unexpected_trap;
+> > +
+> > +     /* Use the same handler for all the interrupts */
+> > +     if (regs->cause & CAUSE_IRQ_FLAG) {
+> > +             vector =3D 1;
+> > +             ec =3D 0;
+> > +     }
+> > +
+> > +     if (handlers && handlers->exception_handlers[vector][ec])
+> > +             return handlers->exception_handlers[vector][ec](regs);
+> > +
+> > +guest_unexpected_trap:
+> > +     return guest_unexp_trap();
+>
+> I think we want this to have consistent behavior with the other
+> architectures, so we should be issuing a UCALL_UNHANDLED.
+>
+> > +}
+> > +
+> > +void vcpu_init_trap_vector_tables(struct kvm_vcpu *vcpu)
+> > +{
+> > +     extern char exception_vectors;
+> > +
+> > +     vcpu_set_reg(vcpu, RISCV_CSR_REG(stvec), (unsigned long)&exceptio=
+n_vectors);
+> > +}
+> > +
+> > +void vm_init_trap_vector_tables(struct kvm_vm *vm)
+> > +{
+> > +     vm->handlers =3D __vm_vaddr_alloc(vm, sizeof(struct handlers),
+> > +                                vm->page_size, MEM_REGION_DATA);
+> > +
+> > +     *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)=
+) =3D vm->handlers;
+> > +}
+> > +
+> > +void vm_install_exception_handler(struct kvm_vm *vm, int ec, void (*ha=
+ndler)(struct ex_regs *))
+> > +{
+> > +     struct handlers *handlers =3D addr_gva2hva(vm, vm->handlers);
+> > +
+>
+> Add assert here that ec is valid.
+>
+> > +     handlers->exception_handlers[0][ec] =3D handler;
+> > +}
+> > +
+> > +void vm_install_interrupt_handler(struct kvm_vm *vm, void (*handler)(s=
+truct ex_regs *))
+> > +{
+> > +     struct handlers *handlers =3D addr_gva2hva(vm, vm->handlers);
+> > +
+> > +     handlers->exception_handlers[1][0] =3D handler;
+> > +}
+> > --
+> > 2.34.1
+> >
+>
+> Besides some nits and wanting to get more consistency with the other
+> architectures, this looks good to me.
+>
+
+Thanks for the review! Will fix them in v2.
+
+> Thanks,
+> drew
