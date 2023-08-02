@@ -2,101 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F15BA76DA7A
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3D5276DACB
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 00:26:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233768AbjHBWQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 18:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59116 "EHLO
+        id S233971AbjHBW0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 18:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231651AbjHBWQq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 18:16:46 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9972B26BD
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:16:45 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so253710276.2
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:16:45 -0700 (PDT)
+        with ESMTP id S233982AbjHBWZw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 18:25:52 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DEFB468D
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 15:24:35 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bba9a0da10so2831585ad.2
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 15:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691014605; x=1691619405;
+        d=google.com; s=20221208; t=1691015074; x=1691619874;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RUKe0tndPE8THtppbQ2T+ebrmbNyYQbFqdjBVqfHPSc=;
-        b=38kWKGnIr9nG7NEImMKN/kYSbzmt49a74eU6F0kFCbveiePdOPvNcSEILmD2Jrj89V
-         5s3HlMArUkW/HBVjC+BKGdl78VEbeZGDRzpzebvzFmuEnfdGuYFrCh3LXUe2ON7XsDcJ
-         XDSLeSHsdI1bdoXHmvcO1jlgRNqVX9i7F64mW3dIaLVO9uUlcnnTV8K4Ciie8zUrBEma
-         T3UfOaEFJQ/Gp4fnvYg3Li6J3QtmUyuB1OzkNZ28bLiFkz/bN6RFDN4Eyei9qrn/QWZT
-         hpTPIOVK7oPnJ3vimIJk7oKHDviRjKFyB8E7Hn/7QR0uMlBKyc9mGCI06sxNJxlvAPN5
-         ZCXQ==
+        bh=F9yIn4dK3mSmUtcCp8LFFT4F/LQPHHPvz5xo49Hmxkk=;
+        b=H+aTSYmBYRO7DEl0/Htl+Y5MU3zO0wo2l+1FTpMwOYDrAjZnYx7ET8cvGNBa+VhiQo
+         VNh5q/Dn9hvp4uKDjTfLgLfw15kkhnDEnfRhiU9yFwZZHyeTWZpXkJqPylFoHBgQAyaf
+         aBTifmJXqJLmP5lVQAoPZsli5/e5GDX78w5BAZjdL1vToFkiklboUC2FYPw4yrY5o7zi
+         FKfloQC0qrIZC8aaCFXsGriAuqPWzKBenKQfVkqPaUsunkHJ9IDkCXMZqn79LQm2+khs
+         y6UAtFp77IpR1eHxik0mHjgsYCbadkRl1CkaPHJo8SdYL1zsjEcOXb/edT5pHOCJNcVZ
+         haXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691014605; x=1691619405;
+        d=1e100.net; s=20221208; t=1691015074; x=1691619874;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RUKe0tndPE8THtppbQ2T+ebrmbNyYQbFqdjBVqfHPSc=;
-        b=Cj1jJ5F3pOyi+mnVbAQhta7TbE1wozoFBWMBaXmH/LwXe6R5bO6CuXR05R7VSpO1nh
-         dh34JoHPqB3vaOOfhoqO0Ij6yPAyQR6E2DRGYrMaOXcRybuZb0B0cqbyKIaS0SeHxlWp
-         psD5d+F5mryKzU5qkn28RN/yuKxPnB3TvMSZVVcgz9CTpREIhTbJ/0uCe9Rx8rmwTtUv
-         0XWYQVhwEYcStlizvqRYuGu0rhy9bQiZY+dvjAN04LGUBmAyygCNTgVdp3pqX3S/Maz5
-         m83hsjPR1lXm6EIIVx1sJ5YK3ws7zfq44SrONmoervuTQF3G+oTZoTPAZk953+96KT3R
-         6f4Q==
-X-Gm-Message-State: ABy/qLZRU1MyXDGxm9tfiQsukC4OfG6GSm43ePiJmJMNxnZK4f1i4z1A
-        lBuFeZDjorayZnEzqgngiy7e/kcNG30=
-X-Google-Smtp-Source: APBJJlHy/PqtmZyQAWZYe0P365x5lyVjJbw50xRf2ugSL9QxHVv9uASQitOtxhGFeAyfSZaX2h+IOYFbSyM=
+        bh=F9yIn4dK3mSmUtcCp8LFFT4F/LQPHHPvz5xo49Hmxkk=;
+        b=JIfrVu+9LfV7t/+MdKX2+FdC+6IKphhEEWrV2RtPBWofqNlUokJUmOT07JgjhDh0a3
+         43LoADREzzbBbL9LR0kUNiqErCKcaaJMHxWQ26tTGBF0E3+RLtGKZCvEZ+8qUtDsUTWt
+         mMMHVZAsYX/OepFCeCKfmdfwBzF839w3HxWhw1HmYpuj0Mb0cDAtFJG6cSt0Bh7OPsuE
+         hTYyt4vbPeLASJOupxC/XEUEYxQIEZg9gtW4SwNFqZ5+hZH2PJH0ZRwBz9okTraUT21V
+         A2L7xd4qM582tWEwMAO38qbUWuGe7wrK/TM+93F7UxTSSwW2WPXhasLHjWVPUjcCqRbp
+         XBLg==
+X-Gm-Message-State: ABy/qLb30Q9eeVsF+qKA/lS8PTIplE1Unkiwwy33Tij7Ly5hC377mrZh
+        /q+0qZXvP8Ut175VgtbgJqEuTglyNFs=
+X-Google-Smtp-Source: APBJJlEIByBfYoY/KC32/g8HzkxLqseO0XeVYpg+NMSyLBH6gtwD9otmWgLk0cSs3kJzChFA66PNbRObft0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:aaae:0:b0:d04:d397:352d with SMTP id
- t43-20020a25aaae000000b00d04d397352dmr130484ybi.4.1691014604767; Wed, 02 Aug
- 2023 15:16:44 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 15:16:43 -0700
-In-Reply-To: <cover.1690364259.git.haibo1.xu@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:2291:b0:1b5:2b14:5f2c with SMTP id
+ b17-20020a170903229100b001b52b145f2cmr105841plh.4.1691015074397; Wed, 02 Aug
+ 2023 15:24:34 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 15:24:33 -0700
+In-Reply-To: <20230725143857.228626-1-iii@linux.ibm.com>
 Mime-Version: 1.0
-References: <cover.1690364259.git.haibo1.xu@intel.com>
-Message-ID: <ZMrVrXlvu/FJEayx@google.com>
-Subject: Re: [PATCH 0/4] RISCV: Add kvm Sstc timer selftest
+References: <20230725143857.228626-1-iii@linux.ibm.com>
+Message-ID: <ZMrXoQ0wN5ZyCf6Q@google.com>
+Subject: Re: [PATCH v4 0/6] KVM: s390: interrupt: Fix stepping into interrupt handlers
 From:   Sean Christopherson <seanjc@google.com>
-To:     Haibo Xu <haibo1.xu@intel.com>
-Cc:     xiaobo55x@gmail.com, ajones@ventanamicro.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Vishal Annapurve <vannapurve@google.com>,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
+To:     Ilya Leoshkevich <iii@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Freimann <jfreimann@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023, Haibo Xu wrote:
-> The sstc_timer selftest is used to validate Sstc timer functionality
-> in a guest, which sets up periodic timer interrupts and check the
-> basic interrupt status upon its receipt.
-> 
-> This KVM selftest was ported from aarch64 arch_timer and tested
-> with Linux v6.5-rc3 on a Qemu riscv64 virt machine.
-> 
-> Haibo Xu (4):
->   tools: riscv: Add header file csr.h
->   KVM: riscv: selftests: Add exception handling support
->   KVM: riscv: selftests: Add guest helper to get vcpu id
->   KVM: riscv: selftests: Add sstc_timer test
+On Tue, Jul 25, 2023, Ilya Leoshkevich wrote:
+> Ilya Leoshkevich (6):
+>   KVM: s390: interrupt: Fix single-stepping into interrupt handlers
+>   KVM: s390: interrupt: Fix single-stepping into program interrupt
+>     handlers
+>   KVM: s390: interrupt: Fix single-stepping kernel-emulated instructions
+>   KVM: s390: interrupt: Fix single-stepping userspace-emulated
+>     instructions
+>   KVM: s390: interrupt: Fix single-stepping keyless mode exits
+>   KVM: s390: selftests: Add selftest for single-stepping
 
-FYI, patch 4 will conflict with the in-flight guest printf changes[*], as will
-reworking the existing arch_timer test.  My plan is to create an immutable tag
-later this week (waiting to make sure nothing explodes).  I highly recommend basing
-v2 on top of that.
+FYI, the selftests change silently conflicts with a global s/ASSERT_EQ/TEST_ASSERT_EQ
+rename[1], but the conflicts are very straightforward to resolve (just prepend TEST_).
+If we want to proactively avoid mild pain in linux-next, one option would be to merge
+the full kvm-x86/selftests branch/tag once I've made that immutable[2] (will be done
+Friday if there are no fireworks).  Though we can probably just get away with doing
+nothing other than letting Paolo know there's a silent conflict.
 
-[*] https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.com
+[1] https://lore.kernel.org/all/169101245511.1754469.7852701829984104093.b4-ty@google.com
+[2] https://lore.kernel.org/all/169101267140.1755771.17089576255751273053.b4-ty@google.com
+
