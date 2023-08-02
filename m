@@ -2,548 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D8C476D8B5
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 22:31:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 320F176D92E
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 23:07:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbjHBUb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 16:31:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37136 "EHLO
+        id S231452AbjHBVHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 17:07:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbjHBUbY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 16:31:24 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68B526BB;
-        Wed,  2 Aug 2023 13:31:22 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bbdc05a93bso2300605ad.0;
-        Wed, 02 Aug 2023 13:31:22 -0700 (PDT)
+        with ESMTP id S229528AbjHBVHj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 17:07:39 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A7C26B6
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 14:07:38 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bba5626342so2577445ad.2
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 14:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691008282; x=1691613082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cVig7nVxAJnz5d000l87J4rtopwFhxXB+8Ok4r23Ka4=;
-        b=s0Oex2eG7H06LbU+BJqKNRoDqdq6SwVlGg4mAPjExi760G3nVDGKHuQFwhOJMnirV1
-         OKLik+MpcS8+IwYl3s3OejRgjqA6HtoV3QPNm1DEUoL3SzgMjQ00TPFsndCxIr3QW0RC
-         WMDpGULuovGmqc69bhPGdXoIqbkhph2K3YUyE2dv1mhYnFSkQTtUqrpUma604U38aYr8
-         9D7AXW+fVMz7xVm7jYpK10dbpi3cq8a3mFqPaCSb6NPtySxN/EUHo7wfBVJFWm+nWHlq
-         kM91bY5x3tn/x/mUvpEp/WaK2AzxKcjD7XsK+rbwt0j14lHtrq8Pfrb4rvf3q+69F+Ed
-         fwOw==
+        d=google.com; s=20221208; t=1691010458; x=1691615258;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rpEdXC5TOUTdj2CmYdlHtLcpKwS3TikTG092WQYJPfo=;
+        b=wQxvCqlq5qq1C/WnDnCtU/Ka49WOCncwgxjNbzc5Mj5DIqQcEXPOrmzXIFGhayWslq
+         DFdKb5Arm4B7qat6+I1Z5d/ZA5shgaDbBHo1tzLuVEKwJWUlFsU6YwkxHxAlCJGOmCBi
+         36sN3ZeAr926MNng32r539FQCrvOmdKjUs6cVx4j8+48hrnk0XG4At1HeRKOLA3QNuU6
+         L9yzlJKscg65fbpzy8vLJ8dLa73+xIyZya3t/FLb4P5cboPHRO1pNviUa2GLXRpCGzYE
+         b1+e6sTAgJASd23xuLO8dGbHvV5g89gd7yticybNJvh3GxELV5a2kxKs25nRX7lTtAYO
+         DsMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691008282; x=1691613082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cVig7nVxAJnz5d000l87J4rtopwFhxXB+8Ok4r23Ka4=;
-        b=FLvmqhaPl6UVJI59WdwvkKtgYIdj/2p4M0okgyztZeV4THHFuLX32nuLVR0pux/3hB
-         IsgKudrNzD25HhHnXUNCzfxxLrcM4mpXIvQPQlM4AxYDy9Ln1Hv4c2YhHVaOCQCwb0M6
-         ILJYE6dAI8+idI2TH08M5kOYDdgxf4y8hbpcsl/s16+zsWwbflK3wrgvuiG1S/yI90wu
-         4L8lMAv8BS1+aU5P536qw/n2eO2RzIC38deAbvG5/9/gaQ4iYdI87cknXiefXBAZOtqZ
-         JSKzMIBVdivB80OwpqFkR4vDgUoHeP9E3g6I41t+170Ic+gLNXSUo1xge0YueUnEm8Y9
-         8Brg==
-X-Gm-Message-State: ABy/qLbkFHUP8PqpHmcEvi2VUxf77eRFyZLK7rAws1CHQP7WvVmefwtn
-        /Heideq69zKQEue8d8m4pwE=
-X-Google-Smtp-Source: APBJJlH5VQArJpLE0EyDQ3184KjZD6X3n94sC4DtbCtW1G2/IJAuWETgKgCABnbhQeEGgLwzvu5Ecw==
-X-Received: by 2002:a17:903:485:b0:1b6:649b:92cc with SMTP id jj5-20020a170903048500b001b6649b92ccmr12847995plb.69.1691008281960;
-        Wed, 02 Aug 2023 13:31:21 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id iy7-20020a170903130700b001b898595be7sm12815534plb.291.2023.08.02.13.31.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 13:31:21 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 13:31:19 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH v11 08/29] KVM: Introduce per-page memory attributes
-Message-ID: <20230802203119.GB2021422@ls.amr.corp.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <20230718234512.1690985-9-seanjc@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230718234512.1690985-9-seanjc@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691010458; x=1691615258;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rpEdXC5TOUTdj2CmYdlHtLcpKwS3TikTG092WQYJPfo=;
+        b=R+44jLPn9HUINmcHPc/WfIx7283UpGw+I+IJo85KTpYy3DnmB9ZFekYC0povuVHBmf
+         0kWuH5nw/NfX4S2V5QmYM2MVaetSr/AyZKTUw9iKt/59daTMyCpDtaO5nEb28hpMXGZn
+         /INNiBdO9SKEUlBKet254RXkQl+kfxNCVWrE1Z9/sJSl5sWGHYRm5rrsbjm5seA4kRk3
+         zLL7iv2xoOmqdfT0acuSlAFR0bJCeSB60VmEU04gXT2q+byXuUvED0G4e0iJrwzEGK0R
+         culOJPa4eOvTHEdCZlFFtS+bNQNAR219XejcK7NmA4RMhviKh2j6N4ZDuPDnR/DoprXD
+         e2DA==
+X-Gm-Message-State: ABy/qLYdozjSBnKfvM1u/FFCaC/gd69Z8BRPofUO1uoXB9O797XnqWNM
+        ncwxfF668916zWx89LSBZPK4Sc1QlXg=
+X-Google-Smtp-Source: APBJJlEa0LOcxSK0tv9tJImx2SQW3MxfL8fxwSoFnphEcyBWFcGY0zIdIPOjtXAsAFg9fCy28PPmDqCFj0Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:244c:b0:1bb:2081:7aa2 with SMTP id
+ l12-20020a170903244c00b001bb20817aa2mr93411pls.9.1691010458021; Wed, 02 Aug
+ 2023 14:07:38 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 14:07:36 -0700
+In-Reply-To: <20230728001606.2275586-3-mhal@rbox.co>
+Mime-Version: 1.0
+References: <20230728001606.2275586-1-mhal@rbox.co> <20230728001606.2275586-3-mhal@rbox.co>
+Message-ID: <ZMrFmKRcsb84DaTY@google.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Extend x86's sync_regs_test to check
+ for races
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 04:44:51PM -0700,
-Sean Christopherson <seanjc@google.com> wrote:
-
-> From: Chao Peng <chao.p.peng@linux.intel.com>
+On Fri, Jul 28, 2023, Michal Luczaj wrote:
+> Attempt to modify vcpu->run->s.regs _after_ the sanity checks performed by
+> KVM_CAP_SYNC_REGS's arch/x86/kvm/x86.c:sync_regs(). This could lead to some
+> nonsensical vCPU states accompanied by kernel splats.
 > 
-> In confidential computing usages, whether a page is private or shared is
-> necessary information for KVM to perform operations like page fault
-> handling, page zapping etc. There are other potential use cases for
-> per-page memory attributes, e.g. to make memory read-only (or no-exec,
-> or exec-only, etc.) without having to modify memslots.
-> 
-> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
-> userspace to operate on the per-page memory attributes.
->   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
->     a guest memory range.
->   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
->     memory attributes.
-> 
-> Use an xarray to store the per-page attributes internally, with a naive,
-> not fully optimized implementation, i.e. prioritize correctness over
-> performance for the initial implementation.
-> 
-> Because setting memory attributes is roughly analogous to mprotect() on
-> memory that is mapped into the guest, zap existing mappings prior to
-> updating the memory attributes.  Opportunistically provide an arch hook
-> for the post-set path (needed to complete invalidation anyways) in
-> anticipation of x86 needing the hook to update metadata related to
-> determining whether or not a given gfn can be backed with various sizes
-> of hugepages.
-> 
-> It's possible that future usages may not require an invalidation, e.g.
-> if KVM ends up supporting RWX protections and userspace grants _more_
-> protections, but again opt for simplicity and punt optimizations to
-> if/when they are needed.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com
-> Cc: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 > ---
->  Documentation/virt/kvm/api.rst |  60 ++++++++++++
->  include/linux/kvm_host.h       |  14 +++
->  include/uapi/linux/kvm.h       |  14 +++
->  virt/kvm/Kconfig               |   4 +
->  virt/kvm/kvm_main.c            | 170 +++++++++++++++++++++++++++++++++
->  5 files changed, 262 insertions(+)
+>  .../selftests/kvm/x86_64/sync_regs_test.c     | 124 ++++++++++++++++++
+>  1 file changed, 124 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 34d4ce66e0c8..0ca8561775ac 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6068,6 +6068,56 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
->  interface. No error will be returned, but the resulting offset will not be
->  applied.
+> diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+> index 2da89fdc2471..feebc7d44c17 100644
+> --- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+> @@ -15,12 +15,14 @@
+>  #include <stdlib.h>
+>  #include <string.h>
+>  #include <sys/ioctl.h>
+> +#include <pthread.h>
 >  
-> +4.139 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: u64 memory attributes bitmask(out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Returns supported memory attributes bitmask. Supported memory attributes will
-> +have the corresponding bits set in u64 memory attributes bitmask.
-> +
-> +The following memory attributes are defined::
-> +
-> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
-> +
-> +4.140 KVM_SET_MEMORY_ATTRIBUTES
-> +-----------------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm ioctl
-> +:Parameters: struct kvm_memory_attributes(in/out)
-> +:Returns: 0 on success, <0 on error
-> +
-> +Sets memory attributes for pages in a guest memory range. Parameters are
-> +specified via the following structure::
-> +
-> +  struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +  };
-> +
-> +The user sets the per-page memory attributes to a guest memory range indicated
-> +by address/size, and in return KVM adjusts address and size to reflect the
-> +actual pages of the memory range have been successfully set to the attributes.
-> +If the call returns 0, "address" is updated to the last successful address + 1
-> +and "size" is updated to the remaining address size that has not been set
-> +successfully. The user should check the return value as well as the size to
-> +decide if the operation succeeded for the whole range or not. The user may want
-> +to retry the operation with the returned address/size if the previous range was
-> +partially successful.
-> +
-> +Both address and size should be page aligned and the supported attributes can be
-> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
-> +
-> +The "flags" field may be used for future extensions and should be set to 0s.
-> +
->  5. The kvm_run structure
->  ========================
+>  #include "test_util.h"
+>  #include "kvm_util.h"
+>  #include "processor.h"
 >  
-> @@ -8494,6 +8544,16 @@ block sizes is exposed in KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES as a
->  64-bit bitmap (each bit describing a block size). The default value is
->  0, to disable the eager page splitting.
+>  #define UCALL_PIO_PORT ((uint16_t)0x1000)
+> +#define TIMEOUT	2	/* seconds, roughly */
+
+I think it makes sense to make this a const in race_sync_regs(), that way its
+usage is a bit more obvious.
+
+>  struct ucall uc_none = {
+>  	.cmd = UCALL_NONE,
+> @@ -80,6 +82,124 @@ static void compare_vcpu_events(struct kvm_vcpu_events *left,
+>  #define TEST_SYNC_FIELDS   (KVM_SYNC_X86_REGS|KVM_SYNC_X86_SREGS|KVM_SYNC_X86_EVENTS)
+>  #define INVALID_SYNC_FIELD 0x80000000
 >  
-> +8.41 KVM_CAP_MEMORY_ATTRIBUTES
-> +------------------------------
-> +
-> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
-> +:Architectures: x86
-> +:Type: vm
-> +
-> +This capability indicates KVM supports per-page memory attributes and ioctls
-> +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
-> +
->  9. Known KVM API problems
->  =========================
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e9ca49d451f3..97db63da6227 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -264,6 +264,7 @@ struct kvm_gfn_range {
->  	gfn_t end;
->  	union {
->  		pte_t pte;
-> +		unsigned long attributes;
->  		u64 raw;
->  	} arg;
->  	bool may_block;
-> @@ -809,6 +810,9 @@ struct kvm {
->  
->  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
->  	struct notifier_block pm_notifier;
-> +#endif
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	struct xarray mem_attr_array;
->  #endif
->  	char stats_id[KVM_STATS_NAME_SIZE];
->  };
-> @@ -2301,4 +2305,14 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
->  /* Max number of entries allowed for each kvm dirty ring */
->  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
->  
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
+> +/*
+> + * WARNING: CPU: 0 PID: 1115 at arch/x86/kvm/x86.c:10095 kvm_check_and_inject_events+0x220/0x500 [kvm]
+> + *
+> + * arch/x86/kvm/x86.c:kvm_check_and_inject_events():
+> + * WARN_ON_ONCE(vcpu->arch.exception.injected &&
+> + *		vcpu->arch.exception.pending);
+> + */
+
+For comments in selftests, describe what's happening without referencing KVM code,
+things like this in particular will become stale sooner than later.  It's a-ok
+(and encouraged) to put the WARNs and function references in changelogs though,
+as those are explicitly tied to a specific time in history.
+
+> +static void race_sync_regs(void *racer, bool poke_mmu)
 > +{
-> +	return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
-> +}
+> +	struct kvm_translation tr;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_run *run;
+> +	struct kvm_vm *vm;
+> +	pthread_t thread;
+> +	time_t t;
 > +
-> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> +					 struct kvm_gfn_range *range);
-> +#endif /* CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES */
+> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> +	run = vcpu->run;
 > +
->  #endif
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6c6ed214b6ac..f065c57db327 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1211,6 +1211,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
->  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
->  #define KVM_CAP_USER_MEMORY2 230
-> +#define KVM_CAP_MEMORY_ATTRIBUTES 231
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> @@ -2270,4 +2271,17 @@ struct kvm_s390_zpci_op {
->  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
->  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
->  
-> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
-> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
-> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOW(KVMIO,  0xd3, struct kvm_memory_attributes)
+> +	run->kvm_valid_regs = KVM_SYNC_X86_SREGS;
+> +	vcpu_run(vcpu);
+> +	TEST_REQUIRE(run->s.regs.sregs.cr4 & X86_CR4_PAE);
+
+This can be an assert, and should also check EFER.LME.  Jump-starting in long mode
+is a property of selftests, i.e. not something that should ever randomly "fail".
+
+> +	run->kvm_valid_regs = 0;
 > +
-> +struct kvm_memory_attributes {
-> +	__u64 address;
-> +	__u64 size;
-> +	__u64 attributes;
-> +	__u64 flags;
-> +};
+> +	ASSERT_EQ(pthread_create(&thread, NULL, racer, (void *)run), 0);
 > +
-> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +	for (t = time(NULL) + TIMEOUT; time(NULL) < t;) {
+> +		__vcpu_run(vcpu);
 > +
->  #endif /* __LINUX_KVM_H */
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 2fa11bd26cfc..8375bc49f97d 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -99,3 +99,7 @@ config KVM_GENERIC_HARDWARE_ENABLING
->  config KVM_GENERIC_MMU_NOTIFIER
->         select MMU_NOTIFIER
->         bool
-> +
-> +config KVM_GENERIC_MEMORY_ATTRIBUTES
-> +       select KVM_GENERIC_MMU_NOTIFIER
-> +       bool
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index c14adf93daec..1a31bfa025b0 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -530,6 +530,7 @@ struct kvm_mmu_notifier_range {
->  	u64 end;
->  	union {
->  		pte_t pte;
-> +		unsigned long attributes;
->  		u64 raw;
->  	} arg;
->  	gfn_handler_t handler;
-> @@ -1175,6 +1176,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->  	spin_lock_init(&kvm->mn_invalidate_lock);
->  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
->  	xa_init(&kvm->vcpu_array);
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	xa_init(&kvm->mem_attr_array);
-> +#endif
->  
->  	INIT_LIST_HEAD(&kvm->gpc_list);
->  	spin_lock_init(&kvm->gpc_lock);
-> @@ -1346,6 +1350,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
->  		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
->  		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
->  	}
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	xa_destroy(&kvm->mem_attr_array);
-> +#endif
->  	cleanup_srcu_struct(&kvm->irq_srcu);
->  	cleanup_srcu_struct(&kvm->srcu);
->  	kvm_arch_free_vm(kvm);
-> @@ -2346,6 +2353,145 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
->  }
->  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
->  
-> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-> +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
-> +{
-> +	return 0;
-> +}
-> +
-> +static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
-> +						 struct kvm_mmu_notifier_range *range)
-> +{
-> +	struct kvm_gfn_range gfn_range;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	struct kvm_memslot_iter iter;
-> +	bool locked = false;
-> +	bool ret = false;
-> +	int i;
-> +
-> +	gfn_range.arg.raw = range->arg.raw;
-> +	gfn_range.may_block = range->may_block;
-> +
-> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +		slots = __kvm_memslots(kvm, i);
-> +
-> +		kvm_for_each_memslot_in_gfn_range(&iter, slots, range->start, range->end) {
-> +			slot = iter.slot;
-> +			gfn_range.slot = slot;
-> +
-> +			gfn_range.start = max(range->start, slot->base_gfn);
-> +			gfn_range.end = min(range->end, slot->base_gfn + slot->npages);
-> +			if (gfn_range.start >= gfn_range.end)
-> +				continue;
-> +
-> +			if (!locked) {
-> +				locked = true;
-> +				KVM_MMU_LOCK(kvm);
-> +				if (!IS_KVM_NULL_FN(range->on_lock))
-> +					range->on_lock(kvm);
-> +			}
-> +
-> +			ret |= range->handler(kvm, &gfn_range);
+> +		if (poke_mmu) {
+
+Rather than pass a boolean, I think it makes sense to do
+
+		if (racer == race_sregs_cr4)
+
+It's arguably just trading ugliness for subtlety, but IMO it's worth avoiding
+the boolean.
+
+> +			tr = (struct kvm_translation) { .linear_address = 0 };
+> +			__vcpu_ioctl(vcpu, KVM_TRANSLATE, &tr);
 > +		}
 > +	}
 > +
-> +	if (range->flush_on_ret && ret)
-> +		kvm_flush_remote_tlbs(kvm);
+> +	ASSERT_EQ(pthread_cancel(thread), 0);
+> +	ASSERT_EQ(pthread_join(thread, NULL), 0);
 > +
-> +	if (locked) {
-> +		KVM_MMU_UNLOCK(kvm);
-> +		if (!IS_KVM_NULL_FN(range->on_unlock))
-> +			range->on_unlock(kvm);
-> +	}
+> +	/*
+> +	 * If kvm->bugged then we won't survive TEST_ASSERT(). Leak.
+> +	 *
+> +	 * kvm_vm_free()
+> +	 *   __vm_mem_region_delete()
+> +	 *     vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->region)
+> +	 *       _vm_ioctl(vm, cmd, #cmd, arg)
+> +	 *         TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret))
+> +	 */
+
+We want the assert, it makes failures explicit.  The signature is a bit unfortunate,
+but the WARN in the kernel log should provide a big clue.
+
+> +	if (!poke_mmu)
+> +		kvm_vm_free(vm);
 > +}
 > +
-> +static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
-> +				     gfn_t start, gfn_t end)
-> +{
-> +	struct kvm_mmu_notifier_range unmap_range = {
-> +		.start = start,
-> +		.end = end,
-> +		.handler = kvm_mmu_unmap_gfn_range,
-> +		.on_lock = kvm_mmu_invalidate_begin,
-> +		.on_unlock = (void *)kvm_null_fn,
-> +		.flush_on_ret = true,
-> +		.may_block = true,
-> +	};
-> +	struct kvm_mmu_notifier_range post_set_range = {
-> +		.start = start,
-> +		.end = end,
-> +		.arg.attributes = attributes,
-> +		.handler = kvm_arch_post_set_memory_attributes,
-> +		.on_lock = (void *)kvm_null_fn,
-> +		.on_unlock = kvm_mmu_invalidate_end,
+>  int main(int argc, char *argv[])
+>  {
+>  	struct kvm_vcpu *vcpu;
+> @@ -218,5 +338,9 @@ int main(int argc, char *argv[])
+>  
+>  	kvm_vm_free(vm);
+>  
+> +	race_sync_regs(race_sregs_cr4, true);
+> +	race_sync_regs(race_events_exc, false);
+> +	race_sync_regs(race_events_inj_pen, false);
 
-
-on_unlock is called after unlocking mmu_lock. So kvm::mmu_invalidate_in_progress
-is touched out side of it.  Here is a quick fix.
-
- WARNING: CPU: 108 PID: 62218 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:757 kvm_mmu_unmap_gfn_range+0x32/0x70 [kvm]
-  ...
- RIP: 0010:kvm_mmu_unmap_gfn_range+0x32/0x70 [kvm]
-  ...
- Call Trace:
-  <TASK>
-  kvm_gmem_invalidate_begin+0xd0/0x130 [kvm]
-  kvm_gmem_fallocate+0x134/0x290 [kvm]
-  vfs_fallocate+0x151/0x380
-  __x64_sys_fallocate+0x3c/0x70
-  do_syscall_64+0x40/0x90
-  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-
-From c06084048271278d3508f534479b356f49f619ce Mon Sep 17 00:00:00 2001
-Message-Id: <c06084048271278d3508f534479b356f49f619ce.1690873712.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Mon, 31 Jul 2023 22:58:15 -0700
-Subject: [PATCH] KVM: guest_memfd(): protect kvm_mmu_invalidate_end()
-
-kvm_mmu_invalidate_end() updates struct kvm::mmu_invalidate_in_progress
-and it's protected by kvm::mmu_lock.  call kvm_mmu_invalidate_end() before
-unlocking it. Not after the unlock.
-
-Fixes: edd048ffeaf6 ("KVM: Introduce per-page memory attributes")
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/kvm_main.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9b4759b6dd87..6947f776851b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -548,6 +548,7 @@ struct kvm_mmu_notifier_range {
- 	} arg;
- 	gfn_handler_t handler;
- 	on_lock_fn_t on_lock;
-+	on_unlock_fn_t before_unlock;
- 	on_unlock_fn_t on_unlock;
- 	bool flush_on_ret;
- 	bool may_block;
-@@ -644,6 +645,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 		kvm_flush_remote_tlbs(kvm);
- 
- 	if (locked) {
-+		if (!IS_KVM_NULL_FN(range->before_unlock))
-+			range->before_unlock(kvm);
- 		KVM_MMU_UNLOCK(kvm);
- 		if (!IS_KVM_NULL_FN(range->on_unlock))
- 			range->on_unlock(kvm);
-@@ -668,6 +671,7 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 		.arg.pte	= pte,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= true,
- 		.may_block	= false,
-@@ -687,6 +691,7 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
- 		.end		= end,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= false,
- 		.may_block	= false,
-@@ -791,6 +796,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 		.end		= range->end,
- 		.handler	= kvm_mmu_unmap_gfn_range,
- 		.on_lock	= kvm_mmu_invalidate_begin,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= kvm_arch_guest_memory_reclaimed,
- 		.flush_on_ret	= true,
- 		.may_block	= mmu_notifier_range_blockable(range),
-@@ -830,6 +836,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 
- void kvm_mmu_invalidate_end(struct kvm *kvm)
- {
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
- 	/*
- 	 * This sequence increase will notify the kvm page fault that
- 	 * the page that is going to be mapped in the spte could have
-@@ -861,6 +869,7 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
- 		.end		= range->end,
- 		.handler	= (void *)kvm_null_fn,
- 		.on_lock	= kvm_mmu_invalidate_end,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock	= (void *)kvm_null_fn,
- 		.flush_on_ret	= false,
- 		.may_block	= mmu_notifier_range_blockable(range),
-@@ -2466,6 +2475,8 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
- 		kvm_flush_remote_tlbs(kvm);
- 
- 	if (locked) {
-+		if (!IS_KVM_NULL_FN(range->before_unlock))
-+			range->before_unlock(kvm);
- 		KVM_MMU_UNLOCK(kvm);
- 		if (!IS_KVM_NULL_FN(range->on_unlock))
- 			range->on_unlock(kvm);
-@@ -2480,6 +2491,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
- 		.end = end,
- 		.handler = kvm_mmu_unmap_gfn_range,
- 		.on_lock = kvm_mmu_invalidate_begin,
-+		.before_unlock	= (void *)kvm_null_fn,
- 		.on_unlock = (void *)kvm_null_fn,
- 		.flush_on_ret = true,
- 		.may_block = true,
-@@ -2490,7 +2502,8 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, unsigned long attributes,
- 		.arg.attributes = attributes,
- 		.handler = kvm_arch_post_set_memory_attributes,
- 		.on_lock = (void *)kvm_null_fn,
--		.on_unlock = kvm_mmu_invalidate_end,
-+		.before_unlock = kvm_mmu_invalidate_end,
-+		.on_unlock = (void *)kvm_null_fn,
- 		.may_block = true,
- 	};
- 	unsigned long i;
--- 
-2.25.1
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+I'll fix up all of the above when applying, and will also split this into three
+patches, mostly so that each splat can be covered in a changelog, i.e. is tied
+to its testcase.
