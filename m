@@ -2,434 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22CBE76D6E1
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 20:31:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E574976D760
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 21:04:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234353AbjHBSbQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 14:31:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39442 "EHLO
+        id S229598AbjHBTES (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 15:04:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbjHBSbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 14:31:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE0D19AD
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 11:30:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691001023;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZVdmius26RlSXht2Utt64qaaZXvCxBapXtuIJrKTQ8A=;
-        b=ZJlwRzMb4wLXeVzkBSLXRDEQCcL55pjo7iNL9v6MBQlxVpiwwVn75ybqgRJe2i8CYNnnJb
-        cqIFfFM7w1MO68144xEgia0gY55uqa8Z8hHDX7sTmFBjXa4KTgTornxWuR6bii03wtgP48
-        G/3ANnNcoqd2wblkD5DOSQrTroARhpw=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-626-N9qvbwQNMq6A_zQ-EIFnxg-1; Wed, 02 Aug 2023 14:30:21 -0400
-X-MC-Unique: N9qvbwQNMq6A_zQ-EIFnxg-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-34911a70e74so791225ab.3
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 11:30:21 -0700 (PDT)
+        with ESMTP id S229589AbjHBTER (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 15:04:17 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1D62129
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 12:04:16 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bb8f751372so1686465ad.0
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 12:04:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691003055; x=1691607855;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ikYXa8mOFQDZbREjRJ8peh9ZkNJ1cnl6br63JB4vnx4=;
+        b=NFWOMN10g/JUtUfNdt5wuiKKHUMDEQSw15FPK2CXKLbgVy0j6AyiBm8M+GD2V/9BsU
+         e9OVtc57b90J4vIjnxWJt4PQ43IO72q6PcLQ5f2FDGbvKfMoXBD/gZ+OzunW6HP1wbfK
+         WeGIG2/xnjG8jCuyBX+r0ZweTjcBWPF5jwoOtB9I77/3loebH3mojxg09s/yEuUylivn
+         lGcuEI1l4AHl4Y5DLG2CaiWnZsnz7oNkygK8YfxTYLTPfbaSLtkYPg1VqTbdG6pjDayP
+         Wk6PMCPh01WT0HcPceAUQ67f4iK4u8MwB0HqXCo+uWfOLG1RdTwP9cScsWpdWSZjfEPt
+         aGfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691001020; x=1691605820;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZVdmius26RlSXht2Utt64qaaZXvCxBapXtuIJrKTQ8A=;
-        b=MZsdE9jsw096pWNflpD23evIo4aKxCE1X0ORBr1xXhmEU1ZWO2BoZ2Zqe2SLd6glJn
-         WG6tW9BMrF1M5A6VpPvJR/GTTNZ1tZLXR3h2NshHk5GiBRDq5gSyYZ+zDr0givLfP9Vg
-         geRzBp9btv/eC5GX9UEVjbODqK4mspppEdTHeacfK3wyBZgLToassWTtCfTD9yyAH8Ly
-         oKxlOB3cZ4Zf1wt3vXGo4xxTMC7Pl4YDO3TvI/3fgR4V6/3pkVEZgfXbH27cQMtdurAg
-         cPbvYMDNd3K/agLYy4U2PkxrqWHlC1cbJgIh0Sk5heHpYPaCD71MUHreg8y4i8o+lCaB
-         udsw==
-X-Gm-Message-State: ABy/qLbgUS7Fotui10FAsmdL3BTFSYBm1CLC0QgidM+ofnn0G9eHvIJD
-        WMLuHTkUJ5Z8h5ys0PQ+/0mpvu7jUR5426uK3LQ4msmTdPK/FFe7UxpJkPSvH7lc5SFwoybbXV4
-        5j1W2PeoSOe7pCrAxDMAD
-X-Received: by 2002:a05:6e02:1d95:b0:343:c8b1:b7f0 with SMTP id h21-20020a056e021d9500b00343c8b1b7f0mr20169464ila.23.1691001020470;
-        Wed, 02 Aug 2023 11:30:20 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEVKivkGg6Az6ZWImURjR70SdK+Vyx1AOC/SoM4fyPdpUkslD0r2GYwjg2gVKL8geGuwkyi0Q==
-X-Received: by 2002:a05:6e02:1d95:b0:343:c8b1:b7f0 with SMTP id h21-20020a056e021d9500b00343c8b1b7f0mr20169442ila.23.1691001020147;
-        Wed, 02 Aug 2023 11:30:20 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id z5-20020a02cea5000000b0042b4b1246cbsm4607233jaq.148.2023.08.02.11.30.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 11:30:19 -0700 (PDT)
-Date:   Wed, 2 Aug 2023 12:30:17 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: irqbypass: Convert producers/consumers
- single linked list to XArray
-Message-ID: <20230802123017.5695fe0a.alex.williamson@redhat.com>
-In-Reply-To: <20230802051700.52321-3-likexu@tencent.com>
-References: <20230802051700.52321-1-likexu@tencent.com>
-        <20230802051700.52321-3-likexu@tencent.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1691003055; x=1691607855;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ikYXa8mOFQDZbREjRJ8peh9ZkNJ1cnl6br63JB4vnx4=;
+        b=G/1dy4SAhHnPhE+Mtv7YSCN/IIn13dhOr48aY74INIfummP+h1wfhmlaEFR/d2UKlX
+         9qVPypf1Iwz+gNSg6gbgvaQWEFr1MiqCGQc4kztie6gwbzUSMTMq2puoL4ldaGfr7js+
+         i3wLAzySNfhcYI7/K1JvTCAbP6QflPR97/IPQopWRu9Zdp3WtHeog7jk6QrfeG5DIoXg
+         756cNerx3nQ+zpi4pdwL5Tbbyot4GUgiCxLZPXY8bESca1UYt3npxbQKXHMCa7REwzY3
+         1807/gY/33pI+FEysioUzF12PmfTti6MO/XKuNN5HTAiit6jyo3HM3P5XuVBYeCf4eow
+         29VA==
+X-Gm-Message-State: ABy/qLZ/TiipRXnaBTnop4UmtSz5GBKjXKr61Nt/VmjhnQ2IV+x7Km7b
+        ov29UUW6vZRXnW6UUXJfnYk+0Pasfco=
+X-Google-Smtp-Source: APBJJlHCJjgZtPFZR17JiLtVe6z5T7rY0lrHPA5nBV8Wciu9MdW1wNKz/CpXGwhYO9h4Ql0UKZnVk4wbcP8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:230a:b0:1af:f80f:185d with SMTP id
+ d10-20020a170903230a00b001aff80f185dmr103405plh.4.1691003055448; Wed, 02 Aug
+ 2023 12:04:15 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 12:04:13 -0700
+In-Reply-To: <6bc819fd-18e4-8472-be7d-14db6e059e9a@cs.utexas.edu>
+Mime-Version: 1.0
+References: <7b5f626c-9f48-15e2-8f7a-1178941db048@cs.utexas.edu>
+ <ZMFVLiC3YvPY3bSP@google.com> <27f998f5-748b-c356-9bb6-813573c758e5@cs.utexas.edu>
+ <ZMF5O6Tq1UTQHvX0@google.com> <7d4a5084-5e1e-22dd-c203-99f46850145a@cs.utexas.edu>
+ <ZMKg5WosmBu78Vgv@google.com> <6bc819fd-18e4-8472-be7d-14db6e059e9a@cs.utexas.edu>
+Message-ID: <ZMqorSAyFWWTwq5Q@google.com>
+Subject: Re: KVM_EXIT_FAIL_ENTRY with hardware_entry_failure_reason = 7
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yahya Sohail <ysohail@cs.utexas.edu>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  2 Aug 2023 13:17:00 +0800
-Like Xu <like.xu.linux@gmail.com> wrote:
+On Fri, Jul 28, 2023, Yahya Sohail wrote:
+> 
+> On 7/27/23 11:52, Sean Christopherson wrote:
+> > Enable /sys/module/kvm_intel/parameters/dump_invalid_vmcs, then KVM will print
+> > out most (all?) VMCS fields on the failed VM-Entry.  From there you'll have to
+> > hunt through guest state to figure out which fields, or combinations of fields,
+> > is invalid.
+> 
+> I get the following output in my log:
+> *** Guest State ***
+> CR0: actual=0x0000000080000031, shadow=0x00000000e0000011,
+> gh_mask=fffffffffffffff7
+> CR4: actual=0x0000000000002060, shadow=0x0000000000000020,
+> gh_mask=fffffffffffef871
+> CR3 = 0x0000000010000000
+> PDPTR0 = 0x0000000000000000  PDPTR1 = 0x0000000000000000
+> PDPTR2 = 0x0000000000000000  PDPTR3 = 0x0000000000000000
+> RSP = 0x0000000002000031  RIP = 0x0000000000103c00
+> RFLAGS=0x00000002         DR7 = 0x0000000000000400
+> Sysenter RSP=0000000000000000 CS:RIP=0000:0000000000000000
+> CS:   sel=0x0010, attr=0x0a09b, limit=0x000fffff, base=0x0000000000000000
+> DS:   sel=0x0018, attr=0x08093, limit=0x000fffff, base=0x0000000000000000
+> SS:   sel=0x0018, attr=0x08093, limit=0x000fffff, base=0x0000000000000000
+> ES:   sel=0x0018, attr=0x08093, limit=0x000fffff, base=0x0000000000000000
+> FS:   sel=0x0000, attr=0x10001, limit=0x00000000, base=0x0000000000000000
+> GS:   sel=0x0000, attr=0x10001, limit=0x00000000, base=0x0000000000000000
+> GDTR:                           limit=0x00001031, base=0x001f000000000200
 
-> From: Like Xu <likexu@tencent.com>
-> 
-> Replace producers/consumers linked list with XArray. There are no changes
-> in functionality, but lookup performance has been improved.
-> 
-> The producers and consumers in current IRQ bypass manager are stored in
-> simple linked lists, and a single mutex is held while traversing the lists
-> and connecting a consumer to a producer (and vice versa). With this design
-> and implementation, if there are a large number of KVM agents concurrently
-> creating irqfds and all requesting to register their irqfds in the global
-> consumers list, the global mutex contention will exponentially increase
-> the avg wait latency, which is no longer tolerable in modern systems with
-> a large number of CPU cores. For example:
-> 
-> the wait time latency to acquire the mutex in a stress test where 174000
-> irqfds were created concurrently on an 2.70GHz ICX w/ 144 cores:
-> 
-> - avg = 117.855314 ms
-> - min = 20 ns
-> - max = 11428.340858 ms
-> 
-> To reduce latency introduced by the irq_bypass_register_consumer() in
-> the above usage scenario, the data structure XArray and its normal API
-> is applied to track the producers and consumers so that lookups don't
-> require a linear walk since the "tokens" used to match producers and
-> consumers are just kernel pointers.
-> 
-> Thanks to the nature of XArray (more memory-efficient, parallelisable
-> and cache friendly), the latecny is significantly reduced (compared to
-> list and hlist proposal) under the same environment and testing:
-> 
-> - avg = 314 ns
-> - min = 124 ns
-> - max = 47637 ns
-> 
-> In this conversion, the non-NULL opaque token to match between producer
-> and consumer () is used as the XArray index. The list_for_each_entry() is
-> replaced by xa_load(), and list_add/del() is replaced by xa_store/erase().
-> The list_head member for linked list is removed, along with comments.
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Reported-by: Yong He <alexyonghe@tencent.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217379
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  include/linux/irqbypass.h |   8 +--
->  virt/lib/irqbypass.c      | 127 +++++++++++++++++++-------------------
->  2 files changed, 63 insertions(+), 72 deletions(-)
-> 
-> diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
-> index 9bdb2a781841..dbcc1b4d0ccf 100644
-> --- a/include/linux/irqbypass.h
-> +++ b/include/linux/irqbypass.h
-> @@ -8,14 +8,12 @@
->  #ifndef IRQBYPASS_H
->  #define IRQBYPASS_H
->  
-> -#include <linux/list.h>
-> -
->  struct irq_bypass_consumer;
->  
->  /*
->   * Theory of operation
->   *
-> - * The IRQ bypass manager is a simple set of lists and callbacks that allows
-> + * The IRQ bypass manager is a simple set of xarrays and callbacks that allows
->   * IRQ producers (ex. physical interrupt sources) to be matched to IRQ
->   * consumers (ex. virtualization hardware that allows IRQ bypass or offload)
->   * via a shared token (ex. eventfd_ctx).  Producers and consumers register
-> @@ -30,7 +28,6 @@ struct irq_bypass_consumer;
->  
->  /**
->   * struct irq_bypass_producer - IRQ bypass producer definition
-> - * @node: IRQ bypass manager private list management
->   * @token: opaque token to match between producer and consumer (non-NULL)
->   * @irq: Linux IRQ number for the producer device
->   * @add_consumer: Connect the IRQ producer to an IRQ consumer (optional)
-> @@ -43,7 +40,6 @@ struct irq_bypass_consumer;
->   * for a physical device assigned to a VM.
->   */
->  struct irq_bypass_producer {
-> -	struct list_head node;
->  	void *token;
->  	int irq;
->  	int (*add_consumer)(struct irq_bypass_producer *,
-> @@ -56,7 +52,6 @@ struct irq_bypass_producer {
->  
->  /**
->   * struct irq_bypass_consumer - IRQ bypass consumer definition
-> - * @node: IRQ bypass manager private list management
->   * @token: opaque token to match between producer and consumer (non-NULL)
->   * @add_producer: Connect the IRQ consumer to an IRQ producer
->   * @del_producer: Disconnect the IRQ consumer from an IRQ producer
-> @@ -69,7 +64,6 @@ struct irq_bypass_producer {
->   * portions of the interrupt handling to the VM.
->   */
->  struct irq_bypass_consumer {
-> -	struct list_head node;
->  	void *token;
->  	int (*add_producer)(struct irq_bypass_consumer *,
->  			    struct irq_bypass_producer *);
-> diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
-> index e0aabbbf27ec..3f8736951e92 100644
-> --- a/virt/lib/irqbypass.c
-> +++ b/virt/lib/irqbypass.c
-> @@ -15,15 +15,15 @@
->   */
->  
->  #include <linux/irqbypass.h>
-> -#include <linux/list.h>
->  #include <linux/module.h>
->  #include <linux/mutex.h>
-> +#include <linux/xarray.h>
->  
->  MODULE_LICENSE("GPL v2");
->  MODULE_DESCRIPTION("IRQ bypass manager utility module");
->  
-> -static LIST_HEAD(producers);
-> -static LIST_HEAD(consumers);
-> +static DEFINE_XARRAY(producers);
-> +static DEFINE_XARRAY(consumers);
->  static DEFINE_MUTEX(lock);
->  
->  /* @lock must be held when calling connect */
-> @@ -78,11 +78,12 @@ static void __disconnect(struct irq_bypass_producer *prod,
->   * irq_bypass_register_producer - register IRQ bypass producer
->   * @producer: pointer to producer structure
->   *
-> - * Add the provided IRQ producer to the list of producers and connect
-> - * with any matching token found on the IRQ consumers list.
-> + * Add the provided IRQ producer to the xarray of producers and connect
-> + * with any matching token found on the IRQ consumers xarray.
->   */
->  int irq_bypass_register_producer(struct irq_bypass_producer *producer)
->  {
-> +	unsigned long token = (unsigned long)producer->token;
->  	struct irq_bypass_producer *tmp;
->  	struct irq_bypass_consumer *consumer;
->  	int ret;
-> @@ -97,24 +98,23 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer)
->  
->  	mutex_lock(&lock);
->  
-> -	list_for_each_entry(tmp, &producers, node) {
-> -		if (tmp->token == producer->token || tmp == producer) {
-> -			ret = -EBUSY;
-> +	tmp = xa_load(&producers, token);
-> +	if (tmp || tmp == producer) {
-> +		ret = -EBUSY;
-> +		goto out_err;
-> +	}
-> +
-> +	ret = xa_err(xa_store(&producers, token, producer, GFP_KERNEL));
-> +	if (ret)
-> +		goto out_err;
-> +
-> +	consumer = xa_load(&consumers, token);
-> +	if (consumer) {
-> +		ret = __connect(producer, consumer);
-> +		if (ret)
->  			goto out_err;
+The GDT base is non-canonical, that's likely the direct source of the consistency
+check.  
 
-This doesn't match previous behavior, the producer is registered to the
-xarray regardless of the result of the connect operation and the caller
-cannot distinguish between failures.  The module reference is released
-regardless of xarray item.  Nak.
+> LDTR: sel=0x0000, attr=0x10000, limit=0x000003e8, base=0x000003e8000081a4
+> IDTR:                           limit=0x00000000, base=0x0000000000000000
+> TR:   sel=0x0000, attr=0x10021, limit=0x01211091, base=0x0000000000010304
+> EFER =     0x0000000000000500  PAT = 0x0007040600070406
+> DebugCtl = 0x0000000000000000  DebugExceptions = 0x0000000000000000
+> BndCfgS = 0x0000000000000000
+> Interruptibility = 00000000  ActivityState = 00000000
+> *** Host State ***
+> RIP = 0xffffffffc09a444f  RSP = 0xffffa3aa0d2fbd50
+> CS=0010 SS=0018 DS=0000 ES=0000 FS=0000 GS=0000 TR=0040
+> FSBase=00007feb463e9740 GSBase=ffff93bb3dd80000 TRBase=fffffe000033d000
+> GDTBase=fffffe000033b000 IDTBase=fffffe0000000000
+> CR0=0000000080050033 CR3=0000000547886004 CR4=00000000007726e0
+> Sysenter RSP=fffffe000033d000 CS:RIP=0010:ffffffff910016e0
+> EFER = 0x0000000000000d01  PAT = 0x0407050600070106
+> *** Control State ***
+> PinBased=0000007f CPUBased=b5986dfa SecondaryExec=00032ce2
+> EntryControls=0001d3ff ExitControls=00abefff
+> ExceptionBitmap=00060042 PFECmask=00000000 PFECmatch=00000000
+> VMEntry: intr_info=80000044 errcode=00000000 ilen=00000000
+> VMExit: intr_info=00000000 errcode=00000000 ilen=00000000
+>         reason=80000021 qualification=0000000000000000
+> IDTVectoring: info=00000000 errcode=00000000
+> TSC Offset = 0xfffda9968024bdbc
+> EPT pointer = 0x0000000103f1905e
+> PLE Gap=00000080 Window=00001000
+> Virtual processor ID = 0x0021
+> 
+> For the control registers, the value I set is shown as shadow not actual.
+> What does that mean?
 
-> -		}
->  	}
->  
-> -	list_for_each_entry(consumer, &consumers, node) {
-> -		if (consumer->token == producer->token) {
-> -			ret = __connect(producer, consumer);
-> -			if (ret)
-> -				goto out_err;
-> -			break;
-> -		}
-> -	}
-> -
-> -	list_add(&producer->node, &producers);
-> -
->  	mutex_unlock(&lock);
->  
->  	return 0;
-> @@ -129,11 +129,12 @@ EXPORT_SYMBOL_GPL(irq_bypass_register_producer);
->   * irq_bypass_unregister_producer - unregister IRQ bypass producer
->   * @producer: pointer to producer structure
->   *
-> - * Remove a previously registered IRQ producer from the list of producers
-> + * Remove a previously registered IRQ producer from the xarray of producers
->   * and disconnect it from any connected IRQ consumer.
->   */
->  void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
->  {
-> +	unsigned long token = (unsigned long)producer->token;
->  	struct irq_bypass_producer *tmp;
->  	struct irq_bypass_consumer *consumer;
->  
-> @@ -143,24 +144,18 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
->  	might_sleep();
->  
->  	if (!try_module_get(THIS_MODULE))
-> -		return; /* nothing in the list anyway */
-> +		return; /* nothing in the xarray anyway */
->  
->  	mutex_lock(&lock);
->  
-> -	list_for_each_entry(tmp, &producers, node) {
-> -		if (tmp != producer)
-> -			continue;
-> +	tmp = xa_load(&producers, token);
-> +	if (tmp == producer) {
-> +		consumer = xa_load(&consumers, token);
-> +		if (consumer)
-> +			__disconnect(producer, consumer);
->  
-> -		list_for_each_entry(consumer, &consumers, node) {
-> -			if (consumer->token == producer->token) {
-> -				__disconnect(producer, consumer);
-> -				break;
-> -			}
-> -		}
-> -
-> -		list_del(&producer->node);
-> +		xa_erase(&producers, token);
->  		module_put(THIS_MODULE);
-> -		break;
->  	}
->  
->  	mutex_unlock(&lock);
-> @@ -173,11 +168,12 @@ EXPORT_SYMBOL_GPL(irq_bypass_unregister_producer);
->   * irq_bypass_register_consumer - register IRQ bypass consumer
->   * @consumer: pointer to consumer structure
->   *
-> - * Add the provided IRQ consumer to the list of consumers and connect
-> - * with any matching token found on the IRQ producer list.
-> + * Add the provided IRQ consumer to the xarray of consumers and connect
-> + * with any matching token found on the IRQ producer xarray.
->   */
->  int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
->  {
-> +	unsigned long token = (unsigned long)consumer->token;
->  	struct irq_bypass_consumer *tmp;
->  	struct irq_bypass_producer *producer;
->  	int ret;
-> @@ -193,24 +189,23 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
->  
->  	mutex_lock(&lock);
->  
-> -	list_for_each_entry(tmp, &consumers, node) {
-> -		if (tmp->token == consumer->token || tmp == consumer) {
-> -			ret = -EBUSY;
-> +	tmp = xa_load(&consumers, token);
-> +	if (tmp || tmp == consumer) {
-> +		ret = -EBUSY;
-> +		goto out_err;
-> +	}
-> +
-> +	ret = xa_err(xa_store(&consumers, token, consumer, GFP_KERNEL));
-> +	if (ret)
-> +		goto out_err;
-> +
-> +	producer = xa_load(&producers, token);
-> +	if (producer) {
-> +		ret = __connect(producer, consumer);
-> +		if (ret)
->  			goto out_err;
+The "shadow" is what the guest sees, the "actual" value is what is loaded in
+hardware.  VMX virtualization of CR0 and CR4, through a combination of VMCS fields
+(actual + shadow + gh_mask in the above terminology), effectively allows intercepting
+writes to individual CR0 and CR4 bits, and entirely avoids VM-Exits on read from
+CR0/CR4.
 
-Same.  Thanks,
+Copying from the SDM:
 
-Alex
+  MOV from CR4. The behavior of MOV from CR4 is determined by the CR4 guest/host
+  mask and the CR4 read shadow. For each position corresponding to a bit clear in
+  the CR4 guest/host mask, the destination operand is loaded with the value of the
+  corresponding bit in CR4. For each position corresponding to a bit set in the CR4
+  guest/host mask, the destination operand is loaded with the value of the corresponding
+  bit in the CR4 read shadow. Thus, if every bit is cleared in the CR4 guest/host
+  mask, MOV from CR4 reads normally from CR4; if every bit is set in the CR4 guest/host
+  mask, MOV from CR4 returns the value of the CR4 read shadow.  Depending on the
+  contents of the CR4 guest/host mask and the CR4 read shadow, bits may be set in the
+  destination that would never be set when reading directly from CR4.
 
-> -		}
->  	}
->  
-> -	list_for_each_entry(producer, &producers, node) {
-> -		if (producer->token == consumer->token) {
-> -			ret = __connect(producer, consumer);
-> -			if (ret)
-> -				goto out_err;
-> -			break;
-> -		}
-> -	}
-> -
-> -	list_add(&consumer->node, &consumers);
-> -
->  	mutex_unlock(&lock);
->  
->  	return 0;
-> @@ -225,11 +220,12 @@ EXPORT_SYMBOL_GPL(irq_bypass_register_consumer);
->   * irq_bypass_unregister_consumer - unregister IRQ bypass consumer
->   * @consumer: pointer to consumer structure
->   *
-> - * Remove a previously registered IRQ consumer from the list of consumers
-> + * Remove a previously registered IRQ consumer from the xarray of consumers
->   * and disconnect it from any connected IRQ producer.
->   */
->  void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
->  {
-> +	unsigned long token = (unsigned long)consumer->token;
->  	struct irq_bypass_consumer *tmp;
->  	struct irq_bypass_producer *producer;
->  
-> @@ -239,24 +235,18 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
->  	might_sleep();
->  
->  	if (!try_module_get(THIS_MODULE))
-> -		return; /* nothing in the list anyway */
-> +		return; /* nothing in the xarray anyway */
->  
->  	mutex_lock(&lock);
->  
-> -	list_for_each_entry(tmp, &consumers, node) {
-> -		if (tmp != consumer)
-> -			continue;
-> +	tmp = xa_load(&consumers, token);
-> +	if (tmp == consumer) {
-> +		producer = xa_load(&producers, token);
-> +		if (producer)
-> +			__disconnect(producer, consumer);
->  
-> -		list_for_each_entry(producer, &producers, node) {
-> -			if (producer->token == consumer->token) {
-> -				__disconnect(producer, consumer);
-> -				break;
-> -			}
-> -		}
-> -
-> -		list_del(&consumer->node);
-> +		xa_erase(&consumers, token);
->  		module_put(THIS_MODULE);
-> -		break;
->  	}
->  
->  	mutex_unlock(&lock);
-> @@ -264,3 +254,10 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
->  	module_put(THIS_MODULE);
->  }
->  EXPORT_SYMBOL_GPL(irq_bypass_unregister_consumer);
-> +
-> +static void __exit irqbypass_exit(void)
-> +{
-> +	xa_destroy(&producers);
-> +	xa_destroy(&consumers);
-> +}
-> +module_exit(irqbypass_exit);
+ ...
+
+  MOV to CR4. An execution of MOV to CR4 that does not cause a VM exit (see Section
+  26.1.3) leaves unmodified any bit in CR4 corresponding to a bit set in the CR4
+  guest/host mask. Such an execution causes a general-protection exception if it
+  attempts to set any bit in CR4 (not corresponding to a bit set in the CR4
+  guest/host mask) to a value not supported in VMX operation (see Section 24.8).
+
+> Additionally, I consulted the Intel manual for the meaning of the 0x80000021
+> error code, and it appears it is caused by not meeting one or more of the
+> requirements for guest state set in Volume 3 Section 27.3.1 of the Intel
+> manual.
+
+Yep.
+
+> I noticed that there are certain requirements for tr and ldtr
+> registers even though they are not really used in IA-32e mode (see Volume 3
+> Section 27.3.1.2). I've tried setting them as follows to meet those
+> requirements, but that didn't seem to do anything:
+>   state->sregs.tr.type = 0b11;
+>   state->sregs.tr.s = 0;
+>   state->sregs.tr.present = 1;
+>   state->sregs.tr.g = 1;
+>   state->sregs.tr.limit = 0xFFFFF;
+>   state->sregs.tr.unusable = 0;
+>   state->sregs.tr.selector = 0b100;
+>   state->sregs.ldt.unusable = 1;
+> 
+> Does that look correct?
+
+Maybe?  Sorry, I've essentially exhausted my bandwidth for helping this along
+beyond quick comments.
+
+> I suppose my best course of action now is to go through each check in Volume
+> 3 Section 27.3.1 and check each one individually.
+
 
