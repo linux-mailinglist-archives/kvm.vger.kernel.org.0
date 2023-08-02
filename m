@@ -2,61 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6ED6776C512
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 07:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A188276C562
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 08:41:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231314AbjHBF5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 01:57:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52750 "EHLO
+        id S232398AbjHBGlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 02:41:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjHBF5g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 01:57:36 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4152122
-        for <kvm@vger.kernel.org>; Tue,  1 Aug 2023 22:57:34 -0700 (PDT)
+        with ESMTP id S231827AbjHBGkx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 02:40:53 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AFE2728;
+        Tue,  1 Aug 2023 23:40:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690955854; x=1722491854;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=DDCG9G8B7JjR5/3p2DOxhxhlOun5LPMyvVYR7Xc2qDA=;
-  b=UX+uhmW/iZgC49IN/J4KmVkIGHtdd7P6Kh5mYH/7scdfsGKmM1oUtveU
-   hdNjvh+7Kgd0FxU7qDeEMX22QnNiVvSVZn1UCgKJEtgHNAIzBc61kWMHl
-   EJDPbMgp5hrws7vRDESZHCh1J6oXkdzVWPW9tgdHR3Ty3A5mIqK3V8Hb7
-   itDpURXKAXAzZqW7jla8UurbxEwWLBE8xjfK5euNnk2H8JaDYHayhYH6a
-   f3SfkKAqjX14nqkpmfIPaKimr+ulFdsAArkSDl8tcv111n8v6G9y3mAqT
-   wt97X9wi9klJKDTD4nMW+6kREpEuv92eHGfJaVSbLIz9UszIPqQlZllCC
+  t=1690958450; x=1722494450;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=zWAInL+Y+JvL9c6U27dfKWQhhLmxrfhU1BGGMim9Z7A=;
+  b=T4w+X/thyIpD79YcJnMeEhE0tgiTVVmT1toAfjOMnDXxPcYDcxiaWtB/
+   +Y99l5GHcM3X/yBrGP5V8E8NVzTEUjd7T5T6yoEy1LI3cUtxbeQ3eIL0t
+   xQjGKMB3j7qdwqKJ6hl6c4VhQgd8JxHcyOOxBknIBv2vAAwR2kOidaq43
+   zD9cSqbOKgNtFHyyM+Mtv8TRoxnoqYgpu0McqCrvCBJW9eRJiQWZ3FW3L
+   iy61BZnf0XL6/Q0JM/E/KqMwXTIGq28DTivNefRJqom8bnHo6+jEUtHb4
+   69iBMqeHo91bn6BZMWI/jhGMJvtOjEj/JFcy3G2G8Nhd470s9pRgbVH3f
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="455857754"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="433336604"
 X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="455857754"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 22:57:34 -0700
+   d="scan'208";a="433336604"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 23:40:49 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="902866407"
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="728988969"
 X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="902866407"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.20.184]) ([10.93.20.184])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2023 22:57:31 -0700
-Message-ID: <e0e478bd-282b-68fa-7c94-8efbcc450750@linux.intel.com>
-Date:   Wed, 2 Aug 2023 13:57:29 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v2] Documentation: KVM: Add vPMU implementaion and gap
- document
-To:     Xiong Zhang <xiong.y.zhang@intel.com>, kvm@vger.kernel.org
-Cc:     weijiang.yang@intel.com, seanjc@google.com,
-        like.xu.linux@gmail.com, zhiyuan.lv@intel.com,
-        zhenyu.z.wang@intel.com, kan.liang@intel.com
-References: <20230801035836.1048879-1-xiong.y.zhang@intel.com>
+   d="scan'208";a="728988969"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP; 01 Aug 2023 23:40:48 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 23:40:48 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 1 Aug 2023 23:40:47 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 1 Aug 2023 23:40:47 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.172)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 1 Aug 2023 23:40:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GI1bXp+MXOhiXCB2HWFxCb89Udf2CWgkUneUedLZUDrEW7Gd7+QY8ZiFhMpLzhOl6R1AzKUglqS3OyCk9ZH4JlZb6khl227tKAEjm9UAn29p5vWgIdq825jAe18RGXtAVwTvHFm0SF7umpNtNgZwGFNJ2qQ9uCuMjJCmHRO+sa5NNvsfJI0JiKU1RlVKH/D6fF2leTYPdogJ6k/4wKZWapeMpiESZYY1GvhhY+cfptNTt1gOmC1pLTmKh/MLSNL+T/hobShm9c75C7MlLC/dPDILUO2QDND3v/zYhzg/TPsblZoUnt4sgzHhwRmHZDWAlIGad7YLYeOHrMENvYcggg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zeWvosz0upjVcHKU886x0lu1I7VS2TZ7oRc0Ddi5LTw=;
+ b=F5GWHJMi8t8shcw3FO/325/kpaTinrMceTjBGjrUBHUgIksI4c8Tw5FaPH15PozcT1pNZWjzUsUmgImZXonHctyKMyLR7P/dwKZbbPbRLcMmBKirpzwV5GIS2G+5Fv+hfr9dCiTwziPXHtoZuUTCT34YSPJCZk8eD+dOzvAXpNOwjhkaqdUYVtfvtfdd2spzMRubkGnGeVBvKdcJgPLyLrqrD8l/jnGtMHWd2x3ri+NRrLWvVGUTMzxVK1Zkr8q92nmHXO3LfVh/FkpWZ69ccH7JwPHbF4Tw/So4p2GmF5YyGbmlRVXxILy3woT4Lvplh5EH2tT69GL50H4L2i4qEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CH3PR11MB8465.namprd11.prod.outlook.com (2603:10b6:610:1bc::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 06:40:45 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::dcf3:7bac:d274:7bed]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::dcf3:7bac:d274:7bed%4]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 06:40:45 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: RE: [PATCH v4 01/12] iommufd: Add data structure for Intel VT-d
+ stage-1 domain allocation
+Thread-Topic: [PATCH v4 01/12] iommufd: Add data structure for Intel VT-d
+ stage-1 domain allocation
+Thread-Index: AQHZvh/r9YX/Pz/Wpk6TTWJVn/EYta/Wm1KA
+Date:   Wed, 2 Aug 2023 06:40:45 +0000
+Message-ID: <BN9PR11MB527678547A8F9E98EFA4D1AA8C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-2-yi.l.liu@intel.com>
+In-Reply-To: <20230724111335.107427-2-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20230801035836.1048879-1-xiong.y.zhang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH3PR11MB8465:EE_
+x-ms-office365-filtering-correlation-id: ca86a237-230e-421a-b9da-08db93236679
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +aikdYxFN7wGbgilVgSwgO7CvoKE4DLdFq5PDPFEw88Jh7yYIBBCMTonn/Y+989vJ6LAPmo4hbTyC3qLfmhBywUt3ajUzwNBNKacwcLUafP1Y8jjJC5WXlxjJ7LKbXoMsokHET/ka0IEvLUIHfeOAOgrspldcUnQpBiY1FiE2mv6Ocn+MD7MplfX82UyJpzK+O3hRWj4MnXHXDPHyxys1wNs+MNJ1r1xToE8YtSQ44JCloAo2jndXfwYcFMYfR1qONEwM9wtu2F4pIuJmgRE930AxLdS5sRJZ0nSJXDyeWwtjzeYmPPvWBtSLPzD+riwd7p7S0LfIzP7vTt5DafBUYCDOKVJwBdbmct8OhP5V6ZzHb3xotfDy9bSLICXHWr0nFLpyJaYWWcfRohS96UBrjc+s2TRNBOnJuzug4pQWN0zuW52o5wpGTnX0C5eF+fyVK4od1PggR05r5FxGB1oQvHdYFizjPB9W3V6EExRYT142YMfyxHM4vVBp0joMHyZBmY6IH48NY011dU+4cCwyLS2KahUaKIAngxuXnchiWadBdLOtMhrowfYNygSCi0ipvMW7qHV6W68hXMuhBQi8EMYQP2/64tvpnyLbc3EfG5Tu5BHZ8pywM0wlNXlHxTn
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(376002)(346002)(366004)(136003)(451199021)(66946007)(2906002)(76116006)(66446008)(64756008)(66476007)(4326008)(66556008)(7696005)(33656002)(71200400001)(86362001)(9686003)(478600001)(186003)(82960400001)(38070700005)(26005)(6506007)(38100700002)(122000001)(110136005)(54906003)(55016003)(41300700001)(4744005)(52536014)(8936002)(8676002)(5660300002)(7416002)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?UZWtoX+/BIY5VkDuCVGfrzwrbcue5zPNiTEeSrV10AIwfgDnukwsi6Lb0M4p?=
+ =?us-ascii?Q?9LAA4Yf7+NAoyq/F/Zhtx+xy5BfwhAEUftkSt5daSgxgCg5Xk7J7LaxMPJJO?=
+ =?us-ascii?Q?Z4rUq/g53CV0MTTKJiHKQ9Yj60BpyGHyL1eOjv7y+ImC5crNxGNHVA0CM1Wx?=
+ =?us-ascii?Q?CekmKmM51JBUKYB96YU3bPwbrFGMCqsX9wLiwjHZe+OzO1mCKpgjML2K7A+J?=
+ =?us-ascii?Q?nsCwYRRsLKkz3cotl2bcLD/qyfwQtneaAx6u7PoEt1wKdyV0Nln7tK3OJoNU?=
+ =?us-ascii?Q?l4P98caoMQeEEQnLGGd94Sr4LE6fP4FyCE96K/1TZLgAWIXA53ObrG9neaDt?=
+ =?us-ascii?Q?eRSzoyovtKqr13uDouRUQgjfcEdTsXg6bTC5AnG1i/Fzq99fU4cnVvNlotTN?=
+ =?us-ascii?Q?APTqiGTM8H3mhYyGjTcQJ2hRwm8nXZLNs46n5U7v0Y2iFZjGZJFo+Nq64NPe?=
+ =?us-ascii?Q?C9K3JyOj2FDL5pTZSM59cf01OHDjQfQdsfGaS79MTOqbpgNHuLAQnaA08IU0?=
+ =?us-ascii?Q?DbkNH5fOxFPoK5AA8HZ7vUAd6tD12HVO5njqY5m5WYua8VW85mTg+91I0jyQ?=
+ =?us-ascii?Q?PV9I3eIIjNuFOyFdTEgQPCQG1DlW83KgXnNX9lHX6NNQn7yBsWZJ9pb/PuH3?=
+ =?us-ascii?Q?3pYqex/1HkgR5tsvVrm/1WW8MiqzhJbOcesylXDcagExb9QG1/vCsRXD5iOd?=
+ =?us-ascii?Q?Vsj+qYlL4UMLlYwLflJbmOsHxE2HdIJMwOLFBldOdKFZWuluiJGPTFIxPvzb?=
+ =?us-ascii?Q?QprQw8JMtPiP55y6HXelIea6GDQB9tyLhPRG9HvwRv5d7NdAmYpWuMDj0blf?=
+ =?us-ascii?Q?LwYjenug5DSGl19MSMwF/feHiNvdYqQLSoAld5b4ENI7wYoPADL8D10f9P7d?=
+ =?us-ascii?Q?cp4wtyLR/N6Y/tzPz1/kqHS4sSHncXTGDk540D3s4/eQOwXQ0MyP6MYS7RSC?=
+ =?us-ascii?Q?T/q4kQdaRfPdieZAOKBQAzxanIyRfunIRidhQXgBsNwSHPidtEBYB7/g0ECR?=
+ =?us-ascii?Q?sRBZg1s9ZaVEjDJFtD9DdGUQsl0tdKcRCBUbXIM5gtXmyvymk/JMGOWgVqLG?=
+ =?us-ascii?Q?UvZznU+SE4MgQke5PJZ+t3E2fIkl1YCsgMaWMlOyxRKNN5y0M1otvVN+0ZI0?=
+ =?us-ascii?Q?gwZ/0bsCEqlcS7AVkIaiScbR0I2MUbEa26CQeMxJVqZqF4rJPPMT+GO5F5Nr?=
+ =?us-ascii?Q?NRMxZUH5vzZ9PmV7BbtRq30KOB9K5ix0qUOMN5yM4gasFVIFdgfwWHL7A3Ei?=
+ =?us-ascii?Q?n5raxVrmNtCYfUg1Whg7UQbxy19RdigcxO8cGWDHfa3j5m5ZYaYnCyX/HRij?=
+ =?us-ascii?Q?1/vGSqPZxen3CUwvvQeerz/hnI2Y7PuPOVc9qq7fOmBFhJyKYuxS2BIBjJHr?=
+ =?us-ascii?Q?BMCtkjMWEZWZiVCRz5iJ4qLvFQoHpJ9DgubbDuulpDVa8HSeVUmVjepKWQlt?=
+ =?us-ascii?Q?BLWhabaXF5qclS9lUk64sco6PLnocIKf7rpci2OJzAUnHZ5YQ3nw/g7/2x14?=
+ =?us-ascii?Q?NHiihqROE5rgcCCrUx9wSLZpQ4TSNrp/R6eXoUJorIfu4kcLz92wopAH9nU/?=
+ =?us-ascii?Q?N/QYqeOxXcimZyXmqkW+suwBVEvb83ZPoZtc2c1W?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca86a237-230e-421a-b9da-08db93236679
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 06:40:45.5379
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eJzl0W0H0VRWjkscyeZrUAGRpLVPIvcMFLTI401+UYRLMPA9FDS4tdyz3Kfu3+xa2O9XT3rQuVjpJ4NpdTRfNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8465
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -65,367 +173,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Add a vPMU implementation and gap document to explain vArch PMU and vLBR
-> implementation in kvm, especially the current gap to support host and
-> guest perf event coexist.
->
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
-> Changelog:
-> v1 -> v2:
-> * Refactor perf scheduler section
-> * Correct one sentence in vArch PMU section
-> ---
->   Documentation/virt/kvm/x86/index.rst |   1 +
->   Documentation/virt/kvm/x86/pmu.rst   | 325 +++++++++++++++++++++++++++
->   2 files changed, 326 insertions(+)
->   create mode 100644 Documentation/virt/kvm/x86/pmu.rst
->
-> diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
-> index 9ece6b8dc817..02c1c7b01bf3 100644
-> --- a/Documentation/virt/kvm/x86/index.rst
-> +++ b/Documentation/virt/kvm/x86/index.rst
-> @@ -14,5 +14,6 @@ KVM for x86 systems
->      mmu
->      msr
->      nested-vmx
-> +   pmu
->      running-nested-guests
->      timekeeping
-> diff --git a/Documentation/virt/kvm/x86/pmu.rst b/Documentation/virt/kvm/x86/pmu.rst
-> new file mode 100644
-> index 000000000000..1b83390bacbf
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/x86/pmu.rst
-> @@ -0,0 +1,325 @@
-> +﻿.. SPDX-License-Identifier: GPL-2.0
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Monday, July 24, 2023 7:13 PM
+>=20
 > +
-> +==========================
-> +PMU virtualization for X86
-> +==========================
-> +
-> +:Author: Xiong Zhang <xiong.y.zhang@intel.com>
-> +:Copyright: (c) 2023, Intel.  All rights reserved.
-> +
-> +.. Contents
-> +
-> +1. Overview
-> +2. Perf Scheduler Basic
-> +3. Arch PMU virtualization
-> +4. LBR virtualization
-> +
-> +1. Overview
-> +===========
-> +
-> +KVM has supported PMU virtualization on x86 for many years and provides
-> +MSR based Arch PMU interface to the guest. The major features include
-> +Arch PMU v2, LBR and PEBS. Users have the same operation to profile
-> +performance in guest and host.
-> +KVM is a normal perf subsystem user as other perf subsystem users. When
-> +the guest access vPMU MSRs, KVM traps it and creates a perf event for it.
-> +This perf event takes part in perf scheduler to request PMU resources
-> +and let the guest use these resources.
-> +
-> +This document describes the X86 PMU virtualization architecture design
-> +and opens. It is organized as follows: Next section describes more
-> +details of Linux perf scheduler as it takes a key role in vPMU
-> +implementation and allocates PMU resources for guest usage. Then Arch
-> +PMU virtualization and LBR virtualization are introduced, each feature
-> +has sections to introduce implementation overview,  the expectation and
-> +gaps when host and guest perf events coexist.
-> +
-> +2. Perf Scheduler Basic
-> +=======================
-> +
-> +Perf subsystem users can not get PMU counter or resource directly, user
-> +should create a perf event first and specify event’s attribute which is
-> +used to choose PMU counters, then perf event joins in perf scheduler,
-> +perf scheduler assigns the corresponding PMU counter to a perf event.
-> +
-> +Perf event is created by perf_event_open() system call:
-> +int syscall(SYS_perf_event_open, struct perf_event_attr *attr,
-> +	    pid_t pid, int cpu, int roup_fd, unsigned long flags)
-> +
-> +    struct perf_event_attr {
-> +	    ......
-> +	    /* Major type: hardware/software/tracepoint/etc. */
-> +	    __u32   type;
-> +	    /* Type specific configuration information. */
-> +	    __u64   config;
-> +	    union {
-> +		    __u64      sample_period;
-> +		    __u64      sample_freq;
-> +	    }
-> +	   __u64   disabled :1;
-> +	           pinned   :1;
-> +		   exclude_user  :1;
-> +		   exclude_kernel :1;
-> +		   exclude_host   :1;
-> +	           exclude_guest  :1;
-> +	    ......
-> +    }
-> +
-> +The pid and cpu arguments allow specifying which process and CPU
-> +to monitor:
-> +pid == 0 and cpu == -1
-> +        This measures the calling process/thread on any CPU.
-> +pid == 0 and cpu >= 0
-> +        This measures the calling process/thread only when running on
-> +	the specified cpu.
-> +pid > 0 and cpu == -1
-> +        This measures the specified process/thread on any cpu.
-> +pid > 0 and cpu >= 0
-> +        This  measures the specified process/thread only when running
-> +	on the specified CPU.
-> +pid == -1 and cpu >= 0
-> +        This measures all processes/threads on the specified CPU.
-> +pid == -1 and cpu == -1
-> +        This setting is invalid and will return an error.
-> +
-> +Perf scheduler's responsibility is choosing which events are active at
-> +one moment and binding counter with perf event. As processor has limited
-> +PMU counters and other resource, only limited perf events can be active
-> +at one moment, the inactive perf event may be active in the next moment,
-> +perf scheduler has defined rules to control these things.
-> +
-> +Perf scheduler defines four types of perf event, defined by the pid and
-> +cpu arguments in perf_event_open(), plus perf_event_attr.pinned, their
-> +schedule priority are: per_cpu pinned > per_process pinned
-> +> per_cpu flexible > per_process flexible. High priority events can
-> +preempt low priority events when resources contend.
-> +
-> +--------------------------------------------------------
-> +|                      |   pid   |   cpu   |   pinned  |
-> +--------------------------------------------------------
-> +| Per-cpu pinned       |   *    |   >= 0   |     1     |
-> +--------------------------------------------------------
-> +| Per-process pinned   |  >= 0  |    *     |     1     |
-> +--------------------------------------------------------
-> +| Per-cpu flexible     |   *    |   >= 0   |     0     |
-> +--------------------------------------------------------
-> +| Per-process flexible | >= 0   |    *     |     0     |
-> +--------------------------------------------------------
-> +
-> +    struct perf_event {
-> +	    struct list_head       event_entry;
-> +	    ......
-> +	    struct pmu             *pmu;
-> +	    enum perf_event_state  state;
-> +	    local64_t              count;
-> +	    u64                    total_time_enabled;
-> +	    u64                    total_time_running;
-> +	    struct perf_event_attr attr;
-> +	    ......
-> +    }
-> +
-> +For per-cpu perf event, it is linked into per cpu global variable
-> +perf_cpu_context, for per-process perf event, it is linked into
-> +task_struct->perf_event_context.
-> +
-> +Usually the following cases cause perf event reschedule:
-> +1) In a context switch from one task to a different task.
-> +2) When an event is manually enabled.
-> +3) A call to perf_event_open() with disabled field of the
-> +perf_event_attr argument set to 0.
-> +
-> +When perf_event_open() or perf_event_enable() is called, perf event
-> +reschedule is needed on a specific cpu, perf will send an IPI to the
-> +target cpu, and the IPI handler will activate events ordered by event
-> +type, and will iterate all the eligible events in per cpu gloable
-> +variable perf_cpu_context and current->perf_event_context.
-> +
-> +When a perf event is sched out, this event mapped counter is disabled,
-> +and the counter's setting and count value are saved. When a perf event
-> +is sched in, perf driver assigns a counter to this event, the counter's
-> +setting and count values are restored from last saved.
-> +
-> +If the event could not be scheduled because no resource is available for
-> +it, pinned event goes into error state and is excluded from perf
-> +scheduler, the only way to recover it is re-enable it, flexible event
-> +goes into inactive state and can be multiplexed with other events if
-> +needed.
-> +
-> +
-> +3. Arch PMU virtualization
-> +==========================
-> +
-> +3.1. Overview
-> +-------------
-> +
-> +Once KVM/QEMU expose vcpu's Arch PMU capability into guest, the guest
-> +PMU driver would access the Arch PMU MSRs (including Fixed and GP
-> +counter) as the host does. All the guest Arch PMU MSRs accessing are
-> +interceptable.
-> +
-> +When a guest virtual counter is enabled through guest MSR writing, the
-> +KVM trap will create a kvm perf event through the perf subsystem. The
-> +kvm perf event's attribute is gotten from the guest virtual counter's
-> +MSR setting.
-> +
-> +When a guest changes the virtual counter's setting later, the KVM trap
-> +will release the old kvm perf event then create a new kvm perf event
-> +with the new setting.
-> +
-> +When guest read the virtual counter's count number, the kvm trap will
-> +read kvm perf event's counter value and accumulate it to the previous
-> +counter value.
-> +
-> +When guest no longer access the virtual counter's MSR within a
-> +scheduling time slice and the virtual counter is disabled, KVM will
-> +release the kvm perf event.
-> +
-> +  ----------------------------
-> +  |  Guest                   |
-> +  |  perf subsystem          |
-> +  ----------------------------
-> +       |            ^
-> +  vMSR |            | vPMI
-> +       v            |
-> +  ----------------------------
-> +  |  vPMU        KVM vCPU    |
-> +  ----------------------------
-> +        |          ^
-> +  Call  |          | Callbacks
-> +        v          |
-> +  ---------------------------
-> +  | Host Linux Kernel       |
-> +  | perf subsystem          |
-> +  ---------------------------
-> +               |       ^
-> +           MSR |       | PMI
-> +               v       |
-> +         --------------------
-> +	 | PMU        CPU   |
-> +         --------------------
-> +
-> +Each guest virtual counter has a corresponding kvm perf event, and the
-> +kvm perf event joins host perf scheduler and complies with host perf
-> +scheduler rule. When kvm perf event is scheduled by host perf scheduler
-> +and is active, the guest virtual counter could supply the correct value.
-> +However, if another host perf event comes in and takes over the kvm perf
-> +event resource, the kvm perf event will be inactive, then the virtual
-> +counter keeps the saved value when the kvm perf event is preempted. But
-> +guest perf doesn't notice the underbeach virtual counter is stopped, so
-> +the final guest profiling data is wrong.
-> +
-> +3.2. Host and Guest perf event contention
-> +-----------------------------------------
-> +
-> +Kvm perf event is a per-process pinned event, its priority is second.
-> +When kvm perf event is active, it can be preempted by host per-cpu
-> +pinned perf event, or it can preempt host flexible perf events. Such
-> +preemption can be temporarily prohibited through disabling host IRQ.
-> +
-> +The following results are expected when host and guest perf event
-> +coexist according to perf scheduler rule:
-> +1). if host per cpu pinned events occupy all the HW resource, kvm perf
-> +event can not be active as no available resource, the virtual counter
-> +value is  zero always when the guest reads it.
-> +2). if host per cpu pinned event release HW resource, and kvm perf event
-> +is inactive, kvm perf event can claim the HW resource and switch into
-> +active, then the guest can get the correct value from the guest virtual
-> +counter during kvm perf event is active, but the guest total counter
-> +value is not correct since counter value is lost during kvm perf event
-> +is inactive.
-> +3). if kvm perf event is active, then host per cpu pinned perf event
-> +becomes active and reclaims kvm perf event resource, kvm perf event will
-> +be inactive. Finally the virtual counter value is kept unchanged and
-> +stores previous saved value when the guest reads it. So the guest total
-> +counter isn't correct.
-> +4). If host flexible perf events occupy all the HW resource, kvm perf
-> +event can be active and preempts host flexible perf event resource,
-> +the guest can get the correct value from the guest virtual counter.
-> +5). if kvm perf event is active, then other host flexible perf events
-> +request to active, kvm perf event still own the resource and active, so
-> +the guest can get the correct value from the guest virtual counter.
-> +
-> +3.3. vPMU Arch Gaps
-> +-------------------
-> +
-> +The coexist of host and guest perf events has gap:
-> +1). when guest accesses PMU MSRs at the first time, KVM will trap it and
-> +create kvm perf event, but this event may be inactive because the
+> +/**
+> + * struct iommu_hwpt_vtd_s1 - Intel VT-d specific user-managed stage-1
+> + *                            page table info (IOMMU_HWPT_TYPE_VTD_S1)
 
-inactive? It seems the event should enter error state base on previous 
-description?
+remove "specific user-managed"
 
-> +contention with host perf event. But guest doesn't notice this and when
-> +guest read virtual counter, the return value is zero.
-> +2). when kvm perf event is active, host per-cpu pinned perf event can
-> +reclaim kvm perf event resource at any time once resource contention
-> +happens. But guest doesn't notice this neither and guest following
-> +counter accesses get wrong data.
-> +So maillist had some discussion titled "Reconsider the current approach
-> +of vPMU".
-> +
-> +https://lore.kernel.org/lkml/810c3148-1791-de57-27c0-d1ac5ed35fb8@gmail.com/
-> +
-> +The major suggestion in this discussion is host pass-through some
-> +counters into guest, but this suggestion is not feasible, the reasons
-> +are:
-> +a. processor has several counters, but counters are not equal, some
-> +event must bind with a specific counter.
-> +b. if a special counter is passthrough into guest, host can not support
-> +such events and lose some capability.
-> +c. if a normal counter is passthrough into guest, guest can support
-> +general event only, and the guest has limited capability.
-> +So both host and guest lose capability in pass-through mode.
-> +
-> +4. LBR Virtualization
-> +=====================
-> +
-> +4.1. Overview
-> +-------------
-> +
-> +The guest LBR driver would access the LBR MSR (including IA32_DEBUGCTLMSR
-> +and records MSRs) as host does once KVM/QEMU export vcpu's LBR capability
-> +into guest,  The first guest access on LBR related MSRs is always
-> +interceptable. The KVM trap would create a vLBR perf event which enables
-> +the callstack mode and none of the hardware counters are assigned. The
-> +host perf would enable and schedule this event as usual.
-> +
-> +When vLBR event is scheduled by host perf scheduler and is active, host
-> +LBR MSRs are owned by guest and are pass-through into guest, guest will
-> +access them without VM Exit. However, if another host LBR event comes in
-> +and takes over the LBR facility, the vLBR event will be inactive, and
-> +the guest following access to the LBR MSRs will be trapped and
-> +meaningless.
-> +
-> +As kvm perf event, vLBR event will be released when guest doesn't access
-> +LBR-related MSRs within a scheduling time slice and guest unset LBR
-> +enable bit, then the pass-through state of the LBR MSRs will be canceled.
-> +
-> +4.2. Host and Guest LBR contention
-> +----------------------------------
-> +
-> +vLBR event is a per-process pinned event, its priority is second. vLBR
-> +event together with host other LBR event to contend LBR resource,
-> +according to perf scheduler rule, when vLBR event is active, it can be
-> +preempted by host per-cpu pinned LBR event, or it can preempt host
-> +flexible LBR event. Such preemption can be temporarily prohibited
-> +through disabling host IRQ as perf scheduler uses IPI to change LBR owner.
-> +
-> +The following results are expected when host and guest LBR event coexist:
-> +1) If host per cpu pinned LBR event is active when vm starts, the guest
-> +vLBR event can not preempt the LBR resource, so the guest can not use
-> +LBR.
-> +2). If host flexible LBR events are active when vm starts, guest vLBR
-> +event can preempt LBR, so the guest can use LBR.
-> +3). If host per cpu pinned LBR event becomes enabled when guest vLBR
-> +event is active, the guest vLBR event will lose LBR and the guest can
-> +not use LBR anymore.
-> +4). If host flexible LBR event becomes enabled when guest vLBR event is
-> +active, the guest vLBR event keeps LBR, the guest can still use LBR.
-> +5). If host per cpu pinned LBR event becomes inactive when guest vLBR
-> +event is inactive, guest vLBR event can be active and own LBR, the guest
-> +can use LBR.
-> +
-> +4.3. vLBR Arch Gaps
-> +-------------------
-> +
-> +Like vPMU Arch Gap, vLBR event can be preempted by host Per cpu pinned
-> +event at any time, or vLBR event is inactive at creation, but guest
-> +can not notice this, so the guest will get meaningless value when the
-> +vLBR event is inactive.
->
-> base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+> + * @flags: Combination of enum iommu_hwpt_vtd_s1_flags
+> + * @pgtbl_addr: The base address of the stage-1 page table.
+> + * @addr_width: The address width of the stage-1 page table
+> + * @__reserved: Must be 0
+> + *
+> + * VT-d specific data for creating a stage-1 page table that is used
+> + * in nested translation.
+
+this doesn't add more info. could be removed.
+
