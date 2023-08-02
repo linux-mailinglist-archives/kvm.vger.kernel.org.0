@@ -2,141 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF46576D1FE
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 17:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7706C76D218
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 17:34:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232678AbjHBPcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 11:32:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52520 "EHLO
+        id S235295AbjHBPek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 11:34:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235226AbjHBPb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 11:31:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8279A3AAB
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 08:30:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690990201;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Zpl8aOOTIJ9mlaQuYNUfJFxKv/U9O46R/LTmVpfLtOc=;
-        b=Tszg2KFjFWc6p2eCoQprY1kaXZ/lBQ4PR9IZivXTXA60Z0TGeLYsgvEaExBxC8aCY7JtMy
-        hDZsGVIee7yCXFDsjbWD/AzxM8FkH8/ERU06Iosh/BK4UUxwQRWIC8OGNRzwrUpfWZqXD+
-        E/KqGpfcdLrvVpGoz0Xv+2T/WZYItfw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-eOFSnERxO0qKC7Bmd9M5MQ-1; Wed, 02 Aug 2023 11:30:00 -0400
-X-MC-Unique: eOFSnERxO0qKC7Bmd9M5MQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3179f70a6bdso2221157f8f.3
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 08:29:59 -0700 (PDT)
+        with ESMTP id S235230AbjHBPeN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 11:34:13 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59152D4B
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 08:34:07 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d3c37e7f998so1305180276.1
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 08:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690990447; x=1691595247;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=47vDOuTOmJODDoHf0fxLE5q0pUVLmeIBs4RrnBhQarw=;
+        b=tushyJeIL89dg+jXepENaNyG+dF/l1MxwZcJBdG+7wxGxsLN9bduWzn02ddwxLqblm
+         BuSzzFSqQaQfpnmtfO3rwVhaF25VH9gazvQlpcBtMRgbI8ZOZL4bB7QCgbU91sCltTvD
+         JHehLkrbr7mJzCArjIQc45EmYzQQpcy+CHj+nYUge354nDpoA999/ayHvZVvUgPurpai
+         vR8ThVmfHX8T7xNDFUHWubq1LqI9vCDK7y4otiM0mly3s/djxhbU75kmF0UYRm+hJu0P
+         AMjc/R7LVqVnY3zs+scjfTIKGUD9oXJvhHigXV8vZQbCKL0Uauij2snxHYJNHm9bJ9T9
+         VjhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690990199; x=1691594999;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zpl8aOOTIJ9mlaQuYNUfJFxKv/U9O46R/LTmVpfLtOc=;
-        b=lhnhgQeYy4Z78hStjIjoQePk6QbaFCZh5lpRVmuCF3WvGxy2rT5PF94cbjMfJhfExz
-         83NdRDi2njX5DI2JVg6iRWM1Ywu5DrvSTmdkar+CFWk7e9FCJMVJqCx2i0CQknj4XYrc
-         TDdT93h6l9CahJbvpDe5bN3ggfzlzbhnQdPqw5sPH5Nrxgg89t0S10Nos0+EpQZFsMBt
-         hj2ItLUT7a9W2oPn/8rjFoOhQj3V/klA3hXbIAyfWa2smw+6B1yV0iJT9qpg4Wi5KhNA
-         Yz20QyEMZlm0J5C52IQsQDFEalGOA44KL6M30AQfFiFZcCD5b6S2Lqkufx+WvPfggfbe
-         JzaA==
-X-Gm-Message-State: ABy/qLY3p+rl0146kqhSBREcF8z7cA74a7axoSPrrxUPzg0pkqIBLZgF
-        dPkH19ZeAehjoiZRttJeEMT+GdxOa1lQwPk+3mRatn8Mo6v9VBSH/4OpSf96ALlY6q1RUhp92wL
-        It9ob7+nMSZIy
-X-Received: by 2002:adf:e68b:0:b0:314:824:3788 with SMTP id r11-20020adfe68b000000b0031408243788mr5186028wrm.27.1690990198976;
-        Wed, 02 Aug 2023 08:29:58 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGPZ/gSkVfcDR0DyBgF0AO8vuUoscywmniaGjeRDFdrJLQLEfW8GrNw+nUwMNbFo2XQBknSkA==
-X-Received: by 2002:adf:e68b:0:b0:314:824:3788 with SMTP id r11-20020adfe68b000000b0031408243788mr5186009wrm.27.1690990198551;
-        Wed, 02 Aug 2023 08:29:58 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70b:e00:b8a4:8613:1529:1caf? (p200300cbc70b0e00b8a4861315291caf.dip0.t-ipconnect.de. [2003:cb:c70b:e00:b8a4:8613:1529:1caf])
-        by smtp.gmail.com with ESMTPSA id o20-20020a5d58d4000000b0031762e89f94sm19173032wrf.117.2023.08.02.08.29.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Aug 2023 08:29:58 -0700 (PDT)
-Message-ID: <cc408a90-9044-54cd-04a5-5977ffe8b24b@redhat.com>
-Date:   Wed, 2 Aug 2023 17:29:56 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 3/8] kvm: explicitly set FOLL_HONOR_NUMA_FAULT in
- hva_to_pfn_slow()
-Content-Language: en-US
-To:     Mel Gorman <mgorman@techsingularity.net>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        liubo <liubo254@huawei.com>, Peter Xu <peterx@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230801124844.278698-1-david@redhat.com>
- <20230801124844.278698-4-david@redhat.com>
- <20230802152702.wamtroy3zm7nbtvs@techsingularity.net>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20230802152702.wamtroy3zm7nbtvs@techsingularity.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1690990447; x=1691595247;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=47vDOuTOmJODDoHf0fxLE5q0pUVLmeIBs4RrnBhQarw=;
+        b=bBXO5L18UUws1SPdP/hMajKhQxcUjWfPhliD9QTOnKidPdq6NMPa8A+T24X8Z4Pvp3
+         KwIRrv06X0rniydF7hMiGiA1/NxlmJbqik4E5WCr6TfHxH78/dyF2gYYLTZ0N4KQUy5e
+         1+AllksrsQidBqMCvQTL/JA/1ppDNMV9+M85HEtYfzMwpD6AtFaK+dHfBykr6sRzeSVS
+         /+d/87ddh2ik6fy09RbiVGtTC1iNvavOfncGuX1nVQg2YTVanfumFc1fpCm/ClY7I7xJ
+         EE9PX6OAcK9r9U+OIGUNj0r55o2p0TXcJ3yuoD8okaeu+GLVReh+bFj1XkCgATcmOTSn
+         GeqQ==
+X-Gm-Message-State: ABy/qLbaBdHcvTtcDNmeyji0zkmklb9sYJW0j6nslB1NETXcuuVQCAn5
+        6C58VBfcu5VE9iYvYu4T3cz/cgdjTkc=
+X-Google-Smtp-Source: APBJJlGG2HpboFgUMWcWAi0VABvoT+IpvDRegZykcMjH6q8E+EQTsUL6kjM/4fH8ZCoLEe2Ia2QBdt+C3P8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:11cb:b0:d16:7ccc:b406 with SMTP id
+ n11-20020a05690211cb00b00d167cccb406mr193848ybu.5.1690990447020; Wed, 02 Aug
+ 2023 08:34:07 -0700 (PDT)
+Date:   Wed, 2 Aug 2023 08:34:05 -0700
+In-Reply-To: <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+Mime-Version: 1.0
+References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com>
+ <ZLrCUkwot/yiVC8T@google.com> <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
+ <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+Message-ID: <ZMp3bR2YkK2QGIFH@google.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+From:   Sean Christopherson <seanjc@google.com>
+To:     Amaan Cheval <amaan.cheval@gmail.com>
+Cc:     brak@gameservers.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.08.23 17:27, Mel Gorman wrote:
-> On Tue, Aug 01, 2023 at 02:48:39PM +0200, David Hildenbrand wrote:
->> KVM is *the* case we know that really wants to honor NUMA hinting falls.
->> As we want to stop setting FOLL_HONOR_NUMA_FAULT implicitly, set
->> FOLL_HONOR_NUMA_FAULT whenever we might obtain pages on behalf of a VCPU
->> to map them into a secondary MMU, and add a comment why.
->>
->> Do that unconditionally in hva_to_pfn_slow() when calling
->> get_user_pages_unlocked().
->>
->> kvmppc_book3s_instantiate_page(), hva_to_pfn_fast() and
->> gfn_to_page_many_atomic() are similarly used to map pages into a
->> secondary MMU. However, FOLL_WRITE and get_user_page_fast_only() always
->> implicitly honor NUMA hinting faults -- as documented for
->> FOLL_HONOR_NUMA_FAULT -- so we can limit this change to a single location
->> for now.
->>
->> Don't set it in check_user_page_hwpoison(), where we really only want to
->> check if the mapped page is HW-poisoned.
->>
->> We won't set it for other KVM users of get_user_pages()/pin_user_pages()
->> * arch/powerpc/kvm/book3s_64_mmu_hv.c: not used to map pages into a
->>    secondary MMU.
->> * arch/powerpc/kvm/e500_mmu.c: only used on shared TLB pages with userspace
->> * arch/s390/kvm/*: s390x only supports a single NUMA node either way
->> * arch/x86/kvm/svm/sev.c: not used to map pages into a secondary MMU.
->>
->> This is a preparation for making FOLL_HONOR_NUMA_FAULT no longer
->> implicitly be set by get_user_pages() and friends.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Wed, Aug 02, 2023, Amaan Cheval wrote:
+> > Yeesh.  There is a ridiculous amount of potentially problematic activity.  KSM is
+> > active in that trace, it looks like NUMA balancing might be in play,
 > 
-> Seems sane but I don't know KVM well enough to know if this is the only
-> relevant case so didn't ack.
+> Sorry about the delayed response - it seems like the majority of locked up guest
+> VMs stop throwing repeated EPT_VIOLATIONs as soon as we turn `numa_balancing`
+> off.
 
-Makes sense, some careful eyes from KVM people would be appreciated.
+LOL, NUMA autobalancing.  I have a longstanding hatred of that feature.  I'm sure
+there are setups where it adds value, but from my perspective it's nothing but
+pain and misery.
 
-At least from kvm_main.c POV, I'm pretty confident that that's it.
+> They still remain locked up, but that might be because the original cause of the
+> looping EPT_VIOLATIONs corrupted/crashed them in an unrecoverable way (are there
+> any ways you can think of that that might happen)?
 
--- 
-Cheers,
+Define "remain locked up".  If the vCPUs are actively running in the guest and
+making forward progress, i.e. not looping on VM-Exits on a single RIP, then they
+aren't stuck from KVM's perspective.
 
-David / dhildenb
-
+But that doesn't mean the guest didn't take punitive action when a vCPU was
+effectively stalled indefinitely by KVM, e.g. from the guest's perspective the
+stuck vCPU will likely manifest as a soft lockup, and that could lead to a panic()
+if the guest is a Linux kernel running with softlockup_panic=1.
