@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D45C76DBB9
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B596F76DBBA
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 01:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232654AbjHBXnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 19:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
+        id S232853AbjHBXnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 19:43:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232163AbjHBXnS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 19:43:18 -0400
-Received: from out-83.mta1.migadu.com (out-83.mta1.migadu.com [95.215.58.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E4430CF
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:43:17 -0700 (PDT)
+        with ESMTP id S232108AbjHBXnU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 19:43:20 -0400
+Received: from out-77.mta1.migadu.com (out-77.mta1.migadu.com [95.215.58.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2141BF1
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 16:43:19 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1691019795;
+        t=1691019797;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9ep7omgEDp84//Mtf9U1LKts+nIskxE/RsUlqUe8Znc=;
-        b=eRqgNr40GUXqEt+b7Hxa4+v0r71zv9AW5HFrRoKHLXcwHY0PfYQ/rmQgQobfY1Z6BCCaWn
-        4BVGyOLVpgZPkP9ZhtBQXr+vKajABsPEGky/Q39X6a3v6wsK5I+DP/8YrXzr7f7kI2Hp25
-        L6PCxLICFjPxCX+SjYqi968AFv7wqYE=
+        bh=ev3SDPunXCWTJ1ggdNe8DIBa+5NRmW648ATtklgt00s=;
+        b=Ltqa8JWbMUVOjaT8qW3VzXAOkI2/kjx1ZSnOT33u5pU/ahtkHKayj3UndqwmYJ4LiyaPMl
+        llSjjE6oYf4kDPCOxv1+2HVdCDnaOhCS9BiUS2FmaTfaP/piK+jydhUJZe+nS1trsUoXVw
+        uZgaCgt3XPjKeIaqpK13rS4ouvx1hwM=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     kvmarm@lists.linux.dev
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -35,9 +35,9 @@ Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Salil Mehta <salil.mehta@huawei.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH kvmtool v3 02/17] aarch64: Copy cputype.h from Linux 6.5-rc1
-Date:   Wed,  2 Aug 2023 23:42:40 +0000
-Message-ID: <20230802234255.466782-3-oliver.upton@linux.dev>
+Subject: [PATCH kvmtool v3 03/17] Update psci.h to Linux 6.5-rc1
+Date:   Wed,  2 Aug 2023 23:42:41 +0000
+Message-ID: <20230802234255.466782-4-oliver.upton@linux.dev>
 In-Reply-To: <20230802234255.466782-1-oliver.upton@linux.dev>
 References: <20230802234255.466782-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -53,207 +53,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-cputype.h has some helpful definitions for working with mpidrs and
-affinity masks.
+In order to do PSCI emulation in kvmtool, we're going to need to pull in
+a few more definitions.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arm/aarch64/include/asm/cputype.h | 186 ++++++++++++++++++++++++++++++
- 1 file changed, 186 insertions(+)
- create mode 100644 arm/aarch64/include/asm/cputype.h
+ include/linux/psci.h | 47 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/arm/aarch64/include/asm/cputype.h b/arm/aarch64/include/asm/cputype.h
-new file mode 100644
-index 000000000000..698665ab41ae
---- /dev/null
-+++ b/arm/aarch64/include/asm/cputype.h
-@@ -0,0 +1,186 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2012 ARM Ltd.
-+ */
-+#ifndef __ASM_CPUTYPE_H
-+#define __ASM_CPUTYPE_H
+diff --git a/include/linux/psci.h b/include/linux/psci.h
+index 310d83e0a91b..42a40ad3fb62 100644
+--- a/include/linux/psci.h
++++ b/include/linux/psci.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ /*
+  * ARM Power State and Coordination Interface (PSCI) header
+  *
+@@ -46,6 +47,28 @@
+ #define PSCI_0_2_FN64_MIGRATE			PSCI_0_2_FN64(5)
+ #define PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU	PSCI_0_2_FN64(7)
+ 
++#define PSCI_1_0_FN_PSCI_FEATURES		PSCI_0_2_FN(10)
++#define PSCI_1_0_FN_CPU_FREEZE			PSCI_0_2_FN(11)
++#define PSCI_1_0_FN_CPU_DEFAULT_SUSPEND		PSCI_0_2_FN(12)
++#define PSCI_1_0_FN_NODE_HW_STATE		PSCI_0_2_FN(13)
++#define PSCI_1_0_FN_SYSTEM_SUSPEND		PSCI_0_2_FN(14)
++#define PSCI_1_0_FN_SET_SUSPEND_MODE		PSCI_0_2_FN(15)
++#define PSCI_1_0_FN_STAT_RESIDENCY		PSCI_0_2_FN(16)
++#define PSCI_1_0_FN_STAT_COUNT			PSCI_0_2_FN(17)
 +
-+#define INVALID_HWID		ULONG_MAX
++#define PSCI_1_1_FN_SYSTEM_RESET2		PSCI_0_2_FN(18)
++#define PSCI_1_1_FN_MEM_PROTECT			PSCI_0_2_FN(19)
++#define PSCI_1_1_FN_MEM_PROTECT_CHECK_RANGE	PSCI_0_2_FN(20)
 +
-+#define MPIDR_UP_BITMASK	(0x1 << 30)
-+#define MPIDR_MT_BITMASK	(0x1 << 24)
-+#define MPIDR_HWID_BITMASK	UL(0xff00ffffff)
++#define PSCI_1_0_FN64_CPU_DEFAULT_SUSPEND	PSCI_0_2_FN64(12)
++#define PSCI_1_0_FN64_NODE_HW_STATE		PSCI_0_2_FN64(13)
++#define PSCI_1_0_FN64_SYSTEM_SUSPEND		PSCI_0_2_FN64(14)
++#define PSCI_1_0_FN64_STAT_RESIDENCY		PSCI_0_2_FN64(16)
++#define PSCI_1_0_FN64_STAT_COUNT		PSCI_0_2_FN64(17)
 +
-+#define MPIDR_LEVEL_BITS_SHIFT	3
-+#define MPIDR_LEVEL_BITS	(1 << MPIDR_LEVEL_BITS_SHIFT)
-+#define MPIDR_LEVEL_MASK	((1 << MPIDR_LEVEL_BITS) - 1)
++#define PSCI_1_1_FN64_SYSTEM_RESET2		PSCI_0_2_FN64(18)
++#define PSCI_1_1_FN64_MEM_PROTECT_CHECK_RANGE	PSCI_0_2_FN64(20)
 +
-+#define MPIDR_LEVEL_SHIFT(level) \
-+	(((1 << level) >> 1) << MPIDR_LEVEL_BITS_SHIFT)
+ /* PSCI v0.2 power state encoding for CPU_SUSPEND function */
+ #define PSCI_0_2_POWER_STATE_ID_MASK		0xffff
+ #define PSCI_0_2_POWER_STATE_ID_SHIFT		0
+@@ -56,6 +79,13 @@
+ #define PSCI_0_2_POWER_STATE_AFFL_MASK		\
+ 				(0x3 << PSCI_0_2_POWER_STATE_AFFL_SHIFT)
+ 
++/* PSCI extended power state encoding for CPU_SUSPEND function */
++#define PSCI_1_0_EXT_POWER_STATE_ID_MASK	0xfffffff
++#define PSCI_1_0_EXT_POWER_STATE_ID_SHIFT	0
++#define PSCI_1_0_EXT_POWER_STATE_TYPE_SHIFT	30
++#define PSCI_1_0_EXT_POWER_STATE_TYPE_MASK	\
++				(0x1 << PSCI_1_0_EXT_POWER_STATE_TYPE_SHIFT)
 +
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
+ /* PSCI v0.2 affinity level state returned by AFFINITY_INFO */
+ #define PSCI_0_2_AFFINITY_LEVEL_ON		0
+ #define PSCI_0_2_AFFINITY_LEVEL_OFF		1
+@@ -66,6 +96,10 @@
+ #define PSCI_0_2_TOS_UP_NO_MIGRATE		1
+ #define PSCI_0_2_TOS_MP				2
+ 
++/* PSCI v1.1 reset type encoding for SYSTEM_RESET2 */
++#define PSCI_1_1_RESET_TYPE_SYSTEM_WARM_RESET	0
++#define PSCI_1_1_RESET_TYPE_VENDOR_START	0x80000000U
 +
-+#define MIDR_REVISION_MASK	0xf
-+#define MIDR_REVISION(midr)	((midr) & MIDR_REVISION_MASK)
-+#define MIDR_PARTNUM_SHIFT	4
-+#define MIDR_PARTNUM_MASK	(0xfff << MIDR_PARTNUM_SHIFT)
-+#define MIDR_PARTNUM(midr)	\
-+	(((midr) & MIDR_PARTNUM_MASK) >> MIDR_PARTNUM_SHIFT)
-+#define MIDR_ARCHITECTURE_SHIFT	16
-+#define MIDR_ARCHITECTURE_MASK	(0xf << MIDR_ARCHITECTURE_SHIFT)
-+#define MIDR_ARCHITECTURE(midr)	\
-+	(((midr) & MIDR_ARCHITECTURE_MASK) >> MIDR_ARCHITECTURE_SHIFT)
-+#define MIDR_VARIANT_SHIFT	20
-+#define MIDR_VARIANT_MASK	(0xf << MIDR_VARIANT_SHIFT)
-+#define MIDR_VARIANT(midr)	\
-+	(((midr) & MIDR_VARIANT_MASK) >> MIDR_VARIANT_SHIFT)
-+#define MIDR_IMPLEMENTOR_SHIFT	24
-+#define MIDR_IMPLEMENTOR_MASK	(0xffU << MIDR_IMPLEMENTOR_SHIFT)
-+#define MIDR_IMPLEMENTOR(midr)	\
-+	(((midr) & MIDR_IMPLEMENTOR_MASK) >> MIDR_IMPLEMENTOR_SHIFT)
+ /* PSCI version decoding (independent of PSCI version) */
+ #define PSCI_VERSION_MAJOR_SHIFT		16
+ #define PSCI_VERSION_MINOR_MASK			\
+@@ -75,6 +109,18 @@
+ 		(((ver) & PSCI_VERSION_MAJOR_MASK) >> PSCI_VERSION_MAJOR_SHIFT)
+ #define PSCI_VERSION_MINOR(ver)			\
+ 		((ver) & PSCI_VERSION_MINOR_MASK)
++#define PSCI_VERSION(maj, min)						\
++	((((maj) << PSCI_VERSION_MAJOR_SHIFT) & PSCI_VERSION_MAJOR_MASK) | \
++	 ((min) & PSCI_VERSION_MINOR_MASK))
 +
-+#define MIDR_CPU_MODEL(imp, partnum) \
-+	((_AT(u32, imp)		<< MIDR_IMPLEMENTOR_SHIFT) | \
-+	(0xf			<< MIDR_ARCHITECTURE_SHIFT) | \
-+	((partnum)		<< MIDR_PARTNUM_SHIFT))
++/* PSCI features decoding (>=1.0) */
++#define PSCI_1_0_FEATURES_CPU_SUSPEND_PF_SHIFT	1
++#define PSCI_1_0_FEATURES_CPU_SUSPEND_PF_MASK	\
++			(0x1 << PSCI_1_0_FEATURES_CPU_SUSPEND_PF_SHIFT)
 +
-+#define MIDR_CPU_VAR_REV(var, rev) \
-+	(((var)	<< MIDR_VARIANT_SHIFT) | (rev))
-+
-+#define MIDR_CPU_MODEL_MASK (MIDR_IMPLEMENTOR_MASK | MIDR_PARTNUM_MASK | \
-+			     MIDR_ARCHITECTURE_MASK)
-+
-+#define ARM_CPU_IMP_ARM			0x41
-+#define ARM_CPU_IMP_APM			0x50
-+#define ARM_CPU_IMP_CAVIUM		0x43
-+#define ARM_CPU_IMP_BRCM		0x42
-+#define ARM_CPU_IMP_QCOM		0x51
-+#define ARM_CPU_IMP_NVIDIA		0x4E
-+#define ARM_CPU_IMP_FUJITSU		0x46
-+#define ARM_CPU_IMP_HISI		0x48
-+#define ARM_CPU_IMP_APPLE		0x61
-+#define ARM_CPU_IMP_AMPERE		0xC0
-+
-+#define ARM_CPU_PART_AEM_V8		0xD0F
-+#define ARM_CPU_PART_FOUNDATION		0xD00
-+#define ARM_CPU_PART_CORTEX_A57		0xD07
-+#define ARM_CPU_PART_CORTEX_A72		0xD08
-+#define ARM_CPU_PART_CORTEX_A53		0xD03
-+#define ARM_CPU_PART_CORTEX_A73		0xD09
-+#define ARM_CPU_PART_CORTEX_A75		0xD0A
-+#define ARM_CPU_PART_CORTEX_A35		0xD04
-+#define ARM_CPU_PART_CORTEX_A55		0xD05
-+#define ARM_CPU_PART_CORTEX_A76		0xD0B
-+#define ARM_CPU_PART_NEOVERSE_N1	0xD0C
-+#define ARM_CPU_PART_CORTEX_A77		0xD0D
-+#define ARM_CPU_PART_NEOVERSE_V1	0xD40
-+#define ARM_CPU_PART_CORTEX_A78		0xD41
-+#define ARM_CPU_PART_CORTEX_A78AE	0xD42
-+#define ARM_CPU_PART_CORTEX_X1		0xD44
-+#define ARM_CPU_PART_CORTEX_A510	0xD46
-+#define ARM_CPU_PART_CORTEX_A710	0xD47
-+#define ARM_CPU_PART_CORTEX_A715	0xD4D
-+#define ARM_CPU_PART_CORTEX_X2		0xD48
-+#define ARM_CPU_PART_NEOVERSE_N2	0xD49
-+#define ARM_CPU_PART_CORTEX_A78C	0xD4B
-+
-+#define APM_CPU_PART_POTENZA		0x000
-+
-+#define CAVIUM_CPU_PART_THUNDERX	0x0A1
-+#define CAVIUM_CPU_PART_THUNDERX_81XX	0x0A2
-+#define CAVIUM_CPU_PART_THUNDERX_83XX	0x0A3
-+#define CAVIUM_CPU_PART_THUNDERX2	0x0AF
-+/* OcteonTx2 series */
-+#define CAVIUM_CPU_PART_OCTX2_98XX	0x0B1
-+#define CAVIUM_CPU_PART_OCTX2_96XX	0x0B2
-+#define CAVIUM_CPU_PART_OCTX2_95XX	0x0B3
-+#define CAVIUM_CPU_PART_OCTX2_95XXN	0x0B4
-+#define CAVIUM_CPU_PART_OCTX2_95XXMM	0x0B5
-+#define CAVIUM_CPU_PART_OCTX2_95XXO	0x0B6
-+
-+#define BRCM_CPU_PART_BRAHMA_B53	0x100
-+#define BRCM_CPU_PART_VULCAN		0x516
-+
-+#define QCOM_CPU_PART_FALKOR_V1		0x800
-+#define QCOM_CPU_PART_FALKOR		0xC00
-+#define QCOM_CPU_PART_KRYO		0x200
-+#define QCOM_CPU_PART_KRYO_2XX_GOLD	0x800
-+#define QCOM_CPU_PART_KRYO_2XX_SILVER	0x801
-+#define QCOM_CPU_PART_KRYO_3XX_SILVER	0x803
-+#define QCOM_CPU_PART_KRYO_4XX_GOLD	0x804
-+#define QCOM_CPU_PART_KRYO_4XX_SILVER	0x805
-+
-+#define NVIDIA_CPU_PART_DENVER		0x003
-+#define NVIDIA_CPU_PART_CARMEL		0x004
-+
-+#define FUJITSU_CPU_PART_A64FX		0x001
-+
-+#define HISI_CPU_PART_TSV110		0xD01
-+
-+#define APPLE_CPU_PART_M1_ICESTORM	0x022
-+#define APPLE_CPU_PART_M1_FIRESTORM	0x023
-+#define APPLE_CPU_PART_M1_ICESTORM_PRO	0x024
-+#define APPLE_CPU_PART_M1_FIRESTORM_PRO	0x025
-+#define APPLE_CPU_PART_M1_ICESTORM_MAX	0x028
-+#define APPLE_CPU_PART_M1_FIRESTORM_MAX	0x029
-+#define APPLE_CPU_PART_M2_BLIZZARD	0x032
-+#define APPLE_CPU_PART_M2_AVALANCHE	0x033
-+
-+#define AMPERE_CPU_PART_AMPERE1		0xAC3
-+
-+#define MIDR_CORTEX_A53 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A53)
-+#define MIDR_CORTEX_A57 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A57)
-+#define MIDR_CORTEX_A72 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A72)
-+#define MIDR_CORTEX_A73 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A73)
-+#define MIDR_CORTEX_A75 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A75)
-+#define MIDR_CORTEX_A35 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A35)
-+#define MIDR_CORTEX_A55 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A55)
-+#define MIDR_CORTEX_A76	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A76)
-+#define MIDR_NEOVERSE_N1 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N1)
-+#define MIDR_CORTEX_A77	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A77)
-+#define MIDR_NEOVERSE_V1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_V1)
-+#define MIDR_CORTEX_A78	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78)
-+#define MIDR_CORTEX_A78AE	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78AE)
-+#define MIDR_CORTEX_X1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X1)
-+#define MIDR_CORTEX_A510 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A510)
-+#define MIDR_CORTEX_A710 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A710)
-+#define MIDR_CORTEX_A715 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A715)
-+#define MIDR_CORTEX_X2 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X2)
-+#define MIDR_NEOVERSE_N2 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N2)
-+#define MIDR_CORTEX_A78C	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78C)
-+#define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
-+#define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
-+#define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
-+#define MIDR_OCTX2_98XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_98XX)
-+#define MIDR_OCTX2_96XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_96XX)
-+#define MIDR_OCTX2_95XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XX)
-+#define MIDR_OCTX2_95XXN MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXN)
-+#define MIDR_OCTX2_95XXMM MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXMM)
-+#define MIDR_OCTX2_95XXO MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_OCTX2_95XXO)
-+#define MIDR_CAVIUM_THUNDERX2 MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX2)
-+#define MIDR_BRAHMA_B53 MIDR_CPU_MODEL(ARM_CPU_IMP_BRCM, BRCM_CPU_PART_BRAHMA_B53)
-+#define MIDR_BRCM_VULCAN MIDR_CPU_MODEL(ARM_CPU_IMP_BRCM, BRCM_CPU_PART_VULCAN)
-+#define MIDR_QCOM_FALKOR_V1 MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR_V1)
-+#define MIDR_QCOM_FALKOR MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_FALKOR)
-+#define MIDR_QCOM_KRYO MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO)
-+#define MIDR_QCOM_KRYO_2XX_GOLD MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_2XX_GOLD)
-+#define MIDR_QCOM_KRYO_2XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_2XX_SILVER)
-+#define MIDR_QCOM_KRYO_3XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_3XX_SILVER)
-+#define MIDR_QCOM_KRYO_4XX_GOLD MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_4XX_GOLD)
-+#define MIDR_QCOM_KRYO_4XX_SILVER MIDR_CPU_MODEL(ARM_CPU_IMP_QCOM, QCOM_CPU_PART_KRYO_4XX_SILVER)
-+#define MIDR_NVIDIA_DENVER MIDR_CPU_MODEL(ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_DENVER)
-+#define MIDR_NVIDIA_CARMEL MIDR_CPU_MODEL(ARM_CPU_IMP_NVIDIA, NVIDIA_CPU_PART_CARMEL)
-+#define MIDR_FUJITSU_A64FX MIDR_CPU_MODEL(ARM_CPU_IMP_FUJITSU, FUJITSU_CPU_PART_A64FX)
-+#define MIDR_HISI_TSV110 MIDR_CPU_MODEL(ARM_CPU_IMP_HISI, HISI_CPU_PART_TSV110)
-+#define MIDR_APPLE_M1_ICESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM)
-+#define MIDR_APPLE_M1_FIRESTORM MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM)
-+#define MIDR_APPLE_M1_ICESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_PRO)
-+#define MIDR_APPLE_M1_FIRESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_PRO)
-+#define MIDR_APPLE_M1_ICESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_MAX)
-+#define MIDR_APPLE_M1_FIRESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX)
-+#define MIDR_APPLE_M2_BLIZZARD MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD)
-+#define MIDR_APPLE_M2_AVALANCHE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE)
-+#define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
-+
-+#endif
++#define PSCI_1_0_OS_INITIATED			BIT(0)
++#define PSCI_1_0_SUSPEND_MODE_PC		0
++#define PSCI_1_0_SUSPEND_MODE_OSI		1
+ 
+ /* PSCI return values (inclusive of all PSCI versions) */
+ #define PSCI_RET_SUCCESS			0
+@@ -86,5 +132,6 @@
+ #define PSCI_RET_INTERNAL_FAILURE		-6
+ #define PSCI_RET_NOT_PRESENT			-7
+ #define PSCI_RET_DISABLED			-8
++#define PSCI_RET_INVALID_ADDRESS		-9
+ 
+ #endif /* _UAPI_LINUX_PSCI_H */
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
