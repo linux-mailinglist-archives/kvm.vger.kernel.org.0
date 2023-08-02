@@ -2,112 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2C276C73B
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 09:43:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7F2376C73F
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 09:43:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231909AbjHBHnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 03:43:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44890 "EHLO
+        id S233291AbjHBHno (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 03:43:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233316AbjHBHmd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 03:42:33 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F651EA
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 00:40:32 -0700 (PDT)
+        with ESMTP id S233721AbjHBHnI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 03:43:08 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9469949E0;
+        Wed,  2 Aug 2023 00:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690962032; x=1722498032;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GwPiwjg0i2K9L8XD5Q2aQMXQ75PL3dJWZdYCk5VsBtM=;
-  b=HDGq3wWZhX1niSxdGJ72jV3FKa7sGS+jbV0UkOyd/M8//6wDydUL4orp
-   aKqOvlmkAng0A62s0Uu916X5ta0iXYUF/bowv2Yr1vJzDBt9Q5pcxpuPF
-   pPdlp8UQr8hfNDOPAf5+KbjooVMB5T3/k70Ka4UGx68/2C3TVHHx1Q1lG
-   15EQeqp9fn5sAIZIrC/bK7OACCVQU4nNJ5KMcqHXzGwn0wMFIQq3nX4fx
-   UCEMR8kwFUqhfvSdAlTyTT6TQP4K0v4rHRydc+68Ta44TGUlNqdsVOeGI
-   fObSffy0VxImMpCXYsbRVCN0E3ngA8fL02W8Tt5/JSJvy8gvmli7Itxkt
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="368405930"
+  t=1690962074; x=1722498074;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=61qqszoerukUUD2N9E/nHWZH6DjfxDTSCR6GyZSjXIM=;
+  b=TRWkSfEdt8BUR5oDuKkVdtAJlpIPQIFipb33YZhI76L36v1y7Zm0iC/J
+   k6Y6P/DL9uF5DKCwJWSr9HblGatVqNLbravnHwFt3ItwJFQQ2hLXQlNjO
+   gcFf/rz/lVaF/walrjbpoHgHqucwx9//6lJkOeZhFDrOGYIIsCrDJfBuO
+   MbR771UrBWhP7FBHDqOQHOLQB1Ra3YGK5A/qItd3kxfXzuPS4xrkhKlsy
+   8a7wbuLrlMzpcGiPqA5Cd4nCNKEPfIdF7UokBkSG4hHAX4a1BDe2R9E2Q
+   lkm+qGKa0jKJ0vUexM6t57JeyRl7D1222f9Q5TZSqZaDJ5bfM99QVydWI
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="400452619"
 X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
-   d="scan'208";a="368405930"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 00:40:31 -0700
+   d="scan'208";a="400452619"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 00:41:14 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="872363597"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 00:40:32 -0700
-Message-ID: <7653b2aa-14f7-b1a2-f0fc-cd3b3c012e8d@intel.com>
-Date:   Wed, 2 Aug 2023 15:40:27 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Subject: Re: [PATCH] KVM: x86: Advertise AMX-COMPLEX CPUID to userspace
+X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="852784125"
+X-IronPort-AV: E=Sophos;i="6.01,248,1684825200"; 
+   d="scan'208";a="852784125"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga004.jf.intel.com with ESMTP; 02 Aug 2023 00:41:13 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 2 Aug 2023 00:41:13 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 2 Aug 2023 00:41:13 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.46) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 2 Aug 2023 00:41:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=deW20q8ISyCiYX+rkuRPNiOe+JFQ3gRPDPIL1u3D7goBPnUISWrx80IJQohMU2OfwFHzec8Wcj6XLilmPdSzVqx/wuITRTh0nFpd2tZf4u45v4jbKAVgw8Zqq9nzwj//YUi3wE2ZlEPqm+q6I28zvhgR5IF4d0zl3cnPglNyaGGb9lxpIlFBVmpZBYy7iZsxGMhPcIBKOTMf4EoLAI8LcPfbBJfbjnWf6G8YfSK3Zx0vMOo57/k9fUTueF3+eecTMQ+QKVICAnXtRm4wpenRmSDDw8NyNPpsuJqlyN7NwkYe4dJ6Y2UxWMccokzyB1mXCrwpI5R/aeJFARAyPoGKiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sJxeVh+Gq4slBgBeKSOzxjrag+YaWUtjTnsj+sPAWK4=;
+ b=nQm55Pj80fCbQRe2aL4BiiFmIlGqS0FmJFeBW482XOmYnehIZHGCAv9Ltei74ee3iSUf9x/E6Pyo23XNKVhyDq0Ezt9uDc0ZK1vtjihlzS7dO4rjiwJTXpNmbAKw2JZPQu1aK+4f5VcYqDFwAN296/zbx6sC/+1p6cylkzP4jVhrrjWKH4vZVnSGIYXGzT4w4+azNwXjkbnRKwBF3MBZBNgRENEAdEtFgoStNGx84j/CASswnP6tcZQqZqF01S5vU4tiMg+yxUEBIq5CJra2SAJv0aTUj51U/fEY1WlAo2irqqsQjowQzy83y9RtJ9f+WMMq9GAI85fotJvoAErLdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CH3PR11MB8433.namprd11.prod.outlook.com (2603:10b6:610:168::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.45; Wed, 2 Aug
+ 2023 07:41:11 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::dcf3:7bac:d274:7bed]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::dcf3:7bac:d274:7bed%4]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 07:41:05 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: RE: [PATCH v4 07/12] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Thread-Topic: [PATCH v4 07/12] iommufd: Add data structure for Intel VT-d
+ stage-1 cache invalidation
+Thread-Index: AQHZvh/vvq7opaI5PkGCKntULu5FEK/WqARw
+Date:   Wed, 2 Aug 2023 07:41:05 +0000
+Message-ID: <BN9PR11MB52763681308D7950A51E18438C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-8-yi.l.liu@intel.com>
+In-Reply-To: <20230724111335.107427-8-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com
-References: <20230802022954.193843-1-tao1.su@linux.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20230802022954.193843-1-tao1.su@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH3PR11MB8433:EE_
+x-ms-office365-filtering-correlation-id: 6281059e-c681-4991-367a-08db932bd424
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: jYZiplBCfY6AER730fy7SMkPMbQe325YnXhCw2+cJV/2UFEaogvsJyOhazEaWeV0FJEue0jFkF9iGSSClT6DQkWW/GmDfFwTaHweip/8CubHvXq9vg4R2eZ2dpLqZQdR5h+AQckr7VY702I0yXFufF68l5XWBNDhKhdzOsDJhg4vtXOr+ekgLipEVInjGMJggWignp7hWvJQlj+f0za+cU1EGqvF1EnrytyAeT+BNe4rChO5HEmK/XadqlPX+QGsjeC0BuLWxSJst3Ova552akYyu1PWnhptozPcEbT/iLginDnO26Sr7KkIQ80W56kKwBOS9vsoV+9yMVy/mJhxzQMCYkEqIPsCPR2R5u+qFhofzq7Yf1FPzJT9VZMRaTiNC9TVdo5F1PiVc3o1xw+Kgs3Hdxs7blvh7V/GPdONFN0ibaic2ZD8OianF0p57JMNVDdIfDi8QLiAoB3jXm9RpdgQUVjTn6w1e4aFxHwwpHeqdy5Q9CilVcFplK1tE3Wj2/rLbvXDXZZoY4Zf8e+/LrlG2V0GZcwLNhZRLrYifh4NxXj8ZJ7LMrhFN8Av+yfhO3ggGJs2ZNaBQoTjN7WEJx5Wj7UwD4IdD7KWs7IB8kenk/sFmYJlg3yFP3g4aDsL
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(39860400002)(376002)(346002)(396003)(366004)(451199021)(122000001)(6506007)(38100700002)(26005)(82960400001)(186003)(38070700005)(83380400001)(2906002)(5660300002)(8676002)(52536014)(7416002)(8936002)(33656002)(54906003)(478600001)(110136005)(86362001)(9686003)(71200400001)(7696005)(55016003)(41300700001)(316002)(66476007)(66556008)(76116006)(64756008)(4326008)(66946007)(66446008)(66899021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9dc6oHiIm9MvoBiRFdlnTY/vlKMwp9DTJMMxnEOttxR97Egqn9W6JJ+/Y/yD?=
+ =?us-ascii?Q?EEvI0YHD36w73g8AAH+HKhQqKaEInS90wVyiUNpEpK7+aKdszs+8wp0chbSB?=
+ =?us-ascii?Q?TYcSdZi1f0Q5VnXdU3ddhIVAg3BWouwlNius6I0pXf32cthdg1hP8rCrZUKZ?=
+ =?us-ascii?Q?1KZnRXlt14MFAtUw7Vz234nLCIy2gI/NGNmpGihxZSRYHwgAFYLx2A8/8JDG?=
+ =?us-ascii?Q?ok3moP5zCTZZjP0PptFk5IaMCrnKzjWV84t0Zx2CWTZDBxmap1zNtwCClkNq?=
+ =?us-ascii?Q?lsChcRV2DviS4uPiIeoF6Ll5SQ6X4TTxklR0fsfYCYdrWet64e0KD2diD67b?=
+ =?us-ascii?Q?Z6wxMOTSUZ8ezmqxtErV/RJf97uQw7OlU22UYjzIUxZBMcfCH4PiRF/c61an?=
+ =?us-ascii?Q?3zYjKkkqxtk2vhwcfPMGwUldGUPT5IQaOXzFSJ7xJ6dV2pXtyzdQe/jUlzzy?=
+ =?us-ascii?Q?QVpCoJg8LhVv6qKpVHDi/BTpwMxCZJhWKZcOECrSYra+zBW+5PQJSryJ2fK0?=
+ =?us-ascii?Q?00rxfM5rm6ERGGN47A4fChgpKoZNSSqopdcbZhcjwzByATyd+CN9s1/m/i8a?=
+ =?us-ascii?Q?9pIW0B/slUIpjS61CaP6fUjSc1g+oWJqueL/mqrLKYFOVoBJZgfFuSTJyDlF?=
+ =?us-ascii?Q?pnKTZXt3WoAjVggHLkUC8CnVc9vC30UbBEmR8vOO1XjtpZbczzfWPYjqoYTh?=
+ =?us-ascii?Q?1nhIs1htzyxFQCLiPGkrqOOUpegHcqQxumsZj8eNctSXPnuwBs6job+kwIe8?=
+ =?us-ascii?Q?fdV2cqLpH45SoSa1pXXFccZghjZWQZw5hh8oEE7gS+8AWoGWUbntBXj9tWn3?=
+ =?us-ascii?Q?YyWc3Nq4HpQvdc4obE+exMPA9rzHfAfNySlR7/4lvv6Bt+66Y/277WrxTs1Y?=
+ =?us-ascii?Q?VISOoMQLgIKaO5Q8PivK572Q5mj9SWDFY+gGVnKjVbNl19Nbm2lQbfkJGuPI?=
+ =?us-ascii?Q?zrDNoKCNDftXCXJZ8G6B10pRl+VDdBWIQ2qTrVvtyg+1CGC3hs2iOJdqGsLk?=
+ =?us-ascii?Q?zAJyEehek7XlmRmd+W+znt59SPgahGYIsV9Rx5ksUmkRH17ihse2XpwH4vEG?=
+ =?us-ascii?Q?jfr1oUUPw18REqNCFj2bahCMX4da7zatZ1IszvO+PUUwjhA7t/7eBQAkeWRG?=
+ =?us-ascii?Q?IaPNpVSnvbysEE2+BoSQB2G17dliWNkDwgxl40KN/ri3uY+0nmS2u7rzbjxj?=
+ =?us-ascii?Q?/B9Nu+VbhbViMCUqfJMshX2/5JoENTpUF86NdwSRLw/EYjg0l35Rl9RI34+X?=
+ =?us-ascii?Q?NE7fmuYvu3NEvh25JdaUUJV93yx94uFukF2Dsz+2B3ELaL3kLs1NcJaFpsOp?=
+ =?us-ascii?Q?ldctp6Ne6TCoDebuzchWhA73Mm7lcW1wZaldrIoChc5dDjwmEYTjdbi7DNz2?=
+ =?us-ascii?Q?pWBbDNEVu9z3lpcf3yE0wFblTTYUetHnFvBY00HgLUthy/zbS3DOIRUTQfqd?=
+ =?us-ascii?Q?n7nOOkXA34gDoXXN/FJ0etnds1zIZ5obYMLspLAUsajg7vcFjuZeWFBFM7ol?=
+ =?us-ascii?Q?OjZqYwYGSObjZRBjHUSVNsuQeWBdmqnvkcZS6y4JJ2ZVJ8u8S448JJqpKsxD?=
+ =?us-ascii?Q?1COs4XSiNcvhryvZYqKJoMVDYSy3yBZZkqVHZ3of?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6281059e-c681-4991-367a-08db932bd424
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2023 07:41:05.4769
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YIzxGXtHboFbMKNFQZ7+f8Q3LNeQAz6ImSw0V+78j5QJzeRtwyPrJgR0nGNgxoBKycoGR5lZeOW5TPhAl0rhxQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8433
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/2/2023 10:29 AM, Tao Su wrote:
-> Latest Intel platform GraniteRapids-D introduces AMX-COMPLEX, which adds
-> two instructions to perform matrix multiplication of two tiles containing
-> complex elements and accumulate the results into a packed single precision
-> tile.
-> 
-> AMX-COMPLEX is enumerated via CPUID.(EAX=7,ECX=1):EDX[bit 8]
-> 
-> Since there are no new VMX controls or additional host enabling required
-> for guests to use this feature, advertise the CPUID to userspace.
-> 
-> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Monday, July 24, 2023 7:13 PM
+>=20
+> This adds the data structure for flushing iotlb for the nested domain
+> allocated with IOMMU_HWPT_TYPE_VTD_S1 type.
+>=20
+> Cache invalidation path is performance path, so it's better to avoid
+> memory allocation in such path. To achieve it, this path reuses the
+> ucmd_buffer to copy user data. So the new data structures are added in
+> the ucmd_buffer union to avoid overflow.
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+this patch has nothing to do with ucmd_buffer
 
-> ---
->   arch/x86/kvm/cpuid.c         | 3 ++-
->   arch/x86/kvm/reverse_cpuid.h | 1 +
->   2 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 7f4d13383cf2..883ec8d5a77f 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -647,7 +647,8 @@ void kvm_set_cpu_caps(void)
->   	);
->   
->   	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
-> -		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI)
-> +		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI) |
-> +		F(AMX_COMPLEX)
->   	);
->   
->   	kvm_cpu_cap_mask(CPUID_D_1_EAX,
-> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-> index 56cbdb24400a..b81650678375 100644
-> --- a/arch/x86/kvm/reverse_cpuid.h
-> +++ b/arch/x86/kvm/reverse_cpuid.h
-> @@ -43,6 +43,7 @@ enum kvm_only_cpuid_leafs {
->   /* Intel-defined sub-features, CPUID level 0x00000007:1 (EDX) */
->   #define X86_FEATURE_AVX_VNNI_INT8       KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
->   #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
-> +#define X86_FEATURE_AMX_COMPLEX         KVM_X86_FEATURE(CPUID_7_1_EDX, 8)
->   #define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
->   
->   /* CPUID level 0x80000007 (EDX). */
-> 
-> base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
+> +
+> +/**
+> + * struct iommu_hwpt_vtd_s1_invalidate - Intel VT-d cache invalidation
+> + *                                       (IOMMU_HWPT_TYPE_VTD_S1)
+> + * @flags: Must be 0
+> + * @entry_size: Size in bytes of each cache invalidation request
+> + * @entry_nr_uptr: User pointer to the number of invalidation requests.
+> + *                 Kernel reads it to get the number of requests and
+> + *                 updates the buffer with the number of requests that
+> + *                 have been processed successfully. This pointer must
+> + *                 point to a __u32 type of memory location.
+> + * @inv_data_uptr: Pointer to the cache invalidation requests
+> + *
+> + * The Intel VT-d specific invalidation data for a set of cache invalida=
+tion
+> + * requests. Kernel loops the requests one-by-one and stops when failure
+> + * is encountered. The number of handled requests is reported to user by
+> + * writing the buffer pointed by @entry_nr_uptr.
+> + */
+> +struct iommu_hwpt_vtd_s1_invalidate {
+> +	__u32 flags;
+> +	__u32 entry_size;
+> +	__aligned_u64 entry_nr_uptr;
+> +	__aligned_u64 inv_data_uptr;
+> +};
+> +
 
+I wonder whether this array can be defined directly in the common
+struct iommu_hwpt_invalidate so there is no need for underlying
+iommu driver to further deal with user buffers, including various
+minsz/backward compat. check.=20
+
+smmu may not require it by using a native queue format. But that
+could be considered as a special case of 1-entry array. With careful
+coding the added cost should be negligible.
+
+Jason, your thought?
