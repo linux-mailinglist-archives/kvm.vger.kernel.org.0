@@ -2,258 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DC7776D310
-	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 17:56:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CF4476D326
+	for <lists+kvm@lfdr.de>; Wed,  2 Aug 2023 17:58:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234030AbjHBP4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 11:56:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44112 "EHLO
+        id S235441AbjHBP6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 11:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235260AbjHBP4L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 11:56:11 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EBF83592
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 08:55:56 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6bb231f1817so4478214a34.3
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 08:55:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1690991756; x=1691596556;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ubQj/3dGnf4pbnMsHPiejppGoYTt9Wg22xTu32HO9BE=;
-        b=PHGwRIHJcnyadfR6XMlYOTUzdIToWvVmA6TonalqrStJ1a/h7gV18QalYLEHqVp2bA
-         dMzecMgMDncMgw0K1/JexArtgtCDqGpLjIVo2uAIBD+f5bw71Uk1imSeyztmDD8A/ZIG
-         HLmpKfkVnagFWUDplPe2uQHAizQKt2kdJA6dePUzY47J93pxSYPItKh5Nx5cO3gVAFy3
-         byVyl4G4NUdgTuFuOH6cgZ9gv3D/rUGnt78RxnRdiTh7jGXFosT9qkCpB1NxpC0js32o
-         SAB8hgWPHNhu366rWAwuRitDAHggfmOiNf5c7NURqlmEHd4rV87iXvds9n671PElOgu8
-         ThkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690991756; x=1691596556;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ubQj/3dGnf4pbnMsHPiejppGoYTt9Wg22xTu32HO9BE=;
-        b=NOjoZVDiVmyBwD+TJHcrllbjbpWyC47qVd5g6+yMyEa+WfLuMgyl8HxsIMHdd5i5YH
-         6rvhUn8fBPZGpVlodBKfYDs5TZIjNOB+5KGZEMXbL18XbeyAdF86CG/lcIKQbrf/TBw5
-         iiGwTKHF2ywxGrBQdexk4QRzpzjwsz8wOk24t4C8kFJ0Gg5fVpMKi8rdkk3ioTP5oG02
-         H4B0GwrU++L63Mvw4jidcVyNBuJDEx3RZgc6ld8aq71I425F6metL2AmhcRM75/jUDr6
-         PaN6qbm4eHzsg9kUOSR35H1H48xznfvIwewElIU952Q4Dnc1LTmrijPxgomwQ7kcpz7P
-         gjYg==
-X-Gm-Message-State: ABy/qLbx2/GkJK2rSrIePfHqMmMiTefuOXyKaxZfcPyHy6QlY19W+jcs
-        8kPDnxwqAN9XOpDPglK3SkqYgG6hh9Zpkv3WRWZs8Q==
-X-Google-Smtp-Source: APBJJlF4o1bIcGiQFf43fjASxBZeK7+bmV1iOO1ChqUB+DF24sSx0BBJWGweWhipBaZvn1pzE26kQZAvY9+DOmyer9E=
-X-Received: by 2002:a05:6870:d613:b0:18d:4738:33fc with SMTP id
- a19-20020a056870d61300b0018d473833fcmr17382535oaq.37.1690991755595; Wed, 02
- Aug 2023 08:55:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230801152007.337272-1-jingzhangos@google.com>
- <20230801152007.337272-2-jingzhangos@google.com> <ZMmdnou5Pk/9V1Gs@linux.dev>
-In-Reply-To: <ZMmdnou5Pk/9V1Gs@linux.dev>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 2 Aug 2023 08:55:43 -0700
-Message-ID: <CAAdAUtj-6tk53TE6p0TYBfmFghj94g+Sg2KK_80Gar18kJ=5OA@mail.gmail.com>
-Subject: Re: [PATCH v7 01/10] KVM: arm64: Allow userspace to get the writable
- masks for feature ID registers
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S235340AbjHBP6b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 11:58:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B454BA;
+        Wed,  2 Aug 2023 08:58:30 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7D10E61A35;
+        Wed,  2 Aug 2023 15:58:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5C42C433C7;
+        Wed,  2 Aug 2023 15:58:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690991908;
+        bh=Efu/dr3jOn1VaTX57cLLSWiNYnjtaqySwrOSZDjUPqQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZBXCXaWsYZ6ZlQct9rxxSKisWvEYggis2ghmHQxOrF9tMav+Gdntp6izvzlrlpDy/
+         3rfy+IZKA07S0dDz4QSel+uFToUD58bYVI+A/Hsp9mE5NOGx+VIQ+nIiJL7YJedIQf
+         GyhChNxbwFGapOZVy+M3mY32pow7Jaw/vMovuLQziwJ+1d9IPY/p9f5yksZ1kTieId
+         NRWMw5FWyj+QAGevBlLdsE1hGaG1j6PIhQSlw8roYCbk/AoJYlZUcvcQllbw2Q8vAQ
+         9/jtQ2BpLI+ns2GEXvOQjqPkIwRtIFzPw9xIVYduJxEiSe/cOqo26To4TQ9K9txDeL
+         gf6EGg97hnJ9A==
+Received: from [104.132.1.99] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qREF0-001Pz2-E9;
+        Wed, 02 Aug 2023 16:58:26 +0100
+Date:   Wed, 02 Aug 2023 16:58:21 +0100
+Message-ID: <875y5xqvvm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
         Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v7 06/12] arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
+In-Reply-To: <CAJHc60zqOeWXf3kh5hKL6DL3g4znmHaH-TqC0QDcBrWPsHAEXQ@mail.gmail.com>
+References: <20230722022251.3446223-1-rananta@google.com>
+        <20230722022251.3446223-7-rananta@google.com>
+        <87r0otr579.wl-maz@kernel.org>
+        <CAJHc60zqOeWXf3kh5hKL6DL3g4znmHaH-TqC0QDcBrWPsHAEXQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 104.132.1.99
+X-SA-Exim-Rcpt-To: rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com, gshan@redhat.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+On Mon, 31 Jul 2023 18:36:47 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+>=20
+> On Thu, Jul 27, 2023 at 3:58=E2=80=AFAM Marc Zyngier <maz@kernel.org> wro=
+te:
+> >
+> > On Sat, 22 Jul 2023 03:22:45 +0100,
+> > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > >
+> > > Currently, the core TLB flush functionality of __flush_tlb_range()
+> > > hardcodes vae1is (and variants) for the flush operation. In the
+> > > upcoming patches, the KVM code reuses this core algorithm with
+> > > ipas2e1is for range based TLB invalidations based on the IPA.
+> > > Hence, extract the core flush functionality of __flush_tlb_range()
+> > > into its own macro that accepts an 'op' argument to pass any
+> > > TLBI operation, such that other callers (KVM) can benefit.
+> > >
+> > > No functional changes intended.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > > Reviewed-by: Gavin Shan <gshan@redhat.com>
+> > > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+> > > ---
+> > >  arch/arm64/include/asm/tlbflush.h | 109 +++++++++++++++-------------=
+--
+> > >  1 file changed, 56 insertions(+), 53 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/a=
+sm/tlbflush.h
+> > > index 412a3b9a3c25..f7fafba25add 100644
+> > > --- a/arch/arm64/include/asm/tlbflush.h
+> > > +++ b/arch/arm64/include/asm/tlbflush.h
+> > > @@ -278,14 +278,62 @@ static inline void flush_tlb_page(struct vm_are=
+a_struct *vma,
+> > >   */
+> > >  #define MAX_TLBI_OPS PTRS_PER_PTE
+> > >
+> > > +/* When the CPU does not support TLB range operations, flush the TLB
+> > > + * entries one by one at the granularity of 'stride'. If the TLB
+> > > + * range ops are supported, then:
+> >
+> > Comment format (the original was correct).
+> >
+> Isn't the format the same as original? Or are you referring to the
+> fact that it needs to be placed inside the macro definition?
 
-On Tue, Aug 1, 2023 at 5:04=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> Hi Jing,
->
-> On Tue, Aug 01, 2023 at 08:19:57AM -0700, Jing Zhang wrote:
-> > Add a VM ioctl to allow userspace to get writable masks for feature ID
-> > registers in below system register space:
-> > op0 =3D 3, op1 =3D {0, 1, 3}, CRn =3D 0, CRm =3D {0 - 7}, op2 =3D {0 - =
-7}
-> > This is used to support mix-and-match userspace and kernels for writabl=
-e
-> > ID registers, where userspace may want to know upfront whether it can
-> > actually tweak the contents of an idreg or not.
-> >
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  2 ++
-> >  arch/arm64/include/uapi/asm/kvm.h | 25 +++++++++++++++
-> >  arch/arm64/kvm/arm.c              |  3 ++
-> >  arch/arm64/kvm/sys_regs.c         | 51 +++++++++++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h          |  2 ++
-> >  5 files changed, 83 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
-/kvm_host.h
-> > index d3dd05bbfe23..3996a3707f4e 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1074,6 +1074,8 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> >                              struct kvm_arm_copy_mte_tags *copy_tags);
-> >  int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
-> >                                   struct kvm_arm_counter_offset *offset=
-);
-> > +int kvm_vm_ioctl_get_feature_id_writable_masks(struct kvm *kvm,
-> > +                                            u64 __user *masks);
-> >
-> >  /* Guest/host FPSIMD coordination helpers */
-> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uap=
-i/asm/kvm.h
-> > index f7ddd73a8c0f..2970c0d792ee 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -505,6 +505,31 @@ struct kvm_smccc_filter {
-> >  #define KVM_HYPERCALL_EXIT_SMC               (1U << 0)
-> >  #define KVM_HYPERCALL_EXIT_16BIT     (1U << 1)
-> >
-> > +/* Get feature ID registers userspace writable mask. */
-> > +/*
-> > + * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
-> > + * Feature Register 2"):
-> > + *
-> > + * "The Feature ID space is defined as the System register space in
-> > + * AArch64 with op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{=
-0-7},
-> > + * op2=3D=3D{0-7}."
-> > + *
-> > + * This covers all R/O registers that indicate anything useful feature
-> > + * wise, including the ID registers.
-> > + */
-> > +#define ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)          \
-> > +     ({                                                              \
-> > +             __u64 __op1 =3D (op1) & 3;                               =
- \
-> > +             __op1 -=3D (__op1 =3D=3D 3);                             =
-     \
-> > +             (__op1 << 6 | ((crm) & 7) << 3 | (op2));                \
-> > +     })
-> > +
-> > +#define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
-> > +
-> > +struct feature_id_writable_masks {
-> > +     __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-> > +};
->
-> This UAPI is rather difficult to extend in the future. We may need to
-> support describing the masks of multiple ranges of registers in the
-> future. I was thinking something along the lines of:
->
->         enum reg_mask_range_idx {
->                 FEATURE_ID,
->         };
->
->         struct reg_mask_range {
->                 __u64 idx;
->                 __u64 *masks;
->                 __u64 rsvd[6];
->         };
->
-Since have the way to map sysregs encoding to the index in the mask
-array, we can extend the UAPI by just adding a size field in struct
-feature_id_writable_masks like below:
-struct feature_id_writable_masks {
-         __u64 size;
-         __u64 mask[ARM64_FEATURE_ID_SPACE_SIZE];
-};
-The 'size' field can be used as input for the size of 'mask' array and
-output for the number of masks actually read in.
-This way, we can freely add more ranges without breaking anything in usersp=
-ace.
-WDYT?
-> >  #endif
-> >
-> >  #endif /* __ARM_KVM_H__ */
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 72dc53a75d1c..c9cd14057c58 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1630,6 +1630,9 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned=
- int ioctl, unsigned long arg)
-> >
-> >               return kvm_vm_set_attr(kvm, &attr);
-> >       }
-> > +     case KVM_ARM_GET_FEATURE_ID_WRITABLE_MASKS: {
-> > +             return kvm_vm_ioctl_get_feature_id_writable_masks(kvm, ar=
-gp);
-> > +     }
-> >       default:
-> >               return -EINVAL;
-> >       }
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 2ca2973abe66..d9317b640ba5 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -3560,6 +3560,57 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu=
- *vcpu, u64 __user *uindices)
-> >       return write_demux_regids(uindices);
-> >  }
-> >
-> > +#define ARM64_FEATURE_ID_SPACE_INDEX(r)                      \
-> > +     ARM64_FEATURE_ID_SPACE_IDX(sys_reg_Op0(r),      \
-> > +             sys_reg_Op1(r),                         \
-> > +             sys_reg_CRn(r),                         \
-> > +             sys_reg_CRm(r),                         \
-> > +             sys_reg_Op2(r))
-> > +
-> > +static bool is_feature_id_reg(u32 encoding)
-> > +{
-> > +     return (sys_reg_Op0(encoding) =3D=3D 3 &&
-> > +             (sys_reg_Op1(encoding) < 2 || sys_reg_Op1(encoding) =3D=
-=3D 3) &&
-> > +             sys_reg_CRn(encoding) =3D=3D 0 &&
-> > +             sys_reg_CRm(encoding) <=3D 7);
-> > +}
-> > +
-> > +int kvm_vm_ioctl_get_feature_id_writable_masks(struct kvm *kvm, u64 __=
-user *masks)
-> > +{
->
-> Use the correct type for the user pointer (it's a struct pointer).
-Will fix.
->
-> > +     /* Wipe the whole thing first */
-> > +     for (int i =3D 0; i < ARM64_FEATURE_ID_SPACE_SIZE; i++)
-> > +             if (put_user(0, masks + i))
-> > +                     return -EFAULT;
->
-> Why not:
->
->         if (clear_user(masks, ARM64_FEATURE_ID_SPACE_SIZE * sizeof(__u64)=
-))
->                 return -EFAULT;
-Sure, will do.
->
-> Of course, this may need to be adapted if the UAPI struct changes.
->
-> --
-> Thanks,
-> Oliver
+No, I'm referring to the multiline comment that starts with:
+
+	/*  When the CPU does not support TLB range operations...
+
+instead of the required:
+
+	/*
+	 * When the CPU does not support TLB range operations
+
+which was correct before the coment was moved.
+
 Thanks,
-Jing
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
