@@ -2,169 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EFE276F1EA
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 20:34:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A965276F1FB
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 20:40:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232779AbjHCSd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 14:33:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54784 "EHLO
+        id S233210AbjHCSkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 14:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230344AbjHCSd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 14:33:58 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43102273E
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 11:33:57 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d1851c52f3dso1374216276.1
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 11:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691087636; x=1691692436;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=U3VOaPJ6MKTIiohfINI/eYuhi42VF/TpE5lJuXmVnZU=;
-        b=jGBcVWGiKzPAHOVeNjq1y7oxUP/yrgTePN9mw3TokA4mYnl3VDEc0K63yNHbMmWj19
-         GPHyuz9aZECjuN6QGh09dWL6iBwA6n10Smp7y1Jh/MHuEpWEZyq1SMWIQ9fXZi3u+Rnn
-         Q4PzbmbAQj5lD2qkXPusJo1mDha8dVvAwg47zexPP6FviSk+KBD3yHKAmHO3VC+yY1jY
-         pIa3y0jz91NRfZrBiYtMV37D3Tg6Y2KyfAkgsxVxYrCjAHfDA6CMiziLZASdpEGmvDO8
-         Jf1Gu2ZDuwlIMpjZIAz0IEkIcqLSpqtewaRO8/SkHfSAiTWvVpbvS7ereml0dLLBf3fV
-         suEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691087636; x=1691692436;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U3VOaPJ6MKTIiohfINI/eYuhi42VF/TpE5lJuXmVnZU=;
-        b=QIohpgTPFOMcoM6npsbP27LegRT65jHrwyh5KC14fr1tOc1vs4PNLs3ZNuud6yxgHs
-         JYnV3xsvgGuwcXFF4Y4q8fg5PAz794taNdnQHQpOGJwQiewYv1K9WzCXA505jveOvEDA
-         29xAQcLiehNzhsgAjuzzArpaNPga8aMsTmHRRkHFti/FvpcyYqP634hkBV2x88V+e8YU
-         kee3S3f2590Z+XH4kodkW7WMKvAwqrvVbyi+nUBOjW+gRKGJYIq+1UK8shcj2b1fA4HV
-         ots7ican8lEQG0HzMAtTjP819Vmd1UgRJuhG/mIbZ1gQ97hB3GP8i3tivrWFFITJEPxR
-         ovOw==
-X-Gm-Message-State: ABy/qLZ4PfQFY7tdXTijB04oVIrc0JllONFXBepXTIzbUXsfwTkiWgtJ
-        HzRMye8r2XlxZbiHOi07FKGg6UhlmFwe62WrbNA=
-X-Google-Smtp-Source: APBJJlGgnFQzPOitZAU98RMK0X9+hq6s9tJJjr7a1RlQJuN/fchCzoXnESBcHJ3kPK5j1medkwomkVGXWLCOWggpRxM=
-X-Received: from ndesaulniers-desktop.svl.corp.google.com ([2620:15c:2d1:203:cd2a:c126:8d90:d5ab])
- (user=ndesaulniers job=sendgmr) by 2002:a05:6902:569:b0:d11:3c58:2068 with
- SMTP id a9-20020a056902056900b00d113c582068mr133475ybt.2.1691087636427; Thu,
- 03 Aug 2023 11:33:56 -0700 (PDT)
-Date:   Thu, 03 Aug 2023 11:33:52 -0700
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAA/zy2QC/32NywrCMBBFf6VkbaR5qNWV/yEieU0bSJuQlFAp/
- XeT7lzo8sxw7llRMtGahG7NiqLJNlk/FWCHBqlBTL3BVhdGtKWs7VqGQ1Cv2UnrFhesxgq0BA6
- awwVQkaRIBssoJjVUbRRpNrE+QjRgl730eBYebJp9fO/hTOr1ZyMTTHDHBZHqpOB6Zvfe+96Zo /IjqluZ/vdp8SkhAIJoIFf+5W/b9gEPHU1kBgEAAA==
-X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=UIrHvErwpgNbhCkRZAYSX0CFd/XFEwqX3D0xqtqjNug=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691087634; l=3590;
- i=ndesaulniers@google.com; s=20220923; h=from:subject:message-id;
- bh=DXS75M6ip4LIo9QVOPrHgK0haQj5/x/umg+wlNPWCPQ=; b=AfeE+hGjVv3usaoDClqYLXcfcyNoLusX6a90nkmY2QDifz22bZ5hqW8UPQE+UW4b6yR7D6XX6
- kx3WwCXMXWtBwssf5qp7Ju6NNxmRCCQDloYP+6XypBgQ9bapq9Ou/AQ
-X-Mailer: b4 0.12.3
-Message-ID: <20230803-ppc_tlbilxlpid-v3-1-ca84739bfd73@google.com>
-Subject: [PATCH v3] powerpc/inst: add PPC_TLBILX_LPID
-From:   Nick Desaulniers <ndesaulniers@google.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Tom Rix <trix@redhat.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229473AbjHCSkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 14:40:40 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F642D4C;
+        Thu,  3 Aug 2023 11:40:39 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E8B232189D;
+        Thu,  3 Aug 2023 18:40:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1691088037; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=OtTqFXBQhlrG+PZAvHxivPSqb0Fo/vxr7QReG0BjreQ=;
+        b=uqV8yhMEb4iL193tfXjqv5+X4ARxnhBjn/KyK/krKa931N538DnrW6jSuuJbdPMnqVWEz6
+        rG1Lwbat9vFKhDkieHbSaBNKRflX54LJgot4HF7ACTyA3TL1Jl/ubURaeNxTelysKhUcL8
+        tfSLHdEolxQ8h09FzS78SYwc1diPX+o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1691088037;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=OtTqFXBQhlrG+PZAvHxivPSqb0Fo/vxr7QReG0BjreQ=;
+        b=du5u9+OHtnBg+RMsEpDMTVwG8N1kRebeeHEvq+egzUBYpUTgNJW0CiqTllKzfzFEcZEXR+
+        FAn2X86CkwCkf6AQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AE7491333C;
+        Thu,  3 Aug 2023 18:40:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 7zagKaX0y2TLGAAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Thu, 03 Aug 2023 18:40:37 +0000
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+To:     deller@gmx.de, javierm@redhat.com, sam@ravnborg.org
+Cc:     linux-media@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-geode@lists.infradead.org, linux-omap@vger.kernel.org,
+        kvm@vger.kernel.org, Thomas Zimmermann <tzimmermann@suse.de>
+Subject: [PATCH v3 00/47] fbdev: Use I/O helpers
+Date:   Thu,  3 Aug 2023 20:35:25 +0200
+Message-ID: <20230803184034.6456-1-tzimmermann@suse.de>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clang didn't recognize the instruction tlbilxlpid. This was fixed in
-clang-18 [0] then backported to clang-17 [1].  To support clang-16 and
-older, rather than using that instruction bare in inline asm, add it to
-ppc-opcode.h and use that macro as is done elsewhere for other
-instructions.
+Most fbdev drivers operate on I/O memory. And most of those use the
+default implementations for file I/O and console drawing. Convert all
+these low-hanging fruits to the fb_ops initializer macro and Kconfig
+token for fbdev I/O helpers.
 
-Link: https://github.com/ClangBuiltLinux/linux/issues/1891
-Link: https://github.com/llvm/llvm-project/issues/64080
-Link: https://github.com/llvm/llvm-project/commit/53648ac1d0c953ae6d008864dd2eddb437a92468 [0]
-Link: https://github.com/llvm/llvm-project-release-prs/commit/0af7e5e54a8c7ac665773ac1ada328713e8338f5 [1]
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/llvm/202307211945.TSPcyOhh-lkp@intel.com/
-Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
-Changes in v3:
-- left comment @ https://github.com/linuxppc/issues/issues/350#issuecomment-1664417212
-- restore PPC_RAW_TLBILX previous definition
-- fix comment style
-- Link to v2: https://lore.kernel.org/r/20230803-ppc_tlbilxlpid-v2-1-211ffa1df194@google.com
+The fbdev I/O helpers are easily grep-able. In a later patch, they can
+be left to empty values if the rsp. functionality, such as file I/O or
+console, has been disabled.
 
-Changes in v2:
-- add 2 missing tabs to PPC_RAW_TLBILX_LPID
-- Link to v1: https://lore.kernel.org/r/20230803-ppc_tlbilxlpid-v1-1-84a1bc5cf963@google.com
----
- arch/powerpc/include/asm/ppc-opcode.h |  2 ++
- arch/powerpc/kvm/e500mc.c             | 11 ++++++++---
- 2 files changed, 10 insertions(+), 3 deletions(-)
+There are no functional changes. The helpers set the defaults that
+the drivers already use. The fb_io_*() functions that the initializer
+macro sets are the defaults if struct fb_ops.fb_read or .fb_write are
+NULL. After all drivers have been updated to set them explicitly, the
+defaults can be dropped and the functions can be made optional.
 
-diff --git a/arch/powerpc/include/asm/ppc-opcode.h b/arch/powerpc/include/asm/ppc-opcode.h
-index ef6972aa33b9..005601243dda 100644
---- a/arch/powerpc/include/asm/ppc-opcode.h
-+++ b/arch/powerpc/include/asm/ppc-opcode.h
-@@ -397,6 +397,7 @@
- #define PPC_RAW_RFCI			(0x4c000066)
- #define PPC_RAW_RFDI			(0x4c00004e)
- #define PPC_RAW_RFMCI			(0x4c00004c)
-+#define PPC_RAW_TLBILX_LPID		(0x7c000024)
- #define PPC_RAW_TLBILX(t, a, b)		(0x7c000024 | __PPC_T_TLB(t) | 	__PPC_RA0(a) | __PPC_RB(b))
- #define PPC_RAW_WAIT_v203		(0x7c00007c)
- #define PPC_RAW_WAIT(w, p)		(0x7c00003c | __PPC_WC(w) | __PPC_PL(p))
-@@ -616,6 +617,7 @@
- #define PPC_TLBILX(t, a, b)	stringify_in_c(.long PPC_RAW_TLBILX(t, a, b))
- #define PPC_TLBILX_ALL(a, b)	PPC_TLBILX(0, a, b)
- #define PPC_TLBILX_PID(a, b)	PPC_TLBILX(1, a, b)
-+#define PPC_TLBILX_LPID		stringify_in_c(.long PPC_RAW_TLBILX_LPID)
- #define PPC_TLBILX_VA(a, b)	PPC_TLBILX(3, a, b)
- #define PPC_WAIT_v203		stringify_in_c(.long PPC_RAW_WAIT_v203)
- #define PPC_WAIT(w, p)		stringify_in_c(.long PPC_RAW_WAIT(w, p))
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index d58df71ace58..7c09c000c330 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -16,10 +16,11 @@
- #include <linux/miscdevice.h>
- #include <linux/module.h>
- 
--#include <asm/reg.h>
- #include <asm/cputable.h>
--#include <asm/kvm_ppc.h>
- #include <asm/dbell.h>
-+#include <asm/kvm_ppc.h>
-+#include <asm/ppc-opcode.h>
-+#include <asm/reg.h>
- 
- #include "booke.h"
- #include "e500.h"
-@@ -92,7 +93,11 @@ void kvmppc_e500_tlbil_all(struct kvmppc_vcpu_e500 *vcpu_e500)
- 
- 	local_irq_save(flags);
- 	mtspr(SPRN_MAS5, MAS5_SGS | get_lpid(&vcpu_e500->vcpu));
--	asm volatile("tlbilxlpid");
-+	/*
-+	 * clang-17 and older could not assemble tlbilxlpid.
-+	 * https://github.com/ClangBuiltLinux/linux/issues/1891
-+	 */
-+	asm volatile (PPC_TLBILX_LPID);
- 	mtspr(SPRN_MAS5, 0);
- 	local_irq_restore(flags);
- }
+v3:
+	* use _IOMEM_ in commit message
+v2:
+	* updated to use _IOMEM_ tokens
 
----
-base-commit: 7bafbd4027ae86572f308c4ddf93120c90126332
-change-id: 20230803-ppc_tlbilxlpid-cfdbf4fd4f7f
+Thomas Zimmermann (47):
+  media/vivid: Use fbdev I/O helpers
+  fbdev/acornfb: Use fbdev I/O helpers
+  fbdev/asiliantfb: Use fbdev I/O helpers
+  fbdev/atmel_lcdfb: Use fbdev I/O helpers
+  fbdev/aty128fb: Use fbdev I/O helpers
+  fbdev/carminefb: Use fbdev I/O helpers
+  fbdev/chipsfb: Use fbdev I/O helpers
+  fbdev/da8xx-fb: Use fbdev I/O helpers
+  fbdev/efifb: Use fbdev I/O helpers
+  fbdev/fm2fb: Use fbdev I/O helpers
+  fbdev/fsl-diu-fb: Use fbdev I/O helpers
+  fbdev/g364fb: Use fbdev I/O helpers
+  fbdev/geode/gx1fb: Use fbdev I/O helpers
+  fbdev/geode/gxfb: Use fbdev I/O helpers
+  fbdev/geode/lxfb: Use fbdev I/O helpers
+  fbdev/goldfishfb: Use fbdev I/O helpers
+  fbdev/grvga: Use fbdev I/O helpers
+  fbdev/gxt4500: Use fbdev I/O helpers
+  fbdev/i740fb: Use fbdev I/O helpers
+  fbdev/imxfb: Use fbdev I/O helpers
+  fbdev/kyro: Use fbdev I/O helpers
+  fbdev/macfb: Use fbdev I/O helpers
+  fbdev/maxinefb: Use fbdev I/O helpers
+  fbdev/mb862xxfb: Use fbdev I/O helpers
+  fbdev/mmpfb: Use fbdev I/O helpers
+  fbdev/mx3fb: Use fbdev I/O helpers
+  fbdev/ocfb: Use fbdev I/O helpers
+  fbdev/offb: Use fbdev I/O helpers
+  fbdev/omapfb: Use fbdev I/O helpers
+  fbdev/platinumfb: Use fbdev I/O helpers
+  fbdev/pmag-aa-fb: Use fbdev I/O helpers
+  fbdev/pmag-ba-fb: Use fbdev I/O helpers
+  fbdev/pmagb-b-fb: Use fbdev I/O helpers
+  fbdev/pxa168fb: Use fbdev I/O helpers
+  fbdev/pxafb: Use fbdev I/O helpers
+  fbdev/q40fb: Use fbdev I/O helpers
+  fbdev/s3cfb: Use fbdev I/O helpers
+  fbdev/sh7760fb: Use fbdev I/O helpers
+  fbdev/simplefb: Use fbdev I/O helpers
+  fbdev/sstfb: Use fbdev I/O helpers
+  fbdev/sunxvr1000: Use fbdev I/O helpers
+  fbdev/sunxvr2500: Use fbdev I/O helpers
+  fbdev/uvesafb: Use fbdev I/O helpers
+  fbdev/valkyriefb: Use fbdev I/O helpers
+  fbdev/vesafb: Use fbdev I/O helpers
+  fbdev/xilinxfb: Use fbdev I/O helpers
+  vfio-dev/mdpy-fb: Use fbdev I/O helpers
 
-Best regards,
+ drivers/media/test-drivers/vivid/Kconfig     |   4 +-
+ drivers/media/test-drivers/vivid/vivid-osd.c |   4 +-
+ drivers/video/fbdev/Kconfig                  | 160 +++++--------------
+ drivers/video/fbdev/acornfb.c                |   4 +-
+ drivers/video/fbdev/asiliantfb.c             |   4 +-
+ drivers/video/fbdev/atmel_lcdfb.c            |   4 +-
+ drivers/video/fbdev/aty/aty128fb.c           |   4 +-
+ drivers/video/fbdev/carminefb.c              |   5 +-
+ drivers/video/fbdev/chipsfb.c                |   4 +-
+ drivers/video/fbdev/da8xx-fb.c               |   4 +-
+ drivers/video/fbdev/efifb.c                  |   4 +-
+ drivers/video/fbdev/fm2fb.c                  |   4 +-
+ drivers/video/fbdev/fsl-diu-fb.c             |   4 +-
+ drivers/video/fbdev/g364fb.c                 |   4 +-
+ drivers/video/fbdev/geode/Kconfig            |  12 +-
+ drivers/video/fbdev/geode/gx1fb_core.c       |   5 +-
+ drivers/video/fbdev/geode/gxfb_core.c        |   5 +-
+ drivers/video/fbdev/geode/lxfb_core.c        |   5 +-
+ drivers/video/fbdev/goldfishfb.c             |   4 +-
+ drivers/video/fbdev/grvga.c                  |   4 +-
+ drivers/video/fbdev/gxt4500.c                |   4 +-
+ drivers/video/fbdev/i740fb.c                 |   4 +-
+ drivers/video/fbdev/imxfb.c                  |   4 +-
+ drivers/video/fbdev/kyro/fbdev.c             |   4 +-
+ drivers/video/fbdev/macfb.c                  |   4 +-
+ drivers/video/fbdev/maxinefb.c               |   4 +-
+ drivers/video/fbdev/mb862xx/mb862xxfbdrv.c   |   4 +-
+ drivers/video/fbdev/mmp/fb/Kconfig           |   4 +-
+ drivers/video/fbdev/mmp/fb/mmpfb.c           |   4 +-
+ drivers/video/fbdev/mx3fb.c                  |   4 +-
+ drivers/video/fbdev/ocfb.c                   |   4 +-
+ drivers/video/fbdev/offb.c                   |   4 +-
+ drivers/video/fbdev/omap/Kconfig             |   4 +-
+ drivers/video/fbdev/omap/omapfb_main.c       |   4 +-
+ drivers/video/fbdev/platinumfb.c             |   4 +-
+ drivers/video/fbdev/pmag-aa-fb.c             |   4 +-
+ drivers/video/fbdev/pmag-ba-fb.c             |   4 +-
+ drivers/video/fbdev/pmagb-b-fb.c             |   4 +-
+ drivers/video/fbdev/pxa168fb.c               |   4 +-
+ drivers/video/fbdev/pxafb.c                  |   4 +-
+ drivers/video/fbdev/q40fb.c                  |   4 +-
+ drivers/video/fbdev/s3c-fb.c                 |   4 +-
+ drivers/video/fbdev/sh7760fb.c               |   4 +-
+ drivers/video/fbdev/simplefb.c               |   4 +-
+ drivers/video/fbdev/sstfb.c                  |   4 +-
+ drivers/video/fbdev/sunxvr1000.c             |   4 +-
+ drivers/video/fbdev/sunxvr2500.c             |   4 +-
+ drivers/video/fbdev/uvesafb.c                |   4 +-
+ drivers/video/fbdev/valkyriefb.c             |   4 +-
+ drivers/video/fbdev/vesafb.c                 |   4 +-
+ drivers/video/fbdev/xilinxfb.c               |   4 +-
+ samples/Kconfig                              |   4 +-
+ samples/vfio-mdev/mdpy-fb.c                  |   4 +-
+ 53 files changed, 94 insertions(+), 286 deletions(-)
+
+
+base-commit: 194cd63362db9ed2cbdd3deaa7a8752b86d95f3b
+prerequisite-patch-id: 0aa359f6144c4015c140c8a6750be19099c676fb
+prerequisite-patch-id: c67e5d886a47b7d0266d81100837557fda34cb24
+prerequisite-patch-id: cbc453ee02fae02af22fbfdce56ab732c7a88c36
+prerequisite-patch-id: 9e45f32f01ebd4d3a927038e52b91a389673b9bb
+prerequisite-patch-id: b0b735b6e10a12816cea5ea15e3292c6342ed2f2
+prerequisite-patch-id: 3997b2a71240d34ccf6990cf133cad39d4efc8f4
+prerequisite-patch-id: d64b3896ffd91137df0c4311a8b7aa0d5fa40a11
+prerequisite-patch-id: 5c8669f6947f5a44d19f4f8bd36b77c31163eda7
 -- 
-Nick Desaulniers <ndesaulniers@google.com>
+2.41.0
 
