@@ -2,165 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 63F5876E75E
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 13:51:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FF3F76E7DA
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 14:07:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232697AbjHCLvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 07:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47536 "EHLO
+        id S234172AbjHCMHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 08:07:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233022AbjHCLvU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 07:51:20 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F397C273B
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 04:51:17 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99357737980so122892466b.2
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 04:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1691063476; x=1691668276;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MzPKbAFOISRw/5YbvjKOSvX0ETCU4L0S6O4dsEu3NT4=;
-        b=NmceIrgAHf6DAIvboMUEJ7JzGv/tctRVCkJT5rFCwP1gjAqtTTP8QBBHcUFFDfMGBs
-         BYoMiwGFBUcc4qkO1aP5M+f3VANXSoUG79+qViju1B4qLjEdKSuii/Ejplx775yyq/KY
-         kwPpM3SoyKTKiJrPp30PV+xmIGSRPVg2kTQqiX6zrE6KZqRDssx2DXyfePCNsheKnpps
-         y7P9xhkULIkmVQ5263v7d+3SilFSbIJvnWQH+1DJzyzAhpl8c6SbxLArCbvMWuvUAQYW
-         7i0oTbFZTMHZaNnBJlX8EVHXYOQcZMJygUJ2RX7N99gREQtmg4jdm/X5OEBAAGcseg+n
-         mjjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691063476; x=1691668276;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MzPKbAFOISRw/5YbvjKOSvX0ETCU4L0S6O4dsEu3NT4=;
-        b=AN/Vw3+NxaxXRSiLP7ac34vptCG0ZKGDEQYmvfFxx2DqvVUaMwHdEiSxxH4Yk8qYbp
-         kGH+YGth/n30oHTS6YwZT+275Ti1O3VGRuz+iPyews9FIchSPi0K/6f6WlbgmWahZ05i
-         jVXij4x34YnypbPLHEqxnJ+ToEalFuyvY8Q/M32jshKXGYPMHSWS+tXigtGNIQRtFz0O
-         S/c7YD2Fh64nDUiKDylhwVSZm4Ljgf9ACVkYyATfRDS+0FE7KoG+Gcm+gfvESyjUeROl
-         vFdRmA625WPWbQtFlKZ7s6LChJHuyA8bzZCtDO1ntIicc/TH59MfpgRpceuLeiKo7Yel
-         tgWw==
-X-Gm-Message-State: ABy/qLZp4lusc4UzBdIJrac2pxwOhE9rhAlgWTc8cXQrfGh32uUJ+Nw+
-        byRSr/I3HIKqWcDhlav+j4Mu7LPTKSi6IZSoAhBNhw==
-X-Google-Smtp-Source: APBJJlHaBGbLysLT4OovkxC+A8IVLYfeu33xeC0pulr4EZBtAA8oMQYOh/PvStYR1i80XF9LdMskfV0M9j4jh4uFMsg=
-X-Received: by 2002:a17:906:5352:b0:99b:f676:52da with SMTP id
- j18-20020a170906535200b0099bf67652damr7364642ejo.65.1691063476270; Thu, 03
- Aug 2023 04:51:16 -0700 (PDT)
+        with ESMTP id S234686AbjHCMHE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 08:07:04 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BFEA3582
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 05:06:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=uB9ZimC/0RQhXiGwTFDRfcy98CEo+zz58pmAUofIlvo=; b=cGMr4b9L1bG5I10sJltjYTOI2F
+        TMt/xzjyax5Uy568saRASYvMqjnktSDgIAW2hQeRUxuh6MUmlqgsCz6mnqfZdoRRhI/joVwXCEXKq
+        AIJAc7kDWN8P5fyEAU/hP7FPZTYAcdN239fLlupmout7ozYqju5l7KdyBy63jGbNgKhlMb2pzEwQg
+        WnZ2nJAN31sBymklDpThQjC5Vfj+DSgwX5aHaSO0Hc41LjpOJoIdKzUKwFshADLaZMMT7il9UzvoK
+        EVCYgtyhjfIzSlFbPFarln/jMzEiwuCzL/zYtNdIKv0vLk0sQ0MZ5/uksZKAgLrSgoqDMgtwoQT/V
+        Ix+6sG2A==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qRX6E-00Gnwg-0J;
+        Thu, 03 Aug 2023 12:06:38 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7033D30007E;
+        Thu,  3 Aug 2023 14:06:37 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 54C62203C701D; Thu,  3 Aug 2023 14:06:37 +0200 (CEST)
+Date:   Thu, 3 Aug 2023 14:06:37 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Nikunj A Dadhania <nikunj@amd.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>
+Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
+ kvm-amd.o
+Message-ID: <20230803120637.GD214207@hirez.programming.kicks-ass.net>
+References: <20230802091107.1160320-1-nikunj@amd.com>
 MIME-Version: 1.0
-References: <20230728210122.175229-1-dbarboza@ventanamicro.com> <20230728210122.175229-2-dbarboza@ventanamicro.com>
-In-Reply-To: <20230728210122.175229-2-dbarboza@ventanamicro.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 3 Aug 2023 17:21:04 +0530
-Message-ID: <CAAhSdy28VzHT5NMcPokEm0i3Jdzg=+YQRhLR++YrUt1BykBsFA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] RISC-V: KVM: provide UAPI for host SATP mode
-To:     Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Cc:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, atishp@atishpatra.org, ajones@ventanamicro.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230802091107.1160320-1-nikunj@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 29, 2023 at 2:31=E2=80=AFAM Daniel Henrique Barboza
-<dbarboza@ventanamicro.com> wrote:
->
-> KVM userspaces need to be aware of the host SATP to allow them to
-> advertise it back to the guest OS.
->
-> Since this information is used to build the guest FDT we can't wait for
-> the SATP reg to be readable. We just need to read the SATP mode, thus
-> we can use the existing 'satp_mode' global that represents the SATP reg
-> with MODE set and both ASID and PPN cleared. E.g. for a 32 bit host
-> running with sv32 satp_mode is 0x80000000, for a 64 bit host running
-> sv57 satp_mode is 0xa000000000000000, and so on.
->
-> Add a new userspace virtual config register 'satp_mode' to allow
-> userspace to read the current SATP mode the host is using with
-> GET_ONE_REG API before spinning the vcpu.
->
-> 'satp_mode' can't be changed via KVM, so SET_ONE_REG is allowed as long
-> as userspace writes the existing 'satp_mode'.
->
-> Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-
-Queued this patch for Linux-6.6
-
-Thanks,
-Anup
-
+On Wed, Aug 02, 2023 at 02:41:07PM +0530, Nikunj A Dadhania wrote:
+> commit 7f4b5cde2409 ("kvm: Disable objtool frame pointer checking for
+> vmenter.S") had added the vmenter.o file to the exception list.
+> 
+> objtool gives the following warnings in the newer kernel builds:
+> 
+>   arch/x86/kvm/kvm-amd.o: warning: objtool: __svm_vcpu_run+0x17d: BP used as a scratch register
+>   arch/x86/kvm/kvm-amd.o: warning: objtool: __svm_sev_es_vcpu_run+0x72: BP used as a scratch register
+> 
+> As kvm-amd.o is a link time object, skipping the kvm-amd.o is not possible
+> as per the objtool documentation, better to skip the offending functions.
+> 
+> Functions __svm_vcpu_run() and __svm_sev_es_vcpu_run() saves and restores
+> RBP. Below is the snippet:
+> 
+>     SYM_FUNC_START(__svm_vcpu_run)
+>         push %_ASM_BP
+>     <…>
+>         pop %_ASM_BP
+>         RET
+> 
+> Add exceptions to skip both these functions. Remove the
+> OBJECT_FILES_NON_STANDARD for vmenter.o
+> 
+> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Reported-by: Ravi Bangoria <ravi.bangoria@amd.com>
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 > ---
->  arch/riscv/include/asm/csr.h      | 2 ++
->  arch/riscv/include/uapi/asm/kvm.h | 1 +
->  arch/riscv/kvm/vcpu_onereg.c      | 7 +++++++
->  3 files changed, 10 insertions(+)
->
-> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-> index 7bac43a3176e..777cb8299551 100644
-> --- a/arch/riscv/include/asm/csr.h
-> +++ b/arch/riscv/include/asm/csr.h
-> @@ -54,6 +54,7 @@
->  #ifndef CONFIG_64BIT
->  #define SATP_PPN       _AC(0x003FFFFF, UL)
->  #define SATP_MODE_32   _AC(0x80000000, UL)
-> +#define SATP_MODE_SHIFT        31
->  #define SATP_ASID_BITS 9
->  #define SATP_ASID_SHIFT        22
->  #define SATP_ASID_MASK _AC(0x1FF, UL)
-> @@ -62,6 +63,7 @@
->  #define SATP_MODE_39   _AC(0x8000000000000000, UL)
->  #define SATP_MODE_48   _AC(0x9000000000000000, UL)
->  #define SATP_MODE_57   _AC(0xa000000000000000, UL)
-> +#define SATP_MODE_SHIFT        60
->  #define SATP_ASID_BITS 16
->  #define SATP_ASID_SHIFT        44
->  #define SATP_ASID_MASK _AC(0xFFFF, UL)
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
-asm/kvm.h
-> index 9c35e1427f73..992c5e407104 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -55,6 +55,7 @@ struct kvm_riscv_config {
->         unsigned long marchid;
->         unsigned long mimpid;
->         unsigned long zicboz_block_size;
-> +       unsigned long satp_mode;
->  };
->
->  /* CORE registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
-> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-> index 0dc2c2cecb45..85773e858120 100644
-> --- a/arch/riscv/kvm/vcpu_onereg.c
-> +++ b/arch/riscv/kvm/vcpu_onereg.c
-> @@ -152,6 +152,9 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_v=
-cpu *vcpu,
->         case KVM_REG_RISCV_CONFIG_REG(mimpid):
->                 reg_val =3D vcpu->arch.mimpid;
->                 break;
-> +       case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-> +               reg_val =3D satp_mode >> SATP_MODE_SHIFT;
-> +               break;
->         default:
->                 return -EINVAL;
->         }
-> @@ -234,6 +237,10 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_=
-vcpu *vcpu,
->                 else
->                         return -EBUSY;
->                 break;
-> +       case KVM_REG_RISCV_CONFIG_REG(satp_mode):
-> +               if (reg_val !=3D (satp_mode >> SATP_MODE_SHIFT))
-> +                       return -EINVAL;
-> +               break;
->         default:
->                 return -EINVAL;
->         }
-> --
-> 2.41.0
->
+>  arch/x86/kvm/Makefile      | 4 ----
+>  arch/x86/kvm/svm/vmenter.S | 2 ++
+>  2 files changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 80e3fe184d17..0c5c2f090e93 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -3,10 +3,6 @@
+>  ccflags-y += -I $(srctree)/arch/x86/kvm
+>  ccflags-$(CONFIG_KVM_WERROR) += -Werror
+>  
+> -ifeq ($(CONFIG_FRAME_POINTER),y)
+> -OBJECT_FILES_NON_STANDARD_vmenter.o := y
+> -endif
+> -
+>  include $(srctree)/virt/kvm/Makefile.kvm
+>  
+>  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+> diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+> index 8e8295e774f0..8fd37d661c33 100644
+> --- a/arch/x86/kvm/svm/vmenter.S
+> +++ b/arch/x86/kvm/svm/vmenter.S
+> @@ -289,6 +289,7 @@ SYM_FUNC_START(__svm_vcpu_run)
+>  	_ASM_EXTABLE(7b, 70b)
+>  
+>  SYM_FUNC_END(__svm_vcpu_run)
+> +STACK_FRAME_NON_STANDARD(__svm_vcpu_run)
+>  
+>  /**
+>   * __svm_sev_es_vcpu_run - Run a SEV-ES vCPU via a transition to SVM guest mode
+> @@ -388,3 +389,4 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+>  	_ASM_EXTABLE(1b, 3b)
+>  
+>  SYM_FUNC_END(__svm_sev_es_vcpu_run)
+> +STACK_FRAME_NON_STANDARD_FP(__svm_sev_es_vcpu_run)
+
+Urgh... no, no, this is all broken.
+
+By marking them with STACK_FRAME_NON_STANDARD you will get no ORC data
+at all, and then you also violate the normal framepointer calling
+convention.
+
+This means that if you need to unwind here you're up a creek without no
+paddles on.
+
+Objtool complains for a reason, your changelog does not provide a
+counter argument for that reason.
+
+Hardware/firmware interfaces that require one to violate basic
+calling conventions are horrible crap.
