@@ -2,220 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED38B76DEFF
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:28:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6921876DF07
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233792AbjHCD2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 23:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51370 "EHLO
+        id S230251AbjHCDam (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 23:30:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231705AbjHCD1o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 23:27:44 -0400
-Received: from ustc.edu.cn (email.ustc.edu.cn [IPv6:2001:da8:d800::8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F561272A;
-        Wed,  2 Aug 2023 20:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mail.ustc.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
-        Message-ID:Reply-To:References:MIME-Version:Content-Type:
-        Content-Disposition:Content-Transfer-Encoding:In-Reply-To; bh=bd
-        dxYDM5apsIslXV2cs/xXI53EabgYuAyY8wWPoNGvg=; b=jqVdQduAIgxMdGz7TI
-        2b1OA66CSkzQSeTSfR9ZTPN12tyTruIWp66Ri6I/3gkc9OO3ftdCdoYweYtTMGvz
-        I1h35JyO/j/BH9NB0t5LX582OQaWoExvOBM+VD6R7sRi7JxTmqtScQjGm1QDzSsF
-        DktuJVGkO9eAhbDMBxMFUDuAM=
-Received: from localhost (unknown [139.224.204.105])
-        by newmailweb.ustc.edu.cn (Coremail) with SMTP id LkAmygBn1ByQHstko0UjAA--.5436S2;
-        Thu, 03 Aug 2023 11:27:12 +0800 (CST)
-Date:   Thu, 3 Aug 2023 11:27:12 +0800
-From:   Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-coco@lists.linux.dev
-Subject: Re: [Question] int3 instruction generates a #UD in SEV VM
-Message-ID: <ZMsekJG8PF0f4sCp@iZuf6hx7901barev1c282cZ>
-Reply-To: Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
-References: <8eb933fd-2cf3-d7a9-32fe-2a1d82eac42a@mail.ustc.edu.cn>
- <ZMfFaF2M6Vrh/QdW@google.com>
- <4ebb3e20-a043-8ad3-ef6c-f64c2443412c@amd.com>
- <544b7f95-4b34-654d-a57b-3791a6f4fd5f@mail.ustc.edu.cn>
- <ZMpEUVsv5hSmrcH8@iZuf6hx7901barev1c282cZ>
- <ZMphvF+0H9wHQr5B@google.com>
- <bbc52f40-2661-3fa2-8e09-bec772728812@amd.com>
- <7a4f3f59-1482-49c4-92b2-aa621e9b06b3@amd.com>
- <bdf548d1-84cb-6885-c4eb-cbb16c4a3e3b@amd.com>
+        with ESMTP id S229613AbjHCDaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 23:30:39 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 387FEC3;
+        Wed,  2 Aug 2023 20:30:37 -0700 (PDT)
+Received: from loongson.cn (unknown [10.40.46.158])
+        by gateway (Coremail) with SMTP id _____8CxyOhbH8tkH3EPAA--.87S3;
+        Thu, 03 Aug 2023 11:30:35 +0800 (CST)
+Received: from [192.168.124.126] (unknown [10.40.46.158])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfSNaH8tkaZdGAA--.3392S3;
+        Thu, 03 Aug 2023 11:30:35 +0800 (CST)
+Subject: Re: [PATCH v1 1/4] selftests: kvm: Add kvm selftests header files for
+ LoongArch
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vishal Annapurve <vannapurve@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
+References: <20230801020206.1957986-1-zhaotianrui@loongson.cn>
+ <20230801020206.1957986-2-zhaotianrui@loongson.cn>
+ <ZMqL7qPyngxOH4Y0@google.com>
+From:   zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <06a4e9f0-483c-e79c-fc64-7e9e0ce7348d@loongson.cn>
+Date:   Thu, 3 Aug 2023 11:30:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <ZMqL7qPyngxOH4Y0@google.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <bdf548d1-84cb-6885-c4eb-cbb16c4a3e3b@amd.com>
-X-CM-TRANSID: LkAmygBn1ByQHstko0UjAA--.5436S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxKr1DZr4xGF47Zw13Jw15CFg_yoW7CFW7pF
-        Z7tF15tFWUJr1kJr1Utr1UJry5tr47Jw1UXr1UJFyrJrWqyr1Fgr4UXrn09F1DJr4rJr1U
-        tw18J3srur17ArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUy2b7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xII
-        jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
-        C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxAIw28IcxkI7VAKI48JMxC20s02
-        6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
-        I_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
-        6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj4
-        0_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j
-        6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jY6wZUUUUU=
-X-CM-SenderInfo: pzx200xj1rqzxdloh3xvwfhvlgxou0/
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Language: en-US
+X-CM-TRANSID: AQAAf8DxfSNaH8tkaZdGAA--.3392S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxXr47uw1UZryfXryfXrykXrc_yoWrWw4xp3
+        WkA3WFkF48GF17C34S9an3XryfGws7KF48KrySqryUCwnIq3s7Jr1xKF45ZFy3X395t345
+        Z3Z2g34Y9Fy3XagCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+        6r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
+        02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAF
+        wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
+        CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
+        67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
+        IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
+        14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7XTm
+        DUUUU
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 03:03:45PM -0500, Tom Lendacky wrote:
-> On 8/2/23 09:33, Tom Lendacky wrote:
-> > On 8/2/23 09:25, Tom Lendacky wrote:
-> > > On 8/2/23 09:01, Sean Christopherson wrote:
-> > > > On Wed, Aug 02, 2023, Wu Zongyo wrote:
-> > > > > On Mon, Jul 31, 2023 at 11:45:29PM +0800, wuzongyong wrote:
-> > > > > > 
-> > > > > > On 2023/7/31 23:03, Tom Lendacky wrote:
-> > > > > > > On 7/31/23 09:30, Sean Christopherson wrote:
-> > > > > > > > On Sat, Jul 29, 2023, wuzongyong wrote:
-> > > > > > > > > Hi,
-> > > > > > > > > I am writing a firmware in Rust to support
-> > > > > > > > > SEV based on project td-shim[1].
-> > > > > > > > > But when I create a SEV VM (just SEV, no
-> > > > > > > > > SEV-ES and no SEV-SNP) with the firmware,
-> > > > > > > > > the linux kernel crashed because the int3
-> > > > > > > > > instruction in int3_selftest() cause a
-> > > > > > > > > #UD.
-> > > > > > > > 
-> > > > > > > > ...
-> > > > > > > > 
-> > > > > > > > > BTW, if a create a normal VM without SEV by
-> > > > > > > > > qemu & OVMF, the int3 instruction always
-> > > > > > > > > generates a
-> > > > > > > > > #BP.
-> > > > > > > > > So I am confused now about the behaviour of
-> > > > > > > > > int3 instruction, could anyone help to
-> > > > > > > > > explain the behaviour?
-> > > > > > > > > Any suggestion is appreciated!
-> > > > > > > > 
-> > > > > > > > Have you tried my suggestions from the other thread[*]?
-> > > > > > Firstly, I'm sorry for sending muliple mails with the
-> > > > > > same content. I thought the mails I sent previously
-> > > > > > didn't be sent successfully.
-> > > > > > And let's talk the problem here.
-> > > > > > > > 
-> > > > > > > >     : > > I'm curious how this happend. I cannot
-> > > > > > > > find any condition that would
-> > > > > > > >     : > > cause the int3 instruction generate a
-> > > > > > > > #UD according to the AMD's spec.
-> > > > > > > >     :
-> > > > > > > >     : One possibility is that the value from
-> > > > > > > > memory that gets executed diverges from the
-> > > > > > > >     : value that is read out be the #UD handler,
-> > > > > > > > e.g. due to patching (doesn't seem to
-> > > > > > > >     : be the case in this test), stale cache/tlb entries, etc.
-> > > > > > > >     :
-> > > > > > > >     : > > BTW, it worked nomarlly with qemu and ovmf.
-> > > > > > > >     : >
-> > > > > > > >     : > Does this happen every time you boot the
-> > > > > > > > guest with your firmware? What
-> > > > > > > >     : > processor are you running on?
-> > > > > > > >     :
-> > > > > > Yes, every time.
-> > > > > > The processor I used is EPYC 7T83.
-> > > > > > > >     : And have you ruled out KVM as the
-> > > > > > > > culprit?  I.e. verified that KVM is NOT
-> > > > > > > > injecting
-> > > > > > > >     : a #UD.  That obviously shouldn't happen,
-> > > > > > > > but it should be easy to check via KVM
-> > > > > > > >     : tracepoints.
-> > > > > > > 
-> > > > > > > I have a feeling that KVM is injecting the #UD, but
-> > > > > > > it will take instrumenting KVM to see which path the
-> > > > > > > #UD is being injected from.
-> > > > > > > 
-> > > > > > > Wu Zongyo, can you add some instrumentation to
-> > > > > > > figure that out if the trace points towards KVM
-> > > > > > > injecting the #UD?
-> > > > > > Ok, I will try to do that.
-> > > > > You're right. The #UD is injected by KVM.
-> > > > > 
-> > > > > The path I found is:
-> > > > >      svm_vcpu_run
-> > > > >          svm_complete_interrupts
-> > > > >         kvm_requeue_exception // vector = 3
-> > > > >             kvm_make_request
-> > > > > 
-> > > > >      vcpu_enter_guest
-> > > > >          kvm_check_and_inject_events
-> > > > >         svm_inject_exception
-> > > > >             svm_update_soft_interrupt_rip
-> > > > >             __svm_skip_emulated_instruction
-> > > > >                 x86_emulate_instruction
-> > > > >                 svm_can_emulate_instruction
-> > > > >                     kvm_queue_exception(vcpu, UD_VECTOR)
-> > > > > 
-> > > > > Does this mean a #PF intercept occur when the guest try to deliver a
-> > > > > #BP through the IDT? But why?
-> > > > 
-> > > > I doubt it's a #PF.  A #NPF is much more likely, though it could
-> > > > be something
-> > > > else entirely, but I'm pretty sure that would require bugs in
-> > > > both the host and
-> > > > guest.
-> > > > 
-> > > > What is the last exit recorded by trace_kvm_exit() before the
-> > > > #UD is injected?
-> > > 
-> > > I'm guessing it was a #NPF, too. Could it be related to the changes that
-> > > went in around svm_update_soft_interrupt_rip()?
-Yes, it's a #NPF with exit code 0x400.
 
-There must be something I didn't handle corretly since it behave normally with
-qemu & ovmf If I don't add int3 before mcheck_cpu_init().
-
-So it'a about memory, is there something I need to pay special attention
-to?
+ÔÚ 2023/8/3 ÉÏÎç1:01, Sean Christopherson Ð´µÀ:
+> On Tue, Aug 01, 2023, Tianrui Zhao wrote:
+>> Add kvm selftests header files for LoongArch, including processor.h,
+>> sysreg.h, and kvm_util_base.h. Those mainly contain LoongArch CSR
+>> register defines and page table information.
+>>
+>> Based-on: <20230720062813.4126751-1-zhaotianrui@loongson.cn>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   .../selftests/kvm/include/kvm_util_base.h     |  5 ++
+>>   .../kvm/include/loongarch/processor.h         | 28 ++++++
+>>   .../selftests/kvm/include/loongarch/sysreg.h  | 89 +++++++++++++++++++
+>>   3 files changed, 122 insertions(+)
+>>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+>>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/sysreg.h
+>>
+>> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+>> index 07732a157ccd..8747127e0bab 100644
+>> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+>> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+>> @@ -197,6 +197,11 @@ extern enum vm_guest_mode vm_mode_default;
+>>   #define MIN_PAGE_SHIFT			12U
+>>   #define ptes_per_page(page_size)	((page_size) / 8)
+>>   
+>> +#elif defined(__loongarch__)
+>> +#define VM_MODE_DEFAULT			VM_MODE_P36V47_16K
+>> +#define MIN_PAGE_SHIFT			14U
+>> +#define ptes_per_page(page_size)	((page_size) / 8)
+>> +
+>>   #endif
+>>   
+>>   #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
+>> diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/tools/testing/selftests/kvm/include/loongarch/processor.h
+>> new file mode 100644
+>> index 000000000000..d67796af51a0
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
+>> @@ -0,0 +1,28 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * LoongArch processor specific defines
+> Nit, my preference is to not bother with these types of comments, it should be
+> quite obvious from the file name that that everything in here is LoongArch
+> specific.
+Thanks, I will simplify this comment.
+>
+>> + */
+>> +#ifndef SELFTEST_KVM_PROCESSOR_H
+>> +#define SELFTEST_KVM_PROCESSOR_H
+>> +
+>> +#include <linux/compiler.h>
+>> +#define _PAGE_VALID_SHIFT	0
+>> +#define _PAGE_DIRTY_SHIFT	1
+>> +#define _PAGE_PLV_SHIFT		2  /* 2~3, two bits */
+>> +#define _CACHE_SHIFT		4  /* 4~5, two bits */
+>> +#define _PAGE_PRESENT_SHIFT	7
+>> +#define _PAGE_WRITE_SHIFT	8
+>> +
+>> +#define PLV_KERN		0
+>> +#define PLV_USER		3
+>> +#define PLV_MASK		0x3
+>> +
+>> +#define _PAGE_VALID		(0x1UL << _PAGE_VALID_SHIFT)
+>> +#define _PAGE_PRESENT		(0x1UL << _PAGE_PRESENT_SHIFT)
+>> +#define _PAGE_WRITE		(0x1UL << _PAGE_WRITE_SHIFT)
+>> +#define _PAGE_DIRTY		(0x1UL << _PAGE_DIRTY_SHIFT)
+>> +#define _PAGE_USER		(PLV_USER << _PAGE_PLV_SHIFT)
+>> +#define __READABLE		(_PAGE_VALID)
+>> +#define __WRITEABLE		(_PAGE_DIRTY | _PAGE_WRITE)
+>> +#define _CACHE_CC		(0x1UL << _CACHE_SHIFT) /* Coherent Cached */
+>> +#endif
+>> diff --git a/tools/testing/selftests/kvm/include/loongarch/sysreg.h b/tools/testing/selftests/kvm/include/loongarch/sysreg.h
+>> new file mode 100644
+>> index 000000000000..04f53674c9d8
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/include/loongarch/sysreg.h
+> Any reason these can't simply go in processor.h?  Neither file is particular large,
+> especially for CPU definition files.
+Thanks, I will move the contents of sysreg.h into processor.h to make 
+the file easier.
+>
+>> @@ -0,0 +1,89 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +#ifndef SELFTEST_KVM_SYSREG_H
+>> +#define SELFTEST_KVM_SYSREG_H
+>> +
+>> +/*
+>> + * note that this declaration raises a checkpatch warning, but
+>> + * no good way to avoid it.
+>> + */
+> Definitely drop this comment, once the patch is applied the fact that checkpatch
+> complains is irrelevant.
+Ok, I will drop this comment.
 
 Thanks
-> > > 
-> > > 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the
-> > > instruction")
-> > 
-> > Sorry, that should have been:
-> > 
-> > 7e5b5ef8dca3 ("KVM: SVM: Re-inject INTn instead of retrying the insn on
-> > "failure"")
-> 
-> Doh! I was right the first time... sigh
-> 
-> 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
-> 
-> Thanks,
-> Tom
-> 
-> > 
-> > > 
-> > > Before this the !nrips check would prevent the call into
-> > > svm_skip_emulated_instruction(). But now, there is a call to:
-> > > 
-> > >    svm_update_soft_interrupt_rip()
-> > >      __svm_skip_emulated_instruction()
-> > >        kvm_emulate_instruction()
-> > >          x86_emulate_instruction() (passed a NULL insn pointer)
-> > >            kvm_can_emulate_insn() (passed a NULL insn pointer)
-> > >              svm_can_emulate_instruction() (passed NULL insn pointer)
-> > > 
-> > > Because it is an SEV guest, it ends up in the "if (unlikely(!insn))" path
-> > > and injects the #UD.
-> > > 
-> > > Thanks,
-> > > Tom
-> > > 
+Tianrui Zhao
+>
+>> +#define zero	$r0
 
