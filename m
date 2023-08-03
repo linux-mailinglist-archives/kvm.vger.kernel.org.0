@@ -2,316 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AA8776ECEE
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:43:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFF0276ED50
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:56:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234153AbjHCOno (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 10:43:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50062 "EHLO
+        id S236208AbjHCO4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 10:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjHCOmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 10:42:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E4946A1
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:41:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691073673;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=sdjOUaagf8wzj+9dXABDn81ONTEy4ukFajiNJ6J9Xz0=;
-        b=X9TgGceSrlSNB0P5bhGHdTwoTKkJQhlBzwVN5h9td1B95gHpUfPQDwF5SVxBZ8Zag2IeN/
-        OF51YflgDt/5DlEOnRKRrOJmzIyZaLhHYdP8g2hAlYx43iyDRao/G6yPZ1ZU6/Dxqvuafn
-        gY0bvL8hHZJEdPhrqjFoOWXO30/VFD8=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-397-az8IbsBMNxi6IQHCDoCwAw-1; Thu, 03 Aug 2023 10:41:11 -0400
-X-MC-Unique: az8IbsBMNxi6IQHCDoCwAw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 101783C025B3;
-        Thu,  3 Aug 2023 14:41:11 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 86AA71401C2E;
-        Thu,  3 Aug 2023 14:41:10 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH] vfio: align capability structures
-Date:   Thu,  3 Aug 2023 10:41:09 -0400
-Message-ID: <20230803144109.2331944-1-stefanha@redhat.com>
+        with ESMTP id S236216AbjHCO4i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 10:56:38 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545451990
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:56:37 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3a6f3ef3155so780404b6e.1
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 07:56:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1691074596; x=1691679396;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9hyFp+WOW+/vd01e2wQ2PJhYLg5FzB78DSPLaMZwJJc=;
+        b=LM+vjonnFE2mN6DKBgGGnuIBMg+KyZq8ditO7F2DyWQOF9cbbMjPrISPG8/ISkAU2w
+         /uU93H9qVn9Q1OOe54CqM3dsdI8DAQJpW6inYpLxDQ4mpAtiwDcQ9Z9rzlhjZ53QS4Fh
+         TZHCI9x5zbiIRAjNWj05tsGo5+3jdHn5Z1MoYMxFaVyHuK9cpLupfKORwCUcAgUFtpJq
+         7aPHeVsTrVKNFmy/KoTyS3GS9CtCwzl7B7dLXywap2r6PiGx1o3XYv59vCJumDvE+w+U
+         bwiA8CZoLlhovg08C0F2ND5peG7dm/h8SnQp0IouxgdIlMCUPDREYYrM2rA8WMa7Ui/h
+         rrKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691074596; x=1691679396;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9hyFp+WOW+/vd01e2wQ2PJhYLg5FzB78DSPLaMZwJJc=;
+        b=OQs6AJ/yJazFkujx4uDzvk4ZdeE1n8VR/bvhGKkGR4XjHp6jfXTm7DaPKmAZDx1SPL
+         8MyOG0f8rY5yuTjdcrdMAtxVytSEO19haF02LEduAomxoZ7E0bytDHZL9O+ZbZBLeSLU
+         xZ/Z0JkLwEoZ1qIqDDAFUcH/sn5yWKXlsGSftj15A8PsKzLeKwwDcVqPp1a+R8gYSaBB
+         pZ6l3crDwI5iHmGegONmHCprt+CBkK6pSTVC2hEutbJUhEIz4bs0M7IOI+VEchQEW6mr
+         lrmlVEU6TR/Do9NTO28lnHOaGcXXFAH9bCFvV19efsmv1o8nPljzse/WHHjmSy4HqPcI
+         c0xQ==
+X-Gm-Message-State: ABy/qLaUQfYliN1lpJ5CaHhrEmVl3+NOMCdr+WQAaWQFod9P8qqK8UrI
+        tEm/7zjiqzG/l220oE+AlwKsVg==
+X-Google-Smtp-Source: APBJJlEzXXI3/ZLMBVq6Rkf2ep5w01HsOd8PK0JmrTvxzzjQp8NND2XQF0tUmpYGZgDbswWqNYEcng==
+X-Received: by 2002:a05:6808:1a17:b0:3a7:458e:3df4 with SMTP id bk23-20020a0568081a1700b003a7458e3df4mr12354106oib.56.1691074596615;
+        Thu, 03 Aug 2023 07:56:36 -0700 (PDT)
+Received: from [192.168.68.108] ([187.11.154.63])
+        by smtp.gmail.com with ESMTPSA id y6-20020a056808130600b003a7543bb635sm401034oiv.22.2023.08.03.07.56.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Aug 2023 07:56:36 -0700 (PDT)
+Message-ID: <b7ac5ba8-63f0-ca47-aa64-cb634e0fb33b@ventanamicro.com>
+Date:   Thu, 3 Aug 2023 11:56:32 -0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 00/10] RISC-V: KVM: change get_reg/set_reg error codes
+Content-Language: en-US
+To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     anup@brainfault.org, atishp@atishpatra.org, ajones@ventanamicro.com
+References: <20230803140022.399333-1-dbarboza@ventanamicro.com>
+From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+In-Reply-To: <20230803140022.399333-1-dbarboza@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The VFIO_DEVICE_GET_INFO, VFIO_DEVICE_GET_REGION_INFO, and
-VFIO_IOMMU_GET_INFO ioctls fill in an info struct followed by capability
-structs:
 
-  +------+---------+---------+-----+
-  | info | caps[0] | caps[1] | ... |
-  +------+---------+---------+-----+
 
-Both the info and capability struct sizes are not always multiples of
-sizeof(u64), leaving u64 fields in later capability structs misaligned.
+On 8/3/23 11:00, Daniel Henrique Barboza wrote:
+> Hi,
+> 
+> This version has changes in the document patch, as suggested by Andrew
+> in v2. It also has a new patch (patch 9) that handles error code changes
+> in vcpu_vector.c.
 
-Userspace applications currently need to handle misalignment manually in
-order to support CPU architectures and programming languages with strict
-alignment requirements.
+I forgot to include a diff that Andrew mentioned in his v2 review:
 
-Make life easier for userspace by ensuring alignment in the kernel.
-The new layout is as follows:
 
-  +------+---+---------+---------+---+-----+
-  | info | 0 | caps[0] | caps[1] | 0 | ... |
-  +------+---+---------+---------+---+-----+
+diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+index c88b0c7f7f01..6ca90c04ba61 100644
+--- a/arch/riscv/kvm/vcpu_onereg.c
++++ b/arch/riscv/kvm/vcpu_onereg.c
+@@ -506,7 +506,7 @@ static int riscv_vcpu_get_isa_ext_multi(struct kvm_vcpu *vcpu,
+         unsigned long i, ext_id, ext_val;
 
-In this example info and caps[1] have sizes that are not multiples of
-sizeof(u64), so zero padding is added to align the subsequent structure.
+         if (reg_num > KVM_REG_RISCV_ISA_MULTI_REG_LAST)
+-               return -EINVAL;
++               return -ENOENT;
 
-Adding zero padding between structs does not break the uapi. The memory
-layout is specified by the info.cap_offset and caps[i].next fields
-filled in by the kernel. Applications use these field values to locate
-structs and are therefore unaffected by the addition of zero padding.
+         for (i = 0; i < BITS_PER_LONG; i++) {
+                 ext_id = i + reg_num * BITS_PER_LONG;
+@@ -529,7 +529,7 @@ static int riscv_vcpu_set_isa_ext_multi(struct kvm_vcpu *vcpu,
+         unsigned long i, ext_id;
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/linux/vfio.h             |  2 +-
- drivers/gpu/drm/i915/gvt/kvmgt.c |  7 +++--
- drivers/s390/cio/vfio_ccw_ops.c  |  7 +++--
- drivers/vfio/pci/vfio_pci_core.c | 14 ++++++---
- drivers/vfio/vfio_iommu_type1.c  |  7 +++--
- drivers/vfio/vfio_main.c         | 53 +++++++++++++++++++++++++++-----
- 6 files changed, 71 insertions(+), 19 deletions(-)
+         if (reg_num > KVM_REG_RISCV_ISA_MULTI_REG_LAST)
+-               return -EINVAL;
++               return -ENOENT;
 
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 2c137ea94a3e..ff0864e73cc3 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -272,7 +272,7 @@ struct vfio_info_cap {
- struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
- 					       size_t size, u16 id,
- 					       u16 version);
--void vfio_info_cap_shift(struct vfio_info_cap *caps, size_t offset);
-+ssize_t vfio_info_cap_shift(struct vfio_info_cap *caps, size_t offset);
- 
- int vfio_info_add_capability(struct vfio_info_cap *caps,
- 			     struct vfio_info_cap_header *cap, size_t size);
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index de675d799c7d..9060e9c6ac7c 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1297,7 +1297,10 @@ static long intel_vgpu_ioctl(struct vfio_device *vfio_dev, unsigned int cmd,
- 				info.argsz = sizeof(info) + caps.size;
- 				info.cap_offset = 0;
- 			} else {
--				vfio_info_cap_shift(&caps, sizeof(info));
-+				ssize_t cap_offset = vfio_info_cap_shift(&caps, sizeof(info));
-+				if (cap_offset < 0)
-+					return cap_offset;
-+
- 				if (copy_to_user((void __user *)arg +
- 						  sizeof(info), caps.buf,
- 						  caps.size)) {
-@@ -1305,7 +1308,7 @@ static long intel_vgpu_ioctl(struct vfio_device *vfio_dev, unsigned int cmd,
- 					kfree(sparse);
- 					return -EFAULT;
- 				}
--				info.cap_offset = sizeof(info);
-+				info.cap_offset = cap_offset;
- 			}
- 
- 			kfree(caps.buf);
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 5b53b94f13c7..63d5163376a5 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -361,13 +361,16 @@ static int vfio_ccw_mdev_get_region_info(struct vfio_ccw_private *private,
- 			info->argsz = sizeof(*info) + caps.size;
- 			info->cap_offset = 0;
- 		} else {
--			vfio_info_cap_shift(&caps, sizeof(*info));
-+			ssize_t cap_offset = vfio_info_cap_shift(&caps, sizeof(*info));
-+			if (cap_offset < 0)
-+				return cap_offset;
-+
- 			if (copy_to_user((void __user *)arg + sizeof(*info),
- 					 caps.buf, caps.size)) {
- 				kfree(caps.buf);
- 				return -EFAULT;
- 			}
--			info->cap_offset = sizeof(*info);
-+			info->cap_offset = cap_offset;
- 		}
- 
- 		kfree(caps.buf);
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 20d7b69ea6ff..92c093b99187 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -966,12 +966,15 @@ static int vfio_pci_ioctl_get_info(struct vfio_pci_core_device *vdev,
- 		if (info.argsz < sizeof(info) + caps.size) {
- 			info.argsz = sizeof(info) + caps.size;
- 		} else {
--			vfio_info_cap_shift(&caps, sizeof(info));
-+			ssize_t cap_offset = vfio_info_cap_shift(&caps, sizeof(info));
-+			if (cap_offset < 0)
-+				return cap_offset;
-+
- 			if (copy_to_user(arg + 1, caps.buf, caps.size)) {
- 				kfree(caps.buf);
- 				return -EFAULT;
- 			}
--			info.cap_offset = sizeof(*arg);
-+			info.cap_offset = cap_offset;
- 		}
- 
- 		kfree(caps.buf);
-@@ -1107,12 +1110,15 @@ static int vfio_pci_ioctl_get_region_info(struct vfio_pci_core_device *vdev,
- 			info.argsz = sizeof(info) + caps.size;
- 			info.cap_offset = 0;
- 		} else {
--			vfio_info_cap_shift(&caps, sizeof(info));
-+			ssize_t cap_offset = vfio_info_cap_shift(&caps, sizeof(info));
-+			if (cap_offset < 0)
-+				return cap_offset;
-+
- 			if (copy_to_user(arg + 1, caps.buf, caps.size)) {
- 				kfree(caps.buf);
- 				return -EFAULT;
- 			}
--			info.cap_offset = sizeof(*arg);
-+			info.cap_offset = cap_offset;
- 		}
- 
- 		kfree(caps.buf);
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index ebe0ad31d0b0..ab64b9e3ed7c 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2808,14 +2808,17 @@ static int vfio_iommu_type1_get_info(struct vfio_iommu *iommu,
- 		if (info.argsz < sizeof(info) + caps.size) {
- 			info.argsz = sizeof(info) + caps.size;
- 		} else {
--			vfio_info_cap_shift(&caps, sizeof(info));
-+			ssize_t cap_offset = vfio_info_cap_shift(&caps, sizeof(info));
-+			if (cap_offset < 0)
-+				return cap_offset;
-+
- 			if (copy_to_user((void __user *)arg +
- 					sizeof(info), caps.buf,
- 					caps.size)) {
- 				kfree(caps.buf);
- 				return -EFAULT;
- 			}
--			info.cap_offset = sizeof(info);
-+			info.cap_offset = cap_offset;
- 		}
- 
- 		kfree(caps.buf);
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index f0ca33b2e1df..4fc8698577a7 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -1171,8 +1171,18 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
- {
- 	void *buf;
- 	struct vfio_info_cap_header *header, *tmp;
-+	size_t header_offset;
-+	size_t new_size;
- 
--	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
-+	/*
-+	 * Reserve extra space when the previous capability was not a multiple of
-+	 * the largest field size. This ensures that capabilities are properly
-+	 * aligned.
-+	 */
-+	header_offset = ALIGN(caps->size, sizeof(u64));
-+	new_size = header_offset + size;
-+
-+	buf = krealloc(caps->buf, new_size, GFP_KERNEL);
- 	if (!buf) {
- 		kfree(caps->buf);
- 		caps->buf = NULL;
-@@ -1181,10 +1191,10 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
- 	}
- 
- 	caps->buf = buf;
--	header = buf + caps->size;
-+	header = buf + header_offset;
- 
- 	/* Eventually copied to user buffer, zero */
--	memset(header, 0, size);
-+	memset(buf + caps->size, 0, new_size - caps->size);
- 
- 	header->id = id;
- 	header->version = version;
-@@ -1193,20 +1203,47 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
- 	for (tmp = buf; tmp->next; tmp = buf + tmp->next)
- 		; /* nothing */
- 
--	tmp->next = caps->size;
--	caps->size += size;
-+	tmp->next = header_offset;
-+	caps->size = new_size;
- 
- 	return header;
- }
- EXPORT_SYMBOL_GPL(vfio_info_cap_add);
- 
--void vfio_info_cap_shift(struct vfio_info_cap *caps, size_t offset)
-+/*
-+ * Adjust the capability next fields to account for the given offset at which
-+ * capability structures start and any padding added for alignment. Returns the
-+ * cap_offset or -errno.
-+ */
-+ssize_t vfio_info_cap_shift(struct vfio_info_cap *caps, size_t offset)
- {
- 	struct vfio_info_cap_header *tmp;
-+	struct vfio_info_cap_header *next_tmp;
- 	void *buf = (void *)caps->buf;
-+	size_t pad = ALIGN(offset, sizeof(u64)) - offset;
-+	size_t cap_offset = offset + pad;
- 
--	for (tmp = buf; tmp->next; tmp = buf + tmp->next - offset)
--		tmp->next += offset;
-+	/* Shift the next fields to account for offset and pad */
-+	for (tmp = buf; tmp->next; tmp = next_tmp) {
-+		next_tmp = buf + tmp->next;
-+		tmp->next += cap_offset;
-+	}
-+
-+	/* Pad with zeroes so capabilities start with proper alignment */
-+	buf = krealloc(caps->buf, caps->size + pad, GFP_KERNEL);
-+	if (!buf) {
-+		kfree(caps->buf);
-+		caps->buf = NULL;
-+		caps->size = 0;
-+		return -ENOMEM;
-+	}
-+
-+	memmove(buf + pad, buf, caps->size);
-+	memset(buf, 0, pad);
-+
-+	caps->buf = buf;
-+	caps->size += pad;
-+	return cap_offset;
- }
- EXPORT_SYMBOL(vfio_info_cap_shift);
- 
--- 
-2.41.0
+         for_each_set_bit(i, &reg_val, BITS_PER_LONG) {
+                 ext_id = i + reg_num * BITS_PER_LONG;
+@@ -644,7 +644,7 @@ int kvm_riscv_vcpu_set_reg(struct kvm_vcpu *vcpu,
+                 break;
+         }
 
+-       return -EINVAL;
++       return -ENOENT;
+  }
+
+  int kvm_riscv_vcpu_get_reg(struct kvm_vcpu *vcpu,
+
+
+I'll send a v4 including it. Thanks,
+
+
+Daniel
+
+
+> 
+> Patches rebased on top of kvm_riscv_queue.
+> 
+> Changes from v2:
+> - patch 9 (new):
+>    - change kvm error codes for vector registers
+> - patch 10 (former 9):
+>    - rewrite EBUSY doc to mention that the error code indicates that it
+>      is not allowed to change the reg val after the vcpu started.
+> - v2 link: https://lore.kernel.org/kvm/20230801222629.210929-1-dbarboza@ventanamicro.com/
+> 
+> Andrew Jones (1):
+>    RISC-V: KVM: Improve vector save/restore errors
+> 
+> Daniel Henrique Barboza (9):
+>    RISC-V: KVM: return ENOENT in *_one_reg() when reg is unknown
+>    RISC-V: KVM: use ENOENT in *_one_reg() when extension is unavailable
+>    RISC-V: KVM: do not EOPNOTSUPP in set_one_reg() zicbo(m|z)
+>    RISC-V: KVM: do not EOPNOTSUPP in set KVM_REG_RISCV_TIMER_REG
+>    RISC-V: KVM: use EBUSY when !vcpu->arch.ran_atleast_once
+>    RISC-V: KVM: avoid EBUSY when writing same ISA val
+>    RISC-V: KVM: avoid EBUSY when writing the same machine ID val
+>    RISC-V: KVM: avoid EBUSY when writing the same isa_ext val
+>    docs: kvm: riscv: document EBUSY in KVM_SET_ONE_REG
+> 
+>   Documentation/virt/kvm/api.rst |  2 +
+>   arch/riscv/kvm/aia.c           |  4 +-
+>   arch/riscv/kvm/vcpu_fp.c       | 12 +++---
+>   arch/riscv/kvm/vcpu_onereg.c   | 68 +++++++++++++++++++++++-----------
+>   arch/riscv/kvm/vcpu_sbi.c      | 16 ++++----
+>   arch/riscv/kvm/vcpu_timer.c    | 11 +++---
+>   arch/riscv/kvm/vcpu_vector.c   | 60 ++++++++++++++++--------------
+>   7 files changed, 104 insertions(+), 69 deletions(-)
+> 
