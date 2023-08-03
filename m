@@ -2,114 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A75CD76F174
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 20:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C91676F1D8
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 20:28:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232399AbjHCSJX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 14:09:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37462 "EHLO
+        id S232395AbjHCS2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 14:28:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbjHCSJH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 14:09:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF8E3A85
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 11:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691085984;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S1ZJTd38oGT1lCSM4IaW/s1mn4TZSNjX8w7N3Xg2xtY=;
-        b=KbG2v8vs3E8bxTQ7Wmwma9UeLCeXC1xvTgzlMe15llQMKBYU8lQMzaMZjs+esz/ZVxzxjo
-        pv52gCd5kjXpkDGAedO3NF+9gAKkY3SKz+8lg0kalfMSeuLdGv77qfqeLo6yzY9n3AQCAR
-        90UzMP/YE5GrDKfEuuTTxanYXDTowG0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-32-5via6L6jOZ2nZsfnhINO4w-1; Thu, 03 Aug 2023 14:06:23 -0400
-X-MC-Unique: 5via6L6jOZ2nZsfnhINO4w-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5226eaba9e9so767538a12.2
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 11:06:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691085982; x=1691690782;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1ZJTd38oGT1lCSM4IaW/s1mn4TZSNjX8w7N3Xg2xtY=;
-        b=MwiLNM/aB9B8Ziud9ypvu1EwW0yH8j+LKcV+pUB5YrFEakltDHhsznrISo3bE0LDbF
-         X8373pLXjS1ycUaz2pANj6RxX1ypiUtV4doMGHzBuXdYjh2RvCxRwgr6yDmGFfWKOCgb
-         OrmwYUiq3s655oNagiJoNy25DfzXB8w4qkxUJ+IVqtwEufIloKKIdRsvgiUoVGguzCfw
-         OeDVvnBlLeKH0F+vE2tibsMVlmkAdsRaAvgEFM5UFlouLOBac0p2S8oNfAgZgaN7kKV1
-         Z0TRB8l2/TyIHam4CdQ6h2NR2Wrj/X2v6AxIti80yqviWIcZnkRInHtWN9+fY+4NNRwn
-         iBKg==
-X-Gm-Message-State: ABy/qLYBZRNGkxdlkUuA2N/irlyeWRObFC0FyekNLu5ZZ6OhxBFE3YeY
-        OC+eAwvRX+pT9FTiH92JkR1aWo3zfQXQ+b0g3OwEjN4Jp6iJx/fdqBXxRA1+7YvaknHiI9uhqHb
-        bSYvK1ac2Qpo/
-X-Received: by 2002:aa7:c909:0:b0:522:2bc8:cbb8 with SMTP id b9-20020aa7c909000000b005222bc8cbb8mr7896551edt.6.1691085982401;
-        Thu, 03 Aug 2023 11:06:22 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFtE+yfltFDHkqS15jMqMR1Edptp9lqv6uXuMSNq97wdoUmq+ekXmmUPeYoAq3AcEaTA4p8dA==
-X-Received: by 2002:aa7:c909:0:b0:522:2bc8:cbb8 with SMTP id b9-20020aa7c909000000b005222bc8cbb8mr7896538edt.6.1691085982139;
-        Thu, 03 Aug 2023 11:06:22 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id r9-20020aa7d149000000b005231410bbf2sm108084edo.11.2023.08.03.11.06.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Aug 2023 11:06:21 -0700 (PDT)
-Message-ID: <b22761ea-cab6-0e11-cdc9-ec26c300cd3f@redhat.com>
-Date:   Thu, 3 Aug 2023 20:06:20 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+        with ESMTP id S230344AbjHCS2L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 14:28:11 -0400
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 457FA110;
+        Thu,  3 Aug 2023 11:28:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1691087287; x=1722623287;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   content-id:mime-version:content-transfer-encoding;
+  bh=dU7FhD9vg9CDvnRfzIXtvR7vPuzQleLv4BUkDfepjCk=;
+  b=loyjJ0Nkhbkmzv90mngg8M+qc0afK4SSmBS9xNM0G706Fz/nrhL28zVw
+   HojYvmpDne89nDofr1cj08Hc3znJ0ahEmHevC/kWXl5coruod57uOGn0z
+   IIpNeg726xobAK5QAC8CvMxE9Doj/UAJ2ND1sMted90/Y+XuHHXbPzPWV
+   k=;
+X-IronPort-AV: E=Sophos;i="6.01,252,1684800000"; 
+   d="scan'208";a="350627819"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 18:28:01 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2b-m6i4x-26a610d2.us-west-2.amazon.com (Postfix) with ESMTPS id 8B90F40DE0;
+        Thu,  3 Aug 2023 18:27:58 +0000 (UTC)
+Received: from EX19D020UWA002.ant.amazon.com (10.13.138.222) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 3 Aug 2023 18:27:58 +0000
+Received: from EX19D033EUC001.ant.amazon.com (10.252.61.132) by
+ EX19D020UWA002.ant.amazon.com (10.13.138.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 3 Aug 2023 18:27:57 +0000
+Received: from EX19D033EUC001.ant.amazon.com ([fe80::6dc8:500e:fe63:454c]) by
+ EX19D033EUC001.ant.amazon.com ([fe80::6dc8:500e:fe63:454c%3]) with mapi id
+ 15.02.1118.030; Thu, 3 Aug 2023 18:27:56 +0000
+From:   "Schander, Johanna 'Mimoja' Amelie" <mimoja@amazon.de>
+To:     "Graf (AWS), Alexander" <graf@amazon.de>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "mimoja@mimoja.de" <mimoja@mimoja.de>
+CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "nikunj.dadhania@amd.com" <nikunj.dadhania@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+Subject: Re: [PATCH RFC v8 00/56] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Thread-Topic: [PATCH RFC v8 00/56] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Thread-Index: AQHZxjg5EcZaH17x7USkn+te0u//TQ==
+Date:   Thu, 3 Aug 2023 18:27:56 +0000
+Message-ID: <f4905c32f4054d4ce254b3acb9339aa1c59728b8.camel@amazon.de>
+In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Nikunj A Dadhania <nikunj@amd.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ravi Bangoria <ravi.bangoria@amd.com>
-References: <20230802091107.1160320-1-nikunj@amd.com>
- <20230803120637.GD214207@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
- kvm-amd.o
-In-Reply-To: <20230803120637.GD214207@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.106.82.18]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <21BE49845F41F240B8334E1AF103963F@amazon.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,
+        T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/23 14:06, Peter Zijlstra wrote:
-> 
-> By marking them with STACK_FRAME_NON_STANDARD you will get no ORC data
-> at all, and then you also violate the normal framepointer calling
-> convention.
-> 
-> This means that if you need to unwind here you're up a creek without no
-> paddles on.
-
-The only weird thing that can happen is ud2 instructions that are 
-executed in case the vmload/vmrun/vmsave instructions causes a #GP, from 
-the exception handler.
-
-If I understand correctly those ud2 would use ORC information to show 
-the backtrace, but even then the frame pointer should be correct.  Of 
-these instructions, vmrun is the only one that runs with wrong %rbp; and 
-it is unlikely or even impossible that a #GP happens at vmrun, because 
-the same operand has been used for a vmload ten instructions before. 
-The only time I saw that #GP it was due to a processor errata, but it 
-happened consistently on the vmload.
-
-So if frame pointer unwinding can be used in the absence of ORC, Nikunj 
-patch should not break anything.
-
-Paolo
+V2UgZGlzY292ZXJlZCB0aGF0IHRoZSBrZHVtcCBjcmFzaGtlcm5lbCB3b3VsZCBub3Qgd29yayB3
+aXRoIG91ciBTRVYtDQpTTlAgY29uZmlndXJhdGlvbi4NCg0KQWZ0ZXIgcmVhZGluZyB0aGUgZGV2
+aWNlIHRhYmxlIGZyb20gdGhlIHByZXZpb3VyIGtlcm5lbCB3ZSB3b3VsZA0Kc2VlIGEgbG90IG9m
+DQogIEFNRC1WaTogQ29tcGxldGlvbi1XYWl0IGxvb3AgdGltZWQgb3V0DQplcnJvcnMgYW5kIGZp
+bmFsbHkgY3Jhc2g6DQogIEtlcm5lbCBwYW5pYyAtIG5vdCBzeW5jaW5nOiB0aW1lciBkb2Vzbid0
+IHdvcmsgdGhyb3VnaCBJbnRlcnJ1cHQtDQpyZW1hcHBlZCBJTy1BUElDDQoNCldlIGZvdW5kIHRo
+YXQgZGlzYWJlbGluZyBTTlAgaW4gdGhlIG91dGdvaW5nIChjcmFzaGluZykga2VybmVsDQp3b3Vs
+ZCBlbmFibGUgdGhlIGNyYXNoa2VybmVsIHRvIHRha2Ugb3ZlciB0aGUgaW9tbXUgY29uZmlnIGFu
+ZA0KYm9vdCBmcm9tIHRoZXJlLg0KDQpXZSBvcGVuZWQgYSBQUiBvdmVyIG9uIGdpdGh1YiBhZ2Fp
+bnN0IHRoZSByZmMtdjkgYnJhbmNoIHRvIGRpc2N1c3MNCnRoZSBpc3N1ZToNCmh0dHBzOi8vZ2l0
+aHViLmNvbS9BTURFU0UvbGludXgvcHVsbC81DQoNCkNoZWVycyBKb2hhbm5hDQoNCg0KDQoNCgoK
+CkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEw
+MTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIEpvbmF0
+aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJsb3R0ZW5idXJnIHVudGVy
+IEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkgMjM3IDg3OQoKCg==
 
