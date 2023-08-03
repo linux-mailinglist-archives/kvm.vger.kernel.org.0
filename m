@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E278876E1BF
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAAC076E1C2
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:37:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234082AbjHCHhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 03:37:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46922 "EHLO
+        id S231542AbjHCHhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 03:37:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233213AbjHCHgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232386AbjHCHgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 3 Aug 2023 03:36:09 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7012949DD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78F3B49DE;
         Thu,  3 Aug 2023 00:32:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1691047940; x=1722583940;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=vNllE2Y9ire4AWHQOg7xEw0xLKtvwfNzPjWKsewbPlk=;
-  b=aPF1Pwb5si9DWTtNIhp5GcTbCkLo2iekEPk1enMjMxC48gJTT3/VDn+v
-   0AjY2Wq9rEvOhqW8udK+oIB6iqef345xHemgJEsyzjtKUHCDyw9okNe6O
-   ZsyUnt3XruwnJOq/tt7JeNW3bGptip2nHuVHzrd1TDRJvzcHrcPd2xgKJ
-   W/PxgK/Azf8tAChGChz1Fb0n0qIWYgumBb5EsiX9/y5NQo+xB9ng/VPr8
-   RS4ltY0IUevqyUOPv9Y7Xvde0Ea72RVYQKdHTE310Ve9AT2z4peCz9DFd
-   kkRnwJ0KhYkvPH5Th/SK5B6qklXX4Ic4qUGfHuAhYg9E7314NOYkRGyhC
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="354708139"
+  bh=93vLErl8ccSchrRyHq0bfKsXuDt7NS/Y/g+1+b739Vw=;
+  b=SbsvmerdnnchPRroZiZO4kOEuyUj1IDhI+BbMM4eQ1HWgWaG/Stz3UI0
+   3qKhlGrN7HzJ6MeDZuWn8imp8YHhi1f8gOUmq9zJAl1LvZxYjx09eTQV2
+   PFM0CnXyqdP+IVoHsfZbSRjpcW7ZTkZO7BLlK/6VGtShg+5VJN/GKpSNw
+   m9CejDpKbk9Qg1LBFjBVXRPtTlsW3pQYmGx+kUTEzYCjkeyKK3EzvOcCL
+   b5sFeaNEStwIDwuk4kLG2zYcASvBsBlXmhoHCxZNfiHmA0ii+HHeDzw74
+   Mopod1w0snP9aLrPopNe8lnxw+yno87GzEUQVocgZMdZ/YE6Pub/0UqE0
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="354708150"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="354708139"
+   d="scan'208";a="354708150"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:32:17 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:32:18 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="794888502"
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="794888508"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="794888502"
+   d="scan'208";a="794888508"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:32:17 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
@@ -44,9 +44,9 @@ To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         linux-kernel@vger.kernel.org
 Cc:     rick.p.edgecombe@intel.com, chao.gao@intel.com,
         binbin.wu@linux.intel.com, weijiang.yang@intel.com
-Subject: [PATCH v5 12/19] KVM:x86: Save and reload SSP to/from SMRAM
-Date:   Thu,  3 Aug 2023 00:27:25 -0400
-Message-Id: <20230803042732.88515-13-weijiang.yang@intel.com>
+Subject: [PATCH v5 13/19] KVM:VMX: Set up interception for CET MSRs
+Date:   Thu,  3 Aug 2023 00:27:26 -0400
+Message-Id: <20230803042732.88515-14-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230803042732.88515-1-weijiang.yang@intel.com>
 References: <20230803042732.88515-1-weijiang.yang@intel.com>
@@ -62,88 +62,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Save CET SSP to SMRAM on SMI and reload it on RSM.
-KVM emulates architectural behavior when guest enters/leaves SMM
-mode, i.e., save registers to SMRAM at the entry of SMM and reload
-them at the exit of SMM. Per SDM, SSP is defined as one of
-the fields in SMRAM for 64-bit mode, so handle the state accordingly.
-
-Check is_smm() to determine whether kvm_cet_is_msr_accessible()
-is called in SMM mode so that kvm_{set,get}_msr() works in SMM mode.
+Pass through CET MSRs when the associated feature is enabled.
+Shadow Stack feature requires all the CET MSRs to make it
+architectural support in guest. IBT feature only depends on
+MSR_IA32_U_CET and MSR_IA32_S_CET to enable both user and
+supervisor IBT. Note, This MSR design introduced an architectual
+limitation of SHSTK and IBT control for guest, i.e., when SHSTK
+is exposed, IBT is also available to guest from architectual level
+since IBT relies on subset of SHSTK relevant MSRs.
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/smm.c | 11 +++++++++++
- arch/x86/kvm/smm.h |  2 +-
- arch/x86/kvm/x86.c | 11 ++++++++++-
- 3 files changed, 22 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-index b42111a24cc2..e0b62d211306 100644
---- a/arch/x86/kvm/smm.c
-+++ b/arch/x86/kvm/smm.c
-@@ -309,6 +309,12 @@ void enter_smm(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index ccf750e79608..6779b8a63789 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -709,6 +709,10 @@ static bool is_valid_passthrough_msr(u32 msr)
+ 	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
+ 		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+ 		return true;
++	case MSR_IA32_U_CET:
++	case MSR_IA32_S_CET:
++	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
++		return true;
+ 	}
  
- 	kvm_smm_changed(vcpu, true);
+ 	r = possible_passthrough_msr_slot(msr) != -ENOENT;
+@@ -7747,6 +7751,41 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+ 		vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+ }
  
-+#ifdef CONFIG_X86_64
-+	if (guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
-+	    kvm_get_msr(vcpu, MSR_KVM_GUEST_SSP, &smram.smram64.ssp))
-+		goto error;
-+#endif
++static void vmx_update_intercept_for_cet_msr(struct kvm_vcpu *vcpu)
++{
++	bool incpt;
 +
- 	if (kvm_vcpu_write_guest(vcpu, vcpu->arch.smbase + 0xfe00, &smram, sizeof(smram)))
- 		goto error;
- 
-@@ -586,6 +592,11 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 	if ((vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK) == 0)
- 		static_call(kvm_x86_set_nmi_mask)(vcpu, false);
- 
-+#ifdef CONFIG_X86_64
-+	if (guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
-+	    kvm_set_msr(vcpu, MSR_KVM_GUEST_SSP, smram.smram64.ssp))
-+		return X86EMUL_UNHANDLEABLE;
-+#endif
- 	kvm_smm_changed(vcpu, false);
- 
- 	/*
-diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
-index a1cf2ac5bd78..1e2a3e18207f 100644
---- a/arch/x86/kvm/smm.h
-+++ b/arch/x86/kvm/smm.h
-@@ -116,8 +116,8 @@ struct kvm_smram_state_64 {
- 	u32 smbase;
- 	u32 reserved4[5];
- 
--	/* ssp and svm_* fields below are not implemented by KVM */
- 	u64 ssp;
-+	/* svm_* fields below are not implemented by KVM */
- 	u64 svm_guest_pat;
- 	u64 svm_host_efer;
- 	u64 svm_host_cr4;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 98f3ff6078e6..56aa5a3d3913 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3644,8 +3644,17 @@ static bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu,
- 		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
- 			return false;
- 
--		if (msr->index == MSR_KVM_GUEST_SSP)
-+		/*
-+		 * This MSR is synthesized mainly for userspace access during
-+		 * Live Migration, it also can be accessed in SMM mode by VMM.
-+		 * Guest is not allowed to access this MSR.
-+		 */
-+		if (msr->index == MSR_KVM_GUEST_SSP) {
-+			if (IS_ENABLED(CONFIG_X86_64) && is_smm(vcpu))
-+				return true;
++	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
++		incpt = !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
 +
- 			return msr->host_initiated;
-+		}
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL3_SSP,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_INT_SSP_TAB,
++					  MSR_TYPE_RW, incpt);
++		if (!incpt)
++			return;
++	}
++
++	if (kvm_cpu_cap_has(X86_FEATURE_IBT)) {
++		incpt = !guest_can_use(vcpu, X86_FEATURE_IBT);
++
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET,
++					  MSR_TYPE_RW, incpt);
++		vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET,
++					  MSR_TYPE_RW, incpt);
++	}
++}
++
+ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -7814,6 +7853,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
  
- 		return msr->host_initiated ||
- 			guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+ 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+ 	vmx_update_exception_bitmap(vcpu);
++
++	vmx_update_intercept_for_cet_msr(vcpu);
+ }
+ 
+ static u64 vmx_get_perf_capabilities(void)
 -- 
 2.27.0
 
