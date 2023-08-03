@@ -2,159 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFFBA76F03D
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 19:00:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E477476F04B
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 19:05:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234746AbjHCRA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 13:00:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56722 "EHLO
+        id S233613AbjHCRFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 13:05:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234316AbjHCRAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 13:00:16 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 647553C28
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 10:00:05 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58419550c3aso12892977b3.0
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 10:00:05 -0700 (PDT)
+        with ESMTP id S232802AbjHCRFw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 13:05:52 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CCFA30D2
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 10:05:50 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-99bf3f59905so166405366b.3
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 10:05:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691082004; x=1691686804;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LdpV+DH+21J7QAEkTnfNOAQAsfcko1q6UaP1GJIDTnI=;
-        b=zXo67EMFCmlR8g2/3AGxLd05dx70MvSxWD4rF+7pgg99d1xuRvHZrpbOgyGUsP3QBU
-         ylvUZJY/+4n4+ZEEfTrsh+ne0dd4tnwdm3VZBLGhaQd9BJAEOVUzLpzk1zK2rNowebYt
-         TmRtsvrV95AFDUiRlwg38JifdZ22CGW3+t5sLmvAfc9L+HxOB/fRmPpKGq6uw65HJnIM
-         yRlVhg8xn7zxiAcfa4SOUwZthveRqF2C98mhQF9eBEmFRjzvoqTOMCVHfltJDERF2jWc
-         Pd9Cz+hKIzOcz6sL8SCuxrEduMDYrGGwXbpPLXGH5AFPaOlAF2gpcH3Dc4Mh2RE1eLHv
-         yh4Q==
+        d=ventanamicro.com; s=google; t=1691082349; x=1691687149;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gCXp7bnCQeJHembOcEQXDYLfhb8aJsvFXnOpWD7E2ZA=;
+        b=nkbuVCky5eIYut5xJfnpTwEyqc7rBKJjKYsn6N3/A4qUDKOJ9tlAot8cNOq/SqrbOE
+         bQ8cWWtVX56qnPCTpkOmEN58TXAcfFPqvLA6MDO4Kz9L5985cKntVWU4sTsaD3nB5d36
+         aNkzGLVPOz8g0uVIRmfajzjCZZxv8uGw98ALm/GwDAkBVL9xkGKrYN0XLzcQm51xoCJY
+         Vr0HvJu5qtSYxM02ER/JrWhjjf00aXiPPNsXpJHScL77h/eFgt/0O/3/prc3JwcOhUEx
+         ieEsQx33jq0VSNoyRfC0uSBQw+qFbdZsFJcajFJRym4gM743qnBfuTO4PaULUeDTos4j
+         dFrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691082004; x=1691686804;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LdpV+DH+21J7QAEkTnfNOAQAsfcko1q6UaP1GJIDTnI=;
-        b=e+I6abtVOa2kwf4+er3JLLOW7Pd8qDNNhqf57d22bp3oO65l+88U36rq8BJW1Kjupe
-         98SQThijlqyCD9rJcIzWSb6WYjCTzRmXz3+ttpqOIapTJFCgQhVIEC7KCraFFxVtKo4Z
-         Cn7VKT0j1hmf1F29MfqkkMSoGLf/Txut9j9+fZNfVQjZIIfvydJJVcChaHTKt1n1FqZy
-         mxOWUZWVzfbRFdpUrqWhiVnJrEJ6rR0wOwn4UOukePjQPRUgQWATFsi5xcMiVz2a90v1
-         a/3NkMbSR0BBmw4s9NzVR+6FfMXLpuiqa43GDci4MnNENQItx6Ejsnz8AirWxpwmf/oQ
-         b31Q==
-X-Gm-Message-State: ABy/qLYywhw/ygTtc0pf5nstLqSZF5luh5rZOazDV1/j48XTU7iaUDh/
-        r7RSdQodDfD+9NP8w07eohysRiyhRvsqpVDnk5s=
-X-Google-Smtp-Source: APBJJlGksVVjGVIObIx2/mXTZpuRAMwuhKcKzs8rLj2YUL4cq0X1qaSCaYxW3X08m1IWm04TsbXN5fkglVjgnv6z5Wk=
-X-Received: from ndesaulniers-desktop.svl.corp.google.com ([2620:15c:2d1:203:cd2a:c126:8d90:d5ab])
- (user=ndesaulniers job=sendgmr) by 2002:a81:b301:0:b0:576:fdbe:76b2 with SMTP
- id r1-20020a81b301000000b00576fdbe76b2mr186945ywh.3.1691082004604; Thu, 03
- Aug 2023 10:00:04 -0700 (PDT)
-Date:   Thu, 03 Aug 2023 10:00:02 -0700
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIABHdy2QC/x2NWwqDMBAAryL7bSBVwdKrlCJ57NaFNA27IoJ4d
- 6OfwzDMDorCqPBqdhBcWfmfKzzaBsLs8hcNx8rQ2a63T9ubUsK0JM9pS4WjCRQ9DRQHGglq5J2 i8eJymK/s53RBuUQRJN7u0/tzHCfgFm7WeQAAAA==
-X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=UIrHvErwpgNbhCkRZAYSX0CFd/XFEwqX3D0xqtqjNug=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691082002; l=3336;
- i=ndesaulniers@google.com; s=20220923; h=from:subject:message-id;
- bh=ygrekE3OJlxoODNxNdS4zpKsCJbmF4Ej66DUNrX+sns=; b=6ESEzLXLRxfTTmoIr1ONWLU2kpm/KUS/7LVisgI5MJMLO6Evo7UTzeGnfKvWdnsvmi3aS8J/D
- F894n+V/CtADKx/l04oyCTIC06BNo6t4xFQceRgtaNdCZGsDic6Jx2o
-X-Mailer: b4 0.12.2
-Message-ID: <20230803-ppc_tlbilxlpid-v1-1-84a1bc5cf963@google.com>
-Subject: [PATCH] powerpc/inst: add PPC_TLBILX_LPID
-From:   ndesaulniers@google.com
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Tom Rix <trix@redhat.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691082349; x=1691687149;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gCXp7bnCQeJHembOcEQXDYLfhb8aJsvFXnOpWD7E2ZA=;
+        b=h4mvOfe3uKSCJ9nIIKgxsXvswWdelVL+zKDUYdmc+tmaHBnm1j5WW+ZyXnaACJagLV
+         ANjw/cqV+9P8R5ZbvpI2EmXHp4ti0DCVgQVU3EVD6o3K32wuBlq5yLWjMLpmsp2c/URn
+         4M1jZhbPjV6c4Om/ZPtZ092MQ6NU5VT7TbG6HqdLXbatRp6SQWTrtdx/SaIdtpK2b9MB
+         9EwdkwwAReOguXkyAWI8Dxoo2aELi5ooQa7VrKqHLAXFxp1gDi5KZ+DmUlbkjy/3ztgw
+         GD15ATG7Vzh1cVchVIiX4TK21lXA+yTZcBBk1t2P+4hAYsTMjGE2AjfrQg4+oPLEKfte
+         oXsw==
+X-Gm-Message-State: ABy/qLYLd/Vc4jXCLDPp0egTf002B6yTWy6vMZLnL9ZfqRD0UIgYqTQP
+        4qk8qJOiGp4USDS/caKOb4jk0A==
+X-Google-Smtp-Source: APBJJlG+zs5JImt9tHG4hc3+8c7LBgiyeeRh3j9Z3j3hqFOE5to+atpc30mSVh/tLX/dKoTvmROn7Q==
+X-Received: by 2002:a17:907:7841:b0:993:22a2:8158 with SMTP id lb1-20020a170907784100b0099322a28158mr8135032ejc.61.1691082348817;
+        Thu, 03 Aug 2023 10:05:48 -0700 (PDT)
+Received: from localhost (212-5-140-29.ip.btc-net.bg. [212.5.140.29])
+        by smtp.gmail.com with ESMTPSA id i14-20020a170906114e00b00992dcae806bsm84195eja.5.2023.08.03.10.05.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 10:05:48 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 20:05:47 +0300
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Cc:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, anup@brainfault.org, atishp@atishpatra.org
+Subject: Re: [PATCH v4 09/10] RISC-V: KVM: Improve vector save/restore errors
+Message-ID: <20230803-b656c44ee07d661600b8696a@orel>
+References: <20230803163302.445167-1-dbarboza@ventanamicro.com>
+ <20230803163302.445167-10-dbarboza@ventanamicro.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803163302.445167-10-dbarboza@ventanamicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clang didn't recognize the instruction tlbilxlpid. This was fixed in
-clang-18 [0] then backported to clang-17 [1].  To support clang-16 and
-older, rather than using that instruction bare in inline asm, add it to
-ppc-opcode.h and use that macro as is done elsewhere for other
-instructions.
+On Thu, Aug 03, 2023 at 01:33:01PM -0300, Daniel Henrique Barboza wrote:
+> From: Andrew Jones <ajones@ventanamicro.com>
+> 
+> kvm_riscv_vcpu_(get/set)_reg_vector() now returns ENOENT if V is not
+> available, EINVAL if reg type is not of VECTOR type, and any error that
+> might be thrown by kvm_riscv_vcpu_vreg_addr().
+> 
+> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/kvm/vcpu_vector.c | 60 ++++++++++++++++++++----------------
+>  1 file changed, 33 insertions(+), 27 deletions(-)
+> 
+> diff --git a/arch/riscv/kvm/vcpu_vector.c b/arch/riscv/kvm/vcpu_vector.c
+> index edd2eecbddc2..39c5bceb4d1b 100644
+> --- a/arch/riscv/kvm/vcpu_vector.c
+> +++ b/arch/riscv/kvm/vcpu_vector.c
+> @@ -91,44 +91,44 @@ void kvm_riscv_vcpu_free_vector_context(struct kvm_vcpu *vcpu)
+>  }
+>  #endif
+>  
+> -static void *kvm_riscv_vcpu_vreg_addr(struct kvm_vcpu *vcpu,
+> +static int kvm_riscv_vcpu_vreg_addr(struct kvm_vcpu *vcpu,
+>  				      unsigned long reg_num,
+> -				      size_t reg_size)
+> +				      size_t reg_size,
+> +				      void **reg_val)
+>  {
+>  	struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
+> -	void *reg_val;
+>  	size_t vlenb = riscv_v_vsize / 32;
+>  
+>  	if (reg_num < KVM_REG_RISCV_VECTOR_REG(0)) {
+>  		if (reg_size != sizeof(unsigned long))
+> -			return NULL;
+> +			return -EINVAL;
+>  		switch (reg_num) {
+>  		case KVM_REG_RISCV_VECTOR_CSR_REG(vstart):
+> -			reg_val = &cntx->vector.vstart;
+> +			*reg_val = &cntx->vector.vstart;
+>  			break;
+>  		case KVM_REG_RISCV_VECTOR_CSR_REG(vl):
+> -			reg_val = &cntx->vector.vl;
+> +			*reg_val = &cntx->vector.vl;
+>  			break;
+>  		case KVM_REG_RISCV_VECTOR_CSR_REG(vtype):
+> -			reg_val = &cntx->vector.vtype;
+> +			*reg_val = &cntx->vector.vtype;
+>  			break;
+>  		case KVM_REG_RISCV_VECTOR_CSR_REG(vcsr):
+> -			reg_val = &cntx->vector.vcsr;
+> +			*reg_val = &cntx->vector.vcsr;
+>  			break;
+>  		case KVM_REG_RISCV_VECTOR_CSR_REG(datap):
+>  		default:
+> -			return NULL;
+> +			return -ENOENT;
+>  		}
+>  	} else if (reg_num <= KVM_REG_RISCV_VECTOR_REG(31)) {
+>  		if (reg_size != vlenb)
+> -			return NULL;
+> -		reg_val = cntx->vector.datap
+> +			return -EINVAL;
+> +		*reg_val = cntx->vector.datap
+>  			  + (reg_num - KVM_REG_RISCV_VECTOR_REG(0)) * vlenb;
+>  	} else {
+> -		return NULL;
+> +		return -ENOENT;
+>  	}
+>  
+> -	return reg_val;
+> +	return 0;
+>  }
+>  
+>  int kvm_riscv_vcpu_get_reg_vector(struct kvm_vcpu *vcpu,
+> @@ -141,17 +141,20 @@ int kvm_riscv_vcpu_get_reg_vector(struct kvm_vcpu *vcpu,
+>  	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
+>  					    KVM_REG_SIZE_MASK |
+>  					    rtype);
+> -	void *reg_val = NULL;
+>  	size_t reg_size = KVM_REG_SIZE(reg->id);
+> +	void *reg_val;
+> +	int rc;
+>  
+> -	if (rtype == KVM_REG_RISCV_VECTOR &&
+> -	    riscv_isa_extension_available(isa, v)) {
+> -		reg_val = kvm_riscv_vcpu_vreg_addr(vcpu, reg_num, reg_size);
+> -	}
+> -
+> -	if (!reg_val)
+> +	if (rtype != KVM_REG_RISCV_VECTOR)
+>  		return -EINVAL;
+>  
+> +	if (!riscv_isa_extension_available(isa, v))
+> +		return -ENOENT;
+> +
+> +	rc = kvm_riscv_vcpu_vreg_addr(vcpu, reg_num, reg_size, &reg_val);
+> +	if (rc)
+> +		return rc;
+> +
+>  	if (copy_to_user(uaddr, reg_val, reg_size))
+>  		return -EFAULT;
+>  
+> @@ -168,17 +171,20 @@ int kvm_riscv_vcpu_set_reg_vector(struct kvm_vcpu *vcpu,
+>  	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
+>  					    KVM_REG_SIZE_MASK |
+>  					    rtype);
+> -	void *reg_val = NULL;
+>  	size_t reg_size = KVM_REG_SIZE(reg->id);
+> +	void *reg_val;
+> +	int rc;
+>  
+> -	if (rtype == KVM_REG_RISCV_VECTOR &&
+> -	    riscv_isa_extension_available(isa, v)) {
+> -		reg_val = kvm_riscv_vcpu_vreg_addr(vcpu, reg_num, reg_size);
+> -	}
+> -
+> -	if (!reg_val)
+> +	if (rtype != KVM_REG_RISCV_VECTOR)
+>  		return -EINVAL;
+>  
+> +	if (!riscv_isa_extension_available(isa, v))
+> +		return -ENOENT;
+> +
+> +	rc = kvm_riscv_vcpu_vreg_addr(vcpu, reg_num, reg_size, &reg_val);
+> +	if (rc)
+> +		return rc;
+> +
+>  	if (copy_from_user(reg_val, uaddr, reg_size))
+>  		return -EFAULT;
 
-Link: https://github.com/ClangBuiltLinux/linux/issues/1891
-Link: https://github.com/llvm/llvm-project/issues/64080
-Link: https://github.com/llvm/llvm-project/commit/53648ac1d0c953ae6d008864dd2eddb437a92468 [0]
-Link: https://github.com/llvm/llvm-project-release-prs/commit/0af7e5e54a8c7ac665773ac1ada328713e8338f5 [1]
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/llvm/202307211945.TSPcyOhh-lkp@intel.com/
-Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
- arch/powerpc/include/asm/ppc-opcode.h |  4 +++-
- arch/powerpc/kvm/e500mc.c             | 10 +++++++---
- 2 files changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/ppc-opcode.h b/arch/powerpc/include/asm/ppc-opcode.h
-index ef6972aa33b9..72f184e06bec 100644
---- a/arch/powerpc/include/asm/ppc-opcode.h
-+++ b/arch/powerpc/include/asm/ppc-opcode.h
-@@ -397,7 +397,8 @@
- #define PPC_RAW_RFCI			(0x4c000066)
- #define PPC_RAW_RFDI			(0x4c00004e)
- #define PPC_RAW_RFMCI			(0x4c00004c)
--#define PPC_RAW_TLBILX(t, a, b)		(0x7c000024 | __PPC_T_TLB(t) | 	__PPC_RA0(a) | __PPC_RB(b))
-+#define PPC_RAW_TLBILX_LPID (0x7c000024)
-+#define PPC_RAW_TLBILX(t, a, b)		(PPC_RAW_TLBILX_LPID | __PPC_T_TLB(t) | __PPC_RA0(a) | __PPC_RB(b))
- #define PPC_RAW_WAIT_v203		(0x7c00007c)
- #define PPC_RAW_WAIT(w, p)		(0x7c00003c | __PPC_WC(w) | __PPC_PL(p))
- #define PPC_RAW_TLBIE(lp, a)		(0x7c000264 | ___PPC_RB(a) | ___PPC_RS(lp))
-@@ -616,6 +617,7 @@
- #define PPC_TLBILX(t, a, b)	stringify_in_c(.long PPC_RAW_TLBILX(t, a, b))
- #define PPC_TLBILX_ALL(a, b)	PPC_TLBILX(0, a, b)
- #define PPC_TLBILX_PID(a, b)	PPC_TLBILX(1, a, b)
-+#define PPC_TLBILX_LPID		stringify_in_c(.long PPC_RAW_TLBILX_LPID)
- #define PPC_TLBILX_VA(a, b)	PPC_TLBILX(3, a, b)
- #define PPC_WAIT_v203		stringify_in_c(.long PPC_RAW_WAIT_v203)
- #define PPC_WAIT(w, p)		stringify_in_c(.long PPC_RAW_WAIT(w, p))
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index d58df71ace58..dc054b8b5032 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -16,10 +16,11 @@
- #include <linux/miscdevice.h>
- #include <linux/module.h>
- 
--#include <asm/reg.h>
- #include <asm/cputable.h>
--#include <asm/kvm_ppc.h>
- #include <asm/dbell.h>
-+#include <asm/kvm_ppc.h>
-+#include <asm/ppc-opcode.h>
-+#include <asm/reg.h>
- 
- #include "booke.h"
- #include "e500.h"
-@@ -92,7 +93,10 @@ void kvmppc_e500_tlbil_all(struct kvmppc_vcpu_e500 *vcpu_e500)
- 
- 	local_irq_save(flags);
- 	mtspr(SPRN_MAS5, MAS5_SGS | get_lpid(&vcpu_e500->vcpu));
--	asm volatile("tlbilxlpid");
-+	/* clang-17 and older could not assemble tlbilxlpid.
-+	 * https://github.com/ClangBuiltLinux/linux/issues/1891
-+	 */
-+	asm volatile (PPC_TLBILX_LPID);
- 	mtspr(SPRN_MAS5, 0);
- 	local_irq_restore(flags);
- }
-
----
-base-commit: 7bafbd4027ae86572f308c4ddf93120c90126332
-change-id: 20230803-ppc_tlbilxlpid-cfdbf4fd4f7f
-
-Best regards,
--- 
-Nick Desaulniers <ndesaulniers@google.com>
+Ugh, this is totally wrong. We no longer set the register. I need to
+rework this rework...
 
