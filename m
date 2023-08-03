@@ -2,198 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8CED76F2F9
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 20:49:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B08B76F310
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 20:58:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230504AbjHCStp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 14:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37994 "EHLO
+        id S229837AbjHCS63 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 14:58:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236207AbjHCStU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 14:49:20 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 488CF358B
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 11:48:51 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-63cf7cce5fbso8249766d6.0
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 11:48:51 -0700 (PDT)
+        with ESMTP id S229457AbjHCS62 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 14:58:28 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5D3F1713;
+        Thu,  3 Aug 2023 11:58:26 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bbc7b2133fso9137725ad.1;
+        Thu, 03 Aug 2023 11:58:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691088528; x=1691693328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9tbNHE93nYjXEA/O+xALVAEDc6FnXESddWS3lWiWLV0=;
-        b=6VFzvdxm3YrleojZUDMcow5FlyLkuGEPWo7uL1Sub4U4LzVMQhi5UpSPEaYtXxQig6
-         R78lgZrOqqK6yg0QQv/JfRTYg+AsYws7jCkd8Bg1iujIIi9/A8JGaIKa3nySYUYxYXMD
-         fDeqWcFIbb7KgTxygJUFLUFd9FltJ7Sx1WpUt7PJDnRkqFqEAYX3UY0X49kRyzwn5sdP
-         I37qBWtWNXQq7xllL7dbKsCaawao2B5L/YEZK2kvud+xkjOMxt2YCSPKhd52vD+CcmjX
-         qsvwDpR8y8XyjjIEENEG/wD83xbRHVmg+fosa7E0VP5fHwabw7hE0ggbCtQWbEI9pBLv
-         f8mg==
+        d=gmail.com; s=20221208; t=1691089106; x=1691693906;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=acwzAvJJew1sBkrG7SLAsHAOiLMxXJQy0g6yQkN9J/k=;
+        b=DxY4CDfpDvBX+XIqoLFhc0uGzmno9xoVBWjtaR6lqHyxtNKmZ9d9SOFiBOvrBZwJZC
+         dB+pc8Msa+6VdRUPyRJVHs5YFQIL0w5i5V+BGooPb4YIKv9SzkRDkWWigoEq0yBR2mgE
+         8nGSJT2vfhnBlpelTiadreUHEwREu4vyz+oKv3Hzb7wujpwV1tdI2K7KCus3dpU6uCZd
+         zJ5ZY4FPDSq57HVMclKpIGSAoeX/HXNyP1Vm1PGr+RwR4Pjp8eyj442S3RcMN1mCVizX
+         2wrvExUVcxLroQT/KF7pSGfyPFD7yjb6Zx3jl2PHrL53c9pKisDpGgSyHFrO5Ma0hC3L
+         USzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691088528; x=1691693328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9tbNHE93nYjXEA/O+xALVAEDc6FnXESddWS3lWiWLV0=;
-        b=WWIf4Ux0Jd5jbMmXaLy+TsqwdO7uaD66wX1bz1k0JBo2U720vHVljp+m75DKIHSyKy
-         o3zEIMzwwGkle0W7w9Bq7NUx8gJgC5T3KEKRmbe0C7+qJHpXGvfSbNMJYHSvNj6KaLtB
-         2/F32V1vrEEBD7RTwcbjHs/HGbdJakIv/acleBHFGm6WXDBtCjgUHKpQKPsJayfFEqoV
-         IEeGit/XEnqY2ypcKUuNHcq/+yCqmbKV6yCPP1tI6QZKxK4WUt61EpOBM26fKQlm97YI
-         Q9HPamKUVsJsiUHjAjNGysChH0uHBPtIvhum7v7UEFcVE9BXKMDbxKOrU/lTmwU0ShZc
-         q22Q==
-X-Gm-Message-State: ABy/qLa3jQxIh0yDDb+PAKNR2pV7iv9GtG6+wjZ/3TyWwsb8mAYBvajq
-        aKL7htEQiz+GdLXnvx9GieRdxN3yK36ZpscrkrIDsQ==
-X-Google-Smtp-Source: APBJJlHVHOlFaAc7QLzwJ5MQyhcxQ7uez6gZPgXw7RdtP68eZ2qt3tpg4x+z+Z2XW9dTV2WAxlrUtvM5KRnWu0hSBto=
-X-Received: by 2002:a05:6214:3011:b0:63d:a05:256a with SMTP id
- ke17-20020a056214301100b0063d0a05256amr21855102qvb.8.1691088527629; Thu, 03
- Aug 2023 11:48:47 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691089106; x=1691693906;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=acwzAvJJew1sBkrG7SLAsHAOiLMxXJQy0g6yQkN9J/k=;
+        b=CEdeyISbIvke3T6/eCTaVLgRLSJ04n1drsl/t8EFr/zgmNn35Fwpxn0ODdjfACoHKV
+         cweaPdaR80fRAdJUPNWVW09cJXtQbr/QmqV92JunQxCLNIPIAswdJ0YgTtr2uf2favvV
+         pAlnwHwnTeijAnHPSyG/xBALqbo8xNarxXuLw/QLbVLl1ewANK3U3a4N9xiNgI7pNj+u
+         D31IFjLAaF2TxuBU+1vaCICRUpKateASd5JrS/BCfWAwvTDGPFigkL/wy7lJCrQxu0iK
+         zsXWzg0yHKkL1rAc7Adh+viWow4jPwiO5rK1iL7RDm4PZNlOWc5SXnFDMu7JJCQaRPQ6
+         pj4A==
+X-Gm-Message-State: ABy/qLbxhUuGzVO/8/Xh6eq9/KchAMlegn57svsiqy08VJ1WY06+wYbz
+        mfXEcUIf/S0XIrykY6G9Lq4=
+X-Google-Smtp-Source: APBJJlHXIG1PCBPpnlGmiDmeq4Zbu8dxh/ZMyrS/Enqv5aR5XB1tVPRb2BW4n7uiLrN+5lCxUib3gg==
+X-Received: by 2002:a17:903:22c1:b0:1b8:a936:1905 with SMTP id y1-20020a17090322c100b001b8a9361905mr20738159plg.38.1691089106130;
+        Thu, 03 Aug 2023 11:58:26 -0700 (PDT)
+Received: from localhost (ec2-52-8-182-0.us-west-1.compute.amazonaws.com. [52.8.182.0])
+        by smtp.gmail.com with ESMTPSA id y7-20020a170902b48700b001b83dc8649dsm189259plr.250.2023.08.03.11.58.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 11:58:25 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 18:58:24 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     linux-hyperv@vger.kernel.org,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Eric Dumazet <edumazet@google.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Arseniy Krasnov <oxffffaa@gmail.com>,
+        Vishnu Dasa <vdasa@vmware.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH RFC net-next v5 03/14] af_vsock: support multi-transport
+ datagrams
+Message-ID: <ZMv40KJo/9Pd2Lik@bullseye>
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-3-581bd37fdb26@bytedance.com>
+ <43fad7ab-2ca9-608e-566f-80e607d2d6b8@gmail.com>
+ <ZMrXrBHuaEcpxGwA@bullseye>
+ <ZMr6giur//A1hrND@bullseye>
+ <7ioiy325g6bkplp6sqk676sk62wlsxaqy6luwjnnztxsgd3srt@5nh73ct53kr3>
 MIME-Version: 1.0
-References: <20230803-ppc_tlbilxlpid-v3-1-ca84739bfd73@google.com> <31b387c5-c6a4-2911-b337-b7af6a15c29e@csgroup.eu>
-In-Reply-To: <31b387c5-c6a4-2911-b337-b7af6a15c29e@csgroup.eu>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Thu, 3 Aug 2023 11:48:36 -0700
-Message-ID: <CAKwvOdm7ftWse5LVwM_0b_Zk_H-qavXsjsSyUmd0onZzvYcasw@mail.gmail.com>
-Subject: Re: [PATCH v3] powerpc/inst: add PPC_TLBILX_LPID
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Tom Rix <trix@redhat.com>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7ioiy325g6bkplp6sqk676sk62wlsxaqy6luwjnnztxsgd3srt@5nh73ct53kr3>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 3, 2023 at 11:47=E2=80=AFAM Christophe Leroy
-<christophe.leroy@csgroup.eu> wrote:
->
->
->
-> Le 03/08/2023 =C3=A0 20:33, Nick Desaulniers a =C3=A9crit :
-> > Clang didn't recognize the instruction tlbilxlpid. This was fixed in
-> > clang-18 [0] then backported to clang-17 [1].  To support clang-16 and
-> > older, rather than using that instruction bare in inline asm, add it to
-> > ppc-opcode.h and use that macro as is done elsewhere for other
-> > instructions.
-> >
-> > Link: https://github.com/ClangBuiltLinux/linux/issues/1891
-> > Link: https://github.com/llvm/llvm-project/issues/64080
-> > Link: https://github.com/llvm/llvm-project/commit/53648ac1d0c953ae6d008=
-864dd2eddb437a92468 [0]
-> > Link: https://github.com/llvm/llvm-project-release-prs/commit/0af7e5e54=
-a8c7ac665773ac1ada328713e8338f5 [1]
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Closes: https://lore.kernel.org/llvm/202307211945.TSPcyOhh-lkp@intel.co=
-m/
-> > Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
-> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
->
-> Not sure why you changed the order of #includes , nevertheless
+On Thu, Aug 03, 2023 at 02:42:26PM +0200, Stefano Garzarella wrote:
+> On Thu, Aug 03, 2023 at 12:53:22AM +0000, Bobby Eshleman wrote:
+> > On Wed, Aug 02, 2023 at 10:24:44PM +0000, Bobby Eshleman wrote:
+> > > On Sun, Jul 23, 2023 at 12:53:15AM +0300, Arseniy Krasnov wrote:
+> > > >
+> > > >
+> > > > On 19.07.2023 03:50, Bobby Eshleman wrote:
+> > > > > This patch adds support for multi-transport datagrams.
+> > > > >
+> > > > > This includes:
+> > > > > - Per-packet lookup of transports when using sendto(sockaddr_vm)
+> > > > > - Selecting H2G or G2H transport using VMADDR_FLAG_TO_HOST and CID in
+> > > > >   sockaddr_vm
+> > > > > - rename VSOCK_TRANSPORT_F_DGRAM to VSOCK_TRANSPORT_F_DGRAM_FALLBACK
+> > > > > - connect() now assigns the transport for (similar to connectible
+> > > > >   sockets)
+> > > > >
+> > > > > To preserve backwards compatibility with VMCI, some important changes
+> > > > > are made. The "transport_dgram" / VSOCK_TRANSPORT_F_DGRAM is changed to
+> > > > > be used for dgrams only if there is not yet a g2h or h2g transport that
+> > > > > has been registered that can transmit the packet. If there is a g2h/h2g
+> > > > > transport for that remote address, then that transport will be used and
+> > > > > not "transport_dgram". This essentially makes "transport_dgram" a
+> > > > > fallback transport for when h2g/g2h has not yet gone online, and so it
+> > > > > is renamed "transport_dgram_fallback". VMCI implements this transport.
+> > > > >
+> > > > > The logic around "transport_dgram" needs to be retained to prevent
+> > > > > breaking VMCI:
+> > > > >
+> > > > > 1) VMCI datagrams existed prior to h2g/g2h and so operate under a
+> > > > >    different paradigm. When the vmci transport comes online, it registers
+> > > > >    itself with the DGRAM feature, but not H2G/G2H. Only later when the
+> > > > >    transport has more information about its environment does it register
+> > > > >    H2G or G2H.  In the case that a datagram socket is created after
+> > > > >    VSOCK_TRANSPORT_F_DGRAM registration but before G2H/H2G registration,
+> > > > >    the "transport_dgram" transport is the only registered transport and so
+> > > > >    needs to be used.
+> > > > >
+> > > > > 2) VMCI seems to require a special message be sent by the transport when a
+> > > > >    datagram socket calls bind(). Under the h2g/g2h model, the transport
+> > > > >    is selected using the remote_addr which is set by connect(). At
+> > > > >    bind time there is no remote_addr because often no connect() has been
+> > > > >    called yet: the transport is null. Therefore, with a null transport
+> > > > >    there doesn't seem to be any good way for a datagram socket to tell the
+> > > > >    VMCI transport that it has just had bind() called upon it.
+> > > > >
+> > > > > With the new fallback logic, after H2G/G2H comes online the socket layer
+> > > > > will access the VMCI transport via transport_{h2g,g2h}. Prior to H2G/G2H
+> > > > > coming online, the socket layer will access the VMCI transport via
+> > > > > "transport_dgram_fallback".
+> > > > >
+> > > > > Only transports with a special datagram fallback use-case such as VMCI
+> > > > > need to register VSOCK_TRANSPORT_F_DGRAM_FALLBACK.
+> > > > >
+> > > > > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > > > > ---
+> > > > >  drivers/vhost/vsock.c                   |  1 -
+> > > > >  include/linux/virtio_vsock.h            |  2 --
+> > > > >  include/net/af_vsock.h                  | 10 +++---
+> > > > >  net/vmw_vsock/af_vsock.c                | 64 ++++++++++++++++++++++++++-------
+> > > > >  net/vmw_vsock/hyperv_transport.c        |  6 ----
+> > > > >  net/vmw_vsock/virtio_transport.c        |  1 -
+> > > > >  net/vmw_vsock/virtio_transport_common.c |  7 ----
+> > > > >  net/vmw_vsock/vmci_transport.c          |  2 +-
+> > > > >  net/vmw_vsock/vsock_loopback.c          |  1 -
+> > > > >  9 files changed, 58 insertions(+), 36 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > > index ae8891598a48..d5d6a3c3f273 100644
+> > > > > --- a/drivers/vhost/vsock.c
+> > > > > +++ b/drivers/vhost/vsock.c
+> > > > > @@ -410,7 +410,6 @@ static struct virtio_transport vhost_transport = {
+> > > > >  		.cancel_pkt               = vhost_transport_cancel_pkt,
+> > > > >
+> > > > >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > > > > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > > > >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > > > >
+> > > > >  		.stream_enqueue           = virtio_transport_stream_enqueue,
+> > > > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > > > > index 18cbe8d37fca..7632552bee58 100644
+> > > > > --- a/include/linux/virtio_vsock.h
+> > > > > +++ b/include/linux/virtio_vsock.h
+> > > > > @@ -211,8 +211,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
+> > > > >  u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
+> > > > >  bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
+> > > > >  bool virtio_transport_stream_allow(u32 cid, u32 port);
+> > > > > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> > > > > -				struct sockaddr_vm *addr);
+> > > > >  bool virtio_transport_dgram_allow(u32 cid, u32 port);
+> > > > >
+> > > > >  int virtio_transport_connect(struct vsock_sock *vsk);
+> > > > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > > > > index 305d57502e89..f6a0ca9d7c3e 100644
+> > > > > --- a/include/net/af_vsock.h
+> > > > > +++ b/include/net/af_vsock.h
+> > > > > @@ -96,13 +96,13 @@ struct vsock_transport_send_notify_data {
+> > > > >
+> > > > >  /* Transport features flags */
+> > > > >  /* Transport provides host->guest communication */
+> > > > > -#define VSOCK_TRANSPORT_F_H2G		0x00000001
+> > > > > +#define VSOCK_TRANSPORT_F_H2G			0x00000001
+> > > > >  /* Transport provides guest->host communication */
+> > > > > -#define VSOCK_TRANSPORT_F_G2H		0x00000002
+> > > > > -/* Transport provides DGRAM communication */
+> > > > > -#define VSOCK_TRANSPORT_F_DGRAM		0x00000004
+> > > > > +#define VSOCK_TRANSPORT_F_G2H			0x00000002
+> > > > > +/* Transport provides fallback for DGRAM communication */
+> > > > > +#define VSOCK_TRANSPORT_F_DGRAM_FALLBACK	0x00000004
+> > > > >  /* Transport provides local (loopback) communication */
+> > > > > -#define VSOCK_TRANSPORT_F_LOCAL		0x00000008
+> > > > > +#define VSOCK_TRANSPORT_F_LOCAL			0x00000008
+> > > > >
+> > > > >  struct vsock_transport {
+> > > > >  	struct module *module;
+> > > > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > > > > index ae5ac5531d96..26c97b33d55a 100644
+> > > > > --- a/net/vmw_vsock/af_vsock.c
+> > > > > +++ b/net/vmw_vsock/af_vsock.c
+> > > > > @@ -139,8 +139,8 @@ struct proto vsock_proto = {
+> > > > >  static const struct vsock_transport *transport_h2g;
+> > > > >  /* Transport used for guest->host communication */
+> > > > >  static const struct vsock_transport *transport_g2h;
+> > > > > -/* Transport used for DGRAM communication */
+> > > > > -static const struct vsock_transport *transport_dgram;
+> > > > > +/* Transport used as a fallback for DGRAM communication */
+> > > > > +static const struct vsock_transport *transport_dgram_fallback;
+> > > > >  /* Transport used for local communication */
+> > > > >  static const struct vsock_transport *transport_local;
+> > > > >  static DEFINE_MUTEX(vsock_register_mutex);
+> > > > > @@ -439,6 +439,18 @@ vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
+> > > > >  	return transport;
+> > > > >  }
+> > > > >
+> > > > > +static const struct vsock_transport *
+> > > > > +vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
+> > > > > +{
+> > > > > +	const struct vsock_transport *transport;
+> > > > > +
+> > > > > +	transport = vsock_connectible_lookup_transport(cid, flags);
+> > > > > +	if (transport)
+> > > > > +		return transport;
+> > > > > +
+> > > > > +	return transport_dgram_fallback;
+> > > > > +}
+> > > > > +
+> > > > >  /* Assign a transport to a socket and call the .init transport callback.
+> > > > >   *
+> > > > >   * Note: for connection oriented socket this must be called when vsk->remote_addr
+> > > > > @@ -475,7 +487,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> > > > >
+> > > > >  	switch (sk->sk_type) {
+> > > > >  	case SOCK_DGRAM:
+> > > > > -		new_transport = transport_dgram;
+> > > > > +		new_transport = vsock_dgram_lookup_transport(remote_cid,
+> > > > > +							     remote_flags);
+> > > >
+> > > > I'm a little bit confused about this:
+> > > > 1) Let's create SOCK_DGRAM socket using vsock_create()
+> > > > 2) for SOCK_DGRAM it calls 'vsock_assign_transport()' and we go here, remote_cid == -1
+> > > > 3) I guess 'vsock_dgram_lookup_transport()' calls logic from 0002 and returns h2g for such remote cid, which is not
+> > > >    correct I think...
+> > > >
+> > > > Please correct me if i'm wrong
+> > > >
+> > > > Thanks, Arseniy
+> > > >
+> > > 
+> > > As I understand, for the VMCI case, if transport_h2g != NULL, then
+> > > transport_h2g == transport_dgram_fallback. In either case,
+> > > vsk->transport == transport_dgram_fallback.
+> > > 
+> > > For the virtio/vhost case, temporarily vsk->transport == transport_h2g,
+> > > but it is unused because vsk->transport->dgram_bind == NULL.
+> > > 
+> > > Until SS_CONNECTED is set by connect() and vsk->transport is set
+> > > correctly, the send path is barred from using the bad transport.
+> > > 
+> > > I guess the recvmsg() path is a little more sketchy, and probably only
+> > > works in my test cases because h2g/g2h in the vhost/virtio case have
+> > > identical dgram_addr_init() implementations.
+> > > 
+> > > I think a cleaner solution is maybe checking in vsock_create() if
+> > > dgram_bind is implemented. If it is not, then vsk->transport should be
+> > > reset to NULL and a comment added explaining why VMCI requires this.
+> > > 
+> > > Then the other calls can begin explicitly checking for vsk->transport ==
+> > > NULL.
+> > 
+> > Actually, on further reflection here, in order for the vsk->transport to
+> > be called in time for ->dgram_addr_init(), it is going to be necessary
+> > to call vsock_assign_transport() in vsock_dgram_bind() anyway.
+> > 
+> > I think this means that the vsock_assign_transport() call can be removed
+> > from vsock_create() call entirely, and yet VMCI can still dispatch
+> > messages upon bind() calls as needed.
+> > 
+> > This would then simplify the whole arrangement, if there aren't other
+> > unseen issues.
+> 
+> This sounds like a good approach.
+> 
+> My only question is whether vsock_dgram_bind() is always called for each
+> dgram socket.
+> 
 
-Habit to sort; can drop if maintaining git blame is more important
-than cleaning that up.
+No, not yet.
 
->
-> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
->
-> > ---
-> > Changes in v3:
-> > - left comment @ https://github.com/linuxppc/issues/issues/350#issuecom=
-ment-1664417212
-> > - restore PPC_RAW_TLBILX previous definition
-> > - fix comment style
-> > - Link to v2: https://lore.kernel.org/r/20230803-ppc_tlbilxlpid-v2-1-21=
-1ffa1df194@google.com
-> >
-> > Changes in v2:
-> > - add 2 missing tabs to PPC_RAW_TLBILX_LPID
-> > - Link to v1: https://lore.kernel.org/r/20230803-ppc_tlbilxlpid-v1-1-84=
-a1bc5cf963@google.com
-> > ---
-> >   arch/powerpc/include/asm/ppc-opcode.h |  2 ++
-> >   arch/powerpc/kvm/e500mc.c             | 11 ++++++++---
-> >   2 files changed, 10 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/powerpc/include/asm/ppc-opcode.h b/arch/powerpc/inclu=
-de/asm/ppc-opcode.h
-> > index ef6972aa33b9..005601243dda 100644
-> > --- a/arch/powerpc/include/asm/ppc-opcode.h
-> > +++ b/arch/powerpc/include/asm/ppc-opcode.h
-> > @@ -397,6 +397,7 @@
-> >   #define PPC_RAW_RFCI                        (0x4c000066)
-> >   #define PPC_RAW_RFDI                        (0x4c00004e)
-> >   #define PPC_RAW_RFMCI                       (0x4c00004c)
-> > +#define PPC_RAW_TLBILX_LPID          (0x7c000024)
-> >   #define PPC_RAW_TLBILX(t, a, b)             (0x7c000024 | __PPC_T_TLB=
-(t) |  __PPC_RA0(a) | __PPC_RB(b))
-> >   #define PPC_RAW_WAIT_v203           (0x7c00007c)
-> >   #define PPC_RAW_WAIT(w, p)          (0x7c00003c | __PPC_WC(w) | __PPC=
-_PL(p))
-> > @@ -616,6 +617,7 @@
-> >   #define PPC_TLBILX(t, a, b) stringify_in_c(.long PPC_RAW_TLBILX(t, a,=
- b))
-> >   #define PPC_TLBILX_ALL(a, b)        PPC_TLBILX(0, a, b)
-> >   #define PPC_TLBILX_PID(a, b)        PPC_TLBILX(1, a, b)
-> > +#define PPC_TLBILX_LPID              stringify_in_c(.long PPC_RAW_TLBI=
-LX_LPID)
-> >   #define PPC_TLBILX_VA(a, b) PPC_TLBILX(3, a, b)
-> >   #define PPC_WAIT_v203               stringify_in_c(.long PPC_RAW_WAIT=
-_v203)
-> >   #define PPC_WAIT(w, p)              stringify_in_c(.long PPC_RAW_WAIT=
-(w, p))
-> > diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-> > index d58df71ace58..7c09c000c330 100644
-> > --- a/arch/powerpc/kvm/e500mc.c
-> > +++ b/arch/powerpc/kvm/e500mc.c
-> > @@ -16,10 +16,11 @@
-> >   #include <linux/miscdevice.h>
-> >   #include <linux/module.h>
-> >
-> > -#include <asm/reg.h>
-> >   #include <asm/cputable.h>
-> > -#include <asm/kvm_ppc.h>
-> >   #include <asm/dbell.h>
-> > +#include <asm/kvm_ppc.h>
-> > +#include <asm/ppc-opcode.h>
-> > +#include <asm/reg.h>
-> >
-> >   #include "booke.h"
-> >   #include "e500.h"
-> > @@ -92,7 +93,11 @@ void kvmppc_e500_tlbil_all(struct kvmppc_vcpu_e500 *=
-vcpu_e500)
-> >
-> >       local_irq_save(flags);
-> >       mtspr(SPRN_MAS5, MAS5_SGS | get_lpid(&vcpu_e500->vcpu));
-> > -     asm volatile("tlbilxlpid");
-> > +     /*
-> > +      * clang-17 and older could not assemble tlbilxlpid.
-> > +      * https://github.com/ClangBuiltLinux/linux/issues/1891
-> > +      */
-> > +     asm volatile (PPC_TLBILX_LPID);
-> >       mtspr(SPRN_MAS5, 0);
-> >       local_irq_restore(flags);
-> >   }
-> >
-> > ---
-> > base-commit: 7bafbd4027ae86572f308c4ddf93120c90126332
-> > change-id: 20230803-ppc_tlbilxlpid-cfdbf4fd4f7f
-> >
-> > Best regards,
+Currently, receivers may use vsock_dgram_recvmsg() prior to any bind,
+but this should probably change.
 
+For UDP, if we initialize a socket and call recvmsg() with no prior
+bind, then the socket will be auto-bound to 0.0.0.0. I guess vsock
+should probably also auto-bind in this case.
 
+For other cases, bind may not be called prior to calls to vsock_poll() /
+vsock_getname() (even if it doesn't make sense to do so), but I think it
+is okay as long as vsk->transport is not used.
 
---=20
-Thanks,
-~Nick Desaulniers
+vsock_dgram_sendmsg() always auto-binds if needed.
+
+> Stefano
+> 
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
