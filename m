@@ -2,98 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2566C76EBAE
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:02:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B7C976ECC2
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236586AbjHCOCl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 10:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
+        id S235802AbjHCOhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 10:37:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236588AbjHCOCS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 10:02:18 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9018C212A
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:01:03 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6bc9efb5091so697806a34.1
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 07:01:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1691071259; x=1691676059;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hAcynScOpmJJpAgbkOZYKn6ILQea1aDVBL6bd0lWO7g=;
-        b=h5wyGZdJugOapVTfRnHPWCqmuQ9bCO45+4hqZwI2EqNaFNIjubOL6dva8fyv4jLr5O
-         xbfQyVMF2ZQyB6k19gH7XQKMviR4uuhjAVI9H8vb/0MJeGnslZORMBmqzgkWmgybTPrG
-         LS2c2KCjkSZOJcmfHUstcgf0CUWTdUkmPpSA2BelrXV8adTExbXSf2DHSKJGiJS7O3i9
-         Ep1av+4DO+qPtMhsWUDPJaTfHdBBnHSDiA9owbLM+SBg3ku+1wxKHwVwyNWynVEomwDA
-         +jRKqr4/rlD819kJ9oXsOdMCejAAz7nCE+hMYZNI9RgbVWMWk3Xj2FPw0HXmnnvJQgNz
-         tZAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691071259; x=1691676059;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hAcynScOpmJJpAgbkOZYKn6ILQea1aDVBL6bd0lWO7g=;
-        b=SiAAA4geRZv8FDlbIT168Kn91WNsKFa7IH8BKB9UDBn1di1mZMTbcx2XibSCYNRrnB
-         ktdZ+tBrnEqYyv3AWBnwJJwi3MxJsY2OXoFcG+fm6YS75uyfvqdSgHD5bla31h7u6fmg
-         94TbDwRwt45R0aXDNxL0cyFWp3kMS4ZaRernYShQ/P6JspP7ErXIPhFd8fF/JUFw3a5x
-         pJwxuMfB1tU1m1M1qf3U8uB5Iw1kAvlskbvdNPHw04KUDmjeW2OjlukeyguVqMiAbive
-         dMIScivZzAl7V2UJKy1/dQ3JgNkaXbJSs7AH5PscMC7ygmzpOoaFvIyO6xAZz8nEKauU
-         gCvA==
-X-Gm-Message-State: ABy/qLZjaYYLo+p7Fl4rQc7uzhRTAshpLIfz+3Zbhz7KIzIXTSrwLRve
-        fRhjqJ3oI8o01oPCNkvpZNE8XA==
-X-Google-Smtp-Source: APBJJlHllE/EaunMqwLTs5cwVf8bqP6wD0HL99VVwT6cKqI+jaDH/VDH2t/f1OSr6sXmNFPwBWf53Q==
-X-Received: by 2002:a05:6830:4621:b0:6bc:a626:701b with SMTP id ba33-20020a056830462100b006bca626701bmr7019403otb.17.1691071259085;
-        Thu, 03 Aug 2023 07:00:59 -0700 (PDT)
-Received: from grind.. ([187.11.154.63])
-        by smtp.gmail.com with ESMTPSA id e14-20020a0568301e4e00b006b29a73efb5sm11628otj.7.2023.08.03.07.00.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 07:00:58 -0700 (PDT)
-From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     anup@brainfault.org, atishp@atishpatra.org,
-        ajones@ventanamicro.com,
-        Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Subject: [PATCH v3 10/10] docs: kvm: riscv: document EBUSY in KVM_SET_ONE_REG
-Date:   Thu,  3 Aug 2023 11:00:22 -0300
-Message-ID: <20230803140022.399333-11-dbarboza@ventanamicro.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230803140022.399333-1-dbarboza@ventanamicro.com>
-References: <20230803140022.399333-1-dbarboza@ventanamicro.com>
+        with ESMTP id S235381AbjHCOhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 10:37:20 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81BA5256;
+        Thu,  3 Aug 2023 07:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691073383; x=1722609383;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5XOAANYi6PhPbrJ+klTCobbNvd+SaqKSvWlM8mBjHuA=;
+  b=jcNrFXIcGGPbGs/XZ/Wthsm8DY8KT7w5UAgREcZGaY6f8505HMNxjrbd
+   nnYN/jsm1wtGnBAIlSIt9D0F7nEtLNMrFUv0CXQcyj8IP9S5G8XoADo9V
+   47bRzyowJMyyT0op6/sBRFgY45tOGvy6lkeCGpiuUzywjSRQDclaPm13C
+   +qbt9I+Uu7vJfQK0Bu7HByrEM3X6XYksleKQS3cR/kGOAO/XSfDP96e1T
+   t/0ZQ1zM+kQu9p6Ro8RKielCNUnC0MrqdvqUlrnYSz823X9WMHsetYchS
+   hZR7BEmIcnldVi5Rv97gssk0UVZOKMJLdSHqjE6wYobtaX+gF+JiRJG/4
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="372643344"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="372643344"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 07:31:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="759153147"
+X-IronPort-AV: E=Sophos;i="6.01,252,1684825200"; 
+   d="scan'208";a="759153147"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga008.jf.intel.com with ESMTP; 03 Aug 2023 07:31:45 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com
+Subject: [PATCH v5 0/4] iommufd: Add iommu hardware info reporting
+Date:   Thu,  3 Aug 2023 07:31:40 -0700
+Message-Id: <20230803143144.200945-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The EBUSY errno is being used for KVM_SET_ONE_REG as a way to tell
-userspace that a given reg can't be changed after the vcpu started.
+iommufd gives userspace the capability to manipulate iommu subsytem.
+e.g. DMA map/unmap etc. In the near future, it will support iommu nested
+translation. Different platform vendors have different implementation for
+the nested translation. For example, Intel VT-d supports using guest I/O
+page table as the stage-1 translation table. This requires guest I/O page
+table be compatible with hardware IOMMU. So before set up nested translation,
+userspace needs to know the hardware iommu information to understand the
+nested translation requirements.
 
-Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
----
- Documentation/virt/kvm/api.rst | 2 ++
- 1 file changed, 2 insertions(+)
+This series reports the iommu hardware information for a given device
+which has been bound to iommufd. It is preparation work for userspace to
+allocate hwpt for given device. Like the nested translation support[1].
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c0ddd3035462..3249fb56cc69 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2259,6 +2259,8 @@ Errors:
-   EINVAL   invalid register ID, or no such register or used with VMs in
-            protected virtualization mode on s390
-   EPERM    (arm64) register access not allowed before vcpu finalization
-+  EBUSY    (riscv) changing register value not allowed after the vcpu
-+           has run at least once
-   ======   ============================================================
- 
- (These error codes are indicative only: do not rely on a specific error
+This series introduces an iommu op to report the iommu hardware info,
+and an ioctl IOMMU_GET_HW_INFO is added to report such hardware info to
+user. enum iommu_hw_info_type is defined to differentiate the iommu hardware
+info reported to user hence user can decode them. This series only adds the
+framework for iommu hw info reporting, the complete reporting path needs vendor
+specific definition and driver support. The full code is available in [1]
+as well.
+
+[1] https://github.com/yiliu1765/iommufd/tree/wip/iommufd_nesting_08032023-yi
+(only the hw_info report path is the latest, other parts is wip)
+
+Change log:
+
+v5:
+ - Return hw_info_type in the .hw_info op, hence drop hw_info_type field in iommu_ops (Kevin)
+ - Add Jason's r-b for patch 01
+ - Address coding style comments from Jason and Kevin w.r.t. patch 02, 03 and 04
+
+v4: https://lore.kernel.org/linux-iommu/20230724105936.107042-1-yi.l.liu@intel.com/
+ - Rename ioctl to IOMMU_GET_HW_INFO and structure to iommu_hw_info
+ - Move the iommufd_get_hw_info handler to main.c
+ - Place iommu_hw_info prior to iommu_hwpt_alloc
+ - Update the function namings accordingly
+ - Update uapi kdocs
+
+v3: https://lore.kernel.org/linux-iommu/20230511143024.19542-1-yi.l.liu@intel.com/#t
+ - Add r-b from Baolu
+ - Rename IOMMU_HW_INFO_TYPE_DEFAULT to be IOMMU_HW_INFO_TYPE_NONE to
+   better suit what it means
+ - Let IOMMU_DEVICE_GET_HW_INFO succeed even the underlying iommu driver
+   does not have driver-specific data to report per below remark.
+   https://lore.kernel.org/kvm/ZAcwJSK%2F9UVI9LXu@nvidia.com/
+
+v2: https://lore.kernel.org/linux-iommu/20230309075358.571567-1-yi.l.liu@intel.com/
+ - Drop patch 05 of v1 as it is already covered by other series
+ - Rename the capability info to be iommu hardware info
+
+v1: https://lore.kernel.org/linux-iommu/20230209041642.9346-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Lu Baolu (1):
+  iommu: Add new iommu op to get iommu hardware information
+
+Nicolin Chen (1):
+  iommufd/selftest: Add coverage for IOMMU_GET_HW_INFO ioctl
+
+Yi Liu (2):
+  iommu: Move dev_iommu_ops() to private header
+  iommufd: Add IOMMU_GET_HW_INFO
+
+ drivers/iommu/iommu-priv.h                    | 11 +++
+ drivers/iommu/iommufd/iommufd_test.h          |  9 +++
+ drivers/iommu/iommufd/main.c                  | 79 +++++++++++++++++++
+ drivers/iommu/iommufd/selftest.c              | 16 ++++
+ include/linux/iommu.h                         | 20 +++--
+ include/uapi/linux/iommufd.h                  | 44 +++++++++++
+ tools/testing/selftests/iommu/iommufd.c       | 17 +++-
+ tools/testing/selftests/iommu/iommufd_utils.h | 26 ++++++
+ 8 files changed, 210 insertions(+), 12 deletions(-)
+
 -- 
-2.41.0
+2.34.1
 
