@@ -2,92 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F01C76DBFC
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 02:06:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA3A376DC6E
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 02:14:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233384AbjHCAGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 20:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
+        id S229685AbjHCAOZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 20:14:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233351AbjHCAGd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 20:06:33 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B9B1421E
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 17:06:04 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c6dd0e46a52so370149276.2
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 17:06:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691021154; x=1691625954;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=24xpWy5jqWvnaUWcLSAqh6x2b0mz42plt2nZzdQyqhk=;
-        b=J0wDGRo3GVgo0cQOQvYi6z+1Z9xEECkzTI0o3sOeSAfztMRUBv0/edPKcXdVgWCJoN
-         bUCDfFYNfaRLtCy+y43YvhRDbIoeD4FrXPn0QCerDk0zwiIa77efRqrzAOpKZ1lpHnTo
-         XT+it1KSz15jDTo69J0uHerP9G7HuXFQZGLDa/fpIwCKafjhUpaShneLrzRcRyUD/85l
-         71nmJqWRNT9PhBXMISpzibjMCVWN22es9FNI8OCdF0YX/8G2Loi0sgWJTm9G6vo8SutM
-         bFe76GDNCL9EJk2+gVB4Nz4hpnV8MKjJh692U6w6wVr9AgD5Fr6/rGTaOis2kViFzGBr
-         8HxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691021154; x=1691625954;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=24xpWy5jqWvnaUWcLSAqh6x2b0mz42plt2nZzdQyqhk=;
-        b=PmMCqdksTUEgd00wz+Ie2MjlwaEPiV/X93Zaj1fsgmUR7g2G/AEVvfTFUKpT74YJRW
-         Dua6lUE7zoxuha/D3siT7RURK7sEdIRaxw2DSfktqLb4nujdvT/wA+6GJA73+hVwKzQf
-         B+c6QIA7CR45BIShlVaMJ3Bx5ZQ4hROHH9WVS4NKlpHP77pCPa1o4ovEJYWj74wJZDwn
-         UYeLNcaCIx4Qh2cj/1cmvHa3igSDNsuKuHLruZRzzo1IMaEutwfb7SEb5jJdEZDz4Wv9
-         5BTyA8gfmIDg2vVsD8xb7/i8rLn9Oa8rs17zEITbDL/yf5OCvqmJ3pdOAA4QiRR8Rx15
-         3clw==
-X-Gm-Message-State: ABy/qLaGgZ/VrZX/6zTovOn7WOyZhIxHJAtKunZuGapaoKBPAu4i4HZt
-        jqRkxhcYnxsOBffl6gtRZ64rIpzHlu4=
-X-Google-Smtp-Source: APBJJlEmoDryPaAQoynG+0QllaP7SCbPdVOfYdjwezb/OIO5nbMPPapZeNIsHeV5kRXSKPVLYXRDkBg6IHU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1582:b0:d0a:353b:b93b with SMTP id
- k2-20020a056902158200b00d0a353bb93bmr144582ybu.3.1691021154336; Wed, 02 Aug
- 2023 17:05:54 -0700 (PDT)
-Date:   Wed,  2 Aug 2023 17:05:51 -0700
-In-Reply-To: <20230721233858.2343941-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230721233858.2343941-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <169101967698.1829360.6805677761713115883.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: VMX: Drop manual TLB flush when migrating vmcs.APIC_ACCESS_ADDR
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229480AbjHCAOY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 20:14:24 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A6ACE4C
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 17:14:22 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1qRLyt-003Bzv-61; Thu, 03 Aug 2023 02:14:19 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=IMQDFJIkfKnwYtJ6mv8Y8A1YfnrZI8Kox++gEWmy8T4=; b=AdT47cjjR1uWrT9LyFTKpwh9Mj
+        L6G3lb7TMLV3WOGKDsIWh29FzKYIkHLUbP5pEX+jLZRE6NRbeHvG+bpB4NFzdXxS9ksxrmnx84DUa
+        YQkAyelMj5Kf88smYgp0AkvajDFX7+EZjHw5iVlmW5DeJPmUDNGlfABIHbmIl2A/mgf6GY1m7X2YH
+        WMlznU24z5lHDYVNEdduSE4duKMKgZVUBGbp0zs9ECKyzX7VU2HGdNdZbseDW9Sim7o+QdtdFj1RI
+        yFHe/JZSH+zJlX5k36zDpj7TrUP6TmPI3/IfbBu9GSIhBzdlSTA61fdb+Xajo0BGq4L7tFT+jmxvR
+        vpX9yUeg==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1qRLys-0007ks-JL; Thu, 03 Aug 2023 02:14:18 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1qRLya-0008EN-6i; Thu, 03 Aug 2023 02:14:00 +0200
+Message-ID: <38f69410-d794-6eae-387a-481417c6b323@rbox.co>
+Date:   Thu, 3 Aug 2023 02:13:59 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU
+ issues
+Content-Language: pl-PL, en-GB
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
+References: <20230728001606.2275586-1-mhal@rbox.co>
+ <20230728001606.2275586-2-mhal@rbox.co> <ZMhIlj+nUAXeL91B@google.com>
+ <7e24e0b1-d265-2ac0-d411-4d6f4f0c1383@rbox.co> <ZMqr/A1O4PPbKfFz@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <ZMqr/A1O4PPbKfFz@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 21 Jul 2023 16:38:58 -0700, Sean Christopherson wrote:
-> Remove the superfluous flush of the current TLB in VMX's handling of
-> migration of the APIC-access page, as a full TLB flush on all vCPUs will
-> have already been performed in response to kvm_unmap_gfn_range() *if*
-> there were SPTEs pointing at the APIC-access page.  And if there were no
-> valid SPTEs, then there can't possibly be TLB entries to flush.
+On 8/2/23 21:18, Sean Christopherson wrote:
+> On Tue, Aug 01, 2023, Michal Luczaj wrote:
+>> All right, so assuming the revert is not happening and the API is not misused
+>> (i.e. unless vcpu->run->kvm_valid_regs is set, no one is expecting up to date
+>> values in vcpu->run->s.regs), is assignment copying
+>>
+>> 	struct kvm_vcpu_events events = vcpu->run->s.regs.events;
+>>
+>> the right approach or should it be a memcpy(), like in ioctl handlers?
 > 
-> The extra flush was added by commit fb6c81984313 ("kvm: vmx: Flush TLB
-> when the APIC-access address changes"), with the justification of "because
-> the SDM says so".  The SDM said, and still says:
+> Both approaches are fine, though I am gaining a preference for the copy-by-value
+> method.  With gcc-12 and probably most compilers, the code generation is identical
+> for both as the compiler generates a call to memcpy() to handle the the struct
+> assignment.
 > 
-> [...]
+> The advantage of copy-by-value for structs, and why I think I now prefer it, is
+> that it provides type safety.  E.g. this compiles without complaint
+> 
+> 	memcpy(&events, &vcpu->run->s.regs.sregs, sizeof(events));
+> 
+> whereas this
+> 
+> 	struct kvm_vcpu_events events = vcpu->run->s.regs.sregs;
+> 
+> yields
+> 
+>   arch/x86/kvm/x86.c: In function ‘sync_regs’:
+>   arch/x86/kvm/x86.c:11793:49: error: invalid initializer
+>   11793 |                 struct kvm_vcpu_events events = vcpu->run->s.regs.sregs;
+>         |                                                 ^~~~
+> 
+> The downside is that it's less obvious when reading the code that there is a
+> large-ish memcpy happening, but IMO it's worth gaining the type safety.
 
-Applied to kvm-x86 vmx, thanks!
+Sure, that makes sense. I was a bit concerned how a padding within a struct
+might affect performance of such copy-by-value, but (obviously?) there's no
+padding in kvm_sregs, nor kvm_vcpu_events...
 
-[1/1] KVM: VMX: Drop manual TLB flush when migrating vmcs.APIC_ACCESS_ADDR
-      https://github.com/kvm-x86/linux/commit/775bc098657b
+Anyway, while there, could you take a look at __set_sregs_common()?
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+	*mmu_reset_needed |= kvm_read_cr0(vcpu) != sregs->cr0;
+	static_call(kvm_x86_set_cr0)(vcpu, sregs->cr0);
+	vcpu->arch.cr0 = sregs->cr0;
+
+That last assignment seems redundant as both vmx_set_cr0() and svm_set_cr0()
+take care of it, but I may be missing something (even if selftests pass with
+that line removed).
+
+thanks,
+Michal
+
