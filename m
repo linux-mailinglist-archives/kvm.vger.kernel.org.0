@@ -2,83 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B627876DEFD
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:28:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED38B76DEFF
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:28:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232836AbjHCD2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 23:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51960 "EHLO
+        id S233792AbjHCD2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 23:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233754AbjHCD1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 23:27:36 -0400
-Received: from mgamail.intel.com (unknown [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE57E420B;
-        Wed,  2 Aug 2023 20:27:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691033230; x=1722569230;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=QmXtopTlfod2q44aI/cG9ypI7xSvby98JB+fVs0/xVI=;
-  b=ZlGQeNen83frkSPFBy0wBOztIYz0ZIXn5BUAl0A2/fwaTTxr3atKTrYr
-   vsPE1AvFxE3SZNlh516JL6wFRbBNPRfpSCks0KHmDypGlcGExs6BGAtsg
-   NwHitkjrcNdfAlUj6YWOmPm0mhmYqK1AWaSSnAGmT/KvZsJvxwfiXtXPC
-   islc2DGbiWZyUP1VHSpyS+q+ncWuQlq0SU7JsGiwP10mB9F49fX9bAnuz
-   74JNeNQj3PmcwnHoJ9yb9t4m2T7UHoFKALxXSzb/4vCFwcKhhghEFsECW
-   AI7yEnXsxeHM3QN86ZiJSaG9YSjqbq6CJfDtb9G+Yf5b/AmbqA1HhdmHh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="359797827"
-X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="359797827"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:27:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="819464846"
-X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="819464846"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.255.31.34]) ([10.255.31.34])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:27:03 -0700
-Message-ID: <b099a333-65b1-de9e-742d-d12f4fb58f67@linux.intel.com>
-Date:   Thu, 3 Aug 2023 11:27:01 +0800
+        with ESMTP id S231705AbjHCD1o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 23:27:44 -0400
+Received: from ustc.edu.cn (email.ustc.edu.cn [IPv6:2001:da8:d800::8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F561272A;
+        Wed,  2 Aug 2023 20:27:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mail.ustc.edu.cn; s=dkim; h=Received:Date:From:To:Cc:Subject:
+        Message-ID:Reply-To:References:MIME-Version:Content-Type:
+        Content-Disposition:Content-Transfer-Encoding:In-Reply-To; bh=bd
+        dxYDM5apsIslXV2cs/xXI53EabgYuAyY8wWPoNGvg=; b=jqVdQduAIgxMdGz7TI
+        2b1OA66CSkzQSeTSfR9ZTPN12tyTruIWp66Ri6I/3gkc9OO3ftdCdoYweYtTMGvz
+        I1h35JyO/j/BH9NB0t5LX582OQaWoExvOBM+VD6R7sRi7JxTmqtScQjGm1QDzSsF
+        DktuJVGkO9eAhbDMBxMFUDuAM=
+Received: from localhost (unknown [139.224.204.105])
+        by newmailweb.ustc.edu.cn (Coremail) with SMTP id LkAmygBn1ByQHstko0UjAA--.5436S2;
+        Thu, 03 Aug 2023 11:27:12 +0800 (CST)
+Date:   Thu, 3 Aug 2023 11:27:12 +0800
+From:   Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        linux-coco@lists.linux.dev
+Subject: Re: [Question] int3 instruction generates a #UD in SEV VM
+Message-ID: <ZMsekJG8PF0f4sCp@iZuf6hx7901barev1c282cZ>
+Reply-To: Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
+References: <8eb933fd-2cf3-d7a9-32fe-2a1d82eac42a@mail.ustc.edu.cn>
+ <ZMfFaF2M6Vrh/QdW@google.com>
+ <4ebb3e20-a043-8ad3-ef6c-f64c2443412c@amd.com>
+ <544b7f95-4b34-654d-a57b-3791a6f4fd5f@mail.ustc.edu.cn>
+ <ZMpEUVsv5hSmrcH8@iZuf6hx7901barev1c282cZ>
+ <ZMphvF+0H9wHQr5B@google.com>
+ <bbc52f40-2661-3fa2-8e09-bec772728812@amd.com>
+ <7a4f3f59-1482-49c4-92b2-aa621e9b06b3@amd.com>
+ <bdf548d1-84cb-6885-c4eb-cbb16c4a3e3b@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 12/12] iommu/vt-d: Disallow nesting on domains with
- read-only mappings
-Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-References: <20230724111335.107427-1-yi.l.liu@intel.com>
- <20230724111335.107427-13-yi.l.liu@intel.com>
- <BN9PR11MB52767DF0C8F25AB893B38B678C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <BN9PR11MB52767DF0C8F25AB893B38B678C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bdf548d1-84cb-6885-c4eb-cbb16c4a3e3b@amd.com>
+X-CM-TRANSID: LkAmygBn1ByQHstko0UjAA--.5436S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxKr1DZr4xGF47Zw13Jw15CFg_yoW7CFW7pF
+        Z7tF15tFWUJr1kJr1Utr1UJry5tr47Jw1UXr1UJFyrJrWqyr1Fgr4UXrn09F1DJr4rJr1U
+        tw18J3srur17ArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUy2b7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xII
+        jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
+        C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxAIw28IcxkI7VAKI48JMxC20s02
+        6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
+        I_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
+        6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj4
+        0_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j
+        6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jY6wZUUUUU=
+X-CM-SenderInfo: pzx200xj1rqzxdloh3xvwfhvlgxou0/
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,49 +74,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/8/2 15:59, Tian, Kevin wrote:
->> From: Liu, Yi L <yi.l.liu@intel.com>
->> Sent: Monday, July 24, 2023 7:14 PM
->>
->> @@ -2147,6 +2148,18 @@ __domain_mapping(struct dmar_domain
->> *domain, unsigned long iov_pfn,
->>   	if ((prot & (DMA_PTE_READ|DMA_PTE_WRITE)) == 0)
->>   		return -EINVAL;
->>
->> +	if (!(prot & DMA_PTE_WRITE) && !domain->read_only_mapped) {
->> +		spin_lock_irqsave(&domain->lock, flags);
->> +		if (domain->set_nested) {
->> +			pr_err_ratelimited("No read-only mapping
->> permitted\n");
+On Wed, Aug 02, 2023 at 03:03:45PM -0500, Tom Lendacky wrote:
+> On 8/2/23 09:33, Tom Lendacky wrote:
+> > On 8/2/23 09:25, Tom Lendacky wrote:
+> > > On 8/2/23 09:01, Sean Christopherson wrote:
+> > > > On Wed, Aug 02, 2023, Wu Zongyo wrote:
+> > > > > On Mon, Jul 31, 2023 at 11:45:29PM +0800, wuzongyong wrote:
+> > > > > > 
+> > > > > > On 2023/7/31 23:03, Tom Lendacky wrote:
+> > > > > > > On 7/31/23 09:30, Sean Christopherson wrote:
+> > > > > > > > On Sat, Jul 29, 2023, wuzongyong wrote:
+> > > > > > > > > Hi,
+> > > > > > > > > I am writing a firmware in Rust to support
+> > > > > > > > > SEV based on project td-shim[1].
+> > > > > > > > > But when I create a SEV VM (just SEV, no
+> > > > > > > > > SEV-ES and no SEV-SNP) with the firmware,
+> > > > > > > > > the linux kernel crashed because the int3
+> > > > > > > > > instruction in int3_selftest() cause a
+> > > > > > > > > #UD.
+> > > > > > > > 
+> > > > > > > > ...
+> > > > > > > > 
+> > > > > > > > > BTW, if a create a normal VM without SEV by
+> > > > > > > > > qemu & OVMF, the int3 instruction always
+> > > > > > > > > generates a
+> > > > > > > > > #BP.
+> > > > > > > > > So I am confused now about the behaviour of
+> > > > > > > > > int3 instruction, could anyone help to
+> > > > > > > > > explain the behaviour?
+> > > > > > > > > Any suggestion is appreciated!
+> > > > > > > > 
+> > > > > > > > Have you tried my suggestions from the other thread[*]?
+> > > > > > Firstly, I'm sorry for sending muliple mails with the
+> > > > > > same content. I thought the mails I sent previously
+> > > > > > didn't be sent successfully.
+> > > > > > And let's talk the problem here.
+> > > > > > > > 
+> > > > > > > >     : > > I'm curious how this happend. I cannot
+> > > > > > > > find any condition that would
+> > > > > > > >     : > > cause the int3 instruction generate a
+> > > > > > > > #UD according to the AMD's spec.
+> > > > > > > >     :
+> > > > > > > >     : One possibility is that the value from
+> > > > > > > > memory that gets executed diverges from the
+> > > > > > > >     : value that is read out be the #UD handler,
+> > > > > > > > e.g. due to patching (doesn't seem to
+> > > > > > > >     : be the case in this test), stale cache/tlb entries, etc.
+> > > > > > > >     :
+> > > > > > > >     : > > BTW, it worked nomarlly with qemu and ovmf.
+> > > > > > > >     : >
+> > > > > > > >     : > Does this happen every time you boot the
+> > > > > > > > guest with your firmware? What
+> > > > > > > >     : > processor are you running on?
+> > > > > > > >     :
+> > > > > > Yes, every time.
+> > > > > > The processor I used is EPYC 7T83.
+> > > > > > > >     : And have you ruled out KVM as the
+> > > > > > > > culprit?  I.e. verified that KVM is NOT
+> > > > > > > > injecting
+> > > > > > > >     : a #UD.  That obviously shouldn't happen,
+> > > > > > > > but it should be easy to check via KVM
+> > > > > > > >     : tracepoints.
+> > > > > > > 
+> > > > > > > I have a feeling that KVM is injecting the #UD, but
+> > > > > > > it will take instrumenting KVM to see which path the
+> > > > > > > #UD is being injected from.
+> > > > > > > 
+> > > > > > > Wu Zongyo, can you add some instrumentation to
+> > > > > > > figure that out if the trace points towards KVM
+> > > > > > > injecting the #UD?
+> > > > > > Ok, I will try to do that.
+> > > > > You're right. The #UD is injected by KVM.
+> > > > > 
+> > > > > The path I found is:
+> > > > >      svm_vcpu_run
+> > > > >          svm_complete_interrupts
+> > > > >         kvm_requeue_exception // vector = 3
+> > > > >             kvm_make_request
+> > > > > 
+> > > > >      vcpu_enter_guest
+> > > > >          kvm_check_and_inject_events
+> > > > >         svm_inject_exception
+> > > > >             svm_update_soft_interrupt_rip
+> > > > >             __svm_skip_emulated_instruction
+> > > > >                 x86_emulate_instruction
+> > > > >                 svm_can_emulate_instruction
+> > > > >                     kvm_queue_exception(vcpu, UD_VECTOR)
+> > > > > 
+> > > > > Does this mean a #PF intercept occur when the guest try to deliver a
+> > > > > #BP through the IDT? But why?
+> > > > 
+> > > > I doubt it's a #PF.  A #NPF is much more likely, though it could
+> > > > be something
+> > > > else entirely, but I'm pretty sure that would require bugs in
+> > > > both the host and
+> > > > guest.
+> > > > 
+> > > > What is the last exit recorded by trace_kvm_exit() before the
+> > > > #UD is injected?
+> > > 
+> > > I'm guessing it was a #NPF, too. Could it be related to the changes that
+> > > went in around svm_update_soft_interrupt_rip()?
+Yes, it's a #NPF with exit code 0x400.
+
+There must be something I didn't handle corretly since it behave normally with
+qemu & ovmf If I don't add int3 before mcheck_cpu_init().
+
+So it'a about memory, is there something I need to pay special attention
+to?
+
+Thanks
+> > > 
+> > > 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the
+> > > instruction")
+> > 
+> > Sorry, that should have been:
+> > 
+> > 7e5b5ef8dca3 ("KVM: SVM: Re-inject INTn instead of retrying the insn on
+> > "failure"")
 > 
-> "Read-only mapping is disallowed on the domain which serves as the
-> parent in a nested configuration, due to HW errata (ERRATA_772415_SPR17)"
-
-Ack.
-
+> Doh! I was right the first time... sigh
 > 
->> +	u8 read_only_mapped:1;		/* domain has mappings with
->> read-only
->> +					 * permission.
->> +					 */
->> +	u8 set_nested:1;		/* has other domains nested on it */
+> 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
 > 
-> what about "is_parent"?
-
-"is_parent" is still a bit generic. How about "is_nested_parent"?
-
+> Thanks,
+> Tom
 > 
->>
->> +	spin_lock_irqsave(&s2_dmar_domain->lock, flags);
->> +	if (s2_dmar_domain->read_only_mapped) {
->> +		spin_unlock_irqrestore(&s2_dmar_domain->lock, flags);
->> +		pr_err_ratelimited("S2 domain has read-only mappings\n");
-> 
-> "Nested configuration is disallowed when the stage-2 domain already
-> has read-only mappings, due to HW errata (ERRATA_772415_SPR17)"
-
-Ack.
-
-Best regards,
-baolu
+> > 
+> > > 
+> > > Before this the !nrips check would prevent the call into
+> > > svm_skip_emulated_instruction(). But now, there is a call to:
+> > > 
+> > >    svm_update_soft_interrupt_rip()
+> > >      __svm_skip_emulated_instruction()
+> > >        kvm_emulate_instruction()
+> > >          x86_emulate_instruction() (passed a NULL insn pointer)
+> > >            kvm_can_emulate_insn() (passed a NULL insn pointer)
+> > >              svm_can_emulate_instruction() (passed NULL insn pointer)
+> > > 
+> > > Because it is an SEV guest, it ends up in the "if (unlikely(!insn))" path
+> > > and injects the #UD.
+> > > 
+> > > Thanks,
+> > > Tom
+> > > 
 
