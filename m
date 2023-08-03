@@ -2,228 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BF8C76E36A
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 10:44:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6563376E3F2
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 11:07:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234457AbjHCIo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 04:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34264 "EHLO
+        id S234958AbjHCJHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 05:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232634AbjHCIoY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 04:44:24 -0400
-Received: from ustc.edu.cn (email.ustc.edu.cn [IPv6:2001:da8:d800::8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A190FDA;
-        Thu,  3 Aug 2023 01:44:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mail.ustc.edu.cn; s=dkim; h=Received:Date:From:To:Subject:
-        Message-ID:Reply-To:References:MIME-Version:Content-Type:
-        Content-Disposition:In-Reply-To; bh=yXnEgMyB+c/lKx03qRo/gn5A2aJh
-        N2Ua96JMPHGvbm8=; b=sd+r0iqT9xJ6UUOW8AsRNOz5v/B21/0i9IhD0VfQOb3Y
-        I7tulBEl0AUysnMflLMbQJCTVjgupVYn3CgsRqDgZzP3uLUSeGwVcFFpv0fXoRZd
-        xECT/T4/yjpIgIr8cXdJ7buk3QzR9LiawPOC4ggwasebs5rvyJe0vEKUnhhiH+I=
-Received: from localhost (unknown [139.224.204.105])
-        by newmailweb.ustc.edu.cn (Coremail) with SMTP id LkAmygDHmqbZaMtkmg8nAA--.458S2;
-        Thu, 03 Aug 2023 16:44:09 +0800 (CST)
-Date:   Thu, 3 Aug 2023 16:44:09 +0800
-From:   Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        linux-coco@lists.linux.dev
-Subject: Re: [Question] int3 instruction generates a #UD in SEV VM
-Message-ID: <ZMto2Yza4rd2JdXf@iZuf6hx7901barev1c282cZ>
-Reply-To: Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
-References: <8eb933fd-2cf3-d7a9-32fe-2a1d82eac42a@mail.ustc.edu.cn>
- <ZMfFaF2M6Vrh/QdW@google.com>
- <4ebb3e20-a043-8ad3-ef6c-f64c2443412c@amd.com>
- <544b7f95-4b34-654d-a57b-3791a6f4fd5f@mail.ustc.edu.cn>
- <ZMpEUVsv5hSmrcH8@iZuf6hx7901barev1c282cZ>
- <ZMphvF+0H9wHQr5B@google.com>
- <bbc52f40-2661-3fa2-8e09-bec772728812@amd.com>
- <7a4f3f59-1482-49c4-92b2-aa621e9b06b3@amd.com>
- <bdf548d1-84cb-6885-c4eb-cbb16c4a3e3b@amd.com>
- <ZMsekJG8PF0f4sCp@iZuf6hx7901barev1c282cZ>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        with ESMTP id S234961AbjHCJHf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 05:07:35 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A51E8E53;
+        Thu,  3 Aug 2023 02:07:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691053653; x=1722589653;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=JePaTM/2T9+vi/NL7kZ8Jns0c6ylYA7WR+mapvf8j+w=;
+  b=ZpADdwORwKfwZcrcSX2tFmE7Gy/gEIKbH7PsfOz4koE++jC5/2IzkcUC
+   ZCwREswIAFsq3mCYVaRN7h07qdIgDm3PVdTMqNMiSJOgyaBmxR+xJYUjV
+   8vGsNxPrq8BP/iIZqRpGkves5cNz+hn0nfJPWQjQthr8aXUZPLyQsjPaL
+   JjUrsmF2wQrRODLslyVIKTwqyQCwtm+ldF2l/NEKU6X+IPYyZCrWJUpeL
+   t54kJ+7ksLuZd3gNUFdfLBhLI4O2lcRI7qrr88HSprlQVAWqIyO0KJTCs
+   KNk0Ou6HsypVadW9/HWb+nsivkpKFJS4rOqI6koMmx8A9lW9sRgegxWJG
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="456197516"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="456197516"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 02:07:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="799476223"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="799476223"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP; 03 Aug 2023 02:07:32 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 02:07:32 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 02:07:32 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 3 Aug 2023 02:07:31 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.102)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 3 Aug 2023 02:07:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R5UHP+Nu6YWp3z+SqQEDjBM0IIXa2aHGNrV9rb267675fsgduIqJ66UVnIkkapBhyqC2iV2gjbBXhMZv7gKtH8VGUwrVSR9OWscVymCDioOibIdf+BVRyoVpzLvsNwhVCGeW8ZyF1oUttI9b1FL4c7CE/s5ote/U2y3iorbIzrfNEMkWtPBgXCqQDP/8CWqAsZkO1WOxlFkYRCbOpXtT34BdLWTHgXTlZ7hjMav6gxaNgqxGSZcMVjGbhU/b/OIBYQnIZ3FZMWDZ+mPU2MWqVxaYiXCRhAjzhzVnAIgqjEOJhURLpNRq1tBfT3fWJk3Rfzey9EDnyxTS72dBwL2DqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JePaTM/2T9+vi/NL7kZ8Jns0c6ylYA7WR+mapvf8j+w=;
+ b=BPX1iKydao0tgsR+LXWj4DGmrzPOjiO7qpTfyPJwm/eHeRMOKwjfzi4DSqbf4ykqlFSdFVL2jnao/Ep+Z/GW3MdLwvKcYZXogCSBHgKwLEIoJ61x4EwmUvD5XBIqOOHuB6fFm87JGL3An9iX0WdzOWOWFKRCQ4zEv5i4xilMQk5hZXfRq+wJesVfg/hqXr7ieBGq3ykow7FTcbl7MElm0vWYC5Cd4pmxRIElMeaIstmcboPctM26h4z17ZIix1WyCU/lfOkXrBXlAyvMPQjDeZFKuCH7vZu2eAxuSrWgYhLiFe90krtcnal4q48+sXN8uDS2sYLdT9XXUtqUEhSfVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
+ by CY8PR11MB7847.namprd11.prod.outlook.com (2603:10b6:930:7c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
+ 2023 09:07:30 +0000
+Received: from PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::146e:30d4:7f1e:7f4b]) by PH8PR11MB6780.namprd11.prod.outlook.com
+ ([fe80::146e:30d4:7f1e:7f4b%3]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
+ 09:07:29 +0000
+Date:   Thu, 3 Aug 2023 17:07:19 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
+        <john.allen@amd.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
+        <binbin.wu@linux.intel.com>
+Subject: Re: [PATCH v5 07/19] KVM:x86: Add fault checks for guest CR4.CET
+ setting
+Message-ID: <ZMtuRx+rM5v9eWEh@chao-email>
+References: <20230803042732.88515-1-weijiang.yang@intel.com>
+ <20230803042732.88515-8-weijiang.yang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ZMsekJG8PF0f4sCp@iZuf6hx7901barev1c282cZ>
-X-CM-TRANSID: LkAmygDHmqbZaMtkmg8nAA--.458S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxKr4UKry7GrykJr4xuF43trb_yoW7trWxpF
-        W8G3WDtr4UJr18AryUtr4kAryYyr4fAr4jqr1UAw13Ja4qk3Wrtr4xtrW5CF1UCr4fAr1U
-        tr10q3srWryUArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUy2b7Iv0xC_KF4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-        A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
-        jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I
-        8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-        64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8Jw
-        Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E
-        4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGV
-        WUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_
-        Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rV
-        WrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_
-        Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jOb18UUUUU=
-X-CM-SenderInfo: pzx200xj1rqzxdloh3xvwfhvlgxou0/
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230803042732.88515-8-weijiang.yang@intel.com>
+X-ClientProxiedBy: SG2PR03CA0117.apcprd03.prod.outlook.com
+ (2603:1096:4:91::21) To PH8PR11MB6780.namprd11.prod.outlook.com
+ (2603:10b6:510:1cb::11)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|CY8PR11MB7847:EE_
+X-MS-Office365-Filtering-Correlation-Id: abbd5c84-54a2-4224-9da3-08db94011082
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: k5pHgSV+1iaDMrSDtzdjs2ekDkJSbzYZ7z5Fe7IR5os1zQJuJ06QzdDf6DSeVG6fYndyoU1nZxJaf5Bmo38Y3HExwmoZWmhAMT6t3GcSzHZGOXSIDCcvsSQp7CcuxcisrKglzxjDvzaHfyAsTUCk6ImP8NikjU1WOX6CndTzj0cN8wJjoCmcKx3DieT6VF99wOhIyW+6RYktD5EkagYi+Je2/mLi2vp6szNVDO9waPEQnverSgjuNV/6SIQXT518U2yV9FtR3matN651UEI6AWIbBuOShfAWQ1vjftZw+sHUa0aK9bNxL8rA7rKVrgrGFZ+3FKtCCaVhHzZdE8gzFXAx0QeNc0Kmt18sL3R/hQDDjLZ6z0xAZ/91FX5WqVkXynSOIs1D64dxsFNhYLZ+cTcKaEtTnsQ2r89Ho3nxXQt4pd4YEL3aXcA6TfXr3QJy44xlPKSu9qZ8fWGb9wUwICTn8moKXuzwqI9XdayscssvzdzMv5Qtp/lcqahUvaxFy1DT/vTy3sDVsTGDdil2Grh2L/3Zy7dozuBSbciiSGj3LPYYlccNP/Xg7IaJqLzJTZ/bw4hBGG2VgVPHBOKKs83x3EqEbIFH8bBtBpo8H8g=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(376002)(396003)(366004)(136003)(39860400002)(346002)(451199021)(6506007)(26005)(186003)(41300700001)(4744005)(2906002)(66946007)(4326008)(66476007)(66556008)(6636002)(5660300002)(316002)(44832011)(8676002)(8936002)(6666004)(6486002)(6862004)(6512007)(9686003)(478600001)(38100700002)(82960400001)(33716001)(86362001)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iyz9DeWBPdrbthT4BDHME7c4pfiB9b9OdkKQvjxo6FrenxM7XEyhFMF2XjO8?=
+ =?us-ascii?Q?LTCUlR6jdc3IWPerqda0s/0qlp0+RHIwP+TVqvVxM/zU+wudLXgJm4T0FTQ6?=
+ =?us-ascii?Q?LuoY43Aaapl4Bdp3WmT4K4MOsHhQe9vjmlgFpHqCzQjfsbnvQKwo9P+M7De9?=
+ =?us-ascii?Q?/vXsA7xB3ESnav/pWgga5TYJQegu20bt06aa+7TMLOgQ+LwGv5j7dYS3TX0T?=
+ =?us-ascii?Q?LHNk8A+AL39NwnqnG67H0H3NYMA8CIu3FW0kBdo71ti30JW0aammNVRpU1K1?=
+ =?us-ascii?Q?gQFs0IebWr8dmyTbx+fSRNgc8P/m4mQDnUl8kA6H38BbpyjGsgURI4gDVqyn?=
+ =?us-ascii?Q?Bs8siuLObxWLNeFmPZM701d48c8Vd8VOmaZYwKc2JmePuwSo8Ig+7iVkdF7E?=
+ =?us-ascii?Q?Ep3PTWdU8FP43q7dKwW43Hna3a4eolq2B8GW0t5/wJ5NbgWzvBzEAMBP0493?=
+ =?us-ascii?Q?BrqCIOo9nLXA+ka9i81YuIGH0J29ZKFbVe1GcQ40D0E2DkrUV0IC1yMDqFU+?=
+ =?us-ascii?Q?YpWMjep9ABLEn4WwYrlAfto6qqiER/0hfKilJYNvkE48I4clIve7+wCXj6Ve?=
+ =?us-ascii?Q?nRijMvg/OGQRJisN8/z8uWYecxnkWsLUC4SoUiKpn969cXVqYVmdt7dcwwIb?=
+ =?us-ascii?Q?zWphwQG0Zm7BHa2jhKdpjJMYCjyTCrDKwBm4js7u9QJore99fevM1KgO+YaF?=
+ =?us-ascii?Q?SPI7HL1SIHGreOlavgkm3cuaH3AF3NYtCM5q9bYbnUqUqjmKTs4zf16z3HRy?=
+ =?us-ascii?Q?W9X+9lgHH2cdc+ntdhUgNCnmPAOwckEDrjLXwTGaaL0cR0B1CtSv8/+5ZaHS?=
+ =?us-ascii?Q?ghknWf+1Ntw1ix0KGyWdst8zz5shaTFmucxYKG+Vi19/Jr35T7hLWTlzxRu4?=
+ =?us-ascii?Q?aNoK/ce9QkC64fA1BZF/7welM5nGmrbrkIN6FA2u1+fr5r+2PTsOoN4K5Yw4?=
+ =?us-ascii?Q?Ku1DERi1xTbYUIxJ9wkW9g2xjhg5jSjbaFTglV8+FwHE06t3svOD8ZzoeEvp?=
+ =?us-ascii?Q?ftLeFfMK+P0GIV8JPyQe9AE6aqPDKMA2DoTXJlJwQDgWCGnpowm/wmS9EEIB?=
+ =?us-ascii?Q?lLp1N/Ej/W+PUjQ8zzSd7s1RjlUEMDJRisAQVUEnsinPkt8CeIPlPmCqrJmQ?=
+ =?us-ascii?Q?Xt+fvsKTx/nyD9lGSybu92pCJsPtM6D0vTt723Zym9OENiP2KBGfBXHaUBCC?=
+ =?us-ascii?Q?ROVx2I21d2Zj60pBzBwgeIB9fJGQGnPEYKMxiEQzYb5X4u6l6ln2rqD8EjhN?=
+ =?us-ascii?Q?6zd44VlpJuCiu6iHniUW5OfUeN4rBRlseok8mE0sPBedLUsi+iSQu+1LTJuf?=
+ =?us-ascii?Q?J1ggAWjXOi83JTl5dA15eXd6HqsdAuTRlc5kxAkBnIbHVMPhgWnQyI+FkLww?=
+ =?us-ascii?Q?GzY6TT1uk/eFF1W5Uszdzrd8h9XjpubCBfVrHA2J1adyz/ROPGD9Scg18iPq?=
+ =?us-ascii?Q?7Uttlt71xyVUV75aEgX+pdPsaliMqnJlIPUcuUuaETCuj9NArLg8xHba3Xpl?=
+ =?us-ascii?Q?w7ElLPSizNXdJFIdC1nk2bTl5Hll/ATX67z2QlNrSD+qij/ikveL5f1AGmbw?=
+ =?us-ascii?Q?cSsfYVP8AcXUWXGmdCGHxR+CappOR1BbZL6m3t/R?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: abbd5c84-54a2-4224-9da3-08db94011082
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 09:07:29.7077
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: D3N8aaYrW+3/ms0rh7/J4dlg6+yzy6lLawvmBqEbAJ0cyjemquQUW0CV5cXxJtLLJZYg1upwF7NlWgwF4k4O/A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7847
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 03, 2023 at 11:27:12AM +0800, Wu Zongyo wrote:
-> On Wed, Aug 02, 2023 at 03:03:45PM -0500, Tom Lendacky wrote:
-> > On 8/2/23 09:33, Tom Lendacky wrote:
-> > > On 8/2/23 09:25, Tom Lendacky wrote:
-> > > > On 8/2/23 09:01, Sean Christopherson wrote:
-> > > > > On Wed, Aug 02, 2023, Wu Zongyo wrote:
-> > > > > > On Mon, Jul 31, 2023 at 11:45:29PM +0800, wuzongyong wrote:
-> > > > > > > 
-> > > > > > > On 2023/7/31 23:03, Tom Lendacky wrote:
-> > > > > > > > On 7/31/23 09:30, Sean Christopherson wrote:
-> > > > > > > > > On Sat, Jul 29, 2023, wuzongyong wrote:
-> > > > > > > > > > Hi,
-> > > > > > > > > > I am writing a firmware in Rust to support
-> > > > > > > > > > SEV based on project td-shim[1].
-> > > > > > > > > > But when I create a SEV VM (just SEV, no
-> > > > > > > > > > SEV-ES and no SEV-SNP) with the firmware,
-> > > > > > > > > > the linux kernel crashed because the int3
-> > > > > > > > > > instruction in int3_selftest() cause a
-> > > > > > > > > > #UD.
-> > > > > > > > > 
-> > > > > > > > > ...
-> > > > > > > > > 
-> > > > > > > > > > BTW, if a create a normal VM without SEV by
-> > > > > > > > > > qemu & OVMF, the int3 instruction always
-> > > > > > > > > > generates a
-> > > > > > > > > > #BP.
-> > > > > > > > > > So I am confused now about the behaviour of
-> > > > > > > > > > int3 instruction, could anyone help to
-> > > > > > > > > > explain the behaviour?
-> > > > > > > > > > Any suggestion is appreciated!
-> > > > > > > > > 
-> > > > > > > > > Have you tried my suggestions from the other thread[*]?
-> > > > > > > Firstly, I'm sorry for sending muliple mails with the
-> > > > > > > same content. I thought the mails I sent previously
-> > > > > > > didn't be sent successfully.
-> > > > > > > And let's talk the problem here.
-> > > > > > > > > 
-> > > > > > > > > ??? : > > I'm curious how this happend. I cannot
-> > > > > > > > > find any condition that would
-> > > > > > > > > ??? : > > cause the int3 instruction generate a
-> > > > > > > > > #UD according to the AMD's spec.
-> > > > > > > > > ??? :
-> > > > > > > > > ??? : One possibility is that the value from
-> > > > > > > > > memory that gets executed diverges from the
-> > > > > > > > > ??? : value that is read out be the #UD handler,
-> > > > > > > > > e.g. due to patching (doesn't seem to
-> > > > > > > > > ??? : be the case in this test), stale cache/tlb entries, etc.
-> > > > > > > > > ??? :
-> > > > > > > > > ??? : > > BTW, it worked nomarlly with qemu and ovmf.
-> > > > > > > > > ??? : >
-> > > > > > > > > ??? : > Does this happen every time you boot the
-> > > > > > > > > guest with your firmware? What
-> > > > > > > > > ??? : > processor are you running on?
-> > > > > > > > > ??? :
-> > > > > > > Yes, every time.
-> > > > > > > The processor I used is EPYC 7T83.
-> > > > > > > > > ??? : And have you ruled out KVM as the
-> > > > > > > > > culprit?? I.e. verified that KVM is NOT
-> > > > > > > > > injecting
-> > > > > > > > > ??? : a #UD.? That obviously shouldn't happen,
-> > > > > > > > > but it should be easy to check via KVM
-> > > > > > > > > ??? : tracepoints.
-> > > > > > > > 
-> > > > > > > > I have a feeling that KVM is injecting the #UD, but
-> > > > > > > > it will take instrumenting KVM to see which path the
-> > > > > > > > #UD is being injected from.
-> > > > > > > > 
-> > > > > > > > Wu Zongyo, can you add some instrumentation to
-> > > > > > > > figure that out if the trace points towards KVM
-> > > > > > > > injecting the #UD?
-> > > > > > > Ok, I will try to do that.
-> > > > > > You're right. The #UD is injected by KVM.
-> > > > > > 
-> > > > > > The path I found is:
-> > > > > > ???? svm_vcpu_run
-> > > > > > ???????? svm_complete_interrupts
-> > > > > > ??????? kvm_requeue_exception // vector = 3
-> > > > > > ??????????? kvm_make_request
-> > > > > > 
-> > > > > > ???? vcpu_enter_guest
-> > > > > > ???????? kvm_check_and_inject_events
-> > > > > > ??????? svm_inject_exception
-> > > > > > ??????????? svm_update_soft_interrupt_rip
-> > > > > > ??????????? __svm_skip_emulated_instruction
-> > > > > > ??????????????? x86_emulate_instruction
-> > > > > > ??????????????? svm_can_emulate_instruction
-> > > > > > ??????????????????? kvm_queue_exception(vcpu, UD_VECTOR)
-> > > > > > 
-> > > > > > Does this mean a #PF intercept occur when the guest try to deliver a
-> > > > > > #BP through the IDT? But why?
-> > > > > 
-> > > > > I doubt it's a #PF.? A #NPF is much more likely, though it could
-> > > > > be something
-> > > > > else entirely, but I'm pretty sure that would require bugs in
-> > > > > both the host and
-> > > > > guest.
-> > > > > 
-> > > > > What is the last exit recorded by trace_kvm_exit() before the
-> > > > > #UD is injected?
-> > > > 
-> > > > I'm guessing it was a #NPF, too. Could it be related to the changes that
-> > > > went in around svm_update_soft_interrupt_rip()?
-> Yes, it's a #NPF with exit code 0x400.
-> 
-> There must be something I didn't handle corretly since it behave normally with
-> qemu & ovmf If I don't add int3 before mcheck_cpu_init().
-> 
-> So it'a about memory, is there something I need to pay special attention
-> to?
-> 
-> Thanks
-I check the fault address of #NPF, and it is the IDT entry address of
-the guest kernel. The NPT page table is not constructed for the IDT
-entry and the #NPF is generated when guest try to access IDT.
+nit: add a space betwen "KVM:" and "x86:" in the short changelog.
 
-With qemu & ovmf, I didn't see the #NPF when guest invoke the int3
-handler. That means the NPT page table has already been constructed, but
-when?
+On Thu, Aug 03, 2023 at 12:27:20AM -0400, Yang Weijiang wrote:
+>Check potential faults for CR4.CET setting per Intel SDM.
+>CET can be enabled if and only if CR0.WP==1, i.e. setting
+>CR4.CET=1 faults if CR0.WP==0 and setting CR0.WP=0 fails
+>if CR4.CET==1.
+>
+>Co-developed-by: Sean Christopherson <seanjc@google.com>
+>Signed-off-by: Sean Christopherson <seanjc@google.com>
+>Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 
-> > > > 
-> > > > 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the
-> > > > instruction")
-> > > 
-> > > Sorry, that should have been:
-> > > 
-> > > 7e5b5ef8dca3 ("KVM: SVM: Re-inject INTn instead of retrying the insn on
-> > > "failure"")
-> > 
-> > Doh! I was right the first time... sigh
-> > 
-> > 6ef88d6e36c2 ("KVM: SVM: Re-inject INT3/INTO instead of retrying the instruction")
-> > 
-> > Thanks,
-> > Tom
-> > 
-> > > 
-> > > > 
-> > > > Before this the !nrips check would prevent the call into
-> > > > svm_skip_emulated_instruction(). But now, there is a call to:
-> > > > 
-> > > > ?? svm_update_soft_interrupt_rip()
-> > > > ???? __svm_skip_emulated_instruction()
-> > > > ?????? kvm_emulate_instruction()
-> > > > ???????? x86_emulate_instruction() (passed a NULL insn pointer)
-> > > > ?????????? kvm_can_emulate_insn() (passed a NULL insn pointer)
-> > > > ???????????? svm_can_emulate_instruction() (passed NULL insn pointer)
-> > > > 
-> > > > Because it is an SEV guest, it ends up in the "if (unlikely(!insn))" path
-> > > > and injects the #UD.
-> > > > 
-> > > > Thanks,
-> > > > Tom
-> > > > 
-
+Reviewed-by: Chao Gao <chao.gao@intel.com>
