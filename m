@@ -2,68 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE52F76E089
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 08:52:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88C0076E205
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:39:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232803AbjHCGwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 02:52:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53304 "EHLO
+        id S234192AbjHCHjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 03:39:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjHCGwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 02:52:23 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56BA62D62;
-        Wed,  2 Aug 2023 23:52:21 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8Dxl+ikTstk_IYPAA--.207S3;
-        Thu, 03 Aug 2023 14:52:20 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxHCOiTstkNcpGAA--.32882S3;
-        Thu, 03 Aug 2023 14:52:19 +0800 (CST)
-Subject: Re: [PATCH v1 4/4] selftests: kvm: Add LoongArch tests into makefile
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vishal Annapurve <vannapurve@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
-        Peter Xu <peterx@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
-References: <20230801020206.1957986-1-zhaotianrui@loongson.cn>
- <20230801020206.1957986-5-zhaotianrui@loongson.cn>
- <ZMqcKzrSsw9WGeTC@google.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <37029e59-78f7-d9e8-7ee9-4a221141111a@loongson.cn>
-Date:   Thu, 3 Aug 2023 14:52:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        with ESMTP id S231903AbjHCHhb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 03:37:31 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AE13C21;
+        Thu,  3 Aug 2023 00:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691048190; x=1722584190;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=L0xn3LN+iLDuwnDfC10OXNIFwR0hNYvlK8cIufvM8+I=;
+  b=bMIpammyIwA2nQIhyueXNYbMwDutK/idp4VrBc7VS8I1plJlCLF2jezJ
+   aJ/ydf4tXqe9riQGjcKCFb3vSgL8vQ7f51YKGuh7rms5xz+SuEs/q672D
+   Rya2CxtnqZKC3SpHvxp5BhyYLbSNOh74bAcxmaQQe4k9ozfootN3O/kKD
+   Y8vl03tTkQjO2OYIokZAmfDC4fkix8R4ocTgD50Ur89OPYbPEm6PQdPP1
+   XUUkgtLA5i678axVPeUezgoBENKxuIp/Sdkrt7siTYqSJ/jphu43I0IiR
+   ED6uG9qq4tOXjfzD9EEKiAaQnqXdEt8DWtDSEroRfeLVNqsyNkym5Pyv2
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="368696070"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="368696070"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:36:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="764494874"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="764494874"
+Received: from zhaoyuan-mobl.ccr.corp.intel.com (HELO [10.254.213.243]) ([10.254.213.243])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:36:16 -0700
+Message-ID: <898e9680-3e5c-29d5-39d0-f9648165a2d6@linux.intel.com>
+Date:   Thu, 3 Aug 2023 15:36:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <ZMqcKzrSsw9WGeTC@google.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-10-yi.l.liu@intel.com>
+ <BN9PR11MB527690EBAA872A16AE8926F88C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <58ae9095-28f2-a44a-b0e5-be82e1eae9d9@linux.intel.com>
+ <BN9PR11MB52764994FB32B2B1CD9C95068C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <40d9b0fa-4a36-c3b7-53bb-4333ff89dc45@linux.intel.com>
+ <BN9PR11MB5276FED948D84DAA81D09C838C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Language: en-US
-X-CM-TRANSID: AQAAf8BxHCOiTstkNcpGAA--.32882S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uF48Jr13XrW3GrWfAFWDGFX_yoW8uw1Upa
-        48CF1qyFWxur47Gw1xWw4DZan7Gr92gF40gFyfK348uwnxJ34xJr17KasrGFsY9w4jqa1a
-        v3WFgFnF9ayDA3XCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUxhiSDU
-        UUU
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB5276FED948D84DAA81D09C838C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,55 +89,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-ÔÚ 2023/8/3 ÉÏÎç2:10, Sean Christopherson Ð´µÀ:
-> On Tue, Aug 01, 2023, Tianrui Zhao wrote:
->> Add LoongArch tests into selftests/kvm makefile.
-> Please elaborate on how the lists of tests was chosen.  E.g. explaing why
-> LoongArch isn't supporting kvm_binary_stats_test, rseq_test, etc.
-The kvm_binary_stats_test is supported by LoongArch and we will add it 
-later, but the rseq_test is not supported by LoongArch and the glibc, so 
-we do not add it.
-
-Thanks
-Tianrui Zhao
->
->> Based-on: <20230720062813.4126751-1-zhaotianrui@loongson.cn>
->> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
->> ---
->>   tools/testing/selftests/kvm/Makefile | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
+On 2023/8/3 12:13, Tian, Kevin wrote:
+>> From: Baolu Lu <baolu.lu@linux.intel.com>
+>> Sent: Thursday, August 3, 2023 12:06 PM
 >>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index c692cc86e7da..36a808c0dd4c 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -55,6 +55,10 @@ LIBKVM_s390x += lib/s390x/ucall.c
->>   LIBKVM_riscv += lib/riscv/processor.c
->>   LIBKVM_riscv += lib/riscv/ucall.c
->>   
->> +LIBKVM_loongarch += lib/loongarch/processor.c
->> +LIBKVM_loongarch += lib/loongarch/ucall.c
->> +LIBKVM_loongarch += lib/loongarch/exception.S
->> +
->>   # Non-compiled test targets
->>   TEST_PROGS_x86_64 += x86_64/nx_huge_pages_test.sh
->>   
->> @@ -181,6 +185,13 @@ TEST_GEN_PROGS_riscv += kvm_page_table_test
->>   TEST_GEN_PROGS_riscv += set_memory_region_test
->>   TEST_GEN_PROGS_riscv += kvm_binary_stats_test
->>   
->> +TEST_GEN_PROGS_loongarch += kvm_create_max_vcpus
->> +TEST_GEN_PROGS_loongarch += demand_paging_test
->> +TEST_GEN_PROGS_loongarch += kvm_page_table_test
->> +TEST_GEN_PROGS_loongarch += set_memory_region_test
->> +TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
->> +TEST_GEN_PROGS_loongarch += memslot_perf_test
->> +
->>   TEST_PROGS += $(TEST_PROGS_$(ARCH_DIR))
->>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
->>   TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
->> -- 
->> 2.39.1
+>> On 2023/8/3 12:00, Tian, Kevin wrote:
+>>>> From: Baolu Lu <baolu.lu@linux.intel.com>
+>>>> Sent: Thursday, August 3, 2023 11:25 AM
+>>>>
+>>>> On 2023/8/2 15:46, Tian, Kevin wrote:
+>>>>>> From: Liu, Yi L <yi.l.liu@intel.com>
+>>>>>> Sent: Monday, July 24, 2023 7:14 PM
+>>>>>>
+>>>>>> +
+>>>>>> +		spin_lock_irqsave(&dmar_domain->lock, flags);
+>>>>>> +		list_for_each_entry(info, &dmar_domain->devices, link)
+>>>>>> +			intel_nested_invalidate(info->dev, dmar_domain,
+>>>>>> +						req->addr, req->npages);
+>>>>>> +		spin_unlock_irqrestore(&dmar_domain->lock, flags);
+>>>>>
+>>>>> Disabling interrupt while invalidating iotlb is certainly unacceptable.
+>>>>>
+>>>>> Actually there is no need to walk devices. Under dmar_domain there
+>>>>> is already a list of attached iommu's.
+>>>>
+>>>> Walking device is only necessary when invalidating device TLB. For iotlb
+>>>> invalidation, it only needs to know the iommu's.
+>>>>
+>>>
+>>> even for device tlb we may think whether there is any better way
+>>> to avoid disabling interrupt. It's a slow path, especially in a guest.
 >>
+>> I ever tried this. But some device drivers call iommu_unmap() in the
+>> interrupt critical path. :-( So we have a long way to go.
+>>
+> 
+> emmm... this path only comes from iommufd and the domain is
+> user-managed. There won't be kernel drivers to call iommu_unmap()
+> on such domain.
+
+Probably we can use a different lock for nested domain and add a comment
+around the lock with above explanation.
+
+Best regards,
+baolu
 
