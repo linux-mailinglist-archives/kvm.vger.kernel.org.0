@@ -2,98 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFD3276DF01
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:29:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B627876DEFD
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:28:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231935AbjHCD3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 23:29:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50964 "EHLO
+        id S232836AbjHCD2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 23:28:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233212AbjHCD2r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 23:28:47 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E9E3AAC
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 20:28:25 -0700 (PDT)
+        with ESMTP id S233754AbjHCD1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 23:27:36 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE57E420B;
+        Wed,  2 Aug 2023 20:27:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691033305; x=1722569305;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=M25kOQe2Zu3NonvjBfD85cRZReV7uS8x0eVkMFH5XAU=;
-  b=P/8s0OxWKZoKUaHsd5nKg6eKcobAeghOB/D1F+haloXFtFP5Ch6T7Nt+
-   h+PRobMWdsROA2gMA6zBWmklTfQRFmaEnqJFdddEzGoZeLph4flfdcC39
-   PiDN/Di2uvuR+qlTyXwpIhygjVoJLbnkvKPWz/+Fa6RLRgG9juuZ8Dnjk
-   41uVvGMzQ82MelyAT8YkXoCDG8G27PCQdglNkXG9Ir8H1c/DJ61pavn/y
-   PJylBmwDPBFZCZJ7hnFl3uVTzWkL+aE64E/IQneh3WDKo46MXkGXIb5xh
-   XZegMIASYqIS4almbN/BX52vO+JbAednmbCN2Gofdsp4dZo6a0HgoQ9Hw
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="367219088"
+  t=1691033230; x=1722569230;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QmXtopTlfod2q44aI/cG9ypI7xSvby98JB+fVs0/xVI=;
+  b=ZlGQeNen83frkSPFBy0wBOztIYz0ZIXn5BUAl0A2/fwaTTxr3atKTrYr
+   vsPE1AvFxE3SZNlh516JL6wFRbBNPRfpSCks0KHmDypGlcGExs6BGAtsg
+   NwHitkjrcNdfAlUj6YWOmPm0mhmYqK1AWaSSnAGmT/KvZsJvxwfiXtXPC
+   islc2DGbiWZyUP1VHSpyS+q+ncWuQlq0SU7JsGiwP10mB9F49fX9bAnuz
+   74JNeNQj3PmcwnHoJ9yb9t4m2T7UHoFKALxXSzb/4vCFwcKhhghEFsECW
+   AI7yEnXsxeHM3QN86ZiJSaG9YSjqbq6CJfDtb9G+Yf5b/AmbqA1HhdmHh
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="359797827"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="367219088"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:28:25 -0700
+   d="scan'208";a="359797827"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:27:08 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="706389454"
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="819464846"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="706389454"
-Received: from linux.bj.intel.com ([10.238.156.127])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:28:23 -0700
-Date:   Thu, 3 Aug 2023 11:26:21 +0800
-From:   Tao Su <tao1.su@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, xiaoyao.li@intel.com
-Subject: Re: [PATCH] KVM: x86: Advertise AMX-COMPLEX CPUID to userspace
-Message-ID: <ZMseXTL80yxUQxa0@linux.bj.intel.com>
-References: <20230802022954.193843-1-tao1.su@linux.intel.com>
- <ZMroatylDm1b5+WJ@google.com>
+   d="scan'208";a="819464846"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.255.31.34]) ([10.255.31.34])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:27:03 -0700
+Message-ID: <b099a333-65b1-de9e-742d-d12f4fb58f67@linux.intel.com>
+Date:   Thu, 3 Aug 2023 11:27:01 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZMroatylDm1b5+WJ@google.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 12/12] iommu/vt-d: Disallow nesting on domains with
+ read-only mappings
+Content-Language: en-US
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-13-yi.l.liu@intel.com>
+ <BN9PR11MB52767DF0C8F25AB893B38B678C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB52767DF0C8F25AB893B38B678C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 02, 2023 at 04:36:10PM -0700, Sean Christopherson wrote:
-> On Wed, Aug 02, 2023, Tao Su wrote:
-> > Latest Intel platform GraniteRapids-D introduces AMX-COMPLEX, which adds
-> > two instructions to perform matrix multiplication of two tiles containing
-> > complex elements and accumulate the results into a packed single precision
-> > tile.
-> > 
-> > AMX-COMPLEX is enumerated via CPUID.(EAX=7,ECX=1):EDX[bit 8]
-> > 
-> > Since there are no new VMX controls or additional host enabling required
-> > for guests to use this feature, advertise the CPUID to userspace.
+On 2023/8/2 15:59, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Monday, July 24, 2023 7:14 PM
+>>
+>> @@ -2147,6 +2148,18 @@ __domain_mapping(struct dmar_domain
+>> *domain, unsigned long iov_pfn,
+>>   	if ((prot & (DMA_PTE_READ|DMA_PTE_WRITE)) == 0)
+>>   		return -EINVAL;
+>>
+>> +	if (!(prot & DMA_PTE_WRITE) && !domain->read_only_mapped) {
+>> +		spin_lock_irqsave(&domain->lock, flags);
+>> +		if (domain->set_nested) {
+>> +			pr_err_ratelimited("No read-only mapping
+>> permitted\n");
 > 
-> Nit, I would rather justify this (last paragraph) with something like:
-> 
->   Advertise AMX_COMPLEX if it's supported in hardware.  There are no VMX
->   controls for the feature, i.e. the instructions can't be interecepted, and
->   KVM advertises base AMX in CPUID if AMX is supported in hardware, even if
->   KVM doesn't advertise AMX as being supported in XCR0, e.g. because the
->   process didn't opt-in to allocating tile data.
-> 
-> If the above is accurate and there are no objections, I'll fixup the changelog
-> when applying.
+> "Read-only mapping is disallowed on the domain which serves as the
+> parent in a nested configuration, due to HW errata (ERRATA_772415_SPR17)"
 
-Totally agree.
+Ack.
 
 > 
-> Side topic, this does make me wonder if advertising AMX when XTILE_DATA isn't
-> permitted is a bad idea.  But no one has complained, and chasing down all the
-> dependent AMX features would get annoying, so I'm inclined to keep the status quo.
+>> +	u8 read_only_mapped:1;		/* domain has mappings with
+>> read-only
+>> +					 * permission.
+>> +					 */
+>> +	u8 set_nested:1;		/* has other domains nested on it */
+> 
+> what about "is_parent"?
 
-From the description of AMX exception, there is no CPUID checking and #UD will be produced
-if XCR0[18:17] != 0b11. Since user applications should check both the XCR0 and CPUIDs
-before using related AMX instructions, I don't think there should be bad effects in keeping
-the status quo.
+"is_parent" is still a bit generic. How about "is_nested_parent"?
 
-Thanks,
-Tao
+> 
+>>
+>> +	spin_lock_irqsave(&s2_dmar_domain->lock, flags);
+>> +	if (s2_dmar_domain->read_only_mapped) {
+>> +		spin_unlock_irqrestore(&s2_dmar_domain->lock, flags);
+>> +		pr_err_ratelimited("S2 domain has read-only mappings\n");
+> 
+> "Nested configuration is disallowed when the stage-2 domain already
+> has read-only mappings, due to HW errata (ERRATA_772415_SPR17)"
+
+Ack.
+
+Best regards,
+baolu
+
