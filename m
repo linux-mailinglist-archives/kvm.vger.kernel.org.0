@@ -2,97 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE9FA76F34B
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 21:16:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EBE876F389
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 21:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbjHCTQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 15:16:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55018 "EHLO
+        id S230353AbjHCTjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 15:39:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbjHCTQA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 15:16:00 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B6230F4
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 12:15:57 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5635233876bso892516a12.0
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 12:15:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691090157; x=1691694957;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1QAbc+4fCOMN1wq3LOwJ4k1bsXl9R1Q+x4bhgj3rFIg=;
-        b=DSNF3uKlxbN1/j9sGPdV4RLbiLmTPzUp9Zu3X+X+jI/CXp8qoKO4kiLFxh0eWH4ras
-         3UHMbP1YaoUXHaU6RKc0xiD6OqP0/G8GaXsxhmkMXaXcobPCXbuINlBumVapPQ9eL9WI
-         SQMF6MIyr2Twu3rQpgN63Ty4xEmvWMdFcq1qk0s/bO53R4WtT4D6mxqEq84CrHbE24tW
-         R+R0wb7QBQEWXSd0EQn3phD4GyYVVYig+DH6wM230PxAw/bTqhOS8nPt+LaY5XqmbBEo
-         2lNVu9E2Fm9D/OSL8FvXxR34+QmBLtfkxeWiU2TVRkIK5+koZ6XE0PUmvWk9wsqvFkyB
-         PpQQ==
+        with ESMTP id S229777AbjHCTjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 15:39:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82C2C211B
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 12:38:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691091502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C8fBRKG84oTUzu4cJ0upEFkniwHWsF/Sd26+sDxvy08=;
+        b=f5nC44nZhqLa4M0+ouux80jy1Am6JwhKbst0ntqMzKlEnulWgZWMKMdP0L5Lgv62Vfhtbk
+        wATlmtD6dDFNRSOde/didtfsqNkcxez381b547K3bbdX83mfKcCxzOQ+Qc3tKkRx6jC8RH
+        1Gc92rHnteugqw0Vjg3xX1KqVIvqL3Y=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-402-wxs8BS9cPeuVJgDu5o-now-1; Thu, 03 Aug 2023 15:38:21 -0400
+X-MC-Unique: wxs8BS9cPeuVJgDu5o-now-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-34631fd18beso11478705ab.0
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 12:38:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691090157; x=1691694957;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1QAbc+4fCOMN1wq3LOwJ4k1bsXl9R1Q+x4bhgj3rFIg=;
-        b=Dzj2nj6Pqb2Yt7i47QrEN8XHrTIqqaaVGEUd24tJvwrChfZryTOMUpDRvO2F5CEfTn
-         up2Y1xbgE+UY+LtN6exYa6KAK39UF34fhWMQliiwqIHYYXcwO6QNumHxDt+7+qwvlFsr
-         PYSQGWUMdtTehh9lNwDSqBs0eo3TWQME8/oRG3yyZjZ/JmfeqPYxaD6znYRCbmn4uSmA
-         p0taC9AYC4jKER+4MzeoYe79EXY8zzsnvN0SsMA9FRmSUHCRcOs089BUd2Ch4UAj6eMa
-         osiD4x+PB9GgNV2NSn7fH1p57mjQnoK/ZpCpvOuRvgjlnacYj7lKO3+l8P6ivzNw5mkh
-         HekA==
-X-Gm-Message-State: ABy/qLZWEI/OMmKXeSYgUd2eP2T8Rr96H2oLMg7inXRXQUhaJ3KZHHoU
-        yfKGUSxrbL8o72GVgXr6u2bxo8a+H7QN
-X-Google-Smtp-Source: APBJJlHtGvcJEMYqDDCqDrlA6FqIV7ZBvnc2RG3ctaXexB6pNXaY+PGUAOnc1N44cMVGOG5WgF6ZzIYHZzSS
-X-Received: from afranji.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:47f1])
- (user=afranji job=sendgmr) by 2002:a63:295a:0:b0:563:5065:9d40 with SMTP id
- bu26-20020a63295a000000b0056350659d40mr129290pgb.5.1691090157410; Thu, 03 Aug
- 2023 12:15:57 -0700 (PDT)
-Date:   Thu,  3 Aug 2023 19:15:54 +0000
-In-Reply-To: <20230718234512.1690985-13-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230718234512.1690985-13-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230803191554.205599-1-afranji@google.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-From:   Ryan Afranji <afranji@google.com>
-To:     seanjc@google.com
-Cc:     ackerleytng@google.com, akpm@linux-foundation.org,
-        anup@brainfault.org, aou@eecs.berkeley.edu,
-        chao.p.peng@linux.intel.com, chenhuacai@kernel.org,
-        david@redhat.com, isaku.yamahata@gmail.com, jarkko@kernel.org,
-        jmorris@namei.org, kirill.shutemov@linux.intel.com,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, liam.merwick@oracle.com,
-        linux-arm-kernel@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-riscv@lists.infradead.org,
-        linux-security-module@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mail@maciej.szmigiero.name,
-        maz@kernel.org, michael.roth@amd.com, mpe@ellerman.id.au,
-        oliver.upton@linux.dev, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, paul@paul-moore.com, pbonzini@redhat.com,
-        qperret@google.com, serge@hallyn.com, tabba@google.com,
-        vannapurve@google.com, vbabka@suse.cz, wei.w.wang@intel.com,
-        willy@infradead.org, yu.c.zhang@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1691091500; x=1691696300;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C8fBRKG84oTUzu4cJ0upEFkniwHWsF/Sd26+sDxvy08=;
+        b=A1oj5+QJvBFTnnkMC7jEX6ieasnr430xfjzFGX+Rp1hu3f71Hg/LP3oYXVzt2AWrTz
+         2tkGr2YTsdzhErsiUjmMmPhfPvYCpdug0PbeIBGxY6R3tamZ4cHFBQX/OQiieqHtrHVR
+         LruKfadvSXT7Sg0O3hjnchVVNCC1g6IodTKYPKIZ5T2aFDa5SBoVLMLuOXDX4biv/Byh
+         Fpd7C69sofRfHgG9KSOXYc0HeL+aHISs0yJKKakhiOX7S2XQX1QypQ/rFK5qWlfsUXOj
+         c9fWGsQoGGwoHgC1j/sesSRRsHI6p7Mmw/7Gc/eDXdQLvOpxsDYidUDobh7NYrvIIQXh
+         Qq3Q==
+X-Gm-Message-State: ABy/qLY33EuTHlr6JkGFskyy7T5L//HPRIo35oXP4zQO2u6YxRKFsCEd
+        vwD3y86oMT/Spzocx1zWVHSb01gMvOW3BpFoXt7PM8lh2+ZSxY1XNkj5vBxe8CEslX5j8fEBFC6
+        Iehk9TOoGHevr
+X-Received: by 2002:a92:d083:0:b0:349:19e:7656 with SMTP id h3-20020a92d083000000b00349019e7656mr13385731ilh.28.1691091500566;
+        Thu, 03 Aug 2023 12:38:20 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFozrDPoA3AZ5UQWG5fcKBYQDbRoiwLlBgBEKUdt19LvvvypUn54PZ7JdYNXseH/zc0WqTLYA==
+X-Received: by 2002:a92:d083:0:b0:349:19e:7656 with SMTP id h3-20020a92d083000000b00349019e7656mr13385718ilh.28.1691091500314;
+        Thu, 03 Aug 2023 12:38:20 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id t7-20020a92cc47000000b00345d6e8ded4sm176994ilq.25.2023.08.03.12.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 12:38:19 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 13:38:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Roxana Bradescu <roxabee@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] kvm/vfio: ensure kvg instance stays around in
+ kvm_vfio_group_add()
+Message-ID: <20230803133812.491956b9.alex.williamson@redhat.com>
+In-Reply-To: <20230714224538.404793-1-dmitry.torokhov@gmail.com>
+References: <20230714224538.404793-1-dmitry.torokhov@gmail.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
-> +{
-> +	struct folio *folio;
-> +
-> +	/* TODO: Support huge pages. */
-> +	folio = filemap_grab_folio(file->f_mapping, index);
-> +	if (!folio)
-> +		return NULL;
+On Fri, 14 Jul 2023 15:45:32 -0700
+Dmitry Torokhov <dmitry.torokhov@gmail.com> wrote:
 
-In Linux 6.4, filemap_grab_folio() may also return an error value.
-Instead of just checking for NULL, "IS_ERR_OR_NULL(folio)" will be needed.
+> kvm_vfio_group_add() creates kvg instance, links it to kv->group_list,
+> and calls kvm_vfio_file_set_kvm() with kvg->file as an argument after
+> dropping kv->lock. If we race group addition and deletion calls, kvg
+> instance may get freed by the time we get around to calling
+> kvm_vfio_file_set_kvm().
+> 
+> Previous iterations of the code did not reference kvg->file outside of
+> the critical section, but used a temporary variable. Still, they had
+> similar problem of the file reference being owned by kvg structure and
+> potential for kvm_vfio_group_del() dropping it before
+> kvm_vfio_group_add() had a chance to complete.
+> 
+> Fix this by moving call to kvm_vfio_file_set_kvm() under the protection
+> of kv->lock. We already call it while holding the same lock when vfio
+> group is being deleted, so it should be safe here as well.
+> 
+> Fixes: 2fc1bec15883 ("kvm: set/clear kvm to/from vfio_group when group add/delete")
+> Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> ---
+
+Applied series to vfio next branch for v6.6.  There's a minor rebase
+involved, so please double check the results:
+
+https://github.com/awilliam/linux-vfio/commits/next
+
+Thanks,
+Alex
+
+> 
+> v3: added Alex's reviewed-by
+> 
+> v2: updated commit description with the correct "Fixes" tag (per Alex),
+>     expanded commit description to mention issues with the earlier
+>     implementation of kvm_vfio_group_add().
+> 
+>  virt/kvm/vfio.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+> index 9584eb57e0ed..cd46d7ef98d6 100644
+> --- a/virt/kvm/vfio.c
+> +++ b/virt/kvm/vfio.c
+> @@ -179,10 +179,10 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
+>  	list_add_tail(&kvg->node, &kv->group_list);
+>  
+>  	kvm_arch_start_assignment(dev->kvm);
+> +	kvm_vfio_file_set_kvm(kvg->file, dev->kvm);
+>  
+>  	mutex_unlock(&kv->lock);
+>  
+> -	kvm_vfio_file_set_kvm(kvg->file, dev->kvm);
+>  	kvm_vfio_update_coherency(dev);
+>  
+>  	return 0;
+
