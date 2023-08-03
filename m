@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C99776F63E
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 01:43:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9783C76F648
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 01:50:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231738AbjHCXnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 19:43:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55710 "EHLO
+        id S231520AbjHCXuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 19:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjHCXnL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 19:43:11 -0400
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A591716
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 16:43:10 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-55e1a9ff9d4so1644478eaf.1
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 16:43:10 -0700 (PDT)
+        with ESMTP id S229880AbjHCXuV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 19:50:21 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 703E81718;
+        Thu,  3 Aug 2023 16:50:20 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-686fc0d3c92so1113963b3a.0;
+        Thu, 03 Aug 2023 16:50:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691106189; x=1691710989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O7+T5OtzOt0JkmxCZ3JKOD3dXL81QvqZ18on5E407Iw=;
-        b=WXz/PEsrmzilAWytxUhX96+gxnGeQR72NpzCfxl6OC1hYZfRci7qNy+zPfmKITnuVA
-         9MrlQ879zobsOls+slxsR4lPU7xVLeiXE3DH+TKIIPNnqcUxHi7EM9yZ4hoR3SU5kN8+
-         OXHA7IOWJNPNwhsnDAJ3xpZNarLgZpQrxTe9GRsGmA0zS48Ftb2EDTFalLJA0vdIX4zc
-         +Iqp0ufUPWufB7HCOUHcnlSYh8B5BPvUlcu0uNeUODoJaYr25Q2Xn6WKRKVWnuuCPiBV
-         waFmkCo2HUFd0YxXiIwGdQwrXJ2v8ZVlvfAnIqLLADGd/SWEA41AscJopxhnx5gUb5LK
-         UiSQ==
+        d=gmail.com; s=20221208; t=1691106620; x=1691711420;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OP8pAkGmqcoifyAHKkznCuAfpusO15WSf6dYYfXbnWE=;
+        b=PgXXxzGzaAwUtIpzTTXbsZnBtS76iQFwC1R3DmeSTZdbZJKnoq6FG+qIJfa0ga1hl5
+         TWCOeqIovBS4gZMFFwmjAb5gYwdZSBDwkKzMqBDZI6rZpTSnZjZhbM2sws+XtC3BQu16
+         F3bEEb6TMl7dhdkyDVhVaBfbLf6FSsiDjbQd/gg4iQFuNf736eah9lWpOuFQ+Ftd1c6u
+         rSRZI7+FyciRYDmW3pLArfl9uM9HecVmp5Qk84Vf0FnlTBDAL7G5t5EmeVy87oRkcDiW
+         +4XQwEh9SShZN/bTn2OqthQfTWpjgWmkfz8CkoxAZG0yOqla4DJ66IppVflWDBg9kyyN
+         UUEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691106189; x=1691710989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O7+T5OtzOt0JkmxCZ3JKOD3dXL81QvqZ18on5E407Iw=;
-        b=Qq0mkbDfKfXY2NJfDeH+MfzsICZhC887npXLlCa572I3MHCmvXjZmIefI8axijV0Ez
-         pQalLpOMV4LDVUy14CQ9bZye0w/OGl4udzjLpHI+RUrbPdAdh3fHApFBPZOYHOLd75nK
-         DLyDo4dRlvJxX9oqx+HQZBAQscZvBFheJECwNpAG6uqlm8mx6TBFN9p/lM+nlsEMfTw4
-         HlWA2v4gaCAt5tWFmXeHc7zYQnovI08vuvY4Zv0QfH1tHbMvI/2teXrmlLNwvtLh9iwu
-         N/RSZP9aP3/uhP6C3Te1BTqdxODrvgy/FpWVp2IO9hszztCJtMfigfTwQoCdEPHeiIUO
-         u6Ag==
-X-Gm-Message-State: AOJu0YxzcJJXNMBaKhhG6Al5nAureOVT5AdeWn9B6DF8wphhJJlf05iv
-        Lt2xE5/H0Vn+9e/Hqnd2Q9QWq8U+QOKkv3c7eZVQwQ==
-X-Google-Smtp-Source: AGHT+IE8EFiGXpLyt+I/OTRAPgx9UftqLbrYi//2dfgHbp2F0UderK+0htYSrMFvcH7I82ud9+Ruoa3h/aZ+lWV/A6Y=
-X-Received: by 2002:a05:6871:58d:b0:1bb:860d:8106 with SMTP id
- u13-20020a056871058d00b001bb860d8106mr165777oan.22.1691106189458; Thu, 03 Aug
- 2023 16:43:09 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691106620; x=1691711420;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OP8pAkGmqcoifyAHKkznCuAfpusO15WSf6dYYfXbnWE=;
+        b=LiHovXKAiNK727rql1qXS4sHB9tAz3Ma8Hn7Eh3awJZNTdkPGSPQ5/jf3U9eEOL2hO
+         8W+tfOegITLv76RpjU5Imnnqs7OyLPsvDg4wupvWEKpQez6cHGP5xdb3cNeBCd13/aGU
+         BPe6ZW9D55zvxBpcFlQcFP8wUm+GaVvecj2tITugRwg+urynl13OqwJcOJa6bWx+pQ1P
+         1RrFRdT2frZUdogLybMobk5CaDSLvKXRAfSlI5zGEkqt2/7HqAOUy+ARNtb78gQ5ANfy
+         RYBsE53lW8UHguDtpg1cBvM105tBnOOUEnMKD82NUAOBwrr9NIlbnBb4XAmytStt3kK4
+         xAYg==
+X-Gm-Message-State: AOJu0YxOSOFEFZoqY5qmcotcDvXulGRmPlAi9wSxbXKxD0WMzVVHwv+X
+        oBdE2xNClppKpFJRUEbQcbU=
+X-Google-Smtp-Source: AGHT+IEkK9m5UC0fjBbStPVpvGbMqyYkE8OIDUNZCnvuaRzMxzZJ52sAUlgCOO0Uch9UiRf+Mik+qw==
+X-Received: by 2002:a05:6a00:14d5:b0:680:252d:da3e with SMTP id w21-20020a056a0014d500b00680252dda3emr208073pfu.5.1691106619663;
+        Thu, 03 Aug 2023 16:50:19 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id c23-20020a62e817000000b0068783a2dfdasm367609pfi.104.2023.08.03.16.50.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 16:50:19 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 16:50:17 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Yongwei Ma <yongwei.ma@intel.com>,
+        Ben Gardon <bgardon@google.com>, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v4 12/29] KVM: x86/mmu: Move
+ kvm_arch_flush_shadow_{all,memslot}() to mmu.c
+Message-ID: <20230803235017.GA2257301@ls.amr.corp.intel.com>
+References: <20230729013535.1070024-1-seanjc@google.com>
+ <20230729013535.1070024-13-seanjc@google.com>
 MIME-Version: 1.0
-References: <20230726044652.2169513-1-jingzhangos@google.com>
- <871qgvrwbi.wl-maz@kernel.org> <CAAdAUthi6oZ6oRQDFLeOFVwm2dtcTK2ERJm316x0bdn5TQObYw@mail.gmail.com>
- <ZMq5zDJ16xav7NPa@linux.dev>
-In-Reply-To: <ZMq5zDJ16xav7NPa@linux.dev>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 3 Aug 2023 16:42:57 -0700
-Message-ID: <CAAdAUtgjZEbp_uwT2WuNVn3Ko7d0yty1hpkUyYfhotk-f0a1Wg@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: arm64: selftests: Test pointer authentication
- support in KVM guest
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230729013535.1070024-13-seanjc@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,62 +78,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+On Fri, Jul 28, 2023 at 06:35:18PM -0700,
+Sean Christopherson <seanjc@google.com> wrote:
 
-On Wed, Aug 2, 2023 at 1:17=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
-> wrote:
->
-> Hi Jing,
->
-> Nothing serious, but when you're replying on a thread can you add a
-> leading and trailing line of whitespace between the quotation and your
-> reply? Otherwise threads get really dense and hard to read.
+> Move x86's implementation of kvm_arch_flush_shadow_{all,memslot}() into
+> mmu.c, and make kvm_mmu_zap_all() static as it was globally visible only
+> for kvm_arch_flush_shadow_all().  This will allow refactoring
+> kvm_arch_flush_shadow_memslot() to call kvm_mmu_zap_all() directly without
+> having to expose kvm_mmu_zap_all_fast() outside of mmu.c.  Keeping
+> everything in mmu.c will also likely simplify supporting TDX, which
+> intends to do zap only relevant SPTEs on memslot updates.
 
-Will do. Thanks for the suggestion.
-
->
-> On Wed, Aug 02, 2023 at 10:19:30AM -0700, Jing Zhang wrote:
-> > > > +                     case FAIL_KVM:
-> > > > +                             TEST_FAIL("KVM doesn't support guest =
-PAuth!\n");
-> > >
-> > > Why is that a hard failure? The vast majority of the HW out there
-> > > doesn't support PAuth...
-> > Since previous TEST_REQUIRES have passed, KVM should be able to
-> > support guest PAuth. The test will be skipped on those HW without
-> > PAuth.
->
-> So then what is the purpose of this failure mode? The only case where
-> this would happen is if KVM is if KVM screwed up the emulation somehow,
-> took a trap on a PAC instruction or register and reflected that back
-> into the guest as an UNDEF.
-
-You are right about the purpose of this test case.
-
->
-> That's a perfectly valid thing to test for, but the naming and failure
-> messages should indicate what actually happened.
-
-Sure. Will use more sensible messages.
-
->
-> > > As I mentioned above, another thing I'd like to see is a set of
-> > > reference results for a given set of keys and architected algorithm
-> > > (QARMA3, QARMA5) so that we can compare between implementations
-> > > (excluding the IMPDEF implementations, of course).
-> > Sure. Will do.
->
-> I was initially hesitant towards testing PAC like this since it is
-> entirely a hardware issue besides KVM context switching, but you could
-> spin this off as a way to test if vCPU save/restore works correctly by
-> priming the vCPU from userspace.
->
-> Marc, is there something else here you're interested in exercising I
-> may've missed?
->
-> --
-> Thanks,
-> Oliver
+Yes, it helps TDX code cleaner to move mmu related function under mmu.c.
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
 Thanks,
-Jing
+
+> 
+> No functional change intended.
+> 
+> Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
+> Tested-by: Yongwei Ma <yongwei.ma@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 -
+>  arch/x86/kvm/mmu/mmu.c          | 13 ++++++++++++-
+>  arch/x86/kvm/x86.c              | 11 -----------
+>  3 files changed, 12 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 28bd38303d70..856ec22aceb6 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1832,7 +1832,6 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+>  				   const struct kvm_memory_slot *memslot);
+>  void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+>  				   const struct kvm_memory_slot *memslot);
+> -void kvm_mmu_zap_all(struct kvm *kvm);
+>  void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+>  void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
+>  
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index ec169f5c7dce..c6dee659d592 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6732,7 +6732,7 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+>  	 */
+>  }
+>  
+> -void kvm_mmu_zap_all(struct kvm *kvm)
+> +static void kvm_mmu_zap_all(struct kvm *kvm)
+>  {
+>  	struct kvm_mmu_page *sp, *node;
+>  	LIST_HEAD(invalid_list);
+> @@ -6757,6 +6757,17 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+>  	write_unlock(&kvm->mmu_lock);
+>  }
+>  
+> +void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> +{
+> +	kvm_mmu_zap_all(kvm);
+> +}
+> +
+> +void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+> +				   struct kvm_memory_slot *slot)
+> +{
+> +	kvm_page_track_flush_slot(kvm, slot);
+> +}
+> +
+>  void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+>  {
+>  	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a6b9bea62fb8..059571d5abed 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12776,17 +12776,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>  		kvm_arch_free_memslot(kvm, old);
+>  }
+>  
+> -void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> -{
+> -	kvm_mmu_zap_all(kvm);
+> -}
+> -
+> -void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+> -				   struct kvm_memory_slot *slot)
+> -{
+> -	kvm_page_track_flush_slot(kvm, slot);
+> -}
+> -
+>  static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+>  {
+>  	return (is_guest_mode(vcpu) &&
+> -- 
+> 2.41.0.487.g6d72f3e995-goog
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
