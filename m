@@ -2,149 +2,280 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C375676E02B
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 08:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF8AD76E044
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 08:32:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbjHCG0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 02:26:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41808 "EHLO
+        id S233242AbjHCGcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 02:32:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233351AbjHCG0I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 02:26:08 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2062.outbound.protection.outlook.com [40.107.93.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FD4C3AA6
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 23:25:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b2ASHRIqCTvoxc3Hw5lsMLgFXdWWRCN9cM4d/J1J+FVcfu3gqv9dzzuFxy4Q8fZqAGhEfsW+pAwlRaWAfzoWsa6eOowwdFw9FH+vv35vYZgulyo7xKdq5+ranRuqMOIe/prSPM3zINIMlbPO/aQXe84eFN/AjNPOhZ0l708CWtn3bbbyXCvQd2hQfSKOPf+aZv8AzzXD4tJmkJaUdu8kmTY2k+nytb8tIpZd6ejkzdB/iwWXC3ch/lzTh34RIPPyMcBOFHb5hA+VAhULeu/VtjpUGwH5qoyY5H91yNUl1I0Lzb0itwFRwkGzwOJWWQZ/A544b9JqLpbLgBz0lC3Zmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qkyupGunf2EqW7d+bTe/yYi7w94o/n8/ZX2ZGKiA2fo=;
- b=SIvUwghGfdjaDXXRMlWikSLi7EzU6KrUqyo/LhQnmW5McGhm/jQ5SENRRtrIJwbm4IT1AqlR9FVIwVxXycNVVoiUtmYsZ4MfzFxkdEpP70jcU4FUNXQmSk1ciXZTs2K8oomaAJL/LaEHXJ7h95T0O6JptvCBqxwMd60iNLO1rSYeB0u4m10GUdxrC1LlRwz043URhbNmPPezt2Ckh7OE1Lkw05fOGYlHyRaaSrhs+retyqmnS7e3+c0Lr700gYqFS+q9azZJ0T1zm8I1AhMxl1lKkG6KG8Mg0NnJHI+6tsgukXcEYygGytjN1IU9ZRpj8qZfwZuNhOxuz6YiDQ4iOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qkyupGunf2EqW7d+bTe/yYi7w94o/n8/ZX2ZGKiA2fo=;
- b=5Txqo7CZiOe9zbHVjKpUyk9iepvIHJ6nZg7UHyeMFfbOWg7rMVj0aq2IewMUNsRRv71bu/jP/yxeytklrtnUXH0PVSV0DHGKx5OhW3RIXJhdyEPZ2/NgusNY0yHM5IlWkw02LqSjlgv6ImBG+Gt74NP1o0HjSI8La3uRYWqVNIk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- MW4PR12MB5641.namprd12.prod.outlook.com (2603:10b6:303:186::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6631.47; Thu, 3 Aug 2023 06:25:44 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::9ade:451:96c3:7b54]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::9ade:451:96c3:7b54%3]) with mapi id 15.20.6631.045; Thu, 3 Aug 2023
- 06:25:44 +0000
-Message-ID: <d34ea89c-9cbc-9485-a6db-2b72ce8bf0e3@amd.com>
-Date:   Thu, 3 Aug 2023 11:55:27 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: nikunj@amd.com
-Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
- kvm-amd.o
-Content-Language: en-US
+        with ESMTP id S229578AbjHCGcN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 02:32:13 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CFBE610FB;
+        Wed,  2 Aug 2023 23:32:09 -0700 (PDT)
+Received: from loongson.cn (unknown [10.40.46.158])
+        by gateway (Coremail) with SMTP id _____8AxjuvoSctkMYUPAA--.33761S3;
+        Thu, 03 Aug 2023 14:32:08 +0800 (CST)
+Received: from [192.168.124.126] (unknown [10.40.46.158])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxPCPjSctk0MRGAA--.33140S3;
+        Thu, 03 Aug 2023 14:32:05 +0800 (CST)
+Subject: Re: [PATCH v1 2/4] selftests: kvm: Add processor tests for LoongArch
+ KVM
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ravi Bangoria <ravi.bangoria@amd.com>,
-        Arnd Bergmann <arnd@arndb.de>
-References: <20230802091107.1160320-1-nikunj@amd.com>
- <ZMph82WH/k19fMvE@google.com>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <ZMph82WH/k19fMvE@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0161.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:c8::17) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+Cc:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vishal Annapurve <vannapurve@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
+References: <20230801020206.1957986-1-zhaotianrui@loongson.cn>
+ <20230801020206.1957986-3-zhaotianrui@loongson.cn>
+ <ZMqba0j82Di+P+LI@google.com>
+From:   zhaotianrui <zhaotianrui@loongson.cn>
+Message-ID: <d9939cb6-c193-26e3-4717-17e9f6640e24@loongson.cn>
+Date:   Thu, 3 Aug 2023 14:32:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|MW4PR12MB5641:EE_
-X-MS-Office365-Filtering-Correlation-Id: cce06e92-720c-4361-8b3a-08db93ea76c4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: TD7KWOVRLLKacVPlId+LKQ/LOTvOlh0F/dSQ1qMFMUW2ASCfeH//IQB+iW+hcSJHjk+0LfS3SjjbRfRqkLkixSaMEkToHvGvU+ox4zy1WtopQWRprJP+CFDocOF9RHQHMND9OFNBggaA4doqLYqLBhoa66+H/G1K21id/mf4mGf2ThJ2HD4Y+dIzpyzeTzgppmUtI9jD+vmM/NKlda4btzP+WRZWEFsC1dnR99i009SO0IxjlkbE5R3V90/eTkd+H5PypGxwSbJZIdXKZmxAVbLhCCA2MCVebx251/z+fjIPQgIPzKuFG0YJHPsX9UeBAGezPR1j0FweQNsGyMnoEyO4Gmv8ZFQkAUlEmj2MwVK9pYEnUGTKVVYM61Miqea1GYurSQ1UibANYIzHGocdjhqgvxSiaS79DLDyqLoFVuZV1heAUJTjWJrlzlEn8IrNDU/qntX0uVqhoscphUiDkbMU8TL83mzZQfMsTv8vN38LYiJnbLN0yU7cUsU3IbCri5O6ickBraAVJLem4Nw8lyomK26kMUkuSaWRttUdRLHUiH4SN56uVrFDhahgZ3kaVRqnpJ8O5FEW/VUAHYrnVlPZE82TzK0YpRNIYIIZShv8C1CKUKlPMCjR6hvtQOfah6eAOcAfMHQoSfhUdoAHrw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(451199021)(2616005)(53546011)(6506007)(83380400001)(26005)(186003)(4744005)(316002)(3450700001)(2906002)(66946007)(4326008)(6916009)(66476007)(66556008)(5660300002)(41300700001)(8676002)(8936002)(6666004)(6486002)(966005)(6512007)(478600001)(54906003)(38100700002)(36756003)(31696002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RDdqblltc0JZbk1LQ2NZOE5DK3c4WGJoRjBVVHA5aEhLdG1qdDBVZnAzTU9Q?=
- =?utf-8?B?VkwvYVNlYi93YjNIUWsrT1RvYXlhQW5pSlBkSXNnYjFkcW5xazdzczZ5akN6?=
- =?utf-8?B?UDVRS1pHR0Q0SUc1Tm5tNkVrLzdFT1JqSmU3dDZUS04wVFJrYWVJTENibXJa?=
- =?utf-8?B?ODdoVHgrcWs3b0VRSUoyc3BXbGhHUVIzNjJLSENvMXVxYVpTQVNEVTMwSHdr?=
- =?utf-8?B?UTVqci9lT3ZPTHhLVndtK3BhbEdQVDdUQ29TR2ttQXgzZFdka3gyb25WNDQ1?=
- =?utf-8?B?MW56bkQ0c2tPV1FuSWZNSlN0R1FMengyUlBTOVU4TWxGQ1lLVVFibEE4dCtY?=
- =?utf-8?B?TWxYSzF4M09KT2JzR2FoMFZaMGlTSjR6L2M0Z1N5alpFcSs3Qm42Y3RhYjgy?=
- =?utf-8?B?V21CSHlTVGR2L0o2OStZbG5EbkhsRWZINmxHZkVuMXJrWFhMdldmcmdTY0V3?=
- =?utf-8?B?cG93VU43N2tXVHgrcmFBeHpWZTdqcmQ4anlicUhkazVRNW5qSmRmZ0JuWEVs?=
- =?utf-8?B?aGlWQS91Z29UTGRCbHAzdWJuVjY3WHo3cmd0bW51TW5CK3ltRW5wRFBSazBX?=
- =?utf-8?B?dG84RUJPNWJYbmVTMEIwUURnT3VqYXpidjNvbTg4TlZQMzJ4Mi9GTTNWeGM2?=
- =?utf-8?B?dW1uRWxBaUFMYmFEelBjOTBIYlQrUTlLZW13Y1RoVnhhRTNocXArUThpQkVj?=
- =?utf-8?B?KzhkRGFTbGhadi95VHBKOUZlRlBBL0liMXN5VDNHOTVSYmwxeXlHL0RUMFA4?=
- =?utf-8?B?b0FMUEhIUE1CdW9xdTNnaGhzcDFYeFBUbjdHK3U5Z3N4aTNPTGtmcnJabDgz?=
- =?utf-8?B?ZTZyUGRpb3FkUXdoMTBpRUQwbFB5a21rOGkzTTljMFErelVVYmZlR0YwTlNH?=
- =?utf-8?B?czJtZGxzWGwwQjlLaUxZVXd4b2R4TkN4bHNpUlRLbkxPNXJHck1WM1lZYTBO?=
- =?utf-8?B?UWRSNCtxWXFneFp4UU40dDVLaDBOWXh4NHlnZkdFbmZheXJjS29ETUxHWXdq?=
- =?utf-8?B?Z0JjWCtQdkgrSmhYUkk4YjFiclJEUCtQeGpYdU9Mc2VLMGpGL3ExZEs4R1Bl?=
- =?utf-8?B?TFJUOWZaazNvRVBoTVA2bUNxNDMyVlgrUTdHUnU2QVBoSzZsVlJKTUxKWFI4?=
- =?utf-8?B?aE55Y0JKanBsMkxVc0pRZXY5cTg1eGdqRldxdXh6Tng5NTlIbXV6dkV4ME5n?=
- =?utf-8?B?VjN4T0lwV2pGeXZjcEltY3lNRXJNR0JEdTljK2w5dnNqS1VIV2xLdnNSb3B6?=
- =?utf-8?B?aTV1MUxWS3pOOUdQUjJmZ1l3ZUZjUG90TEhBUVZxRGdxOEZFbUxJMHZ3Um1q?=
- =?utf-8?B?UU4yZEtUZkpwUjVnem9WYlZvL0tScU56blpvenp3R3dGWm1ic2o1dWhXK0xQ?=
- =?utf-8?B?Vm1NeHQvUy9TdG5WTDJpQWd6WHBlUEdEM3l4UzA1U1RKNHNrMS9qYWEwdzNr?=
- =?utf-8?B?OGFpSWtNd3NhcjdZaGdSMFZqWGVpTTBiMElHQ1g5L25kYzN5bXgyYWs5dERH?=
- =?utf-8?B?WkVMTmRmaS84V3ZCTWUwb1VCYlc5NXVuYVJISHZRVnpPcmF5eWMxVFFoc3Ru?=
- =?utf-8?B?YnpkaE1lN00wVldCU09ESkZ3aXRYbGdPdy9pOUxlK1NsamJ4eFp2WmwvakVH?=
- =?utf-8?B?bmlLZTNtUFF1S2dPQ3pUMmN6NDY3YTZkcGdYMnVVOG9vUWRBYlRjTGZIbWJk?=
- =?utf-8?B?S1RFOFl5d2JnbFdYRzhZbXIyU3lwMnY2UWFvSEhLbXljYlR5Yjc5QW5nQmxN?=
- =?utf-8?B?YVpqU1BNZDEyL216ZUFCKzR3czExcFZDbCs3L2lvYS9ObmR3R3UrTllFdjh3?=
- =?utf-8?B?b3JlMVFQTm1yc1NCaUtlNnk2eHlFSmxZRkF1QjBENGkwc1pqUGJnclpRbFow?=
- =?utf-8?B?T0dCcjk4ZnhBd0FSY1dSTU16N0dZalp0M3M0d0lXb1dkMzFSNmh3UFZEYnRl?=
- =?utf-8?B?WmRkRU1sWTNaa2xPeVp5dXROTWtienVtUS82Qms0TVMxZTM4UHJCem80NUkz?=
- =?utf-8?B?UjZHd3FSZU8wckNpMlh1WHlPNkRRQ3VPVksrRmpSUlpyQU1LVkxVREhNSjI1?=
- =?utf-8?B?emVpT1F2dXpsclQ4OHNoZUoxRWloaWtCTmhWQVA4bWFjeFFWYVBTSVZlKzlX?=
- =?utf-8?Q?zwJtzTS9D0j5rrifZb8zwFor3?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cce06e92-720c-4361-8b3a-08db93ea76c4
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 06:25:43.4113
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 29XX8RUy9ilgxXqlvpkTJ4k0h3c/CnuPB5OyDa1gUPfhPBR9joirlq0oou/tH5oFcwcFHb9DmQK7TvML1pkZ4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5641
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <ZMqba0j82Di+P+LI@google.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: AQAAf8DxPCPjSctk0MRGAA--.33140S3
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Gr1UWr48Ar1Uuw13Jw17twc_yoWxKw45pF
+        yxCFn3WF4xJr1xJ3srXwn8ZF1ftrsakryjyry3KFyjvrsFv34fJ348KFZxWFy3uwsY9w4F
+        v3WYqa13ZF45t3cCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+        xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+        1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
+        67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+        AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+        F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
+        ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+        xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+        4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j5
+        WrAUUUUU=
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/2/2023 7:32 PM, Sean Christopherson wrote:
-> On Wed, Aug 02, 2023, Nikunj A Dadhania wrote:
->> objtool gives the following warnings in the newer kernel builds:
-> 
-> Define "newer".  As in, exactly what commit is causing problems?
 
-Not that new it seems, I have tried till v5.19 and the warning is there but 
-with a different signature. Do you want me to further bisect it ?
-
-arch/x86/kvm/kvm-amd.o: warning: objtool: .altinstr_replacement+0x4d: call without frame pointer save/setup
-arch/x86/kvm/kvm-amd.o: warning: objtool: .altinstr_replacement+0x57: call without frame pointer save/setup
-
-kvm-amd.o warnings were also reported in the below thread:
-https://lore.kernel.org/lkml/9698eff1-9680-4f0a-94de-590eaa923e94@app.fastmail.com/
-
-Regards,
-Nikunj
+ÔÚ 2023/8/3 ÉÏÎç2:07, Sean Christopherson Ð´µÀ:
+> On Tue, Aug 01, 2023, Tianrui Zhao wrote:
+>> Add processor tests for LoongArch KVM, including vcpu initialize
+> Nit, AFAICT these aren't tests, this is simply the core KVM selftests support
+> for LoongArch.
+Thanks, I will fix this comment.
+>
+>> and tlb refill exception handler.
+>>
+>> Based-on: <20230720062813.4126751-1-zhaotianrui@loongson.cn>
+>> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> ---
+>>   .../selftests/kvm/lib/loongarch/exception.S   |  27 ++
+>>   .../selftests/kvm/lib/loongarch/processor.c   | 367 ++++++++++++++++++
+>>   2 files changed, 394 insertions(+)
+>>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+>>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+>>
+>> diff --git a/tools/testing/selftests/kvm/lib/loongarch/exception.S b/tools/testing/selftests/kvm/lib/loongarch/exception.S
+>> new file mode 100644
+>> index 000000000000..19dc50993da4
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/lib/loongarch/exception.S
+>> @@ -0,0 +1,27 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +
+>> +#include "sysreg.h"
+>> +
+>> +/* address of refill exception should be 4K aligned */
+>> +.align  12
+> .align works on bytes, not on shifts.  I.e. this will make handle_tlb_refill
+> 12-byte aligned, not 4096-byte aligned.
+Thanks, I will fix it to .balign 4096.
+>
+>> +.global handle_tlb_refill
+>> +handle_tlb_refill:
+>> +	csrwr	t0, LOONGARCH_CSR_TLBRSAVE
+>> +	csrrd	t0, LOONGARCH_CSR_PGD
+>> +	lddir	t0, t0, 3
+>> +	lddir	t0, t0, 1
+>> +	ldpte	t0, 0
+>> +	ldpte	t0, 1
+>> +	tlbfill
+>> +	csrrd	t0, LOONGARCH_CSR_TLBRSAVE
+>> +	ertn
+>> +
+>> +/* address of general exception should be 4K aligned */
+>> +.align  12
+> Same thing here.
+I will fix it too.
+>
+>> +.global handle_exception
+>> +handle_exception:
+>> +1:
+>> +	nop
+>> +	b	1b
+>> +	nop
+>> +	ertn
+>> diff --git a/tools/testing/selftests/kvm/lib/loongarch/processor.c b/tools/testing/selftests/kvm/lib/loongarch/processor.c
+>> new file mode 100644
+>> index 000000000000..2e50b6e2c556
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/lib/loongarch/processor.c
+>> @@ -0,0 +1,367 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * KVM selftest LoongArch library code, including CPU-related functions.
+>> + *
+> Again, unnecessary IMO.  If you do keep the comment, the extra line with a bare
+> asterisk should be dropped.
+Thanks, I will remove this comment.
+>
+>> + */
+>> +
+>> +#include <assert.h>
+>> +#include <linux/bitfield.h>
+>> +#include <linux/compiler.h>
+>> +
+>> +#include "kvm_util.h"
+>> +#include "processor.h"
+>> +#include "sysreg.h"
+>> +
+>> +#define DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN		0xac0000
+> Why diverge from the common?
+>
+> 	#define DEFAULT_GUEST_STACK_VADDR_MIN	0xab6000
+>
+> AFAIK, the common value is also mostly arbitrary, but that just makes it even
+> more confusing as to why LoongArch needs to bump the min by 0x4000.
+This is reference from ARM, and I will fix it to use the the common value.
+>
+>> +uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+>> +{
+>> +	uint64_t *ptep;
+>> +
+>> +	if (!vm->pgd_created)
+>> +		goto unmapped_gva;
+>> +
+>> +	ptep = addr_gpa2hva(vm, vm->pgd) + pgd_index(vm, gva) * 8;
+>> +	if (!ptep)
+>> +		goto unmapped_gva;
+>> +
+>> +	switch (vm->pgtable_levels) {
+>> +	case 4:
+>> +		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pud_index(vm, gva) * 8;
+>> +		if (!ptep)
+>> +			goto unmapped_gva;
+> This wants a "fallthrough" annotation.
+Thanks, I will add the "fallthrough" annotation.
+>
+>> +	case 3:
+>> +		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pmd_index(vm, gva) * 8;
+>> +		if (!ptep)
+>> +			goto unmapped_gva;
+>> +	case 2:
+>> +		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pte_index(vm, gva) * 8;
+>> +		if (!ptep)
+>> +			goto unmapped_gva;
+>> +		break;
+>> +	default:
+>> +		TEST_FAIL("Page table levels must be 2, 3, or 4");
+> Obviously it shouldn't come up, but print the actual pgtable_levels to make debug
+> a wee bit easier e.g.
+> 		TEST_FAIL("Got %u page table levels, expected 2, 3, or 4",
+> 			  vm->pgtable_levels);
+Thanks, I will also print the actual pgtable_levels in this debug function.
+>
+> Mostly out of curiosity, but also because it looks like this was heavily copy+pasted
+> from ARM: does LoongArch actually support 2-level page tables?
+Yes, this codes are mostly copy pasted from ARM, but LoongArch does not 
+support 2-levels page tables, it only support 3-level and 4-level page 
+tables, and I will fix it.
+>> +static void loongarch_set_csr(struct kvm_vcpu *vcpu, uint64_t id, uint64_t val)
+>> +{
+>> +	uint64_t csrid;
+>> +
+>> +	csrid = KVM_REG_LOONGARCH_CSR | KVM_REG_SIZE_U64 | 8 * id;
+>> +	vcpu_set_reg(vcpu, csrid, val);
+>> +}
+>> +
+>> +static void loongarch_vcpu_setup(struct kvm_vcpu *vcpu)
+>> +{
+>> +	unsigned long val;
+>> +	int width;
+>> +	struct kvm_vm *vm = vcpu->vm;
+>> +
+>> +	switch (vm->mode) {
+>> +	case VM_MODE_P48V48_16K:
+>> +	case VM_MODE_P40V48_16K:
+>> +	case VM_MODE_P36V48_16K:
+>> +	case VM_MODE_P36V47_16K:
+>> +		break;
+>> +
+>> +	default:
+>> +		TEST_FAIL("Unknown guest mode, mode: 0x%x", vm->mode);
+>> +	}
+>> +
+>> +	/* user mode and page enable mode */
+>> +	val = PLV_USER | CSR_CRMD_PG;
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_CRMD, val);
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PRMD, val);
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_EUEN, 1);
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_ECFG, 0);
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_TCFG, 0);
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_ASID, 1);
+>> +
+>> +	width = vm->page_shift - 3;
+>> +	val = 0;
+>> +	switch (vm->pgtable_levels) {
+>> +	case 4:
+>> +		/* pud page shift and width */
+>> +		val = (vm->page_shift + width * 2) << 20 | (width << 25);
+>> +	case 3:
+>> +		/* pmd page shift and width */
+>> +		val |= (vm->page_shift + width) << 10 | (width << 15);
+>> +	case 2:
+>> +		/* pte page shift and width */
+>> +		val |= vm->page_shift | width << 5;
+>> +		break;
+>> +	default:
+>> +		TEST_FAIL("Page table levels must be 2, 3, or 4");
+>> +	}
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PWCTL0, val);
+>> +
+>> +	/* pgd page shift and width */
+>> +	val = (vm->page_shift + width * (vm->pgtable_levels - 1)) | width << 6;
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PWCTL1, val);
+>> +
+>> +	loongarch_set_csr(vcpu, LOONGARCH_CSR_PGDL, vm->pgd);
+>> +
+>> +	extern void handle_tlb_refill(void);
+>> +	extern void handle_exception(void);
+> Eww.  I get that it's probably undesirable to expose these via processor.h, but
+> at least declare them outside of the function.
+Thanks, I will declare them outside of the function.
+>
+>> +struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+>> +				  void *guest_code)
+>> +{
+>> +	return loongarch_vcpu_add(vm, vcpu_id, guest_code);
+> Please drop the single-line passthrough, i.e. drop loongarch_vcpu_add().  I'm
+> guessing you copy+pasted much of this from ARM.  ARM's passthrough isn't a pure
+> passthrough, which is directly related to why the "passthrough" is ok: there are
+> other callers to aarch64_vcpu_add() that pass a non-NULL @source.
+Yes, this is also copy pasted from ARM, and I will drop the 
+loongarch_vcpu_add() function and move the content of it to here.
 
