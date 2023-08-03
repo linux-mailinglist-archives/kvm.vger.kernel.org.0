@@ -2,99 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75B6876DBF8
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 02:06:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F01C76DBFC
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 02:06:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233428AbjHCAGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 20:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53008 "EHLO
+        id S233384AbjHCAGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 20:06:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232525AbjHCAG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 20:06:26 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62DF14202
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 17:05:51 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bbb97d27d6so3274705ad.1
-        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 17:05:51 -0700 (PDT)
+        with ESMTP id S233351AbjHCAGd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 20:06:33 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B9B1421E
+        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 17:06:04 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c6dd0e46a52so370149276.2
+        for <kvm@vger.kernel.org>; Wed, 02 Aug 2023 17:06:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691021147; x=1691625947;
+        d=google.com; s=20221208; t=1691021154; x=1691625954;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlCUVKX6yHmT83rCLHSwZjnxDTnktIg6Wv8CEdATqYU=;
-        b=UgsX2266duslCIx7H3KbGtKnmIzKzMCIYtbXnwjfD/gAa8Y796aUmREyFBNdZMULn9
-         1JqfIWtERU07Kniq8B8S9AbP61PJu+BmkkaUor4mkzQNIlqiGLjYgOCgTNf2sIJUptr0
-         jNiX9Q+IKHjC/zKCYh+RwGjsDBd20DR5IRj/38vx1X79kjC8DgxiV6EJGtWEEPMCNcBL
-         cdD+uHJmvOao17hnMdAQJeGB/ZXjhuBlmLiNR4rx8Gh29qmiDzVrbd5/cI/U8lkQoqel
-         4RXwosqn/ZhkYRhAIi8NjoPL7bSgeOkAN0qJTlKpWSW9V4oYuJcqIjiDf7CC/b484HRL
-         xsCA==
+        bh=24xpWy5jqWvnaUWcLSAqh6x2b0mz42plt2nZzdQyqhk=;
+        b=J0wDGRo3GVgo0cQOQvYi6z+1Z9xEECkzTI0o3sOeSAfztMRUBv0/edPKcXdVgWCJoN
+         bUCDfFYNfaRLtCy+y43YvhRDbIoeD4FrXPn0QCerDk0zwiIa77efRqrzAOpKZ1lpHnTo
+         XT+it1KSz15jDTo69J0uHerP9G7HuXFQZGLDa/fpIwCKafjhUpaShneLrzRcRyUD/85l
+         71nmJqWRNT9PhBXMISpzibjMCVWN22es9FNI8OCdF0YX/8G2Loi0sgWJTm9G6vo8SutM
+         bFe76GDNCL9EJk2+gVB4Nz4hpnV8MKjJh692U6w6wVr9AgD5Fr6/rGTaOis2kViFzGBr
+         8HxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691021147; x=1691625947;
+        d=1e100.net; s=20221208; t=1691021154; x=1691625954;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlCUVKX6yHmT83rCLHSwZjnxDTnktIg6Wv8CEdATqYU=;
-        b=gpZ5l+sHZm+WHAEjThxUpV8ieq+wfKX4SZTVyb/ngmSv9Sw3IIi+tChyaLxaVO7xbm
-         uM5SMKuIfmdB4hFxv/zan5oOZi5YzkgSWys2GQy3F0/Sfjz5c1lAsqblGktuaXG6bjdZ
-         95v/fxGZHeud0FCdLQ3XizXdMLZntUSiZgws3LPs9gRNg3z79KObjhR8rbc12Y7uGEBy
-         zxQ3MvNU2VzE4ZlmHBgfYvrC4EtEtznTuyqivk0y62YXifyjXi9nLN/6JFVXH9ZL4FiP
-         dZEG6penG0S0wOgaHojQEh7wDkzhlgevPecdMiEDovyGyFmor7yIjzpRrI8Eg57UcTQY
-         llwA==
-X-Gm-Message-State: ABy/qLaiYWWG67t+t3R7oc70yO0voUIFB8YO+1KclpXA3r3trcZQAxcH
-        a8ASL1kcb/MDNY5i+aIWAtD78Z7V8JU=
-X-Google-Smtp-Source: APBJJlEXUzqIMppSTa6zA2UipB6qgQTTTzx9gWZ46EnoosI8YXxuzK1t/AWOOzBrtqw92VXwvZMD9O5+quw=
+        bh=24xpWy5jqWvnaUWcLSAqh6x2b0mz42plt2nZzdQyqhk=;
+        b=PmMCqdksTUEgd00wz+Ie2MjlwaEPiV/X93Zaj1fsgmUR7g2G/AEVvfTFUKpT74YJRW
+         Dua6lUE7zoxuha/D3siT7RURK7sEdIRaxw2DSfktqLb4nujdvT/wA+6GJA73+hVwKzQf
+         B+c6QIA7CR45BIShlVaMJ3Bx5ZQ4hROHH9WVS4NKlpHP77pCPa1o4ovEJYWj74wJZDwn
+         UYeLNcaCIx4Qh2cj/1cmvHa3igSDNsuKuHLruZRzzo1IMaEutwfb7SEb5jJdEZDz4Wv9
+         5BTyA8gfmIDg2vVsD8xb7/i8rLn9Oa8rs17zEITbDL/yf5OCvqmJ3pdOAA4QiRR8Rx15
+         3clw==
+X-Gm-Message-State: ABy/qLaGgZ/VrZX/6zTovOn7WOyZhIxHJAtKunZuGapaoKBPAu4i4HZt
+        jqRkxhcYnxsOBffl6gtRZ64rIpzHlu4=
+X-Google-Smtp-Source: APBJJlEmoDryPaAQoynG+0QllaP7SCbPdVOfYdjwezb/OIO5nbMPPapZeNIsHeV5kRXSKPVLYXRDkBg6IHU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ea09:b0:1bc:2547:b184 with SMTP id
- s9-20020a170902ea0900b001bc2547b184mr59465plg.1.1691021147078; Wed, 02 Aug
- 2023 17:05:47 -0700 (PDT)
-Date:   Wed,  2 Aug 2023 17:05:42 -0700
-In-Reply-To: <20230607010206.1425277-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1582:b0:d0a:353b:b93b with SMTP id
+ k2-20020a056902158200b00d0a353bb93bmr144582ybu.3.1691021154336; Wed, 02 Aug
+ 2023 17:05:54 -0700 (PDT)
+Date:   Wed,  2 Aug 2023 17:05:51 -0700
+In-Reply-To: <20230721233858.2343941-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20230607010206.1425277-1-seanjc@google.com>
+References: <20230721233858.2343941-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <169101994485.1830375.1891135489217943647.b4-ty@google.com>
-Subject: Re: [PATCH 0/4] KVM: x86/pmu: Clean up arch/hw event handling
+Message-ID: <169101967698.1829360.6805677761713115883.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: VMX: Drop manual TLB flush when migrating vmcs.APIC_ACCESS_ADDR
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        Like Xu <like.xu.linux@gmail.com>
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 06 Jun 2023 18:02:02 -0700, Sean Christopherson wrote:
-> Clean up KVM's handling of arch/hw events, and the related fixed counter
-> usage.  KVM has far too many open coded magic numbers, and kludgy code
-> that stems from the magic numbers.
+On Fri, 21 Jul 2023 16:38:58 -0700, Sean Christopherson wrote:
+> Remove the superfluous flush of the current TLB in VMX's handling of
+> migration of the APIC-access page, as a full TLB flush on all vCPUs will
+> have already been performed in response to kvm_unmap_gfn_range() *if*
+> there were SPTEs pointing at the APIC-access page.  And if there were no
+> valid SPTEs, then there can't possibly be TLB entries to flush.
 > 
-> Sean Christopherson (4):
->   KVM: x86/pmu: Use enums instead of hardcoded magic for arch event
->     indices
->   KVM: x86/pmu: Simplify intel_hw_event_available()
->   KVM: x86/pmu: Require nr fixed_pmc_events to match nr max fixed
->     counters
->   KVM: x86/pmu: Move .hw_event_available() check out of PMC filter
->     helper
+> The extra flush was added by commit fb6c81984313 ("kvm: vmx: Flush TLB
+> when the APIC-access address changes"), with the justification of "because
+> the SDM says so".  The SDM said, and still says:
 > 
 > [...]
 
-Applied to kvm-x86 pmu, thanks!
+Applied to kvm-x86 vmx, thanks!
 
-[1/4] KVM: x86/pmu: Use enums instead of hardcoded magic for arch event indices
-      https://github.com/kvm-x86/linux/commit/0033fa354916
-[2/4] KVM: x86/pmu: Simplify intel_hw_event_available()
-      https://github.com/kvm-x86/linux/commit/bc9658999b3e
-[3/4] KVM: x86/pmu: Require nr fixed_pmc_events to match nr max fixed counters
-      https://github.com/kvm-x86/linux/commit/6d88d0ee5de1
-[4/4] KVM: x86/pmu: Move .hw_event_available() check out of PMC filter helper
-      https://github.com/kvm-x86/linux/commit/6de2ccc16968
+[1/1] KVM: VMX: Drop manual TLB flush when migrating vmcs.APIC_ACCESS_ADDR
+      https://github.com/kvm-x86/linux/commit/775bc098657b
 
 --
 https://github.com/kvm-x86/linux/tree/next
