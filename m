@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECA7276EBA2
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:02:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7A7B76EBA4
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:02:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236654AbjHCOCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 10:02:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47344 "EHLO
+        id S236610AbjHCOCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 10:02:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236533AbjHCOBY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 10:01:24 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760913ABC
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:00:48 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6bcb15aa074so710134a34.0
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 07:00:48 -0700 (PDT)
+        with ESMTP id S236424AbjHCOB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 10:01:26 -0400
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D60AE4224
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:00:53 -0700 (PDT)
+Received: by mail-ot1-x332.google.com with SMTP id 46e09a7af769-6bcb15aa074so710181a34.0
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 07:00:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1691071247; x=1691676047;
+        d=ventanamicro.com; s=google; t=1691071250; x=1691676050;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yMgdqxcdnDQl98YLRV0LQz8Q38GTfP1yqCfHWC0ZO9E=;
-        b=OCubc2jtAM5saxSdv7vwSmoa0U1OQXP79Jz28sjbUAmAnzUFCYIwjnly6PT+H9qfel
-         ds3DMFmheazZErFepvPTe3pKElknJ08jUJruuQrxei/F9g7B2xjN4SCVaXUBVy3Qipup
-         lHO167bvB/GQJUgwCb8SY1P4IdoSNPsrMR6oyQpHIaW0IrpbNfe8XACcOIFszH07GDPW
-         TfHUGOAZtE4N9hSF5q0qNHZBpKct3f7cBxaZ/H/rGGD1oIyFnPSIfeMv75OeNO1JFyMw
-         IRVZZhYrrWJK15ZfFLGCjdmj0HdA1qPHcwzYBw5I+p5HuKmN7ZQ2k7qdC7O8Wm1N5cfw
-         Rz1Q==
+        bh=e0/jj8XZe2G0/16QSZpeAFh+25Re5O97IU/+Y05CM7U=;
+        b=TMj2mDCqaHn1I7iRa95PfoZqVLDu/uigTDCqaamPwaAEITunT4atuoTgcUVlgBPnRw
+         r9t77Nd1b81S5uWJ2kTsuaAKAZzGaDh3aQhlysDm3e0smm74UJk7QqrGyKlHgolWQ1oV
+         BYTvJZWl3coXumhKXwtQCBRKooFyE83LZLiX//OaK/MO+9qMKtAitngfpAKeg8sHCatd
+         FnzumKuNswefhxaXUjYJdke2RFBYXqpDcyicniWDFkFcx8vsBTuROU4lZYSlvhS9QyWf
+         +rknPZGQ23JeiHt4vjxadRmvReQ8JARfNQ/8FKj3cy5Z1CFzxuegd967m0jIQ8Eia0qn
+         cHCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691071247; x=1691676047;
+        d=1e100.net; s=20221208; t=1691071250; x=1691676050;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yMgdqxcdnDQl98YLRV0LQz8Q38GTfP1yqCfHWC0ZO9E=;
-        b=KqbBjIq3MzdRCwOLY2Tyu/0OC7lkD8oBCgDNBwiChFxcdH0dIIXw8qcptkNDPfymLr
-         sdcPaVfQQw0FgS5n/SIX45l9vRisbiq+GligVpF471hFq98hH9mdR5qxYeaDvc90tI3K
-         UOMHS0yiIPvLg/ktbTbvXSe98SgAxJnQxXEnoQi+H7Rh7ATjZVl2zmj4cp4WhoWeh7oX
-         eP2mHzEoHm5EIGFfIBeZLtYSeRCf+xSr7xCGTmweUO+DwGvz3eXPpondLeSou9+PJtsZ
-         OIldVAx5NZoyog1RdtglcFyFUpR3SLibKLRDMIMNiG8MCz2Ifu4NzAzURUSOjNVfzU+Y
-         uMvg==
-X-Gm-Message-State: ABy/qLbHzbcDjsMZpWHgXc5RUTk8uQkKLRJO/UYeADCAwVcCqv2vKT9S
-        dwIcPoDbLynw6Hux75Fv5wJn/HfTXzcwefIPSsX/Eg==
-X-Google-Smtp-Source: APBJJlEcDRgMfvC3IQOWIDRGvND2vw9Hl/YKtkj7BedFr1ziA1rcBuyU5M2yaJHjMLmruPyJIQMDLQ==
-X-Received: by 2002:a05:6830:831:b0:6b8:6bd1:d0d3 with SMTP id t17-20020a056830083100b006b86bd1d0d3mr18175614ots.5.1691071246747;
-        Thu, 03 Aug 2023 07:00:46 -0700 (PDT)
+        bh=e0/jj8XZe2G0/16QSZpeAFh+25Re5O97IU/+Y05CM7U=;
+        b=Q5UVK8dgqGxNWrk0LT/BrDCUybIYpoYz9mNZmp5iXaxUbBGkA1fKIUm1RgH29KXYg/
+         W8TOlBbM8fWprSdcH8ddjbQZGYcwdnFUu+3R9ADaMDPoVnln/2B2by101dZb0bFdkZmt
+         3/7dURPuGu8OjKSce62FIYXUEwRDF014UYAZPdZzbbg2Sz/IA3mJ4t3tq6dlMF1q3JKX
+         Id9CuBrz9SbLDJeptWQ4TRLul5NDTilLaj7UOlu7dKL2Hwl2W5w6dDbunA9iGTO3ZZch
+         lpaKr5ep8iByJo8h5cNBmcWtZEcSxB7WZphvv2QluL1NaMyBCHmSHGVQwtxoPMuD5eDD
+         kxow==
+X-Gm-Message-State: ABy/qLbBPeV8nFf2YqiJWbOQwB0BtkhQC+vr+XfR+UzaWhuax8o+hx+C
+        dSiDT0zt7QIg7UVzRxMFmhxDVA==
+X-Google-Smtp-Source: APBJJlFN0Rk5STEm5jArdHCeyZjSMbEocsbopm5itxXndoi1sdc8VNe6PTE/U5cndrjgITYvO07ytA==
+X-Received: by 2002:a9d:4f1a:0:b0:6bc:b06c:9277 with SMTP id d26-20020a9d4f1a000000b006bcb06c9277mr6918980otl.7.1691071250017;
+        Thu, 03 Aug 2023 07:00:50 -0700 (PDT)
 Received: from grind.. ([187.11.154.63])
-        by smtp.gmail.com with ESMTPSA id e14-20020a0568301e4e00b006b29a73efb5sm11628otj.7.2023.08.03.07.00.44
+        by smtp.gmail.com with ESMTPSA id e14-20020a0568301e4e00b006b29a73efb5sm11628otj.7.2023.08.03.07.00.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 07:00:46 -0700 (PDT)
+        Thu, 03 Aug 2023 07:00:49 -0700 (PDT)
 From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
         kvm@vger.kernel.org
 Cc:     anup@brainfault.org, atishp@atishpatra.org,
         ajones@ventanamicro.com,
         Daniel Henrique Barboza <dbarboza@ventanamicro.com>
-Subject: [PATCH v3 06/10] RISC-V: KVM: avoid EBUSY when writing same ISA val
-Date:   Thu,  3 Aug 2023 11:00:18 -0300
-Message-ID: <20230803140022.399333-7-dbarboza@ventanamicro.com>
+Subject: [PATCH v3 07/10] RISC-V: KVM: avoid EBUSY when writing the same machine ID val
+Date:   Thu,  3 Aug 2023 11:00:19 -0300
+Message-ID: <20230803140022.399333-8-dbarboza@ventanamicro.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230803140022.399333-1-dbarboza@ventanamicro.com>
 References: <20230803140022.399333-1-dbarboza@ventanamicro.com>
@@ -73,40 +73,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_riscv_vcpu_set_reg_config() will return -EBUSY if the ISA config reg
-is being written after the VCPU ran at least once.
+Right now we do not allow any write in mvendorid/marchid/mimpid if the
+vcpu already started, preventing these regs to be changed.
 
-The same restriction isn't placed in kvm_riscv_vcpu_get_reg_config(), so
-there's a chance that we'll -EBUSY out on an ISA config reg write even
-if the userspace intended no changes to it.
+However, if userspace doesn't change them, an alternative is to consider
+the reg write a no-op and avoid erroring out altogether. Userpace can
+then be oblivious about KVM internals if no changes were intended in the
+first place.
 
-We'll allow the same form of 'lazy writing' that registers such as
-zicbom/zicboz_block_size supports: avoid erroring out if userspace made
-no changes to the ISA config reg.
+Allow the same form of 'lazy writing' that registers such as
+zicbom/zicboz_block_size supports: avoid erroring out if userspace makes
+no changes in mvendorid/marchid/mimpid during reg write.
 
 Signed-off-by: Daniel Henrique Barboza <dbarboza@ventanamicro.com>
 ---
- arch/riscv/kvm/vcpu_onereg.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/riscv/kvm/vcpu_onereg.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-index 0cf25c18b582..e752e2dca8ed 100644
+index e752e2dca8ed..818900f30859 100644
 --- a/arch/riscv/kvm/vcpu_onereg.c
 +++ b/arch/riscv/kvm/vcpu_onereg.c
-@@ -190,6 +190,13 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
- 		if (fls(reg_val) >= RISCV_ISA_EXT_BASE)
+@@ -235,18 +235,24 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
  			return -EINVAL;
- 
-+		/*
-+		 * Return early (i.e. do nothing) if reg_val is the same
-+		 * value retrievable via kvm_riscv_vcpu_get_reg_config().
-+		 */
-+		if (reg_val == (vcpu->arch.isa[0] & KVM_RISCV_BASE_ISA_MASK))
+ 		break;
+ 	case KVM_REG_RISCV_CONFIG_REG(mvendorid):
++		if (reg_val == vcpu->arch.mvendorid)
 +			break;
-+
- 		if (!vcpu->arch.ran_atleast_once) {
- 			/* Ignore the enable/disable request for certain extensions */
- 			for (i = 0; i < RISCV_ISA_EXT_BASE; i++) {
+ 		if (!vcpu->arch.ran_atleast_once)
+ 			vcpu->arch.mvendorid = reg_val;
+ 		else
+ 			return -EBUSY;
+ 		break;
+ 	case KVM_REG_RISCV_CONFIG_REG(marchid):
++		if (reg_val == vcpu->arch.marchid)
++			break;
+ 		if (!vcpu->arch.ran_atleast_once)
+ 			vcpu->arch.marchid = reg_val;
+ 		else
+ 			return -EBUSY;
+ 		break;
+ 	case KVM_REG_RISCV_CONFIG_REG(mimpid):
++		if (reg_val == vcpu->arch.mimpid)
++			break;
+ 		if (!vcpu->arch.ran_atleast_once)
+ 			vcpu->arch.mimpid = reg_val;
+ 		else
 -- 
 2.41.0
 
