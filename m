@@ -2,165 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF60C76DCE5
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 02:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4419A76DCEA
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 02:53:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbjHCAwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 20:52:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44168 "EHLO
+        id S232654AbjHCAx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 20:53:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232249AbjHCAwK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 20:52:10 -0400
-Received: from mgamail.intel.com (unknown [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6504F2D4A
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 17:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691023928; x=1722559928;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=e482nf7tF797SGwliwd0Qzgn2wofZ9ZqgSCO7jQ7few=;
-  b=Cp9U8N1VlNqXdj2LV3/NqJxE9551Zu8OkCnx8Ym1GZK3zLI7TMheFyes
-   ndf7ePNilknb4Syr7WuAI/ubcw823O2vMBIJ9qCxFYjhjrkU9AeGb5nuc
-   sSXAH8T1JRN4vdEP0WI+lKTTkseZ/Ce9jhedOlFGiUdzjInWPE4wMPdxW
-   ypKZ/iiNnTxNPEMEhlxF1f6vMvHs7NTyOIDeJCFNqTULZSeHCX0PX247L
-   jqZP0mb/TZOUocTP2y0gEnjy0BkewAD9evEr52zflKiJGiOOaQWFOjQor
-   dQbZsJBzdrr7mcNvGtc+axXBu70EyLObMWrQnzCr1gqL6u9JZQxfYZGYH
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="433577452"
-X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
-   d="scan'208";a="433577452"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 17:52:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="729345534"
-X-IronPort-AV: E=Sophos;i="6.01,250,1684825200"; 
-   d="scan'208";a="729345534"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga002.jf.intel.com with ESMTP; 02 Aug 2023 17:52:03 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 2 Aug 2023 17:52:03 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 2 Aug 2023 17:52:03 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 2 Aug 2023 17:52:03 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.171)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 2 Aug 2023 17:52:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V8fnt9v0hFA8x7x690fzRCLEFLMTZaAcqGoOkCaakoai5mdpHzQ+h41L/Ogq8W+qVyJJN2JrQf/NUUN+1MlSZohlV5S98bnrKGMKdT20P3o+w+0kHG2axRV3oUZLAPHnnLFBDhgt4RVvAeaep7Jw7nsbUb6iRtqx5lBdinsRBUasVlyrEpc1rj9S3rTIWn2tyEq3dZ3DbEndTJ7Yz6W5+4/vu+NXnbjtjR5oxXzky6J3y7RLcqBzQbtf5BqXjUT83HsbJmmq+CTtjjOH5Sc6IPpnScFyc2J9AoNZrmUsDnIHcDSVBVAjcidBzuCNpB0tETI+kzy++SWDQ8/h20iQmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e482nf7tF797SGwliwd0Qzgn2wofZ9ZqgSCO7jQ7few=;
- b=c2ORosrE4Uf/YFKuXuHhyqmPJD4xyUjja7jJ4sx8J0JdW3oXawqQGgp9L8S+e77zCcAts1K/zSCJ1PWEWBN8dK7ycRvwOEhMElDWZJ3smJn4Ojr0s3tDAjmXc7c50jmMvagq+8E2eGRygdAp4GnDf5c4jAr0xokkhUghs6+06HBvDFAdMNba0k0QZjv3leTOzSVh9Xv4GTkZywL/M7EhdiW3esIF0LRxyhmR3kz/9fXWVvG1OSWWFbYT4ywhAaGhXR+YshC3XHX3x9Dg4fcGVunxdL5EiOc0P0GrOokwAUdv2llIGv9raesdZvOwySpiXmo8621zs+a8VwJtNF0wAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5824.namprd11.prod.outlook.com (2603:10b6:303:187::19)
- by CH0PR11MB5330.namprd11.prod.outlook.com (2603:10b6:610:bd::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
- 2023 00:52:01 +0000
-Received: from MW4PR11MB5824.namprd11.prod.outlook.com
- ([fe80::c8f6:72a0:67fa:5032]) by MW4PR11MB5824.namprd11.prod.outlook.com
- ([fe80::c8f6:72a0:67fa:5032%7]) with mapi id 15.20.6652.020; Thu, 3 Aug 2023
- 00:52:00 +0000
-From:   "Zhang, Xiong Y" <xiong.y.zhang@intel.com>
-To:     "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhenyu Z" <zhenyu.z.wang@intel.com>,
-        "Liang, Kan" <kan.liang@intel.com>
-Subject: RE: [PATCH v2] Documentation: KVM: Add vPMU implementaion and gap
- document
-Thread-Topic: [PATCH v2] Documentation: KVM: Add vPMU implementaion and gap
- document
-Thread-Index: AQHZxCyHa6M1ISGl8kSz6PMeAT2vNK/WhBeAgAE3pNA=
-Date:   Thu, 3 Aug 2023 00:52:00 +0000
-Message-ID: <MW4PR11MB58244C7211F68A8973C663E9BB08A@MW4PR11MB5824.namprd11.prod.outlook.com>
-References: <20230801035836.1048879-1-xiong.y.zhang@intel.com>
- <e0e478bd-282b-68fa-7c94-8efbcc450750@linux.intel.com>
-In-Reply-To: <e0e478bd-282b-68fa-7c94-8efbcc450750@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5824:EE_|CH0PR11MB5330:EE_
-x-ms-office365-filtering-correlation-id: 6bcd00cf-fdec-4629-22a5-08db93bbd8a8
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: j4jXCmzdb5OUmPOgEbpznQpd9Mgp9yZNSKmyATdNig7n8zqSBHzJOdOwLm7yF0nw16mFwwRuynYFNTK2FGcgQ03LsWQRsbGDM/LEisZsK4+aHMP4dlGWtIarPIoruGdIuUYI2PmEbj4dFbnjA+vwAXjxwpZCeUWAmsZ4EyjmIBAYQbu3nzlIf0iBMP5k6x5WTioqoNs+vGKkdSxfSGGlAxSBSuL0AXC1d7rjTT0uPjvPkvFJ8xJpXlXqtn8l9OREh3eEnFip2XAJZh7LBZNMWc+FTvTylVtmyKKsxGbMhaIbwj8kU7OjQswCPn2ZeACdQHa7FnDolfVod8xPnpfLekvAh4/RYbTIxk6nrMHeu/wuLQcbi+yRPi3GKebkG6Y3lVvaMzf7iUi2kaAAWVSaRiD7mmcsTHUV5XlaeA9qN7bEHkO9d6X9lybk1ed3DtymbupbQv/GAEZaSrHRrKBqhmQKRVYgMSczVoqD4BssvnznBqGwo5iqg0E1JdT9JRL7lQ6U2FnxHQsl7T7D8+sSRAd6kcbP1DugXc1ROXWUXIXhniRTXts9a1Ib6eNtXYzDXNcywtLKJu2KPdqqY2xn3yW9pHLjyjG03Ix94W0Up2lnRPm0Bv0bW64dSwxd9PlR
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5824.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(366004)(39860400002)(376002)(136003)(451199021)(38070700005)(86362001)(33656002)(55016003)(54906003)(478600001)(110136005)(38100700002)(122000001)(82960400001)(83380400001)(186003)(6506007)(26005)(41300700001)(8676002)(8936002)(52536014)(9686003)(71200400001)(7696005)(316002)(64756008)(66446008)(66476007)(66556008)(5660300002)(4326008)(76116006)(2906002)(66946007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dDJxK3laQWlzbFEwQWZ4RnIzOWVDaEpzR29HMGxWcnE1YlNMaEhyQWxLNkwr?=
- =?utf-8?B?VElEYjBWZEpwM1dNMDN6TUhXWGxWRnE0dTdEQmdsTmRVMzRoelRLdWJNTmlV?=
- =?utf-8?B?akh3aDFEMmFhdnJvUCt2SllqMUZseVZVdGJPU2poOFNlTER6SzQ5RXpweTg5?=
- =?utf-8?B?SUhQMzNQL2ErSUpRL0cxL1lFdjd3am9JZWZoVHNOTTJvdm5DUVZnWGhtYXNj?=
- =?utf-8?B?T0JXY2tSQnp2NW0xNWpYM2lxV0hmcExaaE80bU5LK1BxRVNDdCtveXRlSXFL?=
- =?utf-8?B?OE0wcURBOENyakVFbDF0cVhTY3lsWjJuWEk5SXJXQXhPWC9NZml2S09STnpC?=
- =?utf-8?B?cERFSlBPQ3RkT3dKdGpIeW5zNzA5OTJpU296YVBsMUtxbE51eUtnak15L083?=
- =?utf-8?B?M2ljczZrajltWS9YN2MzNVM4aldCQVB4RGZnUzJUdCs2b2hVYkJwMUtHMzNH?=
- =?utf-8?B?U016WmxnY2FtdlNuSTlTRjA0ZVBib3p2aittZTgvazVhTWNYY05kQnJHU3Rt?=
- =?utf-8?B?OW4zcTZ2d2hXcHdkbytndXN6bFRHaVJidy8wMHpkVDJPWlcwN2hwYmdTVUpF?=
- =?utf-8?B?dTlrQ1lSNThDeXYyQkxoTnZhaGVYdS9BVTFDZGMwZ3Z3RUlES0lMVUI2Njk3?=
- =?utf-8?B?ZmMyMEpKWEJlV3FiQ0lUcmMyTVNRbk9vQzBja2orYXVnTWljajhNc3BoS3E3?=
- =?utf-8?B?bE5oTlVjdmhWakc2SUxFYWlod2tnQnVaYUtnSDUxVmJWWjMzbEY1WXZXZlZu?=
- =?utf-8?B?RUZDc2F6UXJaZUZGcmhHTTE0cmc5d3lNZU5UUnQ2cXVJc01PeDZyeUJ5WlJi?=
- =?utf-8?B?U0xMZnVCOE1EMldHRkFFVnYvV3NpUGFaWjlRYU5YaHM2cGdUTEhpVkRsbkMw?=
- =?utf-8?B?ZWdVTnErcVJHS3dqWWhlYWVwWE5UM1E1ODcvTXkzYmp1dTczdHhKeXNHZFc0?=
- =?utf-8?B?cDhUSlQ4NmxKcm5yQlBWTWJBOEc5MExxMWk1ay8zYTZneEV3OWN5bERtN1Zs?=
- =?utf-8?B?QmpGMis0L1h6SFRqODhsTDFsSFN4Y0tUOTc2aWhGVHNpL05xN0VGWDZ1SmFE?=
- =?utf-8?B?VEhJUXpGaTRUN2ZuMXdwZ0ozaEcwc0ZxelljeUl0NGxwVFY4OFRWVkpGU3Ra?=
- =?utf-8?B?YVV2RCttK08zOFg5NS81bmgrd1RNTkdYYmcwa0RMTDhBQkRBaFNsdFJvRVdQ?=
- =?utf-8?B?UW1GK2trVEtraUpJTUdhcmptcmJseVJYYnRFMWVJS1ErT0tYbmxNcTAvS3JF?=
- =?utf-8?B?VjIwRGhBaG5IbHV0UyszTkpmampMQzljZ3VoOFgxbWV6QVRJaEtsQ3FQdkpW?=
- =?utf-8?B?WHZYSWtSQWdGVHdnc0lIckhGTWNvK0NuRHdCWXVtYUlmeU9jT1pyQi91bGhD?=
- =?utf-8?B?M0w2N29mSUFSTVA2ZnZ6Qy8vNVNHeStZUWhxWGVaaXQxems2VytJQ0lub25M?=
- =?utf-8?B?Rnd5RnQyLzB6N1NjTm13SEl4WlFFTTlTNkw2U3pqeW5ZY1N1OUF3VHdhNG5O?=
- =?utf-8?B?T1A2SWZUUjdRUmNXSHE4bHU3SlZCbUZEODZhZXRsbENmTmdlc1FPUkRTMmpL?=
- =?utf-8?B?RVFybDBab1NMM21IWnhxdysyOXVhdGtkenV3emVId1Fac2hFL05vQ3lrb3or?=
- =?utf-8?B?MWlPejU0MEVDcGpRMFd2UHNlYzBla0F4dUFDQXF1L2plT3lNakU1MWx4YU5r?=
- =?utf-8?B?bWk4ZFdBVFhlcWhmUGV3TGJHS2sxVGY3eUJERkxORzQyOGlBMUM4SStvVmww?=
- =?utf-8?B?VE1aaHBNOFlISThnc0FOdjZlM3kzc0l6QmRYdFZybnFHTzBoQkRGeVpUcnp4?=
- =?utf-8?B?NTJiTFNnYWFGU2pab01EUGlHUjJ6YWFOZ3I2ZjBzR1cwWjFmQ01KVVMrcHdm?=
- =?utf-8?B?SGZLa1VNTTgyb1dOU2pvZXFqZngzZWJxdlhFdHVoMmxoNHo0bmM1bGE5b0Zw?=
- =?utf-8?B?RmNXQko1Z0o0QVQvYkZ0aTNBWmpZdjRVUi95dzc1SStsZkdyTFZQcXRuYktt?=
- =?utf-8?B?anU4YVdnemxnRkdDb0dKQ3pRcHltbm16cnlEVXovRDlRaVBOKzhGUXl6SWJx?=
- =?utf-8?B?ZzBQS20vb0QyS1I4YmlYR0hSSDB3UXUwLzVjVXhpM25QcG1IbnZxTTZTMlJC?=
- =?utf-8?Q?HBy70hLC3cY1yXUUd3khK8xwt?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229597AbjHCAxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 20:53:25 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3192102;
+        Wed,  2 Aug 2023 17:53:23 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-686e29b058cso303548b3a.1;
+        Wed, 02 Aug 2023 17:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691024003; x=1691628803;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zZ9dGWM/27uTbk4G6LFzY3aX0Wx6mK6D2JfWAFDZw+8=;
+        b=EjRaOAYPQEXaCdjPeGPKMIX+t1b64+Knuy5qVmaroPI+ulPi4M3Mx+8RDvh2+8YIph
+         AiTC9DaTQ3Jfz8a7mJG10oLYU7y8LyD/o4HRCnCt2dWwR+aOkC6JcDJxlPmH7yMcfrAY
+         7d2YJguyt4TaR1ueWVADEhVsMZfovpGb4JdVLB9L7hpWJ157/Tr1rKt2bghfi17/+pIH
+         Gp9LRD2z2ohS1fXiB8ReZC17XiJe4cLWuBIpjC29vdHSgEDndKqevS49mMVM3syFQbcc
+         1BcuRiqn2DtyR+2OeI+/n4eeZbABxjE7WLgnkfa0jMMEf2TOFIK54W1mLtklba/PuUAd
+         FUWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691024003; x=1691628803;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zZ9dGWM/27uTbk4G6LFzY3aX0Wx6mK6D2JfWAFDZw+8=;
+        b=F/++hBDNL5o9aogsOUfJrf37INbiy8I0voQT4ZpxJuhfJsb0FPFOUTg1w3RpVYNiRN
+         5fn3Y38CaAag6uX1ZF2090bWLV979P7Y9CwtDESbWYzA6s7nHpxfZYWT9g+qXmJZc7N0
+         UPEXYgZuLo2oyXWrs0CynJfg5t9KUcm7eC9HquE91XSg6DEehkMoDHcLgO2Be/b/Pp5O
+         9lnxzcTr+ArhvackbCVE5khuEnaLvjdiRVn8WAQ/Zy/0YLD+G3enRyUv80uqYsT3D5Yi
+         lCnYPVEz31MTIOMXU2xyjWoAlN/17ZWhBppqCMNz5QMgvalsB0R72L0v47dpXvhao8S1
+         J8KA==
+X-Gm-Message-State: ABy/qLZAihB0kbS+ZZpXjRUt3u/NFJJ/qbuNgDhySj01oF3cW+5Kwdmk
+        FDL+r/xMhScP+LPUs4JgDAg=
+X-Google-Smtp-Source: APBJJlF0Chd224yiHOmP45PspTp8hExjT5K+UpaZUJC08EQ9fRDRebyom7GrPMtyCH+i6cKP9HkzpQ==
+X-Received: by 2002:a05:6a00:391c:b0:67e:bf65:ae68 with SMTP id fh28-20020a056a00391c00b0067ebf65ae68mr17184470pfb.3.1691024003169;
+        Wed, 02 Aug 2023 17:53:23 -0700 (PDT)
+Received: from localhost (c-67-166-91-86.hsd1.wa.comcast.net. [67.166.91.86])
+        by smtp.gmail.com with ESMTPSA id v24-20020aa78518000000b00679b7d2bd57sm11605103pfn.192.2023.08.02.17.53.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Aug 2023 17:53:22 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 00:53:22 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Arseniy Krasnov <oxffffaa@gmail.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v5 03/14] af_vsock: support multi-transport
+ datagrams
+Message-ID: <ZMr6giur//A1hrND@bullseye>
+References: <20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com>
+ <20230413-b4-vsock-dgram-v5-3-581bd37fdb26@bytedance.com>
+ <43fad7ab-2ca9-608e-566f-80e607d2d6b8@gmail.com>
+ <ZMrXrBHuaEcpxGwA@bullseye>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5824.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6bcd00cf-fdec-4629-22a5-08db93bbd8a8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Aug 2023 00:52:00.6053
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mMkrmHT+XOxCsOcnMuuOzvi9qIDzt7ZY35FY96UtPr8+hmjKjx4hRUnA0ORGqx/V9Tvqft6jGMioEv/rIR046w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5330
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMrXrBHuaEcpxGwA@bullseye>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -168,96 +93,418 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiA+ICsNCj4gPiArMy4gQXJjaCBQTVUgdmlydHVhbGl6YXRpb24NCj4gPiArPT09PT09PT09PT09
-PT09PT09PT09PT09PT0NCj4gPiArDQo+ID4gKzMuMS4gT3ZlcnZpZXcNCj4gPiArLS0tLS0tLS0t
-LS0tLQ0KPiA+ICsNCj4gPiArT25jZSBLVk0vUUVNVSBleHBvc2UgdmNwdSdzIEFyY2ggUE1VIGNh
-cGFiaWxpdHkgaW50byBndWVzdCwgdGhlIGd1ZXN0DQo+ID4gK1BNVSBkcml2ZXIgd291bGQgYWNj
-ZXNzIHRoZSBBcmNoIFBNVSBNU1JzIChpbmNsdWRpbmcgRml4ZWQgYW5kIEdQDQo+ID4gK2NvdW50
-ZXIpIGFzIHRoZSBob3N0IGRvZXMuIEFsbCB0aGUgZ3Vlc3QgQXJjaCBQTVUgTVNScyBhY2Nlc3Np
-bmcgYXJlDQo+ID4gK2ludGVyY2VwdGFibGUuDQo+ID4gKw0KPiA+ICtXaGVuIGEgZ3Vlc3Qgdmly
-dHVhbCBjb3VudGVyIGlzIGVuYWJsZWQgdGhyb3VnaCBndWVzdCBNU1Igd3JpdGluZywNCj4gPiAr
-dGhlIEtWTSB0cmFwIHdpbGwgY3JlYXRlIGEga3ZtIHBlcmYgZXZlbnQgdGhyb3VnaCB0aGUgcGVy
-ZiBzdWJzeXN0ZW0uDQo+ID4gK1RoZSBrdm0gcGVyZiBldmVudCdzIGF0dHJpYnV0ZSBpcyBnb3R0
-ZW4gZnJvbSB0aGUgZ3Vlc3QgdmlydHVhbA0KPiA+ICtjb3VudGVyJ3MgTVNSIHNldHRpbmcuDQo+
-ID4gKw0KPiA+ICtXaGVuIGEgZ3Vlc3QgY2hhbmdlcyB0aGUgdmlydHVhbCBjb3VudGVyJ3Mgc2V0
-dGluZyBsYXRlciwgdGhlIEtWTQ0KPiA+ICt0cmFwIHdpbGwgcmVsZWFzZSB0aGUgb2xkIGt2bSBw
-ZXJmIGV2ZW50IHRoZW4gY3JlYXRlIGEgbmV3IGt2bSBwZXJmDQo+ID4gK2V2ZW50IHdpdGggdGhl
-IG5ldyBzZXR0aW5nLg0KPiA+ICsNCj4gPiArV2hlbiBndWVzdCByZWFkIHRoZSB2aXJ0dWFsIGNv
-dW50ZXIncyBjb3VudCBudW1iZXIsIHRoZSBrdm0gdHJhcCB3aWxsDQo+ID4gK3JlYWQga3ZtIHBl
-cmYgZXZlbnQncyBjb3VudGVyIHZhbHVlIGFuZCBhY2N1bXVsYXRlIGl0IHRvIHRoZSBwcmV2aW91
-cw0KPiA+ICtjb3VudGVyIHZhbHVlLg0KPiA+ICsNCj4gPiArV2hlbiBndWVzdCBubyBsb25nZXIg
-YWNjZXNzIHRoZSB2aXJ0dWFsIGNvdW50ZXIncyBNU1Igd2l0aGluIGENCj4gPiArc2NoZWR1bGlu
-ZyB0aW1lIHNsaWNlIGFuZCB0aGUgdmlydHVhbCBjb3VudGVyIGlzIGRpc2FibGVkLCBLVk0gd2ls
-bA0KPiA+ICtyZWxlYXNlIHRoZSBrdm0gcGVyZiBldmVudC4NCj4gPiArDQo+ID4gKyAgLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICsgIHwgIEd1ZXN0ICAgICAgICAgICAgICAgICAg
-IHwNCj4gPiArICB8ICBwZXJmIHN1YnN5c3RlbSAgICAgICAgICB8DQo+ID4gKyAgLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICsgICAgICAgfCAgICAgICAgICAgIF4NCj4gPiArICB2
-TVNSIHwgICAgICAgICAgICB8IHZQTUkNCj4gPiArICAgICAgIHYgICAgICAgICAgICB8DQo+ID4g
-KyAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICsgIHwgIHZQTVUgICAgICAgIEtW
-TSB2Q1BVICAgIHwNCj4gPiArICAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4gKyAg
-ICAgICAgfCAgICAgICAgICBeDQo+ID4gKyAgQ2FsbCAgfCAgICAgICAgICB8IENhbGxiYWNrcw0K
-PiA+ICsgICAgICAgIHYgICAgICAgICAgfA0KPiA+ICsgIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQ0KPiA+ICsgIHwgSG9zdCBMaW51eCBLZXJuZWwgICAgICAgfA0KPiA+ICsgIHwgcGVyZiBz
-dWJzeXN0ZW0gICAgICAgICAgfA0KPiA+ICsgIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
-PiA+ICsgICAgICAgICAgICAgICB8ICAgICAgIF4NCj4gPiArICAgICAgICAgICBNU1IgfCAgICAg
-ICB8IFBNSQ0KPiA+ICsgICAgICAgICAgICAgICB2ICAgICAgIHwNCj4gPiArICAgICAgICAgLS0t
-LS0tLS0tLS0tLS0tLS0tLS0NCj4gPiArCSB8IFBNVSAgICAgICAgQ1BVICAgfA0KPiA+ICsgICAg
-ICAgICAtLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICsNCj4gPiArRWFjaCBndWVzdCB2aXJ0dWFs
-IGNvdW50ZXIgaGFzIGEgY29ycmVzcG9uZGluZyBrdm0gcGVyZiBldmVudCwgYW5kDQo+ID4gK3Ro
-ZSBrdm0gcGVyZiBldmVudCBqb2lucyBob3N0IHBlcmYgc2NoZWR1bGVyIGFuZCBjb21wbGllcyB3
-aXRoIGhvc3QNCj4gPiArcGVyZiBzY2hlZHVsZXIgcnVsZS4gV2hlbiBrdm0gcGVyZiBldmVudCBp
-cyBzY2hlZHVsZWQgYnkgaG9zdCBwZXJmDQo+ID4gK3NjaGVkdWxlciBhbmQgaXMgYWN0aXZlLCB0
-aGUgZ3Vlc3QgdmlydHVhbCBjb3VudGVyIGNvdWxkIHN1cHBseSB0aGUgY29ycmVjdA0KPiB2YWx1
-ZS4NCj4gPiArSG93ZXZlciwgaWYgYW5vdGhlciBob3N0IHBlcmYgZXZlbnQgY29tZXMgaW4gYW5k
-IHRha2VzIG92ZXIgdGhlIGt2bQ0KPiA+ICtwZXJmIGV2ZW50IHJlc291cmNlLCB0aGUga3ZtIHBl
-cmYgZXZlbnQgd2lsbCBiZSBpbmFjdGl2ZSwgdGhlbiB0aGUNCj4gPiArdmlydHVhbCBjb3VudGVy
-IGtlZXBzIHRoZSBzYXZlZCB2YWx1ZSB3aGVuIHRoZSBrdm0gcGVyZiBldmVudCBpcw0KPiA+ICtw
-cmVlbXB0ZWQuIEJ1dCBndWVzdCBwZXJmIGRvZXNuJ3Qgbm90aWNlIHRoZSB1bmRlcmJlYWNoIHZp
-cnR1YWwNCj4gPiArY291bnRlciBpcyBzdG9wcGVkLCBzbyB0aGUgZmluYWwgZ3Vlc3QgcHJvZmls
-aW5nIGRhdGEgaXMgd3JvbmcuDQo+ID4gKw0KPiA+ICszLjIuIEhvc3QgYW5kIEd1ZXN0IHBlcmYg
-ZXZlbnQgY29udGVudGlvbg0KPiA+ICstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQ0KPiA+ICsNCj4gPiArS3ZtIHBlcmYgZXZlbnQgaXMgYSBwZXItcHJvY2VzcyBwaW5u
-ZWQgZXZlbnQsIGl0cyBwcmlvcml0eSBpcyBzZWNvbmQuDQo+ID4gK1doZW4ga3ZtIHBlcmYgZXZl
-bnQgaXMgYWN0aXZlLCBpdCBjYW4gYmUgcHJlZW1wdGVkIGJ5IGhvc3QgcGVyLWNwdQ0KPiA+ICtw
-aW5uZWQgcGVyZiBldmVudCwgb3IgaXQgY2FuIHByZWVtcHQgaG9zdCBmbGV4aWJsZSBwZXJmIGV2
-ZW50cy4gU3VjaA0KPiA+ICtwcmVlbXB0aW9uIGNhbiBiZSB0ZW1wb3JhcmlseSBwcm9oaWJpdGVk
-IHRocm91Z2ggZGlzYWJsaW5nIGhvc3QgSVJRLg0KPiA+ICsNCj4gPiArVGhlIGZvbGxvd2luZyBy
-ZXN1bHRzIGFyZSBleHBlY3RlZCB3aGVuIGhvc3QgYW5kIGd1ZXN0IHBlcmYgZXZlbnQNCj4gPiAr
-Y29leGlzdCBhY2NvcmRpbmcgdG8gcGVyZiBzY2hlZHVsZXIgcnVsZToNCj4gPiArMSkuIGlmIGhv
-c3QgcGVyIGNwdSBwaW5uZWQgZXZlbnRzIG9jY3VweSBhbGwgdGhlIEhXIHJlc291cmNlLCBrdm0N
-Cj4gPiArcGVyZiBldmVudCBjYW4gbm90IGJlIGFjdGl2ZSBhcyBubyBhdmFpbGFibGUgcmVzb3Vy
-Y2UsIHRoZSB2aXJ0dWFsDQo+ID4gK2NvdW50ZXIgdmFsdWUgaXMgIHplcm8gYWx3YXlzIHdoZW4g
-dGhlIGd1ZXN0IHJlYWRzIGl0Lg0KPiA+ICsyKS4gaWYgaG9zdCBwZXIgY3B1IHBpbm5lZCBldmVu
-dCByZWxlYXNlIEhXIHJlc291cmNlLCBhbmQga3ZtIHBlcmYNCj4gPiArZXZlbnQgaXMgaW5hY3Rp
-dmUsIGt2bSBwZXJmIGV2ZW50IGNhbiBjbGFpbSB0aGUgSFcgcmVzb3VyY2UgYW5kDQo+ID4gK3N3
-aXRjaCBpbnRvIGFjdGl2ZSwgdGhlbiB0aGUgZ3Vlc3QgY2FuIGdldCB0aGUgY29ycmVjdCB2YWx1
-ZSBmcm9tIHRoZQ0KPiA+ICtndWVzdCB2aXJ0dWFsIGNvdW50ZXIgZHVyaW5nIGt2bSBwZXJmIGV2
-ZW50IGlzIGFjdGl2ZSwgYnV0IHRoZSBndWVzdA0KPiA+ICt0b3RhbCBjb3VudGVyIHZhbHVlIGlz
-IG5vdCBjb3JyZWN0IHNpbmNlIGNvdW50ZXIgdmFsdWUgaXMgbG9zdCBkdXJpbmcNCj4gPiAra3Zt
-IHBlcmYgZXZlbnQgaXMgaW5hY3RpdmUuDQo+ID4gKzMpLiBpZiBrdm0gcGVyZiBldmVudCBpcyBh
-Y3RpdmUsIHRoZW4gaG9zdCBwZXIgY3B1IHBpbm5lZCBwZXJmIGV2ZW50DQo+ID4gK2JlY29tZXMg
-YWN0aXZlIGFuZCByZWNsYWltcyBrdm0gcGVyZiBldmVudCByZXNvdXJjZSwga3ZtIHBlcmYgZXZl
-bnQNCj4gPiArd2lsbCBiZSBpbmFjdGl2ZS4gRmluYWxseSB0aGUgdmlydHVhbCBjb3VudGVyIHZh
-bHVlIGlzIGtlcHQgdW5jaGFuZ2VkDQo+ID4gK2FuZCBzdG9yZXMgcHJldmlvdXMgc2F2ZWQgdmFs
-dWUgd2hlbiB0aGUgZ3Vlc3QgcmVhZHMgaXQuIFNvIHRoZSBndWVzdA0KPiA+ICt0b3RhbCBjb3Vu
-dGVyIGlzbid0IGNvcnJlY3QuDQo+ID4gKzQpLiBJZiBob3N0IGZsZXhpYmxlIHBlcmYgZXZlbnRz
-IG9jY3VweSBhbGwgdGhlIEhXIHJlc291cmNlLCBrdm0gcGVyZg0KPiA+ICtldmVudCBjYW4gYmUg
-YWN0aXZlIGFuZCBwcmVlbXB0cyBob3N0IGZsZXhpYmxlIHBlcmYgZXZlbnQgcmVzb3VyY2UsDQo+
-ID4gK3RoZSBndWVzdCBjYW4gZ2V0IHRoZSBjb3JyZWN0IHZhbHVlIGZyb20gdGhlIGd1ZXN0IHZp
-cnR1YWwgY291bnRlci4NCj4gPiArNSkuIGlmIGt2bSBwZXJmIGV2ZW50IGlzIGFjdGl2ZSwgdGhl
-biBvdGhlciBob3N0IGZsZXhpYmxlIHBlcmYgZXZlbnRzDQo+ID4gK3JlcXVlc3QgdG8gYWN0aXZl
-LCBrdm0gcGVyZiBldmVudCBzdGlsbCBvd24gdGhlIHJlc291cmNlIGFuZCBhY3RpdmUsDQo+ID4g
-K3NvIHRoZSBndWVzdCBjYW4gZ2V0IHRoZSBjb3JyZWN0IHZhbHVlIGZyb20gdGhlIGd1ZXN0IHZp
-cnR1YWwgY291bnRlci4NCj4gPiArDQo+ID4gKzMuMy4gdlBNVSBBcmNoIEdhcHMNCj4gPiArLS0t
-LS0tLS0tLS0tLS0tLS0tLQ0KPiA+ICsNCj4gPiArVGhlIGNvZXhpc3Qgb2YgaG9zdCBhbmQgZ3Vl
-c3QgcGVyZiBldmVudHMgaGFzIGdhcDoNCj4gPiArMSkuIHdoZW4gZ3Vlc3QgYWNjZXNzZXMgUE1V
-IE1TUnMgYXQgdGhlIGZpcnN0IHRpbWUsIEtWTSB3aWxsIHRyYXAgaXQNCj4gPiArYW5kIGNyZWF0
-ZSBrdm0gcGVyZiBldmVudCwgYnV0IHRoaXMgZXZlbnQgbWF5IGJlIGluYWN0aXZlIGJlY2F1c2Ug
-dGhlDQo+IA0KPiBpbmFjdGl2ZT8gSXQgc2VlbXMgdGhlIGV2ZW50IHNob3VsZCBlbnRlciBlcnJv
-ciBzdGF0ZSBiYXNlIG9uIHByZXZpb3VzDQo+IGRlc2NyaXB0aW9uPw0KW1poYW5nLCBYaW9uZyBZ
-XSB5ZXMsIHRoZSBjb2RlIHdpbGwgcHV0IGl0IGludG8gZXJyb3Igc3RhdGUuIEkgdXNlZCBpbmFj
-dGl2ZSBpbnN0ZWFkIG9mIGVycm9yIGluIGFsbCB0aGUgdlBNVSBzZWN0aW9uLCBteSBpbnRlbnRp
-b24gaXMgdG8gbWFrZSB0aGluZyBlYXNpZXIgdG8gdW5kZXJzdGFuZCBpZiByZWFkZXIgaXMgbm90
-IGZhbWlsaWFyIHdpdGggcGVyZiBzY2hlZHVsZXIsIGFuZCBpbXBsaWVzIHRoaXMgc3RhdGUgaXMg
-cmVjb3ZlcmFibGUuIEkgc2hvdWxkIGNoYW5nZSBpdCB0byBlcnJvciBzdGF0ZSBzaW5jZSBwZXJm
-IHNjaGVkdWxlciBzZWN0aW9uIGhhcyBpbnRyb2R1Y2VkIHRoaXMuDQoNCnRoYW5rcw0KDQo=
+On Wed, Aug 02, 2023 at 10:24:44PM +0000, Bobby Eshleman wrote:
+> On Sun, Jul 23, 2023 at 12:53:15AM +0300, Arseniy Krasnov wrote:
+> > 
+> > 
+> > On 19.07.2023 03:50, Bobby Eshleman wrote:
+> > > This patch adds support for multi-transport datagrams.
+> > > 
+> > > This includes:
+> > > - Per-packet lookup of transports when using sendto(sockaddr_vm)
+> > > - Selecting H2G or G2H transport using VMADDR_FLAG_TO_HOST and CID in
+> > >   sockaddr_vm
+> > > - rename VSOCK_TRANSPORT_F_DGRAM to VSOCK_TRANSPORT_F_DGRAM_FALLBACK
+> > > - connect() now assigns the transport for (similar to connectible
+> > >   sockets)
+> > > 
+> > > To preserve backwards compatibility with VMCI, some important changes
+> > > are made. The "transport_dgram" / VSOCK_TRANSPORT_F_DGRAM is changed to
+> > > be used for dgrams only if there is not yet a g2h or h2g transport that
+> > > has been registered that can transmit the packet. If there is a g2h/h2g
+> > > transport for that remote address, then that transport will be used and
+> > > not "transport_dgram". This essentially makes "transport_dgram" a
+> > > fallback transport for when h2g/g2h has not yet gone online, and so it
+> > > is renamed "transport_dgram_fallback". VMCI implements this transport.
+> > > 
+> > > The logic around "transport_dgram" needs to be retained to prevent
+> > > breaking VMCI:
+> > > 
+> > > 1) VMCI datagrams existed prior to h2g/g2h and so operate under a
+> > >    different paradigm. When the vmci transport comes online, it registers
+> > >    itself with the DGRAM feature, but not H2G/G2H. Only later when the
+> > >    transport has more information about its environment does it register
+> > >    H2G or G2H.  In the case that a datagram socket is created after
+> > >    VSOCK_TRANSPORT_F_DGRAM registration but before G2H/H2G registration,
+> > >    the "transport_dgram" transport is the only registered transport and so
+> > >    needs to be used.
+> > > 
+> > > 2) VMCI seems to require a special message be sent by the transport when a
+> > >    datagram socket calls bind(). Under the h2g/g2h model, the transport
+> > >    is selected using the remote_addr which is set by connect(). At
+> > >    bind time there is no remote_addr because often no connect() has been
+> > >    called yet: the transport is null. Therefore, with a null transport
+> > >    there doesn't seem to be any good way for a datagram socket to tell the
+> > >    VMCI transport that it has just had bind() called upon it.
+> > > 
+> > > With the new fallback logic, after H2G/G2H comes online the socket layer
+> > > will access the VMCI transport via transport_{h2g,g2h}. Prior to H2G/G2H
+> > > coming online, the socket layer will access the VMCI transport via
+> > > "transport_dgram_fallback".
+> > > 
+> > > Only transports with a special datagram fallback use-case such as VMCI
+> > > need to register VSOCK_TRANSPORT_F_DGRAM_FALLBACK.
+> > > 
+> > > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > > ---
+> > >  drivers/vhost/vsock.c                   |  1 -
+> > >  include/linux/virtio_vsock.h            |  2 --
+> > >  include/net/af_vsock.h                  | 10 +++---
+> > >  net/vmw_vsock/af_vsock.c                | 64 ++++++++++++++++++++++++++-------
+> > >  net/vmw_vsock/hyperv_transport.c        |  6 ----
+> > >  net/vmw_vsock/virtio_transport.c        |  1 -
+> > >  net/vmw_vsock/virtio_transport_common.c |  7 ----
+> > >  net/vmw_vsock/vmci_transport.c          |  2 +-
+> > >  net/vmw_vsock/vsock_loopback.c          |  1 -
+> > >  9 files changed, 58 insertions(+), 36 deletions(-)
+> > > 
+> > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > index ae8891598a48..d5d6a3c3f273 100644
+> > > --- a/drivers/vhost/vsock.c
+> > > +++ b/drivers/vhost/vsock.c
+> > > @@ -410,7 +410,6 @@ static struct virtio_transport vhost_transport = {
+> > >  		.cancel_pkt               = vhost_transport_cancel_pkt,
+> > >  
+> > >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > >  
+> > >  		.stream_enqueue           = virtio_transport_stream_enqueue,
+> > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > > index 18cbe8d37fca..7632552bee58 100644
+> > > --- a/include/linux/virtio_vsock.h
+> > > +++ b/include/linux/virtio_vsock.h
+> > > @@ -211,8 +211,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
+> > >  u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
+> > >  bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
+> > >  bool virtio_transport_stream_allow(u32 cid, u32 port);
+> > > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> > > -				struct sockaddr_vm *addr);
+> > >  bool virtio_transport_dgram_allow(u32 cid, u32 port);
+> > >  
+> > >  int virtio_transport_connect(struct vsock_sock *vsk);
+> > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > > index 305d57502e89..f6a0ca9d7c3e 100644
+> > > --- a/include/net/af_vsock.h
+> > > +++ b/include/net/af_vsock.h
+> > > @@ -96,13 +96,13 @@ struct vsock_transport_send_notify_data {
+> > >  
+> > >  /* Transport features flags */
+> > >  /* Transport provides host->guest communication */
+> > > -#define VSOCK_TRANSPORT_F_H2G		0x00000001
+> > > +#define VSOCK_TRANSPORT_F_H2G			0x00000001
+> > >  /* Transport provides guest->host communication */
+> > > -#define VSOCK_TRANSPORT_F_G2H		0x00000002
+> > > -/* Transport provides DGRAM communication */
+> > > -#define VSOCK_TRANSPORT_F_DGRAM		0x00000004
+> > > +#define VSOCK_TRANSPORT_F_G2H			0x00000002
+> > > +/* Transport provides fallback for DGRAM communication */
+> > > +#define VSOCK_TRANSPORT_F_DGRAM_FALLBACK	0x00000004
+> > >  /* Transport provides local (loopback) communication */
+> > > -#define VSOCK_TRANSPORT_F_LOCAL		0x00000008
+> > > +#define VSOCK_TRANSPORT_F_LOCAL			0x00000008
+> > >  
+> > >  struct vsock_transport {
+> > >  	struct module *module;
+> > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > > index ae5ac5531d96..26c97b33d55a 100644
+> > > --- a/net/vmw_vsock/af_vsock.c
+> > > +++ b/net/vmw_vsock/af_vsock.c
+> > > @@ -139,8 +139,8 @@ struct proto vsock_proto = {
+> > >  static const struct vsock_transport *transport_h2g;
+> > >  /* Transport used for guest->host communication */
+> > >  static const struct vsock_transport *transport_g2h;
+> > > -/* Transport used for DGRAM communication */
+> > > -static const struct vsock_transport *transport_dgram;
+> > > +/* Transport used as a fallback for DGRAM communication */
+> > > +static const struct vsock_transport *transport_dgram_fallback;
+> > >  /* Transport used for local communication */
+> > >  static const struct vsock_transport *transport_local;
+> > >  static DEFINE_MUTEX(vsock_register_mutex);
+> > > @@ -439,6 +439,18 @@ vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
+> > >  	return transport;
+> > >  }
+> > >  
+> > > +static const struct vsock_transport *
+> > > +vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
+> > > +{
+> > > +	const struct vsock_transport *transport;
+> > > +
+> > > +	transport = vsock_connectible_lookup_transport(cid, flags);
+> > > +	if (transport)
+> > > +		return transport;
+> > > +
+> > > +	return transport_dgram_fallback;
+> > > +}
+> > > +
+> > >  /* Assign a transport to a socket and call the .init transport callback.
+> > >   *
+> > >   * Note: for connection oriented socket this must be called when vsk->remote_addr
+> > > @@ -475,7 +487,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> > >  
+> > >  	switch (sk->sk_type) {
+> > >  	case SOCK_DGRAM:
+> > > -		new_transport = transport_dgram;
+> > > +		new_transport = vsock_dgram_lookup_transport(remote_cid,
+> > > +							     remote_flags);
+> > 
+> > I'm a little bit confused about this: 
+> > 1) Let's create SOCK_DGRAM socket using vsock_create()
+> > 2) for SOCK_DGRAM it calls 'vsock_assign_transport()' and we go here, remote_cid == -1
+> > 3) I guess 'vsock_dgram_lookup_transport()' calls logic from 0002 and returns h2g for such remote cid, which is not
+> >    correct I think...
+> > 
+> > Please correct me if i'm wrong
+> > 
+> > Thanks, Arseniy
+> > 
+> 
+> As I understand, for the VMCI case, if transport_h2g != NULL, then
+> transport_h2g == transport_dgram_fallback. In either case,
+> vsk->transport == transport_dgram_fallback.
+> 
+> For the virtio/vhost case, temporarily vsk->transport == transport_h2g,
+> but it is unused because vsk->transport->dgram_bind == NULL.
+> 
+> Until SS_CONNECTED is set by connect() and vsk->transport is set
+> correctly, the send path is barred from using the bad transport.
+> 
+> I guess the recvmsg() path is a little more sketchy, and probably only
+> works in my test cases because h2g/g2h in the vhost/virtio case have
+> identical dgram_addr_init() implementations.
+> 
+> I think a cleaner solution is maybe checking in vsock_create() if
+> dgram_bind is implemented. If it is not, then vsk->transport should be
+> reset to NULL and a comment added explaining why VMCI requires this.
+> 
+> Then the other calls can begin explicitly checking for vsk->transport ==
+> NULL.
+
+Actually, on further reflection here, in order for the vsk->transport to
+be called in time for ->dgram_addr_init(), it is going to be necessary
+to call vsock_assign_transport() in vsock_dgram_bind() anyway.
+
+I think this means that the vsock_assign_transport() call can be removed
+from vsock_create() call entirely, and yet VMCI can still dispatch
+messages upon bind() calls as needed.
+
+This would then simplify the whole arrangement, if there aren't other
+unseen issues.
+
+> 
+> Thoughts?
+> 
+> > >  		break;
+> > >  	case SOCK_STREAM:
+> > >  	case SOCK_SEQPACKET:
+> > > @@ -692,6 +705,9 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > >  static int __vsock_bind_dgram(struct vsock_sock *vsk,
+> > >  			      struct sockaddr_vm *addr)
+> > >  {
+> > > +	if (!vsk->transport || !vsk->transport->dgram_bind)
+> > > +		return -EINVAL;
+> > > +
+> > >  	return vsk->transport->dgram_bind(vsk, addr);
+> > >  }
+> > >  
+> > > @@ -1162,6 +1178,7 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > >  	struct vsock_sock *vsk;
+> > >  	struct sockaddr_vm *remote_addr;
+> > >  	const struct vsock_transport *transport;
+> > > +	bool module_got = false;
+> > >  
+> > >  	if (msg->msg_flags & MSG_OOB)
+> > >  		return -EOPNOTSUPP;
+> > > @@ -1173,19 +1190,34 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > >  
+> > >  	lock_sock(sk);
+> > >  
+> > > -	transport = vsk->transport;
+> > > -
+> > >  	err = vsock_auto_bind(vsk);
+> > >  	if (err)
+> > >  		goto out;
+> > >  
+> > > -
+> > >  	/* If the provided message contains an address, use that.  Otherwise
+> > >  	 * fall back on the socket's remote handle (if it has been connected).
+> > >  	 */
+> > >  	if (msg->msg_name &&
+> > >  	    vsock_addr_cast(msg->msg_name, msg->msg_namelen,
+> > >  			    &remote_addr) == 0) {
+> > > +		transport = vsock_dgram_lookup_transport(remote_addr->svm_cid,
+> > > +							 remote_addr->svm_flags);
+> > > +		if (!transport) {
+> > > +			err = -EINVAL;
+> > > +			goto out;
+> > > +		}
+> > > +
+> > > +		if (!try_module_get(transport->module)) {
+> > > +			err = -ENODEV;
+> > > +			goto out;
+> > > +		}
+> > > +
+> > > +		/* When looking up a transport dynamically and acquiring a
+> > > +		 * reference on the module, we need to remember to release the
+> > > +		 * reference later.
+> > > +		 */
+> > > +		module_got = true;
+> > > +
+> > >  		/* Ensure this address is of the right type and is a valid
+> > >  		 * destination.
+> > >  		 */
+> > > @@ -1200,6 +1232,7 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > >  	} else if (sock->state == SS_CONNECTED) {
+> > >  		remote_addr = &vsk->remote_addr;
+> > >  
+> > > +		transport = vsk->transport;
+> > >  		if (remote_addr->svm_cid == VMADDR_CID_ANY)
+> > >  			remote_addr->svm_cid = transport->get_local_cid();
+> > >  
+> > > @@ -1224,6 +1257,8 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> > >  	err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
+> > >  
+> > >  out:
+> > > +	if (module_got)
+> > > +		module_put(transport->module);
+> > >  	release_sock(sk);
+> > >  	return err;
+> > >  }
+> > > @@ -1256,13 +1291,18 @@ static int vsock_dgram_connect(struct socket *sock,
+> > >  	if (err)
+> > >  		goto out;
+> > >  
+> > > +	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
+> > > +
+> > > +	err = vsock_assign_transport(vsk, NULL);
+> > > +	if (err)
+> > > +		goto out;
+> > > +
+> > >  	if (!vsk->transport->dgram_allow(remote_addr->svm_cid,
+> > >  					 remote_addr->svm_port)) {
+> > >  		err = -EINVAL;
+> > >  		goto out;
+> > >  	}
+> > >  
+> > > -	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
+> > >  	sock->state = SS_CONNECTED;
+> > >  
+> > >  	/* sock map disallows redirection of non-TCP sockets with sk_state !=
+> > > @@ -2487,7 +2527,7 @@ int vsock_core_register(const struct vsock_transport *t, int features)
+> > >  
+> > >  	t_h2g = transport_h2g;
+> > >  	t_g2h = transport_g2h;
+> > > -	t_dgram = transport_dgram;
+> > > +	t_dgram = transport_dgram_fallback;
+> > >  	t_local = transport_local;
+> > >  
+> > >  	if (features & VSOCK_TRANSPORT_F_H2G) {
+> > > @@ -2506,7 +2546,7 @@ int vsock_core_register(const struct vsock_transport *t, int features)
+> > >  		t_g2h = t;
+> > >  	}
+> > >  
+> > > -	if (features & VSOCK_TRANSPORT_F_DGRAM) {
+> > > +	if (features & VSOCK_TRANSPORT_F_DGRAM_FALLBACK) {
+> > >  		if (t_dgram) {
+> > >  			err = -EBUSY;
+> > >  			goto err_busy;
+> > > @@ -2524,7 +2564,7 @@ int vsock_core_register(const struct vsock_transport *t, int features)
+> > >  
+> > >  	transport_h2g = t_h2g;
+> > >  	transport_g2h = t_g2h;
+> > > -	transport_dgram = t_dgram;
+> > > +	transport_dgram_fallback = t_dgram;
+> > >  	transport_local = t_local;
+> > >  
+> > >  err_busy:
+> > > @@ -2543,8 +2583,8 @@ void vsock_core_unregister(const struct vsock_transport *t)
+> > >  	if (transport_g2h == t)
+> > >  		transport_g2h = NULL;
+> > >  
+> > > -	if (transport_dgram == t)
+> > > -		transport_dgram = NULL;
+> > > +	if (transport_dgram_fallback == t)
+> > > +		transport_dgram_fallback = NULL;
+> > >  
+> > >  	if (transport_local == t)
+> > >  		transport_local = NULL;
+> > > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> > > index 7f1ea434656d..c29000f2612a 100644
+> > > --- a/net/vmw_vsock/hyperv_transport.c
+> > > +++ b/net/vmw_vsock/hyperv_transport.c
+> > > @@ -551,11 +551,6 @@ static void hvs_destruct(struct vsock_sock *vsk)
+> > >  	kfree(hvs);
+> > >  }
+> > >  
+> > > -static int hvs_dgram_bind(struct vsock_sock *vsk, struct sockaddr_vm *addr)
+> > > -{
+> > > -	return -EOPNOTSUPP;
+> > > -}
+> > > -
+> > >  static int hvs_dgram_enqueue(struct vsock_sock *vsk,
+> > >  			     struct sockaddr_vm *remote, struct msghdr *msg,
+> > >  			     size_t dgram_len)
+> > > @@ -826,7 +821,6 @@ static struct vsock_transport hvs_transport = {
+> > >  	.connect                  = hvs_connect,
+> > >  	.shutdown                 = hvs_shutdown,
+> > >  
+> > > -	.dgram_bind               = hvs_dgram_bind,
+> > >  	.dgram_enqueue            = hvs_dgram_enqueue,
+> > >  	.dgram_allow              = hvs_dgram_allow,
+> > >  
+> > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > > index 66edffdbf303..ac2126c7dac5 100644
+> > > --- a/net/vmw_vsock/virtio_transport.c
+> > > +++ b/net/vmw_vsock/virtio_transport.c
+> > > @@ -428,7 +428,6 @@ static struct virtio_transport virtio_transport = {
+> > >  		.shutdown                 = virtio_transport_shutdown,
+> > >  		.cancel_pkt               = virtio_transport_cancel_pkt,
+> > >  
+> > > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > >  
+> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > index 01ea1402ad40..ffcbdd77feaa 100644
+> > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > @@ -781,13 +781,6 @@ bool virtio_transport_stream_allow(u32 cid, u32 port)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
+> > >  
+> > > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+> > > -				struct sockaddr_vm *addr)
+> > > -{
+> > > -	return -EOPNOTSUPP;
+> > > -}
+> > > -EXPORT_SYMBOL_GPL(virtio_transport_dgram_bind);
+> > > -
+> > >  bool virtio_transport_dgram_allow(u32 cid, u32 port)
+> > >  {
+> > >  	return false;
+> > > diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+> > > index 0bbbdb222245..857b0461f856 100644
+> > > --- a/net/vmw_vsock/vmci_transport.c
+> > > +++ b/net/vmw_vsock/vmci_transport.c
+> > > @@ -2072,7 +2072,7 @@ static int __init vmci_transport_init(void)
+> > >  	/* Register only with dgram feature, other features (H2G, G2H) will be
+> > >  	 * registered when the first host or guest becomes active.
+> > >  	 */
+> > > -	err = vsock_core_register(&vmci_transport, VSOCK_TRANSPORT_F_DGRAM);
+> > > +	err = vsock_core_register(&vmci_transport, VSOCK_TRANSPORT_F_DGRAM_FALLBACK);
+> > >  	if (err < 0)
+> > >  		goto err_unsubscribe;
+> > >  
+> > > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+> > > index 2a59dd177c74..278235ea06c4 100644
+> > > --- a/net/vmw_vsock/vsock_loopback.c
+> > > +++ b/net/vmw_vsock/vsock_loopback.c
+> > > @@ -61,7 +61,6 @@ static struct virtio_transport loopback_transport = {
+> > >  		.shutdown                 = virtio_transport_shutdown,
+> > >  		.cancel_pkt               = vsock_loopback_cancel_pkt,
+> > >  
+> > > -		.dgram_bind               = virtio_transport_dgram_bind,
+> > >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> > >  		.dgram_allow              = virtio_transport_dgram_allow,
+> > >  
+> > > 
