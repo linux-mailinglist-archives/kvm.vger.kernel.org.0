@@ -2,102 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11E1D76E65A
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 13:05:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A72476E663
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 13:09:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234036AbjHCLF2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 07:05:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46016 "EHLO
+        id S235000AbjHCLJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 07:09:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235323AbjHCLFI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 07:05:08 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5324F3C3E;
-        Thu,  3 Aug 2023 04:03:33 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C5EC421980;
-        Thu,  3 Aug 2023 11:03:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1691060607; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ELFTahEoHWF3OWY1nmXyZ3K1aLk6cFNvnoHkAihu/Mw=;
-        b=Zk1HY4iMRP9uheCuU2Gwd5DiqLAsx6L/pbJrWVbGs2G5tg+EI9ElS+gE66dB2FTHm11UF8
-        qWgiTyTJQ7yRAiBtoBdi2fqPMtREOO8my04MU6Xu8b+lwvm6aj++D29U6Bm4b38Thm1sQ5
-        PdGs2uwSRTJt8ojn16bv8gGCtOwUUxA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1691060607;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ELFTahEoHWF3OWY1nmXyZ3K1aLk6cFNvnoHkAihu/Mw=;
-        b=ZJe2RSlXii++jrPpaFNL6iXhx+JwVqn0T8np7kqzxyJSLwbPFRd7+wdefPUF3yIddEHPpo
-        hddKSxL+A16bWFAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 34D39134B0;
-        Thu,  3 Aug 2023 11:03:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VY8NDH+Jy2RAJQAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Thu, 03 Aug 2023 11:03:27 +0000
-Message-ID: <d6ee67a2-b5b9-7287-bc62-b250c1872ed5@suse.cz>
-Date:   Thu, 3 Aug 2023 13:03:26 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [RFC PATCH v11 00/29] KVM: guest_memfd() and per-page attributes
+        with ESMTP id S234942AbjHCLJF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 07:09:05 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB125278
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 04:07:22 -0700 (PDT)
+Received: from lhrpeml500001.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RGmCN0hfyz6J7sx;
+        Thu,  3 Aug 2023 19:02:40 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500001.china.huawei.com (7.191.163.213) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 3 Aug 2023 12:06:19 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.027;
+ Thu, 3 Aug 2023 12:06:19 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+        "ricarkol@google.com" <ricarkol@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RFC PATCH] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Thread-Topic: [RFC PATCH] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Thread-Index: AQHZvwjifN5MO8LOQ0OA7FeN8cqACa/NszgAgAqrVrA=
+Date:   Thu, 3 Aug 2023 11:06:19 +0000
+Message-ID: <633173352b14449ea80525e97f65fe0a@huawei.com>
+References: <20230725150002.621-1-shameerali.kolothum.thodi@huawei.com>
+ <CAFEAcA_3+=m8nt6_eJMiEpxyGcSAXJRC5LWMVvU3f9CHAxKzCw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_3+=m8nt6_eJMiEpxyGcSAXJRC5LWMVvU3f9CHAxKzCw@mail.gmail.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-To:     nikunj@amd.com, Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Maciej Szmigiero <mail@maciej.szmigiero.name>,
-        David Hildenbrand <david@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Wang <wei.w.wang@intel.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20230718234512.1690985-1-seanjc@google.com>
- <110f1aa0-7fcd-1287-701a-89c2203f0ac2@amd.com> <ZL6uMk/8UeuGj8CP@google.com>
- <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <2f98a32c-bd3d-4890-b757-4d2f67a3b1a7@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -106,178 +61,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/26/23 13:20, Nikunj A. Dadhania wrote:
-> Hi Sean,
-> 
-> On 7/24/2023 10:30 PM, Sean Christopherson wrote:
->> On Mon, Jul 24, 2023, Nikunj A. Dadhania wrote:
->>> On 7/19/2023 5:14 AM, Sean Christopherson wrote:
->>>> This is the next iteration of implementing fd-based (instead of vma-based)
->>>> memory for KVM guests.  If you want the full background of why we are doing
->>>> this, please go read the v10 cover letter[1].
->>>>
->>>> The biggest change from v10 is to implement the backing storage in KVM
->>>> itself, and expose it via a KVM ioctl() instead of a "generic" sycall.
->>>> See link[2] for details on why we pivoted to a KVM-specific approach.
->>>>
->>>> Key word is "biggest".  Relative to v10, there are many big changes.
->>>> Highlights below (I can't remember everything that got changed at
->>>> this point).
->>>>
->>>> Tagged RFC as there are a lot of empty changelogs, and a lot of missing
->>>> documentation.  And ideally, we'll have even more tests before merging.
->>>> There are also several gaps/opens (to be discussed in tomorrow's PUCK).
->>>
->>> As per our discussion on the PUCK call, here are the memory/NUMA accounting 
->>> related observations that I had while working on SNP guest secure page migration:
->>>
->>> * gmem allocations are currently treated as file page allocations
->>>   accounted to the kernel and not to the QEMU process.
->> 
->> We need to level set on terminology: these are all *stats*, not accounting.  That
->> distinction matters because we have wiggle room on stats, e.g. we can probably get
->> away with just about any definition of how guest_memfd memory impacts stats, so
->> long as the information that is surfaced to userspace is useful and expected.
->> 
->> But we absolutely need to get accounting correct, specifically the allocations
->> need to be correctly accounted in memcg.  And unless I'm missing something,
->> nothing in here shows anything related to memcg.
-> 
-> I tried out memcg after creating a separate cgroup for the qemu process. Guest 
-> memory is accounted in memcg.
-> 
->   $ egrep -w "file|file_thp|unevictable" memory.stat
->   file 42978775040
->   file_thp 42949672960
->   unevictable 42953588736 
-> 
-> NUMA allocations are coming from right nodes as set by the numactl.
-> 
->   $ egrep -w "file|file_thp|unevictable" memory.numa_stat
->   file N0=0 N1=20480 N2=21489377280 N3=21489377280
->   file_thp N0=0 N1=0 N2=21472739328 N3=21476933632
->   unevictable N0=0 N1=0 N2=21474697216 N3=21478891520
-> 
->> 
->>>   Starting an SNP guest with 40G memory with memory interleave between
->>>   Node2 and Node3
->>>
->>>   $ numactl -i 2,3 ./bootg_snp.sh
->>>
->>>     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
->>>  242179 root      20   0   40.4g  99580  51676 S  78.0   0.0   0:56.58 qemu-system-x86
->>>
->>>   -> Incorrect process resident memory and shared memory is reported
->> 
->> I don't know that I would call these "incorrect".  Shared memory definitely is
->> correct, because by definition guest_memfd isn't shared.  RSS is less clear cut;
->> gmem memory is resident in RAM, but if we show gmem in RSS then we'll end up with
->> scenarios where RSS > VIRT, which will be quite confusing for unaware users (I'm
->> assuming the 40g of VIRT here comes from QEMU mapping the shared half of gmem
->> memslots).
-> 
-> I am not sure why will RSS exceed the VIRT, it should be at max 40G (assuming all the
-> memory is private)
-> 
-> As per my experiments with a hack below. MM_FILEPAGES does get accounted to RSS/SHR in top
-> 
->     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
->    4339 root      20   0   40.4g  40.1g  40.1g S  76.7  16.0   0:13.83 qemu-system-x86
-> 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index f456f3b5049c..5b1f48a2e714 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -166,6 +166,7 @@ void mm_trace_rss_stat(struct mm_struct *mm, int member)
->  {
->         trace_rss_stat(mm, member);
->  }
-> +EXPORT_SYMBOL(mm_trace_rss_stat);
-> 
->  /*
->   * Note: this doesn't free the actual pages themselves. That
-> diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-> index a7e926af4255..e4f268bf9ce2 100644
-> --- a/virt/kvm/guest_mem.c
-> +++ b/virt/kvm/guest_mem.c
-> @@ -91,6 +91,10 @@ static struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index)
->                         clear_highpage(folio_page(folio, i));
->         }
-> 
-> +       /* Account only once for the first time */
-> +       if (!folio_test_dirty(folio))
-> +               add_mm_counter(current->mm, MM_FILEPAGES, folio_nr_pages(folio));
-
-I think this alone would cause "Bad rss-counter" messages when the process
-exits, because there's no corresponding decrement when page tables are torn
-down. We would probably have to instantiate the page tables (i.e. with
-PROT_NONE so userspace can't really do accesses through them) for this to
-work properly.
-
-So then it wouldn't technically be "unmapped private memory" anymore, but
-effectively still would be. Maybe there would be more benefits, like the
-mbind() working. But where would the PROT_NONE page tables be instantiated
-if there's no page fault? During the ioctl? And is perhaps too much (CPU)
-work for little benefit? Maybe, but we could say it makes things simpler and
-can be optimized later?
-
-Anyway IMHO it would be really great if the memory usage was attributable
-the usual way without new IOCTLs or something. Each time some memory appears
-"unaccounted" somewhere, it causes confusion.
-
-> +
->         folio_mark_accessed(folio);
->         folio_mark_dirty(folio);
->         folio_mark_uptodate(folio);
-> 
-> We can update the rss_stat appropriately to get correct reporting in userspace.
-> 
->>>   Accounting of the memory happens in the host page fault handler path,
->>>   but for private guest pages we will never hit that.
->>>
->>> * NUMA allocation does use the process mempolicy for appropriate node 
->>>   allocation (Node2 and Node3), but they again do not get attributed to 
->>>   the QEMU process
->>>
->>>   Every 1.0s: sudo numastat  -m -p qemu-system-x86 | egrep -i "qemu|PID|Node|Filepage"   gomati: Mon Jul 24 11:51:34 2023
->>>
->>>   Per-node process memory usage (in MBs)
->>>   PID                               Node 0          Node 1          Node 2          Node 3           Total
->>>   242179 (qemu-system-x86)           21.14            1.61           39.44           39.38          101.57
->>>
->>>   Per-node system memory usage (in MBs):
->>>                             Node 0          Node 1          Node 2          Node 3           Total
->>>   FilePages                2475.63         2395.83        23999.46        23373.22        52244.14
->>>
->>>
->>> * Most of the memory accounting relies on the VMAs and as private-fd of 
->>>   gmem doesn't have a VMA(and that was the design goal), user-space fails 
->>>   to attribute the memory appropriately to the process.
->>>
->>>   /proc/<qemu pid>/numa_maps
->>>   7f528be00000 interleave:2-3 file=/memfd:memory-backend-memfd-shared\040(deleted) anon=1070 dirty=1070 mapped=1987 mapmax=256 active=1956 N2=582 N3=1405 kernelpagesize_kB=4
->>>   7f5c90200000 interleave:2-3 file=/memfd:rom-backend-memfd-shared\040(deleted)
->>>   7f5c90400000 interleave:2-3 file=/memfd:rom-backend-memfd-shared\040(deleted) dirty=32 active=0 N2=32 kernelpagesize_kB=4
->>>   7f5c90800000 interleave:2-3 file=/memfd:rom-backend-memfd-shared\040(deleted) dirty=892 active=0 N2=512 N3=380 kernelpagesize_kB=4
->>>
->>>   /proc/<qemu pid>/smaps
->>>   7f528be00000-7f5c8be00000 rw-p 00000000 00:01 26629                      /memfd:memory-backend-memfd-shared (deleted)
->>>   7f5c90200000-7f5c90220000 rw-s 00000000 00:01 44033                      /memfd:rom-backend-memfd-shared (deleted)
->>>   7f5c90400000-7f5c90420000 rw-s 00000000 00:01 44032                      /memfd:rom-backend-memfd-shared (deleted)
->>>   7f5c90800000-7f5c90b7c000 rw-s 00000000 00:01 1025                       /memfd:rom-backend-memfd-shared (deleted)
->> 
->> This is all expected, and IMO correct.  There are no userspace mappings, and so
->> not accounting anything is working as intended.
-> Doesn't sound that correct, if 10 SNP guests are running each using 10GB, how would we know who is using 100GB of memory?
-> 
->> 
->>> * QEMU based NUMA bindings will not work. Memory backend uses mbind() 
->>>   to set the policy for a particular virtual memory range but gmem 
->>>   private-FD does not have a virtual memory range visible in the host.
->> 
->> Yes, adding a generic fbind() is the way to solve silve.
-> 
-> Regards,
-> Nikunj
-> 
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgTWF5ZGVsbCBb
+bWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCj4gU2VudDogMjcgSnVseSAyMDIzIDE2
+OjQzDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
+LnRob2RpQGh1YXdlaS5jb20+DQo+IENjOiBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtYXJt
+QG5vbmdudS5vcmc7IHJpY2Fya29sQGdvb2dsZS5jb207DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7
+IEpvbmF0aGFuIENhbWVyb24gPGpvbmF0aGFuLmNhbWVyb25AaHVhd2VpLmNvbT47DQo+IExpbnV4
+YXJtIDxsaW51eGFybUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSF0gYXJt
+L2t2bTogRW5hYmxlIHN1cHBvcnQgZm9yDQo+IEtWTV9DQVBfQVJNX0VBR0VSX1NQTElUX0NIVU5L
+X1NJWkUNCj4gDQo+IE9uIFR1ZSwgMjUgSnVsIDIwMjMgYXQgMTY6MDEsIFNoYW1lZXIgS29sb3Ro
+dW0NCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4gd3JvdGU6DQo+ID4N
+Cj4gPiBOb3cgdGhhdCB3ZSBoYXZlIEVhZ2VyIFBhZ2UgU3BsaXQgc3VwcG9ydCBhZGRlZCBmb3Ig
+QVJNIGluIHRoZSBrZXJuZWxbMF0sDQo+ID4gZW5hYmxlIGl0IGluIFFlbXUuIFRoaXMgYWRkcywN
+Cj4gPiAgLWVhZ2VyLXNwbGl0LXNpemUgdG8gUWVtdSBvcHRpb25zIHRvIHNldCB0aGUgZWFnZXIg
+cGFnZSBzcGxpdCBjaHVuayBzaXplLg0KPiA+ICAtZW5hYmxlIEtWTV9DQVBfQVJNX0VBR0VSX1NQ
+TElUX0NIVU5LX1NJWkUuDQo+IA0KPiBJdCBsb29rcyBmcm9tIHRoZSBjb2RlIGxpa2UgeW91J3Zl
+IGFkZGVkIGEgbmV3IHN1Yi1vcHRpb24NCj4gdG8gLWFjY2VsLCBub3QgYSBuZXcgZ2xvYmFsIG9w
+dGlvbi4gVGhpcyBpcyB0aGUgcmlnaHQgdGhpbmcsDQo+IGJ1dCB5b3VyIGNvbW1pdCBtZXNzYWdl
+IHNob3VsZCBkb2N1bWVudCB0aGUgYWN0dWFsIG9wdGlvbiBzeW50YXgNCj4gdG8gYXZvaWQgY29u
+ZnVzaW9uLg0KDQpPay4gV2lsbCB1cGRhdGUgdGhlIGNvbW1pdCBtZXNzYWdlLg0KDQo+ID4gVGhl
+IGNodW5rIHNpemUgc3BlY2lmaWVzIGhvdyBtYW55IHBhZ2VzIHRvIGJyZWFrIGF0IGEgdGltZSwg
+dXNpbmcgYQ0KPiA+IHNpbmdsZSBhbGxvY2F0aW9uLiBCaWdnZXIgdGhlIGNodW5rIHNpemUsIG1v
+cmUgcGFnZXMgbmVlZCB0byBiZQ0KPiA+IGFsbG9jYXRlZCBhaGVhZCBvZiB0aW1lLg0KPiA+DQo+
+ID4gTm90ZXM6DQo+ID4gIC0gSSBhbSBub3Qgc3VyZSB3aGV0aGVyIHdlIG5lZWQgdG8gY2FsbCBr
+dm1fdm1fY2hlY2tfZXh0ZW5zaW9uKCkgZm9yDQo+ID4gICAgS1ZNX0NBUF9BUk1fRUFHRVJfU1BM
+SVRfQ0hVTktfU0laRSBvciBub3QgYXMga2VybmVsIHNlZW1zIHRvDQo+IGRpc2FibGUNCj4gPiAg
+ICBlYWdlciBwYWdlIHNpemUgYnkgZGVmYXVsdCBhbmQgaXQgd2lsbCByZXR1cm4gemVybyBhbHdh
+eXMuDQo+ID4NCj4gPiAgIC1Ub0RvOiBVcGRhdGUgcWVtdS1vcHRpb25zLmh4DQo+ID4NCj4gPiBb
+MF06DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC8xNjg0MjYxMTE0NzcuMzE5MzEzMy4x
+MDc0ODEwNjE5OTg0Mzc4MDkzDQo+IDAuYjQtdHlAbGludXguZGV2Lw0KPiANCj4gU3BlYWtpbmcg
+b2YgY29uZnVzaW9uLCB0aGlzIG1lc3NhZ2Ugc2F5cyAiSXQncyBhbiBvcHRpbWl6YXRpb24gdXNl
+ZA0KPiBpbiBHb29nbGUgQ2xvdWQgc2luY2UgMjAxNiBvbiB4ODYsIGFuZCBmb3IgdGhlIGxhc3Qg
+Y291cGxlIG9mIG1vbnRocw0KPiBvbiBBUk0uIiBzbyBJJ20gbm90IHN1cmUgd2h5IHdlJ3ZlIGVu
+ZGVkIHVwIHdpdGggYW4gQXJtLXNwZWNpZmljDQo+IEtWTV9DQVAgYW5kIGNvZGUgaW4gdGFyZ2V0
+L2FybS9rdm0uYyByYXRoZXIgdGhhbiBzb21ldGhpbmcgbW9yZQ0KPiBnZW5lcmljID8NCj4gDQo+
+IElmIHRoaXMgaXMgZ29pbmcgdG8gYXJyaXZlIGZvciBvdGhlciBhcmNoaXRlY3R1cmVzIGluIHRo
+ZSBmdXR1cmUNCj4gd2Ugc2hvdWxkIHByb2JhYmx5IHRoaW5rIGFib3V0IHdoZXRoZXIgc29tZSBv
+ZiB0aGlzIGNvZGUgc2hvdWxkDQo+IGJlIGdlbmVyaWMsIG5vdCBhcm0tc3BlY2lmaWMuDQo+IA0K
+PiBBbHNvIHRoaXMgc2VlbXMgdG8gYmUgYW4gb2JzY3VyZSB0dW5pbmcgcGFyYW1ldGVyIC0tIGl0
+IGNvdWxkDQo+IHVzZSBnb29kIGRvY3VtZW50YXRpb24gc28gdXNlcnMgaGF2ZSBzb21lIGlkZWEg
+d2hlbiBpdCBjYW4gaGVscC4NCj4gDQo+IEFzIGEgbW9yZSBzcGVjaWZpYyBjYXNlIG9mIHRoYXQ6
+IHRoZSBrZXJuZWwgcGF0Y2hzZXQgc2F5cyBpdA0KPiBtYWtlcyBBcm0gZG8gdGhlIHNhbWUgdGhp
+bmcgdGhhdCB4ODYgYWxyZWFkeSBkb2VzLCBhbmQgc3BsaXQNCj4gdGhlIGh1Z2UgcGFnZXMgYXV0
+b21hdGljYWxseSBiYXNlZCBvbiB1c2Ugb2YgdGhlIGRpcnR5IGxvZy4NCj4gSWYgdGhlIGtlcm5l
+bCBjYW4gZG8gdGhpcyBhdXRvbWF0aWNhbGx5IGFuZCB3ZSBuZXZlciBmZWx0DQo+IHRoZSBuZWVk
+IHRvIHByb3ZpZGUgYSBtYW51YWwgdHVuaW5nIGtub2IgZm9yIHg4NiwgZG8gd2UgZXZlbg0KPiBu
+ZWVkIHRvIGV4cG9zZSB0aGUgQXJtIG1hbnVhbCBjb250cm9sIHZpYSBRRU1VPw0KDQpGcm9tIHRo
+ZSBoaXN0b3J5IG9mIHRoZSBhYm92ZSBzZXJpZXMsIGl0IGxvb2tzIGxpa2UsIHRoZSBtYWluIGFy
+Z3VtZW50DQpmb3IgbWFraW5nIHRoaXMgYSB1c2VyIGFkanVzdGFibGUga25vYiBmb3IgQVJNIGlz
+IGJlY2F1c2Ugb2YgdGhlIHVwZnJvbnQNCmV4dHJhIG1lbW9yeSBhbGxvY2F0aW9ucyByZXF1aXJl
+ZCBpbiBrZXJuZWwgYXNzb2NpYXRlZCB3aXRoIHNwbGl0dGluZyB0aGUNCmJsb2NrIHBhZ2UuIA0K
+DQpodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm1hcm0vODZ2OGt0a3FmeC53bC1tYXpAa2VybmVs
+Lm9yZy8NCg0KaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtYXJtLzg2aDZ3NzB6aGMud2wtbWF6
+QGtlcm5lbC5vcmcvDQoNCkFuZCB0aGUga25vYiBmb3IgeDg2IGNhc2UgaXMgYSBrdm0gbW9kdWxl
+X3BhcmFtKGVhZ2VyX3BhZ2Vfc3BsaXQpLg0KTm90IGNsZWFyIHRvIG1lIHdoeSB4ODYgb3B0ZWQg
+Zm9yIGEgbW9kdWxlX3BhcmFtIHBlciBLVk0gYnV0IG5vdA0KcGVyIFZNIHVzZXIgc3BhY2Ugb25l
+LiBUaGUgZGlzY3Vzc2lvbiBjYW4gYmUgZm91bmQgaGVyZSwNCmh0dHBzOi8vbG9yZS5rZXJuZWwu
+b3JnL2t2bS9ZYURybU5Wc1hTTVhSNzJaQHh6LW0xLmxvY2FsLyN0DQoNCg0KPiBPdGhlciB0aGFu
+IHRoYXQsIEkgaGF2ZSBhIGZldyBtaW5vciBjb2RpbmcgdGhpbmdzIGJlbG93Lg0KPiANCj4gPiAr
+c3RhdGljIGJvb2wga3ZtX2FybV9lYWdlcl9zcGxpdF9zaXplX3ZhbGlkKHVpbnQ2NF90IHJlcV9z
+aXplLCB1aW50MzJfdA0KPiBzaXplcykNCj4gPiArew0KPiA+ICsgICAgaW50IGk7DQo+ID4gKw0K
+PiA+ICsgICAgZm9yIChpID0gMDsgaSA8IHNpemVvZih1aW50MzJfdCkgKiBCSVRTX1BFUl9CWVRF
+OyBpKyspIHsNCj4gPiArICAgICAgICBpZiAoIShzaXplcyAmICgxIDw8IGkpKSkgew0KPiA+ICsg
+ICAgICAgICAgICBjb250aW51ZTsNCj4gPiArICAgICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAg
+IGlmIChyZXFfc2l6ZSA9PSAoMSA8PCBpKSkgew0KPiA+ICsgICAgICAgICAgICByZXR1cm4gdHJ1
+ZTsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+IA0KPiBXZSBrbm93IHJlcV9zaXplIGlz
+IGEgcG93ZXIgb2YgMiBoZXJlLCBzbyBpZiB5b3UgYWxzbyBleHBsaWNpdGx5DQo+IHJ1bGUgb3V0
+IDAgdGhlbiB5b3UgY2FuIGRvDQo+ICAgICAgcmV0dXJuIHNpemVzICYgKDEgPDwgY3R6NjQocmVx
+X3NpemUpKTsNCj4gcmF0aGVyIHRoYW4gaGF2aW5nIHRvIGxvb3AgdGhyb3VnaC4gKE5lZWQgdG8g
+cnVsZSBvdXQgMA0KPiBiZWNhdXNlIG90aGVyd2lzZSBjdHo2NCgpIHJldHVybnMgNjQgYW5kIHRo
+ZSBzaGlmdCBpcyBVQi4pDQoNClllcywgbWlzc2VkIHRoYXQgd2UgYWxyZWFkeSBoYW5kbGVkIHRo
+ZSAhPSBwb3dlciBvZiAyIGNhc2UuDQpXaWxsIHVwZGF0ZSBhcyBwZXIgeW91ciBuZXh0IGNvbW1l
+bnQgb24gdGhpcyBwYXRjaC4gVGhhdA0KaXMgbXVjaCBzaW1wbGVyLiBUaGFua3MuDQoNCj4gDQo+
+ID4gKw0KPiA+ICsgICAgcmV0dXJuIGZhbHNlOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICBpbnQga3Zt
+X2FyY2hfaW5pdChNYWNoaW5lU3RhdGUgKm1zLCBLVk1TdGF0ZSAqcykNCj4gPiAgew0KPiA+ICAg
+ICAgaW50IHJldCA9IDA7DQo+ID4gQEAgLTI4MCw2ICsyOTgsMjEgQEAgaW50IGt2bV9hcmNoX2lu
+aXQoTWFjaGluZVN0YXRlICptcywgS1ZNU3RhdGUNCj4gKnMpDQo+ID4gICAgICAgICAgfQ0KPiA+
+ICAgICAgfQ0KPiA+DQo+ID4gKyAgICBpZiAocy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemUpIHsNCj4g
+PiArICAgICAgICB1aW50MzJfdCBzaXplczsNCj4gPiArDQo+ID4gKyAgICAgICAgc2l6ZXMgPSBr
+dm1fdm1fY2hlY2tfZXh0ZW5zaW9uKHMsDQo+IEtWTV9DQVBfQVJNX1NVUFBPUlRFRF9CTE9DS19T
+SVpFUyk7DQo+ID4gKyAgICAgICAgaWYgKCFzaXplcykgew0KPiA+ICsgICAgICAgICAgICBlcnJv
+cl9yZXBvcnQoIkVhZ2VyIFBhZ2UgU3BsaXQgbm90IHN1cHBvcnRlZCBvbiBob3N0Iik7DQo+ID4g
+KyAgICAgICAgfSBlbHNlIGlmDQo+ICgha3ZtX2FybV9lYWdlcl9zcGxpdF9zaXplX3ZhbGlkKHMt
+Pmt2bV9lYWdlcl9zcGxpdF9zaXplLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBzaXplcykpIHsNCj4gPiArICAgICAgICAgICAgZXJyb3Jf
+cmVwb3J0KCJFYWdlciBQYWdlIFNwbGl0IHJlcXVlc3RlZCBjaHVuayBzaXplIG5vdA0KPiB2YWxp
+ZCIpOw0KPiA+ICsgICAgICAgIH0gZWxzZSBpZiAoa3ZtX3ZtX2VuYWJsZV9jYXAocywNCj4gS1ZN
+X0NBUF9BUk1fRUFHRVJfU1BMSVRfQ0hVTktfU0laRSwgMCwNCj4gPiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHMtPmt2bV9lYWdlcl9zcGxpdF9zaXplKSkgew0KPiA+ICsg
+ICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkZhaWxlZCB0byBzZXQgRWFnZXIgUGFnZSBTcGxpdCBj
+aHVuayBzaXplIik7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAgICAg
+IGt2bV9hcm1faW5pdF9kZWJ1ZyhzKTsNCj4gPg0KPiA+ICAgICAgcmV0dXJuIHJldDsNCj4gPiBA
+QCAtMTA2Miw2ICsxMDk1LDQ2IEBAIGJvb2wNCj4ga3ZtX2FyY2hfY3B1X2NoZWNrX2FyZV9yZXNl
+dHRhYmxlKHZvaWQpDQo+ID4gICAgICByZXR1cm4gdHJ1ZTsNCj4gPiAgfQ0KPiA+DQo+ID4gK3N0
+YXRpYyB2b2lkIGt2bV9hcmNoX2dldF9lYWdlcl9zcGxpdF9zaXplKE9iamVjdCAqb2JqLCBWaXNp
+dG9yICp2LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBj
+b25zdCBjaGFyICpuYW1lLCB2b2lkDQo+ICpvcGFxdWUsDQo+ID4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gPiArew0KPiA+ICsgICAg
+S1ZNU3RhdGUgKnMgPSBLVk1fU1RBVEUob2JqKTsNCj4gPiArICAgIHVpbnQ2NF90IHZhbHVlID0g
+cy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemU7DQo+ID4gKw0KPiA+ICsgICAgdmlzaXRfdHlwZV9zaXpl
+KHYsIG5hbWUsICZ2YWx1ZSwgZXJycCk7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyB2b2lk
+IGt2bV9hcmNoX3NldF9lYWdlcl9zcGxpdF9zaXplKE9iamVjdCAqb2JqLCBWaXNpdG9yICp2LA0K
+PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdCBjaGFy
+ICpuYW1lLCB2b2lkDQo+ICpvcGFxdWUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkNCj4gPiArew0KPiA+ICsgICAgS1ZNU3RhdGUg
+KnMgPSBLVk1fU1RBVEUob2JqKTsNCj4gPiArICAgIHVpbnQ2NF90IHZhbHVlOw0KPiA+ICsNCj4g
+PiArICAgIGlmIChzLT5mZCAhPSAtMSkgew0KPiA+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwg
+IkNhbm5vdCBzZXQgcHJvcGVydGllcyBhZnRlciB0aGUgYWNjZWxlcmF0b3IgaGFzDQo+IGJlZW4g
+aW5pdGlhbGl6ZWQiKTsNCj4gPiArICAgICAgICByZXR1cm47DQo+ID4gKyAgICB9DQo+ID4gKw0K
+PiA+ICsgICAgaWYgKCF2aXNpdF90eXBlX3NpemUodiwgbmFtZSwgJnZhbHVlLCBlcnJwKSkgew0K
+PiA+ICsgICAgICAgIHJldHVybjsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBpZiAodmFs
+dWUgJiAodmFsdWUgLSAxKSkgew0KPiANCj4gImlmICghaXNfcG93ZXJfb2ZfMih2YWx1ZSkpIiBp
+cyBhIGNsZWFyZXIgd2F5IHRvIHdyaXRlIHRoaXMuDQoNCk9rLiBXaWxsIHVwZGF0ZSBpbiBuZXh0
+Lg0KDQpUaGFua3MgZm9yIHRha2luZyBhIGxvb2sgYW5kIHNvcnJ5IGZvciBsYXRlIHJlcGx5LCB3
+YXMgYXdheS4NCg0KU2hhbWVlcg0KDQo+IA0KPiA+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwg
+ImVhcmx5LXNwbGl0LXNpemUgbXVzdCBiZSBhIHBvd2VyIG9mIHR3by4iKTsNCj4gPiArICAgICAg
+ICByZXR1cm47DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcy0+a3ZtX2VhZ2VyX3NwbGl0
+X3NpemUgPSB2YWx1ZTsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgdm9pZCBrdm1fYXJjaF9hY2NlbF9j
+bGFzc19pbml0KE9iamVjdENsYXNzICpvYykNCj4gPiAgew0KPiA+ICsgICAgb2JqZWN0X2NsYXNz
+X3Byb3BlcnR5X2FkZChvYywgImVhZ2VyLXNwbGl0LXNpemUiLCAic2l6ZSIsDQo+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9hcmNoX2dldF9lYWdlcl9zcGxpdF9zaXplLA0K
+PiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBrdm1fYXJjaF9zZXRfZWFnZXJfc3Bs
+aXRfc2l6ZSwgTlVMTCwNCj4gTlVMTCk7DQo+ID4gKw0KPiA+ICsgICAgb2JqZWN0X2NsYXNzX3By
+b3BlcnR5X3NldF9kZXNjcmlwdGlvbihvYywgImVhZ2VyLXNwbGl0LXNpemUiLA0KPiA+ICsgICAg
+ICAgICJDb25maWd1cmUgRWFnZXIgUGFnZSBTcGxpdCBjaHVuayBzaXplIGZvciBodWdlcGFnZXMu
+IChkZWZhdWx0OiAwLA0KPiBkaXNhYmxlZCkiKTsNCj4gPiAgfQ0KPiA+IC0tDQo+IA0KPiB0aGFu
+a3MNCj4gLS0gUE1NDQo=
