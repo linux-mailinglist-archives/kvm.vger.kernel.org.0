@@ -2,67 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6709B76ECB0
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:35:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3400076ECB8
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 16:36:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236778AbjHCOfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 10:35:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44076 "EHLO
+        id S234450AbjHCOgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 10:36:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236741AbjHCOem (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 10:34:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381932102
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:32:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691073158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hi/J18RARw6/Qxc4oFoZIMtkW25pVX+KOdV/ft2I3Ss=;
-        b=SO+DRJ1na5XCvViLkGW5SXh8mKHt8mMlGaC8eA12GNgjr9UJhgtXLh3PurOrTl+42kKV2e
-        2UQ3a1GZ3QQDHE/rPzgiw250jHTemioFOawcLyQmb4xTY4sgnd3KKCvpTHB/uAS/+i3f6+
-        7Jbex8rlCn3DirVqiDyPjDRLL7Gr2l8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-650-PGKiOyclP_iO75_O7B9M2w-1; Thu, 03 Aug 2023 10:32:36 -0400
-X-MC-Unique: PGKiOyclP_iO75_O7B9M2w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 686CE8DC664;
-        Thu,  3 Aug 2023 14:32:35 +0000 (UTC)
-Received: from t14s.fritz.box (unknown [10.39.193.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5569C201EE6E;
-        Thu,  3 Aug 2023 14:32:32 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        liubo <liubo254@huawei.com>, Peter Xu <peterx@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 7/7] selftest/mm: ksm_functional_tests: Add PROT_NONE test
-Date:   Thu,  3 Aug 2023 16:32:08 +0200
-Message-ID: <20230803143208.383663-8-david@redhat.com>
-In-Reply-To: <20230803143208.383663-1-david@redhat.com>
-References: <20230803143208.383663-1-david@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+        with ESMTP id S233558AbjHCOf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 10:35:59 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B634C3E
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 07:35:01 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-584126c65d1so11390587b3.3
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 07:35:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691073292; x=1691678092;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HeVObJQnYDsmrxbFy3UKyOXJ/04Tm/UrYLmx2eoTf0=;
+        b=mY+VlJDI/9R96lHrF/byfI80tHJ1s5Gus55V305s7E4SAg0rPoHWmnYIjWZxnR96Qg
+         wNgVWy+nar1i5fCgkhUIxyuPYnwULI/CDGcui4W4frLoCo2Xs6Mvmh4O93VXwINaG4MD
+         aLQSjEgY5Sr++uwder4uv1U1zr+RE/TZw70suJBkPoAxfERYGUAh65xpMXXf1VC4L6YR
+         QI1yBioovUHQV314pZya8DbV6ot00JQTOHznRjjB0MHBwoe648gepwgyrhx6yF+obTXg
+         4b5zV85RlYKVZAVdlQIMyXxU5SyIvwC4aueFb8qZtbmEWd++S6ziiWUINJuLfm1ROpFm
+         9WQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691073292; x=1691678092;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/HeVObJQnYDsmrxbFy3UKyOXJ/04Tm/UrYLmx2eoTf0=;
+        b=Z2+RKSO+W5ArUssNOyh11zcZb8KrSBCkUb8/JvNGT1wL8G/eBYjvhGo4SNvlm89K0C
+         OuzVtXAoc4X7WzI/3lo0Oj+SJj6ij75qFYDOGVVGBfrTgIZa7+kfpmdnOM2jSntMo9h7
+         rC8wkfvCoP3kF8+6zJZlPsJEDUvbiZwnHVGdqNk3XFvj90tS7il/DyDeZ+e97z/05JEU
+         joVlBLqRCBnE2aBT6o1ozSoiMr0AQwRj8EPVDZOaLGKYRBjHcLUos8ChHdeG4ivg6N47
+         UI1Oz/flVspBARoquxwL4EKrnMVxm0WTR6B2rfS9QF7++mSuG46Z4l18F1rB+vgWJsqL
+         iEqA==
+X-Gm-Message-State: ABy/qLaQVBjX5rsPQnEa72MWOLFh+JHGJdbtCaO+AfTJ680IuKpoQDGa
+        B8ugGDr+gXtChU6xd9EesyPG3c7vhjA=
+X-Google-Smtp-Source: APBJJlFFzKkAdKTRoLZ2bhoaeb1cJvVOWKX7WmBJwxFpjymL5GMdod+dfzaL5IdKDJfMFpNHYNav47SkUAk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:37d8:0:b0:c64:2bcd:a451 with SMTP id
+ e207-20020a2537d8000000b00c642bcda451mr133323yba.7.1691073291936; Thu, 03 Aug
+ 2023 07:34:51 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 14:34:50 +0000
+In-Reply-To: <ZMto2Yza4rd2JdXf@iZuf6hx7901barev1c282cZ>
+Mime-Version: 1.0
+References: <ZMfFaF2M6Vrh/QdW@google.com> <4ebb3e20-a043-8ad3-ef6c-f64c2443412c@amd.com>
+ <544b7f95-4b34-654d-a57b-3791a6f4fd5f@mail.ustc.edu.cn> <ZMpEUVsv5hSmrcH8@iZuf6hx7901barev1c282cZ>
+ <ZMphvF+0H9wHQr5B@google.com> <bbc52f40-2661-3fa2-8e09-bec772728812@amd.com>
+ <7a4f3f59-1482-49c4-92b2-aa621e9b06b3@amd.com> <bdf548d1-84cb-6885-c4eb-cbb16c4a3e3b@amd.com>
+ <ZMsekJG8PF0f4sCp@iZuf6hx7901barev1c282cZ> <ZMto2Yza4rd2JdXf@iZuf6hx7901barev1c282cZ>
+Message-ID: <ZMu7Cl6im9JwjHIQ@google.com>
+Subject: Re: [Question] int3 instruction generates a #UD in SEV VM
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,165 +72,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's test whether merging and unmerging in PROT_NONE areas works as
-expected.
+On Thu, Aug 03, 2023, Wu Zongyo wrote:
+> On Thu, Aug 03, 2023 at 11:27:12AM +0800, Wu Zongyo wrote:
+> > > > > 
+> > > > > I'm guessing it was a #NPF, too. Could it be related to the changes that
+> > > > > went in around svm_update_soft_interrupt_rip()?
+> > Yes, it's a #NPF with exit code 0x400.
+> > 
+> > There must be something I didn't handle corretly since it behave normally with
+> > qemu & ovmf If I don't add int3 before mcheck_cpu_init().
+> > 
+> > So it'a about memory, is there something I need to pay special attention
+> > to?
+> > 
+> > Thanks
+> I check the fault address of #NPF, and it is the IDT entry address of
+> the guest kernel. The NPT page table is not constructed for the IDT
+> entry and the #NPF is generated when guest try to access IDT.
+> 
+> With qemu & ovmf, I didn't see the #NPF when guest invoke the int3
+> handler. That means the NPT page table has already been constructed, but
+> when?
 
-Pass a page protection to mmap_and_merge_range(), which will trigger
-an mprotect() after writing to the pages, but before enabling merging.
+More than likely, the page was used by the guest at some point earlier in boot.
+Why the page is faulted in for certain setups but not others isn't really all
+that interesting in terms of fixing the KVM bug, both guest behaviors are completely
+normal and should work.
 
-Make sure that unsharing works as expected, by performing a ptrace write
-(using /proc/self/mem) and by setting MADV_UNMERGEABLE.
+Can you try this patch I suggested earlier?  If this fixes the problem, I'll post
+a formal patch.
 
-Note that this implicitly tests that ptrace writes in an inaccessible
-(PROT_NONE) mapping work as expected.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d381ad424554..2eace114a934 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -385,6 +385,9 @@ static int __svm_skip_emulated_instruction(struct kvm_vcpu *vcpu,
+        }
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- .../selftests/mm/ksm_functional_tests.c       | 59 ++++++++++++++++---
- 1 file changed, 52 insertions(+), 7 deletions(-)
-
-diff --git a/tools/testing/selftests/mm/ksm_functional_tests.c b/tools/testing/selftests/mm/ksm_functional_tests.c
-index cb63b600cb4f..8fa4889ab4f3 100644
---- a/tools/testing/selftests/mm/ksm_functional_tests.c
-+++ b/tools/testing/selftests/mm/ksm_functional_tests.c
-@@ -27,6 +27,7 @@
- #define KiB 1024u
- #define MiB (1024 * KiB)
- 
-+static int mem_fd;
- static int ksm_fd;
- static int ksm_full_scans_fd;
- static int proc_self_ksm_stat_fd;
-@@ -144,7 +145,8 @@ static int ksm_unmerge(void)
- 	return 0;
- }
- 
--static char *mmap_and_merge_range(char val, unsigned long size, bool use_prctl)
-+static char *mmap_and_merge_range(char val, unsigned long size, int prot,
-+				  bool use_prctl)
- {
- 	char *map;
- 	int ret;
-@@ -176,6 +178,11 @@ static char *mmap_and_merge_range(char val, unsigned long size, bool use_prctl)
- 	/* Make sure each page contains the same values to merge them. */
- 	memset(map, val, size);
- 
-+	if (mprotect(map, size, prot)) {
-+		ksft_test_result_skip("mprotect() failed\n");
-+		goto unmap;
-+	}
+        if (!svm->next_rip) {
++               if (sev_guest(vcpu->kvm))
++                       return 0;
 +
- 	if (use_prctl) {
- 		ret = prctl(PR_SET_MEMORY_MERGE, 1, 0, 0, 0);
- 		if (ret < 0 && errno == EINVAL) {
-@@ -218,7 +225,7 @@ static void test_unmerge(void)
- 
- 	ksft_print_msg("[RUN] %s\n", __func__);
- 
--	map = mmap_and_merge_range(0xcf, size, false);
-+	map = mmap_and_merge_range(0xcf, size, PROT_READ | PROT_WRITE, false);
- 	if (map == MAP_FAILED)
- 		return;
- 
-@@ -256,7 +263,7 @@ static void test_unmerge_zero_pages(void)
- 	}
- 
- 	/* Let KSM deduplicate zero pages. */
--	map = mmap_and_merge_range(0x00, size, false);
-+	map = mmap_and_merge_range(0x00, size, PROT_READ | PROT_WRITE, false);
- 	if (map == MAP_FAILED)
- 		return;
- 
-@@ -304,7 +311,7 @@ static void test_unmerge_discarded(void)
- 
- 	ksft_print_msg("[RUN] %s\n", __func__);
- 
--	map = mmap_and_merge_range(0xcf, size, false);
-+	map = mmap_and_merge_range(0xcf, size, PROT_READ | PROT_WRITE, false);
- 	if (map == MAP_FAILED)
- 		return;
- 
-@@ -336,7 +343,7 @@ static void test_unmerge_uffd_wp(void)
- 
- 	ksft_print_msg("[RUN] %s\n", __func__);
- 
--	map = mmap_and_merge_range(0xcf, size, false);
-+	map = mmap_and_merge_range(0xcf, size, PROT_READ | PROT_WRITE, false);
- 	if (map == MAP_FAILED)
- 		return;
- 
-@@ -479,7 +486,7 @@ static void test_prctl_unmerge(void)
- 
- 	ksft_print_msg("[RUN] %s\n", __func__);
- 
--	map = mmap_and_merge_range(0xcf, size, true);
-+	map = mmap_and_merge_range(0xcf, size, PROT_READ | PROT_WRITE, true);
- 	if (map == MAP_FAILED)
- 		return;
- 
-@@ -494,9 +501,42 @@ static void test_prctl_unmerge(void)
- 	munmap(map, size);
- }
- 
-+static void test_prot_none(void)
-+{
-+	const unsigned int size = 2 * MiB;
-+	char *map;
-+	int i;
-+
-+	ksft_print_msg("[RUN] %s\n", __func__);
-+
-+	map = mmap_and_merge_range(0x11, size, PROT_NONE, false);
-+	if (map == MAP_FAILED)
-+		goto unmap;
-+
-+	/* Store a unique value in each page on one half using ptrace */
-+	for (i = 0; i < size / 2; i += pagesize) {
-+		lseek(mem_fd, (uintptr_t) map + i, SEEK_SET);
-+		if (write(mem_fd, &i, sizeof(size)) != sizeof(size)) {
-+			ksft_test_result_fail("ptrace write failed\n");
-+			goto unmap;
-+		}
-+	}
-+
-+	/* Trigger unsharing on the other half. */
-+	if (madvise(map + size / 2, size / 2, MADV_UNMERGEABLE)) {
-+		ksft_test_result_fail("MADV_UNMERGEABLE failed\n");
-+		goto unmap;
-+	}
-+
-+	ksft_test_result(!range_maps_duplicates(map, size),
-+			 "Pages were unmerged\n");
-+unmap:
-+	munmap(map, size);
-+}
-+
- int main(int argc, char **argv)
- {
--	unsigned int tests = 6;
-+	unsigned int tests = 7;
- 	int err;
- 
- #ifdef __NR_userfaultfd
-@@ -508,6 +548,9 @@ int main(int argc, char **argv)
- 
- 	pagesize = getpagesize();
- 
-+	mem_fd = open("/proc/self/mem", O_RDWR);
-+	if (mem_fd < 0)
-+		ksft_exit_fail_msg("opening /proc/self/mem failed\n");
- 	ksm_fd = open("/sys/kernel/mm/ksm/run", O_RDWR);
- 	if (ksm_fd < 0)
- 		ksft_exit_skip("open(\"/sys/kernel/mm/ksm/run\") failed\n");
-@@ -529,6 +572,8 @@ int main(int argc, char **argv)
- 	test_unmerge_uffd_wp();
- #endif
- 
-+	test_prot_none();
-+
- 	test_prctl();
- 	test_prctl_fork();
- 	test_prctl_unmerge();
--- 
-2.41.0
+                if (unlikely(!commit_side_effects))
+                        old_rflags = svm->vmcb->save.rflags;
 
