@@ -2,66 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D063676DECE
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:16:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58B3A76DEDE
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:18:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232855AbjHCDP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 23:15:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47744 "EHLO
+        id S232836AbjHCDSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 23:18:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232836AbjHCDPy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 23:15:54 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23D562719;
-        Wed,  2 Aug 2023 20:15:47 -0700 (PDT)
-Received: from loongson.cn (unknown [10.40.46.158])
-        by gateway (Coremail) with SMTP id _____8BxXeviG8tkGG8PAA--.30739S3;
-        Thu, 03 Aug 2023 11:15:46 +0800 (CST)
-Received: from [192.168.124.126] (unknown [10.40.46.158])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxLCPgG8tkAZNGAA--.32394S3;
-        Thu, 03 Aug 2023 11:15:44 +0800 (CST)
-Subject: Re: [PATCH v1 0/4] selftests: kvm: Add LoongArch support
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vishal Annapurve <vannapurve@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
-        Peter Xu <peterx@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn
-References: <20230801020206.1957986-1-zhaotianrui@loongson.cn>
- <ZMqLKAWRapQjGgWR@google.com>
-From:   zhaotianrui <zhaotianrui@loongson.cn>
-Message-ID: <66eb2e6c-7d16-6fbf-7deb-f6d821b1cd8c@loongson.cn>
-Date:   Thu, 3 Aug 2023 11:14:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        with ESMTP id S232999AbjHCDR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 23:17:57 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7764EC3;
+        Wed,  2 Aug 2023 20:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691032676; x=1722568676;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ITxwVfuZT01y5Gp5DbNNV01Z7VFQOHZEB0FHXaK6+N8=;
+  b=I++uUxpRFQ+O61FO7/rfiQzCxW9VQdffBPriL9J4V2yiJFgI4XJPAKxM
+   b5izoPHlbNmg8yszihIOBZ+9juUeu3wUp+J7ZYGr7dPDoY9LOVXekfYJz
+   xLU/EZReKCN2UROPRLIFTeirh9MsXYK8za8vmTr5cAabct927UwKzALdD
+   oR/okDLwVFt+l6OdbOAUlpW9vezCNwmuiySoxSZ/ayDop5FPja4zQqJbC
+   TGxotghMd5XH5xdPoIkcrkuL3vKMIGEJqL2zk5EeuDkcYcKA1HSNSSLg2
+   LMwEk2ekVKjaZQK8fVCHYWZ8JAIhmLJWKMpx2p22C2IMaTWhrHsN3Q3O+
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="433597611"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="433597611"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:17:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="843387044"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="843387044"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.255.31.34]) ([10.255.31.34])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:17:50 -0700
+Message-ID: <f673c178-b52d-29cc-b337-0d0aa761f101@linux.intel.com>
+Date:   Thu, 3 Aug 2023 11:17:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <ZMqLKAWRapQjGgWR@google.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: Re: [PATCH v4 06/12] iommu/vt-d: Set the nested domain to a device
 Content-Language: en-US
-X-CM-TRANSID: AQAAf8CxLCPgG8tkAZNGAA--.32394S3
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7WF1kuw4fGF1Dtw4xCw48AFc_yoW8uw1rpa
-        9akF4FkFs7KF1IyF93J397Xr1Fya1kGr42v3WSqryUZw47try8Jr1xKFZ2kFy3u34kWr1F
-        vas7KwnxW3WUXagCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-        6r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-        02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAF
-        wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
-        CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-        67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
-        IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-        14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j1YL9U
-        UUUU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-7-yi.l.liu@intel.com>
+ <BN9PR11MB527652A8EB70FF1FEB0E74308C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB527652A8EB70FF1FEB0E74308C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,49 +86,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2023/8/2 15:22, Tian, Kevin wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Monday, July 24, 2023 7:13 PM
+>> +
+>> +static int intel_nested_attach_dev(struct iommu_domain *domain,
+>> +				   struct device *dev)
+>> +{
+>> +	struct device_domain_info *info = dev_iommu_priv_get(dev);
+>> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+>> +	struct intel_iommu *iommu = info->iommu;
+>> +	unsigned long flags;
+>> +	int ret = 0;
+>> +
+>> +	if (info->domain)
+>> +		device_block_translation(dev);
+>> +
+>> +	if (iommu->agaw < dmar_domain->s2_domain->agaw) {
+>> +		dev_err_ratelimited(dev, "Adjusted guest address width not
+>> compatible\n");
+>> +		return -ENODEV;
+>> +	}
+> 
+> this is the check duplicated with patch04.
 
-ÔÚ 2023/8/3 ÉÏÎç12:58, Sean Christopherson Ð´µÀ:
-> Please use "KVM: selftests:" for the scope.  There's no "official" requirement,
-> but I've been heavily pushing "KVM: selftests:" and no one has objected or
-> suggested an alternative, and I'd really like all of KVM selftests to use a
-> consistent scope.
-Thanks for your reviewing.
-I will replace all the "selftests: kvm:" with "KVM: selftests:".
->
-> On Tue, Aug 01, 2023, Tianrui Zhao wrote:
->> This patch series base on the Linux LoongArch KVM patch:
->> Based-on: <20230720062813.4126751-1-zhaotianrui@loongson.cn>
-> Is there an actual dependency?  I ask because I'm shepherding along a series[*]
-> that will silently conflict with the ucall support, and in a way with the Makefile
-> changes.
-Yes, this KVM selftests patch series actually depend on the previous 
-LoongArch KVM patches.
+Ack. No need for a check here.
 
-Thanks
-Tianrui Zhao
->
-> If there's no hard dependency, one option would be take this series through
-> kvm-x86/selftests (my topic branch for KVM selftests changes) along with the
-> guest printf series, e.g. so that we don't end up with a mess in linux-next and/or
-> come the 6.6 merge window.
->
-> https://lore.kernel.org/all/20230731203026.1192091-1-seanjc@google.com
->
->>   tools/testing/selftests/kvm/Makefile          |  11 +
->>   .../selftests/kvm/include/kvm_util_base.h     |   5 +
->>   .../kvm/include/loongarch/processor.h         |  28 ++
->>   .../selftests/kvm/include/loongarch/sysreg.h  |  89 +++++
->>   .../selftests/kvm/lib/loongarch/exception.S   |  27 ++
->>   .../selftests/kvm/lib/loongarch/processor.c   | 367 ++++++++++++++++++
->>   .../selftests/kvm/lib/loongarch/ucall.c       |  44 +++
->>   7 files changed, 571 insertions(+)
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
->>   create mode 100644 tools/testing/selftests/kvm/include/loongarch/sysreg.h
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
->>   create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+> 
+>> +
+>> +	ret = domain_attach_iommu(dmar_domain, iommu);
+>> +	if (ret) {
+>> +		dev_err_ratelimited(dev, "Failed to attach domain to
+>> iommu\n");
+>> +		return ret;
+>> +	}
+>> +
+> 
+> [...]
+> 
+>> +	domain_update_iommu_cap(dmar_domain);
+> 
+> iommu_cap is already updated in domain_attach_iommu().
+
+Ack. We will eventually remove this helper when every domain is
+allocated for a specific device.
+
 >>
->> -- 
->> 2.39.1
->>
+>>   static const struct iommu_domain_ops intel_nested_domain_ops = {
+>> +	.attach_dev		= intel_nested_attach_dev,
+>>   	.free			= intel_nested_domain_free,
+>> +	.enforce_cache_coherency = intel_iommu_enforce_cache_coherency,
+> 
+> this is not required. enforce_cache_coherency() will be called on parent
+> hwpt when it's being created. patch04 should check parent's force_snooping
+> to set pgsnp in the pasid entry.
+> 
+> As Jason explained it should be done only for kernel owned page table.
 
+Ack and thanks!
+
+Best regards,
+baolu
