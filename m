@@ -2,135 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C0076E205
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:39:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 538A276E238
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:58:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234192AbjHCHjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 03:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47200 "EHLO
+        id S233351AbjHCH55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 03:57:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231903AbjHCHhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 03:37:31 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AE13C21;
-        Thu,  3 Aug 2023 00:36:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691048190; x=1722584190;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=L0xn3LN+iLDuwnDfC10OXNIFwR0hNYvlK8cIufvM8+I=;
-  b=bMIpammyIwA2nQIhyueXNYbMwDutK/idp4VrBc7VS8I1plJlCLF2jezJ
-   aJ/ydf4tXqe9riQGjcKCFb3vSgL8vQ7f51YKGuh7rms5xz+SuEs/q672D
-   Rya2CxtnqZKC3SpHvxp5BhyYLbSNOh74bAcxmaQQe4k9ozfootN3O/kKD
-   Y8vl03tTkQjO2OYIokZAmfDC4fkix8R4ocTgD50Ur89OPYbPEm6PQdPP1
-   XUUkgtLA5i678axVPeUezgoBENKxuIp/Sdkrt7siTYqSJ/jphu43I0IiR
-   ED6uG9qq4tOXjfzD9EEKiAaQnqXdEt8DWtDSEroRfeLVNqsyNkym5Pyv2
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="368696070"
-X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="368696070"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:36:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="764494874"
-X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="764494874"
-Received: from zhaoyuan-mobl.ccr.corp.intel.com (HELO [10.254.213.243]) ([10.254.213.243])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:36:16 -0700
-Message-ID: <898e9680-3e5c-29d5-39d0-f9648165a2d6@linux.intel.com>
-Date:   Thu, 3 Aug 2023 15:36:13 +0800
+        with ESMTP id S229792AbjHCH5H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 03:57:07 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B67F93EB
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 00:44:53 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so3824430a12.0
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 00:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1691048689; x=1691653489;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CSSRhpwsXf70z+1rxlQ2+hkymtm2lwEBhyh07kPB2pk=;
+        b=hVshpXD1f4VzOD4XcxN3LbCb5HapivOPgFQ+ILU0E4alQRUTVmJwgTwVgUvmzBMszt
+         NDqQtPAZmoLrTkgoPimF8eEzhIDPdpAKz+2EKqLtmx7HB/j2CAUcEcg/+5rMoDpwE0nO
+         3eWEEAyYy1dNbtgfyBWfxn0dYcGaX5y2VC5pxwRD13Nkz2YIkx8/HrOFqbbgo1cDi1xv
+         RefAjQl5EQ0h6nMKJja2YklPKW0V8kuY+qiTMI5yn3SCwLsVjJpvexcAFsqNgXTVLnRH
+         QkGpbWuDmvFT02VSc55AQg68lHgTe2htKOM4EvvpIE/Tk4ZGfEhGvwHg19itDFbM26AX
+         qdMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691048689; x=1691653489;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CSSRhpwsXf70z+1rxlQ2+hkymtm2lwEBhyh07kPB2pk=;
+        b=kTigL6lc1++Sa10radlzIRVojEXPsrFH+K6iZm75NN1zxbkqEvqGId8dzTDT/4MuLR
+         7by4uLyqu69WDEOMg3kCZv6dcwPwZJLErFrxrlBg5PIlsFQKQcPazNQJhp8fo1qvIZoe
+         6/Blrs86f9VNt0MZKMvjhTJ+464VSFzmAFUqzD5EBqXH4mQE99tDKDx4KNrajPRv67QM
+         Z/bJxNnylKeemQy/fQPfW7OGi3iOKwBLYgocHM+23/1uZJx3mkSx0q3uEWN0Lysc4la5
+         eFHWIfBv4/an2hohfHpb5B3kdmBUxDurQVKEZosYPf1fzLq29x4mX66zn72HPqK59njq
+         qwUg==
+X-Gm-Message-State: ABy/qLY7Zl1beYzAVY1w3NuuUQdu92FcstmzJu+RL1u34UJyTIZuJGC5
+        aZ22wR4a555gAjfFiIjNrFExeA==
+X-Google-Smtp-Source: APBJJlHdMEoyrcmNp/byt0aZUIBGbZ/dYH98Vd4bOX3Z9OBMzCaUzxR0W2Ed2cfgzDFl1sbdTUlvww==
+X-Received: by 2002:a17:906:8a4d:b0:993:da0b:8783 with SMTP id gx13-20020a1709068a4d00b00993da0b8783mr8855806ejc.3.1691048689638;
+        Thu, 03 Aug 2023 00:44:49 -0700 (PDT)
+Received: from localhost (212-5-140-29.ip.btc-net.bg. [212.5.140.29])
+        by smtp.gmail.com with ESMTPSA id si15-20020a170906cecf00b00993004239a4sm10128648ejb.215.2023.08.03.00.44.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Aug 2023 00:44:49 -0700 (PDT)
+Date:   Thu, 3 Aug 2023 10:44:47 +0300
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     Haibo Xu <xiaobo55x@gmail.com>, Haibo Xu <haibo1.xu@intel.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Colton Lewis <coltonlewis@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Vishal Annapurve <vannapurve@google.com>,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH 1/4] tools: riscv: Add header file csr.h
+Message-ID: <20230803-5b7e7c0d95597b004764a296@orel>
+References: <cover.1690364259.git.haibo1.xu@intel.com>
+ <35ce2b9f7ca655eb3af13730b1ca9f05b518e08f.1690364259.git.haibo1.xu@intel.com>
+ <20230728-879500f157954d849fb303ec@orel>
+ <CAJve8onDLEC1JFdERi098sTmN3-UkwaJ1aJz3CJNYU-GShkEyg@mail.gmail.com>
+ <ZMsbXk4JU/Ung7qu@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-References: <20230724111335.107427-1-yi.l.liu@intel.com>
- <20230724111335.107427-10-yi.l.liu@intel.com>
- <BN9PR11MB527690EBAA872A16AE8926F88C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <58ae9095-28f2-a44a-b0e5-be82e1eae9d9@linux.intel.com>
- <BN9PR11MB52764994FB32B2B1CD9C95068C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <40d9b0fa-4a36-c3b7-53bb-4333ff89dc45@linux.intel.com>
- <BN9PR11MB5276FED948D84DAA81D09C838C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Language: en-US
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <BN9PR11MB5276FED948D84DAA81D09C838C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZMsbXk4JU/Ung7qu@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/8/3 12:13, Tian, Kevin wrote:
->> From: Baolu Lu <baolu.lu@linux.intel.com>
->> Sent: Thursday, August 3, 2023 12:06 PM
->>
->> On 2023/8/3 12:00, Tian, Kevin wrote:
->>>> From: Baolu Lu <baolu.lu@linux.intel.com>
->>>> Sent: Thursday, August 3, 2023 11:25 AM
->>>>
->>>> On 2023/8/2 15:46, Tian, Kevin wrote:
->>>>>> From: Liu, Yi L <yi.l.liu@intel.com>
->>>>>> Sent: Monday, July 24, 2023 7:14 PM
->>>>>>
->>>>>> +
->>>>>> +		spin_lock_irqsave(&dmar_domain->lock, flags);
->>>>>> +		list_for_each_entry(info, &dmar_domain->devices, link)
->>>>>> +			intel_nested_invalidate(info->dev, dmar_domain,
->>>>>> +						req->addr, req->npages);
->>>>>> +		spin_unlock_irqrestore(&dmar_domain->lock, flags);
->>>>>
->>>>> Disabling interrupt while invalidating iotlb is certainly unacceptable.
->>>>>
->>>>> Actually there is no need to walk devices. Under dmar_domain there
->>>>> is already a list of attached iommu's.
->>>>
->>>> Walking device is only necessary when invalidating device TLB. For iotlb
->>>> invalidation, it only needs to know the iommu's.
->>>>
->>>
->>> even for device tlb we may think whether there is any better way
->>> to avoid disabling interrupt. It's a slow path, especially in a guest.
->>
->> I ever tried this. But some device drivers call iommu_unmap() in the
->> interrupt critical path. :-( So we have a long way to go.
->>
-> 
-> emmm... this path only comes from iommufd and the domain is
-> user-managed. There won't be kernel drivers to call iommu_unmap()
-> on such domain.
+On Wed, Aug 02, 2023 at 11:13:34PM -0400, Guo Ren wrote:
+> On Wed, Aug 02, 2023 at 10:05:00AM +0800, Haibo Xu wrote:
+> > On Fri, Jul 28, 2023 at 5:43 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+> > >
+> > > On Thu, Jul 27, 2023 at 03:20:05PM +0800, Haibo Xu wrote:
+> > > > Borrow some of the csr definitions and operations from kernel's
+> > > > arch/riscv/include/asm/csr.h to tools/ for riscv.
+> > >
+> > > You should copy the entire file verbatim.
+> > >
+> > 
+> > Ok, will copy all the definitions in the original csr.h
+> Why not include the original one? Maintain the one csr.h is more
+> comfortable.
 
-Probably we can use a different lock for nested domain and add a comment
-around the lock with above explanation.
+selftests and other userspace tools can't always compile when including a
+kernel header without modifying the header in some way. Rather than
+polluting headers with #ifdeffery, the practice has been to copy necessary
+headers to tools/include and modify if necessary.
 
-Best regards,
-baolu
-
+Thanks,
+drew
