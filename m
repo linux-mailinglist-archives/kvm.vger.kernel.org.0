@@ -2,164 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BFEE76F0B1
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 19:33:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6167976F0E0
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 19:49:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234957AbjHCRdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 13:33:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47280 "EHLO
+        id S234372AbjHCRtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 13:49:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234450AbjHCRdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 13:33:39 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCACA3AA0
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 10:33:32 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5734d919156so13155557b3.3
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 10:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691084012; x=1691688812;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0pu/AbS0HKjXzXWiPYnMLO2Amc72EsgDe6tRMstBdak=;
-        b=KC193m6YkfKMgU1V5pk0nLnwEMaKH+pCPxR6oyeWGiIkaM4A2w8Pp69NstZno0wmB1
-         ZDjO/BuWqE7adFEoyq3k08am+VD+HDLkdlXGSfaOrrWJLfoTTrC8zC2MD/8zr3IwpcGS
-         o72PCx2btOf54qsSVe5aRfxxbauOWdb1xXriKdpgIWMYv8OxBaHbQe3OkHX+1ExgQT45
-         4fi2EEVVuwEfD4HoT72VhlIbFGq1san8AhAwlOpsM/inO6HtwB2deOg08vibUNXNZbAS
-         PKBRwsPLy2Rp5beitfEyzkusmkTZvL9/MuWg+1nxQ2xObOdCIZbE25I+cpJg67GqrUbV
-         EF+Q==
+        with ESMTP id S231978AbjHCRtE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 13:49:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324F81718
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 10:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691084897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k8w3UIrphhKQ2XHpYcuYIqOipT2J9rUiRAVKoTRmuc0=;
+        b=GO95dhYhOpMiEIYY8zMoFvgKU0Jv4ZhzVQbDSUj2fOidpktXqnoTunXQfWXcIa9yWLpF73
+        OXlMSJKiIX4zJBm1bK74zgERQNdHOe8zWuC0JzxYgFswhKAJNESEECfScZBSxCNwo9BPPY
+        bz7/6oDue/gmpZoDbfzHya6fh1n9h2k=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-524-C4yPhqvgNnejCevGL4_v2A-1; Thu, 03 Aug 2023 13:48:16 -0400
+X-MC-Unique: C4yPhqvgNnejCevGL4_v2A-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-522a85b4caaso1643911a12.0
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 10:48:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691084012; x=1691688812;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0pu/AbS0HKjXzXWiPYnMLO2Amc72EsgDe6tRMstBdak=;
-        b=PQxw4yO4ZQWjFGRUHelRXtFRHFjAbLl3/gpzbCIsKi/RMMrUOlCsP34nOt4e28zthW
-         EnERuhGpt82sYNBG+P77ujM+B2+uLqCFyoIuP05h9jFjpDm8kLy5hByUBYKsWzYgICpL
-         XsLvthUHnp2JLveMLCgONZj9dnZKqwZqOjUHzTeUt7tyMcDvMaWg5PtHHQ+8dDESRbil
-         lU5wDMuBoK3zejusLmivXeoOLIVJohsCynd555jAvzBKt+o/xvU5Pnj1k0i8+rCGfez4
-         kjWHPGvpZ/2nHY/OH3cDeOCxyRgL5fkJQgoHUvFAJ/uCnLHvbu5mFvzCZmu6zEhP22Q9
-         Wn/Q==
-X-Gm-Message-State: ABy/qLZUPY7tX68AfGxLvH8hZG7HsmYzYkN86ZYbck5fhzdPqqrg68S/
-        CNA7HBKVdprFFmx8PMXe/nRch2Rb8BVRqIca8+Q=
-X-Google-Smtp-Source: APBJJlEJdivYv8+b0csxVKGpKeftEtW6vp2C3Qo3RNq++FnZzd8sjOXFBRON9kXJ/6W7O/EGTSqXhU2ZwUIF7yQaems=
-X-Received: from ndesaulniers-desktop.svl.corp.google.com ([2620:15c:2d1:203:cd2a:c126:8d90:d5ab])
- (user=ndesaulniers job=sendgmr) by 2002:a81:b646:0:b0:569:e04a:238f with SMTP
- id h6-20020a81b646000000b00569e04a238fmr187846ywk.4.1691084012010; Thu, 03
- Aug 2023 10:33:32 -0700 (PDT)
-Date:   Thu, 03 Aug 2023 10:33:27 -0700
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAObky2QC/3WNQQ6CMBBFr2JmbQ0FVHTlPQwx7XQKkxTatIRgC
- He3sHf5/s/LWyFRZErwPK0QaebEfsxQnk+AvRo7EmwyQ1mUVdEUlQgBP5PT7BYX2Ai0Rtvamtr
- eLWRJq0RCRzViv2uDShPF/QiRLC9H6d1m7jlNPn6P8Cz39W9jlkKKplZS4xXt41a9Ou87Rxf0A 7Tbtv0Aeg6LYsYAAAA=
-X-Developer-Key: i=ndesaulniers@google.com; a=ed25519; pk=UIrHvErwpgNbhCkRZAYSX0CFd/XFEwqX3D0xqtqjNug=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691084010; l=3497;
- i=ndesaulniers@google.com; s=20220923; h=from:subject:message-id;
- bh=67hlOu38BB7CQZwIwTCku7kE6/CaycFqUpDIAeyUINw=; b=bEhP7KO3a79AFAV5eK8xUw0gGcjsqOcYWQS5seKyBUjoRQ1L5F0wGAVdqGIdML0+QnIFkiFCZ
- aVyNKTTHEi8Bvs5TOuBZ3doktaLzVfwNxT210gHDiu1vK3zkunVW0w1
-X-Mailer: b4 0.12.3
-Message-ID: <20230803-ppc_tlbilxlpid-v2-1-211ffa1df194@google.com>
-Subject: [PATCH v2] powerpc/inst: add PPC_TLBILX_LPID
-From:   Nick Desaulniers <ndesaulniers@google.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Tom Rix <trix@redhat.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, llvm@lists.linux.dev,
-        kernel test robot <lkp@intel.com>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691084895; x=1691689695;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k8w3UIrphhKQ2XHpYcuYIqOipT2J9rUiRAVKoTRmuc0=;
+        b=ei/jsLTb4QPXndWGWpInTAP2R7jGVsKjM6wE74gBDfGDCEHjNSH9R7Z/cB8WcxQTt8
+         AyO9WTEiAd+EUAua1KWjsNhuZe4YVAqLxfrB7sYK7bW10vQ4hxc9BN6az23HoyDwvMLm
+         ZJQ4cLavRVIP5J/16/ETPNmR/UX1i1LC8lckwGCb+d54nrErz4aXSEz6Mge3BdGfAfJu
+         DjgUtHHrAO88Hb2D0s51bsSvwCpCJWodAonI9+eXd9fmrSqrxbG40rJyilwCcn3PRhgw
+         1AdqbQpdUNbfaTjyx+Gs1smkQm5Wgzwf+Ml8YKA9HupaHwD2voBeO/6oIl2ohZpRht4F
+         RWPg==
+X-Gm-Message-State: ABy/qLZTYrRRyzrm4akh/lrjMQdS/U3BSTGBZJgGx75IOrnrgcn5YIx9
+        DflB6ItO85uCnHD5CSTtwI77VqMAo5qz6IdDePVgwSqi2EC8knMVqx/zqE39nwwqqfqaEoOEjFW
+        MST42I3lwCdb5
+X-Received: by 2002:aa7:ca58:0:b0:522:b876:9ef5 with SMTP id j24-20020aa7ca58000000b00522b8769ef5mr10879522edt.8.1691084895080;
+        Thu, 03 Aug 2023 10:48:15 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGxuw8b/Ix8dvNkObQ9VxnrmDGH8imE0GdHZMF47iewomEpxIOxDe7YZHHPKQR6L9yUeeRRaw==
+X-Received: by 2002:aa7:ca58:0:b0:522:b876:9ef5 with SMTP id j24-20020aa7ca58000000b00522b8769ef5mr10879501edt.8.1691084894707;
+        Thu, 03 Aug 2023 10:48:14 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id k20-20020a05640212d400b005228614c358sm82933edx.88.2023.08.03.10.48.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Aug 2023 10:48:13 -0700 (PDT)
+Message-ID: <e55656be-2752-a317-80eb-ad40e474b62f@redhat.com>
+Date:   Thu, 3 Aug 2023 19:48:13 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Content-Language: en-US
+To:     Michal Luczaj <mhal@rbox.co>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, shuah@kernel.org
+References: <20230728001606.2275586-1-mhal@rbox.co>
+ <20230728001606.2275586-2-mhal@rbox.co> <ZMhIlj+nUAXeL91B@google.com>
+ <7e24e0b1-d265-2ac0-d411-4d6f4f0c1383@rbox.co> <ZMqr/A1O4PPbKfFz@google.com>
+ <38f69410-d794-6eae-387a-481417c6b323@rbox.co>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU
+ issues
+In-Reply-To: <38f69410-d794-6eae-387a-481417c6b323@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clang didn't recognize the instruction tlbilxlpid. This was fixed in
-clang-18 [0] then backported to clang-17 [1].  To support clang-16 and
-older, rather than using that instruction bare in inline asm, add it to
-ppc-opcode.h and use that macro as is done elsewhere for other
-instructions.
+On 8/3/23 02:13, Michal Luczaj wrote:
+> Anyway, while there, could you take a look at __set_sregs_common()?
+> 
+> 	*mmu_reset_needed |= kvm_read_cr0(vcpu) != sregs->cr0;
+> 	static_call(kvm_x86_set_cr0)(vcpu, sregs->cr0);
+> 	vcpu->arch.cr0 = sregs->cr0;
+> 
+> That last assignment seems redundant as both vmx_set_cr0() and svm_set_cr0()
+> take care of it, but I may be missing something (even if selftests pass with
+> that line removed).
 
-Link: https://github.com/ClangBuiltLinux/linux/issues/1891
-Link: https://github.com/llvm/llvm-project/issues/64080
-Link: https://github.com/llvm/llvm-project/commit/53648ac1d0c953ae6d008864dd2eddb437a92468 [0]
-Link: https://github.com/llvm/llvm-project-release-prs/commit/0af7e5e54a8c7ac665773ac1ada328713e8338f5 [1]
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/llvm/202307211945.TSPcyOhh-lkp@intel.com/
-Suggested-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
----
-Changes in v2:
-- add 2 missing tabs to PPC_RAW_TLBILX_LPID
-- Link to v1: https://lore.kernel.org/r/20230803-ppc_tlbilxlpid-v1-1-84a1bc5cf963@google.com
----
- arch/powerpc/include/asm/ppc-opcode.h |  4 +++-
- arch/powerpc/kvm/e500mc.c             | 10 +++++++---
- 2 files changed, 10 insertions(+), 4 deletions(-)
+kvm_set_cr0 assumes that the static call sets vcpu->arch.cr0, so indeed 
+it can be removed:
 
-diff --git a/arch/powerpc/include/asm/ppc-opcode.h b/arch/powerpc/include/asm/ppc-opcode.h
-index ef6972aa33b9..f37d8d8cbec6 100644
---- a/arch/powerpc/include/asm/ppc-opcode.h
-+++ b/arch/powerpc/include/asm/ppc-opcode.h
-@@ -397,7 +397,8 @@
- #define PPC_RAW_RFCI			(0x4c000066)
- #define PPC_RAW_RFDI			(0x4c00004e)
- #define PPC_RAW_RFMCI			(0x4c00004c)
--#define PPC_RAW_TLBILX(t, a, b)		(0x7c000024 | __PPC_T_TLB(t) | 	__PPC_RA0(a) | __PPC_RB(b))
-+#define PPC_RAW_TLBILX_LPID		(0x7c000024)
-+#define PPC_RAW_TLBILX(t, a, b)		(PPC_RAW_TLBILX_LPID | __PPC_T_TLB(t) | __PPC_RA0(a) | __PPC_RB(b))
- #define PPC_RAW_WAIT_v203		(0x7c00007c)
- #define PPC_RAW_WAIT(w, p)		(0x7c00003c | __PPC_WC(w) | __PPC_PL(p))
- #define PPC_RAW_TLBIE(lp, a)		(0x7c000264 | ___PPC_RB(a) | ___PPC_RS(lp))
-@@ -616,6 +617,7 @@
- #define PPC_TLBILX(t, a, b)	stringify_in_c(.long PPC_RAW_TLBILX(t, a, b))
- #define PPC_TLBILX_ALL(a, b)	PPC_TLBILX(0, a, b)
- #define PPC_TLBILX_PID(a, b)	PPC_TLBILX(1, a, b)
-+#define PPC_TLBILX_LPID		stringify_in_c(.long PPC_RAW_TLBILX_LPID)
- #define PPC_TLBILX_VA(a, b)	PPC_TLBILX(3, a, b)
- #define PPC_WAIT_v203		stringify_in_c(.long PPC_RAW_WAIT_v203)
- #define PPC_WAIT(w, p)		stringify_in_c(.long PPC_RAW_WAIT(w, p))
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index d58df71ace58..dc054b8b5032 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -16,10 +16,11 @@
- #include <linux/miscdevice.h>
- #include <linux/module.h>
- 
--#include <asm/reg.h>
- #include <asm/cputable.h>
--#include <asm/kvm_ppc.h>
- #include <asm/dbell.h>
-+#include <asm/kvm_ppc.h>
-+#include <asm/ppc-opcode.h>
-+#include <asm/reg.h>
- 
- #include "booke.h"
- #include "e500.h"
-@@ -92,7 +93,10 @@ void kvmppc_e500_tlbil_all(struct kvmppc_vcpu_e500 *vcpu_e500)
- 
- 	local_irq_save(flags);
- 	mtspr(SPRN_MAS5, MAS5_SGS | get_lpid(&vcpu_e500->vcpu));
--	asm volatile("tlbilxlpid");
-+	/* clang-17 and older could not assemble tlbilxlpid.
-+	 * https://github.com/ClangBuiltLinux/linux/issues/1891
-+	 */
-+	asm volatile (PPC_TLBILX_LPID);
- 	mtspr(SPRN_MAS5, 0);
- 	local_irq_restore(flags);
- }
+         static_call(kvm_x86_set_cr0)(vcpu, cr0);
+         kvm_post_set_cr0(vcpu, old_cr0, cr0);
+         return 0;
 
----
-base-commit: 7bafbd4027ae86572f308c4ddf93120c90126332
-change-id: 20230803-ppc_tlbilxlpid-cfdbf4fd4f7f
+Neither __set_sregs_common nor its callers does not call 
+kvm_post_set_cr0...  Not great, even though most uses of KVM_SET_SREGS 
+are probably limited to reset in most "usual" VMMs.  It's probably 
+enough to replace this line:
 
-Best regards,
--- 
-Nick Desaulniers <ndesaulniers@google.com>
+         *mmu_reset_needed |= kvm_read_cr0(vcpu) != sregs->cr0;
+
+with a call to the function just before __set_sregs_common returns.
+
+Paolo
 
