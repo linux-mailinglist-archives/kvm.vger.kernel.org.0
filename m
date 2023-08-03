@@ -2,174 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC2C776EFCE
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 18:42:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 035A676EFE8
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 18:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235521AbjHCQmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 12:42:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44082 "EHLO
+        id S231874AbjHCQsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 12:48:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235635AbjHCQm0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 12:42:26 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3AE3ABE
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 09:42:01 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d1bcb99b518so1307736276.2
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 09:42:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691080921; x=1691685721;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kEfK6uXoOOqmnGh1iZAHkEy6kbDfk8RpX9kLNMH0qMw=;
-        b=SxIer3Ffo+cVQaIx9FpKirNSI36AS35BlUL3j2HwGzyzwH2DNlgIFKf38mR4bcHaNH
-         iQI9tI5x1dn3K0ifJAEMPuv85fSRh4B6C1GTffs6qzhVQBAEQmzNNlR9/furePi6Gu5P
-         6oZ3Gg5oh/6+mtZsq/Ha15KtfIECSlxee1MSBKzK4AbNZgiH4etgUyFQUckgalUfBLLd
-         n57UK5XeSGM77BrORRBpFBrP3/zJdJqteHG2xlnLvf2y/MCVyTQ8Ab061BUwOo/947S5
-         PKb+7xaErpGfcugqPS0+s49xfrHDWQLcWQ2Vq0FcEb4URxs0qRxCfTRQ4wVnjgAwVqHE
-         hFIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691080921; x=1691685721;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kEfK6uXoOOqmnGh1iZAHkEy6kbDfk8RpX9kLNMH0qMw=;
-        b=kw7Te0uvuNl7L2d4RMG4OoLkXnFN24YOBMhH8Pt7xxr2npOicY4p/qouoXjwXbSNQ+
-         xSVF+slLRAFW4dMtz+IPfyQBBJPFe7RwTnQLaXGBrvhi1++JQgrxcyKhsPZN4XFg+r6a
-         yoYTYnbdWOERkJBU1EUo96wb6qJIZAcwvlV6eHKrPJnNT/Zbj/ETpcDhbAhdcb3UsajJ
-         5Fq9RwgcZYTi/77mxVbUj1dY67+Lj7Ix/Afjw+ZAXlxTvIJwcE49kYIt8ngxl371+bJ+
-         Z+p2VnD/X7eqH2Hti0EOsOT6EFSkqo93pbzVtFqWju5WgL8kWRGKjbgNLPPffZeYAtcy
-         qASQ==
-X-Gm-Message-State: AOJu0YyY7LxIr2l0hex0h1zLoHzQdXmqnTGyN/RFTFSN5oNiDf102Yls
-        V+sYOfvl1dn+FPqPtJcO296emp7/5+8=
-X-Google-Smtp-Source: AGHT+IFSXX3XUIFF9i1iWJqRlZSpC9uDBIJzN8GgwOUbLfO0uIP09S819pAXv9q/2/xWaTDijcgAnMG/LS0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:18d5:0:b0:d42:30b5:1b5f with SMTP id
- 204-20020a2518d5000000b00d4230b51b5fmr7908yby.13.1691080920862; Thu, 03 Aug
- 2023 09:42:00 -0700 (PDT)
-Date:   Thu, 3 Aug 2023 09:41:59 -0700
-In-Reply-To: <222888b6-0046-3351-ba2f-fe6ac863f73d@rbox.co>
-Mime-Version: 1.0
-References: <20230728001606.2275586-1-mhal@rbox.co> <20230728001606.2275586-3-mhal@rbox.co>
- <ZMrFmKRcsb84DaTY@google.com> <222888b6-0046-3351-ba2f-fe6ac863f73d@rbox.co>
-Message-ID: <ZMvY17kJR59P2blD@google.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Extend x86's sync_regs_test to check
- for races
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232935AbjHCQrz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 12:47:55 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA31DA;
+        Thu,  3 Aug 2023 09:47:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jaIyykD9LTjypAIPFSahqsoNOS83yzHl1ZXRsyBmLWdXFMXzD/PZNNpoWNq7mK5Yoatrznkj88an8kpCpJx7bTrLzb1zlu9XJ7rj+k+PwOCugpRMR+ndrGGb+s/VgRE6wwtlbRlB2E5C/OpQ5WP9iVln+n8TWLovIXnKl2rAmQ/TxlaLZcBIUG6JkObIfvDcEg02tGMpXY8OYqj/3qR3RYAL34YE486v8pIOijZlWIP8n4LZP2tUdhnmgq9G87Wl8Bxsoh8Nlt1oXg5LcX1+8zZ7rIszMztPw680C3b1edQ1a9M9WzulobNN3ALMM3XVadhK50fRR2YpC9n8ZnN3bA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YbcMkhYlFFKFnjE6NwOrolSHJ3TLqk6B+Sx73Ti/FGE=;
+ b=NoCgU26bPjw1M/ppZfPj4Jh4qR/VNVpwcNugH80Kygxoig+8o8fwrKNvHBKpHe0cKLbPGVjbtHBQBcG8YJwtZBydv0joyNOg9Y7u7fLOBgIWYaA0UdaOG1iZ2XpDdCEkCzV8wGy5ZcFAzGb0sYk0SKuZW1OixTla02RQqoqClVwMkDMxtqHpRisC6GyZqNvV3Sj4OCXgF4LKynG6qFltlbWIe+O45WqMWPN8p+Cvr9Es8crUZd2yYfA2F9IO0yusJZTje2E15w4W+kA0NSCA8RHPxe2bdAiNWSNuJVepBezBx5VCMAxWHZiKH5EOAOxCV4fErnYXxa2uus82cqm4Gg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YbcMkhYlFFKFnjE6NwOrolSHJ3TLqk6B+Sx73Ti/FGE=;
+ b=F+bwY/d676+ZN1fzwwLbr6dBXULsRdYqZ8sRGxu+h8COk/19uSkn9+otybT1Sspcv6hvdNJFT7HgT6U5qPdtGkGuhKe4+RRRMoohBn3uAgQ/VszfPoPj5XF99pluXR963ZRGtmT99pVXJpOViKM5U/86adtylTgQUHaXqKI0kcRNr1mpBPFEdQbE0sG473mqytmUKw5vxwgAMTBQXc53ueqZDT1Sr/6nbmVqTUKL0ojnvJIc0Ym0eOXPTJKz3SABV/UbZacoLAfJOVidBR+0cScFdx9JDJIge5CsAnMiM3T+9IqvfpC9nRCN90lSEo2i5iDqnFA24Q+CJqS4mW0zoQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH0PR12MB8550.namprd12.prod.outlook.com (2603:10b6:610:192::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
+ 2023 16:47:52 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
+ 16:47:51 +0000
+Date:   Thu, 3 Aug 2023 13:47:50 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Nicolin Chen <nicolinc@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v3 08/17] iommufd: IOMMU_HWPT_ALLOC allocation with user
+ data
+Message-ID: <ZMvaNqskASX3pGuF@nvidia.com>
+References: <20230724110406.107212-1-yi.l.liu@intel.com>
+ <20230724110406.107212-9-yi.l.liu@intel.com>
+ <ZMQBLTm+U+5bgC/Z@nvidia.com>
+ <BN9PR11MB5276C84452E56AB03B819D208C05A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZMe0IQksFgV6yKTB@nvidia.com>
+ <ZMrp0ofsx8M6fT/S@Asurada-Nvidia>
+ <ZMrqEAOh82SBvyaq@nvidia.com>
+ <ZMr6lJpRDNZsvSm/@Asurada-Nvidia>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMr6lJpRDNZsvSm/@Asurada-Nvidia>
+X-ClientProxiedBy: BL0PR0102CA0013.prod.exchangelabs.com
+ (2603:10b6:207:18::26) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB8550:EE_
+X-MS-Office365-Filtering-Correlation-Id: df503b35-d826-426b-0557-08db94416072
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PUalJmP4ebQ+lk9npchnSLr+Hem91SwQfivPqt1oTZdm968kEh0XiHMK82i0Xz/WRGjYW0u8E/mNbXvNtXpJWS5ZyNCR5PNXV6p4+vE3Fi8c6tH5dK3OJv/gPtdZKYpd3KmVLGl5pCPJX9hjM3KWl4JQ2rxYYoo+dwiLrJkBQB4Zvfb84HoUVW42jD5V/Tdctzh/kWw/+avRzZDoC32wDDP2p5d/SQ/Gz1pO/vm835aQ59YbjHco7X6UnomW8RWd8ehFqYcQFWfMQmQr6c2IgSKkGUcU1vukV4qT3SwR0+fVh6U2C9doxngyGlIphAx8ZJ41KKe3CG/eHVFyxpIIReJIpblwd14O9maO87v9Vzmg0wpYL8EAD5KTDvW0TXozXOKqyRt5elnSuUTxwc59vDy9R33COVMGwtdBU/zTdgv5V1ZSu2ZyC5P0ecanqcRwk3qE46peOfPyUci7jWASA+HfEMRFSSCgl96L6xwtgud72FSnwmgW1jexQaJSOZIR+pu5IePEasM+/rTT44qP7M9BG5LAg1VIvWBZRmXtlV9x3Ofv/2dJqeJ8AiBnTeSV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(366004)(136003)(39860400002)(451199021)(66899021)(41300700001)(38100700002)(6486002)(6512007)(54906003)(6636002)(66556008)(4326008)(66476007)(66946007)(316002)(37006003)(5660300002)(478600001)(26005)(83380400001)(186003)(6506007)(2616005)(6862004)(36756003)(7416002)(8676002)(8936002)(86362001)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DTHpaui4knb0rRsxIy/z6ecOJ598EvkqwafbXjUQ9zu7mVCfBNkwdbbNazB4?=
+ =?us-ascii?Q?nv6HVp5m3PSKiOffbRKha0d8pnZ9cfjG1Zj73ONt4R1BzSdGDRsUuhP4tD4q?=
+ =?us-ascii?Q?ImCUjkEPFCkpxdYVShAruoYN5bl4ODbtLQwPzALDQceaVGwZk5xD7Wi3GOVJ?=
+ =?us-ascii?Q?pgchpjBLdYMhTqMcyOl022GwfpsCB8hfqA+BU39smz+LLcVzFaP4LsGPqM5M?=
+ =?us-ascii?Q?qjCRHtpNg89kzDZiGBrQrrzwR71KjDtGPrLJ1f7S5eS+bl621CPSvxS4MyXd?=
+ =?us-ascii?Q?PAdrVW9VkzSxCkvTbw+Ol5h+tpmlg12YdEf7IETgY0xdsRQmNfrE+IIH9WQj?=
+ =?us-ascii?Q?XDhWKpzu8QWa2zxgdQ1xhqUUmTWSMETav8RoVwQQQyqpMs1eXAz9cdij0UTw?=
+ =?us-ascii?Q?ZCPd+myg6t/qZ9VLtfZooPZa0FvQ+XgW/sU5nisY2zmKMxBRmuUSOEwJIOlU?=
+ =?us-ascii?Q?oEoosJoJclnq2v6nTt/fQyCU8ZCI0SFYMlBwBuVFO8zS02TJW0oOZWL9AOnQ?=
+ =?us-ascii?Q?DJzKjHvfRDoKjZ7u9cxG6mDuHL4FXmnLX807ExrTYYs8nqcbYoCIMovHI+3x?=
+ =?us-ascii?Q?TINErZyRiE20JJg9tRCpxtzRjJLAoJu3+qA36xmz6DDC394sUqWdW6+X57DB?=
+ =?us-ascii?Q?kFNU46QUynrI6/+XoERzd4tSt4zWh9QeDn+o/Ssl7JiIn8y6fetMnFpo9oeX?=
+ =?us-ascii?Q?T4etzrqJyWuc6Nd6wOXBf7X1Z1V3TtHmk3u7hdQApBsnixIFVCTkHyZ0mNJP?=
+ =?us-ascii?Q?DPo/YWEHsHcdHpb3F7vHZzq8D+NtlKTxPV/pgxh1r0hZVJbqWyfYqnrFcB/x?=
+ =?us-ascii?Q?fufPsHaVMuoWFYewIhjtXfobxaoNHJoNjxKEkCFQE8YpmStUJ7r/k0ySEmyE?=
+ =?us-ascii?Q?uEbdD3ZcbG+xlcWYGm6ePi8UvZpl3PY2Z/Y1kSrmvVAC1u8uXtEUOI/dW/Yw?=
+ =?us-ascii?Q?jLgzIF2Z6pI5xf5YS6JZglMjmyLw0g5n78mmaa97L48qxiHLrYr4dU27SoqN?=
+ =?us-ascii?Q?FhH4+Evlh6b3HtQQzn9n+nJ9Ik7Rm7ns+ZHgfRAvDBTB+El2ZEeiuca1QSup?=
+ =?us-ascii?Q?WZFAndbg7j/0ZLme3sKmZN4bcmMnPDyzTurzgXD52noXZUPk5LWStRvx1dLR?=
+ =?us-ascii?Q?QeNiHLWyHAfh8jAPEV4i5POyMJLsrOoF8roK5SRlEkBYv2CmuK9qyNfd+gGr?=
+ =?us-ascii?Q?Kfv6tUaFPgwMyS2r5xv0CXqV5SjFW4+cFaUxGwpYx4wXYojPbDPEqJOv0a6i?=
+ =?us-ascii?Q?yXlmBKDN7zl/fdNCIaWmP+AakGVjzB9iKdr0EA+QGbFFSBLCfwvF92u7YF2D?=
+ =?us-ascii?Q?bR/OHtoaSLYPF4QR5N4BSnt2XNaWSvO5SSc28lHaqfTtT9mrAcTyEtIekldo?=
+ =?us-ascii?Q?afsSyAGL7vZtcWonxEFYXf0wQ2XYoUaToN7wPPsxdYw0mVL9Ub8Oyf/HA5PW?=
+ =?us-ascii?Q?jU+iGhSOdrdMGO+3iGHTWu9d2vdSTOZL4J2mmR6N9cauHSCCptIAVt1LqfZk?=
+ =?us-ascii?Q?spFQVzz0On6exBH59KJ+/c9ht1+TqrQHAwToRUCMIUdqWOHsawee4dX+eie1?=
+ =?us-ascii?Q?jNHwKvGO5Zm5sJmbqeGtRS4Evrqt8hxTvXfKqGVj?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: df503b35-d826-426b-0557-08db94416072
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 16:47:51.6920
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G7SVeXPeNbWwSbuPVrG6WNUExWltMrZ2ForHzysisk4GnJVNr7uWy1lgt3Jx4ABK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8550
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 03, 2023, Michal Luczaj wrote:
-> On 8/2/23 23:07, Sean Christopherson wrote:
-> > On Fri, Jul 28, 2023, Michal Luczaj wrote:
-> >> +	/*
-> >> +	 * If kvm->bugged then we won't survive TEST_ASSERT(). Leak.
-> >> +	 *
-> >> +	 * kvm_vm_free()
-> >> +	 *   __vm_mem_region_delete()
-> >> +	 *     vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->region)
-> >> +	 *       _vm_ioctl(vm, cmd, #cmd, arg)
-> >> +	 *         TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret))
-> >> +	 */
+On Wed, Aug 02, 2023 at 05:53:40PM -0700, Nicolin Chen wrote:
+> On Wed, Aug 02, 2023 at 08:43:12PM -0300, Jason Gunthorpe wrote:
+> > On Wed, Aug 02, 2023 at 04:42:10PM -0700, Nicolin Chen wrote:
+> > > On Mon, Jul 31, 2023 at 10:16:17AM -0300, Jason Gunthorpe wrote:
+> > >  
+> > > > > Ideally expanding uAPI structure size should come with new flag bits.
+> > > > 
+> > > > Flags or some kind of 'zero is the same behavior as a smaller struct'
+> > > > scheme.
+> > > > 
+> > > > This patch is doing the zero option:
+> > > > 
+> > > >  	__u32 __reserved;
+> > > > +	__u32 hwpt_type;
+> > > > +	__u32 data_len;
+> > > > +	__aligned_u64 data_uptr;
+> > > >  };
+> > > > 
+> > > > hwpt_type == 0 means default type
+> > > > data_len == 0 means no data
+> > > > data_uptr is ignored (zero is safe)
+> > > > 
+> > > > So there is no need to change it
+> > > 
+> > > TEST_LENGTH passing ".size = sizeof(struct _struct) - 1" expects a
+> > > -EINVAL error code from "if (ucmd.user_size < op->min_size)" check
+> > > in the iommufd_fops_ioctl(). This has been working when min_size is
+> > > exactly the size of the structure.
+> > > 
+> > > When the size of the structure becomes larger than min_size, i.e.
+> > > the passing size above is larger than min_size, it bypasses that
+> > > min_size sanity and goes down to an ioctl handler with a potential
+> > > risk. And actually, the size range can be [min_size, struct_size),
+> > > making it harder for us to sanitize with the existing code.
+> > > 
+> > > I wonder what's the generic way of sanitizing this case? And, it
+> > > seems that TEST_LENGTH needs some rework to test min_size only?
 > > 
-> > We want the assert, it makes failures explicit.  The signature is a bit unfortunate,
-> > but the WARN in the kernel log should provide a big clue.
+> > Yes, it should technically test using offsetof and a matching set of
+> > struct members.
 > 
-> Sure, I get it. And not that there is a way to check if VM is bugged/dead?
+> OK. I copied 3 lines for offsetofend from the kernel and did this:
+> --------------------------------------------------------------------------
+> diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
+> index 6b075a68b928..a15a475c1243 100644
+> --- a/tools/testing/selftests/iommu/iommufd.c
+> +++ b/tools/testing/selftests/iommu/iommufd.c
+> @@ -86,12 +86,13 @@ TEST_F(iommufd, cmd_fail)
+> 
+>  TEST_F(iommufd, cmd_length)
+>  {
+> -#define TEST_LENGTH(_struct, _ioctl)                                     \
+> +#define TEST_LENGTH(_struct, _ioctl, _last)                              \
+>         {                                                                \
+> +               size_t min_size = offsetofend(struct _struct, _last);    \
+>                 struct {                                                 \
+>                         struct _struct cmd;                              \
+>                         uint8_t extra;                                   \
+> -               } cmd = { .cmd = { .size = sizeof(struct _struct) - 1 }, \
+> +               } cmd = { .cmd = { .size = min_size - 1 },               \
+>                           .extra = UINT8_MAX };                          \
+>                 int old_errno;                                           \
+>                 int rc;                                                  \
+> --------------------------------------------------------------------------
+> 
+> Any misaligned size within the range of [min_size, struct_size) still
+> doesn't have a coverage though. Is this something that we have to let
+> it fail with a potential risk?
 
-KVM doesn't expost the bugged/dead information, though I suppose userspace could
-probe that information by doing an ioctl() that is guaranteed to succeeed and
-looking for -EIO, e.g. KVM_CHECK_EXTENSION on the VM.
+It looks about right, I didn't try to test all the permutations, it
+could be done but I'm not sure it has value.
 
-I was going to say that it's not worth trying to detect a bugged/dead VM in
-selftests, because it requires having the pointer to the VM, and that's not
-typically available when an assert fails, but the obviously solution is to tap
-into the VM and vCPU ioctl() helpers.  That's also good motivation to add helpers
-and consolidate asserts for ioctls() that return fds, i.e. for which a positive
-return is considered success.
-
-With the below (partial conversion), the failing testcase yields this.  Using a
-heuristic isn't ideal, but practically speaking I can't see a way for the -EIO
-check to go awry, and anything to make debugging errors easier is definitely worth
-doing IMO.
-
-==== Test Assertion Failure ====
-  lib/kvm_util.c:689: false
-  pid=80347 tid=80347 errno=5 - Input/output error
-     1	0x00000000004039ab: __vm_mem_region_delete at kvm_util.c:689 (discriminator 5)
-     2	0x0000000000404660: kvm_vm_free at kvm_util.c:724 (discriminator 12)
-     3	0x0000000000402ac9: race_sync_regs at sync_regs_test.c:193
-     4	0x0000000000401cb7: main at sync_regs_test.c:334 (discriminator 6)
-     5	0x0000000000418263: __libc_start_call_main at libc-start.o:?
-     6	0x00000000004198af: __libc_start_main_impl at ??:?
-     7	0x0000000000401d90: _start at ??:?
-  KVM killed/bugged the VM, check kernel log for clues
-
-
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 07732a157ccd..e48ac57be13a 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -258,17 +258,42 @@ static __always_inline void static_assert_is_vm(struct kvm_vm *vm) { }
-        kvm_do_ioctl((vm)->fd, cmd, arg);                       \
- })
- 
-+/*
-+ * Assert that a VM or vCPU ioctl() succeeded (obviously), with extra magic to
-+ * detect if the ioctl() failed because KVM killed/bugged the VM.  To detect a
-+ * dead VM, probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM
-+ * since before selftests existed and (b) should never outright fail, i.e. is
-+ * supposed to return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all
-+ * ioctl()s for the VM and its vCPUs, including KVM_CHECK_EXTENSION.
-+ */
-+#define TEST_ASSERT_VM_VCPU_IOCTL_SUCCESS(name, ret, vm)                               \
-+do {                                                                                   \
-+       int __errno = errno;                                                            \
-+                                                                                       \
-+       static_assert_is_vm(vm);                                                        \
-+                                                                                       \
-+       if (!ret)                                                                       \
-+               break;                                                                  \
-+                                                                                       \
-+       if (errno == EIO &&                                                             \
-+           __vm_ioctl(vm, KVM_CHECK_EXTENSION, (void *)KVM_CAP_USER_MEMORY) < 0) {     \
-+               TEST_ASSERT(errno == EIO, "KVM killed the VM, should return -EIO");     \
-+               TEST_FAIL("KVM killed/bugged the VM, check kernel log for clues");      \
-+       }                                                                               \
-+       errno = __errno;                                                                \
-+       TEST_FAIL(__KVM_IOCTL_ERROR(name, ret));                                        \
-+} while (0)
-+
- #define _vm_ioctl(vm, cmd, name, arg)                          \
- ({                                                             \
-        int ret = __vm_ioctl(vm, cmd, arg);                     \
-                                                                \
--       TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));        \
-+       TEST_ASSERT_VM_VCPU_IOCTL_SUCCESS(name, ret, vm);       \
- })
- 
- #define vm_ioctl(vm, cmd, arg)                                 \
-        _vm_ioctl(vm, cmd, #cmd, arg)
- 
--
- static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
- 
- #define __vcpu_ioctl(vcpu, cmd, arg)                           \
-@@ -281,7 +306,7 @@ static __always_inline void static_assert_is_vcpu(struct kvm_vcpu *vcpu) { }
- ({                                                             \
-        int ret = __vcpu_ioctl(vcpu, cmd, arg);                 \
-                                                                \
--       TEST_ASSERT(!ret, __KVM_IOCTL_ERROR(name, ret));        \
-+       TEST_ASSERT_VM_VCPU_IOCTL_SUCCESS(name, ret, vcpu->vm); \
- })
- 
- #define vcpu_ioctl(vcpu, cmd, arg)                             \
-
+Jason
