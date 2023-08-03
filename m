@@ -2,86 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6536276F341
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 21:07:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1BA76F342
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 21:08:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231474AbjHCTHk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 15:07:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46678 "EHLO
+        id S229837AbjHCTIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 15:08:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231236AbjHCTHg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 15:07:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E82106
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 12:06:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691089604;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qFYzrSS5XNvQWAYfcj9a9H/bevzOTd1j3Mu4MDu2J6A=;
-        b=d13fCPqVh2nk/XVFtFdf7YguCY2/mlb3z6gwHycsr2mGnOgy7ndOH8IwUOohPEPrWn7C8T
-        VtpNYbl8L7fvmBfB8mmi7c7m5SWqiaoRmZMKvFgPNQepTWQKm/daZeI1uhlSBF/ac5L1aJ
-        EwlKhRT2D0aQ2HpRyh6XfdX5VTj6lb0=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-Ltp1yIQlOiusVEDXUECqWQ-1; Thu, 03 Aug 2023 15:06:42 -0400
-X-MC-Unique: Ltp1yIQlOiusVEDXUECqWQ-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4059b5c3dd0so3062731cf.0
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 12:06:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691089602; x=1691694402;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qFYzrSS5XNvQWAYfcj9a9H/bevzOTd1j3Mu4MDu2J6A=;
-        b=OfGku+nzf9duyNnk6p+XzoX0wGZZtVQAyS0/GEA0uG/Hi9z2t91RLPuLMZRamc93A8
-         MFgVppDhSuVao+1brHqctkevwBSIyNnED72/i7KJ1+yOx0nt9ayPpQUq2FXZv08GEQ2e
-         oLCLvwWBGGa6MGcECs9dNsZQNkg8yI1+4tT1ySoFzs/kwH2exu+WLaF+s1ty9n+OXdXD
-         IgUESa9f0NfISoLKq1LLz8kAmcK/iCJXjg1sOaYR5nqZ+wAlzFQo2GPBqqKvvYG1eDsB
-         CwCUgq22wWY6ER1tlWVfdx0Z8wSaC3hKHsbPaJ82W5DOVxXMPuKumrbFASffKc9YHFNf
-         SXKA==
-X-Gm-Message-State: ABy/qLa3Meq6uk2AFj5voIvmAkkIpoxVLbphwBTDI8GGIQ8VhProdu18
-        ZYyE3O61fgKH1mLca3mVbUcWZUW1Ym/hXDBO6OWjNS4ArOMVXfGwc+F1zCaTxiLpU/PFQWRFvaF
-        J1ZA4keazTheA
-X-Received: by 2002:a05:622a:1828:b0:3f6:a8e2:127b with SMTP id t40-20020a05622a182800b003f6a8e2127bmr20616713qtc.5.1691089602287;
-        Thu, 03 Aug 2023 12:06:42 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFizsiZjzbYNwIPp/+9OLfOtrHLxCg3OVOqwnveu9rIN6TWoLqQWZIyH+9ZlPvwA+YrlWrJVw==
-X-Received: by 2002:a05:622a:1828:b0:3f6:a8e2:127b with SMTP id t40-20020a05622a182800b003f6a8e2127bmr20616681qtc.5.1691089601995;
-        Thu, 03 Aug 2023 12:06:41 -0700 (PDT)
-Received: from x1n (cpe5c7695f3aee0-cm5c7695f3aede.cpe.net.cable.rogers.com. [99.254.144.39])
-        by smtp.gmail.com with ESMTPSA id oo13-20020a05620a530d00b007339c5114a9sm111503qkn.103.2023.08.03.12.06.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 12:06:41 -0700 (PDT)
-Date:   Thu, 3 Aug 2023 15:06:40 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        liubo <liubo254@huawei.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 7/7] selftest/mm: ksm_functional_tests: Add PROT_NONE
- test
-Message-ID: <ZMv6wG7PqehMp6vT@x1n>
-References: <20230803143208.383663-1-david@redhat.com>
- <20230803143208.383663-8-david@redhat.com>
+        with ESMTP id S231928AbjHCTH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 15:07:59 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77DF03C0A
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 12:07:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l5rnQAE/sHDnIBFIJdD6853WLxMuNCPmxmuCTJhBJcc=; b=nYvUkacVmCXLl23Xl3GDFVerd5
+        RVJjtqJh54icJ6/LBMm6RaoXNWaskrYO6ReS8Jdzc1fScsmw7EQ3KlPle9oSYR0BHNSBBqUQXKlcN
+        x1SQw0hN6gNNUERzclxof7z4WGnP4Ns/FXV3iyImuQ26h6lXRmsSNHlu8Sbov15CMUcz1bCGySma5
+        ZadZARnCJ6JfgdXYAwBrctC14AFajKAWYuQoPthipRBC1i0yc3xxmDr+BNRwk90CEheoTAzPm65Bx
+        jcCqbP7ckuesTU5cc8gh3uvtoOw3hpvFRIrKzIA9zVk0xkXEoeXLVGxqnFcySDeOG9lzWLLeS2EWp
+        cB+nQoMg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qRdfY-00H14O-3D;
+        Thu, 03 Aug 2023 19:07:33 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6C70D30007E;
+        Thu,  3 Aug 2023 21:07:28 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 3E7B2200E8B31; Thu,  3 Aug 2023 21:07:28 +0200 (CEST)
+Date:   Thu, 3 Aug 2023 21:07:28 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Nikunj A Dadhania <nikunj@amd.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>
+Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
+ kvm-amd.o
+Message-ID: <20230803190728.GJ212435@hirez.programming.kicks-ass.net>
+References: <20230802091107.1160320-1-nikunj@amd.com>
+ <20230803120637.GD214207@hirez.programming.kicks-ass.net>
+ <b22761ea-cab6-0e11-cdc9-ec26c300cd3f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230803143208.383663-8-david@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+In-Reply-To: <b22761ea-cab6-0e11-cdc9-ec26c300cd3f@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,49 +65,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 03, 2023 at 04:32:08PM +0200, David Hildenbrand wrote:
-> Let's test whether merging and unmerging in PROT_NONE areas works as
-> expected.
+On Thu, Aug 03, 2023 at 08:06:20PM +0200, Paolo Bonzini wrote:
+> On 8/3/23 14:06, Peter Zijlstra wrote:
+> > 
+> > By marking them with STACK_FRAME_NON_STANDARD you will get no ORC data
+> > at all, and then you also violate the normal framepointer calling
+> > convention.
+> > 
+> > This means that if you need to unwind here you're up a creek without no
+> > paddles on.
 > 
-> Pass a page protection to mmap_and_merge_range(), which will trigger
-> an mprotect() after writing to the pages, but before enabling merging.
+> The only weird thing that can happen is ud2 instructions that are executed
+> in case the vmload/vmrun/vmsave instructions causes a #GP, from the
+> exception handler.
+
+This code is ran with GIF disabled, so NMIs are not in the books, right?
+Does GIF block #MC ?
+
+> If I understand correctly those ud2 would use ORC information to show the
+> backtrace, but even then the frame pointer should be correct.  Of these
+> instructions, vmrun is the only one that runs with wrong %rbp; and it is
+> unlikely or even impossible that a #GP happens at vmrun, because the same
+> operand has been used for a vmload ten instructions before. The only time I
+> saw that #GP it was due to a processor errata, but it happened consistently
+> on the vmload.
 > 
-> Make sure that unsharing works as expected, by performing a ptrace write
-> (using /proc/self/mem) and by setting MADV_UNMERGEABLE.
-> 
-> Note that this implicitly tests that ptrace writes in an inaccessible
-> (PROT_NONE) mapping work as expected.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> So if frame pointer unwinding can be used in the absence of ORC, Nikunj
+> patch should not break anything.
 
-[...]
+But framepointer unwinds rely on BP, and that is clobbered per the
+objtool complaint.
 
-> +static void test_prot_none(void)
-> +{
-> +	const unsigned int size = 2 * MiB;
-> +	char *map;
-> +	int i;
-> +
-> +	ksft_print_msg("[RUN] %s\n", __func__);
-> +
-> +	map = mmap_and_merge_range(0x11, size, PROT_NONE, false);
-> +	if (map == MAP_FAILED)
-> +		goto unmap;
-> +
-> +	/* Store a unique value in each page on one half using ptrace */
-> +	for (i = 0; i < size / 2; i += pagesize) {
-> +		lseek(mem_fd, (uintptr_t) map + i, SEEK_SET);
-> +		if (write(mem_fd, &i, sizeof(size)) != sizeof(size)) {
-
-sizeof(i)?  May not matter a huge lot, though..
-
-> +			ksft_test_result_fail("ptrace write failed\n");
-> +			goto unmap;
-> +		}
-> +	}
-
-Acked-by: Peter Xu <peterx@redhat.com>
-
--- 
-Peter Xu
-
+Also, if you look at the makefile hunk that's being replaced, that was
+conditional on CONFIG_FRAMEPOINTS, while the annotation that's being
+added is not. I think objtool won't complain for ORC builds, only for
+framepoints builds.
