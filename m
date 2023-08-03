@@ -2,94 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CCD676DEBE
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:12:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 307D476DEC0
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 05:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231651AbjHCDMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 2 Aug 2023 23:12:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45400 "EHLO
+        id S232324AbjHCDNZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 2 Aug 2023 23:13:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbjHCDMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 2 Aug 2023 23:12:38 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA76FED
-        for <kvm@vger.kernel.org>; Wed,  2 Aug 2023 20:12:37 -0700 (PDT)
+        with ESMTP id S229864AbjHCDNY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 2 Aug 2023 23:13:24 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093C11FD6;
+        Wed,  2 Aug 2023 20:13:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691032357; x=1722568357;
-  h=message-id:date:mime-version:subject:to:cc:references:
+  t=1691032403; x=1722568403;
+  h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=hjKVq+cCV1wX3Jbg6GEunxtbRY4rYSmVI0jzRvDnMpA=;
-  b=cFlvIZ5ND2sFokFMGgiwWJZhDkfDHArYY1kD1UNxtwqI4faNsECHsShx
-   ZrMcTqEZLuaMgerWKrh1J9MjlDm8VwhaafqKrcUm9zi8oDPu3jTBgEalU
-   xMnvtIlepCh+K/KVAIfwFB7WRnAUIYkSRXLFWfx7cCaVipNM7tjbcm5Wa
-   /Ip1szPom0nHNOucMDohEsgiW9Qkj8ZtNQI0CHbzizaaAlIihiPh1Z8Ve
-   8M324utREPuxMHO6fKRdQRbOSOVCTbiX1PgTDfZofpvCwwk5z+P7L3oQH
-   jE2qkbJNi5kh+UqsaBVx6D1FbzAK1HxYvBwBsAWXUG85DsaYyfvyfJQaJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="349352102"
+  bh=yPbevtCcZpOeTAiAA2lNuyEOiqfa6vas4KxoyVt3mTA=;
+  b=l5RMvK6L4EaKVttyVzlCDzc6hv+TSMEJ4huwnIYIjuIWpR+PxYx7iMHm
+   zxyQnOR3TzmJ1SffRFpfdrnzQVbcGWtPTtEE+wCZ5iCO+5YYl8ZlrL0C5
+   Ufj8jgKDLD9+2O/kNEkyZsl+3WIEn3QhhmfWDZSh7Ui3zH65iqH6zzp8O
+   tSMytMw0IEn85BsDz18oDI8AKcKGaisKjX2/hBsPuCkNe+7OeDw2y3AUt
+   btQk/I8cMr6fFJ7EpnUiVPh1BHgTux/dR4LB/0bGD1Xgu8Xh9gG8wsvLL
+   9v0GawJqnJxPapFuAqrajLAcyswn5ht4eM7QS9wPx2j/l9MoEIk06ptWB
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="433597060"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="349352102"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:12:27 -0700
+   d="scan'208";a="433597060"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:13:22 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="764446486"
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="843385818"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="764446486"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.18.246]) ([10.93.18.246])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:12:22 -0700
-Message-ID: <8677f439-4d3e-6831-dfc4-d5a95461f6de@intel.com>
-Date:   Thu, 3 Aug 2023 11:12:19 +0800
+   d="scan'208";a="843385818"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.255.31.34]) ([10.255.31.34])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 20:13:16 -0700
+Message-ID: <d57dc99c-4970-fe0f-53f9-ea6f926910ca@linux.intel.com>
+Date:   Thu, 3 Aug 2023 11:13:14 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.13.0
-Subject: Re: [PATCH] KVM: x86: Advertise AMX-COMPLEX CPUID to userspace
-To:     Sean Christopherson <seanjc@google.com>,
-        Tao Su <tao1.su@linux.intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-References: <20230802022954.193843-1-tao1.su@linux.intel.com>
- <ZMroatylDm1b5+WJ@google.com>
+ Thunderbird/102.13.0
+Cc:     baolu.lu@linux.intel.com, "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: Re: [PATCH v4 04/12] iommu/vt-d: Add helper to setup pasid nested
+ translation
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-5-yi.l.liu@intel.com>
+ <BN9PR11MB5276C84A20C48B4041BE07B78C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Language: en-US
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZMroatylDm1b5+WJ@google.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB5276C84A20C48B4041BE07B78C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/3/2023 7:36 AM, Sean Christopherson wrote:
-> On Wed, Aug 02, 2023, Tao Su wrote:
->> Latest Intel platform GraniteRapids-D introduces AMX-COMPLEX, which adds
->> two instructions to perform matrix multiplication of two tiles containing
->> complex elements and accumulate the results into a packed single precision
->> tile.
->>
->> AMX-COMPLEX is enumerated via CPUID.(EAX=7,ECX=1):EDX[bit 8]
->>
->> Since there are no new VMX controls or additional host enabling required
->> for guests to use this feature, advertise the CPUID to userspace.
-> 
-> Nit, I would rather justify this (last paragraph) with something like:
-> 
->    Advertise AMX_COMPLEX if it's supported in hardware.  There are no VMX
->    controls for the feature, i.e. the instructions can't be interecepted, and
->    KVM advertises base AMX in CPUID if AMX is supported in hardware, even if
->    KVM doesn't advertise AMX as being supported in XCR0, e.g. because the
->    process didn't opt-in to allocating tile data.
+On 2023/8/2 15:10, Tian, Kevin wrote:
+>> From: Liu, Yi L<yi.l.liu@intel.com>
+>> Sent: Monday, July 24, 2023 7:13 PM
+>>   }
+>> +
+>> +/**
+>> + * intel_pasid_setup_nested() - Set up PASID entry for nested translation.
+>> + * This could be used for nested translation based vIOMMU. e.g. guest IOVA
+> s/could be/is/
 
-It looks good to me.
+Ack.
 
-> If the above is accurate and there are no objections, I'll fixup the changelog
-> when applying.
 > 
-> Side topic, this does make me wonder if advertising AMX when XTILE_DATA isn't
-> permitted is a bad idea.  But no one has complained, and chasing down all the
-> dependent AMX features would get annoying, so I'm inclined to keep the status quo.
+>> + * and guest shared virtual address. In this case, the first level page
+>> + * tables are used for GVA/GIOVA-GPA translation in the guest, second level
+>> + * page tables are used for GPA-HPA translation.
+> let's be consistent on using stage-1/stage-2
+> 
+> btw the convention is to have 1-line summary, then the list of
+> parameters followed by detail explanation of the function.
+> 
+
+This patch just follows the existing code style in this file. Need a
+separated patch to cleanup this.
+
+>> + *
+>> + * @iommu:      IOMMU which the device belong to
+>> + * @dev:        Device to be set up for translation
+>> + * @pasid:      PASID to be programmed in the device PASID table
+>> + * @domain:     User stage-1 domain nested on a s2 domain
+>> + */
+>> +int intel_pasid_setup_nested(struct intel_iommu *iommu, struct device
+>> *dev,
+>> +			     u32 pasid, struct dmar_domain *domain)
+>> +{
+>> +	struct iommu_hwpt_vtd_s1 *s1_cfg = &domain->s1_cfg;
+>> +	pgd_t *s1_gpgd = (pgd_t *)(uintptr_t)domain->s1_pgtbl;
+>> +	struct dmar_domain *s2_domain = domain->s2_domain;
+>> +	u16 did = domain_id_iommu(domain, iommu);
+>> +	struct dma_pte *pgd = s2_domain->pgd;
+>> +	struct pasid_entry *pte;
+>> +
+>> +	if (!ecap_nest(iommu->ecap)) {
+>> +		pr_err_ratelimited("%s: No nested translation support\n",
+>> +				   iommu->name);
+>> +		return -ENODEV;
+>> +	}
+> -EINVAL
+
+This is in the attach domain path. -EINVAL has the special meaning of
+"this domain is not compatible with iommu for the device".
+
+So here, I still think we should return -ENODEV and the caller doesn't
+need to retry anymore.
+
+> 
+>> +
+>> +	if (s2_domain->agaw > iommu->agaw) {
+>> +		pr_err_ratelimited("Incompatible agaw %s\n", iommu-
+>>> name);
+>> +		return -EINVAL;
+>> +	}
+> there is a duplicated check in intel_nested_attach_dev().
+> 
+
+Yeah, should be removed.
+
+Best regards,
+baolu
 
