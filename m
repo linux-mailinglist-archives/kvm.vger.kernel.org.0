@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AF4376E1C9
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:37:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 197AF76E1CD
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 09:37:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234103AbjHCHhd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 03:37:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47180 "EHLO
+        id S234121AbjHCHhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 03:37:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232438AbjHCHgQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 03:36:16 -0400
+        with ESMTP id S232555AbjHCHgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 03:36:17 -0400
 Received: from mgamail.intel.com (unknown [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DDB849E2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9E049E3;
         Thu,  3 Aug 2023 00:32:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1691047942; x=1722583942;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CmAs7m1B9VFSX+QDbvzqcYRQr/GL9RBo18A45fnyo9E=;
-  b=Gmmw4GG2FxxewWsSHzLi6ZBwn/B+qUUqiNY0k86xXs/Pua4IJFVle1u8
-   tQE6aW4FPsJkO074ul7OzJcdkpUoov2pCUZoS3hLZib0+KC+R0Rjz7pvF
-   bzTVpxlodiDsw1uBmldnTa8arRLSMwPWyBnrpSjBv+oXb0ChCV1N9yz64
-   bPUckwTYfrlgtaFxqhbo4IB+CRsaz5/Kdgv84HU9dKBwKyIGgp+sLE5gh
-   6Tst/8F9U4qDsQaA0J62keE4EpgW8EyrqzwFXVEaU8TazCYOwMKr5lh0J
-   PB8l405XZv43DzLA9vTDNhzgy4nYEp56EaNt46Y8UUE5Vn2hJMPqfzw6W
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="354708174"
+  bh=7e5ypkNSvdnqN0MtKaMYvhf+y8wsyyJlu13WVz7mfU8=;
+  b=bjAH44JRU+58OQM/x+IGAP4KjrG+bp4K/RjOQuL8f/5POyMSOQnWzlTj
+   xhG1w5Rdo6YWff1PaxSAgq7TpD3xdr1hnr17Wxflfj0TP/o5m8KbaFQ/o
+   ICX/vkCBwrexiX5FAv/JSer7b5DQ/2mQhs/FiJdaqAJ7s6VUpvsJAXE+Q
+   YWOR7eFdPHdDZDg2YkzQm+WbQUabPEDlwQNMf/Zu5xjvqX7O2T+61b4Ak
+   XxaCPOUJhPEG8wyRTULn101GYCn8+z4s3pyTMf1R8R+NTB5n14TzCNTrK
+   wMVFukxvp9Y4UjnO7ZpFaCOlQAF7LgWp/rxMigzc/nil88zsqFc/oJoR8
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="354708180"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="354708174"
+   d="scan'208";a="354708180"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:32:18 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="794888521"
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="794888524"
 X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
-   d="scan'208";a="794888521"
+   d="scan'208";a="794888524"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 00:32:18 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
@@ -44,9 +44,9 @@ To:     seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
         linux-kernel@vger.kernel.org
 Cc:     rick.p.edgecombe@intel.com, chao.gao@intel.com,
         binbin.wu@linux.intel.com, weijiang.yang@intel.com
-Subject: [PATCH v5 17/19] KVM:x86: Enable guest CET supervisor xstate bit support
-Date:   Thu,  3 Aug 2023 00:27:30 -0400
-Message-Id: <20230803042732.88515-18-weijiang.yang@intel.com>
+Subject: [PATCH v5 18/19] KVM:nVMX: Refine error code injection to nested VM
+Date:   Thu,  3 Aug 2023 00:27:31 -0400
+Message-Id: <20230803042732.88515-19-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230803042732.88515-1-weijiang.yang@intel.com>
 References: <20230803042732.88515-1-weijiang.yang@intel.com>
@@ -62,61 +62,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add S_CET bit in kvm_caps.supported_xss so that guest can enumerate
-the feature in CPUID(0xd,1).ECX.
+Per SDM description(Vol.3D, Appendix A.1):
+"If bit 56 is read as 1, software can use VM entry to deliver
+a hardware exception with or without an error code, regardless
+of vector"
 
-Guest S_CET xstate bit is specially handled, i.e., it can be exposed
-without related enabling on host side, because KVM manually saves/reloads
-guest supervisor SHSTK SSPs and current XSS swap logic for host/guest aslo
-supports doing so, thus it's safe to enable the bit without host support.
+Modify has_error_code check  before inject events to nested guest.
+Only enforce the check when guest is in real mode, the exception
+is not hard exception and the platform doesn't enumerate bit56
+in VMX_BASIC, otherwise ignore it.
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/x86.c | 8 +++++++-
- arch/x86/kvm/x86.h | 2 +-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 22 ++++++++++++++--------
+ arch/x86/kvm/vmx/nested.h |  7 +++++++
+ 2 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index aa92dec66f1e..2e200a5d00e9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -230,7 +230,8 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 516391cc0d64..9bcd989252f7 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1205,9 +1205,9 @@ static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
+ {
+ 	const u64 feature_and_reserved =
+ 		/* feature (except bit 48; see below) */
+-		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) |
++		BIT_ULL(49) | BIT_ULL(54) | BIT_ULL(55) | BIT_ULL(56) |
+ 		/* reserved */
+-		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 56);
++		BIT_ULL(31) | GENMASK_ULL(47, 45) | GENMASK_ULL(63, 57);
+ 	u64 vmx_basic = vmcs_config.nested.basic;
  
--#define KVM_SUPPORTED_XSS	(XFEATURE_MASK_CET_USER)
-+#define KVM_SUPPORTED_XSS	(XFEATURE_MASK_CET_USER | \
-+				 XFEATURE_MASK_CET_KERNEL)
+ 	if (!is_bitwise_subset(vmx_basic, data, feature_and_reserved))
+@@ -2846,12 +2846,16 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
+ 		    CC(intr_type == INTR_TYPE_OTHER_EVENT && vector != 0))
+ 			return -EINVAL;
  
- u64 __read_mostly host_efer;
- EXPORT_SYMBOL_GPL(host_efer);
-@@ -9657,8 +9658,13 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 	rdmsrl_safe(MSR_EFER, &host_efer);
+-		/* VM-entry interruption-info field: deliver error code */
+-		should_have_error_code =
+-			intr_type == INTR_TYPE_HARD_EXCEPTION && prot_mode &&
+-			x86_exception_has_error_code(vector);
+-		if (CC(has_error_code != should_have_error_code))
+-			return -EINVAL;
++		if (!prot_mode || intr_type != INTR_TYPE_HARD_EXCEPTION ||
++		    !nested_cpu_has_no_hw_errcode(vcpu)) {
++			/* VM-entry interruption-info field: deliver error code */
++			should_have_error_code =
++				intr_type == INTR_TYPE_HARD_EXCEPTION &&
++				prot_mode &&
++				x86_exception_has_error_code(vector);
++			if (CC(has_error_code != should_have_error_code))
++				return -EINVAL;
++		}
  
- 	if (boot_cpu_has(X86_FEATURE_XSAVES)) {
-+		u32 eax, ebx, ecx, edx;
-+
-+		cpuid_count(0xd, 1, &eax, &ebx, &ecx, &edx);
- 		rdmsrl(MSR_IA32_XSS, host_xss);
- 		kvm_caps.supported_xss = host_xss & KVM_SUPPORTED_XSS;
-+		if (ecx & XFEATURE_MASK_CET_KERNEL)
-+			kvm_caps.supported_xss |= XFEATURE_MASK_CET_KERNEL;
- 	}
+ 		/* VM-entry exception error code */
+ 		if (CC(has_error_code &&
+@@ -6967,6 +6971,8 @@ static void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
  
- 	kvm_init_pmu_capability(ops->pmu_ops);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 373386fb9ed2..ea0ecb8f0df6 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -363,7 +363,7 @@ static inline bool kvm_mpx_supported(void)
- 		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
+ 	if (cpu_has_vmx_basic_inout())
+ 		msrs->basic |= VMX_BASIC_INOUT;
++	if (cpu_has_vmx_basic_no_hw_errcode())
++		msrs->basic |= VMX_BASIC_NO_HW_ERROR_CODE;
  }
  
--#define CET_XSTATE_MASK (XFEATURE_MASK_CET_USER)
-+#define CET_XSTATE_MASK (XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL)
- /*
-  * Shadow Stack and Indirect Branch Tracking feature enabling depends on
-  * whether host side CET user xstate bit is supported or not.
+ static void nested_vmx_setup_cr_fixed(struct nested_vmx_msrs *msrs)
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index 96952263b029..1884628294e4 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -284,6 +284,13 @@ static inline bool nested_cr4_valid(struct kvm_vcpu *vcpu, unsigned long val)
+ 	       __kvm_is_valid_cr4(vcpu, val);
+ }
+ 
++static inline bool nested_cpu_has_no_hw_errcode(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	return vmx->nested.msrs.basic & VMX_BASIC_NO_HW_ERROR_CODE;
++}
++
+ /* No difference in the restrictions on guest and host CR4 in VMX operation. */
+ #define nested_guest_cr4_valid	nested_cr4_valid
+ #define nested_host_cr4_valid	nested_cr4_valid
 -- 
 2.27.0
 
