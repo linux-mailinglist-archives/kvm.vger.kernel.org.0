@@ -2,81 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09B2D76EDE2
-	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 17:18:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D74A276EF89
+	for <lists+kvm@lfdr.de>; Thu,  3 Aug 2023 18:33:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237020AbjHCPSm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 11:18:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49348 "EHLO
+        id S235293AbjHCQdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 12:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237008AbjHCPSl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 11:18:41 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDD43581
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 08:18:34 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63d23473ed5so6418616d6.1
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 08:18:34 -0700 (PDT)
+        with ESMTP id S237425AbjHCQdP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 12:33:15 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521C730D3
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 09:33:10 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6bca88c3487so1000114a34.2
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 09:33:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691075913; x=1691680713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SrtWuwZhdNs/bI8zWxTP33Nw+h1qasK2MRKJMmMYr/4=;
-        b=E1UK52reFDWJj91FF3IhG6fofZVbBF1CMu5AUmA5P/aBTeF9EmL0e2Ag/uQ5mZtDqB
-         vM1ktCfSpCslIJUeRsI5CPu84J+jDsQzMphrSBkYyp3X05AKPm/DhlNTtjREshESZLoY
-         /X505RGgObdxBJETvDhXwAqWrs6Y/Zw6pcMSBBDlPnnikOwEY+tYFbugc+CMBzwdzGle
-         Eaq+5KQTkPm4awjEV4gjVbPU1TS0hKOMsWitpFbSK9/dJ96r9HIIpOEnYO+zBdUwtda3
-         yGQh3rd0OidzYP0sAG5PADUjrdFpKL7F5i8T3iPDnz2i1uf+QS6jkNZ5Yuer9Mb9hcdz
-         nsCQ==
+        d=ventanamicro.com; s=google; t=1691080389; x=1691685189;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ILMTrWynO1XeQZo7Pg/qrvjmupOG1msKuU2sVES4A7U=;
+        b=FVmdL9BKhYm0oI0J4dt4CGErWoGauSC4HRBJ5n1Etp1kEGIvThQH1Dh9CwrqzeD4IJ
+         zwL8q3eyWF7EBEkfjkbJjM89k6iUWCH2y/BdjTIqnPb8iZFKRYTMHjxg2+8z8ahVZKFJ
+         SPHAWwroS0984S4jWk1AxN+pNYputTym03cih2/4osNfduxZUZuXYd+6C8yH+fpbjDg4
+         NhuCCWcT/L0CjreDuzfEuzfWWz6oPBgNmwg90LRZiwEVOcsWEuMp7IAm1b4KUtUvUMv7
+         jJR+kDHl0BYDTieC8D8zTDz4EAsEulTGWrE3x6QeKTQIH0TD5gDjjjTVvp7XkZFvtEyW
+         qHqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691075913; x=1691680713;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SrtWuwZhdNs/bI8zWxTP33Nw+h1qasK2MRKJMmMYr/4=;
-        b=Ts+s/g1Iu+8a+ZOwu2JgH+A5sluq5txGrXiZcSrc5bAXBkcHfZhlAGJ8dLlRLrwkjE
-         cZAWetY9UfMiTWCIBBR7ceJR+Cjf0ym46m/+11r5HUYVYBx7t0DP7L0IRU2la5q8qdqF
-         hiCFPbHqQ35H9DmY3LispsuYfV4OdjMPb4QiP1K5YCP8FK7E+NmkT01dN3t/i/OuDaIQ
-         NUTr7QiGOH8wD2oPYcUStOKEypeD6UJOYPhRiFax7q2A5cIqnNw+WR44YnI8SProb3xJ
-         tIH6DVCnqvT9/AqtIFz7Jpfo7fh5jil8PCIGsB9QlmbMAxjpvFq6wp4/z02Tp7UBvlWp
-         IZsA==
-X-Gm-Message-State: ABy/qLbQcqbliryeRnBoA8sOEZBqWgYguvK9YfV4Is7s6UJOBaYgZes1
-        wJVX8gB1q0p0TX7MvjTEe0hH/A==
-X-Google-Smtp-Source: APBJJlH/rA99J/7CA7uo7xtFqI8WroRHA9x/isWbdJj2w0aHTXtpvbyBT3+lsZq9lWIGy9l3uiwCWw==
-X-Received: by 2002:a05:6214:3011:b0:63d:25f:71af with SMTP id ke17-20020a056214301100b0063d025f71afmr20256559qvb.60.1691075913346;
-        Thu, 03 Aug 2023 08:18:33 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id b9-20020a0cc989000000b0063d4890b6cdsm5599822qvk.145.2023.08.03.08.18.31
+        d=1e100.net; s=20221208; t=1691080389; x=1691685189;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ILMTrWynO1XeQZo7Pg/qrvjmupOG1msKuU2sVES4A7U=;
+        b=JL5fTMzsnNKMRtmw3nK7YArP17C9qpBcTuSlWKAlKXHGvs7QbANHc9lGtWYP0x0YZN
+         FQRc1AINgVnkhBDceGUkf0twtO40fyJ5gShuXZ8u2xvI0YjKqiK3X5mcJbr3lYNhon1K
+         UU1woK8/GgnkiIr2KBrurfJI0VN4NmP+sUiwE4nBJBQ6zL5HApjjrYPr1kR4wk9SAwvf
+         nV/lqc8qMcwJiHdZW57JnZ/Hcj4N6SbWfB11Jj2P7zO09j6MOJDJ5EaBGMmRGrO9CkMn
+         0Ea96rCcls0xUdzqRdqPqFkVp8QQQFZc1BNnAXFxCJnKNos90UjEqAjn9Eck1iZ7enBm
+         vhjg==
+X-Gm-Message-State: ABy/qLZmeQHwrw8+m5u3VI53XvemnUqhQw7vDoh+r4CqKhJ6xX4R80VJ
+        hIiLTf5m1Y+2Olg5ME583PgPiQ==
+X-Google-Smtp-Source: APBJJlFtQ/kKMZtlpg91FxETCiMj0acqjG/Nc1UJc9kNAWDnlX6fQ7+E3ozHQnRPcxlPa2jRfPNJng==
+X-Received: by 2002:a05:6870:f623:b0:1a6:c968:4a15 with SMTP id ek35-20020a056870f62300b001a6c9684a15mr21181995oab.4.1691080388818;
+        Thu, 03 Aug 2023 09:33:08 -0700 (PDT)
+Received: from grind.. ([187.11.154.63])
+        by smtp.gmail.com with ESMTPSA id y5-20020a056870428500b001bb71264dccsm152929oah.8.2023.08.03.09.33.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 08:18:32 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qRa5v-003YnM-85;
-        Thu, 03 Aug 2023 12:18:31 -0300
-Date:   Thu, 3 Aug 2023 12:18:31 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 0/2] iommu: Make pasid array per device
-Message-ID: <ZMvFR52o86upAVrp@ziepe.ca>
-References: <20230801063125.34995-1-baolu.lu@linux.intel.com>
- <ZMplBfgSb8Hh9jLt@ziepe.ca>
- <BN9PR11MB527649D7E79E29291DA1A5538C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+        Thu, 03 Aug 2023 09:33:08 -0700 (PDT)
+From:   Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+To:     kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     anup@brainfault.org, atishp@atishpatra.org,
+        ajones@ventanamicro.com,
+        Daniel Henrique Barboza <dbarboza@ventanamicro.com>
+Subject: [PATCH v4 00/10] RISC-V: KVM: change get_reg/set_reg error code
+Date:   Thu,  3 Aug 2023 13:32:52 -0300
+Message-ID: <20230803163302.445167-1-dbarboza@ventanamicro.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527649D7E79E29291DA1A5538C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,44 +70,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 03, 2023 at 12:44:03AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > Sent: Wednesday, August 2, 2023 10:16 PM
-> > 
-> > On Tue, Aug 01, 2023 at 02:31:23PM +0800, Lu Baolu wrote:
-> > > The PCI PASID enabling interface guarantees that the address space used
-> > > by each PASID is unique. This is achieved by checking that the PCI ACS
-> > > path is enabled for the device. If the path is not enabled, then the
-> > > PASID feature cannot be used.
-> > >
-> > >     if (!pci_acs_path_enabled(pdev, NULL, PCI_ACS_RR | PCI_ACS_UF))
-> > >             return -EINVAL;
-> > >
-> > > The PASID array is not an attribute of the IOMMU group. It is more
-> > > natural to store the PASID array in the per-device IOMMU data. This
-> > > makes the code clearer and easier to understand. No functional changes
-> > > are intended.
-> > 
-> > Is there a reason to do this?
-> > 
-> > *PCI* requires the ACS/etc because PCI kind of messed up how switches
-> > handled PASID so PASID doesn't work otherwise.
-> > 
-> > But there is nothing that says other bus type can't have working
-> > (non-PCI) PASID and still have device isolation issues.
-> > 
-> > So unless there is a really strong reason to do this we should keep
-> > the PASID list in the group just like the domain.
-> > 
-> 
-> this comes from the consensus in [1].
-> 
-> [1] https://lore.kernel.org/linux-iommu/ZAcyEzN4102gPsWC@nvidia.com/
+Hi,
 
-That consensus was that we don't have PASID support if there is
-multi-device groups, at least in iommufd.. That makes sense. If we
-want to change the core code to enforce this that also makes sense
+This version includes a diff that Andrew mentioned in v2 [1] that I
+missed. They were squashed into patch 1.
 
-But this series is just moving the array?
+No other changes made. Patches rebased on top of riscv_kvm_queue.
 
-Jason
+Changes from v3:
+- patch 1:
+  - added missing EINVAL - ENOENT conversions
+- v3 link: https://lore.kernel.org/kvm/20230803140022.399333-1-dbarboza@ventanamicro.com/
+
+[1] https://lore.kernel.org/kvm/20230801222629.210929-1-dbarboza@ventanamicro.com/
+
+
+Andrew Jones (1):
+  RISC-V: KVM: Improve vector save/restore errors
+
+Daniel Henrique Barboza (9):
+  RISC-V: KVM: return ENOENT in *_one_reg() when reg is unknown
+  RISC-V: KVM: use ENOENT in *_one_reg() when extension is unavailable
+  RISC-V: KVM: do not EOPNOTSUPP in set_one_reg() zicbo(m|z)
+  RISC-V: KVM: do not EOPNOTSUPP in set KVM_REG_RISCV_TIMER_REG
+  RISC-V: KVM: use EBUSY when !vcpu->arch.ran_atleast_once
+  RISC-V: KVM: avoid EBUSY when writing same ISA val
+  RISC-V: KVM: avoid EBUSY when writing the same machine ID val
+  RISC-V: KVM: avoid EBUSY when writing the same isa_ext val
+  docs: kvm: riscv: document EBUSY in KVM_SET_ONE_REG
+
+ Documentation/virt/kvm/api.rst |  2 +
+ arch/riscv/kvm/aia.c           |  4 +-
+ arch/riscv/kvm/vcpu_fp.c       | 12 +++---
+ arch/riscv/kvm/vcpu_onereg.c   | 74 ++++++++++++++++++++++------------
+ arch/riscv/kvm/vcpu_sbi.c      | 16 ++++----
+ arch/riscv/kvm/vcpu_timer.c    | 11 ++---
+ arch/riscv/kvm/vcpu_vector.c   | 60 ++++++++++++++-------------
+ 7 files changed, 107 insertions(+), 72 deletions(-)
+
+-- 
+2.41.0
+
