@@ -2,208 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3F57705DE
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 18:24:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D69A770653
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 18:51:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbjHDQYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 12:24:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39152 "EHLO
+        id S230409AbjHDQvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 12:51:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbjHDQYP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 12:24:15 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86EE249E8;
-        Fri,  4 Aug 2023 09:24:13 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fb4146e8deso22275395e9.0;
-        Fri, 04 Aug 2023 09:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691166252; x=1691771052;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FxMm48ji9JaXht0N1EMlGEYOgbLi8EFkhDxDgGDkG90=;
-        b=OqOngvzkp89AvEQTuNEUTPPWut/Q2x4cPfcqFK0zK1t/KmCMIi8QZdsZfKpJM39efr
-         ROy3euPpsM8STbsN3Jpb8hXjzF2XH7xeYut7XooeMsM4Zx26sqD4tz7ycj28NaameeYi
-         lrVaBVsS4BzDMQA0byIyioQpI1cpfb1e9B4mz5N6cKDFlJMx06Ii0z5DBuIEvEAP3mf3
-         O8eUwc1FLLIKMAO3LQNyOIRUR52TA26+TKn4IQJ+Gp2T2aIOmaX/8qoaL/GF0qVE44Qd
-         bytSekj+Tq1xLTCXO2qDpTLusF1z3JB23/l59GfDur5iynpyt0ZRu8r6VLhPr0ozrQrv
-         Zkhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691166252; x=1691771052;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FxMm48ji9JaXht0N1EMlGEYOgbLi8EFkhDxDgGDkG90=;
-        b=k9h2Xqp86rjZmaX/TRkXKgIwqy+IPB0cTuKTKrmi2VkX4RMnQ6A7cdfq9SVbrlwQ94
-         B/FzRklTZEI5sGSlcObK2zrlnXu4pI5CR0hrVy3mDT3RK9+BpmENEPH90CToC8z7yajl
-         ho3GxCbei6qztSIVl43ifMc1sRytTdiMqdi9z/XORtTG368C3GwTiEm39HhQqiKKcEAg
-         d1CgYzmne+Qc9JcahHqir1lEcxG7CSVFwQt2HLNiFIFW5PTTSYQ6MET80KZIs3sheifS
-         rRITxpgc386f9+PG+GlQrF33Lo9EHsiD+KWoMkNZ/ZA65jBDNFVN0v0/S/QoUw3RvNP2
-         0xWg==
-X-Gm-Message-State: AOJu0YzjhszjgGkqspJKbYp4W51tlvvctBLaU9VssYVBXMXmDbHDJliW
-        lG+dhKNhCIjEQ1kd68RcjrQ=
-X-Google-Smtp-Source: AGHT+IECDxewontQLHmMI2qTcWM8S95By9HkjaTJVwRMBKauDrG4/fFkniE0oSaRp4tF+Ixz/OgWrQ==
-X-Received: by 2002:a05:600c:3791:b0:3fe:10d8:e7ef with SMTP id o17-20020a05600c379100b003fe10d8e7efmr1764124wmr.19.1691166251632;
-        Fri, 04 Aug 2023 09:24:11 -0700 (PDT)
-Received: from [10.9.105.115] ([41.86.56.122])
-        by smtp.gmail.com with ESMTPSA id d18-20020adfe892000000b003143cdc5949sm2922562wrm.9.2023.08.04.09.24.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Aug 2023 09:24:11 -0700 (PDT)
-Message-ID: <15ba8dc5-0bab-1829-16f5-54de14cef5a7@gmail.com>
-Date:   Fri, 4 Aug 2023 19:24:02 +0300
+        with ESMTP id S229666AbjHDQve (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 12:51:34 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2061.outbound.protection.outlook.com [40.107.223.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71041994;
+        Fri,  4 Aug 2023 09:51:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bVrhZuBL0raP08m77cWqVmuvLKzvRrrQK6Rf4LJrwR6s44+oHS1JfnlyRDyNEfNMObBkPFzSkNjUsORpA8fvsVj0WW/lxGdtK8bmpi/GLCbpb8GPi6PLA7UKZ+SVtrRvi9FZiDhIzxrOQ7InTOzxI/vzMqpFL1HGmz8HkLwTahpTOfCv6rxo4dN2rBaoQLlRZCfm9vEqLHdvoQChmy14JsOHO93x8MAsR9gVCHWN3Ez1Rn1NAshoBQtA73TLtuVvORT8ZdZF8v3WXOSqZEsoOPR5Co2UEIRoboxSb8pHarkJzoWa7kPfiERJo/nRw9e+zp7k6bhJW9LXMbW6kVSHlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lAN2gxDToXnbmOndznQSaQmy6ZhAGSA95vBqW5CTp/U=;
+ b=blEQsUOq8cAAVZemwmkdQNPfF8HtJafMz+u/MF+qhob9ucitZG/azHLBFoaSijCPxlvPoOQhrEnp3S8582NQ7pFu8jXD/3RGYktFVE9y0hNqE+quEO4wgbXO1+xZgUR/eJLomTEtnir/xHNeHjUmlHxtsQU5J2U0Sz395zyE96ovAftdwqR8ym9yilSwVqM8gmTstnKJS/TUGi9qB5qD4PchivdorcBxdK+B8SLNtPKsSXFr7aN5oNc22PTj5gbb2iceE0jkjIeaSFfJ1vil4aRyejBsaMJDk1tCtIQqnMKtPkDaUZ9LOu6v6ZDvg2ieVlQjezx2odorKw2Zb5v0GQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lAN2gxDToXnbmOndznQSaQmy6ZhAGSA95vBqW5CTp/U=;
+ b=juH5LOUWDgYeYqeQzS9fX1dO/URp2diIeHEjuMmiwDtJ6qo6h7+fQE922kJSQQjeKKqF8QRY+NrwZkxr+CVN+mKotILj1SkDCUp9/9XtzeBdmxtclcu4hHfuHD98vzDbyNfAXx1otyumoEWOr+JuswkO99gt/a1h9UsaWniGdHGHkHwUM90Q0+QewZczqanTCqMFJdeNOf72ekBf7ptk7KuOCAa8NbJzpbvNV3VvLyJppuz+Yq2/tDi/vEkstmb+XrTRd8MzPNuRlqoVscBwHI0NppGbArtVDSeW23coPh2X/PVMZYXF/KCO3Ly0js/E1yUMiB2T2lXkEN0BlQLqwg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by LV8PR12MB9406.namprd12.prod.outlook.com (2603:10b6:408:20b::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
+ 2023 16:51:31 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
+ 16:51:31 +0000
+Date:   Fri, 4 Aug 2023 13:51:29 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        simon.horman@corigine.com, shannon.nelson@amd.com
+Subject: Re: [PATCH v13 vfio 1/7] vfio: Commonize combine_ranges for use in
+ other VFIO drivers
+Message-ID: <ZM0skSmMTNbfRrQ0@nvidia.com>
+References: <20230725214025.9288-1-brett.creeley@amd.com>
+ <20230725214025.9288-2-brett.creeley@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230725214025.9288-2-brett.creeley@amd.com>
+X-ClientProxiedBy: MN2PR07CA0003.namprd07.prod.outlook.com
+ (2603:10b6:208:1a0::13) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
- socket
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru
-References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
- <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
- <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
- <44fef482-579a-fed6-6e8c-d400546285fc@gmail.com>
- <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
- <140bb8ec-f443-79f9-662b-0c4e972c8dd6@gmail.com>
- <e2ytj5asmxnyb7oebxpzfuithtidwzcwxki7aao2q344sg3yru@ezqk5iezf3i4>
-From:   Arseniy Krasnov <oxffffaa@gmail.com>
-In-Reply-To: <e2ytj5asmxnyb7oebxpzfuithtidwzcwxki7aao2q344sg3yru@ezqk5iezf3i4>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV8PR12MB9406:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7cd5d90-9f31-41e7-20e5-08db950b0d80
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Uh/lgwSRhbJrIqtE9q+p4l1ajrBXWVz8b3Kiaa6xysC9ltFxnSyfns1aRtXJp2cAkgEW3mibJJQ9bk95KDJSMoL9r2opm2xy3pxWlx1FxcVwOHE0jYfkNWxtkMJXg5HGunrMH4rG2/FPYHyNnyxrk0Phl1Ltl/HHOQbAgSBpGnodBhbxqdatKtVCyNLVgdddJPq6ey4XMKNGmK4il8ryGG0EIQ4NtQxVqSgCmX22iK/EclWRQWGxKIiHbZ/gAtIfff/9675nmC2bxwbmrx8g/b2s704Bq4/Fhn7+YRc0sSczzu9b3mpcCe79CEkncyjJY5ACP60CZ13ptTa6sSNMmgEJruNfd6E5AVSnxzqsCJOwrgKywXVCucgeahexBhyEMlqrAmvRU5LJasU5SIEmCGk9hStBZFLskm1tHf9hc5XZAodhSoCAvUx6VG8hgbY/zvPEp5Ir97kjbue/pbE2sEQGJ1IpkTYrjnZ5uEXxNlNCZxWJmewI2S3Fvsy/7uzfAZp5D2g9pVVVpUELyK5UM3vsFXGKEmyZlh7unlclGJ6CPYtTIf5T3m1CgmEcoCnA
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(39860400002)(346002)(136003)(1800799003)(451199021)(186006)(2616005)(26005)(6506007)(8676002)(4326008)(2906002)(66476007)(316002)(66946007)(5660300002)(6916009)(66556008)(8936002)(41300700001)(6486002)(6512007)(478600001)(38100700002)(83380400001)(36756003)(86362001)(66899021);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KZalLPoWRLoa4vvis8CkDy504bRU+KAk1tOLOphv3hggmCwOX6D6rCHy/xdd?=
+ =?us-ascii?Q?Zb80R2Q6JkA10wr6aouaMJ8XjhDUxJ5l+3cgArKRpD7ibHGR5fgws7oUqVVr?=
+ =?us-ascii?Q?PmozR+CtQdkwdrA4H5OM76FPPlMeC1peRLrFP9Wmz7Lit0qv9BsdQoO1h65K?=
+ =?us-ascii?Q?d2Lj7K9S7Rb/4IUCxrfimaxovWZWrZaLnMS8Q587OH20U7CNvVtWG7S7O6O7?=
+ =?us-ascii?Q?UqAW5WrMwC6ShCt3U1tqfSCPEZY8wUv4OGTejCjsQJhhmHdRYj7MKH9fwymW?=
+ =?us-ascii?Q?J8XYWzsdHglRnKNDsaRAz2aMMocTIT96VFm3Ym3LRNwyNqHIgH3o0+QExh1o?=
+ =?us-ascii?Q?uq7mrIN99TWO799kc9+qHB3Il9Vs/JpSeXCG9hbrEPVkoF/AFAW5MXeoOhzg?=
+ =?us-ascii?Q?BEvsrHY21S6fdqzWu4zidDDbkyY6cTBgGZQ/nEqpT1cpEgwyfLVRTcJGHtZs?=
+ =?us-ascii?Q?n6KuH3UFitvwEA11oIO7TKMpbqM+pRJM8g+9VEbhA/YVy15X+IOmZ0nZWvKD?=
+ =?us-ascii?Q?e1SJT6rqvpKozUYbomX3twodM0s2SqBkMSPUG4Ulvqj8F/0M1YL/HNQpGfb5?=
+ =?us-ascii?Q?Jv4OQ2bhQ8a6Nhq9u1TmcsZ/OVzkfcrHNpn3NNja2XpheoTbAjOag7Gkh5+3?=
+ =?us-ascii?Q?hLzgjSogAzDsjZw+8FoCztXOIuR4FL+/hHHZkCvDvxe5V9htsl2iEXEqnGMr?=
+ =?us-ascii?Q?5Pqls/SjurQMWMSPr5n0BMEVxvm6FJYSQszEFo5TrzX2ocIWEsM1HpAFLdaF?=
+ =?us-ascii?Q?oXDY4CSCXb7UGN8RrFc185feeAdIwWWT+BRgxhXN3QG93lpsl5ayxFt8uiOR?=
+ =?us-ascii?Q?ziTdB+l9rQs3q8U/Hpksi+me0kQvuvNTSv+rrdJisCyy8AQshvL4Fe5X0MMh?=
+ =?us-ascii?Q?wnIH6mfrqpm1t6WVyIC73BCImvYuQc69WP7PQLW/l/oI5uiMKEpYUYpCHTjc?=
+ =?us-ascii?Q?/v/jFG6fEBeqvQZ96ZVOIfPkL9Ttg49Vkic2rkqKkHhK4E4r2fUMfY48q7P3?=
+ =?us-ascii?Q?CFjLttZRloN0byTordMsb+I71IPc5fK1d8PxNvLzkiqZnRNuz/LXR2gYkY1d?=
+ =?us-ascii?Q?d/uoAwpsVYu37MS6j+036E2/9P+73WmzUbvdmIMSrXzpg5ye8bY1BuYhQY5V?=
+ =?us-ascii?Q?xrddOJTHJgabklpwRVIOq4hQsFjQ5t/0yAoZM52Mmmo7zwutICQf4X9ayREo?=
+ =?us-ascii?Q?n4uAFPEx2wm4wvr9gzrbra8wajWEumMM3g9xNb0NyLz1O5q6CizzfmlvZ0GS?=
+ =?us-ascii?Q?4aKsU9Gfq9iEWLbQIEWnmRJCsviMLdNnEdXOevAcTlZU7OeMa69NhfDs/6Xr?=
+ =?us-ascii?Q?500UCS3NDfPYZT8Ry6ebm4nbji6gtBtGql4mW7R2Aowo1fh7VqY6zzexIcY1?=
+ =?us-ascii?Q?raWyH8lCBIKBJp376zOqRaDJPjGfZyde9sylLIHk94qkAL45zOzlEWZVIGVS?=
+ =?us-ascii?Q?9Uab2pKWnyYGCxACZnQW3svmOKngoUubIKB/RMvOfzypK4b2HDAAchm0Pd+r?=
+ =?us-ascii?Q?6k15UEyR/4kucIOwKyNQ7t2TehptC3esse+oxCCWkFAraQLwTQbDZzrxXC5J?=
+ =?us-ascii?Q?7wpziMhE8UGn5iezR7iljUPW3+Pgmen+UZ9SglJs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7cd5d90-9f31-41e7-20e5-08db950b0d80
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 16:51:30.9019
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kJ6EfgJOLcfmHBXTllnzAxVXXKbUHm/LFpqywp99EN4b7JEB2xlysdODfrZJHquU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9406
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 04.08.2023 18:02, Stefano Garzarella wrote:
-> On Fri, Aug 04, 2023 at 05:34:20PM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 04.08.2023 17:28, Stefano Garzarella wrote:
->>> On Fri, Aug 04, 2023 at 03:46:47PM +0300, Arseniy Krasnov wrote:
->>>> Hi Stefano,
->>>>
->>>> On 02.08.2023 10:46, Stefano Garzarella wrote:
->>>>> On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
->>>>>> POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
->>>>>> shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
->>>>>> flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
->>>>>>
->>>>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>>>>> ---
->>>>>> net/vmw_vsock/af_vsock.c | 3 +++
->>>>>> 1 file changed, 3 insertions(+)
->>>>>>
->>>>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>>>> index 020cf17ab7e4..013b65241b65 100644
->>>>>> --- a/net/vmw_vsock/af_vsock.c
->>>>>> +++ b/net/vmw_vsock/af_vsock.c
->>>>>> @@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
->>>>>>             err = total_written;
->>>>>>     }
->>>>>> out:
->>>>>> +    if (sk->sk_type == SOCK_STREAM)
->>>>>> +        err = sk_stream_error(sk, msg->msg_flags, err);
->>>>>
->>>>> Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
->>>>
->>>> Yes, here is my explanation:
->>>>
->>>> This function checks that input error is SIGPIPE, and if so it sends SIGPIPE to the 'current' thread
->>>> (except case when MSG_NOSIGNAL flag is set). This behaviour is described in POSIX:
->>>>
->>>> Page 367 (description of defines from sys/socket.h):
->>>> MSG_NOSIGNAL: No SIGPIPE generated when an attempt to send is made on a stream-
->>>> oriented socket that is no longer connected.
->>>>
->>>> Page 497 (description of SOCK_STREAM):
->>>> A SIGPIPE signal is raised if a thread sends on a broken stream (one that is
->>>> no longer connected).
->>>
->>> Okay, but I think we should do also for SEQPACKET:
->>>
->>> https://pubs.opengroup.org/onlinepubs/009696699/functions/xsh_chap02_10.html
->>>
->>> In 2.10.6 Socket Types:
->>>
->>> "The SOCK_SEQPACKET socket type is similar to the SOCK_STREAM type, and
->>> is also connection-oriented. The only difference between these types is
->>> that record boundaries ..."
->>>
->>> Then in  2.10.14 Signals:
->>>
->>> "The SIGPIPE signal shall be sent to a thread that attempts to send data
->>> on a socket that is no longer able to send. In addition, the send
->>> operation fails with the error [EPIPE]."
->>>
->>> It's honestly not super clear, but I assume the problem is similar with
->>> seqpacket since it's connection-oriented, or did I miss something?
->>>
->>> For example in sctp_sendmsg() IIUC we raise a SIGPIPE regardless of
->>> whether the socket is STREAM or SEQPACKET.
->>
->> Hm, yes, you're right. Seems check for socket type is not needed in this case,
->> as this function is only for connection oriented sockets.
+On Tue, Jul 25, 2023 at 02:40:19PM -0700, Brett Creeley wrote:
+> Currently only Mellanox uses the combine_ranges function. The
+> new pds_vfio driver also needs this function. So, move it to
+> a common location for other vendor drivers to use.
 > 
-> Ack!
+> Also, fix RCT ordering while moving/renaming the function.
 > 
->>
->>>
->>>>
->>>> Page 1802 (description of 'send()' call):
->>>> MSG_NOSIGNAL
->>>>
->>>> Requests not to send the SIGPIPE signal if an attempt to
->>>> send is made on a stream-oriented socket that is no
->>>> longer connected. The [EPIPE] error shall still be
->>>> returned
->>>>
->>>> And the same for 'sendto()' and 'sendmsg()'
->>>>
->>>> Link to the POSIX document:
->>>> https://www.open-std.org/jtc1/sc22/open/n4217.pdf
->>>>
->>>> TCP (I think we must rely on it), KCM, SMC sockets (all of them are stream) work in the same
->>>> way by calling this function. AF_UNIX also works in the same way, but it implements SIGPIPE handling
->>>> without this function.
->>>
->>> I'm okay calling this function.
->>>
->>>>
->>>> The only thing that confused me a little bit, that sockets above returns EPIPE when
->>>> we have only SEND_SHUTDOWN set, but for AF_VSOCK EPIPE is returned for RCV_SHUTDOWN
->>>> also, but I think it is related to this patchset.
->>>
->>> Do you mean that it is NOT related to this patchset?
->>
->> Yes, **NOT**
+> Cc: Yishai Hadas <yishaih@nvidia.com>
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+> ---
+>  drivers/vfio/pci/mlx5/cmd.c | 48 +------------------------------------
+>  drivers/vfio/vfio_main.c    | 47 ++++++++++++++++++++++++++++++++++++
+>  include/linux/vfio.h        |  3 +++
+>  3 files changed, 51 insertions(+), 47 deletions(-)
 > 
-> Got it, so if you have time when you're back, let's check also that
-> (not for this series as you mentioned).
+> diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
+> index deed156e6165..7f6c51992a15 100644
+> --- a/drivers/vfio/pci/mlx5/cmd.c
+> +++ b/drivers/vfio/pci/mlx5/cmd.c
+> @@ -732,52 +732,6 @@ void mlx5fv_cmd_clean_migf_resources(struct mlx5_vf_migration_file *migf)
+>  	mlx5vf_cmd_dealloc_pd(migf);
+>  }
+>  
+> -static void combine_ranges(struct rb_root_cached *root, u32 cur_nodes,
+> -			   u32 req_nodes)
+> -{
+> -	struct interval_tree_node *prev, *curr, *comb_start, *comb_end;
+> -	unsigned long min_gap;
+> -	unsigned long curr_gap;
+> -
+> -	/* Special shortcut when a single range is required */
+> -	if (req_nodes == 1) {
+> -		unsigned long last;
+> -
+> -		curr = comb_start = interval_tree_iter_first(root, 0, ULONG_MAX);
+> -		while (curr) {
+> -			last = curr->last;
+> -			prev = curr;
+> -			curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
+> -			if (prev != comb_start)
+> -				interval_tree_remove(prev, root);
+> -		}
+> -		comb_start->last = last;
+> -		return;
+> -	}
+> -
+> -	/* Combine ranges which have the smallest gap */
+> -	while (cur_nodes > req_nodes) {
+> -		prev = NULL;
+> -		min_gap = ULONG_MAX;
+> -		curr = interval_tree_iter_first(root, 0, ULONG_MAX);
+> -		while (curr) {
+> -			if (prev) {
+> -				curr_gap = curr->start - prev->last;
+> -				if (curr_gap < min_gap) {
+> -					min_gap = curr_gap;
+> -					comb_start = prev;
+> -					comb_end = curr;
+> -				}
+> -			}
+> -			prev = curr;
+> -			curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
+> -		}
+> -		comb_start->last = comb_end->last;
+> -		interval_tree_remove(comb_end, root);
+> -		cur_nodes--;
+> -	}
+> -}
+> -
+>  static int mlx5vf_create_tracker(struct mlx5_core_dev *mdev,
+>  				 struct mlx5vf_pci_core_device *mvdev,
+>  				 struct rb_root_cached *ranges, u32 nnodes)
+> @@ -800,7 +754,7 @@ static int mlx5vf_create_tracker(struct mlx5_core_dev *mdev,
+>  	int i;
+>  
+>  	if (num_ranges > max_num_range) {
+> -		combine_ranges(ranges, nnodes, max_num_range);
+> +		vfio_combine_iova_ranges(ranges, nnodes, max_num_range);
+>  		num_ranges = max_num_range;
+>  	}
+>  
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index f0ca33b2e1df..3bde62f7e08b 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -865,6 +865,53 @@ static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
+>  	return 0;
+>  }
+>  
+> +void vfio_combine_iova_ranges(struct rb_root_cached *root, u32 cur_nodes,
+> +			      u32 req_nodes)
+> +{
 
-Sure!
+It should really gain a kdoc now.
 
-Thanks, Arseniy
+But the code is fine
 
-> 
-> Thanks,
-> Stefano
-> 
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason
