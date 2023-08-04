@@ -2,174 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C38176FB7E
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 09:56:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70BC576FB8C
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 10:00:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234057AbjHDH4N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 03:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45678 "EHLO
+        id S234326AbjHDIA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 04:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229902AbjHDH4L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 03:56:11 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809A013E;
-        Fri,  4 Aug 2023 00:56:10 -0700 (PDT)
+        with ESMTP id S232507AbjHDIAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 04:00:24 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3BA1704;
+        Fri,  4 Aug 2023 01:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691135770; x=1722671770;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=z/UITKAGaR/v9j2RkN2t8N5ApF3c4ogFDckOwFU+oFw=;
-  b=mV1ZR5EeRCBuhDVmB4raGDsdgBxF5jnDiGOkUi1jifS1ijP0+bxF0W62
-   x8ug20MYgUNljDNvnaF/vf1N0v9X5Bu3rFMAXD8dci0ABw9DY9p/j2BhF
-   R3PtUM70Xtht5BmINOch7hLKH/DXMC58jEZFXKKMHQ14YUUn1GkccNr3o
-   v3kGh/gWsuyEHy+nyjObLuZb5ABg3a2H69/g6A9Ox9iVSL4SZNaBAp7jG
-   6pmU9G/7wjAJFzdzFlKtwQjynRlUwWxpVNNWAKN8B0fKMsu6RXFnRWR1U
-   3caccInO9zxRhRKzFeuiC3zxJBmBR/+SsRSppmN9GYMoZih20a1zYqhMO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="372843611"
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1691136023; x=1722672023;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mozKuYzJnKHA2aKr3eiYDtSGyCx3d+I7fkTRCyvB7W0=;
+  b=S9meV5hrPUbBWAY9o6CBbP4zp+xjTUOqzEz4V6ZlpD8H2B8tHo8L1nwn
+   J+cxYIHYcDIgWTY2rLLlG3UhfVIB554mdIApG5n6sVzQMbMid3158CjkH
+   v/rNMykvOYsJ49x2MXBs1YjEVpZlQTA+Li9qoAZJVc86SfwWzIp/+RIHq
+   C0o7scN3tX+VkKR/L+J5S+dFJK5K7cDvlqF3d42Pk4MR0XiKzXV6bm8hK
+   W6ISf0f/5EQPsoIdmAlr3tcyz+F72jnKDnepDDHxGslQ76uyFlcoyIogo
+   H8xoAXe/MiIZPQ1mhshb9FWdRwKYEmZwvCbhM0ZHqoAGTLBeefzP/VehU
+   g==;
 X-IronPort-AV: E=Sophos;i="6.01,254,1684825200"; 
-   d="scan'208";a="372843611"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2023 00:56:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10791"; a="679823481"
-X-IronPort-AV: E=Sophos;i="6.01,254,1684825200"; 
-   d="scan'208";a="679823481"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga003.jf.intel.com with ESMTP; 04 Aug 2023 00:56:09 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="asc'?scan'208";a="164824311"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 04 Aug 2023 01:00:21 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 4 Aug 2023 00:56:09 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 4 Aug 2023 00:56:09 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 4 Aug 2023 00:55:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ecf6RvdZsNAvCpBINJq65gTafKIr1LsQIace+vWTO65UtnwYo/hMEiH/ny1NwgUlhdqblqUDv12KYuq13U5IfuqYKbHrYhN2OtAbBxa9CJNQ7R9aiMLZC0XejhTP4+DBdadQoCVZphTCYPf+qMEGThN7bvmaSbHzVip6cSAw8/tKkJdySdLjZBxugombCDM9PBpERJF7CnwW10eM9FdcN0aCwW1Mrctmrd1S635rSW0G0Av740rXDAD5CnzSqcMbok75alE4Xv5w3tSXzBH54Pw+XxQi4SJF8bmemmUl2MmUQBZJozaEBRM7ZSC76zODTSqpANWrytaUF51EEMXPKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YG2jwBjkXyBUkKI3CVlf21T5RGb1ocCcTEpSp1iZwrg=;
- b=KIu5qOAGlzxeIvFxC+sLMCpuopSvHmaJqoJGacEL4OTCibq1BoVIgWDI7e2oraHhetZdCYvUtaOevLvfOHXP1nlU8VHXsDXm/tYuB93mRogFqwkqIFTBB/+/3rCPSRF7v2rtAUnG8GEdcm4vbOWq2MM/is0tshxRkLRrHzlPZ9FnrHgkG3K5r1Nk2MvdVxwXz5zQpbzXvvlX0GRXQMDmjI0YZ85sJFsKR6ER8kyeHyNLVefJ6IM6/PHtyNBOdwkFBcPsHVBOdwiB81O9f92JkeED1Kg/8stxCFpOCn3LkniOi0U9dhF9TgUJJ3HXXvRjMxrPImTAq2bWUAwJQ62ewA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH7PR11MB6426.namprd11.prod.outlook.com (2603:10b6:510:1f6::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
- 2023 07:55:49 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::dcf3:7bac:d274:7bed]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::dcf3:7bac:d274:7bed%4]) with mapi id 15.20.6652.020; Fri, 4 Aug 2023
- 07:55:49 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Zeng, Xin" <xin.zeng@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "Zeng, Xin" <xin.zeng@intel.com>,
-        "Wan, Siming" <siming.wan@intel.com>
-Subject: RE: [RFC 4/5] crypto: qat - implement interface for live migration
-Thread-Topic: [RFC 4/5] crypto: qat - implement interface for live migration
-Thread-Index: AQHZq1WCG0Kftx6lpEKi6jBcMnEel6/Z+yxw
-Date:   Fri, 4 Aug 2023 07:55:49 +0000
-Message-ID: <BN9PR11MB52768334F696E7009E8D80008C09A@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230630131304.64243-1-xin.zeng@intel.com>
- <20230630131304.64243-5-xin.zeng@intel.com>
-In-Reply-To: <20230630131304.64243-5-xin.zeng@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH7PR11MB6426:EE_
-x-ms-office365-filtering-correlation-id: eb78f2d0-ae65-47de-c467-08db94c037c6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kBaiQnkyERPTchTShz8HW8aADXJ+vgVKOEZredi8PPIpeJQ1vNwhj4+HGaalk3i41zcjmfjZ+CHMMJ7CkE8mo5ORR/m4d1zdJGxLpG8qmJi9e4rDFr6f2K6s1+jdd3dZ3lPw4zEoaA2EP5qr7OpyyUvLJbjldFXb06WxRbV27NOYXqy/oeN3Mr3Ncu4iM/+ervBWfKMi29M7hiS4ZHxTlA89sqwZhizBAZAxZaDmwuIaqhMc85yMsPhs+PGoao3rRKQ4erERCy0qhVNXzDwTFpUfqKKNW3rq90orRp6XmtTxxaIJfcLMa1PwOT6bWaCR2No1DN0HtD2xhnmUFwu1GwZZt/kxcHAGWlMcy704TyF/x6Trrzm/jxejk+BEveIUPxpNW0Fxf/sSMOnh4y0oaWUwCGT/+3NO9X6Zd1+0WxoIf4ITVBZktONxNJ3RvaZ+u9ZidHH3oZ8E7O1dqGfh00c7/sirjQhzZYbO2tZnU/DrJ8hj9wPJFf0ALRA2Jmw8BhZoWLr83UGch7ohzHdHYo+rgZB3zziAwn92AzReaiStsktnz115J8svCqZDoFRrBqzPokgy3Fv9yzmOTbeRBCNqZEx5Q0cHi6LlTpooEM1ERTV2oGjKyDFeOKB89mq1
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(376002)(136003)(366004)(396003)(1800799003)(451199021)(186006)(8676002)(26005)(6506007)(83380400001)(66476007)(2906002)(316002)(76116006)(4326008)(4744005)(66946007)(5660300002)(66446008)(64756008)(66556008)(8936002)(41300700001)(7696005)(71200400001)(52536014)(9686003)(110136005)(478600001)(55016003)(54906003)(38100700002)(82960400001)(122000001)(33656002)(86362001)(38070700005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/dMCukP32ptdMmBnkEzaW6RTpQtKS8PySdmphTwvFuNkNDKmwocFD2CQM7cx?=
- =?us-ascii?Q?LGlmM7OP6KqQSSh1wosb16BNwhi+9thcU/6RqFw+B25/wJCIQLFXINJFG8ZD?=
- =?us-ascii?Q?y76+pHA5v5DdSVC5ivlyGPPVfeZmGkxN2VilDxYD4SIAIJS7ivHKct8ZVkqY?=
- =?us-ascii?Q?Kw/E0a1JZFNb92TuKg1yxzLoUtnnvDebxDCC44HJPUrjdUTYq2FbNzm4SXaB?=
- =?us-ascii?Q?86aF3Wkxfztduiptjb46bo/eTPSvliQkcllrBCUT+bs3hiRPpj6wrHko/tvL?=
- =?us-ascii?Q?kUWGsRZqTYqYO8QJ5Gq21wF5if68ub9k3iAoyKRMexO61BUF6yNkdSOs1TcI?=
- =?us-ascii?Q?Ek1WD2ieEw+4MlzP/Fgrid5N1M4HEBaqfrlFGIcnfiN0EMW4WnpbkpHvQ2nk?=
- =?us-ascii?Q?atEYP8ELtRZTMP8NiM3pAumX0HQHR5vrjtnGhYF9dQZha4GZ8RyBZjH2pqRi?=
- =?us-ascii?Q?EY62AfBJT2wUPLxIsRxmbu3t4aYDRXwy9uVVwYnxdJRFsmjMFdxcKaYfjLQC?=
- =?us-ascii?Q?4UKlrVH9ObY4ejwB0ZvvhbaUivEc7gaMYbnxWLP0OehYClCVzTVcED2MiWwu?=
- =?us-ascii?Q?Le4DHumfGldm+tfCSTbO0oF52BK2GbCXrOpdKWB0ZM2yCMuHVLtiXc+daiTY?=
- =?us-ascii?Q?BLt6AHOMTPmq6fyG0OYAsjBspfX3PS3V+Q2BT5IxS7Tbhnzju5CTn+THb4yE?=
- =?us-ascii?Q?fm8e7xTbx+PERWImg/S/5/ZW8ODDoIha4OMG1OOO9i09cOseK3ZWD/cgZOOX?=
- =?us-ascii?Q?5xtL1VX1UrQWwJyw4a5CFuKfmkBUdmbeJtM8L4WmniiMxOkU6tpDOMHxt3LO?=
- =?us-ascii?Q?gvu1q33uUcc2sCtW+NrjJIJyWXoTNc/jhsCFlqesYyejY1fLaTjbh8SgbXiA?=
- =?us-ascii?Q?pVZ9yhCuUcBKlc8N70wyT3m2+7YOYZegeGr3sebQhvzmMNdQZ2kl9c9UXWYg?=
- =?us-ascii?Q?6hnsrMgYsurG4U0ATq3pUVNVtUVo7LOMbfO9q15efM/i1jclQKyaPJmXVCOe?=
- =?us-ascii?Q?/U336x97BSSaP8h37vOWQ6YxA9bSn7muCgsI4tSSQR4jRaXqdxclrFICPUi5?=
- =?us-ascii?Q?6ltul+YTRZkWU6lcOo/o6fZ5mDCdDWGQENYBp8WxeEowF5+NIr+rd8E2cix7?=
- =?us-ascii?Q?lVkFBrcF7+TX+lShFRAs12nU93Xx83cIu2IC3Yeg03pAta8Vj3S2uGFSvN23?=
- =?us-ascii?Q?+NIZhQr2cXeviQePTkSJXaHKKWcLMQppKf49D30JFiHK0cNt54xNH9//YXE8?=
- =?us-ascii?Q?hT0lJv3WPPm4REPBMIGOSG3eUe7vJQS4HBo0nBjzFVLwsaFBWeKjNzqFz8DH?=
- =?us-ascii?Q?IFqBhz2DXrG1YDkW+GD4dysauRtAxxkE5m4NSyjlFRVRaFN/f9PlZN9tU/07?=
- =?us-ascii?Q?daZ9Dwq0TDqqEgW9z6GmJSfzT2wHTfnZMghhjSUonUBMoC3Uqu8shUVUlbHP?=
- =?us-ascii?Q?V1hfnuO7S4/1jdgtZhMEKuUr0tixyaXPsSMcOOEnPzcYwgeEWzPTmIkREx9N?=
- =?us-ascii?Q?VcCmfBUDflaNYEPdTQatukdIxZfK3DuddDhJCBNsaOZPCRQiNCxjkI6XlYrc?=
- =?us-ascii?Q?b0QaZ8G4ug5RExatTPVx8QbjPL2twGDreOOo35FE?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.1.2507.21; Fri, 4 Aug 2023 01:00:06 -0700
+Received: from wendy (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Fri, 4 Aug 2023 01:00:01 -0700
+Date:   Fri, 4 Aug 2023 08:59:24 +0100
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Charlie Jenkins <charlie@rivosinc.com>
+CC:     <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <bpf@vger.kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+        Luke Nelson <luke.r.nels@gmail.com>,
+        Xi Wang <xi.wang@gmail.com>, Nam Cao <namcaov@gmail.com>
+Subject: Re: [PATCH 01/10] RISC-V: Expand instruction definitions
+Message-ID: <20230804-barterer-heritage-ed191081bc47@wendy>
+References: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
+ <20230803-master-refactor-instructions-v4-v1-1-2128e61fa4ff@rivosinc.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb78f2d0-ae65-47de-c467-08db94c037c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Aug 2023 07:55:49.2947
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qqv8QGAzLMylbMoxoyRGRb7jpAvGNtBEtvpZoz/jzMOlz8bKMeL2G8JppyIQVYPrtrp+N4oNjDyVABbFHUN4bg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6426
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="giltLFM/xoeS/K8e"
+Content-Disposition: inline
+In-Reply-To: <20230803-master-refactor-instructions-v4-v1-1-2128e61fa4ff@rivosinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Xin Zeng <xin.zeng@intel.com>
-> Sent: Friday, June 30, 2023 9:13 PM
->=20
-> Add logic to implement interface for live migration for QAT GEN4 Virtual
-> Functions (VFs).
-> This introduces a migration data manager which is used to hold the
-> device state during migration.
->=20
-> The VF state is organized in a section hierarchy, as reported below:
->     preamble | general state section | leaf state
->              | MISC bar state section| leaf state
->              | ETR bar state section | bank0 state section | leaf state
->                                      | bank1 state section | leaf state
->                                      | bank2 state section | leaf state
->                                      | bank3 state section | leaf state
->=20
-> Co-developed-by: Siming Wan <siming.wan@intel.com>
-> Signed-off-by: Siming Wan <siming.wan@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+--giltLFM/xoeS/K8e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-this is a big patch. Need reviewed-by from qat/crypto maintainers.
+On Thu, Aug 03, 2023 at 07:10:26PM -0700, Charlie Jenkins wrote:
+> There are many systems across the kernel that rely on directly creating
+> and modifying instructions. In order to unify them, create shared
+> definitions for instructions and registers.
+>=20
+> Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/insn.h            | 2742 ++++++++++++++++++++++++=
++++---
+
+"I did a lot of copy-pasting from the RISC-V spec"
+
+How is anyone supposed to cross check this when there's 1000s of lines
+of a diff here? We've had some subtle bugs in some of the definitions in
+the past, so I would like to be able to check at this opportune moment
+that things are correct.
+
+>  arch/riscv/include/asm/reg.h             |   88 +
+>  arch/riscv/kernel/kgdb.c                 |    4 +-
+>  arch/riscv/kernel/probes/simulate-insn.c |   39 +-
+>  arch/riscv/kernel/vector.c               |    2 +-
+
+You need to at least split this up. I doubt a 2742 change diff for
+insn.h was required to make the changes in these 4 files.
+
+Then after that, it would be so much easier to reason about these
+changes if the additions to insn.h happened at the same time as the
+removals from the affected locations.
+
+I would probably split this so that things are done in more stages,
+with the larger patches split between changes that require no new
+definitions and changes that require moving things to insn.h
+
+>  5 files changed, 2629 insertions(+), 246 deletions(-)
+
+What you would want to see if this arrived in your inbox as a reviewer?
+
+Don't get me wrong, I do like what you are doing here, the BPF JIT
+especially is filled with "uhh okay, I guess those offsets are right",
+so I don't mean to be discouraging.
+
+Thanks,
+Conor.
+
+--giltLFM/xoeS/K8e
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMyvzwAKCRB4tDGHoIJi
+0gQYAP0UlvSWYX6mB67CAGmIVZwnT0CwyiNPOEXW+G0t9GnWngD+PxdgtapB+DMY
+MPJ1zDp8mSYyzU+MKQ++56q8pPpFyQg=
+=yGw/
+-----END PGP SIGNATURE-----
+
+--giltLFM/xoeS/K8e--
