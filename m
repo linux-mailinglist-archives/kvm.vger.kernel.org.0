@@ -2,145 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 439CB770843
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 20:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DBB57708E8
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 21:21:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbjHDSzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 14:55:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37034 "EHLO
+        id S229570AbjHDTVa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 15:21:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbjHDSz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 14:55:27 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9555FBA
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 11:55:25 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58667d06607so25290957b3.1
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 11:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691175325; x=1691780125;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NAPgIg7L4ziLXGFvzhNY7osXv5BuPJ5kgHsCha/MeAE=;
-        b=09X1PUv7wpVwOes147v9SG1Z9gh2smyMNp1zr/AKW5J7WbIvI9peuAGdjUMF0DVZaN
-         aveQQbAeGVvLVaOmRpdotnUfmY6/+glZY/8QXZk81Nw4eLGjgnNx+LsR/27PvBuNlAqa
-         UAE4QP+cBygiZYxD1KyzcDLJZgL43r+Q0cw1lCxopxYALDbeVIKL22C/1jMrUc4whjg9
-         gFzmcQEDLp3cyQe6ixy1lCwPk986b+m355poJdXzKb9cpeANB9fZ8uCB6ov7MUBxl6d6
-         pwaRY2SwjsUwbYiY8FLiTJHvxkorxgvvTJKokzpT59chWGwK6zoyzCTI9XsE+Fr1LkaE
-         oKmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691175325; x=1691780125;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NAPgIg7L4ziLXGFvzhNY7osXv5BuPJ5kgHsCha/MeAE=;
-        b=XG+YGI0xFeG0QydbRhU1hmBQ0PdMKS1inOFbrNXxOVy7c5KghHnlSPPlJPKd1PlErG
-         heo37VZf00vCV8TDpoJ4uvp0wI8td5qFVL/LI/Xrlf1bJgIhmzYbm7MvlDnWgOTI8M9J
-         HNsu7XX15aOKp9YTsL1oEm0fCK8Iva4cdfkdwaZym30XfXF8c6kcqAWuq7lYLE8UXeIB
-         xmj8nRVaLO30xGVtd70oa6roWUvo5mdlQo2ay2cGC7X7T+3evpk1oQNxtA4dKJz87mmm
-         XT9mkOznIz6dhNsWAtTbZUewDVz97x8QdDL2vf4OAUZc3Rh2IFuVrko5TBfjISum0sUf
-         4qLg==
-X-Gm-Message-State: AOJu0YxnjcZTxMw+Hz+OXoRS2r2bQ8YCKc9t5hhdmbs+qC3brUPhrgwA
-        DmiPYczZodA9Y0QYQpMUY07EKCiLICg=
-X-Google-Smtp-Source: AGHT+IFExXfiQLDG+1YqUi84WVhwKGQeKxbGbbX5j1WutV1i3yIABmdTQnuznjCByAyoYcETU0Qsaf4SKqA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:441a:0:b0:584:4158:7f86 with SMTP id
- r26-20020a81441a000000b0058441587f86mr18476ywa.1.1691175324835; Fri, 04 Aug
- 2023 11:55:24 -0700 (PDT)
-Date:   Fri, 4 Aug 2023 11:55:23 -0700
-In-Reply-To: <20230803042732.88515-9-weijiang.yang@intel.com>
-Mime-Version: 1.0
-References: <20230803042732.88515-1-weijiang.yang@intel.com> <20230803042732.88515-9-weijiang.yang@intel.com>
-Message-ID: <ZM1JmxzyMgTLeEIy@google.com>
-Subject: Re: [PATCH v5 08/19] KVM:x86: Report KVM supported CET MSRs as to-be-saved
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, peterz@infradead.org, john.allen@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rick.p.edgecombe@intel.com, chao.gao@intel.com,
-        binbin.wu@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229510AbjHDTV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 15:21:28 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2043.outbound.protection.outlook.com [40.107.244.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21FE2B9;
+        Fri,  4 Aug 2023 12:21:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i0iVVAQ+pon86Zl0pDyRZEZ8Sz8lwma/osIolQ62nfcrl8YIQbjfh0wkRcAAp3kOJMGejs+jkAQ/2uWnBztuwfsrzG662WyKibivSOIfmAgILASfVkeruh0bw+77aU4ZY4zLT7TFxi2sqNbwetCQfsHxOeE0g9KNcUsQmo8Md4wAMjpghZFNq/EglSbZO83gE3t0GIiV2bkunRI65eVaxPB/J+yWDYkmxa8NYhbqLWHmRSqqPlLePPs1G9pVqNgRuSKCh8MFSBlbq61ENGl0l9Q0QzL7KaVaclOs5P7RFGRsigM0Wj8zp6emMqpEr8UzmFtBP7lH8gfetIKMubN9Tw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hi0dbPn5LyghegcjCTLnACafXx8MhvVCA5nRkRSFvDY=;
+ b=Q42iLIbcv3/tdIm7SjBsUAw8j+S3olajY/WrxLkvx0HJ2n2GFh/dV8JHn1fs+mn4xWkrAAOA5Iq3IVWi4x5EGQ43g6XFR5dBDo/YKYE+asobuiJF6U6v2Hwdrl+cQaA0VM6Si+R870/rlMJI42jdCn976j28XvBPCYhGf3ZKBQdOGq7uqgfSscg4Bh+EsicMXoLAtY29lqoRHaMDso/VzcawH1rze2tv8B/LoHCk9B09cnzZLUfBnl2aAKMIOkwg1OeCzOfwetMBRyo18wyfdCysJpwOigpntC3F14QDMdKUOSDOfsq89De51s2fYaJp87Z7Z8czDlFXQh2WlHTMIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hi0dbPn5LyghegcjCTLnACafXx8MhvVCA5nRkRSFvDY=;
+ b=G81SJGWMsDqgQiL+48sX5R8C32u2xnnZFZpMeUglaGKYJgfGJnniI//McxbFWAlMgsQIfBL8cuWPododOuHjWearLQQ/tmiiNaDaU0iBONkQkkUJj6b3FX3N3D26RjmUNu3an54hiea9oXxguOUnhrCK8+K+aEzYkeW/s+HrSB4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by SA1PR12MB6775.namprd12.prod.outlook.com (2603:10b6:806:25a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Fri, 4 Aug
+ 2023 19:21:23 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::ee63:b5d6:340c:63b2%4]) with mapi id 15.20.6652.021; Fri, 4 Aug 2023
+ 19:21:23 +0000
+Message-ID: <afdd5231-cd7b-c940-7c51-c522b4cb5b90@amd.com>
+Date:   Fri, 4 Aug 2023 12:21:21 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v13 vfio 3/7] vfio/pds: register with the pds_core PF
+Content-Language: en-US
+From:   Brett Creeley <bcreeley@amd.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Brett Creeley <brett.creeley@amd.com>
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
+        alex.williamson@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        simon.horman@corigine.com, shannon.nelson@amd.com
+References: <20230725214025.9288-1-brett.creeley@amd.com>
+ <20230725214025.9288-4-brett.creeley@amd.com> <ZM0vTlNQnglE7Pjy@nvidia.com>
+ <44535ea4-9886-a33a-7ee2-99514f04b53c@amd.com>
+In-Reply-To: <44535ea4-9886-a33a-7ee2-99514f04b53c@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH8PR05CA0021.namprd05.prod.outlook.com
+ (2603:10b6:510:2cc::9) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SA1PR12MB6775:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5729e7a7-a0a7-4112-3cb7-08db951ffd8c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ldijyVrlIPmm/COp3G4DtrWdXhIajp12xaLougB4FlYqLCBKlM0ZVhDu13xBCuTRq5neEczCQH//q6K9S6fDqjncO6a/B4YsN16f3MmJpL+lGYck+yIYz9Z1lQTOOB8fCcuQgP7iNOi79+dWDsKb/j4HZxZrEIbxcyrKER2ERcBZangomthjGUckyj9AqC12vVObliwMHvjaLkmrhHZwPR+0ZisL4P1QwKkNcydPz9ql17P4YoekFqWSI3tnNGme/F6fhTIwcg40V5Mt7OXkaf5TF8qrgMEOCB9jr8waxlMRF4jZ639Bo9Bc2fW9rClmgM5VAZlOAkbjnYp5BoncfNhzlJKcyEMgjzd0vVSjWGL0C8P0uDafdX7Fcuso1g8Zpsfy6kXQq4q1z9oLut53TwcbD1iwMLw0ptjKnXa4buTP1ppgfY5vNHIOtK0PUPItwCMCev8r5E6ARYlLiOtdDByyhg88GPO68DfKRewH6pfNzE+tmrzzeLemncp+O9egVQzq9wV9qGkauNjZeR3hD7PJ8pVF+F96gdddU7m1lZB5XyqDcxsBTcDEAkWNlcQgif6b+PwoVS76AbNmDPEJYpml+VFNzPQXcujDmAj+0379y/m41qLS2hyE2Me7Qd5TLrsiD6DUjaSZ67lVXBumCg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(366004)(376002)(396003)(136003)(451199021)(1800799003)(186006)(41300700001)(8936002)(8676002)(83380400001)(53546011)(6506007)(26005)(2616005)(38100700002)(31696002)(316002)(6512007)(478600001)(6486002)(110136005)(6636002)(4326008)(36756003)(31686004)(2906002)(66476007)(5660300002)(66946007)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VDhHTHl3Q0txYTMyOWpPU1l4ZTRiNGdwSy8rUDdUd05TL05xaUpPZjgxYlZC?=
+ =?utf-8?B?V2NJeGVTZjB0ZFBrSmpqaUM4UWE2VzR1dFloeGkvTDNiRGVoYnhwWHNsM1g0?=
+ =?utf-8?B?Unl3c09GbWJkWjY4djR3eldBUkVpVnc5RFRDL3paYTViTWo1ajFEc2Fhb3VW?=
+ =?utf-8?B?LzFlMTBmdFk4L3dLb2pSYkJJVFlOOHVsc0k1SlJtbkppd1ZVY1p1N1Jzdllt?=
+ =?utf-8?B?OG4wOXE5S2d2YzkzUDZPV0l6THVjTTFZMFZRakorK2VxT2pqMXdqRzFEa1lz?=
+ =?utf-8?B?eEdhcFlFd3R3VkM3dlpSVC80T3hjenBNYmcxL244dG1UN05URFJRVENSYngw?=
+ =?utf-8?B?VjJ1MHdZcTVJSDIvN1B1VW5UVXRubkd2YlkxWUhFYXhUd0RzZHZBUkF5K3Nl?=
+ =?utf-8?B?RDBteExUYkhrQTBsUW9oeDAxUWJ0WlhWcEhZY3Q5VGZRZTNwZG5UWmFjMUs1?=
+ =?utf-8?B?WUhDZjJWYTNVSVZJdVZ2WDhNTm91QnpBRSsrUGZ1a0dOK2MrNUJWSlNkUWpR?=
+ =?utf-8?B?Qll6d09KSm9XRXluYmt0K1FNNVBadzdiUzJlMy9NbE1aa1M3bGxKbmtNRmw1?=
+ =?utf-8?B?OG4xWEVOY3B2NW9hWDVSZFdzcWJoZFQzVEpsUVEyenozd2RYUUpIUStwczlO?=
+ =?utf-8?B?cDlLRU00dm5iYmNYT294R05NTVNnQVdRdFlhaVF6bVduaVhGNlQvdGdEb1Vx?=
+ =?utf-8?B?aERNWlRjNzRyLzFjMjlQTlBXN1JlbDRlbHBjVk1CWjM2UG01MjYwM3k4ZE1j?=
+ =?utf-8?B?YTlZdDRmQWtoQ2x1VVBmOVB1WDlDMTlrRFJRQkhtWjJxNDRUQ0hSV2M0b2Ur?=
+ =?utf-8?B?WE5iSkhZajZuQjRFSTYzZ28rRWRJbHBPbktrbXJoOEN0WXNVQUIyTGpMWmpz?=
+ =?utf-8?B?OTZKeEpCSEg4UEJkN2JCYS9ZR0czZlRZLyt3VjlZNEZJbVVPeHAvTzFwOFQz?=
+ =?utf-8?B?NkZsalNBa01zV0RJaE1EYlcxWXRwVWtQZCtZWDFhRzQxOVc0RENKdFBDdUVv?=
+ =?utf-8?B?aVVJa010ZlZEMFVlTmtMYkRPTFh3d3RENGd4Tjc5OUw0ZWNGSkh0OGFoSWZv?=
+ =?utf-8?B?ZlNDSzI2WXlJYmw5MDc4VmFMaUlXQmRaVVRpTGhVcTBsREIwczJxcytnSWRN?=
+ =?utf-8?B?SjUrMEZjOVorK1JsWEtNMUNIcUExRjN0UmlXVXhxNkQ3YTNWdys2eVZySzdX?=
+ =?utf-8?B?SW41OFVrbVBzL2FmREJJbmFMZXphRXVlRCs1TWhHOUJodSs1ZGhKQjdURlYx?=
+ =?utf-8?B?WXRwWnFQZzJoU2NaRHMrd0hDSnJMRDdqditPNC9rZDY4K0FzcGh6RUFTT2to?=
+ =?utf-8?B?NCtnVVliUi8rTS9NUEdPenFqWG5mQXVvMnZjTkhKb1BsTU1KWml0eTlrR3RM?=
+ =?utf-8?B?MjYzaHZMNGQrZVQ5SldWeWpvZXpudy96SHZVT3VhRm1jY3NyQTY3UlRNdW5k?=
+ =?utf-8?B?L1pJaGovbEp4aldnYzIyZnI1bXJ0NythNUdkYkNZZUZ2RHBaOFE0bmFlMEkz?=
+ =?utf-8?B?OGsvZjlGRUNwOGJ6cHpiQ29uYzhnWkF3MlFqRUp5d3RoZXRWQU9IZGNVVTFC?=
+ =?utf-8?B?WEZ6VndRUmpsaVdiYkRJSUdCcFhNcU9GUGN0bnRSUXYzczRKeit4bjVZMWJ3?=
+ =?utf-8?B?V3NydllCeXRBVGtwbVVSTUpOck9qZFpnK0xzRUd1YUdOYzZlbzU1aXFlYjJx?=
+ =?utf-8?B?OGpJNUdVejZySFZrRWRjNGJjVEdNYnMzTlVDVjB6TDVRZWkwblpzdTN6MXMv?=
+ =?utf-8?B?OXdGOTVhNEJZeGdmc2dGRVk4QUdCYnBUZjUxb01UN1BZY2FnNWpmVDBZaTUx?=
+ =?utf-8?B?VFlseFNHWXl4UThYdElIWTFBOXJzdG5vbUp5Ymt0QzNncG5oeXNxekRRYkto?=
+ =?utf-8?B?aXdsOUxBUm8zd0JyMElQMjNNVHFMblFZREVLWGhNOVIrNy9HRjIwSzdXcnRq?=
+ =?utf-8?B?V21OOWh6Y3FvNU1FNmV3SnhTYTRCRmFPRnQrZ0lJM1JaS1VYR29VV2pqV2N6?=
+ =?utf-8?B?ejB0cnk3ZS9INlh4M3FOVnIyTFBDNndxdHBCUlZUN2VXTjlrQ3g0Z1kzWTRa?=
+ =?utf-8?B?TkVXa3N4SS9sNEszYVo3WXY3OWJzbTJwRHEzclRRc0MxYWJmdWRLZmw4NjJl?=
+ =?utf-8?Q?u35/xrDCmDaQo6bMhsx9jzBU9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5729e7a7-a0a7-4112-3cb7-08db951ffd8c
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 19:21:23.4338
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6hNcxYnbAjJALvpJI+out5vmyGZzoF+odu15eotM9H9ylnqQkEx9lDz3thimE1QaT07j+blWojrqi/k+OMrQwA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6775
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 03, 2023, Yang Weijiang wrote:
-> Add all CET MSRs including the synthesized GUEST_SSP to report list.
-> PL{0,1,2}_SSP are independent to host XSAVE management with later
-> patches. MSR_IA32_U_CET and MSR_IA32_PL3_SSP are XSAVE-managed on
-> host side. MSR_IA32_S_CET/MSR_IA32_INT_SSP_TAB/MSR_KVM_GUEST_SSP
-> are not XSAVE-managed.
+On 8/4/2023 10:23 AM, Brett Creeley wrote:
+> On 8/4/2023 10:03 AM, Jason Gunthorpe wrote:
+>> Caution: This message originated from an External Source. Use proper 
+>> caution when opening attachments, clicking links, or responding.
+>>
+>>
+>> On Tue, Jul 25, 2023 at 02:40:21PM -0700, Brett Creeley wrote:
+>>
+>>> diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
+>>> new file mode 100644
+>>> index 000000000000..198e8e2ed002
+>>> --- /dev/null
+>>> +++ b/drivers/vfio/pci/pds/cmds.c
+>>> @@ -0,0 +1,44 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +/* Copyright(c) 2023 Advanced Micro Devices, Inc. */
+>>> +
+>>> +#include <linux/io.h>
+>>> +#include <linux/types.h>
+>>> +
+>>> +#include <linux/pds/pds_common.h>
+>>> +#include <linux/pds/pds_core_if.h>
+>>> +#include <linux/pds/pds_adminq.h>
+>>> +
+>>> +#include "vfio_dev.h"
+>>> +#include "cmds.h"
+>>> +
+>>> +int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+>>> +{
+>>> +     struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+>>> +     char devname[PDS_DEVNAME_LEN];
+>>> +     int ci;
+>>> +
+>>> +     snprintf(devname, sizeof(devname), "%s.%d-%u", 
+>>> PDS_VFIO_LM_DEV_NAME,
+>>> +              pci_domain_nr(pdev->bus),
+>>> +              PCI_DEVID(pdev->bus->number, pdev->devfn));
+>>> +
+>>> +     ci = pds_client_register(pci_physfn(pdev), devname);
+>>> +     if (ci < 0)
+>>> +             return ci;
+>>
+>> This is not the right way to get the drvdata of a PCI PF from a VF,
+>> you must call pci_iov_get_pf_drvdata().
+>>
+>> Jason
 > 
-> When CET IBT/SHSTK are enumerated to guest, both user and supervisor
-> modes should be supported for architechtural integrity, i.e., two
-> modes are supported as both or neither.
+> Okay, I will look at this and fix it up on the next version.
 > 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/include/uapi/asm/kvm_para.h |  1 +
->  arch/x86/kvm/x86.c                   | 10 ++++++++++
->  arch/x86/kvm/x86.h                   | 10 ++++++++++
->  3 files changed, 21 insertions(+)
+> Thanks,
 > 
-> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> index 6e64b27b2c1e..7af465e4e0bd 100644
-> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> @@ -58,6 +58,7 @@
->  #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
->  #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
->  #define MSR_KVM_MIGRATION_CONTROL	0x4b564d08
-> +#define MSR_KVM_GUEST_SSP	0x4b564d09
->  
->  struct kvm_steal_time {
->  	__u64 steal;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 82b9f14990da..d68ef87fe007 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1463,6 +1463,9 @@ static const u32 msrs_to_save_base[] = {
->  
->  	MSR_IA32_XFD, MSR_IA32_XFD_ERR,
->  	MSR_IA32_XSS,
-> +	MSR_IA32_U_CET, MSR_IA32_S_CET,
-> +	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
-> +	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB, MSR_KVM_GUEST_SSP,
->  };
->  
->  static const u32 msrs_to_save_pmu[] = {
-> @@ -7214,6 +7217,13 @@ static void kvm_probe_msr_to_save(u32 msr_index)
->  		if (!kvm_caps.supported_xss)
->  			return;
->  		break;
-> +	case MSR_IA32_U_CET:
-> +	case MSR_IA32_S_CET:
-> +	case MSR_KVM_GUEST_SSP:
-> +	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
-> +		if (!kvm_is_cet_supported())
-> +			return;
-> +		break;
->  	default:
->  		break;
->  	}
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 82e3dafc5453..6e6292915f8c 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -362,6 +362,16 @@ static inline bool kvm_mpx_supported(void)
->  		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
->  }
->  
-> +#define CET_XSTATE_MASK (XFEATURE_MASK_CET_USER)
+> Brett
 
-This is funky.  As of this patch, KVM reports MSR_IA32_S_CET, a supervisor MSR,
-but does not require XFEATURE_MASK_CET_KERNEL.  That eventually comes along with
-"KVM:x86: Enable guest CET supervisor xstate bit support", but as of this patch
-KVM is busted.
+After taking another look this was intentional. I'm getting the PF 
+pci_dev, not the PF's drvdata.
 
-The whole cpuid_count() code in that patch shouldn't exist, so the easiest thing
-is to just fold the KVM_SUPPORTED_XSS and CET_XSTATE_MASK changes from that patch
-into this one.
+Thanks,
+
+Brett
