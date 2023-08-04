@@ -2,97 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6778F770BD3
-	for <lists+kvm@lfdr.de>; Sat,  5 Aug 2023 00:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08720770BDF
+	for <lists+kvm@lfdr.de>; Sat,  5 Aug 2023 00:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229475AbjHDWRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 18:17:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35410 "EHLO
+        id S230441AbjHDWVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 18:21:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbjHDWRO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 18:17:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEDDF10CA
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 15:16:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691187389;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XBev8f48euppbrlGUJrvFvq/NbcYvN6NDEEVGIE+gM4=;
-        b=VnhYn6LO3yPtnz9DKfy/FGMwK6T+Wq/FpfrUGvCtxp9xNr/z9cPyaTq7LiMvca7UuRgTq/
-        bwNOyN/I+8Wqa0WKQNgv7SM/pZ/xirViumUfRz7gq1Lfa4zgCrJQFmvqD67uWTdQsH+LSH
-        b8YTvVOr616JCh2dYtl4GKWYnK4O404=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-56-a7MRxR8lM063iDrBZxxFpw-1; Fri, 04 Aug 2023 18:16:27 -0400
-X-MC-Unique: a7MRxR8lM063iDrBZxxFpw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-94f7a2b21fdso173515866b.2
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 15:16:27 -0700 (PDT)
+        with ESMTP id S230060AbjHDWVE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 18:21:04 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958EC10EA
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 15:21:03 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so2567672276.2
+        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 15:21:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691187663; x=1691792463;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/b75SsC9scGnF35935tzcOT5yZXu5YqOH3IvVYTIO2M=;
+        b=6FIcWAdAD/y19QrMG96QEM8qoHmJvas1148syfBbX+sRjRgF3cTEEPXcRYJ18kwrhR
+         wY1q1+67C0HpeIGox5P8r/KCkTFi3U9liXADQWiM+qrM2aKtTpLGMlaHBY/cwEmHqDag
+         55NBesv7opvqVSXeMQ/XhCcEiQaob/XbWgJuO9P9NPREzbwde2YtLaKx/LIR1bU4bSGA
+         vKED5hykI3YzHz6tuRxWQPNfi782TDdzjvwHcwH00mR7PMQQCUUaimJi9vrPA4nwsUPK
+         fw33ZNAR45xNkwbyPFD1Jm5kDJJa0yX39n9UidMVMX27yXlJSZZi9LYWSjpFc1ENr2bv
+         rW3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691187386; x=1691792186;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XBev8f48euppbrlGUJrvFvq/NbcYvN6NDEEVGIE+gM4=;
-        b=Gounvci7Sa+YZTl+/NW7PhMTBCGb2ikigm68j8Y/ePtazFeEV5gThgmtTA5ekbbgCH
-         RfD9CDRVFbX3tdSBdfTMHNh3Sd3majPKRSnoVePcU5OLm0q1lURBKK4BgB7qF4oojnhD
-         c9eHjHvY07SzPbzgN4jPsSpcI63VfAy2qlQ4qaC351QT4mjwDTHuVeRrDn4JudLy1wRD
-         Xm99KN0xczMMAWfTOXEI7/ddsUE3HeIOD5e7X5b6S+BpBwPAVJ1+qEjnXeikpkKkXlF2
-         +WEZNEfbLjTIUKK9iaZeFkjii7uaXloBT/7uF2cBlEeT0NRBlwMqFzkUbxR+hbgAcM1i
-         6lWw==
-X-Gm-Message-State: AOJu0Yx+7sy75MJnAwW2sewcShJCMvX9GjZ0yKCyWaO8IE6zgi0PyfjQ
-        9O8NasJq5AHhoN9iRWd+j/iJu/sihLyHuM5VvKHNLxri2zMqGhM0x+bMv6p1Ht7Xoy3lnFHmnE8
-        1NHweb32+mR80jAKQj+HD
-X-Received: by 2002:a17:907:2e19:b0:99c:6c29:7871 with SMTP id ig25-20020a1709072e1900b0099c6c297871mr2382641ejc.65.1691187386212;
-        Fri, 04 Aug 2023 15:16:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/XXy6aDU1bbyW2yj9LLfsXSmynDDC9N6br47yixyCqPnORioHqUSbfysOOjLmNVL+/dXRnQ==
-X-Received: by 2002:a17:907:2e19:b0:99c:6c29:7871 with SMTP id ig25-20020a1709072e1900b0099c6c297871mr2382632ejc.65.1691187385974;
-        Fri, 04 Aug 2023 15:16:25 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id si10-20020a170906ceca00b00992e14af9c3sm1858566ejb.143.2023.08.04.15.16.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Aug 2023 15:16:25 -0700 (PDT)
-Message-ID: <84a37508-4884-ff06-f7f3-6e8cd136b1f2@redhat.com>
-Date:   Sat, 5 Aug 2023 00:16:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: Question about the KVM API KVM_VCPU_TSC_CTRL to control guest TSC
-Content-Language: en-US
-To:     Yifei Ma <yifei@clockwork.io>, kvm@vger.kernel.org
-References: <ED93F288-CA91-4D4D-85C3-3482234287D7@clockwork.io>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ED93F288-CA91-4D4D-85C3-3482234287D7@clockwork.io>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691187663; x=1691792463;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/b75SsC9scGnF35935tzcOT5yZXu5YqOH3IvVYTIO2M=;
+        b=dST20Sm0cHp5c1Smz02+RPq8oyhxvC2uAeS8x3AAMPIdV0xK75vnPKR5PfPauT0cPC
+         GRZlBmnZRX6ts7FFBUp4yEdvkpCjpDzlnj5ifSMxOti04UoGvn36ux+jlJETRWnRSiAl
+         51z+6S5arlk5BiYtOt9UQZpOB7L4lV4pfH4gBZ78A3j9Ibf4g97gAWFa03JFr7Eg2vG+
+         HArHNR46f00Ag82nqkqF4fIuftt9omciVCllrnfkq/y7oqdCUEP0f1SqKZylDEY3Y0g7
+         /ecw30PI3G5O3/ywzJ66lAsBey/QhCXjTknqSZmYtwfok7LnYpWmiAdUpZoaVH5aVkmF
+         Sb1w==
+X-Gm-Message-State: AOJu0YwiaiieXWNzACO1aNVfz2CocGtO9ony70ml3tjHfOUbN9ii6Ite
+        GUdeF6q+bBtgvFnrV9YKFov40359y+U=
+X-Google-Smtp-Source: AGHT+IFxxYBFH5my/2+uZ9Q6VY5C7xgo4Zgh009je/H07I1uOf8Iit/Wc6LPC/VGWP9RteGn6/kCxzDIifc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:dbcf:0:b0:d01:60ec:d0e with SMTP id
+ g198-20020a25dbcf000000b00d0160ec0d0emr17435ybf.9.1691187662858; Fri, 04 Aug
+ 2023 15:21:02 -0700 (PDT)
+Date:   Fri, 4 Aug 2023 15:21:01 -0700
+In-Reply-To: <c5bdcd8e-c6cd-d586-499c-4a2b7528cda9@redhat.com>
+Mime-Version: 1.0
+References: <20230803042732.88515-1-weijiang.yang@intel.com>
+ <20230803042732.88515-12-weijiang.yang@intel.com> <ZMyJIq4CgXxudJED@chao-email>
+ <ZM1tNJ9ZdQb+VZVo@google.com> <c5bdcd8e-c6cd-d586-499c-4a2b7528cda9@redhat.com>
+Message-ID: <ZM15zd998LCOUOrZ@google.com>
+Subject: Re: [PATCH v5 11/19] KVM:VMX: Emulate read and write to CET MSRs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Chao Gao <chao.gao@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>, peterz@infradead.org,
+        john.allen@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com,
+        binbin.wu@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/4/23 21:56, Yifei Ma wrote:
-> The doc says "Read the KVM_VCPU_TSC_OFFSET attribute for*every vCPU*
-> to record the guest TSC offset”. However, the KVM API for
-> getting/setting the offset is not through vCPU’s fd, it is through
-> KVM device's fd, E.g., when I refer to the KVM selftest code, I found
-> accessing TSC_OFFSET is through the “KVM_SET_DEVICE_ATTR” cmd, with
-> args “KVM_VCPU_TSC_CTRL” & “KVM_VCPU_TSC_OFFSET”. It looks like the
-> API sets the TSC offset on all vCPUs, instead of a single vCPU.
+On Fri, Aug 04, 2023, Paolo Bonzini wrote:
+> On 8/4/23 23:27, Sean Christopherson wrote:
+> > > > +
+> > > > +	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> > > > +	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> > > > +		return false;
+> > > > +
+> > > > +	return msr->host_initiated ||
+> > > > +		guest_cpuid_has(vcpu, X86_FEATURE_IBT) ||
+> > > > +		guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> > 
+> > Similar to my suggestsion for XSS, I think we drop the waiver for host_initiated
+> > accesses, i.e. require the feature to be enabled and exposed to the guest, even
+> > for the host.
+> 
+> No, please don't.  Allowing host-initiated accesses is what makes it
+> possible to take the list of MSR indices and pass it blindly to KVM_GET_MSR
+> and KVM_SET_MSR.
 
-KVM_SET_DEVICE_ATTR is accessible through the vCPU fd as well.  In 
-particular, the group=KVM_VCPU_TSC_CTRL attr=KVM_VCPU_TSC_OFFSET is 
-available through the vCPU fd.
+I don't see how that can work today.  Oooh, the MSRs that don't exempt host_initiated
+are added to the list of MSRs to save/restore, i.e. KVM "silently" supports
+MSR_AMD64_OSVW_ID_LENGTH and MSR_AMD64_OSVW_STATUS.
 
-On x86, the device fd instead supports group=0 
-attr=KVM_X86_XCOMP_GUEST_SUPP.
+And guest_pv_has() returns true unless userspace has opted in to enforcement.
 
-Paolo
+Sad panda.
 
+That means we need to figure out a solution for KVM stuffing GUEST_SSP on RSM,
+which is a "host" write but a guest controlled value.
