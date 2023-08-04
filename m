@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B42576F7A3
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 04:12:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8B8976F7A8
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 04:13:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbjHDCMo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 22:12:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37478 "EHLO
+        id S232749AbjHDCNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 22:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231797AbjHDCMJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 22:12:09 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940E14C1F
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 19:11:29 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-686e0213c0bso1201557b3a.1
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 19:11:29 -0700 (PDT)
+        with ESMTP id S233660AbjHDCMO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 22:12:14 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1C6E4682
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 19:11:33 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-686c06b806cso1153616b3a.2
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 19:11:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1691115067; x=1691719867;
+        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1691115069; x=1691719869;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BPKfiGgHhMfFwAhfWVPwqE1z0LYuKsCQFhQ5Mh2pvvg=;
-        b=ta12HpfnDKw4trrgJe1kDu+nj00f+KtjOCKksu/MbokQkDICvsHjetWJjnnUAQ9mKA
-         WxcGuGzIACqWL4C7F0cNuUurtmsjAqQtku6EGVRRAIRX6czrur7a1fkoTwQb67I8psns
-         qiw1jr3pgIU6q5lKcqF2K0YyV/Q9izdftRMTHTrdstDWvQdYLXBYAs9POUL60yw9Qx6o
-         NxmgZnNssWnJqQ8eqgXh5ytWv/DME6JtSdllQIrmeVjOnn+1OhwqPUSJ71/U9z5WHACg
-         tIgJe92B0DResa1Wi2A+yRPOYTSNhVYGYoNJY+JGdxcqvoQH4MrlPXgKUvzgvd61u6zx
-         6NWQ==
+        bh=/9x+TFVnCGe2WU5RlGvKxqVtj4tmROvC82ze+5KJL3U=;
+        b=IkJmUMf16prXQkjP4lj5rTDJLv7FD4/XceOUaKRy9nwYg1AbjR/4hACj7L4bdWnNht
+         i/68KOTrShtWhocen7puRJ0ZaDPHRmsWFaBrqaPGdFnd0H1vvz0dIffzYNiC4Sgx5nZl
+         sOvmRmlJ+e0a66iwtno4OqFeMbZ6mHXcj5Xi/jbqbEpgrG75Gt1Mz8kXrKk4nIcFtlVh
+         bLy9PqCz8rm0g2iU/gPweYHr5CSnbe/J5MA5IoTzLIHYkq3S4sx80FZgJyF51i4nK1wG
+         JSKBN38+oh9vdwZG72hCVhOSiz6e7xSAoKkN3cE2pEDlaVUDrUaQBnQXT2hZ1YjnL+3c
+         44Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691115067; x=1691719867;
+        d=1e100.net; s=20221208; t=1691115069; x=1691719869;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BPKfiGgHhMfFwAhfWVPwqE1z0LYuKsCQFhQ5Mh2pvvg=;
-        b=jKv2qJzHQMx/6/N5SLDxb8bucrONCe3XcxRn5u6TZsVs5cgZ8Gu//le1K5q+xVqV8d
-         GvIQevq61R2YnsXRhcjZp0uCZ4Zuw9nc5Xhw+Z6Dmdcxq47RzYfM5XweXMTe35lcOhAo
-         GZwyhhgPHJ+PHdhQJfMHKgBq6tOfVcT9APa2l+e9u5fYIYRQNPqCcinkyWJXuffBImnP
-         NsRtMk/KEvE6w3NNWjaIq8HqyeF47zzWrswdUjUiiVciwl+A0Cy5XPqxtZC8JbHrzyJ2
-         mng9QZ2bBVKtAislF9XFEUaa3pGoayJw3JLxrym3Utmiuwqx8KzGdh1DCSZLyI0EdBXT
-         fuOQ==
-X-Gm-Message-State: AOJu0Yz4aN5HZLwYIb1ZBC1SAAuVjzzvWs8BninkBr5AstG7IUD8k0Qq
-        mJwKYr4Ha/jxie1wsYGWu2SWHA==
-X-Google-Smtp-Source: AGHT+IFN09ZI6JBftIb4c4o1ythrdzlTD6KiUWhToEJZR6WsVai+ZUmWDZsVnZ7Njw6c/iZ527XncQ==
-X-Received: by 2002:a05:6a00:2301:b0:686:efda:76a2 with SMTP id h1-20020a056a00230100b00686efda76a2mr405546pfh.29.1691115067089;
-        Thu, 03 Aug 2023 19:11:07 -0700 (PDT)
+        bh=/9x+TFVnCGe2WU5RlGvKxqVtj4tmROvC82ze+5KJL3U=;
+        b=QgGEnhxey6P6NEqzoxU1XfbnI3kCjMJPoYs/Q6gwJzAAndn6eu4McrOlrC/P5r/lyJ
+         SCHw2s9dYENskD10GipZv8Bn/vml5mOFLCPnq34tJtMzbaAaL8a58VAg0g1ckvHhFMap
+         D2HXoKWQtJhJsy3M5ZGHoRMUkVyxiRoAjoFEednKll2Yhhg2tHYVGCkrFc/sBx+asaxW
+         EiJUY6mijifQgrtZQJ/xLyv0DdbcnRBkxKaQTDoRffRtQzt8ztmA6CjgmfmyDQ/E/wr7
+         1j74aYM5q8gb5hK1uKRQbYHxPfPeu/AB+BV5T99l+8S1O47Qt8bIZyNh+MkJ8FQBYZVv
+         K28w==
+X-Gm-Message-State: AOJu0YwLrcjurrxQ2fUUWlhQmsDxN5CFKHjDhA/wGM5iv4Njn2Ob2why
+        GyUbitXCqNiWFBkxgHAb+XxV7g==
+X-Google-Smtp-Source: AGHT+IFkJti/J73gi8xVh6nlOFT/LodI5/N609ojJyoF75AUYfW9T3mL2OZpJIfMNG8tpG29DJWNVA==
+X-Received: by 2002:a05:6a00:228f:b0:666:ecf4:ed6d with SMTP id f15-20020a056a00228f00b00666ecf4ed6dmr469564pfe.18.1691115069170;
+        Thu, 03 Aug 2023 19:11:09 -0700 (PDT)
 Received: from charlie.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id g6-20020a655806000000b0055c558ac4edsm369499pgr.46.2023.08.03.19.11.05
+        by smtp.gmail.com with ESMTPSA id g6-20020a655806000000b0055c558ac4edsm369499pgr.46.2023.08.03.19.11.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 19:11:06 -0700 (PDT)
+        Thu, 03 Aug 2023 19:11:08 -0700 (PDT)
 From:   Charlie Jenkins <charlie@rivosinc.com>
-Date:   Thu, 03 Aug 2023 19:10:33 -0700
-Subject: [PATCH 08/10] RISC-V: kvm: Refactor instructions
+Date:   Thu, 03 Aug 2023 19:10:34 -0700
+Subject: [PATCH 09/10] RISC-V: bpf: Refactor instructions
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230803-master-refactor-instructions-v4-v1-8-2128e61fa4ff@rivosinc.com>
+Message-Id: <20230803-master-refactor-instructions-v4-v1-9-2128e61fa4ff@rivosinc.com>
 References: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
 In-Reply-To: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
 To:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -100,475 +100,734 @@ constructing them.
 
 Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
 ---
- arch/riscv/kvm/vcpu_insn.c | 281 ++++++++++++++-------------------------------
- 1 file changed, 86 insertions(+), 195 deletions(-)
+ arch/riscv/net/bpf_jit.h | 707 +----------------------------------------------
+ 1 file changed, 2 insertions(+), 705 deletions(-)
 
-diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-index 7a6abed41bc1..73c7d21b496e 100644
---- a/arch/riscv/kvm/vcpu_insn.c
-+++ b/arch/riscv/kvm/vcpu_insn.c
-@@ -6,130 +6,7 @@
- 
- #include <linux/bitops.h>
- #include <linux/kvm_host.h>
+diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
+index 2717f5490428..3f79c938166d 100644
+--- a/arch/riscv/net/bpf_jit.h
++++ b/arch/riscv/net/bpf_jit.h
+@@ -12,58 +12,8 @@
+ #include <linux/bpf.h>
+ #include <linux/filter.h>
+ #include <asm/cacheflush.h>
 -
--#define INSN_OPCODE_MASK	0x007c
--#define INSN_OPCODE_SHIFT	2
--#define INSN_OPCODE_SYSTEM	28
+-static inline bool rvc_enabled(void)
+-{
+-	return IS_ENABLED(CONFIG_RISCV_ISA_C);
+-}
 -
--#define INSN_MASK_WFI		0xffffffff
--#define INSN_MATCH_WFI		0x10500073
+-enum {
+-	RV_REG_ZERO =	0,	/* The constant value 0 */
+-	RV_REG_RA =	1,	/* Return address */
+-	RV_REG_SP =	2,	/* Stack pointer */
+-	RV_REG_GP =	3,	/* Global pointer */
+-	RV_REG_TP =	4,	/* Thread pointer */
+-	RV_REG_T0 =	5,	/* Temporaries */
+-	RV_REG_T1 =	6,
+-	RV_REG_T2 =	7,
+-	RV_REG_FP =	8,	/* Saved register/frame pointer */
+-	RV_REG_S1 =	9,	/* Saved register */
+-	RV_REG_A0 =	10,	/* Function argument/return values */
+-	RV_REG_A1 =	11,	/* Function arguments */
+-	RV_REG_A2 =	12,
+-	RV_REG_A3 =	13,
+-	RV_REG_A4 =	14,
+-	RV_REG_A5 =	15,
+-	RV_REG_A6 =	16,
+-	RV_REG_A7 =	17,
+-	RV_REG_S2 =	18,	/* Saved registers */
+-	RV_REG_S3 =	19,
+-	RV_REG_S4 =	20,
+-	RV_REG_S5 =	21,
+-	RV_REG_S6 =	22,
+-	RV_REG_S7 =	23,
+-	RV_REG_S8 =	24,
+-	RV_REG_S9 =	25,
+-	RV_REG_S10 =	26,
+-	RV_REG_S11 =	27,
+-	RV_REG_T3 =	28,	/* Temporaries */
+-	RV_REG_T4 =	29,
+-	RV_REG_T5 =	30,
+-	RV_REG_T6 =	31,
+-};
 -
--#define INSN_MATCH_CSRRW	0x1073
--#define INSN_MASK_CSRRW		0x707f
--#define INSN_MATCH_CSRRS	0x2073
--#define INSN_MASK_CSRRS		0x707f
--#define INSN_MATCH_CSRRC	0x3073
--#define INSN_MASK_CSRRC		0x707f
--#define INSN_MATCH_CSRRWI	0x5073
--#define INSN_MASK_CSRRWI	0x707f
--#define INSN_MATCH_CSRRSI	0x6073
--#define INSN_MASK_CSRRSI	0x707f
--#define INSN_MATCH_CSRRCI	0x7073
--#define INSN_MASK_CSRRCI	0x707f
--
--#define INSN_MATCH_LB		0x3
--#define INSN_MASK_LB		0x707f
--#define INSN_MATCH_LH		0x1003
--#define INSN_MASK_LH		0x707f
--#define INSN_MATCH_LW		0x2003
--#define INSN_MASK_LW		0x707f
--#define INSN_MATCH_LD		0x3003
--#define INSN_MASK_LD		0x707f
--#define INSN_MATCH_LBU		0x4003
--#define INSN_MASK_LBU		0x707f
--#define INSN_MATCH_LHU		0x5003
--#define INSN_MASK_LHU		0x707f
--#define INSN_MATCH_LWU		0x6003
--#define INSN_MASK_LWU		0x707f
--#define INSN_MATCH_SB		0x23
--#define INSN_MASK_SB		0x707f
--#define INSN_MATCH_SH		0x1023
--#define INSN_MASK_SH		0x707f
--#define INSN_MATCH_SW		0x2023
--#define INSN_MASK_SW		0x707f
--#define INSN_MATCH_SD		0x3023
--#define INSN_MASK_SD		0x707f
--
--#define INSN_MATCH_C_LD		0x6000
--#define INSN_MASK_C_LD		0xe003
--#define INSN_MATCH_C_SD		0xe000
--#define INSN_MASK_C_SD		0xe003
--#define INSN_MATCH_C_LW		0x4000
--#define INSN_MASK_C_LW		0xe003
--#define INSN_MATCH_C_SW		0xc000
--#define INSN_MASK_C_SW		0xe003
--#define INSN_MATCH_C_LDSP	0x6002
--#define INSN_MASK_C_LDSP	0xe003
--#define INSN_MATCH_C_SDSP	0xe002
--#define INSN_MASK_C_SDSP	0xe003
--#define INSN_MATCH_C_LWSP	0x4002
--#define INSN_MASK_C_LWSP	0xe003
--#define INSN_MATCH_C_SWSP	0xc002
--#define INSN_MASK_C_SWSP	0xe003
--
--#define INSN_16BIT_MASK		0x3
--
--#define INSN_IS_16BIT(insn)	(((insn) & INSN_16BIT_MASK) != INSN_16BIT_MASK)
--
--#define INSN_LEN(insn)		(INSN_IS_16BIT(insn) ? 2 : 4)
--
--#ifdef CONFIG_64BIT
--#define LOG_REGBYTES		3
--#else
--#define LOG_REGBYTES		2
--#endif
--#define REGBYTES		(1 << LOG_REGBYTES)
--
--#define SH_RD			7
--#define SH_RS1			15
--#define SH_RS2			20
--#define SH_RS2C			2
--#define MASK_RX			0x1f
--
--#define RV_X(x, s, n)		(((x) >> (s)) & ((1 << (n)) - 1))
--#define RVC_LW_IMM(x)		((RV_X(x, 6, 1) << 2) | \
--				 (RV_X(x, 10, 3) << 3) | \
--				 (RV_X(x, 5, 1) << 6))
--#define RVC_LD_IMM(x)		((RV_X(x, 10, 3) << 3) | \
--				 (RV_X(x, 5, 2) << 6))
--#define RVC_LWSP_IMM(x)		((RV_X(x, 4, 3) << 2) | \
--				 (RV_X(x, 12, 1) << 5) | \
--				 (RV_X(x, 2, 2) << 6))
--#define RVC_LDSP_IMM(x)		((RV_X(x, 5, 2) << 3) | \
--				 (RV_X(x, 12, 1) << 5) | \
--				 (RV_X(x, 2, 3) << 6))
--#define RVC_SWSP_IMM(x)		((RV_X(x, 9, 4) << 2) | \
--				 (RV_X(x, 7, 2) << 6))
--#define RVC_SDSP_IMM(x)		((RV_X(x, 10, 3) << 3) | \
--				 (RV_X(x, 7, 3) << 6))
--#define RVC_RS1S(insn)		(8 + RV_X(insn, SH_RD, 3))
--#define RVC_RS2S(insn)		(8 + RV_X(insn, SH_RS2C, 3))
--#define RVC_RS2(insn)		RV_X(insn, SH_RS2C, 5)
--
--#define SHIFT_RIGHT(x, y)		\
--	((y) < 0 ? ((x) << -(y)) : ((x) >> (y)))
--
--#define REG_MASK			\
--	((1 << (5 + LOG_REGBYTES)) - (1 << LOG_REGBYTES))
--
--#define REG_OFFSET(insn, pos)		\
--	(SHIFT_RIGHT((insn), (pos) - LOG_REGBYTES) & REG_MASK)
--
--#define REG_PTR(insn, pos, regs)	\
--	((ulong *)((ulong)(regs) + REG_OFFSET(insn, pos)))
--
--#define GET_FUNCT3(insn)	(((insn) >> 12) & 7)
--
--#define GET_RS1(insn, regs)	(*REG_PTR(insn, SH_RS1, regs))
--#define GET_RS2(insn, regs)	(*REG_PTR(insn, SH_RS2, regs))
--#define GET_RS1S(insn, regs)	(*REG_PTR(RVC_RS1S(insn), 0, regs))
--#define GET_RS2S(insn, regs)	(*REG_PTR(RVC_RS2S(insn), 0, regs))
--#define GET_RS2C(insn, regs)	(*REG_PTR(insn, SH_RS2C, regs))
--#define GET_SP(regs)		(*REG_PTR(2, 0, regs))
--#define SET_RD(insn, regs, val)	(*REG_PTR(insn, SH_RD, regs) = (val))
--#define IMM_I(insn)		((s32)(insn) >> 20)
--#define IMM_S(insn)		(((s32)(insn) >> 25 << 5) | \
--				 (s32)(((insn) >> 7) & 0x1f))
+-static inline bool is_creg(u8 reg)
+-{
+-	return (1 << reg) & (BIT(RV_REG_FP) |
+-			     BIT(RV_REG_S1) |
+-			     BIT(RV_REG_A0) |
+-			     BIT(RV_REG_A1) |
+-			     BIT(RV_REG_A2) |
+-			     BIT(RV_REG_A3) |
+-			     BIT(RV_REG_A4) |
+-			     BIT(RV_REG_A5));
+-}
++#include <asm/reg.h>
 +#include <asm/insn.h>
  
- struct insn_func {
- 	unsigned long mask;
-@@ -230,6 +107,7 @@ static const struct csr_func csr_funcs[] = {
- int kvm_riscv_vcpu_csr_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	ulong insn;
-+	u32 index;
+ struct rv_jit_context {
+ 	struct bpf_prog *prog;
+@@ -221,659 +171,6 @@ static inline int rv_offset(int insn, int off, struct rv_jit_context *ctx)
+ 	return ninsns_rvoff(to - from);
+ }
  
- 	if (vcpu->arch.csr_decode.return_handled)
- 		return 0;
-@@ -237,9 +115,10 @@ int kvm_riscv_vcpu_csr_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+-/* Instruction formats. */
+-
+-static inline u32 rv_r_insn(u8 funct7, u8 rs2, u8 rs1, u8 funct3, u8 rd,
+-			    u8 opcode)
+-{
+-	return (funct7 << 25) | (rs2 << 20) | (rs1 << 15) | (funct3 << 12) |
+-		(rd << 7) | opcode;
+-}
+-
+-static inline u32 rv_i_insn(u16 imm11_0, u8 rs1, u8 funct3, u8 rd, u8 opcode)
+-{
+-	return (imm11_0 << 20) | (rs1 << 15) | (funct3 << 12) | (rd << 7) |
+-		opcode;
+-}
+-
+-static inline u32 rv_s_insn(u16 imm11_0, u8 rs2, u8 rs1, u8 funct3, u8 opcode)
+-{
+-	u8 imm11_5 = imm11_0 >> 5, imm4_0 = imm11_0 & 0x1f;
+-
+-	return (imm11_5 << 25) | (rs2 << 20) | (rs1 << 15) | (funct3 << 12) |
+-		(imm4_0 << 7) | opcode;
+-}
+-
+-static inline u32 rv_b_insn(u16 imm12_1, u8 rs2, u8 rs1, u8 funct3, u8 opcode)
+-{
+-	u8 imm12 = ((imm12_1 & 0x800) >> 5) | ((imm12_1 & 0x3f0) >> 4);
+-	u8 imm4_1 = ((imm12_1 & 0xf) << 1) | ((imm12_1 & 0x400) >> 10);
+-
+-	return (imm12 << 25) | (rs2 << 20) | (rs1 << 15) | (funct3 << 12) |
+-		(imm4_1 << 7) | opcode;
+-}
+-
+-static inline u32 rv_u_insn(u32 imm31_12, u8 rd, u8 opcode)
+-{
+-	return (imm31_12 << 12) | (rd << 7) | opcode;
+-}
+-
+-static inline u32 rv_j_insn(u32 imm20_1, u8 rd, u8 opcode)
+-{
+-	u32 imm;
+-
+-	imm = (imm20_1 & 0x80000) | ((imm20_1 & 0x3ff) << 9) |
+-		((imm20_1 & 0x400) >> 2) | ((imm20_1 & 0x7f800) >> 11);
+-
+-	return (imm << 12) | (rd << 7) | opcode;
+-}
+-
+-static inline u32 rv_amo_insn(u8 funct5, u8 aq, u8 rl, u8 rs2, u8 rs1,
+-			      u8 funct3, u8 rd, u8 opcode)
+-{
+-	u8 funct7 = (funct5 << 2) | (aq << 1) | rl;
+-
+-	return rv_r_insn(funct7, rs2, rs1, funct3, rd, opcode);
+-}
+-
+-/* RISC-V compressed instruction formats. */
+-
+-static inline u16 rv_cr_insn(u8 funct4, u8 rd, u8 rs2, u8 op)
+-{
+-	return (funct4 << 12) | (rd << 7) | (rs2 << 2) | op;
+-}
+-
+-static inline u16 rv_ci_insn(u8 funct3, u32 imm6, u8 rd, u8 op)
+-{
+-	u32 imm;
+-
+-	imm = ((imm6 & 0x20) << 7) | ((imm6 & 0x1f) << 2);
+-	return (funct3 << 13) | (rd << 7) | op | imm;
+-}
+-
+-static inline u16 rv_css_insn(u8 funct3, u32 uimm, u8 rs2, u8 op)
+-{
+-	return (funct3 << 13) | (uimm << 7) | (rs2 << 2) | op;
+-}
+-
+-static inline u16 rv_ciw_insn(u8 funct3, u32 uimm, u8 rd, u8 op)
+-{
+-	return (funct3 << 13) | (uimm << 5) | ((rd & 0x7) << 2) | op;
+-}
+-
+-static inline u16 rv_cl_insn(u8 funct3, u32 imm_hi, u8 rs1, u32 imm_lo, u8 rd,
+-			     u8 op)
+-{
+-	return (funct3 << 13) | (imm_hi << 10) | ((rs1 & 0x7) << 7) |
+-		(imm_lo << 5) | ((rd & 0x7) << 2) | op;
+-}
+-
+-static inline u16 rv_cs_insn(u8 funct3, u32 imm_hi, u8 rs1, u32 imm_lo, u8 rs2,
+-			     u8 op)
+-{
+-	return (funct3 << 13) | (imm_hi << 10) | ((rs1 & 0x7) << 7) |
+-		(imm_lo << 5) | ((rs2 & 0x7) << 2) | op;
+-}
+-
+-static inline u16 rv_ca_insn(u8 funct6, u8 rd, u8 funct2, u8 rs2, u8 op)
+-{
+-	return (funct6 << 10) | ((rd & 0x7) << 7) | (funct2 << 5) |
+-		((rs2 & 0x7) << 2) | op;
+-}
+-
+-static inline u16 rv_cb_insn(u8 funct3, u32 imm6, u8 funct2, u8 rd, u8 op)
+-{
+-	u32 imm;
+-
+-	imm = ((imm6 & 0x20) << 7) | ((imm6 & 0x1f) << 2);
+-	return (funct3 << 13) | (funct2 << 10) | ((rd & 0x7) << 7) | op | imm;
+-}
+-
+-/* Instructions shared by both RV32 and RV64. */
+-
+-static inline u32 rv_addi(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 0, rd, 0x13);
+-}
+-
+-static inline u32 rv_andi(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 7, rd, 0x13);
+-}
+-
+-static inline u32 rv_ori(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 6, rd, 0x13);
+-}
+-
+-static inline u32 rv_xori(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 4, rd, 0x13);
+-}
+-
+-static inline u32 rv_slli(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 1, rd, 0x13);
+-}
+-
+-static inline u32 rv_srli(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 5, rd, 0x13);
+-}
+-
+-static inline u32 rv_srai(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(0x400 | imm11_0, rs1, 5, rd, 0x13);
+-}
+-
+-static inline u32 rv_lui(u8 rd, u32 imm31_12)
+-{
+-	return rv_u_insn(imm31_12, rd, 0x37);
+-}
+-
+-static inline u32 rv_auipc(u8 rd, u32 imm31_12)
+-{
+-	return rv_u_insn(imm31_12, rd, 0x17);
+-}
+-
+-static inline u32 rv_add(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 0, rd, 0x33);
+-}
+-
+-static inline u32 rv_sub(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0x20, rs2, rs1, 0, rd, 0x33);
+-}
+-
+-static inline u32 rv_sltu(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 3, rd, 0x33);
+-}
+-
+-static inline u32 rv_and(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 7, rd, 0x33);
+-}
+-
+-static inline u32 rv_or(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 6, rd, 0x33);
+-}
+-
+-static inline u32 rv_xor(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 4, rd, 0x33);
+-}
+-
+-static inline u32 rv_sll(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 1, rd, 0x33);
+-}
+-
+-static inline u32 rv_srl(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 5, rd, 0x33);
+-}
+-
+-static inline u32 rv_sra(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0x20, rs2, rs1, 5, rd, 0x33);
+-}
+-
+-static inline u32 rv_mul(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 0, rd, 0x33);
+-}
+-
+-static inline u32 rv_mulhu(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 3, rd, 0x33);
+-}
+-
+-static inline u32 rv_divu(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 5, rd, 0x33);
+-}
+-
+-static inline u32 rv_remu(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 7, rd, 0x33);
+-}
+-
+-static inline u32 rv_jal(u8 rd, u32 imm20_1)
+-{
+-	return rv_j_insn(imm20_1, rd, 0x6f);
+-}
+-
+-static inline u32 rv_jalr(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 0, rd, 0x67);
+-}
+-
+-static inline u32 rv_beq(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_b_insn(imm12_1, rs2, rs1, 0, 0x63);
+-}
+-
+-static inline u32 rv_bne(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_b_insn(imm12_1, rs2, rs1, 1, 0x63);
+-}
+-
+-static inline u32 rv_bltu(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_b_insn(imm12_1, rs2, rs1, 6, 0x63);
+-}
+-
+-static inline u32 rv_bgtu(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_bltu(rs2, rs1, imm12_1);
+-}
+-
+-static inline u32 rv_bgeu(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_b_insn(imm12_1, rs2, rs1, 7, 0x63);
+-}
+-
+-static inline u32 rv_bleu(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_bgeu(rs2, rs1, imm12_1);
+-}
+-
+-static inline u32 rv_blt(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_b_insn(imm12_1, rs2, rs1, 4, 0x63);
+-}
+-
+-static inline u32 rv_bgt(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_blt(rs2, rs1, imm12_1);
+-}
+-
+-static inline u32 rv_bge(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_b_insn(imm12_1, rs2, rs1, 5, 0x63);
+-}
+-
+-static inline u32 rv_ble(u8 rs1, u8 rs2, u16 imm12_1)
+-{
+-	return rv_bge(rs2, rs1, imm12_1);
+-}
+-
+-static inline u32 rv_lw(u8 rd, u16 imm11_0, u8 rs1)
+-{
+-	return rv_i_insn(imm11_0, rs1, 2, rd, 0x03);
+-}
+-
+-static inline u32 rv_lbu(u8 rd, u16 imm11_0, u8 rs1)
+-{
+-	return rv_i_insn(imm11_0, rs1, 4, rd, 0x03);
+-}
+-
+-static inline u32 rv_lhu(u8 rd, u16 imm11_0, u8 rs1)
+-{
+-	return rv_i_insn(imm11_0, rs1, 5, rd, 0x03);
+-}
+-
+-static inline u32 rv_sb(u8 rs1, u16 imm11_0, u8 rs2)
+-{
+-	return rv_s_insn(imm11_0, rs2, rs1, 0, 0x23);
+-}
+-
+-static inline u32 rv_sh(u8 rs1, u16 imm11_0, u8 rs2)
+-{
+-	return rv_s_insn(imm11_0, rs2, rs1, 1, 0x23);
+-}
+-
+-static inline u32 rv_sw(u8 rs1, u16 imm11_0, u8 rs2)
+-{
+-	return rv_s_insn(imm11_0, rs2, rs1, 2, 0x23);
+-}
+-
+-static inline u32 rv_amoadd_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoand_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0xc, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoor_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x8, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoxor_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x4, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoswap_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x1, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_lr_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x2, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_sc_w(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x3, aq, rl, rs2, rs1, 2, rd, 0x2f);
+-}
+-
+-static inline u32 rv_fence(u8 pred, u8 succ)
+-{
+-	u16 imm11_0 = pred << 4 | succ;
+-
+-	return rv_i_insn(imm11_0, 0, 0, 0, 0xf);
+-}
+-
+-static inline u32 rv_nop(void)
+-{
+-	return rv_i_insn(0, 0, 0, 0, 0x13);
+-}
+-
+-/* RVC instrutions. */
+-
+-static inline u16 rvc_addi4spn(u8 rd, u32 imm10)
+-{
+-	u32 imm;
+-
+-	imm = ((imm10 & 0x30) << 2) | ((imm10 & 0x3c0) >> 4) |
+-		((imm10 & 0x4) >> 1) | ((imm10 & 0x8) >> 3);
+-	return rv_ciw_insn(0x0, imm, rd, 0x0);
+-}
+-
+-static inline u16 rvc_lw(u8 rd, u32 imm7, u8 rs1)
+-{
+-	u32 imm_hi, imm_lo;
+-
+-	imm_hi = (imm7 & 0x38) >> 3;
+-	imm_lo = ((imm7 & 0x4) >> 1) | ((imm7 & 0x40) >> 6);
+-	return rv_cl_insn(0x2, imm_hi, rs1, imm_lo, rd, 0x0);
+-}
+-
+-static inline u16 rvc_sw(u8 rs1, u32 imm7, u8 rs2)
+-{
+-	u32 imm_hi, imm_lo;
+-
+-	imm_hi = (imm7 & 0x38) >> 3;
+-	imm_lo = ((imm7 & 0x4) >> 1) | ((imm7 & 0x40) >> 6);
+-	return rv_cs_insn(0x6, imm_hi, rs1, imm_lo, rs2, 0x0);
+-}
+-
+-static inline u16 rvc_addi(u8 rd, u32 imm6)
+-{
+-	return rv_ci_insn(0, imm6, rd, 0x1);
+-}
+-
+-static inline u16 rvc_li(u8 rd, u32 imm6)
+-{
+-	return rv_ci_insn(0x2, imm6, rd, 0x1);
+-}
+-
+-static inline u16 rvc_addi16sp(u32 imm10)
+-{
+-	u32 imm;
+-
+-	imm = ((imm10 & 0x200) >> 4) | (imm10 & 0x10) | ((imm10 & 0x40) >> 3) |
+-		((imm10 & 0x180) >> 6) | ((imm10 & 0x20) >> 5);
+-	return rv_ci_insn(0x3, imm, RV_REG_SP, 0x1);
+-}
+-
+-static inline u16 rvc_lui(u8 rd, u32 imm6)
+-{
+-	return rv_ci_insn(0x3, imm6, rd, 0x1);
+-}
+-
+-static inline u16 rvc_srli(u8 rd, u32 imm6)
+-{
+-	return rv_cb_insn(0x4, imm6, 0, rd, 0x1);
+-}
+-
+-static inline u16 rvc_srai(u8 rd, u32 imm6)
+-{
+-	return rv_cb_insn(0x4, imm6, 0x1, rd, 0x1);
+-}
+-
+-static inline u16 rvc_andi(u8 rd, u32 imm6)
+-{
+-	return rv_cb_insn(0x4, imm6, 0x2, rd, 0x1);
+-}
+-
+-static inline u16 rvc_sub(u8 rd, u8 rs)
+-{
+-	return rv_ca_insn(0x23, rd, 0, rs, 0x1);
+-}
+-
+-static inline u16 rvc_xor(u8 rd, u8 rs)
+-{
+-	return rv_ca_insn(0x23, rd, 0x1, rs, 0x1);
+-}
+-
+-static inline u16 rvc_or(u8 rd, u8 rs)
+-{
+-	return rv_ca_insn(0x23, rd, 0x2, rs, 0x1);
+-}
+-
+-static inline u16 rvc_and(u8 rd, u8 rs)
+-{
+-	return rv_ca_insn(0x23, rd, 0x3, rs, 0x1);
+-}
+-
+-static inline u16 rvc_slli(u8 rd, u32 imm6)
+-{
+-	return rv_ci_insn(0, imm6, rd, 0x2);
+-}
+-
+-static inline u16 rvc_lwsp(u8 rd, u32 imm8)
+-{
+-	u32 imm;
+-
+-	imm = ((imm8 & 0xc0) >> 6) | (imm8 & 0x3c);
+-	return rv_ci_insn(0x2, imm, rd, 0x2);
+-}
+-
+-static inline u16 rvc_jr(u8 rs1)
+-{
+-	return rv_cr_insn(0x8, rs1, RV_REG_ZERO, 0x2);
+-}
+-
+-static inline u16 rvc_mv(u8 rd, u8 rs)
+-{
+-	return rv_cr_insn(0x8, rd, rs, 0x2);
+-}
+-
+-static inline u16 rvc_jalr(u8 rs1)
+-{
+-	return rv_cr_insn(0x9, rs1, RV_REG_ZERO, 0x2);
+-}
+-
+-static inline u16 rvc_add(u8 rd, u8 rs)
+-{
+-	return rv_cr_insn(0x9, rd, rs, 0x2);
+-}
+-
+-static inline u16 rvc_swsp(u32 imm8, u8 rs2)
+-{
+-	u32 imm;
+-
+-	imm = (imm8 & 0x3c) | ((imm8 & 0xc0) >> 6);
+-	return rv_css_insn(0x6, imm, rs2, 0x2);
+-}
+-
+-/*
+- * RV64-only instructions.
+- *
+- * These instructions are not available on RV32.  Wrap them below a #if to
+- * ensure that the RV32 JIT doesn't emit any of these instructions.
+- */
+-
+-#if __riscv_xlen == 64
+-
+-static inline u32 rv_addiw(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 0, rd, 0x1b);
+-}
+-
+-static inline u32 rv_slliw(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 1, rd, 0x1b);
+-}
+-
+-static inline u32 rv_srliw(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(imm11_0, rs1, 5, rd, 0x1b);
+-}
+-
+-static inline u32 rv_sraiw(u8 rd, u8 rs1, u16 imm11_0)
+-{
+-	return rv_i_insn(0x400 | imm11_0, rs1, 5, rd, 0x1b);
+-}
+-
+-static inline u32 rv_addw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 0, rd, 0x3b);
+-}
+-
+-static inline u32 rv_subw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0x20, rs2, rs1, 0, rd, 0x3b);
+-}
+-
+-static inline u32 rv_sllw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 1, rd, 0x3b);
+-}
+-
+-static inline u32 rv_srlw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0, rs2, rs1, 5, rd, 0x3b);
+-}
+-
+-static inline u32 rv_sraw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(0x20, rs2, rs1, 5, rd, 0x3b);
+-}
+-
+-static inline u32 rv_mulw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 0, rd, 0x3b);
+-}
+-
+-static inline u32 rv_divuw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 5, rd, 0x3b);
+-}
+-
+-static inline u32 rv_remuw(u8 rd, u8 rs1, u8 rs2)
+-{
+-	return rv_r_insn(1, rs2, rs1, 7, rd, 0x3b);
+-}
+-
+-static inline u32 rv_ld(u8 rd, u16 imm11_0, u8 rs1)
+-{
+-	return rv_i_insn(imm11_0, rs1, 3, rd, 0x03);
+-}
+-
+-static inline u32 rv_lwu(u8 rd, u16 imm11_0, u8 rs1)
+-{
+-	return rv_i_insn(imm11_0, rs1, 6, rd, 0x03);
+-}
+-
+-static inline u32 rv_sd(u8 rs1, u16 imm11_0, u8 rs2)
+-{
+-	return rv_s_insn(imm11_0, rs2, rs1, 3, 0x23);
+-}
+-
+-static inline u32 rv_amoadd_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoand_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0xc, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoor_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x8, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoxor_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x4, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-static inline u32 rv_amoswap_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x1, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-static inline u32 rv_lr_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x2, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-static inline u32 rv_sc_d(u8 rd, u8 rs2, u8 rs1, u8 aq, u8 rl)
+-{
+-	return rv_amo_insn(0x3, aq, rl, rs2, rs1, 3, rd, 0x2f);
+-}
+-
+-/* RV64-only RVC instructions. */
+-
+-static inline u16 rvc_ld(u8 rd, u32 imm8, u8 rs1)
+-{
+-	u32 imm_hi, imm_lo;
+-
+-	imm_hi = (imm8 & 0x38) >> 3;
+-	imm_lo = (imm8 & 0xc0) >> 6;
+-	return rv_cl_insn(0x3, imm_hi, rs1, imm_lo, rd, 0x0);
+-}
+-
+-static inline u16 rvc_sd(u8 rs1, u32 imm8, u8 rs2)
+-{
+-	u32 imm_hi, imm_lo;
+-
+-	imm_hi = (imm8 & 0x38) >> 3;
+-	imm_lo = (imm8 & 0xc0) >> 6;
+-	return rv_cs_insn(0x7, imm_hi, rs1, imm_lo, rs2, 0x0);
+-}
+-
+-static inline u16 rvc_subw(u8 rd, u8 rs)
+-{
+-	return rv_ca_insn(0x27, rd, 0, rs, 0x1);
+-}
+-
+-static inline u16 rvc_addiw(u8 rd, u32 imm6)
+-{
+-	return rv_ci_insn(0x1, imm6, rd, 0x1);
+-}
+-
+-static inline u16 rvc_ldsp(u8 rd, u32 imm9)
+-{
+-	u32 imm;
+-
+-	imm = ((imm9 & 0x1c0) >> 6) | (imm9 & 0x38);
+-	return rv_ci_insn(0x3, imm, rd, 0x2);
+-}
+-
+-static inline u16 rvc_sdsp(u32 imm9, u8 rs2)
+-{
+-	u32 imm;
+-
+-	imm = (imm9 & 0x38) | ((imm9 & 0x1c0) >> 6);
+-	return rv_css_insn(0x7, imm, rs2, 0x2);
+-}
+-
+-#endif /* __riscv_xlen == 64 */
+-
+ /* Helper functions that emit RVC instructions when possible. */
  
- 	/* Update destination register for CSR reads */
- 	insn = vcpu->arch.csr_decode.insn;
--	if ((insn >> SH_RD) & MASK_RX)
--		SET_RD(insn, &vcpu->arch.guest_context,
--		       run->riscv_csr.ret_value);
-+	riscv_insn_extract_rd(insn);
-+	if (index)
-+		rv_insn_reg_set_val((unsigned long *)&vcpu->arch.guest_context,
-+				    index, run->riscv_csr.ret_value);
- 
- 	/* Move to next instruction */
- 	vcpu->arch.guest_context.sepc += INSN_LEN(insn);
-@@ -249,36 +128,39 @@ int kvm_riscv_vcpu_csr_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- static int csr_insn(struct kvm_vcpu *vcpu, struct kvm_run *run, ulong insn)
- {
-+	ulong rs1_val;
- 	int i, rc = KVM_INSN_ILLEGAL_TRAP;
--	unsigned int csr_num = insn >> SH_RS2;
--	unsigned int rs1_num = (insn >> SH_RS1) & MASK_RX;
--	ulong rs1_val = GET_RS1(insn, &vcpu->arch.guest_context);
-+	unsigned int csr_num = insn >> RV_I_IMM_11_0_OPOFF;
-+	unsigned int rs1_num = riscv_insn_extract_rs1(insn);
- 	const struct csr_func *tcfn, *cfn = NULL;
- 	ulong val = 0, wr_mask = 0, new_val = 0;
- 
-+	rv_insn_reg_get_val((unsigned long *)&vcpu->arch.guest_context,
-+			    riscv_insn_extract_rs1(insn), &rs1_val);
-+
- 	/* Decode the CSR instruction */
--	switch (GET_FUNCT3(insn)) {
--	case GET_FUNCT3(INSN_MATCH_CSRRW):
-+	switch (riscv_insn_extract_funct3(insn)) {
-+	case RVG_FUNCT3_CSRRW:
- 		wr_mask = -1UL;
- 		new_val = rs1_val;
- 		break;
--	case GET_FUNCT3(INSN_MATCH_CSRRS):
-+	case RVG_FUNCT3_CSRRS:
- 		wr_mask = rs1_val;
- 		new_val = -1UL;
- 		break;
--	case GET_FUNCT3(INSN_MATCH_CSRRC):
-+	case RVG_FUNCT3_CSRRC:
- 		wr_mask = rs1_val;
- 		new_val = 0;
- 		break;
--	case GET_FUNCT3(INSN_MATCH_CSRRWI):
-+	case RVG_FUNCT3_CSRRWI:
- 		wr_mask = -1UL;
- 		new_val = rs1_num;
- 		break;
--	case GET_FUNCT3(INSN_MATCH_CSRRSI):
-+	case RVG_FUNCT3_CSRRSI:
- 		wr_mask = rs1_num;
- 		new_val = -1UL;
- 		break;
--	case GET_FUNCT3(INSN_MATCH_CSRRCI):
-+	case RVG_FUNCT3_CSRRCI:
- 		wr_mask = rs1_num;
- 		new_val = 0;
- 		break;
-@@ -331,38 +213,38 @@ static int csr_insn(struct kvm_vcpu *vcpu, struct kvm_run *run, ulong insn)
- 
- static const struct insn_func system_opcode_funcs[] = {
- 	{
--		.mask  = INSN_MASK_CSRRW,
--		.match = INSN_MATCH_CSRRW,
-+		.mask  = RVG_MASK_CSRRW,
-+		.match = RVG_MATCH_CSRRW,
- 		.func  = csr_insn,
- 	},
- 	{
--		.mask  = INSN_MASK_CSRRS,
--		.match = INSN_MATCH_CSRRS,
-+		.mask  = RVG_MASK_CSRRS,
-+		.match = RVG_MATCH_CSRRS,
- 		.func  = csr_insn,
- 	},
- 	{
--		.mask  = INSN_MASK_CSRRC,
--		.match = INSN_MATCH_CSRRC,
-+		.mask  = RVG_MASK_CSRRC,
-+		.match = RVG_MATCH_CSRRC,
- 		.func  = csr_insn,
- 	},
- 	{
--		.mask  = INSN_MASK_CSRRWI,
--		.match = INSN_MATCH_CSRRWI,
-+		.mask  = RVG_MASK_CSRRWI,
-+		.match = RVG_MATCH_CSRRWI,
- 		.func  = csr_insn,
- 	},
- 	{
--		.mask  = INSN_MASK_CSRRSI,
--		.match = INSN_MATCH_CSRRSI,
-+		.mask  = RVG_MASK_CSRRSI,
-+		.match = RVG_MATCH_CSRRSI,
- 		.func  = csr_insn,
- 	},
- 	{
--		.mask  = INSN_MASK_CSRRCI,
--		.match = INSN_MATCH_CSRRCI,
-+		.mask  = RVG_MASK_CSRRCI,
-+		.match = RVG_MATCH_CSRRCI,
- 		.func  = csr_insn,
- 	},
- 	{
--		.mask  = INSN_MASK_WFI,
--		.match = INSN_MATCH_WFI,
-+		.mask  = RV_MASK_WFI,
-+		.match = RV_MATCH_WFI,
- 		.func  = wfi_insn,
- 	},
- };
-@@ -414,7 +296,7 @@ int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	struct kvm_cpu_trap utrap = { 0 };
- 	struct kvm_cpu_context *ct;
- 
--	if (unlikely(INSN_IS_16BIT(insn))) {
-+	if (unlikely(INSN_IS_C(insn))) {
- 		if (insn == 0) {
- 			ct = &vcpu->arch.guest_context;
- 			insn = kvm_riscv_vcpu_unpriv_read(vcpu, true,
-@@ -426,12 +308,12 @@ int kvm_riscv_vcpu_virtual_insn(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 				return 1;
- 			}
- 		}
--		if (INSN_IS_16BIT(insn))
-+		if (INSN_IS_C(insn))
- 			return truly_illegal_insn(vcpu, run, insn);
- 	}
- 
--	switch ((insn & INSN_OPCODE_MASK) >> INSN_OPCODE_SHIFT) {
--	case INSN_OPCODE_SYSTEM:
-+	switch (insn) {
-+	case RVG_OPCODE_SYSTEM:
- 		return system_opcode_insn(vcpu, run, insn);
- 	default:
- 		return truly_illegal_insn(vcpu, run, insn);
-@@ -466,7 +348,7 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 * Bit[0] == 1 implies trapped instruction value is
- 		 * transformed instruction or custom instruction.
- 		 */
--		insn = htinst | INSN_16BIT_MASK;
-+		insn = htinst | INSN_C_MASK;
- 		insn_len = (htinst & BIT(1)) ? INSN_LEN(insn) : 2;
- 	} else {
- 		/*
-@@ -485,43 +367,43 @@ int kvm_riscv_vcpu_mmio_load(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	}
- 
- 	/* Decode length of MMIO and shift */
--	if ((insn & INSN_MASK_LW) == INSN_MATCH_LW) {
-+	if (riscv_insn_is_lw(insn)) {
- 		len = 4;
- 		shift = 8 * (sizeof(ulong) - len);
--	} else if ((insn & INSN_MASK_LB) == INSN_MATCH_LB) {
-+	} else if (riscv_insn_is_lb(insn)) {
- 		len = 1;
- 		shift = 8 * (sizeof(ulong) - len);
--	} else if ((insn & INSN_MASK_LBU) == INSN_MATCH_LBU) {
-+	} else if (riscv_insn_is_lbu(insn)) {
- 		len = 1;
- 		shift = 8 * (sizeof(ulong) - len);
- #ifdef CONFIG_64BIT
--	} else if ((insn & INSN_MASK_LD) == INSN_MATCH_LD) {
-+	} else if (riscv_insn_is_ld(insn)) {
- 		len = 8;
- 		shift = 8 * (sizeof(ulong) - len);
--	} else if ((insn & INSN_MASK_LWU) == INSN_MATCH_LWU) {
-+	} else if (riscv_insn_is_lwu(insn)) {
- 		len = 4;
- #endif
--	} else if ((insn & INSN_MASK_LH) == INSN_MATCH_LH) {
-+	} else if (riscv_insn_is_lh(insn)) {
- 		len = 2;
- 		shift = 8 * (sizeof(ulong) - len);
--	} else if ((insn & INSN_MASK_LHU) == INSN_MATCH_LHU) {
-+	} else if (riscv_insn_is_lhu(insn)) {
- 		len = 2;
- #ifdef CONFIG_64BIT
--	} else if ((insn & INSN_MASK_C_LD) == INSN_MATCH_C_LD) {
-+	} else if (riscv_insn_is_c_ld(insn)) {
- 		len = 8;
- 		shift = 8 * (sizeof(ulong) - len);
--		insn = RVC_RS2S(insn) << SH_RD;
--	} else if ((insn & INSN_MASK_C_LDSP) == INSN_MATCH_C_LDSP &&
--		   ((insn >> SH_RD) & 0x1f)) {
-+		insn = riscv_insn_extract_csca_rs2(insn) << RVG_RD_OPOFF;
-+	} else if (riscv_insn_is_c_ldsp(insn) &&
-+		   riscv_insn_extract_rd(insn)) {
- 		len = 8;
- 		shift = 8 * (sizeof(ulong) - len);
- #endif
--	} else if ((insn & INSN_MASK_C_LW) == INSN_MATCH_C_LW) {
-+	} else if (riscv_insn_is_c_lw(insn)) {
- 		len = 4;
- 		shift = 8 * (sizeof(ulong) - len);
--		insn = RVC_RS2S(insn) << SH_RD;
--	} else if ((insn & INSN_MASK_C_LWSP) == INSN_MATCH_C_LWSP &&
--		   ((insn >> SH_RD) & 0x1f)) {
-+		insn = riscv_insn_extract_csca_rs2(insn) << RVG_RD_OPOFF;
-+	} else if (riscv_insn_is_c_lwsp(insn) &&
-+		   riscv_insn_extract_rd(insn)) {
- 		len = 4;
- 		shift = 8 * (sizeof(ulong) - len);
- 	} else {
-@@ -592,7 +474,7 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 * Bit[0] == 1 implies trapped instruction value is
- 		 * transformed instruction or custom instruction.
- 		 */
--		insn = htinst | INSN_16BIT_MASK;
-+		insn = htinst | INSN_C_MASK;
- 		insn_len = (htinst & BIT(1)) ? INSN_LEN(insn) : 2;
- 	} else {
- 		/*
-@@ -610,35 +492,42 @@ int kvm_riscv_vcpu_mmio_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		insn_len = INSN_LEN(insn);
- 	}
- 
--	data = GET_RS2(insn, &vcpu->arch.guest_context);
-+	rv_insn_reg_get_val((unsigned long *)&vcpu->arch.guest_context,
-+			    riscv_insn_extract_rs1(insn), &data);
- 	data8 = data16 = data32 = data64 = data;
- 
--	if ((insn & INSN_MASK_SW) == INSN_MATCH_SW) {
-+	if (riscv_insn_is_sw(insn)) {
- 		len = 4;
--	} else if ((insn & INSN_MASK_SB) == INSN_MATCH_SB) {
-+	} else if (riscv_insn_is_sb(insn)) {
- 		len = 1;
- #ifdef CONFIG_64BIT
--	} else if ((insn & INSN_MASK_SD) == INSN_MATCH_SD) {
-+	} else if (riscv_insn_is_sd(insn)) {
- 		len = 8;
- #endif
--	} else if ((insn & INSN_MASK_SH) == INSN_MATCH_SH) {
-+	} else if (riscv_insn_is_sh(insn)) {
- 		len = 2;
- #ifdef CONFIG_64BIT
--	} else if ((insn & INSN_MASK_C_SD) == INSN_MATCH_C_SD) {
-+	} else if (riscv_insn_is_c_sd(insn)) {
- 		len = 8;
--		data64 = GET_RS2S(insn, &vcpu->arch.guest_context);
--	} else if ((insn & INSN_MASK_C_SDSP) == INSN_MATCH_C_SDSP &&
--		   ((insn >> SH_RD) & 0x1f)) {
-+		rv_insn_reg_get_val((unsigned long *)&vcpu->arch.guest_context,
-+				    riscv_insn_extract_rs2(insn),
-+				    (unsigned long *)&data64);
-+	} else if (riscv_insn_is_c_sdsp(insn) && riscv_insn_extract_rd(insn)) {
- 		len = 8;
--		data64 = GET_RS2C(insn, &vcpu->arch.guest_context);
-+		rv_insn_reg_get_val((unsigned long *)&vcpu->arch.guest_context,
-+				    riscv_insn_extract_csca_rs2(insn),
-+				    (unsigned long *)&data64);
- #endif
--	} else if ((insn & INSN_MASK_C_SW) == INSN_MATCH_C_SW) {
-+	} else if (riscv_insn_is_c_sw(insn)) {
- 		len = 4;
--		data32 = GET_RS2S(insn, &vcpu->arch.guest_context);
--	} else if ((insn & INSN_MASK_C_SWSP) == INSN_MATCH_C_SWSP &&
--		   ((insn >> SH_RD) & 0x1f)) {
-+		rv_insn_reg_get_val((unsigned long *)&vcpu->arch.guest_context,
-+				    riscv_insn_extract_rs2(insn),
-+				    (unsigned long *)&data32);
-+	} else if (riscv_insn_is_c_swsp(insn) && riscv_insn_extract_rd(insn)) {
- 		len = 4;
--		data32 = GET_RS2C(insn, &vcpu->arch.guest_context);
-+		rv_insn_reg_get_val((unsigned long *)&vcpu->arch.guest_context,
-+				    riscv_insn_extract_csca_rs2(insn),
-+				    (unsigned long *)&data32);
- 	} else {
- 		return -EOPNOTSUPP;
- 	}
-@@ -707,6 +596,7 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	u32 data32;
- 	u64 data64;
- 	ulong insn;
-+	u32 index;
- 	int len, shift;
- 
- 	if (vcpu->arch.mmio_decode.return_handled)
-@@ -720,27 +610,28 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 	len = vcpu->arch.mmio_decode.len;
- 	shift = vcpu->arch.mmio_decode.shift;
-+	index = riscv_insn_extract_rd(insn);
- 
- 	switch (len) {
- 	case 1:
- 		data8 = *((u8 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data8 << shift >> shift);
-+		rv_insn_reg_set_val((unsigned long *)&vcpu->arch.guest_context,
-+				    index, (ulong)data8 << shift >> shift);
- 		break;
- 	case 2:
- 		data16 = *((u16 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data16 << shift >> shift);
-+		rv_insn_reg_set_val((unsigned long *)&vcpu->arch.guest_context,
-+				    index, (ulong)data16 << shift >> shift);
- 		break;
- 	case 4:
- 		data32 = *((u32 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data32 << shift >> shift);
-+		rv_insn_reg_set_val((unsigned long *)&vcpu->arch.guest_context,
-+				    index, (ulong)data32 << shift >> shift);
- 		break;
- 	case 8:
- 		data64 = *((u64 *)run->mmio.data);
--		SET_RD(insn, &vcpu->arch.guest_context,
--			(ulong)data64 << shift >> shift);
-+		rv_insn_reg_set_val((unsigned long *)&vcpu->arch.guest_context,
-+				    index, (ulong)data64 << shift >> shift);
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
+ static inline void emit_jalr(u8 rd, u8 rs, s32 imm, struct rv_jit_context *ctx)
 
 -- 
 2.34.1
