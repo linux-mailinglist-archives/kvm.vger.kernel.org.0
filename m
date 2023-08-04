@@ -2,91 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40ADB770747
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 19:40:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 850BE770748
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 19:41:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbjHDRkN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 13:40:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
+        id S229795AbjHDRlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 13:41:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjHDRkM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 13:40:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7AB49F2
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 10:39:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691170762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6weKQD+ozqNv4G1UIrG5/+1TB5PpQPCo1dFnfE0/XVA=;
-        b=P2xgtiJVhUiJAG5ZhKfuwkNVlEl7hj5aZTWIERghhkpvBeJ0j2Unt92zpV+HoO913ts0WG
-        i6pGDslegnMMUKdFaB8GN1SVEm8kkFM0SEgvmqtrpVfePiISD0vVcR0rMimh5vXVin6Xm8
-        lPxilSO0o/VLO6D0QxCDYycw799pMUg=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-bW2rIFBuP2SEvspvNYG_-g-1; Fri, 04 Aug 2023 13:39:21 -0400
-X-MC-Unique: bW2rIFBuP2SEvspvNYG_-g-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-523204878d9so393891a12.0
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 10:39:20 -0700 (PDT)
+        with ESMTP id S229471AbjHDRlV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 13:41:21 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC9949F3
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 10:41:20 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51e2a6a3768so2973069a12.0
+        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 10:41:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691170879; x=1691775679;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I8DSE+JTnwjzGTqhdGV+2N88MKsz3oqj5aY2BVsl1Lk=;
+        b=yDu0lAlRP9QhH6w7lpEZy0Z/JoK1YN+Hu8QtFuf8oZYei9IvlPEKk7Ui/swbqmVCat
+         jVEUfLn9xTPCuAlOfC0s4Xp5v6zAkKACZXhYtuRx1RaQNCjUri+r/iu2s9lMXoqiU6Li
+         JPosLjVjzaTMcEUZN61NkPP2x4FXyi0T8IHwyf+lW13yfRS6y7cklIjwMNbYtumyK9A3
+         ZPw3c1Gv3mztlK5OvD4KQ3pjPfF8SVf9xYQzKZZlr7hAIOlNqSncVe4Hf0ebnU8phs8x
+         AIiPRb0nn8REDlRX+WxZu0iVorJUnUjYZg7ITAuCF1Ch8RUAABZVg9ZThewZPXV259NP
+         pHgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691170760; x=1691775560;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6weKQD+ozqNv4G1UIrG5/+1TB5PpQPCo1dFnfE0/XVA=;
-        b=FgXIT4MkFYbwXVY7LPEj0U7oPZEOa44WtV48bK4l9VBU6fmZrjgM0gBxu4mDWkMpt8
-         Rc/mrZRbhAK7aEGeR5zLlW6RIJKUpAVKPQDGq14Nj8PIaGN98bZ0zfxp5vGbNjm0kFOF
-         tgYGZlKSEuz3CVhSfLi7//4vgIMh1jIZfCuF8GEVQeakCn+eyTjfW3Wm3UxIW+xcQiLS
-         vrcJHSKGDCNmrWQkZa5kBgbzZWFirG7GBIlXxwRYwdat9ocss52Xef4rIhZmLsNdX6uu
-         F4+B2slB7sTS0ZBNGtm54r64UCwrBj3EONYD3R5Tyi7ieSJUJDuA8O6GiyscYlwHE2hY
-         fhKg==
-X-Gm-Message-State: AOJu0Yyd4DKZMjan5rP2GqsN2DAePyYhrIsEq+1abO3k8SddSJ+LHZwg
-        3MmuWuBTJruNbn5uKsOl+sVmFS84CStPIzUDyqHtISCcsEoET1RmdrRjnRCXJOdyCNc4r6znPvu
-        pNJrj3gyhRmcI
-X-Received: by 2002:aa7:dc0a:0:b0:522:79e8:e51b with SMTP id b10-20020aa7dc0a000000b0052279e8e51bmr2125748edu.32.1691170760213;
-        Fri, 04 Aug 2023 10:39:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFaZEd7/x6GR64ZWOyj478PsDoZMJscVQ1zgnGO6VSfQ5aurf8cwVNnAso80Blhq7blvq+CHg==
-X-Received: by 2002:aa7:dc0a:0:b0:522:79e8:e51b with SMTP id b10-20020aa7dc0a000000b0052279e8e51bmr2125736edu.32.1691170759962;
-        Fri, 04 Aug 2023 10:39:19 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id i22-20020a50fc16000000b0051d9de03516sm1516807edr.52.2023.08.04.10.39.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Aug 2023 10:39:19 -0700 (PDT)
-Message-ID: <4d97b4bf-26a4-1222-a1e4-04c3f33a8170@redhat.com>
-Date:   Fri, 4 Aug 2023 19:39:18 +0200
+        d=1e100.net; s=20221208; t=1691170879; x=1691775679;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I8DSE+JTnwjzGTqhdGV+2N88MKsz3oqj5aY2BVsl1Lk=;
+        b=glkwh6iwLmg6lE7+llLTuEDKqA92mKq/Qp2C2IEhXGUzyzMCc0t291V5xhDHVdBXxV
+         0pqNMM8xzmHyAYuh1yZn2usAKerNLcJOnImOql3SuvxiIYm+v/hxjk6Vcox2Q0TAEuVM
+         5uSDc4dUKZUgIHfGkqS/5OPlLYC7o8jw/zQ7TTyjZ0XdkAD1oLcBYMFi1QMreNAP/flH
+         7Orcrv7cYSXIeiyLEdXbawNR3kEFnbOKvfoqUak1a/0x+wrwTt0CmoZLIJQ9BjPJ571Z
+         qbVLNwDEoIKjcdvPnrkitXZc/DgHBgdn64WGnPnnLrd1/roK/uZJOWx/XwfIf+AOHJ5z
+         sRUg==
+X-Gm-Message-State: AOJu0YwfLLzt/5DWIeOPzSmXR1qhwkMPSyq/R9B2wNDYJS17s0nl6p4r
+        9MOkr8iNL/O4hRLWhTsrmr3V6BWjyGV63pkLzIUZ5Q==
+X-Google-Smtp-Source: AGHT+IHC2MKSbOxwi5TuC+vEBtMxRnkWBp9vGKZkjj6ZMbWmWAp4fsDj6YL80ZkvT8F3E2qzu/HuV9Ck7hUurH6FKkU=
+X-Received: by 2002:aa7:d79a:0:b0:522:3aae:c69b with SMTP id
+ s26-20020aa7d79a000000b005223aaec69bmr2076403edq.20.1691170878931; Fri, 04
+ Aug 2023 10:41:18 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.5, part #2
-Content-Language: en-US
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, rananta@google.com, tabba@google.com,
-        arnd@arndb.de, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <ZMi/EkSLgRymQZzN@thinky-boi>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ZMi/EkSLgRymQZzN@thinky-boi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230727073134.134102-1-akihiko.odaki@daynix.com>
+In-Reply-To: <20230727073134.134102-1-akihiko.odaki@daynix.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 4 Aug 2023 18:41:07 +0100
+Message-ID: <CAFEAcA9zGqkWL2zf_z-CuWEnrGxCHmO_i=_9CY347b8zCC2AuA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/6] accel/kvm: Specify default IPA size for arm64
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/1/23 10:15, Oliver Upton wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.5-2
+On Thu, 27 Jul 2023 at 08:31, Akihiko Odaki <akihiko.odaki@daynix.com> wrot=
+e:
+>
+> Some Arm systems such as Apple Silicon Macs have IPA size smaller than th=
+e
+> default used by KVM. Introduce our own default IPA size that fits on such=
+ a
+> system.
+>
+> When reviewing this series, Philippe Mathieu-Daud=C3=A9 found the error h=
+andling
+> around KVM type decision logic is flawed so I added a few patches for fix=
+ing
+> the error handling path.
+>
+> V4 -> V5: Fixed KVM type error handling
+> V3 -> V4: Removed an inclusion of kvm_mips.h that is no longer needed.
+> V2 -> V3: Changed to use the maximum IPA size as the default.
+> V1 -> V2: Introduced an arch hook
 
-Pulled (but not pushed yet), thanks.
+Applied to target-arm-for-8.2 with an extra doc comment in patch 1;
+thanks.
 
-Paolo
-
+-- PMM
