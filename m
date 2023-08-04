@@ -2,141 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6888B770BF3
-	for <lists+kvm@lfdr.de>; Sat,  5 Aug 2023 00:30:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A87B6770C15
+	for <lists+kvm@lfdr.de>; Sat,  5 Aug 2023 00:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229715AbjHDWa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 18:30:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41566 "EHLO
+        id S229542AbjHDWnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 18:43:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbjHDWa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 18:30:28 -0400
-Received: from mail-oi1-x249.google.com (mail-oi1-x249.google.com [IPv6:2607:f8b0:4864:20::249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE4D1E42
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 15:30:26 -0700 (PDT)
-Received: by mail-oi1-x249.google.com with SMTP id 5614622812f47-3a1c2d69709so3948343b6e.1
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 15:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691188226; x=1691793026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFzzUD1s8YBHblwI04VOeCdWAbdee3I5YnQWnVOxvpo=;
-        b=TFcn4WhuF59CuOFW+nA/rZmm0UJ9lmliU/kzI0ZppRYE7sDBYkerAuHzzRxdX3d7+X
-         4kzLTKYNiq3+tnYZLXIkLwujJLcAX9xlXFF7P6HucTbVVv4htw7jc7Fx1odjOorNhcMK
-         dodd2vDxN7Iv863IP8Ul0VCeKTSNeqWflaPt3PPJv7+5ayDRQWhkgJ+D3K75dcAoYxtZ
-         WPhu6CqDtddYxxH4dTGFYTkyLBsWJw8IjQxufeXxzFdyCgNiKmvISMu1mHITGEKHgkkb
-         HhwXF5timTSNjIo6jS4S4vsYjZPe1ZaATLPhRP8kRuAhbSLipOJg1Qe8hXm34hNZJUIk
-         0cUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691188226; x=1691793026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFzzUD1s8YBHblwI04VOeCdWAbdee3I5YnQWnVOxvpo=;
-        b=dR/PpIK/5Y07+FDs/JORgaBukEwDK0H8qaijuPm/2iVPNdOTO3JkL1B7YrzltmWA0U
-         6Bp41A94GZBkyxpJKIrAE/sfquTjE9YG38gwT/HgXxhY6d/t8eM71NRL+z+yzDVRAazk
-         DHQYLY89RpnK9Y7GsTDATkvAGVDvw9StF5Bk83HnqKDW2KSVGDyQmFu/SK8qWfovUjKt
-         W+PgpQQrYLn2f/+cUdvgz5BAZuTg+GxnwKW/FlZYucGL3JUhBf1a5NU66isW5/2Zq7WE
-         ePWX7AsPb68BBaXHUZYfDpqVPKBoHuvk1AChcTqvx1Hnbi7Z+VRuXpG3RvUX2jNS+t7j
-         KILA==
-X-Gm-Message-State: AOJu0YyMrsVmccYwMwSutPEd1WILxa0ugVbeAcMLKwoKueG7/Jp8WUYM
-        hBvYdU484tFafwg5HtY1C6fSkkq0NMc=
-X-Google-Smtp-Source: AGHT+IG/f7h4NBFD7Fzz9VqAMwBIHPfIp5Oxxm2+KkdFX36TNY82jUIYr8jbB4mGvNrT4WJJhTCK/9o3DZg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6808:198b:b0:3a7:75cd:df61 with SMTP id
- bj11-20020a056808198b00b003a775cddf61mr4531539oib.5.1691188226241; Fri, 04
- Aug 2023 15:30:26 -0700 (PDT)
-Date:   Fri, 4 Aug 2023 15:30:24 -0700
-In-Reply-To: <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
-Mime-Version: 1.0
-References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-5-stevensd@google.com>
- <20230705080756.xv7fm3jxewipunvn@linux.intel.com>
-Message-ID: <ZM18AAFj21Fo36hg@google.com>
-Subject: Re: [PATCH v7 4/8] KVM: x86/mmu: Migrate to __kvm_follow_pfn
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     David Stevens <stevensd@chromium.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Peter Xu <peterx@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229464AbjHDWnw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 18:43:52 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9236558F;
+        Fri,  4 Aug 2023 15:43:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E4daR66F0klWPN1ndFS+3HzjXnZQlyFgIwRc9UDz/9P4cl4S7B0lRBKIa3bbL1523YUQuFfghmbKD4w4urrN8rDZbj83Xv8krRrTV0T7YyPbqNvBaV/2A5A719qw6qnAPlT1s5Pj1ZOd4Di5awCNvlHZjItN8HmVp3LX4h4x5it3zI9pPg93MaR+4DTGVRUDJ2rVkdxImPDj/XxmmGERiUMdsriNX3afFOvFSzg3ATJAHNanKewrOizX6imS4DSzO8ZJ6tvld65a0UIuy7qzUxiGiZOv0QxgAlLWxB9DoMf2EckiidikVmv6RTv56e3hBFKQrzhD+bLSa5Eh++frew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3tfX43VGu9CvrRnZf9RPfMgucrghFJdB3kQBQGeIzIE=;
+ b=DNrj8iJrY37e3vzi0kfi6DpCzIDBJ+2d012iVhbu6t0xTY35bMuRyG8oCUdkzYWIzzOdZO6B6nDuJYi8RNDTsKH+wuWb6qnjENozb7vNO0CF8eXe2FUFA963Ok9OT83c8C64xqFYzpL1mdpEaj+gxKQStcasrc9O87JqW6NE9hKup7PVje26PA5Do70sdpxKuUlv85ocJgDMb3QeZJ4yyhW4NdUbwXH1/t5vehunGp5/z/Y5X2OOOmbNIgO159XHz/HfcDIKG17dSXDwsMChXqviukZ8ANfc5JrbkZsswkgw2/mCI2KWOduHJbSivUwqKeLm47UKsuVV9kVQ0zmQBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3tfX43VGu9CvrRnZf9RPfMgucrghFJdB3kQBQGeIzIE=;
+ b=Gs1WG8dMwbVY77EBnozULlewe5zlmlFcCZbmYPLBI5nQCgOjMb6A/8dznlmdzNSk6zygDxyszZXldYu7QFCTwlf9+YurVeMu5oB7VTnjNzcSOX1Dpuo2L21Db18y+DsRiOi3OKbxX1c0zeb5yEUsaRGB0R7Yo9KV1dAmOWxKgUadUIP17RmQVTLFR6TjBGdZlMjyKfvsniS1MyyJneg2hvLyygCG/7MEZEkoISFOWZPQtcO6Nr+6ck5KOCferaIIpJgqWnQQlBINcxnWhg1z5nG5ptc3lutaew19xhblBX+38A2J/j2Zl13a9xt4ENd27Uy2/vNPPyQO91QU01G7cw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by BY5PR12MB4129.namprd12.prod.outlook.com (2603:10b6:a03:213::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.21; Fri, 4 Aug
+ 2023 22:42:44 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
+ 22:42:44 +0000
+Date:   Fri, 4 Aug 2023 19:42:43 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Brett Creeley <bcreeley@amd.com>
+Cc:     Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, alex.williamson@redhat.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com, simon.horman@corigine.com,
+        shannon.nelson@amd.com
+Subject: Re: [PATCH v13 vfio 3/7] vfio/pds: register with the pds_core PF
+Message-ID: <ZM1+48h9EcqqXrZI@nvidia.com>
+References: <20230725214025.9288-1-brett.creeley@amd.com>
+ <20230725214025.9288-4-brett.creeley@amd.com>
+ <ZM0vTlNQnglE7Pjy@nvidia.com>
+ <44535ea4-9886-a33a-7ee2-99514f04b53c@amd.com>
+ <afdd5231-cd7b-c940-7c51-c522b4cb5b90@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afdd5231-cd7b-c940-7c51-c522b4cb5b90@amd.com>
+X-ClientProxiedBy: MN2PR18CA0016.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::21) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BY5PR12MB4129:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c87b936-8794-4d65-70ef-08db953c1e35
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aE1VLK8rG/wTBN6Qx6bYdBGHCosw/nmCo5VT9B9DeBVzTFS4my//hslAcnU2HQHuaZzbFcYRpOsooYtPK+tFawdw2WtvdaGOJjaTYaSBgaEslKs5THpZw7C0nu+YCAwKkFHYDZ/pMgQwOhUlunsySwLeg+mc1QFmu7FouRdwgYc1vAS2pDPT7om93vfbpERD1BVoaZKXauHtbO5S9yGc4EKjgVZShJO4I43U1+oBeBc8n8rNtFKokL7M3/5ripnOHX45NLsoKLJ6x5kawKkl2NT8ummGbofOLGBUH3FPt1rVKchosuzFaiygnrjzrQRuduMb70wRMkqs+EOBPn8ab6tSE6qh9xSPH+wpid3/FwfAVvbSS1nEWqRHQgvRxcSLiF3BaFUEn56+hGru1YqTkFMBGjxds4JhGka3xoV42EZUJsZnikTr3g2r8187xzDDH7mvnadX1oQG5SONvOPS9feOFWDuNDPGsZV/I5nLL07+ECQDeeaqtk2Y7pV7QBJ8zAj87kqkaMs98nM03ULmvbd6k0TWmoBGmu/YBbRiZ04acH2HFMfBO83w3BqpUMBkn3067k8H0td1EjcnWv/xjdyk8NTE4NUkZ9SNAcCt9Hc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(136003)(39860400002)(376002)(346002)(1800799003)(186006)(451199021)(8676002)(8936002)(478600001)(36756003)(26005)(86362001)(6512007)(6486002)(316002)(41300700001)(5660300002)(4326008)(66476007)(66556008)(66946007)(6916009)(83380400001)(2906002)(2616005)(38100700002)(6506007)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eS9mYUJZS1FPZDVjSU01cE5mazU1WVNSeHRHUlk5dlhlRXJTNVRwRFpwa0Zw?=
+ =?utf-8?B?aHd3UmZEWGRaa0pRblhuVkFxUTZad3UwMHRpb0NPTWdXQTNjaThOcFRlTzZJ?=
+ =?utf-8?B?L3REYlBBV0ZXb2owZ0lqV1lqbmlnOXVSb3NwZXEvWjlUZ2JldlM3Rm5GUjhR?=
+ =?utf-8?B?VGRSemtjbFhWRzlwK3A3KzAyakZOS1diazQrOWhrQ3A4ZU5MSnRudkh2UFRC?=
+ =?utf-8?B?MDEvZysyRjQ4OUV2UDlCRGJrUldIaG8xc01DcmRBTGdpSy9vdC9VaTdGKytE?=
+ =?utf-8?B?akxydFN1eHVueExFVkJuQVZHY1dXbWUzb1RkYTdDRVhnYmJ5V0h3ZEorYXdU?=
+ =?utf-8?B?ZXcyTnhweCtFV3h1YXNVU2xnNG9DUXhBeHF2eGRlWEdpTnc3VzVvanVpRkxO?=
+ =?utf-8?B?bmpockpoMlJiRzRoU3VyUHZVMU9aRWZKa3RoWkVlajFXd2VJVUFWT3YvUFVO?=
+ =?utf-8?B?bitQRUl2VG5MUmJMVHBOV2FTd2xPNVFCell3RktBNUQ5VjFoRGVZaGlzTmcy?=
+ =?utf-8?B?RmFCN3k4TG9NSzkzbDI4UExLWUptRkdrUE93S3ViaDhBclpWdjhZMXQrOGxY?=
+ =?utf-8?B?cVRiVlhoWHIzNEFsNWhHVjJRU20xTGUzVGplZzk4S3RWL3dhUDh4dlpKY1dP?=
+ =?utf-8?B?ZUVkblIwUlBNc0RIVXZWZmF1cElSMEJ6Q2RFT1pQMDR4a0ZORmNRYU5rZ3Ir?=
+ =?utf-8?B?WDVDcXVEZ1NoQU16RW85YnV0aXRjaWl3NWw4ZUwyMjQxQXN5WStEblg3VmE1?=
+ =?utf-8?B?RmRlY25SRTJraURuTFVCU25vdC9ObkNBV1NyVjVwVGVxeGhSZnZoV3Jzd280?=
+ =?utf-8?B?ZFd1Q2lVc0pwUmZnYjhMSEhSSVI3SVliV3c0Q3NYZlprRjhzeDhYdDFrSDM1?=
+ =?utf-8?B?bnFDK2RvNVI3Umx2TFlVd0dFL2VlejZCQnNqRGN4SEJKelNsWDFSd211VjJ2?=
+ =?utf-8?B?M0gxTTBrY0dIbkhQRDdpRDIxMTYwbExkV0RyMDRwNVlpK0VlMnhxTVN0SGhQ?=
+ =?utf-8?B?bHU0Q1ZSZFgwUHkvaFc0alJkUC81VERiOTFIa1BLeEIvcE9xT1F6NTBzVG5Z?=
+ =?utf-8?B?NUxpTVFicE1scUhQUStxQ2VsQTcvNnRaeFNPR3NUR3ZrY1N4OTlKVVQ5d1RU?=
+ =?utf-8?B?TG5FNS9zU0VUUFZTK0E0ejdBQ1VMZ1dnZXFsWjZOR3kvbzlsUFA4cGpiUCt4?=
+ =?utf-8?B?MlRxNitUY0tqZjExVVNUZ2RqTWNRdDZOcjkxc2dKS1R3eW5FOE10ZUdGa2hU?=
+ =?utf-8?B?OXhWdi8vcFRXb1JFa3dhYkQxb2VWbHNudndXalg2UFVCNlEwNEdtaHBBN0tk?=
+ =?utf-8?B?UUlncjJiWGUrUWNHcFI4T1MwdW9uU1IyY2NMT3ZlVEZpbDd5R0l2cGtiNGd4?=
+ =?utf-8?B?WjJzN01nYmlDQnF1MjI1ME10d0R2dG10ODVlMi9wZTN1dWVxb2MweFpHTS85?=
+ =?utf-8?B?aEJGZFQ1ditTUTBTZEZPOG1lMS9jbjVhUGV2b3ZOZVhLeTBwRkMwZ0lka2Fw?=
+ =?utf-8?B?Mk91SWxad0x2bE5jUnlNTjZWZTBjUVJFNE92bnNmZCtQUG9nZ1U0Z2xQQ0g5?=
+ =?utf-8?B?enF0VllrcGpFTUF1NElHZ3J5UTl4V0xubERXd21CZ1VzZ1c0RmlUUzBhQUhp?=
+ =?utf-8?B?RFBwc1RsYjhsOFpVVGhLUjVPN21DYkFQV2dCZDdGaWFqaTVsUU0zcWUzK1JX?=
+ =?utf-8?B?QmVlZDlRdmNMOTJsUUVXZFhQb1VnNjBQbDdIMW0xazY0VlAvMFdUdGFxaEwv?=
+ =?utf-8?B?c24rTEQ5anZaOVhRaE8rNGRUYTBtL2g5TlV2RHplZ210RFAxL0hpTXh6eHpr?=
+ =?utf-8?B?T0k0K2F3OE5XMVl0YXVOdWFBZERxRVJQaytDN2puNDZvdlE2b0dVbFg5RTNx?=
+ =?utf-8?B?ME03THRYVmRBcWU3WElVL3RUbE5ZMjlaNFR6eXR3QnloOGNLZmVMNW0xSFdM?=
+ =?utf-8?B?WlRsRGx2MUQ0QXJYQmZuYUZmSThVRko0cFloUkd2R2R3UHBlZDkzTDFIZXN1?=
+ =?utf-8?B?cElUWExkeTVEN2lZV3hoMGV0Qk8zNFhMeWw3U1ZPQnlvZE9nbjFUaVBvZGU0?=
+ =?utf-8?B?T3pqbzgwWjVYTWhoVDZQRnQ0VEZ1eEJvWnc1Wnk1TmF0MWp3U2gwbjVHV21a?=
+ =?utf-8?Q?EqHOEsur1K1TVwjBG2Kz2WdIw?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c87b936-8794-4d65-70ef-08db953c1e35
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 22:42:44.2355
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dFwTlpEvTkGl8D5WPHgTf6xlxIKSy50+Q3lL350S3weXaAzH448R0ftf4g2e5+FX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4129
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 05, 2023, Yu Zhang wrote:
-> On Tue, Jul 04, 2023 at 04:50:49PM +0900, David Stevens wrote:
-> > From: David Stevens <stevensd@chromium.org>
+On Fri, Aug 04, 2023 at 12:21:21PM -0700, Brett Creeley wrote:
+> > > > +int pds_vfio_register_client_cmd(struct pds_vfio_pci_device *pds_vfio)
+> > > > +{
+> > > > +     struct pci_dev *pdev = pds_vfio_to_pci_dev(pds_vfio);
+> > > > +     char devname[PDS_DEVNAME_LEN];
+> > > > +     int ci;
+> > > > +
+> > > > +     snprintf(devname, sizeof(devname), "%s.%d-%u",
+> > > > PDS_VFIO_LM_DEV_NAME,
+> > > > +              pci_domain_nr(pdev->bus),
+> > > > +              PCI_DEVID(pdev->bus->number, pdev->devfn));
+> > > > +
+> > > > +     ci = pds_client_register(pci_physfn(pdev), devname);
+> > > > +     if (ci < 0)
+> > > > +             return ci;
+> > > 
+> > > This is not the right way to get the drvdata of a PCI PF from a VF,
+> > > you must call pci_iov_get_pf_drvdata().
+> > > 
+> > > Jason
 > > 
-> > Migrate from __gfn_to_pfn_memslot to __kvm_follow_pfn.
-
-Please turn up your changelog verbosity from ~2 to ~8.  E.g. explain the transition
-from async => FOLL_NOWAIT+KVM_PFN_ERR_NEEDS_IO, there's no reason to force readers
-to suss that out on their own.
-
-> > Signed-off-by: David Stevens <stevensd@chromium.org>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 35 +++++++++++++++++++++++++----------
-> >  1 file changed, 25 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ec169f5c7dce..e44ab512c3a1 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4296,7 +4296,12 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
-> >  static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  {
-> >  	struct kvm_memory_slot *slot = fault->slot;
-> > -	bool async;
-> > +	struct kvm_follow_pfn foll = {
-> > +		.slot = slot,
-> > +		.gfn = fault->gfn,
-> > +		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
-> > +		.allow_write_mapping = true,
-> > +	};
-> >  
-> >  	/*
-> >  	 * Retry the page fault if the gfn hit a memslot that is being deleted
-> > @@ -4325,12 +4330,14 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >  			return RET_PF_EMULATE;
-> >  	}
-> >  
-> > -	async = false;
-> > -	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, false, &async,
-> > -					  fault->write, &fault->map_writable,
-> > -					  &fault->hva);
-> > -	if (!async)
-> > -		return RET_PF_CONTINUE; /* *pfn has correct page already */
-> > +	foll.flags |= FOLL_NOWAIT;
-> > +	fault->pfn = __kvm_follow_pfn(&foll);
-> > +
-> > +	if (!is_error_noslot_pfn(fault->pfn))
-> > +		goto success;
-> > +
-> > +	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
-> > +		return RET_PF_CONTINUE;
+> > Okay, I will look at this and fix it up on the next version.
 > 
-> IIUC, FOLL_NOWAIT is set only when we wanna an async fault. So
-> KVM_PFN_ERR_NEEDS_IO may not be necessary? 
+> After taking another look this was intentional. I'm getting the PF pci_dev,
+> not the PF's drvdata.
 
-But FOLL_NOWAIT is set above.  This logic is essentially saying "bail immediately
-if __gfn_to_pfn_memslot() returned a fatal error".
+pds_client_register() gets the drvdata from the passed PCI function,
+you have to use pci_iov_get_pf_drvdata() to do this. You can't
+shortcut it like this.
 
-A commented would definitely be helpful though.  How about?
+This is all nonsensical, the existing callers start with aa pdsc:
 
-	/*
-	 * If __kvm_follow_pfn() failed because I/O is needed to fault in the
-	 * page, then either set up an asynchronous #PF to do the I/O, or if
-	 * doing an async #PF isn't possible, retry __kvm_follow_pfn() with
-	  I/O allowed. All other failures are fatal, i.e. retrying won't help.
-	 */
-	if (fault->pfn != KVM_PFN_ERR_NEEDS_IO)
-		return RET_PF_CONTINUE;
+int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf)
+
+Then they call
+
+	client_id = pds_client_register(pf->pdev, devname);
+
+Which then does
+
+	struct pdsc *pf;
+	pf = pci_get_drvdata(pf_pdev);
+
+Just pass in the pdsc you already had
+
+Add another wrapper to get the pdsc from a VF using
+pci_iov_get_pf_drvdata() like you are supposed to.
+
+Jason
