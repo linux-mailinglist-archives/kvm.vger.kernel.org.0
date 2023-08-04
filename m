@@ -2,144 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 643137708F8
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 21:23:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B3EB770935
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 21:56:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbjHDTXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 15:23:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50266 "EHLO
+        id S229827AbjHDT4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 15:56:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjHDTXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 15:23:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E861BE;
-        Fri,  4 Aug 2023 12:23:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 40E086211E;
-        Fri,  4 Aug 2023 19:23:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17DE8C433C7;
-        Fri,  4 Aug 2023 19:22:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691176981;
-        bh=XOri76sJpkz03uX4PCxdz17la0oq/zwN78Dx+ZuWn6E=;
-        h=From:Date:Subject:To:Cc:From;
-        b=cknJ4MVW9GsFmnvCz3QefAmehTF3taU0s4Xel4PtbztuLCO5PdCcUmK7JKxJxgsOa
-         upoLQVjMQzBMc1rhOK74sD/XW62yXiZ9hmxlTsBwr1byTn1f6S97GTXBLdx71fb+5f
-         +21Qi/KS5pjHu/j3hbyuthyGMv2a/OXaCBUMt2cA8uDLZigXY6GZSLAauGA4bYwFts
-         VHD1XriK9QT0qZsBV8HUflipU5/Mxymp3wCvWiOZPUitwGlpo8ds5xxATieNfl/Xdj
-         BUUGHGmb0AZuiASPLSj/Fia9EpH66s+vgVPtrDLl408o+QlzNOP44zeEaB9hE436cw
-         6q0aXxoRJMaKA==
-From:   Mark Brown <broonie@kernel.org>
-Date:   Fri, 04 Aug 2023 20:22:11 +0100
-Subject: [PATCH] selftests/rseq: Fix build with undefined __weak
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230804-kselftest-rseq-build-v1-1-015830b66aa9@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAOJPzWQC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI2MDCwMT3ezi1Jy0ktTiEt2i4tRC3aTSzJwUXcsUU2NzSxOjJMOUVCWg1oK
- i1LTMCrCx0bG1tQB6lBNIZgAAAA==
-To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, stable@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.13-dev-034f2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2410; i=broonie@kernel.org;
- h=from:subject:message-id; bh=XOri76sJpkz03uX4PCxdz17la0oq/zwN78Dx+ZuWn6E=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBkzVASILAQQzthU6vaozHnSSJrqoeklAkR7/lneg1V
- 6U6HkuWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZM1QEgAKCRAk1otyXVSH0K8uB/
- 9fP4U1ure2KD6wbesdwvU7rvh7aeJT6lOCKZlUp4ZxY/AkPXdFeUZIpMLptqk7UQn7aFHJT2+flbJ2
- pYnATX/W1banTs6c7waPruBz9cVg5cJJW7nYa3MCY3ErHm4uluhA9il3c/yQ1iZEJrg9twyiYEyoNi
- m1bGgzcNzXrJqgj5hYEwdOMbkCSDDSpw1H+drp6UZtJoS1+3jRbjhIDNdf9hqgKaymqslePKekFqld
- 5gnqhQ5dwDx7xE59L3b1BRC8B/L7U8zPPOcPl8D/WjbRQyRsa8QN8pTuuooCjplNsx6AzyEg9PAF6q
- KjqCB5hxFqh8Rf4U05Ioerdz5N1Z7t
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229551AbjHDT4Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 15:56:24 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EBEAE60
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 12:56:23 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bc02bd4eafso21299195ad.1
+        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 12:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=clockwork.io; s=google; t=1691178982; x=1691783782;
+        h=to:date:message-id:subject:mime-version:content-transfer-encoding
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=18yzC8adv9d9r+TrJP/sYCyYX1o5TbNOmnh9ZbK4xbE=;
+        b=Zhdub2mEbvcFSBs4xu3gYCFyhODseJCxaONqVMs56k0aRA/6bw/FimH/OvzwkaGYIn
+         7OQS1dqGCZusk4JX+tXZ9smNP+MdFrnKwZeOgGksU/VPjYbVwLEnNG7hyJv/IHjEYrn0
+         ZtZrygohKS26EtizV4gvMgrjKK1I8Xb5Hbi3GksGeSoaWAglo8sQ6mH6PcTDQY9WfGzN
+         K1Tx8/BbRmkMndMnI9wal5/BIMaau4JEYXi4gT2vcApwpyJnvpAWYSeoc573bkLN92Au
+         KGM7hD20IUu/dpSMc1dthAlHeEMAmI+UixIqxmtUHAHNZPYCLy9QEVZLa4PdkcTndqog
+         Qk8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691178982; x=1691783782;
+        h=to:date:message-id:subject:mime-version:content-transfer-encoding
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=18yzC8adv9d9r+TrJP/sYCyYX1o5TbNOmnh9ZbK4xbE=;
+        b=IknYfAMVI7eRsXOWE5BvtyKVTy15a6vjwvI7TdTMwAXe6u901Kt5Dh/nWnknLTRYzm
+         cDMMOLdywY9IK9/rpcgVuvwzPJEQymnM9VTFx2dSy7/kwKi9mpJe+qShBwBR6He+Kb9w
+         hbEtD1pwW98iUjxhLfhOgdFJ7hkJxYf1THZi8jJDx2JeofCCY1aD/AM6g/8YpAIZ9JmI
+         Y+aHXugPjIyILcMKPcvPWUDscWVvbGVNTVVSqDNM3tX2KcZ2ay4zCEMnl08UIwBoooQc
+         fxRGBD29/K/soW+qUlvsRQOjV7uQ6bWxHLqgW4w/W0NM9xcAhR0Zwlow+xwBD/TJ5beg
+         7SEQ==
+X-Gm-Message-State: AOJu0YytQCXrUmxCsmyuwhtunrhvWhrZWChxws72RwrTLRDssYlCdFg1
+        CeMUflJY/eLierMGpGL8x1xTCqi+yy0kc/zRCQ==
+X-Google-Smtp-Source: AGHT+IFyOta4rHlSljMofwk2Ho043nHk+F+jUsvCXpBmuxIatUdz90HVedZKC5g74dLj0z83xPwsrw==
+X-Received: by 2002:a17:902:db06:b0:1b2:1a79:147d with SMTP id m6-20020a170902db0600b001b21a79147dmr2909718plx.2.1691178982650;
+        Fri, 04 Aug 2023 12:56:22 -0700 (PDT)
+Received: from smtpclient.apple ([2603:3024:1825:5a00:25c7:a45e:f98c:8b1b])
+        by smtp.gmail.com with ESMTPSA id ji5-20020a170903324500b001bc445e249asm2126240plb.124.2023.08.04.12.56.22
+        for <kvm@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 04 Aug 2023 12:56:22 -0700 (PDT)
+From:   Yifei Ma <yifei@clockwork.io>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
+Subject: Question about the KVM API KVM_VCPU_TSC_CTRL to control guest TSC
+Message-Id: <ED93F288-CA91-4D4D-85C3-3482234287D7@clockwork.io>
+Date:   Fri, 4 Aug 2023 12:56:11 -0700
+To:     kvm@vger.kernel.org
+X-Mailer: Apple Mail (2.3731.200.110.1.12)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 3bcbc20942db ("selftests/rseq: Play nice with binaries statically
-linked against glibc 2.35+") which is now in Linus' tree introduced uses
-of __weak but did nothing to ensure that a definition is provided for it
-resulting in build failures for the rseq tests:
+Hi KVM communication,
 
-rseq.c:41:1: error: unknown type name '__weak'
-__weak ptrdiff_t __rseq_offset;
-^
-rseq.c:41:17: error: expected ';' after top level declarator
-__weak ptrdiff_t __rseq_offset;
-                ^
-                ;
-rseq.c:42:1: error: unknown type name '__weak'
-__weak unsigned int __rseq_size;
-^
-rseq.c:43:1: error: unknown type name '__weak'
-__weak unsigned int __rseq_flags;
+    I am working on TSC synchronization between host and guests.
+    I found this doc =
+(https://docs.kernel.org/virt/kvm/devices/vcpu.html#group-kvm-vcpu-tsc-ctr=
+l), which gives some instructions of how to synchronize them. When I =
+reading the KVM APIs (kernel version 6.4), I am a little confused. It =
+seems to me the KVM APIs don=E2=80=99t match the instructions in the =
+doc.
+    The doc says "Read the KVM_VCPU_TSC_OFFSET attribute for *every =
+vCPU* to record the guest TSC offset=E2=80=9D. However, the KVM API for =
+getting/setting the offset is not through vCPU=E2=80=99s fd, it is =
+through KVM device's fd,=20
+    E.g., when I refer to the KVM selftest code, I found accessing =
+TSC_OFFSET is through the =E2=80=9CKVM_SET_DEVICE_ATTR=E2=80=9D cmd, =
+with args =E2=80=9CKVM_VCPU_TSC_CTRL=E2=80=9D & =
+=E2=80=9CKVM_VCPU_TSC_OFFSET=E2=80=9D. It looks like the API sets the =
+TSC offset on all vCPUs, instead of a single vCPU.
+    Can someone help on it and give some input? Thanks a lot!
 
-Fix this by using the definition from tools/include compiler.h.
-
-Fixes: 3bcbc20942db ("selftests/rseq: Play nice with binaries statically linked against glibc 2.35+")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
-It'd be good if the KVM testing could include builds of the rseq
-selftests, the KVM tests pull in code from rseq but not the build system
-which has resulted in multiple failures like this.
----
- tools/testing/selftests/rseq/Makefile | 4 +++-
- tools/testing/selftests/rseq/rseq.c   | 2 ++
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/rseq/Makefile b/tools/testing/selftests/rseq/Makefile
-index b357ba24af06..7a957c7d459a 100644
---- a/tools/testing/selftests/rseq/Makefile
-+++ b/tools/testing/selftests/rseq/Makefile
-@@ -4,8 +4,10 @@ ifneq ($(shell $(CC) --version 2>&1 | head -n 1 | grep clang),)
- CLANG_FLAGS += -no-integrated-as
- endif
- 
-+top_srcdir = ../../../..
-+
- CFLAGS += -O2 -Wall -g -I./ $(KHDR_INCLUDES) -L$(OUTPUT) -Wl,-rpath=./ \
--	  $(CLANG_FLAGS)
-+	  $(CLANG_FLAGS) -I$(top_srcdir)/tools/include
- LDLIBS += -lpthread -ldl
- 
- # Own dependencies because we only want to build against 1st prerequisite, but
-diff --git a/tools/testing/selftests/rseq/rseq.c b/tools/testing/selftests/rseq/rseq.c
-index a723da253244..96e812bdf8a4 100644
---- a/tools/testing/selftests/rseq/rseq.c
-+++ b/tools/testing/selftests/rseq/rseq.c
-@@ -31,6 +31,8 @@
- #include <sys/auxv.h>
- #include <linux/auxvec.h>
- 
-+#include <linux/compiler.h>
-+
- #include "../kselftest.h"
- #include "rseq.h"
- 
-
----
-base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
-change-id: 20230804-kselftest-rseq-build-9d537942b1de
-
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
-
+    Yifei=
