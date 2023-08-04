@@ -2,160 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5CE376FDB9
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 11:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D096276FDD9
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 11:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231186AbjHDJqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 05:46:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
+        id S231228AbjHDJyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 05:54:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231238AbjHDJqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 05:46:15 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E777C49FA;
-        Fri,  4 Aug 2023 02:46:11 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3749ckwc014098;
-        Fri, 4 Aug 2023 09:46:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : cc : subject : to : message-id : date; s=pp1;
- bh=LDWA5hEwRFL2483mPODKHUjFwor5SYcTyNogSzzZouU=;
- b=ZOdFyqGVfrniQZsp+V7QQUB/ODDulVzC4vuz5xqrSXaCBjEuzDun0rBl4lWNDZGl8IG0
- 3/lV7ww1ZXaXNF4y7w4A21am7RlRepfdaacdCzveXJxcFFcU9A7dBgJw+Y6koQKmJZeH
- LywL1RWjdypCllgfYF2uhbCQmbIydcq0XYc7aIyhkGq2blZcAZWvN+I0rwRuW6Irc44k
- OJ3hPxo6pOulMhJB5vMU0TC3UkTzr/HltT7xHw8ZQ/4Xmozk/b7THYaxSHIeNYp4XK1n
- B2pplhvlewnwWyO7iJEfIpPILu84zi6JXbwQfyu/yeUu/FaWwQJzf89HXJ19AU0Us2os aQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8xq08mt4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 09:46:11 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3749d9of017916;
-        Fri, 4 Aug 2023 09:46:10 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8xq08msk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 09:46:10 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3749NLcq027816;
-        Fri, 4 Aug 2023 09:46:09 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8kp2vg4j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 09:46:09 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3749k6vX35848834
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Aug 2023 09:46:06 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F221120043;
-        Fri,  4 Aug 2023 09:46:05 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4EBF2005A;
-        Fri,  4 Aug 2023 09:46:05 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.78.151])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Aug 2023 09:46:05 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S230063AbjHDJyB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 05:54:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 558652118
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 02:53:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691142794;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PkzZWuhLFjwMtxIV36yhw3pgLa/1WvhRgyDX/UaxUwM=;
+        b=fp16RSBOFZCn1h1ZCQgOo3Pe4uZRRXveHewRmgJDfX1gJrZWocAvz7xdafK9Qz8FZbiWur
+        VCQDCkizcbQ0H9fa3ETUK04q0M05bkdbuJcghcdRZURmpS3an/KPl5gbEyvWYuRtKdQNeP
+        4eH2dQovwGluGoFPkic1zIkJAtHvEJ0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-o7_jsGoDPGy6g6g23TkJLg-1; Fri, 04 Aug 2023 05:53:12 -0400
+X-MC-Unique: o7_jsGoDPGy6g6g23TkJLg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-99bcf56a2e9so131508266b.2
+        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 02:53:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691142791; x=1691747591;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PkzZWuhLFjwMtxIV36yhw3pgLa/1WvhRgyDX/UaxUwM=;
+        b=TePlZjM7FrsoXIf3grAC4LOzLZjfHD+ICOQuAEpP6xUN1wlWuin6k0aOWISnNzZLWn
+         EJ0RpwzdfznSCxgGttZl2rGhwQNAlCrw0OFtKrkO9C9uchIttEhBTx6FkhA+m1/tbxrf
+         ZqYF5nd6b5P4ESOsR/9e+IRFsPnKiBu+i+spL8LnDfJB5GIq9BZ2pdfPIK30oCY2v4Fw
+         M4t9BfaCJHs+sMpcNY5wvU0oQjRwruSa/BPo32YLk65jGMjHdFkNxN96slbDkTeSPDvB
+         7hkDXUUbz+poZeI0fKFY3KyUJLxX+73ag4AzCiFjlBvZ+McqB9K+4/mqOvmZTqWFbiaL
+         01LA==
+X-Gm-Message-State: AOJu0Ywlsj5UZG+wp0cJPwC6IZf+kHo/dHgSjB/R9aSTEQec7ovqfBWH
+        n3E8cbhj38xKkiFnZRiHvvr31jbKMzzWJ4w/td3m7KyR+CP4U1T9lcsVlZWwWV2HWKWmLSd66ff
+        7x/HnIu3ur6rXQR/tGPtD
+X-Received: by 2002:a17:906:300d:b0:99c:56d1:79fd with SMTP id 13-20020a170906300d00b0099c56d179fdmr1120806ejz.51.1691142790893;
+        Fri, 04 Aug 2023 02:53:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEW5qWL5bsR84brLU2i7CNGBux5l/ftPiihWjKSS+UX++2jXU3WPyppKTdIa1dlgeFHQf8n0A==
+X-Received: by 2002:a17:906:300d:b0:99c:56d1:79fd with SMTP id 13-20020a170906300d00b0099c56d179fdmr1120790ejz.51.1691142790580;
+        Fri, 04 Aug 2023 02:53:10 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id x4-20020a170906804400b00992ed412c74sm1054137ejw.88.2023.08.04.02.53.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Aug 2023 02:53:09 -0700 (PDT)
+Message-ID: <e578173b-8edf-dd89-494e-ecbec5b7cba8@redhat.com>
+Date:   Fri, 4 Aug 2023 11:53:08 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <6f8951e2-9ea6-5bad-9c2c-b27d70d57ffe@redhat.com>
-References: <20230510121822.546629-1-nrb@linux.ibm.com> <20230510121822.546629-3-nrb@linux.ibm.com> <6f8951e2-9ea6-5bad-9c2c-b27d70d57ffe@redhat.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: s390: add tracepoint in gmap notifier
-To:     David Hildenbrand <david@redhat.com>, borntraeger@linux.ibm.com,
-        frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Message-ID: <169114236545.36389.12085901437050856794@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Fri, 04 Aug 2023 11:46:05 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: p-_cvb9h6aHmSI6vtKeyjDNBrgtnXeUA
-X-Proofpoint-GUID: huCehl-ochPLzIKgqWR3e02zZJMak3Z3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-04_08,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- phishscore=0 suspectscore=0 clxscore=1011 adultscore=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308040083
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 1/2] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU
+ issues
+Content-Language: en-US
+To:     Michal Luczaj <mhal@rbox.co>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, shuah@kernel.org
+References: <20230728001606.2275586-1-mhal@rbox.co>
+ <20230728001606.2275586-2-mhal@rbox.co> <ZMhIlj+nUAXeL91B@google.com>
+ <7e24e0b1-d265-2ac0-d411-4d6f4f0c1383@rbox.co> <ZMqr/A1O4PPbKfFz@google.com>
+ <38f69410-d794-6eae-387a-481417c6b323@rbox.co>
+ <e55656be-2752-a317-80eb-ad40e474b62f@redhat.com>
+ <8adb2f2b-df9c-3e49-3bdd-7970d918a1d0@rbox.co>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <8adb2f2b-df9c-3e49-3bdd-7970d918a1d0@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting David Hildenbrand (2023-07-27 09:41:51)
-> On 10.05.23 14:18, Nico Boehr wrote:
-> > The gmap notifier is called for changes in table entries with the
-> > notifier bit set. To diagnose performance issues, it can be useful to
-> > see what causes certain changes in the gmap.
-> >=20
-> > Hence, add a tracepoint in the gmap notifier.
-> >=20
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >   arch/s390/kvm/kvm-s390.c   |  2 ++
-> >   arch/s390/kvm/trace-s390.h | 23 +++++++++++++++++++++++
-> >   2 files changed, 25 insertions(+)
-> >=20
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index ded4149e145b..e8476c023b07 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -3982,6 +3982,8 @@ static void kvm_gmap_notifier(struct gmap *gmap, =
-unsigned long start,
-> >       unsigned long prefix;
-> >       unsigned long i;
-> >  =20
-> > +     trace_kvm_s390_gmap_notifier(start, end, gmap_is_shadow(gmap));
-> > +
-> >       if (gmap_is_shadow(gmap))
-> >               return;
-> >       if (start >=3D 1UL << 31)
-> > diff --git a/arch/s390/kvm/trace-s390.h b/arch/s390/kvm/trace-s390.h
-> > index 6f0209d45164..5dabd0b64d6e 100644
-> > --- a/arch/s390/kvm/trace-s390.h
-> > +++ b/arch/s390/kvm/trace-s390.h
-> > @@ -333,6 +333,29 @@ TRACE_EVENT(kvm_s390_airq_suppressed,
-> >                     __entry->id, __entry->isc)
-> >       );
-> >  =20
-> > +/*
-> > + * Trace point for gmap notifier calls.
-> > + */
-> > +TRACE_EVENT(kvm_s390_gmap_notifier,
-> > +             TP_PROTO(unsigned long start, unsigned long end, unsigned=
- int shadow),
-> > +             TP_ARGS(start, end, shadow),
-> > +
-> > +             TP_STRUCT__entry(
-> > +                     __field(unsigned long, start)
-> > +                     __field(unsigned long, end)
-> > +                     __field(unsigned int, shadow)
-> > +                     ),
-> > +
-> > +             TP_fast_assign(
-> > +                     __entry->start =3D start;
-> > +                     __entry->end =3D end;
-> > +                     __entry->shadow =3D shadow;
-> > +                     ),
-> > +
-> > +             TP_printk("gmap notified (start:0x%lx end:0x%lx shadow:%d=
-)",
-> > +                     __entry->start, __entry->end, __entry->shadow)
-> > +     );
-> > +
-> >  =20
-> >   #endif /* _TRACE_KVMS390_H */
-> >  =20
->=20
-> In the context of vsie, I'd have thought you'd be tracing=20
-> kvm_s390_vsie_gmap_notifier() instead.
+On 8/3/23 23:15, Michal Luczaj wrote:
+>>           *mmu_reset_needed |= kvm_read_cr0(vcpu) != sregs->cr0;
+>>
+>> with a call to the function just before __set_sregs_common returns.
+> What about kvm_post_set_cr4() then? Should it be introduced to
+> __set_sregs_common() as well?
 
-Right, I can change that if you / others have a preference for that.
+Yes, indeed, but it starts getting a bit unwieldy.
+
+If we decide not to particularly optimize KVM_SYNC_X86_SREGS, however, 
+we can just chuck a KVM_REQ_TLB_FLUSH_GUEST request after __set_sregs 
+and __set_sregs2 call kvm_mmu_reset_context().
+
+Paolo
+
