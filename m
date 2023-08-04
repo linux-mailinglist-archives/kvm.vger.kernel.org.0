@@ -2,188 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 827AB7709F6
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 22:45:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B21C770A07
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 22:48:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbjHDUpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 16:45:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
+        id S230145AbjHDUsv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 16:48:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbjHDUpQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 16:45:16 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B344EC8
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 13:45:14 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5840614b13cso41827937b3.0
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 13:45:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691181913; x=1691786713;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1IZ9TxmG6rW/P+wqZtdK0JQvLT9QR/+7YuE6G9TOZBI=;
-        b=hJWr9iNZ7BGT2VQ6gLFolHQwFpNRi7FPWyBaZ/8LClsSOkgMb0KuXKmwCV7LJJBoEs
-         Ck0d/Et14/lhURaSSc9r3WcZZY8KjNPSLCXjVbTBVqejRbleGbw8erJNiGb8+8g0ZbDi
-         /gpMCbeax0LRS6LNhzS4Y42bCFUIY6rtufCUjOeZpl/+TXMHrVumGaRz3tISh7Kb0j7e
-         nzfbyITqbXai9Js0ghc36Xi4DEJBq1MZsCPTZLpALx44/lLLj5QdqhXDQC9Qs0yLpgWG
-         K9mdKiPmKDNXFcYrfE0Oi3sBdBP+j45C+y++V4wTfdXIVpThHhrEOE7d9AbZhnpFSB3o
-         VmCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691181913; x=1691786713;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1IZ9TxmG6rW/P+wqZtdK0JQvLT9QR/+7YuE6G9TOZBI=;
-        b=G3nxdtWxmsX9IoY+O5Prq4kfgfNYjSBBGHrdYDg8BO7zPbjWF87ht8BFwhth2MLha+
-         9T6nAsANEb23ZF04ZUQmQv4sxguGBN2ITag1slKXAUWcZMOvyyEpYUpGfzFXM4iDu1De
-         fqZ1CaMbsXX/t805sBO8lKFYmUM0JvTLWGsUemwe8cJRZOl3ENuC6UvPmt05ju1H2Ikp
-         ScLLv6r4XAkv1HeWAApZmjjfC3S9jXYH994XeASG0mmt8a5BHwuNPMmfQgLrLx9Wu52X
-         Gz6gewWeFpJ20b1bq5imJD2aHd9mi4vEr+pHwY2ER8Z+CUkMr750l3N8IgXz8sPjExuJ
-         Nqkg==
-X-Gm-Message-State: AOJu0Yw/cLuem47mnGR5ojDOzETcMBmeCJZhvZcIdQKxrKlRkwsIznti
-        P6siyIaiGQcXauGZ0mkOiynQvp5d3DM=
-X-Google-Smtp-Source: AGHT+IF2PuxW12h6zfqO88bv+26n+39oznd1/LTsgYYcLOWAbuIVI79Xjo5Y4jv112tU7Ec4Uhs30w/DD4c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2c0a:b0:586:88d5:9434 with SMTP id
- eo10-20020a05690c2c0a00b0058688d59434mr8303ywb.1.1691181913764; Fri, 04 Aug
- 2023 13:45:13 -0700 (PDT)
-Date:   Fri, 4 Aug 2023 13:45:11 -0700
-In-Reply-To: <bfc0b3cb-c17a-0ad6-6378-0c4e38f23024@intel.com>
-Mime-Version: 1.0
-References: <20230803042732.88515-1-weijiang.yang@intel.com>
- <20230803042732.88515-10-weijiang.yang@intel.com> <ZMuMN/8Qa1sjJR/n@chao-email>
- <bfc0b3cb-c17a-0ad6-6378-0c4e38f23024@intel.com>
-Message-ID: <ZM1jV3UPL0AMpVDI@google.com>
-Subject: Re: [PATCH v5 09/19] KVM:x86: Make guest supervisor states as
- non-XSAVE managed
-From:   Sean Christopherson <seanjc@google.com>
-To:     Weijiang Yang <weijiang.yang@intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, pbonzini@redhat.com,
-        peterz@infradead.org, john.allen@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com,
-        binbin.wu@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S230048AbjHDUss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 16:48:48 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 259464C31
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 13:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=SsIlIsZ6z0Qa+ezvqAt5qK8xNpKejIA94e/4QHw6gFA=; b=G4bWC5pfW52gl63xbxu5L3W2fv
+        GlXwvwfNxqd0v3X9Vcjhnr35CVe0/3K25YwZOzdaiAqbcc8niPnN8ryEpX0eM/HlVCk6oHBG5Z/AL
+        gAAGiSzBoeh5ewGQPIzUkpjSBAhJ8w37xzWVaGC+X8wwAs6Fn8U0bmoI+21dqXUJaB3Dre6EdOjjk
+        33FJFdmKylQw9X1Hwch3uY0e/C2luBGiojoV5hZWKyRlem5dR47qCKTqtXZFxTJso93Qq6H2QeJfu
+        4T1o0xk3mm9TUTDU4+TZVwbI3hUe1LL9NM5zG9Xe+RDMWY+WyBZYAwr5b1ooScKT4DFEczTgYOqdq
+        CJ28NUCw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1qS1iz-00BxlH-7U; Fri, 04 Aug 2023 20:48:41 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 30AFC30007E;
+        Fri,  4 Aug 2023 22:48:40 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 1762B276A4B5C; Fri,  4 Aug 2023 22:48:40 +0200 (CEST)
+Date:   Fri, 4 Aug 2023 22:48:40 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Nikunj A Dadhania <nikunj@amd.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>
+Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
+ kvm-amd.o
+Message-ID: <20230804204840.GR212435@hirez.programming.kicks-ass.net>
+References: <20230802091107.1160320-1-nikunj@amd.com>
+ <20230803120637.GD214207@hirez.programming.kicks-ass.net>
+ <b22761ea-cab6-0e11-cdc9-ec26c300cd3f@redhat.com>
+ <20230803190728.GJ212435@hirez.programming.kicks-ass.net>
+ <7c2f6fa3-23ba-6df5-24d9-28f95f866574@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c2f6fa3-23ba-6df5-24d9-28f95f866574@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 04, 2023, Weijiang Yang wrote:
-> On 8/3/2023 7:15 PM, Chao Gao wrote:
-> > On Thu, Aug 03, 2023 at 12:27:22AM -0400, Yang Weijiang wrote:
-> > > +void save_cet_supervisor_ssp(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	if (unlikely(guest_can_use(vcpu, X86_FEATURE_SHSTK))) {
+On Fri, Aug 04, 2023 at 12:20:05PM +0200, Paolo Bonzini wrote:
+> It's not clobbered in a part that will cause unwinding; we can further
+> restrict the part to a handful of instructions (and add a mov %rsp, %rbp
+> at the top, see untested patch after signature).
+> 
+> I think the chance of this failure is similar or lower to the chance of
+> a memory failure that hits the exception handler code itself.
 
-Drop the unlikely, KVM should not speculate on the guest configuration or underlying
-hardware.
+Yes, that's very helpful, the below is your patch with a few extra
+hints and a comment. This seems to cure things.
 
-> > > +		rdmsrl(MSR_IA32_PL0_SSP, vcpu->arch.cet_s_ssp[0]);
-> > > +		rdmsrl(MSR_IA32_PL1_SSP, vcpu->arch.cet_s_ssp[1]);
-> > > +		rdmsrl(MSR_IA32_PL2_SSP, vcpu->arch.cet_s_ssp[2]);
-> > > +		/*
-> > > +		 * Omit reset to host PL{1,2}_SSP because Linux will never use
-> > > +		 * these MSRs.
-> > > +		 */
-> > > +		wrmsrl(MSR_IA32_PL0_SSP, 0);
-> > This wrmsrl() can be dropped because host doesn't support SSS yet.
-> Frankly speaking, I want to remove this line of code. But that would mess up the MSR
-> on host side, i.e., from host perspective, the MSRs could be filled with garbage data,
-> and looks awful.
+Specifically, your change is needed to put UNWIND_HINT_RESTORE before we
+go CALL things (like entry_ibpb), otherwise objtool gets upset we CALL
+without having a valid framepointer.
 
-So?  :-)
+Josh, this look ok to you?
 
-That's the case for all of the MSRs that KVM defers restoring until the host
-returns to userspace, i.e. running in the host with bogus values in hardware is
-nothing new.
+---
+ arch/x86/kvm/Makefile      |  4 ----
+ arch/x86/kvm/svm/vmenter.S | 38 ++++++++++++++++++++++++++++++++------
+ 2 files changed, 32 insertions(+), 10 deletions(-)
 
-And as I mentioned in the other thread regarding the assertion that SSS isn't
-enabled in the host, sanitizing hardware values for something that should never
-be consumed is a fools errand.
-
-> Anyway, I can remove it.
-
-Yes please, though it may be a moot point.
-
-> > > +	}
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(save_cet_supervisor_ssp);
-> > > +
-> > > +void reload_cet_supervisor_ssp(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	if (unlikely(guest_can_use(vcpu, X86_FEATURE_SHSTK))) {
-> > ditto
-> Below is to reload guest supervisor SSPs instead of resetting host ones.
-> > > +		wrmsrl(MSR_IA32_PL0_SSP, vcpu->arch.cet_s_ssp[0]);
-> > > +		wrmsrl(MSR_IA32_PL1_SSP, vcpu->arch.cet_s_ssp[1]);
-> > > +		wrmsrl(MSR_IA32_PL2_SSP, vcpu->arch.cet_s_ssp[2]);
-
-Pulling back in the justification from v3:
-
- the Pros:
-  - Super easy to implement for KVM.
-  - Automatically avoids saving and restoring this data when the vmexit
-    is handled within KVM.
-
- the Cons:
-  - Unnecessarily restores XFEATURE_CET_KERNEL when switching to
-    non-KVM task's userspace.
-  - Forces allocating space for this state on all tasks, whether or not
-    they use KVM, and with likely zero users today and the near future.
-  - Complicates the FPU optimization thinking by including things that
-    can have no affect on userspace in the FPU
-
-IMO the pros far outweigh the cons.  3x RDMSR and 3x WRMSR when loading host/guest
-state is non-trivial overhead.  That can be mitigated, e.g. by utilizing the
-user return MSR framework, but it's still unpalatable.  It's unlikely many guests
-will SSS in the *near* future, but I don't want to end up with code that performs
-poorly in the future and needs to be rewritten.
-
-Especially because another big negative is that not utilizing XSTATE bleeds into
-KVM's ABI.  Userspace has to be told to manually save+restore MSRs instead of just
-letting KVM_{G,S}ET_XSAVE handle the state.  And that will create a bit of a
-snafu if Linux does gain support for SSS.
-
-On the other hand, the extra per-task memory is all of 24 bytes.  AFAICT, there's
-literally zero effect on guest XSTATE allocations because those are vmalloc'd and
-thus rounded up to PAGE_SIZE, i.e. the next 4KiB.  And XSTATE needs to be 64-byte
-aligned, so the 24 bytes is only actually meaningful if the current size is within
-24 bytes of the next cahce line.  And the "current" size is variable depending on
-which features are present and enabled, i.e. it's a roll of the dice as to whether
-or not using XSTATE for supervisor CET would actually increase memory usage.  And
-_if_ it does increase memory consumption, I have a very hard time believing an
-extra 64 bytes in the worst case scenario is a dealbreaker.
-
-If the performance is a concern, i.e. we don't want to eat saving/restoring the
-MSRs when switching to/from host FPU context, then I *think* that's simply a matter
-of keeping guest state resident when loading non-guest FPU state.
-
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 1015af1ae562..8e7599e3b923 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -167,6 +167,16 @@ void restore_fpregs_from_fpstate(struct fpstate *fpstate, u64 mask)
-                 */
-                xfd_update_state(fpstate);
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 80e3fe184d17..0c5c2f090e93 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -3,10 +3,6 @@
+ ccflags-y += -I $(srctree)/arch/x86/kvm
+ ccflags-$(CONFIG_KVM_WERROR) += -Werror
  
-+               /*
-+                * Leave supervisor CET state as-is when loading host state
-+                * (kernel or userspace).  Supervisor CET state is managed via
-+                * XSTATE for KVM guests, but the host never consumes said
-+                * state (doesn't support supervisor shadow stacks), i.e. it's
-+                * safe to keep guest state loaded into hardware.
-+                */
-+               if (!fpstate->is_guest)
-+                       mask &= ~XFEATURE_MASK_CET_KERNEL;
+-ifeq ($(CONFIG_FRAME_POINTER),y)
+-OBJECT_FILES_NON_STANDARD_vmenter.o := y
+-endif
+-
+ include $(srctree)/virt/kvm/Makefile.kvm
+ 
+ kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+index 8e8295e774f0..99b9be9a56c3 100644
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -99,6 +99,8 @@
+  */
+ SYM_FUNC_START(__svm_vcpu_run)
+ 	push %_ASM_BP
++	mov %_ASM_SP, %_ASM_BP
 +
-                /*
-                 * Restoring state always needs to modify all features
-                 * which are in @mask even if the current task cannot use
-
-
-So unless I'm missing something, NAK to this approach, at least not without trying
-the kernel FPU approach, i.e. I want somelike like to PeterZ or tglx to actually
-full on NAK the kernel approach before we consider shoving a hack into KVM.
+ #ifdef CONFIG_X86_64
+ 	push %r15
+ 	push %r14
+@@ -121,7 +123,18 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	/* Needed to restore access to percpu variables.  */
+ 	__ASM_SIZE(push) PER_CPU_VAR(svm_data + SD_save_area_pa)
+ 
+-	/* Finally save @svm. */
++	/*
++	 * Finally save frame pointer and @svm.
++	 *
++	 * Clobbering BP here is mostly ok since GIF will block NMIs and with
++	 * the exception of #MC and the kvm_rebooting _ASM_EXTABLE()s below
++	 * nothing untoward will happen until BP is restored.
++	 *
++	 * The kvm_rebooting exceptions should not want to unwind stack, and
++	 * while #MV might want to unwind stack, it is ultimately fatal.
++	 */
++	UNWIND_HINT_SAVE
++	push %_ASM_BP
+ 	push %_ASM_ARG1
+ 
+ .ifnc _ASM_ARG1, _ASM_DI
+@@ -153,7 +166,6 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	mov VCPU_RCX(%_ASM_DI), %_ASM_CX
+ 	mov VCPU_RDX(%_ASM_DI), %_ASM_DX
+ 	mov VCPU_RBX(%_ASM_DI), %_ASM_BX
+-	mov VCPU_RBP(%_ASM_DI), %_ASM_BP
+ 	mov VCPU_RSI(%_ASM_DI), %_ASM_SI
+ #ifdef CONFIG_X86_64
+ 	mov VCPU_R8 (%_ASM_DI),  %r8
+@@ -165,6 +177,7 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	mov VCPU_R14(%_ASM_DI), %r14
+ 	mov VCPU_R15(%_ASM_DI), %r15
+ #endif
++	mov VCPU_RBP(%_ASM_DI), %_ASM_BP
+ 	mov VCPU_RDI(%_ASM_DI), %_ASM_DI
+ 
+ 	/* Enter guest mode */
+@@ -177,11 +190,16 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	/* Pop @svm to RAX while it's the only available register. */
+ 	pop %_ASM_AX
+ 
+-	/* Save all guest registers.  */
++	/*
++	 * Save all guest registers. Pop the frame pointer as soon as possible
++	 * to enable unwinding.
++	 */
++	mov %_ASM_BP,   VCPU_RBP(%_ASM_AX)
++	pop %_ASM_BP
++	UNWIND_HINT_RESTORE
+ 	mov %_ASM_CX,   VCPU_RCX(%_ASM_AX)
+ 	mov %_ASM_DX,   VCPU_RDX(%_ASM_AX)
+ 	mov %_ASM_BX,   VCPU_RBX(%_ASM_AX)
+-	mov %_ASM_BP,   VCPU_RBP(%_ASM_AX)
+ 	mov %_ASM_SI,   VCPU_RSI(%_ASM_AX)
+ 	mov %_ASM_DI,   VCPU_RDI(%_ASM_AX)
+ #ifdef CONFIG_X86_64
+@@ -297,6 +315,7 @@ SYM_FUNC_END(__svm_vcpu_run)
+  */
+ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ 	push %_ASM_BP
++	mov %_ASM_SP, %_ASM_BP
+ #ifdef CONFIG_X86_64
+ 	push %r15
+ 	push %r14
+@@ -316,7 +335,9 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ 	/* Accessed directly from the stack in RESTORE_HOST_SPEC_CTRL.  */
+ 	push %_ASM_ARG2
+ 
+-	/* Save @svm. */
++	/* Save frame pointer and @svm. */
++	UNWIND_HINT_SAVE
++	push %_ASM_BP
+ 	push %_ASM_ARG1
+ 
+ .ifnc _ASM_ARG1, _ASM_DI
+@@ -341,8 +362,13 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ 
+ 2:	cli
+ 
+-	/* Pop @svm to RDI, guest registers have been saved already. */
++	/*
++	 * Guest registers have been saved already.
++	 * Pop @svm to RDI and restore the frame pointer to allow unwinding.
++	 */
+ 	pop %_ASM_DI
++	pop %_ASM_BP
++	UNWIND_HINT_RESTORE
+ 
+ #ifdef CONFIG_RETPOLINE
+ 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
