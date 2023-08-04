@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4046E76F78D
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 04:11:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A72676F790
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 04:11:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232585AbjHDCLm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 22:11:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36706 "EHLO
+        id S233554AbjHDCLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 22:11:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233397AbjHDCLW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 22:11:22 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994C044BB
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 19:10:51 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1bbaa549bcbso1180668fac.3
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 19:10:51 -0700 (PDT)
+        with ESMTP id S233450AbjHDCL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 22:11:29 -0400
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D14265249
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 19:10:57 -0700 (PDT)
+Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6bcbb0c40b1so1341427a34.3
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 19:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1691115050; x=1691719850;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKI9/8r29fiRcdK5stgXJjwhW7P4T9bJiQbL+zxyBRE=;
-        b=AkhJfOQFM1pGb6BlPUy06oljjiN78H7icu0FCH4lB+bXHw/LwEgE5WfUHUrhk68xKT
-         VZ9dam0/U64TWA5t9TdKruXPJ3X0H+Sf0d6VfdGQUmlqqGKLC8z8Yvh7+P06WeYSaRF6
-         7tff9KQinoC1Hs5opB6YqN+4f3XkGXDoNcN0XTyYvtwmEI6i78JSWRjapxttsIFecIL3
-         TCvudV8tBM9EoNig/xmiY7igTYmcPHx0ukaFkc/TJlPFpGWB16NSmemF6Z9bDb7+PdFN
-         fVb3cD33kRf2q8frdWvDdZU0s40iHWB50DKpovfgMWF8buP9mcXSJ1u8dbQjRbyQHCxf
-         UWXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691115050; x=1691719850;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=rivosinc-com.20221208.gappssmtp.com; s=20221208; t=1691115054; x=1691719854;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aKI9/8r29fiRcdK5stgXJjwhW7P4T9bJiQbL+zxyBRE=;
-        b=S/98EvWUEg0NOcjlcUfsB3gias2sYg/oM5uF4VrzccxXeB3+iG5H1UFaz9Z9PIyV0f
-         xGV94FDZMoPyEg1yXhARVwb3tTrm07NmtPDiHRMNbX5aiq8iOCfPfIl+Zoboadh69/84
-         iwJ48eSLgUO/HgsJGcAV44Mq8AbejOLo1Udc5FUXJ0qHicpXOZCqzWowi16bqbVBy93f
-         nlAqx4/iPZlfhMf7WwqdOceiyhHe3BH6STNdwnXZ+V6VM98CIXHN6e4m/87hm4ltBka1
-         +XpMhLyCBaV2RQ+odbHDYcuGNBucMB7/qZotwDexpl+KCM8qSlnfaOIzNWMNZJ3Du7cj
-         AZVg==
-X-Gm-Message-State: AOJu0YzWqSzSnTH35eJEmcAZ3kiWi/zcm8cqCvX/9RCfCLaHHtJvy6DJ
-        FU5lXejWTDh9CUXxmkyGG0MVjg==
-X-Google-Smtp-Source: AGHT+IGEhqmUxc1mmFiSsBDUL26nAWIZW9KyBf1DeJ5CThKaab1yi3ouqz1V6OLbD8yYEm2oPVP2Jw==
-X-Received: by 2002:a05:6871:707:b0:19f:aee0:e169 with SMTP id f7-20020a056871070700b0019faee0e169mr420658oap.30.1691115050056;
-        Thu, 03 Aug 2023 19:10:50 -0700 (PDT)
+        bh=efS36dkbCzja1DEoOkKk5twnSGIQYzSPz7GFgwV0rps=;
+        b=sL5L+XGZXxz3uilHLZ9996rABpzv96OCLn70c9kreiKgPg+WH3KJroL9cVLj2fBjI4
+         NQe8+w7CLAox+ot9c6Sx0ktR3iYP5P+c8pN85u54Rsy06KDa4GcfJccDlv6X4vB+zHUn
+         fOSxh1hOUBlo6UgFcJDC47IQVz1f4EDcD0TlBOGU/8cvax961M2jcrcuGJPlBRjyBApH
+         Yr9yABf/BnVF1c20z4GgGSV/40DAWyj5SVhDT+9mC7k6UVziYmYdgL3moyY6QrCvZd73
+         4FZ3hUQCNUuO/ok3JHJqIRfA/yxktc+meR9K37rZmH55b5iR6aKlCC4Gg1xr0MwsaNDG
+         Pekw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691115054; x=1691719854;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=efS36dkbCzja1DEoOkKk5twnSGIQYzSPz7GFgwV0rps=;
+        b=kCoy3nILxG9FGQKT+Icf21fI7ntg+9FtyAxBR7HvdtDTPy6yeU3ypg9ieCqrSZeJib
+         0xrZEIu9tX46TWNOuXrLYXkMcHk5Zh1/QcJcJIxy+dNntGS3fOVG7QxnMV2MDI63o2RS
+         vXKPNC1LAQ3PAcKOfLxqV3TQDYymSsD6BXld6DmE20cMNurCwtNF43oM+Y9o9xygmpdK
+         4JYofbwU63kRt/kNUlWyWkl1MNzl59m0NaBIv7FyKAsjQ7s8KBGPKmrXHq+Z2lgBUw/4
+         ZBS9IR461LYrxmr9W4WJPYoirT7FXS8j+9uFyp+7ILSwAB6Gb3EVtNCiru36ttDDXHi5
+         Z6jw==
+X-Gm-Message-State: AOJu0YzgRZ+45MiTjQ6rDpLCXTuo5oEYv61SeIc9MNuYSPxrGpWFmtsg
+        +FJy6LJG10vkYVPl3LHiNOYWyg==
+X-Google-Smtp-Source: AGHT+IHkkquc+vtnTAEnaVFOIeS3KymV7yesjBryf/XUZfueFQfWUT4yuX+ZoQdYenvjMp3+aT7A/A==
+X-Received: by 2002:a05:6358:c603:b0:134:ded4:294 with SMTP id fd3-20020a056358c60300b00134ded40294mr441125rwb.17.1691115054417;
+        Thu, 03 Aug 2023 19:10:54 -0700 (PDT)
 Received: from charlie.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id g6-20020a655806000000b0055c558ac4edsm369499pgr.46.2023.08.03.19.10.48
+        by smtp.gmail.com with ESMTPSA id g6-20020a655806000000b0055c558ac4edsm369499pgr.46.2023.08.03.19.10.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 19:10:49 -0700 (PDT)
+        Thu, 03 Aug 2023 19:10:53 -0700 (PDT)
 From:   Charlie Jenkins <charlie@rivosinc.com>
-Subject: [PATCH 00/10] RISC-V: Refactor instructions
-Date:   Thu, 03 Aug 2023 19:10:25 -0700
-Message-Id: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
+Date:   Thu, 03 Aug 2023 19:10:27 -0700
+Subject: [PATCH 02/10] RISC-V: vector: Refactor instructions
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIABJezGQC/x2NQQqDQAxFryJZG4jOLMSrlC7CmNYsHEsyFUG8e
- 0OXD/777wIXU3GYuwtMDnXda8DQd1BWrm9BXYJhpDHRRANu7E0MTV5c2m6o1Zt9SwvP8ciYU2K
- mTAtTgnj5xFLPf+HxvO8foTEC2nEAAAA=
+Message-Id: <20230803-master-refactor-instructions-v4-v1-2-2128e61fa4ff@rivosinc.com>
+References: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
+In-Reply-To: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
 To:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
         bpf@vger.kernel.org
@@ -94,80 +94,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are numerous systems in the kernel that rely on directly
-modifying, creating, and reading instructions. Many of these systems
-have rewritten code to do this. This patch will delegate all instruction
-handling into insn.h and reg.h. All of the compressed instructions, RVI,
-Zicsr, M, A instructions are included, as well as a subset of the F,D,Q
-extensions.
-
----
-This is modifying code that https://lore.kernel.org/lkml/20230731183925.152145-1-namcaov@gmail.com/
-is also touching.
-
----
-Testing:
-
-There are a lot of subsystems touched and I have not tested every
-individual instruction. I did a lot of copy-pasting from the RISC-V spec
-so opcodes and such should be correct, but the construction of every
-instruction is not fully tested.
-
-vector: Compiled and booted
-
-jump_label: Ensured static keys function as expected.
-
-kgdb: Attempted to run the provided tests but they failed even without
-my changes
-
-module: Loaded and unloaded modules
-
-patch.c: Ensured kernel booted
-
-kprobes: Used a kprobing module to probe jalr, auipc, and branch
-instructions
-
-nommu misaligned addresses: Kernel boots
-
-kvm: Ran KVM selftests
-
-bpf: Kernel boots. Most of the instructions are exclusively used by BPF
-but I am unsure of the best way of testing BPF.
+Use instructions in insn.h
 
 Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
-
 ---
-Charlie Jenkins (10):
-      RISC-V: Expand instruction definitions
-      RISC-V: vector: Refactor instructions
-      RISC-V: Refactor jump label instructions
-      RISC-V: KGDB: Refactor instructions
-      RISC-V: module: Refactor instructions
-      RISC-V: Refactor patch instructions
-      RISC-V: nommu: Refactor instructions
-      RISC-V: kvm: Refactor instructions
-      RISC-V: bpf: Refactor instructions
-      RISC-V: Refactor bug and traps instructions
+ arch/riscv/kernel/vector.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
- arch/riscv/include/asm/bug.h             |   18 +-
- arch/riscv/include/asm/insn.h            | 2744 +++++++++++++++++++++++++++---
- arch/riscv/include/asm/reg.h             |   88 +
- arch/riscv/kernel/jump_label.c           |   13 +-
- arch/riscv/kernel/kgdb.c                 |   13 +-
- arch/riscv/kernel/module.c               |   80 +-
- arch/riscv/kernel/patch.c                |    3 +-
- arch/riscv/kernel/probes/kprobes.c       |   13 +-
- arch/riscv/kernel/probes/simulate-insn.c |  100 +-
- arch/riscv/kernel/probes/uprobes.c       |    5 +-
- arch/riscv/kernel/traps.c                |    9 +-
- arch/riscv/kernel/traps_misaligned.c     |  218 +--
- arch/riscv/kernel/vector.c               |    5 +-
- arch/riscv/kvm/vcpu_insn.c               |  281 +--
- arch/riscv/net/bpf_jit.h                 |  707 +-------
- 15 files changed, 2825 insertions(+), 1472 deletions(-)
----
-base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
-change-id: 20230801-master-refactor-instructions-v4-433aa040da03
+diff --git a/arch/riscv/kernel/vector.c b/arch/riscv/kernel/vector.c
+index d67a60369e02..1433d70abdd7 100644
+--- a/arch/riscv/kernel/vector.c
++++ b/arch/riscv/kernel/vector.c
+@@ -18,7 +18,6 @@
+ #include <asm/csr.h>
+ #include <asm/elf.h>
+ #include <asm/ptrace.h>
+-#include <asm/bug.h>
+ 
+ static bool riscv_v_implicit_uacc = IS_ENABLED(CONFIG_RISCV_ISA_V_DEFAULT_ENABLE);
+ 
+@@ -56,7 +55,7 @@ static bool insn_is_vector(u32 insn_buf)
+ 	 * All V-related instructions, including CSR operations are 4-Byte. So,
+ 	 * do not handle if the instruction length is not 4-Byte.
+ 	 */
+-	if (unlikely(GET_INSN_LENGTH(insn_buf) != 4))
++	if (unlikely(INSN_LEN(insn_buf) != 4))
+ 		return false;
+ 
+ 	switch (opcode) {
+
 -- 
-- Charlie
+2.34.1
 
