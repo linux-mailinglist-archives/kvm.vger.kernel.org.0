@@ -2,147 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42F337707B1
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 20:19:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B718A7707FD
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 20:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230413AbjHDSTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 14:19:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50782 "EHLO
+        id S231488AbjHDSat (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 14:30:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbjHDSTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 14:19:16 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F0549C3
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 11:19:14 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1bc0075ab7aso18165ad.1
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 11:19:14 -0700 (PDT)
+        with ESMTP id S230094AbjHDSaH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 14:30:07 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AA561AF
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 11:27:24 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5734d919156so24933837b3.3
+        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 11:27:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691173154; x=1691777954;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mfl7UJxUbxuUeTFoCKSsO/YqaEDE5S858pqTp5fgS00=;
-        b=uCBp75tLHriee//ikoqX2p7GjimbkirtfpIc8u1w4o4rJ5LjqEB3KYoXAiKiKEJ1MF
-         DotbslqYm5Nhe3DYQsDTksQT7Her1ubNthHRWCzWT4FlTQfKRzfdCp6TYxeevDR31fvW
-         0zyetWbMhkUr7qGOnjI6KiEqxCz6dPc2GmSHje5ATyYxqrTq6lSL+WS1dI0HHL++kfX8
-         D+v4noCZoArF+1sIIwVhIBcDOTPnV5jsidMUaZYjedfSrLAc1z5UsqyKSi4/1p+Jm50S
-         Tm2k90LzEhrYGbndJU95LHQSily8ML2kCFE6HRvTt1LMGvaeA2yRRJSEA2PA7YMzA0vp
-         Y3SA==
+        d=google.com; s=20221208; t=1691173626; x=1691778426;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yicl8HQWxQqj3w4wcqj/w2h6VZPy7YMSL4dCcW63iys=;
+        b=zsme1DSz81gpIQfOQX3wWoXO8SQg5Lnsl9fwG2BcXHdEHPgZMpS84JTXH+7hjqVgJE
+         EKfSAWA4vETl1TeMAThrU6X7RPzer1qGCKqD8O8c+I9I3lPwuFnv3RzZ8e2VBY0C2Aef
+         Bw/vFmwYDQ4Qx4gaRkBU1N0+J5R6IoMe5iYtLihh23GfIdOCxMtHdRBVuQDp2RlSQtIG
+         Q76cNr5/Zx4kmVoLQKFolxNb5noig4VtIwNqcwl45UZJAIl9Ep/uifXC3oJad8tNwvMk
+         kqbqpHndaNRmyAPWZarfBpNq/Qrl8Byn7VMrbxsPxPVvqCF15sKOgPZCROJ5Ybba3lnl
+         N67w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691173154; x=1691777954;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Mfl7UJxUbxuUeTFoCKSsO/YqaEDE5S858pqTp5fgS00=;
-        b=AjMF/IJ7gEBHYRiEqvXW7FI6Zfm/aaNaTmKeJWj3IVMzU9rVz3yYOWQTqyIrjDS9VE
-         iq/R/n80cZmWrYGdY00NyGN+rMxqEvvVwMNe8jNasSsVXoQmnw2jYFzFM+JHp+YivpTn
-         rGQvSJa7Js0ZQy6WcdOCpdY/ShDpQ99DgBjwVm48J69KMKcnR8aGEVeeG3NAlI9brVaE
-         gMXzKamsfCSTOa0b5f8YVQnBWC0/voupjss9kkw8YB2/p4x5lL9lvMhmZykRCWOyHcwR
-         DP2eWx1hRMXBlm3uHJkoXLfdfb7KUhsRkIjP67exLUpXckRzMG5Conai3MusSf05Ce2Y
-         VZNw==
-X-Gm-Message-State: AOJu0YzLgBgg7bGQ1F9R0k6+SuA6Tfhuw7N1OYkwOg9EltI6QJhKkBmE
-        ztMyekaAK0VF3yFbjgLIVhRSZb/Y3ZhCkm8xh/tVcg==
-X-Google-Smtp-Source: AGHT+IFFuspIZOGK/w9Z6kR37S5PKecewC+tAEgC1N9zpe8mnYVma9ptD/pOi27s4N+BxyB/wElI7D/qTwtc1r+Abqc=
-X-Received: by 2002:a17:902:c409:b0:1a9:bb1d:64e with SMTP id
- k9-20020a170902c40900b001a9bb1d064emr24172plk.15.1691173154182; Fri, 04 Aug
- 2023 11:19:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230722022251.3446223-1-rananta@google.com> <20230722022251.3446223-3-rananta@google.com>
- <87tttpr6qy.wl-maz@kernel.org> <ZMgsjx8dwKd4xBGe@google.com>
- <877cqdqw12.wl-maz@kernel.org> <CAJHc60xAUVt5fbhEkOqeC-VF8SWVOt3si=1yxVVAUW=+Hu_wNg@mail.gmail.com>
-In-Reply-To: <CAJHc60xAUVt5fbhEkOqeC-VF8SWVOt3si=1yxVVAUW=+Hu_wNg@mail.gmail.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Fri, 4 Aug 2023 11:19:02 -0700
-Message-ID: <CAJHc60zN-dc2E-fS7fuXgkrfGD9bqW6tMy2GRZxbHOeZv0ZOBw@mail.gmail.com>
-Subject: Re: [PATCH v7 02/12] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1691173626; x=1691778426;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yicl8HQWxQqj3w4wcqj/w2h6VZPy7YMSL4dCcW63iys=;
+        b=ZWy/AKmdDBgOluaxwt7mMN7BrSojU/1xg1b3fyDJwzntJvunxqxxNoIWOVNiQ9M7JR
+         sZgk31o4Rm/95OdhXEk/IQBj4MBoMHdF/IsGdV5Tgw+D3xlih9u13QAEoNvljr5vh7s1
+         3KYS//yKog972gcc5ZGiFxvH1dWkzM9SV2yKL8pj3PmupoZzU/MUdS/6/dtKR5fJZBlc
+         xKxApxSqNV+IukvMYF/qiBc/o08ORzL3NKH7d5K4JhHvhLZWTpqzOfYWgKeYY9NYXs+s
+         LIY2TiWBU7ooHOUYkqqIm6YpQsCte2kdB3wvokm83IRcEP4lCJkzabZ2SMb37fRH0FCY
+         zm+w==
+X-Gm-Message-State: AOJu0Yz0rPq4zvEI+5rANy8mrdVPrPcTJ3Em4fpgfw9dht1l3ruTy5lK
+        Ia+jpaLOQ3cssMoMrbgjsCBPA4bfgYg=
+X-Google-Smtp-Source: AGHT+IHoZUXVYbPP+MadD0iZRGDE0s1QJNlhExLbvmwhVTuvQVXgGPBmnTPtoHs7EIJYDdx+8/h9hEmhmmQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1588:b0:d3b:12d3:564e with SMTP id
+ k8-20020a056902158800b00d3b12d3564emr14010ybu.2.1691173625936; Fri, 04 Aug
+ 2023 11:27:05 -0700 (PDT)
+Date:   Fri, 4 Aug 2023 11:27:04 -0700
+In-Reply-To: <20230803042732.88515-5-weijiang.yang@intel.com>
+Mime-Version: 1.0
+References: <20230803042732.88515-1-weijiang.yang@intel.com> <20230803042732.88515-5-weijiang.yang@intel.com>
+Message-ID: <ZM1C+ILRMCfzJxx7@google.com>
+Subject: Re: [PATCH v5 04/19] KVM:x86: Refresh CPUID on write to guest MSR_IA32_XSS
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, peterz@infradead.org, john.allen@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rick.p.edgecombe@intel.com, chao.gao@intel.com,
+        binbin.wu@linux.intel.com, Zhang Yi Z <yi.z.zhang@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 2, 2023 at 4:28=E2=80=AFPM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> Sure, I'll change it to kvm_arch_flush_vm_tlbs() in v8.
->
-While working on the renaming, I realized that since this function is
-called from kvm_main.c's kvm_flush_remote_tlbs(). Do we want to rename
-this and the other kvm_flush_*() functions that the series introduces
-to match their kvm_arch_flush_*() counterparts?  (spiraling more into
-this, we also have the 'remote_tlb_flush_requests' and
-'remote_tlb_flush' stats)
+On Thu, Aug 03, 2023, Yang Weijiang wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0b9033551d8c..5d6d6fa33e5b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3780,10 +3780,12 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
+>  		 * XSAVES/XRSTORS to save/restore PT MSRs.
+>  		 */
+> -		if (data & ~kvm_caps.supported_xss)
+> +		if (data & ~vcpu->arch.guest_supported_xss)
 
-Thank you.
-Raghavendra
+Hmm, this is arguably wrong for userspace-initiated writes, as it would prevent
+userspace from restoring MSRs before CPUID.
 
-> Thanks,
-> Raghavendra
->
-> On Wed, Aug 2, 2023 at 8:55=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
-> >
-> > On Mon, 31 Jul 2023 22:50:07 +0100,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Thu, Jul 27, 2023, Marc Zyngier wrote:
-> > > > On Sat, 22 Jul 2023 03:22:41 +0100,
-> > > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > > >
-> > > > > Stop depending on CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL and opt to
-> > > > > standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> > > > > duplicating the generic TLB stats across architectures that imple=
-ment
-> > > > > their own remote TLB flush.
-> > > > >
-> > > > > This adds an extra function call to the ARM64 kvm_flush_remote_tl=
-bs()
-> > > > > path, but that is a small cost in comparison to flushing remote T=
-LBs.
-> > > >
-> > > > Well, there is no such thing as a "remote TLB" anyway. We either ha=
-ve
-> > > > a non-shareable or inner-shareable invalidation. The notion of remo=
-te
-> > > > would imply that we track who potentially has a TLB, which we
-> > > > obviously don't.
-> > >
-> > > Maybe kvm_arch_flush_vm_tlbs()?  The "remote" part is misleading even=
- on x86 when
-> > > running on Hyper-V, as the flush may be done via a single hypercall a=
-nd by kicking
-> > > "remote" vCPUs.
-> >
-> > Yup, this would be much better.
-> >
-> > Thanks,
-> >
-> >         M.
-> >
-> > --
-> > Without deviation from the norm, progress is not possible.
+And it would make the handling of MSR_IA32_XSS writes inconsistent just within
+this case statement.  The initial "can this MSR be written at all" check would
+*not* honor guest CPUID for host writes, but then the per-bit check *would* honor
+guest CPUID for host writes.
+
+But if we exempt host writes, then we'll end up with another mess, as exempting
+host writes for MSR_KVM_GUEST_SSP would let the guest coerce KVM into writing an
+illegal value by modifying SMRAM while in SMM.
+
+Blech.
+
+If we can get away with it, i.e. not break userspace, I think my preference is
+to enforce guest CPUID for host accesses to XSS, XFD, XFD_ERR, etc.  I'm 99%
+certain we can make that change, because there are many, many MSRs that do NOT
+exempt host writes, i.e. the only way this would be a breaking change is if
+userspace is writing things like XSS before KVM_SET_CPUID2, but other MSRs after
+KVM_SET_CPUID2.
+
+I'm pretty sure I've advocated for the exact opposite in the past, i.e. argued
+that KVM's ABI is to not enforce ordering between KVM_SET_CPUID2 and KVM_SET_MSR.
+But this is becoming untenable, juggling the dependencies in KVM is complex and
+is going to result in a nasty bug at some point.
+
+For this series, lets just tighten the rules for XSS, i.e. drop the host_initated
+exemption.  And in a parallel/separate series, try to do a wholesale cleanup of
+all the cases that essentially allow userspace to do KVM_SET_MSR before KVM_SET_CPUID2.
