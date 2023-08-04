@@ -2,201 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6370376FD3D
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 11:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5CE376FDB9
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 11:46:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230018AbjHDJ2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 05:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40010 "EHLO
+        id S231186AbjHDJqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 05:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjHDJ2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 05:28:33 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B41A30EA
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 02:28:32 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99c4923195dso256837566b.2
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 02:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1691141310; x=1691746110;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZfqEgyUyGWV+uCR/G+Jp30EpbAjcXJAFKXc4wfVRnvc=;
-        b=E5XARrnWgyw7Cl6ZED5yZTcAjZ31Ocmt/9ACuiwG3t25Jv8VSFbwPR0xS8/w6YDBWS
-         jFraad9vh58ejKHgML+JfZPZLP6hZx6immp48/Ns5zgR1eVbrtVmIxwjpDjurBTZQLkZ
-         0la33KkRHDu0Sny+rPQjycd9YlzI3KNeLSdwoRjSh2x7GSGeRvrN+8/jv+SxRdnX4Mf2
-         5wLmtp9/XsJpk/EWdDbpwoNxWZsvCmxe0FRPzCVH7oKMxWd9yyKlyhyTQ6KTnoB2fiEt
-         192MzRXO2VNkgNOtCPU4sZx8wov6wXGgBZfbXDKB++JuQrVnIiKO3CXnkPFx07E5vDhY
-         NsZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691141310; x=1691746110;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZfqEgyUyGWV+uCR/G+Jp30EpbAjcXJAFKXc4wfVRnvc=;
-        b=Efx341ehIWnIwoqA6jG0x5VBut+Hnv8m/uTFasINBY+k7vhXz6XHZkYzX8DYxy/Upn
-         EpDzvZcW7e/XBQE/wJ/ZB1v22Sgv+46zqVZ9Ukh4y9PfL0dYiQFcTYQZQ6Q46MF7gc7S
-         yVCbxA1DYikILQFsYzAFg3PG/9gsZEiKuK029LKCnjF7tIyH95c2R/lemgqftkhn1yHG
-         S8vaUMAyCIZCvpNp+DAdik9o+PH7qbx2IJBjIjeAyP9fXozm+ytfSDjsuIkDznTo4xAt
-         IOfAtRcyoUv47YyBCEvjo7zCWDEwKs1KD6ob0GP5gDsybhouNnvKwXv+itoAs1eSM2y+
-         aDhw==
-X-Gm-Message-State: AOJu0YyORhYOHPc5sV9ly6ydKwjTLqeU/WhmwnuaZriYEQ+rgAzHDXUh
-        lryNT9HHcd9mN1SeZp9vcCn63A==
-X-Google-Smtp-Source: AGHT+IE6rLcJxJxn18Xxg19aKhaZkkPhYOGD3RLIstSvThFuRa9fmKxoji2QZX4Ve7Hm/5p2G7FBoA==
-X-Received: by 2002:a17:906:2012:b0:99b:f53c:3648 with SMTP id 18-20020a170906201200b0099bf53c3648mr991573ejo.72.1691141310471;
-        Fri, 04 Aug 2023 02:28:30 -0700 (PDT)
-Received: from localhost (212-5-140-29.ip.btc-net.bg. [212.5.140.29])
-        by smtp.gmail.com with ESMTPSA id p7-20020a1709066a8700b009930042510csm1024394ejr.222.2023.08.04.02.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Aug 2023 02:28:30 -0700 (PDT)
-Date:   Fri, 4 Aug 2023 12:28:28 +0300
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Charlie Jenkins <charlie@rivosinc.com>
-Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        bpf@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-        Luke Nelson <luke.r.nels@gmail.com>,
-        Xi Wang <xi.wang@gmail.com>, Nam Cao <namcaov@gmail.com>
-Subject: Re: [PATCH 00/10] RISC-V: Refactor instructions
-Message-ID: <20230804-2c57bddd6e87fdebc20ff9d5@orel>
-References: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
+        with ESMTP id S231238AbjHDJqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 05:46:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E777C49FA;
+        Fri,  4 Aug 2023 02:46:11 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3749ckwc014098;
+        Fri, 4 Aug 2023 09:46:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : from
+ : cc : subject : to : message-id : date; s=pp1;
+ bh=LDWA5hEwRFL2483mPODKHUjFwor5SYcTyNogSzzZouU=;
+ b=ZOdFyqGVfrniQZsp+V7QQUB/ODDulVzC4vuz5xqrSXaCBjEuzDun0rBl4lWNDZGl8IG0
+ 3/lV7ww1ZXaXNF4y7w4A21am7RlRepfdaacdCzveXJxcFFcU9A7dBgJw+Y6koQKmJZeH
+ LywL1RWjdypCllgfYF2uhbCQmbIydcq0XYc7aIyhkGq2blZcAZWvN+I0rwRuW6Irc44k
+ OJ3hPxo6pOulMhJB5vMU0TC3UkTzr/HltT7xHw8ZQ/4Xmozk/b7THYaxSHIeNYp4XK1n
+ B2pplhvlewnwWyO7iJEfIpPILu84zi6JXbwQfyu/yeUu/FaWwQJzf89HXJ19AU0Us2os aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8xq08mt4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Aug 2023 09:46:11 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3749d9of017916;
+        Fri, 4 Aug 2023 09:46:10 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s8xq08msk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Aug 2023 09:46:10 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3749NLcq027816;
+        Fri, 4 Aug 2023 09:46:09 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s8kp2vg4j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 04 Aug 2023 09:46:09 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3749k6vX35848834
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 4 Aug 2023 09:46:06 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F221120043;
+        Fri,  4 Aug 2023 09:46:05 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4EBF2005A;
+        Fri,  4 Aug 2023 09:46:05 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.78.151])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri,  4 Aug 2023 09:46:05 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <6f8951e2-9ea6-5bad-9c2c-b27d70d57ffe@redhat.com>
+References: <20230510121822.546629-1-nrb@linux.ibm.com> <20230510121822.546629-3-nrb@linux.ibm.com> <6f8951e2-9ea6-5bad-9c2c-b27d70d57ffe@redhat.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] KVM: s390: add tracepoint in gmap notifier
+To:     David Hildenbrand <david@redhat.com>, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Message-ID: <169114236545.36389.12085901437050856794@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Fri, 04 Aug 2023 11:46:05 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: p-_cvb9h6aHmSI6vtKeyjDNBrgtnXeUA
+X-Proofpoint-GUID: huCehl-ochPLzIKgqWR3e02zZJMak3Z3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-04_08,2023-08-03_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ phishscore=0 suspectscore=0 clxscore=1011 adultscore=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2308040083
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 03, 2023 at 07:10:25PM -0700, Charlie Jenkins wrote:
-> There are numerous systems in the kernel that rely on directly
-> modifying, creating, and reading instructions. Many of these systems
-> have rewritten code to do this. This patch will delegate all instruction
-> handling into insn.h and reg.h. All of the compressed instructions, RVI,
-> Zicsr, M, A instructions are included, as well as a subset of the F,D,Q
-> extensions.
-> 
-> ---
-> This is modifying code that https://lore.kernel.org/lkml/20230731183925.152145-1-namcaov@gmail.com/
-> is also touching.
-> 
-> ---
-> Testing:
-> 
-> There are a lot of subsystems touched and I have not tested every
-> individual instruction. I did a lot of copy-pasting from the RISC-V spec
-> so opcodes and such should be correct
+Quoting David Hildenbrand (2023-07-27 09:41:51)
+> On 10.05.23 14:18, Nico Boehr wrote:
+> > The gmap notifier is called for changes in table entries with the
+> > notifier bit set. To diagnose performance issues, it can be useful to
+> > see what causes certain changes in the gmap.
+> >=20
+> > Hence, add a tracepoint in the gmap notifier.
+> >=20
+> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> > ---
+> >   arch/s390/kvm/kvm-s390.c   |  2 ++
+> >   arch/s390/kvm/trace-s390.h | 23 +++++++++++++++++++++++
+> >   2 files changed, 25 insertions(+)
+> >=20
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index ded4149e145b..e8476c023b07 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -3982,6 +3982,8 @@ static void kvm_gmap_notifier(struct gmap *gmap, =
+unsigned long start,
+> >       unsigned long prefix;
+> >       unsigned long i;
+> >  =20
+> > +     trace_kvm_s390_gmap_notifier(start, end, gmap_is_shadow(gmap));
+> > +
+> >       if (gmap_is_shadow(gmap))
+> >               return;
+> >       if (start >=3D 1UL << 31)
+> > diff --git a/arch/s390/kvm/trace-s390.h b/arch/s390/kvm/trace-s390.h
+> > index 6f0209d45164..5dabd0b64d6e 100644
+> > --- a/arch/s390/kvm/trace-s390.h
+> > +++ b/arch/s390/kvm/trace-s390.h
+> > @@ -333,6 +333,29 @@ TRACE_EVENT(kvm_s390_airq_suppressed,
+> >                     __entry->id, __entry->isc)
+> >       );
+> >  =20
+> > +/*
+> > + * Trace point for gmap notifier calls.
+> > + */
+> > +TRACE_EVENT(kvm_s390_gmap_notifier,
+> > +             TP_PROTO(unsigned long start, unsigned long end, unsigned=
+ int shadow),
+> > +             TP_ARGS(start, end, shadow),
+> > +
+> > +             TP_STRUCT__entry(
+> > +                     __field(unsigned long, start)
+> > +                     __field(unsigned long, end)
+> > +                     __field(unsigned int, shadow)
+> > +                     ),
+> > +
+> > +             TP_fast_assign(
+> > +                     __entry->start =3D start;
+> > +                     __entry->end =3D end;
+> > +                     __entry->shadow =3D shadow;
+> > +                     ),
+> > +
+> > +             TP_printk("gmap notified (start:0x%lx end:0x%lx shadow:%d=
+)",
+> > +                     __entry->start, __entry->end, __entry->shadow)
+> > +     );
+> > +
+> >  =20
+> >   #endif /* _TRACE_KVMS390_H */
+> >  =20
+>=20
+> In the context of vsie, I'd have thought you'd be tracing=20
+> kvm_s390_vsie_gmap_notifier() instead.
 
-How about we create macros which generate each of the functions an
-instruction needs, e.g. riscv_insn_is_*(), etc. based on the output of
-[1]. I know basically nothing about that project, but it looks like it
-creates most the defines this series is creating from what we [hope] to
-be an authoritative source. I also assume that if we don't like the
-current output format, then we could probably post patches to the project
-to get the format we want. For example, we could maybe propose an "lc"
-format for "Linux C".
-
-I'd also recommend only importing the generated defines and generating
-the functions that will actually have immediate consumers or are part of
-a set of defines that have immediate consumers. Each consumer of new
-instructions will be responsible for generating and importing the defines
-and adding the respective macro invocations to generate the functions.
-This series can also take that approach, i.e. convert one set of
-instructions at a time, each in a separate patch.
-
-[1] https://github.com/riscv/riscv-opcodes
-
-Thanks,
-drew
-
-
-> , but the construction of every
-> instruction is not fully tested.
-> 
-> vector: Compiled and booted
-> 
-> jump_label: Ensured static keys function as expected.
-> 
-> kgdb: Attempted to run the provided tests but they failed even without
-> my changes
-> 
-> module: Loaded and unloaded modules
-> 
-> patch.c: Ensured kernel booted
-> 
-> kprobes: Used a kprobing module to probe jalr, auipc, and branch
-> instructions
-> 
-> nommu misaligned addresses: Kernel boots
-> 
-> kvm: Ran KVM selftests
-> 
-> bpf: Kernel boots. Most of the instructions are exclusively used by BPF
-> but I am unsure of the best way of testing BPF.
-> 
-> Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
-> 
-> ---
-> Charlie Jenkins (10):
->       RISC-V: Expand instruction definitions
->       RISC-V: vector: Refactor instructions
->       RISC-V: Refactor jump label instructions
->       RISC-V: KGDB: Refactor instructions
->       RISC-V: module: Refactor instructions
->       RISC-V: Refactor patch instructions
->       RISC-V: nommu: Refactor instructions
->       RISC-V: kvm: Refactor instructions
->       RISC-V: bpf: Refactor instructions
->       RISC-V: Refactor bug and traps instructions
-> 
->  arch/riscv/include/asm/bug.h             |   18 +-
->  arch/riscv/include/asm/insn.h            | 2744 +++++++++++++++++++++++++++---
->  arch/riscv/include/asm/reg.h             |   88 +
->  arch/riscv/kernel/jump_label.c           |   13 +-
->  arch/riscv/kernel/kgdb.c                 |   13 +-
->  arch/riscv/kernel/module.c               |   80 +-
->  arch/riscv/kernel/patch.c                |    3 +-
->  arch/riscv/kernel/probes/kprobes.c       |   13 +-
->  arch/riscv/kernel/probes/simulate-insn.c |  100 +-
->  arch/riscv/kernel/probes/uprobes.c       |    5 +-
->  arch/riscv/kernel/traps.c                |    9 +-
->  arch/riscv/kernel/traps_misaligned.c     |  218 +--
->  arch/riscv/kernel/vector.c               |    5 +-
->  arch/riscv/kvm/vcpu_insn.c               |  281 +--
->  arch/riscv/net/bpf_jit.h                 |  707 +-------
->  15 files changed, 2825 insertions(+), 1472 deletions(-)
-> ---
-> base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
-> change-id: 20230801-master-refactor-instructions-v4-433aa040da03
-> -- 
-> - Charlie
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+Right, I can change that if you / others have a preference for that.
