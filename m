@@ -2,131 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56A3F76F68C
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 02:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C521176F68E
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 02:41:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232225AbjHDAkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 3 Aug 2023 20:40:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38324 "EHLO
+        id S232558AbjHDAlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 3 Aug 2023 20:41:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjHDAkl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 3 Aug 2023 20:40:41 -0400
+        with ESMTP id S232480AbjHDAlB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 3 Aug 2023 20:41:01 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044A3211F
-        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 17:40:40 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d27ac992539so1609725276.3
-        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 17:40:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD87E44BD
+        for <kvm@vger.kernel.org>; Thu,  3 Aug 2023 17:40:55 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d07cb52a768so1727381276.1
+        for <kvm@vger.kernel.org>; Thu, 03 Aug 2023 17:40:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691109639; x=1691714439;
+        d=google.com; s=20221208; t=1691109654; x=1691714454;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2MTPG25T990bVHJJfSXBJqNtxyxIeDTfGkDNbbn9VRo=;
-        b=iW8mrfPxZd6Y73dLSWJB8xTj6eLOlzlP6IPatG1zrb9Y89hhKoXzIJeR7vbjVwKNEN
-         yDJ2DN2qGreGCJEZQJmiYlW3hT4+ihZctX8cQela4iH5oeDxROUoQDGk5gZevGQuVT4v
-         fUljMMElPag1IfLrYDj8Puli35vdMbqrHVDsTInoeEpeCnXAYDxtw2amtbFHCTMp3IGN
-         JJHz1r6vu+UAG8wvf7l8a3mCAjQHAcntCRyvPZhGUReQipoon92zvMxYeWcRtR7HHv0t
-         WV+FDmI6+B8XGjOTdQP43ohlRkuhwcKupPlrNeSDv3fwfuV9ThiZ38wMKYs2uYT+aACE
-         scCQ==
+        bh=OMeEbdNzRBMhLJX7Jj1oYrb1Y8jq11YVXHG0dUaROQw=;
+        b=QtCPDD7BDigbfVlhCztgjtEtpnDhuzjp5LSRitLIFjr34xmXnNNjyeeBDF8foMn2pG
+         hhTw6XAuK1GgODmFVQRdtAG0sX4RDeye2JXeKi++Y0PaeGfhJqO5c5FQEooPvhIJ5WqY
+         wFTSe6DGDQF67+7f+2cV8WpTxCesRd/hn8+G/MrCLm/rcf7Fcp0ZghW6ZZTwTcLqiWH1
+         vBSRPNSW0GhAzvEDLzSyq/vaxpn337pMeJmsfMPQqHIWnrDAn6zdAuca6wwF6NX/jWOW
+         0gkvpGiT0oKgDRiWQfZiNgXUiA60N1570jkoa8TIhuz+se+DwZ6s0v7BO0EBx4XmWLWv
+         AVqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691109639; x=1691714439;
+        d=1e100.net; s=20221208; t=1691109654; x=1691714454;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2MTPG25T990bVHJJfSXBJqNtxyxIeDTfGkDNbbn9VRo=;
-        b=DlIqoO2NYFCJ3UGhqpl2ctcN4Kt8iOcc0P9w+N4yUcVu+kPgdTMhtPcu2E8iwbWudT
-         SzLzUNcPutycOYxsiNNAPp/6+MlLLJ+QmwRlDEWAFz2sFdHVAdG2rMaoG/mxX0DXAj+l
-         yH2WhWxmDujx8obXphedTThAAKzXO/cboE4UnHkE9TTcF4tKRkewFf4Sr8TLlU8oYlE5
-         seVstynqWvZw79zMB7h/usKPTVyZXgjUH9HPzIVrG8OPsHzkFM9yXg8sETIEXh19pSON
-         h1eWtlIC8C0DUIWza9298I3zOLj0u3CV/5GMbLnBoG9TOTfN5REXkbPnxnCQwhYdDm5j
-         7Bww==
-X-Gm-Message-State: AOJu0YxV0ZKintHRe7pY2rx9jITG5vknj4JJWuYZW370eCt2OfAlcS49
-        J2dhdolPwvYnsaTEL5NATWSl3pXErnQ=
-X-Google-Smtp-Source: AGHT+IEJhILmalCdW3UiHIHpablrybyGDuSz9AiVfz/YiWvbHs7HVTkacldRuQREBUWnzwu1QyZyAs7NmPE=
+        bh=OMeEbdNzRBMhLJX7Jj1oYrb1Y8jq11YVXHG0dUaROQw=;
+        b=eF31WPfPV6jr0aK/8qf2qlTjcU2wZ5KOWCvJV5W/OihvYWfTZxjoKK7yt+14gmlSY+
+         aVMSnes8EVI0KLPzRlNdLYiI9Z+vMDFn9yTPJAu+qyNgRXE14tqtEUct5Pmh42Zwhkpg
+         yEgWwAO5OYkSsnGcb/qu35gTnG9QRsg86C031hYBS7N+QSHGbtzHue5vxOF3ac04vmMz
+         rRLqwrVilyV+6DHT2qzZKV3OqCUz/h+o3M23JtbUYhCrBiMcpHbBwfSpZrncRmcUzUQy
+         jAUHUs4a77KDlpffxujGCZtoFeDhvQ/afVmvon+ZglSXOlsFW9YuevderdCHcye7Sa1y
+         ZJCw==
+X-Gm-Message-State: AOJu0Yz8l5GTSfSMRI4bMXMYtcDZGYRYipXBUnfOR19OzLr5S0NAwUml
+        oztVrvoa5X32VdDZXRItu+/13UGtwv8=
+X-Google-Smtp-Source: AGHT+IHW9WCL8mnGZuXC1EYuIAH1ZEQoIKy7JnF6jta9YkxED2VsAMO1v9zeszNokSE+bWRDMql19Nhiksk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1363:b0:d0d:cce3:d32d with SMTP id
- bt3-20020a056902136300b00d0dcce3d32dmr724ybb.6.1691109639295; Thu, 03 Aug
- 2023 17:40:39 -0700 (PDT)
-Date:   Thu,  3 Aug 2023 17:40:24 -0700
-In-Reply-To: <20230729011608.1065019-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:2f52:0:b0:d1c:5506:9761 with SMTP id
+ v79-20020a252f52000000b00d1c55069761mr692ybv.1.1691109654397; Thu, 03 Aug
+ 2023 17:40:54 -0700 (PDT)
+Date:   Thu,  3 Aug 2023 17:40:26 -0700
+In-Reply-To: <20230721201859.2307736-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20230729011608.1065019-1-seanjc@google.com>
+References: <20230721201859.2307736-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
-Message-ID: <169110235118.1966695.6759395684478323945.b4-ty@google.com>
-Subject: Re: [PATCH v2 00/21] KVM: x86: Add "governed" X86_FEATURE framework
+Message-ID: <169110224628.1966361.853135096516007767.b4-ty@google.com>
+Subject: Re: [PATCH v4 00/19] x86/reboot: KVM: Clean up "emergency" virt code
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Maxim Levitsky <mlevitsk@redhat.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Andrew Cooper <Andrew.Cooper3@citrix.com>,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Jul 2023 18:15:47 -0700, Sean Christopherson wrote:
-> Add a framework to manage and cache KVM-governed features, i.e. CPUID
-> based features that require explicit KVM enabling and/or need to be
-> queried semi-frequently by KVM.  The idea originally came up in the
-> context of the architectural LBRs series as a way to avoid querying
-> guest CPUID in hot paths without needing a dedicated flag, but as
-> evidenced by the shortlog, the most common usage is to handle the ever-
-> growing list of SVM features that are exposed to L1.
+On Fri, 21 Jul 2023 13:18:40 -0700, Sean Christopherson wrote:
+> If there are no objections, my plan is to take this through the KVM tree
+> for 6.6.
+> 
+> Instead of having the reboot code blindly try to disable virtualization
+> during an emergency, use the existing callback into KVM to disable virt
+> as "needed".  In quotes because KVM still somewhat blindly attempts to
+> disable virt, e.g. if KVM is loaded but doesn't have active VMs and thus
+> hasn't enabled hardware.  That could theoretically be "fixed", but due to
+> the callback being invoked from NMI context, I'm not convinced it would
+> be worth the complexity.  E.g. false positives would still be possible,
+> and KVM would have to play games with the per-CPU hardware_enabled flag
+> to ensure there are no false negatives.
 > 
 > [...]
 
-Applied to kvm-x86 misc.  I'm still hoping for reviews before sending this on
-to Paolo, but I also want to get this into -next sooner than later.  And I
-tried to grab everything else for "misc" ahead of time, so hopefully there won't
-be much, if any, collateral damage if I need to unwind.
+Applied to kvm-x86 misc, thanks!
 
-[01/21] KVM: nSVM: Check instead of asserting on nested TSC scaling support
-        https://github.com/kvm-x86/linux/commit/06b2c8f7d994
-[02/21] KVM: nSVM: Load L1's TSC multiplier based on L1 state, not L2 state
-        https://github.com/kvm-x86/linux/commit/3b5ebb78fdc4
-[03/21] KVM: nSVM: Use the "outer" helper for writing multiplier to MSR_AMD64_TSC_RATIO
-        https://github.com/kvm-x86/linux/commit/b5b10353a0c6
-[04/21] KVM: SVM: Clean up preemption toggling related to MSR_AMD64_TSC_RATIO
-        https://github.com/kvm-x86/linux/commit/3e6e20a49690
-[05/21] KVM: x86: Always write vCPU's current TSC offset/ratio in vendor hooks
-        https://github.com/kvm-x86/linux/commit/c1a3910b30f6
-[06/21] KVM: nSVM: Skip writes to MSR_AMD64_TSC_RATIO if guest state isn't loaded
-        https://github.com/kvm-x86/linux/commit/923428d7f741
-[07/21] KVM: x86: Add a framework for enabling KVM-governed x86 features
-        https://github.com/kvm-x86/linux/commit/ed425263d977
-[08/21] KVM: x86/mmu: Use KVM-governed feature framework to track "GBPAGES enabled"
-        https://github.com/kvm-x86/linux/commit/f274417a0920
-[09/21] KVM: VMX: Recompute "XSAVES enabled" only after CPUID update
-        https://github.com/kvm-x86/linux/commit/73db29bfc576
-[10/21] KVM: VMX: Check KVM CPU caps, not just VMX MSR support, for XSAVE enabling
-        https://github.com/kvm-x86/linux/commit/82816e485b02
-[11/21] KVM: VMX: Rename XSAVES control to follow KVM's preferred "ENABLE_XYZ"
-        https://github.com/kvm-x86/linux/commit/080b5890f88e
-[12/21] KVM: x86: Use KVM-governed feature framework to track "XSAVES enabled"
-        https://github.com/kvm-x86/linux/commit/ae1f7788d4a3
-[13/21] KVM: nVMX: Use KVM-governed feature framework to track "nested VMX enabled"
-        https://github.com/kvm-x86/linux/commit/d60c21f44fe2
-[14/21] KVM: nSVM: Use KVM-governed feature framework to track "NRIPS enabled"
-        https://github.com/kvm-x86/linux/commit/f32e9ba4ff57
-[15/21] KVM: nSVM: Use KVM-governed feature framework to track "TSC scaling enabled"
-        https://github.com/kvm-x86/linux/commit/417293d8eebc
-[16/21] KVM: nSVM: Use KVM-governed feature framework to track "vVM{SAVE,LOAD} enabled"
-        https://github.com/kvm-x86/linux/commit/a179919b6b08
-[17/21] KVM: nSVM: Use KVM-governed feature framework to track "LBRv enabled"
-        https://github.com/kvm-x86/linux/commit/2a688180ae59
-[18/21] KVM: nSVM: Use KVM-governed feature framework to track "Pause Filter enabled"
-        https://github.com/kvm-x86/linux/commit/2b4a6cce48b6
-[19/21] KVM: nSVM: Use KVM-governed feature framework to track "vGIF enabled"
-        https://github.com/kvm-x86/linux/commit/994e74975227
-[20/21] KVM: nSVM: Use KVM-governed feature framework to track "vNMI enabled"
-        https://github.com/kvm-x86/linux/commit/17e2299ac6a6
-[21/21] KVM: x86: Disallow guest CPUID lookups when IRQs are disabled
-        https://github.com/kvm-x86/linux/commit/20b18b1dea4c
+[01/19] x86/reboot: VMCLEAR active VMCSes before emergency reboot
+        https://github.com/kvm-x86/linux/commit/b23c83ad2c63
+[02/19] x86/reboot: Harden virtualization hooks for emergency reboot
+        https://github.com/kvm-x86/linux/commit/5e408396c60c
+[03/19] x86/reboot: KVM: Handle VMXOFF in KVM's reboot callback
+        https://github.com/kvm-x86/linux/commit/119b5cb4ffd0
+[04/19] x86/reboot: KVM: Disable SVM during reboot via virt/KVM reboot callback
+        https://github.com/kvm-x86/linux/commit/baeb4de7ad12
+[05/19] x86/reboot: Assert that IRQs are disabled when turning off virtualization
+        https://github.com/kvm-x86/linux/commit/ad93c1a7c010
+[06/19] x86/reboot: Hoist "disable virt" helpers above "emergency reboot" path
+        https://github.com/kvm-x86/linux/commit/edc8deb087d8
+[07/19] x86/reboot: Disable virtualization during reboot iff callback is registered
+        https://github.com/kvm-x86/linux/commit/59765db5fc82
+[08/19] x86/reboot: Expose VMCS crash hooks if and only if KVM_{INTEL,AMD} is enabled
+        https://github.com/kvm-x86/linux/commit/261cd5ed934e
+[09/19] x86/virt: KVM: Open code cpu_has_vmx() in KVM VMX
+        https://github.com/kvm-x86/linux/commit/b6a6af0d19ce
+[10/19] x86/virt: KVM: Move VMXOFF helpers into KVM VMX
+        https://github.com/kvm-x86/linux/commit/22e420e12739
+[11/19] KVM: SVM: Make KVM_AMD depend on CPU_SUP_AMD or CPU_SUP_HYGON
+        https://github.com/kvm-x86/linux/commit/554856b69e3d
+[12/19] x86/virt: Drop unnecessary check on extended CPUID level in cpu_has_svm()
+        https://github.com/kvm-x86/linux/commit/5df8ecfe3632
+[13/19] x86/virt: KVM: Open code cpu_has_svm() into kvm_is_svm_supported()
+        https://github.com/kvm-x86/linux/commit/85fd29dd5fe4
+[14/19] KVM: SVM: Check that the current CPU supports SVM in kvm_is_svm_supported()
+        https://github.com/kvm-x86/linux/commit/c4db4f20f3bf
+[15/19] KVM: VMX: Ensure CPU is stable when probing basic VMX support
+        https://github.com/kvm-x86/linux/commit/f9a8866040fc
+[16/19] x86/virt: KVM: Move "disable SVM" helper into KVM SVM
+        https://github.com/kvm-x86/linux/commit/76ab8161083b
+[17/19] KVM: x86: Force kvm_rebooting=true during emergency reboot/crash
+        https://github.com/kvm-x86/linux/commit/6ae44e012f4c
+[18/19] KVM: SVM: Use "standard" stgi() helper when disabling SVM
+        https://github.com/kvm-x86/linux/commit/2e6b9bd49b70
+[19/19] KVM: VMX: Skip VMCLEAR logic during emergency reboots if CR4.VMXE=0
+        https://github.com/kvm-x86/linux/commit/a788fbb763b5
 
 --
 https://github.com/kvm-x86/linux/tree/next
