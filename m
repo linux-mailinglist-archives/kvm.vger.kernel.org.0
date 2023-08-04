@@ -2,278 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32DAC7702B1
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 16:12:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB15C770311
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 16:29:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbjHDOM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 10:12:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43622 "EHLO
+        id S231755AbjHDO3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 10:29:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231612AbjHDOMR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 10:12:17 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2057.outbound.protection.outlook.com [40.107.220.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 465DD1994;
-        Fri,  4 Aug 2023 07:12:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Fw2h5XOWaqYDNnDXHjvBFju359r/Faxcz/GL9T9yS/3sRzpsSgeYDw8EGMMYUyVmDCAHrij38sJ+gr+XSDdk1oi4FJmLJE8PKYN3DYxxaIJqhAzBEIIaVg+C9BtKdIrj7IA+A8ugUUeXJw7JxbNgzJJh6WbW6ZxBh/OOU70zVOnSQbYd919hgnMrvuUo+Uw3hEhZzfXJtSBRmb6lcUOPyNi4ssjalz5HlbYIDwNqv2XeohXwnFhordZsEjLd+yezJ8Tr9T+24zmLnjNKKUKxDpsqMyiAXp5E4+MiKuqSX5pVyADToLK75WEq5+0uqPd9km4/ReLb+w73SEO0ZmqA8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6wTWyjrXzreKk+DJWT2zlESyKLss4moZMmmLXDbolZE=;
- b=ZzfWu5yNfQKZKtCd1m1ez6LP8i+gXWu8O8XbMkw90Bco/TWtrNBpHG/sVk6ppnXohkPcxplRdMxX0dpXBeId9pQO1oF8qrKKQTzOU+h+KN2pb/1D7a8qIN8UwaqYVi2yjec6J3ae9MG96IrvoLfDk7e83zftjQUQyrjab0ptt7usNPe61M5FfRImMHXbxNN7teY4pY/B2cEmwgc/o4KYslFz6V36moM6lCfbH7XMq8SQ+Um0AEEEICwSO35Xc4Go0fc66e9CL0FlAMuseRZkE+pZi+ukXwEVFOEREPn7ZafwkWLUTeuwtKDlkWIBsDNnEgCtVD4asIvGlGG4F8r7qA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6wTWyjrXzreKk+DJWT2zlESyKLss4moZMmmLXDbolZE=;
- b=B9Y9NJTGF7Oz4izYXzyUwIE1/RGRLqcedo6MFJCVAMeRuUjdqsvySgT8dRV8MpSuxFzokuGuJFGwVmmvxd0DlERBfL8PFatnQ/R4V/MT5xbRAlZ4hsorLH/udZ1yLx3au6kMjizcH2cJYmryE9iKPR02X98woIrXD09f0KvpvoZXKLdVQekK8Og+PcGnIwGKQZsDk1IUMe5HOpGSWAqaHnNMtkrS64xragxfmuz9csWgoFxY28gXq0eewn3biOw85QYMKLBniMCmNzFxBtW0EMwvA7N0MhGzVw8O6uTFkiM6D5n5f2hipAeUEao8fAErhgMl3hC/FGNPdmoD6GHH3A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CH3PR12MB7667.namprd12.prod.outlook.com (2603:10b6:610:14f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Fri, 4 Aug
- 2023 14:12:13 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
- 14:12:12 +0000
-Date:   Fri, 4 Aug 2023 11:12:11 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Baolu Lu <baolu.lu@linux.intel.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org,
-        alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com
-Subject: Re: [PATCH v5 3/4] iommufd: Add IOMMU_GET_HW_INFO
-Message-ID: <ZM0HO02QRHnIKIIJ@nvidia.com>
-References: <20230803143144.200945-1-yi.l.liu@intel.com>
- <20230803143144.200945-4-yi.l.liu@intel.com>
- <51418f60-db2f-8ee3-ed9c-1a97d89774cf@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51418f60-db2f-8ee3-ed9c-1a97d89774cf@linux.intel.com>
-X-ClientProxiedBy: BL1PR13CA0275.namprd13.prod.outlook.com
- (2603:10b6:208:2bc::10) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231748AbjHDO3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 10:29:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A318546B2
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 07:28:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691159312;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/6TKiUoe55IIrqSia7IbdrPQay+jmTfT+IM/4+k+lpc=;
+        b=eIJX/cfGxTi17lgseDYrTmfI1jhQ1pRy1gjjFtAzQ7XPoEuc5ImPCeTvJLFLbXhAjlESHR
+        nuaQuhPhMYFI/hzw1f0wIS+5Ei5MN/4E8GaULw/1EtnwOokrt14JBn1y6g3GLfHUAJG5jP
+        S/Bj5QIZGuEImhC+r2T8r4ichUXi7nk=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-aFvTPRnkOsGAeTe0XBIxdg-1; Fri, 04 Aug 2023 10:28:31 -0400
+X-MC-Unique: aFvTPRnkOsGAeTe0XBIxdg-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-63cceb8c21aso24373846d6.0
+        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 07:28:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691159311; x=1691764111;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/6TKiUoe55IIrqSia7IbdrPQay+jmTfT+IM/4+k+lpc=;
+        b=Gj6RZQgWoa/g5lWE5ppYuRBdazc+WWsIULxsM85dqPBzCZx120wxpD/TSY97lnhhvt
+         CgMgsUsF31ToOWuDODjm7R+s7JIuEOV0ukfP+eqCHqRj7GUqUW55mPMo06mUUEK4ex52
+         019AJNPKzoaT5FkrAk7IPgdCOZt+jiHR3pn+Uxvf/nuUUFlRPvmxLll/9t0DsToblUqD
+         jg3ip5OAMdpsbXfn7tsdZBFSV5IdqoodxVirPNtiq+9vwh2+mjDsZvcNZtpo86IBDt2F
+         9aqCSDtjmiPyiN9TgGYxUwgvVdi88xem0RImHkx/G7VOBZSyA8VD6ucpXPCj25Qkf97P
+         KO5g==
+X-Gm-Message-State: AOJu0YwYguCH4IIc4rZyRkyyaBruJLyQ+MadtHEoGgCBsPQR0niZR2aI
+        IDJqwNJS4UDGzuP+dxcmbniQX3+hlrcpcx/Sj5/wl6yb2vWwwt/4R66PkSr6n90LJ1uPJIW5SIc
+        QiFu2nOPWzX/b
+X-Received: by 2002:a0c:9d04:0:b0:63c:eb1e:e004 with SMTP id m4-20020a0c9d04000000b0063ceb1ee004mr1771021qvf.3.1691159310919;
+        Fri, 04 Aug 2023 07:28:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEQOm1oB5/xrHwYk3PxdGj4/DBN9i2DE5i3OHfDF64MaIhm95kSdYL67jDQe5etcx8sQx28kw==
+X-Received: by 2002:a0c:9d04:0:b0:63c:eb1e:e004 with SMTP id m4-20020a0c9d04000000b0063ceb1ee004mr1770996qvf.3.1691159310619;
+        Fri, 04 Aug 2023 07:28:30 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-214.retail.telecomitalia.it. [82.57.51.214])
+        by smtp.gmail.com with ESMTPSA id d30-20020a0caa1e000000b00637abbfaac9sm698043qvb.98.2023.08.04.07.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Aug 2023 07:28:30 -0700 (PDT)
+Date:   Fri, 4 Aug 2023 16:28:25 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseniy Krasnov <oxffffaa@gmail.com>
+Cc:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru
+Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
+ socket
+Message-ID: <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
+References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
+ <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
+ <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
+ <44fef482-579a-fed6-6e8c-d400546285fc@gmail.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB7667:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9740c7dc-2bb6-4ccc-0ad4-08db94f4cc7d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: McxDhLcvl3cZqZO1KcM7wnBLIF2ZiGZLDcAVHr859B+Xn1J7lBEP+iq4nxzIWpnkzS2iAT9GJYZol0YU36TPjpR3DszoMOsKwR/RLOnTdLPN613JJU2Wr0xAsblkdb10n4DhYshVTKkNNcip6xCjsCg6H9McB0bv5XVu4iDyYLR1hZr7xWU/youT31kHNipQqcRmcdQAv8Vh0iiV9mhNCU63oQjd9PXKdm6Wyq7InWuMW1H+9hZMgd1IUEdJj6v7ado1tuUOVVmwoxVcWdqYjq7MZW+OJcb/GM3W+0rfTu2UTeNs91CU2/2zCpuZfs2widA98PaqCE8Y7gMTFT41i82VRrkZutgYk5tnhIDEuALb31cPHG5GMRd7GnSlToiGYYAjmI5DsyjdPdr8aOWmRzVqv2EVATsE448yQIuTJzYNc8NlDbCzsRGgjWb26dLDqOLo1eSP/IJeqLKchJEnUPx4P4M86WND9d86HwBHHVsUl/qcSFiclVrWQnYdl884kMILvxqFuKNCAXhgqOKyeAqfDQnHh0boBXCvNxRAuN6ZcOky2bIf23nfRqh9aDdO
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(376002)(346002)(366004)(1800799003)(186006)(451199021)(2906002)(2616005)(86362001)(36756003)(38100700002)(41300700001)(6486002)(6512007)(316002)(66476007)(6916009)(4326008)(66946007)(66556008)(26005)(6506007)(53546011)(5660300002)(478600001)(7416002)(8676002)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rWGMS8EcZc0qcjzhpvCUB4wX0ZgCwqXX+PHWemxgF35A+Evb94iNdtnXrhPn?=
- =?us-ascii?Q?My4mThLQlP1hcIwSt26wUV70rdmvn1BsLvuMkCwR4XOlX3PJ6AuE5Iwwou2M?=
- =?us-ascii?Q?HIpbVZghFaK5PMuGEh0omQfHYHmttfj/IIxRx5yQYxMzB41W1rKXD+3evKi+?=
- =?us-ascii?Q?5BEwJffbuMEm7FJeliQf7hdlhqF9/LwYclbgfL8ksdSr4AFxCPlsY4ApDcYS?=
- =?us-ascii?Q?g56PMox3nKuivHySsjvL3z1DN9rsZ+sIhJKIsHLP6VbQvajPuy5nierCRNOO?=
- =?us-ascii?Q?lGA5L1et49RV5lgjnPQuRk8V+svDF7TsvZY4oCRhsjw6bheuOCyIQWeNk8sN?=
- =?us-ascii?Q?ocVs0qTomqsdfqmdll8oMMzlc5tWV28f48dJtBHWEFY63fpLmRlblHnmuVpA?=
- =?us-ascii?Q?nBPFy3qgsv0F7CZM1+f7kJ36fl8WiIOd7jI8pAkdcvAe0H0o+BBV+8JBCMwd?=
- =?us-ascii?Q?EHf71V/OBzNXDwXNsvweHmFZYPbWe5j4w4Amf8WBiHK9SBUqS4P9HaWRuy3p?=
- =?us-ascii?Q?fxeKFyQt9If6PfLDvrWGtyR6DgXmJv0N/mO3VkDI2kL/xxQB/4xsCtvkTRG6?=
- =?us-ascii?Q?CHTON8H/cqGVIrVyY/P1xUUD5JT2AlHMgT8+pNlb58/7zTG4QuVUlK78xUD+?=
- =?us-ascii?Q?0rLX8RuaJ8pVQyYJcEh2c19CdMGdV/wIyljh2h66tQEyIzuxwciKjs9/rO6S?=
- =?us-ascii?Q?gNq0k9byadXIULb5/w7zUNahlzD9czxzwnjKyNHVeDgrxeMVe/QSnWCb9C2c?=
- =?us-ascii?Q?L6j7epGZDKshTFBqAdO+wNbhQQWSwp0QXKlfUERM6/BWEq6djPFwE3fvYARF?=
- =?us-ascii?Q?Z1Wjtnz5nUuxLPJCUc5ZZf9g1X1hCRTuhY3Y90JJguJYb+RIsAcix+t/GTyW?=
- =?us-ascii?Q?GWCRU2X5xXUpFbePjfPNYXfnhAo6fX93dxeRlQ87hDUE+eX/sqZCfike45Hq?=
- =?us-ascii?Q?L09aiW9I/BPJXW2yn79Tvf77KDncIpOX9eGujr1TCtgfcreE/2AdYqv72tK7?=
- =?us-ascii?Q?hu6nCI6aC8NWAdeY/gHZ9wsmzMBvhFelfdAaxsrbFsMMQP0KnoS93YGjeJfv?=
- =?us-ascii?Q?vmJGcThvfbjx1f3QQgNug05vf6OFcCMIrRiJc5HCYBd7UQZlXO2rHXef/Cgj?=
- =?us-ascii?Q?KIBrxSAgvzBvgwFWh7oG8dyd2ghJWqmvo4T3+apNl2LBekZh+kk61qpaGA0B?=
- =?us-ascii?Q?5enyGE9oqby4hP28s4wHzKN+daP5RhX5zGiABsj5WL/RLgBv4Mx1LGh6HZU2?=
- =?us-ascii?Q?Ei9pPrHgYxpRCNeyyOUtyA3Ny6Wdp6tpWk0Vg0qO5ELJvfOs7FcH60ieL5nC?=
- =?us-ascii?Q?Ono6sctgkirpZByiapyPwYWqhkDsyHYf9SSv5PcLMZG+9p7JUt+AdZQWtc3Z?=
- =?us-ascii?Q?y0yg6WNSHd2P3cNHwvwDmuwnghVpCf17wxVIODUfsE6Bho0Jac2RFgZuSKiu?=
- =?us-ascii?Q?xNFB6xfY9gO7R/8G58Ow4M7l1PWO/uF7V91iPBHU15L02P0m+by0krPgNCg8?=
- =?us-ascii?Q?874Ws3mR6Cz4oiYZtHFyVqDu7P8Isw0VnZGAa6xtntTgsYBRPuKbE7pvL8Jr?=
- =?us-ascii?Q?YXWzRlz+ydxLKISgUKTjiMuMdSHEoStFSGHnnNGU?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9740c7dc-2bb6-4ccc-0ad4-08db94f4cc7d
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2023 14:12:12.8570
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9PVJ3aSfX0XhxZA9p9RJE2peCJm+MoWWdSXEuip4ja1pDn2Kct2ueYSvPcXS9E9h
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7667
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <44fef482-579a-fed6-6e8c-d400546285fc@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 04, 2023 at 09:59:11AM +0800, Baolu Lu wrote:
-> On 2023/8/3 22:31, Yi Liu wrote:
-> > Under nested IOMMU translation, userspace owns the stage-1 translation
-> > table (e.g. the stage-1 page table of Intel VT-d or the context table
-> > of ARM SMMUv3, and etc.). Stage-1 translation tables are vendor specific,
-> > and need to be compatiable with the underlying IOMMU hardware. Hence,
-> 
->                  compatible
-> 
-> > userspace should know the IOMMU hardware capability before creating and
-> > configuring the stage-1 translation table to kernel.
-> > 
-> > This adds IOMMU_GET_HW_INFO ioctl to query the IOMMU hardware information
-> > (a.k.a capability) for a given device. The returned data is vendor specific,
-> > userspace needs to decode it with the structure mapped by the @out_data_type
-> > field.
-> > 
-> > As only physical devices have IOMMU hardware, so this will return error
-> > if the given device is not a physical device.
-> > 
-> > Co-developed-by: Nicolin Chen <nicolinc@nvidia.com>
-> > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > ---
-> >   drivers/iommu/iommufd/main.c | 79 ++++++++++++++++++++++++++++++++++++
-> >   include/uapi/linux/iommufd.h | 36 ++++++++++++++++
-> >   2 files changed, 115 insertions(+)
-> > 
-> > diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
-> > index 94c498b8fdf6..a0302bcaa97c 100644
-> > --- a/drivers/iommu/iommufd/main.c
-> > +++ b/drivers/iommu/iommufd/main.c
-> > @@ -17,6 +17,7 @@
-> >   #include <linux/bug.h>
-> >   #include <uapi/linux/iommufd.h>
-> >   #include <linux/iommufd.h>
-> > +#include "../iommu-priv.h"
-> >   #include "io_pagetable.h"
-> >   #include "iommufd_private.h"
-> > @@ -177,6 +178,81 @@ static int iommufd_destroy(struct iommufd_ucmd *ucmd)
-> >   	return 0;
-> >   }
-> > +static int iommufd_zero_fill_user(void __user *ptr, size_t bytes)
-> > +{
-> > +	int index = 0;
-> > +
-> > +	for (; index < bytes; index++) {
-> > +		if (put_user(0, (uint8_t __user *)(ptr + index)))
-> > +			return -EFAULT;
-> > +	}
-> > +	return 0;
-> > +}
-> > +
-> > +static int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
-> > +{
-> > +	u32 hw_info_type = IOMMU_HW_INFO_TYPE_NONE;
-> > +	struct iommu_hw_info *cmd = ucmd->cmd;
-> > +	unsigned int length = 0, data_len;
-> > +	struct iommufd_device *idev;
-> > +	const struct iommu_ops *ops;
-> > +	void __user *user_ptr;
-> > +	void *data = NULL;
-> > +	int rc = 0;
-> > +
-> > +	if (cmd->flags || cmd->__reserved || !cmd->data_len)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	idev = iommufd_get_device(ucmd, cmd->dev_id);
-> > +	if (IS_ERR(idev))
-> > +		return PTR_ERR(idev);
-> > +
-> > +	user_ptr = u64_to_user_ptr(cmd->data_ptr);
-> > +
-> > +	ops = dev_iommu_ops(idev->dev);
-> > +	if (!ops->hw_info)
-> > +		goto done;
-> > +
-> > +	data = ops->hw_info(idev->dev, &data_len, &hw_info_type);
-> > +	if (IS_ERR(data)) {
-> > +		rc = PTR_ERR(data);
-> > +		goto out_err;
-> 
-> Can kfree() handle a ERR_PTR input? I am afraid not,
-> 
-> /**
->  * kfree - free previously allocated memory
->  * @object: pointer returned by kmalloc() or kmem_cache_alloc()
->  *
->  * If @object is NULL, no operation is performed.
->  */
-> void kfree(const void *object)
-> {
->         struct folio *folio;
->         struct slab *slab;
->         struct kmem_cache *s;
-> 
->         trace_kfree(_RET_IP_, object);
-> 
->         if (unlikely(ZERO_OR_NULL_PTR(object)))
->                 return;
-> 
-> So, perhaps we should add
-> 
-> 	data = NULL;
-> 
-> before
-> 	goto out_err;
+On Fri, Aug 04, 2023 at 03:46:47PM +0300, Arseniy Krasnov wrote:
+>Hi Stefano,
+>
+>On 02.08.2023 10:46, Stefano Garzarella wrote:
+>> On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
+>>> POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
+>>> shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
+>>> flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
+>>>
+>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>> ---
+>>> net/vmw_vsock/af_vsock.c | 3 +++
+>>> 1 file changed, 3 insertions(+)
+>>>
+>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>> index 020cf17ab7e4..013b65241b65 100644
+>>> --- a/net/vmw_vsock/af_vsock.c
+>>> +++ b/net/vmw_vsock/af_vsock.c
+>>> @@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+>>>             err = total_written;
+>>>     }
+>>> out:
+>>> +    if (sk->sk_type == SOCK_STREAM)
+>>> +        err = sk_stream_error(sk, msg->msg_flags, err);
+>>
+>> Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
+>
+>Yes, here is my explanation:
+>
+>This function checks that input error is SIGPIPE, and if so it sends SIGPIPE to the 'current' thread
+>(except case when MSG_NOSIGNAL flag is set). This behaviour is described in POSIX:
+>
+>Page 367 (description of defines from sys/socket.h):
+>MSG_NOSIGNAL: No SIGPIPE generated when an attempt to send is made on a stream-
+>oriented socket that is no longer connected.
+>
+>Page 497 (description of SOCK_STREAM):
+>A SIGPIPE signal is raised if a thread sends on a broken stream (one that is
+>no longer connected).
 
-No, use more labels.
+Okay, but I think we should do also for SEQPACKET:
 
-> > +	}
-> > +
-> > +	/* driver has hw_info callback should have a unique hw_info_type */
-> > +	if (WARN_ON_ONCE(hw_info_type == IOMMU_HW_INFO_TYPE_NONE)) {
-> > +		rc = -ENODEV;
-> > +		goto out_err;
-> > +	}
-> > +
-> > +	length = min(cmd->data_len, data_len);
-> > +	if (copy_to_user(user_ptr, data, length)) {
-> > +		rc = -EFAULT;
-> > +		goto out_err;
-> > +	}
-> > +
-> > +done:
+https://pubs.opengroup.org/onlinepubs/009696699/functions/xsh_chap02_10.html
 
-No label here, put it in a if {}
+In 2.10.6 Socket Types:
 
-> > +	/*
-> > +	 * Zero the trailing bytes if the user buffer is bigger than the
-> > +	 * data size kernel actually has.
-> > +	 */
-> > +	if (length < cmd->data_len) {
-> > +		rc = iommufd_zero_fill_user(user_ptr + length,
-> > +					    cmd->data_len - length);
-> > +		if (rc)
-> > +			goto out_err;
-> > +	}
-> > +
-> > +	cmd->data_len = length;
-> > +	cmd->out_data_type = hw_info_type;
-> > +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
-> > +
-> > +out_err:
+"The SOCK_SEQPACKET socket type is similar to the SOCK_STREAM type, and
+is also connection-oriented. The only difference between these types is
+that record boundaries ..."
 
-err_free:
-> > +	kfree(data);
+Then in  2.10.14 Signals:
 
-err_put:
+"The SIGPIPE signal shall be sent to a thread that attempts to send data
+on a socket that is no longer able to send. In addition, the send
+operation fails with the error [EPIPE]."
 
-> > +	iommufd_put_object(&idev->obj);
-> > +	return rc;
-> > +}
+It's honestly not super clear, but I assume the problem is similar with
+seqpacket since it's connection-oriented, or did I miss something?
 
-Jason
+For example in sctp_sendmsg() IIUC we raise a SIGPIPE regardless of
+whether the socket is STREAM or SEQPACKET.
+
+>
+>Page 1802 (description of 'send()' call):
+>MSG_NOSIGNAL
+>
+>Requests not to send the SIGPIPE signal if an attempt to
+>send is made on a stream-oriented socket that is no
+>longer connected. The [EPIPE] error shall still be
+>returned
+>
+>And the same for 'sendto()' and 'sendmsg()'
+>
+>Link to the POSIX document:
+>https://www.open-std.org/jtc1/sc22/open/n4217.pdf
+>
+>TCP (I think we must rely on it), KCM, SMC sockets (all of them are stream) work in the same
+>way by calling this function. AF_UNIX also works in the same way, but it implements SIGPIPE handling
+>without this function.
+
+I'm okay calling this function.
+
+>
+>The only thing that confused me a little bit, that sockets above returns EPIPE when
+>we have only SEND_SHUTDOWN set, but for AF_VSOCK EPIPE is returned for RCV_SHUTDOWN
+>also, but I think it is related to this patchset.
+
+Do you mean that it is NOT related to this patchset?
+
+Thanks,
+Stefano
+
