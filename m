@@ -2,94 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 850BE770748
-	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 19:41:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B0BF77074F
+	for <lists+kvm@lfdr.de>; Fri,  4 Aug 2023 19:51:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbjHDRlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 4 Aug 2023 13:41:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34048 "EHLO
+        id S229656AbjHDRvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 4 Aug 2023 13:51:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjHDRlV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 4 Aug 2023 13:41:21 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC9949F3
-        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 10:41:20 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51e2a6a3768so2973069a12.0
-        for <kvm@vger.kernel.org>; Fri, 04 Aug 2023 10:41:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691170879; x=1691775679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I8DSE+JTnwjzGTqhdGV+2N88MKsz3oqj5aY2BVsl1Lk=;
-        b=yDu0lAlRP9QhH6w7lpEZy0Z/JoK1YN+Hu8QtFuf8oZYei9IvlPEKk7Ui/swbqmVCat
-         jVEUfLn9xTPCuAlOfC0s4Xp5v6zAkKACZXhYtuRx1RaQNCjUri+r/iu2s9lMXoqiU6Li
-         JPosLjVjzaTMcEUZN61NkPP2x4FXyi0T8IHwyf+lW13yfRS6y7cklIjwMNbYtumyK9A3
-         ZPw3c1Gv3mztlK5OvD4KQ3pjPfF8SVf9xYQzKZZlr7hAIOlNqSncVe4Hf0ebnU8phs8x
-         AIiPRb0nn8REDlRX+WxZu0iVorJUnUjYZg7ITAuCF1Ch8RUAABZVg9ZThewZPXV259NP
-         pHgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691170879; x=1691775679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I8DSE+JTnwjzGTqhdGV+2N88MKsz3oqj5aY2BVsl1Lk=;
-        b=glkwh6iwLmg6lE7+llLTuEDKqA92mKq/Qp2C2IEhXGUzyzMCc0t291V5xhDHVdBXxV
-         0pqNMM8xzmHyAYuh1yZn2usAKerNLcJOnImOql3SuvxiIYm+v/hxjk6Vcox2Q0TAEuVM
-         5uSDc4dUKZUgIHfGkqS/5OPlLYC7o8jw/zQ7TTyjZ0XdkAD1oLcBYMFi1QMreNAP/flH
-         7Orcrv7cYSXIeiyLEdXbawNR3kEFnbOKvfoqUak1a/0x+wrwTt0CmoZLIJQ9BjPJ571Z
-         qbVLNwDEoIKjcdvPnrkitXZc/DgHBgdn64WGnPnnLrd1/roK/uZJOWx/XwfIf+AOHJ5z
-         sRUg==
-X-Gm-Message-State: AOJu0YwfLLzt/5DWIeOPzSmXR1qhwkMPSyq/R9B2wNDYJS17s0nl6p4r
-        9MOkr8iNL/O4hRLWhTsrmr3V6BWjyGV63pkLzIUZ5Q==
-X-Google-Smtp-Source: AGHT+IHC2MKSbOxwi5TuC+vEBtMxRnkWBp9vGKZkjj6ZMbWmWAp4fsDj6YL80ZkvT8F3E2qzu/HuV9Ck7hUurH6FKkU=
-X-Received: by 2002:aa7:d79a:0:b0:522:3aae:c69b with SMTP id
- s26-20020aa7d79a000000b005223aaec69bmr2076403edq.20.1691170878931; Fri, 04
- Aug 2023 10:41:18 -0700 (PDT)
+        with ESMTP id S229624AbjHDRvV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 4 Aug 2023 13:51:21 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4EF4C02
+        for <kvm@vger.kernel.org>; Fri,  4 Aug 2023 10:51:17 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1qRyxG-00453B-Pc; Fri, 04 Aug 2023 19:51:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=oEhuic+LhTwu1WfgezOVRiYoq1EH3VkPBEg8lBEUgA4=; b=ofkFlB7o83fBAtbHUOhuaOHJQM
+        hQ9Ycye3xpzU/k00aaM/0TNc4wOFRZO/Uou/tbVoJgiuagpYp6TkBA4zqkTKOHSJfFmEy6fYZ9Wqq
+        W+kCOX7VD0AyK1coVtXmSsvnLBTgTjadm3wokpgLa3mgB/4j1X5LoCsaIqOqPeFzX02Uy5sS5GJIX
+        ROWMdVD6wkWnAtd5orOLBadmGPk/0jBD+tI5sa8MZLStPMUSRglUA28JMpQ/1jeDm3bXWfOOw529p
+        KszrrNxE0CpflR/ojHQ9/tdA9hDu84Siff47YyAAvGOTBXg6hBb/pPznB71PK9lXf5wQqJGLHUimy
+        AmZAKQew==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1qRyxG-0006Mg-DC; Fri, 04 Aug 2023 19:51:14 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1qRywz-00059y-Ky; Fri, 04 Aug 2023 19:50:57 +0200
+Message-ID: <4a8a5851-5f04-deef-32b2-4f5392ceb54a@rbox.co>
+Date:   Fri, 4 Aug 2023 19:50:53 +0200
 MIME-Version: 1.0
-References: <20230727073134.134102-1-akihiko.odaki@daynix.com>
-In-Reply-To: <20230727073134.134102-1-akihiko.odaki@daynix.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 4 Aug 2023 18:41:07 +0100
-Message-ID: <CAFEAcA9zGqkWL2zf_z-CuWEnrGxCHmO_i=_9CY347b8zCC2AuA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] accel/kvm: Specify default IPA size for arm64
-To:     Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU
+ issues
+Content-Language: pl-PL, en-GB
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, shuah@kernel.org
+References: <20230728001606.2275586-1-mhal@rbox.co>
+ <20230728001606.2275586-2-mhal@rbox.co> <ZMhIlj+nUAXeL91B@google.com>
+ <7e24e0b1-d265-2ac0-d411-4d6f4f0c1383@rbox.co> <ZMqr/A1O4PPbKfFz@google.com>
+ <38f69410-d794-6eae-387a-481417c6b323@rbox.co>
+ <e55656be-2752-a317-80eb-ad40e474b62f@redhat.com>
+ <8adb2f2b-df9c-3e49-3bdd-7970d918a1d0@rbox.co>
+ <e578173b-8edf-dd89-494e-ecbec5b7cba8@redhat.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <e578173b-8edf-dd89-494e-ecbec5b7cba8@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Jul 2023 at 08:31, Akihiko Odaki <akihiko.odaki@daynix.com> wrot=
-e:
->
-> Some Arm systems such as Apple Silicon Macs have IPA size smaller than th=
-e
-> default used by KVM. Introduce our own default IPA size that fits on such=
- a
-> system.
->
-> When reviewing this series, Philippe Mathieu-Daud=C3=A9 found the error h=
-andling
-> around KVM type decision logic is flawed so I added a few patches for fix=
-ing
-> the error handling path.
->
-> V4 -> V5: Fixed KVM type error handling
-> V3 -> V4: Removed an inclusion of kvm_mips.h that is no longer needed.
-> V2 -> V3: Changed to use the maximum IPA size as the default.
-> V1 -> V2: Introduced an arch hook
+On 8/4/23 11:53, Paolo Bonzini wrote:
+> On 8/3/23 23:15, Michal Luczaj wrote:
+>>>           *mmu_reset_needed |= kvm_read_cr0(vcpu) != sregs->cr0;
+>>>
+>>> with a call to the function just before __set_sregs_common returns.
+>> What about kvm_post_set_cr4() then? Should it be introduced to
+>> __set_sregs_common() as well?
+> 
+> Yes, indeed, but it starts getting a bit unwieldy.
+> 
+> If we decide not to particularly optimize KVM_SYNC_X86_SREGS, however, 
+> we can just chuck a KVM_REQ_TLB_FLUSH_GUEST request after __set_sregs 
+> and __set_sregs2 call kvm_mmu_reset_context().
 
-Applied to target-arm-for-8.2 with an extra doc comment in patch 1;
-thanks.
+Something like this?
 
--- PMM
+@@ -11562,8 +11562,10 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+        if (ret)
+                return ret;
+
+-       if (mmu_reset_needed)
++       if (mmu_reset_needed) {
+                kvm_mmu_reset_context(vcpu);
++               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++       }
+
+        max_bits = KVM_NR_INTERRUPTS;
+        pending_vec = find_first_bit(
+@@ -11604,8 +11606,10 @@ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
+                mmu_reset_needed = 1;
+                vcpu->arch.pdptrs_from_userspace = true;
+        }
+-       if (mmu_reset_needed)
++       if (mmu_reset_needed) {
+                kvm_mmu_reset_context(vcpu);
++               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++       }
+        return 0;
+ }
+
