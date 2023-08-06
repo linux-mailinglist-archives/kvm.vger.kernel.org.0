@@ -2,750 +2,596 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC0177713CE
-	for <lists+kvm@lfdr.de>; Sun,  6 Aug 2023 08:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3FF6771400
+	for <lists+kvm@lfdr.de>; Sun,  6 Aug 2023 10:45:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbjHFGsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Aug 2023 02:48:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
+        id S229863AbjHFIo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Aug 2023 04:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjHFGsH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Aug 2023 02:48:07 -0400
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71ACA10C9;
-        Sat,  5 Aug 2023 23:48:01 -0700 (PDT)
-X-QQ-mid: bizesmtpipv603t1691304400trd0
-Received: from [198.18.0.1] ( [255.163.185.0])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Sun, 06 Aug 2023 14:46:37 +0800 (CST)
-X-QQ-SSF: 01400000000000C0G000000A0000000
-X-QQ-FEAT: FVl8EHhfVR7Zhhti4TDR8LzsiRC+Xa2NJFZt4azR8KRKmUQK4Ik6YdfYbB7Jd
-        Y8s6F6oBY2HJduakjJk0xYrrrCEJaiIBOVsb50RyH8NIwetP1GxcYQgBKHf8wbIpqHVKrbf
-        7O30LiD6XG0uK+hPUAWEnbvmZut7j+fjfpUwjTZcVhCqLTg31sAbL2PvsQz0MwYb3aFkpP+
-        +omYh53UvRvtZ/uZml9sVibMexRv8gYlGvorLD4nyKMChDSJjsfwovZFK/quwP2f6mWurSJ
-        g3bdqzrNsLw1+DpETxiu53FITm8/tcYwzWvmCid8vv1vtjQQPxPy4sD1/rMH5CPLgflDZNV
-        fFh72LJmAtwwf9Rwd/E4jDYLIaNlyPxEKO6pkbQI6SPRq92RSRL/qi9b6PPLA==
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6625185426042604506
-Message-ID: <367239C38ED9D19C+9ef16061-9057-482c-bd8c-0b9ede71cfa7@uniontech.com>
-Date:   Sun, 6 Aug 2023 14:46:38 +0800
+        with ESMTP id S229445AbjHFIo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Aug 2023 04:44:56 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C257E5;
+        Sun,  6 Aug 2023 01:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691311492; x=1722847492;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=H050wStVDy+S6ekB/wQGyDJ6edKUiVheS9j8XkCM44Y=;
+  b=oAog3RWxaH/Zuub30EplL5kFvQfx9VAWu8x9n+Qj74YnIWbs/noQxZet
+   SBbx5hB7OrlxDxkDxWjzIgrTlYREPTW/MVn4veWAydKL55XKa0NqaJdVI
+   FHHO78awQ/JdEuIYyDKVetY728Y7fAjtpFiBPMUfITw7XAQnl2fe4Pf47
+   Ee1GF6AtgWl0pnyTvrod5juXf9z+yHEfTyTrhx88BXcbcnlz/GbIEX/CA
+   rJSJvjjD9QEwfBptlB7LN0mq2eBOhinNF4TeYZG78fEm9fNX+WzwxooUZ
+   yhLnsvgRgEjwd/mZ3FKsj0GUPXirGgWgezg3Sq7aTGu5NGq3SmStvGoE6
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="456747047"
+X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
+   d="scan'208";a="456747047"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2023 01:44:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10793"; a="760101753"
+X-IronPort-AV: E=Sophos;i="6.01,259,1684825200"; 
+   d="scan'208";a="760101753"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga008.jf.intel.com with ESMTP; 06 Aug 2023 01:44:51 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Sun, 6 Aug 2023 01:44:50 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Sun, 6 Aug 2023 01:44:50 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Sun, 6 Aug 2023 01:44:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QNXfuODZQTH07YdCe+zqQeG5DbF/BSr9Q3brKmuwaCzwhig52mbpIjywE1yu6Fl/E0uCPsfYVRT60cj7DoqiVVXcMss/fVW3kFuO3KATegH9ufqJy3U4mpRzxKMNc+aaW9CO0crc7HaBQUQitRSB9BdOBk0Tv8E9Ejk3Mv2rkOw60TdfzAEWdVr6kfwXDmJpwmXy8gS3EwGNIAE0SaHe0rEsQjMbQqE1Oqx4poZEKi6Wu32zxyEMqWipoqlgSQOVg2S6cEOdf366St4WBNTbla4gMjwuftRfmSLzwVifnfEJii872ShchWV40cpYKYxTdndwlP+OZNpQl8WefH7n7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZoFmMAezqZ3/9idVnbpl9CDSlN+eVtfUfTi6TOnBgb4=;
+ b=fHefYw9k8pmyi2Vp7aJ7mMV1e8zRPbQ13TUC7e+hxYeVJ2CBg7iXvZiuF91PMln7VnXthgb0bqEZfzNpUNZ740ARPnDC6L3tl9+aoGXOQYUsyksZzK36qv44C08JE6ByVOJ1QA2g21C9KQOFLQXUicFTHm8V5y0Q9qC6N4PmjAoQxU5qmN8U65ewSoml2aCuZJAZDpvwskOSfgT8HieJf80LOL1CyBfB/HCmlvq2jGEANMZBITflBR2NCkeWIJRN7BJtpSnPWkNcjewuHQYMsT5ktD2eKGpvZI4GRoaibDKaTcuNfg0NXziZ1Xd6KmvYkx+OPHfuKXqDCM8FZzZcGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by CH3PR11MB8093.namprd11.prod.outlook.com (2603:10b6:610:139::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.25; Sun, 6 Aug
+ 2023 08:44:47 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::94f8:4717:4e7c:2c6b]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::94f8:4717:4e7c:2c6b%6]) with mapi id 15.20.6652.025; Sun, 6 Aug 2023
+ 08:44:46 +0000
+Message-ID: <7df23a0d-e2a6-71a7-7641-6363f4905f5c@intel.com>
+Date:   Sun, 6 Aug 2023 16:44:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v5 11/19] KVM:VMX: Emulate read and write to CET MSRs
+To:     Sean Christopherson <seanjc@google.com>,
+        Chao Gao <chao.gao@intel.com>
+CC:     <pbonzini@redhat.com>, <peterz@infradead.org>,
+        <john.allen@amd.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
+        <binbin.wu@linux.intel.com>
+References: <20230803042732.88515-1-weijiang.yang@intel.com>
+ <20230803042732.88515-12-weijiang.yang@intel.com>
+ <ZMyJIq4CgXxudJED@chao-email> <ZM1tNJ9ZdQb+VZVo@google.com>
+Content-Language: en-US
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <ZM1tNJ9ZdQb+VZVo@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: KL1P15301CA0066.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:820:3d::14) To PH0PR11MB4965.namprd11.prod.outlook.com
+ (2603:10b6:510:34::7)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v18 05/30] LoongArch: KVM: Add vcpu related header files
-To:     Tianrui Zhao <zhaotianrui@loongson.cn>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>
-References: <20230803022138.2736430-1-zhaotianrui@loongson.cn>
- <20230803022138.2736430-6-zhaotianrui@loongson.cn>
-From:   Chen Linxuan <chenlinxuan@uniontech.com>
-In-Reply-To: <20230803022138.2736430-6-zhaotianrui@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpipv:uniontech.com:qybglogicsvrgz:qybglogicsvrgz6a-1
-X-Spam-Status: No, score=1.7 required=5.0 tests=BAYES_00,FORGED_MUA_MOZILLA,
-        RCVD_ILLEGAL_IP,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS autolearn=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|CH3PR11MB8093:EE_
+X-MS-Office365-Filtering-Correlation-Id: af4c8869-f5a7-4567-6ede-08db965962f9
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VX1S/BfluUwf/5Z4jXDODAkO+fzC2/gsmMbsUoqezV1FY8wXFEcSIdvgYP7Z2N/iOZzhIzu9s/SKKwyDUU0T8P+/OaeogKIPeh3ZmNi7O/S25U02n2v6kZn0RdYaNBwGKtoW30Uln/jU9DoG2xy4YzxHGEvTB/0eCUJXLMXEE/q+7zmTAOjryJUYBT5g8XTN4J6Q7bEMfl8cYUBXg1b4TThfLR5YSXlljeIvro/oRFtlKWEf4kvEGk3a5rrDd7u90Cs+M/iTtGLsHHPj7zZHtfbfXOdRiCY3pLWbIJ0WHk+sbR7ZR6ZM5tkUNPFb+W/1s4r7+aQEFu0NzjJXs0C+A8/i5IB9/+PWNQuPPWhKwY3XpS1krejfdVZPXKOW+wjhQUu4s4j7ml0IxwTD3rLz1JUm8wERn5zBEeg0v1FpR7tvJrGjrNFEmP2XbQ6PRcvAzRSdiNdfR+WfHi5I4YnC1e4lvwdma5ZkMh+3xgAbiyRpuGDNqVycMFxvoGO0ZdYkR48bL/E8xXn9cCQfVTSSKwbl2PgmREClbUHu3+RZoaQ+yMdxQ7N9o/9VrggAq+UtbXOcILZ6H/sZWkLoVaIdRGAAByxFQ/Dl1pvU+iy7PhUQULaD2tGmd2gX0w+suhsZuCo2/zG8l4Bt5Jz34uHq6A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(136003)(376002)(346002)(39860400002)(366004)(451199021)(186006)(1800799003)(86362001)(31696002)(41300700001)(53546011)(478600001)(6506007)(26005)(8936002)(8676002)(38100700002)(6486002)(6666004)(30864003)(2616005)(5660300002)(83380400001)(36756003)(2906002)(110136005)(31686004)(316002)(66556008)(66476007)(66946007)(6636002)(4326008)(6512007)(82960400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ekpNSFhwb1dEcXBObnlROE9qQ0czb0dYTGpFNkxJUExMWDhEZlVpVjNxRGZz?=
+ =?utf-8?B?SW9UVmRwOVRheWwvWHZmSHJZQ1MrUi9qVXlQSkVCRGpiV2RYU2tXOUUvK0cy?=
+ =?utf-8?B?ZU1USXRFa3MrZUtxZ1pvbnNhZkFuOWsyS3dUNXBjRGFrVXRVQjlDVDBNL3U0?=
+ =?utf-8?B?M0krUE8wMHJneDB3YUp2VzFzQi9Cd2tNRS93QnpLV29EcUZoRlRRRzI0SnBY?=
+ =?utf-8?B?SnJwUUFjTUVZUENSY3IzajBTVmZmanhKRkdvRGVrdWplM3NvVCtzVGFSZUFJ?=
+ =?utf-8?B?ai9sUlF5ME5CMTk4OHY4d3gwV0IrU0RPSkFqOWgwMUNrYURPSVBzemRCRVZr?=
+ =?utf-8?B?WlRCbWFCTEJMOVpZZXNoS0YwSkY1S3RackEzcVpnQ3hWSWtSdXVTQnVLV0Fo?=
+ =?utf-8?B?Vmg4ZTh3aUNxUHhSQkVRTVpTQ3pZMC9sSWpVdUNWSmx1My9XS1VPaW8wU0Rt?=
+ =?utf-8?B?U2xrdmtFOUVlN1lIaHE3TjZhNUs4VE1ZOEhlSzEwd2VkaXM5dHNZMVQ0Wjg4?=
+ =?utf-8?B?amlGWUhQamRjeHRjcWV6QU51Q2ErU3F4dkIySEVycm14YTliZG1WRnRlV1dO?=
+ =?utf-8?B?TkNWZjNQd25yc3RVQndyb2RPczkxOWszRVVTcEpXc0VYbmExcmI0WFdqdnRF?=
+ =?utf-8?B?S1lGTTdIZEVVdzNHYU5zUkpQSlhWZ1BneWVHdjlHcmRTL1gzM1FGa2hRaXVh?=
+ =?utf-8?B?aCtpakZZeXd3WVp5YmVYVG55em9sZHNkQ3JFRmcvTEg0TlI4QmltK2pWY2dQ?=
+ =?utf-8?B?bjBwTVZtTzlYM0t4Z3hQRzBHcTVwMEFXdkNWTFYzOFJvYTRjMGhnWU92WE5Z?=
+ =?utf-8?B?VnZrRnh5dC90TUJjSmQ0MFBqUFhGK2gyZmdyMFFpMFZuRTgwSzhoMkREWVpP?=
+ =?utf-8?B?UEJVbHJsRFpYSm1zaVYrcW9YcUp5Vis1eWVIRDNTcWFYaUp3YzJJbVlXdmtY?=
+ =?utf-8?B?V3FMT3llUzBHTnk4WVpzVTdKajN1S1d6RUxYNldQSnlyQndKU0lrb05BQWNE?=
+ =?utf-8?B?MHE2b0pmYlNIREhpRndSMjA5dzU4SmZyVlJvT1JEenB1VUpDcENvK3ZIcTZi?=
+ =?utf-8?B?dTR4ZHYyRmRmYjBOZUFlelA2Q25NSHNtRTd2cDIwQ1JhR1cvODQ3UDBBZVV5?=
+ =?utf-8?B?QmVSazZrdlp4ZjErOGJndFJ0Tkk5RE1iU0hzbWlTVG4xWUY1NEYwbnMwa1VF?=
+ =?utf-8?B?K3kyYTFPbWFFU2hGUy9XT1U0K2RyVWJpbWt5NE5zWjRSTTBDZjZ2V2ROWjVK?=
+ =?utf-8?B?OXpPQUtBVHMyV2pIK3JvTEg3eEdhR2dCMkttQ3BUZWFORDRPTDd3am9aYkZG?=
+ =?utf-8?B?U25raDB5TGF5T2c0T3dGYUd3NGtjS05ubDVRTjgwNnhCNVdubDhUNnRva25Z?=
+ =?utf-8?B?V2pkKytMOWNxUFQ0K3NBS0dneDM2TldCWkNIN1plVncrUXJtQU1zYkxoY2Q4?=
+ =?utf-8?B?cW5qU01vVjA4Zm1DenJvZWpSRVZFUUYxQUpYZUxLdEhJd1VGV0I1a1cxZS9a?=
+ =?utf-8?B?ZU1iblMzc044UUdwZkpFOTN2S1J2b1Vnd0JiUjdlbUdIRm5IQ2thU0RJdDdv?=
+ =?utf-8?B?U2hsT0VMYjViaWxnQkN2UE9mQk05TWd4ZUdTT29mSy9ITWlCNkdZTUE0VmFw?=
+ =?utf-8?B?eXQ2Rzc3N0JBeFMwVnRDRkhhUXBhSU9NZGFPVHplT0w1d3UwWERtV0JzNmY4?=
+ =?utf-8?B?bG5KSzdtRG5XRk5qclV0aCs2OUJGQ2xVQklEekhlSHFRMGpES0s3ai9ZSk02?=
+ =?utf-8?B?Tkg3Z1VSakdyODJ5NC9zWks3ZGdINWdoa1AvcHdqNWtjRXNEQkxTWnBxSlZi?=
+ =?utf-8?B?VWo3b05qMHBrM0RHSU5IWG5EOXdGYlRMVTk0K2dzSXNTdWpMVnAvL3M5SGQ0?=
+ =?utf-8?B?a3BYUzl1OXFUdHZVZVNzSEUzS05XdXVIR2o1bjU4OXRFYjI2UUh0S0k5cmpr?=
+ =?utf-8?B?RENrTnB3TkNTU1JubURLeEhmOUpqQ0d5SDNXZU4yQWFWVklPZWpycDlPQUFl?=
+ =?utf-8?B?RVRYb29RdDVGS0tWOXBoclNRRzlaRlgyQkxCaDRUaDVGbzJTV2ZpeWczOWw4?=
+ =?utf-8?B?anc2ZjJJYTBLK3ZKTVN0a3Bob3RqVDZTUE1GUzhWdHBNQzZpL0dEdDVMamtL?=
+ =?utf-8?B?Yml6WU1sWFNGR1ZPU0hIKy9SVzhoandJNVc3MWNrbmJaVG55bC9rbTloTlFx?=
+ =?utf-8?B?ZFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: af4c8869-f5a7-4567-6ede-08db965962f9
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2023 08:44:46.2898
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FcnZL6SXImk4CsVY5ftkB8mv8NA7s2fs0cMYjBBJobTd7RWGc1rXz98H9HtygHdQBSW2DH3w0ihquP3XiIt4ZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8093
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
-X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I notice that v18 is released. So I resend my comment on v17 again.
-
-On 2023/8/3 10:21, Tianrui Zhao wrote:
-> Add LoongArch vcpu related header files, including vcpu csr
-> information, irq number defines, and some vcpu interfaces.
-> 
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+On 8/5/2023 5:27 AM, Sean Christopherson wrote:
+> On Fri, Aug 04, 2023, Chao Gao wrote:
+>> On Thu, Aug 03, 2023 at 12:27:24AM -0400, Yang Weijiang wrote:
+>>> Add emulation interface for CET MSR read and write.
+>>> The emulation code is split into common part and vendor specific
+>>> part, the former resides in x86.c to benefic different x86 CPU
+>>> vendors, the latter for VMX is implemented in this patch.
+>>>
+>>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>>> ---
+>>> arch/x86/kvm/vmx/vmx.c |  27 +++++++++++
+>>> arch/x86/kvm/x86.c     | 104 +++++++++++++++++++++++++++++++++++++----
+>>> arch/x86/kvm/x86.h     |  18 +++++++
+>>> 3 files changed, 141 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 6aa76124e81e..ccf750e79608 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -2095,6 +2095,18 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>> 		else
+>>> 			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>>> 		break;
+>>> +	case MSR_IA32_S_CET:
+>>> +	case MSR_KVM_GUEST_SSP:
+>>> +	case MSR_IA32_INT_SSP_TAB:
+>>> +		if (kvm_get_msr_common(vcpu, msr_info))
+>>> +			return 1;
+>>> +		if (msr_info->index == MSR_KVM_GUEST_SSP)
+>>> +			msr_info->data = vmcs_readl(GUEST_SSP);
+>>> +		else if (msr_info->index == MSR_IA32_S_CET)
+>>> +			msr_info->data = vmcs_readl(GUEST_S_CET);
+>>> +		else if (msr_info->index == MSR_IA32_INT_SSP_TAB)
+>>> +			msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
+>> This if-else-if suggests that they are focibly grouped together to just
+>> share the call of kvm_get_msr_common(). For readability, I think it is better
+>> to handle them separately.
+>>
+>> e.g.,
+>> 	case MSR_IA32_S_CET:
+>> 		if (kvm_get_msr_common(vcpu, msr_info))
+>> 			return 1;
+>> 		msr_info->data = vmcs_readl(GUEST_S_CET);
+>> 		break;
+>>
+>> 	case MSR_KVM_GUEST_SSP:
+>> 		if (kvm_get_msr_common(vcpu, msr_info))
+>> 			return 1;
+>> 		msr_info->data = vmcs_readl(GUEST_SSP);
+>> 		break;
+> Actually, we can do even better.  We have an existing framework for these types
+> of prechecks, I just completely forgot about it :-(  (my "look at PAT" was a bad
+> suggestion).
+>
+> Handle the checks in __kvm_set_msr() and __kvm_get_msr(), i.e. *before* calling
+> into vendor code.  Then vendor code doesn't need to make weird callbacks.
+I see, will change it, thank you!
+>>> int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>> {
+>>> 	u32 msr = msr_info->index;
+>>> @@ -3981,6 +4014,45 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>> 		vcpu->arch.guest_fpu.xfd_err = data;
+>>> 		break;
+>>> #endif
+>>> +#define CET_EXCLUSIVE_BITS		(CET_SUPPRESS | CET_WAIT_ENDBR)
+>>> +#define CET_CTRL_RESERVED_BITS		GENMASK(9, 6)
+> Please use a single namespace for these #defines, e.g. CET_CTRL_* or maybe
+> CET_US_* for everything.
+OK.
+>>> +#define CET_SHSTK_MASK_BITS		GENMASK(1, 0)
+>>> +#define CET_IBT_MASK_BITS		(GENMASK_ULL(5, 2) | \
+>>> +					 GENMASK_ULL(63, 10))
+>>> +#define CET_LEG_BITMAP_BASE(data)	((data) >> 12)
+> Bah, stupid SDM.  Please spell out "LEGACY", I though "LEG" was short for "LEGAL"
+> since this looks a lot like a page shift, i.e. getting a pfn.
+Sure :-)
+>>> +static bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu,
+>>> +				      struct msr_data *msr)
+>>> +{
+>>> +	if (is_shadow_stack_msr(msr->index)) {
+>>> +		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
+>>> +			return false;
+>>> +
+>>> +		if (msr->index == MSR_KVM_GUEST_SSP)
+>>> +			return msr->host_initiated;
+>>> +
+>>> +		return msr->host_initiated ||
+>>> +			guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+>>> +	}
+>>> +
+>>> +	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+>>> +	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+>>> +		return false;
+>>> +
+>>> +	return msr->host_initiated ||
+>>> +		guest_cpuid_has(vcpu, X86_FEATURE_IBT) ||
+>>> +		guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> Similar to my suggestsion for XSS, I think we drop the waiver for host_initiated
+> accesses, i.e. require the feature to be enabled and exposed to the guest, even
+> for the host.
+I saw Paolo shares different opinion on this, so would hold on for a while...
+>>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>>> index c69fc027f5ec..3b79d6db2f83 100644
+>>> --- a/arch/x86/kvm/x86.h
+>>> +++ b/arch/x86/kvm/x86.h
+>>> @@ -552,4 +552,22 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+>>> 			 unsigned int port, void *data,  unsigned int count,
+>>> 			 int in);
+>>>
+>>> +/*
+>>> + * Guest xstate MSRs have been loaded in __msr_io(), disable preemption before
+>>> + * access the MSRs to avoid MSR content corruption.
+>>> + */
+>> I think it is better to describe what the function does prior to jumping into
+>> details like where guest FPU is loaded.
+OK, will do it, thanks!
+>> /*
+>>   * Lock and/or reload guest FPU and access xstate MSRs. For accesses initiated
+>>   * by host, guest FPU is loaded in __msr_io(). For accesses initiated by guest,
+>>   * guest FPU should have been loaded already.
+>>   */
+>>> +static inline void kvm_get_xsave_msr(struct msr_data *msr_info)
+>>> +{
+>>> +	kvm_fpu_get();
+>>> +	rdmsrl(msr_info->index, msr_info->data);
+>>> +	kvm_fpu_put();
+>>> +}
+>>> +
+>>> +static inline void kvm_set_xsave_msr(struct msr_data *msr_info)
+>>> +{
+>>> +	kvm_fpu_get();
+>>> +	wrmsrl(msr_info->index, msr_info->data);
+>>> +	kvm_fpu_put();
+>>> +}
+>> Can you rename functions to kvm_get/set_xstate_msr() to align with the comment
+>> and patch 6? And if there is no user outside x86.c, you can just put these two
+>> functions right after the is_xstate_msr() added in patch 6.
+OK, maybe I added the helpers in this patch duo to compilation error "function is defined but not used".
+> +1.  These should also assert that (a) guest FPU state is loaded and
+Do you mean something like this:
+WARN_ON_ONCE(!vcpu->arch.guest_fpu->in_use) or  KVM_BUG_ON()
+added in the helpers?
+> (b) the MSR
+> is passed through to the guest.  I might be ok dropping (b) if both VMX and SVM
+> passthrough all MSRs if they're exposed to the guest, i.e. not lazily passed
+> through.
+I'm OK to add the assert if finally all the CET MSRs are passed through directly.
+> Sans any changes to kvm_{g,s}et_xsave_msr(), I think this?  (completely untested)
+>
+>
 > ---
->   arch/loongarch/include/asm/insn-def.h  |  55 ++++++
->   arch/loongarch/include/asm/kvm_csr.h   | 252 +++++++++++++++++++++++++
->   arch/loongarch/include/asm/kvm_vcpu.h  |  95 ++++++++++
->   arch/loongarch/include/asm/loongarch.h |  20 +-
->   arch/loongarch/kvm/trace.h             | 168 +++++++++++++++++
->   5 files changed, 585 insertions(+), 5 deletions(-)
->   create mode 100644 arch/loongarch/include/asm/insn-def.h
->   create mode 100644 arch/loongarch/include/asm/kvm_csr.h
->   create mode 100644 arch/loongarch/include/asm/kvm_vcpu.h
->   create mode 100644 arch/loongarch/kvm/trace.h
-> 
-> diff --git a/arch/loongarch/include/asm/insn-def.h b/arch/loongarch/include/asm/insn-def.h
-> new file mode 100644
-> index 000000000000..e285ee108fb0
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/insn-def.h
-> @@ -0,0 +1,55 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __ASM_INSN_DEF_H
-> +#define __ASM_INSN_DEF_H
-> +
-> +#include <linux/stringify.h>
-> +#include <asm/gpr-num.h>
-> +#include <asm/asm.h>
-> +
-> +#define INSN_STR(x)		__stringify(x)
-> +#define CSR_RD_SHIFT		0
-> +#define CSR_RJ_SHIFT		5
-> +#define CSR_SIMM14_SHIFT	10
-> +#define CSR_OPCODE_SHIFT	24
-
-I want to continue the discussion in v16 here.
-
-Just as what Huacai Chen and WANG Xuerui described before,
-I believe that whatever distros pick the kernel release contain this 
-feature will be able to use the new toolchain baseline, just as what 
-deepin is doing now.
-
-That situation you describe before in which a distro support loongarch 
-using such new kernel release somehow won't be able to use a new 
-toolchain seems to be never going to happen in real world.
-
-> +
-> +#define DEFINE_INSN_CSR							\
-> +	__DEFINE_ASM_GPR_NUMS						\
-> +"	.macro insn_csr, opcode, rj, rd, simm14\n"			\
-> +"	.4byte	((\\opcode << " INSN_STR(CSR_OPCODE_SHIFT) ") |"	\
-> +"		 (.L__gpr_num_\\rj << " INSN_STR(CSR_RJ_SHIFT) ") |"	\
-> +"		 (.L__gpr_num_\\rd << " INSN_STR(CSR_RD_SHIFT) ") |"	\
-> +"		 (\\simm14 << " INSN_STR(CSR_SIMM14_SHIFT) "))\n"	\
-> +"	.endm\n"
-> +
-> +#define UNDEFINE_INSN_CSR						\
-> +"	.purgem insn_csr\n"
-> +
-> +#define __INSN_CSR(opcode, rj, rd, simm14)				\
-> +	DEFINE_INSN_CSR							\
-> +	"insn_csr " opcode ", " rj ", " rd ", " simm14 "\n"		\
-> +	UNDEFINE_INSN_CSR
-> +
-> +
-> +#define INSN_CSR(opcode, rj, rd, simm14)				\
-> +	__INSN_CSR(LARCH_##opcode, LARCH_##rj, LARCH_##rd,		\
-> +		   LARCH_##simm14)
-> +
-> +#define __ASM_STR(x)		#x
-> +#define LARCH_OPCODE(v)		__ASM_STR(v)
-> +#define LARCH_SIMM14(v)		__ASM_STR(v)
-> +#define __LARCH_REG(v)		__ASM_STR(v)
-> +#define LARCH___RD(v)		__LARCH_REG(v)
-> +#define LARCH___RJ(v)		__LARCH_REG(v)
-> +#define LARCH_OPCODE_GCSR	LARCH_OPCODE(5)
-> +
-> +#define GCSR_read(csr, rd)						\
-> +	INSN_CSR(OPCODE_GCSR, __RJ(zero), __RD(rd), SIMM14(csr))
-> +
-> +#define GCSR_write(csr, rd)						\
-> +	INSN_CSR(OPCODE_GCSR, __RJ($r1), __RD(rd), SIMM14(csr))
-> +
-> +#define GCSR_xchg(csr, rj, rd)						\
-> +	INSN_CSR(OPCODE_GCSR, __RJ(rj), __RD(rd), SIMM14(csr))
-> +
-> +#endif /* __ASM_INSN_DEF_H */
-> diff --git a/arch/loongarch/include/asm/kvm_csr.h b/arch/loongarch/include/asm/kvm_csr.h
-> new file mode 100644
-> index 000000000000..34483bbaec15
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_csr.h
-> @@ -0,0 +1,252 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_LOONGARCH_KVM_CSR_H__
-> +#define __ASM_LOONGARCH_KVM_CSR_H__
-> +#include <asm/loongarch.h>
-> +#include <asm/kvm_vcpu.h>
-> +#include <linux/uaccess.h>
-> +#include <linux/kvm_host.h>
-> +
-> +#ifdef CONFIG_AS_HAS_LVZ_EXTENSION
-> +/* binutils support virtualization instructions */
-> +#define gcsr_read(csr)						\
-> +({								\
-> +	register unsigned long __v;				\
-> +	__asm__ __volatile__(					\
-> +		" gcsrrd %[val], %[reg]\n\t"			\
-> +		: [val] "=r" (__v)				\
-> +		: [reg] "i" (csr)				\
-> +		: "memory");					\
-> +	__v;							\
-> +})
-> +
-> +#define gcsr_write(v, csr)					\
-> +({								\
-> +	register unsigned long __v = v;				\
-> +	__asm__ __volatile__ (					\
-> +		" gcsrwr %[val], %[reg]\n\t"			\
-> +		: [val] "+r" (__v)				\
-> +		: [reg] "i" (csr)				\
-> +		: "memory");					\
-> +})
-> +
-> +#define gcsr_xchg(v, m, csr)					\
-> +({								\
-> +	register unsigned long __v = v;				\
-> +	__asm__ __volatile__(					\
-> +		" gcsrxchg %[val], %[mask], %[reg]\n\t"		\
-> +		: [val] "+r" (__v)				\
-> +		: [mask] "r" (m), [reg] "i" (csr)		\
-> +		: "memory");					\
-> +	__v;							\
-> +})
-> +#else
-> +/* binutils do not support virtualization instructions */
-> +#define gcsr_read(csr)						\
-> +({								\
-> +	register unsigned long __v;				\
-> +	__asm__ __volatile__ (GCSR_read(csr, %0)		\
-> +				: "=r" (__v) :			\
-> +				: "memory");			\
-> +	__v;							\
-> +})
-> +
-> +#define gcsr_write(val, csr)					\
-> +({								\
-> +	register unsigned long __v = val;			\
-> +	__asm__ __volatile__ (GCSR_write(csr, %0)		\
-> +				: "+r" (__v) :			\
-> +				: "memory");			\
-> +})
-> +
-> +#define gcsr_xchg(val, mask, csr)				\
-> +({								\
-> +	register unsigned long __v = val;			\
-> +	__asm__ __volatile__ (GCSR_xchg(csr, %1, %0)		\
-> +				: "+r" (__v)			\
-> +				: "r"  (mask)			\
-> +				: "memory");			\
-> +	__v;							\
-> +})
-> +#endif
-> +
-> +/* Guest CSRS read and write */
-> +#define read_gcsr_crmd()		gcsr_read(LOONGARCH_CSR_CRMD)
-> +#define write_gcsr_crmd(val)		gcsr_write(val, LOONGARCH_CSR_CRMD)
-> +#define read_gcsr_prmd()		gcsr_read(LOONGARCH_CSR_PRMD)
-> +#define write_gcsr_prmd(val)		gcsr_write(val, LOONGARCH_CSR_PRMD)
-> +#define read_gcsr_euen()		gcsr_read(LOONGARCH_CSR_EUEN)
-> +#define write_gcsr_euen(val)		gcsr_write(val, LOONGARCH_CSR_EUEN)
-> +#define read_gcsr_misc()		gcsr_read(LOONGARCH_CSR_MISC)
-> +#define write_gcsr_misc(val)		gcsr_write(val, LOONGARCH_CSR_MISC)
-> +#define read_gcsr_ecfg()		gcsr_read(LOONGARCH_CSR_ECFG)
-> +#define write_gcsr_ecfg(val)		gcsr_write(val, LOONGARCH_CSR_ECFG)
-> +#define read_gcsr_estat()		gcsr_read(LOONGARCH_CSR_ESTAT)
-> +#define write_gcsr_estat(val)		gcsr_write(val, LOONGARCH_CSR_ESTAT)
-> +#define read_gcsr_era()			gcsr_read(LOONGARCH_CSR_ERA)
-> +#define write_gcsr_era(val)		gcsr_write(val, LOONGARCH_CSR_ERA)
-> +#define read_gcsr_badv()		gcsr_read(LOONGARCH_CSR_BADV)
-> +#define write_gcsr_badv(val)		gcsr_write(val, LOONGARCH_CSR_BADV)
-> +#define read_gcsr_badi()		gcsr_read(LOONGARCH_CSR_BADI)
-> +#define write_gcsr_badi(val)		gcsr_write(val, LOONGARCH_CSR_BADI)
-> +#define read_gcsr_eentry()		gcsr_read(LOONGARCH_CSR_EENTRY)
-> +#define write_gcsr_eentry(val)		gcsr_write(val, LOONGARCH_CSR_EENTRY)
-> +
-> +#define read_gcsr_tlbidx()		gcsr_read(LOONGARCH_CSR_TLBIDX)
-> +#define write_gcsr_tlbidx(val)		gcsr_write(val, LOONGARCH_CSR_TLBIDX)
-> +#define read_gcsr_tlbhi()		gcsr_read(LOONGARCH_CSR_TLBEHI)
-> +#define write_gcsr_tlbhi(val)		gcsr_write(val, LOONGARCH_CSR_TLBEHI)
-> +#define read_gcsr_tlblo0()		gcsr_read(LOONGARCH_CSR_TLBELO0)
-> +#define write_gcsr_tlblo0(val)		gcsr_write(val, LOONGARCH_CSR_TLBELO0)
-> +#define read_gcsr_tlblo1()		gcsr_read(LOONGARCH_CSR_TLBELO1)
-> +#define write_gcsr_tlblo1(val)		gcsr_write(val, LOONGARCH_CSR_TLBELO1)
-> +
-> +#define read_gcsr_asid()		gcsr_read(LOONGARCH_CSR_ASID)
-> +#define write_gcsr_asid(val)		gcsr_write(val, LOONGARCH_CSR_ASID)
-> +#define read_gcsr_pgdl()		gcsr_read(LOONGARCH_CSR_PGDL)
-> +#define write_gcsr_pgdl(val)		gcsr_write(val, LOONGARCH_CSR_PGDL)
-> +#define read_gcsr_pgdh()		gcsr_read(LOONGARCH_CSR_PGDH)
-> +#define write_gcsr_pgdh(val)		gcsr_write(val, LOONGARCH_CSR_PGDH)
-> +#define write_gcsr_pgd(val)		gcsr_write(val, LOONGARCH_CSR_PGD)
-> +#define read_gcsr_pgd()			gcsr_read(LOONGARCH_CSR_PGD)
-> +#define read_gcsr_pwctl0()		gcsr_read(LOONGARCH_CSR_PWCTL0)
-> +#define write_gcsr_pwctl0(val)		gcsr_write(val, LOONGARCH_CSR_PWCTL0)
-> +#define read_gcsr_pwctl1()		gcsr_read(LOONGARCH_CSR_PWCTL1)
-> +#define write_gcsr_pwctl1(val)		gcsr_write(val, LOONGARCH_CSR_PWCTL1)
-> +#define read_gcsr_stlbpgsize()		gcsr_read(LOONGARCH_CSR_STLBPGSIZE)
-> +#define write_gcsr_stlbpgsize(val)	gcsr_write(val, LOONGARCH_CSR_STLBPGSIZE)
-> +#define read_gcsr_rvacfg()		gcsr_read(LOONGARCH_CSR_RVACFG)
-> +#define write_gcsr_rvacfg(val)		gcsr_write(val, LOONGARCH_CSR_RVACFG)
-> +
-> +#define read_gcsr_cpuid()		gcsr_read(LOONGARCH_CSR_CPUID)
-> +#define write_gcsr_cpuid(val)		gcsr_write(val, LOONGARCH_CSR_CPUID)
-> +#define read_gcsr_prcfg1()		gcsr_read(LOONGARCH_CSR_PRCFG1)
-> +#define write_gcsr_prcfg1(val)		gcsr_write(val, LOONGARCH_CSR_PRCFG1)
-> +#define read_gcsr_prcfg2()		gcsr_read(LOONGARCH_CSR_PRCFG2)
-> +#define write_gcsr_prcfg2(val)		gcsr_write(val, LOONGARCH_CSR_PRCFG2)
-> +#define read_gcsr_prcfg3()		gcsr_read(LOONGARCH_CSR_PRCFG3)
-> +#define write_gcsr_prcfg3(val)		gcsr_write(val, LOONGARCH_CSR_PRCFG3)
-> +
-> +#define read_gcsr_kscratch0()		gcsr_read(LOONGARCH_CSR_KS0)
-> +#define write_gcsr_kscratch0(val)	gcsr_write(val, LOONGARCH_CSR_KS0)
-> +#define read_gcsr_kscratch1()		gcsr_read(LOONGARCH_CSR_KS1)
-> +#define write_gcsr_kscratch1(val)	gcsr_write(val, LOONGARCH_CSR_KS1)
-> +#define read_gcsr_kscratch2()		gcsr_read(LOONGARCH_CSR_KS2)
-> +#define write_gcsr_kscratch2(val)	gcsr_write(val, LOONGARCH_CSR_KS2)
-> +#define read_gcsr_kscratch3()		gcsr_read(LOONGARCH_CSR_KS3)
-> +#define write_gcsr_kscratch3(val)	gcsr_write(val, LOONGARCH_CSR_KS3)
-> +#define read_gcsr_kscratch4()		gcsr_read(LOONGARCH_CSR_KS4)
-> +#define write_gcsr_kscratch4(val)	gcsr_write(val, LOONGARCH_CSR_KS4)
-> +#define read_gcsr_kscratch5()		gcsr_read(LOONGARCH_CSR_KS5)
-> +#define write_gcsr_kscratch5(val)	gcsr_write(val, LOONGARCH_CSR_KS5)
-> +#define read_gcsr_kscratch6()		gcsr_read(LOONGARCH_CSR_KS6)
-> +#define write_gcsr_kscratch6(val)	gcsr_write(val, LOONGARCH_CSR_KS6)
-> +#define read_gcsr_kscratch7()		gcsr_read(LOONGARCH_CSR_KS7)
-> +#define write_gcsr_kscratch7(val)	gcsr_write(val, LOONGARCH_CSR_KS7)
-> +
-> +#define read_gcsr_timerid()		gcsr_read(LOONGARCH_CSR_TMID)
-> +#define write_gcsr_timerid(val)		gcsr_write(val, LOONGARCH_CSR_TMID)
-> +#define read_gcsr_timercfg()		gcsr_read(LOONGARCH_CSR_TCFG)
-> +#define write_gcsr_timercfg(val)	gcsr_write(val, LOONGARCH_CSR_TCFG)
-> +#define read_gcsr_timertick()		gcsr_read(LOONGARCH_CSR_TVAL)
-> +#define write_gcsr_timertick(val)	gcsr_write(val, LOONGARCH_CSR_TVAL)
-> +#define read_gcsr_timeroffset()		gcsr_read(LOONGARCH_CSR_CNTC)
-> +#define write_gcsr_timeroffset(val)	gcsr_write(val, LOONGARCH_CSR_CNTC)
-> +
-> +#define read_gcsr_llbctl()		gcsr_read(LOONGARCH_CSR_LLBCTL)
-> +#define write_gcsr_llbctl(val)		gcsr_write(val, LOONGARCH_CSR_LLBCTL)
-> +
-> +#define read_gcsr_tlbrentry()		gcsr_read(LOONGARCH_CSR_TLBRENTRY)
-> +#define write_gcsr_tlbrentry(val)	gcsr_write(val, LOONGARCH_CSR_TLBRENTRY)
-> +#define read_gcsr_tlbrbadv()		gcsr_read(LOONGARCH_CSR_TLBRBADV)
-> +#define write_gcsr_tlbrbadv(val)	gcsr_write(val, LOONGARCH_CSR_TLBRBADV)
-> +#define read_gcsr_tlbrera()		gcsr_read(LOONGARCH_CSR_TLBRERA)
-> +#define write_gcsr_tlbrera(val)		gcsr_write(val, LOONGARCH_CSR_TLBRERA)
-> +#define read_gcsr_tlbrsave()		gcsr_read(LOONGARCH_CSR_TLBRSAVE)
-> +#define write_gcsr_tlbrsave(val)	gcsr_write(val, LOONGARCH_CSR_TLBRSAVE)
-> +#define read_gcsr_tlbrelo0()		gcsr_read(LOONGARCH_CSR_TLBRELO0)
-> +#define write_gcsr_tlbrelo0(val)	gcsr_write(val, LOONGARCH_CSR_TLBRELO0)
-> +#define read_gcsr_tlbrelo1()		gcsr_read(LOONGARCH_CSR_TLBRELO1)
-> +#define write_gcsr_tlbrelo1(val)	gcsr_write(val, LOONGARCH_CSR_TLBRELO1)
-> +#define read_gcsr_tlbrehi()		gcsr_read(LOONGARCH_CSR_TLBREHI)
-> +#define write_gcsr_tlbrehi(val)		gcsr_write(val, LOONGARCH_CSR_TLBREHI)
-> +#define read_gcsr_tlbrprmd()		gcsr_read(LOONGARCH_CSR_TLBRPRMD)
-> +#define write_gcsr_tlbrprmd(val)	gcsr_write(val, LOONGARCH_CSR_TLBRPRMD)
-> +
-> +#define read_gcsr_directwin0()		gcsr_read(LOONGARCH_CSR_DMWIN0)
-> +#define write_gcsr_directwin0(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN0)
-> +#define read_gcsr_directwin1()		gcsr_read(LOONGARCH_CSR_DMWIN1)
-> +#define write_gcsr_directwin1(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN1)
-> +#define read_gcsr_directwin2()		gcsr_read(LOONGARCH_CSR_DMWIN2)
-> +#define write_gcsr_directwin2(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN2)
-> +#define read_gcsr_directwin3()		gcsr_read(LOONGARCH_CSR_DMWIN3)
-> +#define write_gcsr_directwin3(val)	gcsr_write(val, LOONGARCH_CSR_DMWIN3)
-> +
-> +/* Guest related CSRs */
-> +#define read_csr_gtlbc()		csr_read64(LOONGARCH_CSR_GTLBC)
-> +#define write_csr_gtlbc(val)		csr_write64(val, LOONGARCH_CSR_GTLBC)
-> +#define read_csr_trgp()			csr_read64(LOONGARCH_CSR_TRGP)
-> +#define read_csr_gcfg()			csr_read64(LOONGARCH_CSR_GCFG)
-> +#define write_csr_gcfg(val)		csr_write64(val, LOONGARCH_CSR_GCFG)
-> +#define read_csr_gstat()		csr_read64(LOONGARCH_CSR_GSTAT)
-> +#define write_csr_gstat(val)		csr_write64(val, LOONGARCH_CSR_GSTAT)
-> +#define read_csr_gintc()		csr_read64(LOONGARCH_CSR_GINTC)
-> +#define write_csr_gintc(val)		csr_write64(val, LOONGARCH_CSR_GINTC)
-> +#define read_csr_gcntc()		csr_read64(LOONGARCH_CSR_GCNTC)
-> +#define write_csr_gcntc(val)		csr_write64(val, LOONGARCH_CSR_GCNTC)
-> +
-> +#define __BUILD_GCSR_OP(name)		__BUILD_CSR_COMMON(gcsr_##name)
-> +
-> +__BUILD_GCSR_OP(llbctl)
-> +__BUILD_GCSR_OP(tlbidx)
-> +__BUILD_CSR_OP(gcfg)
-> +__BUILD_CSR_OP(gstat)
-> +__BUILD_CSR_OP(gtlbc)
-> +__BUILD_CSR_OP(gintc)
-> +
-> +#define set_gcsr_estat(val)	\
-> +	gcsr_xchg(val, val, LOONGARCH_CSR_ESTAT)
-> +#define clear_gcsr_estat(val)	\
-> +	gcsr_xchg(~(val), val, LOONGARCH_CSR_ESTAT)
-> +
-> +#define kvm_read_hw_gcsr(id)		gcsr_read(id)
-> +#define kvm_write_hw_gcsr(csr, id, val)	gcsr_write(val, id)
-> +
-> +int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *v);
-> +int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 v);
-> +
-> +int _kvm_emu_iocsr(larch_inst inst, struct kvm_run *run, struct kvm_vcpu *vcpu);
-> +
-> +#define kvm_save_hw_gcsr(csr, gid)	(csr->csrs[gid] = gcsr_read(gid))
-> +#define kvm_restore_hw_gcsr(csr, gid)	(gcsr_write(csr->csrs[gid], gid))
-> +
-> +static __always_inline unsigned long kvm_read_sw_gcsr(struct loongarch_csrs *csr, int gid)
-> +{
-> +	return csr->csrs[gid];
-> +}
-> +
-> +static __always_inline void kvm_write_sw_gcsr(struct loongarch_csrs *csr,
-> +					      int gid, unsigned long val)
-> +{
-> +	csr->csrs[gid] = val;
-> +}
-> +
-> +static __always_inline void kvm_set_sw_gcsr(struct loongarch_csrs *csr,
-> +					    int gid, unsigned long val)
-> +{
-> +	csr->csrs[gid] |= val;
-> +}
-> +
-> +static __always_inline void kvm_change_sw_gcsr(struct loongarch_csrs *csr,
-> +					       int gid, unsigned long mask,
-> +					       unsigned long val)
-> +{
-> +	unsigned long _mask = mask;
-> +
-> +	csr->csrs[gid] &= ~_mask;
-> +	csr->csrs[gid] |= val & _mask;
-> +}
-> +#endif	/* __ASM_LOONGARCH_KVM_CSR_H__ */
-> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
-> new file mode 100644
-> index 000000000000..3d23a656fea3
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
-> @@ -0,0 +1,95 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_LOONGARCH_KVM_VCPU_H__
-> +#define __ASM_LOONGARCH_KVM_VCPU_H__
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/loongarch.h>
-> +
-> +/* Controlled by 0x5 guest exst */
-> +#define CPU_SIP0			(_ULCAST_(1))
-> +#define CPU_SIP1			(_ULCAST_(1) << 1)
-> +#define CPU_PMU				(_ULCAST_(1) << 10)
-> +#define CPU_TIMER			(_ULCAST_(1) << 11)
-> +#define CPU_IPI				(_ULCAST_(1) << 12)
-> +
-> +/* Controlled by 0x52 guest exception VIP
-> + * aligned to exst bit 5~12
-> + */
-> +#define CPU_IP0				(_ULCAST_(1))
-> +#define CPU_IP1				(_ULCAST_(1) << 1)
-> +#define CPU_IP2				(_ULCAST_(1) << 2)
-> +#define CPU_IP3				(_ULCAST_(1) << 3)
-> +#define CPU_IP4				(_ULCAST_(1) << 4)
-> +#define CPU_IP5				(_ULCAST_(1) << 5)
-> +#define CPU_IP6				(_ULCAST_(1) << 6)
-> +#define CPU_IP7				(_ULCAST_(1) << 7)
-> +
-> +#define MNSEC_PER_SEC			(NSEC_PER_SEC >> 20)
-> +
-> +/* KVM_IRQ_LINE irq field index values */
-> +#define KVM_LOONGSON_IRQ_TYPE_SHIFT	24
-> +#define KVM_LOONGSON_IRQ_TYPE_MASK	0xff
-> +#define KVM_LOONGSON_IRQ_VCPU_SHIFT	16
-> +#define KVM_LOONGSON_IRQ_VCPU_MASK	0xff
-> +#define KVM_LOONGSON_IRQ_NUM_SHIFT	0
-> +#define KVM_LOONGSON_IRQ_NUM_MASK	0xffff
-> +
-> +/* Irq_type field */
-> +#define KVM_LOONGSON_IRQ_TYPE_CPU_IP	0
-> +#define KVM_LOONGSON_IRQ_TYPE_CPU_IO	1
-> +#define KVM_LOONGSON_IRQ_TYPE_HT	2
-> +#define KVM_LOONGSON_IRQ_TYPE_MSI	3
-> +#define KVM_LOONGSON_IRQ_TYPE_IOAPIC	4
-> +#define KVM_LOONGSON_IRQ_TYPE_ROUTE	5
-> +
-> +/* Out-of-kernel GIC cpu interrupt injection irq_number field */
-> +#define KVM_LOONGSON_IRQ_CPU_IRQ	0
-> +#define KVM_LOONGSON_IRQ_CPU_FIQ	1
-> +#define KVM_LOONGSON_CPU_IP_NUM		8
-> +
-> +typedef union loongarch_instruction  larch_inst;
-> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-> +
-> +int  _kvm_emu_mmio_write(struct kvm_vcpu *vcpu, larch_inst inst);
-> +int  _kvm_emu_mmio_read(struct kvm_vcpu *vcpu, larch_inst inst);
-> +int  _kvm_complete_mmio_read(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> +int  _kvm_complete_iocsr_read(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> +int  _kvm_emu_idle(struct kvm_vcpu *vcpu);
-> +int  _kvm_handle_pv_hcall(struct kvm_vcpu *vcpu);
-> +int  _kvm_pending_timer(struct kvm_vcpu *vcpu);
-> +int  _kvm_handle_fault(struct kvm_vcpu *vcpu, int fault);
-> +void _kvm_deliver_intr(struct kvm_vcpu *vcpu);
-> +
-> +void kvm_own_fpu(struct kvm_vcpu *vcpu);
-> +void kvm_lose_fpu(struct kvm_vcpu *vcpu);
-> +void kvm_save_fpu(struct loongarch_fpu *fpu);
-> +void kvm_restore_fpu(struct loongarch_fpu *fpu);
-> +void kvm_restore_fcsr(struct loongarch_fpu *fpu);
-> +
-> +void kvm_acquire_timer(struct kvm_vcpu *vcpu);
-> +void kvm_reset_timer(struct kvm_vcpu *vcpu);
-> +void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
-> +void kvm_restore_timer(struct kvm_vcpu *vcpu);
-> +void kvm_save_timer(struct kvm_vcpu *vcpu);
-> +
-> +int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu, struct kvm_interrupt *irq);
-> +/*
-> + * Loongarch KVM guest interrupt handling
-> + */
-> +static inline void _kvm_queue_irq(struct kvm_vcpu *vcpu, unsigned int irq)
-> +{
-> +	set_bit(irq, &vcpu->arch.irq_pending);
-> +	clear_bit(irq, &vcpu->arch.irq_clear);
-> +}
-> +
-> +static inline void _kvm_dequeue_irq(struct kvm_vcpu *vcpu, unsigned int irq)
-> +{
-> +	clear_bit(irq, &vcpu->arch.irq_pending);
-> +	set_bit(irq, &vcpu->arch.irq_clear);
-> +}
-> +
-> +#endif /* __ASM_LOONGARCH_KVM_VCPU_H__ */
-> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
-> index 10748a20a2ab..cce83a4cf1b3 100644
-> --- a/arch/loongarch/include/asm/loongarch.h
-> +++ b/arch/loongarch/include/asm/loongarch.h
-> @@ -11,6 +11,7 @@
+>   arch/x86/kvm/vmx/vmx.c |  34 +++-------
+>   arch/x86/kvm/x86.c     | 151 +++++++++++++++--------------------------
+>   2 files changed, 64 insertions(+), 121 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 491039aeb61b..1211eb469d06 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2100,16 +2100,13 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
+>   		break;
+>   	case MSR_IA32_S_CET:
+> +		msr_info->data = vmcs_readl(GUEST_S_CET);
+> +		break;
+>   	case MSR_KVM_GUEST_SSP:
+> +		msr_info->data = vmcs_readl(GUEST_SSP);
+> +		break;
+>   	case MSR_IA32_INT_SSP_TAB:
+> -		if (kvm_get_msr_common(vcpu, msr_info))
+> -			return 1;
+> -		if (msr_info->index == MSR_KVM_GUEST_SSP)
+> -			msr_info->data = vmcs_readl(GUEST_SSP);
+> -		else if (msr_info->index == MSR_IA32_S_CET)
+> -			msr_info->data = vmcs_readl(GUEST_S_CET);
+> -		else if (msr_info->index == MSR_IA32_INT_SSP_TAB)
+> -			msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> +		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
+>   		break;
+>   	case MSR_IA32_DEBUGCTLMSR:
+>   		msr_info->data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> @@ -2432,25 +2429,14 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		else
+>   			vmx->pt_desc.guest.addr_a[index / 2] = data;
+>   		break;
+> -	case MSR_IA32_PL0_SSP ... MSR_IA32_PL2_SSP:
+> -		if (kvm_set_msr_common(vcpu, msr_info))
+> -			return 1;
+> -		if (data) {
+> -			vmx_disable_write_intercept_sss_msr(vcpu);
+> -			wrmsrl(msr_index, data);
+> -		}
+> -		break;
+>   	case MSR_IA32_S_CET:
+> +		vmcs_writel(GUEST_S_CET, data);
+> +		break;
+>   	case MSR_KVM_GUEST_SSP:
+> +		vmcs_writel(GUEST_SSP, data);
+> +		break;
+>   	case MSR_IA32_INT_SSP_TAB:
+> -		if (kvm_set_msr_common(vcpu, msr_info))
+> -			return 1;
+> -		if (msr_index == MSR_KVM_GUEST_SSP)
+> -			vmcs_writel(GUEST_SSP, data);
+> -		else if (msr_index == MSR_IA32_S_CET)
+> -			vmcs_writel(GUEST_S_CET, data);
+> -		else if (msr_index == MSR_IA32_INT_SSP_TAB)
+> -			vmcs_writel(GUEST_INTR_SSP_TABLE, data);
+> +		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
+>   		break;
+>   	case MSR_IA32_PERF_CAPABILITIES:
+>   		if (data && !vcpu_to_pmu(vcpu)->version)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7385fc25a987..75e6de7c9268 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1838,6 +1838,11 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_msr_allowed);
 >   
->   #ifndef __ASSEMBLY__
->   #include <larchintrin.h>
-> +#include <asm/insn-def.h>
->   
+> +#define CET_US_RESERVED_BITS		GENMASK(9, 6)
+> +#define CET_US_SHSTK_MASK_BITS		GENMASK(1, 0)
+> +#define CET_US_IBT_MASK_BITS		(GENMASK_ULL(5, 2) | GENMASK_ULL(63, 10))
+> +#define CET_US_LEGACY_BITMAP_BASE(data)	((data) >> 12)
+> +
 >   /*
->    * parse_r var, r - Helper assembler macro for parsing register names.
-> @@ -269,6 +270,7 @@ __asm__(".macro	parse_r var r\n\t"
->   #define LOONGARCH_CSR_ECFG		0x4	/* Exception config */
->   #define  CSR_ECFG_VS_SHIFT		16
->   #define  CSR_ECFG_VS_WIDTH		3
-> +#define  CSR_ECFG_VS_SHIFT_END		(CSR_ECFG_VS_SHIFT + CSR_ECFG_VS_WIDTH - 1)
->   #define  CSR_ECFG_VS			(_ULCAST_(0x7) << CSR_ECFG_VS_SHIFT)
->   #define  CSR_ECFG_IM_SHIFT		0
->   #define  CSR_ECFG_IM_WIDTH		14
-> @@ -357,13 +359,14 @@ __asm__(".macro	parse_r var r\n\t"
->   #define  CSR_TLBLO1_V			(_ULCAST_(0x1) << CSR_TLBLO1_V_SHIFT)
+>    * Write @data into the MSR specified by @index.  Select MSR specific fault
+>    * checks are bypassed if @host_initiated is %true.
+> @@ -1897,6 +1902,35 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
 >   
->   #define LOONGARCH_CSR_GTLBC		0x15	/* Guest TLB control */
-> -#define  CSR_GTLBC_RID_SHIFT		16
-> -#define  CSR_GTLBC_RID_WIDTH		8
-> -#define  CSR_GTLBC_RID			(_ULCAST_(0xff) << CSR_GTLBC_RID_SHIFT)
-> +#define  CSR_GTLBC_TGID_SHIFT		16
-> +#define  CSR_GTLBC_TGID_WIDTH		8
-> +#define  CSR_GTLBC_TGID_SHIFT_END	(CSR_GTLBC_TGID_SHIFT + CSR_GTLBC_TGID_WIDTH - 1)
-> +#define  CSR_GTLBC_TGID			(_ULCAST_(0xff) << CSR_GTLBC_TGID_SHIFT)
->   #define  CSR_GTLBC_TOTI_SHIFT		13
->   #define  CSR_GTLBC_TOTI			(_ULCAST_(0x1) << CSR_GTLBC_TOTI_SHIFT)
-> -#define  CSR_GTLBC_USERID_SHIFT		12
-> -#define  CSR_GTLBC_USERID		(_ULCAST_(0x1) << CSR_GTLBC_USERID_SHIFT)
-> +#define  CSR_GTLBC_USETGID_SHIFT	12
-> +#define  CSR_GTLBC_USETGID		(_ULCAST_(0x1) << CSR_GTLBC_USETGID_SHIFT)
->   #define  CSR_GTLBC_GMTLBSZ_SHIFT	0
->   #define  CSR_GTLBC_GMTLBSZ_WIDTH	6
->   #define  CSR_GTLBC_GMTLBSZ		(_ULCAST_(0x3f) << CSR_GTLBC_GMTLBSZ_SHIFT)
-> @@ -518,6 +521,7 @@ __asm__(".macro	parse_r var r\n\t"
->   #define LOONGARCH_CSR_GSTAT		0x50	/* Guest status */
->   #define  CSR_GSTAT_GID_SHIFT		16
->   #define  CSR_GSTAT_GID_WIDTH		8
-> +#define  CSR_GSTAT_GID_SHIFT_END	(CSR_GSTAT_GID_SHIFT + CSR_GSTAT_GID_WIDTH - 1)
->   #define  CSR_GSTAT_GID			(_ULCAST_(0xff) << CSR_GSTAT_GID_SHIFT)
->   #define  CSR_GSTAT_GIDBIT_SHIFT		4
->   #define  CSR_GSTAT_GIDBIT_WIDTH		6
-> @@ -568,6 +572,12 @@ __asm__(".macro	parse_r var r\n\t"
->   #define  CSR_GCFG_MATC_GUEST		(_ULCAST_(0x0) << CSR_GCFG_MATC_SHITF)
->   #define  CSR_GCFG_MATC_ROOT		(_ULCAST_(0x1) << CSR_GCFG_MATC_SHITF)
->   #define  CSR_GCFG_MATC_NEST		(_ULCAST_(0x2) << CSR_GCFG_MATC_SHITF)
-> +#define  CSR_GCFG_MATP_NEST_SHIFT	2
-> +#define  CSR_GCFG_MATP_NEST		(_ULCAST_(0x1) << CSR_GCFG_MATP_NEST_SHIFT)
-> +#define  CSR_GCFG_MATP_ROOT_SHIFT	1
-> +#define  CSR_GCFG_MATP_ROOT		(_ULCAST_(0x1) << CSR_GCFG_MATP_ROOT_SHIFT)
-> +#define  CSR_GCFG_MATP_GUEST_SHIFT	0
-> +#define  CSR_GCFG_MATP_GUEST		(_ULCAST_(0x1) << CSR_GCFG_MATP_GUEST_SHIFT)
+>   		data = (u32)data;
+>   		break;
+> +	case MSR_IA32_U_CET:
+> +	case MSR_IA32_S_CET:
+> +		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
+> +		    !guest_can_use(vcpu, X86_FEATURE_IBT))
+> +		    	return 1;
+> +		if (data & CET_US_RESERVED_BITS)
+> +			return 1;
+> +		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
+> +		    (data & CET_US_SHSTK_MASK_BITS))
+> +			return 1;
+> +		if (!guest_can_use(vcpu, X86_FEATURE_IBT) &&
+> +		    (data & CET_US_IBT_MASK_BITS))
+> +			return 1;
+> +		if (!IS_ALIGNED(CET_US_LEGACY_BITMAP_BASE(data), 4))
+> +			return 1;
+> +
+> +		/* IBT can be suppressed iff the TRACKER isn't WAIT_ENDR. */
+> +		if ((data & CET_SUPPRESS) && (data & CET_WAIT_ENDBR))
+> +			return 1;
+> +		break;
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> +	case MSR_KVM_GUEST_SSP:
+> +		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK))
+> +			return 1;
+> +		if (is_noncanonical_address(data, vcpu))
+> +			return 1;
+> +		if (!IS_ALIGNED(data, 4))
+> +			return 1;
+> +		break;
+>   	}
 >   
->   #define LOONGARCH_CSR_GINTC		0x52	/* Guest interrupt control */
->   #define  CSR_GINTC_HC_SHIFT		16
-> diff --git a/arch/loongarch/kvm/trace.h b/arch/loongarch/kvm/trace.h
-> new file mode 100644
-> index 000000000000..17b28d94d569
-> --- /dev/null
-> +++ b/arch/loongarch/kvm/trace.h
-> @@ -0,0 +1,168 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-> + */
-> +
-> +#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
-> +#define _TRACE_KVM_H
-> +
-> +#include <linux/tracepoint.h>
-> +#include <asm/kvm_csr.h>
-> +
-> +#undef	TRACE_SYSTEM
-> +#define TRACE_SYSTEM	kvm
-> +
-> +/*
-> + * Tracepoints for VM enters
-> + */
-> +DECLARE_EVENT_CLASS(kvm_transition,
-> +	TP_PROTO(struct kvm_vcpu *vcpu),
-> +	TP_ARGS(vcpu),
-> +	TP_STRUCT__entry(
-> +		__field(unsigned long, pc)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->pc = vcpu->arch.pc;
-> +	),
-> +
-> +	TP_printk("PC: 0x%08lx",
-> +		  __entry->pc)
-> +);
-> +
-> +DEFINE_EVENT(kvm_transition, kvm_enter,
-> +	     TP_PROTO(struct kvm_vcpu *vcpu),
-> +	     TP_ARGS(vcpu));
-> +
-> +DEFINE_EVENT(kvm_transition, kvm_reenter,
-> +	     TP_PROTO(struct kvm_vcpu *vcpu),
-> +	     TP_ARGS(vcpu));
-> +
-> +DEFINE_EVENT(kvm_transition, kvm_out,
-> +	     TP_PROTO(struct kvm_vcpu *vcpu),
-> +	     TP_ARGS(vcpu));
-> +
-> +/* Further exit reasons */
-> +#define KVM_TRACE_EXIT_IDLE		64
-> +#define KVM_TRACE_EXIT_CACHE		65
-> +#define KVM_TRACE_EXIT_SIGNAL		66
-> +
-> +/* Tracepoints for VM exits */
-> +#define kvm_trace_symbol_exit_types			\
-> +	{ KVM_TRACE_EXIT_IDLE,		"IDLE" },	\
-> +	{ KVM_TRACE_EXIT_CACHE,		"CACHE" },	\
-> +	{ KVM_TRACE_EXIT_SIGNAL,	"Signal" }
-> +
-> +TRACE_EVENT(kvm_exit_gspr,
-> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int inst_word),
-> +	    TP_ARGS(vcpu, inst_word),
-> +	    TP_STRUCT__entry(
-> +			__field(unsigned int, inst_word)
-> +	    ),
-> +
-> +	    TP_fast_assign(
-> +			__entry->inst_word = inst_word;
-> +	    ),
-> +
-> +	    TP_printk("inst word: 0x%08x",
-> +		      __entry->inst_word)
-> +);
-> +
-> +
-> +DECLARE_EVENT_CLASS(kvm_exit,
-> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
-> +	    TP_ARGS(vcpu, reason),
-> +	    TP_STRUCT__entry(
-> +			__field(unsigned long, pc)
-> +			__field(unsigned int, reason)
-> +	    ),
-> +
-> +	    TP_fast_assign(
-> +			__entry->pc = vcpu->arch.pc;
-> +			__entry->reason = reason;
-> +	    ),
-> +
-> +	    TP_printk("[%s]PC: 0x%08lx",
-> +		      __print_symbolic(__entry->reason,
-> +				       kvm_trace_symbol_exit_types),
-> +		      __entry->pc)
-> +);
-> +
-> +DEFINE_EVENT(kvm_exit, kvm_exit_idle,
-> +	     TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
-> +	     TP_ARGS(vcpu, reason));
-> +
-> +DEFINE_EVENT(kvm_exit, kvm_exit_cache,
-> +	     TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
-> +	     TP_ARGS(vcpu, reason));
-> +
-> +DEFINE_EVENT(kvm_exit, kvm_exit,
-> +	     TP_PROTO(struct kvm_vcpu *vcpu, unsigned int reason),
-> +	     TP_ARGS(vcpu, reason));
-> +
-> +#define KVM_TRACE_AUX_RESTORE		0
-> +#define KVM_TRACE_AUX_SAVE		1
-> +#define KVM_TRACE_AUX_ENABLE		2
-> +#define KVM_TRACE_AUX_DISABLE		3
-> +#define KVM_TRACE_AUX_DISCARD		4
-> +
-> +#define KVM_TRACE_AUX_FPU		1
-> +
-> +#define kvm_trace_symbol_aux_op				\
-> +	{ KVM_TRACE_AUX_RESTORE,	"restore" },	\
-> +	{ KVM_TRACE_AUX_SAVE,		"save" },	\
-> +	{ KVM_TRACE_AUX_ENABLE,		"enable" },	\
-> +	{ KVM_TRACE_AUX_DISABLE,	"disable" },	\
-> +	{ KVM_TRACE_AUX_DISCARD,	"discard" }
-> +
-> +#define kvm_trace_symbol_aux_state			\
-> +	{ KVM_TRACE_AUX_FPU,     "FPU" }
-> +
-> +TRACE_EVENT(kvm_aux,
-> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned int op,
-> +		     unsigned int state),
-> +	    TP_ARGS(vcpu, op, state),
-> +	    TP_STRUCT__entry(
-> +			__field(unsigned long, pc)
-> +			__field(u8, op)
-> +			__field(u8, state)
-> +	    ),
-> +
-> +	    TP_fast_assign(
-> +			__entry->pc = vcpu->arch.pc;
-> +			__entry->op = op;
-> +			__entry->state = state;
-> +	    ),
-> +
-> +	    TP_printk("%s %s PC: 0x%08lx",
-> +		      __print_symbolic(__entry->op,
-> +				       kvm_trace_symbol_aux_op),
-> +		      __print_symbolic(__entry->state,
-> +				       kvm_trace_symbol_aux_state),
-> +		      __entry->pc)
-> +);
-> +
-> +TRACE_EVENT(kvm_vpid_change,
-> +	    TP_PROTO(struct kvm_vcpu *vcpu, unsigned long vpid),
-> +	    TP_ARGS(vcpu, vpid),
-> +	    TP_STRUCT__entry(
-> +			__field(unsigned long, vpid)
-> +	    ),
-> +
-> +	    TP_fast_assign(
-> +			__entry->vpid = vpid;
-> +	    ),
-> +
-> +	    TP_printk("vpid: 0x%08lx",
-> +		      __entry->vpid)
-> +);
-> +
-> +#endif /* _TRACE_LOONGARCH64_KVM_H */
-> +
-> +#undef TRACE_INCLUDE_PATH
-> +#define TRACE_INCLUDE_PATH ../../arch/loongarch/kvm
-> +#undef TRACE_INCLUDE_FILE
-> +#define TRACE_INCLUDE_FILE trace
-> +
-> +/* This part must be outside protection */
-> +#include <trace/define_trace.h>
+>   	msr.data = data;
+> @@ -1940,6 +1974,17 @@ static int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
+>   		    !guest_cpuid_has(vcpu, X86_FEATURE_RDPID))
+>   			return 1;
+>   		break;
+> +	case MSR_IA32_U_CET:
+> +	case MSR_IA32_S_CET:
+> +		if (!guest_can_use(vcpu, X86_FEATURE_IBT) &&
+> +		    !guest_can_use(vcpu, X86_FEATURE_SHSTK))
+> +			return 1;
+> +		break;
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> +	case MSR_KVM_GUEST_SSP:
+> +		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK))
+> +			return 1;
+> +		break;
+>   	}
+>   
+>   	msr.index = index;
+> @@ -3640,47 +3685,6 @@ static bool kvm_is_msr_to_save(u32 msr_index)
+>   	return false;
+>   }
+>   
+> -static inline bool is_shadow_stack_msr(u32 msr)
+> -{
+> -	return msr == MSR_IA32_PL0_SSP ||
+> -		msr == MSR_IA32_PL1_SSP ||
+> -		msr == MSR_IA32_PL2_SSP ||
+> -		msr == MSR_IA32_PL3_SSP ||
+> -		msr == MSR_IA32_INT_SSP_TAB ||
+> -		msr == MSR_KVM_GUEST_SSP;
+> -}
+> -
+> -static bool kvm_cet_is_msr_accessible(struct kvm_vcpu *vcpu,
+> -				      struct msr_data *msr)
+> -{
+> -	if (is_shadow_stack_msr(msr->index)) {
+> -		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
+> -			return false;
+> -
+> -		/*
+> -		 * This MSR is synthesized mainly for userspace access during
+> -		 * Live Migration, it also can be accessed in SMM mode by VMM.
+> -		 * Guest is not allowed to access this MSR.
+> -		 */
+> -		if (msr->index == MSR_KVM_GUEST_SSP) {
+> -			if (IS_ENABLED(CONFIG_X86_64) && is_smm(vcpu))
+> -				return true;
+> -
+> -			return msr->host_initiated;
+> -		}
+> -
+> -		return msr->host_initiated ||
+> -			guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> -	}
+> -
+> -	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> -	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> -		return false;
+> -
+> -	return msr->host_initiated ||
+> -		guest_cpuid_has(vcpu, X86_FEATURE_IBT) ||
+> -		guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+> -}
+>   
+>   int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   {
+> @@ -4036,46 +4040,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		vcpu->arch.guest_fpu.xfd_err = data;
+>   		break;
+>   #endif
+> -#define CET_EXCLUSIVE_BITS		(CET_SUPPRESS | CET_WAIT_ENDBR)
+> -#define CET_CTRL_RESERVED_BITS		GENMASK(9, 6)
+> -#define CET_SHSTK_MASK_BITS		GENMASK(1, 0)
+> -#define CET_IBT_MASK_BITS		(GENMASK_ULL(5, 2) | \
+> -					 GENMASK_ULL(63, 10))
+> -#define CET_LEG_BITMAP_BASE(data)	((data) >> 12)
+>   	case MSR_IA32_U_CET:
+> -	case MSR_IA32_S_CET:
+> -		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+> -			return 1;
+> -		if (!!(data & CET_CTRL_RESERVED_BITS))
+> -			return 1;
+> -		if (!guest_can_use(vcpu, X86_FEATURE_SHSTK) &&
+> -		    (data & CET_SHSTK_MASK_BITS))
+> -			return 1;
+> -		if (!guest_can_use(vcpu, X86_FEATURE_IBT) &&
+> -		    (data & CET_IBT_MASK_BITS))
+> -			return 1;
+> -		if (!IS_ALIGNED(CET_LEG_BITMAP_BASE(data), 4) ||
+> -		    (data & CET_EXCLUSIVE_BITS) == CET_EXCLUSIVE_BITS)
+> -			return 1;
+> -		if (msr == MSR_IA32_U_CET)
+> -			kvm_set_xsave_msr(msr_info);
+> -		break;
+> -	case MSR_KVM_GUEST_SSP:
+> -	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> -		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+> -			return 1;
+> -		if (is_noncanonical_address(data, vcpu))
+> -			return 1;
+> -		if (!IS_ALIGNED(data, 4))
+> -			return 1;
+> -		if (msr == MSR_IA32_PL0_SSP || msr == MSR_IA32_PL1_SSP ||
+> -		    msr == MSR_IA32_PL2_SSP) {
+> -			vcpu->arch.cet_s_ssp[msr - MSR_IA32_PL0_SSP] = data;
+> -			if (!vcpu->arch.cet_sss_active && data)
+> -				vcpu->arch.cet_sss_active = true;
+> -		} else if (msr == MSR_IA32_PL3_SSP) {
+> -			kvm_set_xsave_msr(msr_info);
+> -		}
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +		kvm_set_xsave_msr(msr_info);
+>   		break;
+>   	default:
+>   		if (kvm_pmu_is_valid_msr(vcpu, msr))
+> @@ -4436,17 +4403,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		break;
+>   #endif
+>   	case MSR_IA32_U_CET:
+> -	case MSR_IA32_S_CET:
+> -	case MSR_KVM_GUEST_SSP:
+> -	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> -		if (!kvm_cet_is_msr_accessible(vcpu, msr_info))
+> -			return 1;
+> -		if (msr == MSR_IA32_PL0_SSP || msr == MSR_IA32_PL1_SSP ||
+> -		    msr == MSR_IA32_PL2_SSP) {
+> -			msr_info->data = vcpu->arch.cet_s_ssp[msr - MSR_IA32_PL0_SSP];
+> -		} else if (msr == MSR_IA32_U_CET || msr == MSR_IA32_PL3_SSP) {
+> -			kvm_get_xsave_msr(msr_info);
+> -		}
+> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> +		kvm_get_xsave_msr(msr_info);
+>   		break;
+>   	default:
+>   		if (kvm_pmu_is_valid_msr(vcpu, msr))
+> @@ -7330,9 +7288,13 @@ static void kvm_probe_msr_to_save(u32 msr_index)
+>   		break;
+>   	case MSR_IA32_U_CET:
+>   	case MSR_IA32_S_CET:
+> +		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> +		    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> +			return;
+> +		break;
+>   	case MSR_KVM_GUEST_SSP:
+>   	case MSR_IA32_PL0_SSP ... MSR_IA32_INT_SSP_TAB:
+> -		if (!kvm_is_cet_supported())
+> +		if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK))
+>   			return;
+>   		break;
+>   	default:
+> @@ -9664,13 +9626,8 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>   		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
+>   	}
+>   	if (boot_cpu_has(X86_FEATURE_XSAVES)) {
+> -		u32 eax, ebx, ecx, edx;
+> -
+> -		cpuid_count(0xd, 1, &eax, &ebx, &ecx, &edx);
+>   		rdmsrl(MSR_IA32_XSS, host_xss);
+>   		kvm_caps.supported_xss = host_xss & KVM_SUPPORTED_XSS;
+> -		if (ecx & XFEATURE_MASK_CET_KERNEL)
+> -			kvm_caps.supported_xss |= XFEATURE_MASK_CET_KERNEL;
+>   	}
+>   
+>   	rdmsrl_safe(MSR_EFER, &host_efer);
+>
+> base-commit: efb9177acd7a4df5883b844e1ec9c69ef0899c9c
+The code looks good to me except the handling of MSR_KVM_GUEST_SSP,
+non-host-initiated read/write should be prevented.
+
