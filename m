@@ -2,52 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 995CD77245E
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 14:41:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06EB3772539
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 15:15:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231625AbjHGMlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 08:41:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
+        id S231376AbjHGNPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 09:15:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230175AbjHGMlF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 08:41:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 753BF170B
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 05:40:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 544CD619C4
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 12:40:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA53EC433C7;
-        Mon,  7 Aug 2023 12:40:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691412044;
-        bh=RsAY8F/KSwqORT8NHwkg0CSFj0ZY5rAKG23RDmdDLzY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=jRd9+oTOceOVTrrj62l+cpv5OGndVY4+EeBfYYSdMf9yzbc/uK8Q/roDA+nktJT99
-         dFwkYbhHozVgsGwjuWpz0kG70pKRv6zo4kYDNpuHOB+ZSRdEdr99jayUz0pcKXWrVq
-         MtiGqtNAN/pxxqh0+ya7/Wcv6uSZIaLgboracqBonKUTOYbsQZA/6VaxH0kqUHTAbm
-         OvnVvErTUwOg8kPIr0yL6kLrhfwKRN9hCBXPvWfRg8eDIzn71f3I8WvwxiQR+meLT6
-         f1OV1Dy7ivYWD3+aM8lj+cHomUmj2jqghsvcM5mQsazmYc63H5gsYDsb0/EFpS1uvD
-         /Z+iiVREW9bYQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qSzXO-002pS2-5r;
-        Mon, 07 Aug 2023 13:40:42 +0100
-Date:   Mon, 07 Aug 2023 13:40:34 +0100
-Message-ID: <868ran58l9.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Miguel Luis <miguel.luis@oracle.com>
-Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
+        with ESMTP id S229820AbjHGNPC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 09:15:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796B7B3
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 06:14:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691414053;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dv2Nfm9aNkY4uLvGrSmBJ4eTnNJ17/ZlzGmDOwKHMUQ=;
+        b=fQfmh3jcFsi4LfWpQp+R2TB+TxIksHnsT93bWP0HMMlAXB4CaYuPft1U1BFyluWedqAwTC
+        SsjTSIwCJJY4jTZTmpWAaWk68cQSyrbVoHUYxhIYyJRHhned/SbNwzQB5QaVv+NmfTkW8r
+        UE4npVIi1tPPYzv1e2NO4osdVvPsb5I=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-399-9mu73-TCNO-BOKuv4ZpldQ-1; Mon, 07 Aug 2023 09:14:12 -0400
+X-MC-Unique: 9mu73-TCNO-BOKuv4ZpldQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b9fa64dba8so42632851fa.0
+        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 06:14:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691414051; x=1692018851;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dv2Nfm9aNkY4uLvGrSmBJ4eTnNJ17/ZlzGmDOwKHMUQ=;
+        b=Uy+jMQ7cRdkrMa94/nvCn6fVG60XVfbBv9fZxhSLreJhuoS1V5CoXn76ThZAzLOaoE
+         UySDY1VcayjFP4SfN+wFPJ8Ktjs0tUQlvPZZmQxmR8gaf7HoXnSSCA70nZjYeHN5xnjY
+         i7fjGt7Mblgh5aLoLb0C1SsOi0ioh+d2HWAKRhgsdC0w61P0g9w0ZWcxuAjj4OSSEEvv
+         52+k3QJm2jbDD4IdYDA8iqxl0SRkQ3TjMKO4UMUXsIOUXgJr/8OkVb7RF2uSwsjRBmFK
+         KOPyBG7zpLx5396sVTcjkB/dpFA+9r+DPWS8Yihlr9fZZXhY44MSO0MxvoUPVXEDEFbX
+         gJxA==
+X-Gm-Message-State: AOJu0YxqzmZdgCmSHcWgfjoyi8W/k1Eh4zcZUDi2szdphft3hdEEPCBM
+        PLmH2fCdVqLHWWK72sbuZwDhEMrEW+qbRLnB4f+OuCKurtYfdWkrSKjfsqWZmUhwIVy+0rxGllQ
+        vJP9rj3qhgEq4
+X-Received: by 2002:a05:651c:14c:b0:2b9:e053:7a07 with SMTP id c12-20020a05651c014c00b002b9e0537a07mr5981102ljd.45.1691414050936;
+        Mon, 07 Aug 2023 06:14:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEt6kv6AQv90Pg+ohq034x/nkNV4LHFX3zG/F2vylittWcIpLWvLnLIqFpeWbVeNgH/keCt6Q==
+X-Received: by 2002:a05:651c:14c:b0:2b9:e053:7a07 with SMTP id c12-20020a05651c014c00b002b9e0537a07mr5981077ljd.45.1691414050581;
+        Mon, 07 Aug 2023 06:14:10 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 23-20020a05600c229700b003fbdd5d0758sm10742100wmf.22.2023.08.07.06.14.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Aug 2023 06:14:09 -0700 (PDT)
+Message-ID: <d7a3e173-f66c-8885-9550-8d0d9768111f@redhat.com>
+Date:   Mon, 7 Aug 2023 15:14:07 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2 19/26] KVM: arm64: nv: Add trap forwarding for
+ HFGxTR_EL2
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Mark Brown <broonie@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         Will Deacon <will@kernel.org>,
@@ -56,132 +77,222 @@ Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
         Chase Conklin <chase.conklin@arm.com>,
         Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
         Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 06/26] arm64: Add debug registers affected by HDFGxTR_EL2
-In-Reply-To: <C4009786-DAF1-4BB7-8DF1-B249205B7F9A@oracle.com>
 References: <20230728082952.959212-1-maz@kernel.org>
-        <20230728082952.959212-7-maz@kernel.org>
-        <61B845D3-A42B-451F-B74D-51B4A1FD28C6@oracle.com>
-        <86leet5o20.wl-maz@kernel.org>
-        <C4009786-DAF1-4BB7-8DF1-B249205B7F9A@oracle.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+ <20230728082952.959212-20-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230728082952.959212-20-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 03 Aug 2023 01:00:52 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
->=20
-> Hi Marc,
->=20
-> > On 2 Aug 2023, at 17:52, Marc Zyngier <maz@kernel.org> wrote:
-> >=20
-> > On Mon, 31 Jul 2023 17:41:41 +0100,
-> > Miguel Luis <miguel.luis@oracle.com> wrote:
-> >>=20
-> >> Hi Marc,
-> >>=20
-> >> A few comments on this one, please see below.
-> >>=20
-> >>> On 28 Jul 2023, at 08:29, Marc Zyngier <maz@kernel.org> wrote:
-> >>>=20
-> >>> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
-> >>> related registers. Add their encodings (and only that, because
-> >>> we really don't care about what these registers actually do at
-> >>> this stage).
-> >>>=20
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> ---
-> >>> arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
-> >>> 1 file changed, 78 insertions(+)
-> >>>=20
-> >>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm=
-/sysreg.h
-> >>> index 76289339b43b..9dfd127be55a 100644
-> >>> --- a/arch/arm64/include/asm/sysreg.h
-> >>> +++ b/arch/arm64/include/asm/sysreg.h
-> >>> @@ -194,6 +194,84 @@
-> >>> #define SYS_DBGDTRTX_EL0 sys_reg(2, 3, 0, 5, 0)
-> >>> #define SYS_DBGVCR32_EL2 sys_reg(2, 4, 0, 7, 0)
-> >>>=20
-> >>> +#define SYS_BRBINF_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
-) | 0))
-> >>> +#define SYS_BRBINFINJ_EL1 sys_reg(2, 1, 9, 1, 0)
-> >>> +#define SYS_BRBSRC_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
-) | 1))
-> >>> +#define SYS_BRBSRCINJ_EL1 sys_reg(2, 1, 9, 1, 1)
-> >>> +#define SYS_BRBTGT_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
-) | 2))
-> >>> +#define SYS_BRBTGTINJ_EL1 sys_reg(2, 1, 9, 1, 2)
-> >>> +#define SYS_BRBTS_EL1 sys_reg(2, 1, 9, 0, 2)
-> >>> +
-> >>> +#define SYS_BRBCR_EL1 sys_reg(2, 1, 9, 0, 0)
-> >>> +#define SYS_BRBFCR_EL1 sys_reg(2, 1, 9, 0, 1)
-> >>> +#define SYS_BRBIDR0_EL1 sys_reg(2, 1, 9, 2, 0)
-> >>> +
-> >>> +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
-> >>> +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
-> >>=20
-> >> SYS_TRCITECR_EL1 shows up twice.
-> >=20
-> > Ah, nice one. Too many registers.
-> >=20
-> >>=20
-> >>> +#define SYS_TRCACATR(m) sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> =
-3)))
-> >>=20
-> >> Besides m=E2=80=99s restrictions it could be sanitised in op2 to consi=
-der only bit m[3].
-> >> Suggestion for op2: (2 | ((m & 8) >> 3)))
-> >=20
-> > It is fully expected that 'm' will be in the 0-15 range, as per the
-> > architecture (D19.4.8), and the tables only use that exact range.
-> >=20
-> > Do you see an actual bug, or is this defensive programming?
-> >=20
->=20
-> I was seeing a problem when m[5]=3D1 then Op2 of 0b01:m[3] isn=E2=80=99t =
-guaranteed
-> anymore overridden with 0b11:m[3].
+Hi Marc,
 
-But that'd be wrong anyway. Now, we'd have an encoding that possibly
-aliases to something else, and we don't know about it.
+On 7/28/23 10:29, Marc Zyngier wrote:
+> Fine Grained Traps are fun. Not.
+>
+> Implement the trap forwarding for traps describer by HFGxTR_EL2,
+described
+> reusing the Coarse Grained Traps infrastructure previously implemented.
+>
+> Each sysreg/instruction inserted in the xarray gets a FGT group
+> (vaguely equivalent to a register number), a bit number in that register,
+> and a polarity.
+>
+> It is then pretty easy to check the FGT state at handling time, just
+> like we do for the coarse version (it is just faster).
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/emulate-nested.c | 133 +++++++++++++++++++++++++++++++-
+>  1 file changed, 132 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 74b67895c791..5f4cf824eadc 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -922,6 +922,88 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+>  
+>  static DEFINE_XARRAY(sr_forward_xa);
+>  
+> +enum fgt_group_id {
+> +	__NO_FGT_GROUP__,
+> +	HFGxTR_GROUP,
+> +};
+> +
+> +#define SR_FGT(sr, g, b, p)					\
+> +	{							\
+> +		.encoding	= sr,				\
+> +		.end		= sr,				\
+> +		.tc		= {				\
+> +			.fgt = g ## _GROUP,			\
+> +			.bit = g ## _EL2_ ## b ## _SHIFT,	\
+> +			.pol = p,				\
+> +		},						\
+> +	}
+> +
+> +static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+> +	/* HFGTR_EL2, HFGWTR_EL2 */
+HFGRTR_EL2
+> +	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
+> +	SR_FGT(SYS_SMPRI_EL1,		HFGxTR, nSMPRI_EL1, 0),
+> +	SR_FGT(SYS_ACCDATA_EL1,		HFGxTR, nACCDATA_EL1, 0),
+> +	SR_FGT(SYS_ERXADDR_EL1,		HFGxTR, ERXADDR_EL1, 1),
+> +	SR_FGT(SYS_ERXPFGCDN_EL1,	HFGxTR, ERXPFGCDN_EL1, 1),
+> +	SR_FGT(SYS_ERXPFGCTL_EL1,	HFGxTR, ERXPFGCTL_EL1, 1),
+> +	SR_FGT(SYS_ERXPFGF_EL1,		HFGxTR, ERXPFGF_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC0_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC1_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC2_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXMISC3_EL1,	HFGxTR, ERXMISCn_EL1, 1),
+> +	SR_FGT(SYS_ERXSTATUS_EL1,	HFGxTR, ERXSTATUS_EL1, 1),
+> +	SR_FGT(SYS_ERXCTLR_EL1,		HFGxTR, ERXCTLR_EL1, 1),
+> +	SR_FGT(SYS_ERXFR_EL1,		HFGxTR, ERXFR_EL1, 1),
+> +	SR_FGT(SYS_ERRSELR_EL1,		HFGxTR, ERRSELR_EL1, 1),
+> +	SR_FGT(SYS_ERRIDR_EL1,		HFGxTR, ERRIDR_EL1, 1),
+> +	SR_FGT(SYS_ICC_IGRPEN0_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
+> +	SR_FGT(SYS_ICC_IGRPEN1_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
+> +	SR_FGT(SYS_VBAR_EL1,		HFGxTR, VBAR_EL1, 1),
+> +	SR_FGT(SYS_TTBR1_EL1,		HFGxTR, TTBR1_EL1, 1),
+> +	SR_FGT(SYS_TTBR0_EL1,		HFGxTR, TTBR0_EL1, 1),
+> +	SR_FGT(SYS_TPIDR_EL0,		HFGxTR, TPIDR_EL0, 1),
+> +	SR_FGT(SYS_TPIDRRO_EL0,		HFGxTR, TPIDRRO_EL0, 1),
+> +	SR_FGT(SYS_TPIDR_EL1,		HFGxTR, TPIDR_EL1, 1),
+> +	SR_FGT(SYS_TCR_EL1,		HFGxTR, TCR_EL1, 1),
+> +	SR_FGT(SYS_SCXTNUM_EL0,		HFGxTR, SCXTNUM_EL0, 1),
+> +	SR_FGT(SYS_SCXTNUM_EL1, 	HFGxTR, SCXTNUM_EL1, 1),
+> +	SR_FGT(SYS_SCTLR_EL1, 		HFGxTR, SCTLR_EL1, 1),
+> +	SR_FGT(SYS_REVIDR_EL1, 		HFGxTR, REVIDR_EL1, 1),
+> +	SR_FGT(SYS_PAR_EL1, 		HFGxTR, PAR_EL1, 1),
+> +	SR_FGT(SYS_MPIDR_EL1, 		HFGxTR, MPIDR_EL1, 1),
+> +	SR_FGT(SYS_MIDR_EL1, 		HFGxTR, MIDR_EL1, 1),
+> +	SR_FGT(SYS_MAIR_EL1, 		HFGxTR, MAIR_EL1, 1),
+> +	SR_FGT(SYS_LORSA_EL1, 		HFGxTR, LORSA_EL1, 1),
+> +	SR_FGT(SYS_LORN_EL1, 		HFGxTR, LORN_EL1, 1),
+> +	SR_FGT(SYS_LORID_EL1, 		HFGxTR, LORID_EL1, 1),
+> +	SR_FGT(SYS_LOREA_EL1, 		HFGxTR, LOREA_EL1, 1),
+> +	SR_FGT(SYS_LORC_EL1, 		HFGxTR, LORC_EL1, 1),
+> +	SR_FGT(SYS_ISR_EL1, 		HFGxTR, ISR_EL1, 1),
+> +	SR_FGT(SYS_FAR_EL1, 		HFGxTR, FAR_EL1, 1),
+> +	SR_FGT(SYS_ESR_EL1, 		HFGxTR, ESR_EL1, 1),
+> +	SR_FGT(SYS_DCZID_EL0, 		HFGxTR, DCZID_EL0, 1),
+> +	SR_FGT(SYS_CTR_EL0, 		HFGxTR, CTR_EL0, 1),
+> +	SR_FGT(SYS_CSSELR_EL1, 		HFGxTR, CSSELR_EL1, 1),
+> +	SR_FGT(SYS_CPACR_EL1, 		HFGxTR, CPACR_EL1, 1),
+> +	SR_FGT(SYS_CONTEXTIDR_EL1, 	HFGxTR, CONTEXTIDR_EL1, 1),
+> +	SR_FGT(SYS_CLIDR_EL1, 		HFGxTR, CLIDR_EL1, 1),
+> +	SR_FGT(SYS_CCSIDR_EL1, 		HFGxTR, CCSIDR_EL1, 1),
+> +	SR_FGT(SYS_APIBKEYLO_EL1, 	HFGxTR, APIBKey, 1),
+> +	SR_FGT(SYS_APIBKEYHI_EL1, 	HFGxTR, APIBKey, 1),
+> +	SR_FGT(SYS_APIAKEYLO_EL1, 	HFGxTR, APIAKey, 1),
+> +	SR_FGT(SYS_APIAKEYHI_EL1, 	HFGxTR, APIAKey, 1),
+> +	SR_FGT(SYS_APGAKEYLO_EL1, 	HFGxTR, APGAKey, 1),
+> +	SR_FGT(SYS_APGAKEYHI_EL1, 	HFGxTR, APGAKey, 1),
+> +	SR_FGT(SYS_APDBKEYLO_EL1, 	HFGxTR, APDBKey, 1),
+> +	SR_FGT(SYS_APDBKEYHI_EL1, 	HFGxTR, APDBKey, 1),
+> +	SR_FGT(SYS_APDAKEYLO_EL1, 	HFGxTR, APDAKey, 1),
+> +	SR_FGT(SYS_APDAKEYHI_EL1, 	HFGxTR, APDAKey, 1),
+> +	SR_FGT(SYS_AMAIR_EL1, 		HFGxTR, AMAIR_EL1, 1),
+> +	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
+> +	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
+> +	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
+> +};
+> +
+>  static union trap_config get_trap_config(u32 sysreg)
+>  {
+>  	return (union trap_config) {
+> @@ -943,6 +1025,27 @@ void __init populate_nv_trap_config(void)
+>  	kvm_info("nv: %ld coarse grained trap handlers\n",
+>  		 ARRAY_SIZE(encoding_to_cgt));
+>  
+> +	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+> +		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
+> +		union trap_config tc;
+> +
+> +		tc = get_trap_config(fgt->encoding);
+> +
+> +		WARN(tc.fgt,
+> +		     "Duplicate FGT for sys_reg(%d, %d, %d, %d, %d)\n",
+> +		     sys_reg_Op0(fgt->encoding),
+> +		     sys_reg_Op1(fgt->encoding),
+> +		     sys_reg_CRn(fgt->encoding),
+> +		     sys_reg_CRm(fgt->encoding),
+> +		     sys_reg_Op2(fgt->encoding));
+> +
+> +		tc.val |= fgt->tc.val;
+> +		xa_store(&sr_forward_xa, fgt->encoding,
+> +			 xa_mk_value(tc.val), GFP_KERNEL);
+> +	}
+> +
+> +	kvm_info("nv: %ld fine grained trap handlers\n",
+> +		 ARRAY_SIZE(encoding_to_fgt));
+>  }
+>  
+>  static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+> @@ -992,13 +1095,26 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+>  	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
+>  }
+>  
+> +static bool check_fgt_bit(u64 val, const union trap_config tc)
+> +{
+> +	return ((val >> tc.bit) & 1) == tc.pol;
+> +}
+> +
+> +#define sanitised_sys_reg(vcpu, reg)			\
+> +	({						\
+> +		u64 __val;				\
+> +		__val = __vcpu_sys_reg(vcpu, reg);	\
+> +		__val &= ~__ ## reg ## _RES0;		\
+> +		(__val);				\
+> +	})
+> +
+>  bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  {
+>  	union trap_config tc;
+>  	enum trap_behaviour b;
+>  	bool is_read;
+>  	u32 sysreg;
+> -	u64 esr;
+> +	u64 esr, val;
+>  
+>  	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+>  		return false;
+> @@ -1009,6 +1125,21 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  
+>  	tc = get_trap_config(sysreg);
+>  
+> +	switch ((enum fgt_group_id)tc.fgt) {
+> +	case __NO_FGT_GROUP__:
+> +		break;
+> +
+> +	case HFGxTR_GROUP:
+> +		if (is_read)
+> +			val = sanitised_sys_reg(vcpu, HFGRTR_EL2);
+> +		else
+> +			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
+> +		break;
+> +	}
+> +
+> +	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
+> +		goto inject;
+> +
+>  	b = compute_trap_behaviour(vcpu, tc);
+>  
+>  	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
+With Oliver's comments
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-> Clearly =E2=80=98m=E2=80=99 would be outside the range but not messing wi=
-th Op2 fixed bits 0b01.
-> Not a problem for patch 21 though.
+Eric
 
-All these macros have as the basis for their use that you use *valid*
-input.
-
-> Due to the uncertainty if this can bite later, hence the suggestion and a=
-lso
-> open to advices.
-
-If you really want some defensive programming on that front, then you
-should make sure we detect the issue at compile time, rather than
-silently changing the encoding.
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
