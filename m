@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DF99773333
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 01:01:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91EF7773334
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 01:01:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbjHGXBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 19:01:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40332 "EHLO
+        id S230369AbjHGXBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 19:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbjHGXBc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 19:01:32 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23FD110F1
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 16:01:31 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5896bdb0b18so9022107b3.1
-        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 16:01:31 -0700 (PDT)
+        with ESMTP id S230053AbjHGXBf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 19:01:35 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C04C610F4
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 16:01:32 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d4ca2881833so2644353276.3
+        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 16:01:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691449290; x=1692054090;
+        d=google.com; s=20221208; t=1691449292; x=1692054092;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bl1TLMRbvm5qHwbmYRTb4VdYc7Xj9ZoiU46WkqVPij4=;
-        b=2BOtUuEUFEIj9skMvKxqhTWLGWm0zT85W9Ihp2s4CpbxeUR5ws+01RJ+HQ+yYQxSKj
-         woBvSb4Gk9IPbajI2xb83HAVL2vNi6DqnESZhzmotF6Ol6W/EJeSILA9FOeYje4rZmlQ
-         jwLqD4etekit8dCQHL06GwEffA8P+bK2BwprQsLD6vr9T5p2VjUY/rSCPLXKN8pg0X2n
-         lqCQCQsl6ilU2YFEKJfBss9T/uJCTM8wKKp4u8S1wqiZfR4YgIj+8oKUyz68tt/c7dCt
-         50DX3ArGIPxPQ5orgu4PasB4iVOVKIP4vUILDfnEp1whQTtvB9OscnFZjDC5X2wkcQqB
-         1e7A==
+        bh=5cvBt015EcTFztTll0vjYcigrW3DKQzPiIwftCLBNbM=;
+        b=4OG8fBnSqfhUNNOlfnfz98xpsIB7sZynFZMU9BXRZDeo8igEknP1RefaC4s7LZNeCf
+         qpPMus4Yv/693O6vUY7liG7wBhF61GbZ8Gu50050qv8TPVkOR1TRkquqD7DNpNJoljU+
+         9tVv8DfberuiWwZgc+Mhd2FTDtLVWo5AeWlfuEs7knlnoTv4Cr2Q+2WQS9QdlWEc5HtG
+         kYvhjSIf7NxYeJmrftUnpUB4FM2sjylnNKHyYe0/15Ub5mzT68NKrfIaUv/flzcCe0Hd
+         gm1FMmNrSAwZad9C6TB9Ffn68907ViOZrpQdw/VIsQ0pd9YLYsuh0Byhq7ugSxaq5/E5
+         9FKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691449290; x=1692054090;
+        d=1e100.net; s=20221208; t=1691449292; x=1692054092;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bl1TLMRbvm5qHwbmYRTb4VdYc7Xj9ZoiU46WkqVPij4=;
-        b=lZs5jOoGtqY9PE8UD1vH+f6ybw61JezdQCOZKBMZXU7jqai9TmMaFbhSVVX1xF3xyE
-         W4TIRDnEbjEyTL8EWK2HDCCvCpDsrdMMLx0cJKzaZDHeGrNoazhyphkfH3xhx5dn+cRh
-         Yxb7Lu1wT8MVL7CGROh/yXhFd0th3JysVX4/tUx52Qi2X+TjzYMiP0x7DkMzykWY/H6a
-         O6oQ78gNBrac98kmsmdTsg//WysJ0k2A+zLd3EVxDvoig0+VHuMrJJ2KdNkfjEG8tAFj
-         2GaaVyK3cwxkfyQJa7/7+ikM49Bu4TbUclnZepZw4Tn5XjOz//TSFCsjqffpBGaCRHTM
-         oWfQ==
-X-Gm-Message-State: AOJu0YypFH7syolYkpMF3tFlmx0UsDoTvqPra/og8+ZCQ+xSelWoKg6H
-        tB7e9ISgb6bHnx/NVHWVH/vdHh9/9Xs4Ec9DtQ==
-X-Google-Smtp-Source: AGHT+IFL47JJrdOOCTSSCqmQW4kyE1p9SLbuAhrBqFamUwBb9QpVhVP6lKw0HpbJOyLQyDEH0YWD7t8AgUzH5zj9ig==
+        bh=5cvBt015EcTFztTll0vjYcigrW3DKQzPiIwftCLBNbM=;
+        b=gdVgIpx1rlkNrlf6VczwdsMPXH9YljDu656wXCNWDsDFCsbauHs6LnFsX2k92i1lAW
+         W3qkh99mzmIuZgxAY2rQr/utdvVGVOyBmD/tsJHjZ3cEDzceLo22MfxW0+FyKxIJ9lU9
+         c6zt8pwkDjxEalArJe/9l5NfF7wpOCADDZTKmWktbkmrVZhzcH+UjrJBGJ+j/D89iMZ+
+         o5mbdtU/OqBu9O4zjIA8PhFHFBngREUCDn7PSQtbtjqZXFN9FP9bCv/kdAu/oVJYY6MW
+         N65fVsHRLapVGYuC31C3PTG4hos7rLrsJUIhbZP+f1ugGFvcKJ+48sHIwx4zph03m1wq
+         AFaQ==
+X-Gm-Message-State: AOJu0Ywu5kCpM2Z93HIvvOZvDfseMaaFc7HA78G/WO7sCy0UlarYsIkQ
+        FFjmEVI5sXqQmJsb/+Eew/SR/OrV7K9BNNa/JQ==
+X-Google-Smtp-Source: AGHT+IGdw3ugUEUdCbd6fq8R3RilcWFcQ1uc3EKy8wFjzIC2OfpZfHcOLTYB9nd+UNWfigkUWKaPVAQg8LLScvzD2Q==
 X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a05:690c:c05:b0:576:e268:903d with
- SMTP id cl5-20020a05690c0c0500b00576e268903dmr109985ywb.2.1691449290326; Mon,
- 07 Aug 2023 16:01:30 -0700 (PDT)
-Date:   Mon,  7 Aug 2023 23:01:04 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a25:e6d3:0:b0:d10:5b67:843c with SMTP
+ id d202-20020a25e6d3000000b00d105b67843cmr59428ybh.4.1691449291933; Mon, 07
+ Aug 2023 16:01:31 -0700 (PDT)
+Date:   Mon,  7 Aug 2023 23:01:05 +0000
 In-Reply-To: <cover.1691446946.git.ackerleytng@google.com>
 Mime-Version: 1.0
 References: <cover.1691446946.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <21569429bcd8be29f1719649aae0067a00172b66.1691446946.git.ackerleytng@google.com>
-Subject: [RFC PATCH 01/11] KVM: guest_mem: Refactor out kvm_gmem_alloc_file()
+Message-ID: <053b45023744f62bd97cd4f87f048ab514f42b9d.1691446946.git.ackerleytng@google.com>
+Subject: [RFC PATCH 02/11] KVM: guest_mem: Add ioctl KVM_LINK_GUEST_MEMFD
 From:   Ackerley Tng <ackerleytng@google.com>
 To:     pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de,
         x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -69,106 +69,171 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_gmem_alloc_file() will allocate and build a file out of an inode.
-
-Will be reused later by __kvm_gmem_link()
+KVM_LINK_GUEST_MEMFD will link a gmem fd's underlying inode to a new
+file (and fd).
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- virt/kvm/guest_mem.c | 53 ++++++++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 21 deletions(-)
+ include/uapi/linux/kvm.h |  8 +++++
+ virt/kvm/guest_mem.c     | 73 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c      | 10 ++++++
+ virt/kvm/kvm_mm.h        |  7 ++++
+ 4 files changed, 98 insertions(+)
 
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index 3a3e38151b45..30d0ab8745ee 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -365,12 +365,42 @@ static const struct inode_operations kvm_gmem_iops = {
- 	.setattr	= kvm_gmem_setattr,
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index eb900344a054..d0e2a2ce0df2 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -2299,4 +2299,12 @@ struct kvm_create_guest_memfd {
+ 	__u64 reserved[6];
  };
  
-+static struct file *kvm_gmem_alloc_file(struct kvm *kvm, struct inode *inode,
-+					struct vfsmount *mnt)
++#define KVM_LINK_GUEST_MEMFD	_IOWR(KVMIO,  0xd5, struct kvm_link_guest_memfd)
++
++struct kvm_link_guest_memfd {
++	__u64 fd;
++	__u64 flags;
++	__u64 reserved[6];
++};
++
+ #endif /* __LINUX_KVM_H */
+diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
+index 30d0ab8745ee..1b3df273f785 100644
+--- a/virt/kvm/guest_mem.c
++++ b/virt/kvm/guest_mem.c
+@@ -477,6 +477,79 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
+ 	return __kvm_gmem_create(kvm, size, flags, kvm_gmem_mnt);
+ }
+ 
++static inline void __kvm_gmem_do_link(struct inode *inode)
 +{
-+	struct file *file;
-+	struct kvm_gmem *gmem;
++	/* Refer to simple_link() */
 +
-+	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
-+	if (!gmem)
-+		return ERR_PTR(-ENOMEM);
++	inode->i_ctime = current_time(inode);
++	inc_nlink(inode);
 +
-+	file = alloc_file_pseudo(inode, mnt, "kvm-gmem", O_RDWR, &kvm_gmem_fops);
-+	if (IS_ERR(file))
-+		goto err;
++	/*
++	 * ihold() to add additional reference to inode for reference in dentry,
++	 * created in kvm_gmem_alloc_file() -> alloc_file_pseudo(). This is not
++	 * necessary when creating a new file because alloc_inode() creates
++	 * inodes with i_count = 1, which is the refcount for the dentry in the
++	 * file.
++	 */
++	ihold(inode);
 +
-+	file->f_flags |= O_LARGEFILE;
-+	file->f_mapping = inode->i_mapping;
-+
-+	kvm_get_kvm(kvm);
-+	gmem->kvm = kvm;
-+	xa_init(&gmem->bindings);
-+
-+	file->private_data = gmem;
-+
-+	list_add(&gmem->entry, &inode->i_mapping->private_list);
-+
-+	return file;
-+err:
-+	kfree(gmem);
-+	return file;
++	/*
++	 * dget() and d_instantiate() complete the setup of a dentry, but those
++	 * have already been done in kvm_gmem_alloc_file() ->
++	 * alloc_file_pseudo()
++	 */
 +}
 +
- static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
- 			     struct vfsmount *mnt)
++int kvm_gmem_link(struct kvm *kvm, struct kvm_link_guest_memfd *args)
++{
++	int ret;
++	int fd;
++	struct fd f;
++	struct kvm_gmem *gmem;
++	u64 flags = args->flags;
++	u64 valid_flags = 0;
++	struct inode *inode;
++	struct file *dst_file;
++
++	if (flags & ~valid_flags)
++		return -EINVAL;
++
++	f = fdget(args->fd);
++	if (!f.file)
++		return -EINVAL;
++
++	ret = -EINVAL;
++	if (f.file->f_op != &kvm_gmem_fops)
++		goto out;
++
++	/* Cannot link a gmem file with the same vm again */
++	gmem = f.file->private_data;
++	if (gmem->kvm == kvm)
++		goto out;
++
++	ret = fd = get_unused_fd_flags(0);
++	if (fd < 0)
++		goto out;
++
++	inode = file_inode(f.file);
++	dst_file = kvm_gmem_alloc_file(inode, kvm_gmem_mnt);
++	if (IS_ERR(dst_file)) {
++		ret = PTR_ERR(dst_file);
++		goto out_fd;
++	}
++
++	__kvm_gmem_do_link(inode);
++
++	fd_install(fd, dst_file);
++	return fd;
++
++out_fd:
++	put_unused_fd(fd);
++out:
++	fdput(f);
++	return ret;
++}
++
+ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		  unsigned int fd, loff_t offset)
  {
- 	const char *anon_name = "[kvm-gmem]";
- 	const struct qstr qname = QSTR_INIT(anon_name, strlen(anon_name));
--	struct kvm_gmem *gmem;
- 	struct inode *inode;
- 	struct file *file;
- 	int fd, err;
-@@ -399,34 +429,15 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
- 		goto err_inode;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ee331cf8ba54..51cc8b80ebe0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5177,6 +5177,16 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = kvm_gmem_create(kvm, &guest_memfd);
+ 		break;
  	}
- 
--	file = alloc_file_pseudo(inode, mnt, "kvm-gmem", O_RDWR, &kvm_gmem_fops);
-+	file = kvm_gmem_alloc_file(kvm, inode, mnt);
- 	if (IS_ERR(file)) {
- 		err = PTR_ERR(file);
- 		goto err_fd;
++	case KVM_LINK_GUEST_MEMFD: {
++		struct kvm_link_guest_memfd params;
++
++		r = -EFAULT;
++		if (copy_from_user(&params, argp, sizeof(params)))
++			goto out;
++
++		r = kvm_gmem_link(kvm, &params);
++		break;
++	}
+ 	default:
+ 		r = kvm_arch_vm_ioctl(filp, ioctl, arg);
  	}
+diff --git a/virt/kvm/kvm_mm.h b/virt/kvm/kvm_mm.h
+index 798f20d612bb..f85f452133b3 100644
+--- a/virt/kvm/kvm_mm.h
++++ b/virt/kvm/kvm_mm.h
+@@ -41,6 +41,7 @@ static inline void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm,
+ int kvm_gmem_init(void);
+ void kvm_gmem_exit(void);
+ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args);
++int kvm_gmem_link(struct kvm *kvm, struct kvm_link_guest_memfd *args);
+ int kvm_gmem_bind(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		  unsigned int fd, loff_t offset);
+ void kvm_gmem_unbind(struct kvm_memory_slot *slot);
+@@ -61,6 +62,12 @@ static inline int kvm_gmem_create(struct kvm *kvm,
+ 	return -EOPNOTSUPP;
+ }
  
--	file->f_flags |= O_LARGEFILE;
--	file->f_mapping = inode->i_mapping;
--
--	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
--	if (!gmem) {
--		err = -ENOMEM;
--		goto err_file;
--	}
--
--	kvm_get_kvm(kvm);
--	gmem->kvm = kvm;
--	xa_init(&gmem->bindings);
--
--	file->private_data = gmem;
--
--	list_add(&gmem->entry, &inode->i_mapping->private_list);
--
- 	fd_install(fd, file);
- 	return fd;
- 
--err_file:
--	fput(file);
- err_fd:
- 	put_unused_fd(fd);
- err_inode:
++static inline int kvm_gmem_link(struct kvm *kvm,
++				struct kvm_link_guest_memfd *args)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline int kvm_gmem_bind(struct kvm *kvm,
+ 					 struct kvm_memory_slot *slot,
+ 					 unsigned int fd, loff_t offset)
 -- 
 2.41.0.640.ga95def55d0-goog
 
