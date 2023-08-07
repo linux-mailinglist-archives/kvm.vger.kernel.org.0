@@ -2,55 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5453F77240B
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 14:30:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 995CD77245E
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 14:41:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233557AbjHGMap (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 08:30:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60814 "EHLO
+        id S231625AbjHGMlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 08:41:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232473AbjHGMai (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 08:30:38 -0400
-Received: from mail.8bytes.org (mail.8bytes.org [IPv6:2a01:238:42d9:3f00:e505:6202:4f0c:f051])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C36891710;
-        Mon,  7 Aug 2023 05:30:19 -0700 (PDT)
-Received: from 8bytes.org (pd9fe94eb.dip0.t-ipconnect.de [217.254.148.235])
+        with ESMTP id S230175AbjHGMlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 08:41:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 753BF170B
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 05:40:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mail.8bytes.org (Postfix) with ESMTPSA id 1DBD22802C2;
-        Mon,  7 Aug 2023 14:30:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-        s=default; t=1691411417;
-        bh=c90Yi4nQt040JDhF9erB1oWX7zPJ6lrzrHSn0+kunok=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bGIxBTZgxFw6JJa7RMXuE/I8Zw+NcgF5f//wxdTV+F4R6BdunMII8DMX4IBYnewgA
-         IQNhOmd6zSLBr8yJYTQxVikb99dHEmAWD5JXXbeT5BTwb8ViI5oCTUaxJdrZc5mC6n
-         835qdE16OyAroZ7ZDnp1ieSyd0j+8tFbCXzwmOJU/BoFiKoHVeJdqvdnnjwiDRxA4H
-         qww2h/wbxnLnO7TpUzR/lNbpD0LF9O5ogmkwVT8v8vXkBMEJDjluYgy5pnUZzarHX4
-         6XumXbhqwKnUAvu6okwC8RLvstvLhwgjle0MzX2FoHyLREySBaJG/bMvOe2lZlLtYb
-         CmwPWzeuPpTSA==
-Date:   Mon, 7 Aug 2023 14:30:15 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 544CD619C4
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 12:40:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA53EC433C7;
+        Mon,  7 Aug 2023 12:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691412044;
+        bh=RsAY8F/KSwqORT8NHwkg0CSFj0ZY5rAKG23RDmdDLzY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jRd9+oTOceOVTrrj62l+cpv5OGndVY4+EeBfYYSdMf9yzbc/uK8Q/roDA+nktJT99
+         dFwkYbhHozVgsGwjuWpz0kG70pKRv6zo4kYDNpuHOB+ZSRdEdr99jayUz0pcKXWrVq
+         MtiGqtNAN/pxxqh0+ya7/Wcv6uSZIaLgboracqBonKUTOYbsQZA/6VaxH0kqUHTAbm
+         OvnVvErTUwOg8kPIr0yL6kLrhfwKRN9hCBXPvWfRg8eDIzn71f3I8WvwxiQR+meLT6
+         f1OV1Dy7ivYWD3+aM8lj+cHomUmj2jqghsvcM5mQsazmYc63H5gsYDsb0/EFpS1uvD
+         /Z+iiVREW9bYQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qSzXO-002pS2-5r;
+        Mon, 07 Aug 2023 13:40:42 +0100
+Date:   Mon, 07 Aug 2023 13:40:34 +0100
+Message-ID: <868ran58l9.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Miguel Luis <miguel.luis@oracle.com>
+Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
         Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v3 1/2] iommu: Prevent RESV_DIRECT devices from blocking
- domains
-Message-ID: <ZNDj1-Od0iXFhgce@8bytes.org>
-References: <20230724060352.113458-1-baolu.lu@linux.intel.com>
- <20230724060352.113458-2-baolu.lu@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230724060352.113458-2-baolu.lu@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 06/26] arm64: Add debug registers affected by HDFGxTR_EL2
+In-Reply-To: <C4009786-DAF1-4BB7-8DF1-B249205B7F9A@oracle.com>
+References: <20230728082952.959212-1-maz@kernel.org>
+        <20230728082952.959212-7-maz@kernel.org>
+        <61B845D3-A42B-451F-B74D-51B4A1FD28C6@oracle.com>
+        <86leet5o20.wl-maz@kernel.org>
+        <C4009786-DAF1-4BB7-8DF1-B249205B7F9A@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -58,39 +86,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Baolu,
+On Thu, 03 Aug 2023 01:00:52 +0100,
+Miguel Luis <miguel.luis@oracle.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> > On 2 Aug 2023, at 17:52, Marc Zyngier <maz@kernel.org> wrote:
+> >=20
+> > On Mon, 31 Jul 2023 17:41:41 +0100,
+> > Miguel Luis <miguel.luis@oracle.com> wrote:
+> >>=20
+> >> Hi Marc,
+> >>=20
+> >> A few comments on this one, please see below.
+> >>=20
+> >>> On 28 Jul 2023, at 08:29, Marc Zyngier <maz@kernel.org> wrote:
+> >>>=20
+> >>> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+> >>> related registers. Add their encodings (and only that, because
+> >>> we really don't care about what these registers actually do at
+> >>> this stage).
+> >>>=20
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> ---
+> >>> arch/arm64/include/asm/sysreg.h | 78 +++++++++++++++++++++++++++++++++
+> >>> 1 file changed, 78 insertions(+)
+> >>>=20
+> >>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm=
+/sysreg.h
+> >>> index 76289339b43b..9dfd127be55a 100644
+> >>> --- a/arch/arm64/include/asm/sysreg.h
+> >>> +++ b/arch/arm64/include/asm/sysreg.h
+> >>> @@ -194,6 +194,84 @@
+> >>> #define SYS_DBGDTRTX_EL0 sys_reg(2, 3, 0, 5, 0)
+> >>> #define SYS_DBGVCR32_EL2 sys_reg(2, 4, 0, 7, 0)
+> >>>=20
+> >>> +#define SYS_BRBINF_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
+) | 0))
+> >>> +#define SYS_BRBINFINJ_EL1 sys_reg(2, 1, 9, 1, 0)
+> >>> +#define SYS_BRBSRC_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
+) | 1))
+> >>> +#define SYS_BRBSRCINJ_EL1 sys_reg(2, 1, 9, 1, 1)
+> >>> +#define SYS_BRBTGT_EL1(n) sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2=
+) | 2))
+> >>> +#define SYS_BRBTGTINJ_EL1 sys_reg(2, 1, 9, 1, 2)
+> >>> +#define SYS_BRBTS_EL1 sys_reg(2, 1, 9, 0, 2)
+> >>> +
+> >>> +#define SYS_BRBCR_EL1 sys_reg(2, 1, 9, 0, 0)
+> >>> +#define SYS_BRBFCR_EL1 sys_reg(2, 1, 9, 0, 1)
+> >>> +#define SYS_BRBIDR0_EL1 sys_reg(2, 1, 9, 2, 0)
+> >>> +
+> >>> +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
+> >>> +#define SYS_TRCITECR_EL1 sys_reg(3, 0, 1, 2, 3)
+> >>=20
+> >> SYS_TRCITECR_EL1 shows up twice.
+> >=20
+> > Ah, nice one. Too many registers.
+> >=20
+> >>=20
+> >>> +#define SYS_TRCACATR(m) sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> =
+3)))
+> >>=20
+> >> Besides m=E2=80=99s restrictions it could be sanitised in op2 to consi=
+der only bit m[3].
+> >> Suggestion for op2: (2 | ((m & 8) >> 3)))
+> >=20
+> > It is fully expected that 'm' will be in the 0-15 range, as per the
+> > architecture (D19.4.8), and the tables only use that exact range.
+> >=20
+> > Do you see an actual bug, or is this defensive programming?
+> >=20
+>=20
+> I was seeing a problem when m[5]=3D1 then Op2 of 0b01:m[3] isn=E2=80=99t =
+guaranteed
+> anymore overridden with 0b11:m[3].
 
-On Mon, Jul 24, 2023 at 02:03:51PM +0800, Lu Baolu wrote:
-> The IOMMU_RESV_DIRECT flag indicates that a memory region must be mapped
-> 1:1 at all times. This means that the region must always be accessible to
-> the device, even if the device is attached to a blocking domain. This is
-> equal to saying that IOMMU_RESV_DIRECT flag prevents devices from being
-> attached to blocking domains.
-> 
-> This also implies that devices that implement RESV_DIRECT regions will be
-> prevented from being assigned to user space since taking the DMA ownership
-> immediately switches to a blocking domain.
-> 
-> The rule of preventing devices with the IOMMU_RESV_DIRECT regions from
-> being assigned to user space has existed in the Intel IOMMU driver for
-> a long time. Now, this rule is being lifted up to a general core rule,
-> as other architectures like AMD and ARM also have RMRR-like reserved
-> regions. This has been discussed in the community mailing list and refer
-> to below link for more details.
-> 
-> Other places using unmanaged domains for kernel DMA must follow the
-> iommu_get_resv_regions() and setup IOMMU_RESV_DIRECT - we do not restrict
-> them in the core code.
-> 
-> Cc: Robin Murphy <robin.murphy@arm.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Link: https://lore.kernel.org/linux-iommu/BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+But that'd be wrong anyway. Now, we'd have an encoding that possibly
+aliases to something else, and we don't know about it.
 
-Acked-by: Joerg Roedel <jroedel@suse.de>
+> Clearly =E2=80=98m=E2=80=99 would be outside the range but not messing wi=
+th Op2 fixed bits 0b01.
+> Not a problem for patch 21 though.
 
-Feel free to include that in your next round of VT-d updates you send my
-way.
+All these macros have as the basis for their use that you use *valid*
+input.
+
+> Due to the uncertainty if this can bite later, hence the suggestion and a=
+lso
+> open to advices.
+
+If you really want some defensive programming on that front, then you
+should make sure we detect the issue at compile time, rather than
+silently changing the encoding.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
