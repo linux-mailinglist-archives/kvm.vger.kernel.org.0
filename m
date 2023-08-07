@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CBEE771AC3
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 08:51:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31143771AC1
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 08:51:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbjHGGvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 02:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49914 "EHLO
+        id S231332AbjHGGvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 02:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbjHGGvp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231320AbjHGGvp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 7 Aug 2023 02:51:45 -0400
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3FF481B5;
-        Sun,  6 Aug 2023 23:51:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B6E541738;
+        Sun,  6 Aug 2023 23:51:40 -0700 (PDT)
 Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8BxHOt6lNBk49wRAA--.35082S3;
-        Mon, 07 Aug 2023 14:51:38 +0800 (CST)
+        by gateway (Coremail) with SMTP id _____8AxEvB7lNBk6dwRAA--.39118S3;
+        Mon, 07 Aug 2023 14:51:39 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxJ8x5lNBkwspMAA--.23544S2;
-        Mon, 07 Aug 2023 14:51:37 +0800 (CST)
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxJ8x5lNBkwspMAA--.23544S3;
+        Mon, 07 Aug 2023 14:51:38 +0800 (CST)
 From:   Tianrui Zhao <zhaotianrui@loongson.cn>
 To:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -30,13 +30,15 @@ Cc:     Vishal Annapurve <vannapurve@google.com>,
         Peter Xu <peterx@redhat.com>,
         Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn,
         zhaotianrui@loongson.cn
-Subject: [PATCH v2 0/4] KVM: selftests: Add LoongArch support
-Date:   Mon,  7 Aug 2023 14:51:33 +0800
-Message-Id: <20230807065137.3408970-1-zhaotianrui@loongson.cn>
+Subject: [PATCH v2 1/4] KVM: selftests: Add KVM selftests header files for LoongArch
+Date:   Mon,  7 Aug 2023 14:51:34 +0800
+Message-Id: <20230807065137.3408970-2-zhaotianrui@loongson.cn>
 X-Mailer: git-send-email 2.39.1
+In-Reply-To: <20230807065137.3408970-1-zhaotianrui@loongson.cn>
+References: <20230807065137.3408970-1-zhaotianrui@loongson.cn>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8DxJ8x5lNBkwspMAA--.23544S2
+X-CM-TRANSID: AQAAf8DxJ8x5lNBkwspMAA--.23544S3
 X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
 X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
         ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
@@ -50,142 +52,147 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series base on the Linux LoongArch KVM patch:
+Add KVM selftests header files for LoongArch, including processor.h
+and kvm_util_base.h. Those mainly contain LoongArch CSR register defines
+and page table information.
+
 Based-on: <20230803022138.2736430-1-zhaotianrui@loongson.cn>
-
-We add LoongArch support into KVM selftests and there are some KVM
-test cases we have passed:
-  kvm_create_max_vcpus
-  demand_paging_test
-  kvm_page_table_test
-  set_memory_region_test
-  memslot_modification_stress_test
-  memslot_perf_test
-  kvm_binary_stats_test
-
-The test results:
-1..7
-selftests: kvm: kvm_create_max_vcpus
-  KVM_CAP_MAX_VCPU_ID: 256
-  KVM_CAP_MAX_VCPUS: 256
-  Testing creating 256 vCPUs, with IDs 0...255.
-  ok 1 selftests: kvm: kvm_create_max_vcpus
-
-selftests: kvm: demand_paging_test
-  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-  guest physical test memory: [0xfbfffc000, 0xfffffc000)
-  Finished creating vCPUs and starting uffd threads
-  Started all vCPUs
-  All vCPU threads joined
-  Total guest execution time: 0.787727423s
-  Overall demand paging rate: 83196.291111 pgs/sec
-  ok 2 selftests: kvm: demand_paging_test
-
-selftests: kvm: kvm_page_table_test
-  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-  Testing memory backing src type: anonymous
-  Testing memory backing src granularity: 0x4000
-  Testing memory size(aligned): 0x40000000
-  Guest physical test memory offset: 0xfbfffc000
-  Host  virtual  test memory offset: 0xffb011c000
-  Number of testing vCPUs: 1
-  Started all vCPUs successfully
-  KVM_CREATE_MAPPINGS: total execution time: -3.-672213074s
-  KVM_UPDATE_MAPPINGS: total execution time: -4.-381650744s
-  KVM_ADJUST_MAPPINGS: total execution time: -4.-434860241s
-  ok 3 selftests: kvm: kvm_page_table_test
-
-selftests: kvm: set_memory_region_test
-  Allowed number of memory slots: 256
-  Adding slots 0..255, each memory region with 2048K size
-  ok 4 selftests: kvm: set_memory_region_test
-
-selftests: kvm: memslot_modification_stress_test
-  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
-  guest physical test memory: [0xfbfffc000, 0xfffffc000)
-  Finished creating vCPUs
-  Started all vCPUs
-  All vCPU threads joined
-  ok 5 selftests: kvm: memslot_modification_stress_test
-
-selftests: kvm: memslot_perf_test
-  Testing map performance with 1 runs, 5 seconds each
-  Test took 0.003797735s for slot setup + 5.012294023s all iterations
-  Done 369 iterations, avg 0.013583452s each
-  Best runtime result was 0.013583452s per iteration (with 369 iterations)
-
-  Testing unmap performance with 1 runs, 5 seconds each
-  Test took 0.003841196s for slot setup + 5.001802893s all iterations
-  Done 341 iterations, avg 0.014668043s each
-  Best runtime result was 0.014668043s per iteration (with 341 iterations)
-
-  Testing unmap chunked performance with 1 runs, 5 seconds each
-  Test took 0.003784356s for slot setup + 5.000265398s all iterations
-  Done 7376 iterations, avg 0.000677910s each
-  Best runtime result was 0.000677910s per iteration (with 7376 iterations)
-
-  Testing move active area performance with 1 runs, 5 seconds each
-  Test took 0.003828075s for slot setup + 5.000021760s all iterations
-  Done 85449 iterations, avg 0.000058514s each
-  Best runtime result was 0.000058514s per iteration (with 85449 iterations)
-
-  Testing move inactive area performance with 1 runs, 5 seconds each
-  Test took 0.003809146s for slot setup + 5.000024149s all iterations
-  Done 181908 iterations, avg 0.000027486s each
-  Best runtime result was 0.000027486s per iteration (with 181908 iterations)
-
-  Testing RW performance with 1 runs, 5 seconds each
-  Test took 0.003780596s for slot setup + 5.001116175s all iterations
-  Done 391 iterations, avg 0.012790578s each
-  Best runtime result was 0.012790578s per iteration (with 391 iterations)
-  Best slot setup time for the whole test area was 0.003780596s
-  ok 6 selftests: kvm: memslot_perf_test
-
-selftests: kvm: kvm_binary_stats_test
-  TAP version 13
-  1..4
-  ok 1 vm0
-  ok 2 vm1
-  ok 3 vm2
-  ok 4 vm3
-  Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-  ok 7 selftests: kvm: kvm_binary_stats_test
-
-Changes for v2:
-1. We should use ".balign 4096" to align the assemble code with 4K in
-exception.S instead of "align 12".
-2. LoongArch only supports 3 or 4 levels page tables, so we remove the
-hanlders for 2-levels page table.
-3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
-DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
-4. Reorganize the test cases supported by LoongArch.
-5. Fix some code comments.
-6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
-
-changes for v1:
-1. Add kvm selftests header files for LoongArch.
-2. Add processor tests for LoongArch KVM.
-3. Add ucall tests for LoongArch KVM.
-4. Add LoongArch tests into makefile.
-
-Tianrui Zhao (4):
-  KVM: selftests: Add KVM selftests header files for LoongArch
-  KVM: selftests: Add core KVM selftests support for LoongArch
-  KVM: selftests: Add ucall test support for LoongArch
-  KVM: selftests: Add test cases supported by LoongArch into makefile
-
- tools/testing/selftests/kvm/Makefile          |  12 +
+Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+---
  .../selftests/kvm/include/kvm_util_base.h     |   5 +
- .../kvm/include/loongarch/processor.h         | 107 ++++++
- .../selftests/kvm/lib/loongarch/exception.S   |  27 ++
- .../selftests/kvm/lib/loongarch/processor.c   | 356 ++++++++++++++++++
- .../selftests/kvm/lib/loongarch/ucall.c       |  43 +++
- 6 files changed, 550 insertions(+)
+ .../kvm/include/loongarch/processor.h         | 107 ++++++++++++++++++
+ 2 files changed, 112 insertions(+)
  create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
- create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
- create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
- create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index eb1ff597bcca..adb20ab0345f 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -197,6 +197,11 @@ extern enum vm_guest_mode vm_mode_default;
+ #define MIN_PAGE_SHIFT			12U
+ #define ptes_per_page(page_size)	((page_size) / 8)
+ 
++#elif defined(__loongarch__)
++#define VM_MODE_DEFAULT			VM_MODE_P36V47_16K
++#define MIN_PAGE_SHIFT			14U
++#define ptes_per_page(page_size)	((page_size) / 8)
++
+ #endif
+ 
+ #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
+diff --git a/tools/testing/selftests/kvm/include/loongarch/processor.h b/tools/testing/selftests/kvm/include/loongarch/processor.h
+new file mode 100644
+index 000000000000..9486130325a9
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/loongarch/processor.h
+@@ -0,0 +1,107 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++#ifndef SELFTEST_KVM_PROCESSOR_H
++#define SELFTEST_KVM_PROCESSOR_H
++
++#define _PAGE_VALID_SHIFT	0
++#define _PAGE_DIRTY_SHIFT	1
++#define _PAGE_PLV_SHIFT		2  /* 2~3, two bits */
++#define _CACHE_SHIFT		4  /* 4~5, two bits */
++#define _PAGE_PRESENT_SHIFT	7
++#define _PAGE_WRITE_SHIFT	8
++
++#define PLV_KERN		0
++#define PLV_USER		3
++#define PLV_MASK		0x3
++
++#define _PAGE_VALID		(0x1UL << _PAGE_VALID_SHIFT)
++#define _PAGE_PRESENT		(0x1UL << _PAGE_PRESENT_SHIFT)
++#define _PAGE_WRITE		(0x1UL << _PAGE_WRITE_SHIFT)
++#define _PAGE_DIRTY		(0x1UL << _PAGE_DIRTY_SHIFT)
++#define _PAGE_USER		(PLV_USER << _PAGE_PLV_SHIFT)
++#define __READABLE		(_PAGE_VALID)
++#define __WRITEABLE		(_PAGE_DIRTY | _PAGE_WRITE)
++#define _CACHE_CC		(0x1UL << _CACHE_SHIFT) /* Coherent Cached */
++
++/* general registers */
++#define zero	$r0
++#define ra	$r1
++#define tp	$r2
++#define sp	$r3
++#define a0	$r4
++#define a1	$r5
++#define a2	$r6
++#define a3	$r7
++#define a4	$r8
++#define a5	$r9
++#define a6	$r10
++#define a7	$r11
++#define t0	$r12
++#define t1	$r13
++#define t2	$r14
++#define t3	$r15
++#define t4	$r16
++#define t5	$r17
++#define t6	$r18
++#define t7	$r19
++#define t8	$r20
++#define u0	$r21
++#define fp	$r22
++#define s0	$r23
++#define s1	$r24
++#define s2	$r25
++#define s3	$r26
++#define s4	$r27
++#define s5	$r28
++#define s6	$r29
++#define s7	$r30
++#define s8	$r31
++
++#define PS_4K				0x0000000c
++#define PS_8K				0x0000000d
++#define PS_16K				0x0000000e
++#define PS_DEFAULT_SIZE			PS_16K
++
++/* Basic CSR registers */
++#define LOONGARCH_CSR_CRMD		0x0 /* Current mode info */
++#define CSR_CRMD_PG_SHIFT		4
++#define CSR_CRMD_PG			(0x1UL << CSR_CRMD_PG_SHIFT)
++#define CSR_CRMD_IE_SHIFT		2
++#define CSR_CRMD_IE			(0x1UL << CSR_CRMD_IE_SHIFT)
++#define CSR_CRMD_PLV_SHIFT		0
++#define CSR_CRMD_PLV_WIDTH		2
++#define CSR_CRMD_PLV			(0x3UL << CSR_CRMD_PLV_SHIFT)
++#define PLV_MASK			0x3
++
++#define LOONGARCH_CSR_PRMD		0x1
++#define LOONGARCH_CSR_EUEN		0x2
++#define LOONGARCH_CSR_ECFG		0x4
++#define LOONGARCH_CSR_EENTRY		0xc
++#define LOONGARCH_CSR_TLBIDX		0x10 /* TLB Index, EHINV, PageSize, NP */
++#define CSR_TLBIDX_PS_SHIFT		24
++#define CSR_TLBIDX_PS_WIDTH		6
++#define CSR_TLBIDX_PS			(0x3fUL << CSR_TLBIDX_PS_SHIFT)
++#define CSR_TLBIDX_SIZEM		0x3f000000
++#define CSR_TLBIDX_SIZE			CSR_TLBIDX_PS_SHIFT
++
++#define LOONGARCH_CSR_ASID		0x18 /* ASID */
++/* Page table base address when VA[VALEN-1] = 0 */
++#define LOONGARCH_CSR_PGDL		0x19
++/* Page table base address when VA[VALEN-1] = 1 */
++#define LOONGARCH_CSR_PGDH		0x1a
++/* Page table base */
++#define LOONGARCH_CSR_PGD		0x1b
++#define LOONGARCH_CSR_PWCTL0		0x1c
++#define LOONGARCH_CSR_PWCTL1		0x1d
++#define LOONGARCH_CSR_STLBPGSIZE	0x1e
++#define LOONGARCH_CSR_CPUID		0x20
++#define LOONGARCH_CSR_TMID		0x40
++#define LOONGARCH_CSR_TCFG		0x41
++#define LOONGARCH_CSR_TLBRENTRY		0x88 /* TLB refill exception entry */
++/* KSave for TLB refill exception */
++#define LOONGARCH_CSR_TLBRSAVE		0x8b
++#define LOONGARCH_CSR_TLBREHI		0x8e
++#define CSR_TLBREHI_PS_SHIFT		0
++#define CSR_TLBREHI_PS			(0x3fUL << CSR_TLBREHI_PS_SHIFT)
++
++#endif
 -- 
 2.39.1
 
