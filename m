@@ -2,101 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C06B772931
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 17:28:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63349772969
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 17:37:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbjHGP2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 11:28:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51382 "EHLO
+        id S230476AbjHGPhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 11:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230364AbjHGP2D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 11:28:03 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0851BE3
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 08:27:55 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fe389d6f19so7332841e87.3
-        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 08:27:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1691422073; x=1692026873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QoOuEPwXAoB1CcjOzijYnAuXvV/Nt/hIFSXgej+7r2U=;
-        b=WnujQTuJX9CTtEQZgkoDjS7in/bKcKItleRv5OMk+2I1R2NZsJ217ZnDtiKz0B0tEQ
-         b2NxTNA6XTlkTdmTKy7qbTX4ZyOCfnpUcCHxcpnNspb/UscDGFhoS2vv4+SklzfRIDkb
-         SMTZuqNAYxIEtQ4IPXJN961rQXHQe5UU9V6pH7oZ65RWqXG65iv73BaXEhDnA+lcMrmt
-         imMK5iq9IO+hGkH1FIfKHsrBmhVKKFKowStzsaTB/W1CFndfgZkv2yAb1Gw3PUSUtGJ6
-         JTEa1i5Yv0X75Cdqoq+i//njLbeWQJvBWRnxPstoNugOuhnsuNTpdTHDlEiwCxjbjZZA
-         xomQ==
+        with ESMTP id S230470AbjHGPhd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 11:37:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491B5BD
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 08:36:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691422609;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wCM0LSVABzEid+9ZFB8RVu58baVBQ5wmkVT334cAYKs=;
+        b=dlHOSv6650uKMK7y6IFub5qerDl7w/6oHXuqCiC2rXK7mXr0JaPfo+E0c0YD8ioIr4HVmD
+        Wl46VYkPR4tWQsXn+AIpaqy3XaIATCi2jUq7G4GuJ6ctQVWbQmfcPq7ObIiTPefN+sRH7z
+        AfSheYF0HQNqc6MtYoAU+1yfNmHdYk0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-94-AWH5K5yxNZ2pud42Nar3jQ-1; Mon, 07 Aug 2023 11:36:48 -0400
+X-MC-Unique: AWH5K5yxNZ2pud42Nar3jQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30932d15a30so2517218f8f.1
+        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 08:36:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691422073; x=1692026873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QoOuEPwXAoB1CcjOzijYnAuXvV/Nt/hIFSXgej+7r2U=;
-        b=W3Ye8/4g3PGZ0hUKLv0ASMmdLP24pl5Bs+hFQ8J2z4kfmy+IfFkQcxj4/dnqvLax9h
-         B9DrNJpj//ZkzEaffJL6YWWIeDld7VzprHy8TQMm7p2NNGVlYAICDZ/VOWWsVc7v2ADP
-         BAaVh1XCG3ONE2hz5/wUJhNtrfp8L/htlrHgFnPFD+t2I4MH+exwEtQ/uufSLCtoPmAT
-         l16XoVDhospDXa0zd497KO9KuNu7egDv/eUBzkVA0056Y8Sy2emPoS2j3+dCQ0Ln/rRm
-         W1VlmMVMI5GEg8qfxFdPQYkWIhMRdzjOPXKWi5dl/Ie3/Qe1XnYbBLgSXA2+bt7qCH1D
-         vqCg==
-X-Gm-Message-State: AOJu0YyJV0fY6QKVSrCiPawQaFpWEq0KgbE5MY+POqrCEv7ZLE/agSuh
-        CW0KHZzZHO4MLjjL7z9k0x2hbG6Cvhmd9tHe/P+IlA==
-X-Google-Smtp-Source: AGHT+IGBANRbPwCTQseSaIfmRqk0Uk8t9EGhTT4K7ebfXgm82Uqvo+wFcHhcw3lSVwBBpEFZCQDHH0BGZhTSHgs23Cg=
-X-Received: by 2002:a19:5f19:0:b0:4f8:5b23:5287 with SMTP id
- t25-20020a195f19000000b004f85b235287mr6052226lfb.62.1691422073568; Mon, 07
- Aug 2023 08:27:53 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691422607; x=1692027407;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wCM0LSVABzEid+9ZFB8RVu58baVBQ5wmkVT334cAYKs=;
+        b=QM5gtpMItVkOo2rIs4pm/DYlwuOaROmvTbcacHdOXI5C7XeZimsx8mOE7Zbwg4lXPn
+         b+AaSpB2INA/QOY6QJpfDMIpaytFL7WCGCfOrcrmXlpf7rDRdO+36jMvt0ve9kumbHsk
+         L0ab5k5Xa1HvIDuf9xjr+bPtbS1miTmy5gvJsvhTBecRHyEOEcqYvCIp8j/F5CwfPQWq
+         Qqdb85GsavHevjnIu9XEHs004ZxYz8fQIj2EJHKNWaS8FDbWq5+RA1rwSHc76W70fYGD
+         z2JMlRkSpW5SwWOTcZFBlPknz6QgSXqrWW62PYSAb7tMdbY2n7TFjPxETRElImmPxfpz
+         ftNA==
+X-Gm-Message-State: AOJu0Ywu5hB5ngmEw87Hh/RCrQtT/ZJKgAQ55z/4fh31tWkrVOBbUV7i
+        ToZYTeluHs5M2QPoYaq0BZpJD0XqVuVCn92iJRt/Ir0n3qZCEzZZbIvU18dygvEUKI0xRGvShmU
+        OFHM2nbkVETVc
+X-Received: by 2002:a5d:4085:0:b0:315:96ca:dcab with SMTP id o5-20020a5d4085000000b0031596cadcabmr7337363wrp.35.1691422607006;
+        Mon, 07 Aug 2023 08:36:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFazJ0hQvyp0w7nVsyclbNvRXnBSHlJEwsegobzfYo7VP5sfkvDEV8yiWkWqkqGh7ZbhT/yBw==
+X-Received: by 2002:a5d:4085:0:b0:315:96ca:dcab with SMTP id o5-20020a5d4085000000b0031596cadcabmr7337347wrp.35.1691422606590;
+        Mon, 07 Aug 2023 08:36:46 -0700 (PDT)
+Received: from [192.168.3.108] (p4ff234da.dip0.t-ipconnect.de. [79.242.52.218])
+        by smtp.gmail.com with ESMTPSA id s1-20020adff801000000b00314417f5272sm10811517wrp.64.2023.08.07.08.36.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Aug 2023 08:36:46 -0700 (PDT)
+Message-ID: <e9cdb144-70c7-6596-2377-e675635c94e0@redhat.com>
+Date:   Mon, 7 Aug 2023 17:36:44 +0200
 MIME-Version: 1.0
-References: <20230727073134.134102-1-akihiko.odaki@daynix.com> <CAFEAcA9zGqkWL2zf_z-CuWEnrGxCHmO_i=_9CY347b8zCC2AuA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9zGqkWL2zf_z-CuWEnrGxCHmO_i=_9CY347b8zCC2AuA@mail.gmail.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 7 Aug 2023 16:27:42 +0100
-Message-ID: <CAFEAcA9A9ZG8q6cYYbtUNgAe5JQZKVKKXWWzipzDDqcjLr39sQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] accel/kvm: Specify default IPA size for arm64
-To:     Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-stable <qemu-stable@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3 7/7] selftest/mm: ksm_functional_tests: Add PROT_NONE
+ test
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        liubo <liubo254@huawei.com>, Peter Xu <peterx@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Mel Gorman <mgorman@suse.de>, Shuah Khan <shuah@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230803143208.383663-1-david@redhat.com>
+ <20230803143208.383663-8-david@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20230803143208.383663-8-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 4 Aug 2023 at 18:41, Peter Maydell <peter.maydell@linaro.org> wrote=
-:
->
-> On Thu, 27 Jul 2023 at 08:31, Akihiko Odaki <akihiko.odaki@daynix.com> wr=
-ote:
-> >
-> > Some Arm systems such as Apple Silicon Macs have IPA size smaller than =
-the
-> > default used by KVM. Introduce our own default IPA size that fits on su=
-ch a
-> > system.
-> >
-> > When reviewing this series, Philippe Mathieu-Daud=C3=A9 found the error=
- handling
-> > around KVM type decision logic is flawed so I added a few patches for f=
-ixing
-> > the error handling path.
-> >
-> > V4 -> V5: Fixed KVM type error handling
-> > V3 -> V4: Removed an inclusion of kvm_mips.h that is no longer needed.
-> > V2 -> V3: Changed to use the maximum IPA size as the default.
-> > V1 -> V2: Introduced an arch hook
->
-> Applied to target-arm-for-8.2 with an extra doc comment in patch 1;
-> thanks.
+On 03.08.23 16:32, David Hildenbrand wrote:
+> Let's test whether merging and unmerging in PROT_NONE areas works as
+> expected.
+> 
+> Pass a page protection to mmap_and_merge_range(), which will trigger
+> an mprotect() after writing to the pages, but before enabling merging.
+> 
+> Make sure that unsharing works as expected, by performing a ptrace write
+> (using /proc/self/mem) and by setting MADV_UNMERGEABLE.
+> 
+> Note that this implicitly tests that ptrace writes in an inaccessible
+> (PROT_NONE) mapping work as expected.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
-I also figured it would be good to tag the first 2 patches
-for qemu-stable, so I'll do that as well.
+Andrew, can you squash the following?
 
-thanks
--- PMM
+ From c2be7c02cb96b9189a52a5937821600ef4e259bd Mon Sep 17 00:00:00 2001
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 7 Aug 2023 17:33:54 +0200
+Subject: [PATCH] Fixup: selftest/mm: ksm_functional_tests: Add PROT_NONE test
+
+As noted by Peter, we should be using sizeof(i) in test_prot_none().
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+  tools/testing/selftests/mm/ksm_functional_tests.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/mm/ksm_functional_tests.c b/tools/testing/selftests/mm/ksm_functional_tests.c
+index 8fa4889ab4f3..901e950f9138 100644
+--- a/tools/testing/selftests/mm/ksm_functional_tests.c
++++ b/tools/testing/selftests/mm/ksm_functional_tests.c
+@@ -516,7 +516,7 @@ static void test_prot_none(void)
+  	/* Store a unique value in each page on one half using ptrace */
+  	for (i = 0; i < size / 2; i += pagesize) {
+  		lseek(mem_fd, (uintptr_t) map + i, SEEK_SET);
+-		if (write(mem_fd, &i, sizeof(size)) != sizeof(size)) {
++		if (write(mem_fd, &i, sizeof(i)) != sizeof(i)) {
+  			ksft_test_result_fail("ptrace write failed\n");
+  			goto unmap;
+  		}
+-- 
+2.41.0
+
+
+
+-- 
+Cheers,
+
+David / dhildenb
+
