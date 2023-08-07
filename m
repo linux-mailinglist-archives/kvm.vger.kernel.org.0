@@ -2,68 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 47B45771A6A
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 08:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CBEE771AC3
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 08:51:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231368AbjHGGaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 02:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37968 "EHLO
+        id S231363AbjHGGvv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 02:51:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbjHGG3e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 02:29:34 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363D4172C
-        for <kvm@vger.kernel.org>; Sun,  6 Aug 2023 23:29:33 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-686f8614ce5so4175564b3a.3
-        for <kvm@vger.kernel.org>; Sun, 06 Aug 2023 23:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igel-co-jp.20221208.gappssmtp.com; s=20221208; t=1691389772; x=1691994572;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2KhJcMMHF/QGvcv4V+SvNCxHUnjoV6Ng8+aFfn5AdYA=;
-        b=fs7s2Xlp88INcWS7tNQLgGN60cO0nAz+utJVEUemGul8/xSDJ21UtEgMHzUvF5vfwN
-         /MDRVb05BOtxTyn1Ffk6dGmYT0bCnCBkqcFGucWJ79bMlE0gv8fBXdqnYmfFWbGA9Gvx
-         6GVB3cgElVZYABWqEIW2vs6WaapSGgNOPq/uNw2761ZEIZy2YBWA28cb6uYND80TRlfj
-         YcKL2QBM/QagmQnUKlwCjBehlB9fK5uTr2C1FC+LqDEAjclzUUsc4q4ZO98nQlfjpv0x
-         63zbbkFZRTsyCLlpuKt3tHEw0Khdy2/tfhu9kZb9Hx4nyXK2lG2Ih7mEjN8mVOWB/pXI
-         t0uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691389772; x=1691994572;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2KhJcMMHF/QGvcv4V+SvNCxHUnjoV6Ng8+aFfn5AdYA=;
-        b=Nqu4eKz5zzj0ry/+PCTOW3zuF7YQyeSBgqvdej1WWLdQU1KmNu/gCVzXSwHddZbRt5
-         /H6DZUvYmSE1IZoNpYsnABt000TImgCD3x7/vEiYYkQr4ZwxwF8qgRQPHMm1nVu0wBPE
-         lnW7ggn1iu/Yi0WtJ7yndp/bH4WR3G84GRWypQVgteCt+kL3WbvlaPKheMv1v6RwK+Je
-         ZXCqfQqjJG3clAvBX78acv7G9dXe771SUlcjDehY3BQ/ONHYjO4BQYIyLs0QHFiH/ohK
-         psh3yxW5lgvXmWIfKTOgyS0H5D767EiYVeqdqxXfnaxZ3yDzMDIy1J/wDiyYlW4RmecW
-         ExVQ==
-X-Gm-Message-State: AOJu0YyMGWPub1CKLa9gshzHqrup9WqLy/LlbZuHoEI9XfXR0N1BMpIt
-        kyFIip62A/VyAu5e1ig5tD1tR6MnJbvbAx1JGI9eZA==
-X-Google-Smtp-Source: AGHT+IEAuY8XGTkyoOcnJC0CLiGG976Ootrt5rrvsyVIzma2je36sHWbmaa2fVHPyHTShPNI42VHsg==
-X-Received: by 2002:a05:6a20:244b:b0:140:3554:3f44 with SMTP id t11-20020a056a20244b00b0014035543f44mr8699412pzc.22.1691389772644;
-        Sun, 06 Aug 2023 23:29:32 -0700 (PDT)
-Received: from localhost.co.jp (napt.igel.co.jp. [219.106.231.132])
-        by smtp.gmail.com with ESMTPSA id s8-20020aa78d48000000b0065a1b05193asm5347392pfe.185.2023.08.06.23.29.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 23:29:32 -0700 (PDT)
-From:   Ake Koomsin <ake@igel.co.jp>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Ake Koomsin <ake@igel.co.jp>
-Subject: [RFC PATCH] KVM: x86: inhibit APICv upon detecting direct APIC access from L2
-Date:   Mon,  7 Aug 2023 15:26:11 +0900
-Message-ID: <20230807062611.12596-1-ake@igel.co.jp>
-X-Mailer: git-send-email 2.41.0
+        with ESMTP id S231340AbjHGGvp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 02:51:45 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3FF481B5;
+        Sun,  6 Aug 2023 23:51:41 -0700 (PDT)
+Received: from loongson.cn (unknown [10.2.5.185])
+        by gateway (Coremail) with SMTP id _____8BxHOt6lNBk49wRAA--.35082S3;
+        Mon, 07 Aug 2023 14:51:38 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8DxJ8x5lNBkwspMAA--.23544S2;
+        Mon, 07 Aug 2023 14:51:37 +0800 (CST)
+From:   Tianrui Zhao <zhaotianrui@loongson.cn>
+To:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vishal Annapurve <vannapurve@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>, loongarch@lists.linux.dev,
+        Peter Xu <peterx@redhat.com>,
+        Vipin Sharma <vipinsh@google.com>, maobibo@loongson.cn,
+        zhaotianrui@loongson.cn
+Subject: [PATCH v2 0/4] KVM: selftests: Add LoongArch support
+Date:   Mon,  7 Aug 2023 14:51:33 +0800
+Message-Id: <20230807065137.3408970-1-zhaotianrui@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-CM-TRANSID: AQAAf8DxJ8x5lNBkwspMAA--.23544S2
+X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+        ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+        nUUI43ZEXa7xR_UUUUUUUUU==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,117 +50,142 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current KVM does not expect L1 hypervisor to allow L2 guest to access
-APIC page directly when APICv is enabled. When this happens, KVM
-emulates the access itself resulting in interrupt lost.
+This patch series base on the Linux LoongArch KVM patch:
+Based-on: <20230803022138.2736430-1-zhaotianrui@loongson.cn>
 
-As this kind of hypervisor is rare, it is simpler to inhibit APICv upon
-detecting direct APIC access from L2 to avoid unexpected interrupt lost.
+We add LoongArch support into KVM selftests and there are some KVM
+test cases we have passed:
+  kvm_create_max_vcpus
+  demand_paging_test
+  kvm_page_table_test
+  set_memory_region_test
+  memslot_modification_stress_test
+  memslot_perf_test
+  kvm_binary_stats_test
 
-Signed-off-by: Ake Koomsin <ake@igel.co.jp>
----
- arch/x86/include/asm/kvm_host.h |  6 ++++++
- arch/x86/kvm/mmu/mmu.c          | 33 ++++++++++++++++++++++++++-------
- arch/x86/kvm/svm/svm.h          |  3 ++-
- arch/x86/kvm/vmx/vmx.c          |  3 ++-
- 4 files changed, 36 insertions(+), 9 deletions(-)
+The test results:
+1..7
+selftests: kvm: kvm_create_max_vcpus
+  KVM_CAP_MAX_VCPU_ID: 256
+  KVM_CAP_MAX_VCPUS: 256
+  Testing creating 256 vCPUs, with IDs 0...255.
+  ok 1 selftests: kvm: kvm_create_max_vcpus
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3bc146dfd38d..8764b11922a0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1188,6 +1188,12 @@ enum kvm_apicv_inhibit {
- 	APICV_INHIBIT_REASON_APIC_ID_MODIFIED,
- 	APICV_INHIBIT_REASON_APIC_BASE_MODIFIED,
- 
-+	/*
-+	 * APICv is disabled because L1 hypervisor allows L2 guest to access
-+	 * APIC directly.
-+	 */
-+	APICV_INHIBIT_REASON_L2_PASSTHROUGH_ACCESS,
-+
- 	/******************************************************/
- 	/* INHIBITs that are relevant only to the AMD's AVIC. */
- 	/******************************************************/
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ec169f5c7dce..c1150ef9fce1 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4293,6 +4293,30 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
- }
- 
-+static int __kvm_faultin_pfn_guest_mode(struct kvm_vcpu *vcpu,
-+					struct kvm_page_fault *fault)
-+{
-+	struct kvm_memory_slot *slot = fault->slot;
-+
-+	/* Don't expose private memslots to L2. */
-+	fault->slot = NULL;
-+	fault->pfn = KVM_PFN_NOSLOT;
-+	fault->map_writable = false;
-+
-+	/*
-+	 * APICv does not work when L1 hypervisor allows L2 guest to access
-+	 * APIC directly. As this kind of L1 hypervisor is rare, it is simpler
-+	 * to inhibit APICv when we detect direct APIC access from L2, and
-+	 * fallback to emulation path to avoid interrupt lost.
-+	 */
-+	if (unlikely(slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
-+		     kvm_apicv_activated(vcpu->kvm)))
-+		kvm_set_apicv_inhibit(vcpu->kvm,
-+				      APICV_INHIBIT_REASON_L2_PASSTHROUGH_ACCESS);
-+
-+	return RET_PF_CONTINUE;
-+}
-+
- static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
- 	struct kvm_memory_slot *slot = fault->slot;
-@@ -4307,13 +4331,8 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 		return RET_PF_RETRY;
- 
- 	if (!kvm_is_visible_memslot(slot)) {
--		/* Don't expose private memslots to L2. */
--		if (is_guest_mode(vcpu)) {
--			fault->slot = NULL;
--			fault->pfn = KVM_PFN_NOSLOT;
--			fault->map_writable = false;
--			return RET_PF_CONTINUE;
--		}
-+		if (is_guest_mode(vcpu))
-+			return __kvm_faultin_pfn_guest_mode(vcpu, fault);
- 		/*
- 		 * If the APIC access page exists but is disabled, go directly
- 		 * to emulation without caching the MMIO access or creating a
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 18af7e712a5a..8d77932ee0fb 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -683,7 +683,8 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- 	BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |	\
- 	BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |	\
- 	BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |	\
--	BIT(APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED)	\
-+	BIT(APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED) |	\
-+	BIT(APICV_INHIBIT_REASON_L2_PASSTHROUGH_ACCESS)	\
- )
- 
- bool avic_hardware_setup(void);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index df461f387e20..f652397c9765 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8189,7 +8189,8 @@ static void vmx_hardware_unsetup(void)
- 	BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |		\
- 	BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |	\
- 	BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |	\
--	BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED)	\
-+	BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |	\
-+	BIT(APICV_INHIBIT_REASON_L2_PASSTHROUGH_ACCESS)	\
- )
- 
- static void vmx_vm_destroy(struct kvm *kvm)
+selftests: kvm: demand_paging_test
+  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+  guest physical test memory: [0xfbfffc000, 0xfffffc000)
+  Finished creating vCPUs and starting uffd threads
+  Started all vCPUs
+  All vCPU threads joined
+  Total guest execution time: 0.787727423s
+  Overall demand paging rate: 83196.291111 pgs/sec
+  ok 2 selftests: kvm: demand_paging_test
+
+selftests: kvm: kvm_page_table_test
+  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+  Testing memory backing src type: anonymous
+  Testing memory backing src granularity: 0x4000
+  Testing memory size(aligned): 0x40000000
+  Guest physical test memory offset: 0xfbfffc000
+  Host  virtual  test memory offset: 0xffb011c000
+  Number of testing vCPUs: 1
+  Started all vCPUs successfully
+  KVM_CREATE_MAPPINGS: total execution time: -3.-672213074s
+  KVM_UPDATE_MAPPINGS: total execution time: -4.-381650744s
+  KVM_ADJUST_MAPPINGS: total execution time: -4.-434860241s
+  ok 3 selftests: kvm: kvm_page_table_test
+
+selftests: kvm: set_memory_region_test
+  Allowed number of memory slots: 256
+  Adding slots 0..255, each memory region with 2048K size
+  ok 4 selftests: kvm: set_memory_region_test
+
+selftests: kvm: memslot_modification_stress_test
+  Testing guest mode: PA-bits:36,  VA-bits:47, 16K pages
+  guest physical test memory: [0xfbfffc000, 0xfffffc000)
+  Finished creating vCPUs
+  Started all vCPUs
+  All vCPU threads joined
+  ok 5 selftests: kvm: memslot_modification_stress_test
+
+selftests: kvm: memslot_perf_test
+  Testing map performance with 1 runs, 5 seconds each
+  Test took 0.003797735s for slot setup + 5.012294023s all iterations
+  Done 369 iterations, avg 0.013583452s each
+  Best runtime result was 0.013583452s per iteration (with 369 iterations)
+
+  Testing unmap performance with 1 runs, 5 seconds each
+  Test took 0.003841196s for slot setup + 5.001802893s all iterations
+  Done 341 iterations, avg 0.014668043s each
+  Best runtime result was 0.014668043s per iteration (with 341 iterations)
+
+  Testing unmap chunked performance with 1 runs, 5 seconds each
+  Test took 0.003784356s for slot setup + 5.000265398s all iterations
+  Done 7376 iterations, avg 0.000677910s each
+  Best runtime result was 0.000677910s per iteration (with 7376 iterations)
+
+  Testing move active area performance with 1 runs, 5 seconds each
+  Test took 0.003828075s for slot setup + 5.000021760s all iterations
+  Done 85449 iterations, avg 0.000058514s each
+  Best runtime result was 0.000058514s per iteration (with 85449 iterations)
+
+  Testing move inactive area performance with 1 runs, 5 seconds each
+  Test took 0.003809146s for slot setup + 5.000024149s all iterations
+  Done 181908 iterations, avg 0.000027486s each
+  Best runtime result was 0.000027486s per iteration (with 181908 iterations)
+
+  Testing RW performance with 1 runs, 5 seconds each
+  Test took 0.003780596s for slot setup + 5.001116175s all iterations
+  Done 391 iterations, avg 0.012790578s each
+  Best runtime result was 0.012790578s per iteration (with 391 iterations)
+  Best slot setup time for the whole test area was 0.003780596s
+  ok 6 selftests: kvm: memslot_perf_test
+
+selftests: kvm: kvm_binary_stats_test
+  TAP version 13
+  1..4
+  ok 1 vm0
+  ok 2 vm1
+  ok 3 vm2
+  ok 4 vm3
+  Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+  ok 7 selftests: kvm: kvm_binary_stats_test
+
+Changes for v2:
+1. We should use ".balign 4096" to align the assemble code with 4K in
+exception.S instead of "align 12".
+2. LoongArch only supports 3 or 4 levels page tables, so we remove the
+hanlders for 2-levels page table.
+3. Remove the DEFAULT_LOONGARCH_GUEST_STACK_VADDR_MIN and use the common
+DEFAULT_GUEST_STACK_VADDR_MIN to allocate stack memory in guest.
+4. Reorganize the test cases supported by LoongArch.
+5. Fix some code comments.
+6. Add kvm_binary_stats_test test case into LoongArch KVM selftests.
+
+changes for v1:
+1. Add kvm selftests header files for LoongArch.
+2. Add processor tests for LoongArch KVM.
+3. Add ucall tests for LoongArch KVM.
+4. Add LoongArch tests into makefile.
+
+Tianrui Zhao (4):
+  KVM: selftests: Add KVM selftests header files for LoongArch
+  KVM: selftests: Add core KVM selftests support for LoongArch
+  KVM: selftests: Add ucall test support for LoongArch
+  KVM: selftests: Add test cases supported by LoongArch into makefile
+
+ tools/testing/selftests/kvm/Makefile          |  12 +
+ .../selftests/kvm/include/kvm_util_base.h     |   5 +
+ .../kvm/include/loongarch/processor.h         | 107 ++++++
+ .../selftests/kvm/lib/loongarch/exception.S   |  27 ++
+ .../selftests/kvm/lib/loongarch/processor.c   | 356 ++++++++++++++++++
+ .../selftests/kvm/lib/loongarch/ucall.c       |  43 +++
+ 6 files changed, 550 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/include/loongarch/processor.h
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/exception.S
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/processor.c
+ create mode 100644 tools/testing/selftests/kvm/lib/loongarch/ucall.c
+
 -- 
-2.41.0
+2.39.1
 
