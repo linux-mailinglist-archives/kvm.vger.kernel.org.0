@@ -2,146 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8109E7717B3
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 03:16:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 281167717FA
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 03:46:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbjHGBQm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 6 Aug 2023 21:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52994 "EHLO
+        id S229575AbjHGBqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 6 Aug 2023 21:46:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjHGBQk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 6 Aug 2023 21:16:40 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E198C170E;
-        Sun,  6 Aug 2023 18:16:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691370999; x=1722906999;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=4TGcjTrVn97WcqFI/J9OcgxG7o6IioJaT5HRkBvlsig=;
-  b=Aj6z9J7lFRLsdYntcqY56OxGjFXZvpEUjQYLdgwop8Vam37rwN3+QIFg
-   it3bq8FqbGLyGj0Dgo3FStR/oveo6qVisrBeGczmaFccPxwtGp//VLeoU
-   fzaqBbjtzvwI3fCsPYw9vS58kbFehOvYQnilT2wvDgEvztQAxVgke9Gln
-   /93T/Rf95CXw1f4Ttci9kN9bmtmFssQ8P119IJDrUQ9kaBaHtvCgcB/bW
-   lm6i8fnCP3Z2x2dm4qxVTvhMjG6INwGSeRuUlYix69SmtS3oFY8dVqJOr
-   VZpx/rwqmJ8lblR1lAMiUldLSlBrYZn83rYLNdH4U71ClItgmbZZoOjca
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10794"; a="456809076"
-X-IronPort-AV: E=Sophos;i="6.01,261,1684825200"; 
-   d="scan'208";a="456809076"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2023 18:16:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10794"; a="724329140"
-X-IronPort-AV: E=Sophos;i="6.01,261,1684825200"; 
-   d="scan'208";a="724329140"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga007.jf.intel.com with ESMTP; 06 Aug 2023 18:16:32 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 6 Aug 2023 18:16:32 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Sun, 6 Aug 2023 18:16:32 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Sun, 6 Aug 2023 18:16:32 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KRQg/4O72IJaex4GvxmajsUmfld9KmaEO8gpMWnG2EV9bq0WISo/es52Wy4UXEmFBmkZdRJ17rETgDJll8HX6tzYBUT3odNx6LRuiNlfXc3w21ch6JldV8KjXp5TdqtFisbgMjSvEYti1eWLz9oYQjpiI4HqsGcEquinXt+6ZMeyz/gw2muhNjwR6rWFANAkKFPddVGv5o2JUFKuZ57DbHwSZmw44TdAYigrNfer3o1YObqymSYSZClk9Q87aP7Mr8pWgPwQbEVt30LuRVbwG0JFR6njc5OeC08cUQM0lo7nM/bDGrkNwVBxn8KzqCLAs2ndlsHY1K6i2JcF5ixg4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vLdzoob6+MSHIqGwHQIa0NfLf6CG3ZkLL9n8uJ6SpiA=;
- b=BRjxh3wV+0ZFIr+gX5NVEMtJlkKZrg+MX7ggPSJKkeHptNVuDe4YwVYyNq1LZpBnEt2O773NAy866mZVcJkrS3o9NMzupO2esxdmkS9X0s5iCGzuUOKTSTZS2PmLHrwRFBgV9SAd1jkqpx0Qpq2GlJO+t6Z9mG64xmkHsD/aaM6f2pNTDtdnyHOQR+vm13DMW6aWECmlwNctW2fZygxR96YaLFd6rK2vtMpoWTdbP1XqGedBGb8i/uqhByHw11qBj7F+eBrioMNLpNtO9uIsLbzEdGPQeZtzQGVgbv/F9QW6/UgExHsX6Zvb/7NjTIKi+JcJ9FSsuD6wrnm8uXMM0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11)
- by DM4PR11MB5247.namprd11.prod.outlook.com (2603:10b6:5:38a::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
- 2023 01:16:29 +0000
-Received: from PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::146e:30d4:7f1e:7f4b]) by PH8PR11MB6780.namprd11.prod.outlook.com
- ([fe80::146e:30d4:7f1e:7f4b%3]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
- 01:16:29 +0000
-Date:   Mon, 7 Aug 2023 09:16:18 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     "Yang, Weijiang" <weijiang.yang@intel.com>
-CC:     <seanjc@google.com>, <pbonzini@redhat.com>, <peterz@infradead.org>,
-        <john.allen@amd.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
-        <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v5 13/19] KVM:VMX: Set up interception for CET MSRs
-Message-ID: <ZNBF4t+x5Gf14PV7@chao-email>
-References: <20230803042732.88515-1-weijiang.yang@intel.com>
- <20230803042732.88515-14-weijiang.yang@intel.com>
- <ZMyz2S8A4HqhPIfy@chao-email>
- <f894d23a-5c6a-d189-57ee-8f2bae0baf6b@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <f894d23a-5c6a-d189-57ee-8f2bae0baf6b@intel.com>
-X-ClientProxiedBy: KL1PR0401CA0027.apcprd04.prod.outlook.com
- (2603:1096:820:e::14) To PH8PR11MB6780.namprd11.prod.outlook.com
- (2603:10b6:510:1cb::11)
+        with ESMTP id S229564AbjHGBqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 6 Aug 2023 21:46:07 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08BBB1730;
+        Sun,  6 Aug 2023 18:46:03 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-686be3cbea0so3280341b3a.0;
+        Sun, 06 Aug 2023 18:46:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691372763; x=1691977563;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UZ6if50eZRgHimXmMC5vP8yX/YCFbKYFdXuMwJLAnu8=;
+        b=QZP4aNLO6cLuZOmN7hehGGce+GLPgAza5Ia7Dag42B62pqoU4qw/zpR9zdfsUFkKsg
+         SeAXig+zGpKki+WJbs29uiyp0ilLRZ1l317RsPgwRU50WqTu4lqO2vM2GcqQkwXKkwnE
+         F9lD0s5VL4J4QiFRyOAovgdRx07debFiMjVoh25ZhR5URwgoTl4VcgdohgV+RjH8yIAA
+         xemM+l/f/sR5+ltQ9rNzifIXueBRiNOtaxDUIFmpT/jo5Ke8Pb3EDzAax+X+mIaM3Aoo
+         XwnYwSHGVy7/dH4I1LpaJzszPz9eXPpNCZCn2RYpiT3OhX2AUs4vfmXVoyUAhHO6jEWx
+         V5Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691372763; x=1691977563;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UZ6if50eZRgHimXmMC5vP8yX/YCFbKYFdXuMwJLAnu8=;
+        b=HQYUqh35+uKymoVoXZO7JTmsoxvgeBJ1t1tdbw5kS3sI5zCz/Vsz/mZQhlYnr2F1F0
+         e4/xDtTmYhvmjcGznFBEVvvPfr5QjsRRQXKltrFu+3RUxb/BnuvPqGeyvetZ32MZBuzU
+         BScO4Y5BZRBrr+k7oqRV/qZB9adc+//HxhikZPTzL9CO1Kffjd9ucGnrLjrpPLiO47Zk
+         n9g2uQtoaniy1hbfRkuz/06MFKwu/HdBuX6+HPGZ4UAmyVFFpLEH7CQR08hCp7zK5YEW
+         cvdUfFTo4gJvB3ckSnl2BgcY+u/OdA+GAc0fyZ4YqUfu+qvCZT0LumA5XhXhQ7LLotwU
+         snUg==
+X-Gm-Message-State: AOJu0Yw7AKFqPlJtglEaep4J3iYWRpK+3dKf2teObm3vP5I7aghJrtos
+        +/LPS/z1hO4FmOHFbLXBeDnjXgtezAZ4RA==
+X-Google-Smtp-Source: AGHT+IElaz+9GwCk2aWhOffH7066X/1oWiN7f3LtCQZdFN9wL3Nv3nh9MbOJGb/wNgv+ahX+mcCQzA==
+X-Received: by 2002:a17:90a:940e:b0:268:266a:1ab with SMTP id r14-20020a17090a940e00b00268266a01abmr6934141pjo.5.1691372763252;
+        Sun, 06 Aug 2023 18:46:03 -0700 (PDT)
+Received: from pwon.ibmuc.com (159-196-117-139.9fc475.syd.nbn.aussiebb.net. [159.196.117.139])
+        by smtp.gmail.com with ESMTPSA id jk16-20020a170903331000b001b9e0918b0asm5485139plb.169.2023.08.06.18.45.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Aug 2023 18:46:02 -0700 (PDT)
+From:   Jordan Niethe <jniethe5@gmail.com>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, npiggin@gmail.com,
+        mikey@neuling.org, paulus@ozlabs.org, vaibhav@linux.ibm.com,
+        sbhat@linux.ibm.com, gautam@linux.ibm.com,
+        kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
+        Jordan Niethe <jniethe5@gmail.com>
+Subject: [PATCH v3 0/6] KVM: PPC: Nested APIv2 guest support
+Date:   Mon,  7 Aug 2023 11:45:47 +1000
+Message-Id: <20230807014553.1168699-1-jniethe5@gmail.com>
+X-Mailer: git-send-email 2.39.3
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6780:EE_|DM4PR11MB5247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 184f7038-c81d-45bf-dcb1-08db96e3ede6
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /m9ACiAZUxrCCgdjhV169/qwxRf3KgENBIA+48ofiJObEDGEEYxnqp6xtZlwSS8aSF0I85A7RobAjr1TCwMEx9yFGkkKkVR4dvLTBX7bv2bKOwWHsOrUoPTN3PHDYvSPAblbeIXEQSFqnXwowJUJK1wauNBN9ywemwScs798v/RODP4ED5Q4aKZhfk77qlSTC+hjtfnBiLWgtR5ZIjFWlw8YWkUAX8oGZwiP2kgb7hz6QIbnAm+DMwy2QvEkN/RbfMEqaOghM2SxVOYApL6kPpx29AP7od/1S1xbMXI3Q2Da6vbW0hzGeKFe6SgRgZ8vDMr6gVeWa0gipHYd/bgJn493UBw9FsqADi13v7hPul5rgrKnCSkzKNIUPc9KiDGhDABBffnFGRf3exQ2vaicpy6myQWOWVRE4enz1jaOorWfeZ4XBRERzDl9dkIhWadyYkd++FzBmuVPhbflUH3Q/hfOFatqbLuKBTT+Q5fO8HEmSXbskXU68mXdftiIHuzOVspZIsEKx/9j1RMc6BASfpZE8lhbDd3hxSO9CaKPd0LFXvxQtE+MiInZYW8iG6NG21Q8SAurXUhoYo7jd1Zy99f2IcZ2q9oSsypms66MsYg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6780.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(136003)(376002)(366004)(346002)(39860400002)(396003)(1800799003)(186006)(451199021)(38100700002)(2906002)(6636002)(4326008)(5660300002)(4744005)(316002)(8936002)(8676002)(6862004)(44832011)(66946007)(66556008)(66476007)(86362001)(33716001)(6512007)(478600001)(82960400001)(9686003)(6666004)(6486002)(41300700001)(6506007)(26005)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?S9z8Xz2KS/8/13YcZh5n15JTtk2TIna0Md9N6fGTxU2jPFcN1Z+vPswI5QbC?=
- =?us-ascii?Q?R59CtTKqmn2J6SxHFjh4gPfD0ibMDolqy7n80FvdDg77l60+gpEiXwUDE/hk?=
- =?us-ascii?Q?zsxQ0IGsWS/3XbSCDgNfDC1eJIDHkHTHO3sawaWl7oaVs5XyWBGJuoj9xMjB?=
- =?us-ascii?Q?ySvVc/uvt9f54bISx9xhseD9/v1BToUUgsGPgFC3Pl5M+k2swq1XseVetlJU?=
- =?us-ascii?Q?wurukcP/enbeT7wElA/nwM7a8RTZQwc8v7Z7Rj9MpNW7RGp7boXe6CaZ7cXH?=
- =?us-ascii?Q?HhIb/IDMC7Raga4NprRZ0PAk5doc3tKaj+kPsGZFSGLaN2boqm0P1WU02sJV?=
- =?us-ascii?Q?tVANtyNOdDE/wVVQnHyV/GwWErsVaB/B7WZyip00oJ0bmoeIUFg2l4iu0Y2F?=
- =?us-ascii?Q?z9Uvkefwt+d3eaCRP79CLHYPoOH6Ty7GgPHI4APjuoFdoB+zWDKEzl4z1hP8?=
- =?us-ascii?Q?jGQujBB0WfuLDpCK1DILaVcQsuTF7OjkLpHotoEt3EOItj6j6VbPW/hwMHnN?=
- =?us-ascii?Q?p142T+bo7AbHcVqXZQwgpyDU+gNBSkMVSiOzp6n7T8FxMXYdN8+6pgvV3TE9?=
- =?us-ascii?Q?YSpHyYYkDSJXS1we9qhr4+h/DCGlpJFRdZMfFbC1HdIjA5DrcM0nHKGj5iHt?=
- =?us-ascii?Q?V1vTwPqZ98lWrj4GDNaz7KL8U/Miusj98hvBjwxr5m0riXAjqCchs8PomDGo?=
- =?us-ascii?Q?ftOoCdttE4CCmbqT0+KoThExdTIeBT+h8VyZvHm8gsC/a5wHVQgfLZhvELWz?=
- =?us-ascii?Q?Ep2jiX96brYljAETtvcz7TedtIYIVFCLvUZfFvu5lrczjLo0TE0zZAg/uRIz?=
- =?us-ascii?Q?ZanWL3GRz2t4vPk7CEbrY31HVJUgrBp7Tle6ecQaUH+CEskfQUgSq3rTC3kM?=
- =?us-ascii?Q?YWASH81tmORiMEuXVbqffY+/qdnecw1/jTtw8fC9bjmd0wTuP//SPqFVuj95?=
- =?us-ascii?Q?8SQZKglp92qgAfLVmWA/RRruebeerGiZY9kZjLaQUydiah0TjayBw4Ko6nac?=
- =?us-ascii?Q?Zbd5cCaEJrHgC/IfOVqTdxtXiLR9xKgSERAU39fEsDpG7N8x7trJ3wgY+MdX?=
- =?us-ascii?Q?XmUnMWGNS507Se5ZU2Z3XjuxyNaylZa6xdHHSUPzNqP8yXTOYPvCQ701+F5x?=
- =?us-ascii?Q?LYQ0Ufqw+AEcKEuLl5oCGqrLMPsqcNrJpxX/o5czigAM43x5pRoKN4gBv8Tp?=
- =?us-ascii?Q?h0m1xdDQxsWdgiXhSNbNWv8ehS715O8LPBi9iBWbz364MtCBQbDW+4Y2Szrv?=
- =?us-ascii?Q?NXpaiDB6NUaz7seFA8fl7AGK+uePBuDKX7sia/aFmsvK+03HgjgrO7KV2Vjz?=
- =?us-ascii?Q?8v+4WHrWGerpkkCtIWGpzPgSoZl3W8OuxIZZeU1fIePIqLhYLB0MEE/xQ5nF?=
- =?us-ascii?Q?kQAW27g2RxMw9T33tKIjO0x4VZ2gUFo9On2Rsn+IJTnArObuHyNgCYk0dViA?=
- =?us-ascii?Q?njczmWBXqh/DkuB3gz6SblKcQ1fqpVejRozAQA67qqHY89/s1zxTzHOgZj0+?=
- =?us-ascii?Q?JE4ceDae2CGJ2USARFVKXAOA0qWMctMrzpoKTgla8Alp6YEVl6A6rpdg072q?=
- =?us-ascii?Q?fkySP1mpSJZ/jpPp+bRapCcHAsTUWsYiPc1OtYUf?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 184f7038-c81d-45bf-dcb1-08db96e3ede6
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6780.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 01:16:29.7574
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: E4kIrxAXGxAR1q72m012/2awlP1Ff+sEBXHaYzzGIqrb+3GduLwTBsqi2Pf4siPeBqQgKV/COzYlEHgMgcQ6NQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5247
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -149,12 +71,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> > +	if (kvm_cpu_cap_has(X86_FEATURE_IBT)) {
->> > +		incpt = !guest_can_use(vcpu, X86_FEATURE_IBT);
->> can you use guest_can_use() or guest_cpuid_has() consistently?
->Hmm, the inspiration actually came from Sean:
->Re: [RFC PATCH v2 3/6] KVM: x86: SVM: Pass through shadow stack MSRs - Sean Christopherson (kernel.org) <https://lore.kernel.org/all/ZMk14YiPw9l7ZTXP@google.com/>
->it would make the code more reasonable on non-CET platforms.
+A nested-HV API for PAPR has been developed based on the KVM-specific
+nested-HV API that is upstream in Linux/KVM and QEMU. The PAPR API had
+to break compatibility to accommodate implementation in other
+hypervisors and partitioning firmware. The existing KVM-specific API
+will be known as the Nested APIv1 and the PAPR API will be known as the
+Nested APIv2. 
 
-then, can you switch to use guest_cpuid_has() for IBT here as you do a few
-lines above for the SHSTK? that's why I said "consistently".
+The control flow and interrupt processing between L0, L1, and L2 in
+the Nested APIv2 are conceptually unchanged. Where Nested APIv1 is almost
+stateless, the Nested APIv2 is stateful, with the L1 registering L2 virtual
+machines and vCPUs with the L0. Supervisor-privileged register switching
+duty is now the responsibility for the L0, which holds canonical L2
+register state and handles all switching. This new register handling
+motivates the "getters and setters" wrappers to assist in syncing the
+L2s state in the L1 and the L0.
+
+Broadly, the new hcalls will be used for  creating and managing guests
+by a regular partition in the following way:
+
+  - L1 and L0 negotiate capabilities with
+    H_GUEST_{G,S}ET_CAPABILITIES
+
+  - L1 requests the L0 create a L2 with
+    H_GUEST_CREATE and receives a handle to use in future hcalls
+
+  - L1 requests the L0 create a L2 vCPU with
+    H_GUEST_CREATE_VCPU
+
+  - L1 sets up the L2 using H_GUEST_SET and the
+    H_GUEST_VCPU_RUN input buffer
+
+  - L1 requests the L0 runs the L2 vCPU using H_GUEST_VCPU_RUN
+
+  - L2 returns to L1 with an exit reason and L1 reads the
+    H_GUEST_VCPU_RUN output buffer populated by the L0
+
+  - L1 handles the exit using H_GET_STATE if necessary
+
+  - L1 reruns L2 vCPU with H_GUEST_VCPU_RUN
+
+  - L1 frees the L2 in the L0 with H_GUEST_DELETE
+
+Further details are available in Documentation/powerpc/kvm-nested.rst.
+
+This series adds KVM support for using this hcall interface as a regular
+PAPR partition, i.e. the L1. It does not add support for running as the
+L0.
+
+The new hcalls have been implemented in the spapr qemu model for
+testing.
+
+This is available at https://github.com/planetharsh/qemu/tree/upstream-0714-kop
+
+There are scripts available to assist in setting up an environment for
+testing nested guests at https://github.com/iamjpn/kvm-powervm-test
+
+A tree with this series is available at
+https://github.com/iamjpn/linux/tree/features/kvm-nestedv2-v3
+
+Thanks to Amit Machhiwal, Kautuk Consul, Vaibhav Jain, Michael Neuling,
+Shivaprasad Bhat, Harsh Prateek Bora, Paul Mackerras and Nicholas
+Piggin. 
+
+Change overview in v3:
+  - KVM: PPC: Use getters and setters for vcpu register state
+      - Do not add a helper for pvr
+      - Use an expression when declaring variable in case
+      - Squash in all getters and setters
+      - Pass vector registers by reference
+  - KVM: PPC: Rename accessor generator macros
+      - New to series
+  - KVM: PPC: Add helper library for Guest State Buffers
+      - Use EXPORT_SYMBOL_GPL()
+      - Use the kvmppc namespace
+      - Move kvmppc_gsb_reset() out of kvmppc_gsm_fill_info()
+      - Comments for GSID elements
+      - Pass vector elements by reference
+      - Remove generic put and get functions
+  - KVM: PPC: Book3s HV: Hold LPIDs in an unsigned long
+      - New to series
+  - KVM: PPC: Add support for nestedv2 guests
+      - Use EXPORT_SYMBOL_GPL()
+      - Change to kvmhv_nestedv2 namespace
+      - Make kvmhv_enable_nested() return -ENODEV on NESTEDv2 L1 hosts
+      - s/kvmhv_on_papr/kvmhv_is_nestedv2/
+      - mv book3s_hv_papr.c book3s_hv_nestedv2.c
+      - Handle shared regs without a guest state id in the same wrapper
+      - Use a static key for API version
+      - Add a positive test for NESTEDv1
+      - Give the amor a static value
+      - s/struct kvmhv_nestedv2_host/struct kvmhv_nestedv2_io/
+      - Propagate failure in kvmhv_vcpu_entry_nestedv2()
+      - WARN if getters and setters fail
+      - Progagate failure from kvmhv_nestedv2_parse_output()
+      - Replace delay with sleep in plpar_guest_{create,delete,create_vcpu}()
+      - Add logical PVR handling
+      - Replace kvmppc_gse_{get,put} with specific version
+  - docs: powerpc: Document nested KVM on POWER
+      - Fix typos
+
+
+Change overview in v2:
+  - Rebase on top of kvm ppc prefix instruction support
+  - Make documentation an individual patch
+  - Move guest state buffer files from arch/powerpc/lib/ to
+    arch/powerpc/kvm/
+  - Use kunit for testing guest state buffer
+  - Fix some build errors
+  - Change HEIR element from 4 bytes to 8 bytes
+
+Previous revisions:
+
+  - v1: https://lore.kernel.org/linuxppc-dev/20230508072332.2937883-1-jpn@linux.vnet.ibm.com/
+  - v2: https://lore.kernel.org/linuxppc-dev/20230605064848.12319-1-jpn@linux.vnet.ibm.com/ 
+
+Jordan Niethe (5):
+  KVM: PPC: Use getters and setters for vcpu register state
+  KVM: PPC: Rename accessor generator macros
+  KVM: PPC: Add helper library for Guest State Buffers
+  KVM: PPC: Book3s HV: Hold LPIDs in an unsigned long
+  KVM: PPC: Add support for nestedv2 guests
+
+Michael Neuling (1):
+  docs: powerpc: Document nested KVM on POWER
+
+ Documentation/powerpc/index.rst               |   1 +
+ Documentation/powerpc/kvm-nested.rst          | 636 +++++++++++
+ arch/powerpc/Kconfig.debug                    |  12 +
+ arch/powerpc/include/asm/guest-state-buffer.h | 995 ++++++++++++++++++
+ arch/powerpc/include/asm/hvcall.h             |  30 +
+ arch/powerpc/include/asm/kvm_book3s.h         | 231 +++-
+ arch/powerpc/include/asm/kvm_book3s_64.h      |   8 +-
+ arch/powerpc/include/asm/kvm_booke.h          |  10 +
+ arch/powerpc/include/asm/kvm_host.h           |  22 +-
+ arch/powerpc/include/asm/kvm_ppc.h            | 102 +-
+ arch/powerpc/include/asm/plpar_wrappers.h     | 192 +++-
+ arch/powerpc/kvm/Makefile                     |   4 +
+ arch/powerpc/kvm/book3s.c                     |  38 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c           |   6 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c        |  31 +-
+ arch/powerpc/kvm/book3s_64_vio.c              |   4 +-
+ arch/powerpc/kvm/book3s_hv.c                  | 354 +++++--
+ arch/powerpc/kvm/book3s_hv.h                  |  64 ++
+ arch/powerpc/kvm/book3s_hv_builtin.c          |  10 +-
+ arch/powerpc/kvm/book3s_hv_nested.c           |  42 +-
+ arch/powerpc/kvm/book3s_hv_nestedv2.c         | 985 +++++++++++++++++
+ arch/powerpc/kvm/book3s_hv_p9_entry.c         |   4 +-
+ arch/powerpc/kvm/book3s_hv_ras.c              |   5 +-
+ arch/powerpc/kvm/book3s_hv_rm_mmu.c           |   8 +-
+ arch/powerpc/kvm/book3s_hv_rm_xics.c          |   4 +-
+ arch/powerpc/kvm/book3s_xive.c                |  13 +-
+ arch/powerpc/kvm/emulate_loadstore.c          |   6 +-
+ arch/powerpc/kvm/guest-state-buffer.c         | 621 +++++++++++
+ arch/powerpc/kvm/powerpc.c                    |  76 +-
+ arch/powerpc/kvm/test-guest-state-buffer.c    | 328 ++++++
+ 30 files changed, 4582 insertions(+), 260 deletions(-)
+ create mode 100644 Documentation/powerpc/kvm-nested.rst
+ create mode 100644 arch/powerpc/include/asm/guest-state-buffer.h
+ create mode 100644 arch/powerpc/kvm/book3s_hv_nestedv2.c
+ create mode 100644 arch/powerpc/kvm/guest-state-buffer.c
+ create mode 100644 arch/powerpc/kvm/test-guest-state-buffer.c
+
+-- 
+2.39.3
+
