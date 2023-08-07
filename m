@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06EB3772539
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 15:15:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD4A87725D0
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 15:33:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231376AbjHGNPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 09:15:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59792 "EHLO
+        id S233924AbjHGNdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 09:33:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229820AbjHGNPC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 09:15:02 -0400
+        with ESMTP id S234365AbjHGNdP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 09:33:15 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796B7B3
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 06:14:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DCE7170B
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 06:32:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691414053;
+        s=mimecast20190719; t=1691415054;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dv2Nfm9aNkY4uLvGrSmBJ4eTnNJ17/ZlzGmDOwKHMUQ=;
-        b=fQfmh3jcFsi4LfWpQp+R2TB+TxIksHnsT93bWP0HMMlAXB4CaYuPft1U1BFyluWedqAwTC
-        SsjTSIwCJJY4jTZTmpWAaWk68cQSyrbVoHUYxhIYyJRHhned/SbNwzQB5QaVv+NmfTkW8r
-        UE4npVIi1tPPYzv1e2NO4osdVvPsb5I=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=5hK8kz26GjpdjzujUSybacpdOJ3+BX7RjUS82AalACc=;
+        b=GUcQnmRHNZwVW6O3XxUtb9xghf3eNjGrRTWGAphpIPF4wc4fquNETySGcirCXz7bmwHVtm
+        M1tEZP+SV7/lE6vpkBSiDi2KjjYJFNQk41KOn2m9FUepQ2y8/cey+0WS/p+tFfzWHH/J4M
+        HqLhqom927R8zoDOGuIpxj174hZcj9M=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-399-9mu73-TCNO-BOKuv4ZpldQ-1; Mon, 07 Aug 2023 09:14:12 -0400
-X-MC-Unique: 9mu73-TCNO-BOKuv4ZpldQ-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b9fa64dba8so42632851fa.0
-        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 06:14:12 -0700 (PDT)
+ us-mta-259-wXTDspP5NXaHsBugRL323w-1; Mon, 07 Aug 2023 09:30:53 -0400
+X-MC-Unique: wXTDspP5NXaHsBugRL323w-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-31792080fdeso1872956f8f.2
+        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 06:30:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691414051; x=1692018851;
+        d=1e100.net; s=20221208; t=1691415052; x=1692019852;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dv2Nfm9aNkY4uLvGrSmBJ4eTnNJ17/ZlzGmDOwKHMUQ=;
-        b=Uy+jMQ7cRdkrMa94/nvCn6fVG60XVfbBv9fZxhSLreJhuoS1V5CoXn76ThZAzLOaoE
-         UySDY1VcayjFP4SfN+wFPJ8Ktjs0tUQlvPZZmQxmR8gaf7HoXnSSCA70nZjYeHN5xnjY
-         i7fjGt7Mblgh5aLoLb0C1SsOi0ioh+d2HWAKRhgsdC0w61P0g9w0ZWcxuAjj4OSSEEvv
-         52+k3QJm2jbDD4IdYDA8iqxl0SRkQ3TjMKO4UMUXsIOUXgJr/8OkVb7RF2uSwsjRBmFK
-         KOPyBG7zpLx5396sVTcjkB/dpFA+9r+DPWS8Yihlr9fZZXhY44MSO0MxvoUPVXEDEFbX
-         gJxA==
-X-Gm-Message-State: AOJu0YxqzmZdgCmSHcWgfjoyi8W/k1Eh4zcZUDi2szdphft3hdEEPCBM
-        PLmH2fCdVqLHWWK72sbuZwDhEMrEW+qbRLnB4f+OuCKurtYfdWkrSKjfsqWZmUhwIVy+0rxGllQ
-        vJP9rj3qhgEq4
-X-Received: by 2002:a05:651c:14c:b0:2b9:e053:7a07 with SMTP id c12-20020a05651c014c00b002b9e0537a07mr5981102ljd.45.1691414050936;
-        Mon, 07 Aug 2023 06:14:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEt6kv6AQv90Pg+ohq034x/nkNV4LHFX3zG/F2vylittWcIpLWvLnLIqFpeWbVeNgH/keCt6Q==
-X-Received: by 2002:a05:651c:14c:b0:2b9:e053:7a07 with SMTP id c12-20020a05651c014c00b002b9e0537a07mr5981077ljd.45.1691414050581;
-        Mon, 07 Aug 2023 06:14:10 -0700 (PDT)
+        bh=5hK8kz26GjpdjzujUSybacpdOJ3+BX7RjUS82AalACc=;
+        b=YNLKuzSLaH+EWYIC0j9690j887Z664J5WRHZOiu2XD9twdJ5jJrDe88j4T4XX8LUhc
+         /KUGJaRYAwu+E7xYIZbUP2yP8sSCAOmO5Scu0BVXjzBGVRjRGmtsKaQp1bW45zA6QosR
+         HgkvxO65u8R8rKENMSXIcWE1kHgbyLCUS4Ug+c/qQXph2UxTi/oYMcEDqkkd6HgqfKSv
+         og47kN/FUbfv5+nLs5su4hkZE9c+eZsWF4g+9mD+FEHk0w0cY1+xX+7l05m7JFBEodQG
+         C3b/51R+eTfTgg1nvvknQ2JxEAKdvl05e9EmijU9rjYHVP2iv9YVrQpd9+t+y94CHFwU
+         du7Q==
+X-Gm-Message-State: AOJu0YwZjrO3awvRAo4yqjYiDbaq1hjsDMldlp/1aY9Oy8PyoITsv6Kr
+        c+jc5+ehmxB+3zDzFC2k+4gXYH6WnPAS6+k4IJPZV5EUIv7jS+2YRNe+Tex92DNIQRAqEai7cKg
+        CqiRlqyXLWCZh
+X-Received: by 2002:adf:f491:0:b0:313:f0ef:1e55 with SMTP id l17-20020adff491000000b00313f0ef1e55mr5925150wro.37.1691415052184;
+        Mon, 07 Aug 2023 06:30:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH17R+XNLgtY05mfA07P6WXFRIwMFReWI0TTFg1yfRSIjTNm6lDYaVoJY0IREkirzsIfp+A2A==
+X-Received: by 2002:adf:f491:0:b0:313:f0ef:1e55 with SMTP id l17-20020adff491000000b00313f0ef1e55mr5925124wro.37.1691415051846;
+        Mon, 07 Aug 2023 06:30:51 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id 23-20020a05600c229700b003fbdd5d0758sm10742100wmf.22.2023.08.07.06.14.08
+        by smtp.gmail.com with ESMTPSA id i12-20020a05600c290c00b003fbb618f7adsm10725122wmd.15.2023.08.07.06.30.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Aug 2023 06:14:09 -0700 (PDT)
-Message-ID: <d7a3e173-f66c-8885-9550-8d0d9768111f@redhat.com>
-Date:   Mon, 7 Aug 2023 15:14:07 +0200
+        Mon, 07 Aug 2023 06:30:51 -0700 (PDT)
+Message-ID: <b06cd9c0-980a-6b6a-e163-1846173ec5ec@redhat.com>
+Date:   Mon, 7 Aug 2023 15:30:49 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
 Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 19/26] KVM: arm64: nv: Add trap forwarding for
- HFGxTR_EL2
+Subject: Re: [PATCH v2 20/26] KVM: arm64: nv: Add trap forwarding for
+ HFGITR_EL2
 Content-Language: en-US
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
@@ -83,15 +83,16 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
 References: <20230728082952.959212-1-maz@kernel.org>
- <20230728082952.959212-20-maz@kernel.org>
+ <20230728082952.959212-21-maz@kernel.org>
 From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230728082952.959212-20-maz@kernel.org>
+In-Reply-To: <20230728082952.959212-21-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,UPPERCASE_50_75 autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -101,197 +102,170 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Marc,
 
 On 7/28/23 10:29, Marc Zyngier wrote:
-> Fine Grained Traps are fun. Not.
+> Similarly, implement the trap forwarding for instructions affected
+> by HFGITR_EL2.
 >
-> Implement the trap forwarding for traps describer by HFGxTR_EL2,
-described
-> reusing the Coarse Grained Traps infrastructure previously implemented.
->
-> Each sysreg/instruction inserted in the xarray gets a FGT group
-> (vaguely equivalent to a register number), a bit number in that register,
-> and a polarity.
->
-> It is then pretty easy to check the FGT state at handling time, just
-> like we do for the coarse version (it is just faster).
+> Note that the TLBI*nXS instructions should be affected by HCRX_EL2,
+> which will be dealt with down the line.
+
+I think you should also add a comment about the fact SVC_EL1/0 and ERET
+are not dealt with in this patch.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 133 +++++++++++++++++++++++++++++++-
->  1 file changed, 132 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/kvm_arm.h |   4 ++
+>  arch/arm64/kvm/emulate-nested.c  | 109 +++++++++++++++++++++++++++++++
+>  2 files changed, 113 insertions(+)
 >
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 85908aa18908..809bc86acefd 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -354,6 +354,10 @@
+>  #define __HFGWTR_EL2_MASK	GENMASK(49, 0)
+>  #define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
+>  
+> +#define __HFGITR_EL2_RES0	GENMASK(63, 57)
+> +#define __HFGITR_EL2_MASK	GENMASK(54, 0)
+> +#define __HFGITR_EL2_nMASK	GENMASK(56, 55)
+> +
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+>  /*
 > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 74b67895c791..5f4cf824eadc 100644
+> index 5f4cf824eadc..72619d845cc8 100644
 > --- a/arch/arm64/kvm/emulate-nested.c
 > +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -922,6 +922,88 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+> @@ -925,6 +925,7 @@ static DEFINE_XARRAY(sr_forward_xa);
+>  enum fgt_group_id {
+>  	__NO_FGT_GROUP__,
+>  	HFGxTR_GROUP,
+> +	HFGITR_GROUP,
+>  };
 >  
->  static DEFINE_XARRAY(sr_forward_xa);
+>  #define SR_FGT(sr, g, b, p)					\
+> @@ -1002,6 +1003,110 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
+>  	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
+>  	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
+> +	/* HFGITR_EL2 */
+> +	SR_FGT(OP_BRB_IALL, 		HFGITR, nBRBIALL, 0),
+> +	SR_FGT(OP_BRB_INJ, 		HFGITR, nBRBINJ, 0),
+> +	SR_FGT(SYS_DC_CVAC, 		HFGITR, DCCVAC, 1),
+> +	SR_FGT(SYS_DC_CGVAC, 		HFGITR, DCCVAC, 1),
+> +	SR_FGT(SYS_DC_CGDVAC, 		HFGITR, DCCVAC, 1),
+> +	SR_FGT(OP_CPP_RCTX, 		HFGITR, CPPRCTX, 1),
+> +	SR_FGT(OP_DVP_RCTX, 		HFGITR, DVPRCTX, 1),
+> +	SR_FGT(OP_CFP_RCTX, 		HFGITR, CFPRCTX, 1),
+> +	SR_FGT(OP_TLBI_VAALE1, 		HFGITR, TLBIVAALE1, 1),y
+> +	SR_FGT(OP_TLBI_VALE1, 		HFGITR, TLBIVALE1, 1),y
+> +	SR_FGT(OP_TLBI_VAAE1, 		HFGITR, TLBIVAAE1, 1),y
+> +	SR_FGT(OP_TLBI_ASIDE1, 		HFGITR, TLBIASIDE1, 1),y
+> +	SR_FGT(OP_TLBI_VAE1, 		HFGITR, TLBIVAE1, 1),y
+> +	SR_FGT(OP_TLBI_VMALLE1, 	HFGITR, TLBIVMALLE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAALE1, 	HFGITR, TLBIRVAALE1, 1),y
+> +	SR_FGT(OP_TLBI_RVALE1, 		HFGITR, TLBIRVALE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAAE1, 		HFGITR, TLBIRVAAE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAE1, 		HFGITR, TLBIRVAE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAALE1IS, 	HFGITR, TLBIRVAALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVALE1IS, 	HFGITR, TLBIRVALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVAAE1IS, 	HFGITR, TLBIRVAAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVAE1IS, 	HFGITR, TLBIRVAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VAALE1IS, 	HFGITR, TLBIVAALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VALE1IS, 	HFGITR, TLBIVALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VAAE1IS, 	HFGITR, TLBIVAAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_ASIDE1IS, 	HFGITR, TLBIASIDE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VAE1IS, 		HFGITR, TLBIVAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VMALLE1IS, 	HFGITR, TLBIVMALLE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVAALE1OS, 	HFGITR, TLBIRVAALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_RVALE1OS, 	HFGITR, TLBIRVALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_RVAAE1OS, 	HFGITR, TLBIRVAAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_RVAE1OS, 	HFGITR, TLBIRVAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VAALE1OS, 	HFGITR, TLBIVAALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VALE1OS, 	HFGITR, TLBIVALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VAAE1OS, 	HFGITR, TLBIVAAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_ASIDE1OS, 	HFGITR, TLBIASIDE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VAE1OS, 		HFGITR, TLBIVAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VMALLE1OS, 	HFGITR, TLBIVMALLE1OS, 1),y
+> +	/* FIXME: nXS variants must be checked against HCRX_EL2.FGTnXS */
+> +	SR_FGT(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1),y
+> +	SR_FGT(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1),y
+> +	SR_FGT(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1),y
+> +	SR_FGT(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1),y
+> +	SR_FGT(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1),y
+> +	SR_FGT(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1),y
+> +	SR_FGT(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1),y
+> +	SR_FGT(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1),
+> +	SR_FGT(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1),y
+> +	SR_FGT(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1),y
+> +	SR_FGT(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1),y
+> +	SR_FGT(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1),y
+> +	SR_FGT(OP_AT_S1E1WP, 		HFGITR, ATS1E1WP, 1),
+> +	SR_FGT(OP_AT_S1E1RP, 		HFGITR, ATS1E1RP, 1),
+> +	SR_FGT(OP_AT_S1E0W, 		HFGITR, ATS1E0W, 1),
+> +	SR_FGT(OP_AT_S1E0R, 		HFGITR, ATS1E0R, 1),
+> +	SR_FGT(OP_AT_S1E1W, 		HFGITR, ATS1E1W, 1),
+> +	SR_FGT(OP_AT_S1E1R, 		HFGITR, ATS1E1R, 1),
+> +	SR_FGT(SYS_DC_ZVA, 		HFGITR, DCZVA, 1),
+> +	SR_FGT(SYS_DC_GVA, 		HFGITR, DCZVA, 1),
+> +	SR_FGT(SYS_DC_GZVA, 		HFGITR, DCZVA, 1),
+> +	SR_FGT(SYS_DC_CIVAC, 		HFGITR, DCCIVAC, 1),
+> +	SR_FGT(SYS_DC_CIGVAC, 		HFGITR, DCCIVAC, 1),
+> +	SR_FGT(SYS_DC_CIGDVAC, 		HFGITR, DCCIVAC, 1),
+> +	SR_FGT(SYS_DC_CVADP, 		HFGITR, DCCVADP, 1),
+> +	SR_FGT(SYS_DC_CGVADP, 		HFGITR, DCCVADP, 1),
+> +	SR_FGT(SYS_DC_CGDVADP, 		HFGITR, DCCVADP, 1),
+> +	SR_FGT(SYS_DC_CVAP, 		HFGITR, DCCVAP, 1),
+> +	SR_FGT(SYS_DC_CGVAP, 		HFGITR, DCCVAP, 1),
+> +	SR_FGT(SYS_DC_CGDVAP, 		HFGITR, DCCVAP, 1),
+> +	SR_FGT(SYS_DC_CVAU, 		HFGITR, DCCVAU, 1),
+> +	SR_FGT(SYS_DC_CISW, 		HFGITR, DCCISW, 1),
+> +	SR_FGT(SYS_DC_CIGSW, 		HFGITR, DCCISW, 1),
+> +	SR_FGT(SYS_DC_CIGDSW, 		HFGITR, DCCISW, 1),
+> +	SR_FGT(SYS_DC_CSW, 		HFGITR, DCCSW, 1),
+> +	SR_FGT(SYS_DC_CGSW, 		HFGITR, DCCSW, 1),
+> +	SR_FGT(SYS_DC_CGDSW, 		HFGITR, DCCSW, 1),
+> +	SR_FGT(SYS_DC_ISW, 		HFGITR, DCISW, 1),
+> +	SR_FGT(SYS_DC_IGSW, 		HFGITR, DCISW, 1),
+> +	SR_FGT(SYS_DC_IGDSW, 		HFGITR, DCISW, 1),
+> +	SR_FGT(SYS_DC_IVAC, 		HFGITR, DCIVAC, 1),
+> +	SR_FGT(SYS_DC_IGVAC, 		HFGITR, DCIVAC, 1),
+> +	SR_FGT(SYS_DC_IGDVAC, 		HFGITR, DCIVAC, 1),
+> +	SR_FGT(SYS_IC_IVAU, 		HFGITR, ICIVAU, 1),
+> +	SR_FGT(SYS_IC_IALLU, 		HFGITR, ICIALLU, 1),
+> +	SR_FGT(SYS_IC_IALLUIS, 		HFGITR, ICIALLUIS, 1),
+>  };
 >  
-> +enum fgt_group_id {
-> +	__NO_FGT_GROUP__,
-> +	HFGxTR_GROUP,
-> +};
-> +
-> +#define SR_FGT(sr, g, b, p)					\
-> +	{							\
-> +		.encoding	= sr,				\
-> +		.end		= sr,				\
-> +		.tc		= {				\
-> +			.fgt = g ## _GROUP,			\
-> +			.bit = g ## _EL2_ ## b ## _SHIFT,	\
-> +			.pol = p,				\
-> +		},						\
-> +	}
-> +
-> +static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
-> +	/* HFGTR_EL2, HFGWTR_EL2 */
-HFGRTR_EL2
-> +	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
-> +	SR_FGT(SYS_SMPRI_EL1,		HFGxTR, nSMPRI_EL1, 0),
-> +	SR_FGT(SYS_ACCDATA_EL1,		HFGxTR, nACCDATA_EL1, 0),
-> +	SR_FGT(SYS_ERXADDR_EL1,		HFGxTR, ERXADDR_EL1, 1),
-> +	SR_FGT(SYS_ERXPFGCDN_EL1,	HFGxTR, ERXPFGCDN_EL1, 1),
-> +	SR_FGT(SYS_ERXPFGCTL_EL1,	HFGxTR, ERXPFGCTL_EL1, 1),
-> +	SR_FGT(SYS_ERXPFGF_EL1,		HFGxTR, ERXPFGF_EL1, 1),
-> +	SR_FGT(SYS_ERXMISC0_EL1,	HFGxTR, ERXMISCn_EL1, 1),
-> +	SR_FGT(SYS_ERXMISC1_EL1,	HFGxTR, ERXMISCn_EL1, 1),
-> +	SR_FGT(SYS_ERXMISC2_EL1,	HFGxTR, ERXMISCn_EL1, 1),
-> +	SR_FGT(SYS_ERXMISC3_EL1,	HFGxTR, ERXMISCn_EL1, 1),
-> +	SR_FGT(SYS_ERXSTATUS_EL1,	HFGxTR, ERXSTATUS_EL1, 1),
-> +	SR_FGT(SYS_ERXCTLR_EL1,		HFGxTR, ERXCTLR_EL1, 1),
-> +	SR_FGT(SYS_ERXFR_EL1,		HFGxTR, ERXFR_EL1, 1),
-> +	SR_FGT(SYS_ERRSELR_EL1,		HFGxTR, ERRSELR_EL1, 1),
-> +	SR_FGT(SYS_ERRIDR_EL1,		HFGxTR, ERRIDR_EL1, 1),
-> +	SR_FGT(SYS_ICC_IGRPEN0_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
-> +	SR_FGT(SYS_ICC_IGRPEN1_EL1,	HFGxTR, ICC_IGRPENn_EL1, 1),
-> +	SR_FGT(SYS_VBAR_EL1,		HFGxTR, VBAR_EL1, 1),
-> +	SR_FGT(SYS_TTBR1_EL1,		HFGxTR, TTBR1_EL1, 1),
-> +	SR_FGT(SYS_TTBR0_EL1,		HFGxTR, TTBR0_EL1, 1),
-> +	SR_FGT(SYS_TPIDR_EL0,		HFGxTR, TPIDR_EL0, 1),
-> +	SR_FGT(SYS_TPIDRRO_EL0,		HFGxTR, TPIDRRO_EL0, 1),
-> +	SR_FGT(SYS_TPIDR_EL1,		HFGxTR, TPIDR_EL1, 1),
-> +	SR_FGT(SYS_TCR_EL1,		HFGxTR, TCR_EL1, 1),
-> +	SR_FGT(SYS_SCXTNUM_EL0,		HFGxTR, SCXTNUM_EL0, 1),
-> +	SR_FGT(SYS_SCXTNUM_EL1, 	HFGxTR, SCXTNUM_EL1, 1),
-> +	SR_FGT(SYS_SCTLR_EL1, 		HFGxTR, SCTLR_EL1, 1),
-> +	SR_FGT(SYS_REVIDR_EL1, 		HFGxTR, REVIDR_EL1, 1),
-> +	SR_FGT(SYS_PAR_EL1, 		HFGxTR, PAR_EL1, 1),
-> +	SR_FGT(SYS_MPIDR_EL1, 		HFGxTR, MPIDR_EL1, 1),
-> +	SR_FGT(SYS_MIDR_EL1, 		HFGxTR, MIDR_EL1, 1),
-> +	SR_FGT(SYS_MAIR_EL1, 		HFGxTR, MAIR_EL1, 1),
-> +	SR_FGT(SYS_LORSA_EL1, 		HFGxTR, LORSA_EL1, 1),
-> +	SR_FGT(SYS_LORN_EL1, 		HFGxTR, LORN_EL1, 1),
-> +	SR_FGT(SYS_LORID_EL1, 		HFGxTR, LORID_EL1, 1),
-> +	SR_FGT(SYS_LOREA_EL1, 		HFGxTR, LOREA_EL1, 1),
-> +	SR_FGT(SYS_LORC_EL1, 		HFGxTR, LORC_EL1, 1),
-> +	SR_FGT(SYS_ISR_EL1, 		HFGxTR, ISR_EL1, 1),
-> +	SR_FGT(SYS_FAR_EL1, 		HFGxTR, FAR_EL1, 1),
-> +	SR_FGT(SYS_ESR_EL1, 		HFGxTR, ESR_EL1, 1),
-> +	SR_FGT(SYS_DCZID_EL0, 		HFGxTR, DCZID_EL0, 1),
-> +	SR_FGT(SYS_CTR_EL0, 		HFGxTR, CTR_EL0, 1),
-> +	SR_FGT(SYS_CSSELR_EL1, 		HFGxTR, CSSELR_EL1, 1),
-> +	SR_FGT(SYS_CPACR_EL1, 		HFGxTR, CPACR_EL1, 1),
-> +	SR_FGT(SYS_CONTEXTIDR_EL1, 	HFGxTR, CONTEXTIDR_EL1, 1),
-> +	SR_FGT(SYS_CLIDR_EL1, 		HFGxTR, CLIDR_EL1, 1),
-> +	SR_FGT(SYS_CCSIDR_EL1, 		HFGxTR, CCSIDR_EL1, 1),
-> +	SR_FGT(SYS_APIBKEYLO_EL1, 	HFGxTR, APIBKey, 1),
-> +	SR_FGT(SYS_APIBKEYHI_EL1, 	HFGxTR, APIBKey, 1),
-> +	SR_FGT(SYS_APIAKEYLO_EL1, 	HFGxTR, APIAKey, 1),
-> +	SR_FGT(SYS_APIAKEYHI_EL1, 	HFGxTR, APIAKey, 1),
-> +	SR_FGT(SYS_APGAKEYLO_EL1, 	HFGxTR, APGAKey, 1),
-> +	SR_FGT(SYS_APGAKEYHI_EL1, 	HFGxTR, APGAKey, 1),
-> +	SR_FGT(SYS_APDBKEYLO_EL1, 	HFGxTR, APDBKey, 1),
-> +	SR_FGT(SYS_APDBKEYHI_EL1, 	HFGxTR, APDBKey, 1),
-> +	SR_FGT(SYS_APDAKEYLO_EL1, 	HFGxTR, APDAKey, 1),
-> +	SR_FGT(SYS_APDAKEYHI_EL1, 	HFGxTR, APDAKey, 1),
-> +	SR_FGT(SYS_AMAIR_EL1, 		HFGxTR, AMAIR_EL1, 1),
-> +	SR_FGT(SYS_AIDR_EL1, 		HFGxTR, AIDR_EL1, 1),
-> +	SR_FGT(SYS_AFSR1_EL1, 		HFGxTR, AFSR1_EL1, 1),
-> +	SR_FGT(SYS_AFSR0_EL1, 		HFGxTR, AFSR0_EL1, 1),
-> +};
-> +
 >  static union trap_config get_trap_config(u32 sysreg)
->  {
->  	return (union trap_config) {
-> @@ -943,6 +1025,27 @@ void __init populate_nv_trap_config(void)
->  	kvm_info("nv: %ld coarse grained trap handlers\n",
->  		 ARRAY_SIZE(encoding_to_cgt));
->  
-> +	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
-> +		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
-> +		union trap_config tc;
+> @@ -1135,6 +1240,10 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  		else
+>  			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
+>  		break;
 > +
-> +		tc = get_trap_config(fgt->encoding);
-> +
-> +		WARN(tc.fgt,
-> +		     "Duplicate FGT for sys_reg(%d, %d, %d, %d, %d)\n",
-> +		     sys_reg_Op0(fgt->encoding),
-> +		     sys_reg_Op1(fgt->encoding),
-> +		     sys_reg_CRn(fgt->encoding),
-> +		     sys_reg_CRm(fgt->encoding),
-> +		     sys_reg_Op2(fgt->encoding));
-> +
-> +		tc.val |= fgt->tc.val;
-> +		xa_store(&sr_forward_xa, fgt->encoding,
-> +			 xa_mk_value(tc.val), GFP_KERNEL);
-> +	}
-> +
-> +	kvm_info("nv: %ld fine grained trap handlers\n",
-> +		 ARRAY_SIZE(encoding_to_fgt));
->  }
->  
->  static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
-> @@ -992,13 +1095,26 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
->  	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
->  }
->  
-> +static bool check_fgt_bit(u64 val, const union trap_config tc)
-> +{
-> +	return ((val >> tc.bit) & 1) == tc.pol;
-> +}
-> +
-> +#define sanitised_sys_reg(vcpu, reg)			\
-> +	({						\
-> +		u64 __val;				\
-> +		__val = __vcpu_sys_reg(vcpu, reg);	\
-> +		__val &= ~__ ## reg ## _RES0;		\
-> +		(__val);				\
-> +	})
-> +
->  bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->  {
->  	union trap_config tc;
->  	enum trap_behaviour b;
->  	bool is_read;
->  	u32 sysreg;
-> -	u64 esr;
-> +	u64 esr, val;
->  
->  	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
->  		return false;
-> @@ -1009,6 +1125,21 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->  
->  	tc = get_trap_config(sysreg);
->  
-> +	switch ((enum fgt_group_id)tc.fgt) {
-> +	case __NO_FGT_GROUP__:
+> +	case HFGITR_GROUP:
+> +		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
 > +		break;
-> +
-> +	case HFGxTR_GROUP:
-> +		if (is_read)
-> +			val = sanitised_sys_reg(vcpu, HFGRTR_EL2);
-> +		else
-> +			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
-> +		break;
-> +	}
-> +
-> +	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
-> +		goto inject;
-> +
->  	b = compute_trap_behaviour(vcpu, tc);
+>  	}
 >  
->  	if (((b & BEHAVE_FORWARD_READ) && is_read) ||
-With Oliver's comments
+>  	if (tc.fgt != __NO_FGT_GROUP__ && check_fgt_bit(val, tc))
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
