@@ -2,95 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65BDF77235B
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 14:02:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5453F77240B
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 14:30:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233157AbjHGMCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 08:02:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39022 "EHLO
+        id S233557AbjHGMap (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 08:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231416AbjHGMCr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 08:02:47 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F95D1FC8;
-        Mon,  7 Aug 2023 05:02:06 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1bb893e6365so27632825ad.2;
-        Mon, 07 Aug 2023 05:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691409725; x=1692014525;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GUzrPfmRrMPt+i4UE/lAe9+fC5lOiUGAw2K7J8tfV2c=;
-        b=d2GE3aQo5mQfZvlEF7f4oSva4EKJvypvIGy6IuBTAsIUE3RDscNyHs6Em+I3dvnLEN
-         Obr3UC2AiaTlHrSkEsJ/2/LFeYfvI1DiNMw5FenkPOHuDossPPZc8ZfeJGsIy+R9emgH
-         S+zPKCf80hsaVWKsNUpdmTN80mS2TgCrpRIY5tVhvkJPAPvo5KeS0X2Jwyldn9yI+g6Q
-         Z55xF5Wu+GHCqh6GAMq9ECVbnwQqBc3oeadTkaDvDDfs5YsfG/1knWcS8z7eeL+BWZrT
-         egWAAOtE1/vlGanMsyRR3IJqlk1YK1GLJmry94YPMykoZPpGbxmbd5/l8MnQYh04wIDr
-         yzPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691409725; x=1692014525;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GUzrPfmRrMPt+i4UE/lAe9+fC5lOiUGAw2K7J8tfV2c=;
-        b=MXnsLErHJ9VZOsyQJLYTuC4A5hiBTRsVY58ivG6u0RFHg7ncdh8cy2x1eY5qDiPW4V
-         qS4bZvvUERtyilxlAxosNjdWooEgR2O80M4V7DN+kkJDEj5xJ+qaMMuZa7cGotUaVHQJ
-         kQ6Q9Pp6G7gLiKleXK9aeFPOaU5MbVNz+vhFjkrCkwzilYypWmjyZftkyi3vje7EzXtO
-         AUVHc2FvPz10FM8sCH5J1f5BPgt20LHMDnpXPw/halxd+ZvmUc+7+/M+TRhztExJ3bI0
-         21vMU5VuqwNvILaRbvHg+CabvpA/RjnKhT5gnchHz6bo29QcPwOuVa1tmXVdLOHR7lb7
-         qxRw==
-X-Gm-Message-State: AOJu0Ywqj9gFM3GMC4Y4d9rTPoS/mfkBZ83s2eQOjG9GoegtqZJ5EMTn
-        NIR9umm27tbHnxBN72xj5vw=
-X-Google-Smtp-Source: AGHT+IHWYNulalQMDqlB0MHADRqG5ScHqlrzXhiB9uHTqVA4K3003dWe9L2ntXhX6qq+PcVohtu+WA==
-X-Received: by 2002:a17:902:c101:b0:1b5:edd:e3c7 with SMTP id 1-20020a170902c10100b001b50edde3c7mr7864273pli.16.1691409724767;
-        Mon, 07 Aug 2023 05:02:04 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jc15-20020a17090325cf00b001b7ffca7dbcsm6752298plb.148.2023.08.07.05.02.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Aug 2023 05:02:04 -0700 (PDT)
-Message-ID: <5581418b-2e1c-6011-f0a4-580df7e00b44@gmail.com>
-Date:   Mon, 7 Aug 2023 20:01:55 +0800
+        with ESMTP id S232473AbjHGMai (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 08:30:38 -0400
+Received: from mail.8bytes.org (mail.8bytes.org [IPv6:2a01:238:42d9:3f00:e505:6202:4f0c:f051])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C36891710;
+        Mon,  7 Aug 2023 05:30:19 -0700 (PDT)
+Received: from 8bytes.org (pd9fe94eb.dip0.t-ipconnect.de [217.254.148.235])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.8bytes.org (Postfix) with ESMTPSA id 1DBD22802C2;
+        Mon,  7 Aug 2023 14:30:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
+        s=default; t=1691411417;
+        bh=c90Yi4nQt040JDhF9erB1oWX7zPJ6lrzrHSn0+kunok=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bGIxBTZgxFw6JJa7RMXuE/I8Zw+NcgF5f//wxdTV+F4R6BdunMII8DMX4IBYnewgA
+         IQNhOmd6zSLBr8yJYTQxVikb99dHEmAWD5JXXbeT5BTwb8ViI5oCTUaxJdrZc5mC6n
+         835qdE16OyAroZ7ZDnp1ieSyd0j+8tFbCXzwmOJU/BoFiKoHVeJdqvdnnjwiDRxA4H
+         qww2h/wbxnLnO7TpUzR/lNbpD0LF9O5ogmkwVT8v8vXkBMEJDjluYgy5pnUZzarHX4
+         6XumXbhqwKnUAvu6okwC8RLvstvLhwgjle0MzX2FoHyLREySBaJG/bMvOe2lZlLtYb
+         CmwPWzeuPpTSA==
+Date:   Mon, 7 Aug 2023 14:30:15 +0200
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v3 1/2] iommu: Prevent RESV_DIRECT devices from blocking
+ domains
+Message-ID: <ZNDj1-Od0iXFhgce@8bytes.org>
+References: <20230724060352.113458-1-baolu.lu@linux.intel.com>
+ <20230724060352.113458-2-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH 19/27] KVM: x86/mmu: Use page-track notifiers iff there
- are external users
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Ben Gardon <bgardon@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20221223005739.1295925-1-seanjc@google.com>
- <20221223005739.1295925-20-seanjc@google.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20221223005739.1295925-20-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230724060352.113458-2-baolu.lu@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/12/2022 8:57 am, Sean Christopherson wrote:
-> +static inline void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
-> +					const u8 *new, int bytes)
-> +{
-> +	__kvm_page_track_write(vcpu, gpa, new, bytes);
-> +
-> +	kvm_mmu_track_write(vcpu, gpa, new, bytes);
-> +}
+Hi Baolu,
 
-The kvm_mmu_track_write() is only used for x86, where the incoming parameter
-"u8 *new" has not been required since 0e0fee5c539b ("kvm: mmu: Fix race in
-emulated page table writes"), please help confirm if it's still needed ? Thanks.
-A minor clean up is proposed.
+On Mon, Jul 24, 2023 at 02:03:51PM +0800, Lu Baolu wrote:
+> The IOMMU_RESV_DIRECT flag indicates that a memory region must be mapped
+> 1:1 at all times. This means that the region must always be accessible to
+> the device, even if the device is attached to a blocking domain. This is
+> equal to saying that IOMMU_RESV_DIRECT flag prevents devices from being
+> attached to blocking domains.
+> 
+> This also implies that devices that implement RESV_DIRECT regions will be
+> prevented from being assigned to user space since taking the DMA ownership
+> immediately switches to a blocking domain.
+> 
+> The rule of preventing devices with the IOMMU_RESV_DIRECT regions from
+> being assigned to user space has existed in the Intel IOMMU driver for
+> a long time. Now, this rule is being lifted up to a general core rule,
+> as other architectures like AMD and ARM also have RMRR-like reserved
+> regions. This has been discussed in the community mailing list and refer
+> to below link for more details.
+> 
+> Other places using unmanaged domains for kernel DMA must follow the
+> iommu_get_resv_regions() and setup IOMMU_RESV_DIRECT - we do not restrict
+> them in the core code.
+> 
+> Cc: Robin Murphy <robin.murphy@arm.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Link: https://lore.kernel.org/linux-iommu/BN9PR11MB5276E84229B5BD952D78E9598C639@BN9PR11MB5276.namprd11.prod.outlook.com
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Acked-by: Joerg Roedel <jroedel@suse.de>
+
+Feel free to include that in your next round of VT-d updates you send my
+way.
