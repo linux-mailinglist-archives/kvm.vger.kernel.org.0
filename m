@@ -2,197 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40529771B07
-	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 09:04:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BCEB771B6B
+	for <lists+kvm@lfdr.de>; Mon,  7 Aug 2023 09:26:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230495AbjHGHEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 03:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57786 "EHLO
+        id S231386AbjHGH0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 03:26:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231263AbjHGHEA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 03:04:00 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAFF31736;
-        Mon,  7 Aug 2023 00:03:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691391837; x=1722927837;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=OYx8ib8UwDw50WR3f9wPZdPj36xMXCE8nxGRK88XDgw=;
-  b=SZW9mlZbpCJBFMJ1nj0PwBQcuWI3a6iAbTeDqnhDPi7c8uwoWuxzGQjM
-   LJ5N60c6pi1t9ezQ2IGXhvG4jwzqYnMc1OKvB2uNt9e4Qm7sEslIEov7S
-   gaNKRNbi5USs5YjZwt9bk0chiny3J/QlvnNmdZaOvqqlF4VdYq7psRaPQ
-   u2ll2OEVOeOg+yLQnBv3YJ+s9OhxYpwstcOJ59TH5iCDMQS/8e1wbyviv
-   mXfW5/2NbRCqLROBaObGGEzEZdHhBWB1e83Jpy+SUu7CZ7M/lG2hPWcOB
-   MAAWK4AB6UDYgTinkCCW9+Df2hVmbJkgzMyY5GniiGRsxbxUVhUIKn/X5
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10794"; a="367930720"
-X-IronPort-AV: E=Sophos;i="6.01,261,1684825200"; 
-   d="scan'208";a="367930720"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 00:03:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10794"; a="730844393"
-X-IronPort-AV: E=Sophos;i="6.01,261,1684825200"; 
-   d="scan'208";a="730844393"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.9.230]) ([10.238.9.230])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 00:03:53 -0700
-Message-ID: <8c628549-a388-afd5-3c6e-a956fbce7f79@linux.intel.com>
-Date:   Mon, 7 Aug 2023 15:03:33 +0800
+        with ESMTP id S231219AbjHGH0U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 03:26:20 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66D8EA7
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 00:26:18 -0700 (PDT)
+Received: from lhrpeml500002.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RK77j4LyVz6J673;
+        Mon,  7 Aug 2023 15:22:41 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
+ lhrpeml500002.china.huawei.com (7.191.160.78) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 7 Aug 2023 08:26:15 +0100
+Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
+ lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.027;
+ Mon, 7 Aug 2023 08:26:15 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Gavin Shan <gshan@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+CC:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "ricarkol@google.com" <ricarkol@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: RE: [RFC PATCH] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Thread-Topic: [RFC PATCH] arm/kvm: Enable support for
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Thread-Index: AQHZvwjifN5MO8LOQ0OA7FeN8cqACa/eWBoAgAAqTfA=
+Date:   Mon, 7 Aug 2023 07:26:15 +0000
+Message-ID: <6edab089b36341c39d0fe66f0b060e66@huawei.com>
+References: <20230725150002.621-1-shameerali.kolothum.thodi@huawei.com>
+ <c76de653-489c-ea4a-3163-f7d114c72d0f@redhat.com>
+In-Reply-To: <c76de653-489c-ea4a-3163-f7d114c72d0f@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.48.149.63]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v2 6/8] KVM: VMX: Implement and apply
- vmx_is_lass_violation() for LASS protection
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-References: <20230719024558.8539-1-guang.zeng@intel.com>
- <20230719024558.8539-7-guang.zeng@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20230719024558.8539-7-guang.zeng@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/19/2023 10:45 AM, Zeng Guang wrote:
-> Implement and wire up vmx_is_lass_violation() in kvm_x86_ops for VMX.
->
-> LASS violation check takes effect in KVM emulation of instruction fetch
-> and data access including implicit access when vCPU is running in long
-> mode, and also involved in emulation of VMX instruction and SGX ENCLS
-> instruction to enforce the mode-based protections before paging.
->
-> But the target memory address of emulation of TLB invalidation and branch
-> instructions aren't subject to LASS as exceptions.
->
-> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
-> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
-> ---
->   arch/x86/kvm/vmx/nested.c |  3 ++-
->   arch/x86/kvm/vmx/sgx.c    |  4 ++++
->   arch/x86/kvm/vmx/vmx.c    | 35 +++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/vmx.h    |  3 +++
->   4 files changed, 44 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index e35cf0bd0df9..72e78566a3b6 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4985,7 +4985,8 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
->   		 * non-canonical form. This is the only check on the memory
->   		 * destination for long mode!
->   		 */
-> -		exn = is_noncanonical_address(*ret, vcpu);
-> +		exn = is_noncanonical_address(*ret, vcpu) ||
-> +		      vmx_is_lass_violation(vcpu, *ret, len, 0);
->   	} else {
->   		/*
->   		 * When not in long mode, the virtual/linear address is
-> diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-> index 2261b684a7d4..f8de637ce634 100644
-> --- a/arch/x86/kvm/vmx/sgx.c
-> +++ b/arch/x86/kvm/vmx/sgx.c
-> @@ -46,6 +46,10 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
->   			((s.base != 0 || s.limit != 0xffffffff) &&
->   			(((u64)*gva + size - 1) > s.limit + 1));
->   	}
-> +
-> +	if (!fault)
-> +		fault = vmx_is_lass_violation(vcpu, *gva, size, 0);
-> +
->   	if (fault)
->   		kvm_inject_gp(vcpu, 0);
->   	return fault ? -EINVAL : 0;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 44fb619803b8..15a7c6e7a25d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -8127,6 +8127,40 @@ static void vmx_vm_destroy(struct kvm *kvm)
->   	free_pages((unsigned long)kvm_vmx->pid_table, vmx_get_pid_table_order(kvm));
->   }
->   
-> +bool vmx_is_lass_violation(struct kvm_vcpu *vcpu, unsigned long addr,
-> +			   unsigned int size, unsigned int flags)
-> +{
-> +	const bool is_supervisor_address = !!(addr & BIT_ULL(63));
-> +	const bool implicit = !!(flags & X86EMUL_F_IMPLICIT);
-> +	const bool fetch = !!(flags & X86EMUL_F_FETCH);
-> +	const bool is_wraparound_access = size ? (addr + size - 1) < addr : false;
-> +
-> +	if (!kvm_is_cr4_bit_set(vcpu, X86_CR4_LASS) || !is_long_mode(vcpu))
-> +		return false;
-> +
-> +	/*
-> +	 * INVTLB isn't subject to LASS, e.g. to allow invalidating userspace
-> +	 * addresses without toggling RFLAGS.AC.  Branch targets aren't subject
-> +	 * to LASS in order to simplifiy far control transfers (the subsequent
-s/simplifiy/simplifiy
-
-> +	 * fetch will enforce LASS as appropriate).
-> +	 */
-> +	if (flags & (X86EMUL_F_BRANCH | X86EMUL_F_INVTLB))
-> +		return false;
-> +
-> +	if (!implicit && vmx_get_cpl(vcpu) == 3)
-> +		return is_supervisor_address;
-> +
-> +	/* LASS is enforced for supervisor-mode access iff SMAP is enabled. */
-To be more accurate, supervisor-mode data access.
-Also, "iff" here is not is a typo for "if" or it stands for "if and only 
-if"?
-It is not accureate to use "if and only if" here because beside SMAP, 
-there are other conditions, i.e. implicit or RFLAGS.AC.
-
-> +	if (!fetch && !kvm_is_cr4_bit_set(vcpu, X86_CR4_SMAP))
-> +		return false;
-> +
-> +	/* Like SMAP, RFLAGS.AC disables LASS checks in supervisor mode. */
-> +	if (!fetch && !implicit && (kvm_get_rflags(vcpu) & X86_EFLAGS_AC))
-> +		return false;
-> +
-> +	return is_wraparound_access ? true : !is_supervisor_address;
-> +}
-> +
->   static struct kvm_x86_ops vmx_x86_ops __initdata = {
->   	.name = KBUILD_MODNAME,
->   
-> @@ -8266,6 +8300,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->   	.complete_emulated_msr = kvm_complete_insn_gp,
->   
->   	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
-> +	.is_lass_violation = vmx_is_lass_violation,
->   };
->   
->   static unsigned int vmx_handle_intel_pt_intr(void)
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 9e66531861cf..c1e541a790bb 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -433,6 +433,9 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type);
->   u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
->   u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
->   
-> +bool vmx_is_lass_violation(struct kvm_vcpu *vcpu, unsigned long addr,
-> +			   unsigned int size, unsigned int flags);
-> +
->   static inline void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr,
->   					     int type, bool value)
->   {
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogR2F2aW4gU2hhbiBbbWFp
+bHRvOmdzaGFuQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDA3IEF1Z3VzdCAyMDIzIDA2OjUzDQo+IFRv
+OiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1
+YXdlaS5jb20+Ow0KPiBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtYXJtQG5vbmdudS5vcmcN
+Cj4gQ2M6IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgcmljYXJrb2xAZ29vZ2xlLmNvbTsga3Zt
+QHZnZXIua2VybmVsLm9yZzsNCj4gSm9uYXRoYW4gQ2FtZXJvbiA8am9uYXRoYW4uY2FtZXJvbkBo
+dWF3ZWkuY29tPjsgTGludXhhcm0NCj4gPGxpbnV4YXJtQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6
+IFJlOiBbUkZDIFBBVENIXSBhcm0va3ZtOiBFbmFibGUgc3VwcG9ydCBmb3INCj4gS1ZNX0NBUF9B
+Uk1fRUFHRVJfU1BMSVRfQ0hVTktfU0laRQ0KPiANCj4gDQo+IE9uIDcvMjYvMjMgMDE6MDAsIFNo
+YW1lZXIgS29sb3RodW0gd3JvdGU6DQo+ID4gTm93IHRoYXQgd2UgaGF2ZSBFYWdlciBQYWdlIFNw
+bGl0IHN1cHBvcnQgYWRkZWQgZm9yIEFSTSBpbiB0aGUga2VybmVsWzBdLA0KPiA+IGVuYWJsZSBp
+dCBpbiBRZW11LiBUaGlzIGFkZHMsDQo+ID4gICAtZWFnZXItc3BsaXQtc2l6ZSB0byBRZW11IG9w
+dGlvbnMgdG8gc2V0IHRoZSBlYWdlciBwYWdlIHNwbGl0IGNodW5rIHNpemUuDQo+ID4gICAtZW5h
+YmxlIEtWTV9DQVBfQVJNX0VBR0VSX1NQTElUX0NIVU5LX1NJWkUuDQo+ID4NCj4gPiBUaGUgY2h1
+bmsgc2l6ZSBzcGVjaWZpZXMgaG93IG1hbnkgcGFnZXMgdG8gYnJlYWsgYXQgYSB0aW1lLCB1c2lu
+ZyBhDQo+ID4gc2luZ2xlIGFsbG9jYXRpb24uIEJpZ2dlciB0aGUgY2h1bmsgc2l6ZSwgbW9yZSBw
+YWdlcyBuZWVkIHRvIGJlDQo+ID4gYWxsb2NhdGVkIGFoZWFkIG9mIHRpbWUuDQo+ID4NCj4gPiBO
+b3RlczoNCj4gPiAgIC0gSSBhbSBub3Qgc3VyZSB3aGV0aGVyIHdlIG5lZWQgdG8gY2FsbCBrdm1f
+dm1fY2hlY2tfZXh0ZW5zaW9uKCkgZm9yDQo+ID4gICAgIEtWTV9DQVBfQVJNX0VBR0VSX1NQTElU
+X0NIVU5LX1NJWkUgb3Igbm90IGFzIGtlcm5lbCBzZWVtcyB0bw0KPiBkaXNhYmxlDQo+ID4gICAg
+IGVhZ2VyIHBhZ2Ugc2l6ZSBieSBkZWZhdWx0IGFuZCBpdCB3aWxsIHJldHVybiB6ZXJvIGFsd2F5
+cy4NCj4gPg0KPiA+ICAgIC1Ub0RvOiBVcGRhdGUgcWVtdS1vcHRpb25zLmh4DQo+ID4NCj4gPiBb
+MF06DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC8xNjg0MjYxMTE0NzcuMzE5MzEzMy4x
+MDc0ODEwNjE5OTg0Mzc4MDkzDQo+IDAuYjQtdHlAbGludXguZGV2Lw0KPiA+DQo+ID4gU2lnbmVk
+LW9mZi1ieTogU2hhbWVlciBLb2xvdGh1bQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBo
+dWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+ICAgaW5jbHVkZS9zeXNlbXUva3ZtX2ludC5oIHwgIDEg
+Kw0KPiA+ICAgdGFyZ2V0L2FybS9rdm0uYyAgICAgICAgIHwgNzMNCj4gKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+ICAgMiBmaWxlcyBjaGFuZ2VkLCA3NCBpbnNl
+cnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9zeXNlbXUva3ZtX2ludC5o
+IGIvaW5jbHVkZS9zeXNlbXUva3ZtX2ludC5oDQo+ID4gaW5kZXggNTExYjQyYmRlNS4uMDNhMTY2
+MGQ0MCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL3N5c2VtdS9rdm1faW50LmgNCj4gPiArKysg
+Yi9pbmNsdWRlL3N5c2VtdS9rdm1faW50LmgNCj4gPiBAQCAtMTE2LDYgKzExNiw3IEBAIHN0cnVj
+dCBLVk1TdGF0ZQ0KPiA+ICAgICAgIHVpbnQ2NF90IGt2bV9kaXJ0eV9yaW5nX2J5dGVzOyAgLyog
+U2l6ZSBvZiB0aGUgcGVyLXZjcHUgZGlydHkgcmluZw0KPiAqLw0KPiA+ICAgICAgIHVpbnQzMl90
+IGt2bV9kaXJ0eV9yaW5nX3NpemU7ICAgLyogTnVtYmVyIG9mIGRpcnR5IEdGTnMgcGVyIHJpbmcN
+Cj4gKi8NCj4gPiAgICAgICBib29sIGt2bV9kaXJ0eV9yaW5nX3dpdGhfYml0bWFwOw0KPiA+ICsg
+ICAgdWludDY0X3Qga3ZtX2VhZ2VyX3NwbGl0X3NpemU7IC8qIEVhZ2VyIFBhZ2UgU3BsaXR0aW5n
+IGNodW5rIHNpemUgKi8NCj4gPiAgICAgICBzdHJ1Y3QgS1ZNRGlydHlSaW5nUmVhcGVyIHJlYXBl
+cjsNCj4gPiAgICAgICBOb3RpZnlWbWV4aXRPcHRpb24gbm90aWZ5X3ZtZXhpdDsNCj4gPiAgICAg
+ICB1aW50MzJfdCBub3RpZnlfd2luZG93Ow0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvYXJtL2t2
+bS5jIGIvdGFyZ2V0L2FybS9rdm0uYw0KPiA+IGluZGV4IGI0Yzc2NTRmNDkuLjk4NWQ5MDEwNjIg
+MTAwNjQ0DQo+ID4gLS0tIGEvdGFyZ2V0L2FybS9rdm0uYw0KPiA+ICsrKyBiL3RhcmdldC9hcm0v
+a3ZtLmMNCj4gPiBAQCAtMzAsNiArMzAsNyBAQA0KPiA+ICAgI2luY2x1ZGUgImV4ZWMvYWRkcmVz
+cy1zcGFjZXMuaCINCj4gPiAgICNpbmNsdWRlICJody9ib2FyZHMuaCINCj4gPiAgICNpbmNsdWRl
+ICJody9pcnEuaCINCj4gPiArI2luY2x1ZGUgInFhcGkvdmlzaXRvci5oIg0KPiA+ICAgI2luY2x1
+ZGUgInFlbXUvbG9nLmgiDQo+ID4NCj4gPiAgIGNvbnN0IEtWTUNhcGFiaWxpdHlJbmZvIGt2bV9h
+cmNoX3JlcXVpcmVkX2NhcGFiaWxpdGllc1tdID0gew0KPiA+IEBAIC0yNDcsNiArMjQ4LDIzIEBA
+IGludA0KPiBrdm1fYXJtX2dldF9tYXhfdm1faXBhX3NpemUoTWFjaGluZVN0YXRlICptcywgYm9v
+bCAqZml4ZWRfaXBhKQ0KPiA+ICAgICAgIHJldHVybiByZXQgPiAwID8gcmV0IDogNDA7DQo+ID4g
+ICB9DQo+ID4NCj4gPiArc3RhdGljIGJvb2wga3ZtX2FybV9lYWdlcl9zcGxpdF9zaXplX3ZhbGlk
+KHVpbnQ2NF90IHJlcV9zaXplLCB1aW50MzJfdA0KPiBzaXplcykNCj4gPiArew0KPiA+ICsgICAg
+aW50IGk7DQo+ID4gKw0KPiA+ICsgICAgZm9yIChpID0gMDsgaSA8IHNpemVvZih1aW50MzJfdCkg
+KiBCSVRTX1BFUl9CWVRFOyBpKyspIHsNCj4gPiArICAgICAgICBpZiAoIShzaXplcyAmICgxIDw8
+IGkpKSkgew0KPiA+ICsgICAgICAgICAgICBjb250aW51ZTsNCj4gPiArICAgICAgICB9DQo+ID4g
+Kw0KPiA+ICsgICAgICAgIGlmIChyZXFfc2l6ZSA9PSAoMSA8PCBpKSkgew0KPiA+ICsgICAgICAg
+ICAgICByZXR1cm4gdHJ1ZTsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+
+ICsgICAgcmV0dXJuIGZhbHNlOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICAgaW50IGt2bV9hcmNoX2lu
+aXQoTWFjaGluZVN0YXRlICptcywgS1ZNU3RhdGUgKnMpDQo+ID4gICB7DQo+ID4gICAgICAgaW50
+IHJldCA9IDA7DQo+ID4gQEAgLTI4MCw2ICsyOTgsMjEgQEAgaW50IGt2bV9hcmNoX2luaXQoTWFj
+aGluZVN0YXRlICptcywgS1ZNU3RhdGUNCj4gKnMpDQo+ID4gICAgICAgICAgIH0NCj4gPiAgICAg
+ICB9DQo+ID4NCj4gPiArICAgIGlmIChzLT5rdm1fZWFnZXJfc3BsaXRfc2l6ZSkgew0KPiA+ICsg
+ICAgICAgIHVpbnQzMl90IHNpemVzOw0KPiA+ICsNCj4gPiArICAgICAgICBzaXplcyA9IGt2bV92
+bV9jaGVja19leHRlbnNpb24ocywNCj4gS1ZNX0NBUF9BUk1fU1VQUE9SVEVEX0JMT0NLX1NJWkVT
+KTsNCj4gPiArICAgICAgICBpZiAoIXNpemVzKSB7DQo+ID4gKyAgICAgICAgICAgIGVycm9yX3Jl
+cG9ydCgiRWFnZXIgUGFnZSBTcGxpdCBub3Qgc3VwcG9ydGVkIG9uIGhvc3QiKTsNCj4gPiArICAg
+ICAgICB9IGVsc2UgaWYNCj4gKCFrdm1fYXJtX2VhZ2VyX3NwbGl0X3NpemVfdmFsaWQocy0+a3Zt
+X2VhZ2VyX3NwbGl0X3NpemUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHNpemVzKSkgew0KPiA+ICsgICAgICAgICAgICBlcnJvcl9yZXBv
+cnQoIkVhZ2VyIFBhZ2UgU3BsaXQgcmVxdWVzdGVkIGNodW5rIHNpemUgbm90DQo+IHZhbGlkIik7
+DQo+ID4gKyAgICAgICAgfSBlbHNlIGlmIChrdm1fdm1fZW5hYmxlX2NhcChzLA0KPiBLVk1fQ0FQ
+X0FSTV9FQUdFUl9TUExJVF9DSFVOS19TSVpFLCAwLA0KPiA+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgcy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemUpKSB7DQo+ID4gKyAgICAg
+ICAgICAgIGVycm9yX3JlcG9ydCgiRmFpbGVkIHRvIHNldCBFYWdlciBQYWdlIFNwbGl0IGNodW5r
+IHNpemUiKTsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICAgICAgIGt2
+bV9hcm1faW5pdF9kZWJ1ZyhzKTsNCj4gPg0KPiA+ICAgICAgIHJldHVybiByZXQ7DQo+IA0KPiBE
+byB3ZSByZWFsbHkgd2FudCB0byBmYWlsIHdoZW4gS1ZNX0NBUF9BUk1fU1VQUE9SVEVEX0JMT0NL
+X1NJWkVTDQo+IGlzbid0IHN1cHBvcnRlZD8NCj4gSSB0aGluayB0aGUgYXBwcm9wcmlhdGUgYmVo
+YXZpb3IgaXMgdG8gd2FybiBhbmQgY2xlYXIgcy0+a3ZtX2VhZ2VyX3NwbGl0X3NpemUNCj4gZm9y
+IHRoaXMgc3BlY2lmaWMgY2FzZSwgc2ltaWxhciB0byB3aGF0IHdlIGFyZSBkb2luZyBmb3Igcy0+
+a3ZtX2RpcnR5X3Jpbmdfc2l6ZQ0KPiBpbiBrdm1fZGlydHlfcmluZ19pbml0KCkuIFdpdGggdGhp
+cywgdGhlIGJlaGF2aW9yIGlzIGJhY2t3YXJkcyBjb21wYXRpYmxlIHRvDQo+IHRoZQ0KPiBvbGQg
+aG9zdCBrZXJuZWxzLg0KDQpPay4gVGhhdCBtYWtlcyBzZW5zZS4gV2lsbCB1cGRhdGUuDQoNClRo
+YW5rcywNClNoYW1lZXINCg0KPiANCj4gPiBAQCAtMTA2Miw2ICsxMDk1LDQ2IEBAIGJvb2wNCj4g
+a3ZtX2FyY2hfY3B1X2NoZWNrX2FyZV9yZXNldHRhYmxlKHZvaWQpDQo+ID4gICAgICAgcmV0dXJu
+IHRydWU7DQo+ID4gICB9DQo+ID4NCj4gPiArc3RhdGljIHZvaWQga3ZtX2FyY2hfZ2V0X2VhZ2Vy
+X3NwbGl0X3NpemUoT2JqZWN0ICpvYmosIFZpc2l0b3IgKnYsDQo+ID4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIHZvaWQNCj4gKm9w
+YXF1ZSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJy
+b3IgKiplcnJwKQ0KPiA+ICt7DQo+ID4gKyAgICBLVk1TdGF0ZSAqcyA9IEtWTV9TVEFURShvYmop
+Ow0KPiA+ICsgICAgdWludDY0X3QgdmFsdWUgPSBzLT5rdm1fZWFnZXJfc3BsaXRfc2l6ZTsNCj4g
+PiArDQo+ID4gKyAgICB2aXNpdF90eXBlX3NpemUodiwgbmFtZSwgJnZhbHVlLCBlcnJwKTsNCj4g
+PiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIHZvaWQga3ZtX2FyY2hfc2V0X2VhZ2VyX3NwbGl0X3Np
+emUoT2JqZWN0ICpvYmosIFZpc2l0b3IgKnYsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIHZvaWQNCj4gKm9wYXF1ZSwNCj4g
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJw
+KQ0KPiA+ICt7DQo+ID4gKyAgICBLVk1TdGF0ZSAqcyA9IEtWTV9TVEFURShvYmopOw0KPiA+ICsg
+ICAgdWludDY0X3QgdmFsdWU7DQo+ID4gKw0KPiA+ICsgICAgaWYgKHMtPmZkICE9IC0xKSB7DQo+
+ID4gKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiQ2Fubm90IHNldCBwcm9wZXJ0aWVzIGFmdGVy
+IHRoZSBhY2NlbGVyYXRvciBoYXMNCj4gYmVlbiBpbml0aWFsaXplZCIpOw0KPiA+ICsgICAgICAg
+IHJldHVybjsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBpZiAoIXZpc2l0X3R5cGVfc2l6
+ZSh2LCBuYW1lLCAmdmFsdWUsIGVycnApKSB7DQo+ID4gKyAgICAgICAgcmV0dXJuOw0KPiA+ICsg
+ICAgfQ0KPiA+ICsNCj4gPiArICAgIGlmICh2YWx1ZSAmICh2YWx1ZSAtIDEpKSB7DQo+ID4gKyAg
+ICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiZWFybHktc3BsaXQtc2l6ZSBtdXN0IGJlIGEgcG93ZXIg
+b2YgdHdvLiIpOw0KPiA+ICsgICAgICAgIHJldHVybjsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4g
+KyAgICBzLT5rdm1fZWFnZXJfc3BsaXRfc2l6ZSA9IHZhbHVlOw0KPiA+ICt9DQo+ID4gKw0KPiA+
+ICAgdm9pZCBrdm1fYXJjaF9hY2NlbF9jbGFzc19pbml0KE9iamVjdENsYXNzICpvYykNCj4gPiAg
+IHsNCj4gPiArICAgIG9iamVjdF9jbGFzc19wcm9wZXJ0eV9hZGQob2MsICJlYWdlci1zcGxpdC1z
+aXplIiwgInNpemUiLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBrdm1fYXJj
+aF9nZXRfZWFnZXJfc3BsaXRfc2l6ZSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAga3ZtX2FyY2hfc2V0X2VhZ2VyX3NwbGl0X3NpemUsIE5VTEwsDQo+IE5VTEwpOw0KPiA+ICsN
+Cj4gPiArICAgIG9iamVjdF9jbGFzc19wcm9wZXJ0eV9zZXRfZGVzY3JpcHRpb24ob2MsICJlYWdl
+ci1zcGxpdC1zaXplIiwNCj4gPiArICAgICAgICAiQ29uZmlndXJlIEVhZ2VyIFBhZ2UgU3BsaXQg
+Y2h1bmsgc2l6ZSBmb3IgaHVnZXBhZ2VzLiAoZGVmYXVsdDogMCwNCj4gZGlzYWJsZWQpIik7DQo+
+ID4gICB9DQo+IA0KPiBUaGFua3MsDQo+IEdhdmluDQoNCg==
