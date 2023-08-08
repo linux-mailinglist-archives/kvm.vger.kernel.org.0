@@ -2,291 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D3C077365F
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 04:12:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0C1C773682
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 04:24:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbjHHCMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 22:12:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44708 "EHLO
+        id S229975AbjHHCY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 22:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbjHHCMd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 22:12:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FE91711;
-        Mon,  7 Aug 2023 19:12:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2E3AC62377;
-        Tue,  8 Aug 2023 02:12:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41A6CC433C9;
-        Tue,  8 Aug 2023 02:12:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691460748;
-        bh=VRkYha2WcYiFCfW1jnh2VzYnyzSI0BELp4Vbm5rvuJ0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kIDPQ2tkRoESMxlHw70sgk7jaT2faK4xi7GqlRBnpsnrfAGVWf56MAMy5koAx3fEu
-         rc8orB5Jl57n/+LS4Q+M8wXPJlijTHZ/Mf+BbCq7fRz0uH9WVui1WSDJbW/sdv74h6
-         hpcz6wB9Nf+Kae77HrB87LBryEUzWLuy8NCpFfX9qOy/CmCuFW+WeZJHruny88kTUU
-         g+w7Yzys9y9TwUPJEJ4M+eT+sn+F/H3G+VIWsU/UsSfzSpmjECNB4p90XnDdXv0hcn
-         A0ZPCj9ITwAzmSiKqhaCLUy9pW4lcrGn647Zu7X+t/8052h+2ejyG/w7z2f/x1Cre8
-         vHXMHucz3xXmA==
-Date:   Mon, 7 Aug 2023 22:12:15 -0400
-From:   Guo Ren <guoren@kernel.org>
-To:     Stefan O'Rear <sorear@fastmail.com>
-Cc:     paul.walmsley@sifive.com, Anup Patel <anup@brainfault.org>,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        Palmer Dabbelt <palmer@rivosinc.com>, longman@redhat.com,
-        boqun.feng@gmail.com, tglx@linutronix.de, paulmck@kernel.org,
-        rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, Conor Dooley <conor.dooley@microchip.com>,
-        xiaoguang.xing@sophgo.com,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-        alexghiti@rivosinc.com, Kees Cook <keescook@chromium.org>,
-        greentime.hu@sifive.com, Andrew Jones <ajones@ventanamicro.com>,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        with ESMTP id S230053AbjHHCYY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 22:24:24 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F69119A1
+        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 19:24:14 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bc65360648so19491665ad.1
+        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 19:24:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1691461454; x=1692066254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HUGk8Gm4qWKcvYyYW1oMdtOdnxgdWZtLrf0WmvG8aOg=;
+        b=E8R/sNcxrOK1IUnWWdPxuHAURfzEKsQXFvPF/8WoYIocyBzrOF6C/15wk0bBTyq8fp
+         w+9skh2POsCjChG96SdxCE1ukUJoo7U6iUCJoOHux3qHabiPQt2q8GYhzVnnqh4Ia8gf
+         otMrpF/u+4+6GZvnjfH9iZQVLX7oYyO80eB3aSg/65gqSdDxQ6TBQ0eTbg/7hck8CRIR
+         N2poqJrxPUv+xHM8+kwldwyyrpY8ClA2gjcNqxK3I6Rjaxj3f+CIGTw2aTNSrwyrBhAC
+         fS1NWvmq7XKVFcVROA15iTu7BqzTlMOOgRsfusR61dD9uCRFfNfvH5SixHmdTB0ZZ2at
+         NUZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691461454; x=1692066254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HUGk8Gm4qWKcvYyYW1oMdtOdnxgdWZtLrf0WmvG8aOg=;
+        b=ZqMRCxZAASFBYHTJlkW24m/uzS1SQ36gfQx/0MgqeZgg0z7z9yVq4yGhDOwonkdESM
+         SxHk+hO8lGSjNkW9Jm5G++1Ei1VU5WoKGzW6M1D3aG0UkCG3tAvXqVpmVubPJp5xTX7i
+         xmoYZ9bB2pfGRDgkck00N4u91KP+iFeFpMbnjRxclI7x6JRPTcWU+htHEG+RjDpy1nRo
+         Bb15x5umpqZST363hOtmicTqlwrbOgYDf3m5hu45n3N3vIj2BD0A8zJZXpYe3sMpyaD4
+         3rKR6s0F5yv2s370/5Ebm/dLsVhGjYKRz1IRO1DaC8Tpw9Hcero94izqtjOacRJT7Tcg
+         JRuQ==
+X-Gm-Message-State: AOJu0YwOKITSuhAtpkfyzNPdDFnVa4mbOoKIFenoyPhqPR0jtKVrNreb
+        ThNUsGx7omQuxXhR/MsYglYSUw==
+X-Google-Smtp-Source: AGHT+IEzrDGpXyLCXRNBmZGxK80nBmbnZ3Zc29NdEkVzSJ3QNXEJvOFh13D52+77LsVxnWz7HKqTHA==
+X-Received: by 2002:a17:902:8692:b0:1b9:d307:c1df with SMTP id g18-20020a170902869200b001b9d307c1dfmr10722096plo.17.1691461453690;
+        Mon, 07 Aug 2023 19:24:13 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-166-213.pa.nsw.optusnet.com.au. [49.180.166.213])
+        by smtp.gmail.com with ESMTPSA id h17-20020a170902f55100b001b864add154sm7583543plf.154.2023.08.07.19.24.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 19:24:13 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1qTCOH-002Wjl-2u;
+        Tue, 08 Aug 2023 12:24:09 +1000
+Date:   Tue, 8 Aug 2023 12:24:09 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
+        roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
+        paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
+        cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
+        gregkh@linuxfoundation.org, muchun.song@linux.dev,
+        simon.horman@corigine.com, dlemoal@kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-erofs@lists.ozlabs.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
+        rcu@vger.kernel.org, netdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>,
-        guoren@kernel.org
-Subject: Re: [PATCH V10 07/19] riscv: qspinlock: errata: Introduce
- ERRATA_THEAD_QSPINLOCK
-Message-ID: <ZNGkf88lhPt7fdhH@gmail.com>
-References: <20230802164701.192791-1-guoren@kernel.org>
- <20230802164701.192791-8-guoren@kernel.org>
- <ae320af5-6cca-4689-aa66-9d0193713d40@app.fastmail.com>
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v4 45/48] mm: shrinker: make global slab shrink lockless
+Message-ID: <ZNGnSbiPN0lDLpSW@dread.disaster.area>
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-46-zhengqi.arch@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ae320af5-6cca-4689-aa66-9d0193713d40@app.fastmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230807110936.21819-46-zhengqi.arch@bytedance.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 07, 2023 at 01:23:34AM -0400, Stefan O'Rear wrote:
-> On Wed, Aug 2, 2023, at 12:46 PM, guoren@kernel.org wrote:
-> > From: Guo Ren <guoren@linux.alibaba.com>
-> >
-> > According to qspinlock requirements, RISC-V gives out a weak LR/SC
-> > forward progress guarantee which does not satisfy qspinlock. But
-> > many vendors could produce stronger forward guarantee LR/SC to
-> > ensure the xchg_tail could be finished in time on any kind of
-> > hart. T-HEAD is the vendor which implements strong forward
-> > guarantee LR/SC instruction pairs, so enable qspinlock for T-HEAD
-> > with errata help.
-> >
-> > T-HEAD early version of processors has the merge buffer delay
-> > problem, so we need ERRATA_WRITEONCE to support qspinlock.
-> >
-> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> > Signed-off-by: Guo Ren <guoren@kernel.org>
-> > ---
-> >  arch/riscv/Kconfig.errata              | 13 +++++++++++++
-> >  arch/riscv/errata/thead/errata.c       | 24 ++++++++++++++++++++++++
-> >  arch/riscv/include/asm/errata_list.h   | 20 ++++++++++++++++++++
-> >  arch/riscv/include/asm/vendorid_list.h |  3 ++-
-> >  arch/riscv/kernel/cpufeature.c         |  3 ++-
-> >  5 files changed, 61 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/riscv/Kconfig.errata b/arch/riscv/Kconfig.errata
-> > index 4745a5c57e7c..eb43677b13cc 100644
-> > --- a/arch/riscv/Kconfig.errata
-> > +++ b/arch/riscv/Kconfig.errata
-> > @@ -96,4 +96,17 @@ config ERRATA_THEAD_WRITE_ONCE
-> > 
-> >  	  If you don't know what to do here, say "Y".
-> > 
-> > +config ERRATA_THEAD_QSPINLOCK
-> > +	bool "Apply T-Head queued spinlock errata"
-> > +	depends on ERRATA_THEAD
-> > +	default y
-> > +	help
-> > +	  The T-HEAD C9xx processors implement strong fwd guarantee LR/SC to
-> > +	  match the xchg_tail requirement of qspinlock.
-> > +
-> > +	  This will apply the QSPINLOCK errata to handle the non-standard
-> > +	  behavior via using qspinlock instead of ticket_lock.
-> > +
-> > +	  If you don't know what to do here, say "Y".
-> 
-> If this is to be applied, I would like to see a detailed explanation somewhere,
-> preferably with citations, of:
-> 
-> (a) The memory model requirements for qspinlock
-These were written in commit: a8ad07e5240 ("asm-generic: qspinlock: Indicate the use of
-mixed-size atomics"). For riscv, the most controversial point is xchg_tail()
-implementation for native queued spinlock.
+On Mon, Aug 07, 2023 at 07:09:33PM +0800, Qi Zheng wrote:
+> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+> index eb342994675a..f06225f18531 100644
+> --- a/include/linux/shrinker.h
+> +++ b/include/linux/shrinker.h
+> @@ -4,6 +4,8 @@
+>  
+>  #include <linux/atomic.h>
+>  #include <linux/types.h>
+> +#include <linux/refcount.h>
+> +#include <linux/completion.h>
+>  
+>  #define SHRINKER_UNIT_BITS	BITS_PER_LONG
+>  
+> @@ -87,6 +89,10 @@ struct shrinker {
+>  	int seeks;	/* seeks to recreate an obj */
+>  	unsigned flags;
+>  
+> +	refcount_t refcount;
+> +	struct completion done;
+> +	struct rcu_head rcu;
 
-> (b) Why, with arguments, RISC-V does not architecturally meet (a)
-In the spec "Eventual Success of Store-Conditional Instructions":
-"By contrast, if other harts or devices continue to write to that reservation set, it is
-not guaranteed that any hart will exit its LR/SC loop."
+Documentation, please. What does the refcount protect, what does the
+completion provide, etc.
 
-1. The arch_spinlock_t is 32-bit width, and it contains LOCK_PENDING
-   part and IDX_TAIL part.
-    - LOCK:     lock holder
-    - PENDING:  next waiter (Only once per contended situation)
-    - IDX:      nested context (normal, hwirq, softirq, nmi)
-    - TAIL:     last contended cpu
-   The xchg_tail operate on IDX_TAIL part, so there is no guarantee on "NO"
-   "other harts or devices continue to write to that reservation set".
+> +
+>  	void *private_data;
+>  
+>  	/* These are for internal use */
+> @@ -120,6 +126,17 @@ struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+>  void shrinker_register(struct shrinker *shrinker);
+>  void shrinker_free(struct shrinker *shrinker);
+>  
+> +static inline bool shrinker_try_get(struct shrinker *shrinker)
+> +{
+> +	return refcount_inc_not_zero(&shrinker->refcount);
+> +}
+> +
+> +static inline void shrinker_put(struct shrinker *shrinker)
+> +{
+> +	if (refcount_dec_and_test(&shrinker->refcount))
+> +		complete(&shrinker->done);
+> +}
+> +
+>  #ifdef CONFIG_SHRINKER_DEBUG
+>  extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
+>  						  const char *fmt, ...);
+> diff --git a/mm/shrinker.c b/mm/shrinker.c
+> index 1911c06b8af5..d318f5621862 100644
+> --- a/mm/shrinker.c
+> +++ b/mm/shrinker.c
+> @@ -2,6 +2,7 @@
+>  #include <linux/memcontrol.h>
+>  #include <linux/rwsem.h>
+>  #include <linux/shrinker.h>
+> +#include <linux/rculist.h>
+>  #include <trace/events/vmscan.h>
+>  
+>  #include "internal.h"
+> @@ -577,33 +578,42 @@ unsigned long shrink_slab(gfp_t gfp_mask, int nid, struct mem_cgroup *memcg,
+>  	if (!mem_cgroup_disabled() && !mem_cgroup_is_root(memcg))
+>  		return shrink_slab_memcg(gfp_mask, nid, memcg, priority);
+>  
+> -	if (!down_read_trylock(&shrinker_rwsem))
+> -		goto out;
+> -
+> -	list_for_each_entry(shrinker, &shrinker_list, list) {
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(shrinker, &shrinker_list, list) {
+>  		struct shrink_control sc = {
+>  			.gfp_mask = gfp_mask,
+>  			.nid = nid,
+>  			.memcg = memcg,
+>  		};
+>  
+> +		if (!shrinker_try_get(shrinker))
+> +			continue;
+> +
+> +		/*
+> +		 * We can safely unlock the RCU lock here since we already
+> +		 * hold the refcount of the shrinker.
+> +		 */
+> +		rcu_read_unlock();
+> +
+>  		ret = do_shrink_slab(&sc, shrinker, priority);
+>  		if (ret == SHRINK_EMPTY)
+>  			ret = 0;
+>  		freed += ret;
+> +
+>  		/*
+> -		 * Bail out if someone want to register a new shrinker to
+> -		 * prevent the registration from being stalled for long periods
+> -		 * by parallel ongoing shrinking.
+> +		 * This shrinker may be deleted from shrinker_list and freed
+> +		 * after the shrinker_put() below, but this shrinker is still
+> +		 * used for the next traversal. So it is necessary to hold the
+> +		 * RCU lock first to prevent this shrinker from being freed,
+> +		 * which also ensures that the next shrinker that is traversed
+> +		 * will not be freed (even if it is deleted from shrinker_list
+> +		 * at the same time).
+>  		 */
 
-2. When you do lock torture test, you may see a long contended ring queue:
-                                                                xchg_tail
-                                                                    +-----> CPU4 (big core)
-                                                                    |
-   CPU3 (lock holder) -> CPU1 (mcs queued) -> CPU2 (mcs queued) ----+-----> CPU0 (little core)
-    |                                                               |
-    |                                                               +-----> CPU5 (big core)
-    |                                                               |
-    +--locktorture release lock (spin_unlock) and spin_lock again --+-----> CPU3 (big core)
+This needs to be moved to the head of the function, and document
+the whole list walk, get, put and completion parts of the algorithm
+that make it safe. There's more to this than "we hold a reference
+count", especially the tricky "we might see the shrinker before it
+is fully initialised" case....
 
-    If CPU0 doesn't have a strong fwd guarantee, xhg_tail is consistently failed.
 
-> (c) Why, with arguments, T-HEAD C9xx meets (a)
-> (d) Why at least one other architecture which defines ARCH_USE_QUEUED_SPINLOCKS
->     meets (a)
-I can't give the C9xx microarch implementation detail. But many
-open-source riscv cores have provided strong forward progress guarantee
-LR/SC implementation [1] [2]. But I would say these implementations are
-too rude, which makes LR send a cacheline unique interconnect request.
-It satisfies xchg_tail but not cmpxchg & cond_load. CPU vendors should
-carefully consider your LR/SC fwd guarantee implementation.
+.....
+>  void shrinker_free(struct shrinker *shrinker)
+>  {
+>  	struct dentry *debugfs_entry = NULL;
+> @@ -686,9 +712,18 @@ void shrinker_free(struct shrinker *shrinker)
+>  	if (!shrinker)
+>  		return;
+>  
+> +	if (shrinker->flags & SHRINKER_REGISTERED) {
+> +		shrinker_put(shrinker);
+> +		wait_for_completion(&shrinker->done);
+> +	}
 
-[1]: https://github.com/riscv-boom/riscv-boom/blob/v3.0.0/src/main/scala/lsu/dcache.scala#L650
-[2]: https://github.com/OpenXiangShan/XiangShan/blob/v1.0/src/main/scala/xiangshan/cache/MainPipe.scala#L470
+Needs a comment explaining why we need to wait here...
+> +
+>  	down_write(&shrinker_rwsem);
+>  	if (shrinker->flags & SHRINKER_REGISTERED) {
+> -		list_del(&shrinker->list);
+> +		/*
+> +		 * Lookups on the shrinker are over and will fail in the future,
+> +		 * so we can now remove it from the lists and free it.
+> +		 */
 
-> 
-> As far as I can tell, the RISC-V guarantees concerning constrained LR/SC loops
-> (livelock freedom but no starvation freedom) are exactly the same as those in
-> Armv8 (as of 0487F.c) for equivalent loops, and xchg_tail compiles to a
-> constrained LR/SC loop with guaranteed eventual success (with -O1).  Clearly you
-> disagree; I would like to see your perspective.
-For Armv8, I would use LSE for the lock-contended scenario. Ref this
-commit 0ea366f5e1b6: ("arm64: atomics: prefetch the destination word for
-write prior to stxr").
+.... rather than here after the wait has been done and provided the
+guarantee that no shrinker is running or will run again...
 
-> 
-> -s
-> 
-> > +
-> >  endmenu # "CPU errata selection"
-> > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
-> > index 881729746d2e..d560dc45c0e7 100644
-> > --- a/arch/riscv/errata/thead/errata.c
-> > +++ b/arch/riscv/errata/thead/errata.c
-> > @@ -86,6 +86,27 @@ static bool errata_probe_write_once(unsigned int stage,
-> >  	return false;
-> >  }
-> > 
-> > +static bool errata_probe_qspinlock(unsigned int stage,
-> > +				   unsigned long arch_id, unsigned long impid)
-> > +{
-> > +	if (!IS_ENABLED(CONFIG_ERRATA_THEAD_QSPINLOCK))
-> > +		return false;
-> > +
-> > +	/*
-> > +	 * The queued_spinlock torture would get in livelock without
-> > +	 * ERRATA_THEAD_WRITE_ONCE fixup for the early versions of T-HEAD
-> > +	 * processors.
-> > +	 */
-> > +	if (arch_id == 0 && impid == 0 &&
-> > +	    !IS_ENABLED(CONFIG_ERRATA_THEAD_WRITE_ONCE))
-> > +		return false;
-> > +
-> > +	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
-> > +		return true;
-> > +
-> > +	return false;
-> > +}
-> > +
-> >  static u32 thead_errata_probe(unsigned int stage,
-> >  			      unsigned long archid, unsigned long impid)
-> >  {
-> > @@ -103,6 +124,9 @@ static u32 thead_errata_probe(unsigned int stage,
-> >  	if (errata_probe_write_once(stage, archid, impid))
-> >  		cpu_req_errata |= BIT(ERRATA_THEAD_WRITE_ONCE);
-> > 
-> > +	if (errata_probe_qspinlock(stage, archid, impid))
-> > +		cpu_req_errata |= BIT(ERRATA_THEAD_QSPINLOCK);
-> > +
-> >  	return cpu_req_errata;
-> >  }
-> > 
-> > diff --git a/arch/riscv/include/asm/errata_list.h 
-> > b/arch/riscv/include/asm/errata_list.h
-> > index fbb2b8d39321..a696d18d1b0d 100644
-> > --- a/arch/riscv/include/asm/errata_list.h
-> > +++ b/arch/riscv/include/asm/errata_list.h
-> > @@ -141,6 +141,26 @@ asm volatile(ALTERNATIVE(						\
-> >  	: "=r" (__ovl) :						\
-> >  	: "memory")
-> > 
-> > +static __always_inline bool
-> > +riscv_has_errata_thead_qspinlock(void)
-> > +{
-> > +	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
-> > +		asm_volatile_goto(
-> > +		ALTERNATIVE(
-> > +		"j	%l[l_no]", "nop",
-> > +		THEAD_VENDOR_ID,
-> > +		ERRATA_THEAD_QSPINLOCK,
-> > +		CONFIG_ERRATA_THEAD_QSPINLOCK)
-> > +		: : : : l_no);
-> > +	} else {
-> > +		goto l_no;
-> > +	}
-> > +
-> > +	return true;
-> > +l_no:
-> > +	return false;
-> > +}
-> > +
-> >  #endif /* __ASSEMBLY__ */
-> > 
-> >  #endif
-> > diff --git a/arch/riscv/include/asm/vendorid_list.h 
-> > b/arch/riscv/include/asm/vendorid_list.h
-> > index 73078cfe4029..1f1d03877f5f 100644
-> > --- a/arch/riscv/include/asm/vendorid_list.h
-> > +++ b/arch/riscv/include/asm/vendorid_list.h
-> > @@ -19,7 +19,8 @@
-> >  #define	ERRATA_THEAD_CMO 1
-> >  #define	ERRATA_THEAD_PMU 2
-> >  #define	ERRATA_THEAD_WRITE_ONCE 3
-> > -#define	ERRATA_THEAD_NUMBER 4
-> > +#define	ERRATA_THEAD_QSPINLOCK 4
-> > +#define	ERRATA_THEAD_NUMBER 5
-> >  #endif
-> > 
-> >  #endif
-> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> > index f8dbbe1bbd34..d9694fe40a9a 100644
-> > --- a/arch/riscv/kernel/cpufeature.c
-> > +++ b/arch/riscv/kernel/cpufeature.c
-> > @@ -342,7 +342,8 @@ void __init riscv_fill_hwcap(void)
-> >  		 * spinlock value, the only way is to change from queued_spinlock to
-> >  		 * ticket_spinlock, but can not be vice.
-> >  		 */
-> > -		if (!force_qspinlock) {
-> > +		if (!force_qspinlock &&
-> > +		    !riscv_has_errata_thead_qspinlock()) {
-> >  			set_bit(RISCV_ISA_EXT_XTICKETLOCK, isainfo->isa);
-> >  		}
-> >  #endif
-> > -- 
-> > 2.36.1
-> >
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
