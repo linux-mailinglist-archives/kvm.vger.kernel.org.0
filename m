@@ -2,347 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A0B9774B28
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:42:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73516774B5E
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:46:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229553AbjHHUmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 16:42:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54918 "EHLO
+        id S233080AbjHHUp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 16:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbjHHUls (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:41:48 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AAE78DCCF;
-        Tue,  8 Aug 2023 10:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691515897; x=1723051897;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eqRRMLl2kIoz0ZwHwY02c6d7SX45/i2Q/jssTnU7/tA=;
-  b=JmKkWqIA0/GVc8tGbrgwAMTXe8xpEcUH9BPs/q6KFqCy17gspPRcU9tt
-   gHlw+wnwJLuV7Fodg4OpAbUUhbXXGYvgMawZB0jgDcA5Yvy5kLOug2/46
-   Drnu0Y0q0WoBxUaHzPyD1X1+sRwWPtSCjrzGb6T3B+DJhtF7PTnp0DAs+
-   gZWErGyyoNJ6gj0lgdg63WDAHo1C4HC6xV4LEY9DsD2E8TGRdiRL/2+Uu
-   fvoc+gNnp7IbctTqsqUp1GU48AF/HESn37ajJl7Ww8s83XJwCv6n/Rwyu
-   Wc8soxrGVCoNx0rTaLysemGQZFFmuVcUK4eW6ONkxk2b+0ej9NFqagzDG
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="434581748"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="434581748"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 23:25:12 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="734376741"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="734376741"
-Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga007.fm.intel.com with ESMTP; 07 Aug 2023 23:25:07 -0700
-From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
+        with ESMTP id S234850AbjHHUpl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 16:45:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6AC735C7E
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:36:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6E986624E8
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:47:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF880C433C8;
+        Tue,  8 Aug 2023 11:47:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691495236;
+        bh=WHaqpb43+ZOBLDtwaLwEg6bIG9e4PdCboxhmAO2bbDg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=FFmE1UHBl/vf2Nr8UU6yc1HymZBMjJqNQgew2pKTnfevvUDN8XJ9Cm56j/kHnsTJi
+         MI+ng1Wjybp26CFaz3XdrKLmtzGj7AphnIykZfFMYhpG54NrHIbxzFikZyzP6qonrB
+         kQmWFTwNwRMTBcN1CFmnuJJLLNJ+9llvf5pQgZaGA5UBBCkvH3QlRo+/rltjIu1o4R
+         ZTJoGbc5fz84ZIuAFIpygUDtk31d0UZtGJnAzjWcZFmU1TEL/e4xERllyTne1R7Ov+
+         jxh6b2RrXXTGgb9hk6WZJ9koCEEVLh0yobYc+1GyFsdaBBroilbzcoZgPP2zOuJSWL
+         9UvNaqTPQj1lg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qTLBC-0037Ph-KQ;
+        Tue, 08 Aug 2023 12:47:14 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>
-Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH RFV v2 00/13] Enable fixed counter 3 and topdown perf metrics for vPMU
-Date:   Tue,  8 Aug 2023 14:30:58 +0800
-Message-Id: <20230808063111.1870070-1-dapeng1.mi@linux.intel.com>
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v3 00/27] KVM: arm64: NV trap forwarding infrastructure
+Date:   Tue,  8 Aug 2023 12:46:44 +0100
+Message-Id: <20230808114711.2013842-1-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TopDown Microarchitecture Analysis (TMA) Method is a structured
-analysis methodology to identify critical performance bottlenecks in
-out-of-order processors. The details about topdown metrics support on
-Intel processors can be found in section "Performance Metrics" of Intel's
-SDM Volume 3[1]. Kernel enabling code has also been merged, see
-patchset[2] to learn more about the feature.
+As people are getting tired of seeing the full NV series, I've
+extracted some of the easy stuff which I'm targeting for 6.6.
 
-The TMA method is quite powerful and efficient to help developers to
-identify the performance bottleneck in the program. The TMA method has
-been integrated into multiple performance analysis tools, such as perf,
-Vtune. Developers can leverage TMA method to analyze their program's
-performance bottleneck easily with these tools and improve their program's
-performance. TMA method is becoming the most widely used performance
-analysis method on x86 platform. Currently the TMA method has been
-supported fairly well on Native, but it's still not supported in Guest
-environment. Since the environment difference between Host and Guest,
-even same program may show different performance bottleneck between Guest
-and Host. Obviously, the most straightforward and best method to
-profiling Guest performance bottleneck is to run the TMA method in Guest
-directly. So supporting topdown perf metrics in Guest becomes a real and
-important requirement and we hope this patchset can mitigate this gap.
+This implements the so called "trap forwarding" infrastructure, which
+gets used when we take a trap from an L2 guest and that the L1 guest
+wants to see the trap for itself.
 
-Like Xu posted a patch series to support guest Topdown[3], the patchset
-creates a group of topdown metric events in KVM by binding to fixed counter
-3 to obtain hardware values and the guest value of PERF_METRICS MSR is
-assembled based on the count of grouped metric events.
+Most of the series is pretty boring stuff, mostly a long list of
+encodings which are mapped to a set of trap bits. I swear they are
+correct. Sort of (then are much more correct now that Eric has gone
+through them all with a fine comb).
 
-This patchset improves Like's proposal, it leverages mature vPMU PMC
-emulation framework and current perf topdown metric handling logic to
-support guest topdown metrics feature.
+The interesting bit is around how we compute the trap result, which is
+pretty complex due to the layers of crap the architecture has piled
+over the years (a single op can be trapped by multiple coarse grained
+trap bits, or a fine grained trap bit, which may itself be conditioned
+by another control bit -- madness).
 
-In current perf logic, an events group is required to handle the topdown
-metrics profiling, and the events group couples a slots event which
-acts events group leader and multiple metric events. To coordinate with
-the perf topdown metrics handing logic and reduce the code changes in
-KVM, we choose to follow current mature vPMU PMC emulation framework. The
-only difference is that we need to create a events group for fixed
-counter 3 and manipulate FIXED_CTR3 and PERF_METRICS MSRS together
-instead of a single event and only manipulating FIXED_CTR3 MSR.
+This also results in some rework of both the FGT stuff (for which I
+carry a patch from Mark) and newly introduced the HCRX support.
 
-When guest writes PERF_METRICS MSR at first, KVM would create an event
-group which couples a slots event and a virtual metrics event. In this
-event group, slots event claims the fixed counter 3 HW resource and acts
-as group leader which is required by perf system. The virtual metrics
-event claims the PERF_METRICS MSR. This event group is just like the perf
-metrics events group on host and is scheduled by host perf system.
+With that (and the rest of the NV series), FGT gets exposed to guests
+and the trapping seems to work as expected.
 
-In this proposal, the count of slots event is calculated and emulated
-on host and returned to guest just like other normal counters, but there
-is a difference for the metrics event processing. KVM doesn't calculate
-the real count of topdown metrics, it just stores the raw data of
-PERF_METRICS MSR and directly returnthe stored raw data to guest. Thus,
-guest can get the real HW PERF_METRICS data and guarantee the calculation
-accuracy of topdown metrics.
+I'm very inclined to queue this for 6.6, so shout if you think it is a
+bad idea!
 
-Comparing with Like's patchset, this proposal brings two benefits.
+* From v1 [1]:
 
-1. Reduce the created perf events number
-   Like's patchset needs to create 4 (Ice Lake) or 8 (Sapphire Rapids)
-   metric events, whereas this patchset only needs to create 1 metric
-   event.
+  - Lots of fixups all over the map (too many to mention) after Eric's
+    fantastic reviewing effort. Hopefully the result is easier to
+    understand and less wrong
 
-2. Increase the accuracy of metric calculation
-   Like's patchset needs to do twice metric count conversion. The first
-   conversion happens on perf system, perf topdown metrics handling
-   logic reads the metric percentage from PERF_METRICS MSR and times with
-   elapsed slots count and obtains the metric count. The second conversion
-   happens on KVM, KVM needs to convert the metric count back to metric
-   percentage by using metric count divide elapsed slots again and then
-   assembles the 4 or 8 metric percentage values to the virtual
-   PERF_METRICS MSR and return to Guest at last. Considering each metric
-   percentage in PERF_METRICS MSR is represented with only 8 bits, the
-   twice conversions (once multiplication and once division) definitely
-   cause accuracy loss in theory. Since this patchset directly returns
-   the raw data of PERF_METRICS MSR to guest, it won't have any accuracy
-   loss.
+  - Amended Mark's patch to use the ARM64_CPUID_FIELDS() macro
 
-The patchset is rebased on latest kvm-x86/next branch and it is tested
-on both Host and Guest (SPR Platform) with below perf commands. The 'foo'
-is a backend-bound benchmark. We can see the output of perf commands are
-quite close between host and guest.
+  - Collected RBs, with thanks.
 
-1. perf stat ./foo
+* From v1 [2]:
 
-Host outputs:
+  - Another set up fixups thanks to Oliver, Eric and Miguel: TRCID
+    bits, duplicate encodings, sanity checking, error handling at boot
+    time, spelling mistakes...
 
- Performance counter stats for '/home/sdp/work/foo/foo':
+  - Split the HFGxTR_EL2 patch in two patches: one that provides the
+    FGT infrastructure, and one that provides the HFGxTR_EL2 traps. It
+    makes it easier to review and matches the rest of the series.
 
-         26,525.25 msec task-clock                       #    1.000 CPUs utilized
-                 9      context-switches                 #    0.339 /sec
-                 2      cpu-migrations                   #    0.075 /sec
-                51      page-faults                      #    1.923 /sec
-   125,330,033,745      cycles                           #    4.725 GHz
-   238,172,965,287      instructions                     #    1.90  insn per cycle
-    44,904,300,430      branches                         #    1.693 G/sec
-        69,299,003      branch-misses                    #    0.15% of all branches
-   751,979,445,222      TOPDOWN.SLOTS                    #     59.2 %  tma_backend_bound
-                                                  #     38.0 %  tma_retiring
-                                                  #      0.8 %  tma_bad_speculation
-                                                  #      1.9 %  tma_frontend_bound
-   286,047,083,084      topdown-retiring
-    14,744,695,003      topdown-fe-bound
-   445,289,789,131      topdown-be-bound
-     5,897,878,000      topdown-bad-spec
-       138,674,397      INT_MISC.UOP_DROPPING            #    5.228 M/sec
+  - Collected RBs, with thanks
 
-      26.528600835 seconds time elapsed
+[1] https://lore.kernel.org/all/20230712145810.3864793-1-maz@kernel.org
+[2] https://lore.kernel.org/all/20230728082952.959212-1-maz@kernel.org
 
-      26.527849000 seconds user
-       0.000000000 seconds sys
+Marc Zyngier (26):
+  arm64: Add missing VA CMO encodings
+  arm64: Add missing ERX*_EL1 encodings
+  arm64: Add missing DC ZVA/GVA/GZVA encodings
+  arm64: Add TLBI operation encodings
+  arm64: Add AT operation encodings
+  arm64: Add debug registers affected by HDFGxTR_EL2
+  arm64: Add missing BRB/CFP/DVP/CPP instructions
+  arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+  KVM: arm64: Correctly handle ACCDATA_EL1 traps
+  KVM: arm64: Add missing HCR_EL2 trap bits
+  KVM: arm64: nv: Add FGT registers
+  KVM: arm64: Restructure FGT register switching
+  KVM: arm64: nv: Add trap forwarding infrastructure
+  KVM: arm64: nv: Add trap forwarding for HCR_EL2
+  KVM: arm64: nv: Expose FEAT_EVT to nested guests
+  KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+  KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+  KVM: arm64: nv: Add fine grained trap forwarding infrastructure
+  KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+  KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
+  KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
+  KVM: arm64: nv: Add SVC trap forwarding
+  KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
+  KVM: arm64: nv: Expose FGT to nested guests
+  KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+  KVM: arm64: nv: Add support for HCRX_EL2
 
-Guest outputs:
+Mark Brown (1):
+  arm64: Add feature detection for fine grained traps
 
-  Performance counter stats for '/home/pnp/foo/foo':
+ arch/arm64/include/asm/kvm_arm.h        |   50 +
+ arch/arm64/include/asm/kvm_host.h       |    7 +
+ arch/arm64/include/asm/kvm_nested.h     |    2 +
+ arch/arm64/include/asm/sysreg.h         |  268 +++-
+ arch/arm64/kernel/cpufeature.c          |    7 +
+ arch/arm64/kvm/arm.c                    |    4 +
+ arch/arm64/kvm/emulate-nested.c         | 1817 +++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c            |   12 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  127 +-
+ arch/arm64/kvm/nested.c                 |   11 +-
+ arch/arm64/kvm/sys_regs.c               |   15 +
+ arch/arm64/kvm/trace_arm.h              |   26 +
+ arch/arm64/tools/cpucaps                |    1 +
+ arch/arm64/tools/sysreg                 |  129 ++
+ 14 files changed, 2436 insertions(+), 40 deletions(-)
 
-         29,051.43 msec task-clock                       #    1.000 CPUs utilized
-                10      context-switches                 #    0.344 /sec
-                 0      cpu-migrations                   #    0.000 /sec
-                51      page-faults                      #    1.756 /sec
-   125,337,801,996      cycles                           #    4.314 GHz
-   238,139,676,030      instructions                     #    1.90  insn per cycle
-    44,897,906,380      branches                         #    1.545 G/sec
-        69,402,326      branch-misses                    #    0.15% of all branches
-   752,022,710,490      TOPDOWN.SLOTS                    #     58.4 %  tma_backend_bound
-                                                  #     37.6 %  tma_retiring
-                                                  #      1.2 %  tma_bad_speculation
-                                                  #      2.7 %  tma_frontend_bound
-   283,114,432,184      topdown-retiring
-    20,643,760,680      topdown-fe-bound
-   439,417,191,619      topdown-be-bound
-     8,847,326,005      topdown-bad-spec
-       138,873,309      INT_MISC.UOP_DROPPING            #    4.780 M/sec
-
-      29.058833449 seconds time elapsed
-
-      29.048761000 seconds user
-       0.004003000 seconds sys
-
-2. perf stat -e slots ./foo
-
-Host outputs:
-
- Performance counter stats for '/home/sdp/work/foo/foo':
-
-   713,292,346,950      slots
-
-      25.472861484 seconds time elapsed
-
-      25.470978000 seconds user
-       0.000000000 seconds sys
-
-Guest outputs:
-
- Performance counter stats for '/home/pnp/foo/foo':
-
-   713,286,331,824      slots
-
-      25.264007882 seconds time elapsed
-
-      25.259790000 seconds user
-       0.004002000 seconds sys
-
-3.
-echo 0 > /proc/sys/kernel/nmi_watchdog
-echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
-echo 100000 > /proc/sys/kernel/perf_event_max_sample_rate
-echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
-perf record -e slots ./foo && perf report
-
-Host outputs:
-
-# Total Lost Samples: 0
-#
-# Samples: 109K of event 'slots'
-# Event count (approx.): 715723903347
-#
-# Overhead  Command  Shared Object     Symbol
-# ........  .......  ................  ..................................
-#
-    74.83%  foo      libc.so.6         [.] __random
-     7.22%  foo      foo               [.] qux
-     7.07%  foo      libc.so.6         [.] __random_r
-     5.40%  foo      foo               [.] main
-     1.82%  foo      foo               [.] bar
-     1.75%  foo      foo               [.] random@plt
-     1.73%  foo      foo               [.] foo
-     0.02%  foo      [kernel.vmlinux]  [k] arch_asym_cpu_priority
-
-
-Guest outputs:
-
-# Total Lost Samples: 0
-#
-# Samples: 7K of event 'slots'
-# Event count (approx.): 24532005986
-#
-# Overhead  Command  Shared Object     Symbol
-# ........  .......  ................  ....................
-#
-    75.21%  foo      libc.so.6         [.] __random
-     7.19%  foo      libc.so.6         [.] __random_r
-     7.12%  foo      foo               [.] qux
-     5.21%  foo      foo               [.] main
-     1.90%  foo      foo               [.] foo
-     1.81%  foo      foo               [.] bar
-     1.56%  foo      foo               [.] random@plt
-     0.00%  perf-ex  [kernel.vmlinux]  [k] native_write_msr
-
-
-To support the guest topdown metrics feature, we have to do several
-fundamental changes for perf system and vPMU code, we tried to avoid
-these changes AMAP, but it seems it's inevitable. If you have any idea,
-please suggest.
-
-The fundamental changes:
-1. perf/core: Add function perf_event_create_group_kernel_counters()
-   Add a new API to create group events from kernel space
-2. perf/core: Add new function perf_event_topdown_metrics()
-   Add a new API to update topdown metrics values
-3. perf/x86/intel: Handle KVM virtual metrics event in perf system
-   Add virtual metrics event processing logic in topdown metrics
-processing code
-4. KVM: x86/pmu: Extend pmc_reprogram_counter() to create group events
-   Extend pmc_reprogram_counter() to be capable to create group events
-instead of just single event
-
-References:
-[1]: Intel 64 and IA-32 Architectures Software Developer Manual
- Combined Volumes: 1, 2A, 2B, 2C, 2D, 3A, 3B, 3C, 3D, and 4
-https://cdrdv2.intel.com/v1/dl/getContent/671200
-[2]: perf/x86/intel: Support TopDown metrics on Ice Lake
-https://lwn.net/ml/linux-kernel/20191203141212.7704-1-kan.liang@linux.intel.com/
-[3]: KVM: x86/pmu: Enable Fixed Counter3 and Topdown Perf Metrics
-https://lwn.net/ml/linux-kernel/20221212125844.41157-1-likexu@tencent.com/
-
-Dapeng Mi (13):
-  KVM: x86/pmu: Add Intel CPUID-hinted TopDown slots event
-  KVM: x86/pmu: Support PMU fixed counter 3
-  perf/core: Add function perf_event_group_leader_check()
-  perf/core: Add function perf_event_move_group()
-  perf/core: Add function perf_event_create_group_kernel_counters()
-  perf/x86: Fix typos and inconsistent indents in perf_event header
-  perf/x86: Add constraint for guest perf metrics event
-  perf/core: Add new function perf_event_topdown_metrics()
-  perf/x86/intel: Handle KVM virtual metrics event in perf system
-  KVM: x86/pmu: Extend pmc_reprogram_counter() to create group events
-  KVM: x86/pmu: Support topdown perf metrics feature
-  KVM: x86/pmu: Handle PERF_METRICS overflow
-  KVM: x86/pmu: Expose Topdown in MSR_IA32_PERF_CAPABILITIES
-
- arch/x86/events/intel/core.c      |  72 +++++--
- arch/x86/events/perf_event.h      |  10 +-
- arch/x86/include/asm/kvm_host.h   |  19 +-
- arch/x86/include/asm/perf_event.h |  21 +-
- arch/x86/kvm/pmu.c                | 142 +++++++++++--
- arch/x86/kvm/pmu.h                |  50 ++++-
- arch/x86/kvm/svm/pmu.c            |   2 +
- arch/x86/kvm/vmx/capabilities.h   |   1 +
- arch/x86/kvm/vmx/pmu_intel.c      |  67 ++++++
- arch/x86/kvm/vmx/vmx.c            |   2 +
- arch/x86/kvm/vmx/vmx.h            |   5 +
- arch/x86/kvm/x86.c                |   5 +-
- include/linux/perf_event.h        |  19 ++
- kernel/events/core.c              | 326 ++++++++++++++++++++----------
- 14 files changed, 590 insertions(+), 151 deletions(-)
-
-
-base-commit: 240f736891887939571854bd6d734b6c9291f22e
 -- 
 2.34.1
 
