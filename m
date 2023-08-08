@@ -2,423 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D76E7745A9
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:44:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C8F277470F
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 21:09:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbjHHSov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 14:44:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
+        id S233829AbjHHTJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 15:09:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230396AbjHHSoR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 14:44:17 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584FF155B6
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:40:49 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-63d1234b181so12342066d6.0
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 09:40:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1691512844; x=1692117644;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m1STCrinczuq8FuoUgLs8N4vldOealvmees85dm6MPY=;
-        b=QKOVKUy+0BTHxB/hGHtc6MJ8rFYPsgqjMD+W6qQ4HpUyOvn8J92OvFYNq14riy5/Df
-         TRsXp3Eq5YWW3r0qOwDz41vh9XJsQ5IeWne9U/p/oQ5nHqB0CSpyT39YkURo6aAxOYBm
-         uhR1qZ/S+8p+cy6cCmaiFbTttOXt66QodqIxvjpFJXv1/S8vVwIBLmjI/TFysXS7ckxn
-         gVRBYYNapmPfZOwhRcyfNCZPzcmc+O+mjLw6LOvlET7LuYaFkvdTQvM7xJ/gVtTXfQWP
-         PCBIkGhFM3shtsBBbUrmtzOQ54KjfKwm7YBkRcE9z9gMGZMbaEtijHl8nXg5BtyHFk0C
-         x9sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691512844; x=1692117644;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1STCrinczuq8FuoUgLs8N4vldOealvmees85dm6MPY=;
-        b=PeIJ0dBp5hgbCZ1v7iiJYZ0boFI954uvyVKPu2aQGgqiGdx2Aimnf3Kw0WBA4u2SS/
-         njPfL/X0goUq/Z0EBkTRdvcyxaQ43WkYXPSBBA51jd6nxDlwjMQm+rhy2oS3biRg4kX6
-         DV3L11+wH4UxC1AgLgWqyqJNoeyFFZDMXVHV67tbAuFgRgAoeUU69k/ff/+q+K7kSSzz
-         FiJlZ53sbdrNRISdxQLNv0kFdRHi4vzJYkxhbY1iVARJRGdbmMkwUgFlsdWW96tz66bW
-         2MozXohpS/7POcAdtjjCBxmBV1YUtQU+A4pfUucm4o82GIRI+LchatmW3nVaepHIcV4o
-         hp7w==
-X-Gm-Message-State: ABy/qLZUwxximSA7oZ+Vq8nFrKSRuir2D6a7q6/uAmn+AEQsaoSI89So
-        HdWaxtQKG/rSrtL8+Tz2/SLCdDxITzTCKyfsQGY=
-X-Google-Smtp-Source: APBJJlEAHd7r+M3vyCUQDMAxEjMveuzSqb/Q6wUuSUNAB0Ns9zs1qKL/YECIY4J9DtcJjA3HpA/s7A==
-X-Received: by 2002:a05:6a21:998c:b0:13d:1ebf:5dfc with SMTP id ve12-20020a056a21998c00b0013d1ebf5dfcmr38062815pzb.5.1691476391828;
-        Mon, 07 Aug 2023 23:33:11 -0700 (PDT)
-Received: from [10.70.252.135] ([203.208.167.146])
-        by smtp.gmail.com with ESMTPSA id ff12-20020a056a002f4c00b0067f2f7eccdcsm7204570pfb.193.2023.08.07.23.32.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Aug 2023 23:33:11 -0700 (PDT)
-Message-ID: <0e7b16ce-19f9-0c70-4a94-f05cbfee613a@bytedance.com>
-Date:   Tue, 8 Aug 2023 14:32:55 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v4 44/48] mm: shrinker: add a secondary array for
- shrinker_info::{map, nr_deferred}
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
-        roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
-        paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
-        cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
-        gregkh@linuxfoundation.org, muchun.song@linux.dev,
-        simon.horman@corigine.com, dlemoal@kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Muchun Song <songmuchun@bytedance.com>
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-45-zhengqi.arch@bytedance.com>
- <ZNGkcp3Dh8hOiFpk@dread.disaster.area>
-Content-Language: en-US
-From:   Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <ZNGkcp3Dh8hOiFpk@dread.disaster.area>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229526AbjHHTId (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 15:08:33 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9E2D6284;
+        Tue,  8 Aug 2023 09:30:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691512237; x=1723048237;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references;
+  bh=K1GJsw8lgF1tjIRVOFaimnhAkcSgXQtHjuv5CgZrIAk=;
+  b=L85yKn0veHzlCxtgvqDywAwLbtM0gGcMUJlyOdRZb/DrNGO0DgL5SGVn
+   2KGCi4lSLoODHbxrTg00VakA8EKJs8aXkN7stg6F/qAFEvZz7YyPuOPfL
+   QShE/NjV0bRILAteBMWULQfMdgihgkYwN9TthZ27XzTXeoiJsOmxEtQe5
+   5f0leygAZNRFB7UUmtXOWbcn53y17m0E4lfu8YFlMSExqYl4sAxX9RF8D
+   zmN3/5D5faxddFUq8yoBTd8DRbHmkADyty0n4c7cMaC8F84IJUzZTaxWW
+   C5cgF6h75qmK0eakRLlvSAcT8ifszFgcLHJoLr194T7qgm/ujZaYr5A+4
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="401711470"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="401711470"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 00:45:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="1061918389"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="1061918389"
+Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 00:43:51 -0700
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, mike.kravetz@oracle.com,
+        apopple@nvidia.com, jgg@nvidia.com, rppt@kernel.org,
+        akpm@linux-foundation.org, kevin.tian@intel.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [RFC PATCH 3/3] KVM: x86/mmu: skip zap maybe-dma-pinned pages for NUMA migration
+Date:   Tue,  8 Aug 2023 15:17:02 +0800
+Message-Id: <20230808071702.20269-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230808071329.19995-1-yan.y.zhao@intel.com>
+References: <20230808071329.19995-1-yan.y.zhao@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dave,
+Skip zapping pages that're exclusive anonymas and maybe-dma-pinned in TDP
+MMU if it's for NUMA migration purpose to save unnecessary zaps and TLB
+shootdowns.
 
-On 2023/8/8 10:12, Dave Chinner wrote:
-> On Mon, Aug 07, 2023 at 07:09:32PM +0800, Qi Zheng wrote:
->> Currently, we maintain two linear arrays per node per memcg, which are
->> shrinker_info::map and shrinker_info::nr_deferred. And we need to resize
->> them when the shrinker_nr_max is exceeded, that is, allocate a new array,
->> and then copy the old array to the new array, and finally free the old
->> array by RCU.
->>
->> For shrinker_info::map, we do set_bit() under the RCU lock, so we may set
->> the value into the old map which is about to be freed. This may cause the
->> value set to be lost. The current solution is not to copy the old map when
->> resizing, but to set all the corresponding bits in the new map to 1. This
->> solves the data loss problem, but bring the overhead of more pointless
->> loops while doing memcg slab shrink.
->>
->> For shrinker_info::nr_deferred, we will only modify it under the read lock
->> of shrinker_rwsem, so it will not run concurrently with the resizing. But
->> after we make memcg slab shrink lockless, there will be the same data loss
->> problem as shrinker_info::map, and we can't work around it like the map.
->>
->> For such resizable arrays, the most straightforward idea is to change it
->> to xarray, like we did for list_lru [1]. We need to do xa_store() in the
->> list_lru_add()-->set_shrinker_bit(), but this will cause memory
->> allocation, and the list_lru_add() doesn't accept failure. A possible
->> solution is to pre-allocate, but the location of pre-allocation is not
->> well determined.
-> 
-> So you implemented a two level array that preallocates leaf
-> nodes to work around it? It's remarkable complex for what it does,
+For NUMA balancing, change_pmd_range() will send .invalidate_range_start()
+and .invalidate_range_end() pair unconditionally before setting a huge PMD
+or PTE to be PROT_NONE.
 
-Yes, here I have implemented a two level array like the following:
+No matter whether PROT_NONE is set under change_pmd_range(), NUMA migration
+will eventually reject migrating of exclusive anonymas and maybe_dma_pinned
+pages in later try_to_migrate_one() phase and restoring the affected huge
+PMD or PTE.
 
-+---------------+--------+--------+-----+
-| shrinker_info | unit 0 | unit 1 | ... | (secondary array)
-+---------------+--------+--------+-----+
-                      ^
-                      |
-                 +---------------+-----+
-                 | nr_deferred[] | map | (leaf array)
-                 +---------------+-----+
-                 (shrinker_info_unit)
+Therefore, if KVM can detect those kind of pages in the zap phase, zap and
+TLB shootdowns caused by this kind of protection can be avoided.
 
-The leaf array is never freed unless the memcg is destroyed. The
-secondary array will be resized every time the shrinker id exceeds
-shrinker_nr_max.
+Corner cases like below are still fine.
+1. Auto NUMA balancing selects a PMD range to set PROT_NONE in
+   change_pmd_range().
+2. A page is maybe-dma-pinned at the time of sending
+   .invalidate_range_start() with event type MMU_NOTIFY_PROTECTION_VMA.
+    ==> so it's not zapped in KVM's secondary MMU.
+3. The page is unpinned after sending .invalidate_range_start(), therefore
+   is not maybe-dma-pinned and set to PROT_NONE in primary MMU.
+4. For some reason, page fault is triggered in primary MMU and the page
+   will be found to be suitable for NUMA migration.
+5. try_to_migrate_one() will send .invalidate_range_start() notification
+   with event type MMU_NOTIFY_CLEAR to KVM, and ===>
+   KVM will zap the pages in secondary MMU.
+6. The old page will be replaced by a new page in primary MMU.
 
-> I can't help but think a radix tree using a special holder for
-> nr_deferred values of zero would end up being simpler...
+If step 4 does not happen, though KVM will keep accessing a page that
+might not be on the best NUMA node, it can be fixed by a next round of
+step 1 in Auto NUMA balancing as change_pmd_range() will send mmu
+notification without checking PROT_NONE is set or not.
 
-I tried. If the shrinker uses list_lru, then we can preallocate
-xa node where list_lru_one is pre-allocated. But for other types of
-shrinkers, the location of pre-allocation is not easy to determine
-(Such as deferred_split_shrinker). And we can't force all memcg aware
-shrinkers to use list_lru, so I gave up using xarray and implemented the 
-above two-level array.
+Currently in this patch, for NUMA migration protection purpose, only
+exclusive anonymous maybe-dma-pinned pages are skipped.
+Can later include other type of pages, e.g., is_zone_device_page() or
+PageKsm() if necessary.
 
-> 
->> Therefore, this commit chooses to introduce a secondary array for
->> shrinker_info::{map, nr_deferred}, so that we only need to copy this
->> secondary array every time the size is resized. Then even if we get the
->> old secondary array under the RCU lock, the found map and nr_deferred are
->> also true, so no data is lost.
-> 
-> I don't understand what you are trying to describe here. If we get
-> the old array, then don't we get either a stale nr_deferred value,
-> or the update we do gets lost because the next shrinker lookup will
-> find the new array and os the deferred value stored to the old one
-> is never seen again?
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+---
+ arch/x86/kvm/mmu/mmu.c     |  4 ++--
+ arch/x86/kvm/mmu/tdp_mmu.c | 26 ++++++++++++++++++++++----
+ arch/x86/kvm/mmu/tdp_mmu.h |  4 ++--
+ include/linux/kvm_host.h   |  1 +
+ virt/kvm/kvm_main.c        |  5 +++++
+ 5 files changed, 32 insertions(+), 8 deletions(-)
 
-As shown above, the leaf array will not be freed when shrinker_info is
-expanded, so the shrinker_info_unit can be indexed from both the old
-and the new shrinker_info->unit[x]. So the updated nr_deferred and map
-will not be lost.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d72f2b20f430..9dccc25b1389 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6307,8 +6307,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 
+ 	if (tdp_mmu_enabled) {
+ 		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
+-			flush = kvm_tdp_mmu_zap_leafs(kvm, i, gfn_start,
+-						      gfn_end, true, flush);
++			flush = kvm_tdp_mmu_zap_leafs(kvm, i, gfn_start, gfn_end,
++						      true, flush, false);
+ 	}
+ 
+ 	if (flush)
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6250bd3d20c1..17762b5a2b98 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -838,7 +838,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+  * operation can cause a soft lockup.
+  */
+ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+-			      gfn_t start, gfn_t end, bool can_yield, bool flush)
++			      gfn_t start, gfn_t end, bool can_yield, bool flush,
++			      bool skip_pinned)
+ {
+ 	struct tdp_iter iter;
+ 
+@@ -859,6 +860,21 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		    !is_last_spte(iter.old_spte, iter.level))
+ 			continue;
+ 
++		if (skip_pinned) {
++			kvm_pfn_t pfn = spte_to_pfn(iter.old_spte);
++			struct page *page = kvm_pfn_to_refcounted_page(pfn);
++			struct folio *folio;
++
++			if (!page)
++				continue;
++
++			folio = page_folio(page);
++
++			if (folio_test_anon(folio) && PageAnonExclusive(&folio->page) &&
++			    folio_maybe_dma_pinned(folio))
++				continue;
++		}
++
+ 		tdp_mmu_iter_set_spte(kvm, &iter, 0);
+ 		flush = true;
+ 	}
+@@ -878,12 +894,13 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+  * more SPTEs were zapped since the MMU lock was last acquired.
+  */
+ bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
+-			   bool can_yield, bool flush)
++			   bool can_yield, bool flush, bool skip_pinned)
+ {
+ 	struct kvm_mmu_page *root;
+ 
+ 	for_each_tdp_mmu_root_yield_safe(kvm, root, as_id)
+-		flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, flush);
++		flush = tdp_mmu_zap_leafs(kvm, root, start, end, can_yield, flush,
++					  skip_pinned);
+ 
+ 	return flush;
+ }
+@@ -1147,7 +1164,8 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
+ 				 bool flush)
+ {
+ 	return kvm_tdp_mmu_zap_leafs(kvm, range->slot->as_id, range->start,
+-				     range->end, range->may_block, flush);
++				     range->end, range->may_block, flush,
++				     range->skip_pinned);
+ }
+ 
+ typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 0a63b1afabd3..2a9de44bc5c3 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -20,8 +20,8 @@ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
+ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			  bool shared);
+ 
+-bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start,
+-				 gfn_t end, bool can_yield, bool flush);
++bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
++			   bool can_yield, bool flush, bool skip_pinned);
+ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
+ void kvm_tdp_mmu_zap_all(struct kvm *kvm);
+ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9125d0ab642d..f883d6b59545 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -266,6 +266,7 @@ struct kvm_gfn_range {
+ 	gfn_t end;
+ 	union kvm_mmu_notifier_arg arg;
+ 	bool may_block;
++	bool skip_pinned;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index f84ef9399aee..1202c1daa568 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -532,6 +532,7 @@ struct kvm_hva_range {
+ 	on_unlock_fn_t on_unlock;
+ 	bool flush_on_ret;
+ 	bool may_block;
++	bool skip_pinned;
+ };
+ 
+ /*
+@@ -595,6 +596,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 			 */
+ 			gfn_range.arg = range->arg;
+ 			gfn_range.may_block = range->may_block;
++			gfn_range.skip_pinned = range->skip_pinned;
+ 
+ 			/*
+ 			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+@@ -754,6 +756,9 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+ 		.on_unlock	= kvm_arch_guest_memory_reclaimed,
+ 		.flush_on_ret	= true,
+ 		.may_block	= mmu_notifier_range_blockable(range),
++		.skip_pinned	= test_bit(MMF_HAS_PINNED, &range->mm->flags) &&
++				  (range->event == MMU_NOTIFY_PROTECTION_VMA) &&
++				  (range->flags & MMU_NOTIFIER_RANGE_NUMA),
+ 	};
+ 
+ 	trace_kvm_unmap_hva_range(range->start, range->end);
+-- 
+2.17.1
 
-> 
->>
->> [1]. https://lore.kernel.org/all/20220228122126.37293-13-songmuchun@bytedance.com/
->>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
->> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
->> ---
-> .....
->> diff --git a/mm/shrinker.c b/mm/shrinker.c
->> index a27779ed3798..1911c06b8af5 100644
->> --- a/mm/shrinker.c
->> +++ b/mm/shrinker.c
->> @@ -12,15 +12,50 @@ DECLARE_RWSEM(shrinker_rwsem);
->>   #ifdef CONFIG_MEMCG
->>   static int shrinker_nr_max;
->>   
->> -/* The shrinker_info is expanded in a batch of BITS_PER_LONG */
->> -static inline int shrinker_map_size(int nr_items)
->> +static inline int shrinker_unit_size(int nr_items)
->>   {
->> -	return (DIV_ROUND_UP(nr_items, BITS_PER_LONG) * sizeof(unsigned long));
->> +	return (DIV_ROUND_UP(nr_items, SHRINKER_UNIT_BITS) * sizeof(struct shrinker_info_unit *));
->>   }
->>   
->> -static inline int shrinker_defer_size(int nr_items)
->> +static inline void shrinker_unit_free(struct shrinker_info *info, int start)
->>   {
->> -	return (round_up(nr_items, BITS_PER_LONG) * sizeof(atomic_long_t));
->> +	struct shrinker_info_unit **unit;
->> +	int nr, i;
->> +
->> +	if (!info)
->> +		return;
->> +
->> +	unit = info->unit;
->> +	nr = DIV_ROUND_UP(info->map_nr_max, SHRINKER_UNIT_BITS);
->> +
->> +	for (i = start; i < nr; i++) {
->> +		if (!unit[i])
->> +			break;
->> +
->> +		kvfree(unit[i]);
->> +		unit[i] = NULL;
->> +	}
->> +}
->> +
->> +static inline int shrinker_unit_alloc(struct shrinker_info *new,
->> +				       struct shrinker_info *old, int nid)
->> +{
->> +	struct shrinker_info_unit *unit;
->> +	int nr = DIV_ROUND_UP(new->map_nr_max, SHRINKER_UNIT_BITS);
->> +	int start = old ? DIV_ROUND_UP(old->map_nr_max, SHRINKER_UNIT_BITS) : 0;
->> +	int i;
->> +
->> +	for (i = start; i < nr; i++) {
->> +		unit = kvzalloc_node(sizeof(*unit), GFP_KERNEL, nid);
-> 
-> A unit is 576 bytes. Why is this using kvzalloc_node()?
-
-Ah, will use kzalloc_node() in the next version.
-
-> 
->> +		if (!unit) {
->> +			shrinker_unit_free(new, start);
->> +			return -ENOMEM;
->> +		}
->> +
->> +		new->unit[i] = unit;
->> +	}
->> +
->> +	return 0;
->>   }
->>   
->>   void free_shrinker_info(struct mem_cgroup *memcg)
->> @@ -32,6 +67,7 @@ void free_shrinker_info(struct mem_cgroup *memcg)
->>   	for_each_node(nid) {
->>   		pn = memcg->nodeinfo[nid];
->>   		info = rcu_dereference_protected(pn->shrinker_info, true);
->> +		shrinker_unit_free(info, 0);
->>   		kvfree(info);
->>   		rcu_assign_pointer(pn->shrinker_info, NULL);
->>   	}
-> 
-> Why is this safe? The info and maps are looked up by RCU, so why is
-> freeing them without a RCU grace period expiring safe?
-
-The free_shrinker_info() will be called in alloc_shrinker_info() and
-mem_cgroup_css_free().
-
-In alloc_shrinker_info(), it will only be called in the error path, so
-shrinker_info_unit and shrinker_info can be safely freed.
-
-In mem_cgroup_css_free(), when we get here, the traversal of this memcg
-has ended and will not be found again. That is to say, the corresponding
-shrink_slab() is also over, so shrinker_info_unit and shrinker_info can
-also be safely freed here.
-
-> 
-> Yes, it was safe to do this when it was all under a semaphore, but
-> now the lookup and use is under RCU, so this freeing isn't
-> serialised against lookups anymore...
-> 
-> 
->> @@ -40,28 +76,27 @@ void free_shrinker_info(struct mem_cgroup *memcg)
->>   int alloc_shrinker_info(struct mem_cgroup *memcg)
->>   {
->>   	struct shrinker_info *info;
->> -	int nid, size, ret = 0;
->> -	int map_size, defer_size = 0;
->> +	int nid, ret = 0;
->> +	int array_size = 0;
->>   
->>   	down_write(&shrinker_rwsem);
->> -	map_size = shrinker_map_size(shrinker_nr_max);
->> -	defer_size = shrinker_defer_size(shrinker_nr_max);
->> -	size = map_size + defer_size;
->> +	array_size = shrinker_unit_size(shrinker_nr_max);
->>   	for_each_node(nid) {
->> -		info = kvzalloc_node(sizeof(*info) + size, GFP_KERNEL, nid);
->> -		if (!info) {
->> -			free_shrinker_info(memcg);
->> -			ret = -ENOMEM;
->> -			break;
->> -		}
->> -		info->nr_deferred = (atomic_long_t *)(info + 1);
->> -		info->map = (void *)info->nr_deferred + defer_size;
->> +		info = kvzalloc_node(sizeof(*info) + array_size, GFP_KERNEL, nid);
->> +		if (!info)
->> +			goto err;
->>   		info->map_nr_max = shrinker_nr_max;
->> +		if (shrinker_unit_alloc(info, NULL, nid))
->> +			goto err;
-> 
-> That's going to now do a lot of small memory allocation when we have
-> lots of shrinkers active....
-> 
->> @@ -150,17 +175,34 @@ static int expand_shrinker_info(int new_id)
->>   	return ret;
->>   }
->>   
->> +static inline int shriner_id_to_index(int shrinker_id)
-> 
-> shrinker_id_to_index
-
-Will fix.
-
-> 
->> +{
->> +	return shrinker_id / SHRINKER_UNIT_BITS;
->> +}
->> +
->> +static inline int shriner_id_to_offset(int shrinker_id)
-> 
-> shrinker_id_to_offset
-
-Will fix.
-
-> 
->> +{
->> +	return shrinker_id % SHRINKER_UNIT_BITS;
->> +}
-> 
-> ....
->> @@ -209,26 +251,31 @@ static long xchg_nr_deferred_memcg(int nid, struct shrinker *shrinker,
->>   				   struct mem_cgroup *memcg)
->>   {
->>   	struct shrinker_info *info;
->> +	struct shrinker_info_unit *unit;
->>   
->>   	info = shrinker_info_protected(memcg, nid);
->> -	return atomic_long_xchg(&info->nr_deferred[shrinker->id], 0);
->> +	unit = info->unit[shriner_id_to_index(shrinker->id)];
->> +	return atomic_long_xchg(&unit->nr_deferred[shriner_id_to_offset(shrinker->id)], 0);
->>   }
->>   
->>   static long add_nr_deferred_memcg(long nr, int nid, struct shrinker *shrinker,
->>   				  struct mem_cgroup *memcg)
->>   {
->>   	struct shrinker_info *info;
->> +	struct shrinker_info_unit *unit;
->>   
->>   	info = shrinker_info_protected(memcg, nid);
->> -	return atomic_long_add_return(nr, &info->nr_deferred[shrinker->id]);
->> +	unit = info->unit[shriner_id_to_index(shrinker->id)];
->> +	return atomic_long_add_return(nr, &unit->nr_deferred[shriner_id_to_offset(shrinker->id)]);
->>   }
->>   
->>   void reparent_shrinker_deferred(struct mem_cgroup *memcg)
->>   {
->> -	int i, nid;
->> +	int nid, index, offset;
->>   	long nr;
->>   	struct mem_cgroup *parent;
->>   	struct shrinker_info *child_info, *parent_info;
->> +	struct shrinker_info_unit *child_unit, *parent_unit;
->>   
->>   	parent = parent_mem_cgroup(memcg);
->>   	if (!parent)
->> @@ -239,9 +286,13 @@ void reparent_shrinker_deferred(struct mem_cgroup *memcg)
->>   	for_each_node(nid) {
->>   		child_info = shrinker_info_protected(memcg, nid);
->>   		parent_info = shrinker_info_protected(parent, nid);
->> -		for (i = 0; i < child_info->map_nr_max; i++) {
->> -			nr = atomic_long_read(&child_info->nr_deferred[i]);
->> -			atomic_long_add(nr, &parent_info->nr_deferred[i]);
->> +		for (index = 0; index < shriner_id_to_index(child_info->map_nr_max); index++) {
->> +			child_unit = child_info->unit[index];
->> +			parent_unit = parent_info->unit[index];
->> +			for (offset = 0; offset < SHRINKER_UNIT_BITS; offset++) {
->> +				nr = atomic_long_read(&child_unit->nr_deferred[offset]);
->> +				atomic_long_add(nr, &parent_unit->nr_deferred[offset]);
->> +			}
->>   		}
->>   	}
->>   	up_read(&shrinker_rwsem);
->> @@ -407,7 +458,7 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->>   {
->>   	struct shrinker_info *info;
->>   	unsigned long ret, freed = 0;
->> -	int i;
->> +	int offset, index = 0;
->>   
->>   	if (!mem_cgroup_online(memcg))
->>   		return 0;
->> @@ -419,56 +470,63 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->>   	if (unlikely(!info))
->>   		goto unlock;
->>   
->> -	for_each_set_bit(i, info->map, info->map_nr_max) {
->> -		struct shrink_control sc = {
->> -			.gfp_mask = gfp_mask,
->> -			.nid = nid,
->> -			.memcg = memcg,
->> -		};
->> -		struct shrinker *shrinker;
->> +	for (; index < shriner_id_to_index(info->map_nr_max); index++) {
->> +		struct shrinker_info_unit *unit;
-> 
-> This adds another layer of indent to shrink_slab_memcg(). Please
-> factor it first so that the code ends up being readable. Doing that
-> first as a separate patch will also make the actual algorithm
-> changes in this patch be much more obvious - this huge hunk of
-> diff is pretty much impossible to review...
-
-OK, I will send this patch together with PATCH v4 01/02/03/43 as
-a single cleanup patchset.
-
-Thanks,
-Qi
-
-> 
-> -Dave.
