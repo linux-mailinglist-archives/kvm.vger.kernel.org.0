@@ -2,362 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D51277365A
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 04:12:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D3C077365F
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 04:12:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbjHHCM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 22:12:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44454 "EHLO
+        id S230316AbjHHCMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 22:12:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230321AbjHHCMN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 22:12:13 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF35172A
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 19:12:06 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bbff6b2679so33363005ad.1
-        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 19:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1691460726; x=1692065526;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S5nJ90Y7HkcDKRE+pcPu5keZJ+24iVkBC6PdC2b5uJ0=;
-        b=AFt/VuazRx0w4Tn1IU2JUHjsvK9//KmKNKOzUsMjyPWc+WauQSv5qCgAlx5y8wlPIL
-         hZ4kYEryWxLgRLeYaQj4xKQmbz2+fwGFdpiEnUYFWB8cS1WKDsqaNRvUwjpvdhEE1wqM
-         Pa0gWwQ1zRdGeKwMXonsis/5aIvId3dvX65TjmeUK6fHIDfWZQ6NWrHdG0BFjSgBlwHn
-         EPCT/fdxzOXvB1URY1V13teKkeQnNqcDN6h4mKjIkvEjRefZqSa/0jDLGkSWo+riYILJ
-         5YWVtmGXaJL6ouBig0rvs/QbDa4KngUZ9XItmSUyw062F/G/EjTZcECBZuQiNzd7pFh2
-         XSVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691460726; x=1692065526;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S5nJ90Y7HkcDKRE+pcPu5keZJ+24iVkBC6PdC2b5uJ0=;
-        b=XBAxyIRdUMwsVZUXhlfBNE+lSvM+WC7IqoxjhHF71xtmIjygjw5Z0HbiIExKGIh7na
-         wkoVk30bxyv06AFl597qDgs2tVWOYtvWnR+NQnIL/uKgu8pmVxMVDzH6KAbtQV88OlgG
-         iNXAdocj6J2e1aOyT/9uh4FRZDy6k7GsXCfV6xt7Oxamb5gbRj7yVsBMsDwIs9Hc2XR4
-         NQsEa4bjQyHJ5zhtgzchTkPje93JQcOu1vcNOuEKZY3Xh8yPLaWR/126RPhUZdaEBz71
-         bqL8IHhYIZpPdumw4nI8O6AO7Zv4dUIT4h091vzMlWu3qsDC1pxw8Nyy9RuTFsFEgowl
-         vVzg==
-X-Gm-Message-State: AOJu0YwN2ItZB0ydy7oPOYpbrJoooFmMZAE6E3LyldZcHTvY0kQOp/nI
-        OCxY2mx4mitY01+WHPOwtR8YkQ==
-X-Google-Smtp-Source: AGHT+IHE8FO8RAjHks3Izbxy+yXIAOFeIsxej7SyncoSZwq8TiDh2J09MxtXtA2ffdHhYGJ2WNjVaA==
-X-Received: by 2002:a17:90a:ad90:b0:25e:d013:c22c with SMTP id s16-20020a17090aad9000b0025ed013c22cmr8256877pjq.47.1691460726140;
-        Mon, 07 Aug 2023 19:12:06 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-166-213.pa.nsw.optusnet.com.au. [49.180.166.213])
-        by smtp.gmail.com with ESMTPSA id jv14-20020a17090b31ce00b00263e4dc33aasm9313956pjb.11.2023.08.07.19.12.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 19:12:05 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qTCCY-002WbH-25;
-        Tue, 08 Aug 2023 12:12:02 +1000
-Date:   Tue, 8 Aug 2023 12:12:02 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Qi Zheng <zhengqi.arch@bytedance.com>
-Cc:     akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
-        roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
-        paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
-        cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
-        gregkh@linuxfoundation.org, muchun.song@linux.dev,
-        simon.horman@corigine.com, dlemoal@kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
+        with ESMTP id S229621AbjHHCMd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 22:12:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FE91711;
+        Mon,  7 Aug 2023 19:12:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2E3AC62377;
+        Tue,  8 Aug 2023 02:12:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41A6CC433C9;
+        Tue,  8 Aug 2023 02:12:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691460748;
+        bh=VRkYha2WcYiFCfW1jnh2VzYnyzSI0BELp4Vbm5rvuJ0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kIDPQ2tkRoESMxlHw70sgk7jaT2faK4xi7GqlRBnpsnrfAGVWf56MAMy5koAx3fEu
+         rc8orB5Jl57n/+LS4Q+M8wXPJlijTHZ/Mf+BbCq7fRz0uH9WVui1WSDJbW/sdv74h6
+         hpcz6wB9Nf+Kae77HrB87LBryEUzWLuy8NCpFfX9qOy/CmCuFW+WeZJHruny88kTUU
+         g+w7Yzys9y9TwUPJEJ4M+eT+sn+F/H3G+VIWsU/UsSfzSpmjECNB4p90XnDdXv0hcn
+         A0ZPCj9ITwAzmSiKqhaCLUy9pW4lcrGn647Zu7X+t/8052h+2ejyG/w7z2f/x1Cre8
+         vHXMHucz3xXmA==
+Date:   Mon, 7 Aug 2023 22:12:15 -0400
+From:   Guo Ren <guoren@kernel.org>
+To:     Stefan O'Rear <sorear@fastmail.com>
+Cc:     paul.walmsley@sifive.com, Anup Patel <anup@brainfault.org>,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        Palmer Dabbelt <palmer@rivosinc.com>, longman@redhat.com,
+        boqun.feng@gmail.com, tglx@linutronix.de, paulmck@kernel.org,
+        rostedt@goodmis.org, rdunlap@infradead.org,
+        catalin.marinas@arm.com, Conor Dooley <conor.dooley@microchip.com>,
+        xiaoguang.xing@sophgo.com,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
+        alexghiti@rivosinc.com, Kees Cook <keescook@chromium.org>,
+        greentime.hu@sifive.com, Andrew Jones <ajones@ventanamicro.com>,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
+        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v4 44/48] mm: shrinker: add a secondary array for
- shrinker_info::{map, nr_deferred}
-Message-ID: <ZNGkcp3Dh8hOiFpk@dread.disaster.area>
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-45-zhengqi.arch@bytedance.com>
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>,
+        guoren@kernel.org
+Subject: Re: [PATCH V10 07/19] riscv: qspinlock: errata: Introduce
+ ERRATA_THEAD_QSPINLOCK
+Message-ID: <ZNGkf88lhPt7fdhH@gmail.com>
+References: <20230802164701.192791-1-guoren@kernel.org>
+ <20230802164701.192791-8-guoren@kernel.org>
+ <ae320af5-6cca-4689-aa66-9d0193713d40@app.fastmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230807110936.21819-45-zhengqi.arch@bytedance.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <ae320af5-6cca-4689-aa66-9d0193713d40@app.fastmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 07, 2023 at 07:09:32PM +0800, Qi Zheng wrote:
-> Currently, we maintain two linear arrays per node per memcg, which are
-> shrinker_info::map and shrinker_info::nr_deferred. And we need to resize
-> them when the shrinker_nr_max is exceeded, that is, allocate a new array,
-> and then copy the old array to the new array, and finally free the old
-> array by RCU.
+On Mon, Aug 07, 2023 at 01:23:34AM -0400, Stefan O'Rear wrote:
+> On Wed, Aug 2, 2023, at 12:46 PM, guoren@kernel.org wrote:
+> > From: Guo Ren <guoren@linux.alibaba.com>
+> >
+> > According to qspinlock requirements, RISC-V gives out a weak LR/SC
+> > forward progress guarantee which does not satisfy qspinlock. But
+> > many vendors could produce stronger forward guarantee LR/SC to
+> > ensure the xchg_tail could be finished in time on any kind of
+> > hart. T-HEAD is the vendor which implements strong forward
+> > guarantee LR/SC instruction pairs, so enable qspinlock for T-HEAD
+> > with errata help.
+> >
+> > T-HEAD early version of processors has the merge buffer delay
+> > problem, so we need ERRATA_WRITEONCE to support qspinlock.
+> >
+> > Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> > Signed-off-by: Guo Ren <guoren@kernel.org>
+> > ---
+> >  arch/riscv/Kconfig.errata              | 13 +++++++++++++
+> >  arch/riscv/errata/thead/errata.c       | 24 ++++++++++++++++++++++++
+> >  arch/riscv/include/asm/errata_list.h   | 20 ++++++++++++++++++++
+> >  arch/riscv/include/asm/vendorid_list.h |  3 ++-
+> >  arch/riscv/kernel/cpufeature.c         |  3 ++-
+> >  5 files changed, 61 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/riscv/Kconfig.errata b/arch/riscv/Kconfig.errata
+> > index 4745a5c57e7c..eb43677b13cc 100644
+> > --- a/arch/riscv/Kconfig.errata
+> > +++ b/arch/riscv/Kconfig.errata
+> > @@ -96,4 +96,17 @@ config ERRATA_THEAD_WRITE_ONCE
+> > 
+> >  	  If you don't know what to do here, say "Y".
+> > 
+> > +config ERRATA_THEAD_QSPINLOCK
+> > +	bool "Apply T-Head queued spinlock errata"
+> > +	depends on ERRATA_THEAD
+> > +	default y
+> > +	help
+> > +	  The T-HEAD C9xx processors implement strong fwd guarantee LR/SC to
+> > +	  match the xchg_tail requirement of qspinlock.
+> > +
+> > +	  This will apply the QSPINLOCK errata to handle the non-standard
+> > +	  behavior via using qspinlock instead of ticket_lock.
+> > +
+> > +	  If you don't know what to do here, say "Y".
 > 
-> For shrinker_info::map, we do set_bit() under the RCU lock, so we may set
-> the value into the old map which is about to be freed. This may cause the
-> value set to be lost. The current solution is not to copy the old map when
-> resizing, but to set all the corresponding bits in the new map to 1. This
-> solves the data loss problem, but bring the overhead of more pointless
-> loops while doing memcg slab shrink.
+> If this is to be applied, I would like to see a detailed explanation somewhere,
+> preferably with citations, of:
 > 
-> For shrinker_info::nr_deferred, we will only modify it under the read lock
-> of shrinker_rwsem, so it will not run concurrently with the resizing. But
-> after we make memcg slab shrink lockless, there will be the same data loss
-> problem as shrinker_info::map, and we can't work around it like the map.
+> (a) The memory model requirements for qspinlock
+These were written in commit: a8ad07e5240 ("asm-generic: qspinlock: Indicate the use of
+mixed-size atomics"). For riscv, the most controversial point is xchg_tail()
+implementation for native queued spinlock.
+
+> (b) Why, with arguments, RISC-V does not architecturally meet (a)
+In the spec "Eventual Success of Store-Conditional Instructions":
+"By contrast, if other harts or devices continue to write to that reservation set, it is
+not guaranteed that any hart will exit its LR/SC loop."
+
+1. The arch_spinlock_t is 32-bit width, and it contains LOCK_PENDING
+   part and IDX_TAIL part.
+    - LOCK:     lock holder
+    - PENDING:  next waiter (Only once per contended situation)
+    - IDX:      nested context (normal, hwirq, softirq, nmi)
+    - TAIL:     last contended cpu
+   The xchg_tail operate on IDX_TAIL part, so there is no guarantee on "NO"
+   "other harts or devices continue to write to that reservation set".
+
+2. When you do lock torture test, you may see a long contended ring queue:
+                                                                xchg_tail
+                                                                    +-----> CPU4 (big core)
+                                                                    |
+   CPU3 (lock holder) -> CPU1 (mcs queued) -> CPU2 (mcs queued) ----+-----> CPU0 (little core)
+    |                                                               |
+    |                                                               +-----> CPU5 (big core)
+    |                                                               |
+    +--locktorture release lock (spin_unlock) and spin_lock again --+-----> CPU3 (big core)
+
+    If CPU0 doesn't have a strong fwd guarantee, xhg_tail is consistently failed.
+
+> (c) Why, with arguments, T-HEAD C9xx meets (a)
+> (d) Why at least one other architecture which defines ARCH_USE_QUEUED_SPINLOCKS
+>     meets (a)
+I can't give the C9xx microarch implementation detail. But many
+open-source riscv cores have provided strong forward progress guarantee
+LR/SC implementation [1] [2]. But I would say these implementations are
+too rude, which makes LR send a cacheline unique interconnect request.
+It satisfies xchg_tail but not cmpxchg & cond_load. CPU vendors should
+carefully consider your LR/SC fwd guarantee implementation.
+
+[1]: https://github.com/riscv-boom/riscv-boom/blob/v3.0.0/src/main/scala/lsu/dcache.scala#L650
+[2]: https://github.com/OpenXiangShan/XiangShan/blob/v1.0/src/main/scala/xiangshan/cache/MainPipe.scala#L470
+
 > 
-> For such resizable arrays, the most straightforward idea is to change it
-> to xarray, like we did for list_lru [1]. We need to do xa_store() in the
-> list_lru_add()-->set_shrinker_bit(), but this will cause memory
-> allocation, and the list_lru_add() doesn't accept failure. A possible
-> solution is to pre-allocate, but the location of pre-allocation is not
-> well determined.
-
-So you implemented a two level array that preallocates leaf
-nodes to work around it? It's remarkable complex for what it does,
-I can't help but think a radix tree using a special holder for
-nr_deferred values of zero would end up being simpler...
-
-> Therefore, this commit chooses to introduce a secondary array for
-> shrinker_info::{map, nr_deferred}, so that we only need to copy this
-> secondary array every time the size is resized. Then even if we get the
-> old secondary array under the RCU lock, the found map and nr_deferred are
-> also true, so no data is lost.
-
-I don't understand what you are trying to describe here. If we get
-the old array, then don't we get either a stale nr_deferred value,
-or the update we do gets lost because the next shrinker lookup will
-find the new array and os the deferred value stored to the old one
-is never seen again?
+> As far as I can tell, the RISC-V guarantees concerning constrained LR/SC loops
+> (livelock freedom but no starvation freedom) are exactly the same as those in
+> Armv8 (as of 0487F.c) for equivalent loops, and xchg_tail compiles to a
+> constrained LR/SC loop with guaranteed eventual success (with -O1).  Clearly you
+> disagree; I would like to see your perspective.
+For Armv8, I would use LSE for the lock-contended scenario. Ref this
+commit 0ea366f5e1b6: ("arm64: atomics: prefetch the destination word for
+write prior to stxr").
 
 > 
-> [1]. https://lore.kernel.org/all/20220228122126.37293-13-songmuchun@bytedance.com/
+> -s
 > 
-> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
-> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-> ---
-.....
-> diff --git a/mm/shrinker.c b/mm/shrinker.c
-> index a27779ed3798..1911c06b8af5 100644
-> --- a/mm/shrinker.c
-> +++ b/mm/shrinker.c
-> @@ -12,15 +12,50 @@ DECLARE_RWSEM(shrinker_rwsem);
->  #ifdef CONFIG_MEMCG
->  static int shrinker_nr_max;
->  
-> -/* The shrinker_info is expanded in a batch of BITS_PER_LONG */
-> -static inline int shrinker_map_size(int nr_items)
-> +static inline int shrinker_unit_size(int nr_items)
->  {
-> -	return (DIV_ROUND_UP(nr_items, BITS_PER_LONG) * sizeof(unsigned long));
-> +	return (DIV_ROUND_UP(nr_items, SHRINKER_UNIT_BITS) * sizeof(struct shrinker_info_unit *));
->  }
->  
-> -static inline int shrinker_defer_size(int nr_items)
-> +static inline void shrinker_unit_free(struct shrinker_info *info, int start)
->  {
-> -	return (round_up(nr_items, BITS_PER_LONG) * sizeof(atomic_long_t));
-> +	struct shrinker_info_unit **unit;
-> +	int nr, i;
-> +
-> +	if (!info)
-> +		return;
-> +
-> +	unit = info->unit;
-> +	nr = DIV_ROUND_UP(info->map_nr_max, SHRINKER_UNIT_BITS);
-> +
-> +	for (i = start; i < nr; i++) {
-> +		if (!unit[i])
-> +			break;
-> +
-> +		kvfree(unit[i]);
-> +		unit[i] = NULL;
-> +	}
-> +}
-> +
-> +static inline int shrinker_unit_alloc(struct shrinker_info *new,
-> +				       struct shrinker_info *old, int nid)
-> +{
-> +	struct shrinker_info_unit *unit;
-> +	int nr = DIV_ROUND_UP(new->map_nr_max, SHRINKER_UNIT_BITS);
-> +	int start = old ? DIV_ROUND_UP(old->map_nr_max, SHRINKER_UNIT_BITS) : 0;
-> +	int i;
-> +
-> +	for (i = start; i < nr; i++) {
-> +		unit = kvzalloc_node(sizeof(*unit), GFP_KERNEL, nid);
-
-A unit is 576 bytes. Why is this using kvzalloc_node()?
-
-> +		if (!unit) {
-> +			shrinker_unit_free(new, start);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		new->unit[i] = unit;
-> +	}
-> +
-> +	return 0;
->  }
->  
->  void free_shrinker_info(struct mem_cgroup *memcg)
-> @@ -32,6 +67,7 @@ void free_shrinker_info(struct mem_cgroup *memcg)
->  	for_each_node(nid) {
->  		pn = memcg->nodeinfo[nid];
->  		info = rcu_dereference_protected(pn->shrinker_info, true);
-> +		shrinker_unit_free(info, 0);
->  		kvfree(info);
->  		rcu_assign_pointer(pn->shrinker_info, NULL);
->  	}
-
-Why is this safe? The info and maps are looked up by RCU, so why is
-freeing them without a RCU grace period expiring safe?
-
-Yes, it was safe to do this when it was all under a semaphore, but
-now the lookup and use is under RCU, so this freeing isn't
-serialised against lookups anymore...
-
-
-> @@ -40,28 +76,27 @@ void free_shrinker_info(struct mem_cgroup *memcg)
->  int alloc_shrinker_info(struct mem_cgroup *memcg)
->  {
->  	struct shrinker_info *info;
-> -	int nid, size, ret = 0;
-> -	int map_size, defer_size = 0;
-> +	int nid, ret = 0;
-> +	int array_size = 0;
->  
->  	down_write(&shrinker_rwsem);
-> -	map_size = shrinker_map_size(shrinker_nr_max);
-> -	defer_size = shrinker_defer_size(shrinker_nr_max);
-> -	size = map_size + defer_size;
-> +	array_size = shrinker_unit_size(shrinker_nr_max);
->  	for_each_node(nid) {
-> -		info = kvzalloc_node(sizeof(*info) + size, GFP_KERNEL, nid);
-> -		if (!info) {
-> -			free_shrinker_info(memcg);
-> -			ret = -ENOMEM;
-> -			break;
-> -		}
-> -		info->nr_deferred = (atomic_long_t *)(info + 1);
-> -		info->map = (void *)info->nr_deferred + defer_size;
-> +		info = kvzalloc_node(sizeof(*info) + array_size, GFP_KERNEL, nid);
-> +		if (!info)
-> +			goto err;
->  		info->map_nr_max = shrinker_nr_max;
-> +		if (shrinker_unit_alloc(info, NULL, nid))
-> +			goto err;
-
-That's going to now do a lot of small memory allocation when we have
-lots of shrinkers active....
-
-> @@ -150,17 +175,34 @@ static int expand_shrinker_info(int new_id)
->  	return ret;
->  }
->  
-> +static inline int shriner_id_to_index(int shrinker_id)
-
-shrinker_id_to_index
-
-> +{
-> +	return shrinker_id / SHRINKER_UNIT_BITS;
-> +}
-> +
-> +static inline int shriner_id_to_offset(int shrinker_id)
-
-shrinker_id_to_offset
-
-> +{
-> +	return shrinker_id % SHRINKER_UNIT_BITS;
-> +}
-
-....
-> @@ -209,26 +251,31 @@ static long xchg_nr_deferred_memcg(int nid, struct shrinker *shrinker,
->  				   struct mem_cgroup *memcg)
->  {
->  	struct shrinker_info *info;
-> +	struct shrinker_info_unit *unit;
->  
->  	info = shrinker_info_protected(memcg, nid);
-> -	return atomic_long_xchg(&info->nr_deferred[shrinker->id], 0);
-> +	unit = info->unit[shriner_id_to_index(shrinker->id)];
-> +	return atomic_long_xchg(&unit->nr_deferred[shriner_id_to_offset(shrinker->id)], 0);
->  }
->  
->  static long add_nr_deferred_memcg(long nr, int nid, struct shrinker *shrinker,
->  				  struct mem_cgroup *memcg)
->  {
->  	struct shrinker_info *info;
-> +	struct shrinker_info_unit *unit;
->  
->  	info = shrinker_info_protected(memcg, nid);
-> -	return atomic_long_add_return(nr, &info->nr_deferred[shrinker->id]);
-> +	unit = info->unit[shriner_id_to_index(shrinker->id)];
-> +	return atomic_long_add_return(nr, &unit->nr_deferred[shriner_id_to_offset(shrinker->id)]);
->  }
->  
->  void reparent_shrinker_deferred(struct mem_cgroup *memcg)
->  {
-> -	int i, nid;
-> +	int nid, index, offset;
->  	long nr;
->  	struct mem_cgroup *parent;
->  	struct shrinker_info *child_info, *parent_info;
-> +	struct shrinker_info_unit *child_unit, *parent_unit;
->  
->  	parent = parent_mem_cgroup(memcg);
->  	if (!parent)
-> @@ -239,9 +286,13 @@ void reparent_shrinker_deferred(struct mem_cgroup *memcg)
->  	for_each_node(nid) {
->  		child_info = shrinker_info_protected(memcg, nid);
->  		parent_info = shrinker_info_protected(parent, nid);
-> -		for (i = 0; i < child_info->map_nr_max; i++) {
-> -			nr = atomic_long_read(&child_info->nr_deferred[i]);
-> -			atomic_long_add(nr, &parent_info->nr_deferred[i]);
-> +		for (index = 0; index < shriner_id_to_index(child_info->map_nr_max); index++) {
-> +			child_unit = child_info->unit[index];
-> +			parent_unit = parent_info->unit[index];
-> +			for (offset = 0; offset < SHRINKER_UNIT_BITS; offset++) {
-> +				nr = atomic_long_read(&child_unit->nr_deferred[offset]);
-> +				atomic_long_add(nr, &parent_unit->nr_deferred[offset]);
-> +			}
->  		}
->  	}
->  	up_read(&shrinker_rwsem);
-> @@ -407,7 +458,7 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->  {
->  	struct shrinker_info *info;
->  	unsigned long ret, freed = 0;
-> -	int i;
-> +	int offset, index = 0;
->  
->  	if (!mem_cgroup_online(memcg))
->  		return 0;
-> @@ -419,56 +470,63 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->  	if (unlikely(!info))
->  		goto unlock;
->  
-> -	for_each_set_bit(i, info->map, info->map_nr_max) {
-> -		struct shrink_control sc = {
-> -			.gfp_mask = gfp_mask,
-> -			.nid = nid,
-> -			.memcg = memcg,
-> -		};
-> -		struct shrinker *shrinker;
-> +	for (; index < shriner_id_to_index(info->map_nr_max); index++) {
-> +		struct shrinker_info_unit *unit;
-
-This adds another layer of indent to shrink_slab_memcg(). Please
-factor it first so that the code ends up being readable. Doing that
-first as a separate patch will also make the actual algorithm
-changes in this patch be much more obvious - this huge hunk of
-diff is pretty much impossible to review...
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> > +
+> >  endmenu # "CPU errata selection"
+> > diff --git a/arch/riscv/errata/thead/errata.c b/arch/riscv/errata/thead/errata.c
+> > index 881729746d2e..d560dc45c0e7 100644
+> > --- a/arch/riscv/errata/thead/errata.c
+> > +++ b/arch/riscv/errata/thead/errata.c
+> > @@ -86,6 +86,27 @@ static bool errata_probe_write_once(unsigned int stage,
+> >  	return false;
+> >  }
+> > 
+> > +static bool errata_probe_qspinlock(unsigned int stage,
+> > +				   unsigned long arch_id, unsigned long impid)
+> > +{
+> > +	if (!IS_ENABLED(CONFIG_ERRATA_THEAD_QSPINLOCK))
+> > +		return false;
+> > +
+> > +	/*
+> > +	 * The queued_spinlock torture would get in livelock without
+> > +	 * ERRATA_THEAD_WRITE_ONCE fixup for the early versions of T-HEAD
+> > +	 * processors.
+> > +	 */
+> > +	if (arch_id == 0 && impid == 0 &&
+> > +	    !IS_ENABLED(CONFIG_ERRATA_THEAD_WRITE_ONCE))
+> > +		return false;
+> > +
+> > +	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+> > +		return true;
+> > +
+> > +	return false;
+> > +}
+> > +
+> >  static u32 thead_errata_probe(unsigned int stage,
+> >  			      unsigned long archid, unsigned long impid)
+> >  {
+> > @@ -103,6 +124,9 @@ static u32 thead_errata_probe(unsigned int stage,
+> >  	if (errata_probe_write_once(stage, archid, impid))
+> >  		cpu_req_errata |= BIT(ERRATA_THEAD_WRITE_ONCE);
+> > 
+> > +	if (errata_probe_qspinlock(stage, archid, impid))
+> > +		cpu_req_errata |= BIT(ERRATA_THEAD_QSPINLOCK);
+> > +
+> >  	return cpu_req_errata;
+> >  }
+> > 
+> > diff --git a/arch/riscv/include/asm/errata_list.h 
+> > b/arch/riscv/include/asm/errata_list.h
+> > index fbb2b8d39321..a696d18d1b0d 100644
+> > --- a/arch/riscv/include/asm/errata_list.h
+> > +++ b/arch/riscv/include/asm/errata_list.h
+> > @@ -141,6 +141,26 @@ asm volatile(ALTERNATIVE(						\
+> >  	: "=r" (__ovl) :						\
+> >  	: "memory")
+> > 
+> > +static __always_inline bool
+> > +riscv_has_errata_thead_qspinlock(void)
+> > +{
+> > +	if (IS_ENABLED(CONFIG_RISCV_ALTERNATIVE)) {
+> > +		asm_volatile_goto(
+> > +		ALTERNATIVE(
+> > +		"j	%l[l_no]", "nop",
+> > +		THEAD_VENDOR_ID,
+> > +		ERRATA_THEAD_QSPINLOCK,
+> > +		CONFIG_ERRATA_THEAD_QSPINLOCK)
+> > +		: : : : l_no);
+> > +	} else {
+> > +		goto l_no;
+> > +	}
+> > +
+> > +	return true;
+> > +l_no:
+> > +	return false;
+> > +}
+> > +
+> >  #endif /* __ASSEMBLY__ */
+> > 
+> >  #endif
+> > diff --git a/arch/riscv/include/asm/vendorid_list.h 
+> > b/arch/riscv/include/asm/vendorid_list.h
+> > index 73078cfe4029..1f1d03877f5f 100644
+> > --- a/arch/riscv/include/asm/vendorid_list.h
+> > +++ b/arch/riscv/include/asm/vendorid_list.h
+> > @@ -19,7 +19,8 @@
+> >  #define	ERRATA_THEAD_CMO 1
+> >  #define	ERRATA_THEAD_PMU 2
+> >  #define	ERRATA_THEAD_WRITE_ONCE 3
+> > -#define	ERRATA_THEAD_NUMBER 4
+> > +#define	ERRATA_THEAD_QSPINLOCK 4
+> > +#define	ERRATA_THEAD_NUMBER 5
+> >  #endif
+> > 
+> >  #endif
+> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > index f8dbbe1bbd34..d9694fe40a9a 100644
+> > --- a/arch/riscv/kernel/cpufeature.c
+> > +++ b/arch/riscv/kernel/cpufeature.c
+> > @@ -342,7 +342,8 @@ void __init riscv_fill_hwcap(void)
+> >  		 * spinlock value, the only way is to change from queued_spinlock to
+> >  		 * ticket_spinlock, but can not be vice.
+> >  		 */
+> > -		if (!force_qspinlock) {
+> > +		if (!force_qspinlock &&
+> > +		    !riscv_has_errata_thead_qspinlock()) {
+> >  			set_bit(RISCV_ISA_EXT_XTICKETLOCK, isainfo->isa);
+> >  		}
+> >  #endif
+> > -- 
+> > 2.36.1
+> >
+> >
+> > _______________________________________________
+> > linux-riscv mailing list
+> > linux-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-riscv
