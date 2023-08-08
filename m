@@ -2,334 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A11AD774779
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 21:15:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D3977447F
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:21:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235736AbjHHTPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 15:15:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
+        id S235708AbjHHSVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 14:21:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230460AbjHHTOn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 15:14:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A7CC47CA
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:37:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 151DF6251B
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:48:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532FAC433C9;
-        Tue,  8 Aug 2023 11:48:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691495315;
-        bh=8BkzYZbE/DYdO/xi/HRvqgA6bVkzXVBJnxlxPNjuvFc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=l0PQ8qOas9PogWswE/27vonKoZ+hQ/pbXGspT2mdPnF1tgVXyBhsdgVQ37jtBUAhv
-         qYTHmtNnp81TnGm/+JMRm49dN0AKKIVBeXgVk9J4MgUrs4eJ5QIHM21+v24jPDTL3g
-         AXLpR0ozS9ozau/bUs3Y1bgyhAvwRnYexcQIbHMwC/dxOdZ4KbYGCHaeKbk5E3VpxK
-         wI48noDzIOM9EZu4JBOv0RLwyDfLS+lhVlQso7q7QB7CX3iG1i5zeE0TD9493QTnUq
-         eCsjFFa1i09ZlcRSHvdeZyfuoPDviM1+5uWwxR4CE1fBLqo450E3peg+s7EquB6bTX
-         UtliVEFmKMFmA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qTLBO-0037Ph-IG;
-        Tue, 08 Aug 2023 12:47:27 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 27/27] KVM: arm64: nv: Add support for HCRX_EL2
-Date:   Tue,  8 Aug 2023 12:47:11 +0100
-Message-Id: <20230808114711.2013842-28-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
-References: <20230808114711.2013842-1-maz@kernel.org>
+        with ESMTP id S235124AbjHHSVU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 14:21:20 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ABD77EC0;
+        Tue,  8 Aug 2023 10:31:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691515905; x=1723051905;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cZfIxP7Lt8aIJjSSmyf/+r54nHKLxM7rCCvsDfYER9E=;
+  b=EZuK49CPbGywFr5bn0DaNJQH4GtG/lgrycEhEIidW4092YykJSJ7CmSG
+   srNy9g8wMS2yH2zPTRkXZifH8Auksngj8IqlLhlfYGZ+amSzvDlrs4FgJ
+   esjEnCDEjhnYFBqa2fQuasXh5NKXlKfZZBYGI9x/ZrK3H0p4nj6Lrv7Wo
+   cRXBn6gcIG1qQNFzglNtMYxRQXTapAFWHYbEra4zBtGFGunNhYPi59+U9
+   rNIy46dgvDU70Ko6fQTUd40kNRxFjl7hxdKRuo9iNSRLKXXiB0bmsN74Q
+   ZK5ZBDiL3QZ23MRjUCQRboCD8fXr+mF2Doy3Kkgh6DTRaja26nGI9XB8i
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="434705492"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="434705492"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 08:26:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="724958865"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="724958865"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga007.jf.intel.com with ESMTP; 08 Aug 2023 08:26:49 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 8 Aug 2023 08:26:48 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 8 Aug 2023 08:26:48 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 8 Aug 2023 08:26:48 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k98h6QN1zfFEyAdElzER6O2rHM9uazOPf8c/hq1tlFxZzKQFPGntqHe20tpzcABwb4itUgoLkD7zG+n7YkP7GZqkKReNG2tVA+quZMtBnOVAKyiJ4bAZggadSzAYWujcrrWi7mCcecw3O3RzZk7AyAh7PRbl4o4heIAiVhgkO0GnOXIi8qi5HWdcqs+CJoKGNsbA3UgWonsX0F9nFK9iXLrMUW1OmIZy6lhMxRcDk1oZoTt9hMqQBI/86QmjH83EZokzhlKlaIOhuQ62fNezqJHDXCvpL2TjSln/sBXnUvjKkDWSKJ6feEff4QmX7m1Bh+uA3tY2njMfDpqagpcDAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MlucIOcRMhSDzOs+tbF5/nOqBPAlGCT48hx8lJG0tFg=;
+ b=eLc5iXmKzmxud5hAMYj9sIC5MVD9RiBhgynC2gXLpYIlqCN5CNgAzDBxsP40ylifvWQtxVTsQR2GN/9kjL6CBfXXONUvNiDnQdD3LGcFHGDAdLr9/jVO44myHnijJQ9ToinidR/S2pWYNFHXwOlU+PJkK0xSz1egyMWZs+cLO5BPHOAKODGjWrW0av9jkdA9dIVfgiySbK4RRM+AnTuW1fQKwnNcshp15C/bBzxnaa/dhzxSD3iTxWk6Oymlsss0NcxKdRXux/L1V9M2FavyWHMQfaPO+A++ejwbnfyqSuHWV+ILZBSCmnrextuikoYbYR7zjl//bk8PY1g45YXpSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by SJ0PR11MB4974.namprd11.prod.outlook.com (2603:10b6:a03:2d6::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
+ 2023 15:26:42 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::94f8:4717:4e7c:2c6b]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::94f8:4717:4e7c:2c6b%6]) with mapi id 15.20.6652.026; Tue, 8 Aug 2023
+ 15:26:41 +0000
+Message-ID: <834e5b99-e3d9-2608-ed8a-af7de00cfdd4@intel.com>
+Date:   Tue, 8 Aug 2023 23:26:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v5 08/19] KVM:x86: Report KVM supported CET MSRs as
+ to-be-saved
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+CC:     <pbonzini@redhat.com>, <peterz@infradead.org>,
+        <john.allen@amd.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
+        <chao.gao@intel.com>, <binbin.wu@linux.intel.com>
+References: <20230803042732.88515-1-weijiang.yang@intel.com>
+ <20230803042732.88515-9-weijiang.yang@intel.com>
+ <ZM1JmxzyMgTLeEIy@google.com>
+From:   "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <ZM1JmxzyMgTLeEIy@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: KL1P15301CA0049.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:820:3d::6) To PH0PR11MB4965.namprd11.prod.outlook.com
+ (2603:10b6:510:34::7)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|SJ0PR11MB4974:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71b3b36e-492f-4d22-3a93-08db9823ddb8
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8R15UlxcZmM0VOPZ8fz75MjUnvx2mDswL3AiISU6eqNm3uRAWA4+Hzz0Ixduyh0usIgL5cd3xd0XHCdauYRlsasVVl1XXC+x4/tTctWcupK1GDwdrxbQ277Upq6JvnNnRCrHYFCAvsdvJxDEATLJe0VLnCSbPe3uhwli+S393CcXf0FWi5r0XtueIExFqC/toActiGDFRU+hxj8Bi6Wrds9WOcmWvWKwe8GqabnQeaabkiqwQlnLoKjJeRVLAUJMu7PkVvEpvbE48w+s8q0eo7Mge+1mjxyep0613h5JjXKz30/FTaSdJdGmT+NB06KwE5QOPAO2CXWHzQ4TPSWKr7Xgq4gNPiTBCSsUjsWdK1JGG2KTn4vCn140jmVasJoOwzhEr/HgCMx2I5TAu0MsHrNni9BemDEXLuvAHPXIFQxSPlAj20yuinR9KR2ikjXu2K9bcrkLw7/qfaLfSZmRNWi2FCQzeVDJwpB53IYJMBSIT5ennlDSUKostASyGw9aaFSNv/SeN2D5hSLnirRQKs5HBt0HSD5YEx+ddxBZPYY23cyHV2bC0WYdbBsneY4hFrhQ3pCNlFT5sIUCYGzMbg3oLjVDT198A2SnFpEtwrkN9Ao3LdOmI7iueZqaDZZJWqaSg+MNUsXqjOFVEf+Yew==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(346002)(396003)(136003)(366004)(39860400002)(451199021)(1800799003)(186006)(8936002)(8676002)(5660300002)(6916009)(4326008)(41300700001)(316002)(31696002)(86362001)(2906002)(6512007)(6666004)(2616005)(53546011)(26005)(6506007)(6486002)(36756003)(66946007)(66556008)(66476007)(478600001)(82960400001)(31686004)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cFJPSXZiZlUyKzlrNkhRNlh1Sys4d2gxb05XRGt6RXBvZ1NQMU5Zb3Bjb2pH?=
+ =?utf-8?B?ZHFscUJMeFMxQzdqcVMzcXAxTnkrNXIxVThWMTNrRkF3eW9BTS9KL0Q4dVU5?=
+ =?utf-8?B?bEhpVEdWYU1uV1RnZjV1OUs5cGcxbGZzL1lWWG1aREJENFkreTNSUjVscFZu?=
+ =?utf-8?B?SzQ1dmpVM0RaZllOYW9lN0hHVTZOVm54VnNDazk3QjI2aG5Ud1VtWWlFeDBj?=
+ =?utf-8?B?SFNqd0cySThxUkVwd0VxL3dwbkowaVRNMUFqL2RyVmZFMFVFZDVrSGxzTC9v?=
+ =?utf-8?B?ek9QQzRvcXlaY2tzU0N5VjFhV2d3VFp0enZFMjNyOUlzWldBWDBKQmtaSEVj?=
+ =?utf-8?B?NUplTkxkeU5OQnU4Mk5WekxRUlZtdzIvYTQ2YUJSZWJEMVBrWCthZXpBdHNQ?=
+ =?utf-8?B?d3JlZ3dSdGFpWnoxZm9uc3lpbVdQYkxLaTRIM0tDeFNDc1ZOQ2JVckFvSkNY?=
+ =?utf-8?B?YmRrL2w5WHhUSHRDTWkyMWpveTlvT29KVEhEbUxTRzBYcDRRTytPeE14dWVL?=
+ =?utf-8?B?ZytPSmZ0eUpkbzJhckJUTEFQalpIaHhIQlJqbi81UVE5Wm8yQ1h3OTlGRE5H?=
+ =?utf-8?B?M3hoM3hoSzdDWGttbTN1OHVBanJoc3pFNzVnUFVZSGdHQTZCVyt5eTNEWmRk?=
+ =?utf-8?B?ZHp4eEMwTzNQOVBsaFRXYlVvYnBPdHRKZ01xN0ZBTk52SVpvTUgyblNJY21V?=
+ =?utf-8?B?emNFblpTZk14Qk1zUnFxQ3BaOU4yVlhlWktsVDVCaUR0M3BQa3V2VGpzbStu?=
+ =?utf-8?B?OWFKeTNBajVoc2J6ODBrK1ArSFZjRVFhUEFFUGJpYUJlVkNkNGk5amJtdlRN?=
+ =?utf-8?B?cHF5UDNwQWJycFQyZ211V2tjNmVaNEFlMGFWWkFXWUhoVUZtaEswK3lmVG1P?=
+ =?utf-8?B?RURKb1RzOGEvMWVJYzdxUVY0OVpjalpMRXVsckpWQ1NKSlBTeTMwaS9laFdn?=
+ =?utf-8?B?WTFKUjFOUElYVjNCdTRqUG8zdWlrTWZ4dWJPUTRsN24wazRMblR6SWhBcEpV?=
+ =?utf-8?B?ell4eGYvQVJtZ3pWRWljZDFDWWZRRjZNVmVhVElCYmNPZFBscnNSS0NYd04r?=
+ =?utf-8?B?TVdTTjBaSEFaSEFHMmFQalFWcWkvVXJXaFM0OExHVmZzMitsMjlOUTdnN0Fu?=
+ =?utf-8?B?UGJOZHZHWG5RMlphNmd5TFpMY2VJdVR5eXZXd1VjZDFYa3FnMDVRWlpCMXVW?=
+ =?utf-8?B?SHRLN3UyWGJ1UnFHa2lWNnpEcGJOeUJpVHVaWGNxaVFrNDBmNkxZbEllVEdr?=
+ =?utf-8?B?QzNXbXpYQloxSUFLM0FtcWF1MGtBM3d6VG0wZkRoWExrYitUZFhSY2ZEU1g3?=
+ =?utf-8?B?TldlTSs4dllaVWNNVkkzS2F2UG15eFVNejUyaUJRYU90ckVzOWpMSTBtNWNk?=
+ =?utf-8?B?YkpuVzNtRmtHSVd0WEI0V21EWWE3dGdHZjdtd1ZVR3M4SXprcUU2bStJakg1?=
+ =?utf-8?B?NDIrMmppM0RHWU1GaFprZ0x0Vmt6UnpKUm0wbmxFN0dkNmFhRXBoVG0zTFVZ?=
+ =?utf-8?B?K3lzaXpMbndKUUpGeEx3SkN1aEw5S3FmR2lNNENLN0VkT2R2R0lVb3BRL00w?=
+ =?utf-8?B?cTFzRG4wYnNRb0FmamNsREo4MXFHSXlyeW5hSURtbGF6d0c1NmREVWdlcUVU?=
+ =?utf-8?B?aUw4WTd1Nm9Wa09Yc2JXallsN3VtS25WVXZkWEt4aXRzcU8zc0ZKZVRady82?=
+ =?utf-8?B?YnpJTCsvenErMVpHRW1MNUtBdlJobkkrVEdqbk1mcFB6SkRkZzIwVEp2dVFT?=
+ =?utf-8?B?L2JqaG1rM0lOZmJYZU1yMGxsT3g2NzJKNVM1Tzg3QkhxajN6SHFoN3FlNW1S?=
+ =?utf-8?B?dGk5Rml3OHRCZGdoTkR6bFVHS0l4bFNDaFE0TFE1b0o1Y2oxWU9OS3N6S1J2?=
+ =?utf-8?B?Vk84UHNCUlhERjdUdk4xZnUrbDR6Q2VCK05tNFV4RjFYTTdlbDBvekJYQ1Mz?=
+ =?utf-8?B?WlBqNWd6R0FTckJKNlBOK3R5YitHVzhoOStKZTZhTVc5UlhXNjFaWUsxMmpp?=
+ =?utf-8?B?Z1gyc0h6RHlDL3NpOXBSVG1YSTJobHVMZEdvaFUwRnAyZWN1eURhdzdzNktK?=
+ =?utf-8?B?R0lTNEIzMUhtT1dYK3dyc0hxa1F1ZERLVkVWY3hpYzkzOGhaQVF4eEdlc3U1?=
+ =?utf-8?B?L2thMmlMajZpUUVXd0lTYWw5QkU1WTlUL1dQZXQrN0tOSzkvTDlHdk9UMHJG?=
+ =?utf-8?B?d2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71b3b36e-492f-4d22-3a93-08db9823ddb8
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 15:26:41.7255
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gvWn1A4HcnqUKNoehUlz2BCHW9zsRPahQ2qTJRq53si4wKpzUkgU0kjvBkOPMao4/Dw3fN3htLkwQGhiQXYgWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4974
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HCRX_EL2 has an interesting effect on HFGITR_EL2, as it conditions
-the traps of TLBI*nXS.
-
-Expand the FGT support to add a new Fine Grained Filter that will
-get checked when the instruction gets trapped, allowing the shadow
-register to override the trap as needed.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_arm.h        |  5 ++
- arch/arm64/include/asm/kvm_host.h       |  1 +
- arch/arm64/kvm/emulate-nested.c         | 94 ++++++++++++++++---------
- arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++-
- arch/arm64/kvm/nested.c                 |  3 +-
- arch/arm64/kvm/sys_regs.c               |  2 +
- 6 files changed, 83 insertions(+), 37 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index d229f238c3b6..137f732789c9 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -369,6 +369,11 @@
- #define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
- #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
- 
-+/* Similar definitions for HCRX_EL2 */
-+#define __HCRX_EL2_RES0		(GENMASK(63, 16) | GENMASK(13, 12))
-+#define __HCRX_EL2_MASK		(0)
-+#define __HCRX_EL2_nMASK	(GENMASK(15, 14) | GENMASK(4, 0))
-+
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
- /*
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cb1c5c54cedd..93c541111dea 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -380,6 +380,7 @@ enum vcpu_sysreg {
- 	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
- 	HSTR_EL2,	/* Hypervisor System Trap Register */
- 	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
-+	HCRX_EL2,	/* Extended Hypervisor Configuration Register */
- 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
- 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
- 	TCR_EL2,	/* Translation Control Register (EL2) */
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 4497666db45d..35f2f051af97 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -425,11 +425,13 @@ static const complex_condition_check ccc[] = {
-  * [13:10]	enum fgt_group_id (4 bits)
-  * [19:14]	bit number in the FGT register (6 bits)
-  * [20]		trap polarity (1 bit)
-- * [62:21]	Unused (42 bits)
-+ * [25:21]	FG filter (5 bits)
-+ * [62:26]	Unused (37 bits)
-  * [63]		RES0 - Must be zero, as lost on insertion in the xarray
-  */
- #define TC_CGT_BITS	10
- #define TC_FGT_BITS	4
-+#define TC_FGF_BITS	5
- 
- union trap_config {
- 	u64	val;
-@@ -438,7 +440,8 @@ union trap_config {
- 		unsigned long	fgt:TC_FGT_BITS; /* Fing Grained Trap id */
- 		unsigned long	bit:6;		 /* Bit number */
- 		unsigned long	pol:1;		 /* Polarity */
--		unsigned long	unk:42;		 /* Unknown */
-+		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
-+		unsigned long	unk:37;		 /* Unknown */
- 		unsigned long	mbz:1;		 /* Must Be Zero */
- 	};
- };
-@@ -939,7 +942,15 @@ enum fgt_group_id {
- 	__NR_FGT_GROUP_IDS__
- };
- 
--#define SR_FGT(sr, g, b, p)					\
-+enum fg_filter_id {
-+	__NO_FGF__,
-+	HCRX_FGTnXS,
-+
-+	/* Must be last */
-+	__NR_FG_FILTER_IDS__
-+};
-+
-+#define SR_FGF(sr, g, b, p, f)					\
- 	{							\
- 		.encoding	= sr,				\
- 		.end		= sr,				\
-@@ -947,9 +958,12 @@ enum fgt_group_id {
- 			.fgt = g ## _GROUP,			\
- 			.bit = g ## _EL2_ ## b ## _SHIFT,	\
- 			.pol = p,				\
-+			.fgf = f,				\
- 		},						\
- 	}
- 
-+#define SR_FGT(sr, g, b, p)	SR_FGF(sr, g, b, p, __NO_FGF__)
-+
- static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
- 	/* HFGRTR_EL2, HFGWTR_EL2 */
- 	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
-@@ -1053,37 +1067,37 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
- 	SR_FGT(OP_TLBI_ASIDE1OS, 	HFGITR, TLBIASIDE1OS, 1),
- 	SR_FGT(OP_TLBI_VAE1OS, 		HFGITR, TLBIVAE1OS, 1),
- 	SR_FGT(OP_TLBI_VMALLE1OS, 	HFGITR, TLBIVMALLE1OS, 1),
--	/* FIXME: nXS variants must be checked against HCRX_EL2.FGTnXS */
--	SR_FGT(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1),
--	SR_FGT(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1),
--	SR_FGT(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1),
--	SR_FGT(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1),
--	SR_FGT(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1),
--	SR_FGT(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1),
--	SR_FGT(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1),
--	SR_FGT(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1),
--	SR_FGT(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1),
--	SR_FGT(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1),
--	SR_FGT(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1),
--	SR_FGT(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1),
--	SR_FGT(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1),
--	SR_FGT(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1),
--	SR_FGT(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1),
--	SR_FGT(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1),
--	SR_FGT(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1),
--	SR_FGT(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1),
--	SR_FGT(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1),
--	SR_FGT(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1),
--	SR_FGT(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1),
--	SR_FGT(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1),
--	SR_FGT(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1),
--	SR_FGT(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1),
--	SR_FGT(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1),
--	SR_FGT(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1),
--	SR_FGT(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1),
--	SR_FGT(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1),
--	SR_FGT(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1),
--	SR_FGT(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1),
-+	/* nXS variants must be checked against HCRX_EL2.FGTnXS */
-+	SR_FGF(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1, HCRX_FGTnXS),
-+	SR_FGF(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1, HCRX_FGTnXS),
- 	SR_FGT(OP_AT_S1E1WP, 		HFGITR, ATS1E1WP, 1),
- 	SR_FGT(OP_AT_S1E1RP, 		HFGITR, ATS1E1RP, 1),
- 	SR_FGT(OP_AT_S1E0W, 		HFGITR, ATS1E0W, 1),
-@@ -1598,6 +1612,7 @@ int __init populate_nv_trap_config(void)
- 	BUILD_BUG_ON(sizeof(union trap_config) != sizeof(void *));
- 	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
- 	BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
-+	BUILD_BUG_ON(__NR_FG_FILTER_IDS__ > BIT(TC_FGF_BITS));
- 
- 	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
- 		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
-@@ -1779,6 +1794,17 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
- 
- 	case HFGITR_GROUP:
- 		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
-+		switch (tc.fgf) {
-+			u64 tmp;
-+
-+		case __NO_FGF__:
-+			break;
-+
-+		case HCRX_FGTnXS:
-+			tmp = sanitised_sys_reg(vcpu, HCRX_EL2);
-+			if (tmp & HCRX_EL2_FGTnXS)
-+				tc.fgt = __NO_FGT_GROUP__;
-+		}
- 		break;
- 
- 	case __NR_FGT_GROUP_IDS__:
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 060c5a0409e5..3acf6d77e324 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -197,8 +197,19 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
- 
--	if (cpus_have_final_cap(ARM64_HAS_HCX))
--		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
-+	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
-+		u64 hcrx = HCRX_GUEST_FLAGS;
-+		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
-+			u64 clr = 0, set = 0;
-+
-+			compute_clr_set(vcpu, HCRX_EL2, clr, set);
-+
-+			hcrx |= set;
-+			hcrx &= ~clr;
-+		}
-+
-+		write_sysreg_s(hcrx, SYS_HCRX_EL2);
-+	}
- 
- 	__activate_traps_hfgxtr(vcpu);
- }
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 3facd8918ae3..042695a210ce 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -117,7 +117,8 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
- 		break;
- 
- 	case SYS_ID_AA64MMFR1_EL1:
--		val &= (NV_FTR(MMFR1, PAN)	|
-+		val &= (NV_FTR(MMFR1, HCX)	|
-+			NV_FTR(MMFR1, PAN)	|
- 			NV_FTR(MMFR1, LO)	|
- 			NV_FTR(MMFR1, HPDS)	|
- 			NV_FTR(MMFR1, VH)	|
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dfd72b3a625f..374b21f08fc3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2372,6 +2372,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
- 
-+	EL2_REG(HCRX_EL2, access_rw, reset_val, 0),
-+
- 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
--- 
-2.34.1
-
+On 8/5/2023 2:55 AM, Sean Christopherson wrote:
+> On Thu, Aug 03, 2023, Yang Weijiang wrote:
+>> Add all CET MSRs including the synthesized GUEST_SSP to report list.
+>> PL{0,1,2}_SSP are independent to host XSAVE management with later
+>> patches. MSR_IA32_U_CET and MSR_IA32_PL3_SSP are XSAVE-managed on
+>> host side. MSR_IA32_S_CET/MSR_IA32_INT_SSP_TAB/MSR_KVM_GUEST_SSP
+>> are not XSAVE-managed.
+>>
+>> [...]
+>>   	}
+>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>> index 82e3dafc5453..6e6292915f8c 100644
+>> --- a/arch/x86/kvm/x86.h
+>> +++ b/arch/x86/kvm/x86.h
+>> @@ -362,6 +362,16 @@ static inline bool kvm_mpx_supported(void)
+>>   		== (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
+>>   }
+>>   
+>> +#define CET_XSTATE_MASK (XFEATURE_MASK_CET_USER)
+> This is funky.  As of this patch, KVM reports MSR_IA32_S_CET, a supervisor MSR,
+> but does not require XFEATURE_MASK_CET_KERNEL.  That eventually comes along with
+> "KVM:x86: Enable guest CET supervisor xstate bit support", but as of this patch
+> KVM is busted.
+>
+> The whole cpuid_count() code in that patch shouldn't exist, so the easiest thing
+> is to just fold the KVM_SUPPORTED_XSS and CET_XSTATE_MASK changes from that patch
+> into this one.
+I screwed it up when tried to make it clearer :-/
+Will do it, thanks!
