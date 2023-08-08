@@ -2,65 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD079774F8B
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 01:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC5D0774F99
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 01:56:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230232AbjHHXsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 19:48:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
+        id S230318AbjHHX4P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 19:56:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbjHHXsW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 19:48:22 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB6994
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 16:48:21 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-686f0c37911so6836131b3a.1
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 16:48:21 -0700 (PDT)
+        with ESMTP id S229470AbjHHX4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 19:56:14 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC60BD
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 16:56:13 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-55c79a5565aso4246467a12.3
+        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 16:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691538501; x=1692143301;
+        d=google.com; s=20221208; t=1691538973; x=1692143773;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D2YnROpvUkDVkcj2rtSrEnyN7qYS/S3plRfhiHd5mcc=;
-        b=6P2ISKH9dvBzrmFMwwWEjDe2KAlrgm7n3Rw9Zs+PD42odg66V+LxrZ02Ue8LMdiYul
-         oWEUtT2q5ZOWeg6+4OIbliz12nv6mqaJ2+ThsfUOp7RCVT1OBUkYjffdzH7nZ88cKLC/
-         cNFeOXcl1+we7dDpCA6swxOHdcqUe7TJFTqs0lRwXcNua58vKB4tlYbk+VYpDkjUaGsC
-         DVeyLt7jtkIy5AyihK80tD5eKIIe/TAF5t7O0uJPh0HHrh0N+cTyd6p9CYSX9F6+UGbq
-         uhEY1Vt1ZEnz58dxntnxZNVUaNPGBklzd8xOWA4zdJfyZw3OqGMPkPPrDd7jjj2TKYk0
-         xBqw==
+        bh=XgoBtS59LZuoBAyEloPvADSmnrKxGh/v4r7Okvrfr4o=;
+        b=Q6/BjIT8mjhrv07nsAbmoicM/qHEosdwfknD5hDC0C02vvZ/1F1ijLo0pMCvbgvuaJ
+         FPehy1Ab0tZr56BJl4xw6YJXPeMsDYqA/G6PU/IK2Y+P7axa5Jirw92bqk3Z0uxK14Si
+         6MUrKEbWhluUamwzEwLQ62wXmiS5bUPopiSaIFq9c8iQ/6ukqmm9bbadnll32FMJB96X
+         cLXaFhlYzBYIb0wJdq1zRYXKVSRNTLY0EqC/5EGEYC05HropJaGaiUiS4brw6U+DblUi
+         slMKXrah5BAK2kSaNWEZOQHSrfv0iH3TM2zaEgPsnX6CM8Jr0kH3SrUlN38WBn08OnQM
+         qY5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691538501; x=1692143301;
+        d=1e100.net; s=20221208; t=1691538973; x=1692143773;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D2YnROpvUkDVkcj2rtSrEnyN7qYS/S3plRfhiHd5mcc=;
-        b=cUHtwUmUxPuYNtYPusWfuRkFXU0XlX09bXpmMnaCmx3+Att1haP/Z/B+M1w3w+9VFm
-         zQL4A9daEjQlzAADB0JYw9mXVg/un6bWfQlTZwuBfFeXGLCud2j2V7UMKy9gk7RKe1MM
-         O/YOrYOAMVHNUbgFwgkaKeqI8omLe4rArzX0GHvIwKJSn1muNecomDYMUHih237OxKre
-         NNpkBh72++6AU4XdPkg3+FEQzugEDhE/5STh5XvyxcdyUSfRyNZc/3zvo5MzZ7xe3LnP
-         ydz9ONQWmj/ZiHyLqL/6bc/QYLF8bU0hfv1tfZXfuuGw7+OssgBnbEdQ5zN6PUSSXRCA
-         9vdw==
-X-Gm-Message-State: AOJu0YxCFl2xLTRJNwOlxPHBnrtoFbAMbMlrTjajIjhtA5+BRh55P9TH
-        yfG9S80EL2j1RmgiohcydA3zFaOyDuM=
-X-Google-Smtp-Source: AGHT+IFB+E74GSS+aNsfmXDJZDbtqZmI75nMIS02+u3DXfr2Yncv2vuU3JtqszWWUbFToboGSQ6t0IzWQN4=
+        bh=XgoBtS59LZuoBAyEloPvADSmnrKxGh/v4r7Okvrfr4o=;
+        b=QOnZy4MkKFYs9XAKtcZJOU/rzZmXaBuOm9kghhiNmZIu1PsISRbqWne5Iy6EI5uX0O
+         VYkVH6QJV625hd1WmoskaUiwjSfKBDdJMkDG6padmg2mkP+IjtxepMU1o+498KbEiRIb
+         lD3cmeLRdbu803FxWzbrSP9LH/h2/CCpyrI1JWA7IuzWR+xEEulU6FYtqroRoZhQxi+y
+         H+plyjg6j5oZ/bM+r4V4zG6kxXYxaVcJ27sBGKDZmYO+ug6XWT9/qCID0/8XwLFj8q/k
+         vdxYO+pPlGgLofzEaSK97Hpi/DBu48v7YPXZbynaa3t590MilTnLkXiqo8DnYBy4iRJj
+         ++qg==
+X-Gm-Message-State: AOJu0YxB6gCInsC9knAzqvf6a7OHp81Zok7B9qWPwcXuCRZtBpAC2xEi
+        Cf/xSeWCO/NEgXLZVqUVyjxJP79vU84=
+X-Google-Smtp-Source: AGHT+IFCy98whUjzcexHxPN7DcnWkTBvcwwuL6i8yxqfvEo6t02c7Nz85aa9s5UPPKWZzlxIm3hK6x9XiBs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:179b:b0:686:2ad5:d132 with SMTP id
- s27-20020a056a00179b00b006862ad5d132mr26585pfg.5.1691538500779; Tue, 08 Aug
- 2023 16:48:20 -0700 (PDT)
-Date:   Tue, 8 Aug 2023 16:48:19 -0700
-In-Reply-To: <20230808164532.09337d49@ake-x260>
+ (user=seanjc job=sendgmr) by 2002:a63:7702:0:b0:564:9d36:f3e7 with SMTP id
+ s2-20020a637702000000b005649d36f3e7mr21257pgc.0.1691538973466; Tue, 08 Aug
+ 2023 16:56:13 -0700 (PDT)
+Date:   Tue, 8 Aug 2023 16:56:11 -0700
+In-Reply-To: <ZNJSBS9w+6cS5eRM@nvidia.com>
 Mime-Version: 1.0
-References: <20230807062611.12596-1-ake@igel.co.jp> <43c18a3d57305cf52a1c3643fa8f714ae3769551.camel@redhat.com>
- <20230808164532.09337d49@ake-x260>
-Message-ID: <ZNLUQ6ZtugOjmlZR@google.com>
-Subject: Re: [RFC PATCH] KVM: x86: inhibit APICv upon detecting direct APIC
- access from L2
+References: <20230808071329.19995-1-yan.y.zhao@intel.com> <20230808071702.20269-1-yan.y.zhao@intel.com>
+ <ZNI14eN4bFV5eO4W@nvidia.com> <ZNJQf1/jzEeyKaIi@google.com> <ZNJSBS9w+6cS5eRM@nvidia.com>
+Message-ID: <ZNLWG++qK1mZcEOq@google.com>
+Subject: Re: [RFC PATCH 3/3] KVM: x86/mmu: skip zap maybe-dma-pinned pages for
+ NUMA migration
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ake Koomsin <ake@igel.co.jp>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, mike.kravetz@oracle.com, apopple@nvidia.com,
+        rppt@kernel.org, akpm@linux-foundation.org, kevin.tian@intel.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -72,53 +70,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 08, 2023, Ake Koomsin wrote:
-> On Mon, 07 Aug 2023 17:00:58 +0300
-> Maxim Levitsky <mlevitsk@redhat.com> wrote:
->  
-> > Is there a good reason why KVM doesn't expose APIC memslot to a
-> > nested guest? While nested guest runs, the L1's APICv is "inhibited"
-> > effectively anyway, so writes to this memslot should update APIC
-> > registers and be picked up by APICv hardware when L1 resumes
-> > execution.
+On Tue, Aug 08, 2023, Jason Gunthorpe wrote:
+> On Tue, Aug 08, 2023 at 07:26:07AM -0700, Sean Christopherson wrote:
+> > On Tue, Aug 08, 2023, Jason Gunthorpe wrote:
+> > > On Tue, Aug 08, 2023 at 03:17:02PM +0800, Yan Zhao wrote:
+> > > > @@ -859,6 +860,21 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+> > > >  		    !is_last_spte(iter.old_spte, iter.level))
+> > > >  			continue;
+> > > >  
+> > > > +		if (skip_pinned) {
+> > > > +			kvm_pfn_t pfn = spte_to_pfn(iter.old_spte);
+> > > > +			struct page *page = kvm_pfn_to_refcounted_page(pfn);
+> > > > +			struct folio *folio;
+> > > > +
+> > > > +			if (!page)
+> > > > +				continue;
+> > > > +
+> > > > +			folio = page_folio(page);
+> > > > +
+> > > > +			if (folio_test_anon(folio) && PageAnonExclusive(&folio->page) &&
+> > > > +			    folio_maybe_dma_pinned(folio))
+> > > > +				continue;
+> > > > +		}
+> > > > +
+> > > 
+> > > I don't get it..
+> > > 
+> > > The last patch made it so that the NUMA balancing code doesn't change
+> > > page_maybe_dma_pinned() pages to PROT_NONE
+> > > 
+> > > So why doesn't KVM just check if the current and new SPTE are the same
+> > > and refrain from invalidating if nothing changed?
 > > 
-> > Since APICv alows itself to be inhibited due to other reasons, it
-> > means that just like AVIC, it should be able to pick up arbitrary
-> > changes to APIC registers which happened while it was inhibited, just
-> > like AVIC does.
+> > Because KVM doesn't have visibility into the current and new PTEs when the zapping
+> > occurs.  The contract for invalidate_range_start() requires that KVM drop all
+> > references before returning, and so the zapping occurs before change_pte_range()
+> > or change_huge_pmd() have done antyhing.
 > > 
-> > I'll take a look at the code to see if APICv does this (I know AVIC's
-> > code much better that APICv's)
+> > > Duplicating the checks here seems very frail to me.
 > > 
-> > Is there a reproducer for this bug?
->
-> The idea from step 6 to step 10 is to start BitVisor first, and start Linux on
-> top of it. You can adjust the step as you like. Feel free to ask me anything
-> regarding reproducing the problem with BitVisor if the giving steps are not
-> sufficient.
-
-Thank you for the detailed repro steps!  However, it's likely going to be O(weeks)
-before anyone is able to look at this in detail given the extensive repro steps.
-If you have bandwidth, it's probably worth trying to reproduce the problem in a
-KVM selftest (or a KVM-Unit-Test), e.g. create a nested VM, send an IPI from L2,
-and see if it gets routed correctly.  This purely a suggestion to try and get a
-faster fix, it's by no means necessary.
-
-Actually, typing that out raises a question (or two).  What APICv VMCS control
-settings does BitVisor use?  E.g. is BitVisor enabling APICv for its VM (L2)?
-If so, what values for the APIC access page and vAPIC page are shoved into
-BitVisor's VMCS?
-
-> The problem does not happen when enable_apicv=N. Note that SMP bringup with
-> enable_apicv=N can fail. This is another problem. We don't have to worry about
-> this for now. Linux seems to have no delay between INIT DEASSERT and SIPI during
-> its SMP bringup. This can easily makes INIT and SIPI pending together resultling
-> in signal lost.
+> > Yes, this is approach gets a hard NAK from me.  IIUC, folio_maybe_dma_pinned()
+> > can yield different results purely based on refcounts, i.e. KVM could skip pages
+> > that the primary MMU does not, and thus violate the mmu_notifier contract.  And
+> > in general, I am steadfastedly against adding any kind of heuristic to KVM's
+> > zapping logic.
+> > 
+> > This really needs to be fixed in the primary MMU and not require any direct
+> > involvement from secondary MMUs, e.g. the mmu_notifier invalidation itself needs
+> > to be skipped.
 > 
-> I admit that my knowledge on KVM and APICv is very limited. I may misunderstand
-> the problem. If you don't mind, would it be possible for you to guide me which
-> code path should I pay attention to? I would love to learn to find out the
-> actual cause of the problem.
+> This likely has the same issue you just described, we don't know if it
+> can be skipped until we iterate over the PTEs and by then it is too
+> late to invoke the notifier. Maybe some kind of abort and restart
+> scheme could work?
 
-KVM *should* emulate the APIC MMIO access from L2.  The call stack should reach
-apic_mmio_write(), and assuming it's an ICR write, KVM should send an IPI.
+Or maybe treat this as a userspace config problem?  Pinning DMA pages in a VM,
+having a fair amount of remote memory, *and* expecting NUMA balancing to do anything
+useful for that VM seems like a userspace problem.
+
+Actually, does NUMA balancing even support this particular scenario?  I see this
+in do_numa_page()
+
+	/* TODO: handle PTE-mapped THP */
+	if (PageCompound(page))
+		goto out_map;
+
+and then for PG_anon_exclusive
+
+	 * ... For now, we only expect it to be
+	 * set on tail pages for PTE-mapped THP.
+	 */
+	PG_anon_exclusive = PG_mappedtodisk,
+
+which IIUC means zapping these pages to do migrate_on-fault will never succeed.
+
+Can we just tell userspace to mbind() the pinned region to explicitly exclude the
+VMA(s) from NUMA balancing?
