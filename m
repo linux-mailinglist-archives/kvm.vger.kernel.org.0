@@ -2,110 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF511773F19
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 18:43:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CC4177404E
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 19:01:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233284AbjHHQnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 12:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
+        id S233974AbjHHRBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 13:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230207AbjHHQm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 12:42:29 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 697C2559E;
-        Tue,  8 Aug 2023 08:55:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rbJ3h3QmDJ6bpkUM4uMIuNPfbpSJD00kJV0NklJSmiA=; b=Fd8tgqsBPUOBIihzsg07e7aPVT
-        mtAkvOyckQcpeet43iN8RS/Sm5K1j5GAM2ZXhRnNuDwgaqhsqUsTSVfPgioMMSQZ/QX5cQpz+0ObS
-        cRvUq/mlXJyq9oqLxr666lHtgE2msZUZGku8cN1j6iYkLKpUsX5l8uNvqCXMnW3yGg4o2p974Dg9m
-        MFcyxvNdBhiP0zx7762aynGeWFl8pFlVlHTa48JbUPsKpR4bH1bt+zSq0eWKOL6YLQ3+5P7q8yWa2
-        lj5JhaA30KW8fEYxsR1+FP0BWgh74Vx8k1bYu/PfZY/asnuiyaMFeP1nbDcOM3WfYt99FXxTCr1aQ
-        t2JPNPIA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qTJqD-004iKP-0C;
-        Tue, 08 Aug 2023 10:21:29 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        with ESMTP id S233828AbjHHRBB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 13:01:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8768681;
+        Tue,  8 Aug 2023 09:00:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 21E5030026C;
-        Tue,  8 Aug 2023 12:21:27 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id D791C203D48A1; Tue,  8 Aug 2023 12:21:27 +0200 (CEST)
-Date:   Tue, 8 Aug 2023 12:21:27 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 396B8624C2;
+        Tue,  8 Aug 2023 11:12:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B77C433C7;
+        Tue,  8 Aug 2023 11:12:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691493129;
+        bh=1QMm2qYYenzfqrS9JtfJhviMwybOhFCTNjTSNEl8Uq4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Pac1+sdY1mCBsPtQKAp6KfSZke3+ZBoIRZKAq4FOZYbRqr3J1FmN1eYHV24JD+vWP
+         8rXqfnrUS7PT+9ReDUlUeSB3dy8aNma2jcigPfN1Xc7fVYYRfv0ja/Ce83eULQnwpb
+         XViufpw39qsVaOpRvFR8jsCujgepLFVxZ+Su+ULX8NTvV/OGwHjSvwsrKjv5tERC+X
+         BmvFyy5T3jDSNAh6afNl3pVM3QRaYoA+s5iqziwsiQjlcxAHGyso1yzzbzqNGvIa3i
+         n77zRhws7zWBAx27h8GEQwAmQE0Ss/XkGz1YXHZuN2REA6IA8apT+hhHu6ElBm+Csk
+         hrRwlqbGY3yjw==
+Received: from [104.132.45.110] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qTKdC-00377i-VX;
+        Tue, 08 Aug 2023 12:12:07 +0100
+Date:   Tue, 08 Aug 2023 12:12:13 +0100
+Message-ID: <87y1ilpz3m.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Anup Patel <anup@brainfault.org>
+Cc:     oliver.upton@linux.dev, xiaobo55x@gmail.com,
+        ajones@ventanamicro.com, seanjc@google.com,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
         Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH RFV v2 05/13] perf/core: Add function
- perf_event_create_group_kernel_counters()
-Message-ID: <20230808102127.GZ212435@hirez.programming.kicks-ass.net>
-References: <20230808063111.1870070-1-dapeng1.mi@linux.intel.com>
- <20230808063111.1870070-6-dapeng1.mi@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230808063111.1870070-6-dapeng1.mi@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
+In-Reply-To: <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
+References: <cover.1690273969.git.haibo1.xu@intel.com>
+        <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 104.132.45.110
+X-SA-Exim-Rcpt-To: anup@brainfault.org, oliver.upton@linux.dev, xiaobo55x@gmail.com, ajones@ventanamicro.com, seanjc@google.com, pbonzini@redhat.com, corbet@lwn.net, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, shuah@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ricarkol@google.com, vannapurve@google.com, likexu@tencent.com, vipinsh@google.com, dmatlack@google.com, coltonlewis@google.com, kvm@vger.kernel.org, haibo1.xu@intel.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 08, 2023 at 02:31:03PM +0800, Dapeng Mi wrote:
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 15eb82d1a010..1877171e9590 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -12762,11 +12762,34 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
->  				 struct task_struct *task,
->  				 perf_overflow_handler_t overflow_handler,
->  				 void *context)
-> +{
-> +	return perf_event_create_group_kernel_counters(attr, cpu, task,
-> +			NULL, overflow_handler, context);
-> +}
-> +EXPORT_SYMBOL_GPL(perf_event_create_kernel_counter);
-> +
-> +/**
-> + * perf_event_create_group_kernel_counters
-> + *
-> + * @attr: attributes of the counter to create
-> + * @cpu: cpu in which the counter is bound
-> + * @task: task to profile (NULL for percpu)
-> + * @group_leader: the group leader event of the created event
-> + * @overflow_handler: callback to trigger when we hit the event
-> + * @context: context data could be used in overflow_handler callback
-> + */
-> +struct perf_event *
-> +perf_event_create_group_kernel_counters(struct perf_event_attr *attr,
-> +					int cpu, struct task_struct *task,
-> +					struct perf_event *group_leader,
-> +					perf_overflow_handler_t overflow_handler,
-> +					void *context)
+On Mon, 07 Aug 2023 04:48:33 +0100,
+Anup Patel <anup@brainfault.org> wrote:
+>=20
+> Hi Marc, Hi Oliver,
+>=20
+> On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> wr=
+ote:
+> >
+> > KVM_GET_REG_LIST will dump all register IDs that are available to
+> > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+> > regression issue during VM migration.
+> >
+> > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+> > of the code as common test framework that can be shared by riscv.
+> >
+> > Patch 8 move reject_set check logic to a function so as to check for
+> > different errno for different registers.
+> > Patch 9 move finalize_vcpu back to run_test so that riscv can implement
+> > its specific operation.
+> > Patch 10 change to do the get/set operation only on present-blessed lis=
+t.
+> > Patch 11 add the skip_set facilities so that riscv can skip set operati=
+on
+> > on some registers.
+> > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
+> > patch 13 added the corresponding kselftest for checking possible
+> > register regressions.
+> >
+> > The get-reg-list kvm selftest was ported from aarch64 and tested with
+> > Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+> >
+> > ---
+> > Changed since v5:
+> >   * Rebase to v6.5-rc3
+> >   * Minor fix for Andrew's comments
+> >
+> > Andrew Jones (7):
+> >   KVM: arm64: selftests: Replace str_with_index with strdup_printf
+> >   KVM: arm64: selftests: Drop SVE cap check in print_reg
+> >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+> >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+> >   KVM: arm64: selftests: Delete core_reg_fixup
+> >   KVM: arm64: selftests: Split get-reg-list test code
+> >   KVM: arm64: selftests: Finish generalizing get-reg-list
+> >
+> > Haibo Xu (6):
+> >   KVM: arm64: selftests: Move reject_set check logic to a function
+> >   KVM: arm64: selftests: Move finalize_vcpu back to run_test
+> >   KVM: selftests: Only do get/set tests on present blessed list
+> >   KVM: selftests: Add skip_set facility to get_reg_list test
+> >   KVM: riscv: Add KVM_GET_REG_LIST API support
+> >   KVM: riscv: selftests: Add get-reg-list test
+>=20
+> Are you okay for this series to go through the KVM RISC-V tree ?
 
-I would much prefer if you just add the argument to
-perf_event_create_kernel_counter(), there aren't *that* many users.
+Sure, seems fine from my point of view. But please put it on an
+immutable topic branch so that we can also merge it in the arm64 tree,
+should we need to resolve any conflicts.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
