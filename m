@@ -2,120 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6455C774F3F
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 01:21:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43F7B774F46
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 01:29:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbjHHXVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 19:21:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60000 "EHLO
+        id S230016AbjHHX33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 19:29:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjHHXVA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 19:21:00 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE9719B6
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 16:21:00 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5868992ddd4so74226157b3.0
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 16:21:00 -0700 (PDT)
+        with ESMTP id S229652AbjHHX33 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 19:29:29 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CB31BC3
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 16:29:27 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-40fee14093dso32994731cf.1
+        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 16:29:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691536859; x=1692141659;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h31RifgLdWj/uBkkEanO2XNAftVRa4x/sEAr5Du6O7s=;
-        b=3HkpHRvUGz0wWRT9OA2Ov4hn6J6IuWP0KypK80EvpNWkaxvw5xrqpgKSc6cN/pQUeS
-         BTy0QrS4OgiVI2hc16+7oGnfLI3JzDXO3tZCfX3Ga31R7/IEG9HQVP49xveMYR2Sy096
-         t+cBlH5TzUA4S+paOIda4LbGc2Mp/7c3DM7mNrOQuHOZ1W0Zhu/4Z4QjMaZuOF6vlKYt
-         rJ3Wfol3W8ZzlZQEZ4/84C3qOsIssVV4BC+kcMmhQ28SBdY+slKFRYau7RtFnSaRpGUR
-         y3JbWRiPUgHG0pZlHoQ8PusqX5v0e3hDdT90UCtfbztjJo/RI5+6Waht9EJSCMWPjTTM
-         mEHg==
+        d=ziepe.ca; s=google; t=1691537367; x=1692142167;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YE/LYcFZQN6MbPrG0CFAYL17czJIbn0IYvyYFqhferI=;
+        b=dMqr9o4M8WjFFzRLn3gT0X6z7XpuuP1kZX6/7LHdZZZBgoyat6Lus4tIiafgpDz0MU
+         2RMgaDaSko0mTB53fcS93V6hYpsQvZA/Kark6Mou+j7xe5Yk/01OXIA6qJThHTELrmh8
+         r0vAzUAjLjpcS009YhV7uDp6m6kyIt1Y9tYTKxiTqrT+en7vXX71HF+Witbyt758JIhu
+         dDzYlg5+Aeg/id0tq5zhGKH4v+VMKRUWhH+bOs+2/Nn3CWJ1yjRDt5LeTeLWHxQ0aY+t
+         NlpK/eVBUVS5jRbrwsd0efK74bHY9MAdcXbmUDPXvQR6KcimiyXj+l0gspcKbwOfwcq0
+         GnSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691536859; x=1692141659;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h31RifgLdWj/uBkkEanO2XNAftVRa4x/sEAr5Du6O7s=;
-        b=TCXRj1aB6ZKOs8xYpXoRaKJv5gC6m70vYNOq6L4l8UUKKflBPospaIdp/Pv20S57WQ
-         UuS0c+23GxmvWJeAhu6QJ88SwdPYLikpYRf2mGuIGQlgETvlkoLwTc3LqXrTxNPYXX0C
-         whGVKHFMYyiIoVhJj2tEMpBaWouSUmQz6X8qTlQXtsbeknuw0N53grfvybKb/x4LUJdg
-         0o4pmGvtV6C/Y3+IV98Phgs+SrAKb3MBV4EJOi6Qd5razDvjUm+r2CRmITxWSq1abTC0
-         DNIcnMV/SeM3j+0L8+l0NoYT4HpN+4ff8YO2YVX4p0ORw63BQU0gpbOb3DGSRNhpF+bf
-         o9Rw==
-X-Gm-Message-State: AOJu0YwlwTfUUdWFoZny0BbySvrDFeSlNm7Qms+AJ/xRFHwnnUueL2jH
-        96+EgJeklDZVZGoGY5mqrmRNilzWK9c=
-X-Google-Smtp-Source: AGHT+IFacH1gV3EFOlAiXA5r13GnRn0tz4keJlj3GrBkHHQsxR2ixuO7JpkZvWdwq6OLOMIvvXHRz6bdj+I=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:b707:0:b0:586:a689:eb69 with SMTP id
- v7-20020a81b707000000b00586a689eb69mr25680ywh.2.1691536859434; Tue, 08 Aug
- 2023 16:20:59 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  8 Aug 2023 16:20:57 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230808232057.2498287-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Remove WARN sanity check on hypervisor timer vs.
- UNINITIALIZED vCPU
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yikebaer Aizezi <yikebaer61@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691537367; x=1692142167;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YE/LYcFZQN6MbPrG0CFAYL17czJIbn0IYvyYFqhferI=;
+        b=jlfaOBLTHq+2J9+ugYCULL9NyVZi2hxx7yqBtdkr1WG9+Z1+fbUa+WJP0RnQr9CGG7
+         DygT+dKrQumva/TqsOlSSjRixSV25zPAi7hzPmNsgGGKxTXwEYZ05w5gEAHBUtqb/5D1
+         T2+hLe0nGYgWNNoaxk9SyNv/VKyMsB7vc4jVE7yA6QPEc4hTPPdMeYxPdjSTbf/BcXWx
+         aOFlQWEwBIMBocEzv1l+noGOym7bZP5Yf40Jkkica1nv4XNsrAJytb2f+apW3TOy+Tl3
+         WwUok/NB9xDYLQy6mPaG4Ytb8K6X8cAl8uvzVylFbWQC63Eqf8402vnXMYDmP6A/3EHX
+         G5fw==
+X-Gm-Message-State: AOJu0YwUCrJA+la2AXpx9JOe7s8w0pIpVm41RBoLoFUTZW75oLh68aax
+        ucALxISRIF0xZd2rNMFMk2Sqgg==
+X-Google-Smtp-Source: AGHT+IEb1Hn6gZeP0sARPggqx3KdSzmLFtqIymY6Wbvb0zN5J0Q+Z1g0X9mqlML8w4Y/XbBaZe/2Tg==
+X-Received: by 2002:a05:622a:11c1:b0:40f:f058:1478 with SMTP id n1-20020a05622a11c100b0040ff0581478mr1403575qtk.30.1691537367126;
+        Tue, 08 Aug 2023 16:29:27 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id v29-20020a05622a189d00b00403b3156f18sm3683586qtc.8.2023.08.08.16.29.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 16:29:26 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qTW8j-004xs5-Pa;
+        Tue, 08 Aug 2023 20:29:25 -0300
+Date:   Tue, 8 Aug 2023 20:29:25 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: align capability structures
+Message-ID: <ZNLP1dU1Ijzm/NPE@ziepe.ca>
+References: <20230803144109.2331944-1-stefanha@redhat.com>
+ <20230803151823.4e5943e6.alex.williamson@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803151823.4e5943e6.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the WARN in KVM_RUN that asserts that KVM isn't using the hypervisor
-timer, a.k.a. the VMX preemption timer, for a vCPU that is in the
-UNINITIALIZIED activity state.  The intent of the WARN is to sanity check
-that KVM won't drop a timer interrupt due to an unexpected transition to
-UNINITIALIZED, but unfortunately userspace can use various ioctl()s to
-force the unexpected state.
+On Thu, Aug 03, 2023 at 03:18:23PM -0600, Alex Williamson wrote:
 
-Drop the sanity check instead of switching from the hypervisor timer to a
-software based timer, as the only reason to switch to a software timer
-when a vCPU is blocking is to ensure the timer interrupt wakes the vCPU,
-but said interrupt isn't a valid wake event for vCPUs in UNINITIALIZED
-state *and* the interrupt will be dropped in the end.
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 902f06e52c48..2d074cbd371d 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1362,6 +1362,8 @@ struct vfio_info_cap_header *vfio_info_cap_add(struct vfio_info_cap *caps,
+>  	void *buf;
+>  	struct vfio_info_cap_header *header, *tmp;
+>  
+> +	size = ALIGN(size, sizeof(u64));
+> +
+>  	buf = krealloc(caps->buf, caps->size + size, GFP_KERNEL);
+>  	if (!buf) {
+>  		kfree(caps->buf);
+> @@ -1395,6 +1397,8 @@ void vfio_info_cap_shift(struct vfio_info_cap *caps, size_t offset)
+>  	struct vfio_info_cap_header *tmp;
+>  	void *buf = (void *)caps->buf;
+>  
+> +	WARN_ON(!IS_ALIGNED(offset, sizeof(u64)));
+> +
+>  	for (tmp = buf; tmp->next; tmp = buf + tmp->next - offset)
+>  		tmp->next += offset;
+>  }
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index fa06e3eb4955..fd2761841ffe 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -217,6 +217,7 @@ struct vfio_device_info {
+>  	__u32	num_regions;	/* Max region index + 1 */
+>  	__u32	num_irqs;	/* Max IRQ index + 1 */
+>  	__u32   cap_offset;	/* Offset within info struct of first cap */
+> +	__u32	pad;		/* Size must be aligned for caps */
+>  };
+>  #define VFIO_DEVICE_GET_INFO		_IO(VFIO_TYPE, VFIO_BASE + 7)
+>  
+> @@ -1444,6 +1445,7 @@ struct vfio_iommu_type1_info {
+>  #define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
+>  	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
+>  	__u32   cap_offset;	/* Offset within info struct of first cap */
+> +	__u32	pad;		/* Size must be aligned for caps */
+>  };
 
-Reported-by: Yikebaer Aizezi <yikebaer61@gmail.com>
-Closes: https://lore.kernel.org/all/CALcu4rbFrU4go8sBHk3FreP+qjgtZCGcYNpSiEXOLm==qFv7iQ@mail.gmail.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+IMHO this is partially being caused by not using __aligned_u64 for the
+other __u64's in the same struct..
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a6b9bea62fb8..fa7eeb45b8e3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11091,12 +11091,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 			r = -EINTR;
- 			goto out;
- 		}
+Both of these structs have u64s in them and many arches will
+automatically add the above padding. __aligned_u64 will force the
+reset to do it, and then making padding explicit as you have done will
+make it really true.
+
+This is a subtle x64/x32 compatability issue also. It is probably best
+just to do the change across the whole header file.
+
+Please also include the matching hunk for iommufd:
+
+--- a/drivers/iommu/iommufd/vfio_compat.c
++++ b/drivers/iommu/iommufd/vfio_compat.c
+@@ -483,6 +483,8 @@ static int iommufd_vfio_iommu_get_info(struct iommufd_ctx *ictx,
+                        rc = cap_size;
+                        goto out_put;
+                }
++               cap_size = ALIGN(cap_size, sizeof(u64));
 +
- 		/*
--		 * It should be impossible for the hypervisor timer to be in
--		 * use before KVM has ever run the vCPU.
-+		 * Don't bother switching APIC timer emulation from the
-+		 * hypervisor timer to the software timer, the only way for the
-+		 * APIC timer to be active is if userspace stuffed vCPU state,
-+		 * i.e. put the vCPU into a nonsensical state.  Only an INIT
-+		 * will transition the vCPU out of UNINITIALIZED (without more
-+		 * state stuffing from userspace), which will reset the local
-+		 * APIC and thus smother the timer anyways, i.e. the APIC timer
-+		 * IRQ(s) will be dropped no matter what.
- 		 */
--		WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
--
- 		kvm_vcpu_srcu_read_unlock(vcpu);
- 		kvm_vcpu_block(vcpu);
- 		kvm_vcpu_srcu_read_lock(vcpu);
+                if (last_cap && info.argsz >= total_cap_size &&
+                    put_user(total_cap_size, &last_cap->next)) {
+                        rc = -EFAULT;
 
-base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
--- 
-2.41.0.640.ga95def55d0-goog
-
+Thanks,
+Jason
