@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F28F774B61
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:46:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F0E774B63
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:46:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235008AbjHHUqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 16:46:00 -0400
+        id S234833AbjHHUqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 16:46:10 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234582AbjHHUpm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:45:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF2B145B5
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:37:45 -0700 (PDT)
+        with ESMTP id S234864AbjHHUp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 16:45:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D05E91424C
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:35:57 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 00C91624F7
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C1CE624FB
         for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:47:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55D2CC433D9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA68EC433CA;
         Tue,  8 Aug 2023 11:47:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1691495237;
-        bh=v5iH5FTyEpyHMdqXE1ha5bdSz0FgSx4VbyMF9ixrvDE=;
+        bh=k70vbGyqtpFHqhcl5LnkNzDTDcL16PBph+LK/kmFZ1A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OgRFK0ptG1ERD1TX77TFDwKBpe+d7jZu0ORf3YmnB3geXyhu9ThMCoq8Bc8aGOw0D
-         3JDvolzRUCGqyNSJx4eyTesWoSWhBw33GONu+ETJeMLxDUYF4xRpNVxdnAOTd84DdG
-         9XAcgVMvR16R0tL4oqurSnPXcYtcQET94QYP/8OZW6/8Ae+cpMopSfQSF++2GBqwSp
-         zZ8D9lQeHAF/e8FZt930Gey3s7kXiAzeZXvYnQev4H2x9qO+Db15i2exPXPYAdWjqS
-         sn7u3sgFENZK3rKJrzVS6pguHD8J8g8Go9zo4T4fmgvlxuYXUoG9Nt6aNLj98KOExC
-         qqwlZoeOC5KBA==
+        b=fWlemGLL9nKR9YW4eyEYFjneYgBex87iSIMrSL6aBXcwZ//GVkkqmiwezRn3VLqw+
+         9HA3pa6Or8/zHx6AGFNuoDPjoLeWKNFoV8h4+96xLRgPixrQXasjYHwmRt4bIB30vi
+         OPAKD6XmzzhynLwFnuS31nD0E6fAqySygG7Ya49tWcdF6rnP24sfYyFGpYuJM9DHlM
+         Qk8MIwZvdl1LYR0NQoG7dy9KodialIclvsTgtiO0UUhqVf+taeBjtHP9qUXg0T8RSy
+         d9SczPUVrLVwNAfCCdnJ25Rm2hf5SCZEFBBXjfO+DlyOH+0pvYKYUrAoTkx30ksMq3
+         1vAxNviv7kYSQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qTLBD-0037Ph-BW;
+        id 1qTLBD-0037Ph-MY;
         Tue, 08 Aug 2023 12:47:15 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 02/27] arm64: Add missing ERX*_EL1 encodings
-Date:   Tue,  8 Aug 2023 12:46:46 +0100
-Message-Id: <20230808114711.2013842-3-maz@kernel.org>
+Subject: [PATCH v3 03/27] arm64: Add missing DC ZVA/GVA/GZVA encodings
+Date:   Tue,  8 Aug 2023 12:46:47 +0100
+Message-Id: <20230808114711.2013842-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -78,9 +78,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We only describe a few of the ERX*_EL1 registers. Add the missing
-ones (ERXPFGF_EL1, ERXPFGCTL_EL1, ERXPFGCDN_EL1, ERXMISC2_EL1 and
-ERXMISC3_EL1).
+Add the missing DC *VA encodings.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
@@ -92,23 +90,21 @@ Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 85447e68951a..ed2739897859 100644
+index ed2739897859..5084add86897 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -229,8 +229,13 @@
- #define SYS_ERXCTLR_EL1			sys_reg(3, 0, 5, 4, 1)
- #define SYS_ERXSTATUS_EL1		sys_reg(3, 0, 5, 4, 2)
- #define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
-+#define SYS_ERXPFGF_EL1			sys_reg(3, 0, 5, 4, 4)
-+#define SYS_ERXPFGCTL_EL1		sys_reg(3, 0, 5, 4, 5)
-+#define SYS_ERXPFGCDN_EL1		sys_reg(3, 0, 5, 4, 6)
- #define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
- #define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
-+#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
-+#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
- #define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
- #define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
+@@ -150,6 +150,11 @@
+ #define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
+ #define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
  
++/* Data cache zero operations */
++#define SYS_DC_ZVA			sys_insn(1, 3, 7, 4, 1)
++#define SYS_DC_GVA			sys_insn(1, 3, 7, 4, 3)
++#define SYS_DC_GZVA			sys_insn(1, 3, 7, 4, 4)
++
+ /*
+  * Automatically generated definitions for system registers, the
+  * manual encodings below are in the process of being converted to
 -- 
 2.34.1
 
