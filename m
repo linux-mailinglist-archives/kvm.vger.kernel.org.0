@@ -2,264 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49D25774A70
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0DC7774A02
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:10:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbjHHU3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 16:29:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50234 "EHLO
+        id S234502AbjHHUKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 16:10:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbjHHU2z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:28:55 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEB20157923
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 10:07:37 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56385c43eaeso36595a12.1
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 10:07:37 -0700 (PDT)
+        with ESMTP id S232111AbjHHUJ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 16:09:59 -0400
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 833D844811
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:39:40 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-40849e69eb5so39614911cf.1
+        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 11:39:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691514457; x=1692119257;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FYydZ/WC/X7PBz3rGSs121PfBH3fb5ehFOJQFZBx3p4=;
-        b=GV0T5JGICTxBHQToBy1PfSyoy2i4bM1zH73FdGtuKSDbeUUFxy0mudpUdMA9EPwcN/
-         j9JXJzSqXP5zsg/86aZbjj3WK6wE6yNNwTycSPQEiglcligbGzAAlM+yBOTID7rqdjfj
-         6Aji/NflE6sHuE7Q7L0y/h/uyQwprnXyF7UHP7SQXMUAqy0cM5MagWJ74MsmFB9uNvz4
-         Fhzeb/hC7QxHmzNY8sct7/oI+RxQxXyGdMlFt1HKVaf4LrBL8E5QrHqUnWUbGvMbH5N1
-         orjBrAWkw9u53y0m5n5LsKUHYYdC/jL1/eWH2X30bvMRM3MC3nrYUuz3kYjwwZb6Kd5V
-         fCJg==
+        d=ziepe.ca; s=google; t=1691519979; x=1692124779;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=64QCZ+lCjqLCLgWqPm6Im36kRBI6O73TOOo0qu3TAc4=;
+        b=ngl7ca+dDeOo1NbtsDWD3hb35GubXAE9bW4YU+Q9ZeNQiYlwws2AP21vm1W9mce/Yx
+         6ip0BJ/dz8OEdvpusCgK0uEuMiptwij0mmqFChb/mPzoZnydcBzqCj/wld2p+OPVf6aA
+         94cg94q9bQBcUj9Shjbi2ywkjakp+/Iuhhg8yF14oxRyg67JuNY8DDoIdat+Bb7WNm31
+         W6hOXXt1M8Bj4UHq743YLSzvXXeU4X/bf5rjjn1XoYfXfkxTdDqEX+zEwcLdcBisuwd8
+         Y3ls3blTbOZaIN0WkgM2lPu6FUW3roESHOhBLzCk9y44Sc2qYJBZ3qim4dVFt2ny3ReI
+         /GQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691514457; x=1692119257;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FYydZ/WC/X7PBz3rGSs121PfBH3fb5ehFOJQFZBx3p4=;
-        b=TnxMtC+tQOvcSPJr5TAqEKcjBEY5sO5mb8iWSDg4HCkuZSq/nub8zg2eaD9l6mjGCo
-         1caFWeTH39P+tpw3qBOdStIoD3eniIHJ29djCxwHT2R3MtipVvU4THk7KmZP48QIdeRP
-         0ZuXs8UJtHW1kbWc9WKxkQs4y9A3mjpjOH04SSbo2DbygteaMn7nhk5K/fIHjZIyZGwq
-         +tVC+Taijre9NpDDcsjDJFy/NwgDDaNpCXuD+fwXkLUHl9D3OhU8ikOAbj21+yFulP5N
-         2IpbigwOwx6keaEeialbIvjiaRjXqqkMhJCslt3K1uePQDQvzcQEz3G47tQ2OrHDITvp
-         029Q==
-X-Gm-Message-State: AOJu0YwqnnI7JiqxqBRaNxU/gussNMkGCfpm575DKayXlKxUGLl/8Z2D
-        Y8mUxbhtagRkMCu5LU1/yV+IrxwUyrw=
-X-Google-Smtp-Source: AGHT+IHKPz9NN9UwaUpEVU90XfLOlmfjcXFMG76C/HmVH7eT9tRDEVaJTacVs/21ngorplmfMSbyl1i9APo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:5264:0:b0:564:4a9e:1b80 with SMTP id
- s36-20020a635264000000b005644a9e1b80mr76736pgl.6.1691514457246; Tue, 08 Aug
- 2023 10:07:37 -0700 (PDT)
-Date:   Tue, 8 Aug 2023 10:07:35 -0700
-In-Reply-To: <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
-Mime-Version: 1.0
-References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com>
- <ZLrCUkwot/yiVC8T@google.com> <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
- <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
- <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
- <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
-Message-ID: <ZNJ2V2vRXckMwPX2@google.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-From:   Sean Christopherson <seanjc@google.com>
-To:     Amaan Cheval <amaan.cheval@gmail.com>
-Cc:     brak@gameservers.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691519979; x=1692124779;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=64QCZ+lCjqLCLgWqPm6Im36kRBI6O73TOOo0qu3TAc4=;
+        b=Q7qr7sypZNZ8zuFSr+oMgZ2w3Y4qOMsGV/sme/W5Cm64+yvnNHihKlItUQtnmXH0Uo
+         sKg2h8fVr7l5wrt5NpNke9AByevbk/toFAps5WhDjT3OquQuJJYNNytJxCohy+VbcPef
+         Icj2Gr//f3lGilZOVpBKTTPWvchFtBjU22avNj2Hu/5gRMPOM9YKAYxjkp/GD/lTE78E
+         +LUv5HMhoKdmfhL5I3UvizbEN3oCqCzcfzWVRDv2vKfO1fMla5xBt9BnysZETyZ7gMYp
+         uIW2221IaLqJOmja44y/RKgMm0QTHtWixzNBcSyqMYUBm9rBuP4bl2Edssg0KbG2GsL4
+         /MVw==
+X-Gm-Message-State: AOJu0YwmSrFO7JpICrzQFwrAqkPqAPHCIQF+KMrv7zdedlCrZpuongf5
+        m1/G1Ybu8bwzcQWTZIDpPOZVQw==
+X-Google-Smtp-Source: AGHT+IHpUQvjin0dfbxMHZFXvfs1yLMSRD2Rp9ldZKVLrYQ9K6NRMfi8+h/vzLGKDPZotUVGEmHXeg==
+X-Received: by 2002:a05:622a:1a9e:b0:405:45e2:39f9 with SMTP id s30-20020a05622a1a9e00b0040545e239f9mr682152qtc.15.1691519979699;
+        Tue, 08 Aug 2023 11:39:39 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id 16-20020a05620a071000b00765ab6d3e81sm3457218qkc.122.2023.08.08.11.39.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 11:39:39 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qTRcI-004vXr-3a;
+        Tue, 08 Aug 2023 15:39:38 -0300
+Date:   Tue, 8 Aug 2023 15:39:38 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Baolu Lu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 03/12] iommu: Remove unrecoverable fault data
+Message-ID: <ZNKL6hGRZT9qfV1K@ziepe.ca>
+References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
+ <20230727054837.147050-4-baolu.lu@linux.intel.com>
+ <BN9PR11MB52767976314CC61A0F8BEFD08C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <faad1948-5096-c9d3-616a-cd0f0a4b5876@linux.intel.com>
+ <BN9PR11MB527614E61BC257FE113EFE358C09A@BN9PR11MB5276.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527614E61BC257FE113EFE358C09A@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 08, 2023, Amaan Cheval wrote:
-> Hey Sean,
+On Fri, Aug 04, 2023 at 03:51:30AM +0000, Tian, Kevin wrote:
+> > From: Baolu Lu <baolu.lu@linux.intel.com>
+> > Sent: Friday, August 4, 2023 10:59 AM
+> > 
+> > On 2023/8/3 15:54, Tian, Kevin wrote:
+> > >> From: Lu Baolu<baolu.lu@linux.intel.com>
+> > >> Sent: Thursday, July 27, 2023 1:48 PM
+> > >>
+> > >>   struct iommu_fault {
+> > >>   	__u32	type;
+> > >> -	__u32	padding;
+> > > this padding should be kept.
+> > >
+> > 
+> > To keep above 64-bit aligned, right?
+> > 
 > 
-> > If NUMA balancing is going nuclear and constantly zapping PTEs, the resulting
-> > mmu_notifier events could theoretically stall a vCPU indefinitely.  The reason I
-> > dislike NUMA balancing is that it's all too easy to end up with subtle bugs
-> > and/or misconfigured setups where the NUMA balancing logic zaps PTEs/SPTEs without
-> > actuablly being able to move the page in the end, i.e. it's (IMO) too easy for
-> > NUMA balancing to get false positives when determining whether or not to try and
-> > migrate a page.
-> 
-> What are some situations where it might not be able to move the page in the end?
+> yes
 
-There's a pretty big list, see the "failure" paths of do_numa_page() and
-migrate_misplaced_page().
+If it is not uapi we should not explicitly document padding (and __u32
+should be u32). The compiler will add it if it is necessary.
 
-> > That said, it's definitely very unexpected that NUMA balancing would be zapping
-> > SPTEs to the point where a vCPU can't make forward progress.   It's theoretically
-> > possible that that's what's happening, but quite unlikely, especially since it
-> > sounds like you're seeing issues even with NUMA balancing disabled.
-> 
-> Yep, we're definitely seeing the issue occur even with numa_balancing
-> enabled, but the likelihood of it occurring has significantly dropped since
-> we've disabled numa_balancing.
+If the compiler isn't right for some reason then something else has
+gone wrong.
 
-So the fact that this occurs with NUMA balancing disabled means the problem likely
-isn't with NUMA balancing itself.  NUMA balancing probably exposes some underlying
-issue due to it generating a near-constant stream of mmu_notifier invalidation.
-
-> > More likely is that there is a bug somewhere that results in the mmu_notifier
-> > event refcount staying incorrectly eleveated, but that type of bug shouldn't follow
-> > the VM across a live migration...
-> 
-> Good news! We managed to live migrate a guest and that did "fix it".
-
-...
-
-> A colleague also modified a host kernel with KFI (Kernel Function
-> Instrumentation) and wrote a kernel module to intercept the vmexit handler,
-> handle_ept_violation, and does an EPT walk for each pfn, compared against
-> /proc/iomem.
-> 
-> Assuming the EPT walking code is correct, we see this surprising result of a
-> PDPTE's pfn=0:
-
-Not surprising.  The entire EPTE is zero, i.e. has been zapped by KVM.  This is
-exactly what is expected.
-
-> Does this seem to indicate an mmu_notifier refcount issue to you, given that
-> migration did fix it? Any way to verify?
-
-It doesn't move the needle either way, it just confirms what we already know: the
-vCPU is repeatedly taking !PRESENT faults.  The unexpected part is that KVM never
-"fixes" the fault and never outright fails.
-
-> We haven't found any guests with `softlockup_panic=1` yet, and since we can't
-> reproduce the issue on command ourselves yet, we might have to wait a bit - but
-> I imagine that the fact that live migration "fixed" the locked up guest confirms
-> that the other guests that didn't get "fixed" were likely softlocked from the
-> CPU stalling?
-
-Yes.
-
-> If you have any suggestions on how modifying the host kernel (and then migrating
-> a locked up guest to it) or eBPF programs that might help illuminate the issue
-> further, let me know!
-> 
-> Thanks for all your help so far!
-
-Since it sounds like you can test with a custom kernel, try running with this
-patch and then enable the kvm_page_fault tracepoint when a vCPU gets stuck.  The
-below expands said tracepoint to capture information about mmu_notifiers and
-memslots generation.  With luck, it will reveal a smoking gun.
-
----
- arch/x86/kvm/mmu/mmu.c          | 10 ----------
- arch/x86/kvm/mmu/mmu_internal.h |  2 ++
- arch/x86/kvm/mmu/tdp_mmu.h      | 10 ++++++++++
- arch/x86/kvm/trace.h            | 28 ++++++++++++++++++++++++++--
- 4 files changed, 38 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9e4cd8b4a202..122bfc884293 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2006,16 +2006,6 @@ static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
- 	return true;
- }
- 
--static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
--{
--	if (sp->role.invalid)
--		return true;
--
--	/* TDP MMU pages do not use the MMU generation. */
--	return !is_tdp_mmu_page(sp) &&
--	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
--}
--
- struct mmu_page_path {
- 	struct kvm_mmu_page *parent[PT64_ROOT_MAX_LEVEL];
- 	unsigned int idx[PT64_ROOT_MAX_LEVEL];
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index f1ef670058e5..cf7ba0abaa8f 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -6,6 +6,8 @@
- #include <linux/kvm_host.h>
- #include <asm/kvm_host.h>
- 
-+#include "mmu.h"
-+
- #ifdef CONFIG_KVM_PROVE_MMU
- #define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
- #else
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 0a63b1afabd3..a0d7c8acf78f 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -76,4 +76,14 @@ static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return sp->tdp_mmu
- static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
- #endif
- 
-+static inline bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-+{
-+	if (sp->role.invalid)
-+		return true;
-+
-+	/* TDP MMU pages do not use the MMU generation. */
-+	return !is_tdp_mmu_page(sp) &&
-+	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
-+}
-+
- #endif /* __KVM_X86_MMU_TDP_MMU_H */
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 83843379813e..ff4a384ab03a 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -8,6 +8,8 @@
- #include <asm/clocksource.h>
- #include <asm/pvclock-abi.h>
- 
-+#include "mmu/tdp_mmu.h"
-+
- #undef TRACE_SYSTEM
- #define TRACE_SYSTEM kvm
- 
-@@ -405,6 +407,13 @@ TRACE_EVENT(kvm_page_fault,
- 		__field(	unsigned long,	guest_rip	)
- 		__field(	u64,		fault_address	)
- 		__field(	u64,		error_code	)
-+		__field(	unsigned long,  mmu_invalidate_seq)
-+		__field(	long,  mmu_invalidate_in_progress)
-+		__field(	unsigned long,  mmu_invalidate_range_start)
-+		__field(	unsigned long,  mmu_invalidate_range_end)
-+		__field(	bool,		root_is_valid)
-+		__field(	bool,		root_has_sp)
-+		__field(	bool,		root_is_obsolete)
- 	),
- 
- 	TP_fast_assign(
-@@ -412,11 +421,26 @@ TRACE_EVENT(kvm_page_fault,
- 		__entry->guest_rip	= kvm_rip_read(vcpu);
- 		__entry->fault_address	= fault_address;
- 		__entry->error_code	= error_code;
-+		__entry->mmu_invalidate_seq		= vcpu->kvm->mmu_invalidate_seq;
-+		__entry->mmu_invalidate_in_progress	= vcpu->kvm->mmu_invalidate_in_progress;
-+		__entry->mmu_invalidate_range_start	= vcpu->kvm->mmu_invalidate_range_start;
-+		__entry->mmu_invalidate_range_end	= vcpu->kvm->mmu_invalidate_range_end;
-+		__entry->root_is_valid			= VALID_PAGE(vcpu->arch.mmu->root.hpa);
-+		__entry->root_has_sp			= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
-+							  to_shadow_page(vcpu->arch.mmu->root.hpa);
-+		__entry->root_is_obsolete		= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
-+							  to_shadow_page(vcpu->arch.mmu->root.hpa) &&
-+							  is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root.hpa));
- 	),
- 
--	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx",
-+	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx, seq = 0x%lx, in_prog = 0x%lx, start = 0x%lx, end = 0x%lx, root = %s",
- 		  __entry->vcpu_id, __entry->guest_rip,
--		  __entry->fault_address, __entry->error_code)
-+		  __entry->fault_address, __entry->error_code,
-+		  __entry->mmu_invalidate_seq, __entry->mmu_invalidate_in_progress,
-+		  __entry->mmu_invalidate_range_start, __entry->mmu_invalidate_range_end,
-+		  !__entry->root_is_valid ? "invalid" :
-+		  !__entry->root_has_sp ? "no shadow page" :
-+		  __entry->root_is_obsolete ? "obsolete" : "fresh")
- );
- 
- /*
-
-base-commit: 240f736891887939571854bd6d734b6c9291f22e
--- 
-
+Jason
