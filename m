@@ -2,118 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52893774E76
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 00:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D962774F00
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 01:11:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230131AbjHHWlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 18:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46744 "EHLO
+        id S230261AbjHHXLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 19:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbjHHWlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 18:41:03 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711EC10E
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 15:41:02 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58440eb872aso80735577b3.3
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 15:41:02 -0700 (PDT)
+        with ESMTP id S229487AbjHHXLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 19:11:24 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DF17101
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 16:11:23 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2680007cdeaso4154075a91.1
+        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 16:11:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691534461; x=1692139261;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3rNBj6786+N1k32eHRRlayZnJaz3TtrdUsSjOGUYzq0=;
-        b=3ZqoyMsmInjqXfLrhhQo3PmaKb4aK/U3mYdCHpVvru5JheoWVyAk7sYiYRcVwL9dpq
-         V0pqPbbRLmNLOJrWYIfGS67Au7hiWO3Vz95IBlKApSJelhVNpJY2RIkyb8nhYheTKQ69
-         LL/RVxaE99OBa9+pGsngWbYgn9Pz/XEdLG1MGfiVI/hNhd+ZTBqotzZQeJZistGxnGvd
-         d8yne52FcFYEhfwd6swj2mlxRB0f6w2iyI9expZ+Xc+q2DsH/3UvvD33pKWaRksyZJna
-         F0Czv86+YHqEIkQR/h76PYg62M7N5afvK5DkAuXmdLIE9QTqgSlVxNABCeA48U3/Pri+
-         +Rbg==
+        d=google.com; s=20221208; t=1691536282; x=1692141082;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ojsc/u6rUVpX8HdGmZzouIRwar1EemcmsKTh2MHMIRg=;
+        b=06plQQVWsgx7IKWxM0lUaNqesObzvOL8NEZgPuTF70P/ac3lodpKxIkb0jj9Bjgohs
+         hkAsa1AunIVA+5m6CaKJ4QPvWYMSmjfHdNVkluxlzHt9GDpIIcBG+pQH0NOofk7pRPcG
+         UEQliX2XJed/IR9kx4J++VPBFUpJi+rPKV3BBy3gmHNdoN/pyrFDA08l8wRcIRpMhAuL
+         PSWcRS0KzMDoQbHpvNFKcBeQ0ZZ6jLxJPB9qtsvDvzFJj2ljHkhhAXZm7AcAIYYTJ8Ex
+         AwA0veMnDzZM2bCWrq+U1gCyF4gZyUmwAenlNWYLLAPyyTXMjHX34yJaySH7VIrfC0zx
+         0ocw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691534461; x=1692139261;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3rNBj6786+N1k32eHRRlayZnJaz3TtrdUsSjOGUYzq0=;
-        b=KbdcPA7lL2JBxnqS+Qv+CEa1BcpXmPVjprrWlTrrZ5rDONyrmd2vVHy1XEGml/X4FS
-         DIOIQL/9FuBqhkBDs6+liSsWnwPGAXIBiAqR0RnDETRSVn3wbR+CuvUgidSeA1GC4QMk
-         M1KGkm6uxwNhnvIy6AhJ/pqNpkeXxn1KfAfnX14AXnm8QGGt0fYvvhafx3+0CGu5qGgD
-         JAxxaMgsSVpLtqMQhckZ8rcUhPB+u4JY5yyo3GfqSdOWyBm4aTBtlgPq9hihqQs8wCpL
-         U4X7KxAhDvhGp02Hk8jz9AiBmxy6B25fBfKXczIruKWvST/cGHLKThi4pH+dcC/nCfy3
-         uQwA==
-X-Gm-Message-State: AOJu0Yy1kTFsEsmXsi07oR8dSdmJwkPOqO3U/PAKC+GLTyPlJwFmJCvZ
-        qa3Qz8fACW7u1dYU6QMZXtG3dbQB+O4=
-X-Google-Smtp-Source: AGHT+IGc1h7XTB7+xg8mBM4QFplLeZIjv0hdDbovIRNMtMDEFpAgGy+/lWVn/UQwSSVabwzQ6Dr8OOuQtrA=
+        d=1e100.net; s=20221208; t=1691536282; x=1692141082;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ojsc/u6rUVpX8HdGmZzouIRwar1EemcmsKTh2MHMIRg=;
+        b=ItDqKeCmMTwsDkKPOQEBp4GFVZbC6VAKhgVoTRwGLn4DFQ1nh1rnyKlfDTij16GWuA
+         Ln9x5oX4L7rbdHaRcoEjRXgMfUwgZ4rDwzdC/UHxjbG5HESghoVsa02gea9X+0D5AYGt
+         RwxlB+LwYEkWamwFRhuOIgTNqUxu3YeQHNJOJLc7SErnxMRBU5aPZRsaXMU1NzOm8Lq3
+         SJLhMR7H0FAohcuTXq6YCkGoG0rWCpheLQo48Gb0YiACy+x3wEvFKSj1VJ3AnuOiphOd
+         DNKAyGOZ6AAdI+XAPH9vjYWbRItJKHiSuZdtDdOYsF7wruaGOz9dQiTlVW7+Gq1+K3zd
+         UIxg==
+X-Gm-Message-State: AOJu0YwmmsRcBVAr0d0Ma319yKpZxV4VFC6ZCvg5tEThjkRz7nUxu6DZ
+        puJMg0xhdqKYd7hYm+SKRchurdohqY0=
+X-Google-Smtp-Source: AGHT+IHzS9zA8UwhpC4eUpMDZdJASDaKyuAg60aRHUVvqAyijrJC3sB28HYLE92EVctTnXF7euJALl+qRJw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7456:0:b0:d05:7ba4:67f9 with SMTP id
- p83-20020a257456000000b00d057ba467f9mr20788ybc.3.1691534461716; Tue, 08 Aug
- 2023 15:41:01 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  8 Aug 2023 15:40:59 -0700
+ (user=seanjc job=sendgmr) by 2002:a17:90a:858a:b0:263:3b44:43ae with SMTP id
+ m10-20020a17090a858a00b002633b4443aemr21798pjn.8.1691536282499; Tue, 08 Aug
+ 2023 16:11:22 -0700 (PDT)
+Date:   Tue, 8 Aug 2023 16:11:21 -0700
+In-Reply-To: <5c7309cb-30be-fe99-8563-d33098adbfe9@rbox.co>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230808224059.2492476-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86/mmu: Include mmu.h in spte.h
+References: <20230728001606.2275586-1-mhal@rbox.co> <20230728001606.2275586-3-mhal@rbox.co>
+ <ZMrFmKRcsb84DaTY@google.com> <222888b6-0046-3351-ba2f-fe6ac863f73d@rbox.co>
+ <ZMvY17kJR59P2blD@google.com> <5c7309cb-30be-fe99-8563-d33098adbfe9@rbox.co>
+Message-ID: <ZNLLmSCHL6jDa3Ie@google.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Extend x86's sync_regs_test to check
+ for races
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Explicitly include mmu.h in spte.h instead of relying on the "parent" to
-include mmu.h.  spte.h references a variety of macros and variables that
-are defined/declared in mmu.h, and so including spte.h before (or instead
-of) mmu.h will result in build errors, e.g.
+On Thu, Aug 03, 2023, Michal Luczaj wrote:
+> On 8/3/23 18:41, Sean Christopherson wrote:
+> > +/*
+> > + * Assert that a VM or vCPU ioctl() succeeded (obviously), with extra magic to
+> > + * detect if the ioctl() failed because KVM killed/bugged the VM.  To detect a
+> > + * dead VM, probe KVM_CAP_USER_MEMORY, which (a) has been supported by KVM
+> > + * since before selftests existed and (b) should never outright fail, i.e. is
+> > + * supposed to return 0 or 1.  If KVM kills a VM, KVM returns -EIO for all
+> > + * ioctl()s for the VM and its vCPUs, including KVM_CHECK_EXTENSION.
+> > + */
+> 
+> Do you think it's worth mentioning the ioctl() always returning -EIO in case of
+> kvm->mm != current->mm? I suppose that's something purely hypothetical in this
+> context.
 
-  arch/x86/kvm/mmu/spte.h: In function =E2=80=98is_mmio_spte=E2=80=99:
-  arch/x86/kvm/mmu/spte.h:242:23: error: =E2=80=98enable_mmio_caching=E2=80=
-=99 undeclared
-    242 |                likely(enable_mmio_caching);
-        |                       ^~~~~~~~~~~~~~~~~~~
-
-  arch/x86/kvm/mmu/spte.h: In function =E2=80=98is_large_pte=E2=80=99:
-  arch/x86/kvm/mmu/spte.h:302:22: error: =E2=80=98PT_PAGE_SIZE_MASK=E2=80=
-=99 undeclared
-    302 |         return pte & PT_PAGE_SIZE_MASK;
-        |                      ^~~~~~~~~~~~~~~~~
-
-  arch/x86/kvm/mmu/spte.h: In function =E2=80=98is_dirty_spte=E2=80=99:
-  arch/x86/kvm/mmu/spte.h:332:56: error: =E2=80=98PT_WRITABLE_MASK=E2=80=99=
- undeclared
-    332 |         return dirty_mask ? spte & dirty_mask : spte & PT_WRITABL=
-E_MASK;
-        |                                                        ^~~~~~~~~~=
-~~~~~~
-
-Fixes: 5a9624affe7c ("KVM: mmu: extract spte.h and spte.c")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/spte.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 83e6614f3720..6215f4c60ed5 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -3,6 +3,7 @@
- #ifndef KVM_X86_MMU_SPTE_H
- #define KVM_X86_MMU_SPTE_H
-=20
-+#include "mmu.h"
- #include "mmu_internal.h"
-=20
- /*
-
-base-commit: 240f736891887939571854bd6d734b6c9291f22e
---=20
-2.41.0.640.ga95def55d0-goog
-
+Hmm, probably not?  Practically speaking, that scenario should really only ever
+happen when someone is developing a new selftest.  Though I suppose a blurb in
+the comment wouldn't hurt.
