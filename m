@@ -2,248 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30D657736FD
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 04:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2DBA773767
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 05:13:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231181AbjHHCop (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 7 Aug 2023 22:44:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60280 "EHLO
+        id S229681AbjHHDNC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 7 Aug 2023 23:13:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231215AbjHHCoh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 7 Aug 2023 22:44:37 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D141FE4
-        for <kvm@vger.kernel.org>; Mon,  7 Aug 2023 19:44:15 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bc34b32785so33837795ad.3
-        for <kvm@vger.kernel.org>; Mon, 07 Aug 2023 19:44:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1691462655; x=1692067455;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZZ3n364wJBBn5i6olC7X8xOphz5aoEwi3PPn9Humxy4=;
-        b=c9iOPpy41VC6QSzv5vLbmCPsxZB2K7hAItf8MEtryT/BAlfvdA0UPM4PAg3DtN7rr+
-         GFW2nm1AoLFEe5zmSSiqyIhn92P6iecybeuExkqa7jbnj+LEVM1LioV7SZGiR/8Kzy2+
-         mJYrJW8XMi2+dbRvP7Xg6QuSzUnp/yHkq29M7vbAYNrF1NokfShgkpn7COiSBb38dkF0
-         MWE0ZNG9ZS4LzaWgVeAy0Pmh7etHcKYaOYLW+oCVP3Q2zlcEbOnfLG0lI+GjqQwBJGqv
-         OKDqkP3u3mDYRaZI2hDArPl64kIP09oRYh791qhymi4aMBqJthtqlGcAIAw7e+Im4Q2d
-         AiTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691462655; x=1692067455;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZZ3n364wJBBn5i6olC7X8xOphz5aoEwi3PPn9Humxy4=;
-        b=Ogrw3/DEECRm7caT58u+uMAYOtwgU8EVk6np75orAuX384Pro7SUFcReeNlltmuoa4
-         /dsxsAhapLrBuxyHw5E0qy+IP2I6iVeQJ21Z4xV0HHBoND1661xONSRmTUnvyFWv0/Ay
-         CB8dokZcihPs9Biw0g8RDow6y9swuSxPW1afxMehlaV3NwXLQYLedX56HyrePGdNsBUC
-         oZrMdWIyyoaknnNn/u34yGDNiSKc3u7ss14GisXKHghMu38aOO/MyG8vxJH/2y2n+IGt
-         46SXv6tmU3wqNw5CJOWLAg2NdpOLzRbEpd2RfO+zIY9ordhJBLI2bee3rY2OY9nSJuJw
-         l/eg==
-X-Gm-Message-State: AOJu0YwcMONLzE4q6UDLyuEk7caaiJusJGPwm2CrN0HdGeTxbDQh6kNM
-        1TDL3P/wzJAj4ctRB/0U9P+zHQ==
-X-Google-Smtp-Source: AGHT+IEZT2gUmOSYrkIbMjP5ySF6z1UEt5Q+o+GMN8zU98oO9pgzqqi+i8QK+swPthTlPTk4WQ36Qw==
-X-Received: by 2002:a17:902:7287:b0:1b3:f5c7:4e75 with SMTP id d7-20020a170902728700b001b3f5c74e75mr9699662pll.58.1691462654669;
-        Mon, 07 Aug 2023 19:44:14 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-166-213.pa.nsw.optusnet.com.au. [49.180.166.213])
-        by smtp.gmail.com with ESMTPSA id u2-20020a170902e80200b001b893b689a0sm7632067plg.84.2023.08.07.19.44.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 19:44:14 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qTChf-002XBg-27;
-        Tue, 08 Aug 2023 12:44:11 +1000
-Date:   Tue, 8 Aug 2023 12:44:11 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Qi Zheng <zhengqi.arch@bytedance.com>
-Cc:     akpm@linux-foundation.org, tkhai@ya.ru, vbabka@suse.cz,
-        roman.gushchin@linux.dev, djwong@kernel.org, brauner@kernel.org,
-        paulmck@kernel.org, tytso@mit.edu, steven.price@arm.com,
-        cel@kernel.org, senozhatsky@chromium.org, yujie.liu@intel.com,
-        gregkh@linuxfoundation.org, muchun.song@linux.dev,
-        simon.horman@corigine.com, dlemoal@kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v4 46/48] mm: shrinker: make memcg slab shrink lockless
-Message-ID: <ZNGr+1orhHaBORJG@dread.disaster.area>
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-47-zhengqi.arch@bytedance.com>
+        with ESMTP id S231148AbjHHDNA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 7 Aug 2023 23:13:00 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2047.outbound.protection.outlook.com [40.107.94.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B870E7;
+        Mon,  7 Aug 2023 20:12:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z82k2cXZuEdxRZDNC7SY+5pHFh6EfvrGZO7XDv48W+RAyvfcne3ZLlxk7mhlZWBtxmbDJZybaB3X+ZbexK2Iup+muIKLqgvmifxPAeAIMW31U/If/t4w6dFS2E0Tqs4drk/yRQEn9xgg3mmI8xtv2N2e+DPafwovsaQrPw3JVDHKQLOSDLSSRjAP2dz350OvCSgATQdcF2FY/7iziph/UgSwlDXvuRN4BdwGLOITUNV2i5bgJ1/22kQ8BCXzjzSGAP4+HoivUAweRkZVoPKOV8PkqKzAM7hbW3S4CxvqzDi8eTNR6vpXHUmHBcsrhZdCj4hkqjRQ6BEt91FH/QfSjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eALnJYcGKflQ/kh5eX2J9rbfxsXpouoABpu2G9OAQlQ=;
+ b=nUsb4uVSpLuS1KNCQDLHX516pu1y/ClrnX+08wV5MlJJdAhjslw10RvPjV66WR0mcjc8VrbNk2kGRcd8Yqyzm2klY2g7YA2r3lEyznJnncH2yGdkHWUGy1s1lR4vZBxx02qeCnUUSy10B8b4F4QzzwHxhn8FMERGenIpf+C5OuR48YMicEJ3rNRE8Azk+h8eySohU2XPi/jiDklt0nUn4HklW+JwNIDArNy5W9dSAhqygotoxuuezxPbXkzh6v6z6Q0hIDkxPcLK/Q4ZyFV9H3Vv2C28A0UhhsIKLxJzhF4Sh0ZB+nLj79o3TAAEN6nqfRhXClJN5wtbfiIYEooCuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eALnJYcGKflQ/kh5eX2J9rbfxsXpouoABpu2G9OAQlQ=;
+ b=eHTzMFFp63WQpdluivgRIWmX6XwuEzvPeBq+vOP6ciM7aaKNVmX6/W+juPHrOwgZHLdbP/wToUbeitOiKc/yH/vejXFtxyE0gvU8rftheC6EZpCE/LH4jiFJlm2w/UGw8kQxYLTIygcb4wjJG/MphQ9HLoJ8IHKA2mEjeBWP1k9o+geIaqN7Fi8POD2kANRxZ0q/tfMiFIVA1lpfc7ymemf86EqLrqVxX+c1tIoOX86xmrPVvgXRGfsuClbrzww8YqsmiccLItxEtQq+Y9fsw1WMsjZWx09KaBhN0q1P5BxUWmBmcZ6t3W3xlUQSdjUvnMfu2i1St3IeOPZ5eOjIlA==
+Received: from PH0PR07CA0060.namprd07.prod.outlook.com (2603:10b6:510:e::35)
+ by SN7PR12MB6689.namprd12.prod.outlook.com (2603:10b6:806:273::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Tue, 8 Aug
+ 2023 03:12:51 +0000
+Received: from SN1PEPF000252A0.namprd05.prod.outlook.com
+ (2603:10b6:510:e:cafe::e1) by PH0PR07CA0060.outlook.office365.com
+ (2603:10b6:510:e::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
+ Transport; Tue, 8 Aug 2023 03:12:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF000252A0.mail.protection.outlook.com (10.167.242.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 03:12:54 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 7 Aug 2023
+ 20:12:41 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 7 Aug 2023
+ 20:12:40 -0700
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Mon, 7 Aug 2023 20:12:39 -0700
+Date:   Mon, 7 Aug 2023 20:12:37 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
+Message-ID: <ZNGypUee/U9d68TZ@Asurada-Nvidia>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-10-yi.l.liu@intel.com>
+ <BN9PR11MB527690EBAA872A16AE8926F88C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <DS0PR11MB7529F4D4DABBE29E9B7BF5C9C30CA@DS0PR11MB7529.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230807110936.21819-47-zhengqi.arch@bytedance.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <DS0PR11MB7529F4D4DABBE29E9B7BF5C9C30CA@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000252A0:EE_|SN7PR12MB6689:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2cda00ae-25f4-468f-55de-08db97bd5b9c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: n0WLcyo5yUAUJhOWtpYtkCmk/TN7egcaFnOw0k/NZsHIkIYqnHYPBUpbgXbAJjQ0a5qpR8apH7LJe2ZLKZZhSWhQ1J2P1Z99WyX9FAU+RmWDs58t60Fekfkeb+iMfCaAdehzRsyZNoBTREmxD+70E8LkkyiVD7Cm0zkiEQVi8uJCx7KaKNaF74nvL5YAT90s5az7JL5B68VEGVMI5kZS4uiqMdkxSDx5Rr3vLIYuqEENs/iL9EFv578TDSCaJ+eW1sFyY3xwGZbs9/H9NqR1qnrl/tFWKw+0msPvsSMRZvzD+ZP+mtoPbXXdV3fdu5DpPppfKQhtK6MuhWDPExSLm9sZiSrSQqMLt5NLwqCzIJK5DyvKwf4vapfAyrlBbO3F0atTMDulSQqtPNpkv+7AKWmtInHXPZYqrzdXssqIft6p6Y7P0GSansUPej5ZvvSk1su9FiK+IzLF6sE5cyD0is1Qh+CnEEJXCcBECacB5AWm1z2J7WAI2RPfWWJAehxhvPoefk96n2U0uhLFMFgL9h9OeWuirUlkKdyG+qg0IqPx9Y/3ro/azBZ/bKFU0aijaieNCo1/hl7ZCJ2nG2v5Km6ce/av1Ci89LGgWuHac91pOrLr0DpQslu3uVS6+qtjE0/0Dm6IhOGD54PqtLbUdbn0ZQpa/h4WoIX/w1cBWZ3N8hvyE686Vx9GEUr4ZGDjspoUjEfFY+Ys6rjc2WAyng1xLEKN6mRnomAnkrKpUehsDMqM8VyB78vVF4terAt17E6CNmUAKz+SZJVTgim0Mauw/GAAYjigBHgimI9RGkspGuPNRNIpjwNFMd1ZOs2N
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199021)(82310400008)(186006)(1800799003)(90011799007)(90021799007)(40470700004)(46966006)(36840700001)(70206006)(4326008)(6916009)(41300700001)(316002)(2906002)(54906003)(478600001)(9686003)(26005)(336012)(7416002)(8676002)(8936002)(70586007)(5660300002)(426003)(47076005)(83380400001)(86362001)(36860700001)(40460700003)(40480700001)(356005)(7636003)(55016003)(82740400003)(33716001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 03:12:54.3236
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cda00ae-25f4-468f-55de-08db97bd5b9c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF000252A0.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6689
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 07, 2023 at 07:09:34PM +0800, Qi Zheng wrote:
-> Like global slab shrink, this commit also uses refcount+RCU method to make
-> memcg slab shrink lockless.
+On Mon, Aug 07, 2023 at 03:08:29PM +0000, Liu, Yi L wrote:
+> > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > Sent: Monday, July 24, 2023 7:14 PM
+> > >
+> > > +static int intel_nested_cache_invalidate_user(struct iommu_domain
+> > > *domain,
+> > > +                                         void *user_data)
+> > > +{
+> > > +   struct iommu_hwpt_vtd_s1_invalidate_desc *req = user_data;
+> > > +   struct iommu_hwpt_vtd_s1_invalidate *inv_info = user_data;
+> > > +   struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+> > > +   unsigned int entry_size = inv_info->entry_size;
+> > > +   u64 uptr = inv_info->inv_data_uptr;
+> > > +   u64 nr_uptr = inv_info->entry_nr_uptr;
+> > > +   struct device_domain_info *info;
+> > > +   u32 entry_nr, index;
+> > > +   unsigned long flags;
+> > > +   int ret = 0;
+> > > +
+> > > +   if (get_user(entry_nr, (uint32_t __user *)u64_to_user_ptr(nr_uptr)))
+> > > +           return -EFAULT;
+> > > +
+> > > +   for (index = 0; index < entry_nr; index++) {
+> > > +           ret = copy_struct_from_user(req, sizeof(*req),
+> > > +                                       u64_to_user_ptr(uptr + index *
+> > > entry_size),
+> > > +                                       entry_size);
+> >
+> > If continuing this direction then the driver should also check minsz etc.
+> > for struct iommu_hwpt_vtd_s1_invalidate and iommu_hwpt_vtd_s1_invalidate_desc
+> > since they are uAPI and subject to change.
+> 
+> Then needs to define size in the uapi data structure, and copy size first and
+> check minsz before going forward. How about the structures for hwpt alloc
+> like struct iommu_hwpt_vtd_s1? Should check minsz for them as well?
 
-This patch does random code cleanups amongst the actual RCU changes.
-Can you please move the cleanups to a spearate patch to reduce the
-noise in this one?
+Assuming that every uAPI data structure needs a min_size, we can
+either add a structure holding all min_sizes like iommufd main.c
+or have another xx_min_len in iommu_/domain_ops.
 
-> diff --git a/mm/shrinker.c b/mm/shrinker.c
-> index d318f5621862..fee6f62904fb 100644
-> --- a/mm/shrinker.c
-> +++ b/mm/shrinker.c
-> @@ -107,6 +107,12 @@ static struct shrinker_info *shrinker_info_protected(struct mem_cgroup *memcg,
->  					 lockdep_is_held(&shrinker_rwsem));
->  }
->  
-> +static struct shrinker_info *shrinker_info_rcu(struct mem_cgroup *memcg,
-> +					       int nid)
-> +{
-> +	return rcu_dereference(memcg->nodeinfo[nid]->shrinker_info);
-> +}
+Currently, we have the union of structures in iommu.h and also a
+xx_data_len in iommu_ops. So, neither of the two places seem to
+be optimal from my p.o.v... any suggestion?
 
-This helper doesn't add value. It doesn't tell me that
-rcu_read_lock() needs to be held when it is called, for one....
+Also, alloc allows data_len=0, so a min_size check will be only
+applied to data_len > 0 case.
 
->  static int expand_one_shrinker_info(struct mem_cgroup *memcg, int new_size,
->  				    int old_size, int new_nr_max)
->  {
-> @@ -198,7 +204,7 @@ void set_shrinker_bit(struct mem_cgroup *memcg, int nid, int shrinker_id)
->  		struct shrinker_info_unit *unit;
->  
->  		rcu_read_lock();
-> -		info = rcu_dereference(memcg->nodeinfo[nid]->shrinker_info);
-> +		info = shrinker_info_rcu(memcg, nid);
-
-... whilst the original code here was obviously correct.
-
->  		unit = info->unit[shriner_id_to_index(shrinker_id)];
->  		if (!WARN_ON_ONCE(shrinker_id >= info->map_nr_max)) {
->  			/* Pairs with smp mb in shrink_slab() */
-> @@ -211,7 +217,7 @@ void set_shrinker_bit(struct mem_cgroup *memcg, int nid, int shrinker_id)
->  
->  static DEFINE_IDR(shrinker_idr);
->  
-> -static int prealloc_memcg_shrinker(struct shrinker *shrinker)
-> +static int shrinker_memcg_alloc(struct shrinker *shrinker)
-
-Cleanups in a separate patch.
-
-> @@ -253,10 +258,15 @@ static long xchg_nr_deferred_memcg(int nid, struct shrinker *shrinker,
->  {
->  	struct shrinker_info *info;
->  	struct shrinker_info_unit *unit;
-> +	long nr_deferred;
->  
-> -	info = shrinker_info_protected(memcg, nid);
-> +	rcu_read_lock();
-> +	info = shrinker_info_rcu(memcg, nid);
->  	unit = info->unit[shriner_id_to_index(shrinker->id)];
-> -	return atomic_long_xchg(&unit->nr_deferred[shriner_id_to_offset(shrinker->id)], 0);
-> +	nr_deferred = atomic_long_xchg(&unit->nr_deferred[shriner_id_to_offset(shrinker->id)], 0);
-> +	rcu_read_unlock();
-> +
-> +	return nr_deferred;
->  }
-
-This adds two rcu_read_lock() sections to every call to
-do_shrink_slab(). It's not at all clear ifrom any of the other code
-that do_shrink_slab() now has internal rcu_read_lock() sections....
-
-> @@ -464,18 +480,23 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->  	if (!mem_cgroup_online(memcg))
->  		return 0;
->  
-> -	if (!down_read_trylock(&shrinker_rwsem))
-> -		return 0;
-> -
-> -	info = shrinker_info_protected(memcg, nid);
-> +again:
-> +	rcu_read_lock();
-> +	info = shrinker_info_rcu(memcg, nid);
->  	if (unlikely(!info))
->  		goto unlock;
->  
-> -	for (; index < shriner_id_to_index(info->map_nr_max); index++) {
-> +	if (index < shriner_id_to_index(info->map_nr_max)) {
->  		struct shrinker_info_unit *unit;
->  
->  		unit = info->unit[index];
->  
-> +		/*
-> +		 * The shrinker_info_unit will not be freed, so we can
-> +		 * safely release the RCU lock here.
-> +		 */
-> +		rcu_read_unlock();
-
-Why - what guarantees that the shrinker_info_unit exists at this
-point? We hold no reference to it, we hold no reference to any
-shrinker, etc. What provides this existence guarantee?
-
-> +
->  		for_each_set_bit(offset, unit->map, SHRINKER_UNIT_BITS) {
->  			struct shrink_control sc = {
->  				.gfp_mask = gfp_mask,
-> @@ -485,12 +506,14 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->  			struct shrinker *shrinker;
->  			int shrinker_id = calc_shrinker_id(index, offset);
->  
-> +			rcu_read_lock();
->  			shrinker = idr_find(&shrinker_idr, shrinker_id);
-> -			if (unlikely(!shrinker || !(shrinker->flags & SHRINKER_REGISTERED))) {
-> -				if (!shrinker)
-> -					clear_bit(offset, unit->map);
-> +			if (unlikely(!shrinker || !shrinker_try_get(shrinker))) {
-> +				clear_bit(offset, unit->map);
-> +				rcu_read_unlock();
->  				continue;
->  			}
-> +			rcu_read_unlock();
->  
->  			/* Call non-slab shrinkers even though kmem is disabled */
->  			if (!memcg_kmem_online() &&
-> @@ -523,15 +546,20 @@ static unsigned long shrink_slab_memcg(gfp_t gfp_mask, int nid,
->  					set_shrinker_bit(memcg, nid, shrinker_id);
->  			}
->  			freed += ret;
-> -
-> -			if (rwsem_is_contended(&shrinker_rwsem)) {
-> -				freed = freed ? : 1;
-> -				goto unlock;
-> -			}
-> +			shrinker_put(shrinker);
-
-Ok, so why is this safe to call without holding the rcu read lock?
-The global shrinker has to hold the rcu_read_lock() whilst calling
-shrinker_put() to guarantee the validity of the list next pointer,
-but we don't hold off RCU here so what guarantees a racing global
-shrinker walk doesn't trip over this shrinker_put() call dropping
-the refcount to zero and freeing occuring in a different context...
-
-
-> +		/*
-> +		 * We have already exited the read-side of rcu critical section
-> +		 * before calling do_shrink_slab(), the shrinker_info may be
-> +		 * released in expand_one_shrinker_info(), so reacquire the
-> +		 * shrinker_info.
-> +		 */
-> +		index++;
-> +		goto again;
-
-With that, what makes the use of shrinker_info in
-xchg_nr_deferred_memcg() in do_shrink_slab() coherent and valid?
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Thanks
+Nic
