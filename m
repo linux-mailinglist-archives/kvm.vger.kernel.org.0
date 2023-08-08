@@ -2,638 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EF7F774B4B
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:44:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DB64774B3E
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234826AbjHHUoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 16:44:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59092 "EHLO
+        id S234521AbjHHUny (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 16:43:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234586AbjHHUn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:43:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEA530A46
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:31:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691512278;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kixB0wIrpelEHk5JF5XLhPboyqV2/WZx+8wUvbWNpw8=;
-        b=LL1t+5V2As9fjMiWGMakHQ/q0HaCCXLw1LT81U4+tmtsg1p650I709/aGfrqNtkPcvPAL0
-        vbSyxdBxX+ZiJfNtCmDVX207hOLCvQU9+QRtwitHGfaI3zfDAj+MTepjcAQXs/38hpnJdQ
-        f6XWDEE+2zrKVyi4Qf0NId7Rkr6r6RA=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-128-a2hFChyIOEW8xQYRd8xabw-1; Tue, 08 Aug 2023 08:30:16 -0400
-X-MC-Unique: a2hFChyIOEW8xQYRd8xabw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-76cf0c77d07so631512285a.0
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 05:30:16 -0700 (PDT)
+        with ESMTP id S234422AbjHHUnf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 16:43:35 -0400
+Received: from mail-oi1-x249.google.com (mail-oi1-x249.google.com [IPv6:2607:f8b0:4864:20::249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0E3D92AD
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:31:48 -0700 (PDT)
+Received: by mail-oi1-x249.google.com with SMTP id 5614622812f47-3a79a9395dfso20999b6e.1
+        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 09:31:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691512275; x=1692117075;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HGXHZ3drdzK75vM8gHoxCvKjL0tQ6wzVt3s6s+3IffU=;
+        b=Pqy7yR/h1JfVyYBndU/ff2WNqRF/Cn024xB+7NRlHPhGu0/SiyrAmfRd5OmdT6Eotn
+         4fFa7nfny115Uv4b3qFCXr9CzKTRjmyhZ+ovCd+5t6fTAh1+XdfQE2wHYzu/NO2hRjvE
+         zKbE6voNKutiA+4PAJKrDd/YCTQcLX6HZ9EzDL2yj3kUmUafe/D+78PuXLRmqYeztauI
+         BY5PnSHdm5SHZLqcHfzK8OBampZNBjxpLrrUKPxTgGyP9qGvgJDscLUmCCzHW+IMd5K0
+         kz/st7RYocW5PnRhcpmA+zi62bUtZVlsHuBZntsdUt8ZTVc4/dJvOt25umgvUNWr4DLo
+         ciRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691497816; x=1692102616;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kixB0wIrpelEHk5JF5XLhPboyqV2/WZx+8wUvbWNpw8=;
-        b=WX8j7rcjBRLUEvpwC3uSpFwkWEigZ6hK/ziygx5e1a2qNogP2IzrnNqEf38u4vHGby
-         9O3ZNobR5IBQ5AvS0C+ZJXonNQhRtEeZdqqElD6F913/z3wLfJLaRkNx6989oaxE9sEf
-         d31uPkdd1V9XMIX/K933CC72NJXOx8DDWMYwBjbVKRYr9NW5njfmibUu1rmQWWQ8JBux
-         PuSM9ihbt3oIMTQDAHXLjsrbNKwswwU7U+Td+qCgXiNtD79zRNt8SjLQoFxHxMZjNHgw
-         kRz1KhSvpNtL/VsoPEzE5jOi5Bw0UMNZCl7ICFYcHG1mkkiJ4L/XQBX6gRkMA1o6ObGe
-         Rd2g==
-X-Gm-Message-State: AOJu0YzLxCbTjKZbYy48efFpG7Hh8vf9jqpq5650JjzWGCxC+RWr1pyq
-        lnQUXeCJh1BVADTO6f66Id+0Evv3NKeXVwE1k7j1HSaZDvLFj+0a6RNsqtKMSeqOulDNiYJ0gsm
-        QIGfprQdB6HXx
-X-Received: by 2002:a05:620a:4708:b0:765:a89b:ce04 with SMTP id bs8-20020a05620a470800b00765a89bce04mr14918854qkb.59.1691497815951;
-        Tue, 08 Aug 2023 05:30:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF3ccSDlIbY+bfKLLpEpVP/My+jPpT4i42qQl6vqYLTg5fHyGhqr9AGATeDKTi0R/5v92SsNQ==
-X-Received: by 2002:a05:620a:4708:b0:765:a89b:ce04 with SMTP id bs8-20020a05620a470800b00765a89bce04mr14918825qkb.59.1691497815584;
-        Tue, 08 Aug 2023 05:30:15 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id f16-20020a05620a15b000b0076c94030a2esm3261095qkk.114.2023.08.08.05.30.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 05:30:14 -0700 (PDT)
-Message-ID: <3d79c5c5-6e70-04c3-381e-93cffc61640e@redhat.com>
-Date:   Tue, 8 Aug 2023 14:30:09 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 22/27] KVM: arm64: nv: Add trap forwarding for
- HDFGxTR_EL2
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
- <20230808114711.2013842-23-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230808114711.2013842-23-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,UPPERCASE_75_100 autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691512275; x=1692117075;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HGXHZ3drdzK75vM8gHoxCvKjL0tQ6wzVt3s6s+3IffU=;
+        b=VE5TWyio++GKoqNfCAd1nkszqOPzm1YcxXGiTEpWzKMFkBL5M2S62Y94zmBA8rjxX7
+         bqIrE7sDFs6/Y9tttKzYaqvTsV7qtnUoq2qkP8Pa8dBSN2HcnZzgEFBJY/xC0usT2rye
+         QK8lPBHSrGYsWlc2ZFm9xelEjNwW36eMbyaLmpLGPKtSrKZlATJxFMcY8AxtPu8ZHew4
+         VDHILVfp3LJ4KlFunEjGa7FL6EYSwDAJYXmY12HBf6JGOlwv8vd69ysoQf4+P6Pm40uo
+         m6AJFY890JGxbiWGvhispmweKlMnd52HPZ7fW7hMwc7KsUhq4UXdem4KLsZQigDuD0b3
+         vQ2Q==
+X-Gm-Message-State: AOJu0YxF2cYG2CO8BT9Rwpltfk4tBfs+zrQ6bFtJYb6Oy4Z8AwNv94fS
+        s9GApHQiwT5LmPsCbxlEVhCL2r/9EWo=
+X-Google-Smtp-Source: AGHT+IHIu+df+uNKRHuZ1U7hdYtwjQKpOkRRORgxpZw3jGTJRzS8amVnvOKjBjsEBYetabpmhnKN6Bq+h1o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:1e88:0:b0:d10:a33d:36b6 with SMTP id
+ e130-20020a251e88000000b00d10a33d36b6mr118914ybe.0.1691505071871; Tue, 08 Aug
+ 2023 07:31:11 -0700 (PDT)
+Date:   Tue, 8 Aug 2023 14:31:10 +0000
+In-Reply-To: <20230808114006.73970-1-likexu@tencent.com>
+Mime-Version: 1.0
+References: <20230808114006.73970-1-likexu@tencent.com>
+Message-ID: <ZNJRrqk1cFFo5BoP@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Remove unused "const u8 *new" for kvm_mmu_track_write()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Tue, Aug 08, 2023, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> The incoming parameter @new has not been required since commit 0e0fee5c539b
+> ("kvm: mmu: Fix race in emulated page table writes"). And the callback
+> kvmgt_page_track_write() registered by KVMGT still formally consumes it.
+> 
+> No functional change intended.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
 
-On 8/8/23 13:47, Marc Zyngier wrote:
-> ... and finally, the Debug version of FGT, with its *enormous*
-> list of trapped registers.
->
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h |  11 +
->  arch/arm64/kvm/emulate-nested.c  | 474 +++++++++++++++++++++++++++++++
->  2 files changed, 485 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 809bc86acefd..d229f238c3b6 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -358,6 +358,17 @@
->  #define __HFGITR_EL2_MASK	GENMASK(54, 0)
->  #define __HFGITR_EL2_nMASK	GENMASK(56, 55)
->  
-> +#define __HDFGRTR_EL2_RES0	(BIT(49) | BIT(42) | GENMASK(39, 38) |	\
-> +				 GENMASK(21, 20) | BIT(8))
-> +#define __HDFGRTR_EL2_MASK	~__HDFGRTR_EL2_nMASK
-> +#define __HDFGRTR_EL2_nMASK	GENMASK(62, 59)
-> +
-> +#define __HDFGWTR_EL2_RES0	(BIT(63) | GENMASK(59, 58) | BIT(51) | BIT(47) | \
-> +				 BIT(43) | GENMASK(40, 38) | BIT(34) | BIT(30) | \
-> +				 BIT(22) | BIT(9) | BIT(6))
-> +#define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
-> +#define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
-> +
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
->  /*
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 46f6982202e2..4497666db45d 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -931,6 +931,8 @@ static DEFINE_XARRAY(sr_forward_xa);
->  enum fgt_group_id {
->  	__NO_FGT_GROUP__,
->  	HFGxTR_GROUP,
-> +	HDFGRTR_GROUP,
-> +	HDFGWTR_GROUP,
->  	HFGITR_GROUP,
->  
->  	/* Must be last */
-> @@ -1116,6 +1118,470 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
->  	SR_FGT(SYS_IC_IVAU, 		HFGITR, ICIVAU, 1),
->  	SR_FGT(SYS_IC_IALLU, 		HFGITR, ICIALLU, 1),
->  	SR_FGT(SYS_IC_IALLUIS, 		HFGITR, ICIALLUIS, 1),
-> +	/* HDFGRTR_EL2 */
-> +	SR_FGT(SYS_PMBIDR_EL1, 		HDFGRTR, PMBIDR_EL1, 1),
-> +	SR_FGT(SYS_PMSNEVFR_EL1, 	HDFGRTR, nPMSNEVFR_EL1, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(0), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(1), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(2), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(3), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(4), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(5), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(6), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(7), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(8), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(9), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(10), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(11), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(12), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(13), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(14), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(15), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(16), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(17), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(18), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(19), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(20), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(21), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(22), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(23), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(24), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(25), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(26), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(27), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(28), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(29), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(30), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINF_EL1(31), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBINFINJ_EL1, 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(0), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(1), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(2), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(3), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(4), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(5), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(6), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(7), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(8), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(9), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(10), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(11), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(12), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(13), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(14), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(15), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(16), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(17), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(18), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(19), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(20), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(21), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(22), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(23), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(24), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(25), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(26), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(27), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(28), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(29), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(30), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRC_EL1(31), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBSRCINJ_EL1, 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(0), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(1), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(2), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(3), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(4), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(5), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(6), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(7), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(8), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(9), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(10), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(11), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(12), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(13), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(14), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(15), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(16), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(17), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(18), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(19), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(20), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(21), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(22), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(23), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(24), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(25), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(26), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(27), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(28), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(29), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(30), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGT_EL1(31), 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTGTINJ_EL1, 	HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBTS_EL1, 		HDFGRTR, nBRBDATA, 0),
-> +	SR_FGT(SYS_BRBCR_EL1, 		HDFGRTR, nBRBCTL, 0),
-> +	SR_FGT(SYS_BRBFCR_EL1, 		HDFGRTR, nBRBCTL, 0),
-> +	SR_FGT(SYS_BRBIDR0_EL1, 	HDFGRTR, nBRBIDR, 0),
-> +	SR_FGT(SYS_PMCEID0_EL0, 	HDFGRTR, PMCEIDn_EL0, 1),
-> +	SR_FGT(SYS_PMCEID1_EL0, 	HDFGRTR, PMCEIDn_EL0, 1),
-> +	SR_FGT(SYS_PMUSERENR_EL0, 	HDFGRTR, PMUSERENR_EL0, 1),
-> +	SR_FGT(SYS_TRBTRG_EL1, 		HDFGRTR, TRBTRG_EL1, 1),
-> +	SR_FGT(SYS_TRBSR_EL1, 		HDFGRTR, TRBSR_EL1, 1),
-> +	SR_FGT(SYS_TRBPTR_EL1, 		HDFGRTR, TRBPTR_EL1, 1),
-> +	SR_FGT(SYS_TRBMAR_EL1, 		HDFGRTR, TRBMAR_EL1, 1),
-> +	SR_FGT(SYS_TRBLIMITR_EL1, 	HDFGRTR, TRBLIMITR_EL1, 1),
-> +	SR_FGT(SYS_TRBIDR_EL1, 		HDFGRTR, TRBIDR_EL1, 1),
-> +	SR_FGT(SYS_TRBBASER_EL1, 	HDFGRTR, TRBBASER_EL1, 1),
-> +	SR_FGT(SYS_TRCVICTLR, 		HDFGRTR, TRCVICTLR, 1),
-> +	SR_FGT(SYS_TRCSTATR, 		HDFGRTR, TRCSTATR, 1),
-> +	SR_FGT(SYS_TRCSSCSR(0), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(1), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(2), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(3), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(4), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(5), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(6), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSSCSR(7), 	HDFGRTR, TRCSSCSRn, 1),
-> +	SR_FGT(SYS_TRCSEQSTR, 		HDFGRTR, TRCSEQSTR, 1),
-> +	SR_FGT(SYS_TRCPRGCTLR, 		HDFGRTR, TRCPRGCTLR, 1),
-> +	SR_FGT(SYS_TRCOSLSR, 		HDFGRTR, TRCOSLSR, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(0), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(1), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(2), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(3), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(4), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(5), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(6), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCIMSPEC(7), 	HDFGRTR, TRCIMSPECn, 1),
-> +	SR_FGT(SYS_TRCDEVARCH, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCDEVID, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR0, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR1, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR2, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR3, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR4, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR5, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR6, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR7, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR8, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR9, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR10, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR11, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR12, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCIDR13, 		HDFGRTR, TRCID, 1),
-> +	SR_FGT(SYS_TRCCNTVR(0), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCNTVR(1), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCNTVR(2), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCNTVR(3), 	HDFGRTR, TRCCNTVRn, 1),
-> +	SR_FGT(SYS_TRCCLAIMCLR, 	HDFGRTR, TRCCLAIM, 1),
-> +	SR_FGT(SYS_TRCCLAIMSET, 	HDFGRTR, TRCCLAIM, 1),
-> +	SR_FGT(SYS_TRCAUXCTLR, 		HDFGRTR, TRCAUXCTLR, 1),
-> +	SR_FGT(SYS_TRCAUTHSTATUS, 	HDFGRTR, TRCAUTHSTATUS, 1),
-> +	SR_FGT(SYS_TRCACATR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(8), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(9), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(10), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(11), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(12), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(13), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(14), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACATR(15), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(0), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(1), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(2), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(3), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(4), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(5), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(6), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(7), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(8), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(9), 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(10), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(11), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(12), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(13), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(14), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCACVR(15), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCBBCTLR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCCCTLR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCCTLR0, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCCTLR1, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCIDCVR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTCTLR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTCTLR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTCTLR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTCTLR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTRLDVR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTRLDVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTRLDVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCNTRLDVR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCCONFIGR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEVENTCTL0R, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEVENTCTL1R, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEXTINSELR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEXTINSELR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEXTINSELR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCEXTINSELR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCQCTLR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(8), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(9), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(10), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(11), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(12), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(13), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(14), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(15), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(16), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(17), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(18), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(19), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(20), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(21), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(22), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(23), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(24), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(25), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(26), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(27), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(28), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(29), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(30), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSCTLR(31), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCRSR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQEVR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQEVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQEVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSEQRSTEVR, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSCCR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSSPCICR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSTALLCTLR, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCSYNCPR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCTRACEIDR, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCTSCTLR, 		HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVIIECTLR, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVIPCSSCTLR, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVISSCTLR, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCCTLR0, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCCTLR1, 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(0), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(1), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(2), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(3), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(4), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(5), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(6), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_TRCVMIDCVR(7), 	HDFGRTR, TRC, 1),
-> +	SR_FGT(SYS_PMSLATFR_EL1, 	HDFGRTR, PMSLATFR_EL1, 1),
-> +	SR_FGT(SYS_PMSIRR_EL1, 		HDFGRTR, PMSIRR_EL1, 1),
-> +	SR_FGT(SYS_PMSIDR_EL1, 		HDFGRTR, PMSIDR_EL1, 1),
-> +	SR_FGT(SYS_PMSICR_EL1, 		HDFGRTR, PMSICR_EL1, 1),
-> +	SR_FGT(SYS_PMSFCR_EL1, 		HDFGRTR, PMSFCR_EL1, 1),
-> +	SR_FGT(SYS_PMSEVFR_EL1, 	HDFGRTR, PMSEVFR_EL1, 1),
-> +	SR_FGT(SYS_PMSCR_EL1, 		HDFGRTR, PMSCR_EL1, 1),
-> +	SR_FGT(SYS_PMBSR_EL1, 		HDFGRTR, PMBSR_EL1, 1),
-> +	SR_FGT(SYS_PMBPTR_EL1, 		HDFGRTR, PMBPTR_EL1, 1),
-> +	SR_FGT(SYS_PMBLIMITR_EL1, 	HDFGRTR, PMBLIMITR_EL1, 1),
-> +	SR_FGT(SYS_PMMIR_EL1, 		HDFGRTR, PMMIR_EL1, 1),
-> +	SR_FGT(SYS_PMSELR_EL0, 		HDFGRTR, PMSELR_EL0, 1),
-> +	SR_FGT(SYS_PMOVSCLR_EL0, 	HDFGRTR, PMOVS, 1),
-> +	SR_FGT(SYS_PMOVSSET_EL0, 	HDFGRTR, PMOVS, 1),
-> +	SR_FGT(SYS_PMINTENCLR_EL1, 	HDFGRTR, PMINTEN, 1),
-> +	SR_FGT(SYS_PMINTENSET_EL1, 	HDFGRTR, PMINTEN, 1),
-> +	SR_FGT(SYS_PMCNTENCLR_EL0, 	HDFGRTR, PMCNTEN, 1),
-> +	SR_FGT(SYS_PMCNTENSET_EL0, 	HDFGRTR, PMCNTEN, 1),
-> +	SR_FGT(SYS_PMCCNTR_EL0, 	HDFGRTR, PMCCNTR_EL0, 1),
-> +	SR_FGT(SYS_PMCCFILTR_EL0, 	HDFGRTR, PMCCFILTR_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(0), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(1), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(2), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(3), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(4), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(5), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(6), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(7), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(8), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(9), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(10), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(11), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(12), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(13), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(14), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(15), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(16), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(17), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(18), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(19), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(20), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(21), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(22), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(23), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(24), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(25), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(26), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(27), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(28), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(29), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVTYPERn_EL0(30), 	HDFGRTR, PMEVTYPERn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(0), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(1), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(2), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(3), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(4), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(5), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(6), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(7), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(8), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(9), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(10), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(11), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(12), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(13), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(14), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(15), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(16), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(17), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(18), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(19), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(20), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(21), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(22), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(23), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(24), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(25), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(26), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(27), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(28), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(29), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_PMEVCNTRn_EL0(30), 	HDFGRTR, PMEVCNTRn_EL0, 1),
-> +	SR_FGT(SYS_OSDLR_EL1, 		HDFGRTR, OSDLR_EL1, 1),
-> +	SR_FGT(SYS_OSECCR_EL1, 		HDFGRTR, OSECCR_EL1, 1),
-> +	SR_FGT(SYS_OSLSR_EL1, 		HDFGRTR, OSLSR_EL1, 1),
-> +	SR_FGT(SYS_DBGPRCR_EL1, 	HDFGRTR, DBGPRCR_EL1, 1),
-> +	SR_FGT(SYS_DBGAUTHSTATUS_EL1, 	HDFGRTR, DBGAUTHSTATUS_EL1, 1),
-> +	SR_FGT(SYS_DBGCLAIMSET_EL1, 	HDFGRTR, DBGCLAIM, 1),
-> +	SR_FGT(SYS_DBGCLAIMCLR_EL1, 	HDFGRTR, DBGCLAIM, 1),
-> +	SR_FGT(SYS_MDSCR_EL1, 		HDFGRTR, MDSCR_EL1, 1),
-> +	/*
-> +	 * The trap bits capture *64* debug registers per bit, but the
-> +	 * ARM ARM only describes the encoding for the first 16, and
-> +	 * we don't really support more than that anyway.
-> +	 */
-> +	SR_FGT(SYS_DBGWVRn_EL1(0), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(1), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(2), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(3), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(4), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(5), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(6), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(7), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(8), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(9), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(10), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(11), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(12), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(13), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(14), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWVRn_EL1(15), 	HDFGRTR, DBGWVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(0), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(1), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(2), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(3), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(4), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(5), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(6), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(7), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(8), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(9), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(10), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(11), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(12), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(13), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(14), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGWCRn_EL1(15), 	HDFGRTR, DBGWCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(0), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(1), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(2), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(3), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(4), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(5), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(6), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(7), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(8), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(9), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(10), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(11), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(12), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(13), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(14), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBVRn_EL1(15), 	HDFGRTR, DBGBVRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(0), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(1), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(2), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(3), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(4), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(5), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(6), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(7), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(8), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(9), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(10), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(11), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(12), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(13), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(14), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	SR_FGT(SYS_DBGBCRn_EL1(15), 	HDFGRTR, DBGBCRn_EL1, 1),
-> +	/*
-> +	 * HDFGWTR_EL2
-> +	 *
-> +	 * Although HDFGRTR_EL2 and HDFGWTR_EL2 registers largely
-> +	 * overlap in their bit assignment, there are a number of bits
-> +	 * that are RES0 on one side, and an actual trap bit on the
-> +	 * other.  The policy chosen here is to describe all the
-> +	 * read-side mappings, and only the write-side mappings that
-> +	 * differ from the read side, and the trap handler will pick
-> +	 * the correct shadow register based on the access type.
-> +	 */
-> +	SR_FGT(SYS_TRFCR_EL1,		HDFGWTR, TRFCR_EL1, 1),
-> +	SR_FGT(SYS_TRCOSLAR,		HDFGWTR, TRCOSLAR, 1),
-> +	SR_FGT(SYS_PMCR_EL0,		HDFGWTR, PMCR_EL0, 1),
-> +	SR_FGT(SYS_PMSWINC_EL0,		HDFGWTR, PMSWINC_EL0, 1),
-> +	SR_FGT(SYS_OSLAR_EL1,		HDFGWTR, OSLAR_EL1, 1),
->  };
->  
->  static union trap_config get_trap_config(u32 sysreg)
-> @@ -1303,6 +1769,14 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->  			val = sanitised_sys_reg(vcpu, HFGWTR_EL2);
->  		break;
->  
-> +	case HDFGRTR_GROUP:
-> +	case HDFGWTR_GROUP:
-> +		if (is_read)
-> +			val = sanitised_sys_reg(vcpu, HDFGRTR_EL2);
-> +		else
-> +			val = sanitised_sys_reg(vcpu, HDFGWTR_EL2);
-> +		break;
-> +
->  	case HFGITR_GROUP:
->  		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
->  		break;
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+No need to give me credit, you spotted the unnecessary param, all I did was confirm
+that it wasn't needed.
 
-Eric
+> -void kvm_mmu_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+> -			 int bytes)
+> +void kvm_mmu_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, int bytes)
+>  {
+>  	gfn_t gfn = gpa >> PAGE_SHIFT;
+>  	struct kvm_mmu_page *sp;
+> diff --git a/arch/x86/kvm/mmu/page_track.h b/arch/x86/kvm/mmu/page_track.h
+> index 62f98c6c5af3..ea5dfd53b5c4 100644
+> --- a/arch/x86/kvm/mmu/page_track.h
+> +++ b/arch/x86/kvm/mmu/page_track.h
+> @@ -52,7 +52,7 @@ static inline void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
 
+Please remove it from the entire kvm_page_track_write() chain.  Yes, it will be
+a larger patch and need an ack from the KVMGT folks, but there is no reason to
+only do a partial cleanup
