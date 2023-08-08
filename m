@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEF00774767
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 21:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28C3877458B
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:43:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235721AbjHHTOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 15:14:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54572 "EHLO
+        id S230486AbjHHSna (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 14:43:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235419AbjHHTOD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 15:14:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B4D135DD1
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:36:58 -0700 (PDT)
+        with ESMTP id S230406AbjHHSnK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 14:43:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E84F1D96
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:36:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 198C661575
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 50DF862500
         for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:47:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E851C433CD;
-        Tue,  8 Aug 2023 11:47:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22302C433C7;
+        Tue,  8 Aug 2023 11:47:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691495238;
-        bh=ZWynGMiNxbCfXyb+flcel8KTpsG6pXxqx7Zk0SqPzK8=;
+        s=k20201202; t=1691495239;
+        bh=RYO2JAa7ghNvgDPNXogmd3jf0/ibv470rZsbZ6x/4Uw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lmfOdeKV2MGPDOIqw7wkrAwSIldINTPbAsKDdXZqjhvMRN3xMijlDuhQHZiPBsGmH
-         bWbXsMnguUN/SThJo3DLBGUAspVOEgWrmsO9th+P24ieq1adHtN4sDYH8TQ64OUsuy
-         uRaZZc0SvAzztBJfJYAsdJvWDmv7DX+fjYHQF/jPKqFUX6xOuD25C8FUotjrC0qLe/
-         rYYpwFmV1jtEJl9rBbHkAUYyiv//wcauekN0JXdV8JBObqx0dAorBYOpsV2aYaTBM5
-         5YTbS0HUXyrJPG4IHfdJwh9XPqYFu0u5HbzInXCssuBSoetgOZrVPLqF9ngiSg7jFB
-         YujtwINPohmHw==
+        b=lugcxRBcGQ9lUEhXOVSJG5gBXKxz6GQIQhcCpfXbrJR9dCVg5OeV0cXGWyLGDeV6L
+         AyGFBbugFeLcj48yNFKvptqJDsAZ3ERTej0iUvw6zzPul4KzJrw/RCkKJ4MW1IfbEe
+         tVdZNCUSCNRaMszuF1mmV7UcL8s18Bp8nQ8FmLHOBxERLM+uDiS3l98O/BrU8S7ADC
+         kUWKharWXPyF5H1kPyIj7Sm5I3iKjFfQFz+kYmJJGtgsATsiUNyiloRkOc2Nmu2pD+
+         pSiM6LbLHyIfdAoS8iafgOq2s5yKdw6sblHmbFF3iRwmDHiMn1qDHpOC/6C8kqhU8V
+         vFaOFBMKJ5jhA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qTLBE-0037Ph-M6;
-        Tue, 08 Aug 2023 12:47:16 +0100
+        id 1qTLBF-0037Ph-BQ;
+        Tue, 08 Aug 2023 12:47:17 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -56,9 +56,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
-Date:   Tue,  8 Aug 2023 12:46:50 +0100
-Message-Id: <20230808114711.2013842-7-maz@kernel.org>
+Subject: [PATCH v3 08/27] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+Date:   Tue,  8 Aug 2023 12:46:52 +0100
+Message-Id: <20230808114711.2013842-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -78,105 +78,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
-related registers. Add their encodings (and only that, because
-we really don't care about what these registers actually do at
-this stage).
+As we're about to implement full support for FEAT_FGT, add the
+full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
 
+Reviewed-by: Mark Brown <broonie@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 ---
- arch/arm64/include/asm/sysreg.h | 76 +++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+ arch/arm64/include/asm/sysreg.h |   2 -
+ arch/arm64/tools/sysreg         | 129 ++++++++++++++++++++++++++++++++
+ 2 files changed, 129 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 76289339b43b..bb5a0877a210 100644
+index 6d9d7ac4b31c..043c677e9f04 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -194,6 +194,82 @@
- #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
- #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
+@@ -495,8 +495,6 @@
+ #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
  
-+#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
-+#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)
-+#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
-+#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)
-+#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
-+#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)
-+#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)
+ #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+-#define SYS_HDFGRTR_EL2			sys_reg(3, 4, 3, 1, 4)
+-#define SYS_HDFGWTR_EL2			sys_reg(3, 4, 3, 1, 5)
+ #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+ #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 65866bf819c3..2517ef7c21cf 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2156,6 +2156,135 @@ Field	1	ICIALLU
+ Field	0	ICIALLUIS
+ EndSysreg
+ 
++Sysreg HDFGRTR_EL2	3	4	3	1	4
++Field	63	PMBIDR_EL1
++Field	62	nPMSNEVFR_EL1
++Field	61	nBRBDATA
++Field	60	nBRBCTL
++Field	59	nBRBIDR
++Field	58	PMCEIDn_EL0
++Field	57	PMUSERENR_EL0
++Field	56	TRBTRG_EL1
++Field	55	TRBSR_EL1
++Field	54	TRBPTR_EL1
++Field	53	TRBMAR_EL1
++Field	52	TRBLIMITR_EL1
++Field	51	TRBIDR_EL1
++Field	50	TRBBASER_EL1
++Res0	49
++Field	48	TRCVICTLR
++Field	47	TRCSTATR
++Field	46	TRCSSCSRn
++Field	45	TRCSEQSTR
++Field	44	TRCPRGCTLR
++Field	43	TRCOSLSR
++Res0	42
++Field	41	TRCIMSPECn
++Field	40	TRCID
++Res0	39:38
++Field	37	TRCCNTVRn
++Field	36	TRCCLAIM
++Field	35	TRCAUXCTLR
++Field	34	TRCAUTHSTATUS
++Field	33	TRC
++Field	32	PMSLATFR_EL1
++Field	31	PMSIRR_EL1
++Field	30	PMSIDR_EL1
++Field	29	PMSICR_EL1
++Field	28	PMSFCR_EL1
++Field	27	PMSEVFR_EL1
++Field	26	PMSCR_EL1
++Field	25	PMBSR_EL1
++Field	24	PMBPTR_EL1
++Field	23	PMBLIMITR_EL1
++Field	22	PMMIR_EL1
++Res0	21:20
++Field	19	PMSELR_EL0
++Field	18	PMOVS
++Field	17	PMINTEN
++Field	16	PMCNTEN
++Field	15	PMCCNTR_EL0
++Field	14	PMCCFILTR_EL0
++Field	13	PMEVTYPERn_EL0
++Field	12	PMEVCNTRn_EL0
++Field	11	OSDLR_EL1
++Field	10	OSECCR_EL1
++Field	9	OSLSR_EL1
++Res0	8
++Field	7	DBGPRCR_EL1
++Field	6	DBGAUTHSTATUS_EL1
++Field	5	DBGCLAIM
++Field	4	MDSCR_EL1
++Field	3	DBGWVRn_EL1
++Field	2	DBGWCRn_EL1
++Field	1	DBGBVRn_EL1
++Field	0	DBGBCRn_EL1
++EndSysreg
 +
-+#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)
-+#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)
-+#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)
++Sysreg HDFGWTR_EL2	3	4	3	1	5
++Res0	63
++Field	62	nPMSNEVFR_EL1
++Field	61	nBRBDATA
++Field	60	nBRBCTL
++Res0	59:58
++Field	57	PMUSERENR_EL0
++Field	56	TRBTRG_EL1
++Field	55	TRBSR_EL1
++Field	54	TRBPTR_EL1
++Field	53	TRBMAR_EL1
++Field	52	TRBLIMITR_EL1
++Res0	51
++Field	50	TRBBASER_EL1
++Field	49	TRFCR_EL1
++Field	48	TRCVICTLR
++Res0	47
++Field	46	TRCSSCSRn
++Field	45	TRCSEQSTR
++Field	44	TRCPRGCTLR
++Res0	43
++Field	42	TRCOSLAR
++Field	41	TRCIMSPECn
++Res0	40:38
++Field	37	TRCCNTVRn
++Field	36	TRCCLAIM
++Field	35	TRCAUXCTLR
++Res0	34
++Field	33	TRC
++Field	32	PMSLATFR_EL1
++Field	31	PMSIRR_EL1
++Res0	30
++Field	29	PMSICR_EL1
++Field	28	PMSFCR_EL1
++Field	27	PMSEVFR_EL1
++Field	26	PMSCR_EL1
++Field	25	PMBSR_EL1
++Field	24	PMBPTR_EL1
++Field	23	PMBLIMITR_EL1
++Res0	22
++Field	21	PMCR_EL0
++Field	20	PMSWINC_EL0
++Field	19	PMSELR_EL0
++Field	18	PMOVS
++Field	17	PMINTEN
++Field	16	PMCNTEN
++Field	15	PMCCNTR_EL0
++Field	14	PMCCFILTR_EL0
++Field	13	PMEVTYPERn_EL0
++Field	12	PMEVCNTRn_EL0
++Field	11	OSDLR_EL1
++Field	10	OSECCR_EL1
++Res0	9
++Field	8	OSLAR_EL1
++Field	7	DBGPRCR_EL1
++Res0	6
++Field	5	DBGCLAIM
++Field	4	MDSCR_EL1
++Field	3	DBGWVRn_EL1
++Field	2	DBGWCRn_EL1
++Field	1	DBGBVRn_EL1
++Field	0	DBGBCRn_EL1
++EndSysreg
 +
-+#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
-+#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
-+#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))
-+#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)
-+#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)
-+#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)
-+#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)
-+#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)
-+#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)
-+#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)
-+#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)
-+#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)
-+#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)
-+#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)
-+#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)
-+#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)
-+#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)
-+#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)
-+#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)
-+#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)
-+#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)
-+#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)
-+#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)
-+#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)
-+#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)
-+#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)
-+#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)
-+#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)
-+#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)
-+#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)
-+#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)
-+#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)
-+#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)
-+#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)
-+#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)
-+#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)
-+#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
-+#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)
-+#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)
-+#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)
-+#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))
-+#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)
-+#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)
-+#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)
-+#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)
-+#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)
-+#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)
-+#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)
-+#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)
-+#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)
-+#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)
-+#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)
-+#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)
-+#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)
-+#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)
-+#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)
-+#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)
-+#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)
-+#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)
-+#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)
-+
-+/* ETM */
-+#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
-+
- #define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
- #define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
- #define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
+ Sysreg	ZCR_EL2	3	4	1	2	0
+ Fields	ZCR_ELx
+ EndSysreg
 -- 
 2.34.1
 
