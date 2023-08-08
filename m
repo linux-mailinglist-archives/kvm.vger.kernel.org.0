@@ -2,200 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4867744BB
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:27:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A0B9774B28
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:42:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235872AbjHHS1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 14:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33740 "EHLO
+        id S229553AbjHHUmq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 16:42:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236048AbjHHS1P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 14:27:15 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2049.outbound.protection.outlook.com [40.107.102.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCAE7238E3;
-        Tue,  8 Aug 2023 10:42:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HGuV6FfVLbEUFR8RJgVimj9d/JyzuKo0Ywku6HURbKFtdveAbGT5A65suSIgOUz+tHc3OgHkTujQsiBgPbHwAjkAn7NlXifmhAg1sRXqxB4WvjcrkR4ym6/HGw/hk+zxgIA/ZZPPGLv4Nh75WGWGmjLcM8fNL+oCcBO6XPp+YCRHDJDFj5vmNN2pXUFX8w2PjKaLNEgGzpiLIEszhtQ5QtVUwgYmo4kFpekJDCDxeIcMRwT8adNEs77CCIufvc+TR9yawfVInY9dl8v+bb7FYsDRk7U6RLSoPGjxXrO3xpWdrwO/ikgpx/TEahB9gMsz0T2oO6tyL30QnGRHZ3RZlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=spIGaO4/zw0S2pIKf3YwYUO8KFM+Jm+Hn2CgzFxrPGs=;
- b=ClrFl7gcEmiZ4AwhIGQ0uwonegjWbKAeVUTredHP/yxe61+icvtHdPcVbvrUaAO8/mdaURwX4YMcN8qk2C6aIarjHE6Mcl/5kweGMNgwXR4SHddpmYYue3zWixL1xc19yd7UxtwHWdnZ18sDjQUNPIaHVCJCv/UhWnL3XXUkbkcj0XcNkpuKK8ptzsXpXfkSE2g6bLQpZVDjl9JqR1tj+ZvD7omuEYpjatIin2EwmyzYMmDz7Tnr5/v4KuNCRWFMb90bGORgCS3QUHkRSGRCFYhMPAHgui6OO7JcdBDC85KfiKzPwPJxzSK6LwwiJwqoKIHj71WPRRZXXQ0RQz/ufQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=spIGaO4/zw0S2pIKf3YwYUO8KFM+Jm+Hn2CgzFxrPGs=;
- b=gwg3mwLfhXmS1oVYJVWNrCmDuUysb2uxJfyMInse7OK5i/vQ5tk4TP4kBi7VVaqlJcZLQ+aA5XIl2PqhOQ2yKImH98axNUDoqLQmKgfluuXHVfpZwf+/0o/16qY+LUgU40PhWJmIC3+yGfvW4+5kOYSdQHoR/S8FUPi4QO0P46+YEOahdhtPnP5gaXs5nn17q+7AIBoFPfjupNDhEZ+H5+jQqq6Ha+P8FEXpBoUEHvJKqt9sBkK4nQYVLbbdAqvSDE/CCuWUBcAdM27K5/Urnh1uxiLYDnFYBCr1vz/WDrhtmGdcK177b+sMDykfj5GtqdGu+H76QAxTVzNE4GrV7A==
-Received: from MW4PR04CA0168.namprd04.prod.outlook.com (2603:10b6:303:85::23)
- by DS7PR12MB6024.namprd12.prod.outlook.com (2603:10b6:8:84::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Tue, 8 Aug
- 2023 17:42:04 +0000
-Received: from CO1PEPF000044F4.namprd05.prod.outlook.com
- (2603:10b6:303:85:cafe::46) by MW4PR04CA0168.outlook.office365.com
- (2603:10b6:303:85::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
- Transport; Tue, 8 Aug 2023 17:42:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000044F4.mail.protection.outlook.com (10.167.241.74) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 17:42:03 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 8 Aug 2023
- 10:41:41 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 8 Aug 2023
- 10:41:41 -0700
-Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
- Transport; Tue, 8 Aug 2023 10:41:40 -0700
-Date:   Tue, 8 Aug 2023 10:41:38 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
-Message-ID: <ZNJ+Uv/WJwngosjJ@Asurada-Nvidia>
-References: <20230724111335.107427-1-yi.l.liu@intel.com>
- <20230724111335.107427-10-yi.l.liu@intel.com>
- <BN9PR11MB527690EBAA872A16AE8926F88C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529F4D4DABBE29E9B7BF5C9C30CA@DS0PR11MB7529.namprd11.prod.outlook.com>
- <ZNGypUee/U9d68TZ@Asurada-Nvidia>
- <ZNI2O4Upyna5AWDA@nvidia.com>
+        with ESMTP id S229834AbjHHUls (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 16:41:48 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AAE78DCCF;
+        Tue,  8 Aug 2023 10:31:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691515897; x=1723051897;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eqRRMLl2kIoz0ZwHwY02c6d7SX45/i2Q/jssTnU7/tA=;
+  b=JmKkWqIA0/GVc8tGbrgwAMTXe8xpEcUH9BPs/q6KFqCy17gspPRcU9tt
+   gHlw+wnwJLuV7Fodg4OpAbUUhbXXGYvgMawZB0jgDcA5Yvy5kLOug2/46
+   Drnu0Y0q0WoBxUaHzPyD1X1+sRwWPtSCjrzGb6T3B+DJhtF7PTnp0DAs+
+   gZWErGyyoNJ6gj0lgdg63WDAHo1C4HC6xV4LEY9DsD2E8TGRdiRL/2+Uu
+   fvoc+gNnp7IbctTqsqUp1GU48AF/HESn37ajJl7Ww8s83XJwCv6n/Rwyu
+   Wc8soxrGVCoNx0rTaLysemGQZFFmuVcUK4eW6ONkxk2b+0ej9NFqagzDG
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="434581748"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="434581748"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 23:25:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="734376741"
+X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
+   d="scan'208";a="734376741"
+Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Aug 2023 23:25:07 -0700
+From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>
+Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>,
+        Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: [PATCH RFV v2 00/13] Enable fixed counter 3 and topdown perf metrics for vPMU
+Date:   Tue,  8 Aug 2023 14:30:58 +0800
+Message-Id: <20230808063111.1870070-1-dapeng1.mi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZNI2O4Upyna5AWDA@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F4:EE_|DS7PR12MB6024:EE_
-X-MS-Office365-Filtering-Correlation-Id: 26d06e0f-a556-47eb-0254-08db9836c72f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JNwW95xE/152GDh3p6HsMf64Ckp337R9sWcaY+b9FhsHQJN8LnxOGOvRJ8T3Neu2HM1mRmbpktnzfwtqFQDAt6b33YvxX9dq3pDcFhsllqJGXigqReLRXfXro+4FZ7juKGdbAbsNKLH3OdytfFqaYK7UEja9HrF088iWg4HpG9MMij919g9eCPxCQTIDSHua0usnRJv7fgZhCmP9dVWkSwXnn8pIR9m8kLf/q4eCCa7l424AoBnT52yLJZSsgR9/m8wGLb7C84iFoj7d4DIV6gmGFsyiZS7mEjzI+Vram7EtQQ78oP9gl1e+RFQK6co47zbO0ios47rr5lFtsuoANPUjuPLoxdI5MLoWmU7pA0mZ1ikEebcslhDXhMpCaax+glB6n+sJnfgsdECfv0fw43CO8A1b4yBn40DcS8z1KkYD62THmE215r13/mNNsVKLoSpDNVgffvFUrfIF1aVS8A2WKFru021fwHW1988itqj0Vbh/08u9f+e13rUSMDyWwaT/uh9SXOE8ceGrhHHQt6r6vK+v5LsKJc8rOEJTM+xjP9QBwcCjvHtXl+Ytok3kBLI1EqU5Xkg78OMk4yOzsUAGMR6Urao1zceM4D99K5jd0mu/phXtpYVLV02X+qgqanlgL0DhXhlE7zKOdv6SsWCvm2/D5k2qGgI9ReNysINF4J4BZSWNVoF6UycM+XpiX1RDz91vonwseC1ktRTlDymBAJKQFQV1jlOCpTAv1kUowYhTQixhKsQ/rPozE8iY
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(376002)(136003)(451199021)(1800799003)(82310400008)(186006)(46966006)(36840700001)(40470700004)(40480700001)(55016003)(336012)(40460700003)(4326008)(9686003)(316002)(6636002)(86362001)(7636003)(54906003)(356005)(70586007)(70206006)(478600001)(82740400003)(33716001)(26005)(426003)(8676002)(8936002)(41300700001)(6862004)(47076005)(36860700001)(2906002)(83380400001)(7416002)(5660300002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 17:42:03.9678
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26d06e0f-a556-47eb-0254-08db9836c72f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044F4.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6024
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 08, 2023 at 09:34:03AM -0300, Jason Gunthorpe wrote:
-> On Mon, Aug 07, 2023 at 08:12:37PM -0700, Nicolin Chen wrote:
-> > On Mon, Aug 07, 2023 at 03:08:29PM +0000, Liu, Yi L wrote:
-> > > > > From: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > Sent: Monday, July 24, 2023 7:14 PM
-> > > > >
-> > > > > +static int intel_nested_cache_invalidate_user(struct iommu_domain
-> > > > > *domain,
-> > > > > +                                         void *user_data)
-> > > > > +{
-> > > > > +   struct iommu_hwpt_vtd_s1_invalidate_desc *req = user_data;
-> > > > > +   struct iommu_hwpt_vtd_s1_invalidate *inv_info = user_data;
-> > > > > +   struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-> > > > > +   unsigned int entry_size = inv_info->entry_size;
-> > > > > +   u64 uptr = inv_info->inv_data_uptr;
-> > > > > +   u64 nr_uptr = inv_info->entry_nr_uptr;
-> > > > > +   struct device_domain_info *info;
-> > > > > +   u32 entry_nr, index;
-> > > > > +   unsigned long flags;
-> > > > > +   int ret = 0;
-> > > > > +
-> > > > > +   if (get_user(entry_nr, (uint32_t __user *)u64_to_user_ptr(nr_uptr)))
-> > > > > +           return -EFAULT;
-> > > > > +
-> > > > > +   for (index = 0; index < entry_nr; index++) {
-> > > > > +           ret = copy_struct_from_user(req, sizeof(*req),
-> > > > > +                                       u64_to_user_ptr(uptr + index *
-> > > > > entry_size),
-> > > > > +                                       entry_size);
-> > > >
-> > > > If continuing this direction then the driver should also check minsz etc.
-> > > > for struct iommu_hwpt_vtd_s1_invalidate and iommu_hwpt_vtd_s1_invalidate_desc
-> > > > since they are uAPI and subject to change.
-> > > 
-> > > Then needs to define size in the uapi data structure, and copy size first and
-> > > check minsz before going forward. How about the structures for hwpt alloc
-> > > like struct iommu_hwpt_vtd_s1? Should check minsz for them as well?
-> > 
-> > Assuming that every uAPI data structure needs a min_size, we can
-> > either add a structure holding all min_sizes like iommufd main.c
-> > or have another xx_min_len in iommu_/domain_ops.
-> 
-> If driver is doing the copy it is OK that driver does the min_size
-> check too
+The TopDown Microarchitecture Analysis (TMA) Method is a structured
+analysis methodology to identify critical performance bottlenecks in
+out-of-order processors. The details about topdown metrics support on
+Intel processors can be found in section "Performance Metrics" of Intel's
+SDM Volume 3[1]. Kernel enabling code has also been merged, see
+patchset[2] to learn more about the feature.
 
-Ah, just realized my reply above was missing a context..
+The TMA method is quite powerful and efficient to help developers to
+identify the performance bottleneck in the program. The TMA method has
+been integrated into multiple performance analysis tools, such as perf,
+Vtune. Developers can leverage TMA method to analyze their program's
+performance bottleneck easily with these tools and improve their program's
+performance. TMA method is becoming the most widely used performance
+analysis method on x86 platform. Currently the TMA method has been
+supported fairly well on Native, but it's still not supported in Guest
+environment. Since the environment difference between Host and Guest,
+even same program may show different performance bottleneck between Guest
+and Host. Obviously, the most straightforward and best method to
+profiling Guest performance bottleneck is to run the TMA method in Guest
+directly. So supporting topdown perf metrics in Guest becomes a real and
+important requirement and we hope this patchset can mitigate this gap.
 
-Yi and I are having a concern that the core iommu_hpwt_alloc()
-and iommu_hwpt_cache_invalidate(), in the nesting series, copy
-data without checking the min_sizes. So, we are trying to add
-the missing piece into the next version but not sure which way
-could be optimal.
+Like Xu posted a patch series to support guest Topdown[3], the patchset
+creates a group of topdown metric events in KVM by binding to fixed counter
+3 to obtain hardware values and the guest value of PERF_METRICS MSR is
+assembled based on the count of grouped metric events.
 
-It probably makes sense to add cache_invalidate_user_min_len
-next to the existing cache_invalidate_user_data_len. For the
-iommu_hwpt_alloc, we are missing a data_len, as the core just
-uses sizeof(union iommu_domain_user_data) when calling the
-copy_struct_from_user().
+This patchset improves Like's proposal, it leverages mature vPMU PMC
+emulation framework and current perf topdown metric handling logic to
+support guest topdown metrics feature.
 
-Perhaps we could add two pairs of data_len/min_len in the ops
-structs:
-	// iommu_ops
-	const size_t domain_alloc_user_data_len; // for sanity&copy
-	const size_t domain_alloc_user_min_len; // for sanity only
-	// iommu_domain_ops
-	const size_t cache_invalidate_user_data_len; // for sanity&copy
-	const size_t cache_invalidate_user_min_len; // for sanity only
+In current perf logic, an events group is required to handle the topdown
+metrics profiling, and the events group couples a slots event which
+acts events group leader and multiple metric events. To coordinate with
+the perf topdown metrics handing logic and reduce the code changes in
+KVM, we choose to follow current mature vPMU PMC emulation framework. The
+only difference is that we need to create a events group for fixed
+counter 3 and manipulate FIXED_CTR3 and PERF_METRICS MSRS together
+instead of a single event and only manipulating FIXED_CTR3 MSR.
 
-Thanks
-Nic
+When guest writes PERF_METRICS MSR at first, KVM would create an event
+group which couples a slots event and a virtual metrics event. In this
+event group, slots event claims the fixed counter 3 HW resource and acts
+as group leader which is required by perf system. The virtual metrics
+event claims the PERF_METRICS MSR. This event group is just like the perf
+metrics events group on host and is scheduled by host perf system.
+
+In this proposal, the count of slots event is calculated and emulated
+on host and returned to guest just like other normal counters, but there
+is a difference for the metrics event processing. KVM doesn't calculate
+the real count of topdown metrics, it just stores the raw data of
+PERF_METRICS MSR and directly returnthe stored raw data to guest. Thus,
+guest can get the real HW PERF_METRICS data and guarantee the calculation
+accuracy of topdown metrics.
+
+Comparing with Like's patchset, this proposal brings two benefits.
+
+1. Reduce the created perf events number
+   Like's patchset needs to create 4 (Ice Lake) or 8 (Sapphire Rapids)
+   metric events, whereas this patchset only needs to create 1 metric
+   event.
+
+2. Increase the accuracy of metric calculation
+   Like's patchset needs to do twice metric count conversion. The first
+   conversion happens on perf system, perf topdown metrics handling
+   logic reads the metric percentage from PERF_METRICS MSR and times with
+   elapsed slots count and obtains the metric count. The second conversion
+   happens on KVM, KVM needs to convert the metric count back to metric
+   percentage by using metric count divide elapsed slots again and then
+   assembles the 4 or 8 metric percentage values to the virtual
+   PERF_METRICS MSR and return to Guest at last. Considering each metric
+   percentage in PERF_METRICS MSR is represented with only 8 bits, the
+   twice conversions (once multiplication and once division) definitely
+   cause accuracy loss in theory. Since this patchset directly returns
+   the raw data of PERF_METRICS MSR to guest, it won't have any accuracy
+   loss.
+
+The patchset is rebased on latest kvm-x86/next branch and it is tested
+on both Host and Guest (SPR Platform) with below perf commands. The 'foo'
+is a backend-bound benchmark. We can see the output of perf commands are
+quite close between host and guest.
+
+1. perf stat ./foo
+
+Host outputs:
+
+ Performance counter stats for '/home/sdp/work/foo/foo':
+
+         26,525.25 msec task-clock                       #    1.000 CPUs utilized
+                 9      context-switches                 #    0.339 /sec
+                 2      cpu-migrations                   #    0.075 /sec
+                51      page-faults                      #    1.923 /sec
+   125,330,033,745      cycles                           #    4.725 GHz
+   238,172,965,287      instructions                     #    1.90  insn per cycle
+    44,904,300,430      branches                         #    1.693 G/sec
+        69,299,003      branch-misses                    #    0.15% of all branches
+   751,979,445,222      TOPDOWN.SLOTS                    #     59.2 %  tma_backend_bound
+                                                  #     38.0 %  tma_retiring
+                                                  #      0.8 %  tma_bad_speculation
+                                                  #      1.9 %  tma_frontend_bound
+   286,047,083,084      topdown-retiring
+    14,744,695,003      topdown-fe-bound
+   445,289,789,131      topdown-be-bound
+     5,897,878,000      topdown-bad-spec
+       138,674,397      INT_MISC.UOP_DROPPING            #    5.228 M/sec
+
+      26.528600835 seconds time elapsed
+
+      26.527849000 seconds user
+       0.000000000 seconds sys
+
+Guest outputs:
+
+  Performance counter stats for '/home/pnp/foo/foo':
+
+         29,051.43 msec task-clock                       #    1.000 CPUs utilized
+                10      context-switches                 #    0.344 /sec
+                 0      cpu-migrations                   #    0.000 /sec
+                51      page-faults                      #    1.756 /sec
+   125,337,801,996      cycles                           #    4.314 GHz
+   238,139,676,030      instructions                     #    1.90  insn per cycle
+    44,897,906,380      branches                         #    1.545 G/sec
+        69,402,326      branch-misses                    #    0.15% of all branches
+   752,022,710,490      TOPDOWN.SLOTS                    #     58.4 %  tma_backend_bound
+                                                  #     37.6 %  tma_retiring
+                                                  #      1.2 %  tma_bad_speculation
+                                                  #      2.7 %  tma_frontend_bound
+   283,114,432,184      topdown-retiring
+    20,643,760,680      topdown-fe-bound
+   439,417,191,619      topdown-be-bound
+     8,847,326,005      topdown-bad-spec
+       138,873,309      INT_MISC.UOP_DROPPING            #    4.780 M/sec
+
+      29.058833449 seconds time elapsed
+
+      29.048761000 seconds user
+       0.004003000 seconds sys
+
+2. perf stat -e slots ./foo
+
+Host outputs:
+
+ Performance counter stats for '/home/sdp/work/foo/foo':
+
+   713,292,346,950      slots
+
+      25.472861484 seconds time elapsed
+
+      25.470978000 seconds user
+       0.000000000 seconds sys
+
+Guest outputs:
+
+ Performance counter stats for '/home/pnp/foo/foo':
+
+   713,286,331,824      slots
+
+      25.264007882 seconds time elapsed
+
+      25.259790000 seconds user
+       0.004002000 seconds sys
+
+3.
+echo 0 > /proc/sys/kernel/nmi_watchdog
+echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
+echo 100000 > /proc/sys/kernel/perf_event_max_sample_rate
+echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
+perf record -e slots ./foo && perf report
+
+Host outputs:
+
+# Total Lost Samples: 0
+#
+# Samples: 109K of event 'slots'
+# Event count (approx.): 715723903347
+#
+# Overhead  Command  Shared Object     Symbol
+# ........  .......  ................  ..................................
+#
+    74.83%  foo      libc.so.6         [.] __random
+     7.22%  foo      foo               [.] qux
+     7.07%  foo      libc.so.6         [.] __random_r
+     5.40%  foo      foo               [.] main
+     1.82%  foo      foo               [.] bar
+     1.75%  foo      foo               [.] random@plt
+     1.73%  foo      foo               [.] foo
+     0.02%  foo      [kernel.vmlinux]  [k] arch_asym_cpu_priority
+
+
+Guest outputs:
+
+# Total Lost Samples: 0
+#
+# Samples: 7K of event 'slots'
+# Event count (approx.): 24532005986
+#
+# Overhead  Command  Shared Object     Symbol
+# ........  .......  ................  ....................
+#
+    75.21%  foo      libc.so.6         [.] __random
+     7.19%  foo      libc.so.6         [.] __random_r
+     7.12%  foo      foo               [.] qux
+     5.21%  foo      foo               [.] main
+     1.90%  foo      foo               [.] foo
+     1.81%  foo      foo               [.] bar
+     1.56%  foo      foo               [.] random@plt
+     0.00%  perf-ex  [kernel.vmlinux]  [k] native_write_msr
+
+
+To support the guest topdown metrics feature, we have to do several
+fundamental changes for perf system and vPMU code, we tried to avoid
+these changes AMAP, but it seems it's inevitable. If you have any idea,
+please suggest.
+
+The fundamental changes:
+1. perf/core: Add function perf_event_create_group_kernel_counters()
+   Add a new API to create group events from kernel space
+2. perf/core: Add new function perf_event_topdown_metrics()
+   Add a new API to update topdown metrics values
+3. perf/x86/intel: Handle KVM virtual metrics event in perf system
+   Add virtual metrics event processing logic in topdown metrics
+processing code
+4. KVM: x86/pmu: Extend pmc_reprogram_counter() to create group events
+   Extend pmc_reprogram_counter() to be capable to create group events
+instead of just single event
+
+References:
+[1]: Intel 64 and IA-32 Architectures Software Developer Manual
+ Combined Volumes: 1, 2A, 2B, 2C, 2D, 3A, 3B, 3C, 3D, and 4
+https://cdrdv2.intel.com/v1/dl/getContent/671200
+[2]: perf/x86/intel: Support TopDown metrics on Ice Lake
+https://lwn.net/ml/linux-kernel/20191203141212.7704-1-kan.liang@linux.intel.com/
+[3]: KVM: x86/pmu: Enable Fixed Counter3 and Topdown Perf Metrics
+https://lwn.net/ml/linux-kernel/20221212125844.41157-1-likexu@tencent.com/
+
+Dapeng Mi (13):
+  KVM: x86/pmu: Add Intel CPUID-hinted TopDown slots event
+  KVM: x86/pmu: Support PMU fixed counter 3
+  perf/core: Add function perf_event_group_leader_check()
+  perf/core: Add function perf_event_move_group()
+  perf/core: Add function perf_event_create_group_kernel_counters()
+  perf/x86: Fix typos and inconsistent indents in perf_event header
+  perf/x86: Add constraint for guest perf metrics event
+  perf/core: Add new function perf_event_topdown_metrics()
+  perf/x86/intel: Handle KVM virtual metrics event in perf system
+  KVM: x86/pmu: Extend pmc_reprogram_counter() to create group events
+  KVM: x86/pmu: Support topdown perf metrics feature
+  KVM: x86/pmu: Handle PERF_METRICS overflow
+  KVM: x86/pmu: Expose Topdown in MSR_IA32_PERF_CAPABILITIES
+
+ arch/x86/events/intel/core.c      |  72 +++++--
+ arch/x86/events/perf_event.h      |  10 +-
+ arch/x86/include/asm/kvm_host.h   |  19 +-
+ arch/x86/include/asm/perf_event.h |  21 +-
+ arch/x86/kvm/pmu.c                | 142 +++++++++++--
+ arch/x86/kvm/pmu.h                |  50 ++++-
+ arch/x86/kvm/svm/pmu.c            |   2 +
+ arch/x86/kvm/vmx/capabilities.h   |   1 +
+ arch/x86/kvm/vmx/pmu_intel.c      |  67 ++++++
+ arch/x86/kvm/vmx/vmx.c            |   2 +
+ arch/x86/kvm/vmx/vmx.h            |   5 +
+ arch/x86/kvm/x86.c                |   5 +-
+ include/linux/perf_event.h        |  19 ++
+ kernel/events/core.c              | 326 ++++++++++++++++++++----------
+ 14 files changed, 590 insertions(+), 151 deletions(-)
+
+
+base-commit: 240f736891887939571854bd6d734b6c9291f22e
+-- 
+2.34.1
+
