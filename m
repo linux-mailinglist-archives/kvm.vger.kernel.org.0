@@ -2,200 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8426D7743A5
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:08:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D4867744BB
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:27:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235308AbjHHSIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 14:08:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41550 "EHLO
+        id S235872AbjHHS1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 14:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235242AbjHHSHc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 14:07:32 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B370A79A
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 10:08:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=4Cxaxfc6oSiSrUpgTyDTEScslyQPFH/56HB3b+fyjuw=; b=pJ2CoGrC6h9fRx8UQdijyV2Wwv
-        rd6gAfW2UdgltpB5/RGoOjN8wzR8mTDUkD1jkVxE8omWYQsD9WrS9nYx2AVd5jUYj89h5TphO5mzv
-        7ZZP7TlnrI+RiB4v5apyb6bExS/z2oYP+F/vwwlPJjkNvUci78E3xkvzy74bdFzVi1qmrm57ikypy
-        2L8PFP78ygqRL4ySwGEoAQ/rU0qCxRpdiBp2JNryx92p0AkDlC3+fj+adadavkk0D9MUDpy8IBS1i
-        zrtvXyHNQc08bEKFGbxLDGxn0Y4BSOF0NiHFs2ybcCzzNn5El40U9Ws9r9sXURNUQxD6y7dfJRFkB
-        fs1Vr0mA==;
-Received: from [2001:8b0:10b:5:f83c:7084:b68b:2288] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1qTQC9-0012ji-Cz; Tue, 08 Aug 2023 17:08:33 +0000
-Message-ID: <782b63c1f9c41a6bfa771789cde4b45644b3a239.camel@infradead.org>
-Subject: [PATCH] i386/xen: Don't advertise XENFEAT_supervisor_mode_kernel
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     qemu-devel <qemu-devel@nongnu.org>
-Cc:     Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Date:   Tue, 08 Aug 2023 18:08:32 +0100
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-BMSpcRdCRnzQLHD3lhM9"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        with ESMTP id S236048AbjHHS1P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 14:27:15 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2049.outbound.protection.outlook.com [40.107.102.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCAE7238E3;
+        Tue,  8 Aug 2023 10:42:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HGuV6FfVLbEUFR8RJgVimj9d/JyzuKo0Ywku6HURbKFtdveAbGT5A65suSIgOUz+tHc3OgHkTujQsiBgPbHwAjkAn7NlXifmhAg1sRXqxB4WvjcrkR4ym6/HGw/hk+zxgIA/ZZPPGLv4Nh75WGWGmjLcM8fNL+oCcBO6XPp+YCRHDJDFj5vmNN2pXUFX8w2PjKaLNEgGzpiLIEszhtQ5QtVUwgYmo4kFpekJDCDxeIcMRwT8adNEs77CCIufvc+TR9yawfVInY9dl8v+bb7FYsDRk7U6RLSoPGjxXrO3xpWdrwO/ikgpx/TEahB9gMsz0T2oO6tyL30QnGRHZ3RZlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=spIGaO4/zw0S2pIKf3YwYUO8KFM+Jm+Hn2CgzFxrPGs=;
+ b=ClrFl7gcEmiZ4AwhIGQ0uwonegjWbKAeVUTredHP/yxe61+icvtHdPcVbvrUaAO8/mdaURwX4YMcN8qk2C6aIarjHE6Mcl/5kweGMNgwXR4SHddpmYYue3zWixL1xc19yd7UxtwHWdnZ18sDjQUNPIaHVCJCv/UhWnL3XXUkbkcj0XcNkpuKK8ptzsXpXfkSE2g6bLQpZVDjl9JqR1tj+ZvD7omuEYpjatIin2EwmyzYMmDz7Tnr5/v4KuNCRWFMb90bGORgCS3QUHkRSGRCFYhMPAHgui6OO7JcdBDC85KfiKzPwPJxzSK6LwwiJwqoKIHj71WPRRZXXQ0RQz/ufQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=spIGaO4/zw0S2pIKf3YwYUO8KFM+Jm+Hn2CgzFxrPGs=;
+ b=gwg3mwLfhXmS1oVYJVWNrCmDuUysb2uxJfyMInse7OK5i/vQ5tk4TP4kBi7VVaqlJcZLQ+aA5XIl2PqhOQ2yKImH98axNUDoqLQmKgfluuXHVfpZwf+/0o/16qY+LUgU40PhWJmIC3+yGfvW4+5kOYSdQHoR/S8FUPi4QO0P46+YEOahdhtPnP5gaXs5nn17q+7AIBoFPfjupNDhEZ+H5+jQqq6Ha+P8FEXpBoUEHvJKqt9sBkK4nQYVLbbdAqvSDE/CCuWUBcAdM27K5/Urnh1uxiLYDnFYBCr1vz/WDrhtmGdcK177b+sMDykfj5GtqdGu+H76QAxTVzNE4GrV7A==
+Received: from MW4PR04CA0168.namprd04.prod.outlook.com (2603:10b6:303:85::23)
+ by DS7PR12MB6024.namprd12.prod.outlook.com (2603:10b6:8:84::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Tue, 8 Aug
+ 2023 17:42:04 +0000
+Received: from CO1PEPF000044F4.namprd05.prod.outlook.com
+ (2603:10b6:303:85:cafe::46) by MW4PR04CA0168.outlook.office365.com
+ (2603:10b6:303:85::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27 via Frontend
+ Transport; Tue, 8 Aug 2023 17:42:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044F4.mail.protection.outlook.com (10.167.241.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Tue, 8 Aug 2023 17:42:03 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 8 Aug 2023
+ 10:41:41 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 8 Aug 2023
+ 10:41:41 -0700
+Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Tue, 8 Aug 2023 10:41:40 -0700
+Date:   Tue, 8 Aug 2023 10:41:38 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
+Message-ID: <ZNJ+Uv/WJwngosjJ@Asurada-Nvidia>
+References: <20230724111335.107427-1-yi.l.liu@intel.com>
+ <20230724111335.107427-10-yi.l.liu@intel.com>
+ <BN9PR11MB527690EBAA872A16AE8926F88C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <DS0PR11MB7529F4D4DABBE29E9B7BF5C9C30CA@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <ZNGypUee/U9d68TZ@Asurada-Nvidia>
+ <ZNI2O4Upyna5AWDA@nvidia.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZNI2O4Upyna5AWDA@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F4:EE_|DS7PR12MB6024:EE_
+X-MS-Office365-Filtering-Correlation-Id: 26d06e0f-a556-47eb-0254-08db9836c72f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JNwW95xE/152GDh3p6HsMf64Ckp337R9sWcaY+b9FhsHQJN8LnxOGOvRJ8T3Neu2HM1mRmbpktnzfwtqFQDAt6b33YvxX9dq3pDcFhsllqJGXigqReLRXfXro+4FZ7juKGdbAbsNKLH3OdytfFqaYK7UEja9HrF088iWg4HpG9MMij919g9eCPxCQTIDSHua0usnRJv7fgZhCmP9dVWkSwXnn8pIR9m8kLf/q4eCCa7l424AoBnT52yLJZSsgR9/m8wGLb7C84iFoj7d4DIV6gmGFsyiZS7mEjzI+Vram7EtQQ78oP9gl1e+RFQK6co47zbO0ios47rr5lFtsuoANPUjuPLoxdI5MLoWmU7pA0mZ1ikEebcslhDXhMpCaax+glB6n+sJnfgsdECfv0fw43CO8A1b4yBn40DcS8z1KkYD62THmE215r13/mNNsVKLoSpDNVgffvFUrfIF1aVS8A2WKFru021fwHW1988itqj0Vbh/08u9f+e13rUSMDyWwaT/uh9SXOE8ceGrhHHQt6r6vK+v5LsKJc8rOEJTM+xjP9QBwcCjvHtXl+Ytok3kBLI1EqU5Xkg78OMk4yOzsUAGMR6Urao1zceM4D99K5jd0mu/phXtpYVLV02X+qgqanlgL0DhXhlE7zKOdv6SsWCvm2/D5k2qGgI9ReNysINF4J4BZSWNVoF6UycM+XpiX1RDz91vonwseC1ktRTlDymBAJKQFQV1jlOCpTAv1kUowYhTQixhKsQ/rPozE8iY
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(376002)(136003)(451199021)(1800799003)(82310400008)(186006)(46966006)(36840700001)(40470700004)(40480700001)(55016003)(336012)(40460700003)(4326008)(9686003)(316002)(6636002)(86362001)(7636003)(54906003)(356005)(70586007)(70206006)(478600001)(82740400003)(33716001)(26005)(426003)(8676002)(8936002)(41300700001)(6862004)(47076005)(36860700001)(2906002)(83380400001)(7416002)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 17:42:03.9678
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26d06e0f-a556-47eb-0254-08db9836c72f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044F4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6024
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Aug 08, 2023 at 09:34:03AM -0300, Jason Gunthorpe wrote:
+> On Mon, Aug 07, 2023 at 08:12:37PM -0700, Nicolin Chen wrote:
+> > On Mon, Aug 07, 2023 at 03:08:29PM +0000, Liu, Yi L wrote:
+> > > > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > > > Sent: Monday, July 24, 2023 7:14 PM
+> > > > >
+> > > > > +static int intel_nested_cache_invalidate_user(struct iommu_domain
+> > > > > *domain,
+> > > > > +                                         void *user_data)
+> > > > > +{
+> > > > > +   struct iommu_hwpt_vtd_s1_invalidate_desc *req = user_data;
+> > > > > +   struct iommu_hwpt_vtd_s1_invalidate *inv_info = user_data;
+> > > > > +   struct dmar_domain *dmar_domain = to_dmar_domain(domain);
+> > > > > +   unsigned int entry_size = inv_info->entry_size;
+> > > > > +   u64 uptr = inv_info->inv_data_uptr;
+> > > > > +   u64 nr_uptr = inv_info->entry_nr_uptr;
+> > > > > +   struct device_domain_info *info;
+> > > > > +   u32 entry_nr, index;
+> > > > > +   unsigned long flags;
+> > > > > +   int ret = 0;
+> > > > > +
+> > > > > +   if (get_user(entry_nr, (uint32_t __user *)u64_to_user_ptr(nr_uptr)))
+> > > > > +           return -EFAULT;
+> > > > > +
+> > > > > +   for (index = 0; index < entry_nr; index++) {
+> > > > > +           ret = copy_struct_from_user(req, sizeof(*req),
+> > > > > +                                       u64_to_user_ptr(uptr + index *
+> > > > > entry_size),
+> > > > > +                                       entry_size);
+> > > >
+> > > > If continuing this direction then the driver should also check minsz etc.
+> > > > for struct iommu_hwpt_vtd_s1_invalidate and iommu_hwpt_vtd_s1_invalidate_desc
+> > > > since they are uAPI and subject to change.
+> > > 
+> > > Then needs to define size in the uapi data structure, and copy size first and
+> > > check minsz before going forward. How about the structures for hwpt alloc
+> > > like struct iommu_hwpt_vtd_s1? Should check minsz for them as well?
+> > 
+> > Assuming that every uAPI data structure needs a min_size, we can
+> > either add a structure holding all min_sizes like iommufd main.c
+> > or have another xx_min_len in iommu_/domain_ops.
+> 
+> If driver is doing the copy it is OK that driver does the min_size
+> check too
 
---=-BMSpcRdCRnzQLHD3lhM9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Ah, just realized my reply above was missing a context..
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+Yi and I are having a concern that the core iommu_hpwt_alloc()
+and iommu_hwpt_cache_invalidate(), in the nesting series, copy
+data without checking the min_sizes. So, we are trying to add
+the missing piece into the next version but not sure which way
+could be optimal.
 
-XENFEAT_supervisor_mode_kernel shouldn't be set for HVM guests. It
-confuses lscpu into thinking it's running in PVH mode.
+It probably makes sense to add cache_invalidate_user_min_len
+next to the existing cache_invalidate_user_data_len. For the
+iommu_hwpt_alloc, we are missing a data_len, as the core just
+uses sizeof(union iommu_domain_user_data) when calling the
+copy_struct_from_user().
 
-No non-cosmetic effects have been observed so far.
+Perhaps we could add two pairs of data_len/min_len in the ops
+structs:
+	// iommu_ops
+	const size_t domain_alloc_user_data_len; // for sanity&copy
+	const size_t domain_alloc_user_min_len; // for sanity only
+	// iommu_domain_ops
+	const size_t cache_invalidate_user_data_len; // for sanity&copy
+	const size_t cache_invalidate_user_min_len; // for sanity only
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
-Only really cosmetic. Don't feel strongly about whether it makes 8.1.
-
- target/i386/kvm/xen-emu.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
-index a8146115f0..b307c75713 100644
---- a/target/i386/kvm/xen-emu.c
-+++ b/target/i386/kvm/xen-emu.c
-@@ -267,7 +267,6 @@ static bool kvm_xen_hcall_xen_version(struct kvm_xen_ex=
-it *exit, X86CPU *cpu,
-             fi.submap |=3D 1 << XENFEAT_writable_page_tables |
-                          1 << XENFEAT_writable_descriptor_tables |
-                          1 << XENFEAT_auto_translated_physmap |
--                         1 << XENFEAT_supervisor_mode_kernel |
-                          1 << XENFEAT_hvm_callback_vector |
-                          1 << XENFEAT_hvm_safe_pvclock |
-                          1 << XENFEAT_hvm_pirqs;
---=20
-2.34.1
-
-
-
---=-BMSpcRdCRnzQLHD3lhM9
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwODA4MTcwODMyWjAvBgkqhkiG9w0BCQQxIgQgr1tBQ8QE
-1pXfX/7kAkPOQWNG8YtP98kExzoBJtvVMHwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA4F5qzZo6Fu+UjTIHr8dAcYWR3bHL+SBjU
-f83jiLRCB+3ywWk6fuxVNl8bfHmQ9Ts/CTBbSTqeKQYct/ATwc1WX53M8WyvGRpu2qlxvhDRVzTG
-8wReJ1dTITZygnNFrZlS57mdfgAbUf4CRqlEt6apA1HQrmo30HYEIkW6VJdJWmj7Di9XJZlmBpyP
-ovEV2UC5rgva4kdE6A5nbHDHLs2N01py6qcMWkEHSoN6pIDpi9Dx2fqDISRraJZ68l/Wxz9d0QEx
-X1XiUS8sQeX/HDnrBkA2J9s/jUB2chX14mlSXh6uPJZyl0UKLDyqXVZbo9X0uOZmdaaiCfma2UoA
-fnPXvvA+xZZayAgI0KGl9z+pm42ZbN1V0uwm9onODIDeqx6QmCZIpw1OFcPHUTAq42pVLWkuIjH9
-DNj++9+bnQk6i73MdABFI/WRJA2G2Vke4ZCoFgZXWFBly/4qqXwBMSFihPi742ZN9IMfoESl7ajO
-7UYCM52+RwFDscj9t9bxydIGGBPr+lrPCr2VgppWBEpT7evIGQUP1Rpz2s4aPfUWEYV6R/w2QHPu
-uFK2kUF9IokEo6KkyRdH8rf4CLoh6+wqCfNGsyVltFpl/VtXqz1zsxmZ6N6wPIZmLB6ftChllo+G
-64MTRtNnOhBR8Og1RPixpMjFVVibBWACJw80N+ALKwAAAAAAAA==
-
-
---=-BMSpcRdCRnzQLHD3lhM9--
+Thanks
+Nic
