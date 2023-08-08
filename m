@@ -2,124 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89A70774CAC
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 23:14:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89244774B30
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:43:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236384AbjHHVO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 17:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59798 "EHLO
+        id S233655AbjHHUmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 16:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235792AbjHHVOQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 17:14:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5535581
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 13:14:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691525645;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4tq9zaiMuCXpHn4k92r0nRKOAFW/cdOCpDp3JYeJH9A=;
-        b=fCUEq+MvW5psCmpY15mmB4X5qPhChuTRSKlxOMt/VQXIuN9ZoEeFhE93BmlaG1L3St+BYg
-        uWDNiiBXU86tqZhh3SfsixaJ9Z7XVS9KCRUdCDvVkksx0YFPGx3UtdJvKirI1SComtY8Db
-        lCt7kpxyBLrxz25SyAP3dkodrjTXvi4=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-408-thv8kBBkP6ymcgT9ihKsXA-1; Tue, 08 Aug 2023 16:14:04 -0400
-X-MC-Unique: thv8kBBkP6ymcgT9ihKsXA-1
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3495ff148fcso38388515ab.0
-        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 13:14:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691525643; x=1692130443;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4tq9zaiMuCXpHn4k92r0nRKOAFW/cdOCpDp3JYeJH9A=;
-        b=k5P3gvy/n3/fDBcR6K/3RUKGlOdhGVkNPvC3dZsctOKZBAczccQf6dickkYRYw1RTR
-         8AstzN+JA7jrtM2hBtRZxQzddeJRWaZfZ1vqpC3AC2QdmLOJvGDl9r8S/qlZH1RQX1TG
-         NeQodwcH2tDow0yDU5RcljuZl1IVAG4sQ27aW9R6B3hh6GYRLMsRAhccxF3Ot/8gBNVH
-         SRcpmty00C2rwvq0JjqR5iNJ9WvtPn70AEgNkn1Gdvcg6E4M/F19cynG8+/wRfujmQDZ
-         FQFWXQM2qQv+m3Yqa/evWBqucXjULyOFB2Ct/2ABbI+ZsNYyS0ikzdL2Ix9BmcZ0syMS
-         4aAA==
-X-Gm-Message-State: AOJu0YzTaVI18pAhIixdmNSJ3L7JvCRk+OepuMJaNkR8C+wIUN3pqny9
-        yjVQRlYYOk1PWY0Ck8q9aX8aiZWSw6R+7f7/NLDGrrUdwQIzead0BcpSp5ehUizHGup2O+j9Sf5
-        vYwpvQ5YCyGdhDwSc5j76
-X-Received: by 2002:a92:c5cf:0:b0:348:824b:8949 with SMTP id s15-20020a92c5cf000000b00348824b8949mr855992ilt.15.1691525643110;
-        Tue, 08 Aug 2023 13:14:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF35Are0JBcvXwaL8NZqOifBd2r2CGWj31ctQ95nS53cfvyCm9DXh5rr72/u+RrbGNG1vRQgw==
-X-Received: by 2002:a92:c5cf:0:b0:348:824b:8949 with SMTP id s15-20020a92c5cf000000b00348824b8949mr855984ilt.15.1691525642845;
-        Tue, 08 Aug 2023 13:14:02 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id h11-20020a92d08b000000b00348ac48e127sm3688902ilh.33.2023.08.08.13.14.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Aug 2023 13:14:02 -0700 (PDT)
-Date:   Tue, 8 Aug 2023 14:14:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Li Zetao <lizetao1@huawei.com>
-Cc:     <nipun.gupta@amd.com>, <nikhil.agarwal@amd.com>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH -next] vfio/cdx: Remove redundant initialization owner
- in vfio_cdx_driver
-Message-ID: <20230808141401.0f680e7a.alex.williamson@redhat.com>
-In-Reply-To: <20230808020937.2975196-1-lizetao1@huawei.com>
-References: <20230808020937.2975196-1-lizetao1@huawei.com>
-Organization: Red Hat
+        with ESMTP id S235924AbjHHUmi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 16:42:38 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B1B92C9;
+        Tue,  8 Aug 2023 13:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691525869; x=1723061869;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xESjQ6/u2lB6PM/C4hmJU1/s7F3OphDWt1XzFqnGAQM=;
+  b=AuSv9MuEyJfu3qFJ//MeijVO1UHngly+ByuornEv0pIQ8AaoZKKt2+kO
+   5kmp3XmXKMO9jEZuwvhQnh1kOJBjLPFufEHMjJ3C+f/TJ5rv5U2QhNDcP
+   drbGdW9G3XPHvMu46SZYKg03wFunpKyxHcXkauF6P/i8mIocKV+OeC7JU
+   /iYfwp26WVGj83SvrL8q4uIB+KP2EwxB1AJeM6ig3G2pGeaMH5qyGa3wQ
+   QX1njsUmkC+HRJqfVW8RKN5o55hV6heV5/gXxw29Gctr3GbzbJ5u23qfP
+   jzT2s1jlEiV+2ATHA5ezjhJX4VpHAJ2lLMI4lJKcH0n1uih9sHkC/frXs
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="355903496"
+X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
+   d="scan'208";a="355903496"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 13:17:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="708401075"
+X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
+   d="scan'208";a="708401075"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 08 Aug 2023 13:17:12 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qTT8g-0005aP-2i;
+        Tue, 08 Aug 2023 20:17:10 +0000
+Date:   Wed, 9 Aug 2023 04:16:50 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Dapeng Mi <dapeng1.mi@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Like Xu <likexu@tencent.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Adrian Hunter <adrian.hunter@intel.com>
+Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhang Xiong <xiong.y.zhang@intel.com>,
+        Lv Zhiyuan <zhiyuan.lv@intel.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Dapeng Mi <dapeng1.mi@intel.com>
+Subject: Re: [PATCH RFV v2 08/13] perf/core: Add new function
+ perf_event_topdown_metrics()
+Message-ID: <202308090447.HY139um6-lkp@intel.com>
+References: <20230808063111.1870070-9-dapeng1.mi@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808063111.1870070-9-dapeng1.mi@linux.intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Aug 2023 10:09:37 +0800
-Li Zetao <lizetao1@huawei.com> wrote:
+Hi Dapeng,
 
-> The cdx_driver_register() will set "THIS_MODULE" to driver.owner when
-> register a cdx_driver driver, so it is redundant initialization to set
-> driver.owner in the statement. Remove it for clean code.
-> 
-> Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> ---
->  drivers/vfio/cdx/main.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/cdx/main.c b/drivers/vfio/cdx/main.c
-> index c376a69d2db2..de56686581ae 100644
-> --- a/drivers/vfio/cdx/main.c
-> +++ b/drivers/vfio/cdx/main.c
-> @@ -223,7 +223,6 @@ static struct cdx_driver vfio_cdx_driver = {
->  	.match_id_table	= vfio_cdx_table,
->  	.driver	= {
->  		.name	= "vfio-cdx",
-> -		.owner	= THIS_MODULE,
->  	},
->  	.driver_managed_dma = true,
->  };
+kernel test robot noticed the following build warnings:
 
-Doesn't vfio_fsl_mc_driver have the same issue?
+[auto build test WARNING on next-20230808]
+[cannot apply to kvm/queue acme/perf/core tip/perf/core kvm/linux-next v6.5-rc5 v6.5-rc4 v6.5-rc3 linus/master v6.5-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-#define fsl_mc_driver_register(drv) \
-        __fsl_mc_driver_register(drv, THIS_MODULE)
+url:    https://github.com/intel-lab-lkp/linux/commits/Dapeng-Mi/KVM-x86-pmu-Support-PMU-fixed-counter-3/20230809-030457
+base:   next-20230808
+patch link:    https://lore.kernel.org/r/20230808063111.1870070-9-dapeng1.mi%40linux.intel.com
+patch subject: [PATCH RFV v2 08/13] perf/core: Add new function perf_event_topdown_metrics()
+config: loongarch-allnoconfig (https://download.01.org/0day-ci/archive/20230809/202308090447.HY139um6-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230809/202308090447.HY139um6-lkp@intel.com/reproduce)
 
-static struct fsl_mc_driver vfio_fsl_mc_driver = {
-        .probe          = vfio_fsl_mc_probe,
-        .remove         = vfio_fsl_mc_remove,
-        .driver = {
-                .name   = "vfio-fsl-mc",
-                .owner  = THIS_MODULE,
-        },
-        .driver_managed_dma = true,
-};
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308090447.HY139um6-lkp@intel.com/
 
-That driver could also be converted to use module_driver().  Thanks,
+All warnings (new ones prefixed by >>):
 
-Alex
+   In file included from include/linux/trace_events.h:10,
+                    from include/trace/syscall.h:7,
+                    from include/linux/syscalls.h:90,
+                    from arch/loongarch/mm/cache.c:17:
+>> include/linux/perf_event.h:1793:53: warning: 'struct td_metrics' declared inside parameter list will not be visible outside of this definition or declaration
+    1793 |                                              struct td_metrics *value)
+         |                                                     ^~~~~~~~~~
+--
+   In file included from include/linux/trace_events.h:10,
+                    from include/trace/syscall.h:7,
+                    from include/linux/syscalls.h:90,
+                    from include/linux/entry-common.h:7,
+                    from arch/loongarch/mm/fault.c:13:
+>> include/linux/perf_event.h:1793:53: warning: 'struct td_metrics' declared inside parameter list will not be visible outside of this definition or declaration
+    1793 |                                              struct td_metrics *value)
+         |                                                     ^~~~~~~~~~
+   arch/loongarch/mm/fault.c:256:27: warning: no previous prototype for 'do_page_fault' [-Wmissing-prototypes]
+     256 | asmlinkage void __kprobes do_page_fault(struct pt_regs *regs,
+         |                           ^~~~~~~~~~~~~
 
+
+vim +1793 include/linux/perf_event.h
+
+  1791	
+  1792	static inline int perf_event_topdown_metrics(struct perf_event *event,
+> 1793						     struct td_metrics *value)
+  1794	{
+  1795		return 0;
+  1796	}
+  1797	#endif
+  1798	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
