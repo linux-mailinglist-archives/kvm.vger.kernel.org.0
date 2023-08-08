@@ -2,256 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2F82774B31
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 22:43:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 034BB774CCD
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 23:18:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233224AbjHHUmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 16:42:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49752 "EHLO
+        id S236464AbjHHVSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 17:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235923AbjHHUmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 16:42:38 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772E214FCE;
-        Tue,  8 Aug 2023 13:17:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691525870; x=1723061870;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Es2qusPBI+Upp+gjA6iZyfm+jjbTtNkyAFCBl7xskTc=;
-  b=Rfxlzm9XeKKYL2yNMJEi7iizlRarU7HVJewbJ19rg+xMqHfomvnzTj0q
-   whAcCU5d6PqNv9IBiqySsYlyYSOrFzARtnTVonzzvTbflXvgn5qoUK2Ec
-   GixGjF8jO25LoNsrakTqU89Q9ruda3zGEa9fwnkCuHDiL8LZXF1FU763/
-   E0KlnfZn/sl8mq3wkm2MIVCUds8TSw9h7XVGrMYcddi8KkD/3b5bIc8eX
-   jJpmAbM3XyW7lgGnuR/WbDZdjIeIErkkN8EBW9CwzKbH0kRTFvV/HiyQ6
-   efwFPI8wp/HEHYIJM6ImpM51iaPHtjlk2CaNTUZybzigL3f4UBYeBMls4
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="355903484"
-X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
-   d="scan'208";a="355903484"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 13:17:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="708401073"
-X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
-   d="scan'208";a="708401073"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 08 Aug 2023 13:17:12 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qTT8g-0005aM-2e;
-        Tue, 08 Aug 2023 20:17:10 +0000
-Date:   Wed, 9 Aug 2023 04:16:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>
-Subject: Re: [PATCH RFV v2 08/13] perf/core: Add new function
- perf_event_topdown_metrics()
-Message-ID: <202308090418.vTakFy6e-lkp@intel.com>
-References: <20230808063111.1870070-9-dapeng1.mi@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230808063111.1870070-9-dapeng1.mi@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S236563AbjHHVSM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 17:18:12 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02A71FD5
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 14:13:28 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-56463e0340cso6299732a12.2
+        for <kvm@vger.kernel.org>; Tue, 08 Aug 2023 14:13:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691529208; x=1692134008;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2U8op5NWCZxGer1aWuXuZ1d6J73Ge5+Hk7EgkvJJLAs=;
+        b=EiApR7LgfgrJOIT4RH8vwTp7YvtN3WX8F65amcCZ5tUQpyv/ZsbnzElbxtLH3YiRAr
+         Xco5OB//pxBTUJ1Hz9I9wbK8VFMOtBI25Tou7znxlR4xLwF5hwG16hAzm3VNuOm7qNVv
+         RXaphvZexnvsjJwdUedz4miwZlrHjyPKGJ4tg41nXpc1Cr1tDeUR45j+cXRmHY2zeNeJ
+         aD2FSNHH9s2X0AH/332mpiw5dSfBYPcqgRab/m5d5fFkQb+ZWPzwvwukMvExFid52TaS
+         W3qOIOCRBt/UK+p15DAoWro/GC9Q6ni0EalNj49A0OSEsHwDkeyMMKxa0prAwizF/XXF
+         JV1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691529208; x=1692134008;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2U8op5NWCZxGer1aWuXuZ1d6J73Ge5+Hk7EgkvJJLAs=;
+        b=ij6InxzA32wEJzCpeC1iEvtwJEhosZEfGWFxCecyt/HP1S91fHA7ryT4iaEoQMyqW3
+         E3gFW43zugeWVkigL9G1jkVGwSp4S4kKep3oLJ6utTGCvVkZOKV/lt5PV/Jl2DtvZ2gj
+         e8S/YNCrbR0OqYQl0XpvaPGRJlfIQ3TQIPt6tuK+/nElStgqWdNFo3oPjrAM5M/tJJtX
+         6AwiE8w0rZZfN+HPEJoNW0yEt6QEyeGUbYB1+5K8k2dTcW7IAtVq0/C/TnAhVNkv/ltv
+         meyE+2qO0VQyYy2qrvVl7MC8I8J62Aqb6Aw9Gtdey8qTPrh1xCanhjVWYh6q7/o4D4it
+         OZVA==
+X-Gm-Message-State: AOJu0YxHIeEYe74v1TtLJNpgxyWTjCgN3YO6MD6AQSQN27r2fG5DKK00
+        RghxFSReAKYE2+iNikjkbvzgG7Szdjo=
+X-Google-Smtp-Source: AGHT+IF3VhVvM3seA6Kd3G1yrwf0aF3MmO0cqr5SVZX1MHXlsabrjEav/SHlO1qK0PHGPVCVUrfGthX1EsA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:b242:0:b0:563:e937:5e87 with SMTP id
+ t2-20020a63b242000000b00563e9375e87mr12735pgo.5.1691529208021; Tue, 08 Aug
+ 2023 14:13:28 -0700 (PDT)
+Date:   Tue, 8 Aug 2023 14:13:26 -0700
+In-Reply-To: <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
+Mime-Version: 1.0
+References: <20230718234512.1690985-13-seanjc@google.com> <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
+Message-ID: <ZNKv9ul2I7A4V7IF@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        david@redhat.com, qperret@google.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dapeng,
+On Mon, Aug 07, 2023, Ackerley Tng wrote:
+> I=E2=80=99d like to propose an alternative to the refcounting approach be=
+tween
+> the gmem file and associated kvm, where we think of KVM=E2=80=99s memslot=
+s as
+> users of the gmem file.
+>=20
+> Instead of having the gmem file pin the VM (i.e. take a refcount on
+> kvm), we could let memslot take a refcount on the gmem file when the
+> memslots are configured.
+>=20
+> Here=E2=80=99s a POC patch that flips the refcounting (and modified selft=
+ests in
+> the next commit):
+> https://github.com/googleprodkernel/linux-cc/commit/7f487b029b89b9f3e9b09=
+4a721bc0772f3c8c797
+>=20
+> One side effect of having the gmem file pin the VM is that now the gmem
+> file becomes sort of a false handle on the VM:
+>=20
+> + Closing the file destroys the file pointers in the VM and invalidates
+>   the pointers
 
-kernel test robot noticed the following build warnings:
+Yeah, this is less than ideal.  But, it's also how things operate today.  K=
+VM
+doesn't hold references to VMAs or files, e.g. if userspace munmap()s memor=
+y,
+any and all SPTEs pointing at the memory are zapped.  The only difference w=
+ith
+gmem is that KVM needs to explicitly invalidate file pointers, instead of t=
+hat
+happening behind the scenes (no more VMAs to find).  Again, I agree the res=
+ulting
+code is more complex than I would prefer, but from a userspace perspective =
+I
+don't see this as problematic.
 
-[auto build test WARNING on next-20230808]
-[cannot apply to kvm/queue acme/perf/core tip/perf/core kvm/linux-next v6.5-rc5 v6.5-rc4 v6.5-rc3 linus/master v6.5-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> + Keeping the file open keeps the VM around in the kernel even though
+>   the VM fd may already be closed.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dapeng-Mi/KVM-x86-pmu-Support-PMU-fixed-counter-3/20230809-030457
-base:   next-20230808
-patch link:    https://lore.kernel.org/r/20230808063111.1870070-9-dapeng1.mi%40linux.intel.com
-patch subject: [PATCH RFV v2 08/13] perf/core: Add new function perf_event_topdown_metrics()
-config: arm-randconfig-r046-20230808 (https://download.01.org/0day-ci/archive/20230809/202308090418.vTakFy6e-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce: (https://download.01.org/0day-ci/archive/20230809/202308090418.vTakFy6e-lkp@intel.com/reproduce)
+That is perfectly ok.  There is plenty of prior art, as well as plenty of w=
+ays
+for userspace to shoot itself in the foot.  E.g. open a stats fd for a vCPU=
+ and
+the VM and all its vCPUs will be kept alive.  And conceptually it's sound,
+anything created in the scope of a VM _should_ pin the VM.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308090418.vTakFy6e-lkp@intel.com/
+> I feel that memslots form a natural way of managing usage of the gmem
+> file. When a memslot is created, it is using the file; hence we take a
+> refcount on the gmem file, and as memslots are removed, we drop
+> refcounts on the gmem file.
 
-All warnings (new ones prefixed by >>):
+Yes and no.  It's definitely more natural *if* the goal is to allow guest_m=
+emfd
+memory to exist without being attached to a VM.  But I'm not at all convinc=
+ed
+that we want to allow that, or that it has desirable properties.  With TDX =
+and
+SNP in particuarly, I'm pretty sure that allowing memory to outlive the VM =
+is
+very underisable (more below).
 
-   In file included from kernel/sched/build_policy.c:34:
-   In file included from kernel/sched/sched.h:61:
-   In file included from include/linux/syscalls_api.h:1:
-   In file included from include/linux/syscalls.h:90:
-   In file included from include/trace/syscall.h:7:
-   In file included from include/linux/trace_events.h:10:
->> include/linux/perf_event.h:1793:18: warning: declaration of 'struct td_metrics' will not be visible outside of this function [-Wvisibility]
-                                                struct td_metrics *value)
-                                                       ^
-   1 warning generated.
---
-   In file included from kernel/sched/fair.c:56:
-   In file included from kernel/sched/sched.h:61:
-   In file included from include/linux/syscalls_api.h:1:
-   In file included from include/linux/syscalls.h:90:
-   In file included from include/trace/syscall.h:7:
-   In file included from include/linux/trace_events.h:10:
->> include/linux/perf_event.h:1793:18: warning: declaration of 'struct td_metrics' will not be visible outside of this function [-Wvisibility]
-                                                struct td_metrics *value)
-                                                       ^
-   kernel/sched/fair.c:702:6: warning: no previous prototype for function 'update_entity_lag' [-Wmissing-prototypes]
-   void update_entity_lag(struct cfs_rq *cfs_rq, struct sched_entity *se)
-        ^
-   kernel/sched/fair.c:702:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void update_entity_lag(struct cfs_rq *cfs_rq, struct sched_entity *se)
-   ^
-   static 
-   kernel/sched/fair.c:12732:6: warning: no previous prototype for function 'free_fair_sched_group' [-Wmissing-prototypes]
-   void free_fair_sched_group(struct task_group *tg) { }
-        ^
-   kernel/sched/fair.c:12732:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void free_fair_sched_group(struct task_group *tg) { }
-   ^
-   static 
-   kernel/sched/fair.c:12734:5: warning: no previous prototype for function 'alloc_fair_sched_group' [-Wmissing-prototypes]
-   int alloc_fair_sched_group(struct task_group *tg, struct task_group *parent)
-       ^
-   kernel/sched/fair.c:12734:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int alloc_fair_sched_group(struct task_group *tg, struct task_group *parent)
-   ^
-   static 
-   kernel/sched/fair.c:12739:6: warning: no previous prototype for function 'online_fair_sched_group' [-Wmissing-prototypes]
-   void online_fair_sched_group(struct task_group *tg) { }
-        ^
-   kernel/sched/fair.c:12739:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void online_fair_sched_group(struct task_group *tg) { }
-   ^
-   static 
-   kernel/sched/fair.c:12741:6: warning: no previous prototype for function 'unregister_fair_sched_group' [-Wmissing-prototypes]
-   void unregister_fair_sched_group(struct task_group *tg) { }
-        ^
-   kernel/sched/fair.c:12741:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void unregister_fair_sched_group(struct task_group *tg) { }
-   ^
-   static 
-   kernel/sched/fair.c:503:20: warning: unused function 'list_del_leaf_cfs_rq' [-Wunused-function]
-   static inline void list_del_leaf_cfs_rq(struct cfs_rq *cfs_rq)
-                      ^
-   kernel/sched/fair.c:524:19: warning: unused function 'tg_is_idle' [-Wunused-function]
-   static inline int tg_is_idle(struct task_group *tg)
-                     ^
-   kernel/sched/fair.c:548:19: warning: unused function 'max_vruntime' [-Wunused-function]
-   static inline u64 max_vruntime(u64 max_vruntime, u64 vruntime)
-                     ^
-   kernel/sched/fair.c:1262:20: warning: unused function 'is_core_idle' [-Wunused-function]
-   static inline bool is_core_idle(int cpu)
-                      ^
-   kernel/sched/fair.c:3452:20: warning: unused function 'account_numa_enqueue' [-Wunused-function]
-   static inline void account_numa_enqueue(struct rq *rq, struct task_struct *p)
-                      ^
-   kernel/sched/fair.c:3456:20: warning: unused function 'account_numa_dequeue' [-Wunused-function]
-   static inline void account_numa_dequeue(struct rq *rq, struct task_struct *p)
-                      ^
-   kernel/sched/fair.c:3460:20: warning: unused function 'update_scan_period' [-Wunused-function]
-   static inline void update_scan_period(struct task_struct *p, int new_cpu)
-                      ^
-   kernel/sched/fair.c:4872:20: warning: unused function 'cfs_rq_is_decayed' [-Wunused-function]
-   static inline bool cfs_rq_is_decayed(struct cfs_rq *cfs_rq)
-                      ^
-   kernel/sched/fair.c:4887:20: warning: unused function 'remove_entity_load_avg' [-Wunused-function]
-   static inline void remove_entity_load_avg(struct sched_entity *se) {}
-                      ^
-   kernel/sched/fair.c:6259:20: warning: unused function 'cfs_bandwidth_used' [-Wunused-function]
-   static inline bool cfs_bandwidth_used(void)
-                      ^
-   kernel/sched/fair.c:6267:20: warning: unused function 'sync_throttle' [-Wunused-function]
-   static inline void sync_throttle(struct task_group *tg, int cpu) {}
-                      ^
-   kernel/sched/fair.c:6280:19: warning: unused function 'throttled_lb_pair' [-Wunused-function]
-   static inline int throttled_lb_pair(struct task_group *tg,
-                     ^
-   kernel/sched/fair.c:6291:37: warning: unused function 'tg_cfs_bandwidth' [-Wunused-function]
-   static inline struct cfs_bandwidth *tg_cfs_bandwidth(struct task_group *tg)
-                                       ^
-   kernel/sched/fair.c:6295:20: warning: unused function 'destroy_cfs_bandwidth' [-Wunused-function]
-   static inline void destroy_cfs_bandwidth(struct cfs_bandwidth *cfs_b) {}
-                      ^
-   kernel/sched/fair.c:6296:20: warning: unused function 'update_runtime_enabled' [-Wunused-function]
-   static inline void update_runtime_enabled(struct rq *rq) {}
-                      ^
-   kernel/sched/fair.c:6297:20: warning: unused function 'unthrottle_offline_cfs_rqs' [-Wunused-function]
-   static inline void unthrottle_offline_cfs_rqs(struct rq *rq) {}
-                      ^
-   22 warnings generated.
---
-   In file included from kernel/sched/core.c:13:
-   In file included from include/linux/syscalls_api.h:1:
-   In file included from include/linux/syscalls.h:90:
-   In file included from include/trace/syscall.h:7:
-   In file included from include/linux/trace_events.h:10:
->> include/linux/perf_event.h:1793:18: warning: declaration of 'struct td_metrics' will not be visible outside of this function [-Wvisibility]
-                                                struct td_metrics *value)
-                                                       ^
-   kernel/sched/core.c:3695:20: warning: unused function 'rq_has_pinned_tasks' [-Wunused-function]
-   static inline bool rq_has_pinned_tasks(struct rq *rq)
-                      ^
-   kernel/sched/core.c:5822:20: warning: unused function 'sched_tick_start' [-Wunused-function]
-   static inline void sched_tick_start(int cpu) { }
-                      ^
-   kernel/sched/core.c:5823:20: warning: unused function 'sched_tick_stop' [-Wunused-function]
-   static inline void sched_tick_stop(int cpu) { }
-                      ^
-   kernel/sched/core.c:6523:20: warning: unused function 'sched_core_cpu_starting' [-Wunused-function]
-   static inline void sched_core_cpu_starting(unsigned int cpu) {}
-                      ^
-   kernel/sched/core.c:6524:20: warning: unused function 'sched_core_cpu_deactivate' [-Wunused-function]
-   static inline void sched_core_cpu_deactivate(unsigned int cpu) {}
-                      ^
-   kernel/sched/core.c:6525:20: warning: unused function 'sched_core_cpu_dying' [-Wunused-function]
-   static inline void sched_core_cpu_dying(unsigned int cpu) {}
-                      ^
-   7 warnings generated.
+> The KVM pointer is shared among all the bindings in gmem=E2=80=99s xarray=
+, and we can
+> enforce that a gmem file is used only with one VM:
+>=20
+> + When binding a memslot to the file, if a kvm pointer exists, it must
+>   be the same kvm as the one in this binding
+> + When the binding to the last memslot is removed from a file, NULL the
+>   kvm pointer.
 
+Nullifying the KVM pointer isn't sufficient, because without additional act=
+ions
+userspace could extract data from a VM by deleting its memslots and then bi=
+nding
+the guest_memfd to an attacker controlled VM.  Or more likely with TDX and =
+SNP,
+induce badness by coercing KVM into mapping memory into a guest with the wr=
+ong
+ASID/HKID.
 
-vim +1793 include/linux/perf_event.h
+I can think of three ways to handle that:
 
-  1791	
-  1792	static inline int perf_event_topdown_metrics(struct perf_event *event,
-> 1793						     struct td_metrics *value)
-  1794	{
-  1795		return 0;
-  1796	}
-  1797	#endif
-  1798	
+  (a) prevent a different VM from *ever* binding to the gmem instance
+  (b) free/zero physical pages when unbinding
+  (c) free/zero when binding to a different VM
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Option (a) is easy, but that pretty much defeats the purpose of decopuling
+guest_memfd from a VM.
+
+Option (b) isn't hard to implement, but it screws up the lifecycle of the m=
+emory,
+e.g. would require memory when a memslot is deleted.  That isn't necessaril=
+y a
+deal-breaker, but it runs counter to how KVM memlots currently operate.  Me=
+mslots
+are basically just weird page tables, e.g. deleting a memslot doesn't have =
+any
+impact on the underlying data in memory.  TDX throws a wrench in this as re=
+moving
+a page from the Secure EPT is effectively destructive to the data (can't be=
+ mapped
+back in to the VM without zeroing the data), but IMO that's an oddity with =
+TDX and
+not necessarily something we want to carry over to other VM types.
+
+There would also be performance implications (probably a non-issue in pract=
+ice),
+and weirdness if/when we get to sharing, linking and/or mmap()ing gmem.  E.=
+g. what
+should happen if the last memslot (binding) is deleted, but there outstandi=
+ng userspace
+mappings?
+
+Option (c) is better from a lifecycle perspective, but it adds its own flav=
+or of
+complexity, e.g. the performant way to reclaim TDX memory requires the TDMR
+(effectively the VM pointer), and so a deferred relcaim doesn't really work=
+ for
+TDX.  And I'm pretty sure it *can't* work for SNP, because RMP entries must=
+ not
+outlive the VM; KVM can't reuse an ASID if there are pages assigned to that=
+ ASID
+in the RMP, i.e. until all memory belonging to the VM has been fully freed.
+
+> Could binding gmem files not on creation, but at memslot configuration
+> time be sufficient and simpler?
+
+After working through the flows, I think binding on-demand would simplify t=
+he
+refcounting (stating the obvious), but complicate the lifecycle of the memo=
+ry as
+well as the contract between KVM and userspace, and would break the separat=
+ion of
+concerns between the inode (physical memory / data) and file (VM's view / m=
+appings).
