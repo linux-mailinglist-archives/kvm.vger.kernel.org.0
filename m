@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28C3877458B
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 20:43:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87279774753
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 21:14:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230486AbjHHSna (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 14:43:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60526 "EHLO
+        id S235081AbjHHTOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 15:14:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbjHHSnK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 14:43:10 -0400
+        with ESMTP id S235235AbjHHTNs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 15:13:48 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E84F1D96
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:36:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F3536023
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 09:36:30 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 50DF862500
-        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:47:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22302C433C7;
-        Tue,  8 Aug 2023 11:47:19 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D22BB6250F
+        for <kvm@vger.kernel.org>; Tue,  8 Aug 2023 11:48:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45234C433C7;
+        Tue,  8 Aug 2023 11:48:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691495239;
-        bh=RYO2JAa7ghNvgDPNXogmd3jf0/ibv470rZsbZ6x/4Uw=;
+        s=k20201202; t=1691495299;
+        bh=g9lF6f/zofV6XDIjwy9g9CHoD3pdiuP3oaDjd8BrvyA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lugcxRBcGQ9lUEhXOVSJG5gBXKxz6GQIQhcCpfXbrJR9dCVg5OeV0cXGWyLGDeV6L
-         AyGFBbugFeLcj48yNFKvptqJDsAZ3ERTej0iUvw6zzPul4KzJrw/RCkKJ4MW1IfbEe
-         tVdZNCUSCNRaMszuF1mmV7UcL8s18Bp8nQ8FmLHOBxERLM+uDiS3l98O/BrU8S7ADC
-         kUWKharWXPyF5H1kPyIj7Sm5I3iKjFfQFz+kYmJJGtgsATsiUNyiloRkOc2Nmu2pD+
-         pSiM6LbLHyIfdAoS8iafgOq2s5yKdw6sblHmbFF3iRwmDHiMn1qDHpOC/6C8kqhU8V
-         vFaOFBMKJ5jhA==
+        b=dyX4cW6Xyzq34ZXtBd/CFEasBWMqWXtA8SKcfWUEJ+gARk8SD9fYgINi8PcYjZIej
+         dRVAbB4kk/TaHWtziXR1X45N4NjwHfNgthzbCrjME3G7ur73Xln50mSHMgWygW4Qjr
+         jGyhctoCU3HLYFhIorbuQxqhxm6bpTveMm3Bac51TXFvXTnYwYLqvem+yKV8hDjkqX
+         RrT9Lj6LosI9uyX6jFFTNlgR2yXlfQ5g0uLObI4wMSk+HNbI2LwDR7OG8EeR3HhdkT
+         DPQopKpQYy/gCp3PuSW5MzBOk9m7vhJsNIrHwl7sTuVxWeEzUAdqZsjbzyu0VIHfN+
+         lUjksO/+vX6Uw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qTLBF-0037Ph-BQ;
-        Tue, 08 Aug 2023 12:47:17 +0100
+        id 1qTLBG-0037Ph-0g;
+        Tue, 08 Aug 2023 12:47:18 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -56,9 +56,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v3 08/27] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-Date:   Tue,  8 Aug 2023 12:46:52 +0100
-Message-Id: <20230808114711.2013842-9-maz@kernel.org>
+Subject: [PATCH v3 10/27] KVM: arm64: Correctly handle ACCDATA_EL1 traps
+Date:   Tue,  8 Aug 2023 12:46:54 +0100
+Message-Id: <20230808114711.2013842-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808114711.2013842-1-maz@kernel.org>
 References: <20230808114711.2013842-1-maz@kernel.org>
@@ -78,171 +78,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we're about to implement full support for FEAT_FGT, add the
-full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
+As we blindly reset some HFGxTR_EL2 bits to 0, we also randomly trap
+unsuspecting sysregs that have their trap bits with a negative
+polarity.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+ACCDATA_EL1 is one such register that can be accessed by the guest,
+causing a splat on the host as we don't have a proper handler for
+it.
+
+Adding such handler addresses the issue, though there are a number
+of other registers missing as the current architecture documentation
+doesn't describe them yet.
+
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 ---
- arch/arm64/include/asm/sysreg.h |   2 -
- arch/arm64/tools/sysreg         | 129 ++++++++++++++++++++++++++++++++
- 2 files changed, 129 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ arch/arm64/kvm/sys_regs.c       | 2 ++
+ 2 files changed, 4 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 6d9d7ac4b31c..043c677e9f04 100644
+index 043c677e9f04..818c111009ca 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -495,8 +495,6 @@
- #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+@@ -387,6 +387,8 @@
+ #define SYS_ICC_IGRPEN0_EL1		sys_reg(3, 0, 12, 12, 6)
+ #define SYS_ICC_IGRPEN1_EL1		sys_reg(3, 0, 12, 12, 7)
  
- #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
--#define SYS_HDFGRTR_EL2			sys_reg(3, 4, 3, 1, 4)
--#define SYS_HDFGWTR_EL2			sys_reg(3, 4, 3, 1, 5)
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
- #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 65866bf819c3..2517ef7c21cf 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -2156,6 +2156,135 @@ Field	1	ICIALLU
- Field	0	ICIALLUIS
- EndSysreg
++#define SYS_ACCDATA_EL1			sys_reg(3, 0, 13, 0, 5)
++
+ #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
  
-+Sysreg HDFGRTR_EL2	3	4	3	1	4
-+Field	63	PMBIDR_EL1
-+Field	62	nPMSNEVFR_EL1
-+Field	61	nBRBDATA
-+Field	60	nBRBCTL
-+Field	59	nBRBIDR
-+Field	58	PMCEIDn_EL0
-+Field	57	PMUSERENR_EL0
-+Field	56	TRBTRG_EL1
-+Field	55	TRBSR_EL1
-+Field	54	TRBPTR_EL1
-+Field	53	TRBMAR_EL1
-+Field	52	TRBLIMITR_EL1
-+Field	51	TRBIDR_EL1
-+Field	50	TRBBASER_EL1
-+Res0	49
-+Field	48	TRCVICTLR
-+Field	47	TRCSTATR
-+Field	46	TRCSSCSRn
-+Field	45	TRCSEQSTR
-+Field	44	TRCPRGCTLR
-+Field	43	TRCOSLSR
-+Res0	42
-+Field	41	TRCIMSPECn
-+Field	40	TRCID
-+Res0	39:38
-+Field	37	TRCCNTVRn
-+Field	36	TRCCLAIM
-+Field	35	TRCAUXCTLR
-+Field	34	TRCAUTHSTATUS
-+Field	33	TRC
-+Field	32	PMSLATFR_EL1
-+Field	31	PMSIRR_EL1
-+Field	30	PMSIDR_EL1
-+Field	29	PMSICR_EL1
-+Field	28	PMSFCR_EL1
-+Field	27	PMSEVFR_EL1
-+Field	26	PMSCR_EL1
-+Field	25	PMBSR_EL1
-+Field	24	PMBPTR_EL1
-+Field	23	PMBLIMITR_EL1
-+Field	22	PMMIR_EL1
-+Res0	21:20
-+Field	19	PMSELR_EL0
-+Field	18	PMOVS
-+Field	17	PMINTEN
-+Field	16	PMCNTEN
-+Field	15	PMCCNTR_EL0
-+Field	14	PMCCFILTR_EL0
-+Field	13	PMEVTYPERn_EL0
-+Field	12	PMEVCNTRn_EL0
-+Field	11	OSDLR_EL1
-+Field	10	OSECCR_EL1
-+Field	9	OSLSR_EL1
-+Res0	8
-+Field	7	DBGPRCR_EL1
-+Field	6	DBGAUTHSTATUS_EL1
-+Field	5	DBGCLAIM
-+Field	4	MDSCR_EL1
-+Field	3	DBGWVRn_EL1
-+Field	2	DBGWCRn_EL1
-+Field	1	DBGBVRn_EL1
-+Field	0	DBGBCRn_EL1
-+EndSysreg
+ #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2ca2973abe66..38f221f9fc98 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2151,6 +2151,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXTIDR_EL1, 0 },
+ 	{ SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
+ 
++	{ SYS_DESC(SYS_ACCDATA_EL1), undef_access },
 +
-+Sysreg HDFGWTR_EL2	3	4	3	1	5
-+Res0	63
-+Field	62	nPMSNEVFR_EL1
-+Field	61	nBRBDATA
-+Field	60	nBRBCTL
-+Res0	59:58
-+Field	57	PMUSERENR_EL0
-+Field	56	TRBTRG_EL1
-+Field	55	TRBSR_EL1
-+Field	54	TRBPTR_EL1
-+Field	53	TRBMAR_EL1
-+Field	52	TRBLIMITR_EL1
-+Res0	51
-+Field	50	TRBBASER_EL1
-+Field	49	TRFCR_EL1
-+Field	48	TRCVICTLR
-+Res0	47
-+Field	46	TRCSSCSRn
-+Field	45	TRCSEQSTR
-+Field	44	TRCPRGCTLR
-+Res0	43
-+Field	42	TRCOSLAR
-+Field	41	TRCIMSPECn
-+Res0	40:38
-+Field	37	TRCCNTVRn
-+Field	36	TRCCLAIM
-+Field	35	TRCAUXCTLR
-+Res0	34
-+Field	33	TRC
-+Field	32	PMSLATFR_EL1
-+Field	31	PMSIRR_EL1
-+Res0	30
-+Field	29	PMSICR_EL1
-+Field	28	PMSFCR_EL1
-+Field	27	PMSEVFR_EL1
-+Field	26	PMSCR_EL1
-+Field	25	PMBSR_EL1
-+Field	24	PMBPTR_EL1
-+Field	23	PMBLIMITR_EL1
-+Res0	22
-+Field	21	PMCR_EL0
-+Field	20	PMSWINC_EL0
-+Field	19	PMSELR_EL0
-+Field	18	PMOVS
-+Field	17	PMINTEN
-+Field	16	PMCNTEN
-+Field	15	PMCCNTR_EL0
-+Field	14	PMCCFILTR_EL0
-+Field	13	PMEVTYPERn_EL0
-+Field	12	PMEVCNTRn_EL0
-+Field	11	OSDLR_EL1
-+Field	10	OSECCR_EL1
-+Res0	9
-+Field	8	OSLAR_EL1
-+Field	7	DBGPRCR_EL1
-+Res0	6
-+Field	5	DBGCLAIM
-+Field	4	MDSCR_EL1
-+Field	3	DBGWVRn_EL1
-+Field	2	DBGWCRn_EL1
-+Field	1	DBGBVRn_EL1
-+Field	0	DBGBCRn_EL1
-+EndSysreg
-+
- Sysreg	ZCR_EL2	3	4	1	2	0
- Fields	ZCR_ELx
- EndSysreg
+ 	{ SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
+ 
+ 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
 -- 
 2.34.1
 
