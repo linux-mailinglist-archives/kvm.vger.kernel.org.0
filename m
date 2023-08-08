@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48CF47746D0
-	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 21:02:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8BB47746CD
+	for <lists+kvm@lfdr.de>; Tue,  8 Aug 2023 21:02:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233376AbjHHTCx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 15:02:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49664 "EHLO
+        id S231769AbjHHTCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 15:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233409AbjHHTBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 15:01:53 -0400
+        with ESMTP id S230035AbjHHTBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 15:01:54 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C745187EB0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36AAC187EB1;
         Tue,  8 Aug 2023 10:31:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691515899; x=1723051899;
+  t=1691515901; x=1723051901;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=v2TBA06nKy1Tjy6kQhxIeqPQoJIb6eI5+/NRpk5Kagw=;
-  b=FaCNBzbTwFWhkl/78MOtcK+M2XR3pmGMrQEJT3vLf7OkZmm1mwOgLNPH
-   pz58ek8JCbt6dvReUgRQrQkpNL8xp8+J0U96H6K08xltOdTFlR/9ihdw0
-   L9qVq6pTUnkfmypNlzlQhWwEH9UrLWs2ZdVBTQKdAfTDN8vJiAU7tpCBp
-   S0U//fgCwOpXl4wSJ0HkwkmgArYxwfQG28eB7JVFO3BdF2A7c+IXcprHJ
-   miRP3eTdvXOl6n8QgF0q1w6hAXy+mg0xiaF2jWlwiXYRE/ypcpQMU1omH
-   l9dcIlyONEokgUt5oCA6OF15U1nOFvghbzznlnXbLMywy7fCvX/QuLj+h
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="434582015"
+  bh=BI0wCz5Y1/hfopD6qA0qFJQF81Z7fbGbcwe5ACKj33k=;
+  b=glbnkBclzXSDsID57KE/WICXqYBWP18bhv39X3c55MT9Ek0N2Ct7xIzK
+   v6oxRDD0448icuxAtoSrLgIDCa5uGYyzXaIgu3sUn/3gPKXVSxuOwWGCA
+   VQLW4ooyZ5aqX84uGHOhbRkoIbpudZY2IrzBAx+vGREhuYTLp8Rua+HfN
+   wrGMwSKshchDtpDP6fDH9SKfvwVxldnwWCztKmNpCpQ3iD09sSoZWU2Ee
+   I5tQwFK8d07bTOe+SShCn+p6HXo1mw2cUcC5ZzeAWdFreQSWFrwxQDR+P
+   uTMclUdSoCxxu9YIDrE0qRW4qUAeZHw2AiqBAgBuY9+qoqeKCxXkvgaHp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="434582052"
 X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="434582015"
+   d="scan'208";a="434582052"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 23:26:44 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2023 23:26:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="734377719"
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="734377740"
 X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="734377719"
+   d="scan'208";a="734377740"
 Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga007.fm.intel.com with ESMTP; 07 Aug 2023 23:26:40 -0700
+  by fmsmga007.fm.intel.com with ESMTP; 07 Aug 2023 23:26:50 -0700
 From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -58,11 +58,10 @@ Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
         Lv Zhiyuan <zhiyuan.lv@intel.com>,
         Yang Weijiang <weijiang.yang@intel.com>,
         Dapeng Mi <dapeng1.mi@intel.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>,
-        Marc Zyngier <maz@kernel.org>
-Subject: [PATCH RFV v2 05/13] perf/core: Add function perf_event_create_group_kernel_counters()
-Date:   Tue,  8 Aug 2023 14:31:03 +0800
-Message-Id: <20230808063111.1870070-6-dapeng1.mi@linux.intel.com>
+        Dapeng Mi <dapeng1.mi@linux.intel.com>
+Subject: [PATCH RFV v2 06/13] perf/x86: Fix typos and inconsistent indents in perf_event header
+Date:   Tue,  8 Aug 2023 14:31:04 +0800
+Message-Id: <20230808063111.1870070-7-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230808063111.1870070-1-dapeng1.mi@linux.intel.com>
 References: <20230808063111.1870070-1-dapeng1.mi@linux.intel.com>
@@ -78,133 +77,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add function perf_event_create_group_kernel_counters() which can be used
-to create group perf events from kernel space.
+There is one typo and some inconsistent indents in perf_event.h header
+file. Fix them.
 
-Comparing with modifying function perf_event_create_kernel_counter()
-directly to support create group events, creating a new function looks a
-better method since function perf_event_create_kernel_counter() is called
-by many places in kernel and modifying directly this function introduces
-lots of changes.
-
-Kernel space may want to create group events just like user space perf
-tool does. One example is to support topdown metrics feature in KVM.
-
-Current perf logic requires perf tool creates an perf events group to
-handle the topdown metrics profiling. The events group couples one slots
-event acting as group leader and multiple metric events.
-
-To support topdown metrics feature in KVM, KVM has to follow this
-requirement to create the events group from kernel space. That's why we
-need to add this new function.
-
-Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- include/linux/perf_event.h |  6 ++++++
- kernel/events/core.c       | 39 ++++++++++++++++++++++++++++++++++++--
- 2 files changed, 43 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/perf_event.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index 2166a69e3bf2..e95152531f4c 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -1104,6 +1104,12 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr,
- 				struct task_struct *task,
- 				perf_overflow_handler_t callback,
- 				void *context);
-+extern struct perf_event *
-+perf_event_create_group_kernel_counters(struct perf_event_attr *attr,
-+					int cpu, struct task_struct *task,
-+					struct perf_event *group_leader,
-+					perf_overflow_handler_t overflow_handler,
-+					void *context);
- extern void perf_pmu_migrate_context(struct pmu *pmu,
- 				int src_cpu, int dst_cpu);
- int perf_event_read_local(struct perf_event *event, u64 *value,
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 15eb82d1a010..1877171e9590 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -12762,11 +12762,34 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
- 				 struct task_struct *task,
- 				 perf_overflow_handler_t overflow_handler,
- 				 void *context)
-+{
-+	return perf_event_create_group_kernel_counters(attr, cpu, task,
-+			NULL, overflow_handler, context);
-+}
-+EXPORT_SYMBOL_GPL(perf_event_create_kernel_counter);
-+
-+/**
-+ * perf_event_create_group_kernel_counters
-+ *
-+ * @attr: attributes of the counter to create
-+ * @cpu: cpu in which the counter is bound
-+ * @task: task to profile (NULL for percpu)
-+ * @group_leader: the group leader event of the created event
-+ * @overflow_handler: callback to trigger when we hit the event
-+ * @context: context data could be used in overflow_handler callback
-+ */
-+struct perf_event *
-+perf_event_create_group_kernel_counters(struct perf_event_attr *attr,
-+					int cpu, struct task_struct *task,
-+					struct perf_event *group_leader,
-+					perf_overflow_handler_t overflow_handler,
-+					void *context)
- {
- 	struct perf_event_pmu_context *pmu_ctx;
- 	struct perf_event_context *ctx;
- 	struct perf_event *event;
- 	struct pmu *pmu;
-+	int move_group = 0;
- 	int err;
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 85a9fd5a3ec3..63e1ce1f4b27 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -386,15 +386,15 @@ static inline bool is_topdown_idx(int idx)
+  *
+  * With this fake counter assigned, the guest LBR event user (such as KVM),
+  * can program the LBR registers on its own, and we don't actually do anything
+- * with then in the host context.
++ * with them in the host context.
+  */
+-#define INTEL_PMC_IDX_FIXED_VLBR	(GLOBAL_STATUS_LBRS_FROZEN_BIT)
++#define INTEL_PMC_IDX_FIXED_VLBR		(GLOBAL_STATUS_LBRS_FROZEN_BIT)
  
- 	/*
-@@ -12776,7 +12799,11 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
- 	if (attr->aux_output)
- 		return ERR_PTR(-EINVAL);
+ /*
+  * Pseudo-encoding the guest LBR event as event=0x00,umask=0x1b,
+  * since it would claim bit 58 which is effectively Fixed26.
+  */
+-#define INTEL_FIXED_VLBR_EVENT	0x1b00
++#define INTEL_FIXED_VLBR_EVENT			0x1b00
  
--	event = perf_event_alloc(attr, cpu, task, NULL, NULL,
-+	if (task && group_leader &&
-+	    group_leader->attr.inherit != attr->inherit)
-+		return ERR_PTR(-EINVAL);
-+
-+	event = perf_event_alloc(attr, cpu, task, group_leader, NULL,
- 				 overflow_handler, context, -1);
- 	if (IS_ERR(event)) {
- 		err = PTR_ERR(event);
-@@ -12806,6 +12833,11 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
- 		goto err_unlock;
- 	}
- 
-+	err = perf_event_group_leader_check(group_leader, event, attr, ctx,
-+					    &pmu, &move_group);
-+	if (err)
-+		goto err_unlock;
-+
- 	pmu_ctx = find_get_pmu_context(pmu, ctx, event);
- 	if (IS_ERR(pmu_ctx)) {
- 		err = PTR_ERR(pmu_ctx);
-@@ -12833,6 +12865,9 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
- 		goto err_pmu_ctx;
- 	}
- 
-+	if (move_group)
-+		perf_event_move_group(group_leader, pmu_ctx, ctx);
-+
- 	perf_install_in_context(ctx, event, event->cpu);
- 	perf_unpin_context(ctx);
- 	mutex_unlock(&ctx->mutex);
-@@ -12851,7 +12886,7 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
- err:
- 	return ERR_PTR(err);
- }
--EXPORT_SYMBOL_GPL(perf_event_create_kernel_counter);
-+EXPORT_SYMBOL_GPL(perf_event_create_group_kernel_counters);
- 
- static void __perf_pmu_remove(struct perf_event_context *ctx,
- 			      int cpu, struct pmu *pmu,
+ /*
+  * Adaptive PEBS v4
 -- 
 2.34.1
 
