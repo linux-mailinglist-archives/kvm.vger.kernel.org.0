@@ -2,259 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6A1577653E
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 18:42:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8A4A776545
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 18:43:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbjHIQmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 12:42:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33026 "EHLO
+        id S230301AbjHIQnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 12:43:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230204AbjHIQl6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 12:41:58 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBA351982
-        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 09:41:57 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-40a47e8e38dso309761cf.1
-        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 09:41:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691599317; x=1692204117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lPf4XGOX6Yz3caGFLI4HNiFX/4urner6v/ltX/ESS/0=;
-        b=M8NqHm95x4nGnCdrVnscaqRXS4zv1xJk+mKi6qhzpoV0xAgedW8xKK1WrktthW+/qX
-         b79Rjw1HWdoTj0bfrzxyYngD13WhEXYtTDNUTB4Nwp3syn4yn8vOXHVKklDeZcJZpc9o
-         GDICgnZbUUQ4VwPvxkozg6ZrzrsWy820TbFiNBjvXSnVlLga3PusimdxiUHWSrjmgq9M
-         YMKKBcxudeH5NygCy+Ei5czOibqi8SOG3nDIHx+h0cIT0Z9F1Ff0QOjnl3TwU7bKPVG3
-         fESF+gvCoCtyd47weuYbH5uFlwg9LfCAVKAGmtq8i8np6ERRNhFQ4wt4KpNnlYCunDKT
-         NTyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691599317; x=1692204117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lPf4XGOX6Yz3caGFLI4HNiFX/4urner6v/ltX/ESS/0=;
-        b=Sauxc8zSKHHhlmZMyxSOunKdqIepLg+fM8o6yYTOFMD9lBRvRlW+fxr4ggdYs06vFX
-         pa5wv+u9N6cmh30EnNU5Ak+QzeU+4FHkj6Xd+i7Eu9JvwGzkMjrZPHV15Ekb4TdDtGaS
-         XPuHeZ+G+xJrD2Gdi7GosdOJ34RoFZmofcw7IBFhh9yrboNxv5Jjp29PgSH90xPMJpA+
-         vRAhAPldE8Ed8dKSeR+eLMWIxL2eY7JIOD1eiHc/zdLqFBveRbdlV2FCnLIHBvxYEw2D
-         QNjuGhYT+SrRBoVH9lWKptKWStZaoJL5ZJoHEe0WDZjSnwbODjyDuZ3iAuumvwwNAdBQ
-         HLxQ==
-X-Gm-Message-State: AOJu0Ywa5otsvfDri7G0K20KuioHhZosImRKvkDu+8ysOKb9Zftmg39g
-        2EdOgPmO/pyxHzbbijPvHyvWk7SRKWrMHV1wzJMTQg==
-X-Google-Smtp-Source: AGHT+IEasKjYjirTCPg/lhza9bQPF4rYp5ejx4/QKjY7XilhifZ9KFaFlpeH95SrDC1XV+HGwPF+ASFIZPAlqAB/AME=
-X-Received: by 2002:ac8:5dc9:0:b0:3f5:2006:50f1 with SMTP id
- e9-20020ac85dc9000000b003f5200650f1mr133814qtx.12.1691599316808; Wed, 09 Aug
- 2023 09:41:56 -0700 (PDT)
+        with ESMTP id S229541AbjHIQnl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 12:43:41 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2077.outbound.protection.outlook.com [40.107.237.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CDE1BD9;
+        Wed,  9 Aug 2023 09:43:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IO/5v4wzSEUc2PydNkpoFe4ADm6NeR8h/AtnNORxQpKGohqEKZYnT4SuJhWpdKPkZFAyxreSmsErqP1leO0YonZ4tXyUzEQCmsiganW5PgO/JHVV2O/2i0TtHmoFSzUvLZeMlCSaTRtpbrXTqSWlqYzcx7eOiCXPjO8Dt8QkT3Mz8RR+PfKDXxWJyqCcKUu7ppzHHQK3wej22K6l6R1Npb52YG3pWrzpFLtQF5Qyg/SDBB/j8WUT2/K0U+/NALomcTm4ispb4EgHVCP0c7FzTCh4XM3i78gbUWRlYcpaNwr9fxLcfzbaKu2KRfnPvG6LVZsskgqK5bzpHPjbrGhndw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hlnAzR+DK4eiEGt851MoVpLGi8DGxEsjhA3tTsYhjNA=;
+ b=j0dfAvOhk0wWkODxTDwJ8sBfq8riYBwTUCM0TrHZVfyXXPaOrmHBCND+EEDp194Q69nDlJMf4VKCsW5wWhbt0CmQv3h3A50Fkx2USyTOkYnWfr0wIh11dBmDVEfw5CiwgOt4OsueD57Fiu/sI3ZHYThQEChHCT6vpZo+31BQ0fNqmfsMlIa32Xwga24xaIvvzqYSgPyRHqndRFQeZfHuwvxla8aAJzmqsNbsmj+h0nVAOE872LoKaR9OAqyZGb+SFJ7kv5q2G4kwx+TmkH8GHoamNONVxjetISph9llh6a3vIHfS/YaNsMq6R4Hs3JYaWtV441QxrU0T/yzH7hOQNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hlnAzR+DK4eiEGt851MoVpLGi8DGxEsjhA3tTsYhjNA=;
+ b=sQwxlFtF4xGOnDu3vbPa3H29GR9Ps4dN6CkyfzhB+Xj6ukFcEDpicaa9frbyco1ALD6B3AUMYyQgM71u2binx2Z12jPhflYzrJHkb7bLT/Xxfg5ygLe1t0BZOVLsB2HyI0GRyqtwm3+2py5nwvD/qkZpcFjoolpDcTssM0beh6ogS+fGDSeVoRPRPBbF/BkrzESTlcD7Rc6xI68ctWPZL50d+hknkqy5K67BNLP4ybyA9ezV9H0J93JG2v1YgXd81aydHgCT2TkWK85M2ZIa+Y0JuqS3ppHuOqmWGWPgOTmJWVG9xz/YK/9Zlv0b0isomsFsdZ+8InU5OP788k5+Ow==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SN7PR12MB8129.namprd12.prod.outlook.com (2603:10b6:806:323::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Wed, 9 Aug
+ 2023 16:43:38 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6652.028; Wed, 9 Aug 2023
+ 16:43:38 +0000
+Date:   Wed, 9 Aug 2023 13:43:33 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
+        robin.murphy@arm.com, baolu.lu@linux.intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com
+Subject: Re: [PATCH v6 3/4] iommufd: Add IOMMU_GET_HW_INFO
+Message-ID: <ZNPCNQxUesiMD1wM@nvidia.com>
+References: <20230808153510.4170-1-yi.l.liu@intel.com>
+ <20230808153510.4170-4-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230808153510.4170-4-yi.l.liu@intel.com>
+X-ClientProxiedBy: SJ0PR03CA0380.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::25) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-6-rananta@google.com>
- <15975205-6161-d54b-fe40-805a16b0cb27@redhat.com>
-In-Reply-To: <15975205-6161-d54b-fe40-805a16b0cb27@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Wed, 9 Aug 2023 09:41:44 -0700
-Message-ID: <CAJHc60xk1ZAw-44FG7CDbAGPMUSnAmZ3LxMPGcQ0RPBcenHrig@mail.gmail.com>
-Subject: Re: [PATCH v8 05/14] KVM: Allow range-based TLB invalidation from
- common code
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Shaoqin Huang <shahuang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB8129:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5039e698-cc16-493a-1f7a-08db98f7c7a4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OFEZJtxtvBVzzDJXM1UVuPycL11N/srPEqGE3IBFbQBgztK1lYC37X5ZhS9uRl/MIWfFs7VC5KxS5SViwmwfnO4i3AZVlrpfL6Z9LQ02/lgEtgp8140A5C8iGpmJxuOo1fic2KcTpVDl6lQTl1BV+YQbxQys7q57hRhHBZkM6y8zpA9JReOUQKxKGV56YBIFJp9IHkVzpefQvX3hW8xRnh5keWGoHKnrxKkk4s7Z65CdSd2TY3le59Kvv2O9pxhQkDj7BeGbOFOx+hCZv7Nn+zlouET6LEW4XlU8lVd6nrFzpU1/HaczsSi6TZ3dcOZy8ZfSoLVON6Cbo5v4GAeLGMLocYqxx8IMznJ9oS/2tYsRuwMjpATd5+1AgXmsy3GgJ9jw7xkHIrrotBAuxq9Z08ZXCSQ/PQvzwmJa3yf75tYOa9eJLQ+JV8+zYmMIe/k8OjA0y4DssJblyPMy2jVB8UDRXZtjQjA8gJZTGWqa2R5MtM8TeUCU4ybGKAKGwduN0f/8BmEdsbzMrM/PyJTyx7Yb8WQ3z41SA6PoRxqaRDAa2uwjFvnlDBEKlHOBS003
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(186006)(451199021)(1800799006)(83380400001)(2616005)(2906002)(7416002)(6916009)(4326008)(4744005)(5660300002)(8936002)(38100700002)(8676002)(316002)(66476007)(66946007)(66556008)(86362001)(478600001)(6666004)(6512007)(6486002)(41300700001)(36756003)(26005)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?l2G4+mDWctULKvMdeuul0ma3UzL3QklRDAOsZSkSolDgTgbU4oFSCnLBO6Xm?=
+ =?us-ascii?Q?HktZnwKjO8gnskQ4gjF/uOFxDbXYoq3MTm//vF07JaxrLCb4/ObGG/7kaeTG?=
+ =?us-ascii?Q?B9UDk3FAMcvOmaeDQnWTKZUI5lpxkzlO6mjT+xq4crgOYxVTHwxPakhov57v?=
+ =?us-ascii?Q?aEJ9I59/1BX3f7KU2Mfgmo9lf7XBHEdCFmqRVbbFd2f3WyjX07M+j2rPyvNU?=
+ =?us-ascii?Q?MO8F+yVhddopN1ypC501C6WbhXQAoSGyYUU8VxHfrY/0+Zjx2o0KiHp4lk4Q?=
+ =?us-ascii?Q?kgvr0ebrQjIGM5P+czrpY8NxV/HyZn3dBpXGHiYHAKZfLTBBJ2R3rKOfPIxb?=
+ =?us-ascii?Q?GhWa7d+GbL6qOZsy5x1m+1NuKvSIxGU/7IUq/ae7a5wgP9kNGHyWPpJ2A6A3?=
+ =?us-ascii?Q?/QhGY46MqjJDQ4h9LSXtv/tKHPwtOWKL7uk1F2xkAxUVSuaSTZ0arYmFfnRq?=
+ =?us-ascii?Q?bdq/pmGonsuRyf1f261KU4Kugb/tjAGBUH5Rj6Wq7dhGRfaKuKDO5wj/Puau?=
+ =?us-ascii?Q?P50CqCHPKPYtNyzrOVkXy6nKOS9yB69RNEU/gd3VgIvOnc4v0V4NZv8mRqRB?=
+ =?us-ascii?Q?JFrgPHqr+UKpIO19Tpds1FLd3W5on5DzG8HtCTYwkqjbQd0nAHbYxrEvJRDQ?=
+ =?us-ascii?Q?Jo61Fknbx/2IgUiO7YzFlDj0cceRTrgjCAMAfz9ChdLMN5UgO3BXRRo5513V?=
+ =?us-ascii?Q?GCQxeAZHFyJd4A8uVJPuiCcrXgeOvZwb7nRsYjNeSW492Qztx5BkW7d30cdt?=
+ =?us-ascii?Q?1frsG1oE4b8S6YKmn5GvaD7B1HhAHOZAchG/ZkaZMa/cJ0jH9dPm1pSwJBWw?=
+ =?us-ascii?Q?eb/dEuURrCcTmLllPYAD4g1abYOQu+vQcq3x4oQiFsgxrYzwJuR42WIRswxf?=
+ =?us-ascii?Q?56549jxnQvav7m7uZh0ZrJOq/vnyzyJ2aXX/tlvO++25aC7ZFnPO3+ZkimCY?=
+ =?us-ascii?Q?ZP2KBPad9Yv4txkVIhARkQGACd5jLXCLhrZqdWbsZCs+xIjHJZntVGgkh5rz?=
+ =?us-ascii?Q?G21RDICEm25KHFrPh8VjSZxfCesX38nwkelTqTt9IkJQTq2y+Z4QCNBeO5t8?=
+ =?us-ascii?Q?Ty+fEz1VKVOKLdUnfczw80mRFbNO3J4Q7i4WpVvudfxmxs71/XOc1CzZBi8S?=
+ =?us-ascii?Q?MwAJL1AaLmgksHL5SG/bk0FIv8Tsd+AUdn8i+dl0sX5pBiKD99iKQNdQ8qBb?=
+ =?us-ascii?Q?AjiWJ0l4esHy8KQmJ88Ke/VGxxchvQS4W9s4Qtm6GG2dC5L5NuxciCpo0DPi?=
+ =?us-ascii?Q?+EdZq0FiQ2/G1DfnYxUYlXGjXVCDIDNlpQSpjfoMvYag0BI/2kM6m17OBiGH?=
+ =?us-ascii?Q?S7F9DfZVIq/lhJhXNO4x2bHKUvQo7Zh/wm8dsPjvR6iuJdiKPhkFdsm4cV7X?=
+ =?us-ascii?Q?kusyjZ0XeR+G/Ct2Rg38VGcuBgjypPW7NWSlpwD3E1DhEd+3ZwWdEs2ZOimx?=
+ =?us-ascii?Q?kOMXcYK7IHFCebqS1EP8M9ki3l4zxztKX99hDcs2dbfe6gDxke84WeQX3C1i?=
+ =?us-ascii?Q?8jN9KyI9UIILCXfBRQGLXMAWwe0F9q7npnNPakMXU9RpFCHNtEwMNjreuQY+?=
+ =?us-ascii?Q?TamI2HjZNB11yIwLtg63Hlws1Tw6qy2MxA9oEe3N?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5039e698-cc16-493a-1f7a-08db98f7c7a4
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 16:43:37.9355
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OGrSD/4PD8cZDntRJ+QWn2OQFGq2xJdcQHQ7vi/5aAJ6CiWFrmH+iZFWAzFUYwd6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8129
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 8, 2023 at 11:09=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote=
-:
->
-> On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
-> > From: David Matlack <dmatlack@google.com>
-> >
-> > Make kvm_flush_remote_tlbs_range() visible in common code and create a
-> > default implementation that just invalidates the whole TLB.
-> >
-> > This paves the way for several future features/cleanups:
-> >
-> >   - Introduction of range-based TLBI on ARM.
-> >   - Eliminating kvm_arch_flush_remote_tlbs_memslot()
-> >   - Moving the KVM/x86 TDP MMU to common code.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Gavin Shan <gshan@redhat.com>
-> > Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
-> > Reviewed-by: Anup Patel <anup@brainfault.org>
-> > ---
-> >   arch/x86/include/asm/kvm_host.h |  2 ++
-> >   arch/x86/kvm/mmu/mmu.c          |  8 ++++----
-> >   arch/x86/kvm/mmu/mmu_internal.h |  3 ---
-> >   include/linux/kvm_host.h        | 12 ++++++++++++
-> >   virt/kvm/kvm_main.c             | 13 +++++++++++++
-> >   5 files changed, 31 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index a2d3cfc2eb75c..b547d17c58f63 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1804,6 +1804,8 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
-ct kvm *kvm)
-> >               return -ENOTSUPP;
-> >   }
-> >
-> > +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > +
-> >   #define kvm_arch_pmi_in_guest(vcpu) \
-> >       ((vcpu) && (vcpu)->arch.handling_intr_from_guest)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ec169f5c7dce2..6adbe6c870982 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -278,16 +278,16 @@ static inline bool kvm_available_flush_remote_tlb=
-s_range(void)
-> >       return kvm_x86_ops.flush_remote_tlbs_range;
-> >   }
-> >
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -                              gfn_t nr_pages)
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > +                                   u64 nr_pages)
-> >   {
-> >       int ret =3D -EOPNOTSUPP;
-> >
-> >       if (kvm_x86_ops.flush_remote_tlbs_range)
-> >               ret =3D static_call(kvm_x86_flush_remote_tlbs_range)(kvm,=
- start_gfn,
-> >                                                                  nr_pag=
-es);
-> > -     if (ret)
-> > -             kvm_flush_remote_tlbs(kvm);
-> > +
-> > +     return ret;
-> >   }
-> >
->
-> I guess @start_gfn can be renamed to @gfn, to be consistent with its decl=
-aration
-> in include/linux/kvm_host.h and struct kvm_x86_ops::flush_remote_tlbs_ran=
-ge()
->
-Oh, yes. I'll consider this change for v9 (if there are enough changes
-and we plan to push one).
+On Tue, Aug 08, 2023 at 08:35:09AM -0700, Yi Liu wrote:
+> +static int iommufd_zero_fill_user(void __user *ptr, size_t bytes)
+> +{
+> +	int index = 0;
+> +
+> +	for (; index < bytes; index++) {
+> +		if (put_user(0, (uint8_t __user *)(ptr + index)))
+> +			return -EFAULT;
+> +	}
 
-Thank you.
-Raghavendra
+I've recently learned this routine is spelled 'clear_user()'
 
-> >   static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)=
-;
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_int=
-ernal.h
-> > index d39af5639ce97..86cb83bb34804 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -170,9 +170,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm=
-,
-> >                                   struct kvm_memory_slot *slot, u64 gfn=
-,
-> >                                   int min_level);
-> >
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -                              gfn_t nr_pages);
-> > -
-> >   /* Flush the given page (huge or not) of guest memory. */
-> >   static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t g=
-fn, int level)
-> >   {
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index ade5d4500c2ce..f0be5d9c37dd1 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
-> >   void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mod=
-e);
-> >
-> >   void kvm_flush_remote_tlbs(struct kvm *kvm);
-> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pa=
-ges);
-> >
-> >   #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> >   int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int m=
-in);
-> > @@ -1488,6 +1489,17 @@ static inline int kvm_arch_flush_remote_tlbs(str=
-uct kvm *kvm)
-> >   int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> >   #endif
-> >
-> > +#ifndef __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
-> > +static inline int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-> > +                                                 gfn_t gfn, u64 nr_pag=
-es)
-> > +{
-> > +     return -EOPNOTSUPP;
-> > +}
-> > +#else
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
-> > +                                   gfn_t gfn, u64 nr_pages);
-> > +#endif
-> > +
-> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
-> >   void kvm_arch_register_noncoherent_dma(struct kvm *kvm);
-> >   void kvm_arch_unregister_noncoherent_dma(struct kvm *kvm);
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d6b0507861550..26e91000f579d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -366,6 +366,19 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
-> >   }
-> >   EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
-> >
-> > +void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pa=
-ges)
-> > +{
-> > +     if (!kvm_arch_flush_remote_tlbs_range(kvm, gfn, nr_pages))
-> > +             return;
-> > +
-> > +     /*
-> > +      * Fall back to a flushing entire TLBs if the architecture range-=
-based
-> > +      * TLB invalidation is unsupported or can't be performed for what=
-ever
-> > +      * reason.
-> > +      */
-> > +     kvm_flush_remote_tlbs(kvm);
-> > +}
-> > +
-> >   static void kvm_flush_shadow_all(struct kvm *kvm)
-> >   {
-> >       kvm_arch_flush_shadow_all(kvm);
->
-> Thanks,
-> Gavin
->
+Jason
