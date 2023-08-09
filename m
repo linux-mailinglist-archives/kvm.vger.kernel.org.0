@@ -2,212 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5681477505A
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 03:29:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CA08775080
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 03:45:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbjHIB3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 21:29:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33848 "EHLO
+        id S230450AbjHIBpA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 21:45:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbjHIB3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 21:29:53 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B5DF173F;
-        Tue,  8 Aug 2023 18:29:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691544592; x=1723080592;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=/WZNBxq6I6MCGnubWyEeZzwN/+Ce8WdlSC4QJ8H1zpA=;
-  b=abhZihh9lr3ulTAUVAJlbL6sDG3IGccM01kc3lrhTfiW2ibbg0cvxMJy
-   vLf9yylupFI1gesvhvOsj+BGKf1rpeRtqPKa4zH3Bkpdv+dRFUG2esZKr
-   y8et4J58Zegx1ANZGLmPGlFCkMQWoc/sSFypQeNxC2in7Nx/d+SYiHwT/
-   6mE07wkPOFPW8cIlV3F74QhgFxK7hUGLCQ9MFy8j4CfH4nYPrFAzFSfJj
-   zgW7Icn/bvPZBT6CkYGujVUYg4ODq2XLA5bqQ82+1X9s8clb1zPk3MPBT
-   4GjI57828v8lkclleCrNAXD+osVI6voSYomwNrmAbasmC7AgGtrg2lkdy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="351304186"
-X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
-   d="scan'208";a="351304186"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 18:29:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="761162689"
-X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
-   d="scan'208";a="761162689"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga008.jf.intel.com with ESMTP; 08 Aug 2023 18:29:51 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 8 Aug 2023 18:29:51 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 8 Aug 2023 18:29:51 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 8 Aug 2023 18:29:50 -0700
+        with ESMTP id S230195AbjHIBo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 21:44:59 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2094.outbound.protection.outlook.com [40.107.220.94])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A39F1982;
+        Tue,  8 Aug 2023 18:44:58 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WqFUJworrrDURoPCF5YrGOiTXqoaAvNtqBgYX0lsBm15UGZksdhgwQXtrbjMQEEC9pPbQlaceEBX+cQRCP4na7wYBNvFnhBeO4+JAMeQi5o4jE5PcYjOGtP8HwADu5Jqu6AnXCz9lRTvjtgQDGMTahwMrZRNLbkV1zZMSuJT1V25JRBmO9lMLMk/ViDBgXiYK6GsjXJDlQgbWWA8tgHp78ASFVL7qYDwWSWmE3dJ1QOuHa4Jw3hchCoE8hes53FfQRH2Vm+XXo0sonee5kAixiX9lRb17qpxkegX/HTmXGZ8xpw4B1ERYb7qgFdqGCeD8YuOnc+NBp/EmqtKSao+Fw==
+ b=VdwyxeY5U9gHRkWaN5SI34MLTvlxR0VPdzE3sBCjjjvJV9e9ZsvfuPcYvKu78J6zSK5FH8m+MZLzmXvv8Ue11gv47jGkEFR2UeoyfTQwGMBhd3ZqoYA4Cm49B0BOb+bka6Iwjs0FUrkcPcZxTHs63gmsZx8qvrqMwND78/qlt97bPaBo88nHPfWjnu9c5pHz/1i/mcdcl3pPYQVilW6eu03dhXBnr7a1cPNiHWtNSwZNXU2ZYshsklQQKr99NfU0OMcRBK0NOqmSb9VS/uGJuF1qSQrrSQLQVIx0xtn6MXiOoB3aNdWqAymGvuCVb9Mb5LxLf6Ob1Csb5R7WoK5f7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=83xn5JeDmv3newAy06m0YJifnuMPrb22dj2LWGha6qM=;
- b=IHKN3acpSNYMc5NK45qcKES/DhT1u36s01xjWhS3chW7HKh7cCmp20+DfvmaNjUBsyCgkiwqJmiCUuKDlAqdtbl8d0xGL4YA/00+4cBV5ZaoqPovG3mTKGmJ6QFmwMZjNYfzkWfjBXp5Pk3rfKaUhDjZEyi4IEnHVKcsptITM5W+l3yK/zERgKv/SPUpbH3wGWaXUt9wfCQ98IFtyqdkStbSNiLfCtDojv1uAPP94iXgLW/BLAvTovKFwIuRv45XnnSBnDIXiZwDYGmKBuxN68TMdYnjqpkFwmweK6UXwhZUBkuoXn8g8JhqWbP2JzoliuAhvDGfwCazrJm6Pcd2mg==
+ bh=v9jg819mhanbD2rclFVjTh61HzjMSpSIt9SvwBwyAwI=;
+ b=Ww4IBuBRCdIcaqYNid4DJpsfTZ1PGA03MOtGJc4Kwmhggg3m1S1/DFkrxYMmfkLtPl6UVB7Yc5h18cA90NsHSFXG3PHod8TV/yE/Z+gyp8JKyAV8igqj2zkInnlXBmNIVDXyEbMxYuoyYrBnYhuu4Q/nYr12ybAavVloXc+wu4jsOc3ftVpSO/EbpnSseAHFyrlAi4AQDmDUAAJl/Dsy3e2VLNXhZBTIJgiJhLY1RXRviqYSaAB/DjBCNCnSpdLudTxpkkzikx8mzUMWsHsjqQ7qZ89mrjBuDYZeikLeoXDhBffLo4epFgHtWd1CKArGBgr1FhVAfT5t86AY7KPOnw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v9jg819mhanbD2rclFVjTh61HzjMSpSIt9SvwBwyAwI=;
+ b=K4mVPy2e293ndoebZgoAkSwCGyAT5dZDXWqMpqWQ/i/WOMXFhbGEBOtzg6MlsPrd495XCYlxjyt3lWJkgXoN1OkuZquWc/YR+0rN7TXSsJakzWu0K3IJhKmkGYvewI6rKu7IKxa/XJDBY9c2mxCKh5K18sq5WRpeke2iQX8hQyk=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SJ2PR11MB7426.namprd11.prod.outlook.com (2603:10b6:a03:4c4::8) with Microsoft
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ PH0PR01MB8118.prod.exchangelabs.com (2603:10b6:510:29c::19) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.27; Wed, 9 Aug 2023 01:29:49 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::1b1a:af8e:7514:6f63]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::1b1a:af8e:7514:6f63%2]) with mapi id 15.20.6652.028; Wed, 9 Aug 2023
- 01:29:48 +0000
-Date:   Wed, 9 Aug 2023 09:02:41 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Like Xu <like.xu.linux@gmail.com>, <kvm@vger.kernel.org>,
-        <intel-gfx@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
-        "Zhenyu Wang" <zhenyuw@linux.intel.com>,
-        Ben Gardon <bgardon@google.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Zhi Wang" <zhi.a.wang@intel.com>
-Subject: Re: [PATCH 19/27] KVM: x86/mmu: Use page-track notifiers iff there
- are external users
-Message-ID: <ZNLlseYag5DniUg3@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20221223005739.1295925-1-seanjc@google.com>
- <20221223005739.1295925-20-seanjc@google.com>
- <5581418b-2e1c-6011-f0a4-580df7e00b44@gmail.com>
- <ZNEni2XZuwiPgqaC@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZNEni2XZuwiPgqaC@google.com>
-X-ClientProxiedBy: SI2PR04CA0004.apcprd04.prod.outlook.com
- (2603:1096:4:197::22) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ 15.20.6652.25; Wed, 9 Aug 2023 01:44:53 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::d62f:d774:15b0:4a40]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::d62f:d774:15b0:4a40%4]) with mapi id 15.20.6652.026; Wed, 9 Aug 2023
+ 01:44:52 +0000
+From:   Huang Shijie <shijie@os.amperecomputing.com>
+To:     maz@kernel.org
+Cc:     oliver.upton@linux.dev, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com,
+        peterz@infradead.org, ingo@redhat.com, acme@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, namhyung@kernel.org, irogers@google.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, patches@amperecomputing.com,
+        zwang@amperecomputing.com,
+        Huang Shijie <shijie@os.amperecomputing.com>
+Subject: [PATCH] perf/core: fix the bug in the event multiplexing
+Date:   Wed,  9 Aug 2023 09:39:53 +0800
+Message-Id: <20230809013953.7692-1-shijie@os.amperecomputing.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CH2PR08CA0013.namprd08.prod.outlook.com
+ (2603:10b6:610:5a::23) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ2PR11MB7426:EE_
-X-MS-Office365-Filtering-Correlation-Id: d43866fd-821c-48c1-b877-08db98781e06
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|PH0PR01MB8118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a487444-e968-4013-b558-08db987a397d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: U9eGkO0tIgxmKnAB9VM5z7hfshFwFoQfz98/Wd8qMg4YwF6S+4Ld75m1zcMUAbPQHcOvLYVfM4zKXuyT4NU1KXhY0hVJmKITiR1D7qfpohzPsgtBxwF7Du1FCm93RwieucBEl/GxTOWNm1RaC4tUe70x3iloRZoH6MNwtynYi1pIzOA92dUFFY0j+tob2cQ+y2vt8LoIy8DfCoa4rtt6uGx1JEytbIndLdRVD2+7xW+uhEkj+rcG4OtPwutcqNRMsfZRcL4n2swfXr5Ypf504U7iEWGUDxJ9jBJmyJfoOfmwPdNQjdzDl3fQV0ZwZFcgyiqlxIL7v4/A1foFIV957HVrOmX7+5DnkV5magkvJ7h6E7gUo5UeSeipuu1wRhe5tzYQUTUvcYd3YMdt9NRo7xJXbRzC5WafDE7HZTy5PD6Aw22pgU9O1ca+be58pPq4Q2mkreIDapLcz6sedbEFc3+Qot4bCcvbo3L2MakOo6mUxxXAYUdCoyIVl1LKD0nGCPEu8rVtJXgL0oE0+MXuYIbTA/KMlx/SF7p4XcVa5HK2PQmGptt3gr276C19HRMpB7ZLIcCTs7pRBBXZAV7vs/ofsDP/CGkozx8ioeXqdtd/+4oPhKIftZiw4jbtypcfxXbNtIgePMNZn8uMbX7/gQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(136003)(366004)(376002)(39860400002)(451199021)(1800799006)(186006)(3450700001)(83380400001)(316002)(41300700001)(6666004)(2906002)(86362001)(5660300002)(8936002)(53546011)(26005)(6506007)(8676002)(54906003)(6512007)(6486002)(66556008)(82960400001)(66946007)(66476007)(38100700002)(478600001)(6916009)(4326008)(26730200005)(19860200003);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: Tglo45JWWddTWQD06yjH232/bRukz0zfSrOACw6Coc3lqTwSvIz1Vjd/B4l/ITXxXf8WEeOdvPOc5kl7SPseJ/HLzb2wKawAXtRlKmNmBy2nt/NfLF0ZkYpKd7i2RO1FBMue7VojmUxuvJHocT9s2fswiGvGrseQ00q6anpc1kZIEelcb4zeSEDBQOadX88t4DbH5NhyLZAwVKDl56a4pB+XiYXj7p43jBzFJpmWPr6pQDpWGkT759wOBlPMtPfUR8BoCXKlNl8Vx4fkGc1mCAhQ/EOoTE717KRUCkq86W3QSr1Vx4gKa7O4N8hHLD06S+eUEGhSeSEoT4VLCHymJxxzRbZbJBdctrUca0F2tzseRRUi+gpJUm99PMqwKyfEUTEcxdWteX6gOqKE2VrB5nxXpLcmwv6FxtsJ2LhLXXSD1/zgFzGfWZivclc3NI9kpTXIXiDInt2qTkt+CVDRqoVQ/wfW334rcl3t/vJhCZ7Ynma9NcgTauZ+HCyuQrTzHZIIgzMwrGwn0V3PkZL0hbzed9W/mj+p7IN8wLAY3S7HGIHsRzKxuFqEzuW0qVBsBLyZluEzi5BOsXMP8v25jBDXkTBTrQDQQjFlgi9hiXLd/pU+TYXKIyrMaAyBDjPlkrsnR/Jf7MhKH3hPcxJCGg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(366004)(39850400004)(186006)(451199021)(1800799006)(2616005)(52116002)(2906002)(86362001)(1076003)(6512007)(6486002)(478600001)(26005)(107886003)(6506007)(41300700001)(8936002)(4326008)(8676002)(66556008)(7416002)(66946007)(316002)(38350700002)(38100700002)(5660300002)(66476007)(6916009)(83380400001)(309714004);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FYJRwQmVIbd0a1o01/B7RLS8dVP2EB5X6fNo4zky2kvm40BtDAbFJ+yrWFHO?=
- =?us-ascii?Q?jl3UAC5hh3CZHxutKfX0snaVTOFPt0IGvO7PlfjwdQfBQYxiagPfOKV2vuqy?=
- =?us-ascii?Q?mwxfoRykN9xozbP8XgUU1kLQrlG9qAQcQxZRndcvBkkyaYOQhUE7ibd1NYZI?=
- =?us-ascii?Q?XRI+KLLLzBcKrVE7G6qgXhZT1KKfvIvNiSXBuMkIDIvLxfxMx094Z8MFuSMI?=
- =?us-ascii?Q?TpYZSX/BCPv83SHi2ICjUkK5QHYCJK9moYqqHRy/7kIw5GrzlkYL3OXd4BBd?=
- =?us-ascii?Q?erIrWjwkAsweTRB8JsdNl/RnI2PK8qlhNThIVr773IgVkma7Jha+lVz+A6ZC?=
- =?us-ascii?Q?MUJjNBNd9hiAWwoP0x0ntfN5pPRT5vM1nVdKvCulsgwUCE/WiDiAZ6G2SpYR?=
- =?us-ascii?Q?6TmcBOiyDlaxmmsJ9Rb3q98xLN3fLWdgxP9j/FhyPaXHHVDW/atE34KofAhg?=
- =?us-ascii?Q?lgHFFChDQOXUZunOJViD6JcnnDGT47Zb8CVaxPZ8dR4OFgfzDa21AVLBBj5Y?=
- =?us-ascii?Q?/KK2n4GiuqzO8WRYXyTQypB4xas65hCv5B5+tjQG/nRwx+Yp6G+FTt5RE5ZT?=
- =?us-ascii?Q?Xs9UK/O+rtbJ+WJkfI4N5fLAYUCUUBTdZfXsdmqw2nmsbMfZGC10lKt8fzNw?=
- =?us-ascii?Q?MA6DqolgcWcBLDHzbVMVgvqU4lxm22T7uW0pcQlazlAL4MU+zR/jYxA22ZU4?=
- =?us-ascii?Q?Xlyip4b/mUmb2GpcdW7VURRCgJV8hjfLWLOBlyh5FKN+3uy8JwEqbMt+c1L9?=
- =?us-ascii?Q?eR1hfPAgdLeAjm+jhAfAoCBZa6ajXR+dPTu6TKQqT91MtKV8G0wJo7RmiKsI?=
- =?us-ascii?Q?4acZzTEdg1WLiZO9IFnf9joOZfPQyesufurnvpSSEaLoEiemhh9X65PWd0Zs?=
- =?us-ascii?Q?OQvQMccM9Yf9ZXvx5aiP8vAZOl9lFQoxiiZhzOS6r58Gs+eBGqRH5wLmGpuR?=
- =?us-ascii?Q?cFflgvl7YaCZX97vpascXgKyitdlDZI7HlSPowYx9h/cWy+5bP6NK2S3MI8j?=
- =?us-ascii?Q?3fiL/obeYbQ2LLX54ENZ4DOvg/tmI4MwLrSEmBMtLY3N+1gLZEtR8o0mjxGr?=
- =?us-ascii?Q?tbLUoiT2pEbEIMZ2Fr9uBH6UPY3VaJ9wfll3BlsWwtbf9tW6YX1TBWGwTZOh?=
- =?us-ascii?Q?XfSFobx2MlzlCR5Q6sQRCydnUe2tGRaQ0dE/Yw3l3cI69mL2jDk0MdnY5poh?=
- =?us-ascii?Q?9UrTbnNv22T7XZiaRpmgzpfjocW3kcL3a2wbqVqkVhlcLH3ecQWZPxZqoSTy?=
- =?us-ascii?Q?qdmKW7m5nv5MG7qAqAT/JQjcxeOazCYdT2CrswOms8yPg0cvWAbcIjm7k+gz?=
- =?us-ascii?Q?bD0jI1saAGm/QlTCjbyfjh+ragx/13bsLxdi9vZ+d+heqlU5z6XHZk6CXvkb?=
- =?us-ascii?Q?+QULTxWLyTXSIfrxHkWJstPA0Qt2RyPOfUQPYMYkYSa27jlVZuXZLJDag+Ny?=
- =?us-ascii?Q?bdnL7uJMOKQHk+aoeeXQJ1zNfNW0YG1qwp92Gnv63FnzIY5/aG9vWcnM9kHL?=
- =?us-ascii?Q?bG86K5DrzTkYhoO4qgA5em8V6WDl5ZcIQHHWlMmoEBL1enRl8i/YnGyxxFwR?=
- =?us-ascii?Q?6++oVHdl2vaBLgt2nElXqSoc69+2hFJegGU4GE+4?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d43866fd-821c-48c1-b877-08db98781e06
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/yl5zHIoDSMhGOQiK2uyTd9uVzpe0Mqr9K+FBQubuQzSKpZbYeG9ChMZ5XLi?=
+ =?us-ascii?Q?5VBT5AvNhXTsDllHj/sppide9TnMQ1FbXZwSv5lH+C4RsPbHmTyGAHvKRvY+?=
+ =?us-ascii?Q?HJ6mbqZQTo59THuJbCd3GSfwRsWOVxb5EzSsE7f4UrbFYDqBbDZpA2rom24A?=
+ =?us-ascii?Q?aD91vH1wNjn1GDS1qq/yQzfe5LoejYa0Gku4toudsLFoj2TwUwbb50c4pmuP?=
+ =?us-ascii?Q?MHb+hAJKf51EmKH2Vh0omK8k6lQtmRVyE3BZEjy4USyVYfYUEnKjtheSg6sD?=
+ =?us-ascii?Q?CSKU7Bq7QVI2Nh1hF0H9wZ2+xv87mLyhjQQf+Ifod4tyEka0W7bNecjvQO+/?=
+ =?us-ascii?Q?bohN7AYbwYTRxV4Hi7IvQPw3Zif+smyFrn9gizVqFiKq/5/kAKIdi5H6KyS6?=
+ =?us-ascii?Q?uexOiGMEdqubhroDW/O7eMyPb9KU3yZB7xhA2QSFk3KfurZLmD8sCmkiw4T2?=
+ =?us-ascii?Q?sM9Va3BmSCnxkShPGQsFHqMCdH9F7sX+hLjntzPnfwtl0vUPtTIQJAD5Hilw?=
+ =?us-ascii?Q?OKPceh1VKW4wKB0gR2O9LRm7olG1qP+5iWbWudH+UC2IcH//fjz+mAdUBQ5I?=
+ =?us-ascii?Q?2PQsYA/kUrUFZPmZJ6QaiLEW7B/XmoDkFefjtg16QloMW71JtE6YabKjSUlH?=
+ =?us-ascii?Q?LMy5HTjgtQ2reNvcRcE4EyUDx3wnWqHpWJRQ1q36/izW8HXXehvVSyunfyxl?=
+ =?us-ascii?Q?2xuUliuipHLlJP9xKCGSjTyLRnWCxlDCPwRCeU4e/MoOVnpS5VIjmWhUdv8T?=
+ =?us-ascii?Q?4dZd6YUCwpxALBdm46TqXzRaXU0CPH+H8XwmWMGhMeWRKi3ddi+o5AzDBv7H?=
+ =?us-ascii?Q?uP0Pjl1MxxULJCyvjEfyYlo3jQBXBQL8GJaN//Pil3Ztu2t71uR3AFC7OgFg?=
+ =?us-ascii?Q?sm+HC1FbK9G3t5n/L0doJg+oHkM/BwrepEx1bI/Hv47+ZnWHSntHKj+MceB5?=
+ =?us-ascii?Q?yLVuNS8V5PX10mTxazTrM2862enPAOCIWj59CLyfzGMoL/F1+/clxIX7bUrc?=
+ =?us-ascii?Q?ZrCD14ziBr1AnToqSo/RwrZtEUvAMmfzgJ4gNGFUC1VTeoCB31fZFG64cKIr?=
+ =?us-ascii?Q?AHUVNAPoSInlaENzAY0AYBJuIDQiKUw2l4Pi2phzDe+1Har67Qegmua6sQMR?=
+ =?us-ascii?Q?Wa2N/v2pgdwWalJ2aZmf8q5H18ay2zZWsqPWAbMo68b9dvO9iGgcNIdqZjY+?=
+ =?us-ascii?Q?Y3rRpaDi9/Y5Jy+0EBTNTCRL1jKwzjrwBqFpvVp/ACFgW3KsaDYQQYCVFoCA?=
+ =?us-ascii?Q?HKyAD3toGj774eDxPl70pCi7X1UnBsXAAtP2N/qSIJ6XFgFAeeJy3efyHLF4?=
+ =?us-ascii?Q?XDn9YYLywzCYZmu6bixS6iQWlb20U+0EFsJ1uIlL2KDAzO9AnXaqr9lfE5dj?=
+ =?us-ascii?Q?4GWmN5J7Fs0SxudjKy+jcmJky6xQtTwlhbFT3vGMjtZDH7PyBJydynna0UtM?=
+ =?us-ascii?Q?T8ydmzMjVBrb0KuKtUuh7Sj7yEMnz7qzxLK86j0nh082qZZtaOeR7NhLDz42?=
+ =?us-ascii?Q?kyDztckT2/ICs13fSqJ+skGfdyi8WCo7KH52EVkoVlvSABAdaWtcJeVW8P3N?=
+ =?us-ascii?Q?bng5edOeQnBSRXXy8DFblkNBVM6RDAz+KlgFe005f9LWofI97sKwZ4IenqP4?=
+ =?us-ascii?Q?iBYu18zJCkZaoPBT9qlGaUQ=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a487444-e968-4013-b558-08db987a397d
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 01:29:48.9055
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 01:44:52.7626
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7OUxPR1X2PFYyXv6e1XdMWB3e1RQ8ViyQGto6QqZn8nwJ0fgbIJBG5e0DDzcVLlvk5wD/8Pz5u7lIEqMfdi+2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7426
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3cA2jnJxtuh0IGxpxwcF9Vj8PMFbV4wo4NiBNS9cnq5cQlrAAFmGshitJ2gb7I/7cRJfbiKrBhzrfHLlaR2cqx+ME+ppQB3i/YlZyf2oFcP0b9oUfIFNzRUcr5N0SULc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB8118
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 07, 2023 at 10:19:07AM -0700, Sean Christopherson wrote:
-> On Mon, Aug 07, 2023, Like Xu wrote:
-> > On 23/12/2022 8:57 am, Sean Christopherson wrote:
-> > > +static inline void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
-> > > +					const u8 *new, int bytes)
-> > > +{
-> > > +	__kvm_page_track_write(vcpu, gpa, new, bytes);
-> > > +
-> > > +	kvm_mmu_track_write(vcpu, gpa, new, bytes);
-> > > +}
-> > 
-> > The kvm_mmu_track_write() is only used for x86, where the incoming parameter
-> > "u8 *new" has not been required since 0e0fee5c539b ("kvm: mmu: Fix race in
-> > emulated page table writes"), please help confirm if it's still needed ? Thanks.
-> > A minor clean up is proposed.
-> 
-> Hmm, unless I'm misreading things, KVMGT ultimately doesn't consume @new either.
-> So I think we can remove @new from kvm_page_track_write() entirely.
-Sorry for the late reply.
-Yes, KVMGT does not consume @new and it reads the guest PTE again in the
-page track write handler.
+1.) Background.
+   1.1) In arm64, run a virtual guest with Qemu, and bind the guest
+        to core 33 and run program "a" in guest.
+        The code of "a" shows below:
+   	----------------------------------------------------------
+		#include <stdio.h>
 
-But I have a couple of questions related to the memtioned commit as
-below:
+		int main()
+		{
+			unsigned long i = 0;
 
-(1) If "re-reading the current value of the guest PTE after the MMU lock has
-been acquired", then should KVMGT also acquire the MMU lock too?
-If so, could we move the MMU lock and unlock into kvm_page_track_write()
-as it's common.
+			for (;;) {
+				i++;
+			}
 
-(2) Even if KVMGT consumes @new,
-will kvm_page_track_write() be called for once or twice if there are two
-concurent emulated write?
+			printf("i:%ld\n", i);
+			return 0;
+		}
+   	----------------------------------------------------------
 
+   1.2) Use the following perf command in host:
+      #perf stat -e cycles:G,cycles:H -C 33 -I 1000 sleep 1
+          #           time             counts unit events
+               1.000817400      3,299,471,572      cycles:G
+               1.000817400          3,240,586      cycles:H
 
-commit 0e0fee5c539b61fdd098332e0e2cc375d9073706
-Author: Junaid Shahid <junaids@google.com>
-Date:   Wed Oct 31 14:53:57 2018 -0700
+       This result is correct, my cpu's frequency is 3.3G.
 
-    kvm: mmu: Fix race in emulated page table writes
-    
-    When a guest page table is updated via an emulated write,
-    kvm_mmu_pte_write() is called to update the shadow PTE using the just
-    written guest PTE value. But if two emulated guest PTE writes happened
-    concurrently, it is possible that the guest PTE and the shadow PTE end
-    up being out of sync. Emulated writes do not mark the shadow page as
-    unsync-ed, so this inconsistency will not be resolved even by a guest TLB
-    flush (unless the page was marked as unsync-ed at some other point).
-    
-    This is fixed by re-reading the current value of the guest PTE after the
-    MMU lock has been acquired instead of just using the value that was
-    written prior to calling kvm_mmu_pte_write().
+   1.3) Use the following perf command in host:
+      #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
+            time             counts unit events
+     1.000831480        153,634,097      cycles:G                                                                (70.03%)
+     1.000831480      3,147,940,599      cycles:H                                                                (70.03%)
+     1.000831480      1,143,598,527      L1-dcache-loads                                                         (70.03%)
+     1.000831480              9,986      L1-dcache-load-misses            #    0.00% of all L1-dcache accesses   (70.03%)
+     1.000831480    <not supported>      LLC-loads
+     1.000831480    <not supported>      LLC-load-misses
+     1.000831480        580,887,696      L1-icache-loads                                                         (70.03%)
+     1.000831480             77,855      L1-icache-load-misses            #    0.01% of all L1-icache accesses   (70.03%)
+     1.000831480      6,112,224,612      dTLB-loads                                                              (70.03%)
+     1.000831480             16,222      dTLB-load-misses                 #    0.00% of all dTLB cache accesses  (69.94%)
+     1.000831480        590,015,996      iTLB-loads                                                              (59.95%)
+     1.000831480                505      iTLB-load-misses                 #    0.00% of all iTLB cache accesses  (59.95%)
 
+       This result is wrong. The "cycle:G" should be nearly 3.3G.
 
+2.) Root cause.
+	There is only 7 counters in my arm64 platform:
+	  (one cycle counter) + (6 normal counters)
 
+	In 1.3 above, we will use 10 event counters.
+	Since we only have 7 counters, the perf core will trigger
+       	event multiplexing in hrtimer:
+	     merge_sched_in() -->perf_mux_hrtimer_restart() -->
+	     perf_rotate_context().
 
+       In the perf_rotate_context(), it does not restore some PMU registers
+       as context_switch() does.  In context_switch():
+             kvm_sched_in()  --> kvm_vcpu_pmu_restore_guest()
+             kvm_sched_out() --> kvm_vcpu_pmu_restore_host()
 
+       So we got wrong result.
+
+3.) About this patch.
+        3.1) Add arch_perf_rotate_pmu_set()
+        3.2) Add is_guest().
+	     Check the context for hrtimer.
+	3.3) In arm64's arch_perf_rotate_pmu_set(),
+       	     set the PMU registers by the context.
+
+4.) Test result of this patch:
+      #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
+            time             counts unit events
+     1.000817360      3,297,898,244      cycles:G                                                                (70.03%)
+     1.000817360          2,719,941      cycles:H                                                                (70.03%)
+     1.000817360            883,764      L1-dcache-loads                                                         (70.03%)
+     1.000817360             17,517      L1-dcache-load-misses            #    1.98% of all L1-dcache accesses   (70.03%)
+     1.000817360    <not supported>      LLC-loads
+     1.000817360    <not supported>      LLC-load-misses
+     1.000817360          1,033,816      L1-icache-loads                                                         (70.03%)
+     1.000817360            103,839      L1-icache-load-misses            #   10.04% of all L1-icache accesses   (70.03%)
+     1.000817360            982,401      dTLB-loads                                                              (70.03%)
+     1.000817360             28,272      dTLB-load-misses                 #    2.88% of all dTLB cache accesses  (69.94%)
+     1.000817360            972,072      iTLB-loads                                                              (59.95%)
+     1.000817360                772      iTLB-load-misses                 #    0.08% of all iTLB cache accesses  (59.95%)
+
+    The result is correct. The "cycle:G" is nearly 3.3G now.
+
+Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
+---
+ arch/arm64/kvm/pmu.c     | 8 ++++++++
+ include/linux/kvm_host.h | 1 +
+ kernel/events/core.c     | 5 +++++
+ virt/kvm/kvm_main.c      | 9 +++++++++
+ 4 files changed, 23 insertions(+)
+
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index 121f1a14c829..a6815c3f0c4e 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -210,6 +210,14 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+ 	kvm_vcpu_pmu_disable_el0(events_guest);
+ }
+ 
++void arch_perf_rotate_pmu_set(void)
++{
++	if (is_guest())
++		kvm_vcpu_pmu_restore_guest(NULL);
++	else
++		kvm_vcpu_pmu_restore_host(NULL);
++}
++
+ /*
+  * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
+  * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d3ac7720da9..e350cbc8190f 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -931,6 +931,7 @@ void kvm_destroy_vcpus(struct kvm *kvm);
+ 
+ void vcpu_load(struct kvm_vcpu *vcpu);
+ void vcpu_put(struct kvm_vcpu *vcpu);
++bool is_guest(void);
+ 
+ #ifdef __KVM_HAVE_IOAPIC
+ void kvm_arch_post_irq_ack_notifier_list_update(struct kvm *kvm);
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 6fd9272eec6e..fe78f9d17eba 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -4229,6 +4229,10 @@ ctx_event_to_rotate(struct perf_event_pmu_context *pmu_ctx)
+ 	return event;
+ }
+ 
++void __weak arch_perf_rotate_pmu_set(void)
++{
++}
++
+ static bool perf_rotate_context(struct perf_cpu_pmu_context *cpc)
+ {
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+@@ -4282,6 +4286,7 @@ static bool perf_rotate_context(struct perf_cpu_pmu_context *cpc)
+ 	if (task_event || (task_epc && cpu_event))
+ 		__pmu_ctx_sched_in(task_epc->ctx, pmu);
+ 
++	arch_perf_rotate_pmu_set();
+ 	perf_pmu_enable(pmu);
+ 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index dfbaafbe3a00..a77d336552be 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -218,6 +218,15 @@ void vcpu_load(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(vcpu_load);
+ 
++/* Do we in the guest? */
++bool is_guest(void)
++{
++	struct kvm_vcpu *vcpu;
++
++	vcpu = __this_cpu_read(kvm_running_vcpu);
++	return !!vcpu;
++}
++
+ void vcpu_put(struct kvm_vcpu *vcpu)
+ {
+ 	preempt_disable();
+-- 
+2.39.2
 
