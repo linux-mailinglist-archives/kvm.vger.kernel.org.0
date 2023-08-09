@@ -2,88 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A3CF776560
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 18:47:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8FC57765A9
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 18:54:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229902AbjHIQrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 12:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37480 "EHLO
+        id S231563AbjHIQym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 12:54:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbjHIQrq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 12:47:46 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC361BF2
-        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 09:47:45 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-76cab6fe9c0so7027985a.0
-        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 09:47:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691599665; x=1692204465;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TKLYw5a4wl46UvTRd+wqHFOPUEf9fKU8e+XgZSVZNng=;
-        b=UZTtAGbLc3K12uqEvG0cCmTHPST1v5Wbf0478+3O7Ckqc53+8RtxnB4+1jq/p2R0Bo
-         ulm6Slf37pMz23waX3upGsvgQ3E35cKFkScVLm19DIsLYShJttd0jkdKbaLxTcUuvdBg
-         Hr70lBnodEz73mGydQJEBJyJRsETzs3E9ey5FTqjZj4dVwb8wA7BjTWH+XtbDkH+GNTv
-         HS5KLGULyR0hExNiF3c7QNqivit3NOdL15cFRAFvDKKDOK/UE/6BAuxE3YUqdd/fdanZ
-         FhaDxzymytwbvZFl26n0u1moieBzNKfOtaK6KneNyofhYxodGKgAjQKd3CN+vCOblUlY
-         Ap7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691599665; x=1692204465;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TKLYw5a4wl46UvTRd+wqHFOPUEf9fKU8e+XgZSVZNng=;
-        b=MSZ6A2S72jKqLbBmd1SI1j28dp8LMz5VuMhaO9TZVYVWTet0SzIM5XzZKpQjitX1J+
-         IsRijJ82cGN3rX/IrRI4KPdHIvc0z0OUikuGZqj0gATU/eoUJCyRFAID5SNp5YlvxPFO
-         sPDpQcAEihrkfWvCa3IKL3c4afnYadngFCvXNuWNYxmtZpNtPVngCSamJxTZneRjavv7
-         Uf0MGqVGfgdbnmSzQoX4cUfc/ErOBm01U62mCP0vUJEViAy038qnTlMSyun6Rgg9ENhV
-         ZdbZsOnkBLgMg46tMSPAR/T6jihhmycJUzyvwi/44aSnaFHwkk5OPf/LfQJu/1tnM3fI
-         OzsQ==
-X-Gm-Message-State: AOJu0Yw795odSe9bo6SGdv1IGcXpgh81Iudk/tLJBY5X3BmlbepUJslB
-        T+TEYlXFvZVeXyVebVQxHm4q4A==
-X-Google-Smtp-Source: AGHT+IFRn8dA0ZK+Uka+o0QNJ8QXllmNjP7TWFhaMs/FaD/CpRa3IV+xWwCG1pyRTy9rwrWogdnhkw==
-X-Received: by 2002:a05:620a:40c5:b0:76c:e764:5059 with SMTP id g5-20020a05620a40c500b0076ce7645059mr4328174qko.55.1691599665098;
-        Wed, 09 Aug 2023 09:47:45 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id j11-20020a37c24b000000b0076ce5622df1sm4104961qkm.3.2023.08.09.09.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 09:47:44 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qTmLX-0054uK-A2;
-        Wed, 09 Aug 2023 13:47:43 -0300
-Date:   Wed, 9 Aug 2023 13:47:43 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Li Zetao <lizetao1@huawei.com>
-Cc:     diana.craciun@oss.nxp.com, alex.williamson@redhat.com,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH -next] vfio/fsl-mc: Use module_fsl_mc_driver macro to
- simplify the code
-Message-ID: <ZNPDL82H28AqCUtU@ziepe.ca>
-References: <20230809131536.4021639-1-lizetao1@huawei.com>
+        with ESMTP id S229523AbjHIQyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 12:54:41 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D04DA1FCC;
+        Wed,  9 Aug 2023 09:54:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691600080; x=1723136080;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cWd+WJtraePHa8yoIsytNwHvyearb/8mHjcRzWKS4Cw=;
+  b=ITuPxZkKcJ45A3mH1pQkDyE7xXVsK/qm699VtHwJlmgQHsZVofx9nNgG
+   Yg6WhDS3PVELvr7dOnFb7fLNQT68gWJuMm6HxK/w3ls7xwrdO5SU0L0tx
+   hShZFU9CDt3dOtuKYF8fQQdmi/bk43xLrV3ZVl+yskG6YqZB2ADeFIIbx
+   IlsOzjWX4Y9v5xBbqXUter5tftS50EbWUcN9X75kTq8qpU9Uw4eFAgYMa
+   QsfKOOt/SG0TyHd3LCuL3sr01XJzg8T5fbaNW3zKuYACCCuhPHSMfhMuy
+   rm4L8CmR03f77b4mHXy2B86OcuQrhV0exL6JZKIwc0ZchuRooBwm/afqO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="435065794"
+X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
+   d="scan'208";a="435065794"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 09:54:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="681752880"
+X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
+   d="scan'208";a="681752880"
+Received: from sakkired-mobl1.amr.corp.intel.com (HELO [10.212.9.77]) ([10.212.9.77])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 09:54:38 -0700
+Message-ID: <f66ef6d0-18f7-ebef-0297-ad2f2d578aff@linux.intel.com>
+Date:   Wed, 9 Aug 2023 09:54:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230809131536.4021639-1-lizetao1@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 2/2] x86: move gds_ucode_mitigated() declaration to header
+Content-Language: en-US
+To:     Arnd Bergmann <arnd@kernel.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20230809130530.1913368-1-arnd@kernel.org>
+ <20230809130530.1913368-2-arnd@kernel.org>
+From:   Daniel Sneddon <daniel.sneddon@linux.intel.com>
+In-Reply-To: <20230809130530.1913368-2-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 09, 2023 at 09:15:36PM +0800, Li Zetao wrote:
-> Use the module_fsl_mc_driver macro to simplify the code and
-> remove redundant initialization owner in vfio_fsl_mc_driver.
+HI Arnd,
+
+On 8/9/23 06:05, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> ---
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 14 +-------------
->  1 file changed, 1 insertion(+), 13 deletions(-)
+> The declaration got placed in the .c file of the caller, but that
+> causes a warning for the definition:
+> 
+> arch/x86/kernel/cpu/bugs.c:682:6: error: no previous prototype for 'gds_ucode_mitigated' [-Werror=missing-prototypes]
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+When I build with gcc 9.4 and the x86_64_defconfig I don't see this warning even
+without this patch. I'm curious why you're seeing it and I'm not. Any ideas?
 
-Jason
+Thanks,
+Dan
+
