@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99772775CFA
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 13:32:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 855F1775DDC
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 13:42:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233943AbjHILcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 07:32:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47468 "EHLO
+        id S234247AbjHILmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 07:42:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233939AbjHILcl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 07:32:41 -0400
+        with ESMTP id S234370AbjHILmK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 07:42:10 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8701FDE;
-        Wed,  9 Aug 2023 04:32:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A984173A;
+        Wed,  9 Aug 2023 04:42:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BFDF16340C;
-        Wed,  9 Aug 2023 11:32:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0244C433C8;
-        Wed,  9 Aug 2023 11:32:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2FE8C636B7;
+        Wed,  9 Aug 2023 11:42:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F036C433C8;
+        Wed,  9 Aug 2023 11:42:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1691580760;
+        s=korg; t=1691581328;
         bh=Ye3ys9UcDM6pMksK+MRq0l+vVAWGIT5xFw4fgsIyerM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TFKkmwkaqKjAzmHHyZOqkZq1XolJx2INwva5xFemQVf9meNHsGrAM7DYT7gQzQMeb
-         nB1/YIS3fdoxmC8HzBDRf/2Zhf1ET58sJ7gawKQDrh3TCZNW3rJWPlJts5gi02CC0B
-         4CRicZ0RWKGsQ+z2BlZhw/SEbqWljX2C+LHnW2Uc=
+        b=ENtj5AE2/PyIdNFRQwT4lht99QV+1DKclUf1oxFcOK1XfMWTHjMiTBO8zWtPyvVGw
+         UB717Yns9lLhwb0ohf/gI2bsKAVQbzMVboW3vntzQVI0fQOoKUaauEixOq2yuM5HDs
+         oPvQlV0eegGHoQZzWG+suYIYSEZrfRpuzQ6Iqb/Q=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -36,12 +36,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.4 139/154] selftests/rseq: Play nice with binaries statically linked against glibc 2.35+
-Date:   Wed,  9 Aug 2023 12:42:50 +0200
-Message-ID: <20230809103641.472760854@linuxfoundation.org>
+Subject: [PATCH 5.10 187/201] selftests/rseq: Play nice with binaries statically linked against glibc 2.35+
+Date:   Wed,  9 Aug 2023 12:43:09 +0200
+Message-ID: <20230809103650.066409074@linuxfoundation.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230809103636.887175326@linuxfoundation.org>
-References: <20230809103636.887175326@linuxfoundation.org>
+In-Reply-To: <20230809103643.799166053@linuxfoundation.org>
+References: <20230809103643.799166053@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
