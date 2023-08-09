@@ -2,172 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D87627764F3
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 18:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D37FC776538
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 18:39:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbjHIQZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 12:25:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45470 "EHLO
+        id S229906AbjHIQjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 12:39:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbjHIQZM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 12:25:12 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51EB1724;
-        Wed,  9 Aug 2023 09:25:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Uo3bXseAzOq6JSSt9Mt1N/kFXiJRqHbLqL7mblB6Ovredyf2w+iOshQsPqUWDSciLn26znop5mfV1ptF5ZU8CqdZ+K5rJkvrQAf3Laed+VNgqxFxGsd+rCy5sZIxq34q20TZNivmjl4IbOXE3l1LsfLOAhMd8d5esiXHWHNBIOT22ZNJkXa1l0Q4GwQpswSfG827V+qXL36Y/M2VaRyOTSArqT2QqtjcwrWTdxS0K7qi+7R68TTzlJEAQ1oJmTgluixzAlJqLHcCsumqvM5R//ROJ1W+9fD4GWbI2fsaIXgYRnAkI7xN7BYz+rFT92h6Jfff7sjGLbZ3gjk3asodNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gZOOz8qzCVnz5l4AJumXICc3CB3C47TRy05LZGQcFIM=;
- b=VheO01u3ebelKuRwuVk1WZ/GvfL7jact026U0ER+DEoQ52nEqnaZ7ZcqQe6xOAUvh6WY7zpImiVYyeGAR1spTlLROJEk+DQEw+SlcYQ0rLqPsPnTg3xKtTQZu2ErU95Otu93c++Pki5gHSKhEjaEZDhvACzdVnsa18DNLGXJwJHzvoREiHIkteRoKBjVLig54rDJ4pDhoS9vOhVh8DM0VzkelyWLOspcjrNQk9Yabt+H/rEE6osh0whV4ijDjtju7iUWggSJkLW7N8uTJscmjUpPYK8y6XfMCkbk8MVoNGhocnDmeEdEtj+qHVNCV7ZMIlsr4YDEe3ItY6f83paCNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gZOOz8qzCVnz5l4AJumXICc3CB3C47TRy05LZGQcFIM=;
- b=ISQ7K+OeLpKv88kx/ERdEDODB0JebBj3a1kpCxMMrdr1vkjW4RKUm+BPiLBGkvT08FeAqSfb/WUsi/mI4R523CFB1CTn0a+R9eVhjnncQowqO0wwBEPEU8GYVaj9rS99+xCTeGFOnsCIp23kcKzR6Qqs4SR7FD5CTyWLOww37Tb2b+6rF4D1KhbS136nahCiR6n3372LKxur4vOuqV1aLzFv+cO70PrA8PojKRrejUoI5WBRAc+XA5Q1dXzq6ypycPPYc4nedvWbRIJBUpxmHMwvZegTMHLZsXlOdcmTs2N0r6rnP5mvk1qj+QH2W75Hp4k760ES5nPngIAs265B6w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SN7PR12MB6932.namprd12.prod.outlook.com (2603:10b6:806:260::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.27; Wed, 9 Aug
- 2023 16:25:08 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6652.028; Wed, 9 Aug 2023
- 16:25:08 +0000
-Date:   Wed, 9 Aug 2023 13:24:56 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
-Message-ID: <ZNO92PIx2IQ70+DY@nvidia.com>
-References: <20230724111335.107427-10-yi.l.liu@intel.com>
- <BN9PR11MB527690EBAA872A16AE8926F88C0BA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529F4D4DABBE29E9B7BF5C9C30CA@DS0PR11MB7529.namprd11.prod.outlook.com>
- <ZNGypUee/U9d68TZ@Asurada-Nvidia>
- <ZNI2O4Upyna5AWDA@nvidia.com>
- <ZNJ+Uv/WJwngosjJ@Asurada-Nvidia>
- <BN9PR11MB5276BFFEC7E12EEBD4503BF08C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529C3646E38542457D7B75DC312A@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB5276912120F662498910A1D48C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529C310FAEA61B6E7988629C312A@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB7529C310FAEA61B6E7988629C312A@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BYAPR01CA0030.prod.exchangelabs.com (2603:10b6:a02:80::43)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+        with ESMTP id S229733AbjHIQjD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 12:39:03 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DF81982
+        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 09:39:02 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4036bd4fff1so4541cf.0
+        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 09:39:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691599141; x=1692203941;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rAabttuUSlISLQ9kur95AJErnuBmKPlF1t5IPI4xLW8=;
+        b=QK/Md6pLtQcnNYaG7FaNR8YGO5V1BDDGTN1QNcb5t4M8hyK/g2UzsOCkQFbfYrRiBB
+         G0kclZmDhOUC4jPYSDgzil3jq7z68Wq4Y/XsBYF1MGe9Iir+sC7RphbJoMfImBbhq2T/
+         pEhwFheHJqKkE6YRXMAxkXUnF8lSNA2TqIGy9iPTw7Y7ze+v2ZO6wVbfvsq9lZ13AZGe
+         qcvfeTRsEBx541O+obhMMtIFxCFLknFX2bE3VoAPa0QB2Ao3Loe9vbjMaWTez52X0ZNb
+         c1pWu8dZp76+bEISHoUz6Gcb1Dks1IYF1WyX0qZyE1sqGI1eUsOyDxlWzYy0GZ7RrbKU
+         pVQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691599141; x=1692203941;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rAabttuUSlISLQ9kur95AJErnuBmKPlF1t5IPI4xLW8=;
+        b=HZBmEN+saTsaYSSGMcud2ew6py+CVWAuYyeZH3BotqKcXdA+fEob5CYF9vvFcUskBV
+         V7ZbFfT1WBXyuT+tera4TuK5SHRJfWYiUppnlFe3/fAef55IV6Gh0ETZM2ONaPWBxQcx
+         kNqvN+TlNCRoE24GinQjuedly9hal7Zb8I0QWOEY5eRhycQKmbH8t1kbJlIgPCzVsi1y
+         FOPAYNj7H3YedtbcPCjm9BYMzPNjm0cANjXgzxeD85gHYdJcU/xg2fEUTgAfp+9W2/iq
+         csdVchzSlSHQ9B2G+w6541EtIo6FqxgHQAo/OTmhgQx20/9X7yWrHLOenQErLznGSbX5
+         Lkig==
+X-Gm-Message-State: AOJu0YzJATnkrZGQYi+T4jnPhnCBQj0cPvx57IeBITEOVYm4cU4J31ni
+        Jtrx6K/XCHpZeeQpRjCwKF7xARSaNYfL1c9t+eMucg==
+X-Google-Smtp-Source: AGHT+IFIKXrr2ilFq3pewZHyAMJbe1zJNw2R6kC9Ag8lwIUUWtSfseAhG7bbTMLUN+5Rf6sXibPKOvlrXvIKI8OeOqU=
+X-Received: by 2002:a05:622a:206:b0:3ef:302c:319e with SMTP id
+ b6-20020a05622a020600b003ef302c319emr161886qtx.8.1691599141628; Wed, 09 Aug
+ 2023 09:39:01 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB6932:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0834fa33-642a-496f-d2f1-08db98f53224
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zLg6bz14qdCZsmElV/lJsl3HXB2K9DO2/WJiET7M2jdgTublv+ceff7Cob3Ywfk37PF2V1a+sRycfI2wVXYmHz6g+zIkSnp3DAQcz+xmonhOO3s4dDT2holRp5nbh2BzmvxLzwtAOcLFtCX+fyAZzL+FShWQTk5rZFtXKHIdfXNvRs8mIXep8Ugp8D7kWaehsP/xSwDpw3I8dcX+aaaJkDuNKKjYsYh7b87g05RSP3q8UWatn0h1MoKnt6Lzx1s1aXtbeRoSsaMSP48u4uhcm6K3cM+tIO7kEl5vNBypbqX8cH1s1aPvz0IG97ne4GeNqCr3Ch6/gYD6Bs6zyCq+jF6zoWMQCnSUnZcbIXD0zGyRJwIkPKXyc++IbsA+5It6LtCT+p4/0kYuk3FAt8vNPPWsrnPhIwv/Z6YQjfYUEwmGJ/wezoGI1aYumtq55xakje+Rh65Fp0Z2zrKVVyxPthwMpTpXEUIit2Yve5gwFK1YnbLlVevjUmvh7jjEpjg4z8ksnCXWaKbaS+kPiFUDiHZGzeUl0KVn+OxRc5qcsIA4HdY3eLth7vlv9FfWhZ9AzotozAXj3GRktiEFgT3ga2Fucppykw/ZbEkQwyLYHBY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(376002)(346002)(396003)(366004)(451199021)(186006)(1800799006)(66946007)(2906002)(66476007)(66556008)(4326008)(6666004)(6916009)(6486002)(83380400001)(8676002)(5660300002)(7416002)(316002)(41300700001)(8936002)(38100700002)(2616005)(54906003)(478600001)(36756003)(26005)(6506007)(86362001)(6512007)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9OH5KM3kf3kScB9oLv2d/pEVWd33ud4EV+2n/mdM+x32fNqyh7xA6IQTu3X2?=
- =?us-ascii?Q?NkOyyVBTV/8/6jUstmtVYalZnysIqgYYnsqn2rMeTfDhz8v3N+TUeXkr1A1W?=
- =?us-ascii?Q?KlUM0jq2ga9a/qjCcFtVTwh9mBznwTLpUDg5UQ4tGZtOombr1NWaBLFzxDrw?=
- =?us-ascii?Q?DHed/iGVTf5imH0DBxTHJm8DbXlSScF/idEtcJRZWqsjK9y1MwRqzhXjRtYg?=
- =?us-ascii?Q?d1puCUxnvDCGKn31A1Wr5gd4GxkkydQbTTdPSZ+mmU2Tg2grhZb2EszIdi7o?=
- =?us-ascii?Q?KbN/fga8dMz5QZCOi+EJxTo8SUH07NklC3lI7FnMSmNTnYTgyPWuyEfarY0Z?=
- =?us-ascii?Q?CXRjRu4xg7NeXOfFUqZIgsggEcJ5q40Fxuhn2Hmyd/s9zpXMTsTKgBavcw9t?=
- =?us-ascii?Q?Z5b4cKUUlUfRiSSWdpOl1RvRGi+oNJC7jWNl9X1keQDwGZn+RjMvIC8wg/94?=
- =?us-ascii?Q?AhvY+gnqkdRYTCULiJjGf8lI5nePP/qcZAq7fGsGrRdMX/tqJC8vx/7QlWKq?=
- =?us-ascii?Q?nK8edrVZb+biM/NjpcgPV4Aj8KU5OAmw1TeaCpUTs1nMYQ7xzx+Nq0Pq4Iob?=
- =?us-ascii?Q?UZ6MBTFTH1/E7WYA+lqcrezde5zwuEz8MeLKHV1hEg6GY495OfUj+wLB0NBx?=
- =?us-ascii?Q?BMLoLWDqU7VLPqbYZlFYCl0qk/0S5tVLJKpV0iFmJhh+euVaeYhtNcZ9ji+p?=
- =?us-ascii?Q?p/1L96Yx2qNiEqlcdofwe409M4OsmZm9OhFswG2X5NUFpXIMjXCIVLVjGnxn?=
- =?us-ascii?Q?9c6pBIDs1OxXpYA3VlRZQjKik4i6rAy3hEddNCA1rSTGzI66NgEsEOyLVVo8?=
- =?us-ascii?Q?0jtkpoO4i/yyvJkoerb2V0iWr1q28XU6m5l52dzyVk3hK/OY8L6yfR8tn82i?=
- =?us-ascii?Q?sHwt1UJQCXg0DQDXtQeoXkJsjwhffuqnv/oD4bvTR9a5+8kETlcvxg/6/3jQ?=
- =?us-ascii?Q?/pryTQCMQcOjzfZaBUTsGfSh+Zj13acD6byn17tBidnZlSWFDpmvBZXmAmk/?=
- =?us-ascii?Q?xUG2uNYO63Df5oXmThxCTUEb/XlXG6mIgQ5VW84BSGBY3MRQ/bKVc3El+Dvs?=
- =?us-ascii?Q?OtS3HRXZF68SjNXlJSkWt0tr1fUwK6zMuMN+/HAI/XvuuK7KG28SbrUtmkQM?=
- =?us-ascii?Q?Ybo1kyDyBJV8Pat0m8Y+zvQ1JHIdHLVAEqx7+3kcI47DXvU//X8zmIlsm+KM?=
- =?us-ascii?Q?Fpvv4nAKx8A4/rqx+hM/GTAYxrNYNElUL+likylrns3vzzOo0ADxusZhi0RX?=
- =?us-ascii?Q?q3bsNFzLG9EyGsNO7Myyq1DkwP1x5MPqt+A8oESJDZu6bh8s/AalWixF+Atb?=
- =?us-ascii?Q?yJf2Ww76kBDbCWk0lgbt4MWrXn8Hkd6alRM/Hn2Qi3VZok50K0SBzpDfegJx?=
- =?us-ascii?Q?U99KrO7IrbzsqezztsvZbZG6HK8CgMulAqtOjlcXrEx+aR+ozrX8Hvz8ua64?=
- =?us-ascii?Q?bsR/2KJE+LgLdjTRtbjpgcH5suhxtZwh6DOd9wlanO8UqHQkTtw20YVdX5Qe?=
- =?us-ascii?Q?9fkoER0+r9bN1N6jnaG7CptNb/U0upRk1ZQ5qkQDFgTfWW/0NUheBRiRxnqU?=
- =?us-ascii?Q?QXAhjMpNlpYGVE3RqwI11mZazBiXkf3YISLqTyAD?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0834fa33-642a-496f-d2f1-08db98f53224
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 16:25:08.1545
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: q1DVHEw2ILDjmhp2aezMfrWiO6NKGZ6vgA3zjaW2AYzDgU7+Zq+xpKkOGZ7i+hor
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6932
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-3-rananta@google.com>
+ <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com>
+In-Reply-To: <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Wed, 9 Aug 2023 09:38:49 -0700
+Message-ID: <CAJHc60yCJANBQOizaoSPhEJH9e8a9C6n68x4qdVkOhVZiiWqkw@mail.gmail.com>
+Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Fuad Tabba <tabba@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 09, 2023 at 09:30:12AM +0000, Liu, Yi L wrote:
+Hi Gavin,
 
-> Yeah, adding new structures to ucmd_buffer may increase the size as
-> well if the new one is larger. While for an array, if there is new entry,
-> it is for sure to increase the size. I remember there is one tricky thing
-> when handling the selftest type. E.g. it is defined as 0xbadbeef, if using
-> it to index array, it would expire. So we have some special handling on
-> it. If defining the things in iommu_ops, it is simpler. Selftest may be
-> not so critical to determining the direction though.
+On Tue, Aug 8, 2023 at 9:00=E2=80=AFPM Gavin Shan <gshan@redhat.com> wrote:
+>
+>
+> On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
+> > There's no reason for the architectures to declare
+> > kvm_arch_flush_remote_tlbs() in their own headers. Hence to
+> > avoid this duplication, make the declaration global, leaving
+> > the architectures to define only __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > as needed.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >   arch/mips/include/asm/kvm_host.h | 1 -
+> >   include/linux/kvm_host.h         | 2 ++
+> >   2 files changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/k=
+vm_host.h
+> > index 9b0ad8f3bf327..54a85f1d4f2c8 100644
+> > --- a/arch/mips/include/asm/kvm_host.h
+> > +++ b/arch/mips/include/asm/kvm_host.h
+> > @@ -897,6 +897,5 @@ static inline void kvm_arch_vcpu_blocking(struct kv=
+m_vcpu *vcpu) {}
+> >   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> >
+> >   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> > -int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >
+> >   #endif /* __MIPS_KVM_HOST_H__ */
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index e3f968b38ae97..ade5d4500c2ce 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlbs(stru=
+ct kvm *kvm)
+> >   {
+> >       return -ENOTSUPP;
+> >   }
+> > +#else
+> > +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> >   #endif
+> >
+> >   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+>
+> Is the declaration inconsistent to that in arch/x86/include/asm/kvm_host.=
+h?
+> In order to keep them consistent, I guess we need move kvm_arch_flush_rem=
+ote_tlbs()
+> from x86's header file to arch/x86/kvm/mmu/mmu.c and 'inline' needs to be=
+ dropped.
+>
+Unsure of the original intentions, I didn't want to disturb any
+existing arrangements. If more people agree to this refactoring, I'm
+happy to move.
 
-Maybe we are trying too hard to make it "easy" on the driver.
-
-Can't we just have the driver invoke some:
-
-driver_iommufd_invalidate_op(??? *opaque)
-{
-	struct driver_base_struct args;
-
-        rc = iommufd_get_args(opaque, &args, sizeof(args),
-	     offsetof(args, last));
-	if (rc)
-	   return rc;
-}
-
-The whole point of this excercise was to avoid the mistake where
-drivers code the uapi checks incorrectly. We can achieve the same
-outcome by providing a mandatory helper.
-
-Similarly for managing the array of invalidation commands.
-
-Jason
+Thank you.
+Raghavendra
+> Thanks,
+> Gavin
+>
