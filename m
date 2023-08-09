@@ -2,135 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84712775FED
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 14:55:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F09B775ECC
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 14:22:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbjHIMzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 08:55:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36152 "EHLO
+        id S232261AbjHIMV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 08:21:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232789AbjHIMzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 08:55:24 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096C3211D;
-        Wed,  9 Aug 2023 05:55:20 -0700 (PDT)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 379CraK3004191;
-        Wed, 9 Aug 2023 12:54:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2023-03-30;
- bh=hlNIjt1lJtZP47W7eO4KvEIII2+KWpAFpv+PlhUsURU=;
- b=ra4OJKLhpHJPM4lDoVZ1x++5xNqRV0jNJBHJDNetEGjeSCwfAlqwHDRCQXrNYYNmsjaV
- dgfvwOhhQE+2XvGHAGaLJ6jLzIJWB9SzDYT2qNYzlYYzL43Ye7jrhvnJqEt2I7qsCjKd
- cKjzSLk+VNqg+Z26UYx9lrNLsfmEDKDwkXHKopbf82OzY/Nd2InyytWijbIGXuxIhjlZ
- SmcLn5/GIlCRpW3uL1f9ULwWj/I+2DsUNoG6OsAugbU43SLODqB7fMi2EfKpHPPZ0h/o
- magYESnikUhl4mJREOEGcY5V3kDQRxA3wfTEYsmi1IXT8ePLvWMau7/F5DpaFo3fP20X og== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3s9efd8mg5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 09 Aug 2023 12:54:33 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 379CpGXw021492;
-        Wed, 9 Aug 2023 12:54:32 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3s9cvdyhjc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 09 Aug 2023 12:54:32 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 379CqCGR027258;
-        Wed, 9 Aug 2023 12:54:31 GMT
-Received: from mihai.localdomain (ban25x6uut25.us.oracle.com [10.153.73.25])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3s9cvdyf90-8;
-        Wed, 09 Aug 2023 12:54:31 +0000
-From:   Mihai Carabas <mihai.carabas@oracle.com>
-Cc:     Joao Martins <joao.m.martins@oracle.com>,
-        Mihai Carabas <mihai.carabas@oracle.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        with ESMTP id S232234AbjHIMV4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 08:21:56 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BBB21FCE
+        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 05:21:55 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52307552b03so9235113a12.0
+        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 05:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1691583714; x=1692188514;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gse4lQ89R/swNYJYWFRKmfEvRYWCgDAQeQk+i+FC3Qc=;
+        b=z4Z49MED7B2iO1P22Sflcd12HqFoBF5yfCPEmSnPuw92T8YnUDH2KmdmqK/zmm3Hsv
+         Y1A4Myz/vjPMCMyAiAMJtrC215szsuavogK4ztLxqkGSQO7aPAZzUkD1Ozkyv7H3dSaL
+         qsE22vwvMjFkqhjUQQdHhf2t+Y2yF2VZL5Bid1o6X2mZ0zwKa1F0dMm02EOtwX7YI8oZ
+         kQr4IP0wXNHwqQREssTv7kAUZWMAwp8PYn9E03Y7mqOyy+xa2JAZIQ2g56zk0jeEXZhW
+         kRD0s2bF7FjY+mFqcKXFd8fyuF9dqKo3ka5wJ+o55aO6bmVU6NblI+YE2iiYmI3rXl30
+         +XNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691583714; x=1692188514;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gse4lQ89R/swNYJYWFRKmfEvRYWCgDAQeQk+i+FC3Qc=;
+        b=VKHzR7FqaCSs0izEg72LoXa1Y14kGVh4lXdZVLFaJ2Z4vWBXWMEHIRGQLMxbLe/A3X
+         7l+ZRjwpwRVLBWaWg16jxRjjHozBoQxU+pnxcnaEuTyuwW0gof8gYnW68R0qqlfm30c0
+         S2l2MVgDG7uSMu9oL6Y9Y1vrl+rmGyZGPBYdrjpThD9EIuQm7bIdjZIsrR/xHFeiEXt5
+         E+YS4lI3QLEU/yqIN0qrVQVDMrOt45/AlvNCMM+O3RAaM/06aOnDf88PXJ1VWnspYHOm
+         flAVMY5LZEVv0pWMlzzDso0bqA1ll+XAUudd/7HSQQOe3LZbcZ3dzf3LS6SIFxNx94jE
+         ybJw==
+X-Gm-Message-State: AOJu0Yx3nQLpFLhrxphBSnpIF97KywRXe99lcl11xs+AIHSaU1oZPasg
+        DOpXRtdV5n1oDN8ACSw7lW7m6rohPLak1EVc3qZ9Xg==
+X-Google-Smtp-Source: AGHT+IEllS//Vo5DIeilEm06so+oXBAZVZjqk1bluFXrO7jOq/QKmFdOTXQUqzX5tkMzooCga5rA10uXjLIWp+wEMZQ=
+X-Received: by 2002:aa7:d912:0:b0:522:1e2f:99db with SMTP id
+ a18-20020aa7d912000000b005221e2f99dbmr2557441edr.5.1691583713714; Wed, 09 Aug
+ 2023 05:21:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1690273969.git.haibo1.xu@intel.com> <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
+ <87y1ilpz3m.wl-maz@kernel.org>
+In-Reply-To: <87y1ilpz3m.wl-maz@kernel.org>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Wed, 9 Aug 2023 17:51:41 +0530
+Message-ID: <CAAhSdy3f9cyh_b9Z9ah9QOdqWUMzhMV39hxUqVCStOc2FWRYDQ@mail.gmail.com>
+Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     oliver.upton@linux.dev, xiaobo55x@gmail.com,
+        ajones@ventanamicro.com, seanjc@google.com,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Juerg Haefliger <juerg.haefliger@canonical.com>,
-        =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: [PATCH 7/7] cpuidle-haltpoll: ARM64 support
-Date:   Wed,  9 Aug 2023 14:39:41 +0300
-Message-Id: <1691581193-8416-8-git-send-email-mihai.carabas@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1691581193-8416-1-git-send-email-mihai.carabas@oracle.com>
-References: <1691581193-8416-1-git-send-email-mihai.carabas@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-09_10,2023-08-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 spamscore=0
- adultscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308090114
-X-Proofpoint-GUID: TujCdh-4ZmyJLuERrr4PX2oao1-X7VtH
-X-Proofpoint-ORIG-GUID: TujCdh-4ZmyJLuERrr4PX2oao1-X7VtH
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Jonathan Corbet <corbet@lwn.net>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Like Xu <likexu@tencent.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joao Martins <joao.m.martins@oracle.com>
+Hi Marc,
 
-To test whether it's a guest or not for the default cases, the haltpoll
-driver uses the kvm_para* helpers to find out if it's a guest or not.
+On Tue, Aug 8, 2023 at 4:42=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Mon, 07 Aug 2023 04:48:33 +0100,
+> Anup Patel <anup@brainfault.org> wrote:
+> >
+> > Hi Marc, Hi Oliver,
+> >
+> > On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> =
+wrote:
+> > >
+> > > KVM_GET_REG_LIST will dump all register IDs that are available to
+> > > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+> > > regression issue during VM migration.
+> > >
+> > > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+> > > of the code as common test framework that can be shared by riscv.
+> > >
+> > > Patch 8 move reject_set check logic to a function so as to check for
+> > > different errno for different registers.
+> > > Patch 9 move finalize_vcpu back to run_test so that riscv can impleme=
+nt
+> > > its specific operation.
+> > > Patch 10 change to do the get/set operation only on present-blessed l=
+ist.
+> > > Patch 11 add the skip_set facilities so that riscv can skip set opera=
+tion
+> > > on some registers.
+> > > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
+> > > patch 13 added the corresponding kselftest for checking possible
+> > > register regressions.
+> > >
+> > > The get-reg-list kvm selftest was ported from aarch64 and tested with
+> > > Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+> > >
+> > > ---
+> > > Changed since v5:
+> > >   * Rebase to v6.5-rc3
+> > >   * Minor fix for Andrew's comments
+> > >
+> > > Andrew Jones (7):
+> > >   KVM: arm64: selftests: Replace str_with_index with strdup_printf
+> > >   KVM: arm64: selftests: Drop SVE cap check in print_reg
+> > >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+> > >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+> > >   KVM: arm64: selftests: Delete core_reg_fixup
+> > >   KVM: arm64: selftests: Split get-reg-list test code
+> > >   KVM: arm64: selftests: Finish generalizing get-reg-list
+> > >
+> > > Haibo Xu (6):
+> > >   KVM: arm64: selftests: Move reject_set check logic to a function
+> > >   KVM: arm64: selftests: Move finalize_vcpu back to run_test
+> > >   KVM: selftests: Only do get/set tests on present blessed list
+> > >   KVM: selftests: Add skip_set facility to get_reg_list test
+> > >   KVM: riscv: Add KVM_GET_REG_LIST API support
+> > >   KVM: riscv: selftests: Add get-reg-list test
+> >
+> > Are you okay for this series to go through the KVM RISC-V tree ?
+>
+> Sure, seems fine from my point of view. But please put it on an
+> immutable topic branch so that we can also merge it in the arm64 tree,
+> should we need to resolve any conflicts.
 
-ARM64 doesn't have or defined any of these, so it remains disabled on
-the default. Although it allows to be force-loaded.
+I have created topic branch riscv_kvm_get_reg_list in the KVM RISC-V
+repo https://github.com/kvm-riscv/linux.git.
 
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
----
- drivers/cpuidle/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This branch is based upon Linux-6.5-rc5 and also merged into the
+riscv_kvm_next branch for the upcoming merge window.
 
-diff --git a/drivers/cpuidle/Kconfig b/drivers/cpuidle/Kconfig
-index cac5997dca50..067927eda466 100644
---- a/drivers/cpuidle/Kconfig
-+++ b/drivers/cpuidle/Kconfig
-@@ -35,7 +35,7 @@ config CPU_IDLE_GOV_TEO
- 
- config CPU_IDLE_GOV_HALTPOLL
- 	bool "Haltpoll governor (for virtualized systems)"
--	depends on KVM_GUEST
-+	depends on (X86 && KVM_GUEST) || ARM64
- 	help
- 	  This governor implements haltpoll idle state selection, to be
- 	  used in conjunction with the haltpoll cpuidle driver, allowing
-@@ -73,7 +73,7 @@ endmenu
- 
- config HALTPOLL_CPUIDLE
- 	tristate "Halt poll cpuidle driver"
--	depends on X86 && KVM_GUEST
-+	depends on (X86 && KVM_GUEST) || ARM64
- 	select CPU_IDLE_GOV_HALTPOLL
- 	default y
- 	help
--- 
-1.8.3.1
-
+Regards,
+Anup
