@@ -2,124 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADE68775591
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 10:38:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F96F7755DA
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 10:48:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231656AbjHIIij (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 04:38:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60422 "EHLO
+        id S230145AbjHIIsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 04:48:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbjHIIih (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 04:38:37 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5841BD9;
-        Wed,  9 Aug 2023 01:38:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691570315; x=1723106315;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tziAmXkAYaSE5qwVJW6lzgz/AleIpw8ZRRXgZDA5K74=;
-  b=TSrw+8Vq9I3wg7rQagXRF6r3XXRm6DCQK5Iys1FF8DFiDLBJA584NQi4
-   VZZICvCZgk86Ul8Svk+sJAjmDUEyQV0NCTRGurV2BoCBhr9wZSOKjmW3C
-   EVHpRhwBiRqJLtFeVNQSjRq61io0YXfPZuz04MQPlNEFPRVHQe9+p/hjV
-   7c3nLkJkXlBhgv4j0cwcTEOhEMG3cEYwmj6ATvPHoSxWQmN2WwSfmXqcl
-   jeRYGKbHr8UsEOWPZz5jFjoY1oAY3SbCbO9J0j3/sHC/vzDuv9TrS3qB1
-   9v89+fBzxF/1EFusymusCSBIpfGWFUgJd2p9j/5WTJGdW/Zj+E7uo3WnN
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="351372949"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="351372949"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 01:38:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="797089523"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="797089523"
-Received: from dmi-pnp-i7.sh.intel.com (HELO localhost) ([10.239.159.155])
-  by fmsmga008.fm.intel.com with ESMTP; 09 Aug 2023 01:38:27 -0700
-Date:   Wed, 9 Aug 2023 16:44:53 +0800
-From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH RFV v2 05/13] perf/core: Add function
- perf_event_create_group_kernel_counters()
-Message-ID: <ZNNSBZIQERc/nZXQ@dmi-pnp-i7>
-References: <20230808063111.1870070-1-dapeng1.mi@linux.intel.com>
- <20230808063111.1870070-6-dapeng1.mi@linux.intel.com>
- <20230808102127.GZ212435@hirez.programming.kicks-ass.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230808102127.GZ212435@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229886AbjHIIse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 04:48:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4E6D1BF7;
+        Wed,  9 Aug 2023 01:48:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 71D5A6306B;
+        Wed,  9 Aug 2023 08:48:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B132AC433C7;
+        Wed,  9 Aug 2023 08:48:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691570912;
+        bh=ojkU8AFfZNCCP9rY6hwjRyQ/V8po/Qa/5foMGY7Gd+w=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=NjGqEFNNVBMFNto9YJHQdpY6WLBPWmrhhAVjoie/I9dMzGm2JsB7zEsr1YY24zuuT
+         xq6i38ti/9tBZjKqVi3DP6pUQUgdFT/p/ZSSV2N7DE689f+V+nKzfHyztDRU0420YY
+         3ooIXXED5obvLX7TjH7ntN2zAbpylMCyrb3L0vrdwqCcscejWRf7vydMxf0c6kjEub
+         J+hLyD1GiSGHefpIc/MVs8X6kw9+cxbImXLwS5XLR+Q+eGHYYwfTOKrHH/lQjYrzKe
+         fUYPm532bonM3EeEbdt4J9+14iPIbTxz+pQeqytjRO/g5Yg8P7NDwBV/IsVgXchM7Y
+         CoaYWNjDejuAw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qTerm-003QuH-8W;
+        Wed, 09 Aug 2023 09:48:30 +0100
+Date:   Wed, 09 Aug 2023 09:48:29 +0100
+Message-ID: <864jl8ha8y.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Huang Shijie <shijie@os.amperecomputing.com>
+Cc:     oliver.upton@linux.dev, james.morse@arm.com,
+        suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com,
+        peterz@infradead.org, ingo@redhat.com, acme@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, namhyung@kernel.org, irogers@google.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, patches@amperecomputing.com,
+        zwang@amperecomputing.com
+Subject: Re: [PATCH] perf/core: fix the bug in the event multiplexing
+In-Reply-To: <20230809013953.7692-1-shijie@os.amperecomputing.com>
+References: <20230809013953.7692-1-shijie@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shijie@os.amperecomputing.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, peterz@infradead.org, ingo@redhat.com, acme@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, irogers@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, patches@amperecomputing.com, zwang@amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 08, 2023 at 12:21:27PM +0200, Peter Zijlstra wrote:
-> Date: Tue, 8 Aug 2023 12:21:27 +0200
-> From: Peter Zijlstra <peterz@infradead.org>
-> Subject: Re: [PATCH RFV v2 05/13] perf/core: Add function
->  perf_event_create_group_kernel_counters()
-> 
-> On Tue, Aug 08, 2023 at 02:31:03PM +0800, Dapeng Mi wrote:
-> > diff --git a/kernel/events/core.c b/kernel/events/core.c
-> > index 15eb82d1a010..1877171e9590 100644
-> > --- a/kernel/events/core.c
-> > +++ b/kernel/events/core.c
-> > @@ -12762,11 +12762,34 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
-> >  				 struct task_struct *task,
-> >  				 perf_overflow_handler_t overflow_handler,
-> >  				 void *context)
-> > +{
-> > +	return perf_event_create_group_kernel_counters(attr, cpu, task,
-> > +			NULL, overflow_handler, context);
-> > +}
-> > +EXPORT_SYMBOL_GPL(perf_event_create_kernel_counter);
-> > +
-> > +/**
-> > + * perf_event_create_group_kernel_counters
-> > + *
-> > + * @attr: attributes of the counter to create
-> > + * @cpu: cpu in which the counter is bound
-> > + * @task: task to profile (NULL for percpu)
-> > + * @group_leader: the group leader event of the created event
-> > + * @overflow_handler: callback to trigger when we hit the event
-> > + * @context: context data could be used in overflow_handler callback
-> > + */
-> > +struct perf_event *
-> > +perf_event_create_group_kernel_counters(struct perf_event_attr *attr,
-> > +					int cpu, struct task_struct *task,
-> > +					struct perf_event *group_leader,
-> > +					perf_overflow_handler_t overflow_handler,
-> > +					void *context)
-> 
-> I would much prefer if you just add the argument to
-> perf_event_create_kernel_counter(), there aren't *that* many users.
+On Wed, 09 Aug 2023 02:39:53 +0100,
+Huang Shijie <shijie@os.amperecomputing.com> wrote:
 
-Sure. Thanks.
+For a start, please provide a sensible subject line for your patch.
+"fix the bug" is not exactly descriptive, and I'd argue that if there
+was only one bug left, I'd have taken an early retirement by now.
+
+> 
+> 1.) Background.
+>    1.1) In arm64, run a virtual guest with Qemu, and bind the guest
+
+Is that with QEMU in system emulation mode? Or QEMU as a VMM for KVM?
+
+>         to core 33 and run program "a" in guest.
+
+Is core 33 significant? Is the program itself significant?
+
+>         The code of "a" shows below:
+>    	----------------------------------------------------------
+> 		#include <stdio.h>
+> 
+> 		int main()
+> 		{
+> 			unsigned long i = 0;
+> 
+> 			for (;;) {
+> 				i++;
+> 			}
+> 
+> 			printf("i:%ld\n", i);
+> 			return 0;
+> 		}
+>    	----------------------------------------------------------
+> 
+>    1.2) Use the following perf command in host:
+>       #perf stat -e cycles:G,cycles:H -C 33 -I 1000 sleep 1
+>           #           time             counts unit events
+>                1.000817400      3,299,471,572      cycles:G
+>                1.000817400          3,240,586      cycles:H
+> 
+>        This result is correct, my cpu's frequency is 3.3G.
+> 
+>    1.3) Use the following perf command in host:
+>       #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
+>             time             counts unit events
+>      1.000831480        153,634,097      cycles:G                                                                (70.03%)
+>      1.000831480      3,147,940,599      cycles:H                                                                (70.03%)
+>      1.000831480      1,143,598,527      L1-dcache-loads                                                         (70.03%)
+>      1.000831480              9,986      L1-dcache-load-misses            #    0.00% of all L1-dcache accesses   (70.03%)
+>      1.000831480    <not supported>      LLC-loads
+>      1.000831480    <not supported>      LLC-load-misses
+>      1.000831480        580,887,696      L1-icache-loads                                                         (70.03%)
+>      1.000831480             77,855      L1-icache-load-misses            #    0.01% of all L1-icache accesses   (70.03%)
+>      1.000831480      6,112,224,612      dTLB-loads                                                              (70.03%)
+>      1.000831480             16,222      dTLB-load-misses                 #    0.00% of all dTLB cache accesses  (69.94%)
+>      1.000831480        590,015,996      iTLB-loads                                                              (59.95%)
+>      1.000831480                505      iTLB-load-misses                 #    0.00% of all iTLB cache accesses  (59.95%)
+> 
+>        This result is wrong. The "cycle:G" should be nearly 3.3G.
+> 
+> 2.) Root cause.
+> 	There is only 7 counters in my arm64 platform:
+> 	  (one cycle counter) + (6 normal counters)
+> 
+> 	In 1.3 above, we will use 10 event counters.
+> 	Since we only have 7 counters, the perf core will trigger
+>        	event multiplexing in hrtimer:
+> 	     merge_sched_in() -->perf_mux_hrtimer_restart() -->
+> 	     perf_rotate_context().
+> 
+>        In the perf_rotate_context(), it does not restore some PMU registers
+>        as context_switch() does.  In context_switch():
+>              kvm_sched_in()  --> kvm_vcpu_pmu_restore_guest()
+>              kvm_sched_out() --> kvm_vcpu_pmu_restore_host()
+> 
+>        So we got wrong result.
+> 
+> 3.) About this patch.
+>         3.1) Add arch_perf_rotate_pmu_set()
+>         3.2) Add is_guest().
+> 	     Check the context for hrtimer.
+> 	3.3) In arm64's arch_perf_rotate_pmu_set(),
+>        	     set the PMU registers by the context.
+> 
+> 4.) Test result of this patch:
+>       #perf stat -e cycles:G,cycles:H -C 33 -d -d  -I 1000 sleep 1
+>             time             counts unit events
+>      1.000817360      3,297,898,244      cycles:G                                                                (70.03%)
+>      1.000817360          2,719,941      cycles:H                                                                (70.03%)
+>      1.000817360            883,764      L1-dcache-loads                                                         (70.03%)
+>      1.000817360             17,517      L1-dcache-load-misses            #    1.98% of all L1-dcache accesses   (70.03%)
+>      1.000817360    <not supported>      LLC-loads
+>      1.000817360    <not supported>      LLC-load-misses
+>      1.000817360          1,033,816      L1-icache-loads                                                         (70.03%)
+>      1.000817360            103,839      L1-icache-load-misses            #   10.04% of all L1-icache accesses   (70.03%)
+>      1.000817360            982,401      dTLB-loads                                                              (70.03%)
+>      1.000817360             28,272      dTLB-load-misses                 #    2.88% of all dTLB cache accesses  (69.94%)
+>      1.000817360            972,072      iTLB-loads                                                              (59.95%)
+>      1.000817360                772      iTLB-load-misses                 #    0.08% of all iTLB cache accesses  (59.95%)
+> 
+>     The result is correct. The "cycle:G" is nearly 3.3G now.
+> 
+> Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/pmu.c     | 8 ++++++++
+>  include/linux/kvm_host.h | 1 +
+>  kernel/events/core.c     | 5 +++++
+>  virt/kvm/kvm_main.c      | 9 +++++++++
+>  4 files changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index 121f1a14c829..a6815c3f0c4e 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -210,6 +210,14 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
+>  	kvm_vcpu_pmu_disable_el0(events_guest);
+>  }
+>  
+> +void arch_perf_rotate_pmu_set(void)
+> +{
+> +	if (is_guest())
+> +		kvm_vcpu_pmu_restore_guest(NULL);
+> +	else
+> +		kvm_vcpu_pmu_restore_host(NULL);
+> +}
+
+So we're now randomly poking at the counters even when no guest is
+running, based on whatever is stashed in internal KVM data structures?
+I'm sure this is going to work really well.
+
+Hint: even if these functions don't directly look at the vcpu pointer,
+passing NULL is a really bad idea. It is a sure sign that you don't
+have the context on which to perform the action you're trying to do.
+
+This really shouldn't do *anything* when the rotation process is not
+preempting a guest.
+
+> +
+>  /*
+>   * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
+>   * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 9d3ac7720da9..e350cbc8190f 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -931,6 +931,7 @@ void kvm_destroy_vcpus(struct kvm *kvm);
+>  
+>  void vcpu_load(struct kvm_vcpu *vcpu);
+>  void vcpu_put(struct kvm_vcpu *vcpu);
+> +bool is_guest(void);
+
+Why do we need this (not to mention the poor choice of name)? We
+already have kvm_get_running_vcpu(), which does everything you need
+(and gives you the actual context).
+
+>  
+>  #ifdef __KVM_HAVE_IOAPIC
+>  void kvm_arch_post_irq_ack_notifier_list_update(struct kvm *kvm);
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 6fd9272eec6e..fe78f9d17eba 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -4229,6 +4229,10 @@ ctx_event_to_rotate(struct perf_event_pmu_context *pmu_ctx)
+>  	return event;
+>  }
+>  
+> +void __weak arch_perf_rotate_pmu_set(void)
+> +{
+> +}
+> +
+>  static bool perf_rotate_context(struct perf_cpu_pmu_context *cpc)
+>  {
+>  	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+> @@ -4282,6 +4286,7 @@ static bool perf_rotate_context(struct perf_cpu_pmu_context *cpc)
+>  	if (task_event || (task_epc && cpu_event))
+>  		__pmu_ctx_sched_in(task_epc->ctx, pmu);
+>  
+> +	arch_perf_rotate_pmu_set();
+
+KVM already supports hooking into the perf core using the
+perf_guest_info_callbacks structure. Why should we need a separate
+mechanism?
+
+>  	perf_pmu_enable(pmu);
+>  	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dfbaafbe3a00..a77d336552be 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -218,6 +218,15 @@ void vcpu_load(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(vcpu_load);
+>  
+> +/* Do we in the guest? */
+> +bool is_guest(void)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	vcpu = __this_cpu_read(kvm_running_vcpu);
+> +	return !!vcpu;
+> +}
+> +
+>  void vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+>  	preempt_disable();
+
+It looks like you've identified an actual issue. However, I'm highly
+sceptical of the implementation. This really needs some more work.
+
+Another question is how the same thing is handled on x86? Maybe they
+don't suffer from this problem thanks to specific architectural
+features, but it'd be good to find out, as this may guide the
+implementation in a different way.
+
+Thanks,
+
+	M.
 
 -- 
-Thanks,
-Dapeng Mi
+Without deviation from the norm, progress is not possible.
