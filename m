@@ -2,187 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 947EC77514B
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 05:14:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 801F9775160
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 05:26:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230413AbjHIDOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 8 Aug 2023 23:14:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42890 "EHLO
+        id S230435AbjHID0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 8 Aug 2023 23:26:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjHIDOh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 8 Aug 2023 23:14:37 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAFF41995;
-        Tue,  8 Aug 2023 20:14:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691550876; x=1723086876;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=TElIfCAyGbJBDQMYWXyvFwe1iGCJqM++OirbmsUVBhU=;
-  b=nVgIg0FAvHRYPMVBPWMn+jwotp3zdlmuq6d6apidki+YTYa0FjGVQaRK
-   WQVA69PN316PjWfWTsz692YW4n0bT6LZ7Z7E7QA82zSqgokRNhmTWjDy9
-   vnd96fCAImlWytXW2fAG30lxBSriKC76IM3+d2Wm0JBAQbUcYUuYwiwZT
-   gtmByrVL3S0u3mxuJrnate7S8EdP5NOgtEi41vnzSSio3R5vBcon9u3tP
-   lrtwADhiKW68fezbK3VKzYKmMbFa0qFSuyU0JqbbtV4g2TJI2Hj+hIDzJ
-   npPIn+IExS2OfC5ULvJ+cPkDJbZIrLg/w1zWguOQiB+h90epS6vxphmWf
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="374717470"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="374717470"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 20:14:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="734825466"
-X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
-   d="scan'208";a="734825466"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga007.fm.intel.com with ESMTP; 08 Aug 2023 20:14:36 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 8 Aug 2023 20:14:35 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 8 Aug 2023 20:14:35 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 8 Aug 2023 20:14:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bD4gu6cyshsIEtNdRKFR93ZuzqnlTmzXSYEdcEJdADSdDAmThQhZXizKWy3DS4oB+x3A/aeTB2KgToWWMps1GWqEpjuip4fpk9tIhXu83QNWbNTkwpsKbW2uRjFtMj8p2Ud4BaUzLDNECIn9DkKIEQL1bAHXMIGrldC9Jtk5O745QJhuUkGBlJsY6WgmRBVjWJZ3XU/Z+ceJs0+NQ/C3t+rSLMdVuwMJaV8IpfoI5i0qJKwIv0zuyzVNHcMBHUfy6h4SagWzKqbmApjr90lZmQq4pSgaT1swdWw5z+XCG5cpOs/N6BkHwmrtii+S7zXRqpYr22lIJxp1hhuHXNJG5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TElIfCAyGbJBDQMYWXyvFwe1iGCJqM++OirbmsUVBhU=;
- b=XmWVOpPstFmSXBjeTXLS/PY4bxyUEuuheYI0lE3ekI+0035G0QxBrwTDZvrZzfdn6OjIdQ8gw1U1CXLfIPbPQBsbQLQgx1V0vczpHlScBqBG6ylmjpREdfDcHgQv6OmWeL2zgHbFXiE9Zs4twJp41y1KfQwxle3XRnb7d5JBwoHvtv8fvk/90Z2dqBWqXt2rSqWI4EeRsJURFVAuUFncS1IlCUyweAItrHFMDsi1lqHduqzJfBM0WnB/eiGBZ6DUoTA/Fit0/JNgRrbcN5PQ6y4mAKxaE46iXG/kf2Tpq2BYw1HVCGfUJ6jnNH3SnlWglHgLwKOMs/5KsthGifBY1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by LV8PR11MB8605.namprd11.prod.outlook.com (2603:10b6:408:1e5::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28; Wed, 9 Aug
- 2023 03:14:33 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::94f8:4717:4e7c:2c6b]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::94f8:4717:4e7c:2c6b%6]) with mapi id 15.20.6652.026; Wed, 9 Aug 2023
- 03:14:33 +0000
-Message-ID: <6ba8ab92-7771-d077-32ba-40896e06b035@intel.com>
-Date:   Wed, 9 Aug 2023 11:14:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v5 08/19] KVM:x86: Report KVM supported CET MSRs as
- to-be-saved
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     <rick.p.edgecombe@intel.com>, <chao.gao@intel.com>,
-        <binbin.wu@linux.intel.com>, <seanjc@google.com>,
-        <peterz@infradead.org>, <john.allen@amd.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230803042732.88515-1-weijiang.yang@intel.com>
- <20230803042732.88515-9-weijiang.yang@intel.com>
- <6d0b0da3-5df2-46f4-d6ba-75ae6a187483@redhat.com>
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <6d0b0da3-5df2-46f4-d6ba-75ae6a187483@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR04CA0008.apcprd04.prod.outlook.com
- (2603:1096:4:197::20) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+        with ESMTP id S230247AbjHID0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 8 Aug 2023 23:26:51 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D2C1BF7;
+        Tue,  8 Aug 2023 20:26:50 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4fe1489ced6so10518207e87.0;
+        Tue, 08 Aug 2023 20:26:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691551609; x=1692156409;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bDtqmE5WaBwuWbcG5niee6vR0Dh8gvhaHzvoiNOQiws=;
+        b=owAHMA78RpdKw7tQgsXJuS/elEyAp7vSGAzfHHJ5z4MmckA+NQrtCeJ+W8B7PUvc2D
+         I/WpHW66G3aWUjJpuletY1j0z6aKy1xgec4upQFXMpwU9ycs+tCk/ePKYCi6Nbx+Tq5H
+         Qy6MPyf/gtpxrwP1m2i9XoznQjE+jLj5ZwBSTijY/98bVmFXY24MFJCymc8ScA3Nxj2n
+         fSOujTjvaaQVXxt/vcJYEAVtUVvyYiN2uWpHFHiII9KFwlpZWIDhDRw8t4Y/QmWWdq4T
+         tB+UNi3v3GnHUI0r44M6p5HgP9APdJozCrZvNY2C87aDLO+gxiwTpgoEZWh+gs2IkgG7
+         f6hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691551609; x=1692156409;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bDtqmE5WaBwuWbcG5niee6vR0Dh8gvhaHzvoiNOQiws=;
+        b=YAPzH0E9wW5eOLhFONLzj3NjuA1GbLh8coHraIWzzmI8MN6XdCVgDphPv7esgF2cuX
+         xeIHHiOf5HRX84sEUpmrw9PoZwm6AKyJxiyCKrRsCNPriz8iY/yIB1l8vHjTK5jCbCbU
+         eXmY6qoh5vvyeW8yAVigzPZBbw41yJx3jFhho/PSnbS439fBPmHPYU+uOy/esBNDDUMc
+         bseUIhDKWgw7i1NRg42zp60EM2poC723KCSr2yRB2sDA1tMpViboL7rx2MpDrtbJnqEK
+         bLYxy9y2GNoksKI5WSYb072TZLyeMAMjnM9dXAtk5EMdurmyf4BDFgvjzira/HrWOteu
+         OhJQ==
+X-Gm-Message-State: AOJu0Yz36D/G9SLz91zSBk7JIu7GUwTJ/QZugUz5+3R/CaJvtQFtA2Bb
+        FXLaeEO+goUqBDpIy5yI0aL/7Qx+F6cLe2+P51g=
+X-Google-Smtp-Source: AGHT+IH2bKTSsX7/6xPrKfrQgho5P8O/hWC3nUT0gNKKQQAzMu/0fuX80th8S70Ytqj3VHXYwT6+ychP6EtQ0Fkfu08=
+X-Received: by 2002:a2e:a16e:0:b0:2b5:9d78:213e with SMTP id
+ u14-20020a2ea16e000000b002b59d78213emr935818ljl.22.1691551608635; Tue, 08 Aug
+ 2023 20:26:48 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|LV8PR11MB8605:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02ccc645-9ad3-4fad-794b-08db9886c0b2
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: r5ryQjKgWs0Py2+IH8Q+oNFt23yLlTST+fxbujja/qvFmyxApfruJEMN0I5FjSRCKjnzYvqcw3MfnMx8c4bGDSwPCTvAuEF8gnSbV4M6g7PgB5BascEnWaLiC7TgX7UXgAc2RIsdvhPspJm2/WJOAekoWQf9x6AJSC9a67Aua2fNuLQgIWm452RkzhIAT3W+bZSmOybiyry2Upup0ST6chTkob7ve7cpa5U2OchWwvrkmA0IfILklkLbsBzJdu9QDeSawMIiiqdfNhCf8gn/j5AC+IO5seYweJ7gh0ZRT5+OqAADDOzYScddpKAbPmhhiVG58LPMQ05FyHduo1GSFkcmy6WMk/f9i6DhvqoRP4BIFSw92aCz1fWZ0ht6efb7k+o4bjE/z1SIGzWOCMXMIB8fctmnfxFJIL3rv/V3rO1ridc6Yve66a9L9aUEjyPbnS+VJ99wxUEFss22kV7STqN7M5ydHHtWKJp8NgDrRk26piI7H4ae10Prn3TmUM/9GoNON7+9oXyl15NppCpsnTM53bYlRU/jo6FxV9B9YTea0Oc3I/GaY9CxEkpuDYse1iXt20p9npRdz9Thxmb9l7YeLf2bzxZih5BXMgspdN3xQIaJ/KwpB500s58AVV1/D/40CmFU8bzJfTWW0qfjgQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(346002)(396003)(136003)(366004)(186006)(451199021)(1800799006)(82960400001)(26005)(6666004)(53546011)(6506007)(6512007)(6486002)(2616005)(478600001)(2906002)(4744005)(38100700002)(5660300002)(8676002)(8936002)(66946007)(41300700001)(36756003)(316002)(31696002)(6916009)(86362001)(66556008)(66476007)(4326008)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dS9mbTcyRjZ4Q0oyUlhFWUU5VTVjdmVaOWlubmc5YWprUVh1RExOTzZiakVY?=
- =?utf-8?B?T2tZeGRXZ2U0SUNvS28zQlVtK2hCcndZbnFrdHE4UXRzL3RiNWxSOXo3T2x6?=
- =?utf-8?B?eEMyM3BaYnB1TTkyYWQ2eTF0aTRNSjVZbzRqeWtLSW0va2gwVHFmN1NZbmRy?=
- =?utf-8?B?VnN2WHZ3TnFvQU5rNGROV3lJL1dnR212Ti9yTEMyOXMwcHBDQUtFVlV0SXFt?=
- =?utf-8?B?T1ZtTDljZDVNdVNZNDVQTjdhajQ3ZHZQRVB3UDBnN0NLK2lRRHRhZlRIanFR?=
- =?utf-8?B?OHpNdjhGWW9CeVRPRTRZMGgzQTVqKy9pZnJtOE5UNXpjWnJZV1lBc01tYjRS?=
- =?utf-8?B?MzlEd3UxZm8zamIwVnZWcitQRzQyeklZNGZVUUpLU25BSUNuRlRwOEwzWDRl?=
- =?utf-8?B?eHhnSE5rYUg3M1ZlamF6emNTUmNGQkxEUFZValJkQUNrNFowMkJZVmgwcUF1?=
- =?utf-8?B?NFFpMkFWUThYWjlxKzNPNEZuUVZyODd4SnVZVTJUMXBzY0tEamJkdWFSMXBG?=
- =?utf-8?B?V0hYZVJUTUQwalFoZTJ2YlJIOVZHdS9hVGpLd1p3K2JIa2l5UXRKRG1nZ1p0?=
- =?utf-8?B?Qm4yNUVwZk9jSmVyaU1zTUd5TnozajI3WlhxODJVQUJPWVBOZEo1cDMxL09o?=
- =?utf-8?B?ZTdEc3EyNktYcC9kM2lxRkdRcDAwcTRnaWd2SGt3QUgzQVgwdTkya3RTYkp0?=
- =?utf-8?B?TFJwamVZeDM4UmdtYW1PS0FuUTBISm01Q0EvQnNaMUt0RjNjNlNrekExZEsy?=
- =?utf-8?B?aVFua3dDMzg4VlpMSjVoZXVESDJHZGcrbWlndFo3UTAxWjBVY2RMNHp5Tmto?=
- =?utf-8?B?b3MyMVRIWjB4Z1FwanErQk9pVU9zQVh3SlhCODQxMC9WaElkLyt0bUExQllV?=
- =?utf-8?B?UUU5TExvbDJaenV6TjhkQ1NnM1RTQldkeGpOMjRCeWZvQ2lsQ0RjSlJZVnNv?=
- =?utf-8?B?TE5ldTZYcVYwSm9MUlJRbUpEMjhTNjZoN0J1S0wzcmx1RlhTT1VNbkRzQSs1?=
- =?utf-8?B?SzRFOTQ5VVM1aVRsVmF4TVM0K3dvSGhnc3ZHMUhGcTJXMXgrZ0w4U0c5TkFv?=
- =?utf-8?B?YTliK2p3UVlac2JBUDd6d1Y4ajBiVGU3VmF2RFg3MnlQbHFyZUVmclNzZ0pr?=
- =?utf-8?B?OTNhQjlFY0htNWVLT0s2RHZHd2U0WTF2ZkdmbFk2RnhMOUtGUWdkMGlwRnlm?=
- =?utf-8?B?eXVvT05DQ2ZtalIwWmsxcldEN3pPOTdCamlPOGsvRXVxVzBsMWU4aFFlak1k?=
- =?utf-8?B?SEYwZGNIQlJyWDQyeFhEVlN3Q3RlQWRTT2QvcTVmdC9DOEFxalhRRDMwQlk2?=
- =?utf-8?B?UjJvY2ZJMzJ2NU9nMWs5ZXZGdW5GNWtFL0t0NkZSQTdWaTNraWkxaW1FYVpp?=
- =?utf-8?B?NFJITWRZaTlieXRiMkg0aEdldnp4T1E2aEhJN1NUNWY0N2ZCNDhWWnBxWWI1?=
- =?utf-8?B?SFk4NjJNVTVvdE9wMUZ2bGtVRURRWW5qUjd3aW1CVnFqWjN5NFdKL2l6RUNj?=
- =?utf-8?B?S3BrTkNwQ2NsMm1xKzlWS3FNUTZOVTdadnVacGJnRVhmK2ZBU1RyeTZZL3hI?=
- =?utf-8?B?eEZBWmhLdWR2Vm9jSGZzTGpONDlTS3FobElYQ2JsT1lRRkRwckdPa3kzbmNQ?=
- =?utf-8?B?UkZLNnFjRzlJOGVSNkJobEpIU2xzVjJhYjVOaHRjOG5kcjFQcEdVdGpJdDk5?=
- =?utf-8?B?Njk3Q09kSGhodGRoVFRoNm5UWGtWc09DVUFtczIvL0tqOTFYTDN0ZmQ1RUlH?=
- =?utf-8?B?SjNXcEVpK3NqYXkrZDZEU0JXOWpGK3dveGlYa1MvK3lUKy9TVExpbHU0VEwr?=
- =?utf-8?B?N1U3Y3JDYUQzdkFtTHBvT05pWDBnZ1FFMGpRT2oyR0NROFdoaGh5eVk1Vk10?=
- =?utf-8?B?ZVQ0cjFFdndCby9PdHh3MXBxc3J6dFdlcEE4MHVMSlp5ZDNlbnBzV29TY1dJ?=
- =?utf-8?B?Z0dYdG9IcWhrUGE4U1hpT04wVVVUUmJnZG1pWlVGZnRlcllXUkpSRVowVTR6?=
- =?utf-8?B?ZHlJMzlFRjFueWZ4TVQ2MzE1UlI3UlFRMExSQ0hhQlB4MWlGMmFna2Z5bzlJ?=
- =?utf-8?B?RFcyT0ltdmVaSkpKNi9qNnB6eGNaVm15ODYyRUxtSG5SQ2cvbkVpU0Q2WENK?=
- =?utf-8?B?VVlMZzZzYitCZmNscmpjOEFXOTBZZGJsemRqazdKVE1YS1A1WlhDMXM5d1M1?=
- =?utf-8?B?WXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02ccc645-9ad3-4fad-794b-08db9886c0b2
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2023 03:14:33.1896
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i16bXYTIrmr9YQ2aQoBr+EVippcm1JVQw2oDIJqmJ5URVsobYoiIfaJGFVwiv22sXNXk7BJ0/FJEcxc3iS6ZSw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8605
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1690273969.git.haibo1.xu@intel.com> <CAAhSdy0yug=J0nxnnPoLYL=0MiT0w6qgPYOcv0QwMRe+fsQn8Q@mail.gmail.com>
+ <87y1ilpz3m.wl-maz@kernel.org>
+In-Reply-To: <87y1ilpz3m.wl-maz@kernel.org>
+From:   Haibo Xu <xiaobo55x@gmail.com>
+Date:   Wed, 9 Aug 2023 11:26:36 +0800
+Message-ID: <CAJve8onZuOHkAUVY3=QeBPMx5n2F1fGgn57rPp7MB1Q5=vXasA@mail.gmail.com>
+Subject: Re: [PATCH v6 00/13] RISCV: Add KVM_GET_REG_LIST API
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Anup Patel <anup@brainfault.org>, oliver.upton@linux.dev,
+        ajones@ventanamicro.com, seanjc@google.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Shuah Khan <shuah@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Like Xu <likexu@tencent.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        Haibo Xu <haibo1.xu@intel.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/5/2023 5:47 AM, Paolo Bonzini wrote:
-> On 8/3/23 06:27, Yang Weijiang wrote:
->> Add all CET MSRs including the synthesized GUEST_SSP to report list.
->> PL{0,1,2}_SSP are independent to host XSAVE management with later
->> patches. MSR_IA32_U_CET and MSR_IA32_PL3_SSP are XSAVE-managed on
->> host side. MSR_IA32_S_CET/MSR_IA32_INT_SSP_TAB/MSR_KVM_GUEST_SSP
->> are not XSAVE-managed.
+On Tue, Aug 8, 2023 at 7:12=E2=80=AFPM Marc Zyngier <maz@kernel.org> wrote:
 >
-> MSR_KVM_GUEST_SSP -> MSR_KVM_SSP
+> On Mon, 07 Aug 2023 04:48:33 +0100,
+> Anup Patel <anup@brainfault.org> wrote:
+> >
+> > Hi Marc, Hi Oliver,
+> >
+> > On Tue, Jul 25, 2023 at 2:05=E2=80=AFPM Haibo Xu <haibo1.xu@intel.com> =
+wrote:
+> > >
+> > > KVM_GET_REG_LIST will dump all register IDs that are available to
+> > > KVM_GET/SET_ONE_REG and It's very useful to identify some platform
+> > > regression issue during VM migration.
+> > >
+> > > Patch 1-7 re-structured the get-reg-list test in aarch64 to make some
+> > > of the code as common test framework that can be shared by riscv.
+> > >
+> > > Patch 8 move reject_set check logic to a function so as to check for
+> > > different errno for different registers.
+> > > Patch 9 move finalize_vcpu back to run_test so that riscv can impleme=
+nt
+> > > its specific operation.
+> > > Patch 10 change to do the get/set operation only on present-blessed l=
+ist.
+> > > Patch 11 add the skip_set facilities so that riscv can skip set opera=
+tion
+> > > on some registers.
+> > > Patch 12 enabled the KVM_GET_REG_LIST API in riscv.
+> > > patch 13 added the corresponding kselftest for checking possible
+> > > register regressions.
+> > >
+> > > The get-reg-list kvm selftest was ported from aarch64 and tested with
+> > > Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+> > >
+> > > ---
+> > > Changed since v5:
+> > >   * Rebase to v6.5-rc3
+> > >   * Minor fix for Andrew's comments
+> > >
+> > > Andrew Jones (7):
+> > >   KVM: arm64: selftests: Replace str_with_index with strdup_printf
+> > >   KVM: arm64: selftests: Drop SVE cap check in print_reg
+> > >   KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
+> > >   KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
+> > >   KVM: arm64: selftests: Delete core_reg_fixup
+> > >   KVM: arm64: selftests: Split get-reg-list test code
+> > >   KVM: arm64: selftests: Finish generalizing get-reg-list
+> > >
+> > > Haibo Xu (6):
+> > >   KVM: arm64: selftests: Move reject_set check logic to a function
+> > >   KVM: arm64: selftests: Move finalize_vcpu back to run_test
+> > >   KVM: selftests: Only do get/set tests on present blessed list
+> > >   KVM: selftests: Add skip_set facility to get_reg_list test
+> > >   KVM: riscv: Add KVM_GET_REG_LIST API support
+> > >   KVM: riscv: selftests: Add get-reg-list test
+> >
+> > Are you okay for this series to go through the KVM RISC-V tree ?
 >
-> Also please add a comment,
->
-> /*
->  * SSP can only be read via RDSSP; writing even requires
->  * destructive and potentially faulting operations such as
->  * SAVEPREVSSP/RSTORSSP or SETSSBSY/CLRSSBSY.  Let the host
->  * use a pseudo-MSR that is just a wrapper for the GUEST_SSP
->  * field of the VMCS.
->  */
->
-OK,  will take it, thanks!
-> Paolo
+> Sure, seems fine from my point of view. But please put it on an
+> immutable topic branch so that we can also merge it in the arm64 tree,
+> should we need to resolve any conflicts.
 >
 
+Hi Marc,
+
+Thanks for your review!
+
+Which topic branch do you prefer or suggest to use?
+I can do a rebase on it and fix any potential conflicts.
+
+Regards,
+Haibo
+
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
