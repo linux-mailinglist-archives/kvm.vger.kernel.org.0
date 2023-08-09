@@ -2,105 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 240B677625B
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 16:24:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E360877628F
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 16:33:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232701AbjHIOX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 10:23:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
+        id S233394AbjHIOds (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 10:33:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232477AbjHIOX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 10:23:58 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83ED91FC2
-        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 07:23:58 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-687071894eeso4759934b3a.3
-        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 07:23:58 -0700 (PDT)
+        with ESMTP id S233390AbjHIOdr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 10:33:47 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7F71FCC
+        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 07:33:47 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bbb34b0abaso88665495ad.1
+        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 07:33:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691591038; x=1692195838;
+        d=google.com; s=20221208; t=1691591626; x=1692196426;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9zpyW03eshaeH9Sr4sGjLZGjabDdV1ZBUVVrLztPH90=;
-        b=zbGQ0bWUYfp+uCOYSAQRh3kYYI7a3f8k2jI4RUJKQAR1VFdACzIqDnnJA5QRzNnXpD
-         dmUD9ISCPaRLENpCaYx4lZ0qXn/Z8CLewnhT/AlOdrRk2+ofucc5Zwh8j2a7j3HpIoZ0
-         qO7NcEg5YafZfGmcdbAGWAo3Rbo0egtiyusakVgVf0VMLLgzq9ZW8R/WwgPTXLlK3M3B
-         WVxCkB5bLeT6GtRQjA72G0ynae2knnaY+3Gbs2ENYHjN5UA8jCctVPQKTYVLygxSd4mp
-         EMrYOH3az2wxwLzgm9tURx/X0BxHRePaZhv92cmtqge+li5rnO9ZB4X+PbouoFFSiAcM
-         /TTA==
+        bh=jZmbaKKKm3CHbI/QJJpHHXp/km2ij6zusR5ThdOY8EE=;
+        b=DUi7yCKZeHIQOn9Fthn5OjHUhJCT5ipdMgkg2xVzFQPT+Dno1JgMSzuaGqJnec7h2e
+         k+Z7kpr+D6ku5ye4Y6Eo7mDbKoNBW9n6UpATdPMSt2qu7OS+JRrwoR8Bnl03vE6oqRed
+         IdDFcMCZspBAGdgCY0gFnYb8aKK0+wCIjcoCRQhWqa5loj4vewG+g6iwkycBJQSMkLjj
+         F3MgG8WkunnGIX9Tntelx5mF9rV8NItN1nwrgI3NHer6l3ddA7FkQSXwfAflMybwce6F
+         EdaQfPWL6IZPj1YAXH1asOjn4XATl8RQIyRiPv89SVJFee5ERZGSewxIkqk4Plzps/v2
+         kuwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691591038; x=1692195838;
+        d=1e100.net; s=20221208; t=1691591626; x=1692196426;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9zpyW03eshaeH9Sr4sGjLZGjabDdV1ZBUVVrLztPH90=;
-        b=Qh3H2lMgAletbgLLVGvrsDGdZDlDaNwDkFgDZB0GbYvgUiAANPIbKxqWldCDm7ExUt
-         GhG3JrcxxPmZML+wSk23BmvoFDCpsjcWh00XzLbLeuvSRgD3U0/9yruD9acfYQBO9e4t
-         6fUpmOZgOri5Ohk5HDmo3FJikXCeAdDLoIXpv1KoJmUNH3/Y+8MBbkWF5uzihY6MRMc5
-         rT4tfCydXnxcao23Uem6Vn5L71Lg24AhNcQtgNwEYNpNWjNinGk9MaUsYZZP7Q+Yw4wY
-         qTah32K9a9AVe/06QkSgzrlQoTXTsld7cd1wSSJ9HX48/4xPbRwiKq9wAeoxgUdNUMo4
-         IxGA==
-X-Gm-Message-State: AOJu0YyYc4IIs0LLQoEfnS3FbvNs6q4r9HfoHewN8Ro9f+hxPt++3Lzr
-        QZAW0EHgvnky+UTLTTfa41Zq4MhdTew=
-X-Google-Smtp-Source: AGHT+IH4ryL5887Vn/UApVbkk4fujhQ/hVnjb96u5LiJPUr37eC4Iuh3VjN7DAXdLDW/56x9JYiIDfUBdK4=
+        bh=jZmbaKKKm3CHbI/QJJpHHXp/km2ij6zusR5ThdOY8EE=;
+        b=b24lkcFNsoYdgEKSXewpTaPr2lKxrYrV92y9JaGLyQQOt/1XJlk4QF6gKW8std07Gj
+         1tBPv3hfHEwIYHORmdocLMDE/uZz58yL9Lmf27PVvrDGYxNctIs5kaJPV3b4+JJoX//u
+         uH5kvdFb0onUtr4bKe66STPmx+VGUR+X0qyoqiyALBjcI1//STWsNZPIyG9OicBvmFPW
+         a0QEt6Ntawfj0h3MO7Qwz0gaJ6+N4crtFUmIlRw4o5NomzNhk68tEWGSU+jibA7CIqbU
+         eYWdxA+HUkoJg71m5tx6JSUhrFXG1k2AQ0vwCHV6h/ZLHQw0m+EjhFdjmQgOka1VZzGt
+         kevg==
+X-Gm-Message-State: AOJu0YzOIduEfKl8mqXk7xXvrthQgwcQURoOT/p9/ZZyMJb17FaitIdW
+        BC1lPBwywzk/Z6x905qisK9xeaIr9xk=
+X-Google-Smtp-Source: AGHT+IFTcanp2PgeUlsBe6acnCorL6mrsLeGVUyMlUhGhob9bR6LKZlVBrq9Y6Q4E1OFc7EkekhTTOPkt/g=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1398:b0:687:4a62:f49 with SMTP id
- t24-20020a056a00139800b006874a620f49mr313679pfg.5.1691591037991; Wed, 09 Aug
- 2023 07:23:57 -0700 (PDT)
-Date:   Wed, 9 Aug 2023 07:23:56 -0700
-In-Reply-To: <c9a1a5cc-7e84-e887-f4e3-8396cc8ce494@oracle.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e542:b0:1b8:5541:9d3e with SMTP id
+ n2-20020a170902e54200b001b855419d3emr300692plf.6.1691591626649; Wed, 09 Aug
+ 2023 07:33:46 -0700 (PDT)
+Date:   Wed, 9 Aug 2023 07:33:45 -0700
+In-Reply-To: <ZNLlseYag5DniUg3@yzhao56-desk.sh.intel.com>
 Mime-Version: 1.0
-References: <20230808233132.2499764-1-seanjc@google.com> <c9a1a5cc-7e84-e887-f4e3-8396cc8ce494@oracle.com>
-Message-ID: <ZNOhfMgeBnRwwXDX@google.com>
-Subject: Re: [PATCH 0/2] KVM: SVM: Set pCPU during IRTE update if vCPU is running
+References: <20221223005739.1295925-1-seanjc@google.com> <20221223005739.1295925-20-seanjc@google.com>
+ <5581418b-2e1c-6011-f0a4-580df7e00b44@gmail.com> <ZNEni2XZuwiPgqaC@google.com>
+ <ZNLlseYag5DniUg3@yzhao56-desk.sh.intel.com>
+Message-ID: <ZNOjyf2OHQZYfMEJ@google.com>
+Subject: Re: [PATCH 19/27] KVM: x86/mmu: Use page-track notifiers iff there
+ are external users
 From:   Sean Christopherson <seanjc@google.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "dengqiao . joey" <dengqiao.joey@bytedance.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>, kvm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        Zhi Wang <zhi.a.wang@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 09, 2023, Joao Martins wrote:
-> On 09/08/2023 00:31, Sean Christopherson wrote:
-> > Fix a bug where KVM doesn't set the pCPU affinity for running vCPUs when
-> > updating IRTE routing.  Not setting the pCPU means the IOMMU will signal
-> > the wrong pCPU's doorbell until the vCPU goes through a put+load cycle.
+On Wed, Aug 09, 2023, Yan Zhao wrote:
+> On Mon, Aug 07, 2023 at 10:19:07AM -0700, Sean Christopherson wrote:
+> > On Mon, Aug 07, 2023, Like Xu wrote:
+> > > On 23/12/2022 8:57 am, Sean Christopherson wrote:
+> > > > +static inline void kvm_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
+> > > > +					const u8 *new, int bytes)
+> > > > +{
+> > > > +	__kvm_page_track_write(vcpu, gpa, new, bytes);
+> > > > +
+> > > > +	kvm_mmu_track_write(vcpu, gpa, new, bytes);
+> > > > +}
+> > > 
+> > > The kvm_mmu_track_write() is only used for x86, where the incoming parameter
+> > > "u8 *new" has not been required since 0e0fee5c539b ("kvm: mmu: Fix race in
+> > > emulated page table writes"), please help confirm if it's still needed ? Thanks.
+> > > A minor clean up is proposed.
 > > 
+> > Hmm, unless I'm misreading things, KVMGT ultimately doesn't consume @new either.
+> > So I think we can remove @new from kvm_page_track_write() entirely.
+> Sorry for the late reply.
+> Yes, KVMGT does not consume @new and it reads the guest PTE again in the
+> page track write handler.
 > 
-> Or also framed as an inefficiency that we depend on the GALog (for a running
-> vCPU) for interrupt delivery until the put+load cycle happens. I don't think I
-> ever reproduced the missed interrupt case in our stress testing.
+> But I have a couple of questions related to the memtioned commit as
+> below:
+> 
+> (1) If "re-reading the current value of the guest PTE after the MMU lock has
+> been acquired", then should KVMGT also acquire the MMU lock too?
 
-Ah, I'll reword the changelog in patch 2 if this only delays the interrupt instead
-of dropping it entirely.
+No.  If applicable, KVMGT should read the new/current value after acquiring
+whatever lock protects the generation (or update) of the shadow entries.  I
+suspect KVMGT already does this, but I don't have time to confirm that at this
+exact memory.
 
-> > I waffled for far too long between making this one patch or two.  Moving
-> > the lock doesn't make all that much sense as a standalone patch, but in the
-> > end, I decided that isolating the locking change would be useful in the
-> > unlikely event that it breaks something.  If anyone feels strongly about
-> > making this a single patch, I have no objection to squashing these together.
-> > 
-> IMHO, as two patches looks better;
-> 
-> For what is worth:
-> 
-> 	Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-> 
-> I think Alejandro had reported his testing as successful here:
-> 
-> https://lore.kernel.org/kvm/caefe41b-2736-3df9-b5cd-b81fc4c30ff0@oracle.com/
-> 
-> OTOH, he didn't give the Tested-by explicitly
+The race that was fixed in KVM was:
 
-Yeah, I almost asked for a Tested-by, but figured it would be just as easy to
-post the patches.
+  vCPU0         vCPU1   
+  write X
+                 write Y
+                 sync SPTE w/ Y
+  sync SPTE w/ X
+
+Reading the value after acquiring mmu_lock ensures that both vCPUs will see whatever
+value "loses" the race, i.e. whatever written value is processed second ('Y' in the
+above sequence).
+
+> If so, could we move the MMU lock and unlock into kvm_page_track_write()
+> as it's common.
+> 
+> (2) Even if KVMGT consumes @new,
+> will kvm_page_track_write() be called for once or twice if there are two
+> concurent emulated write?
+
+Twice, kvm_page_track_write() is wired up directly to the emulation of the write,
+i.e. there is no batching.
