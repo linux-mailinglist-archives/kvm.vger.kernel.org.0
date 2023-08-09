@@ -2,107 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D34C77602F
-	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 15:06:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8236E776062
+	for <lists+kvm@lfdr.de>; Wed,  9 Aug 2023 15:16:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232535AbjHINGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 09:06:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45228 "EHLO
+        id S232814AbjHINQG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 09:16:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232473AbjHINGN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 09:06:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E93210A;
-        Wed,  9 Aug 2023 06:06:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F15BD63A14;
-        Wed,  9 Aug 2023 13:06:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 152AAC433C8;
-        Wed,  9 Aug 2023 13:06:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691586372;
-        bh=3JOmNkuzooaFOq539u5kCuJhJnFORpHKLeANQVZnpoU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=q8d+/TGnyv61Y+Miho/vuNy3ywBk8wHayiuLyaNPZ6VEuqfx2Cv66aQPaoGNvJTDt
-         fVW1nZnypgqfwHaqdgJOxOfgDpyp/5SNyIDYNq//5+1XAphc/27ibqeZWXJbW6nn5x
-         DyIeTd0LPrqHiU3Q9RMnjQowGEKsLJKRmObiEocf737dMupNdl5sWy4ZNsQ55j+8bF
-         QZ6Ir1MgLX8ELn5P8balpQJ4+NK88dQZyNrbk1b47ZBF1EwtDcpnrvpM1cagod96CM
-         SnhCCyfnTgb8/3cnJBy02um9C9x43UHT2jMQK0HAnDFBWN8Y3Bu76nll9Uwu22+MUz
-         8DyGctY4ZcOPg==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, "H. Peter Anvin" <hpa@zytor.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michal Luczaj <mhal@rbox.co>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH 2/2] x86: move gds_ucode_mitigated() declaration to header
-Date:   Wed,  9 Aug 2023 15:05:00 +0200
-Message-Id: <20230809130530.1913368-2-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230809130530.1913368-1-arnd@kernel.org>
-References: <20230809130530.1913368-1-arnd@kernel.org>
+        with ESMTP id S229803AbjHINQF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 09:16:05 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F5AE5F
+        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 06:16:02 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RLVq93973z1hwd5;
+        Wed,  9 Aug 2023 21:13:09 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500012.china.huawei.com
+ (7.221.188.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 9 Aug
+ 2023 21:15:59 +0800
+From:   Li Zetao <lizetao1@huawei.com>
+To:     <diana.craciun@oss.nxp.com>, <alex.williamson@redhat.com>
+CC:     <lizetao1@huawei.com>, <kvm@vger.kernel.org>
+Subject: [PATCH -next] vfio/fsl-mc: Use module_fsl_mc_driver macro to simplify the code
+Date:   Wed, 9 Aug 2023 21:15:36 +0800
+Message-ID: <20230809131536.4021639-1-lizetao1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemi500012.china.huawei.com (7.221.188.12)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+Use the module_fsl_mc_driver macro to simplify the code and
+remove redundant initialization owner in vfio_fsl_mc_driver.
 
-The declaration got placed in the .c file of the caller, but that
-causes a warning for the definition:
-
-arch/x86/kernel/cpu/bugs.c:682:6: error: no previous prototype for 'gds_ucode_mitigated' [-Werror=missing-prototypes]
-
-Move it to a header where both sides can observe it instead.
-
-Fixes: 81ac7e5d74174 ("KVM: Add GDS_NO support to KVM")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Li Zetao <lizetao1@huawei.com>
 ---
- arch/x86/include/asm/processor.h | 2 ++
- arch/x86/kvm/x86.c               | 2 --
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-index e5b0e23a7a830..01786f3e289cb 100644
---- a/arch/x86/include/asm/processor.h
-+++ b/arch/x86/include/asm/processor.h
-@@ -731,4 +731,6 @@ bool arch_is_platform_page(u64 paddr);
- #define arch_is_platform_page arch_is_platform_page
- #endif
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+index 116358a8f1cf..f65d91c01f2e 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+@@ -601,23 +601,11 @@ static struct fsl_mc_driver vfio_fsl_mc_driver = {
+ 	.remove		= vfio_fsl_mc_remove,
+ 	.driver	= {
+ 		.name	= "vfio-fsl-mc",
+-		.owner	= THIS_MODULE,
+ 	},
+ 	.driver_managed_dma = true,
+ };
  
-+extern bool gds_ucode_mitigated(void);
-+
- #endif /* _ASM_X86_PROCESSOR_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 17b1ee7f839c3..a7d97cde19678 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -318,8 +318,6 @@ u64 __read_mostly host_xcr0;
- 
- static struct kmem_cache *x86_emulator_cache;
- 
--extern bool gds_ucode_mitigated(void);
+-static int __init vfio_fsl_mc_driver_init(void)
+-{
+-	return fsl_mc_driver_register(&vfio_fsl_mc_driver);
+-}
 -
- /*
-  * When called, it means the previous get/set msr reached an invalid msr.
-  * Return true if we want to ignore/silent this failed msr access.
+-static void __exit vfio_fsl_mc_driver_exit(void)
+-{
+-	fsl_mc_driver_unregister(&vfio_fsl_mc_driver);
+-}
+-
+-module_init(vfio_fsl_mc_driver_init);
+-module_exit(vfio_fsl_mc_driver_exit);
++module_fsl_mc_driver(vfio_fsl_mc_driver);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("VFIO for FSL-MC devices - User Level meta-driver");
 -- 
-2.39.2
+2.34.1
 
