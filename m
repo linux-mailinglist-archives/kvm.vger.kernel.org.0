@@ -2,69 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 062D1777AC1
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:30:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8AD9777B06
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:43:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235700AbjHJO3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 10:29:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53162 "EHLO
+        id S235871AbjHJOn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 10:43:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235537AbjHJO3s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:29:48 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E201E4B;
-        Thu, 10 Aug 2023 07:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691677787; x=1723213787;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Yo6Lfzqy2WIB3QzGalEmKlZhegsIaZLYiWJmZDXSayY=;
-  b=h7fuzIS6yuifOoH2FrXVjfvXajiFPJjw7bRMDitFXt+X0hzl4vyH64ML
-   hYjS355yUuVOx9Rv7gTShQh05PH7WAwl9Mz52XRQFhDFkq+KkZ530eE3D
-   SQfpt4Pc6h93INTB/SkjhH7fnVJ/HwSVS/fuOBnHrMDIuoqGKlrUyCkA6
-   K9T0+vHKY5g+68TugK0i+qCmwsTQEtumqWYzAEghET4IpycKmMBlU6Fj1
-   /AQvmdJLq10pCN8ReaHc7q+otBl4mibO+s7kZX2EWAVEHI1vSB4JZiWlF
-   cILU9bZXsUjE2Y4m6Y6/5aabkvFwT+ZCMk2lHqB4EWRTvHKXhhDTQxrm3
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="375128942"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="375128942"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 07:29:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="725839099"
-X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
-   d="scan'208";a="725839099"
-Received: from dcastil2-mobl2.amr.corp.intel.com (HELO [10.212.148.36]) ([10.212.148.36])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 07:29:46 -0700
-Message-ID: <c871cc44-b6a0-06e3-493b-33ddf4fa6e05@intel.com>
-Date:   Thu, 10 Aug 2023 07:29:46 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v5 09/19] KVM:x86: Make guest supervisor states as
- non-XSAVE managed
-Content-Language: en-US
-To:     "Yang, Weijiang" <weijiang.yang@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>, peterz@infradead.org,
-        pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>
-Cc:     Chao Gao <chao.gao@intel.com>, john.allen@amd.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rick.p.edgecombe@intel.com, binbin.wu@linux.intel.com
-References: <20230803042732.88515-1-weijiang.yang@intel.com>
- <20230803042732.88515-10-weijiang.yang@intel.com>
- <ZMuMN/8Qa1sjJR/n@chao-email>
- <bfc0b3cb-c17a-0ad6-6378-0c4e38f23024@intel.com>
- <ZM1jV3UPL0AMpVDI@google.com>
- <806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        with ESMTP id S235454AbjHJOn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 10:43:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB664268D
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:43:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 515CC65E91
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 14:43:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B119AC433C7;
+        Thu, 10 Aug 2023 14:43:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691678606;
+        bh=MjMPBofj9eixKpMqEVyk0yamw7dMCKm//JFQsitXUOQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=G10d5hVjRTjzj9efCgSrdYmFKSG/1wbZm/+5H0OG2PoQ+KV3x/v+Uq/FWWFvNKbcm
+         PWfvj/6Hp1EaBfMFmDwuU0LbZI/4ecgLupDb9n+islaE1Z+hu9+kxuy1w67AHj0a2c
+         6ch5/EhlSLJegSDHq4oXi5CUjPfFWynhjtL13N4zY55Dl0fkBRPBTh0slixdUQ13Cn
+         gu7YSxXqiH847+GLgDu3xfaZFYOmj0O4QaIiTqUQc4j/j5Pf1gezTfU8XN/0YMTRZB
+         nueFK9mNhiaQhGAWz7QF1/efofdDVCRLZCSkk+VgK+zFvV2qoo/93tXd8Vm9QgzmBL
+         7jovM2cCiLBNA==
+Received: from c-xd4ed8728.customers.hiper-net.dk ([212.237.135.40] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qU6sm-003qzZ-8w;
+        Thu, 10 Aug 2023 15:43:24 +0100
+Date:   Thu, 10 Aug 2023 15:43:32 +0100
+Message-ID: <87v8dnot4b.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Miguel Luis <miguel.luis@oracle.com>
+Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 14/27] KVM: arm64: nv: Add trap forwarding infrastructure
+In-Reply-To: <65770FF0-A864-4678-8280-AE9BD666CC12@oracle.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+        <20230808114711.2013842-15-maz@kernel.org>
+        <65770FF0-A864-4678-8280-AE9BD666CC12@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 212.237.135.40
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,75 +84,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/10/23 02:29, Yang, Weijiang wrote:
-...
-> When KVM enumerates shadow stack support for guest in CPUID(0x7, 
-> 0).ECX[bit7], architecturally it claims both SS user and supervisor
-> mode are supported. Although the latter is not supported in Linux,
-> but in virtualization world, the guest OS could be non-Linux system,
-> so KVM supervisor state support is necessary in this case.
+Hi Miguel,
 
-What actual OSes need this support?
-
-> Two solutions are on the table:
-> 1) Enable CET supervisor support in Linux kernel like user mode support.
-
-We _will_ do this eventually, but not until FRED is merged.  The core
-kernel also probably won't be managing the MSRs on non-FRED hardware.
-
-I think what you're really talking about here is that the kernel would
-enable CET_S XSAVE state management so that CET_S state could be managed
-by the core kernel's FPU code.
-
-That is, frankly, *NOT* like the user mode support at all.
-
-> 2) Enable support in KVM domain.
+On Wed, 09 Aug 2023 19:28:08 +0100,
+Miguel Luis <miguel.luis@oracle.com> wrote:
 > 
-> Problem:
-> The Pros/Cons for each solution(my individual thoughts):
-> In kernel solution:
-> Pros:
-> - Avoid saving/restoring 3 supervisor MSRs(PL{0,1,2}_SSP) at vCPU
->   execution path.
-> - Easy for KVM to manage guest CET xstate bits for guest.
-> Cons:
-> - Unnecessary supervisor state xsaves/xrstors operation for non-vCPU
->   thread.
+> Hi Marc,
+> 
+> > On 8 Aug 2023, at 11:46, Marc Zyngier <maz@kernel.org> wrote:
 
-What operations would be unnecessary exactly?
+[...]
 
-> - Potentially extra storage space(24 bytes) for thread context.
+> > + for (int id = __MULTIPLE_CONTROL_BITS__;
+> > +     id < (__COMPLEX_CONDITIONS__ - 1);
+> 
+> This condition seems to be discarding the last MCB from being checked,
+> which IIUC it must also be checked.
 
-Yep.  This one is pretty unavoidable.  But, we've kept MPX around in
-this state for a looooooong time and nobody really seemed to care.
+Indeed, well caught. Now fixed.
 
-> KVM solution:
-> Pros:
-> - Not touch current kernel FPU management framework and logic.
-> - No extra space and operation for non-vCPU thread.
-> Cons:
-> - Manually saving/restoring 3 supervisor MSRs is a performance burden to
->   KVM.
-> - It looks more like a hack method for KVM, and some handling logic
->   seems a bit awkward.
+Thanks,
 
-In a perfect world, we'd just allocate space for CET_S in the KVM
-fpstates.  The core kernel fpstates would have
-XSTATE_BV[13]==XCOMP_BV[13]==0.  An XRSTOR of the core kernel fpstates
-would just set CET_S to its init state.
+	M.
 
-But I suspect that would be too much work to implement in practice.  It
-would be akin to a new lesser kind of dynamic xstate, one that didn't
-interact with XFD and *NEVER* gets allocated in the core kernel
-fpstates, even on demand.
-
-I want to hear more about who is going to use CET_S state under KVM in
-practice.  I don't want to touch it if this is some kind of purely
-academic exercise.  But it's also silly to hack some kind of temporary
-solution into KVM that we'll rip out in a year when real supervisor
-shadow stack support comes along.
-
-If it's actually necessary, we should probably just eat the 24 bytes in
-the fpstates, flip the bit in IA32_XSS and move on.  There shouldn't be
-any other meaningful impact to the core kernel.
-
+-- 
+Without deviation from the norm, progress is not possible.
