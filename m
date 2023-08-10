@@ -2,78 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99E1A7773D4
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 11:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2244977744D
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 11:20:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234574AbjHJJKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 05:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42770 "EHLO
+        id S234870AbjHJJUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 05:20:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234447AbjHJJKY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 05:10:24 -0400
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 686F7211E;
-        Thu, 10 Aug 2023 02:10:22 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id 41be03b00d2f7-564a0d2d35eso460328a12.0;
-        Thu, 10 Aug 2023 02:10:22 -0700 (PDT)
+        with ESMTP id S234869AbjHJJUA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 05:20:00 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C3D5254
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 02:17:44 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3175f17a7baso617887f8f.0
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 02:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691658622; x=1692263422;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sCYgAfd5bZuG3/28sUikGuYme1J7pykWX651228hrR8=;
-        b=VvXorgPLVm/eEiFpVC0OIv0jPwu7sPvvMO30Dp8Chf7YNfeYIlXawKXW0/rSn0rQgx
-         DwuRLG/LX09ieLeAebicdXsSAJn2sw6vdBOsVYNyAqGEAgUX3JbW3JynOHl/rdGgA7Ao
-         orGR7iyF80qBS57wSzBaMZWk0hKIzTzJO5ysUnCizqY4vMyjQ2moL1+4E8cxB5Jsmm5F
-         lbxXG/gnVylwiMaPPmMsJQQvd+D8YKG2Oj+jA4EN1JhVWIfDm6PLtwM+7wPqsAWjEOtV
-         4LNS+ApgsMLFD6LuVOdkxvIoIeWhfNN+MQ684U+66FYCVGpkgN0A+hshXDvSvgXDw8ta
-         6FsA==
+        d=linaro.org; s=google; t=1691659063; x=1692263863;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QQf4LquBd65ySTnhKk68cIBvF8eXymDszmhfrBPoOXM=;
+        b=EzT9qs7EF0FCAf8FT9mNBnTxzVfbxzvYti8Z4cfty3I7+xW+D+IxjrdVbLbmLVNzzc
+         r3LCTYuY+aSbieOgqUrFI5aBI4QRMDjeoq565fhZT4vokXEbzR5D5lF/tmq+PQec8M5A
+         5gsNG4TNfKPdK1fTBQn3LU9/QpYX64r5KdRKsKtfuw96ncNoaKf7a66sAK7g4+S4sidQ
+         72ORPnxU8jcYlVIH6OAey+eI5JYo+auC3oJ27H5vHeR38bv/L4Z3XivRPhZFWy47Oep3
+         VAWEf2yNPO8Y5J+mKQ1pSpWYXjrCsroclNC9IzUx+Qnl7uT2HKLNeic+Sd2XIPCwi4dK
+         2oCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691658622; x=1692263422;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sCYgAfd5bZuG3/28sUikGuYme1J7pykWX651228hrR8=;
-        b=aYaZQSD8QB0MHjyGTre6jWUO/3kTrS1QmUHHCkeOYDxGuJU7plOo+hN1DOGxSCD6aW
-         PwmnQbQLaP9U7oeWDajeCfYOl3z7Z3oCafW+nax8MS9c8aXS5B7b4gUCEl7kElv/blJP
-         Tom4gYD7W4k9JEkS66zTZPrCQJ2yqtiv05/nbVv2B4Dq6ODgPYLkc9ymJRMiQl9qENMw
-         q/yejSTfuP3Ky0ZJUrHg72j+k4KVh6WbQIzTzfpaMqd81uRWHL7+NXpeC40dVP/Ivxlh
-         I3M+8agbQ7Lwg1Cfo7ZJaW7txOqW98cSSASq++LLRDOEWDXZm+ReQC7Wg+Z80zyiRX2A
-         7mMw==
-X-Gm-Message-State: AOJu0YxL9cxXaAMBXWu316dAVxNJ++iymfvwivoXwLnyHExCvBAbjVEm
-        rKMltDJcS92OiNiL/rQ8MjY=
-X-Google-Smtp-Source: AGHT+IF7EVucMd05qUvpask4vh1ZQLlRGwgIr9/xKVM72fgSx73Vs2mbIbW1BNycb1vVzPhA/8LtEQ==
-X-Received: by 2002:a17:90a:9747:b0:269:96e:7d52 with SMTP id i7-20020a17090a974700b00269096e7d52mr1291397pjw.26.1691658621801;
-        Thu, 10 Aug 2023 02:10:21 -0700 (PDT)
-Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id pc16-20020a17090b3b9000b00263154aab24sm970704pjb.57.2023.08.10.02.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 02:10:21 -0700 (PDT)
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v6 6/6] KVM: selftests: Test gp event filters don't affect fixed event filters
-Date:   Thu, 10 Aug 2023 17:09:45 +0800
-Message-Id: <20230810090945.16053-7-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230810090945.16053-1-cloudliang@tencent.com>
-References: <20230810090945.16053-1-cloudliang@tencent.com>
+        d=1e100.net; s=20221208; t=1691659063; x=1692263863;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QQf4LquBd65ySTnhKk68cIBvF8eXymDszmhfrBPoOXM=;
+        b=f7MI5Ur/jMgsvZOz/bAdg8xNz6r+APAVJFa/opzIgbkO4vy2D1rZmdVq0qbWbSmJOl
+         uKbDncQj67+YyOYVn9vGZTyXtdImRhodRyqR2sm53czO+50iEUsi6LNwbm30G2d28wgo
+         iz3Yp3WU6K6808oy6fZHxxX3xVQ7Q9cAM9aHA72yiy7G3F/tUzzZZ1JrzHxhxgI7w7ue
+         gEpYsrYUdDfZQr6gHkmELEP2HDHhFTQeA+PXKWdyoIPIjUXo253L4sQ+119AuuOjWwH0
+         5V/3bmyOwA11KdQTXIL8MQj49cv2y/tNnClxOR+8MEHIDCSvjY31UWNeCFQvaESeVq2x
+         K5YQ==
+X-Gm-Message-State: AOJu0YxO3VB6ZG/19JIBSISKsWMWyMutuxmOEDhlDpgnn/RrzO3eg08Q
+        4/eTRo88JLzNDpWiVN52KZzdsrigQV0324gtibQ=
+X-Google-Smtp-Source: AGHT+IHVUZC2xblty8/WDMMkeM/XMBFZhxw55Mv09xof8YsHMJLyDXUAOmZP4Zn7njVT6X3A3C4Gzw==
+X-Received: by 2002:adf:e689:0:b0:317:690e:7b39 with SMTP id r9-20020adfe689000000b00317690e7b39mr1643959wrm.12.1691659062935;
+        Thu, 10 Aug 2023 02:17:42 -0700 (PDT)
+Received: from [192.168.69.115] ([176.176.158.65])
+        by smtp.gmail.com with ESMTPSA id a2-20020a5d4d42000000b00317ca89f6c5sm1499244wru.107.2023.08.10.02.17.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 02:17:42 -0700 (PDT)
+Message-ID: <183b3243-e61a-12fa-0460-73e417bf029d@linaro.org>
+Date:   Thu, 10 Aug 2023 11:17:39 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH v5 3/6] mips: Report an error when KVM_VM_MIPS_VZ is
+ unavailable
+Content-Language: en-US
+To:     Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>
+References: <20230727073134.134102-1-akihiko.odaki@daynix.com>
+ <20230727073134.134102-4-akihiko.odaki@daynix.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20230727073134.134102-4-akihiko.odaki@daynix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -82,62 +78,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinrong Liang <cloudliang@tencent.com>
+On 27/7/23 09:31, Akihiko Odaki wrote:
+> On MIPS, QEMU requires KVM_VM_MIPS_VZ type for KVM. Report an error in
+> such a case as other architectures do when an error occurred during KVM
+> type decision.
+> 
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>   target/mips/kvm.c | 1 +
+>   1 file changed, 1 insertion(+)
 
-Add a test to ensure that setting both generic and fixed performance
-event filters does not affect the consistency of the fixed event filter
-behavior in KVM.
-
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 27 +++++++++++++++++++
- 1 file changed, 27 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 732c76c41bb0..2166b4085ca3 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -838,6 +838,19 @@ static uint64_t test_with_fixed_counter_filter(struct kvm_vcpu *vcpu,
- 	return run_vcpu_to_sync(vcpu);
- }
- 
-+static uint64_t test_set_gp_and_fixed_event_filter(struct kvm_vcpu *vcpu,
-+						   uint32_t action,
-+						   uint32_t bitmap)
-+{
-+	struct __kvm_pmu_event_filter f = base_event_filter;
-+
-+	f.action = action;
-+	f.fixed_counter_bitmap = bitmap;
-+	do_vcpu_set_pmu_event_filter(vcpu, &f);
-+
-+	return run_vcpu_to_sync(vcpu);
-+}
-+
- static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
- 					uint8_t nr_fixed_counters)
- {
-@@ -864,6 +877,20 @@ static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
- 		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_DENY,
- 						       bitmap);
- 		TEST_ASSERT_EQ(!!count, !(bitmap & BIT(idx)));
-+
-+		/*
-+		 * Check that fixed_counter_bitmap has higher priority than
-+		 * events[] when both are set.
-+		 */
-+		count = test_set_gp_and_fixed_event_filter(vcpu,
-+							   KVM_PMU_EVENT_ALLOW,
-+							   bitmap);
-+		TEST_ASSERT_EQ(!!count, !!(bitmap & BIT(idx)));
-+
-+		count = test_set_gp_and_fixed_event_filter(vcpu,
-+							   KVM_PMU_EVENT_DENY,
-+							   bitmap);
-+		TEST_ASSERT_EQ(!!count, !(bitmap & BIT(idx)));
- 	}
- }
- 
--- 
-2.39.3
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
