@@ -2,117 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C4F1778459
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:53:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F009778468
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:58:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbjHJXx2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 19:53:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
+        id S229806AbjHJX55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 19:57:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbjHJXx1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 19:53:27 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A853526BC;
-        Thu, 10 Aug 2023 16:53:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691711606; x=1723247606;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=5JIN1Yu4mUkxQTHvXnfAGLOJxcyhh/wZyopkkYQtIuo=;
-  b=ix9GZsVn6x/6OELVvd7FHj+YyLU6uWn93NnF4ShO54pUvaK8TgoatOOl
-   6bCyujTRLYoAnBWAHJ7HXYvvVBsUW0JDj8SfKxvEw/+8Q2JviYkIDMA9L
-   mJ4vtwyRPT0IjsR/MnzBPWsAHweHtbm0oo32HlFgTIIAnrRX5ONTqhLI3
-   flDLJkn8utBlPPRKwCpVoPePvYV2pyEJQm8iR8UYiBJOb+qOauanHgVOn
-   V+8tZgAjZs3rkQdXfOzsrHvtFrEHlJm3mvcImMlUIcHwYviv6hW8kJeOP
-   /D4r0VMP6XvGQheYVRxdBAIj9wOwk4RCPrOZYBW8HoG1FQ6kvJ3i5jjya
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="351872279"
-X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
-   d="scan'208";a="351872279"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 16:53:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="856092397"
-X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
-   d="scan'208";a="856092397"
-Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 10 Aug 2023 16:53:24 -0700
-Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qUFT1-0007LM-0U;
-        Thu, 10 Aug 2023 23:53:23 +0000
-Date:   Fri, 11 Aug 2023 07:53:04 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [mst-vhost:vhost 34/46] drivers/vdpa/vdpa_user/vduse_dev.c:1812:23:
- error: use of undeclared identifier 'VIRTIO_RING_F_INDIRECT_DESC'
-Message-ID: <202308110712.wCQoOG00-lkp@intel.com>
+        with ESMTP id S230484AbjHJX5z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 19:57:55 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 941762D48
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:57:49 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99d6d5054bcso205561466b.1
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:57:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691711868; x=1692316668;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hhMgA7qBPuApMhQ4h1vJKFRA4DNp+2B2aFxUktI7jpQ=;
+        b=fSbsTlZ9eRUEq1oc0qlT9VA71infat9B81M3qAFGPQLw+6DiL/k6IQBVuLqYpfm6zc
+         JPbbQuf/OXWE0DDR3Vty3P+Ga7xRDAZJPbwv8Rh6DllYU5zj15degN0az+fa1E+ZZKui
+         Zid/yQ06BXhwoDugW7aU7NJA5d/c3xUSIByYDVFEbgx0r3ZtD20CbtxCBNcFSIJefMq1
+         tRA4cZrI4/sEiaraxlYyAq+sL65bMfdUmaPLsXuLObrwqiszX5v1AaY8IXbz4ltMaoUI
+         FDZXJTolroDTYu55EKXzdNQ57eJWghsSQRQDYygik7m8uY2F9+yL1a51YFkAYkFi+S2u
+         5sVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691711868; x=1692316668;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hhMgA7qBPuApMhQ4h1vJKFRA4DNp+2B2aFxUktI7jpQ=;
+        b=LnJcZCS5Y+VQAhdwCiQLWCRPt9cWh7MLEvydoZueiBbZXWr25nDZ5S3hJaL6xnijhb
+         yie9R3Cty6X61txq9sVgaQA10ufqy2+U/2LWMoTsQ+fkxvu5daawZVrPTVySghXRyG3w
+         GXHC0+4xkihxcQVBI3pOuLqPf9R4Ty0ag2dP5lfo794VauYDy7sPaHiLmJX1Hk7qvhSa
+         nOh6kJ1fRh7bec+Lgw+TjU+2MCItMk5KjMQw+P5OJS4hegaVzOJ8no96qSLoTxBbFyzL
+         Xkk8ZAfTKnJNfPPToK9cEobC9+1EyItBMt/HGGLWK6u4dei4drUjLgfeMsiby7K1TL7c
+         lQoA==
+X-Gm-Message-State: AOJu0YyC7Uo21f6KFkTmifzNvh35iI/3gWeNdregQuzq9MgtyuLMoLJt
+        6TDg+arvIlp0k3IocvgWSG86urneEujsQpC8Jwuvrw==
+X-Google-Smtp-Source: AGHT+IExGyX6IQpw7nkPj/Oj8ZdeERAHUNFikZIEbAqLbQU3zHzZ+Xb2mqkLRl/UdYIm3ylJUJ+cypBkqHv5r6CLu/8=
+X-Received: by 2002:a17:906:1d1:b0:99c:55c5:1c6e with SMTP id
+ 17-20020a17090601d100b0099c55c51c6emr519636ejj.8.1691711867870; Thu, 10 Aug
+ 2023 16:57:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230718234512.1690985-13-seanjc@google.com> <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
+ <ZNKv9ul2I7A4V7IF@google.com>
+In-Reply-To: <ZNKv9ul2I7A4V7IF@google.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Thu, 10 Aug 2023 16:57:36 -0700
+Message-ID: <CAGtprH9YE50RtqhW-U+wK0Vv6aKfqqtOPn8q4s8or=UZwPXZoA@mail.gmail.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ackerley Tng <ackerleytng@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oliver.upton@linux.dev, chenhuacai@kernel.org,
+        mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+        palmer@dabbelt.com, aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        mail@maciej.szmigiero.name, vbabka@suse.cz, david@redhat.com,
+        qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com,
+        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+        kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
-head:   bb59e1f960bd07f70a4b3d8de99bfd8d71835199
-commit: 334f48a83105ebe129a660d1ea1a0c29f87d50c7 [34/46] vduse: Temporarily disable control queue features
-config: x86_64-buildonly-randconfig-r001-20230811 (https://download.01.org/0day-ci/archive/20230811/202308110712.wCQoOG00-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20230811/202308110712.wCQoOG00-lkp@intel.com/reproduce)
+On Tue, Aug 8, 2023 at 2:13=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> ...
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308110712.wCQoOG00-lkp@intel.com/
+> > + When binding a memslot to the file, if a kvm pointer exists, it must
+> >   be the same kvm as the one in this binding
+> > + When the binding to the last memslot is removed from a file, NULL the
+> >   kvm pointer.
+>
+> Nullifying the KVM pointer isn't sufficient, because without additional a=
+ctions
+> userspace could extract data from a VM by deleting its memslots and then =
+binding
+> the guest_memfd to an attacker controlled VM.  Or more likely with TDX an=
+d SNP,
+> induce badness by coercing KVM into mapping memory into a guest with the =
+wrong
+> ASID/HKID.
+>
 
-All errors (new ones prefixed by >>):
+TDX/SNP have mechanisms i.e. PAMT/RMP tables to ensure that the same
+memory is not assigned to two different VMs. Deleting memslots should
+also clear out the contents of the memory as the EPT tables will be
+zapped in the process and the host will reclaim the memory.
 
->> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_RING_F_INDIRECT_DESC'
-                   config->features &= VDUSE_NET_VALID_FEATURES_MASK;
-                                       ^
-   drivers/vdpa/vdpa_user/vduse_dev.c:66:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
-            BIT_ULL(VIRTIO_RING_F_INDIRECT_DESC) | \
-                    ^
->> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_F_EVENT_IDX'
-   drivers/vdpa/vdpa_user/vduse_dev.c:67:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
-            BIT_ULL(VIRTIO_F_EVENT_IDX) |          \
-                    ^
->> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_F_IOMMU_PLATFORM'
-   drivers/vdpa/vdpa_user/vduse_dev.c:69:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
-            BIT_ULL(VIRTIO_F_IOMMU_PLATFORM) |     \
-                    ^
-   drivers/vdpa/vdpa_user/vduse_dev.c:2007:51: warning: shift count >= width of type [-Wshift-count-overflow]
-           ret = dma_set_mask_and_coherent(&vdev->vdpa.dev, DMA_BIT_MASK(64));
-                                                            ^~~~~~~~~~~~~~~~
-   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
-   #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
-                                                        ^ ~~~
-   1 warning and 3 errors generated.
-
-
-vim +/VIRTIO_RING_F_INDIRECT_DESC +1812 drivers/vdpa/vdpa_user/vduse_dev.c
-
-  1804	
-  1805	static void vduse_dev_features_filter(struct vduse_dev_config *config)
-  1806	{
-  1807		/*
-  1808		 * Temporarily filter out virtio-net's control virtqueue and features
-  1809		 * that depend on it while CVQ is being made more robust for VDUSE.
-  1810		 */
-  1811		if (config->device_id == VIRTIO_ID_NET)
-> 1812			config->features &= VDUSE_NET_VALID_FEATURES_MASK;
-  1813	}
-  1814	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Regards,
+Vishal
