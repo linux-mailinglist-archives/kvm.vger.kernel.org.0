@@ -2,114 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F009778468
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:58:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB05877846C
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:58:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbjHJX55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 19:57:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41472 "EHLO
+        id S232762AbjHJX6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 19:58:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230484AbjHJX5z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 19:57:55 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 941762D48
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:57:49 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99d6d5054bcso205561466b.1
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:57:49 -0700 (PDT)
+        with ESMTP id S229802AbjHJX6l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 19:58:41 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7707E272E
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:58:40 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d4db57d2982so1624842276.3
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691711868; x=1692316668;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hhMgA7qBPuApMhQ4h1vJKFRA4DNp+2B2aFxUktI7jpQ=;
-        b=fSbsTlZ9eRUEq1oc0qlT9VA71infat9B81M3qAFGPQLw+6DiL/k6IQBVuLqYpfm6zc
-         JPbbQuf/OXWE0DDR3Vty3P+Ga7xRDAZJPbwv8Rh6DllYU5zj15degN0az+fa1E+ZZKui
-         Zid/yQ06BXhwoDugW7aU7NJA5d/c3xUSIByYDVFEbgx0r3ZtD20CbtxCBNcFSIJefMq1
-         tRA4cZrI4/sEiaraxlYyAq+sL65bMfdUmaPLsXuLObrwqiszX5v1AaY8IXbz4ltMaoUI
-         FDZXJTolroDTYu55EKXzdNQ57eJWghsSQRQDYygik7m8uY2F9+yL1a51YFkAYkFi+S2u
-         5sVg==
+        d=google.com; s=20221208; t=1691711919; x=1692316719;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7TaVxk2ZLZyMV4sj4aUHau1XdgMachiHgDRxXpQpSw=;
+        b=gtfJoNBtgf2nmA0MCyoIsgEUvN83zPnCfYVbdsmX+aecvQHhUIf7674qgmsPb9LxnM
+         foW1+MNfR8qjGqSC2HMsKMixec7fNUm1Rh/FjjU1DQH377QerQVx7txYOx1z/2poukF7
+         5Iz65EJQp3zzjfPQbgrc60824uuAWkZ+2B1OI//owRhEWHnVC9uj/mXea2GvtweUwsgK
+         wjCJd6G9TY3DUAHHTaO2nlHI/YC0XsX5Uwi9yMTQG3QB41QrkFq/0GbyBJjJdrPsO14/
+         HKcWf4CrI+bXJ4BJAcWEz8eyr0BdXen2htmeYURgEFe8ojoohHyg30bs83efcQ+pdsUR
+         wn3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691711868; x=1692316668;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hhMgA7qBPuApMhQ4h1vJKFRA4DNp+2B2aFxUktI7jpQ=;
-        b=LnJcZCS5Y+VQAhdwCiQLWCRPt9cWh7MLEvydoZueiBbZXWr25nDZ5S3hJaL6xnijhb
-         yie9R3Cty6X61txq9sVgaQA10ufqy2+U/2LWMoTsQ+fkxvu5daawZVrPTVySghXRyG3w
-         GXHC0+4xkihxcQVBI3pOuLqPf9R4Ty0ag2dP5lfo794VauYDy7sPaHiLmJX1Hk7qvhSa
-         nOh6kJ1fRh7bec+Lgw+TjU+2MCItMk5KjMQw+P5OJS4hegaVzOJ8no96qSLoTxBbFyzL
-         Xkk8ZAfTKnJNfPPToK9cEobC9+1EyItBMt/HGGLWK6u4dei4drUjLgfeMsiby7K1TL7c
-         lQoA==
-X-Gm-Message-State: AOJu0YyC7Uo21f6KFkTmifzNvh35iI/3gWeNdregQuzq9MgtyuLMoLJt
-        6TDg+arvIlp0k3IocvgWSG86urneEujsQpC8Jwuvrw==
-X-Google-Smtp-Source: AGHT+IExGyX6IQpw7nkPj/Oj8ZdeERAHUNFikZIEbAqLbQU3zHzZ+Xb2mqkLRl/UdYIm3ylJUJ+cypBkqHv5r6CLu/8=
-X-Received: by 2002:a17:906:1d1:b0:99c:55c5:1c6e with SMTP id
- 17-20020a17090601d100b0099c55c51c6emr519636ejj.8.1691711867870; Thu, 10 Aug
- 2023 16:57:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230718234512.1690985-13-seanjc@google.com> <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
- <ZNKv9ul2I7A4V7IF@google.com>
-In-Reply-To: <ZNKv9ul2I7A4V7IF@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Thu, 10 Aug 2023 16:57:36 -0700
-Message-ID: <CAGtprH9YE50RtqhW-U+wK0Vv6aKfqqtOPn8q4s8or=UZwPXZoA@mail.gmail.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ackerley Tng <ackerleytng@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oliver.upton@linux.dev, chenhuacai@kernel.org,
-        mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
-        palmer@dabbelt.com, aou@eecs.berkeley.edu, willy@infradead.org,
-        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
-        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
-        mail@maciej.szmigiero.name, vbabka@suse.cz, david@redhat.com,
-        qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com,
-        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
-        kirill.shutemov@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1691711919; x=1692316719;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7TaVxk2ZLZyMV4sj4aUHau1XdgMachiHgDRxXpQpSw=;
+        b=Y1gOuKlQSIj30e4AoVEYHkHE3323voj209vsPNG/g6XI4+bddpB99hTRM/dAqWEADx
+         eFFKr2KdCQ1Usf7nIS3u5jI/LddC/U+f9T/Nx8MHQ1WmhS2/fIgK6aqU3yI6T7IJQjtB
+         jp5+1EYDS9IW4I7bOSnl6rPnm5iUuAlxEMQZSddvrw1DvJrvv3y0XdY4GEdUhSziGQqD
+         kJ4KKorptuWm/D4IHqbbz9LRW88aycKOMSy9cPPZ2yUs6ugJxVfjhgAKqFI9vcbxoRM/
+         cQSeCZN6kThyUvHEqo8mHwsIF3yRfZlZWz4Mt4J1E9dDNi8jyFOpl6S7R9Rlec0napuv
+         7L0g==
+X-Gm-Message-State: AOJu0Yz2gXX7sF1VuzoRLgT/Pk+WuT4wx7e0KDLs3Xqt458jPD8qLTgE
+        WgZUbWYd8WhnxAZOmFICpp/oZV2wzrQ=
+X-Google-Smtp-Source: AGHT+IHJDIYRFBW2LAZLR4csOSfB1VjiTYZ9Zt4brWftdaN1l/ClE48UHSPut/7oRadou49NRhv+18IvPXk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:11cf:b0:d4e:b0cb:c81d with SMTP id
+ n15-20020a05690211cf00b00d4eb0cbc81dmr4745ybu.8.1691711919804; Thu, 10 Aug
+ 2023 16:58:39 -0700 (PDT)
+Date:   Thu, 10 Aug 2023 16:58:38 -0700
+In-Reply-To: <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net>
+Mime-Version: 1.0
+References: <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
+ <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+ <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
+ <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
+ <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
+ <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net>
+Message-ID: <ZNV5rrq1Ja7QgES5@google.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+From:   Sean Christopherson <seanjc@google.com>
+To:     Eric Wheeler <kvm@lists.ewheeler.net>
+Cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 8, 2023 at 2:13=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
-> ...
+On Wed, Aug 09, 2023, Eric Wheeler wrote:
+> On Wed, 9 Aug 2023, Eric Wheeler wrote:
+> > On Tue, 8 Aug 2023, Sean Christopherson wrote:
+> > > On Tue, Aug 08, 2023, Amaan Cheval wrote:
+> > > > Hey Sean,
+> > > > 
+> > > > > If NUMA balancing is going nuclear and constantly zapping PTEs, the resulting
+> > > > > mmu_notifier events could theoretically stall a vCPU indefinitely.  The reason I
+> > > > > dislike NUMA balancing is that it's all too easy to end up with subtle bugs
+> > > > > and/or misconfigured setups where the NUMA balancing logic zaps PTEs/SPTEs without
+> > > > > actuablly being able to move the page in the end, i.e. it's (IMO) too easy for
+> > > > > NUMA balancing to get false positives when determining whether or not to try and
+> > > > > migrate a page.
+> > > > 
+> > > > What are some situations where it might not be able to move the page in the end?
+> > > 
+> > > There's a pretty big list, see the "failure" paths of do_numa_page() and
+> > > migrate_misplaced_page().
+> > > 
+> > > > > That said, it's definitely very unexpected that NUMA balancing would be zapping
+> > > > > SPTEs to the point where a vCPU can't make forward progress.   It's theoretically
+> > > > > possible that that's what's happening, but quite unlikely, especially since it
+> > > > > sounds like you're seeing issues even with NUMA balancing disabled.
+> 
+> Brak indicated that they've seen this as early as v5.19.  IIRC, Hunter
+> said that v5.15 is working fine, so I went through the >v5.15 and <v5.19
+> commit logs for KVM that appear to be related to EPT. Of course if the
+> problem is outside of KVM, then this is moot, but maybe these are worth
+> a second look.
+> 
+> Sean, could any of these commits cause or hint at the problem?
 
-> > + When binding a memslot to the file, if a kvm pointer exists, it must
-> >   be the same kvm as the one in this binding
-> > + When the binding to the last memslot is removed from a file, NULL the
-> >   kvm pointer.
->
-> Nullifying the KVM pointer isn't sufficient, because without additional a=
-ctions
-> userspace could extract data from a VM by deleting its memslots and then =
-binding
-> the guest_memfd to an attacker controlled VM.  Or more likely with TDX an=
-d SNP,
-> induce badness by coercing KVM into mapping memory into a guest with the =
-wrong
-> ASID/HKID.
->
+No, it's extremely unlikely any of these are related.  FWIW, my money is on this
+being a bug in generic KVM bug or even outside of KVM, not a bug in KVM x86's MMU.
+But I'm not confident enough to bet real money ;-)
 
-TDX/SNP have mechanisms i.e. PAMT/RMP tables to ensure that the same
-memory is not assigned to two different VMs. Deleting memslots should
-also clear out the contents of the memory as the EPT tables will be
-zapped in the process and the host will reclaim the memory.
-
-Regards,
-Vishal
+>   54275f74c KVM: x86/mmu: Don't attempt fast page fault just because EPT is in use
+> 	- this mentions !PRESENT related to faulting out of mmu_lock.
+> 
+>   ec283cb1d KVM: x86/mmu: remove ept_ad field
+> 	- looks like a simple patch, but could there be a reason that
+> 	  this is somehow invalid in corner cases?  Here is the relevant 
+> 	  diff snippet:
+> 
+> 	+++ b/arch/x86/kvm/mmu/mmu.c
+> 	@@ -5007,7 +5007,6 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+> 	 
+> 			context->shadow_root_level = level;
+> 	 
+> 	-               context->ept_ad = accessed_dirty;
+> 
+> 	+++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> 	-       #define PT_HAVE_ACCESSED_DIRTY(mmu) ((mmu)->ept_ad)
+> 	+       #define PT_HAVE_ACCESSED_DIRTY(mmu) (!(mmu)->cpu_role.base.ad_disabled)
+> 
+>   ca2a7c22a KVM: x86/mmu: Derive EPT violation RWX bits from EPTE RWX bits
+> 	- "No functional change intended" but it mentions EPT
+> 	  violations.  Could something unintentional have happened here?
+> 
+>   4f4aa80e3 KVM: X86: Handle implicit supervisor access with SMAP
+> 	- This is a small change, but maybe it would be worth a quick review
+> 	
+>   5b22bbe71 KVM: X86: Change the type of access u32 to u64
+> 	- This is just a datatype change in 5.17-rc3, probably not it.
