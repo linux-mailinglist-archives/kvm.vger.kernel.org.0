@@ -2,81 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F8B1776F7E
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 07:22:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D98FE776FC0
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 07:46:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232951AbjHJFWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 01:22:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46328 "EHLO
+        id S231785AbjHJFp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 01:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjHJFWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 01:22:18 -0400
-Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9DCE69
-        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 22:22:17 -0700 (PDT)
-Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1bf0c4489feso503247fac.0
-        for <kvm@vger.kernel.org>; Wed, 09 Aug 2023 22:22:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691644936; x=1692249736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0iVg1SdmE7vRMP627k+mf/Mh/hG4PT9hvgDSTdO2hnc=;
-        b=N/RHYZdhZSmjJLV37oayCQfTKX9/zO0eIHefavrCNU/CZfDSMarUgpnhNwpUAb8byb
-         KvHQpoMUByrjzWlEdkD+9p/uebXoWRRTEzoLSsyASnkzKR/lyGyD4hMl+DGhEkUGa0x2
-         SBHy0xXUgMMziVUSYAk7dFIBTAaORRI5UQpX5kYj/ImLjd+U3yxBEUjm6OjIwuWpiQAp
-         t8t56uDMoFO/7NartoxzvpDHjexiQkN/eX2xM8xV+KlkFgizW3Qxlguqwh55UHPxweQs
-         VtMQ3W73A5y4vIqpLzzVCmhBYzsnYk6LyxGSJZibhS2lskhkxCyxzOQR5gUrlmtI1Pk9
-         YvzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691644936; x=1692249736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0iVg1SdmE7vRMP627k+mf/Mh/hG4PT9hvgDSTdO2hnc=;
-        b=G/VicLKZJ528mjkQwWeTMQue+dycjLHn86Z8+Aqhr4a3HEpqnZK58s+YSNhAXAlPGa
-         NoGTKXCom4S3NUOmmruVrjHFWenE9KLRM2E9bfQaDOZK41CAmv6EM3Em3pk4l0wCqaYU
-         1p5ry7d4wxC3eWIkG5vpX76QPlV9qhed9kDa6ORfCGN8lFbkecbM3f+SaQ9czXe1Sgt/
-         FPuu+EfympI//yD8Ued1GCu4fLn0O+ja9CvZoN9o/bwFQISE9pAD/aMp23Tn1vPLKa91
-         DRUTbRDYxRd7cVv3txSDamL8jundWAkHvY1VzDBlGnj7P3VF6OxXNG/yNT9+Ycz+AfBo
-         0cnQ==
-X-Gm-Message-State: AOJu0YzEptpJKGgmGTLUbO7CuvJBj6yeeW+cXA69rBExf1Dvbq4PlS3J
-        QyEMTN6OcKvyi42skdNdlv9zvLEQzhHEGUD0W2Emtg==
-X-Google-Smtp-Source: AGHT+IFayVnpVsmXXPJmOuJLzFBZPgf5ckBpS7WD/x1yDb9KDh1iReEKJmuUlsA2CmkqHFxjx/0KDLJAEIpHiz05+Hs=
-X-Received: by 2002:a05:6871:a4:b0:1bb:7200:7601 with SMTP id
- u36-20020a05687100a400b001bb72007601mr1873042oaa.51.1691644936414; Wed, 09
- Aug 2023 22:22:16 -0700 (PDT)
+        with ESMTP id S232409AbjHJFpz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 01:45:55 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1244171D
+        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 22:45:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691646353; x=1723182353;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FHeyqiymghGbe41JdSvIBv8KRcafTxkwqwubQD0pQSo=;
+  b=KvQIn8Lni3Gt5tj2MwL8sjQZ0A5MPBlaOnl/XUVJMdqXMyjLZ/KVffPg
+   Xusy2026hj8DVqYhWc2afotZBFZxN9FLx6+RJWdiqWWunUfI9YITZeQzR
+   xQznEQPqqz8gw/SASGpKKIOBcIqlglUaF9lBUZncY+wWknJRSPOEM0qQA
+   YUCy5yhoGMARTEgyIZqvc1r/jKlJM/8ymoYfASd2PMmcJrr4T+DhALRSp
+   3s4bH/rwIsAa6ZGe857i4oDgNfNpWi+7+bw99/hPL/0OKBYpUK8pgSFzJ
+   NujGocjuhTp0c0Mpqnl4xD030wY+9GA3bjF3VOAeJM0Jhr3vEE2/2IqmO
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="435200034"
+X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
+   d="scan'208";a="435200034"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 22:45:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="978654683"
+X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
+   d="scan'208";a="978654683"
+Received: from linguan-mobl.ccr.corp.intel.com (HELO xiongzha-desk1.ccr.corp.intel.com) ([10.254.215.8])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 22:45:48 -0700
+From:   Xiong Zhang <xiong.y.zhang@intel.com>
+To:     kvm@vger.kernel.org
+Cc:     seanjc@google.com, like.xu.linux@gmail.com,
+        weijiang.yang@intel.com, dapeng1.mi@linux.intel.com,
+        zhiyuan.lv@intel.com, zhenyu.z.wang@intel.com, kan.liang@intel.com,
+        Xiong Zhang <xiong.y.zhang@intel.com>
+Subject: [PATCH v3] Documentation: KVM: Add vPMU implementaion and gap document
+Date:   Thu, 10 Aug 2023 13:45:18 +0800
+Message-Id: <20230810054518.329117-1-xiong.y.zhang@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-5-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-5-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 9 Aug 2023 22:22:04 -0700
-Message-ID: <CAAdAUtg29FVWhWEgf_cb0EdGUuCDpfQRYNXranYmpuKM0BzsLQ@mail.gmail.com>
-Subject: Re: [PATCH v3 04/27] arm64: Add TLBI operation encodings
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,162 +61,378 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> Add all the TLBI encodings that are usable from Non-Secure.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
->  arch/arm64/include/asm/sysreg.h | 128 ++++++++++++++++++++++++++++++++
->  1 file changed, 128 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sys=
-reg.h
-> index 5084add86897..72e18480ce62 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -514,6 +514,134 @@
->
->  #define SYS_SP_EL2                     sys_reg(3, 6,  4, 1, 0)
->
-> +/* TLBI instructions */
-> +#define OP_TLBI_VMALLE1OS              sys_insn(1, 0, 8, 1, 0)
-> +#define OP_TLBI_VAE1OS                 sys_insn(1, 0, 8, 1, 1)
-> +#define OP_TLBI_ASIDE1OS               sys_insn(1, 0, 8, 1, 2)
-> +#define OP_TLBI_VAAE1OS                        sys_insn(1, 0, 8, 1, 3)
-> +#define OP_TLBI_VALE1OS                        sys_insn(1, 0, 8, 1, 5)
-> +#define OP_TLBI_VAALE1OS               sys_insn(1, 0, 8, 1, 7)
-> +#define OP_TLBI_RVAE1IS                        sys_insn(1, 0, 8, 2, 1)
-> +#define OP_TLBI_RVAAE1IS               sys_insn(1, 0, 8, 2, 3)
-> +#define OP_TLBI_RVALE1IS               sys_insn(1, 0, 8, 2, 5)
-> +#define OP_TLBI_RVAALE1IS              sys_insn(1, 0, 8, 2, 7)
-> +#define OP_TLBI_VMALLE1IS              sys_insn(1, 0, 8, 3, 0)
-> +#define OP_TLBI_VAE1IS                 sys_insn(1, 0, 8, 3, 1)
-> +#define OP_TLBI_ASIDE1IS               sys_insn(1, 0, 8, 3, 2)
-> +#define OP_TLBI_VAAE1IS                        sys_insn(1, 0, 8, 3, 3)
-> +#define OP_TLBI_VALE1IS                        sys_insn(1, 0, 8, 3, 5)
-> +#define OP_TLBI_VAALE1IS               sys_insn(1, 0, 8, 3, 7)
-> +#define OP_TLBI_RVAE1OS                        sys_insn(1, 0, 8, 5, 1)
-> +#define OP_TLBI_RVAAE1OS               sys_insn(1, 0, 8, 5, 3)
-> +#define OP_TLBI_RVALE1OS               sys_insn(1, 0, 8, 5, 5)
-> +#define OP_TLBI_RVAALE1OS              sys_insn(1, 0, 8, 5, 7)
-> +#define OP_TLBI_RVAE1                  sys_insn(1, 0, 8, 6, 1)
-> +#define OP_TLBI_RVAAE1                 sys_insn(1, 0, 8, 6, 3)
-> +#define OP_TLBI_RVALE1                 sys_insn(1, 0, 8, 6, 5)
-> +#define OP_TLBI_RVAALE1                        sys_insn(1, 0, 8, 6, 7)
-> +#define OP_TLBI_VMALLE1                        sys_insn(1, 0, 8, 7, 0)
-> +#define OP_TLBI_VAE1                   sys_insn(1, 0, 8, 7, 1)
-> +#define OP_TLBI_ASIDE1                 sys_insn(1, 0, 8, 7, 2)
-> +#define OP_TLBI_VAAE1                  sys_insn(1, 0, 8, 7, 3)
-> +#define OP_TLBI_VALE1                  sys_insn(1, 0, 8, 7, 5)
-> +#define OP_TLBI_VAALE1                 sys_insn(1, 0, 8, 7, 7)
-> +#define OP_TLBI_VMALLE1OSNXS           sys_insn(1, 0, 9, 1, 0)
-> +#define OP_TLBI_VAE1OSNXS              sys_insn(1, 0, 9, 1, 1)
-> +#define OP_TLBI_ASIDE1OSNXS            sys_insn(1, 0, 9, 1, 2)
-> +#define OP_TLBI_VAAE1OSNXS             sys_insn(1, 0, 9, 1, 3)
-> +#define OP_TLBI_VALE1OSNXS             sys_insn(1, 0, 9, 1, 5)
-> +#define OP_TLBI_VAALE1OSNXS            sys_insn(1, 0, 9, 1, 7)
-> +#define OP_TLBI_RVAE1ISNXS             sys_insn(1, 0, 9, 2, 1)
-> +#define OP_TLBI_RVAAE1ISNXS            sys_insn(1, 0, 9, 2, 3)
-> +#define OP_TLBI_RVALE1ISNXS            sys_insn(1, 0, 9, 2, 5)
-> +#define OP_TLBI_RVAALE1ISNXS           sys_insn(1, 0, 9, 2, 7)
-> +#define OP_TLBI_VMALLE1ISNXS           sys_insn(1, 0, 9, 3, 0)
-> +#define OP_TLBI_VAE1ISNXS              sys_insn(1, 0, 9, 3, 1)
-> +#define OP_TLBI_ASIDE1ISNXS            sys_insn(1, 0, 9, 3, 2)
-> +#define OP_TLBI_VAAE1ISNXS             sys_insn(1, 0, 9, 3, 3)
-> +#define OP_TLBI_VALE1ISNXS             sys_insn(1, 0, 9, 3, 5)
-> +#define OP_TLBI_VAALE1ISNXS            sys_insn(1, 0, 9, 3, 7)
-> +#define OP_TLBI_RVAE1OSNXS             sys_insn(1, 0, 9, 5, 1)
-> +#define OP_TLBI_RVAAE1OSNXS            sys_insn(1, 0, 9, 5, 3)
-> +#define OP_TLBI_RVALE1OSNXS            sys_insn(1, 0, 9, 5, 5)
-> +#define OP_TLBI_RVAALE1OSNXS           sys_insn(1, 0, 9, 5, 7)
-> +#define OP_TLBI_RVAE1NXS               sys_insn(1, 0, 9, 6, 1)
-> +#define OP_TLBI_RVAAE1NXS              sys_insn(1, 0, 9, 6, 3)
-> +#define OP_TLBI_RVALE1NXS              sys_insn(1, 0, 9, 6, 5)
-> +#define OP_TLBI_RVAALE1NXS             sys_insn(1, 0, 9, 6, 7)
-> +#define OP_TLBI_VMALLE1NXS             sys_insn(1, 0, 9, 7, 0)
-> +#define OP_TLBI_VAE1NXS                        sys_insn(1, 0, 9, 7, 1)
-> +#define OP_TLBI_ASIDE1NXS              sys_insn(1, 0, 9, 7, 2)
-> +#define OP_TLBI_VAAE1NXS               sys_insn(1, 0, 9, 7, 3)
-> +#define OP_TLBI_VALE1NXS               sys_insn(1, 0, 9, 7, 5)
-> +#define OP_TLBI_VAALE1NXS              sys_insn(1, 0, 9, 7, 7)
-> +#define OP_TLBI_IPAS2E1IS              sys_insn(1, 4, 8, 0, 1)
-> +#define OP_TLBI_RIPAS2E1IS             sys_insn(1, 4, 8, 0, 2)
-> +#define OP_TLBI_IPAS2LE1IS             sys_insn(1, 4, 8, 0, 5)
-> +#define OP_TLBI_RIPAS2LE1IS            sys_insn(1, 4, 8, 0, 6)
-> +#define OP_TLBI_ALLE2OS                        sys_insn(1, 4, 8, 1, 0)
-> +#define OP_TLBI_VAE2OS                 sys_insn(1, 4, 8, 1, 1)
-> +#define OP_TLBI_ALLE1OS                        sys_insn(1, 4, 8, 1, 4)
-> +#define OP_TLBI_VALE2OS                        sys_insn(1, 4, 8, 1, 5)
-> +#define OP_TLBI_VMALLS12E1OS           sys_insn(1, 4, 8, 1, 6)
-> +#define OP_TLBI_RVAE2IS                        sys_insn(1, 4, 8, 2, 1)
-> +#define OP_TLBI_RVALE2IS               sys_insn(1, 4, 8, 2, 5)
-> +#define OP_TLBI_ALLE2IS                        sys_insn(1, 4, 8, 3, 0)
-> +#define OP_TLBI_VAE2IS                 sys_insn(1, 4, 8, 3, 1)
-> +#define OP_TLBI_ALLE1IS                        sys_insn(1, 4, 8, 3, 4)
-> +#define OP_TLBI_VALE2IS                        sys_insn(1, 4, 8, 3, 5)
-> +#define OP_TLBI_VMALLS12E1IS           sys_insn(1, 4, 8, 3, 6)
-> +#define OP_TLBI_IPAS2E1OS              sys_insn(1, 4, 8, 4, 0)
-> +#define OP_TLBI_IPAS2E1                        sys_insn(1, 4, 8, 4, 1)
-> +#define OP_TLBI_RIPAS2E1               sys_insn(1, 4, 8, 4, 2)
-> +#define OP_TLBI_RIPAS2E1OS             sys_insn(1, 4, 8, 4, 3)
-> +#define OP_TLBI_IPAS2LE1OS             sys_insn(1, 4, 8, 4, 4)
-> +#define OP_TLBI_IPAS2LE1               sys_insn(1, 4, 8, 4, 5)
-> +#define OP_TLBI_RIPAS2LE1              sys_insn(1, 4, 8, 4, 6)
-> +#define OP_TLBI_RIPAS2LE1OS            sys_insn(1, 4, 8, 4, 7)
-> +#define OP_TLBI_RVAE2OS                        sys_insn(1, 4, 8, 5, 1)
-> +#define OP_TLBI_RVALE2OS               sys_insn(1, 4, 8, 5, 5)
-> +#define OP_TLBI_RVAE2                  sys_insn(1, 4, 8, 6, 1)
-> +#define OP_TLBI_RVALE2                 sys_insn(1, 4, 8, 6, 5)
-> +#define OP_TLBI_ALLE2                  sys_insn(1, 4, 8, 7, 0)
-> +#define OP_TLBI_VAE2                   sys_insn(1, 4, 8, 7, 1)
-> +#define OP_TLBI_ALLE1                  sys_insn(1, 4, 8, 7, 4)
-> +#define OP_TLBI_VALE2                  sys_insn(1, 4, 8, 7, 5)
-> +#define OP_TLBI_VMALLS12E1             sys_insn(1, 4, 8, 7, 6)
-> +#define OP_TLBI_IPAS2E1ISNXS           sys_insn(1, 4, 9, 0, 1)
-> +#define OP_TLBI_RIPAS2E1ISNXS          sys_insn(1, 4, 9, 0, 2)
-> +#define OP_TLBI_IPAS2LE1ISNXS          sys_insn(1, 4, 9, 0, 5)
-> +#define OP_TLBI_RIPAS2LE1ISNXS         sys_insn(1, 4, 9, 0, 6)
-> +#define OP_TLBI_ALLE2OSNXS             sys_insn(1, 4, 9, 1, 0)
-> +#define OP_TLBI_VAE2OSNXS              sys_insn(1, 4, 9, 1, 1)
-> +#define OP_TLBI_ALLE1OSNXS             sys_insn(1, 4, 9, 1, 4)
-> +#define OP_TLBI_VALE2OSNXS             sys_insn(1, 4, 9, 1, 5)
-> +#define OP_TLBI_VMALLS12E1OSNXS                sys_insn(1, 4, 9, 1, 6)
-> +#define OP_TLBI_RVAE2ISNXS             sys_insn(1, 4, 9, 2, 1)
-> +#define OP_TLBI_RVALE2ISNXS            sys_insn(1, 4, 9, 2, 5)
-> +#define OP_TLBI_ALLE2ISNXS             sys_insn(1, 4, 9, 3, 0)
-> +#define OP_TLBI_VAE2ISNXS              sys_insn(1, 4, 9, 3, 1)
-> +#define OP_TLBI_ALLE1ISNXS             sys_insn(1, 4, 9, 3, 4)
-> +#define OP_TLBI_VALE2ISNXS             sys_insn(1, 4, 9, 3, 5)
-> +#define OP_TLBI_VMALLS12E1ISNXS                sys_insn(1, 4, 9, 3, 6)
-> +#define OP_TLBI_IPAS2E1OSNXS           sys_insn(1, 4, 9, 4, 0)
-> +#define OP_TLBI_IPAS2E1NXS             sys_insn(1, 4, 9, 4, 1)
-> +#define OP_TLBI_RIPAS2E1NXS            sys_insn(1, 4, 9, 4, 2)
-> +#define OP_TLBI_RIPAS2E1OSNXS          sys_insn(1, 4, 9, 4, 3)
-> +#define OP_TLBI_IPAS2LE1OSNXS          sys_insn(1, 4, 9, 4, 4)
-> +#define OP_TLBI_IPAS2LE1NXS            sys_insn(1, 4, 9, 4, 5)
-> +#define OP_TLBI_RIPAS2LE1NXS           sys_insn(1, 4, 9, 4, 6)
-> +#define OP_TLBI_RIPAS2LE1OSNXS         sys_insn(1, 4, 9, 4, 7)
-> +#define OP_TLBI_RVAE2OSNXS             sys_insn(1, 4, 9, 5, 1)
-> +#define OP_TLBI_RVALE2OSNXS            sys_insn(1, 4, 9, 5, 5)
-> +#define OP_TLBI_RVAE2NXS               sys_insn(1, 4, 9, 6, 1)
-> +#define OP_TLBI_RVALE2NXS              sys_insn(1, 4, 9, 6, 5)
-> +#define OP_TLBI_ALLE2NXS               sys_insn(1, 4, 9, 7, 0)
-> +#define OP_TLBI_VAE2NXS                        sys_insn(1, 4, 9, 7, 1)
-> +#define OP_TLBI_ALLE1NXS               sys_insn(1, 4, 9, 7, 4)
-> +#define OP_TLBI_VALE2NXS               sys_insn(1, 4, 9, 7, 5)
-> +#define OP_TLBI_VMALLS12E1NXS          sys_insn(1, 4, 9, 7, 6)
-> +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_ENTP2        (BIT(60))
->  #define SCTLR_ELx_DSSBS        (BIT(44))
-> --
-> 2.34.1
->
->
+Add a vPMU implementation and gap document to explain vArch PMU and vLBR
+implementation in kvm, especially the current gap to support host and
+guest perf event coexist.
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+---
+Changelog:
+v2 -> v3:
+* When kvm perf event is inactive, it is in error state actually,
+so inactive is changed into error.
+* Fix make htmldoc warning
+
+v1 -> v2:
+* Refactor perf scheduler section
+* Correct one sentence in vArch PMU section
+---
+ Documentation/virt/kvm/x86/index.rst |   1 +
+ Documentation/virt/kvm/x86/pmu.rst   | 332 +++++++++++++++++++++++++++
+ 2 files changed, 333 insertions(+)
+ create mode 100644 Documentation/virt/kvm/x86/pmu.rst
+
+diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
+index 9ece6b8dc817..02c1c7b01bf3 100644
+--- a/Documentation/virt/kvm/x86/index.rst
++++ b/Documentation/virt/kvm/x86/index.rst
+@@ -14,5 +14,6 @@ KVM for x86 systems
+    mmu
+    msr
+    nested-vmx
++   pmu
+    running-nested-guests
+    timekeeping
+diff --git a/Documentation/virt/kvm/x86/pmu.rst b/Documentation/virt/kvm/x86/pmu.rst
+new file mode 100644
+index 000000000000..503516c41119
+--- /dev/null
++++ b/Documentation/virt/kvm/x86/pmu.rst
+@@ -0,0 +1,332 @@
++﻿.. SPDX-License-Identifier: GPL-2.0
++
++==========================
++PMU virtualization for X86
++==========================
++
++:Author: Xiong Zhang <xiong.y.zhang@intel.com>
++:Copyright: (c) 2023, Intel.  All rights reserved.
++
++.. Contents
++
++1. Overview
++2. Perf Scheduler Basic
++3. Arch PMU virtualization
++4. LBR virtualization
++
++1. Overview
++===========
++
++KVM has supported PMU virtualization on x86 for many years and provides
++MSR based Arch PMU interface to the guest. The major features include
++Arch PMU v2, LBR and PEBS. Users have the same operation to profile
++performance in guest and host.
++KVM is a normal perf subsystem user as other perf subsystem users. When
++the guest access vPMU MSRs, KVM traps it and creates a perf event for it.
++This perf event takes part in perf scheduler to request PMU resources
++and let the guest use these resources.
++
++This document describes the X86 PMU virtualization architecture design
++and opens. It is organized as follows: Next section describes more
++details of Linux perf scheduler as it takes a key role in vPMU
++implementation and allocates PMU resources for guest usage. Then Arch
++PMU virtualization and LBR virtualization are introduced, each feature
++has sections to introduce implementation overview,  the expectation and
++gaps when host and guest perf events coexist.
++
++2. Perf Scheduler Basic
++=======================
++
++Perf subsystem users can not get PMU counter or resource directly, user
++should create a perf event first and specify event’s attribute which is
++used to choose PMU counters, then perf event joins in perf scheduler,
++perf scheduler assigns the corresponding PMU counter to a perf event.
++
++Perf event is created by perf_event_open() system call::
++
++    int syscall(SYS_perf_event_open, struct perf_event_attr *,
++		pid, cpu, group_fd, flags)
++    struct perf_event_attr {
++	    ......
++	    /* Major type: hardware/software/tracepoint/etc. */
++	    __u32   type;
++	    /* Type specific configuration information. */
++	    __u64   config;
++	    union {
++		    __u64      sample_period;
++		    __u64      sample_freq;
++	    }
++	   __u64   disabled :1;
++	           pinned   :1;
++		   exclude_user  :1;
++		   exclude_kernel :1;
++		   exclude_host   :1;
++	           exclude_guest  :1;
++	......
++    }
++
++The pid and cpu arguments allow specifying which process and CPU
++to monitor::
++
++  pid == 0 and cpu == -1
++        This measures the calling process/thread on any CPU.
++  pid == 0 and cpu >= 0
++        This measures the calling process/thread only when running on
++	the specified cpu.
++  pid > 0 and cpu == -1
++        This measures the specified process/thread on any cpu.
++  pid > 0 and cpu >= 0
++        This  measures the specified process/thread only when running
++	on the specified CPU.
++  pid == -1 and cpu >= 0
++        This measures all processes/threads on the specified CPU.
++  pid == -1 and cpu == -1
++        This setting is invalid and will return an error.
++
++Perf scheduler's responsibility is choosing which events are active at
++one moment and binding counter with perf event. As processor has limited
++PMU counters and other resource, only limited perf events can be active
++at one moment, the inactive perf event may be active in the next moment,
++perf scheduler has defined rules to control these things.
++
++Perf scheduler defines four types of perf event, defined by the pid and
++cpu arguments in perf_event_open(), plus perf_event_attr.pinned, their
++schedule priority are: per_cpu pinned > per_process pinned
++> per_cpu flexible > per_process flexible. High priority events can
++preempt low priority events when resources contend.
++
++perf event type::
++
++  --------------------------------------------------------
++  |                      |   pid   |   cpu   |   pinned  |
++  --------------------------------------------------------
++  | Per-cpu pinned       |   *    |   >= 0   |     1     |
++  --------------------------------------------------------
++  | Per-process pinned   |  >= 0  |    *     |     1     |
++  --------------------------------------------------------
++  | Per-cpu flexible     |   *    |   >= 0   |     0     |
++  --------------------------------------------------------
++  | Per-process flexible | >= 0   |    *     |     0     |
++  --------------------------------------------------------
++
++perf_event abstract::
++
++    struct perf_event {
++	    struct list_head       event_entry;
++	    ......
++	    struct pmu             *pmu;
++	    enum perf_event_state  state;
++	    local64_t              count;
++	    u64                    total_time_enabled;
++	    u64                    total_time_running;
++	    struct perf_event_attr attr;
++	    ......
++    }
++
++For per-cpu perf event, it is linked into per cpu global variable
++perf_cpu_context, for per-process perf event, it is linked into
++task_struct->perf_event_context.
++
++Usually the following cases cause perf event reschedule:
++1) In a context switch from one task to a different task.
++2) When an event is manually enabled.
++3) A call to perf_event_open() with disabled field of the
++perf_event_attr argument set to 0.
++
++When perf_event_open() or perf_event_enable() is called, perf event
++reschedule is needed on a specific cpu, perf will send an IPI to the
++target cpu, and the IPI handler will activate events ordered by event
++type, and will iterate all the eligible events in per cpu gloable
++variable perf_cpu_context and current->perf_event_context.
++
++When a perf event is sched out, this event mapped counter is disabled,
++and the counter's setting and count value are saved. When a perf event
++is sched in, perf driver assigns a counter to this event, the counter's
++setting and count values are restored from last saved.
++
++If the event could not be scheduled because no resource is available for
++it, pinned event goes into error state and is excluded from perf
++scheduler, the only way to recover it is re-enable it, flexible event
++goes into inactive state and can be multiplexed with other events if
++needed.
++
++
++3. Arch PMU virtualization
++==========================
++
++3.1. Overview
++-------------
++
++Once KVM/QEMU expose vcpu's Arch PMU capability into guest, the guest
++PMU driver would access the Arch PMU MSRs (including Fixed and GP
++counter) as the host does. All the guest Arch PMU MSRs accessing are
++interceptable.
++
++When a guest virtual counter is enabled through guest MSR writing, the
++KVM trap will create a kvm perf event through the perf subsystem. The
++kvm perf event's attribute is gotten from the guest virtual counter's
++MSR setting.
++
++When a guest changes the virtual counter's setting later, the KVM trap
++will release the old kvm perf event then create a new kvm perf event
++with the new setting.
++
++When guest read the virtual counter's count number, the kvm trap will
++read kvm perf event's counter value and accumulate it to the previous
++counter value.
++
++When guest no longer access the virtual counter's MSR within a
++scheduling time slice and the virtual counter is disabled, KVM will
++release the kvm perf event.
++
++vPMU diagram::
++
++  ----------------------------
++  |  Guest                   |
++  |  perf subsystem          |
++  ----------------------------
++       |            ^
++  vMSR |            | vPMI
++       v            |
++  ----------------------------
++  |  vPMU        KVM vCPU    |
++  ----------------------------
++        |          ^
++  Call  |          | Callbacks
++        v          |
++  ---------------------------
++  | Host Linux Kernel       |
++  | perf subsystem          |
++  ---------------------------
++               |       ^
++           MSR |       | PMI
++               v       |
++         --------------------
++	 | PMU        CPU   |
++         --------------------
++
++Each guest virtual counter has a corresponding kvm perf event, and the
++kvm perf event joins host perf scheduler and complies with host perf
++scheduler rule. When kvm perf event is scheduled by host perf scheduler
++and is active, the guest virtual counter could supply the correct value.
++However, if another host perf event comes in and takes over the kvm perf
++event resource, the kvm perf event will be in error state, then the
++virtual counter keeps the saved value when the kvm perf event is preempted.
++But guest perf doesn't notice the underbeach virtual counter is stopped, so
++the final guest profiling data is wrong.
++
++3.2. Host and Guest perf event contention
++-----------------------------------------
++
++Kvm perf event is a per-process pinned event, its priority is second.
++When kvm perf event is active, it can be preempted by host per-cpu
++pinned perf event, or it can preempt host flexible perf events. Such
++preemption can be temporarily prohibited through disabling host IRQ.
++
++The following results are expected when host and guest perf event
++coexist according to perf scheduler rule:
++1). if host per cpu pinned events occupy all the HW resource, kvm perf
++event can not be active as no available resource, the virtual counter
++value is zero always when the guest reads it.
++2). if host per cpu pinned event release HW resource, and kvm perf event
++is in error state, kvm perf event can claim the HW resource and switch into
++active, then the guest can get the correct value from the guest virtual
++counter during kvm perf event is active, but the guest total counter
++value is not correct since counter value is lost during kvm perf event
++is in error state.
++3). if kvm perf event is active, then host per cpu pinned perf event
++becomes active and reclaims kvm perf event resource, kvm perf event will
++be in error state. Finally the virtual counter value is kept unchanged and
++stores previous saved value when the guest reads it. So the guest total
++counter isn't correct.
++4). If host flexible perf events occupy all the HW resource, kvm perf
++event can be active and preempts host flexible perf event resource,
++the guest can get the correct value from the guest virtual counter.
++5). if kvm perf event is active, then other host flexible perf events
++request to active, kvm perf event still own the resource and active, so
++the guest can get the correct value from the guest virtual counter.
++
++3.3. vPMU Arch Gaps
++-------------------
++
++The coexist of host and guest perf events has gaps:
++1). when guest accesses PMU MSRs at the first time, KVM will trap it and
++create kvm perf event, but this event may be not active because the
++contention with host perf event. But guest doesn't notice this and when
++guest read virtual counter, the return value is zero.
++2). when kvm perf event is active, host per-cpu pinned perf event can
++reclaim kvm perf event resource at any time once resource contention
++happens. But guest doesn't notice this neither and guest following
++counter accesses get wrong data.
++So maillist had some discussion titled "Reconsider the current approach
++of vPMU".
++
++https://lore.kernel.org/lkml/810c3148-1791-de57-27c0-d1ac5ed35fb8@gmail.com/
++
++The major suggestion in this discussion is host pass-through some
++counters into guest, but this suggestion is not feasible, the reasons
++are:
++a. processor has several counters, but counters are not equal, some
++event must bind with a specific counter.
++b. if a special counter is passthrough into guest, host can not support
++such events and lose some capability.
++c. if a normal counter is passthrough into guest, guest can support
++general event only, and the guest has limited capability.
++So both host and guest lose capability in pass-through mode.
++
++4. LBR Virtualization
++=====================
++
++4.1. Overview
++-------------
++
++The guest LBR driver would access the LBR MSR (including IA32_DEBUGCTLMSR
++and records MSRs) as host does once KVM/QEMU export vcpu's LBR capability
++into guest,  The first guest access on LBR related MSRs is always
++interceptable. The KVM trap would create a vLBR perf event which enables
++the callstack mode and none of the hardware counters are assigned. The
++host perf would enable and schedule this event as usual.
++
++When vLBR event is scheduled by host perf scheduler and is active, host
++LBR MSRs are owned by guest and are pass-through into guest, guest will
++access them without VM Exit. However, if another host LBR event comes in
++and takes over the LBR facility, the vLBR event will be in error state,
++and the guest following access to the LBR MSRs will be trapped and
++meaningless.
++
++As kvm perf event, vLBR event will be released when guest doesn't access
++LBR-related MSRs within a scheduling time slice and guest unset LBR
++enable bit, then the pass-through state of the LBR MSRs will be canceled.
++
++4.2. Host and Guest LBR contention
++----------------------------------
++
++vLBR event is a per-process pinned event, its priority is second. vLBR
++event together with host other LBR event to contend LBR resource,
++according to perf scheduler rule, when vLBR event is active, it can be
++preempted by host per-cpu pinned LBR event, or it can preempt host
++flexible LBR event. Such preemption can be temporarily prohibited
++through disabling host IRQ as perf scheduler uses IPI to change LBR owner.
++
++The following results are expected when host and guest LBR event coexist:
++1) If host per cpu pinned LBR event is active when vm starts, the guest
++vLBR event can not preempt the LBR resource, so the guest can not use
++LBR.
++2). If host flexible LBR events are active when vm starts, guest vLBR
++event can preempt LBR, so the guest can use LBR.
++3). If host per cpu pinned LBR event becomes enabled when guest vLBR
++event is active, the guest vLBR event will lose LBR and the guest can
++not use LBR anymore.
++4). If host flexible LBR event becomes enabled when guest vLBR event is
++active, the guest vLBR event keeps LBR, the guest can still use LBR.
++5). If host per cpu pinned LBR event turns off when guest vLBR event is
++not active, guest vLBR event can be active and own LBR, the guest can use
++LBR.
++
++4.3. vLBR Arch Gaps
++-------------------
++
++Like vPMU Arch Gap, vLBR event can be preempted by host Per cpu pinned
++event at any time, or vLBR event is not active at creation, but guest
++can not notice this, so the guest will get meaningless value when the
++vLBR event is not active.
+
+base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+-- 
+2.25.1
+
