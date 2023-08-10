@@ -2,116 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06B30777A14
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0DBF777A50
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:19:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234989AbjHJOEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 10:04:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37646 "EHLO
+        id S235319AbjHJOTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 10:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjHJOEM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:04:12 -0400
+        with ESMTP id S233590AbjHJOTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 10:19:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4204D120
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:03:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C974120
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691676206;
+        s=mimecast20190719; t=1691677108;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nlAONK5WQTaqTvjs/IJt1TfwjeXJy9baGm//on5NsDU=;
-        b=YcF4l9JvTgYVB0O+7Etb0OcLa17G5Zg47HyRqTjGm0e9UYI9WIKXcq1CGxrk7sAW3Ol3o5
-        jvM1XYuqx5QU51KUBGMIV8W0LqZqBmzfUOHzKJ9TPKTb+WDAXGNJt/07rf8gaTIX1UDC2o
-        tFLgjSRtEG5jkPr6COYkFFpiE7G+A30=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QV3kzAdfq67rkXfk0U1UD+5I2KtPvhdGYoE+7E14Z2o=;
+        b=byMLbuaJGaBaXNenQQj5hQTTQTFppWQu3AciK81le1CrewLLRhNM9vxRvJzR+g4dXtF1f2
+        KGCgprV1rei5b1sAMAfR4JbdiEg9XxnLLZzYjNyTKeG/0OgQ7R7Wn9dyzbN86OjlWKOukW
+        fMpy2Ef9f0XHkz/NKwS6KPeDLL34aTw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-Qlbt3yoYMyqpFb8Z0Xnx-w-1; Thu, 10 Aug 2023 10:03:23 -0400
-X-MC-Unique: Qlbt3yoYMyqpFb8Z0Xnx-w-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fe517ca810so5611515e9.0
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:03:22 -0700 (PDT)
+ us-mta-567-dEGBridTM0yLxdlQvSP5Qg-1; Thu, 10 Aug 2023 10:18:02 -0400
+X-MC-Unique: dEGBridTM0yLxdlQvSP5Qg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-31955c0e2adso90616f8f.2
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:17:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691676201; x=1692281001;
+        d=1e100.net; s=20221208; t=1691677064; x=1692281864;
         h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nlAONK5WQTaqTvjs/IJt1TfwjeXJy9baGm//on5NsDU=;
-        b=OXXQxdm3NodgMGjHN+DVbmZzvK68hTPT8RIX99wX89NI3/veUzoIXxfvbcuLGNJYCX
-         +hx6jXT8IVooJ35dMNGaV7RqoDpJFMCYttQYyCEdUYbEgbLmVnJ/FmNBGrRaA7QfOCAm
-         0RZM4TEyLk7T9Pvd9Yi3SL3m30JdVyXjsbDQH8ybopwJOz3nua0oJyWOwfP2Ozv/POMn
-         nyLx6TX2Fl2PuUvnrK8boUDb3yjmt3P9mk9bJnDHtmZoYHS6lCDp6l+rbu4vxQCEJYVJ
-         KEz0lfWAXvLRr1pxxAr+P+japmiFha530tp8FNAnjhSvYIbd+ZNBEVH1uw8/qIKAftBU
-         UCQA==
-X-Gm-Message-State: AOJu0YzS6WtnNusiaCnwk8SMdaduN9FgQVtF0iagXHyKbLIo3ibClIOK
-        ATgdrfd8k2uZGJVTFDE7S9NMpo2RboqFeK57gdFX8cai8eJDnMobBAu8nuLQsd+L4LhvXR7dKpZ
-        wrd8x7DYVNaiH
-X-Received: by 2002:a05:600c:4685:b0:3fe:b78:f4b1 with SMTP id p5-20020a05600c468500b003fe0b78f4b1mr1898359wmo.2.1691676201672;
-        Thu, 10 Aug 2023 07:03:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGwH4c+ibBCE7JaCGWrshMbWFduUcHCjQpgp+Gizgr2r1PQ5mWl8LEmTu1VHsDdW6O4HOwjdg==
-X-Received: by 2002:a05:600c:4685:b0:3fe:b78:f4b1 with SMTP id p5-20020a05600c468500b003fe0b78f4b1mr1898337wmo.2.1691676201343;
-        Thu, 10 Aug 2023 07:03:21 -0700 (PDT)
+        bh=QV3kzAdfq67rkXfk0U1UD+5I2KtPvhdGYoE+7E14Z2o=;
+        b=jQXganlXF/iosV6SDWpsr29CbR6kHTo4S+eEmC++9VUPVL+bGR1op9ffEKhxuX6YB+
+         7Zry+i4qTeBgfWY+p4dEu1hFnWUGMAcxy6H1CvHvqgvdDCc2TEFC7eAz9ubeMB9liNyU
+         HecfNjTTYFdtuJbV5lBVChdKsMu34AAN9NpRyl4gFfSHty6wIau1k67OyiipSmbcRB7B
+         OPH1WEnDJ+AgNxHuvduPnEbU8p/89GVu45Z5q+RA6HFFCgKtlhp/n/iBvRmnwbcM/pm4
+         dq7N1qqkGUM+qNiXykzKiPffcMqFU/gSpEnB1ply8vs+eCwOWCgx5OaYrGT2EkBK8a8x
+         QaJg==
+X-Gm-Message-State: AOJu0YwTQYAH5/OuPe4myOG4XAEP/Q105pkYD0h0AUR/WdMX9sOSgb05
+        dL9zE4DjWTRvq4XVh+dXbPqFIDtOxw0/UVaOssU9OTbRq3pCsRPzF3ltcTShgZsSlwt0nWm1hYO
+        LhV/nibL2+ZbI
+X-Received: by 2002:a5d:5112:0:b0:317:6639:852d with SMTP id s18-20020a5d5112000000b003176639852dmr2031041wrt.43.1691677064016;
+        Thu, 10 Aug 2023 07:17:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJIOuPdixKCMGjR2K5ty0NoV/em7DnAVHvF/nALkqMPVXfK3+ZQaaJOePrHhmDeP9THFd+eg==
+X-Received: by 2002:a5d:5112:0:b0:317:6639:852d with SMTP id s18-20020a5d5112000000b003176639852dmr2031019wrt.43.1691677063673;
+        Thu, 10 Aug 2023 07:17:43 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id v1-20020adff681000000b00313e2abfb8dsm2279337wrp.92.2023.08.10.07.03.17
+        by smtp.googlemail.com with ESMTPSA id e1-20020adfe381000000b003140f47224csm2357247wrm.15.2023.08.10.07.17.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 07:03:20 -0700 (PDT)
-Message-ID: <d6858d5c-7db6-6e4c-7f07-92ff3340e02b@redhat.com>
-Date:   Thu, 10 Aug 2023 16:03:16 +0200
+        Thu, 10 Aug 2023 07:17:42 -0700 (PDT)
+Message-ID: <fdf4d17a-e134-6e03-87d0-2c018c13a891@redhat.com>
+Date:   Thu, 10 Aug 2023 16:17:41 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
 Content-Language: en-US
-To:     Ackerley Tng <ackerleytng@google.com>, seanjc@google.com,
-        tglx@linutronix.de, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, shuah@kernel.org, andrew.jones@linux.dev,
-        ricarkol@google.com, chao.p.peng@linux.intel.com, tabba@google.com,
-        jarkko@kernel.org, yu.c.zhang@linux.intel.com,
-        vannapurve@google.com, erdemaktas@google.com,
-        mail@maciej.szmigiero.name, vbabka@suse.cz, david@redhat.com,
-        qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com,
-        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
-        kirill.shutemov@linux.intel.com
-References: <cover.1691446946.git.ackerleytng@google.com>
- <196a2130f155cbc0201cce06579f122352c8b236.1691446946.git.ackerleytng@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     Nikunj A Dadhania <nikunj@amd.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>
+References: <20230802091107.1160320-1-nikunj@amd.com>
+ <20230803120637.GD214207@hirez.programming.kicks-ass.net>
+ <b22761ea-cab6-0e11-cdc9-ec26c300cd3f@redhat.com>
+ <20230803190728.GJ212435@hirez.programming.kicks-ass.net>
+ <7c2f6fa3-23ba-6df5-24d9-28f95f866574@redhat.com>
+ <20230804204840.GR212435@hirez.programming.kicks-ass.net>
+ <20230804231954.swdjx6lxkccxals6@treble>
+ <20230805005551.GT212435@hirez.programming.kicks-ass.net>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 08/11] KVM: x86: Let moving encryption context be
- configurable
-In-Reply-To: <196a2130f155cbc0201cce06579f122352c8b236.1691446946.git.ackerleytng@google.com>
+Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
+ kvm-amd.o
+In-Reply-To: <20230805005551.GT212435@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/8/23 01:01, Ackerley Tng wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 75d48379d94d..a1a28dd77b94 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6351,7 +6351,14 @@ static int kvm_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
->   	if (r)
->   		goto out_mark_migration_done;
->   
-> -	r = static_call(kvm_x86_vm_move_enc_context_from)(kvm, source_kvm);
-> +	/*
-> +	 * Different types of VMs will allow userspace to define if moving
-> +	 * encryption context should be supported.
-> +	 */
-> +	if (kvm->arch.vm_move_enc_ctxt_supported &&
-> +	    kvm_x86_ops.vm_move_enc_context_from) {
-> +		r = static_call(kvm_x86_vm_move_enc_context_from)(kvm, source_kvm);
-> +	}
+On 8/5/23 02:55, Peter Zijlstra wrote:
+>> +	 * Clobbering BP here is mostly ok since GIF will block NMIs and with
+>> +	 * the exception of #MC and the kvm_rebooting _ASM_EXTABLE()s below
+>> +	 * nothing untoward will happen until BP is restored.
+>> +	 *
+>> +	 * The kvm_rebooting exceptions should not want to unwind stack, and
+>> +	 * while #MV might want to unwind stack, it is ultimately fatal.
+>> +	 */
+> Aside from me not being able to type #MC, I did realize that the
+> kvm_reboot exception will go outside noinstr code and can hit
+> tracing/instrumentation and do unwinds from there.
 
-Rather than "supported" this is more "required".  So  perhaps 
-kvm->arch.use_vm_enc_ctxt_op?
+Asynchronously disabling SVM requires an IPI, so kvm_rebooting cannot 
+change within CLGI/STGI.   We can check it after CLGI instead of waiting 
+for a #GP:
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 956726d867aa..e3755f5eaf81 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4074,7 +4074,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct 
+kvm_vcpu *vcpu)
+  	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+  		x86_spec_ctrl_set_guest(svm->virt_spec_ctrl);
+
+-	svm_vcpu_enter_exit(vcpu, spec_ctrl_intercepted);
++	if (unlikely(kvm_rebooting))
++		svm->vmcb->control.exit_code = SVM_EXIT_PAUSE;
++	else
++		svm_vcpu_enter_exit(vcpu, spec_ctrl_intercepted);
+
+  	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
+  		x86_spec_ctrl_restore_host(svm->virt_spec_ctrl);
+diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+index 8e8295e774f0..34641b3a6823 100644
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -270,23 +270,12 @@ SYM_FUNC_START(__svm_vcpu_run)
+  	RESTORE_GUEST_SPEC_CTRL_BODY
+  	RESTORE_HOST_SPEC_CTRL_BODY
+
+-10:	cmpb $0, kvm_rebooting
+-	jne 2b
+-	ud2
+-30:	cmpb $0, kvm_rebooting
+-	jne 4b
+-	ud2
+-50:	cmpb $0, kvm_rebooting
+-	jne 6b
+-	ud2
+-70:	cmpb $0, kvm_rebooting
+-	jne 8b
+-	ud2
++10:	ud2
+
+  	_ASM_EXTABLE(1b, 10b)
+-	_ASM_EXTABLE(3b, 30b)
+-	_ASM_EXTABLE(5b, 50b)
+-	_ASM_EXTABLE(7b, 70b)
++	_ASM_EXTABLE(3b, 10b)
++	_ASM_EXTABLE(5b, 10b)
++	_ASM_EXTABLE(7b, 10b)
+
+  SYM_FUNC_END(__svm_vcpu_run)
+
 
 Paolo
 
