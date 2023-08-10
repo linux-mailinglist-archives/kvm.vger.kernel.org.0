@@ -2,125 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55298777E91
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 18:47:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8CA4777E95
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 18:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234364AbjHJQrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 12:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37492 "EHLO
+        id S232701AbjHJQsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 12:48:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234063AbjHJQrL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 12:47:11 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B219F10C7
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 09:47:11 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-26813cd7a8aso757267a91.2
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 09:47:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691686031; x=1692290831;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1YxxQSx9jryP/gaiSlpxrcgwKgQeQJEh/0X+pazM0o=;
-        b=ce/9DcrCCwo6KPfVtyNMNZolyHGIshD4DR/Wwxcjvjqlu2XZC2ifdrhTlTMfIbIpeQ
-         9b90fyURIEL5MZ9OfK9porDeciE520+G8QtnkKssJ+XxcxmmKkEaLPYgHq4/SWdDOjy8
-         LlUjLXgVmYkOjGqOVyfTuMXSsLpV2rW7vChHQJrQWZmlTTBgJZJmxuZGZCMimvei99rP
-         ghT4UMiwO3FVTv8qcE912BIbrT9fazw4xMd4nFj5YEFvMO+dnOCEyHVFG65Bia2hYzwq
-         FxjZlGsyOIbe7GeyLd73rYRo4u1SYKYuPYchLPh0qDZ11YpBFSFTWWKehNUhm+P8FcbT
-         uitw==
+        with ESMTP id S229503AbjHJQsW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 12:48:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4376B10C4
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 09:47:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691686058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iX9dfigAcH8NeakNhELzqilWH4hSvNPsTzEZpq3rGQc=;
+        b=MDzlq3Q6AsJjmFt+x6mSNtwLhsGK+G4HBkxSP4NwqcrpA2HbOC2t3gjlY5h4eoCR2jzFX3
+        YGmlmIQO5E0gVPUCGQrG0Nzw7UtmLA4JFDB/UT8DMzAJaVsEnfbFijbwvpNcndboGOrtLm
+        sFP8GjmUUZmU/Tkx7gt9+R3U1uWnbSA=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-543-SgFhSi4VMU6Rx35_ndBMsg-1; Thu, 10 Aug 2023 12:47:37 -0400
+X-MC-Unique: SgFhSi4VMU6Rx35_ndBMsg-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-790f73b8f8aso82833839f.2
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 09:47:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691686031; x=1692290831;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z1YxxQSx9jryP/gaiSlpxrcgwKgQeQJEh/0X+pazM0o=;
-        b=KdrXTUNA4wbGZbI8UwCybkw8AILmd/B9/6oF4MDx6Att3T7TCjNd1AM3CuHV4v3jHw
-         Zkm/UkD9gUnZRT6rG/szcsuOxGtngbdckzJBw+UrGTd96Xs3vonQyzMlZJ67le6g5Db8
-         ENNv49uEytOQxE4ShUI9LJFLlCCuKqZZprXI4Rxa02ZtRK7DQJenskxScT7QIVbTSKlv
-         N0p25sxa/sUiAHPKKcMfcsPnXpZJs3Zf9jqAWtLH7HmL0zYmQU8OPVxctHLjeTTD0Dut
-         j3q+fOZ7PKKd/UKOh7dy4eXTbx8u7uXW6iAKUVswuUrP4MKK9bkO+n5glYCuIg0kcA2p
-         W93A==
-X-Gm-Message-State: AOJu0Yw+haYMf3yEaS9s1kHLbBDP9VRZRZw9Q5ZshTQS6qZP5d6YYUhX
-        cTk5H8fBzvTQDr6mprjQnOpxYA==
-X-Google-Smtp-Source: AGHT+IEW7khYL0o4UiJXTotcmkvmJTY67L4z884ZB/Rx1B6m1oAZwsmTvmxd1WH9hKUE9QQ1nrFRXQ==
-X-Received: by 2002:a17:90a:ba92:b0:268:300b:ee82 with SMTP id t18-20020a17090aba9200b00268300bee82mr2781613pjr.19.1691686031121;
-        Thu, 10 Aug 2023 09:47:11 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id 19-20020a17090a1a5300b0026851759e9csm1842689pjl.29.2023.08.10.09.47.10
+        d=1e100.net; s=20221208; t=1691686056; x=1692290856;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iX9dfigAcH8NeakNhELzqilWH4hSvNPsTzEZpq3rGQc=;
+        b=eiiXYiLkQhzoaI3k8Wmi/hJ7KcpAMKHm/+i3qZcn3HsyrAyK1Dt2nq5GO8u99B03/R
+         Rlfbd857T7RyiwXUiyv8rtaEHIF/9xJ0dDv8KMEWZ6yVz81Tz5xpwe5cd3vCz+fDdMoT
+         LL5N88szTrHtZlm+VZg9bdIp1J6daydtgis1FXZObvUKb0U/v3RtEFV7H9jIPwUrv2Pd
+         dm3LgPIcrRTgXhomV3gRE26jseZUbvLPfThADJ0lhyrQT6tFUdVo2sdvOdjaPhu6Pf13
+         xCXWUYSbZfQ1ecEHpxcnQ3VWjn3SWXIfUSlMkoK35WdDbNz2uLDGMUJqu7JLPPP4bVZU
+         0goA==
+X-Gm-Message-State: AOJu0YyqK/wsMKcH8w0Sk0TdVNPZl3y1cT5X1GudOw/aIjhumysRaH5e
+        XqwHjUrm3B1s1CtQ2AY2iMKpJVNv2qoVoGJ96sWwnNjBHvKw4eA0AMswbjcv7MR+QlYUV2rcKlR
+        3UMuqljL5TQrL
+X-Received: by 2002:a6b:5c0f:0:b0:783:7275:9c47 with SMTP id z15-20020a6b5c0f000000b0078372759c47mr3904104ioh.7.1691686056515;
+        Thu, 10 Aug 2023 09:47:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhnW6Ng1wIjDiplvduIBOywRGh+zdPgNAkWpJy5wXLpufiRZOX4I6I6q3EE9yZ1q5WAEx+sA==
+X-Received: by 2002:a6b:5c0f:0:b0:783:7275:9c47 with SMTP id z15-20020a6b5c0f000000b0078372759c47mr3904084ioh.7.1691686056256;
+        Thu, 10 Aug 2023 09:47:36 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id eh11-20020a056638298b00b004182f88c368sm510175jab.67.2023.08.10.09.47.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 09:47:10 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qU8oX-005H7B-4H;
-        Thu, 10 Aug 2023 13:47:09 -0300
-Date:   Thu, 10 Aug 2023 13:47:09 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
+        Thu, 10 Aug 2023 09:47:35 -0700 (PDT)
+Date:   Thu, 10 Aug 2023 10:47:34 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
 To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Baolu Lu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, Brett Creeley <bcreeley@amd.com>,
+        Brett Creeley <brett.creeley@amd.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 08/12] iommu: Prepare for separating SVA and IOPF
-Message-ID: <ZNUUjXMrLyU3g5KM@ziepe.ca>
-References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
- <20230727054837.147050-9-baolu.lu@linux.intel.com>
- <BN9PR11MB52769D22490BB09BB25E0C2E8C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZNKMz04uhzL9T7ya@ziepe.ca>
- <BN9PR11MB527629949E7D44BED080400C8C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <0771c28d-1b31-003e-7659-4f3f3cbf5546@linux.intel.com>
- <BN9PR11MB527686C925E33E0DCDF261CB8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
+ tracking
+Message-ID: <20230810104734.74fbe148.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230807205755.29579-1-brett.creeley@amd.com>
+        <20230807205755.29579-7-brett.creeley@amd.com>
+        <20230808162718.2151e175.alex.williamson@redhat.com>
+        <01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
+        <20230809113300.2c4b0888.alex.williamson@redhat.com>
+        <ZNPVmaolrI0XJG7Q@nvidia.com>
+        <BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527686C925E33E0DCDF261CB8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 02:35:40AM +0000, Tian, Kevin wrote:
-> > From: Baolu Lu <baolu.lu@linux.intel.com>
-> > Sent: Wednesday, August 9, 2023 6:41 PM
+On Thu, 10 Aug 2023 02:47:15 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Thursday, August 10, 2023 2:06 AM
 > > 
-> > On 2023/8/9 8:02, Tian, Kevin wrote:
-> > >> From: Jason Gunthorpe <jgg@ziepe.ca>
-> > >> Sent: Wednesday, August 9, 2023 2:43 AM
-> > >>
-> > >> On Thu, Aug 03, 2023 at 08:16:47AM +0000, Tian, Kevin wrote:
-> > >>
-> > >>> Is there plan to introduce further error in the future? otherwise this
-> > should
-> > >>> be void.
-> > >>>
-> > >>> btw the work queue is only for sva. If there is no other caller this can be
-> > >>> just kept in iommu-sva.c. No need to create a helper.
-> > >>
-> > >> I think more than just SVA will need a work queue context to process
-> > >> their faults.
-> > >>
-> > >
-> > > then this series needs more work. Currently the abstraction doesn't
-> > > include workqueue in the common fault reporting layer.
+> > On Wed, Aug 09, 2023 at 11:33:00AM -0600, Alex Williamson wrote:
+> >   
+> > > Shameer, Kevin, Jason, Yishai, I'm hoping one or more of you can
+> > > approve this series as well.  Thanks,  
 > > 
-> > Do you mind elaborate a bit here? workqueue is a basic infrastructure in
-> > the fault handling framework, but it lets the consumers choose to use
-> > it, or not to.
-> > 
+> > I've looked at it a few times now, I think it is OK, aside from the
+> > nvme issue.
+> >   
 > 
-> My understanding of Jason's comment was to make the workqueue the
-> default path instead of being opted by the consumer.. that is my 1st
-> impression but might be wrong...
+> My only concern is the duplication of backing storage management
+> of the migration file which I didn't take time to review.
+> 
+> If all others are fine to leave it as is then I will not insist.
 
-Yeah, that is one path. Do we have anyone that uses this that doesn't
-want the WQ? (actually who even uses this besides SVA?)
+There's leverage now if you feel strongly about it, but code
+consolidation could certainly come later.
 
-Jason
+Are either of you willing to provide a R-b?
+
+What are we looking for relative to NVMe?  AIUI, the first couple
+revisions of this series specified an NVMe device ID, then switched to
+a wildcard, then settled on an Ethernet device ID, all with no obvious
+changes that would suggest support is limited to a specific device
+type.  I think we're therefore concerned that migration of an NVMe VF
+could be enabled by overriding/adding device IDs, whereas we'd like to
+standardize NVMe migration to avoid avoid incompatible implementations.
+
+It's somewhat a strange requirement since we have no expectation of
+compatibility between vendors for any other device type, but how far
+are we going to take it?  Is it enough that the device table here only
+includes the Ethernet VF ID or do we want to actively prevent what
+might be a trivial enabling of migration for another device type
+because we envision it happening through an industry standard that
+currently doesn't exist?  Sorry if I'm not familiar with the dynamics
+of the NVMe working group or previous agreements.  Thanks,
+
+Alex
+
