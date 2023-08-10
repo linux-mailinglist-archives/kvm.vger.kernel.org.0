@@ -2,116 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94264776DDA
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 04:06:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB09776E11
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 04:27:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231326AbjHJCGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 22:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47984 "EHLO
+        id S230097AbjHJC13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 22:27:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbjHJCGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 22:06:05 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B34CF3;
-        Wed,  9 Aug 2023 19:06:03 -0700 (PDT)
+        with ESMTP id S229488AbjHJC12 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 22:27:28 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3EB11999;
+        Wed,  9 Aug 2023 19:27:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691633163; x=1723169163;
+  t=1691634447; x=1723170447;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=LwSdYv2U/EME+IZ0lQwbvUUwI+VkBqY/yWwfc4nDKLM=;
-  b=iWSHh1khG/a7KUCXvo5s4a3h3JqQiroSKhR8M/5Y9cTEvX6kqfb8kc7C
-   leCy7c6s/MKQcp3GZ00J+9BNw08U488JeGAvG9zlC7SYSBcxj882X8/sd
-   7GMI72hCdr0HkFGi2SlscDIFX7ONp01DoKCYxKRbUz5mpJd2afL5pDsOC
-   IRRF48iSiIiB1jxfSlyy0AwPHvLIAziG2u3ZSWO2P4I3Zu1qjjnl7X/Bn
-   uBd2e13XemiWTD+ZpQyId7wkdNMJlS1OqJ/az1l5hcnn+9CHt+VthuvS4
-   14Q1BC8clB86DNU8YN8K1qx8rISfff5H2c6swJWMFXhocRWwJp9nncbsc
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="374056985"
+  bh=wbX5ZGZU+a045ReN97N8foV8POn+IQFOPh9KTo/LP+c=;
+  b=a71U2q5Z88nGFR1DCPIJ6xoLbZLbc5u8HUbAtvwsRbQUSORhW+hN4Ctf
+   N4Ty8DyqqgjSiOGHhONfqOjqeMIomXHTdi+jqyAwyO4UEwJttDKtfUD4y
+   CrG693jlPX+TBfyAruzix8T0HczrnkyqarMmZrlFzgT5JR1q13tsIqXbw
+   Pgg7ELgwV7EPC1bAuwHGsjvO7jW3cSiPh6mXEDfwqs+HmqulRs8DxiFhu
+   HjanZuH80j8a4kJ0wv5JJtuISHG3vhnUGhp/F2agi55nwwlX4ybkC7qXt
+   ygUUIWG8xUQdCkUOyE4Kaj53rIkBp/uD618F9ZTYhcPN6GkfGZfjXT3yb
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="356244295"
 X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="374056985"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 19:06:02 -0700
+   d="scan'208";a="356244295"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 19:27:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="801982441"
+X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="797433020"
 X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="801982441"
+   d="scan'208";a="797433020"
 Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.214.239]) ([10.254.214.239])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 19:05:57 -0700
-Message-ID: <e895888f-9984-176b-f5f2-a256b25f61bd@linux.intel.com>
-Date:   Thu, 10 Aug 2023 10:05:55 +0800
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 19:27:23 -0700
+Message-ID: <28d86414-d684-b468-d0a9-5c429260e081@linux.intel.com>
+Date:   Thu, 10 Aug 2023 10:27:21 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Cc:     baolu.lu@linux.intel.com, Yi Liu <yi.l.liu@intel.com>,
-        joro@8bytes.org, alex.williamson@redhat.com, kevin.tian@intel.com,
-        robin.murphy@arm.com, cohuck@redhat.com, eric.auger@redhat.com,
-        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com
-Subject: Re: [PATCH v6 3/4] iommufd: Add IOMMU_GET_HW_INFO
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 03/12] iommu: Remove unrecoverable fault data
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-References: <20230808153510.4170-1-yi.l.liu@intel.com>
- <20230808153510.4170-4-yi.l.liu@intel.com>
- <aa455c36-83be-7757-7171-05460a459a2e@linux.intel.com>
- <ZNO75LVZemR0YZUR@nvidia.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
+ <20230727054837.147050-4-baolu.lu@linux.intel.com>
+ <ZNPF/nA2JdqHMM10@ziepe.ca>
 From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <ZNO75LVZemR0YZUR@nvidia.com>
+In-Reply-To: <ZNPF/nA2JdqHMM10@ziepe.ca>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/8/10 0:16, Jason Gunthorpe wrote:
-> On Wed, Aug 09, 2023 at 06:16:19PM +0800, Baolu Lu wrote:
->> On 2023/8/8 23:35, Yi Liu wrote:
->>> +static int iommufd_fill_hw_info(struct device *dev, void __user *user_ptr,
->>> +				unsigned int *length, u32 *type)
->>> +{
->>> +	const struct iommu_ops *ops;
->>> +	unsigned int data_len;
->>> +	void *data;
->>> +	int rc = 0;
->>> +
->>> +	ops = dev_iommu_ops(dev);
->>> +	if (!ops->hw_info) {
->>> +		*length = 0;
->>> +		*type = IOMMU_HW_INFO_TYPE_NONE;
->>> +		return 0;
->>> +	}
->>> +
->>> +	data = ops->hw_info(dev, &data_len, type);
->>> +	if (IS_ERR(data))
->>> +		return PTR_ERR(data);
->>> +
->>> +	/*
->>> +	 * drivers that have hw_info callback should have a unique
->>> +	 * iommu_hw_info_type.
->>> +	 */
->>> +	if (WARN_ON_ONCE(*type == IOMMU_HW_INFO_TYPE_NONE)) {
->>> +		rc = -ENODEV;
->>> +		goto err_free;
->>> +	}
->>> +
->>> +	*length = min(*length, data_len);
->>> +	if (copy_to_user(user_ptr, data, *length)) {
->> copy_to_user() returns the number of bytes that were successfully
->> copied, right?
-> It returns length on failure and 0 on success
+On 2023/8/10 0:59, Jason Gunthorpe wrote:
+> On Thu, Jul 27, 2023 at 01:48:28PM +0800, Lu Baolu wrote:
+>> The unrecoverable fault data is not used anywhere. Remove it to avoid
+>> dead code.
+>>
+>> Suggested-by: Kevin Tian<kevin.tian@intel.com>
+>> Signed-off-by: Lu Baolu<baolu.lu@linux.intel.com>
+>> ---
+>>   include/linux/iommu.h | 70 +------------------------------------------
+>>   1 file changed, 1 insertion(+), 69 deletions(-)
+> Do we plan to bring this back in some form? A driver specific fault
+> report via iommufd?
 
-Then it's fine. Thanks for the explanation.
+I can hardly see the possibility.
+
+The only necessary dma fault messages are the offending address and the
+permissions. With these, the user space device model software knows that
+"a DMA fault was generated when the IOMMU hardware tried to translate
+the offending address with the given permissions".
+
+And then, the device model software will walk the page table and figure
+out what is missed before injecting the vendor-specific fault messages
+to the VM guest.
 
 Best regards,
 baolu
