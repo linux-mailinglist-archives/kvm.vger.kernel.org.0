@@ -2,52 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8AD9777B06
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:43:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 539C0777B12
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:44:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235871AbjHJOn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 10:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54918 "EHLO
+        id S233968AbjHJOoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 10:44:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235454AbjHJOn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:43:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB664268D
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:43:27 -0700 (PDT)
+        with ESMTP id S235895AbjHJOoE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 10:44:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392C926BC
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:44:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 515CC65E91
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 14:43:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B119AC433C7;
-        Thu, 10 Aug 2023 14:43:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BFB0465E9B
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 14:44:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AC5FC433CB;
+        Thu, 10 Aug 2023 14:44:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691678606;
-        bh=MjMPBofj9eixKpMqEVyk0yamw7dMCKm//JFQsitXUOQ=;
+        s=k20201202; t=1691678641;
+        bh=mO3bnIbUtzEnniylSh7RL1DI8oatZ5JEMR3db9B8FcA=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=G10d5hVjRTjzj9efCgSrdYmFKSG/1wbZm/+5H0OG2PoQ+KV3x/v+Uq/FWWFvNKbcm
-         PWfvj/6Hp1EaBfMFmDwuU0LbZI/4ecgLupDb9n+islaE1Z+hu9+kxuy1w67AHj0a2c
-         6ch5/EhlSLJegSDHq4oXi5CUjPfFWynhjtL13N4zY55Dl0fkBRPBTh0slixdUQ13Cn
-         gu7YSxXqiH847+GLgDu3xfaZFYOmj0O4QaIiTqUQc4j/j5Pf1gezTfU8XN/0YMTRZB
-         nueFK9mNhiaQhGAWz7QF1/efofdDVCRLZCSkk+VgK+zFvV2qoo/93tXd8Vm9QgzmBL
-         7jovM2cCiLBNA==
+        b=KsyS4dmNfewUOW0ZozKec2quRtce73f9R/mmJjYTfOrNILlhkl0witKj5ip7xwuUE
+         eyaotSqhazNt5Phrmv+CaRzKvMK1xIUClyaVMb45/a4GGan9rQ3CvJUb/iuC+FUHKT
+         boMdo5L9+4G7j00EzIBhr9m+1DhP8BMc5OFR+q1ceM8q6gnZXfrM4WqKp/XT+IKkvq
+         5Y1m8V9f7Im3T2fYyjU0jSBjfvksm3bYwnjETayNm6pWh9005xuqKEudxXdkydQOqC
+         UmwqAMDSpWweVFxyUU3I3BfBCGAcekFPImhiEASVaIfKulTOGKTFWiv4iowEqIa0f0
+         HuIv4L5IGy8FQ==
 Received: from c-xd4ed8728.customers.hiper-net.dk ([212.237.135.40] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qU6sm-003qzZ-8w;
-        Thu, 10 Aug 2023 15:43:24 +0100
-Date:   Thu, 10 Aug 2023 15:43:32 +0100
-Message-ID: <87v8dnot4b.wl-maz@kernel.org>
+        id 1qU6tK-003r0K-JO;
+        Thu, 10 Aug 2023 15:43:58 +0100
+Date:   Thu, 10 Aug 2023 15:44:06 +0100
+Message-ID: <87ttt7ot3d.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Miguel Luis <miguel.luis@oracle.com>
-Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
+To:     eric.auger@redhat.com
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
         Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
         Mark Brown <broonie@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         Will Deacon <will@kernel.org>,
@@ -56,56 +53,428 @@ Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
         Chase Conklin <chase.conklin@arm.com>,
         Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
         Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH v3 14/27] KVM: arm64: nv: Add trap forwarding infrastructure
-In-Reply-To: <65770FF0-A864-4678-8280-AE9BD666CC12@oracle.com>
+In-Reply-To: <18eae581-500b-9c9e-2cce-e2f5fb007071@redhat.com>
 References: <20230808114711.2013842-1-maz@kernel.org>
         <20230808114711.2013842-15-maz@kernel.org>
-        <65770FF0-A864-4678-8280-AE9BD666CC12@oracle.com>
+        <18eae581-500b-9c9e-2cce-e2f5fb007071@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 212.237.135.40
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Miguel,
+Hi Eric,
 
-On Wed, 09 Aug 2023 19:28:08 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
-> 
+On Wed, 09 Aug 2023 14:27:27 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+>=20
 > Hi Marc,
-> 
-> > On 8 Aug 2023, at 11:46, Marc Zyngier <maz@kernel.org> wrote:
+>=20
+> On 8/8/23 13:46, Marc Zyngier wrote:
+> > A significant part of what a NV hypervisor needs to do is to decide
+> > whether a trap from a L2+ guest has to be forwarded to a L1 guest
+> > or handled locally. This is done by checking for the trap bits that
+> > the guest hypervisor has set and acting accordingly, as described by
+> > the architecture.
+> >
+> > A previous approach was to sprinkle a bunch of checks in all the
+> > system register accessors, but this is pretty error prone and doesn't
+> > help getting an overview of what is happening.
+> >
+> > Instead, implement a set of global tables that describe a trap bit,
+> > combinations of trap bits, behaviours on trap, and what bits must
+> > be evaluated on a system register trap.
+> >
+> > Although this is painful to describe, this allows to specify each
+> > and every control bit in a static manner. To make it efficient,
+> > the table is inserted in an xarray that is global to the system,
+> > and checked each time we trap a system register while running
+> > a L2 guest.
+> >
+> > Add the basic infrastructure for now, while additional patches will
+> > implement configuration registers.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h   |   1 +
+> >  arch/arm64/include/asm/kvm_nested.h |   2 +
+> >  arch/arm64/kvm/emulate-nested.c     | 262 ++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/sys_regs.c           |   6 +
+> >  arch/arm64/kvm/trace_arm.h          |  26 +++
+> >  5 files changed, 297 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm=
+/kvm_host.h
+> > index 721680da1011..cb1c5c54cedd 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -988,6 +988,7 @@ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu);
+> >  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+> > =20
+> >  int __init kvm_sys_reg_table_init(void);
+> > +int __init populate_nv_trap_config(void);
+> > =20
+> >  bool lock_all_vcpus(struct kvm *kvm);
+> >  void unlock_all_vcpus(struct kvm *kvm);
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/a=
+sm/kvm_nested.h
+> > index 8fb67f032fd1..fa23cc9c2adc 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -11,6 +11,8 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu =
+*vcpu)
+> >  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> >  }
+> > =20
+> > +extern bool __check_nv_sr_forward(struct kvm_vcpu *vcpu);
+> > +
+> >  struct sys_reg_params;
+> >  struct sys_reg_desc;
+> > =20
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-n=
+ested.c
+> > index b96662029fb1..1b1148770d45 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -14,6 +14,268 @@
+> > =20
+> >  #include "trace.h"
+> > =20
+> > +enum trap_behaviour {
+> > +	BEHAVE_HANDLE_LOCALLY	=3D 0,
+> > +	BEHAVE_FORWARD_READ	=3D BIT(0),
+> > +	BEHAVE_FORWARD_WRITE	=3D BIT(1),
+> > +	BEHAVE_FORWARD_ANY	=3D BEHAVE_FORWARD_READ | BEHAVE_FORWARD_WRITE,
+> > +};
+> > +
+> > +struct trap_bits {
+> > +	const enum vcpu_sysreg		index;
+> > +	const enum trap_behaviour	behaviour;
+> > +	const u64			value;
+> > +	const u64			mask;
+> > +};
+> > +
+> > +enum trap_group {
+> nit: Maybe add a comment saying that it relates to *coarse* trapping as
+> opposed to the other enum which is named fgt_group_id. cgt_group_id may
+> have been better but well ;-)
 
-[...]
+You mean I should apply some sort of consistency to this code in order
+to help reviewers understanding it? Fool! ;-)
 
-> > + for (int id = __MULTIPLE_CONTROL_BITS__;
-> > +     id < (__COMPLEX_CONDITIONS__ - 1);
-> 
-> This condition seems to be discarding the last MCB from being checked,
-> which IIUC it must also be checked.
+Point taken, I'll go over it and apply your suggestion.
 
-Indeed, well caught. Now fixed.
+>=20
+> > +	/* Indicates no coarse trap control */
+> > +	__RESERVED__,
+> > +
+> > +	/*
+> > +	 * The first batch of IDs denote coarse trapping that are used
+> > +	 * on their own instead of being part of a combination of
+> > +	 * trap controls.
+> > +	 */
+> > +
+> > +	/*
+> > +	 * Anything after this point is a combination of trap controls,
+> coarse trap controls
 
-Thanks,
+Yup.
+
+> > +	 * which all must be evaluated to decide what to do.
+> > +	 */
+> > +	__MULTIPLE_CONTROL_BITS__,
+> > +
+> > +	/*
+> > +	 * Anything after this point requires a callback evaluating a
+> > +	 * complex trap condition. Hopefully we'll never need this...
+> > +	 */
+> > +	__COMPLEX_CONDITIONS__,
+> > +
+> > +	/* Must be last */
+> > +	__NR_TRAP_GROUP_IDS__
+> > +};
+> > +
+> > +static const struct trap_bits coarse_trap_bits[] =3D {
+> > +};
+> > +
+> > +#define MCB(id, ...)					\
+> > +	[id - __MULTIPLE_CONTROL_BITS__]	=3D	\
+> > +		(const enum trap_group []){		\
+> > +			__VA_ARGS__, __RESERVED__	\
+> > +		}
+> > +
+> > +static const enum trap_group *coarse_control_combo[] =3D {
+> > +};
+> > +
+> > +typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu=
+ *);
+> > +
+> > +#define CCC(id, fn)				\
+> > +	[id - __COMPLEX_CONDITIONS__] =3D fn
+> > +
+> > +static const complex_condition_check ccc[] =3D {
+> > +};
+> > +
+> > +/*
+> > + * Bit assignment for the trap controls. We use a 64bit word with the
+> > + * following layout for each trapped sysreg:
+> > + *
+> > + * [9:0]	enum trap_group (10 bits)
+> > + * [13:10]	enum fgt_group_id (4 bits)
+> > + * [19:14]	bit number in the FGT register (6 bits)
+> > + * [20]		trap polarity (1 bit)
+> > + * [62:21]	Unused (42 bits)
+> > + * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+> what do you mean by "as lost"
+
+The xarray is only able to store 63 bit of information, not 64, as it
+uses the LSB for its own purpose. This isn't a problem when storing a
+pointer (the last 2 bits are usually 0 if pointing to a structure).
+However, things get funny when you're trying to assign an integer
+value to an xarray location.
+
+This is why we use the xa_mk_value() helper, which is defined as:
+
+static inline void *xa_mk_value(unsigned long v)
+{
+        WARN_ON((long)v < 0);
+        return (void *)((v << 1) | 1);
+}
+
+and the opposite helper on retrieval:
+
+static inline unsigned long xa_to_value(const void *entry)
+{
+        return (unsigned long)entry >> 1;
+}
+
+As you now tell, the MSB is lost on insertion. Hence the comment that
+warns against the use of bit 63, as we will never get it back. I'll
+add some extra checks for that in the code that populates the trap
+configuration.
+
+> > + */
+> > +#define TC_CGT_BITS	10
+> > +#define TC_FGT_BITS	4
+> > +
+> > +union trap_config {
+> > +	u64	val;
+> > +	struct {
+> > +		unsigned long	cgt:TC_CGT_BITS; /* Coarse trap id */
+> > +		unsigned long	fgt:TC_FGT_BITS; /* Fing Grained Trap id */
+> Fine & align capital letter in Trap for both comments
+
+Done.
+
+> > +		unsigned long	bit:6;		 /* Bit number */
+> > +		unsigned long	pol:1;		 /* Polarity */
+> > +		unsigned long	unk:42;		 /* Unknown */
+> s//Unknown/Unused?
+
+Yup, that's better.
+
+> > +		unsigned long	mbz:1;		 /* Must Be Zero */
+> > +	};
+> > +};
+> > +
+> > +struct encoding_to_trap_config {
+> > +	const u32			encoding;
+> > +	const u32			end;
+> > +	const union trap_config		tc;
+> > +};
+> > +
+> > +#define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
+> > +	{								\
+> > +		.encoding	=3D sr_start,				\
+> > +		.end		=3D sr_end,				\
+> > +		.tc		=3D {					\
+> > +			.cgt		=3D trap_id,			\
+> > +		},							\
+> > +	}
+> > +
+> > +#define SR_TRAP(sr, trap_id)		SR_RANGE_TRAP(sr, sr, trap_id)
+> > +
+> > +/*
+> > + * Map encoding to trap bits for exception reported with EC=3D0x18.
+> > + * These must only be evaluated when running a nested hypervisor, but
+> > + * that the current context is not a hypervisor context. When the
+> > + * trapped access matches one of the trap controls, the exception is
+> > + * re-injected in the nested hypervisor.
+> I must confess I was confused by the "forwarding" terminology versus
+> "re-injection into the nested hyp"=C2=A0
+>=20
+> cf.
+>=20
+> "decide whether a trap from a L2+ guest has to be forwarded to a L1 guest
+> or handled locally"
+>=20
+> "re-injection into the nested hyp" sounds clearer to me.
+
+I see them as two sides of the same coin: the "forwarding" is the
+high-level action (we pass the exception on to the L1 hypervisor). The
+"re-injection" is the low-level implementation of the forwarding,
+which is a complicated process (a full world switch).
+
+>=20
+> > + */
+> > +static const struct encoding_to_trap_config encoding_to_cgt[] __initco=
+nst =3D {
+> > +};
+> > +
+> > +static DEFINE_XARRAY(sr_forward_xa);
+> > +
+> > +static union trap_config get_trap_config(u32 sysreg)
+> > +{
+> > +	return (union trap_config) {
+> > +		.val =3D xa_to_value(xa_load(&sr_forward_xa, sysreg)),
+> > +	};
+> > +}
+> > +
+> > +int __init populate_nv_trap_config(void)
+> > +{
+> > +	int ret =3D 0;
+> > +
+> > +	BUILD_BUG_ON(sizeof(union trap_config) !=3D sizeof(void *));
+> > +	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
+> > +
+> > +	for (int i =3D 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+> > +		const struct encoding_to_trap_config *cgt =3D &encoding_to_cgt[i];
+> > +		void *prev;
+> > +
+> > +		prev =3D xa_store_range(&sr_forward_xa, cgt->encoding, cgt->end,
+> > +				      xa_mk_value(cgt->tc.val), GFP_KERNEL);
+> > +
+> > +		if (prev) {
+> > +			kvm_err("Duplicate CGT for (%d, %d, %d, %d, %d)\n",
+> > +				sys_reg_Op0(cgt->encoding),
+> > +				sys_reg_Op1(cgt->encoding),
+> > +				sys_reg_CRn(cgt->encoding),
+> > +				sys_reg_CRm(cgt->encoding),
+> > +				sys_reg_Op2(cgt->encoding));
+> > +			ret =3D -EINVAL;
+> > +		}
+> > +	}
+> > +
+> > +	kvm_info("nv: %ld coarse grained trap handlers\n",
+> > +		 ARRAY_SIZE(encoding_to_cgt));
+> > +
+> > +	for (int id =3D __MULTIPLE_CONTROL_BITS__;
+> > +	     id < (__COMPLEX_CONDITIONS__ - 1);
+> > +	     id++) {
+> > +		const enum trap_group *cgids;
+> > +
+> > +		cgids =3D coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> > +
+> > +		for (int i =3D 0; cgids[i] !=3D __RESERVED__; i++) {
+> > +			if (cgids[i] >=3D __MULTIPLE_CONTROL_BITS__) {
+> > +				kvm_err("Recursive MCB %d/%d\n", id, cgids[i]);
+> > +				ret =3D -EINVAL;
+> > +			}
+> > +		}
+> > +	}
+> > +
+> > +	if (ret)
+> > +		xa_destroy(&sr_forward_xa);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static enum trap_behaviour get_behaviour(struct kvm_vcpu *vcpu,
+> > +					 const struct trap_bits *tb)
+> > +{
+> > +	enum trap_behaviour b =3D BEHAVE_HANDLE_LOCALLY;
+> > +	u64 val;
+> > +
+> > +	val =3D __vcpu_sys_reg(vcpu, tb->index);
+> > +	if ((val & tb->mask) =3D=3D tb->value)
+> > +		b |=3D tb->behaviour;
+> > +
+> > +	return b;
+> > +}
+> > +
+> > +static enum trap_behaviour __do_compute_trap_behaviour(struct kvm_vcpu=
+ *vcpu,
+> > +						       const enum trap_group id,
+> > +						       enum trap_behaviour b)
+> > +{
+> > +	switch (id) {
+> > +		const enum trap_group *cgids;
+> > +
+> > +	case __RESERVED__ ... __MULTIPLE_CONTROL_BITS__ - 1:
+> > +		if (likely(id !=3D __RESERVED__))
+> > +			b |=3D get_behaviour(vcpu, &coarse_trap_bits[id]);
+> > +		break;
+> > +	case __MULTIPLE_CONTROL_BITS__ ... __COMPLEX_CONDITIONS__ - 1:
+> > +		/* Yes, this is recursive. Don't do anything stupid. */
+> > +		cgids =3D coarse_control_combo[id - __MULTIPLE_CONTROL_BITS__];
+> > +		for (int i =3D 0; cgids[i] !=3D __RESERVED__; i++)
+> > +			b |=3D __do_compute_trap_behaviour(vcpu, cgids[i], b);
+> > +		break;
+> > +	default:
+> > +		if (ARRAY_SIZE(ccc))
+> > +			b |=3D ccc[id -  __COMPLEX_CONDITIONS__](vcpu);
+> > +		break;
+> > +	}
+> > +
+> > +	return b;
+> > +}
+> > +
+> > +static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcp=
+u,
+> > +						  const union trap_config tc)
+> > +{
+> > +	enum trap_behaviour b =3D BEHAVE_HANDLE_LOCALLY;
+> > +
+> > +	return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
+> > +}
+> > +
+> > +bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+> > +{
+> > +	union trap_config tc;
+> > +	enum trap_behaviour b;
+> > +	bool is_read;
+> > +	u32 sysreg;
+> > +	u64 esr;
+> > +
+> > +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> > +		return false;
+> > +
+> > +	esr =3D kvm_vcpu_get_esr(vcpu);
+> > +	sysreg =3D esr_sys64_to_sysreg(esr);
+> > +	is_read =3D (esr & ESR_ELx_SYS64_ISS_DIR_MASK) =3D=3D ESR_ELx_SYS64_I=
+SS_DIR_READ;
+> > +
+> > +	tc =3D get_trap_config(sysreg);
+> > +
+> > +	/*
+> > +	 * A value of 0 for the whole entry means that we know nothing
+> > +	 * for this sysreg, and that it cannot be forwareded. In this
+> forwarded
+
+Fixed.
+
+Thanks again for all your suggestions.
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
