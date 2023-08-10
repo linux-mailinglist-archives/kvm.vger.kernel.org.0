@@ -2,180 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAF5F777CEF
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 17:57:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CDBD777CFA
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 17:58:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236274AbjHJP5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 11:57:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
+        id S236293AbjHJP6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 11:58:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236332AbjHJP5K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 11:57:10 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55BE2112;
-        Thu, 10 Aug 2023 08:57:09 -0700 (PDT)
+        with ESMTP id S234880AbjHJP6a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 11:58:30 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2049.outbound.protection.outlook.com [40.107.102.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB242112
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 08:58:28 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JX3Ps9baebypnVI+ev2DPdzcwsw9qJpEWX0xBS+QOUZhVS5TxUm23AJA3v7PiHVq4zTGBauakiH+U0+151ntWl3S1hQ7nO0mZcG82+4UVZBk/cPm4TIWx30BvqU3+usMbkmK8p/4hClBIeoveRLbqJvHz84GPb/Q7eiYdO0/Bq/A8kfwTM5czSfwT2b/a0kGsDsXjFWA3vDrsn39tnl3RG+u2yFcEeOMTK9aIHRCW6xL+pKloo6hDgPpzTHf3347PBx5ogdJiDW0miuLCuTwvdADrCFsN8HBfNlDeM6HT6InujLBs2TFvmSBSm4sWspVfMESaI4YW+frNnEV3fAmGQ==
+ b=YRIjlYRl4zV5AFc8PjWTVuialD3oF6S/K0wMJb+bDymEsMTz5ecGv3dgN/XbTTgdZiKb1q5PdGPR9DchktoJP9/qWz5Bn2TxnBh37jPxshcHpj7JWMVD64z8AgRJutDA9aJqthJ+yzvmxr83W/Sos7znkg/x2n3VhPqCi3iQdiIQBQO3hlbz9v9IIlNJY2Dg8eYGstlZbxKLMzZGsX99uUS3+VbdzhjKhNUdSf4/kDNPV0gBBntCvvxUbtIGO5mEEk9e3dhiANoVJ/1xIIwGsEijW4lHPVuBgmt28Jpd4qpgqNtvNWYtt55cokwsOumH0wyVxA1gxuiVowGugZ5Hcw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J4WadUE/0c677yqnwhT2LBHCKMtHyc5okxShkY3Uj3o=;
- b=V0RfB4nqiJulJzjlX9axe/ac3MH1kpXjq2xsUElhh0mthApWhD6TAiW3q6l52JTB8eM5+E1XMJhZQF+xyAIqoZqjRi/xeVR2BGxlOp1zOJFrHw0wmPvuog1v6UCHk3MfK130jPMBPQo1dtuhDR56CoY5RnY6SFBlfKS86gEo2nBogev2gXpNPJrl3t317dj/JdcQe8umDYTEOURRhwRf0XGwrCGAVdkWaHjULVP5Pl1ZyeQEg400v2t28hem2CZPmrhSv6PMozQO06pZb3zcejY+ziLaRzhE/26BbViKtinuS3285mujZ8U0tg7eaA5liXToZ+JEjv7x+G8GcyX3iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=lnwCOXXW328VRcJ9DphkQVVDfhk1R5a2Ymu0WuO2BT0=;
+ b=hXlu9/znQXH7EZGaOvLf30Vb2H4QfXA5EASE5Akvcj1dNcOxW9oQIzVMz4uu1WgsSsIPgw9sPL0Qo8n82jGKlZ6wPcrctLX4xkeg12XHh42pf68QvPOZ5nolb/njAZbeDj/AfSCFcZ6Q1d1ZrmWTrZpujgj5mIqB5fFrO9NrUq1bxUEojcm8kD3YsfddLEy7idirpsPU20vJ5U8Sa1RYX5gywQHxWzzi0Mx6SmrIerJ3SgwOvqpwRV1Sw7bh8S70vZq33VjsrxMGs3vhZURn9QERVGkcXntR+XJS4xb+ngZILIawIoFuakiej6bOzvcvIYWqyIyn4DCrxweVZV7nGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J4WadUE/0c677yqnwhT2LBHCKMtHyc5okxShkY3Uj3o=;
- b=VYL2JJRueVUAJkiGXErDYl4eDVWFXxsjpAF3C2PN6gIwL/XsdfY1C+48UuJSB1L2k5P7KH2ZUeG4xuoMmoBIJJQucGvHE2o/1bfxgHnyfIlPJladuI3gLXqxS488UL0W91E3Ev0Y5jGKoSyjFiyRtEDVR/Xwt1ngGB/uVDtCiGKIaI7OCqov15HK2tMEP4XYmDyrZClQxu2cqT6wnK/evOC+V8ZF46RIfYIKiPknqMvuOBqKCPx5+nJIhtwWBbp+0wSy96udtOV3/IZKOe8T3TVNbjmIGq+iGdedvkJuIvCqGYbZhn0z7PQa0Mqm+migTtav/zG8TnuCPbMhvf9Kjw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB8118.namprd12.prod.outlook.com (2603:10b6:806:333::9) with
+ bh=lnwCOXXW328VRcJ9DphkQVVDfhk1R5a2Ymu0WuO2BT0=;
+ b=Wn1tvKke4aMSlRTRt280YqlRIkjLpX9SarFyM3cehgZDxDieDGZ4lPMl5p925KxqiE0djj/sf3+budR4NPnrXGZc5dbl1I9WnnH5kR8s/Yu/YFbopbelwYIPp/cT/X7f1pdWRyHEQ0wY/8QIgWFqXQPU+RxU0Ad/upfdVHbmPE0=
+Received: from CY8PR11CA0005.namprd11.prod.outlook.com (2603:10b6:930:48::18)
+ by SJ2PR12MB8954.namprd12.prod.outlook.com (2603:10b6:a03:541::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 15:57:08 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6652.029; Thu, 10 Aug 2023
- 15:57:08 +0000
-Date:   Thu, 10 Aug 2023 12:57:04 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
-Message-ID: <ZNUI0D7ZMvLWlBNx@nvidia.com>
-References: <ZNJ+Uv/WJwngosjJ@Asurada-Nvidia>
- <BN9PR11MB5276BFFEC7E12EEBD4503BF08C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529C3646E38542457D7B75DC312A@DS0PR11MB7529.namprd11.prod.outlook.com>
- <BN9PR11MB5276912120F662498910A1D48C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <DS0PR11MB7529C310FAEA61B6E7988629C312A@DS0PR11MB7529.namprd11.prod.outlook.com>
- <ZNO92PIx2IQ70+DY@nvidia.com>
- <ZNPlGd4/72dahSs4@Asurada-Nvidia>
- <ZNPmpW3/zDnjqxyU@nvidia.com>
- <ZNP0UKGU6id5wfc6@Asurada-Nvidia>
- <BN9PR11MB527683351B687B97AB84B51B8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527683351B687B97AB84B51B8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: SJ0PR13CA0189.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::14) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+ 2023 15:58:26 +0000
+Received: from CY4PEPF0000E9D4.namprd03.prod.outlook.com
+ (2603:10b6:930:48:cafe::7d) by CY8PR11CA0005.outlook.office365.com
+ (2603:10b6:930:48::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30 via Frontend
+ Transport; Thu, 10 Aug 2023 15:58:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D4.mail.protection.outlook.com (10.167.241.147) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6652.19 via Frontend Transport; Thu, 10 Aug 2023 15:58:26 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 10 Aug
+ 2023 10:58:25 -0500
+Date:   Thu, 10 Aug 2023 10:58:09 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+CC:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Peter Xu <peterx@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        <isaku.yamahata@gmail.com>, <qemu-devel@nongnu.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH 00/19] QEMU gmem implemention
+Message-ID: <20230810155808.eqne5zzb53mirgcw@amd.com>
+References: <20230731162201.271114-1-xiaoyao.li@intel.com>
+ <ZMfmkCQImgsinE6T@redhat.com>
+ <9b3a3e88-21f4-bfd2-a9c3-60a25832e698@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9b3a3e88-21f4-bfd2-a9c3-60a25832e698@intel.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB8118:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ca29f58-6b91-4c0b-e2bb-08db99ba730f
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D4:EE_|SJ2PR12MB8954:EE_
+X-MS-Office365-Filtering-Correlation-Id: e8b86225-9f88-4a0b-03a1-08db99baa1d5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1yjtdrx3o91Auy5VICMVvPwcm3WZFfE+/RHv4XKVvGk1qk4v+cMViWDowQuFOESAEOIpyDdLNyBcUfrmwlGg4vm9FxrwUCVd8o2+lgQjO1ChtaM7xZ99szYdAGyyQsuxkxwhGOqG9krVdWh11uHYR7j3hpYTbm4ws0A6oD3XfQBf/w3uwtWT+RnSfKOvj61InX/WO4snH9gYdDIcavAIWw7kqt2QRnbBywUym3rowoYu4yVZN6OmyPHYDmRVzA9879s8lrnltZkabxGWGys9joVwE7o9FQZYwXEIf6+AoDVj0DjZapAWKQrrdCTIaqs06CLYqMwbNCpOUeYLHcD7SxIgDbCTun2/371VqnwkLk4EZ+wgclz3ymNGBDW7jIotzYVipxlW7VTaQaDHzsTkLIQjmQemTw9/zmpygK8qWIppD+KYDAFCeoSEtpbjVtALeVtLZmQUpUGD85ggZSCOLrtGgI0D27zOA2DZihqtBf4e6bzcztlybv79oTkxsx9gY92NT18cJ2ynbNzkO1hmGvonM9+dyndWlaucljk/okjlcz2jw5Q27PssRg3I+nGV
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(376002)(366004)(346002)(39860400002)(1800799006)(186006)(451199021)(54906003)(36756003)(478600001)(6666004)(66946007)(6916009)(26005)(66476007)(6506007)(66556008)(6512007)(6486002)(4326008)(2906002)(41300700001)(316002)(7416002)(5660300002)(8936002)(8676002)(38100700002)(86362001)(83380400001)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/Vpwbf6o35ih7tkc/SCYREgbX52l3pg5/mH1aUJCdRtkOJQVexA15yF19GnW?=
- =?us-ascii?Q?gxHDFbClprgt5MVJceFuzHH8exIKTl0atGOK1dGBE7nM/HjHYe0Kz3nSWooK?=
- =?us-ascii?Q?yYbJzfQTBu7px44AcsUEUocC7ErFwAij2hgfeAuyZBcL2NeM2JoGl7QfObHC?=
- =?us-ascii?Q?qM1Qo4Qx/DEgFoNOXU4q9PXmHyj0yxCuJt8fC+smuOMr/cKEOLI+ObKnmcJ3?=
- =?us-ascii?Q?IBFl9xlViJ2zZjWZWWN90bGaHjktPSBOUg3L//KflUjQSgZiKmNK6GDq+RvF?=
- =?us-ascii?Q?3j+itTACNRs0zlnmQx6ynwSREV2E3sW0vEhOQVrikgQkRCgCyV9rInxe+ShR?=
- =?us-ascii?Q?0K0yENA66jubM5aLIOWaW4Az4rFCPDhTXfwn7O3VyUn6tPBvN+TVUd6ZIV7d?=
- =?us-ascii?Q?wBYvAZJwINBuRtrjUzqTxfnOeQSSZFJAT5SUtSu48O8vlaNNkZPh32q8QGBn?=
- =?us-ascii?Q?b7wCuehHRBHU36k5Il3mPA5szJCdhuGsGZBWb7c2dNvWyjuYjx/shkM7+o0x?=
- =?us-ascii?Q?ODdUHUCppSty86Au2mGJKvlGRBUKnQ47jH5vTkCLVFA2Cuz10OZSn2l+7VxA?=
- =?us-ascii?Q?LpxxjqmJAdPAJQawlFvIZyHOsdVN0b7M2J/P3bit7WzNLri8Hxhfv3G8MLXG?=
- =?us-ascii?Q?ZfWYCfs0XtxKK1PEJ4PRr6T6gpzvF6wXQSVNSpy1xZCTQJP3MBS0u4tZJabl?=
- =?us-ascii?Q?eA7fzITXws3w1LxJTGK3VND7A9qRjG7QSpeUbmxVfCLc4q2sZLUzbsbNdg4O?=
- =?us-ascii?Q?liKYskqfPjbdSdCJzKBNO5UieP1yWME9VUSplX3EOBwdzlqe9Cd2tlvd8+my?=
- =?us-ascii?Q?pzFEXc+pk8XmGkyCcf5rEn6HCMGt1NeOmQyXJBtw50HcMjcS2fhyTR4L4PgP?=
- =?us-ascii?Q?UiQBHR03+RtYyAsZ8Ql5dpI+cKFMJQpg2s1D6aZNHuimSrIqbm7P1q8rpfx5?=
- =?us-ascii?Q?Vgj+WTFBzJV/kG5AkknF/n8Y4sjvrsfEtDncdmwk/CnVR68ActqKcJwcG+XB?=
- =?us-ascii?Q?6x2AdxDvx/OvHFaWj5GvLccP9h6QEr25NsPNgwo80PD46l9gWN+qC+dcv3ep?=
- =?us-ascii?Q?/L3WFQPJeaJLl0l7v4u3l2tq/lFJe50MBaz6RcGdQ+eowDMYQeCVXnks3mGe?=
- =?us-ascii?Q?tbSPQr2sionNKVnKS+RYKdgrqYACtpGmmYA9PwJkraJrUybAwTICCBRgRfwt?=
- =?us-ascii?Q?oIllzyP4fEHcsi9GfyzQfPequ+1FYaFcvcZO/S+X+P5/r96jAvymkgjhZtkF?=
- =?us-ascii?Q?S57gJ61z5pbKpdb/PV4+3mamPWERmJnpvviYSVdtzHb9ode428mDJrwGHSq1?=
- =?us-ascii?Q?AlPCxRL4evDQGg5bPaYmr1/h7f0mIupTqdCvdjEPQMin829TA/JRusU60f8q?=
- =?us-ascii?Q?hlEnsj7Ugo9W/H6f+c7Psqha3VJV7j7LVhIa6Xv6TaYm0YYTNZaBGmsszGZz?=
- =?us-ascii?Q?IsWMrwCDmfpMeocyc1Zgq/nWe4/0ky+WNvpPdstxLTJpwQ1xjZ++VM6+Hgjh?=
- =?us-ascii?Q?j7S8JLfru0y5ZEPubWT6SO2TAoUS76qEaU2WR7DoSewIqwBVi3jDSL2eOANz?=
- =?us-ascii?Q?AEL72Gqne1Ay+QrYG6D+KE+WsOJg95+Znv29Ph9J?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ca29f58-6b91-4c0b-e2bb-08db99ba730f
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 15:57:07.9159
+X-Microsoft-Antispam-Message-Info: a0xYvPDYb3jG65KkOlXMleFcYQ1dvIIQYc7S1joUZa1APjwisSpNxD+7MoplYl0Dfcg9OWhPHKqX+2SK2Z2N6znh0mP5d7EVQZRarWkccCZU+Unp2WscnVbiR/I6LZJm7l1peEbPaHkmolq+6jLDgp9xd6s5gccv2j89aHiMfjEYcoDBRJ26Q9HhKZtL3OVTxE+gSg8zj1uJ3VZ7eY38C77p1uf3UuClOZP2p+3IouueTEbQEs0HwZAyOPONIJa/YGZFvzy612YmM8sTajI7DcP8CZQTwbENfwZy6eLhDKTji2t6ZGGUkVjeyso7GAPyvUZGUYV43Nqv5vnLz67bTtfqAVU52sxDRjA/zp8E7hurI7pDnS7MdwooH/0W7SZu1B0diANl6G1a53+5ivwSbBUkGjHhXeFMudFJMXNIEagFJHNPw2bG40RrgTkiXCGr6Q7T2g6yNYy3waQjKPC05j8ENdUwTQe6VIHQqjmaa/bcxdpUWluxqKeiU7JAHJwpA+HKZy22AR6jQ0mdFuhstBWqJJ8C4AADbXZUC54I+ZgWQKZ1FNmPRm+e8bzO9gi5tFT8EGmydsCQL9/rWyc371i1V03hI9GmQbBuaYNmOFdvkK1HowvGqPAkgWF2O/z7QLFHn8yympTVv5hX94piIJDS1IjHxPgUz62/o3rDFPnZQfEWaMdYeDRcGzscj3g+AYk3WEn2Klg/J1t9ClZ4SbGirc3Pu+2D66eDQzHEGsu6aTrBa/3w3SxLR0wAmjAZIRgbrJwLFGg2WDaHzxXYuNv8GcB7GgJ8hHykiD0mqYA=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(136003)(346002)(396003)(82310400008)(451199021)(1800799006)(186006)(46966006)(36840700001)(40470700004)(8676002)(8936002)(26005)(53546011)(1076003)(41300700001)(82740400003)(40460700003)(36860700001)(36756003)(47076005)(83380400001)(426003)(2906002)(356005)(81166007)(2616005)(86362001)(44832011)(7416002)(16526019)(336012)(40480700001)(5660300002)(6916009)(70586007)(70206006)(4326008)(966005)(54906003)(478600001)(6666004)(66899021)(316002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 15:58:26.0022
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5IE0DFGoAERbrQCyDYNiUOhtWbxP8FcTEZkuIb5hFuieEz6D2bt8v5xBvFlvia2n
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8118
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: e8b86225-9f88-4a0b-03a1-08db99baa1d5
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D4.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8954
+X-Spam-Status: No, score=-0.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,FORGED_SPF_HELO,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_PASS,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 02:49:59AM +0000, Tian, Kevin wrote:
-> > From: Nicolin Chen <nicolinc@nvidia.com>
-> > Sent: Thursday, August 10, 2023 4:17 AM
+On Tue, Aug 01, 2023 at 09:45:41AM +0800, Xiaoyao Li wrote:
+> On 8/1/2023 12:51 AM, Daniel P. Berrangé wrote:
+> > On Mon, Jul 31, 2023 at 12:21:42PM -0400, Xiaoyao Li wrote:
+> > > This is the first RFC version of enabling KVM gmem[1] as the backend for
+> > > private memory of KVM_X86_PROTECTED_VM.
+> > > 
+> > > It adds the support to create a specific KVM_X86_PROTECTED_VM type VM,
+> > > and introduces 'private' property for memory backend. When the vm type
+> > > is KVM_X86_PROTECTED_VM and memory backend has private enabled as below,
+> > > it will call KVM gmem ioctl to allocate private memory for the backend.
+> > > 
+> > >      $qemu -object memory-backend-ram,id=mem0,size=1G,private=on \
+> > >            -machine q35,kvm-type=sw-protected-vm,memory-backend=mem0 \
+> > > 	  ...
+> > > 
+> > > Unfortunately this patch series fails the boot of OVMF at very early
+> > > stage due to triple fault because KVM doesn't support emulate string IO
+> > > to private memory. We leave it as an open to be discussed.
+> > > 
+> > > There are following design opens that need to be discussed:
+> > > 
+> > > 1. how to determine the vm type?
+> > > 
+> > >     a. like this series, specify the vm type via machine property
+> > >        'kvm-type'
+> > >     b. check the memory backend, if any backend has 'private' property
+> > >        set, the vm-type is set to KVM_X86_PROTECTED_VM.
+> > > 
+> > > 2. whether 'private' property is needed if we choose 1.b as design
+> > > 
+> > >     with 1.b, QEMU can decide whether the memory region needs to be
+> > >     private (allocates gmem fd for it) or not, on its own.
+> > > 
+> > > 3. What is KVM_X86_SW_PROTECTED_VM going to look like? What's the
+> > >     purose of it and what's the requirement on it. I think it's the
+> > >     questions for KVM folks than QEMU folks.
+> > > 
+> > > Any other idea/open/question is welcomed.
+> > > 
+> > > 
+> > > Beside, TDX QEMU implemetation is based on this series to provide
+> > > private gmem for TD private memory, which can be found at [2].
+> > > And it can work corresponding KVM [3] to boot TDX guest.
 > > 
-> > On Wed, Aug 09, 2023 at 04:19:01PM -0300, Jason Gunthorpe wrote:
-> > > On Wed, Aug 09, 2023 at 12:12:25PM -0700, Nicolin Chen wrote:
-> > > > On Wed, Aug 09, 2023 at 01:24:56PM -0300, Jason Gunthorpe wrote:
-> > > > > Similarly for managing the array of invalidation commands.
-> > > >
-> > > > You mean an embedded uptr inside a driver user data struct right?
-> > > > Sure, that should go through the new helper too.
-> > >
-> > > If we are committed that all drivers have to process an array then put
-> > > the array in the top level struct and pass it in the same user_data
-> > > struct and use another helper to allow the driver to iterate through
-> > > it.
+> > We already have a general purpose configuration mechanism for
+> > confidential guests.  The -machine argument has a property
+> > confidential-guest-support=$OBJECT-ID, for pointing to an
+> > object that implements the TYPE_CONFIDENTIAL_GUEST_SUPPORT
+> > interface in QEMU. This is implemented with SEV, PPC PEF
+> > mode, and s390 protvirt.
 > > 
-> > I see. Both VTD and SMMU pass uptr to the arrays of invalidation
-> > commands/requests. The only difference is that SMMU's array is a
-> > ring buffer other than a plain one indexing from the beginning.
-> > But the helper could take two index inputs, which should work for
-> > VTD case too. If another IOMMU driver only supports one request,
-> > rather than a array of requests, we can treat that as a single-
-> > entry array.
+> > I would expect TDX to follow this same design ie
 > > 
+> >      qemu-system-x86_64 \
+> >        -object tdx-guest,id=tdx0,..... \
+> >        -machine q35,confidential-guest-support=tdx0 \
+> >        ...
+> > 
+> > and not require inventing the new 'kvm-type' attribute at least.
 > 
-> I like this approach.
+> yes.
+> 
+> TDX is initialized exactly as the above.
+> 
+> This RFC series introduces the 'kvm-type' for KVM_X86_SW_PROTECTED_VM. It's
+> my fault that forgot to list the option of introducing sw_protected_vm
+> object with CONFIDENTIAL_GUEST_SUPPORT interface.
+> Thanks for Isaku to raise it https://lore.kernel.org/qemu-devel/20230731171041.GB1807130@ls.amr.corp.intel.com/
+> 
+> we can specify KVM_X86_SW_PROTECTED_VM this way:
+> 
+> qemu  \
+>   -object sw-protected,id=swp0,... \
+>   -machine confidential-guest-support=swp0 \
+>   ...
+> 
+> > For the memory backend though, I'm not so sure - possibly that
+> > might be something that still wants an extra property to identify
+> > the type of memory to allocate, since we use memory-backend-ram
+> > for a variety of use cases.  Or it could be an entirely new object
+> > type such as "memory-backend-gmem"
+> 
+> What I want to discuss is whether providing the interface to users to allow
+> them configuring which memory is/can be private. For example, QEMU can do it
+> internally. If users wants a confidential guest, QEMU allocates private gmem
+> for normal RAM automatically.
 
-Do we need to worry about the ring wrap around? It is already the case
-that the VMM has to scan the ring and extract the invalidation
-commands, wouldn't it already just linearize them?
+I think handling it automatically simplifies things a good deal on the
+QEMU side. I think it's still worthwhile to still allow:
 
-Is there a use case for invaliation only SW emulated rings, and do we
-care about optimizing for the wrap around case?
+ -object memory-backend-memfd-private,...
 
-Let's answer those questions before designing something complicated :)
+because it provides a nice mechanism to set up a pair of shared/private
+memfd's to enable hole-punching via fallocate() to avoid doubling memory
+allocations for shared/private. It's also a nice place to control
+potentially-configurable things like:
 
-Jason
+ - whether or not to enable discard/hole-punching
+ - if discard is enabled, whether or not to register the range via
+   RamDiscardManager interface so that VFIO/IOMMU mappings get updated
+   when doing PCI passthrough. SNP relies on this for PCI passthrough
+   when discard is enabled, otherwise DMA occurs to stale mappings of
+   discarded bounce-buffer pages:
+
+     https://github.com/AMDESE/qemu/blob/snp-latest/backends/hostmem-memfd-private.c#L449
+
+But for other memory ranges, it doesn't do a lot of good to rely on
+users to control those via -object memory-backend-memfd-private, since
+QEMU will set up some regions internally, like the UEFI ROM.
+
+It also isn't ideal for QEMU itself to internally control what
+should/shouldn't be set up with a backing guest_memfd, because some
+guest kernels do weird stuff, like scan for ROM regions in areas that
+guest kernels might have mapped as encrypted in guest page table. You
+can consider them to be guest bugs, but even current SNP-capable
+kernels exhibit this behavior and if the guest wants to do dumb stuff
+QEMU should let it.
+
+But for these latter 2 cases, it doesn't make sense to attempt to do
+any sort of discarding of backing pages since it doesn't make sense to
+discard ROM pages.
+
+So I think it makes sense to just set up the gmemfd automatically across
+the board internally, and keep memory-backend-memfd-private around
+purely as a way to control/configure discardable memory.
+
+-Mike
+
+> 
+> 
