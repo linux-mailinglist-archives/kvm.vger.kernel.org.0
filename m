@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02C2577810B
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 21:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A7C4778150
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 21:19:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236275AbjHJTJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 15:09:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41308 "EHLO
+        id S231426AbjHJTTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 15:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235853AbjHJTJG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 15:09:06 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0799E2717
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:09:06 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-4085ee5b1e6so11501831cf.0
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:09:05 -0700 (PDT)
+        with ESMTP id S232426AbjHJTS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 15:18:57 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53BCD2D43
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:18:56 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-63d30554eefso7928746d6.3
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:18:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691694545; x=1692299345;
+        d=ziepe.ca; s=google; t=1691695135; x=1692299935;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBsV6+ts68b3MCiRcACqm+YmuoRBitbyDh+1vB9eOfo=;
-        b=COIcEt0fqX73UeUlZllLXQvgTUm3SxDi7CEN7pJgTWDiV+EDp5lJjGdEZeRwUo8ba7
-         PXaBP/ouioLF1NT142OLFuwkskZeDbXO8am2iRGaWKue9antxAodqBhuD/TywtShnwKD
-         EGXqkqzWvQkbkbBw8ZPH3qHUIhOe/Z0FBdAvip6DPUp9uImmcB6DzdEwjuuqM4o5+eRk
-         6i+/8cV93o0QKwhzUWti9awORJDqxqI09xY3Vnp8k7T2mOEdS8GrO2BaWkkmPvmXPR1F
-         vjigqQ/CjxJhRXstDjJ8WoCVpCjWxVK9jAQ0airFucBdnmarCSvz80ZZGhCT3+IBIIPh
-         TODA==
+        bh=6nK40dlXSEtV9j+1clrTX2RCnnQWiTsk3pHmbVPkUwY=;
+        b=VmBkafl1u25d2ecLyUc29ulrsvOSkhhEKJzuIU93CMtsoCspLy4ihE6XAu6q0FKV7H
+         7LnJGstvlp0byYFZseM2BaVUeXnNZLL+R2jOlaxU4o1Ud/nwJDZ3AlwHHAWddr1hdDAg
+         8Alv1t72xMjHMEMMtHU9bWogP2hPkCqxEH22qnX5LDAMnjcCIdacsNJpfbyNjw80iyd3
+         0Xa721kMEsJQYgnTNhLDNMaDAoCHiSoBnKuy0rN8Z+NmXMYhiCdRQJSBHOdZ5K2x7LBG
+         538LpY5D5oj+OGHc81pQ5kls8HpXumbdw5zvGYkIXTJUyb1xkQ++ypNWCPge9FRsMSvh
+         zm7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691694545; x=1692299345;
+        d=1e100.net; s=20221208; t=1691695135; x=1692299935;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OBsV6+ts68b3MCiRcACqm+YmuoRBitbyDh+1vB9eOfo=;
-        b=dT6l6aywxbvtPUDjtHXbWGmFm/eSR9WzqRIsDNV/njwA2LaBHIgjsGaQ9bpFKxcJel
-         nCdbFOprzZiH2/OC/+sJ7KNT0i+AAIRo6S7/seJ7Gr8xEnmRS8Teaemu11TBMT7WE5Xp
-         11JTzRWdk4LA3BQWBDqzFRl8mCokAf+2BnZAHY+7B4hIEQLjWC6rnkwqCURld9QzmT9x
-         1Codz+bbkQqr5Lq9Uierq/StZnpNjAjtapJHVriWC8VOKyofU5U80axx3MnIuv46fhtK
-         YSk3NFxxIP0ouXh/5noYhGwCcN2eOVZoVZOItzKVltkLadsMAasnEHPfFj4PpUOmgj8j
-         tsOQ==
-X-Gm-Message-State: AOJu0Yx46jCkFfkIjhF+5dFE+xEtFECk9MjngI8dquejXJwdY+KG+yXk
-        MtN6+7F+4Juw7d7sssmymGZ5wA==
-X-Google-Smtp-Source: AGHT+IGbRBMB1G0DgtrN1Ti5jWBuKV+GQrt2F3rx7SFZCKQn9VB73jXia/E3+tJJ4ZW9NFFbohJcag==
-X-Received: by 2002:a0c:f04c:0:b0:635:ea31:521a with SMTP id b12-20020a0cf04c000000b00635ea31521amr3605192qvl.7.1691694545156;
-        Thu, 10 Aug 2023 12:09:05 -0700 (PDT)
+        bh=6nK40dlXSEtV9j+1clrTX2RCnnQWiTsk3pHmbVPkUwY=;
+        b=AcUCJkHr76CnV5st3XXgCaEawC1jdhLCImcGlQYfee1QQb9XkRxAhu0XROSJaK6FH/
+         dMtcp91RfK/MYV8tED9fDDIQCyAEbluzEsT52MbhjCM5vYM+eSGiWqm5fuO39DVo5gK8
+         CSosslMUuzDRmk5RwUKUyMm+k/9otvakml5KNXbWFRTYdSeMll0t//K6aO/9VS+I3fjr
+         Rf3odXty4CA/RBrFf0cETeYMlitri6ESyX6YE3zvjDMxYY5mbYkDxar++mD59ojnT6Vx
+         IWsLwiIxrnAflG5T1bILFz6a8KOPLTVzEl4tfQHPoUvZtEXJl0CsyL0qv6zYQ0uIyOoX
+         6iCw==
+X-Gm-Message-State: AOJu0YxzQc1PBf6hOL5uqVaNGoNpoZ9orxARkraCQJEhcYwo4CuHr7Ba
+        yKYtMdOyZLsPVhNf3t7KDb0wcA==
+X-Google-Smtp-Source: AGHT+IHH4IrROTfTjO5eB3vOPq41MQjpTBHKBaN/zPPR2N44/sTFeqgtLodbzZoyZt1KMjgv18nz0g==
+X-Received: by 2002:a05:6214:15c3:b0:635:e528:5213 with SMTP id p3-20020a05621415c300b00635e5285213mr3435331qvz.23.1691695135500;
+        Thu, 10 Aug 2023 12:18:55 -0700 (PDT)
 Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id l17-20020a0ce091000000b0061b5dbf1994sm659891qvk.146.2023.08.10.12.09.03
+        by smtp.gmail.com with ESMTPSA id i9-20020a0cab49000000b0063d316af55csm694456qvb.3.2023.08.10.12.18.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 12:09:04 -0700 (PDT)
+        Thu, 10 Aug 2023 12:18:54 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
         (envelope-from <jgg@ziepe.ca>)
-        id 1qUB1r-005IlP-2Y;
-        Thu, 10 Aug 2023 16:09:03 -0300
-Date:   Thu, 10 Aug 2023 16:09:03 -0300
+        id 1qUBBO-005Ips-5n;
+        Thu, 10 Aug 2023 16:18:54 -0300
+Date:   Thu, 10 Aug 2023 16:18:54 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Lu Baolu <baolu.lu@linux.intel.com>
 Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
@@ -64,15 +64,14 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         iommu@lists.linux.dev, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 11/12] iommu: Separate SVA and IOPF in Makefile and
- Kconfig
-Message-ID: <ZNU1zw1PDs6z9nv4@ziepe.ca>
+Subject: Re: [PATCH v2 12/12] iommu: Add helper to set iopf handler for domain
+Message-ID: <ZNU4Hio8oAHH8RLn@ziepe.ca>
 References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
- <20230727054837.147050-12-baolu.lu@linux.intel.com>
+ <20230727054837.147050-13-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230727054837.147050-12-baolu.lu@linux.intel.com>
+In-Reply-To: <20230727054837.147050-13-baolu.lu@linux.intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
@@ -83,30 +82,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 01:48:36PM +0800, Lu Baolu wrote:
-> Add CONFIG_IOMMU_IOPF for page fault handling framework and select it
-> from its real consumer. Move iopf function declaration from iommu-sva.h
-> to iommu.h and remove iommu-sva.h as it's empty now.
+On Thu, Jul 27, 2023 at 01:48:37PM +0800, Lu Baolu wrote:
+> To avoid open code everywhere.
 > 
 > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 > ---
->  include/linux/iommu.h                         | 63 +++++++++++++++
->  drivers/iommu/iommu-sva.h                     | 80 -------------------
->  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  1 -
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  1 -
->  drivers/iommu/intel/iommu.c                   |  1 -
->  drivers/iommu/intel/svm.c                     |  1 -
->  drivers/iommu/iommu-sva.c                     |  3 +-
->  drivers/iommu/iommu.c                         |  2 -
->  drivers/iommu/Kconfig                         |  4 +
->  drivers/iommu/Makefile                        |  3 +-
->  drivers/iommu/intel/Kconfig                   |  1 +
->  11 files changed, 71 insertions(+), 89 deletions(-)
->  delete mode 100644 drivers/iommu/iommu-sva.h
+>  include/linux/iommu.h | 11 ++++++++++-
+>  drivers/iommu/iommu.c | 20 ++++++++++++++++++--
+>  2 files changed, 28 insertions(+), 3 deletions(-)
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Seems like overkill at this point..
 
-At some point it would be a nice touch to split iommu.h into the
-consumer and iommu driver interfaces
+Also, I think this is probably upside down.
+
+We want to create the domains as fault enabled in the first place.
+
+A fault enabled domain should never be attached to something that
+cannot support faults. It should also not support changing the fault
+handler while it exists.
+
+Thus at the creation point would be the time to supply the fault handler
+as part of requesting faulting.
+
+Taking an existing domain and making it faulting enabled is going to
+be really messy in all the corner cases.
+
+My advice (and Robin will probably hate me), is to define a new op:
+
+struct domain_alloc_paging_args {
+       struct fault_handler *fault_handler;
+       void *fault_data
+};
+
+struct iommu_domain *domain_alloc_paging2(struct device *dev, struct
+       domain_alloc_paging_args *args)
+
+The point would be to leave the majority of drivers using the
+simplified, core assisted, domain_alloc_paging() interface and they
+just don't have to touch any of this stuff at all.
+
+Obviously if handler is given then the domain will be initialized as
+faulting.
 
 Jason
