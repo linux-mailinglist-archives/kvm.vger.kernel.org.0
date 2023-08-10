@@ -2,151 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA68A778450
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:50:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C4F1778459
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:53:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233190AbjHJXt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 19:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47098 "EHLO
+        id S229998AbjHJXx2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 19:53:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233108AbjHJXt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 19:49:26 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F359D2D53
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:49:24 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-26957018988so1712353a91.0
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691711364; x=1692316164;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=WMPe2NIMjXJcWowFfDwErjX/zalQdCmsflMWWEEOcuo=;
-        b=d7jjy5/AjtnCGxszuB7lAloMbDsavS+OxL1L+9ajnm5Qz/Y41Z1HgawGVsunTUS3xB
-         dqcAxCYwbvgbMRbN0nW3VCxeCNJkAUonDBIq7bfmj3bpZcxYkXpflWcNEgD2rTCkap+T
-         IePqZu8IGKglgFlO74RS9KRjymGEQb8S/NFO/hVu19GnxTYtwH0AUY/So2DEapA7nvha
-         Tht7/Q3vLjDfkl9g2FmxocBIfgE95sWGpDfRjHgcpYNKXdlr1/YbB7eYq+rmdlVinP9+
-         BCTcd4/s2uOMlfXjfgoVPnPZsZego0tS/+3I7sRNhkUPL/Dp4/0oPN/SH/YFiyY0VNrL
-         3A2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691711364; x=1692316164;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WMPe2NIMjXJcWowFfDwErjX/zalQdCmsflMWWEEOcuo=;
-        b=TnwRgLWRy7GUilAFZIlEal4hAqJudJm6znOKf/3OmTw9B/WqyfO26UKcF4rg85ML2y
-         jAUtTG76EC2m4PQwfIIiFeEANCKPETg9ebbXo5rnBUjwOkLf5jL2RDWqcylHdhgk5YRh
-         TSFkuAxTS7vptBV9rUmbxeVH1oNE5dWaKqkZkWhZ6Lx+6br6+982Iv1t1dIzEhJcyNfn
-         FTyX747KRf5w6j832ssJ6FBpVrP1honRptzrg3d86V7tpWdZiHM+H56iMclQRcpiw5Eh
-         IkF7vY/upJlWWgfVWXpel10jmN7FvvuyAat6ZekBDXmi5qsFdOxAF/mqWHcQQDtpJt6j
-         RKoQ==
-X-Gm-Message-State: AOJu0YwPSQc9M5bDEA7hBQWxO9pu7vHKHfax1y+YapxyQcyx7vlFSy0U
-        t9n6Txihy8gijGsJgpvh7Ei/VBsbAsU=
-X-Google-Smtp-Source: AGHT+IF5dfV2psEnzrif/xrVyroYLVg73dtvIBZ1EpixRBC1zh3pE/e8lsfgLte3lNjKoBQFP1xsiuWzrSQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4009:b0:26b:dcc:eea0 with SMTP id
- ie9-20020a17090b400900b0026b0dcceea0mr11392pjb.9.1691711364542; Thu, 10 Aug
- 2023 16:49:24 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 10 Aug 2023 16:49:18 -0700
-In-Reply-To: <20230810234919.145474-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230810234919.145474-1-seanjc@google.com>
-X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230810234919.145474-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: SVM: Require nrips support for SEV guests (and beyond)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wu Zongyo <wuzongyo@mail.ustc.edu.cn>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229580AbjHJXx1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 19:53:27 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A853526BC;
+        Thu, 10 Aug 2023 16:53:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691711606; x=1723247606;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=5JIN1Yu4mUkxQTHvXnfAGLOJxcyhh/wZyopkkYQtIuo=;
+  b=ix9GZsVn6x/6OELVvd7FHj+YyLU6uWn93NnF4ShO54pUvaK8TgoatOOl
+   6bCyujTRLYoAnBWAHJ7HXYvvVBsUW0JDj8SfKxvEw/+8Q2JviYkIDMA9L
+   mJ4vtwyRPT0IjsR/MnzBPWsAHweHtbm0oo32HlFgTIIAnrRX5ONTqhLI3
+   flDLJkn8utBlPPRKwCpVoPePvYV2pyEJQm8iR8UYiBJOb+qOauanHgVOn
+   V+8tZgAjZs3rkQdXfOzsrHvtFrEHlJm3mvcImMlUIcHwYviv6hW8kJeOP
+   /D4r0VMP6XvGQheYVRxdBAIj9wOwk4RCPrOZYBW8HoG1FQ6kvJ3i5jjya
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="351872279"
+X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
+   d="scan'208";a="351872279"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 16:53:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="856092397"
+X-IronPort-AV: E=Sophos;i="6.01,163,1684825200"; 
+   d="scan'208";a="856092397"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 10 Aug 2023 16:53:24 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qUFT1-0007LM-0U;
+        Thu, 10 Aug 2023 23:53:23 +0000
+Date:   Fri, 11 Aug 2023 07:53:04 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [mst-vhost:vhost 34/46] drivers/vdpa/vdpa_user/vduse_dev.c:1812:23:
+ error: use of undeclared identifier 'VIRTIO_RING_F_INDIRECT_DESC'
+Message-ID: <202308110712.wCQoOG00-lkp@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disallow SEV (and beyond) if nrips is disabled via module param, as KVM
-can't read guest memory to partially emulate and skip an instruction.  All
-CPUs that support SEV support NRIPS, i.e. this is purely stopping the user
-from shooting themselves in the foot.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   bb59e1f960bd07f70a4b3d8de99bfd8d71835199
+commit: 334f48a83105ebe129a660d1ea1a0c29f87d50c7 [34/46] vduse: Temporarily disable control queue features
+config: x86_64-buildonly-randconfig-r001-20230811 (https://download.01.org/0day-ci/archive/20230811/202308110712.wCQoOG00-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20230811/202308110712.wCQoOG00-lkp@intel.com/reproduce)
 
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c |  2 +-
- arch/x86/kvm/svm/svm.c | 11 ++++-------
- arch/x86/kvm/svm/svm.h |  1 +
- 3 files changed, 6 insertions(+), 8 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308110712.wCQoOG00-lkp@intel.com/
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 2cd15783dfb9..8ce9ffc8709e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2185,7 +2185,7 @@ void __init sev_hardware_setup(void)
- 	bool sev_es_supported = false;
- 	bool sev_supported = false;
- 
--	if (!sev_enabled || !npt_enabled)
-+	if (!sev_enabled || !npt_enabled || !nrips)
- 		goto out;
- 
- 	/*
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 581958c9dd4d..7cb5ef5835c2 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -202,7 +202,7 @@ static int nested = true;
- module_param(nested, int, S_IRUGO);
- 
- /* enable/disable Next RIP Save */
--static int nrips = true;
-+int nrips = true;
- module_param(nrips, int, 0444);
- 
- /* enable/disable Virtual VMLOAD VMSAVE */
-@@ -5191,9 +5191,11 @@ static __init int svm_hardware_setup(void)
- 
- 	svm_adjust_mmio_mask();
- 
-+	nrips = nrips && boot_cpu_has(X86_FEATURE_NRIPS);
-+
- 	/*
- 	 * Note, SEV setup consumes npt_enabled and enable_mmio_caching (which
--	 * may be modified by svm_adjust_mmio_mask()).
-+	 * may be modified by svm_adjust_mmio_mask()), as well as nrips.
- 	 */
- 	sev_hardware_setup();
- 
-@@ -5205,11 +5207,6 @@ static __init int svm_hardware_setup(void)
- 			goto err;
- 	}
- 
--	if (nrips) {
--		if (!boot_cpu_has(X86_FEATURE_NRIPS))
--			nrips = false;
--	}
--
- 	enable_apicv = avic = avic && avic_hardware_setup();
- 
- 	if (!enable_apicv) {
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 2237230aad98..860511276087 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -34,6 +34,7 @@
- #define MSRPM_OFFSETS	32
- extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
-+extern int nrips;
- extern int vgif;
- extern bool intercept_smi;
- extern bool x2avic_enabled;
+All errors (new ones prefixed by >>):
+
+>> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_RING_F_INDIRECT_DESC'
+                   config->features &= VDUSE_NET_VALID_FEATURES_MASK;
+                                       ^
+   drivers/vdpa/vdpa_user/vduse_dev.c:66:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
+            BIT_ULL(VIRTIO_RING_F_INDIRECT_DESC) | \
+                    ^
+>> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_F_EVENT_IDX'
+   drivers/vdpa/vdpa_user/vduse_dev.c:67:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
+            BIT_ULL(VIRTIO_F_EVENT_IDX) |          \
+                    ^
+>> drivers/vdpa/vdpa_user/vduse_dev.c:1812:23: error: use of undeclared identifier 'VIRTIO_F_IOMMU_PLATFORM'
+   drivers/vdpa/vdpa_user/vduse_dev.c:69:11: note: expanded from macro 'VDUSE_NET_VALID_FEATURES_MASK'
+            BIT_ULL(VIRTIO_F_IOMMU_PLATFORM) |     \
+                    ^
+   drivers/vdpa/vdpa_user/vduse_dev.c:2007:51: warning: shift count >= width of type [-Wshift-count-overflow]
+           ret = dma_set_mask_and_coherent(&vdev->vdpa.dev, DMA_BIT_MASK(64));
+                                                            ^~~~~~~~~~~~~~~~
+   include/linux/dma-mapping.h:77:54: note: expanded from macro 'DMA_BIT_MASK'
+   #define DMA_BIT_MASK(n) (((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
+                                                        ^ ~~~
+   1 warning and 3 errors generated.
+
+
+vim +/VIRTIO_RING_F_INDIRECT_DESC +1812 drivers/vdpa/vdpa_user/vduse_dev.c
+
+  1804	
+  1805	static void vduse_dev_features_filter(struct vduse_dev_config *config)
+  1806	{
+  1807		/*
+  1808		 * Temporarily filter out virtio-net's control virtqueue and features
+  1809		 * that depend on it while CVQ is being made more robust for VDUSE.
+  1810		 */
+  1811		if (config->device_id == VIRTIO_ID_NET)
+> 1812			config->features &= VDUSE_NET_VALID_FEATURES_MASK;
+  1813	}
+  1814	
+
 -- 
-2.41.0.694.ge786442a9b-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
