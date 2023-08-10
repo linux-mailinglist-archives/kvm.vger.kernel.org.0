@@ -2,188 +2,305 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EA2F776D65
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 03:13:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A191F776D80
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 03:28:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231548AbjHJBNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 9 Aug 2023 21:13:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39070 "EHLO
+        id S230311AbjHJB2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 9 Aug 2023 21:28:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjHJBNA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 9 Aug 2023 21:13:00 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9757D1982;
-        Wed,  9 Aug 2023 18:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691629978; x=1723165978;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/nAufynBZRyBgfUmD4dTXkv4pt+JgALQ0I2KxmVtz1I=;
-  b=eJtCnKwTFFWfyVi+Wjc/fi+1PzuqfQILMtuu2FWguBFqQNFa1ASZ8pdz
-   3Zkdv1nA9+RUGONCE8eAP8U32ajmNpOlRcLLF2fAuED3w2YsqNPC9yFTQ
-   FT6mHQzUFbQTGjkCdxlpFW58b3lhiM/hv5+0wrT4fwNDsnR2UEgNNwlbb
-   YaFZbN2+GYMlDGs66YbuUcEuvVPF654pIP3hxepnJcQ7XYG8cDtl0lZPP
-   atqR7u7Gm/BKMqITRpzYqlHVchM24FyNSSJLbTPQoh4QuciLkz72dI8t+
-   WMpQmHqWD35v7QZX4ieAqQmr+s945uXEmPoooSy97aAwvF9iHEz4MQ3pa
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="402228561"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="402228561"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2023 18:12:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="801967758"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="801967758"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga004.fm.intel.com with ESMTP; 09 Aug 2023 18:12:57 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 9 Aug 2023 18:12:57 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 9 Aug 2023 18:12:57 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 9 Aug 2023 18:12:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mRKyLyDuHCFzIpLOHeZaFnCg+B54b0tw7Qok69uKSUCboJjK5W1LvsOhCowxbJwc+FMSTY5usg7pDPnaA2WKjava0J5h2KdhKSJDKR1A+HirKmlQMehBmmTW5iY93x5Za24UU6W3OwWMa5WcyXcEWUrkVr8N/3NxYP/gC6zHVCCANLe3Pno1x7udD7p/pP+9tPuRimlRWGm1eyKrux9zOP0SpQqslghPE8XB2ig2A8M2n/pr6F/b9kErdYByGKS8beR0t8dKnBRbuuYosCsmSbVIi+S/N75Fy56Gbzb19lds+E3kchF8FPRBuwsZZ+sIQaYRTJu5MBKABjhfWJvR3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TmhFEd5OlAYyBtyFZaDK1HTwjEiA8tzXFyZgMy33nuQ=;
- b=lTm4A5Ve24DUOS4M3dyVKn259I8mAZPYshilLDXA1p2xOifb37lel+G1YZsfT1nq9sjs5VI9iT5rWAqEG8QxseWCmPKBmKDuiE/ntwbr0o5sSW5ydyDve00eNPeMU9xMRS8LC2mIMYDgoZicZnKt43e9BDm/E7vs5RuO1j0NLzlslBdjchLL12NECT3ynB1688Bov4M5x/s23z5DI63IcxOq4P7Zip7dDZcRU06KDv9zeenxigrC9Wkww4crkFQX5huITIqkCb5XqBwkiYap+Lf0E3aINoDLBFENQ74McnohlRRmUB7Cl/pEHeJfobQ4GPBKyEfK5qj9UdvM9RQ1Vg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by CY8PR11MB7778.namprd11.prod.outlook.com (2603:10b6:930:76::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
- 2023 01:12:54 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::94f8:4717:4e7c:2c6b]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::94f8:4717:4e7c:2c6b%6]) with mapi id 15.20.6652.028; Thu, 10 Aug 2023
- 01:12:54 +0000
-Message-ID: <839913af-a511-19fe-919e-733f080196ea@intel.com>
-Date:   Thu, 10 Aug 2023 09:12:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v5 04/19] KVM:x86: Refresh CPUID on write to guest
- MSR_IA32_XSS
-To:     Paolo Bonzini <pbonzini@redhat.com>
-CC:     Sean Christopherson <seanjc@google.com>, <peterz@infradead.org>,
-        <john.allen@amd.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <rick.p.edgecombe@intel.com>,
-        <chao.gao@intel.com>, <binbin.wu@linux.intel.com>,
-        Zhang Yi Z <yi.z.zhang@linux.intel.com>
-References: <20230803042732.88515-1-weijiang.yang@intel.com>
- <20230803042732.88515-5-weijiang.yang@intel.com>
- <ZM1C+ILRMCfzJxx7@google.com>
- <0655c963-78e5-62c9-50af-20d9de8a1001@intel.com>
- <CABgObfbvr8F8g5hJN6jn95m7u7m2+8ACkqO25KAZwRmJ9AncZg@mail.gmail.com>
-Content-Language: en-US
-From:   "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <CABgObfbvr8F8g5hJN6jn95m7u7m2+8ACkqO25KAZwRmJ9AncZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: KL1PR01CA0065.apcprd01.prod.exchangelabs.com
- (2603:1096:820:5::29) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+        with ESMTP id S229480AbjHJB17 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 9 Aug 2023 21:27:59 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC98910D8
+        for <kvm@vger.kernel.org>; Wed,  9 Aug 2023 18:27:58 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 76E2584;
+        Wed,  9 Aug 2023 18:27:58 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id vA-9mPaNRAFV; Wed,  9 Aug 2023 18:27:57 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id C82C140;
+        Wed,  9 Aug 2023 18:27:56 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net C82C140
+Date:   Wed, 9 Aug 2023 18:27:56 -0700 (PDT)
+From:   Eric Wheeler <kvm@lists.ewheeler.net>
+To:     Sean Christopherson <seanjc@google.com>
+cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Subject: Re: Deadlock due to EPT_VIOLATION
+In-Reply-To: <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
+Message-ID: <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net>
+References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com> <ZLrCUkwot/yiVC8T@google.com> <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com> <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+ <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com> <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com> <ZNJ2V2vRXckMwPX2@google.com>
+ <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|CY8PR11MB7778:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2c76ee3-b37c-4b69-a4d7-08db993eecbb
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cvDxLNUvk9zAaKLmhyM33tmaP6MRioA9l5LS3v9cJ7PXhmfQtO8oynTer0MUMst2Lz6Nw7yrxOlZae2wL7nXsZ5iMBpVnIfYm6LEsFJpfFUztvVZGbaXX/nbj4qIVUhdpS46ehM4YeK/vxhbm7czFbADv2w3Wr4MBT1LeCGEYd6LqKh/FFW7m/1pjxRBAB+o5ip559y/6vgUOC31nDDvqO2p2HBAndAKiiNBdsJdvW80qGB+im2wzlduHEWeSppJOf4MFquMThiAZEv0Q+NF0iC+0DXmd13f1YLHYgMmyiY3qyksk3SW0w+cAZEK+5TAALe4vjvOM/esWqjfgQdmEw68jgHDDDUI5iX0mcK7AfU4BO8zrkaGcJaPCw6C6OsSkjrBoF6glP9IQK46WJvnesy9pf7n/HREpgnH4NM3O41HCh9te+tiZdrRB+/bSPUtlKjPJufD3BZDUmLjE07mbbvl5T4tpNNUdE+cT01WXukm1lpRyYU0r+WeOwKa+5yIdXuml54YTG6KZYUtW0GbXX2aIMVb1FX0bRexKrIc7/15EsLNB31kjnPi1qMDfH99uG9Z57oPpW0DaSJCYXBNdKTift/3+jWaSVW/xXSjiQqajySYsvCzSPmdaz/y0kQUFfFY4WC7U4gintTOw5sVRA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(366004)(346002)(396003)(39860400002)(136003)(1800799006)(186006)(451199021)(5660300002)(8676002)(41300700001)(31686004)(6916009)(66476007)(66946007)(4326008)(66556008)(316002)(2906002)(54906003)(8936002)(6666004)(6486002)(478600001)(6506007)(82960400001)(26005)(53546011)(6512007)(83380400001)(36756003)(2616005)(38100700002)(31696002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dm5zT3BUZUNpL3lHZTRKejVrL05FMlZwZzRzbjE5M3crNExLYXh4K1BhMXB4?=
- =?utf-8?B?UzdiMC9rT3ptR1FjckRyUC9QcVZsNlY2OXRJallBV3BWUlUxZVkvSDlRVENy?=
- =?utf-8?B?Y05tTzgrWHhheG9kQmh4N2RHa3JoMVZyR25hRHNYRHBCd0ZhTXljUVhHOW5M?=
- =?utf-8?B?cm11V3RKNmNJenBra095dUE0RTB4bnl5NW1iK0tnbWlxSXNSbkhObVo1QmJz?=
- =?utf-8?B?aEFqMFM5NUtVZEplU1g2RVpndlh2SlpweDY0ZVZsWEJld3l4a2dmZ2k5NnVI?=
- =?utf-8?B?d3h4ZmM3UjVPZjhZb24ycUt6Z0lRdjlOcXMwdXNZMUNSeXU5eFJ6NTVoZld4?=
- =?utf-8?B?UWlFV3piakRzUFdLVWczRWphWGtqdlJ5dGxuTTFteXBFZFpBSzA3MmVKTGZX?=
- =?utf-8?B?WmZBd051N3JMTThUbms2L2xXU1RqS1JQeUFCVE51OWREVlkxMEhSZTErYnVC?=
- =?utf-8?B?eVphUXFYTWdnUlFpbTJLbHJOUzNqVWNmVHRYaU1DNHRYUmIwOGw3RHM4WnIx?=
- =?utf-8?B?VjB3QkJFc3pEU0dxckFrOTd4NEZ1WmJPcFR3UGR1MXFTYXNjOFI0cUpRSHk2?=
- =?utf-8?B?a3VLeWl1REZnTE5KMzlvTE93T1N5c1ptSzVXT0h6S2xrcHAwRGp1ZFFJdGNq?=
- =?utf-8?B?NFBPWnJpSFdkMXRJT2JsUmxyanJSdEF3UjJWUjc2ODhIdTZqa1NYSEsxeTls?=
- =?utf-8?B?ZVdXU0lkdk1DSDlZVVBZdjlITTdsRkJ5RFhmQVczUU5JYWg4WTVlTElhWGh0?=
- =?utf-8?B?RElvcDVVVmppVjZUdUFPZUdabVRoVzRhclRsVHdhWWxnRnNqWkJ4K2ptdUNZ?=
- =?utf-8?B?SWFYQSsrNXM1K1UyV1ZvbnMxdm83VEI2Vmdxd0UweFFiLzNhbDJsMlNUS2lD?=
- =?utf-8?B?b1RUaFk4TUxTQ2NJUXp4bFBNOFlVRjYzTXJtdWlDbVAyNTdhallYdlpIY2FO?=
- =?utf-8?B?eDJuNGhnZVF1b25uM2hqYjNaZWFoaS9DY0xnUzNUMnNpTkNLNG4zWjBtQzJF?=
- =?utf-8?B?bmxiQlFodi9GUUFqNk1sZGZNQnNvdUgxTXR2bUpZYnZrS0ZqOW8vUFJza1pV?=
- =?utf-8?B?T3hKUmtYd3dHVlEzNU96R0szR1R3QTNWVWdzMkdkVmw1YXlSWDZnYTdwakR2?=
- =?utf-8?B?d3UzWEVPZnRXUDU3amNBc3BhMWhjME5mK2FQRkNDSERMTSt1Zk9aaEx4bDJ6?=
- =?utf-8?B?NmNheDlZZDB5SDZDVS9PcERpLy9GaGZFV3F2YVptaWVFWFU2bmtYM3k3b3Fk?=
- =?utf-8?B?bHptSVB2bFNJNVA4T0hlWVdLMVJja1MwZlp6NTAzQUJYTHY5WFRETWFYZFR4?=
- =?utf-8?B?L3Vibi9HTlN5ek5LdzR2Z3p2Rm9xNmozMkI2dHF1aVdtMTZOL2swMVU2RGVj?=
- =?utf-8?B?MjlKeWlZa0cwVlY0aDYrcExaS0dnY0JhK0c1dVkzb1FBK0x0ZTRLbllYK2hx?=
- =?utf-8?B?QldFNzNMK1NEeWpKNlIyOGxvenhzVzhWREdkN0g2WS91ZWdBa1BENXZSSWVD?=
- =?utf-8?B?SkFyVVJGeW55M1Jkb2RpZm1td3V1bmVXK2hOZkVTUkpTaDc5cmZTSDNaRzAv?=
- =?utf-8?B?K2ZEY3g1ek9SMHo3ajY5RGV6QzdnaGdnVzJrcEFHckovZTF6RlRxL1E3aDVs?=
- =?utf-8?B?L2szNDZMK0ZNWWFOdHY1Z3R5UUpQY2VENEV4OEJudmtHWlBNQyt2OUZvUVVr?=
- =?utf-8?B?K1N0Y1hWVW16YWsxRXZhUkpXbUVmRkxCQ1VGQkZBRTBYVDYwQlk3aXZucjhr?=
- =?utf-8?B?Y1hKNTZ2TGNhYlByMnVyWnF5Z2NGUStmQ3o1VTROR0F1d29jQ0lwNG4wdEl1?=
- =?utf-8?B?YXpyRFkwT0s3bklGYmZYZ2EvSTZyb0VCUjgzODlFNTA2V0x6QitldG8zT0pR?=
- =?utf-8?B?S1JrVjd4ZXRuQVJxdXlPMEtadlBlRzFjOFpkRndJMGtJM2MwL0xGZXI3aDZF?=
- =?utf-8?B?Sm1hZUladFFUZ050a0ZzMUFCNXpvbVQrUW9Dd0hTbUppY0wxWVcrdGtZQ2ZO?=
- =?utf-8?B?UVA0RWxJN3pUamgxc0ZhUHN1VUcxMkhXUjk2SHlUNXUyRjRKOHRQTkNnTWNL?=
- =?utf-8?B?akluTFd0a2pzOWZoZHF2bkd3TFJxcmh5ZHJyNWd6anBjbjNRajJadStQWEs4?=
- =?utf-8?B?dE1CNGhFSG5oUGxjcUFtaERUVCs3ZFJkdGMyQ3JPTDd2OWo1NFdFa3hrb0py?=
- =?utf-8?B?SGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2c76ee3-b37c-4b69-a4d7-08db993eecbb
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 01:12:54.5527
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LqIfOhkIlxiKJP1LGe8WHTMduKvmihsvbP6IXIKBI4CT4Yjp/dUPViHo/yh2JLZEmKe0lSZBCksbuejGR+Dz7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7778
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/10/2023 8:01 AM, Paolo Bonzini wrote:
-> On Wed, Aug 9, 2023 at 10:56 AM Yang, Weijiang <weijiang.yang@intel.com> wrote:
->>> I'm pretty sure I've advocated for the exact opposite in the past, i.e. argued
->>> that KVM's ABI is to not enforce ordering between KVM_SET_CPUID2 and KVM_SET_MSR.
->>> But this is becoming untenable, juggling the dependencies in KVM is complex and
->>> is going to result in a nasty bug at some point.
->>>
->>> For this series, lets just tighten the rules for XSS, i.e. drop the host_initated
->>> exemption.  And in a parallel/separate series, try to do a wholesale cleanup of
->>> all the cases that essentially allow userspace to do KVM_SET_MSR before KVM_SET_CPUID2.
->> OK, will do it for this series and investigate for other MSRs.
->> Thanks!
-> Remember that, while the ordering between KVM_SET_CPUID2 and
-> KVM_SET_MSR must be enforced(*), the host_initiated path must allow
-> the default (generally 0) value.
-Yes, will take it, thanks!
-> Paolo
->
-> (*) this means that you should check guest_cpuid_has even if
-> host_initiated == true.
->
+On Wed, 9 Aug 2023, Eric Wheeler wrote:
+> On Tue, 8 Aug 2023, Sean Christopherson wrote:
+> > On Tue, Aug 08, 2023, Amaan Cheval wrote:
+> > > Hey Sean,
+> > > 
+> > > > If NUMA balancing is going nuclear and constantly zapping PTEs, the resulting
+> > > > mmu_notifier events could theoretically stall a vCPU indefinitely.  The reason I
+> > > > dislike NUMA balancing is that it's all too easy to end up with subtle bugs
+> > > > and/or misconfigured setups where the NUMA balancing logic zaps PTEs/SPTEs without
+> > > > actuablly being able to move the page in the end, i.e. it's (IMO) too easy for
+> > > > NUMA balancing to get false positives when determining whether or not to try and
+> > > > migrate a page.
+> > > 
+> > > What are some situations where it might not be able to move the page in the end?
+> > 
+> > There's a pretty big list, see the "failure" paths of do_numa_page() and
+> > migrate_misplaced_page().
+> > 
+> > > > That said, it's definitely very unexpected that NUMA balancing would be zapping
+> > > > SPTEs to the point where a vCPU can't make forward progress.   It's theoretically
+> > > > possible that that's what's happening, but quite unlikely, especially since it
+> > > > sounds like you're seeing issues even with NUMA balancing disabled.
 
+Brak indicated that they've seen this as early as v5.19.  IIRC, Hunter
+said that v5.15 is working fine, so I went through the >v5.15 and <v5.19
+commit logs for KVM that appear to be related to EPT. Of course if the
+problem is outside of KVM, then this is moot, but maybe these are worth
+a second look.
+
+Sean, could any of these commits cause or hint at the problem?
+
+
+  54275f74c KVM: x86/mmu: Don't attempt fast page fault just because EPT is in use
+	- this mentions !PRESENT related to faulting out of mmu_lock.
+
+  ec283cb1d KVM: x86/mmu: remove ept_ad field
+	- looks like a simple patch, but could there be a reason that
+	  this is somehow invalid in corner cases?  Here is the relevant 
+	  diff snippet:
+
+	+++ b/arch/x86/kvm/mmu/mmu.c
+	@@ -5007,7 +5007,6 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+	 
+			context->shadow_root_level = level;
+	 
+	-               context->ept_ad = accessed_dirty;
+
+	+++ b/arch/x86/kvm/mmu/paging_tmpl.h
+	-       #define PT_HAVE_ACCESSED_DIRTY(mmu) ((mmu)->ept_ad)
+	+       #define PT_HAVE_ACCESSED_DIRTY(mmu) (!(mmu)->cpu_role.base.ad_disabled)
+
+  ca2a7c22a KVM: x86/mmu: Derive EPT violation RWX bits from EPTE RWX bits
+	- "No functional change intended" but it mentions EPT
+	  violations.  Could something unintentional have happened here?
+
+  4f4aa80e3 KVM: X86: Handle implicit supervisor access with SMAP
+	- This is a small change, but maybe it would be worth a quick review
+	
+  5b22bbe71 KVM: X86: Change the type of access u32 to u64
+	- This is just a datatype change in 5.17-rc3, probably not it.
+
+-Eric
+
+> > > 
+> > > Yep, we're definitely seeing the issue occur even with numa_balancing
+> > > enabled, but the likelihood of it occurring has significantly dropped since
+> > > we've disabled numa_balancing.
+> > 
+> > So the fact that this occurs with NUMA balancing disabled means the problem likely
+> > isn't with NUMA balancing itself.  NUMA balancing probably exposes some underlying
+> > issue due to it generating a near-constant stream of mmu_notifier invalidation.
+> > 
+> > > > More likely is that there is a bug somewhere that results in the mmu_notifier
+> > > > event refcount staying incorrectly eleveated, but that type of bug shouldn't follow
+> > > > the VM across a live migration...
+> > > 
+> > > Good news! We managed to live migrate a guest and that did "fix it".
+> 
+> Does the VM make progress even if is migrated to a kernel that presents 
+> the bug?
+> 
+> What was kernel version being migrated from and to?
+> 
+> For example, was it from a >5.19 kernel to something earlier than 5.19?
+> 
+> For example, if the hung VM remains stuck after migrating to a >5.19 
+> kernel but _not_ to a <5.19 kernel, then maybe bisect is an option.
+> 
+> 
+> --
+> Eric Wheeler
+> 
+> 
+> 
+> 
+> > ...
+> > 
+> > > A colleague also modified a host kernel with KFI (Kernel Function
+> > > Instrumentation) and wrote a kernel module to intercept the vmexit handler,
+> > > handle_ept_violation, and does an EPT walk for each pfn, compared against
+> > > /proc/iomem.
+> > > 
+> > > Assuming the EPT walking code is correct, we see this surprising result of a
+> > > PDPTE's pfn=0:
+> > 
+> > Not surprising.  The entire EPTE is zero, i.e. has been zapped by KVM.  This is
+> > exactly what is expected.
+> > 
+> > > Does this seem to indicate an mmu_notifier refcount issue to you, given that
+> > > migration did fix it? Any way to verify?
+> > 
+> > It doesn't move the needle either way, it just confirms what we already know: the
+> > vCPU is repeatedly taking !PRESENT faults.  The unexpected part is that KVM never
+> > "fixes" the fault and never outright fails.
+> > 
+> > > We haven't found any guests with `softlockup_panic=1` yet, and since we can't
+> > > reproduce the issue on command ourselves yet, we might have to wait a bit - but
+> > > I imagine that the fact that live migration "fixed" the locked up guest confirms
+> > > that the other guests that didn't get "fixed" were likely softlocked from the
+> > > CPU stalling?
+> > 
+> > Yes.
+> > 
+> > > If you have any suggestions on how modifying the host kernel (and then migrating
+> > > a locked up guest to it) or eBPF programs that might help illuminate the issue
+> > > further, let me know!
+> > > 
+> > > Thanks for all your help so far!
+> > 
+> > Since it sounds like you can test with a custom kernel, try running with this
+> > patch and then enable the kvm_page_fault tracepoint when a vCPU gets stuck.  The
+> > below expands said tracepoint to capture information about mmu_notifiers and
+> > memslots generation.  With luck, it will reveal a smoking gun.
+> > 
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c          | 10 ----------
+> >  arch/x86/kvm/mmu/mmu_internal.h |  2 ++
+> >  arch/x86/kvm/mmu/tdp_mmu.h      | 10 ++++++++++
+> >  arch/x86/kvm/trace.h            | 28 ++++++++++++++++++++++++++--
+> >  4 files changed, 38 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 9e4cd8b4a202..122bfc884293 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2006,16 +2006,6 @@ static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
+> >  	return true;
+> >  }
+> >  
+> > -static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > -{
+> > -	if (sp->role.invalid)
+> > -		return true;
+> > -
+> > -	/* TDP MMU pages do not use the MMU generation. */
+> > -	return !is_tdp_mmu_page(sp) &&
+> > -	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
+> > -}
+> > -
+> >  struct mmu_page_path {
+> >  	struct kvm_mmu_page *parent[PT64_ROOT_MAX_LEVEL];
+> >  	unsigned int idx[PT64_ROOT_MAX_LEVEL];
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index f1ef670058e5..cf7ba0abaa8f 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -6,6 +6,8 @@
+> >  #include <linux/kvm_host.h>
+> >  #include <asm/kvm_host.h>
+> >  
+> > +#include "mmu.h"
+> > +
+> >  #ifdef CONFIG_KVM_PROVE_MMU
+> >  #define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
+> >  #else
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> > index 0a63b1afabd3..a0d7c8acf78f 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> > @@ -76,4 +76,14 @@ static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return sp->tdp_mmu
+> >  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
+> >  #endif
+> >  
+> > +static inline bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > +{
+> > +	if (sp->role.invalid)
+> > +		return true;
+> > +
+> > +	/* TDP MMU pages do not use the MMU generation. */
+> > +	return !is_tdp_mmu_page(sp) &&
+> > +	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
+> > +}
+> > +
+> >  #endif /* __KVM_X86_MMU_TDP_MMU_H */
+> > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> > index 83843379813e..ff4a384ab03a 100644
+> > --- a/arch/x86/kvm/trace.h
+> > +++ b/arch/x86/kvm/trace.h
+> > @@ -8,6 +8,8 @@
+> >  #include <asm/clocksource.h>
+> >  #include <asm/pvclock-abi.h>
+> >  
+> > +#include "mmu/tdp_mmu.h"
+> > +
+> >  #undef TRACE_SYSTEM
+> >  #define TRACE_SYSTEM kvm
+> >  
+> > @@ -405,6 +407,13 @@ TRACE_EVENT(kvm_page_fault,
+> >  		__field(	unsigned long,	guest_rip	)
+> >  		__field(	u64,		fault_address	)
+> >  		__field(	u64,		error_code	)
+> > +		__field(	unsigned long,  mmu_invalidate_seq)
+> > +		__field(	long,  mmu_invalidate_in_progress)
+> > +		__field(	unsigned long,  mmu_invalidate_range_start)
+> > +		__field(	unsigned long,  mmu_invalidate_range_end)
+> > +		__field(	bool,		root_is_valid)
+> > +		__field(	bool,		root_has_sp)
+> > +		__field(	bool,		root_is_obsolete)
+> >  	),
+> >  
+> >  	TP_fast_assign(
+> > @@ -412,11 +421,26 @@ TRACE_EVENT(kvm_page_fault,
+> >  		__entry->guest_rip	= kvm_rip_read(vcpu);
+> >  		__entry->fault_address	= fault_address;
+> >  		__entry->error_code	= error_code;
+> > +		__entry->mmu_invalidate_seq		= vcpu->kvm->mmu_invalidate_seq;
+> > +		__entry->mmu_invalidate_in_progress	= vcpu->kvm->mmu_invalidate_in_progress;
+> > +		__entry->mmu_invalidate_range_start	= vcpu->kvm->mmu_invalidate_range_start;
+> > +		__entry->mmu_invalidate_range_end	= vcpu->kvm->mmu_invalidate_range_end;
+> > +		__entry->root_is_valid			= VALID_PAGE(vcpu->arch.mmu->root.hpa);
+> > +		__entry->root_has_sp			= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
+> > +							  to_shadow_page(vcpu->arch.mmu->root.hpa);
+> > +		__entry->root_is_obsolete		= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
+> > +							  to_shadow_page(vcpu->arch.mmu->root.hpa) &&
+> > +							  is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root.hpa));
+> >  	),
+> >  
+> > -	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx",
+> > +	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx, seq = 0x%lx, in_prog = 0x%lx, start = 0x%lx, end = 0x%lx, root = %s",
+> >  		  __entry->vcpu_id, __entry->guest_rip,
+> > -		  __entry->fault_address, __entry->error_code)
+> > +		  __entry->fault_address, __entry->error_code,
+> > +		  __entry->mmu_invalidate_seq, __entry->mmu_invalidate_in_progress,
+> > +		  __entry->mmu_invalidate_range_start, __entry->mmu_invalidate_range_end,
+> > +		  !__entry->root_is_valid ? "invalid" :
+> > +		  !__entry->root_has_sp ? "no shadow page" :
+> > +		  __entry->root_is_obsolete ? "obsolete" : "fresh")
+> >  );
+> >  
+> >  /*
+> > 
+> > base-commit: 240f736891887939571854bd6d734b6c9291f22e
+> > -- 
+> > 
+> > 
+> 
