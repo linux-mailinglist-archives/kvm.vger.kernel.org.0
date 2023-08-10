@@ -2,126 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A7C4778150
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 21:19:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B664A77815C
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 21:22:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbjHJTTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 15:19:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41510 "EHLO
+        id S235443AbjHJTWo convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 10 Aug 2023 15:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232426AbjHJTS5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 15:18:57 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53BCD2D43
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:18:56 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-63d30554eefso7928746d6.3
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:18:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691695135; x=1692299935;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6nK40dlXSEtV9j+1clrTX2RCnnQWiTsk3pHmbVPkUwY=;
-        b=VmBkafl1u25d2ecLyUc29ulrsvOSkhhEKJzuIU93CMtsoCspLy4ihE6XAu6q0FKV7H
-         7LnJGstvlp0byYFZseM2BaVUeXnNZLL+R2jOlaxU4o1Ud/nwJDZ3AlwHHAWddr1hdDAg
-         8Alv1t72xMjHMEMMtHU9bWogP2hPkCqxEH22qnX5LDAMnjcCIdacsNJpfbyNjw80iyd3
-         0Xa721kMEsJQYgnTNhLDNMaDAoCHiSoBnKuy0rN8Z+NmXMYhiCdRQJSBHOdZ5K2x7LBG
-         538LpY5D5oj+OGHc81pQ5kls8HpXumbdw5zvGYkIXTJUyb1xkQ++ypNWCPge9FRsMSvh
-         zm7Q==
+        with ESMTP id S234417AbjHJTWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 15:22:43 -0400
+Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8CC10D;
+        Thu, 10 Aug 2023 12:22:42 -0700 (PDT)
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-563393b63dbso208803eaf.1;
+        Thu, 10 Aug 2023 12:22:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691695135; x=1692299935;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6nK40dlXSEtV9j+1clrTX2RCnnQWiTsk3pHmbVPkUwY=;
-        b=AcUCJkHr76CnV5st3XXgCaEawC1jdhLCImcGlQYfee1QQb9XkRxAhu0XROSJaK6FH/
-         dMtcp91RfK/MYV8tED9fDDIQCyAEbluzEsT52MbhjCM5vYM+eSGiWqm5fuO39DVo5gK8
-         CSosslMUuzDRmk5RwUKUyMm+k/9otvakml5KNXbWFRTYdSeMll0t//K6aO/9VS+I3fjr
-         Rf3odXty4CA/RBrFf0cETeYMlitri6ESyX6YE3zvjDMxYY5mbYkDxar++mD59ojnT6Vx
-         IWsLwiIxrnAflG5T1bILFz6a8KOPLTVzEl4tfQHPoUvZtEXJl0CsyL0qv6zYQ0uIyOoX
-         6iCw==
-X-Gm-Message-State: AOJu0YxzQc1PBf6hOL5uqVaNGoNpoZ9orxARkraCQJEhcYwo4CuHr7Ba
-        yKYtMdOyZLsPVhNf3t7KDb0wcA==
-X-Google-Smtp-Source: AGHT+IHH4IrROTfTjO5eB3vOPq41MQjpTBHKBaN/zPPR2N44/sTFeqgtLodbzZoyZt1KMjgv18nz0g==
-X-Received: by 2002:a05:6214:15c3:b0:635:e528:5213 with SMTP id p3-20020a05621415c300b00635e5285213mr3435331qvz.23.1691695135500;
-        Thu, 10 Aug 2023 12:18:55 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id i9-20020a0cab49000000b0063d316af55csm694456qvb.3.2023.08.10.12.18.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 12:18:54 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qUBBO-005Ips-5n;
-        Thu, 10 Aug 2023 16:18:54 -0300
-Date:   Thu, 10 Aug 2023 16:18:54 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        iommu@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 12/12] iommu: Add helper to set iopf handler for domain
-Message-ID: <ZNU4Hio8oAHH8RLn@ziepe.ca>
-References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
- <20230727054837.147050-13-baolu.lu@linux.intel.com>
+        d=1e100.net; s=20221208; t=1691695362; x=1692300162;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V3f/l0R5xil5slGV+XOGNMmiW0lc9Xb/pv7UJWmkgUk=;
+        b=jABmPlD+vi2hrLdlLukMK9zt4ZcEgEJY0CI9gLfeIigscq4x7RoroCvb26aawcinSK
+         AdILQCQWgtVJ9nlX+uhad+U5rsF1nc38Ou/HSnmtO8tXR5Uz/A8PktXr/Jku9ZYeDDxy
+         cqZ9TKKzvP58uox65U328btDMy6mQlSDQO+6iLgBtXjd4R4u1xVF0a46HFfeqyMpZXri
+         gDOCDSe8GP5mMyHQ01oBH/+nq92ALUepyj6DNaynkSmAms5/PgIWxJ1jC9Hh7Te4HFWf
+         suwXjM/K0tkNQ2pA6EFtLzUnNrIImb1/+EOoD3+aAQFaaNObq1Y/DYD6Dxtgrh1RqWqF
+         fsEQ==
+X-Gm-Message-State: AOJu0YwnMBmRVaQFmMyXRs6NyhwBydgyXhSc9qAxPAZIAIKpqPxct+2Y
+        ZpfzV0aZ7TAMshnUsfelGQG5AqFImg+FEvXJo3A=
+X-Google-Smtp-Source: AGHT+IEvqJu69Bm43e9mId2dDkkqRV44o/TlZVy0V8pb/AjZqGTu5tVmVcnXmUBNuRkccMD9B0lc+UIjjAiLGvDZZ/U=
+X-Received: by 2002:a4a:d689:0:b0:56c:484a:923d with SMTP id
+ i9-20020a4ad689000000b0056c484a923dmr2814522oot.1.1691695362058; Thu, 10 Aug
+ 2023 12:22:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230727054837.147050-13-baolu.lu@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <1691581193-8416-1-git-send-email-mihai.carabas@oracle.com> <1691581193-8416-2-git-send-email-mihai.carabas@oracle.com>
+In-Reply-To: <1691581193-8416-2-git-send-email-mihai.carabas@oracle.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Thu, 10 Aug 2023 21:22:30 +0200
+Message-ID: <CAJZ5v0gK2dGPYEMKaKayUGuXpGns-w3V7RBpJwYc3=h-JLDdNg@mail.gmail.com>
+Subject: Re: [PATCH 1/7] cpuidle-haltpoll: Make boot_option_idle_override
+ check X86 specific
+To:     Mihai Carabas <mihai.carabas@oracle.com>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Juerg Haefliger <juerg.haefliger@canonical.com>,
+        =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-pm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 01:48:37PM +0800, Lu Baolu wrote:
-> To avoid open code everywhere.
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+On Wed, Aug 9, 2023 at 2:52 PM Mihai Carabas <mihai.carabas@oracle.com> wrote:
+>
+> From: Joao Martins <joao.m.martins@oracle.com>
+>
+> In the pursuit of letting it build on ARM let's not include what is x86
+> specific.
+>
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
 > ---
->  include/linux/iommu.h | 11 ++++++++++-
->  drivers/iommu/iommu.c | 20 ++++++++++++++++++--
->  2 files changed, 28 insertions(+), 3 deletions(-)
+>  drivers/cpuidle/cpuidle-haltpoll.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/cpuidle/cpuidle-haltpoll.c b/drivers/cpuidle/cpuidle-haltpoll.c
+> index e66df22f9695..0ca3c8422eb6 100644
+> --- a/drivers/cpuidle/cpuidle-haltpoll.c
+> +++ b/drivers/cpuidle/cpuidle-haltpoll.c
+> @@ -104,9 +104,11 @@ static int __init haltpoll_init(void)
+>         int ret;
+>         struct cpuidle_driver *drv = &haltpoll_driver;
+>
+> +#ifdef CONFIG_X86
+>         /* Do not load haltpoll if idle= is passed */
+>         if (boot_option_idle_override != IDLE_NO_OVERRIDE)
+>                 return -ENODEV;
+> +#endif
 
-Seems like overkill at this point..
+I'm sure that adding this #ifdef to the function body is avoidable.
 
-Also, I think this is probably upside down.
-
-We want to create the domains as fault enabled in the first place.
-
-A fault enabled domain should never be attached to something that
-cannot support faults. It should also not support changing the fault
-handler while it exists.
-
-Thus at the creation point would be the time to supply the fault handler
-as part of requesting faulting.
-
-Taking an existing domain and making it faulting enabled is going to
-be really messy in all the corner cases.
-
-My advice (and Robin will probably hate me), is to define a new op:
-
-struct domain_alloc_paging_args {
-       struct fault_handler *fault_handler;
-       void *fault_data
-};
-
-struct iommu_domain *domain_alloc_paging2(struct device *dev, struct
-       domain_alloc_paging_args *args)
-
-The point would be to leave the majority of drivers using the
-simplified, core assisted, domain_alloc_paging() interface and they
-just don't have to touch any of this stuff at all.
-
-Obviously if handler is given then the domain will be initialized as
-faulting.
-
-Jason
+>         if (!kvm_para_available() || !haltpoll_want())
+>                 return -ENODEV;
+> --
