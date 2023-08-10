@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE263778100
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 21:07:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C2577810B
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 21:09:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234851AbjHJTHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 15:07:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39152 "EHLO
+        id S236275AbjHJTJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 15:09:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233905AbjHJTHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 15:07:21 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0953D2696
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:07:20 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-7656652da3cso93729785a.1
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:07:20 -0700 (PDT)
+        with ESMTP id S235853AbjHJTJG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 15:09:06 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0799E2717
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:09:06 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-4085ee5b1e6so11501831cf.0
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 12:09:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1691694439; x=1692299239;
+        d=ziepe.ca; s=google; t=1691694545; x=1692299345;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=osZx9MFsTjA+0nKdtnzmcExs253v22D1JcCvOo2WUgU=;
-        b=CrGiYGDgYC79bexKd3l7JPFKAwwigsGds4ZjU66r3w/rWcMQZMvcVpU6Jc3M9glE5b
-         a6eGeyNZkBhnV20mRtRQ4O8ps+dn3sV/cw7K8As1cdTOhuC5cgbnliCtuPSrsZ5k/QYC
-         Cru+gTxewyFKQQhU0DY5lm4pLtrEnCqnWeWnoSvZFTQhbA/1oHnxChPsSmlSxwn7Ewut
-         Awnh5OiPRtt3hGM0viOKJ66zQhSOioUKxdE6l5VpwQSpdRXVn8gy2XU4OyRKMv4c6mqo
-         2id6eHaLk9ye4giWjZ3+2FkJdVtQ9yEJU/GKg/TA3Hs+0eSubTT57MlIblich7TnvqrY
-         zfwg==
+        bh=OBsV6+ts68b3MCiRcACqm+YmuoRBitbyDh+1vB9eOfo=;
+        b=COIcEt0fqX73UeUlZllLXQvgTUm3SxDi7CEN7pJgTWDiV+EDp5lJjGdEZeRwUo8ba7
+         PXaBP/ouioLF1NT142OLFuwkskZeDbXO8am2iRGaWKue9antxAodqBhuD/TywtShnwKD
+         EGXqkqzWvQkbkbBw8ZPH3qHUIhOe/Z0FBdAvip6DPUp9uImmcB6DzdEwjuuqM4o5+eRk
+         6i+/8cV93o0QKwhzUWti9awORJDqxqI09xY3Vnp8k7T2mOEdS8GrO2BaWkkmPvmXPR1F
+         vjigqQ/CjxJhRXstDjJ8WoCVpCjWxVK9jAQ0airFucBdnmarCSvz80ZZGhCT3+IBIIPh
+         TODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691694439; x=1692299239;
+        d=1e100.net; s=20221208; t=1691694545; x=1692299345;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=osZx9MFsTjA+0nKdtnzmcExs253v22D1JcCvOo2WUgU=;
-        b=blHVl7fsuYmFBEBtDiZMoaP6LLyJCdfBbrQyKgMMVYJftspUopbC53V+EKVm53FqPv
-         jKt85csA7mUSVj+cGmS7RmUrq86xQUi5VBh9vYvDor9RF0UxJtZsRJpiqneBL34Y49NW
-         LwEO12MdwWau7eDSlJzcmiipfPrBF5r3t/VySTgyE8cRRdkwE/PLnejLImJ1K0SjxvI6
-         5S6P7Byd3AwMvUsH5wG4cahAXgISqISofSC6C0Xtog+pfdwgzTX2YCZIoc/lbIuMQaOV
-         iv/mLa/Nu3dStQYkRC+uAItm906yaQsi3MZLdOSBUjQHlLTYoONbXAW0bGdxgN4dv7dX
-         WLaw==
-X-Gm-Message-State: AOJu0Yzso53SQCB1yeRW5ZfTT4yXIDHPfZb970eI4wjxYFjCuwl7kN28
-        0pRvl7DsjjUgGLTW8OLcyrXuOA==
-X-Google-Smtp-Source: AGHT+IEKGHFO3EguY5BB8XGUUBMQPX/yKmTUE725d4gkFS+xRmFBWLNA7932D5/kxJlwZwe37YGYdA==
-X-Received: by 2002:a05:620a:f14:b0:76c:d958:d549 with SMTP id v20-20020a05620a0f1400b0076cd958d549mr3452297qkl.11.1691694439152;
-        Thu, 10 Aug 2023 12:07:19 -0700 (PDT)
+        bh=OBsV6+ts68b3MCiRcACqm+YmuoRBitbyDh+1vB9eOfo=;
+        b=dT6l6aywxbvtPUDjtHXbWGmFm/eSR9WzqRIsDNV/njwA2LaBHIgjsGaQ9bpFKxcJel
+         nCdbFOprzZiH2/OC/+sJ7KNT0i+AAIRo6S7/seJ7Gr8xEnmRS8Teaemu11TBMT7WE5Xp
+         11JTzRWdk4LA3BQWBDqzFRl8mCokAf+2BnZAHY+7B4hIEQLjWC6rnkwqCURld9QzmT9x
+         1Codz+bbkQqr5Lq9Uierq/StZnpNjAjtapJHVriWC8VOKyofU5U80axx3MnIuv46fhtK
+         YSk3NFxxIP0ouXh/5noYhGwCcN2eOVZoVZOItzKVltkLadsMAasnEHPfFj4PpUOmgj8j
+         tsOQ==
+X-Gm-Message-State: AOJu0Yx46jCkFfkIjhF+5dFE+xEtFECk9MjngI8dquejXJwdY+KG+yXk
+        MtN6+7F+4Juw7d7sssmymGZ5wA==
+X-Google-Smtp-Source: AGHT+IGbRBMB1G0DgtrN1Ti5jWBuKV+GQrt2F3rx7SFZCKQn9VB73jXia/E3+tJJ4ZW9NFFbohJcag==
+X-Received: by 2002:a0c:f04c:0:b0:635:ea31:521a with SMTP id b12-20020a0cf04c000000b00635ea31521amr3605192qvl.7.1691694545156;
+        Thu, 10 Aug 2023 12:09:05 -0700 (PDT)
 Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id p17-20020a0cf551000000b00635eeb8a4fcsm684434qvm.114.2023.08.10.12.07.18
+        by smtp.gmail.com with ESMTPSA id l17-20020a0ce091000000b0061b5dbf1994sm659891qvk.146.2023.08.10.12.09.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 12:07:18 -0700 (PDT)
+        Thu, 10 Aug 2023 12:09:04 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
         (envelope-from <jgg@ziepe.ca>)
-        id 1qUB09-005IkR-PB;
-        Thu, 10 Aug 2023 16:07:17 -0300
-Date:   Thu, 10 Aug 2023 16:07:17 -0300
+        id 1qUB1r-005IlP-2Y;
+        Thu, 10 Aug 2023 16:09:03 -0300
+Date:   Thu, 10 Aug 2023 16:09:03 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Lu Baolu <baolu.lu@linux.intel.com>
 Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
@@ -64,14 +64,15 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         iommu@lists.linux.dev, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 10/12] iommu: Make iommu_queue_iopf() more generic
-Message-ID: <ZNU1Zev6j92IJRjn@ziepe.ca>
+Subject: Re: [PATCH v2 11/12] iommu: Separate SVA and IOPF in Makefile and
+ Kconfig
+Message-ID: <ZNU1zw1PDs6z9nv4@ziepe.ca>
 References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
- <20230727054837.147050-11-baolu.lu@linux.intel.com>
+ <20230727054837.147050-12-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230727054837.147050-11-baolu.lu@linux.intel.com>
+In-Reply-To: <20230727054837.147050-12-baolu.lu@linux.intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
@@ -82,78 +83,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 01:48:35PM +0800, Lu Baolu wrote:
-> @@ -137,6 +136,16 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
->  		return 0;
->  	}
->  
-> +	if (fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID)
-> +		domain = iommu_get_domain_for_dev_pasid(dev, fault->prm.pasid, 0);
-> +	else
-> +		domain = iommu_get_domain_for_dev(dev);
+On Thu, Jul 27, 2023 at 01:48:36PM +0800, Lu Baolu wrote:
+> Add CONFIG_IOMMU_IOPF for page fault handling framework and select it
+> from its real consumer. Move iopf function declaration from iommu-sva.h
+> to iommu.h and remove iommu-sva.h as it's empty now.
+> 
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  include/linux/iommu.h                         | 63 +++++++++++++++
+>  drivers/iommu/iommu-sva.h                     | 80 -------------------
+>  .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  1 -
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  1 -
+>  drivers/iommu/intel/iommu.c                   |  1 -
+>  drivers/iommu/intel/svm.c                     |  1 -
+>  drivers/iommu/iommu-sva.c                     |  3 +-
+>  drivers/iommu/iommu.c                         |  2 -
+>  drivers/iommu/Kconfig                         |  4 +
+>  drivers/iommu/Makefile                        |  3 +-
+>  drivers/iommu/intel/Kconfig                   |  1 +
+>  11 files changed, 71 insertions(+), 89 deletions(-)
+>  delete mode 100644 drivers/iommu/iommu-sva.h
 
-How does the lifetime work for this? What prevents UAF on domain?
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-> diff --git a/drivers/iommu/iommu-sva.c b/drivers/iommu/iommu-sva.c
-> index ab42cfdd7636..668f4c2bcf65 100644
-> --- a/drivers/iommu/iommu-sva.c
-> +++ b/drivers/iommu/iommu-sva.c
-> @@ -157,7 +157,7 @@ EXPORT_SYMBOL_GPL(iommu_sva_get_pasid);
->  /*
->   * I/O page fault handler for SVA
->   */
-> -enum iommu_page_response_code
-> +static enum iommu_page_response_code
->  iommu_sva_handle_iopf(struct iommu_fault *fault, void *data)
->  {
->  	vm_fault_t ret;
-> @@ -241,23 +241,16 @@ static void iopf_handler(struct work_struct *work)
->  {
->  	struct iopf_fault *iopf;
->  	struct iopf_group *group;
-> -	struct iommu_domain *domain;
->  	enum iommu_page_response_code status = IOMMU_PAGE_RESP_SUCCESS;
->  
->  	group = container_of(work, struct iopf_group, work);
-> -	domain = iommu_get_domain_for_dev_pasid(group->dev,
-> -				group->last_fault.fault.prm.pasid, 0);
-> -	if (!domain || !domain->iopf_handler)
-> -		status = IOMMU_PAGE_RESP_INVALID;
-> -
->  	list_for_each_entry(iopf, &group->faults, list) {
->  		/*
->  		 * For the moment, errors are sticky: don't handle subsequent
->  		 * faults in the group if there is an error.
->  		 */
->  		if (status == IOMMU_PAGE_RESP_SUCCESS)
-> -			status = domain->iopf_handler(&iopf->fault,
-> -						      domain->fault_data);
-> +			status = iommu_sva_handle_iopf(&iopf->fault, group->data);
->  	}
->  
->  	iopf_complete_group(group->dev, &group->last_fault, status);
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 157a28a49473..535a36e3edc9 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -3330,7 +3330,7 @@ struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
->  	domain->type = IOMMU_DOMAIN_SVA;
->  	mmgrab(mm);
->  	domain->mm = mm;
-> -	domain->iopf_handler = iommu_sva_handle_iopf;
-> +	domain->iopf_handler = iommu_sva_handle_iopf_group;
->  	domain->fault_data = mm;
-
-This also has lifetime problems on the mm.
-
-The domain should flow into the iommu_sva_handle_iopf() instead of the
-void *data.
-
-The SVA code can then just use domain->mm directly.
-
-We need to document/figure out some how to ensure that the faults are
-all done processing before a fault enabled domain can be freed.
-
-This patch would be better ordered before the prior patch.
+At some point it would be a nice touch to split iommu.h into the
+consumer and iommu driver interfaces
 
 Jason
