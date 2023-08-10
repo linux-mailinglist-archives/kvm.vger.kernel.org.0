@@ -2,120 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D98D7777ACD
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:33:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 062D1777AC1
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 16:30:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235760AbjHJOds (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 10:33:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59102 "EHLO
+        id S235700AbjHJO3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 10:29:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbjHJOdr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:33:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B166430F9
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 07:25:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691677542;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nOJZhUQnOs3d56Ww7WWE5sFKVnOac/cwwQNGpd1gdhU=;
-        b=OpFw7a0+/3Ru2fCu4NwYC6B2TeoaTtg81iqYJ2VZSY0pXFH955RKPEtQjHGyIr8cZuNMgy
-        eJxUk7f9SFrHJkaKWUl0dTeBKvHvado3yMlpmV/KpaVBZ+igxiHmjNhkHr9dwxI65+d1fy
-        Wdkuc+YxQVdYmk2ibxFMmA5VUndJvoA=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-584-wisTvYhvNCyOxdjY5DTAZw-1; Thu, 10 Aug 2023 10:25:38 -0400
-X-MC-Unique: wisTvYhvNCyOxdjY5DTAZw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 30BDD382C97A;
-        Thu, 10 Aug 2023 14:25:38 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A161C15BAE;
-        Thu, 10 Aug 2023 14:25:37 +0000 (UTC)
-Date:   Thu, 10 Aug 2023 10:25:35 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH 3/4] vfio: use __aligned_u64 in struct
- vfio_iommu_type1_info
-Message-ID: <20230810142535.GD2931656@fedora>
-References: <20230809210248.2898981-1-stefanha@redhat.com>
- <20230809210248.2898981-4-stefanha@redhat.com>
- <BN9PR11MB5276D1304E854E2AE7E8EFA18C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+        with ESMTP id S235537AbjHJO3s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 10:29:48 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E201E4B;
+        Thu, 10 Aug 2023 07:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691677787; x=1723213787;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Yo6Lfzqy2WIB3QzGalEmKlZhegsIaZLYiWJmZDXSayY=;
+  b=h7fuzIS6yuifOoH2FrXVjfvXajiFPJjw7bRMDitFXt+X0hzl4vyH64ML
+   hYjS355yUuVOx9Rv7gTShQh05PH7WAwl9Mz52XRQFhDFkq+KkZ530eE3D
+   SQfpt4Pc6h93INTB/SkjhH7fnVJ/HwSVS/fuOBnHrMDIuoqGKlrUyCkA6
+   K9T0+vHKY5g+68TugK0i+qCmwsTQEtumqWYzAEghET4IpycKmMBlU6Fj1
+   /AQvmdJLq10pCN8ReaHc7q+otBl4mibO+s7kZX2EWAVEHI1vSB4JZiWlF
+   cILU9bZXsUjE2Y4m6Y6/5aabkvFwT+ZCMk2lHqB4EWRTvHKXhhDTQxrm3
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="375128942"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="375128942"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 07:29:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="725839099"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="725839099"
+Received: from dcastil2-mobl2.amr.corp.intel.com (HELO [10.212.148.36]) ([10.212.148.36])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 07:29:46 -0700
+Message-ID: <c871cc44-b6a0-06e3-493b-33ddf4fa6e05@intel.com>
+Date:   Thu, 10 Aug 2023 07:29:46 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="uYWLEaQvqBpXEN2x"
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276D1304E854E2AE7E8EFA18C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v5 09/19] KVM:x86: Make guest supervisor states as
+ non-XSAVE managed
+Content-Language: en-US
+To:     "Yang, Weijiang" <weijiang.yang@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>, peterz@infradead.org,
+        pbonzini@redhat.com, Sean Christopherson <seanjc@google.com>
+Cc:     Chao Gao <chao.gao@intel.com>, john.allen@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rick.p.edgecombe@intel.com, binbin.wu@linux.intel.com
+References: <20230803042732.88515-1-weijiang.yang@intel.com>
+ <20230803042732.88515-10-weijiang.yang@intel.com>
+ <ZMuMN/8Qa1sjJR/n@chao-email>
+ <bfc0b3cb-c17a-0ad6-6378-0c4e38f23024@intel.com>
+ <ZM1jV3UPL0AMpVDI@google.com>
+ <806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <806e26c2-8d21-9cc9-a0b7-7787dd231729@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 8/10/23 02:29, Yang, Weijiang wrote:
+...
+> When KVM enumerates shadow stack support for guest in CPUID(0x7, 
+> 0).ECX[bit7], architecturally it claims both SS user and supervisor
+> mode are supported. Although the latter is not supported in Linux,
+> but in virtualization world, the guest OS could be non-Linux system,
+> so KVM supervisor state support is necessary in this case.
 
---uYWLEaQvqBpXEN2x
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+What actual OSes need this support?
 
-On Thu, Aug 10, 2023 at 03:25:37AM +0000, Tian, Kevin wrote:
-> > From: Stefan Hajnoczi <stefanha@redhat.com>
-> > Sent: Thursday, August 10, 2023 5:03 AM
-> >
-> > @@ -1303,8 +1303,9 @@ struct vfio_iommu_type1_info {
-> >  	__u32	flags;
-> >  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info
-> > */
-> >  #define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
-> > -	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
-> > +	__aligned_u64	iova_pgsizes;		/* Bitmap of supported page
-> > sizes */
-> >  	__u32   cap_offset;	/* Offset within info struct of first cap */
-> > +	__u32   reserved;
->=20
-> isn't this conflicting with the new 'pad' field introduced in your another
-> patch " [PATCH v3] vfio: align capability structures"?
->=20
-> @@ -1304,6 +1305,7 @@ struct vfio_iommu_type1_info {
->  #define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
->  	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
->  	__u32   cap_offset;	/* Offset within info struct of first cap */
-> +	__u32   pad;
->  };
+> Two solutions are on the table:
+> 1) Enable CET supervisor support in Linux kernel like user mode support.
 
-Yes, I will rebase this series when "[PATCH v3] vfio: align capability
-structures" is merged. I see the __aligned_u64 as a separate issue and
-don't want to combine the patch series.
+We _will_ do this eventually, but not until FRED is merged.  The core
+kernel also probably won't be managing the MSRs on non-FRED hardware.
 
-Stefan
+I think what you're really talking about here is that the kernel would
+enable CET_S XSAVE state management so that CET_S state could be managed
+by the core kernel's FPU code.
 
---uYWLEaQvqBpXEN2x
-Content-Type: application/pgp-signature; name="signature.asc"
+That is, frankly, *NOT* like the user mode support at all.
 
------BEGIN PGP SIGNATURE-----
+> 2) Enable support in KVM domain.
+> 
+> Problem:
+> The Pros/Cons for each solution(my individual thoughts):
+> In kernel solution:
+> Pros:
+> - Avoid saving/restoring 3 supervisor MSRs(PL{0,1,2}_SSP) at vCPU
+>   execution path.
+> - Easy for KVM to manage guest CET xstate bits for guest.
+> Cons:
+> - Unnecessary supervisor state xsaves/xrstors operation for non-vCPU
+>   thread.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmTU818ACgkQnKSrs4Gr
-c8iySQf9FZbRiPNfdlBpBsLYscA+oOj9TOnEyxAcMVkvwRME3HsWH8AD5Esrn038
-lG5gDBfNWcMl0Uxjzo01BYTKMhOIt0ywbGMmP1AZSJERt3N+MTUnveWsx7pxbr67
-VQFlJJyV6JcqSAX7VaRyx4JWJcM1itdWDomC7AG/K8DvE2wupsGZ75tN6eBLQPOW
-PS/5VLF14dHWcWRTDuTtsjiZC5uAxONA8nCir4Cm/u2oXcfVl4KGyoGNAK5HUHCg
-ZCbiz1+Gf1Q+mDOtt/ZLqMtaD0CmzqzI6Y6EzWhy/W/N6fAAsuni18MU26t5X8Oo
-jXsZ6lkXG/eOpZa0r1LswaPNLAzgwQ==
-=dfMD
------END PGP SIGNATURE-----
+What operations would be unnecessary exactly?
 
---uYWLEaQvqBpXEN2x--
+> - Potentially extra storage space(24 bytes) for thread context.
+
+Yep.  This one is pretty unavoidable.  But, we've kept MPX around in
+this state for a looooooong time and nobody really seemed to care.
+
+> KVM solution:
+> Pros:
+> - Not touch current kernel FPU management framework and logic.
+> - No extra space and operation for non-vCPU thread.
+> Cons:
+> - Manually saving/restoring 3 supervisor MSRs is a performance burden to
+>   KVM.
+> - It looks more like a hack method for KVM, and some handling logic
+>   seems a bit awkward.
+
+In a perfect world, we'd just allocate space for CET_S in the KVM
+fpstates.  The core kernel fpstates would have
+XSTATE_BV[13]==XCOMP_BV[13]==0.  An XRSTOR of the core kernel fpstates
+would just set CET_S to its init state.
+
+But I suspect that would be too much work to implement in practice.  It
+would be akin to a new lesser kind of dynamic xstate, one that didn't
+interact with XFD and *NEVER* gets allocated in the core kernel
+fpstates, even on demand.
+
+I want to hear more about who is going to use CET_S state under KVM in
+practice.  I don't want to touch it if this is some kind of purely
+academic exercise.  But it's also silly to hack some kind of temporary
+solution into KVM that we'll rip out in a year when real supervisor
+shadow stack support comes along.
+
+If it's actually necessary, we should probably just eat the 24 bytes in
+the fpstates, flip the bit in IA32_XSS and move on.  There shouldn't be
+any other meaningful impact to the core kernel.
 
