@@ -2,186 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F33D2778271
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 22:55:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46C1B77827F
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 23:03:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbjHJUzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 16:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
+        id S229592AbjHJVDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 17:03:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjHJUzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 16:55:09 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C6F2738
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 13:55:07 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-40a47e8e38dso19021cf.1
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 13:55:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691700907; x=1692305707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fbz6nfirzOItWcULJrhy76vEH5UntBJ+zAdtRqxrtIs=;
-        b=mkXquOWImM+ipsQFpSuV6HphXWcMu0DYJyCRbKA/Dq79yQhHG6TR+uE6DNBjdtFfKW
-         9Ou/urveYZ4pdU9VR2letW3AyzwHrPpup+XFQvg0vonxJ42AGrE0ltKx1/f55708OXYf
-         vRUx09Hzn0lW4KrJOE9nmWrwtUjt3v4ixV/ExTTUVlINSh80tyHy1p6Y/nwisurUxSg3
-         Wmv9YQlCHLhD3Pnz+PxZu242lj8GKSajSa1rIlgV/+M9oPmy8Wnkw4+ChJ0Lg9d6ijtw
-         nCaMDID/yxucfw6q1AGYHCMLPpDCnZU/dtO0FRBlOqagop7dekdu3rV5nFgzRGnaj5/N
-         zDEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691700907; x=1692305707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fbz6nfirzOItWcULJrhy76vEH5UntBJ+zAdtRqxrtIs=;
-        b=a9hxIz1yh+m/0juxaNJfHdX5N9Ap4YAwAtBfJAEwAmsZPPmkWCyj5qhJ3uwmE7Z002
-         RSXd8Z10vwu44oVYP+VxYYJuErQMZbVQEhmV4+P3PkXa0wueXwZp0xFK2oNR7633KBYA
-         vWLSIC9tuKhtjQ1YBcmCwt/Wzn5qAbvLAxDEiQ5VPsLBwGKRbXqWXmgM+SMAxn0ZPRTz
-         9IJlcRNJ6pZSnyLh+riMkGSxi2BIxog2Ozt97HU0dMmJ+dTwIq42e6+uvorJKwguuX1g
-         3dg7LI2RFkrVj0QVSr87pScQN3kY5J4nuyH1RilGbGqO7fQTj6FWVOQFYqB2kuhvAFWQ
-         hQ+Q==
-X-Gm-Message-State: AOJu0Yy1tI2gaJi8O7KKSIP9acdbhIM6yNiGo+/s4sLMFEw4KUooAZ+S
-        chFsnyw2+rY0WHwHNZ+0lU4Xmx2LN1YGuZSurchyaeBDirpymjD6O9ic8A==
-X-Google-Smtp-Source: AGHT+IETRvm1u0c2tw6CwIcy/y+qdG7C9yLn61u49rI1SxhvjvsG0R6dfHP+vWIwnY34cSPU455isRrBYsnfx2fRx9Y=
-X-Received: by 2002:ac8:7f86:0:b0:403:96e3:4745 with SMTP id
- z6-20020ac87f86000000b0040396e34745mr69781qtj.20.1691700906744; Thu, 10 Aug
- 2023 13:55:06 -0700 (PDT)
+        with ESMTP id S229379AbjHJVDE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 17:03:04 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 811F32704;
+        Thu, 10 Aug 2023 14:03:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lmyO/Xkx0hwBYH++lZMATKY/H63MAlCRFKIn126KqxXDXv5LqkwC5crIyF8+3DvO559urAtqi9OGNlVCF6iR20AqeXlangX8+yOyaDkLhuvTlgpX3MgajMPjTprDGoamHSR6ibKNAe/tuB4+O/XeKu+h6oek/OyoXirDipRx3fv42ax/34cpjgDDygvznAtQIouQns3UhJeUc7dwV5DiR8yEQXwbpfq/09GEvZ4YRrjlLwAd6WMkJFSUM3CEKAm0c+YBbGhFlo5QIU6Z8cvJ/N1A0ZrlMgwgd3evpUZH3LBkqYlaEcds1PZ5ZpGPJSzo8sa6DakcPwsR/sGifOvF6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xu4AzyScbEr9wdNlD75ejP3HMCwR+6elq9MSWuprd+8=;
+ b=hi0A6Za+45vUI4ov890ev9JcpDsP6g/3gwAcTTFOE7XIOZknslOof/pbj3kGDV5mohNm8MP9tla2oayponCnqTv5ydZg77IWI0az+wz9n37pth1lTblRxjykWHDdn9WO/2HZs6t9XjlypSxY/cXwH37sQQZEspzT/f6dBq+yPML6pCmrVsLxbHUXMc9ZV7wdzuWhnorMP5Cfowzx4iUlpeXX/0Nf3SFX2tHKwTjhTwYHtn1QLClWr70bAMZLitfhx2nO/8PcdwUdeNYJnzUXr+XaCSk6fHusBLsX0psUOgjkul2Z6cluz/xvvJUgUHTWgIaZfQJ223VV6fWmj5Uucw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xu4AzyScbEr9wdNlD75ejP3HMCwR+6elq9MSWuprd+8=;
+ b=gxTQvlrJk7squYgcET/x8jgtaX8YsAdg5zv5Xyd9rcMyVzdbmUDr9iDyJJ7wVqDhA7GMnnIerHyS87SdrPYiO9BrjUO5c63HicjbM2nYEDrBDpVoab7H1J1VOolNXfFAEyzrjvCTwgGVj/TxCK3GtIorI1R2mt3MWxyZXZD24NA+2bovL/zXwCS9XTj0P1JsSGO5ESnQENM+MCgUNlV1ITxfH2UTJ1cdVGKunam3STc5ZpNT3KmUBsGXgnHj/We/32r4v02BILOmyrbQEeQNLqZMFpINFvbHntQfJT4M5rpWzHATQ35zCIUFu44OlvWoZdupKPqi65Btbmz0Ax0+Gw==
+Received: from MW4PR03CA0239.namprd03.prod.outlook.com (2603:10b6:303:b9::34)
+ by CY8PR12MB7265.namprd12.prod.outlook.com (2603:10b6:930:57::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Thu, 10 Aug
+ 2023 21:03:01 +0000
+Received: from CO1PEPF000044F6.namprd21.prod.outlook.com
+ (2603:10b6:303:b9:cafe::3f) by MW4PR03CA0239.outlook.office365.com
+ (2603:10b6:303:b9::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30 via Frontend
+ Transport; Thu, 10 Aug 2023 21:03:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044F6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.0 via Frontend Transport; Thu, 10 Aug 2023 21:03:01 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 10 Aug 2023
+ 14:02:45 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 10 Aug
+ 2023 14:02:44 -0700
+Received: from Asurada-Nvidia (10.127.8.14) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Thu, 10 Aug 2023 14:02:43 -0700
+Date:   Thu, 10 Aug 2023 14:02:42 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
+Message-ID: <ZNVQcmYp27ap7h30@Asurada-Nvidia>
+References: <BN9PR11MB5276912120F662498910A1D48C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <DS0PR11MB7529C310FAEA61B6E7988629C312A@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <ZNO92PIx2IQ70+DY@nvidia.com>
+ <ZNPlGd4/72dahSs4@Asurada-Nvidia>
+ <ZNPmpW3/zDnjqxyU@nvidia.com>
+ <ZNP0UKGU6id5wfc6@Asurada-Nvidia>
+ <BN9PR11MB527683351B687B97AB84B51B8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNUI0D7ZMvLWlBNx@nvidia.com>
+ <ZNUa/VmeiIo0YA0v@Asurada-Nvidia>
+ <ZNU6BnTgNEWlwNYQ@nvidia.com>
 MIME-Version: 1.0
-References: <20230808231330.3855936-1-rananta@google.com> <20230808231330.3855936-3-rananta@google.com>
- <c33b0518-6e64-7acf-efa8-f404fce1ccac@redhat.com> <CAJHc60yCJANBQOizaoSPhEJH9e8a9C6n68x4qdVkOhVZiiWqkw@mail.gmail.com>
- <30e45ef3-309a-63de-e085-be1645c1be79@redhat.com>
-In-Reply-To: <30e45ef3-309a-63de-e085-be1645c1be79@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Thu, 10 Aug 2023 13:54:55 -0700
-Message-ID: <CAJHc60x=bhXS3PahuRPwRVdqN4LeX-PBdjdEeCEomhf2YAJ1mw@mail.gmail.com>
-Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     Gavin Shan <gshan@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZNU6BnTgNEWlwNYQ@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F6:EE_|CY8PR12MB7265:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7233df6d-f93c-4afb-00be-08db99e52ed8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: guU1s9BnJCWId/SQXiuCBBTwOMzVRbOxHp3NsIUvtSolkeeu+TRzO3oYCWBDsZFZjQ7HjCwpO21FsUlaPALtDUfSAfNp11Zw4g3IQLZyxXMk5GH6FTxO48oVcaagNJ1KtCrGirZpV1gO+nFe7Nvv4X7SSAGFV9o7YOMXqby/tsMq1n3Cy6m4fg9SaO9avZktIOWpsWicaLVU6ywl/WidyYZflmrC+hdbgW6rIjGXBfc1q5uZcanAOzRm/k1/XcD9fMISd2j3ratxpjzay1qA00UsjmUyimgvnJA09KMWwFVGxsuuhkD8oD3rZkIXVZrftm19VT8l1vtE0wPuzHYYnXQG5WGaYcU+Qo6n/EiJlAmkQ4BFX+FemV6nFAF7y6kxz/YjCcKFFkFa4so/SpgyhqOfKhLLFRTSm5sexcL4EJqPZNhvmTndkw81RjWygWMZfj8oTjSKLwEVqx3P5owAHmdynhu19CoEbtrT9gT80njN56fgvrhkcqEJ7v2+n+j83sYEkpSu7X4EUif3UaIyh7jK4FIH/CFHNZSpfKvAWwafM6WhHhoD2IBM9HbSvumlasjFN4KX+WDbMGoT7NsM4YwXZWFuZ0h9IUUoLhHturGqZWyL22sKCv2+QM/fWskP/9meYzyLrZoBZprT9vmm0/Gg3zvNZT3dUshcFLuMKdmyQMyroVNjDUo5f5QKZQWQAtCP/G9uGthIu4Ix3bu/BdDdWYOcBLosczlWJr3pGvQcKx2RGBVDvUlKCTwEy/SP
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(136003)(39860400002)(82310400008)(451199021)(186006)(1800799006)(36840700001)(40470700004)(46966006)(70206006)(36860700001)(478600001)(6636002)(54906003)(70586007)(26005)(336012)(316002)(2906002)(41300700001)(7416002)(4326008)(9686003)(5660300002)(7636003)(8676002)(356005)(82740400003)(6862004)(86362001)(8936002)(33716001)(83380400001)(426003)(47076005)(55016003)(40460700003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2023 21:03:01.3963
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7233df6d-f93c-4afb-00be-08db99e52ed8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044F6.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7265
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 5:26=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
->
->
->
-> On 8/10/23 00:38, Raghavendra Rao Ananta wrote:
-> > Hi Gavin,
-> >
-> > On Tue, Aug 8, 2023 at 9:00=E2=80=AFPM Gavin Shan <gshan@redhat.com> wr=
-ote:
-> >>
-> >>
-> >> On 8/9/23 09:13, Raghavendra Rao Ananta wrote:
-> >>> There's no reason for the architectures to declare
-> >>> kvm_arch_flush_remote_tlbs() in their own headers. Hence to
-> >>> avoid this duplication, make the declaration global, leaving
-> >>> the architectures to define only __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> >>> as needed.
-> >>>
-> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> >>> ---
-> >>>    arch/mips/include/asm/kvm_host.h | 1 -
-> >>>    include/linux/kvm_host.h         | 2 ++
-> >>>    2 files changed, 2 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm=
-/kvm_host.h
-> >>> index 9b0ad8f3bf327..54a85f1d4f2c8 100644
-> >>> --- a/arch/mips/include/asm/kvm_host.h
-> >>> +++ b/arch/mips/include/asm/kvm_host.h
-> >>> @@ -897,6 +897,5 @@ static inline void kvm_arch_vcpu_blocking(struct =
-kvm_vcpu *vcpu) {}
-> >>>    static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)=
- {}
-> >>>
-> >>>    #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> >>> -int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> >>>
-> >>>    #endif /* __MIPS_KVM_HOST_H__ */
-> >>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> >>> index e3f968b38ae97..ade5d4500c2ce 100644
-> >>> --- a/include/linux/kvm_host.h
-> >>> +++ b/include/linux/kvm_host.h
-> >>> @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlbs(st=
-ruct kvm *kvm)
-> >>>    {
-> >>>        return -ENOTSUPP;
-> >>>    }
-> >>> +#else
-> >>> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
-> >>>    #endif
-> >>>
-> >>>    #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
-> >>
-> >> Is the declaration inconsistent to that in arch/x86/include/asm/kvm_ho=
-st.h?
-> >> In order to keep them consistent, I guess we need move kvm_arch_flush_=
-remote_tlbs()
-> >> from x86's header file to arch/x86/kvm/mmu/mmu.c and 'inline' needs to=
- be dropped.
-> >>
-> > Unsure of the original intentions, I didn't want to disturb any
-> > existing arrangements. If more people agree to this refactoring, I'm
-> > happy to move.
->
-> This is amazing to me. This change can be compiled without any error
-> even if the declaration inconsistent between the kvm_host.h and x86's
-> header file.
->
-> I'm curious which option make it possible?
->
-After doing some experiments, I think it works because of the order in
-which the inline-definition and the declaration are laid out. If the
-'inline' part of the function comes first and then the declaration, we
-don't see any error. However if the positions were reversed, we would
-see an error. (I'm not sure what the technical reason for this is).
+On Thu, Aug 10, 2023 at 04:27:02PM -0300, Jason Gunthorpe wrote:
+ 
+> > > Do we need to worry about the ring wrap around? It is already the case
+> > > that the VMM has to scan the ring and extract the invalidation
+> > > commands, wouldn't it already just linearize them?
+> > 
+> > I haven't got the chance to send the latest vSMMU series but I
+> > pass down the raw user CMDQ to the host to go through, as it'd
+> > be easier to stall the consumer index movement when a command
+> > in the middle fails.
+> 
+> Don't some commands have to be executed by the VMM?
 
-Just to be safe, I can move the definition to arch/x86/kvm/mmu/mmu.c
-as a non-inline function.
+Well, they do. VMM would go through the queue and "execute" non-
+invalidation commands, then defer the queue to the kernel to go
+through the queue once more. So, the flaw could be that some of
+the commands behind the failing TLB flush command got "executed",
+though in a real case most of other commands would be "executed"
+standalone with a CMD_SYNC, i.e. not mixing with any invalidation
+command.
 
-Thank you.
-Raghavendra
-> Thanks,
-> Shaoqin
->
-> >
-> > Thank you.
-> > Raghavendra
-> >> Thanks,
-> >> Gavin
-> >>
-> >
->
-> --
-> Shaoqin
->
+> Even so, it seems straightforward enough for the kernel to report the
+> number of commands it executed and the VMM can adjust the virtual
+> consumer index.
+
+It is not that straightforward to revert an array index back to
+a consumer index because they might not be 1:1 mapped, since in
+theory there could be other commands mixing in-between, although
+it unlikely happens.
+
+So, another index-mapping array would be needed for this matter.
+And this doesn't address the flaw that I mentioned above either.
+So, I took the former solution to reduce the complication.
+
+> > > Is there a use case for invaliation only SW emulated rings, and do we
+> > > care about optimizing for the wrap around case?
+> > 
+> > Hmm, why a SW emulated ring?
+> 
+> That is what you are building. The VMM catches the write of the
+> producer pointer and the VMM SW bundles it up to call into the kernel.
+
+Still not fully getting it. Do you mean a ring that is prepared
+by the VMM? I think the only case that we need to handle a ring
+is what I did by forwarding the guest CMDQ (a ring) to the host
+directly. Not sure why VMM would need another ring for those
+linearized invalidation commands. Or maybe I misunderstood..
+
+> > Yes for the latter question. SMMU kernel driver has something
+> > like Q_WRP and other helpers, so it wasn't difficult to process
+> > the user CMDQ in the same raw form. But it does complicates the
+> > common code if we want to do it there.
+> 
+> Optimizing wrap around means when the producer/consumer pointers pass
+> the end of the queue memory we execute one, not two ioctls toward the
+> kernel. That is possible a very minor optimization, it depends how big
+> the queues are and how frequent multi-entry items will be present.
+
+There could be other commands being issued by other VMs or even
+the host between the two ioctls. So probably we'd need to handle
+the wrapping case when doing a ring solution?
+
+Thanks
+Nicolin
