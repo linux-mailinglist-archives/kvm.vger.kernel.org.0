@@ -2,58 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 502F5777468
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 11:25:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 011C7777392
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 11:00:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233279AbjHJJZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 05:25:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39190 "EHLO
+        id S230155AbjHJJAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 05:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231405AbjHJJZU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 05:25:20 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C3A213F;
-        Thu, 10 Aug 2023 02:25:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691659519; x=1723195519;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=n1Msk62xu+U/2i8oJmw01jY05sFs/JrR7DH8MV3GHPs=;
-  b=gVGzE4syAmyLeFTLq7q/I6Zw8D5pDr2UAigi0IPM3fWXkSJP7WeVbpNA
-   ihHP2Mt5mc6GttJLAYvVnutUi2C4zDzBj0e654hLQLfl+q0gDMq3ZPOo8
-   Lqi4WmyOuBT/Vnot79P3T5pvKwzYob2fP1AYs7gHe2G4+HIBUCSAOD+gZ
-   HWPnz3gGWTdcrha34ZVlBbOuGcAxF6WYv//NpvUH6HZ8UbWk94NWNxOBK
-   wsCQPAruSC9bpPHeeTzQJ45GpvUPfU91v9aNTbfgljd+7/Y0ODnCZ+5Yo
-   SBqcP63A6tT5MdcMTTNhQ3EJgsC/qpLvnmPvhI4pnXQveC8IT7smnBgOA
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="374123736"
-X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
-   d="scan'208";a="374123736"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 02:25:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10797"; a="855867318"
-X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
-   d="scan'208";a="855867318"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 02:25:16 -0700
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, mike.kravetz@oracle.com,
-        apopple@nvidia.com, jgg@nvidia.com, rppt@kernel.org,
-        akpm@linux-foundation.org, kevin.tian@intel.com, david@redhat.com,
-        Yan Zhao <yan.y.zhao@intel.com>
-Subject: [RFC PATCH v2 2/5] mm: don't set PROT_NONE to maybe-dma-pinned pages for NUMA-migrate purpose
-Date:   Thu, 10 Aug 2023 16:58:25 +0800
-Message-Id: <20230810085825.26038-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230810085636.25914-1-yan.y.zhao@intel.com>
-References: <20230810085636.25914-1-yan.y.zhao@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        with ESMTP id S232898AbjHJJAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 05:00:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5682103
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 01:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691657995;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=c4Q3bG06Um9xiuwQLyhROTUHKOWnInCYCVs9Q129Zb0=;
+        b=jVBxn0Z/UyeTQ0SS5/R7pd0P3/5XWR715C11U8OIheoPtGj9UnWrq6Njy7E2yfhapg4ze3
+        ieMb3HSRsfhnKcaRI4AF0EVfWKA0JcG9sxG/BMmWa4mlRekFIHi42XTPhiePbT63nRozJc
+        yjTWpinNW9k0+cpTUPMNzaY4H1cd+M4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-158-oGle4ZjBPHyUP5YC2434SQ-1; Thu, 10 Aug 2023 04:59:54 -0400
+X-MC-Unique: oGle4ZjBPHyUP5YC2434SQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30e4943ca7fso397464f8f.3
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 01:59:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691657993; x=1692262793;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c4Q3bG06Um9xiuwQLyhROTUHKOWnInCYCVs9Q129Zb0=;
+        b=Uys3rOjUk0UZ0TujDoMFIUYeU42m8ODchMk10dJ19NCPNMB6tdzB36oISsbvpDwjTq
+         i6vYKQjRwSRHyzcHEwl4xjVzp4lIbc5L1t7m5Bpyj0DikhHOuaY+93/aD9Q4HkTURf9l
+         USo7CZ+KKz7KNEZRUKW9cmUrT4jddwdMdTQTC4ougza5ljG3nLrh8tzgJ6p4x+0c3ZKV
+         7Vq4ol167IwnxqU7KWItKezRGObLeW9uRcukhubkcXBc+3FsyIBa+bctoddVwv5/QU4g
+         sMPH1VhGmA5JqsXJ012loSoIaHk+M4MGdS8gYez+gGSknsukZEChGcuCoLUQqJy8u76b
+         MFDg==
+X-Gm-Message-State: AOJu0YwVi9khonayxj54Gewvz83GZOT4RUGtS+XF09iqy/dyBXtAY9Vj
+        uNGjlZAt9mM5B1Xb5JCLtNwQXeBEJqGLPQYfglM9Ct795Y4J7MhdWYckvwdxuoKa0Em3lBrBFu0
+        /qJJ7Acxhaj5y
+X-Received: by 2002:a5d:6450:0:b0:317:6513:da83 with SMTP id d16-20020a5d6450000000b003176513da83mr1697681wrw.43.1691657992894;
+        Thu, 10 Aug 2023 01:59:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFrNAflve3upAMyov7jePR9HhkLqj4IxvNQI19KVxlcAWoTyHZWkkK9xo/FbcP07VS+yI24Ug==
+X-Received: by 2002:a5d:6450:0:b0:317:6513:da83 with SMTP id d16-20020a5d6450000000b003176513da83mr1697665wrw.43.1691657992546;
+        Thu, 10 Aug 2023 01:59:52 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id i10-20020a5d438a000000b0031760af2331sm1431230wrq.100.2023.08.10.01.59.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 01:59:51 -0700 (PDT)
+Message-ID: <6fd0dc2e-4837-ae64-65c7-c342764b668f@redhat.com>
+Date:   Thu, 10 Aug 2023 10:59:49 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 24/27] KVM: arm64: nv: Add switching support for
+ HFGxTR/HDFGxTR
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+ <20230808114711.2013842-25-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230808114711.2013842-25-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -61,55 +98,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Don't set PROT_NONE for exclusive anonymas and maybe-dma-pinned pages for
-NUMA migration purpose.
+Hi Marc,
 
-For exclusive anonymas and page_maybe_dma_pinned() pages, NUMA-migration
-will eventually drop migration of those pages in try_to_migrate_one().
-(i.e. after -EBUSY returned in page_try_share_anon_rmap()).
+On 8/8/23 13:47, Marc Zyngier wrote:
+> Now that we can evaluate the FGT registers, allow them to be merged
+> with the hypervisor's own configuration (in the case of HFG{RW}TR_EL2)
+> or simply set for HFGITR_EL2, HDGFRTR_EL2 and HDFGWTR_EL2.
+HDFGRTR_EL2
 
-So, skip setting PROT_NONE to those kind of pages earlier in
-change_protection_range() phase to avoid later futile page faults,
-detections, and restoration to original PTEs/PMDs.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 48 +++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index e096b16e85fd..a4750070563f 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -70,6 +70,13 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +#define compute_clr_set(vcpu, reg, clr, set)				\
+> +	do {								\
+> +		u64 hfg;						\
+> +		hfg = __vcpu_sys_reg(vcpu, reg) & ~__ ## reg ## _RES0;	\
+> +		set |= hfg & __ ## reg ## _MASK; 			\
+> +		clr |= ~hfg & __ ## reg ## _nMASK; 			\
+> +	} while(0)
+>  
+>  
+>  static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+> @@ -97,6 +104,10 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+>  		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
+>  
+> +	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> +		compute_clr_set(vcpu, HFGRTR_EL2, r_clr, r_set);
+> +		compute_clr_set(vcpu, HFGWTR_EL2, w_clr, w_set);
+> +	}
+>  
+>  	/* The default is not to trap anything but ACCDATA_EL1 */
+>  	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
+> @@ -109,6 +120,38 @@ static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  
+>  	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
+>  	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
+> +
+> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> +		return;
+> +
+> +	ctxt_sys_reg(hctxt, HFGITR_EL2) = read_sysreg_s(SYS_HFGITR_EL2);
+> +
+> +	r_set = r_clr = 0;
+> +	compute_clr_set(vcpu, HFGITR_EL2, r_clr, r_set);
+> +	r_val = __HFGITR_EL2_nMASK;
+> +	r_val |= r_set;
+> +	r_val &= ~r_clr;
+> +
+> +	write_sysreg_s(r_val, SYS_HFGITR_EL2);
+> +
+> +	ctxt_sys_reg(hctxt, HDFGRTR_EL2) = read_sysreg_s(SYS_HDFGRTR_EL2);
+> +	ctxt_sys_reg(hctxt, HDFGWTR_EL2) = read_sysreg_s(SYS_HDFGWTR_EL2);
+> +
+> +	r_clr = r_set = w_clr = w_set = 0;
+> +
+> +	compute_clr_set(vcpu, HDFGRTR_EL2, r_clr, r_set);
+> +	compute_clr_set(vcpu, HDFGWTR_EL2, w_clr, w_set);
+> +
+> +	r_val = __HDFGRTR_EL2_nMASK;
+> +	r_val |= r_set;
+> +	r_val &= ~r_clr;
+> +
+> +	w_val = __HDFGWTR_EL2_nMASK;
+> +	w_val |= w_set;
+> +	w_val &= ~w_clr;
+> +
+> +	write_sysreg_s(r_val, SYS_HDFGRTR_EL2);
+> +	write_sysreg_s(w_val, SYS_HDFGWTR_EL2);
+>  }
+>  
+>  static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+> @@ -121,7 +164,12 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
+>  	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+>  
+> +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> +		return;
+>  
+> +	write_sysreg_s(ctxt_sys_reg(hctxt, HFGITR_EL2), SYS_HFGITR_EL2);
+> +	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGRTR_EL2), SYS_HDFGRTR_EL2);
+> +	write_sysreg_s(ctxt_sys_reg(hctxt, HDFGWTR_EL2), SYS_HDFGWTR_EL2);
+>  }
+>  
+>  static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+besides looks good to me
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- mm/huge_memory.c | 5 +++++
- mm/mprotect.c    | 5 +++++
- 2 files changed, 10 insertions(+)
-
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index eb3678360b97..a71cf686e3b2 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -1875,6 +1875,11 @@ int change_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
- 			goto unlock;
- 
- 		page = pmd_page(*pmd);
-+
-+		if (PageAnon(page) && PageAnonExclusive(page) &&
-+		    page_maybe_dma_pinned(page))
-+			goto unlock;
-+
- 		toptier = node_is_toptier(page_to_nid(page));
- 		/*
- 		 * Skip scanning top tier node if normal numa
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index cb99a7d66467..a1f63df34b86 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -146,6 +146,11 @@ static long change_pte_range(struct mmu_gather *tlb,
- 				nid = page_to_nid(page);
- 				if (target_node == nid)
- 					continue;
-+
-+				if (PageAnon(page) && PageAnonExclusive(page) &&
-+				    page_maybe_dma_pinned(page))
-+					continue;
-+
- 				toptier = node_is_toptier(nid);
- 
- 				/*
--- 
-2.17.1
+Eric
 
