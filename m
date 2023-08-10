@@ -2,170 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A3947778A9
-	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 14:39:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EED577795E
+	for <lists+kvm@lfdr.de>; Thu, 10 Aug 2023 15:16:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235132AbjHJMjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 08:39:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55606 "EHLO
+        id S234892AbjHJNQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 09:16:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235009AbjHJMjT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 08:39:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121DA268E
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 05:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691671112;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=e0Wo4ft2/DV+pES3oEs9VkOI6CJR3CbB7D53EzyrdWY=;
-        b=BV1ALE3AtVXZRZjebwOkQKd/3fEvgBcNDLN0TfdLsyOSLeh4I+EhmFoKuR67ZsBmreke15
-        dkoiNtWDadlfQZniT0CBlAtvmzAE3x7oVslcquh/j5ChVS+g56GmSkS+kYahUavJg7QT/x
-        yMhvBtwQfzQONanIf/kZ2S/4PSA3BKk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-351-Ik-a6oBMOLeI124tkgeIsw-1; Thu, 10 Aug 2023 08:38:31 -0400
-X-MC-Unique: Ik-a6oBMOLeI124tkgeIsw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-317b30fedb0so525715f8f.2
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 05:38:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691671110; x=1692275910;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e0Wo4ft2/DV+pES3oEs9VkOI6CJR3CbB7D53EzyrdWY=;
-        b=Pmt7JOTIlW3mDwtDwx3wQnaa37pMT0sIgvvldYYvowfQmLRtSfqmP2ASyzVWvl1LA9
-         qaKMUG7yeqexlybOcClMgBvBpQfFvou80Dmi29fNVNl7P/bbfmfYb8vaNZ73StfKBl1N
-         UAtCAl0AQj8sVJ6HK8tW01P8ZrgGYdKN1Pess0L8v/DzN3Oo3pGKhokASGTSGQpmonBT
-         6aPSQtTyuh0iQqGrb/f3lANcfVHSyk/rjgw+mEKLOf9CLHtpiLd+Nkn0WC7vwkb88nd/
-         jXLs/cC3IX/ADUtoPIG35OciGV/ixFzzj3TLPte+ylMDum9G5nqg7d/yWcgReIQ2eDjY
-         RS9Q==
-X-Gm-Message-State: AOJu0YzxVJrNoCnDYMZH06bnZHhYgM9z11Y32i4uJKP303DWQoImDVVJ
-        G7GhNNtTi7GFvfHXlQGSuUnBgf7xp66iIAFuQYr2+x0QQvziM6G+UrjPMYAyb3Agii8OQqEvqJX
-        7FyquQA4r5P9p
-X-Received: by 2002:a5d:61d0:0:b0:313:f463:9d40 with SMTP id q16-20020a5d61d0000000b00313f4639d40mr2256910wrv.65.1691671109948;
-        Thu, 10 Aug 2023 05:38:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFbXiWhGp1spWUmxlRDOb6WbdU0xknSGtpi8pHz6NkVFa/AtQ/PIb5TpAiXANZhMbQnGi8aQw==
-X-Received: by 2002:a5d:61d0:0:b0:313:f463:9d40 with SMTP id q16-20020a5d61d0000000b00313f4639d40mr2256889wrv.65.1691671109649;
-        Thu, 10 Aug 2023 05:38:29 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id f18-20020a5d6652000000b003143ba62cf4sm2051508wrw.86.2023.08.10.05.38.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 05:38:28 -0700 (PDT)
-Message-ID: <15fc525c-7357-7457-c3c2-a8211619e787@redhat.com>
-Date:   Thu, 10 Aug 2023 14:38:26 +0200
+        with ESMTP id S229693AbjHJNQy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 09:16:54 -0400
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8BBFC10E6;
+        Thu, 10 Aug 2023 06:16:52 -0700 (PDT)
+Received: from loongson.cn (unknown [10.20.42.170])
+        by gateway (Coremail) with SMTP id _____8AxlPBC49RkDLEUAA--.44585S3;
+        Thu, 10 Aug 2023 21:16:50 +0800 (CST)
+Received: from [10.20.42.170] (unknown [10.20.42.170])
+        by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax98xB49RkxTVTAA--.56519S3;
+        Thu, 10 Aug 2023 21:16:49 +0800 (CST)
+Message-ID: <277ee023-dc94-6c23-20b2-7deba641f1b1@loongson.cn>
+Date:   Thu, 10 Aug 2023 21:16:49 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 26/27] KVM: arm64: Move HCRX_EL2 switch to load/put on
- VHE systems
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v2 5/5] KVM: Unmap pages only when it's indeed
+ protected for NUMA migration
 Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
- <20230808114711.2013842-27-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230808114711.2013842-27-maz@kernel.org>
+To:     Yan Zhao <yan.y.zhao@intel.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, mike.kravetz@oracle.com,
+        apopple@nvidia.com, jgg@nvidia.com, rppt@kernel.org,
+        akpm@linux-foundation.org, kevin.tian@intel.com, david@redhat.com
+References: <20230810085636.25914-1-yan.y.zhao@intel.com>
+ <20230810090218.26244-1-yan.y.zhao@intel.com>
+From:   bibo mao <maobibo@loongson.cn>
+In-Reply-To: <20230810090218.26244-1-yan.y.zhao@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf8Ax98xB49RkxTVTAA--.56519S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxXr1xXFWDZw4kWFW3tFyDtwc_yoW5CrW8pF
+        WDKrZ5GFsrX3yqgayjqa1vya43XrZ7Wa18Ja4fGr9xtFn0grnrJrW8KwnFvFykAr9YqF13
+        Zayjqr18u34UAagCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+        0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+        AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
+        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+        v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcApnDU
+        UUU
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On 8/8/23 13:47, Marc Zyngier wrote:
-> Although the nVHE behaviour requires HCRX_EL2 to be switched
-> on each switch between host and guest, there is nothing in
-> this register that would affect a VHE host.
->
-> It is thus possible to save/restore this register on load/put
-> on VHE systems, avoiding unnecessary sysreg access on the hot
-> path. Additionally, it avoids unnecessary traps when running
-> with NV.
->
-> To achieve this, simply move the read/writes to the *_common()
-> helpers, which are called on load/put on VHE, and more eagerly
-> on nVHE.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+在 2023/8/10 17:02, Yan Zhao 写道:
+> Register to .numa_protect() callback in mmu notifier so that KVM can get
+> acurate information about when a page is PROT_NONE protected in primary
+> MMU and unmap it in secondary MMU accordingly.
+> 
+> In KVM's .invalidate_range_start() handler, if the event is to notify that
+> the range may be protected to PROT_NONE for NUMA migration purpose,
+> don't do the unmapping in secondary MMU. Hold on until.numa_protect()
+> comes.
+> 
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index a4750070563f..060c5a0409e5 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -197,6 +197,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
->  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>  virt/kvm/kvm_main.c | 25 ++++++++++++++++++++++---
+>  1 file changed, 22 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dfbaafbe3a00..907444a1761b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -711,6 +711,20 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>  	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_change_spte_gfn);
+>  }
 >  
-> +	if (cpus_have_final_cap(ARM64_HAS_HCX))
-> +		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
+> +static void kvm_mmu_notifier_numa_protect(struct mmu_notifier *mn,
+> +					  struct mm_struct *mm,
+> +					  unsigned long start,
+> +					  unsigned long end)
+> +{
+> +	struct kvm *kvm = mmu_notifier_to_kvm(mn);
 > +
->  	__activate_traps_hfgxtr(vcpu);
->  }
->  
-> @@ -213,6 +216,9 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->  		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
->  	}
->  
-> +	if (cpus_have_final_cap(ARM64_HAS_HCX))
-> +		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
+> +	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
+> +	if (!READ_ONCE(kvm->mmu_invalidate_in_progress))
+> +		return;
 > +
->  	__deactivate_traps_hfgxtr(vcpu);
->  }
->  
-> @@ -227,9 +233,6 @@ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
->  
->  	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
->  		write_sysreg_s(vcpu->arch.vsesr_el2, SYS_VSESR_EL2);
-> -
-> -	if (cpus_have_final_cap(ARM64_HAS_HCX))
-> -		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
->  }
->  
->  static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
-> @@ -244,9 +247,6 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 &= ~HCR_VSE;
->  		vcpu->arch.hcr_el2 |= read_sysreg(hcr_el2) & HCR_VSE;
->  	}
-> -
-> -	if (cpus_have_final_cap(ARM64_HAS_HCX))
-> -		write_sysreg_s(HCRX_HOST_FLAGS, SYS_HCRX_EL2);
->  }
->  
->  static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> +	kvm_handle_hva_range(mn, start, end, __pte(0), kvm_unmap_gfn_range);
+> +}
+numa balance will scan wide memory range, and there will be one time
+ipi notification with kvm_flush_remote_tlbs. With page level notification,
+it may bring out lots of flush remote tlb ipi notification.
 
-Thanks
+however numa balance notification, pmd table of vm maybe needs not be freed
+in kvm_unmap_gfn_range.
 
-Eric
+Regards
+Bibo Mao
+> +
+>  void kvm_mmu_invalidate_begin(struct kvm *kvm, unsigned long start,
+>  			      unsigned long end)
+>  {
+> @@ -744,14 +758,18 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  					const struct mmu_notifier_range *range)
+>  {
+>  	struct kvm *kvm = mmu_notifier_to_kvm(mn);
+> +	bool is_numa = (range->event == MMU_NOTIFY_PROTECTION_VMA) &&
+> +		       (range->flags & MMU_NOTIFIER_RANGE_NUMA);
+>  	const struct kvm_hva_range hva_range = {
+>  		.start		= range->start,
+>  		.end		= range->end,
+>  		.pte		= __pte(0),
+> -		.handler	= kvm_unmap_gfn_range,
+> +		.handler	= !is_numa ? kvm_unmap_gfn_range :
+> +				  (void *)kvm_null_fn,
+>  		.on_lock	= kvm_mmu_invalidate_begin,
+> -		.on_unlock	= kvm_arch_guest_memory_reclaimed,
+> -		.flush_on_ret	= true,
+> +		.on_unlock	= !is_numa ? kvm_arch_guest_memory_reclaimed :
+> +				  (void *)kvm_null_fn,
+> +		.flush_on_ret	= !is_numa ? true : false,
+>  		.may_block	= mmu_notifier_range_blockable(range),
+>  	};
+>  
+> @@ -899,6 +917,7 @@ static const struct mmu_notifier_ops kvm_mmu_notifier_ops = {
+>  	.clear_young		= kvm_mmu_notifier_clear_young,
+>  	.test_young		= kvm_mmu_notifier_test_young,
+>  	.change_pte		= kvm_mmu_notifier_change_pte,
+> +	.numa_protect		= kvm_mmu_notifier_numa_protect,
+>  	.release		= kvm_mmu_notifier_release,
+>  };
+>  
 
