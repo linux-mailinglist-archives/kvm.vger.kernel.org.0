@@ -2,88 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DBBB77844A
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:48:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FA8077844D
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:50:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbjHJXsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 19:48:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52860 "EHLO
+        id S233097AbjHJXt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 19:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbjHJXsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 19:48:16 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9808BC5
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:48:16 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-268441d0e64so1931386a91.1
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:48:16 -0700 (PDT)
+        with ESMTP id S232994AbjHJXtW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 19:49:22 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2292D44
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:49:21 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-686bc3f11feso1854861b3a.0
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:49:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691711296; x=1692316096;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZV/Ct/Ds/CxS4v6ir6EHRWsoOhvufSz0INvujsP8hqY=;
-        b=vSrGdjpvDxTK/XL3At5KxkEi3BN7xLVQpPmnORZMhNG6jd39wJsns/R42KS5xfvvXi
-         yWOf3T02bs2cFYxM2Bhrzrfj0k6Po0wWmcQm6G/LaTfmxV81Ct/0B2yvJpQ1Ac5przBM
-         YI/COf8QXx2m5sSQcKF+l2LSoIpkzb5A89S15N5HYQ3pppUclgQ+9/xmB/68xZHvAKfB
-         JSU6pgtHKdHo4h0gV0hA/MMNZT85qAuZCuamTpFwYhHNi9iSZMFI/PgHP9+N4m/gs0vU
-         jiL9rOS/C5ipEbZb8SH5IHTEyqot9sQ8y5Uv8dfoZAg4iBI1zrE098pJmeiz2Px/Socu
-         EZ0w==
+        d=google.com; s=20221208; t=1691711361; x=1692316161;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JCCbjs9yndiAMHKk4zASKNfGLKmo2+2FE4R0zJsZx6Q=;
+        b=FAc2CxSHLC8ZxlV75t3HwLsw3iguLOIiobsunskpVdaaDLobGTrDJNCqxHOV5ZztvF
+         nEi2bjCYtZcX2d6Xc9r34XQ5tf3WDS9tsxpSMrvq30i4m8eN10rkjwr4+TIafkaYvchN
+         UlIyjlmZc0jE1fZGO6VD4N89rDsiqUAojHW7SpaEclte1hgZeZmzXTzfOsZCOiOoTB8a
+         f5EEwkSyykDz+aYoKOO3tlgF6Ma8LqCYWIZPTUTd1VkS8lbB20MP7lkrCujOoaeBtA3I
+         0Ydn6LJ3aIPpJD+KUsTqsgiwv1R0J47J8VXt4pBAs8pMdsi1F0FdVonb/ymJamRErN+A
+         fBzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691711296; x=1692316096;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZV/Ct/Ds/CxS4v6ir6EHRWsoOhvufSz0INvujsP8hqY=;
-        b=kKl4FJGONJBa7E/y56xsDgwXx0oBPL9feNQMCHZgrb2MwNrlzkJUvX03DP93ze4UfT
-         96x7G2Put7GltIv9a/sUAmYo4WCdcQHmlUgHLW3ysNWQbbTY2m7pvKjDUkxCqf6ZFOSJ
-         aySlsHWAdTg6NrY2UVLLt0idptW/QWqK+EXVGigzYPp7rEHh71S/IlkzPA5yNdQaiq0+
-         cbs3tLMOUAEucX0+ZeOCm8jj4fPgvfuJnKw6wKUf97zWWRune61UXSSQ/nL19p5+jG+S
-         akfSQJ/MpJE7uK/SwRROX4cPRfTW2sQzMiPO5jK0ZW/VPKDzJbu9nLzvY92HRsFDO+S4
-         Y6ew==
-X-Gm-Message-State: AOJu0YxirLjh41sU0HEm3aRYdIvOd2kwRjKqJqtD3DeJuhtwRHs6cMp6
-        dqxTTc6s9UIkh4aQqwNz0ylQQmaBb+I=
-X-Google-Smtp-Source: AGHT+IFvQV9B4i2e4uuA2RI0E1Gm8UGPYDS/BYnwMbmvrRmW8AeG2hCnUB9az9bEpN0laGy/rlEDrxMOA1g=
+        d=1e100.net; s=20221208; t=1691711361; x=1692316161;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JCCbjs9yndiAMHKk4zASKNfGLKmo2+2FE4R0zJsZx6Q=;
+        b=GJ/iCtaztFs0uuC2Car7nmrLukkLg2Nvnq6eLFZHhRQZPwaxdqfBx1Cl4/9Tnn/3pH
+         ieLMVh/XUYmHjDWGv73nhF67kgk/r/NSzBRUSCJn8W8bqvQjGVUpl9ITotexNH4hlJPs
+         xGq5oWcpr6fXH7H9v2SRFbOaXBwiV499lAGobS++nTJeY5B/p3CXVTumEK+nKBdpyYyB
+         DtmR6Er2Kyo/aOXJoZE3qIHmHzInRk/XMYyAc3EkFXNeZ305m4Fbqzggsk32vza2Q1oM
+         mMx6LSeD1EgME2dnL9EL0sXGRQEr/gTuXUs03jsHeWhWt3IR+w1jN2B/7L49veEm2ZMG
+         trfA==
+X-Gm-Message-State: AOJu0YzulA3H0A5lSPtgO5d1j0KSEZkzAUiOmgjeCK7xPqg0OQPHngnk
+        tFQ+XhD5vMj/+M3C+2zs+R0hbKwROn0=
+X-Google-Smtp-Source: AGHT+IG/qTAJddN4VYilmPHo9b5dSyzm2/iYFGk9Z2MZOQ0XKIW6/vUu1BscGUmTQICHDP/2SKBq+d+O6p0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:811:b0:262:ffae:56cf with SMTP id
- bk17-20020a17090b081100b00262ffae56cfmr9678pjb.8.1691711296149; Thu, 10 Aug
- 2023 16:48:16 -0700 (PDT)
-Date:   Thu, 10 Aug 2023 16:48:14 -0700
-In-Reply-To: <CAF7b7mqczaqwFhFaoicOtWHGEf50f-14cuCXSPj36eZsuCoGUg@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1d0d:b0:666:8f6c:c8ad with SMTP id
+ a13-20020a056a001d0d00b006668f6cc8admr1036745pfx.2.1691711360993; Thu, 10 Aug
+ 2023 16:49:20 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 10 Aug 2023 16:49:16 -0700
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-2-amoorthy@google.com>
- <ZInRNigDyzeuf79e@google.com> <CAF7b7moOw5irHbZmjj=40H3wJ0uWK5qRhQXpxAk3k4MBg3cH3Q@mail.gmail.com>
- <CAF7b7mqczaqwFhFaoicOtWHGEf50f-14cuCXSPj36eZsuCoGUg@mail.gmail.com>
-Message-ID: <ZNV3Pnqczf6PrNrs@google.com>
-Subject: Re: [PATCH v4 01/16] KVM: Allow hva_pfn_fast() to resolve read-only faults.
+X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
+Message-ID: <20230810234919.145474-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: SVM: Fix unexpected #UD on INT3 in SEV guests
 From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="us-ascii"
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wu Zongyo <wuzongyo@mail.ustc.edu.cn>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 10, 2023, Anish Moorthy wrote:
-> I figured I'd start double checking my documentation changes before
-> sending out the next version, since those have been a persistent
-> issue. So, here's what I've currently got for the commit message here
-> 
-> > hva_to_pfn_fast() currently just fails for read faults where
-> > establishing writable mappings is forbidden, which is unnecessary.
-> > Instead, try getting the page without passing FOLL_WRITE. This allows
-> > the aforementioned faults to (potentially) be resolved without falling
-> > back to slow GUP.
+Fix a bug where KVM injects a bogus #UD for SEV guests when trying to skip
+an INT3 as part of re-injecting the associated #BP that got kinda sorta
+intercepted due to a #NPF occuring while vectoring/delivering the #BP.
 
-Looks good!  One nit, I would drop the "read" part of "read faults".  This behavior
-also applies to executable faults.  You captured the key part well (writable mappings
-forbidden), so I don't think there's any need to further clarify what types of
-faults this applies to.
+I haven't actually confirmed that patch 1 fixes the bug, as it's a
+different change than what I originally proposed.  I'm 99% certain it will
+work, but I definitely need verification that it fixes the problem
+
+Patch 2 is a tangentially related cleanup to make NRIPS a requirement for
+enabling SEV, e.g. so that we don't ever get "bug" reports of SEV guests
+not working when NRIPS is disabled.
+
+Sean Christopherson (2):
+  KVM: SVM: Don't inject #UD if KVM attempts emulation of SEV guest w/o
+    insn
+  KVM: SVM: Require nrips support for SEV guests (and beyond)
+
+ arch/x86/kvm/svm/sev.c |  2 +-
+ arch/x86/kvm/svm/svm.c | 37 ++++++++++++++++++++-----------------
+ arch/x86/kvm/svm/svm.h |  1 +
+ 3 files changed, 22 insertions(+), 18 deletions(-)
+
+
+base-commit: 240f736891887939571854bd6d734b6c9291f22e
+-- 
+2.41.0.694.ge786442a9b-goog
+
