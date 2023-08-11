@@ -2,209 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 318747785B0
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 05:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89D1A7785BE
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 05:04:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbjHKDAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 23:00:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54374 "EHLO
+        id S231377AbjHKDEt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 23:04:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbjHKDA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 23:00:28 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 190C92D61
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:00:26 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1bbaa549c82so1363892fac.0
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:00:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691722825; x=1692327625;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UTJGjUqBapxVhvCdXTD7P0bpdJMZ6O+lPqjyCa3v71k=;
-        b=vXUpok/T4f4PicGTiPoHq0EFJXLr816p6np/CAF2Fem9nUUCJHwpzYQVEP7RPcMPjo
-         Q4i/Dn1zeqa3iSlR1qEjFIsygsGZwEEnKsCSVMJQmIY46rB7hSi8sTwOlMOuCd4oYaKf
-         kbjawAhkXylXMh+tBuh6IifYtEh3fdNPs+0R/yW4IxbQXZqaH4Se7HKYpR6caGaaDayu
-         aL/Il2WNNYBgFppcbfE1WgR+m2VzO684OKxMiOPdZO5RPgnIxN082GrXF+m3NafLYEGr
-         MFt9e1CausCM+qw7QvEnprT/PkY0jEOOq3JwSQrA69QwnxTcrLrKkGri/QqG3S3attQD
-         K6yA==
+        with ESMTP id S229468AbjHKDEr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 23:04:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46ECC2D65
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:04:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691723039;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1DMrZ/cVVx9oJnb2z2JJ4WKVaGEEQv2IXABVTFJ5wRQ=;
+        b=eViK7cmuXm7qapoTxs6HXXdJUQhVUf3IG+2xlSwJoNIYd1q9QtxUE8VjCkxlsVaWY5w+Z4
+        nwgEE4MIyp4EVuwoUI+LiXKj7A03U3Eo5AhQXPIdK7En3GUGRUEx7AJl/v9w6N8vsFs3Bm
+        G9OiwS79Kov8mJFII5i6icfZn10Ni2Y=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-88-AaT3VYr_NKSpQq_SWQxXtA-1; Thu, 10 Aug 2023 23:03:58 -0400
+X-MC-Unique: AaT3VYr_NKSpQq_SWQxXtA-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-56561aaaeeeso234322a12.0
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:03:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691722825; x=1692327625;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UTJGjUqBapxVhvCdXTD7P0bpdJMZ6O+lPqjyCa3v71k=;
-        b=gBlji/C7kMtswdJW/7S8bzTiTPKfLg+NkR6tCUCiV/0wFef3H0fKAQHCXB7LAEenXI
-         NuKe84QFZDeZFZ8MncT+ZiFWVEnWoEleN2p7m1fgB0L1dcoMW0f2vkQOXecAJwl8XmU3
-         lLJCecYqiHzatmAplWdy4KyOP3+tHpE93GtJDglh0h7/mffFA5F6zMJ+DfLboeNnmJla
-         uAWp1oEsBYm7d3BH0p48nmDy0rjzWT/IqtYODdTso860LYBMMMddZi9iTFQ4etWJM928
-         35wsNUx59QwPBvu02xsDH0I5ZctAzTnPd3YCPpOu9hjjpdZ6ZVMZuwL6rRDt9r606DtD
-         qlfg==
-X-Gm-Message-State: AOJu0YyN6wcorDwroVIZJrmG2VfnT/EU7u2tP1l+S/D2aa0XHDk9UlCB
-        bF94KAdFjo3WNmdcxO+osRjdLeIvvz59/tqU2e65HQ==
-X-Google-Smtp-Source: AGHT+IE4r9r52XP5QQyIa4kV7mjGBry+BkkZDTXNKGDTQSHIV8fdVgVCuEWMJzUei7+pxt1jhVKap2356aVv9pLNv/4=
-X-Received: by 2002:a05:6870:7394:b0:1b7:4655:2ac9 with SMTP id
- z20-20020a056870739400b001b746552ac9mr719081oam.6.1691722825262; Thu, 10 Aug
- 2023 20:00:25 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691723037; x=1692327837;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1DMrZ/cVVx9oJnb2z2JJ4WKVaGEEQv2IXABVTFJ5wRQ=;
+        b=N0qp+scS+jNeI/Tf6L+SmtN7CT0fkX1/D6yjfJ8fwCZSdpfCgbqHkVUhVLCPT8aHsi
+         6RHpeIixsNVRXBs2I0L2+yCtq/BXxvDtVx5/q41bJqx6ebMWHLp4mBXorhZsxeJmKknb
+         WLAxnLq6nWmem6K4l5PZfNRWcdASZZhXhyGEugNmzI0lKU/I5YXcwNzoyZAAHwNWoFEA
+         qf7cgqB+aL2No72JJ3KwZQX4Ri/Faumi+5hHndIeFuSfoMU5FU9Oe/ZIoYRpurOz9i6m
+         T+19BRHcbZK3nUVqBNoARJo+i+tfMnMXI60j26J5Iy1teLMkmOjDyG7tIBEI8E6f8Gn+
+         fTUQ==
+X-Gm-Message-State: AOJu0YzjDleq+bx2sHhzUKGXbO6SNXfNPaZbIs7HoOEK+rYCde+O1ygw
+        5CsR5aguGte7jtcDf/hYOD6c+VwwSLaHOrhnT9lbBBtF34UI7U9FkukPrWDmUZSkmFHC6Smt97n
+        aM47aLT1WDpbt
+X-Received: by 2002:a05:6a21:6d88:b0:13a:3649:dc1a with SMTP id wl8-20020a056a216d8800b0013a3649dc1amr1316468pzb.0.1691723036991;
+        Thu, 10 Aug 2023 20:03:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENpkl1RL6Mkjeuk83qmopiO791ccRF4dSFjJzHpK+/MQLjdG2TJSO7XFsP6XAreIKgXCzHJg==
+X-Received: by 2002:a05:6a21:6d88:b0:13a:3649:dc1a with SMTP id wl8-20020a056a216d8800b0013a3649dc1amr1316435pzb.0.1691723036603;
+        Thu, 10 Aug 2023 20:03:56 -0700 (PDT)
+Received: from [10.72.112.92] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id y15-20020a637d0f000000b00553d42a7cb5sm2239376pgc.68.2023.08.10.20.03.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Aug 2023 20:03:56 -0700 (PDT)
+Message-ID: <d03b0f1f-2bd6-fc23-2d7a-ddb36eba93cf@redhat.com>
+Date:   Fri, 11 Aug 2023 11:03:45 +0800
 MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-7-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-7-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 10 Aug 2023 20:00:12 -0700
-Message-ID: <CAAdAUthK6O6u3ZGePpGOqU1eVtfGfxd_0cBpm5LyvjAUzpnhRw@mail.gmail.com>
-Subject: Re: [PATCH v3 06/27] arm64: Add debug registers affected by HDFGxTR_EL2
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v8 11/14] KVM: arm64: Implement
+ kvm_arch_flush_remote_tlbs_range()
+Content-Language: en-US
+To:     Raghavendra Rao Ananta <rananta@google.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Fuad Tabba <tabba@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>
+References: <20230808231330.3855936-1-rananta@google.com>
+ <20230808231330.3855936-12-rananta@google.com>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230808231330.3855936-12-rananta@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
 
-On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
-> related registers. Add their encodings (and only that, because
-> we really don't care about what these registers actually do at
-> this stage).
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+On 8/9/23 07:13, Raghavendra Rao Ananta wrote:
+> Implement kvm_arch_flush_remote_tlbs_range() for arm64
+> to invalidate the given range in the TLB.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
 > ---
->  arch/arm64/include/asm/sysreg.h | 76 +++++++++++++++++++++++++++++++++
->  1 file changed, 76 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sys=
-reg.h
-> index 76289339b43b..bb5a0877a210 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -194,6 +194,82 @@
->  #define SYS_DBGDTRTX_EL0               sys_reg(2, 3, 0, 5, 0)
->  #define SYS_DBGVCR32_EL2               sys_reg(2, 4, 0, 7, 0)
->
-> +#define SYS_BRBINF_EL1(n)              sys_reg(2, 1, 8, (n & 15), (((n &=
- 16) >> 2) | 0))
-> +#define SYS_BRBINFINJ_EL1              sys_reg(2, 1, 9, 1, 0)
-> +#define SYS_BRBSRC_EL1(n)              sys_reg(2, 1, 8, (n & 15), (((n &=
- 16) >> 2) | 1))
-> +#define SYS_BRBSRCINJ_EL1              sys_reg(2, 1, 9, 1, 1)
-> +#define SYS_BRBTGT_EL1(n)              sys_reg(2, 1, 8, (n & 15), (((n &=
- 16) >> 2) | 2))
-> +#define SYS_BRBTGTINJ_EL1              sys_reg(2, 1, 9, 1, 2)
-> +#define SYS_BRBTS_EL1                  sys_reg(2, 1, 9, 0, 2)
+>   arch/arm64/include/asm/kvm_host.h | 2 ++
+>   arch/arm64/kvm/mmu.c              | 8 ++++++++
+>   2 files changed, 10 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 20f2ba149c70c..8f2d99eaab036 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1113,6 +1113,8 @@ struct kvm *kvm_arch_alloc_vm(void);
+>   
+>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+>   
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS_RANGE
 > +
-> +#define SYS_BRBCR_EL1                  sys_reg(2, 1, 9, 0, 0)
-> +#define SYS_BRBFCR_EL1                 sys_reg(2, 1, 9, 0, 1)
-> +#define SYS_BRBIDR0_EL1                        sys_reg(2, 1, 9, 2, 0)
-> +
-> +#define SYS_TRCITECR_EL1               sys_reg(3, 0, 1, 2, 3)
-> +#define SYS_TRCACATR(m)                        sys_reg(2, 1, 2, ((m & 7)=
- << 1), (2 | (m >> 3)))
-> +#define SYS_TRCACVR(m)                 sys_reg(2, 1, 2, ((m & 7) << 1), =
-(0 | (m >> 3)))
-> +#define SYS_TRCAUTHSTATUS              sys_reg(2, 1, 7, 14, 6)
-> +#define SYS_TRCAUXCTLR                 sys_reg(2, 1, 0, 6, 0)
-> +#define SYS_TRCBBCTLR                  sys_reg(2, 1, 0, 15, 0)
-> +#define SYS_TRCCCCTLR                  sys_reg(2, 1, 0, 14, 0)
-> +#define SYS_TRCCIDCCTLR0               sys_reg(2, 1, 3, 0, 2)
-> +#define SYS_TRCCIDCCTLR1               sys_reg(2, 1, 3, 1, 2)
-> +#define SYS_TRCCIDCVR(m)               sys_reg(2, 1, 3, ((m & 7) << 1), =
-0)
-> +#define SYS_TRCCLAIMCLR                        sys_reg(2, 1, 7, 9, 6)
-> +#define SYS_TRCCLAIMSET                        sys_reg(2, 1, 7, 8, 6)
-> +#define SYS_TRCCNTCTLR(m)              sys_reg(2, 1, 0, (4 | (m & 3)), 5=
-)
-> +#define SYS_TRCCNTRLDVR(m)             sys_reg(2, 1, 0, (0 | (m & 3)), 5=
-)
-> +#define SYS_TRCCNTVR(m)                        sys_reg(2, 1, 0, (8 | (m =
-& 3)), 5)
-> +#define SYS_TRCCONFIGR                 sys_reg(2, 1, 0, 4, 0)
-> +#define SYS_TRCDEVARCH                 sys_reg(2, 1, 7, 15, 6)
-> +#define SYS_TRCDEVID                   sys_reg(2, 1, 7, 2, 7)
-> +#define SYS_TRCEVENTCTL0R              sys_reg(2, 1, 0, 8, 0)
-> +#define SYS_TRCEVENTCTL1R              sys_reg(2, 1, 0, 9, 0)
-> +#define SYS_TRCEXTINSELR(m)            sys_reg(2, 1, 0, (8 | (m & 3)), 4=
-)
-> +#define SYS_TRCIDR0                    sys_reg(2, 1, 0, 8, 7)
-> +#define SYS_TRCIDR10                   sys_reg(2, 1, 0, 2, 6)
-> +#define SYS_TRCIDR11                   sys_reg(2, 1, 0, 3, 6)
-> +#define SYS_TRCIDR12                   sys_reg(2, 1, 0, 4, 6)
-> +#define SYS_TRCIDR13                   sys_reg(2, 1, 0, 5, 6)
-> +#define SYS_TRCIDR1                    sys_reg(2, 1, 0, 9, 7)
-> +#define SYS_TRCIDR2                    sys_reg(2, 1, 0, 10, 7)
-> +#define SYS_TRCIDR3                    sys_reg(2, 1, 0, 11, 7)
-> +#define SYS_TRCIDR4                    sys_reg(2, 1, 0, 12, 7)
-> +#define SYS_TRCIDR5                    sys_reg(2, 1, 0, 13, 7)
-> +#define SYS_TRCIDR6                    sys_reg(2, 1, 0, 14, 7)
-> +#define SYS_TRCIDR7                    sys_reg(2, 1, 0, 15, 7)
-> +#define SYS_TRCIDR8                    sys_reg(2, 1, 0, 0, 6)
-> +#define SYS_TRCIDR9                    sys_reg(2, 1, 0, 1, 6)
-> +#define SYS_TRCIMSPEC(m)               sys_reg(2, 1, 0, (m & 7), 7)
-> +#define SYS_TRCITEEDCR                 sys_reg(2, 1, 0, 2, 1)
-> +#define SYS_TRCOSLSR                   sys_reg(2, 1, 1, 1, 4)
-> +#define SYS_TRCPRGCTLR                 sys_reg(2, 1, 0, 1, 0)
-> +#define SYS_TRCQCTLR                   sys_reg(2, 1, 0, 1, 1)
-> +#define SYS_TRCRSCTLR(m)               sys_reg(2, 1, 1, (m & 15), (0 | (=
-m >> 4)))
-> +#define SYS_TRCRSR                     sys_reg(2, 1, 0, 10, 0)
-> +#define SYS_TRCSEQEVR(m)               sys_reg(2, 1, 0, (m & 3), 4)
-> +#define SYS_TRCSEQRSTEVR               sys_reg(2, 1, 0, 6, 4)
-> +#define SYS_TRCSEQSTR                  sys_reg(2, 1, 0, 7, 4)
-> +#define SYS_TRCSSCCR(m)                        sys_reg(2, 1, 1, (m & 7),=
- 2)
-> +#define SYS_TRCSSCSR(m)                        sys_reg(2, 1, 1, (8 | (m =
-& 7)), 2)
-> +#define SYS_TRCSSPCICR(m)              sys_reg(2, 1, 1, (m & 7), 3)
-> +#define SYS_TRCSTALLCTLR               sys_reg(2, 1, 0, 11, 0)
-> +#define SYS_TRCSTATR                   sys_reg(2, 1, 0, 3, 0)
-> +#define SYS_TRCSYNCPR                  sys_reg(2, 1, 0, 13, 0)
-> +#define SYS_TRCTRACEIDR                        sys_reg(2, 1, 0, 0, 1)
-> +#define SYS_TRCTSCTLR                  sys_reg(2, 1, 0, 12, 0)
-> +#define SYS_TRCVICTLR                  sys_reg(2, 1, 0, 0, 2)
-> +#define SYS_TRCVIIECTLR                        sys_reg(2, 1, 0, 1, 2)
-> +#define SYS_TRCVIPCSSCTLR              sys_reg(2, 1, 0, 3, 2)
-> +#define SYS_TRCVISSCTLR                        sys_reg(2, 1, 0, 2, 2)
-> +#define SYS_TRCVMIDCCTLR0              sys_reg(2, 1, 3, 2, 2)
-> +#define SYS_TRCVMIDCCTLR1              sys_reg(2, 1, 3, 3, 2)
-> +#define SYS_TRCVMIDCVR(m)              sys_reg(2, 1, 3, ((m & 7) << 1), =
-1)
-> +
-> +/* ETM */
-> +#define SYS_TRCOSLAR                   sys_reg(2, 1, 1, 0, 4)
-> +
->  #define SYS_MIDR_EL1                   sys_reg(3, 0, 0, 0, 0)
->  #define SYS_MPIDR_EL1                  sys_reg(3, 0, 0, 0, 5)
->  #define SYS_REVIDR_EL1                 sys_reg(3, 0, 0, 0, 6)
-> --
-> 2.34.1
->
->
+>   static inline bool kvm_vm_is_protected(struct kvm *kvm)
+>   {
+>   	return false;
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 0ac721fa27f18..294078ce16349 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -172,6 +172,14 @@ int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>   	return 0;
+>   }
+>   
+> +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm,
+> +				      gfn_t gfn, u64 nr_pages)
+Hi Raghavendra,
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+As the kernel test robot points out, the parameter `gfn` should change 
+to `start_gfn`.
+
+Thanks,
+Shaoqin
+> +{
+> +	kvm_tlb_flush_vmid_range(&kvm->arch.mmu,
+> +				start_gfn << PAGE_SHIFT, nr_pages << PAGE_SHIFT);
+> +	return 0;
+> +}
+> +
+>   static bool kvm_is_device_pfn(unsigned long pfn)
+>   {
+>   	return !pfn_is_map_memory(pfn);
+
+-- 
+Shaoqin
+
