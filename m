@@ -2,165 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 884CA778E91
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 14:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D560778E97
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 14:02:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235718AbjHKMBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 08:01:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
+        id S234213AbjHKMCf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 08:02:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235400AbjHKMB2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 08:01:28 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2044.outbound.protection.outlook.com [40.107.237.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F6810F;
-        Fri, 11 Aug 2023 05:01:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LdtpoRRlcxmHX5u+kfAQkQJNqzWbPWrnIfSxGKavozWjzIpZlLNZ4mZuSICnDXuycs4Dg/UXr2FNST3q10P5f9vF2CEqDo6eVV3gbCshwD3AyvuhCVVh3KtfuAmDZYNtjiwkAi4s9KsKw6A/mZsMg9MhrMFQauP9y/f70LJwyw4z71JWYILfv+a+al++XbCqNUhNs4lUJL2FNN7eRwIkMJTYcWlMv2Zr9/NNiZXlhvp7lzRK+WgQbDl/D3XoWsv6F9HHFehoyukZmPICxUA9N/tv2/R8Q1SfIPWz3QfGYnrZomg5HFraoViH2+tEuz+7jqOQctYqsri1B+/XP1DxsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wbrmd25XzUS/ENsg3zVYb7bdv4mXhY13qwTWphzyWZQ=;
- b=VZBjGkBSpc3wdOFLMdc1V4Q5MP8TXbUxALi8BPOwUrnd+4imbc7DGAc0QlsxxGSuAI9Dfx9UNaeED5GXSBAiHhO4PvfiCUJQjPQLVkVKcvzvnChVMFIRSLXmxfMr/LCpg/H8KWbVllV7u7GfO408wgjdmPmoM2q3rcXrn0BnbLNgRvCLYOk7i/inwjRacz4gDqWApOH6NajIAXjVxy85CSRNzoUZI7Mb8CibD8GIQgPGIqXByWxNys6I8XEuc3mzvrTovDWX671SeC7M6B+TvYMNAqPjgwOGMoEnk/ESUphb/fM8SsVWUOAMFgcF5xw2atlTevZl1Ninn8JXKhZgiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wbrmd25XzUS/ENsg3zVYb7bdv4mXhY13qwTWphzyWZQ=;
- b=o9kWHrkbINAjIGdihbBZjDRoJ9X7HARHaENQjNQTC+MAX1HhB/cYMirAHwdCEAh5uhKGQzvjYlDALQFPJI0noU8iHfSykQYXLY+2n/VZVeU98O7MfiYC7zuBAENyC4cEYv4FpqNfgXmzk1vBpSzJKLpF/FLUmrOdwr0ivLn1QXhs21TltfGnk1pHPArtuKSuQMZ2d9QVfB90YSMalIYpFjUvvQTFifyKAB7hHNDvXK4IAX8s3T2IMZp3gmpvUzXxWu1vPwA7+YT8WelezwJD050IZ8TFGWAbe+xBwRFhi163K3qCTMdsNRgFKkAJZTXTwWrYufUIRISYsm+xY+Fk/Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SN7PR12MB8002.namprd12.prod.outlook.com (2603:10b6:806:34b::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
- 2023 12:01:23 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
- 12:01:23 +0000
-Date:   Fri, 11 Aug 2023 09:01:20 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
-Subject: Re: [PATCH v6 4/4] iommufd/selftest: Add coverage for
- IOMMU_GET_HW_INFO ioctl
-Message-ID: <ZNYjEFpN7iZcM0sE@nvidia.com>
-References: <20230808153510.4170-1-yi.l.liu@intel.com>
- <20230808153510.4170-5-yi.l.liu@intel.com>
- <ZNPCtPTcHvITt6fk@nvidia.com>
- <DS0PR11MB7529441BE81F24EE5C947B5BC310A@DS0PR11MB7529.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB7529441BE81F24EE5C947B5BC310A@DS0PR11MB7529.namprd11.prod.outlook.com>
-X-ClientProxiedBy: SJ0PR03CA0148.namprd03.prod.outlook.com
- (2603:10b6:a03:33c::33) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S233159AbjHKMCe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 08:02:34 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0286125;
+        Fri, 11 Aug 2023 05:02:32 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37BBpWPO023901;
+        Fri, 11 Aug 2023 12:02:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=VdkLcjfWMe6NRoF/NolL+X0OUF17mEipJ/11rANwXMo=;
+ b=Rctp2emZMc+Vs3m9uCMo6qTEOaEAT8i9AD6WAOlimsxM+GpPrc+Pw+RF1TODwJfOpMHF
+ CcRrLX3NUq63o8GzfOHSH10jbnFeJv/aQ7uv/CM9AAJf4Gpzc/lz0zzOujk6TSgKwCkW
+ gEacNZCw+//jJ0EmwbWATvbEjCw3fQKUf42pb8InhY8EIBrZHxSj9nluDII/FmV1V7TF
+ t1edBmtIyftfPtiKPAkr9HLx9ZgemkV1fgMziEBXcwUMkDVZJkAR+Z7vrBJCdJKZ4xk4
+ pk7layfOcw/Wi2t6K1tvpTaDtGZC/WAzMKhN9pgzST6Z7fNC1BX7W2BjRa421m0Hpw8L eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sdmfyg9xe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Aug 2023 12:02:31 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37BBvBlZ009811;
+        Fri, 11 Aug 2023 12:02:31 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sdmfyg9x4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Aug 2023 12:02:31 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37BA1aYQ006421;
+        Fri, 11 Aug 2023 12:02:30 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sd2evfsva-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 11 Aug 2023 12:02:30 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37BC2RVx44827134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 11 Aug 2023 12:02:27 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 32CAE20043;
+        Fri, 11 Aug 2023 12:02:27 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB63620040;
+        Fri, 11 Aug 2023 12:02:26 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 11 Aug 2023 12:02:26 +0000 (GMT)
+Date:   Fri, 11 Aug 2023 14:02:25 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, nsg@linux.ibm.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1] s390x: spec_ex: load full register
+Message-ID: <20230811140225.7e810730@p-imbrenda>
+In-Reply-To: <20230811112949.888903-1-nrb@linux.ibm.com>
+References: <20230811112949.888903-1-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB8002:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb40e61e-6e2f-4086-401a-08db9a62aeca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PnN3n1Xw+GH+OoBFiC5FonvJo2Tyh+g4wnyGaYheyfltd25r9Pao4ego2pK806LQA/K4TejYVQ2L7QgiMlh57ZkcEu+f+wCeY4uv0N6SHSiH09O0SGHN9jc1yB+9poNcKHJpM77Tv/aWN8IGNnAXfOJTc7PkpCAXNREfovM24kO0P//Oqd0fFDUV+QNfmeKIFeangoS1a0z4ELqNJaWP1K0tEYpXfjZFpWk5TG83d19YgXa3ESC9duRMHTV51omnr4hSJTAeM+DWzGaM2YB73tArUMLEy1tgIQaNt1VJeo46MyBUbT3uFzwqpu0nFonHunwT0N4V/JVHPMSZ33CQ/detNSd1I8qC5ltK0I8/9v+WHjdjL4xzSbKadVYXnJM26RC+15XAE/woSfmcjx6lwvNPwha1CoRF2h2LsA3luShadFk75KuH9ymkqCOllQpwsnzZIMBb7c+NzSsHVXYrMNSISHxW8RxamfxZFkgqlwlQxd2mSdWR3rugUWDioDU0tQUw4Nuxzge8BM6IbxJDnj6UlcaPs+JiNaaXJKSiRJPPwU1QvmyrXYStMOoTCgr9
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(396003)(346002)(376002)(39860400002)(366004)(451199021)(1800799006)(186006)(26005)(5660300002)(6506007)(8936002)(8676002)(41300700001)(36756003)(38100700002)(2906002)(83380400001)(2616005)(86362001)(7416002)(4326008)(66946007)(66556008)(66476007)(6916009)(6512007)(54906003)(6486002)(478600001)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?c2QBgZfifIFIPvGM07Jp3JWxtj4Lj55yCkkTyFP4GR0B9djPHZ4ogw2xUnfV?=
- =?us-ascii?Q?aYzZCCUfxP4C2VxLytl9u1nyL2FV8uOfu6pznBwComTrlIfXNeq2QcEdIYkD?=
- =?us-ascii?Q?g3Qxj0xsJHEdGUdMVqBYjbEiKu3qV5wmRIP4rHMgFzo9ToqG6u1NCb+cVnxD?=
- =?us-ascii?Q?RckYRqoVN9EQZvD8ntpisjkelO9rX/baGAHhPJRw+MoMOsdj8rLp6gJx+ufg?=
- =?us-ascii?Q?wey5nuI0/DdnkYzfQRa7ShRcMk535ykP5j1EN3XkLcp65ICjmW41Dq6+Ys+k?=
- =?us-ascii?Q?WPjOzVQH8RdtPXT4AE0NdEsfRKs3te+Vymp8Rb/qqArID6lJREC8mypdv/KZ?=
- =?us-ascii?Q?VSS8YqWhrEdqsc6WpOvoZLdmTP1IY33DyPRr4LcFHv1Kdglp6xvvXA60tP5B?=
- =?us-ascii?Q?1YLC7wAe5bsBtMxTMfDa/mUpQKGogbpKUfxIZhHMrXVTWeWuOObQ2SGbWPr9?=
- =?us-ascii?Q?cmMWb2U6vg9PBjK114Dix910DsUELGeVHjAjKmXWFfHSzKayfNNjZ1sLrzC0?=
- =?us-ascii?Q?b1S24P/pSsHPRBFVHAlbTglmw0oziAFcMSkMzOC5gw5Q5QJCljVUAOOvwLeh?=
- =?us-ascii?Q?0h4F5/CVR09DgBPH+bDBisvtlbcHpJES+Tu/fl43dLEFrRag70934dIPU3pS?=
- =?us-ascii?Q?ieSVZgxXfjZIQ8VYWRad0war4M1kO54kyCCkrY+KeT4bLhEFK7NZBoYfkCxs?=
- =?us-ascii?Q?h1YyATL3IyDbdGKILY5L4GPhIfvCvSPh0eAZZIDVcSEWE8TX+uCIMli1ieNn?=
- =?us-ascii?Q?euHBnbWmacHPZx67WYnza78ZA9VcO13HNL5s29BQbgxltdeorSKO4zWw0bE5?=
- =?us-ascii?Q?hpQlRFFBl4ZuL1gdSeISuH1SRt7vnh1m0kRA8Fl2uoq/Cmq1NOe8uRLoaDwy?=
- =?us-ascii?Q?7nDkBPZ4jd3PWvo0DkRmEB1sN4XbWFJ+XeP7AyjdoLKw2tn5tswGWvWYHIgv?=
- =?us-ascii?Q?/WWLDRODqWgieUhjvzSRByusxYLnj0vzzK/2x4yes10n5bdBoAf6smB1Efw0?=
- =?us-ascii?Q?XtbDWcPEz8Gug1az5eyV8M78wLEjtepkhClps+pn0LT6nLxdYsZY4cxXzUNC?=
- =?us-ascii?Q?JnmOchtsNfrDB0GuMosSMjo0xP5G0L2/tU4q1L4lmFxW8yYHzU8+ClukzpJt?=
- =?us-ascii?Q?r9xtzelsOEDV+Jm3YZnDP5Ik8XIoKKnW4oKuWxZJAuedjpU7R+bLKXfDd355?=
- =?us-ascii?Q?eJwlTBP3eVhSaOX8uGeQ11a9L8mEvHWaWZEAAcDlt0kEZIpBFExwt6N6sGKy?=
- =?us-ascii?Q?dgOR9cSPrw860VQFZNjRSM+qgi7pGUD74fpz74f9czuMryetRKeBEQicXjHU?=
- =?us-ascii?Q?ycYFhfhBaFI3jdQ99oUOhfOH5gJIF0q5nGWR2IPr2FqCPyVuz9PHNInKmuoD?=
- =?us-ascii?Q?ENX6BNLovucf30mHcGtTazog3/alCw2pDdZcoczq9JIwcI9pJCUkMq61xZxi?=
- =?us-ascii?Q?9oPTelXvRrecmPu8rswRxd7CTfxry8ZHFn8IY2M/mrVIu/N8alsKdwyBukSv?=
- =?us-ascii?Q?R+nPJkleYOgkjZXki3PwGoqPh4KGDjENpn8PJSwvY5EK4vlW1YHpmm7ohiZ+?=
- =?us-ascii?Q?zclWJ5GYOI1LxZBWJr/QwWTszFx4jJ+FWNPza0Q8?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb40e61e-6e2f-4086-401a-08db9a62aeca
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 12:01:23.5143
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t+n5XNE234IC5Pxrn99Yf45tx4wZT30eKg0fAbcU6pcFAoAPPuEGOOhpkxGasElB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8002
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Svk9LrCq-Epu8EsKyh3EWtV5HMJnzpxR
+X-Proofpoint-GUID: gxOUoyqwaETS8E8Lc9SgTV6HY6_pewXZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-11_03,2023-08-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 impostorscore=0
+ malwarescore=0 suspectscore=0 clxscore=1015 mlxscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308110106
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 06:57:34AM +0000, Liu, Yi L wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Thursday, August 10, 2023 12:46 AM
-> > 
-> > On Tue, Aug 08, 2023 at 08:35:10AM -0700, Yi Liu wrote:
-> > > From: Nicolin Chen <nicolinc@nvidia.com>
-> > >
-> > > Add a mock_domain_hw_info function and an iommu_test_hw_info data
-> > > structure. This allows to test the IOMMU_GET_HW_INFO ioctl passing
-> > > the test_reg value for the mock_dev.
-> > >
-> > > Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-> > > Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> > > ---
-> > >  drivers/iommu/iommufd/iommufd_test.h          |  9 +++++++
-> > >  drivers/iommu/iommufd/selftest.c              | 16 ++++++++++++
-> > >  tools/testing/selftests/iommu/iommufd.c       | 17 +++++++++++-
-> > >  tools/testing/selftests/iommu/iommufd_utils.h | 26 +++++++++++++++++++
-> > >  4 files changed, 67 insertions(+), 1 deletion(-)
-> > 
-> > Don't forget to add it to fail_nth
+On Fri, 11 Aug 2023 13:29:36 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> There may be contents left in the upper 32 bits of executed_addr; hence
+> we should use a 64-bit load to make sure they are overwritten.
 > 
-> Sure. Btw. Would you share us the rule on determining whether an ioctl/path
-> requires fail_nth case or not.
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-It always requires it :)
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-Jason
+> ---
+>  s390x/spec_ex.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
+> index e3dd85dcb153..72b942576369 100644
+> --- a/s390x/spec_ex.c
+> +++ b/s390x/spec_ex.c
+> @@ -142,7 +142,7 @@ static int psw_odd_address(void)
+>  		"	larl	%%r1,0f\n"
+>  		"	stg	%%r1,%[fixup_addr]\n"
+>  		"	lpswe	%[odd_psw]\n"
+> -		"0:	lr	%[executed_addr],%%r0\n"
+> +		"0:	lgr	%[executed_addr],%%r0\n"
+>  	: [fixup_addr] "=&T" (fixup_psw.addr),
+>  	  [executed_addr] "=d" (executed_addr)
+>  	: [odd_psw] "Q" (odd)
+
