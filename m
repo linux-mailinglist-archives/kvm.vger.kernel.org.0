@@ -2,673 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DC0677846D
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 01:59:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0CEF7784C5
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 03:10:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbjHJX7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 19:59:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58864 "EHLO
+        id S229696AbjHKBKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 21:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjHJX7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 19:59:18 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 048D52D4A
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:59:17 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d66c957e1b2so209692276.0
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 16:59:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691711956; x=1692316756;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/BoKZ32KwsxUQ3UINg4R8i6IlvYW9M8AXX0zSojGAm4=;
-        b=YGU3D4kOIZ2+/ogPkTq59JzxYxILsTbnF+hSszpd+fCCA0yjkLmnf6YJpERGSFX7LR
-         hDEqxKKub9imAzyzhnFFqzoE8en+bB7TPbJhju3Nx/SRTVjvrGRugL3PaBPYOYAyE73U
-         fpv0LHOnqt9KN1OFVPaktBvqvsnTdY9UVSaXFFnwxVZf6WdMr8W5cCzDLwlhWgAl4bDf
-         BapQQBfnT65Vo8Uc7sjDE1ju8Ijl0ffobea31ctmBD08qnuDk7uqytLxojRdZs3yjdkd
-         2IZXPlKDHkk0Kf4Y0guwHvua1UsJj1rnuGKw7FwPGOGQrekFkvNmMKdIOP5IKpNWe2zc
-         Mkmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691711956; x=1692316756;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/BoKZ32KwsxUQ3UINg4R8i6IlvYW9M8AXX0zSojGAm4=;
-        b=FXwcHJRvZK00ljUxBvGHfvNzo6Vetu1hRdQoYb/p8Yjcp+VIh9q449eVqt0Md/KxtF
-         3dcpOqpzGbuGqAqOkrAv9FdxYD/Vi8XmSTmZn6Dvje70+QVt4NcMTJuWZxOYMU5qHuin
-         7f2AsYMzvKujvIGVv695m3mzU82tGoqb/FWV7LnzidaTTKTTUAHyzWsjrDRaa8k4Sc9i
-         M3jI3Z/vD7/anDvEQpJc1fzCLjrvv+oeDL3+KI9aLF1s5vjz2KhsFDymngBkNzDHihkP
-         AKVwqydbHcCa0hsK4bChsWhd2e2fvDDCrfBdOZgFQV5SDKbB1iGTbfc7mWo2C0LHL1Lv
-         XGjw==
-X-Gm-Message-State: AOJu0YzN52eswyubc+SlCyzu6EvQ0sMSZWXOsIU8F3frbxFX2eERVCRC
-        5Ps1RrfiZpzXvxMG0HzueZyoSoZUJ6xDLZQzcWltKBoeawP+6BcrFJUplMWjIR9Uiy/3zaAFVSx
-        jt3Gni3i20RodHy4Xf9cw0U5utxrbEiluYeZpizaUxX9u7qOFYVi7EU2dAB7i3REgyFAiXSo=
-X-Google-Smtp-Source: AGHT+IEu7bAdifn1vdPJqKZTFQ2uPKUiyCCxasanbABXwq7F08t82WrqDy9YX8heD3VUzxxrV7CBhGCOKvxprS5Acw==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a25:ef0b:0:b0:d01:60ec:d0e with SMTP
- id g11-20020a25ef0b000000b00d0160ec0d0emr3612ybd.9.1691711955639; Thu, 10 Aug
- 2023 16:59:15 -0700 (PDT)
-Date:   Thu, 10 Aug 2023 16:59:12 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.640.ga95def55d0-goog
-Message-ID: <20230810235912.3994457-1-jingzhangos@google.com>
-Subject: [PATCH v2] KVM: arm64: selftests: Test pointer authentication support
- in KVM guest
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229487AbjHKBKD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 21:10:03 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4792D40
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 18:10:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ti222+kWHGUvgAzNiVn0AtJ/YkpjheFGsH7As4rqRja7XkcheS8MkD8Yv02+d8bBBIHhsq+KWUWOTufhFfJ+p5ELErypI/PrDwiazOInCAunIIX8N4Fjq7yovyh2c867ruyD1ot8eBu9ma3iPtfZCqu+ePNydn5O8xKuRfnJb9tEgpR3gcJWC3xbgiYccb3ATSblA3T74STR67sJ7Ttb3+Hio6QiAcgrR1Gq/NupVuBSde+v0E/V7r3qYyH+il4eTjX4w9YPj3AWIuGCqXndxdoTGdAwvkpewp/W8fVm82xYlr0GGFGvJ226dQJ3UpqbjWiMarzsdcuwXreF1xKYdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3aFHFZzSNLK3NaaAdFHFo0qav/BGDLCkPexxlphmnI4=;
+ b=BmzpubfQsTAd0M3qVaIA5cT+/lYiPxUgvITFG7TyfdZNM4+Pcxy/2MDyxQUFwClZgTlPdCSlP3EQoB8BMuizqP+QBMx8AtD6IQ/CcXov8BWuidCZolmkbeXKZeVttZGrWMDg7Mf9OrbwabAs9wJRRw/o4SFap0AbZAOwzETcRhJ40m+2rnjwUcW8TEnzQ+XVLnuh/Dtynii9r+hYb8SJB9rPIRxUZ3+oXjxXmI8gGALgMBsXvtK/4R2+9ooIvREAi3Qaty6mFD93BU5c65+sg0Itbn7NC+tSesb+a1vlW7MI+P+/t2isk5P6sZtEfLGUSL5gQ6H9HYEf6Mo8l5ZyBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3aFHFZzSNLK3NaaAdFHFo0qav/BGDLCkPexxlphmnI4=;
+ b=MT0ZJ5fgOLVbDR9viY6kkTCYV9nNTP4JGmwKk04SnvHCD/K40kghV5N4RfBXbGNV8572c4ySRO1n0t7fmZsTks98U5m6rwm/92GSsslJ1JS0QqfIk9f3VeqJvLDPjzxMmb0ONbrct5VN+rJ624bu6PuMULCQRqur6h9oXXHWaOrWcv55xQxPLAhuSQiP2VGQKzwrmad3bm7o/HHKMNB/+8dyloXAIHCNFFk60NmIBQ/qna33PVLIiZSX5Bqwhqn1CX9uyAGuE872RVQk7w38rlXBGx6/bRVBP0TiqM7CSJHEqaSzEFNQGYCHzAoHz9V/mTuCAJg8KebJnsAwcQiAzw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by PH7PR12MB6659.namprd12.prod.outlook.com (2603:10b6:510:210::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
+ 2023 01:09:59 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
+ 01:09:59 +0000
+Date:   Thu, 10 Aug 2023 22:09:56 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Liu <yi.l.liu@intel.com>, Yi Y Sun <yi.y.sun@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH RFCv2 04/24] iommu: Add iommu_domain ops for dirty
+ tracking
+Message-ID: <ZNWKZLJUMnVOEjef@nvidia.com>
+References: <20230518204650.14541-1-joao.m.martins@oracle.com>
+ <20230518204650.14541-5-joao.m.martins@oracle.com>
+ <ZGdgNblpO4rE+IF4@nvidia.com>
+ <424d37fc-d1a4-f56c-e034-20fb96b69c86@oracle.com>
+ <ZGdipWrnZNI/C7mF@nvidia.com>
+ <29dc2b4c-691f-fe34-f198-f1fde229fdb0@oracle.com>
+ <ZGd5uvINBChBll31@nvidia.com>
+ <69511eee-69b5-2a83-b7b9-f4a2664e15e8@oracle.com>
+ <ZNUymqfxICNh0pUO@nvidia.com>
+ <113513fa-ac9c-31c4-6d97-ca2055ceafed@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <113513fa-ac9c-31c4-6d97-ca2055ceafed@oracle.com>
+X-ClientProxiedBy: SJ0PR05CA0192.namprd05.prod.outlook.com
+ (2603:10b6:a03:330::17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB6659:EE_
+X-MS-Office365-Filtering-Correlation-Id: 75cd3b15-f8dd-4f61-70ec-08db9a07aecb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dAmLPnQmHSSSj84eUHqNBYsMQ2ayx9B4lqRKLqidKxQN7r98p6BrcEhJH60m6HDb+2QOtflPVYyOrWTz4fXpqQzVWTagzDb5qZwVxicIFaMcPXMDt6OOB3KtwaqPMMwX593XFNmDlFsDATn2/XWRgMyzZB8oReO/3z4I6+7T4F5uuK4Cq0KXFweio7nKhtyUSpOq43XYvalxcGgSVidxOyIJKAcfuc4xrxAq9s8/6xUKAJKJTwcPx6rmAqN76/8D9ODOq97wHFNXd7wP2pn74BZ5tiNixiZYyB8EpQogWrj7TCVEK0Wd0IBnbYZF76KdfpWa1moj/OGdPKuCSAbNB5GOo+QYACVHk9JQbDzHEvahlBCUqtzgC6t1X3VF+A34VrrQ6jWORlDpk/c49z6tOpl0lZaZ+w/OAAy6ZroWyewjm2wgxYOUrgQOK/ob0aEb7QgwSjs6ZTAt3S6Z2qErl5PLecRKXm3IMRUAzam46XsSHmHBX6RMV14BgQa5UghvuyjfpeOJFExDG1HpY53ZSvgmbao6Ytl1y7FLSMPZb05eBfma2X+y2NFs+8LieZt4jJwdEuhh2yJwE5P1zi17C5UJHXTqCiPpxGuUMydiTqWwl79f4K7uFkZ+XtH/svptSsHPJCK+IOoFbRQG0yqj8g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(366004)(136003)(346002)(376002)(396003)(1800799006)(186006)(451199021)(6512007)(966005)(6486002)(6666004)(54906003)(36756003)(86362001)(38100700002)(26005)(6506007)(2906002)(7416002)(478600001)(41300700001)(5660300002)(2616005)(8936002)(66946007)(8676002)(66556008)(83380400001)(66476007)(316002)(6916009)(4326008)(14143004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SYvJmw7pkkKBqB+RIf0cR7BvCi+mV6Lqj+hc2TK18J60ii/HmdvK+dueC15B?=
+ =?us-ascii?Q?yx//QHhysLUGnkrCjEFT7seO6qO4AeZuL9l5at9pvtdToDiJ/WJ8t1Pk+yY0?=
+ =?us-ascii?Q?mOgULb9CX5Jeg5JlnYt3cZIMwxbdWSdgPYTjH9lRPRyxYjTN1u6kH7zmR/Sr?=
+ =?us-ascii?Q?yIJhQyJslffZZmHuHdJMERNvwE8bI9k0oKsqcgRq5rtthToM6GWIDHaWxI6L?=
+ =?us-ascii?Q?CCS03q9W1gSVkHxVhDKkJK+KfzZ/8RwmVpJjRPNztMiK92+ClJgzjf+MWVCO?=
+ =?us-ascii?Q?TO5mjt0aPksYnOvAei2UckipeYtfWu9/3rgu3Ob73D4JZuVsl8/jS3TFsvKg?=
+ =?us-ascii?Q?+ODk2ru6f7AjBvpR+ke/i758qKx92j8hE5DOsJ34fT84QBbCAhMjZ258J1BP?=
+ =?us-ascii?Q?PSNGFHjmx11xJgy4h0N/TK0qYt0nqSlOMi+B9Aes97YbKJ6rqGx3Of6opaos?=
+ =?us-ascii?Q?ifz9C+yUgwE5r+wN1U6oaKtWT2rTxn/Jj1cb7dGEtXQEMYiSvn6ORp8TB4lq?=
+ =?us-ascii?Q?FrC+ZZU489kPWO8UUlTM+CwsCYcyusE7KXdWEGO8ysVhak9cwC+nBYAOnDuJ?=
+ =?us-ascii?Q?E74w1eBcyndRLeTiNpZ3wjH+pxxUPEiExxsSa0U9vmdZj4qLUUKo8WrJtj3Q?=
+ =?us-ascii?Q?gEYtrRa5ribub/owYP7vgPmZywhJz4DMrQAevbOYJFU3IkeDVbpXfWAta5YR?=
+ =?us-ascii?Q?faeuTCAr3Hu1K5LMcUk44ZliWsSM8k/f7UynubKLg/rOHruGIBL2yXiIHMS8?=
+ =?us-ascii?Q?DeP6hHQMkRSvF3SRiVlltkc7+iKd7xAn2aLJ/S2lBf+AH9ExjESOR0Olncah?=
+ =?us-ascii?Q?7dJsAoHcb+oICNOkJzpRSt8qhC5ZASNAd1JtcJ/PbfPSxT8rsU80EXRSJZbi?=
+ =?us-ascii?Q?ybWV6+TSXMoBOR0rr8JVzkoXsFvNbkHZA1AxFwJmClV9iw4L8PYAk2dy3aNj?=
+ =?us-ascii?Q?xYZsLfhkaGXrq22sEuCJocwywNsIWgmaf0ood7LKB4+wE1qVMhRE7/aoJJjb?=
+ =?us-ascii?Q?iEjul8XnZchRkPPg9VoY9DAP9wcqhIPS6kLt2FU4jVK46f9C11p8mpxpHv4U?=
+ =?us-ascii?Q?m5Aqnd/KO6O7FNXo4jqKFidhJhkmaPMNJm9dajBIQFsqAjvA1+lt1BwE31MI?=
+ =?us-ascii?Q?rbHfmRifkb6sbZeJq3nsbVboYsW6OiG3LJw7OGN4GiKu1lJyPWqqTL2Xl+ji?=
+ =?us-ascii?Q?mju07i4p3PfpRv27RwdbkfI4R6anVNhyI6SeJFkN5h898etu3Qerbt+Ja61l?=
+ =?us-ascii?Q?YArl8k6KhfmlapgXen3Giz/tLe7uy+PZU04fkaeB9GJPlnb9RZrRNZyG50dL?=
+ =?us-ascii?Q?FsYcVOXuk9XtcG4lY2poRfJTIY12xcbH1PklgyzimcQD/fM8HnGwBoNiG53B?=
+ =?us-ascii?Q?1RjA9NMb0AIXe3odixPSUvFlzMJMcvn/8N0Hx9sXp9VUDxHkIugHnHco4khU?=
+ =?us-ascii?Q?iL/MshDTMqsi6xVa13l64MWI5tnejri6jY4z/OWmP/d0OQwvTIrnm/XkXGnz?=
+ =?us-ascii?Q?NG3PRT3uAjR3Nk7nWssoDk4lBMEgAM1sSo8+iRVg291r9N2utrrVap0A0BUL?=
+ =?us-ascii?Q?6VAxD35hNMm1waUJ6HLzLyqnSiEBfK1x7G3A55Jp?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75cd3b15-f8dd-4f61-70ec-08db9a07aecb
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 01:09:59.3742
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: welUu3d68sjawtlz1KuN6HdNDHjKkTHOOtv2Zw4Ys39yBSAcwEwgrrGOdRa7gStS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6659
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify the KVM guest PAuth support on H/W with FEAT_PAuth. This test
-will be skipped on H/W without FEAT_PAuth.
-Following PAuth instructions are tested:
-paciza, pacizb, pacdza, pacdzb, autiza, autizb, autdza, autdzb,
-pacga, xpaclri, xpaci, xpacd
-It also shows the implemented algorithm for both address authentication
-and generic code authentication.
+On Thu, Aug 10, 2023 at 09:36:37PM +0100, Joao Martins wrote:
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- tools/arch/arm64/include/asm/sysreg.h         |   5 +
- tools/testing/selftests/kvm/Makefile          |   5 +
- .../selftests/kvm/aarch64/pauth_test.c        | 511 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |   2 +
- 4 files changed, 523 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/pauth_test.c
+> > Yes, the "domain_default_ops" is basically a transitional hack to
+> > help migrate to narrowly defined per-usage domain ops.
+> > 
+> > eg things like blocking and identity should not have mapping ops.
+> > 
+> My earlier point was more about not what 'domain_default_ops' represents
+> but that it's a pointer. Shared by everyone (devices and domains alike). But you
+> sort of made it clear that it's OK to duplicate it to not have dirty tracking.
+> The duplication is what I felt a little odd.
 
-diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-index 7640fa27be94..9d903eb8388c 100644
---- a/tools/arch/arm64/include/asm/sysreg.h
-+++ b/tools/arch/arm64/include/asm/sysreg.h
-@@ -179,6 +179,7 @@
- 
- #define SYS_ID_AA64ISAR0_EL1		sys_reg(3, 0, 0, 6, 0)
- #define SYS_ID_AA64ISAR1_EL1		sys_reg(3, 0, 0, 6, 1)
-+#define SYS_ID_AA64ISAR2_EL1		sys_reg(3, 0, 0, 6, 2)
- 
- #define SYS_ID_AA64MMFR0_EL1		sys_reg(3, 0, 0, 7, 0)
- #define SYS_ID_AA64MMFR1_EL1		sys_reg(3, 0, 0, 7, 1)
-@@ -764,6 +765,10 @@
- #define ID_AA64ISAR1_GPI_NI			0x0
- #define ID_AA64ISAR1_GPI_IMP_DEF		0x1
- 
-+/* id_aa64isar2 */
-+#define ID_AA64ISAR2_APA3_SHIFT		12
-+#define ID_AA64ISAR2_GPA3_SHIFT		8
-+
- /* id_aa64pfr0 */
- #define ID_AA64PFR0_CSV3_SHIFT		60
- #define ID_AA64PFR0_CSV2_SHIFT		56
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index c692cc86e7da..0fe40fcb02ec 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -143,6 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
- TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-+TEST_GEN_PROGS_aarch64 += aarch64/pauth_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_test
- TEST_GEN_PROGS_aarch64 += aarch64/smccc_filter
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
-@@ -212,6 +213,10 @@ ifeq ($(ARCH),s390)
- 	CFLAGS += -march=z10
- endif
- 
-+ifeq ($(ARCH),arm64)
-+	CFLAGS += -march=armv8.3-a
-+endif
-+
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
- 
-diff --git a/tools/testing/selftests/kvm/aarch64/pauth_test.c b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-new file mode 100644
-index 000000000000..c40c59e4139a
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/pauth_test.c
-@@ -0,0 +1,511 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * pauth_test - Test for KVM guest pointer authentication.
-+ * Following PAuth instructions are tested:
-+ * paciza, pacizb, pacdza, pacdzb, autiza, autizb, autdza, autdzb,
-+ * pacga, xpaclri, xpaci, xpacd
-+ * It also shows the implemented algorithm for both address authentication
-+ * and generic code authentication.
-+ *
-+ * Copyright (c) 2023 Google LLC.
-+ *
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <sched.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define KEY1_LO		0x0123456789abcdefUL
-+#define KEY1_HI		0x123456789abcdef0UL
-+#define KEY2_LO		0x23456789abcdef01UL
-+#define KEY2_HI		0x3456789abcdef012UL
-+#define KEY3_LO		0x456789abcdef0123UL
-+#define KEY3_HI		0x56789abcdef01234UL
-+#define KEY4_LO		0x6789abcdef012345UL
-+#define KEY4_HI		0x789abcdef0123456UL
-+#define KEY5_LO		0x89abcdef01234567UL
-+#define KEY5_HI		0x9abcdef012345678UL
-+
-+enum uc_args {
-+	WAIT_MIGRATION,
-+	ADDR_PAUTH_ALGO,
-+	GENERIC_PAUTH_ALGO,
-+	FAIL_GUEST_PAUTH,
-+};
-+
-+enum pauth_algo {
-+	QARMA5,
-+	QARMA3,
-+	PACIMP,
-+	NOALGO,
-+};
-+
-+static const char *const algo_string[] = {
-+	"QARMA5", "QARMA3", "PACIMP", "Undefined",
-+};
-+
-+#define DEFINE_SIGN_FUNC(INSTR)						\
-+	static size_t INSTR##_sign(size_t ptr)				\
-+	{								\
-+		__asm__ __volatile__(					\
-+			#INSTR" %[p]"					\
-+			: [p] "+r" (ptr)				\
-+		);							\
-+		return ptr;						\
-+	}
-+
-+DEFINE_SIGN_FUNC(paciza)
-+DEFINE_SIGN_FUNC(pacizb)
-+DEFINE_SIGN_FUNC(pacdza)
-+DEFINE_SIGN_FUNC(pacdzb)
-+
-+static size_t pacga_sign(size_t ptr)
-+{
-+	size_t dest = 0;
-+
-+	__asm__ __volatile__(
-+		"pacga %[d], %[p], %[m]"
-+		: [d] "=r" (dest)
-+		: [p] "r" (ptr), [m] "r" (0)
-+	);
-+
-+	return dest;
-+}
-+
-+#define DEFINE_AUTH_STRIP_FUNC(AUTH, STRIP)				\
-+	static size_t AUTH##_auth_##STRIP##_strip(size_t ptr)		\
-+	{								\
-+		__asm__ __volatile__(					\
-+			#AUTH" %[p]\n"					\
-+			#STRIP" %[p]\n"					\
-+			: [p] "+r" (ptr)				\
-+		);							\
-+		return ptr;						\
-+	}
-+
-+DEFINE_AUTH_STRIP_FUNC(autiza, xpaci)
-+DEFINE_AUTH_STRIP_FUNC(autizb, xpaci)
-+DEFINE_AUTH_STRIP_FUNC(autdza, xpacd)
-+DEFINE_AUTH_STRIP_FUNC(autdzb, xpacd)
-+
-+#define GUEST_ALGO(type, algo)	GUEST_SYNC_ARGS(type, algo, 0, 0, 0)
-+
-+static void check_pauth_algorithms(void)
-+{
-+	uint64_t isar1 = read_sysreg_s(SYS_ID_AA64ISAR1_EL1);
-+	uint64_t isar2 = read_sysreg_s(SYS_ID_AA64ISAR2_EL1);
-+	enum pauth_algo algo;
-+
-+	/* Check generic authentication algorithm */
-+	if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI))
-+		algo = PACIMP;
-+	else if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA))
-+		algo = QARMA5;
-+	else if (isar2 & ARM64_FEATURE_MASK(ID_AA64ISAR2_GPA3))
-+		algo = QARMA3;
-+	else
-+		algo = NOALGO;
-+
-+	GUEST_ALGO(GENERIC_PAUTH_ALGO, algo);
-+
-+	/* Check address authentication algorithm */
-+	if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_API))
-+		algo = PACIMP;
-+	else if (isar1 & ARM64_FEATURE_MASK(ID_AA64ISAR1_APA))
-+		algo = QARMA5;
-+	else if (isar2 & ARM64_FEATURE_MASK(ID_AA64ISAR2_APA3))
-+		algo = QARMA3;
-+	else
-+		algo = NOALGO;
-+
-+	GUEST_ALGO(ADDR_PAUTH_ALGO, algo);
-+}
-+
-+/* Setup PAuth keys and check their retainability */
-+static void check_keys_retainable(void)
-+{
-+	bool retainable = true;
-+
-+	/* Address */
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
-+	/* Data */
-+	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
-+	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
-+	/* Generic */
-+	write_sysreg_s(KEY5_LO, SYS_APGAKEYLO_EL1);
-+	write_sysreg_s(KEY5_HI, SYS_APGAKEYHI_EL1);
-+	isb();
-+
-+	GUEST_SYNC(WAIT_MIGRATION);
-+
-+	/* Address */
-+	retainable = retainable && (read_sysreg_s(SYS_APIAKEYLO_EL1) == KEY1_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APIAKEYHI_EL1) == KEY1_HI);
-+	retainable = retainable && (read_sysreg_s(SYS_APIBKEYLO_EL1) == KEY2_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APIBKEYHI_EL1) == KEY2_HI);
-+	/* Data */
-+	retainable = retainable && (read_sysreg_s(SYS_APDAKEYLO_EL1) == KEY3_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APDAKEYHI_EL1) == KEY3_HI);
-+	retainable = retainable && (read_sysreg_s(SYS_APDBKEYLO_EL1) == KEY4_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APDBKEYHI_EL1) == KEY4_HI);
-+	/* Generic */
-+	retainable = retainable && (read_sysreg_s(SYS_APGAKEYLO_EL1) == KEY5_LO);
-+	retainable = retainable && (read_sysreg_s(SYS_APGAKEYHI_EL1) == KEY5_HI);
-+
-+	GUEST_ASSERT(retainable);
-+}
-+
-+#define ADDR_START	0x8000
-+#define ADDR_END	0x8008
-+
-+static void test_same_keys(void)
-+{
-+	/* Set the same keys */
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	write_sysreg_s(KEY1_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIBKEYHI_EL1);
-+	write_sysreg_s(KEY1_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APDAKEYHI_EL1);
-+	write_sysreg_s(KEY1_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	/* Same algorithm, same address, same keys should have same PAC */
-+	for (size_t i = ADDR_START; i < ADDR_END; i++) {
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(paciza_sign(i) != i);
-+
-+		GUEST_ASSERT(paciza_sign(i) == pacizb_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) == pacdza_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) == pacdzb_sign(i));
-+	}
-+}
-+
-+static void test_different_keys(void)
-+{
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
-+	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
-+	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	/* Same algorithm, same address, different keys should have different PAc */
-+	for (size_t i = ADDR_START; i < ADDR_END; i++) {
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(paciza_sign(i) != i);
-+
-+		GUEST_ASSERT(paciza_sign(i) != pacizb_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) != pacdza_sign(i));
-+		GUEST_ASSERT(paciza_sign(i) != pacdzb_sign(i));
-+	}
-+}
-+
-+static void test_generic_sign(void)
-+{
-+	size_t ga_signs[ADDR_END - ADDR_START];
-+	size_t i;
-+
-+	write_sysreg_s(KEY1_LO, SYS_APGAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APGAKEYHI_EL1);
-+	isb();
-+
-+	for (i = ADDR_START; i < ADDR_END; i++) {
-+		ga_signs[i - ADDR_START] = pacga_sign(i);
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(ga_signs[i - ADDR_START] != i);
-+	}
-+
-+	write_sysreg_s(KEY5_LO, SYS_APGAKEYLO_EL1);
-+	write_sysreg_s(KEY5_HI, SYS_APGAKEYHI_EL1);
-+	isb();
-+
-+	/* Different key should have different sign */
-+	for (i = ADDR_START; i < ADDR_END; i++) {
-+		/* Assert if the PAuth instruction did nothing */
-+		GUEST_ASSERT(pacga_sign(i) != i);
-+		GUEST_ASSERT(pacga_sign(i) != ga_signs[i - ADDR_START]);
-+	}
-+}
-+
-+static void test_ia_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY2_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIAKEYHI_EL1);
-+	isb();
-+
-+	ptr = paciza_sign(ptr);
-+
-+	write_sysreg_s(KEY1_LO, SYS_APIAKEYLO_EL1);
-+	write_sysreg_s(KEY1_HI, SYS_APIAKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autiza_auth_xpaci_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_ib_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY3_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APIBKEYHI_EL1);
-+	isb();
-+
-+	ptr = pacizb_sign(ptr);
-+
-+	write_sysreg_s(KEY2_LO, SYS_APIBKEYLO_EL1);
-+	write_sysreg_s(KEY2_HI, SYS_APIBKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autizb_auth_xpaci_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_da_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY4_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDAKEYHI_EL1);
-+	isb();
-+
-+	ptr = pacdza_sign(ptr);
-+
-+	write_sysreg_s(KEY3_LO, SYS_APDAKEYLO_EL1);
-+	write_sysreg_s(KEY3_HI, SYS_APDAKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autdza_auth_xpacd_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_db_auth_strip(void)
-+{
-+	size_t ptr = ADDR_START;
-+
-+	write_sysreg_s(KEY5_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY5_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	ptr = pacdzb_sign(ptr);
-+
-+	write_sysreg_s(KEY4_LO, SYS_APDBKEYLO_EL1);
-+	write_sysreg_s(KEY4_HI, SYS_APDBKEYHI_EL1);
-+	isb();
-+
-+	/*
-+	 * Since key has changed, the authentication would fail and be trapped.
-+	 * In the trap handler, the pauth would be disabled to avoid future trap
-+	 * for auth failure.
-+	 */
-+	ptr = autdzb_auth_xpacd_strip(ptr);
-+
-+	/* Assert if the strip instruction didn't work */
-+	GUEST_ASSERT(ptr == ADDR_START);
-+}
-+
-+static void test_auth_strip(void)
-+{
-+	test_ia_auth_strip();
-+	test_ib_auth_strip();
-+	test_da_auth_strip();
-+	test_db_auth_strip();
-+
-+	/*
-+	 * If all authentication instructions have failed, the PAuth enable bits
-+	 * in SCTLR should have been cleared in the trap handler.
-+	 * Otherwise, the auth instructions didn't work as expected.
-+	 */
-+	if (read_sysreg(sctlr_el1) &
-+	    (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB))
-+		GUEST_ASSERT(0);
-+}
-+
-+static void guest_code(void)
-+{
-+	uint64_t sctlr = read_sysreg(sctlr_el1);
-+
-+	check_pauth_algorithms();
-+	check_keys_retainable();
-+
-+	/* Enable PAuth */
-+	sctlr |= SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | SCTLR_ELx_ENDA | SCTLR_ELx_ENDB;
-+	write_sysreg(sctlr, sctlr_el1);
-+	isb();
-+
-+	test_same_keys();
-+	test_different_keys();
-+	test_generic_sign();
-+	test_auth_strip();
-+
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get an unknown exception (UNDEF) if guest PAuth is not enabled. */
-+static void guest_unknown_handler(struct ex_regs *regs)
-+{
-+	GUEST_SYNC(FAIL_GUEST_PAUTH);
-+	GUEST_DONE();
-+}
-+
-+/* Guest will get a FPAC exception if KVM support guest PAuth */
-+static void guest_fpac_handler(struct ex_regs *regs)
-+{
-+	uint64_t sctlr = read_sysreg(sctlr_el1);
-+
-+	if (sctlr & SCTLR_ELx_ENIA) {
-+		sctlr &= ~SCTLR_ELx_ENIA;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	} else if (sctlr & SCTLR_ELx_ENIB) {
-+		sctlr &= ~SCTLR_ELx_ENIB;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	} else if (sctlr & SCTLR_ELx_ENDA) {
-+		sctlr &= ~SCTLR_ELx_ENDA;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	} else if (sctlr & SCTLR_ELx_ENDB) {
-+		sctlr &= ~SCTLR_ELx_ENDB;
-+		write_sysreg(sctlr, sctlr_el1);
-+		isb();
-+	}
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+	cpu_set_t cpu_mask;
-+	bool guest_done = false;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_ADDRESS));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PTRAUTH_GENERIC));
-+
-+	vm = vm_create(1);
-+
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= ((1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS) |
-+			     (1 << KVM_ARM_VCPU_PTRAUTH_GENERIC));
-+
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_UNKNOWN, guest_unknown_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_EC_FPAC, guest_fpac_handler);
-+
-+	ksft_print_header();
-+	ksft_set_plan(3);
-+
-+	while (!guest_done) {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_SYNC:
-+			switch (uc.args[1]) {
-+			case WAIT_MIGRATION:
-+				sched_getaffinity(0, sizeof(cpu_mask), &cpu_mask);
-+				CPU_CLR(sched_getcpu(), &cpu_mask);
-+				sched_setaffinity(0, sizeof(cpu_mask), &cpu_mask);
-+				break;
-+			case FAIL_GUEST_PAUTH:
-+				/*
-+				 * KVM has already claimed that both itself and
-+				 * HW support PAuth, but the guest still got the
-+				 * UNDEF with PAuth instruction.
-+				 * Usually this shouldn't happen unless KVM
-+				 * screwed up the emulation somehow or the PAuth
-+				 * was not enabled for the guest.
-+				 */
-+				TEST_FAIL("Geust PAuth was not enabled!\n");
-+				break;
-+			case GENERIC_PAUTH_ALGO: {
-+				enum pauth_algo algo = uc.args[2];
-+
-+				if (algo == NOALGO) {
-+					ksft_print_msg("Make sure the VCPU feature is enabled:\n");
-+					ksft_print_msg("KVM_ARM_VCPU_PTRAUTH_GENERIC\n");
-+					TEST_FAIL("No generic PAuth algorithm in guest!\n");
-+				}
-+
-+				ksft_test_result_pass("Generic PAuth Algorithm: %s\n",
-+						      algo_string[algo]);
-+				break;
-+			}
-+			case ADDR_PAUTH_ALGO: {
-+				enum pauth_algo algo = uc.args[2];
-+
-+				if (algo == NOALGO) {
-+					ksft_print_msg("Make sure the VCPU feature is enabled:\n");
-+					ksft_print_msg("KVM_ARM_VCPU_PTRAUTH_ADDRESS\n");
-+					TEST_FAIL("No address PAuth algorithm in guest!\n");
-+				}
-+
-+				ksft_test_result_pass("Address PAuth Algorithm: %s\n",
-+						      algo_string[algo]);
-+				break;
-+			}
-+			default:
-+				ksft_print_msg("Unexpected guest sync arg: 0x%016llx\n",
-+					       uc.args[1]);
-+				break;
-+			}
-+			break;
-+		case UCALL_DONE:
-+			ksft_test_result_pass("Guest PAuth\n");
-+			guest_done = true;
-+			break;
-+		default:
-+			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+		}
-+	}
-+
-+	ksft_finished();
-+	kvm_vm_free(vm);
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index cb537253a6b9..f8d541af9c06 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,7 +104,9 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_UNKNOWN		0x00
- #define ESR_EC_SVC64		0x15
-+#define ESR_EC_FPAC		0x1c
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
- #define ESR_EC_HW_BP_CURRENT	0x31
+Well, it is one path, we could also add a dirty_ops to the
+domain. Hard to say which is better.
 
-base-commit: 52a93d39b17dc7eb98b6aa3edb93943248e03b2f
--- 
-2.41.0.640.ga95def55d0-goog
+> (...) I wasn't quite bodging, just trying to parallelize what was bus cleanup
+> could be tackling domain/device-independent ops without them being global. Maybe
+> I read too much into it hence my previous question.
 
+domain_alloc_user bypasses the bus cleanup
+
+> > Return the IOMMU_CAP_DIRTY as generic data in the new GET_INFO
+> 
+> I have this one here:
+> 
+> https://lore.kernel.org/linux-iommu/20230518204650.14541-14-joao.m.martins@oracle.com/
+> 
+> I can rework to GET_HW_INFO but it really needs to be generic bits of data and
+> not iommu hw specific e.g. that translates into device_iommu_capable() cap
+> checking. 
+
+Yes, HW_INFO seems the right way. Just add a
+
+   __aligned_u64 out_capabilities;
+
+To that struct iommu_hw_info and fill it with generic code.
+
+> > Accept some generic flag in the alloc_hwpt requesting dirty
+> > Pass generic flags down to the driver.
+> > Reject set flags and drivers that don't implement alloc_domain_user.
+> > Driver refuses to attach the dirty enabled domain to places that do
+> > dirty tracking.
+> 
+> This is already done, and so far I have an unsigned long flags to
+> domain_alloc_user() and probably be kept defining it as
+> iommu-domain-feature bit
+
+Yes a flag in some way is the best choice
+
+> (unless it's better to follow similar direction as hwpt_type like in
+> domain_alloc_user). And gets stored as iommu_domain::flags, like this series
+> had. Though if majority of driver rejection flows via alloc_domain_user only
+> (which has a struct device), perhaps it's not even needed to store as a new
+> iommu_domain::flags
+
+Right, we don't need to reflect it back if the dirty ops are NULL.
+
+Jason
