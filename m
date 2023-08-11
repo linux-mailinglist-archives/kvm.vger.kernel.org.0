@@ -2,191 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 986817796A0
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:05:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01BD47796AF
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:06:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234354AbjHKSFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 14:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38932 "EHLO
+        id S236964AbjHKSF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 14:05:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230217AbjHKSFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 14:05:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC7E2706
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:05:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S236948AbjHKSFt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 14:05:49 -0400
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8AE30D8;
+        Fri, 11 Aug 2023 11:05:47 -0700 (PDT)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E2FD440E01A2;
+        Fri, 11 Aug 2023 18:05:45 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id c3WvF_auBTsI; Fri, 11 Aug 2023 18:05:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1691777143; bh=TG6qdhwBVxwwpW817Qu9jh6xKcsj+nyAfk2svsio2bI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gC1Z4gBZMKWYNbeH6y1iZcr+uZA9On7jttERP/Lg6g8e33GhxmiVSB8u8tJ/k6O+H
+         ccm2f1GqLap8JML38vWteOtuv0tQz1ffDrPjeW2sMWXPZrBEA1Lo/cYJ5F31t17E3W
+         RKi5y2wPNcLAnHVhTtZbWBi0f/VGRLeIoogtOINH2epomPcu20LAkPIr8ecPLucRy5
+         ndswql3j5spFNqpKhHbOTw8xL8jLbiI5/+W51uRSi5rhyg0Du5uNCIom9QE8vruvs+
+         03d3v0hQ0B1APMkAs3BYDpQxUOj/FTUkz7rlmFLv2DLj0WpLg3wY95UGTZWQZL7xpm
+         RcAYg9L+7TQfvHPcGyM3FzOIZiH3TR0CnCwUbAqwT9djKAstNfth/zUjrFbSyU/hlH
+         rjqKTSci0Rr5huwkSSNIeU07Cu77wRWgMVrN3GoBIzlrUfQTnmMkq2fArIwA7p57T3
+         ddIhXr/xYs649PUmQJ/9TUKUSGLKt6On7G0u2tu5bG4DK2blI0dj4wtLhz9ww2U+4b
+         Uop3R1JuoVDNoDdSVeXlW/D3xd1g2+yMfhhiKqaTx1DrG60cWNkDln9aLWdIM4FrBu
+         DXKhJvNQ47uuFUIYTNhqDc2f7GX8sJCZO21eTHxKFNzN8fMj18+CeMly0y6kfPIk1P
+         0wfg/EgKtuc6/K58owuz13Lk=
+Received: from zn.tnic (pd9530d32.dip0.t-ipconnect.de [217.83.13.50])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D14AB643AB
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 18:05:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E883C433C7;
-        Fri, 11 Aug 2023 18:05:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691777130;
-        bh=l6yBgpeHwVV6ImpsDnxJpDJrHqgiaHTPBxktsCstHWM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=mNCoLNgCTVYbJPWt59hHrWF5lVHLYzF86W9qUkBiNQAWUgC0DlWhugCSVk0JspUzP
-         4898mvKMggnFb6qJuvTFxTJqYxUimdEax6RCm7NqzzW65vYIFPPOwGEzNotspXqw6i
-         Dg/moxK07MLe2p9J0d1bt5Ru4Hb3tSi8UEMkTVokCfh4jJVaQGf+D+XCa9Sck/TC1I
-         83TqdJwehtcDJ/sIt3oJ9h5KxRqFQ8gJVPuFsUSo6MdCNeZZeJoRyldxAY6IoDMbB9
-         gzkn2knKsxoawhvkiM+5APKGcl09KWHHNulp0G2Q2tNBxI1RwtRS10hkJDhx+QtAqC
-         agELs0ZbevKUQ==
-Received: from c-xd4ed8706.customers.hiper-net.dk ([212.237.135.6] helo=localhost.localdomain)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qUWVr-004DX6-K0;
-        Fri, 11 Aug 2023 19:05:27 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huang Shijie <shijie@os.amperecomputing.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-Date:   Fri, 11 Aug 2023 19:05:20 +0100
-Message-Id: <20230811180520.131727-1-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8EE2840E0194;
+        Fri, 11 Aug 2023 18:05:34 +0000 (UTC)
+Date:   Fri, 11 Aug 2023 20:05:28 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Srikanth Aithal <sraithal@amd.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] x86/retpoline: Don't clobber RFLAGS during
+ srso_safe_ret()
+Message-ID: <20230811180528.GJZNZ4aIHCn3zMaida@fat_crate.local>
+References: <20230811155255.250835-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 212.237.135.6
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, shijie@os.amperecomputing.com, mark.rutland@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230811155255.250835-1-seanjc@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Huang Shijie reports that, when profiling a guest from the host
-with a number of events that exceeds the number of available
-counters, the reported counts are wildly inaccurate. Without
-the counter oversubscription, the reported counts are correct.
+On Fri, Aug 11, 2023 at 08:52:55AM -0700, Sean Christopherson wrote:
+> A major motivation for doing fast emulation is to leverage the CPU to
+> handle consumption and manipulation of arithmetic flags, i.e. RFLAGS is
+> both an input and output to the target of the call.  fastop() collects
+> the RFLAGS result by pushing RFLAGS onto the stack and popping them back
+> into a variable (held in RDI in this case)
+> 
+>   asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
 
-Their investigation indicates that upon counter rotation (which
-takes place on the back of a timer interrupt), we fail to
-re-apply the guest EL0 enabling, leading to the counting of host
-events instead of guest events.
+Right, and I've tested this countless times with gcc-built host and
+guest.
 
-In order to solve this, add yet another hook between the host PMU
-driver and KVM, re-applying the guest EL0 configuration if the
-right conditions apply (the host is VHE, we are in interrupt
-context, and we interrupted a running vcpu). This triggers a new
-vcpu request which will apply the correct configuration on guest
-reentry.
+But Nathan's case where the host is built with gcc but the guest with
+clang, would trigger this. And as he confirms, that fixes it so I wonder
+what is the difference in code generation to make this rFLAGS corruption
+noticeable in that particular configuration.
 
-With this, we have the correct counts, even when the counters are
-oversubscribed.
+Oh well, later when the fires are put out.
 
-Reported-by: Huang Shijie <shijie@os.amperecomputing.com>
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Link: https://lore.kernel.org/r/20230809013953.7692-1-shijie@os.amperecomputing.com
----
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              |  3 +++
- arch/arm64/kvm/pmu.c              | 18 ++++++++++++++++++
- drivers/perf/arm_pmuv3.c          |  2 ++
- include/kvm/arm_pmu.h             |  2 ++
- 5 files changed, 26 insertions(+)
+Thx.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d3dd05bbfe23..553040e0e375 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -49,6 +49,7 @@
- #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
- #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
- #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
-+#define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
- 
- #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
- 				     KVM_DIRTY_LOG_INITIALLY_SET)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 72dc53a75d1c..978b0411082f 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -803,6 +803,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 			kvm_pmu_handle_pmcr(vcpu,
- 					    __vcpu_sys_reg(vcpu, PMCR_EL0));
- 
-+		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
-+			kvm_vcpu_pmu_restore_guest(vcpu);
-+
- 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
- 			return kvm_vcpu_suspend(vcpu);
- 
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 121f1a14c829..0eea225fd09a 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -236,3 +236,21 @@ bool kvm_set_pmuserenr(u64 val)
- 	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
- 	return true;
- }
-+
-+/*
-+ * If we interrupted the guest to update the host PMU context, make
-+ * sure we re-apply the guest EL0 state.
-+ */
-+void kvm_vcpu_pmu_resync_el0(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+
-+	if (!has_vhe() || !in_interrupt())
-+		return;
-+
-+	vcpu = kvm_get_running_vcpu();
-+	if (!vcpu)
-+		return;
-+
-+	kvm_make_request(KVM_REQ_RESYNC_PMU_EL0, vcpu);
-+}
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index 08b3a1bf0ef6..6a3d8176f54a 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -772,6 +772,8 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
- 
- 	/* Enable all counters */
- 	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
-+
-+	kvm_vcpu_pmu_resync_el0();
- }
- 
- static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 847da6fc2713..3a8a70a60794 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -74,6 +74,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
- struct kvm_pmu_events *kvm_get_pmu_events(void);
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-+void kvm_vcpu_pmu_resync_el0(void);
- 
- #define kvm_vcpu_has_pmu(vcpu)					\
- 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
-@@ -171,6 +172,7 @@ static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
- {
- 	return 0;
- }
-+static inline void kvm_vcpu_pmu_resync_el0(void) {}
- 
- #endif
- 
 -- 
-2.39.2
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
