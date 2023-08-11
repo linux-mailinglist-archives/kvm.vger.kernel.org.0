@@ -2,92 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04B2A7796C5
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:07:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21B2C779701
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:21:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236996AbjHKSHy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 14:07:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37540 "EHLO
+        id S234384AbjHKSVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 14:21:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbjHKSHv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 14:07:51 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB1330DE
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:07:33 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d6349e1d4c2so2245466276.2
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691777252; x=1692382052;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=COZqDoRGH08yoJM4v4Rkr8ds3NE7H19/CuY8y3A3k2M=;
-        b=rKqnc7GZnwmVL4AD1kKsOLIsmM7ht48vJ7VlAwLdvZhpk8VeKrXLGvsKeMZVzFO8rR
-         znnuR35LX8aHAq8FRZXO1CkCoJhtBhq71gGg8dsiUkLKk6h6MQzAa2iYSQUcT/msY27V
-         BWhZwR+ett6osrqlyzsACmu82YGgsiVkfX0gvsLzZkySnhvcUR0GgQCVi6r6s8vZA4hC
-         8etnRNph2b3pLdwMj1t4+J5bMuwtdNYEAz3QdTg5aZJAXN8oKbk7zIQuenkGO2OGDdH9
-         yZLQ3Oz4nMT1UAfszSBgPjXbfLZSDYKGk576nFzwf4iSSveTgRAH3fHhoNxQgmsvIs8x
-         BgSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691777252; x=1692382052;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=COZqDoRGH08yoJM4v4Rkr8ds3NE7H19/CuY8y3A3k2M=;
-        b=WBxtnQir0+MvR6SXJsajJi59iYWKZ6VS1a1MlHkJbA9qMGtVuDCXUoYZm1JePZzZI5
-         52Eh+AHHjBsiN+9yTwrLWWGn1M1gQ2Htj3T3lgalC7H4tG0OxnpD9llPJUUfp4GKJYCg
-         xOtJjxeiVax8+2ROr6Jtgz5UClqmSTP/wLUdpYSNjBGV8yttZiQ4mXy8VcaTBEdMJF9Y
-         mxzfaV3EdRixwlGPd+cFB2gzt9vGsIlRApszqPOFCuHoP4h3HUlEwcRirCqYRtzKMnHz
-         quLnnEzeM3ADN+3DXAjIvVBuzliA0Aw73silcitwRh118OtxQDIIK6U3lJfJvUEy+1nR
-         yROQ==
-X-Gm-Message-State: AOJu0Yw9i7PfDO2f1Wa2EgOoVqXW6jpUmcny3bOW31FATg9F6vFAxmDw
-        Up22MsZBzWcdbK5FDzVK7hFsN7n+CC0=
-X-Google-Smtp-Source: AGHT+IF1kuAYwDpr4ZGaYh5iIfqReheBH7zwbmuRDoDz/CoicBiHAd84zxLsQkzl4PTv6NeD9KJ1fo7Rgao=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:588:0:b0:d0f:cf5:3282 with SMTP id
- 130-20020a250588000000b00d0f0cf53282mr43704ybf.1.1691777252197; Fri, 11 Aug
- 2023 11:07:32 -0700 (PDT)
-Date:   Fri, 11 Aug 2023 11:07:30 -0700
-In-Reply-To: <12a72fb7-4125-c705-6dd6-733ec23de80e@cs.utexas.edu>
-Mime-Version: 1.0
-References: <12a72fb7-4125-c705-6dd6-733ec23de80e@cs.utexas.edu>
-Message-ID: <ZNZ44ti0twIoXQqg@google.com>
-Subject: Re: VM Memory Map
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yahya Sohail <ysohail@cs.utexas.edu>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229999AbjHKSVM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 14:21:12 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E21130DD;
+        Fri, 11 Aug 2023 11:21:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lJ4Agpa+SldoYXX9cMUGu6Z4P31ZouGLmuqRrvDQSR1HHh3NtDiYU9XjJcQnIBZ2AtQv+aJvQxY+VHHZAftYUR+6riAKPh57UhFOE7Zflu9hHHTjDOE3sVQnIGrR2Il3CUjkrya33gRFIflCmVSWgkDzPKoREl7B7Ll3cxivjYyYVYRPa2z2xxgX0muEozGs+8vN34pAkpKk9Bz0w9mKvpNWzsimam1F6O7QBToXwLSjHMVJwPREAVrQdbIrpxH7xGiP/7Yvem83b/hFMYBa1a6qgG2tmAYP0Q6Vh/8mLOVHg+qytWwB6TWTalTcelKMZ96bBP9fhDSK9FAkF7dszg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tmyCYJ8CQneTA/yCjp8OBFNwDWMJnlaBLg1MC5C0uno=;
+ b=kfzVHunq8aqc8F/1MeDomb+mIBnjZbezYpI+hVWYPzzEi4RBxSQZ69K+H894eCRCfPEdi6DxbFUB2nQV5QK5PEdgRhPp5j6XYuOZZSZfb9/zUIOHWQwhrQ7xX9Xm+aikawabCKXLhfb5e6SLkK9zx9OmXSeu35Ay9dEKeuJayZOPSoK2b3kY0CEplxO/9ojfE3dsD8njytXRIBFy6YXikw3M6OLySYz82o9W4pBuy8TR7sgMXuTodOG1VZHBAwkQAPtJOcrPNJJLl1YMLdcLFFB66XvCEs/G6snSeKKbR5LDHLj0RrqseTFHuI0VtiIhqMogEGJNiYXeDXOU0XbIkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tmyCYJ8CQneTA/yCjp8OBFNwDWMJnlaBLg1MC5C0uno=;
+ b=rRpqJo8H5A6oE7SEflZE3bhJnckLKpG8L4bNn5GV8DV+WmVvv2j2JPiAP4uULRPbu+IIJnechenwAr8Q0a+lOT248hZBdswNKRKq6aXlHKTlpDc03b7DNqPPFKnqXdH22Pa5lwNZdbKfrYLVw2ZC29y8oS8WC9FXPqHFQml2hJQxJimYIAPUCzi8+3iGd0dL95WEQMEr1TQ8BlwOtTGWiAzLR65MALq6q+4zAt8EolC05FXJdD40I/h8AT7dodajzK1thOh4/vV9TMARdwEwDOUukkd7ItYSfLJcz9nVbaZfKZLR287UtRK2Y90euikn/TJeLdoe1HR31qICDwJHkA==
+Received: from PH7PR13CA0005.namprd13.prod.outlook.com (2603:10b6:510:174::8)
+ by PH7PR12MB6934.namprd12.prod.outlook.com (2603:10b6:510:1b8::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
+ 2023 18:21:07 +0000
+Received: from SA2PEPF000015C6.namprd03.prod.outlook.com
+ (2603:10b6:510:174:cafe::2d) by PH7PR13CA0005.outlook.office365.com
+ (2603:10b6:510:174::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.9 via Frontend
+ Transport; Fri, 11 Aug 2023 18:21:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF000015C6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 18:21:06 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 11 Aug 2023
+ 11:20:47 -0700
+Received: from [10.110.48.28] (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 11 Aug
+ 2023 11:20:47 -0700
+Message-ID: <1ad2c33d-95e1-49ec-acd2-ac02b506974e@nvidia.com>
+Date:   Fri, 11 Aug 2023 11:20:46 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 0/5] Reduce NUMA balance caused TLB-shootdowns in a
+ VM
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>
+CC:     <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+        <mike.kravetz@oracle.com>, <apopple@nvidia.com>, <jgg@nvidia.com>,
+        <rppt@kernel.org>, <akpm@linux-foundation.org>,
+        <kevin.tian@intel.com>
+References: <20230810085636.25914-1-yan.y.zhao@intel.com>
+ <41a893e1-f2e7-23f4-cad2-d5c353a336a3@redhat.com>
+ <ZNSyzgyTxubo0g/D@yzhao56-desk.sh.intel.com>
+ <6b48a161-257b-a02b-c483-87c04b655635@redhat.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+In-Reply-To: <6b48a161-257b-a02b-c483-87c04b655635@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.231.37]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C6:EE_|PH7PR12MB6934:EE_
+X-MS-Office365-Filtering-Correlation-Id: a1870338-a6de-48f1-f2ba-08db9a97bafc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: raPla8IGi3rfJs0Um70A2BlPXSXj3dx7JAI5nT7Tgo/ptQcyu6k+L6vL/WyqbX6WdzCrTqpfV6vR8W0kJ4rzTyww2yMYy8nw4xpajfmdmAbx/cnCp/1/AYCXxCsIULNPJNlrv/p7I0NLSc+0CH/yOjD1rTKmmBnh+Jc1cF19hOJysU4IYWsyoFxzNQHJ0aTAJ6EaAKRiJ2Efz4hZEj9ZiCx+ZcN2c6mt776lss2bwTqfqiIfVDwQpgd5sUdKm2dDcupywxu/DXbDxGOZ+pPaTHH7g8jaBZpGMPC7QDmqGQuEt1bNhj4ENG6K1ZceZuqTAK22RoPFSFH2u7WRvyz0ohOc7Gr1kccN+QJOvmepajhOuDQhExIsmElqZ9anGryIGSWoVuA/9KHbDaiyepPRE8avA3qbHNZT7DrxkPXXtWae1DYk7EefCmj57ZCep9qUxcCUO+htUdUeNGz2NWKxVq4Tw6EMgK4N1nGmgD30DFzKaRpHJwX/igm6Sbgy7IyJX/hkaS6QdMs21V9kkopcQmOlQlnpXnR3XYLyjionWu6DwR/9tpO4yaigdZkuMTZ6CcDztnwdQhLM2i621Cv91iDdRMqlxRuPIEe4gIjftikakAqtHcfwx28FMfPYCKALY40AWt8hlcm56lFx/xrmIJRXtCsQgbZrsNfNijB7EtjWHP338l4uP7wVzmKrYBlZU3LVDYK0qmaM0S5ekED+O5sKB+QYvk5LanQsFjRDBKf/tVsVUi+pPRU1/bBSkfr9B1Ss2QZgq9hOdBxUc6hUJA==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39860400002)(376002)(1800799006)(186006)(451199021)(82310400008)(36840700001)(40470700004)(46966006)(2616005)(478600001)(16526019)(426003)(86362001)(31696002)(83380400001)(40480700001)(336012)(36756003)(2906002)(26005)(7416002)(40460700003)(53546011)(41300700001)(4326008)(7636003)(356005)(16576012)(316002)(82740400003)(31686004)(70586007)(70206006)(47076005)(36860700001)(5660300002)(8936002)(54906003)(8676002)(110136005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 18:21:06.8904
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1870338-a6de-48f1-f2ba-08db9a97bafc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: SA2PEPF000015C6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6934
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 11, 2023, Yahya Sohail wrote:
-> Hi,
+On 8/11/23 10:25, David Hildenbrand wrote:
+...
+> One issue is that folio_maybe_pinned...() ... is unreliable as soon as your page is mapped more than 1024 times.
 > 
-> Accesses to certain memory addresses by the guest trigger a KVM_EXIT_MMIO. I
-> can't seem to find a memory map in the documentation or source that
-> describes exactly which addresses are real memory and which addresses are
-> MMIO addresses (on x86, if that matters). Is there any such documentation or
-> a listing in the source?
+> One might argue that we also want to exclude pages that are mapped that often. That might possibly work.
+
+Yes.
+  
+>>
+>>> Staring at page #2, are we still missing something similar for THPs?
+>> Yes.
+>>
+>>> Why is that MMU notifier thingy and touching KVM code required?
+>> Because NUMA balancing code will firstly send .invalidate_range_start() with
+>> event type MMU_NOTIFY_PROTECTION_VMA to KVM in change_pmd_range()
+>> unconditionally, before it goes down into change_pte_range() and
+>> change_huge_pmd() to check each page count and apply PROT_NONE.
 > 
-> Is there any way to configure which addresses are MMIO? I hoped that mapping
-> memory to MMIO address regions with the KVM_SET_USER_MEMORY_REGION ioctl
-> would allow me to use them as memory, but that didn't work. The only ioctls
-> that seem relevant to MMIO are KVM_(UN)REGISTER_COALESCED_MMIO, but those
-> only allow coalescing MMIO exits, not changing which addresses cause them.
+> Ah, okay I see, thanks. That's indeed unfortunate.
 
-KVM_EXIT_MMIO is for *emulated* MMIO, and is triggered by a guest access to
-non-existent memory from the guest's (and KVM's) perspective.  Specifically, if
-the guest accesses a GPA that is not covered by a memslot.
+Sigh. All this difficulty reminds me that this mechanism was created in
+the early days of NUMA. I wonder sometimes lately whether the cost, in
+complexity and CPU time, is still worth it on today's hardware.
 
-Mapping a "real" host MMIO address into a guest via KVM_SET_USER_MEMORY_REGION
-will not generate KVM_EXIT_MMIO, as KVM will simply map the "real" MMIO directly
-into the guest.
+But of course I am deeply biased, so don't take that too seriously.
+See below. :)
 
-There is no KVM documentation of a memory map or real vs. emulated addresses because
-what is real and what is emulated is completely userspace defined (except for the
-local APIC and/or I/O APIC if userspace enables KVM's "in-kernel" APIC emulation).
+> 
+>>
+>> Then current KVM will unmap all notified pages from secondary MMU
+>> in .invalidate_range_start(), which could include pages that finally not
+>> set to PROT_NONE in primary MMU.
+>>
+>> For VMs with pass-through devices, though all guest pages are pinned,
+>> KVM still periodically unmap pages in response to the
+>> .invalidate_range_start() notification from auto NUMA balancing, which
+>> is a waste.
+> 
+> Should we want to disable NUMA hinting for such VMAs instead (for example, by QEMU/hypervisor) that knows that any NUMA hinting activity on these ranges would be a complete waste of time? I recall that John H. once mentioned that there are 
+similar issues with GPU memory:  NUMA hinting is actually counter-productive and they end up disabling it.
+> 
+
+Yes, NUMA balancing is incredibly harmful to performance, for GPU and
+accelerators that map memory...and VMs as well, it seems. Basically,
+anything that has its own processors and page tables needs to be left
+strictly alone by NUMA balancing. Because the kernel is (still, even
+today) unaware of what those processors are doing, and so it has no way
+to do productive NUMA balancing.
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
+
