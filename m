@@ -2,164 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F9177797D8
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 21:35:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E5F87797F2
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 21:52:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236842AbjHKTft (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 15:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45338 "EHLO
+        id S235706AbjHKTwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 15:52:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234069AbjHKTfr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 15:35:47 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2043.outbound.protection.outlook.com [40.107.95.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B671FE3;
-        Fri, 11 Aug 2023 12:35:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TcHtqcY49zNnajQ23xPVNXbdc/GeQkdmq+UKfNvhf6A8mrRKE7s5vd4jkx5LmMduOgfaGa2/E2p9X6bwXIaYHAzPl2+0InI4K7+Z2Ij14+FfToegVrWhS/g+fTCzF2Gm865psp4odK0avRgBBpkeEyfT/sna65pB6q3Cj5eJ4g92IJPRfPzDljzC5vDO6nQgQZ+ol8MiOFYL1L3kfBnTDAS7L1IbYXk1zcUpdwsw501LvZgIscNb9mO1oaEQR0CEK7IiMEoIOmO+CJ5ejGy2Er2Et6UGS7YtLhNl7spsI7ZxgBXAQmoah4yQM4PgjG/Rwrn1nFTcIEFnVuFlnfiLDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AfoGldP2OSn5G4HX5cWOwJh4PtSzWl/xwqtAHlnKEa0=;
- b=HmCu5aI+gBp3J0h62pKYH/tC37kTmjSUVn8KCCkWlIe0RnD6wTCPqyYk/n5018Q6AstzFa+JvOdecKwusXrk8gCAm9s72drC3W0k/5YHjeFQQIFVU7sXBtAEb0Afh6UGmtErKjJysuTZ8knOlKm8LVjiYrj+6fzCfQfH/tF9GVcv9q7JhMdcL453LQifGmKzAfbMk7DtIsDwNCKQrXHFoU3pLB5xHEtUGP+qoICScoEEbDi7xFYK8CDYAV7+PnrVsY0MazqwPZ9x+2Ixd0IZmehua82pj3W6ZqDXSxaPFTrSAnvP4IXQjs0RrVOVVC0EBMOytM9v6wQfhhn6qDjjtg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AfoGldP2OSn5G4HX5cWOwJh4PtSzWl/xwqtAHlnKEa0=;
- b=E5Al9twyOCHM4wTIPW95tb1QHUJZE+yiagSVnYGQOd2VmW7vIUvJm6SRt6mkFmpxENaUE+5JzXXaicM7XjfKuOzZLLd03tKr+8V3pXg6LCmbpudXNzYRw/8v928VBhXfQ+qM6uUuPa9qDRuXufkr43lssctzFLLNDOPwuTBqGmQWkwGe26Nmi4fKyne36hpVvxtxToR4q7i4fX73ypJIoZNqgmxyfhlQlwQ3BAfHzKrSjtwg/3zfKMbO5esWTaSxjZJTtPKgLtKmxXufeDMkx9ESWBBh65E8RRVDU6NzH0/r85MobwMlYdey6NcOXkQRpYVaed54oBhEfT8djYKn5w==
-Received: from CY5PR15CA0048.namprd15.prod.outlook.com (2603:10b6:930:1b::10)
- by MN2PR12MB4077.namprd12.prod.outlook.com (2603:10b6:208:1da::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
- 2023 19:35:43 +0000
-Received: from CY4PEPF0000EDD6.namprd03.prod.outlook.com
- (2603:10b6:930:1b:cafe::78) by CY5PR15CA0048.outlook.office365.com
- (2603:10b6:930:1b::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.31 via Frontend
- Transport; Fri, 11 Aug 2023 19:35:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EDD6.mail.protection.outlook.com (10.167.241.210) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6652.19 via Frontend Transport; Fri, 11 Aug 2023 19:35:43 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 11 Aug 2023
- 12:35:29 -0700
-Received: from [10.110.48.28] (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 11 Aug
- 2023 12:35:28 -0700
-Message-ID: <d0ad2642-6d72-489e-91af-a7cb15e75a8a@nvidia.com>
-Date:   Fri, 11 Aug 2023 12:35:27 -0700
+        with ESMTP id S236434AbjHKTwM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 15:52:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EA3F3
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 12:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691783491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xXxOGzkfxn/aWsd8gPttRmlIA5cRwswhSr29IEOi3U4=;
+        b=AtvkqVADF5GL0kihmF40EzoQVZicXKwn2u2cew46NZp6rWHSLw5ADy6KKwWWpETQRNslgp
+        NZbY1A2EBM/PibPpT5TQpUPGmw4WgwD+uQgWJb1TB/8ZHGCCIlI55ADF5bjrknzq34z83u
+        kuVt+Xy6uWPKdnlds1GKEJ/H3+wZv2s=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-6-GKeywzkZPMCI_IeqWCbtpw-1; Fri, 11 Aug 2023 15:51:28 -0400
+X-MC-Unique: GKeywzkZPMCI_IeqWCbtpw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC0591C0514C;
+        Fri, 11 Aug 2023 19:51:26 +0000 (UTC)
+Received: from [10.22.17.82] (unknown [10.22.17.82])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EEE2B40C6F4E;
+        Fri, 11 Aug 2023 19:51:24 +0000 (UTC)
+Message-ID: <4cc7113a-0e4e-763a-cba2-7963bcd26c7a@redhat.com>
+Date:   Fri, 11 Aug 2023 15:51:24 -0400
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 0/5] Reduce NUMA balance caused TLB-shootdowns in a
- VM
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH V10 05/19] riscv: qspinlock: Introduce combo spinlock
 Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>
-CC:     <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-        <mike.kravetz@oracle.com>, <apopple@nvidia.com>, <jgg@nvidia.com>,
-        <rppt@kernel.org>, <akpm@linux-foundation.org>,
-        <kevin.tian@intel.com>, "Mel Gorman" <mgorman@techsingularity.net>
-References: <20230810085636.25914-1-yan.y.zhao@intel.com>
- <41a893e1-f2e7-23f4-cad2-d5c353a336a3@redhat.com>
- <ZNSyzgyTxubo0g/D@yzhao56-desk.sh.intel.com>
- <6b48a161-257b-a02b-c483-87c04b655635@redhat.com>
- <1ad2c33d-95e1-49ec-acd2-ac02b506974e@nvidia.com>
- <846e9117-1f79-a5e0-1b14-3dba91ab8033@redhat.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <846e9117-1f79-a5e0-1b14-3dba91ab8033@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD6:EE_|MN2PR12MB4077:EE_
-X-MS-Office365-Filtering-Correlation-Id: aec95a83-517c-47cf-7b51-08db9aa22725
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Cl1iYVoEiSGCqCKe9ctGfVbfiSMYLlbYOJN75g+7Gwq2oRKAte7rUshGRad1Jld4+cDIHFSl+0/Ja/QlfT1Eo5RPH847A/r2upfMgVdeXZAplM3LtDDDZNl0GOA2xtP2wBVGHetCo5Ty4arZPPI9W3T6kgOpNw2DbWIyEmAGadS2bUEHlI8SnXCU4pdZgIVYgbLXmcJsP2h8jElvuJo/ET6nBQ/OaDIp1M2XL5nuC3gVCeNSyltL9su+DZQq77rlYxe4D/0AUDExV6eD6hotvD4JxBRhC8Jx3LtYSe8iW2wJBABm+ISYVnxtWyqQp3MDpjKBgMD2OTFNsfGjF5vU9aMbZR9kgTQsSbto4bdYs9gqIVlZS3GVZIaCJt/nrX8a5ZFmbVqs06L2mE67YgjD8Zq4UIGlPdRKiSt2RUQtkRa/CK8FGvusNcnN5mwdO42NN5YQDgnt8+L5B0jF/ORP/ZaO0ihZiFChi19obzQWKfh63iT5O5duKYlBkdvgL6SE8Q6EBOBaxLsKRdsJnGT0EE/xjfwcDCqVhFuBUZTwhvjMSPycio2in6wp7d2yyPHbfIX1AJshWZlg2mgtvKNC4bP741FlotYkp5p1opT0OeglthrXceJZY+hVPbb0Q/z5xP7lWYfcGpEniENXeQtwYfdIMqKVRkrEUaeJs9tnoqrgDHXH3W7pnGlSUR2g+ry7NNGYh42FLxIMm/m06wZJrqwwhtbLkabbjQGZpfAH2tEmfuhHWqvEcx4rCghF8FWPe/3oqyiSbRJsRDA9vMDhlg==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(346002)(136003)(396003)(82310400008)(1800799006)(451199021)(186006)(36840700001)(40470700004)(46966006)(31686004)(40460700003)(40480700001)(54906003)(70206006)(16526019)(110136005)(26005)(53546011)(336012)(478600001)(70586007)(86362001)(36756003)(426003)(47076005)(83380400001)(2616005)(36860700001)(16576012)(316002)(41300700001)(7416002)(4326008)(356005)(2906002)(31696002)(8676002)(7636003)(82740400003)(5660300002)(8936002)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 19:35:43.3798
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aec95a83-517c-47cf-7b51-08db9aa22725
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EDD6.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4077
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+To:     guoren@kernel.org, paul.walmsley@sifive.com, anup@brainfault.org,
+        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
+        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
+        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
+        catalin.marinas@arm.com, conor.dooley@microchip.com,
+        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
+        alexghiti@rivosinc.com, keescook@chromium.org,
+        greentime.hu@sifive.com, ajones@ventanamicro.com,
+        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn
+Cc:     linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
+References: <20230802164701.192791-1-guoren@kernel.org>
+ <20230802164701.192791-6-guoren@kernel.org>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <20230802164701.192791-6-guoren@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/11/23 11:39, David Hildenbrand wrote:
-...
->>> Should we want to disable NUMA hinting for such VMAs instead (for example, by QEMU/hypervisor) that knows that any NUMA hinting activity on these ranges would be a complete waste of time? I recall that John H. once mentioned that there are
->> similar issues with GPU memory:  NUMA hinting is actually counter-productive and they end up disabling it.
->>>
->>
->> Yes, NUMA balancing is incredibly harmful to performance, for GPU and
->> accelerators that map memory...and VMs as well, it seems. Basically,
->> anything that has its own processors and page tables needs to be left
->> strictly alone by NUMA balancing. Because the kernel is (still, even
->> today) unaware of what those processors are doing, and so it has no way
->> to do productive NUMA balancing.
-> 
-> Is there any existing way we could handle that better on a per-VMA level, or on the process level? Any magic toggles?
-> 
-> MMF_HAS_PINNED might be too restrictive. MMF_HAS_PINNED_LONGTERM might be better, but with things like iouring still too restrictive eventually.
-> 
-> I recall that setting a mempolicy could prevent auto-numa from getting active, but that might be undesired.
-> 
-> CCing Mel.
-> 
+On 8/2/23 12:46, guoren@kernel.org wrote:
+> From: Guo Ren <guoren@linux.alibaba.com>
+>
+> Combo spinlock could support queued and ticket in one Linux Image and
+> select them during boot time via errata mechanism. Here is the func
+> size (Bytes) comparison table below:
+>
+> TYPE			: COMBO | TICKET | QUEUED
+> arch_spin_lock		: 106	| 60     | 50
+> arch_spin_unlock	: 54    | 36     | 26
+> arch_spin_trylock	: 110   | 72     | 54
+> arch_spin_is_locked	: 48    | 34     | 20
+> arch_spin_is_contended	: 56    | 40     | 24
+> rch_spin_value_unlocked	: 48    | 34     | 24
+>
+> One example of disassemble combo arch_spin_unlock:
+>     0xffffffff8000409c <+14>:    nop                # detour slot
+>     0xffffffff800040a0 <+18>:    fence   rw,w       # queued spinlock start
+>     0xffffffff800040a4 <+22>:    sb      zero,0(a4) # queued spinlock end
+>     0xffffffff800040a8 <+26>:    ld      s0,8(sp)
+>     0xffffffff800040aa <+28>:    addi    sp,sp,16
+>     0xffffffff800040ac <+30>:    ret
+>     0xffffffff800040ae <+32>:    lw      a5,0(a4)   # ticket spinlock start
+>     0xffffffff800040b0 <+34>:    sext.w  a5,a5
+>     0xffffffff800040b2 <+36>:    fence   rw,w
+>     0xffffffff800040b6 <+40>:    addiw   a5,a5,1
+>     0xffffffff800040b8 <+42>:    slli    a5,a5,0x30
+>     0xffffffff800040ba <+44>:    srli    a5,a5,0x30
+>     0xffffffff800040bc <+46>:    sh      a5,0(a4)   # ticket spinlock end
+>     0xffffffff800040c0 <+50>:    ld      s0,8(sp)
+>     0xffffffff800040c2 <+52>:    addi    sp,sp,16
+>     0xffffffff800040c4 <+54>:    ret
+>
+> The qspinlock is smaller and faster than ticket-lock when all are in
+> fast-path, and combo spinlock could provide a compatible Linux Image
+> for different micro-arch design (weak/strict fwd guarantee) processors.
+>
+> Signed-off-by: Guo Ren <guoren@kernel.org>
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> ---
+>   arch/riscv/Kconfig                |  9 +++-
+>   arch/riscv/include/asm/hwcap.h    |  1 +
+>   arch/riscv/include/asm/spinlock.h | 87 ++++++++++++++++++++++++++++++-
+>   arch/riscv/kernel/cpufeature.c    | 10 ++++
+>   4 files changed, 104 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index e89a3bea3dc1..119e774a3dcf 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -440,7 +440,7 @@ config NODES_SHIFT
+>   
+>   choice
+>   	prompt "RISC-V spinlock type"
+> -	default RISCV_TICKET_SPINLOCKS
+> +	default RISCV_COMBO_SPINLOCKS
+>   
+>   config RISCV_TICKET_SPINLOCKS
+>   	bool "Using ticket spinlock"
+> @@ -452,6 +452,13 @@ config RISCV_QUEUED_SPINLOCKS
+>   	help
+>   	  Make sure your micro arch LL/SC has a strong forward progress guarantee.
+>   	  Otherwise, stay at ticket-lock.
+> +
+> +config RISCV_COMBO_SPINLOCKS
+> +	bool "Using combo spinlock"
+> +	depends on SMP && MMU
+> +	select ARCH_USE_QUEUED_SPINLOCKS
+> +	help
+> +	  Select queued spinlock or ticket-lock via errata.
+>   endchoice
+>   
+>   config RISCV_ALTERNATIVE
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> index f041bfa7f6a0..08ae75a694c2 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -54,6 +54,7 @@
+>   #define RISCV_ISA_EXT_ZIFENCEI		41
+>   #define RISCV_ISA_EXT_ZIHPM		42
+>   
+> +#define RISCV_ISA_EXT_XTICKETLOCK	63
+>   #define RISCV_ISA_EXT_MAX		64
+>   #define RISCV_ISA_EXT_NAME_LEN_MAX	32
+>   
+> diff --git a/arch/riscv/include/asm/spinlock.h b/arch/riscv/include/asm/spinlock.h
+> index c644a92d4548..9eb3ad31e564 100644
+> --- a/arch/riscv/include/asm/spinlock.h
+> +++ b/arch/riscv/include/asm/spinlock.h
+> @@ -7,11 +7,94 @@
+>   #define _Q_PENDING_LOOPS	(1 << 9)
+>   #endif
+>   
 
-Let's discern between page pinning situations, and HMM-style situations.
-Page pinning of CPU memory is unnecessary when setting up for using that
-memory by modern GPUs or accelerators, because the latter can handle
-replayable page faults. So for such cases, the pages are in use by a GPU
-or accelerator, but unpinned.
+I see why you separated the _Q_PENDING_LOOPS out.
 
-The performance problem occurs because for those pages, the NUMA
-balancing causes unmapping, which generates callbacks to the device
-driver, which dutifully unmaps the pages from the GPU or accelerator,
-even if the GPU might be busy using those pages. The device promptly
-causes a device page fault, and the driver then re-establishes the
-device page table mapping, which is good until the next round of
-unmapping from the NUMA balancer.
 
-hmm_range_fault()-based memory management in particular might benefit
-from having NUMA balancing disabled entirely for the memremap_pages()
-region, come to think of it. That seems relatively easy and clean at
-first glance anyway.
+> +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> +#include <asm-generic/ticket_spinlock.h>
+> +
+> +#undef arch_spin_is_locked
+> +#undef arch_spin_is_contended
+> +#undef arch_spin_value_unlocked
+> +#undef arch_spin_lock
+> +#undef arch_spin_trylock
+> +#undef arch_spin_unlock
+> +
+> +#include <asm-generic/qspinlock.h>
+> +#include <asm/hwcap.h>
+> +
+> +#undef arch_spin_is_locked
+> +#undef arch_spin_is_contended
+> +#undef arch_spin_value_unlocked
+> +#undef arch_spin_lock
+> +#undef arch_spin_trylock
+> +#undef arch_spin_unlock
+Perhaps you can add a macro like __no_arch_spinlock_redefine to disable 
+the various arch_spin_* definition in qspinlock.h and ticket_spinlock.h.
+> +
+> +#define COMBO_DETOUR				\
+> +	asm_volatile_goto(ALTERNATIVE(		\
+> +		"nop",				\
+> +		"j %l[ticket_spin_lock]",	\
+> +		0,				\
+> +		RISCV_ISA_EXT_XTICKETLOCK,	\
+> +		CONFIG_RISCV_COMBO_SPINLOCKS)	\
+> +		: : : : ticket_spin_lock);
+> +
+> +static __always_inline void arch_spin_lock(arch_spinlock_t *lock)
+> +{
+> +	COMBO_DETOUR
+> +	queued_spin_lock(lock);
+> +	return;
+> +ticket_spin_lock:
+> +	ticket_spin_lock(lock);
+> +}
+> +
+> +static __always_inline bool arch_spin_trylock(arch_spinlock_t *lock)
+> +{
+> +	COMBO_DETOUR
+> +	return queued_spin_trylock(lock);
+> +ticket_spin_lock:
+> +	return ticket_spin_trylock(lock);
+> +}
+> +
+> +static __always_inline void arch_spin_unlock(arch_spinlock_t *lock)
+> +{
+> +	COMBO_DETOUR
+> +	queued_spin_unlock(lock);
+> +	return;
+> +ticket_spin_lock:
+> +	ticket_spin_unlock(lock);
+> +}
+> +
+> +static __always_inline int arch_spin_value_unlocked(arch_spinlock_t lock)
+> +{
+> +	COMBO_DETOUR
+> +	return queued_spin_value_unlocked(lock);
+> +ticket_spin_lock:
+> +	return ticket_spin_value_unlocked(lock);
+> +}
+> +
+> +static __always_inline int arch_spin_is_locked(arch_spinlock_t *lock)
+> +{
+> +	COMBO_DETOUR
+> +	return queued_spin_is_locked(lock);
+> +ticket_spin_lock:
+> +	return ticket_spin_is_locked(lock);
+> +}
+> +
+> +static __always_inline int arch_spin_is_contended(arch_spinlock_t *lock)
+> +{
+> +	COMBO_DETOUR
+> +	return queued_spin_is_contended(lock);
+> +ticket_spin_lock:
+> +	return ticket_spin_is_contended(lock);
+> +}
+> +#else /* CONFIG_RISCV_COMBO_SPINLOCKS */
+> +
+>   #ifdef CONFIG_QUEUED_SPINLOCKS
+>   #include <asm/qspinlock.h>
+> -#include <asm/qrwlock.h>
+>   #else
+> -#include <asm-generic/spinlock.h>
+> +#include <asm-generic/ticket_spinlock.h>
+>   #endif
+>   
+> +#endif /* CONFIG_RISCV_COMBO_SPINLOCKS */
+> +
+> +#include <asm/qrwlock.h>
+> +
+>   #endif /* __ASM_RISCV_SPINLOCK_H */
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> index bdcf460ea53d..e65b0e54152d 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -324,6 +324,16 @@ void __init riscv_fill_hwcap(void)
+>   		set_bit(RISCV_ISA_EXT_ZICSR, isainfo->isa);
+>   		set_bit(RISCV_ISA_EXT_ZIFENCEI, isainfo->isa);
+>   
+> +#ifdef CONFIG_RISCV_COMBO_SPINLOCKS
+> +		/*
+> +		 * The RISC-V Linux used queued spinlock at first; then, we used ticket_lock
+> +		 * as default or queued spinlock by choice. Because ticket_lock would dirty
+> +		 * spinlock value, the only way is to change from queued_spinlock to
+> +		 * ticket_spinlock, but can not be vice.
 
-For other regions (allocated by the device driver), a per-VMA flag
-seems about right: VM_NO_NUMA_BALANCING ?
+The phrase "but can not be vice" is confusing. I think you mean "but not 
+vice versa". Right?
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Cheers,
+Longman
 
