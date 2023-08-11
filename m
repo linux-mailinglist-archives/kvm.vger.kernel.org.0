@@ -2,277 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F7537787F2
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 09:15:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2195F77884A
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 09:36:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233852AbjHKHPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 03:15:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41272 "EHLO
+        id S234000AbjHKHgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 03:36:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233755AbjHKHPU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 03:15:20 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 800F530D3;
-        Fri, 11 Aug 2023 00:15:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691738116; x=1723274116;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xXnjiBk5Rm1Wh/mIr4DvEInc/Fi8Guc3wJK5YvAkue4=;
-  b=K+u0O+5VCi5YzKvqgyeFsA5FM6tsBrIoM8fojZnBXH7o5OoMGeL8HFpv
-   Rw1N7u0/34/ddFlwpcfLA0cdVtf2bkknwkfEedhxIk+EY9b6msqV7RFtZ
-   XE5I+RsISZLTcPzQBAlLfkQdL20scFoi4HfzWXjjYa6KT7nqtsW3hFhbX
-   QYnVABSSDOBJX2qfm0cG4SczzhWjuGO5TE4lV1UQ//nPUgI3veGVgMBdS
-   ULi012+rZeLpBwOYWfXzhlt6IdZLBJRlKxE33QCBBmEWP97AJZ1pqPEeO
-   RovjHxdlUw9zQPWfkUdbHuz+UBcTgtWq5loS8hXmT3KiVgfvo71btkYcU
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="351937717"
-X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
-   d="scan'208";a="351937717"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 00:15:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="979142010"
-X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
-   d="scan'208";a="979142010"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by fmsmga006.fm.intel.com with ESMTP; 11 Aug 2023 00:15:07 -0700
-From:   Yi Liu <yi.l.liu@intel.com>
-To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
-        kevin.tian@intel.com, robin.murphy@arm.com,
-        baolu.lu@linux.intel.com
-Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
-        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
-        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
-        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        zhenzhong.duan@intel.com
-Subject: [PATCH v7 4/4] iommufd/selftest: Add coverage for IOMMU_GET_HW_INFO ioctl
-Date:   Fri, 11 Aug 2023 00:15:01 -0700
-Message-Id: <20230811071501.4126-5-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230811071501.4126-1-yi.l.liu@intel.com>
-References: <20230811071501.4126-1-yi.l.liu@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S233943AbjHKHgF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 03:36:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AC9612B
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 00:36:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 456B863E91
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 07:36:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C76AC433C7;
+        Fri, 11 Aug 2023 07:36:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691739363;
+        bh=K38R5xGYCBR1qL5ORoIxdw/ODCb7pIGT+aGMTPJlpho=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fczqVOL9wnrkAIL+zT6XJs8xJqhoDjqppihfGiaz4DFWI8OQf+CoL2YL0XMl4swED
+         fdNNjPLnEZKeQje4DgY/Sp9o/WzJ2c4S1+Bx7YkLjspOPBB6OnBBO3BbWJIPs+Zde3
+         +UiLuhWHGB9WgnIjZj6uqHlZAAIrPROMQzljzf7wjDdh/SXKh9oM9iUSvpR/VZJq21
+         zBvVVn1IM0iz5m5sqRCIPktmdZGdGdtsL72MsSOYnmXQ4357bI5KeNllpFsYhyd5CF
+         QW5S9OLtZEawg1OXmNtyabI4ZBIP5YTSVCUqW2RJnLNwFP0yDs4k82oyCli3z9jxcf
+         BHtU1cogUAScg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qUMgj-0044N7-2R;
+        Fri, 11 Aug 2023 08:36:01 +0100
+Date:   Fri, 11 Aug 2023 08:36:00 +0100
+Message-ID: <861qgaghen.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     eric.auger@redhat.com
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 23/27] KVM: arm64: nv: Add SVC trap forwarding
+In-Reply-To: <527eddd0-b069-3b58-d82e-97b758c128ab@redhat.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+        <20230808114711.2013842-24-maz@kernel.org>
+        <2a751a64-559e-cb17-4359-7f368c1b42ca@redhat.com>
+        <87wmy3p4ac.wl-maz@kernel.org>
+        <527eddd0-b069-3b58-d82e-97b758c128ab@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nicolin Chen <nicolinc@nvidia.com>
+On Thu, 10 Aug 2023 18:30:25 +0100,
+Eric Auger <eric.auger@redhat.com> wrote:
+> 
+> Hi Marc,
+> On 8/10/23 12:42, Marc Zyngier wrote:
+> > Hi Eric,
+> >
+> > On Thu, 10 Aug 2023 09:35:41 +0100,
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >> Hi Marc,
+> >>
+> >> On 8/8/23 13:47, Marc Zyngier wrote:
+> >>> HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
+> >>> traps to be forwarded. Take this opportunity to deny any 32bit activity
+> >>> when NV is enabled.
+> >> I can't figure out how HFGITR_EL2.{SVC_EL1, SVC_EL0 and ERET} are
+> >> handled. Please could you explain.
+> > - SVC: KVM itself never traps it, so any trap of SVC must be the
+> >   result of a guest trap -- we don't need to do any demultiplexing. We
+> >   thus directly inject the trap back. This is what the comment in
+> >   handle_svc() tries to capture, but obviously fails to convey the
+> >   point.
+> Thank you for the explanation. Now I get it and this helps.
+> >
+> > - ERET: This is already handled since 6898a55ce38c ("KVM: arm64: nv:
+> >   Handle trapped ERET from virtual EL2"). Similarly to SVC, KVM never
+> >   traps it unless we run NV.
+> OK
+> >
+> > Now, looking into it, I think I'm missing the additional case where
+> > the L2 guest runs at vEL1. I'm about to add the following patchlet:
+> >
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index 3b86d534b995..617ae6dea5d5 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -222,7 +222,22 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+> >  	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
+> >  		return kvm_handle_ptrauth(vcpu);
+> >  
+> > -	kvm_emulate_nested_eret(vcpu);
+> > +	/*
+> > +	 * If we got here, two possibilities:
+> > +	 *
+> > +	 * - the guest is in EL2, and we need to fully emulate ERET
+> > +	 *
+> > +	 * - the guest is in EL1, and we need to reinject the
+> > +         *   exception into the L1 hypervisor.
+> but in the case the guest was running in vEL1 are we supposed to trap
+> and end up here? in kvm_emulate_nested_eret I can see
+> "the current EL is always the vEL2 since we set the HCR_EL2.NV bit only
+> when entering the vEL2".
 
-Add a mock_domain_hw_info function and an iommu_test_hw_info data
-structure. This allows to test the IOMMU_GET_HW_INFO ioctl passing
-the test_reg value for the mock_dev.
+If the guest is running at vEL1, the only ways to trap ERET are:
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/iommu/iommufd/iommufd_test.h          |  9 ++++
- drivers/iommu/iommufd/selftest.c              | 16 +++++++
- tools/testing/selftests/iommu/iommufd.c       | 28 ++++++++++-
- .../selftests/iommu/iommufd_fail_nth.c        |  4 ++
- tools/testing/selftests/iommu/iommufd_utils.h | 47 +++++++++++++++++++
- 5 files changed, 103 insertions(+), 1 deletion(-)
+- if the guest hypervisor has set HFGITR_EL2.ERET, because the host
+  KVM never sets that bit on its own
 
-diff --git a/drivers/iommu/iommufd/iommufd_test.h b/drivers/iommu/iommufd/iommufd_test.h
-index 258de2253b61..3f3644375bf1 100644
---- a/drivers/iommu/iommufd/iommufd_test.h
-+++ b/drivers/iommu/iommufd/iommufd_test.h
-@@ -100,4 +100,13 @@ struct iommu_test_cmd {
- };
- #define IOMMU_TEST_CMD _IO(IOMMUFD_TYPE, IOMMUFD_CMD_BASE + 32)
- 
-+/* Mock structs for IOMMU_DEVICE_GET_HW_INFO ioctl */
-+#define IOMMU_HW_INFO_TYPE_SELFTEST	0xfeedbeef
-+#define IOMMU_HW_INFO_SELFTEST_REGVAL	0xdeadbeef
-+
-+struct iommu_test_hw_info {
-+	__u32 flags;
-+	__u32 test_reg;
-+};
-+
- #endif
-diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selftest.c
-index bb2cd54ca7b6..ab4011e3a7c6 100644
---- a/drivers/iommu/iommufd/selftest.c
-+++ b/drivers/iommu/iommufd/selftest.c
-@@ -128,6 +128,21 @@ static struct iommu_domain mock_blocking_domain = {
- 	.ops = &mock_blocking_ops,
- };
- 
-+static void *mock_domain_hw_info(struct device *dev, u32 *length, u32 *type)
-+{
-+	struct iommu_test_hw_info *info;
-+
-+	info = kzalloc(sizeof(*info), GFP_KERNEL);
-+	if (!info)
-+		return ERR_PTR(-ENOMEM);
-+
-+	info->test_reg = IOMMU_HW_INFO_SELFTEST_REGVAL;
-+	*length = sizeof(*info);
-+	*type = IOMMU_HW_INFO_TYPE_SELFTEST;
-+
-+	return info;
-+}
-+
- static struct iommu_domain *mock_domain_alloc(unsigned int iommu_domain_type)
- {
- 	struct mock_iommu_domain *mock;
-@@ -279,6 +294,7 @@ static void mock_domain_set_plaform_dma_ops(struct device *dev)
- static const struct iommu_ops mock_ops = {
- 	.owner = THIS_MODULE,
- 	.pgsize_bitmap = MOCK_IO_PAGE_SIZE,
-+	.hw_info = mock_domain_hw_info,
- 	.domain_alloc = mock_domain_alloc,
- 	.capable = mock_domain_capable,
- 	.set_platform_dma_ops = mock_domain_set_plaform_dma_ops,
-diff --git a/tools/testing/selftests/iommu/iommufd.c b/tools/testing/selftests/iommu/iommufd.c
-index 8acd0af37aa5..7e0fdf372c12 100644
---- a/tools/testing/selftests/iommu/iommufd.c
-+++ b/tools/testing/selftests/iommu/iommufd.c
-@@ -113,6 +113,7 @@ TEST_F(iommufd, cmd_length)
- 	}
- 
- 	TEST_LENGTH(iommu_destroy, IOMMU_DESTROY);
-+	TEST_LENGTH(iommu_hw_info, IOMMU_GET_HW_INFO);
- 	TEST_LENGTH(iommu_ioas_alloc, IOMMU_IOAS_ALLOC);
- 	TEST_LENGTH(iommu_ioas_iova_ranges, IOMMU_IOAS_IOVA_RANGES);
- 	TEST_LENGTH(iommu_ioas_allow_iovas, IOMMU_IOAS_ALLOW_IOVAS);
-@@ -185,6 +186,7 @@ FIXTURE(iommufd_ioas)
- 	uint32_t ioas_id;
- 	uint32_t stdev_id;
- 	uint32_t hwpt_id;
-+	uint32_t device_id;
- 	uint64_t base_iova;
- };
- 
-@@ -211,7 +213,7 @@ FIXTURE_SETUP(iommufd_ioas)
- 
- 	for (i = 0; i != variant->mock_domains; i++) {
- 		test_cmd_mock_domain(self->ioas_id, &self->stdev_id,
--				     &self->hwpt_id, NULL);
-+				     &self->hwpt_id, &self->device_id);
- 		self->base_iova = MOCK_APERTURE_START;
- 	}
- }
-@@ -290,6 +292,30 @@ TEST_F(iommufd_ioas, ioas_area_auto_destroy)
- 	}
- }
- 
-+TEST_F(iommufd_ioas, get_hw_info)
-+{
-+	struct iommu_test_hw_info buffer_exact;
-+	struct iommu_test_hw_info_buffer {
-+		struct iommu_test_hw_info info;
-+		uint64_t trailing_bytes;
-+	} buffer_larger;
-+
-+	if (self->device_id) {
-+		/* Provide a user_buffer with exact size */
-+		test_cmd_get_hw_info(self->device_id, &buffer_exact, sizeof(buffer_exact));
-+		/*
-+		 * Provide a user_buffer with size larger than the exact size to check if
-+		 * kernel zero the trailing bytes.
-+		 */
-+		test_cmd_get_hw_info(self->device_id, &buffer_larger, sizeof(buffer_larger));
-+	} else {
-+		test_err_get_hw_info(ENOENT, self->device_id,
-+				     &buffer_exact, sizeof(buffer_exact));
-+		test_err_get_hw_info(ENOENT, self->device_id,
-+				     &buffer_larger, sizeof(buffer_larger));
-+	}
-+}
-+
- TEST_F(iommufd_ioas, area)
- {
- 	int i;
-diff --git a/tools/testing/selftests/iommu/iommufd_fail_nth.c b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-index d4c552e56948..a220ca2a689d 100644
---- a/tools/testing/selftests/iommu/iommufd_fail_nth.c
-+++ b/tools/testing/selftests/iommu/iommufd_fail_nth.c
-@@ -576,6 +576,7 @@ TEST_FAIL_NTH(basic_fail_nth, access_pin_domain)
- /* device.c */
- TEST_FAIL_NTH(basic_fail_nth, device)
- {
-+	struct iommu_test_hw_info info;
- 	uint32_t ioas_id;
- 	uint32_t ioas_id2;
- 	uint32_t stdev_id;
-@@ -611,6 +612,9 @@ TEST_FAIL_NTH(basic_fail_nth, device)
- 				  &idev_id))
- 		return -1;
- 
-+	if (_test_cmd_get_hw_info(self->fd, idev_id, &info, sizeof(info)))
-+		return -1;
-+
- 	if (_test_cmd_hwpt_alloc(self->fd, idev_id, ioas_id, &hwpt_id))
- 		return -1;
- 
-diff --git a/tools/testing/selftests/iommu/iommufd_utils.h b/tools/testing/selftests/iommu/iommufd_utils.h
-index 70353e68e599..ccd0ef7833a0 100644
---- a/tools/testing/selftests/iommu/iommufd_utils.h
-+++ b/tools/testing/selftests/iommu/iommufd_utils.h
-@@ -348,3 +348,50 @@ static void teardown_iommufd(int fd, struct __test_metadata *_metadata)
- 	})
- 
- #endif
-+
-+static int _test_cmd_get_hw_info(int fd, __u32 device_id,
-+				 void *data, size_t data_len)
-+{
-+	struct iommu_hw_info cmd = {
-+		.size = sizeof(cmd),
-+		.dev_id = device_id,
-+		.data_len = data_len,
-+		.data_ptr = (uint64_t)data,
-+	};
-+	struct iommu_test_hw_info *info = (struct iommu_test_hw_info *)data;
-+	int ret;
-+
-+	ret = ioctl(fd, IOMMU_GET_HW_INFO, &cmd);
-+	if (ret)
-+		return ret;
-+
-+	assert(cmd.out_data_type == IOMMU_HW_INFO_TYPE_SELFTEST);
-+
-+	/*
-+	 * Trailing bytes should be 0 if user buffer is larger than
-+	 * the data that kernel reports.
-+	 */
-+	if (data_len > cmd.data_len) {
-+		char *ptr = (char *)(data + cmd.data_len);
-+		int idx = 0;
-+
-+		while (idx < data_len - cmd.data_len) {
-+			assert(!*(ptr + idx));
-+			idx++;
-+		}
-+	}
-+
-+	assert(info->test_reg == IOMMU_HW_INFO_SELFTEST_REGVAL);
-+	assert(!info->flags);
-+
-+	return 0;
-+}
-+
-+#define test_cmd_get_hw_info(device_id, data, data_len)         \
-+	ASSERT_EQ(0, _test_cmd_get_hw_info(self->fd, device_id, \
-+					   data, data_len))
-+
-+#define test_err_get_hw_info(_errno, device_id, data, data_len) \
-+	EXPECT_ERRNO(_errno,                                    \
-+		     _test_cmd_get_hw_info(self->fd, device_id, \
-+					   data, data_len))
+- or if the guest hypervisor has set HCR_EL2.NV (which we don't really
+  handle so far, as we don't expose FEAT_NV to guests).
+
+If the guest is running at vEL2, then it is HCR_EL2.NV that is
+responsible for the trap, and we perform the ERET emulation.
+
+> But I am still catching up on the already landed
+> 
+> [PATCH 00/18] KVM: arm64: Prefix patches for NV support
+> <https://lore.kernel.org/all/20230209175820.1939006-1-maz@kernel.org/>
+> so please forgive me my confusion ;-)
+
+Confusion is the whole purpose of NV, so don't worry, you're in good
+company here! :D
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
