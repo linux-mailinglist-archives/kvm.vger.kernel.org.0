@@ -2,81 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 17665779323
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 17:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11D83779388
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 17:53:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236268AbjHKPbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 11:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40216 "EHLO
+        id S236610AbjHKPxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 11:53:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236553AbjHKPb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 11:31:26 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41CDD103
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:31:26 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id 006d021491bc7-56d0f4180bbso1753838eaf.1
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:31:26 -0700 (PDT)
+        with ESMTP id S236565AbjHKPw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 11:52:59 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE34211C
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:52:59 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-269421d8b22so2412234a91.2
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:52:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691767885; x=1692372685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MkHxuuUE1racnF7AqWkiPAPBMqIdT5jrsMuLVcWQoXY=;
-        b=IkHeT5HL72sVQg87oKLKAWG2T8oyxYgOdRcRjayYES9J4+s9MiAFDfKXWU2VL4jnIw
-         GcV4Vh+5PTwAV2cDuSOsLMW9B/1wrUcaj0a3K+lgKia+k6aDlZCauxBq7Kwh2tqTwB6n
-         ymfnNRLB6fN8YahjGhAW6XA+0paKNUnK8l4T1whS3XOlxtTdvSkLEm7CR8Gr4PixYNqC
-         Fkw5g2Nk0XpQzI6DAXueDlaYo27bz8ICjkl424bv+kp9LS/piJIKrpmC0LFQ1mRKqH5C
-         OV2ais3ra5DO+1B+PCaVEn+qSHhxghrqliF0r4aiDx+izf0qKK3BQVbLe8Rgd9PVIxyP
-         F1Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691767885; x=1692372685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20221208; t=1691769179; x=1692373979;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MkHxuuUE1racnF7AqWkiPAPBMqIdT5jrsMuLVcWQoXY=;
-        b=iThWDkUqlkBPOIdbKTJo5bMeydij3YqgfzpIpnx1Zy1UDopI9cYuAC8XST2b5GVoR7
-         l7uYbKmtOawsO3Bpns0ydnBkHaI5oiPrgxNuoONf0N8n8bHn6YwNc9ZE1EOaKTgNgFjN
-         5o9dYjAEG+miIHMaT7TVpj73U/SnAy+UFIZrwINs1U3LGdQCtJmmBL/7Q+VGkOH05Iof
-         5FK/NfutKMo9Ka5paSG1ZOxs/zWvLzg+sLZT+ulJP1Nmvc6rBcoipc2FEXmgd5tGd47a
-         GlHafW2mKeMRyRnitG/VNeTRI0kb2NCLhkMAku6Ln4s+CUPSeONkzXOwd8IMQANd/D/P
-         pRtQ==
-X-Gm-Message-State: AOJu0Ywxksjm/qLuUCWsktR58UMq6rMvdZ7rB9SWR7m++4SFeww1mUUm
-        SwGDespwSVCCqj21PytBkFijJ6PmR+Rn5rImj6pFAQ==
-X-Google-Smtp-Source: AGHT+IFuU0i4ssk4mXymypXRlN8YzctH8Of+BhP+Z9PlFvCANq23FxDZvhz42dJQbPZ6dyi0OSaExylXwPX2H0Vqzw4=
-X-Received: by 2002:a05:6870:9687:b0:1bf:ce5b:436 with SMTP id
- o7-20020a056870968700b001bfce5b0436mr2760098oaq.58.1691767885480; Fri, 11 Aug
- 2023 08:31:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-11-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-11-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Fri, 11 Aug 2023 08:31:13 -0700
-Message-ID: <CAAdAUtjOo_Bhpy2hvmVTEeG4vTmdHF9uoqnphdKBBW8jKRAndA@mail.gmail.com>
-Subject: Re: [PATCH v3 10/27] KVM: arm64: Correctly handle ACCDATA_EL1 traps
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
+        bh=CYcyNvoCbMZnvtJsGMVLujGIB26i5/C23iYXX1YXZjc=;
+        b=0cFCc1oFNGhv/Pq1KPcZ+Zf5Het5DlyRjdNr3jPKG9GCsUh840eh/lvJM+vrfDpVJh
+         ptGXHenj0jhD4mnL8To8rBXK0xbfF9/Lfl7npBV2gHv14ujjRnW7Y2jghejDmtJ7gVR5
+         zQgD/+1SgZDc2ND5f267TS5KVbfp1vWKizAHixGJWTIApmBSvCILO0NRDT96Gsqq7lcH
+         yDchLta2PptFS4vvUMDs5B65yrBX/OnpuMNLbKvuCrFIE8fWdbfHscjqYHkbo4vXOsih
+         fGYvq8//xPHPgqdHhh2ZUdaxCu1oyI8RBP43GbaZp27pb9DkR6hlVtCdKPoJZ16+HFnm
+         VF8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691769179; x=1692373979;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CYcyNvoCbMZnvtJsGMVLujGIB26i5/C23iYXX1YXZjc=;
+        b=SZKNfVNHtVph3Q1kdzEky+ADkwdH/dmC3BTcipgwtHjqwUoQps5DNmizu9ItNG3TdU
+         h5ZV/QL1r3TUzzAwFCkpDYo4rGqe8DhqJHwGmwU4HWqCEp/VSFA1jlszijAkyc1Hc7jp
+         T/FKydJyEex91pW+6Cli8FZt2TBILmGquz6qpkzOppKKBzf4u6taF/qQniKwI7CkUGTZ
+         rwQOY7JiI05mKtRhuDKwsdlR0Y6ZxQZaquQNltIAaJ5cNaZuv0bks6hi0ITMYYT/y0KS
+         3C+BSxeke/2ZQ5L9B0qr+qhbGABZhA8MkrU8jEB/Q4DlmYR/YfNynoNMna8E5l/dCQG0
+         TDZQ==
+X-Gm-Message-State: AOJu0YzmK6Vzq7RAXwjsMwjTGil9EskCesAP/wmsIKxyjKoRj8ot69rM
+        Tp0oIg6l5mj2+mQtvvYHhlolFDR520c=
+X-Google-Smtp-Source: AGHT+IEezw9j6+9J+XBWvWekg7DnjzC8MC3RETAkZ7jsLzId5+/nuG6OCjytL5Iv5jIrBZY7h69FHzwVXZ4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:fc7:b0:263:8c8b:e7b2 with SMTP id
+ gd7-20020a17090b0fc700b002638c8be7b2mr483565pjb.3.1691769178755; Fri, 11 Aug
+ 2023 08:52:58 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 11 Aug 2023 08:52:55 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
+Message-ID: <20230811155255.250835-1-seanjc@google.com>
+Subject: [PATCH] x86/retpoline: Don't clobber RFLAGS during srso_safe_ret()
+From:   Sean Christopherson <seanjc@google.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+Cc:     linux-kernel@vger.kernel.org, Srikanth Aithal <sraithal@amd.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,62 +69,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Use 'lea' instead of 'add' when adjusting %rsp in srso_safe_ret() so as to
+avoid clobbering flags.  Drop one of the INT3 instructions to account for
+the LEA consuming one more byte than the ADD.
 
-On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> As we blindly reset some HFGxTR_EL2 bits to 0, we also randomly trap
-> unsuspecting sysregs that have their trap bits with a negative
-> polarity.
->
-> ACCDATA_EL1 is one such register that can be accessed by the guest,
-> causing a splat on the host as we don't have a proper handler for
-> it.
->
-> Adding such handler addresses the issue, though there are a number
-> of other registers missing as the current architecture documentation
-> doesn't describe them yet.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> ---
->  arch/arm64/include/asm/sysreg.h | 2 ++
->  arch/arm64/kvm/sys_regs.c       | 2 ++
->  2 files changed, 4 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sys=
-reg.h
-> index 043c677e9f04..818c111009ca 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -387,6 +387,8 @@
->  #define SYS_ICC_IGRPEN0_EL1            sys_reg(3, 0, 12, 12, 6)
->  #define SYS_ICC_IGRPEN1_EL1            sys_reg(3, 0, 12, 12, 7)
->
-> +#define SYS_ACCDATA_EL1                        sys_reg(3, 0, 13, 0, 5)
-> +
->  #define SYS_CNTKCTL_EL1                        sys_reg(3, 0, 14, 1, 0)
->
->  #define SYS_AIDR_EL1                   sys_reg(3, 1, 0, 0, 7)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 2ca2973abe66..38f221f9fc98 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2151,6 +2151,8 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
->         { SYS_DESC(SYS_CONTEXTIDR_EL1), access_vm_reg, reset_val, CONTEXT=
-IDR_EL1, 0 },
->         { SYS_DESC(SYS_TPIDR_EL1), NULL, reset_unknown, TPIDR_EL1 },
->
-> +       { SYS_DESC(SYS_ACCDATA_EL1), undef_access },
-> +
->         { SYS_DESC(SYS_SCXTNUM_EL1), undef_access },
->
->         { SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
-> --
-> 2.34.1
->
->
+KVM's emulator makes indirect calls into a jump table of sorts, where
+the destination of each call is a small blob of code that performs fast
+emulation by executing the target instruction with fixed operands.
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+E.g. to emulate ADC, fastop() invokes adcb_al_dl():
+
+  adcb_al_dl:
+      0xffffffff8105f5f0 <+0>:  adc    %dl,%al
+      0xffffffff8105f5f2 <+2>:  jmp    0xffffffff81a39270 <__x86_return_thunk>
+
+A major motivation for doing fast emulation is to leverage the CPU to
+handle consumption and manipulation of arithmetic flags, i.e. RFLAGS is
+both an input and output to the target of the call.  fastop() collects
+the RFLAGS result by pushing RFLAGS onto the stack and popping them back
+into a variable (held in RDI in this case)
+
+  asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
+
+      0xffffffff81062be7 <+71>: mov    0xc0(%r8),%rdx
+      0xffffffff81062bee <+78>: mov    0x100(%r8),%rcx
+      0xffffffff81062bf5 <+85>: push   %rdi
+      0xffffffff81062bf6 <+86>: popf
+      0xffffffff81062bf7 <+87>: call   *%rsi
+      0xffffffff81062bf9 <+89>: nop
+      0xffffffff81062bfa <+90>: nop
+      0xffffffff81062bfb <+91>: nop
+      0xffffffff81062bfc <+92>: pushf
+      0xffffffff81062bfd <+93>: pop    %rdi
+
+and then propagating the arithmetic flags into the vCPU's emulator state:
+
+    ctxt->eflags = (ctxt->eflags & ~EFLAGS_MASK) | (flags & EFLAGS_MASK);
+
+      0xffffffff81062be0 <+64>:  and    $0xfffffffffffff72a,%r9
+      0xffffffff81062bfe <+94>:  and    $0x8d5,%edi
+      0xffffffff81062c0d <+109>: or     %rdi,%r9
+      0xffffffff81062c1a <+122>: mov    %r9,0x10(%r8)
+
+The failures can be most easily reproduced by running the "emulator" test
+in KVM-Unit-Tests.
+
+If you're feeling a bit of deja vu, see commit b63f20a778c8
+("x86/retpoline: Don't clobber RFLAGS during CALL_NOSPEC on i386").
+
+Fixes: fb3bd914b3ec ("x86/srso: Add a Speculative RAS Overflow mitigation")
+Reported-by: Srikanth Aithal <sraithal@amd.com>
+Closes: https://lore.kernel.org/all/de474347-122d-54cd-eabf-9dcc95ab9eae@amd.com
+Cc: stable@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+
+Those that fail to learn from history are doomed to repeat it. :-D
+
+ arch/x86/lib/retpoline.S | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/lib/retpoline.S b/arch/x86/lib/retpoline.S
+index 2cff585f22f2..132cedbf9e57 100644
+--- a/arch/x86/lib/retpoline.S
++++ b/arch/x86/lib/retpoline.S
+@@ -164,7 +164,7 @@ __EXPORT_THUNK(srso_untrain_ret_alias)
+ /* Needs a definition for the __x86_return_thunk alternative below. */
+ SYM_START(srso_safe_ret_alias, SYM_L_GLOBAL, SYM_A_NONE)
+ #ifdef CONFIG_CPU_SRSO
+-	add $8, %_ASM_SP
++	lea 8(%_ASM_SP), %_ASM_SP
+ 	UNWIND_HINT_FUNC
+ #endif
+ 	ANNOTATE_UNRET_SAFE
+@@ -239,7 +239,7 @@ __EXPORT_THUNK(zen_untrain_ret)
+  * SRSO untraining sequence for Zen1/2, similar to zen_untrain_ret()
+  * above. On kernel entry, srso_untrain_ret() is executed which is a
+  *
+- * movabs $0xccccccc308c48348,%rax
++ * movabs $0xccccc30824648d48,%rax
+  *
+  * and when the return thunk executes the inner label srso_safe_ret()
+  * later, it is a stack manipulation and a RET which is mispredicted and
+@@ -252,11 +252,10 @@ SYM_START(srso_untrain_ret, SYM_L_GLOBAL, SYM_A_NONE)
+ 	.byte 0x48, 0xb8
+ 
+ SYM_INNER_LABEL(srso_safe_ret, SYM_L_GLOBAL)
+-	add $8, %_ASM_SP
++	lea 8(%_ASM_SP), %_ASM_SP
+ 	ret
+ 	int3
+ 	int3
+-	int3
+ 	lfence
+ 	call srso_safe_ret
+ 	int3
+
+base-commit: 25aa0bebba72b318e71fe205bfd1236550cc9534
+-- 
+2.41.0.694.ge786442a9b-goog
+
