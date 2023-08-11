@@ -2,172 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11D83779388
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 17:53:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F2AA77938B
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 17:54:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236610AbjHKPxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 11:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40892 "EHLO
+        id S236441AbjHKPyN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 11:54:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236565AbjHKPw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 11:52:59 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE34211C
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:52:59 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-269421d8b22so2412234a91.2
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:52:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691769179; x=1692373979;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CYcyNvoCbMZnvtJsGMVLujGIB26i5/C23iYXX1YXZjc=;
-        b=0cFCc1oFNGhv/Pq1KPcZ+Zf5Het5DlyRjdNr3jPKG9GCsUh840eh/lvJM+vrfDpVJh
-         ptGXHenj0jhD4mnL8To8rBXK0xbfF9/Lfl7npBV2gHv14ujjRnW7Y2jghejDmtJ7gVR5
-         zQgD/+1SgZDc2ND5f267TS5KVbfp1vWKizAHixGJWTIApmBSvCILO0NRDT96Gsqq7lcH
-         yDchLta2PptFS4vvUMDs5B65yrBX/OnpuMNLbKvuCrFIE8fWdbfHscjqYHkbo4vXOsih
-         fGYvq8//xPHPgqdHhh2ZUdaxCu1oyI8RBP43GbaZp27pb9DkR6hlVtCdKPoJZ16+HFnm
-         VF8g==
+        with ESMTP id S232094AbjHKPyM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 11:54:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFC012B
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:53:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691769203;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xhl/FHlWCyjB0V5qX6lHJBm+v9HOUeOeFTkRbcFqCOM=;
+        b=JUZUAkWUGZXOiHk147jLEXY075ioVx88nTscPV/gOL4IHxleXxgGnuJHEp16AGTUu9sZQB
+        X1W4EzQBHTJrcq0+PX6x1NNDX5X/CQIRnd9srHbwYgW8IIjUD+teG4Mnq7ckz9jHkYwKoa
+        hn8ceS2egX1w9Se6PsBIwu90Ffs7CnY=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-625-et2_5jxtOKaJojz-CKeZ3w-1; Fri, 11 Aug 2023 11:53:22 -0400
+X-MC-Unique: et2_5jxtOKaJojz-CKeZ3w-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-780addd7382so167637039f.1
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:53:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691769179; x=1692373979;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CYcyNvoCbMZnvtJsGMVLujGIB26i5/C23iYXX1YXZjc=;
-        b=SZKNfVNHtVph3Q1kdzEky+ADkwdH/dmC3BTcipgwtHjqwUoQps5DNmizu9ItNG3TdU
-         h5ZV/QL1r3TUzzAwFCkpDYo4rGqe8DhqJHwGmwU4HWqCEp/VSFA1jlszijAkyc1Hc7jp
-         T/FKydJyEex91pW+6Cli8FZt2TBILmGquz6qpkzOppKKBzf4u6taF/qQniKwI7CkUGTZ
-         rwQOY7JiI05mKtRhuDKwsdlR0Y6ZxQZaquQNltIAaJ5cNaZuv0bks6hi0ITMYYT/y0KS
-         3C+BSxeke/2ZQ5L9B0qr+qhbGABZhA8MkrU8jEB/Q4DlmYR/YfNynoNMna8E5l/dCQG0
-         TDZQ==
-X-Gm-Message-State: AOJu0YzmK6Vzq7RAXwjsMwjTGil9EskCesAP/wmsIKxyjKoRj8ot69rM
-        Tp0oIg6l5mj2+mQtvvYHhlolFDR520c=
-X-Google-Smtp-Source: AGHT+IEezw9j6+9J+XBWvWekg7DnjzC8MC3RETAkZ7jsLzId5+/nuG6OCjytL5Iv5jIrBZY7h69FHzwVXZ4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:fc7:b0:263:8c8b:e7b2 with SMTP id
- gd7-20020a17090b0fc700b002638c8be7b2mr483565pjb.3.1691769178755; Fri, 11 Aug
- 2023 08:52:58 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 11 Aug 2023 08:52:55 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230811155255.250835-1-seanjc@google.com>
-Subject: [PATCH] x86/retpoline: Don't clobber RFLAGS during srso_safe_ret()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-Cc:     linux-kernel@vger.kernel.org, Srikanth Aithal <sraithal@amd.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1691769201; x=1692374001;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xhl/FHlWCyjB0V5qX6lHJBm+v9HOUeOeFTkRbcFqCOM=;
+        b=lHWeRHxo2MduCaosVCZsq68bYIzoxlOeiy3gb4btbak6Nrtc4WcY+6ddo6Vd35lO3m
+         sY5wohFMj1sjNKlokDOpseILC99jCMgCxPkjOw94hEyxk5unkv16rygmnkxduWiMzbo/
+         NF4BFv6wzQt4TbGFKfU+bUtiZXfSCcOtwNzcOQAwxrmkPKYxno1y/XmRpM5g/7Qr9YYw
+         4htSJmWLsz2f1eOfEo6jL/BzpHq5pcYFtvmFosU1oYwzn/vxLERxbcEAxq+XNhvhrMJk
+         7RBuoWoW75z8BolgG1UqVRA8qitzS9cxjm6CSRipYUUwJC8K6NCh0d55Q0M9t4RObqNA
+         G6dg==
+X-Gm-Message-State: AOJu0YxYkppP9QTdcLxyND1x69MCqUlM7IbEqnM2370EOlUwv/ACjQ9o
+        0vhG3GLl0IStiCCGEGr5V0VWL7IStvCyVbzBcf+F8zLLl/bZXukz7U0qYASmI95o05lgkeqaf2C
+        1azLf3RNlcnXz
+X-Received: by 2002:a05:6e02:1a2a:b0:349:88c3:a698 with SMTP id g10-20020a056e021a2a00b0034988c3a698mr3233027ile.16.1691769201482;
+        Fri, 11 Aug 2023 08:53:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG8qxeBsF1Aj4GJsQyhj3+QlBAxzTEujZbcwjsWHsX6C7N9m058bSgD4UGQTVBXYvu4QSq/4w==
+X-Received: by 2002:a05:6e02:1a2a:b0:349:88c3:a698 with SMTP id g10-20020a056e021a2a00b0034988c3a698mr3233001ile.16.1691769201249;
+        Fri, 11 Aug 2023 08:53:21 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id q7-20020a02c8c7000000b0042b326ed1ebsm1177465jao.48.2023.08.11.08.53.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 08:53:20 -0700 (PDT)
+Date:   Fri, 11 Aug 2023 09:53:18 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Brett Creeley <bcreeley@amd.com>,
+        Brett Creeley <brett.creeley@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v14 vfio 6/8] vfio/pds: Add support for dirty page
+ tracking
+Message-ID: <20230811095318.5ebcaa05.alex.williamson@redhat.com>
+In-Reply-To: <ZNUoX77mXBTHJHVJ@nvidia.com>
+References: <20230808162718.2151e175.alex.williamson@redhat.com>
+        <01a8ee12-7a95-7245-3a00-2745aa846fca@amd.com>
+        <20230809113300.2c4b0888.alex.williamson@redhat.com>
+        <ZNPVmaolrI0XJG7Q@nvidia.com>
+        <BN9PR11MB5276F32CC5791B3D91C62A468C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20230810104734.74fbe148.alex.williamson@redhat.com>
+        <ZNUcLM/oRaCd7Ig2@nvidia.com>
+        <20230810114008.6b038d2a.alex.williamson@redhat.com>
+        <ZNUhqEYeT7us5SV/@nvidia.com>
+        <20230810115444.21364456.alex.williamson@redhat.com>
+        <ZNUoX77mXBTHJHVJ@nvidia.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use 'lea' instead of 'add' when adjusting %rsp in srso_safe_ret() so as to
-avoid clobbering flags.  Drop one of the INT3 instructions to account for
-the LEA consuming one more byte than the ADD.
+On Thu, 10 Aug 2023 15:11:43 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-KVM's emulator makes indirect calls into a jump table of sorts, where
-the destination of each call is a small blob of code that performs fast
-emulation by executing the target instruction with fixed operands.
+> On Thu, Aug 10, 2023 at 11:54:44AM -0600, Alex Williamson wrote:
+> > On Thu, 10 Aug 2023 14:43:04 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >  =20
+> > > On Thu, Aug 10, 2023 at 11:40:08AM -0600, Alex Williamson wrote:
+> > >  =20
+> > > > PCI Express=C2=AE Base Specification Revision 6.0.1, pg 1461:
+> > > >=20
+> > > >   9.3.3.11 VF Device ID (Offset 1Ah)
+> > > >=20
+> > > >   This field contains the Device ID that should be presented for ev=
+ery VF to the SI.
+> > > >=20
+> > > >   VF Device ID may be different from the PF Device ID...
+> > > >=20
+> > > > That?  Thanks,   =20
+> > >=20
+> > > NVMe matches using the class code, IIRC there is language requiring
+> > > the class code to be the same. =20
+> >=20
+> > Ok, yes:
+> >=20
+> >   7.5.1.1.6 Class Code Register (Offset 09h)
+> >   ...
+> >   The field in a PF and its associated VFs must return the same value
+> >   when read.
+> >=20
+> > Seems limiting, but it's indeed there.  We've got a lot of cleanup to
+> > do if we're going to start rejecting drivers for devices with PCI
+> > spec violations though ;)  Thanks, =20
+>=20
+> Well.. If we defacto say that Linux is endorsing ignoring this part of
+> the spec then I predict we will see more vendors follow this approach.
 
-E.g. to emulate ADC, fastop() invokes adcb_al_dl():
+The NVMe driver will claim PCI_CLASS_STORAGE_EXPRESS devices, but there
+are also various vendor/device IDs in the table, some for the purpose
+of setting driver data with quirks, some not.  So I think the spec
+compliant behavior here would be that the VF replicates the PF class
+code and we'd simply need to add the vendor/device explicitly to the id
+table.
 
-  adcb_al_dl:
-      0xffffffff8105f5f0 <+0>:  adc    %dl,%al
-      0xffffffff8105f5f2 <+2>:  jmp    0xffffffff81a39270 <__x86_return_thunk>
+TBH, I can see why this spec requirement might get overlooked, it's a
+rather arbitrary restriction of the VF device.  Thanks,
 
-A major motivation for doing fast emulation is to leverage the CPU to
-handle consumption and manipulation of arithmetic flags, i.e. RFLAGS is
-both an input and output to the target of the call.  fastop() collects
-the RFLAGS result by pushing RFLAGS onto the stack and popping them back
-into a variable (held in RDI in this case)
-
-  asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
-
-      0xffffffff81062be7 <+71>: mov    0xc0(%r8),%rdx
-      0xffffffff81062bee <+78>: mov    0x100(%r8),%rcx
-      0xffffffff81062bf5 <+85>: push   %rdi
-      0xffffffff81062bf6 <+86>: popf
-      0xffffffff81062bf7 <+87>: call   *%rsi
-      0xffffffff81062bf9 <+89>: nop
-      0xffffffff81062bfa <+90>: nop
-      0xffffffff81062bfb <+91>: nop
-      0xffffffff81062bfc <+92>: pushf
-      0xffffffff81062bfd <+93>: pop    %rdi
-
-and then propagating the arithmetic flags into the vCPU's emulator state:
-
-    ctxt->eflags = (ctxt->eflags & ~EFLAGS_MASK) | (flags & EFLAGS_MASK);
-
-      0xffffffff81062be0 <+64>:  and    $0xfffffffffffff72a,%r9
-      0xffffffff81062bfe <+94>:  and    $0x8d5,%edi
-      0xffffffff81062c0d <+109>: or     %rdi,%r9
-      0xffffffff81062c1a <+122>: mov    %r9,0x10(%r8)
-
-The failures can be most easily reproduced by running the "emulator" test
-in KVM-Unit-Tests.
-
-If you're feeling a bit of deja vu, see commit b63f20a778c8
-("x86/retpoline: Don't clobber RFLAGS during CALL_NOSPEC on i386").
-
-Fixes: fb3bd914b3ec ("x86/srso: Add a Speculative RAS Overflow mitigation")
-Reported-by: Srikanth Aithal <sraithal@amd.com>
-Closes: https://lore.kernel.org/all/de474347-122d-54cd-eabf-9dcc95ab9eae@amd.com
-Cc: stable@vger.kernel.org
-Cc: kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-Those that fail to learn from history are doomed to repeat it. :-D
-
- arch/x86/lib/retpoline.S | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/lib/retpoline.S b/arch/x86/lib/retpoline.S
-index 2cff585f22f2..132cedbf9e57 100644
---- a/arch/x86/lib/retpoline.S
-+++ b/arch/x86/lib/retpoline.S
-@@ -164,7 +164,7 @@ __EXPORT_THUNK(srso_untrain_ret_alias)
- /* Needs a definition for the __x86_return_thunk alternative below. */
- SYM_START(srso_safe_ret_alias, SYM_L_GLOBAL, SYM_A_NONE)
- #ifdef CONFIG_CPU_SRSO
--	add $8, %_ASM_SP
-+	lea 8(%_ASM_SP), %_ASM_SP
- 	UNWIND_HINT_FUNC
- #endif
- 	ANNOTATE_UNRET_SAFE
-@@ -239,7 +239,7 @@ __EXPORT_THUNK(zen_untrain_ret)
-  * SRSO untraining sequence for Zen1/2, similar to zen_untrain_ret()
-  * above. On kernel entry, srso_untrain_ret() is executed which is a
-  *
-- * movabs $0xccccccc308c48348,%rax
-+ * movabs $0xccccc30824648d48,%rax
-  *
-  * and when the return thunk executes the inner label srso_safe_ret()
-  * later, it is a stack manipulation and a RET which is mispredicted and
-@@ -252,11 +252,10 @@ SYM_START(srso_untrain_ret, SYM_L_GLOBAL, SYM_A_NONE)
- 	.byte 0x48, 0xb8
- 
- SYM_INNER_LABEL(srso_safe_ret, SYM_L_GLOBAL)
--	add $8, %_ASM_SP
-+	lea 8(%_ASM_SP), %_ASM_SP
- 	ret
- 	int3
- 	int3
--	int3
- 	lfence
- 	call srso_safe_ret
- 	int3
-
-base-commit: 25aa0bebba72b318e71fe205bfd1236550cc9534
--- 
-2.41.0.694.ge786442a9b-goog
+Alex
 
