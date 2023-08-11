@@ -2,137 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6C8B7795FF
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:18:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CE0D77960C
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236799AbjHKRSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 13:18:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
+        id S235812AbjHKR0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 13:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234215AbjHKRSu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 13:18:50 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2064.outbound.protection.outlook.com [40.107.101.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF660E58;
-        Fri, 11 Aug 2023 10:18:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HLcPl39lFk/mMpJCliL64f/yp8V5aUMSM3VxhUV9wWohPyn5NcmX+aJWRzFtFsUsVhKVQVAsRWMr3c6oDENVaWxW/A79qbKMeFXJMMyXo+obcoQ2eLPw2hN9JkXVSeLkzkPz7c3kP1OvAU92TI+R2OCU5IwM6O0Xn6yZLVWjq3FafJMUOfzAf1XLU06tW/HlvlWq8Fl3QmNF4zIIth+RLpV7YXbphoYvccJvw38GVkh7dxeMAbTNneE7t5qIViZKvZ5FqQCvlJZ+HTdzV9EOhaRxSMR6a+zvAK1XFGx5ZX09IPnUA/PPebRz93yRXIaFu+10AvsyEkE15PbNdmkeEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8QA7Cdakmehf15R0stMu9UIr4WvJTUDE2XACZ8bPttg=;
- b=ecFcxmwdrdCl/9Tip8ItFDaRIz14f1yPyk1mjU7+X3rrMDrs1Q7h8mRuAUgOs2Vw24hZ57meok0aMBLiUnhuDAJRwk/H9btShNpKKd5Y2ltw/ACoYSsRu/OG4n4cH/wMBgUIk5i/iOOKcGlcRwO/RbFHYKyXcvUIkV+uLBLLuQqJuCwZgGTAYYxIgqJqUPMJorldc+tZ+LedA1/fuybLePJtxkEYIRAp+gtjHFeocPnui4R6mX1gUYHZTGjcLTFFZXwPxayaVrOyk5/R0npMM1F3/bNk1exfZ9Zt5GWd6nUjRL40mNj1ADYUqo8zLgK5pLZT5d/5ftMb0fx6lmbCug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8QA7Cdakmehf15R0stMu9UIr4WvJTUDE2XACZ8bPttg=;
- b=bnybg+Jq+hHdANZCu0RCvNntQHAOcRNyyZiB3wZfWWaR+d/yiRwddnAGIXJMjIIqiNXnG4LkGk1srtQ2p+QdKrGR3WoVQO5ek3lPAGLUCryT5hFGHA2WSi2dqvRdPQXV3PRNOGtXwdHn+gVTHs2vXuIIB/IxZgfTJYy13hQxpliW9J+ZzjPm93XFW/yE1lwL9xvkMAZQIz7i5hDenzZmZvZYMwYX5qPQPxBl0PJAvmXfvhdvN+sxtIOb4mwPYsR3dQOmxgsWTE5USVVBGpZcCXEJpb79J5QFdeVpWG0Wziptecywwarx4EppU+wsUic0hZb1+qwpwzdfjnlypwVwGQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB7996.namprd12.prod.outlook.com (2603:10b6:8:14f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.20; Fri, 11 Aug
- 2023 17:18:47 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
- 17:18:47 +0000
-Date:   Fri, 11 Aug 2023 14:18:44 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>, bibo mao <maobibo@loongson.cn>,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, mike.kravetz@oracle.com,
-        apopple@nvidia.com, rppt@kernel.org, akpm@linux-foundation.org,
-        kevin.tian@intel.com, david@redhat.com
-Subject: Re: [RFC PATCH v2 5/5] KVM: Unmap pages only when it's indeed
- protected for NUMA migration
-Message-ID: <ZNZtdKXslPlKYRWY@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZNZshVZI5bRq4mZQ@google.com>
-X-ClientProxiedBy: BYAPR07CA0009.namprd07.prod.outlook.com
- (2603:10b6:a02:bc::22) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S233483AbjHKR0f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 13:26:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B5330CA
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:25:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691774750;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=X6sQ8Q6WelCDCKZ8Z8ftpDHYvOx3deYiCFU+E3Ltf9Y=;
+        b=cMnDtgqYcWZMmKhSNJ8jt25f55SL4q83cWhGNwlj9nCCUeS4uyT0uGJHol1YOr1oD2ZuPE
+        R93sJD+TupAVb6ZiNIe2azwMOY0DvxJpAQwJOgioYG25vedtfBmYwWyzjv6wpA2oKuhBUi
+        Ltpk/weH367ibRnGlJtk19Nnk8ZIopo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-481-QdHXOxskNlihrUQLkgkkFw-1; Fri, 11 Aug 2023 13:25:49 -0400
+X-MC-Unique: QdHXOxskNlihrUQLkgkkFw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3177af1ceacso1232231f8f.1
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:25:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691774732; x=1692379532;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X6sQ8Q6WelCDCKZ8Z8ftpDHYvOx3deYiCFU+E3Ltf9Y=;
+        b=G98t7viYHfn/GgxC8Ds3G4O6yoegrZ6GjH1aW0iD0H9j2QRBd3fiXh8ERj5ZvITPj7
+         IlISEef/jlYroG8WUWvT6eZhGBUylSITLSZMpCTxHKSx/1ilZFRhXoqD8aAHEFG10ze0
+         tACHdVNShU0o7eRakNJl2vc6QibVhIGpMJvhm2uxXhVQRZj6vBruvUUF1QBvVHk6q4vI
+         NhiPH1e+u+zQOF1JYd2KZXbaeRcVWhLQCjqEMjcP/aKlXxmLg97Z/KrdhiBXC29dCc06
+         RgDt6agy1smb9bwPEDXmO0Z+a536UdhU6NQsMSQmUm/lriiMWZVVfYrsGJgXaxRS0B9W
+         jFjg==
+X-Gm-Message-State: AOJu0Yx0w8ru4e2ey4A2rfCwSbRaGoMvBKQIapG98RPOBKSmB8zg9cxK
+        WICJBgrD2o0I6Ku+slnjV8aF0WuhIabFWwCWzeRI9AJp9pdi5Bfi8t7SewbeEsM6TBjT7IO2yN+
+        jKHZ9yR3uVYPB
+X-Received: by 2002:adf:f511:0:b0:317:6b92:26b5 with SMTP id q17-20020adff511000000b003176b9226b5mr1820013wro.23.1691774732466;
+        Fri, 11 Aug 2023 10:25:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IESQhR+T4R/2hhEkOkTbdXkRMH8nFN557GFq/6P+WCs1OfxoSnCzpP/VC0zaopv5X94Y+Tueg==
+X-Received: by 2002:adf:f511:0:b0:317:6b92:26b5 with SMTP id q17-20020adff511000000b003176b9226b5mr1820002wro.23.1691774732111;
+        Fri, 11 Aug 2023 10:25:32 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c71a:3000:973c:c367:3012:8b20? (p200300cbc71a3000973cc36730128b20.dip0.t-ipconnect.de. [2003:cb:c71a:3000:973c:c367:3012:8b20])
+        by smtp.gmail.com with ESMTPSA id o13-20020a05600c378d00b003fe2de3f94fsm5803925wmr.12.2023.08.11.10.25.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Aug 2023 10:25:31 -0700 (PDT)
+Message-ID: <6b48a161-257b-a02b-c483-87c04b655635@redhat.com>
+Date:   Fri, 11 Aug 2023 19:25:30 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7996:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a098585-2acc-45fb-9441-08db9a8f0595
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /8cydHtunO83yG5N2jEl6pvAbZ4yqiiol0rcnoPmziH2vQWkGAPDq4AT+8FuATuQoJy4cBdmFOjEphxTeZq6C1XPDlAzVua+WMuzbdbeyuxjpMtbjUlv7nuoN3lPOavhd9eLUd6Dp0qQyRNcnAOraGVOZ4nnLfccrex2HYfd+Y/Ny/sBX5hn5H04sWte1LLD1sjSO+Ve5f1PvMKFIxQQ/fPVJ5vNPtbWnsYPzmnIVgELLP0xii9pZpCwGFIISf9qwRAoQcXSXFYeFe6tuzq7GdiyJHCUrnAeF1AivdJTOMdjUQ4eZr5nBQduHE3n1uKjkQiwB7LViyvXlVO8TaMGW8hzJ6syotKsQBnAPvrq0vX1ZMYnquW11E6brEIJzKSxY+ZDghvcOPuZ0+iqzizBM/bHyKMgitT3K9Rc8nbefHXk2NbQzKwAPIo5XVeTyhkHmeXIAzeO0xjFab9//IzLQ7jNS122Reem3GgQWxBeg7NtP2i0pRi5Hzk9uX7K8nbPss5zJAOZOP4HChR7WT/nm5JRA3htDRUil0tVeVC5YK8V5AimLB6rV3TL5A0Qu3Z6
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(366004)(39860400002)(136003)(376002)(396003)(186006)(1800799006)(451199021)(6512007)(36756003)(86362001)(38100700002)(26005)(83380400001)(4744005)(2616005)(478600001)(6666004)(54906003)(2906002)(6486002)(41300700001)(8936002)(316002)(4326008)(6916009)(6506007)(8676002)(66476007)(7416002)(66556008)(5660300002)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?sxmH2pOeS2O/JhSsU7dKglxDOfK5Q0j0OEON2h3pFTPNq0pNSVd24e6fp9vf?=
- =?us-ascii?Q?4ylD8hl/qSk0ZaHligq4sm5/5WXQX2R8mG8NuDqfggr7uH5Hjlm8DNZzYn0v?=
- =?us-ascii?Q?Y7lyt7W6wf+2fiG4VH6Y0cQqBhJCMzwPYwHz4F+s6noiz54zUKC/d4X7nL8r?=
- =?us-ascii?Q?FwO8TMpoCwOSRCOEVLJUuePzKItv9ueFjqQvuD/zaqxpAmiPp7dKzKHwAZN8?=
- =?us-ascii?Q?jvS+2kJe4mpEX01cS/BSg13BPEbNZz2WpHpG4MOa08g6YXZkzCgugpzz8l7a?=
- =?us-ascii?Q?mceRpXPB+1GM/VjsOgf9uh580eJaeGcfQ819oU8J5qKUp7Q4Uk91OFiVuKiE?=
- =?us-ascii?Q?79dJbZI72H3xsayjfRFuVWG732V5ZUQWF1dwKT4GVXhMM8Wb4X2F7llCZ1uM?=
- =?us-ascii?Q?PCWxVd+GY9nfDU+0rVzIirf94US2xNChA4fVFXWQFeEILyDj43rpkHM83L7t?=
- =?us-ascii?Q?NnVLHzUOitf4WXKVjTHsCDzgWaazCpyaP7n7ApQSv/olAsp6O4b2IN5g2CSW?=
- =?us-ascii?Q?h6/B5HJI4nV10epIiTeiTfSc1Mssk4dfBTCyqiIXfUmflU1lTy7Bk3uzdv2o?=
- =?us-ascii?Q?axbi05rRB5i/NV4xYLLkEPcqp5ZqufWvBikO7PL2iOvKuO/1nobFaeU8yTsu?=
- =?us-ascii?Q?7uGnUoIWQ75xKDMkQBPTq76dhVlwWNObVWH7hMbzPjkriG8hiIWGWhbVYmVM?=
- =?us-ascii?Q?6MoWIcop9U0fuzAIacNRwyc/tmtt6qPVbyCwgK9giL/rvj+nWgen3A5g8MpO?=
- =?us-ascii?Q?CyefCoD/JADSH1Ntl2Vhm59AzoRnUDx7wy810iKWHge+l0cDxwC8V1zoLJZo?=
- =?us-ascii?Q?Cp+R+TuwiKBGNfHfuRWYuCFOmIRtMymaRHrQqTDu+kMpx+eoCWZfz7iWwRgg?=
- =?us-ascii?Q?zyKo1bSG8RMjDIuE4p/54GZKeb+RaaC8157WidwJ9eDTEZs9Qqeg3O81/cRU?=
- =?us-ascii?Q?75nC6xkH7U9YMmFtboeVtB8Shnn0kF3AJYdnFPXDYTFMadGDFvk4oc2o0f63?=
- =?us-ascii?Q?cbqmgYfY9kQzphsEwpXKOilfZMET2U6cXWhsqAvGk8xWBhaF5odE4QU32r9y?=
- =?us-ascii?Q?6VW9oBNK6jRuf2KiXUzzUgLpZuBxrrABsPqv0Y1CxbgeNA8snkJvzXI4BLdx?=
- =?us-ascii?Q?3okl2fFtntO1SVPfBSnrds+2b1h2m2KmCrYe79naP3LHrTB+K7tsW3J3xJ/r?=
- =?us-ascii?Q?S2s2lYB5mFG2zF7btkc7JkCdBHuxU8dzQfi/ibcyyULZ0QApF4WTvgbcLLQk?=
- =?us-ascii?Q?KLv0OY/0rA3XSDi/PIElvglt/zHwHOWx348c1dDXh5uxhBMEaz8NBPIkffUg?=
- =?us-ascii?Q?ERVI33YS+P5qRDi7FdU+mOxL+4h3jO1P4urGKeyzBEkf15lodBsxi9uT1Edp?=
- =?us-ascii?Q?RlKpLX5y0zh0Ie/58lQm+PXXcgOClxheJ/HpGVeLqLaMSxeQufNpVcB6Kj7q?=
- =?us-ascii?Q?KmMelAP2RHVwAJ7mnwUPBYBlhyKxOH+zorxsNNwkcHII0lSRLyKFwykcl7FD?=
- =?us-ascii?Q?zJ1gWrVe4xZWbaFSpsaT7dofJZE/P3786HnTWlz6nYvlGVed9qUOMpkh1lvb?=
- =?us-ascii?Q?ACQCNDOUKcL+VGGCJ8zM9QsN8E1YhRINYGrHE76Y?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a098585-2acc-45fb-9441-08db9a8f0595
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2023 17:18:46.9227
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T461Xfy+2gWZ1kaA+U//ML/vIJxcnrYF1gj35oWIbeP37DsSfRp3Plgr2hWaV5vE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7996
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC PATCH v2 0/5] Reduce NUMA balance caused TLB-shootdowns in a
+ VM
+Content-Language: en-US
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        mike.kravetz@oracle.com, apopple@nvidia.com, jgg@nvidia.com,
+        rppt@kernel.org, akpm@linux-foundation.org, kevin.tian@intel.com,
+        John Hubbard <jhubbard@nvidia.com>
+References: <20230810085636.25914-1-yan.y.zhao@intel.com>
+ <41a893e1-f2e7-23f4-cad2-d5c353a336a3@redhat.com>
+ <ZNSyzgyTxubo0g/D@yzhao56-desk.sh.intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <ZNSyzgyTxubo0g/D@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> However, *if* it's ok to invoke MMU notifiers while holding PMD/PTE locks, then
-> I think we can achieve what you want without losing batching, and without changing
-> secondary MMUs.
+On 10.08.23 11:50, Yan Zhao wrote:
+> On Thu, Aug 10, 2023 at 11:34:07AM +0200, David Hildenbrand wrote:
+>>> This series first introduces a new flag MMU_NOTIFIER_RANGE_NUMA in patch 1
+>>> to work with mmu notifier event type MMU_NOTIFY_PROTECTION_VMA, so that
+>>> the subscriber (e.g.KVM) of the mmu notifier can know that an invalidation
+>>> event is sent for NUMA migration purpose in specific.
+>>>
+>>> Patch 2 skips setting PROT_NONE to long-term pinned pages in the primary
+>>> MMU to avoid NUMA protection introduced page faults and restoration of old
+>>> huge PMDs/PTEs in primary MMU.
+>>>
+>>> Patch 3 introduces a new mmu notifier callback .numa_protect(), which
+>>> will be called in patch 4 when a page is ensured to be PROT_NONE protected.
+>>>
+>>> Then in patch 5, KVM can recognize a .invalidate_range_start() notification
+>>> is for NUMA balancing specific and do not do the page unmap in secondary
+>>> MMU until .numa_protect() comes.
+>>>
+>>
+>> Why do we need all that, when we should simply not be applying PROT_NONE to
+>> pinned pages?
+>>
+>> In change_pte_range() we already have:
+>>
+>> if (is_cow_mapping(vma->vm_flags) &&
+>>      page_count(page) != 1)
+>>
+>> Which includes both, shared and pinned pages.
+> Ah, right, currently in my side, I don't see any pinned pages are
+> outside of this condition.
+> But I have a question regarding to is_cow_mapping(vma->vm_flags), do we
+> need to allow pinned pages in !is_cow_mapping(vma->vm_flags)?
 
-No, this is not legal.
+One issue is that folio_maybe_pinned...() ... is unreliable as soon as 
+your page is mapped more than 1024 times.
 
-> +void change_pmd_range_notify_secondary_mmus(unsigned long addr,
-> +					    struct mmu_notifier_range *range)
-> +{
-> +	if (range->start)
-> +		return;
-> +
-> +	VM_WARN_ON(addr >= range->end);
-> +	range->start = addr;
-> +	mmu_notifier_invalidate_range_start_nonblock(range);
-> +}
+One might argue that we also want to exclude pages that are mapped that 
+often. That might possibly work.
 
-The 'nonblock' entry point is advisory, if it fails the caller must
-not change the mm.
+> 
+>> Staring at page #2, are we still missing something similar for THPs?
+> Yes.
+> 
+>> Why is that MMU notifier thingy and touching KVM code required?
+> Because NUMA balancing code will firstly send .invalidate_range_start() with
+> event type MMU_NOTIFY_PROTECTION_VMA to KVM in change_pmd_range()
+> unconditionally, before it goes down into change_pte_range() and
+> change_huge_pmd() to check each page count and apply PROT_NONE.
 
-Jason
+Ah, okay I see, thanks. That's indeed unfortunate.
+
+> 
+> Then current KVM will unmap all notified pages from secondary MMU
+> in .invalidate_range_start(), which could include pages that finally not
+> set to PROT_NONE in primary MMU.
+> 
+> For VMs with pass-through devices, though all guest pages are pinned,
+> KVM still periodically unmap pages in response to the
+> .invalidate_range_start() notification from auto NUMA balancing, which
+> is a waste.
+
+Should we want to disable NUMA hinting for such VMAs instead (for 
+example, by QEMU/hypervisor) that knows that any NUMA hinting activity 
+on these ranges would be a complete waste of time? I recall that John H. 
+once mentioned that there are similar issues with GPU memory:  NUMA 
+hinting is actually counter-productive and they end up disabling it.
+
+-- 
+Cheers,
+
+David / dhildenb
+
