@@ -2,161 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CE0D77960C
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:26:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03B80779613
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:28:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235812AbjHKR0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 13:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40182 "EHLO
+        id S236826AbjHKR2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 13:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233483AbjHKR0f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 13:26:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B5330CA
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:25:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691774750;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=X6sQ8Q6WelCDCKZ8Z8ftpDHYvOx3deYiCFU+E3Ltf9Y=;
-        b=cMnDtgqYcWZMmKhSNJ8jt25f55SL4q83cWhGNwlj9nCCUeS4uyT0uGJHol1YOr1oD2ZuPE
-        R93sJD+TupAVb6ZiNIe2azwMOY0DvxJpAQwJOgioYG25vedtfBmYwWyzjv6wpA2oKuhBUi
-        Ltpk/weH367ibRnGlJtk19Nnk8ZIopo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-481-QdHXOxskNlihrUQLkgkkFw-1; Fri, 11 Aug 2023 13:25:49 -0400
-X-MC-Unique: QdHXOxskNlihrUQLkgkkFw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3177af1ceacso1232231f8f.1
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:25:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691774732; x=1692379532;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X6sQ8Q6WelCDCKZ8Z8ftpDHYvOx3deYiCFU+E3Ltf9Y=;
-        b=G98t7viYHfn/GgxC8Ds3G4O6yoegrZ6GjH1aW0iD0H9j2QRBd3fiXh8ERj5ZvITPj7
-         IlISEef/jlYroG8WUWvT6eZhGBUylSITLSZMpCTxHKSx/1ilZFRhXoqD8aAHEFG10ze0
-         tACHdVNShU0o7eRakNJl2vc6QibVhIGpMJvhm2uxXhVQRZj6vBruvUUF1QBvVHk6q4vI
-         NhiPH1e+u+zQOF1JYd2KZXbaeRcVWhLQCjqEMjcP/aKlXxmLg97Z/KrdhiBXC29dCc06
-         RgDt6agy1smb9bwPEDXmO0Z+a536UdhU6NQsMSQmUm/lriiMWZVVfYrsGJgXaxRS0B9W
-         jFjg==
-X-Gm-Message-State: AOJu0Yx0w8ru4e2ey4A2rfCwSbRaGoMvBKQIapG98RPOBKSmB8zg9cxK
-        WICJBgrD2o0I6Ku+slnjV8aF0WuhIabFWwCWzeRI9AJp9pdi5Bfi8t7SewbeEsM6TBjT7IO2yN+
-        jKHZ9yR3uVYPB
-X-Received: by 2002:adf:f511:0:b0:317:6b92:26b5 with SMTP id q17-20020adff511000000b003176b9226b5mr1820013wro.23.1691774732466;
-        Fri, 11 Aug 2023 10:25:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IESQhR+T4R/2hhEkOkTbdXkRMH8nFN557GFq/6P+WCs1OfxoSnCzpP/VC0zaopv5X94Y+Tueg==
-X-Received: by 2002:adf:f511:0:b0:317:6b92:26b5 with SMTP id q17-20020adff511000000b003176b9226b5mr1820002wro.23.1691774732111;
-        Fri, 11 Aug 2023 10:25:32 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c71a:3000:973c:c367:3012:8b20? (p200300cbc71a3000973cc36730128b20.dip0.t-ipconnect.de. [2003:cb:c71a:3000:973c:c367:3012:8b20])
-        by smtp.gmail.com with ESMTPSA id o13-20020a05600c378d00b003fe2de3f94fsm5803925wmr.12.2023.08.11.10.25.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Aug 2023 10:25:31 -0700 (PDT)
-Message-ID: <6b48a161-257b-a02b-c483-87c04b655635@redhat.com>
-Date:   Fri, 11 Aug 2023 19:25:30 +0200
+        with ESMTP id S236816AbjHKR2P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 13:28:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F1530D7;
+        Fri, 11 Aug 2023 10:28:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 122A261231;
+        Fri, 11 Aug 2023 17:28:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8FE8C433C7;
+        Fri, 11 Aug 2023 17:28:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691774893;
+        bh=Cbt4HG7vCUbmItNF5qMZySg8QnQ54QSDlQ6h4NUDREE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kG2VCt4ycGnc748iyJGlbNGZ7qFjvSjO3on0PdwXBy4dmpySywbD4Qv44+h8+Sus3
+         4P4Edjl0mUnnudxsNdGnVmgxHRSJY5bI2b5Szt7QN8thk5SQM+F+wHxfE7PkYgwwOR
+         68YX2xYJcbOapYlQ0jIMPDCBOb8CmRk67v2Fzy6I0nHeOBKhzIs8WKIjo7fOPQ0w5o
+         mphC/NjCwHN26/xNLJwGsWvjuift+fk5BZ2GNqGxfuLdElRveX0p03/kM96fJlHO4k
+         uLcSYpH/TO/WTBjHo1rJFq+Juos5hqvIi4ACA62Cdd+85Qwm2oTAelgDQ+1ZCxWRAx
+         XVffzP+AGRiHw==
+Date:   Fri, 11 Aug 2023 10:28:11 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Srikanth Aithal <sraithal@amd.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] x86/retpoline: Don't clobber RFLAGS during
+ srso_safe_ret()
+Message-ID: <20230811172811.GA3551@dev-arch.thelio-3990X>
+References: <20230811155255.250835-1-seanjc@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [RFC PATCH v2 0/5] Reduce NUMA balance caused TLB-shootdowns in a
- VM
-Content-Language: en-US
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        mike.kravetz@oracle.com, apopple@nvidia.com, jgg@nvidia.com,
-        rppt@kernel.org, akpm@linux-foundation.org, kevin.tian@intel.com,
-        John Hubbard <jhubbard@nvidia.com>
-References: <20230810085636.25914-1-yan.y.zhao@intel.com>
- <41a893e1-f2e7-23f4-cad2-d5c353a336a3@redhat.com>
- <ZNSyzgyTxubo0g/D@yzhao56-desk.sh.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <ZNSyzgyTxubo0g/D@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811155255.250835-1-seanjc@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.08.23 11:50, Yan Zhao wrote:
-> On Thu, Aug 10, 2023 at 11:34:07AM +0200, David Hildenbrand wrote:
->>> This series first introduces a new flag MMU_NOTIFIER_RANGE_NUMA in patch 1
->>> to work with mmu notifier event type MMU_NOTIFY_PROTECTION_VMA, so that
->>> the subscriber (e.g.KVM) of the mmu notifier can know that an invalidation
->>> event is sent for NUMA migration purpose in specific.
->>>
->>> Patch 2 skips setting PROT_NONE to long-term pinned pages in the primary
->>> MMU to avoid NUMA protection introduced page faults and restoration of old
->>> huge PMDs/PTEs in primary MMU.
->>>
->>> Patch 3 introduces a new mmu notifier callback .numa_protect(), which
->>> will be called in patch 4 when a page is ensured to be PROT_NONE protected.
->>>
->>> Then in patch 5, KVM can recognize a .invalidate_range_start() notification
->>> is for NUMA balancing specific and do not do the page unmap in secondary
->>> MMU until .numa_protect() comes.
->>>
->>
->> Why do we need all that, when we should simply not be applying PROT_NONE to
->> pinned pages?
->>
->> In change_pte_range() we already have:
->>
->> if (is_cow_mapping(vma->vm_flags) &&
->>      page_count(page) != 1)
->>
->> Which includes both, shared and pinned pages.
-> Ah, right, currently in my side, I don't see any pinned pages are
-> outside of this condition.
-> But I have a question regarding to is_cow_mapping(vma->vm_flags), do we
-> need to allow pinned pages in !is_cow_mapping(vma->vm_flags)?
-
-One issue is that folio_maybe_pinned...() ... is unreliable as soon as 
-your page is mapped more than 1024 times.
-
-One might argue that we also want to exclude pages that are mapped that 
-often. That might possibly work.
-
+On Fri, Aug 11, 2023 at 08:52:55AM -0700, Sean Christopherson wrote:
+> Use 'lea' instead of 'add' when adjusting %rsp in srso_safe_ret() so as to
+> avoid clobbering flags.  Drop one of the INT3 instructions to account for
+> the LEA consuming one more byte than the ADD.
 > 
->> Staring at page #2, are we still missing something similar for THPs?
-> Yes.
+> KVM's emulator makes indirect calls into a jump table of sorts, where
+> the destination of each call is a small blob of code that performs fast
+> emulation by executing the target instruction with fixed operands.
 > 
->> Why is that MMU notifier thingy and touching KVM code required?
-> Because NUMA balancing code will firstly send .invalidate_range_start() with
-> event type MMU_NOTIFY_PROTECTION_VMA to KVM in change_pmd_range()
-> unconditionally, before it goes down into change_pte_range() and
-> change_huge_pmd() to check each page count and apply PROT_NONE.
-
-Ah, okay I see, thanks. That's indeed unfortunate.
-
+> E.g. to emulate ADC, fastop() invokes adcb_al_dl():
 > 
-> Then current KVM will unmap all notified pages from secondary MMU
-> in .invalidate_range_start(), which could include pages that finally not
-> set to PROT_NONE in primary MMU.
+>   adcb_al_dl:
+>       0xffffffff8105f5f0 <+0>:  adc    %dl,%al
+>       0xffffffff8105f5f2 <+2>:  jmp    0xffffffff81a39270 <__x86_return_thunk>
 > 
-> For VMs with pass-through devices, though all guest pages are pinned,
-> KVM still periodically unmap pages in response to the
-> .invalidate_range_start() notification from auto NUMA balancing, which
-> is a waste.
+> A major motivation for doing fast emulation is to leverage the CPU to
+> handle consumption and manipulation of arithmetic flags, i.e. RFLAGS is
+> both an input and output to the target of the call.  fastop() collects
+> the RFLAGS result by pushing RFLAGS onto the stack and popping them back
+> into a variable (held in RDI in this case)
+> 
+>   asm("push %[flags]; popf; " CALL_NOSPEC " ; pushf; pop %[flags]\n"
+> 
+>       0xffffffff81062be7 <+71>: mov    0xc0(%r8),%rdx
+>       0xffffffff81062bee <+78>: mov    0x100(%r8),%rcx
+>       0xffffffff81062bf5 <+85>: push   %rdi
+>       0xffffffff81062bf6 <+86>: popf
+>       0xffffffff81062bf7 <+87>: call   *%rsi
+>       0xffffffff81062bf9 <+89>: nop
+>       0xffffffff81062bfa <+90>: nop
+>       0xffffffff81062bfb <+91>: nop
+>       0xffffffff81062bfc <+92>: pushf
+>       0xffffffff81062bfd <+93>: pop    %rdi
+> 
+> and then propagating the arithmetic flags into the vCPU's emulator state:
+> 
+>     ctxt->eflags = (ctxt->eflags & ~EFLAGS_MASK) | (flags & EFLAGS_MASK);
+> 
+>       0xffffffff81062be0 <+64>:  and    $0xfffffffffffff72a,%r9
+>       0xffffffff81062bfe <+94>:  and    $0x8d5,%edi
+>       0xffffffff81062c0d <+109>: or     %rdi,%r9
+>       0xffffffff81062c1a <+122>: mov    %r9,0x10(%r8)
+> 
+> The failures can be most easily reproduced by running the "emulator" test
+> in KVM-Unit-Tests.
+> 
+> If you're feeling a bit of deja vu, see commit b63f20a778c8
+> ("x86/retpoline: Don't clobber RFLAGS during CALL_NOSPEC on i386").
+> 
+> Fixes: fb3bd914b3ec ("x86/srso: Add a Speculative RAS Overflow mitigation")
+> Reported-by: Srikanth Aithal <sraithal@amd.com>
+> Closes: https://lore.kernel.org/all/de474347-122d-54cd-eabf-9dcc95ab9eae@amd.com
+> Cc: stable@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Should we want to disable NUMA hinting for such VMAs instead (for 
-example, by QEMU/hypervisor) that knows that any NUMA hinting activity 
-on these ranges would be a complete waste of time? I recall that John H. 
-once mentioned that there are similar issues with GPU memory:  NUMA 
-hinting is actually counter-productive and they end up disabling it.
+This resolves the issue I reported at [1].
 
--- 
-Cheers,
+Tested-by: Nathan Chancellor <nathan@kernel.org>
 
-David / dhildenb
+[1]: https://lore.kernel.org/20230810013334.GA5354@dev-arch.thelio-3990X/
 
+> ---
+> 
+> Those that fail to learn from history are doomed to repeat it. :-D
+> 
+>  arch/x86/lib/retpoline.S | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/lib/retpoline.S b/arch/x86/lib/retpoline.S
+> index 2cff585f22f2..132cedbf9e57 100644
+> --- a/arch/x86/lib/retpoline.S
+> +++ b/arch/x86/lib/retpoline.S
+> @@ -164,7 +164,7 @@ __EXPORT_THUNK(srso_untrain_ret_alias)
+>  /* Needs a definition for the __x86_return_thunk alternative below. */
+>  SYM_START(srso_safe_ret_alias, SYM_L_GLOBAL, SYM_A_NONE)
+>  #ifdef CONFIG_CPU_SRSO
+> -	add $8, %_ASM_SP
+> +	lea 8(%_ASM_SP), %_ASM_SP
+>  	UNWIND_HINT_FUNC
+>  #endif
+>  	ANNOTATE_UNRET_SAFE
+> @@ -239,7 +239,7 @@ __EXPORT_THUNK(zen_untrain_ret)
+>   * SRSO untraining sequence for Zen1/2, similar to zen_untrain_ret()
+>   * above. On kernel entry, srso_untrain_ret() is executed which is a
+>   *
+> - * movabs $0xccccccc308c48348,%rax
+> + * movabs $0xccccc30824648d48,%rax
+>   *
+>   * and when the return thunk executes the inner label srso_safe_ret()
+>   * later, it is a stack manipulation and a RET which is mispredicted and
+> @@ -252,11 +252,10 @@ SYM_START(srso_untrain_ret, SYM_L_GLOBAL, SYM_A_NONE)
+>  	.byte 0x48, 0xb8
+>  
+>  SYM_INNER_LABEL(srso_safe_ret, SYM_L_GLOBAL)
+> -	add $8, %_ASM_SP
+> +	lea 8(%_ASM_SP), %_ASM_SP
+>  	ret
+>  	int3
+>  	int3
+> -	int3
+>  	lfence
+>  	call srso_safe_ret
+>  	int3
+> 
+> base-commit: 25aa0bebba72b318e71fe205bfd1236550cc9534
+> -- 
+> 2.41.0.694.ge786442a9b-goog
+> 
