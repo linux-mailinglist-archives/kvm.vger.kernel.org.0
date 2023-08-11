@@ -2,85 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAE7777855D
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 04:22:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF640778591
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 04:40:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230254AbjHKCWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 22:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33958 "EHLO
+        id S231603AbjHKCkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 22:40:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229954AbjHKCWa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 22:22:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6475A2D58
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 19:22:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ACEAB6537D
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 02:22:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 220CDC433CD
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 02:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691720548;
-        bh=iKFSiCUeO7xdODjF0V1QlmisId87kDwpqxB/+4f+r9M=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=nuNUN7Sc2KBN7nrZpnHUbrSv4Vp6he0+dvLvnUuHeQexv7kLIDVbqgNek1Grl4S8a
-         ah8sU9EnIvoOwrEyw2pUVy8MbtREn5REjO9/an5H7qRFcOMbA/C0wcXGUIO4sV3qOk
-         CRD1AGCyw4E5vjszr0l+RTP0eyknekT1B4w0bjvsFzFK5R4pKgJbkRSke+2b7xauVz
-         F7on4DQBC9F74tMkiuNPh7V/iGVcim/sTAoDLLLnryzR+V+iRTEy9K3lgUbxhv0uGF
-         ctEKXxq2F/KcXLGx1dd/gjTSN8/cFdNjzeUcR7PjpidwW+llPuWa67wYCvojdxRvZJ
-         PoWgRYWg1yNjg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 0FC39C53BC6; Fri, 11 Aug 2023 02:22:28 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217558] In KVM guest with VF of X710 NIC passthrough, the mac
- address of VF is inconsistent with it in host
-Date:   Fri, 11 Aug 2023 02:22:27 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Network
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: farrah.chen@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217558-28872-YShoNcyDAn@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217558-28872@https.bugzilla.kernel.org/>
-References: <bug-217558-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S231611AbjHKCk2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 22:40:28 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1592D48;
+        Thu, 10 Aug 2023 19:40:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691721626; x=1723257626;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aqqOTgbaDxU7YQXJKJJ6d5riUgAVtDn0mUBNSHHE+e4=;
+  b=VFmIs+aIL/FESojyr9acFpHYlG0qmMmJ3TZ+Q7LjQ3Y3KYf/F3oI7+2d
+   GSOoX8uc2JS/pPAQsVK3iaiwRhJOZ/1H6KE9UAbjw3lxLjswBDakJlJtQ
+   CGGz3YagwPYV36EVkjTCvx11OU9d2TnvnpUwSn36Bsat7lDcyY6XKY9Py
+   qN/swbafze/IbwGJOjFGj/8c9xEQwDbKpvDV6skmcrSYJDQYpf2WURXzc
+   CzHSfXfe7sB1A6Jb/KG+4ZKBoljy5FAIobmNgDetaBmFxSbUXIDbvuWci
+   AvvL58B/VCZYVp042QdV9bEuSLExFZHxkP+J6jGeDv1+VTxS0ixp2lIbZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="370477443"
+X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
+   d="scan'208";a="370477443"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 19:40:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="1063148644"
+X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
+   d="scan'208";a="1063148644"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.214.65]) ([10.254.214.65])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 19:40:17 -0700
+Message-ID: <b154c6d4-45db-0f4c-d704-fe1ab8e4d6a5@linux.intel.com>
+Date:   Fri, 11 Aug 2023 10:40:15 +0800
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 12/12] iommu: Add helper to set iopf handler for domain
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
+ <20230727054837.147050-13-baolu.lu@linux.intel.com>
+ <ZNU4Hio8oAHH8RLn@ziepe.ca>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <ZNU4Hio8oAHH8RLn@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217558
+On 2023/8/11 3:18, Jason Gunthorpe wrote:
+> On Thu, Jul 27, 2023 at 01:48:37PM +0800, Lu Baolu wrote:
+>> To avoid open code everywhere.
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   include/linux/iommu.h | 11 ++++++++++-
+>>   drivers/iommu/iommu.c | 20 ++++++++++++++++++--
+>>   2 files changed, 28 insertions(+), 3 deletions(-)
+> 
+> Seems like overkill at this point..
+> 
+> Also, I think this is probably upside down.
+> 
+> We want to create the domains as fault enabled in the first place.
+> 
+> A fault enabled domain should never be attached to something that
+> cannot support faults. It should also not support changing the fault
+> handler while it exists.
+> 
+> Thus at the creation point would be the time to supply the fault handler
+> as part of requesting faulting.
+> 
+> Taking an existing domain and making it faulting enabled is going to
+> be really messy in all the corner cases.
 
---- Comment #13 from Chen, Fan (farrah.chen@intel.com) ---
-Hi Patryk,
+Yes. Agreed.
 
-Do I need to add "tested by"? I cannot find the email.
+> 
+> My advice (and Robin will probably hate me), is to define a new op:
+> 
+> struct domain_alloc_paging_args {
+>         struct fault_handler *fault_handler;
+>         void *fault_data
+> };
+> 
+> struct iommu_domain *domain_alloc_paging2(struct device *dev, struct
+>         domain_alloc_paging_args *args)
+> 
+> The point would be to leave the majority of drivers using the
+> simplified, core assisted, domain_alloc_paging() interface and they
+> just don't have to touch any of this stuff at all.
+> 
+> Obviously if handler is given then the domain will be initialized as
+> faulting.
 
---=20
-You may reply to this email to add a comment.
+Perhaps we also need an internal helper for iommu drivers to check the
+iopf capability of the domain.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Best regards,
+baolu
