@@ -2,141 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF13C77969D
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:02:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 986817796A0
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:05:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234988AbjHKSCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 14:02:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53658 "EHLO
+        id S234354AbjHKSFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 14:05:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230217AbjHKSCP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 14:02:15 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E3310F
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:02:13 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d67a458ff66so515372276.3
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:02:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691776933; x=1692381733;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ma7a/CvcC7qFVUR/wztxpShWVPAvNO22UGYt8xcZrPE=;
-        b=vyhtq7mw6Sok8TLRoNnb2IGBgqG2DuctGPx0sCkRsFzLEc+H7j88xYimth+H6YPf9t
-         pb90l8gdn8EMaad/WFDbC1e6W5BI7XlH7KFZLLryKbi8jLFhSmdqi2dMh/Hr5HIBLfZd
-         m9AAfJfL01O1s+jphUTgHJdDLc1nRKlSYT5RlkpKyhzlIgh4z2+rvMTSXOnxMlldN59H
-         ZfLSCIxX5QkEkxYPN/dTDSog/1HdVfcstnhFiG7tnz7eC13mac/6Pn8/wyHTjiNDTIt9
-         FrByPsqmWJNbX1VgsGgZBXjRnXDsgmu/WNVEKEzuFts0yWP5nmTSc/91mBh5+hkJ1OP9
-         FkLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691776933; x=1692381733;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ma7a/CvcC7qFVUR/wztxpShWVPAvNO22UGYt8xcZrPE=;
-        b=MSfmQu97mCus/k01BbIj1NbeeV3mMGSdpK92ccG79fBO+OiAOs1265NKMhcVuJ4xnW
-         SxuFOeJ6DVFNAeOWodocrwUyJidrICsUOFOgO9OdjnjknnWBo43lvfK4Me0O6ysmyNYZ
-         nI4BKW/U41opTtfKJMPkRXAvzczUlYDwhRbJblwIC4p5+c1fQzKtB1N65K07m1Yu7MNy
-         /EtHf3iNyIBHl0IsFLfdFI5Hk72EOczwgg0KaMbbruUrHPWp0chWwy0kLu3GpbUP16EJ
-         h/A+HXI4jyKfEhfDUb48bboyKpW9aMW2DWKaKOR8XYh0JkrNHiDwtb4qkojPenZ6Z/h9
-         8PzA==
-X-Gm-Message-State: AOJu0Ywa3nGb3vO4fp4zstwjrfxqV/ARizUGo5RFqecfc5v6pjddEvxi
-        a5au0TIb8+Im9sH4kzhvJUh4DI21450=
-X-Google-Smtp-Source: AGHT+IGKIA5LvKpxQc1QTmqZHoMrY0zis6UZ78jc5uBG94hFkrWxWg2Ln36OZayQB7oNw1dHkUGCzDA8XR4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:7443:0:b0:d20:7752:e384 with SMTP id
- p64-20020a257443000000b00d207752e384mr42675ybc.3.1691776933032; Fri, 11 Aug
- 2023 11:02:13 -0700 (PDT)
-Date:   Fri, 11 Aug 2023 11:02:11 -0700
-In-Reply-To: <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
-Mime-Version: 1.0
-References: <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
- <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
- <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
- <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
- <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com>
- <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
-Message-ID: <ZNZ3owRcRjGejWFn@google.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-From:   Sean Christopherson <seanjc@google.com>
-To:     Amaan Cheval <amaan.cheval@gmail.com>
-Cc:     Eric Wheeler <kvm@lists.ewheeler.net>, brak@gameservers.com,
+        with ESMTP id S230217AbjHKSFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 14:05:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC7E2706
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:05:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D14AB643AB
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 18:05:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E883C433C7;
+        Fri, 11 Aug 2023 18:05:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691777130;
+        bh=l6yBgpeHwVV6ImpsDnxJpDJrHqgiaHTPBxktsCstHWM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=mNCoLNgCTVYbJPWt59hHrWF5lVHLYzF86W9qUkBiNQAWUgC0DlWhugCSVk0JspUzP
+         4898mvKMggnFb6qJuvTFxTJqYxUimdEax6RCm7NqzzW65vYIFPPOwGEzNotspXqw6i
+         Dg/moxK07MLe2p9J0d1bt5Ru4Hb3tSi8UEMkTVokCfh4jJVaQGf+D+XCa9Sck/TC1I
+         83TqdJwehtcDJ/sIt3oJ9h5KxRqFQ8gJVPuFsUSo6MdCNeZZeJoRyldxAY6IoDMbB9
+         gzkn2knKsxoawhvkiM+5APKGcl09KWHHNulp0G2Q2tNBxI1RwtRS10hkJDhx+QtAqC
+         agELs0ZbevKUQ==
+Received: from c-xd4ed8706.customers.hiper-net.dk ([212.237.135.6] helo=localhost.localdomain)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qUWVr-004DX6-K0;
+        Fri, 11 Aug 2023 19:05:27 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
         kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huang Shijie <shijie@os.amperecomputing.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>
+Subject: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+Date:   Fri, 11 Aug 2023 19:05:20 +0100
+Message-Id: <20230811180520.131727-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 212.237.135.6
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, shijie@os.amperecomputing.com, mark.rutland@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 11, 2023, Amaan Cheval wrote:
-> > Since it sounds like you can test with a custom kernel, try running with this
-> > patch and then enable the kvm_page_fault tracepoint when a vCPU gets
-> > stuck.  The below expands said tracepoint to capture information about
-> > mmu_notifiers and memslots generation.  With luck, it will reveal a smoking
-> > gun.
-> 
-> Thanks for the patch there. We tried migrating a locked up guest to a host with
-> this modified kernel twice (logs below). The guest "fixed itself" post
-> migration, so the results may not have captured the "problematic" kind of
-> page-fault, but here they are.
+Huang Shijie reports that, when profiling a guest from the host
+with a number of events that exceeds the number of available
+counters, the reported counts are wildly inaccurate. Without
+the counter oversubscription, the reported counts are correct.
 
-The traces need to be captured from the host where a vCPU is stuck.
+Their investigation indicates that upon counter rotation (which
+takes place on the back of a timer interrupt), we fail to
+re-apply the guest EL0 enabling, leading to the counting of host
+events instead of guest events.
 
-> Complete logs of kvm_page_fault tracepoint events, starting just before the
-> migration (with 0 guests before the migration, so the first logs should be of
-> the problematic guest) as it resolves the lockup:
-> 
-> 1. https://transfer.sh/QjB3MjeBqh/trace-kvm-kpf2.log
-> 2. https://transfer.sh/wEFQm4hLHs/trace-kvm-pf.log
-> 
-> Truncated logs of `trace-cmd record -e kvm -e kvmmmu` in case context helps:
-> 
-> 1. https://transfer.sh/FoFsNoFQCP/trace-kvm2.log
-> 2. https://transfer.sh/LBFJryOfu7/trace-kvm.log
-> 
-> Note that for migration #2 in both respectively above (trace-kvm-pf.log and
-> trace-kvm.log), we didn't confirm that the guest was locked up before migration
-> mistakenly. It most likely was but in case trace #2 doesn't present the same
-> symptoms, that's why.
-> 
-> Off an uneducated glance, it seems like `in_prog = 0x1` at least once for every
-> `seq` / kvm_page_fault that seems to be "looping" and staying unresolved -
+In order to solve this, add yet another hook between the host PMU
+driver and KVM, re-applying the guest EL0 configuration if the
+right conditions apply (the host is VHE, we are in interrupt
+context, and we interrupted a running vcpu). This triggers a new
+vcpu request which will apply the correct configuration on guest
+reentry.
 
-This is completely expected.   The "in_prog" thing is just saying that a vCPU
-took a fault while there was an mmu_notifier event in-progress.
+With this, we have the correct counts, even when the counters are
+oversubscribed.
 
-> indicating a lock contention, perhaps, in trying to invalidate/read/write the
-> same page range?
+Reported-by: Huang Shijie <shijie@os.amperecomputing.com>
+Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Link: https://lore.kernel.org/r/20230809013953.7692-1-shijie@os.amperecomputing.com
+---
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/arm.c              |  3 +++
+ arch/arm64/kvm/pmu.c              | 18 ++++++++++++++++++
+ drivers/perf/arm_pmuv3.c          |  2 ++
+ include/kvm/arm_pmu.h             |  2 ++
+ 5 files changed, 26 insertions(+)
 
-No, just a collision between the primary MMU invalidating something, e.g. to move
-a page or do KSM stuff, and a vCPU accessing the page in question.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d3dd05bbfe23..553040e0e375 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -49,6 +49,7 @@
+ #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
+ #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
+ #define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
++#define KVM_REQ_RESYNC_PMU_EL0	KVM_ARCH_REQ(7)
+ 
+ #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+ 				     KVM_DIRTY_LOG_INITIALLY_SET)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 72dc53a75d1c..978b0411082f 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -803,6 +803,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 			kvm_pmu_handle_pmcr(vcpu,
+ 					    __vcpu_sys_reg(vcpu, PMCR_EL0));
+ 
++		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
++			kvm_vcpu_pmu_restore_guest(vcpu);
++
+ 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+ 			return kvm_vcpu_suspend(vcpu);
+ 
+diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+index 121f1a14c829..0eea225fd09a 100644
+--- a/arch/arm64/kvm/pmu.c
++++ b/arch/arm64/kvm/pmu.c
+@@ -236,3 +236,21 @@ bool kvm_set_pmuserenr(u64 val)
+ 	ctxt_sys_reg(hctxt, PMUSERENR_EL0) = val;
+ 	return true;
+ }
++
++/*
++ * If we interrupted the guest to update the host PMU context, make
++ * sure we re-apply the guest EL0 state.
++ */
++void kvm_vcpu_pmu_resync_el0(void)
++{
++	struct kvm_vcpu *vcpu;
++
++	if (!has_vhe() || !in_interrupt())
++		return;
++
++	vcpu = kvm_get_running_vcpu();
++	if (!vcpu)
++		return;
++
++	kvm_make_request(KVM_REQ_RESYNC_PMU_EL0, vcpu);
++}
+diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+index 08b3a1bf0ef6..6a3d8176f54a 100644
+--- a/drivers/perf/arm_pmuv3.c
++++ b/drivers/perf/arm_pmuv3.c
+@@ -772,6 +772,8 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+ 
+ 	/* Enable all counters */
+ 	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
++
++	kvm_vcpu_pmu_resync_el0();
+ }
+ 
+ static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 847da6fc2713..3a8a70a60794 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -74,6 +74,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ struct kvm_pmu_events *kvm_get_pmu_events(void);
+ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
++void kvm_vcpu_pmu_resync_el0(void);
+ 
+ #define kvm_vcpu_has_pmu(vcpu)					\
+ 	(test_bit(KVM_ARM_VCPU_PMU_V3, (vcpu)->arch.features))
+@@ -171,6 +172,7 @@ static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
+ {
+ 	return 0;
+ }
++static inline void kvm_vcpu_pmu_resync_el0(void) {}
+ 
+ #endif
+ 
+-- 
+2.39.2
 
-> We do know this issue _occurs_ as late as 6.1.38 at least (i.e. hosts running
-> 6.1.38 have had guests lockup - we don't have hosts on more recent kernels, so
-> this isn't proof that it's been fixed since then, nor is migration proof of
-> that, IMO).
-
-Note, if my hunch is correct, it's the act of migrating to a different *host* that
-resolves the problem, not the fact that the migration is to a different kernel.
-E.g. I would expect that migrating to the exact same kernel would still unstick
-the vCPU.
-
-What I suspect is happening is that the in-progress count gets left high, e.g.
-because of a start() without a paired end(), and that causes KVM to refuse to
-install mappings for the affected range of guest memory.  Or possibly that the
-problematic host is generating an absolutely massive storm of invalidations and
-unintentionally DoS's the guest.
-
-Either way, migrating the VM to a new host and thus a new KVM instance essentially
-resets all of that metadata and allows KVM to fault-in pages and establish mappings.
-
-Actually, one thing you could try to unstick a VM would be to do an intra-host
-migration, i.e. migrate it to a new KVM instance on the same host.  If that "fixes"
-the guest, then the bug is likely an mmu_notifier counting bug and not an
-invalidation storm.
-
-But the easiest thing would be to catch a host in the act, i.e. capture traces
-with my debug patch from a host with a stuck vCPU.
