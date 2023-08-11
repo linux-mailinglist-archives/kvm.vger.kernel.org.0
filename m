@@ -2,256 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5540D77964C
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:40:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2713D77965F
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234340AbjHKRke (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 13:40:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39020 "EHLO
+        id S236906AbjHKRoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 13:44:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236789AbjHKRkd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 13:40:33 -0400
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC9A30DE
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:40:32 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-5607cdb0959so1518431eaf.2
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:40:32 -0700 (PDT)
+        with ESMTP id S236573AbjHKRoO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 13:44:14 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45F57106
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:44:14 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d67a458ff66so495827276.3
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691775632; x=1692380432;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dOtlYSZgeiijyItPMeigs6OhNr2NGQsx1KFHsLqIaG8=;
-        b=27O3stW8bCTVVB2vY0F+yB33b4/PAyJkPwBMgjCfVCsH7OkVsdlXWAPV+RVKqyL8fm
-         qOYghNr3xuGXJQ534skcPYijnybI2FR4cp3uP3RlS6jt0Q9jZZqrMXVOiDwyhrxgiElG
-         EpUTrYZ6ZQf0PtJpZMsMV3OqmxnZbyaE35mb2qIUY95ACmhNEt0j/fofKOqXuY7H5DJp
-         yX6gmfSeDXTf6Vu+UMQW2R1d3smSZFhd6mDhCUcr1aFEBuqU8Rgm0y9vfvm0xWm4hkb2
-         wme+/i16iR686y8jWiQHq9qHYOyNJp9x+SlUgwoqomCnJsQRzxAcBVJj1IxwT2X1Jg6l
-         qrSw==
+        d=google.com; s=20221208; t=1691775853; x=1692380653;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y5tf/etP9591sBoXXP0u0lhmE2sGhQYCIj4rXej+PgY=;
+        b=z4avZMYBxF/USDP2G14KA+P8N8yreov1u2JOHwfc1TVZdl6Iz+YTKH19wDx7mUMq9M
+         o4u6qon1QiMk8DVxh93qeN2Mz6fZGsUFtzOg33bB4Mo7KFsOypRjJRdzz9Y8WFCiY85q
+         br+fPgBO/on1YU5soxnymBtm9OPZyICHaFKZfYSg9Ropko2mo0wKLVwIok1lVrWFw51i
+         jjhtl/HK+nEz+jNhJe7imTF+VBA6+NGFZjFm7+hHqXCkfP3+rYY1oaYSypJ0v6009kFT
+         lq7bEwknPOhWjDhET6YMFrJ/3n1YTZ5hf1bP/IHZB/5/XDyHPzuDGnqfF1kEhe1cc6AD
+         1nfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691775632; x=1692380432;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dOtlYSZgeiijyItPMeigs6OhNr2NGQsx1KFHsLqIaG8=;
-        b=eEr6BTjdAzJknvfFVrTiMR251xbj35xObm92iTg+s0cMC2R0+KJwhPv9x1awviIVkp
-         Z4gv1Yf7Gt2pA0b0najsEoYwVLKT62hUur03b51kkY5b8aJSyEDM87DSZoMRrOVrPtkX
-         //kq6EME+jIwS0xfivRc8O277lez5nQtggtbdMoy60/mkNy0wmGsLDQKpgQt3mA1SFIp
-         w+MTMrXni+8fN++TCtHX97lh0bS1YiEEJFkaLNZdW2+uwYMM1BXm3SPZVekphsAy7iC2
-         8foSjgzQNYs3rBa99zyGxJ9tipstTMRFOQVxRfTXMdg1CpKJdYxshHZbU4MoP6Y32w2C
-         HwoA==
-X-Gm-Message-State: AOJu0YxGC/sQIrWQZaLtlOEv2m7AEUnrPh9Q2RM7VdbZFyabDNlboe1q
-        +UlmQ99gBFghOGOwDG80knQeQqgPOgSfrCByMSOcEg==
-X-Google-Smtp-Source: AGHT+IGrPdqjjmuzKKjgmseqrlaiV6HLzrmiZwW4eAv/hrhZ5H8Pg3Oq2tlW75x2GsrvU4lQHJTwZcgbfu7rWqAH+vc=
-X-Received: by 2002:a4a:8002:0:b0:566:fd3b:4329 with SMTP id
- x2-20020a4a8002000000b00566fd3b4329mr1441317oof.7.1691775631786; Fri, 11 Aug
- 2023 10:40:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-14-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-14-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Fri, 11 Aug 2023 10:40:20 -0700
-Message-ID: <CAAdAUtgpd=nBz41Ug8Z-bt2riehBa3R=THop0vjXpc0oAzQntw@mail.gmail.com>
-Subject: Re: [PATCH v3 13/27] KVM: arm64: Restructure FGT register switching
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20221208; t=1691775853; x=1692380653;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=y5tf/etP9591sBoXXP0u0lhmE2sGhQYCIj4rXej+PgY=;
+        b=TIw/RQbbPhdFxTiFpdH/WmGka1ss9Vue9MrcD5jRDFiHHfi2t4CPvNf8NtE2i5f8uu
+         O22ip7f9u/x2R9faPJZHBSO8BZJ8oNjknQns0P0GoKl5sbR8Xr/f0QHHI0gZ/DlKmAYe
+         vD2sl25RUG7LPLFTF04jK+8OOHwDZi/GrCgKbInmltwXXCYb4EYDeQVBc/mu0+JEyF7O
+         fgpplDd2KDJtbBoTdxNJOZN+Z+AbyXASXIwPPiAtCVDa7vwb58vOLF0g4UiMAjF0aLXU
+         ZmhxLy+NV5jQrxSU3HJvM7odx0PUbijImYf1cL5aBTVYpqrdOp7Tlg17FAlUefI3DmGw
+         ZPSg==
+X-Gm-Message-State: AOJu0YxN6+zXnb81DNYFEpETkA8X+U189WcOcHKY6FcODvCdEac6nMk/
+        OdPR8e6QB/Hj1DEhJs3S9GcCxn3KM/o=
+X-Google-Smtp-Source: AGHT+IFlh+eXwF8rMcD2luIRCX1nl8Idt0F+6stO6hsWWfidj415wHUgqoJc8kVAwNGB8y2mQW1tGjk2lPA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:7443:0:b0:d20:7752:e384 with SMTP id
+ p64-20020a257443000000b00d207752e384mr41859ybc.3.1691775853469; Fri, 11 Aug
+ 2023 10:44:13 -0700 (PDT)
+Date:   Fri, 11 Aug 2023 10:44:11 -0700
+In-Reply-To: <CAGtprH9YE50RtqhW-U+wK0Vv6aKfqqtOPn8q4s8or=UZwPXZoA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230718234512.1690985-13-seanjc@google.com> <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
+ <ZNKv9ul2I7A4V7IF@google.com> <CAGtprH9YE50RtqhW-U+wK0Vv6aKfqqtOPn8q4s8or=UZwPXZoA@mail.gmail.com>
+Message-ID: <ZNZza/emWldkJC6X@google.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     Ackerley Tng <ackerleytng@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, oliver.upton@linux.dev, chenhuacai@kernel.org,
+        mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
+        palmer@dabbelt.com, aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        mail@maciej.szmigiero.name, vbabka@suse.cz, david@redhat.com,
+        qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com,
+        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
+        kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Thu, Aug 10, 2023, Vishal Annapurve wrote:
+> On Tue, Aug 8, 2023 at 2:13=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > ...
+>=20
+> > > + When binding a memslot to the file, if a kvm pointer exists, it mus=
+t
+> > >   be the same kvm as the one in this binding
+> > > + When the binding to the last memslot is removed from a file, NULL t=
+he
+> > >   kvm pointer.
+> >
+> > Nullifying the KVM pointer isn't sufficient, because without additional=
+ actions
+> > userspace could extract data from a VM by deleting its memslots and the=
+n binding
+> > the guest_memfd to an attacker controlled VM.  Or more likely with TDX =
+and SNP,
+> > induce badness by coercing KVM into mapping memory into a guest with th=
+e wrong
+> > ASID/HKID.
+> >
+>=20
+> TDX/SNP have mechanisms i.e. PAMT/RMP tables to ensure that the same
+> memory is not assigned to two different VMs.
 
-On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
->
-> As we're about to majorly extend the handling of FGT registers,
-> restructure the code to actually save/restore the registers
-> as required. This is made easy thanks to the previous addition
-> of the EL2 registers, allowing us to use the host context for
-> this purpose.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 56 +++++++++++++------------
->  2 files changed, 50 insertions(+), 27 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kv=
-m_arm.h
-> index 028049b147df..85908aa18908 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -333,6 +333,27 @@
->                                  BIT(18) |              \
->                                  GENMASK(16, 15))
->
-> +/*
-> + * FGT register definitions
-> + *
-> + * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
-> + * We're not using the generated masks as they are usually ahead of
-> + * the published ARM ARM, which we use as a reference.
-> + *
-> + * Once we get to a point where the two describe the same thing, we'll
-> + * merge the definitions. One day.
-> + */
-> +#define __HFGRTR_EL2_RES0      (GENMASK(63, 56) | GENMASK(53, 51))
-> +#define __HFGRTR_EL2_MASK      GENMASK(49, 0)
-> +#define __HFGRTR_EL2_nMASK     (GENMASK(55, 54) | BIT(50))
-> +
-> +#define __HFGWTR_EL2_RES0      (GENMASK(63, 56) | GENMASK(53, 51) |    \
-> +                                BIT(46) | BIT(42) | BIT(40) | BIT(28) | =
-\
-> +                                GENMASK(26, 25) | BIT(21) | BIT(18) |  \
-> +                                GENMASK(15, 14) | GENMASK(10, 9) | BIT(2=
-))
-> +#define __HFGWTR_EL2_MASK      GENMASK(49, 0)
-> +#define __HFGWTR_EL2_nMASK     (GENMASK(55, 54) | BIT(50))
-> +
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK     (~UL(0xf))
->  /*
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp=
-/include/hyp/switch.h
-> index 4bddb8541bec..e096b16e85fd 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct k=
-vm_vcpu *vcpu)
->         }
->  }
->
-> -static inline bool __hfgxtr_traps_required(void)
-> -{
-> -       if (cpus_have_final_cap(ARM64_SME))
-> -               return true;
-> -
-> -       if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> -               return true;
->
-> -       return false;
-> -}
->
-> -static inline void __activate_traps_hfgxtr(void)
-> +static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  {
-> +       struct kvm_cpu_context *hctxt =3D &this_cpu_ptr(&kvm_host_data)->=
-host_ctxt;
->         u64 r_clr =3D 0, w_clr =3D 0, r_set =3D 0, w_set =3D 0, tmp;
-> +       u64 r_val, w_val;
-> +
-> +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> +               return;
-> +
-> +       ctxt_sys_reg(hctxt, HFGRTR_EL2) =3D read_sysreg_s(SYS_HFGRTR_EL2)=
-;
-> +       ctxt_sys_reg(hctxt, HFGWTR_EL2) =3D read_sysreg_s(SYS_HFGWTR_EL2)=
-;
->
->         if (cpus_have_final_cap(ARM64_SME)) {
->                 tmp =3D HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_E=
-L0_MASK;
-> @@ -98,26 +97,31 @@ static inline void __activate_traps_hfgxtr(void)
->         if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
->                 w_set |=3D HFGxTR_EL2_TCR_EL1_MASK;
->
-> -       sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> -       sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
-> +
-> +       /* The default is not to trap anything but ACCDATA_EL1 */
-> +       r_val =3D __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-> +       r_val |=3D r_set;
-> +       r_val &=3D ~r_clr;
-> +
-> +       w_val =3D __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
-> +       w_val |=3D w_set;
-> +       w_val &=3D ~w_clr;
-> +
-> +       write_sysreg_s(r_val, SYS_HFGRTR_EL2);
-> +       write_sysreg_s(w_val, SYS_HFGWTR_EL2);
->  }
->
-> -static inline void __deactivate_traps_hfgxtr(void)
-> +static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
->  {
-> -       u64 r_clr =3D 0, w_clr =3D 0, r_set =3D 0, w_set =3D 0, tmp;
-> +       struct kvm_cpu_context *hctxt =3D &this_cpu_ptr(&kvm_host_data)->=
-host_ctxt;
->
-> -       if (cpus_have_final_cap(ARM64_SME)) {
-> -               tmp =3D HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_E=
-L0_MASK;
-> +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
-> +               return;
->
-> -               r_set |=3D tmp;
-> -               w_set |=3D tmp;
-> -       }
-> +       write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
-> +       write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
->
-> -       if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
-> -               w_clr |=3D HFGxTR_EL2_TCR_EL1_MASK;
->
-> -       sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
-> -       sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
->  }
->
->  static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
-> @@ -145,8 +149,7 @@ static inline void __activate_traps_common(struct kvm=
-_vcpu *vcpu)
->         vcpu->arch.mdcr_el2_host =3D read_sysreg(mdcr_el2);
->         write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
->
-> -       if (__hfgxtr_traps_required())
-> -               __activate_traps_hfgxtr();
-> +       __activate_traps_hfgxtr(vcpu);
->  }
->
->  static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
-> @@ -162,8 +165,7 @@ static inline void __deactivate_traps_common(struct k=
-vm_vcpu *vcpu)
->                 vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
->         }
->
-> -       if (__hfgxtr_traps_required())
-> -               __deactivate_traps_hfgxtr();
-> +       __deactivate_traps_hfgxtr(vcpu);
->  }
->
->  static inline void ___activate_traps(struct kvm_vcpu *vcpu)
-> --
-> 2.34.1
->
->
+One of the main reasons we pivoted away from using a flag in "struct page" =
+to
+indicate that a page was private was so that KVM could enforce 1:1 VM:page =
+ownership
+*without* relying on hardware.
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+And FWIW, the PAMT provides no protection in this specific case because KVM=
+ does
+TDH.MEM.PAGE.REMOVE when zapping S-EPT entries, and that marks the page cle=
+ar in
+the PAMT.  The danger there is that physical memory is still encrypted with=
+ the
+guest's HKID, and so mapping the memory into a different VM, which might no=
+t be
+a TDX guest!, could lead to corruption and/or poison #MCs.
 
-Jing
+The HKID issues wouldn't be a problem if v15 is merged as-is, because zappi=
+ng
+S-EPT entries also fully purges and reclaims the page, but as we discussed =
+in
+one of the many threads, reclaiming physical memory should be tied to the i=
+node,
+i.e. to memory truly being freed, and not to S-EPTs being zapped.  And ther=
+e is
+a very good reason for wanting to do that, as it allows KVM to do the expen=
+sive
+cache flush + clear outside of mmu_lock.
+
+> Deleting memslots should also clear out the contents of the memory as the=
+ EPT
+> tables will be zapped in the process
+
+No, deleting a memslot should not clear memory.  As I said in my previous r=
+esponse,
+the fact that zapping S-EPT entries is destructive is a limitiation of TDX,=
+ not a
+feature we want to apply to other VM types.  And that's not even a fundamen=
+tal
+property of TDX, e.g. TDX could remove the limitation, at the cost of consu=
+ming
+quite a bit more memory, by tracking the exact owner by HKID in the PAMT an=
+d
+decoupling S-EPT entries from page ownership.
+
+Or in theory, KVM could workaround the limitation by only doing TDH.MEM.RAN=
+GE.BLOCK
+when zapping S-EPTs.  Hmm, that might actually be worth looking at.
+
+> and the host will reclaim the memory.
+
+There are no guarantees that the host will reclaim the memory.  E.g. QEMU w=
+ill
+delete and re-create memslots for "regular" VMs when emulating option ROMs.=
+  Even
+if that use case is nonsensical for confidential VMs (and it probably is no=
+nsensical),
+I don't want to define KVM's ABI based on what we *think* userspace will do=
+.
