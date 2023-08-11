@@ -2,153 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38FAE778FA7
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 14:38:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E348F7790B7
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 15:27:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbjHKMiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 08:38:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47250 "EHLO
+        id S234684AbjHKN1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 09:27:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjHKMiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 08:38:08 -0400
-Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B24EE65
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 05:38:06 -0700 (PDT)
-Received: by mail-vk1-xa2e.google.com with SMTP id 71dfb90a1353d-4871396a94fso760907e0c.1
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 05:38:06 -0700 (PDT)
+        with ESMTP id S229898AbjHKN1O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 09:27:14 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2828A125
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 06:27:13 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bdb801c667so4596295ad.1
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 06:27:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691757485; x=1692362285;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EvRsZaCvxzdM5qQ74utVXRoJOdLTQO1MpcAYCJUSp2s=;
-        b=RK9AT6X9/XmZS8WZvd3n2tAOdWTwvHJu+/X1uxCzjSC5LTa14KPrZSoSIKIs95nlux
-         nhrgZeg5ahuLbvxanmOe+kMLx9sQ3jV0L4UMMduN7KqWkAYPWnCauONOCNHBQtzTDrA+
-         vK9Olg9A21WrSnCtVwYtYUW1klNX4A0aeQFyrTQZrV4z+a0GkNNyURzOERpm1kyYN5RK
-         bq03bySby1MLn6X6j8wKf9qRuRJI7tPQFkpVDeSO+NEDOgmoHQbknCzWnx89ZZZQT4GA
-         zAJJjP1En1KDwwTpD/CeCwGYgtnFV8maNTXTNmDftRm5XJ0CeJAZ1mbHtmKDdkvL25tp
-         1noQ==
+        d=ziepe.ca; s=google; t=1691760432; x=1692365232;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7v0CVgY9abtWYoDC5bZkBPB2nRR3jrM6lzMQZBvyuU=;
+        b=d1FmtARKaIJHCFVHZhIvjyWeh9YdGWhpXHg47bzfdOXmJHlxrslCa7zHg+/JD34q0e
+         E9/3cip0qUiYQyaSEfw8LW1KYUNSfz7+aubYzAfkCKxHzXz1aD/zcjb2url7DUGw3QFK
+         kXh/FNJld8j2cKTYqxjXigAi37lX18p01LLlG5uqSynfTOhbWhbZ0fNQFC7p238++VRQ
+         Zs3Uxt3iiHDirlnfq3y2keMcgFiobHWlXmeW33RUglZ5pN91g1cbMZjZhs4rHwsn9r1M
+         9rdF/SAB3CLwR+1IA27XUCeOTCmo4PB5RcAUhTvJUQJ7k0WobwUKOsY994haEl65WxVD
+         I38g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691757485; x=1692362285;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EvRsZaCvxzdM5qQ74utVXRoJOdLTQO1MpcAYCJUSp2s=;
-        b=XkZfuHZjYqIFRagl/5VKNQ0vS/8OW6H7kaQhjBRKHRHC/mov2gDnr3h3CweZqu3gle
-         7ytTvla9247srQbCWT4UlgsOiSLE5//n8pM7czEjL4CcAr5fYVZOUJOcytWtnGcfvf+A
-         8TlkuZFvr4YirWcSTFIvosmd0QDYnXS1qmaemjwCqBz4AnT/9RConW1WReuXiPLDovSi
-         waqal6y6voX+ufc51mUKaGkc7d1QsvL2yEAXc9Vod4UcKL07u61A4RUlOV5PYSow4mMK
-         CKqz7Bm5q3BJZqf8zAxQuFNlQe3tl28KYza3D/N+G11z6PZ9+c/PKEBc/gha7hBURdqS
-         dvuA==
-X-Gm-Message-State: AOJu0Yz1rn9k72FHpbymsAASm1YYNpjHlZuGg4mJUeOeFw39aRkkcemI
-        QfShDX9RO+KQZDmZa3ikbU3FpiEnOtPNlwTPQBsvVlbs82M=
-X-Google-Smtp-Source: AGHT+IGXI3c/JO5pz+pmQySybtKvZ/10uS89VksQh1myjVDi8TVMkg1NOpR8fMvhtKiyxZ/y6/ejA9soc0E5WxgCqv8=
-X-Received: by 2002:a1f:bd49:0:b0:471:1785:e838 with SMTP id
- n70-20020a1fbd49000000b004711785e838mr2099256vkf.2.1691757485498; Fri, 11 Aug
- 2023 05:38:05 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691760432; x=1692365232;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F7v0CVgY9abtWYoDC5bZkBPB2nRR3jrM6lzMQZBvyuU=;
+        b=eQhqBYPGHeFlRQ9VwShQU3VpmUTlBrJYY2ntirzQjCsyFuVC/nD6E9OZpdmoJHTFP4
+         yx5adPoc3fOtlOBgqRdBzqtjD8ZKdLnHXra7ItsCOT1Agy7QI2sbKaitafkCEk+APJcs
+         l1BIXr/nEP3ys/7ysLToCj5RCmAtK+3m6bCtYRYK11hC9GGkCEj6GJQJVVydYBDCsXp1
+         HZArpG7jlZ2mgjf2mtteh3I5HHrrCRsHxYp+eEXGyKIvhq7GJLb4cK1pIx8J1usm1uEZ
+         BhqKJDPoUlMPR8G+YnRgbsI2AHousQqbMlI/yHdYsu1SvgnbFaGzJx/X/erOVEjP2j/3
+         wwbA==
+X-Gm-Message-State: AOJu0YxcGnYedmANZHPdRv08HQFnrJYYj5LR64PyGnTVrcPhENtTmAUa
+        IpBqpe9nohtLp4jYZpyg7ZzemQ==
+X-Google-Smtp-Source: AGHT+IHjQ/YmFnNuEbJzT7wjHKlxU7TvjYa59TJH7k5fgJjND7DThiWpL/8pFybIFQzN1/kVVWlFlQ==
+X-Received: by 2002:a17:902:f551:b0:1bb:97d0:c628 with SMTP id h17-20020a170902f55100b001bb97d0c628mr2378919plf.31.1691760432689;
+        Fri, 11 Aug 2023 06:27:12 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id s13-20020a170902988d00b001bdc664ecd3sm19894plp.307.2023.08.11.06.27.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 06:27:12 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qUSAY-005R9K-MW;
+        Fri, 11 Aug 2023 10:27:10 -0300
+Date:   Fri, 11 Aug 2023 10:27:10 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Baolu Lu <baolu.lu@linux.intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 08/12] iommu: Prepare for separating SVA and IOPF
+Message-ID: <ZNY3LuW+FMAhK2xf@ziepe.ca>
+References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
+ <20230727054837.147050-9-baolu.lu@linux.intel.com>
+ <BN9PR11MB52769D22490BB09BB25E0C2E8C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNKMz04uhzL9T7ya@ziepe.ca>
+ <BN9PR11MB527629949E7D44BED080400C8C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <0771c28d-1b31-003e-7659-4f3f3cbf5546@linux.intel.com>
+ <BN9PR11MB527686C925E33E0DCDF261CB8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNUUjXMrLyU3g5KM@ziepe.ca>
+ <f1dbfb6a-5a53-f440-5d3a-25772c67547f@linux.intel.com>
 MIME-Version: 1.0
-References: <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
- <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
- <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
- <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
- <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
- <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com>
-In-Reply-To: <ZNV5rrq1Ja7QgES5@google.com>
-From:   Amaan Cheval <amaan.cheval@gmail.com>
-Date:   Fri, 11 Aug 2023 18:07:53 +0530
-Message-ID: <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Eric Wheeler <kvm@lists.ewheeler.net>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1dbfb6a-5a53-f440-5d3a-25772c67547f@linux.intel.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> There's a pretty big list, see the "failure" paths of do_numa_page() and
-> migrate_misplaced_page().
+On Fri, Aug 11, 2023 at 09:53:41AM +0800, Baolu Lu wrote:
+> On 2023/8/11 0:47, Jason Gunthorpe wrote:
+> > On Thu, Aug 10, 2023 at 02:35:40AM +0000, Tian, Kevin wrote:
+> > > > From: Baolu Lu<baolu.lu@linux.intel.com>
+> > > > Sent: Wednesday, August 9, 2023 6:41 PM
+> > > > 
+> > > > On 2023/8/9 8:02, Tian, Kevin wrote:
+> > > > > > From: Jason Gunthorpe<jgg@ziepe.ca>
+> > > > > > Sent: Wednesday, August 9, 2023 2:43 AM
+> > > > > > 
+> > > > > > On Thu, Aug 03, 2023 at 08:16:47AM +0000, Tian, Kevin wrote:
+> > > > > > 
+> > > > > > > Is there plan to introduce further error in the future? otherwise this
+> > > > should
+> > > > > > > be void.
+> > > > > > > 
+> > > > > > > btw the work queue is only for sva. If there is no other caller this can be
+> > > > > > > just kept in iommu-sva.c. No need to create a helper.
+> > > > > > I think more than just SVA will need a work queue context to process
+> > > > > > their faults.
+> > > > > > 
+> > > > > then this series needs more work. Currently the abstraction doesn't
+> > > > > include workqueue in the common fault reporting layer.
+> > > > Do you mind elaborate a bit here? workqueue is a basic infrastructure in
+> > > > the fault handling framework, but it lets the consumers choose to use
+> > > > it, or not to.
+> > > > 
+> > > My understanding of Jason's comment was to make the workqueue the
+> > > default path instead of being opted by the consumer.. that is my 1st
+> > > impression but might be wrong...
+> > Yeah, that is one path. Do we have anyone that uses this that doesn't
+> > want the WQ? (actually who even uses this besides SVA?)
+> 
+> I am still confused. When we forward iopf's to user space through the
+> iommufd, we don't need to schedule a WQ, right? Or I misunderstood
+> here?
 
-Gotcha, thank you!
+Yes, that could be true, iommufd could just queue it from the
+interrupt context and trigger a wakeup.
 
-...
+But other iommufd modes would want to invoke hmm_range_fault() which
+would need the work queue.
 
-> Since it sounds like you can test with a custom kernel, try running with this
-> patch and then enable the kvm_page_fault tracepoint when a vCPU gets
-> stuck.  The below expands said tracepoint to capture information about
-> mmu_notifiers and memslots generation.  With luck, it will reveal a smoking
-> gun.
-
-Thanks for the patch there. We tried migrating a locked up guest to a host with
-this modified kernel twice (logs below). The guest "fixed itself" post
-migration, so the results may not have captured the "problematic" kind of
-page-fault, but here they are.
-
-Complete logs of kvm_page_fault tracepoint events, starting just before the
-migration (with 0 guests before the migration, so the first logs should be of
-the problematic guest) as it resolves the lockup:
-
-1. https://transfer.sh/QjB3MjeBqh/trace-kvm-kpf2.log
-2. https://transfer.sh/wEFQm4hLHs/trace-kvm-pf.log
-
-Truncated logs of `trace-cmd record -e kvm -e kvmmmu` in case context helps:
-
-1. https://transfer.sh/FoFsNoFQCP/trace-kvm2.log
-2. https://transfer.sh/LBFJryOfu7/trace-kvm.log
-
-Note that for migration #2 in both respectively above (trace-kvm-pf.log and
-trace-kvm.log), we didn't confirm that the guest was locked up before migration
-mistakenly. It most likely was but in case trace #2 doesn't present the same
-symptoms, that's why.
-
-Off an uneducated glance, it seems like `in_prog = 0x1` at least once for every
-`seq` / kvm_page_fault that seems to be "looping" and staying unresolved -
-indicating a lock contention, perhaps, in trying to invalidate/read/write the
-same page range?
-
-Any leads on where in the source code I could look to understand how that might
-happen?
-
-----
-
-@Eric
-
-> Does the VM make progress even if is migrated to a kernel that presents the
-> bug?
-
-We're unsure which kernel versions do present the bug, so it's hard to say.
-We've definitely seen it occur on kernels 5.15.49 to 6.1.38, but beyond that, we
-don't know for certain. (Potentially as early as 5.10.103, though!)
-
-> What was kernel version being migrated from and to?
-
-The live migration where the issue was resolved by migrating, was from 6.1.12 to
-6.5.0-rc2.
-
-The traces above are for this live migration (source 6.1.x to target host
-6.5.0-rc2).
-
-Another migration was from 6.1.x to 6.1.39 (not for these traces). All of these
-times the guest resumed/made progress post-migration.
-
-> For example, was it from a >5.19 kernel to something earlier than 5.19?
-
-No, we haven't tried migrating to < 5.19 yet - we have very few hosts running
-kernels that old.
-
-> For example, if the hung VM remains stuck after migrating to a >5.19 kernel
-> but _not_ to a <5.19 kernel, then maybe bisect is an option.
-
-From what Sean and I discussed above, we suspect that the VM remaining stuck is
-likely due to the kernel softlock'ing from stalling in the kernel due to the
-original bug.
-
-We do know this issue _occurs_ as late as 6.1.38 at least (i.e. hosts running
-6.1.38 have had guests lockup - we don't have hosts on more recent kernels, so
-this isn't proof that it's been fixed since then, nor is migration proof of
-that, IMO).
+Jason
