@@ -2,99 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C1E87791E0
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 16:30:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BDCBD7792CA
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 17:19:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235266AbjHKOaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 10:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51306 "EHLO
+        id S236470AbjHKPTQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 11:19:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbjHKOa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 10:30:29 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 647FE2D79
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 07:30:28 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d6280158f50so2169137276.3
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 07:30:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691764227; x=1692369027;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d+GMD8mZlyVfifzv/ndRqn1h4dvoCt7rexnp0s7wl+8=;
-        b=hBVWGZz8qhFlB4iGeCj2O9bRCIGDd8+iGa2V9DdR+8YSSuTq44QEMxH4UVb5z3KcGl
-         SvGCKaOPbr9W4BtIeqRv4WmD1287D/eAI+SkNlraRS+gpJImllMfuEjyLI2B6FtrEIw6
-         uF/7V19VRBhOKn16x5RklcaE2kTLEiuavBEa0CrfFx8kGMhqQR99O35J0JM8sngsUzBx
-         N6in0eb6zmIm0QIGytHJ0wg4CRF6TzQJLytnF9XO7OqGRnF4WfL0uI5tiNYPLpN4OLX5
-         +VEFVl4I1VL/pu8ijYAu1hUY8QpDz2DQouGaFH4FAqepCDE60kJ//RVJhjVcGY5DuDRp
-         UdEw==
+        with ESMTP id S236314AbjHKPTE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 11:19:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32FAD3A87
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:18:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691767099;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5jvk9gOBrnZNGwTR3Eif+kJzbn0hYBEZnzfA7q6zH3g=;
+        b=T37hwenUB71khBfk3R4xOd5hQxIHh9/A5XyYJHcm1YZaCzksuDgQ+DQQl1J9/N72ZT1Bjt
+        QvHrl0lIDAHjeBopfsXrNVsvKnCJgUEflpy+3MXtUh139bZpF/8C1nLiaJEb9WA6FwZ/+u
+        FRMWWmYikbXJ6CL4J+hvfZRKC7C+w7E=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-606-CObXSGaEMDeYWkxQUhSFAA-1; Fri, 11 Aug 2023 11:18:17 -0400
+X-MC-Unique: CObXSGaEMDeYWkxQUhSFAA-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-790af528c93so166762339f.2
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 08:18:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691764227; x=1692369027;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d+GMD8mZlyVfifzv/ndRqn1h4dvoCt7rexnp0s7wl+8=;
-        b=V4r55tSG6WhwByPEZAVLv78lVy5FPmP0kw/wKWWwDlLryjJj3qxeShLIJpcI+Fl766
-         HMw5D7jRSi5RSIefEOjtoBRcnvTLJk/qDfk7DXyWV27p6UDrAnTvSXz1wgKQxVAIm522
-         rJ9hwoof1YcsIPAby8uz8QQsP1xy81iJQbp+tQaVlAyv76IJU1JkpQHuAqgwEyVgpqY+
-         Y5Qk7A2H/sYpJGfsdyOp9jfZX2shTw7qZK665GkBE7gLuDAGv1W8Q7FOJQdN/f67d9fT
-         bmyVoLnwylNZs/hJVck18C6ikhIFtxDrpYLCNRHm6Eu2nNEpOXW6PH919BKTCzquzWKi
-         1Fmg==
-X-Gm-Message-State: AOJu0YxMb+WH5x5nYAMxw1HdFk3eAQiZkUhT9LJs4ELRUrN2mjcVAzff
-        meHqdC50hXSdeZajQoSo6iJSI/nCy8g=
-X-Google-Smtp-Source: AGHT+IE33lrnYvERPkhF79oAVBOVoEU3v59dJ2RthpMsPnbew0iZgxB0b5RWhHlOBnyqVfyaO4Aw4ONjGOs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:6854:0:b0:d05:7ba4:67f9 with SMTP id
- d81-20020a256854000000b00d057ba467f9mr32202ybc.3.1691764227710; Fri, 11 Aug
- 2023 07:30:27 -0700 (PDT)
-Date:   Fri, 11 Aug 2023 07:30:25 -0700
-In-Reply-To: <fed6f74a-244a-ce07-0018-e6c26f594dd3@amd.com>
-Mime-Version: 1.0
-References: <de474347-122d-54cd-eabf-9dcc95ab9eae@amd.com> <ZNVopRMWRfBjahB9@google.com>
- <fed6f74a-244a-ce07-0018-e6c26f594dd3@amd.com>
-Message-ID: <ZNZGAVMYOEIlBnrv@google.com>
-Subject: Re: next-20230809: kvm unittest fail: emulator
-From:   Sean Christopherson <seanjc@google.com>
-To:     Srikanth Aithal <sraithal@amd.com>
-Cc:     kvm@vger.kernel.org, linux-next@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1691767097; x=1692371897;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5jvk9gOBrnZNGwTR3Eif+kJzbn0hYBEZnzfA7q6zH3g=;
+        b=iLOWeYLyp0wT/oaAwNh1UMUxpD+8yLMGfmkcWMBdX6sGO9SKuO3FPI+cBRVaUSbhMm
+         iJv7bpSMtcZ94NHJC2RpJxx2XqojZdmP/Yma2kJ0BZQsahM7Tq4GUryyn2VNk4QPFOsD
+         KjCUNFVYEoh6VwywG3+d/a/7705Dy/AzFv5QCAXEVC/2NVjHXp/c9k2NKCHHgNaQRX0d
+         MFgnQimM1eIj+kPiddS2LksUnq6sSVMY2jZksUfTarOC8IW4AqMRuqUZwcYSLhJHxZg7
+         S6XHG59FDjZGLyluvu770Wx8T7wBv4ZWN6Ar37q/150AjlPBhucN/BzuBq9/3ECTvze1
+         JRlQ==
+X-Gm-Message-State: AOJu0Yx20zOWLYUoCdQhLgPRz1ZQYcUUNTmLTqrbzWd6S9Zvdcudn3jm
+        CDYlE4Qex+T0du0/GcyVvyHc1lPU7H0PTuqaLkj6DgzomVx213dGR+bm3sWZ5zQrW57F3JVbFXs
+        pDB8HdnM20Rvn
+X-Received: by 2002:a6b:e617:0:b0:787:6bd:e590 with SMTP id g23-20020a6be617000000b0078706bde590mr3051927ioh.3.1691767097169;
+        Fri, 11 Aug 2023 08:18:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFKw28KuDhVAyNPv6MlOEjB1eJ9SY9VxRRQMppZ4UgGp6JYUxVHXcfayh7m4Drb+Z4OuccpNw==
+X-Received: by 2002:a6b:e617:0:b0:787:6bd:e590 with SMTP id g23-20020a6be617000000b0078706bde590mr3051912ioh.3.1691767096942;
+        Fri, 11 Aug 2023 08:18:16 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id u12-20020a02cb8c000000b00430159b03f1sm1122994jap.93.2023.08.11.08.18.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 08:18:16 -0700 (PDT)
+Date:   Fri, 11 Aug 2023 09:18:14 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <diana.craciun@oss.nxp.com>
+Subject: Re: [PATCH -next] vfio/fsl-mc: use module_fsl_mc_driver() macro
+Message-ID: <20230811091814.1808a01a.alex.williamson@redhat.com>
+In-Reply-To: <20230811092911.894659-1-yangyingliang@huawei.com>
+References: <20230811092911.894659-1-yangyingliang@huawei.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 11, 2023, Srikanth Aithal wrote:
-> On 8/11/2023 4:15 AM, Sean Christopherson wrote:
-> > On Thu, Aug 10, 2023, Srikanth Aithal wrote:
-> > > Hello,
-> > > 
-> > > On linux-next 20230809 build kvm emulator unittest failed.
-> > > 
-> > > ===================
-> > > Recreation steps:
-> > > ===================
-> > > 
-> > > 1. git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-> > > 2. export QEMU=<location of QEMU binary> I used v8.0.2
-> > > 3. cd kvm-unit-tests/;./configure;make standalone;tests/emulator
-> > 
-> > What hardware are you running on?  I've tested on a variety of hardware, Intel
-> > and AMD, and haven't observed any problems.
-> I am running it on Dell PowerEdge r6515. Same tests were passing till
-> next-20230808.
+On Fri, 11 Aug 2023 17:29:11 +0800
+Yang Yingliang <yangyingliang@huawei.com> wrote:
 
-Ah, let me try an actual linux-next build (once I get the darn thing to compile).
-I was assuming I broke something in kvm-x86/next and so was testing that.  But I
-haven't pushed to kvm-x86/next since 08/03, so presumably the bug came in from
-somewhere else.
+> The driver init/exit() function don't do anything special, it
+> can use the module_fsl_mc_driver() macro to eliminate boilerplate
+> code.
+> 
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 14 +-------------
+>  1 file changed, 1 insertion(+), 13 deletions(-)
 
-Ugh, it's probably one of the recent mitigations.  Those things always break stuff
-due to getting thrown in without going through the usual channels.
+Your colleague submitted a nearly identical patch, but also removing
+the redundant module owner, 2 days ago:
 
-<time passes>
+https://lore.kernel.org/all/20230809131536.4021639-1-lizetao1@huawei.com/
 
-*sigh*  Yep.  Everything is hunky dory until I turn on CONFIG_CPU_SRSO.  I'll dig
-into it today.
+Thanks,
+Alex
+
+> 
+> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> index f2140e94d41e..8053f13c2be5 100644
+> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+> @@ -604,19 +604,7 @@ static struct fsl_mc_driver vfio_fsl_mc_driver = {
+>  	},
+>  	.driver_managed_dma = true,
+>  };
+> -
+> -static int __init vfio_fsl_mc_driver_init(void)
+> -{
+> -	return fsl_mc_driver_register(&vfio_fsl_mc_driver);
+> -}
+> -
+> -static void __exit vfio_fsl_mc_driver_exit(void)
+> -{
+> -	fsl_mc_driver_unregister(&vfio_fsl_mc_driver);
+> -}
+> -
+> -module_init(vfio_fsl_mc_driver_init);
+> -module_exit(vfio_fsl_mc_driver_exit);
+> +module_fsl_mc_driver(vfio_fsl_mc_driver);
+>  
+>  MODULE_LICENSE("Dual BSD/GPL");
+>  MODULE_DESCRIPTION("VFIO for FSL-MC devices - User Level meta-driver");
+
