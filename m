@@ -2,635 +2,349 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C3937788E0
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 10:24:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 893AB778944
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 10:53:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233981AbjHKIYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 04:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53592 "EHLO
+        id S234574AbjHKIxF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 04:53:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbjHKIYh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 04:24:37 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702082727;
-        Fri, 11 Aug 2023 01:24:36 -0700 (PDT)
+        with ESMTP id S234155AbjHKIxC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 04:53:02 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD6C9B;
+        Fri, 11 Aug 2023 01:53:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691742276; x=1723278276;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hunoZPyF1UuHXl0aPeu/n25+zNkrKtkZP3CSrhp4N34=;
-  b=IlcYmxAwcImjwIiRJY3Stc/tFNT2girOKX+dIAICcbGaYU7D1vcpQLuQ
-   UIIAgMM4VLrBGAgM3nd6sOc5uG6qB72xq0HU/d7UzWMub264OulzcEy0h
-   MJPSOp42phZ0hwW5nvyHHQtiPPkxHBEgDiGQaxuYj2vdZwbqpW9/Poy9M
-   q9weHbWvnQAYv23q2G0aJblebORPUizMOiQkwenyvHOVvk+s1m+MrX4Ls
-   yjHpL7AHRewafZKUuKfFqmtY/ZA/oafBhW+rGptjs1nL+Y16w5QEkF/7S
-   uAfFVWbF2rGl9hHVlHIDM/k73cxlTEXsQ0Cc6V/McY/yfG7laHwQz5NFj
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="351950693"
-X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
-   d="scan'208";a="351950693"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 01:24:35 -0700
+  t=1691743981; x=1723279981;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=gun4iSHHQkh2rLc/lY/yer1uEBIM9N4H06s1O5ecC0w=;
+  b=NKop7aaGS8ZXRtLDzfkECzF6Z9Jt41iZBYDFPuG/Nk7Pwno9r7HyCkHh
+   CN1+qZK3iwxrAlHh12awIk1Zxg73k4u3ocNk2T7cxp0yGVSJcKtEfLCDd
+   g6tMPA5e9BUcaUSuwX3OUYXGpO5FHwFVFX6z3fUAAlAudEID9q38N+oGN
+   lXcW7ATCiJivKjtpv6Sp3vYDQ9h5vQSc/mLD2sNAkyRzYMAntDdtO87+H
+   kQKwVonzoB3qIweVlGDm8OBG5hdIcFnR/Sa1WQV92UYQAd3A5kDEA61Tr
+   83pAAW+NsFuEh0vqYUzxxCx6WXa4oAR7DISbx3Wk9km2MzG4lIsUu+fSi
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="369102804"
+X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
+   d="scan'208";a="369102804"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 01:52:55 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="709459432"
-X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
-   d="scan'208";a="709459432"
-Received: from dmi-pnp-i7.sh.intel.com (HELO localhost) ([10.239.159.155])
-  by orsmga006.jf.intel.com with ESMTP; 11 Aug 2023 01:24:31 -0700
-Date:   Fri, 11 Aug 2023 16:30:57 +0800
-From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Roman Kagan <rkagan@amazon.de>, Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Like Xu <likexu@tencent.com>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-Message-ID: <ZNXxwaLId2Z4DAsD@dmi-pnp-i7>
-References: <20230504120042.785651-1-rkagan@amazon.de>
- <ZH6DJ8aFq/LM6Bk9@google.com>
- <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
- <ZJ4dmrQSduY8aWap@google.com>
- <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
- <ZJ7mjdZ8h/RSilFX@google.com>
- <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
- <ZJ74gELkj4DgAk4S@google.com>
- <ZJ9IaskpbIK9q4rt@google.com>
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="846730790"
+X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
+   d="scan'208";a="846730790"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga002.fm.intel.com with ESMTP; 11 Aug 2023 01:52:55 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 11 Aug 2023 01:52:55 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 11 Aug 2023 01:52:54 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 11 Aug 2023 01:52:54 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 11 Aug 2023 01:52:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R9BQGTH3Btupl/QDp38CSiVswR2YvZKbPCe4jIWBQtnl7kXrt1I6XnsR3nxyMXHe4jhemODdtWvMBBrN5WEreFTU500FimPXCFllc/ap6EoAhiWUVV/tPv9sMKR7ymMe2a+A9fr1sXoKz6BwgUacR6ISCZmdQYKOcwNCyg11S+TczL1fbVJpop3w6w+Nx7YhNEk4emLEBZ4vEyjZZgIHXLN8wJ9NaQRX7WnDgeMM7XZB/aisvgtTj6RK4d6ojCR7/01X/XPqhiA9iA3riU72OeVvJsvLLS8Ov0pIwDwX3vSBVezOBsdBqvXNakfU0alzxKhaorgdoAqGobQVfkl6YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=we65FcLei8heo6z8n0UnesaRun3zS7K/Y8UZEJt5jQQ=;
+ b=XQyBRb7ZFJzlVbRgBFvJJJSNMeos9tnkZ6TJbwUbk8tPTsu3MHUtC6WLQQCqafg5OdD2/3YBeQscLY9Qvkia2yvnUadELMiKnCeSwWz0Mj4nxr+jIZsHAq2x7GY0+D1WYkufsHOBb71yXSTwqnWbh9nFJDOMi76WpLMrFnGETclgspqU7sRVoVcPfWOfknMT8+LlHRJTIf7t2cheAmSQeHZAZ4JJ0xDvlRxMWasqsUTEecHgXgbo0hy3b9Vf9yGTEx27dTit1DJE4YnUGDgu8GMlsRqSP17gBZn8If840OzVb78AHO0+kEEOoR6cqkt/DA2oD9wACRrzS5bNleUgTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM8PR11MB5687.namprd11.prod.outlook.com (2603:10b6:8:22::7) by
+ SJ0PR11MB5134.namprd11.prod.outlook.com (2603:10b6:a03:2de::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
+ 2023 08:52:53 +0000
+Received: from DM8PR11MB5687.namprd11.prod.outlook.com
+ ([fe80::c59:de67:a3c6:2958]) by DM8PR11MB5687.namprd11.prod.outlook.com
+ ([fe80::c59:de67:a3c6:2958%4]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
+ 08:52:53 +0000
+From:   "Wan, Siming" <siming.wan@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Zeng, Xin" <xin.zeng@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "Pankratov, Svyatoslav" <svyatoslav.pankratov@intel.com>,
+        "Zeng, Xin" <xin.zeng@intel.com>
+Subject: RE: [RFC 1/5] crypto: qat - add bank save/restore and RP drain
+Thread-Topic: [RFC 1/5] crypto: qat - add bank save/restore and RP drain
+Thread-Index: AQHZq1VdWVubNLeKgkyuvdLzirFqR6/Z+ikAgAqm6LA=
+Date:   Fri, 11 Aug 2023 08:52:52 +0000
+Message-ID: <DM8PR11MB5687538BD91AF2DBF0A441C38E10A@DM8PR11MB5687.namprd11.prod.outlook.com>
+References: <20230630131304.64243-1-xin.zeng@intel.com>
+ <20230630131304.64243-2-xin.zeng@intel.com>
+ <BN9PR11MB527649234A93384F1EB11F478C09A@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB527649234A93384F1EB11F478C09A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR11MB5687:EE_|SJ0PR11MB5134:EE_
+x-ms-office365-filtering-correlation-id: ab05d18c-be14-4528-22bf-08db9a48594c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: U1J4qtOIkH6k4v2LxGa71IZ9CtaZDo2WJle4vypna6VqO0dQUqLgzAxW0RBVB2dvheGCblC3eKY0e73t6QqJstXSlEr0pOInKUCluwczzxXfSN8lyixl4yAn2iGZRo6uPWx48LXtVdlWYM61NUlrWqnEaF00M9UpUT7R0uQYyd1QecK5VPg2cbCnj/fFeBI8xoj8n1gQPgAiS7daW4beBtHZnLg0GsGPgkSi0yctB5QdWj2cNKtX4PTxElsdH7ZyItcDC26nNZIAAB6aopDFWW9EJj7VZy4tWlV526x67mDn0gVKcfHBvwRvgTpbRRM1/FU8SUUmIpWEhw6kKkQblY4ucMMvca5xp2XaKrmOff0uSFmXuw4QDPerrHvVGo5XLB9/m5t6M46/bRw2PCWJVgx0MRDx/BzTps3iti6wDcJQ1beqOGf5ucszF7Ozj684FBDcFjCbmYF75fXFGYhL+m14EVFSsG15B9+h2yX9Tv162iGhWAQq5iCPQ8AG6gr7BRFjWVSkpKRaGqBjdjh5SCJWg3+nEI3YggZ9RxbSYCOcVIU28Ec3hpczA+3pSxC0QqR8b17N1NppSuzIip2ARG8uP3qaIRuTl7HRt+jF93yKpmns+6xI14JzJbXOOrzk
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5687.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(346002)(366004)(136003)(396003)(376002)(1800799006)(186006)(451199021)(478600001)(7696005)(76116006)(4326008)(66556008)(64756008)(66446008)(66476007)(9686003)(66946007)(5660300002)(52536014)(316002)(54906003)(71200400001)(110136005)(41300700001)(8676002)(8936002)(6506007)(53546011)(26005)(86362001)(38070700005)(55016003)(33656002)(38100700002)(82960400001)(122000001)(83380400001)(2906002)(15650500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VU3LR3Jc2XXC2oFB9BU6vbvxbbQWvK2a1Lvr9UYFkGqYCcqpahNPj1p2o7VF?=
+ =?us-ascii?Q?Ia1j680wvevFtsJw0yXkiGFOY65fIy2Vd8mCVS+Q7Ms1w3h+BFShNgT5e6lA?=
+ =?us-ascii?Q?iSH46JurQD1jnSsoBiom62yoc1/NcSC+6xfSV2UhBpvts+lGSLQqPd+h/1rd?=
+ =?us-ascii?Q?bPB0I04BW8fnwpR9IK28mPPpKkTSrKzCd+8xSTkIDCFSnSVR36DvS7mVDTmp?=
+ =?us-ascii?Q?IKat83cLGSniKsXcbVCek3LdKpdx9rRdZPCDlT7mdGNcVqi8IoRMvakuKfrC?=
+ =?us-ascii?Q?zkZ6XsoxQdxIGowAlrAHCe+hRGeeLloSd6Vz543EZ7TOzk9SuuU9P5BGyXKU?=
+ =?us-ascii?Q?nB3Mu4+4tQLJWxonCS2CTUxBu4DEdp36S2UV0ahB5PAX1YjNxVVoIwYUEvzL?=
+ =?us-ascii?Q?AaG5I50nHTYZkDJyFFZ68GV+gMXzdeZ2yYSRnBoYP2b2NbIoXh2E5GwR+TNR?=
+ =?us-ascii?Q?N09L/Sf05sIcjjMSndJ1cYFRZ5MTJUEvod1n3A2TAiDBZvOd9UGL6qbZpdMk?=
+ =?us-ascii?Q?LGS8E8CJWus0HzgAIbclmt3xGdkl4dQfTESNzHiMnzPqtPqp6RqJ43lXoAnr?=
+ =?us-ascii?Q?4wtoxWgtauzVG22le/kCJYTjCOrn0RzOPF34W57+nU1MzFLCK7FUDpKVDkQq?=
+ =?us-ascii?Q?feJ3Xh+xaNpBLAdZvGGCeFPDJr4joPuvwn+5DCQZzsx0bmsil6NklYAFXQk8?=
+ =?us-ascii?Q?fXEzaPhz7DL1f1nIfY/67Xy/2z06SA5aagqe7WK4dcSuB1fgLRQ+YW0ugC7v?=
+ =?us-ascii?Q?C58298O0kf0DrgSHFFuvCOGR2KFCPxTlQ+AIHvOyn2L9Xd4s5+pOXuCCVMbP?=
+ =?us-ascii?Q?7y9S3BEla7dEg+RdDcBUZDaRjfjxvzI1Hlm8sskhMCv6Ylz8sNo0a8y7dKA3?=
+ =?us-ascii?Q?n9pBSzn5F+oUh08fW/mm66vVXKMf7GFJsv+/U8en2SY0Z0HiPSF331+nL3Rh?=
+ =?us-ascii?Q?tVTPcc7TNZalTyycSYe7bFouj1mt1qZHDJYC11AnPckOsxZoeVdzMH0iRNNM?=
+ =?us-ascii?Q?eouXQITAoo2vjKncx/JxvbV8712hS7sA1U6X37z6i5wIrj6ORqGy3QTiIZa8?=
+ =?us-ascii?Q?2ggksbNWXxi5ka9pxqSptWWwjrbZBi3Q+/1Mjv/MwWPPeiWSmqfKzYGFUhsy?=
+ =?us-ascii?Q?n8rYaz0NKEUMIKV94ZNKG8o8k9XJcOsYz5g4iLQGpQFNUQKQ6izYcqf/6yRc?=
+ =?us-ascii?Q?XbHk/+l/PhSm32ztP05mAXEMuihTPMNlqsge8gn2sIO2zoMKbxd+wdkh/HJX?=
+ =?us-ascii?Q?LgbJdgh5hvp4fs639Y18DUuGjFUQ7nkJy8rNXR93TOWjYJII0iWkOOB9X7mM?=
+ =?us-ascii?Q?Q45LqdNjPzB5KXNNNNB04YWQWsVJuGfqTdpjuJYIagzXumQ8/1DGrrT8rL1Y?=
+ =?us-ascii?Q?FKRGvuHagev9rh36CXtw9Bxle3u1+0ERwE/hYA0hKwlWOM6/UBXNLLQU5gNl?=
+ =?us-ascii?Q?JeQvCFHB91qojsz0sE9KOw5MCC/LJT2kJIHVGheXdmrm2U/xdqCm1BvpfGeH?=
+ =?us-ascii?Q?sN2RDEbZT+lbY5Y41TNww9lUMARvB945C0su1EpBLaDKMDHbK60QPn4OpCHm?=
+ =?us-ascii?Q?7cpVgJFVDjr8OjHlp4TK19v5rjs8//IPuwedFFXS?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJ9IaskpbIK9q4rt@google.com>
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5687.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab05d18c-be14-4528-22bf-08db9a48594c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Aug 2023 08:52:52.9319
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mAa0RRWtD0ZOwxdEHkxnXuEOAtEVGlFj2RK8BvjM9LAvc9WVKBGrFSxkXSNRcpTYFCBQZKfkxU9wK9s77Ov1SA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5134
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 02:26:02PM -0700, Sean Christopherson wrote:
-> Date: Fri, 30 Jun 2023 14:26:02 -0700
-> From: Sean Christopherson <seanjc@google.com>
-> Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-> 
-> On Fri, Jun 30, 2023, Sean Christopherson wrote:
-> > On Fri, Jun 30, 2023, Roman Kagan wrote:
-> > > On Fri, Jun 30, 2023 at 07:28:29AM -0700, Sean Christopherson wrote:
-> > > > On Fri, Jun 30, 2023, Roman Kagan wrote:
-> > > > > On Thu, Jun 29, 2023 at 05:11:06PM -0700, Sean Christopherson wrote:
-> > > > > > @@ -74,6 +74,14 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
-> > > > > >         return counter & pmc_bitmask(pmc);
-> > > > > >  }
-> > > > > >
-> > > > > > +static inline void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
-> > > > > > +{
-> > > > > > +       if (pmc->perf_event && !pmc->is_paused)
-> > > > > > +               perf_event_set_count(pmc->perf_event, val);
-> > > > > > +
-> > > > > > +       pmc->counter = val;
-> > > > >
-> > > > > Doesn't this still have the original problem of storing wider value than
-> > > > > allowed?
-> > > > 
-> > > > Yes, this was just to fix the counter offset weirdness.  My plan is to apply your
-> > > > patch on top.  Sorry for not making that clear.
-> > > 
-> > > Ah, got it, thanks!
-> > > 
-> > > Also I'm now chasing a problem that we occasionally see
-> > > 
-> > > [3939579.462832] Uhhuh. NMI received for unknown reason 30 on CPU 43.
-> > > [3939579.462836] Do you have a strange power saving mode enabled?
-> > > [3939579.462836] Dazed and confused, but trying to continue
-> > > 
-> > > in the guests when perf is used.  These messages disappear when
-> > > 9cd803d496e7 ("KVM: x86: Update vPMCs when retiring instructions") is
-> > > reverted.  I haven't yet figured out where exactly the culprit is.
-> > 
-> > Can you reverting de0f619564f4 ("KVM: x86/pmu: Defer counter emulated overflow
-> > via pmc->prev_counter")?  I suspect the problem is the prev_counter mess.
-> 
-> Ugh, yeah, de0f619564f4 created a bit of a mess.  The underlying issue that it
-> was solving is that perf_event_read_value() and friends might sleep (yay mutex),
-> and so can't be called from KVM's fastpath (IRQs disabled).
-> 
-> However, detecting overflow requires reading perf_event_read_value() to gather
-> the accumulated count from the hardware event in order to add it to the emulated
-> count from software.  E.g. if pmc->counter is X and the perf event counter is Y,
-> KVM needs to factor in Y because X+Y+1 might overflow even if X+1 does not.
-> 
-> Trying to snapshot the previous counter value is a bit of a mess.  It could probably
-> made to work, but it's hard to reason about what the snapshot actually contains
-> and when it should be cleared, especially when factoring in the wrapping logic.
-> 
-> Rather than snapshot the previous counter, I think it makes sense to:
-> 
->   1) Track the number of emulated counter events
->   2) Accumulate and reset the counts from perf_event and emulated_counter into
->      pmc->counter when pausing the PMC
->   3) Pause and reprogram the PMC on writes (instead of the current approach of
->      blindly updating the sample period)
->   4) Pause the counter when stopping the perf_event to ensure pmc->counter is
->      fresh (instead of manually updating pmc->counter)
-> 
-> IMO, that yields more intuitive logic, and makes it easier to reason about
-> correctness since the behavior is easily define: pmc->counter holds the counts
-> that have been gathered and processed, perf_event and emulated_counter hold
-> outstanding counts on top.  E.g. on a WRMSR to the counter, both the emulated
-> counter and the hardware counter are reset, because whatever counts existed
-> previously are irrelevant.
-> 
-> Pausing the counter _might_ make WRMSR slower, but we need to get this all
-> functionally correct before worrying too much about performance.
-> 
-> Diff below for what I'm thinking (needs to be split into multiple patches).  It's
-> *very* lightly tested.
-> 
-> I'm about to disappear for a week, I'll pick this back up when I get return.  In
-> the meantime, any testing and/or input would be much appreciated!
+-----Original Message-----
+From: Tian, Kevin <kevin.tian@intel.com>=20
+Sent: Friday, August 4, 2023 3:51 PM
+To: Zeng, Xin <xin.zeng@intel.com>; linux-crypto@vger.kernel.org; kvm@vger.=
+kernel.org
+Cc: Cabiddu, Giovanni <giovanni.cabiddu@intel.com>; andriy.shevchenko@linux=
+.intel.com; Wan, Siming <siming.wan@intel.com>; Pankratov, Svyatoslav <svya=
+toslav.pankratov@intel.com>; Zeng, Xin <xin.zeng@intel.com>
+Subject: RE: [RFC 1/5] crypto: qat - add bank save/restore and RP drain
 
-We also observed this PMI injection deadloop issue, especially when the
-counters are in non-full-width mode and the MSB of counter value is 1,
-the deadloop issue is quite easily triggered. The PMI injection deadloop
-would cause PMI storm and exhaust all CPU resource eventually.
-
-We verified either Roman or Sean's patch can fix this PMI deadloop issue
-on Intel Sapphire Rapids platform.
-
-The Perf command in validation comes from Mingwei and it is
-
-sudo ./perf record -N -B -T --sample-cpu                                                                            \
---clockid=CLOCK_MONOTONIC_RAW                                                                                            \
--e cpu/period=0xcdfe60,event=0x3c,name='CPU_CLK_UNHALTED.THREAD'/Duk                                                     \
--e cpu/period=0xcdfe60,umask=0x3,name='CPU_CLK_UNHALTED.REF_TSC'/Duk                                                     \
--e cpu/period=0xcdfe60,event=0xc0,name='INST_RETIRED.ANY'/Duk                                                            \
--e cpu/period=0xcdfe60,event=0xec,umask=0x2,name='CPU_CLK_UNHALTED.DISTRIBUTED'/uk                                           \
--e cpu/period=0x98968f,event=0x3c,name='CPU_CLK_UNHALTED.THREAD_P'/uk                                                    \
--e cpu/period=0x98968f,event=0xa6,umask=0x21,cmask=0x5,name='EXE_ACTIVITY.BOUND_ON_LOADS'/uk                             \
--e cpu/period=0x4c4b4f,event=0x9c,umask=0x1,name='IDQ_UOPS_NOT_DELIVERED.CORE'/uk                                        \
--e cpu/period=0x4c4b4f,event=0xad,umask=0x10,name='INT_MISC.UOP_DROPPING'/uk                                             \
--e cpu/period=0x4c4b4f,event=0x47,umask=0x3,cmask=0x3,name='MEMORY_ACTIVITY.STALLS_L1D_MISS'/uk                          \
--e cpu/period=0x4c4b4f,event=0x47,umask=0x5,cmask=0x5,name='MEMORY_ACTIVITY.STALLS_L2_MISS'/uk                           \
--e cpu/period=0x4c4b4f,event=0x47,umask=0x9,cmask=0x9,name='MEMORY_ACTIVITY.STALLS_L3_MISS'/uk                           \
--e cpu/period=0x7a143,event=0xd3,umask=0x1,name='MEM_LOAD_L3_MISS_RETIRED.LOCAL_DRAM'/uk                                 \
--e cpu/period=0x4c4b4f,event=0xd3,umask=0x2,name='MEM_LOAD_L3_MISS_RETIRED.REMOTE_DRAM'/uk                               \
--e cpu/period=0x7a143,event=0xd3,umask=0x8,name='MEM_LOAD_L3_MISS_RETIRED.REMOTE_FWD'/uk                                 \
--e cpu/period=0x4c4b4f,event=0xd3,umask=0x4,name='MEM_LOAD_L3_MISS_RETIRED.REMOTE_HITM'/uk                               \
--e cpu/period=0x7a143,event=0xd3,umask=0x10,name='MEM_LOAD_L3_MISS_RETIRED.REMOTE_PMM'/uk                                \
--e cpu/period=0x7a143,event=0xd1,umask=0x40,name='MEM_LOAD_RETIRED.FB_HIT'/uk                                            \
--e cpu/period=0x4c4b4f,event=0xd1,umask=0x1,name='MEM_LOAD_RETIRED.L1_HIT'/uk                                            \
--e cpu/period=0xf424f,event=0xd1,umask=0x8,name='MEM_LOAD_RETIRED.L1_MISS'/uk                                            \
--e cpu/period=0xf424f,event=0xd1,umask=0x2,name='MEM_LOAD_RETIRED.L2_HIT'/uk                                             \
--e cpu/period=0x7a189,event=0xd1,umask=0x4,name='MEM_LOAD_RETIRED.L3_HIT'/uk                                             \
--e cpu/period=0x3d0f9,event=0xd1,umask=0x20,name='MEM_LOAD_RETIRED.L3_MISS'/uk                                           \
--e cpu/period=0x4c4b4f,event=0xd1,umask=0x80,name='MEM_LOAD_RETIRED.LOCAL_PMM'/uk                                        \
--e cpu/period=0x4c4b4f,event=0x20,umask=0x8,cmask=0x4,name='OFFCORE_REQUESTS_OUTSTANDING.ALL_DATA_RD_cmask_4'/uk         \
--e cpu/period=0x4c4b4f,event=0x20,umask=0x8,cmask=0x1,name='OFFCORE_REQUESTS_OUTSTANDING.CYCLES_WITH_DATA_RD'/uk         \
--e cpu/period=0x2faf090,event=0xa4,umask=0x2,name='TOPDOWN.BACKEND_BOUND_SLOTS'/uk                                       \
--e cpu/period=0x2faf090,event=0xa4,umask=0x10,name='TOPDOWN.MEMORY_BOUND_SLOTS'/uk                                       \
--e cpu/period=0x98968f,event=0xc2,umask=0x2,name='UOPS_RETIRED.SLOTS'/uk                                                 \
--e cpu/period=0x7a12f,event=0xd0,umask=0x82,name='MEM_INST_RETIRED.ALL_STORES'/uk                                        \
--e cpu/period=0x7a12f,event=0xd0,umask=0x81,name='MEM_INST_RETIRED.ALL_LOADS'/uk                                         \
--e cpu/period=0x98968f,event=0xc7,umask=0x2,name='FP_ARITH_INST_RETIRED.SCALAR_SINGLE'/uk                                \
--e cpu/period=0x98968f,event=0xc7,umask=0x8,name='FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE'/uk                           \
--e cpu/period=0x98968f,event=0xc7,umask=0x20,name='FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE'/uk                          \
--e cpu/period=0x98968f,event=0xc7,umask=0x1,name='FP_ARITH_INST_RETIRED.SCALAR_DOUBLE'/uk                                \
--e cpu/period=0x98968f,event=0xc7,umask=0x4,name='FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE'/uk                           \
--e cpu/period=0x98968f,event=0xc7,umask=0x10,name='FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE'/uk                          \
--e cpu/period=0x98968f,event=0xb1,umask=0x10,name='UOPS_EXECUTED.X87'/uk                                                 \
--e cpu/period=0x98968f,event=0xb1,umask=0x1,name='UOPS_EXECUTED.THREAD'/uk                                               \
--e cpu/period=0x98968f,event=0xc7,umask=0x40,name='FP_ARITH_INST_RETIRED.512B_PACKED_DOUBLE'/uk                          \
--e cpu/period=0x98968f,event=0xc7,umask=0x80,name='FP_ARITH_INST_RETIRED.512B_PACKED_SINGLE'/uk                          \
--e cpu/period=0x98968f,event=0xce,umask=0x1,name='AMX_OPS_RETIRED.INT8'/uk                                               \
--e cpu/period=0x98968f,event=0xce,umask=0x2,name='AMX_OPS_RETIRED.BF16'/uk                                               \
--e cpu/period=0x98968f,event=0xcf,umask=0x1,name='FP_ARITH_INST_RETIRED2.SCALAR_HALF'/uk                                 \
--e cpu/period=0x98968f,event=0xcf,umask=0x4,name='FP_ARITH_INST_RETIRED2.128B_PACKED_HALF'/uk                            \
--e cpu/period=0x98968f,event=0xcf,umask=0x8,name='FP_ARITH_INST_RETIRED2.256B_PACKED_HALF'/uk                            \
--e cpu/period=0x98968f,event=0xcf,umask=0x10,name='FP_ARITH_INST_RETIRED2.512B_PACKED_HALF'/uk                           \
--e cpu/period=0xcdfe60,event=0xc0,name='INST_RETIRED.ANY_P'/uk                                                           \
--e cpu/period=0x2faf090,event=0xa4,umask=0x1,name='TOPDOWN.SLOTS_P'/uk
-
-
-> 
+> From: Xin Zeng <xin.zeng@intel.com>
+> Sent: Friday, June 30, 2023 9:13 PM
 > ---
->  arch/x86/include/asm/kvm-x86-pmu-ops.h |  2 +-
->  arch/x86/include/asm/kvm_host.h        | 11 ++-
->  arch/x86/kvm/pmu.c                     | 94 ++++++++++++++++++++++----
->  arch/x86/kvm/pmu.h                     | 53 +++------------
->  arch/x86/kvm/svm/pmu.c                 | 19 +-----
->  arch/x86/kvm/vmx/pmu_intel.c           | 26 +------
->  6 files changed, 103 insertions(+), 102 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-> index 6c98f4bb4228..058bc636356a 100644
-> --- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-> @@ -22,7 +22,7 @@ KVM_X86_PMU_OP(get_msr)
->  KVM_X86_PMU_OP(set_msr)
->  KVM_X86_PMU_OP(refresh)
->  KVM_X86_PMU_OP(init)
-> -KVM_X86_PMU_OP(reset)
-> +KVM_X86_PMU_OP_OPTIONAL(reset)
->  KVM_X86_PMU_OP_OPTIONAL(deliver_pmi)
->  KVM_X86_PMU_OP_OPTIONAL(cleanup)
->  
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 28bd38303d70..337f5e1da57c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -492,8 +492,17 @@ struct kvm_pmc {
->  	u8 idx;
->  	bool is_paused;
->  	bool intr;
-> +	/*
-> +	 * Value of the PMC counter that has been gathered from the associated
-> +	 * perf_event and from emulated_counter.  This is *not* the current
-> +	 * value as seen by the guest or userspace.
-> +	 */
->  	u64 counter;
-> -	u64 prev_counter;
-> +	/*
-> +	 * PMC events triggered by KVM emulation that haven't been fully
-> +	 * procssed, e.g. haven't undergone overflow detection.
-> +	 */
-> +	u64 emulated_counter;
->  	u64 eventsel;
->  	struct perf_event *perf_event;
->  	struct kvm_vcpu *vcpu;
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index bf653df86112..472e45f5993f 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -148,9 +148,9 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
->  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
->  
->  	/*
-> -	 * Ignore overflow events for counters that are scheduled to be
-> -	 * reprogrammed, e.g. if a PMI for the previous event races with KVM's
-> -	 * handling of a related guest WRMSR.
-> +	 * Ignore asynchronous overflow events for counters that are scheduled
-> +	 * to be reprogrammed, e.g. if a PMI for the previous event races with
-> +	 * KVM's handling of a related guest WRMSR.
->  	 */
->  	if (test_and_set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi))
->  		return;
-> @@ -182,6 +182,21 @@ static u64 pmc_get_pebs_precise_level(struct kvm_pmc *pmc)
->  	return 1;
->  }
->  
-> +static u64 pmc_get_sample_period(struct kvm_pmc *pmc)
-> +{
-> +	u64 sample_period = (-pmc->counter) & pmc_bitmask(pmc);
-> +
-> +	/*
-> +	 * Verify pmc->counter is fresh, i.e. that the perf event is paused and
-> +	 * emulated events have been gathered.
-> +	 */
-> +	WARN_ON_ONCE(pmc->emulated_counter || (pmc->perf_event && !pmc->is_paused));
-> +
-> +	if (!sample_period)
-> +		sample_period = pmc_bitmask(pmc) + 1;
-> +	return sample_period;
-> +}
-> +
->  static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
->  				 bool exclude_user, bool exclude_kernel,
->  				 bool intr)
-> @@ -200,7 +215,7 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
->  	};
->  	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
->  
-> -	attr.sample_period = get_sample_period(pmc, pmc->counter);
-> +	attr.sample_period = pmc_get_sample_period(pmc);
->  
->  	if ((attr.config & HSW_IN_TX_CHECKPOINTED) &&
->  	    guest_cpuid_is_intel(pmc->vcpu)) {
-> @@ -238,13 +253,19 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
->  
->  static void pmc_pause_counter(struct kvm_pmc *pmc)
->  {
-> -	u64 counter = pmc->counter;
-> +	/*
-> +	 * Accumulate emulated events, even if the PMC was already paused, e.g.
-> +	 * if KVM emulated an event after a WRMSR, but before reprogramming, or
-> +	 * if KVM couldn't create a perf event.
-> +	 */
-> +	u64 counter = pmc->counter + pmc->emulated_counter;
->  
-> -	if (!pmc->perf_event || pmc->is_paused)
-> -		return;
-> +	pmc->emulated_counter = 0;
->  
->  	/* update counter, reset event value to avoid redundant accumulation */
-> -	counter += perf_event_pause(pmc->perf_event, true);
-> +	if (pmc->perf_event && !pmc->is_paused)
-> +		counter += perf_event_pause(pmc->perf_event, true);
-> +
->  	pmc->counter = counter & pmc_bitmask(pmc);
->  	pmc->is_paused = true;
->  }
-> @@ -256,8 +277,7 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
->  
->  	/* recalibrate sample period and check if it's accepted by perf core */
->  	if (is_sampling_event(pmc->perf_event) &&
-> -	    perf_event_period(pmc->perf_event,
-> -			      get_sample_period(pmc, pmc->counter)))
-> +	    perf_event_period(pmc->perf_event, pmc_get_sample_period(pmc)))
->  		return false;
->  
->  	if (test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) !=
-> @@ -395,6 +415,32 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
->  	return is_fixed_event_allowed(filter, pmc->idx);
->  }
->  
-> +void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
-> +{
-> +	pmc_pause_counter(pmc);
-> +	pmc->counter = val & pmc_bitmask(pmc);
-> +	kvm_pmu_request_counter_reprogram(pmc);
-> +}
-> +EXPORT_SYMBOL_GPL(pmc_write_counter);
-> +
-> +static void pmc_release_perf_event(struct kvm_pmc *pmc)
-> +{
-> +	if (pmc->perf_event) {
-> +		perf_event_release_kernel(pmc->perf_event);
-> +		pmc->perf_event = NULL;
-> +		pmc->current_config = 0;
-> +		pmc_to_pmu(pmc)->event_count--;
-> +	}
-> +}
-> +
-> +static void pmc_stop_counter(struct kvm_pmc *pmc)
-> +{
-> +	if (pmc->perf_event) {
-> +		pmc_pause_counter(pmc);
-> +		pmc_release_perf_event(pmc);
-> +	}
-> +}
-> +
->  static bool pmc_event_is_allowed(struct kvm_pmc *pmc)
->  {
->  	return pmc_is_globally_enabled(pmc) && pmc_speculative_in_use(pmc) &&
-> @@ -404,6 +450,7 @@ static bool pmc_event_is_allowed(struct kvm_pmc *pmc)
->  static void reprogram_counter(struct kvm_pmc *pmc)
->  {
->  	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> +	u64 prev_counter = pmc->counter;
->  	u64 eventsel = pmc->eventsel;
->  	u64 new_config = eventsel;
->  	u8 fixed_ctr_ctrl;
-> @@ -413,7 +460,7 @@ static void reprogram_counter(struct kvm_pmc *pmc)
->  	if (!pmc_event_is_allowed(pmc))
->  		goto reprogram_complete;
->  
-> -	if (pmc->counter < pmc->prev_counter)
-> +	if (pmc->counter < prev_counter)
->  		__kvm_perf_overflow(pmc, false);
->  
->  	if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
-> @@ -453,7 +500,6 @@ static void reprogram_counter(struct kvm_pmc *pmc)
->  
->  reprogram_complete:
->  	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
-> -	pmc->prev_counter = 0;
->  }
->  
->  void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
-> @@ -678,9 +724,28 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->  void kvm_pmu_reset(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	struct kvm_pmc *pmc;
-> +	int i;
->  
->  	irq_work_sync(&pmu->irq_work);
-> -	static_call(kvm_x86_pmu_reset)(vcpu);
-> +
-> +	bitmap_zero(pmu->reprogram_pmi, X86_PMC_IDX_MAX);
-> +
-> +	for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
-> +		pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, i);
-> +		if (!pmc)
-> +			continue;
-> +
-> +		pmc_stop_counter(pmc);
-> +		pmc->counter = 0;
-> +
-> +		if (pmc_is_gp(pmc))
-> +			pmc->eventsel = 0;
-> +	};
-> +
-> +	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
-> +
-> +	static_call_cond(kvm_x86_pmu_reset)(vcpu);
->  }
->  
->  void kvm_pmu_init(struct kvm_vcpu *vcpu)
-> @@ -727,8 +792,7 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
->  
->  static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
->  {
-> -	pmc->prev_counter = pmc->counter;
-> -	pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
-> +	pmc->emulated_counter++;
->  	kvm_pmu_request_counter_reprogram(pmc);
->  }
->  
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 7d9ba301c090..0ac60ffae944 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -55,6 +55,12 @@ static inline bool kvm_pmu_has_perf_global_ctrl(struct kvm_pmu *pmu)
->  	return pmu->version > 1;
->  }
->  
-> +static inline void kvm_pmu_request_counter_reprogram(struct kvm_pmc *pmc)
-> +{
-> +	set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
-> +	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
-> +}
-> +
->  static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
->  {
->  	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> @@ -66,31 +72,17 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
->  {
->  	u64 counter, enabled, running;
->  
-> -	counter = pmc->counter;
-> +	counter = pmc->counter + pmc->emulated_counter;
-> +
->  	if (pmc->perf_event && !pmc->is_paused)
->  		counter += perf_event_read_value(pmc->perf_event,
->  						 &enabled, &running);
-> +
->  	/* FIXME: Scaling needed? */
->  	return counter & pmc_bitmask(pmc);
->  }
->  
-> -static inline void pmc_release_perf_event(struct kvm_pmc *pmc)
-> -{
-> -	if (pmc->perf_event) {
-> -		perf_event_release_kernel(pmc->perf_event);
-> -		pmc->perf_event = NULL;
-> -		pmc->current_config = 0;
-> -		pmc_to_pmu(pmc)->event_count--;
-> -	}
-> -}
-> -
-> -static inline void pmc_stop_counter(struct kvm_pmc *pmc)
-> -{
-> -	if (pmc->perf_event) {
-> -		pmc->counter = pmc_read_counter(pmc);
-> -		pmc_release_perf_event(pmc);
-> -	}
-> -}
-> +void pmc_write_counter(struct kvm_pmc *pmc, u64 val);
->  
->  static inline bool pmc_is_gp(struct kvm_pmc *pmc)
->  {
-> @@ -140,25 +132,6 @@ static inline struct kvm_pmc *get_fixed_pmc(struct kvm_pmu *pmu, u32 msr)
->  	return NULL;
->  }
->  
-> -static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
-> -{
-> -	u64 sample_period = (-counter_value) & pmc_bitmask(pmc);
-> -
-> -	if (!sample_period)
-> -		sample_period = pmc_bitmask(pmc) + 1;
-> -	return sample_period;
-> -}
-> -
-> -static inline void pmc_update_sample_period(struct kvm_pmc *pmc)
-> -{
-> -	if (!pmc->perf_event || pmc->is_paused ||
-> -	    !is_sampling_event(pmc->perf_event))
-> -		return;
-> -
-> -	perf_event_period(pmc->perf_event,
-> -			  get_sample_period(pmc, pmc->counter));
-> -}
-> -
->  static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
->  {
->  	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> @@ -214,12 +187,6 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
->  					     KVM_PMC_MAX_FIXED);
->  }
->  
-> -static inline void kvm_pmu_request_counter_reprogram(struct kvm_pmc *pmc)
-> -{
-> -	set_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
-> -	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
-> -}
-> -
->  static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
->  {
->  	int bit;
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index cef5a3d0abd0..b6a7ad4d6914 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -160,8 +160,7 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	/* MSR_PERFCTRn */
->  	pmc = get_gp_pmc_amd(pmu, msr, PMU_TYPE_COUNTER);
->  	if (pmc) {
-> -		pmc->counter += data - pmc_read_counter(pmc);
-> -		pmc_update_sample_period(pmc);
-> +		pmc_write_counter(pmc, data);
->  		return 0;
->  	}
->  	/* MSR_EVNTSELn */
-> @@ -233,21 +232,6 @@ static void amd_pmu_init(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> -static void amd_pmu_reset(struct kvm_vcpu *vcpu)
-> -{
-> -	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> -	int i;
-> -
-> -	for (i = 0; i < KVM_AMD_PMC_MAX_GENERIC; i++) {
-> -		struct kvm_pmc *pmc = &pmu->gp_counters[i];
-> -
-> -		pmc_stop_counter(pmc);
-> -		pmc->counter = pmc->prev_counter = pmc->eventsel = 0;
-> -	}
-> -
-> -	pmu->global_ctrl = pmu->global_status = 0;
-> -}
-> -
->  struct kvm_pmu_ops amd_pmu_ops __initdata = {
->  	.hw_event_available = amd_hw_event_available,
->  	.pmc_idx_to_pmc = amd_pmc_idx_to_pmc,
-> @@ -259,7 +243,6 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
->  	.set_msr = amd_pmu_set_msr,
->  	.refresh = amd_pmu_refresh,
->  	.init = amd_pmu_init,
-> -	.reset = amd_pmu_reset,
->  	.EVENTSEL_EVENT = AMD64_EVENTSEL_EVENT,
->  	.MAX_NR_GP_COUNTERS = KVM_AMD_PMC_MAX_GENERIC,
->  	.MIN_NR_GP_COUNTERS = AMD64_NUM_COUNTERS,
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 80c769c58a87..ce49d060bc96 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -406,12 +406,10 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  			if (!msr_info->host_initiated &&
->  			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
->  				data = (s64)(s32)data;
-> -			pmc->counter += data - pmc_read_counter(pmc);
-> -			pmc_update_sample_period(pmc);
-> +			pmc_write_counter(pmc, data);
->  			break;
->  		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
-> -			pmc->counter += data - pmc_read_counter(pmc);
-> -			pmc_update_sample_period(pmc);
-> +			pmc_write_counter(pmc, data);
->  			break;
->  		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
->  			reserved_bits = pmu->reserved_bits;
-> @@ -603,26 +601,6 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
->  
->  static void intel_pmu_reset(struct kvm_vcpu *vcpu)
->  {
-> -	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> -	struct kvm_pmc *pmc = NULL;
-> -	int i;
-> -
-> -	for (i = 0; i < KVM_INTEL_PMC_MAX_GENERIC; i++) {
-> -		pmc = &pmu->gp_counters[i];
-> -
-> -		pmc_stop_counter(pmc);
-> -		pmc->counter = pmc->prev_counter = pmc->eventsel = 0;
-> -	}
-> -
-> -	for (i = 0; i < KVM_PMC_MAX_FIXED; i++) {
-> -		pmc = &pmu->fixed_counters[i];
-> -
-> -		pmc_stop_counter(pmc);
-> -		pmc->counter = pmc->prev_counter = 0;
-> -	}
-> -
-> -	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
-> -
->  	intel_pmu_release_guest_lbr_event(vcpu);
->  }
->  
-> 
-> base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
-> -- 
-> 
+>  .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   5 +-
+>  .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |   2 +-
+>  .../qat/qat_c3xxxvf/adf_c3xxxvf_hw_data.c     |   2 +-
+>  .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |   2 +-
+>  .../intel/qat/qat_c62xvf/adf_c62xvf_hw_data.c |   2 +-
+>  .../intel/qat/qat_common/adf_accel_devices.h  |  60 ++-
+>  .../intel/qat/qat_common/adf_gen2_hw_data.c   |  17 +-
+>  .../intel/qat/qat_common/adf_gen2_hw_data.h   |  10 +-
+>  .../intel/qat/qat_common/adf_gen4_hw_data.c   | 362 +++++++++++++++++-
+>  .../intel/qat/qat_common/adf_gen4_hw_data.h   | 131 ++++++-
+>  .../intel/qat/qat_common/adf_transport.c      |  11 +-
+>  .../crypto/intel/qat/qat_common/adf_vf_isr.c  |   2 +-
+>  .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |   2 +-
+>  .../qat_dh895xccvf/adf_dh895xccvf_hw_data.c   |   2 +-
+>  14 files changed, 584 insertions(+), 26 deletions(-)
 
--- 
-Thanks,
-Dapeng Mi
+this could be split into 3 patches.
+
+one is moving from hw_data->csr_ops to hw_data->csr_info. apply to all qat =
+drivers.
+
+the 2nd is adding new csr_ops.
+
+the last one then covers bank save/restore.
+->Will split it, thanks.
+
+> +
+> +#define ADF_RP_INT_SRC_SEL_F_RISE_MASK BIT(2) #define=20
+> +ADF_RP_INT_SRC_SEL_F_FALL_MASK GENMASK(2, 0) static int=20
+> +gen4_bank_state_restore(void __iomem *csr, u32 bank_number,
+> +				   struct bank_state *state, u32 num_rings,
+> +				   int tx_rx_gap)
+> +{
+
+restore is the most tricky part. it's worth of some comments to help unders=
+tand the flow, e.g. what is rx/tx layout, why there are multiple ring tails=
+ writes, etc.=20
+->Will add some comments to explain.
+
+> +	u32 val, tmp_val, i;
+> +
+> +	write_csr_ring_srv_arb_en(csr, bank_number, 0);
+> +
+> +	for (i =3D 0; i < num_rings; i++)
+> +		write_csr_ring_base(csr, bank_number, i, state-
+> >rings[i].base);
+> +
+> +	for (i =3D 0; i < num_rings; i++)
+> +		write_csr_ring_config(csr, bank_number, i, state-
+> >rings[i].config);
+> +
+> +	for (i =3D 0; i < num_rings / 2; i++) {
+> +		int tx =3D i * (tx_rx_gap + 1);
+> +		int rx =3D tx + tx_rx_gap;
+> +		u32 tx_idx =3D tx / ADF_RINGS_PER_INT_SRCSEL;
+> +		u32 rx_idx =3D rx / ADF_RINGS_PER_INT_SRCSEL;
+> +
+> +		write_csr_ring_head(csr, bank_number, tx, state-
+> >rings[tx].head);
+> +
+> +		write_csr_ring_tail(csr, bank_number, tx, state->rings[tx].tail);
+> +
+> +		if (state->ringestat & (BIT(tx))) {
+> +			val =3D read_csr_int_srcsel(csr, bank_number, tx_idx);
+> +			val |=3D (ADF_RP_INT_SRC_SEL_F_RISE_MASK << (8 *
+> tx));
+> +			write_csr_int_srcsel(csr, bank_number, tx_idx, val);
+> +			write_csr_ring_head(csr, bank_number, tx, state-
+> >rings[tx].head);
+> +		}
+> +
+> +		write_csr_ring_tail(csr, bank_number, rx, state-
+> >rings[rx].tail);
+> +
+> +		val =3D read_csr_int_srcsel(csr, bank_number, rx_idx);
+> +		val |=3D (ADF_RP_INT_SRC_SEL_F_RISE_MASK << (8 * rx));
+> +		write_csr_int_srcsel(csr, bank_number, rx_idx, val);
+> +
+> +		write_csr_ring_head(csr, bank_number, rx, state-
+> >rings[rx].head);
+> +
+> +		val =3D read_csr_int_srcsel(csr, bank_number, rx_idx);
+> +		val |=3D (ADF_RP_INT_SRC_SEL_F_FALL_MASK << (8 * rx));
+> +		write_csr_int_srcsel(csr, bank_number, rx_idx, val);
+> +
+> +		if (state->ringfstat & BIT(rx))
+> +			write_csr_ring_tail(csr, bank_number, rx, state-
+> >rings[rx].tail);
+> +	}
+> +
+> +	write_csr_int_flag_and_col(csr, bank_number, state-
+> >iaintflagandcolen);
+> +	write_csr_int_en(csr, bank_number, state->iaintflagen);
+> +	write_csr_int_col_en(csr, bank_number, state->iaintcolen);
+> +	write_csr_int_srcsel(csr, bank_number, 0, state->iaintflagsrcsel0);
+> +	write_csr_exp_int_en(csr, bank_number, state->ringexpintenable);
+> +	write_csr_int_col_ctl(csr, bank_number, state->iaintcolctl);
+> +
+> +	/* Check that all ring statuses are restored into a saved state. */
+> +	tmp_val =3D read_csr_stat(csr, bank_number);
+> +	val =3D state->ringstat0;
+> +	if (tmp_val !=3D val) {
+> +		pr_err("Fail to restore ringstat register. Expected 0x%x, but
+> actual is 0x%x\n",
+> +		       tmp_val, val);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tmp_val =3D read_csr_e_stat(csr, bank_number);
+> +	val =3D state->ringestat;
+> +	if (tmp_val !=3D val) {
+> +		pr_err("Fail to restore ringestat register. Expected 0x%x, but
+> actual is 0x%x\n",
+> +		       tmp_val, val);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tmp_val =3D read_csr_ne_stat(csr, bank_number);
+> +	val =3D state->ringnestat;
+> +	if (tmp_val !=3D val) {
+> +		pr_err("Fail to restore ringnestat register. Expected 0x%x, but
+> actual is 0x%x\n",
+> +		       tmp_val, val);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tmp_val =3D read_csr_nf_stat(csr, bank_number);
+> +	val =3D state->ringnfstat;
+> +	if (tmp_val !=3D val) {
+> +		pr_err("Fail to restore ringnfstat register. Expected 0x%x, but
+> actual is 0x%x\n",
+> +		       tmp_val, val);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tmp_val =3D read_csr_f_stat(csr, bank_number);
+> +	val =3D state->ringfstat;
+> +	if (tmp_val !=3D val) {
+> +		pr_err("Fail to restore ringfstat register. Expected 0x%x, but
+> actual is 0x%x\n",
+> +		       tmp_val, val);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tmp_val =3D read_csr_c_stat(csr, bank_number);
+> +	val =3D state->ringcstat0;
+> +	if (tmp_val !=3D val) {
+> +		pr_err("Fail to restore ringcstat register. Expected 0x%x, but
+> actual is 0x%x\n",
+> +		       tmp_val, val);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tmp_val =3D read_csr_exp_stat(csr, bank_number);
+> +	val =3D state->ringexpstat;
+> +	if (tmp_val && !val) {
+> +		pr_err("Bank was restored with exception: 0x%x\n", val);
+> +		return -EINVAL;
+> +	}
+
+above checks could be wrapped in macros.
+->If define macro as below, checkpatch.pl will appear warning-> WARNING: Ma=
+cros with flow control statements should be avoided.
+So do we still need to change?
+#define CHECK_STAT(expect, actual, csr_name)    \
+do { \
+    u32 _expect =3D expect;                                \
+    u32 _actual =3D actual;                                \
+    char *_csr_name =3D csr_name;                            \
+    if (_expect !=3D _actual) {                            \
+        pr_err("Fail to restore %s register. Expected 0x%x, but actual is 0=
+x%x\n", \
+            _csr_name, _expect, _actual);                    \
+        return -EINVAL;                                \
+    }                                        \
+} while (0)
+
