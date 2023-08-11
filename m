@@ -2,145 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFF607785F3
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 05:19:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D2ED7785F4
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 05:19:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233073AbjHKDTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 23:19:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48550 "EHLO
+        id S232869AbjHKDTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 23:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232840AbjHKDTV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 23:19:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 005692D68
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:18:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691723913;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PiI+QsxMTBs9vA9vlC+ZyswANJfDDGFtsPp4BYCBVbg=;
-        b=StEEFzzG3862GLAF7SiQthLuoO7p7Aio1jiXwNF1oFey2icr81eEA4461RMWpaLYR2sFRY
-        tByJwjf7OxT1nzkSe4gdQ24NL4U3mOPHV6vu7uHPhVogz94p99jPp1sqmE/OHLX0B+zcfu
-        RHVa9uWgE3J63dhpcEQE8jeFwVSTEhI=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-295-fNakT43DO_CqBgwzU8Ql9Q-1; Thu, 10 Aug 2023 23:18:31 -0400
-X-MC-Unique: fNakT43DO_CqBgwzU8Ql9Q-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-26953535169so409682a91.0
-        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:18:31 -0700 (PDT)
+        with ESMTP id S233243AbjHKDTg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 23:19:36 -0400
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 870662D79
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:19:34 -0700 (PDT)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1bb782974f4so1454342fac.3
+        for <kvm@vger.kernel.org>; Thu, 10 Aug 2023 20:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1691723974; x=1692328774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w5bPqvfIuD0lOvDvPnrvc9t+bX6LtHjE8VL/AxKPQik=;
+        b=XcWMmLQqpb0TX/E+MdCde6ILHTwFpAGb4az1KtnDaMk/8/pTcC5MH6bMekFYq7SBDY
+         BQfOHjSdNn0uE2T3MILES0/MCOBP4pS2t0D7KDUGFYewfuJiBzRpxhDU306uwst8wScz
+         vobtrRae1DVHXVF8V/Y0F1zgU0Rw42LvtX/GLehr/BbQzrN9LNSaJSA958fKBmFbfAXS
+         GdRMnv7FJys9UTMeO6Zleb5zeC8IJtXwpRBlQpHNv3yf9s1FDAtNaTfrfWonqAbK3JeG
+         0QnTo6S7sSnRglUaMA2oW6LCR8S5+B2p1OJdD4E+2A6c2R2pZQoXV1qlt42pMINg4Nbm
+         GNGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691723910; x=1692328710;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PiI+QsxMTBs9vA9vlC+ZyswANJfDDGFtsPp4BYCBVbg=;
-        b=JtI0D4fr47g0tuDahLAVYhtxMGsG9+bzJw7uOipRDbkB8GT8QWG3PZLpN24j5BqHYE
-         LcDK0sFd91OEptxNpln8BcXKKVHt+R/eCHU2RCRHiHvmkrIpoGqWyeQkUMxUxz6rEx80
-         xhIz0Jo2x/d6Ts+rlkgdwcA7zWOtyq/SZBKBgvcIO8wvpWmWA7yGXDo1RbYW12ELn+nA
-         06imvMPsFXpQeM4GJ7TboFK25WO5QGKS3r4mxvl4js9bOz2MNzMDyctDIm9NRGBvgkfj
-         xQ6J1doTf6mrDF0L/A6JZX9XTL0lJm1oYu32y3vsQJY/CoqSuzGpRtzUWqzRWPzo2zIn
-         i/Lw==
-X-Gm-Message-State: AOJu0YxX6o+pzmf9jypXNLyaV9/726g3eWZOlrEzLU3j5xpUmWcIOREO
-        7WWKQsy+AwouLxAHWv8Fv5/b8r/uV2X6p1SrpHiRntJonAYOjh3SjEGFAnkHY9PTHuijEhcyJJj
-        0WqmmQasFKGd4
-X-Received: by 2002:a17:903:11c8:b0:1b8:17e8:547e with SMTP id q8-20020a17090311c800b001b817e8547emr828117plh.1.1691723910725;
-        Thu, 10 Aug 2023 20:18:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHID5R08qiLj5A7MSG7B2ILJx/BX/BiDQni1fswd5I7LC3NtLSpgFqmDqjcNklr7RUUka6Afw==
-X-Received: by 2002:a17:903:11c8:b0:1b8:17e8:547e with SMTP id q8-20020a17090311c800b001b817e8547emr828095plh.1.1691723910468;
-        Thu, 10 Aug 2023 20:18:30 -0700 (PDT)
-Received: from [10.72.112.92] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q22-20020a170902b11600b001bb24cb9a40sm2547142plr.39.2023.08.10.20.18.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Aug 2023 20:18:30 -0700 (PDT)
-Message-ID: <60d1a498-2815-2465-ccc9-e4464791a3fb@redhat.com>
-Date:   Fri, 11 Aug 2023 11:18:23 +0800
+        d=1e100.net; s=20221208; t=1691723974; x=1692328774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w5bPqvfIuD0lOvDvPnrvc9t+bX6LtHjE8VL/AxKPQik=;
+        b=UkyHF3Z7DkEb8cesAUNUNz29jMH9W1mAJNTKdq1Kpucpr+Lj5mx9TIeT4nb1Bx60Qs
+         NtVNdlVi1o6mSSQFlNVfbX75JSQfpaReqUqnopkR5DGctxkQzDmETFwu2isrqZauERx+
+         htej0tqk6S7f/vdWsU7CeG6D5y6spjoyec9YQwP1/tyVkWip8nlNwunUDbF3FlCKWyYz
+         sq+oxZHJuXmpt7kqtvExU6CI9mKfa6TmvDhibl29zThtYV/IXRivVgGk4HpWKpkS1Ir1
+         VLnOhSYnsZDjZFB/WF8L7iRgCK9wqLkXuPg2J5jQeWGkC5Cu7GhfSflmXffyOhbMS022
+         JQuA==
+X-Gm-Message-State: AOJu0Yx5egKgGGIwKz40DVzBVGNDZ70przJUn5y5Tx7sMbDnFi/yBDG5
+        1MGNdkJ3hh7HNoy7IV4luSHDlf93WVbvNu4Ptf3HKw==
+X-Google-Smtp-Source: AGHT+IHyLds//g1taO2l0faur+C2u6yObXhHcDdTX5VhQp1KrsPG0xHpvVXUgtgQ8wSIOCNbID/ID6lHvQPaRi5JM20=
+X-Received: by 2002:a05:6871:28e:b0:1bf:295a:68a9 with SMTP id
+ i14-20020a056871028e00b001bf295a68a9mr804869oae.19.1691723973779; Thu, 10 Aug
+ 2023 20:19:33 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v8 02/14] KVM: Declare kvm_arch_flush_remote_tlbs()
- globally
-Content-Language: en-US
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-9-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-9-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 10 Aug 2023 20:19:21 -0700
+Message-ID: <CAAdAUtjc=vsibaxyz5pzhho7a9N2digP1vgHpCN_y9LUoaTOaw@mail.gmail.com>
+Subject: Re: [PATCH v3 08/27] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
         James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20230808231330.3855936-1-rananta@google.com>
- <20230808231330.3855936-3-rananta@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230808231330.3855936-3-rananta@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Marc,
 
-
-On 8/9/23 07:13, Raghavendra Rao Ananta wrote:
-> There's no reason for the architectures to declare
-> kvm_arch_flush_remote_tlbs() in their own headers. Hence to
-> avoid this duplication, make the declaration global, leaving
-> the architectures to define only __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> as needed.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> As we're about to implement full support for FEAT_FGT, add the
+> full HDFGRTR_EL2 and HDFGWTR_EL2 layouts.
+>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
 > ---
->   arch/mips/include/asm/kvm_host.h | 1 -
->   include/linux/kvm_host.h         | 2 ++
->   2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> index 9b0ad8f3bf327..54a85f1d4f2c8 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -897,6 +897,5 @@ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
->   static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
->   
->   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> -int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
->   
->   #endif /* __MIPS_KVM_HOST_H__ */
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e3f968b38ae97..ade5d4500c2ce 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1484,6 +1484,8 @@ static inline int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->   {
->   	return -ENOTSUPP;
->   }
-> +#else
-> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
->   #endif
->   
->   #ifdef __KVM_HAVE_ARCH_NONCOHERENT_DMA
+>  arch/arm64/include/asm/sysreg.h |   2 -
+>  arch/arm64/tools/sysreg         | 129 ++++++++++++++++++++++++++++++++
+>  2 files changed, 129 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sys=
+reg.h
+> index 6d9d7ac4b31c..043c677e9f04 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -495,8 +495,6 @@
+>  #define SYS_VTCR_EL2                   sys_reg(3, 4, 2, 1, 2)
+>
+>  #define SYS_TRFCR_EL2                  sys_reg(3, 4, 1, 2, 1)
+> -#define SYS_HDFGRTR_EL2                        sys_reg(3, 4, 3, 1, 4)
+> -#define SYS_HDFGWTR_EL2                        sys_reg(3, 4, 3, 1, 5)
+>  #define SYS_HAFGRTR_EL2                        sys_reg(3, 4, 3, 1, 6)
+>  #define SYS_SPSR_EL2                   sys_reg(3, 4, 4, 0, 0)
+>  #define SYS_ELR_EL2                    sys_reg(3, 4, 4, 0, 1)
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 65866bf819c3..2517ef7c21cf 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -2156,6 +2156,135 @@ Field   1       ICIALLU
+>  Field  0       ICIALLUIS
+>  EndSysreg
+>
+> +Sysreg HDFGRTR_EL2     3       4       3       1       4
+> +Field  63      PMBIDR_EL1
+> +Field  62      nPMSNEVFR_EL1
+> +Field  61      nBRBDATA
+> +Field  60      nBRBCTL
+> +Field  59      nBRBIDR
+> +Field  58      PMCEIDn_EL0
+> +Field  57      PMUSERENR_EL0
+> +Field  56      TRBTRG_EL1
+> +Field  55      TRBSR_EL1
+> +Field  54      TRBPTR_EL1
+> +Field  53      TRBMAR_EL1
+> +Field  52      TRBLIMITR_EL1
+> +Field  51      TRBIDR_EL1
+> +Field  50      TRBBASER_EL1
+> +Res0   49
+> +Field  48      TRCVICTLR
+> +Field  47      TRCSTATR
+> +Field  46      TRCSSCSRn
+> +Field  45      TRCSEQSTR
+> +Field  44      TRCPRGCTLR
+> +Field  43      TRCOSLSR
+> +Res0   42
+> +Field  41      TRCIMSPECn
+> +Field  40      TRCID
+> +Res0   39:38
+> +Field  37      TRCCNTVRn
+> +Field  36      TRCCLAIM
+> +Field  35      TRCAUXCTLR
+> +Field  34      TRCAUTHSTATUS
+> +Field  33      TRC
+> +Field  32      PMSLATFR_EL1
+> +Field  31      PMSIRR_EL1
+> +Field  30      PMSIDR_EL1
+> +Field  29      PMSICR_EL1
+> +Field  28      PMSFCR_EL1
+> +Field  27      PMSEVFR_EL1
+> +Field  26      PMSCR_EL1
+> +Field  25      PMBSR_EL1
+> +Field  24      PMBPTR_EL1
+> +Field  23      PMBLIMITR_EL1
+> +Field  22      PMMIR_EL1
+> +Res0   21:20
+> +Field  19      PMSELR_EL0
+> +Field  18      PMOVS
+> +Field  17      PMINTEN
+> +Field  16      PMCNTEN
+> +Field  15      PMCCNTR_EL0
+> +Field  14      PMCCFILTR_EL0
+> +Field  13      PMEVTYPERn_EL0
+> +Field  12      PMEVCNTRn_EL0
+> +Field  11      OSDLR_EL1
+> +Field  10      OSECCR_EL1
+> +Field  9       OSLSR_EL1
+> +Res0   8
+> +Field  7       DBGPRCR_EL1
+> +Field  6       DBGAUTHSTATUS_EL1
+> +Field  5       DBGCLAIM
+> +Field  4       MDSCR_EL1
+> +Field  3       DBGWVRn_EL1
+> +Field  2       DBGWCRn_EL1
+> +Field  1       DBGBVRn_EL1
+> +Field  0       DBGBCRn_EL1
+> +EndSysreg
+> +
+> +Sysreg HDFGWTR_EL2     3       4       3       1       5
+> +Res0   63
+> +Field  62      nPMSNEVFR_EL1
+> +Field  61      nBRBDATA
+> +Field  60      nBRBCTL
+> +Res0   59:58
+> +Field  57      PMUSERENR_EL0
+> +Field  56      TRBTRG_EL1
+> +Field  55      TRBSR_EL1
+> +Field  54      TRBPTR_EL1
+> +Field  53      TRBMAR_EL1
+> +Field  52      TRBLIMITR_EL1
+> +Res0   51
+> +Field  50      TRBBASER_EL1
+> +Field  49      TRFCR_EL1
+> +Field  48      TRCVICTLR
+> +Res0   47
+> +Field  46      TRCSSCSRn
+> +Field  45      TRCSEQSTR
+> +Field  44      TRCPRGCTLR
+> +Res0   43
+> +Field  42      TRCOSLAR
+> +Field  41      TRCIMSPECn
+> +Res0   40:38
+> +Field  37      TRCCNTVRn
+> +Field  36      TRCCLAIM
+> +Field  35      TRCAUXCTLR
+> +Res0   34
+> +Field  33      TRC
+> +Field  32      PMSLATFR_EL1
+> +Field  31      PMSIRR_EL1
+> +Res0   30
+> +Field  29      PMSICR_EL1
+> +Field  28      PMSFCR_EL1
+> +Field  27      PMSEVFR_EL1
+> +Field  26      PMSCR_EL1
+> +Field  25      PMBSR_EL1
+> +Field  24      PMBPTR_EL1
+> +Field  23      PMBLIMITR_EL1
+> +Res0   22
+> +Field  21      PMCR_EL0
+> +Field  20      PMSWINC_EL0
+> +Field  19      PMSELR_EL0
+> +Field  18      PMOVS
+> +Field  17      PMINTEN
+> +Field  16      PMCNTEN
+> +Field  15      PMCCNTR_EL0
+> +Field  14      PMCCFILTR_EL0
+> +Field  13      PMEVTYPERn_EL0
+> +Field  12      PMEVCNTRn_EL0
+> +Field  11      OSDLR_EL1
+> +Field  10      OSECCR_EL1
+> +Res0   9
+> +Field  8       OSLAR_EL1
+> +Field  7       DBGPRCR_EL1
+> +Res0   6
+> +Field  5       DBGCLAIM
+> +Field  4       MDSCR_EL1
+> +Field  3       DBGWVRn_EL1
+> +Field  2       DBGWCRn_EL1
+> +Field  1       DBGBVRn_EL1
+> +Field  0       DBGBCRn_EL1
+> +EndSysreg
+> +
+>  Sysreg ZCR_EL2 3       4       1       2       0
+>  Fields ZCR_ELx
+>  EndSysreg
+> --
+> 2.34.1
+>
+>
 
--- 
-Shaoqin
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
 
+Jing
