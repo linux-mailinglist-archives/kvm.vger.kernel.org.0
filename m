@@ -2,120 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D560778E97
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 14:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38FAE778FA7
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 14:38:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234213AbjHKMCf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 08:02:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47590 "EHLO
+        id S233506AbjHKMiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 08:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233159AbjHKMCe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 08:02:34 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0286125;
-        Fri, 11 Aug 2023 05:02:32 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37BBpWPO023901;
-        Fri, 11 Aug 2023 12:02:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=VdkLcjfWMe6NRoF/NolL+X0OUF17mEipJ/11rANwXMo=;
- b=Rctp2emZMc+Vs3m9uCMo6qTEOaEAT8i9AD6WAOlimsxM+GpPrc+Pw+RF1TODwJfOpMHF
- CcRrLX3NUq63o8GzfOHSH10jbnFeJv/aQ7uv/CM9AAJf4Gpzc/lz0zzOujk6TSgKwCkW
- gEacNZCw+//jJ0EmwbWATvbEjCw3fQKUf42pb8InhY8EIBrZHxSj9nluDII/FmV1V7TF
- t1edBmtIyftfPtiKPAkr9HLx9ZgemkV1fgMziEBXcwUMkDVZJkAR+Z7vrBJCdJKZ4xk4
- pk7layfOcw/Wi2t6K1tvpTaDtGZC/WAzMKhN9pgzST6Z7fNC1BX7W2BjRa421m0Hpw8L eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sdmfyg9xe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Aug 2023 12:02:31 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37BBvBlZ009811;
-        Fri, 11 Aug 2023 12:02:31 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sdmfyg9x4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Aug 2023 12:02:31 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37BA1aYQ006421;
-        Fri, 11 Aug 2023 12:02:30 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sd2evfsva-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 11 Aug 2023 12:02:30 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37BC2RVx44827134
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 11 Aug 2023 12:02:27 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32CAE20043;
-        Fri, 11 Aug 2023 12:02:27 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB63620040;
-        Fri, 11 Aug 2023 12:02:26 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 11 Aug 2023 12:02:26 +0000 (GMT)
-Date:   Fri, 11 Aug 2023 14:02:25 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, nsg@linux.ibm.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: spec_ex: load full register
-Message-ID: <20230811140225.7e810730@p-imbrenda>
-In-Reply-To: <20230811112949.888903-1-nrb@linux.ibm.com>
-References: <20230811112949.888903-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+        with ESMTP id S229379AbjHKMiI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 08:38:08 -0400
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B24EE65
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 05:38:06 -0700 (PDT)
+Received: by mail-vk1-xa2e.google.com with SMTP id 71dfb90a1353d-4871396a94fso760907e0c.1
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 05:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691757485; x=1692362285;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EvRsZaCvxzdM5qQ74utVXRoJOdLTQO1MpcAYCJUSp2s=;
+        b=RK9AT6X9/XmZS8WZvd3n2tAOdWTwvHJu+/X1uxCzjSC5LTa14KPrZSoSIKIs95nlux
+         nhrgZeg5ahuLbvxanmOe+kMLx9sQ3jV0L4UMMduN7KqWkAYPWnCauONOCNHBQtzTDrA+
+         vK9Olg9A21WrSnCtVwYtYUW1klNX4A0aeQFyrTQZrV4z+a0GkNNyURzOERpm1kyYN5RK
+         bq03bySby1MLn6X6j8wKf9qRuRJI7tPQFkpVDeSO+NEDOgmoHQbknCzWnx89ZZZQT4GA
+         zAJJjP1En1KDwwTpD/CeCwGYgtnFV8maNTXTNmDftRm5XJ0CeJAZ1mbHtmKDdkvL25tp
+         1noQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691757485; x=1692362285;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EvRsZaCvxzdM5qQ74utVXRoJOdLTQO1MpcAYCJUSp2s=;
+        b=XkZfuHZjYqIFRagl/5VKNQ0vS/8OW6H7kaQhjBRKHRHC/mov2gDnr3h3CweZqu3gle
+         7ytTvla9247srQbCWT4UlgsOiSLE5//n8pM7czEjL4CcAr5fYVZOUJOcytWtnGcfvf+A
+         8TlkuZFvr4YirWcSTFIvosmd0QDYnXS1qmaemjwCqBz4AnT/9RConW1WReuXiPLDovSi
+         waqal6y6voX+ufc51mUKaGkc7d1QsvL2yEAXc9Vod4UcKL07u61A4RUlOV5PYSow4mMK
+         CKqz7Bm5q3BJZqf8zAxQuFNlQe3tl28KYza3D/N+G11z6PZ9+c/PKEBc/gha7hBURdqS
+         dvuA==
+X-Gm-Message-State: AOJu0Yz1rn9k72FHpbymsAASm1YYNpjHlZuGg4mJUeOeFw39aRkkcemI
+        QfShDX9RO+KQZDmZa3ikbU3FpiEnOtPNlwTPQBsvVlbs82M=
+X-Google-Smtp-Source: AGHT+IGXI3c/JO5pz+pmQySybtKvZ/10uS89VksQh1myjVDi8TVMkg1NOpR8fMvhtKiyxZ/y6/ejA9soc0E5WxgCqv8=
+X-Received: by 2002:a1f:bd49:0:b0:471:1785:e838 with SMTP id
+ n70-20020a1fbd49000000b004711785e838mr2099256vkf.2.1691757485498; Fri, 11 Aug
+ 2023 05:38:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Svk9LrCq-Epu8EsKyh3EWtV5HMJnzpxR
-X-Proofpoint-GUID: gxOUoyqwaETS8E8Lc9SgTV6HY6_pewXZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-11_03,2023-08-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 suspectscore=0 clxscore=1015 mlxscore=0 phishscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308110106
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com>
+ <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+ <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
+ <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
+ <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
+ <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com>
+In-Reply-To: <ZNV5rrq1Ja7QgES5@google.com>
+From:   Amaan Cheval <amaan.cheval@gmail.com>
+Date:   Fri, 11 Aug 2023 18:07:53 +0530
+Message-ID: <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Eric Wheeler <kvm@lists.ewheeler.net>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Aug 2023 13:29:36 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+> There's a pretty big list, see the "failure" paths of do_numa_page() and
+> migrate_misplaced_page().
 
-> There may be contents left in the upper 32 bits of executed_addr; hence
-> we should use a 64-bit load to make sure they are overwritten.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Gotcha, thank you!
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+...
 
-> ---
->  s390x/spec_ex.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> index e3dd85dcb153..72b942576369 100644
-> --- a/s390x/spec_ex.c
-> +++ b/s390x/spec_ex.c
-> @@ -142,7 +142,7 @@ static int psw_odd_address(void)
->  		"	larl	%%r1,0f\n"
->  		"	stg	%%r1,%[fixup_addr]\n"
->  		"	lpswe	%[odd_psw]\n"
-> -		"0:	lr	%[executed_addr],%%r0\n"
-> +		"0:	lgr	%[executed_addr],%%r0\n"
->  	: [fixup_addr] "=&T" (fixup_psw.addr),
->  	  [executed_addr] "=d" (executed_addr)
->  	: [odd_psw] "Q" (odd)
+> Since it sounds like you can test with a custom kernel, try running with this
+> patch and then enable the kvm_page_fault tracepoint when a vCPU gets
+> stuck.  The below expands said tracepoint to capture information about
+> mmu_notifiers and memslots generation.  With luck, it will reveal a smoking
+> gun.
 
+Thanks for the patch there. We tried migrating a locked up guest to a host with
+this modified kernel twice (logs below). The guest "fixed itself" post
+migration, so the results may not have captured the "problematic" kind of
+page-fault, but here they are.
+
+Complete logs of kvm_page_fault tracepoint events, starting just before the
+migration (with 0 guests before the migration, so the first logs should be of
+the problematic guest) as it resolves the lockup:
+
+1. https://transfer.sh/QjB3MjeBqh/trace-kvm-kpf2.log
+2. https://transfer.sh/wEFQm4hLHs/trace-kvm-pf.log
+
+Truncated logs of `trace-cmd record -e kvm -e kvmmmu` in case context helps:
+
+1. https://transfer.sh/FoFsNoFQCP/trace-kvm2.log
+2. https://transfer.sh/LBFJryOfu7/trace-kvm.log
+
+Note that for migration #2 in both respectively above (trace-kvm-pf.log and
+trace-kvm.log), we didn't confirm that the guest was locked up before migration
+mistakenly. It most likely was but in case trace #2 doesn't present the same
+symptoms, that's why.
+
+Off an uneducated glance, it seems like `in_prog = 0x1` at least once for every
+`seq` / kvm_page_fault that seems to be "looping" and staying unresolved -
+indicating a lock contention, perhaps, in trying to invalidate/read/write the
+same page range?
+
+Any leads on where in the source code I could look to understand how that might
+happen?
+
+----
+
+@Eric
+
+> Does the VM make progress even if is migrated to a kernel that presents the
+> bug?
+
+We're unsure which kernel versions do present the bug, so it's hard to say.
+We've definitely seen it occur on kernels 5.15.49 to 6.1.38, but beyond that, we
+don't know for certain. (Potentially as early as 5.10.103, though!)
+
+> What was kernel version being migrated from and to?
+
+The live migration where the issue was resolved by migrating, was from 6.1.12 to
+6.5.0-rc2.
+
+The traces above are for this live migration (source 6.1.x to target host
+6.5.0-rc2).
+
+Another migration was from 6.1.x to 6.1.39 (not for these traces). All of these
+times the guest resumed/made progress post-migration.
+
+> For example, was it from a >5.19 kernel to something earlier than 5.19?
+
+No, we haven't tried migrating to < 5.19 yet - we have very few hosts running
+kernels that old.
+
+> For example, if the hung VM remains stuck after migrating to a >5.19 kernel
+> but _not_ to a <5.19 kernel, then maybe bisect is an option.
+
+From what Sean and I discussed above, we suspect that the VM remaining stuck is
+likely due to the kernel softlock'ing from stalling in the kernel due to the
+original bug.
+
+We do know this issue _occurs_ as late as 6.1.38 at least (i.e. hosts running
+6.1.38 have had guests lockup - we don't have hosts on more recent kernels, so
+this isn't proof that it's been fixed since then, nor is migration proof of
+that, IMO).
