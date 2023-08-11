@@ -2,171 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2713D77965F
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 19:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF13C77969D
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 20:02:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236906AbjHKRoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 13:44:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
+        id S234988AbjHKSCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 14:02:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236573AbjHKRoO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 13:44:14 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45F57106
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:44:14 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d67a458ff66so495827276.3
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 10:44:14 -0700 (PDT)
+        with ESMTP id S230217AbjHKSCP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 14:02:15 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E3310F
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:02:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d67a458ff66so515372276.3
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 11:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1691775853; x=1692380653;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y5tf/etP9591sBoXXP0u0lhmE2sGhQYCIj4rXej+PgY=;
-        b=z4avZMYBxF/USDP2G14KA+P8N8yreov1u2JOHwfc1TVZdl6Iz+YTKH19wDx7mUMq9M
-         o4u6qon1QiMk8DVxh93qeN2Mz6fZGsUFtzOg33bB4Mo7KFsOypRjJRdzz9Y8WFCiY85q
-         br+fPgBO/on1YU5soxnymBtm9OPZyICHaFKZfYSg9Ropko2mo0wKLVwIok1lVrWFw51i
-         jjhtl/HK+nEz+jNhJe7imTF+VBA6+NGFZjFm7+hHqXCkfP3+rYY1oaYSypJ0v6009kFT
-         lq7bEwknPOhWjDhET6YMFrJ/3n1YTZ5hf1bP/IHZB/5/XDyHPzuDGnqfF1kEhe1cc6AD
-         1nfg==
+        d=google.com; s=20221208; t=1691776933; x=1692381733;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ma7a/CvcC7qFVUR/wztxpShWVPAvNO22UGYt8xcZrPE=;
+        b=vyhtq7mw6Sok8TLRoNnb2IGBgqG2DuctGPx0sCkRsFzLEc+H7j88xYimth+H6YPf9t
+         pb90l8gdn8EMaad/WFDbC1e6W5BI7XlH7KFZLLryKbi8jLFhSmdqi2dMh/Hr5HIBLfZd
+         m9AAfJfL01O1s+jphUTgHJdDLc1nRKlSYT5RlkpKyhzlIgh4z2+rvMTSXOnxMlldN59H
+         ZfLSCIxX5QkEkxYPN/dTDSog/1HdVfcstnhFiG7tnz7eC13mac/6Pn8/wyHTjiNDTIt9
+         FrByPsqmWJNbX1VgsGgZBXjRnXDsgmu/WNVEKEzuFts0yWP5nmTSc/91mBh5+hkJ1OP9
+         FkLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691775853; x=1692380653;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=y5tf/etP9591sBoXXP0u0lhmE2sGhQYCIj4rXej+PgY=;
-        b=TIw/RQbbPhdFxTiFpdH/WmGka1ss9Vue9MrcD5jRDFiHHfi2t4CPvNf8NtE2i5f8uu
-         O22ip7f9u/x2R9faPJZHBSO8BZJ8oNjknQns0P0GoKl5sbR8Xr/f0QHHI0gZ/DlKmAYe
-         vD2sl25RUG7LPLFTF04jK+8OOHwDZi/GrCgKbInmltwXXCYb4EYDeQVBc/mu0+JEyF7O
-         fgpplDd2KDJtbBoTdxNJOZN+Z+AbyXASXIwPPiAtCVDa7vwb58vOLF0g4UiMAjF0aLXU
-         ZmhxLy+NV5jQrxSU3HJvM7odx0PUbijImYf1cL5aBTVYpqrdOp7Tlg17FAlUefI3DmGw
-         ZPSg==
-X-Gm-Message-State: AOJu0YxN6+zXnb81DNYFEpETkA8X+U189WcOcHKY6FcODvCdEac6nMk/
-        OdPR8e6QB/Hj1DEhJs3S9GcCxn3KM/o=
-X-Google-Smtp-Source: AGHT+IFlh+eXwF8rMcD2luIRCX1nl8Idt0F+6stO6hsWWfidj415wHUgqoJc8kVAwNGB8y2mQW1tGjk2lPA=
+        d=1e100.net; s=20221208; t=1691776933; x=1692381733;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ma7a/CvcC7qFVUR/wztxpShWVPAvNO22UGYt8xcZrPE=;
+        b=MSfmQu97mCus/k01BbIj1NbeeV3mMGSdpK92ccG79fBO+OiAOs1265NKMhcVuJ4xnW
+         SxuFOeJ6DVFNAeOWodocrwUyJidrICsUOFOgO9OdjnjknnWBo43lvfK4Me0O6ysmyNYZ
+         nI4BKW/U41opTtfKJMPkRXAvzczUlYDwhRbJblwIC4p5+c1fQzKtB1N65K07m1Yu7MNy
+         /EtHf3iNyIBHl0IsFLfdFI5Hk72EOczwgg0KaMbbruUrHPWp0chWwy0kLu3GpbUP16EJ
+         h/A+HXI4jyKfEhfDUb48bboyKpW9aMW2DWKaKOR8XYh0JkrNHiDwtb4qkojPenZ6Z/h9
+         8PzA==
+X-Gm-Message-State: AOJu0Ywa3nGb3vO4fp4zstwjrfxqV/ARizUGo5RFqecfc5v6pjddEvxi
+        a5au0TIb8+Im9sH4kzhvJUh4DI21450=
+X-Google-Smtp-Source: AGHT+IGKIA5LvKpxQc1QTmqZHoMrY0zis6UZ78jc5uBG94hFkrWxWg2Ln36OZayQB7oNw1dHkUGCzDA8XR4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
  (user=seanjc job=sendgmr) by 2002:a25:7443:0:b0:d20:7752:e384 with SMTP id
- p64-20020a257443000000b00d207752e384mr41859ybc.3.1691775853469; Fri, 11 Aug
- 2023 10:44:13 -0700 (PDT)
-Date:   Fri, 11 Aug 2023 10:44:11 -0700
-In-Reply-To: <CAGtprH9YE50RtqhW-U+wK0Vv6aKfqqtOPn8q4s8or=UZwPXZoA@mail.gmail.com>
+ p64-20020a257443000000b00d207752e384mr42675ybc.3.1691776933032; Fri, 11 Aug
+ 2023 11:02:13 -0700 (PDT)
+Date:   Fri, 11 Aug 2023 11:02:11 -0700
+In-Reply-To: <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
 Mime-Version: 1.0
-References: <20230718234512.1690985-13-seanjc@google.com> <diqzv8dq3116.fsf@ackerleytng-ctop.c.googlers.com>
- <ZNKv9ul2I7A4V7IF@google.com> <CAGtprH9YE50RtqhW-U+wK0Vv6aKfqqtOPn8q4s8or=UZwPXZoA@mail.gmail.com>
-Message-ID: <ZNZza/emWldkJC6X@google.com>
-Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
- guest-specific backing memory
+References: <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+ <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
+ <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
+ <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
+ <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com>
+ <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
+Message-ID: <ZNZ3owRcRjGejWFn@google.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     Ackerley Tng <ackerleytng@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, oliver.upton@linux.dev, chenhuacai@kernel.org,
-        mpe@ellerman.id.au, anup@brainfault.org, paul.walmsley@sifive.com,
-        palmer@dabbelt.com, aou@eecs.berkeley.edu, willy@infradead.org,
-        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
-        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
-        mail@maciej.szmigiero.name, vbabka@suse.cz, david@redhat.com,
-        qperret@google.com, michael.roth@amd.com, wei.w.wang@intel.com,
-        liam.merwick@oracle.com, isaku.yamahata@gmail.com,
-        kirill.shutemov@linux.intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Amaan Cheval <amaan.cheval@gmail.com>
+Cc:     Eric Wheeler <kvm@lists.ewheeler.net>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 10, 2023, Vishal Annapurve wrote:
-> On Tue, Aug 8, 2023 at 2:13=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > ...
->=20
-> > > + When binding a memslot to the file, if a kvm pointer exists, it mus=
-t
-> > >   be the same kvm as the one in this binding
-> > > + When the binding to the last memslot is removed from a file, NULL t=
-he
-> > >   kvm pointer.
-> >
-> > Nullifying the KVM pointer isn't sufficient, because without additional=
- actions
-> > userspace could extract data from a VM by deleting its memslots and the=
-n binding
-> > the guest_memfd to an attacker controlled VM.  Or more likely with TDX =
-and SNP,
-> > induce badness by coercing KVM into mapping memory into a guest with th=
-e wrong
-> > ASID/HKID.
-> >
->=20
-> TDX/SNP have mechanisms i.e. PAMT/RMP tables to ensure that the same
-> memory is not assigned to two different VMs.
+On Fri, Aug 11, 2023, Amaan Cheval wrote:
+> > Since it sounds like you can test with a custom kernel, try running with this
+> > patch and then enable the kvm_page_fault tracepoint when a vCPU gets
+> > stuck.  The below expands said tracepoint to capture information about
+> > mmu_notifiers and memslots generation.  With luck, it will reveal a smoking
+> > gun.
+> 
+> Thanks for the patch there. We tried migrating a locked up guest to a host with
+> this modified kernel twice (logs below). The guest "fixed itself" post
+> migration, so the results may not have captured the "problematic" kind of
+> page-fault, but here they are.
 
-One of the main reasons we pivoted away from using a flag in "struct page" =
-to
-indicate that a page was private was so that KVM could enforce 1:1 VM:page =
-ownership
-*without* relying on hardware.
+The traces need to be captured from the host where a vCPU is stuck.
 
-And FWIW, the PAMT provides no protection in this specific case because KVM=
- does
-TDH.MEM.PAGE.REMOVE when zapping S-EPT entries, and that marks the page cle=
-ar in
-the PAMT.  The danger there is that physical memory is still encrypted with=
- the
-guest's HKID, and so mapping the memory into a different VM, which might no=
-t be
-a TDX guest!, could lead to corruption and/or poison #MCs.
+> Complete logs of kvm_page_fault tracepoint events, starting just before the
+> migration (with 0 guests before the migration, so the first logs should be of
+> the problematic guest) as it resolves the lockup:
+> 
+> 1. https://transfer.sh/QjB3MjeBqh/trace-kvm-kpf2.log
+> 2. https://transfer.sh/wEFQm4hLHs/trace-kvm-pf.log
+> 
+> Truncated logs of `trace-cmd record -e kvm -e kvmmmu` in case context helps:
+> 
+> 1. https://transfer.sh/FoFsNoFQCP/trace-kvm2.log
+> 2. https://transfer.sh/LBFJryOfu7/trace-kvm.log
+> 
+> Note that for migration #2 in both respectively above (trace-kvm-pf.log and
+> trace-kvm.log), we didn't confirm that the guest was locked up before migration
+> mistakenly. It most likely was but in case trace #2 doesn't present the same
+> symptoms, that's why.
+> 
+> Off an uneducated glance, it seems like `in_prog = 0x1` at least once for every
+> `seq` / kvm_page_fault that seems to be "looping" and staying unresolved -
 
-The HKID issues wouldn't be a problem if v15 is merged as-is, because zappi=
-ng
-S-EPT entries also fully purges and reclaims the page, but as we discussed =
-in
-one of the many threads, reclaiming physical memory should be tied to the i=
-node,
-i.e. to memory truly being freed, and not to S-EPTs being zapped.  And ther=
-e is
-a very good reason for wanting to do that, as it allows KVM to do the expen=
-sive
-cache flush + clear outside of mmu_lock.
+This is completely expected.   The "in_prog" thing is just saying that a vCPU
+took a fault while there was an mmu_notifier event in-progress.
 
-> Deleting memslots should also clear out the contents of the memory as the=
- EPT
-> tables will be zapped in the process
+> indicating a lock contention, perhaps, in trying to invalidate/read/write the
+> same page range?
 
-No, deleting a memslot should not clear memory.  As I said in my previous r=
-esponse,
-the fact that zapping S-EPT entries is destructive is a limitiation of TDX,=
- not a
-feature we want to apply to other VM types.  And that's not even a fundamen=
-tal
-property of TDX, e.g. TDX could remove the limitation, at the cost of consu=
-ming
-quite a bit more memory, by tracking the exact owner by HKID in the PAMT an=
-d
-decoupling S-EPT entries from page ownership.
+No, just a collision between the primary MMU invalidating something, e.g. to move
+a page or do KSM stuff, and a vCPU accessing the page in question.
 
-Or in theory, KVM could workaround the limitation by only doing TDH.MEM.RAN=
-GE.BLOCK
-when zapping S-EPTs.  Hmm, that might actually be worth looking at.
+> We do know this issue _occurs_ as late as 6.1.38 at least (i.e. hosts running
+> 6.1.38 have had guests lockup - we don't have hosts on more recent kernels, so
+> this isn't proof that it's been fixed since then, nor is migration proof of
+> that, IMO).
 
-> and the host will reclaim the memory.
+Note, if my hunch is correct, it's the act of migrating to a different *host* that
+resolves the problem, not the fact that the migration is to a different kernel.
+E.g. I would expect that migrating to the exact same kernel would still unstick
+the vCPU.
 
-There are no guarantees that the host will reclaim the memory.  E.g. QEMU w=
-ill
-delete and re-create memslots for "regular" VMs when emulating option ROMs.=
-  Even
-if that use case is nonsensical for confidential VMs (and it probably is no=
-nsensical),
-I don't want to define KVM's ABI based on what we *think* userspace will do=
-.
+What I suspect is happening is that the in-progress count gets left high, e.g.
+because of a start() without a paired end(), and that causes KVM to refuse to
+install mappings for the affected range of guest memory.  Or possibly that the
+problematic host is generating an absolutely massive storm of invalidations and
+unintentionally DoS's the guest.
+
+Either way, migrating the VM to a new host and thus a new KVM instance essentially
+resets all of that metadata and allows KVM to fault-in pages and establish mappings.
+
+Actually, one thing you could try to unstick a VM would be to do an intra-host
+migration, i.e. migrate it to a new KVM instance on the same host.  If that "fixes"
+the guest, then the bug is likely an mmu_notifier counting bug and not an
+invalidation storm.
+
+But the easiest thing would be to catch a host in the act, i.e. capture traces
+with my debug patch from a host with a stuck vCPU.
