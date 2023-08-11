@@ -2,75 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A047778521
-	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 03:53:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C8F778524
+	for <lists+kvm@lfdr.de>; Fri, 11 Aug 2023 03:55:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229757AbjHKBxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Aug 2023 21:53:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49598 "EHLO
+        id S232663AbjHKBzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 10 Aug 2023 21:55:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjHKBxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Aug 2023 21:53:50 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E662D56;
-        Thu, 10 Aug 2023 18:53:50 -0700 (PDT)
+        with ESMTP id S229456AbjHKBzO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 10 Aug 2023 21:55:14 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3050D2D52;
+        Thu, 10 Aug 2023 18:55:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691718830; x=1723254830;
+  t=1691718914; x=1723254914;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=J9wNibjtWigosqMiqT6RlANIRotnabaMtEYiNz739Ic=;
-  b=RIjUsXX5cZ+T/2W5UBxzd5xpkOs1tTT7/7v6p9v1CYvOD6ba51H923L1
-   mz3iuRFxDnb9Q18csBetFKZ4HRuBs5P54orbVtpsgk4+vrhEPpgY5JJzN
-   A+AUYzMmXTLCvwyzP86pTtBqCIMrrUq9vX1okX2lzWwgWaLP3wL36bD6m
-   i69lOGJ7795WAyYKji/iicAdiz7Wsh9vP0ch6hII0RJqGFWoBRMGEqKoj
-   hFu9NhCUad//rWPfPW+qiZbF3rEfM+MaEeu1SWJs6iqvvYV9MvcAbtWmW
-   +813deOztl6cy5wcIUjAF7JCU+uhD4zEEiVqN0zukx2vwjGVVKRJEo10o
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="369041737"
+  bh=IfHlH8JUVTQwrnI9x4YcZdegqcZ29aRj1abmEHrpcbI=;
+  b=CoNmGeF8wOdLmoXeP8TmIqvQ0iri7KmvAim4PVCjjOK4Ci9B62w1EgQN
+   tgWZP7I6wiKV/IoGfGfsYBKpVeqXbbziGG56XyKNZixjnMN3j/D9Clml1
+   F7u+GZwBQJPfLV2zDSfGfog+4U78Uet525ttqGeK+Xj8f80B4ZuN5GWZ9
+   z1iIndMWgqjOtsrZCXJyLvSteGXrxmmFU8vA27KwReE48LHnpqsT3ZXKt
+   nnObYfCimUVZLUhAk9pgKgDfOcy7J0Y/ghiFrLIi9JugCcxoyKtImTzTZ
+   4yp8CEcr9eadKUmiX0sWZJjJ7iceyjwj3Y9Mq18un3Lka1J9DAhkakMUz
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="374336803"
 X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
-   d="scan'208";a="369041737"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 18:53:49 -0700
+   d="scan'208";a="374336803"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 18:55:13 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="846618196"
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="802480468"
 X-IronPort-AV: E=Sophos;i="6.01,164,1684825200"; 
-   d="scan'208";a="846618196"
+   d="scan'208";a="802480468"
 Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.214.70]) ([10.254.214.70])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 18:53:46 -0700
-Message-ID: <f1dbfb6a-5a53-f440-5d3a-25772c67547f@linux.intel.com>
-Date:   Fri, 11 Aug 2023 09:53:41 +0800
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 18:55:09 -0700
+Message-ID: <74234ff1-492c-5934-49b6-69b08b732b91@linux.intel.com>
+Date:   Fri, 11 Aug 2023 09:55:07 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
 Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
         Will Deacon <will@kernel.org>,
         Robin Murphy <robin.murphy@arm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Yi Liu <yi.l.liu@intel.com>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 08/12] iommu: Prepare for separating SVA and IOPF
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 09/12] iommu: Move iopf_handler() to iommu-sva.c
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
- <20230727054837.147050-9-baolu.lu@linux.intel.com>
- <BN9PR11MB52769D22490BB09BB25E0C2E8C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZNKMz04uhzL9T7ya@ziepe.ca>
- <BN9PR11MB527629949E7D44BED080400C8C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <0771c28d-1b31-003e-7659-4f3f3cbf5546@linux.intel.com>
- <BN9PR11MB527686C925E33E0DCDF261CB8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZNUUjXMrLyU3g5KM@ziepe.ca>
+ <20230727054837.147050-10-baolu.lu@linux.intel.com>
+ <ZNU0U9XscuB3ILuX@ziepe.ca>
 From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <ZNUUjXMrLyU3g5KM@ziepe.ca>
+In-Reply-To: <ZNU0U9XscuB3ILuX@ziepe.ca>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -79,40 +74,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/8/11 0:47, Jason Gunthorpe wrote:
-> On Thu, Aug 10, 2023 at 02:35:40AM +0000, Tian, Kevin wrote:
->>> From: Baolu Lu<baolu.lu@linux.intel.com>
->>> Sent: Wednesday, August 9, 2023 6:41 PM
->>>
->>> On 2023/8/9 8:02, Tian, Kevin wrote:
->>>>> From: Jason Gunthorpe<jgg@ziepe.ca>
->>>>> Sent: Wednesday, August 9, 2023 2:43 AM
->>>>>
->>>>> On Thu, Aug 03, 2023 at 08:16:47AM +0000, Tian, Kevin wrote:
->>>>>
->>>>>> Is there plan to introduce further error in the future? otherwise this
->>> should
->>>>>> be void.
->>>>>>
->>>>>> btw the work queue is only for sva. If there is no other caller this can be
->>>>>> just kept in iommu-sva.c. No need to create a helper.
->>>>> I think more than just SVA will need a work queue context to process
->>>>> their faults.
->>>>>
->>>> then this series needs more work. Currently the abstraction doesn't
->>>> include workqueue in the common fault reporting layer.
->>> Do you mind elaborate a bit here? workqueue is a basic infrastructure in
->>> the fault handling framework, but it lets the consumers choose to use
->>> it, or not to.
->>>
->> My understanding of Jason's comment was to make the workqueue the
->> default path instead of being opted by the consumer.. that is my 1st
->> impression but might be wrong...
-> Yeah, that is one path. Do we have anyone that uses this that doesn't
-> want the WQ? (actually who even uses this besides SVA?)
+On 2023/8/11 3:02, Jason Gunthorpe wrote:
+> On Thu, Jul 27, 2023 at 01:48:34PM +0800, Lu Baolu wrote:
+>> The iopf_handler() function handles a fault_group for a SVA domain. Move
+>> it to the right place.
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   drivers/iommu/iommu-sva.h  | 17 +++++++++++++
+>>   drivers/iommu/io-pgfault.c | 50 +++-----------------------------------
+>>   drivers/iommu/iommu-sva.c  | 49 +++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 69 insertions(+), 47 deletions(-)
+>> diff --git a/drivers/iommu/iommu-sva.c b/drivers/iommu/iommu-sva.c
+>> index 05c0fb2acbc4..ab42cfdd7636 100644
+>> --- a/drivers/iommu/iommu-sva.c
+>> +++ b/drivers/iommu/iommu-sva.c
+>> @@ -219,3 +219,52 @@ void mm_pasid_drop(struct mm_struct *mm)
+> 
+>> +static void iopf_handler(struct work_struct *work)
+>> +{
+>> +	struct iopf_fault *iopf;
+>> +	struct iopf_group *group;
+>> +	struct iommu_domain *domain;
+>> +	enum iommu_page_response_code status = IOMMU_PAGE_RESP_SUCCESS;
+>> +
+>> +	group = container_of(work, struct iopf_group, work);
+>> +	domain = iommu_get_domain_for_dev_pasid(group->dev,
+>> +				group->last_fault.fault.prm.pasid, 0);
+>> +	if (!domain || !domain->iopf_handler)
+>> +		status = IOMMU_PAGE_RESP_INVALID;
+>> +
+>> +	list_for_each_entry(iopf, &group->faults, list) {
+>> +		/*
+>> +		 * For the moment, errors are sticky: don't handle subsequent
+>> +		 * faults in the group if there is an error.
+>> +		 */
+>> +		if (status == IOMMU_PAGE_RESP_SUCCESS)
+>> +			status = domain->iopf_handler(&iopf->fault,
+>> +						      domain->fault_data);
+>> +	}
+>> +
+>> +	iopf_complete_group(group->dev, &group->last_fault, status);
+>> +	iopf_free_group(group);
+>> +}
+> 
+> Routing faults to domains is generic code, not SVA code.
 
-I am still confused. When we forward iopf's to user space through the
-iommufd, we don't need to schedule a WQ, right? Or I misunderstood here?
+You are right. This happens in the latter patch.
+
+> SVA starts at domain->iopf_handler
+> 
+> Jason
+> 
 
 Best regards,
 baolu
