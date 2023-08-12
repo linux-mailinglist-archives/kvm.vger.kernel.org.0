@@ -2,106 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCAC6779C25
-	for <lists+kvm@lfdr.de>; Sat, 12 Aug 2023 02:49:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C1CF779C2A
+	for <lists+kvm@lfdr.de>; Sat, 12 Aug 2023 02:50:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236912AbjHLAs6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 20:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56648 "EHLO
+        id S237124AbjHLAul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 20:50:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235495AbjHLAs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 20:48:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD9135BC
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 17:47:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691801278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rLC/yOAR2d4wIWdWwjFchmmeIa+RdcqwrFVJ1+GuKDw=;
-        b=YPKCaRmJNmgl8pKS+WQ6hlqvXnewKU5X3zgXjU+qK9jBcUNcFfgjiALKxhciJKehRm/Hm5
-        FpszXFKNTnTtgwDxmVgjRUX0uDHeB0f3jLkFOmwRSQqP+vd4T5+RP3jTdfrWttGFMZLtEO
-        aLHhRhTwwneZ256bP+Sp2pBcD7ZRlgM=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-339-lUtXwiZgPMmXVj5sVgtwdQ-1; Fri, 11 Aug 2023 20:47:54 -0400
-X-MC-Unique: lUtXwiZgPMmXVj5sVgtwdQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S236914AbjHLAuk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 20:50:40 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCB010E6
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 17:50:39 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 46B7D84;
+        Fri, 11 Aug 2023 17:50:39 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id H8HrlnczRXpA; Fri, 11 Aug 2023 17:50:35 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 918563C0ED49;
-        Sat, 12 Aug 2023 00:47:53 +0000 (UTC)
-Received: from [10.22.17.82] (unknown [10.22.17.82])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E04A2166B25;
-        Sat, 12 Aug 2023 00:47:51 +0000 (UTC)
-Message-ID: <2f84b806-193a-6d7c-71fe-cc718e9455f9@redhat.com>
-Date:   Fri, 11 Aug 2023 20:47:51 -0400
+        by mx.ewheeler.net (Postfix) with ESMTPSA id DC41040;
+        Fri, 11 Aug 2023 17:50:34 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net DC41040
+Date:   Fri, 11 Aug 2023 17:50:08 -0700 (PDT)
+From:   Eric Wheeler <kvm@lists.ewheeler.net>
+To:     Sean Christopherson <seanjc@google.com>
+cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Subject: Re: Deadlock due to EPT_VIOLATION
+In-Reply-To: <ZNZ3owRcRjGejWFn@google.com>
+Message-ID: <68e7d342-bdeb-39bf-5233-ba1121f0afc@ewheeler.net>
+References: <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com> <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com> <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
+ <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net> <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com> <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
+ <ZNZ3owRcRjGejWFn@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH V10 18/19] locking/qspinlock: Move pv_ops into x86
- directory
-Content-Language: en-US
-To:     Guo Ren <guoren@kernel.org>
-Cc:     paul.walmsley@sifive.com, anup@brainfault.org,
-        peterz@infradead.org, mingo@redhat.com, will@kernel.org,
-        palmer@rivosinc.com, boqun.feng@gmail.com, tglx@linutronix.de,
-        paulmck@kernel.org, rostedt@goodmis.org, rdunlap@infradead.org,
-        catalin.marinas@arm.com, conor.dooley@microchip.com,
-        xiaoguang.xing@sophgo.com, bjorn@rivosinc.com,
-        alexghiti@rivosinc.com, keescook@chromium.org,
-        greentime.hu@sifive.com, ajones@ventanamicro.com,
-        jszhang@kernel.org, wefu@redhat.com, wuwei2016@iscas.ac.cn,
-        linux-arch@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-csky@vger.kernel.org, Guo Ren <guoren@linux.alibaba.com>
-References: <20230802164701.192791-1-guoren@kernel.org>
- <20230802164701.192791-19-guoren@kernel.org>
- <5cf1117c-d537-703c-cdcf-f43c5bd9ed1b@redhat.com>
- <CAJF2gTQ6zJrcyOVCqF+xDXTEzFYUVQuTP0rKy=K6R99TQ05CrA@mail.gmail.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <CAJF2gTQ6zJrcyOVCqF+xDXTEzFYUVQuTP0rKy=K6R99TQ05CrA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 11 Aug 2023, Sean Christopherson wrote:
+> On Fri, Aug 11, 2023, Amaan Cheval wrote:
+> > > Since it sounds like you can test with a custom kernel, try running with this
+> > > patch and then enable the kvm_page_fault tracepoint when a vCPU gets
+> > > stuck.  The below expands said tracepoint to capture information about
+> > > mmu_notifiers and memslots generation.  With luck, it will reveal a smoking
+> > > gun.
+> > 
+> > Thanks for the patch there. We tried migrating a locked up guest to a host with
+> > this modified kernel twice (logs below). The guest "fixed itself" post
+> > migration, so the results may not have captured the "problematic" kind of
+> > page-fault, but here they are.
+> 
+> The traces need to be captured from the host where a vCPU is stuck.
+> 
+> > Complete logs of kvm_page_fault tracepoint events, starting just before the
+> > migration (with 0 guests before the migration, so the first logs should be of
+> > the problematic guest) as it resolves the lockup:
+> > 
+> > 1. https://transfer.sh/QjB3MjeBqh/trace-kvm-kpf2.log
+> > 2. https://transfer.sh/wEFQm4hLHs/trace-kvm-pf.log
+> > 
+> > Truncated logs of `trace-cmd record -e kvm -e kvmmmu` in case context helps:
+> > 
+> > 1. https://transfer.sh/FoFsNoFQCP/trace-kvm2.log
+> > 2. https://transfer.sh/LBFJryOfu7/trace-kvm.log
+> > 
+> > Note that for migration #2 in both respectively above (trace-kvm-pf.log and
+> > trace-kvm.log), we didn't confirm that the guest was locked up before migration
+> > mistakenly. It most likely was but in case trace #2 doesn't present the same
+> > symptoms, that's why.
+> > 
+> > Off an uneducated glance, it seems like `in_prog = 0x1` at least once for every
+> > `seq` / kvm_page_fault that seems to be "looping" and staying unresolved -
+> 
+> This is completely expected.   The "in_prog" thing is just saying that a vCPU
+> took a fault while there was an mmu_notifier event in-progress.
+> 
+> > indicating a lock contention, perhaps, in trying to invalidate/read/write the
+> > same page range?
+> 
+> No, just a collision between the primary MMU invalidating something, e.g. to move
+> a page or do KSM stuff, and a vCPU accessing the page in question.
+> 
+> > We do know this issue _occurs_ as late as 6.1.38 at least (i.e. hosts running
+> > 6.1.38 have had guests lockup - we don't have hosts on more recent kernels, so
+> > this isn't proof that it's been fixed since then, nor is migration proof of
+> > that, IMO).
+> 
+> Note, if my hunch is correct, it's the act of migrating to a different *host* that
+> resolves the problem, not the fact that the migration is to a different kernel.
+> E.g. I would expect that migrating to the exact same kernel would still unstick
+> the vCPU.
+> 
+> What I suspect is happening is that the in-progress count gets left high, e.g.
+> because of a start() without a paired end(), and that causes KVM to refuse to
+> install mappings for the affected range of guest memory.  Or possibly that the
+> problematic host is generating an absolutely massive storm of invalidations and
+> unintentionally DoS's the guest.
 
-On 8/11/23 20:24, Guo Ren wrote:
-> On Sat, Aug 12, 2023 at 4:42 AM Waiman Long <longman@redhat.com> wrote:
->> On 8/2/23 12:47, guoren@kernel.org wrote:
->>> From: Guo Ren <guoren@linux.alibaba.com>
->>>
->>> The pv_ops belongs to x86 custom infrastructure and cleans up the
->>> cna_configure_spin_lock_slowpath() with standard code. This is
->>> preparation for riscv support CNA qspoinlock.
->> CNA qspinlock has not been merged into mainline yet. I will suggest you
->> drop the last 2 patches for now. Of course, you can provide benchmark
->> data to boost the case for the inclusion of the CNA qspinlock patch into
->> the mainline.
-> Yes, my lazy, I would separate paravirt and CNA from this series.
 
-paravirt is OK, it is just that CNA hasn't been merged yet.
+It would would be great to write a micro benchmark of sorts that generates 
+EPT page invalidation pressure, and run it on a test system inside a 
+virtual machine to see if we can get it to fault:
 
-Cheers,
-Longman
+Can you suggest the type(s) of memory operations that could be written in 
+user space (or kernel space as a module) to, find a test case that forces 
+it to fail within a reasonable period of time?
 
->
->> Cheers,
->> Longman
->>
->
+We were thinking of memory mapping lots of page-sized mappings from 
+/dev/zero and then randomly write and free them after there are tons of 
+them allocated, and do this across multiple threads, while simultaneously 
+using `taskset` (or `virsh vcpupin`) on the host to move the guest vCPUs 
+across NUMA boundaries, and also with numabalance turned on.
 
+I have also considered passing a device like null_blk.ko into the guest, 
+and then doing memory mappings against it in the same way to put pressure 
+or on the direct IO path from KVM into the guest user space. 
+
+If you (or anyone else) have other suggestions then I would love to hear 
+it. Maybe we can make a reproducer for this.
+
+
+--
+Eric Wheeler
+
+
+> 
+> Either way, migrating the VM to a new host and thus a new KVM instance essentially
+> resets all of that metadata and allows KVM to fault-in pages and establish mappings.
+> 
+> Actually, one thing you could try to unstick a VM would be to do an intra-host
+> migration, i.e. migrate it to a new KVM instance on the same host.  If that "fixes"
+> the guest, then the bug is likely an mmu_notifier counting bug and not an
+> invalidation storm.
+> 
+> But the easiest thing would be to catch a host in the act, i.e. capture traces
+> with my debug patch from a host with a stuck vCPU.
+> 
