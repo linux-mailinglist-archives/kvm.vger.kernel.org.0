@@ -2,45 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C1CF779C2A
-	for <lists+kvm@lfdr.de>; Sat, 12 Aug 2023 02:50:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C035779C2B
+	for <lists+kvm@lfdr.de>; Sat, 12 Aug 2023 02:52:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237124AbjHLAul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Aug 2023 20:50:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53238 "EHLO
+        id S235342AbjHLAwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Aug 2023 20:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236914AbjHLAuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Aug 2023 20:50:40 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCB010E6
-        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 17:50:39 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 46B7D84;
-        Fri, 11 Aug 2023 17:50:39 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id H8HrlnczRXpA; Fri, 11 Aug 2023 17:50:35 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id DC41040;
-        Fri, 11 Aug 2023 17:50:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net DC41040
-Date:   Fri, 11 Aug 2023 17:50:08 -0700 (PDT)
-From:   Eric Wheeler <kvm@lists.ewheeler.net>
-To:     Sean Christopherson <seanjc@google.com>
-cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Subject: Re: Deadlock due to EPT_VIOLATION
-In-Reply-To: <ZNZ3owRcRjGejWFn@google.com>
-Message-ID: <68e7d342-bdeb-39bf-5233-ba1121f0afc@ewheeler.net>
-References: <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com> <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com> <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
- <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net> <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com> <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
- <ZNZ3owRcRjGejWFn@google.com>
+        with ESMTP id S237229AbjHLAwC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Aug 2023 20:52:02 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7227B30FE
+        for <kvm@vger.kernel.org>; Fri, 11 Aug 2023 17:51:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691801519; x=1723337519;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=T9Daikl/u2ztX3eAdSfiNU9UYztQtRvgl1jmh5MBy9c=;
+  b=Ba/S/bowVnel7gUUUeEPv9r1XGIFfeaWhvQiCxMeTe/1FFIc4mH+Oyf8
+   yCO+hrWqpsrHWoYiTsl6FsDoWwKLf/piv596uKBGnYUjAl1TdPhd6IFk7
+   ZKwxxaeMezAqk9GbYgeLHbY9BPE95gmjc8worfW5FmTajxoeAGgM3mt2W
+   strAAlk5S9+rVpd1Cjar0Oazmb3ffcVS3bThLW0rXjrbZzsZWTwGe+Jo3
+   Qndzt0KGOtW9VX/+Qf72LFtTqHAzlAsLQ2n0xczlIl8WKx5p2zg6oN3VK
+   cJZmSz41NGV8QfPRvuYAfRPEFved9dB1evYWRmOnnBZA0pAJPfBVmtuPZ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="438123419"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="438123419"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2023 17:51:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10799"; a="735936589"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="735936589"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 11 Aug 2023 17:51:56 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qUcrD-00089h-2E;
+        Sat, 12 Aug 2023 00:51:55 +0000
+Date:   Sat, 12 Aug 2023 08:51:00 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nikunj A Dadhania <nikunj@amd.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Ravi Bangoria <ravi.bangoria@amd.com>
+Subject: Re: [PATCH] KVM: SVM: Add exception to disable objtool warning for
+ kvm-amd.o
+Message-ID: <202308120845.gkEMVH5a-lkp@intel.com>
+References: <20230802091107.1160320-1-nikunj@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230802091107.1160320-1-nikunj@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -49,102 +72,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Aug 2023, Sean Christopherson wrote:
-> On Fri, Aug 11, 2023, Amaan Cheval wrote:
-> > > Since it sounds like you can test with a custom kernel, try running with this
-> > > patch and then enable the kvm_page_fault tracepoint when a vCPU gets
-> > > stuck.  The below expands said tracepoint to capture information about
-> > > mmu_notifiers and memslots generation.  With luck, it will reveal a smoking
-> > > gun.
-> > 
-> > Thanks for the patch there. We tried migrating a locked up guest to a host with
-> > this modified kernel twice (logs below). The guest "fixed itself" post
-> > migration, so the results may not have captured the "problematic" kind of
-> > page-fault, but here they are.
-> 
-> The traces need to be captured from the host where a vCPU is stuck.
-> 
-> > Complete logs of kvm_page_fault tracepoint events, starting just before the
-> > migration (with 0 guests before the migration, so the first logs should be of
-> > the problematic guest) as it resolves the lockup:
-> > 
-> > 1. https://transfer.sh/QjB3MjeBqh/trace-kvm-kpf2.log
-> > 2. https://transfer.sh/wEFQm4hLHs/trace-kvm-pf.log
-> > 
-> > Truncated logs of `trace-cmd record -e kvm -e kvmmmu` in case context helps:
-> > 
-> > 1. https://transfer.sh/FoFsNoFQCP/trace-kvm2.log
-> > 2. https://transfer.sh/LBFJryOfu7/trace-kvm.log
-> > 
-> > Note that for migration #2 in both respectively above (trace-kvm-pf.log and
-> > trace-kvm.log), we didn't confirm that the guest was locked up before migration
-> > mistakenly. It most likely was but in case trace #2 doesn't present the same
-> > symptoms, that's why.
-> > 
-> > Off an uneducated glance, it seems like `in_prog = 0x1` at least once for every
-> > `seq` / kvm_page_fault that seems to be "looping" and staying unresolved -
-> 
-> This is completely expected.   The "in_prog" thing is just saying that a vCPU
-> took a fault while there was an mmu_notifier event in-progress.
-> 
-> > indicating a lock contention, perhaps, in trying to invalidate/read/write the
-> > same page range?
-> 
-> No, just a collision between the primary MMU invalidating something, e.g. to move
-> a page or do KSM stuff, and a vCPU accessing the page in question.
-> 
-> > We do know this issue _occurs_ as late as 6.1.38 at least (i.e. hosts running
-> > 6.1.38 have had guests lockup - we don't have hosts on more recent kernels, so
-> > this isn't proof that it's been fixed since then, nor is migration proof of
-> > that, IMO).
-> 
-> Note, if my hunch is correct, it's the act of migrating to a different *host* that
-> resolves the problem, not the fact that the migration is to a different kernel.
-> E.g. I would expect that migrating to the exact same kernel would still unstick
-> the vCPU.
-> 
-> What I suspect is happening is that the in-progress count gets left high, e.g.
-> because of a start() without a paired end(), and that causes KVM to refuse to
-> install mappings for the affected range of guest memory.  Or possibly that the
-> problematic host is generating an absolutely massive storm of invalidations and
-> unintentionally DoS's the guest.
+Hi Nikunj,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on mst-vhost/linux-next linus/master v6.5-rc5 next-20230809]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Nikunj-A-Dadhania/KVM-SVM-Add-exception-to-disable-objtool-warning-for-kvm-amd-o/20230802-171219
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20230802091107.1160320-1-nikunj%40amd.com
+patch subject: [PATCH] KVM: SVM: Add exception to disable objtool warning for kvm-amd.o
+config: i386-randconfig-i013-20230812 (https://download.01.org/0day-ci/archive/20230812/202308120845.gkEMVH5a-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce: (https://download.01.org/0day-ci/archive/20230812/202308120845.gkEMVH5a-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308120845.gkEMVH5a-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kvm/svm/vmenter.S:392:1: error: invalid instruction mnemonic 'stack_frame_non_standard_fp'
+   STACK_FRAME_NON_STANDARD_FP(__svm_sev_es_vcpu_run)
+   ^~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-It would would be great to write a micro benchmark of sorts that generates 
-EPT page invalidation pressure, and run it on a test system inside a 
-virtual machine to see if we can get it to fault:
+vim +/stack_frame_non_standard_fp +392 arch/x86/kvm/svm/vmenter.S
 
-Can you suggest the type(s) of memory operations that could be written in 
-user space (or kernel space as a module) to, find a test case that forces 
-it to fail within a reasonable period of time?
+   352	
+   353		/* Clobbers RAX, RCX, RDX.  */
+   354		RESTORE_HOST_SPEC_CTRL
+   355	
+   356		/*
+   357		 * Mitigate RETBleed for AMD/Hygon Zen uarch. RET should be
+   358		 * untrained as soon as we exit the VM and are back to the
+   359		 * kernel. This should be done before re-enabling interrupts
+   360		 * because interrupt handlers won't sanitize RET if the return is
+   361		 * from the kernel.
+   362		 */
+   363		UNTRAIN_RET
+   364	
+   365		/* "Pop" @spec_ctrl_intercepted.  */
+   366		pop %_ASM_BX
+   367	
+   368		pop %_ASM_BX
+   369	
+   370	#ifdef CONFIG_X86_64
+   371		pop %r12
+   372		pop %r13
+   373		pop %r14
+   374		pop %r15
+   375	#else
+   376		pop %esi
+   377		pop %edi
+   378	#endif
+   379		pop %_ASM_BP
+   380		RET
+   381	
+   382		RESTORE_GUEST_SPEC_CTRL_BODY
+   383		RESTORE_HOST_SPEC_CTRL_BODY
+   384	
+   385	3:	cmpb $0, kvm_rebooting
+   386		jne 2b
+   387		ud2
+   388	
+   389		_ASM_EXTABLE(1b, 3b)
+   390	
+   391	SYM_FUNC_END(__svm_sev_es_vcpu_run)
+ > 392	STACK_FRAME_NON_STANDARD_FP(__svm_sev_es_vcpu_run)
 
-We were thinking of memory mapping lots of page-sized mappings from 
-/dev/zero and then randomly write and free them after there are tons of 
-them allocated, and do this across multiple threads, while simultaneously 
-using `taskset` (or `virsh vcpupin`) on the host to move the guest vCPUs 
-across NUMA boundaries, and also with numabalance turned on.
-
-I have also considered passing a device like null_blk.ko into the guest, 
-and then doing memory mappings against it in the same way to put pressure 
-or on the direct IO path from KVM into the guest user space. 
-
-If you (or anyone else) have other suggestions then I would love to hear 
-it. Maybe we can make a reproducer for this.
-
-
---
-Eric Wheeler
-
-
-> 
-> Either way, migrating the VM to a new host and thus a new KVM instance essentially
-> resets all of that metadata and allows KVM to fault-in pages and establish mappings.
-> 
-> Actually, one thing you could try to unstick a VM would be to do an intra-host
-> migration, i.e. migrate it to a new KVM instance on the same host.  If that "fixes"
-> the guest, then the bug is likely an mmu_notifier counting bug and not an
-> invalidation storm.
-> 
-> But the easiest thing would be to catch a host in the act, i.e. capture traces
-> with my debug patch from a host with a stuck vCPU.
-> 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
