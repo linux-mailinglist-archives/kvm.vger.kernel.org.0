@@ -2,131 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CF3477A625
-	for <lists+kvm@lfdr.de>; Sun, 13 Aug 2023 13:20:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25D3777AED2
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 01:09:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230219AbjHMLT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Aug 2023 07:19:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
+        id S231420AbjHMXJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Aug 2023 19:09:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjHMLTy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Aug 2023 07:19:54 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD1B10DE;
-        Sun, 13 Aug 2023 04:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1691925597; x=1723461597;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+CUXVj1jmKu9wNFCyhaP7miPAmbIeMOb158GcXhBV/M=;
-  b=hA1Q1p/hm6h3s62Vd79DvDaGCDb6sa3JPG2pXwIXUO7C9ZbE4w2yHH+k
-   zSk7FKFMLH0vcycOjaZlfMMl+9rfqXoWyW3aB1kVqEM8NWMJQAgQ6NDIy
-   bjilzJwXXJ+0rbwNAwYVYc2s7fM5tnJp+Lh+FW5WfM2hJAsQ709kRE8M3
-   8bXxq9T4TjwKc9gyUW1Xle29CRFWepkyDj8SCyB5rpBHnHu+qN8a/c9a4
-   CTIhVDAckv1KNR3IIMCs/BGO59FUDsxXkdYTdQtFB11qFNkfNGM03opwy
-   M/KP4OHHxm6CzgIfloM2cv9+r5M4j0G4MBHc+ogQlXD/iNZBWfXyVQhlw
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="438222205"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="438222205"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 04:19:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="683016422"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="683016422"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.215.185]) ([10.254.215.185])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 04:19:53 -0700
-Message-ID: <08ef3338-535a-751e-0cc2-5f5af8107194@linux.intel.com>
-Date:   Sun, 13 Aug 2023 19:19:51 +0800
+        with ESMTP id S229826AbjHMXJC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Aug 2023 19:09:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E34E8
+        for <kvm@vger.kernel.org>; Sun, 13 Aug 2023 16:08:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1691968096;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AUa1QX/mJ1ef9VxwUsegnOGKLjQxThmW1L4mbjRAl5o=;
+        b=Y0Hv0gwMpY81XUsfy3s3cnd1XNWCwgArnfVu4Pj1N7Ebyeqivot2jtArFEpyIKEVXgkNUT
+        SG2TP9P0EAZLqWheOifuW1mqS0fbjD8L2Be1C2zNeNVft0giKu50BYyUgLVzLHqYZOHseA
+        WW539bvfJIYRTd9DNfKrXXuzJyqX5Gk=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-93-YymbDmMoM1yzKFORKmn-dg-1; Sun, 13 Aug 2023 19:08:12 -0400
+X-MC-Unique: YymbDmMoM1yzKFORKmn-dg-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2b9bf49342dso36612541fa.1
+        for <kvm@vger.kernel.org>; Sun, 13 Aug 2023 16:08:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691968091; x=1692572891;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AUa1QX/mJ1ef9VxwUsegnOGKLjQxThmW1L4mbjRAl5o=;
+        b=jy+w7lHKMZ2D0uD/3nYe6Lox2BoX7BfhhezBtPs4+zSfA+lCHruCshTFQka0WltxOt
+         EU1ku3QiuChCSPYjOsbstCLDD6PrQuY9RHW5sbiovgMPH4FjKofQIt66gxBjjzOlOKOb
+         c2rS1VyYkh19Wn/TCs7fLMrCoQzpLHpOiYCfSP0+6P1RaIsNihWcNcdEdAT/Ststp3Oa
+         htso9kaWlwXNu9/a3xJB1N2rIMhyCYFGPisqdK+dDvPstAzIwUgZnjuzKnt7P7RdnCsJ
+         eGH3uCV9f2le8bE38tuo0RU50mEgQfJZHROVY7jtSndqDAgkjVnCJqI1inuf5zdms9hi
+         OhOQ==
+X-Gm-Message-State: AOJu0Yxiwnt1MwttF3/dnxZk1fBXojbZbaQIgJeLAJXlgZZ1Skkd+ZqX
+        jUQ7X7dlf1rnjauvktysH3xPE06+93ClKyG1Kn73rC+32UUhJ4PsNFt3AAj3lwKiFsGHGVwC75b
+        t8MZr4WQVO3Yt
+X-Received: by 2002:a2e:8503:0:b0:2b7:1005:931b with SMTP id j3-20020a2e8503000000b002b71005931bmr5573399lji.0.1691968090805;
+        Sun, 13 Aug 2023 16:08:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHfB6KQC44UtzTvTIQLTU6WSArsFvqwFM/tL9oeOdLXdw+TuyKztZH0mu5DyTnZ3c9/bKtQHw==
+X-Received: by 2002:a2e:8503:0:b0:2b7:1005:931b with SMTP id j3-20020a2e8503000000b002b71005931bmr5573379lji.0.1691968090444;
+        Sun, 13 Aug 2023 16:08:10 -0700 (PDT)
+Received: from redhat.com ([2.55.42.146])
+        by smtp.gmail.com with ESMTPSA id jo19-20020a170906f6d300b0099bcd1fa5b0sm5002759ejb.192.2023.08.13.16.08.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Aug 2023 16:08:09 -0700 (PDT)
+Date:   Sun, 13 Aug 2023 19:08:03 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        allen.hubbe@amd.com, andrew@daynix.com, david@redhat.com,
+        dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com,
+        gal@nvidia.com, jasowang@redhat.com, leiyang@redhat.com,
+        linma@zju.edu.cn, maxime.coquelin@redhat.com,
+        michael.christie@oracle.com, mst@redhat.com, rdunlap@infradead.org,
+        sgarzare@redhat.com, shannon.nelson@amd.com,
+        stable@vger.kernel.org, stable@vger.kernelorg, stefanha@redhat.com,
+        wsa+renesas@sang-engineering.com, xieyongji@bytedance.com,
+        yin31149@gmail.com
+Subject: [GIT PULL] virtio: bugfixes
+Message-ID: <20230813190803-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Cc:     baolu.lu@linux.intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 08/12] iommu: Prepare for separating SVA and IOPF
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
- <20230727054837.147050-9-baolu.lu@linux.intel.com>
- <BN9PR11MB52769D22490BB09BB25E0C2E8C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZNKMz04uhzL9T7ya@ziepe.ca>
- <BN9PR11MB527629949E7D44BED080400C8C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <0771c28d-1b31-003e-7659-4f3f3cbf5546@linux.intel.com>
- <BN9PR11MB527686C925E33E0DCDF261CB8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZNUUjXMrLyU3g5KM@ziepe.ca>
- <f1dbfb6a-5a53-f440-5d3a-25772c67547f@linux.intel.com>
- <ZNY3LuW+FMAhK2xf@ziepe.ca>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <ZNY3LuW+FMAhK2xf@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/8/11 21:27, Jason Gunthorpe wrote:
-> On Fri, Aug 11, 2023 at 09:53:41AM +0800, Baolu Lu wrote:
->> On 2023/8/11 0:47, Jason Gunthorpe wrote:
->>> On Thu, Aug 10, 2023 at 02:35:40AM +0000, Tian, Kevin wrote:
->>>>> From: Baolu Lu<baolu.lu@linux.intel.com>
->>>>> Sent: Wednesday, August 9, 2023 6:41 PM
->>>>>
->>>>> On 2023/8/9 8:02, Tian, Kevin wrote:
->>>>>>> From: Jason Gunthorpe<jgg@ziepe.ca>
->>>>>>> Sent: Wednesday, August 9, 2023 2:43 AM
->>>>>>>
->>>>>>> On Thu, Aug 03, 2023 at 08:16:47AM +0000, Tian, Kevin wrote:
->>>>>>>
->>>>>>>> Is there plan to introduce further error in the future? otherwise this
->>>>> should
->>>>>>>> be void.
->>>>>>>>
->>>>>>>> btw the work queue is only for sva. If there is no other caller this can be
->>>>>>>> just kept in iommu-sva.c. No need to create a helper.
->>>>>>> I think more than just SVA will need a work queue context to process
->>>>>>> their faults.
->>>>>>>
->>>>>> then this series needs more work. Currently the abstraction doesn't
->>>>>> include workqueue in the common fault reporting layer.
->>>>> Do you mind elaborate a bit here? workqueue is a basic infrastructure in
->>>>> the fault handling framework, but it lets the consumers choose to use
->>>>> it, or not to.
->>>>>
->>>> My understanding of Jason's comment was to make the workqueue the
->>>> default path instead of being opted by the consumer.. that is my 1st
->>>> impression but might be wrong...
->>> Yeah, that is one path. Do we have anyone that uses this that doesn't
->>> want the WQ? (actually who even uses this besides SVA?)
->> I am still confused. When we forward iopf's to user space through the
->> iommufd, we don't need to schedule a WQ, right? Or I misunderstood
->> here?
-> Yes, that could be true, iommufd could just queue it from the
-> interrupt context and trigger a wakeup.
-> 
-> But other iommufd modes would want to invoke hmm_range_fault() which
-> would need the work queue.
+All small, fairly safe changes.
 
-Yes. That's the reason why I added below helper
+The following changes since commit 52a93d39b17dc7eb98b6aa3edb93943248e03b2f:
 
-int iopf_queue_work(struct iopf_group *group, work_func_t func)
+  Linux 6.5-rc5 (2023-08-06 15:07:51 -0700)
 
-in the patch 09/12.
+are available in the Git repository at:
 
-Best regards,
-baolu
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to f55484fd7be923b740e8e1fc304070ba53675cb4:
+
+  virtio-mem: check if the config changed before fake offlining memory (2023-08-10 15:51:46 -0400)
+
+----------------------------------------------------------------
+virtio: bugfixes
+
+just a bunch of bugfixes all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Allen Hubbe (2):
+      pds_vdpa: reset to vdpa specified mac
+      pds_vdpa: alloc irq vectors on DRIVER_OK
+
+David Hildenbrand (4):
+      virtio-mem: remove unsafe unplug in Big Block Mode (BBM)
+      virtio-mem: convert most offline_and_remove_memory() errors to -EBUSY
+      virtio-mem: keep retrying on offline_and_remove_memory() errors in Sub Block Mode (SBM)
+      virtio-mem: check if the config changed before fake offlining memory
+
+Dragos Tatulea (4):
+      vdpa: Enable strict validation for netlinks ops
+      vdpa/mlx5: Correct default number of queues when MQ is on
+      vdpa/mlx5: Fix mr->initialized semantics
+      vdpa/mlx5: Fix crash on shutdown for when no ndev exists
+
+Eugenio Pérez (1):
+      vdpa/mlx5: Delete control vq iotlb in destroy_mr only when necessary
+
+Feng Liu (1):
+      virtio-pci: Fix legacy device flag setting error in probe
+
+Gal Pressman (1):
+      virtio-vdpa: Fix cpumask memory leak in virtio_vdpa_find_vqs()
+
+Hawkins Jiawei (1):
+      virtio-net: Zero max_tx_vq field for VIRTIO_NET_CTRL_MQ_HASH_CONFIG case
+
+Lin Ma (3):
+      vdpa: Add features attr to vdpa_nl_policy for nlattr length check
+      vdpa: Add queue index attr to vdpa_nl_policy for nlattr length check
+      vdpa: Add max vqp attr to vdpa_nl_policy for nlattr length check
+
+Maxime Coquelin (1):
+      vduse: Use proper spinlock for IRQ injection
+
+Mike Christie (3):
+      vhost-scsi: Fix alignment handling with windows
+      vhost-scsi: Rename vhost_scsi_iov_to_sgl
+      MAINTAINERS: add vhost-scsi entry and myself as a co-maintainer
+
+Shannon Nelson (4):
+      pds_vdpa: protect Makefile from unconfigured debugfs
+      pds_vdpa: always allow offering VIRTIO_NET_F_MAC
+      pds_vdpa: clean and reset vqs entries
+      pds_vdpa: fix up debugfs feature bit printing
+
+Wolfram Sang (1):
+      virtio-mmio: don't break lifecycle of vm_dev
+
+ MAINTAINERS                        |  11 ++-
+ drivers/net/virtio_net.c           |   2 +-
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h |   2 +
+ drivers/vdpa/mlx5/core/mr.c        | 105 +++++++++++++++------
+ drivers/vdpa/mlx5/net/mlx5_vnet.c  |  26 +++---
+ drivers/vdpa/pds/Makefile          |   3 +-
+ drivers/vdpa/pds/debugfs.c         |  15 ++-
+ drivers/vdpa/pds/vdpa_dev.c        | 176 ++++++++++++++++++++++++----------
+ drivers/vdpa/pds/vdpa_dev.h        |   5 +-
+ drivers/vdpa/vdpa.c                |   9 +-
+ drivers/vdpa/vdpa_user/vduse_dev.c |   8 +-
+ drivers/vhost/scsi.c               | 187 ++++++++++++++++++++++++++++++++-----
+ drivers/virtio/virtio_mem.c        | 168 ++++++++++++++++++++++-----------
+ drivers/virtio/virtio_mmio.c       |   5 +-
+ drivers/virtio/virtio_pci_common.c |   2 -
+ drivers/virtio/virtio_pci_legacy.c |   1 +
+ drivers/virtio/virtio_vdpa.c       |   2 +
+ 17 files changed, 519 insertions(+), 208 deletions(-)
+
