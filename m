@@ -2,121 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58CA377A5E0
-	for <lists+kvm@lfdr.de>; Sun, 13 Aug 2023 11:50:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CF3477A625
+	for <lists+kvm@lfdr.de>; Sun, 13 Aug 2023 13:20:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbjHMJuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Aug 2023 05:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40456 "EHLO
+        id S230219AbjHMLT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Aug 2023 07:19:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231152AbjHMJuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Aug 2023 05:50:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB87E10CE
-        for <kvm@vger.kernel.org>; Sun, 13 Aug 2023 02:50:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1691920205;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vBzH8DX3gC9E1Jmln+XcFwun/a5hLI5hdLYcEoW5X28=;
-        b=OlJ98Ysbi6cXPsQh+zyKHKeszLy/lRK+NGIwzaYq1lNa3yo4qo6sBFJsXKH3Tuc9G2uKzY
-        opFm9k1PjZCpU32HN+8WUyqptKHDM08u67Ab63XBN0DvaPvGUp5o5UVW6hapBDk2MqsFWR
-        A8J7YwHYb+wHD9/TShSfrlOCZvpMmQ8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-424-NEjbKxilMQGPVGf8XUWRMA-1; Sun, 13 Aug 2023 05:50:04 -0400
-X-MC-Unique: NEjbKxilMQGPVGf8XUWRMA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3178ddc3d94so2025384f8f.1
-        for <kvm@vger.kernel.org>; Sun, 13 Aug 2023 02:50:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691920203; x=1692525003;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vBzH8DX3gC9E1Jmln+XcFwun/a5hLI5hdLYcEoW5X28=;
-        b=M5/C04zJTYiypGdLe5bxuJ6nfhi4azETWBn3W3gFQrC9fLyt/C8z135PCjv83NnKy/
-         KNUMNTAOzbeHSFGSxytFMp9l6DyjXoHnvDxe8qY0g3OBa26ugo7EvDdJc6HN4knmk4OO
-         ChVlX2EEzwWfp3HC+gl7vXOqh8Qm0hhwQusx36JqXD2E1pw2kRURk0YB82HWIChsfED2
-         ROyKuWVBvwd7dp2iUn+W6aM2oVHdDlJY5w1VUG/BOXmPiYyCyFNjqJE/0MS0GMamFkPn
-         ey4NAFElnDHOwHqBqJijJB6h+IA7O1a1t1uooLyHmpDNQBwG/lCx+D5/gVVP/B/bnKuX
-         b0TA==
-X-Gm-Message-State: AOJu0Yw0lFlZLP1wV4jPjDWDdhTspr5XBApvtuhDw0mRQEMR9XzFwmPP
-        8FM3cb/0M7iIv6fH1LGRY+glxxPctRbLOsVkWFffy0QqCucXEExT3IjMYb/t4qyAKNuvKaR+0cY
-        E1i5/1Z4awbrBhtxiO/g5
-X-Received: by 2002:adf:dec2:0:b0:317:5a99:4549 with SMTP id i2-20020adfdec2000000b003175a994549mr4575277wrn.0.1691920203198;
-        Sun, 13 Aug 2023 02:50:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnfuzkqCoVq8jy6EOVpp+9RneCX6vcEypZHDYoMLweq1/d7QPLQzBD+n4h+KFAZCkbhPdgSQ==
-X-Received: by 2002:adf:dec2:0:b0:317:5a99:4549 with SMTP id i2-20020adfdec2000000b003175a994549mr4575272wrn.0.1691920202897;
-        Sun, 13 Aug 2023 02:50:02 -0700 (PDT)
-Received: from [192.168.0.5] (ip-109-43-177-246.web.vodafone.de. [109.43.177.246])
-        by smtp.gmail.com with ESMTPSA id j4-20020adfff84000000b003142ea7a661sm11038784wrr.21.2023.08.13.02.50.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Aug 2023 02:50:02 -0700 (PDT)
-Message-ID: <981405ed-060f-de0b-8125-29099ba8791a@redhat.com>
-Date:   Sun, 13 Aug 2023 11:50:00 +0200
+        with ESMTP id S229441AbjHMLTy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Aug 2023 07:19:54 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD1B10DE;
+        Sun, 13 Aug 2023 04:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691925597; x=1723461597;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+CUXVj1jmKu9wNFCyhaP7miPAmbIeMOb158GcXhBV/M=;
+  b=hA1Q1p/hm6h3s62Vd79DvDaGCDb6sa3JPG2pXwIXUO7C9ZbE4w2yHH+k
+   zSk7FKFMLH0vcycOjaZlfMMl+9rfqXoWyW3aB1kVqEM8NWMJQAgQ6NDIy
+   bjilzJwXXJ+0rbwNAwYVYc2s7fM5tnJp+Lh+FW5WfM2hJAsQ709kRE8M3
+   8bXxq9T4TjwKc9gyUW1Xle29CRFWepkyDj8SCyB5rpBHnHu+qN8a/c9a4
+   CTIhVDAckv1KNR3IIMCs/BGO59FUDsxXkdYTdQtFB11qFNkfNGM03opwy
+   M/KP4OHHxm6CzgIfloM2cv9+r5M4j0G4MBHc+ogQlXD/iNZBWfXyVQhlw
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="438222205"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="438222205"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 04:19:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="683016422"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="683016422"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.254.215.185]) ([10.254.215.185])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2023 04:19:53 -0700
+Message-ID: <08ef3338-535a-751e-0cc2-5f5af8107194@linux.intel.com>
+Date:   Sun, 13 Aug 2023 19:19:51 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [kvm-unit-tests PATCH v1] s390x: explicitly mark stack as not
- executable
-To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230809091717.1549-1-nrb@linux.ibm.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Cc:     baolu.lu@linux.intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 08/12] iommu: Prepare for separating SVA and IOPF
 Content-Language: en-US
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230809091717.1549-1-nrb@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230727054837.147050-1-baolu.lu@linux.intel.com>
+ <20230727054837.147050-9-baolu.lu@linux.intel.com>
+ <BN9PR11MB52769D22490BB09BB25E0C2E8C08A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNKMz04uhzL9T7ya@ziepe.ca>
+ <BN9PR11MB527629949E7D44BED080400C8C12A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <0771c28d-1b31-003e-7659-4f3f3cbf5546@linux.intel.com>
+ <BN9PR11MB527686C925E33E0DCDF261CB8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNUUjXMrLyU3g5KM@ziepe.ca>
+ <f1dbfb6a-5a53-f440-5d3a-25772c67547f@linux.intel.com>
+ <ZNY3LuW+FMAhK2xf@ziepe.ca>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <ZNY3LuW+FMAhK2xf@ziepe.ca>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/2023 11.17, Nico Boehr wrote:
-> With somewhat recent GCC versions, we get this warning on s390x:
+On 2023/8/11 21:27, Jason Gunthorpe wrote:
+> On Fri, Aug 11, 2023 at 09:53:41AM +0800, Baolu Lu wrote:
+>> On 2023/8/11 0:47, Jason Gunthorpe wrote:
+>>> On Thu, Aug 10, 2023 at 02:35:40AM +0000, Tian, Kevin wrote:
+>>>>> From: Baolu Lu<baolu.lu@linux.intel.com>
+>>>>> Sent: Wednesday, August 9, 2023 6:41 PM
+>>>>>
+>>>>> On 2023/8/9 8:02, Tian, Kevin wrote:
+>>>>>>> From: Jason Gunthorpe<jgg@ziepe.ca>
+>>>>>>> Sent: Wednesday, August 9, 2023 2:43 AM
+>>>>>>>
+>>>>>>> On Thu, Aug 03, 2023 at 08:16:47AM +0000, Tian, Kevin wrote:
+>>>>>>>
+>>>>>>>> Is there plan to introduce further error in the future? otherwise this
+>>>>> should
+>>>>>>>> be void.
+>>>>>>>>
+>>>>>>>> btw the work queue is only for sva. If there is no other caller this can be
+>>>>>>>> just kept in iommu-sva.c. No need to create a helper.
+>>>>>>> I think more than just SVA will need a work queue context to process
+>>>>>>> their faults.
+>>>>>>>
+>>>>>> then this series needs more work. Currently the abstraction doesn't
+>>>>>> include workqueue in the common fault reporting layer.
+>>>>> Do you mind elaborate a bit here? workqueue is a basic infrastructure in
+>>>>> the fault handling framework, but it lets the consumers choose to use
+>>>>> it, or not to.
+>>>>>
+>>>> My understanding of Jason's comment was to make the workqueue the
+>>>> default path instead of being opted by the consumer.. that is my 1st
+>>>> impression but might be wrong...
+>>> Yeah, that is one path. Do we have anyone that uses this that doesn't
+>>> want the WQ? (actually who even uses this besides SVA?)
+>> I am still confused. When we forward iopf's to user space through the
+>> iommufd, we don't need to schedule a WQ, right? Or I misunderstood
+>> here?
+> Yes, that could be true, iommufd could just queue it from the
+> interrupt context and trigger a wakeup.
 > 
->    /usr/bin/ld: warning: s390x/cpu.o: missing .note.GNU-stack section implies executable stack
->    /usr/bin/ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
-> 
-> We don't really care whether stack is executable or not since we set it
-> up ourselves and we're running DAT off mostly anyways.
-> 
-> Silence the warning by explicitly marking the stack as not executable.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   s390x/Makefile | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 706be7920406..afa47ccbeb93 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -79,7 +79,7 @@ CFLAGS += -O2
->   CFLAGS += -march=zEC12
->   CFLAGS += -mbackchain
->   CFLAGS += -fno-delete-null-pointer-checks
-> -LDFLAGS += -nostdlib -Wl,--build-id=none
-> +LDFLAGS += -nostdlib -Wl,--build-id=none -z noexecstack
+> But other iommufd modes would want to invoke hmm_range_fault() which
+> would need the work queue.
 
-I already did a similar patch some weeks ago:
+Yes. That's the reason why I added below helper
 
-  https://lore.kernel.org/kvm/20230623125416.481755-1-thuth@redhat.com/
+int iopf_queue_work(struct iopf_group *group, work_func_t func)
 
-... we need it for x86, too, so I guess I should go ahead and commit it - 
-and ask Sean to respin his conflicting series.
+in the patch 09/12.
 
-  Thomas
-
-
+Best regards,
+baolu
