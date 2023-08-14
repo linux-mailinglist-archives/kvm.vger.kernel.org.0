@@ -2,95 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E78C77BEF9
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 19:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CE0777BF3B
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 19:48:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbjHNR33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 13:29:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41354 "EHLO
+        id S231244AbjHNRrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 13:47:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230407AbjHNR3R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 13:29:17 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B7A10D0
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 10:29:16 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-584139b6b03so60605297b3.3
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 10:29:16 -0700 (PDT)
+        with ESMTP id S231404AbjHNRr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 13:47:26 -0400
+Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D72F10DD
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 10:47:25 -0700 (PDT)
+Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-56dfe5ce871so1572747eaf.2
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 10:47:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692034155; x=1692638955;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wv/8nZ1yHk/BEJ8mg7HrVuvB2B7eWhaOZuiJd5a6KJw=;
-        b=mPrZWtn0CT6WEMlpg3bX4t0s/n6EHWU3G1NN0gR+6/hKKVLWU1OKVYLkZDVkH8+iHW
-         lRKj2/X/DTOA9b3cUJ2M2/naXih9B+9dWnxHYE6KocAspXH4aZ5F420C1diMzVuYXcgD
-         I0rTrvwmSq9CfeN3FAnZvvzrzIt8HQPr9spgVKSbc/RRW4/N1ybgl2ztqJ0Ss5Rr6kbX
-         R8z/8JN3a198UfMLqQdoHetFWQD4Z78eqOkLdwP+ySzXSwH8zZevl122OErvxSXvakTP
-         nJS0Zytv+1vdkEldYIe5Z1iyRDWdNcm/1snj2os64yIGdE0Zh1Bp+CCim/j6kACZO4LU
-         CdSw==
+        d=ziepe.ca; s=google; t=1692035244; x=1692640044;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y/yNh4F2KqOT+gKhbfMAb20rsFiF8tD3IHTN/BfkK/o=;
+        b=Nnz1d6Q95SoJZqyUmSGv/mULK+qIzASlvU7AAxuOXr7Ap6igT/sLL3+gSSpHpkoB9d
+         nq0FRws0EU8HEIf/UAzptDEUWGEE34uxX7M7wdemum4vt+i8XK0yjWpnP6k6RLQOlYca
+         dPoCaU+Az0Ez4ogVRalWR9rBLicAI0FE3KQlaJxmfFUU4xsacst0OFvU4PfESdDv6C0v
+         rfdVU0Y3kbPD1Wx43UulHldGLfwHHgUYZeqWz8Gin+PoN2qtQ0YA5Zq2OVexuPN5Afyl
+         oUMNjZX2i9gx+2K9cvLivBoiioPUR77MotF6WQlXmHva4gC2yxzxZ617LoiIvIfsnM8b
+         F1cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692034155; x=1692638955;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wv/8nZ1yHk/BEJ8mg7HrVuvB2B7eWhaOZuiJd5a6KJw=;
-        b=kwU8rEJCKIyKPpVrsWexwyVtETCD4HDYf47KZXcJV74NQ5NUT8eGneLMcwiKKWprQk
-         egf+i7OdnAPagZI7kszVMx6LaZLA+UhsT6duNCuHQZgQx48/v5UhK91HLVXLEH+bLJUx
-         ZZYSwLjlYJ2tK4xDq1xA+P0HnZM9UVmnLPqxm9SajasMqC/iW+m77SLtPWRReZhJyPf0
-         M2T3ANGpRohtDuvi5u5O9dMlWtGsz2fi9jnKisf0yQq99xV3c3tSLV3tO+iOkRqMrZsS
-         +LwUXKCMLI81A7dS2lNs9dJ7SBlko4l2lYefc7aOX5UU87nVA2zX2vl6321V612rP67f
-         y4Xw==
-X-Gm-Message-State: AOJu0YxmrjpcFv6UYBd+gRjm6nHKHv/KVKUcqBhBNhyN/wAsBKrV2kb6
-        M8a/RVoCZchUrehcG53lA/EeSq0BYvo=
-X-Google-Smtp-Source: AGHT+IG/QHEENARZdqfI69HdIHl/KAJVTpkeGaNF1fIxiuiAozumleTNkhbSb7LBssCv6hM5/LrWweJxPzU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ad68:0:b0:560:d237:43dc with SMTP id
- l40-20020a81ad68000000b00560d23743dcmr158447ywk.3.1692034155642; Mon, 14 Aug
- 2023 10:29:15 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 10:29:13 -0700
-In-Reply-To: <68e7d342-bdeb-39bf-5233-ba1121f0afc@ewheeler.net>
-Mime-Version: 1.0
-References: <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
- <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
- <ZNJ2V2vRXckMwPX2@google.com> <e21d306a-bed6-36e1-be99-7cdab6b36d11@ewheeler.net>
- <e1d2a8c-ff48-bc69-693-9fe75138632b@ewheeler.net> <ZNV5rrq1Ja7QgES5@google.com>
- <CAG+wEg1wio-0grasdwdfNHr7fHZkZWt2TF2LZtw65WZx42jkyQ@mail.gmail.com>
- <ZNZ3owRcRjGejWFn@google.com> <68e7d342-bdeb-39bf-5233-ba1121f0afc@ewheeler.net>
-Message-ID: <ZNpkac8NDSbSnZ68@google.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-From:   Sean Christopherson <seanjc@google.com>
-To:     Eric Wheeler <kvm@lists.ewheeler.net>
-Cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1692035244; x=1692640044;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y/yNh4F2KqOT+gKhbfMAb20rsFiF8tD3IHTN/BfkK/o=;
+        b=FC5NO3Z00q12eVyFtCZyDOH8gEZZabB9Ay3odCUbzHtF9xtyCI8gcmwMsgInn+gBsP
+         /LGvucjtf/tzzue7CD5EL4RI0DnYAttHkggdE6XEYFloeU0vDG8deLhyuuP72dyrBBzx
+         +v+4qSB/Sva2a/hJd0DCVTCFwPT3gPDoCyCesGDdCO1XWTzwkepWIA/xW+GMyqLgBhpq
+         WstGRyTlukmHP5zmgy6EUmmzENzoO4Dsmh0kWhUZDV5L9hTUeENxU+JZ8F7dMGJcXtgy
+         XYbwO/yCLQT2F/ZRkAXCVfFGU+zSE5Dz/GoQ8N7T39r5SSCPMRARo+yG0ZQdUddue3k9
+         bS0A==
+X-Gm-Message-State: AOJu0Yy3pcr8tEJe8hkm9cVaEi+gtCLvwWiZiFWBz7+oeLXSrZcSsMm0
+        OBrkFHXIyrHj+RvNAiW7LAh4iQ==
+X-Google-Smtp-Source: AGHT+IHKtophzNepnrOSKqJW2gtkKecjEJCHZKJbB96GaU/SIQr5jKKtpBh+9NCgIHhPr2b3svWbtQ==
+X-Received: by 2002:a05:6358:c15:b0:129:c477:289c with SMTP id f21-20020a0563580c1500b00129c477289cmr8037336rwj.26.1692035244459;
+        Mon, 14 Aug 2023 10:47:24 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26])
+        by smtp.gmail.com with ESMTPSA id 11-20020ac8564b000000b003ef189ffa82sm3228482qtt.90.2023.08.14.10.47.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 10:47:23 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qVbf1-0070BL-2Q;
+        Mon, 14 Aug 2023 14:47:23 -0300
+Date:   Mon, 14 Aug 2023 14:47:23 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     kvm@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
+        linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH 1/4] vfio: trivially use __aligned_u64 for ioctl structs
+Message-ID: <ZNpoq7emI19fApND@ziepe.ca>
+References: <20230809210248.2898981-1-stefanha@redhat.com>
+ <20230809210248.2898981-2-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230809210248.2898981-2-stefanha@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 11, 2023, Eric Wheeler wrote:
-> On Fri, 11 Aug 2023, Sean Christopherson wrote:
-> > What I suspect is happening is that the in-progress count gets left high, e.g.
-> > because of a start() without a paired end(), and that causes KVM to refuse to
-> > install mappings for the affected range of guest memory.  Or possibly that the
-> > problematic host is generating an absolutely massive storm of invalidations and
-> > unintentionally DoS's the guest.
+On Wed, Aug 09, 2023 at 05:02:45PM -0400, Stefan Hajnoczi wrote:
+> u64 alignment behaves differently depending on the architecture and so
+> <uapi/linux/types.h> offers __aligned_u64 to achieve consistent behavior
+> in kernel<->userspace ABIs.
 > 
+> There are structs in <uapi/linux/vfio.h> that can trivially be updated
+> to __aligned_u64 because the struct sizes are multiples of 8 bytes.
+> There is no change in memory layout on any CPU architecture and
+> therefore this change is safe.
 > 
-> It would would be great to write a micro benchmark of sorts that generates 
-> EPT page invalidation pressure, and run it on a test system inside a 
-> virtual machine to see if we can get it to fault:
+> The commits that follow this one handle the trickier cases where
+> explanation about ABI breakage is necessary.
 > 
-> Can you suggest the type(s) of memory operations that could be written in 
-> user space (or kernel space as a module) to, find a test case that forces 
-> it to fail within a reasonable period of time?
+> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  include/uapi/linux/vfio.h | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 
-Easiest thing would be to toggle PROT_EXEC via mprotect() on guest memory.  KVM
-ignores PROT_EXEC so that guest memory doesn't need to be mapped executable in
-the VMM, i.e. toggling PROT_EXEC won't cause spurious failures but it will still
-trigger mmu_notifier invalidations.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Side topic, can you provide your host Kconfig?
+Jason
