@@ -2,178 +2,357 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E88677B7D9
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 13:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9875077B87D
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 14:19:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbjHNLwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 07:52:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44736 "EHLO
+        id S231361AbjHNMSx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 08:18:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbjHNLv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 07:51:57 -0400
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3660CEA;
-        Mon, 14 Aug 2023 04:51:56 -0700 (PDT)
-Received: by mail-io1-xd43.google.com with SMTP id ca18e2360f4ac-77acb04309dso203621439f.2;
-        Mon, 14 Aug 2023 04:51:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692013915; x=1692618715;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=20tjvbePUAfEV6JgW2FKzFkjTz/aXRRiD/7BadIt25E=;
-        b=DoCvn378mtZOPxRQN3nFkhu40qYpfHAUGuQG0BNtR2t5Bf4w2XrOuoFjflOGVN3B2+
-         8gN+ojhWJjUdCHs0Ax4Xtqfk3IPdx4xTC+r6VJg+1xBcTKXPtL2e9XF83VHHqjgS3ML6
-         dXolPRCenT2oukRMBWwX/mDHKe+YyH3Cl/0T/FMhaOCh88rJifTJZyN2hbDC6TlFRraP
-         RygcspI0k3u2yNKAoF6sqFYjMsxAx+JV79nPwf3Sq8+Ge/bowkD3A1xgqlUZEzI7vpyW
-         649oEDRbb9PdkRKjTbvpFBPj5Soqc/EgnA29ooQaKi6bKA/hVsPd9/QobNR0hhUeLHlh
-         GACg==
+        with ESMTP id S233689AbjHNMSg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 08:18:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C7F99
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 05:17:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692015474;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aXChxHQ1/Bi6hu4HBpoNe1d5uOB9c+b+DjWb1LSg1rU=;
+        b=TB4V8a2hQCPoWzcrvLr/z+6d4PEAhApzJjxWpbqty2Fw6m0Jug9MIgb1Yrg1gIdQT9KZvo
+        YLRKFjU2Q/R/YWO07znvbrUZNqrsALgfcv7XLQrwbXvak3a5FuYBl7eFE+1K8xHOPH2awa
+        zMqy457QLRFiTZeJhYM/Vne6Bj6X1Bs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-6yZF8-UbPuiykkbCUhDRkA-1; Mon, 14 Aug 2023 08:17:53 -0400
+X-MC-Unique: 6yZF8-UbPuiykkbCUhDRkA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3176ace3f58so2490286f8f.0
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 05:17:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692013915; x=1692618715;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=20tjvbePUAfEV6JgW2FKzFkjTz/aXRRiD/7BadIt25E=;
-        b=NF21ne4j+tHex/vDIU5d9BbkDoCxlGif4Ctkwoo4uqRLbeBpVrWjSSTwE0/uQYSvbi
-         t1LtL6pmycY9eaQ0nGM244IAkzL8a16O9drn42eFlHce19ydi+9dpp59zxGfa4GDx5En
-         LxcI81bsLCvO7eMI7xYJSnkzb5Gc3dVjrcQsTBgIuxPFMFVret7aFl1BdM2CxbSkfR+I
-         o7qQNOnKBFXI6Ci+TluqE6LfKxzorddkAY+QjjbIwVBHcQIw2S10WwCxQL1bSiObT4Au
-         pswIVA+07JF84/9qjGAWEzjF+i/v0QFIeF4b7GuqYA1eKBrYaSFdm8hvxoPNhgAnfHdg
-         oARg==
-X-Gm-Message-State: AOJu0YzZu0zQTkLj8a+cZqnd2oVw77nQwxJ6bdnlfZkHHppVlpQGPeio
-        KKtI/3zFmhO8ZioNg78LJNI=
-X-Google-Smtp-Source: AGHT+IF+ErgJvZY8p1Nd9FZsjgYqCnBE3X9FfVE1ZHWA+Zxg3CWlhnJPydkghkGgTW1nhhu/ZLoaFg==
-X-Received: by 2002:a05:6e02:12e9:b0:346:5bd7:4a17 with SMTP id l9-20020a056e0212e900b003465bd74a17mr16644925iln.17.1692013915595;
-        Mon, 14 Aug 2023 04:51:55 -0700 (PDT)
-Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id x7-20020a63b207000000b0055386b1415dsm8407848pge.51.2023.08.14.04.51.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 04:51:55 -0700 (PDT)
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 11/11] KVM: selftests: Test AMD Guest PerfMonV2
-Date:   Mon, 14 Aug 2023 19:51:08 +0800
-Message-Id: <20230814115108.45741-12-cloudliang@tencent.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230814115108.45741-1-cloudliang@tencent.com>
-References: <20230814115108.45741-1-cloudliang@tencent.com>
+        d=1e100.net; s=20221208; t=1692015472; x=1692620272;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aXChxHQ1/Bi6hu4HBpoNe1d5uOB9c+b+DjWb1LSg1rU=;
+        b=B8yHk4VzLvW0rWr65ERzFuWUk1y7I2pmYKTMK9dFlnN/XZagxdfj8y5hXwxyNNs5W+
+         qEUmkOGJ4YEp/c+e/5SE+w1dDTqUzaBMwBRRYNOKZgZd04WWhr+/s/pObTwqNvzUPdSu
+         8SLwTag3UoKjPOQZmdUA4ONhS2uSRtSV8J3CnxyYisRibC1YSXoE76jZlN+MbzGsI2CF
+         kHEVZZ8FbQWZSVT2WaWwrhJncxaQlN+gMrwVLx++O7CpbodbPulyI4V/H3wXHTEU93NB
+         tobipuTnqgU50UW5BGadTuQqY0Qld6z6+UmTFJwfw9tJuFEJ6webuUPASyqAYfe+/bjR
+         Un8A==
+X-Gm-Message-State: AOJu0YybJ6XsnSoD50IL/RZR3xUUGh7dAPodN0S+I1a4kti7h1n7X2qB
+        03UCxQrgnHmnwE2JDJjeqchbMJH3Fmtbttqa9BFLsKQs2ICWuBCjOWPNEc8SYQYenm0mGqsPFt/
+        4XcakpwK/Dlnq
+X-Received: by 2002:adf:dcc3:0:b0:319:735c:73e1 with SMTP id x3-20020adfdcc3000000b00319735c73e1mr3249040wrm.4.1692015472621;
+        Mon, 14 Aug 2023 05:17:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/IKihKd7BxzA/CCF3CBxVyGLYCDXKh91VoCNk14O4oY/rxNI9ShzAU/QZmZzWvgneSWo+pA==
+X-Received: by 2002:adf:dcc3:0:b0:319:735c:73e1 with SMTP id x3-20020adfdcc3000000b00319735c73e1mr3249009wrm.4.1692015472254;
+        Mon, 14 Aug 2023 05:17:52 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id k13-20020a5d428d000000b0030ada01ca78sm14327977wrq.10.2023.08.14.05.17.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 05:17:51 -0700 (PDT)
+Message-ID: <1324af1b-f8ca-c316-4a7c-2ea75a602ffb@redhat.com>
+Date:   Mon, 14 Aug 2023 14:17:49 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v3 27/27] KVM: arm64: nv: Add support for HCRX_EL2
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+ <20230808114711.2013842-28-maz@kernel.org>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230808114711.2013842-28-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jinrong Liang <cloudliang@tencent.com>
+Hi Marc,
 
-Add test case for AMD Guest PerfMonV2. Also test Intel
-MSR_CORE_PERF_GLOBAL_STATUS and MSR_CORE_PERF_GLOBAL_OVF_CTRL.
+On 8/8/23 13:47, Marc Zyngier wrote:
+> HCRX_EL2 has an interesting effect on HFGITR_EL2, as it conditions
+> the traps of TLBI*nXS.
+>
+> Expand the FGT support to add a new Fine Grained Filter that will
+> get checked when the instruction gets trapped, allowing the shadow
+> register to override the trap as needed.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h        |  5 ++
+>  arch/arm64/include/asm/kvm_host.h       |  1 +
+>  arch/arm64/kvm/emulate-nested.c         | 94 ++++++++++++++++---------
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 15 +++-
+>  arch/arm64/kvm/nested.c                 |  3 +-
+>  arch/arm64/kvm/sys_regs.c               |  2 +
+>  6 files changed, 83 insertions(+), 37 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index d229f238c3b6..137f732789c9 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -369,6 +369,11 @@
+>  #define __HDFGWTR_EL2_MASK	~__HDFGWTR_EL2_nMASK
+>  #define __HDFGWTR_EL2_nMASK	GENMASK(62, 60)
+>  
+> +/* Similar definitions for HCRX_EL2 */
+> +#define __HCRX_EL2_RES0		(GENMASK(63, 16) | GENMASK(13, 12))
+> +#define __HCRX_EL2_MASK		(0)
+> +#define __HCRX_EL2_nMASK	(GENMASK(15, 14) | GENMASK(4, 0))
+> +
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK	(~UL(0xf))
+>  /*
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index cb1c5c54cedd..93c541111dea 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -380,6 +380,7 @@ enum vcpu_sysreg {
+>  	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+>  	HSTR_EL2,	/* Hypervisor System Trap Register */
+>  	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+> +	HCRX_EL2,	/* Extended Hypervisor Configuration Register */
+>  	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+>  	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+>  	TCR_EL2,	/* Translation Control Register (EL2) */
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 4497666db45d..35f2f051af97 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -425,11 +425,13 @@ static const complex_condition_check ccc[] = {
+>   * [13:10]	enum fgt_group_id (4 bits)
+>   * [19:14]	bit number in the FGT register (6 bits)
+>   * [20]		trap polarity (1 bit)
+> - * [62:21]	Unused (42 bits)
+> + * [25:21]	FG filter (5 bits)
+> + * [62:26]	Unused (37 bits)
+>   * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+>   */
+>  #define TC_CGT_BITS	10
+>  #define TC_FGT_BITS	4
+> +#define TC_FGF_BITS	5
+>  
+>  union trap_config {
+>  	u64	val;
+> @@ -438,7 +440,8 @@ union trap_config {
+>  		unsigned long	fgt:TC_FGT_BITS; /* Fing Grained Trap id */
+>  		unsigned long	bit:6;		 /* Bit number */
+>  		unsigned long	pol:1;		 /* Polarity */
+> -		unsigned long	unk:42;		 /* Unknown */
+> +		unsigned long	fgf:TC_FGF_BITS; /* Fine Grained Filter */
+> +		unsigned long	unk:37;		 /* Unknown */
+>  		unsigned long	mbz:1;		 /* Must Be Zero */
+>  	};
+>  };
+> @@ -939,7 +942,15 @@ enum fgt_group_id {
+>  	__NR_FGT_GROUP_IDS__
+>  };
+>  
+> -#define SR_FGT(sr, g, b, p)					\
+> +enum fg_filter_id {
+> +	__NO_FGF__,
+> +	HCRX_FGTnXS,
+> +
+> +	/* Must be last */
+> +	__NR_FG_FILTER_IDS__
+> +};
+> +
+> +#define SR_FGF(sr, g, b, p, f)					\
+>  	{							\
+>  		.encoding	= sr,				\
+>  		.end		= sr,				\
+> @@ -947,9 +958,12 @@ enum fgt_group_id {
+>  			.fgt = g ## _GROUP,			\
+>  			.bit = g ## _EL2_ ## b ## _SHIFT,	\
+>  			.pol = p,				\
+> +			.fgf = f,				\
+>  		},						\
+>  	}
+>  
+> +#define SR_FGT(sr, g, b, p)	SR_FGF(sr, g, b, p, __NO_FGF__)
+> +
+>  static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	/* HFGRTR_EL2, HFGWTR_EL2 */
+>  	SR_FGT(SYS_TPIDR2_EL0,		HFGxTR, nTPIDR2_EL0, 0),
+> @@ -1053,37 +1067,37 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+>  	SR_FGT(OP_TLBI_ASIDE1OS, 	HFGITR, TLBIASIDE1OS, 1),
+>  	SR_FGT(OP_TLBI_VAE1OS, 		HFGITR, TLBIVAE1OS, 1),
+>  	SR_FGT(OP_TLBI_VMALLE1OS, 	HFGITR, TLBIVMALLE1OS, 1),
+> -	/* FIXME: nXS variants must be checked against HCRX_EL2.FGTnXS */
+> -	SR_FGT(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1),
+> -	SR_FGT(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1),
+> -	SR_FGT(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1),
+> -	SR_FGT(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1),
+> -	SR_FGT(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1),
+> -	SR_FGT(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1),
+> -	SR_FGT(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1),
+> -	SR_FGT(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1),
+> -	SR_FGT(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1),
+> -	SR_FGT(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1),
+> -	SR_FGT(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1),
+> -	SR_FGT(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1),
+> -	SR_FGT(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1),
+> -	SR_FGT(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1),
+> -	SR_FGT(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1),
+> -	SR_FGT(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1),
+> -	SR_FGT(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1),
+> -	SR_FGT(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1),
+> -	SR_FGT(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1),
+> -	SR_FGT(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1),
+> -	SR_FGT(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1),
+> -	SR_FGT(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1),
+> -	SR_FGT(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1),
+> -	SR_FGT(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1),
+> -	SR_FGT(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1),
+> -	SR_FGT(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1),
+> -	SR_FGT(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1),
+> +	/* nXS variants must be checked against HCRX_EL2.FGTnXS */
+> +	SR_FGF(OP_TLBI_VAALE1NXS, 	HFGITR, TLBIVAALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VALE1NXS, 	HFGITR, TLBIVALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAAE1NXS, 	HFGITR, TLBIVAAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_ASIDE1NXS, 	HFGITR, TLBIASIDE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAE1NXS, 	HFGITR, TLBIVAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VMALLE1NXS, 	HFGITR, TLBIVMALLE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAALE1NXS, 	HFGITR, TLBIRVAALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVALE1NXS, 	HFGITR, TLBIRVALE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAAE1NXS, 	HFGITR, TLBIRVAAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAE1NXS, 	HFGITR, TLBIRVAE1, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAALE1ISNXS, 	HFGITR, TLBIRVAALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVALE1ISNXS, 	HFGITR, TLBIRVALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAAE1ISNXS, 	HFGITR, TLBIRVAAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAE1ISNXS, 	HFGITR, TLBIRVAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAALE1ISNXS, 	HFGITR, TLBIVAALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VALE1ISNXS, 	HFGITR, TLBIVALE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAAE1ISNXS, 	HFGITR, TLBIVAAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_ASIDE1ISNXS, 	HFGITR, TLBIASIDE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAE1ISNXS, 	HFGITR, TLBIVAE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VMALLE1ISNXS, 	HFGITR, TLBIVMALLE1IS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAALE1OSNXS, 	HFGITR, TLBIRVAALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVALE1OSNXS, 	HFGITR, TLBIRVALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAAE1OSNXS, 	HFGITR, TLBIRVAAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_RVAE1OSNXS, 	HFGITR, TLBIRVAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAALE1OSNXS, 	HFGITR, TLBIVAALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VALE1OSNXS, 	HFGITR, TLBIVALE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAAE1OSNXS, 	HFGITR, TLBIVAAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_ASIDE1OSNXS, 	HFGITR, TLBIASIDE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VAE1OSNXS, 	HFGITR, TLBIVAE1OS, 1, HCRX_FGTnXS),
+> +	SR_FGF(OP_TLBI_VMALLE1OSNXS, 	HFGITR, TLBIVMALLE1OS, 1, HCRX_FGTnXS),
+>  	SR_FGT(OP_AT_S1E1WP, 		HFGITR, ATS1E1WP, 1),
+>  	SR_FGT(OP_AT_S1E1RP, 		HFGITR, ATS1E1RP, 1),
+>  	SR_FGT(OP_AT_S1E0W, 		HFGITR, ATS1E0W, 1),
+> @@ -1598,6 +1612,7 @@ int __init populate_nv_trap_config(void)
+>  	BUILD_BUG_ON(sizeof(union trap_config) != sizeof(void *));
+>  	BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
+>  	BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
+> +	BUILD_BUG_ON(__NR_FG_FILTER_IDS__ > BIT(TC_FGF_BITS));
+>  
+>  	for (int i = 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+>  		const struct encoding_to_trap_config *cgt = &encoding_to_cgt[i];
+> @@ -1779,6 +1794,17 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+>  
+>  	case HFGITR_GROUP:
+>  		val = sanitised_sys_reg(vcpu, HFGITR_EL2);
+> +		switch (tc.fgf) {
+> +			u64 tmp;
+> +
+> +		case __NO_FGF__:
+> +			break;
+> +
+> +		case HCRX_FGTnXS:
+> +			tmp = sanitised_sys_reg(vcpu, HCRX_EL2);
+> +			if (tmp & HCRX_EL2_FGTnXS)
+> +				tc.fgt = __NO_FGT_GROUP__;
+> +		}
+>  		break;
+>  
+>  	case __NR_FGT_GROUP_IDS__:
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 060c5a0409e5..3acf6d77e324 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -197,8 +197,19 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+>  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>  
+> -	if (cpus_have_final_cap(ARM64_HAS_HCX))
+> -		write_sysreg_s(HCRX_GUEST_FLAGS, SYS_HCRX_EL2);
+> +	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
+> +		u64 hcrx = HCRX_GUEST_FLAGS;
+> +		if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
+> +			u64 clr = 0, set = 0;
+> +
+> +			compute_clr_set(vcpu, HCRX_EL2, clr, set);
+> +
+> +			hcrx |= set;
+> +			hcrx &= ~clr;
+> +		}
+> +
+> +		write_sysreg_s(hcrx, SYS_HCRX_EL2);
+> +	}
+>  
+>  	__activate_traps_hfgxtr(vcpu);
+>  }
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 3facd8918ae3..042695a210ce 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -117,7 +117,8 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+>  		break;
+>  
+>  	case SYS_ID_AA64MMFR1_EL1:
+> -		val &= (NV_FTR(MMFR1, PAN)	|
+> +		val &= (NV_FTR(MMFR1, HCX)	|
+> +			NV_FTR(MMFR1, PAN)	|
+>  			NV_FTR(MMFR1, LO)	|
+>  			NV_FTR(MMFR1, HPDS)	|
+>  			NV_FTR(MMFR1, VH)	|
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dfd72b3a625f..374b21f08fc3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2372,6 +2372,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+>  
+> +	EL2_REG(HCRX_EL2, access_rw, reset_val, 0),
+> +
+>  	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+>  	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
----
- .../kvm/x86_64/pmu_basic_functionality_test.c | 48 ++++++++++++++++++-
- 1 file changed, 46 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-index cb2a7ad5c504..02bd1fe3900b 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-@@ -58,7 +58,9 @@ static uint64_t run_vcpu(struct kvm_vcpu *vcpu, uint64_t *ucall_arg)
- 
- static void guest_measure_loop(uint64_t event_code)
- {
-+	uint64_t global_ovf_ctrl_msr, global_status_msr, global_ctrl_msr;
- 	uint8_t nr_gp_counters, pmu_version = 1;
-+	uint8_t gp_counter_bit_width = 48;
- 	uint64_t event_sel_msr;
- 	uint32_t counter_msr;
- 	unsigned int i;
-@@ -68,6 +70,12 @@ static void guest_measure_loop(uint64_t event_code)
- 		pmu_version = this_cpu_property(X86_PROPERTY_PMU_VERSION);
- 		event_sel_msr = MSR_P6_EVNTSEL0;
- 
-+		if (pmu_version > 1) {
-+			global_ovf_ctrl_msr = MSR_CORE_PERF_GLOBAL_OVF_CTRL;
-+			global_status_msr = MSR_CORE_PERF_GLOBAL_STATUS;
-+			global_ctrl_msr = MSR_CORE_PERF_GLOBAL_CTRL;
-+		}
-+
- 		if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES)
- 			counter_msr = MSR_IA32_PMC0;
- 		else
-@@ -76,6 +84,17 @@ static void guest_measure_loop(uint64_t event_code)
- 		nr_gp_counters = AMD64_NR_COUNTERS;
- 		event_sel_msr = MSR_K7_EVNTSEL0;
- 		counter_msr = MSR_K7_PERFCTR0;
-+
-+		if (this_cpu_has(X86_FEATURE_AMD_PMU_EXT_CORE) &&
-+		    this_cpu_has(X86_FEATURE_AMD_PERFMON_V2)) {
-+			nr_gp_counters = this_cpu_property(X86_PROPERTY_AMD_PMU_NR_CORE_COUNTERS);
-+			global_ovf_ctrl_msr = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR;
-+			global_status_msr = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS;
-+			global_ctrl_msr = MSR_AMD64_PERF_CNTR_GLOBAL_CTL;
-+			event_sel_msr = MSR_F15H_PERF_CTL0;
-+			counter_msr = MSR_F15H_PERF_CTR0;
-+			pmu_version = 2;
-+		}
- 	}
- 
- 	for (i = 0; i < nr_gp_counters; i++) {
-@@ -84,14 +103,39 @@ static void guest_measure_loop(uint64_t event_code)
- 		      ARCH_PERFMON_EVENTSEL_ENABLE | event_code);
- 
- 		if (pmu_version > 1) {
--			wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, BIT_ULL(i));
-+			wrmsr(global_ctrl_msr, BIT_ULL(i));
- 			__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
--			wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+			wrmsr(global_ctrl_msr, 0);
- 			GUEST_SYNC(_rdpmc(i));
- 		} else {
- 			__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
- 			GUEST_SYNC(_rdpmc(i));
- 		}
-+
-+		if (pmu_version > 1 && _rdpmc(i)) {
-+			wrmsr(global_ctrl_msr, 0);
-+			wrmsr(counter_msr + i, 0);
-+			__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+			GUEST_ASSERT(!_rdpmc(i));
-+
-+			wrmsr(global_ctrl_msr, BIT_ULL(i));
-+			__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+			GUEST_ASSERT(_rdpmc(i));
-+
-+			if (host_cpu_is_intel)
-+				gp_counter_bit_width =
-+					this_cpu_property(X86_PROPERTY_PMU_GP_COUNTERS_BIT_WIDTH);
-+
-+			wrmsr(global_ctrl_msr, 0);
-+			wrmsr(counter_msr + i, (1ULL << gp_counter_bit_width) - 2);
-+			wrmsr(global_ctrl_msr, BIT_ULL(i));
-+			__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+			GUEST_ASSERT(rdmsr(global_status_msr) & BIT_ULL(i));
-+
-+			wrmsr(global_ctrl_msr, 0);
-+			wrmsr(global_ovf_ctrl_msr, BIT_ULL(i));
-+			GUEST_ASSERT(!(rdmsr(global_status_msr) & BIT_ULL(i)));
-+		}
- 	}
- 
- 	if (host_cpu_is_amd || pmu_version < 2)
--- 
-2.39.3
+Eric
 
