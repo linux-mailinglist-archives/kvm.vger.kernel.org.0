@@ -2,93 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AC2E77C110
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 21:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D639277C18E
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 22:36:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbjHNTwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 15:52:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40614 "EHLO
+        id S232057AbjHNUfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 16:35:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231670AbjHNTwB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 15:52:01 -0400
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21DB1FA;
-        Mon, 14 Aug 2023 12:51:58 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 688C8100005;
-        Mon, 14 Aug 2023 22:51:56 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 688C8100005
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1692042716;
-        bh=Uu/F/7BfivOj4WsQ0lGhlOQbXHsj65lDecxOZ8eeGo0=;
-        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-        b=CH5T9HnojLUkhDzU5ptkvi9wA4A1ptvH15Ls6SKOGYGdy08av2Jqem2EFwZQ1s8nQ
-         YEHwThLqBAS///XGeqPzXyuqiPA+0eXGF1yWQXDYoZgHOJCMCoexoKTlZ/aVVKkIal
-         n8sbIOeLxPwvSapqmjckAuPVz6OytvZqGqM+sjKiVWzHVhgo/vOit2Zp8jTqU0WWBy
-         oGnHbfsNdZPeLsTyzl6R53+iaCPI7BJLTGr1UOrwfseS2JhBZ892K1lL8V4yXK762Z
-         RQF1GV6y8lYYMleoqJB82XLGs0mf3fXXx5vkwnlK2WJp1JYh8m8WdIkUDZxUXPCIlh
-         ayvil5en5yb4Q==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Mon, 14 Aug 2023 22:51:56 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 14 Aug 2023 22:51:53 +0300
-Message-ID: <49cdd121-3389-2f08-c0cc-89c9ac32cd1e@sberdevices.ru>
-Date:   Mon, 14 Aug 2023 22:46:05 +0300
+        with ESMTP id S232506AbjHNUfk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 16:35:40 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 599A11703;
+        Mon, 14 Aug 2023 13:35:39 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bdeb022738so6655595ad.0;
+        Mon, 14 Aug 2023 13:35:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692045339; x=1692650139;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Dpn0LXIHN37LlwYOQkWgoOoiUYJkZj+9sfdGrW9oSE=;
+        b=CxSBv9sizW4p72ywQxQr4bL7KPusbMfLNXDcgwXsEBbZrDAa3Oyh8JTCqEkZb2H3Tc
+         ovpATqnEgZSBs9QqQNNDWyWh1H2GFYnEPE7plBQ2P4C/RNbelcjQydZkenhFREn/7tu1
+         UadB6AH11vlqhDfzIOSxULRVlTWsF1Wz6Z2zQPQDkAKP18OyRN3wqUzlAo+el3HOcGnl
+         vlSAFZuuAmXZ6aTVDo8/RHzxrBNViz4trszkdeQWoVCHDbXPouUIcqAx7GxwX3/l8db3
+         i2TEsbzrDyI+nZmVK8Ye0ETckp+O9AHJBJ1CxNpDy3jaB+rNnhjX2280O1zJ2D1zmPrh
+         H55Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692045339; x=1692650139;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Dpn0LXIHN37LlwYOQkWgoOoiUYJkZj+9sfdGrW9oSE=;
+        b=Md6A5JpYfrSjvJ7gXL/d77yxw8SdFdKtj0uh8OZH+hlk/5jtNibmglGcO7JJgrxCRy
+         xvUr0EDpTB8OOQBbdQtU6YQ1q+iDSpmxRgdsCoco7s4I4t6LPjzuA4v7ubzUthwgKIvM
+         r410iHoWTnGRjfNXx99g1w0EeCSZUzbRP6hUg1wjcmy+Wi5TGN//cKU4Rso0jGsBO/fa
+         S+glDycbeS3xxK0ik6KENB5OXDWBhVId3iySoTnfzctikVt1hYVdZfmBgYWCwIi8ZPPb
+         H1a4LBbTOu9p8IQpp8xxQZ3D251C09HCWxMpBSf0j2afgTxRYnRnvgebtnEP7Um+r8ry
+         nM5g==
+X-Gm-Message-State: AOJu0Yy+OerBXNSRCOoei7/VyUDMtpSFoiHILbES9S8q7cLbrPDNaiYV
+        Pu7+n2mnwuNS3JIdkuGX5kI=
+X-Google-Smtp-Source: AGHT+IHIA+m4NLfJbD0pwljJ4yob89pyeJn1LijeuHhvbV3eu3maw12j/bZrI5voybejoIPe7GOu0A==
+X-Received: by 2002:a17:90a:7486:b0:26b:374f:97c2 with SMTP id p6-20020a17090a748600b0026b374f97c2mr75282pjk.6.1692045338647;
+        Mon, 14 Aug 2023 13:35:38 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id jg22-20020a17090326d600b001bdea189261sm2003751plb.229.2023.08.14.13.35.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 13:35:38 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 13:35:36 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
+        hang.yuan@intel.com, tina.zhang@intel.com
+Subject: Re: [RFC PATCH v4 13/16] KVM: x86/tdp_mmu: Try to merge pages into a
+ large page
+Message-ID: <20230814203536.GB2257301@ls.amr.corp.intel.com>
+References: <cover.1690323516.git.isaku.yamahata@intel.com>
+ <d649f4294d95803a46aaaf3ddd87c7e2f8ff501d.1690323516.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 1/2] vsock: send SIGPIPE on write to shutdowned
- socket
-Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Arseniy Krasnov <oxffffaa@gmail.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@sberdevices.ru>
-References: <20230801141727.481156-1-AVKrasnov@sberdevices.ru>
- <20230801141727.481156-2-AVKrasnov@sberdevices.ru>
- <qgn26mgfotc7qxzp6ad7ezkdex6aqniv32c5tvehxh4hljsnvs@x7wvyvptizxx>
- <44fef482-579a-fed6-6e8c-d400546285fc@gmail.com>
- <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
-From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
-In-Reply-To: <bzkwqp26joyzgvqyoypyv43wv7t3b6rzs3v5hkch45yggmrzp6@25byvzqwiztb>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179234 [Aug 14 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVKrasnov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 526 526 7a6a9b19f6b9b3921b5701490f189af0e0cd5310, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;pubs.opengroup.org:7.1.1;www.open-std.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/08/14 18:25:00
-X-KSMG-LinksScanning: Clean, bases: 2023/08/14 18:25:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/14 14:11:00 #21610501
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d649f4294d95803a46aaaf3ddd87c7e2f8ff501d.1690323516.git.isaku.yamahata@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -96,171 +78,265 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 25, 2023 at 03:23:59PM -0700,
+isaku.yamahata@intel.com wrote:
 
-
-On 04.08.2023 17:28, Stefano Garzarella wrote:
-> On Fri, Aug 04, 2023 at 03:46:47PM +0300, Arseniy Krasnov wrote:
->> Hi Stefano,
->>
->> On 02.08.2023 10:46, Stefano Garzarella wrote:
->>> On Tue, Aug 01, 2023 at 05:17:26PM +0300, Arseniy Krasnov wrote:
->>>> POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
->>>> shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
->>>> flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
->>>>
->>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->>>> ---
->>>> net/vmw_vsock/af_vsock.c | 3 +++
->>>> 1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>> index 020cf17ab7e4..013b65241b65 100644
->>>> --- a/net/vmw_vsock/af_vsock.c
->>>> +++ b/net/vmw_vsock/af_vsock.c
->>>> @@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
->>>>             err = total_written;
->>>>     }
->>>> out:
->>>> +    if (sk->sk_type == SOCK_STREAM)
->>>> +        err = sk_stream_error(sk, msg->msg_flags, err);
->>>
->>> Do you know why we don't need this for SOCK_SEQPACKET and SOCK_DGRAM?
->>
->> Yes, here is my explanation:
->>
->> This function checks that input error is SIGPIPE, and if so it sends SIGPIPE to the 'current' thread
->> (except case when MSG_NOSIGNAL flag is set). This behaviour is described in POSIX:
->>
->> Page 367 (description of defines from sys/socket.h):
->> MSG_NOSIGNAL: No SIGPIPE generated when an attempt to send is made on a stream-
->> oriented socket that is no longer connected.
->>
->> Page 497 (description of SOCK_STREAM):
->> A SIGPIPE signal is raised if a thread sends on a broken stream (one that is
->> no longer connected).
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Okay, but I think we should do also for SEQPACKET:
+> When a large page is passed to the KVM page fault handler and some of sub
+> pages are already populated, try to merge sub pages into a large page.
+> This situation can happen when the guest converts small pages into shared
+> and convert it back into private.
 > 
-> https://pubs.opengroup.org/onlinepubs/009696699/functions/xsh_chap02_10.html
+> When a large page is passed to KVM mmu page fault handler and the spte
+> corresponding to the page is non-leaf (one or more of sub pages are already
+> populated at lower page level), the current kvm mmu zaps non-leaf spte at a
+> large page level, and populate a leaf spte at that level.  Thus small pages
+> are converted into a large page.  However, it doesn't work for TDX because
+> zapping and re-populating results in zeroing page content.  Instead,
+> populate all small pages and merge them into a large page.
 > 
-> In 2.10.6 Socket Types:
+> Merging pages into a large page can fail when some sub pages are accepted
+> and some are not.  In such case, with the assumption that guest tries to
+> accept at large page size for performance when possible, don't try to be
+> smart to identify which page is still pending, map all pages at lower page
+> level, and let vcpu re-execute.
 > 
-> "The SOCK_SEQPACKET socket type is similar to the SOCK_STREAM type, and
-> is also connection-oriented. The only difference between these types is
-> that record boundaries ..."
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |   2 +
+>  arch/x86/include/asm/kvm_host.h    |   4 +
+>  arch/x86/kvm/mmu/tdp_iter.c        |  37 +++++--
+>  arch/x86/kvm/mmu/tdp_iter.h        |   2 +
+>  arch/x86/kvm/mmu/tdp_mmu.c         | 163 ++++++++++++++++++++++++++++-
+>  5 files changed, 198 insertions(+), 10 deletions(-)
 > 
-> Then in  2.10.14 Signals:
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index c3963002722c..612fcaac600d 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1242,6 +1242,167 @@ void kvm_tdp_mmu_invalidate_all_roots(struct kvm *kvm, bool skip_private)
+>  	rcu_read_unlock();
+>  }
+>  
+> +static void tdp_mmu_iter_step_side(int i, struct tdp_iter *iter)
+> +{
+> +	/*
+> +	 * if i = SPTE_ENT_PER_PAGE - 1, tdp_iter_step_side() results
+> +	 * in reading the entry beyond the last entry.
+> +	 */
+> +	if (i < SPTE_ENT_PER_PAGE)
+> +		tdp_iter_step_side(iter);
+> +}
+> +
+> +static int tdp_mmu_merge_private_spt(struct kvm_vcpu *vcpu,
+> +				     struct kvm_page_fault *fault,
+> +				     struct tdp_iter *iter, u64 new_spte)
+> +{
+> +	u64 *sptep = rcu_dereference(iter->sptep);
+> +	struct kvm_mmu_page *child_sp;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct tdp_iter child_iter;
+> +	bool ret_pf_retry = false;
+> +	int level = iter->level;
+> +	gfn_t gfn = iter->gfn;
+> +	u64 old_spte = *sptep;
+> +	tdp_ptep_t child_pt;
+> +	u64 child_spte;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	/*
+> +	 * TDX KVM supports only 2MB large page.  It's not supported to merge
+> +	 * 2MB pages into 1GB page at the moment.
+> +	 */
+> +	WARN_ON_ONCE(fault->goal_level != PG_LEVEL_2M);
+> +	WARN_ON_ONCE(iter->level != PG_LEVEL_2M);
+> +	WARN_ON_ONCE(!is_large_pte(new_spte));
+> +
+> +	/* Freeze the spte to prevent other threads from working spte. */
+> +	if (!try_cmpxchg64(sptep, &iter->old_spte, REMOVED_SPTE))
+> +		return -EBUSY;
+> +
+> +	/*
+> +	 * Step down to the child spte.  Because tdp_iter_next() assumes the
+> +	 * parent spte isn't freezed, do it manually.
+> +	 */
+> +	child_pt = spte_to_child_pt(iter->old_spte, iter->level);
+> +	child_sp = sptep_to_sp(child_pt);
+> +	WARN_ON_ONCE(child_sp->role.level != PG_LEVEL_4K);
+> +	WARN_ON_ONCE(!kvm_mmu_page_role_is_private(child_sp->role));
+> +
+> +	/* Don't modify iter as the caller will use iter after this function. */
+> +	child_iter = *iter;
+> +	/* Adjust the target gfn to the head gfn of the large page. */
+> +	child_iter.next_last_level_gfn &= -KVM_PAGES_PER_HPAGE(level);
+> +	tdp_iter_step_down(&child_iter, child_pt);
+> +
+> +	/*
+> +	 * All child pages are required to be populated for merging them into a
+> +	 * large page.  Populate all child spte.
+> +	 */
+> +	for (i = 0; i < SPTE_ENT_PER_PAGE; i++, tdp_mmu_iter_step_side(i, &child_iter)) {
+> +		WARN_ON_ONCE(child_iter.level != PG_LEVEL_4K);
+> +		if (is_shadow_present_pte(child_iter.old_spte)) {
+> +			/* TODO: relocate page for huge page. */
+> +			if (WARN_ON_ONCE(spte_to_pfn(child_iter.old_spte) !=
+> +					 spte_to_pfn(new_spte) + i)) {
+> +				ret = -EAGAIN;
+> +				ret_pf_retry = true;
+> +			}
+> +			/*
+> +			 * When SEPT_VE_DISABLE=true and the page state is
+> +			 * pending, this case can happen.  Just resume the vcpu
+> +			 * again with the expectation for other vcpu to accept
+> +			 * this page.
+> +			 */
+> +			if (child_iter.gfn == fault->gfn) {
+> +				ret = -EAGAIN;
+> +				ret_pf_retry = true;
+> +				break;
+> +			}
+> +			continue;
+> +		}
+> +
+> +		WARN_ON_ONCE(spte_to_pfn(child_iter.old_spte) != spte_to_pfn(new_spte) + i);
+> +		child_spte = make_huge_page_split_spte(kvm, new_spte, child_sp->role, i);
+> +		/*
+> +		 * Because other thread may have started to operate on this spte
+> +		 * before freezing the parent spte,  Use atomic version to
+> +		 * prevent race.
+> +		 */
+> +		ret = tdp_mmu_set_spte_atomic(vcpu->kvm, &child_iter, child_spte);
+> +		if (ret == -EBUSY || ret == -EAGAIN)
+> +			/*
+> +			 * There was a race condition.  Populate remaining 4K
+> +			 * spte to resolve fault->gfn to guarantee the forward
+> +			 * progress.
+> +			 */
+> +			ret_pf_retry = true;
+> +		else if (ret)
+> +			goto out;
+> +
+> +	}
+> +	if (ret_pf_retry)
+> +		goto out;
+> +
+> +	/* Prevent the Secure-EPT entry from being used. */
+> +	ret = static_call(kvm_x86_zap_private_spte)(kvm, gfn, level);
+> +	if (ret)
+> +		goto out;
+> +	kvm_flush_remote_tlbs_range(kvm, gfn & KVM_HPAGE_GFN_MASK(level),
+> +				    KVM_PAGES_PER_HPAGE(level));
+> +
+> +	/* Merge pages into a large page. */
+> +	ret = static_call(kvm_x86_merge_private_spt)(kvm, gfn, level,
+> +						     kvm_mmu_private_spt(child_sp));
+> +	/*
+> +	 * Failed to merge pages because some pages are accepted and some are
+> +	 * pending.  Since the child page was mapped above, let vcpu run.
+> +	 */
+> +	if (ret) {
+> +		if (static_call(kvm_x86_unzap_private_spte)(kvm, gfn, level))
+> +			old_spte = SHADOW_NONPRESENT_VALUE |
+> +				(spte_to_pfn(old_spte) << PAGE_SHIFT) |
+> +				PT_PAGE_SIZE_MASK;
+> +		goto out;
+> +	}
+> +
+> +	/* Unfreeze spte. */
+> +	__kvm_tdp_mmu_write_spte(sptep, new_spte);
+> +
+> +	/*
+> +	 * Free unused child sp.  Secure-EPT page was already freed at TDX level
+> +	 * by kvm_x86_merge_private_spt().
+> +	 */
+> +	tdp_unaccount_mmu_page(kvm, child_sp);
+> +	tdp_mmu_free_sp(child_sp);
+> +	return -EAGAIN;
+> +
+> +out:
+> +	__kvm_tdp_mmu_write_spte(sptep, old_spte);
+> +	return ret;
+> +}
+> +
+> +static int __tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+> +					     struct kvm_page_fault *fault,
+> +					     struct tdp_iter *iter, u64 new_spte)
+> +{
+> +	/*
+> +	 * The private page has smaller-size pages.  For example, the child
+> +	 * pages was converted from shared to page, and now it can be mapped as
+> +	 * a large page.  Try to merge small pages into a large page.
+> +	 */
+> +	if (fault->slot &&
+> +	    kvm_gfn_shared_mask(vcpu->kvm) &&
+> +	    iter->level > PG_LEVEL_4K &&
+> +	    kvm_is_private_gpa(vcpu->kvm, fault->addr) &&
+> +	    is_shadow_present_pte(iter->old_spte) &&
+> +	    !is_large_pte(iter->old_spte))
+> +		return tdp_mmu_merge_private_spt(vcpu, fault, iter, new_spte);
+> +
+> +	return tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte);
+> +}
+> +
+>  /*
+>   * Installs a last-level SPTE to handle a TDP page fault.
+>   * (NPT/EPT violation/misconfiguration)
+> @@ -1276,7 +1437,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+>  
+>  	if (new_spte == iter->old_spte)
+>  		ret = RET_PF_SPURIOUS;
+> -	else if (tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
+> +	else if (__tdp_mmu_map_handle_target_level(vcpu, fault, iter, new_spte))
+>  		return RET_PF_RETRY;
+>  	else if (is_shadow_present_pte(iter->old_spte) &&
+>  		 !is_last_spte(iter->old_spte, iter->level))
+> -- 
+> 2.25.1
 > 
-> "The SIGPIPE signal shall be sent to a thread that attempts to send data
-> on a socket that is no longer able to send. In addition, the send
-> operation fails with the error [EPIPE]."
-> 
-> It's honestly not super clear, but I assume the problem is similar with
-> seqpacket since it's connection-oriented, or did I miss something?
-> 
-> For example in sctp_sendmsg() IIUC we raise a SIGPIPE regardless of
-> whether the socket is STREAM or SEQPACKET.
-
-Update about sending SIGPIPE for SOCK_SEQPACKET, I checked POSIX doc and kernel sources more deeply:
 
 
-1)
+I missed the race condition and had a wrong WARN_ON_ONCE().  I think it's hard
+to hit it because
+- In most cases, we hit if (is_shadow_present_pte()) because map it with large
+  page, split the page on mapgpa(to-shared), merge the page on
+  mapgpa(to-private-again).
+  We need independent mapgpa sequence on a different GPA, but within same 2M
+  range.
 
-I checked four types of sockets, which sends SIGPIPE for SOCK_SEQPACKET or not ('YES' if
-this socket sends SIGPIPE in SOCK_SEQPACKET case):
+- To hit removed case, we need a race with 2 vcpus in addition to the above.
 
-net/kcm/: YES
-net/unix/: NO
-net/sctp/: YES
-net/caif/: NO
+Anyway this will be included in the next respin.
 
-Looking for this, I think it is impossible to get the right answer, as there is some
-mess - everyone implements it as wish.
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 70051dd863a8..4ccfbd04fb27 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1306,6 +1306,13 @@ static int tdp_mmu_merge_private_spt(struct kvm_vcpu *vcpu,
+ 	 */
+ 	for (i = 0; i < SPTE_ENT_PER_PAGE; i = tdp_mmu_iter_step_side(i, &child_iter)) {
+ 		WARN_ON_ONCE(child_iter.level != PG_LEVEL_4K);
++
++		if (is_removed_spte(child_iter.old_spte)) {
++			ret = -EAGAIN;
++			ret_pf_retry = true;
++			continue;
++		}
++
+ 		if (is_shadow_present_pte(child_iter.old_spte)) {
+ 			/* TODO: relocate page for huge page. */
+ 			if (WARN_ON_ONCE(spte_to_pfn(child_iter.old_spte) !=
+@@ -1327,7 +1334,6 @@ static int tdp_mmu_merge_private_spt(struct kvm_vcpu *vcpu,
+ 			continue;
+ 		}
+ 
+-		WARN_ON_ONCE(spte_to_pfn(child_iter.old_spte) != spte_to_pfn(new_spte) + i);
+ 		child_spte = make_huge_page_split_spte(kvm, new_spte, child_sp->role, i);
+ 		/*
+ 		 * Because other thread may have started to operate on this spte
+-- 
+2.25.1
 
-2)
-
-I opened POSIX spec again, and here are details about returning EPIPE from pages
-for 'send()', 'sendto()', 'sendmsg()':
-
-[EPIPE] The socket is shut down for writing, or the socket is connection-mode and is
-no longer connected. In the latter case, and if the socket is of type
-SOCK_STREAM, the SIGPIPE signal is generated to the calling thread
-
-So my opinion is that we need to send SIGPIPE only for SOCK_STREAM. Another question
-is how to interpret this from above (but again - SIGPIPE is related for SOCK_STREAM
-only):
-
-**" and is no longer connected"**
-
-IIUC, if we follow POSIX strictly, this check must be like:
-
-/* socket is shut down for writing or no longer connected. */
-if (sk->sk_shutdown & SEND_SHUTDOWN ||
-    vsk->peer_shutdown & RCV_SHUTDOWN ||
-    sock_flag(SOCK_DONE)) {
-	err = -EPIPE;
-	goto out;
-}
-
-...
-
-out:
-	/* Handle -EPIPE for stream socket which is no longer connected. */
-	if (sk->sk_type == SOCK_STREAM &&
-		sock_flag(SOCK_DONE))
-		err = sk_stream_error();
-
-
-
-From the other side, we can just follow TCP/AF_UNIX implementations as both are
-popular types of socket. In this case I suggest to implement this check like
-(e.g. without sock_flag(SOCK_DONE)):
-
-
-if (sk->sk_shutdown & SEND_SHUTDOWN ||
-    vsk->peer_shutdown & RCV_SHUTDOWN) {
-	err = -EPIPE;
-	goto out;
-}
-
-...
-
-out:
-	if (sk->sk_type == SOCK_STREAM)
-		err = sk_stream_error();
-
-What do you think?
-
-Thanks, Arseniy
-
-> 
->>
->> Page 1802 (description of 'send()' call):
->> MSG_NOSIGNAL
->>
->> Requests not to send the SIGPIPE signal if an attempt to
->> send is made on a stream-oriented socket that is no
->> longer connected. The [EPIPE] error shall still be
->> returned
->>
->> And the same for 'sendto()' and 'sendmsg()'
->>
->> Link to the POSIX document:
->> https://www.open-std.org/jtc1/sc22/open/n4217.pdf
->>
->> TCP (I think we must rely on it), KCM, SMC sockets (all of them are stream) work in the same
->> way by calling this function. AF_UNIX also works in the same way, but it implements SIGPIPE handling
->> without this function.
-> 
-> I'm okay calling this function.
-> 
->>
->> The only thing that confused me a little bit, that sockets above returns EPIPE when
->> we have only SEND_SHUTDOWN set, but for AF_VSOCK EPIPE is returned for RCV_SHUTDOWN
->> also, but I think it is related to this patchset.
-> 
-> Do you mean that it is NOT related to this patchset?
-> 
-> Thanks,
-> Stefano
-> 
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
