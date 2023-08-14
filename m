@@ -2,79 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B58C377C3E0
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 01:17:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF20C77C40E
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 01:50:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233438AbjHNXRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 19:17:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39596 "EHLO
+        id S233519AbjHNXtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 19:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233470AbjHNXQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 19:16:56 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BDB8171F
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 16:16:56 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-589e3ac6d76so32207517b3.1
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 16:16:56 -0700 (PDT)
+        with ESMTP id S233517AbjHNXta (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 19:49:30 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBAF710C8;
+        Mon, 14 Aug 2023 16:49:29 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-51b4ef5378bso3652376a12.1;
+        Mon, 14 Aug 2023 16:49:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692055015; x=1692659815;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJ2VqA/vSflBac203Z0ZgYzciS8CSN/YrZrCQZvgAqE=;
-        b=OxYYoyUAQaeaCm0MRnDlT6YpDWZ0eDciFaHbssoRAoYyzjd2o0WDI1UOBCOxL+kMJc
-         5YD0NK8r1uDf6e0Jatvt+d6P+BWzIhvUYoQQhLjByYnja3UBlbXrGoFe9hBNCSmd3Por
-         77GbZptlqN3qID9Yi7OuuYNKro+YD6l9Q6jj3+sUYzoK08H9wS69cXzUBziAMKx3xld/
-         w96wxOhnL73JzIXq2lGp1mV73XNcE7Ps2NUvuAohRziILKeBly43Y5qUc7dLaviqameq
-         hE+kTcQyTkgYI/ntVGdkCqeR0EWDhGYDk0kgtw+nvGshr7JSpUCtOXj/qFAa5uoFZbVm
-         YkSw==
+        d=gmail.com; s=20221208; t=1692056969; x=1692661769;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=br6OSR0B9+M+i2ApSCaNNWHBqjYVfS4RRcgrjd9CMp4=;
+        b=V2osuCtpdwgI6KMK3nJNnMne+hWBmVAzcfzyzX5ePvfDyho2bzmh+kfSkTG/KzowLA
+         nptcg3Bkw35RcZEVuPSd9hVeZiPXlVia5shOllZiFH+xfELTGdWuiiBu2uJqKhzQNjlo
+         RfqgzojN0w/Srvf7iRLz5XAQtwrs8Xoi3h8QEioQ+DL0QrVMabh9p+Jku2GEQe8ZC/mZ
+         K+w0WYjmG/7JlUlqiix74JQtk3QfjJr4n2+CXV0UuTWhWEl8+b7CdZOoMJYBX6GTu5SF
+         z9TlPVPNBEAq9scnRjpPvL1avlcnh/8rCdBinVzhGmDPOCaWzBijpS4zJHRrsyBJlJIo
+         upAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692055015; x=1692659815;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJ2VqA/vSflBac203Z0ZgYzciS8CSN/YrZrCQZvgAqE=;
-        b=OMdqEK+IW4GRyJFczbKQuCvnroTe7/zHq2vmEyC8KhvNxgeVQFd2EjiEN/mnPFubO8
-         IsggryLJlU5NAsH9hq1zwOB9+8NftyFb4iEX/tNvQJFC6qox4uW4Yxh3kScw482XTGA5
-         CtmJ76BfZJJnL6kJ+rYDRs0i+Ll6iz+dNJQFJfMiKXZmLz8ENJBWKtWKURYuseDgoDkv
-         7SUqUIvhM/n2SI/jHWO4RQCXaUeKmNgUhhefo8SVSk083VJlm49NXGlUYzfePpNnVbKB
-         wf2TIGSG5lGrROFFYcotMu+Y5+GCJDHdMAZULk40CGtCY5cnj6UBQU9e8QUjHjI7DOmC
-         Cj+A==
-X-Gm-Message-State: AOJu0Yy0HsFZF00nY7q4zwZ/QxKsg/gWw+B9F2MErojtp3qrH41ey0ge
-        CcWjrmnDkx/wl6AEA5o3RN9uvgc2ln4=
-X-Google-Smtp-Source: AGHT+IGO0AL45xRymm0BjDJln3deMA/9LFqjImi7JInSUnl69k7Qer+RG4sudzofLCbCQa+Rdgz1TuaGB1A=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:709:b0:57a:118a:f31 with SMTP id
- bs9-20020a05690c070900b0057a118a0f31mr180335ywb.7.1692055015309; Mon, 14 Aug
- 2023 16:16:55 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 16:16:53 -0700
-In-Reply-To: <20230811045127.3308641-1-rananta@google.com>
-Mime-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com>
-Message-ID: <ZNq15SZ+53umvOfx@google.com>
-Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
-From:   Sean Christopherson <seanjc@google.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        d=1e100.net; s=20221208; t=1692056969; x=1692661769;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=br6OSR0B9+M+i2ApSCaNNWHBqjYVfS4RRcgrjd9CMp4=;
+        b=N7625TlO6ZKPQqMafkqTS/tsGANaipEX39jcMIUyS8NXIDu/iK6bsWQrWDhmXHbiRn
+         dxVjcrQxP+/ntJSo28Q65nqqABaNjIfjg/5GU4Mf1tPDdGli5JsuLJ6fHYiU2bhnhTAg
+         2Rx15b3sb4vEQ/OhUG3tiIqTWnm3meWe+lPjj3UL9o/FEG8sY/Dr+r8b/MypKXq05WTs
+         ku1F3AkiJ/NkLx6QCjcqaDKnQ9FhYWWNoiiYpl1jvnHz/hIv4rIXrWXG0/LCfnLqRAi2
+         kqTXzZUixZ80VtUh4ZC3TudS80vGvoxr5W/JFlDyYWEPim7Dk6HA3l/KIvVdHmS4rI64
+         g7+w==
+X-Gm-Message-State: AOJu0YxBLKXUIBV7PxLUsPGX/evq0/AIEJi69br6qrumNtgQ4gUJrjqn
+        uYi8lfiNDvpgWLIFYmh6Fe0=
+X-Google-Smtp-Source: AGHT+IH4CCajQQNmCMYkXdaClMswtCVN/4396syxM9HzwwTvCAR1c6hIFT7ZD9s4SkTh5JgQsAnvdA==
+X-Received: by 2002:a05:6a21:7189:b0:137:53d1:405 with SMTP id wq9-20020a056a21718900b0013753d10405mr12333022pzb.26.1692056969368;
+        Mon, 14 Aug 2023 16:49:29 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id c16-20020aa78810000000b00687933946ddsm8418263pfo.23.2023.08.14.16.49.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 16:49:28 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 16:49:26 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
         David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v6 3/6] KVM: selftests: Introduce __kvm_pmu_event_filter
+ to improved event filter settings
+Message-ID: <20230814234926.GD2257301@ls.amr.corp.intel.com>
+References: <20230810090945.16053-1-cloudliang@tencent.com>
+ <20230810090945.16053-4-cloudliang@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230810090945.16053-4-cloudliang@tencent.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,21 +83,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> The series is based off of upstream v6.5-rc1.
+On Thu, Aug 10, 2023 at 05:09:42PM +0800,
+Jinrong Liang <ljr.kernel@gmail.com> wrote:
 
-Lies!  :-)
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> Add custom "__kvm_pmu_event_filter" structure to improve pmu event
+> filter settings. Simplifies event filter setup by organizing event
+> filter parameters in a cleaner, more organized way.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> ---
+>  .../kvm/x86_64/pmu_event_filter_test.c        | 182 +++++++++---------
+>  1 file changed, 90 insertions(+), 92 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> index 5ac05e64bec9..94f5a89aac40 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> @@ -28,6 +28,10 @@
+>  
+>  #define NUM_BRANCHES 42
+>  
+> +/* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
+> +#define MAX_FILTER_EVENTS		300
 
-This is based off one of the kvmarm.git topic branches (I didn't bother to figure
-out which one), not v6.5-rc1.
+Can we simply use KVM_PMU_EVENT_FILTER_MAX_EVENTS and remove MAX_FILTER_EVENTS?
 
-Please try to incorporate git format-patch's "--base" option into your workflow,
-e.g. I do "git format-patch --base=HEAD~$nr" where $nr is the number of patches
-I am posting.
 
-It's not foolproof, e.g. my approach doesn't help if I have a local patch that
-I'm not posting, but 99% of the time it Just Works and eliminates any ambuitity.
+> +#define MAX_TEST_EVENTS		10
+> +
+>  /*
+>   * This is how the event selector and unit mask are stored in an AMD
+>   * core performance event-select register. Intel's format is similar,
+> @@ -69,21 +73,33 @@
+>  
+>  #define INST_RETIRED EVENT(0xc0, 0)
+>  
+> +struct __kvm_pmu_event_filter {
+> +	__u32 action;
+> +	__u32 nevents;
+> +	__u32 fixed_counter_bitmap;
+> +	__u32 flags;
+> +	__u32 pad[4];
+> +	__u64 events[MAX_FILTER_EVENTS];
+> +};
+> +
 
-You can also do "--base=auto", but that only does the right thing if your series
-has its upstream branch set to the base/tree that you want your patches applied
-to (I use the upstream branch for a completely different purpose for my dev branches).
+Is this same to struct kvm_pmu_event_filter?
+
+Except two trivial issue, looks good to me.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
