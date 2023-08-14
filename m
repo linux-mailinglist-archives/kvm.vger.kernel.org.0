@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43DAA77B7CD
+	by mail.lfdr.de (Postfix) with ESMTP id E175677B7CF
 	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 13:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbjHNLwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 07:52:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55858 "EHLO
+        id S230464AbjHNLwH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 07:52:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbjHNLvg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 07:51:36 -0400
-Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE22EA;
-        Mon, 14 Aug 2023 04:51:35 -0700 (PDT)
-Received: by mail-pf1-x442.google.com with SMTP id d2e1a72fcca58-68783b2e40bso2897393b3a.3;
-        Mon, 14 Aug 2023 04:51:35 -0700 (PDT)
+        with ESMTP id S229913AbjHNLvj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 07:51:39 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA76EA;
+        Mon, 14 Aug 2023 04:51:38 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id d2e1a72fcca58-688142a392eso3041255b3a.3;
+        Mon, 14 Aug 2023 04:51:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692013895; x=1692618695;
+        d=gmail.com; s=20221208; t=1692013898; x=1692618698;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3Isc+tGprLo3aak9bWJdMKknXw+IJrOLcgnKWJJM4lY=;
-        b=TnNoGgFotOm7S+iWt84C2+bCoMsxRYGXYWfdmRTgOwmTnsb3CobNvjSOCKYtC16Cla
-         DPNSjOtqnkSg5MrFihzNupOUmMMKqtMJ1c61CIwnMUJXyyzELKjxY7oGoR9M+OkUdIqv
-         L5GpBfKSSCt2tbPrDHLkuNZLt+gQDb9g6xTt3IOoFBlnWIZXdOaMfRVHsTeeEOz24gzJ
-         FKyTJ8G4vs4t3JGIJE/oDeCMlaWAWYToEn60GwVxm7uyl138w2qs5/izcfEBBNaGpiIl
-         UkxtlNaZbo6B2X+dixpcK0yz7E9AEks1K4uMOYq9bzXrDO2qNEdho6jyMHPL3RVpDZLU
-         44FQ==
+        bh=0Xx2H5qBp82cfooizXIXNIdk1Jryabv6Gra/eZNCPNc=;
+        b=A6z0GNwCAKQ8ICz3mVzFFHUNd5hf45mUeTrH5+RSnNd7P87XEeVtTuWUzZUYZyemyh
+         nTI3tTlrnY7v8DC5FvPSEqtGJ/XjrXozyAa/Ow4hjIikY4QYhhYk0w9d4DIDZ7mtpGBx
+         Rptb5+y7Xv4TdeV96HkpKFbe0dBgInZCuhMzBU5olzB7WwZiST4LVqQHZ6QBZBH10mpw
+         4rElbPs57tLAcNfIhq0dh1ELRc7nK8Tp4oPvIVFJGwZq6Q0q+umZo0uq3CACGuzkijPt
+         PiXrhZ/lDTmDhj6a6UHbUARSxdjjXlvjfg6+F3py00ceGFyrClcs1ysxBZzcbp4vtFvZ
+         CNnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692013895; x=1692618695;
+        d=1e100.net; s=20221208; t=1692013898; x=1692618698;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3Isc+tGprLo3aak9bWJdMKknXw+IJrOLcgnKWJJM4lY=;
-        b=DdX8TJpycaU9970A+dSCzw4XFMf5/17jCINELDyV7j3JQGipCb++zXQB+xkTZWYEYr
-         ouZx8PzkokH8CHFvNJ0qpks0bCSjzl3atYp6+MBkdOK4HNfsIkwZ/mwq6t4w38QDL3Vk
-         maukn2KaoRE7eqO0U8X3914xrMgKs8Ctuq+gZLo8EbKjbyPl0Q1TAfCXnUddBrYL2BhX
-         Z6iGsUnW/WI6/1jHx8tpirpxHYTnOqUD8lKBALhtUXXTzZfZ5HJbYEWQYEWDXHukXYl3
-         vANsQVzpQn1364Y+szMxwac0InJAT4OWhfm6OuvaB9vez9Cf3mzJTIARGH2KZ5WuFI5w
-         3cxQ==
-X-Gm-Message-State: AOJu0YxWDygqoqECbQ0dbgR+ESKSCWdq/5gfVMLLvQiKDmDULeu6iLEI
-        BjDtsrGSQ7gAkcp12I8RIvw=
-X-Google-Smtp-Source: AGHT+IGPVokJ/z0kOtUc2p2hGpNzMsgHljlX9ntMujLgO+jlTFpot/ArWe0qBYrRjMZLs08tpNVnUA==
-X-Received: by 2002:a05:6a20:12d1:b0:13d:ac08:6b72 with SMTP id v17-20020a056a2012d100b0013dac086b72mr10160283pzg.18.1692013895007;
-        Mon, 14 Aug 2023 04:51:35 -0700 (PDT)
+        bh=0Xx2H5qBp82cfooizXIXNIdk1Jryabv6Gra/eZNCPNc=;
+        b=UeUvdglvpXnl/67zJr2f3WVtUmecAogUXnAAG+emWVNYCzWhWqbG74DxTfcNcdnuQn
+         4ADSOPFLyfhMv+jIwnc7c8qg4WzKL+AZZzJ31l0PArp1zG8m34QHrLMNC+Z9v3XjG5hy
+         o575NgOC3/pdLP8r328pcTM4ciN0RZjH2gAzzcgDHsyDA/sI+R/Y7Mr0HHgbUGPmC8PC
+         yctXH+LXpyrfkuChJsd484T7lAJjDyHDGHL8jtuYP7dHaeYwG36DLazLgJJXvAe83a2L
+         +5gPcxiEgYbcLjGKnk/0Gq5TXLl84Ql+TyUmyy5KqRGKPP+iN3jRW/Ol1GeuWTXI6BwF
+         rpgg==
+X-Gm-Message-State: AOJu0YxnGX1SUrCGY740z46lPFqEe4fJ7xGXmwmQqP5xFD3ykENNHFD+
+        BfVS4zL75igHoyR+B6+65HY=
+X-Google-Smtp-Source: AGHT+IEfFoMyU6qaasErQKedZB88qGgbQQBRBK/uofyA1ut8RAouMhrkGIOYVsDOExlL9zHjHB2Viw==
+X-Received: by 2002:a05:6a20:dd85:b0:13d:c86b:d76d with SMTP id kw5-20020a056a20dd8500b0013dc86bd76dmr9054156pzb.60.1692013897944;
+        Mon, 14 Aug 2023 04:51:37 -0700 (PDT)
 Received: from CLOUDLIANG-MB2.tencent.com ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id x7-20020a63b207000000b0055386b1415dsm8407848pge.51.2023.08.14.04.51.32
+        by smtp.gmail.com with ESMTPSA id x7-20020a63b207000000b0055386b1415dsm8407848pge.51.2023.08.14.04.51.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 04:51:34 -0700 (PDT)
+        Mon, 14 Aug 2023 04:51:37 -0700 (PDT)
 From:   Jinrong Liang <ljr.kernel@gmail.com>
 X-Google-Original-From: Jinrong Liang <cloudliang@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
@@ -59,9 +59,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 04/11] KVM: selftests: Test Intel PMU architectural events on fixed counters
-Date:   Mon, 14 Aug 2023 19:51:01 +0800
-Message-Id: <20230814115108.45741-5-cloudliang@tencent.com>
+Subject: [PATCH v3 05/11] KVM: selftests: Test consistency of CPUID with num of gp counters
+Date:   Mon, 14 Aug 2023 19:51:02 +0800
+Message-Id: <20230814115108.45741-6-cloudliang@tencent.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230814115108.45741-1-cloudliang@tencent.com>
 References: <20230814115108.45741-1-cloudliang@tencent.com>
@@ -79,59 +79,122 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jinrong Liang <cloudliang@tencent.com>
 
-Update test to cover Intel PMU architectural events on fixed counters.
-Per Intel SDM, PMU users can also count architecture performance events
-on fixed counters (specifically, FIXED_CTR0 for the retired instructions
-and FIXED_CTR1 for cpu core cycles event). Therefore, if guest's CPUID
-indicates that an architecture event is not available, the corresponding
-fixed counter will also not count that event.
+Add test to check if non-existent counters can be accessed in guest after
+determining the number of Intel generic performance counters by CPUID.
+When the num of counters is less than 3, KVM does not emulate #GP if
+a counter isn't present due to compatibility MSR_P6_PERFCTRx handling.
+Nor will the KVM emulate more counters than it can support.
 
 Co-developed-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
 ---
- .../kvm/x86_64/pmu_basic_functionality_test.c | 21 +++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ .../kvm/x86_64/pmu_basic_functionality_test.c | 78 +++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-index c04eb0bdf69f..daa45aa285bb 100644
+index daa45aa285bb..b86033e51d5c 100644
 --- a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-@@ -47,6 +47,7 @@ static uint64_t run_vcpu(struct kvm_vcpu *vcpu, uint64_t *ucall_arg)
+@@ -16,6 +16,11 @@
+ /* Guest payload for any performance counter counting */
+ #define NUM_BRANCHES			10
  
- static void guest_measure_loop(uint64_t event_code)
++static const uint64_t perf_caps[] = {
++	0,
++	PMU_CAP_FW_WRITES,
++};
++
+ static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+ 						  void *guest_code)
  {
-+	uint32_t nr_fixed_counter = this_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
- 	uint32_t nr_gp_counters = this_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
- 	uint32_t pmu_version = this_cpu_property(X86_PROPERTY_PMU_VERSION);
- 	uint32_t counter_msr;
-@@ -73,6 +74,26 @@ static void guest_measure_loop(uint64_t event_code)
- 		}
+@@ -164,6 +169,78 @@ static void intel_test_arch_events(void)
  	}
- 
-+	if (pmu_version < 2 || nr_fixed_counter < 1)
-+		goto done;
-+
-+	if (event_code == intel_arch_events[INTEL_ARCH_INSTRUCTIONS_RETIRED])
-+		i = 0;
-+	else if (event_code == intel_arch_events[INTEL_ARCH_CPU_CYCLES])
-+		i = 1;
-+	else
-+		goto done;
-+
-+	wrmsr(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
-+	wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * i));
-+	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, BIT_ULL(INTEL_PMC_IDX_FIXED + i));
-+
-+	__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-+
-+	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+	GUEST_SYNC(_rdpmc(RDPMC_FIXED_BASE | i));
-+
-+done:
- 	GUEST_DONE();
  }
  
++static void guest_wr_and_rd_msrs(uint32_t base, uint8_t begin, uint8_t offset)
++{
++	uint8_t wr_vector, rd_vector;
++	uint64_t msr_val;
++	unsigned int i;
++
++	for (i = begin; i < begin + offset; i++) {
++		wr_vector = wrmsr_safe(base + i, 0xffff);
++		rd_vector = rdmsr_safe(base + i, &msr_val);
++		if (wr_vector == GP_VECTOR || rd_vector == GP_VECTOR)
++			GUEST_SYNC(GP_VECTOR);
++		else
++			GUEST_SYNC(msr_val);
++	}
++
++	GUEST_DONE();
++}
++
++/* Access the first out-of-range counter register to trigger #GP */
++static void test_oob_gp_counter(uint8_t eax_gp_num, uint8_t offset,
++				uint64_t perf_cap, uint64_t expected)
++{
++	uint32_t ctr_msr = MSR_IA32_PERFCTR0;
++	struct kvm_vcpu *vcpu;
++	uint64_t msr_val = 0;
++	struct kvm_vm *vm;
++
++	vm = pmu_vm_create_with_one_vcpu(&vcpu, guest_wr_and_rd_msrs);
++
++	vcpu_set_cpuid_property(vcpu, X86_PROPERTY_PMU_NR_GP_COUNTERS,
++				eax_gp_num);
++
++	if (perf_cap & PMU_CAP_FW_WRITES)
++		ctr_msr = MSR_IA32_PMC0;
++
++	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, perf_cap);
++	vcpu_args_set(vcpu, 3, ctr_msr, eax_gp_num, offset);
++	while (run_vcpu(vcpu, &msr_val) != UCALL_DONE)
++		TEST_ASSERT_EQ(expected, msr_val);
++
++	kvm_vm_free(vm);
++}
++
++static void intel_test_counters_num(void)
++{
++	uint8_t nr_gp_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS);
++	unsigned int i;
++
++	TEST_REQUIRE(nr_gp_counters > 2);
++
++	for (i = 0; i < ARRAY_SIZE(perf_caps); i++) {
++		/*
++		 * For compatibility reasons, KVM does not emulate #GP
++		 * when MSR_P6_PERFCTR[0|1] is not present, but it doesn't
++		 * affect checking the presence of MSR_IA32_PMCx with #GP.
++		 */
++		if (perf_caps[i] & PMU_CAP_FW_WRITES)
++			test_oob_gp_counter(0, 1, perf_caps[i], GP_VECTOR);
++
++		test_oob_gp_counter(2, 1, perf_caps[i], GP_VECTOR);
++		test_oob_gp_counter(nr_gp_counters, 1, perf_caps[i], GP_VECTOR);
++
++		/* KVM doesn't emulate more counters than it can support. */
++		test_oob_gp_counter(nr_gp_counters + 1, 1, perf_caps[i],
++				    GP_VECTOR);
++
++		/* Test that KVM drops writes to MSR_P6_PERFCTR[0|1]. */
++		if (!perf_caps[i])
++			test_oob_gp_counter(0, 2, perf_caps[i], 0);
++	}
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	TEST_REQUIRE(get_kvm_param_bool("enable_pmu"));
+@@ -174,6 +251,7 @@ int main(int argc, char *argv[])
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_PDCM));
+ 
+ 	intel_test_arch_events();
++	intel_test_counters_num();
+ 
+ 	return 0;
+ }
 -- 
 2.39.3
 
