@@ -2,212 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FE9377B38C
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 10:12:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C76877B396
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 10:13:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232704AbjHNIMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 04:12:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40296 "EHLO
+        id S233004AbjHNIMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 04:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234784AbjHNILf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 04:11:35 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF571719;
-        Mon, 14 Aug 2023 01:11:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692000675; x=1723536675;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oSgIdi+RSlbeWUJDGskccGgHISPirJiQabwtsdaIRR8=;
-  b=f45T9bnQsmDdvkS2rB/aECdT7n9U9IVqwlbYx2m0f/7UC1RF8TPwkBa7
-   kaRPhvzKhLJRIjjPNMODm+BJ+ZyKSWmFpPF2Y7MtIotL5NGh5EvRJ5+Gg
-   JdhhCy+OxQKceUn8HSfeBoJq1TEu6alUULLtQsc8zBb0LaiWy9AQvMf5S
-   Uqnk0cSxQGBuz5ltBKog0Ul7whi8Q3lPKDPTjVnWhzLthiokNloeQpbce
-   cmJFjtEgKk/oz3lwZ5iwYO4KWktPZ0CgatKssW19FlcdN5sqhIBhdsSa/
-   HNzCb+NzuRdubHt8HCwWpy1g+FuS3BE1q0wjL2f3BxU1udmGAzrO4+1ly
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="438321522"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="438321522"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 01:11:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="876869083"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Aug 2023 01:11:10 -0700
-Date:   Mon, 14 Aug 2023 16:11:05 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 13/21] KVM: nVMX: Use KVM-governed feature framework
- to track "nested VMX enabled"
-Message-ID: <20230814081105.yr6bamyoutijc36i@yy-desk-7060>
-References: <20230729011608.1065019-1-seanjc@google.com>
- <20230729011608.1065019-14-seanjc@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230729011608.1065019-14-seanjc@google.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S233876AbjHNIMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 04:12:25 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C339F10E5;
+        Mon, 14 Aug 2023 01:12:14 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-68706b39c4cso2788046b3a.2;
+        Mon, 14 Aug 2023 01:12:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692000734; x=1692605534;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UotDdyQGTC4EoLCNaaGpiOUYo68Nb+c5bWned835Hco=;
+        b=e5Qk7OKnnqWrYRCniPWElagFd0f1rj6Qxp5kyXXK+J7ooWeRbaCyWiCzdSvYuSl/9Y
+         6KLN0C+GupvzLyOS0mLfSfhkqJR+9T+4QfDauCILtY/WmOk/f7cWakw7MJ28UBrPY2Mm
+         5OAQtJT6AmdN2dqZWaQkR6uHvq2Uhhbuu8tFd0IS0jTIOsygempZpxPAnYVlzZ8IAdH0
+         WVmKxgbzZjW7LB+u92YfLNu5c15P5Tetmr/IYbYAZlW+FicnxFMv75ZT1dJVjPSqOQoi
+         xDImXI82JWvd/nYPhDM4L73OHyGUrROue6J9FBOyQT+q9x6ecfMTEBn3MmAd31RT00+E
+         9OPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692000734; x=1692605534;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UotDdyQGTC4EoLCNaaGpiOUYo68Nb+c5bWned835Hco=;
+        b=INc9rwDxJ1LKN9zsdwYGNFxLT/P+NHBVEgBAfmG6Ulo3PG5b3pRM/nJpgjn2SHLeWa
+         BlxsaixU4Ez1PGMMHDSmFXcfnwdlqY63xkc+r7kVAywjwLSnnvuBXeT5C0F+JLfZL+ZN
+         E+DqIvXc0AT75D4X+a71fSFmpANNE+IDGOpHckZDzFE0sFCalAP5HkSbsqTSQrzxEDYN
+         etXGHoPt8JmHpLKFbIa1wedrKfxOGG1R8efhViGaR47Z9HTY6dq3lRw2nd7hSo4iFQH2
+         DT6/zLI72cqW3bPgaT+9h0c3qv4sB2uOFE7gUFXideVxb8XIKAAHGOyC9PcAtfZ+PwEa
+         HlVg==
+X-Gm-Message-State: AOJu0YykHMUyEUgUJc4RFf38Qf7W6FoQ6u7AZKJwcj9auIwaXaq+G7hr
+        9Oy4Aq4CeH47j2mgDknVNAczKI16pqc=
+X-Google-Smtp-Source: AGHT+IFowllIVae+ymsdb38SvbxhHy8lJiRHiio7ZFnqr6A9sNLRAO2Rqy+t8W5i0UhOEg4eMXj+1w==
+X-Received: by 2002:a05:6a00:1a50:b0:668:73f5:dce0 with SMTP id h16-20020a056a001a5000b0066873f5dce0mr8770313pfv.29.1692000734120;
+        Mon, 14 Aug 2023 01:12:14 -0700 (PDT)
+Received: from localhost ([61.68.161.249])
+        by smtp.gmail.com with ESMTPSA id j20-20020aa783d4000000b00682c864f35bsm7656159pfn.140.2023.08.14.01.12.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Aug 2023 01:12:13 -0700 (PDT)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date:   Mon, 14 Aug 2023 18:12:07 +1000
+Message-Id: <CUS477NDPEQI.27SBUCRNYD0XG@wheely>
+Cc:     <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
+        <mikey@neuling.org>, <paulus@ozlabs.org>, <vaibhav@linux.ibm.com>,
+        <sbhat@linux.ibm.com>, <gautam@linux.ibm.com>,
+        <kconsul@linux.vnet.ibm.com>, <amachhiw@linux.vnet.ibm.com>
+Subject: Re: [PATCH v3 4/6] KVM: PPC: Book3s HV: Hold LPIDs in an unsigned
+ long
+From:   "Nicholas Piggin" <npiggin@gmail.com>
+To:     "Jordan Niethe" <jniethe5@gmail.com>,
+        <linuxppc-dev@lists.ozlabs.org>
+X-Mailer: aerc 0.15.2
+References: <20230807014553.1168699-1-jniethe5@gmail.com>
+ <20230807014553.1168699-5-jniethe5@gmail.com>
+In-Reply-To: <20230807014553.1168699-5-jniethe5@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 06:16:00PM -0700, Sean Christopherson wrote:
-> Track "VMX exposed to L1" via a governed feature flag instead of using a
-> dedicated helper to provide the same functionality.  The main goal is to
-> drive convergence between VMX and SVM with respect to querying features
-> that are controllable via module param (SVM likes to cache nested
-> features), avoiding the guest CPUID lookups at runtime is just a bonus
-> and unlikely to provide any meaningful performance benefits.
+On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
+> The LPID register is 32 bits long. The host keeps the lpids for each
+> guest in an unsigned word struct kvm_arch. Currently, LPIDs are already
+> limited by mmu_lpid_bits and KVM_MAX_NESTED_GUESTS_SHIFT.
 >
-> No functional change intended.
+> The nestedv2 API returns a 64 bit "Guest ID" to be used be the L1 host
+> for each L2 guest. This value is used as an lpid, e.g. it is the
+> parameter used by H_RPT_INVALIDATE. To minimize needless special casing
+> it makes sense to keep this "Guest ID" in struct kvm_arch::lpid.
 >
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/governed_features.h |  1 +
->  arch/x86/kvm/vmx/nested.c        |  7 ++++---
->  arch/x86/kvm/vmx/vmx.c           | 21 ++++++---------------
->  arch/x86/kvm/vmx/vmx.h           |  1 -
->  4 files changed, 11 insertions(+), 19 deletions(-)
+> This means that struct kvm_arch::lpid is too small so prepare for this
+> and make it an unsigned long. This is not a problem for the KVM-HV and
+> nestedv1 cases as their lpid values are already limited to valid ranges
+> so in those contexts the lpid can be used as an unsigned word safely as
+> needed.
 >
-> diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-> index b896a64e4ac3..22446614bf49 100644
-> --- a/arch/x86/kvm/governed_features.h
-> +++ b/arch/x86/kvm/governed_features.h
-> @@ -7,6 +7,7 @@ BUILD_BUG()
->
->  KVM_GOVERNED_X86_FEATURE(GBPAGES)
->  KVM_GOVERNED_X86_FEATURE(XSAVES)
-> +KVM_GOVERNED_X86_FEATURE(VMX)
->
->  #undef KVM_GOVERNED_X86_FEATURE
->  #undef KVM_GOVERNED_FEATURE
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 22e08d30baef..c5ec0ef51ff7 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -6426,7 +6426,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  	vmx = to_vmx(vcpu);
->  	vmcs12 = get_vmcs12(vcpu);
->
-> -	if (nested_vmx_allowed(vcpu) &&
-> +	if (guest_can_use(vcpu, X86_FEATURE_VMX) &&
->  	    (vmx->nested.vmxon || vmx->nested.smm.vmxon)) {
->  		kvm_state.hdr.vmx.vmxon_pa = vmx->nested.vmxon_ptr;
->  		kvm_state.hdr.vmx.vmcs12_pa = vmx->nested.current_vmptr;
-> @@ -6567,7 +6567,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  		if (kvm_state->flags & ~KVM_STATE_NESTED_EVMCS)
->  			return -EINVAL;
->  	} else {
-> -		if (!nested_vmx_allowed(vcpu))
-> +		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
->  			return -EINVAL;
->
->  		if (!page_address_valid(vcpu, kvm_state->hdr.vmx.vmxon_pa))
-> @@ -6601,7 +6601,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  		return -EINVAL;
->
->  	if ((kvm_state->flags & KVM_STATE_NESTED_EVMCS) &&
-> -		(!nested_vmx_allowed(vcpu) || !vmx->nested.enlightened_vmcs_enabled))
-> +	    (!guest_can_use(vcpu, X86_FEATURE_VMX) ||
-> +	     !vmx->nested.enlightened_vmcs_enabled))
->  			return -EINVAL;
->
->  	vmx_leave_nested(vcpu);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 3100ed62615c..fdf932cfc64d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1894,17 +1894,6 @@ static void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu)
->  	vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
->  }
->
-> -/*
-> - * nested_vmx_allowed() checks whether a guest should be allowed to use VMX
-> - * instructions and MSRs (i.e., nested VMX). Nested VMX is disabled for
-> - * all guests if the "nested" module option is off, and can also be disabled
-> - * for a single guest by disabling its VMX cpuid bit.
-> - */
-> -bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
-> -{
-> -	return nested && guest_cpuid_has(vcpu, X86_FEATURE_VMX);
+> In the PAPR, the H_RPT_INVALIDATE pid/lpid parameter is already
+> specified as an unsigned long so change pseries_rpt_invalidate() to
+> match that.  Update the callers of pseries_rpt_invalidate() to also take
+> an unsigned long if they take an lpid value.
 
-the removed nested here already covered by
-kvm_cpu_cap_set(X86_FEATURE_VMX) from vmx_set_cpu_caps().
+I don't suppose it would be worth having an lpid_t.
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xiv=
+e.c
+> index 4adff4f1896d..229f0a1ffdd4 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -886,10 +886,10 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *=
+vcpu, u8 prio,
+> =20
+>  	if (single_escalation)
+>  		name =3D kasprintf(GFP_KERNEL, "kvm-%d-%d",
+> -				 vcpu->kvm->arch.lpid, xc->server_num);
+> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num);
+>  	else
+>  		name =3D kasprintf(GFP_KERNEL, "kvm-%d-%d-%d",
+> -				 vcpu->kvm->arch.lpid, xc->server_num, prio);
+> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num, prio);
+>  	if (!name) {
+>  		pr_err("Failed to allocate escalation irq name for queue %d of VCPU %d=
+\n",
+>  		       prio, xc->server_num);
 
-> -}
-> -
->  /*
->   * Userspace is allowed to set any supported IA32_FEATURE_CONTROL regardless of
->   * guest CPUID.  Note, KVM allows userspace to set "VMX in SMX" to maintain
-> @@ -2032,7 +2021,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
->  		break;
->  	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
-> -		if (!nested_vmx_allowed(vcpu))
-> +		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
->  			return 1;
->  		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
->  				    &msr_info->data))
-> @@ -2340,7 +2329,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
->  		if (!msr_info->host_initiated)
->  			return 1; /* they are read-only */
-> -		if (!nested_vmx_allowed(vcpu))
-> +		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
->  			return 1;
->  		return vmx_set_vmx_msr(vcpu, msr_index, data);
->  	case MSR_IA32_RTIT_CTL:
-> @@ -7727,13 +7716,15 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
->  		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
->
-> +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
-> +
->  	vmx_setup_uret_msrs(vmx);
->
->  	if (cpu_has_secondary_exec_ctrls())
->  		vmcs_set_secondary_exec_control(vmx,
->  						vmx_secondary_exec_control(vmx));
->
-> -	if (nested_vmx_allowed(vcpu))
-> +	if (guest_can_use(vcpu, X86_FEATURE_VMX))
->  		vmx->msr_ia32_feature_control_valid_bits |=
->  			FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
->  			FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
-> @@ -7742,7 +7733,7 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  			~(FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
->  			  FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX);
->
-> -	if (nested_vmx_allowed(vcpu))
-> +	if (guest_can_use(vcpu, X86_FEATURE_VMX))
->  		nested_vmx_cr_fixed1_bits_update(vcpu);
->
->  	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index cde902b44d97..c2130d2c8e24 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -374,7 +374,6 @@ struct kvm_vmx {
->  	u64 *pid_table;
->  };
->
-> -bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
->  void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
->  			struct loaded_vmcs *buddy);
->  int allocate_vpid(void);
-> --
-> 2.41.0.487.g6d72f3e995-goog
->
+I would have thought you'd keep the type and change the format.
+
+Otherwise seems okay too.
+
+Thanks,
+Nick
