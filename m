@@ -2,138 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CACEF77B5BC
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 11:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9F6477B5E2
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 12:03:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232747AbjHNJro (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 05:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60222 "EHLO
+        id S234681AbjHNKCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 06:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233521AbjHNJrh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 05:47:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A79CC
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 02:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692006407;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=K4sGVUE43D+9dWlB8T8cOXLzUkJGkxQXnJLqjpcMDso=;
-        b=OPSnHqhBMZtzaIyxguXzzz/ATheIKyfnz9+M/hRai/C+I1mwkmSazoPLfLBwNn7vQK2Hih
-        4Pv4WE3V5vqTnjTpf03IowpeLQWagGeKTv1KGl1+zkcD9GQ63mWirOPk6yw/+9P9nmr7Wl
-        rxExQEj1movDBqIypLXhKDeVd0XNH8U=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-59-V1JhcZPKNna7_WvWh_0YbA-1; Mon, 14 Aug 2023 05:46:42 -0400
-X-MC-Unique: V1JhcZPKNna7_WvWh_0YbA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 299DD3815F62;
-        Mon, 14 Aug 2023 09:46:41 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC2D12166B25;
-        Mon, 14 Aug 2023 09:46:40 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S236356AbjHNKCT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 06:02:19 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F931BD5
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 03:02:04 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-686b9964ae2so2541651b3a.3
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 03:02:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692007324; x=1692612124;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VEHQ1GcXOq53Dab+zMuzQTvtwyYcdquVeUtbNvaHWOU=;
+        b=J8n1LwD7YQqqD+OMXwLUxYtQhyW8IbVjSZ6b92hvJKOpz6HTHWoZxRbb18TUNodwvZ
+         J37PVrJf1TAiLPoaoGOJRI6QZkmlgB/zILlYxuyUABWsn8ZwEgGtfOoYm2KO/5vLMP/J
+         oX80WVe/CaU87udWpAzqbBCUzb5cKrIOludcsxPs/SC8agwXd0oPDMzyiFuD1mmQ2oxA
+         HOZzMEwPb5KMbhPOvcBDqhAXuC+Q/pqVqSDLdQhAi8orN8Rpbyz+ZwKTbmEmlw8ODcRj
+         4bgSZ22GwL0QBhXitxApnZi9aU3P1CaccvhVo6bGW+w2JkYLR9drKaE0q5BXJ8SUK2rK
+         r9Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692007324; x=1692612124;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VEHQ1GcXOq53Dab+zMuzQTvtwyYcdquVeUtbNvaHWOU=;
+        b=fB3TKzwAyJRQA67hWwnOFN6ZQYIS6xdV9BeQIZnXwixpRC7EqKipBeft4cDJZN2JIn
+         2vfd2SgS8kqibrB5AXVdrmPM60xSBMG9yN3HcLFs1NtOnzHY9RVwr1XPLlqN0nBsRc41
+         /whxrlu1iLGLO2OOUJlT84GeHzJ1rRbyfVO2o8mHc7DLU8Esdcpag5E/cXRWd1p1mZba
+         XYh5vBPMxbIGNeuuMZZb8Xwx2ZPd/k89QEJ7nESHctaYIuyAASc9vEjmPjnSmDgbU144
+         3lsbIG3bucqQmSr4ps5H3sANP5IRcanzD/Y+fd6rvvSxP6ShfO8Akgc1yzhZNqDSmokU
+         WX9g==
+X-Gm-Message-State: AOJu0YwQwU61rzSn1JEXalGntD523WrusI0CQHYHGaj49PO/f2Or1YOh
+        I1s8iIvwEOjp3rRGhvx4x0uyCA==
+X-Google-Smtp-Source: AGHT+IFtXQ+JjRdMcJ2DIlnBVrUvtOTbNWEKxiMz2Ldb8N2R3N3PRBqrFH/d1/DDuZN8TPtJOtYJ1Q==
+X-Received: by 2002:a05:6a00:2e84:b0:687:1c2c:7cf7 with SMTP id fd4-20020a056a002e8400b006871c2c7cf7mr8235847pfb.19.1692007323946;
+        Mon, 14 Aug 2023 03:02:03 -0700 (PDT)
+Received: from leoy-huanghe.lan ([150.230.248.162])
+        by smtp.gmail.com with ESMTPSA id v8-20020aa78088000000b0068790c41ca2sm7592840pff.27.2023.08.14.03.01.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 03:02:03 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 18:01:54 +0800
+From:   Leo Yan <leo.yan@linaro.org>
+To:     Shijie Huang <shijie@amperemail.onmicrosoft.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v8 02/11] KVM: arm64: Document
- KVM_ARM_GET_REG_WRITABLE_MASKS
-In-Reply-To: <20230807162210.2528230-3-jingzhangos@google.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-3-jingzhangos@google.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Mon, 14 Aug 2023 11:46:39 +0200
-Message-ID: <878raex8g0.fsf@redhat.com>
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huang Shijie <shijie@os.amperecomputing.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+Message-ID: <20230814100154.GB69080@leoy-huanghe.lan>
+References: <20230811180520.131727-1-maz@kernel.org>
+ <20230814071627.GA3963214@leoy-huanghe>
+ <5608d22d-47c3-2a03-a3d9-ba8ec51679a3@amperemail.onmicrosoft.com>
+ <20230814084710.GA69080@leoy-huanghe.lan>
+ <8640c3c7-b117-5754-6ac4-910988e5374f@amperemail.onmicrosoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8640c3c7-b117-5754-6ac4-910988e5374f@amperemail.onmicrosoft.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 07 2023, Jing Zhang <jingzhangos@google.com> wrote:
+Hi Shijie,
 
-> Add some basic documentation on how to get feature ID register writable
-> masks from userspace.
->
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c0ddd3035462..92a9b20f970e 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6068,6 +6068,35 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
->  interface. No error will be returned, but the resulting offset will not be
->  applied.
->  
-> +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
-> +-------------------------------------------
-> +
-> +:Capability: none
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: struct reg_mask_range (in/out)
-> +:Returns: 0 on success, < 0 on error
-> +
-> +
-> +::
-> +
-> +        #define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
-> +
-> +        struct reg_mask_range {
-> +                __u64 addr;             /* Pointer to mask array */
-> +                __u64 reserved[7];
-> +        };
-> +
-> +This ioctl would copy the writable masks for feature ID registers to userspace.
-> +The Feature ID space is defined as the System register space in AArch64 with
-> +op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
-> +To get the index in the mask array pointed by ``addr`` for a specified feature
-> +ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)``.
-> +This allows the userspace to know upfront whether it can actually tweak the
-> +contents of a feature ID register or not.
-> +The ``reserved[7]`` is reserved for future use to add other register space. For
-> +feature ID registers, it should be 0, otherwise, KVM may return error.
+On Mon, Aug 14, 2023 at 05:29:54PM +0800, Shijie Huang wrote:
 
-In case of future extensions, this means that userspace needs to figure
-out what the kernel supports via different content in reg_mask_range
-(i.e. try with a value in one of the currently reserved fields and fall
-back to using addr only if that doesn't work.) Can we do better?
 
-Maybe we could introduce a capability that returns the supported ranges
-as flags, i.e. now we would return 1 for id regs masks, and for the
-future case where we have some values in the next reserved field we
-could return 1 & 2 etc. Would make life easier for userspace that needs
-to work with different kernels, but might be overkill if reserved[] is
-more like an insurance without any concrete plans for extensions.
+[...]
 
+> > Seems to me, based on Marc's patch, we need to apply below change.  In
+> > below code, we don't need to change the perf core code and we can
+> > resolve it as a common issue for Arm PMU drivers.
+> > 
+> > 
+> > diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> > index 121f1a14c829..8f9673cdadec 100644
+> > --- a/arch/arm64/kvm/pmu.c
+> > +++ b/arch/arm64/kvm/pmu.c
+> > @@ -38,14 +38,20 @@ struct kvm_pmu_events *kvm_get_pmu_events(void)
+> >   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
+> >   {
+> >   	struct kvm_pmu_events *pmu = kvm_get_pmu_events();
+> > +	int resync;
+> >   	if (!kvm_arm_support_pmu_v3() || !pmu || !kvm_pmu_switch_needed(attr))
+> >   		return;
+> > +	resync = pmu->events_guest != set;
+> 
+> If we set two events in guest, the resync will set
+> 
+> For example:
+> 
+>            perf stat -e cycles:Gu, cycles:Gk
+> 
+> 
+> If so, this is not reasonble...
+
+You mean if set two guest events, the kvm_vcpu_pmu_resync_el0() will
+be invoked twice, and the second calling is not reasonable, right?
+I can accept this since I personally think this should not introduce
+much performance penalty.
+
+I understand your preference to call kvm_vcpu_pmu_resync_el0() from
+perf core layer, but this is not a common issue for all PMU events and
+crossing arches.  Furthermore, even perf core rotates events, it's not
+necessarily mean we must restore events for guest in the case there
+have no event is enabled for guest.
+
+Thanks,
+Leo
