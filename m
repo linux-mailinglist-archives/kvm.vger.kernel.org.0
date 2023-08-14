@@ -2,167 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C073677B5A5
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 11:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CACEF77B5BC
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 11:48:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbjHNJkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 05:40:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45856 "EHLO
+        id S232747AbjHNJro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 05:47:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234654AbjHNJjY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 05:39:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C23C1723
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 02:38:00 -0700 (PDT)
+        with ESMTP id S233521AbjHNJrh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 05:47:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A79CC
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 02:46:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692005876;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        s=mimecast20190719; t=1692006407;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6UMVQwV2rUoWUqSvlE90BxYjgE4xdcHRUCKaIBUbHGo=;
-        b=FbDw8xi0Mc+mqFP4qq1s/rI74MUVNkboagUZo6pWgYyiTZgfpilvRVASBSKJwkrZZq+HG2
-        S4n/peqOh2SE/c6ixFfWaMeteJmAnyUG/OWK0B1T0LeCmSmSTZU3ZDXzTsghENTzk9DOcU
-        f7VuaiHfV2TMJCCYBNtuTO+8+B5xYso=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-552-ZlcxJULiMD6YH25ku9yhMA-1; Mon, 14 Aug 2023 05:37:55 -0400
-X-MC-Unique: ZlcxJULiMD6YH25ku9yhMA-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-40fdb989957so63355861cf.3
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 02:37:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692005873; x=1692610673;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6UMVQwV2rUoWUqSvlE90BxYjgE4xdcHRUCKaIBUbHGo=;
-        b=GkVnR0Ygv4GkC+V9EaNLpw8Q+UsJkajKMvFtHsLe6lUnL5S0u2IfgXHJUHiSCJt70b
-         ZTkfCoSxRdc13uD0OkW/Boz61EwOfO4sT2IMkYbr5mHCsyxsmuK2qFb/yErY/UytyQRm
-         Pws4wYlQwr0EPlcempyh3fhEIvPynM+XTH7XCuigl//bhJEA7HX3ODmUXggr2bx693wg
-         MM3dRMKiy5aZaN8wRVqNh9mksYhkS/rd2OfX+wXKZPWo54HLvMf2mTM6ZW/FKDnS9aCi
-         Tt5KBUJnt0cWbAsRhUrEhhuycrc6uw0M+sVt4EP1eYH2wUOOYzCBis/ErzW3Q5+rLhCy
-         /Kyw==
-X-Gm-Message-State: AOJu0YyNRnscZiMo8O5tWKbxzLcrLFR6UQqUTe7rp6j+0vlv10dqpS8B
-        jyEFCbjXGZiOo4OHfHL+JmxeMEkoA7K981H1SYdAlhRMrQDV/jlqi25nQwMxlIcE1THwaNM08P5
-        hqzaYjFBDcoUJJSi7n3cs
-X-Received: by 2002:ac8:570a:0:b0:403:6ac5:e761 with SMTP id 10-20020ac8570a000000b004036ac5e761mr12853499qtw.62.1692005873555;
-        Mon, 14 Aug 2023 02:37:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF0lAfb5V+jcAmkdMUWENM/cDVWzSccIaYQkbJhIrzb3dcQbbMk8WUbXBkdEvwwlbiesHpERA==
-X-Received: by 2002:ac8:570a:0:b0:403:6ac5:e761 with SMTP id 10-20020ac8570a000000b004036ac5e761mr12853490qtw.62.1692005873339;
-        Mon, 14 Aug 2023 02:37:53 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id j14-20020a0ce00e000000b00646e0411e8csm1728993qvk.30.2023.08.14.02.37.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 02:37:52 -0700 (PDT)
-Message-ID: <a96a13b5-baaa-3180-9a82-d63f3ccbe7d2@redhat.com>
-Date:   Mon, 14 Aug 2023 11:37:48 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 23/27] KVM: arm64: nv: Add SVC trap forwarding
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
+        bh=K4sGVUE43D+9dWlB8T8cOXLzUkJGkxQXnJLqjpcMDso=;
+        b=OPSnHqhBMZtzaIyxguXzzz/ATheIKyfnz9+M/hRai/C+I1mwkmSazoPLfLBwNn7vQK2Hih
+        4Pv4WE3V5vqTnjTpf03IowpeLQWagGeKTv1KGl1+zkcD9GQ63mWirOPk6yw/+9P9nmr7Wl
+        rxExQEj1movDBqIypLXhKDeVd0XNH8U=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-59-V1JhcZPKNna7_WvWh_0YbA-1; Mon, 14 Aug 2023 05:46:42 -0400
+X-MC-Unique: V1JhcZPKNna7_WvWh_0YbA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 299DD3815F62;
+        Mon, 14 Aug 2023 09:46:41 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC2D12166B25;
+        Mon, 14 Aug 2023 09:46:40 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
- <20230808114711.2013842-24-maz@kernel.org>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230808114711.2013842-24-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v8 02/11] KVM: arm64: Document
+ KVM_ARM_GET_REG_WRITABLE_MASKS
+In-Reply-To: <20230807162210.2528230-3-jingzhangos@google.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+ <20230807162210.2528230-3-jingzhangos@google.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Mon, 14 Aug 2023 11:46:39 +0200
+Message-ID: <878raex8g0.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Aug 07 2023, Jing Zhang <jingzhangos@google.com> wrote:
 
-On 8/8/23 13:47, Marc Zyngier wrote:
-> HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
-> traps to be forwarded. Take this opportunity to deny any 32bit activity
-> when NV is enabled.
+> Add some basic documentation on how to get feature ID register writable
+> masks from userspace.
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/kvm/arm.c         |  4 ++++
->  arch/arm64/kvm/handle_exit.c | 12 ++++++++++++
->  2 files changed, 16 insertions(+)
+>  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 >
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 72dc53a75d1c..8b51570a76f8 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -36,6 +36,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
->  #include <asm/kvm_pkvm.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/sections.h>
-> @@ -818,6 +819,9 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
->  	if (likely(!vcpu_mode_is_32bit(vcpu)))
->  		return false;
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index c0ddd3035462..92a9b20f970e 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6068,6 +6068,35 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registers using the SET_ONE_REG
+>  interface. No error will be returned, but the resulting offset will not be
+>  applied.
 >  
-> +	if (vcpu_has_nv(vcpu))
-> +		return true;
+> +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+> +-------------------------------------------
 > +
->  	return !kvm_supports_32bit_el0();
->  }
->  
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 6dcd6604b6bc..3b86d534b995 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -226,6 +226,17 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
->  	return 1;
->  }
->  
-> +static int handle_svc(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * So far, SVC traps only for NV via HFGITR_EL2. A SVC from a
-> +	 * 32bit guest would be caught by vpcu_mode_is_bad_32bit(), so
-> +	 * we should only have to deal with a 64 bit exception.
-> +	 */
-> +	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-> +	return 1;
-> +}
+> +:Capability: none
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: struct reg_mask_range (in/out)
+> +:Returns: 0 on success, < 0 on error
 > +
->  static exit_handle_fn arm_exit_handlers[] = {
->  	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
->  	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-> @@ -239,6 +250,7 @@ static exit_handle_fn arm_exit_handlers[] = {
->  	[ESR_ELx_EC_SMC32]	= handle_smc,
->  	[ESR_ELx_EC_HVC64]	= handle_hvc,
->  	[ESR_ELx_EC_SMC64]	= handle_smc,
-> +	[ESR_ELx_EC_SVC64]	= handle_svc,
->  	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
->  	[ESR_ELx_EC_SVE]	= handle_sve,
->  	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> +
+> +::
+> +
+> +        #define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
+> +
+> +        struct reg_mask_range {
+> +                __u64 addr;             /* Pointer to mask array */
+> +                __u64 reserved[7];
+> +        };
+> +
+> +This ioctl would copy the writable masks for feature ID registers to userspace.
+> +The Feature ID space is defined as the System register space in AArch64 with
+> +op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
+> +To get the index in the mask array pointed by ``addr`` for a specified feature
+> +ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)``.
+> +This allows the userspace to know upfront whether it can actually tweak the
+> +contents of a feature ID register or not.
+> +The ``reserved[7]`` is reserved for future use to add other register space. For
+> +feature ID registers, it should be 0, otherwise, KVM may return error.
 
-Eric
+In case of future extensions, this means that userspace needs to figure
+out what the kernel supports via different content in reg_mask_range
+(i.e. try with a value in one of the currently reserved fields and fall
+back to using addr only if that doesn't work.) Can we do better?
+
+Maybe we could introduce a capability that returns the supported ranges
+as flags, i.e. now we would return 1 for id regs masks, and for the
+future case where we have some values in the next reserved field we
+could return 1 & 2 etc. Would make life easier for userspace that needs
+to work with different kernels, but might be overkill if reserved[] is
+more like an insurance without any concrete plans for extensions.
 
