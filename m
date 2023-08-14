@@ -2,130 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A9F6477B5E2
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 12:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4745177B5E4
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 12:03:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234681AbjHNKCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 06:02:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59878 "EHLO
+        id S234858AbjHNKC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 06:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236356AbjHNKCT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 06:02:19 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F931BD5
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 03:02:04 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-686b9964ae2so2541651b3a.3
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 03:02:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692007324; x=1692612124;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VEHQ1GcXOq53Dab+zMuzQTvtwyYcdquVeUtbNvaHWOU=;
-        b=J8n1LwD7YQqqD+OMXwLUxYtQhyW8IbVjSZ6b92hvJKOpz6HTHWoZxRbb18TUNodwvZ
-         J37PVrJf1TAiLPoaoGOJRI6QZkmlgB/zILlYxuyUABWsn8ZwEgGtfOoYm2KO/5vLMP/J
-         oX80WVe/CaU87udWpAzqbBCUzb5cKrIOludcsxPs/SC8agwXd0oPDMzyiFuD1mmQ2oxA
-         HOZzMEwPb5KMbhPOvcBDqhAXuC+Q/pqVqSDLdQhAi8orN8Rpbyz+ZwKTbmEmlw8ODcRj
-         4bgSZ22GwL0QBhXitxApnZi9aU3P1CaccvhVo6bGW+w2JkYLR9drKaE0q5BXJ8SUK2rK
-         r9Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692007324; x=1692612124;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VEHQ1GcXOq53Dab+zMuzQTvtwyYcdquVeUtbNvaHWOU=;
-        b=fB3TKzwAyJRQA67hWwnOFN6ZQYIS6xdV9BeQIZnXwixpRC7EqKipBeft4cDJZN2JIn
-         2vfd2SgS8kqibrB5AXVdrmPM60xSBMG9yN3HcLFs1NtOnzHY9RVwr1XPLlqN0nBsRc41
-         /whxrlu1iLGLO2OOUJlT84GeHzJ1rRbyfVO2o8mHc7DLU8Esdcpag5E/cXRWd1p1mZba
-         XYh5vBPMxbIGNeuuMZZb8Xwx2ZPd/k89QEJ7nESHctaYIuyAASc9vEjmPjnSmDgbU144
-         3lsbIG3bucqQmSr4ps5H3sANP5IRcanzD/Y+fd6rvvSxP6ShfO8Akgc1yzhZNqDSmokU
-         WX9g==
-X-Gm-Message-State: AOJu0YwQwU61rzSn1JEXalGntD523WrusI0CQHYHGaj49PO/f2Or1YOh
-        I1s8iIvwEOjp3rRGhvx4x0uyCA==
-X-Google-Smtp-Source: AGHT+IFtXQ+JjRdMcJ2DIlnBVrUvtOTbNWEKxiMz2Ldb8N2R3N3PRBqrFH/d1/DDuZN8TPtJOtYJ1Q==
-X-Received: by 2002:a05:6a00:2e84:b0:687:1c2c:7cf7 with SMTP id fd4-20020a056a002e8400b006871c2c7cf7mr8235847pfb.19.1692007323946;
-        Mon, 14 Aug 2023 03:02:03 -0700 (PDT)
-Received: from leoy-huanghe.lan ([150.230.248.162])
-        by smtp.gmail.com with ESMTPSA id v8-20020aa78088000000b0068790c41ca2sm7592840pff.27.2023.08.14.03.01.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 03:02:03 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 18:01:54 +0800
-From:   Leo Yan <leo.yan@linaro.org>
-To:     Shijie Huang <shijie@amperemail.onmicrosoft.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huang Shijie <shijie@os.amperecomputing.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-Message-ID: <20230814100154.GB69080@leoy-huanghe.lan>
-References: <20230811180520.131727-1-maz@kernel.org>
- <20230814071627.GA3963214@leoy-huanghe>
- <5608d22d-47c3-2a03-a3d9-ba8ec51679a3@amperemail.onmicrosoft.com>
- <20230814084710.GA69080@leoy-huanghe.lan>
- <8640c3c7-b117-5754-6ac4-910988e5374f@amperemail.onmicrosoft.com>
+        with ESMTP id S235731AbjHNKCq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 06:02:46 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADCEBE6A;
+        Mon, 14 Aug 2023 03:02:44 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 5E0C81FD5F;
+        Mon, 14 Aug 2023 10:02:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1692007363; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=IyKh5jauTYrhx4587vKnoX3MH5O7mJ8qY3Jx2CEtlAY=;
+        b=LBi4WPhTJEUgWt3frmet2IQi5mawNGqzLrFq0pNFhUTyREGho0NX1Bm0aWeF3kyRSBrlJU
+        +1LMjKZ9rr8NcmXs/XWIGxXkQZ1Wi/GA5NEmbyVTKzVtbOSIy/FsdcoWgyKtNHJOgYObPL
+        +Y6IOJneFshthL7a55kWN7K3R4AKQ18=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1692007363;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=IyKh5jauTYrhx4587vKnoX3MH5O7mJ8qY3Jx2CEtlAY=;
+        b=9rxNXdttJwvs9OpKw1bcLCb3ybe4RAZlSCd9SekIT8srjzIr2+VR4Ir3VieOXKFMuUMHO6
+        jgzb8eFNBDr9jWDA==
+Received: from hawking.nue2.suse.org (unknown [10.168.4.181])
+        by relay2.suse.de (Postfix) with ESMTP id 4F3BE2C143;
+        Mon, 14 Aug 2023 10:02:43 +0000 (UTC)
+Received: by hawking.nue2.suse.org (Postfix, from userid 17005)
+        id 41F824AB2CC; Mon, 14 Aug 2023 12:02:43 +0200 (CEST)
+From:   Andreas Schwab <schwab@suse.de>
+To:     kvm-riscv@lists.infradead.org
+Subject: [PATCH] tools/kvm_stat: add support for riscv
+CC:     linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+X-Yow:  We are now enjoying total mutual interaction in an imaginary hot tub...
+Date:   Mon, 14 Aug 2023 12:02:43 +0200
+Message-ID: <mvmbkfadjr0.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8640c3c7-b117-5754-6ac4-910988e5374f@amperemail.onmicrosoft.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shijie,
+Signed-off-by: Andreas Schwab <schwab@suse.de>
+---
+ tools/kvm/kvm_stat/kvm_stat | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-On Mon, Aug 14, 2023 at 05:29:54PM +0800, Shijie Huang wrote:
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index 15bf00e79e3f..05220b9d07dc 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -320,6 +320,8 @@ class Arch(object):
+             return ArchA64()
+         elif machine.startswith('s390'):
+             return ArchS390()
++        elif machine.startswith('riscv'):
++            return ArchRISCV()
+         else:
+             # X86_64
+             for line in open('/proc/cpuinfo'):
+@@ -396,6 +398,18 @@ class ArchS390(Arch):
+             return 'exit_instruction'
+ 
+ 
++class ArchRISCV(Arch):
++    def __init__(self):
++        self.sc_perf_evt_open = 241
++        self.ioctl_numbers = IOCTL_NUMBERS
++        self.exit_reason_field = None
++        self.exit_reasons = None
++
++    def debugfs_is_child(self, field):
++        """ Returns name of parent if 'field' is a child, None otherwise """
++        return None
++
++
+ ARCH = Arch.get_arch()
+ 
+ 
+-- 
+2.41.0
 
 
-[...]
-
-> > Seems to me, based on Marc's patch, we need to apply below change.  In
-> > below code, we don't need to change the perf core code and we can
-> > resolve it as a common issue for Arm PMU drivers.
-> > 
-> > 
-> > diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-> > index 121f1a14c829..8f9673cdadec 100644
-> > --- a/arch/arm64/kvm/pmu.c
-> > +++ b/arch/arm64/kvm/pmu.c
-> > @@ -38,14 +38,20 @@ struct kvm_pmu_events *kvm_get_pmu_events(void)
-> >   void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
-> >   {
-> >   	struct kvm_pmu_events *pmu = kvm_get_pmu_events();
-> > +	int resync;
-> >   	if (!kvm_arm_support_pmu_v3() || !pmu || !kvm_pmu_switch_needed(attr))
-> >   		return;
-> > +	resync = pmu->events_guest != set;
-> 
-> If we set two events in guest, the resync will set
-> 
-> For example:
-> 
->            perf stat -e cycles:Gu, cycles:Gk
-> 
-> 
-> If so, this is not reasonble...
-
-You mean if set two guest events, the kvm_vcpu_pmu_resync_el0() will
-be invoked twice, and the second calling is not reasonable, right?
-I can accept this since I personally think this should not introduce
-much performance penalty.
-
-I understand your preference to call kvm_vcpu_pmu_resync_el0() from
-perf core layer, but this is not a common issue for all PMU events and
-crossing arches.  Furthermore, even perf core rotates events, it's not
-necessarily mean we must restore events for guest in the case there
-have no event is enabled for guest.
-
-Thanks,
-Leo
+-- 
+Andreas Schwab, SUSE Labs, schwab@suse.de
+GPG Key fingerprint = 0196 BAD8 1CE9 1970 F4BE  1748 E4D4 88E3 0EEA B9D7
+"And now for something completely different."
