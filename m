@@ -2,164 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 523D177B36A
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 10:10:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FE9377B38C
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 10:12:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232939AbjHNIJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 04:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51904 "EHLO
+        id S232704AbjHNIMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 04:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234009AbjHNIJW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 04:09:22 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657C91702;
-        Mon, 14 Aug 2023 01:08:59 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6884310ee75so12156b3a.1;
-        Mon, 14 Aug 2023 01:08:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692000538; x=1692605338;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HHc6qGu7Ail6gjahuSN4onxMeC32IE8coMewoeVpo+4=;
-        b=XrN429NkkjvtYKQqtj/TEdZqVZrUQ8b8FHbFO4j5Y+ZO5uZ5r1Dfi3Xs4qIqnZtmR8
-         F5VO+c0FbRHfFpuj7l5LrzFaNDanNnZjOShVZ0fzMH6WPQcweob6q4tU7SYsXp+yAZLh
-         E6USBDxvKoxbAvmJAoZAC5JDZ5NQvfz8JaX5NIUmAFWCslykElgu2lYNnd/hu9Kb9VCm
-         rdgyy4TIhst6yWvWegUv4GxmpkkREiUbF0z8jCeNuJp4XYLtZnR0GZX2Q3862rFGn3Nt
-         VCdonYgUs9k7PStlrktcNrAqS033qjRIl8FV6Y+8/UzmsK6NV/ZO1SkriS/QDxTLax0L
-         vv+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692000538; x=1692605338;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HHc6qGu7Ail6gjahuSN4onxMeC32IE8coMewoeVpo+4=;
-        b=ZiY30ICURJsSGkFe6ztTXnivvurzfr2rj0SroHWHawrwtMGNI5/NpMGK9iA8h9XQAh
-         MzrcHH3vYvK38lTPk/zGWYJUfDprs27VaROYAGlFUVTKsO9lPoAUbLat5tDMF3YgTMT5
-         5UmrgYosKKKEF+E2jRH5fkk52ZC/tIYFrU30JsmHERCjz/awIKMhp2a6L+NCw35dzQXa
-         CtQl7UXYrDZUl548+MhtRfggwuAO6R2BnXkxF61vuRKCp5sxetWczYuH9EYFPD+U0nl6
-         sNv6XYR61cDzsbCQfO4OY9ORumjdZUr4V9f90ghPxrLgh8uve9ilPiJaf7aJCpmBJGJ7
-         pquQ==
-X-Gm-Message-State: AOJu0Yzr618hcRomxnq0FuB08L0YI702GXhKgEOK12Z10Hmy3VgEU5/7
-        oBzQ6yDEKlv7ew+kK0Yz+A3RtvK8IZA=
-X-Google-Smtp-Source: AGHT+IEOmHQAaO2710jyujKN7BPqeOdoqB8zTN52ofQqctE6cqKFRrusISuSxbuG3YPodBsb9qeYBw==
-X-Received: by 2002:a05:6a00:b85:b0:686:24b0:554b with SMTP id g5-20020a056a000b8500b0068624b0554bmr12388389pfj.22.1692000538498;
-        Mon, 14 Aug 2023 01:08:58 -0700 (PDT)
-Received: from localhost ([61.68.161.249])
-        by smtp.gmail.com with ESMTPSA id p16-20020a639510000000b005658d3a46d7sm4085195pgd.84.2023.08.14.01.08.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 01:08:58 -0700 (PDT)
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Mon, 14 Aug 2023 18:08:52 +1000
-Message-Id: <CUS44PQRFL72.28PFLWO36FYAO@wheely>
-Cc:     <kvm@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <mikey@neuling.org>, <paulus@ozlabs.org>, <vaibhav@linux.ibm.com>,
-        <sbhat@linux.ibm.com>, <gautam@linux.ibm.com>,
-        <kconsul@linux.vnet.ibm.com>, <amachhiw@linux.vnet.ibm.com>
-Subject: Re: [PATCH v3 1/6] KVM: PPC: Use getters and setters for vcpu
- register state
-From:   "Nicholas Piggin" <npiggin@gmail.com>
-To:     "Jordan Niethe" <jniethe5@gmail.com>,
-        <linuxppc-dev@lists.ozlabs.org>
-X-Mailer: aerc 0.15.2
-References: <20230807014553.1168699-1-jniethe5@gmail.com>
- <20230807014553.1168699-2-jniethe5@gmail.com>
-In-Reply-To: <20230807014553.1168699-2-jniethe5@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234784AbjHNILf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 04:11:35 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF571719;
+        Mon, 14 Aug 2023 01:11:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692000675; x=1723536675;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=oSgIdi+RSlbeWUJDGskccGgHISPirJiQabwtsdaIRR8=;
+  b=f45T9bnQsmDdvkS2rB/aECdT7n9U9IVqwlbYx2m0f/7UC1RF8TPwkBa7
+   kaRPhvzKhLJRIjjPNMODm+BJ+ZyKSWmFpPF2Y7MtIotL5NGh5EvRJ5+Gg
+   JdhhCy+OxQKceUn8HSfeBoJq1TEu6alUULLtQsc8zBb0LaiWy9AQvMf5S
+   Uqnk0cSxQGBuz5ltBKog0Ul7whi8Q3lPKDPTjVnWhzLthiokNloeQpbce
+   cmJFjtEgKk/oz3lwZ5iwYO4KWktPZ0CgatKssW19FlcdN5sqhIBhdsSa/
+   HNzCb+NzuRdubHt8HCwWpy1g+FuS3BE1q0wjL2f3BxU1udmGAzrO4+1ly
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10801"; a="438321522"
+X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
+   d="scan'208";a="438321522"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 01:11:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="876869083"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Aug 2023 01:11:10 -0700
+Date:   Mon, 14 Aug 2023 16:11:05 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v2 13/21] KVM: nVMX: Use KVM-governed feature framework
+ to track "nested VMX enabled"
+Message-ID: <20230814081105.yr6bamyoutijc36i@yy-desk-7060>
+References: <20230729011608.1065019-1-seanjc@google.com>
+ <20230729011608.1065019-14-seanjc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230729011608.1065019-14-seanjc@google.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
-> There are already some getter and setter functions used for accessing
-> vcpu register state, e.g. kvmppc_get_pc(). There are also more
-> complicated examples that are generated by macros like
-> kvmppc_get_sprg0() which are generated by the SHARED_SPRNG_WRAPPER()
-> macro.
+On Fri, Jul 28, 2023 at 06:16:00PM -0700, Sean Christopherson wrote:
+> Track "VMX exposed to L1" via a governed feature flag instead of using a
+> dedicated helper to provide the same functionality.  The main goal is to
+> drive convergence between VMX and SVM with respect to querying features
+> that are controllable via module param (SVM likes to cache nested
+> features), avoiding the guest CPUID lookups at runtime is just a bonus
+> and unlikely to provide any meaningful performance benefits.
 >
-> In the new PAPR "Nestedv2" API for nested guest partitions the L1 is
-> required to communicate with the L0 to modify and read nested guest
-> state.
+> No functional change intended.
 >
-> Prepare to support this by replacing direct accesses to vcpu register
-> state with wrapper functions. Follow the existing pattern of using
-> macros to generate individual wrappers. These wrappers will
-> be augmented for supporting Nestedv2 guests later.
->
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
-> v3:
->   - Do not add a helper for pvr
->   - Use an expression when declaring variable in case
->   - Squash in all getters and setters
->   - Guatam: Pass vector registers by reference
-> ---
->  arch/powerpc/include/asm/kvm_book3s.h  | 123 +++++++++++++-
->  arch/powerpc/include/asm/kvm_booke.h   |  10 ++
->  arch/powerpc/kvm/book3s.c              |  38 ++---
->  arch/powerpc/kvm/book3s_64_mmu_hv.c    |   4 +-
->  arch/powerpc/kvm/book3s_64_mmu_radix.c |   9 +-
->  arch/powerpc/kvm/book3s_64_vio.c       |   4 +-
->  arch/powerpc/kvm/book3s_hv.c           | 220 +++++++++++++------------
->  arch/powerpc/kvm/book3s_hv.h           |  58 +++++++
->  arch/powerpc/kvm/book3s_hv_builtin.c   |  10 +-
->  arch/powerpc/kvm/book3s_hv_p9_entry.c  |   4 +-
->  arch/powerpc/kvm/book3s_hv_ras.c       |   5 +-
->  arch/powerpc/kvm/book3s_hv_rm_mmu.c    |   8 +-
->  arch/powerpc/kvm/book3s_hv_rm_xics.c   |   4 +-
->  arch/powerpc/kvm/book3s_xive.c         |   9 +-
->  arch/powerpc/kvm/emulate_loadstore.c   |   2 +-
->  arch/powerpc/kvm/powerpc.c             |  76 ++++-----
->  16 files changed, 395 insertions(+), 189 deletions(-)
+>  arch/x86/kvm/governed_features.h |  1 +
+>  arch/x86/kvm/vmx/nested.c        |  7 ++++---
+>  arch/x86/kvm/vmx/vmx.c           | 21 ++++++---------------
+>  arch/x86/kvm/vmx/vmx.h           |  1 -
+>  4 files changed, 11 insertions(+), 19 deletions(-)
 >
-
-[snip]
-
-> +
->  /* Expiry time of vcpu DEC relative to host TB */
->  static inline u64 kvmppc_dec_expires_host_tb(struct kvm_vcpu *vcpu)
->  {
-> -	return vcpu->arch.dec_expires - vcpu->arch.vcore->tb_offset;
-> +	return kvmppc_get_dec_expires(vcpu) - kvmppc_get_tb_offset_hv(vcpu);
+> diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
+> index b896a64e4ac3..22446614bf49 100644
+> --- a/arch/x86/kvm/governed_features.h
+> +++ b/arch/x86/kvm/governed_features.h
+> @@ -7,6 +7,7 @@ BUILD_BUG()
+>
+>  KVM_GOVERNED_X86_FEATURE(GBPAGES)
+>  KVM_GOVERNED_X86_FEATURE(XSAVES)
+> +KVM_GOVERNED_X86_FEATURE(VMX)
+>
+>  #undef KVM_GOVERNED_X86_FEATURE
+>  #undef KVM_GOVERNED_FEATURE
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 22e08d30baef..c5ec0ef51ff7 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6426,7 +6426,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  	vmx = to_vmx(vcpu);
+>  	vmcs12 = get_vmcs12(vcpu);
+>
+> -	if (nested_vmx_allowed(vcpu) &&
+> +	if (guest_can_use(vcpu, X86_FEATURE_VMX) &&
+>  	    (vmx->nested.vmxon || vmx->nested.smm.vmxon)) {
+>  		kvm_state.hdr.vmx.vmxon_pa = vmx->nested.vmxon_ptr;
+>  		kvm_state.hdr.vmx.vmcs12_pa = vmx->nested.current_vmptr;
+> @@ -6567,7 +6567,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>  		if (kvm_state->flags & ~KVM_STATE_NESTED_EVMCS)
+>  			return -EINVAL;
+>  	} else {
+> -		if (!nested_vmx_allowed(vcpu))
+> +		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
+>  			return -EINVAL;
+>
+>  		if (!page_address_valid(vcpu, kvm_state->hdr.vmx.vmxon_pa))
+> @@ -6601,7 +6601,8 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>  		return -EINVAL;
+>
+>  	if ((kvm_state->flags & KVM_STATE_NESTED_EVMCS) &&
+> -		(!nested_vmx_allowed(vcpu) || !vmx->nested.enlightened_vmcs_enabled))
+> +	    (!guest_can_use(vcpu, X86_FEATURE_VMX) ||
+> +	     !vmx->nested.enlightened_vmcs_enabled))
+>  			return -EINVAL;
+>
+>  	vmx_leave_nested(vcpu);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 3100ed62615c..fdf932cfc64d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1894,17 +1894,6 @@ static void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu)
+>  	vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
 >  }
+>
+> -/*
+> - * nested_vmx_allowed() checks whether a guest should be allowed to use VMX
+> - * instructions and MSRs (i.e., nested VMX). Nested VMX is disabled for
+> - * all guests if the "nested" module option is off, and can also be disabled
+> - * for a single guest by disabling its VMX cpuid bit.
+> - */
+> -bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
+> -{
+> -	return nested && guest_cpuid_has(vcpu, X86_FEATURE_VMX);
 
-I don't see kvmppc_get_tb_offset_hv in this patch.
+the removed nested here already covered by
+kvm_cpu_cap_set(X86_FEATURE_VMX) from vmx_set_cpu_caps().
 
-> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3=
-s_64_mmu_hv.c
-> index 7f765d5ad436..738f2ecbe9b9 100644
-> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-> @@ -347,7 +347,7 @@ static int kvmppc_mmu_book3s_64_hv_xlate(struct kvm_v=
-cpu *vcpu, gva_t eaddr,
->  	unsigned long v, orig_v, gr;
->  	__be64 *hptep;
->  	long int index;
-> -	int virtmode =3D vcpu->arch.shregs.msr & (data ? MSR_DR : MSR_IR);
-> +	int virtmode =3D kvmppc_get_msr(vcpu) & (data ? MSR_DR : MSR_IR);
-> =20
->  	if (kvm_is_radix(vcpu->kvm))
->  		return kvmppc_mmu_radix_xlate(vcpu, eaddr, gpte, data, iswrite);
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
-So this isn't _only_ adding new accessors. This should be functionally a
-noop, but I think it introduces a branch if PR is defined.
-
-Shared page is a slight annoyance for HV, I'd like to get rid of it...
-but that's another story. I think the pattern here would be to add a
-kvmppc_get_msr_hv() accessor.
-
-And as a nitpick, for anywhere employing existing access functions, gprs
-and such, could that be split into its own patch?
-
-Looks pretty good aside from those little things.
-
-Thanks,
-Nick
+> -}
+> -
+>  /*
+>   * Userspace is allowed to set any supported IA32_FEATURE_CONTROL regardless of
+>   * guest CPUID.  Note, KVM allows userspace to set "VMX in SMX" to maintain
+> @@ -2032,7 +2021,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			[msr_info->index - MSR_IA32_SGXLEPUBKEYHASH0];
+>  		break;
+>  	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+> -		if (!nested_vmx_allowed(vcpu))
+> +		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
+>  			return 1;
+>  		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
+>  				    &msr_info->data))
+> @@ -2340,7 +2329,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+>  		if (!msr_info->host_initiated)
+>  			return 1; /* they are read-only */
+> -		if (!nested_vmx_allowed(vcpu))
+> +		if (!guest_can_use(vcpu, X86_FEATURE_VMX))
+>  			return 1;
+>  		return vmx_set_vmx_msr(vcpu, msr_index, data);
+>  	case MSR_IA32_RTIT_CTL:
+> @@ -7727,13 +7716,15 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+>  		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
+>
+> +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
+> +
+>  	vmx_setup_uret_msrs(vmx);
+>
+>  	if (cpu_has_secondary_exec_ctrls())
+>  		vmcs_set_secondary_exec_control(vmx,
+>  						vmx_secondary_exec_control(vmx));
+>
+> -	if (nested_vmx_allowed(vcpu))
+> +	if (guest_can_use(vcpu, X86_FEATURE_VMX))
+>  		vmx->msr_ia32_feature_control_valid_bits |=
+>  			FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
+>  			FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
+> @@ -7742,7 +7733,7 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  			~(FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
+>  			  FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX);
+>
+> -	if (nested_vmx_allowed(vcpu))
+> +	if (guest_can_use(vcpu, X86_FEATURE_VMX))
+>  		nested_vmx_cr_fixed1_bits_update(vcpu);
+>
+>  	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index cde902b44d97..c2130d2c8e24 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -374,7 +374,6 @@ struct kvm_vmx {
+>  	u64 *pid_table;
+>  };
+>
+> -bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
+>  void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu,
+>  			struct loaded_vmcs *buddy);
+>  int allocate_vpid(void);
+> --
+> 2.41.0.487.g6d72f3e995-goog
+>
