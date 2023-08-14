@@ -2,88 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E7E577C197
-	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 22:38:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6016A77C218
+	for <lists+kvm@lfdr.de>; Mon, 14 Aug 2023 23:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232433AbjHNUh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 16:37:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45054 "EHLO
+        id S232696AbjHNVJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 17:09:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232426AbjHNUhg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 16:37:36 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29BD0170B;
-        Mon, 14 Aug 2023 13:37:35 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1bc8045e09dso29535545ad.0;
-        Mon, 14 Aug 2023 13:37:35 -0700 (PDT)
+        with ESMTP id S232641AbjHNVIo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 17:08:44 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C073E5E
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 14:08:43 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b9cdba1228so75879091fa.2
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 14:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692045454; x=1692650254;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8uPcd7vi+XmxVyTrv3YM7Lu69aTpodBb1P/2mWRyLDk=;
-        b=RWLa6KA90zuKIc0q8BZvrngLTAW5gETvb5oNUH9Pq/RpSvazw3SyF6ERITkqlstHXi
-         SnvQgjJfKnsAcF4yUq+Mg63b4IFzV0NG2rK1nc6z2DCAbMIBWmDugDnNGEyXP0EIYme5
-         vByW4uUP3rEVuPXTYNUgAAhOusoA11AXqtxfzjhZz99E8mB6ZpP/8PIY90K39VvB21Ap
-         /BiWx1dcL9qqIfPsPTe+uGAYk95GGPd+wfp6jv4xrO3kWPoadHh407IRGzAjrCpajfPi
-         3dBcN1OEeIJ17a1rQDYNt2D9bAIjACjkHdD6MkKVNxxOnXNEEOUf5u1e/E6Kkqu2zVoU
-         2Wew==
+        d=google.com; s=20221208; t=1692047321; x=1692652121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HSp/PBgFuqjU5FU2wSVwIwvbq+BUoL+z7yaXrbjmk7E=;
+        b=OS9OcTyyhb0MI7YCPjUC8NTPZAqUrVrUllRWSw1QWEtcLSMWO1aXtrg0HUBCj9yqDf
+         qkMl0AjE4N+YwB1uBuRRlsVs1zgxiNdzIROOb0TNV25Fuz5HkyI8Hyv6muEiV9T8Ggzr
+         7NTuZsmwSHxBicLIgMgzvrMnVtcrn1f56FqfQSKaOIplzWK4g6pP48WIbHB5PpMCngzk
+         Yje2kX4dEXTa1+/0oE3kJ6dlBEBApyN4t5zuZ9vJ3tnWeN7PM86YPbgLH01k2wlzYwj0
+         UPL27kWoVw+NW6v7aOqySigoX1koIA0C5FV8OgFovFsK9tzGThAR94nPxD1lEYvi+pCY
+         0Fxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692045454; x=1692650254;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8uPcd7vi+XmxVyTrv3YM7Lu69aTpodBb1P/2mWRyLDk=;
-        b=kfr0TtKpAsNtSoZlyH+eojE4oBJbqHnHGrDCh1HERt11A+iaDPa7Xko5Ju2BnOLxG6
-         slGjQeY4mT5TK9U+EF9En/loQw4fFgV38FPDsG8cg9ziutSyPtcCz2h5MaNKJ3VBBA8y
-         1mgf4IT1q6saFwZhbsEGlP1tqHkj8ihWwV+LL8nlrf3xyCULokE8r7zzQJviQBR5DDM7
-         bvP0rhYDsb7B1vTbDa6rc6kH9jfvmp83vXgdMXu0K8iPkvY+hB//BGmNXZ0zb9QP+wrp
-         k25UsbFTGpyhjrF1BTJwBJPYeU6JdqedGNO4klpRLd1e2j0JUiZAFZBomlhutH8WI2Vc
-         DcMg==
-X-Gm-Message-State: AOJu0YyW7Jb9bGPZadOw1Og6B9vyIYmtb7WaLRtB9HxCy4Eat9EUtODa
-        gkNO8vJq+zRmtbmoFLgvU3s=
-X-Google-Smtp-Source: AGHT+IGwJ8PLN1gJbnVFzZ7Ji8FunKvpdZ7Xo5ONFNUozyiWCqVAuNY7UblcngaHnVSiLj69ohXYxQ==
-X-Received: by 2002:a17:902:a411:b0:1bb:6875:5a73 with SMTP id p17-20020a170902a41100b001bb68755a73mr7412171plq.2.1692045454549;
-        Mon, 14 Aug 2023 13:37:34 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id p3-20020a170902c70300b001b243a20f26sm9854404plp.273.2023.08.14.13.37.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 13:37:33 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 13:37:32 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH 09/10] x86/virt/tdx: Wire up basic SEAMCALL functions
-Message-ID: <20230814203732.GC2257301@ls.amr.corp.intel.com>
-References: <cover.1689151537.git.kai.huang@intel.com>
- <41b7e5503a3e6057dc168b3c5a9693651c501d22.1689151537.git.kai.huang@intel.com>
- <20230712221510.GG3894444@ls.amr.corp.intel.com>
- <4202b26acdb3fe926dd1a9a46c2c7c35a5d85529.camel@intel.com>
- <20230713184434.GH3894444@ls.amr.corp.intel.com>
- <20230808091606.jk667prer5lmtcpm@yy-desk-7060>
+        d=1e100.net; s=20221208; t=1692047321; x=1692652121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HSp/PBgFuqjU5FU2wSVwIwvbq+BUoL+z7yaXrbjmk7E=;
+        b=AFY6t8Qde7JgGAnMIODNT+85wv/YQF5JFYLT4gbQ4byxlf3lvIkx5q6wgW105jNRHz
+         q9i3nqp0LrRzXJiqLQuVqet0XRaB15H8g0vXh6cZ3a5I8rdCMIj9JJ6+k0HU3Vz5wgbE
+         VuBFte+X+fHM3T+67ahpvBFA8DyPt+PhlJiJyUtH9wMeiA883QRUWJLL0jF65Snr2bHV
+         LCfhNxXeplX/7EaBgHUiMP0lYJzsOQslETA5Iv0Mrhe9cffVER5lqUmXG1id52n5TdC3
+         HupsRYLZSogW5O8UfZrsTMDJONEIWTk3unrhhXhJP+AuMe9GHTH1H3cU7nxbHZO86EwN
+         RyiQ==
+X-Gm-Message-State: AOJu0YxHh0EXtC18UZpQGhejkGOudXPAGMTuJ0C6efvVdt3VcQ7pXtJL
+        rxfzlAunrbAmGLmd5mFtFDzoI4y1ioykk7M8rYWSDw==
+X-Google-Smtp-Source: AGHT+IEmydD7Vg63lIM0FBUIs9+BBEzh+aAHaZt+2h9ySTyHScdO/ox2c3DfLJT1FXQenxJY8qkzoCaqPavs81FI74Y=
+X-Received: by 2002:a2e:8752:0:b0:2b6:c61c:745b with SMTP id
+ q18-20020a2e8752000000b002b6c61c745bmr7782564ljj.3.1692047321419; Mon, 14 Aug
+ 2023 14:08:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230808091606.jk667prer5lmtcpm@yy-desk-7060>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230808114711.2013842-1-maz@kernel.org> <20230808114711.2013842-17-maz@kernel.org>
+In-Reply-To: <20230808114711.2013842-17-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 14 Aug 2023 14:08:29 -0700
+Message-ID: <CAAdAUtjvnbdr==SyKz+8UC-ZDPOc9W-Rp-3JjtMjfbVeB=zuPA@mail.gmail.com>
+Subject: Re: [PATCH v3 16/27] KVM: arm64: nv: Expose FEAT_EVT to nested guests
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,59 +84,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 08, 2023 at 05:16:06PM +0800,
-Yuan Yao <yuan.yao@linux.intel.com> wrote:
+Hi Marc,
 
-> On Thu, Jul 13, 2023 at 11:44:34AM -0700, Isaku Yamahata wrote:
-> > On Thu, Jul 13, 2023 at 03:46:52AM +0000,
-> > "Huang, Kai" <kai.huang@intel.com> wrote:
-> >
-> > > On Wed, 2023-07-12 at 15:15 -0700, Isaku Yamahata wrote:
-> > > > > The SEAMCALL ABI is very similar to the TDCALL ABI and leverages much
-> > > > > TDCALL infrastructure.  Wire up basic functions to make SEAMCALLs for
-> > > > > the basic TDX support: __seamcall(), __seamcall_ret() and
-> > > > > __seamcall_saved_ret() which is for TDH.VP.ENTER leaf function.
-> > > >
-> > > > Hi.  __seamcall_saved_ret() uses struct tdx_module_arg as input and output.  For
-> > > > KVM TDH.VP.ENTER case, those arguments are already in unsigned long
-> > > > kvm_vcpu_arch::regs[].  It's silly to move those values twice.  From
-> > > > kvm_vcpu_arch::regs to tdx_module_args.  From tdx_module_args to real registers.
-> > > >
-> > > > If TDH.VP.ENTER is the only user of __seamcall_saved_ret(), can we make it to
-> > > > take unsigned long kvm_vcpu_argh::regs[NR_VCPU_REGS]?  Maybe I can make the
-> > > > change with TDX KVM patch series.
-> > >
-> > > The assembly code assumes the second argument is a pointer to 'struct
-> > > tdx_module_args'.  I don't know how can we change __seamcall_saved_ret() to
-> > > achieve what you said.  We might change the kvm_vcpu_argh::regs[NR_VCPU_REGS] to
-> > > match 'struct tdx_module_args''s layout and manually convert part of "regs" to
-> > > the structure and pass to __seamcall_saved_ret(), but it's too hacky I suppose.
-> > >
-> > > This was one concern that I mentioned VP.ENTER can be implemented by KVM in its
-> > > own assembly in the TDX host v12 discussion.  I kinda agree we should leverage
-> > > KVM's existing kvm_vcpu_arch::regs[NR_CPU_REGS] infrastructure to minimize the
-> > > code change to the KVM's common infrastructure.  If so, I guess we have to carry
-> > > this memory copy burden between two structures.
-> > >
-> > > Btw, I do find KVM's VP.ENTER code is a little bit redundant to the common
-> > > SEAMCALL assembly, which is a good reason for KVM to use __seamcall() variants
-> > > for TDH.VP.ENTER.
-> > >
-> > > So it's a tradeoff I think.
-> > >
-> > > On the other hand, given CoCo VMs normally don't expose all GPRs to VMM, it's
-> > > also debatable whether we should invent another infrastructure to the KVM code
-> > > to handle register access of CoCo VMs too, e.g., we can catch bugs easily when
-> > > KVM tries to access the registers that it shouldn't access.
-> >
-> > Yes, we'd like to save/restore GPRs only for TDVMCALL. Otherwise skip
-> > save/restore.
-> 
-> And another case to save/restore GPRs: supports DEBUG TD,
-> which is type of TD guest allows VMM to change its register
-> context, for debugging purpose.
+On Tue, Aug 8, 2023 at 4:48=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Now that we properly implement FEAT_EVT (as we correctly forward
+> traps), expose it to guests.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/nested.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 315354d27978..7f80f385d9e8 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -124,8 +124,7 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct =
+sys_reg_params *p,
+>                 break;
+>
+>         case SYS_ID_AA64MMFR2_EL1:
+> -               val &=3D ~(NV_FTR(MMFR2, EVT)     |
+> -                        NV_FTR(MMFR2, BBM)     |
+> +               val &=3D ~(NV_FTR(MMFR2, BBM)     |
+>                          NV_FTR(MMFR2, TTL)     |
+>                          GENMASK_ULL(47, 44)    |
+>                          NV_FTR(MMFR2, ST)      |
+> --
+> 2.34.1
+>
+>
 
-For Debug TD case, we can use TDH.VP.RD(general purpose register) specifically.
-We don't need to optimize for Debug TD case.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
+
+Jing
