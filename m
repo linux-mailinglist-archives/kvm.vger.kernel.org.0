@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C825D77D277
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:51:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82E1777D273
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:51:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239504AbjHOSuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 14:50:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56926 "EHLO
+        id S239497AbjHOSub (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 14:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239463AbjHOSty (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 14:49:54 -0400
+        with ESMTP id S239428AbjHOStu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 14:49:50 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169FA1FE4
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:49:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6AF21FCF
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:49:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C3D4465F90
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:47:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F909C433CA;
-        Tue, 15 Aug 2023 18:47:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BD8BD65F7E
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:47:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 260C7C433C8;
+        Tue, 15 Aug 2023 18:47:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692125244;
-        bh=Z++k16JmZHizsACr+O/98fpQOHUIigAeSJVEHAo5I3A=;
+        s=k20201202; t=1692125231;
+        bh=liPIWJrsaZpZ+LSyTtRogJZZkvVPnG34u65GKptRtkw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CdbW+RgDH51z3BV1G0Gu1p/sttAAZPPVEg0yJwYDS6xZO64NOII/+jb+MjWDip1Nt
-         leSrV3wKKDVtWFr8h21qVbdrRsJlGgE//dohae8Yc8pge+Yvu99Nbbzk2HxsZvYRAc
-         PAStuw8AnNoYqJCRAXWJ0eZNeMu7vO60HysaTAtkvTC0YpKVRzfQEbYSRD73DQz+JF
-         JlAz9tglfePURkyAqNPNS+oCjfZJ345oo89hfwBe+pFeK+AzCCT73WaH60Blzrci/m
-         lfCFZzpFa81icgEM1FfsnN/zGilZJXFol2nNlNtoUJwVaOAOVZ4RYHmwM8XIAyaygs
-         MUfC3vA9RNPTQ==
+        b=RXAid3ekKoy1ySkQTVFtq2vHmtXstc4TmlBOqc+OqJfqM/veCeYtaRA/eMhzkb7p5
+         5w4+PrvIRd6ff5C8mCVE9wGNHW9KNSVqJMDKwMp9sn8fjeXrLHRYU8yF2odVUY12fq
+         Dss+/hDEf+4G1vbQZ7/i/24Qekr/aiTdrMQ940PrOUYhUpPsAstfcGOlzCSfwRvEQV
+         CnRhJ+coMk6OKjLNIgMDV1qqwcZlwpNrDZkDRjFscWEqs627qWuZgH3K47PGhOkNVd
+         /uZFmxKFrP3T+8BxFQ3hENTA32z2HR8E70aLPpygIsE5nQT9JYOodehZCbcNg9wYGu
+         i+rnFG4y3HvIA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVywo-0055Sd-GJ;
+        id 1qVywo-0055Sd-PS;
         Tue, 15 Aug 2023 19:39:18 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 12/28] KVM: arm64: nv: Add FGT registers
-Date:   Tue, 15 Aug 2023 19:38:46 +0100
-Message-Id: <20230815183903.2735724-13-maz@kernel.org>
+Subject: [PATCH v4 13/28] KVM: arm64: Restructure FGT register switching
+Date:   Tue, 15 Aug 2023 19:38:47 +0100
+Message-Id: <20230815183903.2735724-14-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -78,57 +78,152 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the 5 registers covering FEAT_FGT. The AMU-related registers
-are currently left out as we don't have a plan for them. Yet.
+As we're about to majorly extend the handling of FGT registers,
+restructure the code to actually save/restore the registers
+as required. This is made easy thanks to the previous addition
+of the EL2 registers, allowing us to use the host context for
+this purpose.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 5 +++++
- arch/arm64/kvm/sys_regs.c         | 5 +++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h        | 21 ++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 56 +++++++++++++------------
+ 2 files changed, 50 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d3dd05bbfe23..721680da1011 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -400,6 +400,11 @@ enum vcpu_sysreg {
- 	TPIDR_EL2,	/* EL2 Software Thread ID Register */
- 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
- 	SP_EL2,		/* EL2 Stack Pointer */
-+	HFGRTR_EL2,
-+	HFGWTR_EL2,
-+	HFGITR_EL2,
-+	HDFGRTR_EL2,
-+	HDFGWTR_EL2,
- 	CNTHP_CTL_EL2,
- 	CNTHP_CVAL_EL2,
- 	CNTHV_CTL_EL2,
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 38f221f9fc98..f5baaa508926 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2367,6 +2367,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_NVHE_EL2_RES1),
- 	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HFGRTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HFGWTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HFGITR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 028049b147df..85908aa18908 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -333,6 +333,27 @@
+ 				 BIT(18) |		\
+ 				 GENMASK(16, 15))
  
- 	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
-@@ -2376,6 +2379,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
++/*
++ * FGT register definitions
++ *
++ * RES0 and polarity masks as of DDI0487J.a, to be updated as needed.
++ * We're not using the generated masks as they are usually ahead of
++ * the published ARM ARM, which we use as a reference.
++ *
++ * Once we get to a point where the two describe the same thing, we'll
++ * merge the definitions. One day.
++ */
++#define __HFGRTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51))
++#define __HFGRTR_EL2_MASK	GENMASK(49, 0)
++#define __HFGRTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
++
++#define __HFGWTR_EL2_RES0	(GENMASK(63, 56) | GENMASK(53, 51) |	\
++				 BIT(46) | BIT(42) | BIT(40) | BIT(28) | \
++				 GENMASK(26, 25) | BIT(21) | BIT(18) |	\
++				 GENMASK(15, 14) | GENMASK(10, 9) | BIT(2))
++#define __HFGWTR_EL2_MASK	GENMASK(49, 0)
++#define __HFGWTR_EL2_nMASK	(GENMASK(55, 54) | BIT(50))
++
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
+ /*
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 4bddb8541bec..e096b16e85fd 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -70,20 +70,19 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-+	EL2_REG(HDFGRTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HDFGWTR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
- 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+-static inline bool __hfgxtr_traps_required(void)
+-{
+-	if (cpus_have_final_cap(ARM64_SME))
+-		return true;
+-
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+-		return true;
+ 
+-	return false;
+-}
+ 
+-static inline void __activate_traps_hfgxtr(void)
++static inline void __activate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ {
++	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+ 	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
++	u64 r_val, w_val;
++
++	if (!cpus_have_final_cap(ARM64_HAS_FGT))
++		return;
++
++	ctxt_sys_reg(hctxt, HFGRTR_EL2) = read_sysreg_s(SYS_HFGRTR_EL2);
++	ctxt_sys_reg(hctxt, HFGWTR_EL2) = read_sysreg_s(SYS_HFGWTR_EL2);
+ 
+ 	if (cpus_have_final_cap(ARM64_SME)) {
+ 		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
+@@ -98,26 +97,31 @@ static inline void __activate_traps_hfgxtr(void)
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+ 		w_set |= HFGxTR_EL2_TCR_EL1_MASK;
+ 
+-	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
+-	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
++
++	/* The default is not to trap anything but ACCDATA_EL1 */
++	r_val = __HFGRTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
++	r_val |= r_set;
++	r_val &= ~r_clr;
++
++	w_val = __HFGWTR_EL2_nMASK & ~HFGxTR_EL2_nACCDATA_EL1;
++	w_val |= w_set;
++	w_val &= ~w_clr;
++
++	write_sysreg_s(r_val, SYS_HFGRTR_EL2);
++	write_sysreg_s(w_val, SYS_HFGWTR_EL2);
+ }
+ 
+-static inline void __deactivate_traps_hfgxtr(void)
++static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+ {
+-	u64 r_clr = 0, w_clr = 0, r_set = 0, w_set = 0, tmp;
++	struct kvm_cpu_context *hctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+ 
+-	if (cpus_have_final_cap(ARM64_SME)) {
+-		tmp = HFGxTR_EL2_nSMPRI_EL1_MASK | HFGxTR_EL2_nTPIDR2_EL0_MASK;
++	if (!cpus_have_final_cap(ARM64_HAS_FGT))
++		return;
+ 
+-		r_set |= tmp;
+-		w_set |= tmp;
+-	}
++	write_sysreg_s(ctxt_sys_reg(hctxt, HFGRTR_EL2), SYS_HFGRTR_EL2);
++	write_sysreg_s(ctxt_sys_reg(hctxt, HFGWTR_EL2), SYS_HFGWTR_EL2);
+ 
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+-		w_clr |= HFGxTR_EL2_TCR_EL1_MASK;
+ 
+-	sysreg_clear_set_s(SYS_HFGRTR_EL2, r_clr, r_set);
+-	sysreg_clear_set_s(SYS_HFGWTR_EL2, w_clr, w_set);
+ }
+ 
+ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+@@ -145,8 +149,7 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 
+-	if (__hfgxtr_traps_required())
+-		__activate_traps_hfgxtr();
++	__activate_traps_hfgxtr(vcpu);
+ }
+ 
+ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+@@ -162,8 +165,7 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 		vcpu_clear_flag(vcpu, PMUSERENR_ON_CPU);
+ 	}
+ 
+-	if (__hfgxtr_traps_required())
+-		__deactivate_traps_hfgxtr();
++	__deactivate_traps_hfgxtr(vcpu);
+ }
+ 
+ static inline void ___activate_traps(struct kvm_vcpu *vcpu)
 -- 
 2.34.1
 
