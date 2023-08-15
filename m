@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 832DB77D45C
+	by mail.lfdr.de (Postfix) with ESMTP id CCD5677D45D
 	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 22:38:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238685AbjHOUiX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 16:38:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
+        id S238648AbjHOUiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 16:38:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238945AbjHOUh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 16:37:58 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EE8268A
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 13:37:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d630af4038fso6898341276.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 13:37:34 -0700 (PDT)
+        with ESMTP id S238998AbjHOUiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 16:38:00 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EEB02109
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 13:37:36 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-589fae40913so28344967b3.0
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 13:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692131832; x=1692736632;
+        d=google.com; s=20221208; t=1692131834; x=1692736634;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=/gyHxemWXBUuNtn9G6ZmWdv+kLBQgF3gAw0dAQJK39U=;
-        b=QjV9eR7WVBYauzi+3qEmMZRbGnogEfU+B0zFQOnCsCmKlA5Y7+WABAvNAKoUACRX2L
-         FJ7bX6MfATSvoHUMEjiRdyOyWdK7TAlddykPKqbCqchQezNPP6N6uWjI6TcTnnONoQOo
-         Y7zIs8TyBi4tOanPhjiQgenTT3IGnkss334NihSIzpzM+0JLpXHYP+bxavbA3mzM5b4e
-         cQ5Tm47QyV+q1KcQgqcNOl3dUPAgOeWXukEWRpmrEqdobuhlJXP8E+uEKa/EOYHQPTBY
-         ltSICRi8gyLsbi/nOUR5RjYVMs8l1CUTjh/OVD9xL22H1feIKA+awmeD6atr/MdsHmTo
-         2iGQ==
+        bh=xweNaIPfBOW/m2asVm+iJf6F67YoA7+If7dzBXn/b2Y=;
+        b=2oLSelu7YkNFbhZ/UQnbxUbVBAXwQYUifvFWTVXmtT4FzbqBb4rzm3HnWelumm7aaj
+         ern2HGbKmvY5u7ctzw7P7dxSvh02STXDN7MwyP52+48bArlfGV6h58bZdNl0NGvDAziS
+         Bw3xVpuEo7BfRpATSQfhfBQfH3FEqDGHxydQfz0n5B55+IIiEEKvX9azNbN+DCWXELE0
+         32SxhRkJiN1c5+hx5nRMdl3yf3zvYlSRALQoqwwwwTDzkRXioAQM8+RV3to588YmkUkQ
+         xBSYkh8vt7x6Vn4zxrkpq+Ho2UepxYjfhJA1aOXeXQAQeBoaRPqCZ1oWdQ9iVSA1gsx3
+         Qxeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692131832; x=1692736632;
+        d=1e100.net; s=20221208; t=1692131834; x=1692736634;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/gyHxemWXBUuNtn9G6ZmWdv+kLBQgF3gAw0dAQJK39U=;
-        b=IGDIHLVIthem2NiuY/8TrEg8x9K9YfOa5BtCsvDGN8O4/M14Dq3JmGyt5Cck9yw09u
-         MSVaAJDU1TyRWguZDwWJJjhV9D1dmxTnZBnhuM6RoZnXFpecvJmbD1OLaI9MTKb+X08w
-         e+cMP4FTxKSi5VRUi2E3h4jJ4+2Oh/jCOBuYei6NK84JJNowRZMXXDRyM2O5w80NWFxT
-         uYq0/q3hCSohRNQq60oe8g5I20L+ZezwGz16FDogEvfRXT8UHbdSjmh9q5JxJkV6gFfN
-         hZgNMsnrN38w4oThh4twCKqCbiOxs2KG3DH8M1boumJ2M3+2cqKMeftc6kd9L795X2Uv
-         7aZg==
-X-Gm-Message-State: AOJu0Yx/pYkhcYM0//5TiFR+miB2i06oRhpOODbJeVnoylWzfRRDqeDJ
-        5KSrw4No/xXoOrZVsxfLO94Wtwe1HIQ=
-X-Google-Smtp-Source: AGHT+IGI0BUgnGQhn/IYqVCfzOsUxVZRnsC+Kr6E6SXC6uQOYKMqqfBcEmr5TP2ZI+7oiAkj1r2Qc7Km70Q=
+        bh=xweNaIPfBOW/m2asVm+iJf6F67YoA7+If7dzBXn/b2Y=;
+        b=Z7egljcW7ZSQa5Nzgr3nDx//mUir2rmNvxmbEU138JFu3or60ZZ6cYXiZekd3KMyXJ
+         2ThMlO1SfWXbbXif4MVIJZ1CJSlIV+IbwT3eJmjLSBk/zHsrhp4Atud0Q/PD/Wb4+IkN
+         Mo0sbhenfBtuIEZbm65U2Tqe5NezqffrEG+JPdt3hk2/JXgbwfskS3H6cnW6hj20UeQ8
+         KBH5A/i/QCzrCZinBEp7c4zalQQbPb+W6Ek48B3Fvw9Wu2kSTmng9HCxy5SSQLEo/HTi
+         Tc25GAHuRCEh9TsKfnHhkonnVkFt/PJs61bD/+z39Abk/l9ZP485XrNIM8OFDiWLDDU7
+         zlJg==
+X-Gm-Message-State: AOJu0Yw11UN+OIdbQBYlTLM7h9cbY2T471wfWRcBV1+Uw0s6rjC0NmUO
+        cgNT1ouZUIwJI+wVkPkvGqh6+kPGjKA=
+X-Google-Smtp-Source: AGHT+IE8HWufBzXiSTHPBdArXsit6jTp3EmYvkjHZ8UH0EAgkj5U6Kyx0wfq5t5UtKprhvbBJJaPc841cxQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:4c7:b0:d5d:511b:16da with SMTP id
- v7-20020a05690204c700b00d5d511b16damr180847ybs.2.1692131832254; Tue, 15 Aug
- 2023 13:37:12 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:af17:0:b0:586:5d03:67c8 with SMTP id
+ n23-20020a81af17000000b005865d0367c8mr197252ywh.3.1692131834240; Tue, 15 Aug
+ 2023 13:37:14 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 15 Aug 2023 13:36:47 -0700
+Date:   Tue, 15 Aug 2023 13:36:48 -0700
 In-Reply-To: <20230815203653.519297-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230815203653.519297-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230815203653.519297-10-seanjc@google.com>
-Subject: [PATCH v3 09/15] KVM: nSVM: Use KVM-governed feature framework to
- track "TSC scaling enabled"
+Message-ID: <20230815203653.519297-11-seanjc@google.com>
+Subject: [PATCH v3 10/15] KVM: nSVM: Use KVM-governed feature framework to
+ track "vVM{SAVE,LOAD} enabled"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -66,109 +66,94 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Track "TSC scaling exposed to L1" via a governed feature flag instead of
-using a dedicated bit/flag in vcpu_svm.
+Track "virtual VMSAVE/VMLOAD exposed to L1" via a governed feature flag
+instead of using a dedicated bit/flag in vcpu_svm.
 
-Note, this fixes a benign bug where KVM would mark TSC scaling as exposed
-to L1 even if overall nested SVM supported is disabled, i.e. KVM would let
-L1 write MSR_AMD64_TSC_RATIO even when KVM didn't advertise TSCRATEMSR
-support to userspace.
+Opportunistically add a comment explaining why KVM disallows virtual
+VMLOAD/VMSAVE when the vCPU model is Intel.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
  arch/x86/kvm/governed_features.h |  1 +
  arch/x86/kvm/svm/nested.c        |  2 +-
- arch/x86/kvm/svm/svm.c           | 10 ++++++----
+ arch/x86/kvm/svm/svm.c           | 10 +++++++---
  arch/x86/kvm/svm/svm.h           |  1 -
- 4 files changed, 8 insertions(+), 6 deletions(-)
+ 4 files changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-index 722b66af412c..32c0469cf952 100644
+index 32c0469cf952..f01a95fd0071 100644
 --- a/arch/x86/kvm/governed_features.h
 +++ b/arch/x86/kvm/governed_features.h
-@@ -9,6 +9,7 @@ KVM_GOVERNED_X86_FEATURE(GBPAGES)
- KVM_GOVERNED_X86_FEATURE(XSAVES)
+@@ -10,6 +10,7 @@ KVM_GOVERNED_X86_FEATURE(XSAVES)
  KVM_GOVERNED_X86_FEATURE(VMX)
  KVM_GOVERNED_X86_FEATURE(NRIPS)
-+KVM_GOVERNED_X86_FEATURE(TSCRATEMSR)
+ KVM_GOVERNED_X86_FEATURE(TSCRATEMSR)
++KVM_GOVERNED_X86_FEATURE(V_VMSAVE_VMLOAD)
  
  #undef KVM_GOVERNED_X86_FEATURE
  #undef KVM_GOVERNED_FEATURE
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 9092f3f8dccf..da65948064dc 100644
+index da65948064dc..24d47ebeb0e0 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -695,7 +695,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+@@ -107,7 +107,7 @@ static void nested_svm_uninit_mmu_context(struct kvm_vcpu *vcpu)
  
- 	vmcb02->control.tsc_offset = vcpu->arch.tsc_offset;
+ static bool nested_vmcb_needs_vls_intercept(struct vcpu_svm *svm)
+ {
+-	if (!svm->v_vmload_vmsave_enabled)
++	if (!guest_can_use(&svm->vcpu, X86_FEATURE_V_VMSAVE_VMLOAD))
+ 		return true;
  
--	if (svm->tsc_scaling_enabled &&
-+	if (guest_can_use(vcpu, X86_FEATURE_TSCRATEMSR) &&
- 	    svm->tsc_ratio_msr != kvm_caps.default_tsc_scaling_ratio)
- 		nested_svm_update_tsc_ratio_msr(vcpu);
- 
+ 	if (!nested_npt_enabled(svm))
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c8b97cb3138c..15c79457d8c5 100644
+index 15c79457d8c5..7cecbb58c60f 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2809,7 +2809,8 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -1201,8 +1201,6 @@ static inline void init_vmcb_after_set_cpuid(struct kvm_vcpu *vcpu)
  
- 	switch (msr_info->index) {
- 	case MSR_AMD64_TSC_RATIO:
--		if (!msr_info->host_initiated && !svm->tsc_scaling_enabled)
-+		if (!msr_info->host_initiated &&
-+		    !guest_can_use(vcpu, X86_FEATURE_TSCRATEMSR))
- 			return 1;
- 		msr_info->data = svm->tsc_ratio_msr;
- 		break;
-@@ -2959,7 +2960,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	switch (ecx) {
- 	case MSR_AMD64_TSC_RATIO:
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_EIP, 0, 0);
+ 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_ESP, 0, 0);
+-
+-		svm->v_vmload_vmsave_enabled = false;
+ 	} else {
+ 		/*
+ 		 * If hardware supports Virtual VMLOAD VMSAVE then enable it
+@@ -4295,7 +4293,13 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
  
--		if (!svm->tsc_scaling_enabled) {
-+		if (!guest_can_use(vcpu, X86_FEATURE_TSCRATEMSR)) {
- 
- 			if (!msr->host_initiated)
- 				return 1;
-@@ -2981,7 +2982,8 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 
- 		svm->tsc_ratio_msr = data;
- 
--		if (svm->tsc_scaling_enabled && is_guest_mode(vcpu))
-+		if (guest_can_use(vcpu, X86_FEATURE_TSCRATEMSR) &&
-+		    is_guest_mode(vcpu))
- 			nested_svm_update_tsc_ratio_msr(vcpu);
- 
- 		break;
-@@ -4289,8 +4291,8 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
- 
- 	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_NRIPS);
-+	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_TSCRATEMSR);
- 
--	svm->tsc_scaling_enabled = tsc_scaling && guest_cpuid_has(vcpu, X86_FEATURE_TSCRATEMSR);
  	svm->lbrv_enabled = lbrv && guest_cpuid_has(vcpu, X86_FEATURE_LBRV);
  
- 	svm->v_vmload_vmsave_enabled = vls && guest_cpuid_has(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
+-	svm->v_vmload_vmsave_enabled = vls && guest_cpuid_has(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
++	/*
++	 * Intercept VMLOAD if the vCPU mode is Intel in order to emulate that
++	 * VMLOAD drops bits 63:32 of SYSENTER (ignoring the fact that exposing
++	 * SVM on Intel is bonkers and extremely unlikely to work).
++	 */
++	if (!guest_cpuid_is_intel(vcpu))
++		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
+ 
+ 	svm->pause_filter_enabled = kvm_cpu_cap_has(X86_FEATURE_PAUSEFILTER) &&
+ 			guest_cpuid_has(vcpu, X86_FEATURE_PAUSEFILTER);
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index e147f2046ffa..3696f10e2887 100644
+index 3696f10e2887..b3fdaab57363 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
 @@ -259,7 +259,6 @@ struct vcpu_svm {
  	bool soft_int_injected;
  
  	/* optional nested SVM features that are enabled for this guest  */
--	bool tsc_scaling_enabled          : 1;
- 	bool v_vmload_vmsave_enabled      : 1;
+-	bool v_vmload_vmsave_enabled      : 1;
  	bool lbrv_enabled                 : 1;
  	bool pause_filter_enabled         : 1;
+ 	bool pause_threshold_enabled      : 1;
 -- 
 2.41.0.694.ge786442a9b-goog
 
