@@ -2,69 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B17E77C496
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:44:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3458977C4AD
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:49:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjHOAoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 20:44:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
+        id S233618AbjHOAs6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 20:48:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233477AbjHOAni (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 20:43:38 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1421BAF
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:43:37 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-589e5e46735so31097107b3.2
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:43:37 -0700 (PDT)
+        with ESMTP id S233763AbjHOAsh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 20:48:37 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3C7173E
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:48:35 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-589e5e46735so31140297b3.2
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692060216; x=1692665016;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KsY/ZaK2RNf5OtLDY1Fjip2JnZVZAV7QJfs4V9oHYNQ=;
-        b=0x9Y0/N0szkc98rXT0O9vx+lBDT9Urk4YC3IjrsruZyPWTevA0qxTKEE24zkaMVvZX
-         vJ8ijsK1XhTezSGspOieS+NKY0ZP0PdOGDhH4IcTWXpG7BBVnfe/VN97EsW4HGVgtkSZ
-         wrjkjn8kAW6SMBz45nbCNcTfKwzGPxvi92rt93D3wefqvl5aTaio79Zs2ugDmZhtXXnL
-         z1CUzukfcvkuBrgeY4eNluYVVApVWX8vcjZ4OqsCS/x7XFfTkcT71sYtRvJmNbijyFq5
-         HtUkS7zz4r1jhGzlwhp9BrtPieKFymz9Gdpfr6fizWbyNJW/3IbQPODSwmIUEMG7jFby
-         QJlQ==
+        d=google.com; s=20221208; t=1692060514; x=1692665314;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=52oFZVaLBUqV5JDZKjfa7j0JbQy+FgnNmye7nF0zv4Q=;
+        b=FxxWccPFx99rf/V93BNIHCJQDo4G5Zqgck3MdWGlrvNjMCRPN8+G/pY2KOQxIsmru4
+         vHP6l3UEcIbqov0g/ZNfatfTRlVJ4PqnbEjX8htHswC2UWPgE8BCpl4N5rf6TqJAj5r7
+         3cNurQ0Uef0OB/kGIOacEBA/AwM3Z0NXdnm7Tl/dvyTytatiTtWBRn4NtDzJl8cuZpiE
+         An0JjLDU7h1dJCpalHenIF1GbxY9OlZdC6Cps6IKdn8w/2qZYzdExGGuFKJLqlohWPz+
+         CLzdX4lu/e5vAb3ExxkeJaeWP64lX43sqrSEThAmoeNcMVwSigCbOhpzG+ztFaEtaHZe
+         sr4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692060216; x=1692665016;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KsY/ZaK2RNf5OtLDY1Fjip2JnZVZAV7QJfs4V9oHYNQ=;
-        b=jZaC8fehj7xUWmlBMs1NzOfzwCapCc1Mv0pFPXTsXmfTCw+aA4FQqpYi5yaCQNFAO2
-         uLxaD6hOViMJ5060OcWAg4CdMsH+vg2gVejG5AqsbBNVeOrUBL+AXDh+hBV015WsmuaD
-         qCugBYENAe6VccpvAmFtP0cRW/z3h/UxeBOuk84itxFpvtJMwI9oF+Go5JPII4ktBxTQ
-         jTYxp+BqProOtGzvM2omwO6YqEpH71KiDxD5xjVi0Zo0Q24YmHj1B33EXvVdl0LuDma3
-         LoaJeJVANjRPW7HCB1wv+28e7fG5gBgsmzpNowLry0Hr9ttwUWwzyrXV2joX4nmvv4MW
-         crqw==
-X-Gm-Message-State: AOJu0YxTSzsk5WBG5wr7ZL0Nk5NLfZa9nLMQXKePulNeMAOFImot2jIx
-        XWF+er2JjYSh824jg6IETEkUg5XR3c8=
-X-Google-Smtp-Source: AGHT+IHcLwDac4BWNRjgQpIWOkWuss1NmMWEbE9cL8TvxNyzuC00IaInTzAhw3Df+aMOuMZkJ6GxzXkqHz0=
+        d=1e100.net; s=20221208; t=1692060514; x=1692665314;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=52oFZVaLBUqV5JDZKjfa7j0JbQy+FgnNmye7nF0zv4Q=;
+        b=UVGvno6N3EB/XZB2rHmOtko80ftBUQyxpmR35HGZZrAMXkfaTWGnYOqvd+AoBfh96y
+         z+XLCUfXI2nmjDkHbuOln81t5tX0TFD1KjQCB04KEIwjIts4nJ58i9F/mJx1Av3WWh5C
+         lMuNfN4b0VsXB/cOG8ZS4x4y/3VOgGOYQzK+cMwhjFh6y4Aq5bL4t8vL5MKnAzcbTOJO
+         U1/jyS286mYEOCxSQM9T61cpc5WDGdV7Qs+T3EhjUGLh7u24lgecJrzIo1vZlbnaFfGT
+         UFnQ2rIP28XI7dzHsmw9jKj3Qk8taXWJBzUXfALGXWhA6Hny+sq/buqAIPo2M5zLu8jV
+         zC3A==
+X-Gm-Message-State: AOJu0YwXwR1j8xk95kyZ31zxCh5dlxfZRjOUPLLSEgtjcs4MG4rPdcO5
+        ELoxMiEm2xmTEQlpaVpZI4MpflZ7Orc=
+X-Google-Smtp-Source: AGHT+IENRn7eU5S576awdNT0hdv6zNDIVzHUqiIWxFSkMpa6HSwObqb6uEWL8dr1GX7l67afv6TxWe2boxM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:441f:0:b0:589:a974:d7ef with SMTP id
- r31-20020a81441f000000b00589a974d7efmr158615ywa.6.1692060216360; Mon, 14 Aug
- 2023 17:43:36 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 17:43:34 -0700
-In-Reply-To: <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:709:b0:57a:118a:f31 with SMTP id
+ bs9-20020a05690c070900b0057a118a0f31mr182637ywb.7.1692060514350; Mon, 14 Aug
+ 2023 17:48:34 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 17:48:32 -0700
+In-Reply-To: <169100872740.1737125.14417847751002571677.b4-ty@google.com>
 Mime-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com> <CAF7b7mqfkLYtWBJ=u0MK7hhARHrahQXHza9VnaughyNz5_tNug@mail.gmail.com>
- <ZNpsCngiSjISMG5j@google.com> <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
-Message-ID: <ZNrKNs8IjkUWOatn@google.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+References: <20230728001606.2275586-1-mhal@rbox.co> <169100872740.1737125.14417847751002571677.b4-ty@google.com>
+Message-ID: <ZNrLYOiQuImD1g8A@google.com>
+Subject: Re: [PATCH 0/2] sync_regs() TOCTOU issues
 From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -75,87 +65,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14, 2023, Anish Moorthy wrote:
-> On Mon, Aug 14, 2023 at 11:01=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > What is/was the error?  It's probably worth digging into; "static inlin=
-e" should
-> > work just fine, so there might be something funky elsewhere that you're=
- papering
-> > over.
->=20
-> What I get is
->=20
-> > ./include/linux/kvm_host.h:2298:20: error: function 'kvm_handle_guest_u=
-access_fault' has internal linkage but is not defined [-Werror,-Wundefined-=
-internal]
-> > static inline void kvm_handle_guest_uaccess_fault(struct kvm_vcpu *vcpu=
-,
-> >                    ^
-> > arch/x86/kvm/mmu/mmu.c:3323:2: note: used here
-> >         kvm_handle_guest_uaccess_fault(vcpu, gfn_to_gpa(fault->gfn), PA=
-GE_SIZE,
-> >         ^
-> > 1 error generated.
->=20
-> (mmu.c:3323 is in kvm_handle_error_pfn()). I tried shoving the
-> definition of the function from kvm_main.c to kvm_host.h so that I
-> could make it "static inline": but then the same "internal linkage"
-> error pops up in the kvm_vcpu_read/write_guest_page() functions.
+On Wed, Aug 02, 2023, Sean Christopherson wrote:
+> On Fri, 28 Jul 2023 02:12:56 +0200, Michal Luczaj wrote:
+> > Both __set_sregs() and kvm_vcpu_ioctl_x86_set_vcpu_events() assume they
+> > have exclusive rights to structs they operate on. While this is true when
+> > coming from an ioctl handler (caller makes a local copy of user's data),
+> > sync_regs() breaks this contract; a pointer to a user-modifiable memory
+> > (vcpu->run->s.regs) is provided. This can lead to a situation when incoming
+> > data is checked and/or sanitized only to be re-set by a user thread running
+> > in parallel.
+> > 
+> > [...]
+> 
+> Applied to kvm-x86 selftests (there are in-flight reworks for selftests
+> that will conflict, and I didn't want to split the testcases from the fix).
+> 
+> As mentioned in my reply to patch 2, I split up the selftests patch and
+> massaged things a bit.  Please holler if you disagree with any of the
+> changes.
+> 
+> Thanks much!
+> 
+> [1/4] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU issues
+>       https://github.com/kvm-x86/linux/commit/0d033770d43a
+> [2/4] KVM: selftests: Extend x86's sync_regs_test to check for CR4 races
+>       https://github.com/kvm-x86/linux/commit/ae895cbe613a
+> [3/4] KVM: selftests: Extend x86's sync_regs_test to check for event vector races
+>       https://github.com/kvm-x86/linux/commit/60c4063b4752
+> [4/4] KVM: selftests: Extend x86's sync_regs_test to check for exception races
+>       https://github.com/kvm-x86/linux/commit/0de704d2d6c8
 
-Can you point me at your branch?  That should be easy to resolve, but it's =
-all
-but impossible to figure out what's going wrong without being able to see t=
-he
-full code.
+Argh, apparently I didn't run these on AMD.  The exception injection test hangs
+because the vCPU hits triple fault shutdown, and because the VMCB is technically
+undefined on shutdown, KVM synthesizes INIT.  That starts the vCPU at the reset
+vector and it happily fetches zeroes util being killed.
 
-> Btw, do you actually know the size of the union in the run struct? I
-> started checking it but stopped when I realized that it includes
-> arch-dependent structs.
+This fixes the issue, and I confirmed all three testcases repro the KVM bug with
+it.  I'll post formally tomorrow.
 
-256 bytes, though how much of that is actually free for the "speculative" i=
-dea...
+---
+ .../testing/selftests/kvm/x86_64/sync_regs_test.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-		/* Fix the size of the union. */
-		char padding[256];
+diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+index 93fac74ca0a7..55e9b68e6947 100644
+--- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+@@ -94,6 +94,7 @@ static void *race_events_inj_pen(void *arg)
+ 	for (;;) {
+ 		WRITE_ONCE(run->kvm_dirty_regs, KVM_SYNC_X86_EVENTS);
+ 		WRITE_ONCE(events->flags, 0);
++		WRITE_ONCE(events->exception.nr, GP_VECTOR);
+ 		WRITE_ONCE(events->exception.injected, 1);
+ 		WRITE_ONCE(events->exception.pending, 1);
+ 
+@@ -115,6 +116,7 @@ static void *race_events_exc(void *arg)
+ 	for (;;) {
+ 		WRITE_ONCE(run->kvm_dirty_regs, KVM_SYNC_X86_EVENTS);
+ 		WRITE_ONCE(events->flags, 0);
++		WRITE_ONCE(events->exception.nr, GP_VECTOR);
+ 		WRITE_ONCE(events->exception.pending, 1);
+ 		WRITE_ONCE(events->exception.nr, 255);
+ 
+@@ -152,6 +154,7 @@ static noinline void *race_sregs_cr4(void *arg)
+ static void race_sync_regs(void *racer)
+ {
+ 	const time_t TIMEOUT = 2; /* seconds, roughly */
++	struct kvm_x86_state *state;
+ 	struct kvm_translation tr;
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_run *run;
+@@ -178,8 +181,17 @@ static void race_sync_regs(void *racer)
+ 
+ 	TEST_ASSERT_EQ(pthread_create(&thread, NULL, racer, (void *)run), 0);
+ 
++	state = vcpu_save_state(vcpu);
++
+ 	for (t = time(NULL) + TIMEOUT; time(NULL) < t;) {
+-		__vcpu_run(vcpu);
++		/*
++		 * Reload known good state if the vCPU triple faults, e.g. due
++		 * to the unhandled #GPs being injected.  VMX preserves state
++		 * on shutdown, but SVM synthesizes an INIT as the VMCB state
++		 * is architecturally undefined on triple fault.
++		 */
++		if (!__vcpu_run(vcpu) && run->exit_reason == KVM_EXIT_SHUTDOWN)
++			vcpu_load_state(vcpu, state);
+ 
+ 		if (racer == race_sregs_cr4) {
+ 			tr = (struct kvm_translation) { .linear_address = 0 };
+@@ -190,6 +202,7 @@ static void race_sync_regs(void *racer)
+ 	TEST_ASSERT_EQ(pthread_cancel(thread), 0);
+ 	TEST_ASSERT_EQ(pthread_join(thread, NULL), 0);
+ 
++	kvm_x86_state_cleanup(state);
+ 	kvm_vm_free(vm);
+ }
+ 
 
-Well fudge.  PPC's KVM_EXIT_OSI actually uses all 256 bytes.  And KVM_EXIT_=
-SYSTEM_EVENT
-is closer to the limit than I'd like.
-
-On the other hand, despite burning 2048 bytes for kvm_sync_regs, all of kvm=
-_run
-is only 2352 bytes, i.e. we have plenty of room in the 4KiB page.  So we co=
-uld
-throw the "speculative" exits in a completely different union.  But that wo=
-uld
-be cumbersome for userspace.
-
-Hrm.  The best option would probably be to have a "nested" or "previous" ex=
-it union,
-and copy the existing exit information to that field prior to filling a new=
- exit
-reason.  But that would require an absolute insane amount of refactoring be=
-cause
-everything just writes the fields directly. *sigh*
-
-I suppose we could copy the information into two places for "speculative" e=
-xits,
-the actual exit union and a separate "speculative" field.  I might be grasp=
-ing at
-straws though, not sure that ugliness would be worth making it slightly eas=
-ier to
-deal with the (A) scenario from earlier.
-
-FWIW, my trick for quick finding the real size is to feed the size+1 into a=
-n alignment.
-Unless you get really unlucky, that alignment will be illegal and the compi=
-ler
-will tell you the size, e.g.=20
-
-arch/x86/kvm/x86.c:13405:9: error: requested alignment =E2=80=982353=E2=80=
-=99 is not a positive power of 2
-13405 |         unsigned int len __aligned(sizeof(*run) + 1);
-      |         ^~~~~~~~
+base-commit: 722b2afc50abbfaa74accbc52911f9b5e8719c95
+-- 
 
