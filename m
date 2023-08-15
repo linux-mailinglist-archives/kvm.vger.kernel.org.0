@@ -2,211 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83CC977C450
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:08:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 430C477C46D
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:31:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233624AbjHOAHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 20:07:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
+        id S233190AbjHOAad (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 20:30:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233588AbjHOAHM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 20:07:12 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAA511D;
-        Mon, 14 Aug 2023 17:07:11 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-686f94328a4so3286431b3a.0;
-        Mon, 14 Aug 2023 17:07:11 -0700 (PDT)
+        with ESMTP id S233372AbjHOAaR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 20:30:17 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75CF170B
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:30:12 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-40a47e8e38dso75841cf.1
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692058031; x=1692662831;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UIkO9a2jx/LlcIe91jov+x/hrsKTSsxrVnvfV3qLu+w=;
-        b=GleBOZnWm/4yptsct23xsWjRl4FmSulENc/8ZCpakFczYeyJqmTxIFNMW1tLipddtY
-         eWR5kiIvSgpNkCmhejg+qHKhPhJqcFQhiYlZ8c1mxQkAdYiVj6Bd96HwY5t2hxReaUeq
-         9hoylNEjBCACtDHMQ2osjWF70brtY8F8Hab0e1dtmd53DVLemXgJ8dlDpktyaCQUdJte
-         yNc0jfSq47W1cyst01Atin9BDyXcgPh/QYMdNsStjVW/17kG3N/8zhDk+EHjhlBtyi6l
-         AqyzDOT62NkWBe4R+rL3wACWUDZyZQAcbE4NWGlLNNOH6+SJi5QXHnN820Y3MWpM2IXD
-         ijTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692058031; x=1692662831;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1692059412; x=1692664212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UIkO9a2jx/LlcIe91jov+x/hrsKTSsxrVnvfV3qLu+w=;
-        b=BWVEqzhnponrY4j+9vOQgUf2ujV9jD1WxasM0AqdqgTSClfjE6IAyMSbwvmssCwDIb
-         ebFLunZQG74Mgfi+4DlYJxPS3BtN6khQK6WgCoedaNUQUYPivdI9TzmpCLB7PIEpkScx
-         KUoHCKEMtQDGJ4wZo+rGuCuek83OFv1FBvJhxjRTnij2hJn18kbJQyOWoS+5DSKqaYf7
-         6qYSOeTIkOKbRlsrnyOyM2Rivom+IdpvpcZIpxSZMeUIqxKNV67ptnIReQLdIXWK2Ihz
-         L8C9eevjGl5+B6msC+7ZdWoIgeqJ+1QWuDDJZ5JsQU2CI3/IfJc8AlmrmQwElrMdgRsD
-         ecew==
-X-Gm-Message-State: AOJu0YxCNIVg9BQbR/xHikTqziCpXcv5MSYfu7U1Ae8lRoYwFPNnhMxp
-        tHhOJaORuBQDi1R4kfuI7uA=
-X-Google-Smtp-Source: AGHT+IGU7QGcBGqL3dCBGP1LyC3Q0ee0fldrfLMzjbNXgAKf3o2g6U6D1VZCeDPwZDXUI5Sk5awGOw==
-X-Received: by 2002:a05:6a00:15d0:b0:684:bb4a:b86e with SMTP id o16-20020a056a0015d000b00684bb4ab86emr661716pfu.1.1692058031125;
-        Mon, 14 Aug 2023 17:07:11 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id u10-20020aa7838a000000b00686f0b15b06sm8455293pfm.188.2023.08.14.17.07.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 17:07:10 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 17:07:09 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Jinrong Liang <cloudliang@tencent.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com
-Subject: Re: [PATCH v6 5/6] KVM: selftests: Test if event filter meets
- expectations on fixed counters
-Message-ID: <20230815000709.GF2257301@ls.amr.corp.intel.com>
-References: <20230810090945.16053-1-cloudliang@tencent.com>
- <20230810090945.16053-6-cloudliang@tencent.com>
+        bh=HNJoaJWeIvUddw5R6SlhDX5IJGHqkE8DYyIqOAmI/Gc=;
+        b=hrBCgkV9ENepm7Qd/L9Ml7hZlIoeQhj16UMGpltRqi6oHCi8oSz5hvhGXGINM/YEZQ
+         wdvyY41TaZzIENh8IeS3Hkz0kD24KsMePiRu+v3GpxhZkJsyIBS1V32/Ifsg/atXBYo0
+         QBR0kXwQl3WjYDnAFdt2FaoG2PR3lAigDAwZ4oBSCRF8SSMCX3TfLdnmcZirYiHw6Npc
+         23bYSU00FywmNMSLVQNRFYizkiIQlM1kHCw+nxdzthtTcX+orklRLf57AjFOUzZFol3x
+         GrLKd1PaYNym2YGhRHjRgCpgcv6jAOxX3U4HbhS0U7Z8xcrNPdGrA9xYQA9tWCXJgxDU
+         Xycw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692059412; x=1692664212;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HNJoaJWeIvUddw5R6SlhDX5IJGHqkE8DYyIqOAmI/Gc=;
+        b=deANNoTZmngraXyyn4Q24eYu28rSvGcFuXo7erVMrsPIa0g070eURXlHsmnA6cd9dT
+         mgE6fsxJ8ntpXr00MHBGo2ER5nQ79yaBsyjDJUA3JBUwz6te+0tUd+HftiF7e+qJFMbW
+         nTQh/+1ZIfgFLOcf6xiOb3QkhGfhQmbiy4RLuRm3VUkVqyppOYHOQEwp12WfBK/WByxr
+         ODwgvEVCv+PXbVeC9F3gTuGJRK1dU+n1ny9Tv2P5sLCPeKH0jgH0gem8x7IebF/GmCLL
+         7clJIhr+CWL0cu2z0d7nFs/AZFM8YZP/gQDt/NDOkymsQzZ8piaQsSH3Ja3dZgSbJIjY
+         rl9g==
+X-Gm-Message-State: AOJu0YwIe5L8nOwknqGpzp8n1txJCfkWBYNXPs71pAa5fWJmCu1WEHHp
+        hokg/y2yoD4RCSzGQDGDxu4vxmIOxByHne4m3GXABw==
+X-Google-Smtp-Source: AGHT+IH5y5MbCy4rjhKShz2AECkzIJQAfVMplY8s8RsyVo2A8Q6lT4pFb0RwiAA0GgJLzfktk2kf1TttUxP9ICKRKm4=
+X-Received: by 2002:ac8:5b51:0:b0:40f:d3db:f328 with SMTP id
+ n17-20020ac85b51000000b0040fd3dbf328mr724022qtw.2.1692059411605; Mon, 14 Aug
+ 2023 17:30:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230810090945.16053-6-cloudliang@tencent.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230811045127.3308641-1-rananta@google.com> <ZNq15SZ+53umvOfx@google.com>
+In-Reply-To: <ZNq15SZ+53umvOfx@google.com>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 14 Aug 2023 17:29:59 -0700
+Message-ID: <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com>
+Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Fuad Tabba <tabba@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 05:09:44PM +0800,
-Jinrong Liang <ljr.kernel@gmail.com> wrote:
+On Mon, Aug 14, 2023 at 4:16=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
+> > The series is based off of upstream v6.5-rc1.
+>
+> Lies!  :-)
+>
+> This is based off one of the kvmarm.git topic branches (I didn't bother t=
+o figure
+> out which one), not v6.5-rc1.
+>
+Sorry, what am I missing here? My git log is as follows:
 
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> Add tests to cover that pmu event_filter works as expected when it's
-> applied to fixed performance counters, even if there is none fixed
-> counter exists (e.g. Intel guest pmu version=1 or AMD guest).
-> 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
->  .../kvm/x86_64/pmu_event_filter_test.c        | 80 +++++++++++++++++++
->  1 file changed, 80 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> index 8b8bfee11016..732c76c41bb0 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> @@ -27,6 +27,7 @@
->  #define ARCH_PERFMON_BRANCHES_RETIRED		5
->  
->  #define NUM_BRANCHES 42
-> +#define INTEL_PMC_IDX_FIXED		32
->  
->  /* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
->  #define MAX_FILTER_EVENTS		300
-> @@ -808,6 +809,84 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
->  	TEST_ASSERT(!r, "Masking non-existent fixed counters should be allowed");
->  }
->  
-> +static void intel_run_fixed_counter_guest_code(uint8_t fixed_ctr_idx)
-> +{
-> +	for (;;) {
-> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> +		wrmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx, 0);
-> +
-> +		/* Only OS_EN bit is enabled for fixed counter[idx]. */
-> +		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * fixed_ctr_idx));
-> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL,
-> +		      BIT_ULL(INTEL_PMC_IDX_FIXED + fixed_ctr_idx));
-> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
-> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> +
-> +		GUEST_SYNC(rdmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx));
-> +	}
-> +}
-> +
-> +static uint64_t test_with_fixed_counter_filter(struct kvm_vcpu *vcpu,
-> +					       uint32_t action, uint32_t bitmap)
-> +{
-> +	struct __kvm_pmu_event_filter f = {
-> +		.action = action,
-> +		.fixed_counter_bitmap = bitmap,
-> +	};
-> +	do_vcpu_set_pmu_event_filter(vcpu, &f);
-> +
-> +	return run_vcpu_to_sync(vcpu);
-> +}
-> +
-> +static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
-> +					uint8_t nr_fixed_counters)
-> +{
-> +	unsigned int i;
-> +	uint32_t bitmap;
-> +	uint64_t count;
-> +
-> +	TEST_ASSERT(nr_fixed_counters < sizeof(bitmap) * 8,
-> +		    "Invalid nr_fixed_counters");
-> +
-> +	/*
-> +	 * Check the fixed performance counter can count normally when KVM
-> +	 * userspace doesn't set any pmu filter.
-> +	 */
-> +	count = run_vcpu_to_sync(vcpu);
-> +	TEST_ASSERT(count, "Unexpected count value: %ld\n", count);
-> +
-> +	for (i = 0; i < BIT(nr_fixed_counters); i++) {
-> +		bitmap = BIT(i);
-> +		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_ALLOW,
-> +						       bitmap);
-> +		TEST_ASSERT_EQ(!!count, !!(bitmap & BIT(idx)));
-> +
-> +		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_DENY,
-> +						       bitmap);
-> +		TEST_ASSERT_EQ(!!count, !(bitmap & BIT(idx)));
-> +	}
-> +}
-> +
-> +static void test_fixed_counter_bitmap(void)
-> +{
-> +	uint8_t nr_fixed_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
-> +	struct kvm_vm *vm;
-> +	struct kvm_vcpu *vcpu;
-> +	uint8_t idx;
-> +
-> +	/*
-> +	 * Check that pmu_event_filter works as expected when it's applied to
-> +	 * fixed performance counters.
-> +	 */
-> +	for (idx = 0; idx < nr_fixed_counters; idx++) {
-> +		vm = vm_create_with_one_vcpu(&vcpu,
-> +					     intel_run_fixed_counter_guest_code);
-> +		vcpu_args_set(vcpu, 1, idx);
-> +		__test_fixed_counter_bitmap(vcpu, idx, nr_fixed_counters);
-> +		kvm_vm_free(vm);
-> +	}
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->  	void (*guest_code)(void);
-> @@ -851,6 +930,7 @@ int main(int argc, char *argv[])
->  	kvm_vm_free(vm);
->  
->  	test_pmu_config_disable(guest_code);
-> +	test_fixed_counter_bitmap();
->  
->  	return 0;
->  }
-> -- 
-> 2.39.3
-> 
+$ git log --oneline upstream_tlbi_range_v9
+5025857507abe (upstream_tlbi_range_v9) KVM: arm64: Use TLBI
+range-based instructions for unmap
+5c0291b99a8fc KVM: arm64: Invalidate the table entries upon a range
+8c46b54d4aaec KVM: arm64: Flush only the memslot after write-protect
+231abaeb7ffc2 KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+5ec291b863309 KVM: arm64: Define kvm_tlb_flush_vmid_range()
+5bcd7a085c34e KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
+ea08f9dff7e5b arm64: tlb: Implement __flush_s2_tlb_range_op()
+b3178687947c9 arm64: tlb: Refactor the core flush algorithm of __flush_tlb_=
+range
+a4850fa988eef KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
+306dc4e6afd37 KVM: Allow range-based TLB invalidation from common code
+d02785a0a1e01 KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+136fa2d254537 KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+e35c68a75170d KVM: Declare kvm_arch_flush_remote_tlbs() globally
+5d592777b9bba KVM: Rename kvm_arch_flush_remote_tlb() to
+kvm_arch_flush_remote_tlbs()
+06c2afb862f9d (tag: v6.5-rc1, tag: linux/v6.5-rc1) Linux 6.5-rc1
+c192ac7357683 MAINTAINERS 2: Electric Boogaloo
+f71f64210d698 Merge tag 'dma-mapping-6.5-2023-07-09' of
+git://git.infradead.org/users/hch/dma-mapping
+...
 
-Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Isn't the commit, 06c2afb862f9d (06c2afb862f9d (tag: v6.5-rc1, tag:
+linux/v6.5-rc1) Linux 6.5-rc1) the 'base' commit?
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Thank you.
+Raghavendra
+
+> Please try to incorporate git format-patch's "--base" option into your wo=
+rkflow,
+> e.g. I do "git format-patch --base=3DHEAD~$nr" where $nr is the number of=
+ patches
+> I am posting.
+>
+> It's not foolproof, e.g. my approach doesn't help if I have a local patch=
+ that
+> I'm not posting, but 99% of the time it Just Works and eliminates any amb=
+uitity.
+>
+> You can also do "--base=3Dauto", but that only does the right thing if yo=
+ur series
+> has its upstream branch set to the base/tree that you want your patches a=
+pplied
+> to (I use the upstream branch for a completely different purpose for my d=
+ev branches).
