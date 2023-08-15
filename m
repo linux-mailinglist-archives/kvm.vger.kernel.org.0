@@ -2,147 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 430C477C46D
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46D5C77C471
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:31:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233190AbjHOAad (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 20:30:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
+        id S233023AbjHOAbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 20:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233372AbjHOAaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 20:30:17 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75CF170B
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:30:12 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-40a47e8e38dso75841cf.1
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:30:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692059412; x=1692664212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HNJoaJWeIvUddw5R6SlhDX5IJGHqkE8DYyIqOAmI/Gc=;
-        b=hrBCgkV9ENepm7Qd/L9Ml7hZlIoeQhj16UMGpltRqi6oHCi8oSz5hvhGXGINM/YEZQ
-         wdvyY41TaZzIENh8IeS3Hkz0kD24KsMePiRu+v3GpxhZkJsyIBS1V32/Ifsg/atXBYo0
-         QBR0kXwQl3WjYDnAFdt2FaoG2PR3lAigDAwZ4oBSCRF8SSMCX3TfLdnmcZirYiHw6Npc
-         23bYSU00FywmNMSLVQNRFYizkiIQlM1kHCw+nxdzthtTcX+orklRLf57AjFOUzZFol3x
-         GrLKd1PaYNym2YGhRHjRgCpgcv6jAOxX3U4HbhS0U7Z8xcrNPdGrA9xYQA9tWCXJgxDU
-         Xycw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692059412; x=1692664212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HNJoaJWeIvUddw5R6SlhDX5IJGHqkE8DYyIqOAmI/Gc=;
-        b=deANNoTZmngraXyyn4Q24eYu28rSvGcFuXo7erVMrsPIa0g070eURXlHsmnA6cd9dT
-         mgE6fsxJ8ntpXr00MHBGo2ER5nQ79yaBsyjDJUA3JBUwz6te+0tUd+HftiF7e+qJFMbW
-         nTQh/+1ZIfgFLOcf6xiOb3QkhGfhQmbiy4RLuRm3VUkVqyppOYHOQEwp12WfBK/WByxr
-         ODwgvEVCv+PXbVeC9F3gTuGJRK1dU+n1ny9Tv2P5sLCPeKH0jgH0gem8x7IebF/GmCLL
-         7clJIhr+CWL0cu2z0d7nFs/AZFM8YZP/gQDt/NDOkymsQzZ8piaQsSH3Ja3dZgSbJIjY
-         rl9g==
-X-Gm-Message-State: AOJu0YwIe5L8nOwknqGpzp8n1txJCfkWBYNXPs71pAa5fWJmCu1WEHHp
-        hokg/y2yoD4RCSzGQDGDxu4vxmIOxByHne4m3GXABw==
-X-Google-Smtp-Source: AGHT+IH5y5MbCy4rjhKShz2AECkzIJQAfVMplY8s8RsyVo2A8Q6lT4pFb0RwiAA0GgJLzfktk2kf1TttUxP9ICKRKm4=
-X-Received: by 2002:ac8:5b51:0:b0:40f:d3db:f328 with SMTP id
- n17-20020ac85b51000000b0040fd3dbf328mr724022qtw.2.1692059411605; Mon, 14 Aug
- 2023 17:30:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com> <ZNq15SZ+53umvOfx@google.com>
-In-Reply-To: <ZNq15SZ+53umvOfx@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 14 Aug 2023 17:29:59 -0700
-Message-ID: <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com>
-Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
+        with ESMTP id S233670AbjHOAa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 20:30:57 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E6710E3
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:30:56 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 686E184;
+        Mon, 14 Aug 2023 17:30:56 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id EIdT79S7Kxa0; Mon, 14 Aug 2023 17:30:55 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 5104E45;
+        Mon, 14 Aug 2023 17:30:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 5104E45
+Date:   Mon, 14 Aug 2023 17:30:55 -0700 (PDT)
+From:   Eric Wheeler <kvm@lists.ewheeler.net>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
         kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Subject: Re: Deadlock due to EPT_VIOLATION
+In-Reply-To: <ZNJ2V2vRXckMwPX2@google.com>
+Message-ID: <c412929a-14ae-2e1-480-418c8d91368a@ewheeler.net>
+References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com> <ZLrCUkwot/yiVC8T@google.com> <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com> <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
+ <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com> <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com> <ZNJ2V2vRXckMwPX2@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14, 2023 at 4:16=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> > The series is based off of upstream v6.5-rc1.
->
-> Lies!  :-)
->
-> This is based off one of the kvmarm.git topic branches (I didn't bother t=
-o figure
-> out which one), not v6.5-rc1.
->
-Sorry, what am I missing here? My git log is as follows:
+On Tue, 8 Aug 2023, Sean Christopherson wrote:
+> > If you have any suggestions on how modifying the host kernel (and then migrating
+> > a locked up guest to it) or eBPF programs that might help illuminate the issue
+> > further, let me know!
+> > 
+> > Thanks for all your help so far!
+> 
+> Since it sounds like you can test with a custom kernel, try running with this
+> patch and then enable the kvm_page_fault tracepoint when a vCPU gets stuck.  The
+> below expands said tracepoint to capture information about mmu_notifiers and
+> memslots generation.  With luck, it will reveal a smoking gun.
 
-$ git log --oneline upstream_tlbi_range_v9
-5025857507abe (upstream_tlbi_range_v9) KVM: arm64: Use TLBI
-range-based instructions for unmap
-5c0291b99a8fc KVM: arm64: Invalidate the table entries upon a range
-8c46b54d4aaec KVM: arm64: Flush only the memslot after write-protect
-231abaeb7ffc2 KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-5ec291b863309 KVM: arm64: Define kvm_tlb_flush_vmid_range()
-5bcd7a085c34e KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
-ea08f9dff7e5b arm64: tlb: Implement __flush_s2_tlb_range_op()
-b3178687947c9 arm64: tlb: Refactor the core flush algorithm of __flush_tlb_=
-range
-a4850fa988eef KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
-306dc4e6afd37 KVM: Allow range-based TLB invalidation from common code
-d02785a0a1e01 KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-136fa2d254537 KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-e35c68a75170d KVM: Declare kvm_arch_flush_remote_tlbs() globally
-5d592777b9bba KVM: Rename kvm_arch_flush_remote_tlb() to
-kvm_arch_flush_remote_tlbs()
-06c2afb862f9d (tag: v6.5-rc1, tag: linux/v6.5-rc1) Linux 6.5-rc1
-c192ac7357683 MAINTAINERS 2: Electric Boogaloo
-f71f64210d698 Merge tag 'dma-mapping-6.5-2023-07-09' of
-git://git.infradead.org/users/hch/dma-mapping
-...
+Getting this patch into production systems is challenging, perhaps live
+patching is an option:
 
-Isn't the commit, 06c2afb862f9d (06c2afb862f9d (tag: v6.5-rc1, tag:
-linux/v6.5-rc1) Linux 6.5-rc1) the 'base' commit?
 
-Thank you.
-Raghavendra
+Questions:
 
-> Please try to incorporate git format-patch's "--base" option into your wo=
-rkflow,
-> e.g. I do "git format-patch --base=3DHEAD~$nr" where $nr is the number of=
- patches
-> I am posting.
->
-> It's not foolproof, e.g. my approach doesn't help if I have a local patch=
- that
-> I'm not posting, but 99% of the time it Just Works and eliminates any amb=
-uitity.
->
-> You can also do "--base=3Dauto", but that only does the right thing if yo=
-ur series
-> has its upstream branch set to the base/tree that you want your patches a=
-pplied
-> to (I use the upstream branch for a completely different purpose for my d=
-ev branches).
+1. Do you know if this would be safe to insert as a live kernel patch?
+For example, does adding to TRACE_EVENT modify a struct (which is not
+live-patch-safe) or is it something that should plug in with simple
+function redirection?
+	
+
+2. Before we try it, do you know off the top of your head if the patch
+below relies on any code that Linux v6.1 would not have?
+
+
+--
+Eric Wheeler
+
+
+
+> 
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 10 ----------
+>  arch/x86/kvm/mmu/mmu_internal.h |  2 ++
+>  arch/x86/kvm/mmu/tdp_mmu.h      | 10 ++++++++++
+>  arch/x86/kvm/trace.h            | 28 ++++++++++++++++++++++++++--
+>  4 files changed, 38 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 9e4cd8b4a202..122bfc884293 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2006,16 +2006,6 @@ static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
+>  	return true;
+>  }
+>  
+> -static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> -{
+> -	if (sp->role.invalid)
+> -		return true;
+> -
+> -	/* TDP MMU pages do not use the MMU generation. */
+> -	return !is_tdp_mmu_page(sp) &&
+> -	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
+> -}
+> -
+>  struct mmu_page_path {
+>  	struct kvm_mmu_page *parent[PT64_ROOT_MAX_LEVEL];
+>  	unsigned int idx[PT64_ROOT_MAX_LEVEL];
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index f1ef670058e5..cf7ba0abaa8f 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -6,6 +6,8 @@
+>  #include <linux/kvm_host.h>
+>  #include <asm/kvm_host.h>
+>  
+> +#include "mmu.h"
+> +
+>  #ifdef CONFIG_KVM_PROVE_MMU
+>  #define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
+>  #else
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index 0a63b1afabd3..a0d7c8acf78f 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -76,4 +76,14 @@ static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return sp->tdp_mmu
+>  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
+>  #endif
+>  
+> +static inline bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> +{
+> +	if (sp->role.invalid)
+> +		return true;
+> +
+> +	/* TDP MMU pages do not use the MMU generation. */
+> +	return !is_tdp_mmu_page(sp) &&
+> +	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
+> +}
+> +
+>  #endif /* __KVM_X86_MMU_TDP_MMU_H */
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 83843379813e..ff4a384ab03a 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -8,6 +8,8 @@
+>  #include <asm/clocksource.h>
+>  #include <asm/pvclock-abi.h>
+>  
+> +#include "mmu/tdp_mmu.h"
+> +
+>  #undef TRACE_SYSTEM
+>  #define TRACE_SYSTEM kvm
+>  
+> @@ -405,6 +407,13 @@ TRACE_EVENT(kvm_page_fault,
+>  		__field(	unsigned long,	guest_rip	)
+>  		__field(	u64,		fault_address	)
+>  		__field(	u64,		error_code	)
+> +		__field(	unsigned long,  mmu_invalidate_seq)
+> +		__field(	long,  mmu_invalidate_in_progress)
+> +		__field(	unsigned long,  mmu_invalidate_range_start)
+> +		__field(	unsigned long,  mmu_invalidate_range_end)
+> +		__field(	bool,		root_is_valid)
+> +		__field(	bool,		root_has_sp)
+> +		__field(	bool,		root_is_obsolete)
+>  	),
+>  
+>  	TP_fast_assign(
+> @@ -412,11 +421,26 @@ TRACE_EVENT(kvm_page_fault,
+>  		__entry->guest_rip	= kvm_rip_read(vcpu);
+>  		__entry->fault_address	= fault_address;
+>  		__entry->error_code	= error_code;
+> +		__entry->mmu_invalidate_seq		= vcpu->kvm->mmu_invalidate_seq;
+> +		__entry->mmu_invalidate_in_progress	= vcpu->kvm->mmu_invalidate_in_progress;
+> +		__entry->mmu_invalidate_range_start	= vcpu->kvm->mmu_invalidate_range_start;
+> +		__entry->mmu_invalidate_range_end	= vcpu->kvm->mmu_invalidate_range_end;
+> +		__entry->root_is_valid			= VALID_PAGE(vcpu->arch.mmu->root.hpa);
+> +		__entry->root_has_sp			= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
+> +							  to_shadow_page(vcpu->arch.mmu->root.hpa);
+> +		__entry->root_is_obsolete		= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
+> +							  to_shadow_page(vcpu->arch.mmu->root.hpa) &&
+> +							  is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root.hpa));
+>  	),
+>  
+> -	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx",
+> +	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx, seq = 0x%lx, in_prog = 0x%lx, start = 0x%lx, end = 0x%lx, root = %s",
+>  		  __entry->vcpu_id, __entry->guest_rip,
+> -		  __entry->fault_address, __entry->error_code)
+> +		  __entry->fault_address, __entry->error_code,
+> +		  __entry->mmu_invalidate_seq, __entry->mmu_invalidate_in_progress,
+> +		  __entry->mmu_invalidate_range_start, __entry->mmu_invalidate_range_end,
+> +		  !__entry->root_is_valid ? "invalid" :
+> +		  !__entry->root_has_sp ? "no shadow page" :
+> +		  __entry->root_is_obsolete ? "obsolete" : "fresh")
+>  );
+>  
+>  /*
+> 
+> base-commit: 240f736891887939571854bd6d734b6c9291f22e
+> -- 
+> 
+> 
