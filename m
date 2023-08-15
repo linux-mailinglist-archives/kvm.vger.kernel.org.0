@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D83BE77D20A
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98F7777D206
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:40:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239241AbjHOSjr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 14:39:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44862 "EHLO
+        id S239207AbjHOSjo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 14:39:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239253AbjHOSjW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S239250AbjHOSjW (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 15 Aug 2023 14:39:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3AED1BEE
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2E681BEC
         for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:39:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 632DD65F07
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E16E65F06
         for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABD2EC433CD;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9AB1C433CC;
         Tue, 15 Aug 2023 18:39:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1692124757;
-        bh=xu2YUU/jhCrfFKtk8h109BurYyIVdb/eaTfJtVK+xwA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ZAwEoAqVZH1zbVRFL/o1HlhmOTHOll88NEnfZL1cMoHDvQ+wevxObeEqAuv/lr6sQ
-         mc+OK6idQz9wtor4EyOva8wwzE4NLMYbZs035yolC0rtFz+eYBZLfTQ7qnxJBz7NZj
-         zOYe4KW/BQqp9FuG0dY/agsPVL97nxsi3Pdlne/XTEJ4/yNFF+qMcSAbrN5ujsVsOq
-         5V1N22CFM+S4AnyqQoOphWkzuQ465jdOYu7wGzKkpEeRp89Aj0GnWihQVDcgDzoQLs
-         Z5/ks2ZQjGJwPzC11p15mkWUVju2QUm7BylYe9OkQ/Dl3aiLY0pxwBfe8UqJdeRxb0
-         h7s/CjBn7wD8A==
+        bh=f8G4gBvZrescwweQMKJS3/9ifLPSvT1DsxeWiW/U9N0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=PPW7ic+zxr0dXXvCbummaTf/f7PVt64bzpJc3qno0RJxfUuGQdrCIlPz295t6LA32
+         C0GlC1zNpIzNCuzshCAopMkcbx0066Lvy7UtOH5mbJs/9omv08t6YmQehlCzrVaQJo
+         ToqTSP1rf74/XpP60Djzjo2PnwSLU8LxYgFguXWynJp15rNockh03aSrGObHCBuLXd
+         neLM29G2pVuwhub0l1Uy938SPZfGolCVJtBA+mIsx3+5T5r3x2UgaeL0QMIq1Npe8I
+         uqbsS6dcuxjZfi7TmYbAT5xKBTPueyEUpiw9zRCKx0ZwVLliurLgGsABLXk9sHP0pG
+         +Y7WDz6FiCmDQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVywk-0055Sd-Cb;
+        id 1qVywl-0055Sd-E7;
         Tue, 15 Aug 2023 19:39:15 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -57,18 +57,20 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 00/28] KVM: arm64: NV trap forwarding infrastructure
-Date:   Tue, 15 Aug 2023 19:38:34 +0100
-Message-Id: <20230815183903.2735724-1-maz@kernel.org>
+Subject: [PATCH v4 01/28] arm64: Add missing VA CMO encodings
+Date:   Tue, 15 Aug 2023 19:38:35 +0100
+Message-Id: <20230815183903.2735724-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
+References: <20230815183903.2735724-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, jingzhangos@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,111 +78,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Another week, another version. Change log below.
+Add the missing VA-based CMOs encodings.
 
-I'll drop this into -next now, and see what happens.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Jing Zhang <jingzhangos@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/sysreg.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-* From v3 [3]:
-
-  - Renamed trap_group to cgt_group_id (Eric)
-
-  - Plenty of comment rework (Eric)
-
-  - Fix HCR_EL2.FIEN handling (Miguel)
-
-  - Fix missing validation of last MCB entry (Miguel)
-
-  - Fix instance of recursive MCB (Jing)
-
-  - Handle error return from xa_store()/xa_range_store() (Jing)
-
-  - Propagate error generated from populate_nv_trap_config() (Jing)
-
-  - Added more consistency checks for sysregs and trap bits
-
-  - Added a line number entry, which is useful for debugging
-    overlapping entries.
-
-  - Fixed duplicate entries for SP_EL1, DBGDTRRX_EL0 and SCXTNUM_EL0
-
-  - Correctly handle fine grained trapping for ERET
-
-  - Collected RBs, with thanks
-
-* From v2 [2]:
-
-  - Another set up fixups thanks to Oliver, Eric and Miguel: TRCID
-    bits, duplicate encodings, sanity checking, error handling at boot
-    time, spelling mistakes...
-
-  - Split the HFGxTR_EL2 patch in two patches: one that provides the
-    FGT infrastructure, and one that provides the HFGxTR_EL2 traps. It
-    makes it easier to review and matches the rest of the series.
-
-  - Collected RBs, with thanks
-
-* From v1 [1]:
-
-  - Lots of fixups all over the map (too many to mention) after Eric's
-    fantastic reviewing effort. Hopefully the result is easier to
-    understand and less wrong
-
-  - Amended Mark's patch to use the ARM64_CPUID_FIELDS() macro
-
-  - Collected RBs, with thanks.
-
-[1] https://lore.kernel.org/all/20230712145810.3864793-1-maz@kernel.org
-[2] https://lore.kernel.org/all/20230728082952.959212-1-maz@kernel.org
-[3] https://lore.kernel.org/all/20230808114711.2013842-1-maz@kernel.org
-
-Marc Zyngier (27):
-  arm64: Add missing VA CMO encodings
-  arm64: Add missing ERX*_EL1 encodings
-  arm64: Add missing DC ZVA/GVA/GZVA encodings
-  arm64: Add TLBI operation encodings
-  arm64: Add AT operation encodings
-  arm64: Add debug registers affected by HDFGxTR_EL2
-  arm64: Add missing BRB/CFP/DVP/CPP instructions
-  arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
-  KVM: arm64: Correctly handle ACCDATA_EL1 traps
-  KVM: arm64: Add missing HCR_EL2 trap bits
-  KVM: arm64: nv: Add FGT registers
-  KVM: arm64: Restructure FGT register switching
-  KVM: arm64: nv: Add trap forwarding infrastructure
-  KVM: arm64: nv: Add trap forwarding for HCR_EL2
-  KVM: arm64: nv: Expose FEAT_EVT to nested guests
-  KVM: arm64: nv: Add trap forwarding for MDCR_EL2
-  KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
-  KVM: arm64: nv: Add fine grained trap forwarding infrastructure
-  KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
-  KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
-  KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
-  KVM: arm64: nv: Add SVC trap forwarding
-  KVM: arm64: nv: Expand ERET trap forwarding to handle FGT
-  KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
-  KVM: arm64: nv: Expose FGT to nested guests
-  KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
-  KVM: arm64: nv: Add support for HCRX_EL2
-
-Mark Brown (1):
-  arm64: Add feature detection for fine grained traps
-
- arch/arm64/include/asm/kvm_arm.h        |   50 +
- arch/arm64/include/asm/kvm_host.h       |    7 +
- arch/arm64/include/asm/kvm_nested.h     |    2 +
- arch/arm64/include/asm/sysreg.h         |  268 +++-
- arch/arm64/kernel/cpufeature.c          |    7 +
- arch/arm64/kvm/arm.c                    |    4 +
- arch/arm64/kvm/emulate-nested.c         | 1850 +++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c            |   29 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  127 +-
- arch/arm64/kvm/nested.c                 |   11 +-
- arch/arm64/kvm/sys_regs.c               |   15 +
- arch/arm64/kvm/trace_arm.h              |   26 +
- arch/arm64/tools/cpucaps                |    1 +
- arch/arm64/tools/sysreg                 |  129 ++
- 14 files changed, 2485 insertions(+), 41 deletions(-)
-
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index b481935e9314..85447e68951a 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -124,6 +124,32 @@
+ #define SYS_DC_CIGSW			sys_insn(1, 0, 7, 14, 4)
+ #define SYS_DC_CIGDSW			sys_insn(1, 0, 7, 14, 6)
+ 
++#define SYS_IC_IALLUIS			sys_insn(1, 0, 7, 1, 0)
++#define SYS_IC_IALLU			sys_insn(1, 0, 7, 5, 0)
++#define SYS_IC_IVAU			sys_insn(1, 3, 7, 5, 1)
++
++#define SYS_DC_IVAC			sys_insn(1, 0, 7, 6, 1)
++#define SYS_DC_IGVAC			sys_insn(1, 0, 7, 6, 3)
++#define SYS_DC_IGDVAC			sys_insn(1, 0, 7, 6, 5)
++
++#define SYS_DC_CVAC			sys_insn(1, 3, 7, 10, 1)
++#define SYS_DC_CGVAC			sys_insn(1, 3, 7, 10, 3)
++#define SYS_DC_CGDVAC			sys_insn(1, 3, 7, 10, 5)
++
++#define SYS_DC_CVAU			sys_insn(1, 3, 7, 11, 1)
++
++#define SYS_DC_CVAP			sys_insn(1, 3, 7, 12, 1)
++#define SYS_DC_CGVAP			sys_insn(1, 3, 7, 12, 3)
++#define SYS_DC_CGDVAP			sys_insn(1, 3, 7, 12, 5)
++
++#define SYS_DC_CVADP			sys_insn(1, 3, 7, 13, 1)
++#define SYS_DC_CGVADP			sys_insn(1, 3, 7, 13, 3)
++#define SYS_DC_CGDVADP			sys_insn(1, 3, 7, 13, 5)
++
++#define SYS_DC_CIVAC			sys_insn(1, 3, 7, 14, 1)
++#define SYS_DC_CIGVAC			sys_insn(1, 3, 7, 14, 3)
++#define SYS_DC_CIGDVAC			sys_insn(1, 3, 7, 14, 5)
++
+ /*
+  * Automatically generated definitions for system registers, the
+  * manual encodings below are in the process of being converted to
 -- 
 2.34.1
 
