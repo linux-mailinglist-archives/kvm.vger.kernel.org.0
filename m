@@ -2,48 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F0AE77C978
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 10:37:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00C8B77C997
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 10:46:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235710AbjHOIhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 04:37:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50364 "EHLO
+        id S235731AbjHOIpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 04:45:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235691AbjHOIhN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 04:37:13 -0400
-Received: from out-48.mta0.migadu.com (out-48.mta0.migadu.com [IPv6:2001:41d0:1004:224b::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A88138
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 01:37:08 -0700 (PDT)
+        with ESMTP id S235719AbjHOIpP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 04:45:15 -0400
+Received: from out-11.mta1.migadu.com (out-11.mta1.migadu.com [IPv6:2001:41d0:203:375::b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7659510E3
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 01:45:09 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1692088626;
+        t=1692089107;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uBmn5bY96EnmwKJFlv+WltFrhGvpjIbZEKIiYirKvRY=;
-        b=vz0KHcPQmyiJWfmlN0KqRtShPV8OO94S7Ve+8NAyKaJzlfD3l3Gwdcs50vzwkyJwFeNk42
-        wWmdUe83i5yu+zc+P73iwMyGZC6f36VMufdeZyZpMS2xcjecgpOeJWBucmjek3/RmzHbqM
-        Esg+z/IvqlGN9dYsqiRnMi0+1ICkj/k=
+        bh=d2GQT27JBORMGN4q7RKbUYlAoigLeQM193KWTjK1+1c=;
+        b=FRL/ltyDk6h6CRg5cbkY9bVyLglBaTn6TN1AqP0hvLYmbCo7IPQK7K10OejYDI/exkfKch
+        6u6X9SpuAcMC1xJitcw9cZ/1rhmfJ5U48AMYSFpK2Bsy4fCi0AC+IGqXx9ZTbYi9bkVata
+        zUMcVl/PuRM8qvEN8trILpirtVGTVQA=
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 01/48] mm: move some shrinker-related function
- declarations to mm/internal.h
+Subject: Re: [PATCH v4 02/48] mm: vmscan: move shrinker-related code into a
+ separate file
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <20230807110936.21819-2-zhengqi.arch@bytedance.com>
-Date:   Tue, 15 Aug 2023 16:36:31 +0800
+In-Reply-To: <20230807110936.21819-3-zhengqi.arch@bytedance.com>
+Date:   Tue, 15 Aug 2023 16:44:21 +0800
 Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
         Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
         Christian Brauner <brauner@kernel.org>,
         "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        yujie.liu@intel.com, Greg KH <gregkh@linuxfoundation.org>,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
         simon.horman@corigine.com, dlemoal@kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
         kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-erofs@lists.ozlabs.org,
         linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
@@ -55,16 +53,15 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
         virtualization@lists.linux-foundation.org,
         linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FC3AE898-443D-4ACB-BCB4-0F8F2F48CDD0@linux.dev>
+Content-Transfer-Encoding: 7bit
+Message-Id: <BEE5622B-8E74-405C-9A5B-0CF410F8344E@linux.dev>
 References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-2-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-3-zhengqi.arch@bytedance.com>
 To:     Qi Zheng <zhengqi.arch@bytedance.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -74,59 +71,11 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 > On Aug 7, 2023, at 19:08, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
->=20
-> The following functions are only used inside the mm subsystem, so it's
-> better to move their declarations to the mm/internal.h file.
->=20
-> 1. shrinker_debugfs_add()
-> 2. shrinker_debugfs_detach()
-> 3. shrinker_debugfs_remove()
->=20
+> 
+> The mm/vmscan.c file is too large, so separate the shrinker-related
+> code from it into a separate file. No functional changes.
+> 
 > Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
 
 Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-
-One nit bellow.
-
-[...]
-
-> +
-> +/*
-> + * shrinker related functions
-> + */
-
-This is a multi-comment format. "/* shrinker related functions. */" is
-the right one-line format of comment.
-
-> +
-> +#ifdef CONFIG_SHRINKER_DEBUG
-> +extern int shrinker_debugfs_add(struct shrinker *shrinker);
-> +extern struct dentry *shrinker_debugfs_detach(struct shrinker =
-*shrinker,
-> +      int *debugfs_id);
-> +extern void shrinker_debugfs_remove(struct dentry *debugfs_entry,
-> +    int debugfs_id);
-> +#else /* CONFIG_SHRINKER_DEBUG */
-> +static inline int shrinker_debugfs_add(struct shrinker *shrinker)
-> +{
-> +	return 0;
-> +}
-> +static inline struct dentry *shrinker_debugfs_detach(struct shrinker =
-*shrinker,
-> +     int *debugfs_id)
-> +{
-> +	*debugfs_id =3D -1;
-> +	return NULL;
-> +}
-> +static inline void shrinker_debugfs_remove(struct dentry =
-*debugfs_entry,
-> +	int debugfs_id)
-> +{
-> +}
-> +#endif /* CONFIG_SHRINKER_DEBUG */
-> +
-> #endif /* __MM_INTERNAL_H */
-> --=20
-> 2.30.2
->=20
 
