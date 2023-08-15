@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAA9B77CB37
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 12:39:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFAA477CB38
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 12:40:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236480AbjHOKjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 06:39:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40082 "EHLO
+        id S236484AbjHOKjy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 06:39:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236390AbjHOKjM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 06:39:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F12BB
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 03:39:10 -0700 (PDT)
+        with ESMTP id S236390AbjHOKj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 06:39:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F4CBB
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 03:39:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E23CD65179
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:39:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BAFC433C7;
-        Tue, 15 Aug 2023 10:39:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1345065179
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:39:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26BFBC433C7;
+        Tue, 15 Aug 2023 10:39:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692095949;
-        bh=Gf3HzodU8tLo1mIQprRqSUpWxSeTthPjIQL+JBRkSzg=;
+        s=k20201202; t=1692095964;
+        bh=lGpBpkDsEOQPJi3Zi+iXLacaZpWdyRJMMIhqGUJ9v14=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=hPCNwAeaVLW55YAcAFZ6+axIhPjbwlZxgobxFTMyN6do7wyATvRVdDZuoxfTbdcij
-         U/5GDxxMdWjCFa6T+IBkaT0zyqGkjMFHoYdx/cPzey6gDfwz0v1nRRmHLAVIyl5swC
-         plgYvB82cBSsn61TQPFrFQ+QjT1QikhnnF86x07dphFUajWXhrhu6+bUJlLxIxZwD6
-         BXjwyXV22XtL0KI5gFQ2nStq0vWGZrJbI6gAZErAOZR90+W7ObllkTUYaP+jbFPcoI
-         XnNh+Th+gQj0ut3NMKW33E2nZP+erVTkLbiXZ/5MC+ub9PBr7FEz4STq3zQYuVmONH
-         mcu+hGb5ydF8w==
+        b=g2PHew2j/hTikazRhsHToe3V7GbmJ7igUZipRM0xidxig7apE3lhleU2xsmal5QUG
+         aU46Nl0Dp2+oT0C1Uo20rS6apC5cZo0CdWS0tIxZdnkjyp7hMpk40UIk5XZR1rpRKD
+         Ldln1Nm+VcVs1biv/e50jnI+nu4ND3VrBnhOzaNf5YZpwVT7uDyMyzLAVJKEPAZQCa
+         fGHSLcOZ9XwCZs0/GOnqJtREeLBoL5DR0MWEh5tqMJfAygXhRVh8nQs5Iu97h70iAc
+         Y4lRyDrVwPwV860x1bmLn79IJKtobFh5sh7tc8oxn8B3+kv47H5Itw2cCIuvj7SvKm
+         uzMwNeyJ9HVsg==
 Received: from host213-123-75-60.in-addr.btopenworld.com ([213.123.75.60] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVrS5-004ycj-VF;
-        Tue, 15 Aug 2023 11:39:07 +0100
-Date:   Tue, 15 Aug 2023 11:39:18 +0100
-Message-ID: <87h6p0pp2h.wl-maz@kernel.org>
+        id 1qVrSM-004ydV-37;
+        Tue, 15 Aug 2023 11:39:22 +0100
+Date:   Tue, 15 Aug 2023 11:39:34 +0100
+Message-ID: <87fs4kpp21.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jing Zhang <jingzhangos@google.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -59,11 +59,11 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 01/27] arm64: Add missing VA CMO encodings
-In-Reply-To: <CAAdAUtjaj7wCn6VG7KxGqmT_e+nth_LK00+4E2SfF=5dFpmbSA@mail.gmail.com>
+Subject: Re: [PATCH v3 19/27] KVM: arm64: nv: Add fine grained trap forwarding infrastructure
+In-Reply-To: <CAAdAUtiaewy_xAnS2gm-6YhOq=ednvj0_VO=Ld4+UY+9E5BF8w@mail.gmail.com>
 References: <20230808114711.2013842-1-maz@kernel.org>
-        <20230808114711.2013842-2-maz@kernel.org>
-        <CAAdAUtjaj7wCn6VG7KxGqmT_e+nth_LK00+4E2SfF=5dFpmbSA@mail.gmail.com>
+        <20230808114711.2013842-20-maz@kernel.org>
+        <CAAdAUtiaewy_xAnS2gm-6YhOq=ednvj0_VO=Ld4+UY+9E5BF8w@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,17 +74,16 @@ X-SA-Exim-Connect-IP: 213.123.75.60
 X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Aug 2023 04:14:51 +0100,
+On Mon, 14 Aug 2023 18:18:57 +0100,
 Jing Zhang <jingzhangos@google.com> wrote:
 >=20
 > Hi Marc,
@@ -92,62 +91,157 @@ Jing Zhang <jingzhangos@google.com> wrote:
 > On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
 e:
 > >
-> > Add the missing VA-based CMOs encodings.
+> > Fine Grained Traps are fun. Not.
+> >
+> > Implement the fine grained trap forwarding, reusing the Coarse Grained
+> > Traps infrastructure previously implemented.
+> >
+> > Each sysreg/instruction inserted in the xarray gets a FGT group
+> > (vaguely equivalent to a register number), a bit number in that registe=
+r,
+> > and a polarity.
+> >
+> > It is then pretty easy to check the FGT state at handling time, just
+> > like we do for the coarse version (it is just faster).
 > >
 > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 > > ---
-> >  arch/arm64/include/asm/sysreg.h | 26 ++++++++++++++++++++++++++
-> >  1 file changed, 26 insertions(+)
+> >  arch/arm64/kvm/emulate-nested.c | 78 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 77 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/s=
-ysreg.h
-> > index b481935e9314..85447e68951a 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -124,6 +124,32 @@
-> >  #define SYS_DC_CIGSW                   sys_insn(1, 0, 7, 14, 4)
-> >  #define SYS_DC_CIGDSW                  sys_insn(1, 0, 7, 14, 6)
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-n=
+ested.c
+> > index cd0544c3577e..af75c2775638 100644
+> > --- a/arch/arm64/kvm/emulate-nested.c
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -928,6 +928,27 @@ static const struct encoding_to_trap_config encodi=
+ng_to_cgt[] __initconst =3D {
 > >
-> > +#define SYS_IC_IALLUIS                 sys_insn(1, 0, 7, 1, 0)
-> > +#define SYS_IC_IALLU                   sys_insn(1, 0, 7, 5, 0)
-> > +#define SYS_IC_IVAU                    sys_insn(1, 3, 7, 5, 1)
+> >  static DEFINE_XARRAY(sr_forward_xa);
+> >
+> > +enum fgt_group_id {
+> > +       __NO_FGT_GROUP__,
 > > +
-> > +#define SYS_DC_IVAC                    sys_insn(1, 0, 7, 6, 1)
-> > +#define SYS_DC_IGVAC                   sys_insn(1, 0, 7, 6, 3)
-> > +#define SYS_DC_IGDVAC                  sys_insn(1, 0, 7, 6, 5)
+> > +       /* Must be last */
+> > +       __NR_FGT_GROUP_IDS__
+> > +};
 > > +
-> > +#define SYS_DC_CVAC                    sys_insn(1, 3, 7, 10, 1)
-> > +#define SYS_DC_CGVAC                   sys_insn(1, 3, 7, 10, 3)
-> > +#define SYS_DC_CGDVAC                  sys_insn(1, 3, 7, 10, 5)
+> > +#define SR_FGT(sr, g, b, p)                                    \
+> > +       {                                                       \
+> > +               .encoding       =3D sr,                           \
+> > +               .end            =3D sr,                           \
+> > +               .tc             =3D {                             \
+> > +                       .fgt =3D g ## _GROUP,                     \
+> > +                       .bit =3D g ## _EL2_ ## b ## _SHIFT,       \
+> > +                       .pol =3D p,                               \
+> > +               },                                              \
+> > +       }
 > > +
-> > +#define SYS_DC_CVAU                    sys_insn(1, 3, 7, 11, 1)
+> > +static const struct encoding_to_trap_config encoding_to_fgt[] __initco=
+nst =3D {
+> > +};
 > > +
-> > +#define SYS_DC_CVAP                    sys_insn(1, 3, 7, 12, 1)
-> > +#define SYS_DC_CGVAP                   sys_insn(1, 3, 7, 12, 3)
-> > +#define SYS_DC_CGDVAP                  sys_insn(1, 3, 7, 12, 5)
+> >  static union trap_config get_trap_config(u32 sysreg)
+> >  {
+> >         return (union trap_config) {
+> > @@ -941,6 +962,7 @@ int __init populate_nv_trap_config(void)
+> >
+> >         BUILD_BUG_ON(sizeof(union trap_config) !=3D sizeof(void *));
+> >         BUILD_BUG_ON(__NR_TRAP_GROUP_IDS__ > BIT(TC_CGT_BITS));
+> > +       BUILD_BUG_ON(__NR_FGT_GROUP_IDS__ > BIT(TC_FGT_BITS));
+> >
+> >         for (int i =3D 0; i < ARRAY_SIZE(encoding_to_cgt); i++) {
+> >                 const struct encoding_to_trap_config *cgt =3D &encoding=
+_to_cgt[i];
+> > @@ -963,6 +985,34 @@ int __init populate_nv_trap_config(void)
+> >         kvm_info("nv: %ld coarse grained trap handlers\n",
+> >                  ARRAY_SIZE(encoding_to_cgt));
+> >
+> > +       if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> > +               goto check_mcb;
 > > +
-> > +#define SYS_DC_CVADP                   sys_insn(1, 3, 7, 13, 1)
-> > +#define SYS_DC_CGVADP                  sys_insn(1, 3, 7, 13, 3)
-> > +#define SYS_DC_CGDVADP                 sys_insn(1, 3, 7, 13, 5)
+> > +       for (int i =3D 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+> > +               const struct encoding_to_trap_config *fgt =3D &encoding=
+_to_fgt[i];
+> > +               union trap_config tc;
 > > +
-> > +#define SYS_DC_CIVAC                   sys_insn(1, 3, 7, 14, 1)
-> > +#define SYS_DC_CIGVAC                  sys_insn(1, 3, 7, 14, 3)
-> > +#define SYS_DC_CIGDVAC                 sys_insn(1, 3, 7, 14, 5)
+> > +               tc =3D get_trap_config(fgt->encoding);
 > > +
+> > +               if (tc.fgt) {
+> > +                       kvm_err("Duplicate FGT for (%d, %d, %d, %d, %d)=
+\n",
+> > +                               sys_reg_Op0(fgt->encoding),
+> > +                               sys_reg_Op1(fgt->encoding),
+> > +                               sys_reg_CRn(fgt->encoding),
+> > +                               sys_reg_CRm(fgt->encoding),
+> > +                               sys_reg_Op2(fgt->encoding));
+> > +                       ret =3D -EINVAL;
+> > +               }
+> > +
+> > +               tc.val |=3D fgt->tc.val;
+> > +               xa_store(&sr_forward_xa, fgt->encoding,
+> > +                        xa_mk_value(tc.val), GFP_KERNEL);
+> > +       }
+> > +
+> > +       kvm_info("nv: %ld fine grained trap handlers\n",
+> > +                ARRAY_SIZE(encoding_to_fgt));
+> > +
+> > +check_mcb:
+> >         for (int id =3D __MULTIPLE_CONTROL_BITS__;
+> >              id < (__COMPLEX_CONDITIONS__ - 1);
+> >              id++) {
+> > @@ -1031,13 +1081,26 @@ static enum trap_behaviour compute_trap_behavio=
+ur(struct kvm_vcpu *vcpu,
+> >         return __do_compute_trap_behaviour(vcpu, tc.cgt, b);
+> >  }
+> >
+> > +static bool check_fgt_bit(u64 val, const union trap_config tc)
+> > +{
+> > +       return ((val >> tc.bit) & 1) =3D=3D tc.pol;
+> > +}
+> > +
+> > +#define sanitised_sys_reg(vcpu, reg)                   \
+> > +       ({                                              \
+> > +               u64 __val;                              \
+> > +               __val =3D __vcpu_sys_reg(vcpu, reg);      \
+> > +               __val &=3D ~__ ## reg ## _RES0;           \
+> > +               (__val);                                \
+> > +       })
+> > +
+> >  bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+> >  {
+> >         union trap_config tc;
+> >         enum trap_behaviour b;
+> >         bool is_read;
+> >         u32 sysreg;
+> > -       u64 esr;
+> > +       u64 esr, val;
+> >
+> >         if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
+> >                 return false;
+> > @@ -1060,6 +1123,19 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
+> >         if (!tc.val)
+> >                 return false;
+> >
+> > +       switch ((enum fgt_group_id)tc.fgt) {
+> > +       case __NO_FGT_GROUP__:
+> > +               break;
+> > +
+> > +       case __NR_FGT_GROUP_IDS__:
+> > +               /* Something is really wrong, bail out */
+> > +               WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
+> > +               return false;
 >=20
-> How about sorting these new ones with existing ones to make it more reada=
-ble?
-> Otherwise,
-> Reviewed-by: Jing Zhang <jingzhangos@google.com>
+> Do we need a default clause here to catch unexpected tc.fgt values?
 
-Do you mean the DC SW ops? I'd rather keep them separated, as their
-encoding has a different pattern, and they are treated pretty
-differently. I found that mixing them with the rest of the DC ops made
-it *more* difficult to figure out what we were dealing with.
+I'd rather not have anything special at handling time, as the compiler
+is perfectly allowed to use the cast above to restrict the value to
+the enumeration. We already cover all the possible enum values, which
+is good enough.
+
+However, I've added an extra check at boot time for unexpected values
+having sneaked into the FGT table.
 
 Thanks,
 
