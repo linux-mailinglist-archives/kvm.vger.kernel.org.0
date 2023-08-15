@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6421677CFE2
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 18:08:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FBB077CFEB
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 18:10:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238428AbjHOQIE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 12:08:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33814 "EHLO
+        id S238433AbjHOQJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 12:09:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238420AbjHOQHd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 12:07:33 -0400
+        with ESMTP id S238448AbjHOQJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 12:09:28 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7915D127
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 09:07:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F057C5
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 09:09:27 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 16A9A65CCC
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 16:07:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A16C433C7;
-        Tue, 15 Aug 2023 16:07:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 294E765D4A
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 16:09:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E728C433C8;
+        Tue, 15 Aug 2023 16:09:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692115650;
-        bh=5czWxryr8an14tezsiSTtNQm6pcZag0vBREySh9vtr4=;
+        s=k20201202; t=1692115766;
+        bh=KfN7XQyBc/IK+aa8Y/WTlw9imH9lVXCgatZQdrjKCoQ=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VeSOiTj0ACg6L9kyx4p1ShqgxaI1i1fmCDCRjCsqkYjIYBxSm052pyIuLtt/o/44S
-         qSj4yxmS0wAohLDPMtd0mhvjQ+qG9aVbYf6Cz8iBrL9plpExQMN1SIreVHPJ851kWk
-         DL8l4zY8BQ05bcHgAWrII9QvwgW/wSvmOAUpTWXjXNC7hYyAtuB93piEOcfV+vITdG
-         mCn9iDtCtfVqv+xYbplUCtTvu96b1hT+QY+QPRV9MIhFDYlzcH9rogaLDU9jk6dwG2
-         S/c8wJFs7Zm/vYMuwthE9HcLjYJe64J2j40N66HxZScb8WaZiGSig6wHt3U0lbNDO+
-         7BXx3qk7JbnCA==
+        b=uc7PbVZWykELYbaOBOWV8STDkAaUU5TNYjd18jcO9uhnaVCtfkNX4Ltftj0GIbzy7
+         mW1Ia1OhgaOr4brxJU/hdrPrDDGCk3OhwuQqkmQ+v8dI0lXX9gkfpZsEYSaLk/Xmrd
+         EK7h891Rm1N0Qg/S/YTi1BUADyf1WKyylmMAF+b3iZwttXOFn7H7pQ/Cx932qV1kAP
+         0qGEJq5+Me0N67najLtrGA9c0sqM3SFME8njGLCpJ5FEeV0/n/Sxtsn3aQTWHj/hqS
+         QjfvkM5OOI34oDm+NPobDeUUNaKf3DJk5AmXpsozC+TOo/cwIOy97z5k58WreLsC4j
+         2ILgpU9NuF2jg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVwZr-0053ha-RG;
-        Tue, 15 Aug 2023 17:07:28 +0100
-Date:   Tue, 15 Aug 2023 17:07:27 +0100
-Message-ID: <86y1icffwg.wl-maz@kernel.org>
+        id 1qVwbk-0053lV-8W;
+        Tue, 15 Aug 2023 17:09:24 +0100
+Date:   Tue, 15 Aug 2023 17:09:23 +0100
+Message-ID: <86wmxwfft8.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Miguel Luis <miguel.luis@oracle.com>
 Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
@@ -61,18 +61,15 @@ Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
 Subject: Re: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-In-Reply-To: <E8293123-063A-40FF-A83F-D9DE0E4121B0@oracle.com>
+In-Reply-To: <0A8ED162-EF6C-44F4-836B-7421183EA9A0@oracle.com>
 References: <20230808114711.2013842-1-maz@kernel.org>
         <20230808114711.2013842-16-maz@kernel.org>
-        <85C2D540-7AD7-49BB-9EFB-7F950D08AC15@oracle.com>
-        <87il9gpp2s.wl-maz@kernel.org>
-        <E8293123-063A-40FF-A83F-D9DE0E4121B0@oracle.com>
+        <0A8ED162-EF6C-44F4-836B-7421183EA9A0@oracle.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
@@ -87,104 +84,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Aug 2023 16:35:09 +0100,
+On Tue, 15 Aug 2023 16:46:21 +0100,
 Miguel Luis <miguel.luis@oracle.com> wrote:
-> >>> + [CGT_HCR_NV] =3D {
-> >>> + .index =3D HCR_EL2,
-> >>> + .value =3D HCR_NV,
-> >>> + .mask =3D HCR_NV,
-> >>> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> >>> + },
-> >>> + [CGT_HCR_NV_nNV2] =3D {
-> >>> + .index =3D HCR_EL2,
-> >>> + .value =3D HCR_NV,
-> >>> + .mask =3D HCR_NV | HCR_NV2,
-> >>> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> >>> + },
-> >>> + [CGT_HCR_NV1_nNV2] =3D {
-> >>> + .index =3D HCR_EL2,
-> >>> + .value =3D HCR_NV | HCR_NV1,
-> >>> + .mask =3D HCR_NV | HCR_NV1 | HCR_NV2,
-> >>> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> >>> + },
-> >>=20
-> >> The declaration above seems to be a coarse control combination that co=
-uld be
-> >> decomposed in the following, more readable, equivalent by adding a
-> >> combination of two MCBs
-> >> (eg. CGT_HCR_NV_NV1, CGT_HCR_NV_NV1_nNV2)
-> >>=20
-> >>       [CGT_HCR_NV1] =3D {
-> >>               .index          =3D HCR_EL2,
-> >>               .value          =3D HCR_NV1,
-> >>               .mask           =3D HCR_NV1,
-> >>               .behaviour      =3D BEHAVE_FORWARD_ANY,
-> >>       },
-> >>       [CGT_HCR_NV1_nNV2] =3D {
-> >>               .index          =3D HCR_EL2,
-> >>               .value          =3D HCR_NV1,
-> >>               .mask           =3D HCR_NV1 | HCR_NV2,
-> >>               .behaviour      =3D BEHAVE_FORWARD_ANY,
-> >>       },
-> >>=20
-> >> /* FEAT_NV and FEAT_NV2 */
-> >> MCB(CGT_HCR_NV_NV1, CGT_HCR_NV, CGT_HCR_NV1)=20
-> >>=20
-> >> /* FEAT_NV2 and HCR_EL2.NV2 is 0 behaves as FEAT_NV */
-> >> MCB(CGT_HCR_NV_NV1_nNV2, CGT_HCR_NV_nNV2, CGT_HCR_NV1_nNV2 )
-> >=20
-> > This is not equivalent at all, as a MCB is a logical OR, not an AND.
-> >=20
->=20
-> A logical OR as I would expect, which can be used recursively, meaning
-> IIUC that an MCB can contain other MCB ids, is this correct?
+> 
+> > + [CGT_HCR_FIEN] = {
+> > + .index = HCR_EL2,
+> > + .value = HCR_FIEN,
+> 
+> Should this value be 0 ?
 
-We're now forbidding it, but even if we allowed it, it would still be
-an OR, while you really need an AND.
+Indeed. I've renamed the trap to be CGT_HCR_nFIEN, and set the value
+to 0.
 
->
-> Therefore, the equivalent for the declared =E2=80=98CGT_HCR_NV1_nNV2=E2=
-=80=99 would be
->=20
-> MCB(CGT_HCR_NV1_nNV2, CGT_HCR_NV_NV1, CGT_HCR_NV_NV1_nNV2) ?
-
-You have completely lost me. The only valid values we want to check
-for at this stage are:
-
-{NV}=3D{1}
-{NV,NV1}=3D{1,1}
-{NV,NV2}=3D{1,0}
-{NV,NV1,NV2}=3D{1,1,0}
-
-We can check any of these in one go. Why should we build something
-that implement multiple behaviours in bizarre ways?
-
->=20
-> I do not know what I missed.
->=20
-> >> On the above all the coarse HCR_EL2.{NV,NV1} traps are covered but not=
- the
-> >> constrained unpredictable one when HCR_EL2.{NV,NV1} is {0,1} which tra=
-ps in
-> >> two of its behaviours and doesn't trap on one.
-> >=20
-> > The current approach makes it plain that HCR_EL2.NV=3D=3D0 doesn't resu=
-lt
-> > in any trap forwarding, consistent with the current wording of
-> > architecture.
-> >=20
->=20
-> Indeed but it could result in trap forwarding as an expected behaviour
-> in D8.11.4 of DDI0487J.a.
-
-Not in our implementation. We ignore NV1 if NV is 0 and behave as "For
-all purposes other than reading back the value of the HCR_EL2.NV1 bit,
-the implementation behaves as if HCR_EL2.{NV, NV1} is {0, 0}."
-
-The point to understand is that we are implementing *ONE* of the
-allowed behaviours. We don't have to support all of them.
+Thanks,
 
 	M.
 
---=20
+-- 
 Without deviation from the norm, progress is not possible.
