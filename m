@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1B277D26D
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:50:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D44277D264
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239484AbjHOSuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 14:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56736 "EHLO
+        id S239410AbjHOStt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 14:49:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239531AbjHOStm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 14:49:42 -0400
+        with ESMTP id S239292AbjHOStQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 14:49:16 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A38E1FE2
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:49:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F412684
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:48:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4DB6665F7C
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:47:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D73C433C8;
-        Tue, 15 Aug 2023 18:47:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9DF5865F69
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:47:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E59C433C7;
+        Tue, 15 Aug 2023 18:47:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692125248;
-        bh=zznwhj1ZWxRj1G/CivEhfEeRk+TMP0SucsZgA1ya91g=;
+        s=k20201202; t=1692125221;
+        bh=2MC33VMubl8Wc9QSc0xTB0giIGZo60Zeezs0Qg0LdXM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dXbwcsFeMcOAIiYGqW+x1cle9LgSNJY4BLkOG6VQqZC8AEvseuqSznHPBvoM/EApg
-         A/PMpkXDuS+uQoOZ9//fAcAYIGtNt23veknKOPAcZntAQn9kqK5b998fezrPBPDVUl
-         os1BHFqma8SeohNYdHIt62WT31YbLw9Sv4Xou+FB/nAoC08Wk0xNNFFvQB5SfTotCt
-         KyrVNP7oQ1SI7ov7mofCTN6viXkSCMBwSATs6ZOuclaaFJnvaEFtSKUi1Kx0ImYK5k
-         2eoRT8bmDIDSL+ZTXnUazEITzhll5mex+320khZWx4zL/taLp/R+pFaCYytTXmULo5
-         0zIpR6evhE3HQ==
+        b=edoi+fZeepxyjeapWBbtnA720RNM/axdOSszV/L3UCZXf3aFzsuK9V3bB7WQNUdAJ
+         Q8kBsxZHMw0vmOMSc2jhaTiWhyP5kZQoTIQeAH629aChNdkxDR/Gf0tnICqHOTsyl0
+         5J99Hx18ks+7eCfxgzXtLxLmqHKbw1qe1GWXJm60xzyUqKDbQnyeORdwT910v1UNsa
+         t4m++3W7GfgXvKVNaeWx6V9ZihtDa5MtEfpChLHMukiAsgbS06l7ENDhA2OvnFoEdJ
+         nrFq95Lbz/EqFR2yPvnrJXFok5g3lTMx5zdh4Pz30tZChIRl0KTJwYefDhkqokGBta
+         BgrtD5qKvB3dA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVywr-0055Sd-ER;
+        id 1qVywr-0055Sd-Nk;
         Tue, 15 Aug 2023 19:39:21 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 23/28] KVM: arm64: nv: Add SVC trap forwarding
-Date:   Tue, 15 Aug 2023 19:38:57 +0100
-Message-Id: <20230815183903.2735724-24-maz@kernel.org>
+Subject: [PATCH v4 24/28] KVM: arm64: nv: Expand ERET trap forwarding to handle FGT
+Date:   Tue, 15 Aug 2023 19:38:58 +0100
+Message-Id: <20230815183903.2735724-25-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -78,69 +78,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HFGITR_EL2 allows the trap of SVC instructions to EL2. Allow these
-traps to be forwarded. Take this opportunity to deny any 32bit activity
-when NV is enabled.
+We already handle ERET being trapped from a L1 guest in hyp context.
+However, with FGT, we can also have ERET being trapped from L2, and
+this needs to be reinjected into L1.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Add the required exception routing.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c         |  4 ++++
- arch/arm64/kvm/handle_exit.c | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ arch/arm64/kvm/handle_exit.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 72dc53a75d1c..8b51570a76f8 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -36,6 +36,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/kvm_pkvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/sections.h>
-@@ -818,6 +819,9 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
- 	if (likely(!vcpu_mode_is_32bit(vcpu)))
- 		return false;
- 
-+	if (vcpu_has_nv(vcpu))
-+		return true;
-+
- 	return !kvm_supports_32bit_el0();
- }
- 
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 6dcd6604b6bc..3b86d534b995 100644
+index 3b86d534b995..617ae6dea5d5 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -226,6 +226,17 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+@@ -222,7 +222,22 @@ static int kvm_handle_eret(struct kvm_vcpu *vcpu)
+ 	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
+ 		return kvm_handle_ptrauth(vcpu);
+ 
+-	kvm_emulate_nested_eret(vcpu);
++	/*
++	 * If we got here, two possibilities:
++	 *
++	 * - the guest is in EL2, and we need to fully emulate ERET
++	 *
++	 * - the guest is in EL1, and we need to reinject the
++         *   exception into the L1 hypervisor.
++	 *
++	 * If KVM ever traps ERET for its own use, we'll have to
++	 * revisit this.
++	 */
++	if (is_hyp_ctxt(vcpu))
++		kvm_emulate_nested_eret(vcpu);
++	else
++		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
  	return 1;
  }
  
-+static int handle_svc(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * So far, SVC traps only for NV via HFGITR_EL2. A SVC from a
-+	 * 32bit guest would be caught by vpcu_mode_is_bad_32bit(), so
-+	 * we should only have to deal with a 64 bit exception.
-+	 */
-+	kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+	return 1;
-+}
-+
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -239,6 +250,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC32]	= handle_smc,
- 	[ESR_ELx_EC_HVC64]	= handle_hvc,
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
-+	[ESR_ELx_EC_SVC64]	= handle_svc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
- 	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
 -- 
 2.34.1
 
