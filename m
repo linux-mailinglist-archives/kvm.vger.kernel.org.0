@@ -2,204 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB56277D672
+	by mail.lfdr.de (Postfix) with ESMTP id 2EE6A77D670
 	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 00:52:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240490AbjHOWwB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 18:52:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40198 "EHLO
+        id S240482AbjHOWwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 18:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240530AbjHOWvu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 18:51:50 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C0A2121
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 15:51:43 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2bad7499bdcso51045661fa.2
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 15:51:43 -0700 (PDT)
+        with ESMTP id S240510AbjHOWvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 18:51:42 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791A62102
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 15:51:38 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-c8f360a07a2so4782435276.2
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 15:51:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692139902; x=1692744702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NB4kFVYk0VzDJYVvftDfK9K6NvUawMTsvoAjbvdMEwE=;
-        b=xgWSsZ+yzfnrNepdJd9XBKptt8IBaaOIWpyliBOfk98/gDqM9hqn9IAINYWKyqDXCe
-         a2QTw3wHr5LMwxBfCU1r6nCgSLENTlW8JdZfS4VagOKwwYkDrk+TBQg3EpfbYB6fxmMf
-         F76IQ6ckGv3M002Dx4RQpwQYxHhZTGVJd3ORJpcCQ/eeK0HZSqd7lesUi6By5wdPwE+J
-         qO5CqsVaeO+If0rjYqooqIma7c/sN0NISzN8Ei7W9dov7u6f5YzUDWPWtz/d/mCooMTk
-         X6foepwXAFMnsBL4ynSB6O1IdNv3qZISsU04Jr7QfVVm2I+5FONp11ovhipWeeN2B1qO
-         s1CQ==
+        d=google.com; s=20221208; t=1692139897; x=1692744697;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=da5x2zPjHUkqaS3Zbb7k562EOODEMFwJRzvV+YQcZfo=;
+        b=0RL0HKMCJSssEhetdjMpcQhOROKUNlGm5oBzIslOioGrgb5unKYFihVgtIhvZHyCFi
+         3PdrTWwlqWLXiWll0UJeNJZ67ynprulz4rmIVgQeUxziRNDApsBD0JIZgMG2fdkmXg3+
+         PxxDF7RrYhr82+cune2T6CIpQ8xgKaLJXcuBTXk04U/A/tAaijlMXO5C8CS+6xy/hyMA
+         yGjpvSZGr0nCXGG8k02ZlwDW/1WKCKaAdlTorHyVMgGjrBKd1HMljXm6kjCWnA1atTv2
+         p0Asp0ziKPaifFVdrCqXgjkCdKj6t453GXPK+I9ycLuHuNpyR5LlZp/wsR6F+b8B2Trh
+         ok3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692139902; x=1692744702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NB4kFVYk0VzDJYVvftDfK9K6NvUawMTsvoAjbvdMEwE=;
-        b=bRljaCQq+EDiI/yWi2v5QIQqFzjrcKdsaPfvW7zOFiNFooBNy11HL+hUmohlCS/AbV
-         BV4IxKnfOeo1cdoRP/ZUmLXFsxCBbu6aXyMpASingIbOGIGiG5KnxjoultWLsGEZkW7i
-         tt3XIlQti2g1P09JAR5MUO08OMZMpxoJ7Vx6aEmVzEDZfa2/4+h1CuLKIdzFde6PX5RA
-         TrdfB1H24g8aLt/2HbjIZi8UPlgTsIvXffj/gATkCYq+5oWkJk37ZWt7fMaqMT4x+IkO
-         3QztU0uhTB3btX9s79ATdIfwt4MvJ2TAbjfd9hBw9B+l1Lm4wjcMerMsoXLI2rFJFEWf
-         R2iw==
-X-Gm-Message-State: AOJu0YyKoVlegxEtFHUHzJcYqVe0+X6PDorToZsu/WS5mYHznRZQIHn5
-        XiUfAYCY3KSAwm5hHTMhLk/yCJ/oz+ZUbVCFLv0K/g==
-X-Google-Smtp-Source: AGHT+IF424AIaaDGP3mEmWADXxKvMafTTEVIEC9y2GodBdWM1nxssfIaf+VbQh6Lw5rZ3EFxI3eKZ6tBBfbeDYUnH8A=
-X-Received: by 2002:a2e:9915:0:b0:2b6:e0d3:45b7 with SMTP id
- v21-20020a2e9915000000b002b6e0d345b7mr113089lji.14.1692139902024; Tue, 15 Aug
- 2023 15:51:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230815183903.2735724-1-maz@kernel.org> <20230815183903.2735724-21-maz@kernel.org>
-In-Reply-To: <20230815183903.2735724-21-maz@kernel.org>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Tue, 15 Aug 2023 15:51:29 -0700
-Message-ID: <CAAdAUtgFUkwuRZTwXe3E2MkFYV4e8zjgUYjJAP_JLeYWtN9H4g@mail.gmail.com>
-Subject: Re: [PATCH v4 20/28] KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        Miguel Luis <miguel.luis@oracle.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1692139897; x=1692744697;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=da5x2zPjHUkqaS3Zbb7k562EOODEMFwJRzvV+YQcZfo=;
+        b=cAS3EH7lpv1nbKapOqqZjZ50tX3jmHi+2R+185QdKIcyAQbwBOHV6b6EpNxVihDuml
+         fYagV9aD1w7w3FmvnS4npYc4Yn9uOYsuErzFs23bnWGFhzj++I0JGlH/A5N2sEYwc6uz
+         OOCxjglbBYXyBxKi6eWE6e9IDNcZX75/hHv9BaZtQ3Epw/CG43NxTHpcuTa0xCuRI1l7
+         7Qii2V+M2j/MahX2wPf2PpOP5H5J04bBv1WuX1GQvGEMw+5cb2iRFo1Ps7Th3wDNTOpm
+         Ud2kkKvy1TwUp7j1havOJ3u3Gqp96BPAPljsmTrXGw80e3Ks3eo7Xo7LNJUO9IVJ4JbI
+         MdIQ==
+X-Gm-Message-State: AOJu0YygLLtssH/JnvRzaTGFSvDsYOnhovliCTEDLNX9wvsIBAbXJ3r5
+        eKpXEX4iHAet+pnOztPMFVDdUsc2Ey0=
+X-Google-Smtp-Source: AGHT+IH98f7wG38RN37lhDSLWoEwCGnG6D7DEExm2nsd65irQrGyW9WeKZjyXe/0m6DVmKMct0wCNPT8XGY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:90e:0:b0:d6b:1a89:6673 with SMTP id
+ a14-20020a5b090e000000b00d6b1a896673mr3233ybq.5.1692139897682; Tue, 15 Aug
+ 2023 15:51:37 -0700 (PDT)
+Date:   Tue, 15 Aug 2023 15:51:36 -0700
+In-Reply-To: <20230719024558.8539-3-guang.zeng@intel.com>
+Mime-Version: 1.0
+References: <20230719024558.8539-1-guang.zeng@intel.com> <20230719024558.8539-3-guang.zeng@intel.com>
+Message-ID: <ZNwBeN8mGr1sJJ6i@google.com>
+Subject: Re: [PATCH v2 2/8] KVM: x86: Use a new flag for branch instructions
+From:   Sean Christopherson <seanjc@google.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UPPERCASE_50_75,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Branch *targets*, not branch instructions.  
 
-On Tue, Aug 15, 2023 at 11:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> Implement the trap forwarding for traps described by HFGxTR_EL2,
-> reusing the Fine Grained Traps infrastructure previously implemented.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Wed, Jul 19, 2023, Zeng Guang wrote:
+> From: Binbin Wu <binbin.wu@linux.intel.com>
+> 
+> Use the new flag X86EMUL_F_BRANCH instead of X86EMUL_F_FETCH in
+> assign_eip(), since strictly speaking it is not behavior of instruction
+> fetch.
+
+Eh, I'd just drop this paragraph, as evidenced by this code existing as-is for
+years, we wouldn't introduce X86EMUL_F_BRANCH just because resolving a branch
+target isn't strictly an instruction fetch.
+
+> Another reason is to distinguish instruction fetch and execution of branch
+> instruction for feature(s) that handle differently on them.
+
+Similar to the shortlog, it's about computing the branch target, not executing a
+branch instruction.  That distinction matters, e.g. a Jcc that is not taken will
+*not* follow the branch target, but the instruction is still *executed*.  And there
+exist instructions that compute branch targets, but aren't what most people would
+typically consider a branch instruction, e.g. XBEGIN.
+
+> Branch instruction is not data access instruction, so skip checking against
+> execute-only code segment as instruction fetch.
+
+Rather than call out individual use case, I would simply state that as of this
+patch, X86EMUL_F_BRANCH and X86EMUL_F_FETCH are identical as far as KVM is
+concernered.  That let's the reader know that (a) there's no intended change in
+behavior and (b) that the intent is to effectively split all consumption of
+X86EMUL_F_FETCH into (X86EMUL_F_FETCH | X86EMUL_F_BRANCH).
+
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 > ---
->  arch/arm64/kvm/emulate-nested.c | 71 +++++++++++++++++++++++++++++++++
->  1 file changed, 71 insertions(+)
->
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
-ted.c
-> index 0da9d92ed921..0e34797515b6 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -938,6 +938,7 @@ static DEFINE_XARRAY(sr_forward_xa);
->
->  enum fgt_group_id {
->         __NO_FGT_GROUP__,
-> +       HFGxTR_GROUP,
->
->         /* Must be last */
->         __NR_FGT_GROUP_IDS__
-> @@ -956,6 +957,69 @@ enum fgt_group_id {
->         }
->
->  static const struct encoding_to_trap_config encoding_to_fgt[] __initcons=
-t =3D {
-> +       /* HFGRTR_EL2, HFGWTR_EL2 */
-> +       SR_FGT(SYS_TPIDR2_EL0,          HFGxTR, nTPIDR2_EL0, 0),
-> +       SR_FGT(SYS_SMPRI_EL1,           HFGxTR, nSMPRI_EL1, 0),
-> +       SR_FGT(SYS_ACCDATA_EL1,         HFGxTR, nACCDATA_EL1, 0),
-> +       SR_FGT(SYS_ERXADDR_EL1,         HFGxTR, ERXADDR_EL1, 1),
-> +       SR_FGT(SYS_ERXPFGCDN_EL1,       HFGxTR, ERXPFGCDN_EL1, 1),
-> +       SR_FGT(SYS_ERXPFGCTL_EL1,       HFGxTR, ERXPFGCTL_EL1, 1),
-> +       SR_FGT(SYS_ERXPFGF_EL1,         HFGxTR, ERXPFGF_EL1, 1),
-> +       SR_FGT(SYS_ERXMISC0_EL1,        HFGxTR, ERXMISCn_EL1, 1),
-> +       SR_FGT(SYS_ERXMISC1_EL1,        HFGxTR, ERXMISCn_EL1, 1),
-> +       SR_FGT(SYS_ERXMISC2_EL1,        HFGxTR, ERXMISCn_EL1, 1),
-> +       SR_FGT(SYS_ERXMISC3_EL1,        HFGxTR, ERXMISCn_EL1, 1),
-> +       SR_FGT(SYS_ERXSTATUS_EL1,       HFGxTR, ERXSTATUS_EL1, 1),
-> +       SR_FGT(SYS_ERXCTLR_EL1,         HFGxTR, ERXCTLR_EL1, 1),
-> +       SR_FGT(SYS_ERXFR_EL1,           HFGxTR, ERXFR_EL1, 1),
-> +       SR_FGT(SYS_ERRSELR_EL1,         HFGxTR, ERRSELR_EL1, 1),
-> +       SR_FGT(SYS_ERRIDR_EL1,          HFGxTR, ERRIDR_EL1, 1),
-> +       SR_FGT(SYS_ICC_IGRPEN0_EL1,     HFGxTR, ICC_IGRPENn_EL1, 1),
-> +       SR_FGT(SYS_ICC_IGRPEN1_EL1,     HFGxTR, ICC_IGRPENn_EL1, 1),
-> +       SR_FGT(SYS_VBAR_EL1,            HFGxTR, VBAR_EL1, 1),
-> +       SR_FGT(SYS_TTBR1_EL1,           HFGxTR, TTBR1_EL1, 1),
-> +       SR_FGT(SYS_TTBR0_EL1,           HFGxTR, TTBR0_EL1, 1),
-> +       SR_FGT(SYS_TPIDR_EL0,           HFGxTR, TPIDR_EL0, 1),
-> +       SR_FGT(SYS_TPIDRRO_EL0,         HFGxTR, TPIDRRO_EL0, 1),
-> +       SR_FGT(SYS_TPIDR_EL1,           HFGxTR, TPIDR_EL1, 1),
-> +       SR_FGT(SYS_TCR_EL1,             HFGxTR, TCR_EL1, 1),
-> +       SR_FGT(SYS_SCXTNUM_EL0,         HFGxTR, SCXTNUM_EL0, 1),
-> +       SR_FGT(SYS_SCXTNUM_EL1,         HFGxTR, SCXTNUM_EL1, 1),
-> +       SR_FGT(SYS_SCTLR_EL1,           HFGxTR, SCTLR_EL1, 1),
-> +       SR_FGT(SYS_REVIDR_EL1,          HFGxTR, REVIDR_EL1, 1),
-> +       SR_FGT(SYS_PAR_EL1,             HFGxTR, PAR_EL1, 1),
-> +       SR_FGT(SYS_MPIDR_EL1,           HFGxTR, MPIDR_EL1, 1),
-> +       SR_FGT(SYS_MIDR_EL1,            HFGxTR, MIDR_EL1, 1),
-> +       SR_FGT(SYS_MAIR_EL1,            HFGxTR, MAIR_EL1, 1),
-> +       SR_FGT(SYS_LORSA_EL1,           HFGxTR, LORSA_EL1, 1),
-> +       SR_FGT(SYS_LORN_EL1,            HFGxTR, LORN_EL1, 1),
-> +       SR_FGT(SYS_LORID_EL1,           HFGxTR, LORID_EL1, 1),
-> +       SR_FGT(SYS_LOREA_EL1,           HFGxTR, LOREA_EL1, 1),
-> +       SR_FGT(SYS_LORC_EL1,            HFGxTR, LORC_EL1, 1),
-> +       SR_FGT(SYS_ISR_EL1,             HFGxTR, ISR_EL1, 1),
-> +       SR_FGT(SYS_FAR_EL1,             HFGxTR, FAR_EL1, 1),
-> +       SR_FGT(SYS_ESR_EL1,             HFGxTR, ESR_EL1, 1),
-> +       SR_FGT(SYS_DCZID_EL0,           HFGxTR, DCZID_EL0, 1),
-> +       SR_FGT(SYS_CTR_EL0,             HFGxTR, CTR_EL0, 1),
-> +       SR_FGT(SYS_CSSELR_EL1,          HFGxTR, CSSELR_EL1, 1),
-> +       SR_FGT(SYS_CPACR_EL1,           HFGxTR, CPACR_EL1, 1),
-> +       SR_FGT(SYS_CONTEXTIDR_EL1,      HFGxTR, CONTEXTIDR_EL1, 1),
-> +       SR_FGT(SYS_CLIDR_EL1,           HFGxTR, CLIDR_EL1, 1),
-> +       SR_FGT(SYS_CCSIDR_EL1,          HFGxTR, CCSIDR_EL1, 1),
-> +       SR_FGT(SYS_APIBKEYLO_EL1,       HFGxTR, APIBKey, 1),
-> +       SR_FGT(SYS_APIBKEYHI_EL1,       HFGxTR, APIBKey, 1),
-> +       SR_FGT(SYS_APIAKEYLO_EL1,       HFGxTR, APIAKey, 1),
-> +       SR_FGT(SYS_APIAKEYHI_EL1,       HFGxTR, APIAKey, 1),
-> +       SR_FGT(SYS_APGAKEYLO_EL1,       HFGxTR, APGAKey, 1),
-> +       SR_FGT(SYS_APGAKEYHI_EL1,       HFGxTR, APGAKey, 1),
-> +       SR_FGT(SYS_APDBKEYLO_EL1,       HFGxTR, APDBKey, 1),
-> +       SR_FGT(SYS_APDBKEYHI_EL1,       HFGxTR, APDBKey, 1),
-> +       SR_FGT(SYS_APDAKEYLO_EL1,       HFGxTR, APDAKey, 1),
-> +       SR_FGT(SYS_APDAKEYHI_EL1,       HFGxTR, APDAKey, 1),
-> +       SR_FGT(SYS_AMAIR_EL1,           HFGxTR, AMAIR_EL1, 1),
-> +       SR_FGT(SYS_AIDR_EL1,            HFGxTR, AIDR_EL1, 1),
-> +       SR_FGT(SYS_AFSR1_EL1,           HFGxTR, AFSR1_EL1, 1),
-> +       SR_FGT(SYS_AFSR0_EL1,           HFGxTR, AFSR0_EL1, 1),
->  };
->
->  static union trap_config get_trap_config(u32 sysreg)
-> @@ -1160,6 +1224,13 @@ bool __check_nv_sr_forward(struct kvm_vcpu *vcpu)
->         case __NO_FGT_GROUP__:
->                 break;
->
-> +       case HFGxTR_GROUP:
-> +               if (is_read)
-> +                       val =3D sanitised_sys_reg(vcpu, HFGRTR_EL2);
-> +               else
-> +                       val =3D sanitised_sys_reg(vcpu, HFGWTR_EL2);
-> +               break;
-> +
->         case __NR_FGT_GROUP_IDS__:
->                 /* Something is really wrong, bail out */
->                 WARN_ONCE(1, "__NR_FGT_GROUP_IDS__");
-> --
-> 2.34.1
->
+>  arch/x86/kvm/emulate.c     | 5 +++--
+>  arch/x86/kvm/kvm_emulate.h | 1 +
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 3ddfbc99fa4f..8e706d19ae45 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -721,7 +721,8 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>  		    (flags & X86EMUL_F_WRITE))
+>  			goto bad;
+>  		/* unreadable code segment */
+> -		if (!(flags & X86EMUL_F_FETCH) && (desc.type & 8) && !(desc.type & 2))
+> +		if (!(flags & (X86EMUL_F_FETCH | X86EMUL_F_BRANCH))
+> +			&& (desc.type & 8) && !(desc.type & 2))
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+Put the && on the first line, and align indendation.
 
-Jing
+		/* unreadable code segment */
+		if (!(flags & (X86EMUL_F_FETCH | X86EMUL_F_BRANCH)) &&
+		    (desc.type & 8) && !(desc.type & 2))
+			goto bad;
