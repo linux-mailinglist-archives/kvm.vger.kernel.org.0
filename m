@@ -2,72 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A1B277C44F
+	by mail.lfdr.de (Postfix) with ESMTP id 83CC977C450
 	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:08:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233614AbjHOAHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 20:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45646 "EHLO
+        id S233624AbjHOAHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 20:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233584AbjHOAHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 20:07:05 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E8C11D
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:07:04 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-48727371106so2463293e0c.3
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:07:04 -0700 (PDT)
+        with ESMTP id S233588AbjHOAHM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 20:07:12 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAA511D;
+        Mon, 14 Aug 2023 17:07:11 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-686f94328a4so3286431b3a.0;
+        Mon, 14 Aug 2023 17:07:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692058024; x=1692662824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NEb/LALV6ac5FnGK5WrJgICv/9PyQoMajfPza96VUQo=;
-        b=DwuVEz4JSsZHVlYPo5/0uGw0vF6PVEoFMndDCjy7Xze8LDueMPDF9Pp7ZkZnY/d0CT
-         JCtfkLzUhpnNNou4G69uaoUoIb19o5DY40LlyrM8fuPvMOt2qhnyo8hlc3N+E6tUJ835
-         M+KQxYv3ww1vSZ1tzHs9to2SbY4kkNJN54lDZtJxmnZcBCOWw9g/JhJOvh943aLBWEyF
-         ZaobUvc2lF/zTSryWfeglBni8Sz0fsOis7UtmZlKZdgFIGuy6cBhJmP9v/BuVPS+I4Zk
-         1OB5Y2dW/33DPFw709/6rLrZihjpghiic6AXuWItBj/bRxVNey63LhJHcOayLG5nUyzo
-         IHsg==
+        d=gmail.com; s=20221208; t=1692058031; x=1692662831;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UIkO9a2jx/LlcIe91jov+x/hrsKTSsxrVnvfV3qLu+w=;
+        b=GleBOZnWm/4yptsct23xsWjRl4FmSulENc/8ZCpakFczYeyJqmTxIFNMW1tLipddtY
+         eWR5kiIvSgpNkCmhejg+qHKhPhJqcFQhiYlZ8c1mxQkAdYiVj6Bd96HwY5t2hxReaUeq
+         9hoylNEjBCACtDHMQ2osjWF70brtY8F8Hab0e1dtmd53DVLemXgJ8dlDpktyaCQUdJte
+         yNc0jfSq47W1cyst01Atin9BDyXcgPh/QYMdNsStjVW/17kG3N/8zhDk+EHjhlBtyi6l
+         AqyzDOT62NkWBe4R+rL3wACWUDZyZQAcbE4NWGlLNNOH6+SJi5QXHnN820Y3MWpM2IXD
+         ijTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692058024; x=1692662824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NEb/LALV6ac5FnGK5WrJgICv/9PyQoMajfPza96VUQo=;
-        b=lu4rHW8UYefScNFyvZCOQJJpRCZmrn8SzcxeGQC6YrFiQtQtDeWXKR1uIZUv1icwUM
-         5UxGvOL40xsUDpzIS2mRNkUkMFZeRjp9PNnKvBEvY5zfYJBsqqXbQkx1VFAMx2kFnrUd
-         mwZWVgi1vMfSwAXPNclt+J5Gw7S34LeD7OBdNzF0QltaCKics5bNKs+K67E0thT+S81w
-         EurAnYsVSbV1hOoQFRW4gnf/95CSAfynx+3fbR6PgmoOoif8SIK0WiZ91AGzcPsdsAWz
-         kyR/khP+MCObS8u49Rq/3R/hTs/uw6FyU/kmyPSzlDxvxFZ/W44YMinCx8pLEVwJtC8p
-         mrqg==
-X-Gm-Message-State: AOJu0Yw1r3q1BM0ZtrBOJ4A+J0yrCEIQqXpvEgixZPdZzJG7dkh15FF1
-        z9Lr+s3WZaMAYV7E3wbf9JcGA1UvSK5939hQ+Y4SOg==
-X-Google-Smtp-Source: AGHT+IHsIHwWXyqKbw7AFdpj6pk0PdEeqqURN+HPrG/ZUKB6E/6g9lCm3ByHYeozRrG1lCRfMQ1nz8sfwhXku6E9G68=
-X-Received: by 2002:a1f:ea44:0:b0:487:e8f1:a2c1 with SMTP id
- i65-20020a1fea44000000b00487e8f1a2c1mr7836670vkh.8.1692058023805; Mon, 14 Aug
- 2023 17:07:03 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692058031; x=1692662831;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UIkO9a2jx/LlcIe91jov+x/hrsKTSsxrVnvfV3qLu+w=;
+        b=BWVEqzhnponrY4j+9vOQgUf2ujV9jD1WxasM0AqdqgTSClfjE6IAyMSbwvmssCwDIb
+         ebFLunZQG74Mgfi+4DlYJxPS3BtN6khQK6WgCoedaNUQUYPivdI9TzmpCLB7PIEpkScx
+         KUoHCKEMtQDGJ4wZo+rGuCuek83OFv1FBvJhxjRTnij2hJn18kbJQyOWoS+5DSKqaYf7
+         6qYSOeTIkOKbRlsrnyOyM2Rivom+IdpvpcZIpxSZMeUIqxKNV67ptnIReQLdIXWK2Ihz
+         L8C9eevjGl5+B6msC+7ZdWoIgeqJ+1QWuDDJZ5JsQU2CI3/IfJc8AlmrmQwElrMdgRsD
+         ecew==
+X-Gm-Message-State: AOJu0YxCNIVg9BQbR/xHikTqziCpXcv5MSYfu7U1Ae8lRoYwFPNnhMxp
+        tHhOJaORuBQDi1R4kfuI7uA=
+X-Google-Smtp-Source: AGHT+IGU7QGcBGqL3dCBGP1LyC3Q0ee0fldrfLMzjbNXgAKf3o2g6U6D1VZCeDPwZDXUI5Sk5awGOw==
+X-Received: by 2002:a05:6a00:15d0:b0:684:bb4a:b86e with SMTP id o16-20020a056a0015d000b00684bb4ab86emr661716pfu.1.1692058031125;
+        Mon, 14 Aug 2023 17:07:11 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id u10-20020aa7838a000000b00686f0b15b06sm8455293pfm.188.2023.08.14.17.07.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 17:07:10 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 17:07:09 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v6 5/6] KVM: selftests: Test if event filter meets
+ expectations on fixed counters
+Message-ID: <20230815000709.GF2257301@ls.amr.corp.intel.com>
+References: <20230810090945.16053-1-cloudliang@tencent.com>
+ <20230810090945.16053-6-cloudliang@tencent.com>
 MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
- <ZIn6VQSebTRN1jtX@google.com> <CAF7b7mqfkLYtWBJ=u0MK7hhARHrahQXHza9VnaughyNz5_tNug@mail.gmail.com>
- <ZNpsCngiSjISMG5j@google.com>
-In-Reply-To: <ZNpsCngiSjISMG5j@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Mon, 14 Aug 2023 17:06:27 -0700
-Message-ID: <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230810090945.16053-6-cloudliang@tencent.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,33 +83,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14, 2023 at 11:01=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> What is/was the error?  It's probably worth digging into; "static inline"=
- should
-> work just fine, so there might be something funky elsewhere that you're p=
-apering
-> over.
+On Thu, Aug 10, 2023 at 05:09:44PM +0800,
+Jinrong Liang <ljr.kernel@gmail.com> wrote:
 
-What I get is
+> From: Jinrong Liang <cloudliang@tencent.com>
+> 
+> Add tests to cover that pmu event_filter works as expected when it's
+> applied to fixed performance counters, even if there is none fixed
+> counter exists (e.g. Intel guest pmu version=1 or AMD guest).
+> 
+> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> ---
+>  .../kvm/x86_64/pmu_event_filter_test.c        | 80 +++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> index 8b8bfee11016..732c76c41bb0 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> @@ -27,6 +27,7 @@
+>  #define ARCH_PERFMON_BRANCHES_RETIRED		5
+>  
+>  #define NUM_BRANCHES 42
+> +#define INTEL_PMC_IDX_FIXED		32
+>  
+>  /* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
+>  #define MAX_FILTER_EVENTS		300
+> @@ -808,6 +809,84 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
+>  	TEST_ASSERT(!r, "Masking non-existent fixed counters should be allowed");
+>  }
+>  
+> +static void intel_run_fixed_counter_guest_code(uint8_t fixed_ctr_idx)
+> +{
+> +	for (;;) {
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +		wrmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx, 0);
+> +
+> +		/* Only OS_EN bit is enabled for fixed counter[idx]. */
+> +		wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, BIT_ULL(4 * fixed_ctr_idx));
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL,
+> +		      BIT_ULL(INTEL_PMC_IDX_FIXED + fixed_ctr_idx));
+> +		__asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES}));
+> +		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +
+> +		GUEST_SYNC(rdmsr(MSR_CORE_PERF_FIXED_CTR0 + fixed_ctr_idx));
+> +	}
+> +}
+> +
+> +static uint64_t test_with_fixed_counter_filter(struct kvm_vcpu *vcpu,
+> +					       uint32_t action, uint32_t bitmap)
+> +{
+> +	struct __kvm_pmu_event_filter f = {
+> +		.action = action,
+> +		.fixed_counter_bitmap = bitmap,
+> +	};
+> +	do_vcpu_set_pmu_event_filter(vcpu, &f);
+> +
+> +	return run_vcpu_to_sync(vcpu);
+> +}
+> +
+> +static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
+> +					uint8_t nr_fixed_counters)
+> +{
+> +	unsigned int i;
+> +	uint32_t bitmap;
+> +	uint64_t count;
+> +
+> +	TEST_ASSERT(nr_fixed_counters < sizeof(bitmap) * 8,
+> +		    "Invalid nr_fixed_counters");
+> +
+> +	/*
+> +	 * Check the fixed performance counter can count normally when KVM
+> +	 * userspace doesn't set any pmu filter.
+> +	 */
+> +	count = run_vcpu_to_sync(vcpu);
+> +	TEST_ASSERT(count, "Unexpected count value: %ld\n", count);
+> +
+> +	for (i = 0; i < BIT(nr_fixed_counters); i++) {
+> +		bitmap = BIT(i);
+> +		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_ALLOW,
+> +						       bitmap);
+> +		TEST_ASSERT_EQ(!!count, !!(bitmap & BIT(idx)));
+> +
+> +		count = test_with_fixed_counter_filter(vcpu, KVM_PMU_EVENT_DENY,
+> +						       bitmap);
+> +		TEST_ASSERT_EQ(!!count, !(bitmap & BIT(idx)));
+> +	}
+> +}
+> +
+> +static void test_fixed_counter_bitmap(void)
+> +{
+> +	uint8_t nr_fixed_counters = kvm_cpu_property(X86_PROPERTY_PMU_NR_FIXED_COUNTERS);
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +	uint8_t idx;
+> +
+> +	/*
+> +	 * Check that pmu_event_filter works as expected when it's applied to
+> +	 * fixed performance counters.
+> +	 */
+> +	for (idx = 0; idx < nr_fixed_counters; idx++) {
+> +		vm = vm_create_with_one_vcpu(&vcpu,
+> +					     intel_run_fixed_counter_guest_code);
+> +		vcpu_args_set(vcpu, 1, idx);
+> +		__test_fixed_counter_bitmap(vcpu, idx, nr_fixed_counters);
+> +		kvm_vm_free(vm);
+> +	}
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	void (*guest_code)(void);
+> @@ -851,6 +930,7 @@ int main(int argc, char *argv[])
+>  	kvm_vm_free(vm);
+>  
+>  	test_pmu_config_disable(guest_code);
+> +	test_fixed_counter_bitmap();
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.39.3
+> 
 
-> ./include/linux/kvm_host.h:2298:20: error: function 'kvm_handle_guest_uac=
-cess_fault' has internal linkage but is not defined [-Werror,-Wundefined-in=
-ternal]
-> static inline void kvm_handle_guest_uaccess_fault(struct kvm_vcpu *vcpu,
->                    ^
-> arch/x86/kvm/mmu/mmu.c:3323:2: note: used here
->         kvm_handle_guest_uaccess_fault(vcpu, gfn_to_gpa(fault->gfn), PAGE=
-_SIZE,
->         ^
-> 1 error generated.
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-(mmu.c:3323 is in kvm_handle_error_pfn()). I tried shoving the
-definition of the function from kvm_main.c to kvm_host.h so that I
-could make it "static inline": but then the same "internal linkage"
-error pops up in the kvm_vcpu_read/write_guest_page() functions.
-
-Btw, do you actually know the size of the union in the run struct? I
-started checking it but stopped when I realized that it includes
-arch-dependent structs.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
