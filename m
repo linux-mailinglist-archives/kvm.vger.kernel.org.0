@@ -2,50 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0A8977CB36
+	by mail.lfdr.de (Postfix) with ESMTP id EAA9B77CB37
 	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 12:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236475AbjHOKjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 06:39:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47418 "EHLO
+        id S236480AbjHOKjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 06:39:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236506AbjHOKjD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 06:39:03 -0400
+        with ESMTP id S236390AbjHOKjM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 06:39:12 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E6F199B
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 03:38:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F12BB
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 03:39:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B7A86522F
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:38:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 456A7C433C8;
-        Tue, 15 Aug 2023 10:38:57 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E23CD65179
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:39:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BAFC433C7;
+        Tue, 15 Aug 2023 10:39:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692095937;
-        bh=zda4u5KUJ4HH3d/gEyOAJ3iuNxo/s4/E3XJ7jsuJk88=;
+        s=k20201202; t=1692095949;
+        bh=Gf3HzodU8tLo1mIQprRqSUpWxSeTthPjIQL+JBRkSzg=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=XM1DkbFYFoG9FobSob7KV0gsgLlrZJ6xQKWTqoVVxaYbLmSf90NjsF9eHVA5UMI/K
-         eUDQq3SYB2qYIrDjPtZt5DokmGIbrQHcCESyC45nqg4OX8f5Iq+wxqW2yQAEGcYZU9
-         my4dSjM5Xkd6H/DFQtdai1YE9kqN04efXtbJLrRpoYghMWq0HkrkuDKITHuUNTUV7T
-         GduSrlNjmVj+NDgx4aADksZiJGbaHislJ0e9JDJ7s591x5MFrJx25RXasAS6rg7NDg
-         C40wsBXJZcKfus9hMmY/EbUPS9PMRnZml85NOXcqaRzrgsyTWKowrz5TGmsyo7ae6G
-         MDok11H3ZA4QA==
+        b=hPCNwAeaVLW55YAcAFZ6+axIhPjbwlZxgobxFTMyN6do7wyATvRVdDZuoxfTbdcij
+         U/5GDxxMdWjCFa6T+IBkaT0zyqGkjMFHoYdx/cPzey6gDfwz0v1nRRmHLAVIyl5swC
+         plgYvB82cBSsn61TQPFrFQ+QjT1QikhnnF86x07dphFUajWXhrhu6+bUJlLxIxZwD6
+         BXjwyXV22XtL0KI5gFQ2nStq0vWGZrJbI6gAZErAOZR90+W7ObllkTUYaP+jbFPcoI
+         XnNh+Th+gQj0ut3NMKW33E2nZP+erVTkLbiXZ/5MC+ub9PBr7FEz4STq3zQYuVmONH
+         mcu+hGb5ydF8w==
 Received: from host213-123-75-60.in-addr.btopenworld.com ([213.123.75.60] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVrRv-004yal-3P;
-        Tue, 15 Aug 2023 11:38:55 +0100
-Date:   Tue, 15 Aug 2023 11:39:07 +0100
-Message-ID: <87il9gpp2s.wl-maz@kernel.org>
+        id 1qVrS5-004ycj-VF;
+        Tue, 15 Aug 2023 11:39:07 +0100
+Date:   Tue, 15 Aug 2023 11:39:18 +0100
+Message-ID: <87h6p0pp2h.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Miguel Luis <miguel.luis@oracle.com>
-Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
         Catalin Marinas <catalin.marinas@arm.com>,
         Eric Auger <eric.auger@redhat.com>,
         Mark Brown <broonie@kernel.org>,
@@ -56,22 +54,24 @@ Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
         Chase Conklin <chase.conklin@arm.com>,
         Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
         Darren Hart <darren@os.amperecomputing.com>,
+        Miguel Luis <miguel.luis@oracle.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-In-Reply-To: <85C2D540-7AD7-49BB-9EFB-7F950D08AC15@oracle.com>
+Subject: Re: [PATCH v3 01/27] arm64: Add missing VA CMO encodings
+In-Reply-To: <CAAdAUtjaj7wCn6VG7KxGqmT_e+nth_LK00+4E2SfF=5dFpmbSA@mail.gmail.com>
 References: <20230808114711.2013842-1-maz@kernel.org>
-        <20230808114711.2013842-16-maz@kernel.org>
-        <85C2D540-7AD7-49BB-9EFB-7F950D08AC15@oracle.com>
+        <20230808114711.2013842-2-maz@kernel.org>
+        <CAAdAUtjaj7wCn6VG7KxGqmT_e+nth_LK00+4E2SfF=5dFpmbSA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 213.123.75.60
-X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -84,239 +84,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Miguel,
-
-On Sat, 12 Aug 2023 04:08:22 +0100,
-Miguel Luis <miguel.luis@oracle.com> wrote:
-> 
+On Thu, 10 Aug 2023 04:14:51 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+>=20
 > Hi Marc,
-> 
-> > On 8 Aug 2023, at 11:46, Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > Describe the HCR_EL2 register, and associate it with all the sysregs
-> > it allows to trap.
-> > 
+>=20
+> On Tue, Aug 8, 2023 at 4:47=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+> >
+> > Add the missing VA-based CMOs encodings.
+> >
 > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
+> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 > > ---
-> > arch/arm64/kvm/emulate-nested.c | 486 ++++++++++++++++++++++++++++++++
-> > 1 file changed, 486 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index 1b1148770d45..2122d16bdeeb 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -37,12 +37,48 @@ enum trap_group {
-> > * on their own instead of being part of a combination of
-> > * trap controls.
-> > */
-> > + CGT_HCR_TID1,
-> > + CGT_HCR_TID2,
-> > + CGT_HCR_TID3,
-> > + CGT_HCR_IMO,
-> > + CGT_HCR_FMO,
-> > + CGT_HCR_TIDCP,
-> > + CGT_HCR_TACR,
-> > + CGT_HCR_TSW,
-> > + CGT_HCR_TPC,
-> > + CGT_HCR_TPU,
-> > + CGT_HCR_TTLB,
-> > + CGT_HCR_TVM,
-> > + CGT_HCR_TDZ,
-> > + CGT_HCR_TRVM,
-> > + CGT_HCR_TLOR,
-> > + CGT_HCR_TERR,
-> > + CGT_HCR_APK,
-> > + CGT_HCR_NV,
-> > + CGT_HCR_NV_nNV2,
-> > + CGT_HCR_NV1_nNV2,
-> > + CGT_HCR_AT,
-> > + CGT_HCR_FIEN,
-> > + CGT_HCR_TID4,
-> > + CGT_HCR_TICAB,
-> > + CGT_HCR_TOCU,
-> > + CGT_HCR_ENSCXT,
-> > + CGT_HCR_TTLBIS,
-> > + CGT_HCR_TTLBOS,
-> > 
-> > /*
-> > * Anything after this point is a combination of trap controls,
-> > * which all must be evaluated to decide what to do.
-> > */
-> > __MULTIPLE_CONTROL_BITS__,
-> > + CGT_HCR_IMO_FMO = __MULTIPLE_CONTROL_BITS__,
-> > + CGT_HCR_TID2_TID4,
-> > + CGT_HCR_TTLB_TTLBIS,
-> > + CGT_HCR_TTLB_TTLBOS,
-> > + CGT_HCR_TVM_TRVM,
-> > + CGT_HCR_TPU_TICAB,
-> > + CGT_HCR_TPU_TOCU,
-> > + CGT_HCR_NV1_nNV2_ENSCXT,
-> > 
-> > /*
-> > * Anything after this point requires a callback evaluating a
-> > @@ -55,6 +91,174 @@ enum trap_group {
-> > };
-> > 
-> > static const struct trap_bits coarse_trap_bits[] = {
-> > + [CGT_HCR_TID1] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TID1,
-> > + .mask = HCR_TID1,
-> > + .behaviour = BEHAVE_FORWARD_READ,
-> > + },
-> > + [CGT_HCR_TID2] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TID2,
-> > + .mask = HCR_TID2,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TID3] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TID3,
-> > + .mask = HCR_TID3,
-> > + .behaviour = BEHAVE_FORWARD_READ,
-> > + },
-> > + [CGT_HCR_IMO] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_IMO,
-> > + .mask = HCR_IMO,
-> > + .behaviour = BEHAVE_FORWARD_WRITE,
-> > + },
-> > + [CGT_HCR_FMO] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_FMO,
-> > + .mask = HCR_FMO,
-> > + .behaviour = BEHAVE_FORWARD_WRITE,
-> > + },
-> > + [CGT_HCR_TIDCP] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TIDCP,
-> > + .mask = HCR_TIDCP,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TACR] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TACR,
-> > + .mask = HCR_TACR,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TSW] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TSW,
-> > + .mask = HCR_TSW,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TPC] = { /* Also called TCPC when FEAT_DPB is implemented */
-> > + .index = HCR_EL2,
-> > + .value = HCR_TPC,
-> > + .mask = HCR_TPC,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TPU] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TPU,
-> > + .mask = HCR_TPU,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TTLB] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TTLB,
-> > + .mask = HCR_TTLB,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TVM] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TVM,
-> > + .mask = HCR_TVM,
-> > + .behaviour = BEHAVE_FORWARD_WRITE,
-> > + },
-> > + [CGT_HCR_TDZ] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TDZ,
-> > + .mask = HCR_TDZ,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TRVM] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TRVM,
-> > + .mask = HCR_TRVM,
-> > + .behaviour = BEHAVE_FORWARD_READ,
-> > + },
-> > + [CGT_HCR_TLOR] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TLOR,
-> > + .mask = HCR_TLOR,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_TERR] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_TERR,
-> > + .mask = HCR_TERR,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_APK] = {
-> > + .index = HCR_EL2,
-> > + .value = 0,
-> > + .mask = HCR_APK,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_NV] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_NV,
-> > + .mask = HCR_NV,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_NV_nNV2] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_NV,
-> > + .mask = HCR_NV | HCR_NV2,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> > + [CGT_HCR_NV1_nNV2] = {
-> > + .index = HCR_EL2,
-> > + .value = HCR_NV | HCR_NV1,
-> > + .mask = HCR_NV | HCR_NV1 | HCR_NV2,
-> > + .behaviour = BEHAVE_FORWARD_ANY,
-> > + },
-> 
-> The declaration above seems to be a coarse control combination that could be
-> decomposed in the following, more readable, equivalent by adding a
-> combination of two MCBs
-> (eg. CGT_HCR_NV_NV1, CGT_HCR_NV_NV1_nNV2)
-> 
->        [CGT_HCR_NV1] = {
->                .index          = HCR_EL2,
->                .value          = HCR_NV1,
->                .mask           = HCR_NV1,
->                .behaviour      = BEHAVE_FORWARD_ANY,
->        },
->        [CGT_HCR_NV1_nNV2] = {
->                .index          = HCR_EL2,
->                .value          = HCR_NV1,
->                .mask           = HCR_NV1 | HCR_NV2,
->                .behaviour      = BEHAVE_FORWARD_ANY,
->        },
->
-> /* FEAT_NV and FEAT_NV2 */
-> MCB(CGT_HCR_NV_NV1, CGT_HCR_NV, CGT_HCR_NV1)	
-> 
-> /* FEAT_NV2 and HCR_EL2.NV2 is 0 behaves as FEAT_NV */
-> MCB(CGT_HCR_NV_NV1_nNV2, CGT_HCR_NV_nNV2, CGT_HCR_NV1_nNV2 )
+> >  arch/arm64/include/asm/sysreg.h | 26 ++++++++++++++++++++++++++
+> >  1 file changed, 26 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/s=
+ysreg.h
+> > index b481935e9314..85447e68951a 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -124,6 +124,32 @@
+> >  #define SYS_DC_CIGSW                   sys_insn(1, 0, 7, 14, 4)
+> >  #define SYS_DC_CIGDSW                  sys_insn(1, 0, 7, 14, 6)
+> >
+> > +#define SYS_IC_IALLUIS                 sys_insn(1, 0, 7, 1, 0)
+> > +#define SYS_IC_IALLU                   sys_insn(1, 0, 7, 5, 0)
+> > +#define SYS_IC_IVAU                    sys_insn(1, 3, 7, 5, 1)
+> > +
+> > +#define SYS_DC_IVAC                    sys_insn(1, 0, 7, 6, 1)
+> > +#define SYS_DC_IGVAC                   sys_insn(1, 0, 7, 6, 3)
+> > +#define SYS_DC_IGDVAC                  sys_insn(1, 0, 7, 6, 5)
+> > +
+> > +#define SYS_DC_CVAC                    sys_insn(1, 3, 7, 10, 1)
+> > +#define SYS_DC_CGVAC                   sys_insn(1, 3, 7, 10, 3)
+> > +#define SYS_DC_CGDVAC                  sys_insn(1, 3, 7, 10, 5)
+> > +
+> > +#define SYS_DC_CVAU                    sys_insn(1, 3, 7, 11, 1)
+> > +
+> > +#define SYS_DC_CVAP                    sys_insn(1, 3, 7, 12, 1)
+> > +#define SYS_DC_CGVAP                   sys_insn(1, 3, 7, 12, 3)
+> > +#define SYS_DC_CGDVAP                  sys_insn(1, 3, 7, 12, 5)
+> > +
+> > +#define SYS_DC_CVADP                   sys_insn(1, 3, 7, 13, 1)
+> > +#define SYS_DC_CGVADP                  sys_insn(1, 3, 7, 13, 3)
+> > +#define SYS_DC_CGDVADP                 sys_insn(1, 3, 7, 13, 5)
+> > +
+> > +#define SYS_DC_CIVAC                   sys_insn(1, 3, 7, 14, 1)
+> > +#define SYS_DC_CIGVAC                  sys_insn(1, 3, 7, 14, 3)
+> > +#define SYS_DC_CIGDVAC                 sys_insn(1, 3, 7, 14, 5)
+> > +
+>=20
+> How about sorting these new ones with existing ones to make it more reada=
+ble?
+> Otherwise,
+> Reviewed-by: Jing Zhang <jingzhangos@google.com>
 
-This is not equivalent at all, as a MCB is a logical OR, not an AND.
-
-> On the above all the coarse HCR_EL2.{NV,NV1} traps are covered but not the
-> constrained unpredictable one when HCR_EL2.{NV,NV1} is {0,1} which traps in
-> two of its behaviours and doesn't trap on one.
-
-The current approach makes it plain that HCR_EL2.NV==0 doesn't result
-in any trap forwarding, consistent with the current wording of
-architecture.
+Do you mean the DC SW ops? I'd rather keep them separated, as their
+encoding has a different pattern, and they are treated pretty
+differently. I found that mixing them with the rest of the DC ops made
+it *more* difficult to figure out what we were dealing with.
 
 Thanks,
 
 	M.
 
--- 
+--=20
 Without deviation from the norm, progress is not possible.
