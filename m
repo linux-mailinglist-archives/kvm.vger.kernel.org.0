@@ -2,167 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3458977C4AD
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A219C77C4C0
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:53:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233618AbjHOAs6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 20:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39028 "EHLO
+        id S233583AbjHOAxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 20:53:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233763AbjHOAsh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 20:48:37 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3C7173E
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:48:35 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-589e5e46735so31140297b3.2
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:48:35 -0700 (PDT)
+        with ESMTP id S233949AbjHOAxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 20:53:10 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF81819A8
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:52:48 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d672f55d48dso4159863276.2
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:52:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692060514; x=1692665314;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=52oFZVaLBUqV5JDZKjfa7j0JbQy+FgnNmye7nF0zv4Q=;
-        b=FxxWccPFx99rf/V93BNIHCJQDo4G5Zqgck3MdWGlrvNjMCRPN8+G/pY2KOQxIsmru4
-         vHP6l3UEcIbqov0g/ZNfatfTRlVJ4PqnbEjX8htHswC2UWPgE8BCpl4N5rf6TqJAj5r7
-         3cNurQ0Uef0OB/kGIOacEBA/AwM3Z0NXdnm7Tl/dvyTytatiTtWBRn4NtDzJl8cuZpiE
-         An0JjLDU7h1dJCpalHenIF1GbxY9OlZdC6Cps6IKdn8w/2qZYzdExGGuFKJLqlohWPz+
-         CLzdX4lu/e5vAb3ExxkeJaeWP64lX43sqrSEThAmoeNcMVwSigCbOhpzG+ztFaEtaHZe
-         sr4g==
+        d=google.com; s=20221208; t=1692060752; x=1692665552;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hk15mUEG36mYzoWqdyXNILxXbUGFuZdN5ezEkvLZ3iM=;
+        b=SUKnvazqj9CVjAezsoD2+y+B/lascXFbPfh2BmPWUTPhsp2ltMrajsTckozDu9ifdm
+         uRoTdnCgOM98B7Rnb91Ve9c/MBRF5IHK3nGacQ54NRHNp4jfWACljRlSNeWuoRdL+3na
+         CtHqlJoC59YHPayYcYzVEhCEfMbZsPVJQIkTDsx0J6ehfskI+bg3C/TTqGB4GfV7K9Vn
+         rRDM2yi+re6usECld7Z4U2WK/2ghsl54KPV4Ycl6v1kRxR+u2a297eNSVYm3jPrYQCL2
+         cXFmXO9Zt4S3exCCMfQ/QP9nNjQaIR5tBPHnG0PDbMprpJdiffEDLgQQkSHFXTPIaHgD
+         6rOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692060514; x=1692665314;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=52oFZVaLBUqV5JDZKjfa7j0JbQy+FgnNmye7nF0zv4Q=;
-        b=UVGvno6N3EB/XZB2rHmOtko80ftBUQyxpmR35HGZZrAMXkfaTWGnYOqvd+AoBfh96y
-         z+XLCUfXI2nmjDkHbuOln81t5tX0TFD1KjQCB04KEIwjIts4nJ58i9F/mJx1Av3WWh5C
-         lMuNfN4b0VsXB/cOG8ZS4x4y/3VOgGOYQzK+cMwhjFh6y4Aq5bL4t8vL5MKnAzcbTOJO
-         U1/jyS286mYEOCxSQM9T61cpc5WDGdV7Qs+T3EhjUGLh7u24lgecJrzIo1vZlbnaFfGT
-         UFnQ2rIP28XI7dzHsmw9jKj3Qk8taXWJBzUXfALGXWhA6Hny+sq/buqAIPo2M5zLu8jV
-         zC3A==
-X-Gm-Message-State: AOJu0YwXwR1j8xk95kyZ31zxCh5dlxfZRjOUPLLSEgtjcs4MG4rPdcO5
-        ELoxMiEm2xmTEQlpaVpZI4MpflZ7Orc=
-X-Google-Smtp-Source: AGHT+IENRn7eU5S576awdNT0hdv6zNDIVzHUqiIWxFSkMpa6HSwObqb6uEWL8dr1GX7l67afv6TxWe2boxM=
+        d=1e100.net; s=20221208; t=1692060752; x=1692665552;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hk15mUEG36mYzoWqdyXNILxXbUGFuZdN5ezEkvLZ3iM=;
+        b=gArRyDlgETqCw4m/5rSCMFq2wn9OLYQdCN92+yv0I9mKAteK66IyXvxTDOtvLRI17Z
+         vr3Ho4xLcYRpVL5AatHlypkWfGlLwVBcr5/LFQSP2wUbMdQ+UyRiDss3ZjyXaa418nFU
+         3nIYOT2tqwL1NwIRbrMGZ3lqysiMznEjXKciCyRi3214ZRcBoBBQTZazPnfGgDaQ1+hX
+         AYWv9cNl5rgKgmRUa5/9e3ynp9aro2/wKXqeBBRIsdpErQ3cTRbLV2hZz7UsHs4VdTe9
+         JEBMfkVGyJeDYYB5njW4wtH90F4h6IdBi9LMKw7LObxX3LO17c4CT3K7tzn1YfX4ldE4
+         QQug==
+X-Gm-Message-State: AOJu0Yyfa3sMH162cERi97ufttqU2tjrQdujsjE0DgJCdqYaGWbmSPO+
+        ptUrRRSfBAZ4URoEFpbhBoeZSEN7AZA=
+X-Google-Smtp-Source: AGHT+IEm/gyjzby2m0z7Th7h1NzS+zVz9W6iAdmwDKQNzO5UYu/Tw93ovcYoaLNJ0fJilJkbmSYm3tW9J7c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:709:b0:57a:118a:f31 with SMTP id
- bs9-20020a05690c070900b0057a118a0f31mr182637ywb.7.1692060514350; Mon, 14 Aug
- 2023 17:48:34 -0700 (PDT)
-Date:   Mon, 14 Aug 2023 17:48:32 -0700
-In-Reply-To: <169100872740.1737125.14417847751002571677.b4-ty@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:7443:0:b0:d20:7752:e384 with SMTP id
+ p64-20020a257443000000b00d207752e384mr148317ybc.3.1692060751838; Mon, 14 Aug
+ 2023 17:52:31 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 17:52:30 -0700
+In-Reply-To: <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com>
 Mime-Version: 1.0
-References: <20230728001606.2275586-1-mhal@rbox.co> <169100872740.1737125.14417847751002571677.b4-ty@google.com>
-Message-ID: <ZNrLYOiQuImD1g8A@google.com>
-Subject: Re: [PATCH 0/2] sync_regs() TOCTOU issues
+References: <20230811045127.3308641-1-rananta@google.com> <ZNq15SZ+53umvOfx@google.com>
+ <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com>
+Message-ID: <ZNrMTmppUfQhdsyY@google.com>
+Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
 From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Fuad Tabba <tabba@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+        USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 02, 2023, Sean Christopherson wrote:
-> On Fri, 28 Jul 2023 02:12:56 +0200, Michal Luczaj wrote:
-> > Both __set_sregs() and kvm_vcpu_ioctl_x86_set_vcpu_events() assume they
-> > have exclusive rights to structs they operate on. While this is true when
-> > coming from an ioctl handler (caller makes a local copy of user's data),
-> > sync_regs() breaks this contract; a pointer to a user-modifiable memory
-> > (vcpu->run->s.regs) is provided. This can lead to a situation when incoming
-> > data is checked and/or sanitized only to be re-set by a user thread running
-> > in parallel.
-> > 
-> > [...]
-> 
-> Applied to kvm-x86 selftests (there are in-flight reworks for selftests
-> that will conflict, and I didn't want to split the testcases from the fix).
-> 
-> As mentioned in my reply to patch 2, I split up the selftests patch and
-> massaged things a bit.  Please holler if you disagree with any of the
-> changes.
-> 
-> Thanks much!
-> 
-> [1/4] KVM: x86: Fix KVM_CAP_SYNC_REGS's sync_regs() TOCTOU issues
->       https://github.com/kvm-x86/linux/commit/0d033770d43a
-> [2/4] KVM: selftests: Extend x86's sync_regs_test to check for CR4 races
->       https://github.com/kvm-x86/linux/commit/ae895cbe613a
-> [3/4] KVM: selftests: Extend x86's sync_regs_test to check for event vector races
->       https://github.com/kvm-x86/linux/commit/60c4063b4752
-> [4/4] KVM: selftests: Extend x86's sync_regs_test to check for exception races
->       https://github.com/kvm-x86/linux/commit/0de704d2d6c8
+On Mon, Aug 14, 2023, Raghavendra Rao Ananta wrote:
+> On Mon, Aug 14, 2023 at 4:16=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
+> > > The series is based off of upstream v6.5-rc1.
+> >
+> > Lies!  :-)
+> >
+> > This is based off one of the kvmarm.git topic branches (I didn't bother=
+ to figure
+> > out which one), not v6.5-rc1.
+> >
+> Sorry, what am I missing here? My git log is as follows:
 
-Argh, apparently I didn't run these on AMD.  The exception injection test hangs
-because the vCPU hits triple fault shutdown, and because the VMCB is technically
-undefined on shutdown, KVM synthesizes INIT.  That starts the vCPU at the reset
-vector and it happily fetches zeroes util being killed.
+Hmm, not sure what's going on.  Maybe I misinterpreted why `git am` was fai=
+ling?
+I assumed it was because there were objects in kvmarm that I didn't have lo=
+cally,
+and fetching kvmarm allowed am to complete, though with 3-way merges, which=
+ IIUC
+shouldn't have been necessary if I was using the exact same base.  Or maybe=
+ I
+messed up and didn't actually reset to 6.5-rc1.
 
-This fixes the issue, and I confirmed all three testcases repro the KVM bug with
-it.  I'll post formally tomorrow.
+> $ git log --oneline upstream_tlbi_range_v9
+> 5025857507abe (upstream_tlbi_range_v9) KVM: arm64: Use TLBI
+> range-based instructions for unmap
+> 5c0291b99a8fc KVM: arm64: Invalidate the table entries upon a range
+> 8c46b54d4aaec KVM: arm64: Flush only the memslot after write-protect
+> 231abaeb7ffc2 KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
+> 5ec291b863309 KVM: arm64: Define kvm_tlb_flush_vmid_range()
+> 5bcd7a085c34e KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
+> ea08f9dff7e5b arm64: tlb: Implement __flush_s2_tlb_range_op()
+> b3178687947c9 arm64: tlb: Refactor the core flush algorithm of __flush_tl=
+b_range
+> a4850fa988eef KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common co=
+de
+> 306dc4e6afd37 KVM: Allow range-based TLB invalidation from common code
+> d02785a0a1e01 KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+> 136fa2d254537 KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+> e35c68a75170d KVM: Declare kvm_arch_flush_remote_tlbs() globally
+> 5d592777b9bba KVM: Rename kvm_arch_flush_remote_tlb() to
+> kvm_arch_flush_remote_tlbs()
+> 06c2afb862f9d (tag: v6.5-rc1, tag: linux/v6.5-rc1) Linux 6.5-rc1
+> c192ac7357683 MAINTAINERS 2: Electric Boogaloo
+> f71f64210d698 Merge tag 'dma-mapping-6.5-2023-07-09' of
+> git://git.infradead.org/users/hch/dma-mapping
+> ...
+>=20
+> Isn't the commit, 06c2afb862f9d (06c2afb862f9d (tag: v6.5-rc1, tag:
+> linux/v6.5-rc1) Linux 6.5-rc1) the 'base' commit?
 
----
- .../testing/selftests/kvm/x86_64/sync_regs_test.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Ya, should be.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-index 93fac74ca0a7..55e9b68e6947 100644
---- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
-@@ -94,6 +94,7 @@ static void *race_events_inj_pen(void *arg)
- 	for (;;) {
- 		WRITE_ONCE(run->kvm_dirty_regs, KVM_SYNC_X86_EVENTS);
- 		WRITE_ONCE(events->flags, 0);
-+		WRITE_ONCE(events->exception.nr, GP_VECTOR);
- 		WRITE_ONCE(events->exception.injected, 1);
- 		WRITE_ONCE(events->exception.pending, 1);
- 
-@@ -115,6 +116,7 @@ static void *race_events_exc(void *arg)
- 	for (;;) {
- 		WRITE_ONCE(run->kvm_dirty_regs, KVM_SYNC_X86_EVENTS);
- 		WRITE_ONCE(events->flags, 0);
-+		WRITE_ONCE(events->exception.nr, GP_VECTOR);
- 		WRITE_ONCE(events->exception.pending, 1);
- 		WRITE_ONCE(events->exception.nr, 255);
- 
-@@ -152,6 +154,7 @@ static noinline void *race_sregs_cr4(void *arg)
- static void race_sync_regs(void *racer)
- {
- 	const time_t TIMEOUT = 2; /* seconds, roughly */
-+	struct kvm_x86_state *state;
- 	struct kvm_translation tr;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_run *run;
-@@ -178,8 +181,17 @@ static void race_sync_regs(void *racer)
- 
- 	TEST_ASSERT_EQ(pthread_create(&thread, NULL, racer, (void *)run), 0);
- 
-+	state = vcpu_save_state(vcpu);
-+
- 	for (t = time(NULL) + TIMEOUT; time(NULL) < t;) {
--		__vcpu_run(vcpu);
-+		/*
-+		 * Reload known good state if the vCPU triple faults, e.g. due
-+		 * to the unhandled #GPs being injected.  VMX preserves state
-+		 * on shutdown, but SVM synthesizes an INIT as the VMCB state
-+		 * is architecturally undefined on triple fault.
-+		 */
-+		if (!__vcpu_run(vcpu) && run->exit_reason == KVM_EXIT_SHUTDOWN)
-+			vcpu_load_state(vcpu, state);
- 
- 		if (racer == race_sregs_cr4) {
- 			tr = (struct kvm_translation) { .linear_address = 0 };
-@@ -190,6 +202,7 @@ static void race_sync_regs(void *racer)
- 	TEST_ASSERT_EQ(pthread_cancel(thread), 0);
- 	TEST_ASSERT_EQ(pthread_join(thread, NULL), 0);
- 
-+	kvm_x86_state_cleanup(state);
- 	kvm_vm_free(vm);
- }
- 
+Either way, even if this is PEBKAC on my end, using --base would be nice, e=
+.g.
+then you can definitely say it's my fault ;-)
 
-base-commit: 722b2afc50abbfaa74accbc52911f9b5e8719c95
--- 
-
+> > Please try to incorporate git format-patch's "--base" option into your =
+workflow,
+> > e.g. I do "git format-patch --base=3DHEAD~$nr" where $nr is the number =
+of patches
+> > I am posting.
+> >
+> > It's not foolproof, e.g. my approach doesn't help if I have a local pat=
+ch that
+> > I'm not posting, but 99% of the time it Just Works and eliminates any a=
+mbuitity.
+> >
+> > You can also do "--base=3Dauto", but that only does the right thing if =
+your series
+> > has its upstream branch set to the base/tree that you want your patches=
+ applied
+> > to (I use the upstream branch for a completely different purpose for my=
+ dev branches).
