@@ -2,735 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC7CB77CF85
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 17:49:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6649077CF9A
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 17:52:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238246AbjHOPsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 11:48:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43438 "EHLO
+        id S238323AbjHOPvp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 11:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234339AbjHOPsA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 11:48:00 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2741198A
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 08:47:36 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37FBInC3031592;
-        Tue, 15 Aug 2023 15:46:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=Z1txaAX7PF1akZGNVdYd2SRD9BVkjrZXjvTGnm/bWBM=;
- b=PnhuzyxJdGBFCay7fqmF27BIotZP/OO25wXXgICTFY7Wqf9H5OR9/OLpMajff1t4mU2M
- ImWbmtlIf/+FBWMJ/PVfv5j6TiK36dQNsRfjjaj7uSEcf+77s2aZyMTPF05lVCdeKcPw
- gkO1JrwUOB58h571N3V/F0hBLY7U6Fl3AV2cPty1OdV+ercbIpd037kmEeuNBZXl8/YN
- BdXmE/oyhtGrufp3Qg3qTO62/nAhIxgOomY/7ncdkPB2R1tHdzo/pG/JiLN7uZDnHZVx
- 7QETAbw0fAkewQdE0mHFmAI4P/Xx1KFU6QTmH8YBwq0XywCO0j5d7TFMqXxR0T9OwcHW eg== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3se31451ma-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Aug 2023 15:46:26 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37FFiHFl003799;
-        Tue, 15 Aug 2023 15:46:25 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2043.outbound.protection.outlook.com [104.47.66.43])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sexyj0fdq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Aug 2023 15:46:25 +0000
+        with ESMTP id S236263AbjHOPvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 11:51:14 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2082.outbound.protection.outlook.com [40.107.244.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC73E10C6;
+        Tue, 15 Aug 2023 08:51:12 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D2SfKw5TudoK8sAsqWhGJKf3wOX2koFxTZJF6hRuw22Vn0EMkjjy0THGu3Hy0rcty19z4ln9j7PHvX6syAKdjJywOxL7uGGUPyovk5hkRhhFLbWYdB+BBa3pNmJZZsMLMrrXjbrzwbYvLbLG51LQ0OIyCcCVuEY64r4sZRz8sWq6sNTRbfbehXGvYoYkH7ZmNtAZInRzQGVf7E6SGFWFm9gNALE7pLILee/sIYWsL5KtYykxxzFemziPEzM2Mb3pE/NM/euItEJ9mgxnRVeb4NFUYcdUWEFAi5doEMk4X5qS/TxTUDzkXRljM6PTc8vo2EQl5jopY8dgxObSleZK3A==
+ b=BtDQYYbaDrI11lF1Hecg2gQ9Y8febEF0SJPRz+FeCMQfO2tznbDc3Mkg21N+sVlhXIANUl7b9ZjZvs5sLBFhegCjv/OU4S3uuqP0Ljvbvapcyy6/Yd2rah66WeojMhKBBuLv8OCGmJ0PCRHcLDlGA0F52/gdfMzu94OZB2cRrY2MMzIpYZ+8qBF8ol+Gt1Tbl03MtX//itzyuuoxPKff+J9ik/CFEAk+w2hR8h5jppL1dT50R/CZ4gAX4Lj13te6XFbWpDdZCyob0Kc3G3WDP8JLBrIF7e6JK/JzBuovDdHOcqJp+kw/u5uXWXgIBdykO4zycBxVjoB2luKN3HrwmA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z1txaAX7PF1akZGNVdYd2SRD9BVkjrZXjvTGnm/bWBM=;
- b=DkRDKzpiiKOigBJvgJ/UDlSidUx7jzt9xGoldfwfAeADSLOsRNkZeiJdCZWTtfgq3vv65zVBZvWvn6kqv8a3GneVqkzamn5kxydnSJ4Xj9AkncmZ2AX3OPB37X1e3Uhbdb1kwRUDp5YJdWVBxsVhitEQ9u4Q/wnKEIy+zqSWUZ1G8pPJy87rceNJ9uTtEqpdwhA+BTj5STyf/elTu4O/DWU/NFdu5Q+KersjbRb3YyCJFuBcHkPPX9ojWMAgIwgrP5TQKMZNOSQr3tyAiMgkDpPaAbJDS2iRmHIKOqec8E7ltlw3Z2kcAChvdQjOVjS8mj8qLXWlvZeyRrvyugPl8A==
+ bh=slZsflMliJ7MlBj9odh5Rshma0VgD/8+rE8oxMwjTbw=;
+ b=OHpCpru2af7rJis23OamZhlZqbhm0E57ougIrUTrydjCsAr8nvd3xYtsfI/49a9b0+VSdBGvpYwIaw9RiWy8qUa4sG/JvxcoMmxfeWQojdMy05ZjJs9d0zkS2SJOxL9P1KaKReQakw4bukWGHfjl/x15h2Zx6oSWOWqpGdF/6Kqd0GvmnATWyX6xlGQLeNr193GbA2WJg6kcqYpLyqZIt9VxKsrE1af4CgDpoO7UP47FiKVDI8jGtds7Ms6NNiWvcRH8Zgy1rTWHZod3ttVVoiLdg0h7mXim24FxDAjigeaelTFKqrtUkvP4OF3/gQKQ1RgQ/KFimJI8icGrnzQKKw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z1txaAX7PF1akZGNVdYd2SRD9BVkjrZXjvTGnm/bWBM=;
- b=kOx27JyHjazu8qq9hJ+kUM/V5avsDPuEVgOF3hO4c2pGC5PhTiFoBX/gjf9OcKoAu+58SK0tkqpF1fhnWIFV6gsMGf4lmhwPdlT6bnFF585LLN/BblZ71eU1Gi4r3wFOHZGu3P0GmsElQfJiSnAE6K808elFUliTgKJX6r/Vzgc=
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
- by DS0PR10MB6975.namprd10.prod.outlook.com (2603:10b6:8:146::8) with
+ bh=slZsflMliJ7MlBj9odh5Rshma0VgD/8+rE8oxMwjTbw=;
+ b=VEnvFreXDDAZNtFrI/7UMmB2P7Mo7UKRRX2yiCZwJag2mDzRfPvjn+gupv44T4QNTajxws84v2mfAhDPsM9f1e/2w20DC5TM9d1Btu62gtByFtltWsTlrVDlg/xIyBoBbSe2btYdd+okYXCKYMvjmZwQWkhoInB0NdxZE6GdZ6w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by SA1PR12MB5616.namprd12.prod.outlook.com (2603:10b6:806:22a::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
- 2023 15:46:22 +0000
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::76c:cb31:2005:d10c]) by PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::76c:cb31:2005:d10c%5]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
- 15:46:21 +0000
-From:   Miguel Luis <miguel.luis@oracle.com>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Darren Hart <darren@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-Thread-Topic: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
-Thread-Index: AQHZye43LjWt3BICTk+WXyaA4d4s1a/ri1wA
-Date:   Tue, 15 Aug 2023 15:46:21 +0000
-Message-ID: <0A8ED162-EF6C-44F4-836B-7421183EA9A0@oracle.com>
-References: <20230808114711.2013842-1-maz@kernel.org>
- <20230808114711.2013842-16-maz@kernel.org>
-In-Reply-To: <20230808114711.2013842-16-maz@kernel.org>
-Accept-Language: en-GB, en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Tue, 15 Aug
+ 2023 15:51:09 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd%7]) with mapi id 15.20.6678.025; Tue, 15 Aug 2023
+ 15:51:09 +0000
+Message-ID: <930c4030-9581-cded-9349-c4486749c7d7@amd.com>
+Date:   Tue, 15 Aug 2023 10:51:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 2/3] KVM: SEV: only access GHCB fields once
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR10MB5433:EE_|DS0PR10MB6975:EE_
-x-ms-office365-filtering-correlation-id: ddfbc74b-e954-421c-7d71-08db9da6c613
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DhDB4kto8mMQJMvcOfJEFaFpCdKq0ymD5eU9P45YbkwuV/VBLZOoint9Z4vPrwKJBprBhXC2wo9UKYZqC/ZrfaYXamRieKNAC5U3cGXDIEvpmaLEoKIYPyeTfCJSB12eBg5EYGNAU/3Q8fMmuHFLXeBND71c6onPNiDrHvrgBn9WeDzqqvgBNax5CPmBNFJGBJox2Auk58Zu17HVoIQnceW+HNDIxJ7GsHWuD+sJIbsDsdMHcO84xslaEdK5xBr4co5VmbbnTswyxg8lFTLXjYLqWMmh3kULr5nHV2RoNX/aGk9iOJpro4yg4tovNuNXp21Bw3lM+MeP1ZNLI9X+rli47k38Lhl/KyLvKX5RMUmgjczdukiOntkgR66TZrLb9WC762D8nJoE0cR6LkGpqh3+CvRNp9DpaW2BQvLiJhZTSqoSERB+eKrneXayvrLNRxOfMeQLvmt2l/Yjj/AiFlW7LYvXNOnXBfleQr6m7mJZT5Lvdl4tEf9tWzQqeN1a2ARi8FLR1ECYGUQYutKcAO7GcRxYqapGXixYRiqbV6Bgvh+sca0Bf26TyPDPffI9/hYb8iOzdQTcYPRny9K1Bu7GhRVBDUkiocjxMfTtIy4v8dF1DydE8k8P66LpW5bl0rtl7E6qoYDxIK8wCpy6EA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5433.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(366004)(396003)(376002)(346002)(451199024)(1800799009)(186009)(38070700005)(64756008)(5660300002)(4326008)(30864003)(26005)(7416002)(66446008)(66556008)(54906003)(41300700001)(6916009)(478600001)(8936002)(66946007)(8676002)(91956017)(86362001)(122000001)(2906002)(33656002)(2616005)(6486002)(71200400001)(53546011)(6512007)(36756003)(6506007)(44832011)(76116006)(66476007)(38100700002)(316002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?slK6taZ7AyL4zomjpw//EtXQfLyFhunuAUQRM2uCLb68OGcoLTIwasu3qlI+?=
- =?us-ascii?Q?l9LIeLeshZ9ULJFb3X1LZeNVybq4UOG1o/xGciXaYTSLo7Tkc5v+2Zkc/5eq?=
- =?us-ascii?Q?YzRVESiQ/UqJur1NWJJ07XHLGtRlBybw/3FHdew40yzI4aTqXHSHi8nEI1gb?=
- =?us-ascii?Q?C1Oz+sPXFxce7cYRvbv+7EvJFPR8iQdcdH3IWzxpRFXaZzXbJoe7drLs7ct8?=
- =?us-ascii?Q?+5OxDeeHbD2Y2lyjsuaqqOrJ53Kf5HihMKC0gLkpiq2bHH8ntWoKVxZ1fbwE?=
- =?us-ascii?Q?DBbuS5splYreLynCilvxw5sQbL6JJ+QTpjf/b1KrTb733fU9ATqkUQY/fl4c?=
- =?us-ascii?Q?mLsvG9rfrZGezINg5UfmOMxS6ks8A1jPBnN5PN/oL8uqL7TilXqUJkKhdUEm?=
- =?us-ascii?Q?8sHEEGD7n6fgpXf/ehGIS2YNRXmgvHVB+xAYlpW/tFs9SRw0/lwGKZ6Deg2b?=
- =?us-ascii?Q?WZLcOvRxoVfe858qwI9dqNRvekZzeN4zT46ObpU6LxiufrT71d51oGkRLmNs?=
- =?us-ascii?Q?TxJyB3oj+/EqHaagwXbuTH/JTWlwPdrMbZr2pQXQc5h1Oz9RNZqO+dBSpOrv?=
- =?us-ascii?Q?wMF+iyHawT0FnW0HyGduxrqBzpd6HNZRNyJTivHHR7wD0389kLFo4A298yyO?=
- =?us-ascii?Q?6I5GFulcGTa2sL1Ah59USTYf8WTsvbOnVY3bOe6NKLAVRmdfBpo1jmF46OIw?=
- =?us-ascii?Q?4T3/hcrrgU2Fi6G3HLWmoXoKdWJvVyfjr+pDfFyezTzSDoqQVmZYipj/qXD9?=
- =?us-ascii?Q?TzqKqZSj2WVQF40frM8uAd6gTc+luAiKz26bF8IpyzghCSEC5ZTLulzMxSiS?=
- =?us-ascii?Q?HjWxvOQK6d+L19TPq7+PaAivIwUdhteh0mHBYUiN5QYG8AGsFLVREkJdVgAM?=
- =?us-ascii?Q?hEstx6O6AFcCfXYgYcIROobtAg/VTdYIcWNtU/mAbMU6u7dtTb6Bddoq8Agm?=
- =?us-ascii?Q?CgHixVGIx4AejtsbR3bKxbq7Putx3jO8PaQXcUL1Y4PEgZg4Vp/p6yVx4WIk?=
- =?us-ascii?Q?vuY0Ckt0i+TpDay6xpRH3nf5GYxKzZd5vox1TP1BfcH89IGwj1a3kfsA75hq?=
- =?us-ascii?Q?ONGGvDtDRVr1H3g2Gs+/3f5O46iqAgMKGBSDZF/U9F5d/r4t/usuqybWkcpJ?=
- =?us-ascii?Q?FMpB6EuqcF7EPawBnDOzxlmi9GVt7Uuy0YpiKQQapqxDgcZc9S8VBMN+m3De?=
- =?us-ascii?Q?e5xdy9lSx7u0YZe88+u3iicwD2MSbIDwuc8jkngDWb6tQePltHnLweRutk4L?=
- =?us-ascii?Q?nyEJt/Sd7Aesr9zhB1+3shRjf/T795aKDrQ7gWPuRAtZG1WM9SDujW5frNYM?=
- =?us-ascii?Q?SG4CEnneK4Lgap93HdjAmCC2QoG2pyru/ifZf/EnPQcHaoGEXGYk86zBcjal?=
- =?us-ascii?Q?hqXedjosBnJ8Mdwb9Ia1HaX/ueuyRKxdo7S4ZqokbqShz7sY0dpa5V3/cLGw?=
- =?us-ascii?Q?ucLggHY2VQZI3ZN/8a34eWposavzBNhv3d5jgCaF4qyFO6MjsyOKQH2M8TrM?=
- =?us-ascii?Q?FDu6tsf9x7E5AQt2f/I/43JrTu6yBmTV58EphGZdzraPYAJ0EpNWSl6rnWit?=
- =?us-ascii?Q?yWCi0DgjXYjxGA4gPAcBQkYpDrugiqvcJT6bJJS3oRo3P+td2kF55slxLTMk?=
- =?us-ascii?Q?HA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <ACEE7042121499458D6E8F784B529670@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     pgonda@google.com, seanjc@google.com, theflow@google.com,
+        vkuznets@redhat.com, stable@vger.kernel.org
+References: <20230804173355.51753-1-pbonzini@redhat.com>
+ <20230804173355.51753-3-pbonzini@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20230804173355.51753-3-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA1P222CA0154.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c3::27) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?c5jEcfiYZ+dqylx/CD2V9bn+te5OyictWI4l+A2D7tpK1JoDuIhNeAJok4Us?=
- =?us-ascii?Q?irhe7n+2dfLWuiTEV4CWjPWYJ2jWuBidpr7djNVi2JD9qSNrvflIbOFcSwXp?=
- =?us-ascii?Q?RhVrsyw77tCWu/gWQl/Amj94ml6XlseepHxUeOckETwa7HV3mTFywzRs9YWU?=
- =?us-ascii?Q?zP3NODofYId0YQ5Dj700EDuxUsHwAPEx66b5PfXetvcgCdXcdM4cPMeEGcJZ?=
- =?us-ascii?Q?DORbtHE8oqtJhQd9zIv8h7Cqgb/0qxlfgBMZUW8Kxj2VmUkZ6Av2YJhLspqS?=
- =?us-ascii?Q?le3rl32R9Fh3t1g5UXnpdph8APg/brGdxB7wm38kyTMSGCQlcph9nb12ARjL?=
- =?us-ascii?Q?YRRJnozyCqIzh6b5tjUVMjYV22JgsUyAifNhdVuW2OgmcnC7ZXH5O7tU9en3?=
- =?us-ascii?Q?rMBqa92ddVi3PcEU8lrh/kkudGfzsKVRhBYaUNJ3aiPGApzpQDpQB52LzTLs?=
- =?us-ascii?Q?fyL/QGkCatsKEMo2bqnPpNyaFMUlS8EcHrcgxkaqgvJ59D4ZacbaiC3wp5m9?=
- =?us-ascii?Q?yttKP5weebJ3HWQW6hkNMtnXii+XIXYfNxe9jLDgq0fTwBNtLxVMbWh51F0v?=
- =?us-ascii?Q?xkU/kcVJqHr3JlI91qENfHNHF1cccMGs2v/K0SRE+y1sIsgLvJC/NZzpSswG?=
- =?us-ascii?Q?AdB6rKHBz6LhmCjq7wf2cU5OQyYPXr8dGpQIqzLN9an+l9sDTaBK9w8PyEJh?=
- =?us-ascii?Q?gSW409DHU3I8cYWBOvztSkUKqxOqpoXFWeCPeuCdRH+QLQ/QG1YaoPOBxKZs?=
- =?us-ascii?Q?7evlCDCB9wffVhZeQbXLotDdlz0JXJzE2azdxh5ibSTA3zYUd5qRZfhRq+AH?=
- =?us-ascii?Q?lzU3j2JUCb2hHeaLz3YS+bYLSI29TNeW0MPyXOb7KWUghuzEf1AlqhZJaMfi?=
- =?us-ascii?Q?XmGKEUI5NSP/EDOkUf4FUk7t8P42ZurYS9kfe0ABuvxO5j5jgDtVv2wXEzlC?=
- =?us-ascii?Q?do+FPQYN8NYIzujGTuDIevaTla+OnNqb+GxEPeWFAjJkMoTmUaoLbnwr6s27?=
- =?us-ascii?Q?Wmf77ecKV+Mf71pgVNxyOwYOkcouz5WFdQnHERyNc0Btj+U=3D?=
-X-OriginatorOrg: oracle.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SA1PR12MB5616:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3696f55-6f86-4ee8-f2c7-08db9da77145
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: F5HVrMNgdHd2rHXPTBf3bx+LwkkXsvDD87aQNpWN/UcsM6rugn3o3hRsT3eZNVGE4YDG02wKLW8ZJWEe3YzqpmNLijqxIELmItMkU3mFGuK22OBdsl+/L5x+Cbv80oj7CH6OJEFa5LLXzRjDOQUliaLFUArPzahEj8DVcWGjnqoZe+1h1eUdNtuif1UnORElVvdPYEB1wCLplYXcODNoOo05BhaXtgTg96V8utW3T1vzvg5A4I+WNn+7SwCRYDTAHR5EAw7sPVVW496YFGA4X1iN9GKQHjnuxQhfe4sb07nEidM0rpKEO+Bnac0J/5HbbRgRECaj21PUMhNBwhlRUFnNhZ6mFBAuLSkDKyHi06XBRR58lH7parrVZgLycXKLu6M3ZQ2AE0QT/dVAUk1C+NeIbe2z9qsMN0SrxWz/1OEswGTYwL+fbynuUt74DTqkYSod0WuOl3w9Iom54fXtJoMioT6RpNzCPBmyTO+cFb+4dG+dA/XFqgJLerSbLgkeeDGy7MLdcxy3iUCy7RdD2+V8unpDxYbpAAeCTwFg9sf3Fh2UFBNDEMpf1hg6CdpirdRVlAVfBkQlXXdAT06P+1tFjBPdaKt5xjom5WVQz7ug1Uz/VLiiU5AE4o9JJc5KgnzthqlZh3xTh84OnoexTA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(396003)(136003)(39860400002)(366004)(451199024)(1800799009)(186009)(2616005)(38100700002)(2906002)(83380400001)(8676002)(31696002)(6506007)(31686004)(86362001)(26005)(5660300002)(66556008)(6512007)(66946007)(316002)(66476007)(6486002)(478600001)(53546011)(8936002)(41300700001)(4326008)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bEkrcjZYbDg2U1YyOVplalJSNllNdGZlWjlvRTA1SEtTNERZYzdFeUx5eTIx?=
+ =?utf-8?B?OFVpNFVGbG5XWUZXcXB0N3ZqOW1JM1htZ2lxTkhlaTFVSGc5d0F4SFgvUG5U?=
+ =?utf-8?B?K3NVNzQvalhFTDFMaVNUOTgySEx5UkJvSS9EVmN5Vm5iRVh3VFpPdGRZMGcr?=
+ =?utf-8?B?SURrcjVWek45WjVsVWowQ25DbXhtZlFrTkVuakNTYXFWVGpWWWlRU01rMTYy?=
+ =?utf-8?B?ZkRBdE9NREVBQjh1WUFWN1FNcDJjclIyY1lYbmR1aCtSdi9yNmVidkdUOEc4?=
+ =?utf-8?B?VHNkbWRsUUE0SmtuUkdjbnR3QlZxaDliWklUMFpxalFxRXhwSldabXBySlVY?=
+ =?utf-8?B?UW1FT2FMZUtScDk4cWRoOUVVdE5IakE4c0UyM2FKajZ0YXE1REZsWDN4aVNo?=
+ =?utf-8?B?cDJKMFF3cUdMZ2tEMGtNNUlEMVVKTXZTb3JQUEQzUmg1YWtqck8waEtCTjUv?=
+ =?utf-8?B?blRNbHp4ckhlV1Zzd0tjcmFBQ05tTDJVWjRSRFZqTlB1TlViM3g5VWF6UUJS?=
+ =?utf-8?B?aFVIUHpYNENjYlFtRG1BODJscFFXY2VxVVRmblpwQklTek5RWEhiSlRVbXhT?=
+ =?utf-8?B?SmZvMUwwRE1NRFFpOVVpN2Y0V0FNVXNRVnI0RmdRbkpGcVNjL1BqaU9tbzV5?=
+ =?utf-8?B?aG1wZ0VWNWdKYmRLYUhGenhzUmlMUHU5eTI4bklPZURUaXgzT1dyc01XdklU?=
+ =?utf-8?B?K3RmZ0RhUFF6R3N3WEVlNGhCN2c0VmVISkhqZzNVOVRCd0RWbnN3ekNPZnpq?=
+ =?utf-8?B?QXd3MHdqVTA3ZWdndmxvVnF1b3hDMGkyYXErNE85U0c4YnBVaElBQmVsb2cx?=
+ =?utf-8?B?ZVJzZzlwdkFtcEVTU0FjQ0FKN0dIbzM0SFpCQlRpK25BcDZNRHBxQnZlZ2lp?=
+ =?utf-8?B?eFJaMjQrVVhOQ3QwOGtXa29MdXR4MmdlMzJ6bGtNb3NNQmF0SVhWby8yby9l?=
+ =?utf-8?B?KzI2MWNZZXJBT1N1UlkvRWtqdXpLVWd1VS9LUVFjSkdBUmRFa0s2MFdBQytT?=
+ =?utf-8?B?b3lVTVh4YllMUGFTZlZCeVA2ZGpEbWFxUi9JRy9YVU01c3k4UktJUnZjektq?=
+ =?utf-8?B?cEdBQnB3ZVVIMnZIeXdpVTZpWXI2R1NoU0NjaUNWZC9WU09iT2d0Mk5OTHlt?=
+ =?utf-8?B?RHlQYTdpdnVmRFJ2OHdVZXkwbXJtbHNlaU84eWxORVYvU1B6WUxEclQxcWpH?=
+ =?utf-8?B?TExsdzUyd3Bqb01qaXpVUVhIRXNnK3hwV25pQTBIT001VnBvWGxjRjJJYkwx?=
+ =?utf-8?B?eEJ5L3pJUnRhbUdSQXNLdzU4VHNwaGNiMzhUTWd0SXcxSkNUb1pGTTlDYk4x?=
+ =?utf-8?B?YXdHdnNXZEZYWnRZYmtha1VBZ3RUREZvUXNLSmJPZTg1VGM3eTJFbWtYZkdk?=
+ =?utf-8?B?M1RTSGx3dzhLZTVzZ3U4enAzUW5ZTkpGU2I1TDNzbjErNld2cldzT0d6VFV6?=
+ =?utf-8?B?RS9nR1RWWllMNDFZWEgwYVNSR1RxTGUrOU51MVFucTBjY1VMQy9UZ1I4ckk1?=
+ =?utf-8?B?RFozS1k3ck1jZ3VBbFh5UzFFZGpVSVh5WnZzQUJFN2c3QStzcm5IRzlZVVBS?=
+ =?utf-8?B?dFRFcFZqK0xPS25ERHVpODZOcUoyRE16b3V0amd4MGRrQ3k3d2trNzRPbVlB?=
+ =?utf-8?B?NUhzYm5vMkVEOHZ5UFJianQwNXNDOXg3UnJtdTMwNDhaOFFVczdLaFRFaG5S?=
+ =?utf-8?B?cFNjZFlQUDc1di9ZL1lieHBYQ2h2SjBaK0FHTGJvRG02Vjl5U1ZNOFlVQi9X?=
+ =?utf-8?B?cjJyeGJkNFNlWmhXZFhPZlV1MHVUS1N6NmMzdklHSm9XS3NPd1I3eU1Lc1J0?=
+ =?utf-8?B?bFhIazJzempJMmtET004OXFhNTF1QlhhSTNNQXRhcndPMWJ3cHBPaktyT0FS?=
+ =?utf-8?B?Wk1mWUNGMVJ5b0V5aG5pN2hoUVgyZk5mR240U1lvbkZiUUN4cTI0Q2JaQ1NB?=
+ =?utf-8?B?RVVpdVppRjJyRzlaOFZHY1M2d3dKcVFERG5BaDlDWC8xY2FhUnp0U1FXeExq?=
+ =?utf-8?B?OVluTTV3KzBLcmMxZUtTNXRKZWZ5OFMwNGk0SVNRVFBITjRzcFJWbWxkMzRl?=
+ =?utf-8?B?SDQ1WlZzNlFSY2dzNjVrS3MvdVVnTWNuTWJySEI2MytJMjZ5R0Y5di8yTXdE?=
+ =?utf-8?Q?KRxxx5n0KE2tLAhplqbhv6I7u?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3696f55-6f86-4ee8-f2c7-08db9da77145
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ddfbc74b-e954-421c-7d71-08db9da6c613
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2023 15:46:21.5833
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 15:51:09.0072
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8MiBbA6XGeAhhB6QWR1SN6kj2Y9gRUoLsB08Kp6+kAw78EFjp9BfKerawm539JtfpFl7aVu6T8kDJk0Fvja7KA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6975
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-15_16,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 bulkscore=0 phishscore=0 suspectscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308150141
-X-Proofpoint-GUID: BJxHndOpdssmG5odwmKE4lIha-cbSVb8
-X-Proofpoint-ORIG-GUID: BJxHndOpdssmG5odwmKE4lIha-cbSVb8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        UPPERCASE_75_100 autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 67vewOOqbX/ZmSPEJEkAbzDBU3D/4oJtGgJCgqvjrddl42/JCf9+wa3LgoPwiaOpS21jiIi3DSRxR4YsbtIALA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5616
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 8/4/23 12:33, Paolo Bonzini wrote:
+> A KVM guest using SEV-ES or SEV-SNP with multiple vCPUs can trigger
+> a double fetch race condition vulnerability and invoke the VMGEXIT
+> handler recursively.
+> 
+> sev_handle_vmgexit() maps the GHCB page using kvm_vcpu_map() and then
+> fetches the exit code using ghcb_get_sw_exit_code().  Soon after,
+> sev_es_validate_vmgexit() fetches the exit code again. Since the GHCB
+> page is shared with the guest, the guest is able to quickly swap the
+> values with another vCPU and hence bypass the validation. One vmexit code
+> that can be rejected by sev_es_validate_vmgexit() is SVM_EXIT_VMGEXIT;
+> if sev_handle_vmgexit() observes it in the second fetch, the call
+> to svm_invoke_exit_handler() will invoke sev_handle_vmgexit() again
+> recursively.
+> 
+> To avoid the race, always fetch the GHCB data from the places where
+> sev_es_sync_from_ghcb stores it.
+> 
+> Exploiting recursions on linux kernel has been proven feasible
+> in the past, but the impact is mitigated by stack guard pages
+> (CONFIG_VMAP_STACK).  Still, if an attacker manages to call the handler
+> multiple times, they can theoretically trigger a stack overflow and
+> cause a denial-of-service, or potentially guest-to-host escape in kernel
+> configurations without stack guard pages.
+> 
+> Note that winning the race reliably in every iteration is very tricky
+> due to the very tight window of the fetches; depending on the compiler
+> settings, they are often consecutive because of optimization and inlining.
+> 
+> Tested by booting an SEV-ES RHEL9 guest.
+> 
+> Fixes: CVE-2023-4155
+> Fixes: 291bd20d5d88 ("KVM: SVM: Add initial support for a VMGEXIT VMEXIT")
+> Cc: stable@vger.kernel.org
+> Reported-by: Andy Nguyen <theflow@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> On 8 Aug 2023, at 11:46, Marc Zyngier <maz@kernel.org> wrote:
->=20
-> Describe the HCR_EL2 register, and associate it with all the sysregs
-> it allows to trap.
->=20
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Just one very minor comment below, otherwise
+
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > ---
-> arch/arm64/kvm/emulate-nested.c | 486 ++++++++++++++++++++++++++++++++
-> 1 file changed, 486 insertions(+)
->=20
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nes=
-ted.c
-> index 1b1148770d45..2122d16bdeeb 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -37,12 +37,48 @@ enum trap_group {
-> * on their own instead of being part of a combination of
-> * trap controls.
-> */
-> + CGT_HCR_TID1,
-> + CGT_HCR_TID2,
-> + CGT_HCR_TID3,
-> + CGT_HCR_IMO,
-> + CGT_HCR_FMO,
-> + CGT_HCR_TIDCP,
-> + CGT_HCR_TACR,
-> + CGT_HCR_TSW,
-> + CGT_HCR_TPC,
-> + CGT_HCR_TPU,
-> + CGT_HCR_TTLB,
-> + CGT_HCR_TVM,
-> + CGT_HCR_TDZ,
-> + CGT_HCR_TRVM,
-> + CGT_HCR_TLOR,
-> + CGT_HCR_TERR,
-> + CGT_HCR_APK,
-> + CGT_HCR_NV,
-> + CGT_HCR_NV_nNV2,
-> + CGT_HCR_NV1_nNV2,
-> + CGT_HCR_AT,
-> + CGT_HCR_FIEN,
-> + CGT_HCR_TID4,
-> + CGT_HCR_TICAB,
-> + CGT_HCR_TOCU,
-> + CGT_HCR_ENSCXT,
-> + CGT_HCR_TTLBIS,
-> + CGT_HCR_TTLBOS,
->=20
-> /*
-> * Anything after this point is a combination of trap controls,
-> * which all must be evaluated to decide what to do.
-> */
-> __MULTIPLE_CONTROL_BITS__,
-> + CGT_HCR_IMO_FMO =3D __MULTIPLE_CONTROL_BITS__,
-> + CGT_HCR_TID2_TID4,
-> + CGT_HCR_TTLB_TTLBIS,
-> + CGT_HCR_TTLB_TTLBOS,
-> + CGT_HCR_TVM_TRVM,
-> + CGT_HCR_TPU_TICAB,
-> + CGT_HCR_TPU_TOCU,
-> + CGT_HCR_NV1_nNV2_ENSCXT,
->=20
-> /*
-> * Anything after this point requires a callback evaluating a
-> @@ -55,6 +91,174 @@ enum trap_group {
-> };
->=20
-> static const struct trap_bits coarse_trap_bits[] =3D {
-> + [CGT_HCR_TID1] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TID1,
-> + .mask =3D HCR_TID1,
-> + .behaviour =3D BEHAVE_FORWARD_READ,
-> + },
-> + [CGT_HCR_TID2] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TID2,
-> + .mask =3D HCR_TID2,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TID3] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TID3,
-> + .mask =3D HCR_TID3,
-> + .behaviour =3D BEHAVE_FORWARD_READ,
-> + },
-> + [CGT_HCR_IMO] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_IMO,
-> + .mask =3D HCR_IMO,
-> + .behaviour =3D BEHAVE_FORWARD_WRITE,
-> + },
-> + [CGT_HCR_FMO] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_FMO,
-> + .mask =3D HCR_FMO,
-> + .behaviour =3D BEHAVE_FORWARD_WRITE,
-> + },
-> + [CGT_HCR_TIDCP] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TIDCP,
-> + .mask =3D HCR_TIDCP,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TACR] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TACR,
-> + .mask =3D HCR_TACR,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TSW] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TSW,
-> + .mask =3D HCR_TSW,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TPC] =3D { /* Also called TCPC when FEAT_DPB is implemented */
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TPC,
-> + .mask =3D HCR_TPC,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TPU] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TPU,
-> + .mask =3D HCR_TPU,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TTLB] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TTLB,
-> + .mask =3D HCR_TTLB,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TVM] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TVM,
-> + .mask =3D HCR_TVM,
-> + .behaviour =3D BEHAVE_FORWARD_WRITE,
-> + },
-> + [CGT_HCR_TDZ] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TDZ,
-> + .mask =3D HCR_TDZ,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TRVM] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TRVM,
-> + .mask =3D HCR_TRVM,
-> + .behaviour =3D BEHAVE_FORWARD_READ,
-> + },
-> + [CGT_HCR_TLOR] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TLOR,
-> + .mask =3D HCR_TLOR,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TERR] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TERR,
-> + .mask =3D HCR_TERR,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_APK] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D 0,
-> + .mask =3D HCR_APK,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_NV] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_NV,
-> + .mask =3D HCR_NV,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_NV_nNV2] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_NV,
-> + .mask =3D HCR_NV | HCR_NV2,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_NV1_nNV2] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_NV | HCR_NV1,
-> + .mask =3D HCR_NV | HCR_NV1 | HCR_NV2,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_AT] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_AT,
-> + .mask =3D HCR_AT,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_FIEN] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_FIEN,
+>   arch/x86/kvm/svm/sev.c | 25 ++++++++++++++-----------
+>   1 file changed, 14 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index e898f0b2b0ba..ca4ba5fe9a01 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2445,9 +2445,15 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+>   	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
+>   }
+>   
+> +static u64 kvm_ghcb_get_sw_exit_code(struct vmcb_control_area *control)
+> +{
 
-Should this value be 0 ?
+Since ghcb is in the function name it might be nice to have a comment 
+indicating that the actual GHCB value was copied to the VMCB fields as 
+part of sev_es_sync_from_ghcb() and this is used to avoid reading from the 
+GHCB after validation.
 
 Thanks,
-Miguel
+Tom
 
-> + .mask =3D HCR_FIEN,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TID4] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TID4,
-> + .mask =3D HCR_TID4,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TICAB] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TICAB,
-> + .mask =3D HCR_TICAB,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TOCU] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TOCU,
-> + .mask =3D HCR_TOCU,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_ENSCXT] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D 0,
-> + .mask =3D HCR_ENSCXT,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TTLBIS] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TTLBIS,
-> + .mask =3D HCR_TTLBIS,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> + [CGT_HCR_TTLBOS] =3D {
-> + .index =3D HCR_EL2,
-> + .value =3D HCR_TTLBOS,
-> + .mask =3D HCR_TTLBOS,
-> + .behaviour =3D BEHAVE_FORWARD_ANY,
-> + },
-> };
->=20
-> #define MCB(id, ...) \
-> @@ -64,6 +268,14 @@ static const struct trap_bits coarse_trap_bits[] =3D =
-{
-> }
->=20
-> static const enum trap_group *coarse_control_combo[] =3D {
-> + MCB(CGT_HCR_IMO_FMO, CGT_HCR_IMO, CGT_HCR_FMO),
-> + MCB(CGT_HCR_TID2_TID4, CGT_HCR_TID2, CGT_HCR_TID4),
-> + MCB(CGT_HCR_TTLB_TTLBIS, CGT_HCR_TTLB, CGT_HCR_TTLBIS),
-> + MCB(CGT_HCR_TTLB_TTLBOS, CGT_HCR_TTLB, CGT_HCR_TTLBOS),
-> + MCB(CGT_HCR_TVM_TRVM, CGT_HCR_TVM, CGT_HCR_TRVM),
-> + MCB(CGT_HCR_TPU_TICAB, CGT_HCR_TPU, CGT_HCR_TICAB),
-> + MCB(CGT_HCR_TPU_TOCU, CGT_HCR_TPU, CGT_HCR_TOCU),
-> + MCB(CGT_HCR_NV1_nNV2_ENSCXT, CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
-> };
->=20
-> typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *)=
-;
-> @@ -125,6 +337,280 @@ struct encoding_to_trap_config {
->  * re-injected in the nested hypervisor.
->  */
-> static const struct encoding_to_trap_config encoding_to_cgt[] __initconst=
- =3D {
-> + SR_TRAP(SYS_REVIDR_EL1, CGT_HCR_TID1),
-> + SR_TRAP(SYS_AIDR_EL1, CGT_HCR_TID1),
-> + SR_TRAP(SYS_SMIDR_EL1, CGT_HCR_TID1),
-> + SR_TRAP(SYS_CTR_EL0, CGT_HCR_TID2),
-> + SR_TRAP(SYS_CCSIDR_EL1, CGT_HCR_TID2_TID4),
-> + SR_TRAP(SYS_CCSIDR2_EL1, CGT_HCR_TID2_TID4),
-> + SR_TRAP(SYS_CLIDR_EL1, CGT_HCR_TID2_TID4),
-> + SR_TRAP(SYS_CSSELR_EL1, CGT_HCR_TID2_TID4),
-> + SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
-> +      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
-> + SR_TRAP(SYS_ICC_SGI0R_EL1, CGT_HCR_IMO_FMO),
-> + SR_TRAP(SYS_ICC_ASGI1R_EL1, CGT_HCR_IMO_FMO),
-> + SR_TRAP(SYS_ICC_SGI1R_EL1, CGT_HCR_IMO_FMO),
-> + SR_RANGE_TRAP(sys_reg(3, 0, 11, 0, 0),
-> +      sys_reg(3, 0, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 1, 11, 0, 0),
-> +      sys_reg(3, 1, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 2, 11, 0, 0),
-> +      sys_reg(3, 2, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 3, 11, 0, 0),
-> +      sys_reg(3, 3, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 4, 11, 0, 0),
-> +      sys_reg(3, 4, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 5, 11, 0, 0),
-> +      sys_reg(3, 5, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 6, 11, 0, 0),
-> +      sys_reg(3, 6, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 7, 11, 0, 0),
-> +      sys_reg(3, 7, 11, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 0, 15, 0, 0),
-> +      sys_reg(3, 0, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 1, 15, 0, 0),
-> +      sys_reg(3, 1, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 2, 15, 0, 0),
-> +      sys_reg(3, 2, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 3, 15, 0, 0),
-> +      sys_reg(3, 3, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 4, 15, 0, 0),
-> +      sys_reg(3, 4, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 5, 15, 0, 0),
-> +      sys_reg(3, 5, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 6, 15, 0, 0),
-> +      sys_reg(3, 6, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_RANGE_TRAP(sys_reg(3, 7, 15, 0, 0),
-> +      sys_reg(3, 7, 15, 15, 7), CGT_HCR_TIDCP),
-> + SR_TRAP(SYS_ACTLR_EL1, CGT_HCR_TACR),
-> + SR_TRAP(SYS_DC_ISW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CISW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_IGSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_IGDSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CGSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CGDSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CIGSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CIGDSW, CGT_HCR_TSW),
-> + SR_TRAP(SYS_DC_CIVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CVAP, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CVADP, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_IVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CIGVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CIGDVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_IGVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_IGDVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CGVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CGDVAC, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CGVAP, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CGDVAP, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CGVADP, CGT_HCR_TPC),
-> + SR_TRAP(SYS_DC_CGDVADP, CGT_HCR_TPC),
-> + SR_TRAP(SYS_IC_IVAU, CGT_HCR_TPU_TOCU),
-> + SR_TRAP(SYS_IC_IALLU, CGT_HCR_TPU_TOCU),
-> + SR_TRAP(SYS_IC_IALLUIS, CGT_HCR_TPU_TICAB),
-> + SR_TRAP(SYS_DC_CVAU, CGT_HCR_TPU_TOCU),
-> + SR_TRAP(OP_TLBI_RVAE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVAAE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVALE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVAALE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VMALLE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VAE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_ASIDE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VAAE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VALE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VAALE1, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVAE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVAAE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVALE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVAALE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VMALLE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VAE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_ASIDE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VAAE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VALE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_VAALE1NXS, CGT_HCR_TTLB),
-> + SR_TRAP(OP_TLBI_RVAE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVAAE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVALE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVAALE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VMALLE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VAE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_ASIDE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VAAE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VALE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VAALE1IS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVAAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_RVAALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VMALLE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_ASIDE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VAAE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VAALE1ISNXS, CGT_HCR_TTLB_TTLBIS),
-> + SR_TRAP(OP_TLBI_VMALLE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VAE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_ASIDE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VAAE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VALE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VAALE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVAE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVAAE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVALE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVAALE1OS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VMALLE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_ASIDE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VAAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_VAALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVAAE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(OP_TLBI_RVAALE1OSNXS, CGT_HCR_TTLB_TTLBOS),
-> + SR_TRAP(SYS_SCTLR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_TTBR0_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_TTBR1_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_TCR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_ESR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_FAR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_AFSR0_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_AFSR1_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_MAIR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_AMAIR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_CONTEXTIDR_EL1, CGT_HCR_TVM_TRVM),
-> + SR_TRAP(SYS_DC_ZVA, CGT_HCR_TDZ),
-> + SR_TRAP(SYS_DC_GVA, CGT_HCR_TDZ),
-> + SR_TRAP(SYS_DC_GZVA, CGT_HCR_TDZ),
-> + SR_TRAP(SYS_LORSA_EL1, CGT_HCR_TLOR),
-> + SR_TRAP(SYS_LOREA_EL1, CGT_HCR_TLOR),
-> + SR_TRAP(SYS_LORN_EL1, CGT_HCR_TLOR),
-> + SR_TRAP(SYS_LORC_EL1, CGT_HCR_TLOR),
-> + SR_TRAP(SYS_LORID_EL1, CGT_HCR_TLOR),
-> + SR_TRAP(SYS_ERRIDR_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERRSELR_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXADDR_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXCTLR_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXFR_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXMISC0_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXMISC1_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXMISC2_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXMISC3_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_ERXSTATUS_EL1, CGT_HCR_TERR),
-> + SR_TRAP(SYS_APIAKEYLO_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APIAKEYHI_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APIBKEYLO_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APIBKEYHI_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APDAKEYLO_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APDAKEYHI_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APDBKEYLO_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APDBKEYHI_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APGAKEYLO_EL1, CGT_HCR_APK),
-> + SR_TRAP(SYS_APGAKEYHI_EL1, CGT_HCR_APK),
-> + /* All _EL2 registers */
-> + SR_RANGE_TRAP(sys_reg(3, 4, 0, 0, 0),
-> +      sys_reg(3, 4, 10, 15, 7), CGT_HCR_NV),
-> + SR_RANGE_TRAP(sys_reg(3, 4, 12, 0, 0),
-> +      sys_reg(3, 4, 14, 15, 7), CGT_HCR_NV),
-> + /* All _EL02, _EL12 registers */
-> + SR_RANGE_TRAP(sys_reg(3, 5, 0, 0, 0),
-> +      sys_reg(3, 5, 10, 15, 7), CGT_HCR_NV),
-> + SR_RANGE_TRAP(sys_reg(3, 5, 12, 0, 0),
-> +      sys_reg(3, 5, 14, 15, 7), CGT_HCR_NV),
-> + SR_TRAP(OP_AT_S1E2R, CGT_HCR_NV),
-> + SR_TRAP(OP_AT_S1E2W, CGT_HCR_NV),
-> + SR_TRAP(OP_AT_S12E1R, CGT_HCR_NV),
-> + SR_TRAP(OP_AT_S12E1W, CGT_HCR_NV),
-> + SR_TRAP(OP_AT_S12E0R, CGT_HCR_NV),
-> + SR_TRAP(OP_AT_S12E0W, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2E1, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2E1, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2LE1, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2LE1, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVAE2, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVALE2, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE2, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VAE2, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE1, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VALE2, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VMALLS12E1, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2E1NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2E1NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2LE1NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2LE1NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVAE2NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVALE2NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE2NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VAE2NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE1NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VALE2NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VMALLS12E1NXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2E1IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2E1IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2LE1IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2LE1IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVAE2IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVALE2IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE2IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VAE2IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE1IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VALE2IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VMALLS12E1IS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2E1ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2E1ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2LE1ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2LE1ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVAE2ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVALE2ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE2ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VAE2ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE1ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VALE2ISNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VMALLS12E1ISNXS,CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE2OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VAE2OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE1OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VALE2OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VMALLS12E1OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2E1OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2E1OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2LE1OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2LE1OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVAE2OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVALE2OS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE2OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VAE2OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_ALLE1OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VALE2OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_VMALLS12E1OSNXS,CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2E1OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2E1OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_IPAS2LE1OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RIPAS2LE1OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVAE2OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_TLBI_RVALE2OSNXS, CGT_HCR_NV),
-> + SR_TRAP(OP_CPP_RCTX, CGT_HCR_NV),
-> + SR_TRAP(OP_DVP_RCTX, CGT_HCR_NV),
-> + SR_TRAP(OP_CFP_RCTX, CGT_HCR_NV),
-> + SR_TRAP(SYS_SP_EL1, CGT_HCR_NV_nNV2),
-> + SR_TRAP(SYS_VBAR_EL1, CGT_HCR_NV1_nNV2),
-> + SR_TRAP(SYS_ELR_EL1, CGT_HCR_NV1_nNV2),
-> + SR_TRAP(SYS_SPSR_EL1, CGT_HCR_NV1_nNV2),
-> + SR_TRAP(SYS_SCXTNUM_EL1, CGT_HCR_NV1_nNV2_ENSCXT),
-> + SR_TRAP(SYS_SCXTNUM_EL0, CGT_HCR_ENSCXT),
-> + SR_TRAP(OP_AT_S1E1R, CGT_HCR_AT),
-> + SR_TRAP(OP_AT_S1E1W, CGT_HCR_AT),
-> + SR_TRAP(OP_AT_S1E0R, CGT_HCR_AT),
-> + SR_TRAP(OP_AT_S1E0W, CGT_HCR_AT),
-> + SR_TRAP(OP_AT_S1E1RP, CGT_HCR_AT),
-> + SR_TRAP(OP_AT_S1E1WP, CGT_HCR_AT),
-> + SR_TRAP(SYS_ERXPFGF_EL1, CGT_HCR_FIEN),
-> + SR_TRAP(SYS_ERXPFGCTL_EL1, CGT_HCR_FIEN),
-> + SR_TRAP(SYS_ERXPFGCDN_EL1, CGT_HCR_FIEN),
-> + SR_TRAP(SYS_SCXTNUM_EL0, CGT_HCR_ENSCXT),
-> };
->=20
-> static DEFINE_XARRAY(sr_forward_xa);
-> --=20
-> 2.34.1
->=20
-
+> +	return (((u64)control->exit_code_hi) << 32) | control->exit_code;
+> +}
+> +
+>   static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
