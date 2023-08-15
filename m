@@ -2,169 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22A0A77D0AF
+	by mail.lfdr.de (Postfix) with ESMTP id 7653777D0B0
 	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 19:12:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238666AbjHORL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 13:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33506 "EHLO
+        id S238674AbjHORLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 13:11:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238678AbjHORLR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 13:11:17 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D832AE72
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:11:15 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-40c72caec5cso17211cf.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:11:15 -0700 (PDT)
+        with ESMTP id S238683AbjHORLU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 13:11:20 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AA36E72
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:11:19 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id d2e1a72fcca58-68877dc8350so434310b3a.1
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 10:11:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692119475; x=1692724275;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VjU1cPGHPErz26GfxK/V2Y6QQnaVBfBoHVJffwhAgeg=;
-        b=OkID7iHXzv+hD+tKR8T6YOXxoIXliF3W34NUBxDaFcmljCtGa4UoyiTKJr8D/Tqe60
-         twt1hBEnODfYIcEtDbVnm54kA0lIiilXkx9/J9jQrHX5X/XhOJQ7UdJ3uclpwKIqOirD
-         Nz+BaBpxqO9GVtg0Nf9FtqfKgA5MSX6L6ZpkqwrGirkV/80R7EjnEy3vAejyJrvzENi/
-         tBF0sSeWY68NphfTowZ3duiS82ZwwGD9DYGMlv24ihtwu4rin3c/EbsSxVYNJXnuceR1
-         sl4g7UKfuObykb/yzYDT2NhA5VP8HNK+onSuMDL7WMvns54M1ica33zsia1c0sn9ISDX
-         ebGw==
+        d=google.com; s=20221208; t=1692119479; x=1692724279;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cv2n5WJJQIuL/aVi/GBknUHwNAlL9ubXLjVa7Ggcv7I=;
+        b=juBpYIQZEyCC6Jxj3rJ8WnAzIPrIzPVj5tnkYhXpIeMCc4oO2/fQGumrrkXbGCk3g8
+         89rFQ8JFJ7jAi+RKDOoGZu0lboERBLSeqj26Du2aiiZT3HUXr++j5MsFNimW/4tMY2+g
+         rhai3gOe8SafhKvRJ/5b9PjsXezcxE8GcsL2AIP6DNYOol1ymPNSpzGKX4N4U2270Cds
+         PN1LqsVigNzgBLwqPpwepEwsM8KimXnw2TOdhRx1KWDbFUKPeDRaFClMO9+2T2z1icRJ
+         wmeoUCm00GDLdP2w0bHV7FmLWFYd4+xi5/TBn+q9x2KyZBLOZopWH3LIlJtxQ8Z+T6b0
+         OarA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692119475; x=1692724275;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VjU1cPGHPErz26GfxK/V2Y6QQnaVBfBoHVJffwhAgeg=;
-        b=Wp6bs9XhaKJQiaQ4aK7YBE6VhmIiL50UKSM+kRWr9nHlxc29uBRCIkt1q8pVJIez9M
-         X0rR7ZowKylAgUiqO77VtJSOCvKhtgWcKogVFtn4OPXgY0bOGWTVC/vmbFQbIPCnvbie
-         Oyso1+DPAciQ9r0wMJVUsv844nTu6jHkQmPTUE410iWYi/q80f1p+g9lOyfVHLEjbSNP
-         kpukpzVPypA6QLAM3Zfow0sT/BkKbzbtG+JWMUxk7yLwIcD057JZ2QDUqFTLIcAJO0+n
-         CqxsPohI7RTLaz3ppCQxpgZHD/OQ9d+soFoVh8vs7ag08v5ZStw0A5Y+ecdbATPGQUug
-         hSGg==
-X-Gm-Message-State: AOJu0YyB6x7pxfZV8hOES5okFTQ9OVlsNWZncgFlc5oo4CT8Wr67d7jK
-        3H8x0o1sgoDAU8Fp1fFr6vSqpg17FrCMwTJeJtQ6eg==
-X-Google-Smtp-Source: AGHT+IHxC6i5qwpObe1eDOWi/Od0g4GRgAk9jzOZ3XKeiC1SDm7VVZDyGLVzpXyK6cSH8wHoFhS6cxSCFQC9A0v0DV0=
-X-Received: by 2002:a05:622a:198f:b0:40f:c60d:1c79 with SMTP id
- u15-20020a05622a198f00b0040fc60d1c79mr3382qtc.28.1692119474862; Tue, 15 Aug
- 2023 10:11:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230811045127.3308641-1-rananta@google.com> <ZNq15SZ+53umvOfx@google.com>
- <CAJHc60wMueazp3Wm=b6-tnFPAyX0zeYuVQe9uPEJrpAm0azw2A@mail.gmail.com> <ZNrMTmppUfQhdsyY@google.com>
-In-Reply-To: <ZNrMTmppUfQhdsyY@google.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 15 Aug 2023 10:11:02 -0700
-Message-ID: <CAJHc60yp7X9Za=CJnJWqAbPuKznp91fYtnBOuQQCGtiXyQBqWw@mail.gmail.com>
-Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1692119479; x=1692724279;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cv2n5WJJQIuL/aVi/GBknUHwNAlL9ubXLjVa7Ggcv7I=;
+        b=WM/udpj38CMH1iy98QSb3s4cwccSXvgfv4tG4FjILTYo11MFTPhnG7g6UqM7pVK2lE
+         5A+cdzJHL8+UpcP4h9SgvSbESxmB+uCF0ibB1iLaF3EYV7u66StklHIwfQw3HSVGOuzF
+         t+TOIq52aIjMyPfzr2PEnfYfU5CTCUGPhyMndcnuItM5KoE9K3m7bBaTMESjvzwJxCLi
+         zIOOGaHLw/ummdHUYFiGNwLGo0UqfjwMHDo32KhAD+qage52h+SWGeI/Wchnuqif+V2O
+         Yo+6UYQS8rF4g82qeqnWmSNbUkgIUbu2QxlOKSKsKzydxo1gRRCqgNDXetU30AxXr81Y
+         9LsQ==
+X-Gm-Message-State: AOJu0YzaYXjy37j8Ikh19ce+WUbRVEOSgd8HVBtY0M2fSvcrn1w1wFWW
+        35Mm78X6UjssMSRnonJdxpqP9Nb6th4=
+X-Google-Smtp-Source: AGHT+IHbOv08Ksb8i4GH5D8SvhTbeb288EfGwKpVHkJw1xaHbiUdJmgJiWqHwrAr1/byOS/72K0ihXyR9Hs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:398a:b0:687:5d7c:82b8 with SMTP id
+ fi10-20020a056a00398a00b006875d7c82b8mr5796779pfb.2.1692119478722; Tue, 15
+ Aug 2023 10:11:18 -0700 (PDT)
+Date:   Tue, 15 Aug 2023 10:11:17 -0700
+In-Reply-To: <20230815153537.113861-1-kyle.meyer@hpe.com>
+Mime-Version: 1.0
+References: <20230815153537.113861-1-kyle.meyer@hpe.com>
+Message-ID: <ZNuxtU7kxnv1L88H@google.com>
+Subject: Re: [PATCH] KVM: x86: Increase KVM_MAX_VCPUS to 4096
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kyle Meyer <kyle.meyer@hpe.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hasen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        vkuznets@redhat.com, dmatlack@google.com, russ.anderson@hpe.com,
+        dimitri.sivanich@hpe.com, steve.wahl@hpe.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14, 2023 at 5:52=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Mon, Aug 14, 2023, Raghavendra Rao Ananta wrote:
-> > On Mon, Aug 14, 2023 at 4:16=E2=80=AFPM Sean Christopherson <seanjc@goo=
-gle.com> wrote:
-> > >
-> > > On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> > > > The series is based off of upstream v6.5-rc1.
-> > >
-> > > Lies!  :-)
-> > >
-> > > This is based off one of the kvmarm.git topic branches (I didn't both=
-er to figure
-> > > out which one), not v6.5-rc1.
-> > >
-> > Sorry, what am I missing here? My git log is as follows:
->
-> Hmm, not sure what's going on.  Maybe I misinterpreted why `git am` was f=
-ailing?
-> I assumed it was because there were objects in kvmarm that I didn't have =
-locally,
-> and fetching kvmarm allowed am to complete, though with 3-way merges, whi=
-ch IIUC
-> shouldn't have been necessary if I was using the exact same base.  Or may=
-be I
-> messed up and didn't actually reset to 6.5-rc1.
->
-> > $ git log --oneline upstream_tlbi_range_v9
-> > 5025857507abe (upstream_tlbi_range_v9) KVM: arm64: Use TLBI
-> > range-based instructions for unmap
-> > 5c0291b99a8fc KVM: arm64: Invalidate the table entries upon a range
-> > 8c46b54d4aaec KVM: arm64: Flush only the memslot after write-protect
-> > 231abaeb7ffc2 KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-> > 5ec291b863309 KVM: arm64: Define kvm_tlb_flush_vmid_range()
-> > 5bcd7a085c34e KVM: arm64: Implement  __kvm_tlb_flush_vmid_range()
-> > ea08f9dff7e5b arm64: tlb: Implement __flush_s2_tlb_range_op()
-> > b3178687947c9 arm64: tlb: Refactor the core flush algorithm of __flush_=
-tlb_range
-> > a4850fa988eef KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common =
-code
-> > 306dc4e6afd37 KVM: Allow range-based TLB invalidation from common code
-> > d02785a0a1e01 KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> > 136fa2d254537 KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-> > e35c68a75170d KVM: Declare kvm_arch_flush_remote_tlbs() globally
-> > 5d592777b9bba KVM: Rename kvm_arch_flush_remote_tlb() to
-> > kvm_arch_flush_remote_tlbs()
-> > 06c2afb862f9d (tag: v6.5-rc1, tag: linux/v6.5-rc1) Linux 6.5-rc1
-> > c192ac7357683 MAINTAINERS 2: Electric Boogaloo
-> > f71f64210d698 Merge tag 'dma-mapping-6.5-2023-07-09' of
-> > git://git.infradead.org/users/hch/dma-mapping
-> > ...
-> >
-> > Isn't the commit, 06c2afb862f9d (06c2afb862f9d (tag: v6.5-rc1, tag:
-> > linux/v6.5-rc1) Linux 6.5-rc1) the 'base' commit?
->
-> Ya, should be.
->
-> Either way, even if this is PEBKAC on my end, using --base would be nice,=
- e.g.
-> then you can definitely say it's my fault ;-)
->
-I'll consider this, and thanks for the confirmation.
+On Tue, Aug 15, 2023, Kyle Meyer wrote:
+> Increase KVM_MAX_VCPUS to 4096 when MAXSMP is enabled.
+> 
+> Notable changes (when MAXSMP is enabled):
+> 
+> * KMV_MAX_VCPUS will increase from 1024 to 4096.
+> * KVM_MAX_VCPU_IDS will increase from 4096 to 16384.
+> * KVM_HV_MAX_SPARSE_VCPU_SET_BITS will increase from 16 to 64.
+> * CPUID[HYPERV_CPUID_IMPLEMENT_LIMITS (0x40000005)].EAX will now be 4096.
+> 
+> * struct kvm will increase from 39408 B to 39792 B.
+> * struct kvm_ioapic will increase from 5240 B to 19064 B.
+> 
+> * The following (on-stack) bitmaps will increase from 128 B to 512 B:
+> 	* dest_vcpu_bitmap in kvm_irq_delivery_to_apic.
+> 	* vcpu_mask in kvm_hv_flush_tlb.
+> 	* vcpu_bitmap in ioapic_write_indirect.
+> 	* vp_bitmap in sparse_set_to_vcpu_mask.
+> 
+> Signed-off-by: Kyle Meyer <kyle.meyer@hpe.com>
+> ---
+> Virtual machines with 4096 virtual CPUs have been created on 32 socket
+> Cascade Lake and Sapphire Rapids systems.
+> 
+> 4096 is the current maximum value because of the Hyper-V TLFS. See
+> BUILD_BUG_ON in arch/x86/kvm/hyperv.c, commit 79661c3, and Vitaly's
+> comment on https://lore.kernel.org/all/87r136shcc.fsf@redhat.com.
 
-- Raghavendra
-> > > Please try to incorporate git format-patch's "--base" option into you=
-r workflow,
-> > > e.g. I do "git format-patch --base=3DHEAD~$nr" where $nr is the numbe=
-r of patches
-> > > I am posting.
-> > >
-> > > It's not foolproof, e.g. my approach doesn't help if I have a local p=
-atch that
-> > > I'm not posting, but 99% of the time it Just Works and eliminates any=
- ambuitity.
-> > >
-> > > You can also do "--base=3Dauto", but that only does the right thing i=
-f your series
-> > > has its upstream branch set to the base/tree that you want your patch=
-es applied
-> > > to (I use the upstream branch for a completely different purpose for =
-my dev branches).
+Mostly out of curiosity, do you care about Hyper-V support?   If not, at some
+point it'd probably be worth exploring a CONFIG_KVM_HYPERV option to allow
+disabling KVM's Hyper-V support at compile time so that we're not bound by the
+restrictions of the TLFS.
+
+>  arch/x86/include/asm/kvm_host.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3bc146dfd38d..91a01fa17fa7 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -39,7 +39,11 @@
+>  
+>  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+>  
+> +#ifdef CONFIG_MAXSMP
+> +#define KVM_MAX_VCPUS 4096
+> +#else
+>  #define KVM_MAX_VCPUS 1024
+> +#endif
+
+Rather than tightly couple this to MAXSMP, what if we add a Kconfig?  I know of
+at least one scenario, SVM's AVIC/x2AVIC, where it would be desirable to configure
+KVM to a much smaller maximum.  The biggest downside I can think of is that KVM
+selftests would need to be updated (they assume the max is >=512), and some of the
+tests might be completely invalid if KVM_MAX_VCPUS is too low (<256?).
+
+E.g.
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 60d430b4650f..8704748e35d9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -39,7 +39,7 @@
+ 
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+ 
+-#define KVM_MAX_VCPUS 1024
++#define KVM_MAX_VCPUS CONFIG_KVM_MAX_NR_VCPUS
+ 
+ /*
+  * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index ed90f148140d..b0f92eb77f78 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -151,6 +151,17 @@ config KVM_PROVE_MMU
+ 
+          If in doubt, say "N".
+ 
++config KVM_MAX_NR_VCPUS
++       int "Maximum vCPUs per VM"
++       default "4096" if MAXSMP
++       default "1024"
++       range 1 4096
++       depends on KVM
++       help
++         Set the maximum number of vCPUs for a single VM.  Larger values
++         increase the memory footprint of each VM regardless of how many vCPUs
++         are actually created (though the memory increase is relatively small).
++
+ config KVM_EXTERNAL_WRITE_TRACKING
+        bool
+ 
+
