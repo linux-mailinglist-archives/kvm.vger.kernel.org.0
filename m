@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A24C77D534
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 23:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 211D277D531
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 23:36:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240286AbjHOVgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 17:36:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57302 "EHLO
+        id S240278AbjHOVgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 17:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240293AbjHOVfw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 17:35:52 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D071BF3
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 14:35:41 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-589cd098d24so56957127b3.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 14:35:41 -0700 (PDT)
+        with ESMTP id S240296AbjHOVfx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 17:35:53 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A49781FD4
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 14:35:42 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-686e29cb7a0so6703931b3a.3
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 14:35:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692135340; x=1692740140;
+        d=google.com; s=20221208; t=1692135342; x=1692740142;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=bCGvdYVO9EKbpa2jmZF0w8IsHUC4STqQLwNPEWIlFrg=;
-        b=4seg8jbUuzcf+Jrd/1/VCZUZyBFVOg1OI+RgVOOd17/vtRlmnaSGCfGp+yaEQXkaUV
-         T93drzsN5+fFePzUoNFE5SkAYPYATw3WDE7OlPsPwxwzAMhJUK4DDKasrG347gUl0E0m
-         bjiWWESP9bDXOkIXBXe5d/i1vj2ID5gyS8VmBT98ZfA0J7RSycx3pK9aDweUnUg1pEpZ
-         OMJRY5agn0k5JzWysk/6LYC5fkHk1aZcSyGv+bny6dm9yLROA7+zldsiELd3m9avnZ+y
-         AOqsx3XjHgeRNK9pgBLcqe3SoweWvFnkgZGQmTVd+2LdyxnWwa93d1buUfX/MTMzuYaq
-         imaA==
+        bh=SFpi+WGuvYcTqc5iutU3gDOga20tlCn0kmKYiGzba1s=;
+        b=74tVcNm00OZaHpD1xVuPf4Jjj8KBDUlS++wNuw6IOr9Xww7JLEHfMfpDin20hyekXn
+         UAZzdeOvKkgZUS6btGqtbj1EtOcbudgfP8uunjSwa10kl53dOsD2H4PMXQQ7CpyOKOA0
+         fFJjtiO9IkGgau4YpenIfY616mMKNSNOk/KybhEQhb/R1OBjzFS1FxAE5sc0kRQ+eebR
+         f+hPBPVTsmtcKA98ubnfVz6rHszpNxsmqCasREoyiC8y1zLZQWM3maIi8g+mst+1jtCV
+         qq4sZhxyR+JYTtYagySkZoMNAZfN36FpIVb+Q3rAOdXkc6+JefuhcRoK+Iwm0FGQTYOH
+         wB+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692135340; x=1692740140;
+        d=1e100.net; s=20221208; t=1692135342; x=1692740142;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bCGvdYVO9EKbpa2jmZF0w8IsHUC4STqQLwNPEWIlFrg=;
-        b=dJe2n2JeL1f57gSyNGUPVE9IkzNnq5+rhGan9PSU+gMaYRxkORDYrD1VMi/tmvvMmP
-         PvakedOVZjHWcTsY9mMqiAoxFT307athRbvxOmqLpGOnux/CT+l9pizj3eREQpcuS0qA
-         8HgAcjdaNhYU7NJKD72wKNsB897p3feZKM0NgLjOKn23s/odGxonoZ1xB3h/u6YWI+vR
-         G+JcDXkrBgq39OzkSKQ+H/PufRVJpvq/vp1zcPU128v5v5fFJDBXboUk0vWOh7oV1BXI
-         9P81+tE3g05wLj689/oqMIbg0YQONBP1hlDIdo1eY6PEmKs4iwhhdKYXPBUO1mloBMnz
-         h0WQ==
-X-Gm-Message-State: AOJu0YxIozCz9ax+LKKK+Lf9WijVWiL79OOmG3WDrvLBR5jZoTYPNouQ
-        P7UXG1Gzbdw3I9AdbiK9Nl3T9izDuBQ=
-X-Google-Smtp-Source: AGHT+IGRuzrjE+vpyIzdyF/OQOo1U5zpH5XKrPubx9S5xZyoHO/CMSeIvVbf4AW+/aR8z9iCg8Y6aE7RL/Y=
+        bh=SFpi+WGuvYcTqc5iutU3gDOga20tlCn0kmKYiGzba1s=;
+        b=acXKmDBksOQ68npLDxK8J6wAE6kcOo+rsZ+p3CM6LaMCo6KEj/Ia0kzssIQs8Ww919
+         swVy1rwdJXVi3nMo+cwYAjCEX0y4QNyMiLxOG3yttD4eb0mJZbX/HMNt2f1QdNfkfpxu
+         9ZHgA8xakMl46UJ3amnVN10PFHKPHGHtVUiGLvcwRo/wliVsJewPxfq2OJWAZg8Lsak/
+         EFM1M+QpshuJkLU9APYZ2fSnHwRkzTd7ZjPJtp2ncO7CwOa3tZV/9oI4Co+n3sND1EmQ
+         n/NhG4B+SKHd2Oc78kyC/jUwvkYBZHc/XNttWMVhVyA01QMhZSfdFkMd9BlnvG5ddccu
+         fiUQ==
+X-Gm-Message-State: AOJu0YyufaaTuIxdojIGjNul1zBSkk66lpbdA7mxMTR/v6op93rgjrxU
+        M1lfgp9gUOjNFLxoQndRQDLSrj8c/bg=
+X-Google-Smtp-Source: AGHT+IG5MHzZLav8gJ1/MnkDQMEocS8Nk95fglVaOP6iG8M0zB5pJMu3CTRFZ48wrIVfKHX4OCFGKU3C7d8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:af27:0:b0:579:f832:74b with SMTP id
- n39-20020a81af27000000b00579f832074bmr200736ywh.10.1692135340576; Tue, 15 Aug
- 2023 14:35:40 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:a17:b0:682:24c1:2951 with SMTP id
+ p23-20020a056a000a1700b0068224c12951mr8029pfh.0.1692135342319; Tue, 15 Aug
+ 2023 14:35:42 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 15 Aug 2023 14:35:24 -0700
+Date:   Tue, 15 Aug 2023 14:35:25 -0700
 In-Reply-To: <20230815213533.548732-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230815213533.548732-1-seanjc@google.com>
 X-Mailer: git-send-email 2.41.0.694.ge786442a9b-goog
-Message-ID: <20230815213533.548732-2-seanjc@google.com>
-Subject: [PATCH 01/10] KVM: SVM: Drop pointless masking of default APIC base
- when setting V_APIC_BAR
+Message-ID: <20230815213533.548732-3-seanjc@google.com>
+Subject: [PATCH 02/10] KVM: SVM: Use AVIC_HPA_MASK when initializing vCPU's
+ Physical ID entry
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,52 +65,61 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop VMCB_AVIC_APIC_BAR_MASK, it's just a regurgitation of the maximum
-theoretical 4KiB-aligned physical address, i.e. is not novel in any way,
-and its only usage is to mask the default APIC base, which is 4KiB aligned
-and (obviously) a legal physical address.
+Use AVIC_HPA_MASK instead of AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK when
+initializing a vCPU's Physical ID table entry, the two masks are identical.
+Keep both #defines for now, along with a few new static asserts.  A future
+change will clean up the entire mess (spoiler alert, the masks are
+pointless).
+
+Opportunisitically move the bitwise-OR of AVIC_PHYSICAL_ID_ENTRY_VALID_MASK
+outside of the call to __sme_set(), again to pave the way for code
+deduplication.  __sme_set() is purely additive, i.e. ORing in the valid
+bit before or after the C-bit does not change the end result.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/svm.h | 2 --
- arch/x86/kvm/svm/avic.c    | 2 +-
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ arch/x86/include/asm/svm.h | 2 ++
+ arch/x86/kvm/svm/avic.c    | 5 ++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 72ebd5e4e975..1e70600e84f7 100644
+index 1e70600e84f7..609c9b596399 100644
 --- a/arch/x86/include/asm/svm.h
 +++ b/arch/x86/include/asm/svm.h
-@@ -257,8 +257,6 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+@@ -285,6 +285,8 @@ static_assert((AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == AVIC_MAX_
+ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_MAX_PHYSICAL_ID);
  
- #define AVIC_DOORBELL_PHYSICAL_ID_MASK			GENMASK_ULL(11, 0)
+ #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
++static_assert(AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK == AVIC_HPA_MASK);
++static_assert(AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK == GENMASK_ULL(51, 12));
  
--#define VMCB_AVIC_APIC_BAR_MASK				0xFFFFFFFFFF000ULL
--
- #define AVIC_UNACCEL_ACCESS_WRITE_MASK		1
- #define AVIC_UNACCEL_ACCESS_OFFSET_MASK		0xFF0
- #define AVIC_UNACCEL_ACCESS_VECTOR_MASK		0xFFFFFFFF
+ #define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
+ 
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index cfc8ab773025..7062164e4041 100644
+index 7062164e4041..442c58ef8158 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -251,7 +251,7 @@ void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb)
- 	vmcb->control.avic_backing_page = bpa & AVIC_HPA_MASK;
- 	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
- 	vmcb->control.avic_physical_id = ppa & AVIC_HPA_MASK;
--	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE & VMCB_AVIC_APIC_BAR_MASK;
-+	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE;
+@@ -308,9 +308,8 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
+ 	if (!entry)
+ 		return -EINVAL;
  
- 	if (kvm_apicv_activated(svm->vcpu.kvm))
- 		avic_activate_vmcb(svm);
+-	new_entry = __sme_set((page_to_phys(svm->avic_backing_page) &
+-			      AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK) |
+-			      AVIC_PHYSICAL_ID_ENTRY_VALID_MASK);
++	new_entry = __sme_set(page_to_phys(svm->avic_backing_page) & AVIC_HPA_MASK) |
++		    AVIC_PHYSICAL_ID_ENTRY_VALID_MASK;
+ 	WRITE_ONCE(*entry, new_entry);
+ 
+ 	svm->avic_physical_id_cache = entry;
 -- 
 2.41.0.694.ge786442a9b-goog
 
