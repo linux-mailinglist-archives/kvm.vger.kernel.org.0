@@ -2,169 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 009BE77D246
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:45:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFBD777D226
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:44:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239292AbjHOSob (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 14:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39988 "EHLO
+        id S239276AbjHOSn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 14:43:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239285AbjHOSoA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 14:44:00 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2524C19A0;
-        Tue, 15 Aug 2023 11:43:59 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37FISkPP009736;
-        Tue, 15 Aug 2023 18:43:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=b4qqs5p1+tL7145x1KZqgpgGY/eSyFNdpfmpDdEztJI=;
- b=exTDavLG3LMs1+eaLJn2RhDLHkX+0iTuvXihO8XoHjYKxqQ9NSCoa4g+PZnKeBDXJbGa
- xZGzf0gMnjHcjvgOK9BmMStlAe7/cRfgHQw464Fl6OsZEMb1ZW6D+E2q910vrsIP19IB
- Jd74fQ20XVtQW9ahkNukDbxGS/4o4j8knwIsdayHO0tnmLZsrWxVxMxnDMOIlzvphxyS
- tiFPGxXTgPzN1R9NvdK3WBHonIhw1X0DvrjzztNC5hmUu2qbi6kmMo24GR9UbVWzScYG
- VzpSx5jtsBYMtilKm4nWbYDvE1SoxpwTnXc0qvwbTWV73nBvBX671hXu8ABDn4z/Vl2R iQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgep28bjs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Aug 2023 18:43:55 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37FITrlW012935;
-        Tue, 15 Aug 2023 18:43:55 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgep28bjj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Aug 2023 18:43:54 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37FGtMFS013425;
-        Tue, 15 Aug 2023 18:43:54 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sepmjphp7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Aug 2023 18:43:54 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37FIhqAF27919080
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Aug 2023 18:43:53 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CCF695804E;
-        Tue, 15 Aug 2023 18:43:52 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83C195803F;
-        Tue, 15 Aug 2023 18:43:51 +0000 (GMT)
-Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.endicott.ibm.com (unknown [9.60.75.177])
-        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Aug 2023 18:43:51 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Subject: [PATCH 12/12] s390/vfio-ap: Make sure nib is shared
-Date:   Tue, 15 Aug 2023 14:43:33 -0400
-Message-Id: <20230815184333.6554-13-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20230815184333.6554-1-akrowiak@linux.ibm.com>
-References: <20230815184333.6554-1-akrowiak@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: no--9qH4NYYhmNF9p13et18N0fxfsoB-
-X-Proofpoint-ORIG-GUID: wKKizstHSgvH-_M-3s6oBi0O_oF0ZkVE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-15_16,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- bulkscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
- impostorscore=0 clxscore=1015 priorityscore=1501 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308150167
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S239230AbjHOSnn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 14:43:43 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD60BF1
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:43:41 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5646e695ec1so8777181a12.1
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692125021; x=1692729821;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JSvYsD6+1EOsLwMbZUcg1SbKGoI2rKHIFLeuHZgRRx8=;
+        b=3GbaBNZWweXPbCUfjNMBCMIO1/9pik3Ou7FeHEWzr8nKjSkzvqGcURow0A8T+s1N/W
+         RVe6VK7Cczc0hkFYSPIsM+jZix/6+Avk/pXQMvDNFYcZzDKKROk6r/GnFpEmHHYj2KFW
+         h93ooZKanquSe6AJs+58Zz6N7PTRsHyBuSQ388gemOe4SoUihxzHiPkARWazsr3ZZAz0
+         OcYltDEsS3pdqe1uhroxEJVJrBI209UjBYz0S7Ir9y59ufYp5G/tA7HIMpi+zHCVIaVP
+         g8K5m646ssrl0DCyD/aPBQgyLNjNw/h6F2pb8fxpumb9nBAkrhKWZXYmHJ6A2HGZPyrg
+         dUMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692125021; x=1692729821;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JSvYsD6+1EOsLwMbZUcg1SbKGoI2rKHIFLeuHZgRRx8=;
+        b=iJ0yULE3ogXwy5WbV8Y5F5we+A9Wzf0o3b/Q7riOCoahXQYqIeusomj/MYTxQOJ7a8
+         HpX0Pf790AUWg2YywjvPpS6A89NG3jVcAe5iak2ZbTb/PlsioEA4XMpnYJpN5XRPu1ni
+         Ob8aiWy/1w80/evQCvVnWBX6Z+qSbhAUJaWgnAtY0ktsM4eWszqxFi3odPwO8aShOsC4
+         jUfnqVK04OuSaqdIlg6howNA5L34bH8OtmIH1qrO3IQwjHhms9liESu9x51p6p3fgGyO
+         r3jR42J0t2KRvFbq8h2brD8E8h0k5KWaMQVHU2i+JZas1zIeZUwm4n1ac7GW+rbuhnu9
+         MEkQ==
+X-Gm-Message-State: AOJu0YyYvGiqIwx0wc5y2UK8UgNq4YWjc5HVioBDwyUNcHDkyiuU7aRg
+        BmzAXkqW9s9aO49UaOJ+BIYvfmrZ6xSZ8uRd+Q==
+X-Google-Smtp-Source: AGHT+IFNCwiTqbLEpaHtcY7JBuMDew3z5ESL3Ou2Kgu6Eu67p23Z+gfY19LxZRmFi4kbANuVSsG1veuDWoQmibZMwA==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a17:903:645:b0:1b7:d4d2:c385 with SMTP
+ id kh5-20020a170903064500b001b7d4d2c385mr4788682plb.1.1692125021245; Tue, 15
+ Aug 2023 11:43:41 -0700 (PDT)
+Date:   Tue, 15 Aug 2023 18:43:39 +0000
+In-Reply-To: <ZNKv9ul2I7A4V7IF@google.com> (message from Sean Christopherson
+ on Tue, 8 Aug 2023 14:13:26 -0700)
+Mime-Version: 1.0
+Message-ID: <diqzh6p02lk4.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v11 12/29] KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for
+ guest-specific backing memory
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        david@redhat.com, qperret@google.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since the NIB is visible by HW, KVM and the (PV) guest it needs to be
-in non-secure or secure but shared storage. Return code 6 is used to
-indicate to a PV guest that its NIB would be on secure, unshared
-storage and therefore the NIB address is invalid.
+Sean Christopherson <seanjc@google.com> writes:
 
-Unfortunately we have no easy way to check if a page is unshared after
-vfio_pin_pages() since it will automatically export an unshared page
-if the UV pin shared call did not succeed due to a page being in
-unshared state.
+> On Mon, Aug 07, 2023, Ackerley Tng wrote:
+>> I=E2=80=99d like to propose an alternative to the refcounting approach b=
+etween
+>> the gmem file and associated kvm, where we think of KVM=E2=80=99s memslo=
+ts as
+>> users of the gmem file.
+>>
+>> Instead of having the gmem file pin the VM (i.e. take a refcount on
+>> kvm), we could let memslot take a refcount on the gmem file when the
+>> memslots are configured.
+>>
+>> Here=E2=80=99s a POC patch that flips the refcounting (and modified self=
+tests in
+>> the next commit):
+>> https://github.com/googleprodkernel/linux-cc/commit/7f487b029b89b9f3e9b0=
+94a721bc0772f3c8c797
+>>
+>> One side effect of having the gmem file pin the VM is that now the gmem
+>> file becomes sort of a false handle on the VM:
+>>
+>> + Closing the file destroys the file pointers in the VM and invalidates
+>>   the pointers
+>
+> Yeah, this is less than ideal.  But, it's also how things operate today. =
+ KVM
+> doesn't hold references to VMAs or files, e.g. if userspace munmap()s mem=
+ory,
+> any and all SPTEs pointing at the memory are zapped.  The only difference=
+ with
+> gmem is that KVM needs to explicitly invalidate file pointers, instead of=
+ that
+> happening behind the scenes (no more VMAs to find).  Again, I agree the r=
+esulting
+> code is more complex than I would prefer, but from a userspace perspectiv=
+e I
+> don't see this as problematic.
+>
+>> + Keeping the file open keeps the VM around in the kernel even though
+>>   the VM fd may already be closed.
+>
+> That is perfectly ok.  There is plenty of prior art, as well as plenty of=
+ ways
+> for userspace to shoot itself in the foot.  E.g. open a stats fd for a vC=
+PU and
+> the VM and all its vCPUs will be kept alive.  And conceptually it's sound=
+,
+> anything created in the scope of a VM _should_ pin the VM.
+>
 
-Therefore we use the fact that UV pinning it a second time is a nop
-but trying to pin an exported page is an error (0x102). If we
-encounter this error, we do a vfio unpin and import the page again,
-since vfio_pin_pages() exported it.
+Thanks for explaining!
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-Tested-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
----
- drivers/s390/crypto/vfio_ap_ops.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+>> I feel that memslots form a natural way of managing usage of the gmem
+>> file. When a memslot is created, it is using the file; hence we take a
+>> refcount on the gmem file, and as memslots are removed, we drop
+>> refcounts on the gmem file.
+>
+> Yes and no.  It's definitely more natural *if* the goal is to allow guest=
+_memfd
+> memory to exist without being attached to a VM.  But I'm not at all convi=
+nced
+> that we want to allow that, or that it has desirable properties.  With TD=
+X and
+> SNP in particuarly, I'm pretty sure that allowing memory to outlive the V=
+M is
+> very underisable (more below).
+>
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 8bda52c46df0..0509f80622cd 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -359,6 +359,28 @@ static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
- 	return 0;
- }
- 
-+static int ensure_nib_shared(unsigned long addr, struct gmap *gmap)
-+{
-+	int ret;
-+
-+	/*
-+	 * The nib has to be located in shared storage since guest and
-+	 * host access it. vfio_pin_pages() will do a pin shared and
-+	 * if that fails (possibly because it's not a shared page) it
-+	 * calls export. We try to do a second pin shared here so that
-+	 * the UV gives us an error code if we try to pin a non-shared
-+	 * page.
-+	 *
-+	 * If the page is already pinned shared the UV will return a success.
-+	 */
-+	ret = uv_pin_shared(addr);
-+	if (ret) {
-+		/* vfio_pin_pages() likely exported the page so let's re-import */
-+		gmap_convert_to_secure(gmap, addr);
-+	}
-+	return ret;
-+}
-+
- /**
-  * vfio_ap_irq_enable - Enable Interruption for a APQN
-  *
-@@ -422,6 +444,14 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
- 	h_nib = page_to_phys(h_page) | (nib & ~PAGE_MASK);
- 	aqic_gisa.gisc = isc;
- 
-+	/* NIB in non-shared storage is a rc 6 for PV guests */
-+	if (kvm_s390_pv_cpu_is_protected(vcpu) &&
-+	    ensure_nib_shared(h_nib & PAGE_MASK, kvm->arch.gmap)) {
-+		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
-+		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
-+		return status;
-+	}
-+
- 	nisc = kvm_s390_gisc_register(kvm, isc);
- 	if (nisc < 0) {
- 		VFIO_AP_DBF_WARN("%s: gisc registration failed: nisc=%d, isc=%d, apqn=%#04x\n",
--- 
-2.39.3
+This is a little confusing, with the file/inode split in gmem where the
+physical memory/data is attached to the inode and the file represents
+the VM's view of that memory, won't the memory outlive the VM?
 
+This [1] POC was built based on that premise, that the gmem inode can be
+linked to another file and handed off to another VM, to facilitate
+intra-host migration, where the point is to save the work of rebuilding
+the VM's memory in the destination VM.
+
+With this, the bindings don't outlive the VM, but the data/memory
+does. I think this split design you proposed is really nice.
+
+>> The KVM pointer is shared among all the bindings in gmem=E2=80=99s xarra=
+y, and we can
+>> enforce that a gmem file is used only with one VM:
+>>
+>> + When binding a memslot to the file, if a kvm pointer exists, it must
+>>   be the same kvm as the one in this binding
+>> + When the binding to the last memslot is removed from a file, NULL the
+>>   kvm pointer.
+>
+> Nullifying the KVM pointer isn't sufficient, because without additional a=
+ctions
+> userspace could extract data from a VM by deleting its memslots and then =
+binding
+> the guest_memfd to an attacker controlled VM.  Or more likely with TDX an=
+d SNP,
+> induce badness by coercing KVM into mapping memory into a guest with the =
+wrong
+> ASID/HKID.
+>
+> I can think of three ways to handle that:
+>
+>   (a) prevent a different VM from *ever* binding to the gmem instance
+>   (b) free/zero physical pages when unbinding
+>   (c) free/zero when binding to a different VM
+>
+> Option (a) is easy, but that pretty much defeats the purpose of decopulin=
+g
+> guest_memfd from a VM.
+>
+> Option (b) isn't hard to implement, but it screws up the lifecycle of the=
+ memory,
+> e.g. would require memory when a memslot is deleted.  That isn't necessar=
+ily a
+> deal-breaker, but it runs counter to how KVM memlots currently operate.  =
+Memslots
+> are basically just weird page tables, e.g. deleting a memslot doesn't hav=
+e any
+> impact on the underlying data in memory.  TDX throws a wrench in this as =
+removing
+> a page from the Secure EPT is effectively destructive to the data (can't =
+be mapped
+> back in to the VM without zeroing the data), but IMO that's an oddity wit=
+h TDX and
+> not necessarily something we want to carry over to other VM types.
+>
+> There would also be performance implications (probably a non-issue in pra=
+ctice),
+> and weirdness if/when we get to sharing, linking and/or mmap()ing gmem.  =
+E.g. what
+> should happen if the last memslot (binding) is deleted, but there outstan=
+ding userspace
+> mappings?
+>
+> Option (c) is better from a lifecycle perspective, but it adds its own fl=
+avor of
+> complexity, e.g. the performant way to reclaim TDX memory requires the TD=
+MR
+> (effectively the VM pointer), and so a deferred relcaim doesn't really wo=
+rk for
+> TDX.  And I'm pretty sure it *can't* work for SNP, because RMP entries mu=
+st not
+> outlive the VM; KVM can't reuse an ASID if there are pages assigned to th=
+at ASID
+> in the RMP, i.e. until all memory belonging to the VM has been fully free=
+d.
+>
+
+If we are on the same page that the memory should outlive the VM but not
+the bindings, then associating the gmem inode to a new VM should be a
+feature and not a bug.
+
+What do we want to defend against here?
+
+(a) Malicious host VMM
+
+For a malicious host VMM to read guest memory (with TDX and SNP), it can
+create a new VM with the same HKID/ASID as the victim VM, rebind the
+gmem inode to a VM crafted with an image that dumps the memory.
+
+I believe it is not possible for userspace to arbitrarily select a
+matching HKID unless userspace uses the intra-host migration ioctls, but if=
+ the
+migration ioctl is used, then EPTs are migrated and the memory dumper VM
+can't successfully run a different image from the victim VM. If the
+dumper VM needs to run the same image as the victim VM, then it would be
+a successful migration rather than an attack. (Perhaps we need to clean
+up some #MCs here but that can be a separate patch)
+
+(b) Malicious host kernel
+
+A malicious host kernel can allow a malicious host VMM to re-use a HKID
+for the dumper VM, but this isn't something a better gmem design can
+defend against.
+
+(c) Attacks using gmem for software-protected VMs
+
+Attacks using gmem for software-protected VMs are possible since there
+is no real encryption with HKID/ASID (yet?). The selftest for [1]
+actually uses this lack of encryption to test that the destination VM
+can read the source VM's memory after the migration. In the POC [1], as
+long as both destination VM knows where in the inode's memory to read,
+it can read what it wants to. This is a problem for software-protected
+VMs, but I feel that it is also a separate issue from gmem's design.
+
+>> Could binding gmem files not on creation, but at memslot configuration
+>> time be sufficient and simpler?
+>
+> After working through the flows, I think binding on-demand would simplify=
+ the
+> refcounting (stating the obvious), but complicate the lifecycle of the me=
+mory as
+> well as the contract between KVM and userspace,
+
+If we are on the same page that the memory should outlive the VM but not
+the bindings, does it still complicate the lifecycle of the memory and
+the userspace/KVM contract? Could it just be a different contract?
+
+> and would break the separation of
+> concerns between the inode (physical memory / data) and file (VM's view /=
+ mappings).
+
+Binding on-demand is orthogonal to the separation of concerns between
+inode and file, because it can be built regardless of whether we do the
+gmem file/inode split.
+
++ This flip-the-refcounting POC is built with the file/inode split and
++ In [2] (the delayed binding approach to solve intra-host migration), I
+  also tried flipping the refcounting, and that without the gmem
+  file/inode split. (Refcounting in [2] is buggy because the file can't
+  take a refcount on KVM, but it would work without taking that refcount)
+
+[1] https://lore.kernel.org/lkml/cover.1691446946.git.ackerleytng@google.co=
+m/T/
+[2] https://github.com/googleprodkernel/linux-cc/commit/dd5ac5e53f14a1ef991=
+5c9c1e4cc1006a40b49df
