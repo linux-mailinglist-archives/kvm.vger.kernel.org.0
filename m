@@ -2,163 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 538ED77CA36
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 11:16:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D60BC77CA6C
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 11:29:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235965AbjHOJQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 05:16:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
+        id S236091AbjHOJ2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 05:28:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236047AbjHOJP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 05:15:28 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F1A113
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 02:15:02 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bb91c20602so9096495ad.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 02:15:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1692090901; x=1692695701;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N6UPah3rxy6GE+IW6hhaEXFukV19/RQgo9PDGSDaxjc=;
-        b=B4NWnukFtWBpBFBooLjjX+4xRi6cYrfaI8iegReeVzLQWKPXXt1CxHdKL4/tZ0fNPM
-         0UExtQR6YZe58qkKHpbXtHQV0uPapic2RYOUTB+6Pi7LdOE1C7GEcaF7+zgpTtYtD/de
-         UlP+/TDXrfMVghqI9OT3wDmB4f+60Ecld4ptmi3g4OGE44+/xTS+dFaCetp2KrysicqF
-         +aYy3xTBT6yAIsFwZB/EdPqMFUGo82MatiM8ko8K8L/pW/bDYDRzwOeVlfM6AvdWPq+b
-         HcGAAnq5GXzxPWbDmjMNdTVLUEtTfSjxZmvfFI4JrMMNezs7y6COdvHcs3klmaxHW6vC
-         FHlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692090901; x=1692695701;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N6UPah3rxy6GE+IW6hhaEXFukV19/RQgo9PDGSDaxjc=;
-        b=juvjIU66UPfK+w2/sh3ebFRM/VvV4elF0xPdlZevib1uhYkKRalAuKvO9lR3WtGwuz
-         2t1zzgbVJX88O83ZgEVpUyZ7VcbTFTK0pAqFSNSxedtYOa0kQP/XsyCk2rrYUTBpTvgq
-         mNLDtN0I+mcDsrzEZ89Yy0LyEPmIowfunvWa7G6GlE9Wj6GUBcO8bTeFPdSQN9v6zcNG
-         eEXIiCBEs69jjaDIsaYx/MaqxoDYmQFZCnwhC6h+lZEI8E3tljynsT03Lk5X9F8NJz0H
-         cjo8Ikz3BrUlh5HhvRpo5q5HqQNfwqqVg1k2FCqexXQ+bqKKaLxVmQ77a9pP1QXxTwys
-         6BUA==
-X-Gm-Message-State: AOJu0Yz/3Mx0Zx6Rdv2iZYrFbC8IT2BKZRORzdrCwB1IW3iLvAz3/9Lh
-        j9HZJ5oBBx7lFsW+zZYGtA4JnQ==
-X-Google-Smtp-Source: AGHT+IGKaQyK0d17VyjHV7p/Fr8yAF+2JMAJsl65uoihXD9UcmAUSi1eF134pFnOBdZUKl9ThFMr5Q==
-X-Received: by 2002:a17:902:e5c8:b0:1bb:83ec:832 with SMTP id u8-20020a170902e5c800b001bb83ec0832mr13866844plf.2.1692090901535;
-        Tue, 15 Aug 2023 02:15:01 -0700 (PDT)
-Received: from ?IPV6:fdbd:ff1:ce00:1c25:884:3ed:e1db:b610? ([240e:694:e21:b::2])
-        by smtp.gmail.com with ESMTPSA id io13-20020a17090312cd00b001b39ffff838sm10630843plb.25.2023.08.15.02.14.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 02:15:01 -0700 (PDT)
-Message-ID: <4f64cd2d-90e8-7902-7ef7-1ac58d51b2a8@bytedance.com>
-Date:   Tue, 15 Aug 2023 17:14:40 +0800
+        with ESMTP id S234145AbjHOJ1t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 05:27:49 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2123B5
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 02:27:47 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RQ5Rl5DGZz6J7Xw;
+        Tue, 15 Aug 2023 17:23:47 +0800 (CST)
+Received: from A2006125610.china.huawei.com (10.202.227.178) by
+ lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 15 Aug 2023 10:27:40 +0100
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+CC:     <peter.maydell@linaro.org>, <ricarkol@google.com>,
+        <kvm@vger.kernel.org>, <gshan@redhat.com>,
+        <jonathan.cameron@huawei.com>, <linuxarm@huawei.com>
+Subject: [PATCH v2] arm/kvm: Enable support for KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+Date:   Tue, 15 Aug 2023 10:27:09 +0100
+Message-ID: <20230815092709.1290-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v4 01/48] mm: move some shrinker-related function
- declarations to mm/internal.h
-Content-Language: en-US
-To:     Muchun Song <muchun.song@linux.dev>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, david@fromorbit.com,
-        tkhai@ya.ru, Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>, djwong@kernel.org,
-        Christian Brauner <brauner@kernel.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>, tytso@mit.edu,
-        steven.price@arm.com, cel@kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        yujie.liu@intel.com, Greg KH <gregkh@linuxfoundation.org>,
-        simon.horman@corigine.com, dlemoal@kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>, x86@kernel.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-erofs@lists.ozlabs.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-nfs@vger.kernel.org, linux-mtd@lists.infradead.org,
-        rcu@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        linux-bcache@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
- <20230807110936.21819-2-zhengqi.arch@bytedance.com>
- <FC3AE898-443D-4ACB-BCB4-0F8F2F48CDD0@linux.dev>
-From:   Qi Zheng <zhengqi.arch@bytedance.com>
-In-Reply-To: <FC3AE898-443D-4ACB-BCB4-0F8F2F48CDD0@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.202.227.178]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=1.1 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Now that we have Eager Page Split support added for ARM in the kernel,
+enable it in Qemu. This adds,
+ -eager-split-size to -accel sub-options to set the eager page split chunk size.
+ -enable KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE.
 
+The chunk size specifies how many pages to break at a time, using a
+single allocation. Bigger the chunk size, more pages need to be
+allocated ahead of time.
 
-On 2023/8/15 16:36, Muchun Song wrote:
-> 
-> 
->> On Aug 7, 2023, at 19:08, Qi Zheng <zhengqi.arch@bytedance.com> wrote:
->>
->> The following functions are only used inside the mm subsystem, so it's
->> better to move their declarations to the mm/internal.h file.
->>
->> 1. shrinker_debugfs_add()
->> 2. shrinker_debugfs_detach()
->> 3. shrinker_debugfs_remove()
->>
->> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
-> 
-> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-> 
-> One nit bellow.
-> 
-> [...]
-> 
->> +
->> +/*
->> + * shrinker related functions
->> + */
-> 
-> This is a multi-comment format. "/* shrinker related functions. */" is
-> the right one-line format of comment.
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+RFC v1: https://lore.kernel.org/qemu-devel/20230725150002.621-1-shameerali.kolothum.thodi@huawei.com/
+  -Updated qemu-options.hx with description
+  -Addressed review comments from Peter and Gavin(Thanks).
+---
+ include/sysemu/kvm_int.h |  1 +
+ qemu-options.hx          | 14 +++++++++
+ target/arm/kvm.c         | 62 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+)
 
-Will do.
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 511b42bde5..03a1660d40 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -116,6 +116,7 @@ struct KVMState
+     uint64_t kvm_dirty_ring_bytes;  /* Size of the per-vcpu dirty ring */
+     uint32_t kvm_dirty_ring_size;   /* Number of dirty GFNs per ring */
+     bool kvm_dirty_ring_with_bitmap;
++    uint64_t kvm_eager_split_size; /* Eager Page Splitting chunk size */
+     struct KVMDirtyRingReaper reaper;
+     NotifyVmexitOption notify_vmexit;
+     uint32_t notify_window;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 29b98c3d4c..6ef7b89013 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -186,6 +186,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "                split-wx=on|off (enable TCG split w^x mapping)\n"
+     "                tb-size=n (TCG translation block cache size)\n"
+     "                dirty-ring-size=n (KVM dirty ring GFN count, default 0)\n"
++    "                eager-split-size=n (KVM Eager Page Split chunk size, default 0, disabled. ARM only)\n"
+     "                notify-vmexit=run|internal-error|disable,notify-window=n (enable notify VM exit and set notify window, x86 only)\n"
+     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ SRST
+@@ -244,6 +245,19 @@ SRST
+         is disabled (dirty-ring-size=0).  When enabled, KVM will instead
+         record dirty pages in a bitmap.
+ 
++    ``eager-split-size=n``
++        KVM implements dirty page logging at the PAGE_SIZE granularity and
++        enabling dirty-logging on a huge-page requires breaking it into
++        PAGE_SIZE pages in the first place. KVM on ARM does this splitting
++        lazily by default. There are performance benefits in doing huge-page
++        split eagerly, especially in situations where TLBI costs associated
++        with break-before-make sequences are considerable and also if guest
++        workloads are read intensive. The size here specifies how many pages
++        to break at a time and needs to be a valid block page size(eg: 4KB |
++        2M | 1G when PAGE_SIZE is 4K). Be wary of specifying a higher size as
++        it will have an impact on the memory. By default, this feature is
++        disabled (eager-split-size=0).
++
+     ``notify-vmexit=run|internal-error|disable,notify-window=n``
+         Enables or disables notify VM exit support on x86 host and specify
+         the corresponding notify window to trigger the VM exit if enabled.
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index b4c7654f49..6ceba673d9 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -30,6 +30,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/boards.h"
+ #include "hw/irq.h"
++#include "qapi/visitor.h"
+ #include "qemu/log.h"
+ 
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+@@ -247,6 +248,11 @@ int kvm_arm_get_max_vm_ipa_size(MachineState *ms, bool *fixed_ipa)
+     return ret > 0 ? ret : 40;
+ }
+ 
++static bool kvm_arm_eager_split_size_valid(uint64_t req_size, uint32_t sizes)
++{
++    return req_size & sizes;
++}
++
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     int ret = 0;
+@@ -280,6 +286,22 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         }
+     }
+ 
++    if (s->kvm_eager_split_size) {
++        uint32_t sizes;
++
++        sizes = kvm_vm_check_extension(s, KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES);
++        if (!sizes) {
++            s->kvm_eager_split_size = 0;
++            warn_report("Eager Page Split support not available");
++        } else if (!kvm_arm_eager_split_size_valid(s->kvm_eager_split_size,
++                                                   sizes)) {
++            error_report("Eager Page Split requested chunk size not valid");
++        } else if (kvm_vm_enable_cap(s, KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE, 0,
++                                     s->kvm_eager_split_size)) {
++            error_report("Failed to set Eager Page Split chunk size");
++        }
++    }
++
+     kvm_arm_init_debug(s);
+ 
+     return ret;
+@@ -1062,6 +1084,46 @@ bool kvm_arch_cpu_check_are_resettable(void)
+     return true;
+ }
+ 
++static void kvm_arch_get_eager_split_size(Object *obj, Visitor *v,
++                                          const char *name, void *opaque,
++                                          Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    uint64_t value = s->kvm_eager_split_size;
++
++    visit_type_size(v, name, &value, errp);
++}
++
++static void kvm_arch_set_eager_split_size(Object *obj, Visitor *v,
++                                          const char *name, void *opaque,
++                                          Error **errp)
++{
++    KVMState *s = KVM_STATE(obj);
++    uint64_t value;
++
++    if (s->fd != -1) {
++        error_setg(errp, "Cannot set properties after the accelerator has been initialized");
++        return;
++    }
++
++    if (!visit_type_size(v, name, &value, errp)) {
++        return;
++    }
++
++    if (is_power_of_2(value)) {
++        error_setg(errp, "early-split-size must be a power of two.");
++        return;
++    }
++
++    s->kvm_eager_split_size = value;
++}
++
+ void kvm_arch_accel_class_init(ObjectClass *oc)
+ {
++    object_class_property_add(oc, "eager-split-size", "size",
++                              kvm_arch_get_eager_split_size,
++                              kvm_arch_set_eager_split_size, NULL, NULL);
++
++    object_class_property_set_description(oc, "eager-split-size",
++        "Configure Eager Page Split chunk size for hugepages. (default: 0, disabled)");
+ }
+-- 
+2.17.1
 
-Thanks,
-Qi
-
-> 
->> +
->> +#ifdef CONFIG_SHRINKER_DEBUG
->> +extern int shrinker_debugfs_add(struct shrinker *shrinker);
->> +extern struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
->> +      int *debugfs_id);
->> +extern void shrinker_debugfs_remove(struct dentry *debugfs_entry,
->> +    int debugfs_id);
->> +#else /* CONFIG_SHRINKER_DEBUG */
->> +static inline int shrinker_debugfs_add(struct shrinker *shrinker)
->> +{
->> +	return 0;
->> +}
->> +static inline struct dentry *shrinker_debugfs_detach(struct shrinker *shrinker,
->> +     int *debugfs_id)
->> +{
->> +	*debugfs_id = -1;
->> +	return NULL;
->> +}
->> +static inline void shrinker_debugfs_remove(struct dentry *debugfs_entry,
->> +	int debugfs_id)
->> +{
->> +}
->> +#endif /* CONFIG_SHRINKER_DEBUG */
->> +
->> #endif /* __MM_INTERNAL_H */
->> -- 
->> 2.30.2
->>
-> 
