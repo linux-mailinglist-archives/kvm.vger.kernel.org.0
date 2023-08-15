@@ -2,136 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20A1A77C674
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 05:43:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77E3277C672
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 05:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234237AbjHODlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 23:41:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54634 "EHLO
+        id S234456AbjHODmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 23:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234539AbjHODiC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 23:38:02 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34D8F199E;
-        Mon, 14 Aug 2023 20:25:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692069948; x=1723605948;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hYxRQBVIjQPWurYqWEgYetagwObrSeUZ9qM9B13jnXU=;
-  b=G0fOQ28xKhatUKMMbzg6apAYGGP2rVtmop/5RpL/pP1RsZTQLUmK9y0p
-   8nITOQrFGsoGr26Jlb8BgfyMGgawKUNUpsU+yxLebSWKcXgFxrL8Q/tkl
-   bfSocHbxMWnmlke+sd/6ELTM6iAmOwapoAuIIq7NV5XnY0HnzBZG3+Tix
-   MsZQJqHyL5poKPs+4iCKG6UxudrcJbf8M7/9PWNCzHJJeaSmIgJbBlXsc
-   dZT/2B9Dn8Tcq68KWSADQXtvji4fDvFW8MYG/1Y79nfsutmjSV13uNh4x
-   NlLaVdmPe08MsRc/04Cwqd7Embybl8g9jtOcIDM5grDlMpsfBCwFMyIME
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="362341461"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="362341461"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 20:25:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="799061073"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="799061073"
-Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Aug 2023 20:25:44 -0700
-From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>
-Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH v2] KVM: x86/pmu: Manipulate FIXED_CTR_CTRL MSR with macros
-Date:   Tue, 15 Aug 2023 11:28:49 +0800
-Message-Id: <20230815032849.2929788-1-dapeng1.mi@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S234321AbjHODmH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 23:42:07 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E66FEE52;
+        Mon, 14 Aug 2023 20:41:21 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id 4fb4d7f45d1cf-5255da974c4so2666671a12.3;
+        Mon, 14 Aug 2023 20:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692070880; x=1692675680;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2NGrWB5KOcou0erbpEXIt7BZ0L3xELVtjyeYvYlNDOE=;
+        b=kw7RG2wPnj0BJtdnBFkjXJvetMx/mDARmhhX0e5j8mTwWl/JJ5kAnxxiQxNfRwu79e
+         Iiir8YfjPU7aDBFVZlHTkvfopCuZs49vYAN8Ff4f5q90qR1CUErMGimy23lUrigzMc37
+         ZSbzoU3sSXqopo6hsJ/rXJjpB3CH+FYAa43CnlTpBXWPJhJSFv2WSDxugxOz9pbr2I2t
+         S/3ySCaSaI0AcHzuXM/mNDx0ZiCBVu/GJWaad8DI4BWNHEtqCSWLjaWulTAW7HRv6Kxc
+         /3AUIjSRYD9fX6YGQIpls1eNpFo6gjGs92JSVq2ZCCdA5OEAdB9GS0m9XhwKdXntY/qA
+         AJqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692070880; x=1692675680;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2NGrWB5KOcou0erbpEXIt7BZ0L3xELVtjyeYvYlNDOE=;
+        b=DB7u0CWjYYtSRTpyBJmKedOqsjdAcllgA8YQqeIAGCtwvE8PFFkbqPGF7e1tGQ7NBW
+         f5RCiH0YXn80dn/LkCF60l2Xh98aVYDYT9qMirKMSa1PUIdp2T7sT9Hr4gVgD4rHFZLB
+         9NRhPZ/IA3TJOFKGm+HkP1lFvAKcnFoRDvD38xXRbJT/FQd/NLrFbNQa0NsAd6gGZbGp
+         i6FNoFB71NKm3hd2u9f9fn52tGnzVutZWGVGRalOYiC/R1oSXbK2I7GfEBfpmT8Xg04B
+         IF3B5gNRk3zv31iKARhWTVKhQPI0b4pNxXK0B5Tw9tUWrpEdUA2Y3Tnzns8d3o5p7fWP
+         4/RA==
+X-Gm-Message-State: AOJu0YzcqfpLJEHyR4lTXq97xr+9p859fioANxvBHG+GM2/xadMUEehg
+        CgU4bJTGk3J3fAQPPnyfMp1iUthw36SW4JFIRlk=
+X-Google-Smtp-Source: AGHT+IGchufaFx/xTfpZS4VLh8iBiAmEvNeDDNJn9iKkW3MGEIc0nqdLs7t1YOOoMbK0yMyF0f1KUyOKi2ZCPAYb3KU=
+X-Received: by 2002:aa7:d292:0:b0:523:b133:5c7e with SMTP id
+ w18-20020aa7d292000000b00523b1335c7emr9921250edq.1.1692070880211; Mon, 14 Aug
+ 2023 20:41:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230810090945.16053-1-cloudliang@tencent.com>
+ <20230810090945.16053-4-cloudliang@tencent.com> <20230814234926.GD2257301@ls.amr.corp.intel.com>
+In-Reply-To: <20230814234926.GD2257301@ls.amr.corp.intel.com>
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+Date:   Tue, 15 Aug 2023 11:41:08 +0800
+Message-ID: <CAFg_LQXuBfCD6ypmOLS4NhBCPrLXTpetYWGqFDSnKgQa0R6_gA@mail.gmail.com>
+Subject: Re: [PATCH v6 3/6] KVM: selftests: Introduce __kvm_pmu_event_filter
+ to improved event filter settings
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Magic numbers are used to manipulate the bit fields of
-FIXED_CTR_CTRL MSR. This is not read-friendly and use macros to replace
-these magic numbers to increase the readability.
+Isaku Yamahata <isaku.yamahata@gmail.com> =E4=BA=8E2023=E5=B9=B48=E6=9C=881=
+5=E6=97=A5=E5=91=A8=E4=BA=8C 07:49=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Thu, Aug 10, 2023 at 05:09:42PM +0800,
+> Jinrong Liang <ljr.kernel@gmail.com> wrote:
+>
+> > From: Jinrong Liang <cloudliang@tencent.com>
+> >
+> > Add custom "__kvm_pmu_event_filter" structure to improve pmu event
+> > filter settings. Simplifies event filter setup by organizing event
+> > filter parameters in a cleaner, more organized way.
+> >
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> > ---
+> >  .../kvm/x86_64/pmu_event_filter_test.c        | 182 +++++++++---------
+> >  1 file changed, 90 insertions(+), 92 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c=
+ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > index 5ac05e64bec9..94f5a89aac40 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > @@ -28,6 +28,10 @@
+> >
+> >  #define NUM_BRANCHES 42
+> >
+> > +/* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
+> > +#define MAX_FILTER_EVENTS            300
+>
+> Can we simply use KVM_PMU_EVENT_FILTER_MAX_EVENTS and remove MAX_FILTER_E=
+VENTS?
 
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
----
- arch/x86/kvm/pmu.c | 10 +++++-----
- arch/x86/kvm/pmu.h |  6 ++++--
- 2 files changed, 9 insertions(+), 7 deletions(-)
+I didn't find the definition of KVM_PMU_EVENT_FILTER_MAX_EVENTS in
+selftests. KVM_PMU_EVENT_FILTER_MAX_EVENTS is defined in pmu.c. To use
+it, we need to define it in selftests.
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index edb89b51b383..fb4ef2da3e32 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -420,11 +420,11 @@ static void reprogram_counter(struct kvm_pmc *pmc)
- 	if (pmc_is_fixed(pmc)) {
- 		fixed_ctr_ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl,
- 						  pmc->idx - INTEL_PMC_IDX_FIXED);
--		if (fixed_ctr_ctrl & 0x1)
-+		if (fixed_ctr_ctrl & INTEL_FIXED_0_KERNEL)
- 			eventsel |= ARCH_PERFMON_EVENTSEL_OS;
--		if (fixed_ctr_ctrl & 0x2)
-+		if (fixed_ctr_ctrl & INTEL_FIXED_0_USER)
- 			eventsel |= ARCH_PERFMON_EVENTSEL_USR;
--		if (fixed_ctr_ctrl & 0x8)
-+		if (fixed_ctr_ctrl & INTEL_FIXED_0_ENABLE_PMI)
- 			eventsel |= ARCH_PERFMON_EVENTSEL_INT;
- 		new_config = (u64)fixed_ctr_ctrl;
- 	}
-@@ -749,8 +749,8 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
- 	} else {
- 		config = fixed_ctrl_field(pmc_to_pmu(pmc)->fixed_ctr_ctrl,
- 					  pmc->idx - INTEL_PMC_IDX_FIXED);
--		select_os = config & 0x1;
--		select_user = config & 0x2;
-+		select_os = config & INTEL_FIXED_0_KERNEL;
-+		select_user = config & INTEL_FIXED_0_USER;
- 	}
- 
- 	return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? select_os : select_user;
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 7d9ba301c090..ffda2ecc3a22 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -12,7 +12,8 @@
- 					  MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
- 
- /* retrieve the 4 bits for EN and PMI out of IA32_FIXED_CTR_CTRL */
--#define fixed_ctrl_field(ctrl_reg, idx) (((ctrl_reg) >> ((idx)*4)) & 0xf)
-+#define fixed_ctrl_field(ctrl_reg, idx) \
-+	(((ctrl_reg) >> ((idx) * INTEL_FIXED_BITS_STRIDE)) & INTEL_FIXED_BITS_MASK)
- 
- #define VMWARE_BACKDOOR_PMC_HOST_TSC		0x10000
- #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
-@@ -165,7 +166,8 @@ static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
- 
- 	if (pmc_is_fixed(pmc))
- 		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
--					pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
-+					pmc->idx - INTEL_PMC_IDX_FIXED) &
-+					(INTEL_FIXED_0_KERNEL | INTEL_FIXED_0_USER);
- 
- 	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
- }
+>
+>
+> > +#define MAX_TEST_EVENTS              10
+> > +
+> >  /*
+> >   * This is how the event selector and unit mask are stored in an AMD
+> >   * core performance event-select register. Intel's format is similar,
+> > @@ -69,21 +73,33 @@
+> >
+> >  #define INST_RETIRED EVENT(0xc0, 0)
+> >
+> > +struct __kvm_pmu_event_filter {
+> > +     __u32 action;
+> > +     __u32 nevents;
+> > +     __u32 fixed_counter_bitmap;
+> > +     __u32 flags;
+> > +     __u32 pad[4];
+> > +     __u64 events[MAX_FILTER_EVENTS];
+> > +};
+> > +
+>
+> Is this same to struct kvm_pmu_event_filter?
 
-base-commit: 240f736891887939571854bd6d734b6c9291f22e
--- 
-2.34.1
+In tools/arch/x86/include/uapi/asm/kvm.h
 
+/* for KVM_CAP_PMU_EVENT_FILTER */
+struct kvm_pmu_event_filter {
+__u32 action;
+__u32 nevents;
+__u32 fixed_counter_bitmap;
+__u32 flags;
+__u32 pad[4];
+__u64 events[];
+};
+
+>
+> Except two trivial issue, looks good to me.
+> --
+> Isaku Yamahata <isaku.yamahata@gmail.com>
