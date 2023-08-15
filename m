@@ -2,98 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BF7677C893
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 09:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9414977C8A6
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 09:39:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235119AbjHOHbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 03:31:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45374 "EHLO
+        id S235251AbjHOHih (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 03:38:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235312AbjHOHau (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 03:30:50 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC5A19B5;
-        Tue, 15 Aug 2023 00:30:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1692084645;
-        bh=XiXX9eU/s/AkSjfJm9DwVrwntmLvwo4y7VDo0VRqfqw=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=cpr2h286rbQ9ZWA7sIJpieEEunosIMnHIlpuAHRa9sZE8MabuVXAmlJlUtBRr1yar
-         IOyhe1OBFhP8Pi60NS60najNtcw9Sgyfrt6gBpX/YisA9UK7cfOXuy0/pQX9w6s8As
-         r5sR07G+emd4A9HK+8h1Nh6FsveFmjVmpqxUP0orFHTqdRoLatEzucsXjPmv2Jw628
-         aM8/xb6e5beQ4RTtnkfEszZCHauoBHz5drU74sVo0G/im0RywT3ncWqdiN//qhTISa
-         jLIH5smjeKm2+e0N0MLLa7zAAnDnDEWhMGL74bOiDj1IT9D35NOz73L89+1wZ3gkZl
-         qfW7n4aWihFyw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RQ2xK3MyFz4wqX;
-        Tue, 15 Aug 2023 17:30:45 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Linus Walleij <linus.walleij@linaro.org>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH] powerpc: Make virt_to_pfn() a static inline
-In-Reply-To: <20230809-virt-to-phys-powerpc-v1-1-12e912a7d439@linaro.org>
-References: <20230809-virt-to-phys-powerpc-v1-1-12e912a7d439@linaro.org>
-Date:   Tue, 15 Aug 2023 17:30:45 +1000
-Message-ID: <87y1icdaoq.fsf@mail.lhotse>
+        with ESMTP id S235203AbjHOHiF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 03:38:05 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37EF10C
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 00:38:02 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1qVocq-00GTR7-0K; Tue, 15 Aug 2023 09:38:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=bjvkxw/0DRLHOuO0XbwbecMtmiRmjuqU+0R1kCiCRfI=; b=B48I2jes2OLqQb1HR7eCdv9pHB
+        7c652BZNLlCoG9t2zqrzJNrEal0feYIejgqTHl9a+5Ucj6rp0yN2xCh7Pg/Wc1nCjtbszABSULirP
+        8iu1D9vQnNhkV/nskqL9d9eyXamV2r71bDpeSJ7tIydaU+WQnvc+XoOFJFV8Tr4KUMb1FhwgAhqlF
+        lBlRE2mchNEPel4uAeEMAHdxR8i1m+8Ex15fD2eVg3AHqFEOL2nKa/PdyXMVG/WzylwOec/gW0VTX
+        7qcipxT9O+iWURGy1b9w+/l85sOqzCA1UMoy6Ej5+NmQ4LK+Sk1EUpf8jeKywjsLadWssv092tci9
+        kgegsQ5A==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1qVocp-0002VT-Es; Tue, 15 Aug 2023 09:37:59 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1qVocl-0002ny-DK; Tue, 15 Aug 2023 09:37:55 +0200
+Message-ID: <2c823911-4712-4d06-bfb5-e6ee3f7023a7@rbox.co>
+Date:   Tue, 15 Aug 2023 09:37:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] sync_regs() TOCTOU issues
+Content-Language: pl-PL, en-GB
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
+References: <20230728001606.2275586-1-mhal@rbox.co>
+ <169100872740.1737125.14417847751002571677.b4-ty@google.com>
+ <ZNrLYOiQuImD1g8A@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <ZNrLYOiQuImD1g8A@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus Walleij <linus.walleij@linaro.org> writes:
+On 8/15/23 02:48, Sean Christopherson wrote:
+> ...
+> Argh, apparently I didn't run these on AMD.  The exception injection test hangs
+> because the vCPU hits triple fault shutdown, and because the VMCB is technically
+> undefined on shutdown, KVM synthesizes INIT.  That starts the vCPU at the reset
+> vector and it happily fetches zeroes util being killed.
 
-> Making virt_to_pfn() a static inline taking a strongly typed
-> (const void *) makes the contract of a passing a pointer of that
-> type to the function explicit and exposes any misuse of the
-> macro virt_to_pfn() acting polymorphic and accepting many types
-> such as (void *), (unitptr_t) or (unsigned long) as arguments
-> without warnings.
->
-> Move the virt_to_pfn() and related functions below the
-> declaration of __pa() so it compiles.
->
-> For symmetry do the same with pfn_to_kaddr().
->
-> As the file is included right into the linker file, we need
-> to surround the functions with ifndef __ASSEMBLY__ so we
-> don't cause compilation errors.
->
-> The conversion moreover exposes the fact that pmd_page_vaddr()
-> was returning an unsigned long rather than a const void * as
-> could be expected, so all the sites defining pmd_page_vaddr()
-> had to be augmented as well.
-...
-> diff --git a/arch/powerpc/include/asm/pgtable.h b/arch/powerpc/include/asm/pgtable.h
-> index 6a88bfdaa69b..a9515d3d7831 100644
-> --- a/arch/powerpc/include/asm/pgtable.h
-> +++ b/arch/powerpc/include/asm/pgtable.h
-> @@ -60,9 +60,9 @@ static inline pgprot_t pte_pgprot(pte_t pte)
->  }
->  
->  #ifndef pmd_page_vaddr
-> -static inline unsigned long pmd_page_vaddr(pmd_t pmd)
-> +static inline const void *pmd_page_vaddr(pmd_t pmd)
->  {
-> -	return ((unsigned long)__va(pmd_val(pmd) & ~PMD_MASKED_BITS));
-> +	return (const void *)((unsigned long)__va(pmd_val(pmd) & ~PMD_MASKED_BITS));
+Thank you for getting this. I should have mentioned, due to lack of access to
+AMD hardware, I've only tested on Intel.
 
-This can also just be:
+> @@ -115,6 +116,7 @@ static void *race_events_exc(void *arg)
+>  	for (;;) {
+>  		WRITE_ONCE(run->kvm_dirty_regs, KVM_SYNC_X86_EVENTS);
+>  		WRITE_ONCE(events->flags, 0);
+> +		WRITE_ONCE(events->exception.nr, GP_VECTOR);
+>  		WRITE_ONCE(events->exception.pending, 1);
+>  		WRITE_ONCE(events->exception.nr, 255);
 
-	return __va(pmd_val(pmd) & ~PMD_MASKED_BITS);
+Here you're setting events->exception.nr twice. Is it deliberate?
 
-I've squashed that in.
+Thanks again,
+Michal
 
-cheers
