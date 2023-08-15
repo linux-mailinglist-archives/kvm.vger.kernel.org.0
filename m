@@ -2,45 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46D5C77C471
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B17E77C496
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 02:44:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233023AbjHOAbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 20:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59138 "EHLO
+        id S229554AbjHOAoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 20:44:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233670AbjHOAa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 20:30:57 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E6710E3
-        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:30:56 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 686E184;
-        Mon, 14 Aug 2023 17:30:56 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id EIdT79S7Kxa0; Mon, 14 Aug 2023 17:30:55 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id 5104E45;
-        Mon, 14 Aug 2023 17:30:55 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 5104E45
-Date:   Mon, 14 Aug 2023 17:30:55 -0700 (PDT)
-From:   Eric Wheeler <kvm@lists.ewheeler.net>
-To:     Sean Christopherson <seanjc@google.com>
-cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Subject: Re: Deadlock due to EPT_VIOLATION
-In-Reply-To: <ZNJ2V2vRXckMwPX2@google.com>
-Message-ID: <c412929a-14ae-2e1-480-418c8d91368a@ewheeler.net>
-References: <ZHZCEUzr9Ak7rkjG@google.com> <20230721143407.2654728-1-amaan.cheval@gmail.com> <ZLrCUkwot/yiVC8T@google.com> <CAG+wEg21f6PPEnP2N7oE=48PBSd_2bHOcRsTy_ZuBpa2=dGuiA@mail.gmail.com> <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
- <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com> <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com> <ZNJ2V2vRXckMwPX2@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        with ESMTP id S233477AbjHOAni (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 20:43:38 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1421BAF
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:43:37 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-589e5e46735so31097107b3.2
+        for <kvm@vger.kernel.org>; Mon, 14 Aug 2023 17:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692060216; x=1692665016;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KsY/ZaK2RNf5OtLDY1Fjip2JnZVZAV7QJfs4V9oHYNQ=;
+        b=0x9Y0/N0szkc98rXT0O9vx+lBDT9Urk4YC3IjrsruZyPWTevA0qxTKEE24zkaMVvZX
+         vJ8ijsK1XhTezSGspOieS+NKY0ZP0PdOGDhH4IcTWXpG7BBVnfe/VN97EsW4HGVgtkSZ
+         wrjkjn8kAW6SMBz45nbCNcTfKwzGPxvi92rt93D3wefqvl5aTaio79Zs2ugDmZhtXXnL
+         z1CUzukfcvkuBrgeY4eNluYVVApVWX8vcjZ4OqsCS/x7XFfTkcT71sYtRvJmNbijyFq5
+         HtUkS7zz4r1jhGzlwhp9BrtPieKFymz9Gdpfr6fizWbyNJW/3IbQPODSwmIUEMG7jFby
+         QJlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692060216; x=1692665016;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KsY/ZaK2RNf5OtLDY1Fjip2JnZVZAV7QJfs4V9oHYNQ=;
+        b=jZaC8fehj7xUWmlBMs1NzOfzwCapCc1Mv0pFPXTsXmfTCw+aA4FQqpYi5yaCQNFAO2
+         uLxaD6hOViMJ5060OcWAg4CdMsH+vg2gVejG5AqsbBNVeOrUBL+AXDh+hBV015WsmuaD
+         qCugBYENAe6VccpvAmFtP0cRW/z3h/UxeBOuk84itxFpvtJMwI9oF+Go5JPII4ktBxTQ
+         jTYxp+BqProOtGzvM2omwO6YqEpH71KiDxD5xjVi0Zo0Q24YmHj1B33EXvVdl0LuDma3
+         LoaJeJVANjRPW7HCB1wv+28e7fG5gBgsmzpNowLry0Hr9ttwUWwzyrXV2joX4nmvv4MW
+         crqw==
+X-Gm-Message-State: AOJu0YxTSzsk5WBG5wr7ZL0Nk5NLfZa9nLMQXKePulNeMAOFImot2jIx
+        XWF+er2JjYSh824jg6IETEkUg5XR3c8=
+X-Google-Smtp-Source: AGHT+IHcLwDac4BWNRjgQpIWOkWuss1NmMWEbE9cL8TvxNyzuC00IaInTzAhw3Df+aMOuMZkJ6GxzXkqHz0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:441f:0:b0:589:a974:d7ef with SMTP id
+ r31-20020a81441f000000b00589a974d7efmr158615ywa.6.1692060216360; Mon, 14 Aug
+ 2023 17:43:36 -0700 (PDT)
+Date:   Mon, 14 Aug 2023 17:43:34 -0700
+In-Reply-To: <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
+Mime-Version: 1.0
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com> <CAF7b7mqfkLYtWBJ=u0MK7hhARHrahQXHza9VnaughyNz5_tNug@mail.gmail.com>
+ <ZNpsCngiSjISMG5j@google.com> <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
+Message-ID: <ZNrKNs8IjkUWOatn@google.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anish Moorthy <amoorthy@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -48,158 +75,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 8 Aug 2023, Sean Christopherson wrote:
-> > If you have any suggestions on how modifying the host kernel (and then migrating
-> > a locked up guest to it) or eBPF programs that might help illuminate the issue
-> > further, let me know!
-> > 
-> > Thanks for all your help so far!
-> 
-> Since it sounds like you can test with a custom kernel, try running with this
-> patch and then enable the kvm_page_fault tracepoint when a vCPU gets stuck.  The
-> below expands said tracepoint to capture information about mmu_notifiers and
-> memslots generation.  With luck, it will reveal a smoking gun.
+On Mon, Aug 14, 2023, Anish Moorthy wrote:
+> On Mon, Aug 14, 2023 at 11:01=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > What is/was the error?  It's probably worth digging into; "static inlin=
+e" should
+> > work just fine, so there might be something funky elsewhere that you're=
+ papering
+> > over.
+>=20
+> What I get is
+>=20
+> > ./include/linux/kvm_host.h:2298:20: error: function 'kvm_handle_guest_u=
+access_fault' has internal linkage but is not defined [-Werror,-Wundefined-=
+internal]
+> > static inline void kvm_handle_guest_uaccess_fault(struct kvm_vcpu *vcpu=
+,
+> >                    ^
+> > arch/x86/kvm/mmu/mmu.c:3323:2: note: used here
+> >         kvm_handle_guest_uaccess_fault(vcpu, gfn_to_gpa(fault->gfn), PA=
+GE_SIZE,
+> >         ^
+> > 1 error generated.
+>=20
+> (mmu.c:3323 is in kvm_handle_error_pfn()). I tried shoving the
+> definition of the function from kvm_main.c to kvm_host.h so that I
+> could make it "static inline": but then the same "internal linkage"
+> error pops up in the kvm_vcpu_read/write_guest_page() functions.
 
-Getting this patch into production systems is challenging, perhaps live
-patching is an option:
+Can you point me at your branch?  That should be easy to resolve, but it's =
+all
+but impossible to figure out what's going wrong without being able to see t=
+he
+full code.
 
+> Btw, do you actually know the size of the union in the run struct? I
+> started checking it but stopped when I realized that it includes
+> arch-dependent structs.
 
-Questions:
+256 bytes, though how much of that is actually free for the "speculative" i=
+dea...
 
-1. Do you know if this would be safe to insert as a live kernel patch?
-For example, does adding to TRACE_EVENT modify a struct (which is not
-live-patch-safe) or is it something that should plug in with simple
-function redirection?
-	
+		/* Fix the size of the union. */
+		char padding[256];
 
-2. Before we try it, do you know off the top of your head if the patch
-below relies on any code that Linux v6.1 would not have?
+Well fudge.  PPC's KVM_EXIT_OSI actually uses all 256 bytes.  And KVM_EXIT_=
+SYSTEM_EVENT
+is closer to the limit than I'd like.
 
+On the other hand, despite burning 2048 bytes for kvm_sync_regs, all of kvm=
+_run
+is only 2352 bytes, i.e. we have plenty of room in the 4KiB page.  So we co=
+uld
+throw the "speculative" exits in a completely different union.  But that wo=
+uld
+be cumbersome for userspace.
 
---
-Eric Wheeler
+Hrm.  The best option would probably be to have a "nested" or "previous" ex=
+it union,
+and copy the existing exit information to that field prior to filling a new=
+ exit
+reason.  But that would require an absolute insane amount of refactoring be=
+cause
+everything just writes the fields directly. *sigh*
 
+I suppose we could copy the information into two places for "speculative" e=
+xits,
+the actual exit union and a separate "speculative" field.  I might be grasp=
+ing at
+straws though, not sure that ugliness would be worth making it slightly eas=
+ier to
+deal with the (A) scenario from earlier.
 
+FWIW, my trick for quick finding the real size is to feed the size+1 into a=
+n alignment.
+Unless you get really unlucky, that alignment will be illegal and the compi=
+ler
+will tell you the size, e.g.=20
 
-> 
-> ---
->  arch/x86/kvm/mmu/mmu.c          | 10 ----------
->  arch/x86/kvm/mmu/mmu_internal.h |  2 ++
->  arch/x86/kvm/mmu/tdp_mmu.h      | 10 ++++++++++
->  arch/x86/kvm/trace.h            | 28 ++++++++++++++++++++++++++--
->  4 files changed, 38 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 9e4cd8b4a202..122bfc884293 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2006,16 +2006,6 @@ static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
->  	return true;
->  }
->  
-> -static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-> -{
-> -	if (sp->role.invalid)
-> -		return true;
-> -
-> -	/* TDP MMU pages do not use the MMU generation. */
-> -	return !is_tdp_mmu_page(sp) &&
-> -	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
-> -}
-> -
->  struct mmu_page_path {
->  	struct kvm_mmu_page *parent[PT64_ROOT_MAX_LEVEL];
->  	unsigned int idx[PT64_ROOT_MAX_LEVEL];
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index f1ef670058e5..cf7ba0abaa8f 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -6,6 +6,8 @@
->  #include <linux/kvm_host.h>
->  #include <asm/kvm_host.h>
->  
-> +#include "mmu.h"
-> +
->  #ifdef CONFIG_KVM_PROVE_MMU
->  #define KVM_MMU_WARN_ON(x) WARN_ON_ONCE(x)
->  #else
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index 0a63b1afabd3..a0d7c8acf78f 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -76,4 +76,14 @@ static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return sp->tdp_mmu
->  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
->  #endif
->  
-> +static inline bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-> +{
-> +	if (sp->role.invalid)
-> +		return true;
-> +
-> +	/* TDP MMU pages do not use the MMU generation. */
-> +	return !is_tdp_mmu_page(sp) &&
-> +	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
-> +}
-> +
->  #endif /* __KVM_X86_MMU_TDP_MMU_H */
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index 83843379813e..ff4a384ab03a 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -8,6 +8,8 @@
->  #include <asm/clocksource.h>
->  #include <asm/pvclock-abi.h>
->  
-> +#include "mmu/tdp_mmu.h"
-> +
->  #undef TRACE_SYSTEM
->  #define TRACE_SYSTEM kvm
->  
-> @@ -405,6 +407,13 @@ TRACE_EVENT(kvm_page_fault,
->  		__field(	unsigned long,	guest_rip	)
->  		__field(	u64,		fault_address	)
->  		__field(	u64,		error_code	)
-> +		__field(	unsigned long,  mmu_invalidate_seq)
-> +		__field(	long,  mmu_invalidate_in_progress)
-> +		__field(	unsigned long,  mmu_invalidate_range_start)
-> +		__field(	unsigned long,  mmu_invalidate_range_end)
-> +		__field(	bool,		root_is_valid)
-> +		__field(	bool,		root_has_sp)
-> +		__field(	bool,		root_is_obsolete)
->  	),
->  
->  	TP_fast_assign(
-> @@ -412,11 +421,26 @@ TRACE_EVENT(kvm_page_fault,
->  		__entry->guest_rip	= kvm_rip_read(vcpu);
->  		__entry->fault_address	= fault_address;
->  		__entry->error_code	= error_code;
-> +		__entry->mmu_invalidate_seq		= vcpu->kvm->mmu_invalidate_seq;
-> +		__entry->mmu_invalidate_in_progress	= vcpu->kvm->mmu_invalidate_in_progress;
-> +		__entry->mmu_invalidate_range_start	= vcpu->kvm->mmu_invalidate_range_start;
-> +		__entry->mmu_invalidate_range_end	= vcpu->kvm->mmu_invalidate_range_end;
-> +		__entry->root_is_valid			= VALID_PAGE(vcpu->arch.mmu->root.hpa);
-> +		__entry->root_has_sp			= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
-> +							  to_shadow_page(vcpu->arch.mmu->root.hpa);
-> +		__entry->root_is_obsolete		= VALID_PAGE(vcpu->arch.mmu->root.hpa) &&
-> +							  to_shadow_page(vcpu->arch.mmu->root.hpa) &&
-> +							  is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root.hpa));
->  	),
->  
-> -	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx",
-> +	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx, seq = 0x%lx, in_prog = 0x%lx, start = 0x%lx, end = 0x%lx, root = %s",
->  		  __entry->vcpu_id, __entry->guest_rip,
-> -		  __entry->fault_address, __entry->error_code)
-> +		  __entry->fault_address, __entry->error_code,
-> +		  __entry->mmu_invalidate_seq, __entry->mmu_invalidate_in_progress,
-> +		  __entry->mmu_invalidate_range_start, __entry->mmu_invalidate_range_end,
-> +		  !__entry->root_is_valid ? "invalid" :
-> +		  !__entry->root_has_sp ? "no shadow page" :
-> +		  __entry->root_is_obsolete ? "obsolete" : "fresh")
->  );
->  
->  /*
-> 
-> base-commit: 240f736891887939571854bd6d734b6c9291f22e
-> -- 
-> 
-> 
+arch/x86/kvm/x86.c:13405:9: error: requested alignment =E2=80=982353=E2=80=
+=99 is not a positive power of 2
+13405 |         unsigned int len __aligned(sizeof(*run) + 1);
+      |         ^~~~~~~~
+
