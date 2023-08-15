@@ -2,311 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E90B877C5CE
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 04:22:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41E2677C596
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 04:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234184AbjHOCWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Aug 2023 22:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52270 "EHLO
+        id S234060AbjHOCGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Aug 2023 22:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234204AbjHOCVu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Aug 2023 22:21:50 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B1C173F;
-        Mon, 14 Aug 2023 19:21:48 -0700 (PDT)
+        with ESMTP id S229461AbjHOCFw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Aug 2023 22:05:52 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03E410F9;
+        Mon, 14 Aug 2023 19:05:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692066108; x=1723602108;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=nC0zImcMj6A18czSPBep1fxkrsQzEfI5tzjBiawlFsE=;
-  b=gQC18SIo/r+IoZL5+IXcc7sfIuhY/0hsfn2OlmrRJNVEtJ1CPFEYO8ET
-   K0gCW9H5eFHDxhhrdTpF21CuWHe9xXYm3IkiLNUa8WwCyIFlR1wjDP1Y9
-   Vq450yuOTlixu2NpilrLc4xjQKl5wUoMM5ClFXWHEI4VjuhTtBH3SwRB3
-   gdj30TLUyMMT+bp3Yz2C00kjQ49t5p/7yxj7sqga90GAib8hw8pvTQIc6
-   xo7N8agqzvS02PXVxW3vfBugn1tqHhE6vkyPWapq4WI+4AFhNKgdHZDNV
-   D7jP0XV+W/DZ6QqxsOOeQhlZESqnnn51tLS/C7NK8UDEnDR9/h1DkKJjc
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="369656230"
+  t=1692065150; x=1723601150;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=kOhEq5j6ZpVqxpqEhNJFGC3hZkEQkwoE6LRvKcKDsZA=;
+  b=dXqygv7OtaCFISKTcEeTXNkRlzzNTtIYfEakIvflOYK7tWTOMs8Qo9/M
+   7y5o7ODJU6ug/IkebuGFqocVjgLAJw2KrMfbFHrX9ihttY62wuNSFVR3C
+   pqzBXBnmyIEHgoVMDjeyjtbCx4PnezR2ySlrwCnB/cNN+gRQPGX0ws82I
+   1IZ1Vkt5lCORqvQLrQbU/b+Y9ufJ6kC1dRdElr7K2B9Q+NYCRTHj+HRjc
+   dm12WF4t4g7g5xcI5qAhshZ5ZSlA/jv+uKBj1v+Bg2JQlXt6ipp1iJoYI
+   Igp92LSgB4ngAcPD7+l8wpppDMgRVlNMmIGfhBSJozIKQFmqKJ0ciZdYl
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="372176526"
 X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="369656230"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 19:21:47 -0700
+   d="scan'208";a="372176526"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 19:05:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="847876786"
+X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="823678580"
 X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="847876786"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga002.fm.intel.com with ESMTP; 14 Aug 2023 19:21:47 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 14 Aug 2023 19:21:47 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 14 Aug 2023 19:21:46 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 14 Aug 2023 19:21:46 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 14 Aug 2023 19:21:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dBdUDSjzt8qqQ301mFuoDO1c2NQduSxtSfagwv1JUcw7OzBKayeV0H3ukJbNaveGMM+UW/1llM+ZUzcyydnYFyesezNJWqIv8QlpVpeHxm3xMrxV8KBa/g/Rn9ykfn4SUiS/7ZCxRAu3U/Tkpe0a0HMVx6atw7/VMUX0Xo7mZcbsC/o3WWQJ6DzvusE6vdKXS+JXa6nRunudfB9iwn9KgW/83TjlGT23ZXWUkNDYSjZvxlPq0QZ/zxzIxykshmk8RGvSh/KQgPq683Kb/fHMzMY3POLrbluibyorKH8PEa1llUq63DtcezlaOGq3Cj4+WDxQ0o8NfBvoD8+KW7oRIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k5uPTHZ3Y4gQ6tfMCgiF0wcRtpGpu7YrtGImTqYpRVg=;
- b=Gp09upTw9XbThWjHU95dIV4dp7VV4sdGsVQpxGxpLrlj7sG24sYK6zD0nYSk8m6mKcQ4PB0ZrNUbWaiWX6K3X4DKgF/l68Fhq8MqVGvfZFD6pNGXmsr9rJwGp9F+hbbQ8SulGCpx9Qst5cQvHH5e+zNGqpnBqHmqnMZ/40fM2L9EIUuaffj3neB/YekjVq9rDU91bwu1T0wgYGmg5Zd0vMyhV90oYAIjDsV+ZsPZLpSWYhgZB4iYD06QkVbBUwlz/FoC/yA3eONAwZK84sNV4/c6kla41PEfw/BEJ2+nTJYRuO2yxSoISvyfDKkVdJPcxaDyQ5KTqTFZqHvX7Iy8Hw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- MW4PR11MB6864.namprd11.prod.outlook.com (2603:10b6:303:21b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
- 2023 02:21:38 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::1b1a:af8e:7514:6f63]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::1b1a:af8e:7514:6f63%2]) with mapi id 15.20.6652.029; Tue, 15 Aug 2023
- 02:21:38 +0000
-Date:   Tue, 15 Aug 2023 09:54:37 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     bibo mao <maobibo@loongson.cn>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <pbonzini@redhat.com>, <mike.kravetz@oracle.com>,
-        <apopple@nvidia.com>, <jgg@nvidia.com>, <rppt@kernel.org>,
-        <akpm@linux-foundation.org>, <kevin.tian@intel.com>,
-        <david@redhat.com>
-Subject: Re: [RFC PATCH v2 5/5] KVM: Unmap pages only when it's indeed
- protected for NUMA migration
-Message-ID: <ZNra3eDNTaKVc7MT@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20230810085636.25914-1-yan.y.zhao@intel.com>
- <20230810090218.26244-1-yan.y.zhao@intel.com>
- <277ee023-dc94-6c23-20b2-7deba641f1b1@loongson.cn>
- <ZNWu2YCxy2FQBl4z@yzhao56-desk.sh.intel.com>
- <e7032573-9717-b1b9-7335-cbb0da12cd2a@loongson.cn>
- <ZNXq9M/WqjEkfi3x@yzhao56-desk.sh.intel.com>
- <ZNZshVZI5bRq4mZQ@google.com>
- <ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com>
- <ZNpZDH9//vk8Rqvo@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZNpZDH9//vk8Rqvo@google.com>
-X-ClientProxiedBy: SI2P153CA0015.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::21) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+   d="scan'208";a="823678580"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.52]) ([10.238.10.52])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 19:05:48 -0700
+Message-ID: <6adf6bdd-4ba5-991e-9547-deec36819898@linux.intel.com>
+Date:   Tue, 15 Aug 2023 10:05:45 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MW4PR11MB6864:EE_
-X-MS-Office365-Filtering-Correlation-Id: 525bf631-b4c1-4c42-32ec-08db9d365ae5
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: baVELJPkJOIZZobnwd8puZLjy0V2eO7TIKcZvPZdaCOlqguf3PKspJmdlIJMWNIOHzLTtyaOMK6UTPuGInj/OACuBm5P3CUQPHZDHrPv/WuKYiw72y98+e03aD89n8SldDnedcf9s5GQeTI5VweY+TU4dcoIU9fr6Nvpwu9k6QAaEJzXbn7IHcneGXvPfBR8eYW0g0loaRbRhPWjVRmArdKQA9qrfp0viG6ei6Yept/DYhLwCnsgVT5NeRv9c6jQYUCdl7KdkBraYv4LPmc9xtiuhnPG80+Chjk0WzPALcpq9rwc4gNgfKazPXnT0RQfVTXy5qYQ1weNt00wQ/qxpkFe3aAPc+PMXb7DO43LZaXAMTZDaYFYnTiOGu8WENWzNn634amelEEwK6n8Y2ODehXoMZ7oeaduniGZWH0CfYC+nZsoSt84eDgfH0H5J2Bzd1p7TZ+d6piE804fiEY1YfqBbp2TbjLjBy0xJ48wjV6PD2Dp6TwKl3tPh1P7Ne/IE5D4efehS/VUTH7F5zfnK/UouFFkYNWhbtc3bCTArnQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(346002)(136003)(396003)(376002)(451199021)(1800799006)(186006)(38100700002)(6486002)(478600001)(82960400001)(7416002)(2906002)(5660300002)(3450700001)(86362001)(4326008)(6916009)(66476007)(66556008)(66946007)(41300700001)(8936002)(8676002)(316002)(6506007)(53546011)(26005)(83380400001)(6512007)(966005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5HEhopEawgZ6Hp/1SUVGacib4ectpgOVBKqMznv+1+kLQcbziKlnr1K7SQDT?=
- =?us-ascii?Q?4/YhqdR0ror1AVbRkIj1+Fwxpfj0imw8bqjXGpuz6Q9E5UwbZv60b6i3nogl?=
- =?us-ascii?Q?+JrRmaNp8R0zJ2j/1tgE7a58+6ViG3xmWD8fItKz/PFsQK3E2lgRRKD1s4AQ?=
- =?us-ascii?Q?5w94TDnAER6mKQxO/DyZzJbMkVz+WYHwWHYTr0vSTOvmRePCDjUikHXz2BvU?=
- =?us-ascii?Q?Nca6fAVSxuLAyJTSHywf6Rm4pJG7/fpYcjdojze7W+RDRYTQtqPwJXuxX3+W?=
- =?us-ascii?Q?YMzLbJcFKJQzXEZMK/NoAqCnBSZzmCo1A4BfFNesMCQxGAE/VDYCvc1WQfSU?=
- =?us-ascii?Q?qNUyiuA3hO1QALYiGCU9Hf8vzBHKrjwKBfkl3ZKehFy9ngFwnW5KA6vMOZb9?=
- =?us-ascii?Q?jU+CKw3BEgAl1wWN/oLeX8S0Nyc/X6dt6nA8JTv0ZM41IxXm3gXAU+VjRKyd?=
- =?us-ascii?Q?lV1/QQCnWb9odKmNrpCOkzrG+P+JGR27deAxWgjRQ4+swH94aVqZuct2PXK1?=
- =?us-ascii?Q?TuWvjj0vh/e2tBmx8I7z6gzwfjfXpMiF9SGSfy8HOczwe3oFzZ6GV9owSKT6?=
- =?us-ascii?Q?jiUyp+6u6qmpRkd9A71/TcriSnY/WGF3zGPUGdyOxYhnmPdmviB6Z4l1LGwG?=
- =?us-ascii?Q?dKOkjV90VnQKCkjj2+5sSQpUVjCvE+0Q42XHwqMnt/+ojyPcNdFceItjhi6d?=
- =?us-ascii?Q?CzQ64WjJAEiRinK2TTiplJM/fa+pzwIneqhbxRfghm1qLHWC5+i558L1x5ww?=
- =?us-ascii?Q?ff6dW/K+tuO2hVX5DVL2i3DgK0jWShS0c1scqTL7xz5PPdDIK5F7YI4UukIL?=
- =?us-ascii?Q?OjIoGPQmI/AFvMFOSKnpgFUOWJcGfrigCnZJmaULWN2HH4nFM+vhjLCp9/Sx?=
- =?us-ascii?Q?mUfqtgwtU2hX7moFFQhSzwuJuwayz3RNNrm2PGF0ndr4P7Y0RiVxgPQ1FcVD?=
- =?us-ascii?Q?74y7Gr9w7XLp6z3MiJ2vVvD9prz0ai6qUcsfzEkGbTB/PMqL9M1xm9tgkfOi?=
- =?us-ascii?Q?plVA8hKOMwCLYZaR1Rh09JDVDQLN18mkvlF0kl5FhjZ04J8ZFyuCFoW2CMWu?=
- =?us-ascii?Q?B30o++MTJt0hw15O++7DWvt/SdvX4gvHOjADaFiF7ZkESAyTNDrOHu7y1eVT?=
- =?us-ascii?Q?IN89Aqy1XVjGxG3kQb6Np0CldWMJ9qDpdG8RtOy4ILZm7prRnJBsbmUNSnHB?=
- =?us-ascii?Q?FdcWR/zjqLh+pP1DXlDTElS9zWPNsCiyquun9xvwZwRudYYGM072Xb8u0do4?=
- =?us-ascii?Q?ouylwZ6ZwzIP7D+EuKeYbQrqHlf9kEPUuLxBecW+9oe2ZMLMS4ZlPg/xAd0o?=
- =?us-ascii?Q?+JBTnXCLCm5mpaJ1HmIpZSjPfqRMPXQO5B3vnCExu9j7nOC9jUrvNc25SEdm?=
- =?us-ascii?Q?O6USLNR2/+4ux+gDOZNKJ4KLhXYaf2xx2ru0Ibk0Y5/52LGKtgjswthSOtvr?=
- =?us-ascii?Q?wp7vn307HxTLhr4mut6iECaXdAI3XSDWhQ+IBZW9uCkOSChF4LWcbz8yKFux?=
- =?us-ascii?Q?Jui/qky6hb/bkLODjGSmNAQ89oBX5Gqt7TffGVBlCTmJbuaTu+wBdsftezfr?=
- =?us-ascii?Q?VsCKY6k+k+CpPVWiqDOEo2yqL2BZsHj6Ttd7U8g5?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 525bf631-b4c1-4c42-32ec-08db9d365ae5
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 02:21:38.5785
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SNHBFDN83d3PbGfsyNMIj8LRS5AUq6GpdHFQsoPSTp5/k2HmrxSW4gNR0fm7j9WNYNaHlr4m6/0yJnkKAwRk9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6864
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v10 0/9] Linear Address Masking (LAM) KVM Enabling
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
+        kai.huang@intel.com, David.Laight@ACULAB.COM,
+        robert.hu@linux.intel.com, guang.zeng@intel.com
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14, 2023 at 09:40:44AM -0700, Sean Christopherson wrote:
-> > > I'm strongly opposed to adding MMU_NOTIFIER_RANGE_NUMA.  It's too much of a one-off,
-> > > and losing the batching of invalidations makes me nervous.  As Bibo points out,
-> > > the behavior will vary based on the workload, VM configuration, etc.
-> > > 
-> > > There's also a *very* subtle change, in that the notification will be sent while
-> > > holding the PMD/PTE lock.  Taking KVM's mmu_lock under that is *probably* ok, but
-> > > I'm not exactly 100% confident on that.  And the only reason there isn't a more
-> > MMU lock is a rwlock, which is a variant of spinlock.
-> > So, I think taking it within PMD/PTE lock is ok.
-> > Actually we have already done that during the .change_pte() notification, where
-> > 
-> > kvm_mmu_notifier_change_pte() takes KVM mmu_lock for write,
-> > while PTE lock is held while sending set_pte_at_notify() --> .change_pte() handlers
-> 
-> .change_pte() gets away with running under PMD/PTE lock because (a) it's not allowed
-> to fail and (b) KVM is the only secondary MMU that hooks .change_pte() and KVM
-> doesn't use a sleepable lock.
-.numa_protect() in patch 4 is also sent when it's not allowed to
-fail and there's no sleepable lock in KVM's handler :)
+Gentle ping.
 
 
-> As Jason pointed out, mmu_notifier_invalidate_range_start_nonblock() can fail
-> because some secondary MMUs use mutexes or r/w semaphores to handle mmu_notifier
-> events.  For NUMA balancing, canceling the protection change might be ok, but for
-> everything else, failure is not an option.  So unfortunately, my idea won't work
-> as-is.
-> 
-> We might get away with deferring just the change_prot_numa() case, but I don't
-> think that's worth the mess/complexity.
-Yes, I also think deferring mmu_notifier_invalidate_range_start() is not working.
-One possible approach is to send successful .numa_protect() in batch.
-But I admit it will introduce complexity.
-
-> 
-> I would much rather tell userspace to disable migrate-on-fault for KVM guest
-> mappings (mbind() should work?) for these types of setups, or to disable NUMA
-> balancing entirely.  If the user really cares about performance of their VM(s),
-> vCPUs should be affined to a single NUMA node (or core, or pinned 1:1), and if
-> the VM spans multiple nodes, a virtual NUMA topology should be given to the guest.
-> At that point, NUMA balancing is likely to do more harm than good.
-> 
-> > > obvious bug is because kvm_handle_hva_range() sets may_block to false, e.g. KVM
-> > > won't yield if there's mmu_lock contention.
-> > Yes, KVM won't yield and reschedule of KVM mmu_lock, so it's fine.
-> > 
-> > > However, *if* it's ok to invoke MMU notifiers while holding PMD/PTE locks, then
-> > > I think we can achieve what you want without losing batching, and without changing
-> > > secondary MMUs.
-> > > 
-> > > Rather than muck with the notification types and add a one-off for NUMA, just
-> > > defer the notification until a present PMD/PTE is actually going to be modified.
-> > > It's not the prettiest, but other than the locking, I don't think has any chance
-> > > of regressing other workloads/configurations.
-> > > 
-> > > Note, I'm assuming secondary MMUs aren't allowed to map swap entries...
-> > > 
-> > > Compile tested only.
-> > 
-> > I don't find a matching end to each
-> > mmu_notifier_invalidate_range_start_nonblock().
-> 
-> It pairs with existing call to mmu_notifier_invalidate_range_end() in change_pmd_range():
-> 
-> 	if (range.start)
-> 		mmu_notifier_invalidate_range_end(&range);
-No, It doesn't work for mmu_notifier_invalidate_range_start() sent in change_pte_range(),
-if we only want the range to include pages successfully set to PROT_NONE.
-
-> --
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Mon, 14 Aug 2023 08:59:12 -0700
-> Subject: [PATCH] KVM: x86/mmu: Retry fault before acquiring mmu_lock if
->  mapping is changing
-> 
-> Retry page faults without acquiring mmu_lock if the resolve hva is covered
-> by an active invalidation.  Contending for mmu_lock is especially
-> problematic on preemptible kernels as the invalidation task will yield the
-> lock (see rwlock_needbreak()), delay the in-progress invalidation, and
-> ultimately increase the latency of resolving the page fault.  And in the
-> worst case scenario, yielding will be accompanied by a remote TLB flush,
-> e.g. if the invalidation covers a large range of memory and vCPUs are
-> accessing addresses that were already zapped.
-> 
-> Alternatively, the yielding issue could be mitigated by teaching KVM's MMU
-> iterators to perform more work before yielding, but that wouldn't solve
-> the lock contention and would negatively affect scenarios where a vCPU is
-> trying to fault in an address that is NOT covered by the in-progress
-> invalidation.
-> 
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Closes: https://lore.kernel.org/all/ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On 7/19/2023 10:41 PM, Binbin Wu wrote:
+> ===Feature Introduction===
+>
+> Linear-address masking (LAM) [1], modifies the checking that is applied to
+> *64-bit* linear addresses, allowing software to use of the untranslated address
+> bits for metadata and masks the metadata bits before using them as linear
+> addresses to access memory.
+>
+> When the feature is virtualized and exposed to guest, it can be used for efficient
+> address sanitizers (ASAN) implementation and for optimizations in JITs and virtual
+> machines.
+>
+> Regarding which pointer bits are masked and can be used for metadata, LAM has 2
+> modes:
+> - LAM_48: metadata bits 62:48, i.e. LAM width of 15.
+> - LAM_57: metadata bits 62:57, i.e. LAM width of 6.
+>
+> * For user pointers:
+>    CR3.LAM_U57 = CR3.LAM_U48 = 0, LAM is off;
+>    CR3.LAM_U57 = 1, LAM57 is active;
+>    CR3.LAM_U57 = 0 and CR3.LAM_U48 = 1, LAM48 is active.
+> * For supervisor pointers:
+>    CR4.LAM_SUP =0, LAM is off;
+>    CR4.LAM_SUP =1 with 5-level paging mode, LAM57 is active;
+>    CR4.LAM_SUP =1 with 4-level paging mode, LAM48 is active.
+>
+> The modified LAM canonicality check:
+> * LAM_S48                : [ 1 ][ metadata ][ 1 ]
+>                               63               47
+> * LAM_U48                : [ 0 ][ metadata ][ 0 ]
+>                               63               47
+> * LAM_S57                : [ 1 ][ metadata ][ 1 ]
+>                               63               56
+> * LAM_U57 + 5-lvl paging : [ 0 ][ metadata ][ 0 ]
+>                               63               56
+> * LAM_U57 + 4-lvl paging : [ 0 ][ metadata ][ 0...0 ]
+>                               63               56..47
+>
+> Note:
+> 1. LAM applies to only data address, not to instructions.
+> 2. LAM identification of an address as user or supervisor is based solely on the
+>     value of pointer bit 63 and does not depend on the CPL.
+> 3. LAM doesn't apply to the writes to control registers or MSRs.
+> 4. LAM masking applies before paging, so the faulting linear address in CR2
+>     doesn't contain the metadata.
+> 5  The guest linear address saved in VMCS doesn't contain metadata.
+> 6. For user mode address, it is possible that 5-level paging and LAM_U48 are both
+>     set, in this case, the effective usable linear address width is 48.
+>     (Currently, only LAM_U57 is enabled in Linux kernel. [2])
+>
+> ===LAM KVM Design===
+> LAM KVM enabling includes the following parts:
+> - Feature Enumeration
+>    LAM feature is enumerated by CPUID.7.1:EAX.LAM[bit 26].
+>    If hardware supports LAM and host doesn't disable it explicitly (e.g. via
+>    clearcpuid), LAM feature will be exposed to user VMM.
+>
+> - CR4 Virtualization
+>    LAM uses CR4.LAM_SUP (bit 28) to configure LAM on supervisor pointers.
+>    Add support to allow guests to set the new CR4 control bit for guests to enable
+>    LAM on supervisor pointers.
+>
+> - CR3 Virtualization
+>    LAM uses CR3.LAM_U48 (bit 62) and CR3.LAM_U57 (bit 61) to configure LAM on user
+>    pointers.
+>    Add support to allow guests to set two new CR3 non-address control bits for
+>    guests to enable LAM on user pointers.
+>
+> - Modified Canonicality Check and Metadata Mask
+>    When LAM is enabled, 64-bit linear address may be tagged with metadata. Linear
+>    address should be checked for modified canonicality and untagged in instruction
+>    emulations and VMExit handlers when LAM is applicable.
+>
+> LAM support in SGX enclave mode needs additional enabling and is not
+> included in this patch series.
+>
+> This patch series depends on "governed" X86_FEATURE framework from Sean.
+> https://lore.kernel.org/kvm/20230217231022.816138-2-seanjc@google.com/
+>
+> This patch series depends on the patches of refactor of instruction emulation flags,
+> using flags to identify the access type of instructions, sent along with LASS patch series.
+> https://lore.kernel.org/kvm/20230719024558.8539-2-guang.zeng@intel.com/
+> https://lore.kernel.org/kvm/20230719024558.8539-3-guang.zeng@intel.com/
+> https://lore.kernel.org/kvm/20230719024558.8539-4-guang.zeng@intel.com/
+> https://lore.kernel.org/kvm/20230719024558.8539-5-guang.zeng@intel.com/
+>
+>
+> LAM QEMU patch:
+> https://lists.nongnu.org/archive/html/qemu-devel/2023-05/msg07843.html
+>
+> LAM kvm-unit-tests patch:
+> https://lore.kernel.org/kvm/20230530024356.24870-1-binbin.wu@linux.intel.com/
+>
+> ===Test===
+> 1. Add test cases in kvm-unit-test [3] for LAM, including LAM_SUP and LAM_{U57,U48}.
+>     For supervisor pointers, the test covers CR4 LAM_SUP bits toggle, Memory/MMIO
+>     access with tagged pointer, and some special instructions (INVLPG, INVPCID,
+>     INVVPID), INVVPID cases also used to cover VMX instruction VMExit path.
+>     For uer pointers, the test covers CR3 LAM bits toggle, Memory/MMIO access with
+>     tagged pointer.
+>     MMIO cases are used to trigger instruction emulation path.
+>     Run the unit test with both LAM feature on/off (i.e. including negative cases).
+>     Run the unit test in L1 guest with both LAM feature on/off.
+> 2. Run Kernel LAM kselftests [2] in guest, with both EPT=Y/N.
+> 3. Launch a nested guest.
+>
+> All tests have passed in Simics environment.
+>
+> [1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
+>      Chapter Linear Address Masking (LAM)
+> [2] https://lore.kernel.org/all/20230312112612.31869-9-kirill.shutemov@linux.intel.com/
+> [3] https://lore.kernel.org/kvm/20230530024356.24870-1-binbin.wu@linux.intel.com/
+>
 > ---
->  arch/x86/kvm/mmu/mmu.c   | 3 +++
->  include/linux/kvm_host.h | 8 +++++++-
->  2 files changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 9e4cd8b4a202..f29718a16211 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4345,6 +4345,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  	if (unlikely(!fault->slot))
->  		return kvm_handle_noslot_fault(vcpu, fault, access);
->  
-> +	if (mmu_invalidate_retry_hva(vcpu->kvm, fault->mmu_seq, fault->hva))
-> +		return RET_PF_RETRY;
-> +
-This can effectively reduce the remote flush IPIs a lot!
-One Nit is that, maybe rmb() or READ_ONCE() is required for kvm->mmu_invalidate_range_start
-and kvm->mmu_invalidate_range_end.
-Otherwise, I'm somewhat worried about constant false positive and retry.
+> Changelog
+> v10:
+> - Split out the patch "Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK". [Sean]
+> - Split out the patch "Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality". [Sean]
+> - Use "KVM-governed feature framework" to track if guest can use LAM. [Sean]
+> - Use emulation flags to describe the access instead of making the flag a command. [Sean]
+> - Split the implementation of vmx_get_untagged_addr() for LAM from emulator and kvm_x86_ops definition. [Per Sean's comment for LASS]
+> - Some improvement of implementation in vmx_get_untagged_addr(). [Sean]
+>
+> v9:
+> https://lore.kernel.org/kvm/20230606091842.13123-1-binbin.wu@linux.intel.com/
+>
+> Binbin Wu (7):
+>    KVM: x86/mmu: Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK
+>    KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality
+>    KVM: x86: Use KVM-governed feature framework to track "LAM enabled"
+>    KVM: x86: Virtualize CR3.LAM_{U48,U57}
+>    KVM: x86: Introduce get_untagged_addr() in kvm_x86_ops and call it in
+>      emulator
+>    KVM: VMX: Implement and wire get_untagged_addr() for LAM
+>    KVM: x86: Untag address for vmexit handlers when LAM applicable
+>
+> Robert Hoo (2):
+>    KVM: x86: Virtualize CR4.LAM_SUP
+>    KVM: x86: Expose LAM feature to userspace VMM
+>
+>   arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>   arch/x86/include/asm/kvm_host.h    |  5 +++-
+>   arch/x86/kvm/cpuid.c               |  2 +-
+>   arch/x86/kvm/cpuid.h               |  8 ++++++
+>   arch/x86/kvm/emulate.c             |  2 +-
+>   arch/x86/kvm/governed_features.h   |  2 ++
+>   arch/x86/kvm/kvm_emulate.h         |  3 +++
+>   arch/x86/kvm/mmu.h                 |  8 ++++++
+>   arch/x86/kvm/mmu/mmu.c             |  2 +-
+>   arch/x86/kvm/mmu/mmu_internal.h    |  1 +
+>   arch/x86/kvm/mmu/paging_tmpl.h     |  2 +-
+>   arch/x86/kvm/svm/nested.c          |  4 +--
+>   arch/x86/kvm/vmx/nested.c          |  6 +++--
+>   arch/x86/kvm/vmx/sgx.c             |  1 +
+>   arch/x86/kvm/vmx/vmx.c             | 43 +++++++++++++++++++++++++++++-
+>   arch/x86/kvm/vmx/vmx.h             |  2 ++
+>   arch/x86/kvm/x86.c                 | 15 +++++++++--
+>   arch/x86/kvm/x86.h                 |  2 ++
+>   18 files changed, 97 insertions(+), 12 deletions(-)
+>
+>
+> base-commit: fdf0eaf11452d72945af31804e2a1048ee1b574c
+> prerequisite-patch-id: 3467bc611ce3774ba481ab72e187eba47000c01b
+> prerequisite-patch-id: 1bf4c9da384b39c92c21c467a5c6ed0d306ec266
+> prerequisite-patch-id: 226fd3d9a09ef80a5b8001a3bdc6fbf2c23d2a88
+> prerequisite-patch-id: 0c31cc0dec011d7e22efde1f7dde9847c86024d8
+> prerequisite-patch-id: f487db8bc77007679f4b0e670a9e487c1f63fcfe
 
-
->  	return RET_PF_CONTINUE;
->  }
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index cb86108c624d..f41d4fe61a06 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1960,7 +1960,6 @@ static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
->  					   unsigned long mmu_seq,
->  					   unsigned long hva)
->  {
-> -	lockdep_assert_held(&kvm->mmu_lock);
->  	/*
->  	 * If mmu_invalidate_in_progress is non-zero, then the range maintained
->  	 * by kvm_mmu_notifier_invalidate_range_start contains all addresses
-> @@ -1971,6 +1970,13 @@ static inline int mmu_invalidate_retry_hva(struct kvm *kvm,
->  	    hva >= kvm->mmu_invalidate_range_start &&
->  	    hva < kvm->mmu_invalidate_range_end)
->  		return 1;
-> +
-> +	/*
-> +	 * Note the lack of a memory barrier!  The caller *must* hold mmu_lock
-> +	 * to avoid false negatives and/or false positives (less concerning).
-> +	 * Holding mmu_lock is not mandatory though, e.g. to allow pre-checking
-> +	 * for an in-progress invalidation to avoiding contending mmu_lock.
-> +	 */
->  	if (kvm->mmu_invalidate_seq != mmu_seq)
->  		return 1;
->  	return 0;
-> 
-> base-commit: 5bc7f472423f95a3f5c73b0b56c47e57d8833efc
-> -- 
-> 
