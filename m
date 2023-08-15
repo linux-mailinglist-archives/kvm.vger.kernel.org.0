@@ -2,215 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB76377D0C3
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 19:20:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 521EC77D10B
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 19:32:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238726AbjHORTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 13:19:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57738 "EHLO
+        id S238866AbjHORby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 13:31:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238704AbjHORTM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 13:19:12 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3339A1BCB;
-        Tue, 15 Aug 2023 10:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692119951; x=1723655951;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fnhmYRSLLF7upnCUT+rF6FBxCOUm7AKxntdwOQGVU48=;
-  b=nxlTRel/kQ67/0a8wwv1RLZj0whFlMvBgqlqGYgzQuRjPuQ9zQadzrw1
-   9EysTS3mGXR+lC7PVnx/FTeAEhu1pt3MP1Y3l5Om8k1evOueMyl51STK1
-   d2lIF/kA38QZC6pxsBjPrtOL9nbkPsQkfsDc+UhqtiaWwP+worWg/50VU
-   DZScYAhZTn7vQC9xWiBQRjXVLgr8Z0Huo+51tRknW91ehQjfgPiX/pEc7
-   PqFbOO3H0FyJXH5TWZnj8stgtA1RoXo9h+rdxaC+YiF+6oEmQkD1jBPdL
-   LgVceTcQb0NxYcn1wWKiJphHyrN0+oj9ctKajh9vVqheXywypFjOdMlJt
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="436229858"
-X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="436229858"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 10:19:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="907693416"
-X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="907693416"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 10:19:08 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
-        Fuad Tabba <tabba@google.com>
-Subject: [PATCH 8/8] RFC: KVM: gmem: Guarantee the order of destruction
-Date:   Tue, 15 Aug 2023 10:18:55 -0700
-Message-Id: <72655345e07a02028c9239ccb2c3633dd72bbf9d.1692119201.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1692119201.git.isaku.yamahata@intel.com>
-References: <cover.1692119201.git.isaku.yamahata@intel.com>
+        with ESMTP id S238904AbjHORba (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 13:31:30 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2053.outbound.protection.outlook.com [40.107.93.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF0F1BE2;
+        Tue, 15 Aug 2023 10:31:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FweOPhSVgYwwGfacd+fc15Aq7bw/cuqD7v+iRCNS8jeoiuVX6x0mrqO6XbrGB8y/KLa6O1yOhq0LulT1KkzDdjmyPRsLhpKWIsSIEtZbUwDZnm64Wewo7TsAIlJacj3JfTGuy7WFmYXkMlbz9wHKWI4fiqpubuQSWrtfCzGk9PpDhu8kr91s6RKwye5FCFSuEHxppDrYlABZ7KLZwdtIcr3N+2EJgOFUJ1OlNLT9RcRZ8gTykBcdfrnELuzpzZFsD/+I8WMyfqtxi3gvJHjYtP7r3hJ+ZwMp+3OYg7sYfYY6pwMk3ky8lKXjUsYq7zBCQhxAgC6WWclxW2D+ojqz6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j9FbaoEe96RqhW2dtgjewBqEdVWmCr5m2eL/3jQZHgU=;
+ b=SxTR+KQBzMd4ayrBYhb1kXm4Bb/7oTvGm3VWiFWJ0/AdGOesMjniREslR0OEaNdUDeFb3UvkUX4oi1BCWLxPy9NdK8hViTv2ltdXeVOSfdTM/Npnhzr9f1NRxMXuWr5rUJRNa/6Q5dNOtbq2LQzhi0ac1ieWcsoDvnEmLkRcAMj/iglYYwhSQOfW7+D/vOuvh8zVNYCEv/egbX2JI+F7JdDuqnX1dW54yKFv9oaiV9rydqIRphm/TqG1/kGftynpTWf1wIhkIXyL+RJwSY+tVf5xXyJ70k3kYL1TiD2ypDfAuQE2BkclebBcayq8thw9SavTRQ5MuO8vqgdmvcF8Yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j9FbaoEe96RqhW2dtgjewBqEdVWmCr5m2eL/3jQZHgU=;
+ b=qe1MQmp0mJr8qV2YQHDHG+vi2fxoPztU/N6pjSV3vANFUnuAo15yCdZGlAWn3h6osRQz9sRRqGfynweYm3qCUuLG1V6mcCr/g984rr5rOagVRmi/FxHFE3PtjfaShzscGQFua+pecc0zozzPZBpo0vxEeFt28MH0NBXvPqqSQ/5dnjjZhg2vNycwdcrZ2ms8ikgl9Vz5X28P19aqwBwObPphTi/IcTfA0s2PqqVy7N0nq00Q5pxz8QKL4hPsiMmo2RpKj9NjvwF6EpJGsutIbaLgWz5AMMNzTgF9sYBO5XaGX/x3jsf8UGyNFBL/OyADxsR9Uy0b4P0wDSFJ6G/TOA==
+Received: from SJ0PR13CA0054.namprd13.prod.outlook.com (2603:10b6:a03:2c2::29)
+ by SA1PR12MB7341.namprd12.prod.outlook.com (2603:10b6:806:2ba::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Tue, 15 Aug
+ 2023 17:31:26 +0000
+Received: from MWH0EPF000989E8.namprd02.prod.outlook.com
+ (2603:10b6:a03:2c2:cafe::80) by SJ0PR13CA0054.outlook.office365.com
+ (2603:10b6:a03:2c2::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.14 via Frontend
+ Transport; Tue, 15 Aug 2023 17:31:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ MWH0EPF000989E8.mail.protection.outlook.com (10.167.241.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.14 via Frontend Transport; Tue, 15 Aug 2023 17:31:25 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 15 Aug 2023
+ 10:31:11 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.37; Tue, 15 Aug 2023 10:31:11 -0700
+Received: from Asurada-Nvidia (10.127.8.13) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Tue, 15 Aug 2023 10:31:10 -0700
+Date:   Tue, 15 Aug 2023 10:31:09 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Yi Liu <yi.l.liu@intel.com>, <joro@8bytes.org>,
+        <alex.williamson@redhat.com>, <kevin.tian@intel.com>,
+        <robin.murphy@arm.com>, <baolu.lu@linux.intel.com>,
+        <cohuck@redhat.com>, <eric.auger@redhat.com>,
+        <kvm@vger.kernel.org>, <mjrosato@linux.ibm.com>,
+        <chao.p.peng@linux.intel.com>, <yi.y.sun@linux.intel.com>,
+        <peterx@redhat.com>, <jasowang@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <lulu@redhat.com>,
+        <suravee.suthikulpanit@amd.com>, <iommu@lists.linux.dev>,
+        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v7 3/4] iommufd: Add IOMMU_GET_HW_INFO
+Message-ID: <ZNu2XWS0BERqykIA@Asurada-Nvidia>
+References: <20230811071501.4126-1-yi.l.liu@intel.com>
+ <20230811071501.4126-4-yi.l.liu@intel.com>
+ <ZNuogZV2eEeVwNX4@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZNuogZV2eEeVwNX4@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E8:EE_|SA1PR12MB7341:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7994e17f-ec5a-481e-f7fc-08db9db573cc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: C9MOTQS7lma19Q8RdHO7KQx+bWMmr0LDelcV2d2HccAQCVllzPq+dpB+/S1jF0f9e8zWH2Zw8WrxnVN2dABI7fjQ0fB3XbYezTu6hWsRYLvBvS/qTwLqExwFTgwp8LFWIRc9SwDcy4qXgSu2bfp2vt+cj0qk3NDwsom8rwfutCGWPoo7rudUlCOpJV2yr/1OnTua3c47WtWvbm7g4Fc7LrVbTOrGrP/GY32efINQ/MsnuGJMLbNUauRX1TFmS+iEgDKy+P4++sO8hLDWvAOTftENkyYbtkBJztbi1EmBaYRNmDh3vZXbMX+eR8wpnATUn9pmAfyTh6jdPGppD9DthNoWaBR4Vxc+fE/hcuIo1iNYZHrKu5S1+QP1aA9y72eMriA0/3/p/QFq0EhTvFXe42zT5f1VNmeJV4eZiA5OVXSJYqWlWGe/4Ugq2hMbqMh9SYCh8Yk58TECDb8FAZKUserKhDiosY4ibJTgRhzDIBXQnmU/SPK2yUa/BdYSGVSqwZSxLNc9cUplTQkQQM5DFKaA3lGbkhHPr/fRg5eA7vg9pYBfw8b6VBnHB808PdLAtsfbVyGp64M+mc0BT+KFPvqpcz8NJw8gPKeuGsDDwfby/SSghsv45gc+IiINLwnor9RgqLSVAr0AomSeucqh8U3YGkhljd0wKZN5aQK+QLNQ4UgrHou8ENObw3Tlrty42emRcnzMr3kL9oUiKkpCEHlZU7zLE/XIMt/wPZKDDtAgupLU0doRRmz1tDslKe5Q
+X-Forefront-Antispam-Report: CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(396003)(39860400002)(136003)(451199024)(1800799009)(186009)(82310400011)(46966006)(40470700004)(36840700001)(478600001)(86362001)(55016003)(70586007)(356005)(5660300002)(47076005)(316002)(70206006)(41300700001)(4744005)(40460700003)(6636002)(26005)(9686003)(36860700001)(7636003)(82740400003)(33716001)(40480700001)(83380400001)(426003)(336012)(54906003)(4326008)(6862004)(2906002)(7416002)(8676002)(8936002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2023 17:31:25.9729
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7994e17f-ec5a-481e-f7fc-08db9db573cc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: MWH0EPF000989E8.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7341
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, Aug 15, 2023 at 01:32:01PM -0300, Jason Gunthorpe wrote:
+> On Fri, Aug 11, 2023 at 12:15:00AM -0700, Yi Liu wrote:
+> 
+> > +static int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
+> > +{
+> > +	struct iommu_hw_info *cmd = ucmd->cmd;
+> > +	unsigned int length = cmd->data_len;
+> > +	struct iommufd_device *idev;
+> > +	void __user *user_ptr;
+> > +	u32 hw_info_type;
+> > +	int rc = 0;
+> > +
+> > +	if (cmd->flags || cmd->__reserved || !cmd->data_len)
+> > +		return -EOPNOTSUPP;
+> 
+> Is there a reason to block 0 data_len? I think this should work. The
+> code looks OK?
 
-Call kvm_flush_shadow_all() before releasing kvm gmem file on the guest
-destruction.
+I did a quick test passing !data_len and !data_ptr. And it works
+by returning the type only.
 
-The current gmem doesn't guarantee the destruction order between kvm gmem
-and kvm_mmu_notifier_release(), which calls kvm_flush_shadow_all().  When
-destructing TD guest, it's efficient to call kvm_flush_shadow_all() before
-calling kvm_gmem_issue_arch_invalidate() on releasing its struct file
-because kvm_flush_shadow_all() releases its host key ID (HKID).  After
-releasing HKID, the TDX module doesn't have to validate the consistency of
-the Secure-EPT structure.
+Yet, in that case, should we mention this in the uAPI kdoc? It
+feels to me that the uAPI always expects user space to read out
+a length of data.
 
-One way is to make struct kvm to reference kvm gmem file.  The current gmem
-implementation chose to make kvm gmem file to reference struct kvm.  So
-reference from struct kvm to reference kvm gmem file results in a circular
-reference.  Use kvm_mmu_notifier_release() to break it.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- include/linux/kvm_host.h | 24 ++++++++++++++++++++++++
- virt/kvm/kvm_main.c      | 23 ++++++++++++++++++++++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 349b0bf81fa5..d717945702a8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -594,6 +594,10 @@ struct kvm_memory_slot {
- 	u16 as_id;
- 
- #ifdef CONFIG_KVM_PRIVATE_MEM
-+#ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
-+	struct file *file;
-+#endif
-+	/* Private guest_mem */
- 	struct {
- 		struct file __rcu *file;
- 		pgoff_t pgoff;
-@@ -601,6 +605,26 @@ struct kvm_memory_slot {
- #endif
- };
- 
-+static inline int kvm_memslot_gmem_fget(struct kvm_memory_slot *memslot, int fd)
-+{
-+#if defined(CONFIG_KVM_PRIVATE_MEM) && defined(CONFIG_KVM_GENERIC_MMU_NOTIFIER)
-+	memslot->file = fget(fd);
-+	if (!memslot->file)
-+		return -EBADF;
-+#endif
-+	return 0;
-+}
-+
-+static inline void kvm_memslot_gmem_fput(struct kvm_memory_slot *memslot)
-+{
-+#if defined(CONFIG_KVM_PRIVATE_MEM) && defined(CONFIG_KVM_GENERIC_MMU_NOTIFIER)
-+	if (memslot->file) {
-+		fput(memslot->file);
-+		memslot->file = NULL;
-+	}
-+#endif
-+}
-+
- static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
- {
- 	return slot && (slot->flags & KVM_MEM_PRIVATE);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4855d0b7a859..35bc3b64b7e4 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -926,6 +926,7 @@ static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
- {
- 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
- 	int idx;
-+	int i;
- 
- 	/*
- 	 * Avoide race with kvm_gmem_release().
-@@ -936,6 +937,18 @@ static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
- 	idx = srcu_read_lock(&kvm->srcu);
- 	kvm_flush_shadow_all(kvm);
- 	srcu_read_unlock(&kvm->srcu, idx);
-+
-+	/* Break circular reference count: kvm->gmem, gmem->kvm. */
-+	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-+		struct kvm_memslots *slots = __kvm_memslots(kvm, i);
-+		struct kvm_memory_slot *memslot;
-+		struct hlist_node *tmp;
-+		int bkt;
-+
-+		hash_for_each_safe(slots->id_hash, bkt, tmp, memslot, id_node[slots->node_idx])
-+			kvm_memslot_gmem_fput(memslot);
-+	}
-+
- 	mutex_unlock(&kvm->slots_lock);
- }
- 
-@@ -1008,8 +1021,10 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
- /* This does not remove the slot from struct kvm_memslots data structures */
- static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- {
--	if (slot->flags & KVM_MEM_PRIVATE)
-+	if (slot->flags & KVM_MEM_PRIVATE) {
- 		kvm_gmem_unbind(slot);
-+		kvm_memslot_gmem_fput(slot);
-+	}
- 
- 	kvm_destroy_dirty_bitmap(slot);
- 
-@@ -1734,6 +1749,8 @@ static void kvm_commit_memory_region(struct kvm *kvm,
- 		if (old->dirty_bitmap && !new->dirty_bitmap)
- 			kvm_destroy_dirty_bitmap(old);
- 
-+		kvm_memslot_gmem_fput(old);
-+
- 		/*
- 		 * The final quirk.  Free the detached, old slot, but only its
- 		 * memory, not any metadata.  Metadata, including arch specific
-@@ -2088,6 +2105,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	new->flags = mem->flags;
- 	new->userspace_addr = mem->userspace_addr;
- 	if (mem->flags & KVM_MEM_PRIVATE) {
-+		r = kvm_memslot_gmem_fget(new, mem->gmem_fd);
-+		if (r)
-+			goto out;
- 		r = kvm_gmem_bind(kvm, new, mem->gmem_fd, mem->gmem_offset);
- 		if (r)
- 			goto out;
-@@ -2103,6 +2123,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	if (mem->flags & KVM_MEM_PRIVATE)
- 		kvm_gmem_unbind(new);
- out:
-+	kvm_memslot_gmem_fput(new);
- 	kfree(new);
- 	return r;
- }
--- 
-2.25.1
-
+Thanks
+Nic
