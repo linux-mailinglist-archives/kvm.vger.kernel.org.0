@@ -2,181 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8985D77CE8E
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 16:56:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE77C77CED0
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 17:15:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237804AbjHOOzl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 10:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35848 "EHLO
+        id S237856AbjHOPOp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 11:14:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237810AbjHOOzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 10:55:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F871E6B
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 07:55:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B8D9063EAE
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 14:55:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2720FC433C8
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 14:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692111322;
-        bh=IRGfJfwDMItxnyqualierd4b+UPqlvgPJShKck+SG8A=;
-        h=From:To:Subject:Date:From;
-        b=FJMFZQ4QFTIj4pxEHdCVnPWTlBUvXwAnDLGTjvlxMfWEZ0siQ3mu0oIPO85nG/B2O
-         e2uyy33+EuVKlSJsmM+eupo3h47vOBkGC89Sfz+rv9NaWciVzltgejpQCmMzvXLgO8
-         Yub4NYeyxKZ61gR/TvePZHm+vFC7Cj8Lh6fehKt+5vvqaDfrgaHvNV8xCQ+WpTLFQ9
-         Tb3TuB4Y0UZcHctKfWh5OEZLcdfS/mDVDVCjmEvjFoeete9ZTMjzVYkrRz90GV2/bO
-         vRXAaGbeS0+0jufBg7F8HXwIQ7Wa7r6NhWcZRwI2AzG+uWaB9Sxf1qkZHv1RUWeerJ
-         CoZci8nSHVYKg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 0F67CC53BD3; Tue, 15 Aug 2023 14:55:22 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 217796] New: latest Zen Inception fixes breaks nested kvm
- virtualization on AMD
-Date:   Tue, 15 Aug 2023 14:55:21 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: sonst+kernel@o-oberst.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-217796-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S237920AbjHOPOe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 11:14:34 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4019F1BDA;
+        Tue, 15 Aug 2023 08:14:24 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37FEvj3E002279;
+        Tue, 15 Aug 2023 15:14:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=zqjFYU5QdPdq/NHI3+4Y4CavCLJM0D8JM50BowmVVHA=;
+ b=iCvRt7B/zb0TuebgrH4XD9DN0TVvhSBF2RDBYUsZw5Aui+hY1doZdQ+EpnulPe8s3CYb
+ md+yb9bec1hHA4d9Pqt1CZToLJLjtsg+BKHzQWtduCII92CJ0D/tM3Pons7aZt/IkTsF
+ RrLc6MTYtK9iR3WB20wwketskjvxsiGvBZPCzjJOfyALonipcl7Rfn8Ho4QxEKo/IoUh
+ OT3bAp85/Vbf/yixmvkPsmcdUWTEwWVkUvcx5cRDnE+KoFAPzc9ioNQul7JLfvoFWDoo
+ p0QlfuFjxbWFidB8eYyop38uxLEXwnrcjNlHCQ1cuFQsqKUpQ2YCkoNEdtj5F3aFngWX YA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgbk0gjj4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Aug 2023 15:14:23 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37FF07SA008888;
+        Tue, 15 Aug 2023 15:14:23 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgbk0gjhh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Aug 2023 15:14:23 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37FCuZt1002421;
+        Tue, 15 Aug 2023 15:14:21 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sendn5ktv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Aug 2023 15:14:21 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37FFEGHn23921292
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Aug 2023 15:14:16 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 30C082004D;
+        Tue, 15 Aug 2023 15:14:16 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3D262004B;
+        Tue, 15 Aug 2023 15:14:15 +0000 (GMT)
+Received: from a46lp73.lnxne.boe (unknown [9.152.108.100])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Aug 2023 15:14:15 +0000 (GMT)
+From:   Steffen Eiden <seiden@linux.ibm.com>
+To:     linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Michael Mueller <mimu@linux.vnet.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Subject: [PATCH v4 0/4] KVM: s390: Enable AP instructions for PV-guests
+Date:   Tue, 15 Aug 2023 17:14:11 +0200
+Message-ID: <20230815151415.379760-1-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZfryHlECIzIiy1jgoC-D9LPYFkrKAVrO
+X-Proofpoint-GUID: Uq5wQWdWc86rcHF8N5uUtpVic3igFAjr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-15_16,2023-08-15_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ bulkscore=0 mlxlogscore=542 suspectscore=0 phishscore=0 spamscore=0
+ malwarescore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308150134
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217796
+This series enables general KVM support for AP-passthrough for Secure
+Execution guests (PV-guests).
 
-            Bug ID: 217796
-           Summary: latest Zen Inception fixes breaks nested kvm
-                    virtualization on AMD
-           Product: Virtualization
-           Version: unspecified
-          Hardware: AMD
-                OS: Linux
-            Status: NEW
-          Severity: blocking
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: sonst+kernel@o-oberst.de
-        Regression: No
+To enable AP inside PV-guests two things have to be done/considered:
+	1) set corresponding flags in the Create Secure Configuration UVC if
+     firmware supports AP for PV-guests (patch 4).
+	2) enable/disable AP in PV-guests if the VMM wants this (patch 3).
 
-Hi all,
+since v3:
+  - add a patch from Viktor that handles a new rc that can occur with AP-pt.
+  - remove KVM_S390_VM_CPU_UV_FEAT_GUEST_DEFAULT define (Janosch)
+  - add a boundary check in uv_has_feature() (Janosch)
+  - add r-b from Janosch
 
-today I updated to 6.4.10 on arch linux. This broke my setup with running a=
- KVM
-nested virtualization within a KVM VM. Problem seems kernel update related =
-not
-distribution specific since others report same issue on a totally different
-setup:
-https://forum.proxmox.com/threads/amd-incpetion-fixes-cause-qemu-kvm-memory=
--leak.132057/#post-581207
+since v2:
+  - applied styling recommendations from Heiko
 
-Issue:=20
-1. Start KVM vm ("hostVM") with 60GB memory assigned -> all works.
-2. within that hostVM I start a nestedVM with 5GB memory assigned.
-3. Memory consumption of the quemu process within the hostVM goes beyond
-available memory. Then the nestedVM gets OOM killed before even being start=
-ed
-using more than the 60GB + Swap.
+since v1:
+  - PATCH 1: r-b from Claudio
+  - PATCH 2: fixed formatting issues (Claudio)
+  - PATCH 3: removed unnecessary checks (Claudio)
 
-I tried to setup fresh nestedVMs with no luck, same problem.
+Steffen
 
-Reverting to an earlier kernel (6.4.7 on arch linux) lets everything work
-again.
+Steffen Eiden (3):
+  s390: uv: UV feature check utility
+  KVM: s390: Add UV feature negotiation
+  KVM: s390: pv:  Allow AP-instructions for pv-guests
 
-host kernel: 6.4.10-arch1 (this induces the problems, rest was unchanged)=20
-hostVM kernel: 5.15.107+truenas
-nestedVM kernel: 5.15.0-78-generic
+Viktor Mihajlovski (1):
+  KVM: s390: pv: relax WARN_ONCE condition for destroy fast
 
-Logs from the hostVM when OOM happens:
+ arch/s390/include/asm/kvm_host.h |  2 +
+ arch/s390/include/asm/uv.h       | 19 +++++++-
+ arch/s390/include/uapi/asm/kvm.h | 16 +++++++
+ arch/s390/kernel/uv.c            |  2 +-
+ arch/s390/kvm/kvm-s390.c         | 75 +++++++++++++++++++++++++++++++-
+ arch/s390/kvm/pv.c               |  9 ++--
+ arch/s390/mm/fault.c             |  2 +-
+ 7 files changed, 118 insertions(+), 7 deletions(-)
 
-Aug 15 10:59:41 truenas kernel: CPU 0/KVM invoked oom-killer:
-gfp_mask=3D0x400dc0(GFP_KERNEL_ACCOUNT|__GFP_ZERO), order=3D0, oom_score_ad=
-j=3D0
-Aug 15 10:59:42 truenas kernel: CPU: 9 PID: 7079 Comm: CPU 0/KVM Tainted: P=
-=20=20=20=20
-      OE     5.15.107+truenas #1
-Aug 15 10:59:43 truenas kernel: Hardware name: QEMU Standard PC (Q35 + ICH9,
-2009), BIOS unknown 2/2/2022
-Aug 15 10:59:43 truenas kernel: Call Trace:
-Aug 15 10:59:43 truenas kernel:  <TASK>
-Aug 15 10:59:43 truenas kernel:  dump_stack_lvl+0x46/0x5e
-Aug 15 10:59:43 truenas kernel:  dump_header+0x4a/0x1f4
-Aug 15 10:59:43 truenas kernel:  oom_kill_process.cold+0xb/0x10
-Aug 15 10:59:43 truenas kernel:  out_of_memory+0x1bd/0x4f0
-Aug 15 10:59:43 truenas kernel:  __alloc_pages_slowpath.constprop.0+0xc30/0=
-xd00
-Aug 15 10:59:44 truenas kernel:  __alloc_pages+0x1e9/0x220
-Aug 15 10:59:44 truenas kernel:  __get_free_pages+0xd/0x40
-Aug 15 10:59:44 truenas kernel:  kvm_mmu_topup_memory_cache+0x56/0x80 [kvm]
-Aug 15 10:59:44 truenas kernel:  mmu_topup_memory_caches+0x39/0x70 [kvm]
-Aug 15 10:59:44 truenas kernel:  direct_page_fault+0x3d9/0xbb0 [kvm]
-Aug 15 10:59:44 truenas kernel:  ?
-kvm_mtrr_check_gfn_range_consistency+0x61/0x120 [kvm]
-Aug 15 10:59:44 truenas kernel:  kvm_mmu_page_fault+0x7a/0x730 [kvm]
-Aug 15 10:59:44 truenas kernel:  ? ktime_get+0x38/0xa0
-Aug 15 10:59:44 truenas kernel:  ? lock_timer_base+0x61/0x80
-Aug 15 10:59:44 truenas kernel:  ? __svm_vcpu_run+0x5f/0xf0 [kvm_amd]
-Aug 15 10:59:44 truenas kernel:  ? __svm_vcpu_run+0x59/0xf0 [kvm_amd]
-Aug 15 10:59:44 truenas kernel:  ? __svm_vcpu_run+0xaa/0xf0 [kvm_amd]
-Aug 15 10:59:44 truenas kernel:  ? load_fixmap_gdt+0x22/0x30
-Aug 15 10:59:44 truenas kernel:  ? native_load_tr_desc+0x67/0x70
-Aug 15 10:59:44 truenas kernel:  ? x86_virt_spec_ctrl+0x43/0xb0
-Aug 15 10:59:44 truenas kernel:  kvm_arch_vcpu_ioctl_run+0xbff/0x1750 [kvm]
-Aug 15 10:59:44 truenas kernel:  kvm_vcpu_ioctl+0x278/0x660 [kvm]
-Aug 15 10:59:44 truenas kernel:  ? __seccomp_filter+0x385/0x5c0
-Aug 15 10:59:44 truenas kernel:  __x64_sys_ioctl+0x8b/0xc0
-Aug 15 10:59:44 truenas kernel:  do_syscall_64+0x3b/0xc0
-Aug 15 10:59:44 truenas kernel:  entry_SYSCALL_64_after_hwframe+0x61/0xcb
-Aug 15 10:59:44 truenas kernel: RIP: 0033:0x7f29eee166b7
-Aug 15 10:59:45 truenas kernel: Code: Unable to access opcode bytes at RIP
-0x7f29eee1668d.
-Aug 15 10:59:45 truenas kernel: RSP: 002b:00007f27f35fd4c8 EFLAGS: 00000246
-ORIG_RAX: 0000000000000010
-Aug 15 10:59:45 truenas kernel: RAX: ffffffffffffffda RBX: 000000000000ae80
-RCX: 00007f29eee166b7
-Aug 15 10:59:45 truenas kernel: RDX: 0000000000000000 RSI: 000000000000ae80
-RDI: 0000000000000015
-Aug 15 10:59:45 truenas kernel: RBP: 00005558a87d3f00 R08: 00005558a7e52848
-R09: 00005558a827c580
-Aug 15 10:59:45 truenas kernel: R10: 0000000000000000 R11: 0000000000000246
-R12: 0000000000000000
-Aug 15 10:59:45 truenas kernel: R13: 00005558a8298bc0 R14: 00007f27f35fd780
-R15: 0000000000802000
-Aug 15 10:59:45 truenas kernel:  </TASK>
-Aug 15 10:59:45 truenas kernel: Mem-Info:
+-- 
+2.41.0
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
