@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3964A77D208
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B99F77D20F
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 20:40:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239225AbjHOSjq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 14:39:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44872 "EHLO
+        id S239278AbjHOSjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 14:39:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239255AbjHOSjX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 14:39:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB631BF4
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:39:19 -0700 (PDT)
+        with ESMTP id S239269AbjHOSj1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 14:39:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CA11BC5
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 11:39:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ECE7965F02
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5885DC433B6;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 90CCB65F12
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 18:39:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED718C433C8;
         Tue, 15 Aug 2023 18:39:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692124758;
-        bh=+1mSrDCrdoO+cqTPBPGRCfHi68Y0gWanHUR791COJAI=;
+        s=k20201202; t=1692124759;
+        bh=SgQI+0ltBwqNJqGHm2AUV0i6twOisPRAD4iuiYVdld4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=o+AzVsFklPO1y9165Wy8/F3xFYv3SPW4gDOGpIR3kVYt9HQKi+/3KnizUr9cpVACw
-         /mBy1tnEwm2R4CNAYYPpl1tb/R8P0GWZQ0JdnK6rWrSo3E6WXwnJBsI9OgRnyfXkYl
-         leErSk2qedYiKro0QOGb2v4aV28SwJPAKLfyE9jVYuyB4db2t9dsignO0nxxjUORk9
-         ZxZhCl7uIvTK7p2sKjJ8gpvXCScCXLJymbNqjLsgP/P8KUZqsERgNv2SIKP97bm9R5
-         A9R7MfBiPynKi2wcOXQZnNv6cj30o0+Cx7gwWV22hD7R5dKsTSqevHXdPa4tT6SurB
-         McCY7vySOdpTA==
+        b=Q90JdlwnJ2CrxMrEdJ9uKyQeO69kSaGuk3Ak7bkl4YMuLQkK/LnoHEoBwfAIYGPCk
+         ZXFKIcPoYTH7RN18epGuU2NmFRSnN5ffegilUx6sYwVcNgacaYEWn3TzXODgMxed8Q
+         5wb6av/rkTSEm/n18U1AVW8IUXIcFQRYruMpkqQ7ntxEHStKwkJmKFzELB1CLYxPze
+         DuWvHhMF1Sn0jSsFihYt6gC4VzR2iU8w2eQiV5+ySL73d7yqAV1dnZ7rMkjwLVDJI2
+         JzFCLMWuaOmWEICzLevDmMLSnW/bUZ9BzzGKyNd+Z6lTOOZWKHwuxubOdIchvVND5N
+         0y8giXXPF15pw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qVywm-0055Sd-Gh;
+        id 1qVywm-0055Sd-Pr;
         Tue, 15 Aug 2023 19:39:16 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc:     Catalin Marinas <catalin.marinas@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v4 05/28] arm64: Add AT operation encodings
-Date:   Tue, 15 Aug 2023 19:38:39 +0100
-Message-Id: <20230815183903.2735724-6-maz@kernel.org>
+Subject: [PATCH v4 06/28] arm64: Add debug registers affected by HDFGxTR_EL2
+Date:   Tue, 15 Aug 2023 19:38:40 +0100
+Message-Id: <20230815183903.2735724-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
 References: <20230815183903.2735724-1-maz@kernel.org>
@@ -69,8 +69,8 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, miguel.luis@oracle.com, jingzhangos@google.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,46 +78,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the encodings for the AT operation that are usable from NS.
+The HDFGxTR_EL2 registers trap a (huge) set of debug and trace
+related registers. Add their encodings (and only that, because
+we really don't care about what these registers actually do at
+this stage).
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: Miguel Luis <miguel.luis@oracle.com>
-Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Jing Zhang <jingzhangos@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 76 +++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 72e18480ce62..76289339b43b 100644
+index 76289339b43b..bb5a0877a210 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -514,6 +514,23 @@
+@@ -194,6 +194,82 @@
+ #define SYS_DBGDTRTX_EL0		sys_reg(2, 3, 0, 5, 0)
+ #define SYS_DBGVCR32_EL2		sys_reg(2, 4, 0, 7, 0)
  
- #define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
- 
-+/* AT instructions */
-+#define AT_Op0 1
-+#define AT_CRn 7
++#define SYS_BRBINF_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 0))
++#define SYS_BRBINFINJ_EL1		sys_reg(2, 1, 9, 1, 0)
++#define SYS_BRBSRC_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 1))
++#define SYS_BRBSRCINJ_EL1		sys_reg(2, 1, 9, 1, 1)
++#define SYS_BRBTGT_EL1(n)		sys_reg(2, 1, 8, (n & 15), (((n & 16) >> 2) | 2))
++#define SYS_BRBTGTINJ_EL1		sys_reg(2, 1, 9, 1, 2)
++#define SYS_BRBTS_EL1			sys_reg(2, 1, 9, 0, 2)
 +
-+#define OP_AT_S1E1R	sys_insn(AT_Op0, 0, AT_CRn, 8, 0)
-+#define OP_AT_S1E1W	sys_insn(AT_Op0, 0, AT_CRn, 8, 1)
-+#define OP_AT_S1E0R	sys_insn(AT_Op0, 0, AT_CRn, 8, 2)
-+#define OP_AT_S1E0W	sys_insn(AT_Op0, 0, AT_CRn, 8, 3)
-+#define OP_AT_S1E1RP	sys_insn(AT_Op0, 0, AT_CRn, 9, 0)
-+#define OP_AT_S1E1WP	sys_insn(AT_Op0, 0, AT_CRn, 9, 1)
-+#define OP_AT_S1E2R	sys_insn(AT_Op0, 4, AT_CRn, 8, 0)
-+#define OP_AT_S1E2W	sys_insn(AT_Op0, 4, AT_CRn, 8, 1)
-+#define OP_AT_S12E1R	sys_insn(AT_Op0, 4, AT_CRn, 8, 4)
-+#define OP_AT_S12E1W	sys_insn(AT_Op0, 4, AT_CRn, 8, 5)
-+#define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
-+#define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
++#define SYS_BRBCR_EL1			sys_reg(2, 1, 9, 0, 0)
++#define SYS_BRBFCR_EL1			sys_reg(2, 1, 9, 0, 1)
++#define SYS_BRBIDR0_EL1			sys_reg(2, 1, 9, 2, 0)
 +
- /* TLBI instructions */
- #define OP_TLBI_VMALLE1OS		sys_insn(1, 0, 8, 1, 0)
- #define OP_TLBI_VAE1OS			sys_insn(1, 0, 8, 1, 1)
++#define SYS_TRCITECR_EL1		sys_reg(3, 0, 1, 2, 3)
++#define SYS_TRCACATR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (2 | (m >> 3)))
++#define SYS_TRCACVR(m)			sys_reg(2, 1, 2, ((m & 7) << 1), (0 | (m >> 3)))
++#define SYS_TRCAUTHSTATUS		sys_reg(2, 1, 7, 14, 6)
++#define SYS_TRCAUXCTLR			sys_reg(2, 1, 0, 6, 0)
++#define SYS_TRCBBCTLR			sys_reg(2, 1, 0, 15, 0)
++#define SYS_TRCCCCTLR			sys_reg(2, 1, 0, 14, 0)
++#define SYS_TRCCIDCCTLR0		sys_reg(2, 1, 3, 0, 2)
++#define SYS_TRCCIDCCTLR1		sys_reg(2, 1, 3, 1, 2)
++#define SYS_TRCCIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 0)
++#define SYS_TRCCLAIMCLR			sys_reg(2, 1, 7, 9, 6)
++#define SYS_TRCCLAIMSET			sys_reg(2, 1, 7, 8, 6)
++#define SYS_TRCCNTCTLR(m)		sys_reg(2, 1, 0, (4 | (m & 3)), 5)
++#define SYS_TRCCNTRLDVR(m)		sys_reg(2, 1, 0, (0 | (m & 3)), 5)
++#define SYS_TRCCNTVR(m)			sys_reg(2, 1, 0, (8 | (m & 3)), 5)
++#define SYS_TRCCONFIGR			sys_reg(2, 1, 0, 4, 0)
++#define SYS_TRCDEVARCH			sys_reg(2, 1, 7, 15, 6)
++#define SYS_TRCDEVID			sys_reg(2, 1, 7, 2, 7)
++#define SYS_TRCEVENTCTL0R		sys_reg(2, 1, 0, 8, 0)
++#define SYS_TRCEVENTCTL1R		sys_reg(2, 1, 0, 9, 0)
++#define SYS_TRCEXTINSELR(m)		sys_reg(2, 1, 0, (8 | (m & 3)), 4)
++#define SYS_TRCIDR0			sys_reg(2, 1, 0, 8, 7)
++#define SYS_TRCIDR10			sys_reg(2, 1, 0, 2, 6)
++#define SYS_TRCIDR11			sys_reg(2, 1, 0, 3, 6)
++#define SYS_TRCIDR12			sys_reg(2, 1, 0, 4, 6)
++#define SYS_TRCIDR13			sys_reg(2, 1, 0, 5, 6)
++#define SYS_TRCIDR1			sys_reg(2, 1, 0, 9, 7)
++#define SYS_TRCIDR2			sys_reg(2, 1, 0, 10, 7)
++#define SYS_TRCIDR3			sys_reg(2, 1, 0, 11, 7)
++#define SYS_TRCIDR4			sys_reg(2, 1, 0, 12, 7)
++#define SYS_TRCIDR5			sys_reg(2, 1, 0, 13, 7)
++#define SYS_TRCIDR6			sys_reg(2, 1, 0, 14, 7)
++#define SYS_TRCIDR7			sys_reg(2, 1, 0, 15, 7)
++#define SYS_TRCIDR8			sys_reg(2, 1, 0, 0, 6)
++#define SYS_TRCIDR9			sys_reg(2, 1, 0, 1, 6)
++#define SYS_TRCIMSPEC(m)		sys_reg(2, 1, 0, (m & 7), 7)
++#define SYS_TRCITEEDCR			sys_reg(2, 1, 0, 2, 1)
++#define SYS_TRCOSLSR			sys_reg(2, 1, 1, 1, 4)
++#define SYS_TRCPRGCTLR			sys_reg(2, 1, 0, 1, 0)
++#define SYS_TRCQCTLR			sys_reg(2, 1, 0, 1, 1)
++#define SYS_TRCRSCTLR(m)		sys_reg(2, 1, 1, (m & 15), (0 | (m >> 4)))
++#define SYS_TRCRSR			sys_reg(2, 1, 0, 10, 0)
++#define SYS_TRCSEQEVR(m)		sys_reg(2, 1, 0, (m & 3), 4)
++#define SYS_TRCSEQRSTEVR		sys_reg(2, 1, 0, 6, 4)
++#define SYS_TRCSEQSTR			sys_reg(2, 1, 0, 7, 4)
++#define SYS_TRCSSCCR(m)			sys_reg(2, 1, 1, (m & 7), 2)
++#define SYS_TRCSSCSR(m)			sys_reg(2, 1, 1, (8 | (m & 7)), 2)
++#define SYS_TRCSSPCICR(m)		sys_reg(2, 1, 1, (m & 7), 3)
++#define SYS_TRCSTALLCTLR		sys_reg(2, 1, 0, 11, 0)
++#define SYS_TRCSTATR			sys_reg(2, 1, 0, 3, 0)
++#define SYS_TRCSYNCPR			sys_reg(2, 1, 0, 13, 0)
++#define SYS_TRCTRACEIDR			sys_reg(2, 1, 0, 0, 1)
++#define SYS_TRCTSCTLR			sys_reg(2, 1, 0, 12, 0)
++#define SYS_TRCVICTLR			sys_reg(2, 1, 0, 0, 2)
++#define SYS_TRCVIIECTLR			sys_reg(2, 1, 0, 1, 2)
++#define SYS_TRCVIPCSSCTLR		sys_reg(2, 1, 0, 3, 2)
++#define SYS_TRCVISSCTLR			sys_reg(2, 1, 0, 2, 2)
++#define SYS_TRCVMIDCCTLR0		sys_reg(2, 1, 3, 2, 2)
++#define SYS_TRCVMIDCCTLR1		sys_reg(2, 1, 3, 3, 2)
++#define SYS_TRCVMIDCVR(m)		sys_reg(2, 1, 3, ((m & 7) << 1), 1)
++
++/* ETM */
++#define SYS_TRCOSLAR			sys_reg(2, 1, 1, 0, 4)
++
+ #define SYS_MIDR_EL1			sys_reg(3, 0, 0, 0, 0)
+ #define SYS_MPIDR_EL1			sys_reg(3, 0, 0, 0, 5)
+ #define SYS_REVIDR_EL1			sys_reg(3, 0, 0, 0, 6)
 -- 
 2.34.1
 
