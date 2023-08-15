@@ -2,84 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9414977C8A6
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 09:39:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFD7177C8BE
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 09:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235251AbjHOHih (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 03:38:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56048 "EHLO
+        id S235344AbjHOHnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 03:43:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235203AbjHOHiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 03:38:05 -0400
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37EF10C
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 00:38:02 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1qVocq-00GTR7-0K; Tue, 15 Aug 2023 09:38:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=bjvkxw/0DRLHOuO0XbwbecMtmiRmjuqU+0R1kCiCRfI=; b=B48I2jes2OLqQb1HR7eCdv9pHB
-        7c652BZNLlCoG9t2zqrzJNrEal0feYIejgqTHl9a+5Ucj6rp0yN2xCh7Pg/Wc1nCjtbszABSULirP
-        8iu1D9vQnNhkV/nskqL9d9eyXamV2r71bDpeSJ7tIydaU+WQnvc+XoOFJFV8Tr4KUMb1FhwgAhqlF
-        lBlRE2mchNEPel4uAeEMAHdxR8i1m+8Ex15fD2eVg3AHqFEOL2nKa/PdyXMVG/WzylwOec/gW0VTX
-        7qcipxT9O+iWURGy1b9w+/l85sOqzCA1UMoy6Ej5+NmQ4LK+Sk1EUpf8jeKywjsLadWssv092tci9
-        kgegsQ5A==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1qVocp-0002VT-Es; Tue, 15 Aug 2023 09:37:59 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1qVocl-0002ny-DK; Tue, 15 Aug 2023 09:37:55 +0200
-Message-ID: <2c823911-4712-4d06-bfb5-e6ee3f7023a7@rbox.co>
-Date:   Tue, 15 Aug 2023 09:37:54 +0200
+        with ESMTP id S235391AbjHOHm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 03:42:56 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96EA11737
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 00:42:54 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-d659ad4af70so4456897276.1
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 00:42:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692085374; x=1692690174;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bAQfC8Fk99VKXGvykRcnXCDXuQl6wZXlhTPZ78iPS24=;
+        b=pAgTYUwGaIFdx5eLvLdZU3jJRUWKNxuF5n/OPgySmUjGdU8SXpEE6AtbXT2gdwCQP9
+         gMe/DNfv/rj1WjMNqp6MkdJmCcdjutwIM/lQMM2c9nEdXHKY9rho8a1CE7L2a9Ky+M7Q
+         l37zR8KQ2A9KromftjpezDMFdIBE/9m9flyL+fwp1/+pXK9/gT+AOqAtzu1jN0vULDcU
+         t/d7H0rMQOGD/Ex6u9EKrN84uEGcO3aH3i+ZB0rOlgMjRz+YKrb5GDQgdN3etgG9miZd
+         x7c/MVPyjI7zikIJ6DBZBaImviz2DEk5gz94lDyXTRHFfZPL1Jra3lj6s99Lb6G4uRhd
+         jPtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692085374; x=1692690174;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bAQfC8Fk99VKXGvykRcnXCDXuQl6wZXlhTPZ78iPS24=;
+        b=KS03eHNRJuP+Z8/AmY8e7HcMoZWHj3zSmbP1+BULSNbBsHfaXyzcY0oZPeLY0D5HY1
+         rRfB8agslNvv6xq1VASgcu6cq0pid+wrsIf8NwD1Bo7KIKj1Jlc0m7+94tQY+LZxVfYY
+         N4r/4kWLpcUNFiJxyLWLDmTW6d56fpQrC+lesQiIdUkzqjbIaftqX/oAgC9Vz6sCqlUf
+         xV7jAoilKw17sKQPaVR8PF7B1Gdtb9Q4IRjRVkig/mPQqxIqb4gm/WjLe6xMKv9LPzmo
+         bFPRvtzUe/dGej5v8O2ynQ72p92t3GNzOOMDIkGpsKA3UQRevxMKB8rNM85qTJoteKEC
+         C6tg==
+X-Gm-Message-State: AOJu0YxhCaD1E9aYOzMxpTAqymDGTV47fJUBiFBSfodEIFG5CN+oJLQ3
+        88DeIfpyhLB+6sZrDKpkNKnQh7YliaH57xkYwIk4oQ==
+X-Google-Smtp-Source: AGHT+IFDQ5yjy3RJRehLsSgIxf5pspuHEFGdUfMHD78IpF/c7/o8oIdh4kFoyKOFD7wT8BGLpm7/zzaiE8Xh7Iy0tOI=
+X-Received: by 2002:a25:ae52:0:b0:d67:5d71:d817 with SMTP id
+ g18-20020a25ae52000000b00d675d71d817mr13014469ybe.61.1692085373841; Tue, 15
+ Aug 2023 00:42:53 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] sync_regs() TOCTOU issues
-Content-Language: pl-PL, en-GB
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, shuah@kernel.org
-References: <20230728001606.2275586-1-mhal@rbox.co>
- <169100872740.1737125.14417847751002571677.b4-ty@google.com>
- <ZNrLYOiQuImD1g8A@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <ZNrLYOiQuImD1g8A@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230809-virt-to-phys-powerpc-v1-1-12e912a7d439@linaro.org> <87y1icdaoq.fsf@mail.lhotse>
+In-Reply-To: <87y1icdaoq.fsf@mail.lhotse>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Tue, 15 Aug 2023 09:42:42 +0200
+Message-ID: <CACRpkdZuLeMKg1vG9+8tcUtWUNN-EowhpPmt6VnGuS+f9ok81g@mail.gmail.com>
+Subject: Re: [PATCH] powerpc: Make virt_to_pfn() a static inline
+To:     Michael Ellerman <mpe@ellerman.id.au>
+Cc:     Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/15/23 02:48, Sean Christopherson wrote:
-> ...
-> Argh, apparently I didn't run these on AMD.  The exception injection test hangs
-> because the vCPU hits triple fault shutdown, and because the VMCB is technically
-> undefined on shutdown, KVM synthesizes INIT.  That starts the vCPU at the reset
-> vector and it happily fetches zeroes util being killed.
+On Tue, Aug 15, 2023 at 9:30=E2=80=AFAM Michael Ellerman <mpe@ellerman.id.a=
+u> wrote:
+> Linus Walleij <linus.walleij@linaro.org> writes:
 
-Thank you for getting this. I should have mentioned, due to lack of access to
-AMD hardware, I've only tested on Intel.
+> > -     return ((unsigned long)__va(pmd_val(pmd) & ~PMD_MASKED_BITS));
+> > +     return (const void *)((unsigned long)__va(pmd_val(pmd) & ~PMD_MAS=
+KED_BITS));
+>
+> This can also just be:
+>
+>         return __va(pmd_val(pmd) & ~PMD_MASKED_BITS);
+>
+> I've squashed that in.
 
-> @@ -115,6 +116,7 @@ static void *race_events_exc(void *arg)
->  	for (;;) {
->  		WRITE_ONCE(run->kvm_dirty_regs, KVM_SYNC_X86_EVENTS);
->  		WRITE_ONCE(events->flags, 0);
-> +		WRITE_ONCE(events->exception.nr, GP_VECTOR);
->  		WRITE_ONCE(events->exception.pending, 1);
->  		WRITE_ONCE(events->exception.nr, 255);
+Oh you applied it, then I don't need to send revised versions, thanks Micha=
+el!
 
-Here you're setting events->exception.nr twice. Is it deliberate?
-
-Thanks again,
-Michal
-
+Yours,
+Linus Walleij
