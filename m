@@ -2,77 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D99777CFD5
-	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 18:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6421677CFE2
+	for <lists+kvm@lfdr.de>; Tue, 15 Aug 2023 18:08:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238411AbjHOQBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 12:01:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57292 "EHLO
+        id S238428AbjHOQIE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 12:08:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233892AbjHOQA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 12:00:59 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BCB0127
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 09:00:58 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5257d67368bso4827a12.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 09:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692115257; x=1692720057;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XpJb+OJfG+8YyFrgPemLQHLQMcBP2sLxedbL+4WkyQI=;
-        b=12OED/nj8x27vkzaTPH4huvtjj1jVfmU0hALhPhRV6AHmDCTdQhEw61qFu0CiIfn5o
-         xv23dzfwiXjilKF2V4mskgtYOlyAItz4mGPTN2wpAueITgQOP78cOJbBTI5T+qpxeb1D
-         i+enASWV3RDnzBDsM9sJhV1dKddbywFKKUa61O57PtAiIAuwyGiXXM14LOto23UpYAxE
-         PGemjOd/8RRrs6Lx5h5wH0joSWfAVxRthE6BXEwns8z2BhGRUhYJtOemEbyDvBnO44s/
-         oV7zywqJBfWLvArDGYmw2b/xFekU2Hy5QZ25lKkvn+5v2YLe42/YEkzYEm+UrksNlC2f
-         uQYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692115257; x=1692720057;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XpJb+OJfG+8YyFrgPemLQHLQMcBP2sLxedbL+4WkyQI=;
-        b=R9GtHQnihrCkiRQxUVkP7zqs3XD55xW71xdqIhzCb3OW1HIr4P2QAx+aSpsoErvMnO
-         HJG+gQ/bDjotW73TpBIqiCFzNZ1kcRdXluQqbQGcW9gHIfZXn/rj2uZnq/z7RYwtvsep
-         fFYz8OhC687VGwvcoFPnaiHFDvZcLUnSAJq+o9Ff3cB4vXXaJL19Spam8gGzZpR+9fGL
-         VMRTO1K862WY5QbpehFBV+JOSknyrUbevZSzMiN/eEJU4xUIqlVLfRHXfEdlzm1bfe3W
-         HpowjcMh8fRsMLy7NSmBkxMop0jqG5paeLUVwxHvJuDVp+CEPCQuE2dRly+CbT4Am+1Y
-         Muaw==
-X-Gm-Message-State: AOJu0YxOEbthlxYVjRctFi4npQyVZWzklh6WpDqBWkmM9y+Fqfuq+SM5
-        Vk4CyJTYQrHQFAJWwCVs00Ufl1Mubq4MhDbOZPP/GQ==
-X-Google-Smtp-Source: AGHT+IEdGhK9M3JtHIkjAkwh3xNQNLfzowgWF508z3Uj0qlA890h/RB4apOdF96xxD3sICYqpWEaeKcnTbjgLEFFWtk=
-X-Received: by 2002:a50:9fa4:0:b0:506:b280:4993 with SMTP id
- c33-20020a509fa4000000b00506b2804993mr363704edf.2.1692115256934; Tue, 15 Aug
- 2023 09:00:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230612042559.375660-1-michael.roth@amd.com> <20230612042559.375660-43-michael.roth@amd.com>
-In-Reply-To: <20230612042559.375660-43-michael.roth@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 15 Aug 2023 10:00:45 -0600
-Message-ID: <CAMkAt6r9noa7NCukf213cpmTOFgUSvowEOoGwRaGH+E4vxL20g@mail.gmail.com>
-Subject: Re: [PATCH RFC v9 42/51] KVM: SVM: Support SEV-SNP AP Creation NAE event
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        with ESMTP id S238420AbjHOQHd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 12:07:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7915D127
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 09:07:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 16A9A65CCC
+        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 16:07:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A16C433C7;
+        Tue, 15 Aug 2023 16:07:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692115650;
+        bh=5czWxryr8an14tezsiSTtNQm6pcZag0vBREySh9vtr4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VeSOiTj0ACg6L9kyx4p1ShqgxaI1i1fmCDCRjCsqkYjIYBxSm052pyIuLtt/o/44S
+         qSj4yxmS0wAohLDPMtd0mhvjQ+qG9aVbYf6Cz8iBrL9plpExQMN1SIreVHPJ851kWk
+         DL8l4zY8BQ05bcHgAWrII9QvwgW/wSvmOAUpTWXjXNC7hYyAtuB93piEOcfV+vITdG
+         mCn9iDtCtfVqv+xYbplUCtTvu96b1hT+QY+QPRV9MIhFDYlzcH9rogaLDU9jk6dwG2
+         S/c8wJFs7Zm/vYMuwthE9HcLjYJe64J2j40N66HxZScb8WaZiGSig6wHt3U0lbNDO+
+         7BXx3qk7JbnCA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qVwZr-0053ha-RG;
+        Tue, 15 Aug 2023 17:07:28 +0100
+Date:   Tue, 15 Aug 2023 17:07:27 +0100
+Message-ID: <86y1icffwg.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Miguel Luis <miguel.luis@oracle.com>
+Cc:     "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 15/27] KVM: arm64: nv: Add trap forwarding for HCR_EL2
+In-Reply-To: <E8293123-063A-40FF-A83F-D9DE0E4121B0@oracle.com>
+References: <20230808114711.2013842-1-maz@kernel.org>
+        <20230808114711.2013842-16-maz@kernel.org>
+        <85C2D540-7AD7-49BB-9EFB-7F950D08AC15@oracle.com>
+        <87il9gpp2s.wl-maz@kernel.org>
+        <E8293123-063A-40FF-A83F-D9DE0E4121B0@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, eric.auger@redhat.com, broonie@kernel.org, mark.rutland@arm.com, will@kernel.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, gankulkarni@os.amperecomputing.com, darren@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,54 +87,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +
-> +       switch (request) {
-> +       case SVM_VMGEXIT_AP_CREATE_ON_INIT:
-> +               kick = false;
-> +               fallthrough;
-> +       case SVM_VMGEXIT_AP_CREATE:
-> +               if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
-> +                       vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
-> +                                   svm->vmcb->control.exit_info_2);
-> +                       ret = -EINVAL;
-> +                       goto out;
-> +               }
-> +
-> +               /*
-> +                * Malicious guest can RMPADJUST a large page into VMSA which
-> +                * will hit the SNP erratum where the CPU will incorrectly signal
-> +                * an RMP violation #PF if a hugepage collides with the RMP entry
-> +                * of VMSA page, reject the AP CREATE request if VMSA address from
-> +                * guest is 2M aligned.
-> +                */
-> +               if (IS_ALIGNED(svm->vmcb->control.exit_info_2, PMD_SIZE)) {
-> +                       vcpu_unimpl(vcpu,
-> +                                   "vmgexit: AP VMSA address [%llx] from guest is unsafe as it is 2M aligned\n",
-> +                                   svm->vmcb->control.exit_info_2);
+On Tue, 15 Aug 2023 16:35:09 +0100,
+Miguel Luis <miguel.luis@oracle.com> wrote:
+> >>> + [CGT_HCR_NV] =3D {
+> >>> + .index =3D HCR_EL2,
+> >>> + .value =3D HCR_NV,
+> >>> + .mask =3D HCR_NV,
+> >>> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> >>> + },
+> >>> + [CGT_HCR_NV_nNV2] =3D {
+> >>> + .index =3D HCR_EL2,
+> >>> + .value =3D HCR_NV,
+> >>> + .mask =3D HCR_NV | HCR_NV2,
+> >>> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> >>> + },
+> >>> + [CGT_HCR_NV1_nNV2] =3D {
+> >>> + .index =3D HCR_EL2,
+> >>> + .value =3D HCR_NV | HCR_NV1,
+> >>> + .mask =3D HCR_NV | HCR_NV1 | HCR_NV2,
+> >>> + .behaviour =3D BEHAVE_FORWARD_ANY,
+> >>> + },
+> >>=20
+> >> The declaration above seems to be a coarse control combination that co=
+uld be
+> >> decomposed in the following, more readable, equivalent by adding a
+> >> combination of two MCBs
+> >> (eg. CGT_HCR_NV_NV1, CGT_HCR_NV_NV1_nNV2)
+> >>=20
+> >>       [CGT_HCR_NV1] =3D {
+> >>               .index          =3D HCR_EL2,
+> >>               .value          =3D HCR_NV1,
+> >>               .mask           =3D HCR_NV1,
+> >>               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> >>       },
+> >>       [CGT_HCR_NV1_nNV2] =3D {
+> >>               .index          =3D HCR_EL2,
+> >>               .value          =3D HCR_NV1,
+> >>               .mask           =3D HCR_NV1 | HCR_NV2,
+> >>               .behaviour      =3D BEHAVE_FORWARD_ANY,
+> >>       },
+> >>=20
+> >> /* FEAT_NV and FEAT_NV2 */
+> >> MCB(CGT_HCR_NV_NV1, CGT_HCR_NV, CGT_HCR_NV1)=20
+> >>=20
+> >> /* FEAT_NV2 and HCR_EL2.NV2 is 0 behaves as FEAT_NV */
+> >> MCB(CGT_HCR_NV_NV1_nNV2, CGT_HCR_NV_nNV2, CGT_HCR_NV1_nNV2 )
+> >=20
+> > This is not equivalent at all, as a MCB is a logical OR, not an AND.
+> >=20
+>=20
+> A logical OR as I would expect, which can be used recursively, meaning
+> IIUC that an MCB can contain other MCB ids, is this correct?
 
-In this case and maybe the above case can we instead return an error
-to the guest instead of a #GP?
+We're now forbidding it, but even if we allowed it, it would still be
+an OR, while you really need an AND.
 
-I think Tom suggested: SW_EXITINFO1[31:0] to 2 (meaning there was an
-error with the VMGEXIT request) and SW_EXITINFO2 to 5 (The NAE event
-input was not valid (e.g., an invalid SW_EXITINFO1 value for the AP
-Jump Table NAE event).
+>
+> Therefore, the equivalent for the declared =E2=80=98CGT_HCR_NV1_nNV2=E2=
+=80=99 would be
+>=20
+> MCB(CGT_HCR_NV1_nNV2, CGT_HCR_NV_NV1, CGT_HCR_NV_NV1_nNV2) ?
 
-This way a non-malicious but buggy or naive guest gets a little more
-information and a chance to retry the request?
+You have completely lost me. The only valid values we want to check
+for at this stage are:
 
-> +                       ret = -EINVAL;
-> +                       goto out;
-> +               }
-> +
-> +               target_svm->sev_es.snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
-> +               break;
-> +       case SVM_VMGEXIT_AP_DESTROY:
-> +               break;
-> +       default:
-> +               vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
-> +                           request);
-> +               ret = -EINVAL;
-> +               break;
-> +       }
-> +
+{NV}=3D{1}
+{NV,NV1}=3D{1,1}
+{NV,NV2}=3D{1,0}
+{NV,NV1,NV2}=3D{1,1,0}
+
+We can check any of these in one go. Why should we build something
+that implement multiple behaviours in bizarre ways?
+
+>=20
+> I do not know what I missed.
+>=20
+> >> On the above all the coarse HCR_EL2.{NV,NV1} traps are covered but not=
+ the
+> >> constrained unpredictable one when HCR_EL2.{NV,NV1} is {0,1} which tra=
+ps in
+> >> two of its behaviours and doesn't trap on one.
+> >=20
+> > The current approach makes it plain that HCR_EL2.NV=3D=3D0 doesn't resu=
+lt
+> > in any trap forwarding, consistent with the current wording of
+> > architecture.
+> >=20
+>=20
+> Indeed but it could result in trap forwarding as an expected behaviour
+> in D8.11.4 of DDI0487J.a.
+
+Not in our implementation. We ignore NV1 if NV is 0 and behave as "For
+all purposes other than reading back the value of the HCR_EL2.NV1 bit,
+the implementation behaves as if HCR_EL2.{NV, NV1} is {0, 0}."
+
+The point to understand is that we are implementing *ONE* of the
+allowed behaviours. We don't have to support all of them.
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
