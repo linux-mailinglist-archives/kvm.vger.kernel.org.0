@@ -2,120 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ABE177E135
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 14:14:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91A4377E13D
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 14:15:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244956AbjHPMN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 08:13:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38832 "EHLO
+        id S245001AbjHPMPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 08:15:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241161AbjHPMM6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 08:12:58 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BB1212F;
-        Wed, 16 Aug 2023 05:12:57 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37GCAsOR002259;
-        Wed, 16 Aug 2023 12:12:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7FNhRzBltffrklb4ZWXl8QxcFSZp9uWMwMZk+IG/ilI=;
- b=mWFy5FL0XrFEytTHTZrF0a8QwKYJJ0kBeCY8uxCaPp7Su9ddF8pm5k+m+q6Hy/jg3HF1
- nJpLbebtWpWjYkdlKLk6RpT+qCHcPOaVRVGUDup6gd51Hc4fpuGSzzpK9MmREOYLllAy
- HmpIpmgRnBxeYjqJtFLaOMjKxzhF0eY9NI/fZzmXWy4daAmoUY/jHq0k9YHCsLVzxRGW
- wlpCtpnOyISnudPJark72T+2pnTmptlYid7sfLQv4dIkUw+I2OjZ4LtEWOdqVnWHhFKa
- 5vO6y566Gx2HhjBS4bdRyl9uGyy7mhjtlQhNv4ySUe8OKXucXvh0WqZa6LLpUKKODDVI MA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgx22g6rt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Aug 2023 12:12:56 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37GCB4qS003149;
-        Wed, 16 Aug 2023 12:12:55 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sgx22g6r7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Aug 2023 12:12:55 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37GAQxH6001124;
-        Wed, 16 Aug 2023 12:12:54 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3semsycc63-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Aug 2023 12:12:53 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37GCCoY113238846
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Aug 2023 12:12:50 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A456020040;
-        Wed, 16 Aug 2023 12:12:50 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B8EC2004B;
-        Wed, 16 Aug 2023 12:12:50 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Aug 2023 12:12:50 +0000 (GMT)
-Message-ID: <b841f8b4-b065-db5c-9339-f199301b2f12@linux.ibm.com>
-Date:   Wed, 16 Aug 2023 14:12:50 +0200
+        with ESMTP id S244998AbjHPMOd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 08:14:33 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03EE26BB;
+        Wed, 16 Aug 2023 05:14:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692188056; x=1723724056;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6lZ8JOEKOYC3b0U/4VDDKZlYi9r5dshaRIs3eUATwiA=;
+  b=FZILb+qG14f38xshEJeLCzQwFyJIS9beRJgz7SpcV67XwLY08MSoGu8c
+   HkOYaW+tTR4Q8rnAFHwp5WFN3F6aU5piW5zVkMDYsnUumcxTVzShTzm1m
+   yjyQaBXGR/gSXosnr/td054IttAZL6Emqj8/GDTNZZRQOTdXCbjgwHfL3
+   7blKt06kDPvY5tMHPsCoU3nNWICBRRRmimc0OzrfI4afvqeOrX3B/EPOf
+   pB6bWFUJiMd4hMAIwE3hca0+8KgmaFmgN8NH/3PxOm5up5IyFkIiSbq6F
+   3WutCpoCKKsjuzwlVWNvFT0RA7qxFGi1C5eDA5ZjhXl+2bEAely564s+1
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="436411601"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="436411601"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 05:14:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="727730748"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="727730748"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga007.jf.intel.com with ESMTP; 16 Aug 2023 05:14:05 -0700
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     joro@8bytes.org, alex.williamson@redhat.com, jgg@nvidia.com,
+        kevin.tian@intel.com, robin.murphy@arm.com,
+        baolu.lu@linux.intel.com
+Cc:     cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        shameerali.kolothum.thodi@huawei.com, lulu@redhat.com,
+        suravee.suthikulpanit@amd.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        zhenzhong.duan@intel.com
+Subject: [PATCH v8 0/5] iommufd: Add iommu hardware info reporting
+Date:   Wed, 16 Aug 2023 05:13:44 -0700
+Message-Id: <20230816121349.104436-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 00/12] s390/vfio_ap: crypto pass-through for SE guests
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20230815184333.6554-1-akrowiak@linux.ibm.com>
- <b083c649-0032-4501-54eb-1d86af5fd4c8@linux.ibm.com>
-In-Reply-To: <b083c649-0032-4501-54eb-1d86af5fd4c8@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qksQAiic00BEieg84a-LRAn5w6qJkkRv
-X-Proofpoint-ORIG-GUID: JiO9OG5J-wVGIP9JdGWtqC4WmtXNkw-n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-16_10,2023-08-15_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- mlxlogscore=999 spamscore=0 priorityscore=1501 malwarescore=0
- clxscore=1015 impostorscore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308160105
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/16/23 13:39, Janosch Frank wrote:
-> On 8/15/23 20:43, Tony Krowiak wrote:
->> This patch series is for the changes required in the vfio_ap device
->> driver to facilitate pass-through of crypto devices to a secure
->> execution guest. In particular, it is critical that no data from the
->> queues passed through to the SE guest is leaked when the guest is
->> destroyed. There are also some new response codes returned from the
->> PQAP(ZAPQ) and PQAP(TAPQ) commands that have been added to the
->> architecture in support of pass-through of crypto devices to SE guests;
->> these need to be accounted for when handling the reset of queues.
->>
-> 
-> @Heiko: Once this has soaked a day or two, could you please apply this
-> and create a feature branch that I can pull from?
+iommufd gives userspace the capability to manipulate iommu subsytem.
+e.g. DMA map/unmap etc. In the near future, it will support iommu nested
+translation. Different platform vendors have different implementations for
+the nested translation. For example, Intel VT-d supports using guest I/O
+page table as the stage-1 translation table. This requires guest I/O page
+table be compatible with hardware IOMMU. So before set up nested translation,
+userspace needs to know the hardware iommu information to understand the
+nested translation requirements.
 
-Sorry for the noise, for some reason I still had Heiko's old address in 
-the address book. I'll delete it in a second.
+This series reports the iommu hardware information for a given device
+which has been bound to iommufd. It is preparation work for userspace to
+allocate hwpt for given device. Like the nested translation support[1].
 
-Here we go again.
+This series introduces an iommu op to report the iommu hardware info,
+and an ioctl IOMMU_GET_HW_INFO is added to report such hardware info to
+user. enum iommu_hw_info_type is defined to differentiate the iommu hardware
+info reported to user hence user can decode them. This series adds the
+framework for iommu hw info reporting, and adds the vtd implementation. The
+complete code is available in [1].
+
+[1] https://github.com/yiliu1765/iommufd/tree/iommufd_hw_info-v8
+
+Change log:
+
+v8:
+ - Updated the uAPI by allowing a 0 value at the input @data_len
+ - Changed to always report the kernel supported data length instead of the
+   length that kernel filled in the user space buffer
+ - Updated uAPI doc accordingly
+ - Add one more selftest for 0 value @data_len and also check the output @data_len
+   with the size kernel supports
+ - Fix the usage of clear_user()
+ - Rebase on top of Jason's for-next branch (base: 65aaca1 iommufd: Remove iommufd_ref_to_users())
+ - Include the vtd hw_info implementation from vtd nesting series
+   https://lore.kernel.org/r/20230724111335.107427-12-yi.l.liu@intel.com
+
+v7: https://lore.kernel.org/linux-iommu/20230811071501.4126-1-yi.l.liu@intel.com/
+ - Use clear_user() (Jason)
+ - Add fail_nth for hw_ifo (Jason)
+
+v6: https://lore.kernel.org/linux-iommu/20230808153510.4170-1-yi.l.liu@intel.com/
+ - Add Jingqi's comment on patch 02
+ - Add Baolu's r-b to patch 03
+ - Address Jason's comment on patch 03
+
+v5: https://lore.kernel.org/linux-iommu/20230803143144.200945-1-yi.l.liu@intel.com/
+ - Return hw_info_type in the .hw_info op, hence drop hw_info_type field in iommu_ops (Kevin)
+ - Add Jason's r-b for patch 01
+ - Address coding style comments from Jason and Kevin w.r.t. patch 02, 03 and 04
+
+v4: https://lore.kernel.org/linux-iommu/20230724105936.107042-1-yi.l.liu@intel.com/
+ - Rename ioctl to IOMMU_GET_HW_INFO and structure to iommu_hw_info
+ - Move the iommufd_get_hw_info handler to main.c
+ - Place iommu_hw_info prior to iommu_hwpt_alloc
+ - Update the function namings accordingly
+ - Update uapi kdocs
+
+v3: https://lore.kernel.org/linux-iommu/20230511143024.19542-1-yi.l.liu@intel.com/#t
+ - Add r-b from Baolu
+ - Rename IOMMU_HW_INFO_TYPE_DEFAULT to be IOMMU_HW_INFO_TYPE_NONE to
+   better suit what it means
+ - Let IOMMU_DEVICE_GET_HW_INFO succeed even the underlying iommu driver
+   does not have driver-specific data to report per below remark.
+   https://lore.kernel.org/kvm/ZAcwJSK%2F9UVI9LXu@nvidia.com/
+
+v2: https://lore.kernel.org/linux-iommu/20230309075358.571567-1-yi.l.liu@intel.com/
+ - Drop patch 05 of v1 as it is already covered by other series
+ - Rename the capability info to be iommu hardware info
+
+v1: https://lore.kernel.org/linux-iommu/20230209041642.9346-1-yi.l.liu@intel.com/
+
+Regards,
+	Yi Liu
+
+Lu Baolu (1):
+  iommu: Add new iommu op to get iommu hardware information
+
+Nicolin Chen (1):
+  iommufd/selftest: Add coverage for IOMMU_GET_HW_INFO ioctl
+
+Yi Liu (3):
+  iommu: Move dev_iommu_ops() to private header
+  iommufd: Add IOMMU_GET_HW_INFO
+  iommu/vt-d: Implement hw_info for iommu capability query
+
+ drivers/iommu/intel/iommu.c                   | 19 +++++
+ drivers/iommu/iommu-priv.h                    | 11 +++
+ drivers/iommu/iommufd/device.c                | 73 ++++++++++++++++++
+ drivers/iommu/iommufd/iommufd_private.h       |  1 +
+ drivers/iommu/iommufd/iommufd_test.h          |  9 +++
+ drivers/iommu/iommufd/main.c                  |  3 +
+ drivers/iommu/iommufd/selftest.c              | 16 ++++
+ include/linux/iommu.h                         | 20 +++--
+ include/uapi/linux/iommufd.h                  | 74 +++++++++++++++++++
+ tools/testing/selftests/iommu/iommufd.c       | 30 +++++++-
+ .../selftests/iommu/iommufd_fail_nth.c        |  4 +
+ tools/testing/selftests/iommu/iommufd_utils.h | 56 ++++++++++++++
+ 12 files changed, 304 insertions(+), 12 deletions(-)
+
+-- 
+2.34.1
+
