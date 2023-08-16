@@ -2,295 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B15877EAD1
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 22:38:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3305277EB30
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 23:01:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346174AbjHPUhg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 16:37:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44728 "EHLO
+        id S1346309AbjHPVA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 17:00:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346187AbjHPUhN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 16:37:13 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0F3E2701;
-        Wed, 16 Aug 2023 13:37:11 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68859ba3a93so1525843b3a.1;
-        Wed, 16 Aug 2023 13:37:11 -0700 (PDT)
+        with ESMTP id S1346251AbjHPVAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 17:00:42 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6482735
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:00:36 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d4ddbcbbaacso5762164276.1
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:00:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692218231; x=1692823031;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jGuo32BcwZ4xrip9OSKVN8CRZpvzjsNQ0WOCuGvqoo=;
-        b=IwRFjsy3rmvP07bgFhAzql9KyPj/+y7HhbnNxUmt5S21f2nbnXpvDbV+ASL6sPvjp4
-         V1TGGNXnTRmkD5Il95nbhJQx6Mo5XHTbp/R1+Z2XkwMPAwvizKEiMH8o/vq03J1ExQgx
-         6wOwul6ue6R/VU091fCQb+RPUEAlCqyMoWwJMfbIWA+PvUznpqCJPJPco8TZ/aYxikik
-         mNg//VmsW2YpfEGJ5swqjMxwlouqmUv7KfL9by0U0DfnGS8IoO1vqub7EXex2cftSLEH
-         zEsYxLmszuTF1TKUgPUGacgc7HNQqayEKvPSNZ10Xq2BPcX0gIUJii/aMKx/TONc4lMB
-         BaGg==
+        d=google.com; s=20221208; t=1692219636; x=1692824436;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mEKCsNAdQtsP5aYZXuXtRCirnaLNuizB4J6R93XEmoU=;
+        b=MD16cjoR0K1HMlo0H/xbNVvBx5YSivolQqz/f7DPhaxbb0pBoZ5vpRco9aTKjQNeOq
+         Bbldshr40dC8nnhFfQQpBpWIwGc2S9sD0RKBlUwrehKJGuUi1yNZqOgoa2VjGLFGe5x8
+         7YvpmqXmRe9A6FtgxQ4ZeKxUjjBPN6VwzXq/JbxANwzdHgRYRz2Vqepa3jXTb4a+ksth
+         DyL3gu6oLgOTm/JrphBHF3TynJG6g3/pAim7l3pG0qRYQ9ZUPJXQPam6BLurLLhzzGEZ
+         IMR5NQNVOJ7nLv8so8JlkvNC1zRHpGtYOi5uCy7FGIuAHXuprn96m627q9ZaXKqlZTjg
+         Mwkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692218231; x=1692823031;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3jGuo32BcwZ4xrip9OSKVN8CRZpvzjsNQ0WOCuGvqoo=;
-        b=bUe8k5LynsrRL9I+7WsdsnkpPuisPvu6ttu4Cfrd/A/X4Ul1Vomd0JJSmtnDFvoUra
-         PxHWcTiWGmllaoN0tWIqWJR/ZwabQgAber57mdLWzUIRU9zFCNOUg59iRpGT6p+fEzlR
-         BgfA6ey9GXdFfixqkOnMB/k4KGxFZqkwCFLbHbFjGb5lyKM3v/h8wl5obYK7T32QyXvi
-         v+VzjalwJUBuHAydHwdnKU+iyZvmBIFAKcby/1GWn3SCN69FTfPoT8OhaxeLWIQXBirs
-         wbYMfeOD6qVSgyD3PM4Yj0O5XRZS9CV+IeB8oMCdVSvIywYU//JrVsdyUpfD7A6CsUR3
-         /W/w==
-X-Gm-Message-State: AOJu0YztDkDAVXvACDdV5vl8+YcpY5/PcRxtIow6KkzQrMibRBMRULoX
-        +QFRhaaT6dSicUyOqtNnZ6A=
-X-Google-Smtp-Source: AGHT+IFueect6CxNlrZ/Gbgac9xxnV2DHvFL3lOI6qtByKzkkLJhbDn1orqcbqpgFUNsfejd88MaiA==
-X-Received: by 2002:a05:6a00:418f:b0:668:8596:752f with SMTP id ca15-20020a056a00418f00b006688596752fmr2890359pfb.4.1692218231115;
-        Wed, 16 Aug 2023 13:37:11 -0700 (PDT)
-Received: from localhost ([192.55.55.51])
-        by smtp.gmail.com with ESMTPSA id u9-20020a62ed09000000b00686ed095681sm11421006pfh.191.2023.08.16.13.37.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 13:37:10 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 13:37:09 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     isaku.yamahata@intel.com
+        d=1e100.net; s=20221208; t=1692219636; x=1692824436;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mEKCsNAdQtsP5aYZXuXtRCirnaLNuizB4J6R93XEmoU=;
+        b=dRx2MY59+CEham7khVV/aENdyOTtEWkTQahkw+pbTd+4xTiXUlcwOMD4tHY8B6kzuR
+         ZplyfvKWiOwAazKiyQCxANx2UkMJ6zWdaxZRVU5lNFfhGJOfUSBR34DRa7fPAoNgsCJB
+         9e235ZeIhHGX+M7fOE7bAeESw8yQtDZf70c9P8G4maElM9jsyun/D+wu8n77ZIwWQypf
+         Xgu8Oh+O/FJ85ciwX/EobviwsODhkxBNs8+5bUBjcE/MqxeE1mvP8mokoHMUarCjFPhE
+         xOg2j7E06j8XTlq5yPnGpR25Iy48GwkDgzWdvbV9Cwzx5PPVYD44kNC33mKLCKz7jNXE
+         mrOA==
+X-Gm-Message-State: AOJu0Yw9eQ8gZjPQf0gBYLmRHVH2HPrf4/nTHgO3KYKuLglfLFyZUark
+        ETIUYZ3ROLi73hjSD52ULC6TyBXfVLw=
+X-Google-Smtp-Source: AGHT+IGtmkH20GX7f4dZ9plMJAihmnuy0mIGZ1YWKc/0uhrE3EJ6VKwRoOa33zghHSgI7WW2mrPYn78qvqU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:d84c:0:b0:d62:e781:5f02 with SMTP id
+ p73-20020a25d84c000000b00d62e7815f02mr44598ybg.13.1692219636034; Wed, 16 Aug
+ 2023 14:00:36 -0700 (PDT)
+Date:   Wed, 16 Aug 2023 14:00:23 -0700
+In-Reply-To: <20230719144131.29052-2-binbin.wu@linux.intel.com>
+Mime-Version: 1.0
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com> <20230719144131.29052-2-binbin.wu@linux.intel.com>
+Message-ID: <ZN0454peMb3z/0Bg@google.com>
+Subject: Re: [PATCH v10 1/9] KVM: x86/mmu: Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
-        Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 6/8] KVM: gmem, x86: Add gmem hook for invalidating
- private memory
-Message-ID: <20230816203709.GA3561043@ls.amr.corp.intel.com>
-References: <cover.1692119201.git.isaku.yamahata@intel.com>
- <8c9f0470ba6e5dc122f3f4e37c4dcfb6fb97b184.1692119201.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8c9f0470ba6e5dc122f3f4e37c4dcfb6fb97b184.1692119201.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        David.Laight@aculab.com, robert.hu@linux.intel.com,
+        guang.zeng@intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 15, 2023 at 10:18:53AM -0700,
-isaku.yamahata@intel.com wrote:
+On Wed, Jul 19, 2023, Binbin Wu wrote:
+> Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK.
 
-> From: Michael Roth <michael.roth@amd.com>
+Using GENMASK_ULL() is an opportunistic cleanup, it is not the main purpose for
+this patch.  The main purpose is to extract the maximum theoretical mask for guest
+MAXPHYADDR so that it can be used to strip bits from CR3.
+
+And rather than bury the actual use in "KVM: x86: Virtualize CR3.LAM_{U48,U57}",
+I think it makes sense to do the masking in this patch.  That change only becomes
+_necessary_ when LAM comes along, but it's completely valid without LAM.
+
+That will also provide a place to explain why we decided to unconditionally mask
+the pgd (it's harmless for 32-bit guests, querying 64-bit mode would be more
+expensive, and for EPT the mask isn't tied to guest mode).  And it should also
+explain that using PT_BASE_ADDR_MASK would actually be wrong (PAE has 64-bit
+elements _except_ for CR3).
+
+E.g. end up with a shortlog for this patch along the lines of:
+
+  KVM: x86/mmu: Drop non-PA bits when getting GFN for guest's PGD
+
+and write the changelog accordingly.
+
+> No functional change intended.
 > 
-> TODO: add a CONFIG option that can be to completely skip arch
-> invalidation loop and avoid __weak references for arch/platforms that
-> don't need an additional invalidation hook.
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu_internal.h | 1 +
+>  arch/x86/kvm/mmu/paging_tmpl.h  | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 > 
-> In some cases, like with SEV-SNP, guest memory needs to be updated in a
-> platform-specific manner before it can be safely freed back to the host.
-> Add hooks to wire up handling of this sort when freeing memory in
-> response to FALLOC_FL_PUNCH_HOLE operations.
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index d39af5639ce9..7d2105432d66 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -21,6 +21,7 @@ extern bool dbg;
+>  #endif
+>  
+>  /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
+> +#define __PT_BASE_ADDR_MASK GENMASK_ULL(51, 12)
+>  #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
+>  	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
+>  #define __PT_INDEX(address, level, bits_per_level) \
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 0662e0278e70..00c8193f5991 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -62,7 +62,7 @@
+>  #endif
+>  
+>  /* Common logic, but per-type values.  These also need to be undefined. */
+> -#define PT_BASE_ADDR_MASK	((pt_element_t)(((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1)))
+> +#define PT_BASE_ADDR_MASK	((pt_element_t)__PT_BASE_ADDR_MASK)
+>  #define PT_LVL_ADDR_MASK(lvl)	__PT_LVL_ADDR_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+>  #define PT_LVL_OFFSET_MASK(lvl)	__PT_LVL_OFFSET_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
+>  #define PT_INDEX(addr, lvl)	__PT_INDEX(addr, lvl, PT_LEVEL_BITS)
+> -- 
+> 2.25.1
 > 
-> Also issue invalidations of all allocated pages when releasing the gmem
-> file so that the pages are not left in an unusable state when they get
-> freed back to the host.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Link: https://lore.kernel.org/r/20230612042559.375660-3-michael.roth@amd.com
-
-Somehow I used the old one. Here is the updated one. The change is the argument
-for kvm_gmem_issue_arch_invalidate() is struct inode instead of struct file.
-
-
-From e14483943e2ab6d8a0e4d00ea903509595847aa9 Mon Sep 17 00:00:00 2001
-Message-Id: <e14483943e2ab6d8a0e4d00ea903509595847aa9.1692218085.git.isaku.yamahata@intel.com>
-In-Reply-To: <cover.1692218085.git.isaku.yamahata@intel.com>
-References: <cover.1692218085.git.isaku.yamahata@intel.com>
-From: Michael Roth <michael.roth@amd.com>
-Date: Sun, 11 Jun 2023 23:25:10 -0500
-Subject: [PATCH 6/8] KVM: gmem, x86: Add gmem hook for invalidating private
- memory
-
-TODO: add a CONFIG option that can be to completely skip arch
-invalidation loop and avoid __weak references for arch/platforms that
-don't need an additional invalidation hook.
-
-In some cases, like with SEV-SNP, guest memory needs to be updated in a
-platform-specific manner before it can be safely freed back to the host.
-Add hooks to wire up handling of this sort when freeing memory in
-response to FALLOC_FL_PUNCH_HOLE operations.
-
-Also issue invalidations of all allocated pages when releasing the gmem
-file so that the pages are not left in an unusable state when they get
-freed back to the host.
-
-Signed-off-by: Michael Roth <michael.roth@amd.com>
-Link: https://lore.kernel.org/r/20230612042559.375660-3-michael.roth@amd.com
-
----
-Changes:
-- Use struct inode instead of struct file.
-
-Changes v4 -> v5:
-- Fix compile issue by adding static inline when gmem is disabled
-
-Changes v2 -> v3:
-- Newly added
-
-KVM: guest_mem: fix kvm_gmem_issue_arch_invalidate()
-
-Now kvm_gmem_issue_arch_invalidate() takes struct inode instead of
-struct file.  Adjust argument.
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/include/asm/kvm-x86-ops.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  1 +
- arch/x86/kvm/x86.c                 |  6 +++++
- include/linux/kvm_host.h           |  3 +++
- virt/kvm/guest_mem.c               | 42 ++++++++++++++++++++++++++++++
- 5 files changed, 53 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 439ba4beb5af..48f043de2ec0 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -134,6 +134,7 @@ KVM_X86_OP(complete_emulated_msr)
- KVM_X86_OP(vcpu_deliver_sipi_vector)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
- KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
-+KVM_X86_OP_OPTIONAL(gmem_invalidate)
- 
- #undef KVM_X86_OP
- #undef KVM_X86_OP_OPTIONAL
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2bc42f2887fa..17e78f9f2d17 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1735,6 +1735,7 @@ struct kvm_x86_ops {
- 
- 	int (*gmem_prepare)(struct kvm *kvm, struct kvm_memory_slot *slot,
- 			    kvm_pfn_t pfn, gfn_t gfn, u8 *max_level);
-+	void (*gmem_invalidate)(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end);
- };
- 
- struct kvm_x86_nested_ops {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index de195ad83ec0..b54818d02cb1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13274,6 +13274,12 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
- 
-+#ifdef CONFIG_KVM_PRIVATE_MEM
-+void kvm_arch_gmem_invalidate(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end)
-+{
-+	static_call_cond(kvm_x86_gmem_invalidate)(kvm, start, end);
-+}
-+#endif
- 
- int kvm_spec_ctrl_test_value(u64 value)
- {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 091bc89ae805..349b0bf81fa5 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2358,6 +2358,7 @@ static inline bool kvm_mem_is_private(struct kvm *kvm, gfn_t gfn)
- #ifdef CONFIG_KVM_PRIVATE_MEM
- int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 			      gfn_t gfn, kvm_pfn_t *pfn, int *max_order);
-+void kvm_arch_gmem_invalidate(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end);
- #else
- static inline int kvm_gmem_get_pfn(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot, gfn_t gfn,
-@@ -2366,6 +2367,8 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
- 	KVM_BUG_ON(1, kvm);
- 	return -EIO;
- }
-+
-+static inline void kvm_arch_gmem_invalidate(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end) { }
- #endif /* CONFIG_KVM_PRIVATE_MEM */
- 
- #endif
-diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-index ed03f1d12172..13d6dab08f87 100644
---- a/virt/kvm/guest_mem.c
-+++ b/virt/kvm/guest_mem.c
-@@ -127,6 +127,46 @@ static void kvm_gmem_invalidate_end(struct kvm_gmem *gmem, pgoff_t start,
- 	KVM_MMU_UNLOCK(kvm);
- }
- 
-+void __weak kvm_arch_gmem_invalidate(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end)
-+{
-+}
-+
-+/* Handle arch-specific hooks needed before releasing guarded pages. */
-+static void kvm_gmem_issue_arch_invalidate(struct kvm *kvm, struct inode *inode,
-+					   pgoff_t start, pgoff_t end)
-+{
-+	pgoff_t file_end = i_size_read(inode) >> PAGE_SHIFT;
-+	pgoff_t index = start;
-+
-+	end = min(end, file_end);
-+
-+	while (index < end) {
-+		struct folio *folio;
-+		unsigned int order;
-+		struct page *page;
-+		kvm_pfn_t pfn;
-+
-+		folio = __filemap_get_folio(inode->i_mapping, index,
-+					    FGP_LOCK, 0);
-+		if (!folio) {
-+			index++;
-+			continue;
-+		}
-+
-+		page = folio_file_page(folio, index);
-+		pfn = page_to_pfn(page);
-+		order = folio_order(folio);
-+
-+		kvm_arch_gmem_invalidate(kvm, pfn, pfn + min((1ul << order), end - index));
-+
-+		index = folio_next_index(folio);
-+		folio_unlock(folio);
-+		folio_put(folio);
-+
-+		cond_resched();
-+	}
-+}
-+
- static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- {
- 	struct list_head *gmem_list = &inode->i_mapping->private_list;
-@@ -143,6 +183,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	list_for_each_entry(gmem, gmem_list, entry)
- 		kvm_gmem_invalidate_begin(gmem, start, end);
- 
-+	kvm_gmem_issue_arch_invalidate(gmem->kvm, inode, start, end);
- 	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
- 
- 	list_for_each_entry(gmem, gmem_list, entry)
-@@ -253,6 +294,7 @@ static int kvm_gmem_release(struct inode *inode, struct file *file)
- 	 * memory, as its lifetime is associated with the inode, not the file.
- 	 */
- 	kvm_gmem_invalidate_begin(gmem, 0, -1ul);
-+	kvm_gmem_issue_arch_invalidate(gmem->kvm, file_inode(file), 0, -1ul);
- 	kvm_gmem_invalidate_end(gmem, 0, -1ul);
- 
- 	list_del(&gmem->entry);
--- 
-2.25.1
--- 
-Isaku Yamahata <isaku.yamahata@linux.intel.com>
