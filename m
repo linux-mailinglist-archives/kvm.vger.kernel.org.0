@@ -2,221 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E79C877D8F5
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:21:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E814377D8F6
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241531AbjHPDUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 23:20:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33160 "EHLO
+        id S241528AbjHPDVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 23:21:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241543AbjHPDU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 23:20:26 -0400
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB442682;
-        Tue, 15 Aug 2023 20:20:24 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-56ce156bd37so4321812eaf.3;
-        Tue, 15 Aug 2023 20:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692156024; x=1692760824;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gmX+B7J+wmAurtUlUbZbOqhkBn25gXv9vA1g9p4CbPA=;
-        b=MW1+Gm5lqAPzUQyo7ltqasF+300upvYWD88MF2EabmJRL5vy2k/dhIOy4Cwiqwt9Uv
-         hClwdqNoYkVvXEni/7FdAamE90NWPj5r5HosFgI7bzfDQUHkArH8yBhBOSb9bRQBm1E+
-         XTxF3HLG79XM+qVqycSPst3WtFcxCX6CohDfxIc4fXco0U6EXazeKz6t7MVHyK5PiY4Z
-         IC06wDNxccFaBWQ9wUxZTPikB1f0TOderj8CZVcjSZJUE8D5N4doDV47UVbwRyvxlLng
-         KDFH7HADIATLCDKwqLJO0JsYtuFFnApvN8F80W6TVgxaM9Fx8l01dDiP2heFfEp0pbJP
-         qn4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692156024; x=1692760824;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gmX+B7J+wmAurtUlUbZbOqhkBn25gXv9vA1g9p4CbPA=;
-        b=Hb2boo14CXrOFKrGWG2WdJBICNfMkiOs7U1gd9y/l5veU3OQeBl7aVd9zBuxxyx8e6
-         XlwKiJyfIXK7nSAD8P19wGTngfOOofNcfPGJeUQlBCniARj2MxnqVJ8NmE8BkLJNlokf
-         wlKRx0kDzQp+p4XVSNUyhlrzuAdlesXlzGwZ4XpNuKrIsulINtTtMCJpSW0pl/QGDKeb
-         tLu5qTuWL0Ll6/0beZ0fxKeB5yxz4KOODg0US2AFTors5xTztJnFnNVbbP15WRrQ77wq
-         DLd/odYt3FVw1u7KImsk1FlPisfu2uLLn8ekLGg/5X4OiUVJ61yfZPGgIXVbs0zclUju
-         UYVg==
-X-Gm-Message-State: AOJu0Yw3El2b9wyctT2NIOkEldLNQ1qU5TpbTS354VKVWXdQKuMRGjhm
-        DsnyvGa9n1J9p4bwH690mM+KpaEKFPAOwQ==
-X-Google-Smtp-Source: AGHT+IHP8Nvbnx53Vi5Az6VTu9OuSy4vtl+Dd/TGFW9dktKQelTl2wk80eGIK6eAd/XQysOa6ji9jA==
-X-Received: by 2002:a05:6358:52d2:b0:139:be3d:d2fa with SMTP id z18-20020a05635852d200b00139be3dd2famr1102039rwz.30.1692156023940;
-        Tue, 15 Aug 2023 20:20:23 -0700 (PDT)
-Received: from localhost.localdomain ([146.112.118.69])
-        by smtp.gmail.com with ESMTPSA id s18-20020a17090330d200b001bdbe6c86a9sm9128572plc.225.2023.08.15.20.20.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 20:20:23 -0700 (PDT)
-Subject: Re: [PATCH v3 2/6] KVM: PPC: Rename accessor generator macros
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, mikey@neuling.org,
-        paulus@ozlabs.org, vaibhav@linux.ibm.com, sbhat@linux.ibm.com,
-        gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
-        amachhiw@linux.vnet.ibm.com
-References: <20230807014553.1168699-1-jniethe5@gmail.com>
- <20230807014553.1168699-3-jniethe5@gmail.com>
- <CUS4J2YPYFAO.3P4R24H4KFJ83@wheely>
-From:   Jordan Niethe <jniethe5@gmail.com>
-Message-ID: <efa0e456-1b7e-f12e-c720-076e962c7ca2@gmail.com>
-Date:   Wed, 16 Aug 2023 13:20:18 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        with ESMTP id S241545AbjHPDV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 23:21:28 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA98268F;
+        Tue, 15 Aug 2023 20:21:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692156086; x=1723692086;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rmyzQPkQsHgwSTF/oayLJ1Rn63HIRPbUUReMD5vaGUg=;
+  b=UNC62hxbzRPyZTzIah+IS47Ml6YHX54dCfdhr3cdFYp+X9TIXMieXj17
+   ATJ905zbyHzzfYyUycXK4iU9xrqGBINzk9PznT8G3eU/vDMvjAEe2vQGk
+   P3TT+kKwVQDnqJDizKqc1/mKlFUcAygk8UfUNALDpuHPuS8xNqbreWhR7
+   VMbhVSn4UtXea1uslUfxLqRcfKDr4g4US4/TchmhLXU2f+Ic/ljdZq2sd
+   8MJ39JfaOquVCjQCuquhcn7W7LT2F8VMHpM7NFfMFwJTAy/kF+bKIARiU
+   +0OIsRASurq9eDFLgY2tqhqQ9FuNDx31CmLOZbZT0SDaHQKSjOpqFwWBb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="375200364"
+X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
+   d="scan'208";a="375200364"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 20:21:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="980570545"
+X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
+   d="scan'208";a="980570545"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga006.fm.intel.com with ESMTP; 15 Aug 2023 20:21:23 -0700
+Date:   Wed, 16 Aug 2023 11:21:23 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Zeng Guang <guang.zeng@intel.com>,
+        Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH v3 06/15] KVM: x86: Use KVM-governed feature framework to
+ track "XSAVES enabled"
+Message-ID: <20230816032123.tzoijkrqbui65c44@yy-desk-7060>
+References: <20230815203653.519297-1-seanjc@google.com>
+ <20230815203653.519297-7-seanjc@google.com>
+ <20230816025841.hp4lortav6lzwyuy@yy-desk-7060>
 MIME-Version: 1.0
-In-Reply-To: <CUS4J2YPYFAO.3P4R24H4KFJ83@wheely>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230816025841.hp4lortav6lzwyuy@yy-desk-7060>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Aug 16, 2023 at 10:58:41AM +0800, Yuan Yao wrote:
+> On Tue, Aug 15, 2023 at 01:36:44PM -0700, Sean Christopherson wrote:
+> > Use the governed feature framework to track if XSAVES is "enabled", i.e.
+> > if XSAVES can be used by the guest.  Add a comment in the SVM code to
+> > explain the very unintuitive logic of deliberately NOT checking if XSAVES
+> > is enumerated in the guest CPUID model.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h  |  1 -
+> >  arch/x86/kvm/governed_features.h |  1 +
+> >  arch/x86/kvm/svm/svm.c           | 17 ++++++++++++---
+> >  arch/x86/kvm/vmx/vmx.c           | 36 ++++++++++++++++----------------
+> >  arch/x86/kvm/x86.c               |  4 ++--
+> >  5 files changed, 35 insertions(+), 24 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 60d430b4650f..9f57aa33798b 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -746,7 +746,6 @@ struct kvm_vcpu_arch {
+> >  	u64 smi_count;
+> >  	bool at_instruction_boundary;
+> >  	bool tpr_access_reporting;
+> > -	bool xsaves_enabled;
+> >  	bool xfd_no_write_intercept;
+> >  	u64 ia32_xss;
+> >  	u64 microcode_version;
+> > diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
+> > index b29c15d5e038..b896a64e4ac3 100644
+> > --- a/arch/x86/kvm/governed_features.h
+> > +++ b/arch/x86/kvm/governed_features.h
+> > @@ -6,6 +6,7 @@ BUILD_BUG()
+> >  #define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
+> >
+> >  KVM_GOVERNED_X86_FEATURE(GBPAGES)
+> > +KVM_GOVERNED_X86_FEATURE(XSAVES)
+> >
+> >  #undef KVM_GOVERNED_X86_FEATURE
+> >  #undef KVM_GOVERNED_FEATURE
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 6aaa3c7b4578..d67f6e23dcd2 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -4273,9 +4273,20 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> >  	struct vcpu_svm *svm = to_svm(vcpu);
+> >  	struct kvm_cpuid_entry2 *best;
+> >
+> > -	vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+> > -				    boot_cpu_has(X86_FEATURE_XSAVE) &&
+> > -				    boot_cpu_has(X86_FEATURE_XSAVES);
+> > +	/*
+> > +	 * SVM doesn't provide a way to disable just XSAVES in the guest, KVM
+> > +	 * can only disable all variants of by disallowing CR4.OSXSAVE from
+> > +	 * being set.  As a result, if the host has XSAVE and XSAVES, and the
+> > +	 * guest has XSAVE enabled, the guest can execute XSAVES without
+> > +	 * faulting.  Treat XSAVES as enabled in this case regardless of
+> > +	 * whether it's advertised to the guest so that KVM context switches
+> > +	 * XSS on VM-Enter/VM-Exit.  Failure to do so would effectively give
+> > +	 * the guest read/write access to the host's XSS.
+> > +	 */
+> > +	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
+> > +	    boot_cpu_has(X86_FEATURE_XSAVES) &&
+> > +	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+> > +		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
+> >
+> >  	/* Update nrips enabled cache */
+> >  	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 22975cc949b7..6314ca32a5cf 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -4543,16 +4543,19 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
+> >   * based on a single guest CPUID bit, with a dedicated feature bit.  This also
+> >   * verifies that the control is actually supported by KVM and hardware.
+> >   */
+> > -#define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting) \
+> > -({									 \
+> > -	bool __enabled;							 \
+> > -									 \
+> > -	if (cpu_has_vmx_##name()) {					 \
+> > -		__enabled = guest_cpuid_has(&(vmx)->vcpu,		 \
+> > -					    X86_FEATURE_##feat_name);	 \
+> > -		vmx_adjust_secondary_exec_control(vmx, exec_control,	 \
+> > -			SECONDARY_EXEC_##ctrl_name, __enabled, exiting); \
+> > -	}								 \
+> > +#define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting)	\
+> > +({												\
+> > +	struct kvm_vcpu *__vcpu = &(vmx)->vcpu;							\
+> > +	bool __enabled;										\
+> > +												\
+> > +	if (cpu_has_vmx_##name()) {								\
+> > +		if (kvm_is_governed_feature(X86_FEATURE_##feat_name))				\
+> > +			__enabled = guest_can_use(__vcpu, X86_FEATURE_##feat_name);		\
+> > +		else										\
+> > +			__enabled = guest_cpuid_has(__vcpu, X86_FEATURE_##feat_name);		\
+> > +		vmx_adjust_secondary_exec_control(vmx, exec_control, SECONDARY_EXEC_##ctrl_name,\
+> > +						  __enabled, exiting);				\
+> > +	}											\
+> >  })
+> >
+> >  /* More macro magic for ENABLE_/opt-in versus _EXITING/opt-out controls. */
+> > @@ -4612,10 +4615,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+> >  	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
+> >  		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
+> >
+> > -	if (cpu_has_vmx_xsaves())
+> > -		vmx_adjust_secondary_exec_control(vmx, &exec_control,
+> > -						  SECONDARY_EXEC_ENABLE_XSAVES,
+> > -						  vcpu->arch.xsaves_enabled, false);
+> > +	vmx_adjust_sec_exec_feature(vmx, &exec_control, xsaves, XSAVES);
+> >
+> >  	/*
+> >  	 * RDPID is also gated by ENABLE_RDTSCP, turn on the control if either
+> > @@ -4634,6 +4634,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+> >  						  SECONDARY_EXEC_ENABLE_RDTSCP,
+> >  						  rdpid_or_rdtscp_enabled, false);
+> >  	}
+> > +
+> >  	vmx_adjust_sec_exec_feature(vmx, &exec_control, invpcid, INVPCID);
+> >
+> >  	vmx_adjust_sec_exec_exiting(vmx, &exec_control, rdrand, RDRAND);
+> > @@ -7745,10 +7746,9 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> >  	 * to the guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
+> >  	 * set if and only if XSAVE is supported.
+> >  	 */
+> > -	vcpu->arch.xsaves_enabled = kvm_cpu_cap_has(X86_FEATURE_XSAVES) &&
+> > -				    boot_cpu_has(X86_FEATURE_XSAVE) &&
+> > -				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
+> > -				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES);
+> > +	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
+> > +	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+>
+> Should above 2 be X86_FEATURE_XSAVES ? XSAVE and XSAVES have different
+> cpuid definition.
+> Otherwise X86_FEATURE_XSAVES is allowed in governor even XSAVES
+> is not exposed to guest cpuid, with unnecessary context switches.
 
+Oh! false alarm.
+I just forgot that kvm_governed_feature_check_and_set() does checks
+on kvm cpu cap and guest cpuid set, thus no problem.
 
-On 14/8/23 6:27 pm, Nicholas Piggin wrote:
-> On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
->> More "wrapper" style accessor generating macros will be introduced for
->> the nestedv2 guest support. Rename the existing macros with more
->> descriptive names now so there is a consistent naming convention.
->>
->> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
-> 
->> ---
->> v3:
->>    - New to series
->> ---
->>   arch/powerpc/include/asm/kvm_ppc.h | 60 +++++++++++++++---------------
->>   1 file changed, 30 insertions(+), 30 deletions(-)
->>
->> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
->> index d16d80ad2ae4..b66084a81dd0 100644
->> --- a/arch/powerpc/include/asm/kvm_ppc.h
->> +++ b/arch/powerpc/include/asm/kvm_ppc.h
->> @@ -927,19 +927,19 @@ static inline bool kvmppc_shared_big_endian(struct kvm_vcpu *vcpu)
->>   #endif
->>   }
->>   
->> -#define SPRNG_WRAPPER_GET(reg, bookehv_spr)				\
->> +#define KVMPPC_BOOKE_HV_SPRNG_ACESSOR_GET(reg, bookehv_spr)		\
->>   static inline ulong kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
->>   {									\
->>   	return mfspr(bookehv_spr);					\
->>   }									\
->>   
->> -#define SPRNG_WRAPPER_SET(reg, bookehv_spr)				\
->> +#define KVMPPC_BOOKE_HV_SPRNG_ACESSOR_SET(reg, bookehv_spr)		\
->>   static inline void kvmppc_set_##reg(struct kvm_vcpu *vcpu, ulong val)	\
->>   {									\
->>   	mtspr(bookehv_spr, val);						\
->>   }									\
->>   
->> -#define SHARED_WRAPPER_GET(reg, size)					\
->> +#define KVMPPC_VCPU_SHARED_REGS_ACESSOR_GET(reg, size)			\
->>   static inline u##size kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
->>   {									\
->>   	if (kvmppc_shared_big_endian(vcpu))				\
->> @@ -948,7 +948,7 @@ static inline u##size kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
->>   	       return le##size##_to_cpu(vcpu->arch.shared->reg);	\
->>   }									\
->>   
->> -#define SHARED_WRAPPER_SET(reg, size)					\
->> +#define KVMPPC_VCPU_SHARED_REGS_ACESSOR_SET(reg, size)			\
->>   static inline void kvmppc_set_##reg(struct kvm_vcpu *vcpu, u##size val)	\
->>   {									\
->>   	if (kvmppc_shared_big_endian(vcpu))				\
->> @@ -957,36 +957,36 @@ static inline void kvmppc_set_##reg(struct kvm_vcpu *vcpu, u##size val)	\
->>   	       vcpu->arch.shared->reg = cpu_to_le##size(val);		\
->>   }									\
->>   
->> -#define SHARED_WRAPPER(reg, size)					\
->> -	SHARED_WRAPPER_GET(reg, size)					\
->> -	SHARED_WRAPPER_SET(reg, size)					\
->> +#define KVMPPC_VCPU_SHARED_REGS_ACESSOR(reg, size)					\
->> +	KVMPPC_VCPU_SHARED_REGS_ACESSOR_GET(reg, size)					\
->> +	KVMPPC_VCPU_SHARED_REGS_ACESSOR_SET(reg, size)					\
->>   
->> -#define SPRNG_WRAPPER(reg, bookehv_spr)					\
->> -	SPRNG_WRAPPER_GET(reg, bookehv_spr)				\
->> -	SPRNG_WRAPPER_SET(reg, bookehv_spr)				\
->> +#define KVMPPC_BOOKE_HV_SPRNG_ACESSOR(reg, bookehv_spr)					\
->> +	KVMPPC_BOOKE_HV_SPRNG_ACESSOR_GET(reg, bookehv_spr)				\
->> +	KVMPPC_BOOKE_HV_SPRNG_ACESSOR_SET(reg, bookehv_spr)				\
->>   
->>   #ifdef CONFIG_KVM_BOOKE_HV
->>   
->> -#define SHARED_SPRNG_WRAPPER(reg, size, bookehv_spr)			\
->> -	SPRNG_WRAPPER(reg, bookehv_spr)					\
->> +#define KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(reg, size, bookehv_spr)	\
->> +	KVMPPC_BOOKE_HV_SPRNG_ACESSOR(reg, bookehv_spr)			\
->>   
->>   #else
->>   
->> -#define SHARED_SPRNG_WRAPPER(reg, size, bookehv_spr)			\
->> -	SHARED_WRAPPER(reg, size)					\
->> +#define KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(reg, size, bookehv_spr)	\
->> +	KVMPPC_VCPU_SHARED_REGS_ACESSOR(reg, size)			\
-> 
-> Not the greatest name I've ever seen :D Hard to be concice and
-> consistent though, this is an odd one.
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
-Yes, it is a bit wordy.
-
-> 
-> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
-
-Thanks.
-
-> 
->>   
->>   #endif
->>   
->> -SHARED_WRAPPER(critical, 64)
->> -SHARED_SPRNG_WRAPPER(sprg0, 64, SPRN_GSPRG0)
->> -SHARED_SPRNG_WRAPPER(sprg1, 64, SPRN_GSPRG1)
->> -SHARED_SPRNG_WRAPPER(sprg2, 64, SPRN_GSPRG2)
->> -SHARED_SPRNG_WRAPPER(sprg3, 64, SPRN_GSPRG3)
->> -SHARED_SPRNG_WRAPPER(srr0, 64, SPRN_GSRR0)
->> -SHARED_SPRNG_WRAPPER(srr1, 64, SPRN_GSRR1)
->> -SHARED_SPRNG_WRAPPER(dar, 64, SPRN_GDEAR)
->> -SHARED_SPRNG_WRAPPER(esr, 64, SPRN_GESR)
->> -SHARED_WRAPPER_GET(msr, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(critical, 64)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg0, 64, SPRN_GSPRG0)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg1, 64, SPRN_GSPRG1)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg2, 64, SPRN_GSPRG2)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(sprg3, 64, SPRN_GSPRG3)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(srr0, 64, SPRN_GSRR0)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(srr1, 64, SPRN_GSRR1)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(dar, 64, SPRN_GDEAR)
->> +KVMPPC_BOOKE_HV_SPRNG_OR_VCPU_SHARED_REGS_ACCESSOR(esr, 64, SPRN_GESR)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR_GET(msr, 64)
->>   static inline void kvmppc_set_msr_fast(struct kvm_vcpu *vcpu, u64 val)
->>   {
->>   	if (kvmppc_shared_big_endian(vcpu))
->> @@ -994,12 +994,12 @@ static inline void kvmppc_set_msr_fast(struct kvm_vcpu *vcpu, u64 val)
->>   	else
->>   	       vcpu->arch.shared->msr = cpu_to_le64(val);
->>   }
->> -SHARED_WRAPPER(dsisr, 32)
->> -SHARED_WRAPPER(int_pending, 32)
->> -SHARED_WRAPPER(sprg4, 64)
->> -SHARED_WRAPPER(sprg5, 64)
->> -SHARED_WRAPPER(sprg6, 64)
->> -SHARED_WRAPPER(sprg7, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(dsisr, 32)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(int_pending, 32)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg4, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg5, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg6, 64)
->> +KVMPPC_VCPU_SHARED_REGS_ACESSOR(sprg7, 64)
->>   
->>   static inline u32 kvmppc_get_sr(struct kvm_vcpu *vcpu, int nr)
->>   {
-> 
+>
+> > +		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
+> >
+> >  	vmx_setup_uret_msrs(vmx);
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index eba35d43e3fe..34945c7dba38 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1016,7 +1016,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
+> >  		if (vcpu->arch.xcr0 != host_xcr0)
+> >  			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
+> >
+> > -		if (vcpu->arch.xsaves_enabled &&
+> > +		if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
+> >  		    vcpu->arch.ia32_xss != host_xss)
+> >  			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
+> >  	}
+> > @@ -1047,7 +1047,7 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
+> >  		if (vcpu->arch.xcr0 != host_xcr0)
+> >  			xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
+> >
+> > -		if (vcpu->arch.xsaves_enabled &&
+> > +		if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
+> >  		    vcpu->arch.ia32_xss != host_xss)
+> >  			wrmsrl(MSR_IA32_XSS, host_xss);
+> >  	}
+> > --
+> > 2.41.0.694.ge786442a9b-goog
+> >
