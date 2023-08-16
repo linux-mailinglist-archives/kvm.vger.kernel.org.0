@@ -2,166 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21F8977D8CB
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:05:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B21B677D8DD
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:12:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241468AbjHPDEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 23:04:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51740 "EHLO
+        id S241514AbjHPDLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 23:11:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241476AbjHPDEW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 23:04:22 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E46C98
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 20:04:20 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1c4f4d67f5bso1891090fac.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 20:04:20 -0700 (PDT)
+        with ESMTP id S241504AbjHPDLI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 23:11:08 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A2DBE6B;
+        Tue, 15 Aug 2023 20:11:07 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bda9207132so48075675ad.0;
+        Tue, 15 Aug 2023 20:11:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692155060; x=1692759860;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PbUwQci3yHdMlV3tff0nEXdq6+hUjlgV0bD2bXxRCQQ=;
-        b=J2i4I01D5vunEh4zyxJMzRJ+HML+Fkz7JnIEETKY+Rdt/zTPpOgicvucsCD8X8gvsV
-         tlnKJzudFhgeNVYsj7v0OvqpKhGJWsSa4Yb+I5qPeMOyK3SerkSLKqtT2RnUwQFlYDBf
-         N230n7WFrQOdvEDbd/bU+hpM/TlLGZSDU0ruqDOMGxgOLatenKp6b5uYNiO4CdWmZPpx
-         oB7g+2TFYOx4ejrFxdGOc36iY5hneURiFXprRQXw5haTfcpQZg1CRU2HGQcv8icsu9jF
-         tWFrJn2nRaiOD3rgwInjW3KIsOCi/hSOJw0BdaSa/Dwp5vM4dKYtwANLF3SDHqskX6/C
-         3Dfw==
+        d=gmail.com; s=20221208; t=1692155467; x=1692760267;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CFcNtuBxixf5wJuU8gYA0YbfyYSQsy3zy43VL6AoIEY=;
+        b=SRUA0K5UfvnzSINPXjOGsfInJgg9jLJF8AFzEUCIEEszX7g/RIcWRPwaQLREyXJX9a
+         AhgL1fflrqmmLxB6lHSJEmG2HoIpjYvR64CUmme8fbdv22c2H89taCMOtxO8AliL9JMb
+         aI1Ariuz+hDlNOhbZqQqbQOAEn/900EFSxsQlMxwCai/8Xh5tqp4dRI1zbbsLvI9lYlZ
+         2D86rkm/j9FeEZ+B592IY90PpCv44KAnVnSLOByafiS1c1JZTO8PUpoOzFe6RfApse6I
+         W2GbwGUZ1MnGpObtJR0VRpLbUNKMq43wXqfhdgxt+o4To/FZlvVj5snta8zDTy6NyAyi
+         riFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692155060; x=1692759860;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PbUwQci3yHdMlV3tff0nEXdq6+hUjlgV0bD2bXxRCQQ=;
-        b=BT50a7AoprLRdNj0jmQFC612d818DUNr+36pdz8T0A4FWRSuzSjunhUhrgzaf0xngp
-         9R5xpJZzjMYR9XiFNemAQGFaKzd3poDGa8Cr2P73EktWIZjl5g+yEZFlWKd/K1GVpOyf
-         zehbDxObi4L8+mVm7vZeM+skfebZ2mKpn5OrWrdaqXgbaAwr6kBGKsCztajKM+gawbOe
-         UFxxVJTt/Yc8vWErx8tfTS1V/hiAVtX4gbhNh39E3U5VggcUloOnG433wj3YiXeJLNPl
-         hHLjMBIH8aNZ/PW3eYSI3eYE8bscvyc07W46f72Lutep6BDZI3rhI2RzPV0KbxaLAGd8
-         kRXg==
-X-Gm-Message-State: AOJu0YxizwzLE5xhz6WSHZGHqwhzG0MAUYVHQyvWsbmtuZt87fPcHw8X
-        RO1DZM4QuFb5I4ABNXeyWurwFw==
-X-Google-Smtp-Source: AGHT+IFxyrXLX1rtq7cqWcrPo0K9tp7pvjJThOgma4n4YvsV9mSOFbliMSIC2KW8LHl1Gs5xRYhVRw==
-X-Received: by 2002:a05:6870:9725:b0:1bf:87af:e6df with SMTP id n37-20020a056870972500b001bf87afe6dfmr622354oaq.55.1692155059803;
-        Tue, 15 Aug 2023 20:04:19 -0700 (PDT)
-Received: from leoy-huanghe.lan ([150.230.248.162])
-        by smtp.gmail.com with ESMTPSA id bo24-20020a17090b091800b00262d6ac0140sm10086730pjb.9.2023.08.15.20.04.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 20:04:19 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 11:04:12 +0800
-From:   Leo Yan <leo.yan@linaro.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huang Shijie <shijie@os.amperecomputing.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-Message-ID: <20230816030412.GB135657@leoy-huanghe.lan>
-References: <20230811180520.131727-1-maz@kernel.org>
- <20230814071627.GA3963214@leoy-huanghe>
- <87leecq0hj.wl-maz@kernel.org>
+        d=1e100.net; s=20221208; t=1692155467; x=1692760267;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CFcNtuBxixf5wJuU8gYA0YbfyYSQsy3zy43VL6AoIEY=;
+        b=hnOHHlW24pvZ4USgSGqrF4nIE8ejsN0JOVPMbLvSwFnIqr9cv5b6coLm/6fV8grpoW
+         zJgSs14bDEbaXfjgLHIgBaCDDvV893mUTpc5xpJvKK4WDR4TstYmXpPR/bOhBxAaMdHm
+         oJxc1nLXGfRxIp+vQ1OIkDnLlxkHiWTUjBLKssMlc44bKGDM0A9wAZgOvVSFV8h8OarQ
+         R6EcSchYXzoA4xTSikpMnn6zo/+HQIZUL5GPFuJ55ym30+SvNtz1HJI1M5sAw+GZAI4o
+         GK9JAs6Gof+85k38nwBitGhipLkcVCCAn/aFMVMc1/ReduP0J0XiDVh4kayC20rffvee
+         MjBQ==
+X-Gm-Message-State: AOJu0Yw/gtHhYEOhw9ahCrcBZGVEpOb/JprDwMzrgc//GZ+Xw3bIVEoK
+        m8Jf5+wclF3GNUAkQcx/jCc=
+X-Google-Smtp-Source: AGHT+IGkc2hUDta+IGakHFjBInQVHNIBETmu5s9HDyvblnc18wwsR4JMRHOdec1VsGltqDsuiTUy+w==
+X-Received: by 2002:a17:902:bd42:b0:1bd:d663:45ad with SMTP id b2-20020a170902bd4200b001bdd66345admr723438plx.68.1692155466914;
+        Tue, 15 Aug 2023 20:11:06 -0700 (PDT)
+Received: from localhost.localdomain ([146.112.118.69])
+        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b001b8622c1ad2sm11792839plx.130.2023.08.15.20.11.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Aug 2023 20:11:06 -0700 (PDT)
+Subject: Re: [PATCH v3 1/6] KVM: PPC: Use getters and setters for vcpu
+ register state
+To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, mikey@neuling.org,
+        paulus@ozlabs.org, vaibhav@linux.ibm.com, sbhat@linux.ibm.com,
+        gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
+        amachhiw@linux.vnet.ibm.com
+References: <20230807014553.1168699-1-jniethe5@gmail.com>
+ <20230807014553.1168699-2-jniethe5@gmail.com>
+ <CUS44PQRFL72.28PFLWO36FYAO@wheely>
+From:   Jordan Niethe <jniethe5@gmail.com>
+Message-ID: <71e14e67-3ba4-4ddd-921d-38181f3c0159@gmail.com>
+Date:   Wed, 16 Aug 2023 13:11:00 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87leecq0hj.wl-maz@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <CUS44PQRFL72.28PFLWO36FYAO@wheely>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 15, 2023 at 07:32:40AM +0100, Marc Zyngier wrote:
-> On Mon, 14 Aug 2023 08:16:27 +0100,
-> Leo Yan <leo.yan@linaro.org> wrote:
-> > 
-> > On Fri, Aug 11, 2023 at 07:05:20PM +0100, Marc Zyngier wrote:
-> > > Huang Shijie reports that, when profiling a guest from the host
-> > > with a number of events that exceeds the number of available
-> > > counters, the reported counts are wildly inaccurate. Without
-> > > the counter oversubscription, the reported counts are correct.
-> > > 
-> > > Their investigation indicates that upon counter rotation (which
-> > > takes place on the back of a timer interrupt), we fail to
-> > > re-apply the guest EL0 enabling, leading to the counting of host
-> > > events instead of guest events.
-> > 
-> > Seems to me, it's not clear for why the counter rotation will cause
-> > the issue.
+
+
+On 14/8/23 6:08 pm, Nicholas Piggin wrote:
+> On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
+>> There are already some getter and setter functions used for accessing
+>> vcpu register state, e.g. kvmppc_get_pc(). There are also more
+>> complicated examples that are generated by macros like
+>> kvmppc_get_sprg0() which are generated by the SHARED_SPRNG_WRAPPER()
+>> macro.
+>>
+>> In the new PAPR "Nestedv2" API for nested guest partitions the L1 is
+>> required to communicate with the L0 to modify and read nested guest
+>> state.
+>>
+>> Prepare to support this by replacing direct accesses to vcpu register
+>> state with wrapper functions. Follow the existing pattern of using
+>> macros to generate individual wrappers. These wrappers will
+>> be augmented for supporting Nestedv2 guests later.
+>>
+>> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
+>> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
+>> ---
+>> v3:
+>>    - Do not add a helper for pvr
+>>    - Use an expression when declaring variable in case
+>>    - Squash in all getters and setters
+>>    - Guatam: Pass vector registers by reference
+>> ---
+>>   arch/powerpc/include/asm/kvm_book3s.h  | 123 +++++++++++++-
+>>   arch/powerpc/include/asm/kvm_booke.h   |  10 ++
+>>   arch/powerpc/kvm/book3s.c              |  38 ++---
+>>   arch/powerpc/kvm/book3s_64_mmu_hv.c    |   4 +-
+>>   arch/powerpc/kvm/book3s_64_mmu_radix.c |   9 +-
+>>   arch/powerpc/kvm/book3s_64_vio.c       |   4 +-
+>>   arch/powerpc/kvm/book3s_hv.c           | 220 +++++++++++++------------
+>>   arch/powerpc/kvm/book3s_hv.h           |  58 +++++++
+>>   arch/powerpc/kvm/book3s_hv_builtin.c   |  10 +-
+>>   arch/powerpc/kvm/book3s_hv_p9_entry.c  |   4 +-
+>>   arch/powerpc/kvm/book3s_hv_ras.c       |   5 +-
+>>   arch/powerpc/kvm/book3s_hv_rm_mmu.c    |   8 +-
+>>   arch/powerpc/kvm/book3s_hv_rm_xics.c   |   4 +-
+>>   arch/powerpc/kvm/book3s_xive.c         |   9 +-
+>>   arch/powerpc/kvm/emulate_loadstore.c   |   2 +-
+>>   arch/powerpc/kvm/powerpc.c             |  76 ++++-----
+>>   16 files changed, 395 insertions(+), 189 deletions(-)
+>>
 > 
-> Maybe unclear to you, but rather clear to me (and most people else on
-> Cc).
-
-I have to admit this it true.
-
-> > In the example shared by Shijie in [1], the cycle counter is enabled
-> > for both host and guest
+> [snip]
 > 
-> No. You're misreading the example. We're profiling the guest from the
-> host, and the guest has no PMU access.
+>> +
+>>   /* Expiry time of vcpu DEC relative to host TB */
+>>   static inline u64 kvmppc_dec_expires_host_tb(struct kvm_vcpu *vcpu)
+>>   {
+>> -	return vcpu->arch.dec_expires - vcpu->arch.vcore->tb_offset;
+>> +	return kvmppc_get_dec_expires(vcpu) - kvmppc_get_tb_offset_hv(vcpu);
+>>   }
 > 
-> > and cycle counter is a dedicated event
-> > which does not share counter with other events.  Even there have
-> > counter rotation, it should not impact the cycle counter.
+> I don't see kvmppc_get_tb_offset_hv in this patch.
+
+It should be generated by:
+
+KVMPPC_BOOK3S_VCORE_ACCESSOR(tb_offset, 64)
+
 > 
-> Who says that we're counting cycles using the cycle counter? This is
-> an event like any other, and it can be counted on any counter.
-
-Sorry for noise.
-
-> > I mean if we cannot explain clearly for this part, we don't find the
-> > root cause, and this patch (and Shijie's patch) just walks around the
-> > issue.
+>> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+>> index 7f765d5ad436..738f2ecbe9b9 100644
+>> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
+>> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+>> @@ -347,7 +347,7 @@ static int kvmppc_mmu_book3s_64_hv_xlate(struct kvm_vcpu *vcpu, gva_t eaddr,
+>>   	unsigned long v, orig_v, gr;
+>>   	__be64 *hptep;
+>>   	long int index;
+>> -	int virtmode = vcpu->arch.shregs.msr & (data ? MSR_DR : MSR_IR);
+>> +	int virtmode = kvmppc_get_msr(vcpu) & (data ? MSR_DR : MSR_IR);
+>>   
+>>   	if (kvm_is_radix(vcpu->kvm))
+>>   		return kvmppc_mmu_radix_xlate(vcpu, eaddr, gpte, data, iswrite);
 > 
-> We have the root cause. You just need to think a bit harder.
+> So this isn't _only_ adding new accessors. This should be functionally a
+> noop, but I think it introduces a branch if PR is defined.
 
-Let me elaborate a bit more for my concern.  The question is how we can
-know the exactly the host and the guest have the different counter
-enabling?
+That being checking kvmppc_shared_big_endian()?
 
-Shijie's patch relies on perf event rotation to trigger syncing for
-PMU PMEVTYPER and PMCCFILTR registers.  The perf event rotation will
-enable and disable some events, but it doesn't mean the host and the
-guest enable different counters.  If we use the perf event rotation to
-trigger syncing, there must introduce redundant operations.
+> 
+> Shared page is a slight annoyance for HV, I'd like to get rid of it...
+> but that's another story. I think the pattern here would be to add a
+> kvmppc_get_msr_hv() accessor.
 
-In your patch, it resyncs the PMU registers in the function
-armv8pmu_start(), this function is invoked not only when start PMU
-event, it also is invoked in PMU interrupt handler (see
-armv8pmu_handle_irq()), this also will lead to redundant syncing if
-we use the perf record command for PMU event sampling:
+Yes, that will work.
 
-  perf record -e cycles:G,cycles:H -d -d -- sleep 10
+> 
+> And as a nitpick, for anywhere employing existing access functions, gprs
+> and such, could that be split into its own patch?
 
-This is why I think we should trigger the syncing in the function
-kvm_set_pmu_events(), where we can know exactly the event mismatching
-between the host and the guest.  At the beginning it has checked the
-difference between the host and the guest by calling
-kvm_pmu_switch_needed(attr), thus we don't need to add more condition
-checking and directly call kvm_vcpu_pmu_resync_el0().
+Sure will do. One other thing I could do is make the existing functions 
+use the macros if they don't already. Do you think that is worth doing?
 
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 121f1a14c829..99adcdbb6a5d 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -46,6 +46,12 @@ void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
-                pmu->events_host |= set;
-        if (!attr->exclude_guest)
-                pmu->events_guest |= set;
-+
-+       /*
-+        * The host and the guest enable different events for EL0,
-+        * resync it.
-+        */
-+       kvm_vcpu_pmu_resync_el0();
- }
+> 
+> Looks pretty good aside from those little things.
 
-Thanks,
-Leo
+Thanks.
+
+> 
+> Thanks,
+> Nick
+> 
