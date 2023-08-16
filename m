@@ -2,243 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E814377D8F6
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC84077D8F9
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:22:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241528AbjHPDVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 23:21:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
+        id S241548AbjHPDV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 23:21:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241545AbjHPDV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 23:21:28 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA98268F;
-        Tue, 15 Aug 2023 20:21:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692156086; x=1723692086;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rmyzQPkQsHgwSTF/oayLJ1Rn63HIRPbUUReMD5vaGUg=;
-  b=UNC62hxbzRPyZTzIah+IS47Ml6YHX54dCfdhr3cdFYp+X9TIXMieXj17
-   ATJ905zbyHzzfYyUycXK4iU9xrqGBINzk9PznT8G3eU/vDMvjAEe2vQGk
-   P3TT+kKwVQDnqJDizKqc1/mKlFUcAygk8UfUNALDpuHPuS8xNqbreWhR7
-   VMbhVSn4UtXea1uslUfxLqRcfKDr4g4US4/TchmhLXU2f+Ic/ljdZq2sd
-   8MJ39JfaOquVCjQCuquhcn7W7LT2F8VMHpM7NFfMFwJTAy/kF+bKIARiU
-   +0OIsRASurq9eDFLgY2tqhqQ9FuNDx31CmLOZbZT0SDaHQKSjOpqFwWBb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="375200364"
-X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="375200364"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2023 20:21:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="980570545"
-X-IronPort-AV: E=Sophos;i="6.01,175,1684825200"; 
-   d="scan'208";a="980570545"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga006.fm.intel.com with ESMTP; 15 Aug 2023 20:21:23 -0700
-Date:   Wed, 16 Aug 2023 11:21:23 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Zeng Guang <guang.zeng@intel.com>,
-        Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH v3 06/15] KVM: x86: Use KVM-governed feature framework to
- track "XSAVES enabled"
-Message-ID: <20230816032123.tzoijkrqbui65c44@yy-desk-7060>
-References: <20230815203653.519297-1-seanjc@google.com>
- <20230815203653.519297-7-seanjc@google.com>
- <20230816025841.hp4lortav6lzwyuy@yy-desk-7060>
+        with ESMTP id S241618AbjHPDVs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 23:21:48 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6546C26A9;
+        Tue, 15 Aug 2023 20:21:42 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-565334377d0so4516603a12.2;
+        Tue, 15 Aug 2023 20:21:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692156102; x=1692760902;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yLgZ/fh5M5NltE3AWQwyfXy2dGWq1QEmZxlklznfsAg=;
+        b=NQFRZ5iVj7FHi2JAjM2ygQ/W2FNrRIAPpcJgrHNOIdu23BM2e1PWYrzXPLCMlkXoeB
+         Sf8XkZl/yFuuDhv/8MPHV8BGzMMo1LgyIk5B3/B5IbljKG6EgFumXyz/UAdjFWq1hN9x
+         nE9wE/zWw1/HrQ9ApB7NMcZSu+5VEXU3T3BqIopMBwwJxCORVe8qgPUvH11nADoaTuJh
+         BsLwhXwLsx0DAAqvSP4rAy0TOGPIRU/pcw8vmxPe2bgLnEIhsgT29b+JwmA5qW6yHWyM
+         LX3qM3OlVYWbYx+sUGsI3YeR4R6F82MBTE73GZZslXBeDuYGP7w0zrd6C9wBild41vcw
+         0wMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692156102; x=1692760902;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yLgZ/fh5M5NltE3AWQwyfXy2dGWq1QEmZxlklznfsAg=;
+        b=YfFePqgU9y7rAjGx4eYw9Ss12HNuggA6hSZLYlGwnIr2iJg3TYI+7ZrV8p8f7qFYpd
+         S100EidgP8NdFUD+pIAMxLdEfN1BIhGhMIStFTklWQm6j+kbN8EvdvKkWSBt6tEYfXYD
+         j9pVFXoHskZco7P4sP+V6w5uPc4Y1GQP2Rzufdf6j8mBJx1+D49UPzHZZfp5vb5FxTKy
+         zg9/J5kECp3xmiUc+JvpYJ0B1Nu3zw+FOk4E0lk4x9P9lDvqtPGmP05tPMWAG8Kdk2KL
+         KE6Q1WW8hV/AYmnfef2h3OnzbKQ5siwhmIpZ9IOnKYDOgmagSWmpnml2JWlYYrcLayjY
+         KWSw==
+X-Gm-Message-State: AOJu0YxAePxZzB0t6JqREHtsLcIOgveazP0bR0PCOM97Vpc2Yqp9PPLc
+        ujn3RN0zJiYp3GOPIQPDrHQ=
+X-Google-Smtp-Source: AGHT+IE7yVdS0kMwy4HCS9A43/hjpM+6g1vzheq8U3+lI6mnkuv35ezpapXAmiqsRXd/mnIEFHG+sQ==
+X-Received: by 2002:a17:90b:3809:b0:268:5c3b:6f37 with SMTP id mq9-20020a17090b380900b002685c3b6f37mr407598pjb.0.1692156101753;
+        Tue, 15 Aug 2023 20:21:41 -0700 (PDT)
+Received: from localhost.localdomain ([146.112.118.69])
+        by smtp.gmail.com with ESMTPSA id u18-20020a170902e5d200b001b892aac5c9sm11786337plf.298.2023.08.15.20.21.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Aug 2023 20:21:41 -0700 (PDT)
+Subject: Re: [PATCH v3 4/6] KVM: PPC: Book3s HV: Hold LPIDs in an unsigned
+ long
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, mikey@neuling.org,
+        paulus@ozlabs.org, vaibhav@linux.ibm.com, sbhat@linux.ibm.com,
+        gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
+        amachhiw@linux.vnet.ibm.com
+References: <20230807014553.1168699-1-jniethe5@gmail.com>
+ <20230807014553.1168699-5-jniethe5@gmail.com>
+ <CUS477NDPEQI.27SBUCRNYD0XG@wheely> <87ttt0d1ol.fsf@mail.lhotse>
+From:   Jordan Niethe <jniethe5@gmail.com>
+Message-ID: <473611e9-5831-cc6f-ba75-86964fe71b6e@gmail.com>
+Date:   Wed, 16 Aug 2023 13:21:36 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230816025841.hp4lortav6lzwyuy@yy-desk-7060>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <87ttt0d1ol.fsf@mail.lhotse>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 16, 2023 at 10:58:41AM +0800, Yuan Yao wrote:
-> On Tue, Aug 15, 2023 at 01:36:44PM -0700, Sean Christopherson wrote:
-> > Use the governed feature framework to track if XSAVES is "enabled", i.e.
-> > if XSAVES can be used by the guest.  Add a comment in the SVM code to
-> > explain the very unintuitive logic of deliberately NOT checking if XSAVES
-> > is enumerated in the guest CPUID model.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h  |  1 -
-> >  arch/x86/kvm/governed_features.h |  1 +
-> >  arch/x86/kvm/svm/svm.c           | 17 ++++++++++++---
-> >  arch/x86/kvm/vmx/vmx.c           | 36 ++++++++++++++++----------------
-> >  arch/x86/kvm/x86.c               |  4 ++--
-> >  5 files changed, 35 insertions(+), 24 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 60d430b4650f..9f57aa33798b 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -746,7 +746,6 @@ struct kvm_vcpu_arch {
-> >  	u64 smi_count;
-> >  	bool at_instruction_boundary;
-> >  	bool tpr_access_reporting;
-> > -	bool xsaves_enabled;
-> >  	bool xfd_no_write_intercept;
-> >  	u64 ia32_xss;
-> >  	u64 microcode_version;
-> > diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
-> > index b29c15d5e038..b896a64e4ac3 100644
-> > --- a/arch/x86/kvm/governed_features.h
-> > +++ b/arch/x86/kvm/governed_features.h
-> > @@ -6,6 +6,7 @@ BUILD_BUG()
-> >  #define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
-> >
-> >  KVM_GOVERNED_X86_FEATURE(GBPAGES)
-> > +KVM_GOVERNED_X86_FEATURE(XSAVES)
-> >
-> >  #undef KVM_GOVERNED_X86_FEATURE
-> >  #undef KVM_GOVERNED_FEATURE
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 6aaa3c7b4578..d67f6e23dcd2 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -4273,9 +4273,20 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  	struct vcpu_svm *svm = to_svm(vcpu);
-> >  	struct kvm_cpuid_entry2 *best;
-> >
-> > -	vcpu->arch.xsaves_enabled = guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-> > -				    boot_cpu_has(X86_FEATURE_XSAVE) &&
-> > -				    boot_cpu_has(X86_FEATURE_XSAVES);
-> > +	/*
-> > +	 * SVM doesn't provide a way to disable just XSAVES in the guest, KVM
-> > +	 * can only disable all variants of by disallowing CR4.OSXSAVE from
-> > +	 * being set.  As a result, if the host has XSAVE and XSAVES, and the
-> > +	 * guest has XSAVE enabled, the guest can execute XSAVES without
-> > +	 * faulting.  Treat XSAVES as enabled in this case regardless of
-> > +	 * whether it's advertised to the guest so that KVM context switches
-> > +	 * XSS on VM-Enter/VM-Exit.  Failure to do so would effectively give
-> > +	 * the guest read/write access to the host's XSS.
-> > +	 */
-> > +	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
-> > +	    boot_cpu_has(X86_FEATURE_XSAVES) &&
-> > +	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
-> > +		kvm_governed_feature_set(vcpu, X86_FEATURE_XSAVES);
-> >
-> >  	/* Update nrips enabled cache */
-> >  	svm->nrips_enabled = kvm_cpu_cap_has(X86_FEATURE_NRIPS) &&
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 22975cc949b7..6314ca32a5cf 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -4543,16 +4543,19 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
-> >   * based on a single guest CPUID bit, with a dedicated feature bit.  This also
-> >   * verifies that the control is actually supported by KVM and hardware.
-> >   */
-> > -#define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting) \
-> > -({									 \
-> > -	bool __enabled;							 \
-> > -									 \
-> > -	if (cpu_has_vmx_##name()) {					 \
-> > -		__enabled = guest_cpuid_has(&(vmx)->vcpu,		 \
-> > -					    X86_FEATURE_##feat_name);	 \
-> > -		vmx_adjust_secondary_exec_control(vmx, exec_control,	 \
-> > -			SECONDARY_EXEC_##ctrl_name, __enabled, exiting); \
-> > -	}								 \
-> > +#define vmx_adjust_sec_exec_control(vmx, exec_control, name, feat_name, ctrl_name, exiting)	\
-> > +({												\
-> > +	struct kvm_vcpu *__vcpu = &(vmx)->vcpu;							\
-> > +	bool __enabled;										\
-> > +												\
-> > +	if (cpu_has_vmx_##name()) {								\
-> > +		if (kvm_is_governed_feature(X86_FEATURE_##feat_name))				\
-> > +			__enabled = guest_can_use(__vcpu, X86_FEATURE_##feat_name);		\
-> > +		else										\
-> > +			__enabled = guest_cpuid_has(__vcpu, X86_FEATURE_##feat_name);		\
-> > +		vmx_adjust_secondary_exec_control(vmx, exec_control, SECONDARY_EXEC_##ctrl_name,\
-> > +						  __enabled, exiting);				\
-> > +	}											\
-> >  })
-> >
-> >  /* More macro magic for ENABLE_/opt-in versus _EXITING/opt-out controls. */
-> > @@ -4612,10 +4615,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
-> >  	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
-> >  		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
-> >
-> > -	if (cpu_has_vmx_xsaves())
-> > -		vmx_adjust_secondary_exec_control(vmx, &exec_control,
-> > -						  SECONDARY_EXEC_ENABLE_XSAVES,
-> > -						  vcpu->arch.xsaves_enabled, false);
-> > +	vmx_adjust_sec_exec_feature(vmx, &exec_control, xsaves, XSAVES);
-> >
-> >  	/*
-> >  	 * RDPID is also gated by ENABLE_RDTSCP, turn on the control if either
-> > @@ -4634,6 +4634,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
-> >  						  SECONDARY_EXEC_ENABLE_RDTSCP,
-> >  						  rdpid_or_rdtscp_enabled, false);
-> >  	}
-> > +
-> >  	vmx_adjust_sec_exec_feature(vmx, &exec_control, invpcid, INVPCID);
-> >
-> >  	vmx_adjust_sec_exec_exiting(vmx, &exec_control, rdrand, RDRAND);
-> > @@ -7745,10 +7746,9 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  	 * to the guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
-> >  	 * set if and only if XSAVE is supported.
-> >  	 */
-> > -	vcpu->arch.xsaves_enabled = kvm_cpu_cap_has(X86_FEATURE_XSAVES) &&
-> > -				    boot_cpu_has(X86_FEATURE_XSAVE) &&
-> > -				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-> > -				    guest_cpuid_has(vcpu, X86_FEATURE_XSAVES);
-> > +	if (boot_cpu_has(X86_FEATURE_XSAVE) &&
-> > +	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
->
-> Should above 2 be X86_FEATURE_XSAVES ? XSAVE and XSAVES have different
-> cpuid definition.
-> Otherwise X86_FEATURE_XSAVES is allowed in governor even XSAVES
-> is not exposed to guest cpuid, with unnecessary context switches.
 
-Oh! false alarm.
-I just forgot that kvm_governed_feature_check_and_set() does checks
-on kvm cpu cap and guest cpuid set, thus no problem.
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+On 15/8/23 8:45 pm, Michael Ellerman wrote:
+> "Nicholas Piggin" <npiggin@gmail.com> writes:
+>> On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
+>>> The LPID register is 32 bits long. The host keeps the lpids for each
+>>> guest in an unsigned word struct kvm_arch. Currently, LPIDs are already
+>>> limited by mmu_lpid_bits and KVM_MAX_NESTED_GUESTS_SHIFT.
+>>>
+>>> The nestedv2 API returns a 64 bit "Guest ID" to be used be the L1 host
+>>> for each L2 guest. This value is used as an lpid, e.g. it is the
+>>> parameter used by H_RPT_INVALIDATE. To minimize needless special casing
+>>> it makes sense to keep this "Guest ID" in struct kvm_arch::lpid.
+>>>
+>>> This means that struct kvm_arch::lpid is too small so prepare for this
+>>> and make it an unsigned long. This is not a problem for the KVM-HV and
+>>> nestedv1 cases as their lpid values are already limited to valid ranges
+>>> so in those contexts the lpid can be used as an unsigned word safely as
+>>> needed.
+>>>
+>>> In the PAPR, the H_RPT_INVALIDATE pid/lpid parameter is already
+>>> specified as an unsigned long so change pseries_rpt_invalidate() to
+>>> match that.  Update the callers of pseries_rpt_invalidate() to also take
+>>> an unsigned long if they take an lpid value.
+>>
+>> I don't suppose it would be worth having an lpid_t.
+>>
+>>> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+>>> index 4adff4f1896d..229f0a1ffdd4 100644
+>>> --- a/arch/powerpc/kvm/book3s_xive.c
+>>> +++ b/arch/powerpc/kvm/book3s_xive.c
+>>> @@ -886,10 +886,10 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu, u8 prio,
+>>>   
+>>>   	if (single_escalation)
+>>>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d",
+>>> -				 vcpu->kvm->arch.lpid, xc->server_num);
+>>> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num);
+>>>   	else
+>>>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d-%d",
+>>> -				 vcpu->kvm->arch.lpid, xc->server_num, prio);
+>>> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num, prio);
+>>>   	if (!name) {
+>>>   		pr_err("Failed to allocate escalation irq name for queue %d of VCPU %d\n",
+>>>   		       prio, xc->server_num);
+>>
+>> I would have thought you'd keep the type and change the format.
+> 
+> Yeah. Don't we risk having ambigious names by discarding the high bits?
+> Not sure that would be a bug per se, but it could be confusing.
 
->
-> > +		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
-> >
-> >  	vmx_setup_uret_msrs(vmx);
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index eba35d43e3fe..34945c7dba38 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -1016,7 +1016,7 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu)
-> >  		if (vcpu->arch.xcr0 != host_xcr0)
-> >  			xsetbv(XCR_XFEATURE_ENABLED_MASK, vcpu->arch.xcr0);
-> >
-> > -		if (vcpu->arch.xsaves_enabled &&
-> > +		if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
-> >  		    vcpu->arch.ia32_xss != host_xss)
-> >  			wrmsrl(MSR_IA32_XSS, vcpu->arch.ia32_xss);
-> >  	}
-> > @@ -1047,7 +1047,7 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
-> >  		if (vcpu->arch.xcr0 != host_xcr0)
-> >  			xsetbv(XCR_XFEATURE_ENABLED_MASK, host_xcr0);
-> >
-> > -		if (vcpu->arch.xsaves_enabled &&
-> > +		if (guest_can_use(vcpu, X86_FEATURE_XSAVES) &&
-> >  		    vcpu->arch.ia32_xss != host_xss)
-> >  			wrmsrl(MSR_IA32_XSS, host_xss);
-> >  	}
-> > --
-> > 2.41.0.694.ge786442a9b-goog
-> >
+In this context is would always be constrained be the number of LPID 
+bits so wouldn't be ambiguous, but I'm going to change the format.
+
+> 
+> cheers
+> 
