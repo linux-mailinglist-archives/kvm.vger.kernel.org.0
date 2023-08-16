@@ -2,128 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3305277EB30
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 23:01:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF6A277EB86
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 23:17:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346309AbjHPVA5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 17:00:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
+        id S1346407AbjHPVRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 17:17:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346251AbjHPVAm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 17:00:42 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6482735
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:00:36 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d4ddbcbbaacso5762164276.1
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:00:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692219636; x=1692824436;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mEKCsNAdQtsP5aYZXuXtRCirnaLNuizB4J6R93XEmoU=;
-        b=MD16cjoR0K1HMlo0H/xbNVvBx5YSivolQqz/f7DPhaxbb0pBoZ5vpRco9aTKjQNeOq
-         Bbldshr40dC8nnhFfQQpBpWIwGc2S9sD0RKBlUwrehKJGuUi1yNZqOgoa2VjGLFGe5x8
-         7YvpmqXmRe9A6FtgxQ4ZeKxUjjBPN6VwzXq/JbxANwzdHgRYRz2Vqepa3jXTb4a+ksth
-         DyL3gu6oLgOTm/JrphBHF3TynJG6g3/pAim7l3pG0qRYQ9ZUPJXQPam6BLurLLhzzGEZ
-         IMR5NQNVOJ7nLv8so8JlkvNC1zRHpGtYOi5uCy7FGIuAHXuprn96m627q9ZaXKqlZTjg
-         Mwkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692219636; x=1692824436;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mEKCsNAdQtsP5aYZXuXtRCirnaLNuizB4J6R93XEmoU=;
-        b=dRx2MY59+CEham7khVV/aENdyOTtEWkTQahkw+pbTd+4xTiXUlcwOMD4tHY8B6kzuR
-         ZplyfvKWiOwAazKiyQCxANx2UkMJ6zWdaxZRVU5lNFfhGJOfUSBR34DRa7fPAoNgsCJB
-         9e235ZeIhHGX+M7fOE7bAeESw8yQtDZf70c9P8G4maElM9jsyun/D+wu8n77ZIwWQypf
-         Xgu8Oh+O/FJ85ciwX/EobviwsODhkxBNs8+5bUBjcE/MqxeE1mvP8mokoHMUarCjFPhE
-         xOg2j7E06j8XTlq5yPnGpR25Iy48GwkDgzWdvbV9Cwzx5PPVYD44kNC33mKLCKz7jNXE
-         mrOA==
-X-Gm-Message-State: AOJu0Yw9eQ8gZjPQf0gBYLmRHVH2HPrf4/nTHgO3KYKuLglfLFyZUark
-        ETIUYZ3ROLi73hjSD52ULC6TyBXfVLw=
-X-Google-Smtp-Source: AGHT+IGtmkH20GX7f4dZ9plMJAihmnuy0mIGZ1YWKc/0uhrE3EJ6VKwRoOa33zghHSgI7WW2mrPYn78qvqU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d84c:0:b0:d62:e781:5f02 with SMTP id
- p73-20020a25d84c000000b00d62e7815f02mr44598ybg.13.1692219636034; Wed, 16 Aug
- 2023 14:00:36 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 14:00:23 -0700
-In-Reply-To: <20230719144131.29052-2-binbin.wu@linux.intel.com>
-Mime-Version: 1.0
-References: <20230719144131.29052-1-binbin.wu@linux.intel.com> <20230719144131.29052-2-binbin.wu@linux.intel.com>
-Message-ID: <ZN0454peMb3z/0Bg@google.com>
-Subject: Re: [PATCH v10 1/9] KVM: x86/mmu: Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
-        David.Laight@aculab.com, robert.hu@linux.intel.com,
-        guang.zeng@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1346403AbjHPVQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 17:16:59 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90512128
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692220618; x=1723756618;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QcX46Lc6STB1co3R3vSNDqsmhBlhD/jldK7+HV4nVdM=;
+  b=oKNVpvy023FOY03SRlFWXQjHAt5MJp59CNVVqqn4ykqJt1s90K4uB7vz
+   UVdGc6q+hTAkZSYBRAEHtGwfZ93Z2spXaG+8EDolM6967WadxOzBThoNg
+   MhvovCWDCNbxQ3YvK8iy1bDnLCCuIml7TEtbKAn35OvugeXwvG2X6xqKn
+   jMUMsfVhlHI9DJrP7nLwC/IwVlYujLIYubi/4JYJSa2NIkxLK6o7rkVpU
+   cAC2CEulvtvQEUUi7YTjtywEwTrU4UITk2S0KoCOBY8Gv1TYvpAfyphtv
+   t4DJ53o5uT4zJ6yEHgdsH//Zph0D2Q4uzGBilhRS/1tbEeA5VwZAiw3r9
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="352958141"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="352958141"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 14:16:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="857960392"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="857960392"
+Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 16 Aug 2023 14:16:54 -0700
+Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qWNss-0000Zh-0H;
+        Wed, 16 Aug 2023 21:16:54 +0000
+Date:   Thu, 17 Aug 2023 05:15:56 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huang Shijie <shijie@os.amperecomputing.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+Message-ID: <202308170409.yogZXrWD-lkp@intel.com>
+References: <20230811180520.131727-1-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811180520.131727-1-maz@kernel.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 19, 2023, Binbin Wu wrote:
-> Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK.
+Hi Marc,
 
-Using GENMASK_ULL() is an opportunistic cleanup, it is not the main purpose for
-this patch.  The main purpose is to extract the maximum theoretical mask for guest
-MAXPHYADDR so that it can be used to strip bits from CR3.
+kernel test robot noticed the following build errors:
 
-And rather than bury the actual use in "KVM: x86: Virtualize CR3.LAM_{U48,U57}",
-I think it makes sense to do the masking in this patch.  That change only becomes
-_necessary_ when LAM comes along, but it's completely valid without LAM.
+[auto build test ERROR on kvmarm/next]
+[also build test ERROR on arm/for-next arm64/for-next/core soc/for-next linus/master arm/fixes v6.5-rc6 next-20230816]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-That will also provide a place to explain why we decided to unconditionally mask
-the pgd (it's harmless for 32-bit guests, querying 64-bit mode would be more
-expensive, and for EPT the mask isn't tied to guest mode).  And it should also
-explain that using PT_BASE_ADDR_MASK would actually be wrong (PAE has 64-bit
-elements _except_ for CR3).
+url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Zyngier/KVM-arm64-pmu-Resync-EL0-state-on-counter-rotation/20230812-020712
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+patch link:    https://lore.kernel.org/r/20230811180520.131727-1-maz%40kernel.org
+patch subject: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
+config: arm-randconfig-r046-20230817 (https://download.01.org/0day-ci/archive/20230817/202308170409.yogZXrWD-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230817/202308170409.yogZXrWD-lkp@intel.com/reproduce)
 
-E.g. end up with a shortlog for this patch along the lines of:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308170409.yogZXrWD-lkp@intel.com/
 
-  KVM: x86/mmu: Drop non-PA bits when getting GFN for guest's PGD
+All errors (new ones prefixed by >>):
 
-and write the changelog accordingly.
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/arm_pmuv3.c:148:44: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     148 |         [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:133:44: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
+     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD                         0x004E
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/arm_pmuv3.c:149:45: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     149 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:134:44: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
+     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR                         0x004F
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/arm_pmuv3.c:150:42: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     150 |         [C(DTLB)][C(OP_READ)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:131:50: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
+     131 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD                  0x004C
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/arm_pmuv3.c:151:43: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     151 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)]  = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:132:50: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
+     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR                  0x004D
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/arm_pmuv3.c:153:44: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     153 |         [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
+         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:148:46: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
+     148 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD                      0x0060
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+   drivers/perf/arm_pmuv3.c:154:45: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+     154 |         [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmuv3.h:149:46: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
+     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR                      0x0061
+         |                                                                 ^~~~~~
+   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
+     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
+      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
+         |                                             ^~~~~~~~~~~~~~~~~~~~
+   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
+      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
+         |                                         ^~~~~~
+>> drivers/perf/arm_pmuv3.c:776:2: error: call to undeclared function 'kvm_vcpu_pmu_resync_el0'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     776 |         kvm_vcpu_pmu_resync_el0();
+         |         ^
+   55 warnings and 1 error generated.
 
-> No functional change intended.
-> 
-> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu_internal.h | 1 +
->  arch/x86/kvm/mmu/paging_tmpl.h  | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index d39af5639ce9..7d2105432d66 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -21,6 +21,7 @@ extern bool dbg;
->  #endif
->  
->  /* Page table builder macros common to shadow (host) PTEs and guest PTEs. */
-> +#define __PT_BASE_ADDR_MASK GENMASK_ULL(51, 12)
->  #define __PT_LEVEL_SHIFT(level, bits_per_level)	\
->  	(PAGE_SHIFT + ((level) - 1) * (bits_per_level))
->  #define __PT_INDEX(address, level, bits_per_level) \
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 0662e0278e70..00c8193f5991 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -62,7 +62,7 @@
->  #endif
->  
->  /* Common logic, but per-type values.  These also need to be undefined. */
-> -#define PT_BASE_ADDR_MASK	((pt_element_t)(((1ULL << 52) - 1) & ~(u64)(PAGE_SIZE-1)))
-> +#define PT_BASE_ADDR_MASK	((pt_element_t)__PT_BASE_ADDR_MASK)
->  #define PT_LVL_ADDR_MASK(lvl)	__PT_LVL_ADDR_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
->  #define PT_LVL_OFFSET_MASK(lvl)	__PT_LVL_OFFSET_MASK(PT_BASE_ADDR_MASK, lvl, PT_LEVEL_BITS)
->  #define PT_INDEX(addr, lvl)	__PT_INDEX(addr, lvl, PT_LEVEL_BITS)
-> -- 
-> 2.25.1
-> 
+
+vim +/kvm_vcpu_pmu_resync_el0 +776 drivers/perf/arm_pmuv3.c
+
+   758	
+   759	static void armv8pmu_start(struct arm_pmu *cpu_pmu)
+   760	{
+   761		struct perf_event_context *ctx;
+   762		int nr_user = 0;
+   763	
+   764		ctx = perf_cpu_task_ctx();
+   765		if (ctx)
+   766			nr_user = ctx->nr_user;
+   767	
+   768		if (sysctl_perf_user_access && nr_user)
+   769			armv8pmu_enable_user_access(cpu_pmu);
+   770		else
+   771			armv8pmu_disable_user_access();
+   772	
+   773		/* Enable all counters */
+   774		armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
+   775	
+ > 776		kvm_vcpu_pmu_resync_el0();
+   777	}
+   778	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
