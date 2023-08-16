@@ -2,155 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3628677E6FF
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 18:54:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC76077E76B
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 19:16:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344966AbjHPQyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 12:54:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35912 "EHLO
+        id S1345142AbjHPRQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 13:16:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345031AbjHPQxs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 12:53:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4999FE4C
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 09:53:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692204791;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gs4/ygsmx60svnx/BACaLYethMvInQSVH+8hNUPRRfQ=;
-        b=hm4fu6Gbu4hM8ka7Q6KmGyOj3rZ8gwXGoi3DCFJgdJx18lmg1N+EC+Ve6+bHWf1lE5mcp6
-        mLrnRgR8tta9Sl/CvJDO5ziX7Jwjno5Vopv5pKZw8sooWhbNGcL0tt67jmU5HF+1ikdisK
-        1/JweEhpF9pXIuEwwl4zpGkWVcps9OU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-490-xPC7SSzFPZObTLFJOWzNAg-1; Wed, 16 Aug 2023 12:53:09 -0400
-X-MC-Unique: xPC7SSzFPZObTLFJOWzNAg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-993831c639aso403196666b.2
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 09:53:09 -0700 (PDT)
+        with ESMTP id S1345156AbjHPRPo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 13:15:44 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE6826A6
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 10:15:41 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b9cd6a554cso100588631fa.3
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 10:15:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692206139; x=1692810939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KHzwP25lc2+5c3C6UwJkbP07p9JjcSoaHXyiPwCJzpU=;
+        b=fQXxAGiQN4dFyoOtWD4APY/yIxHdbFpIum5aPTDTxm+FvcXEsBlLCL3pp8mM/q77jE
+         c9F0FGauolC0CF9Nj7pTa+V8w4z3OmbLrheu8LNqRDULZ5ZcA9RvtIJqRB07jqTjaRwg
+         U+UpkPk/oH1zpY8XavV5RIAAhI42yzxQBoxOyp22+pci8pLhir5SQIeri2sq+gvCNAkH
+         9yHgb5IZt2KpLhFoxyFUM3uGj/IWm+9hpKnlLFfQ3TkXGhYKtCh7djaSyKxQqsvIA98l
+         93Z+MIp28orCRiEzJdR+fWZ1Wc+Fa3+bxv6/P76Sv4gdRJaXIqppjVcnPOM/3wQ3NDaU
+         Nj2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692204788; x=1692809588;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gs4/ygsmx60svnx/BACaLYethMvInQSVH+8hNUPRRfQ=;
-        b=OMYZVuSnpBXAPaJQ55uhiNM7nrJYa/r7QixZV3VD44edD+IIa6x3fqwLK7V5HcJIEX
-         kfbyY8HOcSDxzEjQ7f9KEyomWMNLG5Fibk9OFgs4uFQk8ulu1ETRhj9puB0ijJ9OHAE4
-         63wYJjanTEY37IporiKb/EeURop0tAkge7PycbNA32TU34/bj8zicjTv54AMXZDzuBss
-         ZiEl/7gqMqAludkukBU2UG9YFz+dXz8yuWK1QE1QAQWOtBLYV2p0x/57g/HcCo9Q8gp5
-         ik8yeWDm9IYLYpOt9jsiVA+swNk74y10gVEa7BOm0Vf2cGRsjAEtz7Y8AkGSdbVm06ls
-         2wqg==
-X-Gm-Message-State: AOJu0YwZFraV4i3+hMcZbfTPT9W0bpF7y6s6MtxVL1NkUD5wXL6hVgwy
-        WDI4U5iAe2SP0Tdi8aIOiuNQOfAwbmmKC/cPK2CQdeHet4Pe6rmiG/POJP+W41XBxF8N+5rDx6E
-        OiHhD1v8oG6A+
-X-Received: by 2002:a17:906:8a6c:b0:98e:2b01:ab97 with SMTP id hy12-20020a1709068a6c00b0098e2b01ab97mr1640172ejc.68.1692204788522;
-        Wed, 16 Aug 2023 09:53:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFU1ojiVZymlqloH4pPtPiX1lfCdcDJ2adbg7XhEXCcNlm0BxaLm0gVIFz94ySyezwHEVrMGA==
-X-Received: by 2002:a17:906:8a6c:b0:98e:2b01:ab97 with SMTP id hy12-20020a1709068a6c00b0098e2b01ab97mr1640156ejc.68.1692204788162;
-        Wed, 16 Aug 2023 09:53:08 -0700 (PDT)
-Received: from starship ([77.137.131.138])
-        by smtp.gmail.com with ESMTPSA id k17-20020a17090646d100b00997d76981e0sm8672389ejs.208.2023.08.16.09.53.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 09:53:07 -0700 (PDT)
-Message-ID: <6b2aedbcff7625574596b363651e0bbd76b03140.camel@redhat.com>
-Subject: Re: Fwd: kvm: Windows Server 2003 VM fails to work on 6.1.44 (works
- fine on 6.1.43)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Roman Mamedov <rm+bko@romanrm.net>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux KVM <kvm@vger.kernel.org>, Borislav Petkov <bp@alien8.de>
-Date:   Wed, 16 Aug 2023 19:53:05 +0300
-In-Reply-To: <87cyzn5cln.fsf@redhat.com>
-References: <8cc000d5-9445-d6f1-f02e-4629a4a59e0e@gmail.com>
-         <87o7j75g0g.fsf@redhat.com> <87il9f5eg1.fsf@redhat.com>
-         <87cyzn5cln.fsf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20221208; t=1692206139; x=1692810939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KHzwP25lc2+5c3C6UwJkbP07p9JjcSoaHXyiPwCJzpU=;
+        b=c+WMf7dFAERO/2XbVj1e3z/iFNp2bwFOr4xLFY9GuO5+8Al0eWgKPSUjAFUslwQjxL
+         pbpE4WmykTRCFlnd1i2Zm7xCd9Biy9h5EOmIs45G3wlILperYAe8hJjlb/HOkD0BjBSj
+         RFGLVXOOlJXS3Rhf+aGcnuHJzARwDHSRSZEhaL5EH8hauvGwvAD1hRGQ0HeN08kzA+Mo
+         ctFoW62/e4J2UJYpKyZac5eT9X62o9tD0v59JrYzm7yr69W8b7fgJWy7b/U+cOIA70It
+         S9BlwJEhYSHF+ggVV7aZnwwybD6UGXcKOj7ZMnM6/0TPRYOqtTEnVAN3CmEZvXLjZuOM
+         VTsA==
+X-Gm-Message-State: AOJu0YzrZEANKCwIpbjD994Icqy3CESRs99h+rbD/Fde6serc19zHQL5
+        BX6hiCRtvhCbzK49Pgf9fLK0qAktBcuNq3QT9r13ig==
+X-Google-Smtp-Source: AGHT+IGLSaJ3/O+Pfy5Uz0nILdeFwQS4LZ9hdXZc4YhdJvRYKlDuwaIsK6a1aIppt4bzPTuIfQMIrpF3hvU89A6BsQc=
+X-Received: by 2002:a2e:7013:0:b0:2b6:a763:5d13 with SMTP id
+ l19-20020a2e7013000000b002b6a7635d13mr1934137ljc.27.1692206139312; Wed, 16
+ Aug 2023 10:15:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+ <20230807162210.2528230-11-jingzhangos@google.com> <eaa2519e-15b3-2fd4-199e-8e3368df7e0d@redhat.com>
+In-Reply-To: <eaa2519e-15b3-2fd4-199e-8e3368df7e0d@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Wed, 16 Aug 2023 10:15:26 -0700
+Message-ID: <CAAdAUtj0zUqpjm1L+7-D5eeEK85f0jiqDyjoQm47tpzDGxhaLw@mail.gmail.com>
+Subject: Re: [PATCH v8 10/11] KVM: arm64: selftests: Import automatic system
+ register definition generation from kernel
+To:     Shaoqin Huang <shahuang@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-У ср, 2023-08-16 у 15:41 +0200, Vitaly Kuznetsov пише:
-> Vitaly Kuznetsov <vkuznets@redhat.com> writes:
-> 
-> > Vitaly Kuznetsov <vkuznets@redhat.com> writes:
-> > 
-> > > Bagas Sanjaya <bagasdotme@gmail.com> writes:
-> > > 
-> > > > Hi,
-> > > > 
-> > > > I notice a regression report on Bugzilla [1]. Quoting from it:
-> > > > 
-> > > > > Hello,
-> > > > > 
-> > > > > I have a virtual machine running the old Windows Server 2003. On kernels 6.1.44 and 6.1.45, the QEMU VNC window stays dark, not switching to any of the guest's video modes and the VM process uses only ~64 MB of RAM of the assigned 2 GB, indefinitely. It's like the VM is paused/halted/stuck before even starting. The process can be killed successfully and then restarted again (with the same result), so it is not deadlocked in kernel or the like.
-> > > > > 
-> > > > > Kernel 6.1.43 works fine.
-> > > > > 
-> > > > > I have also tried downgrading CPU microcode from 20230808 to 20230719, but that did not help.
-> > > > > 
-> > > > > The CPU is AMD Ryzen 5900. I suspect some of the newly added mitigations may be the culprit?
-> > > > 
-> > > > See Bugzilla for the full thread.
-> > > > 
-> > > > Anyway, I'm adding it to regzbot as stable-specific regression:
-> > > > 
-> > > > #regzbot introduced: v6.1.43..v6.1.44 https://bugzilla.kernel.org/show_bug.cgi?id=217799
-> > > > #regzbot title: Windows Server 2003 VM boot hang (only 64MB RAM allocated)
-> > > > 
-> > > > Thanks.
-> > > > 
-> > > > [1]: https://bugzilla.kernel.org/show_bug.cgi?id=217799
-> > > 
-> > > From KVM's PoV, I don't see any KVM/x86 patches v6.1.44..v6.1.45 
-> > 
-> > Oh, sorry, my bad, in the description of the BZ it is said that 6.1.44
-> > is already broken, so it's most likely srso stuff then:
-> > 
-> > dd5f2ef16e3c x86: fix backwards merge of GDS/SRSO bit
-> > 4f25355540ad x86/srso: Tie SBPB bit setting to microcode patch detection
-> > 77cf32d0dbfb x86/srso: Add a forgotten NOENDBR annotation
-> > c7f2cd045542 x86/srso: Fix return thunks in generated code
-> > c9ae63d773ca x86/srso: Add IBPB on VMEXIT
-> > 79c8091888ef x86/srso: Add IBPB
-> > 98f62883e751 x86/srso: Add SRSO_NO support
-> > 9139f4b6dd4f x86/srso: Add IBPB_BRTYPE support
-> > ac41e90d8daa x86/srso: Add a Speculative RAS Overflow mitigation
-> 
-> Sean's https://lore.kernel.org/all/20230811155255.250835-1-seanjc@google.com/
-> (alteady in 'tip') can actually be related and I see it was already
-> tagged for stable@. Can anyone check if it really helps?
-> 
-> > dec3b91f2c4b x86/cpu, kvm: Add support for CPUID_80000021_EAX
-> > 
-> > it would still be great to try to bisect to the particular patch causing
-> > the issue.
+Hi Shaoqin,
 
-My 0.2 cents on something that might be related:
+On Tue, Aug 15, 2023 at 11:54=E2=80=AFPM Shaoqin Huang <shahuang@redhat.com=
+> wrote:
+>
+> Hi Jing,
+>
+> On 8/8/23 00:22, Jing Zhang wrote:
+> > Import automatic system register definition generation from kernel and
+> > update system register usage accordingly.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
+ests/kvm/Makefile
+> > index c692cc86e7da..a8cf0cb04db7 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -200,14 +200,15 @@ ifeq ($(ARCH),x86_64)
+> >   LINUX_TOOL_ARCH_INCLUDE =3D $(top_srcdir)/tools/arch/x86/include
+> >   else
+> >   LINUX_TOOL_ARCH_INCLUDE =3D $(top_srcdir)/tools/arch/$(ARCH)/include
+> > +ARCH_GENERATED_INCLUDE =3D $(top_srcdir)/tools/arch/$(ARCH)/include/ge=
+nerated
+> >   endif
+> >   CFLAGS +=3D -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=3Dg=
+nu99 \
+> > -     -Wno-gnu-variable-sized-type-not-at-end -MD\
+> > +     -Wno-gnu-variable-sized-type-not-at-end -MD \
+> >       -fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+> >       -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+> >       -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+> >       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+> > -     $(KHDR_INCLUDES)
+> > +     -I$(ARCH_GENERATED_INCLUDE) $(KHDR_INCLUDES)
+> >   ifeq ($(ARCH),s390)
+> >       CFLAGS +=3D -march=3Dz10
+> >   endif
+> > @@ -255,8 +256,16 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+> >   $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+> >       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -=
+o $@
+> >
+> > +ifeq ($(ARCH),arm64)
+> > +GEN_SYSREGS :=3D $(ARCH_GENERATED_INCLUDE)/asm/sysreg-defs.h
+> > +ARCH_TOOLS :=3D $(top_srcdir)/tools/arch/$(ARCH)/tools/
+> > +
+> > +$(GEN_SYSREGS): $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TOOLS)/sysreg
+> > +     mkdir -p $(dir $@); awk -f $(ARCH_TOOLS)/gen-sysreg.awk $(ARCH_TO=
+OLS)/sysreg > $@
+> > +endif
+> > +
+> >   x :=3D $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+> > -$(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+> > +$(TEST_GEN_PROGS): $(LIBKVM_OBJS) $(GEN_SYSREGS)
+>
+> I don't this this really works. Since the $(GEN_SYSREG) is the
+> prerequisites of $(TEST_GEN_PROGS). Only when $(TEST_GEN_PROGS) being
+> compiled, the $(GEN_SYSREG) can be generated.
+>
+> But the fact is, the $(TEST_GEN_PROGS) is relies on $(TEST_GEN_OBJ),
+> which means $(TEST_GEN_OBJ) will be compiled before $(TEST_GEN_PROGS),
+> but $(TEST_GEN_OBJ) depends on $(GEN_SYSREG) again, at the time, the
+> $(GEN_SYSREG) hasn't been generated, so it will has error:
+>
+> No such file or directory.
+>
+> #include "asm/sysreg-defs.h"
+>
+> I think the correct way to generate $(GEN_SYSREGS) is add a prerequisite
+> for $(TEST_GEN_OBJ), like:
+>
+> $(TEST_GEN_OBJ): $(GEN_SYSREGS)
 
-On my Intel laptop I can't boot a windows guest with hyperv enabled inside (either regular hyperv win10 or win11 with core isolation)
-I know now that 'ibt=off' on host kernel line fixes this, but I didn't yet bisected it to see which commit started it.
-(I took this from https://bugzilla.redhat.com/show_bug.cgi?id=2221531, which is unrelated but I just noticed it somehow and tried the solution)
+You're right. Fixed.
 
-I run upstream 6.4 kernel + kvm/queue on that laptop.
+>
+> Thanks,
+> Shaoqin
+>
+> >   $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+> >
+> >   cscope: include_paths =3D $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) inc=
+lude lib ..
+> --
+> Shaoqin
+>
 
-Best regards,
-	Maxim Levitsky
-
+Thanks,
+Jing
