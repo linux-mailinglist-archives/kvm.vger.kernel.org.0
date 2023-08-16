@@ -2,181 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E481C77DAC2
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 08:59:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E71577DAF4
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 09:11:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242227AbjHPG7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 02:59:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
+        id S242274AbjHPHLN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 03:11:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242226AbjHPG7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 02:59:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4461FD0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 23:58:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692169099;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=coMx+qrk3+nAFJq/8MLLAKSoS+skVzUmoa64bBG+3v8=;
-        b=DK1bTv5j0PmS/Z/f3eitGYNzUnW6Gb7+dHVxM3oYmJUPFwGwmeJ7u0NpuYGSf3LV3kKGrN
-        0n4QcoygYKp0I040nShANji/dzWL/1tEcpmFf9Yr2lkFlYkYYeIe+WPxuapzQ52cBBJgA3
-        2FIG4XbdbMe+WHB47xB7FkXyxmg6DWU=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-74-fYqvA-DKO1KT-tUW6fyFww-1; Wed, 16 Aug 2023 02:58:18 -0400
-X-MC-Unique: fYqvA-DKO1KT-tUW6fyFww-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-26b4befaf7cso882420a91.0
-        for <kvm@vger.kernel.org>; Tue, 15 Aug 2023 23:58:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692169097; x=1692773897;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=coMx+qrk3+nAFJq/8MLLAKSoS+skVzUmoa64bBG+3v8=;
-        b=Il+PtvT/2j1DtDLNsaMiLFE9mSdkhhzA3oRnih3VXe1gEdrCwxIVpkEcCjOwoK5MQp
-         ui5AxiLI5sMoOjSRZcqpMAzgxcU17AOop8OmyQOdPzpsAjTDPet6yo5c956N298RQ3DU
-         FZ2+vu4ReIHs8dECSQjqBmRM3xSEVnYfZl7NPOqXa4jFEIEiUT0/zhpBi1oopAakYTLx
-         vqs9CV/qy10OKnfJyMO2npSxuhDQdgoO6Q0Ovm7M7634AVZ/CY/Zyl5F+GRsfyNEYRMs
-         Zi0MhoMPQrJAxNX/Y3yc2e4uNrheusy97GzrjCCeBJyeoEiQ+djJMY4WM+4owPJOgmvX
-         HgYA==
-X-Gm-Message-State: AOJu0YwzWVxS9IKaqIDCDwc5GuKUel5BYaHnJlLVg13eUMZoymtqtjdI
-        tKG/uDhJ7Xr7iNqCfteemWo9dYfR+9FMQIjD7/3L9vsITAmiwMvPBIgOHx+HL61IfWW+y5VYYwZ
-        SXs/Kg8ABPSvZ
-X-Received: by 2002:a17:902:d2c1:b0:1bb:9e6e:a9f3 with SMTP id n1-20020a170902d2c100b001bb9e6ea9f3mr1275670plc.4.1692169097050;
-        Tue, 15 Aug 2023 23:58:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkQ6TEk2n+Vw3400DfBNV4tQEKHqCod2o55k2tbJS/5J/3qoq6lE5clV2Y5xNar/cYRPaAng==
-X-Received: by 2002:a17:902:d2c1:b0:1bb:9e6e:a9f3 with SMTP id n1-20020a170902d2c100b001bb9e6ea9f3mr1275646plc.4.1692169096760;
-        Tue, 15 Aug 2023 23:58:16 -0700 (PDT)
-Received: from [10.66.61.39] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id o5-20020a170902d4c500b001bb9bc8d232sm12229560plg.61.2023.08.15.23.58.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 23:58:16 -0700 (PDT)
-Message-ID: <268054f7-e2f5-37fb-187c-3b2cca41b31a@redhat.com>
-Date:   Wed, 16 Aug 2023 14:58:11 +0800
+        with ESMTP id S242291AbjHPHLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 03:11:02 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF624210E;
+        Wed, 16 Aug 2023 00:11:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692169861; x=1723705861;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Avk47HRr7hmd3aiB6mFoRtvYzU40ndIbm2aY2S3QoHo=;
+  b=iTlD8kyKPJ8HKHEOrZCNzkj0OM9/AiIbXT2x7yDRiDxSpvqmbsYLSiPb
+   WGL3R763bf/JcL92Tg90S584aj0SCrj2e8OhIWhae8fEDSB1sYNkCBw1t
+   EDVlmXDapdlTIUPrUF1fMba4QYe9fy2ZABZO0PRAUOmADDcE8DwndAnpt
+   TUnBtf/wXW4mT6zS6ViKP8EKdsisg1pwMcJeMk2a12zh+NJ9CPrgvSFRB
+   v6iKxv9C3U9ngX3Wpc24C2twmZQODU8U7OtjPQ1CdMetsaVzXsNWRWL0p
+   8l9V1j9IataEytJVFjCI9Uqe2sxGl27aatkMbSDp2BrxYZYLuE6AhWeVx
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="369933508"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="369933508"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 00:08:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="769084380"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="769084380"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.52]) ([10.238.10.52])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 00:08:56 -0700
+Message-ID: <66235c55-05ac-edd5-c45e-df1c42446eb3@linux.intel.com>
+Date:   Wed, 16 Aug 2023 15:08:53 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v8 11/11] KVM: arm64: selftests: Test for setting ID
- register from usersapce
-Content-Language: en-US
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Cornelia Huck <cohuck@redhat.com>
-References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-12-jingzhangos@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230807162210.2528230-12-jingzhangos@google.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v10 3/9] KVM: x86: Use KVM-governed feature framework to
+ track "LAM enabled"
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "David.Laight@ACULAB.COM" <David.Laight@ACULAB.COM>
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+ <20230719144131.29052-4-binbin.wu@linux.intel.com>
+ <c4faf38ea79e0f4eb3d35d26c018cd2bfe9fe384.camel@intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <c4faf38ea79e0f4eb3d35d26c018cd2bfe9fe384.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jing,
 
-On 8/8/23 00:22, Jing Zhang wrote:
-> Add tests to verify setting ID registers from userapce is handled
-> correctly by KVM. Also add a test case to use ioctl
-> KVM_ARM_GET_REG_WRITABLE_MASKS to get writable masks.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->   tools/testing/selftests/kvm/Makefile          |   1 +
->   .../selftests/kvm/aarch64/set_id_regs.c       | 453 ++++++++++++++++++
->   2 files changed, 454 insertions(+)
->   create mode 100644 tools/testing/selftests/kvm/aarch64/set_id_regs.c
-> 
-> +
-> +static void test_guest_reg_read(struct kvm_vcpu *vcpu)
-> +{
-> +	struct ucall uc;
-> +	bool done = false;
-> +
-> +	while (!done) {
-> +		vcpu_run(vcpu);
-> +
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			break;
-> +		case UCALL_SYNC:
-> +			uint64_t val;
-aarch64/set_id_regs.c:408:4: error: a label can only be part of a 
-statement and a declaration is not a statement.
 
-I can encounter a compiler error at this line. Why not just put the 
-uint64_t at the beginning of the function.
+On 8/16/2023 11:46 AM, Huang, Kai wrote:
+> On Wed, 2023-07-19 at 22:41 +0800, Binbin Wu wrote:
+>> Use the governed feature framework to track if Linear Address Masking (LAM)
+>> is "enabled", i.e. if LAM can be used by the guest. So that guest_can_use()
+>> can be used to support LAM virtualization.
+> Better to explain why to use governed feature for LAM?  Is it because there's
+> hot path(s) calling guest_cpuid_has()?  Anyway some context of why can help
+> here.
+Yes, to avoid calling guest_cpuid_has() in CR3 handling and instruction 
+emulation paths.
+I will add the context next version.
+Thanks!
 
-Thanks,
-Shaoqin
+>
+>> LAM modifies the checking that is applied to 64-bit linear addresses, allowing
+>> software to use of the untranslated address bits for metadata and masks the
+>> metadata bits before using them as linear addresses to access memory.
+>>
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> ---
+>>   arch/x86/kvm/governed_features.h | 2 ++
+>>   arch/x86/kvm/vmx/vmx.c           | 3 +++
+>>   2 files changed, 5 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/governed_features.h b/arch/x86/kvm/governed_features.h
+>> index 40ce8e6608cd..708578d60e6f 100644
+>> --- a/arch/x86/kvm/governed_features.h
+>> +++ b/arch/x86/kvm/governed_features.h
+>> @@ -5,5 +5,7 @@ BUILD_BUG()
+>>   
+>>   #define KVM_GOVERNED_X86_FEATURE(x) KVM_GOVERNED_FEATURE(X86_FEATURE_##x)
+>>   
+>> +KVM_GOVERNED_X86_FEATURE(LAM)
+>> +
+>>   #undef KVM_GOVERNED_X86_FEATURE
+>>   #undef KVM_GOVERNED_FEATURE
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 0ecf4be2c6af..ae47303c88d7 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -7783,6 +7783,9 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>   		vmx->msr_ia32_feature_control_valid_bits &=
+>>   			~FEAT_CTL_SGX_LC_ENABLED;
+>>   
+>> +	if (boot_cpu_has(X86_FEATURE_LAM))
+>> +		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_LAM);
+>> +
+> If you want to use boot_cpu_has(), it's better to be done at your last patch to
+> only set the cap bit when boot_cpu_has() is true, I suppose.
+Yes, but new version of kvm_governed_feature_check_and_set() of 
+KVM-governed feature framework will check against kvm_cpu_cap_has() as well.
+I will remove the if statement and call 
+kvm_governed_feature_check_and_set()  directly.
+https://lore.kernel.org/kvm/20230815203653.519297-2-seanjc@google.com/
 
-> +
-> +			/* Make sure the written values are seen by guest */
-> +			vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(uc.args[2]), &val);
-> +			ASSERT_EQ(val, uc.args[3]);
-> +			break;
-> +		case UCALL_DONE:
-> +			done = true;
-> +			break;
-> +		default:
-> +			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-> +		}
-> +	}
-> +}
-> +
-> +int main(void)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +	bool aarch64_only;
-> +	uint64_t val, el0;
-> +	int ftr_cnt;
-> +
-> +	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-> +
-> +	/* Check for AARCH64 only system */
-> +	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-> +	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_EL0), val);
-> +	aarch64_only = (el0 == ID_AA64PFR0_EL1_ELx_64BIT_ONLY);
-> +
-> +	ksft_print_header();
-> +
-> +	ftr_cnt = ARRAY_SIZE(ftr_id_aa64dfr0_el1) + ARRAY_SIZE(ftr_id_dfr0_el1)
-> +		  + ARRAY_SIZE(ftr_id_aa64pfr0_el1) + ARRAY_SIZE(ftr_id_aa64mmfr0_el1)
-> +		  + ARRAY_SIZE(ftr_id_aa64mmfr1_el1) + ARRAY_SIZE(ftr_id_aa64mmfr2_el1)
-> +		  + ARRAY_SIZE(ftr_id_aa64mmfr3_el1) - ARRAY_SIZE(test_regs);
-> +
-> +	ksft_set_plan(ftr_cnt);
-> +
-> +	test_user_set_reg(vcpu, aarch64_only);
-> +	test_guest_reg_read(vcpu);
-> +
-> +	kvm_vm_free(vm);
-> +
-> +	ksft_finished();
-> +}
 
--- 
-Shaoqin
+>
+>>   	/* Refresh #PF interception to account for MAXPHYADDR changes. */
+>>   	vmx_update_exception_bitmap(vcpu);
+>>   }
 
