@@ -2,70 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2001877D8E7
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6956277D8F0
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:20:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241538AbjHPDPY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 23:15:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35074 "EHLO
+        id S241526AbjHPDTl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 23:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241518AbjHPDOw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 23:14:52 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F3A1FC8;
-        Tue, 15 Aug 2023 20:14:51 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-688787570ccso556240b3a.2;
-        Tue, 15 Aug 2023 20:14:51 -0700 (PDT)
+        with ESMTP id S241525AbjHPDTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 23:19:25 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA901FCA;
+        Tue, 15 Aug 2023 20:19:24 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-686f1240a22so6005151b3a.0;
+        Tue, 15 Aug 2023 20:19:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692155691; x=1692760491;
+        d=gmail.com; s=20221208; t=1692155964; x=1692760764;
         h=content-transfer-encoding:content-language:in-reply-to:mime-version
          :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4JSYxFxoCtFaYHq5tDU35/I/PKWW/aYx+DXVUemb6C8=;
-        b=IVIOClPljq34fr21uTeNphPBEvAoJLU/liAPxCBuJmyUK9k41dnPmVJfq/AhruOP6+
-         mj2oa6spfJfGtV4628IAPxNYK+g/FM3BLrOH/K+NJi9pDO8LH1R29jUwR7XDOY9HMTsg
-         ZgFwWwsmQ7lqUS++CpU59fmiqj5tZtJi8/nKLKYPA6Dv2MZ047/xGP0+45nFEr3CDUFs
-         kaoaURMfFyxiwjVnJBxRJfz7YMKpVWrHGXTwoobBd9v4VDflFE0sRgUmD5EtFlBd6K7w
-         GK8qRVg2RVqb5+WkcAIYyjW6OaYPzNPmDYDiRZ432rFV4Ux/gpVVJhZcWgG3OAyiUbLt
-         RaJQ==
+        bh=zx6N9SoWNF/u8V+Sw75Ge9zPmSloa2YLfzZtVAyqGyY=;
+        b=s3C8ACJj/lDPCCddh1QoxVHfewVO7396V2p0GBnixVGYMJKuEn8LI1f58ij29dTrPT
+         aTccs/sE4GUWui4HNce/CCxS3/5UXv/C5xU/IFQ6gHV+yUxcP2D9vM3mdXtwDuLZJR76
+         aeIIrXMhonKMbDxjGvoDN3XN3NYmOVgTiTKtTYcZ7C+mOJN5JoJa/6fgnaqqTgR6PGEU
+         F5VeaQLA0AtEtPLQsYlkB8X2tHqquPgrTYXkIFupBNn1b6/DOavYgJ6FfEsCgQQkz0Hl
+         AtjFbDDRP9YtWXtX0qb1EZicp1a0WzT2G1KYBJ7UZRWyuDTFqkNtFUqsC3xlGvM8IF+1
+         ZyqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692155691; x=1692760491;
+        d=1e100.net; s=20221208; t=1692155964; x=1692760764;
         h=content-transfer-encoding:content-language:in-reply-to:mime-version
          :user-agent:date:message-id:from:references:cc:to:subject
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4JSYxFxoCtFaYHq5tDU35/I/PKWW/aYx+DXVUemb6C8=;
-        b=TJXc+Tt4XDoN5PcxluflpHtRe7XQX8p9GxZnOwj1thrxv/9RGh3h5sjG0rYDWNuxuG
-         CsjcFQ535b/n4vTFUZRp6aB2qCTEIump2csV7fehWTBwo3XJKJAuwVqytAv82eUUI9cK
-         H9PZqoiH0trd0KPdbvCYifYepgN//cqSChxRPJtkTVlhNGePkOiwpMye0CSvo12J5NxW
-         1eN8KrrZk4TLH9/w+6Hx2OQzpSfM5Qo6ZhtBoFe/apoIumhnBeMGQ11ckG+IjcoF1STF
-         nSmrYeDYnvVKSYS/2zcHvNa0Xzihat5nuiNxvJ3Id3V3OBNpLrd9xHell+xg2RRmJOfj
-         tn0w==
-X-Gm-Message-State: AOJu0YyGLvGZ43363/sG2vBVtVoJNWgxO32i7HUmqzJ5MCjvwUnCxAp7
-        pezuBTZ8OEAEVNrNw+dGlvw=
-X-Google-Smtp-Source: AGHT+IEAlXG+94dueZdgF8qUiyf6p18xZm8TZWLHkpOLwdvpWUDRBxCs7nQ4NLKP2AEo3HiDAEA0Jg==
-X-Received: by 2002:a05:6a00:189c:b0:686:5e0d:bd4f with SMTP id x28-20020a056a00189c00b006865e0dbd4fmr749285pfh.0.1692155691323;
-        Tue, 15 Aug 2023 20:14:51 -0700 (PDT)
+        bh=zx6N9SoWNF/u8V+Sw75Ge9zPmSloa2YLfzZtVAyqGyY=;
+        b=RmTOWSwwSmvkPU/7CjCOc1FV6jdLUGT6Kw3IIRTrvG6IN+rWMHTMLNjs7FWnk0nZfG
+         garru9RXDpyODsRDYuaH0v0jqGPJUwzfsSz3wXxAIh0lGaw5qY1MSF7CrG4nuvnZ07Y0
+         JyyWEytmeTfdVfrkKQN1CPRA9yUerjCNUQr9yDAU6fy9Ow8xKKi9Rh70db4BgYZ4x+HB
+         mj3/pEkcJsoeTGmGNkYEGYtGRFu+aX/BWNZBmqeVXzXVdkN1VWP+eZ6HbGRbYHOTAvd6
+         3CCB2Disb/PJKM4QGpupRHerQ5BFAEQq5Tz0oiNmiW/nHbonesJFawFCRJ9FAtpmiyLP
+         ldwA==
+X-Gm-Message-State: AOJu0Yzogwz++RoeeLM5GCSb4+Z01+JWA6nVIAcfzeJYW4X9yQj7MHi0
+        XqWnz2jvmADSByyQuONEj18=
+X-Google-Smtp-Source: AGHT+IEsefrY5bIASd4gMz3zA3GYRyya7JFTsszT0s4RlXNEyyyIpIa7AqHk4qYms/LNviBFAwlnpw==
+X-Received: by 2002:a05:6a00:22d0:b0:676:ad06:29d7 with SMTP id f16-20020a056a0022d000b00676ad0629d7mr971769pfj.15.1692155964000;
+        Tue, 15 Aug 2023 20:19:24 -0700 (PDT)
 Received: from localhost.localdomain ([146.112.118.69])
-        by smtp.gmail.com with ESMTPSA id q18-20020a62e112000000b006874a6e74b4sm10048422pfh.151.2023.08.15.20.14.47
+        by smtp.gmail.com with ESMTPSA id m22-20020aa78a16000000b00686f048bb9dsm122891pfa.74.2023.08.15.20.19.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 20:14:50 -0700 (PDT)
+        Tue, 15 Aug 2023 20:19:23 -0700 (PDT)
 Subject: Re: [PATCH v3 4/6] KVM: PPC: Book3s HV: Hold LPIDs in an unsigned
  long
-To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, mikey@neuling.org,
-        paulus@ozlabs.org, vaibhav@linux.ibm.com, sbhat@linux.ibm.com,
-        gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
-        amachhiw@linux.vnet.ibm.com
+To:     David Laight <David.Laight@ACULAB.COM>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Cc:     "mikey@neuling.org" <mikey@neuling.org>,
+        "sbhat@linux.ibm.com" <sbhat@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "amachhiw@linux.vnet.ibm.com" <amachhiw@linux.vnet.ibm.com>,
+        "gautam@linux.ibm.com" <gautam@linux.ibm.com>,
+        "npiggin@gmail.com" <npiggin@gmail.com>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        "vaibhav@linux.ibm.com" <vaibhav@linux.ibm.com>,
+        "kconsul@linux.vnet.ibm.com" <kconsul@linux.vnet.ibm.com>
 References: <20230807014553.1168699-1-jniethe5@gmail.com>
  <20230807014553.1168699-5-jniethe5@gmail.com>
- <CUS477NDPEQI.27SBUCRNYD0XG@wheely>
+ <014488c6d90446f38154a2f7645aa053@AcuMS.aculab.com>
 From:   Jordan Niethe <jniethe5@gmail.com>
-Message-ID: <7e1df0da-77e4-eca7-e487-f51fc0968c14@gmail.com>
-Date:   Wed, 16 Aug 2023 13:14:45 +1000
+Message-ID: <1b187307-596d-392f-45a6-3da2c9aa20d9@gmail.com>
+Date:   Wed, 16 Aug 2023 13:19:17 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <CUS477NDPEQI.27SBUCRNYD0XG@wheely>
+In-Reply-To: <014488c6d90446f38154a2f7645aa053@AcuMS.aculab.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,8 +87,10 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 14/8/23 6:12 pm, Nicholas Piggin wrote:
-> On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
+On 14/8/23 6:15 pm, David Laight wrote:
+> From: Jordan Niethe
+>> Sent: 07 August 2023 02:46
+>>
 >> The LPID register is 32 bits long. The host keeps the lpids for each
 >> guest in an unsigned word struct kvm_arch. Currently, LPIDs are already
 >> limited by mmu_lpid_bits and KVM_MAX_NESTED_GUESTS_SHIFT.
@@ -97,47 +105,17 @@ On 14/8/23 6:12 pm, Nicholas Piggin wrote:
 >> nestedv1 cases as their lpid values are already limited to valid ranges
 >> so in those contexts the lpid can be used as an unsigned word safely as
 >> needed.
->>
->> In the PAPR, the H_RPT_INVALIDATE pid/lpid parameter is already
->> specified as an unsigned long so change pseries_rpt_invalidate() to
->> match that.  Update the callers of pseries_rpt_invalidate() to also take
->> an unsigned long if they take an lpid value.
 > 
-> I don't suppose it would be worth having an lpid_t.
+> Shouldn't it be changed to u64?
 
-I actually introduced that when I was developing for the purpose of 
-doing the conversion, but I felt like it was unnecessary in the end, it 
-is just a wider integer and it is simpler to treat it that way imho.
+This will only be for 64-bit PPC so an unsigned long will always be 64 
+bits wide, but I can use a u64 instead.
 
 > 
->> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
->> index 4adff4f1896d..229f0a1ffdd4 100644
->> --- a/arch/powerpc/kvm/book3s_xive.c
->> +++ b/arch/powerpc/kvm/book3s_xive.c
->> @@ -886,10 +886,10 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu, u8 prio,
->>   
->>   	if (single_escalation)
->>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d",
->> -				 vcpu->kvm->arch.lpid, xc->server_num);
->> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num);
->>   	else
->>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d-%d",
->> -				 vcpu->kvm->arch.lpid, xc->server_num, prio);
->> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num, prio);
->>   	if (!name) {
->>   		pr_err("Failed to allocate escalation irq name for queue %d of VCPU %d\n",
->>   		       prio, xc->server_num);
+> 	David
+>   
 > 
-> I would have thought you'd keep the type and change the format.
-
-yeah, I will do that.
-
-> 
-> Otherwise seems okay too.
-
-Thanks.
-
-> 
-> Thanks,
-> Nick
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+> Registration No: 1397386 (Wales)
 > 
