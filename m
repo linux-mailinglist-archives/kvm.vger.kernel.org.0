@@ -2,230 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF6A277EB86
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 23:17:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B90D777EBD8
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 23:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346407AbjHPVRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 17:17:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47074 "EHLO
+        id S1346604AbjHPVaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 17:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346403AbjHPVQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 17:16:59 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90512128
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:16:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692220618; x=1723756618;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=QcX46Lc6STB1co3R3vSNDqsmhBlhD/jldK7+HV4nVdM=;
-  b=oKNVpvy023FOY03SRlFWXQjHAt5MJp59CNVVqqn4ykqJt1s90K4uB7vz
-   UVdGc6q+hTAkZSYBRAEHtGwfZ93Z2spXaG+8EDolM6967WadxOzBThoNg
-   MhvovCWDCNbxQ3YvK8iy1bDnLCCuIml7TEtbKAn35OvugeXwvG2X6xqKn
-   jMUMsfVhlHI9DJrP7nLwC/IwVlYujLIYubi/4JYJSa2NIkxLK6o7rkVpU
-   cAC2CEulvtvQEUUi7YTjtywEwTrU4UITk2S0KoCOBY8Gv1TYvpAfyphtv
-   t4DJ53o5uT4zJ6yEHgdsH//Zph0D2Q4uzGBilhRS/1tbEeA5VwZAiw3r9
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="352958141"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="352958141"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 14:16:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="857960392"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="857960392"
-Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 16 Aug 2023 14:16:54 -0700
-Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qWNss-0000Zh-0H;
-        Wed, 16 Aug 2023 21:16:54 +0000
-Date:   Thu, 17 Aug 2023 05:15:56 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huang Shijie <shijie@os.amperecomputing.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-Message-ID: <202308170409.yogZXrWD-lkp@intel.com>
-References: <20230811180520.131727-1-maz@kernel.org>
+        with ESMTP id S1346519AbjHPV3n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 17:29:43 -0400
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4046C1FD0
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:29:31 -0700 (PDT)
+Received: by mail-ua1-x935.google.com with SMTP id a1e0cc1a2514c-791b8525b59so2306443241.1
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 14:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692221370; x=1692826170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DlcbRLxSS9LJxSfztLkyLAJRRpXHnMpareK1YLEXhh8=;
+        b=LSHhMsW41PTgH3YTb+e8PZKig6HyY6Drph3GPlflLxEgpiZVP4/6mvaBBknLkzx7DY
+         qYnOAiEg9BrIRQiL0N/zHwJ2Dy8XXAmFbdNTj0D+kRFVIzeYZU3pcJv8yDCHCg0KXyXQ
+         +ghop3iVqkFWQSJZwMbZzBLoV8wrC5MsuBCIEUXp7Yb+kq6tXfv02mdFzCmPS8HvcFzs
+         k361vZVKLKD7yaybs+fYvYzV+jExZ+o44J6TmCvCw5oSc/W8L5UOBLRqR5QN4N8EdUIA
+         E6kB0/Qu7IEsg972YNeCwjLRY3hwwa8NksShW89ifQWd1ud5pbNKgQhy0n3QKz+TvfAw
+         WMVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692221370; x=1692826170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DlcbRLxSS9LJxSfztLkyLAJRRpXHnMpareK1YLEXhh8=;
+        b=Zij2r3CJfdGzydVsFHaIj1P6+XnkY5YtczIDLx1cHcAqxaEGro+AbE1y+f7oic+wzI
+         ndYhQyU+zTFiZZPMcDUzTf9Y9udQrpjghQdSDZS0+c1Ipsf9HObiSOlG3SbDxBWEbrvU
+         oaa6EU7krYqo7I0R2WWh4A+GZwzl1p4bU720xT5y56kYsM7p95tI6VtSm1tr8gH7pfek
+         OEZvQiLQHotvAOHFMjCzt7hLln+zVWQtV1xWKw/785pPqnFv0gFeOrXnwSWbIfNzGvor
+         4l3wWDpTFqtN74LNtbgjCcvMeWHdChbgFkywgOpxe+4gr4wD9r1R+bhcVZbToA5/y1Ll
+         mMQA==
+X-Gm-Message-State: AOJu0YywTfXVNCLRXayOpOwyRflRq0tl3NoVRIQ6U3JB9p0nnxyBEMFQ
+        Jc+OqkWqoENsmWlsJqxqOsx3oo5SoTRMJmHFL6c5/g==
+X-Google-Smtp-Source: AGHT+IGPuiV8gPvloD58PgsLpwUsBkS4qGPhk5DeyvH9pk/s9V/9rokUEZVAEoYKMJdthCiTbd5tU7COfpAaEq3lgJ8=
+X-Received: by 2002:a1f:ccc6:0:b0:486:3e05:da14 with SMTP id
+ c189-20020a1fccc6000000b004863e05da14mr2912659vkg.12.1692221370260; Wed, 16
+ Aug 2023 14:29:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230811180520.131727-1-maz@kernel.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-4-amoorthy@google.com>
+ <ZIn6VQSebTRN1jtX@google.com> <CAF7b7mqfkLYtWBJ=u0MK7hhARHrahQXHza9VnaughyNz5_tNug@mail.gmail.com>
+ <ZNpsCngiSjISMG5j@google.com> <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
+ <ZNrKNs8IjkUWOatn@google.com> <CAF7b7mp=bDBpaN+NHoSmL-+JUdShGfippRKdxr9LW0nNUhtpWA@mail.gmail.com>
+ <ZNzyHqLKQu9bMT8M@google.com>
+In-Reply-To: <ZNzyHqLKQu9bMT8M@google.com>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Wed, 16 Aug 2023 14:28:54 -0700
+Message-ID: <CAF7b7mpOAJ5MO0F4EPMvb9nsgmjBCASo-6=rMC3kUbFPAh4Vfg@mail.gmail.com>
+Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Wed, Aug 16, 2023 at 8:58=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> That branch builds (and looks) just fine on gcc-12 and clang-14.  Maybe y=
+ou have
+> stale objects in your build directory?  Or maybe PEBKAC?
 
-kernel test robot noticed the following build errors:
+Hmm, so it does- PEBKAC indeed...
 
-[auto build test ERROR on kvmarm/next]
-[also build test ERROR on arm/for-next arm64/for-next/core soc/for-next linus/master arm/fixes v6.5-rc6 next-20230816]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> I was thinking that we couldn't have two anonymous unions, and so userspa=
+ce (and
+> KVM) would need to do something like
+>
+>         run->exit2.memory_fault.gpa
+>
+> instead of
+>
+>         run->memory_fault.gpa
+>
+> but the names just need to be unique, e.g. the below compiles just fine. =
+ So unless
+> someone has a better idea, using a separate union for exits that might be=
+ clobbered
+> seems like the way to go.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Zyngier/KVM-arm64-pmu-Resync-EL0-state-on-counter-rotation/20230812-020712
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-patch link:    https://lore.kernel.org/r/20230811180520.131727-1-maz%40kernel.org
-patch subject: [PATCH] KVM: arm64: pmu: Resync EL0 state on counter rotation
-config: arm-randconfig-r046-20230817 (https://download.01.org/0day-ci/archive/20230817/202308170409.yogZXrWD-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce: (https://download.01.org/0day-ci/archive/20230817/202308170409.yogZXrWD-lkp@intel.com/reproduce)
+Agreed. By the way, what was the reason why you wanted to avoid the
+exit reason canary being ABI?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308170409.yogZXrWD-lkp@intel.com/
+On Wed, Jun 14, 2023 at 10:35=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> And rather than use kvm_run.exit_reason as the canary, we should carve ou=
+t a
+> kernel-only, i.e. non-ABI, field from the union.  That would allow settin=
+g the
+> canary in common KVM code, which can't be done for kvm_run.exit_reason be=
+cause
+> some architectures, e.g. s390 (and x86 IIRC), consume the exit_reason ear=
+ly on
+> in KVM_RUN.
+>
+> E.g. something like this (the #ifdefs are heinous, it might be better to =
+let
+> userspace see the exit_canary, but make it abundantly clear that it's not=
+ ABI).
+>
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 143abb334f56..233702124e0a 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -511,16 +511,43 @@ struct kvm_run {
+> +       /*
+> +        * This second KVM_EXIT_* union holds structures for exits that m=
+ay be
+> +        * triggered after KVM has already initiated a different exit, an=
+d/or
+> +        * may be filled speculatively by KVM.  E.g. because of limitatio=
+ns in
+> +        * KVM's uAPI, a memory fault can be encountered after an MMIO ex=
+it is
+> +        * initiated and kvm_run.mmio is filled.  Isolating these structu=
+res
+> +        * from the primary KVM_EXIT_* union ensures that KVM won't clobb=
+er
+> +        * information for the original exit.
+> +        */
+> +       union {
+>                 /* KVM_EXIT_MEMORY_FAULT */
+>                 blahblahblah
+> +#endif
+>         };
+>
+> +#ifdef __KERNEL__
+> +       /*
+> +        * Non-ABI, kernel-only field that KVM uses to detect bugs relate=
+d to
+> +        * filling exit_reason and the exit unions, e.g. to guard against
+> +        * clobbering a previous exit.
+> +        */
+> +       __u64 exit_canary;
+> +#endif
+> +
 
-All errors (new ones prefixed by >>):
+We can't set exit_reason in the kvm_handle_guest_uaccess_fault()
+helper if we're to handle case A (the setup vcpu exit -> fail guest
+memory access -> return to userspace) correctly. But then userspace
+needs some other way to check whether an efault is annotated, and
+might as well check the canary, so something like
 
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:148:44: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     148 |         [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:133:44: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
-     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD                         0x004E
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:149:45: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     149 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
-         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:134:44: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
-     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR                         0x004F
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:150:42: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     150 |         [C(DTLB)][C(OP_READ)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:131:50: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
-     131 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD                  0x004C
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:151:43: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     151 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)]  = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:132:50: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
-     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR                  0x004D
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:153:44: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     153 |         [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:148:46: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
-     148 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD                      0x0060
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:154:45: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     154 |         [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
-         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:149:46: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
-     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR                      0x0061
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
->> drivers/perf/arm_pmuv3.c:776:2: error: call to undeclared function 'kvm_vcpu_pmu_resync_el0'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     776 |         kvm_vcpu_pmu_resync_el0();
-         |         ^
-   55 warnings and 1 error generated.
+> +       __u32 speculative_exit_reason;
+> +       union {
+> +               /* KVM_SPEC_EXIT_MEMORY_FAULT */
+> +               struct {
+> +                       __u64 flags;
+> +                       __u64 gpa;
+> +                       __u64 len;
+> +               } memory_fault;
+> +               /* Fix the size of the union. */
+> +               char speculative_padding[256];
+> +       };
 
-
-vim +/kvm_vcpu_pmu_resync_el0 +776 drivers/perf/arm_pmuv3.c
-
-   758	
-   759	static void armv8pmu_start(struct arm_pmu *cpu_pmu)
-   760	{
-   761		struct perf_event_context *ctx;
-   762		int nr_user = 0;
-   763	
-   764		ctx = perf_cpu_task_ctx();
-   765		if (ctx)
-   766			nr_user = ctx->nr_user;
-   767	
-   768		if (sysctl_perf_user_access && nr_user)
-   769			armv8pmu_enable_user_access(cpu_pmu);
-   770		else
-   771			armv8pmu_disable_user_access();
-   772	
-   773		/* Enable all counters */
-   774		armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
-   775	
- > 776		kvm_vcpu_pmu_resync_el0();
-   777	}
-   778	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+With the condition for an annotated efault being "if kvm_run returns
+-EFAULT and speculative_exit_reason is..."
