@@ -2,154 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD90377E3DB
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 16:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DF8D77E3F9
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 16:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343758AbjHPOjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 10:39:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39612 "EHLO
+        id S1343735AbjHPOnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 10:43:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343784AbjHPOja (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 10:39:30 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574602D67
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:39:03 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d6adc83eb10so3500158276.2
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:39:03 -0700 (PDT)
+        with ESMTP id S1343766AbjHPOmj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 10:42:39 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B3326A1
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:42:37 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bb893e61d5so85238585ad.0
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:42:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692196741; x=1692801541;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jX7V1lWluewhSh6VMm5HNZIM42OiPORMFCW/iRk3n2s=;
-        b=cccuvca16nyqVbTT+p9NSMZsvpgmLzaCavWmkhGRspARsQI445ljxYnl/xM9pXE9iq
-         kI1541LdnXukuAuL73uLvN7Z7Lk0yrcLeeThM7TABW+xSp+QemBd0jzVoR/ZWyJfKz9O
-         MwzWLAaDVQZGFMq9TF/+TfgKNe1ajrgF8PYwJVDSP1jDRVxXWvs0VFjyXdI+wEs9UqZp
-         5WEpenVLKOKBbAentiDPY7WJq7kFfz14K0uY1+hJzNr/QtnnDD8VqI2z3K0ex2OSncm2
-         X9qrvzbUrOYBzk5wstwOwcINpjuqoXdeccyAWWi4yAdY6B5HA1LeEsQ6+5pVY8Ur1LQx
-         RoKQ==
+        d=google.com; s=20221208; t=1692196957; x=1692801757;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O+NKKfGEeZmwLeWjKJlNSbTEwrWsyhKqsr/nfdnWkMI=;
+        b=PvGRNivZAHac1lVhb7q2gfjl72s07J4x8rqc+JmqafvaLh/c6zZHA4Y+6vlWDoRXSb
+         Wzbc0TNO7hO//fE3xUEURlTA3aAm07ld2+GTNXu/SaB3S1h+zQS3UaAynNU4//QYqMRH
+         hE/7x4TIZgKHm1lT/jWGeJIzKZ0xpFukyOCl9PUmRaiFm2QkFF3qeYbpQt+J6behjuR1
+         C0d2x2nzgjqYNL2yM8bhDkCpVNVdPJbN+oOFPniRM2p2xQtoWLgfZb44NEpoye1/+Wpt
+         QzrrfCHIiAzdG6XIR2x5oO0KKpehZlCAGwkOtW803Y0Y6YnMvgBGchKfdqCyZY8Y/nl6
+         XfMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692196741; x=1692801541;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jX7V1lWluewhSh6VMm5HNZIM42OiPORMFCW/iRk3n2s=;
-        b=SKKQppKzkTiqqM27NjceHpuF1h1gt4CehNkf+rYMUd2wZvaVse0p43DqFT5KgEaP8w
-         eF4ZRP8lBX9TykZOf7rIIxHnjlWnQFC+RzByN9c+nUoSz3NTo9/qGecXwMeEIf73EWlL
-         jGvxufxWCFpXAGGimpjyy6oky5nSukmoDMDTTS6t0r0NtLEDfvo8n/j7aMpTxU3uXqNP
-         4NFt+O/VAx+NsCh5jR5QwjcBZYFTZI6YFNsdMv+dJAuxHyxb8vsA8NOBjy7vlxXpJ7G7
-         5UDlb77iTR2XN3XdZDolyNzuFJYeTrBMwlBMv7pqzCfoNefszcVGr9i6FYeemAfgAveZ
-         26gw==
-X-Gm-Message-State: AOJu0YxEHvuVn8qwQUyrhRjbqkWu10jnXkqj73FFmWBfwrzZgTj6FL7V
-        vtiDOGodqCgtWb5pKhTg0R3kMEWDCb8=
-X-Google-Smtp-Source: AGHT+IGLS18VtpS5sotDPXKkkyKkV2lBpEJVX+jOkjIePdxefddQ5MDvZSPMjSRTbXRFZc1ZcLoclXrAX0E=
+        d=1e100.net; s=20221208; t=1692196957; x=1692801757;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O+NKKfGEeZmwLeWjKJlNSbTEwrWsyhKqsr/nfdnWkMI=;
+        b=abLc8JR+9mvjryFbx+1luDVankflb/hzLEMf/YVb1jbn340TU70zXk6jf4DWsKRacJ
+         hP3JlzzLob+dHb6UlRhYpHGSXH80+weGxOIEhiafXnivM8M0P1cMhxrZkKJTHOJ2c3k5
+         D/TIj6gd0xAJWjzz7fxw2idLAG66+MYJC0AYlgV/7MO0/CI4NbSDAF3TSrzY/H2MNMsL
+         7ONKr8WnPqR9UHgfvpTxuEB9iU+ipaidLUkQ6o2j3KMWVWLQG2/Adewf9BeEa9qxUSB3
+         HznbYTs23Yi5eXFDhs7CY/PhXtmzILmTdXnBrG380pD+ZKEkj4MKIEWG23RjABGaIjXq
+         XhBg==
+X-Gm-Message-State: AOJu0YzTN5J5JiXbquZ0czG5wyRiZst6khe2hXipafFrnuNrnDNMGwDF
+        MTLczTMlp8ZbZR9Xf9znyAVJD8C/bwY=
+X-Google-Smtp-Source: AGHT+IECDUtRVVRnx6BMLTfuVckuU+Xenk8TbZKwZilY62e5q35p07pBOOqcstMkeQmSJoopdrgQzDwj434=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:b901:0:b0:d71:36b5:e9ee with SMTP id
- x1-20020a25b901000000b00d7136b5e9eemr33704ybj.8.1692196740878; Wed, 16 Aug
- 2023 07:39:00 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 07:38:59 -0700
-In-Reply-To: <e2662efe-9c53-77de-836c-a29076d3ccdc@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:da91:b0:1bb:b033:88f2 with SMTP id
+ j17-20020a170902da9100b001bbb03388f2mr609257plx.12.1692196956999; Wed, 16 Aug
+ 2023 07:42:36 -0700 (PDT)
+Date:   Wed, 16 Aug 2023 07:42:35 -0700
+In-Reply-To: <55bfeecb59787369d57c2704785af13604e63a62.camel@intel.com>
 Mime-Version: 1.0
-References: <20230719024558.8539-1-guang.zeng@intel.com> <20230719024558.8539-3-guang.zeng@intel.com>
- <ZNwBeN8mGr1sJJ6i@google.com> <e2662efe-9c53-77de-836c-a29076d3ccdc@linux.intel.com>
-Message-ID: <ZNzfgxTnB6KYWENg@google.com>
-Subject: Re: [PATCH v2 2/8] KVM: x86: Use a new flag for branch instructions
+References: <20230815203653.519297-1-seanjc@google.com> <20230815203653.519297-8-seanjc@google.com>
+ <55bfeecb59787369d57c2704785af13604e63a62.camel@intel.com>
+Message-ID: <ZNzgWwUNy/2J3SV2@google.com>
+Subject: Re: [PATCH v3 07/15] KVM: nVMX: Use KVM-governed feature framework to
+ track "nested VMX enabled"
 From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Guang Zeng <guang.zeng@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Yuan Yao <yuan.yao@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 16, 2023, Binbin Wu wrote:
->=20
->=20
-> On 8/16/2023 6:51 AM, Sean Christopherson wrote:
-> > Branch *targets*, not branch instructions.
-> >=20
-> > On Wed, Jul 19, 2023, Zeng Guang wrote:
-> > > From: Binbin Wu <binbin.wu@linux.intel.com>
-> > >=20
-> > > Use the new flag X86EMUL_F_BRANCH instead of X86EMUL_F_FETCH in
-> > > assign_eip(), since strictly speaking it is not behavior of instructi=
-on
-> > > fetch.
-> > Eh, I'd just drop this paragraph, as evidenced by this code existing as=
--is for
-> > years, we wouldn't introduce X86EMUL_F_BRANCH just because resolving a =
-branch
-> > target isn't strictly an instruction fetch.
-> >=20
-> > > Another reason is to distinguish instruction fetch and execution of b=
-ranch
-> > > instruction for feature(s) that handle differently on them.
-> > Similar to the shortlog, it's about computing the branch target, not ex=
-ecuting a
-> > branch instruction.  That distinction matters, e.g. a Jcc that is not t=
-aken will
-> > *not* follow the branch target, but the instruction is still *executed*=
-.  And there
-> > exist instructions that compute branch targets, but aren't what most pe=
-ople would
-> > typically consider a branch instruction, e.g. XBEGIN.
-> >=20
-> > > Branch instruction is not data access instruction, so skip checking a=
-gainst
-> > > execute-only code segment as instruction fetch.
-> > Rather than call out individual use case, I would simply state that as =
-of this
-> > patch, X86EMUL_F_BRANCH and X86EMUL_F_FETCH are identical as far as KVM=
- is
-> > concernered.  That let's the reader know that (a) there's no intended c=
-hange in
-> > behavior and (b) that the intent is to effectively split all consumptio=
-n of
-> > X86EMUL_F_FETCH into (X86EMUL_F_FETCH | X86EMUL_F_BRANCH).
->=20
-> How about this:
->=20
-> =C2=A0=C2=A0=C2=A0 KVM: x86: Use a new flag for branch targets
->=20
-> =C2=A0=C2=A0=C2=A0 Use the new flag X86EMUL_F_BRANCH instead of X86EMUL_F=
-_FETCH in
-> assign_eip()
-> =C2=A0=C2=A0=C2=A0 to distinguish instruction fetch and branch target com=
-putation for
-> feature(s)
+On Wed, Aug 16, 2023, Kai Huang wrote:
+> On Tue, 2023-08-15 at 13:36 -0700, Sean Christopherson wrote:
+> > Track "VMX exposed to L1" via a governed feature flag instead of using a
+> > dedicated helper to provide the same functionality.  The main goal is to
+> > drive convergence between VMX and SVM with respect to querying features
+> > that are controllable via module param (SVM likes to cache nested
+> > features), avoiding the guest CPUID lookups at runtime is just a bonus
+> > and unlikely to provide any meaningful performance benefits.
+> > 
+> > No functional change intended.
+> > 
+> > 
+> [...]
+> 
+> >  
+> > -/*
+> > - * nested_vmx_allowed() checks whether a guest should be allowed to use VMX
+> > - * instructions and MSRs (i.e., nested VMX). Nested VMX is disabled for
+> > - * all guests if the "nested" module option is off, and can also be disabled
+> > - * for a single guest by disabling its VMX cpuid bit.
+> > - */
+> > -bool nested_vmx_allowed(struct kvm_vcpu *vcpu)
+> > -{
+> > -	return nested && guest_cpuid_has(vcpu, X86_FEATURE_VMX);
+> > -}
+> > -
+> > 
+> 
+> [...]
+> 
+> > @@ -7750,13 +7739,15 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> >  	    guest_cpuid_has(vcpu, X86_FEATURE_XSAVE))
+> >  		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_XSAVES);
+> >  
+> > +	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_VMX);
+> > +
+> > 
+> 
+> Nit:
+> 
+> nested_vmx_allowed() also checks 'nested' global variable.  However
+> kvm_governed_feature_check_and_set() is called unconditionally.  Although IIUC
+> it should never actually set the VMX governed bit when 'nested=0', it's not that
+> obvious in _this_ patch.
 
-Just "features", i.e. no parentheses...
+Yeah, 100% agree after re-reading this patch without context.  I had to go search
+the code to remember where "nested" is checked.  :-)
 
-> =C2=A0=C2=A0=C2=A0 that handle differently on them.
+> Should we explicitly call this out in the changelog so git blamers can
+> understand this more easily in the future?
 
-...and tack on ", e.g. LASS and LAM." at the end.  There's zero reason not =
-to more
-explicitly call out why the flag is being added.  Trying to predict the fut=
-ure in
-changelogs is generally discouraged, but having understandable changelogs i=
-s more
-important.
+Yep, I'll add a blurb to point out the dependency in vmx_set_cpu_caps().
 
-> =C2=A0=C2=A0=C2=A0 As of this patch, X86EMUL_F_BRANCH and X86EMUL_F_FETCH=
- are identical as
-> far as
-> =C2=A0=C2=A0=C2=A0 KVM is concernered.
->=20
-> =C2=A0=C2=A0=C2=A0 No functional change intended.
-
-Heh, you need to fix whatever is forcefully wrapping lines, but other than =
-the
-nit above, the content itself is good.
+Thanks!
