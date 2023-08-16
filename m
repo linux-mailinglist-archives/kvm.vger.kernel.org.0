@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B21B677D8DD
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:12:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2001877D8E7
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 05:15:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241514AbjHPDLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Aug 2023 23:11:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
+        id S241538AbjHPDPY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Aug 2023 23:15:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241504AbjHPDLI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Aug 2023 23:11:08 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A2DBE6B;
-        Tue, 15 Aug 2023 20:11:07 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1bda9207132so48075675ad.0;
-        Tue, 15 Aug 2023 20:11:07 -0700 (PDT)
+        with ESMTP id S241518AbjHPDOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Aug 2023 23:14:52 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F3A1FC8;
+        Tue, 15 Aug 2023 20:14:51 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-688787570ccso556240b3a.2;
+        Tue, 15 Aug 2023 20:14:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692155467; x=1692760267;
+        d=gmail.com; s=20221208; t=1692155691; x=1692760491;
         h=content-transfer-encoding:content-language:in-reply-to:mime-version
          :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CFcNtuBxixf5wJuU8gYA0YbfyYSQsy3zy43VL6AoIEY=;
-        b=SRUA0K5UfvnzSINPXjOGsfInJgg9jLJF8AFzEUCIEEszX7g/RIcWRPwaQLREyXJX9a
-         AhgL1fflrqmmLxB6lHSJEmG2HoIpjYvR64CUmme8fbdv22c2H89taCMOtxO8AliL9JMb
-         aI1Ariuz+hDlNOhbZqQqbQOAEn/900EFSxsQlMxwCai/8Xh5tqp4dRI1zbbsLvI9lYlZ
-         2D86rkm/j9FeEZ+B592IY90PpCv44KAnVnSLOByafiS1c1JZTO8PUpoOzFe6RfApse6I
-         W2GbwGUZ1MnGpObtJR0VRpLbUNKMq43wXqfhdgxt+o4To/FZlvVj5snta8zDTy6NyAyi
-         riFQ==
+        bh=4JSYxFxoCtFaYHq5tDU35/I/PKWW/aYx+DXVUemb6C8=;
+        b=IVIOClPljq34fr21uTeNphPBEvAoJLU/liAPxCBuJmyUK9k41dnPmVJfq/AhruOP6+
+         mj2oa6spfJfGtV4628IAPxNYK+g/FM3BLrOH/K+NJi9pDO8LH1R29jUwR7XDOY9HMTsg
+         ZgFwWwsmQ7lqUS++CpU59fmiqj5tZtJi8/nKLKYPA6Dv2MZ047/xGP0+45nFEr3CDUFs
+         kaoaURMfFyxiwjVnJBxRJfz7YMKpVWrHGXTwoobBd9v4VDflFE0sRgUmD5EtFlBd6K7w
+         GK8qRVg2RVqb5+WkcAIYyjW6OaYPzNPmDYDiRZ432rFV4Ux/gpVVJhZcWgG3OAyiUbLt
+         RaJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692155467; x=1692760267;
+        d=1e100.net; s=20221208; t=1692155691; x=1692760491;
         h=content-transfer-encoding:content-language:in-reply-to:mime-version
          :user-agent:date:message-id:from:references:cc:to:subject
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CFcNtuBxixf5wJuU8gYA0YbfyYSQsy3zy43VL6AoIEY=;
-        b=hnOHHlW24pvZ4USgSGqrF4nIE8ejsN0JOVPMbLvSwFnIqr9cv5b6coLm/6fV8grpoW
-         zJgSs14bDEbaXfjgLHIgBaCDDvV893mUTpc5xpJvKK4WDR4TstYmXpPR/bOhBxAaMdHm
-         oJxc1nLXGfRxIp+vQ1OIkDnLlxkHiWTUjBLKssMlc44bKGDM0A9wAZgOvVSFV8h8OarQ
-         R6EcSchYXzoA4xTSikpMnn6zo/+HQIZUL5GPFuJ55ym30+SvNtz1HJI1M5sAw+GZAI4o
-         GK9JAs6Gof+85k38nwBitGhipLkcVCCAn/aFMVMc1/ReduP0J0XiDVh4kayC20rffvee
-         MjBQ==
-X-Gm-Message-State: AOJu0Yw/gtHhYEOhw9ahCrcBZGVEpOb/JprDwMzrgc//GZ+Xw3bIVEoK
-        m8Jf5+wclF3GNUAkQcx/jCc=
-X-Google-Smtp-Source: AGHT+IGkc2hUDta+IGakHFjBInQVHNIBETmu5s9HDyvblnc18wwsR4JMRHOdec1VsGltqDsuiTUy+w==
-X-Received: by 2002:a17:902:bd42:b0:1bd:d663:45ad with SMTP id b2-20020a170902bd4200b001bdd66345admr723438plx.68.1692155466914;
-        Tue, 15 Aug 2023 20:11:06 -0700 (PDT)
+        bh=4JSYxFxoCtFaYHq5tDU35/I/PKWW/aYx+DXVUemb6C8=;
+        b=TJXc+Tt4XDoN5PcxluflpHtRe7XQX8p9GxZnOwj1thrxv/9RGh3h5sjG0rYDWNuxuG
+         CsjcFQ535b/n4vTFUZRp6aB2qCTEIump2csV7fehWTBwo3XJKJAuwVqytAv82eUUI9cK
+         H9PZqoiH0trd0KPdbvCYifYepgN//cqSChxRPJtkTVlhNGePkOiwpMye0CSvo12J5NxW
+         1eN8KrrZk4TLH9/w+6Hx2OQzpSfM5Qo6ZhtBoFe/apoIumhnBeMGQ11ckG+IjcoF1STF
+         nSmrYeDYnvVKSYS/2zcHvNa0Xzihat5nuiNxvJ3Id3V3OBNpLrd9xHell+xg2RRmJOfj
+         tn0w==
+X-Gm-Message-State: AOJu0YyGLvGZ43363/sG2vBVtVoJNWgxO32i7HUmqzJ5MCjvwUnCxAp7
+        pezuBTZ8OEAEVNrNw+dGlvw=
+X-Google-Smtp-Source: AGHT+IEAlXG+94dueZdgF8qUiyf6p18xZm8TZWLHkpOLwdvpWUDRBxCs7nQ4NLKP2AEo3HiDAEA0Jg==
+X-Received: by 2002:a05:6a00:189c:b0:686:5e0d:bd4f with SMTP id x28-20020a056a00189c00b006865e0dbd4fmr749285pfh.0.1692155691323;
+        Tue, 15 Aug 2023 20:14:51 -0700 (PDT)
 Received: from localhost.localdomain ([146.112.118.69])
-        by smtp.gmail.com with ESMTPSA id m1-20020a170902db0100b001b8622c1ad2sm11792839plx.130.2023.08.15.20.11.02
+        by smtp.gmail.com with ESMTPSA id q18-20020a62e112000000b006874a6e74b4sm10048422pfh.151.2023.08.15.20.14.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Aug 2023 20:11:06 -0700 (PDT)
-Subject: Re: [PATCH v3 1/6] KVM: PPC: Use getters and setters for vcpu
- register state
+        Tue, 15 Aug 2023 20:14:50 -0700 (PDT)
+Subject: Re: [PATCH v3 4/6] KVM: PPC: Book3s HV: Hold LPIDs in an unsigned
+ long
 To:     Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
 Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, mikey@neuling.org,
         paulus@ozlabs.org, vaibhav@linux.ibm.com, sbhat@linux.ibm.com,
         gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com,
         amachhiw@linux.vnet.ibm.com
 References: <20230807014553.1168699-1-jniethe5@gmail.com>
- <20230807014553.1168699-2-jniethe5@gmail.com>
- <CUS44PQRFL72.28PFLWO36FYAO@wheely>
+ <20230807014553.1168699-5-jniethe5@gmail.com>
+ <CUS477NDPEQI.27SBUCRNYD0XG@wheely>
 From:   Jordan Niethe <jniethe5@gmail.com>
-Message-ID: <71e14e67-3ba4-4ddd-921d-38181f3c0159@gmail.com>
-Date:   Wed, 16 Aug 2023 13:11:00 +1000
+Message-ID: <7e1df0da-77e4-eca7-e487-f51fc0968c14@gmail.com>
+Date:   Wed, 16 Aug 2023 13:14:45 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <CUS44PQRFL72.28PFLWO36FYAO@wheely>
+In-Reply-To: <CUS477NDPEQI.27SBUCRNYD0XG@wheely>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,103 +81,59 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 14/8/23 6:08 pm, Nicholas Piggin wrote:
+On 14/8/23 6:12 pm, Nicholas Piggin wrote:
 > On Mon Aug 7, 2023 at 11:45 AM AEST, Jordan Niethe wrote:
->> There are already some getter and setter functions used for accessing
->> vcpu register state, e.g. kvmppc_get_pc(). There are also more
->> complicated examples that are generated by macros like
->> kvmppc_get_sprg0() which are generated by the SHARED_SPRNG_WRAPPER()
->> macro.
+>> The LPID register is 32 bits long. The host keeps the lpids for each
+>> guest in an unsigned word struct kvm_arch. Currently, LPIDs are already
+>> limited by mmu_lpid_bits and KVM_MAX_NESTED_GUESTS_SHIFT.
 >>
->> In the new PAPR "Nestedv2" API for nested guest partitions the L1 is
->> required to communicate with the L0 to modify and read nested guest
->> state.
+>> The nestedv2 API returns a 64 bit "Guest ID" to be used be the L1 host
+>> for each L2 guest. This value is used as an lpid, e.g. it is the
+>> parameter used by H_RPT_INVALIDATE. To minimize needless special casing
+>> it makes sense to keep this "Guest ID" in struct kvm_arch::lpid.
 >>
->> Prepare to support this by replacing direct accesses to vcpu register
->> state with wrapper functions. Follow the existing pattern of using
->> macros to generate individual wrappers. These wrappers will
->> be augmented for supporting Nestedv2 guests later.
+>> This means that struct kvm_arch::lpid is too small so prepare for this
+>> and make it an unsigned long. This is not a problem for the KVM-HV and
+>> nestedv1 cases as their lpid values are already limited to valid ranges
+>> so in those contexts the lpid can be used as an unsigned word safely as
+>> needed.
 >>
->> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
->> Signed-off-by: Jordan Niethe <jniethe5@gmail.com>
->> ---
->> v3:
->>    - Do not add a helper for pvr
->>    - Use an expression when declaring variable in case
->>    - Squash in all getters and setters
->>    - Guatam: Pass vector registers by reference
->> ---
->>   arch/powerpc/include/asm/kvm_book3s.h  | 123 +++++++++++++-
->>   arch/powerpc/include/asm/kvm_booke.h   |  10 ++
->>   arch/powerpc/kvm/book3s.c              |  38 ++---
->>   arch/powerpc/kvm/book3s_64_mmu_hv.c    |   4 +-
->>   arch/powerpc/kvm/book3s_64_mmu_radix.c |   9 +-
->>   arch/powerpc/kvm/book3s_64_vio.c       |   4 +-
->>   arch/powerpc/kvm/book3s_hv.c           | 220 +++++++++++++------------
->>   arch/powerpc/kvm/book3s_hv.h           |  58 +++++++
->>   arch/powerpc/kvm/book3s_hv_builtin.c   |  10 +-
->>   arch/powerpc/kvm/book3s_hv_p9_entry.c  |   4 +-
->>   arch/powerpc/kvm/book3s_hv_ras.c       |   5 +-
->>   arch/powerpc/kvm/book3s_hv_rm_mmu.c    |   8 +-
->>   arch/powerpc/kvm/book3s_hv_rm_xics.c   |   4 +-
->>   arch/powerpc/kvm/book3s_xive.c         |   9 +-
->>   arch/powerpc/kvm/emulate_loadstore.c   |   2 +-
->>   arch/powerpc/kvm/powerpc.c             |  76 ++++-----
->>   16 files changed, 395 insertions(+), 189 deletions(-)
->>
+>> In the PAPR, the H_RPT_INVALIDATE pid/lpid parameter is already
+>> specified as an unsigned long so change pseries_rpt_invalidate() to
+>> match that.  Update the callers of pseries_rpt_invalidate() to also take
+>> an unsigned long if they take an lpid value.
 > 
-> [snip]
-> 
->> +
->>   /* Expiry time of vcpu DEC relative to host TB */
->>   static inline u64 kvmppc_dec_expires_host_tb(struct kvm_vcpu *vcpu)
->>   {
->> -	return vcpu->arch.dec_expires - vcpu->arch.vcore->tb_offset;
->> +	return kvmppc_get_dec_expires(vcpu) - kvmppc_get_tb_offset_hv(vcpu);
->>   }
-> 
-> I don't see kvmppc_get_tb_offset_hv in this patch.
+> I don't suppose it would be worth having an lpid_t.
 
-It should be generated by:
-
-KVMPPC_BOOK3S_VCORE_ACCESSOR(tb_offset, 64)
+I actually introduced that when I was developing for the purpose of 
+doing the conversion, but I felt like it was unnecessary in the end, it 
+is just a wider integer and it is simpler to treat it that way imho.
 
 > 
->> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
->> index 7f765d5ad436..738f2ecbe9b9 100644
->> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
->> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
->> @@ -347,7 +347,7 @@ static int kvmppc_mmu_book3s_64_hv_xlate(struct kvm_vcpu *vcpu, gva_t eaddr,
->>   	unsigned long v, orig_v, gr;
->>   	__be64 *hptep;
->>   	long int index;
->> -	int virtmode = vcpu->arch.shregs.msr & (data ? MSR_DR : MSR_IR);
->> +	int virtmode = kvmppc_get_msr(vcpu) & (data ? MSR_DR : MSR_IR);
+>> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+>> index 4adff4f1896d..229f0a1ffdd4 100644
+>> --- a/arch/powerpc/kvm/book3s_xive.c
+>> +++ b/arch/powerpc/kvm/book3s_xive.c
+>> @@ -886,10 +886,10 @@ int kvmppc_xive_attach_escalation(struct kvm_vcpu *vcpu, u8 prio,
 >>   
->>   	if (kvm_is_radix(vcpu->kvm))
->>   		return kvmppc_mmu_radix_xlate(vcpu, eaddr, gpte, data, iswrite);
+>>   	if (single_escalation)
+>>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d",
+>> -				 vcpu->kvm->arch.lpid, xc->server_num);
+>> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num);
+>>   	else
+>>   		name = kasprintf(GFP_KERNEL, "kvm-%d-%d-%d",
+>> -				 vcpu->kvm->arch.lpid, xc->server_num, prio);
+>> +				 (unsigned int)vcpu->kvm->arch.lpid, xc->server_num, prio);
+>>   	if (!name) {
+>>   		pr_err("Failed to allocate escalation irq name for queue %d of VCPU %d\n",
+>>   		       prio, xc->server_num);
 > 
-> So this isn't _only_ adding new accessors. This should be functionally a
-> noop, but I think it introduces a branch if PR is defined.
+> I would have thought you'd keep the type and change the format.
 
-That being checking kvmppc_shared_big_endian()?
-
-> 
-> Shared page is a slight annoyance for HV, I'd like to get rid of it...
-> but that's another story. I think the pattern here would be to add a
-> kvmppc_get_msr_hv() accessor.
-
-Yes, that will work.
-
-> 
-> And as a nitpick, for anywhere employing existing access functions, gprs
-> and such, could that be split into its own patch?
-
-Sure will do. One other thing I could do is make the existing functions 
-use the macros if they don't already. Do you think that is worth doing?
+yeah, I will do that.
 
 > 
-> Looks pretty good aside from those little things.
+> Otherwise seems okay too.
 
 Thanks.
 
