@@ -2,129 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06D2677E391
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 16:28:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ED5377E397
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 16:30:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343616AbjHPO2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 10:28:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33948 "EHLO
+        id S235581AbjHPO3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 10:29:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343651AbjHPO1s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 10:27:48 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047B12709
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:27:47 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58c8b2d6784so9439897b3.3
-        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:27:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692196066; x=1692800866;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ocFVuDAoYa76ZBIYvekfvcCSNlPl+8WKQ7zX3J4QGgs=;
-        b=nCDyOoH0oySdjuEsVcz9lUQEbt0d5xVy4T04c2jCprIc8UdB2GwFoxZz1UihZ+8CPg
-         RchUF9UVRX/0ijV1r23vCJ9RJtbt225PJnFS1+zPdaWLb69pEXxa5GMMopLuXBVh3+R1
-         sI1GJOp8Yub6sMF0nBNjzN7CFf+Ii5MjUbyJkFBmWMRnnNLk4rtsozCNHU3XROmtlzk3
-         ETsES3u+oZGHW5tIJukvZ7SakW0f6EChxmcX5V1bkjju+6zhsKN2qR3r722lg/ESZznc
-         2ErdicH2oyAau+bkEu+pVQQa95zmnDny8w93x0oGM2RRgSu4R1tHE8vQN35d1UBO1auN
-         uxsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692196066; x=1692800866;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ocFVuDAoYa76ZBIYvekfvcCSNlPl+8WKQ7zX3J4QGgs=;
-        b=DpPLusXNjN3jAeTDAaKDB8ovHVE12AGbleU1EMgUYBUAY8Qtmcpiv5jL7zKlgSeZdu
-         xNL++Xh18DRPhwePmkuFTTxyfeIk00wPPW6JtSOy+nWipd2VsYy2V5qXVYTPuk0P7MaB
-         oFHu6dKSGLywVusqwMB8N6wEiMeLbPN4p0KavoNCPRAEHEAX6kEpsSRc8w4a6RsPjSE2
-         j5WGGpX798hItryMdacn0mvjPofkvH2QUBgpn1Vq71giWhPBdHqYJoobj8Y5PmNax4Ku
-         l105muDnUrJ9Gt1eXide7a50hE0DwpfaibmX12CkbKU3wW8u33mExUlxHDFsn4hyVoWm
-         eAYg==
-X-Gm-Message-State: AOJu0YyiL5K1HOiyJ82tNnx208FEs+T0shlOJ+KeqZspuY2Q1gFAcVkd
-        CA6cA7HyYvoIKUV8bUywXb6VY46rPUk=
-X-Google-Smtp-Source: AGHT+IGmENvyzABpuuLUU3IFL4Ul5a1yBeBSAE3t8ZD0pBQsXUo3eUdpcxEPHaxQ0CpfwWt/G+VCpF8iq3g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4524:0:b0:58c:8552:458d with SMTP id
- s36-20020a814524000000b0058c8552458dmr28452ywa.3.1692196066288; Wed, 16 Aug
- 2023 07:27:46 -0700 (PDT)
-Date:   Wed, 16 Aug 2023 07:27:44 -0700
-In-Reply-To: <a7ecab8d-a77c-77eb-68cb-383de569fe6d@linux.intel.com>
-Mime-Version: 1.0
-References: <20230719024558.8539-1-guang.zeng@intel.com> <20230719024558.8539-5-guang.zeng@intel.com>
- <ZNwGKPnTY7hRRy+S@google.com> <a7ecab8d-a77c-77eb-68cb-383de569fe6d@linux.intel.com>
-Message-ID: <ZNzc4FMukTamEseJ@google.com>
-Subject: Re: [PATCH v2 4/8] KVM: x86: Add X86EMUL_F_INVTLB and pass it in em_invlpg()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S1343624AbjHPO3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 10:29:18 -0400
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 835A72715
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 07:29:08 -0700 (PDT)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9DA3140E0196;
+        Wed, 16 Aug 2023 14:29:04 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id jQmMiiMMq1-y; Wed, 16 Aug 2023 14:29:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1692196141; bh=1sKUdgXoUTJpuoi5n9A4j+BKFytAA60xeLBbqXRsoHM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=N/0TrEc+661lJfCOD2bnYVWQ7T5coXJhSJW+KWSjB+tXu+jLJo9+6s0R4prYr6O/B
+         WzJ1cufIOF7OB08wcH0njq+SgZrwcLHfG1A+l58x32NGLbEfFU53ijOjlJMjc1dxqv
+         WGTSHijlUfHItskuDCL+alwcv34xZLKBMMRDT6wK/g6XMz8EZ7xkOgIbqdHNrPzWn8
+         lZWYvG5YRo87Wkz9G2G6QPewpefrnjUSHWKbx2baEwWnrEtn1yulWAhpSY5cvqGdvQ
+         7ZXHaLVt4GyU0R/KTlgcFHHbr7T5B0Pyk3ojVTpR1OLLsCc94KK0HBIf+IGy0JhExT
+         SudR+7kPW90ttHzwPtHrfR0OxqQO+gle/WLZiniZezyjft8cM/blfjsIlEZDOTz3/k
+         GYwR66M9278UXAFa5nnN1kqfSNUv7HMi1eEGxm6i12aAYuOTL6BnksNCpsc954kf1p
+         7p+ql/4LJKhwtrLcWpGQJgRCDT8TUARDALs4dM3WE/Po6ROZ04Wh4AkNB7zQEq8g8+
+         DXYfZ54xDhBMfF8P0r8M6a5zcvWx94J1A8Dzm1yZUP5pSEnsI4CqbrwILwBTVMGFBG
+         Su5kkf5dzAypHUvJISrXUQU1iCyoHYHlatLW3U/wHVg6ADvKSvPdj1x/2KrziYbJKV
+         CRx5ZcAfDTrJLoayL/e8zJKk=
+Received: from zn.tnic (pd9530d32.dip0.t-ipconnect.de [217.83.13.50])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BDBA940E0193;
+        Wed, 16 Aug 2023 14:28:57 +0000 (UTC)
+Date:   Wed, 16 Aug 2023 16:28:52 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Mohammad Natiq Khan <natiqk91@gmail.com>, tglx@linutronix.de,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] kvm/mmu: fixed coding style issues
+Message-ID: <20230816142852.GHZNzdJPS3JboQqwmT@fat_crate.local>
+References: <20230815114448.14777-1-natiqk91@gmail.com>
+ <ZNvIRS/YExLtGO2B@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZNvIRS/YExLtGO2B@google.com>
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,T_SPF_HELO_TEMPERROR,T_SPF_TEMPERROR,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 16, 2023, Binbin Wu wrote:
+On Tue, Aug 15, 2023 at 11:47:33AM -0700, Sean Christopherson wrote:
+> First and foremost, don't pack a large pile of unrelated changes into one large
+> patch, as such a patch is annoyingly difficult to review and apply, e.g. this will
+> conflict with other in-flight changes.
 > 
+> Second, generally speaking, the value added by cleanups like this aren't worth
+> the churn to the code, e.g. it pollutes git blame.
 > 
-> On 8/16/2023 7:11 AM, Sean Christopherson wrote:
-> > On Wed, Jul 19, 2023, Zeng Guang wrote:
-> > > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> > > index 8e706d19ae45..9b4b3ce6d52a 100644
-> > > --- a/arch/x86/kvm/emulate.c
-> > > +++ b/arch/x86/kvm/emulate.c
-> > > @@ -3443,8 +3443,10 @@ static int em_invlpg(struct x86_emulate_ctxt *ctxt)
-> > >   {
-> > >   	int rc;
-> > >   	ulong linear;
-> > > +	unsigned max_size;
-> > 	unsigned int
-> Let me think why I use 'unsigned'...
-> It's because the exist code uses 'unsigned'.
-> I suppose it is considered bad practice?
+> Third, checkpatch is not the ultimately authority, e.g. IMO there's value in
+> explicitly initializing nx_huge_pages_recovery_ratio to zero because it shows
+> that it's *intentionally* zero for real-time kernels.
+> 
+> I'm all for opportunistically cleaning up existing messes when touching adjacent
+> code, or fixing specific issues if they're causing actual problems, e.g. actively
+> confusing readers.  But doing a wholesale cleanup based on what checkpatch wants
+> isn't going to happen.
 
-Yeah, use "unsigned int" when writing new code.
+I think you should can this reply as is and paste it each time stuff
+like that comes up. This is exactly what I'm preaching each time but
+explained much better than me.
 
-> I will cleanup the exist code as well. Is it OK to cleanup it
-> opportunistically inside this patch?
+I'd even ask you for permission to quote it each time I get such
+"cleanup" patches. :-)
 
-No, don't bother cleaning up existing usage.  If a patch touches the "bad" code,
-then by all means do an opportunistic cleanup.  But we have too much "legacy" code
-in KVM for a wholesale cleanup of bare unsigned usage to be worth the churn and
-git blame pollution.  See also:
+-- 
+Regards/Gruss,
+    Boris.
 
-https://lore.kernel.org/all/ZNvIRS%2FYExLtGO2B@google.com
-
-> > > diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-> > > index c0e48f4fa7c4..c944055091e1 100644
-> > > --- a/arch/x86/kvm/kvm_emulate.h
-> > > +++ b/arch/x86/kvm/kvm_emulate.h
-> > > @@ -93,6 +93,7 @@ struct x86_instruction_info {
-> > >   #define X86EMUL_F_FETCH			BIT(1)
-> > >   #define X86EMUL_F_BRANCH		BIT(2)
-> > >   #define X86EMUL_F_IMPLICIT		BIT(3)
-> > > +#define X86EMUL_F_INVTLB		BIT(4)
-> > Why F_INVTLB instead of X86EMUL_F_INVLPG?  Ah, because LAM is ignored for the
-> > linear address in the INVPCID and INVVPID descriptors.  Hrm.
-> > 
-> > I think my vote is to call this X86EMUL_F_INVLPG even though *in theory* it's not
-> > strictly limited to INVLPG.  Odds are good KVM's emulator will never support
-> > INVPCID or INVVPID,
-> One case is kvm_handle_invpcid() is in the common kvm x86 code.
-> LAM doesn't apply to the address in descriptor of invpcid though, but I am
-> not sure if there will be the need for SVM in the future.
-
-Right, but the emulator itself doesn't handle INVPCID or INVVPID, so there's no
-direct "conflict" at this time.
-
-> But for now, F_INVLPG is OK if you think F_INVTLB brings confusion.
-
-Yeah, please use F_INVLPG unless someone has a strong objection.
+https://people.kernel.org/tglx/notes-about-netiquette
