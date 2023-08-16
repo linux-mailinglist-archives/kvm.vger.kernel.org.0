@@ -2,73 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96EE477DB1F
-	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 09:30:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C687A77DB2E
+	for <lists+kvm@lfdr.de>; Wed, 16 Aug 2023 09:35:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242424AbjHPH35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 03:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37592 "EHLO
+        id S242439AbjHPHes (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 03:34:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242417AbjHPH3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 03:29:31 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 486E1B3;
-        Wed, 16 Aug 2023 00:29:28 -0700 (PDT)
-Received: from loongson.cn (unknown [10.20.42.170])
-        by gateway (Coremail) with SMTP id _____8Cx5_HVetxkdgoZAA--.51429S3;
-        Wed, 16 Aug 2023 15:29:25 +0800 (CST)
-Received: from [10.20.42.170] (unknown [10.20.42.170])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8CxLCPSetxkms5bAA--.9796S3;
-        Wed, 16 Aug 2023 15:29:23 +0800 (CST)
-Message-ID: <42ff33c7-ec50-1310-3e57-37e8283b9b16@loongson.cn>
-Date:   Wed, 16 Aug 2023 15:29:22 +0800
+        with ESMTP id S240945AbjHPHeV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 03:34:21 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9593710C3;
+        Wed, 16 Aug 2023 00:34:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692171260; x=1723707260;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=i2KSDtaf0K2fVxZGa8dg9sBvHTwUi68y2Lww1KdM/7c=;
+  b=e3BKwIZ7tDqbQhp/Es1FyCrTXsDHTf2oVI/YfNyX0Yub8jiHzR40SQCn
+   wEOdgNyUWysPk90PYqKD9TAbXPc9lIkqGOK6Htt9tTisSEl6ZGmjVy4n6
+   Uv8agc4pa6XOINrNjtlTVaNL50RcNlrRz9Zdoopcd+q+IkfvQKJJxF0Ba
+   Or21wWU6j5LKzT+jsh4lYyphEsPwG0lwt6OPZ/FAkZ3QCgY1GAbItHIJp
+   VPQou240UuEciZK9U609M68Haxz91CEAj/dhOLJ6MSMIgvgkf6/zqj2pp
+   pxA5+IDmkRAzpIIfPk5sMBAUPVmuVEmFgvyFpSvYFA85ULm0nl40t+3ja
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="369938983"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="369938983"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 00:34:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="980640920"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="980640920"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.52]) ([10.238.10.52])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 00:34:17 -0700
+Message-ID: <e2662efe-9c53-77de-836c-a29076d3ccdc@linux.intel.com>
+Date:   Wed, 16 Aug 2023 15:34:15 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [RFC PATCH v2 5/5] KVM: Unmap pages only when it's indeed
- protected for NUMA migration
-Content-Language: en-US
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, mike.kravetz@oracle.com, apopple@nvidia.com,
-        jgg@nvidia.com, rppt@kernel.org, akpm@linux-foundation.org,
-        kevin.tian@intel.com, david@redhat.com
-References: <ZNWu2YCxy2FQBl4z@yzhao56-desk.sh.intel.com>
- <e7032573-9717-b1b9-7335-cbb0da12cd2a@loongson.cn>
- <ZNXq9M/WqjEkfi3x@yzhao56-desk.sh.intel.com> <ZNZshVZI5bRq4mZQ@google.com>
- <ZNnPF4W26ZbAyGto@yzhao56-desk.sh.intel.com> <ZNpZDH9//vk8Rqvo@google.com>
- <ZNra3eDNTaKVc7MT@yzhao56-desk.sh.intel.com> <ZNuQ0grC44Dbh5hS@google.com>
- <107cdaaf-237f-16b9-ebe2-7eefd2b21f8f@loongson.cn>
- <c8ccc8f1-300a-09be-db6b-df2a1dedd4cf@loongson.cn>
- <ZNxbLPG8qbs1FjhM@yzhao56-desk.sh.intel.com>
-From:   bibo mao <maobibo@loongson.cn>
-In-Reply-To: <ZNxbLPG8qbs1FjhM@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v2 2/8] KVM: x86: Use a new flag for branch instructions
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Zeng Guang <guang.zeng@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+References: <20230719024558.8539-1-guang.zeng@intel.com>
+ <20230719024558.8539-3-guang.zeng@intel.com> <ZNwBeN8mGr1sJJ6i@google.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZNwBeN8mGr1sJJ6i@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8CxLCPSetxkms5bAA--.9796S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxuF1xJFWDtry8tw15Ww4kuFX_yoWrGryUpa
-        yY9FW8Kr4DJ3yak34jqw4UAFyYg3yxXr48Xas8t34rAas8tryUCr4UKwn09Fy7JrnxXr12
-        qa1jq3Zrua4UZagCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-        sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-        0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-        IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-        e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-        xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-        AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-        AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-        8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
-        AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-        rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-        v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcApnDU
-        UUU
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -77,84 +70,77 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-在 2023/8/16 13:14, Yan Zhao 写道:
-> On Wed, Aug 16, 2023 at 11:44:29AM +0800, bibo mao wrote:
+On 8/16/2023 6:51 AM, Sean Christopherson wrote:
+> Branch *targets*, not branch instructions.
+>
+> On Wed, Jul 19, 2023, Zeng Guang wrote:
+>> From: Binbin Wu <binbin.wu@linux.intel.com>
 >>
->>
->> 在 2023/8/16 10:43, bibo mao 写道:
->>>
->>>
->>> 在 2023/8/15 22:50, Sean Christopherson 写道:
->>>> On Tue, Aug 15, 2023, Yan Zhao wrote:
->>>>> On Mon, Aug 14, 2023 at 09:40:44AM -0700, Sean Christopherson wrote:
->>>>>>>> Note, I'm assuming secondary MMUs aren't allowed to map swap entries...
->>>>>>>>
->>>>>>>> Compile tested only.
->>>>>>>
->>>>>>> I don't find a matching end to each
->>>>>>> mmu_notifier_invalidate_range_start_nonblock().
->>>>>>
->>>>>> It pairs with existing call to mmu_notifier_invalidate_range_end() in change_pmd_range():
->>>>>>
->>>>>> 	if (range.start)
->>>>>> 		mmu_notifier_invalidate_range_end(&range);
->>>>> No, It doesn't work for mmu_notifier_invalidate_range_start() sent in change_pte_range(),
->>>>> if we only want the range to include pages successfully set to PROT_NONE.
->>>>
->>>> Precise invalidation was a non-goal for my hack-a-patch.  The intent was purely
->>>> to defer invalidation until it was actually needed, but still perform only a
->>>> single notification so as to batch the TLB flushes, e.g. the start() call still
->>>> used the original @end.
->>>>
->>>> The idea was to play nice with the scenario where nothing in a VMA could be migrated.
->>>> It was complete untested though, so it may not have actually done anything to reduce
->>>> the number of pointless invalidations.
->>> For numa-balance scenery, can original page still be used by application even if pte
->>> is changed with PROT_NONE?  If it can be used, maybe we can zap shadow mmu and flush tlb
-> For GUPs that does not honor FOLL_HONOR_NUMA_FAULT, yes,
-> 
-> See https://lore.kernel.org/all/20230803143208.383663-1-david@redhat.com/
-> 
->> Since there is kvm_mmu_notifier_change_pte notification when numa page is replaced with
->> new page, my meaning that can original page still be used by application even if pte
->> is changed with PROT_NONE and before replaced with new page?
-> It's not .change_pte() notification, which is sent when COW.
-> The do_numa_page()/do_huge_pmd_numa_page() will try to unmap old page
-> protected with PROT_NONE, and if every check passes, a separate
-> .invalidate_range_start()/end() with event type MMU_NOTIFY_CLEAR will be
-> sent.
-yes, you are right. change_pte() notification will be will called
-when migrate_vma_pages, I messed it with numa page migration. However
-invalidate_range_start()/end() with event type MMU_NOTIFY_CLEAR will be
-sent also when new page is replaced.
-> 
-> So, I think KVM (though it honors FOLL_HONOR_NUMA_FAULT), can safely
-> keep mapping maybe-dma pages until MMU_NOTIFY_CLEAR is sent.
-> (this approach is implemented in RFC v1
-> https://lore.kernel.org/all/20230810085636.25914-1-yan.y.zhao@intel.com/)
-> 
->>
->> And for primary mmu, tlb is flushed after pte is changed with PROT_NONE and 
->> after mmu_notifier_invalidate_range_end notification for secondary mmu.
->> Regards
->> Bibo Mao
-> 
->>>> in notification mmu_notifier_invalidate_range_end with precised range, the range can
-> But I don't think flush tlb only in the .invalidate_range_end() in
-> secondary MMU is a good idea.
-I have no good idea, and it beyond my ability to modify kvm framework now :(
+>> Use the new flag X86EMUL_F_BRANCH instead of X86EMUL_F_FETCH in
+>> assign_eip(), since strictly speaking it is not behavior of instruction
+>> fetch.
+> Eh, I'd just drop this paragraph, as evidenced by this code existing as-is for
+> years, we wouldn't introduce X86EMUL_F_BRANCH just because resolving a branch
+> target isn't strictly an instruction fetch.
+>
+>> Another reason is to distinguish instruction fetch and execution of branch
+>> instruction for feature(s) that handle differently on them.
+> Similar to the shortlog, it's about computing the branch target, not executing a
+> branch instruction.  That distinction matters, e.g. a Jcc that is not taken will
+> *not* follow the branch target, but the instruction is still *executed*.  And there
+> exist instructions that compute branch targets, but aren't what most people would
+> typically consider a branch instruction, e.g. XBEGIN.
+>
+>> Branch instruction is not data access instruction, so skip checking against
+>> execute-only code segment as instruction fetch.
+> Rather than call out individual use case, I would simply state that as of this
+> patch, X86EMUL_F_BRANCH and X86EMUL_F_FETCH are identical as far as KVM is
+> concernered.  That let's the reader know that (a) there's no intended change in
+> behavior and (b) that the intent is to effectively split all consumption of
+> X86EMUL_F_FETCH into (X86EMUL_F_FETCH | X86EMUL_F_BRANCH).
 
-> Flush must be done before kvm->mmu_lock is unlocked, otherwise,
-> confusion will be caused when multiple threads trying to update the
-> secondary MMU.
-Since tlb flush is delayed after all pte entries are cleared, and currently
-there is no tlb flush range supported for secondary mmu. I do know why there
-is confusion before or after kvm->mmu_lock.
+How about this:
 
-Regards
-Bibo Mao
-> 
->>>> be cross-range between range mmu_gather and mmu_notifier_range.
-> 
-> 
+     KVM: x86: Use a new flag for branch targets
+
+     Use the new flag X86EMUL_F_BRANCH instead of X86EMUL_F_FETCH in 
+assign_eip()
+     to distinguish instruction fetch and branch target computation for 
+feature(s)
+     that handle differently on them.
+
+     As of this patch, X86EMUL_F_BRANCH and X86EMUL_F_FETCH are 
+identical as far as
+     KVM is concernered.
+
+     No functional change intended.
+
+
+>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+>> ---
+>>   arch/x86/kvm/emulate.c     | 5 +++--
+>>   arch/x86/kvm/kvm_emulate.h | 1 +
+>>   2 files changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+>> index 3ddfbc99fa4f..8e706d19ae45 100644
+>> --- a/arch/x86/kvm/emulate.c
+>> +++ b/arch/x86/kvm/emulate.c
+>> @@ -721,7 +721,8 @@ static __always_inline int __linearize(struct x86_emulate_ctxt *ctxt,
+>>   		    (flags & X86EMUL_F_WRITE))
+>>   			goto bad;
+>>   		/* unreadable code segment */
+>> -		if (!(flags & X86EMUL_F_FETCH) && (desc.type & 8) && !(desc.type & 2))
+>> +		if (!(flags & (X86EMUL_F_FETCH | X86EMUL_F_BRANCH))
+>> +			&& (desc.type & 8) && !(desc.type & 2))
+> Put the && on the first line, and align indendation.
+I should have been more careful on the alignment & indentation.
+Will update it. Thanks.
+
+>
+> 		/* unreadable code segment */
+> 		if (!(flags & (X86EMUL_F_FETCH | X86EMUL_F_BRANCH)) &&
+> 		    (desc.type & 8) && !(desc.type & 2))
+> 			goto bad;
 
