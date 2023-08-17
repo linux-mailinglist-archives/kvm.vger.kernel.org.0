@@ -2,72 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC4CE77F347
+	by mail.lfdr.de (Postfix) with ESMTP id 11C7577F345
 	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 11:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349597AbjHQJ3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 05:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56056 "EHLO
+        id S1349605AbjHQJ3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 05:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349640AbjHQJ3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 05:29:31 -0400
+        with ESMTP id S1349641AbjHQJ3d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 05:29:33 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB1F2712;
-        Thu, 17 Aug 2023 02:29:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4312712
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 02:29:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 286A666205;
-        Thu, 17 Aug 2023 09:29:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CAD2C433C7;
-        Thu, 17 Aug 2023 09:29:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BDF5A6624A
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 09:29:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2448EC433C7;
+        Thu, 17 Aug 2023 09:29:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692264568;
-        bh=P4Sp+VqUPcqI98k0LUu6HacGUKj+uHSgw7K7aWCb3k0=;
+        s=k20201202; t=1692264571;
+        bh=0PTCv8BrIVMJUjmKixV2bEKBL/aXU/1ljGkJ3AG/cak=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Q+zYTe9UDF16wP55sTzt+DzGXrWWyu3oY8QF11Gft1JI/tmxvtFEXbtzd0EuHXfBL
-         5MC7tmMiCNFj6YaWcEiak6GLPjmrNiCI/TnQqG01d/+uqGGOYC6tNi+X7ILYxEue0n
-         pfX4YT3XQPt6aNdLhs3RYger0xbLcWjoyfYkZCvsSyUKaSnLjTXZ9rPHiujhdNpxzl
-         2hoAdivaRbwMKK6PyWvXHHNiRjpHf2y+Pec6dwRJlKimbIuUBRLCxCDYAg6m/1P1b2
-         5v4E9wojAJCLauOhLoS73p8UZOnO38263A6U6MVFTXvciUaFbBkdRFG4tzAJgrp/Hr
-         odQW5fyOYiEww==
+        b=iToFXREVJKpzs9nQmAO2jwbhewqe1y6AWRdEWU0c9GBZkJslbzOIxpqDhAkSavSqk
+         7eS5WP0EpB+AjzOzZnnsFudmBt71co3oPwBPsqWJBnwvJE5aYvbA1X42p8O9IYByBZ
+         7QU2egwPPN1ueWdCu03OvJsQCgcz6kfvfWkpXDYpbbZWsTcJCYh89eg7ndvpsXDKUO
+         RcW3WdhyNbZNDl+McdH59E27Ec25WLYAlOUgPpN5fiiSS9KJ7WQx75aFscmIYJ3EQ3
+         aoYUStCmkS7VYfs49j9yqaqDukIrE9BLc1XDxcHbOSrgUASXMded1L+E77yyn7yK7D
+         f28E3lad38iLQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qWZJl-005dbe-IC;
-        Thu, 17 Aug 2023 10:29:25 +0100
+        id 1qWZJo-005dbi-VY;
+        Thu, 17 Aug 2023 10:29:29 +0100
 From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Reiji Watanabe <reijiw@google.com>, kvmarm@lists.linux.dev,
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
+Cc:     Mark Brown <broonie@kernel.org>,
+        Chase Conklin <chase.conklin@arm.com>,
         Jing Zhang <jingzhangos@google.com>,
-        kvm-riscv@lists.infradead.org, linux-mips@vger.kernel.org,
-        Anup Patel <anup@brainfault.org>,
-        Colton Lewis <coltonlewis@google.com>,
-        Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
-        Huacai Chen <chenhuacai@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <seanjc@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Darren Hart <darren@os.amperecomputing.com>,
+        Eric Auger <eric.auger@redhat.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
-        linux-riscv@lists.infradead.org,
-        Atish Patra <atishp@atishpatra.org>
-Subject: Re: [PATCH v9 00/14] KVM: arm64: Add support for FEAT_TLBIRANGE
-Date:   Thu, 17 Aug 2023 10:29:21 +0100
-Message-Id: <169226452281.2753740.2247650864841184971.b4-ty@kernel.org>
+        Will Deacon <will@kernel.org>,
+        Miguel Luis <miguel.luis@oracle.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v4 00/28] KVM: arm64: NV trap forwarding infrastructure
+Date:   Thu, 17 Aug 2023 10:29:26 +0100
+Message-Id: <169226452281.2753740.4810898175548882849.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230811045127.3308641-1-rananta@google.com>
-References: <20230811045127.3308641-1-rananta@google.com>
+In-Reply-To: <20230815183903.2735724-1-maz@kernel.org>
+References: <20230815183903.2735724-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, rananta@google.com, pbonzini@redhat.com, reijiw@google.com, kvmarm@lists.linux.dev, jingzhangos@google.com, kvm-riscv@lists.infradead.org, linux-mips@vger.kernel.org, anup@brainfault.org, coltonlewis@google.com, tabba@google.com, kvm@vger.kernel.org, chenhuacai@kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, dmatlack@google.com, seanjc@google.com, yuzenghui@huawei.com, linux-riscv@lists.infradead.org, atishp@atishpatra.org
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, maz@kernel.org, broonie@kernel.org, chase.conklin@arm.com, jingzhangos@google.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, andre.przywara@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, darren@os.amperecomputing.com, eric.auger@redhat.com, yuzenghui@huawei.com, will@kernel.org, miguel.luis@oracle.com, gankulkarni@os.amperecomputing.com, james.morse@arm.com, mark.rutland@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -79,48 +79,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 11 Aug 2023 04:51:13 +0000, Raghavendra Rao Ananta wrote:
-> In certain code paths, KVM/ARM currently invalidates the entire VM's
-> page-tables instead of just invalidating a necessary range. For example,
-> when collapsing a table PTE to a block PTE, instead of iterating over
-> each PTE and flushing them, KVM uses 'vmalls12e1is' TLBI operation to
-> flush all the entries. This is inefficient since the guest would have
-> to refill the TLBs again, even for the addresses that aren't covered
-> by the table entry. The performance impact would scale poorly if many
-> addresses in the VM is going through this remapping.
+On Tue, 15 Aug 2023 19:38:34 +0100, Marc Zyngier wrote:
+> Another week, another version. Change log below.
+> 
+> I'll drop this into -next now, and see what happens.
+> 
+> * From v3 [3]:
+> 
+>   - Renamed trap_group to cgt_group_id (Eric)
 > 
 > [...]
 
 Applied to next, thanks!
 
-[01/14] KVM: Rename kvm_arch_flush_remote_tlb() to kvm_arch_flush_remote_tlbs()
-        commit: a1342c8027288e345cc5fd16c6800f9d4eb788ed
-[02/14] KVM: Declare kvm_arch_flush_remote_tlbs() globally
-        commit: cfb0c08e80120928dda1e951718be135abd49bae
-[03/14] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-        commit: 32121c813818a87ba7565b3afce93a9cc3610a22
-[04/14] KVM: Remove CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
-        commit: eddd21481011008792f4e647a5244f6e15970abc
-[05/14] KVM: Allow range-based TLB invalidation from common code
-        commit: d4788996051e3c07fadc6d9b214073fcf78810a8
-[06/14] KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
-        commit: 619b5072443c05cf18c31b2c0320cdb42396d411
-[07/14] arm64: tlb: Refactor the core flush algorithm of __flush_tlb_range
-        commit: 360839027a6e4c022e8cbaa373dd747185f1e0a5
-[08/14] arm64: tlb: Implement __flush_s2_tlb_range_op()
-        commit: 4d73a9c13aaa78b149ac04b02f0ee7973f233bfa
-[09/14] KVM: arm64: Implement __kvm_tlb_flush_vmid_range()
-        commit: 6354d15052ec88273c24beae4c99e31c3d3889b6
-[10/14] KVM: arm64: Define kvm_tlb_flush_vmid_range()
-        commit: 117940aa6e5f8308f1529e1313660980f1dae771
-[11/14] KVM: arm64: Implement kvm_arch_flush_remote_tlbs_range()
-        commit: c42b6f0b1cde4dd19e6b5dd052e67b87cc331b01
-[12/14] KVM: arm64: Flush only the memslot after write-protect
-        commit: 3756b6f2bb3a242fef0867b39a23607f5aeca138
-[13/14] KVM: arm64: Invalidate the table entries upon a range
-        commit: defc8cc7abf0fcee8d73e440ee02827348d060e0
-[14/14] KVM: arm64: Use TLBI range-based instructions for unmap
-        commit: 7657ea920c54218f123ddc1b572821695b669c13
+[01/28] arm64: Add missing VA CMO encodings
+        commit: 21f74a51373791732baa0d672a604afa76d5718d
+[02/28] arm64: Add missing ERX*_EL1 encodings
+        commit: 464f2164da7e4cb50faec9d56226b22c9b36cdda
+[03/28] arm64: Add missing DC ZVA/GVA/GZVA encodings
+        commit: 6ddea24dfd59f0fc78a87df54d428e3a6cf3e11f
+[04/28] arm64: Add TLBI operation encodings
+        commit: fb1926cccd70a5032448968dfd639187cd894cb7
+[05/28] arm64: Add AT operation encodings
+        commit: 2b97411fef8ff9dafc862971f08382f780dc5357
+[06/28] arm64: Add debug registers affected by HDFGxTR_EL2
+        commit: 57596c8f991c9aace47d75b31249b8ec36b3b899
+[07/28] arm64: Add missing BRB/CFP/DVP/CPP instructions
+        commit: 2b062ed483ebd625b6c6054b9d29d600bd755a86
+[08/28] arm64: Add HDFGRTR_EL2 and HDFGWTR_EL2 layouts
+        commit: cc24f656f7cf834f384a43fc6fe68ec62730743d
+[09/28] arm64: Add feature detection for fine grained traps
+        commit: b206a708cbfb352f2191089678ab595d24563011
+[10/28] KVM: arm64: Correctly handle ACCDATA_EL1 traps
+        commit: 484f86824a3d94c6d9412618dd70b1d5923fff6f
+[11/28] KVM: arm64: Add missing HCR_EL2 trap bits
+        commit: 3ea84b4fe446319625be64945793b8540ca15f84
+[12/28] KVM: arm64: nv: Add FGT registers
+        commit: 50d2fe4648c50e7d33fa576f6b078f22ad973670
+[13/28] KVM: arm64: Restructure FGT register switching
+        commit: e930694e6145eb210c9931914a7801cc61016a82
+[14/28] KVM: arm64: nv: Add trap forwarding infrastructure
+        commit: e58ec47bf68d2bcaaa97d80cc13aca4bc4abe07b
+[15/28] KVM: arm64: nv: Add trap forwarding for HCR_EL2
+        commit: d0fc0a2519a6dd906aac448e742958d30b5787ac
+[16/28] KVM: arm64: nv: Expose FEAT_EVT to nested guests
+        commit: a0b70fb00db83e678f92b8aed0a9a9e4ffcffb82
+[17/28] KVM: arm64: nv: Add trap forwarding for MDCR_EL2
+        commit: cb31632c44529048c052a2961b3adf62a2c89b17
+[18/28] KVM: arm64: nv: Add trap forwarding for CNTHCTL_EL2
+        commit: e880bd3363237ed8abbe623d1b49d59d5f6fe0d1
+[19/28] KVM: arm64: nv: Add fine grained trap forwarding infrastructure
+        commit: 15b4d82d69d7b0e5833b7a023dff3d7bbae5ccfc
+[20/28] KVM: arm64: nv: Add trap forwarding for HFGxTR_EL2
+        commit: 5a24ea7869857251a83da1512209f76003bc09db
+[21/28] KVM: arm64: nv: Add trap forwarding for HFGITR_EL2
+        commit: 039f9f12de5fc761d2b32fa072071533aa8cbb3b
+[22/28] KVM: arm64: nv: Add trap forwarding for HDFGxTR_EL2
+        commit: d0be0b2ede13247c53745d50e2a5993f2b27c802
+[23/28] KVM: arm64: nv: Add SVC trap forwarding
+        commit: a77b31dce4375be15014b10e8f94a149592ea6b6
+[24/28] KVM: arm64: nv: Expand ERET trap forwarding to handle FGT
+        commit: ea3b27d8dea081f1693b310322ae71fa75d1875b
+[25/28] KVM: arm64: nv: Add switching support for HFGxTR/HDFGxTR
+        commit: d4d2dacc7cddc37aaa7c6eed8665d533d1037e1e
+[26/28] KVM: arm64: nv: Expose FGT to nested guests
+        commit: 0a5d28433ad94cc38ecb3dbb5138b8ae30ffb98a
+[27/28] KVM: arm64: Move HCRX_EL2 switch to load/put on VHE systems
+        commit: a63cf31139b7f41d468dc8ef63dbf6bae213d960
+[28/28] KVM: arm64: nv: Add support for HCRX_EL2
+        commit: 03fb54d0aa73cc14e51f6611eb3289e4fec15184
 
 Cheers,
 
