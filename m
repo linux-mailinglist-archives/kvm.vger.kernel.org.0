@@ -2,111 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4475377F98F
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 16:46:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 028BA77FB0E
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 17:44:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352187AbjHQOqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 10:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35712 "EHLO
+        id S1353278AbjHQPno (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 11:43:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352300AbjHQOp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 10:45:57 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5333593
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 07:45:42 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-586a5ac5c29so96804307b3.1
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 07:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692283541; x=1692888341;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KM80ZNnp20PNpo/anqlhgUFa4QpjUiNpC9plwfXLRWA=;
-        b=QjPyI4XI8622SbvZoKVpJTnnqWN3JkJe21W0wVXqNzUtBrfG+OQ7URD3633OL7QUNb
-         7jK52Cwb8PjbQd4EpdX6HNBT0OAzBM8K3WLRdWFgL2S4PZ2HMxqHxr+YujCOej2Pty4W
-         VDInswRbwKMiZ9w+zvTgR9DK1Ahct/5bFssTvnmUvQnyehc/j3c3cjr+rvBUi7jmLxiK
-         rHNmYvguBJFY0mWfOysXcYsizU3Ve7O+KDqLxmK9SI9zgkKvlPxZniMOdW2ZjoN61vwN
-         sTzk1yRsuCvADiL/OUfsyZXXN7HY0VD3f6UOiRJVPera36gE0QR3vYurbsErAEYYn2fq
-         JNuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692283541; x=1692888341;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KM80ZNnp20PNpo/anqlhgUFa4QpjUiNpC9plwfXLRWA=;
-        b=WR7trrVK6jVJsXkR79BpD+oyiN//b8t8XIXjFU1O1g9T6/39Jt4CvfcooPdIxKN3E3
-         qnS4t6TFW1sKzfNXYASQ9PfVK54VQ7vtQ26ajyQvjA06qawUM7uoTE8ZXmHwvKKNJVtB
-         sbqYZA94RSdsy0xNoWTDiMawXsitHRyJWWRJHa1B4KHTFx/iYQbeWX+3Vk2cDUcGeZl/
-         JjhcNb0pn9YNdtYCe5c/7SrUjb+73gSPIr3oOZc4CN2Qjs+bY+QZi/WllNa6cuzdbOy/
-         +ue5WoxWTd1wLBn5Y5SHyDRQL+FbzTT0l7TQcLGqDZRRXOQ7m/GqsueUI4el4zfE6JlH
-         XUDA==
-X-Gm-Message-State: AOJu0YyeiRvxJA+fn4HYg19aZp+qAo5U40yrkf7sQf2LVP9V3Qnr+9eB
-        qtsmsTq+YIwI6vaC0LZAVKF1jUEwRIg=
-X-Google-Smtp-Source: AGHT+IGHzC3HJHyiKi0mKqHVraRuZMM66a306NXB9BtkJmOJ1ZQlDhwwBy8Zkq73uiBQK9AAN/ZN0YYFZYs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1828:b0:d0e:d67d:6617 with SMTP id
- cf40-20020a056902182800b00d0ed67d6617mr70431ybb.4.1692283541337; Thu, 17 Aug
- 2023 07:45:41 -0700 (PDT)
-Date:   Thu, 17 Aug 2023 07:45:39 -0700
-In-Reply-To: <998ebc6b-4654-f0d3-dc49-b2208635db48@linux.intel.com>
-Mime-Version: 1.0
-References: <20230719024558.8539-1-guang.zeng@intel.com> <20230719024558.8539-3-guang.zeng@intel.com>
- <ZNwBeN8mGr1sJJ6i@google.com> <e2662efe-9c53-77de-836c-a29076d3ccdc@linux.intel.com>
- <ZNzfgxTnB6KYWENg@google.com> <998ebc6b-4654-f0d3-dc49-b2208635db48@linux.intel.com>
-Message-ID: <ZN4ykwq11h6awR2k@google.com>
-Subject: Re: [PATCH v2 2/8] KVM: x86: Use a new flag for branch instructions
-From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Zeng Guang <guang.zeng@intel.com>,
+        with ESMTP id S1353291AbjHQPni (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 11:43:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DBD30D8
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 08:43:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8DEA3674D2
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 15:43:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0AA1C433C8;
+        Thu, 17 Aug 2023 15:43:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692287016;
+        bh=ENSBmFTwAkmLWRSPDWXacvhCmkoWqWKBl83e4JjNB0g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Whf9CQf5w/JqP75xeV5sFKVekukqAQb4oKu36Ppo7n1Bpb+oWmc+2x+YYYhSrefbi
+         jIaAF6dlggiE5szzkLNXzZASE4PSmupbZWZNYyywTf42ltabFnDWp/MXejy0CNS3In
+         2qdZL4OBKZQQhZfsJWzTXWf58FasP8Bz0GG/KDnvaqACMdVu+UWyz+DcnbRFYQzJd1
+         Cq+ggCibb73NqumzWvpRweyNf2OZ4SKPmOGJcdiDZmruOLhPzlKfZUxF74Nn/nKyu/
+         9tGOqa9SA0SwR/bF80DfUyvMaU9DKAgaLnhneq6X9TaRxnMlUTl72GL69r/UdRpqyg
+         OVy+zAZ3I4NxA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qWf9p-005izV-FM;
+        Thu, 17 Aug 2023 16:43:33 +0100
+Date:   Thu, 17 Aug 2023 16:43:33 +0100
+Message-ID: <86r0o1fzdm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        H Peter Anvin <hpa@zytor.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v8 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
+In-Reply-To: <20230807162210.2528230-6-jingzhangos@google.com>
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+        <20230807162210.2528230-6-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com, cohuck@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 17, 2023, Binbin Wu wrote:
->=20
->=20
-> On 8/16/2023 10:38 PM, Sean Christopherson wrote:
-> > On Wed, Aug 16, 2023, Binbin Wu wrote:
-> > >=20
-> > > On 8/16/2023 6:51 AM, Sean Christopherson wrote:
-> > > > Rather than call out individual use case, I would simply state that=
- as of this
-> > > > patch, X86EMUL_F_BRANCH and X86EMUL_F_FETCH are identical as far as=
- KVM is
-> > > > concernered.  That let's the reader know that (a) there's no intend=
-ed change in
-> > > > behavior and (b) that the intent is to effectively split all consum=
-ption of
-> > > > X86EMUL_F_FETCH into (X86EMUL_F_FETCH | X86EMUL_F_BRANCH).
-> > > How about this:
-> > >=20
-> > >  =C2=A0=C2=A0=C2=A0 KVM: x86: Use a new flag for branch targets
-> > >=20
-> > >  =C2=A0=C2=A0=C2=A0 Use the new flag X86EMUL_F_BRANCH instead of X86E=
-MUL_F_FETCH in
-> > > assign_eip()
-> > >  =C2=A0=C2=A0=C2=A0 to distinguish instruction fetch and branch targe=
-t computation for
-> > > feature(s)
-> > Just "features", i.e. no parentheses...
-> >=20
-> > >  =C2=A0=C2=A0=C2=A0 that handle differently on them.
-> > ...and tack on ", e.g. LASS and LAM." at the end.
-> OK, but only LASS here, since LAM only applies to addresses for data
-> accesses, i.e, no need to distingush the two flag.
+On Mon, 07 Aug 2023 17:22:03 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> from usrespace with this change.
 
-Oh, right.   Thanks!
+nit: userspace
+
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index afade7186675..5f6c2be12e44 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2006,7 +2006,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .set_user = set_id_dfr0_el1,
+>  	  .visibility = aa32_id_visibility,
+>  	  .reset = read_sanitised_id_dfr0_el1,
+> -	  .val = ID_DFR0_EL1_PerfMon_MASK, },
+> +	  .val = GENMASK(63, 0), },
+
+For obvious reasons, this cannot be a 64 bit mask...
+
+>  	ID_HIDDEN(ID_AFR0_EL1),
+>  	AA32_ID_SANITISED(ID_MMFR0_EL1),
+>  	AA32_ID_SANITISED(ID_MMFR1_EL1),
+> @@ -2055,7 +2055,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .get_user = get_id_reg,
+>  	  .set_user = set_id_aa64dfr0_el1,
+>  	  .reset = read_sanitised_id_aa64dfr0_el1,
+> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
+> +	  .val = GENMASK(63, 0), },
+
+What is the actual justification to go from "only the PMU version is
+writable" to "everything is writable"?
+
+Also, what about the RES0 fields?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
