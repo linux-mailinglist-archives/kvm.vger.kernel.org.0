@@ -2,145 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B9BA77FDEC
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 20:35:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A91EF77FEB2
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 21:47:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354448AbjHQSev (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 14:34:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58324 "EHLO
+        id S1354748AbjHQTrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 15:47:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354442AbjHQSea (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 14:34:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FF12136
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 11:33:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692297224;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gexPipbqUfcFFvNx/MvK38HTJI+O56duX55+MbeHy94=;
-        b=Ik6likBEE1lEcypUY5A2U3283t18qz1wuQsSi4Y0ftrhFt4oxIAeFhlFBxx6VzXQqa6lJz
-        ucKcMjYts3nrKXhCwtpfKdGUVCEHd4unYU3KEeQSgHNppTaG+ghg31wTb62a8spfTiBtWM
-        DRtGsld5+jSQ3eWrxr3t4HlfqviGmzg=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-wzVBVnGfO8O5FXDQOWKTiQ-1; Thu, 17 Aug 2023 14:33:41 -0400
-X-MC-Unique: wzVBVnGfO8O5FXDQOWKTiQ-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-34a94a4ebeeso1089125ab.1
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 11:33:41 -0700 (PDT)
+        with ESMTP id S243326AbjHQTqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 15:46:44 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75EAB359B
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 12:46:43 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56385c43eaeso220872a12.1
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 12:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692301603; x=1692906403;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=38OjwvLryGdRHNnQWvsk2mgWrNDTfqIkNTH/PDjk+4c=;
+        b=jxJyj8vSc6MVlvwD3uyMXulv8nXM55AWC9xP41lj7Vv/PPFEby+CxZdmmt0CNvuHOH
+         TH9kLw8p++GjtH1j8/hd4kIG8jRZEUotTPHb0Hfr4dtL2YfI+c1IZ9jhNcaIwS/Brv6b
+         KKXsVS5CPcB1ginpNzN2uXhSew0+N2RgepwQd5vEyqVnpItfJcK20+eUs46gU5e5NdLF
+         ZWoRgewhJBv+ehRh49D5L7rS22AyO0ub77AQOOLv1cNoT6y/F+Z3334WyDyrk7F7RMVc
+         e3DitMFKj1rOjnvoqpgM+cvYv93cUinXdWtPlw28mzywXfuQb+5s6w6+DaztqYxvwqgC
+         j7Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692297221; x=1692902021;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gexPipbqUfcFFvNx/MvK38HTJI+O56duX55+MbeHy94=;
-        b=NNq9pXf4OE+SN1DUFLO2z2R+jLv7lUcQsy9Yx/dPA5lRJnTgOSgDka89QkzFyLfWDf
-         58xlH9gApSvDhwSwiB6t7VcmZxCWUZKjqueWvpihKcQRmLND10la1hpYtuSEk4Ad+QfE
-         ii3T+yyZxuvcnz/J2f8ytXnC+rJrl6M1Ph7pNhfwHGAEd1Bh3iFEl01CmhvjUc8SJH7z
-         kXHsbI72ufs9fQBOkYQEuNXarr4Fu4IPAzFk/vHacp+204uyqFuOeLI+QSkePg42vznn
-         AtzIj9qhChXcY5jtmnby+y9OkD2AiIHs2s48L80j2rNvm8fHgl4OYE5TUUvkdu0lezB4
-         U9lA==
-X-Gm-Message-State: AOJu0Yw1yFyGrdBoghqezY24GoFT1BQN+pMq+vRzAgIoH2UHdk797ELC
-        UUgJf3Ubi0pHLrBuxzjlVQFnL6RKUSrB4m8v4OJIXJ6lL2ZAzNEzznwr+M+ws+f2JFV1MmBr4qs
-        10flh/wIBMFkh
-X-Received: by 2002:a05:6e02:927:b0:34a:9120:d7e with SMTP id o7-20020a056e02092700b0034a91200d7emr428420ilt.9.1692297220856;
-        Thu, 17 Aug 2023 11:33:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHa6I/Sfuog1vyDS9pXGoSuKyZqpdybT3hs/6ik00fZZgmWFHMcUgu93VYiI0dKSWu8SQIAvw==
-X-Received: by 2002:a05:6e02:927:b0:34a:9120:d7e with SMTP id o7-20020a056e02092700b0034a91200d7emr428407ilt.9.1692297220597;
-        Thu, 17 Aug 2023 11:33:40 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id y3-20020a92c743000000b003491422ca27sm27524ilp.45.2023.08.17.11.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 11:33:39 -0700 (PDT)
-Date:   Thu, 17 Aug 2023 12:33:38 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] vfio: align capability structures
-Message-ID: <20230817123338.764e8c83.alex.williamson@redhat.com>
-In-Reply-To: <ZN5getPSq1stluMt@nvidia.com>
-References: <20230809203144.2880050-1-stefanha@redhat.com>
-        <ZN5getPSq1stluMt@nvidia.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1692301603; x=1692906403;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=38OjwvLryGdRHNnQWvsk2mgWrNDTfqIkNTH/PDjk+4c=;
+        b=BgChTc7mVzZ2XydEYo002veBJSBWx3p6yTUXOgzrwwQF9xqEhgeYRUcDMHAIJu/cO9
+         Du8wVWR9ZhKTpbOf1KjAzJT25B1X+Rv7lwbqWo7WudzoBJkIJniAnoJu/XR9KLp3D+UH
+         aQ1Ux0RKNDfTuG0957psy9f4liwpCGNoLBPfsZhgoN7WpMlUPGDzXNO8PJOq8NACOL0N
+         ztaJdtAZhziLL5qlIEdGrk5voC0aONh0Q4Fx23856ldUlT77pfy3d8+dzrqnRQjBFUg8
+         e65URf5wFjcW2vn3KNYKLyrJTk8+P+KgXWbuagn25XYq2i7XIvPRVSkAi0FP6cq828f0
+         A3FQ==
+X-Gm-Message-State: AOJu0YwFW+/BnijqqdPanUMdzMdeIJ/QK9+4pnU2mrOTLOBMfWeRBKx2
+        YoiDX1HW8FLCNOjIVK6S10rkO+q/q24=
+X-Google-Smtp-Source: AGHT+IFBe9aniLvKThqqpWnXRIW+Ce6rpM3SxSMATIg5sCkf4FHEzKrUMBQUwCkNZWjSzdkkdkLSS3NKUoQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:295a:0:b0:565:dc04:c912 with SMTP id
+ bu26-20020a63295a000000b00565dc04c912mr76598pgb.5.1692301602857; Thu, 17 Aug
+ 2023 12:46:42 -0700 (PDT)
+Date:   Thu, 17 Aug 2023 12:46:40 -0700
+In-Reply-To: <244a3f0b-16fd-eac8-f207-1dfe7859410b@linux.intel.com>
+Mime-Version: 1.0
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+ <20230719144131.29052-4-binbin.wu@linux.intel.com> <c4faf38ea79e0f4eb3d35d26c018cd2bfe9fe384.camel@intel.com>
+ <66235c55-05ac-edd5-c45e-df1c42446eb3@linux.intel.com> <aa17648c001704d83dcf641c1c7e9894e65eb87a.camel@intel.com>
+ <ZN1Ardu9GRx7KlAV@google.com> <244a3f0b-16fd-eac8-f207-1dfe7859410b@linux.intel.com>
+Message-ID: <ZN55IJoxTMb1niP7@google.com>
+Subject: Re: [PATCH v10 3/9] KVM: x86: Use KVM-governed feature framework to
+ track "LAM enabled"
+From:   Sean Christopherson <seanjc@google.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        "David.Laight@ACULAB.COM" <David.Laight@aculab.com>,
+        Guang Zeng <guang.zeng@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 17 Aug 2023 15:01:30 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, Aug 17, 2023, Binbin Wu wrote:
+>=20
+>=20
+> On 8/17/2023 5:33 AM, Sean Christopherson wrote:
+> > On Wed, Aug 16, 2023, Kai Huang wrote:
+> > > > > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > > > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > > > > @@ -7783,6 +7783,9 @@ static void vmx_vcpu_after_set_cpuid(stru=
+ct kvm_vcpu *vcpu)
+> > > > > >    		vmx->msr_ia32_feature_control_valid_bits &=3D
+> > > > > >    			~FEAT_CTL_SGX_LC_ENABLED;
+> > > > > > +	if (boot_cpu_has(X86_FEATURE_LAM))
+> > > > > > +		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_LAM);
+> > > > > > +
+> > > > > If you want to use boot_cpu_has(), it's better to be done at your=
+ last patch to
+> > > > > only set the cap bit when boot_cpu_has() is true, I suppose.
+> > > > Yes, but new version of kvm_governed_feature_check_and_set() of
+> > > > KVM-governed feature framework will check against kvm_cpu_cap_has()=
+ as well.
+> > > > I will remove the if statement and call
+> > > > kvm_governed_feature_check_and_set()=C2=A0 directly.
+> > > > https://lore.kernel.org/kvm/20230815203653.519297-2-seanjc@google.c=
+om/
+> > > >=20
+> > > I mean kvm_cpu_cap_has() checks against the host CPUID directly while=
+ here you
+> > > are using boot_cpu_has().  They are not the same.
+> > >=20
+> > > If LAM should be only supported when boot_cpu_has() is true then it s=
+eems you
+> > > can just only set the LAM cap bit when boot_cpu_has() is true.  As yo=
+u also
+> > > mentioned above the kvm_governed_feature_check_and_set() here interna=
+lly does
+> > > kvm_cpu_cap_has().
+> > That's covered by the last patch:
+> >=20
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index e961e9a05847..06061c11d74d 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -677,7 +677,7 @@ void kvm_set_cpu_caps(void)
+> >          kvm_cpu_cap_mask(CPUID_7_1_EAX,
+> >                  F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
+> >                  F(FZRM) | F(FSRS) | F(FSRC) |
+> > -               F(AMX_FP16) | F(AVX_IFMA)
+> > +               F(AMX_FP16) | F(AVX_IFMA) | F(LAM)
+> >          );
+> >          kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
+> >=20
+> >=20
+> > Which highlights a problem with activating a goverened feature before s=
+aid feature
+> > is actually supported by KVM: it's all kinds of confusing.
+> >=20
+> > It'll generate a more churn in git history, but I think we should first=
+ enable
+> > LAM without a goverened feature, and then activate a goverened feature =
+later on.
+> > Using a goverened feature is purely an optimization, i.e. the series ne=
+eds to be
+> > function without using a governed feature.
+> OK, then how about the second option which has been listed in your v9 pat=
+ch
+> series discussion.
+> https://lore.kernel.org/kvm/20230606091842.13123-1-binbin.wu@linux.intel.=
+com/T/#m16ee5cec4a46954f985cb6afedb5f5a3435373a1
+>=20
+> Temporarily add a bool can_use_lam in kvm_vcpu_arch and use the bool
+> "can_use_lam" instead of guest_can_use(vcpu, X86_FEATURE_LAM).
+> and then put the patch of adopting "KVM-governed feature framework" to th=
+e
+> last.
 
-> On Wed, Aug 09, 2023 at 04:31:44PM -0400, Stefan Hajnoczi wrote:
-> > The VFIO_DEVICE_GET_INFO, VFIO_DEVICE_GET_REGION_INFO, and
-> > VFIO_IOMMU_GET_INFO ioctls fill in an info struct followed by capability
-> > structs:
-> > 
-> >   +------+---------+---------+-----+
-> >   | info | caps[0] | caps[1] | ... |
-> >   +------+---------+---------+-----+
-> > 
-> > Both the info and capability struct sizes are not always multiples of
-> > sizeof(u64), leaving u64 fields in later capability structs misaligned.
-> > 
-> > Userspace applications currently need to handle misalignment manually in
-> > order to support CPU architectures and programming languages with strict
-> > alignment requirements.
-> > 
-> > Make life easier for userspace by ensuring alignment in the kernel. This
-> > is done by padding info struct definitions and by copying out zeroes
-> > after capability structs that are not aligned.
-> > 
-> > The new layout is as follows:
-> > 
-> >   +------+---------+---+---------+-----+
-> >   | info | caps[0] | 0 | caps[1] | ... |
-> >   +------+---------+---+---------+-----+
-> > 
-> > In this example caps[0] has a size that is not multiples of sizeof(u64),
-> > so zero padding is added to align the subsequent structure.
-> > 
-> > Adding zero padding between structs does not break the uapi. The memory
-> > layout is specified by the info.cap_offset and caps[i].next fields
-> > filled in by the kernel. Applications use these field values to locate
-> > structs and are therefore unaffected by the addition of zero padding.
-> > 
-> > Note that code that copies out info structs with padding is updated to
-> > always zero the struct and copy out as many bytes as userspace
-> > requested. This makes the code shorter and avoids potential information
-> > leaks by ensuring padding is initialized.
-> > 
-> > Originally-by: Alex Williamson <alex.williamson@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> > v3:
-> > - Also align capability structs in drivers/iommu/iommufd/vfio_compat.c
-> >   [Jason]
-> > 
-> >  include/uapi/linux/vfio.h           |  2 ++
-> >  drivers/iommu/iommufd/vfio_compat.c |  2 ++
-> >  drivers/vfio/pci/vfio_pci_core.c    | 11 ++---------
-> >  drivers/vfio/vfio_iommu_type1.c     | 11 ++---------
-> >  drivers/vfio/vfio_main.c            |  6 ++++++
-> >  5 files changed, 14 insertions(+), 18 deletions(-)  
-> 
-> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
+No, just do the completely unoptimized, but functionally obvious thing:
 
-Thanks!
+	if (kvm_cpu_cap_has(x86_FEATURE_LAM) &&
+	    guest_cpuid_has(vcpu, x86_FEATURE_LAM))
+		...
 
-Applied to vfio next branch for v6.6.  Thanks,
+I don't expect anyone to push back on using a governed feature, i.e. I don'=
+t expect
+to ever see a kernel release with the unoptimized code.  If someone is bise=
+cting
+or doing something *really* weird with their kernel management, then yes, t=
+hey
+might see suboptimal performance.
 
-Alex
-
+Again, the goal is to separate the addition of functionality from the optim=
+ization
+of that functionality, e.g. to make it easier to review and understand each=
+ change.
