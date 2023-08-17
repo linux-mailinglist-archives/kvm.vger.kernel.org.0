@@ -2,164 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C29A977FD5A
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 19:57:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30FBB77FD6C
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 20:02:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353344AbjHQR4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 13:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36990 "EHLO
+        id S1354184AbjHQSB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 14:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352926AbjHQR4H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 13:56:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D96119A1
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 10:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692294930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PXnE3oQ7Ijeiq5xZy1Iauyqm0pyudGTEGiUZtSXw3Qw=;
-        b=RBolWuRlEDczv7r+BaWqp4KRcSvh7KGy20qTs4yyPcAr9Ex+D3Mz4Vu/kcMYZxUzt8KaOA
-        mCbbbk0/VcqZZP0lD9S+L1kKZLuZJOxL8vh0zueF4aFCH4x5HPx3c8LbRR6aImBTWC7hFK
-        SS7Ve3ECn7MlAhEsk0OLVWHnL2My/Dg=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-369-QycVId0nMkqa-bLxQ_6qmA-1; Thu, 17 Aug 2023 13:55:28 -0400
-X-MC-Unique: QycVId0nMkqa-bLxQ_6qmA-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-790c9aa32d5so2844639f.2
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 10:55:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692294927; x=1692899727;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PXnE3oQ7Ijeiq5xZy1Iauyqm0pyudGTEGiUZtSXw3Qw=;
-        b=b+oREUZ2j6EEP+UINKmPq+GQFQUJ08UPJ9168U/YV9PGH9VG8pgysy8vqPZAE+VRoZ
-         4vW5JfZvyGveo4a5u6g4IXDFneDYEbDD5luGWDbTX+wKJ9proOv0pOpDlv6LXMHt3nxC
-         V/m/kcwCV/fdTtVTw5kkd+nXHzhON7/8rihmxNYkm5CW4uiq4xZerHfiQ1/X3nj7ffwB
-         Lg0Tc77UC28xECd4MWfxqPoa6mAXH0xeBbK3Gkfr/A1E2quo7tSbUAsao30fByo1UHI9
-         wV2J1ZzkvVqIOq1u/ig3PIpWzUMgW9e1m3JkHREF6EvJT+fCb+mAXgoQy1R3R2fNS24q
-         eblg==
-X-Gm-Message-State: AOJu0YyHL5g+2rrm8qIXgR5GNpQMPk60rOMtz2UqNqgDfG+/nFfV7fGb
-        zEUkDeeHpW2ZMu85Z5Y7R9AT+SvOfKvUcUem1KXlRj72mnKwHZAawFAHPUIIVJIuhBPJS8E6ZtJ
-        DnqjtxUMmcoKt
-X-Received: by 2002:a5d:9741:0:b0:791:1e87:b47a with SMTP id c1-20020a5d9741000000b007911e87b47amr360605ioo.14.1692294927585;
-        Thu, 17 Aug 2023 10:55:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGFpk7bhCZKpwXWcm/cP+vn6eMM4NVHT1F17qUVO5PRiKYLHx0tKZMwwGkdF5hF7Wv+KxgilQ==
-X-Received: by 2002:a5d:9741:0:b0:791:1e87:b47a with SMTP id c1-20020a5d9741000000b007911e87b47amr360592ioo.14.1692294927331;
-        Thu, 17 Aug 2023 10:55:27 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id d9-20020a056602064900b0078680780694sm23841iox.34.2023.08.17.10.55.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 10:55:26 -0700 (PDT)
-Date:   Thu, 17 Aug 2023 11:55:26 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
+        with ESMTP id S1354171AbjHQSBf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 14:01:35 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2088.outbound.protection.outlook.com [40.107.243.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36908FD;
+        Thu, 17 Aug 2023 11:01:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T1D7J676WTK/mIbUPoMtoboFJ06CftFnVPAX7vzJbC+o8IFA2kGbP8KIVaUgM+asVhbfTNjRXHWs4yc5TopBFxb0b17HFIh4SWjrC2ZaujJ+7R9/ZRQw4uWuRPO2BTu/RPgJr6B+kcRCiqHKdRRpU54wkaJWnpgA70nXGMM3utJpJuAnrPMLHIdkwczjHH0SDzDKnYgZgUMk7uwcd8WeDu6cl766VhAEJY1el8SA2YdiK6jUCfZj6t9WztDRjLWoK5eh6Lvuz5i4QHnZIU0jumhJcL0AUSjylflMw0wG1pzn47cZpW2E6cdqawiqFkgIsR5wa0hb072nOj7Q0kCB6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ezh92LY7oJW8E5AHPSH8zKa8X0jwZ35+w5/6xX/Hi8Y=;
+ b=fcEll3soF8KAtxe6m+YsalOKCAikbQ4Ilp/QFZz0ccOrWHwfPv8HZ5/Jc2Bqgc6vcrPVxL9SO5Ojhn37iMyBcl+qdf6oZzHGg+lb++3bgacEE3Xj3OhnEP8l76sf9DXlDS6bR9B0x3mznEFrtiYDIYHnX8Tjl4z46XQMTBd6HrUjxKDDN5kFVJAO404ZZu5utmsCFzlyTQwH86MieR8/RfnqFf8l95OJU1KKNuWet88juuabeshcQw7dyKMRDMkxtb7/50Gug7EEKQvbWS8wWY4xItnfxQ9+9xvSpMtceQaCzs6uZAiRv4vJtnxzF6UdGaJ+5h1dRn5xzVWHO+/flA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ezh92LY7oJW8E5AHPSH8zKa8X0jwZ35+w5/6xX/Hi8Y=;
+ b=M/dKqlr8eKWJLZXBDs0ExWElajJQhnOq2ZFQ6gPKP2ipqdepP8Oz9sJXsX4iYEIoczTkZRyB3ozba+dRQ17Jl9afNdivOIvMkwn1ycr6ViZDfuX0xVSg36IXG3LmVCOh4HiDszNunhP6SXUkQ5sOf+JDTGIt3xz/jSChn7Eb3kz/Mu0BLOVoTRWCRNjWjbvZfztHBwueIIeo67X9HKQfhLx1jlLXH/tpDNrfzrNaSvfyHa9xjKkuffCFRirPwwQlSIwQjhvL2tTPub1nk4nXmEK2/H3jMeT6souPbJ5+pIKogID45zwJTleWrAK4+7dRA+UTrU1UQpQJHf8SKGWQ2w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM6PR12MB4220.namprd12.prod.outlook.com (2603:10b6:5:21d::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.31; Thu, 17 Aug
+ 2023 18:01:31 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6678.031; Thu, 17 Aug 2023
+ 18:01:31 +0000
+Date:   Thu, 17 Aug 2023 15:01:30 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/type1: fix cap_migration information leak
-Message-ID: <20230817115526.04b3bf72.alex.williamson@redhat.com>
-In-Reply-To: <20230801155352.1391945-1-stefanha@redhat.com>
-References: <20230801155352.1391945-1-stefanha@redhat.com>
-Organization: Red Hat
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3] vfio: align capability structures
+Message-ID: <ZN5getPSq1stluMt@nvidia.com>
+References: <20230809203144.2880050-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230809203144.2880050-1-stefanha@redhat.com>
+X-ClientProxiedBy: BL0PR02CA0125.namprd02.prod.outlook.com
+ (2603:10b6:208:35::30) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4220:EE_
+X-MS-Office365-Filtering-Correlation-Id: d75f8875-49ae-437c-928e-08db9f4bfc6f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: L5L1XAWfWAH06jjNwN3O7n04TftaCeuIzrQBoiGoo3aaJUweYMZtm4rfYdZcZyQTsCfp6/lePFiuR74N535kBvgnbQaSfg1NaGlU5/ISk/I7fG9ErGWwrSOkJ69OwSifwWgWNWl8k+SDm4/3sgvLvLMB5FR4oYFdWWPaKw0wX8qBleg5Yztf59IpNjp5CQWTZm/pcJqwLrLMl/eosahJNmI46VDhH5lmiAJIAQV9IIsVzveOQCd3vpVml2M1KvNvl4hn85JhuIgZKFShPxaFTdhQbEO0DPGgm/fNlhLiPEwCr79AWZGps/KO3qpWljvzQARdu7k7P2tybYWf/r3ppI+gOLF7HuyTbz+y/+nVc+idZH6yEAWk2JrMQeRMkdTK1qhcgJ/k8BHto5hNQVo2rErTH3BnGR30YBokMpCQbxksj0RHPXXTCE3WwsQVh1gzg9FHQidXgvuoARyvceO9pmt27sJ/AY1E7+Qn5NHJU8mzL7gKeEGRHWcAKLOk9A1Z6FqQ/Ji7YOFOBsmcrMxdFY8ZOUIVtrEjdBYp6GjyEV234DhwUfp650JEfR25gsIV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(366004)(346002)(396003)(1800799009)(451199024)(186009)(83380400001)(66556008)(38100700002)(66476007)(6916009)(66946007)(316002)(478600001)(2906002)(41300700001)(8676002)(4326008)(8936002)(5660300002)(6512007)(6506007)(6486002)(26005)(2616005)(86362001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IotqXTc+3cCayhGYcXhtoovD4BYVQbEy7dl8NsmvDZhK7dwnuRqTkATr4DkR?=
+ =?us-ascii?Q?5nSNsSP7slarpeYswIRo/axUXBOkef6cBHnKwwJRVrUj0lyzEwgh1grfXB7K?=
+ =?us-ascii?Q?oiBfGNmKu2+zNcUnZrB84rWtjr05PTSHpiVVL6188V7zgBWnGmvzcCYHdqOm?=
+ =?us-ascii?Q?0AyhLgRM6uECHOa5AHJfKzRtEDxwdMjz68pQrNseH5D9lUkGmrSsh6qUKIzi?=
+ =?us-ascii?Q?CXQMhMPogx7Amr8uGMxFa7lAbascsCt/gjpmlMUWv+2k8M6+ziz6jD+pkCXI?=
+ =?us-ascii?Q?OTtZyQGDZTYpYcbp4kefsulF2NSPJTl0USYKiZyiKyFuE+NoYByDyqZSCm22?=
+ =?us-ascii?Q?xdpDzuDAcsiyW9c5+e+eOqwuYC5sRLDFmeFWgJYcOBhhQKb2bVmjEntxSquz?=
+ =?us-ascii?Q?XcLBqCmJ+izYjAbK3iCEvhFMwO1vUkhG3GRZh8rA5Yr/pGqY/DZlMWCmJRFk?=
+ =?us-ascii?Q?bncik2liXvwH2VYRX7rIpmw6GAs9Sj22KIVojc01LOYvMRjexBRNNF4U/Iwz?=
+ =?us-ascii?Q?EaPBpDFlA65cIkkkdg4+Wx13y8bEXx++5Jdfha7yAjclGcGyMpeE80zY2qDe?=
+ =?us-ascii?Q?GeKoNi8NYkH8dvwxg+eXrrDOqWOln3leWlmxXZj71Df72xsHdq9wtAbRvsJ+?=
+ =?us-ascii?Q?0KVXQnjvO/Yy0JxsVWwqiDP5Gh/ovLSh9ETFPpa3apCpGp0g6QM0ovxnqiBB?=
+ =?us-ascii?Q?Iy3P8akDT6CHbcrDF1v0UczWzc6zeNj2FXvJjg1Ls5sycrT/tyewy/sjsgWj?=
+ =?us-ascii?Q?QOa3wLIdbqSxDlCAmNTqhbPfeEvJ6H/IY2qZVgTp4r+8nuvxWhtd/jQMmiGv?=
+ =?us-ascii?Q?Td+wqz9Gqgo8MoMsjnFfZPJJZJKzxUwY29LizhqAQWc5xh37ufYT64yWGMXU?=
+ =?us-ascii?Q?uYCopYDQi6XSKEkupq49DJp+fhEyaRrOtAe95pCgFdLfot+DTtQmo99++wqu?=
+ =?us-ascii?Q?B4JZxv9hnR92TDMx3APDPVdif/IVM/xInJgrODgdljBVDlsTTueXrDkecYOb?=
+ =?us-ascii?Q?Sm/g39HmLRH/frHoxv2DfNQcpmiXzIlWPGvUsHAMyj1YS4PR5n3hmbUD1Y1g?=
+ =?us-ascii?Q?jWIfDVEpN5Ne3Gr35vJxLqHP0VcFFxTAYtmeNX/HLn46iaEkEJRvcLBVm+RN?=
+ =?us-ascii?Q?N24DUi44kn4YXIbeg70hTI+wtNJ6zLibMChbH0TFtKgv9d4oyQUdtVwlW1p2?=
+ =?us-ascii?Q?yt6kh1Sbt8rAuNNku4KrVBpiQxL+vamYUFOEMvmsNTIq5Io3aIpQQKt6h8zS?=
+ =?us-ascii?Q?/vZS+XnvELyPZNuhAAbrkZVcdSXWe2Jtr10r+rcCBo8l8XXJSQoR3GZIulsm?=
+ =?us-ascii?Q?MrjRItqlpiB7GuURRyBOV8j5HfjO2vgdT7Juzk+ahQ4xPtQ75JJ5b5AzoXuv?=
+ =?us-ascii?Q?Ucx58zPW26wIpg4Y4BCgPVSbhgDOR4LNDqaZ+rg1uxw1nI3YfwIfF13qj1Aa?=
+ =?us-ascii?Q?RjlyGwgr56C9+Jf7DWwhNebVOpYZDXtTiFWo6hn9+k3y0KuwpMX1gWekJIYt?=
+ =?us-ascii?Q?SOt0JgPlq9/NgwTTzfsNzZYYLicJXjH8SUFTfoLDKXSWtMTYZmPsImnxfBJp?=
+ =?us-ascii?Q?PLEt+fiiSNhmMVZNeQ920+biZM7zELzjXfiFzu3w?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d75f8875-49ae-437c-928e-08db9f4bfc6f
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2023 18:01:31.3087
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hv4YyTsAlkfTl3Jb/rc+ykf5q+xb5ZTkWLvVQZKfPGh7R4AFVqn+9gPhBfaa+8i/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4220
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  1 Aug 2023 11:53:52 -0400
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
-
-> Fix an information leak where an uninitialized hole in struct
-> vfio_iommu_type1_info_cap_migration on the stack is exposed to userspace.
+On Wed, Aug 09, 2023 at 04:31:44PM -0400, Stefan Hajnoczi wrote:
+> The VFIO_DEVICE_GET_INFO, VFIO_DEVICE_GET_REGION_INFO, and
+> VFIO_IOMMU_GET_INFO ioctls fill in an info struct followed by capability
+> structs:
 > 
-> The definition of struct vfio_iommu_type1_info_cap_migration contains a hole as
-> shown in this pahole(1) output:
+>   +------+---------+---------+-----+
+>   | info | caps[0] | caps[1] | ... |
+>   +------+---------+---------+-----+
 > 
->   struct vfio_iommu_type1_info_cap_migration {
->           struct vfio_info_cap_header header;              /*     0     8 */
->           __u32                      flags;                /*     8     4 */
+> Both the info and capability struct sizes are not always multiples of
+> sizeof(u64), leaving u64 fields in later capability structs misaligned.
 > 
->           /* XXX 4 bytes hole, try to pack */
+> Userspace applications currently need to handle misalignment manually in
+> order to support CPU architectures and programming languages with strict
+> alignment requirements.
 > 
->           __u64                      pgsize_bitmap;        /*    16     8 */
->           __u64                      max_dirty_bitmap_size; /*    24     8 */
+> Make life easier for userspace by ensuring alignment in the kernel. This
+> is done by padding info struct definitions and by copying out zeroes
+> after capability structs that are not aligned.
 > 
->           /* size: 32, cachelines: 1, members: 4 */
->           /* sum members: 28, holes: 1, sum holes: 4 */
->           /* last cacheline: 32 bytes */
->   };
+> The new layout is as follows:
 > 
-> The cap_mig variable is filled in without initializing the hole:
+>   +------+---------+---+---------+-----+
+>   | info | caps[0] | 0 | caps[1] | ... |
+>   +------+---------+---+---------+-----+
 > 
->   static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->                          struct vfio_info_cap *caps)
->   {
->       struct vfio_iommu_type1_info_cap_migration cap_mig;
+> In this example caps[0] has a size that is not multiples of sizeof(u64),
+> so zero padding is added to align the subsequent structure.
 > 
->       cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
->       cap_mig.header.version = 1;
+> Adding zero padding between structs does not break the uapi. The memory
+> layout is specified by the info.cap_offset and caps[i].next fields
+> filled in by the kernel. Applications use these field values to locate
+> structs and are therefore unaffected by the addition of zero padding.
 > 
->       cap_mig.flags = 0;
->       /* support minimum pgsize */
->       cap_mig.pgsize_bitmap = (size_t)1 << __ffs(iommu->pgsize_bitmap);
->       cap_mig.max_dirty_bitmap_size = DIRTY_BITMAP_SIZE_MAX;
+> Note that code that copies out info structs with padding is updated to
+> always zero the struct and copy out as many bytes as userspace
+> requested. This makes the code shorter and avoids potential information
+> leaks by ensuring padding is initialized.
 > 
->       return vfio_info_add_capability(caps, &cap_mig.header, sizeof(cap_mig));
->   }
-> 
-> The structure is then copied to a temporary location on the heap. At this point
-> it's already too late and ioctl(VFIO_IOMMU_GET_INFO) copies it to userspace
-> later:
-> 
->   int vfio_info_add_capability(struct vfio_info_cap *caps,
->                    struct vfio_info_cap_header *cap, size_t size)
->   {
->       struct vfio_info_cap_header *header;
-> 
->       header = vfio_info_cap_add(caps, size, cap->id, cap->version);
->       if (IS_ERR(header))
->           return PTR_ERR(header);
-> 
->       memcpy(header + 1, cap + 1, size - sizeof(*header));
-> 
->       return 0;
->   }
-> 
-> This issue was found by code inspection.
-> 
+> Originally-by: Alex Williamson <alex.williamson@redhat.com>
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Applied to vfio next branch for v6.6.  I'll give Jason a little more
-time to ack "[PATCH v3] vfio: align capability structures".  Thanks!
-
-Alex
-
+> v3:
+> - Also align capability structs in drivers/iommu/iommufd/vfio_compat.c
+>   [Jason]
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index ebe0ad31d0b0..d662aa9d1b4b 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2732,7 +2732,7 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  					   struct vfio_info_cap *caps)
->  {
-> -	struct vfio_iommu_type1_info_cap_migration cap_mig;
-> +	struct vfio_iommu_type1_info_cap_migration cap_mig = {};
->  
->  	cap_mig.header.id = VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION;
->  	cap_mig.header.version = 1;
+>  include/uapi/linux/vfio.h           |  2 ++
+>  drivers/iommu/iommufd/vfio_compat.c |  2 ++
+>  drivers/vfio/pci/vfio_pci_core.c    | 11 ++---------
+>  drivers/vfio/vfio_iommu_type1.c     | 11 ++---------
+>  drivers/vfio/vfio_main.c            |  6 ++++++
+>  5 files changed, 14 insertions(+), 18 deletions(-)
 
+Acked-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason
