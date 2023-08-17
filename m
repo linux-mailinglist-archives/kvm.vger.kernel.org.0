@@ -2,108 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9291577EF60
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 05:06:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 110FA77EF84
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 05:27:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347796AbjHQDFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 23:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45950 "EHLO
+        id S1347841AbjHQD02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 23:26:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347845AbjHQDF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 23:05:29 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016D02D5E;
-        Wed, 16 Aug 2023 20:05:27 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6887b3613e4so1450438b3a.3;
-        Wed, 16 Aug 2023 20:05:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692241526; x=1692846326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dCFr8g9hdLn/Gp4gsKaWBuVjf1qv2s3SUk7n6KsdUV8=;
-        b=kFvA+/uYbXJhT1Z/qEl3KNHdWxyHpauLcp8EkGsy2iRidsBEdGP+UbU/Dl7lrZ52bx
-         ia6JpQkfARQ+4X/Zh4fOkgWLSJZyjhyL1ZpA9YfbdwfO5OeKcegRI8G1Sbzf83eM+RE/
-         nbHaCgs7df1gkz9MIep84xRw2QynwQCOyfLEu8yVZo5l+EImf8VXF0rtnkXvC6tfEwue
-         wUGE/C6a9eVkBZc7NMGhVtkz88ToEuCnoPONvQw4WDrFG83EStVWt0984n3nLKsIpcr3
-         9xTG+5hxAX9RxZWm28TGyUbhSsdmz18tne6Wn5Bqe16FnupFtx5arzQIBw1Bo6LKUJ2g
-         3zwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692241526; x=1692846326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dCFr8g9hdLn/Gp4gsKaWBuVjf1qv2s3SUk7n6KsdUV8=;
-        b=GDZhJIOGgUmIb3Zs9HpSAhxXODA8k+cM7zKD7EoUEuppsvjy4OllnOoSnkgi1GRxkG
-         /R+23ggcCEc27adm8szo/o8sdv1Z3GzMUtQXqglS5/bfSo2itNvYYffpoRuONF5IjIbY
-         2UBYB/dPC84VfH3WzgYZLh36CLdKxKSIsmWW0QD6CI+3s8gLlIutUh9KDrE0ZrHUGFqW
-         b2PuIR/xUItse65LsOFm+7sUjKB/3B1DHLyMXkMGYL7cWhMukpty6xQQThzoLyFzp8XA
-         olfcTtomGCgY5f3faVFy7zwfc2LTGXAsvZZXTJCIod3aCZpjkRKwgpwfL1J6qzjxB9KG
-         BuXw==
-X-Gm-Message-State: AOJu0YzbAakyT/Srn8wQrvFa/nTZdRMYWWvd1ejxov2DLPL8ykEKUkxV
-        zGF+FaDJCeZtNWOCZvhyKGk=
-X-Google-Smtp-Source: AGHT+IETBzR9WoDYjAItJOFnPkvUwNYF7LdkIhh4kX0jJrAh1V7y+63blNn3Wsfx5Xj+E0+SlJCn5g==
-X-Received: by 2002:a05:6a00:2443:b0:67e:18c6:d2c6 with SMTP id d3-20020a056a00244300b0067e18c6d2c6mr4459017pfj.5.1692241526286;
-        Wed, 16 Aug 2023 20:05:26 -0700 (PDT)
-Received: from debian.me ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id x52-20020a056a000bf400b0068883728c16sm2033018pfu.144.2023.08.16.20.05.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 20:05:25 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id 8CFF081A1A74; Thu, 17 Aug 2023 10:05:22 +0700 (WIB)
-Date:   Thu, 17 Aug 2023 10:05:22 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Roman Mamedov <rm+bko@romanrm.net>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux KVM <kvm@vger.kernel.org>
-Subject: Re: Fwd: kvm: Windows Server 2003 VM fails to work on 6.1.44 (works
- fine on 6.1.43)
-Message-ID: <ZN2Ocgp63T0FBuZn@debian.me>
-References: <8cc000d5-9445-d6f1-f02e-4629a4a59e0e@gmail.com>
+        with ESMTP id S1347840AbjHQD0L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 23:26:11 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7C0268F;
+        Wed, 16 Aug 2023 20:26:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1692242763;
+        bh=ZlmenDsbW60G7uJu2veM5G1rkGG/EEMpV5h+3Oe3uEg=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=ryZg14br4OQt+fo/T+XGTbDRZaG5g03gpLyVNOZrOIHHv8Np/CnItphXx1cwBuhwk
+         +3YrrFxzkcHaAC5mdnGAtp0kIoh/44J1Iqe0yuzTbl4nvzNvvHPUmztIfRzRPUO46J
+         rTHOE7YKTOwBk6BEhQM8RQfcCakGK1JrUsHlWS2iMHx6GXf178hGz7lNyH8ZbVHo0W
+         w3YBAvMyotpKM5+Fya4Dkm31h2f+2rU68XjkixrFAKJeYltmHO17tr0ZpENprendQa
+         IZTAzmZjOvyEQI0QVR3jf2bjbvao2IU16QRKTvDAFkWfsNl5lE5MIadIdP2yqBsVCx
+         gfk2KWTfNkK6g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RR9Q250Ymz4wb0;
+        Thu, 17 Aug 2023 13:26:02 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Jordan Niethe <jniethe5@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, npiggin@gmail.com,
+        mikey@neuling.org, paulus@ozlabs.org, vaibhav@linux.ibm.com,
+        sbhat@linux.ibm.com, gautam@linux.ibm.com,
+        kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
+        Jordan Niethe <jniethe5@gmail.com>
+Subject: Re: [PATCH v3 1/6] KVM: PPC: Use getters and setters for vcpu
+ register state
+In-Reply-To: <20230807014553.1168699-2-jniethe5@gmail.com>
+References: <20230807014553.1168699-1-jniethe5@gmail.com>
+ <20230807014553.1168699-2-jniethe5@gmail.com>
+Date:   Thu, 17 Aug 2023 13:25:58 +1000
+Message-ID: <87cyzm73jt.fsf@mail.lhotse>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="g0oVnqwyBJRa495L"
-Content-Disposition: inline
-In-Reply-To: <8cc000d5-9445-d6f1-f02e-4629a4a59e0e@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Jordan Niethe <jniethe5@gmail.com> writes:
+> There are already some getter and setter functions used for accessing
+> vcpu register state, e.g. kvmppc_get_pc(). There are also more
+> complicated examples that are generated by macros like
+> kvmppc_get_sprg0() which are generated by the SHARED_SPRNG_WRAPPER()
+> macro.
+>
 
---g0oVnqwyBJRa495L
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+...
+> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
+/asm/kvm_book3s.h
+> index bbf5e2c5fe09..1a7e837ea2d5 100644
+> --- a/arch/powerpc/include/asm/kvm_book3s.h
+> +++ b/arch/powerpc/include/asm/kvm_book3s.h
+> @@ -403,10 +413,121 @@ static inline ulong kvmppc_get_fault_dar(struct kv=
+m_vcpu *vcpu)
+...
+> +
+> +#ifdef CONFIG_VSX
+> +static inline void kvmppc_get_vsx_vr(struct kvm_vcpu *vcpu, int i, vecto=
+r128 *v)
+> +{
+> +	*v =3D  vcpu->arch.vr.vr[i];
+> +}
 
-On Wed, Aug 16, 2023 at 04:29:32PM +0700, Bagas Sanjaya wrote:
-> #regzbot introduced: v6.1.43..v6.1.44 https://bugzilla.kernel.org/show_bu=
-g.cgi?id=3D217799
-> #regzbot title: Windows Server 2003 VM boot hang (only 64MB RAM allocated)
+This is causing build errors if VSX is disabled.
 
-#regzbot fix: https://lore.kernel.org/all/20230811155255.250835-1-seanjc@go=
-ogle.com
+I'm using g5_defconfig plus:
 
---=20
-An old man doll... just what I always wanted! - Clara
+  CONFIG_VIRTUALIZATION=3Dy
+  CONFIG_KVM_BOOK3S_64=3Dy
+  CONFIG_KVM_BOOK3S_64_PR=3Dy
 
---g0oVnqwyBJRa495L
-Content-Type: application/pgp-signature; name="signature.asc"
+Which gives me:
 
------BEGIN PGP SIGNATURE-----
+  ../arch/powerpc/kvm/powerpc.c: In function =E2=80=98kvmppc_set_vmx_dword=
+=E2=80=99:
+  ../arch/powerpc/kvm/powerpc.c:1061:9: error: implicit declaration of func=
+tion =E2=80=98kvmppc_get_vsx_vr=E2=80=99; did you mean =E2=80=98kvmppc_get_=
+vsx_fpr=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+   1061 |         kvmppc_get_vsx_vr(vcpu, index, &val.vval);
+        |         ^~~~~~~~~~~~~~~~~
+        |         kvmppc_get_vsx_fpr
+  ../arch/powerpc/kvm/powerpc.c:1063:9: error: implicit declaration of func=
+tion =E2=80=98kvmppc_set_vsx_vr=E2=80=99; did you mean =E2=80=98kvmppc_set_=
+vsx_fpr=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+   1063 |         kvmppc_set_vsx_vr(vcpu, index, &val.vval);
+        |         ^~~~~~~~~~~~~~~~~
+        |         kvmppc_set_vsx_fpr
+  In file included from ../arch/powerpc/kvm/powerpc.c:25:
+  ../arch/powerpc/kvm/powerpc.c: In function =E2=80=98kvm_vcpu_ioctl_get_on=
+e_reg=E2=80=99:
+  ../arch/powerpc/kvm/powerpc.c:1729:52: error: implicit declaration of fun=
+ction =E2=80=98kvmppc_get_vscr=E2=80=99; did you mean =E2=80=98kvmppc_get_s=
+r=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+   1729 |                         val =3D get_reg_val(reg->id, kvmppc_get_v=
+scr(vcpu));
+        |                                                    ^~~~~~~~~~~~~~~
+  ../arch/powerpc/include/asm/kvm_ppc.h:412:29: note: in definition of macr=
+o =E2=80=98get_reg_val=E2=80=99
+    412 |         case 4: __u.wval =3D (reg); break;        \
+        |                             ^~~
+  ../arch/powerpc/kvm/powerpc.c: In function =E2=80=98kvm_vcpu_ioctl_set_on=
+e_reg=E2=80=99:
+  ../arch/powerpc/kvm/powerpc.c:1780:25: error: implicit declaration of fun=
+ction =E2=80=98kvmppc_set_vscr=E2=80=99; did you mean =E2=80=98kvmppc_set_f=
+scr=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+   1780 |                         kvmppc_set_vscr(vcpu, set_reg_val(reg->id=
+, val));
+        |                         ^~~~~~~~~~~~~~~
+        |                         kvmppc_set_fscr
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZN2OcgAKCRD2uYlJVVFO
-oyq8AP9v83lAaDlucHZrPAnwXNC+EsVLyLoms0sKBos74GjFrwD9F11N/ZQ3z2vo
-Y2cwCA+IBOnWxlFcH8eQD5c82J0wVAw=
-=U376
------END PGP SIGNATURE-----
 
---g0oVnqwyBJRa495L--
+Looking at kvm_vcpu_arch, the thread_vr_state and members are guarded by
+CONFIG_ALTIVEC, not CONFIG_VSX.
+
+Switching to that fixes the build.
+
+Whether it makes sense to be getting/setting those registers when VSX=3Dn
+is not immediately clear, but is a separate problem.
+
+cheers
