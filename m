@@ -2,134 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E24AE77F252
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 10:42:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A370377F316
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 11:18:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348976AbjHQIkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 04:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60198 "EHLO
+        id S1349475AbjHQJST (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 05:18:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348918AbjHQIjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 04:39:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2236210EC;
-        Thu, 17 Aug 2023 01:39:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A6F56634BD;
-        Thu, 17 Aug 2023 08:39:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03339C433C8;
-        Thu, 17 Aug 2023 08:39:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692261577;
-        bh=gMp6O7RtrZswN4fQDVTuF4+KfrQJM+cudroXxhAsVfs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ZgoJR7uYCUZlDATqxGYVSz+0U1lPgeLMrIlBdxGBWDF1/i35EtI8booG6hSrz+ykh
-         YmbA4whrCn8muyr0h6HW+jwWE3g4GSRi+YWbfXznaw2pHKrqcYrUi7dy/1vUOUljIe
-         NXaJmLBvdRpsIy6GYcHuZgUmV50vh76LEapsSfkHdLzfAZbbJJOhIGMbsksQuMQVLA
-         1eikKjIJeteWDD1tS/88xT1H/klaBjuQvK34eZq66GTjWFp6Zz7VWBtw+Pdi8czJNg
-         EGVZQenILaUDBVgiaRwgthKKI3Bt/mF39TYq1qS2O9yupSu5TNtpxknKcO76xYpz3h
-         TJYcs43ZT4E6A==
-Received: from 82-132-234-11.dab.02.net ([82.132.234.11] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1qWYXW-005coN-B9;
-        Thu, 17 Aug 2023 09:39:34 +0100
-Date:   Thu, 17 Aug 2023 09:39:31 +0100
-Message-ID: <87a5uqoyf0.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
+        with ESMTP id S1349556AbjHQJSG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 05:18:06 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638642684;
+        Thu, 17 Aug 2023 02:17:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692263865; x=1723799865;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=A+AokkXaJj9i8YrWEzlhAoW/AeaNvhtQ33j2YkNOjG8=;
+  b=Tx8+UyIImCbV63cxyAdzeavEt+zLffGa168fZLSNE8f+1RJnq0myEssf
+   wQvqvbE6VlnQqBTxiMkCsi8aR42JqPhP7M9RQXQr2f5FgD7LLJgu//y6u
+   rl+R8X46mlqapL09GbB2gItCCi4PYDWsNqGzvEpfTNFck++MLqWbVZyb7
+   ySWzulsiYwVtHF0NKuRWNQ1gavHfV1oaR6lDa/NXNWx5obFiKm+eswkj+
+   Y54Q736iIHU3fQlJZbmHDznGmSmzpdDgv4APakOfEHdvnnxdTcgyb6xWk
+   qAMgjDxkJ+Dsa3S3k/6RGXZOJt96F+22oJT6EKqxv7UAllCI6KM2ux+Zi
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="403739952"
+X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
+   d="scan'208";a="403739952"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 02:17:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="734597227"
+X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
+   d="scan'208";a="734597227"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.238.10.52]) ([10.238.10.52])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 02:17:31 -0700
+Message-ID: <6e990b88-1e28-9563-2c2f-0d5d52f9c7ca@linux.intel.com>
+Date:   Thu, 17 Aug 2023 17:17:25 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v10 0/9] Linear Address Masking (LAM) KVM Enabling
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Fuad Tabba <tabba@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
-        Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v9 05/14] KVM: Allow range-based TLB invalidation from common code
-In-Reply-To: <ZNv8cCzI9fMWkGWT@google.com>
-References: <20230811045127.3308641-1-rananta@google.com>
-        <20230811045127.3308641-6-rananta@google.com>
-        <ZNv8cCzI9fMWkGWT@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.234.11
-X-SA-Exim-Rcpt-To: seanjc@google.com, rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, shahuang@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        David.Laight@aculab.com, robert.hu@linux.intel.com,
+        guang.zeng@intel.com
+References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
+ <ZN1M5RvuARP1YMfp@google.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZN1M5RvuARP1YMfp@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Aug 2023 23:30:08 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index ec169f5c7dce2..00f7bda9202f2 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -278,16 +278,14 @@ static inline bool kvm_available_flush_remote_tlbs_range(void)
-> >  	return kvm_x86_ops.flush_remote_tlbs_range;
-> >  }
-> >  
-> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
-> > -				 gfn_t nr_pages)
-> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
-> >  {
-> >  	int ret = -EOPNOTSUPP;
-> >  
-> >  	if (kvm_x86_ops.flush_remote_tlbs_range)
-> > -		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, start_gfn,
-> > -								   nr_pages);
-> > -	if (ret)
-> > -		kvm_flush_remote_tlbs(kvm);
-> > +		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
-> > +
-> > +	return ret;
-> 
-> Please write this as
-> 
-> 	if (kvm_x86_ops.flush_remote_tlbs_range)
-> 		return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
-> 
-> 	return -EOPNOTSUPP;
-> 
-> or alternatively
-> 
-> 	if (!kvm_x86_ops.flush_remote_tlbs_range)
-> 		return -EOPNOTSUPP;
-> 
-> 	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
-> 
-> Hmm, I'll throw my official vote for the second version.
 
-I've applied the second version locally.
 
-	M.
+On 8/17/2023 6:25 AM, Sean Christopherson wrote:
+> On Wed, Jul 19, 2023, Binbin Wu wrote:
+>> Binbin Wu (7):
+>>    KVM: x86/mmu: Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK
+>>    KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality
+>>    KVM: x86: Use KVM-governed feature framework to track "LAM enabled"
+>>    KVM: x86: Virtualize CR3.LAM_{U48,U57}
+>>    KVM: x86: Introduce get_untagged_addr() in kvm_x86_ops and call it in
+>>      emulator
+>>    KVM: VMX: Implement and wire get_untagged_addr() for LAM
+>>    KVM: x86: Untag address for vmexit handlers when LAM applicable
+>>
+>> Robert Hoo (2):
+>>    KVM: x86: Virtualize CR4.LAM_SUP
+>>    KVM: x86: Expose LAM feature to userspace VMM
+> Looks good, just needs a bit of re-organination.  Same goes for the LASS series.
+>
+> For the next version, can you (or Zeng) send a single series for LAM and LASS?
+> They're both pretty much ready to go, i.e. I don't expect one to hold up the other
+> at this point, and posting a single series will reduce the probability of me
+> screwing up a conflict resolution or missing a dependency when applying.
+>
+> Lastly, a question: is there a pressing need to get LAM/LASS support merged _now_?
+> E.g. are there are there any publicly available CPUs that support LAM and/or LASS?
+AFAIK, there is no publicly available CPU supporting LAM and LASS yet.
 
--- 
-Without deviation from the norm, progress is not possible.
+>
+> If not, I'll wait until v6.7 to grab these, e.g. so that you don't have to rush
+> madly to turn around the next version, and so that I'm not trying to squeeze too
+> much stuff in just before the merge window.
+
