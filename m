@@ -2,251 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98B0C77F098
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 08:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A85277F124
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 09:25:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348262AbjHQGjf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 02:39:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38022 "EHLO
+        id S1348443AbjHQHY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 03:24:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348256AbjHQGjS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 02:39:18 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545652701;
-        Wed, 16 Aug 2023 23:39:15 -0700 (PDT)
+        with ESMTP id S230177AbjHQHY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 03:24:56 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2BE1BE6;
+        Thu, 17 Aug 2023 00:24:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692254355; x=1723790355;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rFRRVEEucSSTXNeQi/3oBg68H2cCmE1GCVvNVuJOHew=;
-  b=ZlBqf4fU3j6GjQL4bLQSugOWsvZH8zOxHEhFTPM73bAdcZmWsP937dxQ
-   hjXXxI8hjcE9q8kjcrjZNiCLobZsNstIAybW19eNHw8k6UZDG59iTn2AB
-   Brh8xoXKn8FQnY7Rr7yvVTD9oyTRHCYV6lhCGD2nsSjMB6gCN2ATqMe4F
-   U+/7kWjphVNoAzKgO8mehg6qYCkfc0/eLn96FOUUGMWW2xRHMA0xZXKqp
-   7q1F26DdeYpRNb3KnYyKMeAPUWbuUC74+UFsFgCNLH2ZPZFduW8EdvoXf
-   7c2QA6RkCKWhh5nhtH4bgkFKwlo/J2Slfcdw/XO0CuVsD6rubonlBF3wK
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="372727111"
+  t=1692257094; x=1723793094;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sVJ418+173oPWqdKtWXbnLNO701Ba5UoqTYk1cJzynM=;
+  b=PML0kxKz+OArdAfsmDxJDawLCuAxoGqsuzqsVF889QVjB2wQhTOa4X8P
+   y6h6o+SFb1eA7v8pGUpbcCdRhhd1/0rkZBG/W5XaZ16etypnyGU4gzopE
+   2LArAX5OxBhn3u6HpVkrEPCAOt/cxqas2PjnRKeI7+E/HifV5/Px3dReF
+   2G360OiDHAFy/eGzYtfikQSNQbA/iDbdpeVSUityY/s51Fu8ynidDWROU
+   /ksT1xQ3xLctQrQevrtBrlaq3yTwtoCbonOlWxHsRzTym9PCBgEmr1riY
+   5U4OBSUf2OJH6dC8hnxKrmZQ4D35y2tdo5DPyVShsL+9aw+BE+rkWFt5M
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="439090756"
 X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="372727111"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2023 23:39:15 -0700
+   d="scan'208";a="439090756"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 00:24:53 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="1065135113"
+X-IronPort-AV: E=McAfee;i="6600,9927,10803"; a="804531451"
 X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="1065135113"
-Received: from lkp-server02.sh.intel.com (HELO a9caf1a0cf30) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 16 Aug 2023 23:39:10 -0700
-Received: from kbuild by a9caf1a0cf30 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qWWez-0000rX-0i;
-        Thu, 17 Aug 2023 06:39:09 +0000
-Date:   Thu, 17 Aug 2023 14:38:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Raghavendra Rao Ananta <rananta@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 05/12] KVM: arm64: PMU: Simplify extracting PMCR_EL0.N
-Message-ID: <202308171444.Q5rfJubF-lkp@intel.com>
-References: <20230817003029.3073210-6-rananta@google.com>
+   d="scan'208";a="804531451"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP; 17 Aug 2023 00:24:52 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 17 Aug 2023 00:24:52 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 17 Aug 2023 00:24:51 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 17 Aug 2023 00:24:51 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.106)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 17 Aug 2023 00:24:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fDVykSg87FA1+T0j9NiZ6RK6PDfEOH92ZN1brG7lZmEXbNsbkyM3CMRI6904ByS0ArUtmAssOnvbJD7O7eEFEynZfINJLr7i0LWuWq96LHjJp6J4zCr4HcEMvkGjphkicoWicKTGOvFxC37jmdrff9sVk4h8jqalZADxn94QQKtZtPACmCgqz4gqYyAvb8GOWSdk4JcKL2xraD/vnp+bMFC6TKr3E2i1mm4hMSoXUXh6bVijcg3s+GI4T/Hcta34NaQkF3DtDT0QD5SeOVErvvGkzKx2nSOiRqoLfvYZSLo4Kpn1c5GNdznlFea/RCVDYRb5hGwkl4nlc02A+dZuaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=P2duEz0SJzDspVIWAdoLRTmYId2FwmR1tAc92d8rMCY=;
+ b=ie9jYy2r4kMrrqS35pOKOTOMF0uysQKnHzePrTA/llRWMBWzAO8CgDV2k1PLQFoCpD78SzUPx9FHfIysJv1KQ2L0VTHcjkxA2C8po4GFT0WO2kOpQDRLOhVeo/09aK+j1lJPKI6GxNNfn9I1CyudMCvCtCZclYVfQEwZldXtVlndXWgD3mrSjVx72xpyB8k40PoxVqo+/YmncXBP3YitnHfJ5AP86hWQ5Q6vACGkcK/0QmyHzAIj1sJ3rZehU822E27vQ4OxJm95biQNRHHe4PgX8yINNyM5r8pSi2VLQG/6Wdu/CsO6qGFSEQn2yXzlyMy2Mq3AxU3x86ErhsV/jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CH3PR11MB8210.namprd11.prod.outlook.com (2603:10b6:610:163::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.29; Thu, 17 Aug
+ 2023 07:24:44 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::dcf3:7bac:d274:7bed]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::dcf3:7bac:d274:7bed%4]) with mapi id 15.20.6678.029; Thu, 17 Aug 2023
+ 07:24:44 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: RE: [PATCH v8 2/5] iommu: Add new iommu op to get iommu hardware
+ information
+Thread-Topic: [PATCH v8 2/5] iommu: Add new iommu op to get iommu hardware
+ information
+Thread-Index: AQHZ0DstfL3bha9We0yor2Cm+Z3Qqq/uEyoA
+Date:   Thu, 17 Aug 2023 07:24:44 +0000
+Message-ID: <BN9PR11MB52761250777AECADCF77D88F8C1AA@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230816121349.104436-1-yi.l.liu@intel.com>
+ <20230816121349.104436-3-yi.l.liu@intel.com>
+In-Reply-To: <20230816121349.104436-3-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CH3PR11MB8210:EE_
+x-ms-office365-filtering-correlation-id: 54714b0f-9e09-4732-8ecb-08db9ef30781
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: PS0Q4zjmybxPbaB8QedfJ3SnHyTym/blG16CUk30CAXjL3ncUj6E6ay0gPLQEHh+pmv0uM9mHlEFF1Q7z66veYCiPD4E24q7RJcG5m4iL7WLuOzMb3KUo/zwXKY5jRiLGxqCdsy7dwiv1yqivsuAYyfKr0qp6H7jqL/+9xKNnD6hez2snDGrRBvB3zVHJ+HV/eyxE+0lhTkcPHRDiZ7apx1w4EMEttJpAQ6zPlZ6Xle8D8T6kOCAJzQ5OJOCdufH/B/b+gkIHHt4o0xnjLlnqv5HjT4oy4xqbLaiyMycXugvxSDiPc75vL/f8NgO/3E8D49xTTdb8hG7JKE6vEMHouuCIES8eITbp0NB5zGznM5u2ynHx2bsU1YTXf6ZHkfE5VA8p8ORiwM+kft0ohJeNqTGFQ2gPNDw3Bz7XCjtXDSo/WDhHcDZzo39/aH2lR0VEPJYBIEXfZhJ/x6Lwlsfnq6f1D9WA5fUj2cxnpReimf7RY/OpbzOl9td/mrvkbWu6TGiyWfoLMFQRV6gDluSpja4xVpnEC7idqDC/nKiSCezBBHBQiScKGGwRJQgLmS0umgfIMpLxdihYK2OAv7NDU9r7TlcBAgNO60GMQBOXqfldB2d09wMf2vAhxYaGDmc
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(346002)(376002)(39860400002)(1800799009)(451199024)(186009)(2906002)(83380400001)(26005)(7416002)(86362001)(478600001)(6506007)(7696005)(71200400001)(33656002)(9686003)(55016003)(5660300002)(52536014)(41300700001)(66446008)(122000001)(54906003)(316002)(66476007)(66556008)(66946007)(76116006)(64756008)(110136005)(4326008)(8676002)(8936002)(82960400001)(38100700002)(38070700005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/SO/2siH+xm/TB+naCP/YUk5yEQaZM/RSHNfn4/Bxd+k93GSl9RZVHeIz4zx?=
+ =?us-ascii?Q?0u1z+XYZEXCllZa3ysdWkY8THF1XFxYyepwVarAzHLvhRWNz4Hlu9RSWSvxx?=
+ =?us-ascii?Q?JeKcKIbrq5K6LS59tNeJecyhuuwvmeg3k+D060oUWGxJWeh0vJbz/GjhN6YD?=
+ =?us-ascii?Q?sbYhiLVnMwXgiqPlW+sBdmR5Ok7z5PXhhQhG+3EHeTPWSBYCGayjWOt7+pFc?=
+ =?us-ascii?Q?GJiTihCC8BQ5DwuK5I9HDeG7eYQHpQJ3OGhnVmCsm67/obkQTSFKt+sKHLnf?=
+ =?us-ascii?Q?JX2cKlVh7yqffupW2QxpZ6kO+IwtVniOX3F59O6o6LGTCXOkt7WC9h1datHx?=
+ =?us-ascii?Q?I+YJzFmda5je5iMe5SwXZUqxM7M3O6ob1nF7DB1cgS9UCBP4icOXqEQKaZIf?=
+ =?us-ascii?Q?XmWo8RPNiMnNPGEZZxAliBlRiE1tw46dCmVMUHoMwfy5+PdEktYo24F0T+fy?=
+ =?us-ascii?Q?MoFngU+AS1rEobAQ9A79YIjCDfZvY729IJGKxvGVoamVFCz1IRkHDUDMtCU1?=
+ =?us-ascii?Q?PpgQ6J5t/zszwtol9p5tGn+fVhzLQ4ppAjEC7/r8KcBCS146AAMggyEY3i6P?=
+ =?us-ascii?Q?bvK62rOts441kg4/WaPJIqjFVRk+5p0fmhUao82W/fFm4qj0Smtiy9s0AV1c?=
+ =?us-ascii?Q?M7u27nddlS5v6T/yEsGsYPKZSXRlPS0MNqLakIPQe3rfB+utj9RjhTn1PufV?=
+ =?us-ascii?Q?kl9pUMuGtIP6ecECllrXsbDn9lcUqudw24BBjK4iSDs6rcaxAmKyllp0F8mv?=
+ =?us-ascii?Q?IaSNPzxBbqk05nftzEe3cfXxI24wqiyWEYhW9QiIM/QnkJvu0fXFVX3u8pW/?=
+ =?us-ascii?Q?OgyP+UJFjuODM4GahjKJqvl/046IOKZwPuv9L6PGIjbp0TTR0ngbhzuY03V+?=
+ =?us-ascii?Q?lZNynRHdVU8nn75S3UiB1Yym6GuhcGoZuLgiyhrWLfiG+g8f6RoyV5afSBEL?=
+ =?us-ascii?Q?alnWGMWJyyMDfJVQVv2GoVs3FJi4Cwj0CdNEcfAICwKTnM9szxmgiVvJzwyl?=
+ =?us-ascii?Q?G9AV0FShmVBqWHDYOhje3ajxEPXK/fQbh1aIGctxltce6TuuC0M51Cr1E2Q/?=
+ =?us-ascii?Q?lZG7LACSYASXDZJ81AwsgYqxBlq5VULaAwKLx8YhSG7vtNd7S9hwUGJEtjnY?=
+ =?us-ascii?Q?22l3hFbRLDeeYpbu36X0K8uzzqT9xXhJAHr7dIynylvpcNxH82mTQxq8PNHC?=
+ =?us-ascii?Q?Vb93F2sUzCTa1O/4vKC1d8P/ZwCu/AVKLJDNDpDDqeN7I7j4IxI2g8spVkm0?=
+ =?us-ascii?Q?OdbPaW+m5G14KKHvYzjItBiluxRua3ejR0Cgo/TTN5lN2n9R/KBBylpRn0qb?=
+ =?us-ascii?Q?8Jk/bwKicrTQfTboejdm+M9vKNjTOSiINlw8LvhMR6AtRMHTgRssNBvdaztF?=
+ =?us-ascii?Q?8jNEVzT9+gDjdJ2FKM0+aFGRfaZbQdVajcoa9+iDzYwjZc9i1YHnPGFFJYeZ?=
+ =?us-ascii?Q?PiZ+xGEfNy8rMNZfBXA1P6oSuLuxnNo7wHmA34vFnFCq5bbGpxdiafULmd/1?=
+ =?us-ascii?Q?sbsWrQdyEF+LYSRGuIraj0IQLX1d/O9CJDWH0BjP713q3NvwOkioVH+Z6ek7?=
+ =?us-ascii?Q?tNmKY3xzUDjSzh4G8f6I0b9UitTDNeCps5hQYyjZ?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817003029.3073210-6-rananta@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54714b0f-9e09-4732-8ecb-08db9ef30781
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Aug 2023 07:24:44.3006
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: joKyxGxsi+bSf6eLs3CrCgLc5LZBEIqNbty9a2Ph0icnAwjOWceP5SIGMgyWuYv3AtBmb61z3rYpgekAFG3M0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8210
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Raghavendra,
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Wednesday, August 16, 2023 8:14 PM
+>=20
+> Different IOMMU hardware would have different hardware information. So
+> the
+> information reported differs as well. To let the external user understand
+> the difference. enum iommu_hw_info_type is defined. For the iommu
 
-kernel test robot noticed the following build errors:
+s/difference. enum/difference, enum/
 
-[auto build test ERROR on 2ccdd1b13c591d306f0401d98dedc4bdcd02b421]
+> + * @hw_info: IOMMU hardware information. The type of the returned data
+> is
+> + *           marked by the output type of this op. Type is one of
+> + *           enum iommu_hw_info_type defined in
+> include/uapi/linux/iommufd.h.
+> + *           The drivers that support this op should define a unique typ=
+e
+> + *           in include/uapi/linux/iommufd.h. The data buffer returned b=
+y this
+> + *           op is allocated in the IOMMU driver and the caller should f=
+ree it
+> + *           after use. Return the data buffer if success, or ERR_PTR on
+> + *           failure.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Raghavendra-Rao-Ananta/KVM-arm64-PMU-Introduce-a-helper-to-set-the-guest-s-PMU/20230817-083353
-base:   2ccdd1b13c591d306f0401d98dedc4bdcd02b421
-patch link:    https://lore.kernel.org/r/20230817003029.3073210-6-rananta%40google.com
-patch subject: [PATCH v5 05/12] KVM: arm64: PMU: Simplify extracting PMCR_EL0.N
-config: arm-randconfig-r046-20230817 (https://download.01.org/0day-ci/archive/20230817/202308171444.Q5rfJubF-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce: (https://download.01.org/0day-ci/archive/20230817/202308171444.Q5rfJubF-lkp@intel.com/reproduce)
+simplified as:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308171444.Q5rfJubF-lkp@intel.com/
+ @hw_info: report iommu hardware information. The data buffer returned by
+           this op is allocated in the iommu driver and freed by the caller
+           after use. The information type is one of enum iommu_hw_info_typ=
+e
+           defined in include/uapi/linux/iommufd.h.
 
-All errors (new ones prefixed by >>):
-
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:148:44: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     148 |         [C(DTLB)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:133:44: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD'
-     133 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD                         0x004E
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:149:45: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     149 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR,
-         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:134:44: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR'
-     134 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR                         0x004F
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:150:42: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     150 |         [C(DTLB)][C(OP_READ)][C(RESULT_MISS)]   = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:131:50: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD'
-     131 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD                  0x004C
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:151:43: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     151 |         [C(DTLB)][C(OP_WRITE)][C(RESULT_MISS)]  = ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:132:50: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR'
-     132 | #define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR                  0x004D
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:153:44: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     153 |         [C(NODE)][C(OP_READ)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD,
-         |                                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:148:46: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD'
-     148 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD                      0x0060
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
-   drivers/perf/arm_pmuv3.c:154:45: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
-     154 |         [C(NODE)][C(OP_WRITE)][C(RESULT_ACCESS)] = ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR,
-         |                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmuv3.h:149:46: note: expanded from macro 'ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR'
-     149 | #define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR                      0x0061
-         |                                                                 ^~~~~~
-   drivers/perf/arm_pmuv3.c:141:2: note: previous initialization is here
-     141 |         PERF_CACHE_MAP_ALL_UNSUPPORTED,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:45:31: note: expanded from macro 'PERF_CACHE_MAP_ALL_UNSUPPORTED'
-      45 |                 [0 ... C(RESULT_MAX) - 1] = CACHE_OP_UNSUPPORTED,       \
-         |                                             ^~~~~~~~~~~~~~~~~~~~
-   include/linux/perf/arm_pmu.h:37:31: note: expanded from macro 'CACHE_OP_UNSUPPORTED'
-      37 | #define CACHE_OP_UNSUPPORTED            0xFFFF
-         |                                         ^~~~~~
->> drivers/perf/arm_pmuv3.c:1131:24: error: call to undeclared function 'FIELD_GET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    1131 |         cpu_pmu->num_events = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
-         |                               ^
-   55 warnings and 1 error generated.
-
-
-vim +/FIELD_GET +1131 drivers/perf/arm_pmuv3.c
-
-  1114	
-  1115	static void __armv8pmu_probe_pmu(void *info)
-  1116	{
-  1117		struct armv8pmu_probe_info *probe = info;
-  1118		struct arm_pmu *cpu_pmu = probe->pmu;
-  1119		u64 pmceid_raw[2];
-  1120		u32 pmceid[2];
-  1121		int pmuver;
-  1122	
-  1123		pmuver = read_pmuver();
-  1124		if (!pmuv3_implemented(pmuver))
-  1125			return;
-  1126	
-  1127		cpu_pmu->pmuver = pmuver;
-  1128		probe->present = true;
-  1129	
-  1130		/* Read the nb of CNTx counters supported from PMNC */
-> 1131		cpu_pmu->num_events = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
-  1132	
-  1133		/* Add the CPU cycles counter */
-  1134		cpu_pmu->num_events += 1;
-  1135	
-  1136		pmceid[0] = pmceid_raw[0] = read_pmceid0();
-  1137		pmceid[1] = pmceid_raw[1] = read_pmceid1();
-  1138	
-  1139		bitmap_from_arr32(cpu_pmu->pmceid_bitmap,
-  1140				     pmceid, ARMV8_PMUV3_MAX_COMMON_EVENTS);
-  1141	
-  1142		pmceid[0] = pmceid_raw[0] >> 32;
-  1143		pmceid[1] = pmceid_raw[1] >> 32;
-  1144	
-  1145		bitmap_from_arr32(cpu_pmu->pmceid_ext_bitmap,
-  1146				     pmceid, ARMV8_PMUV3_MAX_COMMON_EVENTS);
-  1147	
-  1148		/* store PMMIR register for sysfs */
-  1149		if (is_pmuv3p4(pmuver) && (pmceid_raw[1] & BIT(31)))
-  1150			cpu_pmu->reg_pmmir = read_pmmir();
-  1151		else
-  1152			cpu_pmu->reg_pmmir = 0;
-  1153	}
-  1154	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
