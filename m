@@ -2,75 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A91EF77FEB2
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 21:47:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 426C777FEEB
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 22:18:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354748AbjHQTrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 15:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50260 "EHLO
+        id S1354823AbjHQUR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 16:17:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243326AbjHQTqo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 15:46:44 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75EAB359B
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 12:46:43 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56385c43eaeso220872a12.1
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 12:46:43 -0700 (PDT)
+        with ESMTP id S1354819AbjHQURS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 16:17:18 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA32359B
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 13:17:16 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5637a108d02so308060a12.2
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 13:17:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692301603; x=1692906403;
+        d=google.com; s=20221208; t=1692303436; x=1692908236;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=38OjwvLryGdRHNnQWvsk2mgWrNDTfqIkNTH/PDjk+4c=;
-        b=jxJyj8vSc6MVlvwD3uyMXulv8nXM55AWC9xP41lj7Vv/PPFEby+CxZdmmt0CNvuHOH
-         TH9kLw8p++GjtH1j8/hd4kIG8jRZEUotTPHb0Hfr4dtL2YfI+c1IZ9jhNcaIwS/Brv6b
-         KKXsVS5CPcB1ginpNzN2uXhSew0+N2RgepwQd5vEyqVnpItfJcK20+eUs46gU5e5NdLF
-         ZWoRgewhJBv+ehRh49D5L7rS22AyO0ub77AQOOLv1cNoT6y/F+Z3334WyDyrk7F7RMVc
-         e3DitMFKj1rOjnvoqpgM+cvYv93cUinXdWtPlw28mzywXfuQb+5s6w6+DaztqYxvwqgC
-         j7Xw==
+        bh=KU+yygDiyP0ELbBFxmC0szeJUfwpE0TiBmbPQ8YXVAs=;
+        b=zNA3vpDDz1KyBjk9Ob5BUHexoZIGyPiAf/jYnuCLTrIqL4j8d6uRJul5dmw74Bh5Hq
+         SeyuGFaDDWqXuIHXDZA8/MCkbxdNniW3sClCvGAJwf+6uB9P9YBYZucziWA+uHZ9V3aQ
+         ry1zwBbNsGxEkazo8EH9jBDiVKZ6gZuLtJp6BpHlGyFW2+HSz0J3LwOKAJBm5+Sbpzzh
+         1dOvxxvTnzFRJ0DUIV9Np2zj6Wx5KXBVohTo0UHZTaxclJriOTeM0q8Ral8VlimAaMPU
+         HI0tbM5WA3rH/97lmAIvs2Vj+Px3wTzwhMfDsgg9wXUriOKOFynRHp9VmuR+kHhQtls9
+         snsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692301603; x=1692906403;
+        d=1e100.net; s=20221208; t=1692303436; x=1692908236;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=38OjwvLryGdRHNnQWvsk2mgWrNDTfqIkNTH/PDjk+4c=;
-        b=BgChTc7mVzZ2XydEYo002veBJSBWx3p6yTUXOgzrwwQF9xqEhgeYRUcDMHAIJu/cO9
-         Du8wVWR9ZhKTpbOf1KjAzJT25B1X+Rv7lwbqWo7WudzoBJkIJniAnoJu/XR9KLp3D+UH
-         aQ1Ux0RKNDfTuG0957psy9f4liwpCGNoLBPfsZhgoN7WpMlUPGDzXNO8PJOq8NACOL0N
-         ztaJdtAZhziLL5qlIEdGrk5voC0aONh0Q4Fx23856ldUlT77pfy3d8+dzrqnRQjBFUg8
-         e65URf5wFjcW2vn3KNYKLyrJTk8+P+KgXWbuagn25XYq2i7XIvPRVSkAi0FP6cq828f0
-         A3FQ==
-X-Gm-Message-State: AOJu0YwFW+/BnijqqdPanUMdzMdeIJ/QK9+4pnU2mrOTLOBMfWeRBKx2
-        YoiDX1HW8FLCNOjIVK6S10rkO+q/q24=
-X-Google-Smtp-Source: AGHT+IFBe9aniLvKThqqpWnXRIW+Ce6rpM3SxSMATIg5sCkf4FHEzKrUMBQUwCkNZWjSzdkkdkLSS3NKUoQ=
+        bh=KU+yygDiyP0ELbBFxmC0szeJUfwpE0TiBmbPQ8YXVAs=;
+        b=ZM+sFGK1r5ra0Sjci427pdOweNBxFnTJECRvxR/3af+H5vBMINKJh+I8C3d0wulQx5
+         tHFH4zL/AQtu9xEfvbw6zQUEQZwl3kURAAwxukuMB9RO3mv4QDAbtvHcTPhGtjkDgjAi
+         4SFVYfkgqcg4D8QjvPZKai9mh9d9keF9VL/FbJr+e8bbdNSYoo8Jb5aQcE80C1m9vmob
+         WKUzlq9WDAKe2NehO4aROiHz0YPidskH12ui7o2CV8OpT8cB/+UI/odETdMYBOXvGJ2e
+         8T/nejD5MIwHMACRBcD7pcgh9kDJbg0YavrwTKKhQJ7mc8qR8Zt/AoeAPERWIksyybj7
+         H3Ig==
+X-Gm-Message-State: AOJu0Yz0aWpg089qDA7uVuqBIZ6A3yMpH6Z/UV/x1TOxkldGPGnDbQNc
+        k5QGjo9vO6vDV8UXoJo/qbfhSd+44Y0=
+X-Google-Smtp-Source: AGHT+IFijHumwatVu7On9K+vpmmEsXcAinTeAqe7rw5Domph+e00oHTgIyy4LP9oPODs9OGpTVBlFLzjQh0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:295a:0:b0:565:dc04:c912 with SMTP id
- bu26-20020a63295a000000b00565dc04c912mr76598pgb.5.1692301602857; Thu, 17 Aug
- 2023 12:46:42 -0700 (PDT)
-Date:   Thu, 17 Aug 2023 12:46:40 -0700
-In-Reply-To: <244a3f0b-16fd-eac8-f207-1dfe7859410b@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a63:b00f:0:b0:565:dddd:1f65 with SMTP id
+ h15-20020a63b00f000000b00565dddd1f65mr61039pgf.7.1692303435763; Thu, 17 Aug
+ 2023 13:17:15 -0700 (PDT)
+Date:   Thu, 17 Aug 2023 13:17:14 -0700
+In-Reply-To: <CAFg_LQXuBfCD6ypmOLS4NhBCPrLXTpetYWGqFDSnKgQa0R6_gA@mail.gmail.com>
 Mime-Version: 1.0
-References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
- <20230719144131.29052-4-binbin.wu@linux.intel.com> <c4faf38ea79e0f4eb3d35d26c018cd2bfe9fe384.camel@intel.com>
- <66235c55-05ac-edd5-c45e-df1c42446eb3@linux.intel.com> <aa17648c001704d83dcf641c1c7e9894e65eb87a.camel@intel.com>
- <ZN1Ardu9GRx7KlAV@google.com> <244a3f0b-16fd-eac8-f207-1dfe7859410b@linux.intel.com>
-Message-ID: <ZN55IJoxTMb1niP7@google.com>
-Subject: Re: [PATCH v10 3/9] KVM: x86: Use KVM-governed feature framework to
- track "LAM enabled"
+References: <20230810090945.16053-1-cloudliang@tencent.com>
+ <20230810090945.16053-4-cloudliang@tencent.com> <20230814234926.GD2257301@ls.amr.corp.intel.com>
+ <CAFg_LQXuBfCD6ypmOLS4NhBCPrLXTpetYWGqFDSnKgQa0R6_gA@mail.gmail.com>
+Message-ID: <ZN6ASsmAO2007KJM@google.com>
+Subject: Re: [PATCH v6 3/6] KVM: selftests: Introduce __kvm_pmu_event_filter
+ to improved event filter settings
 From:   Sean Christopherson <seanjc@google.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-        "David.Laight@ACULAB.COM" <David.Laight@aculab.com>,
-        Guang Zeng <guang.zeng@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Jinrong Liang <cloudliang@tencent.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,96 +83,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 17, 2023, Binbin Wu wrote:
+On Tue, Aug 15, 2023, Jinrong Liang wrote:
+> Isaku Yamahata <isaku.yamahata@gmail.com> =E4=BA=8E2023=E5=B9=B48=E6=9C=
+=8815=E6=97=A5=E5=91=A8=E4=BA=8C 07:49=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > On Thu, Aug 10, 2023 at 05:09:42PM +0800,
+> > Jinrong Liang <ljr.kernel@gmail.com> wrote:
+> >
+> > > From: Jinrong Liang <cloudliang@tencent.com>
+> > >
+> > > Add custom "__kvm_pmu_event_filter" structure to improve pmu event
+> > > filter settings. Simplifies event filter setup by organizing event
+> > > filter parameters in a cleaner, more organized way.
+> > >
+> > > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+> > > ---
+> > >  .../kvm/x86_64/pmu_event_filter_test.c        | 182 +++++++++-------=
+--
+> > >  1 file changed, 90 insertions(+), 92 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test=
+.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > > index 5ac05e64bec9..94f5a89aac40 100644
+> > > --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > > +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+> > > @@ -28,6 +28,10 @@
+> > >
+> > >  #define NUM_BRANCHES 42
+> > >
+> > > +/* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
+> > > +#define MAX_FILTER_EVENTS            300
+> >
+> > Can we simply use KVM_PMU_EVENT_FILTER_MAX_EVENTS and remove MAX_FILTER=
+_EVENTS?
 >=20
+> I didn't find the definition of KVM_PMU_EVENT_FILTER_MAX_EVENTS in
+> selftests. KVM_PMU_EVENT_FILTER_MAX_EVENTS is defined in pmu.c. To use
+> it, we need to define it in selftests.
+
+Huh.  That seems like something that should be enumerated to userspace.
+
+> > > +#define MAX_TEST_EVENTS              10
+> > > +
+> > >  /*
+> > >   * This is how the event selector and unit mask are stored in an AMD
+> > >   * core performance event-select register. Intel's format is similar=
+,
+> > > @@ -69,21 +73,33 @@
+> > >
+> > >  #define INST_RETIRED EVENT(0xc0, 0)
+> > >
+> > > +struct __kvm_pmu_event_filter {
+> > > +     __u32 action;
+> > > +     __u32 nevents;
+> > > +     __u32 fixed_counter_bitmap;
+> > > +     __u32 flags;
+> > > +     __u32 pad[4];
+> > > +     __u64 events[MAX_FILTER_EVENTS];
+> > > +};
+> > > +
+> >
+> > Is this same to struct kvm_pmu_event_filter?
 >=20
-> On 8/17/2023 5:33 AM, Sean Christopherson wrote:
-> > On Wed, Aug 16, 2023, Kai Huang wrote:
-> > > > > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > > > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > > > > @@ -7783,6 +7783,9 @@ static void vmx_vcpu_after_set_cpuid(stru=
-ct kvm_vcpu *vcpu)
-> > > > > >    		vmx->msr_ia32_feature_control_valid_bits &=3D
-> > > > > >    			~FEAT_CTL_SGX_LC_ENABLED;
-> > > > > > +	if (boot_cpu_has(X86_FEATURE_LAM))
-> > > > > > +		kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_LAM);
-> > > > > > +
-> > > > > If you want to use boot_cpu_has(), it's better to be done at your=
- last patch to
-> > > > > only set the cap bit when boot_cpu_has() is true, I suppose.
-> > > > Yes, but new version of kvm_governed_feature_check_and_set() of
-> > > > KVM-governed feature framework will check against kvm_cpu_cap_has()=
- as well.
-> > > > I will remove the if statement and call
-> > > > kvm_governed_feature_check_and_set()=C2=A0 directly.
-> > > > https://lore.kernel.org/kvm/20230815203653.519297-2-seanjc@google.c=
-om/
-> > > >=20
-> > > I mean kvm_cpu_cap_has() checks against the host CPUID directly while=
- here you
-> > > are using boot_cpu_has().  They are not the same.
-> > >=20
-> > > If LAM should be only supported when boot_cpu_has() is true then it s=
-eems you
-> > > can just only set the LAM cap bit when boot_cpu_has() is true.  As yo=
-u also
-> > > mentioned above the kvm_governed_feature_check_and_set() here interna=
-lly does
-> > > kvm_cpu_cap_has().
-> > That's covered by the last patch:
-> >=20
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index e961e9a05847..06061c11d74d 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -677,7 +677,7 @@ void kvm_set_cpu_caps(void)
-> >          kvm_cpu_cap_mask(CPUID_7_1_EAX,
-> >                  F(AVX_VNNI) | F(AVX512_BF16) | F(CMPCCXADD) |
-> >                  F(FZRM) | F(FSRS) | F(FSRC) |
-> > -               F(AMX_FP16) | F(AVX_IFMA)
-> > +               F(AMX_FP16) | F(AVX_IFMA) | F(LAM)
-> >          );
-> >          kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
-> >=20
-> >=20
-> > Which highlights a problem with activating a goverened feature before s=
-aid feature
-> > is actually supported by KVM: it's all kinds of confusing.
-> >=20
-> > It'll generate a more churn in git history, but I think we should first=
- enable
-> > LAM without a goverened feature, and then activate a goverened feature =
-later on.
-> > Using a goverened feature is purely an optimization, i.e. the series ne=
-eds to be
-> > function without using a governed feature.
-> OK, then how about the second option which has been listed in your v9 pat=
-ch
-> series discussion.
-> https://lore.kernel.org/kvm/20230606091842.13123-1-binbin.wu@linux.intel.=
-com/T/#m16ee5cec4a46954f985cb6afedb5f5a3435373a1
+> In tools/arch/x86/include/uapi/asm/kvm.h
 >=20
-> Temporarily add a bool can_use_lam in kvm_vcpu_arch and use the bool
-> "can_use_lam" instead of guest_can_use(vcpu, X86_FEATURE_LAM).
-> and then put the patch of adopting "KVM-governed feature framework" to th=
-e
-> last.
+> /* for KVM_CAP_PMU_EVENT_FILTER */
+> struct kvm_pmu_event_filter {
+> __u32 action;
+> __u32 nevents;
+> __u32 fixed_counter_bitmap;
+> __u32 flags;
+> __u32 pad[4];
+> __u64 events[];
+> };
 
-No, just do the completely unoptimized, but functionally obvious thing:
+To more directly answer Isaku's question:
 
-	if (kvm_cpu_cap_has(x86_FEATURE_LAM) &&
-	    guest_cpuid_has(vcpu, x86_FEATURE_LAM))
-		...
+They're *basically* the same, and have an identical layout, but the struct =
+defined
+by KVM uses a flexible array because the number of events comes from usersp=
+ace
+and forcing userspace to create an 1KiB+ object just to define a single eve=
+nt
+filter would be obnoxious.
 
-I don't expect anyone to push back on using a governed feature, i.e. I don'=
-t expect
-to ever see a kernel release with the unoptimized code.  If someone is bise=
-cting
-or doing something *really* weird with their kernel management, then yes, t=
-hey
-might see suboptimal performance.
+There are alternatives, e.g. using an struct overlay to set a single entry:
 
-Again, the goal is to separate the addition of functionality from the optim=
-ization
-of that functionality, e.g. to make it easier to review and understand each=
- change.
+	struct {
+		struct kvm_msrs header;
+		struct kvm_msr_entry entry;
+	} buffer =3D {};
+
+	memset(&buffer, 0, sizeof(buffer));
+	buffer.header.nmsrs =3D 1;
+	buffer.entry.index =3D msr_index;
+	buffer.entry.data =3D msr_value;
+
+but that gets annoying (and IMO confusing) because of the nested structs.
+
+I'll massage the changelog to callout the alternative, and why it's undesir=
+able.
