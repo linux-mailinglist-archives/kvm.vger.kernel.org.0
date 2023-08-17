@@ -2,193 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B51777FDC1
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 20:23:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B9BA77FDEC
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 20:35:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354295AbjHQSWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 14:22:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35538 "EHLO
+        id S1354448AbjHQSev (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 14:34:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354238AbjHQSWA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 14:22:00 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DCA43A97
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 11:21:37 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d72403b9e03so169908276.0
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 11:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692296465; x=1692901265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJ/AmT87XjwjHbKdAHeyGn9OgBJOQ1lFwCiDbKXb6nM=;
-        b=wMrw9lMFcEffCcRcJtV5g/0/iLKduBVIcEgiIFSA8IrJkJkeTZMPTrR/QMqjTiavcs
-         nuaiwQ6pCJ9MIzIs2bZLAL4QUsU24UPYBsHFRaZdaplp82oXRktr6Pr68kKE99GnoZjG
-         DlfsZ9bD95+npn4+notpONZY6gdR5kCDexm4mJtnFwtycrLE06/xLqf8KIZ66zNnfX2z
-         hESHg4xd/wMAxvta3/eSIFFZf/I6mNlBeVNbU6YBRxlygqvZOowvcjUWe6b54CaUouDG
-         HNxF+zackke6qiFESkFImNEnJlysteXDgW9AP8P+UgP9f1fPtq9SItRVjN7GfEdb7z94
-         1fug==
+        with ESMTP id S1354442AbjHQSea (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 14:34:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FF12136
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 11:33:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692297224;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gexPipbqUfcFFvNx/MvK38HTJI+O56duX55+MbeHy94=;
+        b=Ik6likBEE1lEcypUY5A2U3283t18qz1wuQsSi4Y0ftrhFt4oxIAeFhlFBxx6VzXQqa6lJz
+        ucKcMjYts3nrKXhCwtpfKdGUVCEHd4unYU3KEeQSgHNppTaG+ghg31wTb62a8spfTiBtWM
+        DRtGsld5+jSQ3eWrxr3t4HlfqviGmzg=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-678-wzVBVnGfO8O5FXDQOWKTiQ-1; Thu, 17 Aug 2023 14:33:41 -0400
+X-MC-Unique: wzVBVnGfO8O5FXDQOWKTiQ-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-34a94a4ebeeso1089125ab.1
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 11:33:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692296465; x=1692901265;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJ/AmT87XjwjHbKdAHeyGn9OgBJOQ1lFwCiDbKXb6nM=;
-        b=XIcF6wBHVtnjI2cKCPtO0C+ekcHUTxeNXnupzWcuaNnLzSobh1KS0AhKtRCnzfRZG2
-         iwCuyGgVlar1IhsQHxHP6tJiHpZswLF5UddATN889dQxTJ2q1b0th5QqqTqmsCepVOgb
-         4pO9LhiQ06f4WssFpbMIcOCIkTDa48lH02MTXv3qO0MfQmU45jaawSiM5MloLJ9chrCK
-         KFFED3dbq7Nt7RsEAGYI1TlEgwvScXg6ocaWIfk0D3frKVK4BYQZ0GJG7A3VwaJrRebo
-         zCV1pH4rW2Fr0eWEmQx7Fa8i4bGjFJxNGZhuy90h3SZqlQmTWMRkqEgHYKMnHtNWbwER
-         cAsw==
-X-Gm-Message-State: AOJu0YxeyqVjUvd+7xHW414yp7aDAVX3fxTwCZxKLF0GEv/NyCaq2isY
-        o78NeNfLyAv+QQjkX4etaeeO630gFFw=
-X-Google-Smtp-Source: AGHT+IENbp20qCwcOf57Y8LNV1qe1Dy/7KYDpwHsK8x2I7A0BeOOwhz8KLF3v6BjkD8DKTGnavlgnCTrjDU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:818e:0:b0:d4f:638b:d7fd with SMTP id
- p14-20020a25818e000000b00d4f638bd7fdmr4674ybk.9.1692296465662; Thu, 17 Aug
- 2023 11:21:05 -0700 (PDT)
-Date:   Thu, 17 Aug 2023 11:21:03 -0700
-In-Reply-To: <5e678d57-66b-a18d-f97e-b41357fdb7f@ewheeler.net>
-Mime-Version: 1.0
-References: <ZMAGuic1viMLtV7h@google.com> <CAG+wEg3X1Tc_PW6E=pLHKFyAfJD0n2n25Fw2JYCuHrfDC_Ph0Q@mail.gmail.com>
- <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com>
- <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com>
- <ZNJ2V2vRXckMwPX2@google.com> <c412929a-14ae-2e1-480-418c8d91368a@ewheeler.net>
- <ZNujhuG++dMbCp6Z@google.com> <5e678d57-66b-a18d-f97e-b41357fdb7f@ewheeler.net>
-Message-ID: <ZN5lD5Ro9LVgTA6M@google.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-From:   Sean Christopherson <seanjc@google.com>
-To:     Eric Wheeler <kvm@lists.ewheeler.net>
-Cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1692297221; x=1692902021;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gexPipbqUfcFFvNx/MvK38HTJI+O56duX55+MbeHy94=;
+        b=NNq9pXf4OE+SN1DUFLO2z2R+jLv7lUcQsy9Yx/dPA5lRJnTgOSgDka89QkzFyLfWDf
+         58xlH9gApSvDhwSwiB6t7VcmZxCWUZKjqueWvpihKcQRmLND10la1hpYtuSEk4Ad+QfE
+         ii3T+yyZxuvcnz/J2f8ytXnC+rJrl6M1Ph7pNhfwHGAEd1Bh3iFEl01CmhvjUc8SJH7z
+         kXHsbI72ufs9fQBOkYQEuNXarr4Fu4IPAzFk/vHacp+204uyqFuOeLI+QSkePg42vznn
+         AtzIj9qhChXcY5jtmnby+y9OkD2AiIHs2s48L80j2rNvm8fHgl4OYE5TUUvkdu0lezB4
+         U9lA==
+X-Gm-Message-State: AOJu0Yw1yFyGrdBoghqezY24GoFT1BQN+pMq+vRzAgIoH2UHdk797ELC
+        UUgJf3Ubi0pHLrBuxzjlVQFnL6RKUSrB4m8v4OJIXJ6lL2ZAzNEzznwr+M+ws+f2JFV1MmBr4qs
+        10flh/wIBMFkh
+X-Received: by 2002:a05:6e02:927:b0:34a:9120:d7e with SMTP id o7-20020a056e02092700b0034a91200d7emr428420ilt.9.1692297220856;
+        Thu, 17 Aug 2023 11:33:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHa6I/Sfuog1vyDS9pXGoSuKyZqpdybT3hs/6ik00fZZgmWFHMcUgu93VYiI0dKSWu8SQIAvw==
+X-Received: by 2002:a05:6e02:927:b0:34a:9120:d7e with SMTP id o7-20020a056e02092700b0034a91200d7emr428407ilt.9.1692297220597;
+        Thu, 17 Aug 2023 11:33:40 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id y3-20020a92c743000000b003491422ca27sm27524ilp.45.2023.08.17.11.33.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 11:33:39 -0700 (PDT)
+Date:   Thu, 17 Aug 2023 12:33:38 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] vfio: align capability structures
+Message-ID: <20230817123338.764e8c83.alex.williamson@redhat.com>
+In-Reply-To: <ZN5getPSq1stluMt@nvidia.com>
+References: <20230809203144.2880050-1-stefanha@redhat.com>
+        <ZN5getPSq1stluMt@nvidia.com>
+Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 16, 2023, Eric Wheeler wrote:
-> On Tue, 15 Aug 2023, Sean Christopherson wrote:
-> > On Mon, Aug 14, 2023, Eric Wheeler wrote:
-> > > On Tue, 8 Aug 2023, Sean Christopherson wrote:
-> > > > > If you have any suggestions on how modifying the host kernel (and then migrating
-> > > > > a locked up guest to it) or eBPF programs that might help illuminate the issue
-> > > > > further, let me know!
-> > > > > 
-> > > > > Thanks for all your help so far!
-> > > > 
-> > > > Since it sounds like you can test with a custom kernel, try running with this
-> > > > patch and then enable the kvm_page_fault tracepoint when a vCPU gets stuck.  The
-> > > > below expands said tracepoint to capture information about mmu_notifiers and
-> > > > memslots generation.  With luck, it will reveal a smoking gun.
-> > > 
-> > > Getting this patch into production systems is challenging, perhaps live
-> > > patching is an option:
+On Thu, 17 Aug 2023 15:01:30 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Wed, Aug 09, 2023 at 04:31:44PM -0400, Stefan Hajnoczi wrote:
+> > The VFIO_DEVICE_GET_INFO, VFIO_DEVICE_GET_REGION_INFO, and
+> > VFIO_IOMMU_GET_INFO ioctls fill in an info struct followed by capability
+> > structs:
 > > 
-> > Ah, I take when you gathered information after a live migration you were migrating
-> > VMs into a sidecar environment.
+> >   +------+---------+---------+-----+
+> >   | info | caps[0] | caps[1] | ... |
+> >   +------+---------+---------+-----+
 > > 
-> > > Questions:
-> > > 
-> > > 1. Do you know if this would be safe to insert as a live kernel patch?
+> > Both the info and capability struct sizes are not always multiples of
+> > sizeof(u64), leaving u64 fields in later capability structs misaligned.
 > > 
-> > Hmm, probably not safe.
+> > Userspace applications currently need to handle misalignment manually in
+> > order to support CPU architectures and programming languages with strict
+> > alignment requirements.
 > > 
-> > > For example, does adding to TRACE_EVENT modify a struct (which is not
-> > > live-patch-safe) or is it something that should plug in with simple
-> > > function redirection?
+> > Make life easier for userspace by ensuring alignment in the kernel. This
+> > is done by padding info struct definitions and by copying out zeroes
+> > after capability structs that are not aligned.
 > > 
-> > Yes, the tracepoint defines a struct, e.g. in this case trace_event_raw_kvm_page_fault.
+> > The new layout is as follows:
 > > 
-> > Looking back, I think I misinterpreted an earlier response regarding bpftrace and
-> > unnecessarily abandoned that tactic. *sigh*
+> >   +------+---------+---+---------+-----+
+> >   | info | caps[0] | 0 | caps[1] | ... |
+> >   +------+---------+---+---------+-----+
 > > 
-> > If your environment provides btf info, then this bpftrace program should provide
-> > the mmu_notifier half of the tracepoint hack-a-patch.  If this yields nothing
-> > interesting then we can try diving into whether or not the mmu_root is stale, but
-> > let's cross that bridge when we have to.
+> > In this example caps[0] has a size that is not multiples of sizeof(u64),
+> > so zero padding is added to align the subsequent structure.
 > > 
-> > I recommend loading this only when you have a stuck vCPU, it'll be quite noisy.
+> > Adding zero padding between structs does not break the uapi. The memory
+> > layout is specified by the info.cap_offset and caps[i].next fields
+> > filled in by the kernel. Applications use these field values to locate
+> > structs and are therefore unaffected by the addition of zero padding.
 > > 
-> > kprobe:handle_ept_violation
-> > {
-> > 	printf("vcpu = %lx pid = %u MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
-> > 	       arg0, ((struct kvm_vcpu *)arg0)->pid->numbers[0].nr,
-> > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_seq,
-> > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_in_progress,
-> > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_range_start,
-> > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_range_end);
-> > }
+> > Note that code that copies out info structs with padding is updated to
+> > always zero the struct and copy out as many bytes as userspace
+> > requested. This makes the code shorter and avoids potential information
+> > leaks by ensuring padding is initialized.
 > > 
-> > If you don't have BTF info, we can still use a bpf program, but to get at the
-> > fields of interested, I think we'd have to resort to pointer arithmetic with struct
-> > offsets grab from your build.
+> > Originally-by: Alex Williamson <alex.williamson@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> > v3:
+> > - Also align capability structs in drivers/iommu/iommufd/vfio_compat.c
+> >   [Jason]
+> > 
+> >  include/uapi/linux/vfio.h           |  2 ++
+> >  drivers/iommu/iommufd/vfio_compat.c |  2 ++
+> >  drivers/vfio/pci/vfio_pci_core.c    | 11 ++---------
+> >  drivers/vfio/vfio_iommu_type1.c     | 11 ++---------
+> >  drivers/vfio/vfio_main.c            |  6 ++++++
+> >  5 files changed, 14 insertions(+), 18 deletions(-)  
 > 
-> We have BTF, so hurray for not needing struct offsets!
-> 
-> I am testing this on a host that is not (yet) known to be stuck. Please do 
-> a quick sanity check for me and make sure this looks like the kind of 
-> output that you want to see:
-> 
-> I had to shrink the printf line because it was longer than 64 bytes. I put 
-> the process ID as the first item and changed %lx to %08lx for visual 
-> alignment. Aside from that, it is the same as what you provided.
-> 
-> We're piping it through `uniq -c` to only see interesting changes (and 
-> show counts) because it is extremely noisy. If this looks good to you then 
-> please confirm and I will run it on a production system after a lock-up:
-> 
-> 	kprobe:handle_ept_violation
-> 	{
-> 		printf("ept[%u] vcpu=%08lx seq=%08lx inprog=%lx start=%08lx end=%08lx\n",
-> 		       ((struct kvm_vcpu *)arg0)->pid->numbers[0].nr,
-> 			arg0, 
-> 		       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_seq,
-> 		       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_in_progress,
-> 		       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_range_start,
-> 		       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_range_end);
-> 	}
-> 
-> Questions:
->   - Should pid be zero?  (Note this is not yet running on a host with a 
->     locked-up guest, in case that is the reason.)
+> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
 
-No.  I'm not at all familiar with PID management, I just copy+pasted from
-pid_nr(), which is what KVM uses when displaying the pid in debugfs.  I printed
-the PID purely to be able to unambiguously correlated prints to vCPUs without
-needing to cross reference kernel addresses.  I.e. having the PID makes life
-easier, but it shouldn't be strictly necessary.
+Thanks!
 
->   - Can you think of any reason that this would be unsafe? (Forgive my 
->     paranoia, but of course this will be running on a production
->     hypervisor.)
+Applied to vfio next branch for v6.6.  Thanks,
 
-Printing the raw address of the vCPU structure will effectively neuter KASLR, but
-KASLR isn't all that much of a barrier, and whoever has permission to load a BPF
-program on the system can do far, far more damage.
+Alex
 
->   - Can you think of any adjustments to the bpf script above before 
->     running this for real?
-
-You could try and make it less noisy or more precise, e.g. by tailoring it to
-print only information on the vCPU that is stuck.  If the noise isn't a problem
-though, I would keep it as-is, the more information the better.
-
-> Here is an example trace on a test host that isn't locked up:
-> 
->  ~]# bpftrace handle_ept_violation.bt | grep ^ept --line-buffered | uniq -c
->    1926 ept[0] vcpu=ffff969569468000 seq=8009c7eb inprog=0 start=7f5993200000 end=7f5993400000
->  215722 ept[0] vcpu=ffff9695684b8000 seq=8009c7eb inprog=0 start=7f5993200000 end=7f5993400000
->   66280 ept[0] vcpu=ffff969569468000 seq=8009c7eb inprog=0 start=7f5993200000 end=7f5993400000
-> 18609437 ept[0] vcpu=ffff9695684b8000 seq=8009c7eb inprog=0 start=7f5993200000 end=7f5993400000
-
-Woah.  That's over 2 *billion* invalidations for a single VM.  Even if that's a
-long-lived VM, that's still seems rather insane.  E.g. if the uptime of that VM
-*on that host* is 6 months, my back of the napkin math says that that's nearly
-100 invalidations every second for 6 months straight.
-
-Bit 31 being set in relative isolation almost makes me wonder if mmu_invalidate_seq
-got corrupted somehow.  Either that or you are thrashing that VM with a vengeance.
