@@ -2,168 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CCF377F1EE
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 10:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E24AE77F252
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 10:42:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348808AbjHQISQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 04:18:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
+        id S1348976AbjHQIkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 04:40:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348789AbjHQIRy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 04:17:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29622112
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 01:17:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692260225;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QOolyAIrKdePCuvcf3d2mbyCsBtqXn7nucEha9KLm/Y=;
-        b=LnMgo9cpTDMhmzBmW5ktXv7EfYNwWvcUHhSdhK4WfY55IdH4tVkewjiMrmKOMXxqA6hOJ6
-        eFaURtJZF0G1dN4v3v9/TY4sZC8SLbAyXLyhswpfZA8GkJClj8PTou7aEPlSgSwW5EBHzU
-        UPN1ynZioHXJpfjLg2Sbt65rKz7p0yY=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-266-rtujf1jXPdWVOplIqO1E_A-1; Thu, 17 Aug 2023 04:17:01 -0400
-X-MC-Unique: rtujf1jXPdWVOplIqO1E_A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S1348918AbjHQIjj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 04:39:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2236210EC;
+        Thu, 17 Aug 2023 01:39:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D18261C06EE0;
-        Thu, 17 Aug 2023 08:16:59 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44BB7492C14;
-        Thu, 17 Aug 2023 08:16:59 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A6F56634BD;
+        Thu, 17 Aug 2023 08:39:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03339C433C8;
+        Thu, 17 Aug 2023 08:39:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692261577;
+        bh=gMp6O7RtrZswN4fQDVTuF4+KfrQJM+cudroXxhAsVfs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZgoJR7uYCUZlDATqxGYVSz+0U1lPgeLMrIlBdxGBWDF1/i35EtI8booG6hSrz+ykh
+         YmbA4whrCn8muyr0h6HW+jwWE3g4GSRi+YWbfXznaw2pHKrqcYrUi7dy/1vUOUljIe
+         NXaJmLBvdRpsIy6GYcHuZgUmV50vh76LEapsSfkHdLzfAZbbJJOhIGMbsksQuMQVLA
+         1eikKjIJeteWDD1tS/88xT1H/klaBjuQvK34eZq66GTjWFp6Zz7VWBtw+Pdi8czJNg
+         EGVZQenILaUDBVgiaRwgthKKI3Bt/mF39TYq1qS2O9yupSu5TNtpxknKcO76xYpz3h
+         TJYcs43ZT4E6A==
+Received: from 82-132-234-11.dab.02.net ([82.132.234.11] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qWYXW-005coN-B9;
+        Thu, 17 Aug 2023 09:39:34 +0100
+Date:   Thu, 17 Aug 2023 09:39:31 +0100
+Message-ID: <87a5uqoyf0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Raghavendra Rao Ananta <rananta@google.com>,
         Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jing Zhang <jingzhangos@google.com>,
         Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>
-Subject: Re: [PATCH v8 02/11] KVM: arm64: Document
- KVM_ARM_GET_REG_WRITABLE_MASKS
-In-Reply-To: <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20230807162210.2528230-1-jingzhangos@google.com>
- <20230807162210.2528230-3-jingzhangos@google.com>
- <878raex8g0.fsf@redhat.com>
- <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Thu, 17 Aug 2023 10:16:56 +0200
-Message-ID: <874jkyqe13.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Colton Lewis <coltonlewis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Fuad Tabba <tabba@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Gavin Shan <gshan@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Subject: Re: [PATCH v9 05/14] KVM: Allow range-based TLB invalidation from common code
+In-Reply-To: <ZNv8cCzI9fMWkGWT@google.com>
+References: <20230811045127.3308641-1-rananta@google.com>
+        <20230811045127.3308641-6-rananta@google.com>
+        <ZNv8cCzI9fMWkGWT@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.234.11
+X-SA-Exim-Rcpt-To: seanjc@google.com, rananta@google.com, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, chenhuacai@kernel.org, yuzenghui@huawei.com, anup@brainfault.org, atishp@atishpatra.org, jingzhangos@google.com, reijiw@google.com, coltonlewis@google.com, dmatlack@google.com, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, gshan@redhat.com, shahuang@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14 2023, Jing Zhang <jingzhangos@google.com> wrote:
+On Tue, 15 Aug 2023 23:30:08 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Fri, Aug 11, 2023, Raghavendra Rao Ananta wrote:
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index ec169f5c7dce2..00f7bda9202f2 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -278,16 +278,14 @@ static inline bool kvm_available_flush_remote_tlbs_range(void)
+> >  	return kvm_x86_ops.flush_remote_tlbs_range;
+> >  }
+> >  
+> > -void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t start_gfn,
+> > -				 gfn_t nr_pages)
+> > +int kvm_arch_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
+> >  {
+> >  	int ret = -EOPNOTSUPP;
+> >  
+> >  	if (kvm_x86_ops.flush_remote_tlbs_range)
+> > -		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, start_gfn,
+> > -								   nr_pages);
+> > -	if (ret)
+> > -		kvm_flush_remote_tlbs(kvm);
+> > +		ret = static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
+> > +
+> > +	return ret;
+> 
+> Please write this as
+> 
+> 	if (kvm_x86_ops.flush_remote_tlbs_range)
+> 		return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
+> 
+> 	return -EOPNOTSUPP;
+> 
+> or alternatively
+> 
+> 	if (!kvm_x86_ops.flush_remote_tlbs_range)
+> 		return -EOPNOTSUPP;
+> 
+> 	return static_call(kvm_x86_flush_remote_tlbs_range)(kvm, gfn, nr_pages);
+> 
+> Hmm, I'll throw my official vote for the second version.
 
-> On Mon, Aug 14, 2023 at 2:46=E2=80=AFAM Cornelia Huck <cohuck@redhat.com>=
- wrote:
->>
->> On Mon, Aug 07 2023, Jing Zhang <jingzhangos@google.com> wrote:
->>
->> > Add some basic documentation on how to get feature ID register writable
->> > masks from userspace.
->> >
->> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
->> > ---
->> >  Documentation/virt/kvm/api.rst | 29 +++++++++++++++++++++++++++++
->> >  1 file changed, 29 insertions(+)
->> >
->> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/a=
-pi.rst
->> > index c0ddd3035462..92a9b20f970e 100644
->> > --- a/Documentation/virt/kvm/api.rst
->> > +++ b/Documentation/virt/kvm/api.rst
->> > @@ -6068,6 +6068,35 @@ writes to the CNTVCT_EL0 and CNTPCT_EL0 registe=
-rs using the SET_ONE_REG
->> >  interface. No error will be returned, but the resulting offset will n=
-ot be
->> >  applied.
->> >
->> > +4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
->> > +-------------------------------------------
->> > +
->> > +:Capability: none
->> > +:Architectures: arm64
->> > +:Type: vm ioctl
->> > +:Parameters: struct reg_mask_range (in/out)
->> > +:Returns: 0 on success, < 0 on error
->> > +
->> > +
->> > +::
->> > +
->> > +        #define ARM64_FEATURE_ID_SPACE_SIZE  (3 * 8 * 8)
->> > +
->> > +        struct reg_mask_range {
->> > +                __u64 addr;             /* Pointer to mask array */
->> > +                __u64 reserved[7];
->> > +        };
->> > +
->> > +This ioctl would copy the writable masks for feature ID registers to =
-userspace.
->> > +The Feature ID space is defined as the System register space in AArch=
-64 with
->> > +op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7}, op2=3D=3D=
-{0-7}.
->> > +To get the index in the mask array pointed by ``addr`` for a specifie=
-d feature
->> > +ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn=
-, crm, op2)``.
->> > +This allows the userspace to know upfront whether it can actually twe=
-ak the
->> > +contents of a feature ID register or not.
->> > +The ``reserved[7]`` is reserved for future use to add other register =
-space. For
->> > +feature ID registers, it should be 0, otherwise, KVM may return error.
->>
->> In case of future extensions, this means that userspace needs to figure
->> out what the kernel supports via different content in reg_mask_range
->> (i.e. try with a value in one of the currently reserved fields and fall
->> back to using addr only if that doesn't work.) Can we do better?
->>
->> Maybe we could introduce a capability that returns the supported ranges
->> as flags, i.e. now we would return 1 for id regs masks, and for the
->> future case where we have some values in the next reserved field we
->> could return 1 & 2 etc. Would make life easier for userspace that needs
->> to work with different kernels, but might be overkill if reserved[] is
->> more like an insurance without any concrete plans for extensions.
->>
->
-> Maybe it'd be better to leave this to whenever we do need to add other
-> range support?
+I've applied the second version locally.
 
-My point is: How does userspace figure out if the kernel that is running
-supports ranges other than id regs? If this is just an insurance against
-changes that might arrive or not, we can live with the awkward "just try
-it out" approach; if we think it's likely that we'll need to extend it,
-we need to add the mechanism for userspace to find out about it now, or
-it would need to probe for presence of the mechanism...
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
