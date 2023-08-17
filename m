@@ -2,89 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A06E277F71E
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 15:01:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5396977F83B
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 16:01:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351220AbjHQNAa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 09:00:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59998 "EHLO
+        id S1351625AbjHQOA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 10:00:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351123AbjHQNAM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 09:00:12 -0400
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 452CB30D4;
-        Thu, 17 Aug 2023 06:00:10 -0700 (PDT)
-Received: from loongson.cn (unknown [10.2.5.185])
-        by gateway (Coremail) with SMTP id _____8BxyerTGd5k3oYZAA--.42938S3;
-        Thu, 17 Aug 2023 21:00:03 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-        by localhost.localdomain (Coremail) with SMTP id AQAAf8BxniPIGd5kmchcAA--.55665S32;
-        Thu, 17 Aug 2023 21:00:01 +0800 (CST)
-From:   Tianrui Zhao <zhaotianrui@loongson.cn>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        WANG Xuerui <kernel@xen0n.name>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        loongarch@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Mark Brown <broonie@kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Oliver Upton <oliver.upton@linux.dev>, maobibo@loongson.cn,
-        Xi Ruoyao <xry111@xry111.site>, zhaotianrui@loongson.cn,
-        Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH v19 30/30] LoongArch: KVM: Add maintainers for LoongArch KVM
-Date:   Thu, 17 Aug 2023 20:59:51 +0800
-Message-Id: <20230817125951.1126909-31-zhaotianrui@loongson.cn>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230817125951.1126909-1-zhaotianrui@loongson.cn>
-References: <20230817125951.1126909-1-zhaotianrui@loongson.cn>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf8BxniPIGd5kmchcAA--.55665S32
-X-CM-SenderInfo: p2kd03xldq233l6o00pqjv00gofq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-        ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-        nUUI43ZEXa7xR_UUUUUUUUU==
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S1351626AbjHQOA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 10:00:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795622D5A
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 07:00:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0025463258
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 14:00:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37EE8C433C7;
+        Thu, 17 Aug 2023 14:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692280826;
+        bh=u+2CpCl2pxspoLGC0N8j4sr1BNNqSZ9tx+qbKfS+os4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pwiu1UZ/8/d5KtXMAiYUQugb+rVXvo/9lr7aPlXw3SgCkPsSYpgf8nm6ZZnOhcTLj
+         dI0BHqWkiBRiJPiiA5As0JcGCiEhDH3vDID04b4GztZ3Ehl12oWOg3/HDdv+UaOU9h
+         J+HKKNTmRey2JECW2PvA6cUFt5pw2fA/aUjOj+OFIAvUfKO8/vBcUnGIn1lBFdLONJ
+         MYXnlWXtW4Z2D+S9zjUxAK2TU0y+VFK7ckACZdbyTF+FEoHkSHeaE3M2TYkm76XQME
+         ziabxD96f6IIy3M99YgGQOCgT48kcnzReMaGxmbucJEsC/m4uCeh0piYOvK5KJdhQx
+         excRM7G/O+lmw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qWdXz-005hIQ-Pr;
+        Thu, 17 Aug 2023 15:00:23 +0100
+Date:   Thu, 17 Aug 2023 15:00:23 +0100
+Message-ID: <86sf8hg45k.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>
+Subject: Re: [PATCH v8 02/11] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+In-Reply-To: <874jkyqe13.fsf@redhat.com>
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+        <20230807162210.2528230-3-jingzhangos@google.com>
+        <878raex8g0.fsf@redhat.com>
+        <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
+        <874jkyqe13.fsf@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: cohuck@redhat.com, jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add maintainers for LoongArch KVM.
+On Thu, 17 Aug 2023 09:16:56 +0100,
+Cornelia Huck <cohuck@redhat.com> wrote:
+>=20
+> On Mon, Aug 14 2023, Jing Zhang <jingzhangos@google.com> wrote:
+>=20
+> > Maybe it'd be better to leave this to whenever we do need to add other
+> > range support?
+>=20
+> My point is: How does userspace figure out if the kernel that is running
+> supports ranges other than id regs? If this is just an insurance against
+> changes that might arrive or not, we can live with the awkward "just try
+> it out" approach; if we think it's likely that we'll need to extend it,
+> we need to add the mechanism for userspace to find out about it now, or
+> it would need to probe for presence of the mechanism...
 
-Acked-by: Huacai Chen <chenhuacai@loongson.cn>
-Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
+Agreed. Nothing like the present to address this sort of things. it
+really doesn't cost much, and I'd rather have it right now.
+
+Here's a vague attempt at an advertising mechanism. If people are OK
+with it, I can stash that on top of Jing's series.
+
+Thanks,
+
+	M.
+
+=46rom bcfd87e85954e24ac4a905a3486c9040cdfc6d0b Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 17 Aug 2023 14:48:16 +0100
+Subject: [PATCH] KVM: arm64: Add KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
+
+While the Feature ID range is well defined and pretty large, it
+isn't inconceivable that the architecture will eventually grow
+some other ranges that will need to similarly be described to
+userspace.
+
+Add a new capability (KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES)
+that returns a bitmap of the valid ranges, which can subsequently
+be retrieved, one at a time by setting the index of the set bit
+as the range identifier.
+
+Obviously, we only support a value of 0 for now.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- MAINTAINERS | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ Documentation/virt/kvm/api.rst    | 37 ++++++++++++++++++++-----------
+ arch/arm64/include/uapi/asm/kvm.h | 13 +++++++----
+ arch/arm64/kvm/arm.c              |  3 +++
+ arch/arm64/kvm/sys_regs.c         |  5 +++--
+ include/uapi/linux/kvm.h          |  1 +
+ 5 files changed, 40 insertions(+), 19 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 53b7ca804465..b1043a06f3ec 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11428,6 +11428,18 @@ F:	include/kvm/arm_*
- F:	tools/testing/selftests/kvm/*/aarch64/
- F:	tools/testing/selftests/kvm/aarch64/
- 
-+KERNEL VIRTUAL MACHINE FOR LOONGARCH (KVM/LoongArch)
-+M:	Tianrui Zhao <zhaotianrui@loongson.cn>
-+M:	Bibo Mao <maobibo@loongson.cn>
-+M:	Huacai Chen <chenhuacai@kernel.org>
-+L:	kvm@vger.kernel.org
-+L:	loongarch@lists.linux.dev
-+S:	Maintained
-+T:	git git://git.kernel.org/pub/scm/virt/kvm/kvm.git
-+F:	arch/loongarch/include/asm/kvm*
-+F:	arch/loongarch/include/uapi/asm/kvm*
-+F:	arch/loongarch/kvm/
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 92a9b20f970e..0e6ce02cac3b 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6071,7 +6071,7 @@ applied.
+ 4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+ -------------------------------------------
+=20
+-:Capability: none
++:Capability: KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
+ :Architectures: arm64
+ :Type: vm ioctl
+ :Parameters: struct reg_mask_range (in/out)
+@@ -6082,20 +6082,31 @@ applied.
+=20
+         #define ARM64_FEATURE_ID_SPACE_SIZE	(3 * 8 * 8)
+=20
+-        struct reg_mask_range {
+-                __u64 addr;             /* Pointer to mask array */
+-                __u64 reserved[7];
+-        };
++	struct reg_mask_range {
++		__u64 addr;		/* Pointer to mask array */
++		__u32 range;		/* Requested range */
++		__u32 reserved[13];
++	};
+=20
+-This ioctl would copy the writable masks for feature ID registers to users=
+pace.
+-The Feature ID space is defined as the System register space in AArch64 wi=
+th
++This ioctl copies the writable masks for Feature ID registers to userspace.
++The Feature ID space is defined as the AArch64 System Register space with
+ op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7}, op2=3D=3D{0-7}.
+-To get the index in the mask array pointed by ``addr`` for a specified fea=
+ture
+-ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm=
+, op2)``.
+-This allows the userspace to know upfront whether it can actually tweak the
+-contents of a feature ID register or not.
+-The ``reserved[7]`` is reserved for future use to add other register space=
+. For
+-feature ID registers, it should be 0, otherwise, KVM may return error.
 +
- KERNEL VIRTUAL MACHINE FOR MIPS (KVM/mips)
- M:	Huacai Chen <chenhuacai@kernel.org>
- L:	linux-mips@vger.kernel.org
--- 
-2.39.1
++The mask array pointed to by ``addr`` is indexed by the macro
++``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)``, allowing userspace
++to know what bits can be changed for the system register described by ``op=
+0,
++op1, crn, crm, op2``.
++
++The ``range`` field describes the requested range of registers. The valid
++ranges can be retrieved by checking the return value of
++KVM_CAP_CHECK_EXTENSION_VM for the KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
++capability, which will return a bitmask of the supported ranges. Each bit
++set in the return value represents a possible value for the ``range``
++field.  At the time of writing, only bit 0 is returned set by the
++capability, meaning that only the value 0 is value for ``range``.
++
++The ``reserved[13]`` array is reserved for future use and should be 0, or
++KVM may return an error.
+=20
+ 5. The kvm_run structure
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/as=
+m/kvm.h
+index 7a21bbb8a0f7..5148b4c22549 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -505,8 +505,9 @@ struct kvm_smccc_filter {
+ #define KVM_HYPERCALL_EXIT_SMC		(1U << 0)
+ #define KVM_HYPERCALL_EXIT_16BIT	(1U << 1)
+=20
+-/* Get feature ID registers userspace writable mask. */
+ /*
++ * Get feature ID registers userspace writable mask.
++ *
+  * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
+  * Feature Register 2"):
+  *
+@@ -514,8 +515,11 @@ struct kvm_smccc_filter {
+  * AArch64 with op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7},
+  * op2=3D=3D{0-7}."
+  *
+- * This covers all R/O registers that indicate anything useful feature
+- * wise, including the ID registers.
++ * This covers all currently known R/O registers that indicate
++ * anything useful feature wise, including the ID registers.
++ *
++ * If we ever need to introduce a new range, it will be described as
++ * such in the range field.
+  */
+ #define ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)		\
+ 	({								\
+@@ -528,7 +532,8 @@ struct kvm_smccc_filter {
+=20
+ struct reg_mask_range {
+ 	__u64 addr;		/* Pointer to mask array */
+-	__u64 reserved[7];
++	__u32 range;		/* Requested range */
++	__u32 reserved[13];
+ };
+=20
+ #endif
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e08894692829..6ea4d8b0e744 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -316,6 +316,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
+ext)
+ 	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+ 		r =3D kvm_supported_block_sizes();
+ 		break;
++	case KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES:
++		r =3D BIT(0);
++		break;
+ 	default:
+ 		r =3D 0;
+ 	}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 59c590fff4f2..6eadd0fa2c53 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3600,8 +3600,9 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *k=
+vm, struct reg_mask_range *
+ 	const void *zero_page =3D page_to_virt(ZERO_PAGE(0));
+ 	u64 __user *masks =3D (u64 __user *)range->addr;
+=20
+-	/* Only feature id range is supported, reserved[7] must be zero. */
+-	if (memcmp(range->reserved, zero_page, sizeof(range->reserved)))
++	/* Only feature id range is supported, reserved[13] must be zero. */
++	if (range->range ||
++	    memcmp(range->reserved, zero_page, sizeof(range->reserved)))
+ 		return -EINVAL;
+=20
+ 	/* Wipe the whole thing first */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 424b6d00440b..f5100055a1a6 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1192,6 +1192,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_COUNTER_OFFSET 227
+ #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+ #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
++#define KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES 230
+=20
+ #ifdef KVM_CAP_IRQ_ROUTING
+=20
 
+--=20
+Without deviation from the norm, progress is not possible.
