@@ -2,124 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD43B77FB45
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 17:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39C2577FB37
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 17:53:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346695AbjHQPx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1353361AbjHQPx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 17 Aug 2023 11:53:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47158 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353348AbjHQPw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 11:52:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 776B230D4
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 08:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692287527;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=cb3vOuQ+kH0/pSZM4Qtlmw5+LiUYQstAOby+SW+Bxfk=;
-        b=YRtM/J8MCgQoRmUnl5T0pMh6jKmzY7Om5YOA5uBfAid009DRfgqymi0ham0ptvHrYSUqz5
-        fl8xpDaqyuOlVEX7YZxuj7ptfOg9yCbjjT1x3mVNPKj5dwArT+z+fXIqLQbwzgMThayb9i
-        2erQh+FZoyFbTMLDahoV7EEMRwHuWJg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-u16PHGCaNO67dZe8-NzL-g-1; Thu, 17 Aug 2023 11:52:05 -0400
-X-MC-Unique: u16PHGCaNO67dZe8-NzL-g-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99bd6ea0d9eso504274466b.3
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 08:52:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692287524; x=1692892324;
-        h=content-transfer-encoding:mime-version:user-agent:date:cc:to:from
-         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cb3vOuQ+kH0/pSZM4Qtlmw5+LiUYQstAOby+SW+Bxfk=;
-        b=VfTDNenOT3V9EW11GxAnPi8zDOnWBYm8TcORkXIE0K/K3RIeFdRX3pghNy/jBE0yYR
-         L2SFvPNkIjGOJwy8wdv0Z+yxXUoT65S1rO1wGJI2rImxWX2agQ+gjHqa84CdDqTKRV2p
-         An+9dgST72uB6gGiPCJSqx3H8l1Brgh09+40K8CfWUHbb/cKdQhbOQH9/ihR9/AVMHNV
-         ToQjcAVJkThKDPcX6upwIjosZa76nOEh7gSQDEXTx7xvqBjgZINNSOfytlRyOqJ4GRt9
-         yht67drrj+mBOgOgniIuJVQB0+UCErc75hOi0xq0B1IavgK+QeRVImNUstgsyg+NsegS
-         OAXw==
-X-Gm-Message-State: AOJu0YzNq2oH9h2GVnsxtR+KOpAaIPi96cIIbQKR4CANL4hg7HmfyH4T
-        NeApsm7IgtVRDL2yjZkUwMhwoIjqaL7JyIEl3g986hFeUiL86HoAtSyY9yAZcGxSejMEjuT5YUg
-        +sJ9OSUNHGuRH
-X-Received: by 2002:a17:907:78d6:b0:994:580c:5049 with SMTP id kv22-20020a17090778d600b00994580c5049mr3921260ejc.5.1692287524483;
-        Thu, 17 Aug 2023 08:52:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGEYSuhHshTbCW1nXq3/UGD+eEan0fWSN3Vav9nH3UaSvKfRR7o325QMlMkQgHjS9vknG90yw==
-X-Received: by 2002:a17:907:78d6:b0:994:580c:5049 with SMTP id kv22-20020a17090778d600b00994580c5049mr3921251ejc.5.1692287524165;
-        Thu, 17 Aug 2023 08:52:04 -0700 (PDT)
-Received: from starship ([77.137.131.138])
-        by smtp.gmail.com with ESMTPSA id l18-20020a1709065a9200b00991e2b5a27dsm10312068ejq.37.2023.08.17.08.52.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 08:52:03 -0700 (PDT)
-Message-ID: <2d47431decaaf4bba0023c91ef0d7fd51b84333b.camel@redhat.com>
-Subject: Commit 'sunrpc: Use sendmsg(MSG_SPLICE_PAGES) rather then sendpage'
- broke O_DIRECT over NFS
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     linux-nfs@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Thu, 17 Aug 2023 18:52:01 +0300
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S1353370AbjHQPxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 11:53:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580B230D8
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 08:53:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 66CC0618C8
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 15:53:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6A9BC433C8;
+        Thu, 17 Aug 2023 15:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692287589;
+        bh=ePXnfxRXUddVzI3u0tJHF8AuA23aR9K0higvYkyBCvQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=UQtZQAlJ4JGiz4IhxhQb5YLJwnWQHCzW0Rl159gwLZNzqAGw7OCbZg0ZaEjdbr5mE
+         leUuNax9c9s55u1mkv91DXirYSyuZbq4w8ezDYYThf8LEH4gc/oIeYFTLCVaoDLgSG
+         stkVYgf3PiQnKUvJgm6FsEvomy0GZxHD+DpCyLCLizE0AzLL6VGt+xhSwLTvJkqzIS
+         egP7xl9qEaueEzT7Q1jSleh97QSbJgrHNtRZMWhV29aN+Dm55ciQtbGgZB9L1t9OuR
+         6eiZiIZ8MubHbZrBbfyBhpuxoX858pFVLtxRifxoN0GakjGykGta+xYRUZiV05AXGJ
+         mCZWB0Jhn6UFA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qWfJ5-005j6p-FM;
+        Thu, 17 Aug 2023 16:53:07 +0100
+Date:   Thu, 17 Aug 2023 16:53:07 +0100
+Message-ID: <86pm3lfyxo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v8 07/11] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+In-Reply-To: <20230807162210.2528230-8-jingzhangos@google.com>
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+        <20230807162210.2528230-8-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com, cohuck@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi!
+On Mon, 07 Aug 2023 17:22:05 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> All valid fields in ID_AA64PFR0_EL1 are writable from usrespace
+> with this change.
 
-I just updated my developement systems to 6.5-rc6 (from 6.4) and now I can't start a VM 
-with a disk which is mounted over the NFS.
+userspace
 
-The VM has two qcow2 files, one depends on another and qemu opens both.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 879004fd37e5..392613bec560 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2041,7 +2041,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  .get_user = get_id_reg,
+>  	  .set_user = set_id_reg,
+>  	  .reset = read_sanitised_id_aa64pfr0_el1,
+> -	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
+> +	  .val = GENMASK(63, 0), },
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+>  	ID_UNALLOCATED(4,2),
+>  	ID_UNALLOCATED(4,3),
 
-This is the command line of qemu:
+Same remark as the previous patch. What makes it legal to make
+*everything* writable? For example, we don't expose the AMU. And yet
+you are telling userspace "sure, go ahead".
 
--drive if=none,id=os_image,file=./disk_s1.qcow2,aio=native,discard=unmap,cache=none
+Userspace will then try and restore *something*, and will eventually
+crap itself because the kernel won't allow it.
 
-The disk_s1.qcow2 depends on disk_s0.qcow2
+Why do we bother describing the writable fields if userspace can't
+write to them?
 
-However this is what I get:
+	M.
 
-qemu-system-x86_64: -drive if=none,id=os_image,file=./disk_s1.qcow2,aio=native,discard=unmap,cache=none: Could not open backing file: Could not open './QFI?': No such file or directory
-
-'QFI?' is qcow2 file signature, which signals that there might be some nasty corruption happening.
-
-The program was supposed to read a field inside the disk_s1.qcow2 file which should read 'disk_s0.qcow2' 
-but instead it seems to read the first 4 bytes of the file.
-
-
-Bisect leads to the above commit. Reverting it was not possible due to many changes.
-
-Both the client and the server were tested with the 6.5-rc6 kernel, but once rebooting the server into
-the 6.4, the bug disappeared, thus I did a bisect on the server.
-
-When I tested a version before the offending commit on the server, the 6.5-rc6 client was able to work with it,
-which increases the chances that the bug is in nfsd.
-
-Switching qemu to use write back paging also helps (aio=threads,discard=unmap,cache=writeback)
-The client and the server (both 6.5-rc6) work with this configuration.
-
-Running the VM on the same machine (also 6.5-rc6) where the VM disk is located (thus avoiding NFS) works as well.
-
-I tested several VMs that I have, all are affected in the same way.
-
-I run somewhat outdated qemu, but running the latest qemu doesn't make a difference.
-
-I use nfs4.
-
-I can test patches and provide more info if needed.
-
-Best regards,
-	Maxim Levitsky
-
+-- 
+Without deviation from the norm, progress is not possible.
