@@ -2,136 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8336177FD50
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 19:55:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B542577FD4E
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 19:54:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354132AbjHQRyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 13:54:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38268 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354210AbjHQRx7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1354130AbjHQRx7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 17 Aug 2023 13:53:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163F42713
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 10:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692294792;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RXsr/7Nm6yDmyxBqQjD5zYHfE7mun3vBFRDXX4HEKy4=;
-        b=VDb8I0FtjHgjcOgrliTgJhRUV4nnmRApAMi7Z6nmJgw6GWsHAgo6cBlf9hkVkcvqf3naog
-        E9hSsw5Xx+mR1q95lTnhgyk4HdGOYwy59pLLOYNBAG23xfOIG/GjpEf4uJChfvoHW+BMpy
-        nUI4iYcaxyUKTggaquo/a/9r9LJreTY=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-43aS5jHhO_uGiGJRwFuGHg-1; Thu, 17 Aug 2023 13:53:10 -0400
-X-MC-Unique: 43aS5jHhO_uGiGJRwFuGHg-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-786ca3e9160so4912739f.1
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 10:53:10 -0700 (PDT)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50722 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1354110AbjHQRx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 13:53:28 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C04AFD
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 10:53:27 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-565aba2e397so155180a12.3
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 10:53:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692294806; x=1692899606;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/QfHz94PEI777+7Lpp3S/ts6ZJ/OexKtidSfc/v6di4=;
+        b=5VDrrPqxILFeG85qXIOlipeB/fbXU9Z70kmuxlB1LKWWFWR1eJN1Aat8hUG4zNmtYQ
+         Jk8bSAcpoF2xPTk0K5gwQozRc9MT5/5puLlHXxvViNFgE1q3+8mMnDXbo3hFAUNWYtgL
+         2/sDWwAx8TMccYtm62YVgyPGPEly2cWzFPJQ26KyZcnIO5gmoQFxIhuNPNthzVJwbcp6
+         XgOJwX4iCDQ6AMhkK8vDWko0IcNb3SEF95v+6VchC4UidTKYatwqzHpNA96zGDqM9213
+         GhVhONmVY0Fg4IcJ44Xkwvce3WxFbctcltNnkLqZXAEOebigTQ1uZg8f8BwKHt2kmv/D
+         bW/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692294790; x=1692899590;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RXsr/7Nm6yDmyxBqQjD5zYHfE7mun3vBFRDXX4HEKy4=;
-        b=UIv4eBcHIqBQRiudYmuDoW/avh4USnLlnr/mgjZE1B/vPzMB8SUlk+W5i8X1Y02+cO
-         tBI4aAALMyjIx3bjMzPgLLUjea22jxfKfL8LFu+wTebtr/FEzW3PYMwAFX28Wo7Kt2ZI
-         a5dMfjtDV8DsaUL7bnTmbxleveoUdHK9y5i1iuRlVENR0seEYk9mVG5hqCecI3SxZSBY
-         WQmlByUN/OjrlVfw+vrrizY5n7jQYduCGrjAJvr0+54N3cYd8k3iQOXnjempjSQkqfoz
-         d3L2sVQrUpQFwRUGIgLyEUlcXYLf+EZcghZ9Uwqgcic2nSTfS31SfeKWPjcw9bNjqepE
-         yYug==
-X-Gm-Message-State: AOJu0YxIl0FNzJquhJqzuEpqlUiqxRM34rsn/uuele6Gq2l54cEy0FmB
-        9aQ1brVlYaV9Le27s2MzjzzWi3JgFJ/xHkF9qi5OjfUz7zSDJ+WMkbSaI6DXj0zAYM6g14NHlgt
-        uCKjItszoAaC7
-X-Received: by 2002:a05:6602:3894:b0:791:8d6a:9965 with SMTP id br20-20020a056602389400b007918d6a9965mr4637125iob.6.1692294789991;
-        Thu, 17 Aug 2023 10:53:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF3PmHS9aLJrLXIzU4pLZcZl3Cc0gPRyuYSEyYEWcrYUUQNLcZJ1qcDouv3xaQ01y+uaqHUVQ==
-X-Received: by 2002:a05:6602:3894:b0:791:8d6a:9965 with SMTP id br20-20020a056602389400b007918d6a9965mr4637117iob.6.1692294789765;
-        Thu, 17 Aug 2023 10:53:09 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id gn20-20020a0566382c1400b0042baffe832fsm5230209jab.101.2023.08.17.10.53.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 10:53:09 -0700 (PDT)
-Date:   Thu, 17 Aug 2023 11:53:07 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Brett Creeley <brett.creeley@amd.com>
-Cc:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <jgg@nvidia.com>,
-        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-        <kevin.tian@intel.com>, <horms@kernel.org>,
-        <shannon.nelson@amd.com>
-Subject: Re: [PATCH v14 vfio 0/8] pds-vfio-pci driver
-Message-ID: <20230817115307.2d8a6bf4.alex.williamson@redhat.com>
-In-Reply-To: <20230807205755.29579-1-brett.creeley@amd.com>
-References: <20230807205755.29579-1-brett.creeley@amd.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1692294806; x=1692899606;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/QfHz94PEI777+7Lpp3S/ts6ZJ/OexKtidSfc/v6di4=;
+        b=UmhmEsYlJZzg8TkWf/XwIp6cefQNWs5ABYeY0eXrO5pSJ9DePlNaEwpXOwdldRmXzs
+         G9vMhGBIFgxUeGx4/dhTjO0XU4Pep+8sJGKfsm4OsV1RWXJu/etYw5ItGdevh8FVTMbV
+         ljmSljd7OChRHYAu3bUa/kvaf3+n5h9OpYPOVfoJZsz8dVe2g8EXESG9lrff909TjenK
+         TxN2iLouyhhI8syeGKscM8tah2oSa8t2jZ/kXHC240U37MG4M8LZi+LhQDy0YKqHO2IL
+         nTdpZwSizpKOBCI0dnsZ932BtjEfQli703Zb9vJDYq3x6KQLC6brwhnOX1vAcuPZeo/F
+         YPWw==
+X-Gm-Message-State: AOJu0YyqRg3EHmIfJAWOweS4zgrY1ZhWrMqvU+gYr10eVFioUg4+cA/9
+        y/8H7vRyoTK8OpdgwvMrax9BSfd+vRc=
+X-Google-Smtp-Source: AGHT+IF/RicpJSK/jOu2VSTjgEjRuNtgLEUAFiSN3DLAk/LZArf/NVih5B66NrtRt0HGs060Y532Ir/C0yQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:715b:0:b0:567:c791:ce64 with SMTP id
+ b27-20020a63715b000000b00567c791ce64mr726537pgn.8.1692294806566; Thu, 17 Aug
+ 2023 10:53:26 -0700 (PDT)
+Date:   Thu, 17 Aug 2023 10:53:25 -0700
+In-Reply-To: <ZN1jBFBH4C2bFjzZ@yzhao56-desk.sh.intel.com>
+Mime-Version: 1.0
+References: <20230808085056.14644-1-yan.y.zhao@intel.com> <ZN0S28lkbo6+D7aF@google.com>
+ <ZN1jBFBH4C2bFjzZ@yzhao56-desk.sh.intel.com>
+Message-ID: <ZN5elYQ5szQndN8n@google.com>
+Subject: Re: [PATCH 0/2] KVM: x86/mmu: .change_pte() optimization in TDP MMU
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 7 Aug 2023 13:57:47 -0700
-Brett Creeley <brett.creeley@amd.com> wrote:
-> Brett Creeley (8):
->   vfio: Commonize combine_ranges for use in other VFIO drivers
->   vfio/pds: Initial support for pds VFIO driver
->   pds_core: Require callers of register/unregister to pass PF drvdata
->   vfio/pds: register with the pds_core PF
->   vfio/pds: Add VFIO live migration support
->   vfio/pds: Add support for dirty page tracking
->   vfio/pds: Add support for firmware recovery
->   vfio/pds: Add Kconfig and documentation
-> 
->  .../ethernet/amd/pds_vfio_pci.rst             |  79 +++
->  .../device_drivers/ethernet/index.rst         |   1 +
->  MAINTAINERS                                   |   7 +
->  drivers/net/ethernet/amd/pds_core/auxbus.c    |  20 +-
->  drivers/vfio/pci/Kconfig                      |   2 +
->  drivers/vfio/pci/Makefile                     |   2 +
->  drivers/vfio/pci/mlx5/cmd.c                   |  48 +-
->  drivers/vfio/pci/pds/Kconfig                  |  19 +
->  drivers/vfio/pci/pds/Makefile                 |  11 +
->  drivers/vfio/pci/pds/cmds.c                   | 509 ++++++++++++++++
->  drivers/vfio/pci/pds/cmds.h                   |  25 +
->  drivers/vfio/pci/pds/dirty.c                  | 564 ++++++++++++++++++
->  drivers/vfio/pci/pds/dirty.h                  |  39 ++
->  drivers/vfio/pci/pds/lm.c                     | 434 ++++++++++++++
->  drivers/vfio/pci/pds/lm.h                     |  41 ++
->  drivers/vfio/pci/pds/pci_drv.c                | 209 +++++++
->  drivers/vfio/pci/pds/pci_drv.h                |   9 +
->  drivers/vfio/pci/pds/vfio_dev.c               | 227 +++++++
->  drivers/vfio/pci/pds/vfio_dev.h               |  39 ++
->  drivers/vfio/vfio_main.c                      |  47 ++
->  include/linux/pds/pds_adminq.h                | 375 ++++++++++++
->  include/linux/pds/pds_common.h                |   9 +-
->  include/linux/vfio.h                          |   3 +
->  23 files changed, 2654 insertions(+), 65 deletions(-)
->  create mode 100644 Documentation/networking/device_drivers/ethernet/amd/pds_vfio_pci.rst
->  create mode 100644 drivers/vfio/pci/pds/Kconfig
->  create mode 100644 drivers/vfio/pci/pds/Makefile
->  create mode 100644 drivers/vfio/pci/pds/cmds.c
->  create mode 100644 drivers/vfio/pci/pds/cmds.h
->  create mode 100644 drivers/vfio/pci/pds/dirty.c
->  create mode 100644 drivers/vfio/pci/pds/dirty.h
->  create mode 100644 drivers/vfio/pci/pds/lm.c
->  create mode 100644 drivers/vfio/pci/pds/lm.h
->  create mode 100644 drivers/vfio/pci/pds/pci_drv.c
->  create mode 100644 drivers/vfio/pci/pds/pci_drv.h
->  create mode 100644 drivers/vfio/pci/pds/vfio_dev.c
->  create mode 100644 drivers/vfio/pci/pds/vfio_dev.h
-> 
+On Thu, Aug 17, 2023, Yan Zhao wrote:
+> On Wed, Aug 16, 2023 at 11:18:03AM -0700, Sean Christopherson wrote:
+> > On Tue, Aug 08, 2023, Yan Zhao wrote:
+> > > This series optmizes KVM mmu notifier.change_pte() handler in x86 TDP MMU
+> > > (i.e. kvm_tdp_mmu_set_spte_gfn()) by removing old dead code and prefetching
+> > > notified new PFN into SPTEs directly in the handler.
+> > > 
+> > > As in [1], .change_pte() has been dead code on x86 for 10+ years.
+> > > Patch 1 drops the dead code in x86 TDP MMU to save cpu cycles and prepare
+> > > for optimization in TDP MMU in patch 2.
+> > 
+> > If we're going to officially kill the long-dead attempt at optimizing KSM, I'd
+> > strongly prefer to rip out .change_pte() entirely, i.e. kill it off in all
+> > architectures and remove it from mmu_notifiers.  The only reason I haven't proposed
+> > such patches is because I didn't want to it to backfire and lead to someone trying
+> > to resurrect the optimizations for KSM.
+> > 
+> > > Patch 2 optimizes TDP MMU's .change_pte() handler to prefetch SPTEs in the
+> > > handler directly with PFN info contained in .change_pte() to avoid that
+> > > each vCPU write that triggers .change_pte() must undergo twice VMExits and
+> > > TDP page faults.
+> > 
+> > IMO, prefaulting guest memory as writable is better handled by userspace, e.g. by
+> > using QEMU's prealloc option.  It's more coarse grained, but at a minimum it's
+> > sufficient for improving guest boot time, e.g. by preallocating memory below 4GiB.
+> > 
+> > And we can do even better, e.g. by providing a KVM ioctl() to allow userspace to
+> > prefault memory not just into the primary MMU, but also into KVM's MMU.  Such an
+> > ioctl() is basically manadatory for TDX, we just need to morph the support being
+> > added by TDX into a generic ioctl()[*]
+> > 
+> > Prefaulting guest memory as writable into the primary MMU should be able to achieve
+> > far better performance than hooking .change_pte(), as it will avoid the mmu_notifier
+> > invalidation, e.g. won't trigger taking mmu_lock for write and the resulting remote
+> > TLB flush(es).  And a KVM ioctl() to prefault into KVM's MMU should eliminate page
+> > fault VM-Exits entirely.
+> > 
+> > Explicit prefaulting isn't perfect, but IMO the value added by prefetching in
+> > .change_pte() isn't enough to justify carrying the hook and the code in KVM.
+> > 
+> > [*] https://lore.kernel.org/all/ZMFYhkSPE6Zbp8Ea@google.com
+> Hi Sean,
+> As I didn't write the full picture of patch 2 in the cover letter well,
+> may I request you to take a look of patch 2 to see if you like it? (in
+> case if you just read the cover letter).
 
-Applied to vfio next branch for v6.6.  Thanks!
+I read patch two, I replied to the cover letter as I wanted to discuss the two
+patches together since implementing the CoW optimization effectively means
+dropping the long-dead KSM optimization.
 
-Alex
+> What I observed is that each vCPU write to a COW page in primary MMU
+> will lead to twice TDP page faults.
+> Then, I just update the secondary MMU during the first TDP page fault
+> to avoid the second one.
+> It's not a blind prefetch (I checked the vCPU to ensure it's triggered
+> by a vCPU operation as much as possible)
 
+Yes, that's part of the complexity I don't like.
+
+> and it can benefit guests who doesn't explicitly request a prefault memory as
+> write.
+
+Yes, I'm arguing that the benefit isn't significant, and that the use cases it
+might benefit aren't things people care about optimizing.
+
+I'm very skeptical that shaving those 8000 VM-Exits will translate to a meaningful
+reduction in guest boot time, let alone scale beyond very specific scenarios and
+configurations, which again, are likely suboptimal in nature.  Actually, they most
+definitely are suboptimal, because the fact that this provides any benefit
+whatsoever means that either your VM isn't being backed with hugepages, or it's
+being backed with THP and transparent_hugepage/use_zero_page is enabled (and thus
+is generating CoW behavior).
+
+Enabling THP or using HugeTLB (which again can be done on a subset of guest memory)
+will have a far, far bigger impact on guest performance.  Ditto for disabling
+using the huge zero_page when backing VMs with THP (any page touched by the guest
+is all but guaranteed to be written sooner than later, so using the zero_page
+doesn't make a whole lot of sense).
+
+E.g. a single CoW operation will take mmu_lock for write three times:
+invalidate_range_start(), change_pte(), and invalidate_range_end(), not to mention
+the THP zero_page CoW will first fault-in a read-only mapping, then split that
+mapping, and then do CoW on the 4KiB PTEs, which is *really* suboptimal.
+
+Actually, I don't even completely understand how you're seeing CoW behavior in
+the first place.  No sane guest should blindly read (or execute) uninitialized
+memory.  IIUC, you're not running a Windows guest, and even if you are, AFAIK
+QEMU doesn't support Hyper-V's enlightment that lets the guest assume memory has
+been zeroed by the hypervisor.  If KSM is to blame, then my answer it to turn off
+KSM, because turning on KSM is antithetical to guest performance (not to mention
+that KSM is wildly insecure for the guest, especially given the number of speculative
+execution attacks these days).
+
+If there's something else going on, i.e. if your VM really is somehow generating
+reads before writes, and if we really want to optimize use cases that can't use
+hugepages for whatever reason, I would much prefer to do something like add a
+memslot flag to state that the memslot should *always* be mapped writable.  Because
+outside of setups that use KSM, the only reason I can think of to not map memory
+writable straightaway is if userspace somehow knows the guest isn't going to write
+that memory.
+
+If it weren't for KSM, and if it wouldn't potentially be a breaking change, I
+would even go so far as to say that KVM should always map writable memslots as
+writable in the guest.
+
+E.g. minus the uAPI, this is a lot simpler to implement and maintain.
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index dfbaafbe3a00..6c4640483881 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2727,10 +2727,14 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
+                return KVM_PFN_NOSLOT;
+        }
+ 
+-       /* Do not map writable pfn in the readonly memslot. */
+-       if (writable && memslot_is_readonly(slot)) {
+-               *writable = false;
+-               writable = NULL;
++       if (writable) {
++               if (memslot_is_readonly(slot)) {
++                       *writable = false;
++                       writable = NULL;
++               } else if (memslot_is_always_writable(slot)) {
++                       *writable = true;
++                       write_fault = true;
++               }
+        }
+ 
+        return hva_to_pfn(addr, atomic, interruptible, async, write_fault,
+
+
+And FWIW, removing .change_pte() entirely, even without any other optimizations,
+will also benefit those guests, as it will remove a source of mmu_lock contention
+along with all of the overhead of invoking callbacks, walking memslots, etc.  And
+removing .change_pte() will benefit *all* guests by eliminating unrelated callbacks,
+i.e. callbacks when memory for the VMM takes a CoW fault.
+
+So yeah, unless I'm misunderstanding the bigger picture, the more I look at this,
+the more I'm against it.
