@@ -2,139 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 110FA77EF84
-	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 05:27:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CE5077EFB1
+	for <lists+kvm@lfdr.de>; Thu, 17 Aug 2023 05:59:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347841AbjHQD02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Aug 2023 23:26:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57520 "EHLO
+        id S1347938AbjHQD6b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Aug 2023 23:58:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347840AbjHQD0L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Aug 2023 23:26:11 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7C0268F;
-        Wed, 16 Aug 2023 20:26:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1692242763;
-        bh=ZlmenDsbW60G7uJu2veM5G1rkGG/EEMpV5h+3Oe3uEg=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=ryZg14br4OQt+fo/T+XGTbDRZaG5g03gpLyVNOZrOIHHv8Np/CnItphXx1cwBuhwk
-         +3YrrFxzkcHaAC5mdnGAtp0kIoh/44J1Iqe0yuzTbl4nvzNvvHPUmztIfRzRPUO46J
-         rTHOE7YKTOwBk6BEhQM8RQfcCakGK1JrUsHlWS2iMHx6GXf178hGz7lNyH8ZbVHo0W
-         w3YBAvMyotpKM5+Fya4Dkm31h2f+2rU68XjkixrFAKJeYltmHO17tr0ZpENprendQa
-         IZTAzmZjOvyEQI0QVR3jf2bjbvao2IU16QRKTvDAFkWfsNl5lE5MIadIdP2yqBsVCx
-         gfk2KWTfNkK6g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RR9Q250Ymz4wb0;
-        Thu, 17 Aug 2023 13:26:02 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Jordan Niethe <jniethe5@gmail.com>, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, npiggin@gmail.com,
-        mikey@neuling.org, paulus@ozlabs.org, vaibhav@linux.ibm.com,
-        sbhat@linux.ibm.com, gautam@linux.ibm.com,
-        kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
-        Jordan Niethe <jniethe5@gmail.com>
-Subject: Re: [PATCH v3 1/6] KVM: PPC: Use getters and setters for vcpu
- register state
-In-Reply-To: <20230807014553.1168699-2-jniethe5@gmail.com>
-References: <20230807014553.1168699-1-jniethe5@gmail.com>
- <20230807014553.1168699-2-jniethe5@gmail.com>
-Date:   Thu, 17 Aug 2023 13:25:58 +1000
-Message-ID: <87cyzm73jt.fsf@mail.lhotse>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        with ESMTP id S1347932AbjHQD6B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Aug 2023 23:58:01 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC91226AD
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 20:57:59 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3fe12820bffso66697795e9.3
+        for <kvm@vger.kernel.org>; Wed, 16 Aug 2023 20:57:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrtc27.com; s=gmail.jrtc27.user; t=1692244678; x=1692849478;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n6zcSzpJqJ0VluuSboFsoL227pWupWbEH5Uz9sUxXS8=;
+        b=iRlWhDihY+i26ll38K6xAbDNtaTXOuLoVg+U++anaW8++WA1Nc8aLPFmLaFol3/DzO
+         vCk8ILimnRqbPwG3L9C6UPATHJCcVyzJMW1olzMNT4uP8Ia0Xzzd7pzvpl9M9Jikbt4J
+         wZREMgFBQACUU0HsJiKSqdVWByf3yAW+PtqlmCvigtgevZ6H9MT1+7qEnIAXigvkihBj
+         uXfG2d6MHrrne26law8lGRUn3SgA6zcmL9i9DiNsbxR70HQIIy6WhHCmxx/zxayqen2d
+         wYlKEok34Ge1IhiDocb3D6KB4+VWfUG7Di6IuDVZpfD7bxUgbmtrUR3rebpcrKyKKp4/
+         UsZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692244678; x=1692849478;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n6zcSzpJqJ0VluuSboFsoL227pWupWbEH5Uz9sUxXS8=;
+        b=ShvPwWde0B31D2DLE9utTHnbXFUrgJpClquGm/ZbnrmsPO2lQJuiNzzIUERUsuOeMX
+         SvcRXtuVh3d6ea7G0+37uetiY/cd40dupa2Wk0v6hrC8ljtAYmbFABYSPPp1pLnzsE23
+         oJXm7Z/S7Xn9JiPRRPvqjC0dY3KagwRnC2HydigfNZwAuN7cuz10L7+3tCMG1QXcuX/p
+         OplgBgySUHPVxBxw8/OU921pgLM3HnBzB7A55EFQTyt+POOxq18c8BonxpjrKQ5t23hj
+         6T8WOf02JCX0SdCu4Crezm4EjThchiR0z3n1Cf0hsd4Kln28Sxa5Lu0QpeDrF0tYNWfA
+         Lg2g==
+X-Gm-Message-State: AOJu0YwRUeL0a/rlSsDSFgKmankbR8L4eMJGDoj2wSxwzqIh1MUwIMLu
+        gMiIY9ZXXrsb1yMLsaX65P8tYw==
+X-Google-Smtp-Source: AGHT+IHahX6f6Uu0Gp7FNlk7L/qD1ShCeUvOYFcUntgnBwGjVY2sM2aPjBhGSwRabd4YoScnF+JvXw==
+X-Received: by 2002:a1c:e913:0:b0:3fa:98c3:7dbd with SMTP id q19-20020a1ce913000000b003fa98c37dbdmr2924986wmc.41.1692244677964;
+        Wed, 16 Aug 2023 20:57:57 -0700 (PDT)
+Received: from smtpclient.apple ([131.111.5.246])
+        by smtp.gmail.com with ESMTPSA id l6-20020adff486000000b003143867d2ebsm23309801wro.63.2023.08.16.20.57.56
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Aug 2023 20:57:57 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: [PATCH 00/10] RISC-V: Refactor instructions
+From:   Jessica Clarke <jrtc27@jrtc27.com>
+In-Reply-To: <ZN1qXlLp6qfpBeGF@ghost>
+Date:   Thu, 17 Aug 2023 04:57:46 +0100
+Cc:     Andrew Jones <ajones@ventanamicro.com>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, bpf@vger.kernel.org,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+        Luke Nelson <luke.r.nels@gmail.com>,
+        Xi Wang <xi.wang@gmail.com>, Nam Cao <namcaov@gmail.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <12FAB5A9-5723-4A5B-8729-75D8A38921B9@jrtc27.com>
+References: <20230803-master-refactor-instructions-v4-v1-0-2128e61fa4ff@rivosinc.com>
+ <20230804-2c57bddd6e87fdebc20ff9d5@orel> <ZM00UYDzEAz/JT3n@ghost>
+ <ZN1qXlLp6qfpBeGF@ghost>
+To:     Charlie Jenkins <charlie@rivosinc.com>
+X-Mailer: Apple Mail (2.3731.600.7)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jordan Niethe <jniethe5@gmail.com> writes:
-> There are already some getter and setter functions used for accessing
-> vcpu register state, e.g. kvmppc_get_pc(). There are also more
-> complicated examples that are generated by macros like
-> kvmppc_get_sprg0() which are generated by the SHARED_SPRNG_WRAPPER()
-> macro.
->
+On 17 Aug 2023, at 01:31, Charlie Jenkins <charlie@rivosinc.com> wrote:
+>=20
+> On Fri, Aug 04, 2023 at 10:24:33AM -0700, Charlie Jenkins wrote:
+>> On Fri, Aug 04, 2023 at 12:28:28PM +0300, Andrew Jones wrote:
+>>> On Thu, Aug 03, 2023 at 07:10:25PM -0700, Charlie Jenkins wrote:
+>>>> There are numerous systems in the kernel that rely on directly
+>>>> modifying, creating, and reading instructions. Many of these =
+systems
+>>>> have rewritten code to do this. This patch will delegate all =
+instruction
+>>>> handling into insn.h and reg.h. All of the compressed instructions, =
+RVI,
+>>>> Zicsr, M, A instructions are included, as well as a subset of the =
+F,D,Q
+>>>> extensions.
+>>>>=20
+>>>> ---
+>>>> This is modifying code that =
+https://lore.kernel.org/lkml/20230731183925.152145-1-namcaov@gmail.com/
+>>>> is also touching.
+>>>>=20
+>>>> ---
+>>>> Testing:
+>>>>=20
+>>>> There are a lot of subsystems touched and I have not tested every
+>>>> individual instruction. I did a lot of copy-pasting from the RISC-V =
+spec
+>>>> so opcodes and such should be correct
+>>>=20
+>>> How about we create macros which generate each of the functions an
+>>> instruction needs, e.g. riscv_insn_is_*(), etc. based on the output =
+of
+>>> [1]. I know basically nothing about that project, but it looks like =
+it
+>>> creates most the defines this series is creating from what we [hope] =
+to
+>>> be an authoritative source. I also assume that if we don't like the
+>>> current output format, then we could probably post patches to the =
+project
+>>> to get the format we want. For example, we could maybe propose an =
+"lc"
+>>> format for "Linux C".
+>> That's a great idea, I didn't realize that existed!
+> I have discovered that the riscv-opcodes repository is not in a state
+> that makes it helpful. If it were workable, it would make it easy to
+> include a "Linux C" format. I have had a pull request open on the repo
+> for two weeks now and the person who maintains the repo has not
+> interacted.
 
-...
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
-/asm/kvm_book3s.h
-> index bbf5e2c5fe09..1a7e837ea2d5 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -403,10 +413,121 @@ static inline ulong kvmppc_get_fault_dar(struct kv=
-m_vcpu *vcpu)
-...
-> +
-> +#ifdef CONFIG_VSX
-> +static inline void kvmppc_get_vsx_vr(struct kvm_vcpu *vcpu, int i, vecto=
-r128 *v)
-> +{
-> +	*v =3D  vcpu->arch.vr.vr[i];
-> +}
+Huh? Andrew has replied to you twice on your PR, and was the last one to
+comment. That=E2=80=99s hardly =E2=80=9Chas not interacted=E2=80=9D.
 
-This is causing build errors if VSX is disabled.
+> At minimum, in order for it to be useful it would need an ability to
+> describe the bit order of immediates in an instruction and include =
+script
+> arguments to select which instructions should be included. There is a
+> "C" format, but it is actually just a Spike format.
 
-I'm using g5_defconfig plus:
+So extend it? Or do something with QEMU=E2=80=99s equivalent that =
+expresses it.
 
-  CONFIG_VIRTUALIZATION=3Dy
-  CONFIG_KVM_BOOK3S_64=3Dy
-  CONFIG_KVM_BOOK3S_64_PR=3Dy
+Jess
 
-Which gives me:
+> Nonetheless, it
+> seems like it is prohibitive to use it.
+>>>=20
+>>> I'd also recommend only importing the generated defines and =
+generating
+>>> the functions that will actually have immediate consumers or are =
+part of
+>>> a set of defines that have immediate consumers. Each consumer of new
+>>> instructions will be responsible for generating and importing the =
+defines
+>>> and adding the respective macro invocations to generate the =
+functions.
+>>> This series can also take that approach, i.e. convert one set of
+>>> instructions at a time, each in a separate patch.
+>> Since I was hand-writing everything and copying it wasn't too much
+>> effort to just copy all of the instructions from a group. However, =
+from
+>> a testing standpoint it makes sense to exclude instructions not yet =
+in
+>> use.
+>>>=20
+>>> [1] https://github.com/riscv/riscv-opcodes
+>>>=20
+>>> Thanks,
+>>> drew
+>>>=20
+>>>=20
+>>>> , but the construction of every
+>>>> instruction is not fully tested.
+>>>>=20
+>>>> vector: Compiled and booted
+>>>>=20
+>>>> jump_label: Ensured static keys function as expected.
+>>>>=20
+>>>> kgdb: Attempted to run the provided tests but they failed even =
+without
+>>>> my changes
+>>>>=20
+>>>> module: Loaded and unloaded modules
+>>>>=20
+>>>> patch.c: Ensured kernel booted
+>>>>=20
+>>>> kprobes: Used a kprobing module to probe jalr, auipc, and branch
+>>>> instructions
+>>>>=20
+>>>> nommu misaligned addresses: Kernel boots
+>>>>=20
+>>>> kvm: Ran KVM selftests
+>>>>=20
+>>>> bpf: Kernel boots. Most of the instructions are exclusively used by =
+BPF
+>>>> but I am unsure of the best way of testing BPF.
+>>>>=20
+>>>> Signed-off-by: Charlie Jenkins <charlie@rivosinc.com>
+>>>>=20
+>>>> ---
+>>>> Charlie Jenkins (10):
+>>>>      RISC-V: Expand instruction definitions
+>>>>      RISC-V: vector: Refactor instructions
+>>>>      RISC-V: Refactor jump label instructions
+>>>>      RISC-V: KGDB: Refactor instructions
+>>>>      RISC-V: module: Refactor instructions
+>>>>      RISC-V: Refactor patch instructions
+>>>>      RISC-V: nommu: Refactor instructions
+>>>>      RISC-V: kvm: Refactor instructions
+>>>>      RISC-V: bpf: Refactor instructions
+>>>>      RISC-V: Refactor bug and traps instructions
+>>>>=20
+>>>> arch/riscv/include/asm/bug.h             |   18 +-
+>>>> arch/riscv/include/asm/insn.h            | 2744 =
++++++++++++++++++++++++++++---
+>>>> arch/riscv/include/asm/reg.h             |   88 +
+>>>> arch/riscv/kernel/jump_label.c           |   13 +-
+>>>> arch/riscv/kernel/kgdb.c                 |   13 +-
+>>>> arch/riscv/kernel/module.c               |   80 +-
+>>>> arch/riscv/kernel/patch.c                |    3 +-
+>>>> arch/riscv/kernel/probes/kprobes.c       |   13 +-
+>>>> arch/riscv/kernel/probes/simulate-insn.c |  100 +-
+>>>> arch/riscv/kernel/probes/uprobes.c       |    5 +-
+>>>> arch/riscv/kernel/traps.c                |    9 +-
+>>>> arch/riscv/kernel/traps_misaligned.c     |  218 +--
+>>>> arch/riscv/kernel/vector.c               |    5 +-
+>>>> arch/riscv/kvm/vcpu_insn.c               |  281 +--
+>>>> arch/riscv/net/bpf_jit.h                 |  707 +-------
+>>>> 15 files changed, 2825 insertions(+), 1472 deletions(-)
+>>>> ---
+>>>> base-commit: 5d0c230f1de8c7515b6567d9afba1f196fb4e2f4
+>>>> change-id: 20230801-master-refactor-instructions-v4-433aa040da03
+>>>> --=20
+>>>> - Charlie
+>>>>=20
+>>>>=20
+>>>> --=20
+>>>> kvm-riscv mailing list
+>>>> kvm-riscv@lists.infradead.org
+>>>> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+>=20
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
-  ../arch/powerpc/kvm/powerpc.c: In function =E2=80=98kvmppc_set_vmx_dword=
-=E2=80=99:
-  ../arch/powerpc/kvm/powerpc.c:1061:9: error: implicit declaration of func=
-tion =E2=80=98kvmppc_get_vsx_vr=E2=80=99; did you mean =E2=80=98kvmppc_get_=
-vsx_fpr=E2=80=99? [-Werror=3Dimplicit-function-declaration]
-   1061 |         kvmppc_get_vsx_vr(vcpu, index, &val.vval);
-        |         ^~~~~~~~~~~~~~~~~
-        |         kvmppc_get_vsx_fpr
-  ../arch/powerpc/kvm/powerpc.c:1063:9: error: implicit declaration of func=
-tion =E2=80=98kvmppc_set_vsx_vr=E2=80=99; did you mean =E2=80=98kvmppc_set_=
-vsx_fpr=E2=80=99? [-Werror=3Dimplicit-function-declaration]
-   1063 |         kvmppc_set_vsx_vr(vcpu, index, &val.vval);
-        |         ^~~~~~~~~~~~~~~~~
-        |         kvmppc_set_vsx_fpr
-  In file included from ../arch/powerpc/kvm/powerpc.c:25:
-  ../arch/powerpc/kvm/powerpc.c: In function =E2=80=98kvm_vcpu_ioctl_get_on=
-e_reg=E2=80=99:
-  ../arch/powerpc/kvm/powerpc.c:1729:52: error: implicit declaration of fun=
-ction =E2=80=98kvmppc_get_vscr=E2=80=99; did you mean =E2=80=98kvmppc_get_s=
-r=E2=80=99? [-Werror=3Dimplicit-function-declaration]
-   1729 |                         val =3D get_reg_val(reg->id, kvmppc_get_v=
-scr(vcpu));
-        |                                                    ^~~~~~~~~~~~~~~
-  ../arch/powerpc/include/asm/kvm_ppc.h:412:29: note: in definition of macr=
-o =E2=80=98get_reg_val=E2=80=99
-    412 |         case 4: __u.wval =3D (reg); break;        \
-        |                             ^~~
-  ../arch/powerpc/kvm/powerpc.c: In function =E2=80=98kvm_vcpu_ioctl_set_on=
-e_reg=E2=80=99:
-  ../arch/powerpc/kvm/powerpc.c:1780:25: error: implicit declaration of fun=
-ction =E2=80=98kvmppc_set_vscr=E2=80=99; did you mean =E2=80=98kvmppc_set_f=
-scr=E2=80=99? [-Werror=3Dimplicit-function-declaration]
-   1780 |                         kvmppc_set_vscr(vcpu, set_reg_val(reg->id=
-, val));
-        |                         ^~~~~~~~~~~~~~~
-        |                         kvmppc_set_fscr
 
-
-Looking at kvm_vcpu_arch, the thread_vr_state and members are guarded by
-CONFIG_ALTIVEC, not CONFIG_VSX.
-
-Switching to that fixes the build.
-
-Whether it makes sense to be getting/setting those registers when VSX=3Dn
-is not immediately clear, but is a separate problem.
-
-cheers
