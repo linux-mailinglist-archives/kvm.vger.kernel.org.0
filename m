@@ -2,95 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 565BD7801C7
-	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 01:42:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ECEA7801E4
+	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 01:45:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356151AbjHQXlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Aug 2023 19:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36170 "EHLO
+        id S1356235AbjHQXo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Aug 2023 19:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356167AbjHQXlU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Aug 2023 19:41:20 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D2B35A5
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 16:41:18 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-589f986ab8aso7466347b3.1
-        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 16:41:18 -0700 (PDT)
+        with ESMTP id S1356237AbjHQXo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Aug 2023 19:44:28 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC58935B7
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 16:44:27 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1bc0fc321ceso4942665ad.3
+        for <kvm@vger.kernel.org>; Thu, 17 Aug 2023 16:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692315678; x=1692920478;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=25F8YYuLbjvNhO3HlPt4M0cUfz5VnLi83gNLVuSeAB4=;
-        b=LA57IVI5cF6mONL1RTwjov7pbY9Lkrbv4Psb+Ja5qZWoysVg/HAEMuFvtZr7bM/n9l
-         6djlZk/YSfQdXJDdNFoMUYf50PktBs8mvlTWdYFYNpmtiwv307STKg40/01A24feB1Cd
-         +LXtUGSwO9QiwNfeiayKZS4Pm7MvUcXOdk2SB0UD1Kerylh2zDBLwb2+2KWo3gD2Aq/T
-         7Y2EcHMv9q2nt22wRPs0DiGi2gE2n7+zlG18TJTb9Tf1AXEpoAOpVdTK0FsRCIv2mwgr
-         KmwMb/um94c0aPYHrC5wi7UrzB2XR3H0ONM6rpA/wZwwYYmPItcmZKEt98qo+Mhh2KiQ
-         R1aw==
+        d=google.com; s=20221208; t=1692315867; x=1692920667;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uiZ3s0sLfG2R1/VWg5E95FrDyHVZ3RMPRj5oAvekuRs=;
+        b=Fmo8R4pkPRdoFL4utJW8nqPWHAVWkbWVPAlmnJn3GoiseSHYbv6sTNE+4gH7lNPP99
+         n9s5eCvsmrqQTveCjACdptLqpslFBwXNKRhk7521DsTPfA757R0I2gK91p6gI3uf0I91
+         bfj7GOBoukWUY06npGrJS2uW2Nxk7RK7PEWPx9v6mKZJgfrjCXfw7xGQC9Grz4Dxno6J
+         b8kpqOJWmTIbPNletqyxcXWyE4UyqoMYY1CLI9aIUdDlUvnTqZq51u9Nx6LVircrwMK2
+         yIA/DAT2OUWVgbjQaqxLoSZ7oV6FR4Y3DfziHql4OsHCYoVSk9t3jiza0jXvU0X72wXV
+         lPvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692315678; x=1692920478;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=25F8YYuLbjvNhO3HlPt4M0cUfz5VnLi83gNLVuSeAB4=;
-        b=Z/OGcjUuJH3YwrbZelptWrmLwGVFFlF69MhULXIXyPwoAOc+BiYCvazdTlOd0fOUXV
-         pRLGUjpbdEB8rJYRytaZ1+kYb4nwwriGFk2anM90yewsW64FysvZj/yHjAzRRQuUTVHR
-         EksbBxPF9MaXTuoB/T7MY8s+UM6kA0bun+gMSMYLBrWo2j1SdbWmBAButS+2ojFNOPWN
-         f8JZEuZ4ZOJ4+HxtNV6fpQzUsvBt0tB1wvQL/rxlVqwGG9clI0GgMqFxpeh8EIoLkVqn
-         MBXy6ASXAGxRePk9NheHs7MVApiujqoS89PM7mlWYuYlihIIdc7yFL7ErqA0icaGWhM5
-         nwKA==
-X-Gm-Message-State: AOJu0Yz/w6E2tfEBjNho4f7VDgjNwA1XymFjY2vsMfDzMow+Yj7TAzZk
-        RMKMjZGElaA/6203oGOh32gYCLs52vE=
-X-Google-Smtp-Source: AGHT+IFkDF22iybvHPX6lg3hnpgEATiZYD+VWU1sap3dXt09kr+ZOxmv27SFflzuVRb5v/HO3klb6AhjFS8=
+        d=1e100.net; s=20221208; t=1692315867; x=1692920667;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uiZ3s0sLfG2R1/VWg5E95FrDyHVZ3RMPRj5oAvekuRs=;
+        b=LNDSys+wWl2pfoAQG9xGG5gWjsJkCw2LzZb8LArVMRMKzxegz5noGKdDnK4F1G1GP9
+         Hry/1WQdbPsmJ2zmvPutiRR+KF9O/ndW4BbeJsWNtm+m0xGoMxCooqgRKabiVah1J+2C
+         r6F1brKJISD1ttK4A8yRGNSBjiJ+kP/U0ctwsSdI7QGlR2wpuuIekm9x1svgOVsfO3Pj
+         0rHIcHd5zmSAJShN7jvIgoCULM2Jrvt3qmwn3ADno41eppOJqd5dktyfyoLkpSSpV+D6
+         H3ZQ0R3HFS5m1KEUgMW6IrYCqCCPAu6NtH6xVH+xagm4jSE1CriC99TxhOoKvpFNGuDl
+         R/5w==
+X-Gm-Message-State: AOJu0YxfnhoD6AMsT/G/rEZdMHq+EZ6zYvhtA2Ociec9L8Se6oTXijbn
+        WExJTUScwc/kDz0HkF6LL93thA+2GHE=
+X-Google-Smtp-Source: AGHT+IGqqd5eTGmvyGRQXhnh/Ml15OLNi7xclCEoJ1Pnpf0vLIITNizhmWmgRClWEivg/tn7Eddiyl5UKyQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:ad65:0:b0:58d:4ff2:58c with SMTP id
- l37-20020a81ad65000000b0058d4ff2058cmr84914ywk.1.1692315677997; Thu, 17 Aug
- 2023 16:41:17 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 17 Aug 2023 16:41:14 -0700
+ (user=seanjc job=sendgmr) by 2002:a17:902:eccd:b0:1b8:5878:7871 with SMTP id
+ a13-20020a170902eccd00b001b858787871mr340740plh.13.1692315867232; Thu, 17 Aug
+ 2023 16:44:27 -0700 (PDT)
+Date:   Thu, 17 Aug 2023 16:44:25 -0700
+In-Reply-To: <MW5PR84MB17135D3B5BC50FCFD3D9DEEE9B1AA@MW5PR84MB1713.NAMPRD84.PROD.OUTLOOK.COM>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230817234114.1420092-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Update MAINTAINTERS to include selftests
+References: <20230815153537.113861-1-kyle.meyer@hpe.com> <ZNuxtU7kxnv1L88H@google.com>
+ <MW5PR84MB17135D3B5BC50FCFD3D9DEEE9B1AA@MW5PR84MB1713.NAMPRD84.PROD.OUTLOOK.COM>
+Message-ID: <ZN6w2SxyZMKKxtb/@google.com>
+Subject: Re: [PATCH] KVM: x86: Increase KVM_MAX_VCPUS to 4096
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Kyle Meyer <kyle.meyer@hpe.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hasen@linux.intel.com" <dave.hasen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        Russ Anderson <russ.anderson@hpe.com>,
+        Dimitri Sivanich <dimitri.sivanich@hpe.com>,
+        Steve Wahl <steve.wahl@hpe.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Give KVM x86 the same treatment as all other KVM architectures, and
-officially take ownership of x86 specific KVM selftests (changes have
-been routed through kvm and/or kvm-x86 for quite some time).
+On Thu, Aug 17, 2023, Kyle Meyer wrote:
+> > > 4096 is the current maximum value because of the Hyper-V TLFS. See
+> > > BUILD_BUG_ON in arch/x86/kvm/hyperv.c, commit 79661c3, and Vitaly's
+> > > comment on https://lore.kernel.org/all/87r136shcc.fsf@redhat.com.
+> >
+> > Mostly out of curiosity, do you care about Hyper-V support?   If not, at some
+> > point it'd probably be worth exploring a CONFIG_KVM_HYPERV option to allow
+> > disabling KVM's Hyper-V support at compile time so that we're not bound by the
+> > restrictions of the TLFS.
+> 
+> Yes, I care about Hyper-V support. I would like this limitation to be addressed
+> in the future.
+> 
+> > Rather than tightly couple this to MAXSMP, what if we add a Kconfig?  I know of
+> > at least one scenario, SVM's AVIC/x2AVIC, where it would be desirable to configure
+> > KVM to a much smaller maximum.  The biggest downside I can think of is that KVM
+> > selftests would need to be updated (they assume the max is >=512), and some of the
+> > tests might be completely invalid if KVM_MAX_VCPUS is too low (<256?).
+> 
+> That sounds good to me. I would prefer to set the range from 1024 to 4096 in
+> this patch.
 
-Cc: kvm@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index aee340630eca..2adf76b044c8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11498,6 +11498,8 @@ F:	arch/x86/include/uapi/asm/svm.h
- F:	arch/x86/include/uapi/asm/vmx.h
- F:	arch/x86/kvm/
- F:	arch/x86/kvm/*/
-+F:	tools/testing/selftests/kvm/*/x86_64/
-+F:	tools/testing/selftests/kvm/x86_64/
- 
- KERNFS
- M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-base-commit: aaf44a3a699309c77537d0abf49411f9dc7dc523
--- 
-2.42.0.rc1.204.g551eb34607-goog
-
+Yeah, that's probably for the best. 
