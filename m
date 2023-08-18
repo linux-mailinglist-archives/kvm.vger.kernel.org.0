@@ -2,147 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DDCD97805C2
-	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 07:44:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9575B78065E
+	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 09:31:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357717AbjHRFoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 01:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33866 "EHLO
+        id S1358190AbjHRHbJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 03:31:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357674AbjHRFnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 01:43:51 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2057.outbound.protection.outlook.com [40.107.244.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8C22727;
-        Thu, 17 Aug 2023 22:43:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TBn1zGmciOLrcIM9NCWlKqHgbKXyehV4XHUgMrl+o08fJxQzBJslxpF7BPl88fscvT/R/rH3tCwmzhqAmWUk/5KF2M1pOg02GWJcEDw494OOHsPXS0iKZH2Fb83STqTx9LUh4CQML1j6peg/xBFM7jwPZ5eJ3AAnFW9deEpBQpEib6q6I1vaB4rzANHfkvjX1qXHQ0dqctGH6D+m655y4pZk708dknLHrqjKdJLXnYaG4PsEWHyRXg4VC5GreXu5H01anv5Un6xmkYGEjztCERGtLNQPcpdso/0zgpaXXMfMDkd5Yov17k3+cLqWS4SVWiDOuddLF5wFs1cMYftvIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7E3oJ8O0HYP7JWHe6WXGuo7CnITTAQyZJNR/zQseFtk=;
- b=WnCTgYwKnPK9uYJ8aL6dDn3z6DnQy9317eKNJq1pJvsBnMVIPq2sGrZUwFPUS+FbEYYw1frZ9/4jt3Ivnw7nIiYnbVUDu45ql6djwu11flieNvmo17CrqPYNW4Cn8yHNiqeu4SqXPKUoDzPmRYDk8Q4eyYmJeNzh16ddS0H7HTARgviqj34dj7vLBQOQ4KJmeIpcj+qLdwHeJsxxZGPT/NmwWvfuxyV79LzQDgSWi2A0Eh8AgyLrMSFyn9OsDaL7AT19GaHGXaCYVJzPKcrhMy8e7NqXXhN4/FGNkl7ogSC7AD+VjG3RbgbAUl6RLmHNwVn7Xn55vxDgQu8RguRAkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7E3oJ8O0HYP7JWHe6WXGuo7CnITTAQyZJNR/zQseFtk=;
- b=mmuKmHgSLcpmiOC36f+Rg/i9HOguQwh1sKZjgUwuNFz+dr6Oh65mS5olSBlFNnrOTh8bQL1+kgp0QPSVSbmYBc7ii73gZevjajRbeBvoKG3QhO6P4BpT1pZkMJetPbkD9R8MEVrabate9zJoY6xHhlDsofCZKWEgkD8ZOT6U/xgLrnKkujQW/GM46E1e/rfg/iXPqpCpnHCHSHRRbvqU0BDAcQ1oNdT9pa91LpXQSKyoQSYHjVd7HVeTcb18PvezNFLgl8L5VY1YDfHPZCVUWa0RpX/1qZ1LbcsYQqa/Ftjg0GoLBHXV9PcV5SzAcJO6skjbFZafpGfN6xYZlAHFSQ==
-Received: from CY5PR15CA0209.namprd15.prod.outlook.com (2603:10b6:930:82::27)
- by SA3PR12MB8803.namprd12.prod.outlook.com (2603:10b6:806:317::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.26; Fri, 18 Aug
- 2023 05:43:43 +0000
-Received: from CY4PEPF0000EE3C.namprd03.prod.outlook.com
- (2603:10b6:930:82:cafe::a3) by CY5PR15CA0209.outlook.office365.com
- (2603:10b6:930:82::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
- Transport; Fri, 18 Aug 2023 05:43:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE3C.mail.protection.outlook.com (10.167.242.16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6699.14 via Frontend Transport; Fri, 18 Aug 2023 05:43:43 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 17 Aug 2023
- 22:43:31 -0700
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 17 Aug
- 2023 22:43:31 -0700
-Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com (10.129.68.9)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
- Transport; Thu, 17 Aug 2023 22:43:30 -0700
-Date:   Thu, 17 Aug 2023 22:43:28 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-CC:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Yi Liu" <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/3] iommu: Consolidate pasid dma ownership check
-Message-ID: <ZN8FAKHCzWODGRmC@Asurada-Nvidia>
-References: <20230814011759.102089-1-baolu.lu@linux.intel.com>
- <20230814011759.102089-3-baolu.lu@linux.intel.com>
+        with ESMTP id S1358182AbjHRHai (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 03:30:38 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9688E30E9
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 00:30:35 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id a640c23a62f3a-99357737980so70971466b.2
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 00:30:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1692343834; x=1692948634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nu5vRU+Ls6TvII7Q0Vdpj5U5jSrG/Osoam5r9jWleL8=;
+        b=lXKHqegRZrlMfU5dvc9HqWRFicSIRCIvlo/PdAjhqUmjfqRK1rz0adpwnl0+BLHqfn
+         1K1AfFwDMb9CKR/arhqO7ELjP5UK17fL588gxsJVLPksFDvVvh5zbclm7dk+Y5dEVbqD
+         OkY6nD7yxVXJPg1lvEf/rGgFusJJ0pa7IK6GkAHHqlau2FGtZQnSx3Y9bhkVG5LHelTL
+         Vc8Qh/4+p7lwdGJZXi6opSR1jAXmg6TSJDUhy8sMGYBSLCb9TOK1r67D48WAIlh45SbU
+         m2IUgviDZ0aQUlFQ5+AzfUuw5VTOrI0aRqhGBMnmuneYZxLM0jDLyR8cIbcAUnitT7q5
+         176A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692343834; x=1692948634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nu5vRU+Ls6TvII7Q0Vdpj5U5jSrG/Osoam5r9jWleL8=;
+        b=VFgIXMSlWAFmBp/8eNLi15i0ioOnH6jEzU59AvKZBatYVwNA/TRZQeINfvyrBXfvoP
+         MpBSjPlwwcCVzRoETsSmyT1kIxxneWtoEBs5HDtmxGCnSIaN7Qf5Urym0Wzem8IpzBe5
+         ql+f0ktqVEW9KGkps2dwndY5W2Dwa7NXSog3UGD0+QHWRIRxzzH5k7pw1Qn9MSoNkpYQ
+         UOweXFCe6obOvpT1OvFUhXrWSInZRySvzgQ5axhtmT8D6RJzP67nVlwLAH8wJI3qPGhO
+         5JDqkpFvc3X4XmXZttCVq5Mrf35RL4k2uVMifabO0arnL3554f36wi3w16s4pbPZamZ4
+         lk7w==
+X-Gm-Message-State: AOJu0YxCtOc84MBz/3M/sjG0D/5YvfrcnYWGkeqC0yrd7DcGn5BfvEt3
+        04tyhH0aqMaNke/6Ul00b+PHsQ==
+X-Google-Smtp-Source: AGHT+IEsV5M/B1UbYyCeo0WYS5DT7wyD++pmpVV6vSVnEq/FsuPf4jkdM8SM0RY0TL9ZO5reeCNthA==
+X-Received: by 2002:a17:906:10a:b0:99c:441:ffa with SMTP id 10-20020a170906010a00b0099c04410ffamr1431712eje.29.1692343834051;
+        Fri, 18 Aug 2023 00:30:34 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id k20-20020a1709063e1400b00992b71d8f19sm838014eji.133.2023.08.18.00.30.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Aug 2023 00:30:33 -0700 (PDT)
+Date:   Fri, 18 Aug 2023 09:30:32 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Palmer Dabbelt <palmer@dabbelt.com>
+Cc:     Charlie Jenkins <charlie@rivosinc.com>, jrtc27@jrtc27.com,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        bpf@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, peterz@infradead.org, jpoimboe@kernel.org,
+        jbaron@akamai.com, rostedt@goodmis.org,
+        Ard Biesheuvel <ardb@kernel.org>, anup@brainfault.org,
+        atishp@atishpatra.org, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+        yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+        sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+        bjorn@kernel.org, luke.r.nels@gmail.com, xi.wang@gmail.com,
+        namcaov@gmail.com
+Subject: Re: [PATCH 00/10] RISC-V: Refactor instructions
+Message-ID: <20230818-63347af7195b7385c146778d@orel>
+References: <ZN5OJO/xOWUjLK2w@ghost>
+ <mhng-7d609dde-ad47-42ed-a47b-6206e719020a@palmer-ri-x1c9a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230814011759.102089-3-baolu.lu@linux.intel.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3C:EE_|SA3PR12MB8803:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f6c20b5-8d51-4fb7-9694-08db9fae1553
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PInNb/OAQGbAb8/7i+22twYHXEyRY0HCOHL2H46udrOZG5oCGsVCsbWti4RwRnExJ7C5nz6i5pYieM5Ku3aWa65hp/ANGfur0i9JrPiVdoA5wJUuBuHYxIvy50S/7pBPl9dWpoMwb67y+P3ZHHALJQ7i9CgkMPFxOwyUgpI6LtsUCBGy1z0bEvVpqTxCm/AbC1CUi4T/6Jn0fGuXFdhlB84u3D7e79DzKI9f1inBHJOElZp7hP5LeN5FU7Hnh86K6XZL0Kk1eGuHol7/jVF4O8wJ1gUGGgbDpfSzI14wm67H7rmh6C06s20BIwdEdFOeIrGWDfOg16kiMauVekNMtcRaX1Y0DGmNMUN9CjND3ptQDagRF+qOkQ9vw/93QqsdwM+0c6GcDu9WZYp3Jm2XK5YYyRxCX7mPXRvKA9mdzw90oQ7mHY6Uqy4Fx+0uSqfSOgG8V8TVjg+PhdAOYwCmANTSqsv/zEWAbbGaMfFgjUgPNzTzQRn13b+emcvcXYbWONdK3DkBcJhg5FbL4Qs+C/GZUXe6kRdgU6FLuLwKuJUo1fRO1AKb8hyOV7e+sfDmVYDU8mOzsNQbF7wmk9JMoEv6ZfH7wCPMUxkLAx+7YqjldUgoE9scST9C2b+qyZdRu0TYi7bbGcNFx+HBYkTPznfhSIvqqA/3tYxzD10Eno0i6RkFSklncpR8wCFpoGkAVXyKFbzNR8E3TbvKcDiVIpcZ2a71v+bunUQnch+8/wQerjooX/X2w1LMVJlRS5W1
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(39860400002)(396003)(186009)(451199024)(1800799009)(82310400011)(46966006)(40470700004)(36840700001)(2906002)(40460700003)(83380400001)(26005)(86362001)(7416002)(336012)(40480700001)(478600001)(426003)(9686003)(55016003)(5660300002)(36860700001)(41300700001)(70586007)(82740400003)(356005)(54906003)(7636003)(70206006)(316002)(6916009)(4326008)(8936002)(8676002)(33716001)(47076005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2023 05:43:43.2576
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f6c20b5-8d51-4fb7-9694-08db9fae1553
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EE3C.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8803
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <mhng-7d609dde-ad47-42ed-a47b-6206e719020a@palmer-ri-x1c9a>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 14, 2023 at 09:17:58AM +0800, Lu Baolu wrote:
-
-> When switching device DMA ownership, it is required that all the device's
-> pasid DMA be disabled. This is done by checking if the pasid array of the
-> group is empty. Consolidate all the open code into a single helper. No
-> intentional functionality change.
+On Thu, Aug 17, 2023 at 10:52:22AM -0700, Palmer Dabbelt wrote:
+> On Thu, 17 Aug 2023 09:43:16 PDT (-0700), Charlie Jenkins wrote:
+...
+> > It seems to me that it will be significantly more challenging to use
+> > riscv-opcodes than it would for people to just hand create the macros
+> > that they need.
 > 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  drivers/iommu/iommu.c | 23 ++++++++++++++++++-----
->  1 file changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index f1eba60e573f..d4a06a37ce39 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -3127,6 +3127,19 @@ static bool iommu_is_default_domain(struct iommu_group *group)
->         return false;
->  }
-> 
-> +/*
-> + * Assert no PASID DMA when claiming or releasing group's DMA ownership.
-             ^
-	     |...
+> Ya, riscv-opcodes is pretty custy.  We stopped using it elsewhere ages ago.
 
-> + * The device pasid interfaces are only for device drivers that have
-> + * claimed the DMA ownership. Return true if no pasid DMA setup, otherwise
-> + * return false with a WARN().
-> + */
-> +static bool assert_pasid_dma_ownership(struct iommu_group *group)
+Ah, pity I didn't know the history of it or I wouldn't have suggested it,
+wasting Charlie's time (sorry, Charlie!). So everywhere that needs
+encodings are manually scraping them from the PDFs? Or maybe we can write
+our own parser which converts adoc/wavedrom files[1] to Linux C?
 
-... should it be assert_no_pasid_dma_ownership?
+[1] https://github.com/riscv/riscv-isa-manual/tree/main/src/images/wavedrom
 
-Nic
+Thanks,
+drew
