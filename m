@@ -2,319 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3AB5781268
-	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 19:56:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC1A6781271
+	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 19:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379082AbjHRRzg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 13:55:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55712 "EHLO
+        id S1378995AbjHRR5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 13:57:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379343AbjHRRz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 13:55:29 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277CB2D79
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 10:55:28 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58daaa2ba65so15203837b3.1
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 10:55:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692381327; x=1692986127;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OK+8NViLbT4e2HS8SDOPbE3/nK16UAbIxztB0Ra0oFI=;
-        b=xyLB0r66tKK3HtIeMxOjj0iYxeV+b+BNXB0K/YYiuUNB71cFFURuqz7r0bcobYxbCW
-         qQIajCbcKciT2aGVInJCi/p6NZw86Td2er7Fcy+DVknKJXkJ+EpP/Cpg5Yn8arwU8bH0
-         Cu0ZqYHcQZrdmbZcPm9wwwymJcPbkwEstHzy4HGkXIZO84sZKh5JZZNF+ObyUqzpoxgv
-         vWUYWYvo+I53kiS3tOJt0nXhcD3OLPIl5QtniE9iLFqZt1qrZRLmOiADv+0kzNPj39Cx
-         R4FtCUrNPUyBulnHL287SvEbkdRP8SstrXV1WtF0MyciwJ4GK27SLa+RhmxzCmd4HjVo
-         WdWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692381327; x=1692986127;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OK+8NViLbT4e2HS8SDOPbE3/nK16UAbIxztB0Ra0oFI=;
-        b=YGU7N6718lOcSX/fn9o0MK0+Mq2l+6T0tc7uc8t5xQbNTm0o24szZvKT6Bngkk+3UV
-         s2YfM2/hJhVblybKKlLVCoEpBHKMdrzY4e8HPX/RuGUgw3+F5vngBXWJxJgmrlIKbXi7
-         c95Fv0Eldj2wMza3iycgsxitskuCNAQVSObzF+lm4Yjo4/4wRrCbZQtSu/0eR4/rdNhJ
-         jObI8ERcA8ulr9ZRIF3Qu88csEuXH7CgJcpnEQ2H4uhkJcvF1ubKI9YQj0Un32jUAmO0
-         BOtKMVZ+c//L72j8y/zYCoqBSEO8nBLb/GUSJRudgOC7X15Kgwtb/FBlux5KqsI5+CNb
-         i0BA==
-X-Gm-Message-State: AOJu0Yy4WIDge/bN5BXzmYGoj7zsbrPS3F2VbpnekUDsW7C7HRzhp+FO
-        oF/awIwUypA/J5t5m/72gXneeIfuTiE=
-X-Google-Smtp-Source: AGHT+IHFRrhsMBCKFdXjoa9UkoXzEXomb1zbD0I89gNgveRrIuz09gSEhLJGX/SlQ2funcPLA9QxcxpHUcQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:760f:0:b0:589:9d51:c8c0 with SMTP id
- r15-20020a81760f000000b005899d51c8c0mr53502ywc.2.1692381327444; Fri, 18 Aug
- 2023 10:55:27 -0700 (PDT)
-Date:   Fri, 18 Aug 2023 10:55:17 -0700
-In-Reply-To: <b37fb13a9aeb8683d5fdd5351cdc5034639eb2bb.1692119201.git.isaku.yamahata@intel.com>
-Mime-Version: 1.0
-References: <cover.1692119201.git.isaku.yamahata@intel.com> <b37fb13a9aeb8683d5fdd5351cdc5034639eb2bb.1692119201.git.isaku.yamahata@intel.com>
-Message-ID: <ZN+whX3/lSBcZKUj@google.com>
-Subject: Re: [PATCH 4/8] KVM: gmem: protect kvm_mmu_invalidate_end()
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Michael Roth <michael.roth@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Zhi Wang <zhi.wang.linux@gmail.com>, chen.bo@intel.com,
-        linux-coco@lists.linux.dev,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Xu Yilun <yilun.xu@intel.com>,
-        Quentin Perret <qperret@google.com>, wei.w.wang@intel.com,
-        Fuad Tabba <tabba@google.com>
+        with ESMTP id S1379372AbjHRR5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 13:57:09 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2058.outbound.protection.outlook.com [40.107.92.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F91271B;
+        Fri, 18 Aug 2023 10:57:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kCygJMUNBluVlLtvfhGV78o/RqsAcUtOE/C1Q20SiBVXJssNCq+YH2V3ae3OUJuYwvvl6WWIscToAVg6QCoh9J5vhoAFlNpTM6h0KY9WYudSeVxxwRSdinKYwtoPtnLG6ZfMQjvb9K02UTfEHl9ctteL5VgkH6BWDv0DmZwoeO5FYV6X+GaTYsaUoBQno4/KtHZSfe4bMERBw9fAutPMBL/UOIqce+3bOIELZdLwn0uCN9jF82QhTctJrpqteC8krqujCOk2IDgFIXq4estdF/zA8Q4luvxnkpdoe70BMUecq0L6BRzbApw1RJPFw0APLs0oGC2GU8solekMGtBeJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/K/c8Erp/IMlMSdc/V2CbjzOmFyMBlggSOYhu6tscRw=;
+ b=d7ACt4eM4QXhX2MCCmvLX6OykkwrYapKkVpRkgvnt+blCYnQi9AoEhF3aTwT/Tbn60pE/gouEApFJibhoEOKIFcQM7iB53CYuf8NKfuMeBuHq2CKV2TUjyDG45n2/Il/92kjavfPLfn9yfVq8RnEBDcbKZ9f0E+ndIkBgsPdJr1Q8P/0bJKAzBNuLZ2EAI7z0lqia7eyQLIQFBC3uD6knWZY68UUkb/il3PPs3gwZoNxbxFJm0O6QTN3swCRl9EsBPFXi+ZoCm18IB0H3SB4Q1EZMCqrAvZEALKbKNiU5ROUoQkHBS0JSdyvh7kLiDoxEjoA4GGF4/t3aJS8JwLbcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/K/c8Erp/IMlMSdc/V2CbjzOmFyMBlggSOYhu6tscRw=;
+ b=tW+sJ03/L2zFLXl5h+hNc57iaJmmur4k2W8YB6nNN3QG5107wVnvpGOH3WBIJZLTKX3BBwx0cxTdICVKMbBVCzvEZ8T+Rz88BvjJPwYj8BfpbXyJdjxXQiYXHnkjsCrG9dfdSAVHgnf2XZGXo67QqenBS1hW0IF91jKFDFoam1wU/wMXZhrlvkKWaAAp7bMs4NrYOEO8rlAartyty+Wjb7KaUHs11dU6yj7F7P2uJAm12GOxjS/6DRo3hmMcv+gF0RbQSXiX5OsUHOwpgVlOTMhsQRzztMim0lpMSxjyW/Auof4+Sovl/djnjHeWYPvB1scQRVGiolSKK6DAjm9kyw==
+Received: from MW4PR03CA0135.namprd03.prod.outlook.com (2603:10b6:303:8c::20)
+ by SJ2PR12MB9163.namprd12.prod.outlook.com (2603:10b6:a03:559::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Fri, 18 Aug
+ 2023 17:57:05 +0000
+Received: from MWH0EPF000989EA.namprd02.prod.outlook.com
+ (2603:10b6:303:8c:cafe::6f) by MW4PR03CA0135.outlook.office365.com
+ (2603:10b6:303:8c::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
+ Transport; Fri, 18 Aug 2023 17:57:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000989EA.mail.protection.outlook.com (10.167.241.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.14 via Frontend Transport; Fri, 18 Aug 2023 17:57:04 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 18 Aug 2023
+ 10:56:48 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 18 Aug
+ 2023 10:56:48 -0700
+Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37 via Frontend
+ Transport; Fri, 18 Aug 2023 10:56:47 -0700
+Date:   Fri, 18 Aug 2023 10:56:45 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "Duan, Zhenzhong" <zhenzhong.duan@intel.com>
+Subject: Re: [PATCH v4 09/12] iommu/vt-d: Add iotlb flush for nested domain
+Message-ID: <ZN+w3fahQpM2W9Yx@Asurada-Nvidia>
+References: <ZNP0UKGU6id5wfc6@Asurada-Nvidia>
+ <BN9PR11MB527683351B687B97AB84B51B8C13A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNUI0D7ZMvLWlBNx@nvidia.com>
+ <ZNUa/VmeiIo0YA0v@Asurada-Nvidia>
+ <ZNU6BnTgNEWlwNYQ@nvidia.com>
+ <ZNVQcmYp27ap7h30@Asurada-Nvidia>
+ <BN9PR11MB5276D0B3E0106C73C498B8018C10A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZNZlnh+/Q5Vk5Kul@Asurada-Nvidia>
+ <ZNsYxta9Pi7USDoR@Asurada-Nvidia>
+ <ZN+i1pEoN/NsWPKS@nvidia.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Disposition: inline
+In-Reply-To: <ZN+i1pEoN/NsWPKS@nvidia.com>
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989EA:EE_|SJ2PR12MB9163:EE_
+X-MS-Office365-Filtering-Correlation-Id: 06f330e1-22f8-4b0a-97fd-08dba0148867
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wQ6TUWS4HL0pdHQ0EmlZMc9K7nA5FOd87A1Dd2ndKxLBvO5gu6rJR7o0Nzce1C+NQ0XGLtxQ/SJqyRUK4126Ns+vt1kpIBwFiSS+fzgcMc20c2JnoGi5V8LMk0cO7WkWxlNKodtPGqoroV//rUMGIld+N888SWuk+6wuIa4XB7bSc+3ptbOhsTvN9DRwk2c+oXs40DpkUwT6d/pfChK7yycYCtrRIn4aRlBpsgKvaz2Mz/j6COg6Axxcs4jUdwH/pYkFxoZ8bZ4WC+kY+vF+jjVHiNWIwBvcuarVrvd/r/1Poy3nFNQmw+p59D6gE8+TZbz5k315VGowV5L82mJP/g72mOrgNz4e2CaZ6boDotT9cYudgJOd56xUyyjX3V4D6wWWnjuLAokFhAz+5y8mpGhJqlYeF3rmdXbThSsUEfC+RwOaU1qPmV8eBRXQWWB2nzakHik02n0sVJdCzpEI/jC+9hPfCmjDwhnSMe+0AeYe9T+pQuEwGRMnW+Y9tTBSJCBRhshqmzYu9AMdlFpW0GpTaaVUb1DWxPL/3u0qUqloQp6zFVgqQEnrAfOptPqM26BdO9IKe+0CzMBNJwCQ4r5XbYEy7nHO2k4scFUROSDmEyIheRDhhvIl7R+BxLo4IR+y2qtJtxr25tigfZ4pWji+ABGTa9baAgE0d16OswnJfYd4OqEcTY104WWtnumy7kpVX52HSU/3FgCnH/HZe9eZAeG6rOlZNFobHBXFbEdsKiChFHQGM0SBCWo/Lch8QTrq5HBEjN4hVl/Wx+oFHP+ZgdblyGLcV9vhN9jgwCO7WLJeQPQVGT0anBEpG1+/
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(376002)(396003)(39860400002)(186009)(1800799009)(82310400011)(451199024)(46966006)(40470700004)(36840700001)(9686003)(40460700003)(36860700001)(426003)(336012)(55016003)(26005)(40480700001)(83380400001)(47076005)(33716001)(7636003)(82740400003)(356005)(86362001)(2906002)(54906003)(316002)(6636002)(41300700001)(70206006)(70586007)(5660300002)(7416002)(8676002)(6862004)(4326008)(8936002)(478600001)(67856001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2023 17:57:04.9775
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06f330e1-22f8-4b0a-97fd-08dba0148867
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: MWH0EPF000989EA.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9163
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 15, 2023, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Fri, Aug 18, 2023 at 01:56:54PM -0300, Jason Gunthorpe wrote:
+> On Mon, Aug 14, 2023 at 11:18:46PM -0700, Nicolin Chen wrote:
+> > On Fri, Aug 11, 2023 at 09:45:21AM -0700, Nicolin Chen wrote:
+> > 
+> > > > But if stepping back a bit supporting an array-based non-native format
+> > > > could simplify the uAPI design and allows code sharing for array among
+> > > > vendor drivers. You can still keep the entry as native format then the
+> > > > only difference with future in-kernel fast path is just on walking an array
+> > > > vs. walking a ring. And VMM doesn't need to expose non-invalidate
+> > > > cmds to the kernel and then be skipped.
+> > > 
+> > > Ah, so we might still design the uAPI to be ring based at this
+> > > moment, yet don't support a case CONS > 0 to leave that to an
+> > > upgrade in the future.
+> > > 
+> > > I will try estimating a bit how complicated to implement the
+> > > ring, to see if we could just start with that. Otherwise, will
+> > > just start with an array.
+> > 
+> > I drafted a uAPI structure for a ring-based SW queue. While I am
+> > trying an implementation, I'd like to collect some comments at the
+> > structure, to see if it overall makes sense.
 > 
-> kvm_mmu_invalidate_end() updates struct kvm::mmu_invalidate_in_progress
-> and it's protected by kvm::mmu_lock.  call kvm_mmu_invalidate_end() before
-> unlocking it. Not after the unlock.
+> I don't think a ring makes alot of sense at this point. The only thing
+> it optimizes is a system call if the kernel needs to wrap around the
+> tail of the ring. It would possibly be better to have a small gather
+> list than try to describe the ring logic..
 > 
-> Fixes: 8e9009ca6d14 ("KVM: Introduce per-page memory attributes")
+> Further, the VMM already has to process it, so the vmm already knows
+> what ops are going to kernel are not. The VMM can just organize them
+> in a linear list in one way or another. We need to copy and read this
+> stuff in the VMM anyhow to protect against a hostile VM.
 
-This fixes is wrong.  It won't matter in the long run, but it makes my life that
-much harder.
+OK. Then an linear array it is.
 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  virt/kvm/kvm_main.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
+> > One thing that I couldn't add to this common structure for SMMU
+> > is the hardware error code, which should be encoded in the higher
+> > bits of the consumer index register, following the SMMU spec:
+> >     ERR, bits [30:24] Error reason code.
+> >     - When a command execution error is detected, ERR is set to a
+> >       reason code and then the SMMU_GERROR.CMDQ_ERR global error
+> >       becomes active.
+> >     - The value in this field is UNKNOWN when the CMDQ_ERR global
+> >       error is not active. This field resets to an UNKNOWN value.
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 8bfeb615fc4d..49380cd62367 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -535,6 +535,7 @@ struct kvm_mmu_notifier_range {
->  	} arg;
->  	gfn_handler_t handler;
->  	on_lock_fn_t on_lock;
-> +	on_unlock_fn_t before_unlock;
->  	on_unlock_fn_t on_unlock;
+> The invalidate ioctl should fail in some deterministic way and report
+> back the error code and the highest array index that maybe could have
+> triggered it.
 
-Ugh, shame on my past me.  Having on_lock and on_unlock be asymmetrical with respect
-to the lock is nasty.
+Yea. Having an error code in the highest bits of array_index,
+"array_index != array_max" could be the deterministic way to
+indicate a failure. And a kernel errno could be returned also
+to the invalidate ioctl.
 
-I would much rather we either (a) be explicit, e.g. before_(un)lock and after_(un)lock,
-or (b) have just on_(un)lock, make them symetrical, and handle the SEV mess a
-different way.
+> The highest array index sounds generic, the error code maybe is too
 
-The SEV hook doesn't actually care about running immediately after unlock, it just
-wants to know if there was an overlapping memslot.  It can run after SRCU is dropped,
-because even if we make the behavior more precise (right now it blasts WBINVD),
-just having a reference to memslots isn't sufficient, the code needs to guarantee
-memslots are *stable*.  And that is already guaranteed by the notifier code, i.e.
-the SEV code could just reacquire SRCU.
+We could do in its and report the error code in its raw form:
+	__u32 out_array_index;
+	/* number of bits used to report error code in the returned array_index */
+	__u32 out_array_index_error_code_bits;
+Or just:
+	__u32 out_array_index;
+	__u32 out_error_code;
 
-And that will hold true for any possible stuff that wants to do something *after*
-dropping mmu_lock.
+Do we have to define a list of generic error code?
 
-One idea would be to use a struct to return a tuple of the actual return value
-along with whether or not mmu_lock was acquired, i.e. if there was overlap.  The
-only really gross part is squeezing in meaningful name.  Absusing a #define is
-one way to make the code somewhat readable...
-
-I think this has my vote, especially if we can figure out a way to keep the
-line lengths reasonable without a gnarly #define hack (I really don't want to
-split the return onto a separate line).
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 95c621e05b5a..ec45510549bf 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -541,6 +541,11 @@ struct kvm_mmu_notifier_range {
-        bool may_block;
- };
- 
-+struct kvm_mmu_notifier_return {
-+       bool ret;
-+       bool locked;
-+};
-+
- /*
-  * Use a dedicated stub instead of NULL to indicate that there is no callback
-  * function/handler.  The compiler technically can't guarantee that a real
-@@ -560,10 +565,15 @@ static void kvm_null_fn(void)
-             node;                                                           \
-             node = interval_tree_iter_next(node, start, last))      \
- 
--static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
--                                                 const struct kvm_mmu_notifier_range *range)
-+#define kvm_mn_ret_t __always_inline struct kvm_mmu_notifier_return
-+
-+static kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
-+                                          const struct kvm_mmu_notifier_range *range)
- {
--       bool ret = false, locked = false;
-+       struct kvm_mmu_notifier_return r = {
-+               .ret = false,
-+               .locked = false,
-+       };
-        struct kvm_gfn_range gfn_range;
-        struct kvm_memory_slot *slot;
-        struct kvm_memslots *slots;
-@@ -574,12 +584,12 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
-        BUILD_BUG_ON(sizeof(gfn_range.arg) != sizeof(range->arg));
- 
-        if (WARN_ON_ONCE(range->end <= range->start))
--               return 0;
-+               return r;
- 
-        /* A null handler is allowed if and only if on_lock() is provided. */
-        if (WARN_ON_ONCE(IS_KVM_NULL_FN(range->on_lock) &&
-                         IS_KVM_NULL_FN(range->handler)))
--               return 0;
-+               return r;
- 
-        idx = srcu_read_lock(&kvm->srcu);
- 
-@@ -613,8 +623,8 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
-                        gfn_range.end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, slot);
-                        gfn_range.slot = slot;
- 
--                       if (!locked) {
--                               locked = true;
-+                       if (!r.locked) {
-+                               r.locked = true;
-                                KVM_MMU_LOCK(kvm);
-                                if (!IS_KVM_NULL_FN(range->on_lock))
-                                        range->on_lock(kvm);
-@@ -622,33 +632,28 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
-                                if (IS_KVM_NULL_FN(range->handler))
-                                        break;
-                        }
--                       ret |= range->handler(kvm, &gfn_range);
-+                       r.ret |= range->handler(kvm, &gfn_range);
-                }
-        }
- 
--       if (range->flush_on_ret && ret)
-+       if (range->flush_on_ret && r.ret)
-                kvm_flush_remote_tlbs(kvm);
- 
--       if (locked) {
-+       if (r.locked) {
-                KVM_MMU_UNLOCK(kvm);
-                if (!IS_KVM_NULL_FN(range->on_unlock))
-                        range->on_unlock(kvm);
-        }
- 
--       if (range->reclaim_on_ret && ret)
--               kvm_arch_guest_memory_reclaimed(kvm);
--
-        srcu_read_unlock(&kvm->srcu, idx);
- 
--       /* The notifiers are averse to booleans. :-( */
--       return (int)ret;
-+       return r;
- }
- 
-...skipping...
-        const struct kvm_mmu_notifier_range range = {
-@@ -780,7 +785,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
-                .end            = range->end,
-                .handler        = kvm_mmu_unmap_gfn_range,
-                .on_lock        = kvm_mmu_invalidate_begin,
--               .on_unlock      = kvm_null_fn,
-+               .on_unlock      = (void *)kvm_null_fn,
-                .flush_on_ret   = true,
-                .reclaim_on_ret = true,
-                .may_block      = mmu_notifier_range_blockable(range),
-@@ -813,7 +818,8 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
-        gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end,
-                                          hva_range.may_block);
- 
--       __kvm_handle_hva_range(kvm, &hva_range);
-+       if (__kvm_handle_hva_range(kvm, &hva_range).locked)
-+               kvm_arch_guest_memory_reclaimed(kvm);
- 
-        return 0;
- }
-@@ -881,7 +887,7 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
- {
-        trace_kvm_age_hva(start, end);
- 
--       return kvm_handle_hva_range(mn, start, end, __pte(0), kvm_age_gfn);
-+       return kvm_handle_hva_range(mn, start, end, __pte(0), kvm_age_gfn).ret;
- }
- 
- static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
-@@ -904,7 +910,7 @@ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
-         * cadence. If we find this inaccurate, we might come up with a
-         * more sophisticated heuristic later.
-         */
--       return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn);
-+       return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn).ret;
- }
- 
- static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
-@@ -914,7 +920,7 @@ static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
-        trace_kvm_test_age_hva(address);
- 
-        return kvm_handle_hva_range_no_flush(mn, address, address + 1,
--                                            kvm_test_age_gfn);
-+                                            kvm_test_age_gfn).ret;
- }
- 
- static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
-@@ -2400,12 +2406,14 @@ static u64 kvm_supported_mem_attributes(struct kvm *kvm)
- static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
-                                                 struct kvm_mmu_notifier_range *range)
- {
-+       struct kvm_mmu_notifier_return r = {
-+               .ret = false,
-+               .locked = false,
-+       };
-        struct kvm_gfn_range gfn_range;
-        struct kvm_memory_slot *slot;
-        struct kvm_memslots *slots;
-        struct kvm_memslot_iter iter;
--       bool locked = false;
--       bool ret = false;
-        int i;
- 
-        gfn_range.arg.raw = range->arg.raw;
-@@ -2423,21 +2431,21 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
-                        if (gfn_range.start >= gfn_range.end)
-                                continue;
- 
--                       if (!locked) {
--                               locked = true;
-+                       if (!r.locked) {
-+                               r.locked = true;
-                                KVM_MMU_LOCK(kvm);
-                                if (!IS_KVM_NULL_FN(range->on_lock))
-                                        range->on_lock(kvm);
-                        }
- 
--                       ret |= range->handler(kvm, &gfn_range);
-+                       r.ret |= range->handler(kvm, &gfn_range);
-                }
-        }
- 
--       if (range->flush_on_ret && ret)
-+       if (range->flush_on_ret && r.ret)
-                kvm_flush_remote_tlbs(kvm);
- 
--       if (locked) {
-+       if (r.locked) {
-                KVM_MMU_UNLOCK(kvm);
-                if (!IS_KVM_NULL_FN(range->on_unlock))
-                        range->on_unlock(kvm);
-
+Thanks!
+Nic
