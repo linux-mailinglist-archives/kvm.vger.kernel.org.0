@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 494AD780929
-	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 11:57:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 390FA78092D
+	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 11:58:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359475AbjHRJ50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 05:57:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
+        id S1359492AbjHRJ6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 05:58:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359558AbjHRJ5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 05:57:16 -0400
+        with ESMTP id S1359507AbjHRJ5i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 05:57:38 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D33E3C0E
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 02:56:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDDC3A8B
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 02:57:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692352619; x=1723888619;
+  t=1692352636; x=1723888636;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qIio7PdaVk3nTlRlOLmCuWUeF0qwU3Bvt3bsJTRXB3M=;
-  b=SKPXRIez5AGVGXoNeBtzkc/gXy6Tez5RDV0biwkt7DNQAeMCsTFzXuUM
-   jx/7CKp4SM9iDqrdjvro1n5/H8crSBWCURPucdTra0F64dPB9L5IPIVcy
-   vCxiYbYot9BM+fiDn+tGdmO5Hdf3LmEpWjDhi/0U+kpxBOywYTycqCzpx
-   WV4rdTfk0SpL9X7uXQAPK1mrZB2paoXbZM0cAfd4Y/7xC/7MHN6uOqfgi
-   l4mSzjnZSefDzcCtvlR5U5N9mfb5clzWNpxnZOkGk+3NWKMfz873BZTwV
-   zk+JgO5Qfgz0ZZKWk3DomZzk5M36J9it3suMCeQvgn+Jix58TS00uGNqZ
+  bh=7ZLBT0rG0ATJUv31+x8JWdiJhQCgvVwu5lEu9uCBHiI=;
+  b=OlH0HlhwtTHV11tRnzISjiQDXUgaW0WaJRIlc0oSMVa0hMTf14kL0/Gx
+   AegTFC6AEAICNGL/hgx1LF7eToSN49neGsB/f9rdY1GsD4U3iUz6KbCRf
+   mB/PtqFNCrVctfgFmzLX/TjYJApYE2z0UfA5g7Ii+QFD6FcUZKFiiON1a
+   LOgUvXCToMUsdbOET43K+pYVRMsZ1JHhRxMuT5QO0aCYPMDo1gmMvz5qF
+   fg5yVTM59t1EHBmkG4LSD4sOvWoP2kc0L/8qM94xB2T6bXBXLFrR8Qacf
+   kqCPicSXnCt+DjIafcrKCu1qIL2p9Gt1SOdKuSejMsWqGl6RcgKsA5NsL
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371966051"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371966070"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="371966051"
+   d="scan'208";a="371966070"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:56:22 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:56:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849235180"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849235186"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="849235180"
+   d="scan'208";a="849235186"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:56:17 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:56:22 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -58,9 +58,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Laszlo Ersek <lersek@redhat.com>, xiaoyao.li@intel.com,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v2 22/58] i386/tdx: Set kvm_readonly_mem_enabled to false for TDX VM
-Date:   Fri, 18 Aug 2023 05:50:05 -0400
-Message-Id: <20230818095041.1973309-23-xiaoyao.li@intel.com>
+Subject: [PATCH v2 23/58] i386/tdx: Make memory type private by default
+Date:   Fri, 18 Aug 2023 05:50:06 -0400
+Message-Id: <20230818095041.1973309-24-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230818095041.1973309-1-xiaoyao.li@intel.com>
 References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
@@ -76,38 +76,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX only supports readonly for shared memory but not for private memory.
+By default (due to the recent UPM change), restricted memory attribute is
+shared.  Convert the memory region from shared to private at the memory
+slot creation time.
 
-In the view of QEMU, it has no idea whether a memslot is used as shared
-memory of private. Thus just mark kvm_readonly_mem_enabled to false to
-TDX VM for simplicity.
+add kvm region registering function to check the flag
+and convert the region, and add memory listener to TDX guest code to set
+the flag to the possible memory region.
 
+Without this patch
+- Secure-EPT violation on private area
+- KVM_MEMORY_FAULT EXIT (kvm -> qemu)
+- qemu converts the 4K page from shared to private
+- Resume VCPU execution
+- Secure-EPT violation again
+- KVM resolves EPT Violation
+This also prevents huge page because page conversion is done at 4K
+granularity.  Although it's possible to merge 4K private mapping into
+2M large page, it slows guest boot.
+
+With this patch
+- After memory slot creation, convert the region from private to shared
+- Secure-EPT violation on private area.
+- KVM resolves EPT Violation
+
+Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/tdx.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ target/i386/kvm/tdx.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index a72badfbfd65..8a2491ed03c2 100644
+index 8a2491ed03c2..775110f8bd02 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -461,6 +461,15 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
+@@ -18,6 +18,7 @@
+ #include "standard-headers/asm-x86/kvm_para.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/sysemu.h"
++#include "exec/address-spaces.h"
  
-     update_tdx_cpuid_lookup_by_tdx_caps();
+ #include "hw/i386/x86.h"
+ #include "kvm_i386.h"
+@@ -578,6 +579,21 @@ out:
+     return r;
+ }
  
-+    /*
-+     * Set kvm_readonly_mem_allowed to false, because TDX only supports readonly
-+     * memory for shared memory but not for private memory. Besides, whether a
-+     * memslot is private or shared is not determined by QEMU.
-+     *
-+     * Thus, just mark readonly memory not supported for simplicity.
-+     */
-+    kvm_readonly_mem_allowed = false;
++static void tdx_guest_region_add(MemoryListener *listener,
++                                 MemoryRegionSection *section)
++{
++    if (memory_region_can_be_private(section->mr)) {
++        memory_region_set_default_private(section->mr);
++    }
++}
 +
-     tdx_guest = tdx;
++static MemoryListener tdx_memory_listener = {
++    .name = TYPE_TDX_GUEST,
++    .region_add = tdx_guest_region_add,
++    /* Higher than KVM memory listener = 10. */
++    .priority = MEMORY_LISTENER_PRIORITY_ACCEL_HIGH,
++};
++
+ static bool tdx_guest_get_sept_ve_disable(Object *obj, Error **errp)
+ {
+     TdxGuest *tdx = TDX_GUEST(obj);
+@@ -607,6 +623,12 @@ OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
+ static void tdx_guest_init(Object *obj)
+ {
+     TdxGuest *tdx = TDX_GUEST(obj);
++    static bool memory_listener_registered = false;
++
++    if (!memory_listener_registered) {
++        memory_listener_register(&tdx_memory_listener, &address_space_memory);
++        memory_listener_registered = true;
++    }
  
-     return 0;
+     qemu_mutex_init(&tdx->lock);
+ 
 -- 
 2.34.1
 
