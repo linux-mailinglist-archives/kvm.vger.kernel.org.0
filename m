@@ -2,224 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAB2E7815C3
-	for <lists+kvm@lfdr.de>; Sat, 19 Aug 2023 01:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DE8C7815D9
+	for <lists+kvm@lfdr.de>; Sat, 19 Aug 2023 01:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242456AbjHRXV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 19:21:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60994 "EHLO
+        id S242467AbjHRXfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 19:35:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242428AbjHRXU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 19:20:56 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81D0F4205
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 16:20:54 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-565ea69bb0cso2035226a12.0
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 16:20:54 -0700 (PDT)
+        with ESMTP id S241952AbjHRXfS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 19:35:18 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5549C26AA
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 16:35:17 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-268099fd4f5so1704934a91.1
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 16:35:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692400854; x=1693005654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PyLa/YXCWG8Ioi756bZyfqMYZZrLVzfhVj/H9cxHpY=;
-        b=M/a6/H/RyT0D8BSlwnGSke8lsFeU/rFAhJSvmVP4Mi3tp1Cthc49SxGvHn15pLBntt
-         buPtT2YNahM7IdodIebowj+D5P3MstG+M6vFFejySIdkPhart5qK6FwMmmGgZaOhagyy
-         E8ZTPTJlT6Bw2gfeHQwjFH0Kl8uyv0vCmMTrg7IdZ3hNpOxK0nzErbUS12y8vggb4Lvw
-         5gMrdsTSfsDOJkowen/bDkKQUtrUPJ5rMZFIZE+h9p5cLEdqUhH/2AW4v/vF1yDeYAVj
-         19f+WdGW/F26P0llX1k+uZfbIeh6M+8RZ6BfdfXhJltbQ1lxCeaborox5jR+TiAvyrL+
-         +2OQ==
+        d=google.com; s=20221208; t=1692401717; x=1693006517;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ym9SwmeM0EPR5aYHYUdgC/P1fnr32QdCKm3f+6XcXjc=;
+        b=Fv0Xz376xgfbogeLVo/xFfuLTRzprBEz5ZaGPXB4Ur1hfEMZIxb1yuw4VUcU7eJc94
+         dzehw7VYLMIm9IkWTD0asKDJDmvBiYp9oXxAVB4B1JfWh+ywV6o31j0Yd4wLak36umaa
+         +d5AyiEIcenOU5yVmxpLlgY3QPvYZhkM9rATPtRN7O/jU9tj86CrtrjrKkQgbpOm8Pj4
+         3k5MJqvXJcSFnt7TwMa0k2dLebjdKSkm0guwxab6EkC6UjLSDYSWvGiSn/L8wt/QGYLA
+         OA3VZB01v5tyvYxhBndx1DKpDsujYyisDDzwyXS/3OiuppqSUoaXISYPLIw5WNs485lU
+         ROAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692400854; x=1693005654;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PyLa/YXCWG8Ioi756bZyfqMYZZrLVzfhVj/H9cxHpY=;
-        b=XLEwXyy7fZT5CoVCnsao7Kl1uADh0J91zbyXiPxT7Jll9QE84DbwfN2QfdgzWtGG30
-         udS9bdWRpySwElf77QXUbhRyG9/LO8q65uYlc6gzaECoHu1BlEEme0hQXCh8AULEkA3B
-         1e9L8VkZ7Od0UeZL0CgveukvSiHhKZlf5+zTodSpldMGbwn3km3C2x4B+5X9nv53hdbz
-         UkqX2bbudPjQfCFgInuXfPUGY7glmyRR+K9BJgqTpuO136PtsEvVSzYjbXyg4KXEEvfO
-         JNvRMrP9JPF8A1Ce3Lv7b4Pbr+59yOJlQ1bYiUNkYvS71mfgMYjCoMLOrq/hhU662aBw
-         oGGA==
-X-Gm-Message-State: AOJu0Yy8MIAThhe9nBx+xOD/Uwz85I0lv2W6Qb+8fQepmA3uIsU2WSx5
-        8RAv+7fj8CA5bmsfxwsNgdqzyUsTiAo=
-X-Google-Smtp-Source: AGHT+IF4qS5R/BE7dJpAeC+QZGrTgckTfcEAGh0xkqcFb8AxU1bSBqKaL2z1ACwImIW/09VJP1acrmE4dFo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:b252:0:b0:563:932d:8cd7 with SMTP id
- t18-20020a63b252000000b00563932d8cd7mr126459pgo.2.1692400853932; Fri, 18 Aug
- 2023 16:20:53 -0700 (PDT)
-Date:   Fri, 18 Aug 2023 16:20:52 -0700
-In-Reply-To: <053b45023744f62bd97cd4f87f048ab514f42b9d.1691446946.git.ackerleytng@google.com>
+        d=1e100.net; s=20221208; t=1692401717; x=1693006517;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ym9SwmeM0EPR5aYHYUdgC/P1fnr32QdCKm3f+6XcXjc=;
+        b=VJM+/kjtdjOi2dfSXEXz99gwZgzHCI2lWkzlduOhVfcd8lwe8zXUxHXTy31hLI3hSC
+         ytVpwSLOqw254wvcZZATesK518Bd75ZymaudoDSk2PLpcycntV36aFHisRsm72ZQymul
+         bJjS1jiYvlVWkq4DcV40TqOXpAy4Be+B2xPffvtJbgLJYoKGhGB+qcqnGdM0UaSyCAT7
+         TcVwgK0mIlptZjpgal6lqpUXZLUAxUfjp9EUuotCiY1a7rNKNYA4yJWiw09InK40tHoW
+         ANvUyLJgX+/J5KrKhGKlxhMgBw7d9QA9x0bH/Aupe88blBcb2laJZPuZQjbS/PosSV0W
+         J2Bg==
+X-Gm-Message-State: AOJu0Yzy1/uNiqcd2uyC+YIjZ7aiUmGJKTP1UFWUkQOpoBqq2J8Gy3YO
+        1Y3jmZDBX7LDtoMxpRavSm7BkCwv4z8rcQLltA==
+X-Google-Smtp-Source: AGHT+IGPoBEVZBfu7UdhnVUWQ69Uoqx9M/TxjOmX9oQgTBDD0sje061EEqzwCebhqYC+9MOR0gBKrC6ClC3SPuJMvg==
+X-Received: from riemann.sea.corp.google.com ([2620:15c:100:201:63a2:7ca2:9ea:acb8])
+ (user=srutherford job=sendgmr) by 2002:a17:90b:e8b:b0:26d:a6b:9a47 with SMTP
+ id fv11-20020a17090b0e8b00b0026d0a6b9a47mr168989pjb.2.1692401716766; Fri, 18
+ Aug 2023 16:35:16 -0700 (PDT)
+Date:   Fri, 18 Aug 2023 16:34:51 -0700
 Mime-Version: 1.0
-References: <cover.1691446946.git.ackerleytng@google.com> <053b45023744f62bd97cd4f87f048ab514f42b9d.1691446946.git.ackerleytng@google.com>
-Message-ID: <ZN/81KNAWofRCaQK@google.com>
-Subject: Re: [RFC PATCH 02/11] KVM: guest_mem: Add ioctl KVM_LINK_GUEST_MEMFD
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ackerley Tng <ackerleytng@google.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com, shuah@kernel.org,
-        andrew.jones@linux.dev, ricarkol@google.com,
-        chao.p.peng@linux.intel.com, tabba@google.com, jarkko@kernel.org,
-        yu.c.zhang@linux.intel.com, vannapurve@google.com,
-        erdemaktas@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
-        david@redhat.com, qperret@google.com, michael.roth@amd.com,
-        wei.w.wang@intel.com, liam.merwick@oracle.com,
-        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230818233451.3615464-1-srutherford@google.com>
+Subject: [PATCH] x86/sev: Make early_set_memory_decrypted() calls page aligned
+From:   Steve Rutherford <srutherford@google.com>
+To:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
+        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com,
+        Steve Rutherford <srutherford@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 07, 2023, Ackerley Tng wrote:
-> KVM_LINK_GUEST_MEMFD will link a gmem fd's underlying inode to a new
-> file (and fd).
-> 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  include/uapi/linux/kvm.h |  8 +++++
->  virt/kvm/guest_mem.c     | 73 ++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/kvm_main.c      | 10 ++++++
->  virt/kvm/kvm_mm.h        |  7 ++++
->  4 files changed, 98 insertions(+)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index eb900344a054..d0e2a2ce0df2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -2299,4 +2299,12 @@ struct kvm_create_guest_memfd {
->  	__u64 reserved[6];
->  };
->  
-> +#define KVM_LINK_GUEST_MEMFD	_IOWR(KVMIO,  0xd5, struct kvm_link_guest_memfd)
-> +
-> +struct kvm_link_guest_memfd {
-> +	__u64 fd;
-> +	__u64 flags;
-> +	__u64 reserved[6];
-> +};
-> +
->  #endif /* __LINUX_KVM_H */
-> diff --git a/virt/kvm/guest_mem.c b/virt/kvm/guest_mem.c
-> index 30d0ab8745ee..1b3df273f785 100644
-> --- a/virt/kvm/guest_mem.c
-> +++ b/virt/kvm/guest_mem.c
-> @@ -477,6 +477,79 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
->  	return __kvm_gmem_create(kvm, size, flags, kvm_gmem_mnt);
->  }
->  
-> +static inline void __kvm_gmem_do_link(struct inode *inode)
-> +{
-> +	/* Refer to simple_link() */
-> +
-> +	inode->i_ctime = current_time(inode);
-> +	inc_nlink(inode);
-> +
-> +	/*
-> +	 * ihold() to add additional reference to inode for reference in dentry,
-> +	 * created in kvm_gmem_alloc_file() -> alloc_file_pseudo(). This is not
-> +	 * necessary when creating a new file because alloc_inode() creates
-> +	 * inodes with i_count = 1, which is the refcount for the dentry in the
-> +	 * file.
-> +	 */
-> +	ihold(inode);
-> +
-> +	/*
-> +	 * dget() and d_instantiate() complete the setup of a dentry, but those
-> +	 * have already been done in kvm_gmem_alloc_file() ->
-> +	 * alloc_file_pseudo()
-> +	 */
-> +}
+early_set_memory_decrypted() assumes its parameters are page aligned.
+Non-page aligned calls result in additional pages being marked as
+decrypted via the encryption status hypercall, which results in
+consistent corruption of pages during live migration. Live
+migration requires accurate encryption status information to avoid
+migrating pages from the wrong perspective.
 
-Does this have to be done before the fd is exposed to userspace, or can it be
-done after?  If it can be done after, I'd prefer to have the allocation helper
-also install the fd, and also rename it to something that better conveys that
-it's allocating more than just the file, e.g. that it allocates and initialize
-kvm_gmem too.
+Fixes: 4716276184ec ("X86/KVM: Decrypt shared per-cpu variables when SEV is active")
+Signed-off-by: Steve Rutherford <srutherford@google.com>
+---
+ arch/x86/kernel/kvm.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-Completely untested, but this is what I'm thinkin/hoping.
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 6a36db4f79fd..a0c072d3103c 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -419,7 +419,14 @@ static u64 kvm_steal_clock(int cpu)
+ 
+ static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
+ {
+-	early_set_memory_decrypted((unsigned long) ptr, size);
++	/*
++	 * early_set_memory_decrypted() requires page aligned parameters, but
++	 * this function needs to handle ptrs offset into a page.
++	 */
++	unsigned long start = PAGE_ALIGN_DOWN((unsigned long) ptr);
++	unsigned long end = (unsigned long) ptr + size;
++
++	early_set_memory_decrypted(start, end - start);
+ }
+ 
+ /*
+@@ -438,6 +445,11 @@ static void __init sev_map_percpu_data(void)
+ 		return;
+ 
+ 	for_each_possible_cpu(cpu) {
++		/*
++		 * Calling __set_percpu_decrypted() for each per-cpu variable is
++		 * inefficent, since it may decrypt the same page multiple times.
++		 * That said, it avoids the need for more complicated logic.
++		 */
+ 		__set_percpu_decrypted(&per_cpu(apf_reason, cpu), sizeof(apf_reason));
+ 		__set_percpu_decrypted(&per_cpu(steal_time, cpu), sizeof(steal_time));
+ 		__set_percpu_decrypted(&per_cpu(kvm_apic_eoi, cpu), sizeof(kvm_apic_eoi));
+-- 
+2.42.0.rc1.204.g551eb34607-goog
 
-static int kvm_gmem_alloc_view(struct kvm *kvm, struct inode *inode,
-			       struct vfsmount *mnt)
-{
-	struct file *file;
-	struct kvm_gmem *gmem;
-
-	gmem = kzalloc(sizeof(*gmem), GFP_KERNEL);
-	if (!gmem)
-		return -ENOMEM;
-
-	fd = get_unused_fd_flags(0);
-	if (fd < 0) {
-		r = fd;
-		goto err_fd;
-	}
-
-	file = alloc_file_pseudo(inode, mnt, "kvm-gmem", O_RDWR, &kvm_gmem_fops);
-	if (IS_ERR(file)) {
-		r = PTR_ERR(file);
-		goto err_file;
-	}
-
-	file->f_flags |= O_LARGEFILE;
-	file->f_mapping = inode->i_mapping;
-
-	kvm_get_kvm(kvm);
-	gmem->kvm = kvm;
-	xa_init(&gmem->bindings);
-
-	file->private_data = gmem;
-
-	list_add(&gmem->entry, &inode->i_mapping->private_list);
-
-	fd_install(fd, file);
-
-	return 0;
-err:
-	put_unused_fd(fd);
-err_fd:
-	kfree(gmem);
-	return r;
-}
-
-static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags,
-			     struct vfsmount *mnt)
-{
-	const char *anon_name = "[kvm-gmem]";
-	const struct qstr qname = QSTR_INIT(anon_name, strlen(anon_name));
-	struct inode *inode;
-	struct file *file;
-	int fd, err;
-
-	inode = alloc_anon_inode(mnt->mnt_sb);
-	if (IS_ERR(inode))
-		return PTR_ERR(inode);
-
-	err = security_inode_init_security_anon(inode, &qname, NULL);
-	if (err)
-		goto err;
-
-	inode->i_private = (void *)(unsigned long)flags;
-	inode->i_op = &kvm_gmem_iops;
-	inode->i_mapping->a_ops = &kvm_gmem_aops;
-	inode->i_mode |= S_IFREG;
-	inode->i_size = size;
-	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-	mapping_set_large_folios(inode->i_mapping);
-	mapping_set_unevictable(inode->i_mapping);
-	mapping_set_unmovable(inode->i_mapping);
-
-	fd = kvm_gmem_alloc_view(kvm, inode, mnt);
-	if (fd < 0) {
-		err = fd;
-		goto err;
-	}
-	return fd;
-err:
-	iput(inode);
-	return err;
-}
