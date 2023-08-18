@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E289780972
-	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 12:01:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 803D0780975
+	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 12:02:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353036AbjHRKBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 06:01:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
+        id S1359653AbjHRKBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 06:01:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359654AbjHRKAw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 06:00:52 -0400
+        with ESMTP id S1359650AbjHRKBP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 06:01:15 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBEC4493
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 03:00:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5879E3C31
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 03:00:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692352824; x=1723888824;
+  t=1692352847; x=1723888847;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/EAOo4QiTv+WCwOp3vnBiTGgevD+Nf2c+1qM9MsegVA=;
-  b=HVcPdNA2GsZSEwR1I2u/nwguYKgjBEezp+rrYGFr+7nnA7GnP9VJoVwf
-   wR+pjlDDCfS7a7Y+hCPOxd/Z4Feip34EGT/3vAHoXRIv9PrNlpfajJAy0
-   wZnnHH4NA+3A08LmLJACKWOdjD5vK9SPztTeTY706pke9QmwDEUkOPThb
-   Od79p3No7IXmVjwQSGM/mrh0kdD9r8jiYLGyrqMVA/XIvNp/VOT2X4oZf
-   uEeLjpFScTYO8Xfy6EGivVTj6Bkd3V7QseBE9emrwll9kT/itbdaluXV+
-   CsiJti8eDh5fgiJ1ZLO6rTabXUlZA07zeuWpAfkI5YhIasSRH4hcX34a5
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371966875"
+  bh=+/SvpCisWi7VrhwToytirBBYpzG+C0HWkIkqrhR7TC8=;
+  b=E4C6Ttlqxwwm1Ojgc9mmZurl17uaCkW9zhonMPsxNEoYAjwXnQPbGO1H
+   XkZXrvNx00TZkbprZVePgGfHMG6azhi73EHU8hnRX+4H6bfBAtPd0Bxv6
+   Y9Jc7Y3rs/z3dIGI5xWkBeaHaKAa0/cDawBBlU1WeRGf+h9rXCO+Gdj18
+   pO7n0lCtDDWKkHgTUmqbHzZaqVPxy8aFVaXi2u4Ydg7D4AFR+rtRPv9UD
+   9XtxqYo6YttGjrsbDpxbI+jwtjOBaSUQRLJPC9rQ/XtCosz1Gg8u0QdqH
+   aRBf7LAdELQ0SchVTH3i/FB9xQvp/j/NkyFgp0qPBuCDMCmwrWuSjO4AT
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371966893"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="371966875"
+   d="scan'208";a="371966893"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:58:47 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:58:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849235673"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849235703"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="849235673"
+   d="scan'208";a="849235703"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:58:42 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:58:47 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -58,9 +58,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Laszlo Ersek <lersek@redhat.com>, xiaoyao.li@intel.com,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v2 50/58] i386/tdx: Don't allow system reset for TDX VMs
-Date:   Fri, 18 Aug 2023 05:50:33 -0400
-Message-Id: <20230818095041.1973309-51-xiaoyao.li@intel.com>
+Subject: [PATCH v2 51/58] i386/tdx: LMCE is not supported for TDX
+Date:   Fri, 18 Aug 2023 05:50:34 -0400
+Message-Id: <20230818095041.1973309-52-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230818095041.1973309-1-xiaoyao.li@intel.com>
 References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
@@ -76,27 +76,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX CPU state is protected and thus vcpu state cann't be reset by VMM.
+LMCE is not supported TDX since KVM doesn't provide emulation for
+MSR_IA32_FEAT_CTL.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/kvm/kvm-cpu.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 601683d836c8..50b0218a8044 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -5918,7 +5918,7 @@ bool kvm_has_waitpkg(void)
+diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
+index 7237378a7d4e..bec8b5f918e7 100644
+--- a/target/i386/kvm/kvm-cpu.c
++++ b/target/i386/kvm/kvm-cpu.c
+@@ -15,6 +15,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/boards.h"
  
- bool kvm_arch_cpu_check_are_resettable(void)
- {
--    return !sev_es_enabled();
-+    return !sev_es_enabled() && !is_tdx_vm();
++#include "tdx.h"
+ #include "kvm_i386.h"
+ #include "hw/core/accel-cpu.h"
+ 
+@@ -59,6 +60,10 @@ static bool lmce_supported(void)
+     if (kvm_ioctl(kvm_state, KVM_X86_GET_MCE_CAP_SUPPORTED, &mce_cap) < 0) {
+         return false;
+     }
++
++    if (is_tdx_vm())
++        return false;
++
+     return !!(mce_cap & MCG_LMCE_P);
  }
  
- #define ARCH_REQ_XCOMP_GUEST_PERM       0x1025
 -- 
 2.34.1
 
