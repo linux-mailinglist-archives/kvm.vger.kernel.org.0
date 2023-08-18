@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6CF5780908
+	by mail.lfdr.de (Postfix) with ESMTP id 5DDB8780907
 	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 11:55:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359416AbjHRJzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 05:55:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
+        id S1359428AbjHRJzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 05:55:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359397AbjHRJyr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 05:54:47 -0400
+        with ESMTP id S1359400AbjHRJyw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 05:54:52 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B730272B
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 02:54:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E0B272B
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 02:54:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692352486; x=1723888486;
+  t=1692352491; x=1723888491;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZpMpLYwP7BA4LSVlZbzLcYK8rzVQTwQWcbJhJy6IyLo=;
-  b=da/UEgoGagwzxIQ8PlMP1LaSKaaQWQZOWF54N01iEqyY5P9QofeMdnsR
-   eH/C+xKEqM+VDQxRd5uq9PNbT17m/fCLMKhXdPAiIpETiYwoROZiv9xew
-   POoY83/glqzM3FhVtc+aTJwOzPONYhb7Zb88IO0Ow+AoemVjXth2YP8ws
-   3k9N/FdG7ssXFsxhDFoTnKOWF38gVQPgXEFGZ/U15osN8iVD+Qbp6IEnh
-   VJra8ATFguJidLtHl3XwfrqYhOnOhWVgmpXMH0dt9PG2t/3yUxii2l3ei
-   JIb6tyccp+KJaR1cmmGe6w4SUXiLTa3n0jg/n4ZOSqvOuE5hNdJDVadyb
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371965589"
+  bh=wfq2PaWbc9fbQ7uIuISP5p0awFJImI3phjNkL+qK1rQ=;
+  b=lWdH0a3LMxlMmKZ5LvnYtSUaC2Db7adsWZU4sWDHAsiHY9oVX39DHHkP
+   oXlOk5nJBTnsxDk3JQCSDK2+BYBz27761x8GxrW80DWhu1pTbpt3dQ5I6
+   Rb0MPzj3jjoVL3qkkhSAZ4RP1IPPSSAzyVJno2niJyREBpBTIdaTqvS1l
+   ckTlJhe2Ztm8VB/cGEtTJdulZOlpphwEx5cYBWYqiKguRpoQw+EXjDiwV
+   8zCUJ4/64i+GUUaV415yYZcsW0/qnPpMkWs9HFvL357wqRAk4xcBJ7r8U
+   Bn1yNQaWJTpsfTtB6Uvqn3WPZzA+wxZTAkTo+PWVe7Ytj0GCq7/mZL8DM
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371965621"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="371965589"
+   d="scan'208";a="371965621"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:54:46 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:54:51 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849234800"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849234807"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="849234800"
+   d="scan'208";a="849234807"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:54:40 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:54:46 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -58,9 +58,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Laszlo Ersek <lersek@redhat.com>, xiaoyao.li@intel.com,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v2 04/58] target/i386: Introduce kvm_confidential_guest_init()
-Date:   Fri, 18 Aug 2023 05:49:47 -0400
-Message-Id: <20230818095041.1973309-5-xiaoyao.li@intel.com>
+Subject: [PATCH v2 05/58] i386/tdx: Implement tdx_kvm_init() to initialize TDX VM context
+Date:   Fri, 18 Aug 2023 05:49:48 -0400
+Message-Id: <20230818095041.1973309-6-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230818095041.1973309-1-xiaoyao.li@intel.com>
 References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
@@ -76,71 +76,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a separate function kvm_confidential_guest_init() for SEV (and
-future TDX).
+Introduce tdx_kvm_init() and invoke it in kvm_confidential_guest_init()
+if it's a TDX VM. More initialization will be added later.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- target/i386/kvm/kvm.c | 11 ++++++++++-
- target/i386/sev.c     |  1 -
- target/i386/sev.h     |  2 ++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ target/i386/kvm/kvm.c       | 15 ++++++---------
+ target/i386/kvm/meson.build |  2 +-
+ target/i386/kvm/tdx-stub.c  |  8 ++++++++
+ target/i386/kvm/tdx.c       |  7 +++++++
+ target/i386/kvm/tdx.h       |  2 ++
+ 5 files changed, 24 insertions(+), 10 deletions(-)
+ create mode 100644 target/i386/kvm/tdx-stub.c
 
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 77f4772afe6c..051307437ecd 100644
+index 051307437ecd..d6b988d6c2d1 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -2633,6 +2633,15 @@ static MemoryListener kvm_x86_sw_protected_vm_memory_listener = {
-     .priority = MEMORY_LISTENER_PRIORITY_ACCEL_HIGH,
- };
+@@ -63,6 +63,7 @@
+ #include "migration/blocker.h"
+ #include "exec/memattrs.h"
+ #include "trace.h"
++#include "tdx.h"
  
-+static int kvm_confidential_guest_init(MachineState *ms, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(ms->cgs), TYPE_SEV_GUEST)) {
-+        return sev_kvm_init(ms->cgs, errp);
-+    }
+ #include CONFIG_DEVICES
+ 
+@@ -2637,6 +2638,8 @@ static int kvm_confidential_guest_init(MachineState *ms, Error **errp)
+ {
+     if (object_dynamic_cast(OBJECT(ms->cgs), TYPE_SEV_GUEST)) {
+         return sev_kvm_init(ms->cgs, errp);
++    } else if (object_dynamic_cast(OBJECT(ms->cgs), TYPE_TDX_GUEST)) {
++        return tdx_kvm_init(ms, errp);
+     }
+ 
+     return 0;
+@@ -2652,16 +2655,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     Error *local_err = NULL;
+ 
+     /*
+-     * Initialize SEV context, if required
++     * Initialize confidential guest (SEV/TDX) context, if required
+      *
+-     * If no memory encryption is requested (ms->cgs == NULL) this is
+-     * a no-op.
+-     *
+-     * It's also a no-op if a non-SEV confidential guest support
+-     * mechanism is selected.  SEV is the only mechanism available to
+-     * select on x86 at present, so this doesn't arise, but if new
+-     * mechanisms are supported in future (e.g. TDX), they'll need
+-     * their own initialization either here or elsewhere.
++     * It's a no-op if a non-SEV/non-tdx confidential guest support
++     * mechanism is selected, i.e., ms->cgs == NULL
+      */
+     ret = kvm_confidential_guest_init(ms, &local_err);
+     if (ret < 0) {
+diff --git a/target/i386/kvm/meson.build b/target/i386/kvm/meson.build
+index 21ab03fe1349..876350a387aa 100644
+--- a/target/i386/kvm/meson.build
++++ b/target/i386/kvm/meson.build
+@@ -11,7 +11,7 @@ i386_softmmu_kvm_ss.add(when: 'CONFIG_XEN_EMU', if_true: files('xen-emu.c'))
+ 
+ i386_softmmu_kvm_ss.add(when: 'CONFIG_SEV', if_false: files('sev-stub.c'))
+ 
+-i386_softmmu_kvm_ss.add(when: 'CONFIG_TDX', if_true: files('tdx.c'))
++i386_softmmu_kvm_ss.add(when: 'CONFIG_TDX', if_true: files('tdx.c'), if_false: files('tdx-stub.c'))
+ 
+ i386_system_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'), if_false: files('hyperv-stub.c'))
+ 
+diff --git a/target/i386/kvm/tdx-stub.c b/target/i386/kvm/tdx-stub.c
+new file mode 100644
+index 000000000000..1d866d5496bf
+--- /dev/null
++++ b/target/i386/kvm/tdx-stub.c
+@@ -0,0 +1,8 @@
++#include "qemu/osdep.h"
 +
++#include "tdx.h"
++
++int tdx_kvm_init(MachineState *ms, Error **errp)
++{
++    return -EINVAL;
++}
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index d3792d4a3d56..77e33ae01147 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -12,10 +12,17 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "qom/object_interfaces.h"
+ 
++#include "hw/i386/x86.h"
+ #include "tdx.h"
+ 
++int tdx_kvm_init(MachineState *ms, Error **errp)
++{
 +    return 0;
 +}
 +
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     X86MachineState *x86ms = X86_MACHINE(ms);
-@@ -2654,7 +2663,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      * mechanisms are supported in future (e.g. TDX), they'll need
-      * their own initialization either here or elsewhere.
-      */
--    ret = sev_kvm_init(ms->cgs, &local_err);
-+    ret = kvm_confidential_guest_init(ms, &local_err);
-     if (ret < 0) {
-         error_report_err(local_err);
-         return ret;
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index fe2144c0388b..5aa04863846d 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -39,7 +39,6 @@
- #include "hw/i386/pc.h"
- #include "exec/address-spaces.h"
+ /* tdx guest */
+ OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
+                                    tdx_guest,
+diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+index 415aeb5af746..c8a23d95258d 100644
+--- a/target/i386/kvm/tdx.h
++++ b/target/i386/kvm/tdx.h
+@@ -16,4 +16,6 @@ typedef struct TdxGuest {
+     uint64_t attributes;    /* TD attributes */
+ } TdxGuest;
  
--#define TYPE_SEV_GUEST "sev-guest"
- OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
- 
- 
-diff --git a/target/i386/sev.h b/target/i386/sev.h
-index 7b1528248a54..64fbf186dbd2 100644
---- a/target/i386/sev.h
-+++ b/target/i386/sev.h
-@@ -20,6 +20,8 @@
- 
- #include "exec/confidential-guest-support.h"
- 
-+#define TYPE_SEV_GUEST "sev-guest"
++int tdx_kvm_init(MachineState *ms, Error **errp);
 +
- #define SEV_POLICY_NODBG        0x1
- #define SEV_POLICY_NOKS         0x2
- #define SEV_POLICY_ES           0x4
+ #endif /* QEMU_I386_TDX_H */
 -- 
 2.34.1
 
