@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A226C780951
-	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 12:00:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F141780953
+	for <lists+kvm@lfdr.de>; Fri, 18 Aug 2023 12:00:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359586AbjHRJ7x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Aug 2023 05:59:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47836 "EHLO
+        id S1359597AbjHRJ75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Aug 2023 05:59:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359658AbjHRJ72 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Aug 2023 05:59:28 -0400
+        with ESMTP id S1359671AbjHRJ7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Aug 2023 05:59:32 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E3BB422D
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 02:59:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B88F3AB4
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 02:59:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692352752; x=1723888752;
+  t=1692352754; x=1723888754;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mRmkkrsbcYl/h4unuPlDa8xITicU6e+dg3FGKV3epRg=;
-  b=JzFmhyKeGsKetRY8lZNug5ePkD1dkmLaJPS5QsYF7VWJJTZugaPTV/j4
-   +25RHATQQt2WyLbn/dOP4aCOb3D/M2Qd8EdvxmBXYHIagoUyRIRs+GLJV
-   Tf8Rm/NohB//Xo4LORcccLK1nEVU9Hk+B+Hnwk2s48qXrVlO1CymeUmCQ
-   +hzfXSM4f30P8fyjKlyLBy0tXWRWNpM4C3Iaei5F8sm4m2fA65g7wGl4l
-   qJK0m9kwFT3kh4alDVtJXiAPqT6j8aOh6vi6i2yq7NqQgnOmFIwWGFn3i
-   zXiDhou4PsMSwLNthyKAcRwvhfHGPwukyY0Qs2znEhYznO9yuHNWUTow6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371966487"
+  bh=n6J9qyA7Bfj5B8pEb9VtkWEigfZf2sgdu905dTUQSJY=;
+  b=PO3T266HpOwYnw+AuhjJ3j75ToJmcF3YeDG3aEWJ49tx3E5p5vHX7ywa
+   2cdXiC3qo6ldg9EvdyHfW0FkPWruTzy85vcMLS4Ik4U7HsXK321NOWmNw
+   r+W6Oto3hpsT2u/EgmMO400zNImTCOt5RbbMQLuB41t+UBuBNO3cWh1ks
+   Da/Y8qmx0DGr/2cBv9erXoqXYQ5kh1EPdjDVtgdLgEsjESRCvRuWogxm/
+   7HOBYgbPIjXfanb+xVUuuogOqWKQcGBmFurtI4UQbwFRjJj4EgtqUaFDY
+   CKQdrGqb0NBBkfKBWzt3AFjJUOtXg9Z92IdPZ2ZyHHRz2QYDd2OCyBDp6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="371966555"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="371966487"
+   d="scan'208";a="371966555"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:57:39 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 02:57:44 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849235419"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849235429"
 X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="849235419"
+   d="scan'208";a="849235429"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.46])
-  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:57:34 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 18 Aug 2023 02:57:39 -0700
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -58,9 +58,9 @@ Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
         Laszlo Ersek <lersek@redhat.com>, xiaoyao.li@intel.com,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: [PATCH v2 37/58] i386/tdx: register TDVF as private memory
-Date:   Fri, 18 Aug 2023 05:50:20 -0400
-Message-Id: <20230818095041.1973309-38-xiaoyao.li@intel.com>
+Subject: [PATCH v2 38/58] i386/tdx: Call KVM_TDX_INIT_VCPU to initialize TDX vcpu
+Date:   Fri, 18 Aug 2023 05:50:21 -0400
+Message-Id: <20230818095041.1973309-39-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230818095041.1973309-1-xiaoyao.li@intel.com>
 References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
@@ -76,109 +76,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Chao Peng <chao.p.peng@linux.intel.com>
+TDX vcpu needs to be initialized by SEAMCALL(TDH.VP.INIT) and KVM
+provides vcpu level IOCTL KVM_TDX_INIT_VCPU for it.
 
-Allocate private gmem memory for BIOS if it's TD VM.
+KVM_TDX_INIT_VCPU needs the address of the HOB as input. Invoke it for
+each vcpu after HOB list is created.
 
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/i386/x86.c         |  9 ++++++++-
- target/i386/kvm/tdx.c | 17 +++++++++++++++++
- target/i386/kvm/tdx.h |  2 ++
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ target/i386/kvm/tdx.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index e2a1369e5dfc..a0c9f4d646e2 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -1151,8 +1151,15 @@ void x86_bios_rom_init(MachineState *ms, const char *default_firmware,
-         (bios_size % 65536) != 0) {
-         goto bios_error;
-     }
-+
-     bios = g_malloc(sizeof(*bios));
--    memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fatal);
-+    if (is_tdx_vm()) {
-+        memory_region_init_ram_gmem(bios, NULL, "pc.bios", bios_size, &error_fatal);
-+        tdx_set_tdvf_region(bios);
-+    } else {
-+        memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fatal);
-+    }
-+
-     if (sev_enabled() || is_tdx_vm()) {
-         /*
-          * The concept of a "reset" simply doesn't exist for
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 37ff0f4eea11..5b688eb39327 100644
+index 5b688eb39327..2d0efca6787b 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -456,6 +456,12 @@ static void update_tdx_cpuid_lookup_by_tdx_caps(void)
-             (tdx_caps->xfam_fixed1 & CPUID_XSTATE_XSS_MASK) >> 32;
+@@ -578,6 +578,22 @@ static void tdx_init_ram_entries(void)
+     tdx_guest->nr_ram_entries = j;
  }
  
-+void tdx_set_tdvf_region(MemoryRegion *tdvf_region)
++static void tdx_post_init_vcpus(void)
 +{
-+    assert(!tdx_guest->tdvf_region);
-+    tdx_guest->tdvf_region = tdvf_region;
++    TdxFirmwareEntry *hob;
++    CPUState *cpu;
++    int r;
++
++    hob = tdx_get_hob_entry(tdx_guest);
++    CPU_FOREACH(cpu) {
++        r = tdx_vcpu_ioctl(cpu, KVM_TDX_INIT_VCPU, 0, (void *)hob->address);
++        if (r < 0) {
++            error_report("KVM_TDX_INIT_VCPU failed %s", strerror(-r));
++            exit(1);
++        }
++    }
 +}
 +
- static TdxFirmwareEntry *tdx_get_hob_entry(TdxGuest *tdx)
- {
-     TdxFirmwareEntry *entry;
-@@ -576,6 +582,7 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+ static void tdx_finalize_vm(Notifier *notifier, void *unused)
  {
      TdxFirmware *tdvf = &tdx_guest->tdvf;
-     TdxFirmwareEntry *entry;
-+    RAMBlock *ram_block;
-     int r;
+@@ -610,6 +626,8 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
  
-     tdx_init_ram_entries();
-@@ -610,6 +617,12 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
-             .nr_pages = entry->size / 4096,
-         };
+     tdvf_hob_create(tdx_guest, tdx_get_hob_entry(tdx_guest));
  
-+        r = kvm_set_memory_attributes_private(entry->address, entry->size);
-+        if (r < 0) {
-+             error_report("Reserve initial private memory failed %s", strerror(-r));
-+             exit(1);
-+        }
++    tdx_post_init_vcpus();
 +
-         __u32 flags = entry->attributes & TDVF_SECTION_ATTRIBUTES_MR_EXTEND ?
-                       KVM_TDX_MEASURE_MEMORY_REGION : 0;
- 
-@@ -625,6 +638,10 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
-             entry->mem_ptr = NULL;
-         }
-     }
-+
-+    /* Tdvf image was copied into private region above. It becomes unnecessary. */
-+    ram_block = tdx_guest->tdvf_region->ram_block;
-+    ram_block_discard_range(ram_block, 0, ram_block->max_length);
- }
- 
- static Notifier tdx_machine_done_notify = {
-diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-index 9b3c427766ef..1c444b6cdb3f 100644
---- a/target/i386/kvm/tdx.h
-+++ b/target/i386/kvm/tdx.h
-@@ -38,6 +38,7 @@ typedef struct TdxGuest {
-     uint8_t mrownerconfig[48];  /* sha348 digest */
- 
-     TdxFirmware tdvf;
-+    MemoryRegion *tdvf_region;
- 
-     uint32_t nr_ram_entries;
-     TdxRamEntry *ram_entries;
-@@ -53,6 +54,7 @@ int tdx_kvm_init(MachineState *ms, Error **errp);
- void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
-                              uint32_t *ret);
- int tdx_pre_create_vcpu(CPUState *cpu);
-+void tdx_set_tdvf_region(MemoryRegion *tdvf_region);
- int tdx_parse_tdvf(void *flash_ptr, int size);
- 
- #endif /* QEMU_I386_TDX_H */
+     for_each_tdx_fw_entry(tdvf, entry) {
+         struct kvm_tdx_init_mem_region mem_region = {
+             .source_addr = (__u64)entry->mem_ptr,
 -- 
 2.34.1
 
