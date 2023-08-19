@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1A1078175F
-	for <lists+kvm@lfdr.de>; Sat, 19 Aug 2023 06:41:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1149D781760
+	for <lists+kvm@lfdr.de>; Sat, 19 Aug 2023 06:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234115AbjHSEkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 19 Aug 2023 00:40:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60770 "EHLO
+        id S240893AbjHSEke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Aug 2023 00:40:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241773AbjHSEkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 19 Aug 2023 00:40:00 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F4D3A8D
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 21:39:59 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58fbc0e0c6dso1758257b3.0
-        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 21:39:59 -0700 (PDT)
+        with ESMTP id S242377AbjHSEkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Aug 2023 00:40:02 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4D2A7
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 21:40:01 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58c583f885cso22819757b3.1
+        for <kvm@vger.kernel.org>; Fri, 18 Aug 2023 21:40:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692419999; x=1693024799;
+        d=google.com; s=20221208; t=1692420000; x=1693024800;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Seh1pUJAoJeQMsb3DjbA2692WgZC2RtCPmgGThvub30=;
-        b=DwkJD32BekuBCy2U4IGt+GsAXbEeNlO8nqmNBNRYSJRYAuGurqXGOPFa84zQOJUG6B
-         LNX++XExakKbrpEEtpeXFwLrXMqQNp6nJ7PgVb9YR2MT1ig76IumJt0+ofKZIrV3yULh
-         yRVADfXjNzU1NlxKdGULlj+buFsONnxtCUK14eD5NRvOz3hCTltJ/Hz89hHQ0QDm1LNu
-         b5zLZjuAV72if7vS438j5l1gDhM7Eb+jUFyBy+xk/4v1QNP09pY6tL2zIdftUFzWFDqJ
-         HGDtcaUnBhLuUXFvefYPtalWuV4aMkM8zuZRykC/3owI3r3scalOmigyXxpLegc0wNN8
-         H89Q==
+        bh=TAo6+1RgBMzjn0+tgeK+RdjREY7saD7U6oafRnw0fx8=;
+        b=rKmZ11ymHgsb8A+ZhygucloIc+RS76L/+ICgvOdkG41GnCGHyv62mTLMaS9ChptEpP
+         lvA1xiqLn4J6R1X02OildZNEMxMF9TecNNRaYeH6rjJWyLQkqoJeMsGfp5JonrhYLNRk
+         mDdPcat/mu45vFl46D66+iAGMZYw9xaBWB/TB2XxUh5u/wVpgjpMpB2nBT50PserrpvH
+         2EYr0YsubYR1ZjdOYElel/ObCyhTmWPldrY2I5/O26x1B45EYoCGCZ0I7tR4nieMf+HQ
+         zW9aW/c2M1C+Apy+b8eb/JPXMOTaf9toLNiJNtU/pt/w1OhyIe4YTU8+J+GEdx6Sn4Mr
+         UlDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692419999; x=1693024799;
+        d=1e100.net; s=20221208; t=1692420000; x=1693024800;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Seh1pUJAoJeQMsb3DjbA2692WgZC2RtCPmgGThvub30=;
-        b=SR8v5hXY40QSp5LWnRyH4/OYIJ3Ik5t5KUgVhMrOsD/7vYKH5FYy8LCEEpI6q2GznP
-         LVNP4TJNrQVRwZRlGo6dgRj/u5G8HJ8FfswwiBLz/3CoK5vcN+uo9IBvri7Hge1bbQQb
-         7qMky5S7RFW94oUK5AqIJkX7SBNBewTUWsxjrTlUYMalY5BJMzVxvBlMFLQT//oMgxQC
-         QWft1nezEmEJf/zvYMnPZN6zkBFoq04f5ZnvivYTRDVU9eAAXtk/LUW8q3zrTKeNXrSJ
-         KcekgTW4EzAJnFgBEMNJvb37qBan36XFBTB0PlBIrLlv3cQ4aR9Va5It9lu/7kvQSuNV
-         ve3g==
-X-Gm-Message-State: AOJu0YxQX6/A9vT0GSexcLydsy6TUDLznt1MQQC5Fllua6sMmxn1qxZW
-        +STsQGwgwKXWrnQ85mzt5zTM6fWXtdA=
-X-Google-Smtp-Source: AGHT+IHb42+dcZ0kfTh6jwPD34e2/SSiy6aoKrRAB1WAoCDxylqcANHFl34q+BzSpUcEkGGuqaQWd6kWUhU=
+        bh=TAo6+1RgBMzjn0+tgeK+RdjREY7saD7U6oafRnw0fx8=;
+        b=KBHJN0sPVMwiZWySdXo8IWxp6wlsYApN+pjbTxWgfKUqxrLaxOujKMAYgiTOy1hIZB
+         Gs0jcPjKezpNKtkkDQn47v8czs46NPxdwrTJLzrl6GtBQ5jOvNXOmj40E9lZbWsTBnuB
+         nYqBfBnZw8Qea6rgLuh8F6UAJ3fMarpPZ5F0d3ULyAgRRj6o2pwdzzjYX+/wDDFk5PL2
+         EjohfpxIz/b4H90qIEz6Ez1NygaVvijdmfU502jPWdGR6VCNspajzwlzJO0W+urzPmDI
+         UnAK7AdF3bUem027Rz/dhpe7irJmxs48EIZ195M/36DP9vVedl+Bih4uyHMHTKQqa+ca
+         2qLg==
+X-Gm-Message-State: AOJu0YwnY4IcedSbRUN+wNdi0FTbGt/PKTwxf4kYjnYd3PmJrAVXPVBR
+        C3SZK9BQ8iBBVhrUCJiMMy0idC8qMPw=
+X-Google-Smtp-Source: AGHT+IHX3mSDq9FhzDQbdS+XlHKtXxqy2p8nQlFtuOxi5Mt0UrnWf4ZYN4S6hnPUBVVyAcYA9P5COQcbbG4=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a81:764e:0:b0:584:3d8f:a425 with SMTP id
- j14-20020a81764e000000b005843d8fa425mr10578ywk.10.1692419998770; Fri, 18 Aug
- 2023 21:39:58 -0700 (PDT)
-Date:   Fri, 18 Aug 2023 21:39:44 -0700
+ (user=reijiw job=sendgmr) by 2002:a25:768f:0:b0:d3f:ccc:2053 with SMTP id
+ r137-20020a25768f000000b00d3f0ccc2053mr9506ybc.7.1692420000623; Fri, 18 Aug
+ 2023 21:40:00 -0700 (PDT)
+Date:   Fri, 18 Aug 2023 21:39:45 -0700
 In-Reply-To: <20230819043947.4100985-1-reijiw@google.com>
 Mime-Version: 1.0
 References: <20230819043947.4100985-1-reijiw@google.com>
 X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230819043947.4100985-2-reijiw@google.com>
-Subject: [PATCH v3 1/4] KVM: arm64: PMU: Disallow vPMU on non-uniform PMUVer
+Message-ID: <20230819043947.4100985-3-reijiw@google.com>
+Subject: [PATCH v3 2/4] KVM: arm64: PMU: Avoid inappropriate use of host's PMUVer
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
@@ -74,43 +74,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disallow userspace from configuring vPMU for guests on systems
-where the PMUVer is not uniform across all PEs.
-KVM has not been advertising PMUv3 to the guests with vPMU on
-such systems anyway, and such systems would be extremely
-uncommon and unlikely to even use KVM.
+Avoid using the PMUVer of the host's PMU hardware to determine
+the PMU event mask, except in one case, as the value of host's
+PMUVer may differ from the value of ID_AA64DFR0_EL1.PMUVer for
+the guest.
+
+The exception case is when using the PMUVer to determine the
+valid range of events for KVM_ARM_VCPU_PMU_V3_FILTER, as it has
+been allowing userspace to specify events that are valid for
+the PMU hardware, regardless of the value of the guest's
+ID_AA64DFR0_EL1.PMUVer.  KVM will use a valid range of events
+based on the value of the guest's ID_AA64DFR0_EL1.PMUVer,
+in order to effectively filter events that the guest attempts
+to program though.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/pmu-emul.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 560650972478..689bbd88fd69 100644
+index 689bbd88fd69..eaeb8fea7971 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -14,6 +14,7 @@
- #include <asm/kvm_emulate.h>
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/arm_pmuv3.h>
+@@ -36,12 +36,8 @@ static struct kvm_pmc *kvm_vcpu_idx_to_pmc(struct kvm_vcpu *vcpu, int cnt_idx)
+ 	return &vcpu->arch.pmu.pmc[cnt_idx];
+ }
  
- #define PERF_ATTR_CFG1_COUNTER_64BIT	BIT(0)
- 
-@@ -672,8 +673,11 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+-static u32 kvm_pmu_event_mask(struct kvm *kvm)
++static u32 __kvm_pmu_event_mask(unsigned int pmuver)
  {
- 	struct arm_pmu_entry *entry;
+-	unsigned int pmuver;
+-
+-	pmuver = kvm->arch.arm_pmu->pmuver;
+-
+ 	switch (pmuver) {
+ 	case ID_AA64DFR0_EL1_PMUVer_IMP:
+ 		return GENMASK(9, 0);
+@@ -56,6 +52,14 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+ 	}
+ }
  
--	if (pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_NI ||
--	    pmu->pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-+	/*
-+	 * Check the sanitised PMU version for the system, as KVM does not
-+	 * support implementations where PMUv3 exists on a subset of CPUs.
-+	 */
-+	if (!pmuv3_implemented(kvm_arm_pmu_get_pmuver_limit()))
- 		return;
++static u32 kvm_pmu_event_mask(struct kvm *kvm)
++{
++	u64 dfr0 = IDREG(kvm, SYS_ID_AA64DFR0_EL1);
++	u8 pmuver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMUVer, dfr0);
++
++	return __kvm_pmu_event_mask(pmuver);
++}
++
+ /**
+  * kvm_pmc_is_64bit - determine if counter is 64bit
+  * @pmc: counter context
+@@ -954,11 +958,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		return 0;
+ 	}
+ 	case KVM_ARM_VCPU_PMU_V3_FILTER: {
++		u8 pmuver = kvm_arm_pmu_get_pmuver_limit();
+ 		struct kvm_pmu_event_filter __user *uaddr;
+ 		struct kvm_pmu_event_filter filter;
+ 		int nr_events;
  
- 	mutex_lock(&arm_pmus_lock);
+-		nr_events = kvm_pmu_event_mask(kvm) + 1;
++		/*
++		 * Allow userspace to specify an event filter for the entire
++		 * event range supported by PMUVer of the hardware, rather
++		 * than the guest's PMUVer for KVM backward compatibility.
++		 */
++		nr_events = __kvm_pmu_event_mask(pmuver) + 1;
+ 
+ 		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
+ 
 -- 
 2.42.0.rc1.204.g551eb34607-goog
 
