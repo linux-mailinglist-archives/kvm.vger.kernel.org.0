@@ -2,148 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A8397825E6
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 10:56:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEB217825E3
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 10:56:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234214AbjHUI4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 04:56:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37138 "EHLO
+        id S234222AbjHUI4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 04:56:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234234AbjHUI4k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 04:56:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDE1AC2
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 01:55:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692608157;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=Z4QoAFMlDm0EX3Gh2oPcaAHVIq6YmWJXTQovRnPBUJI=;
-        b=g7G+/0Wuf7HycFt7nX3MjDZMxVNPsj7cNguItSZWjSfmRTDnNAbWHEZTStfrjlzCUmaRj6
-        B+B1ED6I3HSjp/p8xglYrvTd+vjNYcWzODZbkHSM8+dhUU04aU0vxj/F6bo+bY1C8L7PaR
-        MZiSF+wIiu55fPNfSQ6bBsBQVwr2yJU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-302-rdu1idYPNDC7x6haN7oAxA-1; Mon, 21 Aug 2023 04:55:53 -0400
-X-MC-Unique: rdu1idYPNDC7x6haN7oAxA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4405783394A;
-        Mon, 21 Aug 2023 08:55:53 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A550F40D2845;
-        Mon, 21 Aug 2023 08:55:50 +0000 (UTC)
-Date:   Mon, 21 Aug 2023 09:55:48 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v2 13/58] kvm: Introduce kvm_arch_pre_create_vcpu()
-Message-ID: <ZOMmlCwMr7Yzg7H2@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
- <20230818095041.1973309-14-xiaoyao.li@intel.com>
+        with ESMTP id S234214AbjHUI4d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 04:56:33 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1DC6BF;
+        Mon, 21 Aug 2023 01:56:30 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bdca7cc28dso23661615ad.1;
+        Mon, 21 Aug 2023 01:56:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692608190; x=1693212990;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yaARTK1IKbr/L5z1vAYgYr14zC5eiDTx8+QfE57cI4c=;
+        b=SBtahzx5JAoR32fbZQXbSZd3ixK/rsCVdiKug48VwPAYoHnEPQuA5fKLIWV5xLAxXk
+         cFa3Oj5kBxWjkKxzmEW0frig+okrtT15Wdy/a1fsA2mJM+WHMebtZgrMZbb15z4gyCKW
+         4WfAquUkyMROSYAqtkejSlgrq4hSputOSlwi7uo2qJwic0ID32N9DVLawnmqsdE8hiGn
+         tNRIfaMa5tTbk20OMyLDhRBzyB3K4rxScztO6do1g6uYPI7gi0fvF2iZ/srXeppPWt7t
+         hOYAPH1ymGh5v3WFbxd8zfFLMCBKsKwRnMq2L9cyqTE8mo4zFxbl81wksvBv6AWv6G1M
+         LxmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692608190; x=1693212990;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yaARTK1IKbr/L5z1vAYgYr14zC5eiDTx8+QfE57cI4c=;
+        b=YbjP4q5cc5/2cmIeHkbys9YaYHMGnyIWOMVxMD0gxLRN5lXoTpJcQ7FS3rVMqf4CPw
+         ogt+nbpQ1LCEeHEJjdDVaUXtDU+Ly8/VlzkhJ39rHHr7Fjo/FDMrHXiSBm84TUHISz0N
+         xywhZW86dy9KKammipF0T0+ly6cWI6xZXcVjyopI2Vdscd6Gj0T3gBJcBm0q7DpCn0t9
+         e+qtSzW8XjK6bpu9wQt7BYm4JtuM/XaiqsIS9gdUQwAFJ67AnYDKu/tjsC8k+a49ONEJ
+         HiuL61NbQ8qchNnQVMBf7KKyosjE9pXoSZKlrSKy9dsRzKEisjaauQzAolAxA3K9F9uU
+         Jwog==
+X-Gm-Message-State: AOJu0YxL9MR1xytJCZ+zu1vU2tuJCEsAycXtRT+G8A7S6KYToOZDyWsT
+        B/OqjbWaqc5K2JgCOWPGwOg=
+X-Google-Smtp-Source: AGHT+IHn7BW7v8NfGf0jxEtyK0auAftSpUByeNz/82mfmnFZ0B5fTTI4fs2osNjsoIfN5/lm3wM2Ug==
+X-Received: by 2002:a17:902:e84f:b0:1bb:8e13:deba with SMTP id t15-20020a170902e84f00b001bb8e13debamr7762899plg.11.1692608190165;
+        Mon, 21 Aug 2023 01:56:30 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id l19-20020a170902d35300b001b89891bfc4sm6496744plk.199.2023.08.21.01.56.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Aug 2023 01:56:29 -0700 (PDT)
+Message-ID: <56873cf7-ddaf-3e8d-3589-78700934c999@gmail.com>
+Date:   Mon, 21 Aug 2023 16:56:21 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230818095041.1973309-14-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH v3 02/11] KVM: selftests: Add pmu.h for PMU events and
+ common masks
+Content-Language: en-US
+To:     Jinrong Liang <ljr.kernel@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20230814115108.45741-1-cloudliang@tencent.com>
+ <20230814115108.45741-3-cloudliang@tencent.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20230814115108.45741-3-cloudliang@tencent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 18, 2023 at 05:49:56AM -0400, Xiaoyao Li wrote:
-> Introduce kvm_arch_pre_create_vcpu(), to perform arch-dependent
-> work prior to create any vcpu. This is for i386 TDX because it needs
-> call TDX_INIT_VM before creating any vcpu.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  accel/kvm/kvm-all.c  | 12 ++++++++++++
->  include/sysemu/kvm.h |  1 +
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index c9f3aab5e587..5071af917ae0 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -422,6 +422,11 @@ static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
->      return kvm_vm_ioctl(s, KVM_CREATE_VCPU, (void *)vcpu_id);
->  }
->  
-> +int __attribute__ ((weak)) kvm_arch_pre_create_vcpu(CPUState *cpu)
-> +{
-> +    return 0;
-> +}
-> +
->  int kvm_init_vcpu(CPUState *cpu, Error **errp)
->  {
->      KVMState *s = kvm_state;
-> @@ -430,6 +435,13 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
->  
->      trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
->  
-> +    ret = kvm_arch_pre_create_vcpu(cpu);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "%s: kvm_arch_pre_create_vcpu() failed",
-> +                        __func__);
+On 14/8/2023 7:50 pm, Jinrong Liang wrote:
+> +#define ARCH_PERFMON_EVENTSEL_EDGE		BIT_ULL(18)
+> +#define ARCH_PERFMON_EVENTSEL_PIN_CONTROL	BIT_ULL(19)
+> +#define ARCH_PERFMON_EVENTSEL_INT		BIT_ULL(20)
+> +#define ARCH_PERFMON_EVENTSEL_ANY		BIT_ULL(21)
+> +#define ARCH_PERFMON_EVENTSEL_ENABLE		BIT_ULL(22)
+> +#define ARCH_PERFMON_EVENTSEL_INV		BIT_ULL(23)
+> +#define ARCH_PERFMON_EVENTSEL_CMASK		GENMASK_ULL(31, 24)
 
-Don't report generic error messages here, when kvm_arch_pre_create_vcpu
-can provide a better error - pass the 'errp' into the kvm_arch_pre_create_vcpu
-method.
-
-> +        goto err;
-> +    }
-> +
->      ret = kvm_get_vcpu(s, kvm_arch_vcpu_id(cpu));
->      if (ret < 0) {
->          error_setg_errno(errp, -ret, "kvm_init_vcpu: kvm_get_vcpu failed (%lu)",
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 49c896d8a512..d89ec87072d7 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -371,6 +371,7 @@ int kvm_arch_put_registers(CPUState *cpu, int level);
->  
->  int kvm_arch_init(MachineState *ms, KVMState *s);
->  
-> +int kvm_arch_pre_create_vcpu(CPUState *cpu);
->  int kvm_arch_init_vcpu(CPUState *cpu);
->  int kvm_arch_destroy_vcpu(CPUState *cpu);
->  
-> -- 
-> 2.34.1
-> 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Could you write more test cases to cover all EVENTSEL bits including ENABLE bit ?
