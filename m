@@ -2,274 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 40859782820
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 13:45:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27BEA7828B2
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 14:13:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233053AbjHULpU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 07:45:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53758 "EHLO
+        id S234486AbjHUMNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 08:13:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbjHULpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 07:45:20 -0400
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D203DC;
-        Mon, 21 Aug 2023 04:45:18 -0700 (PDT)
-Received: by mail-ed1-x542.google.com with SMTP id 4fb4d7f45d1cf-523bf06f7f8so3877598a12.1;
-        Mon, 21 Aug 2023 04:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692618316; x=1693223116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BALywRkxD9F0CEbONXqG28uHu6lw1Ff8sK80X1DwiJM=;
-        b=Pic3ST5DV3SWUyromxS57M56pR1jRJcEBC6QTrbk5SlRNim35s3w9P8Uwed1pPmE+y
-         V6CtvNsrWFje4OVXZEUnWaJrNNQ0iGsxDdIkk7gqCz9AJAyXkne0JbrZpR/aHNR1ndao
-         JIIMTvDeq1IIux8ZxLhUi/oCLP71aUR9XbmwU9puMmZB5NCscNJfZjdaYIfzs0h2f8LQ
-         +ByHTM4x0MCkiWrbQ65mm6Q/psJyTrdwEc/3XS/11EF0PxTvkW915awqL502/aXiefTq
-         LVDfFJLUIx+DNZC9Lp+j75IzLUzDAQpXiHbC5yH0/4YlatPIhubaxpO4nzBz7XaqRcTY
-         hY3g==
+        with ESMTP id S232572AbjHUMNe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 08:13:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E0CBC
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 05:12:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692619969;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ECXndoZvyamApppBKPzFOUWu2BynJjW97KIWX+GR6Jk=;
+        b=WHNJ69ZTKP83i8+ewuurDnLy5dP3OGubWjpk6+h4Wx7JvT0XaUcw0QQAM6FlUvAjHIY1k6
+        BxasxQlpDUjnil9A8XkHvmFS/ctZgfVU2sX+fAxzC5QI5VJsKcYKLQ0U9EDSvitlzLxXjk
+        SNfqI1f/aKbNIPG9IOaHMTdR1Yg2djg=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-245-DgeR650aNgeLHfw5gavyQQ-1; Mon, 21 Aug 2023 08:12:48 -0400
+X-MC-Unique: DgeR650aNgeLHfw5gavyQQ-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-689fdf4c96dso600952b3a.1
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 05:12:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692618316; x=1693223116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BALywRkxD9F0CEbONXqG28uHu6lw1Ff8sK80X1DwiJM=;
-        b=gmgqz6mHa+761DrK7sPsTCF3ZEhP5tjD/jL5CAIef3f7Ptd5GLOIqDqHOkFXIdrdm7
-         th4r8VLSBiX8Q858u9tFmMUwtxMA4AIyGhYwSva72iJSUXkCKOiV7nzvBixGSlLlg9jf
-         SD7srF7lPEmzoV65qYjXt9FxaLM9/5qaI7nSA1zjmGXy3VqHULllKILvE37lkEynxUsE
-         qBSwItVam+0J00SKWcUIfJiKd8MwXChIjeY0cATentUwSbzee2HG0V1sPZs9iHqT2HBm
-         ady/aQ94vTegeDy4ZbE0Fs8n70dQIWQsD7aHhkJNFUgNavxhUPzMjv7K40MhsonJOz3u
-         LQAA==
-X-Gm-Message-State: AOJu0YwK/26a+x/BatsnJWb98Udap6LojK/rSzlchZN/aEsp8PMMLyOE
-        OK7CVyASJqKEIogcJUVlyYrOW9rOQuNbYvGGTO0=
-X-Google-Smtp-Source: AGHT+IH8zlxRY7nI7DYEwFxFGu2aewn0d3cfUZ54TTl4n+GaHg/hPKO8WmUJci3Fy5fi4dZkjI4WPxwR9ikjxtjkd3U=
-X-Received: by 2002:aa7:cd11:0:b0:522:6e3f:b65 with SMTP id
- b17-20020aa7cd11000000b005226e3f0b65mr4444561edw.33.1692618316401; Mon, 21
- Aug 2023 04:45:16 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692619966; x=1693224766;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ECXndoZvyamApppBKPzFOUWu2BynJjW97KIWX+GR6Jk=;
+        b=CZixkrXKqH1gvDhL+BeKewFqOBWrkCykVSNn9VRqgP0nU52xNN3KGkhRJx5nqM9txy
+         Nn2OrMdZy4J1HBgQ5Yb5tdW9/6+RcLP8hUt7nuDSez/i2yfj+IDxJ6Oz7CkMBHPlB/Ci
+         vKi3lHwvWiWX2sAihRARz+X7fzVD3i2D3DmQz0hzM4/qf2bijzwDIc5XXvCT2Lo0ZZsX
+         +zvY6Z8JHvKaRExiRU8LrCwS9oKdDHslIPHN8ziWc7ZgG3YVo6IR0Fm0N3ZuNi3XOmN6
+         7+Wy5iM6T3qv9MFoYTclST5uWEhuKoxYHv95ayrBePjUXiC5env5XQ+baCQ7xunKZDYd
+         qQrw==
+X-Gm-Message-State: AOJu0Yxd35JpZWQqmbYMr+qUPdd2Z/PVHjgU46t1lAR9fLdkoYzkGtNH
+        w+VKnUkvuXb8yQg5EWXJZheASE9GriLLMozdWale22FOS3EFMwdEuB8+efydYt/82JEi1DdaMFQ
+        h4AMX/2t6Z5ET
+X-Received: by 2002:a05:6a00:1f89:b0:68a:33fc:a091 with SMTP id bg9-20020a056a001f8900b0068a33fca091mr5833939pfb.3.1692619965773;
+        Mon, 21 Aug 2023 05:12:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFvw1hhG3XW7vCKln+lTK3xY6Su93VvprY9gNYjCOP5faDv3G1wVKA6bGu165soGXVLu5is+g==
+X-Received: by 2002:a05:6a00:1f89:b0:68a:33fc:a091 with SMTP id bg9-20020a056a001f8900b0068a33fca091mr5833910pfb.3.1692619965352;
+        Mon, 21 Aug 2023 05:12:45 -0700 (PDT)
+Received: from [10.72.112.73] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id j20-20020a62e914000000b00688c733fe92sm5982354pfh.215.2023.08.21.05.12.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Aug 2023 05:12:44 -0700 (PDT)
+Message-ID: <6dc460d2-c7fb-e299-b0a3-55b43de31555@redhat.com>
+Date:   Mon, 21 Aug 2023 20:12:39 +0800
 MIME-Version: 1.0
-References: <20230814115108.45741-1-cloudliang@tencent.com>
- <20230814115108.45741-4-cloudliang@tencent.com> <ZN6lKvN2xvQOSnnz@google.com>
-In-Reply-To: <ZN6lKvN2xvQOSnnz@google.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Mon, 21 Aug 2023 19:45:05 +0800
-Message-ID: <CAFg_LQXJqEZ=2cSA9n5nQV12kpy6LL_mZVO2MuBKq_YwGg4V2Q@mail.gmail.com>
-Subject: Re: [PATCH v3 03/11] KVM: selftests: Test Intel PMU architectural
- events on gp counters
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Like Xu <likexu@tencent.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
+ PMCR_EL0.N for the guest
+Content-Language: en-US
+To:     Raghavendra Rao Ananta <rananta@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20230817003029.3073210-1-rananta@google.com>
+ <20230817003029.3073210-9-rananta@google.com>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <20230817003029.3073210-9-rananta@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> =E4=BA=8E2023=E5=B9=B48=E6=9C=8818=
-=E6=97=A5=E5=91=A8=E4=BA=94 06:54=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Aug 14, 2023, Jinrong Liang wrote:
-> > Add test case for AMD Guest PerfMonV2. Also test Intel
-> > MSR_CORE_PERF_GLOBAL_STATUS and MSR_CORE_PERF_GLOBAL_OVF_CTRL.
-> >
-> > Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> > ---
-> >  .../kvm/x86_64/pmu_basic_functionality_test.c | 48 ++++++++++++++++++-
-> >  1 file changed, 46 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality=
-_test.c b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-> > index cb2a7ad5c504..02bd1fe3900b 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/pmu_basic_functionality_test.c
-> > @@ -58,7 +58,9 @@ static uint64_t run_vcpu(struct kvm_vcpu *vcpu, uint6=
-4_t *ucall_arg)
-> >
-> >  static void guest_measure_loop(uint64_t event_code)
-> >  {
-> > +     uint64_t global_ovf_ctrl_msr, global_status_msr, global_ctrl_msr;
-> >       uint8_t nr_gp_counters, pmu_version =3D 1;
-> > +     uint8_t gp_counter_bit_width =3D 48;
-> >       uint64_t event_sel_msr;
-> >       uint32_t counter_msr;
-> >       unsigned int i;
-> > @@ -68,6 +70,12 @@ static void guest_measure_loop(uint64_t event_code)
-> >               pmu_version =3D this_cpu_property(X86_PROPERTY_PMU_VERSIO=
-N);
-> >               event_sel_msr =3D MSR_P6_EVNTSEL0;
-> >
-> > +             if (pmu_version > 1) {
-> > +                     global_ovf_ctrl_msr =3D MSR_CORE_PERF_GLOBAL_OVF_=
-CTRL;
-> > +                     global_status_msr =3D MSR_CORE_PERF_GLOBAL_STATUS=
-;
-> > +                     global_ctrl_msr =3D MSR_CORE_PERF_GLOBAL_CTRL;
-> > +             }
-> > +
-> >               if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES=
-)
-> >                       counter_msr =3D MSR_IA32_PMC0;
-> >               else
-> > @@ -76,6 +84,17 @@ static void guest_measure_loop(uint64_t event_code)
-> >               nr_gp_counters =3D AMD64_NR_COUNTERS;
-> >               event_sel_msr =3D MSR_K7_EVNTSEL0;
-> >               counter_msr =3D MSR_K7_PERFCTR0;
-> > +
-> > +             if (this_cpu_has(X86_FEATURE_AMD_PMU_EXT_CORE) &&
-> > +                 this_cpu_has(X86_FEATURE_AMD_PERFMON_V2)) {
-> > +                     nr_gp_counters =3D this_cpu_property(X86_PROPERTY=
-_AMD_PMU_NR_CORE_COUNTERS);
-> > +                     global_ovf_ctrl_msr =3D MSR_AMD64_PERF_CNTR_GLOBA=
-L_STATUS_CLR;
-> > +                     global_status_msr =3D MSR_AMD64_PERF_CNTR_GLOBAL_=
-STATUS;
-> > +                     global_ctrl_msr =3D MSR_AMD64_PERF_CNTR_GLOBAL_CT=
-L;
-> > +                     event_sel_msr =3D MSR_F15H_PERF_CTL0;
-> > +                     counter_msr =3D MSR_F15H_PERF_CTR0;
-> > +                     pmu_version =3D 2;
-> > +             }
->
-> Please use an if-else when the two things are completely exclusive, i.e. =
-don't
-> set "defaults" and then override them.
->
-> >       }
-> >
-> >       for (i =3D 0; i < nr_gp_counters; i++) {
-> > @@ -84,14 +103,39 @@ static void guest_measure_loop(uint64_t event_code=
-)
-> >                     ARCH_PERFMON_EVENTSEL_ENABLE | event_code);
-> >
-> >               if (pmu_version > 1) {
-> > -                     wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, BIT_ULL(i));
-> > +                     wrmsr(global_ctrl_msr, BIT_ULL(i));
-> >                       __asm__ __volatile__("loop ." : "+c"((int){NUM_BR=
-ANCHES}));
-> > -                     wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> > +                     wrmsr(global_ctrl_msr, 0);
-> >                       GUEST_SYNC(_rdpmc(i));
-> >               } else {
-> >                       __asm__ __volatile__("loop ." : "+c"((int){NUM_BR=
-ANCHES}));
-> >                       GUEST_SYNC(_rdpmc(i));
-> >               }
->
-> This is extremely difficult to follow.  I think the same thing to do is t=
-o split
-> this up into helpers, e.g. send pmu_version > 1 into one path, and pmu_ve=
-rsion <=3D 1
-> into an entirely different path.
->
-> E.g. something like this?
+Hi Raghavendra,
 
-I agree with all the proposed code changes you have provided. Your
-comments have been incredibly helpful in making the necessary
-improvements to the code. I will diligently follow your suggestions
-and modify the code accordingly.
+On 8/17/23 08:30, Raghavendra Rao Ananta wrote:
+> From: Reiji Watanabe <reijiw@google.com>
+> 
+> KVM does not yet support userspace modifying PMCR_EL0.N (With
+> the previous patch, KVM ignores what is written by upserspace).
+> Add support userspace limiting PMCR_EL0.N.
+> 
+> Disallow userspace to set PMCR_EL0.N to a value that is greater
+> than the host value (KVM_SET_ONE_REG will fail), as KVM doesn't
+> support more event counters than the host HW implements.
+> Although this is an ABI change, this change only affects
+> userspace setting PMCR_EL0.N to a larger value than the host.
+> As accesses to unadvertised event counters indices is CONSTRAINED
+> UNPREDICTABLE behavior, and PMCR_EL0.N was reset to the host value
+> on every vCPU reset before this series, I can't think of any
+> use case where a user space would do that.
+> 
+> Also, ignore writes to read-only bits that are cleared on vCPU reset,
+> and RES{0,1} bits (including writable bits that KVM doesn't support
+> yet), as those bits shouldn't be modified (at least with
+> the current KVM).
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>   arch/arm64/include/asm/kvm_host.h |  3 ++
+>   arch/arm64/kvm/pmu-emul.c         |  1 +
+>   arch/arm64/kvm/sys_regs.c         | 49 +++++++++++++++++++++++++++++--
+>   3 files changed, 51 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 0f2dbbe8f6a7e..c15ec365283d1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -259,6 +259,9 @@ struct kvm_arch {
+>   	/* PMCR_EL0.N value for the guest */
+>   	u8 pmcr_n;
+>   
+> +	/* Limit value of PMCR_EL0.N for the guest */
+> +	u8 pmcr_n_limit;
+> +
+>   	/* Hypercall features firmware registers' descriptor */
+>   	struct kvm_smccc_features smccc_feat;
+>   	struct maple_tree smccc_filter;
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index ce7de6bbdc967..39ad56a71ad20 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+>   	 * while the latter does not.
+>   	 */
+>   	kvm->arch.pmcr_n = arm_pmu->num_events - 1;
+> +	kvm->arch.pmcr_n_limit = arm_pmu->num_events - 1;
+>   
+>   	return 0;
+>   }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2075901356c5b..c01d62afa7db4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+>   	return 0;
+>   }
+>   
+> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
+> +		    u64 val)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	u64 new_n, mutable_mask;
+> +	int ret = 0;
+> +
+> +	new_n = FIELD_GET(ARMV8_PMU_PMCR_N, val);
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +	if (unlikely(new_n != kvm->arch.pmcr_n)) {
+> +		/*
+> +		 * The vCPU can't have more counters than the PMU
+> +		 * hardware implements.
+> +		 */
+> +		if (new_n <= kvm->arch.pmcr_n_limit)
+> +			kvm->arch.pmcr_n = new_n;
+> +		else
+> +			ret = -EINVAL;
+> +	}
 
->
-> static void guest_measure_loop(uint64_t event_code)
-> {
->         uint64_t global_ovf_ctrl_msr, global_status_msr, global_ctrl_msr;
->         uint8_t nr_gp_counters, pmu_version;
->         uint8_t gp_counter_bit_width;
->         uint64_t event_sel_msr;
->         uint32_t counter_msr;
->         unsigned int i;
->
->         if (host_cpu_is_intel)
->                 pmu_version =3D this_cpu_property(X86_PROPERTY_PMU_VERSIO=
-N);
->         else if (this_cpu_has(X86_FEATURE_PERFCTR_CORE) &&
->                  this_cpu_has(X86_FEATURE_PERFMON_V2)) {
->                 pmu_version =3D 2;
->         } else {
->                 pmu_version =3D 1;
->         }
->
->         if (pmu_version <=3D 1) {
->                 guest_measure_pmu_legacy(...);
->                 return;
->         }
->
->         if (host_cpu_is_intel) {
->                 nr_gp_counters =3D this_cpu_property(X86_PROPERTY_PMU_NR_=
-GP_COUNTERS);
->                 global_ovf_ctrl_msr =3D MSR_CORE_PERF_GLOBAL_OVF_CTRL;
->                 global_status_msr =3D MSR_CORE_PERF_GLOBAL_STATUS;
->                 global_ctrl_msr =3D MSR_CORE_PERF_GLOBAL_CTRL;
->                 gp_counter_bit_width =3D this_cpu_property(X86_PROPERTY_P=
-MU_GP_COUNTERS_BIT_WIDTH);
->
->                 if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES=
-)
->                         counter_msr =3D MSR_IA32_PMC0;
->                 else
->                         counter_msr =3D MSR_IA32_PERFCTR0;
->         } else {
->                 nr_gp_counters =3D this_cpu_property(X86_PROPERTY_AMD_PMU=
-_NR_CORE_COUNTERS);
->                 global_ovf_ctrl_msr =3D MSR_AMD64_PERF_CNTR_GLOBAL_STATUS=
-_CLR;
->                 global_status_msr =3D MSR_AMD64_PERF_CNTR_GLOBAL_STATUS;
->                 global_ctrl_msr =3D MSR_AMD64_PERF_CNTR_GLOBAL_CTL;
->                 event_sel_msr =3D MSR_F15H_PERF_CTL0;
->                 counter_msr =3D MSR_F15H_PERF_CTR0;
->                 gp_counter_bit_width =3D 48;
->         }
->
->         for (i =3D 0; i < nr_gp_counters; i++) {
->                 wrmsr(counter_msr + i, 0);
->                 wrmsr(event_sel_msr + i, ARCH_PERFMON_EVENTSEL_OS |
->                       ARCH_PERFMON_EVENTSEL_ENABLE | event_code);
->
->                 wrmsr(global_ctrl_msr, BIT_ULL(i));
->                 __asm__ __volatile__("loop ." : "+c"((int){NUM_BRANCHES})=
-);
->                 wrmsr(global_ctrl_msr, 0);
->                 counter =3D _rdpmc(i);
->                 GUEST_ASSERT_EQ(this_pmu_has(...), !!counter);
->
->                 if ( _rdpmc(i)) {
->                         wrmsr(global_ctrl_msr, 0);
->                         wrmsr(counter_msr + i, 0);
->                         __asm__ __volatile__("loop ." : "+c"((int){NUM_BR=
-ANCHES}));
->                         GUEST_ASSERT(!_rdpmc(i));
->
->                         wrmsr(global_ctrl_msr, BIT_ULL(i));
->                         __asm__ __volatile__("loop ." : "+c"((int){NUM_BR=
-ANCHES}));
->                         GUEST_ASSERT(_rdpmc(i));
->
->                         wrmsr(global_ctrl_msr, 0);
->                         wrmsr(counter_msr + i, (1ULL << gp_counter_bit_wi=
-dth) - 2);
->                         wrmsr(global_ctrl_msr, BIT_ULL(i));
->                         __asm__ __volatile__("loop ." : "+c"((int){NUM_BR=
-ANCHES}));
->                         GUEST_ASSERT(rdmsr(global_status_msr) & BIT_ULL(i=
-));
->
->                         wrmsr(global_ctrl_msr, 0);
->                         wrmsr(global_ovf_ctrl_msr, BIT_ULL(i));
->                         GUEST_ASSERT(!(rdmsr(global_status_msr) & BIT_ULL=
-(i)));
->                 }
->         }
->
+Since we have set the default value of pmcr_n, if we want to set a new 
+pmcr_n, shouldn't it be a different value?
 
-I truly appreciate your time and effort in reviewing the code and
-providing such valuable feedback. Please feel free to share any
-further suggestions or ideas in the future.
+So how about change the checking to:
+
+if (likely(new_n <= kvm->arch.pmcr_n_limit)
+	kvm->arch.pmcr_n = new_n;
+else
+	ret = -EINVAL;
+
+what do you think?
+
+> +	mutex_unlock(&kvm->arch.config_lock);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*
+> +	 * Ignore writes to RES0 bits, read only bits that are cleared on
+> +	 * vCPU reset, and writable bits that KVM doesn't support yet.
+> +	 * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
+> +	 * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
+> +	 * But, we leave the bit as it is here, as the vCPU's PMUver might
+> +	 * be changed later (NOTE: the bit will be cleared on first vCPU run
+> +	 * if necessary).
+> +	 */
+> +	mutable_mask = (ARMV8_PMU_PMCR_MASK | ARMV8_PMU_PMCR_N);
+> +	val &= mutable_mask;
+> +	val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
+> +
+> +	/* The LC bit is RES1 when AArch32 is not supported */
+> +	if (!kvm_supports_32bit_el0())
+> +		val |= ARMV8_PMU_PMCR_LC;
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) = val;
+> +	return 0;
+> +}
+> +
+>   /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>   #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>   	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+> @@ -2147,8 +2192,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>   	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+>   	{ SYS_DESC(SYS_SVCR), undef_access },
+>   
+> -	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr,
+> -	  .reset = reset_pmcr, .reg = PMCR_EL0, .get_user = get_pmcr },
+> +	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+> +	  .reg = PMCR_EL0, .get_user = get_pmcr, .set_user = set_pmcr },
+
+A little confusing, since the PMU_SYS_REG() defines the default 
+visibility which is pmu_visibility can return REG_HIDDEN, the set_user 
+to pmcr will be blocked, how can it being set?
+
+Maybe I lose some details.
+
+Thanks,
+Shaoqin
+
+>   	{ PMU_SYS_REG(PMCNTENSET_EL0),
+>   	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
+>   	{ PMU_SYS_REG(PMCNTENCLR_EL0),
+
+-- 
+Shaoqin
+
