@@ -2,491 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 290F778233E
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 07:41:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8828A782345
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 07:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233208AbjHUFlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 01:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44652 "EHLO
+        id S233233AbjHUFoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 01:44:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231591AbjHUFlJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 01:41:09 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 811C9AA
-        for <kvm@vger.kernel.org>; Sun, 20 Aug 2023 22:41:04 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-56c2e882416so293759a12.3
-        for <kvm@vger.kernel.org>; Sun, 20 Aug 2023 22:41:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692596464; x=1693201264;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f/rUhCTglFi2QWpo8GpeApYnjKmZlXxNbMYbQ/FfcYw=;
-        b=PO2/hyciXUz3Eop5HgQFS+ggCmDbkRIlFr9X5sqCSd4OUGR6xmUZRK9je8TKEYUDin
-         AJlC69APXG/GcjoTzje8J46+phc3DGq+S6Rql8VOdMYX6zmhhKLXhy5o7zQ87MmVWi3C
-         OUC8leMtOYkH1Ny1GoGx9IyZzKSiYX936AAYKNpRIUC+AsGt5FkzWsxNinaG/b3H8kqf
-         g8wZHzwurFFn2/30bytXdxlHmBl87uU8dYftqEL15+JG01ezuANlURBF2PhR2uFpYwot
-         oZyMUdoBy9xVjFXuIjD4IKwVGuvxonUADGjMX9fxB6Blwb8TZygvXdClVf2YZLdZoUjd
-         p99g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692596464; x=1693201264;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f/rUhCTglFi2QWpo8GpeApYnjKmZlXxNbMYbQ/FfcYw=;
-        b=EOx2a+ihkKXi3LemYqmqC1G5gtuBlX9JJaIf3OWoSh2w1bu6sdsft6N3kF7yrR2Cmw
-         AiAmRjF8YC8nhvcSbbnFqLYfV/EOXrHC7vwkEUHNYWKIWlMsMV1pkf9bdA8cF9f0smqr
-         FE1NrdEWEFIqlTi2RidnO9BhEifv08jNM/2m9bfvGeUucs36075fiqgOnTmuQ07TqDS6
-         sN+kcC2AGK1Qae9C+tUszQlGIV5TKjGGGvnu17kccLQadKmFDPYFQk9ljmzpW/2TWglz
-         X6+UZhpGKEqvhslCnRPuivX/SwAqXyoJZ0vy47NjCVDaMAj6PSsxBneEr4QZip5Kf+Bc
-         jfJA==
-X-Gm-Message-State: AOJu0YznZwR49mb54Epyyy2YgwMA3H/zIcdI6G9avCWSfoiTQN7z5RWq
-        gcZQVebagN1xL48wNT7BCh+s2ehs+8nLEJEN
-X-Google-Smtp-Source: AGHT+IH6W36v2UUem3ehHsAu4upexo75yEnmU10TtATkJZJYQJ/Z68o6kmkCM3wCb0hJ//Wp7ZYPXQ==
-X-Received: by 2002:a17:902:7890:b0:1bd:d14a:7e14 with SMTP id q16-20020a170902789000b001bdd14a7e14mr3446484pll.65.1692596463482;
-        Sun, 20 Aug 2023 22:41:03 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id ju22-20020a170903429600b001b016313b1dsm6101286plb.86.2023.08.20.22.41.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Aug 2023 22:41:02 -0700 (PDT)
-Message-ID: <cee16915-b5a4-c4ba-8f9e-3d79c1c0d2c0@gmail.com>
-Date:   Mon, 21 Aug 2023 13:40:54 +0800
+        with ESMTP id S230228AbjHUFoo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 01:44:44 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499EFA3;
+        Sun, 20 Aug 2023 22:44:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692596683; x=1724132683;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Gx3SgnfGV8hbt3rcGhG27+mleRZghv8tlf8VVTaLsFI=;
+  b=St3fGZgDt35K6o0A5vhsqFZS4yttSqTXI5D0I8E+En60k16RlkhD6tVP
+   4/GRCgCav5cVU6+taKLUEUlFbnL8tmpW6VuPiTHeV9duy57gxD+NUy3dA
+   VEROw2i96fBNezT8WvzS131HneVak8PnKUy3u6mVkIVEWgcru6bQNkOd2
+   Oz68qdquyZDY3iiSavNhYB5md2kEDIJzV8lQy/17/i/XwbbM2NLY5XH7h
+   N1SSgrEC9g2R1i/U+KhbBXXi+HGxejqjJ6uzkETT7KCuyRI67OIuc8Ur9
+   ZvbbC8rz64O64pFr9DMo8CwSFtHXQmPK8wG+X/n+ZT4ZwwPuLmturYXiP
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="459869110"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="459869110"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2023 22:44:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="738780305"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="738780305"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.252.185.204]) ([10.252.185.204])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Aug 2023 22:44:37 -0700
+Message-ID: <51dfc143-aafd-fea2-26fe-e2e9025fcd21@linux.intel.com>
+Date:   Mon, 21 Aug 2023 13:44:33 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v3] Documentation: KVM: Add vPMU implementaion and gap
- document
-To:     Xiong Zhang <xiong.y.zhang@intel.com>
-Cc:     seanjc@google.com, weijiang.yang@intel.com,
-        dapeng1.mi@linux.intel.com, zhiyuan.lv@intel.com,
-        zhenyu.z.wang@intel.com, kan.liang@intel.com,
-        kvm list <kvm@vger.kernel.org>
-References: <20230810054518.329117-1-xiong.y.zhang@intel.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Cc:     baolu.lu@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] iommu: Make single-device group for PASID explicit
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>
+References: <20230814011759.102089-1-baolu.lu@linux.intel.com>
+ <20230814011759.102089-2-baolu.lu@linux.intel.com>
+ <BN9PR11MB5276E3C3D99C2DFA963805C98C1BA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230810054518.329117-1-xiong.y.zhang@intel.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <BN9PR11MB5276E3C3D99C2DFA963805C98C1BA@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/8/2023 1:45 pm, Xiong Zhang wrote:
-> Add a vPMU implementation and gap document to explain vArch PMU and vLBR
-> implementation in kvm, especially the current gap to support host and
-> guest perf event coexist.
+On 2023/8/18 11:56, Tian, Kevin wrote:
+>> From: Lu Baolu <baolu.lu@linux.intel.com>
+>> Sent: Monday, August 14, 2023 9:18 AM
+>>
+>> The PASID interfaces have always supported only single-device groups.
+>> This was first introduced in commit 26b25a2b98e45 ("iommu: Bind process
+>> address spaces to devices"), and has been kept consistent in subsequent
+>> commits.
+>>
+>> However, the core code doesn't explicitly check for this requirement
+>> after commit 201007ef707a8 ("PCI: Enable PASID only when ACS RR & UF
+>> enabled on upstream path"), which made this requirement implicit.
+>>
+>> Restore the check to make it explicit that the PASID interfaces only
+>> support devices belonging to single-device groups.
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   drivers/iommu/iommu.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 71b9c41f2a9e..f1eba60e573f 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -3408,6 +3408,11 @@ int iommu_attach_device_pasid(struct
+>> iommu_domain *domain,
+>>   		return -ENODEV;
+>>
+>>   	mutex_lock(&group->mutex);
+>> +	if (list_count_nodes(&group->devices) != 1) {
+>> +		ret = -EINVAL;
+>> +		goto out_unlock;
+>> +	}
+>> +
 > 
-> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
-> ---
-> Changelog:
-> v2 -> v3:
-> * When kvm perf event is inactive, it is in error state actually,
-> so inactive is changed into error.
-> * Fix make htmldoc warning
-> 
-> v1 -> v2:
-> * Refactor perf scheduler section
-> * Correct one sentence in vArch PMU section
-> ---
->   Documentation/virt/kvm/x86/index.rst |   1 +
->   Documentation/virt/kvm/x86/pmu.rst   | 332 +++++++++++++++++++++++++++
->   2 files changed, 333 insertions(+)
->   create mode 100644 Documentation/virt/kvm/x86/pmu.rst
-> 
-> diff --git a/Documentation/virt/kvm/x86/index.rst b/Documentation/virt/kvm/x86/index.rst
-> index 9ece6b8dc817..02c1c7b01bf3 100644
-> --- a/Documentation/virt/kvm/x86/index.rst
-> +++ b/Documentation/virt/kvm/x86/index.rst
-> @@ -14,5 +14,6 @@ KVM for x86 systems
->      mmu
->      msr
->      nested-vmx
-> +   pmu
->      running-nested-guests
->      timekeeping
-> diff --git a/Documentation/virt/kvm/x86/pmu.rst b/Documentation/virt/kvm/x86/pmu.rst
-> new file mode 100644
-> index 000000000000..503516c41119
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/x86/pmu.rst
-> @@ -0,0 +1,332 @@
-> +﻿.. SPDX-License-Identifier: GPL-2.0
+> I wonder whether we should also block adding new device to this
+> group once the single-device has pasid enabled. Otherwise the
 
-WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
-#34: FILE: Documentation/virt/kvm/x86/pmu.rst:1:
-+ï»¿.. SPDX-License-Identifier: GPL-2.0
+This has been guaranteed by pci_enable_pasid():
 
-> +
-> +==========================
-> +PMU virtualization for X86
+         if (!pci_acs_path_enabled(pdev, NULL, PCI_ACS_RR | PCI_ACS_UF))
+                 return -EINVAL;
 
-For Intel ?
+> check alone at attach time doesn't mean this group won't be
+> expanded to have multiple devices later.
 
-Many of the descriptions below are Intel features, so you either have to
-add AMD part or limit the scope, otherwise the reader will be confused.
-
-> +==========================
-> +
-> +:Author: Xiong Zhang <xiong.y.zhang@intel.com>
-> +:Copyright: (c) 2023, Intel.  All rights reserved.
-> +
-> +.. Contents
-> +
-> +1. Overview
-> +2. Perf Scheduler Basic
-
-I would strongly suggest moving this section out of KVM subsystem,
-Two possible locations:
-
-- Documentation/admin-guide/perf
-- tools/perf/Documentation/
-
-Or the better one, the man2/perf_event_open.2 page in the man-pages project:
-
-- 
-https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git/tree/man2/perf_event_open.2
-
-It's more generic and someone more appropriate could update and maintain it for 
-more readers.
-Here we only need to refer to it so as not to bother users with 
-outdated/mismatched content.
-
-> +3. Arch PMU virtualization
-> +4. LBR virtualization
-
-How about organizing it this way:
-
-1. PMU Overview
-2. Capability Enumeration
-3. Basic Counter Virtualization
-4. Intel PEBS Virtualization
-5. Intel LBR Virtualization
-6. KVM PMU APIs Guidance
-7. Limitations and TODOs
-8. Reference
-
-> +
-> +1. Overview
-> +===========
-> +
-> +KVM has supported PMU virtualization on x86 for many years and provides
-> +MSR based Arch PMU interface to the guest. The major features include
-> +Arch PMU v2, LBR and PEBS. Users have the same operation to profile
-> +performance in guest and host.
-> +KVM is a normal perf subsystem user as other perf subsystem users. When
-> +the guest access vPMU MSRs, KVM traps it and creates a perf event for it.
-> +This perf event takes part in perf scheduler to request PMU resources
-> +and let the guest use these resources.
-> +
-> +This document describes the X86 PMU virtualization architecture design
-> +and opens. It is organized as follows: Next section describes more
-> +details of Linux perf scheduler as it takes a key role in vPMU
-> +implementation and allocates PMU resources for guest usage. Then Arch
-> +PMU virtualization and LBR virtualization are introduced, each feature
-> +has sections to introduce implementation overview,  the expectation and
-> +gaps when host and guest perf events coexist.
-> +
-> +2. Perf Scheduler Basic
-> +=======================
-> +
-> +Perf subsystem users can not get PMU counter or resource directly, user
-> +should create a perf event first and specify event’s attribute which is
-> +used to choose PMU counters, then perf event joins in perf scheduler,
-> +perf scheduler assigns the corresponding PMU counter to a perf event.
-> +
-> +Perf event is created by perf_event_open() system call::
-> +
-> +    int syscall(SYS_perf_event_open, struct perf_event_attr *,
-> +		pid, cpu, group_fd, flags)
-> +    struct perf_event_attr {
-> +	    ......
-> +	    /* Major type: hardware/software/tracepoint/etc. */
-> +	    __u32   type;
-> +	    /* Type specific configuration information. */
-> +	    __u64   config;
-> +	    union {
-> +		    __u64      sample_period;
-> +		    __u64      sample_freq;
-> +	    }
-> +	   __u64   disabled :1;
-> +	           pinned   :1;
-> +		   exclude_user  :1;
-> +		   exclude_kernel :1;
-> +		   exclude_host   :1;
-> +	           exclude_guest  :1;
-> +	......
-> +    }
-> +
-> +The pid and cpu arguments allow specifying which process and CPU
-> +to monitor::
-> +
-> +  pid == 0 and cpu == -1
-> +        This measures the calling process/thread on any CPU.
-> +  pid == 0 and cpu >= 0
-> +        This measures the calling process/thread only when running on
-> +	the specified cpu.
-> +  pid > 0 and cpu == -1
-> +        This measures the specified process/thread on any cpu.
-> +  pid > 0 and cpu >= 0
-> +        This  measures the specified process/thread only when running
-> +	on the specified CPU.
-> +  pid == -1 and cpu >= 0
-> +        This measures all processes/threads on the specified CPU.
-> +  pid == -1 and cpu == -1
-> +        This setting is invalid and will return an error.
-> +
-> +Perf scheduler's responsibility is choosing which events are active at
-> +one moment and binding counter with perf event. As processor has limited
-> +PMU counters and other resource, only limited perf events can be active
-> +at one moment, the inactive perf event may be active in the next moment,
-> +perf scheduler has defined rules to control these things.
-> +
-> +Perf scheduler defines four types of perf event, defined by the pid and
-> +cpu arguments in perf_event_open(), plus perf_event_attr.pinned, their
-> +schedule priority are: per_cpu pinned > per_process pinned
-> +> per_cpu flexible > per_process flexible. High priority events can
-> +preempt low priority events when resources contend.
-> +
-> +perf event type::
-> +
-> +  --------------------------------------------------------
-> +  |                      |   pid   |   cpu   |   pinned  |
-> +  --------------------------------------------------------
-> +  | Per-cpu pinned       |   *    |   >= 0   |     1     |
-> +  --------------------------------------------------------
-> +  | Per-process pinned   |  >= 0  |    *     |     1     |
-> +  --------------------------------------------------------
-> +  | Per-cpu flexible     |   *    |   >= 0   |     0     |
-> +  --------------------------------------------------------
-> +  | Per-process flexible | >= 0   |    *     |     0     |
-> +  --------------------------------------------------------
-> +
-> +perf_event abstract::
-> +
-> +    struct perf_event {
-> +	    struct list_head       event_entry;
-> +	    ......
-> +	    struct pmu             *pmu;
-> +	    enum perf_event_state  state;
-> +	    local64_t              count;
-> +	    u64                    total_time_enabled;
-> +	    u64                    total_time_running;
-> +	    struct perf_event_attr attr;
-> +	    ......
-> +    }
-> +
-> +For per-cpu perf event, it is linked into per cpu global variable
-> +perf_cpu_context, for per-process perf event, it is linked into
-> +task_struct->perf_event_context.
-> +
-> +Usually the following cases cause perf event reschedule:
-> +1) In a context switch from one task to a different task.
-> +2) When an event is manually enabled.
-> +3) A call to perf_event_open() with disabled field of the
-> +perf_event_attr argument set to 0.
-> +
-> +When perf_event_open() or perf_event_enable() is called, perf event
-> +reschedule is needed on a specific cpu, perf will send an IPI to the
-> +target cpu, and the IPI handler will activate events ordered by event
-> +type, and will iterate all the eligible events in per cpu gloable
-> +variable perf_cpu_context and current->perf_event_context.
-> +
-> +When a perf event is sched out, this event mapped counter is disabled,
-> +and the counter's setting and count value are saved. When a perf event
-> +is sched in, perf driver assigns a counter to this event, the counter's
-> +setting and count values are restored from last saved.
-> +
-> +If the event could not be scheduled because no resource is available for
-> +it, pinned event goes into error state and is excluded from perf
-> +scheduler, the only way to recover it is re-enable it, flexible event
-> +goes into inactive state and can be multiplexed with other events if
-> +needed.
-> +
-> +
-> +3. Arch PMU virtualization
-> +==========================
-> +
-> +3.1. Overview
-> +-------------
-> +
-> +Once KVM/QEMU expose vcpu's Arch PMU capability into guest, the guest
-> +PMU driver would access the Arch PMU MSRs (including Fixed and GP
-> +counter) as the host does. All the guest Arch PMU MSRs accessing are
-> +interceptable.
-> +
-> +When a guest virtual counter is enabled through guest MSR writing, the
-> +KVM trap will create a kvm perf event through the perf subsystem. The
-> +kvm perf event's attribute is gotten from the guest virtual counter's
-> +MSR setting.
-> +
-> +When a guest changes the virtual counter's setting later, the KVM trap
-> +will release the old kvm perf event then create a new kvm perf event
-> +with the new setting.
-> +
-> +When guest read the virtual counter's count number, the kvm trap will
-> +read kvm perf event's counter value and accumulate it to the previous
-> +counter value.
-> +
-> +When guest no longer access the virtual counter's MSR within a
-> +scheduling time slice and the virtual counter is disabled, KVM will
-> +release the kvm perf event.
-> +
-> +vPMU diagram::
-> +
-> +  ----------------------------
-> +  |  Guest                   |
-> +  |  perf subsystem          |
-> +  ----------------------------
-> +       |            ^
-> +  vMSR |            | vPMI
-> +       v            |
-> +  ----------------------------
-> +  |  vPMU        KVM vCPU    |
-> +  ----------------------------
-> +        |          ^
-> +  Call  |          | Callbacks
-> +        v          |
-> +  ---------------------------
-> +  | Host Linux Kernel       |
-> +  | perf subsystem          |
-> +  ---------------------------
-> +               |       ^
-> +           MSR |       | PMI
-> +               v       |
-> +         --------------------
-> +	 | PMU        CPU   |
-> +         --------------------
-> +
-> +Each guest virtual counter has a corresponding kvm perf event, and the
-> +kvm perf event joins host perf scheduler and complies with host perf
-> +scheduler rule. When kvm perf event is scheduled by host perf scheduler
-> +and is active, the guest virtual counter could supply the correct value.
-> +However, if another host perf event comes in and takes over the kvm perf
-> +event resource, the kvm perf event will be in error state, then the
-> +virtual counter keeps the saved value when the kvm perf event is preempted.
-> +But guest perf doesn't notice the underbeach virtual counter is stopped, so
-> +the final guest profiling data is wrong.
-> +
-> +3.2. Host and Guest perf event contention
-> +-----------------------------------------
-> +
-> +Kvm perf event is a per-process pinned event, its priority is second.
-> +When kvm perf event is active, it can be preempted by host per-cpu
-> +pinned perf event, or it can preempt host flexible perf events. Such
-> +preemption can be temporarily prohibited through disabling host IRQ.
-> +
-> +The following results are expected when host and guest perf event
-> +coexist according to perf scheduler rule:
-> +1). if host per cpu pinned events occupy all the HW resource, kvm perf
-> +event can not be active as no available resource, the virtual counter
-> +value is zero always when the guest reads it.
-> +2). if host per cpu pinned event release HW resource, and kvm perf event
-> +is in error state, kvm perf event can claim the HW resource and switch into
-> +active, then the guest can get the correct value from the guest virtual
-> +counter during kvm perf event is active, but the guest total counter
-> +value is not correct since counter value is lost during kvm perf event
-> +is in error state.
-> +3). if kvm perf event is active, then host per cpu pinned perf event
-> +becomes active and reclaims kvm perf event resource, kvm perf event will
-> +be in error state. Finally the virtual counter value is kept unchanged and
-> +stores previous saved value when the guest reads it. So the guest total
-> +counter isn't correct.
-> +4). If host flexible perf events occupy all the HW resource, kvm perf
-> +event can be active and preempts host flexible perf event resource,
-> +the guest can get the correct value from the guest virtual counter.
-> +5). if kvm perf event is active, then other host flexible perf events
-> +request to active, kvm perf event still own the resource and active, so
-> +the guest can get the correct value from the guest virtual counter.
-> +
-> +3.3. vPMU Arch Gaps
-> +-------------------
-> +
-> +The coexist of host and guest perf events has gaps:
-> +1). when guest accesses PMU MSRs at the first time, KVM will trap it and
-> +create kvm perf event, but this event may be not active because the
-> +contention with host perf event. But guest doesn't notice this and when
-> +guest read virtual counter, the return value is zero.
-> +2). when kvm perf event is active, host per-cpu pinned perf event can
-> +reclaim kvm perf event resource at any time once resource contention
-> +happens. But guest doesn't notice this neither and guest following
-> +counter accesses get wrong data.
-> +So maillist had some discussion titled "Reconsider the current approach
-> +of vPMU".
-> +
-> +https://lore.kernel.org/lkml/810c3148-1791-de57-27c0-d1ac5ed35fb8@gmail.com/
-> +
-> +The major suggestion in this discussion is host pass-through some
-> +counters into guest, but this suggestion is not feasible, the reasons
-> +are:
-> +a. processor has several counters, but counters are not equal, some
-> +event must bind with a specific counter.
-> +b. if a special counter is passthrough into guest, host can not support
-> +such events and lose some capability.
-> +c. if a normal counter is passthrough into guest, guest can support
-> +general event only, and the guest has limited capability.
-> +So both host and guest lose capability in pass-through mode.
-> +
-> +4. LBR Virtualization
-> +=====================
-> +
-> +4.1. Overview
-> +-------------
-> +
-> +The guest LBR driver would access the LBR MSR (including IA32_DEBUGCTLMSR
-> +and records MSRs) as host does once KVM/QEMU export vcpu's LBR capability
-> +into guest,  The first guest access on LBR related MSRs is always
-> +interceptable. The KVM trap would create a vLBR perf event which enables
-> +the callstack mode and none of the hardware counters are assigned. The
-> +host perf would enable and schedule this event as usual.
-> +
-> +When vLBR event is scheduled by host perf scheduler and is active, host
-> +LBR MSRs are owned by guest and are pass-through into guest, guest will
-> +access them without VM Exit. However, if another host LBR event comes in
-> +and takes over the LBR facility, the vLBR event will be in error state,
-> +and the guest following access to the LBR MSRs will be trapped and
-> +meaningless.
-> +
-> +As kvm perf event, vLBR event will be released when guest doesn't access
-> +LBR-related MSRs within a scheduling time slice and guest unset LBR
-> +enable bit, then the pass-through state of the LBR MSRs will be canceled.
-> +
-> +4.2. Host and Guest LBR contention
-> +----------------------------------
-> +
-> +vLBR event is a per-process pinned event, its priority is second. vLBR
-> +event together with host other LBR event to contend LBR resource,
-> +according to perf scheduler rule, when vLBR event is active, it can be
-> +preempted by host per-cpu pinned LBR event, or it can preempt host
-> +flexible LBR event. Such preemption can be temporarily prohibited
-> +through disabling host IRQ as perf scheduler uses IPI to change LBR owner.
-> +
-> +The following results are expected when host and guest LBR event coexist:
-> +1) If host per cpu pinned LBR event is active when vm starts, the guest
-> +vLBR event can not preempt the LBR resource, so the guest can not use
-> +LBR.
-> +2). If host flexible LBR events are active when vm starts, guest vLBR
-> +event can preempt LBR, so the guest can use LBR.
-> +3). If host per cpu pinned LBR event becomes enabled when guest vLBR
-> +event is active, the guest vLBR event will lose LBR and the guest can
-> +not use LBR anymore.
-> +4). If host flexible LBR event becomes enabled when guest vLBR event is
-> +active, the guest vLBR event keeps LBR, the guest can still use LBR.
-> +5). If host per cpu pinned LBR event turns off when guest vLBR event is
-> +not active, guest vLBR event can be active and own LBR, the guest can use
-> +LBR.
-> +
-> +4.3. vLBR Arch Gaps
-> +-------------------
-> +
-> +Like vPMU Arch Gap, vLBR event can be preempted by host Per cpu pinned
-> +event at any time, or vLBR event is not active at creation, but guest
-> +can not notice this, so the guest will get meaningless value when the
-> +vLBR event is not active.
-> 
-> base-commit: 88bb466c9dec4f70d682cf38c685324e7b1b3d60
+Best regards,
+baolu
