@@ -2,259 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1BC783478
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 23:05:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2745783440
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 23:05:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230481AbjHUUYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 16:24:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48298 "EHLO
+        id S230494AbjHUU1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 16:27:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230463AbjHUUYM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 16:24:12 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26DF7101;
-        Mon, 21 Aug 2023 13:24:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kYsuDg71AJ+sMdII2fYAbH7Xz9OGhGep8UdaJ/44olsRrcCiZaO1oUgp7wLdxhQx8ct0jeiwKWA1uJC2PIddF+/eBW3/XK19DHnv0lkDl110CE9fJ/mm2UXUKEkzT3DiQ3AIylBMWRWN7IxDHo8JhpavWWm4o5+K/9GNec8p6Eud1bNl4xOyz3uJcCx5EHcQL0bVtzh45OhxF8y0kxak7Rzvl3yeiSUcKPG7rJXPJVPiEd9KgeUbDSS4Pj1fHSQL5hW3oci+inD0blcM2R/WvVlA5+XRp7PXeNAtejBFqEv/o2RF6Gu5tRuNJB4PhpZHWgTwzFB0l/d6pMEzklkzmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LVR4jTTo8Bt9J9ags44VtcQUyN4ahE+yrvWHnwtqRGA=;
- b=W8ZiElbDDFj6LUXCzwQcnh8yDKkUfCI+j4V+eTSA738L+g7xSmVYq0uTntBeJgqxqGsus2bdDzuy9Cbj7dJD5O1oOBg81cQUP8QD5/3BVXGgf+xOBilmZNNHZeV7lySCEsaE9q6cV1wTarSry+xWnl44/b9vH9ml3zkMw0yDOG5IdLTxKzBYuu/S9sJ/rv8iA+eUT9gd2yZZWGzdZtZ42J9aFKZOBlBRXSbjN0U23FmYuRje6hIVJck0hKJ2CmA/vvg3ZPRfizt9LZginkdzCnMHLxXL+jhTWlvFTRqgHYBk19s0p7oAbyPDTfXwx4gPkEWIwNESTToUYAeJ2gTl0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LVR4jTTo8Bt9J9ags44VtcQUyN4ahE+yrvWHnwtqRGA=;
- b=0l74L9RBX5SAvRF61OLu5EuIDxRo2f4TlO2fUlvTo75ulE/d4GlxWHqeVooPnT76UpBMNCYvr8STRBgbLO21Q1w7WXzwGvb45epWTrqZEtQ5yoXDDb1PGwvp+73d6CKXPuT8zP6pXQA7s1Pef+nBPKoWlcbxPr+bpOupwmYtLdg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by MW4PR12MB7167.namprd12.prod.outlook.com (2603:10b6:303:225::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Mon, 21 Aug
- 2023 20:24:05 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d267:7b8b:844f:8bcd]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d267:7b8b:844f:8bcd%7]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
- 20:24:05 +0000
-Message-ID: <303d2eb7-d337-8516-1120-13c4c2443d2e@amd.com>
-Date:   Mon, 21 Aug 2023 15:24:02 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] x86/sev: Make early_set_memory_decrypted() calls page
- aligned
-Content-Language: en-US
-To:     Steve Rutherford <srutherford@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
-        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
-References: <20230818233451.3615464-1-srutherford@google.com>
- <08418fc0-839a-f2fb-1c2e-b4f077d2647b@amd.com>
- <CABayD+cw3s1UDSN7oR4gWfRT4-snWEqOgAN-y4rzOpe-8D=KdA@mail.gmail.com>
- <2a391d50-d474-eec5-76ea-e5dc5590609c@amd.com>
- <CABayD+f3BLjg4ekO=b4yweqsV4-kA3nfDjKh7MieMh+=zvkA=Q@mail.gmail.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <CABayD+f3BLjg4ekO=b4yweqsV4-kA3nfDjKh7MieMh+=zvkA=Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA1PR04CA0012.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::15) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        with ESMTP id S230488AbjHUU1e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 16:27:34 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65EF8E3
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 13:27:30 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 165D684;
+        Mon, 21 Aug 2023 13:27:30 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id AvSqfoOeBXHq; Mon, 21 Aug 2023 13:27:25 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 86CE239;
+        Mon, 21 Aug 2023 13:27:25 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 86CE239
+Date:   Mon, 21 Aug 2023 13:27:25 -0700 (PDT)
+From:   Eric Wheeler <kvm@lists.ewheeler.net>
+To:     Sean Christopherson <seanjc@google.com>
+cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Subject: Re: Deadlock due to EPT_VIOLATION
+In-Reply-To: <418345e5-a3e5-6e8d-395a-f5551ea13e2@ewheeler.net>
+Message-ID: <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net>
+References: <ZMp3bR2YkK2QGIFH@google.com> <CAG+wEg2x-oGALCwKkHOxcrcdjP6ceU=K52UoQE2ht6ut1O46ug@mail.gmail.com> <ZMqX7TJavsx8WEY2@google.com> <CAG+wEg1d7xViMt3HDusmd=a6NArt_iMbxHwJHBcjyc=GntGK2g@mail.gmail.com> <ZNJ2V2vRXckMwPX2@google.com>
+ <c412929a-14ae-2e1-480-418c8d91368a@ewheeler.net> <ZNujhuG++dMbCp6Z@google.com> <5e678d57-66b-a18d-f97e-b41357fdb7f@ewheeler.net> <ZN5lD5Ro9LVgTA6M@google.com> <3ee6ddd4-74ad-9660-e3e5-a420a089ea54@ewheeler.net> <ZN+BRjUxouKiDSbx@google.com>
+ <418345e5-a3e5-6e8d-395a-f5551ea13e2@ewheeler.net>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|MW4PR12MB7167:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7108e812-17e5-4019-3f37-08dba28490e4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rA5dLjEnvGtt2gxoXfDQ7BSzk0vBqnObY7DCgRvgjX/U6ORUXfDw/Zs+Ho18INHpxG0kG/BkwgXVsg3QUcDfN1Z9AVPg4XEIgPmFJd1RGG7kSRieyqjoLjXsxsuV1t7SQDVLmqD/DcjwkXJcsqSlBEMrLoCKHo+DCwUaAPzucYTZMdroNHKiyAPnDFjvwFv3ftxkd12s2GZJLfR3TSuA5la8Oan9q/c/FBOhspKfQ0z1+pP+GilpgCjFXVLMWYqNe3SRDlUts244gyPRRBZzzbwtgWou8Pfo35KF2/RAR2e4EauEuEUb1QvDx6iOviYX/XVvUM/Vw3zAGbikUf8zUXoYHE4iN6HbAbS6uJP/2PiMqZBZ81BuJd7Ozd0xeRsa2lMDAmqW/HQL/wntW28aPyLXWa74d+HOLdm4c/3340nOmOtNCrQo66bqdA9Xg5+aWijNFuu7BTNDLlq/rNx98vHMzrpI0dC+MbG1sCv7Vn3T9660AgO/m+qxvybgptry9/NOaEh3Riua6kpdj+9/TNiM1sjbzhic2R01RucZM1vZm1E/WMTleSxwgJuLe1BgIuTm75Ag/bp2IbFrbRrpeEf0TC7wM77z4u6d2Jyq+YKbqiqXQCgrEdC+VOb4LxO/zayk98eoWI3Gg7t+bQ2d0Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(39860400002)(366004)(186009)(1800799009)(451199024)(54906003)(6916009)(66476007)(66556008)(316002)(66946007)(6512007)(8676002)(8936002)(2616005)(4326008)(36756003)(41300700001)(478600001)(6666004)(38100700002)(53546011)(6506007)(6486002)(83380400001)(2906002)(7416002)(86362001)(31686004)(31696002)(5660300002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z2VPdWhZRmZCQURCOTlBNlVrdmRxMzdTM3FOL0VKOWsza1dZVmNnYTlIM2U2?=
- =?utf-8?B?VGdENDBPUzJaQXhSbC9wTkRpdXpGQ1ZveE5DK1ZhaEN3dFpFbStsZXdOMWQw?=
- =?utf-8?B?OVVnNm9iVXNERDhpVm1TODQwMjhjTFE5N0p5NmJEL2oxc3JTTGp3TFBoYVE1?=
- =?utf-8?B?OWxKY0ZxVEJHQXVkUHdDSGQyRmdyZHNrblg3SGlQbFZ4UDQ2bStxUWw4MnYw?=
- =?utf-8?B?MldSL3EwYTc4YVV3UHJtc216VUZKY2JOdlRQQ24rUm9HL013U3JaK3U2V2J5?=
- =?utf-8?B?Z2luRmtva0wreHc4WGJGRU4zNGppV3E3c3NudGNFc21YbmdJS0lmR3FGeGpJ?=
- =?utf-8?B?WFpjY0dSMXFkaVdkR2Q3UExta3NKY3ByS2hWU052MElIdEt5cXphYlQwRkZD?=
- =?utf-8?B?Z05GaTl0bjhaVGhDME5UdTlHUGVNWEZmRUM1VUFhRFVkam50a2hFZXF1S2FC?=
- =?utf-8?B?enBhU0txYlNzaUd5K29xS3hFK0laekEwZ25sSUNYNFdZSGlpNURLaVNVOWpX?=
- =?utf-8?B?aHVjWk12RnR6dlNOVENSS216ODRodWp3OUwzMUY3NmczUlRGWkpwY0NRZUZP?=
- =?utf-8?B?cmhSZEFmWk14UEwrWXcxNk52Vkt2OTJxRFUwUmY1OTl3V2xyclBoaDViUmEr?=
- =?utf-8?B?TjRpWk4vRjdnbDN0bXg0NW80VzM1eDcxakNjWGVvSklGT25PZmhnS2NhOGJl?=
- =?utf-8?B?ejlWOWE4cEwxMGlVUTZpOGY1ZGpuK0RteUZ5U2FoWXhuVS8vWkIycCs5OUJO?=
- =?utf-8?B?VjlwM1p6ZWFjSVBlYjM2Slc1Z2NzLzRPMlEwK2dNQjQ0bDhkTlBmQzBZL3NF?=
- =?utf-8?B?cUUzSmJtUURoQlpSY0Jjd3NPcnBmNWxVTDBZY1RJcDdsY2RpR09ENmVBU1lU?=
- =?utf-8?B?S2tzb1ZzMVpjMkErR3Rod1kwRTAyd2JDVVpsRkdibjVsbUJoc0JNY0FKNTFS?=
- =?utf-8?B?U0NrWXdNTTZCNlMrWmd5M2ljSFRjbENHZjlTTzNMalN1MWV4cXZ3cFNmQVNG?=
- =?utf-8?B?RlJVSFhQd3dhcGNva1BYaTVRMFdTdmJvcFdZTEFHdDVzdEo2bytZTHlKSVhT?=
- =?utf-8?B?WXMzOVRrV3FjMC9mN1V4Sk9iRDUwakdxNitSc3ZKTjFCVnV6RjN0NU0wYkJ2?=
- =?utf-8?B?MGJMa1k4bkZDSXFDdFZQUGJzcjA1c3lSQ3luWXI2M2RhVUJUVWNNTWNFVkU2?=
- =?utf-8?B?cjBqWm9hdGNkNHJxYzJKWVQ3a2NNTFJmKzBZcGJQTzVVMWVzRXc2UUFrckc0?=
- =?utf-8?B?VkJzVGxMZTRGM2I2UTAxaUJMdzExOGpsL2N2MHYwZis2ekhGSnpDMFVSd1JE?=
- =?utf-8?B?V1J4ZTg4TS82akRrVlZOQVFuZjhyb1l1aFYzU3F0ZjMzd3luZ0cxaW9mNWg1?=
- =?utf-8?B?QmczVjBvYlo5aE5kRU9MRUh2dnFwNytrU3IwOC96T1N1UTJTaDZpUG9yY3cy?=
- =?utf-8?B?M0FqZ1hRU3FyeUVSejlwSS9KZTlBKzdvekZiR3U2OUNCbWxoQWdOQ2xWQ0hw?=
- =?utf-8?B?YXZiNitGYzZNNUh0VVJsbnRENzBNSDBmNE9xaEQ1Y0wwRjhxSWVXdGQ1TjZT?=
- =?utf-8?B?WWZjNXE1SWN1ZXFCdXFzU3g5NFpSRGp2dGxPSUJhV043RnRETDVRWmU0bTUy?=
- =?utf-8?B?NFpVTXF0d0k4REJOcmJWVWpJaWQ0WmpSbkM2KzZvY1JqY0NmcUlyWUZtNXdV?=
- =?utf-8?B?R2Z5am0rRDlobmY5azJuTEJLQjBFOUxBOWNHY0hNZzdDejZodnlXT1ZmMTho?=
- =?utf-8?B?SFM1UGladjc3M1RjMmZERjEvZWRNRWpMd0JuaGQ4QWhRRWhUYW5xWFFzazVT?=
- =?utf-8?B?MHdEb2pkTkJOSDUzTEVJUUhIUlVIdGkxTm81OHBrYjVUcG1lemhJTkRwMi80?=
- =?utf-8?B?YXNvUFJId1l1WVhjaDdYYVVQM0RlNS9aQ0c3aFZVa3dPcHd6eHNNK2lLdHBK?=
- =?utf-8?B?ZU13a1JnVTdEYjZybTViUkRwNlJkSkdEWGIyODlMK25VVVplZGJtSmhNSHJ1?=
- =?utf-8?B?WlN4cWxVQkZRVmJWaWczdm9vODFnY3lVQ0t0ZTlwdTA3NzFWS1V5M0hUWVdB?=
- =?utf-8?B?MTR5cmtrWmk1TXdRSitFQ09TdEhWWDB3U2ovZ2lyeU1vVjV3dlgxREttTjg2?=
- =?utf-8?Q?NFWxOqCOegLGINtDYpY2C1R8z?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7108e812-17e5-4019-3f37-08dba28490e4
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 20:24:05.4976
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wPYBe0nkk+KbzzxbMDBPesIdxpybne8rLndu3lmevSF8QeaPPDE8qBhmT+jPJvUuFsCCeF6kKW2/PaXq/Evdbg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7167
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="8323328-1343589949-1692649645=:24657"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/21/23 14:25, Steve Rutherford wrote:
-> On Mon, Aug 21, 2023 at 11:54 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->>
->> On 8/21/23 13:15, Steve Rutherford wrote:
->>> On Mon, Aug 21, 2023 at 6:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->>>>
->>>> On 8/18/23 18:34, Steve Rutherford wrote:
->>>>> early_set_memory_decrypted() assumes its parameters are page aligned.
->>>>> Non-page aligned calls result in additional pages being marked as
->>>>> decrypted via the encryption status hypercall, which results in
->>>>> consistent corruption of pages during live migration. Live
->>>>> migration requires accurate encryption status information to avoid
->>>>> migrating pages from the wrong perspective.
->>>>
->>>> Hmmm... I'm not sure this is the proper fix. The code is actually doing
->>>> the right thing from a encyrption/decryption point of view by checking the
->>>> c-bit for the PTE associated with the virtual address and the size
->>>> (possibly crossing page boundaries).
->>>>
->>>> I think the problem is on the call to early_set_mem_enc_dec_hypercall()
->>>> where it doesn't take into account the possible crossing of page
->>>> boundaries and so can under-count the number of pages, right?
->>>
->>> Right now, if you request decryption of e.g. a non-page aligned 0x40
->>> byte structure, it rounds the 0x40 bytes up to one page, and then
->>> hypercalls to mark both the page it's on and the subsequent page as
->>> decrypted (since the rounding stretches the structure onto the next
->>> page spuriously). The arithmetic in the combination of
->>> early_set_memory_enc_dec() and early_set_mem_enc_dec_hypercall() are
->>> correct if they are called with page aligned vaddrs (non-page-aligned
->>> sizes are fine iiuc).
->>
->> Ah, right, correct. It is still related to how the page count is
->> calculated for the hypercall, though, right? The encryption/decryption
->> operations function properly.
-> 
-> Yep! It's just the hypercall that behaves poorly in this situation.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Ok, cool.
+--8323328-1343589949-1692649645=:24657
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
->>
->> If another caller of early_set_memory_decrypted() gets added, it would
->> need to know to do the same thing. So I just wonder if this wouldn't be
->> better fixed in early_set_memory_enc_dec() by using a page aligned address
->> and proper number of pages when calling early_set_mem_enc_dec_hypercall()
->> or in early_set_mem_enc_dec_hypercall() where it would take a size
->> argument instead of a page count and does the proper work to get a page
->> aligned address and proper page count.
->>
->> Also, if it is the hypercall that is causing the issue, should the Fixes
->> tag be 064ce6c550a0 ("mm: x86: Invoke hypercall when page encryption
->> status is changed") since the problem is around the hypercall.
-> 
-> Fair question. I was torn about where to point this, since either
-> fixing up the value inside early_set_memory_enc_dec() or fixing up the
-> per-cpu callers is correct. The non-early version
-> (__set_memory_enc_pgtable()) calls WARN_ONCE for misaligned addresses
-> under the hood, so I thought the early version should have the same
-> contract (though, obviously, this lacks the actual WARN_ONCE). I can
-> re-upload with a WARN_ONCE or with the masking moved into
-> early_set_memory_enc_dec().
+On Fri, 18 Aug 2023, Eric Wheeler wrote:
+> On Fri, 18 Aug 2023, Sean Christopherson wrote:
+> > On Thu, Aug 17, 2023, Eric Wheeler wrote:
+> > > On Thu, 17 Aug 2023, Sean Christopherson wrote:
+> > > > > > kprobe:handle_ept_violation
+> > > > > > {
+> > > > > > 	printf("vcpu = %lx pid = %u MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
+> > > > > > 	       arg0, ((struct kvm_vcpu *)arg0)->pid->numbers[0].nr,
+> > > > > > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_seq,
+> > > > > > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_in_progress,
+> > > > > > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_range_start,
+> > > > > > 	       ((struct kvm_vcpu *)arg0)->kvm->mmu_invalidate_range_end);
+> > > > > > }
+> > > > > > 
+> > > > > > If you don't have BTF info, we can still use a bpf program, but to get at the
+> > > > > > fields of interested, I think we'd have to resort to pointer arithmetic with struct
+> > > > > > offsets grab from your build.
+> > > > > 
+> > > > > We have BTF, so hurray for not needing struct offsets!
 
-I like the fix for the hypercall being in early_set_memory_enc_dec(). This 
-way the behavior doesn't change for existing callers and doesn't require 
-adding a WARN.
+We found a new sample in 6.1.38, right after a lockup, where _all_ log 
+entries show inprog=1, in case that is interesting. Here is a sample, 
+there are 500,000+ entries so let me know if you want the whole log.
+
+To me, these are opaque numbers.  What do they represent?  What are you looking for in them?
+
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854227 inprog=1 start=7fa3183a3000 end=7fa3183a4000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854228 inprog=1 start=7fa3183a3000 end=7fa3183a4000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854229 inprog=1 start=7fa3183a4000 end=7fa3183a5000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085422a inprog=1 start=7fa3183a4000 end=7fa3183a5000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085422b inprog=1 start=7fa3183a8000 end=7fa3183a9000
+      2 ept[0] vcpu=ffff9964cdc48000 seq=8085422d inprog=1 start=7fa3183a9000 end=7fa3183aa000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085422e inprog=1 start=7fa3183a9000 end=7fa3183aa000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854232 inprog=1 start=7fa3183ac000 end=7fa3183ad000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854233 inprog=1 start=7fa3183ad000 end=7fa3183ae000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854235 inprog=1 start=7fa3183ae000 end=7fa3183af000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854236 inprog=1 start=7fa3183ae000 end=7fa3183af000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854237 inprog=1 start=7fa3183b1000 end=7fa3183b2000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854239 inprog=1 start=7fa3183b3000 end=7fa3183b4000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085423a inprog=1 start=7fa3183b3000 end=7fa3183b4000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085423d inprog=1 start=7fa3183b7000 end=7fa3183b8000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085423e inprog=1 start=7fa3183b7000 end=7fa3183b8000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085423f inprog=1 start=7fa3183b8000 end=7fa3183b9000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854240 inprog=1 start=7fa3183b8000 end=7fa3183b9000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854241 inprog=1 start=7fa3183b9000 end=7fa3183ba000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854242 inprog=1 start=7fa3183b9000 end=7fa3183ba000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854243 inprog=1 start=7fa3183ba000 end=7fa3183bb000
+      2 ept[0] vcpu=ffff9964cdc48000 seq=80854244 inprog=1 start=7fa3183ba000 end=7fa3183bb000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854246 inprog=1 start=7fa3183bb000 end=7fa3183bc000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854247 inprog=1 start=7fa3183bc000 end=7fa3183bd000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854248 inprog=1 start=7fa3183bc000 end=7fa3183bd000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854249 inprog=1 start=7fa3183bd000 end=7fa3183be000
+      2 ept[0] vcpu=ffff9964cdc48000 seq=8085424b inprog=1 start=7fa3183be000 end=7fa3183bf000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085424c inprog=1 start=7fa3183be000 end=7fa3183bf000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085424e inprog=1 start=7fa3183bf000 end=7fa3183c0000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854250 inprog=1 start=7fa3183c0000 end=7fa3183c1000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854251 inprog=1 start=7fa3183c1000 end=7fa3183c2000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854255 inprog=1 start=7fa3183c5000 end=7fa3183c6000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854256 inprog=1 start=7fa3183c5000 end=7fa3183c6000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854257 inprog=1 start=7fa3183c6000 end=7fa3183c7000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854259 inprog=1 start=7fa3183c7000 end=7fa3183c8000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085425a inprog=1 start=7fa3183c7000 end=7fa3183c8000
+      2 ept[0] vcpu=ffff9964cdc48000 seq=8085425b inprog=1 start=7fa3183c8000 end=7fa3183c9000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085425c inprog=1 start=7fa3183c8000 end=7fa3183c9000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085425e inprog=1 start=7fa3183c9000 end=7fa3183ca000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854260 inprog=1 start=7fa3183ca000 end=7fa3183cb000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854261 inprog=1 start=7fa3183cb000 end=7fa3183cc000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854262 inprog=1 start=7fa3183cb000 end=7fa3183cc000
+      2 ept[0] vcpu=ffff9964cdc48000 seq=80854263 inprog=1 start=7fa3183ce000 end=7fa3183cf000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854264 inprog=1 start=7fa3183ce000 end=7fa3183cf000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854265 inprog=1 start=7fa3183cf000 end=7fa3183d0000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854266 inprog=1 start=7fa3183cf000 end=7fa3183d0000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=80854268 inprog=1 start=7fa3183d4000 end=7fa3183d5000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085426b inprog=1 start=7fa3183d6000 end=7fa3183d7000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085426c inprog=1 start=7fa3183d6000 end=7fa3183d7000
+      1 ept[0] vcpu=ffff9964cdc48000 seq=8085426d inprog=1 start=7fa3183d7000 end=7fa3183d8000
 
 Thanks,
-Tom
 
-> Thanks,
-> Steve
+-Eric
+
+
 > 
->>
->> Thanks,
->> Tom
->>
->>>
->>> Thanks,
->>> Steve
->>>>
->>>> Thanks,
->>>> Tom
->>>>
->>>>>
->>>>> Fixes: 4716276184ec ("X86/KVM: Decrypt shared per-cpu variables when SEV is active")
->>>>> Signed-off-by: Steve Rutherford <srutherford@google.com>
->>>>> ---
->>>>>     arch/x86/kernel/kvm.c | 14 +++++++++++++-
->>>>>     1 file changed, 13 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->>>>> index 6a36db4f79fd..a0c072d3103c 100644
->>>>> --- a/arch/x86/kernel/kvm.c
->>>>> +++ b/arch/x86/kernel/kvm.c
->>>>> @@ -419,7 +419,14 @@ static u64 kvm_steal_clock(int cpu)
->>>>>
->>>>>     static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
->>>>>     {
->>>>> -     early_set_memory_decrypted((unsigned long) ptr, size);
->>>>> +     /*
->>>>> +      * early_set_memory_decrypted() requires page aligned parameters, but
->>>>> +      * this function needs to handle ptrs offset into a page.
->>>>> +      */
->>>>> +     unsigned long start = PAGE_ALIGN_DOWN((unsigned long) ptr);
->>>>> +     unsigned long end = (unsigned long) ptr + size;
->>>>> +
->>>>> +     early_set_memory_decrypted(start, end - start);
->>>>>     }
->>>>>
->>>>>     /*
->>>>> @@ -438,6 +445,11 @@ static void __init sev_map_percpu_data(void)
->>>>>                 return;
->>>>>
->>>>>         for_each_possible_cpu(cpu) {
->>>>> +             /*
->>>>> +              * Calling __set_percpu_decrypted() for each per-cpu variable is
->>>>> +              * inefficent, since it may decrypt the same page multiple times.
->>>>> +              * That said, it avoids the need for more complicated logic.
->>>>> +              */
->>>>>                 __set_percpu_decrypted(&per_cpu(apf_reason, cpu), sizeof(apf_reason));
->>>>>                 __set_percpu_decrypted(&per_cpu(steal_time, cpu), sizeof(steal_time));
->>>>>                 __set_percpu_decrypted(&per_cpu(kvm_apic_eoi, cpu), sizeof(kvm_apic_eoi));
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32524620 inprog=1 start=7f32477d7000 end=7f32477d8000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32524aee inprog=1 start=7f3252209000 end=7f325220a000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32527895 inprog=1 start=7f329504d000 end=7f329504e000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=325279eb inprog=1 start=7f3296f00000 end=7f3296f01000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=325279f5 inprog=1 start=7f3296fae000 end=7f3296faf000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32527b4d inprog=1 start=7f329937e000 end=7f329937f000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32525ef6 inprog=1 start=7f3272503000 end=7f3272504000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32526517 inprog=1 start=7f327a568000 end=7f327a569000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=325268e8 inprog=1 start=7f327e4a4000 end=7f327e4a5000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=32527543 inprog=1 start=7f328f8ca000 end=7f328f8cb000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c861ab6 inprog=1 start=7fb4c67de000 end=7fb4c67df000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c862600 inprog=1 start=7fb48c132000 end=7fb48c133000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c862a8b inprog=1 start=7fb4f06b8000 end=7fb4f06b9000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c862b9f inprog=1 start=7fb4f1861000 end=7fb4f1862000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c862d33 inprog=1 start=7fb4e72f5000 end=7fb4e72f6000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c86415c inprog=1 start=7fb49fb5a000 end=7fb49fb5b000
+>       1 ept[0] vcpu=ffff9c43d5618000 seq=1c864162 inprog=1 start=7fb49fb59000 end=7fb49fb5a000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862ba1 inprog=1 start=7fb4f0e24000 end=7fb4f0e25000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862bab inprog=1 start=7fb4f0e26000 end=7fb4f0e27000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862bb1 inprog=1 start=7fb4f0e27000 end=7fb4f0e28000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862cbd inprog=1 start=7fb4efffd000 end=7fb4efffe000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862cc4 inprog=1 start=7fb4f0692000 end=7fb4f0693000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862d32 inprog=1 start=7fb4dd282000 end=7fb4dd283000
+>       1 ept[0] vcpu=ffff9c533e1dc680 seq=1c862d36 inprog=1 start=7fb4e8e97000 end=7fb4e8e98000
+>       1 ept[0] vcpu=ffff9c436d26c680 seq=3252adeb inprog=1 start=7f326209b000 end=7f326209c000
+> 
+> The entire dump is 22,687 lines if you want to see it, here (expires in 1 week):
+> 
+> 	https://privatebin.net/?9a3bff6b6fd2566f#BHjrt4NGpoXL12NWiUDpThifi9E46LNXCy7eWzGXgqYx
+> 
+> > > 
+> > > What is involved in doing this with struct offsets for Linux v6.1.x?
+> > 
+> > Unless you are up for a challenge, I'd drop the PID entirely, getting that will
+> > be ugly.
+> > 
+> > For the KVM info, you need the offset of "kvm" within struct kvm_vcpu (more than
+> > likely it's '0'), and then the offset of each of the mmu_invaliate_* fields within
+> > struct kvm.  These need to come from the exact kernel you're running, though unless
+> > a field is added/removed to/from struct kvm between kernel versions, the offsets
+> > should be stable.
+> > 
+> > A cheesy/easy way to get the offsets is to feed offsetof() into __aligned and
+> > then compile.  So long as the offset doesn't happen to be a power-of-2, the
+> > compiler will yell.  E.g. with this
+> > 
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 92c50dc159e8..04ec37f7374a 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -543,7 +543,13 @@ struct kvm_hva_range {
+> >   */
+> >  static void kvm_null_fn(void)
+> >  {
+> > +       int v __aligned(offsetof(struct kvm_vcpu, kvm));
+> > +       int w __aligned(offsetof(struct kvm, mmu_invalidate_seq));
+> > +       int x __aligned(offsetof(struct kvm, mmu_invalidate_in_progress));
+> > +       int y __aligned(offsetof(struct kvm, mmu_invalidate_range_start));
+> > +       int z __aligned(offsetof(struct kvm, mmu_invalidate_range_end));
+> >  
+> > +       v = w = x = y = z = 0;
+> >  }
+> >  #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
+> > 
+> > I get yelled at with (trimmed):
+> > 
+> > arch/x86/kvm/../../../virt/kvm/kvm_main.c:546:34: error: requested alignment ‘0’ is not a positive power of 2 [-Werror=attributes]
+> > arch/x86/kvm/../../../virt/kvm/kvm_main.c:547:20: error: requested alignment ‘36960’ is not a positive power of 2
+> > arch/x86/kvm/../../../virt/kvm/kvm_main.c:549:20: error: requested alignment ‘36968’ is not a positive power of 2
+> > arch/x86/kvm/../../../virt/kvm/kvm_main.c:551:20: error: requested alignment ‘36976’ is not a positive power of 2
+> > arch/x86/kvm/../../../virt/kvm/kvm_main.c:553:20: error: requested alignment ‘36984’ is not a positive power of 2
+> 
+> Neat trick.
+> 
+> So here are my numbers:
+> 
+> # make modules  KDIR=virt 2>&1 | grep -A1 alignment |grep -v ^-
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c:568:40: error: requested alignment ‘0’ is not a positive power of 2 [-Werror=attributes]
+>   568 |        int v __aligned(offsetof(struct kvm_vcpu, kvm));
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c:569:40: error: requested alignment ‘39552’ is not a positive power of 2
+>   569 |        int w __aligned(offsetof(struct kvm, mmu_invalidate_seq));
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c:570:40: error: requested alignment ‘39560’ is not a positive power of 2
+>   570 |        int x __aligned(offsetof(struct kvm, mmu_invalidate_in_progress));
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c:571:40: error: requested alignment ‘39568’ is not a positive power of 2
+>   571 |        int y __aligned(offsetof(struct kvm, mmu_invalidate_range_start));
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c:572:40: error: requested alignment ‘39576’ is not a positive power of 2
+>   572 |        int z __aligned(offsetof(struct kvm, mmu_invalidate_range_end));
+> 
+> and the resulting script:
+> 	kprobe:handle_ept_violation
+> 	{
+> 		$kvm = *((uint64 *)((uint64)arg0 + 0));
+> 
+> 		printf("vcpu=%08lx seq=%08lx inprog=%lx start=%08lx end=%08lx\n",
+> 			arg0, 
+> 		       *((uint64 *)($kvm + 39552)),
+> 		       *((uint64 *)($kvm + 39560)),
+> 		       *((uint64 *)($kvm + 39568)),
+> 		       *((uint64 *)($kvm + 39576))
+> 		       );
+> 	}
+> 
+> ... but the output shows all 0's except vcpu:
+> 
+> 	# bpftrace ./handle_ept_violation.bt |grep ^vcpu | uniq -c
+> 	     11 vcpu=ffff9d518541c680 seq=00000000 inprog=0 start=00000000 end=00000000
+> 	     29 vcpu=ffff9d80cc120000 seq=00000000 inprog=0 start=00000000 end=00000000
+> 	    331 vcpu=ffff9d5f1d1a2340 seq=00000000 inprog=0 start=00000000 end=00000000
+> 	    858 vcpu=ffff9d80c7b98000 seq=00000000 inprog=0 start=00000000 end=00000000
+> 	   2183 vcpu=ffff9d6033fb2340 seq=00000000 inprog=0 start=00000000 end=00000000
+> 
+> Did I do something wrong here?
+> 
+> -Eric
+> 
+> > 
+> > Then take those offsets and do math.  For me, this provides the same output as
+> > the above pretty version.  Just use common sense and verify you're getting sane
+> > data.
+> > 
+> > kprobe:handle_ept_violation
+> > {
+> > 	$kvm = *((uint64 *)((uint64)arg0 + 0));
+> > 
+> > 	printf("vcpu = %lx MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
+> > 	       arg0,
+> >                *((uint64 *)($kvm + 36960)),
+> >                *((uint64 *)($kvm + 36968)),
+> >                *((uint64 *)($kvm + 36976)),
+> >                *((uint64 *)($kvm + 36984)));
+> > }
+> > 
+> > 
+> 
+> 
+> 
+> 
+> 
+> 
+> --
+> Eric Wheeler
+> 
+> 
+--8323328-1343589949-1692649645=:24657--
