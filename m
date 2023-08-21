@@ -2,186 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F2CE7825F1
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A38A3782609
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:08:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234084AbjHUJAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 05:00:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45512 "EHLO
+        id S234273AbjHUJIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 05:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232799AbjHUJAp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 05:00:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36F5CF
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 01:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692608393;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=oUNFPBwuacrfKR5wY4zXtbeCoielBgq1hU50/mf0WdI=;
-        b=gZ3BiUr20yjvQXTgPYKQ3M8PmrUKeIYnFuxNoqqkaMTX3mFnUGfmfY5vW0ZViIkdEzxfl+
-        YkFviCeidGqVtJ9HgVKvwrLet6wbjvQTIlu64uLDePluxeqjHR20G6/MTdi2WNR6RSoNLl
-        zQ1v13+TB/vs0B/EHzIW3RxrGlDNeqI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-96-kUh68BOcP_y6u4hycSuLmg-1; Mon, 21 Aug 2023 04:59:51 -0400
-X-MC-Unique: kUh68BOcP_y6u4hycSuLmg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B59BA185A78B;
-        Mon, 21 Aug 2023 08:59:50 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41B7B40D2843;
-        Mon, 21 Aug 2023 08:59:46 +0000 (UTC)
-Date:   Mon, 21 Aug 2023 09:59:43 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v2 15/58] i386/tdx: Add property sept-ve-disable for
- tdx-guest object
-Message-ID: <ZOMnf8n8BksktlGg@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
- <20230818095041.1973309-16-xiaoyao.li@intel.com>
+        with ESMTP id S232684AbjHUJIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 05:08:00 -0400
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B1FC1;
+        Mon, 21 Aug 2023 02:07:59 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id 2adb3069b0e04-4ff09632194so4149366e87.2;
+        Mon, 21 Aug 2023 02:07:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692608877; x=1693213677;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JKWRJTfGQowIKvL3XjiDWE9FYLrusIoybiwsp0Evuyk=;
+        b=i74RrRT/nZrpfBRl2fhQa9dTPKM7u23SB+mv35LcAjV0iW0uW4MTr18kiBqE7k5aqx
+         aCT3Z+ejZmORg8iaYsiMmuRcRjj/RDzCVwAyZjkVY9tzG2J3Q0fLI37k5RI2BxB3NGaD
+         5DUsAOByVq5e5epmlSCDyT6lkkxwOq5XxXDL+8Rn4+w+bIApLATl6jz0n+fDRkTJ5EmA
+         HwW6Yjs826uPaDIjWXGNAhW7OcyMxTQrj8NKSmbYuu0HwHywkz5B6WkeDlf/+pokItQW
+         U8w21AQbmfLOwmI4hkPUknEPlgCnHbQd22h9iKijRahoqG8UbDSn4/pFWoTfNAfM3KVu
+         aAwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692608877; x=1693213677;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JKWRJTfGQowIKvL3XjiDWE9FYLrusIoybiwsp0Evuyk=;
+        b=IWqMYS/bqI4//jC+H84KAMF7yLm16UiKGJCYow6H4D9oYB5Ltv1q6/hrZX441uHk/+
+         4tnmPYvkqjjK51R1Q9yIDe6rpgohU4EVdfcJoVQBqzmpwrG0XPUnsvQyGmSgCVUxN2nh
+         hThJqK+Awdze1bqE2McxKFIDLFWffqmuSUpB7N9YVkGs68bzEJFk6d+7kEDX5zZUjpNd
+         NqOrt1oSvLOJUH+daRc/XkCZQ+rLLCN0alh8j7V+KWEVnyYo6mfBuGGZ2ktuvFmX5N3E
+         ALLYHBqF0C78EXOS8MEzEQfod/a92ELQ6NBavSGOiLPbWWwDpwGBLDTtQuV//rULom77
+         JOAw==
+X-Gm-Message-State: AOJu0Yz+qJIQb/ZBA8MHgR5kyPgnrQaRJrsP2l3u2abxGFiBpURfneG1
+        obkgioG4/OjYa7KpQwfyPRrwRwXP4rBublfxN50=
+X-Google-Smtp-Source: AGHT+IGcyGcLR9ieZcYZFcxkxoF+t0ejjZ6vHbUf6OXAnQs7ZPV/jSisWOFHbcHRF2Inn7DmUzEGs8tATvEeswPHF9A=
+X-Received: by 2002:a05:6512:e84:b0:4fe:61f:3025 with SMTP id
+ bi4-20020a0565120e8400b004fe061f3025mr5145487lfb.61.1692608876970; Mon, 21
+ Aug 2023 02:07:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230818095041.1973309-16-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230814115108.45741-1-cloudliang@tencent.com>
+ <20230814115108.45741-3-cloudliang@tencent.com> <56873cf7-ddaf-3e8d-3589-78700934c999@gmail.com>
+In-Reply-To: <56873cf7-ddaf-3e8d-3589-78700934c999@gmail.com>
+From:   Jinrong Liang <ljr.kernel@gmail.com>
+Date:   Mon, 21 Aug 2023 17:07:45 +0800
+Message-ID: <CAFg_LQXmcPZnCUP1eWt-cH2=rHtDRWVWDyg7RXK6_QW=eYnp9g@mail.gmail.com>
+Subject: Re: [PATCH v3 02/11] KVM: selftests: Add pmu.h for PMU events and
+ common masks
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 18, 2023 at 05:49:58AM -0400, Xiaoyao Li wrote:
-> Bit 28 of TD attribute, named SEPT_VE_DISABLE. When set to 1, it disables
-> EPT violation conversion to #VE on guest TD access of PENDING pages.
-> 
-> Some guest OS (e.g., Linux TD guest) may require this bit as 1.
-> Otherwise refuse to boot.
-> 
-> Add sept-ve-disable property for tdx-guest object, for user to configure
-> this bit.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  qapi/qom.json         |  4 +++-
->  target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
->  2 files changed, 27 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/qom.json b/qapi/qom.json
-> index 2ca7ce7c0da5..cc08b9a98df9 100644
-> --- a/qapi/qom.json
-> +++ b/qapi/qom.json
-> @@ -871,10 +871,12 @@
->  #
->  # Properties for tdx-guest objects.
->  #
-> +# @sept-ve-disable: bit 28 of TD attributes (default: 0)
+Like Xu <like.xu.linux@gmail.com> =E4=BA=8E2023=E5=B9=B48=E6=9C=8821=E6=97=
+=A5=E5=91=A8=E4=B8=80 16:56=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 14/8/2023 7:50 pm, Jinrong Liang wrote:
+> > +#define ARCH_PERFMON_EVENTSEL_EDGE           BIT_ULL(18)
+> > +#define ARCH_PERFMON_EVENTSEL_PIN_CONTROL    BIT_ULL(19)
+> > +#define ARCH_PERFMON_EVENTSEL_INT            BIT_ULL(20)
+> > +#define ARCH_PERFMON_EVENTSEL_ANY            BIT_ULL(21)
+> > +#define ARCH_PERFMON_EVENTSEL_ENABLE         BIT_ULL(22)
+> > +#define ARCH_PERFMON_EVENTSEL_INV            BIT_ULL(23)
+> > +#define ARCH_PERFMON_EVENTSEL_CMASK          GENMASK_ULL(31, 24)
+>
+> Could you write more test cases to cover all EVENTSEL bits including ENAB=
+LE bit ?
 
-This description isn't very useful as it forces the user to go off and
-read the TDX specification to find out what bit 28 means. You've got a
-more useful description in the commit message, so please use that
-in the docs too. eg something like this
+I am more than willing to write additional test cases to cover all
+EVENTSEL bits, including the ENABLE bit.
 
-  @sept-ve-disable: toggle bit 28 of TD attributes to control disabling
-                    of EPT violation conversion to #VE on guest
-                    TD access of PENDING pages. Some guest OS (e.g.
-		    Linux TD guest) may require this set, otherwise
-                    they refuse to boot.
+If you have any specific suggestions or scenarios you'd like me to
+cover in the new test cases, please feel free to share them. I am open
+to any ideas that can further improve the coverage and quality of our
+selftests.
 
-> +#
->  # Since: 8.2
->  ##
->  { 'struct': 'TdxGuestProperties',
-> -  'data': { }}
-> +  'data': { '*sept-ve-disable': 'bool' } }
->  
->  ##
->  # @ThreadContextProperties:
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index 3d313ed46bd1..22130382c0c5 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -32,6 +32,8 @@
->                                       (1U << KVM_FEATURE_PV_SCHED_YIELD) | \
->                                       (1U << KVM_FEATURE_MSI_EXT_DEST_ID))
->  
-> +#define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
-> +
->  #define TDX_ATTRIBUTES_MAX_BITS      64
->  
->  static FeatureMask tdx_attrs_ctrl_fields[TDX_ATTRIBUTES_MAX_BITS] = {
-> @@ -501,6 +503,24 @@ out:
->      return r;
->  }
->  
-> +static bool tdx_guest_get_sept_ve_disable(Object *obj, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    return !!(tdx->attributes & TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE);
-> +}
-> +
-> +static void tdx_guest_set_sept_ve_disable(Object *obj, bool value, Error **errp)
-> +{
-> +    TdxGuest *tdx = TDX_GUEST(obj);
-> +
-> +    if (value) {
-> +        tdx->attributes |= TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
-> +    } else {
-> +        tdx->attributes &= ~TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
-> +    }
-> +}
-> +
->  /* tdx guest */
->  OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
->                                     tdx_guest,
-> @@ -516,6 +536,10 @@ static void tdx_guest_init(Object *obj)
->      qemu_mutex_init(&tdx->lock);
->  
->      tdx->attributes = 0;
-> +
-> +    object_property_add_bool(obj, "sept-ve-disable",
-> +                             tdx_guest_get_sept_ve_disable,
-> +                             tdx_guest_set_sept_ve_disable);
->  }
->  
->  static void tdx_guest_finalize(Object *obj)
-> -- 
-> 2.34.1
-> 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Thanks
