@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 535E778265E
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E2B2782669
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:39:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbjHUJfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 05:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58136 "EHLO
+        id S234426AbjHUJjQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 05:39:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234421AbjHUJf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 05:35:28 -0400
+        with ESMTP id S230107AbjHUJjP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 05:39:15 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFD37CE
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 02:34:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D03B9D
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 02:38:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692610479;
+        s=mimecast20190719; t=1692610708;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=9McAmfa26fnzkn4wkMS9Leiv/n/uMWhGX6XenuhYcak=;
-        b=hcuv2p/Pzkv5x2ykWQnDtyhduGikRkbQwaKhG6FbsbrwCspV6ID2Yt4qPPlYx4tsk9sBPs
-        WEtGUUp1rSaxxZfe06FynnErz0w/az3f/arE9oaM9cOde/yVQD4nj1RWYJeuMq56weWFN9
-        rdAgpzsYGslx/3eaRELY3rHHjdl5iX8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-594-PQPqsmjEMfCbLOPph2B-9g-1; Mon, 21 Aug 2023 05:34:34 -0400
-X-MC-Unique: PQPqsmjEMfCbLOPph2B-9g-1
+        bh=R2brJ+XSxT0BCix3/bDQpxgcg7IYxyY9nHO9hl4iHpo=;
+        b=a8ij3rrgbQMyMV6tsKY9y905yhAGyNG0nWyQk1Al4msMM2bpc+2h0pmRFhwbLDAaEn0sMy
+        oUVC3gCQatESZsVOd8ReS25m+kEPvPKbOmKzyiGjJmdnklUfP4kw7JXCsI/rvAUmW1LB5U
+        0y8vSAkbAlYKYlNmbsfc1nA+kSuyzdA=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-322-xPJoeZ4kMByDKf4SCIkV0A-1; Mon, 21 Aug 2023 05:38:24 -0400
+X-MC-Unique: xPJoeZ4kMByDKf4SCIkV0A-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0BEF8856F67;
-        Mon, 21 Aug 2023 09:34:34 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 71A7E3815EE7;
+        Mon, 21 Aug 2023 09:38:23 +0000 (UTC)
 Received: from redhat.com (unknown [10.42.28.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D6494A9004;
-        Mon, 21 Aug 2023 09:34:31 +0000 (UTC)
-Date:   Mon, 21 Aug 2023 10:34:29 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC418492C13;
+        Mon, 21 Aug 2023 09:38:20 +0000 (UTC)
+Date:   Mon, 21 Aug 2023 10:38:18 +0100
 From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -56,16 +56,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Laszlo Ersek <lersek@redhat.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v2 25/58] kvm/tdx: Don't complain when converting vMMIO
- region to shared
-Message-ID: <ZOMvpcSUbGcTyAhv@redhat.com>
+Subject: Re: [PATCH v2 32/58] i386/tdx: Track RAM entries for TDX VM
+Message-ID: <ZOMwin3eGaYLNNQh@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
- <20230818095041.1973309-26-xiaoyao.li@intel.com>
+ <20230818095041.1973309-33-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230818095041.1973309-26-xiaoyao.li@intel.com>
+In-Reply-To: <20230818095041.1973309-33-xiaoyao.li@intel.com>
 User-Agent: Mutt/2.2.9 (2022-11-12)
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -78,60 +77,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 18, 2023 at 05:50:08AM -0400, Xiaoyao Li wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Fri, Aug 18, 2023 at 05:50:15AM -0400, Xiaoyao Li wrote:
+> The RAM of TDX VM can be classified into two types:
 > 
-> Because vMMIO region needs to be shared region, guest TD may explicitly
-> convert such region from private to shared.  Don't complain such
-> conversion.
+>  - TDX_RAM_UNACCEPTED: default type of TDX memory, which needs to be
+>    accepted by TDX guest before it can be used and will be all-zeros
+>    after being accepted.
 > 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>  - TDX_RAM_ADDED: the RAM that is ADD'ed to TD guest before running, and
+>    can be used directly. E.g., TD HOB and TEMP MEM that needed by TDVF.
+> 
+> Maintain TdxRamEntries[] which grabs the initial RAM info from e820 table
+> and mark each RAM range as default type TDX_RAM_UNACCEPTED.
+> 
+> Then turn the range of TD HOB and TEMP MEM to TDX_RAM_ADDED since these
+> ranges will be ADD'ed before TD runs and no need to be accepted runtime.
+> 
+> The TdxRamEntries[] are later used to setup the memory TD resource HOB
+> that passes memory info from QEMU to TDVF.
+> 
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  accel/kvm/kvm-all.c | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index fceec7f2a83f..9d0aa8c97feb 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -3094,8 +3094,24 @@ static int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private)
->           */
->          ram_block_convert_range(rb, offset, size, to_private);
->      } else {
-> -        warn_report("Convert non guest-memfd backed memory region (0x%"HWADDR_PRIx" ,+ 0x%"HWADDR_PRIx") to %s",
-> -                    start, size, to_private ? "private" : "shared");
-> +        MemoryRegion *mr = section.mr;
+> ---
+> Changes from RFC v4:
+>   - simplify the algorithm of tdx_accept_ram_range() (Suggested-by: Gerd Hoffman)
+>     (1) Change the existing entry to cover the accepted ram range.
+>     (2) If there is room before the accepted ram range add a
+> 	TDX_RAM_UNACCEPTED entry for that.
+>     (3) If there is room after the accepted ram range add a
+> 	TDX_RAM_UNACCEPTED entry for that.
+> ---
+>  target/i386/kvm/tdx.c | 110 ++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/kvm/tdx.h |  14 ++++++
+>  2 files changed, 124 insertions(+)
+> 
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index bb806736b4ff..ed617ebab266 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> +static int tdx_accept_ram_range(uint64_t address, uint64_t length)
+> +{
+> +    uint64_t head_start, tail_start, head_length, tail_length;
+> +    uint64_t tmp_address, tmp_length;
+> +    TdxRamEntry *e;
+> +    int i;
+> +
+> +    for (i = 0; i < tdx_guest->nr_ram_entries; i++) {
+> +        e = &tdx_guest->ram_entries[i];
+> +
+> +        if (address + length <= e->address ||
+> +            e->address + e->length <= address) {
+> +                continue;
+
+Indented too far
+
+> +        }
 > +
 > +        /*
-> +         * Because vMMIO region must be shared, guest TD may convert vMMIO
-> +         * region to shared explicitly.  Don't complain such case.  See
-> +         * memory_region_type() for checking if the region is MMIO region.
+> +         * The to-be-accepted ram range must be fully contained by one
+> +         * RAM entry.
 > +         */
-> +        if (to_private ||
-> +            memory_region_is_ram(mr) ||
-> +            memory_region_is_ram_device(mr) ||
-> +            memory_region_is_rom(mr) ||
-> +            memory_region_is_romd(mr)) {
-
-Should we also have  !is_tdx_vm() as the first clause to check, as IIUC
-you only need the special logic for TDX VMs.
-
-> +            warn_report("Convert non guest-memfd backed memory region (0x%"HWADDR_PRIx" ,+ 0x%"HWADDR_PRIx") of %s to %s",
-> +                        start, size, mr->name, to_private ? "private" : "shared");
-> +	    } else {
-> +		    ret = 0;
-> +	    }
-
-Inconsistent indentation here due to use of tabs
-
+> +        if (e->address > address ||
+> +            e->address + e->length < address + length) {
+> +            return -EINVAL;
+> +        }
 > +
->      }
->  
->      memory_region_unref(section.mr);
-> -- 
-> 2.34.1
-> 
+> +        if (e->type == TDX_RAM_ADDED) {
+> +            return -EINVAL;
+> +        }
+> +
+> +        break;
+> +    }
+> +
+> +    if (i == tdx_guest->nr_ram_entries) {
+> +        return -1;
+> +    }
+> +
+> +    tmp_address = e->address;
+> +    tmp_length = e->length;
+> +
+> +    e->address = address;
+> +    e->length = length;
+> +    e->type = TDX_RAM_ADDED;
+> +
+> +    head_length = address - tmp_address;
+> +    if (head_length > 0) {
+> +        head_start = tmp_address;
+> +        tdx_add_ram_entry(head_start, head_length, TDX_RAM_UNACCEPTED);
+> +    }
+> +
+> +    tail_start = address + length;
+> +    if (tail_start < tmp_address + tmp_length) {
+> +        tail_length = tmp_address + tmp_length - tail_start;
+> +        tdx_add_ram_entry(tail_start, tail_length, TDX_RAM_UNACCEPTED);
+> +    }
+> +
+> +    return 0;
+> +}
 
 With regards,
 Daniel
