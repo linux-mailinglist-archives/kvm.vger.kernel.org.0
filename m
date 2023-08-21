@@ -2,74 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A38A3782609
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:08:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22E19782612
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:11:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234273AbjHUJIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 05:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50686 "EHLO
+        id S234278AbjHUJLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 05:11:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232684AbjHUJIA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 05:08:00 -0400
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B1FC1;
-        Mon, 21 Aug 2023 02:07:59 -0700 (PDT)
-Received: by mail-lf1-x141.google.com with SMTP id 2adb3069b0e04-4ff09632194so4149366e87.2;
-        Mon, 21 Aug 2023 02:07:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692608877; x=1693213677;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JKWRJTfGQowIKvL3XjiDWE9FYLrusIoybiwsp0Evuyk=;
-        b=i74RrRT/nZrpfBRl2fhQa9dTPKM7u23SB+mv35LcAjV0iW0uW4MTr18kiBqE7k5aqx
-         aCT3Z+ejZmORg8iaYsiMmuRcRjj/RDzCVwAyZjkVY9tzG2J3Q0fLI37k5RI2BxB3NGaD
-         5DUsAOByVq5e5epmlSCDyT6lkkxwOq5XxXDL+8Rn4+w+bIApLATl6jz0n+fDRkTJ5EmA
-         HwW6Yjs826uPaDIjWXGNAhW7OcyMxTQrj8NKSmbYuu0HwHywkz5B6WkeDlf/+pokItQW
-         U8w21AQbmfLOwmI4hkPUknEPlgCnHbQd22h9iKijRahoqG8UbDSn4/pFWoTfNAfM3KVu
-         aAwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692608877; x=1693213677;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JKWRJTfGQowIKvL3XjiDWE9FYLrusIoybiwsp0Evuyk=;
-        b=IWqMYS/bqI4//jC+H84KAMF7yLm16UiKGJCYow6H4D9oYB5Ltv1q6/hrZX441uHk/+
-         4tnmPYvkqjjK51R1Q9yIDe6rpgohU4EVdfcJoVQBqzmpwrG0XPUnsvQyGmSgCVUxN2nh
-         hThJqK+Awdze1bqE2McxKFIDLFWffqmuSUpB7N9YVkGs68bzEJFk6d+7kEDX5zZUjpNd
-         NqOrt1oSvLOJUH+daRc/XkCZQ+rLLCN0alh8j7V+KWEVnyYo6mfBuGGZ2ktuvFmX5N3E
-         ALLYHBqF0C78EXOS8MEzEQfod/a92ELQ6NBavSGOiLPbWWwDpwGBLDTtQuV//rULom77
-         JOAw==
-X-Gm-Message-State: AOJu0Yz+qJIQb/ZBA8MHgR5kyPgnrQaRJrsP2l3u2abxGFiBpURfneG1
-        obkgioG4/OjYa7KpQwfyPRrwRwXP4rBublfxN50=
-X-Google-Smtp-Source: AGHT+IGcyGcLR9ieZcYZFcxkxoF+t0ejjZ6vHbUf6OXAnQs7ZPV/jSisWOFHbcHRF2Inn7DmUzEGs8tATvEeswPHF9A=
-X-Received: by 2002:a05:6512:e84:b0:4fe:61f:3025 with SMTP id
- bi4-20020a0565120e8400b004fe061f3025mr5145487lfb.61.1692608876970; Mon, 21
- Aug 2023 02:07:56 -0700 (PDT)
+        with ESMTP id S230367AbjHUJLX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 05:11:23 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65567C4;
+        Mon, 21 Aug 2023 02:11:21 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VqEqKAv_1692609076;
+Received: from 30.221.109.103(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0VqEqKAv_1692609076)
+          by smtp.aliyun-inc.com;
+          Mon, 21 Aug 2023 17:11:17 +0800
+Message-ID: <6d10dcf7-7912-25a2-8d8e-ef7d71a4ce83@linux.alibaba.com>
+Date:   Mon, 21 Aug 2023 17:11:16 +0800
 MIME-Version: 1.0
-References: <20230814115108.45741-1-cloudliang@tencent.com>
- <20230814115108.45741-3-cloudliang@tencent.com> <56873cf7-ddaf-3e8d-3589-78700934c999@gmail.com>
-In-Reply-To: <56873cf7-ddaf-3e8d-3589-78700934c999@gmail.com>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Mon, 21 Aug 2023 17:07:45 +0800
-Message-ID: <CAFg_LQXmcPZnCUP1eWt-cH2=rHtDRWVWDyg7RXK6_QW=eYnp9g@mail.gmail.com>
-Subject: Re: [PATCH v3 02/11] KVM: selftests: Add pmu.h for PMU events and
- common masks
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
+Content-Language: en-US
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, shannon.zhao@linux.alibaba.com,
+        pbonzini@redhat.com, seanjc@google.com,
+        linux-kernel@vger.kernel.org
+References: <1692588392-58155-1-git-send-email-hao.xiang@linux.alibaba.com>
+ <ZOMWM+YmScUG3U5W@chao-email>
+From:   Hao Xiang <hao.xiang@linux.alibaba.com>
+In-Reply-To: <ZOMWM+YmScUG3U5W@chao-email>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-13.3 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+        SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,27 +45,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Like Xu <like.xu.linux@gmail.com> =E4=BA=8E2023=E5=B9=B48=E6=9C=8821=E6=97=
-=A5=E5=91=A8=E4=B8=80 16:56=E5=86=99=E9=81=93=EF=BC=9A
->
-> On 14/8/2023 7:50 pm, Jinrong Liang wrote:
-> > +#define ARCH_PERFMON_EVENTSEL_EDGE           BIT_ULL(18)
-> > +#define ARCH_PERFMON_EVENTSEL_PIN_CONTROL    BIT_ULL(19)
-> > +#define ARCH_PERFMON_EVENTSEL_INT            BIT_ULL(20)
-> > +#define ARCH_PERFMON_EVENTSEL_ANY            BIT_ULL(21)
-> > +#define ARCH_PERFMON_EVENTSEL_ENABLE         BIT_ULL(22)
-> > +#define ARCH_PERFMON_EVENTSEL_INV            BIT_ULL(23)
-> > +#define ARCH_PERFMON_EVENTSEL_CMASK          GENMASK_ULL(31, 24)
->
-> Could you write more test cases to cover all EVENTSEL bits including ENAB=
-LE bit ?
+For reason that,
 
-I am more than willing to write additional test cases to cover all
-EVENTSEL bits, including the ENABLE bit.
+The turbo frequency info depends on specific machine type. And the msr 
+value of MSR_PLATFORM_INFO may be diferent on diffrent generation machine.
 
-If you have any specific suggestions or scenarios you'd like me to
-cover in the new test cases, please feel free to share them. I am open
-to any ideas that can further improve the coverage and quality of our
-selftests.
+Get following msr bits (needed by turbostat on intel platform) by rdmsr 
+MSR_PLATFORM_INFO directly in KVM is more reasonable. And set these msr 
+bits as vcpu->arch.msr_platform_info default value.
+  -bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
+  -bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
 
-Thanks
+On 2023/8/21 15:52, Chao Gao wrote:
+> On Mon, Aug 21, 2023 at 11:26:32AM +0800, Hao Xiang wrote:
+>> For intel platform, The BzyMhz field of Turbostat shows zero
+>> due to the missing of part msr bits of MSR_PLATFORM_INFO.
+>>
+>> Acquire necessary msr bits, and expose following msr info to guest,
+>> to make sure guest can get correct turbo frequency info.
+> 
+> Userspace VMM (e.g., QEMU) can configure this MSR for guests. Please refer to
+> tools/testing/selftests/kvm/x86_64/platform_info_test.c.
+> 
+> The question is why KVM needs this patch given KVM already provides interfaces
+> for QEMU to configure the MSR.
