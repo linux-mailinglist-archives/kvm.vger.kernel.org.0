@@ -2,143 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAA9D7830A2
+	by mail.lfdr.de (Postfix) with ESMTP id 46FEF7830A0
 	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 21:13:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229463AbjHUSyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 14:54:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39708 "EHLO
+        id S229568AbjHUS4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 14:56:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbjHUSyl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 14:54:41 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B28D6197;
-        Mon, 21 Aug 2023 11:53:34 -0700 (PDT)
+        with ESMTP id S229542AbjHUS4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 14:56:17 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2060.outbound.protection.outlook.com [40.107.93.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8E8B1FC6;
+        Mon, 21 Aug 2023 11:54:40 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EPpEbADWFKLFeyI9dRHb/zYSXedoo2Fb2TiXMWWtF5+0tS8iaV7MAYHKEjF8lB64svKDWOY5AaSYL2iufrxEWPianzAkPcdIT7bmVlNLkaQghUFIy2hmKQMaO4b/Osj0B1yYNGDbmMAKBbl+147yFWX6ZobN71I6XL4mq7PSQy/DTpe5xjoJ+Fd5Ms65Bd0rfD8plyMUmZYBADBSDsdxdkeCoh5Qs/q0ijFN40U9K47KmUijlK7r29bwTTHGxsWw6y7kdFkWeZhpZa7lta5ghw7wSFZ5Lhi1iaHgPzFxvVgvpIiM+p9jdfLaW9nnO1EdoCvFlEVVdX22LqT9+lzrMw==
+ b=F8kwNTvTv+6mMsNIxUt6c7Qaz2nfsIoceOoFic6iBXjndDPexclHxyejd1ODRBwTILCxXMqyUU+r9TkTO1So0+Qm1u4bl+epFGp0qeDpTay6C45RIebkBxWve6gS1Byr3LIDyM2+M9eox3YHHwAuDOt2HClwwXJpHsNdYmOYzNQZE2b9MV33lECQAP0CKwjSQGExxi0bNa73ZyvnoDQIUUC3XT3rfsVWh/4oMUDie4OmHrfoKsgE+7eK+x3FjR9WR6PifvGzmr334i8JJwerw73nyR/DTXn8yoSd8R/9n8poj567hKCnQ+mhUy40aKbNUfCKPFLTGkKhhk7dA0oyVA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZsqodBPlHICZeA0Di90ywJwxQrWxoZmk8tO1ZcAUejo=;
- b=R4L/ABSxbBmWlPZblYjUnvcooZCiPcOfPub2iGy0s3bfS2e/QZbHabwGO+sHlv8wQmmk2ZerFZ1u4x6rNmOjxdIjyV2giWU8Qv50Bi+2z9W40nnbA+R/XuckHXYM5cKind1NrH5zcq5pInK9MNcyoQU99Eqfr7df/r4rYtJ56m2E9FGkRU0HY1nS+ANWFvwglIx9RLPdJQmFqxnVAih7htevZzAAY3qgyXhFVJu/37faJ4lUq9NrEAQ1P9K4LzAOU5PBnjbRzOp1ZlOvDlqaIMCo5qBuDwrVf+oQ/Hqwrqc+kM/JrZV30TNS1YTG/YYP8cdF/hmYHRGVVHCBu8tCng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
+ bh=29ELA0O+zlCnsThKm7H5kDgeNywWjgE0A/chqsljtS8=;
+ b=MXPvhvC+N+p9H+wSQ8Z/G29x+zB2jClXkW5Sbpa8oJ31V5agstvCXTUG4p2zT5Qud2tSv7YEswFwX4VkFB1navOGAufH0Uc1VzYSdIvppfVVVe0jvKYhgmsyy+OWRKZc+ABmrLFvtt/+iJ7g8eYy+VE3QQH5Vns/TxMWopQq6YMZsE0zJxIuZnl8lKldl9epTT2oIOM0MpOlDPOvchVoWKsEp+OWWLoUEJjmerHlLHVZG5gpsk5Zq4GCcxjOv+tbDsDwOXNJlV8SJ9Ks9dNDXe1mcT96c2PhgsPD2VnIf7Lk7eHKe00h65WpHDbMPLlvJMOsbve2Pti6dXMdOFwVnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZsqodBPlHICZeA0Di90ywJwxQrWxoZmk8tO1ZcAUejo=;
- b=haUAvzY29dxMw6U1DjBY6+ZoAbP5RaGj2q41o12eRBJFA3wz78CLa9UK3ETFcxl1ayZtQmrZDIwTvtZLij7E7/eVXHSGhrMDO9YzUpbZAT5QNYZQgkLtmzt1iDyEZJnRmLq4ROjz0KxYVOnLps9N79tV1prm1eWv/50MaydJnyE=
-Received: from SJ0PR03CA0142.namprd03.prod.outlook.com (2603:10b6:a03:33c::27)
- by DS7PR12MB8345.namprd12.prod.outlook.com (2603:10b6:8:e5::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6699.24; Mon, 21 Aug 2023 18:42:27 +0000
-Received: from CO1PEPF000042AC.namprd03.prod.outlook.com
- (2603:10b6:a03:33c:cafe::ab) by SJ0PR03CA0142.outlook.office365.com
- (2603:10b6:a03:33c::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20 via Frontend
- Transport; Mon, 21 Aug 2023 18:42:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000042AC.mail.protection.outlook.com (10.167.243.41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6699.14 via Frontend Transport; Mon, 21 Aug 2023 18:42:26 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 21 Aug
- 2023 13:42:25 -0500
-From:   Brett Creeley <brett.creeley@amd.com>
-To:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-        <yishaih@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
-        <kevin.tian@intel.com>
-CC:     <brett.creeley@amd.com>, <shannon.nelson@amd.com>
-Subject: [PATCH vfio] vfio/pds: Send type for SUSPEND_STATUS command
-Date:   Mon, 21 Aug 2023 11:42:15 -0700
-Message-ID: <20230821184215.34564-1-brett.creeley@amd.com>
-X-Mailer: git-send-email 2.17.1
+ bh=29ELA0O+zlCnsThKm7H5kDgeNywWjgE0A/chqsljtS8=;
+ b=tNpoffeIcWQpwyhWrD/pEasIm5cMnuRkmLy8xIJGWJHuQEDlJqLm8rrLCwgfJHf5HADNqQMI4I5XE2yif8Qqz3tKg2enBLtzWU+Xp/TOwUFEDO6x3+bt4NVqzmh7fLSyzpgawj0TX09InQnttlTPNzrXBvTeXQQr7fCXmZGb3pM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by CO6PR12MB5393.namprd12.prod.outlook.com (2603:10b6:5:356::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Mon, 21 Aug
+ 2023 18:53:57 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd%7]) with mapi id 15.20.6699.022; Mon, 21 Aug 2023
+ 18:53:57 +0000
+Message-ID: <2a391d50-d474-eec5-76ea-e5dc5590609c@amd.com>
+Date:   Mon, 21 Aug 2023 13:53:54 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] x86/sev: Make early_set_memory_decrypted() calls page
+ aligned
+Content-Language: en-US
+To:     Steve Rutherford <srutherford@google.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
+        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
+References: <20230818233451.3615464-1-srutherford@google.com>
+ <08418fc0-839a-f2fb-1c2e-b4f077d2647b@amd.com>
+ <CABayD+cw3s1UDSN7oR4gWfRT4-snWEqOgAN-y4rzOpe-8D=KdA@mail.gmail.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <CABayD+cw3s1UDSN7oR4gWfRT4-snWEqOgAN-y4rzOpe-8D=KdA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA0PR11CA0120.namprd11.prod.outlook.com
+ (2603:10b6:806:d1::35) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AC:EE_|DS7PR12MB8345:EE_
-X-MS-Office365-Filtering-Correlation-Id: 38bf6946-1657-4195-50e4-08dba2765e10
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CO6PR12MB5393:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05b6f7f7-7775-4a01-e25c-08dba277f961
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LS+EzyWnoEBIxH98tpds5a84eMSKfHQP/EAlmICOZpBoeBY59Ndur7HO26/wr47SqmF3a4hXTXjrr0kfprUY1CIK6CKUwdL/3j2/iLP7K4JNvkWC5eN8VXFvScPuMlq7lrCTIjWjj7tiWdVEUq18EtmUcT67Xjmz0jc4EYZOdodJel6BEx1f6tWcSODYekajz+Ub2R436/5LNPe68oUzFnkLx48QqU7zh4NnyTDp4aktI1xaf38SXOEAntXUKIOy28jCi560NW6oXE/HI1coOlS2vHF5an4e2kA9PA2COOgNqRZWGGX5kMiUNZqqsloAICTYx0dYMGCwUGF39TLBJu83Umdi+HDDES96NLtPXZBe3oI4ALpCuJ+IhxE8ijspa4aU7HRTBfIAkPJ+hJV9BfniZ9TrFZA0hacsopVB9wVksGvvra6xrm/PuUMRVyLUzIgM1AMD/42TFwy9xvBbc8mgFHVYAbTyM2jTEOOeQ3n/H89PUKOGKdb7e/8xLGqFfdbdgspy45648GO0y0DR7NmK98VOt79UJ1kC5jKtlJJN4mqWVG09ejn714/lavGnxGon8MSILK8Vi63WsMUYuVEAjoserVh8WvMvV3CZrHp0j5Nhu7f2nA/1wNGNcHWWxuepxwC7NWC1rnLCdspTQh2Gff/vF4TkPkM7rUVbI0PyZDpKFtqqig3B95nhOTJ+GN1FyTpHsuYI7sE45u/DcX+QWeDHKBVErtSne7qQIV4pR3xSMkYQxgYGfXHUaTCOzX8Tot59MNS+QSQ7b00GEA==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(39860400002)(396003)(82310400011)(451199024)(1800799009)(186009)(46966006)(36840700001)(40470700004)(2906002)(83380400001)(40480700001)(15650500001)(5660300002)(44832011)(336012)(426003)(26005)(16526019)(86362001)(36860700001)(47076005)(8676002)(8936002)(2616005)(4326008)(70206006)(316002)(54906003)(70586007)(110136005)(478600001)(356005)(82740400003)(81166007)(6666004)(40460700003)(41300700001)(36756003)(1076003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 1cStbkNpK1vXWZ4HTsBXnusBiC65pENkeQF0i2LmMi4J3cmnxncQ7f81RwmKWmFUQr4GRLMC71ToM4K8BTY2He9mujiP1ohia9spIst9PqxBo7CGwcLFGkS3/9Ttb5t7oqVCDOqyTAzI6RSVVQqyM5sioR2Ivu0/xoX86DoLkGnVn3USQf5IEmVQn5FIdsLUAzAXvJxZXLImJwU4ifhzKaqEb1QyYHHkRiHJsLUeB/TOkl9xmPFf8m4cTKuV8jbAw2UayARsvRQbT6RY2RcDw7U6I/9n1lZhMqMYr5uquhyqBxaXL1mra++jjNmw3tdyzTa/6YBYeJZ0LJsbtfmqn9WOzL6gbRKUyyh+bSOrGs0WjZgK+uEGJDmmkX6XKcQJtinEbiaGuF07lGn3SvuIykd2xtrwkcOo86oJivRitdhIq7tup4droqBQiE1CU55pwj5RQ2Lqh5OyuBwjb4nJw7XuD+aYwFrPXdPEBtldqSmaTK2og0CVXqSoCEPbmenoRSStdhsU28xdHtZdd3EWwB0QsfO760/v7VCjm/Rn2sh80R+/Lu8dpXLJ0t9D9C4fQOpRDxNfCZhKVqoutfM5Sm10sW4aVxPqe6+gn5t+B9xNvystdlXpTWQnuuQmhMQdhiUsHhb0Y1NS0kbdRdMU7A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(136003)(346002)(39860400002)(366004)(186009)(1800799009)(451199024)(54906003)(6916009)(66476007)(66556008)(316002)(66946007)(6512007)(8676002)(8936002)(2616005)(4326008)(36756003)(41300700001)(478600001)(6666004)(38100700002)(53546011)(6506007)(6486002)(83380400001)(2906002)(7416002)(86362001)(31686004)(31696002)(5660300002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cWNvQUcvQjhKNGxnRUpZb1ZsdER3SlRVbVh2V1VXTzRwQmx2QlJFUXFCQzZn?=
+ =?utf-8?B?VHF3VkprbFpMYmZ5Sis1RDJscmVqb1QzUmkyODJOazVNSXlKS25YdVJLSWZH?=
+ =?utf-8?B?MUdYSmc3RU1EalVxUEdUK1NjVTNVM2xNZFdtUUNoVWVRZEtVcjFOUWoxMDA5?=
+ =?utf-8?B?eW1hcWxkRkN1a1MvZW02Q3VISHhiQThjOG5rS1hrOEgzT1JkL1h0eFRWcElv?=
+ =?utf-8?B?QnZCc2lQRHRnbTFPNWNDVXFMTDBHTkxjbnh2VERDSTNHSFNSMExlekRQdWkw?=
+ =?utf-8?B?TW1nMVRtWlE4S1dlVmUxeGkrOUJ4Z1FmZU93a1Q2OFZVbEFURWxTclVkS3pi?=
+ =?utf-8?B?ZHhDUHkyZmhNV2RSSDM5NE9WclNCQVlKQkMrczFjdkZIVVh0QXczaDUrRy9N?=
+ =?utf-8?B?ajZJd3lpd0lDS3N2MmViRGJKcjVlMDB0dG42RE91NUd0ajR4K3piUUR3V3Vj?=
+ =?utf-8?B?THVFNFNrMjl1azdzL09MczhKWk5mR0VpVnlYZENRVDAwVlBHRVJWS1BFTG1I?=
+ =?utf-8?B?LzcyRlZnY25uZW5VeEdRdFRXYnRqK3Yvd0VoVGx6MTE3dk52NWIzUkdHWnU2?=
+ =?utf-8?B?OXU2dTVEeWk1NHo0bFJQQS9nYzQwWU5PNU96L1d3YzBNdzRCYkRzOC9aeGp6?=
+ =?utf-8?B?M1hkSUVPaE9Sb2kwOWZtbnBTcXRscVM2V0kxMEpQMGROSi8yUVVkSXhvZ0Iy?=
+ =?utf-8?B?b01LYko0bmFvaE5IY2ZlbnF4K0hmRVlPK3ZlZHRyNXd2dm55aE1DMmR4L0NV?=
+ =?utf-8?B?cXQ4cmd3VU9IQ1EySW84bWF0eW9GOTFKV05sYWJtSUhEakRCbmUyZmtIb0ZZ?=
+ =?utf-8?B?ZXRQeTlPYjJWRERNV2ZJTi9CZXFjNks3R1dkeVpVaHd5SzdaSlNwVFpPQjhR?=
+ =?utf-8?B?Vm5PNkRtZTlpZWRYcVhlWGMvN3RkTmtUdC9QWXVYakhST0VYanlsUWllMyt4?=
+ =?utf-8?B?L1RTZGlQWW9ZMzhHK0dYbklCSWh4KzFSRFpJaDZsdnNrOUN5RXZJSFdBdUMr?=
+ =?utf-8?B?OUNpZ083QjFtRUlNQW10cTJpQXNKK2duQ2M1UG45QUVUY01KQkpWQWx4SzBi?=
+ =?utf-8?B?QmtyQ2VjOGlGUk1NOUFHYXpsUnFDSkVmaEpVSEVKSit6TVNpdHZDSVBCSjh3?=
+ =?utf-8?B?SGdhSDFxeEIzSFdPQm51cGkvcTRjRE53Q3I1TGR3eWN5TGtlcEVobFdsdnlG?=
+ =?utf-8?B?TGR6eDhyNUZheFRvWU5Gb2FTZkM3U28xd0RKQytvcndWa1YxaWNyQTBNbTlB?=
+ =?utf-8?B?b25DbGhXbGpOTlM2ZXRZVW11eWsvaG51M2pJKzBsODJQc1ZndDRXeDhDYjdR?=
+ =?utf-8?B?YUdOYUtySEMwT0E5b1VJYitSbC95czFUQk0xcTU0dnRWUnNSMEFEUFY2YVpR?=
+ =?utf-8?B?QVdubEd4ZnBBSXJxR2xhZVBzU2RGQ2pqOXIrTCtyZElVQTNMeEhVMHhjYTB5?=
+ =?utf-8?B?SXhmdWl0WGhkcGJvMkNZdXhGSGJwckJSUnFXcTVrMFRVbU1rWXVkNTRKR3RJ?=
+ =?utf-8?B?eU9wd3pGQUZIZWh5Z0dMZXBhT3hLWitMaFBHRVNseWtUSGxEaGhvSnhQKzhR?=
+ =?utf-8?B?RERKNmU0d3p1VVZMUis5V1IwZHM3ZEY1U1NXcDRZWDdTOE8wTllzbG5BZTIz?=
+ =?utf-8?B?OFlMQjhvcG9BeW5pVlVpM2REUEpqS1JGVkkrdWVqcDl0MDJQQ1VTaGl5c2lt?=
+ =?utf-8?B?aVNiUEdNRGkwSnFpTkc4UGFiOWxoZEpOTkx6QlFVdE5ZSm8zYjJEZXczc2JT?=
+ =?utf-8?B?aHpCaW9pZzc3OGcxK0tlSUV4VjZIdVdWVzJGMU1XSDVJbDlOK0JuT2ZhQTdG?=
+ =?utf-8?B?YWNlVVdwVFZ4OSsxUlR5c1paVWxDM1pFRTBQVlZySmhJZ0VsUHJheHlERlhL?=
+ =?utf-8?B?RlRwTUgxd0UxQjY1eGhEdVo2LzFzV05kU1pldlpaZC9MM0l6WUZvOVRkSy9S?=
+ =?utf-8?B?NGhUSlBLOE5xMktDMlJ1T1d0Ty9Va0FVbDNQcjdBMFVZa1RqaGZuSGtVNDdV?=
+ =?utf-8?B?bHBZQk9OZmg2T0xiNjArNnFETkNzUzhOdWNlWGFZSXpYaWFVcHZWY2N3UXBi?=
+ =?utf-8?B?MnVsLzFpNFpJSWc1U040OEVBeS9UcWhKRktKUHVJY2F2aXdGMDJMZWk2bXVV?=
+ =?utf-8?Q?/KQRS4oxhoSyyFmeSOo9GS6qH?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 18:42:26.9462
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05b6f7f7-7775-4a01-e25c-08dba277f961
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 18:53:57.3477
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 38bf6946-1657-4195-50e4-08dba2765e10
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000042AC.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8345
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6buVv6QfRv777StAUtlm3CbXX+NCPYYc1CnTym82/GujTFKwGkO1pvyKKG1RlJmzXuxgJr3C6HtIQrVuGSDozw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5393
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
-added live migration support for the pds-vfio-pci driver. When
-sending the SUSPEND command to the device, the driver sets the
-type of suspend (i.e. P2P or FULL). However, the driver isn't
-sending the type of suspend for the SUSPEND_STATUS command, which
-will result in failures. Fix this by also sending the suspend type
-in the SUSPEND_STATUS command.
+On 8/21/23 13:15, Steve Rutherford wrote:
+> On Mon, Aug 21, 2023 at 6:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>>
+>> On 8/18/23 18:34, Steve Rutherford wrote:
+>>> early_set_memory_decrypted() assumes its parameters are page aligned.
+>>> Non-page aligned calls result in additional pages being marked as
+>>> decrypted via the encryption status hypercall, which results in
+>>> consistent corruption of pages during live migration. Live
+>>> migration requires accurate encryption status information to avoid
+>>> migrating pages from the wrong perspective.
+>>
+>> Hmmm... I'm not sure this is the proper fix. The code is actually doing
+>> the right thing from a encyrption/decryption point of view by checking the
+>> c-bit for the PTE associated with the virtual address and the size
+>> (possibly crossing page boundaries).
+>>
+>> I think the problem is on the call to early_set_mem_enc_dec_hypercall()
+>> where it doesn't take into account the possible crossing of page
+>> boundaries and so can under-count the number of pages, right?
+> 
+> Right now, if you request decryption of e.g. a non-page aligned 0x40
+> byte structure, it rounds the 0x40 bytes up to one page, and then
+> hypercalls to mark both the page it's on and the subsequent page as
+> decrypted (since the rounding stretches the structure onto the next
+> page spuriously). The arithmetic in the combination of
+> early_set_memory_enc_dec() and early_set_mem_enc_dec_hypercall() are
+> correct if they are called with page aligned vaddrs (non-page-aligned
+> sizes are fine iiuc).
 
-Fixes: bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
----
- drivers/vfio/pci/pds/cmds.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Ah, right, correct. It is still related to how the page count is 
+calculated for the hypercall, though, right? The encryption/decryption 
+operations function properly.
 
-diff --git a/drivers/vfio/pci/pds/cmds.c b/drivers/vfio/pci/pds/cmds.c
-index b0d88442b091..36463ccc3df9 100644
---- a/drivers/vfio/pci/pds/cmds.c
-+++ b/drivers/vfio/pci/pds/cmds.c
-@@ -86,12 +86,13 @@ void pds_vfio_unregister_client_cmd(struct pds_vfio_pci_device *pds_vfio)
- }
- 
- static int
--pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio)
-+pds_vfio_suspend_wait_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
- {
- 	union pds_core_adminq_cmd cmd = {
- 		.lm_suspend_status = {
- 			.opcode = PDS_LM_CMD_SUSPEND_STATUS,
- 			.vf_id = cpu_to_le16(pds_vfio->vf_id),
-+			.type = type,
- 		},
- 	};
- 	struct device *dev = pds_vfio_to_dev(pds_vfio);
-@@ -156,7 +157,7 @@ int pds_vfio_suspend_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
- 	 * The subsequent suspend status request(s) check if the firmware has
- 	 * completed the device suspend process.
- 	 */
--	return pds_vfio_suspend_wait_device_cmd(pds_vfio);
-+	return pds_vfio_suspend_wait_device_cmd(pds_vfio, type);
- }
- 
- int pds_vfio_resume_device_cmd(struct pds_vfio_pci_device *pds_vfio, u8 type)
--- 
-2.17.1
+If another caller of early_set_memory_decrypted() gets added, it would 
+need to know to do the same thing. So I just wonder if this wouldn't be 
+better fixed in early_set_memory_enc_dec() by using a page aligned address 
+and proper number of pages when calling early_set_mem_enc_dec_hypercall() 
+or in early_set_mem_enc_dec_hypercall() where it would take a size 
+argument instead of a page count and does the proper work to get a page 
+aligned address and proper page count.
 
+Also, if it is the hypercall that is causing the issue, should the Fixes 
+tag be 064ce6c550a0 ("mm: x86: Invoke hypercall when page encryption 
+status is changed") since the problem is around the hypercall.
+
+Thanks,
+Tom
+
+> 
+> Thanks,
+> Steve
+>>
+>> Thanks,
+>> Tom
+>>
+>>>
+>>> Fixes: 4716276184ec ("X86/KVM: Decrypt shared per-cpu variables when SEV is active")
+>>> Signed-off-by: Steve Rutherford <srutherford@google.com>
+>>> ---
+>>>    arch/x86/kernel/kvm.c | 14 +++++++++++++-
+>>>    1 file changed, 13 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>>> index 6a36db4f79fd..a0c072d3103c 100644
+>>> --- a/arch/x86/kernel/kvm.c
+>>> +++ b/arch/x86/kernel/kvm.c
+>>> @@ -419,7 +419,14 @@ static u64 kvm_steal_clock(int cpu)
+>>>
+>>>    static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
+>>>    {
+>>> -     early_set_memory_decrypted((unsigned long) ptr, size);
+>>> +     /*
+>>> +      * early_set_memory_decrypted() requires page aligned parameters, but
+>>> +      * this function needs to handle ptrs offset into a page.
+>>> +      */
+>>> +     unsigned long start = PAGE_ALIGN_DOWN((unsigned long) ptr);
+>>> +     unsigned long end = (unsigned long) ptr + size;
+>>> +
+>>> +     early_set_memory_decrypted(start, end - start);
+>>>    }
+>>>
+>>>    /*
+>>> @@ -438,6 +445,11 @@ static void __init sev_map_percpu_data(void)
+>>>                return;
+>>>
+>>>        for_each_possible_cpu(cpu) {
+>>> +             /*
+>>> +              * Calling __set_percpu_decrypted() for each per-cpu variable is
+>>> +              * inefficent, since it may decrypt the same page multiple times.
+>>> +              * That said, it avoids the need for more complicated logic.
+>>> +              */
+>>>                __set_percpu_decrypted(&per_cpu(apf_reason, cpu), sizeof(apf_reason));
+>>>                __set_percpu_decrypted(&per_cpu(steal_time, cpu), sizeof(steal_time));
+>>>                __set_percpu_decrypted(&per_cpu(kvm_apic_eoi, cpu), sizeof(kvm_apic_eoi));
