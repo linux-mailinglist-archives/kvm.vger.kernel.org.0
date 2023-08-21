@@ -2,64 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5409783125
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 21:51:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7029D78318D
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 21:52:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbjHUToV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 15:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39486 "EHLO
+        id S229627AbjHUTtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 15:49:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjHUToV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 15:44:21 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22D5C2
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 12:44:19 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1bf6e47b5efso20929545ad.2
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 12:44:19 -0700 (PDT)
+        with ESMTP id S229649AbjHUTtK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 15:49:10 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C6410B
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 12:49:07 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7493303b5cso2308896276.2
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 12:49:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692647059; x=1693251859;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SSCma3xFa9r8jkJRJYtQ3UJXMDuR6ih/O0h93W+17hY=;
-        b=PGySCjo26AZB9cqV8KpF/JMeY7vWef/kDAGS6lGDo0Q2RuJIf9UzSHhuepJrUdYeDP
-         3wsRtqVlyyhBzLg4NgnhNCDBql5wFYZXsWqJsTcRl1mU2NMggXSYZeYvlEGM5PpwIXvP
-         Iielz22yjvHt+QiS4NJj5jraczBUg9QlX3xA9A8GDGKLxHpG8GP/uEWad2wSPgfT93sp
-         EZ7hJaU0K7Ub0I5m2uJSamCTcj1KKMUbq+P7B36rHl21GsY7ypgdNkMCI3OMsw5Bbwl2
-         k8PVgGtQS/r/6BfdZ40O7B8paUefkaPLaVdXZYLeI194w5SGzeP5V2ybLicvfal8Jy53
-         Rw+w==
+        d=google.com; s=20221208; t=1692647347; x=1693252147;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cJZGEQtf1VL3HQEXak5eCjnl1mSbYK2LpINf2Y7mWuc=;
+        b=RZl6OjBiLyxrlN7m8yUzSzxx4s8l6y5XQtCqoL2DKa9CznCEyAG8OEzPqxiGWWfNJU
+         DP58nwM09rHRg7Se9vncvUgBs+EoatdB0oIHiYis/CY/mK8bpz5tBW/wF/N/V/N/8FcH
+         u/rMp5FZpxMI+ASR8w8FwZSKb5yUKy8z1UKPp14XAoTBk3vwb+9KvbuE4eIugJspN8RX
+         snR6LHbvF/g0TCDHMTgr7kn44jTj6A+c9BdOOfnITVAKCoxj2XXqVMiBuH5zs1EhWFJ1
+         LASBEZFLbEqzA+6VnHUNymrGUBh6X+GLDf47Xj3E2vNSql4sDsL+0xZSb2rnh4OE9Sf8
+         LLXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692647059; x=1693251859;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SSCma3xFa9r8jkJRJYtQ3UJXMDuR6ih/O0h93W+17hY=;
-        b=Fkd2RG5wjxyQNnukjCKERPcf1EK9cee5PVRDuJwMcgQ+UcVj/HES/dOMT7q6fnLEB7
-         XN9mc/xzjGAuXzghq0OHXO1h5k71E8/R2DcTYjjFZP4Jh7f6cFVdPTYHdQ77t5pKsTLO
-         xNC3KVhDX4WtDE9gpr1cl4AgjG5m6aB3+jIYh6eHjvjBrqd+6ZEIzelUOSs+PSTNPUmQ
-         BEa3Qz4xSIACbWdHsSIt096u9qjO0KrDMfY5lTFZTbkx3A9t/9L7zG+OuMSjuR6niwNj
-         Cws5xfHvy5GbWbSENRMramwqpuj2clW4rIQLKBAEsMZhnFZRkkETihn3ZyJVe0Hl9/Vw
-         9Xtw==
-X-Gm-Message-State: AOJu0Yxdz0uTmfrgoQmWj3yZt6a1AddaMcZTiP/cL3Hnsq6x59qMrHXq
-        vTlTKg+7LY8+E2DI4NBUphnI3saOMnYnMU1Ulw==
-X-Google-Smtp-Source: AGHT+IFZOgwoG4uIlCSpVcliJBnuI18zwdWZJ8yxViklw8jp6EKLckJ2Gu/KsjtW8j9EbVROEO3Wi7ZjHJ6bUpcQ0Q==
+        d=1e100.net; s=20221208; t=1692647347; x=1693252147;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cJZGEQtf1VL3HQEXak5eCjnl1mSbYK2LpINf2Y7mWuc=;
+        b=dAABz8nadBi35k0Fw/v1T1gCV8oEo+HwMol1+QhLEsSDcSwW/0JQC3CSTur2lvPEJE
+         9vPeFyVdi/es7l6kUMs8yfsGKRgW8oYeFR8j+2DQtZPJSER39clzy1lxG0O8KY3r/YRY
+         arDCf8ZoCw4uOxTHZp0kwCG+gH01Ybgwq4APcS30WTY5STfPCrBzMqFaCZkUTSsL5vP3
+         7qXERr0uUzsQQN+ky7oZvupHxEwpuHF7rM5z4FP7MCa2ZudFI1sN8Nyjag2kvIVkYFvQ
+         kU4a3OxailiqUQ7I6lN2/76X2M5MeLU6L3hToWXWt65U6JDoXSdkdtaU0su1F05xwpxQ
+         fHoQ==
+X-Gm-Message-State: AOJu0YzqSZxCKoc/5NK7SFcBqO3ICxeJ7NkC8H+XaHbmUlYRUaMmOleM
+        519NtC1uMLABkMapZiDG0eKrtZsQlORViEkCjA==
+X-Google-Smtp-Source: AGHT+IHM9bfoMlIQRP0Zhx06e/5qWh61CmNcgWIzhDyB//MY5jBFnNMVKsg1bGSAIpor6rGkYRANDK9cShM4uv9gKA==
 X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a17:903:41d0:b0:1b8:84d9:dea6 with
- SMTP id u16-20020a17090341d000b001b884d9dea6mr3274875ple.12.1692647059281;
- Mon, 21 Aug 2023 12:44:19 -0700 (PDT)
-Date:   Mon, 21 Aug 2023 19:44:11 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a25:fc0d:0:b0:d07:e80c:412e with SMTP
+ id v13-20020a25fc0d000000b00d07e80c412emr56346ybd.12.1692647346791; Mon, 21
+ Aug 2023 12:49:06 -0700 (PDT)
+Date:   Mon, 21 Aug 2023 19:49:05 +0000
+In-Reply-To: <ZN/4RjDsBLf0FB98@google.com> (message from Sean Christopherson
+ on Fri, 18 Aug 2023 16:01:26 -0700)
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230821194411.2165757-1-ackerleytng@google.com>
-Subject: [PATCH] KVM: selftests: Add tests - invalid inputs for KVM_CREATE_GUEST_MEMFD
+Message-ID: <diqzwmxotbv2.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [RFC PATCH v11 28/29] KVM: selftests: Add basic selftest for guest_memfd()
 From:   Ackerley Tng <ackerleytng@google.com>
-To:     pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, shuah@kernel.org, andrew.jones@linux.dev,
-        ricarkol@google.com, chao.p.peng@linux.intel.com, tabba@google.com,
-        jarkko@kernel.org, yu.c.zhang@linux.intel.com,
-        vannapurve@google.com, ackerleytng@google.com,
-        erdemaktas@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, oliver.upton@linux.dev,
+        chenhuacai@kernel.org, mpe@ellerman.id.au, anup@brainfault.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, willy@infradead.org,
+        akpm@linux-foundation.org, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, chao.p.peng@linux.intel.com,
+        tabba@google.com, jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        vannapurve@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
         david@redhat.com, qperret@google.com, michael.roth@amd.com,
         wei.w.wang@intel.com, liam.merwick@oracle.com,
         isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
@@ -74,96 +81,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test that invalid inputs for KVM_CREATE_GUEST_MEMFD, such as
-non-page-aligned page size and invalid flags, are rejected by the
-KVM_CREATE_GUEST_MEMFD with EINVAL
+Sean Christopherson <seanjc@google.com> writes:
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 33 +++++++++++++++++++
- .../selftests/kvm/include/kvm_util_base.h     | 11 +++++--
- 2 files changed, 42 insertions(+), 2 deletions(-)
+> On Mon, Aug 07, 2023, Ackerley Tng wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> 
+>> > Add a selftest to verify the basic functionality of guest_memfd():
+>> >
+>> > <snip>
+>> 
+>> Here's one more test:
+>
+> First off, thank you!  I greatly appreciate all the selftests work you (and
+> others!) have been doing.
+>
+> For v2, can you please post a standalone patch?  My workflow barfs on unrelated,
+> inlined patches.  I'm guessing I can get b4 to play nice, but it's easier to just
+> yell at people :-)
+>
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index eb93c608a7e0..a8e37f001297 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -90,6 +90,37 @@ static void test_fallocate(int fd, size_t page_size, size_t total_size)
- 	TEST_ASSERT(!ret, "fallocate to restore punched hole should succeed");
- }
- 
-+static void test_create_guest_memfd_invalid(struct kvm_vm *vm, size_t page_size)
-+{
-+	int fd;
-+	uint64_t size;
-+	uint64_t flags;
-+	uint64_t valid_flags = 0;
-+
-+	for (size = 1; size < page_size; size++) {
-+		fd = __vm_create_guest_memfd(vm, size, 0);
-+		TEST_ASSERT(
-+			fd == -1,
-+			"Creating guest memfds with non-page-aligned page sizes should fail");
-+		TEST_ASSERT(errno == EINVAL, "... and errno should be set to EINVAL");
-+	}
-+
-+#ifdef CONFIG_TRANSPARENT_HUGEPAGE
-+	valid_flags = KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
-+#endif
-+
-+	for (flags = 1; flags; flags <<= 1) {
-+		if (flags & valid_flags)
-+			continue;
-+
-+		fd = __vm_create_guest_memfd(vm, page_size, flags);
-+		TEST_ASSERT(
-+			fd == -1,
-+			"Creating guest memfds with invalid flags should fail");
-+		TEST_ASSERT(errno == EINVAL, "... and errno should be set to EINVAL");
-+	}
-+}
-+
- 
- int main(int argc, char *argv[])
- {
-@@ -103,6 +134,8 @@ int main(int argc, char *argv[])
- 
- 	vm = vm_create_barebones();
- 
-+	test_create_guest_memfd_invalid(vm, page_size);
-+
- 	fd = vm_create_guest_memfd(vm, total_size, 0);
- 
- 	test_file_read_write(fd);
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 39b38c75b99c..8bdfadd72349 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -474,7 +474,8 @@ static inline uint64_t vm_get_stat(struct kvm_vm *vm, const char *stat_name)
- }
- 
- void vm_create_irqchip(struct kvm_vm *vm);
--static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
-+
-+static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
- 					uint64_t flags)
- {
- 	struct kvm_create_guest_memfd gmem = {
-@@ -482,7 +483,13 @@ static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
- 		.flags = flags,
- 	};
- 
--	int fd = __vm_ioctl(vm, KVM_CREATE_GUEST_MEMFD, &gmem);
-+	return __vm_ioctl(vm, KVM_CREATE_GUEST_MEMFD, &gmem);
-+}
-+
-+static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
-+					uint64_t flags)
-+{
-+	int fd = __vm_create_guest_memfd(vm, size, flags);
- 
- 	TEST_ASSERT(fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_GUEST_MEMFD, fd));
- 	return fd;
--- 
-2.42.0.rc1.204.g551eb34607-goog
+Here's a standalone patch :)
+https://lore.kernel.org/lkml/20230821194411.2165757-1-ackerleytng@google.com/
 
+> <snip>
