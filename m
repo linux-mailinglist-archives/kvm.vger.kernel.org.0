@@ -2,247 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28C9E7823CE
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 08:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F9B87823D2
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 08:44:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233186AbjHUGkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 02:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56290 "EHLO
+        id S233202AbjHUGot (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 02:44:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231642AbjHUGkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 02:40:03 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A265AA9
-        for <kvm@vger.kernel.org>; Sun, 20 Aug 2023 23:40:01 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id 5614622812f47-3a741f46fadso2419623b6e.0
-        for <kvm@vger.kernel.org>; Sun, 20 Aug 2023 23:40:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692600001; x=1693204801;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7s73kuIQHR7LO5KJQWo5RAXHWI8mJ1SQlq0R8hMo4f0=;
-        b=FzeD29dInR8+HqsDpcTM7/5xo+GeiZIWDpCyrXob7dSU7QP3uq2fEif7kjsB6Tc9pL
-         ZpwIPIPVxHqlDpVeKEejBu0mEgMn0GLsh5lzFZZL4uXv3qaaTE/hcvxeO2wnQDErv4bq
-         xoN2bJfTGkJ3n/vDOliO4zVMzeWr6ph/z2pF2JVMhJ2TRbfxlZl1wSczaBGWqSwMaBc4
-         8J0f24dLgjnPwbGD+/V+TdW5uX7aYJECD34nHv0UptHdpQWlgkj2jWoXqyUcd+WlyvMH
-         PqZoInOGVwkqHs3ANLnn0Y9YPCEH5rpBbZC3/0Bxs6KbP/4zhy+BEVBQ6kL8ydYbuY/C
-         f8cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692600001; x=1693204801;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7s73kuIQHR7LO5KJQWo5RAXHWI8mJ1SQlq0R8hMo4f0=;
-        b=JFTI2zR+xb8iRtC2xkM+aKz+ft8IbagybItVfcp3HYNeVZJkna0Mjk+hSoBWJgSUCy
-         l3JorAIBNcbNrYhrbWNJje8XTG2NQ3NItuwn4DW+I1OPoBwxhACeqW9N/tA1BMRP4B9t
-         XRG/bRHyhreT80u1gxhWFxv33bLCU4h0ZtVfsguT/toBKrEej13sNSeQV8vwKbk8GDyw
-         jknQLVc7NiLVcZyO8qrv+bjUKhkIH4EM990n3tJi3ZyBOkb2kPUPZDF7KHSgtrflUgpV
-         CCvq3uKle2rePM+aCXY3YsY9FYbFcIbbmlMtFsXSA8xOCF7WrSA9xTT0owPWST1tSRhz
-         h1MQ==
-X-Gm-Message-State: AOJu0YwtEMjd/6YG5EKtHfR8ppGKxnCIpalxOpUh9fMWejiz+P31stNm
-        yckoL5dPm9SazWROatYKVoo=
-X-Google-Smtp-Source: AGHT+IGiGAHwY/3zimpnCe5Zpwub9kuqz7evKguePUifXVhf/b++TGlkpJC4Fr0gjdpAZIIwCp/PSA==
-X-Received: by 2002:a05:6808:2187:b0:3a4:8590:90f2 with SMTP id be7-20020a056808218700b003a4859090f2mr10211829oib.47.1692600000958;
-        Sun, 20 Aug 2023 23:40:00 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id ey6-20020a056a0038c600b00686f048bb9dsm1620385pfb.74.2023.08.20.23.39.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 20 Aug 2023 23:40:00 -0700 (PDT)
-Message-ID: <eba07a68-893d-079b-a165-0112c33eb865@gmail.com>
-Date:   Mon, 21 Aug 2023 14:39:52 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v3] Documentation: KVM: Add vPMU implementaion and gap
- document
+        with ESMTP id S231597AbjHUGos (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 02:44:48 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2071.outbound.protection.outlook.com [40.107.94.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2973FAC;
+        Sun, 20 Aug 2023 23:44:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IFT5cWz59nlvnBmBS1auGWTIzwiPWhKWunVwQkkPTqU9OztFiwcl8gM7iKyeza8sP9TZfzKmHXJ306opGt3e57LS29YvRLRHrRit7+ykWWc6E7VEDug3+dJYxqoLOEpCLVBFmCat4fXCJbkm3kVDLrmfoB2/N+sIrvzXFEvdREaLxUyytvsEZJLcXJ9qg8VqAJ/drRsVDnp5XCUdd86UnxPtknVfuFbwLacid/XVxVRfiQ4HcN0RCKtb1dDD6LaggKvhR/r46NidddUEAd33ZZwzT/HeCP1IjNvHT0pvVl93nA61JW4Ii47GouAg9YZuzjBjO8bVAH+8RqM45ne8Kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xBTpXBm673d+bxjO7V+XJfdWEaMeN9v2xHEe4VIvvA0=;
+ b=niNxSdaiOliGXYyXgClIBSKqfrT5WlJATtH9f/886qER36DtlnKTxeR5/UHr218iP2G430JJ+KAhtvvtMiONOl8TJ7x8spDo5b7NgAqpB2m0V7LC8ywSc701IgqGQx1g3MO2s9m5Vn4AkFT2Qikg/rScTq7jdvJZVcLuypeaHFV7fh9J/d13aFS3U7WzdYB3/zOOhPxsZEYDn/HNBhLV0gLK3UhpYQsxxPLuQzalBA7leXKLnI949MQBAnI7fhniZKVVVKK3RU/01G/MPkSfZDH4qRL9i2g8hPVRlVrDO5DekSoxbFXUFa8gOC7AnVYhTS20JHoZ7X7XpuWD4bs9eQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xBTpXBm673d+bxjO7V+XJfdWEaMeN9v2xHEe4VIvvA0=;
+ b=QhmK1KZSvc+IYm5sDDiZcWxXccTx9g7Cu7eDg4pof8peAc4m2mRrp0TpJptWJiY6E/Q0OF6IzN2z1mwZjrowXz+y+MCotYjpbM2qZ/xLiHDh8yVcoB+fHEfSCwHn55yftJowtNvL9cZn3e+pwP/vM/c8PkFv2fjgt9GgD+WkYJc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
+ DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.24; Mon, 21 Aug 2023 06:44:41 +0000
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::52dc:b225:8fec:154c]) by DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::52dc:b225:8fec:154c%4]) with mapi id 15.20.6699.020; Mon, 21 Aug 2023
+ 06:44:41 +0000
+Message-ID: <0b37f490-a8c0-d8bc-bda1-fcb04bd5c221@amd.com>
+Date:   Mon, 21 Aug 2023 08:44:30 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] x86/sev: Make early_set_memory_decrypted() calls page
+ aligned
+To:     Steve Rutherford <srutherford@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
+        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
+References: <20230818233451.3615464-1-srutherford@google.com>
 Content-Language: en-US
-To:     Xiong Zhang <xiong.y.zhang@intel.com>
-Cc:     seanjc@google.com, weijiang.yang@intel.com,
-        dapeng1.mi@linux.intel.com, zhiyuan.lv@intel.com,
-        zhenyu.z.wang@intel.com, kan.liang@intel.com,
-        kvm list <kvm@vger.kernel.org>
-References: <20230810054518.329117-1-xiong.y.zhang@intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230810054518.329117-1-xiong.y.zhang@intel.com>
+From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20230818233451.3615464-1-srutherford@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0228.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b2::12) To DM6PR12MB2810.namprd12.prod.outlook.com
+ (2603:10b6:5:41::21)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|DM6PR12MB4140:EE_
+X-MS-Office365-Filtering-Correlation-Id: e8abcc5d-71d5-4479-07a9-08dba2121883
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8AuVRuNzL3pnTj4bhrjUhElaxyyM+kKdyVxIINM7mcPla95j9KYgAd9GTPv71PyBdybnoykpvZbDHt6bX3XiOpJ8AZGn3b4ynzp9G45AVbf5/l6En+Au/huzf+I0I0N6wnLBqbzqHBjf6JgmllTqvHTwMiLc5aGI03RbM6+4OryCadWntL7ia2oI9hc7Gl8IOtLF0zTvYyrbk38FXove1gvg7cs2q5oDnfJ5HMj4hxDSsr/ohHpD71Zvza5CFfKrP9Y5iLp+nXjPkVRN32G1Pq4iqLfum9YyEyZHkd+ouN108wu44mrq3IqKQOXMaLXhWW+oAYEdkZjsJr+UE+gT54mPClKUO3uufImYI2jnJ50m3/Nux7IPlt5+5Of36rts0Oc+gXN2A1yl3dzaTfYyHCdb7EbMfYI5uWttSG0uEMeMbX5D06p4lBkli3AUP6ETOS9182fUYye0ZbXIG9IiB4b51IVDSuNqfCMdRhkv70al1UBDOGwXki2iFVa6cxH13h3Nzr5wQ/s002fOGVBaCqgSnxGw0yyStrCGuUopKzex3TSywsTSZMpUoYOZEnjTRpus0ysftnavrPCVnoRe8q02JksC9vmUXQvH4T2TCaE74xu+DPGYze/K2BC5lDftIplty30jTa5UDU+cwmaLiQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(346002)(366004)(39860400002)(186009)(1800799009)(451199024)(54906003)(66476007)(66556008)(66946007)(6512007)(316002)(110136005)(8676002)(2616005)(8936002)(4326008)(36756003)(41300700001)(478600001)(6666004)(38100700002)(53546011)(6506007)(6486002)(2906002)(83380400001)(7416002)(86362001)(31686004)(31696002)(5660300002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MEdHYkx0K01lSnRaQlVWbzNyZlM3djdhdzd0MGdPOGZrNWZoaXYwSENNaWZa?=
+ =?utf-8?B?VUpvZXdkVmRURFN6ZDhGWkVZeTUyQlNsMFVtYXIwQmp6ZUhRcnZDRmMzUk9R?=
+ =?utf-8?B?eEVtMjBSQzZzUmJ2cDN3VUk2ajM1ZlhzdEFidlIrOVlPeTc5MFBwSm1ONHNX?=
+ =?utf-8?B?Tldta3VqSkdTTjRPQXVJcFcvamg3UmZ6b1BZWUt1bWRzUTF0cTNvQ0RKUU5p?=
+ =?utf-8?B?bEdjYXRlNzVYU05aeFlIV0hXSjFXQlZJUVdncG9WTXQwM3dwL0NNYmN4VFZh?=
+ =?utf-8?B?OFlPejNibmdTK0FLSnhldXNodExoUmJDWWtmZGlYQWYxeWkrMkdxeDRVVFlD?=
+ =?utf-8?B?N084SjVnVXJRRDNXTjNxSlVqM1FvaVQrMWs2cElodGdSNkg5Y1dvMVBwTmpR?=
+ =?utf-8?B?QmZuZk1vZE1iaGRiU0k5VGttR3ZFWWVqSzhhYUZjR1BUbyt6WUpES3JoSlNm?=
+ =?utf-8?B?M3dhTGx4WUtHMmJIWXlNZVJIK0xla0lVYnlKdkYwK3VRRFBMUEwxQjMzV3lx?=
+ =?utf-8?B?NExRRURJRTNZNXpCcmRiUWx5UDRDSUdCdjJyMkh4UkhpQXhOazZtMkZ3Ylp5?=
+ =?utf-8?B?VERpSjZQZXQ4aFBEcnloSjhrV09hZVBLcC9jNHFWTE5YUHE5N2lZZlgyRi9M?=
+ =?utf-8?B?ZFhGZmx1ankybGg5VmowOUxHVGNVTUJ2aHFPNE1pODMxZDVxaXdQVGVQd0dE?=
+ =?utf-8?B?bFdEcnRBajZWRmRvNXAzK3Q1VHMrZDNJNXY1ekM0eDFrYkhXd1JEcWhsa0dh?=
+ =?utf-8?B?ODk2NHo2eWNvelZORUJFa3dyREUyS0lGZzlBQS8wT0M3bzUzUHVWVHFSRW5k?=
+ =?utf-8?B?aEpPY3NVQUt4VlcwMlBnU215ZXhLdVFsVGZ0SzJCUFFTRHBMSGJSUzk1QUt6?=
+ =?utf-8?B?RjFMUkVwdXhYSUROREs4OWlmbHpqdENPVWJqbGhhNU11eTQ4L1dpQk5qNmox?=
+ =?utf-8?B?WnNXZFFURjhMcmZTWlFYZ2hVb2hVMEJKbVROaWUxYWx6NmFiOHJHdWxqWkZK?=
+ =?utf-8?B?R1Z5TzB4cmQvVEY2K3JPSm9pcFpkbXkrc1E3MFdyVjRva3MxRXpxOE1FbGo1?=
+ =?utf-8?B?NDNSdGh0Qm11NE1MWGYyQ0gwNEIzR21xMGYzSkJydFhMeUtyQWZxRVA0UGtH?=
+ =?utf-8?B?bjlZN3VBcnpaZ0JxRFpSOGVUNjdWTWVnUnVTV0t2ZjVRT1lXYlNFcnUwNXA4?=
+ =?utf-8?B?YmR3UlAxUW85YTVLMzZGNDFDUUN3UW9FSGVuSk5Ha0hrS3dPTjVETFR4dG1M?=
+ =?utf-8?B?a0RoR2V3MFJjbmNVNzY5L1RabmpPa0ZmTzhrWjlYUnA1cUlIaGZqYm9tL0Jk?=
+ =?utf-8?B?RVNwWXk4YW5EWTRJd1VYL2JCSXVLZXRRNFVqVjVZL2ttRi9DS0U0WngwQnpQ?=
+ =?utf-8?B?cGI0aVFKS0lDcW9lWG1LeFhMendRcitkR29VZkcxQkdxRlB0c3BSUFV0WG5m?=
+ =?utf-8?B?NzcyRDlmY0ZYZlZwZHBVMmlrMTFjSGR2cWRMdDdCdkpHZ2NSS01WN0wvQXVP?=
+ =?utf-8?B?c0lkRWR1NFdkcENMOU1LMVZBK1hCSmV4QmZOcFU0dzV4ekY3YU1kcjZnNnFZ?=
+ =?utf-8?B?MzlHL3lPbGpwa2l0bllUaHBxY1RwUm9CYm1IamhvclJNSUZPTU1XR3lBWUxa?=
+ =?utf-8?B?ckY5cm1ydk9vVitNMTY0MFRBWWdXakxsUnlXQjE5ZEpGYXUxTCtXR3ROc25H?=
+ =?utf-8?B?TXdBZklEL05yMklUVTZ3U0hxZllyVWlmVlRSOVl1RVNMUC8vQ1JheVNidnJN?=
+ =?utf-8?B?UC8xY2tUL3RVTDV5WjdkZUtkT0JJTjdBL0RXV3RsZjJFcVd2RllIM09xbEFS?=
+ =?utf-8?B?V1FURTVHUE9ZbjFxKys4d0tsN3plUG9Rek5NU2QrMC9jR3ZsUWl6WVo1b2Nv?=
+ =?utf-8?B?OG4zY1NoOTEzUGU4YVBmeE9VSVI4ZXlwRmxDdjNhSTI1Y1YyRFNDSDZKejQ0?=
+ =?utf-8?B?czFUcmp6a1AyVjFkRG5WMFdxQUNvaG4xNWxGWTV5WFlZYW14MEFuK2ZMYkFB?=
+ =?utf-8?B?K0pMd0c3Qk5UMHBCQ3Yvc1oxd2pnMksxQW9aOVl6N3lETFBTdFN6Z2tob3lV?=
+ =?utf-8?B?UTU1cDB0cVRuanZ6b0ZWY2FkZXREeWI4UmhvR09XV1k2cTN6TkZKWnNGdlhV?=
+ =?utf-8?Q?YROWZodYK9WXzgSMaI2GAgq/k?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e8abcc5d-71d5-4479-07a9-08dba2121883
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 06:44:41.0050
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rP2J55cHLlIVb3JS9vLEoCoQnB+w5f4FuUMUACg6nhoVTWLRwsYrLYk5krntucXR8TginKO76lKSwnDjRQKQOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4140
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/8/2023 1:45 pm, Xiong Zhang wrote:
-> +2. Perf Scheduler Basic
-> +=======================
+On 8/19/2023 1:34 AM, Steve Rutherford wrote:
+> early_set_memory_decrypted() assumes its parameters are page aligned.
+> Non-page aligned calls result in additional pages being marked as
+> decrypted via the encryption status hypercall, which results in
+> consistent corruption of pages during live migration. Live
+> migration requires accurate encryption status information to avoid
+> migrating pages from the wrong perspective.
+> 
+> Fixes: 4716276184ec ("X86/KVM: Decrypt shared per-cpu variables when SEV is active")
+> Signed-off-by: Steve Rutherford <srutherford@google.com>
+> ---
+>   arch/x86/kernel/kvm.c | 14 +++++++++++++-
+>   1 file changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 6a36db4f79fd..a0c072d3103c 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -419,7 +419,14 @@ static u64 kvm_steal_clock(int cpu)
+>   
+>   static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
+>   {
+> -	early_set_memory_decrypted((unsigned long) ptr, size);
+> +	/*
+> +	 * early_set_memory_decrypted() requires page aligned parameters, but
+> +	 * this function needs to handle ptrs offset into a page.
+> +	 */
+> +	unsigned long start = PAGE_ALIGN_DOWN((unsigned long) ptr);
+> +	unsigned long end = (unsigned long) ptr + size;
 > +
-> +Perf subsystem users can not get PMU counter or resource directly, user
+> +	early_set_memory_decrypted(start, end - start);
+>   }
+>   
+>   /*
+> @@ -438,6 +445,11 @@ static void __init sev_map_percpu_data(void)
+>   		return;
+>   
+>   	for_each_possible_cpu(cpu) {
+> +		/*
+> +		 * Calling __set_percpu_decrypted() for each per-cpu variable is
+> +		 * inefficent, since it may decrypt the same page multiple times.
+> +		 * That said, it avoids the need for more complicated logic.
+> +		 */
+>   		__set_percpu_decrypted(&per_cpu(apf_reason, cpu), sizeof(apf_reason));
+>   		__set_percpu_decrypted(&per_cpu(steal_time, cpu), sizeof(steal_time));
+>   		__set_percpu_decrypted(&per_cpu(kvm_apic_eoi, cpu), sizeof(kvm_apic_eoi));
 
-s/can not get/not expected to access PMU hw counters/
+The fix looks correct to me.
 
-> +should create a perf event first and specify event’s attribute which is
-
-eventâ€™s attribute, drop the Unicode character.
-
-attribute --> attributes which are
-
-> +used to choose PMU counters, then perf event joins in perf scheduler,
-> +perf scheduler assigns the corresponding PMU counter to a perf event.
-
-"Counter" is not generic enough for LBR case.
-
-The number of perf_event is not necessarily 1:1 mapped to the number of PMU
-hardware resources (such as counters) acquired either.
-
-> +
-> +Perf event is created by perf_event_open() system call::
-
-KVM is using the perf_event_create_kernel_counter() API.
-
-The difference between these two interfaces is worth being described here.
-But generic perf scheduler behavior doesn't fit.
-
-> +
-> +    int syscall(SYS_perf_event_open, struct perf_event_attr *,
-> +		pid, cpu, group_fd, flags)
-> +    struct perf_event_attr {
-> +	    ......
-> +	    /* Major type: hardware/software/tracepoint/etc. */
-> +	    __u32   type;
-> +	    /* Type specific configuration information. */
-> +	    __u64   config;
-> +	    union {
-> +		    __u64      sample_period;
-> +		    __u64      sample_freq;
-> +	    }
-> +	   __u64   disabled :1;
-> +	           pinned   :1;
-> +		   exclude_user  :1;
-> +		   exclude_kernel :1;
-> +		   exclude_host   :1;
-> +	           exclude_guest  :1;
-> +	......
-> +    }
-> +
-> +The pid and cpu arguments allow specifying which process and CPU
-> +to monitor::
-> +
-> +  pid == 0 and cpu == -1
-> +        This measures the calling process/thread on any CPU.
-> +  pid == 0 and cpu >= 0
-> +        This measures the calling process/thread only when running on
-> +	the specified cpu.
-> +  pid > 0 and cpu == -1
-> +        This measures the specified process/thread on any cpu.
-> +  pid > 0 and cpu >= 0
-> +        This  measures the specified process/thread only when running
-> +	on the specified CPU.
-> +  pid == -1 and cpu >= 0
-> +        This measures all processes/threads on the specified CPU.
-> +  pid == -1 and cpu == -1
-> +        This setting is invalid and will return an error.
-> +
-> +Perf scheduler's responsibility is choosing which events are active at
-> +one moment and binding counter with perf event. As processor has limited
-
-This is not rigorous at all, perf manages a lot of kernel abstractions,
-and hardware pmu is just one part of it.
-
-> +PMU counters and other resource, only limited perf events can be active
-> +at one moment, the inactive perf event may be active in the next moment,
-> +perf scheduler has defined rules to control these things.
-
-Some developers often ask about the mechanics of events/counters multiplexing,
-which is expect to be mentioned here for generic perf behavior.
-
-> +
-> +Perf scheduler defines four types of perf event, defined by the pid and
-> +cpu arguments in perf_event_open(), plus perf_event_attr.pinned, their
-> +schedule priority are: per_cpu pinned > per_process pinned
-> +> per_cpu flexible > per_process flexible. High priority events can
-> +preempt low priority events when resources contend.
-
-It's not "per-process",
-
-  *  - CPU pinned (EVENT_CPU | EVENT_PINNED)
-  *  - task pinned (EVENT_PINNED)
-  *  - CPU flexible (EVENT_CPU | EVENT_FLEXIBLE)
-  *  - task flexible (EVENT_FLEXIBLE).
-
-It would be nice to mention here that perf function that handles prioritization:
-
-static void ctx_resched(struct perf_cpu_context *cpuctx,
-			struct perf_event_context *task_ctx,
-			enum event_type_t event_type)
-
-I wouldn't be surprised if the comment around ctx_resched() is out of date.
-
-> +
-> +perf event type::
-> +
-> +  --------------------------------------------------------
-> +  |                      |   pid   |   cpu   |   pinned  |
-> +  --------------------------------------------------------
-> +  | Per-cpu pinned       |   *    |   >= 0   |     1     |
-> +  --------------------------------------------------------
-> +  | Per-process pinned   |  >= 0  |    *     |     1     |
-> +  --------------------------------------------------------
-> +  | Per-cpu flexible     |   *    |   >= 0   |     0     |
-> +  --------------------------------------------------------
-> +  | Per-process flexible | >= 0   |    *     |     0     |
-> +  --------------------------------------------------------
-> +
-> +perf_event abstract::
-> +
-> +    struct perf_event {
-> +	    struct list_head       event_entry;
-> +	    ......
-> +	    struct pmu             *pmu;
-> +	    enum perf_event_state  state;
-> +	    local64_t              count;
-> +	    u64                    total_time_enabled;
-> +	    u64                    total_time_running;
-> +	    struct perf_event_attr attr;
-> +	    ......
-> +    }
-> +
-> +For per-cpu perf event, it is linked into per cpu global variable
-> +perf_cpu_context, for per-process perf event, it is linked into
-> +task_struct->perf_event_context.
-> +
-> +Usually the following cases cause perf event reschedule:
-> +1) In a context switch from one task to a different task.
-> +2) When an event is manually enabled.
-> +3) A call to perf_event_open() with disabled field of the
-> +perf_event_attr argument set to 0.
-> +
-> +When perf_event_open() or perf_event_enable() is called, perf event
-> +reschedule is needed on a specific cpu, perf will send an IPI to the
-> +target cpu, and the IPI handler will activate events ordered by event
-> +type, and will iterate all the eligible events in per cpu gloable
-> +variable perf_cpu_context and current->perf_event_context.
-> +
-> +When a perf event is sched out, this event mapped counter is disabled,
-> +and the counter's setting and count value are saved. When a perf event
-> +is sched in, perf driver assigns a counter to this event, the counter's
-> +setting and count values are restored from last saved.
-> +
-> +If the event could not be scheduled because no resource is available for
-> +it, pinned event goes into error state and is excluded from perf
-> +scheduler, the only way to recover it is re-enable it, flexible event
-> +goes into inactive state and can be multiplexed with other events if
-> +needed.
-
-I highly doubt that these are internal behaviors that the perf system is designed
-to do, some are, some aren't, and some have exceptions like the BTS event.
-
-Obviously this part needs to be reviewed by more perf developers.
-Trying to muddle through will only mislead more developers.
-
-I'd much rather see those perf descriptions in the perf comments or man-pages.
- From time to time, perf core will refactor or change its internal implementations.
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
