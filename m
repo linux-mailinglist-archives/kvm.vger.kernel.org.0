@@ -2,285 +2,310 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A8EB782F26
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 19:11:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7710F782F59
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 19:25:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236892AbjHURLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 13:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41290 "EHLO
+        id S231341AbjHURZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 13:25:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbjHURLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 13:11:25 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2FCEC
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 10:11:23 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-76dafe9574bso17645885a.1
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 10:11:23 -0700 (PDT)
+        with ESMTP id S230378AbjHURZC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 13:25:02 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A829100
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 10:25:00 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso31840691fa.2
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 10:25:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1692637882; x=1693242682;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZQ59N6at0zbBieDZtWXJGjAejF7XYSgNeSZUJ/Ek3E=;
-        b=bubdLBZKqa22OI94f2vUw7HIQe/Y1oDy1YGiTPGnDEt0ni7Wg3SYPyx9VnV4TQl4mC
-         5u1Isb3wLJvyvzaNiPRKBwB/rjlmKWaP2jDgo34bOYjZFArDuZKTgHSio/FMXF0NFcg6
-         oFJQtbcxtZiS/uXRI4mkdubJdvc8ZSagJ8p7cAzMsEfD2O4+Us96+ou6Yk9H1B7JGsHT
-         M0rc0OJedwzh0O5dJ0NV9n/dp4hzlb7Igc0DeWWbZQcePuRlLPhXiR7VAws0hxlfmWfT
-         0EUpJXDi2oje6rv6/RU7tpijdtWYqM4NZn5XjK1JxftkgC+5h5La27n7qTjvkhZ6gdjr
-         +WhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692637882; x=1693242682;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1692638699; x=1693243499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DZQ59N6at0zbBieDZtWXJGjAejF7XYSgNeSZUJ/Ek3E=;
-        b=HpFrrLMfkzf0lpLW+17CEzzxCDhCCqmceqgIkK5BTg7bhaVg7sMihNmT8ocVrN8f3N
-         485MzFsLOM81y1KksWyjuF6asp3CoDhjESI+hUNd06dhdgFaWSZygl7yTLS0PHBYzVOc
-         dxbl48q94DjWpmVv1JBsS+r031dG9Ce4MLR7AgtjFkz1yVvXTNJHzMiN12lZolzqz6dC
-         erPRstqX1RhtOeI1qgV+RwNEJtnmCVWS+0ks+/uhPG5mPDt4s7VZPXwKqd0L3joi6OQD
-         vYa2us2znxasOUglWUhHEI0yJCziFXV3Vos8H+QHdiIH/Iyl4R3YEtPHjYvDFM02OHCo
-         gD7g==
-X-Gm-Message-State: AOJu0YzsTNNdbmtWoacpRJGA7h1q52sV6fk8T7vxe5Ldk4gXYAM7dQEN
-        cn98lz9FvRa/Zaq298dkDuDIMg==
-X-Google-Smtp-Source: AGHT+IH+ma5zsrikDgBqZbfg/lBTwpLwrxV8rmHy0wDGJg7fciff2u7AqewHPoadTAmit1jAmacP2Q==
-X-Received: by 2002:a05:620a:1026:b0:76c:c90d:2eef with SMTP id a6-20020a05620a102600b0076cc90d2eefmr8357328qkk.42.1692637882428;
-        Mon, 21 Aug 2023 10:11:22 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
-        by smtp.gmail.com with ESMTPSA id c8-20020a05620a134800b0076dae4753efsm274426qkl.14.2023.08.21.10.11.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 10:11:21 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1qY8Qz-00DvG9-DQ;
-        Mon, 21 Aug 2023 14:11:21 -0300
-Date:   Mon, 21 Aug 2023 14:11:21 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Yi Liu <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        iommu@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 09/11] iommu: Make iommu_queue_iopf() more generic
-Message-ID: <ZOOauSJpcE2YgIzG@ziepe.ca>
-References: <20230817234047.195194-1-baolu.lu@linux.intel.com>
- <20230817234047.195194-10-baolu.lu@linux.intel.com>
+        bh=L11mwPudUpyxcxi4xDsZZIa+yZ3u5tdBmcOcdJ6MPhM=;
+        b=AWmPiMiw2cXqjSKAKABNL5ueILy2C1/4nX/Y2Y1P+MSQ3BZEU7yOaRhp9ukU2LSg4d
+         QpQaMctjbu3lezcOzg3MKuAUder+Q0mJFpvUigZcOR0ViTuYOiEWwvYtYv94HpPuGPkO
+         acZGkP+9eKcgYSB/brbt2ZJHIzopF1Ef6yILWhH4FIId8+nI70A8VQNTXsYl13KikUiN
+         R2TRJdR1JFn8Cp60ImADFO0DkNmaD1lidW30vIA7kDGNSsyohUkG0tW5saGotcbgm67d
+         BPu7S5dkdpoEjZoIthT0YA0XVK8c9IrbmmKzEo5DOuwle6H+XRh4/Y6oRkyksWok83Cy
+         minw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692638699; x=1693243499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L11mwPudUpyxcxi4xDsZZIa+yZ3u5tdBmcOcdJ6MPhM=;
+        b=JGK4tJ24ozQ+2nB7XYPQyy7LAdcGu/unb07NGMsEGlsLX+I6U+WHwTHwyYBvMkuuJw
+         JgqCnHAQ1Ab48IHz55iG6Bnkmg+jjI9P3l3DKc+iXKA3b//5wBvsSz6cQxURe5JGi0GN
+         5ffc5utKiAWaebz80ARPOUkYi7Apvl7B1DLoKk2AuAWAw0sjhbco1GX20zL2w2qBnwDr
+         Bj5+My2JiwLnCBODK7UKGEfyd380FpK92ibUi2JshaNo/5s5NLoCniV3OTH2RFC2ZObO
+         Ur4SZUFn7zXadF3o4k85aeXplWUtEvitZYiOkG6evFcIGnnQOyiGgvzI0emy5VCHOvHh
+         PsPw==
+X-Gm-Message-State: AOJu0YzKAOLh7kcsvW2kZev1uUZhpPCkDSRs7cqstqFZPM1J+LrLNInj
+        6lgA1tXN3htFCCGbBQKU7rfSJAkUCld16oBjLAuOmA==
+X-Google-Smtp-Source: AGHT+IHbI3VDjhtHox28Y/I58gcolObd5U2Lri41fIc+znSsgOL0TspSi/TN48KfvpCB57G6B6UMyjhuA6OWzmLw8bs=
+X-Received: by 2002:a2e:860d:0:b0:2b7:1005:931b with SMTP id
+ a13-20020a2e860d000000b002b71005931bmr5565528lji.0.1692638698511; Mon, 21 Aug
+ 2023 10:24:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230817234047.195194-10-baolu.lu@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20230807162210.2528230-1-jingzhangos@google.com>
+ <20230807162210.2528230-3-jingzhangos@google.com> <878raex8g0.fsf@redhat.com>
+ <CAAdAUtivsxqpSE_0BL_OftxzwR=e5Rnugb69Ln841ooJqVXgmA@mail.gmail.com>
+ <874jkyqe13.fsf@redhat.com> <86sf8hg45k.wl-maz@kernel.org>
+In-Reply-To: <86sf8hg45k.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 21 Aug 2023 10:24:46 -0700
+Message-ID: <CAAdAUtjG-9Ttdk3_T+OV6ea3p_r9q0yrE1XJUpdB0PwSJsN6VA@mail.gmail.com>
+Subject: Re: [PATCH v8 02/11] KVM: arm64: Document KVM_ARM_GET_REG_WRITABLE_MASKS
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Cornelia Huck <cohuck@redhat.com>, KVM <kvm@vger.kernel.org>,
+        KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 18, 2023 at 07:40:45AM +0800, Lu Baolu wrote:
-> This completely separates the IO page fault handling framework from the
-> SVA implementation. Previously, the SVA implementation was tightly coupled
-> with the IO page fault handling framework. This makes SVA a "customer" of
-> the IO page fault handling framework by converting domain's page fault
-> handler to handle a group of faults and calling it directly from
-> iommu_queue_iopf().
-> 
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+On Thu, Aug 17, 2023 at 7:00=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
+>
+> On Thu, 17 Aug 2023 09:16:56 +0100,
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> >
+> > On Mon, Aug 14 2023, Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > > Maybe it'd be better to leave this to whenever we do need to add othe=
+r
+> > > range support?
+> >
+> > My point is: How does userspace figure out if the kernel that is runnin=
+g
+> > supports ranges other than id regs? If this is just an insurance agains=
+t
+> > changes that might arrive or not, we can live with the awkward "just tr=
+y
+> > it out" approach; if we think it's likely that we'll need to extend it,
+> > we need to add the mechanism for userspace to find out about it now, or
+> > it would need to probe for presence of the mechanism...
+>
+> Agreed. Nothing like the present to address this sort of things. it
+> really doesn't cost much, and I'd rather have it right now.
+>
+> Here's a vague attempt at an advertising mechanism. If people are OK
+> with it, I can stash that on top of Jing's series.
+>
+> Thanks,
+>
+>         M.
+>
+> From bcfd87e85954e24ac4a905a3486c9040cdfc6d0b Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Thu, 17 Aug 2023 14:48:16 +0100
+> Subject: [PATCH] KVM: arm64: Add KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
+>
+> While the Feature ID range is well defined and pretty large, it
+> isn't inconceivable that the architecture will eventually grow
+> some other ranges that will need to similarly be described to
+> userspace.
+>
+> Add a new capability (KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES)
+> that returns a bitmap of the valid ranges, which can subsequently
+> be retrieved, one at a time by setting the index of the set bit
+> as the range identifier.
+>
+> Obviously, we only support a value of 0 for now.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  include/linux/iommu.h      |  5 +++--
->  drivers/iommu/iommu-sva.h  |  8 --------
->  drivers/iommu/io-pgfault.c | 16 +++++++++++++---
->  drivers/iommu/iommu-sva.c  | 14 ++++----------
->  drivers/iommu/iommu.c      |  4 ++--
->  5 files changed, 22 insertions(+), 25 deletions(-)
-> 
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index ff292eea9d31..cf1cb0bb46af 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -41,6 +41,7 @@ struct iommu_sva;
->  struct iommu_fault_event;
->  struct iommu_dma_cookie;
->  struct iopf_queue;
-> +struct iopf_group;
->  
->  #define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
->  #define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
-> @@ -175,8 +176,7 @@ struct iommu_domain {
->  	unsigned long pgsize_bitmap;	/* Bitmap of page sizes in use */
->  	struct iommu_domain_geometry geometry;
->  	struct iommu_dma_cookie *iova_cookie;
-> -	enum iommu_page_response_code (*iopf_handler)(struct iommu_fault *fault,
-> -						      void *data);
-> +	int (*iopf_handler)(struct iopf_group *group);
->  	void *fault_data;
->  	union {
->  		struct {
-> @@ -526,6 +526,7 @@ struct iopf_group {
->  	struct list_head		faults;
->  	struct work_struct		work;
->  	struct device			*dev;
-> +	void				*data;
->  };
->  
->  int iommu_device_register(struct iommu_device *iommu,
-> diff --git a/drivers/iommu/iommu-sva.h b/drivers/iommu/iommu-sva.h
-> index 510a7df23fba..cf41e88fac17 100644
-> --- a/drivers/iommu/iommu-sva.h
-> +++ b/drivers/iommu/iommu-sva.h
-> @@ -22,8 +22,6 @@ int iopf_queue_flush_dev(struct device *dev);
->  struct iopf_queue *iopf_queue_alloc(const char *name);
->  void iopf_queue_free(struct iopf_queue *queue);
->  int iopf_queue_discard_partial(struct iopf_queue *queue);
-> -enum iommu_page_response_code
-> -iommu_sva_handle_iopf(struct iommu_fault *fault, void *data);
->  void iopf_free_group(struct iopf_group *group);
->  int iopf_queue_work(struct iopf_group *group, work_func_t func);
->  int iommu_sva_handle_iopf_group(struct iopf_group *group);
-> @@ -65,12 +63,6 @@ static inline int iopf_queue_discard_partial(struct iopf_queue *queue)
->  	return -ENODEV;
->  }
->  
-> -static inline enum iommu_page_response_code
-> -iommu_sva_handle_iopf(struct iommu_fault *fault, void *data)
-> -{
-> -	return IOMMU_PAGE_RESP_INVALID;
-> -}
-> -
->  static inline void iopf_free_group(struct iopf_group *group)
->  {
->  }
-> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-> index 00c2e447b740..a61c2aabd1b8 100644
-> --- a/drivers/iommu/io-pgfault.c
-> +++ b/drivers/iommu/io-pgfault.c
-> @@ -11,8 +11,6 @@
->  #include <linux/slab.h>
->  #include <linux/workqueue.h>
->  
-> -#include "iommu-sva.h"
-> -
->  /**
->   * struct iopf_queue - IO Page Fault queue
->   * @wq: the fault workqueue
-> @@ -93,6 +91,7 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
->  {
->  	int ret;
->  	struct iopf_group *group;
-> +	struct iommu_domain *domain;
->  	struct iopf_fault *iopf, *next;
->  	struct iommu_fault_param *iopf_param;
->  	struct dev_iommu *param = dev->iommu;
-> @@ -124,6 +123,16 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
->  		return 0;
->  	}
->  
-> +	if (fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID)
-> +		domain = iommu_get_domain_for_dev_pasid(dev, fault->prm.pasid, 0);
-> +	else
-> +		domain = iommu_get_domain_for_dev(dev);
+>  Documentation/virt/kvm/api.rst    | 37 ++++++++++++++++++++-----------
+>  arch/arm64/include/uapi/asm/kvm.h | 13 +++++++----
+>  arch/arm64/kvm/arm.c              |  3 +++
+>  arch/arm64/kvm/sys_regs.c         |  5 +++--
+>  include/uapi/linux/kvm.h          |  1 +
+>  5 files changed, 40 insertions(+), 19 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 92a9b20f970e..0e6ce02cac3b 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6071,7 +6071,7 @@ applied.
+>  4.139 KVM_ARM_GET_REG_WRITABLE_MASKS
+>  -------------------------------------------
+>
+> -:Capability: none
+> +:Capability: KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES
+>  :Architectures: arm64
+>  :Type: vm ioctl
+>  :Parameters: struct reg_mask_range (in/out)
+> @@ -6082,20 +6082,31 @@ applied.
+>
+>          #define ARM64_FEATURE_ID_SPACE_SIZE    (3 * 8 * 8)
+>
+> -        struct reg_mask_range {
+> -                __u64 addr;             /* Pointer to mask array */
+> -                __u64 reserved[7];
+> -        };
+> +       struct reg_mask_range {
+> +               __u64 addr;             /* Pointer to mask array */
+> +               __u32 range;            /* Requested range */
+> +               __u32 reserved[13];
+> +       };
+>
+> -This ioctl would copy the writable masks for feature ID registers to use=
+rspace.
+> -The Feature ID space is defined as the System register space in AArch64 =
+with
+> +This ioctl copies the writable masks for Feature ID registers to userspa=
+ce.
+> +The Feature ID space is defined as the AArch64 System Register space wit=
+h
+>  op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-7}, op2=3D=3D{0-=
+7}.
+> -To get the index in the mask array pointed by ``addr`` for a specified f=
+eature
+> -ID register, use the macro ``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, c=
+rm, op2)``.
+> -This allows the userspace to know upfront whether it can actually tweak =
+the
+> -contents of a feature ID register or not.
+> -The ``reserved[7]`` is reserved for future use to add other register spa=
+ce. For
+> -feature ID registers, it should be 0, otherwise, KVM may return error.
 > +
-> +	if (!domain || !domain->iopf_handler) {
-> +		ret = -ENODEV;
-> +		goto cleanup_partial;
-> +	}
+> +The mask array pointed to by ``addr`` is indexed by the macro
+> +``ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)``, allowing usersp=
+ace
+> +to know what bits can be changed for the system register described by ``=
+op0,
+> +op1, crn, crm, op2``.
 > +
->  	group = kzalloc(sizeof(*group), GFP_KERNEL);
->  	if (!group) {
->  		/*
-> @@ -137,6 +146,7 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
->  
->  	group->dev = dev;
->  	group->last_fault.fault = *fault;
-> +	group->data = domain->fault_data;
->  	INIT_LIST_HEAD(&group->faults);
->  	list_add(&group->last_fault.list, &group->faults);
->  
-> @@ -147,7 +157,7 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
->  			list_move(&iopf->list, &group->faults);
->  	}
->  
-> -	ret = iommu_sva_handle_iopf_group(group);
-> +	ret = domain->iopf_handler(group);
->  	if (ret)
->  		iopf_free_group(group);
->  
-> diff --git a/drivers/iommu/iommu-sva.c b/drivers/iommu/iommu-sva.c
-> index df8734b6ec00..2811f34947ab 100644
-> --- a/drivers/iommu/iommu-sva.c
-> +++ b/drivers/iommu/iommu-sva.c
-> @@ -148,13 +148,14 @@ EXPORT_SYMBOL_GPL(iommu_sva_get_pasid);
+> +The ``range`` field describes the requested range of registers. The vali=
+d
+> +ranges can be retrieved by checking the return value of
+> +KVM_CAP_CHECK_EXTENSION_VM for the KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANG=
+ES
+> +capability, which will return a bitmask of the supported ranges. Each bi=
+t
+> +set in the return value represents a possible value for the ``range``
+> +field.  At the time of writing, only bit 0 is returned set by the
+> +capability, meaning that only the value 0 is value for ``range``.
+> +
+> +The ``reserved[13]`` array is reserved for future use and should be 0, o=
+r
+> +KVM may return an error.
+>
+>  5. The kvm_run structure
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/=
+asm/kvm.h
+> index 7a21bbb8a0f7..5148b4c22549 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -505,8 +505,9 @@ struct kvm_smccc_filter {
+>  #define KVM_HYPERCALL_EXIT_SMC         (1U << 0)
+>  #define KVM_HYPERCALL_EXIT_16BIT       (1U << 1)
+>
+> -/* Get feature ID registers userspace writable mask. */
 >  /*
->   * I/O page fault handler for SVA
+> + * Get feature ID registers userspace writable mask.
+> + *
+>   * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
+>   * Feature Register 2"):
+>   *
+> @@ -514,8 +515,11 @@ struct kvm_smccc_filter {
+>   * AArch64 with op0=3D=3D3, op1=3D=3D{0, 1, 3}, CRn=3D=3D0, CRm=3D=3D{0-=
+7},
+>   * op2=3D=3D{0-7}."
+>   *
+> - * This covers all R/O registers that indicate anything useful feature
+> - * wise, including the ID registers.
+> + * This covers all currently known R/O registers that indicate
+> + * anything useful feature wise, including the ID registers.
+> + *
+> + * If we ever need to introduce a new range, it will be described as
+> + * such in the range field.
 >   */
-> -enum iommu_page_response_code
-> +static enum iommu_page_response_code
->  iommu_sva_handle_iopf(struct iommu_fault *fault, void *data)
->  {
->  	vm_fault_t ret;
->  	struct vm_area_struct *vma;
-> -	struct mm_struct *mm = data;
->  	unsigned int access_flags = 0;
-> +	struct iommu_domain *domain = data;
-> +	struct mm_struct *mm = domain->mm;
->  	unsigned int fault_flags = FAULT_FLAG_REMOTE;
->  	struct iommu_fault_page_request *prm = &fault->prm;
->  	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
-> @@ -231,23 +232,16 @@ static void iommu_sva_iopf_handler(struct work_struct *work)
->  {
->  	struct iopf_fault *iopf;
->  	struct iopf_group *group;
-> -	struct iommu_domain *domain;
->  	enum iommu_page_response_code status = IOMMU_PAGE_RESP_SUCCESS;
->  
->  	group = container_of(work, struct iopf_group, work);
-> -	domain = iommu_get_domain_for_dev_pasid(group->dev,
-> -				group->last_fault.fault.prm.pasid, 0);
-> -	if (!domain || !domain->iopf_handler)
-> -		status = IOMMU_PAGE_RESP_INVALID;
-> -
->  	list_for_each_entry(iopf, &group->faults, list) {
->  		/*
->  		 * For the moment, errors are sticky: don't handle subsequent
->  		 * faults in the group if there is an error.
->  		 */
->  		if (status == IOMMU_PAGE_RESP_SUCCESS)
-> -			status = domain->iopf_handler(&iopf->fault,
-> -						      domain->fault_data);
-> +			status = iommu_sva_handle_iopf(&iopf->fault, group->data);
->  	}
->  
->  	iommu_sva_complete_iopf(group->dev, &group->last_fault, status);
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index b280b9f4d8b4..9b622088c741 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -3395,8 +3395,8 @@ struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
->  	domain->type = IOMMU_DOMAIN_SVA;
->  	mmgrab(mm);
->  	domain->mm = mm;
-> -	domain->iopf_handler = iommu_sva_handle_iopf;
-> -	domain->fault_data = mm;
-> +	domain->iopf_handler = iommu_sva_handle_iopf_group;
-> +	domain->fault_data = domain;
+>  #define ARM64_FEATURE_ID_SPACE_IDX(op0, op1, crn, crm, op2)            \
+>         ({                                                              \
+> @@ -528,7 +532,8 @@ struct kvm_smccc_filter {
+>
+>  struct reg_mask_range {
+>         __u64 addr;             /* Pointer to mask array */
+> -       __u64 reserved[7];
+> +       __u32 range;            /* Requested range */
+> +       __u32 reserved[13];
+>  };
+>
+>  #endif
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e08894692829..6ea4d8b0e744 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -316,6 +316,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
+g ext)
+>         case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+>                 r =3D kvm_supported_block_sizes();
+>                 break;
+> +       case KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES:
+> +               r =3D BIT(0);
+> +               break;
+>         default:
+>                 r =3D 0;
+>         }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 59c590fff4f2..6eadd0fa2c53 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3600,8 +3600,9 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm =
+*kvm, struct reg_mask_range *
+>         const void *zero_page =3D page_to_virt(ZERO_PAGE(0));
+>         u64 __user *masks =3D (u64 __user *)range->addr;
+>
+> -       /* Only feature id range is supported, reserved[7] must be zero. =
+*/
+> -       if (memcmp(range->reserved, zero_page, sizeof(range->reserved)))
+> +       /* Only feature id range is supported, reserved[13] must be zero.=
+ */
+> +       if (range->range ||
+> +           memcmp(range->reserved, zero_page, sizeof(range->reserved)))
+>                 return -EINVAL;
+>
+>         /* Wipe the whole thing first */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 424b6d00440b..f5100055a1a6 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1192,6 +1192,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_COUNTER_OFFSET 227
+>  #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+>  #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
+> +#define KVM_CAP_ARM_SUPPORTED_FEATURE_ID_RANGES 230
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
-Why fault_data? The domain handling the fault should be passed
-through naturally without relying on fault_data.
+Looks good to me.
 
-eg make 
-
-  iommu_sva_handle_iopf(struct iommu_fault *fault, void *data)
-
-into
-  iommu_sva_handle_iopf(struct iommu_fault *fault, struct iommu_domain *domain)
-
-And delete domain->fault_data until we have some use for it.
-
-The core code should be keeping track of the iommu_domain lifetime.
-
-Jason
+Thanks,
+Jing
