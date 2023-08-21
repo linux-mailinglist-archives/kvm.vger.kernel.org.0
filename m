@@ -2,77 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4501D783600
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 00:54:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EF74783609
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 00:59:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbjHUWyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 18:54:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39042 "EHLO
+        id S231645AbjHUW7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 18:59:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231393AbjHUWyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 18:54:11 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D7A1197
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 15:53:59 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fef2fafee2so41235e9.0
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 15:53:59 -0700 (PDT)
+        with ESMTP id S229866AbjHUW7u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 18:59:50 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C4E198
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 15:59:43 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7494be34f8so2601507276.2
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 15:59:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692658437; x=1693263237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jdLYxza4od6gtfHAM+EKsHvl605mqzT8tcnqgOrPUzA=;
-        b=RokrMkjekVqjOnn9Z5xHiQxIHN9kLHJ6H8rzRfsK+Xj5idR0sdE9f/fF2Ler+geLaz
-         rQH9qEONLh4rVXprtQwrFtbF2v7nLjBoQOjk4iptd2KSYuCRQ392xHbEr68//5pzLyZY
-         mnyXI+dXDHSDA7CxLPtE7A8xDxMaGF35osHsxaRy/yHUHUhn8mAcAwUpyMpvhrsxdnDo
-         WJImf5bfjbV4JDhGS0eGg63FJU8cZ+Soy3UeIdvZKkG2cmIKBlrpEsS8doDtJAcgbwbq
-         ynT0l5Q7WmKwPyg8a9/jvNz3pZIWx12Cklci4DWkz1ca5VCTH3zRJ4xZh1JgcvW7kkwf
-         sGow==
+        d=google.com; s=20221208; t=1692658782; x=1693263582;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WojTsyHJlQQoruGt5rJF23KrHwn53DulZRTBhsYqmPM=;
+        b=Xt4OmnWTg7A1bjVlc1q8eZptmz5K2KqmSUzXT/8gqV5GOaACpuxw0gxMfS2/kZRwWA
+         +YeRpkFzN58QNhMU52t3YOip8FLYfk2phrZLdia6BQO9c5kjd2RLX/Pz65dm8u/htRmO
+         IEu22y/b+4NYqo9L2Yfdd0CoerUxwwqhUpljSpwKXYuOqJOutMCzXlDAa2+XvRBhpYCz
+         VykoD2C8Z0ZXtgz8SSsXLmHMX1tWxok5N4GsxB8a3yvKNxVVwE5v6yab9cw0tVusGKPW
+         bAorv2RHU/G/1/Qga2eUAC0X++45x/Eq0N9gi0m609JJVkvPmGjRhXss35lR2STNX41I
+         EVVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692658437; x=1693263237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jdLYxza4od6gtfHAM+EKsHvl605mqzT8tcnqgOrPUzA=;
-        b=QO078rn/52BngVI0bsC+st29frjINUqT33bSKYEJ0kl1pudQJAemGciNDMS8w3Vwfn
-         CcBHGkYp5m+NdTWEpyiazXL8XPYRre1mKqER06VMzB5VJLsqJ1pQFjjRW9ME4WLk9Jqb
-         DIgiSj/Pa4sVgLEk9m3BiaQwuPxIVktN8aPBR36s3HteDzSVFCqFPwLEHw8YLh0JLxPM
-         k5VhdvDnTLCLt5UIaZRaKg8zOvX0fS42ZQizORs/GFnXTAOoXLvbWpM9ZnUdxubwHpmZ
-         TAWTHorBAId9OhAWmvAi682IDYPhzJ568w+rJwn0+nlpJe6lMSLBya0O1+2QQkejSvvZ
-         cXoQ==
-X-Gm-Message-State: AOJu0Ywj6cnxJcJqys53tBKCjjUPxBK9f812gjyJECyvnHH5uIIq7ANd
-        irhXUKlmqJueLVghMgCadsVwOngp1i3pWebyV6neWw==
-X-Google-Smtp-Source: AGHT+IEt1yHPSnbsDH0JcIPR06bqqs+Xcl1PuGluizf8cCRswFgsVE2EkEzXk6qD8Ekw6ub0BuDNTl+fLRqjNmCT/rg=
-X-Received: by 2002:a05:600c:260d:b0:3f6:f4b:d4a6 with SMTP id
- h13-20020a05600c260d00b003f60f4bd4a6mr19299wma.7.1692658437564; Mon, 21 Aug
- 2023 15:53:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230818233451.3615464-1-srutherford@google.com>
- <08418fc0-839a-f2fb-1c2e-b4f077d2647b@amd.com> <CABayD+cw3s1UDSN7oR4gWfRT4-snWEqOgAN-y4rzOpe-8D=KdA@mail.gmail.com>
- <2a391d50-d474-eec5-76ea-e5dc5590609c@amd.com> <CABayD+f3BLjg4ekO=b4yweqsV4-kA3nfDjKh7MieMh+=zvkA=Q@mail.gmail.com>
- <303d2eb7-d337-8516-1120-13c4c2443d2e@amd.com>
-In-Reply-To: <303d2eb7-d337-8516-1120-13c4c2443d2e@amd.com>
+        d=1e100.net; s=20221208; t=1692658782; x=1693263582;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WojTsyHJlQQoruGt5rJF23KrHwn53DulZRTBhsYqmPM=;
+        b=HQMfVkUrXUrQwHsX6Fit1OuA86jTNAabzd9am26cgbWuxrh5P7WMGsPRD0qgZqWVCc
+         Be+6+zq4g/qHnv1dqaeCDemNGTzkgTu0EP6KZW2PWn7GgpnaySIS6pmQvewxHCoXnqGR
+         kZ22vpWa55CkUCTnP6tUKG4CCLvU1dj6KaEMS6CzPcZMTpksU0smhIOd4L9hCPHhgXtl
+         jEyuvA2deEXXRKduovM5mWSrxcfnXpVghufu0PeArfqY/p+yhTdHbRodWVeDEpM4k06G
+         fbaDMPr0MsKoutl13kPnm8i+pb/815YoS7KWeGaCzObS1GQ1BaNfoxvvozsIjKnhVXIC
+         HUxQ==
+X-Gm-Message-State: AOJu0Yxa630c2iU3wwwvZLvdvumr8TOArSsjKNx4z4HLYTQhQYaIxnyB
+        4SQQBC9y6poa+soNabXTkrLGIAwCXGUluidNbg==
+X-Google-Smtp-Source: AGHT+IF0Ms/Uieqvin5sgKbBWkvCy9IWIrxUUGRBd6tv8X2fNrhb6Ijj2ZCUahyed72rzlUp+zhVkPwpTiB73Kz99A==
+X-Received: from riemann.sea.corp.google.com ([2620:15c:100:201:61be:5074:9774:e5b])
+ (user=srutherford job=sendgmr) by 2002:a05:6902:1141:b0:d58:6cea:84de with
+ SMTP id p1-20020a056902114100b00d586cea84demr87039ybu.11.1692658782154; Mon,
+ 21 Aug 2023 15:59:42 -0700 (PDT)
+Date:   Mon, 21 Aug 2023 15:58:59 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230821225859.883120-1-srutherford@google.com>
+Subject: [PATCH v2] x86/sev: Make enc_dec_hypercall() accept a size instead of npages
 From:   Steve Rutherford <srutherford@google.com>
-Date:   Mon, 21 Aug 2023 15:53:21 -0700
-Message-ID: <CABayD+d7imAX98rPp3LKdv0nPFhFkS-r2zJkiacBjQe2tZBQUg@mail.gmail.com>
-Subject: Re: [PATCH] x86/sev: Make early_set_memory_decrypted() calls page aligned
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com,
+        pankaj.gupta@amd.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
-        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
+        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com,
+        Steve Rutherford <srutherford@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,22 +74,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 21, 2023 at 1:24=E2=80=AFPM Tom Lendacky <thomas.lendacky@amd.c=
-om> wrote:
->
-> I like the fix for the hypercall being in early_set_memory_enc_dec(). Thi=
-s
-> way the behavior doesn't change for existing callers and doesn't require
-> adding a WARN.
->
-> Thanks,
-> Tom
+enc_dec_hypercall() accepted a page count instead of a size, which
+forced its callers to round up. As a result, non-page aligned
+vaddrs caused pages to be spuriously marked as decrypted via the
+encryption status hypercall, which in turn caused consistent
+corruption of pages during live migration. Live migration requires
+accurate encryption status information to avoid migrating pages
+from the wrong perspective.
 
-I uploaded a version based on your earlier advice to have
-early_set_mem_enc_dec_hypercall() take a size. I was hesitant since I
-thought I'd have to change a ton of callsites, but the line count was
-a lot shorter than I expected. This seems like the right way to go
-since it directly fixes the problematic rounding.
+Fixes: 064ce6c550a0 ("mm: x86: Invoke hypercall when page encryption status is changed")
+Signed-off-by: Steve Rutherford <srutherford@google.com>
+---
+ arch/x86/include/asm/mem_encrypt.h |  6 +++---
+ arch/x86/kernel/kvm.c              |  4 +---
+ arch/x86/mm/mem_encrypt_amd.c      | 13 ++++++-------
+ 3 files changed, 10 insertions(+), 13 deletions(-)
 
-Thanks,
-Steve
+diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
+index 7f97a8a97e24..473b16d73b47 100644
+--- a/arch/x86/include/asm/mem_encrypt.h
++++ b/arch/x86/include/asm/mem_encrypt.h
+@@ -50,8 +50,8 @@ void __init sme_enable(struct boot_params *bp);
+ 
+ int __init early_set_memory_decrypted(unsigned long vaddr, unsigned long size);
+ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size);
+-void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
+-					    bool enc);
++void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr,
++					    unsigned long size, bool enc);
+ 
+ void __init mem_encrypt_free_decrypted_mem(void);
+ 
+@@ -85,7 +85,7 @@ early_set_memory_decrypted(unsigned long vaddr, unsigned long size) { return 0;
+ static inline int __init
+ early_set_memory_encrypted(unsigned long vaddr, unsigned long size) { return 0; }
+ static inline void __init
+-early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc) {}
++early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc) {}
+ 
+ static inline void mem_encrypt_free_decrypted_mem(void) { }
+ 
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 6a36db4f79fd..b8ab9ee5896c 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -966,10 +966,8 @@ static void __init kvm_init_platform(void)
+ 		 * Ensure that _bss_decrypted section is marked as decrypted in the
+ 		 * shared pages list.
+ 		 */
+-		nr_pages = DIV_ROUND_UP(__end_bss_decrypted - __start_bss_decrypted,
+-					PAGE_SIZE);
+ 		early_set_mem_enc_dec_hypercall((unsigned long)__start_bss_decrypted,
+-						nr_pages, 0);
++						__end_bss_decrypted - __start_bss_decrypted, 0);
+ 
+ 		/*
+ 		 * If not booted using EFI, enable Live migration support.
+diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
+index 54bbd5163e8d..6faea41e99b6 100644
+--- a/arch/x86/mm/mem_encrypt_amd.c
++++ b/arch/x86/mm/mem_encrypt_amd.c
+@@ -288,11 +288,10 @@ static bool amd_enc_cache_flush_required(void)
+ 	return !cpu_feature_enabled(X86_FEATURE_SME_COHERENT);
+ }
+ 
+-static void enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
++static void enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc)
+ {
+ #ifdef CONFIG_PARAVIRT
+-	unsigned long sz = npages << PAGE_SHIFT;
+-	unsigned long vaddr_end = vaddr + sz;
++	unsigned long vaddr_end = vaddr + size;
+ 
+ 	while (vaddr < vaddr_end) {
+ 		int psize, pmask, level;
+@@ -342,7 +341,7 @@ static bool amd_enc_status_change_finish(unsigned long vaddr, int npages, bool e
+ 		snp_set_memory_private(vaddr, npages);
+ 
+ 	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
+-		enc_dec_hypercall(vaddr, npages, enc);
++		enc_dec_hypercall(vaddr, npages << PAGE_SHIFT, enc);
+ 
+ 	return true;
+ }
+@@ -466,7 +465,7 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
+ 
+ 	ret = 0;
+ 
+-	early_set_mem_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIFT, enc);
++	early_set_mem_enc_dec_hypercall(start, size, enc);
+ out:
+ 	__flush_tlb_all();
+ 	return ret;
+@@ -482,9 +481,9 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
+ 	return early_set_memory_enc_dec(vaddr, size, true);
+ }
+ 
+-void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
++void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc)
+ {
+-	enc_dec_hypercall(vaddr, npages, enc);
++	enc_dec_hypercall(vaddr, size, enc);
+ }
+ 
+ void __init sme_early_init(void)
+-- 
+2.42.0.rc1.204.g551eb34607-goog
+
