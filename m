@@ -2,29 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFEAB7821C6
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 05:20:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 616B27821C8
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 05:22:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232618AbjHUDU0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Aug 2023 23:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48346 "EHLO
+        id S232622AbjHUDWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Aug 2023 23:22:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232615AbjHUDUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Aug 2023 23:20:25 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A1D9C
-        for <kvm@vger.kernel.org>; Sun, 20 Aug 2023 20:20:22 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0Vq9jDcy_1692588019;
-Received: from localhost(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0Vq9jDcy_1692588019)
+        with ESMTP id S232615AbjHUDWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Aug 2023 23:22:47 -0400
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989F79D;
+        Sun, 20 Aug 2023 20:22:45 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R971e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0Vq9XIXN_1692588161;
+Received: from localhost(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0Vq9XIXN_1692588161)
           by smtp.aliyun-inc.com;
-          Mon, 21 Aug 2023 11:20:20 +0800
+          Mon, 21 Aug 2023 11:22:42 +0800
 From:   Hao Xiang <hao.xiang@linux.alibaba.com>
 To:     kvm@vger.kernel.org
-Cc:     Hao Xiang <hao.xiang@linux.alibaba.com>,
-        "xianghao.xiang" <xianghao.xiang@alibaba-inc.com>
+Cc:     shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
+        seanjc@google.com, linux-kernel@vger.kernel.org,
+        Hao Xiang <hao.xiang@linux.alibaba.com>
 Subject: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
-Date:   Mon, 21 Aug 2023 11:19:31 +0800
-Message-Id: <1692587971-16537-1-git-send-email-hao.xiang@linux.alibaba.com>
+Date:   Mon, 21 Aug 2023 11:22:31 +0800
+Message-Id: <1692588151-33716-1-git-send-email-hao.xiang@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -47,7 +48,6 @@ bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
 bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
 
 Signed-off-by: Hao Xiang <hao.xiang@linux.alibaba.com>
-Signed-off-by: xianghao.xiang <xianghao.xiang@alibaba-inc.com>
 ---
  arch/x86/include/asm/msr-index.h |  4 ++++
  arch/x86/kvm/x86.c               | 25 ++++++++++++++++++++++++-
