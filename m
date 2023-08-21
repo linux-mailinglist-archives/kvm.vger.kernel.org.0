@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72F62782C8C
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 16:48:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AFE1782C8D
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 16:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236159AbjHUOsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 10:48:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44464 "EHLO
+        id S236158AbjHUOsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 10:48:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236149AbjHUOsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236150AbjHUOsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 21 Aug 2023 10:48:09 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8823BFD
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC8E100
         for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 07:48:06 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 2F609206C7;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 9EC36206C8;
         Mon, 21 Aug 2023 14:48:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1692629285; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QHcBtcCfV9cuAYcbdBQ91zpFDcZpGFaCkaM0luaPLmY=;
-        b=hEEjoQq5ypOTleKEPjG2Idar8I/pBBsIy/k5B6rErmoijf2Au9CbjMc1OrOD1gie9A54BO
-        yAoyy6Z9pTRVmYymj+uDfScdl9qupV9BeQDUDpS+/1JYfwwp0xFeCDb3Ih0sG9yGAQoEaC
-        FnMyNf/sUSxfHPYTHNqnwk5Lw7RIdrQ=
+        bh=+RhCzgzW/g5WiYRKevBmwndl3S3/P51BYhsYKNWaZ9I=;
+        b=2ILukgTGw/jY9SIlmubPtWOptBKXiMMk+5zLLXRRlMOkwnMeBQ7IZqBgAx/BDwUrnSmH9X
+        bfV1quVSpXzeXGAg/M8GjEx7B1W50mhx+/aU6iH55vgaOeerUm5jcDLaSwtBP0mQa4GGbj
+        EW+lDYACLPd7GqXCDbDFhRjD7MAMHTE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1692629285;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QHcBtcCfV9cuAYcbdBQ91zpFDcZpGFaCkaM0luaPLmY=;
-        b=0rw3uPocjdBzX/SoLsHrBdjMhR8tavCodLklmP/IxOhfjWDxbfmVV9lHOjdjKWjHMwzqAl
-        JBIqmvG1umcGBCAA==
+        bh=+RhCzgzW/g5WiYRKevBmwndl3S3/P51BYhsYKNWaZ9I=;
+        b=CCAmUYWihCodyY/ZFlfW/5dg4Zt7WE5FGk2RFkhlCmpC6NctcD3Non5LqfAmByE68/awGQ
+        VMQZMt0bXoR/w9CA==
 Received: from vasant-suse.fritz.box (vkarasulli.udp.ovpn1.nue.suse.de [10.163.24.134])
-        by relay2.suse.de (Postfix) with ESMTP id C1E102C145;
-        Mon, 21 Aug 2023 14:48:04 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 3A2732C143;
+        Mon, 21 Aug 2023 14:48:05 +0000 (UTC)
 From:   Vasant Karasulli <vkarasulli@suse.de>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, jroedel@suse.de,
@@ -45,17 +45,17 @@ Cc:     pbonzini@redhat.com, seanjc@google.com, jroedel@suse.de,
         papaluri@amd.com, rientjes@google.com, zxwang42@gmail.com,
         Vasant Karasulli <vkarasulli@suse.de>,
         Varad Gautam <varad.gautam@suse.com>
-Subject: [kvm-unit-tests PATCH v5 10/11] x86: AMD SEV-ES: Handle IOIO #VC
-Date:   Mon, 21 Aug 2023 16:47:50 +0200
-Message-Id: <20230821144751.22557-11-vkarasulli@suse.de>
+Subject: [kvm-unit-tests PATCH v5 11/11] x86: AMD SEV-ES: Handle string IO for IOIO #VC
+Date:   Mon, 21 Aug 2023 16:47:51 +0200
+Message-Id: <20230821144751.22557-12-vkarasulli@suse.de>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230821144751.22557-1-vkarasulli@suse.de>
 References: <20230821144751.22557-1-vkarasulli@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -67,216 +67,140 @@ Using Linux's IOIO #VC processing logic.
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
 Reviewed-by: Marc Orr <marcorr@google.com>
+Tested-by: Marc Orr <marcorr@google.com>
 ---
- lib/x86/amd_sev_vc.c | 169 +++++++++++++++++++++++++++++++++++++++++++
- lib/x86/processor.h  |   7 ++
- 2 files changed, 176 insertions(+)
+ lib/x86/amd_sev_vc.c | 108 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 106 insertions(+), 2 deletions(-)
 
 diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index 369ce92..f64287c 100644
+index f64287c..90ed1ad 100644
 --- a/lib/x86/amd_sev_vc.c
 +++ b/lib/x86/amd_sev_vc.c
-@@ -171,6 +171,172 @@ static enum es_result vc_handle_msr(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 	return ret;
+@@ -300,10 +300,46 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
+ 	return ES_OK;
  }
 
-+#define IOIO_TYPE_STR  BIT(2)
-+#define IOIO_TYPE_IN   1
-+#define IOIO_TYPE_INS  (IOIO_TYPE_IN | IOIO_TYPE_STR)
-+#define IOIO_TYPE_OUT  0
-+#define IOIO_TYPE_OUTS (IOIO_TYPE_OUT | IOIO_TYPE_STR)
-+
-+#define IOIO_REP       BIT(3)
-+
-+#define IOIO_ADDR_64   BIT(9)
-+#define IOIO_ADDR_32   BIT(8)
-+#define IOIO_ADDR_16   BIT(7)
-+
-+#define IOIO_DATA_32   BIT(6)
-+#define IOIO_DATA_16   BIT(5)
-+#define IOIO_DATA_8    BIT(4)
-+
-+#define IOIO_SEG_ES    (0 << 10)
-+#define IOIO_SEG_DS    (3 << 10)
-+
-+/**
-+ * insn_has_rep_prefix() - Determine if instruction has a REP prefix
-+ * @insn:       Instruction containing the prefix to inspect
-+ *
-+ * Returns:
-+ *
-+ * 1 if the instruction has a REP prefix, 0 if not.
-+ */
-+static int insn_has_rep_prefix(struct insn *insn)
++static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
++					  void *src, unsigned char *buf,
++					  unsigned int data_size,
++					  unsigned int count,
++					  bool backwards)
 +{
-+	insn_byte_t p;
-+	int i;
++	int i, b = backwards ? -1 : 1;
 +
-+	insn_get_prefixes(insn);
++	for (i = 0; i < count; i++) {
++		void *s = src + (i * data_size * b);
++		unsigned char *d = buf + (i * data_size);
 +
-+	for_each_insn_prefix(insn, i, p) {
-+		if (p == 0xf2 || p == 0xf3)
-+			return 1;
++		memcpy(d, s, data_size);
 +	}
-+
-+	return 0;
-+}
-+
-+static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
-+{
-+	struct insn *insn = &ctxt->insn;
-+	*exitinfo = 0;
-+
-+	switch (insn->opcode.bytes[0]) {
-+	/* INS opcodes */
-+	case 0x6c:
-+	case 0x6d:
-+		*exitinfo |= IOIO_TYPE_INS;
-+		*exitinfo |= IOIO_SEG_ES;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* OUTS opcodes */
-+	case 0x6e:
-+	case 0x6f:
-+		*exitinfo |= IOIO_TYPE_OUTS;
-+		*exitinfo |= IOIO_SEG_DS;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* IN immediate opcodes */
-+	case 0xe4:
-+	case 0xe5:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (u8)insn->immediate.value << 16;
-+		break;
-+
-+	/* OUT immediate opcodes */
-+	case 0xe6:
-+	case 0xe7:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (u8)insn->immediate.value << 16;
-+		break;
-+
-+	/* IN register opcodes */
-+	case 0xec:
-+	case 0xed:
-+		*exitinfo |= IOIO_TYPE_IN;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	/* OUT register opcodes */
-+	case 0xee:
-+	case 0xef:
-+		*exitinfo |= IOIO_TYPE_OUT;
-+		*exitinfo |= (ctxt->regs->rdx & 0xffff) << 16;
-+		break;
-+
-+	default:
-+		return ES_DECODE_FAILED;
-+	}
-+
-+	switch (insn->opcode.bytes[0]) {
-+	case 0x6c:
-+	case 0x6e:
-+	case 0xe4:
-+	case 0xe6:
-+	case 0xec:
-+	case 0xee:
-+		/* Single byte opcodes */
-+		*exitinfo |= IOIO_DATA_8;
-+		break;
-+	default:
-+		/* Length determined by instruction parsing */
-+		*exitinfo |= (insn->opnd_bytes == 2) ? IOIO_DATA_16
-+						     : IOIO_DATA_32;
-+	}
-+	switch (insn->addr_bytes) {
-+	case 2:
-+		*exitinfo |= IOIO_ADDR_16;
-+		break;
-+	case 4:
-+		*exitinfo |= IOIO_ADDR_32;
-+		break;
-+	case 8:
-+		*exitinfo |= IOIO_ADDR_64;
-+		break;
-+	}
-+
-+	if (insn_has_rep_prefix(insn))
-+		*exitinfo |= IOIO_REP;
 +
 +	return ES_OK;
 +}
 +
-+static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
++static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
++					   void *dst, unsigned char *buf,
++					   unsigned int data_size,
++					   unsigned int count,
++					   bool backwards)
 +{
-+	struct ex_regs *regs = ctxt->regs;
-+	u64 exit_info_1;
-+	enum es_result ret;
++	int i, s = backwards ? -1 : 1;
 +
-+	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-+	if (ret != ES_OK)
-+		return ret;
++	for (i = 0; i < count; i++) {
++		void *d = dst + (i * data_size * s);
++		unsigned char *b = buf + (i * data_size);
 +
-+	if (exit_info_1 & IOIO_TYPE_STR) {
-+		ret = ES_VMM_ERROR;
-+	} else {
-+		/* IN/OUT into/from rAX */
++		memcpy(d, b, data_size);
++	}
 +
-+		int bits = (exit_info_1 & 0x70) >> 1;
-+		u64 rax = 0;
++	return ES_OK;
++}
 +
-+		if (!(exit_info_1 & IOIO_TYPE_IN))
-+			rax = lower_bits(regs->rax, bits);
+ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ {
+ 	struct ex_regs *regs = ctxt->regs;
+-	u64 exit_info_1;
++	u64 exit_info_1, exit_info_2;
+ 	enum es_result ret;
+
+ 	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
+@@ -311,7 +347,75 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
+ 		return ret;
+
+ 	if (exit_info_1 & IOIO_TYPE_STR) {
+-		ret = ES_VMM_ERROR;
++		/* (REP) INS/OUTS */
 +
-+		ghcb_set_rax(ghcb, rax);
++		bool df = ((regs->rflags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
++		unsigned int io_bytes, exit_bytes;
++		unsigned int ghcb_count, op_count;
++		unsigned long es_base;
++		u64 sw_scratch;
 +
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO, exit_info_1, 0);
++		/*
++		 * For the string variants with rep prefix the amount of in/out
++		 * operations per #VC exception is limited so that the kernel
++		 * has a chance to take interrupts and re-schedule while the
++		 * instruction is emulated.
++		 */
++		io_bytes   = (exit_info_1 >> 4) & 0x7;
++		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
++
++		op_count    = (exit_info_1 & IOIO_REP) ? regs->rcx : 1;
++		exit_info_2 = op_count < ghcb_count ? op_count : ghcb_count;
++		exit_bytes  = exit_info_2 * io_bytes;
++
++		es_base = 0;
++
++		/* Read bytes of OUTS into the shared buffer */
++		if (!(exit_info_1 & IOIO_TYPE_IN)) {
++			ret = vc_insn_string_read(ctxt,
++					       (void *)(es_base + regs->rsi),
++					       ghcb->shared_buffer, io_bytes,
++					       exit_info_2, df);
++			if (ret)
++				return ret;
++		}
++
++		/*
++		 * Issue an VMGEXIT to the HV to consume the bytes from the
++		 * shared buffer or to have it write them into the shared buffer
++		 * depending on the instruction: OUTS or INS.
++		 */
++		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
++		ghcb_set_sw_scratch(ghcb, sw_scratch);
++		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
++					  exit_info_1, exit_info_2);
 +		if (ret != ES_OK)
 +			return ret;
 +
++		/* Read bytes from shared buffer into the guest's destination. */
 +		if (exit_info_1 & IOIO_TYPE_IN) {
-+			if (!ghcb_rax_is_valid(ghcb))
-+				return ES_VMM_ERROR;
-+			regs->rax = lower_bits(ghcb->save.rax, bits);
++			ret = vc_insn_string_write(ctxt,
++						   (void *)(es_base + regs->rdi),
++						   ghcb->shared_buffer, io_bytes,
++						   exit_info_2, df);
++			if (ret)
++				return ret;
++
++			if (df)
++				regs->rdi -= exit_bytes;
++			else
++				regs->rdi += exit_bytes;
++		} else {
++			if (df)
++				regs->rsi -= exit_bytes;
++			else
++				regs->rsi += exit_bytes;
 +		}
-+	}
 +
-+	return ret;
-+}
++		if (exit_info_1 & IOIO_REP)
++			regs->rcx -= exit_info_2;
 +
- static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 					 struct ghcb *ghcb,
- 					 unsigned long exit_code)
-@@ -184,6 +350,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
- 	case SVM_EXIT_MSR:
- 		result = vc_handle_msr(ghcb, ctxt);
- 		break;
-+	case SVM_EXIT_IOIO:
-+		result = vc_handle_ioio(ghcb, ctxt);
-+		break;
- 	default:
- 		/*
- 		 * Unexpected #VC exception
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index dc66ba2..8d27dcc 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -808,6 +808,13 @@ static inline int test_bit(int nr, const volatile unsigned long *addr)
- 	return (*word & mask) != 0;
- }
++		ret = regs->rcx ? ES_RETRY : ES_OK;
+ 	} else {
+ 		/* IN/OUT into/from rAX */
 
-+static inline u64 lower_bits(u64 val, unsigned int bits)
-+{
-+	u64 mask = (1ULL << bits) - 1;
-+
-+	return (val & mask);
-+}
-+
- static inline void flush_tlb(void)
- {
- 	ulong cr4;
 --
 2.34.1
 
