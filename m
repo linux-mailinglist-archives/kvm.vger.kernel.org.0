@@ -2,132 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AEAA782DF6
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 18:12:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC9B1782ED0
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 18:52:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236192AbjHUQMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 12:12:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56222 "EHLO
+        id S236814AbjHUQwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 12:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235599AbjHUQMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 12:12:16 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18913119
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 09:11:53 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56385c43eaeso3738786a12.1
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 09:11:53 -0700 (PDT)
+        with ESMTP id S236802AbjHUQwP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 12:52:15 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95CA710D
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 09:52:03 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id af79cd13be357-76da8e70ed3so56697885a.3
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 09:52:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692634309; x=1693239109;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u3QjzztrdUek9NmbsnBxXwIbW573YOZ8AspNggbaDLI=;
-        b=orQ0mERyXnuswm1Zmd5V0G2Yd7o2mRzbpRQ7ehInterfzMqEr/DJqjkfLX2fLO8nb1
-         P4+xMkEb20m4pfjtjTdl5wdE4FS9QBsEODvaFJtNedeTxKJXtW80WVogUppoc8CR6PQW
-         ct5vvuGn+2UjNqdutlSSVWqL5+0wcs/RKZWVH6s2pJ0PC+pCxv7SOGmFNfNNnhuC5+e+
-         8W9b8zzdeqle2AdclPRpkGE7V234Q3wB/BbTtvmm2oNECNKY8GkQEjpxWXuZblQ071aI
-         1Y/WiFg0fwvKhPhN6kl4rXSH/ZydK0sKD/yajDyMXvjkrDFwpoSk4TFwDnMI447FuN2s
-         LXnA==
+        d=ziepe.ca; s=google; t=1692636722; x=1693241522;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JkXwy1ISt6qrbrNZuCCq5IPH6kF6shpR2kgu96JJrek=;
+        b=TUUsTkKH5URw0jANzhVv1T58xuhiQN8AoY56op+SMW6dJqqBZda8RDoywrFBQnuz3+
+         iff2uk5g1UgRlXxQW+tuJj5yXCU9V7wWqr+lJGapFySbk7mC/eKW4FLVNyoSMxUXFRBR
+         YvQUQ9o2y3GI5GGSue750glVwG2u7MFOxOCO5h2V29DOhKsRMpSKdlGvpr3jWwjWcFcH
+         1VdQFHzo8a9pOqW+rhaOE2f7GTAfUNz3vidG+5vsqK97r4+gSZQlv/3IiBU9xx6Mrym9
+         Klab9eqEoCmD6EKz3OXjW4iANZ5nY0A0aWKyinVKVgiV6PJ83olsWG1alZ2kOZyzlZiw
+         qTog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692634309; x=1693239109;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u3QjzztrdUek9NmbsnBxXwIbW573YOZ8AspNggbaDLI=;
-        b=CCvi2ao2k1/6YzT8xRHoMwTPly7gl9cQKZ2KsoM5D1/Gd4MmT3L7wvNCe2WfXTowqG
-         CMDky+uwcMsNJFIHFi9TrFRS34O0PRrTTbwtJaSWUwK71LHwW3/Crip/pW6kCfZANfcC
-         BG1DY15RCPACk5E+DWor/SfVQg3h79SsA83ObQqH5PF2qaJKBOoMQJBLboehWSltkAfy
-         Tvz+UGqaOfiwF8mmCvQAfzZOwZsKSsUNaVhJyvPScNMRyaAg9ngkD1AoqBlIrw3Lvr4o
-         /VXaf+qsqJMjvaXhziz+zjIIe7eDtlRhKUcJQr3aaPDZi9hXUp5paXkoGYiEkB3rvDBY
-         6mlQ==
-X-Gm-Message-State: AOJu0YytfDqs/aWzjlyeauLZnXZV67lRrMk0w0Kqezbr6vMkiOGUp3fK
-        f0Fl8SOY3eTaebYBasBA25cNPels5Ck=
-X-Google-Smtp-Source: AGHT+IHzfmmumYzE550NGIbVGdL815/OeQTYhHvf+Kl0A5LkJNaTRpp1roY3W2fsxg8AP46Z9G3DSRXLuGg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:754f:0:b0:564:6e43:a00d with SMTP id
- f15-20020a63754f000000b005646e43a00dmr885355pgn.3.1692634308794; Mon, 21 Aug
- 2023 09:11:48 -0700 (PDT)
-Date:   Mon, 21 Aug 2023 09:11:46 -0700
-In-Reply-To: <33f0e9bb-da79-6f32-f1c3-816eb37daea6@linux.alibaba.com>
-Mime-Version: 1.0
-References: <1692588392-58155-1-git-send-email-hao.xiang@linux.alibaba.com>
- <ZOMWM+YmScUG3U5W@chao-email> <6d10dcf7-7912-25a2-8d8e-ef7d71a4ce83@linux.alibaba.com>
- <ZOM/8IVsRf3esyQ1@chao-email> <33f0e9bb-da79-6f32-f1c3-816eb37daea6@linux.alibaba.com>
-Message-ID: <ZOOMwvPd/Cz/cEmv@google.com>
-Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hao Xiang <hao.xiang@linux.alibaba.com>
-Cc:     Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
-        shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        d=1e100.net; s=20221208; t=1692636722; x=1693241522;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JkXwy1ISt6qrbrNZuCCq5IPH6kF6shpR2kgu96JJrek=;
+        b=fyK5cBbfq1dG8XsQweXL6GxHEYiAgWCb1ZAOfG7uHdDS2qtjdfLq7s245CsjwJ7TXk
+         ESLgiXo2gxki2RmQGB0WX6F3qqAGI074oVzRRI3rVolZ5Dg1uOjWhEbw4Zq0XPHvaF/Q
+         eqcrdVmqM8XiZlgbLF8zOBmiqf4EGs+LVq/iEclS3R0CTXWLPry/2ch7v0zDpqVQu6ol
+         xhTlwHhPH8LVS9SbwwSfmIwxDP36rxrDqbuEqOCfoEB0dth/Hus0nfjIwgXJqed5TzaZ
+         WwcubDOClUHNIIFYA3k5fmu/djhO19O/9J5tNEmd5FSSo25erUh+4pMJnh7fY+KZNigb
+         UVHQ==
+X-Gm-Message-State: AOJu0Yz9dQSOK6cQbqlMjX2sAmRXpfOQpW5/KWedVbbJu4ouJ5UiubhN
+        Mje2BuYp8MAs1jhOHXpclsqUlQ==
+X-Google-Smtp-Source: AGHT+IGIrArLMUjqUVsv2NQ4VGh6eVA/ApKYhx1ONwSB7QRBGzVgS5K5zRFadfQ4B9TvLMlxOhAyww==
+X-Received: by 2002:a05:620a:bd5:b0:76c:9ea2:545e with SMTP id s21-20020a05620a0bd500b0076c9ea2545emr8795157qki.3.1692636722684;
+        Mon, 21 Aug 2023 09:52:02 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id a5-20020a05620a124500b0076d9e298928sm1589751qkl.66.2023.08.21.09.52.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 09:52:02 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1qY88H-00DuJL-7T;
+        Mon, 21 Aug 2023 13:52:01 -0300
+Date:   Mon, 21 Aug 2023 13:52:01 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Huang Jiaqing <jiaqing.huang@intel.com>
+Cc:     kvm@vger.kernel.org, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, joro@8bytes.org, will@kernel.org,
+        robin.murphy@arm.com, kevin.tian@intel.com,
+        baolu.lu@linux.intel.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, yi.y.sun@intel.com
+Subject: Re: [PATCH] iommu/vt-d: Introduce a rb_tree for looking up device
+Message-ID: <ZOOWMUmwG2jXOaXL@ziepe.ca>
+References: <20230821071659.123981-1-jiaqing.huang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230821071659.123981-1-jiaqing.huang@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Aaron
-
-When resending a patch, e.g. to change To: or Cc:, tag it RESEND.  I got three
-copies of this...
-
-On Mon, Aug 21, 2023, Hao Xiang wrote:
+On Mon, Aug 21, 2023 at 12:16:59AM -0700, Huang Jiaqing wrote:
+> The existing IO page fault handler locates the PCI device by calling
+> pci_get_domain_bus_and_slot(), which searches the list of all PCI
+> devices until the desired PCI device is found. This is inefficient
+> because the algorithm efficiency of searching a list is O(n). In the
+> critical path of handling an IO page fault, this can cause a significant
+> performance bottleneck.
 > 
+> To improve the performance of the IO page fault handler, replace
+> pci_get_domain_bus_and_slot() with a local red-black tree. A red-black
+> tree is a self-balancing binary search tree, which means that the
+> average time complexity of searching a red-black tree is O(log(n)). This
+> is significantly faster than O(n), so it can significantly improve the
+> performance of the IO page fault handler.
 > 
-> On 2023/8/21 18:44, Chao Gao wrote:
-> > On Mon, Aug 21, 2023 at 05:11:16PM +0800, Hao Xiang wrote:
-> > > For reason that,
-> > > 
-> > > The turbo frequency info depends on specific machine type. And the msr value
-> > > of MSR_PLATFORM_INFO may be diferent on diffrent generation machine.
-> > > 
-> > > Get following msr bits (needed by turbostat on intel platform) by rdmsr
-> > > MSR_PLATFORM_INFO directly in KVM is more reasonable. And set these msr bits
-> > > as vcpu->arch.msr_platform_info default value.
-> > > -bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
-> > > -bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
-> > 
-> > I don't get why QEMU cannot do this with the existing interface, e.g.,
-> > KVM_SET_MSRS.
-> > 
-> > will the MSR value be migrated during VM migration?
-> > 
-> > looks we are in a dilemma. on one side, if the value is migrated, the value can
-> > become inconsisntent with hardware value. On the other side, changing the ratio
-> > bits at runtime isn't the architectural behavior.
-> > 
-> > And the MSR is per-socket. In theory, a system can have two sockets with
-> > different values of the MSR. what if a vCPU is created on a socket and then
-> > later runs on the other socket?
-> > 
+> In addition, we can only insert the affected devices (those that have IO
+> page fault enabled) into the red-black tree. This can further improve
+> the performance of the IO page fault handler.
 > 
-> Set these msr bits (needed by turbostat on intel platform) in KVM by
-> default.
-> Of cource, QEMU can also set MSR value by need. It does not conflict.
+> Signed-off-by: Huang Jiaqing <jiaqing.huang@intel.com>
+> ---
+>  drivers/iommu/intel/iommu.c | 68 +++++++++++++++++++++++++++++++++++++
+>  drivers/iommu/intel/iommu.h |  8 +++++
+>  drivers/iommu/intel/svm.c   | 13 +++----
+>  3 files changed, 81 insertions(+), 8 deletions(-)
 
-It doesn't conflict per se, but it's still problematic.  By stuffing a default
-value, KVM _forces_ userspace to override the MSR to align with the topology and
-CPUID defined by userspace.  And if userspace uses KVM's "default" CPUID, or lack
-thereof, using the underlying values from hardware are all but guaranteed to be
-wrong.
+I feel like this should be a helper library provided by the core
+code, doesn't every PRI driver basically need the same thing?
 
-The existing code that sets MSR_PLATFORM_INFO_CPUID_FAULT really should not exist,
-i.e. KVM shouldn't shouldn't assume userspace wants to expose CPUID faulting to
-the guest.  That particular one probably isn't worth trying to retroactively fix.
-
-Ditto for setting MSR_IA32_ARCH_CAPABILITIES; KVM is overstepping, but doing so
-likely doesn't cause problems.
-
-MSR_IA32_PERF_CAPABILITIES is a different story.  Setting a non-zero default value
-is blatantly wrong, as KVM will advertise vPMU features even if userspace doesn't
-advertise.  Aaron is planning on sending a patch for this one (I'm hoping we can
-get away with retroactively dropping the code without having to add a quirk).
-
-*If* we need KVM to expose the ratios to userspace, then the correct way to do so
-is handle turbo and efficiency ratio information is to by implementing support in
-kvm_get_msr_feature(), i.e. KVM_GET_MSRS on /dev/kvm.  Emphasis on "if", because
-I would prefer to do nothing in KVM if that information is already surfaced to
-userspace through other mechanisms in the kernel.
+Jason
