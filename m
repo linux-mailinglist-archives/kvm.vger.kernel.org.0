@@ -2,279 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C3FB7825EB
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 10:59:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F2CE7825F1
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:00:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234236AbjHUI73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 04:59:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47346 "EHLO
+        id S234084AbjHUJAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 05:00:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233626AbjHUI72 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 04:59:28 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A1F5EC1;
-        Mon, 21 Aug 2023 01:59:25 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A22F2F4;
-        Mon, 21 Aug 2023 02:00:06 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.34.216])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDF0E3F762;
-        Mon, 21 Aug 2023 01:59:23 -0700 (PDT)
-Date:   Mon, 21 Aug 2023 09:59:17 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Xu Zhao <zhaoxu.35@bytedance.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhouyibo@bytedance.com,
-        zhouliang.001@bytedance.com, Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Subject: Re: [RFC] KVM: arm/arm64: optimize vSGI injection performance
-Message-ID: <ZOMnZY_w83vTYnTo@FVFF77S0Q05N>
-References: <20230818104704.7651-1-zhaoxu.35@bytedance.com>
+        with ESMTP id S232799AbjHUJAp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 05:00:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36F5CF
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 01:59:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692608393;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=oUNFPBwuacrfKR5wY4zXtbeCoielBgq1hU50/mf0WdI=;
+        b=gZ3BiUr20yjvQXTgPYKQ3M8PmrUKeIYnFuxNoqqkaMTX3mFnUGfmfY5vW0ZViIkdEzxfl+
+        YkFviCeidGqVtJ9HgVKvwrLet6wbjvQTIlu64uLDePluxeqjHR20G6/MTdi2WNR6RSoNLl
+        zQ1v13+TB/vs0B/EHzIW3RxrGlDNeqI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-96-kUh68BOcP_y6u4hycSuLmg-1; Mon, 21 Aug 2023 04:59:51 -0400
+X-MC-Unique: kUh68BOcP_y6u4hycSuLmg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B59BA185A78B;
+        Mon, 21 Aug 2023 08:59:50 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.139])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41B7B40D2843;
+        Mon, 21 Aug 2023 08:59:46 +0000 (UTC)
+Date:   Mon, 21 Aug 2023 09:59:43 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v2 15/58] i386/tdx: Add property sept-ve-disable for
+ tdx-guest object
+Message-ID: <ZOMnf8n8BksktlGg@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
+ <20230818095041.1973309-16-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230818104704.7651-1-zhaoxu.35@bytedance.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230818095041.1973309-16-xiaoyao.li@intel.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[adding the KVM/arm64 maintainers & list]
-
-Mark.
-
-On Fri, Aug 18, 2023 at 06:47:04PM +0800, Xu Zhao wrote:
-> In the worst case scenario, it may iterate over all vCPUs in the vm in order to complete
-> injecting an SGI interrupt. However, the ICC_SGI_* register provides affinity routing information,
-> and we are interested in exploring the possibility of utilizing this information to reduce iteration
-> times from a total of vcpu numbers to 16 (the length of the targetlist), or even 8 times.
+On Fri, Aug 18, 2023 at 05:49:58AM -0400, Xiaoyao Li wrote:
+> Bit 28 of TD attribute, named SEPT_VE_DISABLE. When set to 1, it disables
+> EPT violation conversion to #VE on guest TD access of PENDING pages.
 > 
-> This work is based on v5.4, and here is test data:
-> 4 cores with vcpu pinning:
-> 	  	 |               ipi benchmark           |	 vgic_v3_dispatch_sgi      |
-> 		 |    original  |  with patch  | impoved | original | with patch | impoved |
-> | core0 -> core1 | 292610285 ns	| 299856696 ns |  -2.5%	 |  1471 ns |   1508 ns  |  -2.5%  |
-> | core0 -> core3 | 333815742 ns	| 327647989 ns |  +1.8%  |  1578 ns |   1532 ns  |  +2.9%  |
-> |  core0 -> all  | 439754104 ns | 433987192 ns |  +1.3%  |  2970 ns |   2875 ns  |  +3.2%  |
+> Some guest OS (e.g., Linux TD guest) may require this bit as 1.
+> Otherwise refuse to boot.
 > 
-> 32 cores with vcpu pinning:
->                   |               ipi benchmark                |        vgic_v3_dispatch_sgi      |
->                   |    original    |    with patch  |  impoved | original | with patch | impoved  |
-> |  core0 -> core1 |  269153219 ns  |   261636906 ns |  +2.8%   |  1743 ns |   1706 ns  |  +2.1%   |
-> | core0 -> core31 |  685199666 ns  |   355250664 ns |  +48.2%  |  4238 ns |   1838 ns  |  +56.6%  |
-> |   core0 -> all  |  7281278980 ns |  3403240773 ns |  +53.3%  | 30879 ns |  13843 ns  |  +55.2%  |
+> Add sept-ve-disable property for tdx-guest object, for user to configure
+> this bit.
 > 
-> Based on the test results, the performance of vm  with less than 16 cores remains almost the same,
-> while significant improvement can be observed with more than 16 cores.
-> 
-> Signed-off-by: Xu Zhao <zhaoxu.35@bytedance.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  include/linux/kvm_host.h         |   5 ++
->  virt/kvm/arm/vgic/vgic-mmio-v3.c | 136 +++++++++++++++----------------
->  2 files changed, 73 insertions(+), 68 deletions(-)
+>  qapi/qom.json         |  4 +++-
+>  target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
+>  2 files changed, 27 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 027e155daf8c..efc7b96946c1 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -580,6 +580,11 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
->  	     (vcpup = kvm_get_vcpu(kvm, idx)) != NULL; \
->  	     idx++)
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index 2ca7ce7c0da5..cc08b9a98df9 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -871,10 +871,12 @@
+>  #
+>  # Properties for tdx-guest objects.
+>  #
+> +# @sept-ve-disable: bit 28 of TD attributes (default: 0)
+
+This description isn't very useful as it forces the user to go off and
+read the TDX specification to find out what bit 28 means. You've got a
+more useful description in the commit message, so please use that
+in the docs too. eg something like this
+
+  @sept-ve-disable: toggle bit 28 of TD attributes to control disabling
+                    of EPT violation conversion to #VE on guest
+                    TD access of PENDING pages. Some guest OS (e.g.
+		    Linux TD guest) may require this set, otherwise
+                    they refuse to boot.
+
+> +#
+>  # Since: 8.2
+>  ##
+>  { 'struct': 'TdxGuestProperties',
+> -  'data': { }}
+> +  'data': { '*sept-ve-disable': 'bool' } }
 >  
-> +#define kvm_for_each_target_vcpus(idx, target_cpus) \
-> +	for (idx = target_cpus & 0xff ? 0 : (ICC_SGI1R_AFFINITY_1_SHIFT>>1); \
-> +		(1 << idx) <= target_cpus; \
-> +		idx++)
+>  ##
+>  # @ThreadContextProperties:
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index 3d313ed46bd1..22130382c0c5 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> @@ -32,6 +32,8 @@
+>                                       (1U << KVM_FEATURE_PV_SCHED_YIELD) | \
+>                                       (1U << KVM_FEATURE_MSI_EXT_DEST_ID))
+>  
+> +#define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
 > +
->  static inline struct kvm_vcpu *kvm_get_vcpu_by_id(struct kvm *kvm, int id)
->  {
->  	struct kvm_vcpu *vcpu = NULL;
-> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> index 24011280c4b1..bb64148ab75b 100644
-> --- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-> @@ -852,44 +852,60 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
+>  #define TDX_ATTRIBUTES_MAX_BITS      64
 >  
->  	return 0;
->  }
-> +
->  /*
-> - * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
-> - * generation register ICC_SGI1R_EL1) with a given VCPU.
-> - * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
-> - * return -1.
-> + * Get affinity routing index from ICC_SGI_* register
-> + * format:
-> + *     aff3       aff2       aff1            aff0
-> + * |- 8 bits -|- 8 bits -|- 8 bits -|- 4 bits or 8bits -|
->   */
-> -static int match_mpidr(u64 sgi_aff, u16 sgi_cpu_mask, struct kvm_vcpu *vcpu)
-> +static u64 sgi_to_affinity(unsigned long reg)
->  {
-> -	unsigned long affinity;
-> -	int level0;
-> +	u64 aff;
->  
-> -	/*
-> -	 * Split the current VCPU's MPIDR into affinity level 0 and the
-> -	 * rest as this is what we have to compare against.
-> -	 */
-> -	affinity = kvm_vcpu_get_mpidr_aff(vcpu);
-> -	level0 = MPIDR_AFFINITY_LEVEL(affinity, 0);
-> -	affinity &= ~MPIDR_LEVEL_MASK;
-> +	/* aff3 - aff1 */
-> +	aff = (((reg) & ICC_SGI1R_AFFINITY_3_MASK) >> ICC_SGI1R_AFFINITY_3_SHIFT) << 16 |
-> +		(((reg) & ICC_SGI1R_AFFINITY_2_MASK) >> ICC_SGI1R_AFFINITY_2_SHIFT) << 8 |
-> +		(((reg) & ICC_SGI1R_AFFINITY_1_MASK) >> ICC_SGI1R_AFFINITY_1_SHIFT);
->  
-> -	/* bail out if the upper three levels don't match */
-> -	if (sgi_aff != affinity)
-> -		return -1;
-> +	/* if use range selector, TargetList[n] represents aff0 value ((RS * 16) + n) */
-> +	if ((reg) & ICC_SGI1R_RS_MASK) {
-> +		aff <<= 4;
-> +		aff |= (reg) & ICC_SGI1R_RS_MASK;
-> +	}
->  
-> -	/* Is this VCPU's bit set in the mask ? */
-> -	if (!(sgi_cpu_mask & BIT(level0)))
-> -		return -1;
-> +	/* aff0, the length of targetlist in sgi register is 16, which is 4bit  */
-> +	aff <<= 4;
->  
-> -	return level0;
-> +	return aff;
+>  static FeatureMask tdx_attrs_ctrl_fields[TDX_ATTRIBUTES_MAX_BITS] = {
+> @@ -501,6 +503,24 @@ out:
+>      return r;
 >  }
 >  
->  /*
-> - * The ICC_SGI* registers encode the affinity differently from the MPIDR,
-> - * so provide a wrapper to use the existing defines to isolate a certain
-> - * affinity level.
-> + * inject a vsgi to vcpu
->   */
-> -#define SGI_AFFINITY_LEVEL(reg, level) \
-> -	((((reg) & ICC_SGI1R_AFFINITY_## level ##_MASK) \
-> -	>> ICC_SGI1R_AFFINITY_## level ##_SHIFT) << MPIDR_LEVEL_SHIFT(level))
-> +static inline void vgic_v3_inject_sgi(struct kvm_vcpu *vcpu, int sgi, bool allow_group1)
+> +static bool tdx_guest_get_sept_ve_disable(Object *obj, Error **errp)
 > +{
-> +	struct vgic_irq *irq;
-> +	unsigned long flags;
+> +    TdxGuest *tdx = TDX_GUEST(obj);
 > +
-> +	irq = vgic_get_irq(vcpu->kvm, vcpu, sgi);
-> +
-> +	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> +
-> +	/*
-> +	 * An access targeting Group0 SGIs can only generate
-> +	 * those, while an access targeting Group1 SGIs can
-> +	 * generate interrupts of either group.
-> +	 */
-> +	if (!irq->group || allow_group1) {
-> +		irq->pending_latch = true;
-> +		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> +	} else {
-> +		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +	}
-> +
-> +	vgic_put_irq(vcpu->kvm, irq);
+> +    return !!(tdx->attributes & TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE);
 > +}
+> +
+> +static void tdx_guest_set_sept_ve_disable(Object *obj, bool value, Error **errp)
+> +{
+> +    TdxGuest *tdx = TDX_GUEST(obj);
+> +
+> +    if (value) {
+> +        tdx->attributes |= TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
+> +    } else {
+> +        tdx->attributes &= ~TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
+> +    }
+> +}
+> +
+>  /* tdx guest */
+>  OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
+>                                     tdx_guest,
+> @@ -516,6 +536,10 @@ static void tdx_guest_init(Object *obj)
+>      qemu_mutex_init(&tdx->lock);
 >  
->  /**
->   * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
-> @@ -910,64 +926,48 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg, bool allow_group1)
->  	struct kvm *kvm = vcpu->kvm;
->  	struct kvm_vcpu *c_vcpu;
->  	u16 target_cpus;
-> -	u64 mpidr;
->  	int sgi, c;
->  	int vcpu_id = vcpu->vcpu_id;
->  	bool broadcast;
-> -	unsigned long flags;
-> +	u64 aff_index;
->  
->  	sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
->  	broadcast = reg & BIT_ULL(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
->  	target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
-> -	mpidr = SGI_AFFINITY_LEVEL(reg, 3);
-> -	mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
-> -	mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
->  
->  	/*
-> -	 * We iterate over all VCPUs to find the MPIDRs matching the request.
-> -	 * If we have handled one CPU, we clear its bit to detect early
-> -	 * if we are already finished. This avoids iterating through all
-> -	 * VCPUs when most of the times we just signal a single VCPU.
-> +	 * Writing IRM bit is not a frequent behavior, so separate SGI injection into two parts.
-> +	 * If it is not broadcast, compute the affinity routing index first,
-> +	 * then iterate targetlist to find the target VCPU.
-> +	 * Or, inject sgi to all VCPUs but the calling one.
->  	 */
-> -	kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> -		struct vgic_irq *irq;
-> -
-> -		/* Exit early if we have dealt with all requested CPUs */
-> -		if (!broadcast && target_cpus == 0)
-> -			break;
-> -
-> -		/* Don't signal the calling VCPU */
-> -		if (broadcast && c == vcpu_id)
-> -			continue;
-> +	if (likely(!broadcast)) {
-> +		/* compute affinity routing index */
-> +		aff_index = sgi_to_affinity(reg);
->  
-> -		if (!broadcast) {
-> -			int level0;
-> +		/* Exit if meet a wrong affinity value */
-> +		if (aff_index >= atomic_read(&kvm->online_vcpus))
-> +			return;
->  
-> -			level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
-> -			if (level0 == -1)
-> +		/* Iterate target list */
-> +		kvm_for_each_target_vcpus(c, target_cpus) {
-> +			if (!(target_cpus & (1 << c)))
->  				continue;
->  
-> -			/* remove this matching VCPU from the mask */
-> -			target_cpus &= ~BIT(level0);
-> -		}
-> -
-> -		irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
-> -
-> -		raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> +			c_vcpu = kvm_get_vcpu_by_id(kvm, aff_index+c);
-> +			if (!c_vcpu)
-> +				break;
->  
-> -		/*
-> -		 * An access targetting Group0 SGIs can only generate
-> -		 * those, while an access targetting Group1 SGIs can
-> -		 * generate interrupts of either group.
-> -		 */
-> -		if (!irq->group || allow_group1) {
-> -			irq->pending_latch = true;
-> -			vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
-> -		} else {
-> -			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +			vgic_v3_inject_sgi(c_vcpu, sgi, allow_group1);
->  		}
-> +	} else {
-> +		kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> +			/* don't signal the calling vcpu  */
-> +			if (c_vcpu->vcpu_id == vcpu_id)
-> +				continue;
->  
-> -		vgic_put_irq(vcpu->kvm, irq);
-> +			vgic_v3_inject_sgi(c_vcpu, sgi, allow_group1);
-> +		}
->  	}
+>      tdx->attributes = 0;
+> +
+> +    object_property_add_bool(obj, "sept-ve-disable",
+> +                             tdx_guest_get_sept_ve_disable,
+> +                             tdx_guest_set_sept_ve_disable);
 >  }
 >  
+>  static void tdx_guest_finalize(Object *obj)
 > -- 
-> 2.20.1
+> 2.34.1
 > 
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
