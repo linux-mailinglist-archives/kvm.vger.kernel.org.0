@@ -2,205 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AFE1782C8D
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 16:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B00782CF0
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 17:09:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236158AbjHUOsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 10:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44466 "EHLO
+        id S236187AbjHUPJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 11:09:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236150AbjHUOsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 10:48:09 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC8E100
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 07:48:06 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 9EC36206C8;
-        Mon, 21 Aug 2023 14:48:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1692629285; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+        with ESMTP id S231829AbjHUPJo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 11:09:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 281DCE2
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 08:08:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692630534;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+RhCzgzW/g5WiYRKevBmwndl3S3/P51BYhsYKNWaZ9I=;
-        b=2ILukgTGw/jY9SIlmubPtWOptBKXiMMk+5zLLXRRlMOkwnMeBQ7IZqBgAx/BDwUrnSmH9X
-        bfV1quVSpXzeXGAg/M8GjEx7B1W50mhx+/aU6iH55vgaOeerUm5jcDLaSwtBP0mQa4GGbj
-        EW+lDYACLPd7GqXCDbDFhRjD7MAMHTE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1692629285;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+RhCzgzW/g5WiYRKevBmwndl3S3/P51BYhsYKNWaZ9I=;
-        b=CCAmUYWihCodyY/ZFlfW/5dg4Zt7WE5FGk2RFkhlCmpC6NctcD3Non5LqfAmByE68/awGQ
-        VMQZMt0bXoR/w9CA==
-Received: from vasant-suse.fritz.box (vkarasulli.udp.ovpn1.nue.suse.de [10.163.24.134])
-        by relay2.suse.de (Postfix) with ESMTP id 3A2732C143;
-        Mon, 21 Aug 2023 14:48:05 +0000 (UTC)
-From:   Vasant Karasulli <vkarasulli@suse.de>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, jroedel@suse.de,
-        drjones@redhat.com, erdemaktas@google.com, marcorr@google.com,
-        papaluri@amd.com, rientjes@google.com, zxwang42@gmail.com,
-        Vasant Karasulli <vkarasulli@suse.de>,
-        Varad Gautam <varad.gautam@suse.com>
-Subject: [kvm-unit-tests PATCH v5 11/11] x86: AMD SEV-ES: Handle string IO for IOIO #VC
-Date:   Mon, 21 Aug 2023 16:47:51 +0200
-Message-Id: <20230821144751.22557-12-vkarasulli@suse.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230821144751.22557-1-vkarasulli@suse.de>
-References: <20230821144751.22557-1-vkarasulli@suse.de>
+        bh=eiftg8Pr9vE2gWFnJOhq8DTyEekLoXKGZzeRO133jUE=;
+        b=XwlzAZzPweFN8ajgqnaWsVwnsNHq/L3p9RRRkJt1PxRVrk/+Q/Eh94subaiYudzzhIFff7
+        znUDhHM1aiRAJVTP/mKdFnP2zP0wtw3HHu2cWk5jKBiOIrlKtT3kqMoClWZgM9iP8F0bxl
+        9ngsMagfzikS9F3bIIC3e/sErXgkyQs=
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com
+ [209.85.160.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-670-m6uB1E5tOIGlXVDYd_sTRw-1; Mon, 21 Aug 2023 11:08:52 -0400
+X-MC-Unique: m6uB1E5tOIGlXVDYd_sTRw-1
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1b0812d43a0so3350006fac.0
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 08:08:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692630532; x=1693235332;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eiftg8Pr9vE2gWFnJOhq8DTyEekLoXKGZzeRO133jUE=;
+        b=KqdzwwPxJJ/IwiAE6NmAjRwJER9aLLXDg/Cnx9SmT3STiCwDY0t2X/AdNphRSYK2vj
+         xT2rlt5+TKU6plEP7qDSToKlSaGXejhvpojIPwsZmF5PDhQSVrK+SKb3JphicF4BeevF
+         dhea04N1p4gM/UXoCcaB44BoNpN0ZS7UgEZvIOydPzPrUBdbvEB+3uDqjYb8nYMPJ1lm
+         J0IB7yjVdk5SovyZK2f+Qr9foUmctgEhH3g4gbiH7N1x6Ydxy53qfg5f2ckg0gNf6gBR
+         DZmtCfeSOfnlUkqcaYh/lLCg2RlHXJOEWlxO8afAPP0o6DNeKqoiEag9lcAaR6lKYNv1
+         XSCA==
+X-Gm-Message-State: AOJu0Yw06/7jT5mD5TJPsmKz3b52FLuxdBuWvtyPqkMElUnJIaueTGc7
+        xfBcLX6YGFlyzzYa9kCpUQ2jYX1Ds1yyGsKDPM8UA5N5PCOG8jhyqOteZGb2dlqzdjCBFoa9cgW
+        TDcB90k+UH5BB
+X-Received: by 2002:a05:6870:470e:b0:1bb:c0ee:5554 with SMTP id b14-20020a056870470e00b001bbc0ee5554mr4604212oaq.2.1692630531988;
+        Mon, 21 Aug 2023 08:08:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH2t2gnAZ9Ox+eHrEFNPmV0KQPQOcL1byJgHVkK10yzfG4Npq1bEBvFEY5S6z60VY01Ww08Bg==
+X-Received: by 2002:a05:6870:470e:b0:1bb:c0ee:5554 with SMTP id b14-20020a056870470e00b001bbc0ee5554mr4604187oaq.2.1692630531478;
+        Mon, 21 Aug 2023 08:08:51 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id u2-20020a05687004c200b001c0f4484d20sm4296627oam.25.2023.08.21.08.08.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Aug 2023 08:08:50 -0700 (PDT)
+Date:   Mon, 21 Aug 2023 09:08:49 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <brett.creeley@amd.com>, <jgg@ziepe.ca>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
+        <horms@kernel.org>, <shannon.nelson@amd.com>
+Subject: Re: [PATCH -next] vfio/pds: fix return value in
+ pds_vfio_get_lm_file()
+Message-ID: <20230821090849.79fe44a4.alex.williamson@redhat.com>
+In-Reply-To: <20230819023716.3469037-1-yangyingliang@huawei.com>
+References: <20230819023716.3469037-1-yangyingliang@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using Linux's IOIO #VC processing logic.
+On Sat, 19 Aug 2023 10:37:16 +0800
+Yang Yingliang <yangyingliang@huawei.com> wrote:
 
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
-Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
-Reviewed-by: Marc Orr <marcorr@google.com>
-Tested-by: Marc Orr <marcorr@google.com>
----
- lib/x86/amd_sev_vc.c | 108 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 106 insertions(+), 2 deletions(-)
+> anon_inode_getfile() never returns NULL pointer, it will return
+> ERR_PTR() when it fails, so replace the check with IS_ERR().
+> 
+> Fixes: bb500dbe2ac6 ("vfio/pds: Add VFIO live migration support")
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+> ---
+>  drivers/vfio/pci/pds/lm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/pds/lm.c b/drivers/vfio/pci/pds/lm.c
+> index aec75574cab3..79fe2e66bb49 100644
+> --- a/drivers/vfio/pci/pds/lm.c
+> +++ b/drivers/vfio/pci/pds/lm.c
+> @@ -31,7 +31,7 @@ pds_vfio_get_lm_file(const struct file_operations *fops, int flags, u64 size)
+>  	/* Create file */
+>  	lm_file->filep =
+>  		anon_inode_getfile("pds_vfio_lm", fops, lm_file, flags);
+> -	if (!lm_file->filep)
+> +	if (IS_ERR(lm_file->filep))
+>  		goto out_free_file;
+>  
+>  	stream_open(lm_file->filep->f_inode, lm_file->filep);
 
-diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
-index f64287c..90ed1ad 100644
---- a/lib/x86/amd_sev_vc.c
-+++ b/lib/x86/amd_sev_vc.c
-@@ -300,10 +300,46 @@ static enum es_result vc_ioio_exitinfo(struct es_em_ctxt *ctxt, u64 *exitinfo)
- 	return ES_OK;
- }
+Applied to vfio next branch for v6.6.  Thanks,
 
-+static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
-+					  void *src, unsigned char *buf,
-+					  unsigned int data_size,
-+					  unsigned int count,
-+					  bool backwards)
-+{
-+	int i, b = backwards ? -1 : 1;
-+
-+	for (i = 0; i < count; i++) {
-+		void *s = src + (i * data_size * b);
-+		unsigned char *d = buf + (i * data_size);
-+
-+		memcpy(d, s, data_size);
-+	}
-+
-+	return ES_OK;
-+}
-+
-+static enum es_result vc_insn_string_write(struct es_em_ctxt *ctxt,
-+					   void *dst, unsigned char *buf,
-+					   unsigned int data_size,
-+					   unsigned int count,
-+					   bool backwards)
-+{
-+	int i, s = backwards ? -1 : 1;
-+
-+	for (i = 0; i < count; i++) {
-+		void *d = dst + (i * data_size * s);
-+		unsigned char *b = buf + (i * data_size);
-+
-+		memcpy(d, b, data_size);
-+	}
-+
-+	return ES_OK;
-+}
-+
- static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- {
- 	struct ex_regs *regs = ctxt->regs;
--	u64 exit_info_1;
-+	u64 exit_info_1, exit_info_2;
- 	enum es_result ret;
-
- 	ret = vc_ioio_exitinfo(ctxt, &exit_info_1);
-@@ -311,7 +347,75 @@ static enum es_result vc_handle_ioio(struct ghcb *ghcb, struct es_em_ctxt *ctxt)
- 		return ret;
-
- 	if (exit_info_1 & IOIO_TYPE_STR) {
--		ret = ES_VMM_ERROR;
-+		/* (REP) INS/OUTS */
-+
-+		bool df = ((regs->rflags & X86_EFLAGS_DF) == X86_EFLAGS_DF);
-+		unsigned int io_bytes, exit_bytes;
-+		unsigned int ghcb_count, op_count;
-+		unsigned long es_base;
-+		u64 sw_scratch;
-+
-+		/*
-+		 * For the string variants with rep prefix the amount of in/out
-+		 * operations per #VC exception is limited so that the kernel
-+		 * has a chance to take interrupts and re-schedule while the
-+		 * instruction is emulated.
-+		 */
-+		io_bytes   = (exit_info_1 >> 4) & 0x7;
-+		ghcb_count = sizeof(ghcb->shared_buffer) / io_bytes;
-+
-+		op_count    = (exit_info_1 & IOIO_REP) ? regs->rcx : 1;
-+		exit_info_2 = op_count < ghcb_count ? op_count : ghcb_count;
-+		exit_bytes  = exit_info_2 * io_bytes;
-+
-+		es_base = 0;
-+
-+		/* Read bytes of OUTS into the shared buffer */
-+		if (!(exit_info_1 & IOIO_TYPE_IN)) {
-+			ret = vc_insn_string_read(ctxt,
-+					       (void *)(es_base + regs->rsi),
-+					       ghcb->shared_buffer, io_bytes,
-+					       exit_info_2, df);
-+			if (ret)
-+				return ret;
-+		}
-+
-+		/*
-+		 * Issue an VMGEXIT to the HV to consume the bytes from the
-+		 * shared buffer or to have it write them into the shared buffer
-+		 * depending on the instruction: OUTS or INS.
-+		 */
-+		sw_scratch = __pa(ghcb) + offsetof(struct ghcb, shared_buffer);
-+		ghcb_set_sw_scratch(ghcb, sw_scratch);
-+		ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_IOIO,
-+					  exit_info_1, exit_info_2);
-+		if (ret != ES_OK)
-+			return ret;
-+
-+		/* Read bytes from shared buffer into the guest's destination. */
-+		if (exit_info_1 & IOIO_TYPE_IN) {
-+			ret = vc_insn_string_write(ctxt,
-+						   (void *)(es_base + regs->rdi),
-+						   ghcb->shared_buffer, io_bytes,
-+						   exit_info_2, df);
-+			if (ret)
-+				return ret;
-+
-+			if (df)
-+				regs->rdi -= exit_bytes;
-+			else
-+				regs->rdi += exit_bytes;
-+		} else {
-+			if (df)
-+				regs->rsi -= exit_bytes;
-+			else
-+				regs->rsi += exit_bytes;
-+		}
-+
-+		if (exit_info_1 & IOIO_REP)
-+			regs->rcx -= exit_info_2;
-+
-+		ret = regs->rcx ? ES_RETRY : ES_OK;
- 	} else {
- 		/* IN/OUT into/from rAX */
-
---
-2.34.1
+Alex
 
