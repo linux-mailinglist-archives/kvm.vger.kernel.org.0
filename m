@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 616B27821C8
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 05:22:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B01A37821CC
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 05:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232622AbjHUDWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Aug 2023 23:22:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
+        id S232638AbjHUD0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Aug 2023 23:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232615AbjHUDWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Aug 2023 23:22:47 -0400
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989F79D;
-        Sun, 20 Aug 2023 20:22:45 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R971e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0Vq9XIXN_1692588161;
-Received: from localhost(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0Vq9XIXN_1692588161)
+        with ESMTP id S232614AbjHUD0k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Aug 2023 23:26:40 -0400
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3929D;
+        Sun, 20 Aug 2023 20:26:37 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0Vq9XJnj_1692588394;
+Received: from localhost(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0Vq9XJnj_1692588394)
           by smtp.aliyun-inc.com;
-          Mon, 21 Aug 2023 11:22:42 +0800
+          Mon, 21 Aug 2023 11:26:35 +0800
 From:   Hao Xiang <hao.xiang@linux.alibaba.com>
 To:     kvm@vger.kernel.org
 Cc:     shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
         seanjc@google.com, linux-kernel@vger.kernel.org,
         Hao Xiang <hao.xiang@linux.alibaba.com>
 Subject: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
-Date:   Mon, 21 Aug 2023 11:22:31 +0800
-Message-Id: <1692588151-33716-1-git-send-email-hao.xiang@linux.alibaba.com>
+Date:   Mon, 21 Aug 2023 11:26:32 +0800
+Message-Id: <1692588392-58155-1-git-send-email-hao.xiang@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -92,7 +92,7 @@ index c381770..621c3e1 100644
 +	 * to make sure guest can get correct turbo frequency info.
 +	 */
 +
-+	msr_platform_info &= (MSR_PLATFORM_INFO_MAX_NON_TURBO_RATIO |
++	msr_platform_info &= (MSR_PLATFORM_INFO_MAX_NON_TURBO_LIM_RATIO |
 +			MSR_PLATFORM_INFO_MAX_EFFICIENCY_RATIO);
 +	msr_platform_info |= MSR_PLATFORM_INFO_CPUID_FAULT;
 +
