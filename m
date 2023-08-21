@@ -2,70 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22E19782612
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:11:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F17C9782621
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:17:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234278AbjHUJLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 05:11:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59446 "EHLO
+        id S234210AbjHUJRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 05:17:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230367AbjHUJLX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 05:11:23 -0400
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65567C4;
-        Mon, 21 Aug 2023 02:11:21 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hao.xiang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VqEqKAv_1692609076;
-Received: from 30.221.109.103(mailfrom:hao.xiang@linux.alibaba.com fp:SMTPD_---0VqEqKAv_1692609076)
-          by smtp.aliyun-inc.com;
-          Mon, 21 Aug 2023 17:11:17 +0800
-Message-ID: <6d10dcf7-7912-25a2-8d8e-ef7d71a4ce83@linux.alibaba.com>
-Date:   Mon, 21 Aug 2023 17:11:16 +0800
+        with ESMTP id S231397AbjHUJRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 05:17:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7705BBA
+        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 02:16:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692609407;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=b1lHD21s+MBJiO7a88Vxmxpex8d+pS/CCRJDDNtoVec=;
+        b=ZaG2SqDi0XOvJIR9U35kZT9KrMbHkQOGiqAOYesBwDeXb0lxNz691a8bYHHOk8faaUo8uA
+        xygK7uJCOBRPvC01xHOgvPWUYxqwzdLN2vSb6eDWXgUkk6vbae3mqDiJLYf4Ixl/nGRxpa
+        ChTOgF9GnJ0fau6GApFKmvvu+Ogy36w=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-112-Xx3PqylANxiSWwzqWSbbHw-1; Mon, 21 Aug 2023 05:16:44 -0400
+X-MC-Unique: Xx3PqylANxiSWwzqWSbbHw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C422338210A0;
+        Mon, 21 Aug 2023 09:16:43 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.139])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25CA240C2063;
+        Mon, 21 Aug 2023 09:16:41 +0000 (UTC)
+Date:   Mon, 21 Aug 2023 10:16:39 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v2 18/58] i386/tdx: Validate TD attributes
+Message-ID: <ZOMrd6f0URDYp/0r@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
+ <20230818095041.1973309-19-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
-Content-Language: en-US
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     kvm@vger.kernel.org, shannon.zhao@linux.alibaba.com,
-        pbonzini@redhat.com, seanjc@google.com,
-        linux-kernel@vger.kernel.org
-References: <1692588392-58155-1-git-send-email-hao.xiang@linux.alibaba.com>
- <ZOMWM+YmScUG3U5W@chao-email>
-From:   Hao Xiang <hao.xiang@linux.alibaba.com>
-In-Reply-To: <ZOMWM+YmScUG3U5W@chao-email>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-13.3 required=5.0 tests=BAYES_00,
-        ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230818095041.1973309-19-xiaoyao.li@intel.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For reason that,
-
-The turbo frequency info depends on specific machine type. And the msr 
-value of MSR_PLATFORM_INFO may be diferent on diffrent generation machine.
-
-Get following msr bits (needed by turbostat on intel platform) by rdmsr 
-MSR_PLATFORM_INFO directly in KVM is more reasonable. And set these msr 
-bits as vcpu->arch.msr_platform_info default value.
-  -bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
-  -bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
-
-On 2023/8/21 15:52, Chao Gao wrote:
-> On Mon, Aug 21, 2023 at 11:26:32AM +0800, Hao Xiang wrote:
->> For intel platform, The BzyMhz field of Turbostat shows zero
->> due to the missing of part msr bits of MSR_PLATFORM_INFO.
->>
->> Acquire necessary msr bits, and expose following msr info to guest,
->> to make sure guest can get correct turbo frequency info.
+On Fri, Aug 18, 2023 at 05:50:01AM -0400, Xiaoyao Li wrote:
+> Validate TD attributes with tdx_caps that fixed-0 bits must be zero and
+> fixed-1 bits must be set.
 > 
-> Userspace VMM (e.g., QEMU) can configure this MSR for guests. Please refer to
-> tools/testing/selftests/kvm/x86_64/platform_info_test.c.
+> Besides, sanity check the attribute bits that have not been supported by
+> QEMU yet. e.g., debug bit, it will be allowed in the future when debug
+> TD support lands in QEMU.
 > 
-> The question is why KVM needs this patch given KVM already provides interfaces
-> for QEMU to configure the MSR.
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  target/i386/kvm/tdx.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> index 629abd267da8..73da15377ec3 100644
+> --- a/target/i386/kvm/tdx.c
+> +++ b/target/i386/kvm/tdx.c
+> @@ -32,6 +32,7 @@
+>                                       (1U << KVM_FEATURE_PV_SCHED_YIELD) | \
+>                                       (1U << KVM_FEATURE_MSI_EXT_DEST_ID))
+>  
+> +#define TDX_TD_ATTRIBUTES_DEBUG             BIT_ULL(0)
+>  #define TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE   BIT_ULL(28)
+>  #define TDX_TD_ATTRIBUTES_PKS               BIT_ULL(30)
+>  #define TDX_TD_ATTRIBUTES_PERFMON           BIT_ULL(63)
+> @@ -462,13 +463,32 @@ int tdx_kvm_init(MachineState *ms, Error **errp)
+>      return 0;
+>  }
+>  
+> -static void setup_td_guest_attributes(X86CPU *x86cpu)
+> +static int tdx_validate_attributes(TdxGuest *tdx)
+> +{
+> +    if (((tdx->attributes & tdx_caps->attrs_fixed0) | tdx_caps->attrs_fixed1) !=
+> +        tdx->attributes) {
+> +            error_report("Invalid attributes 0x%lx for TDX VM (fixed0 0x%llx, fixed1 0x%llx)",
+> +                          tdx->attributes, tdx_caps->attrs_fixed0, tdx_caps->attrs_fixed1);
+> +            return -EINVAL;
+> +    }
+> +
+> +    if (tdx->attributes & TDX_TD_ATTRIBUTES_DEBUG) {
+> +        error_report("Current QEMU doesn't support attributes.debug[bit 0] for TDX VM");
+> +        return -EINVAL;
+> +    }
+
+Use error_setg() in both cases, passing in a 'Error **errp' object,
+and 'return -1' instead of returning an errno value.
+
+> +
+> +    return 0;
+> +}
+> +
+> +static int setup_td_guest_attributes(X86CPU *x86cpu)
+>  {
+>      CPUX86State *env = &x86cpu->env;
+>  
+>      tdx_guest->attributes |= (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_PKS) ?
+>                               TDX_TD_ATTRIBUTES_PKS : 0;
+>      tdx_guest->attributes |= x86cpu->enable_pmu ? TDX_TD_ATTRIBUTES_PERFMON : 0;
+> +
+> +    return tdx_validate_attributes(tdx_guest);
+
+Pass along "errp" into this
+
+>  }
+>  
+>  int tdx_pre_create_vcpu(CPUState *cpu)
+> @@ -493,7 +513,10 @@ int tdx_pre_create_vcpu(CPUState *cpu)
+
+In an earlier patch I suggested adding 'Error **errp' to this method...
+
+>          goto out_free;
+>      }
+>  
+> -    setup_td_guest_attributes(x86cpu);
+> +    r = setup_td_guest_attributes(x86cpu);
+
+...it can also be passed into this method
+
+> +    if (r) {
+> +        goto out;
+> +    }
+>  
+>      init_vm->cpuid.nent = kvm_x86_arch_cpuid(env, init_vm->cpuid.entries, 0);
+>      init_vm->attributes = tdx_guest->attributes;
+> -- 
+> 2.34.1
+> 
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
