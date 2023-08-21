@@ -2,281 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F2AB7826B2
-	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 11:59:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3C977826E2
+	for <lists+kvm@lfdr.de>; Mon, 21 Aug 2023 12:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234532AbjHUJ7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Aug 2023 05:59:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35332 "EHLO
+        id S234590AbjHUKQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Aug 2023 06:16:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232433AbjHUJ7n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Aug 2023 05:59:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BEFEDC
-        for <kvm@vger.kernel.org>; Mon, 21 Aug 2023 02:58:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692611918;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=MouTdXYvd8EMbVAJZG4yva2UaPiccDDkjRW/8Gte4a8=;
-        b=KWIlnpoYnr/VmOx16h5py4JiGH1OF0L1dcJ3VGtIS9Yy0HcoGD9ugZ/UpgRandCgUqoAbQ
-        Zr8LSpxsJrPO8kUVRNzFKWaCKRL5ags4X24RsLn2+EmXlVujJfkYrNg16G01g+F82jbmjh
-        +6vJAXZW/SVRakraERBqSOVL+vuCSbA=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-650-nrWzbycdPR-JNkhvZRDMGA-1; Mon, 21 Aug 2023 05:58:32 -0400
-X-MC-Unique: nrWzbycdPR-JNkhvZRDMGA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S231183AbjHUKQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Aug 2023 06:16:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD54CA;
+        Mon, 21 Aug 2023 03:16:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D566D38210AC;
-        Mon, 21 Aug 2023 09:58:31 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 28E5D492C13;
-        Mon, 21 Aug 2023 09:58:28 +0000 (UTC)
-Date:   Mon, 21 Aug 2023 10:58:26 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v2 47/58] i386/tdx: Wire REPORT_FATAL_ERROR with
- GuestPanic facility
-Message-ID: <ZOM1Qk4wjNczWEf2@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
- <20230818095041.1973309-48-xiaoyao.li@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230818095041.1973309-48-xiaoyao.li@intel.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AAC16625BE;
+        Mon, 21 Aug 2023 10:16:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCB31C433C8;
+        Mon, 21 Aug 2023 10:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692612993;
+        bh=ail/1jTb7rtKZsa1M8PPf3UgwIcIYbTAUY5HqpbucYo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qzYufCGDNqKSOeiMFwBL0ylCmXpR4q3AVdruQLyys1dr0CXOiq75HsZhkInPF2L1/
+         PIfOLJN5se8zMJOC8yJ/Woc3smojyS68uYgw8my2BojKIRXlt3KGuhpFLZk0hGTeLo
+         w0hAhux3WGCRG31rWGXbsgZFQCV3FZBZgyIMMzP3zBrqEMSQ4VTnZfgFo5lKCmhxDS
+         OLbl6uELfBH5Cvsw8iuAxarNPxBHWT0s2ArYA+Y0efVVeTAPyQ1FU5v+GSBZNnhiKH
+         tNyqWYJlxT6lea36bngFgIiMgHWYAZ/lAoeZtfg15uWnTCbMMS7vHd/pwN69rvwmm4
+         vjx6mv8OYCjvQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1qY1xX-006bFJ-9q;
+        Mon, 21 Aug 2023 11:16:31 +0100
+Date:   Mon, 21 Aug 2023 11:16:30 +0100
+Message-ID: <86msykg0ox.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Xu Zhao <zhaoxu.35@bytedance.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, zhouyibo@bytedance.com,
+        zhouliang.001@bytedance.com, Oliver Upton <oliver.upton@linux.dev>,
+        kvmarm@lists.linux.dev, Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [RFC] KVM: arm/arm64: optimize vSGI injection performance
+In-Reply-To: <ZOMnZY_w83vTYnTo@FVFF77S0Q05N>
+References: <20230818104704.7651-1-zhaoxu.35@bytedance.com>
+        <ZOMnZY_w83vTYnTo@FVFF77S0Q05N>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zhaoxu.35@bytedance.com, pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zhouyibo@bytedance.com, zhouliang.001@bytedance.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 18, 2023 at 05:50:30AM -0400, Xiaoyao Li wrote:
-> Originated-from: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->  qapi/run-state.json   | 17 +++++++++++++--
->  softmmu/runstate.c    | 49 +++++++++++++++++++++++++++++++++++++++++++
->  target/i386/kvm/tdx.c | 24 ++++++++++++++++++++-
->  3 files changed, 87 insertions(+), 3 deletions(-)
+On Mon, 21 Aug 2023 09:59:17 +0100,
+Mark Rutland <mark.rutland@arm.com> wrote:
 > 
-> diff --git a/qapi/run-state.json b/qapi/run-state.json
-> index f216ba54ec4c..506bbe31541f 100644
-> --- a/qapi/run-state.json
-> +++ b/qapi/run-state.json
-> @@ -499,7 +499,7 @@
->  # Since: 2.9
->  ##
->  { 'enum': 'GuestPanicInformationType',
-> -  'data': [ 'hyper-v', 's390' ] }
-> +  'data': [ 'hyper-v', 's390', 'tdx' ] }
+> [adding the KVM/arm64 maintainers & list]
 
-Missing documentation for the 'tdx' value
+Thanks for that.
 
->  
->  ##
->  # @GuestPanicInformation:
-> @@ -514,7 +514,8 @@
->   'base': {'type': 'GuestPanicInformationType'},
->   'discriminator': 'type',
->   'data': {'hyper-v': 'GuestPanicInformationHyperV',
-> -          's390': 'GuestPanicInformationS390'}}
-> +          's390': 'GuestPanicInformationS390',
-> +          'tdx' : 'GuestPanicInformationTdx'}}
->  
->  ##
->  # @GuestPanicInformationHyperV:
-> @@ -577,6 +578,18 @@
->            'psw-addr': 'uint64',
->            'reason': 'S390CrashReason'}}
->  
-> +##
-> +# @GuestPanicInformationTdx:
-> +#
-> +# TDX GHCI TDG.VP.VMCALL<ReportFatalError> specific guest panic information
-
-Not documented any of the struct members. Especially please include
-the warning that 'message' comes from the guest and so must not be
-trusted, not assumed to be well formed.
-
-> +#
-> +# Since: 8.2
-> +##
-> +{'struct': 'GuestPanicInformationTdx',
-> + 'data': {'error-code': 'uint64',
-> +          'gpa': 'uint64',
-> +          'message': 'str'}}
-> +
->  ##
->  # @MEMORY_FAILURE:
->  #
-> diff --git a/softmmu/runstate.c b/softmmu/runstate.c
-> index f3bd86281813..cab11484ed7e 100644
-> --- a/softmmu/runstate.c
-> +++ b/softmmu/runstate.c
-> @@ -518,7 +518,56 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
->                            S390CrashReason_str(info->u.s390.reason),
->                            info->u.s390.psw_mask,
->                            info->u.s390.psw_addr);
-> +        } else if (info->type == GUEST_PANIC_INFORMATION_TYPE_TDX) {
-> +            char *buf = NULL;
-> +            bool printable = false;
-> +
-> +            /*
-> +             * Although message is defined as a json string, we shouldn't
-> +             * unconditionally treat it as is because the guest generated it and
-> +             * it's not necessarily trustable.
-> +             */
-> +            if (info->u.tdx.message) {
-> +                /* The caller guarantees the NUL-terminated string. */
-> +                int len = strlen(info->u.tdx.message);
-> +                int i;
-> +
-> +                printable = len > 0;
-> +                for (i = 0; i < len; i++) {
-> +                    if (!(0x20 <= info->u.tdx.message[i] &&
-> +                          info->u.tdx.message[i] <= 0x7e)) {
-> +                        printable = false;
-> +                        break;
-> +                    }
-> +                }
-> +
-> +                /* 3 = length of "%02x " */
-> +                buf = g_malloc(len * 3);
-> +                for (i = 0; i < len; i++) {
-> +                    if (info->u.tdx.message[i] == '\0') {
-> +                        break;
-> +                    } else {
-> +                        sprintf(buf + 3 * i, "%02x ", info->u.tdx.message[i]);
-> +                    }
-> +                }
-> +                if (i > 0)
-> +                    /* replace the last ' '(space) to NUL */
-> +                    buf[i * 3 - 1] = '\0';
-> +                else
-> +                    buf[0] = '\0';
-
-You're building this escaped buffer but...
-
-> +            }
-> +
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          //" TDX report fatal error:\"%s\" %s",
-> +                          " TDX report fatal error:\"%s\""
-> +                          "error: 0x%016" PRIx64 " gpa page: 0x%016" PRIx64 "\n",
-> +                          printable ? info->u.tdx.message : "",
-> +                          //buf ? buf : "",
-
-...then not actually using it
-
-Either delete the 'buf' code, or use it.
-
-> +                          info->u.tdx.error_code,
-> +                          info->u.tdx.gpa);
-> +            g_free(buf);
->          }
-> +
->          qapi_free_GuestPanicInformation(info);
->      }
->  }
-> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-> index f111b46dac92..7efaa13f59e2 100644
-> --- a/target/i386/kvm/tdx.c
-> +++ b/target/i386/kvm/tdx.c
-> @@ -18,6 +18,7 @@
->  #include "qom/object_interfaces.h"
->  #include "standard-headers/asm-x86/kvm_para.h"
->  #include "sysemu/kvm.h"
-> +#include "sysemu/runstate.h"
->  #include "sysemu/sysemu.h"
->  #include "exec/address-spaces.h"
->  #include "exec/ramblock.h"
-> @@ -1408,11 +1409,26 @@ static void tdx_handle_get_quote(X86CPU *cpu, struct kvm_tdx_vmcall *vmcall)
->      vmcall->status_code = TDG_VP_VMCALL_SUCCESS;
->  }
->  
-> +static void tdx_panicked_on_fatal_error(X86CPU *cpu, uint64_t error_code,
-> +                                        uint64_t gpa, char *message)
-> +{
-> +    GuestPanicInformation *panic_info;
-> +
-> +    panic_info = g_new0(GuestPanicInformation, 1);
-> +    panic_info->type = GUEST_PANIC_INFORMATION_TYPE_TDX;
-> +    panic_info->u.tdx.error_code = error_code;
-> +    panic_info->u.tdx.gpa = gpa;
-> +    panic_info->u.tdx.message = (char *)message;
-> +
-> +    qemu_system_guest_panicked(panic_info);
-> +}
-> +
->  static void tdx_handle_report_fatal_error(X86CPU *cpu,
->                                            struct kvm_tdx_vmcall *vmcall)
->  {
->      uint64_t error_code = vmcall->in_r12;
->      char *message = NULL;
-> +    uint64_t gpa = -1ull;
->  
->      if (error_code & 0xffff) {
->          error_report("invalid error code of TDG.VP.VMCALL<REPORT_FATAL_ERROR>\n");
-> @@ -1441,7 +1457,13 @@ static void tdx_handle_report_fatal_error(X86CPU *cpu,
->      }
->  
->      error_report("TD guest reports fatal error. %s\n", message ? : "");
-
-In tdx_panicked_on_fatal_error you're avoiding printing 'message' if it
-contains non-printable characters, but here you're printing it regardless.
-
-Do we still need this error_report call at all ?
-
-> -    exit(1);
-> +
-> +#define TDX_REPORT_FATAL_ERROR_GPA_VALID    BIT_ULL(63)
-> +    if (error_code & TDX_REPORT_FATAL_ERROR_GPA_VALID) {
-> +	gpa = vmcall->in_r13;
-
-Bad indent
-
-> +    }
-> +
-> +    tdx_panicked_on_fatal_error(cpu, error_code, gpa, message);
->  }
->  
->  static void tdx_handle_setup_event_notify_interrupt(X86CPU *cpu,
-> -- 
-> 2.34.1
 > 
+> Mark.
+> 
+> On Fri, Aug 18, 2023 at 06:47:04PM +0800, Xu Zhao wrote:
+> > In the worst case scenario, it may iterate over all vCPUs in the vm in order to complete
+> > injecting an SGI interrupt. However, the ICC_SGI_* register provides affinity routing information,
+> > and we are interested in exploring the possibility of utilizing this information to reduce iteration
+> > times from a total of vcpu numbers to 16 (the length of the targetlist), or even 8 times.
+> > 
+> > This work is based on v5.4, and here is test data:
 
-With regards,
-Daniel
+This is a 4 year old kernel. I'm afraid you'll have to provide
+something that is relevant to a current (e.i. v6.5) kernel.
+
+> > 4 cores with vcpu pinning:
+> > 	  	 |               ipi benchmark           |	 vgic_v3_dispatch_sgi      |
+> > 		 |    original  |  with patch  | impoved | original | with patch | impoved |
+> > | core0 -> core1 | 292610285 ns	| 299856696 ns |  -2.5%	 |  1471 ns |   1508 ns  |  -2.5%  |
+> > | core0 -> core3 | 333815742 ns	| 327647989 ns |  +1.8%  |  1578 ns |   1532 ns  |  +2.9%  |
+> > |  core0 -> all  | 439754104 ns | 433987192 ns |  +1.3%  |  2970 ns |   2875 ns  |  +3.2%  |
+> > 
+> > 32 cores with vcpu pinning:
+> >                   |               ipi benchmark                |        vgic_v3_dispatch_sgi      |
+> >                   |    original    |    with patch  |  impoved | original | with patch | impoved  |
+> > |  core0 -> core1 |  269153219 ns  |   261636906 ns |  +2.8%   |  1743 ns |   1706 ns  |  +2.1%   |
+> > | core0 -> core31 |  685199666 ns  |   355250664 ns |  +48.2%  |  4238 ns |   1838 ns  |  +56.6%  |
+> > |   core0 -> all  |  7281278980 ns |  3403240773 ns |  +53.3%  | 30879 ns |  13843 ns  |  +55.2%  |
+> > 
+> > Based on the test results, the performance of vm  with less than 16 cores remains almost the same,
+> > while significant improvement can be observed with more than 16
+> > cores.
+
+This triggers multiple questions:
+
+- what is the test being used? on what hardware? how can I reproduce
+  this data?
+
+- which current guest OS *currently* make use of broadcast or 1:N
+  SGIs? Linux doesn't and overall SGI multicasting is pretty useless
+  to an OS.
+
+[...]
+
+> >  /*
+> > - * Compare a given affinity (level 1-3 and a level 0 mask, from the SGI
+> > - * generation register ICC_SGI1R_EL1) with a given VCPU.
+> > - * If the VCPU's MPIDR matches, return the level0 affinity, otherwise
+> > - * return -1.
+> > + * Get affinity routing index from ICC_SGI_* register
+> > + * format:
+> > + *     aff3       aff2       aff1            aff0
+> > + * |- 8 bits -|- 8 bits -|- 8 bits -|- 4 bits or 8bits -|
+
+OK, so you are implementing RSS support:
+
+- Why isn't that mentioned anywhere in the commit log?
+
+- Given that KVM actively limits the MPIDR to 4 bits at Aff0, how does
+  it even work the first place?
+
+- How is that advertised to the guest?
+
+- How can the guest enable RSS support?
+
+This is not following the GICv3 architecture, and I'm sceptical that
+it actually works as is (I strongly suspect that you have additional
+patches...).
+
+	M.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Without deviation from the norm, progress is not possible.
