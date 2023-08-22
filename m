@@ -2,105 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 073C6783AF4
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 09:32:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E372783B17
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 09:42:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233410AbjHVHci (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 03:32:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39370 "EHLO
+        id S233510AbjHVHmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 03:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232073AbjHVHch (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 03:32:37 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E4A133;
-        Tue, 22 Aug 2023 00:32:36 -0700 (PDT)
+        with ESMTP id S231375AbjHVHms (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 03:42:48 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E98198;
+        Tue, 22 Aug 2023 00:42:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692689556; x=1724225556;
+  t=1692690166; x=1724226166;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=2WDGroCf9hVRdMg3TmwFYLJHYRQhPfk99Hlw9ivghVQ=;
-  b=I63MPDUfeXXWJENVAhs+7ue/zYBsxlwRsKGIN5FlOqDB8Hqch00l4f1S
-   vE5BM3yt9kChiB+53Go8cTQJyDpe399WUSFilNpHRVxk7Le4VpgxQTAo7
-   5Hr3VVYWak/akY7Z+MVBoxjCq9HNq9QyfJ6xyteJuhzIIiTP6DCxCdw4f
-   D4y33zo1fLbKro0B8oIPEolalDpiJbdTfuzT0VMb51H3+9Mj9xvhIi6aq
-   2vSMnISpAXBNTmU1Hk34h2jWgJpkW/84duv4PdQ53UvXcNYIGhgVlQlgV
-   mC47kcC/UkViEW94NYSWEiEvMvZUNgrMq3ggsuQjqbaTwNVHsMZ71lqYp
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="376540902"
+  bh=PtfQlBNpQEHy7YglStwyz4T6JAjzzd90JE4ZiwNrUUI=;
+  b=Dv54Nnu70iQjEoeWMY4044tPs1kZ3vXgVd8Y8GxW91lF5VA4E3BnKCNA
+   pRpdOm0V6dZVloeLLhvg5oLIbm2DRB5q0nio/c3SAgE4djZYy9+oo3Qmj
+   kTRFsKwLW1xBudQzMxfD5oHofXlPlQTwRNF2yTiXdryF62NRgFxRpyOeg
+   nHTljIr+3diZSIjF6DWeLQzv9qwNHbLkklOUOH8TP/LF4ZR84cRxZ2mkx
+   BKWS2rrBYUKAQQM/MbcjpGP0BaLG7mOJztAkpQTxN7Eg/3lb8ZWWxGHm8
+   GriS0I3q6YBTnnyWiyzXLEETX2QOGrMFzQBv0XRpiehkSDafT5zAYFUjr
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="440176174"
 X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
-   d="scan'208";a="376540902"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 00:32:35 -0700
+   d="scan'208";a="440176174"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 00:42:46 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="685944607"
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="771268894"
 X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
-   d="scan'208";a="685944607"
+   d="scan'208";a="771268894"
 Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.252.189.107]) ([10.252.189.107])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 00:32:30 -0700
-Message-ID: <fe03b53a-c9f9-cc6b-a1fd-d6fd2f1a1ddc@linux.intel.com>
-Date:   Tue, 22 Aug 2023 15:32:26 +0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 00:42:41 -0700
+Message-ID: <ed0c0d2b-dee0-dd43-dee4-a73a46686168@linux.intel.com>
+Date:   Tue, 22 Aug 2023 15:42:37 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Cc:     baolu.lu@linux.intel.com, kvm@vger.kernel.org,
-        iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
-        joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
-        kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, yi.y.sun@intel.com
-Subject: Re: [PATCH] iommu/vt-d: Introduce a rb_tree for looking up device
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Yi Liu <yi.l.liu@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        iommu@lists.linux.dev, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 05/11] iommu: Merge iopf_device_param into
+ iommu_fault_param
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Huang Jiaqing <jiaqing.huang@intel.com>
-References: <20230821071659.123981-1-jiaqing.huang@intel.com>
- <ZOOWMUmwG2jXOaXL@ziepe.ca>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230817234047.195194-1-baolu.lu@linux.intel.com>
+ <20230817234047.195194-6-baolu.lu@linux.intel.com>
+ <ZOOZJ/aQNKY2UDxj@ziepe.ca>
 From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <ZOOWMUmwG2jXOaXL@ziepe.ca>
+In-Reply-To: <ZOOZJ/aQNKY2UDxj@ziepe.ca>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/8/22 0:52, Jason Gunthorpe wrote:
-> On Mon, Aug 21, 2023 at 12:16:59AM -0700, Huang Jiaqing wrote:
->> The existing IO page fault handler locates the PCI device by calling
->> pci_get_domain_bus_and_slot(), which searches the list of all PCI
->> devices until the desired PCI device is found. This is inefficient
->> because the algorithm efficiency of searching a list is O(n). In the
->> critical path of handling an IO page fault, this can cause a significant
->> performance bottleneck.
->>
->> To improve the performance of the IO page fault handler, replace
->> pci_get_domain_bus_and_slot() with a local red-black tree. A red-black
->> tree is a self-balancing binary search tree, which means that the
->> average time complexity of searching a red-black tree is O(log(n)). This
->> is significantly faster than O(n), so it can significantly improve the
->> performance of the IO page fault handler.
->>
->> In addition, we can only insert the affected devices (those that have IO
->> page fault enabled) into the red-black tree. This can further improve
->> the performance of the IO page fault handler.
->>
->> Signed-off-by: Huang Jiaqing<jiaqing.huang@intel.com>
->> ---
->>   drivers/iommu/intel/iommu.c | 68 +++++++++++++++++++++++++++++++++++++
->>   drivers/iommu/intel/iommu.h |  8 +++++
->>   drivers/iommu/intel/svm.c   | 13 +++----
->>   3 files changed, 81 insertions(+), 8 deletions(-)
-> I feel like this should be a helper library provided by the core
-> code, doesn't every PRI driver basically need the same thing?
+On 2023/8/22 1:04, Jason Gunthorpe wrote:
+> On Fri, Aug 18, 2023 at 07:40:41AM +0800, Lu Baolu wrote:
+>> @@ -472,21 +473,31 @@ struct iommu_fault_event {
+>>    * struct iommu_fault_param - per-device IOMMU fault data
+>>    * @handler: Callback function to handle IOMMU faults at device level
+>>    * @data: handler private data
+>> - * @faults: holds the pending faults which needs response
+>>    * @lock: protect pending faults list
+>> + * @dev: the device that owns this param
+>> + * @queue: IOPF queue
+>> + * @queue_list: index into queue->devices
+>> + * @partial: faults that are part of a Page Request Group for which the last
+>> + *           request hasn't been submitted yet.
+>> + * @faults: holds the pending faults which needs response
+>>    */
+>>   struct iommu_fault_param {
+>>   	iommu_dev_fault_handler_t handler;
+>>   	void *data;
+>> -	struct list_head faults;
+>> -	struct mutex lock;
+>> +	struct mutex			lock;
+>> +
+>> +	struct device			*dev;
+>> +	struct iopf_queue		*queue;
+>> +	struct list_head		queue_list;
+>> +
+>> +	struct list_head		partial;
+>> +	struct list_head		faults;
+>>   };
+> Don't add the horizontal spaces
 
-It seems to be. pci_get_domain_bus_and_slot() is also used in the amd
-driver. And the risc-v iommu driver under discussion is also proposing
-this.
+Fixed. Thanks!
 
 Best regards,
 baolu
