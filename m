@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF9AE7838FC
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 07:03:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F2827838FE
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 07:04:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232574AbjHVFD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 01:03:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36596 "EHLO
+        id S232587AbjHVFEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 01:04:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232569AbjHVFD4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 01:03:56 -0400
+        with ESMTP id S232594AbjHVFEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 01:04:13 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF88194;
-        Mon, 21 Aug 2023 22:03:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67765199;
+        Mon, 21 Aug 2023 22:04:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692680634; x=1724216634;
+  t=1692680646; x=1724216646;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=drUrabYm46RgFMJ0wTDwWsyIv5fsvVBqZE8LkTEhGgI=;
-  b=Q5cXJdXK7WQQkUrniXKqTKuQxnxn2Xi2EEUThRdcPNVX5SRX4p9qeK5o
-   ujn3hVnmPeao5K4ox4UfX6tFM++nO24ulp/mboTkhO48kY45cVqoQNR7h
-   ZbcBJEE9ZsMmntMzH/nwpsPGaVRB69YgMD7AI+5brT5vmg7I16B9TryiV
-   WmbFlcR7XCi4koKd3HT6XfJk6dW+BQO3bP3bfyQBCWGZRfrqFg4lXSypT
-   g8J+09iQCQHme34bhGKDHY5RSjUKHD+5ug85ZpgkG9wmwjgiEQy1fmsA6
-   LgZpYNJfyYFgl31lcoQUSs8MgOn1QB0NFK7ueoXDUzn0kefAzrUoaeIgX
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="440146448"
+  bh=O8pf7f7oxoXEvzdcueT5j+AnOqZhPfLnr6A/Hm2lt40=;
+  b=fQEyP+h7DNkDn6XOq0YNptgPbTWg9NrlsbhwB4ncUFrrNlJvZkrqT5Ld
+   ykmmqsO6hqoAngGFmBQo7m8BsYeemFUscTY/Z1LZjrDLkN9ugCgqJpx6R
+   pYvfJk9b5gNaTP8EMBXdFXUArrDU5CVphY+yWwg0kl7QHks7WpcnI3d7W
+   HsS52ba8nHY/AxSZ9hFKXaT2tTeasWyH0yMqfUMzS+DFzNb38jkcUMwur
+   UqOx9ZPxYoINB4m7peEOQTpJmgJCcsCBNeOvPtGuiN5b6fkvA7jWFDFne
+   c8UXY9n2I+99a/z+cPZmrYj9RKw71Mvo4ji7lGxbt1YcPGFBcDFHoJQY1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="440146504"
 X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
-   d="scan'208";a="440146448"
+   d="scan'208";a="440146504"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 22:03:53 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 22:04:05 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="982736649"
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="982736713"
 X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
-   d="scan'208";a="982736649"
+   d="scan'208";a="982736713"
 Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga006.fm.intel.com with ESMTP; 21 Aug 2023 22:03:48 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 21 Aug 2023 22:04:00 -0700
 From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,9 +59,9 @@ Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
         Yang Weijiang <weijiang.yang@intel.com>,
         Dapeng Mi <dapeng1.mi@intel.com>,
         Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH RFC v3 02/13] KVM: x86/pmu: Support PMU fixed counter 3
-Date:   Tue, 22 Aug 2023 13:11:29 +0800
-Message-Id: <20230822051140.512879-3-dapeng1.mi@linux.intel.com>
+Subject: [PATCH RFC v3 03/13] perf/core: Add function perf_event_group_leader_check()
+Date:   Tue, 22 Aug 2023 13:11:30 +0800
+Message-Id: <20230822051140.512879-4-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230822051140.512879-1-dapeng1.mi@linux.intel.com>
 References: <20230822051140.512879-1-dapeng1.mi@linux.intel.com>
@@ -77,95 +77,182 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TopDown slots event can be enabled on gp counter or fixed counter 3
-and it does not differ from other fixed counters in terms of the use of
-count and sampling modes (except for the hardware logic for event
-accumulation).
+Extract the group leader checking code in function sys_perf_event_open()
+to create a new function perf_event_group_leader_check().
 
-According to commit 6017608936c1 ("perf/x86/intel: Add Icelake
-support"), KVM or any perf in-kernel user needs to reprogram fixed
-counter 3 via the kernel-defined TopDown slots event for real fixed
-counter 3 on the host.
+The subsequent change would add a new function
+perf_event_create_group_kernel_counters() which is used to create group
+events in kernel space. The function also needs to do same check for group
+leader event just like function sys_perf_event_open() does. So extract
+the checking code into a separate function and avoid the code
+duplication.
 
-Co-developed-by: Like Xu <likexu@tencent.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/vmx/pmu_intel.c    | 10 ++++++++++
- arch/x86/kvm/x86.c              |  4 ++--
- 3 files changed, 13 insertions(+), 3 deletions(-)
+ kernel/events/core.c | 143 +++++++++++++++++++++++--------------------
+ 1 file changed, 78 insertions(+), 65 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9f57aa33798b..057382249d39 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -509,7 +509,7 @@ struct kvm_pmc {
- #define KVM_INTEL_PMC_MAX_GENERIC	8
- #define MSR_ARCH_PERFMON_PERFCTR_MAX	(MSR_ARCH_PERFMON_PERFCTR0 + KVM_INTEL_PMC_MAX_GENERIC - 1)
- #define MSR_ARCH_PERFMON_EVENTSEL_MAX	(MSR_ARCH_PERFMON_EVENTSEL0 + KVM_INTEL_PMC_MAX_GENERIC - 1)
--#define KVM_PMC_MAX_FIXED	3
-+#define KVM_PMC_MAX_FIXED		4
- #define MSR_ARCH_PERFMON_FIXED_CTR_MAX	(MSR_ARCH_PERFMON_FIXED_CTR0 + KVM_PMC_MAX_FIXED - 1)
- #define KVM_AMD_PMC_MAX_GENERIC	6
- struct kvm_pmu {
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 7322f0c18565..044d61aa63dc 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -45,6 +45,14 @@ enum intel_pmu_architectural_events {
- 	 * core crystal clock or the bus clock (yeah, "architectural").
- 	 */
- 	PSEUDO_ARCH_REFERENCE_CYCLES = NR_REAL_INTEL_ARCH_EVENTS,
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 78ae7b6f90fd..616391158d7c 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -12324,6 +12324,81 @@ perf_check_permission(struct perf_event_attr *attr, struct task_struct *task)
+ 	return is_capable || ptrace_may_access(task, ptrace_mode);
+ }
+ 
++static int perf_event_group_leader_check(struct perf_event *group_leader,
++					 struct perf_event *event,
++					 struct perf_event_attr *attr,
++					 struct perf_event_context *ctx,
++					 struct pmu **pmu,
++					 int *move_group)
++{
++	if (!group_leader)
++		return 0;
++
 +	/*
-+	 * Pseudo-architectural event used to implement IA32_FIXED_CTR3, a.k.a.
-+	 * topDown slots. The topdown slots event counts the total number of
-+	 * available slots for an unhalted logical processor. The topdwon slots
-+	 * event with PERF_METRICS MSR together provides support for topdown
-+	 * micro-architecture analysis method.
++	 * Do not allow a recursive hierarchy (this new sibling
++	 * becoming part of another group-sibling):
 +	 */
-+	PSEUDO_ARCH_TOPDOWN_SLOTS,
- 	NR_INTEL_ARCH_EVENTS,
- };
++	if (group_leader->group_leader != group_leader)
++		return -EINVAL;
++
++	/* All events in a group should have the same clock */
++	if (group_leader->clock != event->clock)
++		return -EINVAL;
++
++	/*
++	 * Make sure we're both events for the same CPU;
++	 * grouping events for different CPUs is broken; since
++	 * you can never concurrently schedule them anyhow.
++	 */
++	if (group_leader->cpu != event->cpu)
++		return -EINVAL;
++
++	/*
++	 * Make sure we're both on the same context; either task or cpu.
++	 */
++	if (group_leader->ctx != ctx)
++		return -EINVAL;
++
++	/*
++	 * Only a group leader can be exclusive or pinned
++	 */
++	if (attr->exclusive || attr->pinned)
++		return -EINVAL;
++
++	if (is_software_event(event) &&
++	    !in_software_context(group_leader)) {
++		/*
++		 * If the event is a sw event, but the group_leader
++		 * is on hw context.
++		 *
++		 * Allow the addition of software events to hw
++		 * groups, this is safe because software events
++		 * never fail to schedule.
++		 *
++		 * Note the comment that goes with struct
++		 * perf_event_pmu_context.
++		 */
++		*pmu = group_leader->pmu_ctx->pmu;
++	} else if (!is_software_event(event)) {
++		if (is_software_event(group_leader) &&
++		    (group_leader->group_caps & PERF_EV_CAP_SOFTWARE)) {
++			/*
++			 * In case the group is a pure software group, and we
++			 * try to add a hardware event, move the whole group to
++			 * the hardware context.
++			 */
++			*move_group = 1;
++		}
++
++		/* Don't allow group of multiple hw events from different pmus */
++		if (!in_software_context(group_leader) &&
++		    group_leader->pmu_ctx->pmu != *pmu)
++			return -EINVAL;
++	}
++
++	return 0;
++}
++
+ /**
+  * sys_perf_event_open - open a performance event, associate it to a task/cpu
+  *
+@@ -12518,71 +12593,9 @@ SYSCALL_DEFINE5(perf_event_open,
+ 		}
+ 	}
  
-@@ -61,6 +69,7 @@ static struct {
- 	[INTEL_ARCH_BRANCHES_MISPREDICTED]	= { 0xc5, 0x00 },
- 	[INTEL_ARCH_TOPDOWN_SLOTS]		= { 0xa4, 0x01 },
- 	[PSEUDO_ARCH_REFERENCE_CYCLES]		= { 0x00, 0x03 },
-+	[PSEUDO_ARCH_TOPDOWN_SLOTS]		= { 0x00, 0x04 },
- };
+-	if (group_leader) {
+-		err = -EINVAL;
+-
+-		/*
+-		 * Do not allow a recursive hierarchy (this new sibling
+-		 * becoming part of another group-sibling):
+-		 */
+-		if (group_leader->group_leader != group_leader)
+-			goto err_locked;
+-
+-		/* All events in a group should have the same clock */
+-		if (group_leader->clock != event->clock)
+-			goto err_locked;
+-
+-		/*
+-		 * Make sure we're both events for the same CPU;
+-		 * grouping events for different CPUs is broken; since
+-		 * you can never concurrently schedule them anyhow.
+-		 */
+-		if (group_leader->cpu != event->cpu)
+-			goto err_locked;
+-
+-		/*
+-		 * Make sure we're both on the same context; either task or cpu.
+-		 */
+-		if (group_leader->ctx != ctx)
+-			goto err_locked;
+-
+-		/*
+-		 * Only a group leader can be exclusive or pinned
+-		 */
+-		if (attr.exclusive || attr.pinned)
+-			goto err_locked;
+-
+-		if (is_software_event(event) &&
+-		    !in_software_context(group_leader)) {
+-			/*
+-			 * If the event is a sw event, but the group_leader
+-			 * is on hw context.
+-			 *
+-			 * Allow the addition of software events to hw
+-			 * groups, this is safe because software events
+-			 * never fail to schedule.
+-			 *
+-			 * Note the comment that goes with struct
+-			 * perf_event_pmu_context.
+-			 */
+-			pmu = group_leader->pmu_ctx->pmu;
+-		} else if (!is_software_event(event)) {
+-			if (is_software_event(group_leader) &&
+-			    (group_leader->group_caps & PERF_EV_CAP_SOFTWARE)) {
+-				/*
+-				 * In case the group is a pure software group, and we
+-				 * try to add a hardware event, move the whole group to
+-				 * the hardware context.
+-				 */
+-				move_group = 1;
+-			}
+-
+-			/* Don't allow group of multiple hw events from different pmus */
+-			if (!in_software_context(group_leader) &&
+-			    group_leader->pmu_ctx->pmu != pmu)
+-				goto err_locked;
+-		}
+-	}
++	err = perf_event_group_leader_check(group_leader, event, &attr, ctx, &pmu, &move_group);
++	if (err)
++		goto err_locked;
  
- /* mapping between fixed pmc index and intel_arch_events array */
-@@ -68,6 +77,7 @@ static int fixed_pmc_events[] = {
- 	[0] = INTEL_ARCH_INSTRUCTIONS_RETIRED,
- 	[1] = INTEL_ARCH_CPU_CYCLES,
- 	[2] = PSEUDO_ARCH_REFERENCE_CYCLES,
-+	[3] = PSEUDO_ARCH_TOPDOWN_SLOTS,
- };
- 
- static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e4a939471df1..95b1ac3bc0b6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1459,7 +1459,7 @@ static const u32 msrs_to_save_base[] = {
- 
- static const u32 msrs_to_save_pmu[] = {
- 	MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
--	MSR_ARCH_PERFMON_FIXED_CTR0 + 2,
-+	MSR_ARCH_PERFMON_FIXED_CTR2, MSR_ARCH_PERFMON_FIXED_CTR3,
- 	MSR_CORE_PERF_FIXED_CTR_CTRL, MSR_CORE_PERF_GLOBAL_STATUS,
- 	MSR_CORE_PERF_GLOBAL_CTRL, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
- 	MSR_IA32_PEBS_ENABLE, MSR_IA32_DS_AREA, MSR_PEBS_DATA_CFG,
-@@ -7180,7 +7180,7 @@ static void kvm_init_msr_lists(void)
- {
- 	unsigned i;
- 
--	BUILD_BUG_ON_MSG(KVM_PMC_MAX_FIXED != 3,
-+	BUILD_BUG_ON_MSG(KVM_PMC_MAX_FIXED != 4,
- 			 "Please update the fixed PMCs in msrs_to_save_pmu[]");
- 
- 	num_msrs_to_save = 0;
+ 	/*
+ 	 * Now that we're certain of the pmu; find the pmu_ctx.
 -- 
 2.34.1
 
