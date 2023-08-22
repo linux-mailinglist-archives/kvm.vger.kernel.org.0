@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7131783A4A
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 09:06:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40442783A86
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 09:12:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233159AbjHVHG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 03:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54170 "EHLO
+        id S233454AbjHVHMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 03:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbjHVHGZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 03:06:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2524F1A5
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 00:06:22 -0700 (PDT)
+        with ESMTP id S233380AbjHVHLl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 03:11:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7159E62
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 00:11:11 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B073064137
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 07:06:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83DEC433C7;
-        Tue, 22 Aug 2023 07:06:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D930864D4B
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 07:10:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24ED4C433C9;
+        Tue, 22 Aug 2023 07:10:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692687980;
-        bh=5uOcyIhTxkdfFiZzTypOH8jz6bs020HL8U3wTiRj29M=;
+        s=k20201202; t=1692688243;
+        bh=9SGUhfuXuQ+/VZ09GAPtAxCF7OjgtRbOA/Fwt1+hsHo=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ZHLEilRK1/fpHx8hG0gRA5X17AKl/beVrxp0dZAR1a4UVRkjwA9ENlXMPbISOGUZW
-         wu7UvLFHz7eMYuIIoitXKsn4AmPNO+AOzE0XuDAqUMiXOEVJzRae3ZjoIR9X7mhEbW
-         1la48yhq7xByXn31y1wyk5BV62W84SgRAunxfB5046PdGsv+jdSUt5+pfdJJrvknB7
-         QnXDlQIku/qaSRX84l+UhkBPOn4Xooef4qzjAC6mQVx9KHw/uvfgU9LEys48k1zjUe
-         sm6FO4Afu01VRp9yRc7tg17hAv5ZKCpmuLkdciMqf1L9Z6cBDz08czvLGhcRowW92a
-         6YD1xgZGZrhXw==
+        b=V1p0plI4UKoqvbVUrEgwadEg7nQ/8X0xHmHQCPKoYE4DW5Q76rSuqtRGfmoEwDXxk
+         fk+twoUadr07zlSoptxX/R8QcnuW+DkVKduv2YxGfOD1gVTdxz5BMY2c0wo19nUAlk
+         1opz7t7zrlCIxKkxyNNx8WVr9Bc1bqGPuqYva0lq8f02MABO0ex3b7ESNSgRU16+Ei
+         8+9idV6lT+v6uk8gdeV/R9E2bcsK2V9KdJNtnMQpLWKqJTXb8I/92YnoBBsDgKBX/4
+         hQnuv/sjuwaD0fkART59pN6CP4A8T9pJqO3T/otWa5iYrWwmlyyRfadMXacW7hGUgx
+         OM8n6pG9TqAow==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1qYLSy-006wSt-Cu;
-        Tue, 22 Aug 2023 08:06:16 +0100
-Date:   Tue, 22 Aug 2023 08:06:03 +0100
-Message-ID: <878ra3pndw.wl-maz@kernel.org>
+        id 1qYLXB-006waI-Hv;
+        Tue, 22 Aug 2023 08:10:39 +0100
+Date:   Tue, 22 Aug 2023 08:10:33 +0100
+Message-ID: <877cpnpn6e.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
@@ -56,10 +56,10 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
         Suraj Jitindar Singh <surajjs@amazon.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Shaoqin Huang <shahuang@redhat.com>
-Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1 and ID_DFR0_EL1
-In-Reply-To: <20230821212243.491660-6-jingzhangos@google.com>
+Subject: Re: [PATCH v9 07/11] KVM: arm64: Enable writable for ID_AA64PFR0_EL1
+In-Reply-To: <20230821212243.491660-8-jingzhangos@google.com>
 References: <20230821212243.491660-1-jingzhangos@google.com>
-        <20230821212243.491660-6-jingzhangos@google.com>
+        <20230821212243.491660-8-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -69,8 +69,8 @@ X-SA-Exim-Connect-IP: 185.104.136.29
 X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, tabba@google.com, reijiw@google.com, rananta@google.com, surajjs@amazon.com, cohuck@redhat.com, shahuang@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,68 +78,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 21 Aug 2023 22:22:37 +0100,
+On Mon, 21 Aug 2023 22:22:39 +0100,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
-> from userspace with this change.
-> RES0 fields and those fields hidden by KVM are not writable.
+> All valid fields in ID_AA64PFR0_EL1 are writable from userspace
+> with this change except AMU field which isn't exposed by KVM.
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index afade7186675..20fc38bad4e8 100644
+> index cee5f879df19..bf716f646872 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 24) | GENMASK(19, 16))
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  .set_user = set_id_dfr0_el1,
->  	  .visibility = aa32_id_visibility,
->  	  .reset = read_sanitised_id_dfr0_el1,
-> -	  .val = ID_DFR0_EL1_PerfMon_MASK, },
-> +	  .val = GENMASK(31, 0), },
-
-Can you *please* look at the register and realise that we *don't*
-support writing to the whole of the low 32 bits? What does it mean to
-allow selecting the M-profile debug? Or the memory-mapped trace?
-
-You are advertising a lot of crap to userspace, and that's definitely
-not on.
-
->  	ID_HIDDEN(ID_AFR0_EL1),
->  	AA32_ID_SANITISED(ID_MMFR0_EL1),
->  	AA32_ID_SANITISED(ID_MMFR1_EL1),
-> @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> @@ -2043,7 +2043,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
 >  	  .get_user = get_id_reg,
->  	  .set_user = set_id_aa64dfr0_el1,
->  	  .reset = read_sanitised_id_aa64dfr0_el1,
-> -	  .val = ID_AA64DFR0_EL1_PMUVer_MASK, },
-> +	  .val = ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_MASK), },
+>  	  .set_user = set_id_reg,
+>  	  .reset = read_sanitised_id_aa64pfr0_el1,
+> -	  .val = ID_AA64PFR0_EL1_CSV2_MASK | ID_AA64PFR0_EL1_CSV3_MASK, },
+> +	  .val = ~ID_AA64PFR0_EL1_AMU_MASK, },
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+>  	ID_UNALLOCATED(4,2),
+>  	ID_UNALLOCATED(4,3),
 
-And it is the same thing here. Where is the handling code to deal with
-variable breakpoint numbers? Oh wait, there is none. Really, the only
-thing we support writing to are the PMU and Debug versions. And
-nothing else.
-
-What does it mean for userspace? Either the write will be denied
-despite being advertised a writable field (remember the first patch of
-the series???), or we'll blindly accept the write and further ignore
-the requested values. Do you really think any of this is acceptable?
-
-This is the *9th* version of this series, and we're still battling
-over some extremely basic userspace issues... I don't think we can
-merge this series as is stands.
+Same thing. Does it mean we can disable the GIC? Or FP? Have you taken
+my previous comment about the AMU as the only issue?
 
 	M.
 
