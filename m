@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F2827838FE
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 07:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8BB7783900
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 07:04:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232587AbjHVFEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 01:04:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54216 "EHLO
+        id S232599AbjHVFEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 01:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232594AbjHVFEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 01:04:13 -0400
+        with ESMTP id S232578AbjHVFEi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 01:04:38 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67765199;
-        Mon, 21 Aug 2023 22:04:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 416F81A5;
+        Mon, 21 Aug 2023 22:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692680646; x=1724216646;
+  t=1692680652; x=1724216652;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=O8pf7f7oxoXEvzdcueT5j+AnOqZhPfLnr6A/Hm2lt40=;
-  b=fQEyP+h7DNkDn6XOq0YNptgPbTWg9NrlsbhwB4ncUFrrNlJvZkrqT5Ld
-   ykmmqsO6hqoAngGFmBQo7m8BsYeemFUscTY/Z1LZjrDLkN9ugCgqJpx6R
-   pYvfJk9b5gNaTP8EMBXdFXUArrDU5CVphY+yWwg0kl7QHks7WpcnI3d7W
-   HsS52ba8nHY/AxSZ9hFKXaT2tTeasWyH0yMqfUMzS+DFzNb38jkcUMwur
-   UqOx9ZPxYoINB4m7peEOQTpJmgJCcsCBNeOvPtGuiN5b6fkvA7jWFDFne
-   c8UXY9n2I+99a/z+cPZmrYj9RKw71Mvo4ji7lGxbt1YcPGFBcDFHoJQY1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="440146504"
+  bh=7C56/gt/RGvreA0L41MZxGhb9elLWu8ezfqy+Cf9NVY=;
+  b=h2HjlYv52c9hY4CpO79OQfpyXKmx0MvZfjaqJ9pi/5I5y5bvkjFYX5dr
+   OYJvx5lh8QOj3GqWclDBQnlQx5lsRiwLHWDRlMROR/bEiQURkdozddUta
+   v6A+of6wmKTwDfp4eIh9Pbjc0qefc2qrLGaGST+IutdJvYrebWQDiJIbq
+   rQBYoIfHyR44roCg67sgcNPHqs37R70q5O10GKS3uofnbAZSSUKKZaKav
+   /qxrt01gXGed+744vrUy2hVkIhdfJIxcyQ216AR2GXpIV8hnKo2MEzyau
+   Iot8iVOUC7p3nG+9OOAYVQeQggQLspTAdINMibX6BOVV85vdPTWhoDiI6
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="440146528"
 X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
-   d="scan'208";a="440146504"
+   d="scan'208";a="440146528"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 22:04:05 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 22:04:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="982736713"
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="982736736"
 X-IronPort-AV: E=Sophos;i="6.01,192,1684825200"; 
-   d="scan'208";a="982736713"
+   d="scan'208";a="982736736"
 Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by fmsmga006.fm.intel.com with ESMTP; 21 Aug 2023 22:04:00 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 21 Aug 2023 22:04:06 -0700
 From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,9 +59,9 @@ Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
         Yang Weijiang <weijiang.yang@intel.com>,
         Dapeng Mi <dapeng1.mi@intel.com>,
         Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [PATCH RFC v3 03/13] perf/core: Add function perf_event_group_leader_check()
-Date:   Tue, 22 Aug 2023 13:11:30 +0800
-Message-Id: <20230822051140.512879-4-dapeng1.mi@linux.intel.com>
+Subject: [PATCH RFC v3 04/13] perf/core: Add function perf_event_move_group()
+Date:   Tue, 22 Aug 2023 13:11:31 +0800
+Message-Id: <20230822051140.512879-5-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230822051140.512879-1-dapeng1.mi@linux.intel.com>
 References: <20230822051140.512879-1-dapeng1.mi@linux.intel.com>
@@ -77,182 +77,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extract the group leader checking code in function sys_perf_event_open()
-to create a new function perf_event_group_leader_check().
+Extract the group moving code in function sys_perf_event_open() to create
+a new function perf_event_move_group().
 
 The subsequent change would add a new function
 perf_event_create_group_kernel_counters() which is used to create group
-events in kernel space. The function also needs to do same check for group
-leader event just like function sys_perf_event_open() does. So extract
-the checking code into a separate function and avoid the code
+events in kernel space. The function also needs to do same group moving
+for group leader event just like function sys_perf_event_open() does. So
+extract the moving code into a separate function to avoid the code
 duplication.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- kernel/events/core.c | 143 +++++++++++++++++++++++--------------------
- 1 file changed, 78 insertions(+), 65 deletions(-)
+ kernel/events/core.c | 82 ++++++++++++++++++++++++--------------------
+ 1 file changed, 45 insertions(+), 37 deletions(-)
 
 diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 78ae7b6f90fd..616391158d7c 100644
+index 616391158d7c..15eb82d1a010 100644
 --- a/kernel/events/core.c
 +++ b/kernel/events/core.c
-@@ -12324,6 +12324,81 @@ perf_check_permission(struct perf_event_attr *attr, struct task_struct *task)
- 	return is_capable || ptrace_may_access(task, ptrace_mode);
+@@ -12399,6 +12399,48 @@ static int perf_event_group_leader_check(struct perf_event *group_leader,
+ 	return 0;
  }
  
-+static int perf_event_group_leader_check(struct perf_event *group_leader,
-+					 struct perf_event *event,
-+					 struct perf_event_attr *attr,
-+					 struct perf_event_context *ctx,
-+					 struct pmu **pmu,
-+					 int *move_group)
++static void perf_event_move_group(struct perf_event *group_leader,
++				  struct perf_event_pmu_context *pmu_ctx,
++				  struct perf_event_context *ctx)
 +{
-+	if (!group_leader)
-+		return 0;
++	struct perf_event *sibling;
 +
-+	/*
-+	 * Do not allow a recursive hierarchy (this new sibling
-+	 * becoming part of another group-sibling):
-+	 */
-+	if (group_leader->group_leader != group_leader)
-+		return -EINVAL;
++	perf_remove_from_context(group_leader, 0);
++	put_pmu_ctx(group_leader->pmu_ctx);
 +
-+	/* All events in a group should have the same clock */
-+	if (group_leader->clock != event->clock)
-+		return -EINVAL;
-+
-+	/*
-+	 * Make sure we're both events for the same CPU;
-+	 * grouping events for different CPUs is broken; since
-+	 * you can never concurrently schedule them anyhow.
-+	 */
-+	if (group_leader->cpu != event->cpu)
-+		return -EINVAL;
-+
-+	/*
-+	 * Make sure we're both on the same context; either task or cpu.
-+	 */
-+	if (group_leader->ctx != ctx)
-+		return -EINVAL;
-+
-+	/*
-+	 * Only a group leader can be exclusive or pinned
-+	 */
-+	if (attr->exclusive || attr->pinned)
-+		return -EINVAL;
-+
-+	if (is_software_event(event) &&
-+	    !in_software_context(group_leader)) {
-+		/*
-+		 * If the event is a sw event, but the group_leader
-+		 * is on hw context.
-+		 *
-+		 * Allow the addition of software events to hw
-+		 * groups, this is safe because software events
-+		 * never fail to schedule.
-+		 *
-+		 * Note the comment that goes with struct
-+		 * perf_event_pmu_context.
-+		 */
-+		*pmu = group_leader->pmu_ctx->pmu;
-+	} else if (!is_software_event(event)) {
-+		if (is_software_event(group_leader) &&
-+		    (group_leader->group_caps & PERF_EV_CAP_SOFTWARE)) {
-+			/*
-+			 * In case the group is a pure software group, and we
-+			 * try to add a hardware event, move the whole group to
-+			 * the hardware context.
-+			 */
-+			*move_group = 1;
-+		}
-+
-+		/* Don't allow group of multiple hw events from different pmus */
-+		if (!in_software_context(group_leader) &&
-+		    group_leader->pmu_ctx->pmu != *pmu)
-+			return -EINVAL;
++	for_each_sibling_event(sibling, group_leader) {
++		perf_remove_from_context(sibling, 0);
++		put_pmu_ctx(sibling->pmu_ctx);
 +	}
 +
-+	return 0;
++	/*
++	 * Install the group siblings before the group leader.
++	 *
++	 * Because a group leader will try and install the entire group
++	 * (through the sibling list, which is still in-tact), we can
++	 * end up with siblings installed in the wrong context.
++	 *
++	 * By installing siblings first we NO-OP because they're not
++	 * reachable through the group lists.
++	 */
++	for_each_sibling_event(sibling, group_leader) {
++		sibling->pmu_ctx = pmu_ctx;
++		get_pmu_ctx(pmu_ctx);
++		perf_event__state_init(sibling);
++		perf_install_in_context(ctx, sibling, sibling->cpu);
++	}
++
++	/*
++	 * Removing from the context ends up with disabled
++	 * event. What we want here is event in the initial
++	 * startup state, ready to be add into new context.
++	 */
++	group_leader->pmu_ctx = pmu_ctx;
++	get_pmu_ctx(pmu_ctx);
++	perf_event__state_init(group_leader);
++	perf_install_in_context(ctx, group_leader, group_leader->cpu);
 +}
 +
  /**
   * sys_perf_event_open - open a performance event, associate it to a task/cpu
   *
-@@ -12518,71 +12593,9 @@ SYSCALL_DEFINE5(perf_event_open,
- 		}
- 	}
+@@ -12414,7 +12456,7 @@ SYSCALL_DEFINE5(perf_event_open,
+ {
+ 	struct perf_event *group_leader = NULL, *output_event = NULL;
+ 	struct perf_event_pmu_context *pmu_ctx;
+-	struct perf_event *event, *sibling;
++	struct perf_event *event;
+ 	struct perf_event_attr attr;
+ 	struct perf_event_context *ctx;
+ 	struct file *event_file = NULL;
+@@ -12646,42 +12688,8 @@ SYSCALL_DEFINE5(perf_event_open,
+ 	 * where we start modifying current state.
+ 	 */
  
--	if (group_leader) {
--		err = -EINVAL;
+-	if (move_group) {
+-		perf_remove_from_context(group_leader, 0);
+-		put_pmu_ctx(group_leader->pmu_ctx);
 -
--		/*
--		 * Do not allow a recursive hierarchy (this new sibling
--		 * becoming part of another group-sibling):
--		 */
--		if (group_leader->group_leader != group_leader)
--			goto err_locked;
--
--		/* All events in a group should have the same clock */
--		if (group_leader->clock != event->clock)
--			goto err_locked;
--
--		/*
--		 * Make sure we're both events for the same CPU;
--		 * grouping events for different CPUs is broken; since
--		 * you can never concurrently schedule them anyhow.
--		 */
--		if (group_leader->cpu != event->cpu)
--			goto err_locked;
--
--		/*
--		 * Make sure we're both on the same context; either task or cpu.
--		 */
--		if (group_leader->ctx != ctx)
--			goto err_locked;
--
--		/*
--		 * Only a group leader can be exclusive or pinned
--		 */
--		if (attr.exclusive || attr.pinned)
--			goto err_locked;
--
--		if (is_software_event(event) &&
--		    !in_software_context(group_leader)) {
--			/*
--			 * If the event is a sw event, but the group_leader
--			 * is on hw context.
--			 *
--			 * Allow the addition of software events to hw
--			 * groups, this is safe because software events
--			 * never fail to schedule.
--			 *
--			 * Note the comment that goes with struct
--			 * perf_event_pmu_context.
--			 */
--			pmu = group_leader->pmu_ctx->pmu;
--		} else if (!is_software_event(event)) {
--			if (is_software_event(group_leader) &&
--			    (group_leader->group_caps & PERF_EV_CAP_SOFTWARE)) {
--				/*
--				 * In case the group is a pure software group, and we
--				 * try to add a hardware event, move the whole group to
--				 * the hardware context.
--				 */
--				move_group = 1;
--			}
--
--			/* Don't allow group of multiple hw events from different pmus */
--			if (!in_software_context(group_leader) &&
--			    group_leader->pmu_ctx->pmu != pmu)
--				goto err_locked;
+-		for_each_sibling_event(sibling, group_leader) {
+-			perf_remove_from_context(sibling, 0);
+-			put_pmu_ctx(sibling->pmu_ctx);
 -		}
+-
+-		/*
+-		 * Install the group siblings before the group leader.
+-		 *
+-		 * Because a group leader will try and install the entire group
+-		 * (through the sibling list, which is still in-tact), we can
+-		 * end up with siblings installed in the wrong context.
+-		 *
+-		 * By installing siblings first we NO-OP because they're not
+-		 * reachable through the group lists.
+-		 */
+-		for_each_sibling_event(sibling, group_leader) {
+-			sibling->pmu_ctx = pmu_ctx;
+-			get_pmu_ctx(pmu_ctx);
+-			perf_event__state_init(sibling);
+-			perf_install_in_context(ctx, sibling, sibling->cpu);
+-		}
+-
+-		/*
+-		 * Removing from the context ends up with disabled
+-		 * event. What we want here is event in the initial
+-		 * startup state, ready to be add into new context.
+-		 */
+-		group_leader->pmu_ctx = pmu_ctx;
+-		get_pmu_ctx(pmu_ctx);
+-		perf_event__state_init(group_leader);
+-		perf_install_in_context(ctx, group_leader, group_leader->cpu);
 -	}
-+	err = perf_event_group_leader_check(group_leader, event, &attr, ctx, &pmu, &move_group);
-+	if (err)
-+		goto err_locked;
++	if (move_group)
++		perf_event_move_group(group_leader, pmu_ctx, ctx);
  
  	/*
- 	 * Now that we're certain of the pmu; find the pmu_ctx.
+ 	 * Precalculate sample_data sizes; do while holding ctx::mutex such
 -- 
 2.34.1
 
