@@ -2,196 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7945A783B9B
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 10:17:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70187783BA4
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 10:20:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233701AbjHVIRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 04:17:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47758 "EHLO
+        id S233658AbjHVIUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 04:20:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233749AbjHVIRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 04:17:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0863919B
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:16:52 -0700 (PDT)
+        with ESMTP id S229652AbjHVIUt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 04:20:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A687010E
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:20:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692692212;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1692692404;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zckv6oFww2IAYABuKXRpSyWhyYXXDqhNviwTg2vLyFU=;
-        b=LAdDYHbCSyJumHz74n6lmcXUHewrY3jdQRYVCOibCTR1eAIMux1+7mB0QnQCmQ2cERqFXL
-        JUu6rQX481vA+q3xyyh3h+2p/cc/MD0BCEpu8ws84XAOaCCSzHjowglo8UxB9g/p4q4nix
-        yg2QpEuFzmZAuEnrmMqYjnLc4mroqUg=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-GphkhIyrOBuobWVJ2UyCAg-1; Tue, 22 Aug 2023 04:16:50 -0400
-X-MC-Unique: GphkhIyrOBuobWVJ2UyCAg-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5219df4e8c4so402943a12.1
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:16:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692692209; x=1693297009;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zckv6oFww2IAYABuKXRpSyWhyYXXDqhNviwTg2vLyFU=;
-        b=XqK5+21OgH4cnEb/q8ux9ewioD4WoSevM+3daXQ2Mq4vEewnt3SjQUSL2mAJNOACF6
-         mX8v9rq4wmUifNVYodtBM9Q5oGoOipeL5tddsmfIyz2OxXVjBrklmjsVmfqY33sjgBSH
-         dU1fQfpj8OmYOUNGKwqIep9Cs8Md0A4LFfW0KLeD64YfaNprc8bicKx130YKft8LA4xi
-         h5ivQ84/BUrOrjuoVhnVzb+wARsAOVsvLI9FfASHz4BtMMPsIwQt7xNtxXGAQGuc/vnH
-         ilFXhEHAkxcoCLc/11buT02ekJ9oVUH4bWVpx3hTV4lB1XoLXyA6l5fkDmdvRR6LTb/O
-         qajQ==
-X-Gm-Message-State: AOJu0YxkbRISJP609D64nkxRKdudwl5xUnHx7VIYIivYE6lslx6Lhfff
-        WIbXk4X58ExiIM2okBNQDncWYzljF3lGpAODLyETOGvOj31xVlrZQFfOhCebUWT9uShMcBXNhlk
-        63gOGFtQznVry
-X-Received: by 2002:a05:6402:268e:b0:523:2e64:122b with SMTP id w14-20020a056402268e00b005232e64122bmr6755156edd.3.1692692209654;
-        Tue, 22 Aug 2023 01:16:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHLSFMBKhUwaZNzwUhuDk7yvXSZjSgwouQMRlutTKOK/6Gw8nbnhQGL5h8TQ+NkO3C5To+oqw==
-X-Received: by 2002:a05:6402:268e:b0:523:2e64:122b with SMTP id w14-20020a056402268e00b005232e64122bmr6755152edd.3.1692692209318;
-        Tue, 22 Aug 2023 01:16:49 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
-        by smtp.gmail.com with ESMTPSA id m4-20020aa7c484000000b0052328d4268asm7109439edq.81.2023.08.22.01.16.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Aug 2023 01:16:48 -0700 (PDT)
-Message-ID: <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 2/4] vsock/virtio: support to send
- non-linear skb
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
+        bh=agB6Opzb6rPqaDWBwKZ/5qpL5CbpESEPdnuQeYUz9NM=;
+        b=BuRTbQ5qowCPKoz9SqcIwRC+c9Xn83eEHUY6IILWfOMXCUcyWgyehasu1EoLNAGTBUeL3c
+        V05sers4Ttx2CRmkUxSlmLGSyeHtgX7Lf7k6DQLgt6IALjjTbwShzkRzaJBirUiCpG9VZ/
+        YChQbDKV0/0/pa957Xp2hTQi7psw3No=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-652-lh7E7-x2MCOTsUUBb6SUfA-1; Tue, 22 Aug 2023 04:20:00 -0400
+X-MC-Unique: lh7E7-x2MCOTsUUBb6SUfA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 952813C11A04;
+        Tue, 22 Aug 2023 08:19:59 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC4812166B26;
+        Tue, 22 Aug 2023 08:19:56 +0000 (UTC)
+Date:   Tue, 22 Aug 2023 09:19:54 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel@sberdevices.ru, oxffffaa@gmail.com
-Date:   Tue, 22 Aug 2023 10:16:47 +0200
-In-Reply-To: <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
-References: <20230814212720.3679058-1-AVKrasnov@sberdevices.ru>
-         <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        erdemaktas@google.com, Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: Re: [PATCH v2 06/58] i386/tdx: Get tdx_capabilities via
+ KVM_TDX_CAPABILITIES
+Message-ID: <ZORvqthhRG+38OlC@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
+ <20230818095041.1973309-7-xiaoyao.li@intel.com>
+ <ZOMkYvm9vsQs8sas@redhat.com>
+ <226923bc-755c-f4db-a381-f00088c6614e@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <226923bc-755c-f4db-a381-f00088c6614e@intel.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Tue, Aug 22, 2023 at 03:31:44PM +0800, Xiaoyao Li wrote:
+> On 8/21/2023 4:46 PM, Daniel P. Berrangé wrote:
+> > On Fri, Aug 18, 2023 at 05:49:49AM -0400, Xiaoyao Li wrote:
+> > > KVM provides TDX capabilities via sub command KVM_TDX_CAPABILITIES of
+> > > IOCTL(KVM_MEMORY_ENCRYPT_OP). Get the capabilities when initializing
+> > > TDX context. It will be used to validate user's setting later.
+> > > 
+> > > Since there is no interface reporting how many cpuid configs contains in
+> > > KVM_TDX_CAPABILITIES, QEMU chooses to try starting with a known number
+> > > and abort when it exceeds KVM_MAX_CPUID_ENTRIES.
+> > > 
+> > > Besides, introduce the interfaces to invoke TDX "ioctls" at different
+> > > scope (KVM, VM and VCPU) in preparation.
+> > > 
+> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > > ---
+> > > changes from v1:
+> > >    - Make the error message more clear;
+> > > 
+> > > changes from RFC v4:
+> > >    - start from nr_cpuid_configs = 6 for the loop;
+> > >    - stop the loop when nr_cpuid_configs exceeds KVM_MAX_CPUID_ENTRIES;
+> > > ---
+> > >   target/i386/kvm/kvm.c      |  2 -
+> > >   target/i386/kvm/kvm_i386.h |  2 +
+> > >   target/i386/kvm/tdx.c      | 93 ++++++++++++++++++++++++++++++++++++++
+> > >   3 files changed, 95 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> > > index d6b988d6c2d1..ec5c07bffd38 100644
+> > > --- a/target/i386/kvm/kvm.c
+> > > +++ b/target/i386/kvm/kvm.c
+> > > @@ -1751,8 +1751,6 @@ static int hyperv_init_vcpu(X86CPU *cpu)
+> > >   static Error *invtsc_mig_blocker;
+> > > -#define KVM_MAX_CPUID_ENTRIES  100
+> > > -
+> > >   static void kvm_init_xsave(CPUX86State *env)
+> > >   {
+> > >       if (has_xsave2) {
+> > > diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+> > > index ea3a5b174ac0..769eadbba56c 100644
+> > > --- a/target/i386/kvm/kvm_i386.h
+> > > +++ b/target/i386/kvm/kvm_i386.h
+> > > @@ -13,6 +13,8 @@
+> > >   #include "sysemu/kvm.h"
+> > > +#define KVM_MAX_CPUID_ENTRIES  100
+> > > +
+> > >   #define kvm_apic_in_kernel() (kvm_irqchip_in_kernel())
+> > >   #ifdef CONFIG_KVM
+> > > diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+> > > index 77e33ae01147..255c47a2a553 100644
+> > > --- a/target/i386/kvm/tdx.c
+> > > +++ b/target/i386/kvm/tdx.c
+> > > @@ -12,14 +12,107 @@
+> > >    */
+> > >   #include "qemu/osdep.h"
+> > > +#include "qemu/error-report.h"
+> > >   #include "qapi/error.h"
+> > >   #include "qom/object_interfaces.h"
+> > > +#include "sysemu/kvm.h"
+> > >   #include "hw/i386/x86.h"
+> > > +#include "kvm_i386.h"
+> > >   #include "tdx.h"
+> > > +static struct kvm_tdx_capabilities *tdx_caps;
+> > > +
+> > > +enum tdx_ioctl_level{
+> > > +    TDX_PLATFORM_IOCTL,
+> > > +    TDX_VM_IOCTL,
+> > > +    TDX_VCPU_IOCTL,
+> > > +};
+> > > +
+> > > +static int __tdx_ioctl(void *state, enum tdx_ioctl_level level, int cmd_id,
+> > > +                        __u32 flags, void *data)
+> > 
+> > Names with an initial double underscore are reserved for us by the
+> > platform implementation, so shouldn't be used in userspace app
+> > code.
+> 
+> How about tdx_ioctl_internal() ?
 
-I'm sorry for the long delay here. I was OoO in the past few weeks.
+Sure, that's fine.
 
-On Tue, 2023-08-15 at 00:27 +0300, Arseniy Krasnov wrote:
-> For non-linear skb use its pages from fragment array as buffers in
-> virtio tx queue. These pages are already pinned by 'get_user_pages()'
-> during such skb creation.
->=20
-> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  Changelog:
->  v2 -> v3:
->   * Comment about 'page_to_virt()' is updated. I don't remove R-b,
->     as this change is quiet small I guess.
->=20
->  net/vmw_vsock/virtio_transport.c | 41 +++++++++++++++++++++++++++-----
->  1 file changed, 35 insertions(+), 6 deletions(-)
->=20
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_tran=
-sport.c
-> index e95df847176b..7bbcc8093e51 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *wo=
-rk)
->  	vq =3D vsock->vqs[VSOCK_VQ_TX];
-> =20
->  	for (;;) {
-> -		struct scatterlist hdr, buf, *sgs[2];
-> +		/* +1 is for packet header. */
-> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
-> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
-
-Note that MAX_SKB_FRAGS depends on a config knob (CONFIG_MAX_SKB_FRAGS)
-and valid/reasonable values are up to 45. The total stack usage can be
-pretty large (~700 bytes).
-
-As this is under the vsk tx lock, have you considered moving such data
-in the virtio_vsock struct?
-
->  		int ret, in_sg =3D 0, out_sg =3D 0;
->  		struct sk_buff *skb;
->  		bool reply;
-> @@ -111,12 +113,39 @@ virtio_transport_send_pkt_work(struct work_struct *=
-work)
-> =20
->  		virtio_transport_deliver_tap_pkt(skb);
->  		reply =3D virtio_vsock_skb_reply(skb);
-> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
-> +			    sizeof(*virtio_vsock_hdr(skb)));
-> +		sgs[out_sg] =3D &bufs[out_sg];
-> +		out_sg++;
-> +
-> +		if (!skb_is_nonlinear(skb)) {
-> +			if (skb->len > 0) {
-> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
-> +				sgs[out_sg] =3D &bufs[out_sg];
-> +				out_sg++;
-> +			}
-> +		} else {
-> +			struct skb_shared_info *si;
-> +			int i;
-> +
-> +			si =3D skb_shinfo(skb);
-
-This assumes that the paged skb does not carry any actual data in the
-head buffer (only the header). Is that constraint enforced somewhere
-else? Otherwise a
-
-	WARN_ON_ONCE(skb_headlen(skb) > sizeof(*virtio_vsock_hdr(skb))
-
-could be helpful to catch early possible bugs.
-
-Thanks!
-
-Paolo
-
-> +
-> +			for (i =3D 0; i < si->nr_frags; i++) {
-> +				skb_frag_t *skb_frag =3D &si->frags[i];
-> +				void *va;
-> =20
-> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)=
-));
-> -		sgs[out_sg++] =3D &hdr;
-> -		if (skb->len > 0) {
-> -			sg_init_one(&buf, skb->data, skb->len);
-> -			sgs[out_sg++] =3D &buf;
-> +				/* We will use 'page_to_virt()' for the userspace page
-> +				 * here, because virtio or dma-mapping layers will call
-> +				 * 'virt_to_phys()' later to fill the buffer descriptor.
-> +				 * We don't touch memory at "virtual" address of this page.
-> +				 */
-> +				va =3D page_to_virt(skb_frag->bv_page);
-> +				sg_init_one(&bufs[out_sg],
-> +					    va + skb_frag->bv_offset,
-> +					    skb_frag->bv_len);
-> +				sgs[out_sg] =3D &bufs[out_sg];
-> +				out_sg++;
-> +			}
->  		}
-> =20
->  		ret =3D virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
