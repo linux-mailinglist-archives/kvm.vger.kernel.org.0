@@ -2,44 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C63847843E3
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 16:22:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18FB778444A
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 16:31:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235456AbjHVOWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 10:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34970 "EHLO
+        id S236775AbjHVOb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 10:31:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234647AbjHVOWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 10:22:04 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E85C7
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 07:22:03 -0700 (PDT)
+        with ESMTP id S236771AbjHVOb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 10:31:28 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C74BCD2
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 07:31:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692714123; x=1724250123;
+  t=1692714680; x=1724250680;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=ZvC+9MIG9rk+1jRXFoIjKvMMJNC7DAOZAeaeh5aL7hU=;
-  b=OBLPvVdrqoFO0g65XAmXFPXyFmlP28bBsz8s2plnlTIHQxjqZ+OSWA1q
-   sRCuMnXeU39dnkApVIRZiIm+1L00MdclUnD65pvL1pdPUnf9i9+dl8ypb
-   xQoZWck0ExRfLKH+6CPnExMym9f0RoUFcERWvRZZ20mdyEWMuGymVsvfD
-   ToBSUzphXBJ+7BXeRiaGduWkf8BLcwrvV5tWO93QyzDeTnrP15depcKff
-   qaia2jCBDQ/aCQDQgtrIySV7n0hvOW+o8D9/RsAqddudBbn39VpUbO7+K
-   QNh2b7pIKfgJ/trtVNJi0dY54aVc3E5w9oiyW4rtrLqUK6rrRNAxPA6Ic
+  bh=8xbeAI3NyPJsCi4eI4jBMgXXMe+Lo9EhfttVpsCcfxc=;
+  b=cjYcHdK6QPGM7QwrkMIyTge8yy20xlyjTnDhg0yGq1g4rJbuVqd93zsA
+   WAKV9RRxgDRjcFRpLvL4SWHBOSiGthmafiKbR0e9bcIx4EfbGs/8PFxX2
+   wLPtUGlFQo+i7WNIKbvKd6SdV+DbWJLdR5lKUHAyudIhaoxt3qMyyx/0V
+   am8590qGpPxoI58lN2d8Qyip5eU0TjvsNLaEIIVkZh0eZj/ol8EFziqwE
+   thHuqj9R5HyP/LcaUya4EPqP9Ah436B90MN1FoU0Vys++vcZ4n7aXPFz1
+   OdYUJNhYtdGehl5drN6XG/E54vScM+uJ1G9p8CDF0Tnz/+w41KdL3VCX3
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="460259072"
+X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="358882570"
 X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
-   d="scan'208";a="460259072"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 07:22:02 -0700
+   d="scan'208";a="358882570"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 07:30:56 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="686064058"
-X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
-   d="scan'208";a="686064058"
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="879974193"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 07:21:53 -0700
-Message-ID: <0a2b2d58-63ac-3764-a4d2-c777d565b61e@intel.com>
-Date:   Tue, 22 Aug 2023 22:21:48 +0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 07:30:55 -0700
+Message-ID: <c1ad3974-876a-9d29-9a59-f54ae4f8b09e@intel.com>
+Date:   Tue, 22 Aug 2023 22:30:47 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Firefox/102.0 Thunderbird/102.14.0
@@ -72,8 +71,8 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        HK_RANDOM_FROM,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -128,52 +127,7 @@ On 8/21/2023 5:16 PM, Daniel P. Berrangé wrote:
 > 
 > Use error_setg() in both cases, passing in a 'Error **errp' object,
 > and 'return -1' instead of returning an errno value.
+> 
 
-Will do it in next version.
-
-thanks!
-
->> +
->> +    return 0;
->> +}
->> +
->> +static int setup_td_guest_attributes(X86CPU *x86cpu)
->>   {
->>       CPUX86State *env = &x86cpu->env;
->>   
->>       tdx_guest->attributes |= (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_PKS) ?
->>                                TDX_TD_ATTRIBUTES_PKS : 0;
->>       tdx_guest->attributes |= x86cpu->enable_pmu ? TDX_TD_ATTRIBUTES_PERFMON : 0;
->> +
->> +    return tdx_validate_attributes(tdx_guest);
-> 
-> Pass along "errp" into this
-> 
->>   }
->>   
->>   int tdx_pre_create_vcpu(CPUState *cpu)
->> @@ -493,7 +513,10 @@ int tdx_pre_create_vcpu(CPUState *cpu)
-> 
-> In an earlier patch I suggested adding 'Error **errp' to this method...
-> 
->>           goto out_free;
->>       }
->>   
->> -    setup_td_guest_attributes(x86cpu);
->> +    r = setup_td_guest_attributes(x86cpu);
-> 
-> ...it can also be passed into this method
-> 
->> +    if (r) {
->> +        goto out;
->> +    }
->>   
->>       init_vm->cpuid.nent = kvm_x86_arch_cpuid(env, init_vm->cpuid.entries, 0);
->>       init_vm->attributes = tdx_guest->attributes;
->> -- 
->> 2.34.1
->>
-> 
-> With regards,
-> Daniel
+why return -1 instead of -EINVAL?
 
