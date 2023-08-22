@@ -2,130 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E1CC784803
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 18:50:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ECF5784974
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 20:35:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237925AbjHVQus (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 12:50:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42362 "EHLO
+        id S229868AbjHVSf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 14:35:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237835AbjHVQur (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 12:50:47 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EADFCD7;
-        Tue, 22 Aug 2023 09:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692723041; x=1724259041;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=v0vLJ0NibDdd3zgnrJFd3vlGqc4K3dLjD4nbgduTk9E=;
-  b=C/UePnsT85SLGTWUUQyKldiITyIoU95AZmgsau4dojCYVxbBgCwKnK+Q
-   HF7cczUnQWg31ifSJbuJPc2euh2b6l5Tyi3If/mYS7+1KnmzZo5MU4LLj
-   c91rnxHIn42jUEj2IFuuYPuFh+xwIWc9yjago/o0C+8R/63Ln9hvY6+5u
-   tWTn/zsiivnx2ASQbhvDw2L/teVD9Qrgi9ICn+d8PKuy3Ee/5JZnzZ34F
-   AZFsfBJ4gbqiUL897FRf3phA+6t+X/Qhp1yDUYwxrubhislrvDdpAvJCP
-   FK4l18ZslJETSVXodN4NbRITuaycZV2p/Fwc8jN+ObU1rx5OyrW8C4Ny6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="358924271"
-X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
-   d="scan'208";a="358924271"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 09:50:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10809"; a="765820409"
-X-IronPort-AV: E=Sophos;i="6.01,193,1684825200"; 
-   d="scan'208";a="765820409"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by orsmga008.jf.intel.com with ESMTP; 22 Aug 2023 09:50:37 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qYUaT-0000Lw-0M;
-        Tue, 22 Aug 2023 16:50:37 +0000
-Date:   Wed, 23 Aug 2023 00:50:27 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Hao Xiang <hao.xiang@linux.alibaba.com>, kvm@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, shannon.zhao@linux.alibaba.com,
-        pbonzini@redhat.com, seanjc@google.com,
-        linux-kernel@vger.kernel.org,
-        Hao Xiang <hao.xiang@linux.alibaba.com>
-Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
-Message-ID: <202308230059.Z4m5fuN7-lkp@intel.com>
-References: <1692588151-33716-1-git-send-email-hao.xiang@linux.alibaba.com>
+        with ESMTP id S229603AbjHVSf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 14:35:27 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA66CD8
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 11:35:24 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2bcc331f942so23280731fa.0
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 11:35:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692729323; x=1693334123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZG8/FKpT+5ZMPFMf3XneVJf41+qrLWykYFB8Mroi2p0=;
+        b=hBOpE32r3X0stLup3zJ47ajL9A3rBNXNiV3E6065k2zRuMHXcc2qeRBznkkK9jaVlb
+         mXHE0QjQdww7Behkc6OxdFIf79q2MJ4L7RsubvntRwLmQnrrTg1cT9d8pyUw8qEi7p+M
+         yAzFTIwy12LM9c0cAPQfJVXbFSoRjKC+wdHLqGUpWgRWR+CCZMQ1BNAeqK2Tt+qbp7mo
+         LWTevvOk3ZEX9tUbJCPVTITMasMl/xdUVcqC1wnYRdfb62QxaOAMrlIbz+0/JUHLmN83
+         4Fb0fNRNj2UgpPrcZpJ5BzlF8o1ZEyoC+NWiug6323PwBztsFF7/er0oLVx2e8iLR3uF
+         zg8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692729323; x=1693334123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZG8/FKpT+5ZMPFMf3XneVJf41+qrLWykYFB8Mroi2p0=;
+        b=XMotm5+o/egNfeTtmCXaJqU1B6UKqJ8xBXkJKMfppZ1CBCkOVAitr43Gn/mWV/0ywT
+         thL4o6voWS2ZmZBrZSXsesCBPO8wMvb6G2agzVfqTfMsNrwMlyfcZCa3xV4c6ZeFZOjx
+         VT28v1lW95KYNf8/9VXhbVUlNyVCPBbptSCOYsqDYJ3ONjjUtbnEt5G1Vtzz4kphFyaq
+         MX28Zr2KgFoT5eMFJj4GPHmQDQSO+Iw4LW+lliSNmdLBDY1UDFBhU5CCgQOSmCCcy/Jy
+         D9KcE28zCNuEvI83zlLowjEL9kvSpTjFmEqvH5azghETI7/U8GDu6k3lSYPGODeLN7Mw
+         MvNA==
+X-Gm-Message-State: AOJu0YxODYWhnizwgzkT5hnhkzGuBU0g7cX8JORXdit9mhiWqO0WNTPe
+        UPIprVFim3MODwQbP/S/0O7ELjD9Ol8yWqtmaxVCOLwgy7b9ebMjz8SMMw==
+X-Google-Smtp-Source: AGHT+IHLjbjdpPtuGDgzItCHCjngA7+Qq5HGzx0ZodQ01Ijp53K1+QI7cmm5rC7QJqm8zCwp9G/pj+yHfDMxXCsrv2g=
+X-Received: by 2002:a2e:2e06:0:b0:2b6:d0fa:7023 with SMTP id
+ u6-20020a2e2e06000000b002b6d0fa7023mr3893380lju.24.1692729322972; Tue, 22 Aug
+ 2023 11:35:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1692588151-33716-1-git-send-email-hao.xiang@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230821212243.491660-1-jingzhangos@google.com>
+ <20230821212243.491660-6-jingzhangos@google.com> <878ra3pndw.wl-maz@kernel.org>
+In-Reply-To: <878ra3pndw.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Tue, 22 Aug 2023 11:35:12 -0700
+Message-ID: <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com>
+Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Hao,
+Hi Marc,
 
-kernel test robot noticed the following build errors:
+On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
+>
+> On Mon, 21 Aug 2023 22:22:37 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> > from userspace with this change.
+> > RES0 fields and those fields hidden by KVM are not writable.
+> >
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index afade7186675..20fc38bad4e8 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+> >       return true;
+> >  }
+> >
+> > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 24) |=
+ GENMASK(19, 16))
+> > +
+> >  /*
+> >   * Architected system registers.
+> >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >         .set_user =3D set_id_dfr0_el1,
+> >         .visibility =3D aa32_id_visibility,
+> >         .reset =3D read_sanitised_id_dfr0_el1,
+> > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+> > +       .val =3D GENMASK(31, 0), },
+>
+> Can you *please* look at the register and realise that we *don't*
+> support writing to the whole of the low 32 bits? What does it mean to
+> allow selecting the M-profile debug? Or the memory-mapped trace?
+>
+> You are advertising a lot of crap to userspace, and that's definitely
+> not on.
+>
+> >       ID_HIDDEN(ID_AFR0_EL1),
+> >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_descs[] =
+=3D {
+> >         .get_user =3D get_id_reg,
+> >         .set_user =3D set_id_aa64dfr0_el1,
+> >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+> > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+> > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RES0_M=
+ASK), },
+>
+> And it is the same thing here. Where is the handling code to deal with
+> variable breakpoint numbers? Oh wait, there is none. Really, the only
+> thing we support writing to are the PMU and Debug versions. And
+> nothing else.
+>
+> What does it mean for userspace? Either the write will be denied
+> despite being advertised a writable field (remember the first patch of
+> the series???), or we'll blindly accept the write and further ignore
+> the requested values. Do you really think any of this is acceptable?
+>
+> This is the *9th* version of this series, and we're still battling
+> over some extremely basic userspace issues... I don't think we can
+> merge this series as is stands.
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on mst-vhost/linux-next tip/x86/core linus/master v6.5-rc7 next-20230822]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I removed sanity checks across multiple fields after the discussion
+here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
+I might have misunderstood the discussion. I thought we'd let VMM do
+more complete sanity checks.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Hao-Xiang/kvm-x86-emulate-MSR_PLATFORM_INFO-msr-bits/20230821-125755
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/1692588151-33716-1-git-send-email-hao.xiang%40linux.alibaba.com
-patch subject: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
-config: i386-randconfig-003-20230822 (https://download.01.org/0day-ci/archive/20230823/202308230059.Z4m5fuN7-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230823/202308230059.Z4m5fuN7-lkp@intel.com/reproduce)
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308230059.Z4m5fuN7-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   arch/x86/kvm/x86.c: In function 'kvm_get_msr_platform_info':
->> arch/x86/kvm/x86.c:1695:31: error: 'MSR_PLATFORM_INFO_MAX_NON_TURBO_RATIO' undeclared (first use in this function); did you mean 'MSR_PLATFORM_INFO_MAX_NON_TURBO_LIM_RATIO'?
-    1695 |         msr_platform_info &= (MSR_PLATFORM_INFO_MAX_NON_TURBO_RATIO |
-         |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                               MSR_PLATFORM_INFO_MAX_NON_TURBO_LIM_RATIO
-   arch/x86/kvm/x86.c:1695:31: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +1695 arch/x86/kvm/x86.c
-
-  1678	
-  1679	
-  1680	static u64 kvm_get_msr_platform_info(void)
-  1681	{
-  1682		u64 msr_platform_info = 0;
-  1683	
-  1684		rdmsrl_safe(MSR_PLATFORM_INFO, &msr_platform_info);
-  1685		/*
-  1686		 * MSR_PLATFORM_INFO bits:
-  1687		 * bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
-  1688		 * bit 31, CPUID Faulting Enabled (CPUID_FAULTING_EN)
-  1689		 * bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
-  1690		 *
-  1691		 * Emulate part msr bits, expose above msr info to guest,
-  1692		 * to make sure guest can get correct turbo frequency info.
-  1693		 */
-  1694	
-> 1695		msr_platform_info &= (MSR_PLATFORM_INFO_MAX_NON_TURBO_RATIO |
-  1696				MSR_PLATFORM_INFO_MAX_EFFICIENCY_RATIO);
-  1697		msr_platform_info |= MSR_PLATFORM_INFO_CPUID_FAULT;
-  1698	
-  1699		return msr_platform_info;
-  1700	}
-  1701	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Jing
