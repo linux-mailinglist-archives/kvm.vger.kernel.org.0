@@ -2,95 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18B59783B6E
-	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 10:10:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7945A783B9B
+	for <lists+kvm@lfdr.de>; Tue, 22 Aug 2023 10:17:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233658AbjHVIKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 04:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38898 "EHLO
+        id S233701AbjHVIRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 04:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233693AbjHVIJz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 04:09:55 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB8A196
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:09:53 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1bbc87ded50so26673955ad.1
-        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:09:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692691793; x=1693296593;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ReMukLzPWF9LnG1igHrE94gO4QgjdRUiL5Va8lFBbLM=;
-        b=JAErxNNk5ah7gi9Q01OQtrS2a3vp0ndZ6BjM4kfuimELn9wiBpqpcEGxd8l2OF9Aqk
-         9XlvnO9yMicIXGbSVwpwByDTybgd8P5P780BHxABeNz9CW+j4khRoPBp+UTxRI2u03b2
-         NcnozVPtSWNh37gS/3qOA/2Kp2B2C0xTZoRAdn7IjtxKBj+626cgXlbWmrIKroF63cOM
-         ZAEpCTaHwmOTbWQXAg1Rf+CApK/7+TKXcDuk6WhURZLk0iD6H1TWs7KQfgFiXNkJH9Dh
-         0QD1aAFe/mfMUeBV+Agzt2jxajgE/n0WGTa3uggsqNvFZVCkyzH0tfZ+08HXSZOMo0DZ
-         2eQw==
+        with ESMTP id S233749AbjHVIRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 04:17:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0863919B
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692692212;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zckv6oFww2IAYABuKXRpSyWhyYXXDqhNviwTg2vLyFU=;
+        b=LAdDYHbCSyJumHz74n6lmcXUHewrY3jdQRYVCOibCTR1eAIMux1+7mB0QnQCmQ2cERqFXL
+        JUu6rQX481vA+q3xyyh3h+2p/cc/MD0BCEpu8ws84XAOaCCSzHjowglo8UxB9g/p4q4nix
+        yg2QpEuFzmZAuEnrmMqYjnLc4mroqUg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-GphkhIyrOBuobWVJ2UyCAg-1; Tue, 22 Aug 2023 04:16:50 -0400
+X-MC-Unique: GphkhIyrOBuobWVJ2UyCAg-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5219df4e8c4so402943a12.1
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 01:16:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692691793; x=1693296593;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ReMukLzPWF9LnG1igHrE94gO4QgjdRUiL5Va8lFBbLM=;
-        b=WN8WUwlX+6ze8mJf1Aewt8GqljyW5a4WGb2jl+XpxzY1SJ4F+GYScf+cQEVz8H9n4K
-         w1e+2HhFu2pxCNtpn1Wq98sQ1hiGRzzHIIGxGlBYv/s2NsnGojydPNTn67AuuH86Ar+K
-         RQhkmfTpfHutV7fE/Su5OLCSV0+//zRhX8GkDckvnzNwwhVh1Edz6x3UHwO0X6d4ANF9
-         H36JtvygDlUST/g4BPXQ0k8KmC52HOs4ih+1WD5v1FHwj8yUWWSi1lDZboLuOHywDAmV
-         pgHl2s25tFfRDddltEW4gFyw+/yYNrW2l38rPOA1PnAuc6o7Lb8AK9084v7JeL2IXoTE
-         E6kQ==
-X-Gm-Message-State: AOJu0YxzlLyBFCecVyCKGUJiAUO28olmTXeywkgLlMGa/JSUePfONU6s
-        SkgoOD5EfhgmFDTEvMwqzG0=
-X-Google-Smtp-Source: AGHT+IEotSHSU6wO+e2Igk8v7gFZAsBWds9LE+kJXAgiFdrdzstcSw+N3XHlmgRZZd+qs7V7PkRzWw==
-X-Received: by 2002:a17:902:dac1:b0:1a6:74f6:fa92 with SMTP id q1-20020a170902dac100b001a674f6fa92mr8975731plx.19.1692691792914;
-        Tue, 22 Aug 2023 01:09:52 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jw18-20020a170903279200b001bafd5cf769sm8388523plb.2.2023.08.22.01.09.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 01:09:52 -0700 (PDT)
-Message-ID: <e8d69cf3-346d-1e67-9fcc-f12826c0e2e4@gmail.com>
-Date:   Tue, 22 Aug 2023 16:09:45 +0800
+        d=1e100.net; s=20221208; t=1692692209; x=1693297009;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zckv6oFww2IAYABuKXRpSyWhyYXXDqhNviwTg2vLyFU=;
+        b=XqK5+21OgH4cnEb/q8ux9ewioD4WoSevM+3daXQ2Mq4vEewnt3SjQUSL2mAJNOACF6
+         mX8v9rq4wmUifNVYodtBM9Q5oGoOipeL5tddsmfIyz2OxXVjBrklmjsVmfqY33sjgBSH
+         dU1fQfpj8OmYOUNGKwqIep9Cs8Md0A4LFfW0KLeD64YfaNprc8bicKx130YKft8LA4xi
+         h5ivQ84/BUrOrjuoVhnVzb+wARsAOVsvLI9FfASHz4BtMMPsIwQt7xNtxXGAQGuc/vnH
+         ilFXhEHAkxcoCLc/11buT02ekJ9oVUH4bWVpx3hTV4lB1XoLXyA6l5fkDmdvRR6LTb/O
+         qajQ==
+X-Gm-Message-State: AOJu0YxkbRISJP609D64nkxRKdudwl5xUnHx7VIYIivYE6lslx6Lhfff
+        WIbXk4X58ExiIM2okBNQDncWYzljF3lGpAODLyETOGvOj31xVlrZQFfOhCebUWT9uShMcBXNhlk
+        63gOGFtQznVry
+X-Received: by 2002:a05:6402:268e:b0:523:2e64:122b with SMTP id w14-20020a056402268e00b005232e64122bmr6755156edd.3.1692692209654;
+        Tue, 22 Aug 2023 01:16:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHLSFMBKhUwaZNzwUhuDk7yvXSZjSgwouQMRlutTKOK/6Gw8nbnhQGL5h8TQ+NkO3C5To+oqw==
+X-Received: by 2002:a05:6402:268e:b0:523:2e64:122b with SMTP id w14-20020a056402268e00b005232e64122bmr6755152edd.3.1692692209318;
+        Tue, 22 Aug 2023 01:16:49 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-241-4.dyn.eolo.it. [146.241.241.4])
+        by smtp.gmail.com with ESMTPSA id m4-20020aa7c484000000b0052328d4268asm7109439edq.81.2023.08.22.01.16.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Aug 2023 01:16:48 -0700 (PDT)
+Message-ID: <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
+Subject: Re: [PATCH net-next v6 2/4] vsock/virtio: support to send
+ non-linear skb
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel@sberdevices.ru, oxffffaa@gmail.com
+Date:   Tue, 22 Aug 2023 10:16:47 +0200
+In-Reply-To: <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
+References: <20230814212720.3679058-1-AVKrasnov@sberdevices.ru>
+         <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [kvm-unit-tests PATCH 03/10] x86: Use "safe" terminology instead
- of "checking"
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20220608235238.3881916-1-seanjc@google.com>
- <20220608235238.3881916-4-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20220608235238.3881916-4-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/6/2022 7:52 am, Sean Christopherson wrote:
-> @@ -138,13 +138,13 @@ static void test_no_xsave(void)
->       printf("Illegal instruction testing:\n");
->   
->       cr4 = read_cr4();
-> -    report(write_cr4_checking(cr4 | X86_CR4_OSXSAVE) == GP_VECTOR,
-> +    report(write_cr4_safe(cr4 | X86_CR4_OSXSAVE) == GP_VECTOR,
->              "Set OSXSAVE in CR4 - expect #GP");
->   
->       report(xgetbv_checking(XCR_XFEATURE_ENABLED_MASK, &xcr0) == UD_VECTOR,
->              "Execute xgetbv - expect #UD");
+Hi,
 
-Oops, xgetbv_checking() has not been renamed to xgetbv_safe().
+I'm sorry for the long delay here. I was OoO in the past few weeks.
 
->   
-> -    report(xsetbv_checking(XCR_XFEATURE_ENABLED_MASK, 0x3) == UD_VECTOR,
-> +    report(xsetbv_safe(XCR_XFEATURE_ENABLED_MASK, 0x3) == UD_VECTOR,
->              "Execute xsetbv - expect #UD");
->   }
+On Tue, 2023-08-15 at 00:27 +0300, Arseniy Krasnov wrote:
+> For non-linear skb use its pages from fragment array as buffers in
+> virtio tx queue. These pages are already pinned by 'get_user_pages()'
+> during such skb creation.
+>=20
+> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  Changelog:
+>  v2 -> v3:
+>   * Comment about 'page_to_virt()' is updated. I don't remove R-b,
+>     as this change is quiet small I guess.
+>=20
+>  net/vmw_vsock/virtio_transport.c | 41 +++++++++++++++++++++++++++-----
+>  1 file changed, 35 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_tran=
+sport.c
+> index e95df847176b..7bbcc8093e51 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *wo=
+rk)
+>  	vq =3D vsock->vqs[VSOCK_VQ_TX];
+> =20
+>  	for (;;) {
+> -		struct scatterlist hdr, buf, *sgs[2];
+> +		/* +1 is for packet header. */
+> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
+> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
+
+Note that MAX_SKB_FRAGS depends on a config knob (CONFIG_MAX_SKB_FRAGS)
+and valid/reasonable values are up to 45. The total stack usage can be
+pretty large (~700 bytes).
+
+As this is under the vsk tx lock, have you considered moving such data
+in the virtio_vsock struct?
+
+>  		int ret, in_sg =3D 0, out_sg =3D 0;
+>  		struct sk_buff *skb;
+>  		bool reply;
+> @@ -111,12 +113,39 @@ virtio_transport_send_pkt_work(struct work_struct *=
+work)
+> =20
+>  		virtio_transport_deliver_tap_pkt(skb);
+>  		reply =3D virtio_vsock_skb_reply(skb);
+> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
+> +			    sizeof(*virtio_vsock_hdr(skb)));
+> +		sgs[out_sg] =3D &bufs[out_sg];
+> +		out_sg++;
+> +
+> +		if (!skb_is_nonlinear(skb)) {
+> +			if (skb->len > 0) {
+> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
+> +				sgs[out_sg] =3D &bufs[out_sg];
+> +				out_sg++;
+> +			}
+> +		} else {
+> +			struct skb_shared_info *si;
+> +			int i;
+> +
+> +			si =3D skb_shinfo(skb);
+
+This assumes that the paged skb does not carry any actual data in the
+head buffer (only the header). Is that constraint enforced somewhere
+else? Otherwise a
+
+	WARN_ON_ONCE(skb_headlen(skb) > sizeof(*virtio_vsock_hdr(skb))
+
+could be helpful to catch early possible bugs.
+
+Thanks!
+
+Paolo
+
+> +
+> +			for (i =3D 0; i < si->nr_frags; i++) {
+> +				skb_frag_t *skb_frag =3D &si->frags[i];
+> +				void *va;
+> =20
+> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)=
+));
+> -		sgs[out_sg++] =3D &hdr;
+> -		if (skb->len > 0) {
+> -			sg_init_one(&buf, skb->data, skb->len);
+> -			sgs[out_sg++] =3D &buf;
+> +				/* We will use 'page_to_virt()' for the userspace page
+> +				 * here, because virtio or dma-mapping layers will call
+> +				 * 'virt_to_phys()' later to fill the buffer descriptor.
+> +				 * We don't touch memory at "virtual" address of this page.
+> +				 */
+> +				va =3D page_to_virt(skb_frag->bv_page);
+> +				sg_init_one(&bufs[out_sg],
+> +					    va + skb_frag->bv_offset,
+> +					    skb_frag->bv_len);
+> +				sgs[out_sg] =3D &bufs[out_sg];
+> +				out_sg++;
+> +			}
+>  		}
+> =20
+>  		ret =3D virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+
