@@ -2,68 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BCDF785EF5
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 19:54:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52245785F9E
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 20:29:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237926AbjHWRyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 13:54:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48822 "EHLO
+        id S238143AbjHWS3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 14:29:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234813AbjHWRyo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 13:54:44 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53BEE7E
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 10:54:41 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-68a2d9a6b5fso6179442b3a.0
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 10:54:41 -0700 (PDT)
+        with ESMTP id S238154AbjHWS27 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 14:28:59 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57866E7F
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 11:28:55 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99bcfe28909so748134766b.3
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 11:28:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692813281; x=1693418081;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRS5JycPIbwXyepy+wtXK/xgbAvVm4Y5kSYZYv7pZro=;
-        b=CaScwIbHjNalEgm8mDbbvhRqFtY2hd3VcU4NfsvTZLv01vrPmr5OrLi5RVl3ef9N1n
-         KQ+zkhvN8+39aOwg0M5oA8A2AQ3HjXeXC05yE6nnlemIJ1/a/wXWP6JQwJ98LWt0BcIf
-         x4UguKrjuU/5qk79Ha1CjeFlDVh9SRNJSpzZyvUYLlvwMdvwr9Rph2RTO40BTVGKPL6p
-         s/w/PHWW6wc1CxRBgvizu/hIBoTMCUVp4Kv/7MvreStmQbu5BHairGhEiUlkO4LJrXhx
-         9Y2x2xI5zGj6Jut2g3VFmtz+E2eQjG056q5Jv61lkT/b13vn+oltG0i9E/P1EjCccYKE
-         y4Gw==
+        d=google.com; s=20221208; t=1692815334; x=1693420134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D1i56BJxrtFkay0cZ6IFmWxVW0ev3tPI6w5w2txm7Do=;
+        b=tY59VRdaWi1DBU5yE67ABWm0o7nBL9MaDrpmh6mNIpiomLMKYM9r5+wGag8dCdpGui
+         NaOu1KuepfxDYEnB5dPlu6HN3tZoqfi4h5AZqSoJMkAg0oJDWfVE8EHuzN27hE3O0KBP
+         JacU7TySMZ9zMI707ZZsNDN3xijkW23FU/k8wMptNZ3fySwsLdyTXz9Lxwn1rCU56ZCE
+         C/Rs2MpZPWH9uHcMD3MIE59ybie080aQKP2f9kpdsw97pgl7vV5p2yZBjbOIXCsUeFLe
+         cYN8QqkTzAvw/3ZN3fCU0RffyJWB4XNowo4aojHT/BDBDqMCUc9dr5tWJQZvMBpdddNz
+         e2UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692813281; x=1693418081;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRS5JycPIbwXyepy+wtXK/xgbAvVm4Y5kSYZYv7pZro=;
-        b=Xjv33mmL4xt0jp64q/RLbpM8HIC/r2U6sN/KxIrW7Y3gtNSbenW6TD9c0wujOjfUQd
-         gjd+uUBfwoyziFRGho4wbca2/s6WhcBxi8X7J9qGj7Fq0QQkDfLOPDEQjyACNGebrOqp
-         K1dwFCiPjfmS1uXf8lsvCnqW4VIYKMb/d83ck47FVugbv4fg3504cOIfibrccnWRJINE
-         dFy5pfTPeW0ZFl8isOd3TdMc1zANgQGKFD0jc2W2KxFfXelS9tDeV+VWP1ebUCK3BsP0
-         GkfS+hHmf9Gk+ZukBNxzDGvYRzAFom3rC2bZXTXBkeUJzcW+0m2DCXzsZQNflNvcCFy8
-         wDjA==
-X-Gm-Message-State: AOJu0Yyq02HBqbnRTyURuaNk2VSSx4qsgLlQ523DqV/6WRay6hI3puh1
-        0QlbmDKNDsVbjJ3zOC0SHyBcutid+2M=
-X-Google-Smtp-Source: AGHT+IGqyqUB5YL1GXyMSP2MQldFgNtsuPWQntLuougmLzJdJR5fJtGRptKATycBFqzTSk/Q0Y7BnY0rHjw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:17a6:b0:68a:6735:e44 with SMTP id
- s38-20020a056a0017a600b0068a67350e44mr3335280pfg.6.1692813281100; Wed, 23 Aug
- 2023 10:54:41 -0700 (PDT)
-Date:   Wed, 23 Aug 2023 10:54:39 -0700
-In-Reply-To: <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net>
-Mime-Version: 1.0
-References: <5e678d57-66b-a18d-f97e-b41357fdb7f@ewheeler.net>
- <ZN5lD5Ro9LVgTA6M@google.com> <3ee6ddd4-74ad-9660-e3e5-a420a089ea54@ewheeler.net>
- <ZN+BRjUxouKiDSbx@google.com> <418345e5-a3e5-6e8d-395a-f5551ea13e2@ewheeler.net>
- <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net> <ZOP4lwiMU2Uf89eQ@google.com>
- <468b1298-e43e-2397-5f3-4b6af6e2f461@ewheeler.net> <ZOTQPUk5kxskDcsi@google.com>
- <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net>
-Message-ID: <ZOZH3xe0u4NHhvL8@google.com>
-Subject: Re: Deadlock due to EPT_VIOLATION
-From:   Sean Christopherson <seanjc@google.com>
-To:     Eric Wheeler <kvm@lists.ewheeler.net>
-Cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+        d=1e100.net; s=20221208; t=1692815334; x=1693420134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D1i56BJxrtFkay0cZ6IFmWxVW0ev3tPI6w5w2txm7Do=;
+        b=Xx640HM6+j0u2Xyjmf73yWHM5qdIOrz7HrBtfraJqGibocmsaw6K0ZRZ0oPMB9FLyd
+         hqs8ScEPk7AwyYpfSkRu/D3kS54wBBUIHqH1+ttCpvme2EVpE1N8WV6Xmwnnn8TxqbHv
+         Y2//Ujo5CqZXmvrVxA8FRgKLL7TWA1HQxRFaOgT051ghbXT9/Jrc0kZBZW8PgLj/wy55
+         JyXAbDiu9aW1fokfFscJyv6N4G4aGn4YBNH2m20oGKVAN2LOFS9GvIo5EtCChDPxIaW+
+         cQx/bF+rc/OrmCjEA4GblT43XRdpnq5ijDtEQge1x96V2THl1e+weJRZhutIn19anjXe
+         6mMg==
+X-Gm-Message-State: AOJu0YxLJeFMGf/W0inq6lnfIRhXd8G6CxvSqa66+aMEnRwUps0eFmV2
+        D/aFPB3u4Mv7lQFCeEVXGCsXf35HneHPcP+sBcEsDg==
+X-Google-Smtp-Source: AGHT+IHlQp9aiZ8Ka0ZJpgClwBB6XmkiaNX9y3bj9ftkzDoc7wSBGvtA2RV/u4qhbokdUveFaacH9H1ARr99SdESQ+M=
+X-Received: by 2002:a17:907:7714:b0:99b:6e54:bd6e with SMTP id
+ kw20-20020a170907771400b0099b6e54bd6emr9614282ejc.56.1692815333628; Wed, 23
+ Aug 2023 11:28:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230504120042.785651-1-rkagan@amazon.de> <ZH6DJ8aFq/LM6Bk9@google.com>
+ <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
+ <ZJ4dmrQSduY8aWap@google.com> <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
+ <ZJ7mjdZ8h/RSilFX@google.com> <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
+ <ZJ74gELkj4DgAk4S@google.com> <ZJ9IaskpbIK9q4rt@google.com> <bdc2be50-c8c4-ff06-196f-d9b67e61a6b5@gmail.com>
+In-Reply-To: <bdc2be50-c8c4-ff06-196f-d9b67e61a6b5@gmail.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Wed, 23 Aug 2023 11:28:17 -0700
+Message-ID: <CAL715WJiUYpxRRqs3FNiLiS8b6=4Pm5K0u==S6t5NYi0p=vutw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Roman Kagan <rkagan@amazon.de>,
+        Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,278 +77,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 22, 2023, Eric Wheeler wrote:
-> On Tue, 22 Aug 2023, Sean Christopherson wrote:
-> > > Here is the whole log with 500,000+ lines over 5 minutes of recording, it 
-> > > was first stuck on one vcpu for most of the time, and toward the end it 
-> > > was stuck on a different VCPU:
-> > > 
-> > > The file starts with 555,596 occurances of vcpu=ffff9964cdc48000 and is 
-> > > then followed by 31,784 occurances of vcpu=ffff9934ed50c680.  As you can 
-> > > see in the file, they are not interleaved:
-> > > 
-> > > 	https://www.linuxglobal.com/out/handle_ept_violation.log2
-> > > 
-> > >   # awk '{print $3}' handle_ept_violation.log2 |uniq -c
-> > >    555596 vcpu=ffff9964cdc48000
-> > >     31784 vcpu=ffff9934ed50c680
-> > 
-> > Hrm, but the address range being invalidated is changing.  Without seeing the
-> > guest RIP, or even a timestamp, it's impossible to tell if the vCPU is well and
-> > truly stuck or if it's just getting thrashed so hard by NUMA balancing or KSM
-> > that it looks stuck.
-> > 
-> > Drat.
-> > 
-> > > > Below is another bpftrace program that will hopefully shrink the 
-> > > > haystack to the point where we can find something via code inspection.
-> > > 
-> > > Ok thanks, we'll give it a try.
-> > 
-> > Try this version instead.  It's more comprehensive and more precise, e.g. should
-> > only trigger on the guest being 100% stuck, and also fixes a PID vs. TID goof.
-> > 
-> > Note!  Enable trace_kvm_exit before/when running this to ensure KVM grabs the guest RIP
-> > from the VMCS.  Without that enabled, RIP from vcpu->arch.regs[16] may be stale.
-> 
-> Ok, we got a 740MB log, zips down to 25MB if you would like to see the
-> whole thing, it is here:
-> 	http://linuxglobal.com/out/handle_ept_violation-v2.log.gz
-> 
-> For brevity, here is a sample of each 100,000th line:
-> 
-> # zcat handle_ept_violation-v2.log.gz | perl -lne '!($n++%100000) && print'
-> Attaching 3 probes...
-> 00:30:31:347560 tid[553909] pid[553848] stuck @ rip ffffffff80094a41 (375972 hits), gpa = 294a41, hva = 7efc5b094000 : MMU seq = 8000b139, in-prog = 0, start = 7efc6e10f000, end = 7efc6e110000
+On Tue, Aug 22, 2023 at 2:30=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> w=
+rote:
+>
+> On 1/7/2023 5:26 am, Sean Christopherson wrote:
+> > Ugh, yeah, de0f619564f4 created a bit of a mess.  The underlying issue =
+that it
+> > was solving is that perf_event_read_value() and friends might sleep (ya=
+y mutex),
+> > and so can't be called from KVM's fastpath (IRQs disabled).
+> Updating pmu counters for emulated instructions cause troubles.
+>
+> >
+> > However, detecting overflow requires reading perf_event_read_value() to=
+ gather
+> > the accumulated count from the hardware event in order to add it to the=
+ emulated
+> > count from software.  E.g. if pmc->counter is X and the perf event coun=
+ter is Y,
+> > KVM needs to factor in Y because X+Y+1 might overflow even if X+1 does =
+not.
+> >
+> > Trying to snapshot the previous counter value is a bit of a mess.  It c=
+ould probably
+> > made to work, but it's hard to reason about what the snapshot actually =
+contains
+> > and when it should be cleared, especially when factoring in the wrappin=
+g logic.
+> >
+> > Rather than snapshot the previous counter, I think it makes sense to:
+> >
+> >    1) Track the number of emulated counter events
+>
+> If events are counted separately, the challenge here is to correctly time
+> the emulation of counter overflows, which can occur on both sides of the
+> counter values out of sync.
+>
+> >    2) Accumulate and reset the counts from perf_event and emulated_coun=
+ter into
+> >       pmc->counter when pausing the PMC
+> >    3) Pause and reprogram the PMC on writes (instead of the current app=
+roach of
+> >       blindly updating the sample period)
+>
+> Updating the sample period is the only interface for KVM to configure hw
+> behaviour on hw-ctr. I note that perf_event_set_count() will be proposed,
+> and I'm pessimistic about this change.
+>
+> >    4) Pause the counter when stopping the perf_event to ensure pmc->cou=
+nter is
+> >       fresh (instead of manually updating pmc->counter)
+> >
+> > IMO, that yields more intuitive logic, and makes it easier to reason ab=
+out
+> > correctness since the behavior is easily define: pmc->counter holds the=
+ counts
+> > that have been gathered and processed, perf_event and emulated_counter =
+hold
+> > outstanding counts on top.  E.g. on a WRMSR to the counter, both the em=
+ulated
+> > counter and the hardware counter are reset, because whatever counts exi=
+sted
+> > previously are irrelevant.
+>
+> If we take the hardware view, a counter, emulated or not, just increments
+> and overflows at the threshold. The missing logic here is when the counte=
+r
+> is truncated when writing high bit-width values, and how to deal with the
+> value of pmc->prev_counter was before pmc->counter was truncated.
+>
+> >
+> > Pausing the counter_might_  make WRMSR slower, but we need to get this =
+all
+> > functionally correct before worrying too much about performance.
+>
+> Performance, security and correctness should all be considered at the beg=
+inning.
+>
 
-Argh.  I'm having a bit of a temper tantrum because I forgot to have the printf
-spit out the memslot flags.  And I apparently gave you a version without a probe
-on kvm_tdp_mmu_map().  Grr.
++1 on the performance part.
 
-Can you capture one more trace?  Fingers crossed this is the last one.  Modified
-program below.
+I did several rounds of performance testing, pausing the counter is
+fast, but restarting the counter is *super* slow. The extra overhead
+might just make vPMU useless especially when the guest workload takes
+full CPU/memory resources in a VM (like SPEC2017 does).
 
-On the plus side, I'm slowly learning how to effectively use bpf programs.
-This version also prints return values and and other relevant side effects from
-kvm_faultin_pfn(), and I figured out a way to get at the vCPU's root MMU page.
+> >
+> > Diff below for what I'm thinking (needs to be split into multiple patch=
+es).  It's
+> > *very*  lightly tested.
+>
+> It saddens me that no one has come up with an actual low-level counter-te=
+st for
+> this issue.
+>
+> >
+> > I'm about to disappear for a week, I'll pick this back up when I get re=
+turn.  In
+> > the meantime, any testing and/or input would be much appreciated!
+>
+> How about accepting Roman's original fix and then exercising the rewritin=
+g genius ?
 
-And it stops printing after a vCPU (task) has been stuck for 100k exits, i.e. it
-should self-limit the spam.  Even if the vCPU managed to unstick itself after
-that point, which is *extremely* unlikely, being stuck for 100k exits all but
-guarantees there's a bug somewhere.
++1
 
-So this *should* give us a smoking gun.  Depending on what the gun points at, a
-full root cause may still be a long ways off, but I'm pretty sure this mess will
-tell us exactly why KVM is refusing to fix the fault.
-
---
-
-struct kvm_page_fault {
-	const u64 addr;
-	const u32 error_code;
-
-	const bool prefetch;
-	const bool exec;
-	const bool write;
-	const bool present;
-
-	const bool rsvd;
-	const bool user;
-	const bool is_tdp;
-	const bool nx_huge_page_workaround_enabled;
-
-	bool huge_page_disallowed;
-
-	u8 max_level;
-	u8 req_level;
-	u8 goal_level;
-
-	u64 gfn;
-
-	struct kvm_memory_slot *slot;
-
-	u64 pfn;
-	unsigned long hva;
-	bool map_writable;
-};
-
-struct kvm_mmu_page {
-	struct list_head link;
-	struct hlist_node hash_link;
-
-	bool tdp_mmu_page;
-	bool unsync;
-	u8 mmu_valid_gen;
-	bool lpage_disallowed;
-
-	u32 role;
-	u64 gfn;
-
-	u64 *spt;
-
-	u64 *shadowed_translation;
-
-	int root_count;
-}
-
-kprobe:kvm_faultin_pfn
-{
-	$vcpu = (struct kvm_vcpu *)arg0;
-	$kvm = $vcpu->kvm;
-	$rip = $vcpu->arch.regs[16];
-
-	if (@last_rip[tid] == $rip) {
-		@same[tid]++
-	} else {
-		@same[tid] = 0;
-	}
-	@last_rip[tid] = $rip;
-
-	if (@same[tid] > 1000 && @same[tid] < 100000) {
-		$fault = (struct kvm_page_fault *)arg1;
-		$hva = -1;
-		$flags = 0;
-
-		@__vcpu[tid] = arg0;
-		@__fault[tid] = arg1;
-
-		if ($fault->slot != 0) {
-			$hva = $fault->slot->userspace_addr +
-			       (($fault->gfn - $fault->slot->base_gfn) << 12);
-			$flags = $fault->slot->flags;
-		}
-
-		printf("%s tid[%u] pid[%u] FAULTIN @ rip %lx (%lu hits), gpa = %lx, hva = %lx, flags = %lx : MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, $rip, @same[tid], $fault->addr, $hva, $flags,
-		       $kvm->mmu_invalidate_seq, $kvm->mmu_invalidate_in_progress,
-		       $kvm->mmu_invalidate_range_start, $kvm->mmu_invalidate_range_end);
-	} else {
-		@__vcpu[tid] = 0;
-		@__fault[tid] = 0;
-	}
-}
-
-kretprobe:kvm_faultin_pfn
-{
-	if (@__fault[tid] != 0) {
-		$vcpu = (struct kvm_vcpu *)@__vcpu[tid];
-		$kvm = $vcpu->kvm;
-		$fault = (struct kvm_page_fault *)@__fault[tid];
-		$hva = -1;
-		$flags = 0;
-
-		if ($fault->slot != 0) {
-			$hva = $fault->slot->userspace_addr +
-			       (($fault->gfn - $fault->slot->base_gfn) << 12);
-			$flags = $fault->slot->flags;
-		}
-
-		printf("%s tid[%u] pid[%u] FAULTIN_RET @ rip %lx (%lu hits), gpa = %lx, hva = %lx (%lx), flags = %lx, pfn = %lx, ret = %lu : MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-		       $fault->addr, $hva, $fault->hva, $flags, $fault->pfn, retval,
-		       $kvm->mmu_invalidate_seq, $kvm->mmu_invalidate_in_progress,
-		       $kvm->mmu_invalidate_range_start, $kvm->mmu_invalidate_range_end);
-	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-		printf("%s tid[%u] pid[%u] FAULTIN_ERROR @ rip %lx (%lu hits), ret = %lu\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid], retval);
-	}
-}
-
-kprobe:kvm_tdp_mmu_map
-{
-	$vcpu = (struct kvm_vcpu *)arg0;
-	$rip = $vcpu->arch.regs[16];
-
-	if (@last_rip[tid] == $rip) {
-		@same[tid]++
-	} else {
-		@same[tid] = 0;
-	}
-	@last_rip[tid] = $rip;
-
-	if (@__fault[tid] != 0) {
-	        $vcpu = (struct kvm_vcpu *)arg0;
-		$fault = (struct kvm_page_fault *)arg1;
-
-                if (@__vcpu[tid] != arg0 || @__fault[tid] != arg1) {
-                        printf("%s tid[%u] pid[%u] MAP_ERROR vcpu %lx vs. %lx, fault %lx vs. %lx\n",
-                               strftime("%H:%M:%S:%f", nsecs), tid, pid, @__vcpu[tid], arg0, @__fault[tid], arg1);
-                }
-
-		printf("%s tid[%u] pid[%u] MAP @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-		       $fault->addr, $fault->hva, $fault->pfn);
-	} else {
-		@__vcpu[tid] = 0;
-		@__fault[tid] = 0;
-	}
-}
-
-kretprobe:kvm_tdp_mmu_map
-{
-	if (@__fault[tid] != 0) {
-		$vcpu = (struct kvm_vcpu *)@__vcpu[tid];
-		$fault = (struct kvm_page_fault *)@__fault[tid];
-		$hva = -1;
-		$flags = 0;
-
-		if ($fault->slot != 0) {
-			$hva = $fault->slot->userspace_addr +
-			       (($fault->gfn - $fault->slot->base_gfn) << 12);
-			$flags = $fault->slot->flags;
-		}
-
-		printf("%s tid[%u] pid[%u] MAP_RET @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx, ret = %lx\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-		       $fault->addr, $fault->hva, $fault->pfn, retval);
-	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-		printf("%s tid[%u] pid[%u] MAP_RET_ERROR @ rip %lx (%lu hits), ret = %lu\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid], retval);
-	}
-}
-
-kprobe:tdp_iter_start
-{
-	if (@__fault[tid] != 0) {
-                $vcpu = (struct kvm_vcpu *)@__vcpu[tid];
-		$fault = (struct kvm_page_fault *)@__fault[tid];
-	        $root = (struct kvm_mmu_page *)arg1;
-
-		printf("%s tid[%u] pid[%u] ITER @ rip %lx (%lu hits), gpa = %lx (%lx), hva = %lx, pfn = %lx, tdp_mmu = %u, role = %x, count = %d\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-		       $fault->addr, arg3 << 12, $fault->hva, $fault->pfn,
-                       $root->tdp_mmu_page, $root->role, $root->root_count);
-	} else {
-		@__vcpu[tid] = 0;
-		@__fault[tid] = 0;
-	}
-}
-
-kprobe:make_mmio_spte
-{
-        if (@__fault[tid] != 0) {
-		$fault = (struct kvm_page_fault *)@__fault[tid];
-
-		printf("%s tid[%u] pid[%u] MMIO @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-		       $fault->addr, $fault->hva, $fault->pfn);
-	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-		printf("%s tid[%u] pid[%u] MMIO_ERROR @ rip %lx (%lu hits)\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid]);
-	}
-}
-
-kprobe:make_spte
-{
-        if (@__fault[tid] != 0) {
-		$fault = (struct kvm_page_fault *)@__fault[tid];
-
-		printf("%s tid[%u] pid[%u] SPTE @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-		       $fault->addr, $fault->hva, $fault->pfn);
-	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-		printf("%s tid[%u] pid[%u] SPTE_ERROR @ rip %lx (%lu hits)\n",
-		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid]);
-	}
-}
-
+I think the best option would be to just apply the fix in a short term
+and put the refactoring of the emulated counter in the next series.
