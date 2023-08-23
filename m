@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8C13785E81
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 19:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BCDF785EF5
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 19:54:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237803AbjHWRZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 13:25:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49112 "EHLO
+        id S237926AbjHWRyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 13:54:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233074AbjHWRZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 13:25:43 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A95AE67
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 10:25:41 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99bcc0adab4so764064566b.2
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 10:25:41 -0700 (PDT)
+        with ESMTP id S234813AbjHWRyo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 13:54:44 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53BEE7E
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 10:54:41 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-68a2d9a6b5fso6179442b3a.0
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 10:54:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20221208.gappssmtp.com; s=20221208; t=1692811539; x=1693416339;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9doNwfaV+DyWn01odwS31ajPbHdtq1usdM6nQ5uPRwQ=;
-        b=OX1aTrHg+kqEwcVYobN3fOSOfbip/pX1WWrfPAn77RO2holwjYNhvnSQMC+367jMGs
-         gXaCoHRKUaJKBezBwM0cCnAKMcVyhTWaxe9BFTRqrVCrC0agodKLsmvPV7Z0aES56ZTc
-         Zwj63HcDsh7+yScm8WnjXghiBDSY3QOfqbNSLL92GXy03p2XD+rhtomtp7fNXSYkBjjM
-         x0FEjNRqSMFCM3U/mFPgiAlf4FEZvExB8GSYnVk6EcdKht5Xi+ZEJfg1b1kydTHqvRxE
-         Hdpu1xCqFMZMgFX4P/oYLAfRQC2U2FZZfo9PxpKcjVQj4qvOtt5pEoCq8y1FBahP26fi
-         7WSw==
+        d=google.com; s=20221208; t=1692813281; x=1693418081;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FRS5JycPIbwXyepy+wtXK/xgbAvVm4Y5kSYZYv7pZro=;
+        b=CaScwIbHjNalEgm8mDbbvhRqFtY2hd3VcU4NfsvTZLv01vrPmr5OrLi5RVl3ef9N1n
+         KQ+zkhvN8+39aOwg0M5oA8A2AQ3HjXeXC05yE6nnlemIJ1/a/wXWP6JQwJ98LWt0BcIf
+         x4UguKrjuU/5qk79Ha1CjeFlDVh9SRNJSpzZyvUYLlvwMdvwr9Rph2RTO40BTVGKPL6p
+         s/w/PHWW6wc1CxRBgvizu/hIBoTMCUVp4Kv/7MvreStmQbu5BHairGhEiUlkO4LJrXhx
+         9Y2x2xI5zGj6Jut2g3VFmtz+E2eQjG056q5Jv61lkT/b13vn+oltG0i9E/P1EjCccYKE
+         y4Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692811539; x=1693416339;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9doNwfaV+DyWn01odwS31ajPbHdtq1usdM6nQ5uPRwQ=;
-        b=Ibj6a9qNZXJFuAYervxp3+NCLN0EQUDbw9qxviQpSfkUKlRbR8Xq5+4m2nzy1ZPslm
-         OlG4ThfVimHigpXV2eZq2RKOEdF9VECVcYwbNl4Ln36MmwRBv7c2ScPAUP73BLR67C+5
-         AP42wJKD2eIpSfsZQPvTLkfNsI6OmJRKzwMKZh+Iz+YGOY9GVw7iXfGL3sDpRVwPcYAo
-         isKCSwhdDEI75sBm+U5sf4MdL2vNVZc3AGf2eZF6E1Ig4DledfK3yQzRH48/hZZ2Zpbr
-         ddO0uJEUZAEmNluTGdFjpveD791X6rioDmbPRG8rHowXqExrizIm5pEziksOnpOqNMFf
-         1h8A==
-X-Gm-Message-State: AOJu0YyeRanTHlWZJ+eyAtCO6b42atNNfwHlquPK+zhkhnFQu2/aG1Sc
-        3iOIfviUaFHw1bG5nkehlcF5HGJFn4TvZHHG1IeIxg==
-X-Google-Smtp-Source: AGHT+IEoUO9OwvjFmBxfjHkKC3F/JNYN6dkjFqrxGPtXf7PN6LvuRceVFlsFxu9sHXQbbWzYd+7m0R73svUkbsXIDqs=
-X-Received: by 2002:a17:907:1de6:b0:9a1:f21e:cdfd with SMTP id
- og38-20020a1709071de600b009a1f21ecdfdmr1066707ejc.34.1692811539344; Wed, 23
- Aug 2023 10:25:39 -0700 (PDT)
-MIME-Version: 1.0
-From:   Anup Patel <anup@brainfault.org>
-Date:   Wed, 23 Aug 2023 22:55:28 +0530
-Message-ID: <CAAhSdy2XiFD1QC+v_UZ5G0TAhmT8uH48=UQdu6=bL=EPWy+2Kg@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.6
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Atish Patra <atishp@rivosinc.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        d=1e100.net; s=20221208; t=1692813281; x=1693418081;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FRS5JycPIbwXyepy+wtXK/xgbAvVm4Y5kSYZYv7pZro=;
+        b=Xjv33mmL4xt0jp64q/RLbpM8HIC/r2U6sN/KxIrW7Y3gtNSbenW6TD9c0wujOjfUQd
+         gjd+uUBfwoyziFRGho4wbca2/s6WhcBxi8X7J9qGj7Fq0QQkDfLOPDEQjyACNGebrOqp
+         K1dwFCiPjfmS1uXf8lsvCnqW4VIYKMb/d83ck47FVugbv4fg3504cOIfibrccnWRJINE
+         dFy5pfTPeW0ZFl8isOd3TdMc1zANgQGKFD0jc2W2KxFfXelS9tDeV+VWP1ebUCK3BsP0
+         GkfS+hHmf9Gk+ZukBNxzDGvYRzAFom3rC2bZXTXBkeUJzcW+0m2DCXzsZQNflNvcCFy8
+         wDjA==
+X-Gm-Message-State: AOJu0Yyq02HBqbnRTyURuaNk2VSSx4qsgLlQ523DqV/6WRay6hI3puh1
+        0QlbmDKNDsVbjJ3zOC0SHyBcutid+2M=
+X-Google-Smtp-Source: AGHT+IGqyqUB5YL1GXyMSP2MQldFgNtsuPWQntLuougmLzJdJR5fJtGRptKATycBFqzTSk/Q0Y7BnY0rHjw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:17a6:b0:68a:6735:e44 with SMTP id
+ s38-20020a056a0017a600b0068a67350e44mr3335280pfg.6.1692813281100; Wed, 23 Aug
+ 2023 10:54:41 -0700 (PDT)
+Date:   Wed, 23 Aug 2023 10:54:39 -0700
+In-Reply-To: <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net>
+Mime-Version: 1.0
+References: <5e678d57-66b-a18d-f97e-b41357fdb7f@ewheeler.net>
+ <ZN5lD5Ro9LVgTA6M@google.com> <3ee6ddd4-74ad-9660-e3e5-a420a089ea54@ewheeler.net>
+ <ZN+BRjUxouKiDSbx@google.com> <418345e5-a3e5-6e8d-395a-f5551ea13e2@ewheeler.net>
+ <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net> <ZOP4lwiMU2Uf89eQ@google.com>
+ <468b1298-e43e-2397-5f3-4b6af6e2f461@ewheeler.net> <ZOTQPUk5kxskDcsi@google.com>
+ <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net>
+Message-ID: <ZOZH3xe0u4NHhvL8@google.com>
+Subject: Re: Deadlock due to EPT_VIOLATION
+From:   Sean Christopherson <seanjc@google.com>
+To:     Eric Wheeler <kvm@lists.ewheeler.net>
+Cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,104 +71,278 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Tue, Aug 22, 2023, Eric Wheeler wrote:
+> On Tue, 22 Aug 2023, Sean Christopherson wrote:
+> > > Here is the whole log with 500,000+ lines over 5 minutes of recording, it 
+> > > was first stuck on one vcpu for most of the time, and toward the end it 
+> > > was stuck on a different VCPU:
+> > > 
+> > > The file starts with 555,596 occurances of vcpu=ffff9964cdc48000 and is 
+> > > then followed by 31,784 occurances of vcpu=ffff9934ed50c680.  As you can 
+> > > see in the file, they are not interleaved:
+> > > 
+> > > 	https://www.linuxglobal.com/out/handle_ept_violation.log2
+> > > 
+> > >   # awk '{print $3}' handle_ept_violation.log2 |uniq -c
+> > >    555596 vcpu=ffff9964cdc48000
+> > >     31784 vcpu=ffff9934ed50c680
+> > 
+> > Hrm, but the address range being invalidated is changing.  Without seeing the
+> > guest RIP, or even a timestamp, it's impossible to tell if the vCPU is well and
+> > truly stuck or if it's just getting thrashed so hard by NUMA balancing or KSM
+> > that it looks stuck.
+> > 
+> > Drat.
+> > 
+> > > > Below is another bpftrace program that will hopefully shrink the 
+> > > > haystack to the point where we can find something via code inspection.
+> > > 
+> > > Ok thanks, we'll give it a try.
+> > 
+> > Try this version instead.  It's more comprehensive and more precise, e.g. should
+> > only trigger on the guest being 100% stuck, and also fixes a PID vs. TID goof.
+> > 
+> > Note!  Enable trace_kvm_exit before/when running this to ensure KVM grabs the guest RIP
+> > from the VMCS.  Without that enabled, RIP from vcpu->arch.regs[16] may be stale.
+> 
+> Ok, we got a 740MB log, zips down to 25MB if you would like to see the
+> whole thing, it is here:
+> 	http://linuxglobal.com/out/handle_ept_violation-v2.log.gz
+> 
+> For brevity, here is a sample of each 100,000th line:
+> 
+> # zcat handle_ept_violation-v2.log.gz | perl -lne '!($n++%100000) && print'
+> Attaching 3 probes...
+> 00:30:31:347560 tid[553909] pid[553848] stuck @ rip ffffffff80094a41 (375972 hits), gpa = 294a41, hva = 7efc5b094000 : MMU seq = 8000b139, in-prog = 0, start = 7efc6e10f000, end = 7efc6e110000
 
-We have the following KVM RISC-V changes for 6.6:
-1) Zba, Zbs, Zicntr, Zicsr, Zifencei, and Zihpm support for Guest/VM
-2) Added ONE_REG interface for SATP mode
-3) Added ONE_REG interface to enable/disable multiple ISA extensions
-4) Improved error codes returned by ONE_REG interfaces
-5) Added KVM_GET_REG_LIST ioctl() implementation for KVM RISC-V
-6) Added get-reg-list selftest for KVM RISC-V
+Argh.  I'm having a bit of a temper tantrum because I forgot to have the printf
+spit out the memslot flags.  And I apparently gave you a version without a probe
+on kvm_tdp_mmu_map().  Grr.
 
-Please pull.
+Can you capture one more trace?  Fingers crossed this is the last one.  Modified
+program below.
 
-Regards,
-Anup
+On the plus side, I'm slowly learning how to effectively use bpf programs.
+This version also prints return values and and other relevant side effects from
+kvm_faultin_pfn(), and I figured out a way to get at the vCPU's root MMU page.
 
-The following changes since commit 52a93d39b17dc7eb98b6aa3edb93943248e03b2f:
+And it stops printing after a vCPU (task) has been stuck for 100k exits, i.e. it
+should self-limit the spam.  Even if the vCPU managed to unstick itself after
+that point, which is *extremely* unlikely, being stuck for 100k exits all but
+guarantees there's a bug somewhere.
 
-  Linux 6.5-rc5 (2023-08-06 15:07:51 -0700)
+So this *should* give us a smoking gun.  Depending on what the gun points at, a
+full root cause may still be a long ways off, but I'm pretty sure this mess will
+tell us exactly why KVM is refusing to fix the fault.
 
-are available in the Git repository at:
+--
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.6-1
+struct kvm_page_fault {
+	const u64 addr;
+	const u32 error_code;
 
-for you to fetch changes up to 477069398ed6e0498ee243e799cb6c68baf6ccb8:
+	const bool prefetch;
+	const bool exec;
+	const bool write;
+	const bool present;
 
-  KVM: riscv: selftests: Add get-reg-list test (2023-08-09 12:15:27 +0530)
+	const bool rsvd;
+	const bool user;
+	const bool is_tdp;
+	const bool nx_huge_page_workaround_enabled;
 
-----------------------------------------------------------------
-KVM/riscv changes for 6.6
+	bool huge_page_disallowed;
 
-- Zba, Zbs, Zicntr, Zicsr, Zifencei, and Zihpm support for Guest/VM
-- Added ONE_REG interface for SATP mode
-- Added ONE_REG interface to enable/disable multiple ISA extensions
-- Improved error codes returned by ONE_REG interfaces
-- Added KVM_GET_REG_LIST ioctl() implementation for KVM RISC-V
-- Added get-reg-list selftest for KVM RISC-V
+	u8 max_level;
+	u8 req_level;
+	u8 goal_level;
 
-----------------------------------------------------------------
-Andrew Jones (9):
-      RISC-V: KVM: Improve vector save/restore errors
-      RISC-V: KVM: Improve vector save/restore functions
-      KVM: arm64: selftests: Replace str_with_index with strdup_printf
-      KVM: arm64: selftests: Drop SVE cap check in print_reg
-      KVM: arm64: selftests: Remove print_reg's dependency on vcpu_config
-      KVM: arm64: selftests: Rename vcpu_config and add to kvm_util.h
-      KVM: arm64: selftests: Delete core_reg_fixup
-      KVM: arm64: selftests: Split get-reg-list test code
-      KVM: arm64: selftests: Finish generalizing get-reg-list
+	u64 gfn;
 
-Anup Patel (5):
-      RISC-V: KVM: Factor-out ONE_REG related code to its own source file
-      RISC-V: KVM: Extend ONE_REG to enable/disable multiple ISA extensions
-      RISC-V: KVM: Allow Zba and Zbs extensions for Guest/VM
-      RISC-V: KVM: Allow Zicntr, Zicsr, Zifencei, and Zihpm for Guest/VM
-      RISC-V: KVM: Sort ISA extensions alphabetically in ONE_REG interface
+	struct kvm_memory_slot *slot;
 
-Daniel Henrique Barboza (10):
-      RISC-V: KVM: provide UAPI for host SATP mode
-      RISC-V: KVM: return ENOENT in *_one_reg() when reg is unknown
-      RISC-V: KVM: use ENOENT in *_one_reg() when extension is unavailable
-      RISC-V: KVM: do not EOPNOTSUPP in set_one_reg() zicbo(m|z)
-      RISC-V: KVM: do not EOPNOTSUPP in set KVM_REG_RISCV_TIMER_REG
-      RISC-V: KVM: use EBUSY when !vcpu->arch.ran_atleast_once
-      RISC-V: KVM: avoid EBUSY when writing same ISA val
-      RISC-V: KVM: avoid EBUSY when writing the same machine ID val
-      RISC-V: KVM: avoid EBUSY when writing the same isa_ext val
-      docs: kvm: riscv: document EBUSY in KVM_SET_ONE_REG
+	u64 pfn;
+	unsigned long hva;
+	bool map_writable;
+};
 
-Haibo Xu (6):
-      KVM: arm64: selftests: Move reject_set check logic to a function
-      KVM: arm64: selftests: Move finalize_vcpu back to run_test
-      KVM: selftests: Only do get/set tests on present blessed list
-      KVM: selftests: Add skip_set facility to get_reg_list test
-      KVM: riscv: Add KVM_GET_REG_LIST API support
-      KVM: riscv: selftests: Add get-reg-list test
+struct kvm_mmu_page {
+	struct list_head link;
+	struct hlist_node hash_link;
 
- Documentation/virt/kvm/api.rst                     |    4 +-
- arch/riscv/include/asm/csr.h                       |    2 +
- arch/riscv/include/asm/kvm_host.h                  |    9 +
- arch/riscv/include/asm/kvm_vcpu_vector.h           |    6 +-
- arch/riscv/include/uapi/asm/kvm.h                  |   16 +
- arch/riscv/kvm/Makefile                            |    1 +
- arch/riscv/kvm/aia.c                               |    4 +-
- arch/riscv/kvm/vcpu.c                              |  547 +---------
- arch/riscv/kvm/vcpu_fp.c                           |   12 +-
- arch/riscv/kvm/vcpu_onereg.c                       | 1051 ++++++++++++++++++++
- arch/riscv/kvm/vcpu_sbi.c                          |   16 +-
- arch/riscv/kvm/vcpu_timer.c                        |   11 +-
- arch/riscv/kvm/vcpu_vector.c                       |   72 +-
- tools/testing/selftests/kvm/Makefile               |   13 +-
- tools/testing/selftests/kvm/aarch64/get-reg-list.c |  554 ++---------
- tools/testing/selftests/kvm/get-reg-list.c         |  401 ++++++++
- .../testing/selftests/kvm/include/kvm_util_base.h  |   21 +
- .../selftests/kvm/include/riscv/processor.h        |    3 +
- tools/testing/selftests/kvm/include/test_util.h    |    2 +
- tools/testing/selftests/kvm/lib/test_util.c        |   15 +
- tools/testing/selftests/kvm/riscv/get-reg-list.c   |  872 ++++++++++++++++
- 21 files changed, 2547 insertions(+), 1085 deletions(-)
- create mode 100644 arch/riscv/kvm/vcpu_onereg.c
- create mode 100644 tools/testing/selftests/kvm/get-reg-list.c
- create mode 100644 tools/testing/selftests/kvm/riscv/get-reg-list.c
+	bool tdp_mmu_page;
+	bool unsync;
+	u8 mmu_valid_gen;
+	bool lpage_disallowed;
+
+	u32 role;
+	u64 gfn;
+
+	u64 *spt;
+
+	u64 *shadowed_translation;
+
+	int root_count;
+}
+
+kprobe:kvm_faultin_pfn
+{
+	$vcpu = (struct kvm_vcpu *)arg0;
+	$kvm = $vcpu->kvm;
+	$rip = $vcpu->arch.regs[16];
+
+	if (@last_rip[tid] == $rip) {
+		@same[tid]++
+	} else {
+		@same[tid] = 0;
+	}
+	@last_rip[tid] = $rip;
+
+	if (@same[tid] > 1000 && @same[tid] < 100000) {
+		$fault = (struct kvm_page_fault *)arg1;
+		$hva = -1;
+		$flags = 0;
+
+		@__vcpu[tid] = arg0;
+		@__fault[tid] = arg1;
+
+		if ($fault->slot != 0) {
+			$hva = $fault->slot->userspace_addr +
+			       (($fault->gfn - $fault->slot->base_gfn) << 12);
+			$flags = $fault->slot->flags;
+		}
+
+		printf("%s tid[%u] pid[%u] FAULTIN @ rip %lx (%lu hits), gpa = %lx, hva = %lx, flags = %lx : MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, $rip, @same[tid], $fault->addr, $hva, $flags,
+		       $kvm->mmu_invalidate_seq, $kvm->mmu_invalidate_in_progress,
+		       $kvm->mmu_invalidate_range_start, $kvm->mmu_invalidate_range_end);
+	} else {
+		@__vcpu[tid] = 0;
+		@__fault[tid] = 0;
+	}
+}
+
+kretprobe:kvm_faultin_pfn
+{
+	if (@__fault[tid] != 0) {
+		$vcpu = (struct kvm_vcpu *)@__vcpu[tid];
+		$kvm = $vcpu->kvm;
+		$fault = (struct kvm_page_fault *)@__fault[tid];
+		$hva = -1;
+		$flags = 0;
+
+		if ($fault->slot != 0) {
+			$hva = $fault->slot->userspace_addr +
+			       (($fault->gfn - $fault->slot->base_gfn) << 12);
+			$flags = $fault->slot->flags;
+		}
+
+		printf("%s tid[%u] pid[%u] FAULTIN_RET @ rip %lx (%lu hits), gpa = %lx, hva = %lx (%lx), flags = %lx, pfn = %lx, ret = %lu : MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
+		       $fault->addr, $hva, $fault->hva, $flags, $fault->pfn, retval,
+		       $kvm->mmu_invalidate_seq, $kvm->mmu_invalidate_in_progress,
+		       $kvm->mmu_invalidate_range_start, $kvm->mmu_invalidate_range_end);
+	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
+		printf("%s tid[%u] pid[%u] FAULTIN_ERROR @ rip %lx (%lu hits), ret = %lu\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid], retval);
+	}
+}
+
+kprobe:kvm_tdp_mmu_map
+{
+	$vcpu = (struct kvm_vcpu *)arg0;
+	$rip = $vcpu->arch.regs[16];
+
+	if (@last_rip[tid] == $rip) {
+		@same[tid]++
+	} else {
+		@same[tid] = 0;
+	}
+	@last_rip[tid] = $rip;
+
+	if (@__fault[tid] != 0) {
+	        $vcpu = (struct kvm_vcpu *)arg0;
+		$fault = (struct kvm_page_fault *)arg1;
+
+                if (@__vcpu[tid] != arg0 || @__fault[tid] != arg1) {
+                        printf("%s tid[%u] pid[%u] MAP_ERROR vcpu %lx vs. %lx, fault %lx vs. %lx\n",
+                               strftime("%H:%M:%S:%f", nsecs), tid, pid, @__vcpu[tid], arg0, @__fault[tid], arg1);
+                }
+
+		printf("%s tid[%u] pid[%u] MAP @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
+		       $fault->addr, $fault->hva, $fault->pfn);
+	} else {
+		@__vcpu[tid] = 0;
+		@__fault[tid] = 0;
+	}
+}
+
+kretprobe:kvm_tdp_mmu_map
+{
+	if (@__fault[tid] != 0) {
+		$vcpu = (struct kvm_vcpu *)@__vcpu[tid];
+		$fault = (struct kvm_page_fault *)@__fault[tid];
+		$hva = -1;
+		$flags = 0;
+
+		if ($fault->slot != 0) {
+			$hva = $fault->slot->userspace_addr +
+			       (($fault->gfn - $fault->slot->base_gfn) << 12);
+			$flags = $fault->slot->flags;
+		}
+
+		printf("%s tid[%u] pid[%u] MAP_RET @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx, ret = %lx\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
+		       $fault->addr, $fault->hva, $fault->pfn, retval);
+	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
+		printf("%s tid[%u] pid[%u] MAP_RET_ERROR @ rip %lx (%lu hits), ret = %lu\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid], retval);
+	}
+}
+
+kprobe:tdp_iter_start
+{
+	if (@__fault[tid] != 0) {
+                $vcpu = (struct kvm_vcpu *)@__vcpu[tid];
+		$fault = (struct kvm_page_fault *)@__fault[tid];
+	        $root = (struct kvm_mmu_page *)arg1;
+
+		printf("%s tid[%u] pid[%u] ITER @ rip %lx (%lu hits), gpa = %lx (%lx), hva = %lx, pfn = %lx, tdp_mmu = %u, role = %x, count = %d\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
+		       $fault->addr, arg3 << 12, $fault->hva, $fault->pfn,
+                       $root->tdp_mmu_page, $root->role, $root->root_count);
+	} else {
+		@__vcpu[tid] = 0;
+		@__fault[tid] = 0;
+	}
+}
+
+kprobe:make_mmio_spte
+{
+        if (@__fault[tid] != 0) {
+		$fault = (struct kvm_page_fault *)@__fault[tid];
+
+		printf("%s tid[%u] pid[%u] MMIO @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
+		       $fault->addr, $fault->hva, $fault->pfn);
+	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
+		printf("%s tid[%u] pid[%u] MMIO_ERROR @ rip %lx (%lu hits)\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid]);
+	}
+}
+
+kprobe:make_spte
+{
+        if (@__fault[tid] != 0) {
+		$fault = (struct kvm_page_fault *)@__fault[tid];
+
+		printf("%s tid[%u] pid[%u] SPTE @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
+		       $fault->addr, $fault->hva, $fault->pfn);
+	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
+		printf("%s tid[%u] pid[%u] SPTE_ERROR @ rip %lx (%lu hits)\n",
+		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid]);
+	}
+}
+
