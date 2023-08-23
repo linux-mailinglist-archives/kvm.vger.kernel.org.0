@@ -2,99 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F38267851C9
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 09:39:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 414E9785544
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 12:20:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233489AbjHWHjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 03:39:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59006 "EHLO
+        id S233376AbjHWKUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 06:20:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231991AbjHWHjX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 03:39:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B42E61
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 00:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692776239;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=u62nPwHcShighjmVk2GZlC7k3Viptp+NNP/1gOvS9nc=;
-        b=XD2xKlwnBjZg8WhoWpnQhUtpx2dyKfR3VPCg5aymeX0jN03zX45q6e6NOJs6Xhst0tEZWc
-        J2MECK9HEJ7DjR12f0PeLUdRLkWndAoUXVYyQ2qukLbdqpiAI5eK6p1ySM0k2BHJKiWLx4
-        JDUDzzLhW9LwqiNl8PaDLyCTaqRIdUM=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-441-YXYYzJ0YM6WOHWJi_fVesQ-1; Wed, 23 Aug 2023 03:37:16 -0400
-X-MC-Unique: YXYYzJ0YM6WOHWJi_fVesQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 407CB381AE57;
-        Wed, 23 Aug 2023 07:37:15 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E4311492C18;
-        Wed, 23 Aug 2023 07:37:14 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMARM <kvmarm@lists.linux.dev>,
-        ARMLinux <linux-arm-kernel@lists.infradead.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>,
-        Shaoqin Huang <shahuang@redhat.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v9 00/11] Enable writable for idregs DFR0,PFR0,
- MMFR{0,1,2,3}
-In-Reply-To: <20230821212243.491660-1-jingzhangos@google.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20230821212243.491660-1-jingzhangos@google.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 23 Aug 2023 09:37:13 +0200
-Message-ID: <878ra28b12.fsf@redhat.com>
+        with ESMTP id S232892AbjHWKUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 06:20:07 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985B193;
+        Wed, 23 Aug 2023 03:20:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692786003; x=1724322003;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=J/smH+od+JQo9e6T8OxoQJwtGe7Bs2VOOafthAAhtBs=;
+  b=ly7RPjJa9pPchWinWLJkwPPoX7NDIBTz6HcdkrMX2qVMrPb1LwTJYhlM
+   FkY5E07VyHjkSJ5OjDGguhmJDucfU0DDvaMnKc7iDeX+dG5ecNGetTtJx
+   yH1AGal06klx+X8nx5LQqi8KTC3opBLoW/ItZ5NEL0gIOBXv3YP40rJuy
+   +YseZMuZQRwybtVwnEJs3wH64hJX6CsfnARGk17RJUATJd5GcViVwTQgV
+   I+XZ+RJSmx3QWopPnYVaEYwDMbDSef8ehKVTKauNj3XY54z+v/8cettp6
+   FDXJUkhZLZcyZ/zO8L2N2n2l3mANqlEZtvb5p1KniHiBcdr/oB+cq93M7
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="377884496"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="377884496"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 03:20:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="730169336"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="730169336"
+Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 23 Aug 2023 03:19:57 -0700
+Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qYkxw-00016C-0r;
+        Wed, 23 Aug 2023 10:19:56 +0000
+Date:   Wed, 23 Aug 2023 18:19:40 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Huang Jiaqing <jiaqing.huang@intel.com>, kvm@vger.kernel.org,
+        iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
+        kevin.tian@intel.com, baolu.lu@linux.intel.com,
+        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@intel.com, jiaqing.huang@intel.com
+Subject: Re: [PATCH] iommu/vt-d: Introduce a rb_tree for looking up device
+Message-ID: <202308231801.6MtvqTmB-lkp@intel.com>
+References: <20230821071659.123981-1-jiaqing.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230821071659.123981-1-jiaqing.huang@intel.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 21 2023, Jing Zhang <jingzhangos@google.com> wrote:
+Hi Huang,
 
-> This patch series enable userspace writable for below idregs:
-> ID_AA64DFR0_EL1, ID_DFR0_EL1, ID_AA64PFR0_EL1, ID_AA64MMFR{0, 1, 2, 3}_EL1.
-> A vm ioctl is added to get feature ID register writable masks from userspace.
-> A selftest is added to verify that KVM handles the writings from user space
-> correctly.
-> A relevant patch from Oliver is picked from [3].
->
-> ---
->
-> * v8 -> v9
->   - Rebase on v6.5-rc7.
->   - Don't allow writable on RES0 fields and those fields not exposed by KVM.
->   - Fixed build dependency issue for system register definition generation in
->     selftest.
+kernel test robot noticed the following build warnings:
 
-What about the changes to the userspace interface as proposed by Marc in
-<86sf8hg45k.wl-maz@kernel.org>?
+[auto build test WARNING on v6.5-rc7]
+[also build test WARNING on linus/master]
+[cannot apply to joro-iommu/next next-20230823]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Huang-Jiaqing/iommu-vt-d-Introduce-a-rb_tree-for-looking-up-device/20230821-151945
+base:   v6.5-rc7
+patch link:    https://lore.kernel.org/r/20230821071659.123981-1-jiaqing.huang%40intel.com
+patch subject: [PATCH] iommu/vt-d: Introduce a rb_tree for looking up device
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20230823/202308231801.6MtvqTmB-lkp@intel.com/config)
+compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
+reproduce: (https://download.01.org/0day-ci/archive/20230823/202308231801.6MtvqTmB-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308231801.6MtvqTmB-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/iommu/intel/iommu.c:239:28: warning: no previous prototype for function 'device_rbtree_find' [-Wmissing-prototypes]
+   struct device_domain_info *device_rbtree_find(struct intel_iommu *iommu, u8 bus, u8 devfn)
+                              ^
+   drivers/iommu/intel/iommu.c:239:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   struct device_domain_info *device_rbtree_find(struct intel_iommu *iommu, u8 bus, u8 devfn)
+   ^
+   static 
+   1 warning generated.
+
+
+vim +/device_rbtree_find +239 drivers/iommu/intel/iommu.c
+
+   237	
+   238	
+ > 239	struct device_domain_info *device_rbtree_find(struct intel_iommu *iommu, u8 bus, u8 devfn)
+   240	{
+   241		struct device_domain_info *data = NULL;
+   242		struct rb_node *node;
+   243	
+   244		down_read(&iommu->iopf_device_sem);
+   245	
+   246		node = iommu->iopf_device_rbtree.rb_node;
+   247		while (node) {
+   248			data = container_of(node, struct device_domain_info, node);
+   249			s16 result = RB_NODE_CMP(bus, devfn, data->bus, data->devfn);
+   250	
+   251			if (result < 0)
+   252				node = node->rb_left;
+   253			else if (result > 0)
+   254				node = node->rb_right;
+   255			else
+   256				break;
+   257		}
+   258		up_read(&iommu->iopf_device_sem);
+   259	
+   260		return node ? data : NULL;
+   261	}
+   262	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
