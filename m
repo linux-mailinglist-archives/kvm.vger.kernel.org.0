@@ -2,55 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CD91784F64
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 05:41:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FE72784F7F
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 05:59:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232463AbjHWDlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 23:41:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        id S232503AbjHWD7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 23:59:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230518AbjHWDlx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 23:41:53 -0400
+        with ESMTP id S232206AbjHWD7U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 23:59:20 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40470CF2;
-        Tue, 22 Aug 2023 20:41:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C457E4D
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 20:59:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692762111; x=1724298111;
+  t=1692763158; x=1724299158;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=mjPtcCXgRvgnCKnH7d3zDGsxkc2orDuelhXK1xkyMoM=;
-  b=k5SPo/OH03ktUlsQKcEsvCnF0d5PqykoclecaO9IVPiaePC4VIp2Qt//
-   emNt3IGXfr3gBVsn2bSm1l89bx60khdExrfSylvzMQ4QCPcc/tEqFfHdE
-   5FRlAFyN0IBuqdcBiDYHmJ5ZkYBkiZ357K8clwpXf15TfLcSkB7paXdBJ
-   fdGEfQ0sGTDrDBlXPFfY1ER3Eza8zMyp+7E0AKz365kYQSWIo17C8Pl4q
-   7zyz6wxFMmcaLezPQED81kkoY05M2DomDZqMFOt47K5QjGfmnmF3Qrxbw
-   BUL9ZtDPSSpMoLnoJDjxeia7c0x9uuDte93d2gh32Awpo7dw/dLWP4XuK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="377811120"
+  bh=OfOKcDn12jJixf7HQHLas2JHhxjBtPqMOoB2H3L4wXQ=;
+  b=bIdI1MWpf8jht+EpnepAnxZs8jSlAQfLTBYHMjCE4gqQif5vBZO8GmJs
+   Ny7c1OqzcGywhmvneOmlieMIAyji4cPsGiQYgq5NmWh6pyrDHSqWF7QGE
+   C3j+bvCxf67gYEmIOBFGUp+6rDhMe56FDK33J1vpf5b1W/LxKNbBgTQS0
+   ny7wiPsg8O28Lf5dY8b99Ebp8VZxqyMT4KHnaIRmm7e1/4h/im+gRzuZk
+   u3BUBq/98coizVR62CVVRjWOqRTqxCHwsEM1fjvwZxjxv5Fu5Z/TnlLJL
+   tO+rLfHPm5h1Y2c2OfBfCZNJ6oLXYmJuS88x7E9h6d0pjnPhbtugWA5jd
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="377816087"
 X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="377811120"
+   d="scan'208";a="377816087"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 20:41:50 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 20:59:18 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="826561945"
+X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="826564613"
 X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="826561945"
+   d="scan'208";a="826564613"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 20:41:48 -0700
-Message-ID: <cf7c7ab6-0907-2eea-bf9c-0811f8ec6c59@intel.com>
-Date:   Wed, 23 Aug 2023 11:41:46 +0800
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 20:59:12 -0700
+Message-ID: <44c62f53-f066-d359-c980-5b24af11e6d7@intel.com>
+Date:   Wed, 23 Aug 2023 11:59:09 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Firefox/102.0 Thunderbird/102.14.0
-Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
+Subject: Re: [PATCH v2 08/58] i386/tdx: Adjust the supported CPUID based on
+ TDX restrictions
 Content-Language: en-US
-To:     Hao Xiang <hao.xiang@linux.alibaba.com>, kvm@vger.kernel.org
-Cc:     shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
-        seanjc@google.com, linux-kernel@vger.kernel.org
-References: <1692588151-33716-1-git-send-email-hao.xiang@linux.alibaba.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
+        Laszlo Ersek <lersek@redhat.com>, erdemaktas@google.com,
+        Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20230818095041.1973309-1-xiaoyao.li@intel.com>
+ <20230818095041.1973309-9-xiaoyao.li@intel.com>
+ <20230821230054.GB3642077@ls.amr.corp.intel.com>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <1692588151-33716-1-git-send-email-hao.xiang@linux.alibaba.com>
+In-Reply-To: <20230821230054.GB3642077@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -63,87 +81,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/21/2023 11:22 AM, Hao Xiang wrote:
-> For intel platform, The BzyMhz field of Turbostat shows zero
-> due to the missing of part msr bits of MSR_PLATFORM_INFO.
+On 8/22/2023 7:00 AM, Isaku Yamahata wrote:
+> On Fri, Aug 18, 2023 at 05:49:51AM -0400,
+> Xiaoyao Li <xiaoyao.li@intel.com> wrote:
 > 
-> Acquire necessary msr bits, and expose following msr info to guest,
-> to make sure guest can get correct turbo frequency info.
->
-> MSR_PLATFORM_INFO bits
-> bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
-> bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
-
-I'm curious. How are they related to turbo frequency info?
-
-bits 15:8, tell the Non-turbo frequency and bits 47:40 tells the min 
-frequency.
-
-> Signed-off-by: Hao Xiang <hao.xiang@linux.alibaba.com>
-> ---
->   arch/x86/include/asm/msr-index.h |  4 ++++
->   arch/x86/kvm/x86.c               | 25 ++++++++++++++++++++++++-
->   2 files changed, 28 insertions(+), 1 deletion(-)
+>> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+>> index 56cb826f6125..3198bc9fd5fb 100644
+>> --- a/target/i386/kvm/tdx.c
+>> +++ b/target/i386/kvm/tdx.c
+> ...
+>> +static inline uint32_t host_cpuid_reg(uint32_t function,
+>> +                                      uint32_t index, int reg)
+>> +{
+>> +    uint32_t eax, ebx, ecx, edx;
+>> +    uint32_t ret = 0;
+>> +
+>> +    host_cpuid(function, index, &eax, &ebx, &ecx, &edx);
+>> +
+>> +    switch (reg) {
+>> +    case R_EAX:
+>> +        ret |= eax;
+>> +        break;
+>> +    case R_EBX:
+>> +        ret |= ebx;
+>> +        break;
+>> +    case R_ECX:
+>> +        ret |= ecx;
+>> +        break;
+>> +    case R_EDX:
+>> +        ret |= edx;
 > 
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 1d11135..1c8a276 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -68,6 +68,10 @@
->   #define MSR_PLATFORM_INFO		0x000000ce
->   #define MSR_PLATFORM_INFO_CPUID_FAULT_BIT	31
->   #define MSR_PLATFORM_INFO_CPUID_FAULT		BIT_ULL(MSR_PLATFORM_INFO_CPUID_FAULT_BIT)
-> +/* MSR_PLATFORM_INFO bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO) */
-> +#define MSR_PLATFORM_INFO_MAX_NON_TURBO_LIM_RATIO	0x00000000ff00
-> +/* MSR_PLATFORM_INFO bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO) */
-> +#define MSR_PLATFORM_INFO_MAX_EFFICIENCY_RATIO		0xff0000000000
+> Nitpick: "|" isn't needed as we initialize ret = 0 above. Just '='.
 
-They are mask not the value, please name them with _MASK suffix.
+Will fix it in next version.
 
->   
->   #define MSR_IA32_UMWAIT_CONTROL			0xe1
->   #define MSR_IA32_UMWAIT_CONTROL_C02_DISABLE	BIT(0)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index c381770..621c3e1 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1679,6 +1679,29 @@ static u64 kvm_get_arch_capabilities(void)
->   	return data;
->   }
->   
-> +
-> +static u64 kvm_get_msr_platform_info(void)
-> +{
-> +	u64 msr_platform_info = 0;
-> +
-> +	rdmsrl_safe(MSR_PLATFORM_INFO, &msr_platform_info);
-> +	/*
-> +	 * MSR_PLATFORM_INFO bits:
-> +	 * bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
-> +	 * bit 31, CPUID Faulting Enabled (CPUID_FAULTING_EN)
-> +	 * bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
-> +	 *
-> +	 * Emulate part msr bits, expose above msr info to guest,
-> +	 * to make sure guest can get correct turbo frequency info.
-> +	 */
-> +
-> +	msr_platform_info &= (MSR_PLATFORM_INFO_MAX_NON_TURBO_RATIO |
-> +			MSR_PLATFORM_INFO_MAX_EFFICIENCY_RATIO);
-> +	msr_platform_info |= MSR_PLATFORM_INFO_CPUID_FAULT;
-> +
-> +	return msr_platform_info;
-> +}
-> +
->   static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
->   {
->   	switch (msr->index) {
-> @@ -11919,7 +11942,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->   		goto free_guest_fpu;
->   
->   	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
-> -	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
-> +	vcpu->arch.msr_platform_info = kvm_get_msr_platform_info();
->   	kvm_xen_init_vcpu(vcpu);
->   	kvm_vcpu_mtrr_init(vcpu);
->   	vcpu_load(vcpu);
-
+thanks!
