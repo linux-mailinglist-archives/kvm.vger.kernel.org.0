@@ -2,124 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28F96785A70
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 16:27:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78343785A87
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 16:31:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236368AbjHWO1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 10:27:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58064 "EHLO
+        id S236438AbjHWOb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 10:31:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233339AbjHWO07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 10:26:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C158EE6D
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 07:26:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692800775;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xnEXzn2y3iDWlgY1h5P4oZRrvMRBGOGB2OSW0swrWlM=;
-        b=N9BGCDxFMF+zXc7mo+c/RZ+kCB9A/LszRyRfRql12yzBAoZ7iPa3GnphNM3sF4wqsMfaFy
-        IcbIjqUvqFmy1uwLfk2NtgbI9HTSJxHs4wTW7FLFvovJhZ/11bTF1LXCF+YNuBOJNcNkOw
-        cACVMdfoPvjTkijAb9snDMywknnI3t4=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-274-p7fzlxCNPyCQdHTdYbA9Vg-1; Wed, 23 Aug 2023 10:26:11 -0400
-X-MC-Unique: p7fzlxCNPyCQdHTdYbA9Vg-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7907f181babso520106039f.2
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 07:26:11 -0700 (PDT)
+        with ESMTP id S236431AbjHWOb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 10:31:58 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95CB0E66
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 07:31:56 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-26b10a6da80so6047546a91.3
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 07:31:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692801116; x=1693405916;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p+7iLveG+eJzHBFrfOKuJ5YG6FqnmCVegyIJkjx3CJs=;
+        b=LzhZHLtB03/JJ1EFMYkoId7U63M6kz0rkZQdYP+DWvlThHHu5yYTmURkn+QTm93znp
+         aDmlh3jz/Z9a3dG9h7rQfpUWUDhMW/Me62S5jR/KVyHvk9sLCeI97HayzwHA4gHzgQDN
+         JKLH4SdNd2wo4dgiAf+TF2u4WIhjZ/xcMIbsPoRk5L3INLBE4eZt8mtQR3+ePM3qrgva
+         aMFnwJawtJQ7LQACF6LIeqPzftsTWoWcoVwiChA/qjkVeMf98TKJ9urswuYEhAVFejO/
+         FTdXmJezgzkc7mtO6slkhV1UEvepS6MvxgKg+fzpNbIwgfE0FUeh2Cjg1PbppcsOcBQ7
+         irnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692800771; x=1693405571;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xnEXzn2y3iDWlgY1h5P4oZRrvMRBGOGB2OSW0swrWlM=;
-        b=VhxYJkxIZfscHFFANzxN8pf6T5lBSa5pNjVvzVrECQYXytPFyBdIiFiRqkSymV5R7C
-         ib0sMEcQsoAJ6kxNpxNrMEYIXVsr4JZ99o+DCiArQdWUFkZUzZhGe6v46NWRLFNhwZtn
-         gSjy8lwmPUAzxX6tkKP67HCYUHrqmWAydHHBP2p7mKWqQ/ax6IwfSQ8OCKtUhyO1uO6v
-         Ah81Nca4f+joxl+GX9tXvXC+WYQIh05cvUeO1h2DzB4ZVkw0f2Qp1PjVTcYJsxQ9roKV
-         6EPDSNK61kyxurt5nn8bWs+Rpi3CM0k4h8Ts6lyU3kDG5hE2aZhU2LqUDzLkaHSdg4n1
-         cz+Q==
-X-Gm-Message-State: AOJu0Yw5JB12JuPwuwG2ysyTRPhqRw7hfh3u9Hkk8weHFVEsYgVzs98q
-        a5JdnYAhuzA3zinHmxvRidvikPtB9qAf2r//jr2kd4Brb1YZrRkbdp5cPnH6EHz/OpNgEUVCujP
-        NWkqkk6uqNmE+
-X-Received: by 2002:a6b:720b:0:b0:787:8d2:e0c with SMTP id n11-20020a6b720b000000b0078708d20e0cmr3146129ioc.12.1692800770863;
-        Wed, 23 Aug 2023 07:26:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF01ICWqFHwLoVEr+m4RVo7T8U8PPG+t9CKdbKB3dT5STz1Cr0meVQgpxup5diHeDwWcJElIw==
-X-Received: by 2002:a6b:720b:0:b0:787:8d2:e0c with SMTP id n11-20020a6b720b000000b0078708d20e0cmr3146112ioc.12.1692800770642;
-        Wed, 23 Aug 2023 07:26:10 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id eq8-20020a0566384e2800b0042b4437d857sm3872718jab.106.2023.08.23.07.26.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 07:26:10 -0700 (PDT)
-Date:   Wed, 23 Aug 2023 08:26:08 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Ankit Agrawal <ankita@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        Aniket Agashe <aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>,
-        Vikram Sethi <vsethi@nvidia.com>,
-        Andy Currid <acurrid@nvidia.com>,
-        Alistair Popple <apopple@nvidia.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dan Williams <danw@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for
- grace hopper
-Message-ID: <20230823082608.2867b73e.alex.williamson@redhat.com>
-In-Reply-To: <BY5PR12MB37635FB280AECC6A4CF59431B01CA@BY5PR12MB3763.namprd12.prod.outlook.com>
-References: <20230822202303.19661-1-ankita@nvidia.com>
-        <ZOYP92q1mDQgwnc9@nvidia.com>
-        <BY5PR12MB37635FB280AECC6A4CF59431B01CA@BY5PR12MB3763.namprd12.prod.outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        d=1e100.net; s=20221208; t=1692801116; x=1693405916;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=p+7iLveG+eJzHBFrfOKuJ5YG6FqnmCVegyIJkjx3CJs=;
+        b=bbo7gRYnsg30TZyLt3U22NFJD4PuK4mJJFRvfQtpn7iLqgqMNQDmvk9aQqhB/Jrz0E
+         gHqWHg6hDAcB/pCzMYS8f9qFMoaRfyFDXy39y6XRqWUdb5ieMQ4DnnRQcBtYecoVGRRG
+         jSH2M3WA+cJzUHHFHqXGXPKLzHT5JHhjTCWRqOJYZYozV3twm2YN5JrfI+kPjTlCQm4Y
+         3iuoFfHt2qmlo91IkoRmxwPMURZtetiTV8B4efEa7hWFdbSG89J2RizFh2t3baqVWtjp
+         bOgbcG8UShlzSZ3oCV1sxo92VOCQluknhGsUEzwCFzxCIwNZCzyLyAYmh90LIIlqyCdG
+         l5Wg==
+X-Gm-Message-State: AOJu0YwYMq3HR+juSXRxF7kePZM5RlMx1N9/dfwo7TTDpGFiXB6xLU4l
+        diGlpCekcdDtDWgFYbiK+7ZI2bYEbvk=
+X-Google-Smtp-Source: AGHT+IGtI7MXslrycISJQNQJ0AoAcyzbEKDIHnO0byuO9FAEJ+E63W5Ojv9JmpsztfJ4GL1dF8FIqVWO81w=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:30cb:b0:268:1be1:b835 with SMTP id
+ hi11-20020a17090b30cb00b002681be1b835mr2918260pjb.2.1692801116013; Wed, 23
+ Aug 2023 07:31:56 -0700 (PDT)
+Date:   Wed, 23 Aug 2023 14:31:54 +0000
+In-Reply-To: <498ee0c4-4736-68a7-7cbf-12e54f6a0d22@intel.com>
+Mime-Version: 1.0
+References: <1692588392-58155-1-git-send-email-hao.xiang@linux.alibaba.com>
+ <ZOMWM+YmScUG3U5W@chao-email> <6d10dcf7-7912-25a2-8d8e-ef7d71a4ce83@linux.alibaba.com>
+ <ZOM/8IVsRf3esyQ1@chao-email> <33f0e9bb-da79-6f32-f1c3-816eb37daea6@linux.alibaba.com>
+ <ZOOMwvPd/Cz/cEmv@google.com> <498ee0c4-4736-68a7-7cbf-12e54f6a0d22@intel.com>
+Message-ID: <ZOYYFPrQSPUjS7kk@google.com>
+Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Hao Xiang <hao.xiang@linux.alibaba.com>,
+        Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
+        shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
+        linux-kernel@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Aug 2023 14:18:52 +0000
-Ankit Agrawal <ankita@nvidia.com> wrote:
+On Wed, Aug 23, 2023, Xiaoyao Li wrote:
+> On 8/22/2023 12:11 AM, Sean Christopherson wrote:
+> > > Set these msr bits (needed by turbostat on intel platform) in KVM by
+> > > default.  Of cource, QEMU can also set MSR value by need. It does not
+> > > conflict.
+> >=20
+> > It doesn't conflict per se, but it's still problematic.  By stuffing a =
+default
+> > value, KVM _forces_ userspace to override the MSR to align with the top=
+ology and
+> > CPUID defined by userspace.
+>=20
+> I don't understand how this MSR is related to topology and CPUID?
 
-> >> +
-> >> +     /*
-> >> +      * Handle read on the BAR2 region. Map to the target device memory
-> >> +      * physical address and copy to the request read buffer.
-> >> +      */
-> >> +     if (copy_to_user(buf, (u8 *)addr + offset, read_count))
-> >> +             return -EFAULT;  
-> >
-> > Just to verify, does this memory allow access of arbitrary alignment
-> > and size?  
-> 
-> Please correct me if I'm wrong, but based on following gdb dump data on
-> the corresponding MemoryRegion->ops, unaligned access isn't supported, and
-> a read of size upto 8 may be done. 
-> 
-> (gdb) p/x *(mr->ops)
-> $7 = {read = 0xaaab5e0b1c50, write = 0xaaab5e0b1a50, read_with_attrs = 0x0, write_with_attrs = 0x0,
->   endianness = 0x2, valid = {min_access_size = 0x1, max_access_size = 0x8, unaligned = 0x0, accepts = 0x0},
->   impl = {min_access_size = 0x1, max_access_size = 0x8, unaligned = 0x0}}
+Heh, looked at the SDM to double check myself, and the first hit when searc=
+hing
+for MSR_PLATFORM_INFO says:
 
-This is QEMU policy relative to this region, the kernel interface is
-not exclusive to QEMU usage.  Thanks,
+  When TSC scaling is enabled for a guest using Intel PT, the VMM should en=
+sure
+  that the value of Maximum Non-Turbo Ratio[15:8] in MSR_PLATFORM_INFO (MSR=
+ 0CEH)
+  and the TSC/=E2=80=9Dcore crystal clock=E2=80=9D ratio (EBX/EAX) in CPUID=
+ leaf 15H are set in
+  a manner consistent with the resulting TSC rate that will be visible to t=
+he VM.
 
-Alex
+As Chao pointed out, the MSR is technically per package, so a weird setup c=
+ould
+have sockets with different frequencies, or enumerate a virtual topology to=
+ the
+guest with such a configuration.  I doubt/hope no one actually does somethi=
+ng
+like that, but it's theoretically possible, and one of the many reasons why=
+ KVM
+needs to stay out of the way and let userspace define the vCPU model.
 
+> > And if userspace uses KVM's "default" CPUID, or lack thereof, using the
+> > underlying values from hardware are all but guaranteed to be wrong.
+>=20
+> Could you please elaborate?
+
+I guess an empty CPUID would probably be ok?  If there's no CPUID.0x15, it =
+can't
+be wrong.  It's largely a moot point though, I highly doubt anyone runs a "=
+real"
+VM without populating _something_ in guest CPUID.
