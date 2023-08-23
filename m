@@ -2,469 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B169E78636E
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 00:33:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F6B7863E9
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 01:22:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238668AbjHWWcs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 18:32:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40744 "EHLO
+        id S238487AbjHWXV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 19:21:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238676AbjHWWcX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 18:32:23 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB94D10CA
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 15:32:18 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 5660385;
-        Wed, 23 Aug 2023 15:32:18 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id 5goesHBvQUZx; Wed, 23 Aug 2023 15:32:13 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id 754D548;
-        Wed, 23 Aug 2023 15:32:13 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 754D548
-Date:   Wed, 23 Aug 2023 15:32:13 -0700 (PDT)
-From:   Eric Wheeler <kvm@lists.ewheeler.net>
-To:     Sean Christopherson <seanjc@google.com>
-cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
+        with ESMTP id S236710AbjHWXV3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 19:21:29 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD97E5F
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 16:21:26 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-cf4cb742715so7012978276.2
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 16:21:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692832885; x=1693437685;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rpLC9clh3aho8QzOtmAgfvKrN+/XGvak1AmvjxHFfxs=;
+        b=up/mMiM6kiXyJexbp8QMQgcI46X7A2KAdkVTn7kM5VtqtIrVtYYa+HfU8mzsXIQicC
+         2Bde4VNLwHIKsgef4xKpNsvc0UNevOf9I7Iy/cbbYfPloZ5H762x1cASaEIGG8JKh+8A
+         SQfJx0F1wsgkXKpswgPA8Yd5OlUB3qvncgMQQfFRR65gPN/qEBtWPr4LfafCtLlmyUjh
+         WD0+1y1cBLGxs0EuAk8qqWRlDVOPAgWEjOb4BSkEeYO1ravW6Jrolg4cHDEZE7u82E4z
+         QL1Y7ZWENaJcK3HZvdX3NeC+WA/PBUYReGh9MudDD+zNejsNz1Kw49x1MWJlVeTZEoMV
+         MXHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692832885; x=1693437685;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rpLC9clh3aho8QzOtmAgfvKrN+/XGvak1AmvjxHFfxs=;
+        b=bqGEVqaz77/hCy7lypzA76Jttu17+a/vM8imYQg+odf5sAuyTrhSHy35PEJBmFSdof
+         MjotJ3aiX5Vt6zzcpXNa8iOdwVmGtObhQasQmlTiKnphWakwqv841+BOXhBNNiQ+qSpi
+         b2/GDfUEwZpwJwWh2wIfqWx6bHE+etzqhkPu41Ezv8xpdS+/9sU1wnPbU5Om8Cp6/Ftj
+         jlFo4/6RQvwfoI1khSBeEQLOsWIvvR35bnl38rfa/PJV3W+ZB2So6LrlvT+PbRnLaeWg
+         mBI/vT2yCgIyAfPCTjAJ0uwjwcsr1+jHugZqn2gf9ZBg9wTxKuAWkT2eTwXFowiVWDxk
+         qM1w==
+X-Gm-Message-State: AOJu0YwSfjf2rZha7qDIlUPBIbr0QkKKpKfollROxfXFI0VMqONvXtSP
+        6YszTiJ3Kfk23TFTYMb2PUCFa2pt1r4=
+X-Google-Smtp-Source: AGHT+IERLyKMXAzftilm99T/yvQp2Pp8XnzsSLFwilBI2KE63z8HtaMZl5rZqHu0Pau6KYZjQtT6bAfbu/c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:209:0:b0:cb6:6c22:d0f8 with SMTP id
+ 9-20020a250209000000b00cb66c22d0f8mr180135ybc.4.1692832885769; Wed, 23 Aug
+ 2023 16:21:25 -0700 (PDT)
+Date:   Wed, 23 Aug 2023 16:21:24 -0700
+In-Reply-To: <347d3526-7f8d-4744-2a9c-8240cc556975@ewheeler.net>
+Mime-Version: 1.0
+References: <ZN+BRjUxouKiDSbx@google.com> <418345e5-a3e5-6e8d-395a-f5551ea13e2@ewheeler.net>
+ <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net> <ZOP4lwiMU2Uf89eQ@google.com>
+ <468b1298-e43e-2397-5f3-4b6af6e2f461@ewheeler.net> <ZOTQPUk5kxskDcsi@google.com>
+ <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net> <ZOZH3xe0u4NHhvL8@google.com>
+ <db7c65b-6530-692-5e50-c74a7757f22@ewheeler.net> <347d3526-7f8d-4744-2a9c-8240cc556975@ewheeler.net>
+Message-ID: <ZOaUdP46f8XjQvio@google.com>
 Subject: Re: Deadlock due to EPT_VIOLATION
-In-Reply-To: <db7c65b-6530-692-5e50-c74a7757f22@ewheeler.net>
-Message-ID: <347d3526-7f8d-4744-2a9c-8240cc556975@ewheeler.net>
-References: <5e678d57-66b-a18d-f97e-b41357fdb7f@ewheeler.net> <ZN5lD5Ro9LVgTA6M@google.com> <3ee6ddd4-74ad-9660-e3e5-a420a089ea54@ewheeler.net> <ZN+BRjUxouKiDSbx@google.com> <418345e5-a3e5-6e8d-395a-f5551ea13e2@ewheeler.net> <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net>
- <ZOP4lwiMU2Uf89eQ@google.com> <468b1298-e43e-2397-5f3-4b6af6e2f461@ewheeler.net> <ZOTQPUk5kxskDcsi@google.com> <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net> <ZOZH3xe0u4NHhvL8@google.com> <db7c65b-6530-692-5e50-c74a7757f22@ewheeler.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-        autolearn=ham autolearn_force=no version=3.4.6
+From:   Sean Christopherson <seanjc@google.com>
+To:     Eric Wheeler <kvm@lists.ewheeler.net>
+Cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Aug 2023, Eric Wheeler wrote:
-> On Wed, 23 Aug 2023, Sean Christopherson wrote:
-> > On Tue, Aug 22, 2023, Eric Wheeler wrote:
-> > > On Tue, 22 Aug 2023, Sean Christopherson wrote:
-> > > > > Here is the whole log with 500,000+ lines over 5 minutes of recording, it 
-> > > > > was first stuck on one vcpu for most of the time, and toward the end it 
-> > > > > was stuck on a different VCPU:
-> > > > > 
-> > > > > The file starts with 555,596 occurances of vcpu=ffff9964cdc48000 and is 
-> > > > > then followed by 31,784 occurances of vcpu=ffff9934ed50c680.  As you can 
-> > > > > see in the file, they are not interleaved:
-> > > > > 
-> > > > > 	https://www.linuxglobal.com/out/handle_ept_violation.log2
-> > > > > 
-> > > > >   # awk '{print $3}' handle_ept_violation.log2 |uniq -c
-> > > > >    555596 vcpu=ffff9964cdc48000
-> > > > >     31784 vcpu=ffff9934ed50c680
-> > > > 
-> > > > Hrm, but the address range being invalidated is changing.  Without seeing the
-> > > > guest RIP, or even a timestamp, it's impossible to tell if the vCPU is well and
-> > > > truly stuck or if it's just getting thrashed so hard by NUMA balancing or KSM
-> > > > that it looks stuck.
-> > > > 
-> > > > Drat.
-> > > > 
-> > > > > > Below is another bpftrace program that will hopefully shrink the 
-> > > > > > haystack to the point where we can find something via code inspection.
-> > > > > 
-> > > > > Ok thanks, we'll give it a try.
-> > > > 
-> > > > Try this version instead.  It's more comprehensive and more precise, e.g. should
-> > > > only trigger on the guest being 100% stuck, and also fixes a PID vs. TID goof.
-> > > > 
-> > > > Note!  Enable trace_kvm_exit before/when running this to ensure KVM grabs the guest RIP
-> > > > from the VMCS.  Without that enabled, RIP from vcpu->arch.regs[16] may be stale.
-> > > 
-> > > Ok, we got a 740MB log, zips down to 25MB if you would like to see the
-> > > whole thing, it is here:
-> > > 	http://linuxglobal.com/out/handle_ept_violation-v2.log.gz
-> > > 
-> > > For brevity, here is a sample of each 100,000th line:
-> > > 
-> > > # zcat handle_ept_violation-v2.log.gz | perl -lne '!($n++%100000) && print'
-> > > Attaching 3 probes...
-> > > 00:30:31:347560 tid[553909] pid[553848] stuck @ rip ffffffff80094a41 (375972 hits), gpa = 294a41, hva = 7efc5b094000 : MMU seq = 8000b139, in-prog = 0, start = 7efc6e10f000, end = 7efc6e110000
-> > 
-> > Argh.  I'm having a bit of a temper tantrum because I forgot to have the printf
-> > spit out the memslot flags.  And I apparently gave you a version without a probe
-> > on kvm_tdp_mmu_map().  Grr.
-> > 
-> > Can you capture one more trace?  Fingers crossed this is the last one.  
+On Wed, Aug 23, 2023, Eric Wheeler wrote:
+> 22:23:31:481644 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1196 hits), gpa = cf7b000, hva = 7f6d24f7b000, pfn = 1e35fc6
+> 22:23:31:481645 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1196 hits), gpa = cf7b000, hva = 7f6d24f7b000, pfn = 1e35fc6, ret = 4
+> 22:23:31:481650 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000, hva = 7f6d24f7c000, flags = 0 : MMU seq = 4724e, in-prog = 0, start = 7f6d24f7b000, end = 7f6d24f7c000
+> 22:23:31:481653 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000 (cf7c000), hva = 7f6d24f7c000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
+> 22:23:31:481658 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000 (cf7c000), hva = 7f6d24f7c000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481660 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000, hva = 7f6d24f7c000 (7f6d24f7c000), flags = 0, pfn = 1ee7439, ret = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
+> 22:23:31:481665 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1198 hits), gpa = cf7c000, hva = 7f6d24f7c000, flags = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
+> 22:23:31:481666 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1198 hits), gpa = cf7c000, hva = 7f6d24f7c000 (7f6d24f7c000), flags = 0, pfn = 1ee7439, ret = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
+> 22:23:31:481667 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000, hva = 7f6d24f7c000, pfn = 1ee7439
+> 22:23:31:481668 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000 (cf7c000), hva = 7f6d24f7c000, pfn = 1ee7439, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481669 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000, hva = 7f6d24f7c000, pfn = 1ee7439
+> 22:23:31:481670 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000, hva = 7f6d24f7c000, pfn = 1ee7439, ret = 4
+> 22:23:31:481673 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000, hva = 7f6d24f7d000, flags = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
+> 22:23:31:481676 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000 (cf7d000), hva = 7f6d24f7d000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
+> 22:23:31:481677 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000 (cf7d000), hva = 7f6d24f7d000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481678 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000, hva = 7f6d24f7d000 (7f6d24f7d000), flags = 0, pfn = 4087d5, ret = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
+> 22:23:31:481682 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1201 hits), gpa = cf7d000, hva = 7f6d24f7d000, flags = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
+> 22:23:31:481683 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1201 hits), gpa = cf7d000, hva = 7f6d24f7d000 (7f6d24f7d000), flags = 0, pfn = 4087d5, ret = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
+> 22:23:31:481684 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000, hva = 7f6d24f7d000, pfn = 4087d5
+> 22:23:31:481684 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000 (cf7d000), hva = 7f6d24f7d000, pfn = 4087d5, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481685 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000, hva = 7f6d24f7d000, pfn = 4087d5
+> 22:23:31:481686 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000, hva = 7f6d24f7d000, pfn = 4087d5, ret = 4
+> 22:23:31:481689 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000, hva = 7f6d24f7e000, flags = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
+> 22:23:31:481691 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000 (cf7e000), hva = 7f6d24f7e000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
+> 22:23:31:481692 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000 (cf7e000), hva = 7f6d24f7e000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481694 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000, hva = 7f6d24f7e000 (7f6d24f7e000), flags = 0, pfn = 51c5ee, ret = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
+> 22:23:31:481697 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1204 hits), gpa = cf7e000, hva = 7f6d24f7e000, flags = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
+> 22:23:31:481698 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1204 hits), gpa = cf7e000, hva = 7f6d24f7e000 (7f6d24f7e000), flags = 0, pfn = 51c5ee, ret = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
+> 22:23:31:481699 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000, hva = 7f6d24f7e000, pfn = 51c5ee
+> 22:23:31:481699 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000 (cf7e000), hva = 7f6d24f7e000, pfn = 51c5ee, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481700 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000, hva = 7f6d24f7e000, pfn = 51c5ee
+> 22:23:31:481701 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000, hva = 7f6d24f7e000, pfn = 51c5ee, ret = 4
+> 22:23:31:481703 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000, hva = 7f6d24f7f000, flags = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
+> 22:23:31:481706 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000 (cf7f000), hva = 7f6d24f7f000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
+> 22:23:31:481707 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000 (cf7f000), hva = 7f6d24f7f000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481708 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000, hva = 7f6d24f7f000 (7f6d24f7f000), flags = 0, pfn = 1ee50ee, ret = 0 : MMU seq = 47252, in-prog = 0, start = 7f6d24f7f000, end = 7f6d24f80000
+> 22:23:31:481712 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1207 hits), gpa = cf7f000, hva = 7f6d24f7f000, flags = 0 : MMU seq = 47252, in-prog = 0, start = 7f6d24f7f000, end = 7f6d24f80000
+> 22:23:31:481712 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1207 hits), gpa = cf7f000, hva = 7f6d24f7f000 (7f6d24f7f000), flags = 0, pfn = 1ee50ee, ret = 0 : MMU seq = 47252, in-prog = 0, start = 7f6d24f7f000, end = 7f6d24f80000
+> 22:23:31:481714 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000, hva = 7f6d24f7f000, pfn = 1ee50ee
+> 22:23:31:481714 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000 (cf7f000), hva = 7f6d24f7f000, pfn = 1ee50ee, tdp_mmu = 1, role = 3784, count = 1
+> 22:23:31:481715 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000, hva = 7f6d24f7f000, pfn = 1ee50ee
+> 22:23:31:481716 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000, hva = 7f6d24f7f000, pfn = 1ee50ee, ret = 4
 
+This vCPU is making forward progress, it just happens to be taken lots of fualts
+on a single RIP.  MAP_RET's "ret = 4" means KVM did inded "fix" the fault, and
+the faulting GPA/HVA is changing on every fault.  Best guess is that the guest
+is zeroing a hugepage, but the guest's 2MiB page is mapped with 4KiB EPT entries,
+i.e. the vCPU is doing REP STOS on a 2MiB region.
 
-See the previous email too, because it had >90k hits:
-	* >90k hits: http://linuxglobal.com/out/handle_ept_violation-v3.log.gz
+> > 21:25:50:282711 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92234 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282714 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92235 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282720 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92237 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282723 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92238 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282726 tid[3484173] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (92239 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
 
-However, this one has different content (not just FAULTs), but it has only 1k hits:
-	* >1k hits: http://linuxglobal.com/out/handle_ept_violation-v3-2.log.gz
+...
 
-22:23:31:481644 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1196 hits), gpa = cf7b000, hva = 7f6d24f7b000, pfn = 1e35fc6
-22:23:31:481645 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1196 hits), gpa = cf7b000, hva = 7f6d24f7b000, pfn = 1e35fc6, ret = 4
-22:23:31:481650 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000, hva = 7f6d24f7c000, flags = 0 : MMU seq = 4724e, in-prog = 0, start = 7f6d24f7b000, end = 7f6d24f7c000
-22:23:31:481653 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000 (cf7c000), hva = 7f6d24f7c000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
-22:23:31:481658 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000 (cf7c000), hva = 7f6d24f7c000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481660 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1197 hits), gpa = cf7c000, hva = 7f6d24f7c000 (7f6d24f7c000), flags = 0, pfn = 1ee7439, ret = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
-22:23:31:481665 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1198 hits), gpa = cf7c000, hva = 7f6d24f7c000, flags = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
-22:23:31:481666 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1198 hits), gpa = cf7c000, hva = 7f6d24f7c000 (7f6d24f7c000), flags = 0, pfn = 1ee7439, ret = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
-22:23:31:481667 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000, hva = 7f6d24f7c000, pfn = 1ee7439
-22:23:31:481668 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000 (cf7c000), hva = 7f6d24f7c000, pfn = 1ee7439, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481669 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000, hva = 7f6d24f7c000, pfn = 1ee7439
-22:23:31:481670 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1199 hits), gpa = cf7c000, hva = 7f6d24f7c000, pfn = 1ee7439, ret = 4
-22:23:31:481673 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000, hva = 7f6d24f7d000, flags = 0 : MMU seq = 4724f, in-prog = 0, start = 7f6d24f7c000, end = 7f6d24f7d000
-22:23:31:481676 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000 (cf7d000), hva = 7f6d24f7d000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
-22:23:31:481677 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000 (cf7d000), hva = 7f6d24f7d000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481678 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1200 hits), gpa = cf7d000, hva = 7f6d24f7d000 (7f6d24f7d000), flags = 0, pfn = 4087d5, ret = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
-22:23:31:481682 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1201 hits), gpa = cf7d000, hva = 7f6d24f7d000, flags = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
-22:23:31:481683 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1201 hits), gpa = cf7d000, hva = 7f6d24f7d000 (7f6d24f7d000), flags = 0, pfn = 4087d5, ret = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
-22:23:31:481684 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000, hva = 7f6d24f7d000, pfn = 4087d5
-22:23:31:481684 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000 (cf7d000), hva = 7f6d24f7d000, pfn = 4087d5, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481685 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000, hva = 7f6d24f7d000, pfn = 4087d5
-22:23:31:481686 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1202 hits), gpa = cf7d000, hva = 7f6d24f7d000, pfn = 4087d5, ret = 4
-22:23:31:481689 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000, hva = 7f6d24f7e000, flags = 0 : MMU seq = 47250, in-prog = 0, start = 7f6d24f7d000, end = 7f6d24f7e000
-22:23:31:481691 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000 (cf7e000), hva = 7f6d24f7e000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
-22:23:31:481692 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000 (cf7e000), hva = 7f6d24f7e000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481694 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1203 hits), gpa = cf7e000, hva = 7f6d24f7e000 (7f6d24f7e000), flags = 0, pfn = 51c5ee, ret = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
-22:23:31:481697 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1204 hits), gpa = cf7e000, hva = 7f6d24f7e000, flags = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
-22:23:31:481698 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1204 hits), gpa = cf7e000, hva = 7f6d24f7e000 (7f6d24f7e000), flags = 0, pfn = 51c5ee, ret = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
-22:23:31:481699 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000, hva = 7f6d24f7e000, pfn = 51c5ee
-22:23:31:481699 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000 (cf7e000), hva = 7f6d24f7e000, pfn = 51c5ee, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481700 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000, hva = 7f6d24f7e000, pfn = 51c5ee
-22:23:31:481701 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1205 hits), gpa = cf7e000, hva = 7f6d24f7e000, pfn = 51c5ee, ret = 4
-22:23:31:481703 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000, hva = 7f6d24f7f000, flags = 0 : MMU seq = 47251, in-prog = 0, start = 7f6d24f7e000, end = 7f6d24f7f000
-22:23:31:481706 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000 (cf7f000), hva = 7f6d24f7f000, pfn = 0, tdp_mmu = 1, role = 3784, count = 2
-22:23:31:481707 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000 (cf7f000), hva = 7f6d24f7f000, pfn = 0, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481708 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1206 hits), gpa = cf7f000, hva = 7f6d24f7f000 (7f6d24f7f000), flags = 0, pfn = 1ee50ee, ret = 0 : MMU seq = 47252, in-prog = 0, start = 7f6d24f7f000, end = 7f6d24f80000
-22:23:31:481712 tid[142943] pid[142917] FAULTIN @ rip ffffffffa43ce877 (1207 hits), gpa = cf7f000, hva = 7f6d24f7f000, flags = 0 : MMU seq = 47252, in-prog = 0, start = 7f6d24f7f000, end = 7f6d24f80000
-22:23:31:481712 tid[142943] pid[142917] FAULTIN_RET @ rip ffffffffa43ce877 (1207 hits), gpa = cf7f000, hva = 7f6d24f7f000 (7f6d24f7f000), flags = 0, pfn = 1ee50ee, ret = 0 : MMU seq = 47252, in-prog = 0, start = 7f6d24f7f000, end = 7f6d24f80000
-22:23:31:481714 tid[142943] pid[142917] MAP @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000, hva = 7f6d24f7f000, pfn = 1ee50ee
-22:23:31:481714 tid[142943] pid[142917] ITER @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000 (cf7f000), hva = 7f6d24f7f000, pfn = 1ee50ee, tdp_mmu = 1, role = 3784, count = 1
-22:23:31:481715 tid[142943] pid[142917] SPTE @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000, hva = 7f6d24f7f000, pfn = 1ee50ee
-22:23:31:481716 tid[142943] pid[142917] MAP_RET @ rip ffffffffa43ce877 (1208 hits), gpa = cf7f000, hva = 7f6d24f7f000, pfn = 1ee50ee, ret = 4
-@__fault[142943]: 0
-@__fault[212784]: 0
-@__vcpu[142943]: 0
-@__vcpu[212784]: 0
-@last_rip[142943]: 4634265
-@last_rip[212784]: 18446735293648697744
-@same[212784]: 1
-@same[142943]: 20
+> > 21:25:50:282354 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90073 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282418 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90087 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282475 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90100 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282507 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90107 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282524 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90111 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282528 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90112 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282557 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90118 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
+> > 21:25:50:282571 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90121 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
 
+These vCPUs (which belong to the same VM) appear to be well and truly stuck.  The
+fact that you got prints from MAP, MAP_RET, ITER, and SPTE for an unrelated (and
+not stuck) vCPU is serendipitious, as it all but guarantees that the trace is
+"good", i.e. that MAP prints aren't missing because the bpf program is bad.
 
+Since the mmu_notifier info is stable (though the seq is still *insanely* high),
+assuming there's no kernel memory corruption, that means that KVM is bailing
+because is_page_fault_stale() returns true.  Based on v5.15 being the last known
+good kernel for you, that places the blame squarerly on commit
+a955cad84cda ("KVM: x86/mmu: Retry page fault if root is invalidated by memslot update").
+Note, that commit had an unrelated but fixed by 18c841e1f411 ("KVM: x86: Retry
+page fault if MMU reload is pending and root has no sp"), but all flavors of v6.1
+have said fix and the bug caused a crash, not stuck vCPUs.
 
---
-Eric Wheeler
+The "MMU seq = 8002dc25" value still gives me pause.  It's one hell of a coincidence
+that all stuck vCPUs have had a sequence counter of 0x800xxxxx.
 
+<time goes by as I keep staring>
 
-> 
-> Here it is: http://linuxglobal.com/out/handle_ept_violation-v3.log.gz
-> 
-> Here are the highlights:
-> 
-> # zcat handle_ept_violation-v3.log.gz | grep 3484173 | tail -n30
-> 21:25:50:282711 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92234 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282714 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92235 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282720 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92237 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282723 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92238 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282726 tid[3484173] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (92239 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282743 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92245 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282749 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92247 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282752 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92248 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282755 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92249 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282769 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92254 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282775 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92256 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282778 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92257 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282784 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92259 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282804 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92266 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282813 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92269 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282816 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92270 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282822 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92272 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282825 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92273 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282831 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92275 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282837 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92277 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282845 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92280 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282854 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92283 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282857 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92284 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282863 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92286 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282866 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92287 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282869 tid[3484173] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (92288 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> @__fault[3484173]: 0
-> @__vcpu[3484173]: 0
-> @last_rip[3484173]: 18446744071583984805
-> @same[3484173]: 11615602
-> 
-> 
-> # zcat handle_ept_violation-v3.log.gz | grep 3484174 | tail -n30
-> 21:25:50:282354 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90073 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282418 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90087 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282475 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90100 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282507 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90107 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282524 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90111 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282528 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90112 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282557 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90118 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282571 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90121 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282660 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90141 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282670 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90143 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282684 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90146 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282693 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90148 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282731 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90156 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282735 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90157 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282739 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90158 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282759 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90162 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282764 tid[3484174] pid[3484149] FAULTIN_RET @ rip ffffffff814e6ca5 (90163 hits), gpa = 1343fa0b0, hva = 7feb409fa000 (7feb409fa000), flags = 0, pfn = 18d1d46, ret = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282786 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90168 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282791 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90169 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282795 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90170 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282800 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90171 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282809 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90173 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282832 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90178 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282841 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90180 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282851 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90182 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> 21:25:50:282874 tid[3484174] pid[3484149] FAULTIN @ rip ffffffff814e6ca5 (90187 hits), gpa = 1343fa0b0, hva = 7feb409fa000, flags = 0 : MMU seq = 8002dc25, in-prog = 0, start = 7feacde61000, end = 7feacde62000
-> @__fault[3484174]: 0
-> @__vcpu[3484174]: 0
-> @last_rip[3484174]: 18446744071583984805
-> @same[3484174]: 11598962
-> 
-> 
-> --
-> Eric Wheeler
-> 
-> 
-> 
-> 
-> > 
-> > On the plus side, I'm slowly learning how to effectively use bpf programs.
-> > This version also prints return values and and other relevant side effects from
-> > kvm_faultin_pfn(), and I figured out a way to get at the vCPU's root MMU page.
-> > 
-> > And it stops printing after a vCPU (task) has been stuck for 100k exits, i.e. it
-> > should self-limit the spam.  Even if the vCPU managed to unstick itself after
-> > that point, which is *extremely* unlikely, being stuck for 100k exits all but
-> > guarantees there's a bug somewhere.
-> > 
-> > So this *should* give us a smoking gun.  Depending on what the gun points at, a
-> > full root cause may still be a long ways off, but I'm pretty sure this mess will
-> > tell us exactly why KVM is refusing to fix the fault.
-> > 
-> > --
-> > 
-> > struct kvm_page_fault {
-> > 	const u64 addr;
-> > 	const u32 error_code;
-> > 
-> > 	const bool prefetch;
-> > 	const bool exec;
-> > 	const bool write;
-> > 	const bool present;
-> > 
-> > 	const bool rsvd;
-> > 	const bool user;
-> > 	const bool is_tdp;
-> > 	const bool nx_huge_page_workaround_enabled;
-> > 
-> > 	bool huge_page_disallowed;
-> > 
-> > 	u8 max_level;
-> > 	u8 req_level;
-> > 	u8 goal_level;
-> > 
-> > 	u64 gfn;
-> > 
-> > 	struct kvm_memory_slot *slot;
-> > 
-> > 	u64 pfn;
-> > 	unsigned long hva;
-> > 	bool map_writable;
-> > };
-> > 
-> > struct kvm_mmu_page {
-> > 	struct list_head link;
-> > 	struct hlist_node hash_link;
-> > 
-> > 	bool tdp_mmu_page;
-> > 	bool unsync;
-> > 	u8 mmu_valid_gen;
-> > 	bool lpage_disallowed;
-> > 
-> > 	u32 role;
-> > 	u64 gfn;
-> > 
-> > 	u64 *spt;
-> > 
-> > 	u64 *shadowed_translation;
-> > 
-> > 	int root_count;
-> > }
-> > 
-> > kprobe:kvm_faultin_pfn
-> > {
-> > 	$vcpu = (struct kvm_vcpu *)arg0;
-> > 	$kvm = $vcpu->kvm;
-> > 	$rip = $vcpu->arch.regs[16];
-> > 
-> > 	if (@last_rip[tid] == $rip) {
-> > 		@same[tid]++
-> > 	} else {
-> > 		@same[tid] = 0;
-> > 	}
-> > 	@last_rip[tid] = $rip;
-> > 
-> > 	if (@same[tid] > 1000 && @same[tid] < 100000) {
-> > 		$fault = (struct kvm_page_fault *)arg1;
-> > 		$hva = -1;
-> > 		$flags = 0;
-> > 
-> > 		@__vcpu[tid] = arg0;
-> > 		@__fault[tid] = arg1;
-> > 
-> > 		if ($fault->slot != 0) {
-> > 			$hva = $fault->slot->userspace_addr +
-> > 			       (($fault->gfn - $fault->slot->base_gfn) << 12);
-> > 			$flags = $fault->slot->flags;
-> > 		}
-> > 
-> > 		printf("%s tid[%u] pid[%u] FAULTIN @ rip %lx (%lu hits), gpa = %lx, hva = %lx, flags = %lx : MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, $rip, @same[tid], $fault->addr, $hva, $flags,
-> > 		       $kvm->mmu_invalidate_seq, $kvm->mmu_invalidate_in_progress,
-> > 		       $kvm->mmu_invalidate_range_start, $kvm->mmu_invalidate_range_end);
-> > 	} else {
-> > 		@__vcpu[tid] = 0;
-> > 		@__fault[tid] = 0;
-> > 	}
-> > }
-> > 
-> > kretprobe:kvm_faultin_pfn
-> > {
-> > 	if (@__fault[tid] != 0) {
-> > 		$vcpu = (struct kvm_vcpu *)@__vcpu[tid];
-> > 		$kvm = $vcpu->kvm;
-> > 		$fault = (struct kvm_page_fault *)@__fault[tid];
-> > 		$hva = -1;
-> > 		$flags = 0;
-> > 
-> > 		if ($fault->slot != 0) {
-> > 			$hva = $fault->slot->userspace_addr +
-> > 			       (($fault->gfn - $fault->slot->base_gfn) << 12);
-> > 			$flags = $fault->slot->flags;
-> > 		}
-> > 
-> > 		printf("%s tid[%u] pid[%u] FAULTIN_RET @ rip %lx (%lu hits), gpa = %lx, hva = %lx (%lx), flags = %lx, pfn = %lx, ret = %lu : MMU seq = %lx, in-prog = %lx, start = %lx, end = %lx\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-> > 		       $fault->addr, $hva, $fault->hva, $flags, $fault->pfn, retval,
-> > 		       $kvm->mmu_invalidate_seq, $kvm->mmu_invalidate_in_progress,
-> > 		       $kvm->mmu_invalidate_range_start, $kvm->mmu_invalidate_range_end);
-> > 	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-> > 		printf("%s tid[%u] pid[%u] FAULTIN_ERROR @ rip %lx (%lu hits), ret = %lu\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid], retval);
-> > 	}
-> > }
-> > 
-> > kprobe:kvm_tdp_mmu_map
-> > {
-> > 	$vcpu = (struct kvm_vcpu *)arg0;
-> > 	$rip = $vcpu->arch.regs[16];
-> > 
-> > 	if (@last_rip[tid] == $rip) {
-> > 		@same[tid]++
-> > 	} else {
-> > 		@same[tid] = 0;
-> > 	}
-> > 	@last_rip[tid] = $rip;
-> > 
-> > 	if (@__fault[tid] != 0) {
-> > 	        $vcpu = (struct kvm_vcpu *)arg0;
-> > 		$fault = (struct kvm_page_fault *)arg1;
-> > 
-> >                 if (@__vcpu[tid] != arg0 || @__fault[tid] != arg1) {
-> >                         printf("%s tid[%u] pid[%u] MAP_ERROR vcpu %lx vs. %lx, fault %lx vs. %lx\n",
-> >                                strftime("%H:%M:%S:%f", nsecs), tid, pid, @__vcpu[tid], arg0, @__fault[tid], arg1);
-> >                 }
-> > 
-> > 		printf("%s tid[%u] pid[%u] MAP @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-> > 		       $fault->addr, $fault->hva, $fault->pfn);
-> > 	} else {
-> > 		@__vcpu[tid] = 0;
-> > 		@__fault[tid] = 0;
-> > 	}
-> > }
-> > 
-> > kretprobe:kvm_tdp_mmu_map
-> > {
-> > 	if (@__fault[tid] != 0) {
-> > 		$vcpu = (struct kvm_vcpu *)@__vcpu[tid];
-> > 		$fault = (struct kvm_page_fault *)@__fault[tid];
-> > 		$hva = -1;
-> > 		$flags = 0;
-> > 
-> > 		if ($fault->slot != 0) {
-> > 			$hva = $fault->slot->userspace_addr +
-> > 			       (($fault->gfn - $fault->slot->base_gfn) << 12);
-> > 			$flags = $fault->slot->flags;
-> > 		}
-> > 
-> > 		printf("%s tid[%u] pid[%u] MAP_RET @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx, ret = %lx\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-> > 		       $fault->addr, $fault->hva, $fault->pfn, retval);
-> > 	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-> > 		printf("%s tid[%u] pid[%u] MAP_RET_ERROR @ rip %lx (%lu hits), ret = %lu\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid], retval);
-> > 	}
-> > }
-> > 
-> > kprobe:tdp_iter_start
-> > {
-> > 	if (@__fault[tid] != 0) {
-> >                 $vcpu = (struct kvm_vcpu *)@__vcpu[tid];
-> > 		$fault = (struct kvm_page_fault *)@__fault[tid];
-> > 	        $root = (struct kvm_mmu_page *)arg1;
-> > 
-> > 		printf("%s tid[%u] pid[%u] ITER @ rip %lx (%lu hits), gpa = %lx (%lx), hva = %lx, pfn = %lx, tdp_mmu = %u, role = %x, count = %d\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-> > 		       $fault->addr, arg3 << 12, $fault->hva, $fault->pfn,
-> >                        $root->tdp_mmu_page, $root->role, $root->root_count);
-> > 	} else {
-> > 		@__vcpu[tid] = 0;
-> > 		@__fault[tid] = 0;
-> > 	}
-> > }
-> > 
-> > kprobe:make_mmio_spte
-> > {
-> >         if (@__fault[tid] != 0) {
-> > 		$fault = (struct kvm_page_fault *)@__fault[tid];
-> > 
-> > 		printf("%s tid[%u] pid[%u] MMIO @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-> > 		       $fault->addr, $fault->hva, $fault->pfn);
-> > 	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-> > 		printf("%s tid[%u] pid[%u] MMIO_ERROR @ rip %lx (%lu hits)\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid]);
-> > 	}
-> > }
-> > 
-> > kprobe:make_spte
-> > {
-> >         if (@__fault[tid] != 0) {
-> > 		$fault = (struct kvm_page_fault *)@__fault[tid];
-> > 
-> > 		printf("%s tid[%u] pid[%u] SPTE @ rip %lx (%lu hits), gpa = %lx, hva = %lx, pfn = %lx\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid, @last_rip[tid], @same[tid],
-> > 		       $fault->addr, $fault->hva, $fault->pfn);
-> > 	} else if (@same[tid] > 1000 && @same[tid] < 100000) {
-> > 		printf("%s tid[%u] pid[%u] SPTE_ERROR @ rip %lx (%lu hits)\n",
-> > 		       strftime("%H:%M:%S:%f", nsecs), tid, pid,  @last_rip[tid], @same[tid]);
-> > 	}
-> > }
-> > 
-> > 
-> 
+Fudge (that's not actually what I said).  *sigh*
+
+Not a coincidence, at all.  The bug is that, in v6.1, is_page_fault_stale() takes
+the local @mmu_seq snapshot as an int, whereas as the per-VM count is stored as an
+unsigned long.  When the sequence sets bit 31, the local @mmu_seq value becomes
+a signed *negative* value, and then when that gets passed to mmu_invalidate_retry_hva(),
+which correctly takes an unsigned long, the negative value gets sign-extended and
+so the comparison ends up being
+
+	if (0x8002dc25 != 0xffffffff8002dc25)
+
+and KVM thinks the sequence count is stale.  I missed it for so long because I
+was stupidly looking mostly at upstream code (see below), and because of the subtle
+sign-extension behavior (I was mostly on the lookout for a straight truncation
+bug where bits[63:32] got dropped).
+
+I suspect others haven't hit this issues because no one else is generating anywhere
+near the same number of mmu_notifier invalidations, and/or live migrates VMs more
+regularly (which effectively resets the sequence count).
+
+The real kicker to all this is that the bug was accidentally fixed in v6.3 by
+commit ba6e3fe25543 ("KVM: x86/mmu: Grab mmu_invalidate_seq in kvm_faultin_pfn()"),
+as that refactoring correctly stored the "local" mmu_seq as an unsigned long.
+
+I'll post the below as a proper patch for inclusion in stable kernels.
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 230108a90cf3..beca03556379 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4212,7 +4212,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+  * root was invalidated by a memslot update or a relevant mmu_notifier fired.
+  */
+ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+-                               struct kvm_page_fault *fault, int mmu_seq)
++                               struct kvm_page_fault *fault,
++                               unsigned long mmu_seq)
+ {
+        struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
+ 
+P.S. FWIW, it's probably worth taking a peek at your NUMA setup and/or KSM settings.
+2 billion invalidations is still quite insane, even for a long-lived VM.  E.g.
+we (Google) disable NUMA balancing and instead rely on other parts of the stack
+to hit our SLOs for NUMA locality.  That certainly has its own challenges, and
+might not be viable for your environment, but NUMA balancing is far from a free
+lunch for VMs; NUMA balancing is a _lot_ more costly when KVM is on the receiving
+end due to the way mmu_notifier invalidations work.   And for KSM, I personally
+think KSM is a terrible tradeoff and should never be enabled.  It saves memory at
+the cost of CPU cycles, guest performance, and guest security.
+
