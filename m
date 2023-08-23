@@ -2,45 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02258785B16
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 16:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F510785BB4
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 17:15:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236679AbjHWOui (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 10:50:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55280 "EHLO
+        id S236903AbjHWPPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 11:15:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233614AbjHWOuf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 10:50:35 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2052.outbound.protection.outlook.com [40.107.101.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97020E6A;
-        Wed, 23 Aug 2023 07:50:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OPB9Zu5SZ67GsfMMz7Stuz+mjq5MmU2kE2j46HQLcHPYEofvnQ0z/nLkkEgQgtqShuvZEB1OQZBHIEIWrWCwnnFq2dJkiT8BwOgVCAmaAwmnLnmJvVlbuyO1CAlkxuvMqfQ4D06CQsvcMu+OhfI7yV4g23TQqo3ZLlQ/8wUCVVue8yZQ2dfB+gVxM+0ewAfGiOgUCyv8ZfpLaZbnb2Koj3zxlUDTFg10b+gtPGdVphTnrsxvhpGuw1Dv+aENiJWuRVkIUMDDF5tMM31VBOewsmE58ULCd575K9909zktPqAGd7ju5QHV0bfyJJWrM3CedXeFwmQINmm3erJiw8JnZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FhwVjQqnV4h9iqNDTKMO4yT05hvmCkOZFwQXl7Z+bn0=;
- b=iH/SQmQN2EHYTQSfgw3z0O+LCd1CZj35kcYdXgQdYxsb4Kx8TehAQJedSz9eWNTnuGBP9OfZj+YE7EsQP9U+ohXkikFyjJzgMe+yyibdy2lQnfkZcZZOf0SSdjETj92SGM68SyR7OiuDi6vIaEcMwgnw1dzuZCxxX2Tx/xsgyAED+KTyt+JazwCCac3T8PgaI75a4maUxqNtkQ5tDjfeGXXKFuV0/Rk52gZSL+NoJ6oQvy0zIqJ4ETC3Ripebae6Zxwf+OorGaTM9Qs51RoV12DWapro0WJnmx8jcf1rtoZuBYX0U250HEFU7fmZ49kmtg+hMNXCz8f5DGcBIYK8LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FhwVjQqnV4h9iqNDTKMO4yT05hvmCkOZFwQXl7Z+bn0=;
- b=USOcgoV6jPPWvL5EHi07+2O5PZk8wwXvfo4yrERklaARB+IQ+hnc3y/H2hZdxXEn3UisY8bnaVWuKxbESfH2BnIZCSThEC05i3v4IerBVnxhGuFYo7kogOF6ZtTWgXgFrgsdz7LzyzEEkHzXHOpV9Q90u1GiCG6PUcevdvKP0N8PlqNo3I2cvrZLbaqXEiGWlLiWwGjCChy6usqkLjg7WU3/feJ1CxUD4esDhlF45qioMFFBqwEAF0Z6+8RmQp3R1HCx67qXPS/4q4uoJyhjHTWtt+mDqr+ixZkzE9G3eEvLQp4Imm29TsdWkc7XG9pXSemhcQB4SeO8+OxfoFREeA==
-Received: from BY5PR12MB3763.namprd12.prod.outlook.com (2603:10b6:a03:1a8::24)
- by CH2PR12MB4229.namprd12.prod.outlook.com (2603:10b6:610:a5::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
- 2023 14:50:31 +0000
-Received: from BY5PR12MB3763.namprd12.prod.outlook.com
- ([fe80::9e7a:4853:fa35:a060]) by BY5PR12MB3763.namprd12.prod.outlook.com
- ([fe80::9e7a:4853:fa35:a060%2]) with mapi id 15.20.6699.026; Wed, 23 Aug 2023
- 14:50:31 +0000
-From:   Ankit Agrawal <ankita@nvidia.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        with ESMTP id S236859AbjHWPPH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 11:15:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F237BE79
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 08:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692803651;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nmWOJ3PgLNwb6XXHu+pQh+YNRDsU+vDPGbdwEescA6k=;
+        b=bYx3ixCNWZGCONUrDDYABMa62gIYOzJBc9DHnISg78YLHUq8uWdVrGlGYCT+p1YOHhCxG9
+        nvZt3Ry/mPlSWXtcvCNW8kaxHx/2m6h6H35QktX2ZbsN3SAmDmpN0xfP6E35X/79Hl6ccc
+        FFZ2VEXIep3aq+45JpEAVwaXSX9nNE8=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-561-unq1TDD1Nb23o1c2ZA_VQg-1; Wed, 23 Aug 2023 11:14:10 -0400
+X-MC-Unique: unq1TDD1Nb23o1c2ZA_VQg-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-786d9d4d9a6so539221439f.2
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 08:14:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692803649; x=1693408449;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nmWOJ3PgLNwb6XXHu+pQh+YNRDsU+vDPGbdwEescA6k=;
+        b=Z9p7zT/nzOVzh0G6cRvbVN3WY1h1Ucw/F6IwqrGHjiPr0eLKwaaKbg9P+4YDJwE++i
+         KoU6GzQZAGz72yJaYV2rFZcFOdFnRnEBYVdOrgsI/543o74QGbUCOtt33DDUwCpFc42i
+         SnlGt7gdRehyYf4lNbGRM3yp+M0/hakW50SheI6PnSxW9ml8dOgrdewLaGrI0zCaG3K3
+         zAwQoC7yhPWBbNFVU6rnPfQ9pabMNh1QKhbUlGK/Ch0gRxmwTasNBJo8s4Z8VH7ZlZBj
+         dA+EXzB0sO85+PtA8nyXqp1Xaxr6dQ7StVc7gNyrpF337bgv/Pe6bL210OZdE3xrrh55
+         JihQ==
+X-Gm-Message-State: AOJu0YzL3vm6B2ECypWTOSjvg57mJmUv9hbywn/Yqny1mgtvUEyh+ADm
+        U++NyMvDiSTYuu0RYgCDzxh/QF3A+N+5oVyKaBcpRMEs5ECBfWlhmr4XQWuRrGcPUkEfThUeSuc
+        cZ8en2+L6mfug
+X-Received: by 2002:a5e:8b04:0:b0:790:a23b:1dfc with SMTP id g4-20020a5e8b04000000b00790a23b1dfcmr3307543iok.9.1692803649368;
+        Wed, 23 Aug 2023 08:14:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1ejXlq1DobE4s847LmD8hNlB4ek7rEulj4rPQgyLGwQUjlN1C1W1HdguCPBUX33+sS3zvSg==
+X-Received: by 2002:a5e:8b04:0:b0:790:a23b:1dfc with SMTP id g4-20020a5e8b04000000b00790a23b1dfcmr3307519iok.9.1692803649184;
+        Wed, 23 Aug 2023 08:14:09 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id s24-20020a02ad18000000b00430a69ea278sm3821226jan.167.2023.08.23.08.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Aug 2023 08:14:08 -0700 (PDT)
+Date:   Wed, 23 Aug 2023 09:14:07 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Ankit Agrawal <ankita@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Yishai Hadas <yishaih@nvidia.com>,
         "shameerali.kolothum.thodi@huawei.com" 
         <shameerali.kolothum.thodi@huawei.com>,
@@ -55,100 +73,48 @@ CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         Dan Williams <danw@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Thread-Topic: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for grace
- hopper
-Thread-Index: AQHZ1TZ6Nms5b5NPG0K9tyfNGGuGJa/36LOAgAANtdw=
-Date:   Wed, 23 Aug 2023 14:50:31 +0000
-Message-ID: <BY5PR12MB37639528FCF1CDB7D595B6FFB01CA@BY5PR12MB3763.namprd12.prod.outlook.com>
+Subject: Re: [PATCH v7 1/1] vfio/nvgpu: Add vfio pci variant module for
+ grace hopper
+Message-ID: <20230823091407.0964bd3b.alex.williamson@redhat.com>
+In-Reply-To: <BY5PR12MB37639528FCF1CDB7D595B6FFB01CA@BY5PR12MB3763.namprd12.prod.outlook.com>
 References: <20230822202303.19661-1-ankita@nvidia.com>
- <ZOYP92q1mDQgwnc9@nvidia.com>
-In-Reply-To: <ZOYP92q1mDQgwnc9@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY5PR12MB3763:EE_|CH2PR12MB4229:EE_
-x-ms-office365-filtering-correlation-id: 7bf7be8d-0195-4b51-35b7-08dba3e84c68
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: CLi7X8KoADlsXDwRybSWfc8SGj9vEmnpZnZhPLjZkuYyRpbmyYSc73oNIIoPNRRo4eX0hhG17+EmNO/T9ycNipRYnf4pZbB92zbQdeWMh59AbMMcoqgZfZflbIUqSWsLoJXwtgUskiu57dc+qBiZQxTszkkyJA9aotbkTs3tGChMm0oIJbe2gFerz2ubix2m5+zD0oGIfvtMgKNfmIIfz8ZKHkz+MT+C0ZhPCDiBVHeq0qUyW3FfbYR/BpuKlIljv5ZKj68geze9cMNWswHvO/TyTLiyqb1NvqAM0YXPB9UpoFPnTqgPfuQti1vq6Q5M38ff+Tv6ook539fVMOiwIgBgsQktw+WKXkjmpTS6vBH7DNKFxrl4ow9SX6rlwaUV6JZSuOBfVse8uYHgz4sqVzLi0IUd06iMo0s1LyRiiXn63FIgHejnG1a7jcWFwW0lytYzon4mvUnFLj6G37QG5ysGzEeCt5coUuRv6axlzHpn+HbHmxBT44N7CCYPhOxWYXZfp5nNNv8v6US7PUn5pGYO/H7Ho2GPvx1QeXflzE9atn1ubtl/Oo0cbo6k2VnjO60GYau/SBQe8DvSdvvqMjDtbXuoJGUhVcWedcrwPiaUHfO2PDwPyY8cVKMJylRK
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB3763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(366004)(396003)(376002)(346002)(1800799009)(186009)(451199024)(83380400001)(4744005)(2906002)(38100700002)(38070700005)(122000001)(33656002)(86362001)(55016003)(91956017)(9686003)(41300700001)(76116006)(54906003)(64756008)(66556008)(66946007)(66476007)(66446008)(7696005)(6506007)(316002)(6636002)(52536014)(6862004)(8676002)(4326008)(8936002)(478600001)(71200400001)(26005)(5660300002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?F9iUuDo0LzBEIfK5cZ4JUVUy4pgDyqvTr8gh9Yb+pBqFsTO7pOR/GQRt8y?=
- =?iso-8859-1?Q?JddE7X5uckq6undiXpsfDAnYnp2qrvhOUh7Mn7EobsDimYGGySuvxrEw3g?=
- =?iso-8859-1?Q?Pq6x0gtRYs4tHCiP06cWa6ZuvLqjqfEtRi9xVs1DN0q6dzpDxe/MkYMHVD?=
- =?iso-8859-1?Q?f7JpNiWYzerHiro2t7jegQ4zoUv5aHRcDe3MK987MjFxrG9lGZtA7r++Jh?=
- =?iso-8859-1?Q?68Wy30WH8JqK9H0YSLWd5uD86K9SDBeJE9giAvv2g5xh0+DiD9+G5o1tJU?=
- =?iso-8859-1?Q?PWgJdZbFEiN4xiN0VQtYWMFgqMubOnUOxnzs3hKfu6u+vYcXlm7xbtP5q+?=
- =?iso-8859-1?Q?yey2pTKaWGYHq3MHuwSJUw6XMl2UpwzzEgeVWKmEevQEp+x8BHNBwk+OFu?=
- =?iso-8859-1?Q?inpPIttt+hICfGNc2wWbj8h3F8+fZY2B4iRS9vficla8rWlp4BKxx/kcwE?=
- =?iso-8859-1?Q?RWcTVp+Q/yuGI9ysyXTt9+VVud4Sux8Qlo8nl07gbDyf8zh4TIfhg7aQ2p?=
- =?iso-8859-1?Q?X4E3cff/Sj1JW7LsxUqx6odA3qF4HznkOAcfmDN/wx0MZUdOfoUcMlYif5?=
- =?iso-8859-1?Q?LE+ACmvo2HE9se/MnVLhEchJZAb512MmcZrOx3NpzHCjhE+786WLeAaRoL?=
- =?iso-8859-1?Q?Jqad/O+8lSLfbPEwNkIFF9Lf80SfWQGSpeyJUYHd6/kSeFuZLPxxaheU8u?=
- =?iso-8859-1?Q?lRRIN/2Ev/ZPAFOK5VOACR1Ke1YVEXABkjggcFj9QSklYYy1vdhnkTugQ2?=
- =?iso-8859-1?Q?1BvjaOZyaugHwRvEqr4GgYqEKxxycObft4wGSqh0Zfb1dCLsmVD2O8ZIVg?=
- =?iso-8859-1?Q?TNS5fE5CxkjX4Sfqy1qoPU/e39S0Hw/D9jucJ6lB9+flGJkbMQ8NxF+61j?=
- =?iso-8859-1?Q?gs2nS9TB5+XnkNsm1p+fuhNHRO7FRkNIvtE7ivbYrCsllLPEiVDkcfti6D?=
- =?iso-8859-1?Q?VFOZRtWaKyIEHNQREhxqfwcXyosmqldkKfPMHevkWDTVcnA+jRzRb96FBY?=
- =?iso-8859-1?Q?g3nket5BK1ZUVMCwSKwNm/XiTzjbdrqSpcA7spB4rPri9gq3VUvxGxwofD?=
- =?iso-8859-1?Q?xQFRtrnSkfuLWQkcM2Jmy96uPQrzuSzKP5g63SUnYAc3FI5rWcvOfqHF1H?=
- =?iso-8859-1?Q?/5eOAZbpet2Pd9UC01CXWfXqM56XlOb7UA5ULEuednupogl82oRR4ETUrp?=
- =?iso-8859-1?Q?PGz0ZkQ+LZxHgPeqNq8PnEpHUBctwTcUpqanCxIZA67VoTYVeuwRIoqi/6?=
- =?iso-8859-1?Q?pfT/Xy2+GI0RdpSgQKqLStGplzyBe3jJSxxVyC3gQWyM5GftJ/GAJFGcqA?=
- =?iso-8859-1?Q?VrI3cZmRmdS4Ps5kzH3B2uTTgCRMJ7sdpW8NdLhsT7xp+4pAdYZ6QksF5i?=
- =?iso-8859-1?Q?mYhQ1j2Yf3SaZ7MD+24cghuZOd+BiwqBbwndDi4FWQGNw7mgyTAU5e4sv8?=
- =?iso-8859-1?Q?8c0kMRpqP/QVXTGqXxxSwYhuGVHVAeMrKzC/i6Y1mpl8BDNg2n3m1D7Yoi?=
- =?iso-8859-1?Q?x3xHSnON7XnLXtCdQteREU/bE1gCDq64lQpvSEVkH/1JYCaZnf/QxX1qp7?=
- =?iso-8859-1?Q?MjddQZWQB8z+EJp1F2F6ic7Z9QpacGWZoOMl7+psjyCVNNRSkQQLPdBtKi?=
- =?iso-8859-1?Q?8f2KvazEhYOW8=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        <ZOYP92q1mDQgwnc9@nvidia.com>
+        <BY5PR12MB37639528FCF1CDB7D595B6FFB01CA@BY5PR12MB3763.namprd12.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bf7be8d-0195-4b51-35b7-08dba3e84c68
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2023 14:50:31.2650
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: m0YHQQ6XgmeFn/x8lxs87z0rbJwiRb9GjQrZrlDkVJZG/tB+eaQDnz+mfQxF6x1+HUfbnjw7iGU25TD5k1+Kvw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4229
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> +     if (index =3D=3D VFIO_PCI_BAR2_REGION_INDEX) {=0A=
->> +             if (!nvdev->opregion) {=0A=
->> +                     nvdev->opregion =3D memremap(nvdev->hpa, nvdev->me=
-m_length, MEMREMAP_WB);=0A=
->> +                     if (!nvdev->opregion)=0A=
->> +                             return -ENOMEM;=0A=
->> +             }=0A=
->=0A=
-> [AW] Seems like this would be susceptible to concurrent accesses causing=
-=0A=
-> duplicate mappings.=0A=
->=0A=
-> [JG] Needs some kind of locking on opregion=0A=
-=0A=
-Right, will add a new lock item in nvdev to control the access to opregion/=
-memmap.=0A=
-Please let me know if it is preferable to do memremap in open_device instea=
-d of=0A=
-read/write.=0A=
+On Wed, 23 Aug 2023 14:50:31 +0000
+Ankit Agrawal <ankita@nvidia.com> wrote:
+
+> >> +     if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> >> +             if (!nvdev->opregion) {
+> >> +                     nvdev->opregion = memremap(nvdev->hpa, nvdev->mem_length, MEMREMAP_WB);
+> >> +                     if (!nvdev->opregion)
+> >> +                             return -ENOMEM;
+> >> +             }  
+> >
+> > [AW] Seems like this would be susceptible to concurrent accesses causing
+> > duplicate mappings.
+> >
+> > [JG] Needs some kind of locking on opregion  
+> 
+> Right, will add a new lock item in nvdev to control the access to opregion/memmap.
+> Please let me know if it is preferable to do memremap in open_device instead of
+> read/write.
+
+That's a valid option also, certainly avoids the locking and
+serialization per access.  Thanks,
+
+Alex
+
