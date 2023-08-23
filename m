@@ -2,146 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C3D9784EA9
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 04:22:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DCE6784F02
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 05:00:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbjHWCWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Aug 2023 22:22:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48566 "EHLO
+        id S232391AbjHWDAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Aug 2023 23:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbjHWCWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Aug 2023 22:22:49 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D88CD3;
-        Tue, 22 Aug 2023 19:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692757367; x=1724293367;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=E2DY2rZ63Jkob00d6HBggLmef15UJ2Y9YFk0LbPi1i8=;
-  b=BCZ84vwnBF/m+vesZFYaUHWDLo5JzlBXg43TAs2k6cWUSZOAhksrXdoh
-   ZPu2FuqEsZz+yoMjI4KLxs35tY6Sq46G7h1/QXJuhIMokH7TL4b9FqZL8
-   kI+Sx3AM/3MOCoFWZrYkaeWdbHwWKvsX/BOcHa//mfF5qTyEfrW9th9CG
-   QSeUIaS+PQQBY0qg6EVgqw/0C0uh/48rfkU7WJOS/9oma2u9IJN9Phnwg
-   MNbIz+7ho3bziZaN1R+dgFCdUZJHsCLB0hXuAHjryuQNtrOabgv9YSgjc
-   IzaE0ukRmM9vemTYkQk1g8Sr8dfOnjNzu+R7CYtq7gYkGMWp877w7lyr9
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="372931310"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="372931310"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 19:22:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="765961314"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="765961314"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.93.5.53]) ([10.93.5.53])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 19:22:43 -0700
-Message-ID: <18e606ba-d6b2-02f0-1511-d949c4c1e6ed@linux.intel.com>
-Date:   Wed, 23 Aug 2023 10:22:41 +0800
+        with ESMTP id S232377AbjHWDAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Aug 2023 23:00:17 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 487C8E4E
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 19:59:49 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1befe39630bso9175005ad.0
+        for <kvm@vger.kernel.org>; Tue, 22 Aug 2023 19:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1692759588; x=1693364388;
+        h=content-transfer-encoding:in-reply-to:cc:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bhgEqLuvf9ApSnTvUwn1L76c2o2W1Ei/QD6yE6yt7Vo=;
+        b=RzbIwpF/0rWWCHIbil/kmvbYsiH+zzV8cteo0NeX4iqS5Th3aMObOrBBZ5QIYYiYNO
+         EzLvxXnwaU3C6HJ66DVx0SYeH6DBUUXE/parOT0tZRTGaLZHY6BYCVv0BWvKsae2+Z4V
+         HEkSBtQA++hJt6hjIX8coUzQJXYdSMU0EhPZnC3wJk9rsU5aMcdQM2J2gdrxRnnAl7ZG
+         8NIlks8SUC7HZyd+TSNVs6GUNYerNVLSzTLDuAq02G7Vh6n7NQtQV5W2S/tTxnIxqdnK
+         Yk0AUrfOj+V8sxulrYV9L4sfBNDgKCkzUecP9KTfiIS3EGmzpdtRXoZ4mpHHvApm3vtv
+         04iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692759588; x=1693364388;
+        h=content-transfer-encoding:in-reply-to:cc:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bhgEqLuvf9ApSnTvUwn1L76c2o2W1Ei/QD6yE6yt7Vo=;
+        b=h+8gZePgEgpp+72sqXALFtFJnH3rOUhUsrya5PvNihnsWWnb+g4icxjhIU34oh8hZM
+         Y3J4vQvPTgmobauLKiRaBuwQJ2+PLMg+ODFOPgvweczV3v+lLsiNGLyNPSOiEgRDW9wA
+         qmMdgF3t/bnlF+5k450PR9OCkB00QGBZBHcRSnu/l3m2b4ycXCzwZlAfs/MCy2C69zoW
+         KoLQpNBv8f/YsaZYbQhDd5zNvU4vsHlPZ1k8JKvhThuj2RrBjx4Yo9yPH7a96J2VJkC3
+         Fhv6JVPuoSqKWbfjyOoqvG9qhXiKbc/u5BzYe/1Eu+Y0zIJVVegSybfcw2TXm0HOpBgK
+         xoqg==
+X-Gm-Message-State: AOJu0YxKXtnaNObknvis16eMx+XtOdoe+JCT+EVYjQNAGRFr3oV1qDV4
+        zKD2BU372yp2Bz6qG9Zk9FmxSQ==
+X-Google-Smtp-Source: AGHT+IEfrTZGJtg+pRH2EfLUkWhGiT4SJbELosEEcEbXeeoUMWHqtsVXqJsCto+j1ri8qfTaL4v/sQ==
+X-Received: by 2002:a17:90a:2f41:b0:26d:4ade:fcf0 with SMTP id s59-20020a17090a2f4100b0026d4adefcf0mr10521410pjd.4.1692759588304;
+        Tue, 22 Aug 2023 19:59:48 -0700 (PDT)
+Received: from ?IPV6:fdbd:ff1:ce00:1c25:884:3ed:e1db:b610? ([2408:8000:b001:1:1f:58ff:f102:103])
+        by smtp.gmail.com with ESMTPSA id z2-20020a17090a1fc200b00262ca945cecsm11045048pjz.54.2023.08.22.19.59.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 19:59:47 -0700 (PDT)
+Message-ID: <63dc1d86-2a15-6b7e-f63a-63fccb25eae2@bytedance.com>
+Date:   Wed, 23 Aug 2023 10:59:34 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v2] KVM: x86/pmu: Manipulate FIXED_CTR_CTRL MSR with
- macros
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH v4 43/48] drm/ttm: introduce pool_shrink_rwsem
 Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kan Liang <kan.liang@linux.intel.com>
-References: <20230815032849.2929788-1-dapeng1.mi@linux.intel.com>
- <305fa208-e1d6-7e22-3156-11fd551a8dd1@gmail.com>
-From:   "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <305fa208-e1d6-7e22-3156-11fd551a8dd1@gmail.com>
+To:     daniel@ffwll.ch
+References: <20230807110936.21819-1-zhengqi.arch@bytedance.com>
+ <20230807110936.21819-44-zhengqi.arch@bytedance.com>
+ <ZOS+g51Yx9PsYkGU@phenom.ffwll.local>
+From:   Qi Zheng <zhengqi.arch@bytedance.com>
+Cc:     akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
+        muchun.song@linux.dev, simon.horman@corigine.com,
+        dlemoal@kernel.org, kvm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, linux-mtd@lists.infradead.org, x86@kernel.org,
+        cluster-devel@redhat.com, xen-devel@lists.xenproject.org,
+        linux-ext4@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        rcu@vger.kernel.org, linux-bcache@vger.kernel.org,
+        Muchun Song <songmuchun@bytedance.com>,
+        linux-raid@vger.kernel.org, linux-nfs@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-btrfs@vger.kernel.org, daniel.vetter@ffwll.ch
+In-Reply-To: <ZOS+g51Yx9PsYkGU@phenom.ffwll.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/21/2023 4:05 PM, Like Xu wrote:
-> On 15/8/2023 11:28 am, Dapeng Mi wrote:
->> Magic numbers are used to manipulate the bit fields of
->> FIXED_CTR_CTRL MSR. This is not read-friendly and use macros to replace
->> these magic numbers to increase the readability.
->
-> More, reuse INTEL_FIXED_0_* macros for pmu->fixed_ctr_ctrl_mask, pls.
+Hi Daniel,
 
-Sure. Thanks.
->
+On 2023/8/22 21:56, Daniel Vetter wrote:
+> On Mon, Aug 07, 2023 at 07:09:31PM +0800, Qi Zheng wrote:
+>> Currently, the synchronize_shrinkers() is only used by TTM pool. It only
+>> requires that no shrinkers run in parallel.
 >>
->> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>> After we use RCU+refcount method to implement the lockless slab shrink,
+>> we can not use shrinker_rwsem or synchronize_rcu() to guarantee that all
+>> shrinker invocations have seen an update before freeing memory.
+>>
+>> So we introduce a new pool_shrink_rwsem to implement a private
+>> synchronize_shrinkers(), so as to achieve the same purpose.
+>>
+>> Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+>> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+> 
+> On the 5 drm patches (I counted 2 ttm and 3 drivers) for merging through
+> some other tree (since I'm assuming that's how this will land):
+
+Yeah, there are 5 drm patches: PATCH v4 07/48 23/48 24/48 25/48 43/48.
+
+> 
+> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+
+Thanks for your review!
+
+Qi
+
+> 
 >> ---
->>   arch/x86/kvm/pmu.c | 10 +++++-----
->>   arch/x86/kvm/pmu.h |  6 ++++--
->>   2 files changed, 9 insertions(+), 7 deletions(-)
+>>   drivers/gpu/drm/ttm/ttm_pool.c | 15 +++++++++++++++
+>>   include/linux/shrinker.h       |  2 --
+>>   mm/shrinker.c                  | 15 ---------------
+>>   3 files changed, 15 insertions(+), 17 deletions(-)
 >>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index edb89b51b383..fb4ef2da3e32 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -420,11 +420,11 @@ static void reprogram_counter(struct kvm_pmc *pmc)
->>       if (pmc_is_fixed(pmc)) {
->>           fixed_ctr_ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl,
->>                             pmc->idx - INTEL_PMC_IDX_FIXED);
->> -        if (fixed_ctr_ctrl & 0x1)
->> +        if (fixed_ctr_ctrl & INTEL_FIXED_0_KERNEL)
->>               eventsel |= ARCH_PERFMON_EVENTSEL_OS;
->> -        if (fixed_ctr_ctrl & 0x2)
->> +        if (fixed_ctr_ctrl & INTEL_FIXED_0_USER)
->>               eventsel |= ARCH_PERFMON_EVENTSEL_USR;
->> -        if (fixed_ctr_ctrl & 0x8)
->> +        if (fixed_ctr_ctrl & INTEL_FIXED_0_ENABLE_PMI)
->>               eventsel |= ARCH_PERFMON_EVENTSEL_INT;
->>           new_config = (u64)fixed_ctr_ctrl;
->>       }
->> @@ -749,8 +749,8 @@ static inline bool cpl_is_matched(struct kvm_pmc 
->> *pmc)
->>       } else {
->>           config = fixed_ctrl_field(pmc_to_pmu(pmc)->fixed_ctr_ctrl,
->>                         pmc->idx - INTEL_PMC_IDX_FIXED);
->> -        select_os = config & 0x1;
->> -        select_user = config & 0x2;
->> +        select_os = config & INTEL_FIXED_0_KERNEL;
->> +        select_user = config & INTEL_FIXED_0_USER;
->>       }
->>         return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? 
->> select_os : select_user;
->> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
->> index 7d9ba301c090..ffda2ecc3a22 100644
->> --- a/arch/x86/kvm/pmu.h
->> +++ b/arch/x86/kvm/pmu.h
->> @@ -12,7 +12,8 @@
->>                         MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
->>     /* retrieve the 4 bits for EN and PMI out of IA32_FIXED_CTR_CTRL */
->> -#define fixed_ctrl_field(ctrl_reg, idx) (((ctrl_reg) >> ((idx)*4)) & 
->> 0xf)
->> +#define fixed_ctrl_field(ctrl_reg, idx) \
->> +    (((ctrl_reg) >> ((idx) * INTEL_FIXED_BITS_STRIDE)) & 
->> INTEL_FIXED_BITS_MASK)
->>     #define VMWARE_BACKDOOR_PMC_HOST_TSC        0x10000
->>   #define VMWARE_BACKDOOR_PMC_REAL_TIME        0x10001
->> @@ -165,7 +166,8 @@ static inline bool pmc_speculative_in_use(struct 
->> kvm_pmc *pmc)
->>         if (pmc_is_fixed(pmc))
->>           return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
->> -                    pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
->> +                    pmc->idx - INTEL_PMC_IDX_FIXED) &
->> +                    (INTEL_FIXED_0_KERNEL | INTEL_FIXED_0_USER);
->>         return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
->>   }
+>> diff --git a/drivers/gpu/drm/ttm/ttm_pool.c b/drivers/gpu/drm/ttm/ttm_pool.c
+>> index c9c9618c0dce..38b4c280725c 100644
+>> --- a/drivers/gpu/drm/ttm/ttm_pool.c
+>> +++ b/drivers/gpu/drm/ttm/ttm_pool.c
+>> @@ -74,6 +74,7 @@ static struct ttm_pool_type global_dma32_uncached[MAX_ORDER + 1];
+>>   static spinlock_t shrinker_lock;
+>>   static struct list_head shrinker_list;
+>>   static struct shrinker *mm_shrinker;
+>> +static DECLARE_RWSEM(pool_shrink_rwsem);
+>>   
+>>   /* Allocate pages of size 1 << order with the given gfp_flags */
+>>   static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+>> @@ -317,6 +318,7 @@ static unsigned int ttm_pool_shrink(void)
+>>   	unsigned int num_pages;
+>>   	struct page *p;
+>>   
+>> +	down_read(&pool_shrink_rwsem);
+>>   	spin_lock(&shrinker_lock);
+>>   	pt = list_first_entry(&shrinker_list, typeof(*pt), shrinker_list);
+>>   	list_move_tail(&pt->shrinker_list, &shrinker_list);
+>> @@ -329,6 +331,7 @@ static unsigned int ttm_pool_shrink(void)
+>>   	} else {
+>>   		num_pages = 0;
+>>   	}
+>> +	up_read(&pool_shrink_rwsem);
+>>   
+>>   	return num_pages;
+>>   }
+>> @@ -572,6 +575,18 @@ void ttm_pool_init(struct ttm_pool *pool, struct device *dev,
+>>   }
+>>   EXPORT_SYMBOL(ttm_pool_init);
+>>   
+>> +/**
+>> + * synchronize_shrinkers - Wait for all running shrinkers to complete.
+>> + *
+>> + * This is useful to guarantee that all shrinker invocations have seen an
+>> + * update, before freeing memory, similar to rcu.
+>> + */
+>> +static void synchronize_shrinkers(void)
+>> +{
+>> +	down_write(&pool_shrink_rwsem);
+>> +	up_write(&pool_shrink_rwsem);
+>> +}
+>> +
+>>   /**
+>>    * ttm_pool_fini - Cleanup a pool
+>>    *
+>> diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+>> index c55c07c3f0cb..025c8070dd86 100644
+>> --- a/include/linux/shrinker.h
+>> +++ b/include/linux/shrinker.h
+>> @@ -103,8 +103,6 @@ struct shrinker *shrinker_alloc(unsigned int flags, const char *fmt, ...);
+>>   void shrinker_register(struct shrinker *shrinker);
+>>   void shrinker_free(struct shrinker *shrinker);
+>>   
+>> -extern void synchronize_shrinkers(void);
+>> -
+>>   #ifdef CONFIG_SHRINKER_DEBUG
+>>   extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
+>>   						  const char *fmt, ...);
+>> diff --git a/mm/shrinker.c b/mm/shrinker.c
+>> index 3ab301ff122d..a27779ed3798 100644
+>> --- a/mm/shrinker.c
+>> +++ b/mm/shrinker.c
+>> @@ -650,18 +650,3 @@ void shrinker_free(struct shrinker *shrinker)
+>>   	kfree(shrinker);
+>>   }
+>>   EXPORT_SYMBOL_GPL(shrinker_free);
+>> -
+>> -/**
+>> - * synchronize_shrinkers - Wait for all running shrinkers to complete.
+>> - *
+>> - * This is equivalent to calling unregister_shrink() and register_shrinker(),
+>> - * but atomically and with less overhead. This is useful to guarantee that all
+>> - * shrinker invocations have seen an update, before freeing memory, similar to
+>> - * rcu.
+>> - */
+>> -void synchronize_shrinkers(void)
+>> -{
+>> -	down_write(&shrinker_rwsem);
+>> -	up_write(&shrinker_rwsem);
+>> -}
+>> -EXPORT_SYMBOL(synchronize_shrinkers);
+>> -- 
+>> 2.30.2
 >>
->> base-commit: 240f736891887939571854bd6d734b6c9291f22e
+> 
