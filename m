@@ -2,109 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65D1578613F
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 22:12:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B2E378619E
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 22:35:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235640AbjHWULe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 16:11:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43308 "EHLO
+        id S236376AbjHWUf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 16:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236407AbjHWUL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 16:11:27 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9696310CC
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 13:11:25 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d66c957e1b2so6626769276.0
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 13:11:25 -0700 (PDT)
+        with ESMTP id S236362AbjHWUfI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 16:35:08 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E90910D4
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 13:35:06 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58419550c3aso82663247b3.0
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 13:35:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692821485; x=1693426285;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Z0FP+hPub/nKJVBpaXkcDppbwPaEend4VotzFjUig+0=;
-        b=UKFqCpIuAooV9vJHdFvVxIzAXGLWB66zKCrFfCWgSV2+jPU+aeEbY3vriBeckSXM+E
-         DhpXZsssDa/ql4yMzYv4lsuaFbBX0DGOGQdNRBTy3IJRScVafk+3AcyLFiMszGddb1vo
-         REGV0hn2+a//Zk3JQn1RDTfM6tRmuPsd7SRjSFH5Tbt594/RTZ2zDEfj0+W3piazAjJF
-         ruQQjMygv9E+p/B1ty7L9mDGGOPlspUW4m20CcUnOrno0OmCLQsEv+EV6V8plyFW7T5t
-         0BlUedSpTtnENVbwSXwSPiGmIHY3aC3Hrd3UYQ16IA15wxkVE+a6Yy9cOuxIvP77xF+p
-         TQwg==
+        d=google.com; s=20221208; t=1692822905; x=1693427705;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uNl0p1iobEmxtFFlFibwUb/5OsmeA37vr99AFPPjLyE=;
+        b=FW4W9kB5t794YWDNQRCavhc2CvnpqUIaUwkp/ugL/Ukmp7NNX8jJc943HmoqQxWTZM
+         eyyHkdxS2FICoRTYJzNOHpSi6dFgu54ZqOA0buCSFNYqJSeswqMy4zPTxwB4/Z4RHsgD
+         84XvivdMj80UUIrZ1YpG82+/yGxcFDfevS/xjtHixzm57TO/2gPrHyzuBZ75t4CvpdZQ
+         WjQOVGjBLDisH2xJ6535GVL8oz3cCqiHkklRgaKTGpgwXib/6di77oz1KVEx9XF7mWcP
+         DKAKk/YhbKZKzsHeDeTTorcai534k6Y3PCRN0Sqtjz3ZzbHTwXZTaiWS/MMZkMzY8QvC
+         34Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692821485; x=1693426285;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z0FP+hPub/nKJVBpaXkcDppbwPaEend4VotzFjUig+0=;
-        b=De5KpG+zje0RMHyJpAUiwmtyixm5dUxWnR7p40PN6FvSBjdRh3BXWPQlvVx+I7IV+/
-         qV+bA/CISrNlvZBwnLqaiuzT3ZNYy88aGOhjUN0MElQpAMyM1YZaE0LEp2EL6jx0y5u/
-         8Rluc2hNaZzP+O4c/0trAuSRq8PeGLY0gASyTHoSKBU6uZ0iMiVCzXehkVzumvI/0pin
-         Q4YcSYi8vFBnR0RHksNhaeCrjZRZkJV9AkCNWjWDCjn7D5qD0YFM2A5nfg6j7R9IMmQt
-         gJg/35Jql3brMnnAK6HT/dBm3bm8+gb6zH44GgaUYwtqd6UR/b3c3FPGkGbbIiaBelrh
-         R+XQ==
-X-Gm-Message-State: AOJu0YxUne0sPexyIjUDKCufRu8Sg6JHrQ2JWK5CW0cKPVi+aLYm26+B
-        bkvGFH0pp9bxElvRXPeepxK8eZiXumdyguvDip3621dSA25GO6VKlhCAOU/I7sTnWX3OcXd39xV
-        9iQ2b2gCHICLRbU5UVX4X6ynQkmhULMzBUmz4qSMOIVvcZf1blV5A4LP1vAUGrZEQOYKMxsE=
-X-Google-Smtp-Source: AGHT+IGTqSfTI5bR/0j1hk91mJSFgF9aSd9HvOFQB8d1/WPp9UdimxMPsLgl8W2nNetxghJu0FgyfzGO3pfev32XYg==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a25:d809:0:b0:d01:60ec:d0e with SMTP
- id p9-20020a25d809000000b00d0160ec0d0emr190756ybg.9.1692821484792; Wed, 23
- Aug 2023 13:11:24 -0700 (PDT)
-Date:   Wed, 23 Aug 2023 20:04:08 +0000
+        d=1e100.net; s=20221208; t=1692822905; x=1693427705;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uNl0p1iobEmxtFFlFibwUb/5OsmeA37vr99AFPPjLyE=;
+        b=MxG1+8HMEMOhLoiuNPbj3dwiAP599u5j/xin/fQhhHTEYQ3LVsZ+Ijlchjz3scGRxH
+         OrlKja5ZKrXnh5qfrKUazurO2D3ycPzNywX0Yk+WFhdKRh65KW/GzTuueWjBR+Cclj7a
+         7yGkv7KTFnPVLeJ7P+FAbWwuFtZChWeTESMV1IqZThTqUJXOLX7Uf1LgWejlqYXQm4hi
+         OpXyaVX38aA2PNBmqITe2w5DvPolyNjd1rAFiog2I3/N0TizroiPJliwAg2C8sLoHQSh
+         A1eTVYUgT1Bn7EwefRD+VFY3Us61uaZs74Ue3kqRKw5DDyd+eg2OBiGtvM5R8YfYNQBl
+         m5+A==
+X-Gm-Message-State: AOJu0Yz8OCvSb0pmKMr28HaWpw/TvFGm4iz0LvYDVjR/329hRE3BoRNc
+        pTxfzPZwr0nWn64nyFpVJaYm9possnM=
+X-Google-Smtp-Source: AGHT+IEgRo/wa5rLpZbO7TJkWXB1xqKmLZ71kIK/huj+vWB3upeFML3xInPXfY5rairb76D9+uV6RZ7y0sg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:ad0d:0:b0:586:a58d:2e24 with SMTP id
+ l13-20020a81ad0d000000b00586a58d2e24mr197643ywh.5.1692822905713; Wed, 23 Aug
+ 2023 13:35:05 -0700 (PDT)
+Date:   Wed, 23 Aug 2023 13:35:04 -0700
+In-Reply-To: <20230822080312.63514-1-likexu@tencent.com>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
-Message-ID: <20230823200408.1214332-1-coltonlewis@google.com>
-Subject: [kvm-unit-tests PATCH] arm64: microbench: Benchmark with virtual
- instead of physical timer
-From:   Colton Lewis <coltonlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Andrew Jones <andrew.jones@linux.dev>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20230822080312.63514-1-likexu@tencent.com>
+Message-ID: <ZOZteOxJvq9v609G@google.com>
+Subject: Re: [PATCH] KVM: x86: Allow exposure of VMware backdoor Pseudo-PMCs
+ when !enable_pmu
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the virtual instead of the physical timer for measuring the time
-taken to execute the microbenchmark.
+On Tue, Aug 22, 2023, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> Fix kvm_pmu_rdpmc() logic to allow exposure of VMware backdoor Pseudo-PMCs
+> if pmu is globally disabled.
+> 
+> In this usage scenario, once vmware_backdoor is enabled, the VMs can fully
+> utilize all of the vmware_backdoor-related resources, not just part of it,
+> i.e., vcpu should always be able to access the VMware backdoor Pseudo-PMCs
+> via RDPMC. Since the enable_pmu is more concerned with the visibility of
+> hardware pmu resources on the host, fix it to decouple the two knobs.
+>
+> The test case vmware_backdoors from KUT is used for validation.
 
-Internal testing discovered a performance regression on this test
-starting with Linux commit 680232a94c12 "KVM: arm64: timers: Allow
-save/restoring of the physical timer". Oliver Upton speculates QEMU is
-changing the guest physical counter to have a nonzero offset since it
-gained the ability as of that commit. As a consequence KVM is
-trap-and-emulating here on architectures without FEAT_ECV.
+Is there a real world need for this?  Per commit 672ff6cff80c ("KVM: x86: Raise
+#GP when guest vCPU do not support PMU"), KVM's behavior is intentional.  If there
+is a real world need, then (a) that justification needs to be provided, (b) this
+needs a Fixes:, and (c) this probably needs to be tagged for stable.
 
-While this isn't a correctness issue, the trap-and-emulate overhead of
-physical counter emulation on systems without ECV leads to surprising
-microbenchmark results.
+> Cc: Arbel Moshe <arbel.moshe@oracle.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: Nikita Leshenko <nikita.leshchenko@oracle.com>
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- arm/micro-bench.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The expectation is that a Cc: in the changelog means the patch email is Cc'd to
+that person, i.e. one of the purposes of Cc: here is to record that people who
+might care about the patch have been made aware of its existence.  stable@ is
+pretty much the only exception to that rule, as "Cc: stable@vger.kernel.org" is
+really just a metadata tag for scripts.
 
-diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-index bfd181dc..fbe59d03 100644
---- a/arm/micro-bench.c
-+++ b/arm/micro-bench.c
-@@ -348,10 +348,10 @@ static void loop_test(struct exit_test *test)
+FWIW, I believe Liran no longer works for Oracle, no idea about the others.
 
- 	while (ntimes < test->times && total_ns.ns < NS_5_SECONDS) {
- 		isb();
--		start = read_sysreg(cntpct_el0);
-+		start = read_sysreg(cntvct_el0);
- 		test->exec();
- 		isb();
--		end = read_sysreg(cntpct_el0);
-+		end = read_sysreg(cntvct_el0);
-
- 		ntimes++;
- 		total_ticks += (end - start);
---
-2.42.0.rc1.204.g551eb34607-goog
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/pmu.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index edb89b51b383..c896328b2b5a 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -526,12 +526,12 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>  	struct kvm_pmc *pmc;
+>  	u64 mask = fast_mode ? ~0u : ~0ull;
+>  
+> -	if (!pmu->version)
+> -		return 1;
+> -
+>  	if (is_vmware_backdoor_pmc(idx))
+>  		return kvm_pmu_rdpmc_vmware(vcpu, idx, data);
+>  
+> +	if (!pmu->version)
+> +		return 1;
+> +
+>  	pmc = static_call(kvm_x86_pmu_rdpmc_ecx_to_pmc)(vcpu, idx, &mask);
+>  	if (!pmc)
+>  		return 1;
+> 
+> base-commit: fff2e47e6c3b8050ca26656693caa857e3a8b740
+> -- 
+> 2.41.0
+> 
