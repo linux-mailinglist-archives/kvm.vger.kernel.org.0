@@ -2,74 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52245785F9E
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 20:29:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ED6B7860A4
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 21:30:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238143AbjHWS3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 14:29:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41864 "EHLO
+        id S237943AbjHWTaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 15:30:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238154AbjHWS27 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 14:28:59 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57866E7F
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 11:28:55 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99bcfe28909so748134766b.3
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 11:28:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692815334; x=1693420134;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D1i56BJxrtFkay0cZ6IFmWxVW0ev3tPI6w5w2txm7Do=;
-        b=tY59VRdaWi1DBU5yE67ABWm0o7nBL9MaDrpmh6mNIpiomLMKYM9r5+wGag8dCdpGui
-         NaOu1KuepfxDYEnB5dPlu6HN3tZoqfi4h5AZqSoJMkAg0oJDWfVE8EHuzN27hE3O0KBP
-         JacU7TySMZ9zMI707ZZsNDN3xijkW23FU/k8wMptNZ3fySwsLdyTXz9Lxwn1rCU56ZCE
-         C/Rs2MpZPWH9uHcMD3MIE59ybie080aQKP2f9kpdsw97pgl7vV5p2yZBjbOIXCsUeFLe
-         cYN8QqkTzAvw/3ZN3fCU0RffyJWB4XNowo4aojHT/BDBDqMCUc9dr5tWJQZvMBpdddNz
-         e2UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692815334; x=1693420134;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D1i56BJxrtFkay0cZ6IFmWxVW0ev3tPI6w5w2txm7Do=;
-        b=Xx640HM6+j0u2Xyjmf73yWHM5qdIOrz7HrBtfraJqGibocmsaw6K0ZRZ0oPMB9FLyd
-         hqs8ScEPk7AwyYpfSkRu/D3kS54wBBUIHqH1+ttCpvme2EVpE1N8WV6Xmwnnn8TxqbHv
-         Y2//Ujo5CqZXmvrVxA8FRgKLL7TWA1HQxRFaOgT051ghbXT9/Jrc0kZBZW8PgLj/wy55
-         JyXAbDiu9aW1fokfFscJyv6N4G4aGn4YBNH2m20oGKVAN2LOFS9GvIo5EtCChDPxIaW+
-         cQx/bF+rc/OrmCjEA4GblT43XRdpnq5ijDtEQge1x96V2THl1e+weJRZhutIn19anjXe
-         6mMg==
-X-Gm-Message-State: AOJu0YxLJeFMGf/W0inq6lnfIRhXd8G6CxvSqa66+aMEnRwUps0eFmV2
-        D/aFPB3u4Mv7lQFCeEVXGCsXf35HneHPcP+sBcEsDg==
-X-Google-Smtp-Source: AGHT+IHlQp9aiZ8Ka0ZJpgClwBB6XmkiaNX9y3bj9ftkzDoc7wSBGvtA2RV/u4qhbokdUveFaacH9H1ARr99SdESQ+M=
-X-Received: by 2002:a17:907:7714:b0:99b:6e54:bd6e with SMTP id
- kw20-20020a170907771400b0099b6e54bd6emr9614282ejc.56.1692815333628; Wed, 23
- Aug 2023 11:28:53 -0700 (PDT)
+        with ESMTP id S238098AbjHWTaA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 15:30:00 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E9E10C8;
+        Wed, 23 Aug 2023 12:29:58 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NJCZGq030998;
+        Wed, 23 Aug 2023 19:29:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=8V1esxwklFErSUFnPK6XOA6s5/KCSCyZQLNUOEjUwVQ=;
+ b=DYQLCFsvQm7ip5ocKtXS1uWIqlbbB2h59SlXyf2Fj18SRGwf6SBl7OdI3PoKnArd5CPE
+ uFxkg1Ka6Rmg23WDAm6dxV4xBUwIawPNnBn7pthvJxEQ5RKr1y/FT/lzUkDBEEzOOW8H
+ xqO1L4SbIgURfEWG2RmjwsQgcOTAIYp45o0zOHj9/NIEV/fEd06VcJ6HodPNRJN1ctyM
+ 8zJ8KIBqOsi65CHT9Kpeuj/jqmFPfp9mTR8nJHzbOpdY812yl6FGn3d2rU+j8iBwyHEW
+ in455Bi661CNMAXhS7ZZTMfou6y8JtWlUF3pqTSZkWeXNfyexUYWaHGPg5UuOuU7ztVO ew== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3snr2kgg3x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Aug 2023 19:29:58 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37NIjrrr016403;
+        Wed, 23 Aug 2023 19:29:57 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sn227rxvj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Aug 2023 19:29:57 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37NJTsww25690648
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Aug 2023 19:29:54 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E839D2004B;
+        Wed, 23 Aug 2023 19:29:53 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5514020040;
+        Wed, 23 Aug 2023 19:29:53 +0000 (GMT)
+Received: from osiris (unknown [9.171.42.232])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed, 23 Aug 2023 19:29:53 +0000 (GMT)
+Date:   Wed, 23 Aug 2023 21:29:51 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     Michael Mueller <mimu@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: fix gisa destroy operation might lead to cpu
+ stalls
+Message-ID: <20230823192951.28372-A-hca@linux.ibm.com>
+References: <20230823124140.3839373-1-mimu@linux.ibm.com>
+ <ZOYIWuq3iqLjDd+q@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <e144381d-4ff3-d7b6-5624-813ea22f196a@linux.ibm.com>
+ <ZOYtd7m2TqMDIb++@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
 MIME-Version: 1.0
-References: <20230504120042.785651-1-rkagan@amazon.de> <ZH6DJ8aFq/LM6Bk9@google.com>
- <CALMp9eS3F08cwUJbKjTRAEL0KyZ=MC==YSH+DW-qsFkNfMpqEQ@mail.gmail.com>
- <ZJ4dmrQSduY8aWap@google.com> <ZJ65CiW0eEL2mGg8@u40bc5e070a0153.ant.amazon.com>
- <ZJ7mjdZ8h/RSilFX@google.com> <ZJ7y9DuedQyBb9eU@u40bc5e070a0153.ant.amazon.com>
- <ZJ74gELkj4DgAk4S@google.com> <ZJ9IaskpbIK9q4rt@google.com> <bdc2be50-c8c4-ff06-196f-d9b67e61a6b5@gmail.com>
-In-Reply-To: <bdc2be50-c8c4-ff06-196f-d9b67e61a6b5@gmail.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 23 Aug 2023 11:28:17 -0700
-Message-ID: <CAL715WJiUYpxRRqs3FNiLiS8b6=4Pm5K0u==S6t5NYi0p=vutw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: vPMU: truncate counter value to allowed width
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Roman Kagan <rkagan@amazon.de>,
-        Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZOYtd7m2TqMDIb++@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mJu6Q59Hxe4ba6l_geAJbSrW0jFH3oY2
+X-Proofpoint-ORIG-GUID: mJu6Q59Hxe4ba6l_geAJbSrW0jFH3oY2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-23_13,2023-08-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=270 mlxscore=0 phishscore=0 clxscore=1015 malwarescore=0
+ spamscore=0 bulkscore=0 suspectscore=0 lowpriorityscore=0 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308230173
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,109 +91,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 22, 2023 at 2:30=E2=80=AFAM Like Xu <like.xu.linux@gmail.com> w=
-rote:
->
-> On 1/7/2023 5:26 am, Sean Christopherson wrote:
-> > Ugh, yeah, de0f619564f4 created a bit of a mess.  The underlying issue =
-that it
-> > was solving is that perf_event_read_value() and friends might sleep (ya=
-y mutex),
-> > and so can't be called from KVM's fastpath (IRQs disabled).
-> Updating pmu counters for emulated instructions cause troubles.
->
-> >
-> > However, detecting overflow requires reading perf_event_read_value() to=
- gather
-> > the accumulated count from the hardware event in order to add it to the=
- emulated
-> > count from software.  E.g. if pmc->counter is X and the perf event coun=
-ter is Y,
-> > KVM needs to factor in Y because X+Y+1 might overflow even if X+1 does =
-not.
-> >
-> > Trying to snapshot the previous counter value is a bit of a mess.  It c=
-ould probably
-> > made to work, but it's hard to reason about what the snapshot actually =
-contains
-> > and when it should be cleared, especially when factoring in the wrappin=
-g logic.
-> >
-> > Rather than snapshot the previous counter, I think it makes sense to:
-> >
-> >    1) Track the number of emulated counter events
->
-> If events are counted separately, the challenge here is to correctly time
-> the emulation of counter overflows, which can occur on both sides of the
-> counter values out of sync.
->
-> >    2) Accumulate and reset the counts from perf_event and emulated_coun=
-ter into
-> >       pmc->counter when pausing the PMC
-> >    3) Pause and reprogram the PMC on writes (instead of the current app=
-roach of
-> >       blindly updating the sample period)
->
-> Updating the sample period is the only interface for KVM to configure hw
-> behaviour on hw-ctr. I note that perf_event_set_count() will be proposed,
-> and I'm pessimistic about this change.
->
-> >    4) Pause the counter when stopping the perf_event to ensure pmc->cou=
-nter is
-> >       fresh (instead of manually updating pmc->counter)
-> >
-> > IMO, that yields more intuitive logic, and makes it easier to reason ab=
-out
-> > correctness since the behavior is easily define: pmc->counter holds the=
- counts
-> > that have been gathered and processed, perf_event and emulated_counter =
-hold
-> > outstanding counts on top.  E.g. on a WRMSR to the counter, both the em=
-ulated
-> > counter and the hardware counter are reset, because whatever counts exi=
-sted
-> > previously are irrelevant.
->
-> If we take the hardware view, a counter, emulated or not, just increments
-> and overflows at the threshold. The missing logic here is when the counte=
-r
-> is truncated when writing high bit-width values, and how to deal with the
-> value of pmc->prev_counter was before pmc->counter was truncated.
->
-> >
-> > Pausing the counter_might_  make WRMSR slower, but we need to get this =
-all
-> > functionally correct before worrying too much about performance.
->
-> Performance, security and correctness should all be considered at the beg=
-inning.
->
+On Wed, Aug 23, 2023 at 06:01:59PM +0200, Alexander Gordeev wrote:
+> On Wed, Aug 23, 2023 at 04:09:26PM +0200, Michael Mueller wrote:
+> > Does that make sense for you?
+> 
+> Not really. If process_gib_alert_list() does guarantee the removal,
+> then it should be a condition, not the loop.
+> 
+> But I am actually not into this code. Just wanted to point out that
+> cpu_relax() is removed from this loop and the two other loops within
+> process_gib_alert_list() do not have it either.
 
-+1 on the performance part.
-
-I did several rounds of performance testing, pausing the counter is
-fast, but restarting the counter is *super* slow. The extra overhead
-might just make vPMU useless especially when the guest workload takes
-full CPU/memory resources in a VM (like SPEC2017 does).
-
-> >
-> > Diff below for what I'm thinking (needs to be split into multiple patch=
-es).  It's
-> > *very*  lightly tested.
->
-> It saddens me that no one has come up with an actual low-level counter-te=
-st for
-> this issue.
->
-> >
-> > I'm about to disappear for a week, I'll pick this back up when I get re=
-turn.  In
-> > the meantime, any testing and/or input would be much appreciated!
->
-> How about accepting Roman's original fix and then exercising the rewritin=
-g genius ?
-
-+1
-
-I think the best option would be to just apply the fix in a short term
-and put the refactoring of the emulated counter in the next series.
+Not sure if you are mainly referring to the missing cpu_relax(), however:
+any chance you missed that cpu_relax() translates only to barrier() on
+s390? So it really doesn't "relax" anything. cpu_relax() used to be a
+diagnose 0x44 (aka voluntary yield), but that caused many problems,
+therefore we removed that logic, and the only thing remaining is a no-op
+with compiler barrier semantics.
