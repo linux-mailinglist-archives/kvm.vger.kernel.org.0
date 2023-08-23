@@ -2,141 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EC61785094
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 08:25:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D3A4785107
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 09:00:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232924AbjHWGZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 02:25:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
+        id S233069AbjHWHAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 03:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232913AbjHWGZA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 02:25:00 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A7CE51;
-        Tue, 22 Aug 2023 23:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692771899; x=1724307899;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=slejTqpOWghte6frBzPjO8NSTtKM/rpyG5Defl6tOVY=;
-  b=BkCe4lyT2k9+DTEBHaS9ACCLz1ad+ES7x4uMSVLpiuGlxmVthtJU1YqO
-   RlmwO5apRm5/wBWuazsLrnr3pHarkny3m/yVWp6xFtjmZ+VkVHuSkXRXd
-   wzY+WVekkBZpQfHDip0Y0qyZvJ8g0eVUElynBvqlzv9fvLCB9rxvusnaZ
-   feuWar+Gb7WkdCf8MN31SupsG3OoeA5g/M2NO10q07z5V1At+js3EUeQw
-   vZsWWI55X7ktWveg7nThzYgB2UojGumS0ZcERounNReUomeIcvskJ5lGW
-   qu1Zt/aGZExp2Gm29E0W9z3XTAGmKLk9wRVfY3OrPV9FXYMBmvcyFmo3R
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="359062876"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="359062876"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 23:24:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10810"; a="739642598"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="739642598"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.93.6.77]) ([10.93.6.77])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2023 23:24:54 -0700
-Message-ID: <498ee0c4-4736-68a7-7cbf-12e54f6a0d22@intel.com>
-Date:   Wed, 23 Aug 2023 14:24:51 +0800
+        with ESMTP id S230323AbjHWHAk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 03:00:40 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F446E7;
+        Wed, 23 Aug 2023 00:00:35 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id A5AE710000E;
+        Wed, 23 Aug 2023 10:00:32 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A5AE710000E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1692774032;
+        bh=SRJZujbowiyE4xrK91RwKf1qOYluLzScsl3Xa81A+dk=;
+        h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+        b=BffrOigH5z4JgZW9GxRwHqrTqdiFOY9UMOPXHdXeZoQmrBL7PCdgk9cLxNDTj/M3/
+         9vvv6yyNgRR+GtStPHapPTzmCo5vT8Ot4J2RZakcVicaNAHkD7XwwtgIbQyd2wSypI
+         fyVUAq7wiFOgC3ljf/pT9JLAOeTjVMa5xPDGbVXJC7JcxbIjwKm0NUKY+b2ZjFR9eb
+         NfHzXvGkHUSq3lkp4+a4Rv80VZJGGKgTCfbRNjNIQ0XwPyq6Cec+phHaGUtfnv+POb
+         09SBHOSIeX4S+VBBW3eD84W+DkCkBTz9ZbhAe1tZ+OC+ARY0esgXG0nL8iW9ByVYnI
+         eP4xtaFdr/3pQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Wed, 23 Aug 2023 10:00:30 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 23 Aug 2023 10:00:25 +0300
+Message-ID: <0e23cec7-0e9a-ac8d-e8b6-536a5c3d4b2e@sberdevices.ru>
+Date:   Wed, 23 Aug 2023 09:54:26 +0300
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.14.0
-Subject: Re: [PATCH] kvm: x86: emulate MSR_PLATFORM_INFO msr bits
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v6 2/4] vsock/virtio: support to send non-linear
+ skb
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Hao Xiang <hao.xiang@linux.alibaba.com>
-Cc:     Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
-        shannon.zhao@linux.alibaba.com, pbonzini@redhat.com,
-        linux-kernel@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
-References: <1692588392-58155-1-git-send-email-hao.xiang@linux.alibaba.com>
- <ZOMWM+YmScUG3U5W@chao-email>
- <6d10dcf7-7912-25a2-8d8e-ef7d71a4ce83@linux.alibaba.com>
- <ZOM/8IVsRf3esyQ1@chao-email>
- <33f0e9bb-da79-6f32-f1c3-816eb37daea6@linux.alibaba.com>
- <ZOOMwvPd/Cz/cEmv@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZOOMwvPd/Cz/cEmv@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Paolo Abeni <pabeni@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230814212720.3679058-1-AVKrasnov@sberdevices.ru>
+ <20230814212720.3679058-3-AVKrasnov@sberdevices.ru>
+ <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
+From:   Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <85ff931ea180e19ae3df83367cf1e7cac99fa0d8.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179391 [Aug 23 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 527 527 5bb611be2ca2baa31d984ccbf4ef4415504fc308, {Tracking_smtp_not_equal_from}, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: n, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/23 04:58:00 #21681850
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/22/2023 12:11 AM, Sean Christopherson wrote:
-> +Aaron
+
+
+On 22.08.2023 11:16, Paolo Abeni wrote:
+> Hi,
 > 
-> When resending a patch, e.g. to change To: or Cc:, tag it RESEND.  I got three
-> copies of this...
+> I'm sorry for the long delay here. I was OoO in the past few weeks.
 > 
-> On Mon, Aug 21, 2023, Hao Xiang wrote:
+> On Tue, 2023-08-15 at 00:27 +0300, Arseniy Krasnov wrote:
+>> For non-linear skb use its pages from fragment array as buffers in
+>> virtio tx queue. These pages are already pinned by 'get_user_pages()'
+>> during such skb creation.
 >>
+>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  Changelog:
+>>  v2 -> v3:
+>>   * Comment about 'page_to_virt()' is updated. I don't remove R-b,
+>>     as this change is quiet small I guess.
 >>
->> On 2023/8/21 18:44, Chao Gao wrote:
->>> On Mon, Aug 21, 2023 at 05:11:16PM +0800, Hao Xiang wrote:
->>>> For reason that,
->>>>
->>>> The turbo frequency info depends on specific machine type. And the msr value
->>>> of MSR_PLATFORM_INFO may be diferent on diffrent generation machine.
->>>>
->>>> Get following msr bits (needed by turbostat on intel platform) by rdmsr
->>>> MSR_PLATFORM_INFO directly in KVM is more reasonable. And set these msr bits
->>>> as vcpu->arch.msr_platform_info default value.
->>>> -bit 15:8, Maximum Non-Turbo Ratio (MAX_NON_TURBO_LIM_RATIO)
->>>> -bit 47:40, Maximum Efficiency Ratio (MAX_EFFICIENCY_RATIO)
->>>
->>> I don't get why QEMU cannot do this with the existing interface, e.g.,
->>> KVM_SET_MSRS.
->>>
->>> will the MSR value be migrated during VM migration?
->>>
->>> looks we are in a dilemma. on one side, if the value is migrated, the value can
->>> become inconsisntent with hardware value. On the other side, changing the ratio
->>> bits at runtime isn't the architectural behavior.
->>>
->>> And the MSR is per-socket. In theory, a system can have two sockets with
->>> different values of the MSR. what if a vCPU is created on a socket and then
->>> later runs on the other socket?
->>>
+>>  net/vmw_vsock/virtio_transport.c | 41 +++++++++++++++++++++++++++-----
+>>  1 file changed, 35 insertions(+), 6 deletions(-)
 >>
->> Set these msr bits (needed by turbostat on intel platform) in KVM by
->> default.
->> Of cource, QEMU can also set MSR value by need. It does not conflict.
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index e95df847176b..7bbcc8093e51 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -100,7 +100,9 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>>  	vq = vsock->vqs[VSOCK_VQ_TX];
+>>  
+>>  	for (;;) {
+>> -		struct scatterlist hdr, buf, *sgs[2];
+>> +		/* +1 is for packet header. */
+>> +		struct scatterlist *sgs[MAX_SKB_FRAGS + 1];
+>> +		struct scatterlist bufs[MAX_SKB_FRAGS + 1];
 > 
-> It doesn't conflict per se, but it's still problematic.  By stuffing a default
-> value, KVM _forces_ userspace to override the MSR to align with the topology and
-> CPUID defined by userspace.  
-
-I don't understand how this MSR is related to topology and CPUID?
-
-> And if userspace uses KVM's "default" CPUID, or lack
-> thereof, using the underlying values from hardware are all but guaranteed to be
-> wrong.
-
-Could you please elaborate?
-
-> The existing code that sets MSR_PLATFORM_INFO_CPUID_FAULT really should not exist,
-> i.e. KVM shouldn't shouldn't assume userspace wants to expose CPUID faulting to
-> the guest.  That particular one probably isn't worth trying to retroactively fix.
+> Note that MAX_SKB_FRAGS depends on a config knob (CONFIG_MAX_SKB_FRAGS)
+> and valid/reasonable values are up to 45. The total stack usage can be
+> pretty large (~700 bytes).
 > 
-> Ditto for setting MSR_IA32_ARCH_CAPABILITIES; KVM is overstepping, but doing so
-> likely doesn't cause problems.
-> 
-> MSR_IA32_PERF_CAPABILITIES is a different story.  Setting a non-zero default value
-> is blatantly wrong, as KVM will advertise vPMU features even if userspace doesn't
-> advertise.  Aaron is planning on sending a patch for this one (I'm hoping we can
-> get away with retroactively dropping the code without having to add a quirk).
-> 
-> *If* we need KVM to expose the ratios to userspace, then the correct way to do so
-> is handle turbo and efficiency ratio information is to by implementing support in
-> kvm_get_msr_feature(), i.e. KVM_GET_MSRS on /dev/kvm.  Emphasis on "if", because
-> I would prefer to do nothing in KVM if that information is already surfaced to
-> userspace through other mechanisms in the kernel.
+> As this is under the vsk tx lock, have you considered moving such data
+> in the virtio_vsock struct?
 
+I think yes, there will be no problem if these temporary variables will be moved
+into this global struct. I'll add comment about this reason.
+
+> 
+>>  		int ret, in_sg = 0, out_sg = 0;
+>>  		struct sk_buff *skb;
+>>  		bool reply;
+>> @@ -111,12 +113,39 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>>  
+>>  		virtio_transport_deliver_tap_pkt(skb);
+>>  		reply = virtio_vsock_skb_reply(skb);
+>> +		sg_init_one(&bufs[out_sg], virtio_vsock_hdr(skb),
+>> +			    sizeof(*virtio_vsock_hdr(skb)));
+>> +		sgs[out_sg] = &bufs[out_sg];
+>> +		out_sg++;
+>> +
+>> +		if (!skb_is_nonlinear(skb)) {
+>> +			if (skb->len > 0) {
+>> +				sg_init_one(&bufs[out_sg], skb->data, skb->len);
+>> +				sgs[out_sg] = &bufs[out_sg];
+>> +				out_sg++;
+>> +			}
+>> +		} else {
+>> +			struct skb_shared_info *si;
+>> +			int i;
+>> +
+>> +			si = skb_shinfo(skb);
+> 
+> This assumes that the paged skb does not carry any actual data in the
+> head buffer (only the header). Is that constraint enforced somewhere
+> else? Otherwise a
+> 
+> 	WARN_ON_ONCE(skb_headlen(skb) > sizeof(*virtio_vsock_hdr(skb))
+> 
+> could be helpful to catch early possible bugs.
+
+Yes, such skbs have data only in paged part, while linear buffer contains only
+header. Ok, let's add this warning here to prevent future bugs.
+
+Thanks, Arseniy
+
+> 
+> Thanks!
+> 
+> Paolo
+> 
+>> +
+>> +			for (i = 0; i < si->nr_frags; i++) {
+>> +				skb_frag_t *skb_frag = &si->frags[i];
+>> +				void *va;
+>>  
+>> -		sg_init_one(&hdr, virtio_vsock_hdr(skb), sizeof(*virtio_vsock_hdr(skb)));
+>> -		sgs[out_sg++] = &hdr;
+>> -		if (skb->len > 0) {
+>> -			sg_init_one(&buf, skb->data, skb->len);
+>> -			sgs[out_sg++] = &buf;
+>> +				/* We will use 'page_to_virt()' for the userspace page
+>> +				 * here, because virtio or dma-mapping layers will call
+>> +				 * 'virt_to_phys()' later to fill the buffer descriptor.
+>> +				 * We don't touch memory at "virtual" address of this page.
+>> +				 */
+>> +				va = page_to_virt(skb_frag->bv_page);
+>> +				sg_init_one(&bufs[out_sg],
+>> +					    va + skb_frag->bv_offset,
+>> +					    skb_frag->bv_len);
+>> +				sgs[out_sg] = &bufs[out_sg];
+>> +				out_sg++;
+>> +			}
+>>  		}
+>>  
+>>  		ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+> 
