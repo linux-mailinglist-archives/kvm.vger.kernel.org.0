@@ -2,145 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7D54785D18
-	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 18:16:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6780F785D1C
+	for <lists+kvm@lfdr.de>; Wed, 23 Aug 2023 18:18:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236855AbjHWQQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 12:16:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44852 "EHLO
+        id S237496AbjHWQSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 12:18:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233376AbjHWQQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 12:16:36 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F67E78;
-        Wed, 23 Aug 2023 09:16:35 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NG7tVv017059;
-        Wed, 23 Aug 2023 16:16:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=w8QYNl3yL/cBFxwdBLHJlStrut5knJs1xpHl5DZXxrg=;
- b=g+XUQseGc67t292FYboz6XFsAhqHM/W0L5eJnRFJVQ66k7rdgGOfDt3y1F4PB2yBL3qn
- pv8O0vN6nJbLP9VlKClfSaevHvyYCE7gYjYd1LrVDbKQwYoUlkoby6HLLavhdVtcqvze
- wF2rwhAzYXbyLOLg3pVQZ0iWE2g6HdT4l9svUjdKUB4d4qD11DDf6mBS7xZnPDd2VIhr
- wLhEaCKSX3W8JI9QwZgo5L5OPU+n9osjc5P+QdXU881pEhvcXvVWJH5e0aJ7Lb2zsbNT
- A3J+vUWdn6iGYieRBmY3mD5OXkq93i0CyvckNJGiFjughjxsLYhRovxlPMnO0+DwFXL5 tQ== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3snn72rcg6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Aug 2023 16:16:34 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37NENBE7016549;
-        Wed, 23 Aug 2023 16:16:33 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sn227qpfh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Aug 2023 16:16:33 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37NGGUPI24511210
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Aug 2023 16:16:30 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F29A720043;
-        Wed, 23 Aug 2023 16:16:29 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD44220040;
-        Wed, 23 Aug 2023 16:16:29 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.66])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 23 Aug 2023 16:16:29 +0000 (GMT)
-Date:   Wed, 23 Aug 2023 18:16:27 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     Michael Mueller <mimu@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Subject: Re: [PATCH] KVM: s390: fix gisa destroy operation might lead to cpu
- stalls
-Message-ID: <20230823181627.7903ad6f@p-imbrenda>
-In-Reply-To: <ZOYtd7m2TqMDIb++@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20230823124140.3839373-1-mimu@linux.ibm.com>
-        <ZOYIWuq3iqLjDd+q@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-        <e144381d-4ff3-d7b6-5624-813ea22f196a@linux.ibm.com>
-        <ZOYtd7m2TqMDIb++@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        with ESMTP id S232131AbjHWQSL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 12:18:11 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2058.outbound.protection.outlook.com [40.107.96.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C46BAE74;
+        Wed, 23 Aug 2023 09:18:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iaiUhBQj/k6XFxxF5kXov1x3kCYcElon0BDW3yJLAxnXWo1kZ+sHoznDcfFeHIiAjExo6MRgp9XOLEX55HVFWrhaVMO6WQwl+7jE5jZnTlWjX9j5pFRv23gLOwu6/AJuo+r5fWvAL0eD89HmIlHyW0PnlY3EubYczzYqhruZPIQ/vYS5pmQOxf565UfipGHcXEWPUzc8jq1XtoY5qPngoy/chzUWste9QKoHJs8qq+r6fimUplZF+63WHjcFpZbL1kbSdnEwnPe/dRXfsDXkKi9Sk3AVJFpjQ1Nu8aJ7Bt4kvK1sT4bIr5M18+15NgUR1QRdAocvtBJmjj/tjjfZjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S0jkNUhKJyHOfeiZ/nsbApLIWbtqlOA9PSUIDW3wznM=;
+ b=nyiZaRjmOod0Mbdho0591mpk3vLKZHEI+8iybPaRbPo9+s7IMKYcZmGgKJjxI6ELgJpL6UuNOVPtkLAxZ8ijG5+0SrsNyGFGjX/r/Cjkn53nBGb0oLrk1bHKrjy6fSp+hK9vILUaKlxxvsCvNO0SpWcLJm7DX22SJo2/N5wkoFulBJXoxnxNpSaPHDxHC9Ryjq7QHlG0L4mVstEHkodo2bve4TaQZFZAAoPohm5BzGCwIt0hp9i84V62lKrI3tRc6QHrybPfwfYDoeAAgXTMjN1gBf+nhL6sRzJAy+S4it6nKQhWrVKIDYDuHBbDyMeojSvtfQqjw8mMhWgHuj/CmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S0jkNUhKJyHOfeiZ/nsbApLIWbtqlOA9PSUIDW3wznM=;
+ b=L+7CZFDZrDv81BGRdMREOGAlQ4xMprCF3+rawctJ0RJZ11XZJscSicsSuPaZbLUIFJgz2Sb3bkKap5/d5ZbW8uwzwyxXD4iHnMazMpFmVImuC4ta4vXXTsx7hAL0mkmiYCyQ/yYwNYjumQvpdqgP7PaX7xaYrbrwQUwtu5asqF8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by MW4PR12MB6998.namprd12.prod.outlook.com (2603:10b6:303:20a::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Wed, 23 Aug
+ 2023 16:18:07 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d267:7b8b:844f:8bcd%7]) with mapi id 15.20.6699.026; Wed, 23 Aug 2023
+ 16:18:07 +0000
+Message-ID: <d183c3f2-d94d-5f22-184d-eab80f9d0fe8@amd.com>
+Date:   Wed, 23 Aug 2023 11:18:05 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 0/2] KVM: SVM: Fix unexpected #UD on INT3 in SEV guests
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
+References: <20230810234919.145474-1-seanjc@google.com>
+ <bf3af7eb-f4ce-b733-08d4-6ab7f106d6e6@amd.com> <ZOTQ6izCUfrBh2oj@google.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <ZOTQ6izCUfrBh2oj@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: iT3CfrmhEuqtemqA_FVoz6JW3EGkv3xE
-X-Proofpoint-ORIG-GUID: iT3CfrmhEuqtemqA_FVoz6JW3EGkv3xE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-23_10,2023-08-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 malwarescore=0 phishscore=0 clxscore=1011 spamscore=0
- priorityscore=1501 mlxlogscore=826 adultscore=0 impostorscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308230147
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-ClientProxiedBy: SA0PR11CA0101.namprd11.prod.outlook.com
+ (2603:10b6:806:d1::16) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|MW4PR12MB6998:EE_
+X-MS-Office365-Filtering-Correlation-Id: 676087e0-c16a-45a6-44ec-08dba3f488fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5Hs0E3MNNaL5r71mpV1jnA9bavPqrsuKrjtXJrAnPer3i9nhshQawfZfGCq6PQSPAlJNiThx/DiQTiTsLv7dpawrZsLdW7UnB0WFaNiFnlXdyvaNuM2WcuW72vwd937UQtvljcGLFYm8gq2cKunJKeoHoT1QqXqMOlX6VRQb/e8CCwDI/KMMDgK2q3l49Z74BEnVaivESwdLVjNoeZsDdF65gZgYgi7La4VLY9aSyIYg66hW5CcSvVPBu87+D+MUww75IXvOmYvWULotOv8JcIGTfq+iGgprIi//lciJRs+Bt+wQ2PkstZ2tgSz5wxpCOZdadilbR5cIUHPQwCPJuh62i/ZOxfkQfQqtPoV7eD8xCP370hM/+s0OLRs0MQtLtScndI6+glzxcPPRI/6Cxjl78W5P2XntFu0hi/amiQmgqJ0iZmMhnxLg3t5faf2cea7wLJlx1T8P3/P78PtlBgf9mdgjo89WF+MhXmGtGM1URhxsoBNHC0OInJRU3A/BX/S3EuktciE6GbQdU9n9LcvUvwEWXPFCUO4SLyBA4fdU8vwO84PaOWIfIiHJsI8rF6C01BWyXNKwpj3180ID78orht/ufoHk1+A1A3gOalPl5jjFBhSbecxkggLMuTGdfsM7AQEJNUCRjC0aBYhEiQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(346002)(366004)(39860400002)(186009)(1800799009)(451199024)(54906003)(6916009)(66476007)(66946007)(6512007)(316002)(66556008)(8676002)(8936002)(2616005)(4326008)(36756003)(41300700001)(478600001)(6506007)(38100700002)(53546011)(6486002)(83380400001)(2906002)(31686004)(31696002)(86362001)(5660300002)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cjhIemlKbXo4eGVRZVMrMWpmVlhXclkrKzgrQm9jYUsvcDM4M2ZQc0hKQnlp?=
+ =?utf-8?B?eDQycDJseFc4aDdqZkpvelBjaFR3RFM1aUJhT3hMQ241N0w4MFNhTDdNcGp6?=
+ =?utf-8?B?dnVYbkYvRHhPSUFqNVExUTAwWEU5cXFRTlVONUgyaWxZTGU1SWI1cTFySkR2?=
+ =?utf-8?B?VWlvdmJKTjZrU3BMVWtJczh3VmVLYU9BQmZIalQ2T1lwa05xNTZJT1dISUQr?=
+ =?utf-8?B?a2xvSm5tQmRyekZSQkc4TGlnZGtIWjZTckplZ1pnMGZrclc2QzBmQVlWci9U?=
+ =?utf-8?B?L2puUG1KMDRoUVpRWElodDNVRDBkaW01MkYybTluRTFaYmZjWFhPRDE3dVc2?=
+ =?utf-8?B?U1dCaEhuc0Iwa1pXSVZhT2RlekRXam1kYVJFSld5UnVuekhLVWxYb3ROZVk1?=
+ =?utf-8?B?UkFPZDBqdkZIS0RJSlBjYW1pTUg1WW5iV1d4OWVqTWwwUC9TY1hKZG55dEdL?=
+ =?utf-8?B?a05uTFZFbXQ0eFFWcDZPR01QMXh0NDI1OUZxY0pTUWxVVTRBYWdCSGRwSlZB?=
+ =?utf-8?B?YnhCVlZWM2dTRm9mTmxGZWEwTklUbVNJQ0NnQ2ttYWx2UUV6dXRTQXlaVHZI?=
+ =?utf-8?B?RXZJQ05QYXZKRUVlRXBwR2pMekhJKzdNZnkxNUNjVW5BNlBhby9XMG5GQXFI?=
+ =?utf-8?B?NWNyaGdhMm1ia1Y1d3ZuMHlFaTVnNVF5cmJPeFZWWVphZlpXeDJCeVUwNEN6?=
+ =?utf-8?B?WWd1Y1pIUnFxRXczYytNZ0tEUTBibFVPbXd0MUx5a2JYWFRxNkJUYWVtRloz?=
+ =?utf-8?B?NFR5clRnTEhoMWZadlpxWm9OUFZMYXdBSTkrTWdzZE50a0R2aitBenhKclhG?=
+ =?utf-8?B?Ty9HK3c0Y0RqMEtGOXZINkdKTFl5MW9lUmtudTYrYjJVc0RlMEtiNjRKNGpa?=
+ =?utf-8?B?RFpvdDlERzJLS2JQSG44V3hGTTU1VmFrSlpMNHRGTkNSemVyQk9vMTcwclJL?=
+ =?utf-8?B?bk5mY3U3Y0hFY3BVNlBFcWtMQzl4NGJGbFBHZEtDTWd5Y3luN1N3bmpZZnZT?=
+ =?utf-8?B?aUxRZmsxMnk3RXVmQjZTeFlxalMrUDNaRHh1ZzlWNHBkeXU1L2s4bjhkNjBa?=
+ =?utf-8?B?U1VXNTZkczd3QU56Ly8vczh1aElsSk5pUUdmSHN4MERTVE1wMEorMFZZQ0xo?=
+ =?utf-8?B?cU5RSmViOEVpRHRiSmdQRFI5aC9TYi93S1FhZTNDK2xLejRMYXJjUU1sSnV4?=
+ =?utf-8?B?ZzYxNmNsdlErNkdCbGZVNUhWalo1NFJ3L09hWVFhcW9DTVZveGxobzh6SDg2?=
+ =?utf-8?B?dFQ4bnFnY0lBSm1uelgzUko3MmN0SjhVU0hHdHYyWHN5dmI4dGM1TGhCcTlZ?=
+ =?utf-8?B?eEMyMlJpUHVYa2tWc1c0cjNEdjkvaHRHK2pFTHE3MlEvSWY4MHdJUXhNcjBV?=
+ =?utf-8?B?OUtaZGUrVWRZdFBjUFVXOU5ndkRFWDA1M0I2MGlGdno1R0U3djFmSTRlcjRK?=
+ =?utf-8?B?Y3VVdnFRZFZ1Rnora3VUalNZb2F0b3ZCcUxJYjMxTmpRNHFJbzVsMVdqdDZU?=
+ =?utf-8?B?TW9UKzBTN2pTbVNlOU1VQXZzbWo0MTNuMlZDbkdJbUN5YXcxUVJ1TUFrR0ZF?=
+ =?utf-8?B?OWNYWC9SaFA1ZEw5akhkdU5ySDlzTGluUmFnbElGRDhTYTNJckVYQlkyNlJr?=
+ =?utf-8?B?aFk3NXYrUzh2eW91dmtlbVpwK05HNlJ6ZFNlUkNkeGpIMXVYYi8rU05CL0JW?=
+ =?utf-8?B?N1o4VmpSZlFEV3ZINzRJOE0xVTZOT1FJZldtcE0vdENFUGNDWXhnLzcrTWdC?=
+ =?utf-8?B?dUwwaEZmUFJPOHVQdjNUbXNWWVB5d0NQK1k2eUQzL0x6VEJ0ZitUaE1QZDdt?=
+ =?utf-8?B?OFhPQkVxbWRlQjNqZ2pBY1BOUURBMldyZ0d4cElwMjI0bXRMck9SalcxRWZz?=
+ =?utf-8?B?YVdnNDVuTG4vUXlzMWtZQkJ4V0svVjZYKzFBNkNhdGJ1SFB0aFpNWWlGQStz?=
+ =?utf-8?B?U0RHZzFtN1dpOERQaWdTZ2tKb3g0UUxEbURqUU5rbHNWRGpFZWhKR3ptcUVR?=
+ =?utf-8?B?Z05OaXBxM042ckpYSkR4VllQRTlhdG0xREllMTdxcVllZ2M0dFhKNDNkcEdn?=
+ =?utf-8?B?R2M2K0hxODROeDdtcG9yMzZITVdJSnFJTFpVSFY2b3B4dEpsU3FLV0x3NklK?=
+ =?utf-8?Q?j1G9eckzJFNy1Au22EgNZmK5Q?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 676087e0-c16a-45a6-44ec-08dba3f488fa
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 16:18:07.0494
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TfbcrVjkx9WcC8eTsmKswribbt0PmmnA+wPKUnpyW3NIdGrQA8ON9vT8NyQNylw7TnbJVUVQoC6Ru+jjJGe/NA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6998
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Aug 2023 18:01:59 +0200
-Alexander Gordeev <agordeev@linux.ibm.com> wrote:
-
-> On Wed, Aug 23, 2023 at 04:09:26PM +0200, Michael Mueller wrote:
-> > 
-> > 
-> > On 23.08.23 15:23, Alexander Gordeev wrote:  
-> > > On Wed, Aug 23, 2023 at 02:41:40PM +0200, Michael Mueller wrote:
-> > > ...  
-> > > > diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> > > > index 9bd0a873f3b1..73153bea6c24 100644
-> > > > --- a/arch/s390/kvm/interrupt.c
-> > > > +++ b/arch/s390/kvm/interrupt.c
-> > > > @@ -3205,8 +3205,10 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
-> > > >   	if (gi->alert.mask)
-> > > >   		KVM_EVENT(3, "vm 0x%pK has unexpected iam 0x%02x",
-> > > >   			  kvm, gi->alert.mask);
-> > > > -	while (gisa_in_alert_list(gi->origin))
-> > > > -		cpu_relax();
-> > > > +	while (gisa_in_alert_list(gi->origin)) {
-> > > > +		KVM_EVENT(3, "vm 0x%pK gisa in alert list during destroy", kvm);
-> > > > +		process_gib_alert_list();  
-> > > 
-> > > process_gib_alert_list() has two nested loops and neither of them
-> > > does cpu_relax(). I guess, those are needed instead of one you remove?  
-> > 
-> > Calling function process_gib_alert_list() guarantees the gisa
-> > is taken out of the alert list immediately and thus the potential
-> > endless loop on gisa_in_alert_list() is solved. The issue surfaced
-> > with the following patch that accidently disabled the GAL interrupt
-> > processing on the host that normaly handles the alert list.
-> > The patch has been reverted from devel and will be re-applied in v2.
-> > 
-> > 88a096a7a460 Revert "s390/airq: remove lsi_mask from airq_struct"
-> > a9d17c5d8813 s390/airq: remove lsi_mask from airq_struct
-> > 
-> > Does that make sense for you?  
+On 8/22/23 10:14, Sean Christopherson wrote:
+> On Tue, Aug 22, 2023, Tom Lendacky wrote:
+>> On 8/10/23 18:49, Sean Christopherson wrote:
+>>> Fix a bug where KVM injects a bogus #UD for SEV guests when trying to skip
+>>> an INT3 as part of re-injecting the associated #BP that got kinda sorta
+>>> intercepted due to a #NPF occuring while vectoring/delivering the #BP.
+>>>
+>>> I haven't actually confirmed that patch 1 fixes the bug, as it's a
+>>> different change than what I originally proposed.  I'm 99% certain it will
+>>> work, but I definitely need verification that it fixes the problem
+>>>
+>>> Patch 2 is a tangentially related cleanup to make NRIPS a requirement for
+>>> enabling SEV, e.g. so that we don't ever get "bug" reports of SEV guests
+>>> not working when NRIPS is disabled.
+>>>
+>>> Sean Christopherson (2):
+>>>     KVM: SVM: Don't inject #UD if KVM attempts emulation of SEV guest w/o
+>>>       insn
+>>>     KVM: SVM: Require nrips support for SEV guests (and beyond)
+>>>
+>>>    arch/x86/kvm/svm/sev.c |  2 +-
+>>>    arch/x86/kvm/svm/svm.c | 37 ++++++++++++++++++++-----------------
+>>>    arch/x86/kvm/svm/svm.h |  1 +
+>>>    3 files changed, 22 insertions(+), 18 deletions(-)
+>>
+>> We ran some stress tests against a version of the kernel without this fix
+>> and we're able to reproduce the issue, but not reliably, after a few hours.
+>> With this patch, it has not reproduced after running for a week.
+>>
+>> Not as reliable a scenario as the original reporter, but this looks like it
+>> resolves the issue.
 > 
-> Not really. If process_gib_alert_list() does guarantee the removal,
-> then it should be a condition, not the loop.
+> Thanks Tom!  I'll apply this for v6.6, that'll give us plenty of time to change
+> course if necessary.
 
-this is actually a good question. why is it still a loop?
+I may have spoke to soon...  When the #UD was triggered it was here:
 
-> 
-> But I am actually not into this code. Just wanted to point out that
-> cpu_relax() is removed from this loop and the two other loops within
-> process_gib_alert_list() do not have it either.
-> 
-> So up to Christian, Janosch and Claudio.
+[    0.118524] Spectre V2 : Enabling Restricted Speculation for firmware calls
+[    0.118524] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    0.118524] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+[    0.118524] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[    0.118524] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.2.2-amdsos-build50-ubuntu-20.04+ #1
+[    0.118524] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+[    0.118524] RIP: 0010:int3_selftest_ip+0x0/0x60
+[    0.118524] Code: b9 25 05 00 00 48 c7 c2 e8 7c 80 b0 48 c7 c6 fe 1c d3 b0 48 c7 c7 f0 7d da b0 e8 4c 2c 0b ff e8 75 da 15 ff 0f 0b 48 8d 7d f4 <cc> 90 90 90 90 83 7d f4 01 74 2f 80 3d 39 7f a8 00 00 74 24 b9 34
 
+
+Now (after about a week) we've encountered a hang here:
+
+[    0.106216] Spectre V2 : Enabling Restricted Speculation for firmware calls
+[    0.106216] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    0.106216] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+
+It is in the very same spot and so I wonder if the return false (without
+queuing a #UD) is causing an infinite loop here that appears as a guest
+hang. Whereas, we have some systems running the first patch that you
+created that have not hit this hang.
+
+But I'm not sure why or how this patch could cause the guest hang. I
+would think that the retry of the instruction would resolve everything
+and the guest would continue. Unfortunately, the guest was killed, so I'll
+try to reproduce and get a dump or trace points of the VM to see what is
+going on.
+
+Thanks,
+Tom
