@@ -2,76 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87F40787BA9
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 00:49:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4F22787C1E
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 01:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243963AbjHXWtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 18:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
+        id S236290AbjHXXvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 19:51:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243964AbjHXWse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 18:48:34 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C7BA1BF7
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 15:48:31 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-40c72caec5cso122531cf.0
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 15:48:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692917310; x=1693522110; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vb9AfcF55mcoZGPO2dmvc9+6EX0/259C9jrBF6CbU4o=;
-        b=JrE8u60dB1+q08qf9STEKBtPPddw8AVaiN5Biq1SOcxcDB6xhDH+oOnhHGGAZ/QRDN
-         +NlQdqx10TEw72SSdBzj66XIrV1sLpJCGjS8eGB60Hy/ZKVVcmreSfedkCvbte+PRw3V
-         SePlMjrc6+JY4QjjfG1iOk6CMMxn54xgflkZUbSC3Ys2v7reEJ+NnqaOR/M9cELzVZFp
-         2DgDaqVBMyhmbUuDLrva8f+kkUSIA1H6tiuQi0qq46YyqG/i/J8mVR9fM9aSTRAyEV3J
-         C7Ui23tvA/x5nXXKnrLSMPr2NVSKqNnJ/j9s0gVSItWG4L5R05jahzHxY/Erz7qWYDuY
-         jJew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692917310; x=1693522110;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vb9AfcF55mcoZGPO2dmvc9+6EX0/259C9jrBF6CbU4o=;
-        b=f5wvlbyy50hLUvyWEtwzKUdK6FF9IO2G+lsbgMeQ3Va1303yW0RGyiMzDI0ZDwtRGT
-         8rw3bwhRMsooe/8tAcRcXAqFZBL+62F0KWujPWCkv8qXbyByY983+wuc5LekTfGhV8UQ
-         fBwHyqSWATzgb5b7xqn8HoQw6SgCZlxg91Y3t/AIN1FkYF9m/dUw6leT8/II3nLMu6h9
-         CkM5TtDhrUVfMRomRANhxLcbKENZQM0/DAtCKHYEQg28oa6VfqU5nH6fFLgUNDBjPKoU
-         Yn/KJihfSxH2uKt94YOeNN05Dk/PIBAV8Eq2O0WkBnIfP5GPTOD3zeGMitMqZO91gT0L
-         mK5Q==
-X-Gm-Message-State: AOJu0YyGtZXOSdxfcTzZ5jCWJ/NE444/GWKATp7O/A8/0+nFrVGRkRMW
-        SOGnzn1T6cvlwieqCtcqc21cUYwcrGOx328qd9rt6A==
-X-Google-Smtp-Source: AGHT+IGUi2btJyqhZwjI0swl1m7dj321OGKdIIYEKxQYvbRMpMhGCU304BgGWP9IHvXqT69giR0E0fo1t3jC1JH77mg=
-X-Received: by 2002:a05:622a:24f:b0:403:b6ff:c0b with SMTP id
- c15-20020a05622a024f00b00403b6ff0c0bmr112968qtx.6.1692917310180; Thu, 24 Aug
- 2023 15:48:30 -0700 (PDT)
+        with ESMTP id S235165AbjHXXva (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 19:51:30 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93D2E77
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 16:51:26 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 737E085;
+        Thu, 24 Aug 2023 16:51:26 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id OaFOtKhSeKnP; Thu, 24 Aug 2023 16:51:22 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id EF5E645;
+        Thu, 24 Aug 2023 16:51:21 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net EF5E645
+Date:   Thu, 24 Aug 2023 16:51:21 -0700 (PDT)
+From:   Eric Wheeler <kvm@lists.ewheeler.net>
+To:     Sean Christopherson <seanjc@google.com>
+cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
+        kvm@vger.kernel.org
+Subject: Re: Deadlock due to EPT_VIOLATION
+In-Reply-To: <ZOaptK09RbJtFbmk@google.com>
+Message-ID: <50b37641-ac2e-c4c4-440-7a443b115913@ewheeler.net>
+References: <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net> <ZOP4lwiMU2Uf89eQ@google.com> <468b1298-e43e-2397-5f3-4b6af6e2f461@ewheeler.net> <ZOTQPUk5kxskDcsi@google.com> <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net> <ZOZH3xe0u4NHhvL8@google.com>
+ <db7c65b-6530-692-5e50-c74a7757f22@ewheeler.net> <347d3526-7f8d-4744-2a9c-8240cc556975@ewheeler.net> <ZOaUdP46f8XjQvio@google.com> <5da12792-1e5d-b89d-ea0-e1159c645568@ewheeler.net> <ZOaptK09RbJtFbmk@google.com>
 MIME-Version: 1.0
-References: <20230824223731.2055016-1-srutherford@google.com>
-In-Reply-To: <20230824223731.2055016-1-srutherford@google.com>
-From:   Ben Hillier <bhillier@google.com>
-Date:   Thu, 24 Aug 2023 15:48:18 -0700
-Message-ID: <CAFn7gfRibD3YCBdXgtHuR0hMzJb+MYBNWHN5h+KJ1wJGzfL1sg@mail.gmail.com>
-Subject: Re: [PATCH v3] x86/sev: Make enc_dec_hypercall() accept a size
- instead of npages
-To:     Steve Rutherford <srutherford@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com,
-        pankaj.gupta@amd.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
-        jacobhxu@google.com, patelsvishal@google.com,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: multipart/mixed; boundary="8323328-110721984-1692921081=:30383"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,143 +48,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 24, 2023 at 3:37=E2=80=AFPM Steve Rutherford <srutherford@googl=
-e.com> wrote:
->
-> enc_dec_hypercall() accepted a page count instead of a size, which
-> forced its callers to round up. As a result, non-page aligned
-> vaddrs caused pages to be spuriously marked as decrypted via the
-> encryption status hypercall, which in turn caused consistent
-> corruption of pages during live migration. Live migration requires
-> accurate encryption status information to avoid migrating pages
-> from the wrong perspective.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 064ce6c550a0 ("mm: x86: Invoke hypercall when page encryption stat=
-us is changed")
-> Signed-off-by: Steve Rutherford <srutherford@google.com>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
-Ran test comparing the c-bit status in the guest page tables to the
-host perspective. Before the patch, there was a c-bit status mismatch.
-Adding the patch fixed these mismatched c-bits.
-Tested-by: Ben Hillier <bhillier@google.com>
-> ---
->  arch/x86/include/asm/mem_encrypt.h |  6 +++---
->  arch/x86/kernel/kvm.c              |  4 +---
->  arch/x86/mm/mem_encrypt_amd.c      | 13 ++++++-------
->  3 files changed, 10 insertions(+), 13 deletions(-)
->
-> diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/me=
-m_encrypt.h
-> index 7f97a8a97e24..473b16d73b47 100644
-> --- a/arch/x86/include/asm/mem_encrypt.h
-> +++ b/arch/x86/include/asm/mem_encrypt.h
-> @@ -50,8 +50,8 @@ void __init sme_enable(struct boot_params *bp);
->
->  int __init early_set_memory_decrypted(unsigned long vaddr, unsigned long=
- size);
->  int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long=
- size);
-> -void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npa=
-ges,
-> -                                           bool enc);
-> +void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr,
-> +                                           unsigned long size, bool enc)=
-;
->
->  void __init mem_encrypt_free_decrypted_mem(void);
->
-> @@ -85,7 +85,7 @@ early_set_memory_decrypted(unsigned long vaddr, unsigne=
-d long size) { return 0;
->  static inline int __init
->  early_set_memory_encrypted(unsigned long vaddr, unsigned long size) { re=
-turn 0; }
->  static inline void __init
-> -early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool en=
-c) {}
-> +early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigned long size,=
- bool enc) {}
->
->  static inline void mem_encrypt_free_decrypted_mem(void) { }
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 6a36db4f79fd..b8ab9ee5896c 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -966,10 +966,8 @@ static void __init kvm_init_platform(void)
->                  * Ensure that _bss_decrypted section is marked as decryp=
-ted in the
->                  * shared pages list.
->                  */
-> -               nr_pages =3D DIV_ROUND_UP(__end_bss_decrypted - __start_b=
-ss_decrypted,
-> -                                       PAGE_SIZE);
->                 early_set_mem_enc_dec_hypercall((unsigned long)__start_bs=
-s_decrypted,
-> -                                               nr_pages, 0);
-> +                                               __end_bss_decrypted - __s=
-tart_bss_decrypted, 0);
->
->                 /*
->                  * If not booted using EFI, enable Live migration support=
-.
-> diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.=
-c
-> index 54bbd5163e8d..6faea41e99b6 100644
-> --- a/arch/x86/mm/mem_encrypt_amd.c
-> +++ b/arch/x86/mm/mem_encrypt_amd.c
-> @@ -288,11 +288,10 @@ static bool amd_enc_cache_flush_required(void)
->         return !cpu_feature_enabled(X86_FEATURE_SME_COHERENT);
->  }
->
-> -static void enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
-> +static void enc_dec_hypercall(unsigned long vaddr, unsigned long size, b=
-ool enc)
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--8323328-110721984-1692921081=:30383
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+
+On Wed, 23 Aug 2023, Sean Christopherson wrote:
+> On Wed, Aug 23, 2023, Eric Wheeler wrote:
+> > On Wed, 23 Aug 2023, Sean Christopherson wrote:
+> > > Not a coincidence, at all.  The bug is that, in v6.1, is_page_fault_stale() takes
+> > > the local @mmu_seq snapshot as an int, whereas as the per-VM count is stored as an
+> > > unsigned long.
+> > 
+> > I'm surprised that there were no compiler warnings about signedness or
+> > type precision.  What would have prevented such a compiler warning?
+> 
+> -Wconversion can detect this, but it detects freaking *everything*, i.e. its
+> signal to noise ratio is straight up awful.  It's so noisy in fact that it's not
+> even in the kernel's W=1 build, it's pushed down all the way to W=3.  W=1 is
+> basically "you'll get some noise, but it may find useful stuff.  W=3 is essentially
+> "don't bother wading through the warnings unless you're masochistic".
+> 
+> E.g. turning it on leads to:
+> 
+> linux/include/linux/kvm_host.h:891:60: error:
+> conversion to ‘long unsigned int’ from ‘int’ may change the sign of the result [-Werror=sign-conversion]
+>   891 |                           (atomic_read(&kvm->online_vcpus) - 1))
+>       |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
+> 
+> which is completely asinine (suppressing the warning would require declaring the
+> above literal as 1u).
+
+I can see that.  I suppose we'll never see the kernel compile with -Wall 
+-Werror!
+
+ 
+> FWIW, I would love to be able to prevent these types of bugs as this isn't the
+> first implicit conversion bug that has hit KVM x86[*], but the signal to noise
+> ratio is just so, so bad.
+> 
+> [*] commit d5aaad6f8342 ("KVM: x86/mmu: Fix per-cpu counter corruption on 32-bit builds")
+> 
+> > > When the sequence sets bit 31, the local @mmu_seq value becomes
+> > > a signed *negative* value, and then when that gets passed to mmu_invalidate_retry_hva(),
+> > > which correctly takes an unsigned long, the negative value gets sign-extended and
+> > > so the comparison ends up being
+> > > 
+> > > 	if (0x8002dc25 != 0xffffffff8002dc25)
+> > >
+> > > and KVM thinks the sequence count is stale.  I missed it for so long because I
+> > > was stupidly looking mostly at upstream code (see below), and because of the subtle
+> > > sign-extension behavior (I was mostly on the lookout for a straight truncation
+> > > bug where bits[63:32] got dropped).
+> > > 
+> > > I suspect others haven't hit this issues because no one else is generating anywhere
+> > > near the same number of mmu_notifier invalidations, and/or live migrates VMs more
+> > > regularly (which effectively resets the sequence count).
+> > > 
+> > > The real kicker to all this is that the bug was accidentally fixed in v6.3 by
+> > > commit ba6e3fe25543 ("KVM: x86/mmu: Grab mmu_invalidate_seq in kvm_faultin_pfn()"),
+> > > as that refactoring correctly stored the "local" mmu_seq as an unsigned long.
+> > > 
+> > > I'll post the below as a proper patch for inclusion in stable kernels.
+> > 
+> > Awesome, and well done.  Can you think of a "simple" patch for the
+> > 6.1-series that would be live-patch safe?
+> 
+> This is what I'm going to post for 6.1, it's as safe and simple a patch as can
+> be.  The only potential hiccup for live-patching is that it's all but guaranteed
+> to be inlined, but the scope creep should be limited to one-level up, e.g. to
+> direct_page_fault().
+> 
+> Author: Sean Christopherson <seanjc@google.com>
+> Date:   Wed Aug 23 16:28:12 2023 -0700
+> 
+>     KVM: x86/mmu: Fix an sign-extension bug with mmu_seq that hangs vCPUs
+>     
+>     Take the vCPU's mmu_seq snapshot as an "unsigned long" instead of an "int"
+>     when checking to see if a page fault is stale, as the sequence count is
+>     stored as an "unsigned long" everywhere else in KVM.  This fixes a bug
+>     where KVM will effectively hang vCPUs due to always thinking page faults
+>     are stale, which result in KVM refusing to "fix" faults.
+>     
+>     mmu_invalidate_seq (née mmu_notifier_seq) is sequence counter used when
+>     KVM is handling page faults to detect if userspace mapping relevant to the
+>     guest was invalidated snapshotting the counter and acquiring mmu_lock, to
+>     ensure that the host pfn that KVM retrieved is still fresh.  If KVM sees
+>     that the counter has change, KVM resumes the guest without fixing the
+>     fault.
+>     
+>     What _should_ happen is that the source of the mmu_notifier invalidations
+>     eventually goes away, mmu_invalidate_seq will become stable, and KVM can
+>     once again fix guest page fault(s).
+>     
+>     But for a long-lived VM and/or a VM that the host just doesn't particularly
+>     like, it's possible for a VM to be on the receiving end of 2 billion (with
+>     a B) mmu_notifier invalidations.  When that happens, bit 31 will be set in
+>     mmu_invalidate_seq.  This causes the value to be turned into a 32-bit
+>     negative value when implicitly cast to an "int" by is_page_fault_stale(),
+>     and then sign-extended into a 64-bit unsigned when the signed "int" is
+>     implicitly cast back to an "unsigned long" on the call to
+>     mmu_invalidate_retry_hva().
+>     
+>     As a result of the casting and sign-extension, given a sequence counter of
+>     e.g. 0x8002dc25, mmu_invalidate_retry_hva() ends up doing
+>     
+>             if (0x8002dc25 != 0xffffffff8002dc25)
+>     
+>     and signals that the page fault is stale and needs to be retried even
+>     though the sequence counter is stable, and KVM effectively hangs any vCPU
+>     that takes a page fault (EPT violation or #NPF when TDP is enabled).
+>     
+>     Note, upstream commit ba6e3fe25543 ("KVM: x86/mmu: Grab mmu_invalidate_seq
+>     in kvm_faultin_pfn()") unknowingly fixed the bug in v6.3 when refactoring
+>     how KVM tracks the sequence counter snapshot.
+>     
+>     Reported-by: Brian Rak <brak@vultr.com>
+>     Reported-by: Amaan Cheval <amaan.cheval@gmail.com>
+>     Reported-by: Eric Wheeler <kvm@lists.ewheeler.net>
+>     Closes: https://lore.kernel.org/all/f023d927-52aa-7e08-2ee5-59a2fbc65953@gameservers.com
+
+Thanks again for all your help on this, I enjoyed working on it with you.
+
+-Eric
+
+>     Fixes: a955cad84cda ("KVM: x86/mmu: Retry page fault if root is invalidated by memslot update")
+>     Signed-off-by: Sean Christopherson <seanjc@google.com>
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 230108a90cf3..beca03556379 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4212,7 +4212,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   * root was invalidated by a memslot update or a relevant mmu_notifier fired.
+>   */
+>  static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+> -                               struct kvm_page_fault *fault, int mmu_seq)
+> +                               struct kvm_page_fault *fault,
+> +                               unsigned long mmu_seq)
 >  {
->  #ifdef CONFIG_PARAVIRT
-> -       unsigned long sz =3D npages << PAGE_SHIFT;
-> -       unsigned long vaddr_end =3D vaddr + sz;
-> +       unsigned long vaddr_end =3D vaddr + size;
->
->         while (vaddr < vaddr_end) {
->                 int psize, pmask, level;
-> @@ -342,7 +341,7 @@ static bool amd_enc_status_change_finish(unsigned lon=
-g vaddr, int npages, bool e
->                 snp_set_memory_private(vaddr, npages);
->
->         if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
-> -               enc_dec_hypercall(vaddr, npages, enc);
-> +               enc_dec_hypercall(vaddr, npages << PAGE_SHIFT, enc);
->
->         return true;
->  }
-> @@ -466,7 +465,7 @@ static int __init early_set_memory_enc_dec(unsigned l=
-ong vaddr,
->
->         ret =3D 0;
->
-> -       early_set_mem_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_S=
-HIFT, enc);
-> +       early_set_mem_enc_dec_hypercall(start, size, enc);
->  out:
->         __flush_tlb_all();
->         return ret;
-> @@ -482,9 +481,9 @@ int __init early_set_memory_encrypted(unsigned long v=
-addr, unsigned long size)
->         return early_set_memory_enc_dec(vaddr, size, true);
->  }
->
-> -void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npa=
-ges, bool enc)
-> +void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigne=
-d long size, bool enc)
->  {
-> -       enc_dec_hypercall(vaddr, npages, enc);
-> +       enc_dec_hypercall(vaddr, size, enc);
->  }
->
->  void __init sme_early_init(void)
-> --
-> 2.42.0.rc1.204.g551eb34607-goog
->
+>         struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
+>  
+> 
+> 
+--8323328-110721984-1692921081=:30383--
