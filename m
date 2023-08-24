@@ -2,111 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C4AD78770F
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 19:25:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B090787833
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 20:46:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234447AbjHXRZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 13:25:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57404 "EHLO
+        id S243076AbjHXSqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 14:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235155AbjHXRY7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 13:24:59 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68F4619A1
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 10:24:57 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id 98e67ed59e1d1-26d52dc97e3so17619a91.2
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 10:24:57 -0700 (PDT)
+        with ESMTP id S243074AbjHXSqK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 14:46:10 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FBCBE50
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 11:46:04 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d77fa2e7771so181149276.1
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 11:46:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692897897; x=1693502697;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qNhRIgPPAJgYOdqHkEPXtIgEpiaV0ld4q4V+3f9cbvg=;
-        b=b+eh84rDiYn74BODGnelrlrFZ73uaoyKIKI+U1ElBMKEziMehrGetltgu2hoGQtRPz
-         YRZSy3GYMvtuV4abKayFmhLVWTYvDvihdhd1MZMJSCJM+C6yLOJsXjGQox4jNxxrHzgQ
-         QI19VSjzefsSmzHXToTAbMS7mn9S165fS82twRJ1wz0aIulkLX4e/UH4Jn8qhZxmy8vo
-         79Y+fzOdDLUtuWQn7I9hVyUshqWB4JBJ5/6w8EWqQuCZXdjyfo8M47EjRMbjsuEhss5E
-         tFqWJTybLGA8sU6F/tTw9jvlWLPRAjv10LdQnozSRSo2wblLahrk44xDDlNt+ush4XjR
-         gjRA==
+        d=google.com; s=20221208; t=1692902763; x=1693507563;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jxvSonwCPl7HzvAeeiStfZghiC+PCdMyvX2s7XAS0qg=;
+        b=NVzIkEv1YN/fNfmOUW8+mCw4FGt9HP7CdvoVunxChDSreigmd4y8LfpytQe/AqNyk6
+         SwtnQuX90QpPGaLd6tImxYVQyNzKUv8yN83q39jElkG6uSHjlKz6kU2oPBtRB5gAMh6o
+         aMpmuTuXTnRULhbBAQ4vAMBl9b0WrIvPS+km14SYltNvzy4lWKgOetCmSN1OhEgpzdry
+         ewT5BOv0btzFrSk0bYtrPvxTYNpRLFSWbdonYryyUQL/0fqlkg3f6ZjQK9urPIgCKVVr
+         UjF/beO0p+u0oXMoXOaco7kmoUYr0lZoCXyO3/23am30ZXFVu4BsB394CHWzmvtIuc3m
+         zhDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692897897; x=1693502697;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qNhRIgPPAJgYOdqHkEPXtIgEpiaV0ld4q4V+3f9cbvg=;
-        b=IE9xaHkwTi8Ofe8eDvDz4OfKl9g25AU8+oSOp5vr38w60551zL8DAAsSTW4ifb1vQ+
-         iMFMpNWcWcGARWijazScJRZB/BvJlFtc/y8xVDcOfamnBuUZolFt0p3gZq4dnAIWfL8x
-         jNrdS0guhc4+bIlMRNBlfuQOWVOook+zyROmShdtdYkw1vsTTxaG1BkeHH7MAYhBi8ZZ
-         vHDt1CMq+2ILJFfy5LWu5l/XybKaP8aumbqeT365wtUAaIBsQi3pTkMztRnm3aFhTXIN
-         LgIXLIXPkt2paqFcTTO+nFpx4Sl6bUBaY++5fZTgXQoaI9+wjfveZDZcDRHSsXjngKu/
-         MSew==
-X-Gm-Message-State: AOJu0Yy75z2U8IMJBsn5Uy45Wa1WSg4Hv3lChxqhYyuJF5lHriUlg+9R
-        9qpwY7du7OvczXspRMYKHSLt1rHfR+o=
-X-Google-Smtp-Source: AGHT+IGKVz1fW1rh3wqfCqAzHna18XbrxT1X4An+gth8oKwk+SMzB/Wl4eiKhX+nKQuki7Cesth/BLh7CYM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:c717:b0:26b:b78:c94f with SMTP id
- o23-20020a17090ac71700b0026b0b78c94fmr3978564pjt.7.1692897896801; Thu, 24 Aug
- 2023 10:24:56 -0700 (PDT)
-Date:   Thu, 24 Aug 2023 10:24:55 -0700
-In-Reply-To: <CAF7b7mpPcbxLKhPvLwVg4mwSbXRQ-zRhz8Osj-CVqhMnG6NRkw@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1692902763; x=1693507563;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jxvSonwCPl7HzvAeeiStfZghiC+PCdMyvX2s7XAS0qg=;
+        b=I6m6QA58J09xEY4BlJaChraBDyiP+KkObZh26vr2J/Y41kVE11aBhUR/gGAouHRHr0
+         C/1QkAq0BAW/fwuA2mut/ZT4LGYUNbqVViwhyFGAflGB52def5KcYFTrZK4g+PPARRir
+         4AdCj7OkTIINN/vtE6QeGDM7Pj16li/LX9/tNotOP00jpQwJabMwQAGClGan/++Ond8w
+         UgVjexS7Mhp83DIDGyBbUkrCqVa6IO3wcWCIgkRx1N3Uv5los2rzyKPk82e9MknQT0v9
+         R8xQTaGeEwPjs3EIR6umBZuY1fh5xuwiG4nNygjBSYoy8qpMmgpbhLO4sSednXdTStk1
+         AReg==
+X-Gm-Message-State: AOJu0YwVdwgekbwHYNe3m8pjX27zSmEuqW+C9+3hVYzhhVIrRLEUJuVA
+        /LB7UuWG86v76xZqUAsEjDF1Rwm3ykRDX1lQDA==
+X-Google-Smtp-Source: AGHT+IHoz5xvutY055FyMb5A0+qKLbY91XiIs6jQGzBhrR+guKJhhRsG+9n92YHGqxDntUt9XeD1fRmg2IQaszGJIw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:aba2:0:b0:d77:f6f9:159 with SMTP
+ id v31-20020a25aba2000000b00d77f6f90159mr62888ybi.9.1692902763449; Thu, 24
+ Aug 2023 11:46:03 -0700 (PDT)
+Date:   Thu, 24 Aug 2023 18:46:02 +0000
+In-Reply-To: <20230824-0c7416fcdabc1f5f04a53560@orel> (message from Andrew
+ Jones on Thu, 24 Aug 2023 09:47:59 +0200)
 Mime-Version: 1.0
-References: <ZNpsCngiSjISMG5j@google.com> <CAF7b7mo0gGGhv9dSFV70md1fNqMvPCfZ05VawPOB=xFkaax8AA@mail.gmail.com>
- <ZNrKNs8IjkUWOatn@google.com> <CAF7b7mp=bDBpaN+NHoSmL-+JUdShGfippRKdxr9LW0nNUhtpWA@mail.gmail.com>
- <ZNzyHqLKQu9bMT8M@google.com> <CAF7b7mpOAJ5MO0F4EPMvb9nsgmjBCASo-6=rMC3kUbFPAh4Vfg@mail.gmail.com>
- <ZN60KPh2uzSo8W4I@google.com> <CAF7b7mo3WDWQDoRX=bQUy-bnm7_3+UMaQX9DKeRxAZ+opQCZiw@mail.gmail.com>
- <ZOaGF6pE5xk7C1It@google.com> <CAF7b7mpPcbxLKhPvLwVg4mwSbXRQ-zRhz8Osj-CVqhMnG6NRkw@mail.gmail.com>
-Message-ID: <ZOeSZ5zScxM/DRf0@google.com>
-Subject: Re: [PATCH v4 03/16] KVM: Add KVM_CAP_MEMORY_FAULT_INFO
-From:   Sean Christopherson <seanjc@google.com>
-To:     Anish Moorthy <amoorthy@google.com>
-Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Message-ID: <gsntttsonus5.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: microbench: Benchmark with virtual
+ instead of physical timer
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvm@vger.kernel.org, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oliver.upton@linux.dev,
+        kvmarm@lists.linux.dev, peter.maydell@linaro.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 23, 2023, Anish Moorthy wrote:
-> On Wed, Aug 23, 2023 at 3:20=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > I don't anticipate anything beyond the memory fault case.  We essential=
-ly already
-> > treat incomplete exits to userspace as KVM bugs.   MMIO is the only oth=
-er case I
-> > can think of where KVM doesn't complete an exit to usersapce, but that =
-one is
-> > essentially getting grandfathered in because of x86's flawed MMIO handl=
-ing.
-> > Userspace memory faults also get grandfathered in because of paravirt A=
-BIs, i.e.
-> > KVM is effectively required to ignore some faults due to external force=
-s.
->=20
-> Well that's good to hear. Are you sure that we don't want to add even
-> just a dedicated u8 to indicate the speculative exit reason though?
+Andrew Jones <andrew.jones@linux.dev> writes:
 
-Pretty sure.
+> On Thu, Aug 24, 2023 at 09:29:33AM +0200, Andrew Jones wrote:
+>> No need to speculate, QEMU is open source :-)  QEMU is setting on offset,
+>> but not because it explicitly wants to.  Simply reading the CNT register
+>> and writing back the same value is enough to set an offset, since the
+>> timer will have certainly moved past whatever value was read by the time
+>> it's written.  QEMU frequently saves and restores all registers in the
+>> get-reg-list array, unless they've been explicitly filtered out (with
+>> Linux commit 680232a94c12, KVM_REG_ARM_PTIMER_CNT is now in the array).
+>> So, to restore trapless ptimer accesses, we need a QEMU patch like below
+>> to filter out the register.
 
-> I'm just thinking that the different structs in speculative_exit will
-> be mutually exclusive,
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index 94bbd9661fd3..f89ea31f170d 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -674,6 +674,7 @@ typedef struct CPRegStateLevel {
+>>    */
+>>   static const CPRegStateLevel non_runtime_cpregs[] = {
+>>       { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+>> +    { KVM_REG_ARM_PTIMER_CNT, KVM_PUT_FULL_STATE },
+>>   };
 
-Given that we have no idea what the next "speculative" exit might be, I don=
-'t
-think it's safe to assume that the next one will be mutually exclusive with
-memory_fault.  I'm essentially betting that we'll never have more than 8
-"speculative" exit types, which IMO is a pretty safe bet.
+>>   int kvm_arm_cpreg_level(uint64_t regidx)
 
-> whereas flags/bitfields usually indicate non-mutually exclusive condition=
-s.
+> Actually, the QEMU fix above is necessary for more than just trap
+> avoidance. The ptimer will lag more and more with respect to other time
+> sources, even with respect to the vtimer (QEMU only updates the vtimer
+> offset when the VM is "paused".)
+
+> I'm not sure when I'll have time to test and post the QEMU patch. It may
+> be better if somebody else picks it up.
+
+I haven't posted any QEMU patches before, but I think I can handle this.
