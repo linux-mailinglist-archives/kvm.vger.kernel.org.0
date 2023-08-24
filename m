@@ -2,64 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA7AC78717E
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 16:27:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 636027873D2
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 17:16:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241620AbjHXO0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 10:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40462 "EHLO
+        id S242146AbjHXPQB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 11:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241699AbjHXO00 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 10:26:26 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496771BC6
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 07:26:22 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59294c55909so557417b3.0
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 07:26:22 -0700 (PDT)
+        with ESMTP id S242104AbjHXPPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 11:15:48 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F35F199E
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 08:15:46 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58e4d2b7d16so248817b3.0
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 08:15:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692887181; x=1693491981;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOEC2gL2vPMfrimKnsUeWbRBTwKLQLkp/XAmV7mc+hM=;
-        b=zThywn62QCEc2gE7/6qdBaDq9/1rKpLx6RFn/awFe4rXfJOV6KKFcgLLeDA1RQnWKp
-         9HSRtKRV90dPkRW3JDaAB3SP/eAtxDVdsHY8i4GiuFObziA0Dsdz7Z6O1gKlANCN/dD0
-         SruoR9Wenx6/YuF5BTQQNs4qC7gcr4rTJqfCLexSNOOiH20ad5vvWFFPspbwLx8GFAT5
-         KP5A3bUNK2KlJwmzUrKcA5/TNXfo1G1rk8v5qJr1Us6VB86XUPOrmp+D0gTrVXhqIUWZ
-         UCwdB0kJjGx1TOOnzY2Z1kLLH3GBrZFCR+HrK95SIMb+ltKBIoc6Cd3gXaMbqYfc2Byk
-         1Mxw==
+        d=google.com; s=20221208; t=1692890145; x=1693494945;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BCC0wwp7wWSIy0MrdACmgS4Vp0ye9VEhwI7wuPMec4A=;
+        b=FtVfL5Tf+6L+aGO+3VLVFfVEdfsELAv/SkE1PTKpiAC3gFVBjTzmjrn/G6noL3tCwT
+         nY/EAJeRp1nUZ1X8yuA3Jxf69ZaoSNHuvOQh3ULPUAYpMu4LVrXdZw1h4nH2PAlfwGQ5
+         HGQOfNLw0wvbAHb80uzDgzcI3HY8lXjzMoOoHDVH4Pz8HXQOOW7DfntGjjOL04U2gBH5
+         ZxYs546ol999Lp9xjtgeFXwtR0AaARSkkT0m/gVyhfqtUMb/pTpVMTXHfDw9wPW17NyP
+         1E6e3/AVVS3EyluWhAt1DasCBBld/p7NdQ0UhAyRFy01f8SCDMvj/nvu0ZKPtEv3L+Gt
+         UNqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692887181; x=1693491981;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOEC2gL2vPMfrimKnsUeWbRBTwKLQLkp/XAmV7mc+hM=;
-        b=KJvJuiip3JIuEjtvwEtsBGe7Ek7blmT3xH2r4NVWqLcwyHSsM8UvVJvKjbNvKw0qme
-         lQjiwJvsnXcpztljjggUD36FZ7M0kiiwF4UamaqsTUn1heUl9kIAflEpknpbDSU8rC2Q
-         iTpwZ1cm40xUSRkmKIMawcr5yjlBzvRRdNs2SbL+JaVwsqSCUG26omUc0I+AQTwcrfpZ
-         ODfHlWGAD8f3G/Qewqh39QRpzvXaK0LQiwG0+iYQN4LRNJ2NEo7dE5sSGfFSasiqt3a3
-         NmL0YdYayI57uG75+gzp+B3nZ2kppeyNvzB/WpzGyZRqG/GSV0+QcvmJ5OKs2rlagCYh
-         t6VA==
-X-Gm-Message-State: AOJu0YwMIbpnQvTvEYec0PnXj3vcC6BfWONBfTx870INdE9rqjgNPTm+
-        WL4wtzEREtXOtow9TPiEQ38LzHaekxw=
-X-Google-Smtp-Source: AGHT+IGRA8onYtETZ5TVTvLafV/wVwLQi13rt/bL96OuVKnHFmkFCsfsn/0KnssV9bbTzeqokJkvsPqXgwQ=
+        d=1e100.net; s=20221208; t=1692890145; x=1693494945;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BCC0wwp7wWSIy0MrdACmgS4Vp0ye9VEhwI7wuPMec4A=;
+        b=a4p3LePXH6ORvCwYM42cxDoc6ROSlbPiO4hMEWQWqNseZMoSf57P6ZJB2xxdj2W+mE
+         qxEg97ETwKHXZijJGPDQxrN/m7uEpiKrN+MGNM+/+6UjXTLfgeLGMVWJNztbJc+J6dLV
+         iQ0ZE1lFnJsHnTU0wg9M0hq1HvFLyu4iIcOLu0wgvLp14NRANQC+ncEnVv8nT2DqKiJS
+         WE+AvM1kXupeHOVRHAGnOEKjWeBE43jGBeoiIIuYf6HBsKEUt61DjRt1v8H3YXKnu/Dg
+         R6SEOUbsVap5OEc1FF+t2Z7biRPstkd6BA7mIBytY6ec3ztvxKMqcOcXjR4YUcdADd+e
+         ds4Q==
+X-Gm-Message-State: AOJu0Yz9ukcqYZH5Qnh7Z4u1Jr8sjX5I04vNfKEDEi0mqcuH0FAXy3V3
+        V+PTjsBunmJw2ewepdyf5B4KwaR4ob0=
+X-Google-Smtp-Source: AGHT+IEE5MT+OR26AI25mjbMCPL/tYmhkhOKeyxLgW2HJM/WWK+y8/HYNn2t4mxnVIC7aAY/Rh8OZ4/3wmA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:af0e:0:b0:58c:6ddd:d27c with SMTP id
- n14-20020a81af0e000000b0058c6dddd27cmr233466ywh.6.1692887181634; Thu, 24 Aug
- 2023 07:26:21 -0700 (PDT)
-Date:   Thu, 24 Aug 2023 07:26:20 -0700
-In-Reply-To: <ZOdmPqq6uXMSWOnV@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:2484:0:b0:d74:cdd7:d491 with SMTP id
+ k126-20020a252484000000b00d74cdd7d491mr186602ybk.5.1692890145678; Thu, 24 Aug
+ 2023 08:15:45 -0700 (PDT)
+Date:   Thu, 24 Aug 2023 08:15:44 -0700
+In-Reply-To: <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
 Mime-Version: 1.0
-References: <20221213060912.654668-1-seanjc@google.com> <20221213060912.654668-8-seanjc@google.com>
- <e91f562b-ecdf-6745-a9b1-52fe19126bad@gmail.com> <ZOdmPqq6uXMSWOnV@google.com>
-Message-ID: <ZOdojKCxPMV8KNo3@google.com>
-Subject: Re: [PATCH 7/7] KVM: VMX: Handle NMI VM-Exits in noinstr region
+References: <20230704075054.3344915-1-stevensd@google.com> <20230704075054.3344915-6-stevensd@google.com>
+ <20230705102547.hr2zxkdkecdxp5tf@linux.intel.com> <CAD=HUj7F6CUNt_9txEu0upB=PBwJzkL5dBhNs_BVHX1cicqBgw@mail.gmail.com>
+Message-ID: <ZOd0IMeKSkBwGIer@google.com>
+Subject: Re: [PATCH v7 5/8] KVM: x86/mmu: Don't pass FOLL_GET to __kvm_follow_pfn
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -70,40 +75,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 24, 2023, Sean Christopherson wrote:
-> On Thu, Aug 24, 2023, Like Xu wrote:
-> > @@ -7389,6 +7382,13 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> > 
-> >  	trace_kvm_exit(vcpu, KVM_ISA_VMX);
-> > 
-> > +	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
-> > +	    is_nmi(vmx_get_intr_info(vcpu))) {
-> > +		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
-> > +		vmx_do_nmi_irqoff();
-> > +		kvm_after_interrupt(vcpu);
-> > +	}
-> 
-> No, the whole point of doing NMI handling in vmx_vcpu_enter_exit() is so that NMIs
-> are serviced before instrumentation is enabled.
-> 
-> I think the below is sufficient (untested at this point).  Not quite minimal, e.g.
-> I'm pretty sure there's (currently) no need to snapshot IDT_VECTORING_INFO_FIELD
-> so early, but I can't think of any reason to wait.
-> 
-> --
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Thu, 24 Aug 2023 06:49:36 -0700
-> Subject: [PATCH] KVM: VMX: Refresh available regs and IDT vectoring info
->  before NMI handling
-> 
-> Reset the mask of available "registers" and refresh the IDT vectoring
-> info snapshot in vmx_vcpu_enter_exit(), before KVM potentially handles a
-> an NMI VM-Exit.  One of the "registers" that KVM VMX lazily loads is the
-> vmcs.VM_EXIT_INTR_INFO field, which is holds the vector+type on "exception
-> or NMI" VM-Exits, i.e. is needed to identify NMIs.  Clearing the available
-> registers bitmask after handling NMIs results in KVM querying info from
-> the last VM-Exit that read vmcs.VM_EXIT_INTR_INFO, and leads to both
-> missed NMIs and spurious NMIs from the guest's perspective.
+On Thu, Aug 24, 2023, David Stevens wrote:
+> On Wed, Jul 5, 2023 at 7:25=E2=80=AFPM Yu Zhang <yu.c.zhang@linux.intel.c=
+om> wrote:
+> >
+> > On Tue, Jul 04, 2023 at 04:50:50PM +0900, David Stevens wrote:
+> > > @@ -4529,7 +4540,8 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vc=
+pu *vcpu,
+> > >
+> > >  out_unlock:
+> > >       read_unlock(&vcpu->kvm->mmu_lock);
+> > > -     kvm_release_pfn_clean(fault->pfn);
+> >
+> > Yet kvm_release_pfn() can still be triggered for the kvm_vcpu_maped gfn=
+s.
+> > What if guest uses a non-referenced page(e.g., as a vmcs12)? Although I
+> > believe this is not gonna happen in real world...
+>=20
+> kvm_vcpu_map still uses gfn_to_pfn, which eventually passes FOLL_GET
+> to __kvm_follow_pfn. So if a guest tries to use a non-refcounted page
+> like that, then kvm_vcpu_map will fail and the guest will probably
+> crash. It won't trigger any bugs in the host, though.
+>=20
+> It is unfortunate that the guest will be able to use certain types of
+> memory for some purposes but not for others. However, while it is
+> theoretically fixable, it's an unreasonable amount of work for
+> something that, as you say, nobody really cares about in practice [1].
+>=20
+> [1] https://lore.kernel.org/all/ZBEEQtmtNPaEqU1i@google.com/
 
-Oof, it's not just from the guest's perspective, NMIs that are destined for host
-consumption will suffer the same fate. 
+There are use cases that care, which is why I suggested allow_unsafe_kmap.
+Specifically, AWS manages their pool of guest memory in userspace and maps =
+it all
+via /dev/mem.  Without that module param to let userspace opt-in, this seri=
+es will
+break such setups.  It still arguably is a breaking change since it require=
+s
+userspace to opt-in, but allowing such behavior by default is simply not a =
+viable
+option, and I don't have much sympathy since so much of this mess has its o=
+rigins
+in commit e45adf665a53 ("KVM: Introduce a new guest mapping API").
+
+The use cases that no one cares about (AFAIK) is allowing _untrusted_ users=
+pace
+to back guest RAM with arbitrary memory.  In other words, I want KVM to all=
+ow
+(by default) mapping device memory into the guest for things like vGPUs, wi=
+thout
+having to do the massive and invasive overhaul needed to safely allow backi=
+ng guest
+RAM with completely arbitrary memory.
