@@ -2,73 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 310F47865D2
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 05:25:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 846A17865FF
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 05:45:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239598AbjHXDZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 23:25:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46468 "EHLO
+        id S239694AbjHXDo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 23:44:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239592AbjHXDY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 23:24:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C95D610EC
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 20:24:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692847446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yPglN9jWCOWkDHiaVESzd3fbifjjVGG3Y2tLlmCAqyw=;
-        b=VxK3WDYbTykeW3YuyAts0vGA7HmODQhnNmzV8yauMtAgjaTW30n5bfxkrhidypQXvMW2/B
-        +NAIEBWyK4/WCBz5seGelMR1IF2BNPdzaynd2qK3mTwzv7Gn1/NbM+nSKtpBdcWY6lykqo
-        JpM85qjPreGIEUzG2erR0i49dZ8Duik=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-12-lUOBWhmTMpazIf8N8SNgVw-1; Wed, 23 Aug 2023 23:24:04 -0400
-X-MC-Unique: lUOBWhmTMpazIf8N8SNgVw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2bcc5098038so38886871fa.2
-        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 20:24:04 -0700 (PDT)
+        with ESMTP id S239673AbjHXDo0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 23:44:26 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B61A310F2
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 20:44:04 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3a707bc2397so848015b6e.0
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 20:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1692848644; x=1693453444;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=igTSDR/vKXgPwxt8Nsf/dMSfVCUUURBFbV4iu+jj8kI=;
+        b=OsYjiPgRzrTeETdk6GAchasY+z5fr/eZhmMBlkdIascYBtVVr8yTfuT5MPzgyaDuTX
+         GP27vx5e3ZRKiWmF8godLPx25zsGkXM7WpgRAlINmRy7OtyQBZMd0woJ7eRBd8ABjz0B
+         gg0KXTzJI21aCRCVIqH7SIRY1+q2UC1Eevp1gZIrFwnGhfMs71V461lgE1bLRRacaMrl
+         VvaxQGpwJpwk7Ore7I/VQ0LQeEZ8Yda/FdaKJLsSrCojTzfm74tjEvkxxRIsttzCumIH
+         JYDNB092mTWiwSCXEE9fsozeBAYzex4vsPbHJSxRaP6Kzq97D+z6ONh9Db9HAMNes38c
+         GNwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692847443; x=1693452243;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1692848644; x=1693453444;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yPglN9jWCOWkDHiaVESzd3fbifjjVGG3Y2tLlmCAqyw=;
-        b=Pj/xLowXhzVw7sfHv9SE+6dyr8Rgd8zbvJr/59f7wNS/EvfQLOoR/pXpwxwas4D+UN
-         phJYxpLTzr1jSm6evPRyqj0pCa6v+wsDR4nkP/gV2rjLp6Sd2y9e94TUQ1Ue59ytA9RJ
-         /EAL+d4Ly3zIoCqQAvuUxTmh81Y9+qIM11ZUVmZD8oZuCkRcvTmVt6VpvkhXgpVhfpxZ
-         ZWCK1oFmC+RBGAzafFYmGGK68iM7oXCmO5iPKx4jXeQaswG5PyydY0rtySYOvTr0PsSu
-         6TU4DauWMxGToESAA6gabG7aJhExjOVMtjWPsm81x4ZBu3I6xd2KqYWZ7rq9WcmkY8p+
-         J2oA==
-X-Gm-Message-State: AOJu0YzZuXDW7efMb2E8Q7RONCr4g1hiCnTZU1ej4OPz0r6SCBNdVPmC
-        vf2buySTKpyNLqGdRKCO5BBvli5XhM4vSSqU3AofNvh1MElH0FzG0C7tzYFy3lj8ZEnvX5qSJln
-        XOXFFMKQd5u5M8Am71RgMVOPCt3/N
-X-Received: by 2002:a2e:b710:0:b0:2b5:80e0:f18e with SMTP id j16-20020a2eb710000000b002b580e0f18emr11256986ljo.3.1692847443057;
-        Wed, 23 Aug 2023 20:24:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEjkeGqdviCPH5wTUExjQLr+CqEbEiWt/ba0nY6S4lLgHFwDlCy0ER84ojf2Z39Sci9dtg33fDr0zJFePv+spQ=
-X-Received: by 2002:a2e:b710:0:b0:2b5:80e0:f18e with SMTP id
- j16-20020a2eb710000000b002b580e0f18emr11256978ljo.3.1692847442724; Wed, 23
- Aug 2023 20:24:02 -0700 (PDT)
+        bh=igTSDR/vKXgPwxt8Nsf/dMSfVCUUURBFbV4iu+jj8kI=;
+        b=I9SkwllXRZSjCSFg4tV0KW5IRb0bZjP9IKlZ5luRfdV4MUv5OkNxhVtojOeyFpY66b
+         Va2nwCag4/DgNZDe1hL7ARpMx4NBmrxjyafZNnVgQ/72txtAnJbStFf9ULNytbjYDRVj
+         JK9Ups2I84f+mwB24RVtz28MqXvHO3gPHnt5TmxEYjr3035iV/AzOpqSoNqX2GVyKH9q
+         tgg+uK/FvnMAkShruzh+q5Io93YCaQ5OaNiW5mEBO9ftN3hEtcx5Q3Ao2zLsYMmwlzBp
+         UtgslY0rfyNWRxR+b7xkZnYwe3XdyG3RnUrc8/5v5BTJ7yzNnwCcWK2fnWsFrFNo2G7h
+         Uf4A==
+X-Gm-Message-State: AOJu0YxjE4SRLr4ylUYjCrp/h6C7HVk+eCFk2kzcKj8T876JEdZ5avKz
+        lDDr5V27xHxnttaGHNaCmzLorA==
+X-Google-Smtp-Source: AGHT+IEujkxb/oLvenG0xAi0WFnbnLyYwhJyu7dzjt01VW0xqm24WtRNYpeYKjaTV28dKNThLBHLgg==
+X-Received: by 2002:a05:6808:152a:b0:3a7:72e2:3262 with SMTP id u42-20020a056808152a00b003a772e23262mr17143493oiw.5.1692848644029;
+        Wed, 23 Aug 2023 20:44:04 -0700 (PDT)
+Received: from C02DW0BEMD6R.bytedance.net ([203.208.167.146])
+        by smtp.gmail.com with ESMTPSA id t6-20020a63b246000000b005579f12a238sm10533157pgo.86.2023.08.23.20.43.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Aug 2023 20:44:03 -0700 (PDT)
+From:   Qi Zheng <zhengqi.arch@bytedance.com>
+To:     akpm@linux-foundation.org, david@fromorbit.com, tkhai@ya.ru,
+        vbabka@suse.cz, roman.gushchin@linux.dev, djwong@kernel.org,
+        brauner@kernel.org, paulmck@kernel.org, tytso@mit.edu,
+        steven.price@arm.com, cel@kernel.org, senozhatsky@chromium.org,
+        yujie.liu@intel.com, gregkh@linuxfoundation.org,
+        muchun.song@linux.dev
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org,
+        Qi Zheng <zhengqi.arch@bytedance.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, kvm@vger.kernel.org,
+        x86@kernel.org
+Subject: [PATCH v5 02/45] kvm: mmu: dynamically allocate the x86-mmu shrinker
+Date:   Thu, 24 Aug 2023 11:42:21 +0800
+Message-Id: <20230824034304.37411-3-zhengqi.arch@bytedance.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+In-Reply-To: <20230824034304.37411-1-zhengqi.arch@bytedance.com>
+References: <20230824034304.37411-1-zhengqi.arch@bytedance.com>
 MIME-Version: 1.0
-References: <20230823153032.239304-1-eric.auger@redhat.com>
-In-Reply-To: <20230823153032.239304-1-eric.auger@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Thu, 24 Aug 2023 11:23:51 +0800
-Message-ID: <CACGkMEseBgbQx1ESA+QV_Y+BDdmwYPVg1UjUu2G0S2B6ksDeyQ@mail.gmail.com>
-Subject: Re: [PATCH] vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, elic@nvidia.com, mail@anirudhrb.com,
-        mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
         SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -77,60 +82,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 11:30=E2=80=AFPM Eric Auger <eric.auger@redhat.com>=
- wrote:
->
-> Commit e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb
-> entries") Forbade vhost iotlb msg with null size to prevent entries
-> with size =3D start =3D 0 and last =3D ULONG_MAX to end up in the iotlb.
->
-> Then commit 95932ab2ea07 ("vhost: allow batching hint without size")
-> only applied the check for VHOST_IOTLB_UPDATE and VHOST_IOTLB_INVALIDATE
-> message types to fix a regression observed with batching hit.
->
-> Still, the introduction of that check introduced a regression for
-> some users attempting to invalidate the whole ULONG_MAX range by
-> setting the size to 0. This is the case with qemu/smmuv3/vhost
-> integration which does not work anymore. It Looks safe to partially
-> revert the original commit and allow VHOST_IOTLB_INVALIDATE messages
-> with null size. vhost_iotlb_del_range() will compute a correct end
-> iova. Same for vhost_vdpa_iotlb_unmap().
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Use new APIs to dynamically allocate the x86-mmu shrinker.
 
-Cc: stable@vger.kernel.org
+Signed-off-by: Qi Zheng <zhengqi.arch@bytedance.com>
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+CC: Thomas Gleixner <tglx@linutronix.de>
+CC: Ingo Molnar <mingo@redhat.com>
+CC: Borislav Petkov <bp@alien8.de>
+CC: Dave Hansen <dave.hansen@linux.intel.com>
+CC: kvm@vger.kernel.org
+CC: x86@kernel.org
+---
+ arch/x86/kvm/mmu/mmu.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-I think we need to document the usage of 0 as msg.size for
-IOTLB_INVALIDATE in uapi.
-
-Other than this:
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-Thanks
-
-> Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entri=
-es")
-> ---
->  drivers/vhost/vhost.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index c71d573f1c94..e0c181ad17e3 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1458,9 +1458,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
->                 goto done;
->         }
->
-> -       if ((msg.type =3D=3D VHOST_IOTLB_UPDATE ||
-> -            msg.type =3D=3D VHOST_IOTLB_INVALIDATE) &&
-> -            msg.size =3D=3D 0) {
-> +       if (msg.type =3D=3D VHOST_IOTLB_UPDATE && msg.size =3D=3D 0) {
->                 ret =3D -EINVAL;
->                 goto done;
->         }
-> --
-> 2.41.0
->
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e1d011c67cc6..9252f2e7afbc 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6796,11 +6796,7 @@ static unsigned long mmu_shrink_count(struct shrinker *shrink,
+ 	return percpu_counter_read_positive(&kvm_total_used_mmu_pages);
+ }
+ 
+-static struct shrinker mmu_shrinker = {
+-	.count_objects = mmu_shrink_count,
+-	.scan_objects = mmu_shrink_scan,
+-	.seeks = DEFAULT_SEEKS * 10,
+-};
++static struct shrinker *mmu_shrinker;
+ 
+ static void mmu_destroy_caches(void)
+ {
+@@ -6933,10 +6929,16 @@ int kvm_mmu_vendor_module_init(void)
+ 	if (percpu_counter_init(&kvm_total_used_mmu_pages, 0, GFP_KERNEL))
+ 		goto out;
+ 
+-	ret = register_shrinker(&mmu_shrinker, "x86-mmu");
+-	if (ret)
++	mmu_shrinker = shrinker_alloc(0, "x86-mmu");
++	if (!mmu_shrinker)
+ 		goto out_shrinker;
+ 
++	mmu_shrinker->count_objects = mmu_shrink_count;
++	mmu_shrinker->scan_objects = mmu_shrink_scan;
++	mmu_shrinker->seeks = DEFAULT_SEEKS * 10;
++
++	shrinker_register(mmu_shrinker);
++
+ 	return 0;
+ 
+ out_shrinker:
+@@ -6958,7 +6960,7 @@ void kvm_mmu_vendor_module_exit(void)
+ {
+ 	mmu_destroy_caches();
+ 	percpu_counter_destroy(&kvm_total_used_mmu_pages);
+-	unregister_shrinker(&mmu_shrinker);
++	shrinker_free(mmu_shrinker);
+ }
+ 
+ /*
+-- 
+2.30.2
 
