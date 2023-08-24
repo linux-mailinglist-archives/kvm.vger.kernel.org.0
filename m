@@ -2,180 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38EB478751A
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 18:20:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24A10787572
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 18:33:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242351AbjHXQTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 12:19:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35724 "EHLO
+        id S242546AbjHXQdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 12:33:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242474AbjHXQTU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 12:19:20 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0C01FEA
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 09:18:46 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59285f1e267so13180767b3.0
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 09:18:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692893918; x=1693498718;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sImAtATpIPQ4GjN+FyqtcPnL+F+zQxPqPl0ZQe9C7p4=;
-        b=PoMAnXq2BcFJ+pyjJq9N4dgyu88oSIyYxcGI0j6ILiPfFgF42/e9n6EDb99fwa+yXx
-         LDrN37KLYc2Bt7GLkqImYdR4S67S8V8ZAjKvs8szL9tbwFuqX30/WeH0x4B3NZsLucl3
-         Nct8q8zMWyfKTdebcDMD8MUuZS2/etO2nxbN+ADeJ72JtQc9N4n8PyvDa/UwFhUbiW96
-         6aOhcp6+cRDwzj+t4JK5DY37ZW9P9ATR1p0sP3jotY0kjrIQ93g1AD7OceO8XMPg0uCG
-         38ddlNC8DG+t4JFdj6diPaeH7PxsP26Lkpfkog12B3/ye+jamrM+OxHdfLcvl/DInv2a
-         pIYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692893918; x=1693498718;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sImAtATpIPQ4GjN+FyqtcPnL+F+zQxPqPl0ZQe9C7p4=;
-        b=eVuLHe2E8IiC+RARNksQouHTRNHCfdJKbO9GsLHduxCFBGDyXQYCl4j/oCamyePrhg
-         m4OBf7IOEmye8uwzp0D9B1QwM+t1v/tSTPUpzY57xkKa1/czJfcQx+KgiD3DCdMfQasp
-         jSgPEvbXPIel1R/njU3KQZiX0yukHbav0HNM57QXq9p7pdbJ7pnLeO6VV/K9J5GlkYwu
-         GEoKjPElTWnB3TdqjQIzznHjQZklEqrkwhxkPeZVnPsG5kjSZ7odmeGgSWxSpqlc1qkq
-         cE+x9Xu8s8TkbQGCUvvkbagN++enyOa/8YgX6dpjGB/lSpz+ekvuazmkT1XG81YnKfDf
-         UeYQ==
-X-Gm-Message-State: AOJu0Yy3cd/QckkV7mYSBtwWOlc7ile7b9gA4svGAwLIq2qd4w4sQIx1
-        9xaA19DN/qXjH4CbZmzkHzzC+3OEr2Y=
-X-Google-Smtp-Source: AGHT+IF15IghsAKoHh0BOfq3fhfVb8/NkHJrUkBZNEHBhDSnmhcDKgKWEs+nwE9NdKNbCRWVreoY8X0QilA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2f87:b0:586:e91a:46c2 with SMTP id
- ew7-20020a05690c2f8700b00586e91a46c2mr301765ywb.4.1692893918800; Thu, 24 Aug
- 2023 09:18:38 -0700 (PDT)
-Date:   Thu, 24 Aug 2023 09:18:37 -0700
-In-Reply-To: <e8bfb368-2869-6ad3-35de-8f7ee5568661@intel.com>
-Mime-Version: 1.0
-References: <20230720115810.104890-1-weijiang.yang@intel.com>
- <ZMqxxH5mggWYDhEx@google.com> <a5bc09c4-cc24-1e70-b70f-dbbce4251717@intel.com>
- <ZMvfxFgHlWMyrvbq@google.com> <e8bfb368-2869-6ad3-35de-8f7ee5568661@intel.com>
-Message-ID: <ZOeC3XYT7kCy/Ukn@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86:VMX: Fixup for VMX test failures
-From:   Sean Christopherson <seanjc@google.com>
-To:     Weijiang Yang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        Gil Neiger <gil.neiger@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S242575AbjHXQdN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 12:33:13 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2080.outbound.protection.outlook.com [40.107.92.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E5DCE5E;
+        Thu, 24 Aug 2023 09:33:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gnBXSaf5JxM1v0ilyuNW4/pNyf14R6E+mrxXYFI+IB0/aUuamTLyV68+H3iOxRHHYN6PsrfO+REkp7xoG4DyifF10CnRPbW3k2jmSWkbxx1vSURe3hZvKu7/uUssQE/8S0GQ350wbvYBsEhmc0QkyB1qNfxYzLcX0NsG7dJur8Vm9bDH9r4z+eywMjgluqzeSfPK0lQKwFC2CEN2kmFQB0cVUHyZmfrCY7Gjg+wMyclsb+TRi9tT1Ww3FxAal3uUYR57rw0L3SB0/CDT3pVe41yxuOZrVaLfVjQIbC9HMU9rHIBozLNIfA/VUnC3ywfCbTe1Z+UaB6CJmEKM3bZOJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FXQDKGVxewLqdoLdOxi8Ou8xuVe/F8ye7SoSoy99QMY=;
+ b=IaUZqoyf8ZKNUMkcZ80Lhw9wOz6v+G85lsB6soFisPn/QheX3hRO02zkr2TXh2hwhhZIFS5toZAx131zTie4C27Iy+Po5iUHOw+nh9NX2EgahcUic9wsIuOOhlMmIuD6wRFZH3eLBT/OvtQO62b9X06aW87efY+ok3sulI9JYxZ/2u7Hduar7OUR0YhGMD8AhEQi0hjc2FCO7GtocIUBi4NyajFR4m3H8hqromClaHrV6zJEd7B1frnoznZCtb3waS/dvkDpcUbQrgCkr3g6nxFajeDT5dEHS0uoxvlMgKFULsXWL66BO+i46eTxOcWxTC6TdL5bvUyzov0i7b8Aqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FXQDKGVxewLqdoLdOxi8Ou8xuVe/F8ye7SoSoy99QMY=;
+ b=eub2BmkwmTOdDJB1p1hte1fWwGJtyf1H+eXyZ3C4dygBoJmKF0maZNYYRqpvCREPmWJatFZZI1pW2j4wQ5BjLXpH6e+9Kr5F+3LMoAqm08gJhEewg6r120wXEveZVA8HbX+WcEaaAQmw40iZAqpqaKQcruCDyKOthm36qtzfKBpxRS7Ij1td28Ogd+0C67f4tnt+iFXnBVX0w60d976VUwvCE1K3uNSIwH4viSGuhmD+WG4LvASl4p+4zg+msMkoi+kmUTdgiKjIJAkk0H6tlPL2TMC0d8gIIG6t9Sz4IEqk9ZjnFXRla3JCWxmfdedQ5oSLC98Fy0GarZ3fysq5tQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DS7PR12MB8324.namprd12.prod.outlook.com (2603:10b6:8:ec::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.27; Thu, 24 Aug 2023 16:33:09 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::5111:16e8:5afe:1da1%6]) with mapi id 15.20.6699.027; Thu, 24 Aug 2023
+ 16:33:09 +0000
+Date:   Thu, 24 Aug 2023 13:33:06 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Reinette Chatre <reinette.chatre@intel.com>
+Cc:     yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com, alex.williamson@redhat.com,
+        kvm@vger.kernel.org, dave.jiang@intel.com, jing2.liu@intel.com,
+        ashok.raj@intel.com, fenghua.yu@intel.com,
+        tom.zanussi@linux.intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] vfio/ims: Support emulated interrupts
+Message-ID: <ZOeGQrRCqf87Joec@nvidia.com>
+References: <cover.1692892275.git.reinette.chatre@intel.com>
+ <7a08c41e1825095814f8c35854d3938c084b2368.1692892275.git.reinette.chatre@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a08c41e1825095814f8c35854d3938c084b2368.1692892275.git.reinette.chatre@intel.com>
+X-ClientProxiedBy: BYAPR08CA0043.namprd08.prod.outlook.com
+ (2603:10b6:a03:117::20) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS7PR12MB8324:EE_
+X-MS-Office365-Filtering-Correlation-Id: cec1fe30-9d56-48d3-cad6-08dba4bfcd03
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kMlxn58Gg+bbHlekXacwZkJodMOEcS2kFShuabp9tGOX7xrGuywgS1noyFxqNWZtimH8jPAFfbywuOOtxkutWwGJN1ceUyCv5vazKp/QJWfQHLjak81tiOvwXuyISygYNWvJLeccH71/ySSZ49igSHLdMFBjeyMYipqEiIIZt+BSA/SMNGyw7WJaLejzQpZ9lf/BlnEBmi4ZnWZwPbIV/HNp7Iz3BWGcwZrXH9bQWAAI999egVdztFjy3M36FQRBMyaBUa0gCxnkF3oGso+q02SIBuV8PswRLAlgLAfNTfg/2RnFNI8n6lNw3HoClIfIvlnBXII1N2c+JARbMpZGGdOzVdwvBXdk6K12gZcGbpRsmz6Tq4Vs1dFP7k9L64qXv4p+1LkEJSI5/QaYdx5LJrG+M70wmYjPrm3v/NN0LG/wCGVqphe6jKFgvFvTcEbk330tugqb891ZAn7LyxidlY4xRTaIxnINtczfjkPJ6ZKs5z7Y6/0qEBi4oAzlIw3aFZePgUHMFaaAAA4owKPby2GsVHyYHQCYz1To/lvi+NFHqKn3c6srdg9LG5WttaHt
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(39860400002)(366004)(376002)(1800799009)(186009)(451199024)(2616005)(8936002)(4326008)(8676002)(83380400001)(5660300002)(4744005)(36756003)(7416002)(26005)(6666004)(38100700002)(66946007)(66556008)(66476007)(6916009)(316002)(478600001)(41300700001)(2906002)(6512007)(6506007)(6486002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hu1GyGLJGyi2Ql41EiuT5yTDQ/gNjzYOkieee5SvrM/oyXUNbOu6yfPPW/DX?=
+ =?us-ascii?Q?/v0Vm33cSL4HBADBrL7znjSygV4yd/CBxGJtnkDPgsV1I34/1/2NBsf3CcLb?=
+ =?us-ascii?Q?5JxqHu+4SbY69mm/iVZB4KpfRbP7NcXdiCcjrc/n9R4P0xF2JEtEKq92SbmU?=
+ =?us-ascii?Q?bE1hGAXfFsU0s8stvkFvrdv6Yh+MwlnITQsKVEv2sIIN2HIP8SFW9GYZrW3l?=
+ =?us-ascii?Q?9dnYINSU3ufomymKhKCNIoH5gTVQXvqTiCyTuBXzAQjjvOcw4O6tm7KoHpJh?=
+ =?us-ascii?Q?zCsqYo//foB4roaXL1Tfr6RLF6YXwtDrPcvTr6viz2mdI+mIf4Bin9NzgEQl?=
+ =?us-ascii?Q?j+Fob/VR+DIzM0dM1lA2Atf6iKlMbgjcc2xnqBKapeyIlmm2PeY/mY5LBOSA?=
+ =?us-ascii?Q?CNAGB1QA4iBjHPeiRKiZdK+OnaHr4mQWpcto/F9abHf77c54MY0PuHSpEJ/8?=
+ =?us-ascii?Q?VZ09ku0/bZ123A3BeGjG7SjK7uEDxp+FqFUO3KowNhnFFO50nzoioPoAgN/I?=
+ =?us-ascii?Q?wZzOXthjywMIcl0kSLpgpkFFe1vM1q4nZBSKtAo31pw5IECPmzPJI2c7/AcW?=
+ =?us-ascii?Q?3zRF51EWOm6AX6cjbg4vaAYe/PydNRJCCtIBeYUijD+X9H/yc0x755sDOuoI?=
+ =?us-ascii?Q?N8mqkjA9ms5VsyJD6Uj4HHee2iiA9CLqsz8/qz/4ewX1wmHVihqBpO+xVoyf?=
+ =?us-ascii?Q?Xx+ogmTppRyn+eRcZ44zBtBKXBUHNinYPsSrtCNs9IYt9n9Xco9W5rhr2ms+?=
+ =?us-ascii?Q?DM54bDIkCR2bV5QF+PeZwO2odzjez9pLwAi8Zmcw0LZHgQI9AN2d+Fb0TZ1f?=
+ =?us-ascii?Q?Ma0DG9IaMYYoyoI504tNeR+XAn+HqM/HiEE5Uca6+dClez9eXAHIZdM6KLC7?=
+ =?us-ascii?Q?1cKUcRtFnHOhjJ3xqpcHfv7PjRJ5wSCAYEob1IKLBHaElD1K/32yyAZr0HyE?=
+ =?us-ascii?Q?dJWoUJdDN6otZDprY0GZgYNKdcg7bvCumLseW2l6U5FiPIsQ+alpP+ds5LdB?=
+ =?us-ascii?Q?oYt+94ojGn9lhNW+9BU7Fg7UP1oYw3s9Bx1ZLyiVeuJtE6W3GC1CW1PCVy56?=
+ =?us-ascii?Q?N8YNwnB024V2vEzUl3EycgUX5y8kfUNw5qxrfnUi4s0UGS+uLtmMrARv3lMX?=
+ =?us-ascii?Q?w6MzjX5a49RTHKnlze4whvqx2ToFeDNRrPQFZqwxf/aqppSfNNqcsd816Esa?=
+ =?us-ascii?Q?Q/1dpHv5cxP1BCyNbzGk1jAJqRIsQ+KuaVp6chSwhxj6KneIOC7oVNTJzy+j?=
+ =?us-ascii?Q?eQpJ+GhhihwG7eLSLywxVTPEkwEQD8EMwJ1WKhTmFgkLvKtkZK9p6DFEt1Bq?=
+ =?us-ascii?Q?NN1YS4a5MvAt+nqxyNVP5Sx5+O9zQUMBJoDnigG8DSXPOvRlYdt8lBujyG3Q?=
+ =?us-ascii?Q?Hl1Vuii4mPYejLb/i3o4svJ94vyNdVj12/oGJ3w5BC070J1DGxQQxQTE2Vik?=
+ =?us-ascii?Q?mb9vaCHZ+x6QJrz+wvEK1C+bba/YvHIwWAs/wOs6+6GSj7gTN3se4Nd2AhVD?=
+ =?us-ascii?Q?au6mxFtngLTrtKsvPCgtz8+iUKMX6CkcKpvY2/zMXlmXpotRkkZ15SdiwxxX?=
+ =?us-ascii?Q?53IFEpVxMeuvccHO1k0y+zVEpMBn6SbJ8YdKnSp5?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cec1fe30-9d56-48d3-cad6-08dba4bfcd03
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 16:33:09.0123
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2zWPGpW3GiyyeKavLIjuoujwJocR81osG6eiTS9s+mgEmZNwMFvELmvPmgZONw9w
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8324
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 24, 2023, Weijiang Yang wrote:
-> On 8/4/2023 1:11 AM, Sean Christopherson wrote:
-> > On Thu, Aug 03, 2023, Weijiang Yang wrote:
-> > > > This is wrong, no?  The consistency check is only skipped for PM, t=
-he above CR0.PE
-> > > > modification means the target is RM.
-> > > I think this case is executed with !CPU_URG, so RM is "converted" to =
-PM because we
-> > > have below in KVM:
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 bool urg =3D nested_cpu_has2(vmcs12,
-> > > SECONDARY_EXEC_UNRESTRICTED_GUEST);
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 bool prot_mode =3D !urg || vmcs12->guest_cr0 & X86=
-_CR0_PE;
-> > > ...
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 if (!prot_mode || intr_type !=3D INTR_TYPE_HARD_EX=
-CEPTION ||
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !nested_cpu_has_no_hw_errc=
-ode(vcpu)) {
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
- VM-entry interruption-info field: deliver error code */
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sh=
-ould_have_error_code =3D
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 intr_type =3D=3D INTR_TYPE_HA=
-RD_EXCEPTION &&
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 prot_mode &&
-> > > x86_exception_has_error_code(vector);
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (CC(has_error_code !=3D should_have_error_code))
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
-> > >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 }
-> > >=20
-> > > so on platform with basic.errcode =3D=3D 1, this case passes.
-> > Huh.  I get the logic, but IMO based on the SDM, that's a ucode bug tha=
-t got
-> > propagated into KVM (or an SDM bug, which is my bet for how this gets t=
-reated).
-> >=20
-> > I verified HSW at least does indeed generate VM-Fail and not VM-Exit(IN=
-VALID_STATE),
-> > so it doesn't appear that KVM is making stuff (for once).  Either that =
-or I'm
-> > misreading the SDM (definite possibility), but the only relevant condit=
-ion I see is:
-> >=20
-> >    bit 0 (corresponding to CR0.PE) is set in the CR0 field in the guest=
--state area
-> >=20
-> > I don't see anything in the SDM that states the CR0.PE is assumed to be=
- '1' for
-> > consistency checks when unrestricted guest is disabled.
-> >=20
-> > Can you bug a VMX architect again to get clarification, e.g. to get an =
-SDM update?
-> > Or just point out where I missed something in the SDM, again...
->=20
-> Sorry for the delayed response! Also added Gil in cc.
+On Thu, Aug 24, 2023 at 09:15:21AM -0700, Reinette Chatre wrote:
+> Access from a guest to a virtual device may be either 'direct-path',
+> where the guest interacts directly with the underlying hardware,
+> or 'intercepted path' where the virtual device emulates operations.
+> 
+> Support emulated interrupts that can be used to handle 'intercepted
+> path' operations. For example, a virtual device may use 'intercepted
+> path' for configuration. Doing so, configuration requests intercepted
+> by the virtual device driver are handled within the virtual device
+> driver with completion signaled to the guest without interacting with
+> the underlying hardware.
 
-Hey Gil!  Thanks for humoring me again.
+Why does this have anything to do with IMS? I thought the point here
+was that IMS was some back end to the MSI-X emulation - should a
+purely emulated interrupt logically be part of the MSI code, not IMS?
 
->=20
-> I got reply from Gil as below:
->=20
-> "I am not sure whether you (or Sean) are referring to guest state or host=
- state.
-
-The question is whether trying to do VMLAUNCH/VMRESUME with this scenario
-
-  1. unrestricted guest disabled
-  2. GUEST_CR0.PE =3D 0
-  3. #GP injection _without_ an error code
-
-should VM-Fail due injecting a #GP without an error code, or VM-Exit(INVALI=
-D_STATE)
-due to CR0.PE=3D0 without unrestricted guest support.
-
-Hardware (I personally tested on Haswell) signals VM-Fail, which doesn't ma=
-tch
-what's in the SDM:
-
-  The field's deliver-error-code bit (bit 11) is 1 if each of the following=
- holds:
-
-   (1) the interruption type is hardware exception;
-   (2) bit 0 (corresponding to CR0.PE) is set in the CR0 field in the guest=
--state area;
-   (3) IA32_VMX_BASIC[56] is read as 0 (see Appendix A.1); and (4) the vect=
-or indicates
-       one of the following exceptions: #DF (vector 8), #TS (10), #NP (11),=
- #SS (12),
-       #GP (13), #PF (14), or #AC (17).
-
-Specifically #2 doesn't say anything about the check treating GUEST_CR0.PE =
-as '1'
-if unrestricted guest is disabled.
+Jason
