@@ -2,129 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD515787B1A
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 00:00:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B87DB787B92
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 00:38:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243766AbjHXWA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 18:00:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54022 "EHLO
+        id S243917AbjHXWiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 18:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243846AbjHXWAY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 18:00:24 -0400
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F30E1BD4;
-        Thu, 24 Aug 2023 15:00:19 -0700 (PDT)
-Received: from pps.filterd (m0150241.ppops.net [127.0.0.1])
-        by mx0a-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OKRHsA020061;
-        Thu, 24 Aug 2023 21:59:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pps0720;
- bh=CASWTq5OVcRru8tc6k2AOfuwFzR62vtIBb/D4ZT1Ld4=;
- b=oeNIPxZyiEEwh49S0qMv2u7t1Gzhhe6YRS81IFhnrhVDabWZMmRnn74MXA29g904tA0M
- x718oPTlwtvhIy9lD6hbHwOqZVRJINPpp71h9e1I9+fDnNuDBPvPZSmPxqYm+/rpcCiL
- D85no9wIBGjYjdNphHmOMVaEGhmSqii0bbhYOXxFFkdEpNZ+3VNTj+tQ+ZwR1Akq8myL
- DuAw6oQZc4+/2v/rs6ur5PidgryDjI5CmAIgYgu3m1V4eDBgnQjLTMnv/Sl63YN3+0yM
- IYjm6I2ReQKzR9K+uBbeRSb0PDGk101KIVKJeAfOoFYrR9+uWwd4zU7OLEMo1D3nsQUf Ew== 
-Received: from p1lg14878.it.hpe.com ([16.230.97.204])
-        by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 3sp69adf7e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Aug 2023 21:59:38 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by p1lg14878.it.hpe.com (Postfix) with ESMTPS id E7574D2EA;
-        Thu, 24 Aug 2023 21:59:37 +0000 (UTC)
-Received: from dog.eag.rdlabs.hpecorp.net (unknown [16.231.227.39])
-        by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTP id F2285809623;
-        Thu, 24 Aug 2023 21:59:36 +0000 (UTC)
-Received: by dog.eag.rdlabs.hpecorp.net (Postfix, from userid 48777)
-        id 482A0302F47FB; Thu, 24 Aug 2023 16:59:36 -0500 (CDT)
-From:   Kyle Meyer <kyle.meyer@hpe.com>
-To:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        dmatlack@google.com
-Cc:     russ.anderson@hpe.com, dimitri.sivanich@hpe.com,
-        steve.wahl@hpe.com, Kyle Meyer <kyle.meyer@hpe.com>
-Subject: [PATCH v3] KVM: x86: Add CONFIG_KVM_MAX_NR_VCPUS
-Date:   Thu, 24 Aug 2023 16:52:46 -0500
-Message-Id: <20230824215244.3897419-1-kyle.meyer@hpe.com>
-X-Mailer: git-send-email 2.26.2
+        with ESMTP id S243941AbjHXWht (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 18:37:49 -0400
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC056E77
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 15:37:47 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-40c72caec5cso120541cf.0
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 15:37:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692916667; x=1693521467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ouja50lRt/Qn0hpYJQBRTrstUcNcH6yXAbWF/Sx0YoQ=;
+        b=tZw52j1sKwnpwFHy0NN85MqIzsxZP6Y8r6be2BeG9U5vYw0SUf7Nri5ROux8Dc5xm3
+         iaP5JdEMuvV0umkgVnVDi7QHr6M2kjdxYIkBKGNe4uPbZlWd3jxrNNab6Rx5XK5sFOLc
+         +68uDJeZO7gI12OdAGCuXb0p2flsHlGeK6lasE7OLhG7wKFTKMFOTiiEQuDBlldR1jnu
+         NAej9SE5C+jkYkiaNMngaBIRuV5euAMk4QUuGqV0XxR1L00fl2u/3vUV87Fz4jkFgzxt
+         JSta+BhkjrQ3bbqOsdQYv+lfj7rwx2AwdJcKsWYHZcNcMYHKGu2T7jpNbMICow+OjRbN
+         KFmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692916667; x=1693521467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ouja50lRt/Qn0hpYJQBRTrstUcNcH6yXAbWF/Sx0YoQ=;
+        b=ijg3TKoMQCpZCIsZla+ltRjOhH8Aw4ZWk9ZXwNXkty+/teaDL6G9jH7Tx7MdigSa9/
+         uk6zoVgOjObTiRsIiY3xAL1vhlU/Qu+dQYDkuSoEJ/7vEDYNOp/+EAAQuVFo5E+vCdoj
+         f13xHaYx+eAPhO41IyWdntGYg9I2pMxKYiQWHoFA2H4XF7ScbZkENA0CBXkTK4xWfwp/
+         Nswzhgf3bKBcCTTENMialpmnwC8BS2TBFFdVcDAqLpR7vcBYTfqpD6+wNykcItx4/9p4
+         8L5coA159Z8cvYF7dyUSm1L3vpzKEI2i1ohdMzJRnTrS3eGK+fJYecBm2xmBxNxd0mPX
+         5dgw==
+X-Gm-Message-State: AOJu0Yxwk3yeR5Mi5An/FjGNEF66Ii+6yytUqLBPSZDe2xUi1I7ar/Ij
+        fjuEDwpm5uSaGUOcZfGjT10KqitCcP2GEMaE5P4cxA==
+X-Google-Smtp-Source: AGHT+IG26i/8A4ihuw5NbTHDvZmpCMZLLOmERpUhBmwhch4uD0C92g4aCugoqIVCKfjauGPEYBkrCMbd+Gox/37XexA=
+X-Received: by 2002:ac8:7e94:0:b0:410:8cbf:61de with SMTP id
+ w20-20020ac87e94000000b004108cbf61demr46213qtj.13.1692916666850; Thu, 24 Aug
+ 2023 15:37:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: CiGzJTnl_NVB2nZUSj8HY8a4321aT84J
-X-Proofpoint-ORIG-GUID: CiGzJTnl_NVB2nZUSj8HY8a4321aT84J
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-24_18,2023-08-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 adultscore=0 spamscore=0 impostorscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 clxscore=1015 mlxlogscore=999 phishscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308240191
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+References: <20230821225859.883120-1-srutherford@google.com> <23cfdd53-597e-45c3-9bd1-dbb1be506137@amd.com>
+In-Reply-To: <23cfdd53-597e-45c3-9bd1-dbb1be506137@amd.com>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Thu, 24 Aug 2023 15:37:08 -0700
+Message-ID: <CABayD+cQ3+34uJ+gO5t5BTL-FYmFt_q-uq7VVLJePww+v8XErQ@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/sev: Make enc_dec_hypercall() accept a size
+ instead of npages
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
+        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a Kconfig entry to set the maximum number of vCPUs per KVM guest and
-set the default value to 4096 when MAXSMP is enabled.
+Reuploading v3 with `Cc: stable@vger.kernel.org`.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Kyle Meyer <kyle.meyer@hpe.com>
----
-v2 -> v3: Default KVM_MAX_VCPUS to 1024 when CONFIG_KVM_MAX_NR_VCPUS is not
-defined. This prevents build failures in arch/x86/events/intel/core.c and
-drivers/vfio/vfio_main.c when KVM is disabled.
 
- arch/x86/include/asm/kvm_host.h |  4 ++++
- arch/x86/kvm/Kconfig            | 11 +++++++++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3bc146dfd38d..cd27e0a00765 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -39,7 +39,11 @@
- 
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
-+#ifdef CONFIG_KVM_MAX_NR_VCPUS
-+#define KVM_MAX_VCPUS CONFIG_KVM_MAX_NR_VCPUS
-+#else
- #define KVM_MAX_VCPUS 1024
-+#endif
- 
- /*
-  * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 89ca7f4c1464..e730e8255e22 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -141,4 +141,15 @@ config KVM_XEN
- config KVM_EXTERNAL_WRITE_TRACKING
- 	bool
- 
-+config KVM_MAX_NR_VCPUS
-+	int "Maximum number of vCPUs per KVM guest"
-+	depends on KVM
-+	range 1024 4096
-+	default 4096 if MAXSMP
-+	default 1024
-+	help
-+	  Set the maximum number of vCPUs per KVM guest. Larger values will increase
-+	  the memory footprint of each KVM guest, regardless of how many vCPUs are
-+	  configured.
-+
- endif # VIRTUALIZATION
--- 
-2.26.2
-
+On Thu, Aug 24, 2023 at 2:04=E2=80=AFAM Gupta, Pankaj <pankaj.gupta@amd.com=
+> wrote:
+>
+> On 8/22/2023 12:58 AM, Steve Rutherford wrote:
+> > enc_dec_hypercall() accepted a page count instead of a size, which
+> > forced its callers to round up. As a result, non-page aligned
+> > vaddrs caused pages to be spuriously marked as decrypted via the
+> > encryption status hypercall, which in turn caused consistent
+> > corruption of pages during live migration. Live migration requires
+> > accurate encryption status information to avoid migrating pages
+> > from the wrong perspective.
+> >
+> > Fixes: 064ce6c550a0 ("mm: x86: Invoke hypercall when page encryption st=
+atus is changed")
+> > Signed-off-by: Steve Rutherford <srutherford@google.com>
+> > ---
+> >   arch/x86/include/asm/mem_encrypt.h |  6 +++---
+> >   arch/x86/kernel/kvm.c              |  4 +---
+> >   arch/x86/mm/mem_encrypt_amd.c      | 13 ++++++-------
+> >   3 files changed, 10 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/=
+mem_encrypt.h
+> > index 7f97a8a97e24..473b16d73b47 100644
+> > --- a/arch/x86/include/asm/mem_encrypt.h
+> > +++ b/arch/x86/include/asm/mem_encrypt.h
+> > @@ -50,8 +50,8 @@ void __init sme_enable(struct boot_params *bp);
+> >
+> >   int __init early_set_memory_decrypted(unsigned long vaddr, unsigned l=
+ong size);
+> >   int __init early_set_memory_encrypted(unsigned long vaddr, unsigned l=
+ong size);
+> > -void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int n=
+pages,
+> > -                                         bool enc);
+> > +void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr,
+> > +                                         unsigned long size, bool enc)=
+;
+> >
+> >   void __init mem_encrypt_free_decrypted_mem(void);
+> >
+> > @@ -85,7 +85,7 @@ early_set_memory_decrypted(unsigned long vaddr, unsig=
+ned long size) { return 0;
+> >   static inline int __init
+> >   early_set_memory_encrypted(unsigned long vaddr, unsigned long size) {=
+ return 0; }
+> >   static inline void __init
+> > -early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool =
+enc) {}
+> > +early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigned long siz=
+e, bool enc) {}
+> >
+> >   static inline void mem_encrypt_free_decrypted_mem(void) { }
+> >
+> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > index 6a36db4f79fd..b8ab9ee5896c 100644
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -966,10 +966,8 @@ static void __init kvm_init_platform(void)
+> >                * Ensure that _bss_decrypted section is marked as decryp=
+ted in the
+> >                * shared pages list.
+> >                */
+> > -             nr_pages =3D DIV_ROUND_UP(__end_bss_decrypted - __start_b=
+ss_decrypted,
+> > -                                     PAGE_SIZE);
+> >               early_set_mem_enc_dec_hypercall((unsigned long)__start_bs=
+s_decrypted,
+> > -                                             nr_pages, 0);
+> > +                                             __end_bss_decrypted - __s=
+tart_bss_decrypted, 0);
+> >
+> >               /*
+> >                * If not booted using EFI, enable Live migration support=
+.
+> > diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_am=
+d.c
+> > index 54bbd5163e8d..6faea41e99b6 100644
+> > --- a/arch/x86/mm/mem_encrypt_amd.c
+> > +++ b/arch/x86/mm/mem_encrypt_amd.c
+> > @@ -288,11 +288,10 @@ static bool amd_enc_cache_flush_required(void)
+> >       return !cpu_feature_enabled(X86_FEATURE_SME_COHERENT);
+> >   }
+> >
+> > -static void enc_dec_hypercall(unsigned long vaddr, int npages, bool en=
+c)
+> > +static void enc_dec_hypercall(unsigned long vaddr, unsigned long size,=
+ bool enc)
+> >   {
+> >   #ifdef CONFIG_PARAVIRT
+> > -     unsigned long sz =3D npages << PAGE_SHIFT;
+> > -     unsigned long vaddr_end =3D vaddr + sz;
+> > +     unsigned long vaddr_end =3D vaddr + size;
+> >
+> >       while (vaddr < vaddr_end) {
+> >               int psize, pmask, level;
+> > @@ -342,7 +341,7 @@ static bool amd_enc_status_change_finish(unsigned l=
+ong vaddr, int npages, bool e
+> >               snp_set_memory_private(vaddr, npages);
+> >
+> >       if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
+> > -             enc_dec_hypercall(vaddr, npages, enc);
+> > +             enc_dec_hypercall(vaddr, npages << PAGE_SHIFT, enc);
+> >
+> >       return true;
+> >   }
+> > @@ -466,7 +465,7 @@ static int __init early_set_memory_enc_dec(unsigned=
+ long vaddr,
+> >
+> >       ret =3D 0;
+> >
+> > -     early_set_mem_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_S=
+HIFT, enc);
+> > +     early_set_mem_enc_dec_hypercall(start, size, enc);
+> >   out:
+> >       __flush_tlb_all();
+> >       return ret;
+> > @@ -482,9 +481,9 @@ int __init early_set_memory_encrypted(unsigned long=
+ vaddr, unsigned long size)
+> >       return early_set_memory_enc_dec(vaddr, size, true);
+> >   }
+> >
+> > -void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int n=
+pages, bool enc)
+> > +void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsig=
+ned long size, bool enc)
+> >   {
+> > -     enc_dec_hypercall(vaddr, npages, enc);
+> > +     enc_dec_hypercall(vaddr, size, enc);
+> >   }
+> >
+> >   void __init sme_early_init(void)
+>
+> Also had this thought to avoid passing the page boundaries calculation
+> with npages in-place of existing size based, but no strong opinions.
+>
+> This seems even better. Thanks!
+>
+> Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
