@@ -2,165 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F0F67864FB
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 03:59:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 310F47865D2
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 05:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239149AbjHXB7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Aug 2023 21:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
+        id S239598AbjHXDZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Aug 2023 23:25:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239172AbjHXB60 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Aug 2023 21:58:26 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B11310D0;
-        Wed, 23 Aug 2023 18:58:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692842303; x=1724378303;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=zr7H0wGlnhCSbEDuWo9f0W/Bc09ig1Y26FxrMMZFams=;
-  b=f+g3AcOlvcJhHgUHHQ1LPSYGF5GZbu7Gl9Zd1vt3us1E4m7fhurjh7XI
-   dy8AZba1T5ZxrcQqEL3qT1ElMxPnccX6lqD1xtPLc8PjevFw21d2Z5YWz
-   2nK5u3IAbwPLhWrOqTczWs+/CXElU8l+tANndSJwL2e5Pxzosij7tcrF+
-   HhXmb6wieDJwGB/K8SGrQdKPFPox2bVnSDPCSqBu24OMofe2jGVgfm+Y9
-   +P9MUvh6Z97kxt7x2mVY7FBun2+msXZLi9HCtnwZMxJaXEMep2UhCCtKV
-   bGjFdKHBWQ6d4iaUz+vBDfXazroNzfsT42TwkyrXDP/uMioAwxEtAI//A
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="460682472"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="460682472"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 18:58:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="713794457"
-X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="713794457"
-Received: from dmi-pnp-i7.sh.intel.com ([10.239.159.155])
-  by orsmga006.jf.intel.com with ESMTP; 23 Aug 2023 18:58:16 -0700
-From:   Dapeng Mi <dapeng1.mi@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Like Xu <likexu@tencent.com>
-Cc:     kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhang Xiong <xiong.y.zhang@intel.com>,
-        Lv Zhiyuan <zhiyuan.lv@intel.com>,
-        Dapeng Mi <dapeng1.mi@intel.com>,
-        Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [Patch v3] KVM: x86/pmu: Manipulate FIXED_CTR_CTRL MSR with macros
-Date:   Thu, 24 Aug 2023 10:05:46 +0800
-Message-Id: <20230824020546.1108516-1-dapeng1.mi@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S239592AbjHXDY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Aug 2023 23:24:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C95D610EC
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 20:24:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692847446;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yPglN9jWCOWkDHiaVESzd3fbifjjVGG3Y2tLlmCAqyw=;
+        b=VxK3WDYbTykeW3YuyAts0vGA7HmODQhnNmzV8yauMtAgjaTW30n5bfxkrhidypQXvMW2/B
+        +NAIEBWyK4/WCBz5seGelMR1IF2BNPdzaynd2qK3mTwzv7Gn1/NbM+nSKtpBdcWY6lykqo
+        JpM85qjPreGIEUzG2erR0i49dZ8Duik=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-12-lUOBWhmTMpazIf8N8SNgVw-1; Wed, 23 Aug 2023 23:24:04 -0400
+X-MC-Unique: lUOBWhmTMpazIf8N8SNgVw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2bcc5098038so38886871fa.2
+        for <kvm@vger.kernel.org>; Wed, 23 Aug 2023 20:24:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692847443; x=1693452243;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yPglN9jWCOWkDHiaVESzd3fbifjjVGG3Y2tLlmCAqyw=;
+        b=Pj/xLowXhzVw7sfHv9SE+6dyr8Rgd8zbvJr/59f7wNS/EvfQLOoR/pXpwxwas4D+UN
+         phJYxpLTzr1jSm6evPRyqj0pCa6v+wsDR4nkP/gV2rjLp6Sd2y9e94TUQ1Ue59ytA9RJ
+         /EAL+d4Ly3zIoCqQAvuUxTmh81Y9+qIM11ZUVmZD8oZuCkRcvTmVt6VpvkhXgpVhfpxZ
+         ZWCK1oFmC+RBGAzafFYmGGK68iM7oXCmO5iPKx4jXeQaswG5PyydY0rtySYOvTr0PsSu
+         6TU4DauWMxGToESAA6gabG7aJhExjOVMtjWPsm81x4ZBu3I6xd2KqYWZ7rq9WcmkY8p+
+         J2oA==
+X-Gm-Message-State: AOJu0YzZuXDW7efMb2E8Q7RONCr4g1hiCnTZU1ej4OPz0r6SCBNdVPmC
+        vf2buySTKpyNLqGdRKCO5BBvli5XhM4vSSqU3AofNvh1MElH0FzG0C7tzYFy3lj8ZEnvX5qSJln
+        XOXFFMKQd5u5M8Am71RgMVOPCt3/N
+X-Received: by 2002:a2e:b710:0:b0:2b5:80e0:f18e with SMTP id j16-20020a2eb710000000b002b580e0f18emr11256986ljo.3.1692847443057;
+        Wed, 23 Aug 2023 20:24:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjkeGqdviCPH5wTUExjQLr+CqEbEiWt/ba0nY6S4lLgHFwDlCy0ER84ojf2Z39Sci9dtg33fDr0zJFePv+spQ=
+X-Received: by 2002:a2e:b710:0:b0:2b5:80e0:f18e with SMTP id
+ j16-20020a2eb710000000b002b580e0f18emr11256978ljo.3.1692847442724; Wed, 23
+ Aug 2023 20:24:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230823153032.239304-1-eric.auger@redhat.com>
+In-Reply-To: <20230823153032.239304-1-eric.auger@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 24 Aug 2023 11:23:51 +0800
+Message-ID: <CACGkMEseBgbQx1ESA+QV_Y+BDdmwYPVg1UjUu2G0S2B6ksDeyQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, elic@nvidia.com, mail@anirudhrb.com,
+        mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Magic numbers are used to manipulate the bit fields of
-FIXED_CTR_CTRL MSR. This is not read-friendly and use macros to replace
-these magic numbers to increase the readability.
+On Wed, Aug 23, 2023 at 11:30=E2=80=AFPM Eric Auger <eric.auger@redhat.com>=
+ wrote:
+>
+> Commit e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb
+> entries") Forbade vhost iotlb msg with null size to prevent entries
+> with size =3D start =3D 0 and last =3D ULONG_MAX to end up in the iotlb.
+>
+> Then commit 95932ab2ea07 ("vhost: allow batching hint without size")
+> only applied the check for VHOST_IOTLB_UPDATE and VHOST_IOTLB_INVALIDATE
+> message types to fix a regression observed with batching hit.
+>
+> Still, the introduction of that check introduced a regression for
+> some users attempting to invalidate the whole ULONG_MAX range by
+> setting the size to 0. This is the case with qemu/smmuv3/vhost
+> integration which does not work anymore. It Looks safe to partially
+> revert the original commit and allow VHOST_IOTLB_INVALIDATE messages
+> with null size. vhost_iotlb_del_range() will compute a correct end
+> iova. Same for vhost_vdpa_iotlb_unmap().
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
----
- arch/x86/kvm/pmu.c           | 10 +++++-----
- arch/x86/kvm/pmu.h           |  6 ++++--
- arch/x86/kvm/vmx/pmu_intel.c | 11 ++++++++---
- 3 files changed, 17 insertions(+), 10 deletions(-)
+Cc: stable@vger.kernel.org
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index edb89b51b383..fb4ef2da3e32 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -420,11 +420,11 @@ static void reprogram_counter(struct kvm_pmc *pmc)
- 	if (pmc_is_fixed(pmc)) {
- 		fixed_ctr_ctrl = fixed_ctrl_field(pmu->fixed_ctr_ctrl,
- 						  pmc->idx - INTEL_PMC_IDX_FIXED);
--		if (fixed_ctr_ctrl & 0x1)
-+		if (fixed_ctr_ctrl & INTEL_FIXED_0_KERNEL)
- 			eventsel |= ARCH_PERFMON_EVENTSEL_OS;
--		if (fixed_ctr_ctrl & 0x2)
-+		if (fixed_ctr_ctrl & INTEL_FIXED_0_USER)
- 			eventsel |= ARCH_PERFMON_EVENTSEL_USR;
--		if (fixed_ctr_ctrl & 0x8)
-+		if (fixed_ctr_ctrl & INTEL_FIXED_0_ENABLE_PMI)
- 			eventsel |= ARCH_PERFMON_EVENTSEL_INT;
- 		new_config = (u64)fixed_ctr_ctrl;
- 	}
-@@ -749,8 +749,8 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
- 	} else {
- 		config = fixed_ctrl_field(pmc_to_pmu(pmc)->fixed_ctr_ctrl,
- 					  pmc->idx - INTEL_PMC_IDX_FIXED);
--		select_os = config & 0x1;
--		select_user = config & 0x2;
-+		select_os = config & INTEL_FIXED_0_KERNEL;
-+		select_user = config & INTEL_FIXED_0_USER;
- 	}
- 
- 	return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? select_os : select_user;
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 7d9ba301c090..ffda2ecc3a22 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -12,7 +12,8 @@
- 					  MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
- 
- /* retrieve the 4 bits for EN and PMI out of IA32_FIXED_CTR_CTRL */
--#define fixed_ctrl_field(ctrl_reg, idx) (((ctrl_reg) >> ((idx)*4)) & 0xf)
-+#define fixed_ctrl_field(ctrl_reg, idx) \
-+	(((ctrl_reg) >> ((idx) * INTEL_FIXED_BITS_STRIDE)) & INTEL_FIXED_BITS_MASK)
- 
- #define VMWARE_BACKDOOR_PMC_HOST_TSC		0x10000
- #define VMWARE_BACKDOOR_PMC_REAL_TIME		0x10001
-@@ -165,7 +166,8 @@ static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
- 
- 	if (pmc_is_fixed(pmc))
- 		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
--					pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
-+					pmc->idx - INTEL_PMC_IDX_FIXED) &
-+					(INTEL_FIXED_0_KERNEL | INTEL_FIXED_0_USER);
- 
- 	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
- }
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index f2efa0bf7ae8..b0ac55891cb7 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -548,8 +548,13 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		setup_fixed_pmc_eventsel(pmu);
- 	}
- 
--	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
--		pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
-+	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
-+		pmu->fixed_ctr_ctrl_mask &=
-+			 ~intel_fixed_bits_by_idx(i,
-+						  INTEL_FIXED_0_KERNEL |
-+						  INTEL_FIXED_0_USER |
-+						  INTEL_FIXED_0_ENABLE_PMI);
-+	}
- 	counter_mask = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
- 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED));
- 	pmu->global_ctrl_mask = counter_mask;
-@@ -595,7 +600,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
- 			for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
- 				pmu->fixed_ctr_ctrl_mask &=
--					~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
-+					~intel_fixed_bits_by_idx(i, ICL_FIXED_0_ADAPTIVE);
- 			}
- 			pmu->pebs_data_cfg_mask = ~0xff00000full;
- 		} else {
+I think we need to document the usage of 0 as msg.size for
+IOTLB_INVALIDATE in uapi.
 
-base-commit: fff2e47e6c3b8050ca26656693caa857e3a8b740
--- 
-2.34.1
+Other than this:
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
+> Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entri=
+es")
+> ---
+>  drivers/vhost/vhost.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index c71d573f1c94..e0c181ad17e3 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1458,9 +1458,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>                 goto done;
+>         }
+>
+> -       if ((msg.type =3D=3D VHOST_IOTLB_UPDATE ||
+> -            msg.type =3D=3D VHOST_IOTLB_INVALIDATE) &&
+> -            msg.size =3D=3D 0) {
+> +       if (msg.type =3D=3D VHOST_IOTLB_UPDATE && msg.size =3D=3D 0) {
+>                 ret =3D -EINVAL;
+>                 goto done;
+>         }
+> --
+> 2.41.0
+>
 
