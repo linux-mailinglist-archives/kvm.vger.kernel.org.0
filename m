@@ -2,225 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4CD7787425
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 17:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0C1A7874E4
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 18:09:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242129AbjHXP0j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 11:26:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33800 "EHLO
+        id S242359AbjHXQIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 12:08:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242203AbjHXP0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 11:26:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46FF19B2
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 08:25:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692890732;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I68/GBXzgIeykhJKJ/R9njNTye2zNl+rr739FJ1Wzkc=;
-        b=HdcX0Hh4RN/rwCOLGdA1fLzxZh8mvq0iAMnzmyXkWBb58T7SGgGj/MOFYDw2ipRta1sN9K
-        pmhxYKOVb39RMzvLksH06BjMpJjEQpkfSpCo+iw5O2xEzVV2j84E176Zt2SU7WjoGvdc3t
-        Xzn0STEg1tFocyfR662a7uuNG8WNO1Y=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-471-7PCiflZKN6S4f38i6fl7Hg-1; Thu, 24 Aug 2023 11:25:30 -0400
-X-MC-Unique: 7PCiflZKN6S4f38i6fl7Hg-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-790d561d943so598680739f.1
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 08:25:30 -0700 (PDT)
+        with ESMTP id S242379AbjHXQIT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 12:08:19 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 161BE1996
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 09:08:18 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-58fbc0e0c6dso726187b3.0
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 09:08:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692893297; x=1693498097;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ixXU2vNex2+1id+8Rly6dixara1UC2RdpyLH0XPBAg=;
+        b=A9kEnqI0HK2memtoFt706uJhZM7N7xDMbtmemAHGlIm1eOkCLsGNXiW7FLVvY05J9P
+         ETqLsxun/tk+RXvLh23UQjYbSRYhEZ9V510uNVjG4RPv9cv4eptel9Vj9R8S0ppxD/06
+         Qizu9c+eNq+u/3DNdekU3zqsmJ5hgJ5j1LfpzhY194N3i9fEDEKwrKYAWCJkmxyzfe8S
+         WlY1cnwQ0g1wwGxWShGOEFCCyOo29vjonYFnOfP8D7/QTuvNz63vBwXZ2yOGkZwZwvbe
+         O6UtspFl1MPBJMtRckLSd8drpEIIwXtqNKt87ZmVxsrxCytOSLhhQrE60MBCe4t6acW5
+         Ko7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692890730; x=1693495530;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I68/GBXzgIeykhJKJ/R9njNTye2zNl+rr739FJ1Wzkc=;
-        b=l/Y7zpmwKF0ZVxDvG/ldnV8VaBBuQxcWhW+EQq8lmD29sjbPUi/rXeSQF4GXnIdTjQ
-         GmtTLK93t9oqI/TV6Dlpz0hHqWq7nQCbNHAK/rZnix67k5uBtE0YnA9PHIWNDxisyPyW
-         ck1K5jrdSgussfuxLwAxeLBnLFLuDv3918QqUaZeQ0HazxIcC81Msfd53CNnPIqqbDV8
-         7KUqAE/v1NDw8ARUrKQkkt+8MOcMcupEGudKRV/wDmpMbh/8NoFN8qBLwSRaLkr6c/eH
-         09XdX4qqZvqKc5fbNpfFd4luiiTn8sW3zQysDPDTvgckHoVYnvHTb8dbfKANm6xvU83v
-         qUGw==
-X-Gm-Message-State: AOJu0Yw4B3u5y2W6Rx/MSxHe5CeDm7SQ+CVZLR3sFilDiC+vw9sr2LPD
-        ZBtpilnBVaEcDJxoP5U7f/7kJFB5scmYvNLF+xAzWaMBlt2Zh97XcEj8p7OG4CaQrAzA88rmTQv
-        fK7LbzrguzKZa
-X-Received: by 2002:a6b:720b:0:b0:787:8d2:e0c with SMTP id n11-20020a6b720b000000b0078708d20e0cmr6671540ioc.12.1692890729769;
-        Thu, 24 Aug 2023 08:25:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEke3AIwUL3voDBxvHAh2VGnvJHrolmd2TOjjUuh6KzxktMdE9vcGe82anmrMXRho36BrIQGg==
-X-Received: by 2002:a6b:720b:0:b0:787:8d2:e0c with SMTP id n11-20020a6b720b000000b0078708d20e0cmr6671520ioc.12.1692890729546;
-        Thu, 24 Aug 2023 08:25:29 -0700 (PDT)
-Received: from redhat.com ([38.15.60.12])
-        by smtp.gmail.com with ESMTPSA id b19-20020a5d8953000000b0079199e52035sm4604093iot.52.2023.08.24.08.25.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 08:25:28 -0700 (PDT)
-Date:   Thu, 24 Aug 2023 09:25:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Zeng, Xin" <xin.zeng@intel.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "Cao, Yahui" <yahui.cao@intel.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [RFC 5/5] vfio/qat: Add vfio_pci driver for Intel QAT VF
- devices
-Message-ID: <20230824092527.143eebbc.alex.williamson@redhat.com>
-In-Reply-To: <DM4PR11MB550203FB22F8D6F0EAF8F717881CA@DM4PR11MB5502.namprd11.prod.outlook.com>
-References: <20230630131304.64243-1-xin.zeng@intel.com>
-        <20230630131304.64243-6-xin.zeng@intel.com>
-        <20230726133726.7e2cf1e8.alex.williamson@redhat.com>
-        <DM4PR11MB550203FB22F8D6F0EAF8F717881CA@DM4PR11MB5502.namprd11.prod.outlook.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        d=1e100.net; s=20221208; t=1692893297; x=1693498097;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ixXU2vNex2+1id+8Rly6dixara1UC2RdpyLH0XPBAg=;
+        b=I/HIPciBRCmeXUDIIJHgsEbHBnwj36WBjSLdvMSnl/4BhXrw7gDcs0ERC1887Jbmq3
+         WNCbRwRksmsXK1vh9kK1FwnRJmMT1XYuhq0heKf2KdkXgAwykPKIlA0YqMl8rsAh5j7G
+         5ViWj9InVuTA5wKfv+82Aumveha3bdP5BbQSFI6CBCjLVp7ioX3i7FfrUBnrxtgKeaHG
+         9c3KY+3U/qYU058/3Y9v80mE0GxeMT9L8nOKP2MlYyDPHbnyNmRdNjUV+2xXIGNYVkLV
+         BmcgS2VQBu8U7VrUozIGz9KU6UwP8zGsnnjim0rJg2xv6fTADX1jteLBcw933Fx5N68X
+         n4NA==
+X-Gm-Message-State: AOJu0YzQTzOa/0Px7B2/Q1B60QN/kBi0+JDUSNBEM5y/Ty8crIbXq6qH
+        t8LqhpUAoOWN/fJ7J8ph5FWcvIMVF58=
+X-Google-Smtp-Source: AGHT+IF4tuSw46JD7qw+5gQdRlBrlVirqCEscZWNprAlepko0RaD8sLBVYb5gppzeZaW50s9t8fpYJ9q8Ec=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:b71c:0:b0:573:8316:8d04 with SMTP id
+ v28-20020a81b71c000000b0057383168d04mr227266ywh.4.1692893297340; Thu, 24 Aug
+ 2023 09:08:17 -0700 (PDT)
+Date:   Thu, 24 Aug 2023 09:08:15 -0700
+In-Reply-To: <ZOZ2KqCIcleJxrTz@google.com>
+Mime-Version: 1.0
+References: <20230810234919.145474-1-seanjc@google.com> <bf3af7eb-f4ce-b733-08d4-6ab7f106d6e6@amd.com>
+ <ZOTQ6izCUfrBh2oj@google.com> <d183c3f2-d94d-5f22-184d-eab80f9d0fe8@amd.com>
+ <ZOZmFe7MT7zwrf/c@google.com> <bc6a9c1f-d41e-ef81-3029-04c2938b300c@amd.com> <ZOZ2KqCIcleJxrTz@google.com>
+Message-ID: <ZOeAb0ccVjdw3Gvw@google.com>
+Subject: Re: [PATCH 0/2] KVM: SVM: Fix unexpected #UD on INT3 in SEV guests
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Wu Zongyo <wuzongyo@mail.ustc.edu.cn>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Aug 2023 15:29:47 +0000
-"Zeng, Xin" <xin.zeng@intel.com> wrote:
+On Wed, Aug 23, 2023, Sean Christopherson wrote:
+> One idea to make the original bug repro on every run would be to constantly
+> toggle nx_huge_pages between "off" and "force" while the guest is booting.  Toggling
+> nx_huge_pages should force KVM to rebuild the SPTEs and all but guarantee trying
+> to deliver the #BP will hit a #NPF.
 
-> Thanks for the comments, Alex.
-> On Thursday, July 27, 2023 3:37 AM, Alex Williamson wrote:
-> > >  drivers/vfio/pci/Kconfig                 |   2 +
-> > >  drivers/vfio/pci/Makefile                |   1 +
-> > >  drivers/vfio/pci/qat/Kconfig             |  13 +
-> > >  drivers/vfio/pci/qat/Makefile            |   4 +
-> > >  drivers/vfio/pci/qat/qat_vfio_pci_main.c | 518  
-> > +++++++++++++++++++++++
-> > 
-> > Rename to main.c.  
-> 
-> Will do in next version.
-> 
-> >   
-> > >  5 files changed, 538 insertions(+)
-> > >  create mode 100644 drivers/vfio/pci/qat/Kconfig
-> > >  create mode 100644 drivers/vfio/pci/qat/Makefile
-> > >  create mode 100644 drivers/vfio/pci/qat/qat_vfio_pci_main.c
-> > >
-> > > diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> > > index f9d0c908e738..47c9773cf0c7 100644
-> > > --- a/drivers/vfio/pci/Kconfig
-> > > +++ b/drivers/vfio/pci/Kconfig
-> > > @@ -59,4 +59,6 @@ source "drivers/vfio/pci/mlx5/Kconfig"
-> > >
-> > >  source "drivers/vfio/pci/hisilicon/Kconfig"
-> > >
-> > > +source "drivers/vfio/pci/qat/Kconfig"
-> > > +
-> > >  endif
-> > > diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> > > index 24c524224da5..dcc6366df8fa 100644
-> > > --- a/drivers/vfio/pci/Makefile
-> > > +++ b/drivers/vfio/pci/Makefile
-> > > @@ -11,3 +11,4 @@ obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-> > >  obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
-> > >
-> > >  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
-> > > +obj-$(CONFIG_QAT_VFIO_PCI) += qat/
-> > > diff --git a/drivers/vfio/pci/qat/Kconfig b/drivers/vfio/pci/qat/Kconfig
-> > > new file mode 100644
-> > > index 000000000000..38e5b4a0ca9c
-> > > --- /dev/null
-> > > +++ b/drivers/vfio/pci/qat/Kconfig
-> > > @@ -0,0 +1,13 @@
-> > > +# SPDX-License-Identifier: GPL-2.0-only
-> > > +config QAT_VFIO_PCI
-> > > +	tristate "VFIO support for QAT VF PCI devices"
-> > > +	depends on X86  
-> > 
-> > What specific X86 dependency exists here?  CRYPTO_DEV_QAT and the
-> > various versions of the QAT driver don't seem to have an explicit arch
-> > dependency, therefore this shouldn't either.  
-> 
-> You are right. Will remove it.
-> 
-> >   
-> > > +	depends on VFIO_PCI_CORE  
-> > 
-> > select VFIO_PCI_CORE, this was updated for all vfio-pci variant drivers
-> > for v6.5.  
-> 
-> Will update it.
-> 
-> >   
-> > > +
-> > > diff --git a/drivers/vfio/pci/qat/qat_vfio_pci_main.c  
-> > b/drivers/vfio/pci/qat/qat_vfio_pci_main.c  
-> > > new file mode 100644
-> > > index 000000000000..af971fd05fd2
-> > > --- /dev/null
-> > > +++ b/drivers/vfio/pci/qat/qat_vfio_pci_main.c
-> > > @@ -0,0 +1,518 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/* Copyright(c) 2023 Intel Corporation */
-> > > +#include <linux/anon_inodes.h>
-> > > +#include <linux/container_of.h>
-> > > +#include <linux/device.h>
-> > > +#include <linux/file.h>
-> > > +#include <linux/init.h>
-> > > +#include <linux/kernel.h>
-> > > +#include <linux/module.h>
-> > > +#include <linux/mutex.h>
-> > > +#include <linux/pci.h>
-> > > +#include <linux/sizes.h>
-> > > +#include <linux/types.h>
-> > > +#include <linux/uaccess.h>
-> > > +#include <linux/vfio_pci_core.h>
-> > > +#include <linux/qat/qat_vf_mig.h>
-> > > +
-> > > +struct qat_vf_mig_data {
-> > > +	u8 state[SZ_4K];
-> > > +};
-> > > +
-> > > +struct qat_vf_migration_file {
-> > > +	struct file *filp;
-> > > +	struct mutex lock; /* protect migration region context */
-> > > +	bool disabled;
-> > > +
-> > > +	size_t total_length;
-> > > +	struct qat_vf_mig_data mig_data;
-> > > +};
-> > > +
-> > > +static void qat_vf_vfio_pci_remove(struct pci_dev *pdev)
-> > > +{
-> > > +	struct qat_vf_core_device *qat_vdev = qat_vf_drvdata(pdev);
-> > > +
-> > > +	vfio_pci_core_unregister_device(&qat_vdev->core_device);
-> > > +	vfio_put_device(&qat_vdev->core_device.vdev);
-> > > +}
-> > > +
-> > > +static const struct pci_device_id qat_vf_vfio_pci_table[] = {
-> > > +	/* Intel QAT GEN4 4xxx VF device */
-> > > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL,  
-> > 0x4941) },
-> > 
-> > Should this driver depend on CRYPTO_DEV_QAT_4XXX if that's the only
-> > supported PF driver?  
-> 
-> This module has not any dependency to QAT_4XXX module at build time, but it indeed has implicit
-> dependency on QAT_4XXX runtime to enable SRIOV and complete the QAT 4xxx VF migration,
-> do you think we still need to put this dependency explicitly in Kconfig?
-
-What benefit does it serve a user to be able to build this module if
-the runtime dependency isn't present in the kernel?  We have
-COMPILE_TEST to support build time regression testing.  Thanks,
-
-Alex
-
+Mwhahaha.  That, plus a delay in the guest and disabling THP, makes this 100%
+reproducible.  I'll verify the fix actually works before posting v2.
