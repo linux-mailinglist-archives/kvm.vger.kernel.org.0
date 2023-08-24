@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 454F4786F7C
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC3E786F7D
 	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 14:47:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240740AbjHXMrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 08:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34572 "EHLO
+        id S240788AbjHXMrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 08:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240170AbjHXMqh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 08:46:37 -0400
+        with ESMTP id S240185AbjHXMqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 08:46:44 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA9AE59;
-        Thu, 24 Aug 2023 05:46:36 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCgqLN020119;
-        Thu, 24 Aug 2023 12:46:35 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0562410FA;
+        Thu, 24 Aug 2023 05:46:42 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCglKv028748;
+        Thu, 24 Aug 2023 12:46:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=KMP/0iEuBdF8cdYBkFPfv8+HL5/LLlqDIMWCj8DhJv0=;
- b=tHdeLW13Aq5KTOXdqmPs0Tx66hwk8QLuX53zYDJVnPKax14wF04qSlj8qczziFTGoXiY
- 6LEEA4ToveLFbuTu3DAqOw30/kxe0PopcYyH1qq8y+7Tl3yhAKXfJCSZSnww9d6+977M
- //NMDRu+SrLxeMKv4MIf/GhSim1Pg6BSJrMrtEYhZC2pSwOrAwynWYHoRBtGCi2KmNY2
- e2floyzQNzI0lBBU3ifcpFy/XRedkFeimMinPiXBxCpzR6TGhZTqirfVIMLIQx7ACnnu
- zA/wWa8oJQfsfNgW0LpjBPL1Du9uJ6SUHnVxj4BpmkD8Oltv0tD9PN4JvOZ9kh1PIsuy Ng== 
+ : mime-version; s=pp1; bh=75e7cKDwWD87JyOkGfyWJzoYTTbtEnsR5cA99qRKw54=;
+ b=VUwQP6N/sLHLN5MPppZ9OWEOlXzA48sqcmLEVvjqKc28XDgG16w4giLVJsaFyq7IeYk2
+ Al2h5Ytlk+372mDnNm2OVjK4oE+xtZQMIBOOrq74Mpg+/Sh8B7VR01gatWA4K+BAeUjf
+ baQTk3vevWl3L4cIzDjch92O5SGoFvmHjSrHAh3yLX5J8/hgSVYc3YfTqVfD56Gsu8az
+ ZJnYwa3blJ5D9f6tYAe5XTtyyLDeHkjgCDbUBxUTrKoC0DO82u76hVDBQn9RV3MjkCkD
+ vV8ynxEM486PGvr5SZx2Nak9hyMPLhHXF1zdSPTyTiQ/RdPV+j1LlNSXUmp6k06TOLnQ AA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7ey0hpv-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7eu0jx9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Aug 2023 12:46:41 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37OCguRu029242;
+        Thu, 24 Aug 2023 12:46:34 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7eu0j4t-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 24 Aug 2023 12:46:34 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37OCgoak020020;
-        Thu, 24 Aug 2023 12:46:30 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7ey0h7a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Aug 2023 12:46:30 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCR0ct018220;
-        Thu, 24 Aug 2023 12:46:25 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn21sq04h-1
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCex6Q010275;
+        Thu, 24 Aug 2023 12:46:26 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn21sy093-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 24 Aug 2023 12:46:25 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37OCkMXc44499460
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37OCkNi723921268
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Aug 2023 12:46:22 GMT
+        Thu, 24 Aug 2023 12:46:23 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A8DA20043;
+        by IMSVA (Postfix) with ESMTP id 14D362004D;
+        Thu, 24 Aug 2023 12:46:23 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6209A2004B;
         Thu, 24 Aug 2023 12:46:22 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9877D2004B;
-        Thu, 24 Aug 2023 12:46:21 +0000 (GMT)
 Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.fritz.box (unknown [9.171.27.69])
         by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Aug 2023 12:46:21 +0000 (GMT)
+        Thu, 24 Aug 2023 12:46:22 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
@@ -63,26 +63,26 @@ Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         hca@linux.ibm.com, mihajlov@linux.ibm.com, seiden@linux.ibm.com,
         akrowiak@linux.ibm.com
-Subject: [GIT PULL 18/22] s390/vfio-ap: make sure nib is shared
-Date:   Thu, 24 Aug 2023 14:43:27 +0200
-Message-ID: <20230824124522.75408-19-frankja@linux.ibm.com>
+Subject: [GIT PULL 19/22] KVM: s390: pv: relax WARN_ONCE condition for destroy fast
+Date:   Thu, 24 Aug 2023 14:43:28 +0200
+Message-ID: <20230824124522.75408-20-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230824124522.75408-1-frankja@linux.ibm.com>
 References: <20230824124522.75408-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: OR1TxtxWkoICe2S_bwpTsnV3WhesGARQ
-X-Proofpoint-GUID: BoR16pi8Xu2No94u5usnfw6xIXcwUQL5
+X-Proofpoint-ORIG-GUID: CCXaEYqUN_1fRTvb0gqXDmmX-LB5FHuy
+X-Proofpoint-GUID: E5F5-KT7S570vSc_V1ZLyEbv35YkCXql
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
  definitions=2023-08-24_09,2023-08-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- adultscore=0 impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0
- clxscore=1015 priorityscore=1501 mlxscore=0 spamscore=0 mlxlogscore=947
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2308240103
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ suspectscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0
+ mlxlogscore=654 adultscore=0 bulkscore=0 spamscore=0 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308240103
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -92,81 +92,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tony Krowiak <akrowiak@linux.ibm.com>
+From: Viktor Mihajlovski <mihajlov@linux.ibm.com>
 
-Since the NIB is visible by HW, KVM and the (PV) guest it needs to be
-in non-secure or secure but shared storage. Return code 6 is used to
-indicate to a PV guest that its NIB would be on secure, unshared
-storage and therefore the NIB address is invalid.
+Destroy configuration fast may return with RC 0x104 if there
+are still bound APQNs in the configuration. The final cleanup
+will occur with the standard destroy configuration UVC as
+at this point in time all APQNs have been reset and thus
+unbound. Therefore, don't warn if RC 0x104 is reported.
 
-Unfortunately we have no easy way to check if a page is unshared after
-vfio_pin_pages() since it will automatically export an unshared page
-if the UV pin shared call did not succeed due to a page being in
-unshared state.
-
-Therefore we use the fact that UV pinning it a second time is a nop
-but trying to pin an exported page is an error (0x102). If we
-encounter this error, we do a vfio unpin and import the page again,
-since vfio_pin_pages() exported it.
-
+Signed-off-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Reviewed-by: Michael Mueller <mimu@linux.ibm.com>
+Link: https://lore.kernel.org/r/20230815151415.379760-2-seiden@linux.ibm.com
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-Tested-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Link: https://lore.kernel.org/r/20230815184333.6554-13-akrowiak@linux.ibm.com
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+Message-ID: <20230815151415.379760-2-seiden@linux.ibm.com>
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ arch/s390/kvm/pv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 8bda52c46df0..0509f80622cd 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -359,6 +359,28 @@ static int vfio_ap_validate_nib(struct kvm_vcpu *vcpu, dma_addr_t *nib)
- 	return 0;
- }
- 
-+static int ensure_nib_shared(unsigned long addr, struct gmap *gmap)
-+{
-+	int ret;
-+
-+	/*
-+	 * The nib has to be located in shared storage since guest and
-+	 * host access it. vfio_pin_pages() will do a pin shared and
-+	 * if that fails (possibly because it's not a shared page) it
-+	 * calls export. We try to do a second pin shared here so that
-+	 * the UV gives us an error code if we try to pin a non-shared
-+	 * page.
-+	 *
-+	 * If the page is already pinned shared the UV will return a success.
-+	 */
-+	ret = uv_pin_shared(addr);
-+	if (ret) {
-+		/* vfio_pin_pages() likely exported the page so let's re-import */
-+		gmap_convert_to_secure(gmap, addr);
-+	}
-+	return ret;
-+}
-+
- /**
-  * vfio_ap_irq_enable - Enable Interruption for a APQN
-  *
-@@ -422,6 +444,14 @@ static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
- 	h_nib = page_to_phys(h_page) | (nib & ~PAGE_MASK);
- 	aqic_gisa.gisc = isc;
- 
-+	/* NIB in non-shared storage is a rc 6 for PV guests */
-+	if (kvm_s390_pv_cpu_is_protected(vcpu) &&
-+	    ensure_nib_shared(h_nib & PAGE_MASK, kvm->arch.gmap)) {
-+		vfio_unpin_pages(&q->matrix_mdev->vdev, nib, 1);
-+		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
-+		return status;
-+	}
-+
- 	nisc = kvm_s390_gisc_register(kvm, isc);
- 	if (nisc < 0) {
- 		VFIO_AP_DBF_WARN("%s: gisc registration failed: nisc=%d, isc=%d, apqn=%#04x\n",
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index 856140e9942e..beeebc11b1a1 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -285,7 +285,8 @@ static int kvm_s390_pv_deinit_vm_fast(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 	WRITE_ONCE(kvm->arch.gmap->guest_handle, 0);
+ 	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM FAST: rc %x rrc %x",
+ 		     uvcb.header.rc, uvcb.header.rrc);
+-	WARN_ONCE(cc, "protvirt destroy vm fast failed handle %llx rc %x rrc %x",
++	WARN_ONCE(cc && uvcb.header.rc != 0x104,
++		  "protvirt destroy vm fast failed handle %llx rc %x rrc %x",
+ 		  kvm_s390_pv_get_handle(kvm), uvcb.header.rc, uvcb.header.rrc);
+ 	/* Intended memory leak on "impossible" error */
+ 	if (!cc)
 -- 
 2.41.0
 
