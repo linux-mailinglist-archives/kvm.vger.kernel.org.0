@@ -2,65 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D64478715F
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 16:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA7AC78717E
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 16:27:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241549AbjHXOXW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 10:23:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52720 "EHLO
+        id S241620AbjHXO0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 10:26:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236682AbjHXOWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 10:22:53 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6065511F
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 07:22:51 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59285f1e267so10298887b3.0
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 07:22:51 -0700 (PDT)
+        with ESMTP id S241699AbjHXO00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 10:26:26 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496771BC6
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 07:26:22 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59294c55909so557417b3.0
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 07:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692886970; x=1693491770;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LUqkh+MsV5Vrt4MTvDlgnnSg6OPpYXOoL7cfHlTtb8M=;
-        b=UWvBCdin9fzOcW//Ix69NYEO26eQR2dYIfmBO7ycAwvPBVNQzetffaZ9xtH1qn+6Wj
-         SX7zr6smqNFsXI687Ckf/On8Uc2/qRwaEQycIbFakkEKjEAOAf3SsJ7DPYDKNawW+Tbs
-         TuL71VlDi5BNXVpf6Nkqxtn1knirtV/yhYEU5lqSEhCdAgsXxsxiuuDyAU0cRfzmatd0
-         pEQFFXCyBH64J6dnRDGZJW5zfzGY1TShoOCir92rQrhFmZLbKILQXSF2OqVCjrFYoxJv
-         XdBNagJOV96y0wP+bNRDwE23pnd6xpZPFrYOewULejQ+4wdJdza9ZEHvpaC74Qk+TmGL
-         AM+A==
+        d=google.com; s=20221208; t=1692887181; x=1693491981;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GOEC2gL2vPMfrimKnsUeWbRBTwKLQLkp/XAmV7mc+hM=;
+        b=zThywn62QCEc2gE7/6qdBaDq9/1rKpLx6RFn/awFe4rXfJOV6KKFcgLLeDA1RQnWKp
+         9HSRtKRV90dPkRW3JDaAB3SP/eAtxDVdsHY8i4GiuFObziA0Dsdz7Z6O1gKlANCN/dD0
+         SruoR9Wenx6/YuF5BTQQNs4qC7gcr4rTJqfCLexSNOOiH20ad5vvWFFPspbwLx8GFAT5
+         KP5A3bUNK2KlJwmzUrKcA5/TNXfo1G1rk8v5qJr1Us6VB86XUPOrmp+D0gTrVXhqIUWZ
+         UCwdB0kJjGx1TOOnzY2Z1kLLH3GBrZFCR+HrK95SIMb+ltKBIoc6Cd3gXaMbqYfc2Byk
+         1Mxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692886970; x=1693491770;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LUqkh+MsV5Vrt4MTvDlgnnSg6OPpYXOoL7cfHlTtb8M=;
-        b=gMOGJerIVO+pzSexAnYmu6uMsR15Z7y+ylsSFL/EyC/aH5BEKGDcH0Vm50D3IQBft0
-         k5TW3l6/+ZWKmGuGcDnk3Rz7gZXWF/xB41h6HD72toDOYaFdW6n01AeGBHe571zvP+7I
-         +65uNjqQ8B+6X4nMtPvyHDKo1SV6GGiqV13o6BudlnMjr37ZMBFyVgXGx6WedbMhAHx0
-         qzwJkU5PSI7oZxLGTTKYtUTFtoN2fvnWULEL4sJi7EKCH5p4HGkWUIqqZzFa0R8o/w/j
-         lRelfRx7CfNQ74KPrfwNmII8ZE3B8WPpgbRb0C6Zj4+PxyakVZMKsaFnyOMIqC67Ydlf
-         xb9g==
-X-Gm-Message-State: AOJu0YySdMQr9DtRgXOprpP7Jo+88YdAE01N/xHfJtBr12CcEpyGoTQg
-        luJJ4uoR3ef3Rn3FDtBiZulHKoe3Dio=
-X-Google-Smtp-Source: AGHT+IEcl3qGP1JrvIn63TSnfzzvUSShyoMV4j6547DJrdRfSZAgVP7pWcLKEyUAru3TUAMu0cVhLEDsybQ=
+        d=1e100.net; s=20221208; t=1692887181; x=1693491981;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GOEC2gL2vPMfrimKnsUeWbRBTwKLQLkp/XAmV7mc+hM=;
+        b=KJvJuiip3JIuEjtvwEtsBGe7Ek7blmT3xH2r4NVWqLcwyHSsM8UvVJvKjbNvKw0qme
+         lQjiwJvsnXcpztljjggUD36FZ7M0kiiwF4UamaqsTUn1heUl9kIAflEpknpbDSU8rC2Q
+         iTpwZ1cm40xUSRkmKIMawcr5yjlBzvRRdNs2SbL+JaVwsqSCUG26omUc0I+AQTwcrfpZ
+         ODfHlWGAD8f3G/Qewqh39QRpzvXaK0LQiwG0+iYQN4LRNJ2NEo7dE5sSGfFSasiqt3a3
+         NmL0YdYayI57uG75+gzp+B3nZ2kppeyNvzB/WpzGyZRqG/GSV0+QcvmJ5OKs2rlagCYh
+         t6VA==
+X-Gm-Message-State: AOJu0YwMIbpnQvTvEYec0PnXj3vcC6BfWONBfTx870INdE9rqjgNPTm+
+        WL4wtzEREtXOtow9TPiEQ38LzHaekxw=
+X-Google-Smtp-Source: AGHT+IGRA8onYtETZ5TVTvLafV/wVwLQi13rt/bL96OuVKnHFmkFCsfsn/0KnssV9bbTzeqokJkvsPqXgwQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:af24:0:b0:586:e2b5:f364 with SMTP id
- n36-20020a81af24000000b00586e2b5f364mr320156ywh.4.1692886970397; Thu, 24 Aug
- 2023 07:22:50 -0700 (PDT)
-Date:   Thu, 24 Aug 2023 14:22:48 +0000
-In-Reply-To: <174aa0da-0b05-a2dc-7884-4f7b57abcc37@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a81:af0e:0:b0:58c:6ddd:d27c with SMTP id
+ n14-20020a81af0e000000b0058c6dddd27cmr233466ywh.6.1692887181634; Thu, 24 Aug
+ 2023 07:26:21 -0700 (PDT)
+Date:   Thu, 24 Aug 2023 07:26:20 -0700
+In-Reply-To: <ZOdmPqq6uXMSWOnV@google.com>
 Mime-Version: 1.0
-References: <67fba65c-ba2a-4681-a9bc-2a6e8f0bcb92.chenpeihong.cph@alibaba-inc.com>
- <ZOYfxgSy/SxCn0Wq@google.com> <174aa0da-0b05-a2dc-7884-4f7b57abcc37@amd.com>
-Message-ID: <ZOdnuDZUd4mevCqe@google.com>
-Subject: Re: Question about AMD SVM's virtual NMI support in Linux kernel mainline
+References: <20221213060912.654668-1-seanjc@google.com> <20221213060912.654668-8-seanjc@google.com>
+ <e91f562b-ecdf-6745-a9b1-52fe19126bad@gmail.com> <ZOdmPqq6uXMSWOnV@google.com>
+Message-ID: <ZOdojKCxPMV8KNo3@google.com>
+Subject: Re: [PATCH 7/7] KVM: VMX: Handle NMI VM-Exits in noinstr region
 From:   Sean Christopherson <seanjc@google.com>
-To:     Santosh Shukla <santosh.shukla@amd.com>
-Cc:     "=?utf-8?B?6ZmI5Z+56bi/KOS5mOm4vyk=?=" 
-        <chenpeihong.cph@alibaba-inc.com>, mlevitsk <mlevitsk@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
@@ -71,135 +70,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+kvm and lkml, didn't realize they weren't Cc'd in the original mail.
+On Thu, Aug 24, 2023, Sean Christopherson wrote:
+> On Thu, Aug 24, 2023, Like Xu wrote:
+> > @@ -7389,6 +7382,13 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> > 
+> >  	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+> > 
+> > +	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
+> > +	    is_nmi(vmx_get_intr_info(vcpu))) {
+> > +		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
+> > +		vmx_do_nmi_irqoff();
+> > +		kvm_after_interrupt(vcpu);
+> > +	}
+> 
+> No, the whole point of doing NMI handling in vmx_vcpu_enter_exit() is so that NMIs
+> are serviced before instrumentation is enabled.
+> 
+> I think the below is sufficient (untested at this point).  Not quite minimal, e.g.
+> I'm pretty sure there's (currently) no need to snapshot IDT_VECTORING_INFO_FIELD
+> so early, but I can't think of any reason to wait.
+> 
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Thu, 24 Aug 2023 06:49:36 -0700
+> Subject: [PATCH] KVM: VMX: Refresh available regs and IDT vectoring info
+>  before NMI handling
+> 
+> Reset the mask of available "registers" and refresh the IDT vectoring
+> info snapshot in vmx_vcpu_enter_exit(), before KVM potentially handles a
+> an NMI VM-Exit.  One of the "registers" that KVM VMX lazily loads is the
+> vmcs.VM_EXIT_INTR_INFO field, which is holds the vector+type on "exception
+> or NMI" VM-Exits, i.e. is needed to identify NMIs.  Clearing the available
+> registers bitmask after handling NMIs results in KVM querying info from
+> the last VM-Exit that read vmcs.VM_EXIT_INTR_INFO, and leads to both
+> missed NMIs and spurious NMIs from the guest's perspective.
 
-On Thu, Aug 24, 2023, Santosh Shukla wrote:
-> Hi Sean,
->=20
-> On 8/23/2023 8:33 PM, Sean Christopherson wrote:
-> > On Fri, Aug 18, 2023, =E9=99=88=E5=9F=B9=E9=B8=BF(=E4=B9=98=E9=B8=BF) w=
-rote:
-> >> According to the results, I found that in the case of concurrent NMIs,=
- some
-> >> NMIs are still injected through eventinj instead of vNMI.
-> >=20
-> > Key word is "some", having two NMIs arrive "simultaneously" is uncommon=
-.  In quotes
-> > because if a vCPU is scheduled out or otherwise delayed, two NMIs can b=
-e recognized
-> > by KVM at the same time even if there was a sizeable delay between when=
- they were
-> > sent.
-> >=20
-> >> Based on the above explanations, I summarize my questions as follows:
-> >> 1. According to the specification of AMD SVM vNMI, with vNMI enabled, =
-will
-> >> some NMIs be injected through eventinj under the condition of concurre=
-nt
-> >> NMIs?
-> >=20
-> > Yes.
-> >=20
-> >> 2. If yes, what is the role of vNMI? Is it just an addition to eventin=
-j? What
-> >> benefits is it designed to expect? Is there any benchmark data support=
-?
-> >=20
-> > Manually injecting NMIs isn't problematic from a performance perspectiv=
-e.  KVM
-> > takes control of the vCPU, i.e. forces a VM-Exit, to pend a virtual NMI=
-, so there's
-> > no extra VM-Exit.
-> >=20
-> > The value added by vNMI support is that KVM doesn't need to manually tr=
-ack/detect
-> > when NMIs become unblocked in the guest.  SVM doesn't provide a hardwar=
-e-supported
-> > NMI-window exiting, so KVM has to intercept _and_ single-step IRET, whi=
-ch adds two
-> > VM-Exits for _every_ NMI when vNMI isn't available (and it's a complete=
- mess for
-> > things like SEV-ES).
-> >=20
-> >> 3. If not, does it mean that the current SVM's vNMI support scheme in =
-the
-> >> Linux mainline code is flawed? How should it be fixed?
-> >=20
-> > The approach as a whole isn't flawed, it's the best KVM can do given SV=
-M's vNMI
-> > architecture and KVM's ABI with respect to "concurrent" NMIs.
-> >=20
-> > Hrm, though there does appear to be a bug in the injecting path.  KVM d=
-oesn't
-> > manually set V_NMI_BLOCKING_MASK, and will unnecessarily enable IRET in=
-terception
-> > when manually injecting a vNMI.  Intercepting IRET should be unnecessar=
-y because
-> > hardware will automatically accept the pending vNMI when NMIs become un=
-blocked.
-> > And I don't see anything in the APM that suggests hardware will set V_N=
-MI_BLOCKING_MASK
-> > when software directly injects an NMI.
-> >=20
-> > So I think we need:
-> >=20
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index d381ad424554..c956a9f500a2 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -3476,6 +3476,11 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu=
-)
-> >         if (svm->nmi_l1_to_l2)
-> >                 return;
-> > =20
-> > +       if (is_vnmi_enabled(svm)) {
-> > +               svm->vmcb->control.int_ctl |=3D V_NMI_BLOCKING_MASK;
-> > +               return;
-> > +       }
-> > +
-> >         svm->nmi_masked =3D true;
-> >         svm_set_iret_intercept(svm);
-> >         ++vcpu->stat.nmi_injections;
-> > --
-> >=20
-> > or if hardware does set V_NMI_BLOCKING_MASK in this case, just:
-> >=20
->=20
-> Yes, HW does set BLOCKING_MASK when HW takes the pending vNMI event.
-
-I'm not asking about the pending vNMI case, which is clearly spelled out in=
- the
-APM.  I'm asking about directly injecting an NMI via:
-
-	svm->vmcb->control.event_inj =3D SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_NMI;
-
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index d381ad424554..201a1a33ecd2 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -3473,7 +3473,7 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
-> > =20
-> >         svm->vmcb->control.event_inj =3D SVM_EVTINJ_VALID | SVM_EVTINJ_=
-TYPE_NMI;
-> > =20
-> > -       if (svm->nmi_l1_to_l2)
-> > +       if (svm->nmi_l1_to_l2 || is_vnmi_enabled(svm))
-> >                 return;
-> > =20
-> >         svm->nmi_masked =3D true;
-> > --
-> >
->=20
-> Above proposal make sense to me, I was reviewing source code flow
-> for a scenarios when two consecutive need to me delivered to Guest.
-> Example, process_nmi will pend the first NMI and then second NMI will
-> be injected through EVTINJ, as because (kvm_x86_inject_nmi)
-> will get called and that will set the _iret_intercept.=20
->=20
-> With your proposal inject_nmi will be set the env_inj NMI w/o the IRET,
-> I think we could check for "is_vnmi_enabled" before the programming
-> the "evt_inj"?
-
-No, because the whole point of this path is to directly inject an NMI when =
-NMIs
-are NOT blocked in the guest AND there is already a pending vNMI.
+Oof, it's not just from the guest's perspective, NMIs that are destined for host
+consumption will suffer the same fate. 
