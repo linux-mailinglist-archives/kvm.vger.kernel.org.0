@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F768786F68
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 14:47:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A474786F6D
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 14:47:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240550AbjHXMrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 08:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43790 "EHLO
+        id S240584AbjHXMrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 08:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239396AbjHXMq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 08:46:27 -0400
+        with ESMTP id S239240AbjHXMq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 08:46:26 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9819510FC;
-        Thu, 24 Aug 2023 05:46:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2437E59;
+        Thu, 24 Aug 2023 05:46:24 -0700 (PDT)
 Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCgl5n028742;
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCgluE028728;
         Thu, 24 Aug 2023 12:46:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=lrSanGjCAtF8Xw0z/BFamfJIiVAupEAP3cDT6ZFfGVE=;
- b=C+GUD7q+AjU1yuZO6D17lEpKUkYL48NFANS4LBjYFZDy7tNuzB7SR4l216oF9+0Quzd2
- k/bGA+0LgQOBHkFbtIPKjZ3OBAClXIxdVTuh6UcK0ZRWas3/HsY8itToFYsdnuh4yn8j
- yVbkAr2KByXnlj50Y9RluXCt/loMlWuvUuE9ZEa1bM6dPdNEhceuL7ukzScjOdD6oV0Y
- UECTSngDB+3Lf5wzUMuPYk7G9eyAu760p45a9ManbH9mPUef/Goxbwlug+hNZSxnHbUk
- /nGVy2/pn1ZBGacOZ+hyMgi1pBfkPg2Zg8SAHb4umt3CdtqUAtVeBLJuo+MayvFcRLNh Zg== 
+ : mime-version; s=pp1; bh=6rvllxeWG4ZKOiuw0X/JUUiJiptKnW0LQrh7eAvfO1E=;
+ b=bW/9Xy+JerkGS83PcalMtAI62pLu1uRi8xlX1AxsP8CX7s90jMY69UsDxCBZ42ICkP5n
+ oMXw18bJ2M1b9VLSKRuk3Ot8jc0WSli21p94AiR6GHfB+uZKNwvaJkZ8A/QYZ8s7IIhP
+ hwSo0UF+RtDhc9GinjSwtrHEZtJt6maTVjiWxvHvGDC5/8OkVhr5Xm22EONwHeLzGLsp
+ DKPKTUAJY8GjB/iWjU2dx0lGp9u62JbQuLz61iXjaek4W/8Zl4EFsACtfmzWvgIYlkB7
+ QIP7vlCOnQ8n1pwSlzd+mI6yTfzr3TislKsd6soSWkOxM+uUtxc1XP4RDPsiGjhdoWjg HA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7eu0hqq-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7eu0hp3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Aug 2023 12:46:24 +0000
+        Thu, 24 Aug 2023 12:46:23 +0000
 Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37OCh5UM029898;
-        Thu, 24 Aug 2023 12:46:22 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7eu0hc8-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37OCguRo029242;
+        Thu, 24 Aug 2023 12:46:21 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sp7eu0hem-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 24 Aug 2023 12:46:21 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCM2ee010414;
-        Thu, 24 Aug 2023 12:46:18 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn21sy075-1
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37OCDdW7026128;
+        Thu, 24 Aug 2023 12:46:19 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3snqgt6c6w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 24 Aug 2023 12:46:18 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37OCkFUZ34406952
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37OCkGh43998454
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Aug 2023 12:46:15 GMT
+        Thu, 24 Aug 2023 12:46:16 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 417FC20043;
+        by IMSVA (Postfix) with ESMTP id 0D80120043;
+        Thu, 24 Aug 2023 12:46:16 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5AF5720040;
         Thu, 24 Aug 2023 12:46:15 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C0AD20040;
-        Thu, 24 Aug 2023 12:46:14 +0000 (GMT)
 Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.fritz.box (unknown [9.171.27.69])
         by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Aug 2023 12:46:14 +0000 (GMT)
+        Thu, 24 Aug 2023 12:46:15 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
@@ -63,15 +63,15 @@ Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         hca@linux.ibm.com, mihajlov@linux.ibm.com, seiden@linux.ibm.com,
         akrowiak@linux.ibm.com
-Subject: [GIT PULL 09/22] s390/vfio-ap: wait for response code 05 to clear on queue reset
-Date:   Thu, 24 Aug 2023 14:43:18 +0200
-Message-ID: <20230824124522.75408-10-frankja@linux.ibm.com>
+Subject: [GIT PULL 10/22] s390/vfio-ap: allow deconfigured queue to be passed through to a guest
+Date:   Thu, 24 Aug 2023 14:43:19 +0200
+Message-ID: <20230824124522.75408-11-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230824124522.75408-1-frankja@linux.ibm.com>
 References: <20230824124522.75408-1-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: KOXxtaM1rnapC3NIZI3zZtjNYcztq44M
-X-Proofpoint-GUID: C-zAYyCfG6opTnL-dcN6XSnr0HTa7O3E
+X-Proofpoint-ORIG-GUID: DuiAUoToqQ1OuBi3eFkRWwhX2I47wKgJ
+X-Proofpoint-GUID: BXCDRa53fp1-DeO-6EQc6iXSIjXuy30b
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
@@ -94,39 +94,48 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Tony Krowiak <akrowiak@linux.ibm.com>
 
-Response code 05, AP busy, is a valid response code for a ZAPQ or TAPQ.
-Instead of returning error -EIO when a ZAPQ fails with response code 05,
-let's wait until the queue is no longer busy and try the ZAPQ again.
+When a queue is reset, the status response code returned from the reset
+operation is stored in the reset_rc field of the vfio_ap_queue structure
+representing the queue being reset. This field is later used to decide
+whether the queue should be passed through to a guest. If the reset_rc
+field is a non-zero value, the queue will be filtered from the list of
+queues passed through.
+
+When an adapter is deconfigured, all queues associated with that adapter
+are reset. That being the case, it is not necessary to filter those queues;
+so, if the status response code returned from a reset operation indicates
+the queue is deconfigured, the reset_rc field of the vfio_ap_queue
+structure will be set to zero so it will be passed through (i.e., not
+filtered).
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
 Tested-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Link: https://lore.kernel.org/r/20230815184333.6554-4-akrowiak@linux.ibm.com
+Link: https://lore.kernel.org/r/20230815184333.6554-5-akrowiak@linux.ibm.com
 Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/s390/crypto/vfio_ap_ops.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index be92ba45226d..3f67cfb53d0c 100644
+index 3f67cfb53d0c..a489536c508a 100644
 --- a/drivers/s390/crypto/vfio_ap_ops.c
 +++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -1611,6 +1611,7 @@ static int apq_status_check(int apqn, struct ap_queue_status *status)
+@@ -1677,9 +1677,11 @@ static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
  	case AP_RESPONSE_DECONFIGURED:
- 		return 0;
- 	case AP_RESPONSE_RESET_IN_PROGRESS:
-+	case AP_RESPONSE_BUSY:
- 		return -EBUSY;
- 	default:
- 		WARN(true,
-@@ -1663,6 +1664,7 @@ static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
- 		}
- 		break;
- 	case AP_RESPONSE_RESET_IN_PROGRESS:
-+	case AP_RESPONSE_BUSY:
  		/*
- 		 * There is a reset issued by another process in progress. Let's wait
- 		 * for that to complete. Since we have no idea whether it was a RAPQ or
+ 		 * When an AP adapter is deconfigured, the associated
+-		 * queues are reset, so let's return a value indicating the reset
+-		 * completed successfully.
++		 * queues are reset, so let's set the status response code to 0
++		 * so the queue may be passed through (i.e., not filtered) and
++		 * return a value indicating the reset completed successfully.
+ 		 */
++		q->reset_rc = 0;
+ 		ret = 0;
+ 		vfio_ap_free_aqic_resources(q);
+ 		break;
 -- 
 2.41.0
 
