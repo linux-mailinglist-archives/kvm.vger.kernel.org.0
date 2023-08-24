@@ -2,245 +2,525 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59C79786B13
-	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 11:05:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7B8B786B46
+	for <lists+kvm@lfdr.de>; Thu, 24 Aug 2023 11:14:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234715AbjHXJFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 05:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49914 "EHLO
+        id S238026AbjHXJOX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 05:14:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240023AbjHXJEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 05:04:43 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660481705;
-        Thu, 24 Aug 2023 02:04:41 -0700 (PDT)
+        with ESMTP id S235807AbjHXJNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 05:13:52 -0400
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2097.outbound.protection.outlook.com [40.107.20.97])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5D710FA;
+        Thu, 24 Aug 2023 02:13:48 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Va/TMPPPBD0qi3iTPXdPNpiBTYcBE8NNQmOTj0bjK7okYERC7mZS5zTObnk4sMnrn3ZWlsuUQ0JGuGYHak10UthOHI+M1M0DtbJOwEWnv64hBrvwMstJCqP06d2e/DpYCaIYKF5IueljhowZcZVrN2hTOB9jKzLjue8yLO9dn/BWeJ6B9FgyLXnPqY1XUaSiu+Ude/hwpSstvG4NKawyiNdMGzy/xa97E6jC1szxMmXHqI/50RlzxOBioG/7EYkoxsrgRbDTKoiB2HnojkfsQ6AA6Tncvc4Q3jd4pUl08L5ixJhM8ks7jX7gRjA4SM0WcTJeXvCR8iMNt68yrZMEiw==
+ b=DAwtd9P3AilnZWrloOWWut86HNIfM+iz74bPv8dArYqFXpsn48AJ9hS/qRog2+BkveysH7pq34OjFJ0vMaugWKHJgNC+fQDPd83xy51KXUF8fklKUiyLv7kGdrkZFjeWOAMhyjmO0VfAHD7NmW0kVn2LChTKzbeWh9t+rnmuR0IXJfC7OYOj6IrwnSWWNN+v72VYMQ5gB1DwScl39gw3PB6aWu5/l3xs5fsqKFLEx0kX1DA+eXWaWOrbGxyZV/v3eu4tuRv05ryoXOuoI7AGorPKqCHszH4qduDyFGU7r+D0pkvLCpHYkS7AztbqOkyFJ3FC/bFssebxijQiUbSjgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nvDbfOR57QD54hEn25mM0t6Lsxq4dNmdYkqbChfIunM=;
- b=S+i8iWzscv2Dnu/9e3tg8KRIjv5pAjeS0ntSydIRdzVMD28EHFI7rupR86Xnx9vVm9LC9BdwaqLzEpJpklGKE8cO+Lcz4Omywz7QDX47gS+JDNDVw9GiH7pfa1G145CA6d5J0cXi/TAph8Y3uECjEgRp02E1zFLLoF8xzoP39X2978d0P6V4ZDWokiaUWdqvGDZvK/pZPlvP9nMHO4/lSCBk43XcEDWXmv1JjisMFNxU4Z8q5fpfcspw/2OV1A5cH+iEeqHDnEadGYawr/28UfVhgiJNzLCS6y1YAZrvnhLqZcbWE8UhnQIo/KSZFfLtOWevdis26TCc/TmfK5/HVQ==
+ bh=cmx4NQus/Iu9Is79WFKz6s/f889ZvIm44iYp3MU3WoY=;
+ b=H6BTLW0toso+R8WgIjOUClNPFfTVSA8kwgZ4k78ykEdqraHXMF9Yh7sS6AQ0h/Hb9D8PR9eIj7bKfsFVjagmW1JAcLBqwVqZZBamc1r47Ck3oK0lyGSNC+nyRb500jmIWU7ERtq54+w7LDcwKGHQieYhm0H0BAlv7kyHgp6pmElbMJlfmRlfuHINUOy803PK6ZynjZ0P4/EB1QeWze0GgMz947dGYXM8q7pM+6rba8u6iXojkTvTBVT1F8XjKQYfBigkexwDhbEd7fecPSoCDMTRErXftLhE1V7fNI8IrlzmYwgiAtpu2OBKmwVsBZjKWYWRpnrVEHmbOmVXQt8/ig==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nvDbfOR57QD54hEn25mM0t6Lsxq4dNmdYkqbChfIunM=;
- b=xKZUu6zilX93u6xRhxITqef5oNeGMVGCzytw2FDNVF8RQY6/AIpM5L5CCeLKsgktrNmQb59qby6Sa/iAYV4XCUumd2anoqpiJ+uHNL+RbYnQtWNUXbsWwFLw+hEaOsq+655kVlFDuvCnhDR0wR/GvEpfL/4P1WPxvr7atWC2Bgc=
+ smtp.mailfrom=mbosol.com; dmarc=pass action=none header.from=mbosol.com;
+ dkim=pass header.d=mbosol.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
- IA1PR12MB6187.namprd12.prod.outlook.com (2603:10b6:208:3e5::12) with
+ header.d=none;dmarc=none action=none header.from=mbosol.com;
+Received: from VE1P192MB0544.EURP192.PROD.OUTLOOK.COM (2603:10a6:800:169::7)
+ by AS4P192MB1549.EURP192.PROD.OUTLOOK.COM (2603:10a6:20b:4b4::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
- 2023 09:04:38 +0000
-Received: from DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::52dc:b225:8fec:154c]) by DM6PR12MB2810.namprd12.prod.outlook.com
- ([fe80::52dc:b225:8fec:154c%4]) with mapi id 15.20.6699.026; Thu, 24 Aug 2023
- 09:04:38 +0000
-Message-ID: <23cfdd53-597e-45c3-9bd1-dbb1be506137@amd.com>
-Date:   Thu, 24 Aug 2023 11:04:28 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.25; Thu, 24 Aug
+ 2023 09:13:45 +0000
+Received: from VE1P192MB0544.EURP192.PROD.OUTLOOK.COM
+ ([fe80::5e94:a582:401e:1c70]) by VE1P192MB0544.EURP192.PROD.OUTLOOK.COM
+ ([fe80::5e94:a582:401e:1c70%4]) with mapi id 15.20.6699.027; Thu, 24 Aug 2023
+ 09:13:45 +0000
+Message-ID: <23d545e8-bf66-bb3c-ebd0-5b4feca91cb6@mbosol.com>
+Date:   Thu, 24 Aug 2023 12:13:42 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: Re: [PATCH v2] x86/sev: Make enc_dec_hypercall() accept a size
- instead of npages
+Subject: Re: [PATCH v8 5/8] KVM: x86/mmu: Don't pass FOLL_GET to
+ __kvm_follow_pfn
 Content-Language: en-US
-To:     Steve Rutherford <srutherford@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David.Kaplan@amd.com,
-        jacobhxu@google.com, patelsvishal@google.com, bhillier@google.com
-References: <20230821225859.883120-1-srutherford@google.com>
-From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20230821225859.883120-1-srutherford@google.com>
+To:     David Stevens <stevensd@chromium.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Peter Xu <peterx@redhat.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org
+References: <20230824080408.2933205-1-stevensd@google.com>
+ <20230824080408.2933205-6-stevensd@google.com>
+From:   =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@mbosol.com>
+In-Reply-To: <20230824080408.2933205-6-stevensd@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0179.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b4::19) To DM6PR12MB2810.namprd12.prod.outlook.com
- (2603:10b6:5:41::21)
+X-ClientProxiedBy: AS4P189CA0045.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dd::17) To VE1P192MB0544.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:800:169::7)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|IA1PR12MB6187:EE_
-X-MS-Office365-Filtering-Correlation-Id: 925a9cce-ce80-4994-f0c7-08dba48124b7
+X-MS-TrafficTypeDiagnostic: VE1P192MB0544:EE_|AS4P192MB1549:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3dd0c6fb-8dd0-476f-9440-08dba4826ad5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: d5s0bsNjtOvkJ60Y4Tx1WjyiRiAsTHvyE6sRuo3kspYkjqdJzfpklarU52qIjo1N9qLU5m+3Fm90k536GrjD26I/MoCHbqenjnalFn5p68YOf0U14+5mRwKGVbGVwWdx8lIdg3+IQcjpNGli9H36eX0+AZWHDToSYAdm0c45JEhZ56LJROFiVPe+NeHfbEplYxw7pn6RE/gHhl+suqE8qjYUv8x/Nmtw/cNs4yXNZxpOshsJ3KAzAH1o+SkZ6V3aUt0iFL4ho/iwSv4w4sjhhHYT4NbUxd4NTJj/rL4DTo32uowPF7NjL9C+wqIkawSK2pf/rrGLT2LacQy/RPyAjGCYVwvCqkCeIofG08YAGDUYA/GDaka/NNpUEMsNazN30f5lD00LRqVVzyYMxLq+OpGFmH8rPuWqQ9d2G8gxGT06DOTrAppH/UtbVSgc8khxEym/AS+fT8rKw0VPiOXZgxHjxDyDXPx69hfPsCD+r5wWoR/eOcyTS6KFBAyhdNC8GXpkGkC+pjU+tFjRWMHRPdSnWJJ1tvZ2dzWPEpvOOA9KMwKPTbJFSSD2JlDy+W3wq/hnyXKSgFkJv6YK+Qk1u6t2pBR8Gdtvvqouc08xbk6a7oyhpzaBtFk/q4XeSnoD0UF2FeIw8nrJ0ENuAIqJEA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(376002)(346002)(136003)(396003)(186009)(1800799009)(451199024)(2616005)(5660300002)(4326008)(8676002)(8936002)(36756003)(83380400001)(7416002)(26005)(6666004)(38100700002)(66556008)(66946007)(66476007)(54906003)(6636002)(316002)(110136005)(478600001)(31686004)(53546011)(41300700001)(2906002)(6512007)(6506007)(86362001)(31696002)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: krEIPkkhoi5fNszH+7fM9q4pU8OEHtpZLpsrJz8HBy3ZABELoLb/ul7liGZZb1Pxm+VFO9rsOCUvG7Aoy7czpfqbMH+Yzn0hXgWhGJGCad8GgmWfAdtZRlmVuI/LBsp6O/XvcxD+EHb6E3T8Ucu1wi8OqwUsxXpWkeibZ40xGAk+T1BDcOeQLvUut2W865/gRdwWdObw6RReDT3b2AOYvVUiSj5jMmiKdXhKSxWpmHu6u9kx+v0qdoXM6kOg87K+RMfl2seZKZUkgbv6J2mWz4gXqt48lgXfB8om+joTt1s76dUKsJu1BM8d67vTKwjm7/SuF8Yoo702IqfaYX1GQXweeYQkGLNvpG7hm6ydKYGw3YxY3aFrI6ikAb/GSgMovxEi+B7IE1ebDXwWzwaYlaj97MkSDu9HqqpNhToy1MMVXMQ3U5EzNz2DypZkl0LyzkBIVMlhdFT9khqyflZ+TzKeFv24votWuE7f5we9h/q5WS9padxRZdzl61joWOEn5zfeV3GbLord9Zz2WpPjMT+tLXsPKaIvkLEvltjEWH+YPPzhkLtd3geUykiNZCxOsDNKlrio1Jnoxqn9AAIXCIYLfsCawspa+BL9feNkZk+Dd55SiF6XyRasvgJqwbneXC6ZuiDnfzPXyyVCnmnBFk6lPGSiT3y4PslFd1OLJeo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1P192MB0544.EURP192.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(39830400003)(376002)(346002)(136003)(366004)(1800799009)(451199024)(186009)(2616005)(83380400001)(30864003)(7416002)(2906002)(66899024)(6486002)(316002)(66476007)(6506007)(66556008)(53546011)(54906003)(52116002)(110136005)(6666004)(66946007)(478600001)(31696002)(86362001)(36756003)(31686004)(5660300002)(26005)(38350700002)(8676002)(41300700001)(6512007)(8936002)(38100700002)(4326008)(43740500002)(45980500001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q3VwOFV6UFY3RGJ0VXBqZGFnT2hkMjlUbGVYMEpkMERkWWlCMDFGTGlzOVZy?=
- =?utf-8?B?QnJOcU1NZFA1S2syRm4rdnVxbkUySlRSa05EdWE1UE9lbzFFVG1LS0l3TWVG?=
- =?utf-8?B?dEZLendtS2tUQyt6NXFXMkF0MVBQaWF6ZjJ0aS9XMDNZTzJqb3lURmpXdkFL?=
- =?utf-8?B?LzNIOUtHdlU5SkZPNzNOTVZZbDM2citFU3p3QmJiSVpLK0JnQjZvY3lnRGkv?=
- =?utf-8?B?OUV0aFVTWnVDWjNYVzNHRVc5amdYeXEzRkNkL0RGbkpSTTMxUEE0V3lleDd2?=
- =?utf-8?B?UjR0Tis0ZDkvSW1PWjRYMUFtR3d3WkhXMG5xa0RsKy84SmJrSnlLdjdKMjM5?=
- =?utf-8?B?ZHNINFBiNFRIMFRPVnJ2TW9XTWIvTEM4N3lFR08rNUVZdGo1K2s0djBXNmJM?=
- =?utf-8?B?TE5hQ3FqR2FFbjVaQWN6UW5aQzhlaEY4UW9WK25INVZtdERGWW1pcEw4cWVv?=
- =?utf-8?B?dVQ5RWM5WVI5YkVWb25OQ3hTQmhITjRXMTg3eTA2bUs4WURaK1FMdU0xTDlK?=
- =?utf-8?B?dER2c1NXR1lUTlFta3pDMm1icjRKVHY5eTNGTEZZNWZhSVZUSGxSMmhmRGpE?=
- =?utf-8?B?QzV2Y2p4SVVTQ1FnVld6bFkxTGZMeE9kYldsZHF6SWNQVHUvYUZ5MXAxRnNK?=
- =?utf-8?B?Wmk3NW5HSGFEOUV4NzV0Rnh3R3FQR1YwcTZrZ0ZoUmk5UEVUQk50Y2RPZEdy?=
- =?utf-8?B?bWtpdytEWlIwRVJDZ3J4cnkvR3dWV3I2ckN1K1V2RGgrS2ZySHFKZnJEL0Fa?=
- =?utf-8?B?M3J5SXJRanNaSzhFUm5hbmNrOFNxS2lpNWkyTmw1Z0ZoNnRXMnVUbTY3NVdP?=
- =?utf-8?B?aS9XRk5mOEZ5cFNscmM0dnphd0t0YlR1T0p5R2F3SDE0cS9xR2VEMEtYNHdL?=
- =?utf-8?B?eU9hNFdFdXdVYUtnTndrV3JJQXNlbTVQbUd5VDJDMWxLOHM2VXVFR09mTFVB?=
- =?utf-8?B?eHladkFXY1hVWUpPVDNCbUJJZWNFaUVpU0NJRmFVckdxL0VSYVBMc2pOQUdF?=
- =?utf-8?B?M0RMc1V2MzVRb1N1UXM1UFFvWjliVThOSFpMRTdIdXAySjc1UEVxYkFPN2gw?=
- =?utf-8?B?OGdyRVV5MjZMMlp0VW85YzVvVEJvYTJvL1ZPcDlkaXh5eVNRUVF0VUdKWXJ6?=
- =?utf-8?B?STlVb0tmampIN2N2SXlGcmRPOWkrWWNMSmhxU1gzNGhnenltcFFyVjk3ZW1r?=
- =?utf-8?B?NmFjL0ExMUt2bDVtOWpOMUd6V09GNkFNSzJSQytUQkJjSFZCWm44WE4zT3Bu?=
- =?utf-8?B?Q3hjZEVQYmJVOUFNclAxeUVkQlFLcWxaQ2lDajl0aHBpemtBWHRvN3BQck9N?=
- =?utf-8?B?VEw1OGZPQmtrRVpJdTdSUWF5RzBHTC83dS82dzNFbWJ2UmZWdmZpQlFWemNO?=
- =?utf-8?B?RFVCc1hBckpKTjVYcWtKRWdHcGxuN3dlNWYvR2xtNW1lSDJic2xlcjcwZElB?=
- =?utf-8?B?VzVpdm9lSlRmWmh6clA5b2MrTHNodE5IWGlkUGEyWTRKRFRaQ3ZBQXFzbSs0?=
- =?utf-8?B?czE3cjM5d0VZZ2ZHVDhoNFVsQk54Smw0ZWM2TUZIR3hSU0JldDJraTdZMFF2?=
- =?utf-8?B?cnJjZzYyT09QSVk2Mzc2MENQQW1NQ0w5a0V5NGgraks2cmNpK3NPNnNEWUk0?=
- =?utf-8?B?RkkvWnE4c3pwV2hNOXdDdkw0ampBbFZNYWYvT2RmOGg1UXJFNWFFODlKVFBZ?=
- =?utf-8?B?TDZmdlhHZDdPNk1ybXJodldOMUNYL0N5bTcvcTRVOVJzY3AwNEVtSllPRS93?=
- =?utf-8?B?NmNJa1RaTCtNT01mdk1sQjVhV3pYU05JRERpNVNtODlXc2dlSGdQaDdjVmNa?=
- =?utf-8?B?R244NC93YThTMXN3S09pL3hVL1dod09jU21DMHkrdUM3NWhjcGd6ejYyVU10?=
- =?utf-8?B?RWY1ZVFkdjc0N3lIeTQyaG9kOThsUjd1ZTNxVldvMTVBMVRHR2lTd2oyQitM?=
- =?utf-8?B?NkU4SlFaZ0RWYlhNbmRLYm5VZ3NDcng0VzVialU4dE56cXloZ1ZqNFFhVzlQ?=
- =?utf-8?B?V2M4bDlxRjZEUVRUQllkZm9GZlhzYjRUT09lbVZ6QTIrREk1N21EYWZVZytl?=
- =?utf-8?B?SmZxZldNSVM5ZUtodlZRdE9Ma2hmc2pyKzZ6MFpDVjh6dnpRcFZjU2hOcld5?=
- =?utf-8?Q?4ywhv8AobnPEaHkE4pIEsTjJG?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 925a9cce-ce80-4994-f0c7-08dba48124b7
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Qjl3dTl3eFczZm9OMm1lZTlNTjQwRExiR1p6Y2RpaE9mUDUzc0xvRzZPdnBz?=
+ =?utf-8?B?Q1djcVNwVytQa2pzWFpCVERGeWVNWEszbHNZWjI2a0xKMWVCd0g1QkZDK2Jq?=
+ =?utf-8?B?L1BxT1p4eERvL3JyUjlvd3hNUE1Gd2p3ZjdZVEVaZFhjT1lHSk1hU0J3SXhy?=
+ =?utf-8?B?QjRhSDRHL0QyUkxUbHYwVDJjMW4zVkpDMUxZK2VWby9ZcUtwYXd3RW5jZCtr?=
+ =?utf-8?B?aitmS0k2dStzNnJDRnBNVEZHQi9reFpxbmM5YitOeUZRb0hMNWlrOUlIRkpP?=
+ =?utf-8?B?eE40VnhvYThmOWR6Um1QdFVRK1AvNTJSbWh5RytOTGEyd1RKbVpRaWxtbDZu?=
+ =?utf-8?B?TUFCV1lOR21XQVc5ckNwcDBOdXdIT0lKMWtObkx0QTgvdldUallaczhWMUU4?=
+ =?utf-8?B?dlBEMEI1UTR2OWxCVU9qbEtYSmpXQXovMmFUT0tOVHp6a0dzZWFyeXQvSCt0?=
+ =?utf-8?B?UjZPWWRIVmZxWndZclI1WmxieTQ2UU1rSy9iWlJQUE93U3htSUdiRWZXRWR2?=
+ =?utf-8?B?VnFPYW15alM0bVZEWkFUTWg2L2E2TDZ3Y1RsUzAvWHk0dkdSeDg4NjhRU0x4?=
+ =?utf-8?B?REszektybEl6VTBIQ3BCSzB0TzlxbGdFaGo0TGFUYW9TenpwRDZQNlZyMHND?=
+ =?utf-8?B?Vm5oRkxwNHB4OVFudzVIN09SS3N3OEIyNXhiUXphZzNnZVZ0SEJQNi9oNWhK?=
+ =?utf-8?B?dXZPa1hxcThHQXhhZEN5ZXRpcE5uRHEwTytaeXdETnQvZktLQnZDYm1NVkR0?=
+ =?utf-8?B?bnlzZGNhRVBkZXNoL3hzZWVwQ05MaXY0d0RCcG9VSDZ6R0hsSXVZNTdjN29y?=
+ =?utf-8?B?cUJXdFc3akFBS1VYQ0VmalhybGdoVW0rWDBkajcrWjFEU3ZTUDFlU1pTdzFH?=
+ =?utf-8?B?bnlnanhlak1POW9tbTRxcFJWN241TDZFUDlvbnBoeHNaSm94SmxmalVZL3JP?=
+ =?utf-8?B?QnErL1U3bmk5TERkWDRpSXRETnhEMTJBczhpSjFDRTdBWUhNd25ZSk1PQVdv?=
+ =?utf-8?B?YUhqalpicHA3cXlISHBBR045S1BybjJtWFVDMitDZy9NbWJhbGVGYUxVWXlt?=
+ =?utf-8?B?cFpYUG5tVXFhMVI2OURwMlN2WEF2QVZrOXpxeG9QMTduek5PdWhzZ2FLSTIr?=
+ =?utf-8?B?TmJxREJ6OU5FOVNBQVYyTVYxNzBVS3JFK0t0OVl4SXZYK1QxRTREZXluU1dl?=
+ =?utf-8?B?NlhoeVY4OEd5MStTdGNNS3kxY241T3pSZ0E3cXNYWWhEOFBiTTVQQXhocU96?=
+ =?utf-8?B?ZEV3V2hpck9LSmw4NXg2SzluMTJYWGdTYXo3TXBLREU1ZkhPWlgyamdHbTVm?=
+ =?utf-8?B?czhJclJCMjZjcEhzSmxZYnhmcWp0a2V6VjY4K2VKMk04a2xFWUZrNUJDZXVm?=
+ =?utf-8?B?UWpmV2UrU0J1NkJaZjVjUmhEQkNsVjIyUm9Uanc5dndqTURrQ0YrWVZueG1r?=
+ =?utf-8?B?aWdOdHZ0UFU2bzBQajhvK2VqWk5NSjBSeXc1QkREWFpWV0l4RlIwQ0U1c2ZZ?=
+ =?utf-8?B?ZW9SYnl3QitBdWNYYllpdVVqd2hoVWRwL3VYZU9EYlByZGJWUTh2ZGRkZjlG?=
+ =?utf-8?B?dm5lcUR1cUpWSldKaUM0NGFnMmJWQTNON0d0N3J6S2hmdVVrYkZKc29jcFZZ?=
+ =?utf-8?B?Z3d3RkMyMzNoeGFOdTVvdE5jelJza1ltL1lQajVJTVIrK1Rra0FKWEk2eHcw?=
+ =?utf-8?B?KytnU2QxNE13eGFmVDlLVllWVHk1c2hhcFQ4UmtyNjRyV2d4MEEySGVZa0xh?=
+ =?utf-8?B?RDJTSDZEbTBUamhoa2ppNTdwK083Sm9ONzBGRkFMcUxlU1BQMWFrVWZtcWVt?=
+ =?utf-8?B?Z29SenZQNnIzdFpueDAyVXMrV0t1TVNIeHdvaHNUR1BaUEhxMWgwbWsxQXgw?=
+ =?utf-8?B?UUloczZJNXIySlNjWXhOOFJZRWdycm52NGRnZHZVZjRzT2VmOU5qYjA1OUg4?=
+ =?utf-8?B?Vm9YQ1E5T3g2Wms4YmY3VjhBaTFhL2Uvd00vNTdDN1YwVFNwQXRkSEFMZXdU?=
+ =?utf-8?B?VEY1UWRyVUtqY1Nhbm1hUFJEN2UvcDdMcEYrQU5IR1hmSUlFZTRyN0pUcEd4?=
+ =?utf-8?B?aTMxWmdmVG95Y1FnODYvUWtQelNPSjR4bEFiaG1rNlhPWnl2YWNFSTYySEpZ?=
+ =?utf-8?B?YjE1dFNXWEY5Vis2TklHSUZPZHlPdEpDUU5sRC9UWW01T3V5NmF3MEVZK0Nv?=
+ =?utf-8?B?bkE9PQ==?=
+X-OriginatorOrg: mbosol.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd0c6fb-8dd0-476f-9440-08dba4826ad5
+X-MS-Exchange-CrossTenant-AuthSource: VE1P192MB0544.EURP192.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 09:04:37.9831
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 09:13:44.9567
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 571b6760-44e0-4aae-b783-84984ac780c0
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cmufeuHSOMdNFBHwJS/R9t2GX+B6QI2vVAqB3BaljRVLBeJJkLg01+SKIuAVX4VEFIFbAvgCTwU06hsQXjPIgg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6187
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5/YhCjh8zWnK7/BYnIgF1zv9TSYEnhnjr47BuwzMVSuQbEV4aSynLPKC4SlISdG4gncXDC7t89JzMzubKTh0c0ZxeKSl7WqvvC+Z18KwdTo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4P192MB1549
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/22/2023 12:58 AM, Steve Rutherford wrote:
-> enc_dec_hypercall() accepted a page count instead of a size, which
-> forced its callers to round up. As a result, non-page aligned
-> vaddrs caused pages to be spuriously marked as decrypted via the
-> encryption status hypercall, which in turn caused consistent
-> corruption of pages during live migration. Live migration requires
-> accurate encryption status information to avoid migrating pages
-> from the wrong perspective.
-> 
-> Fixes: 064ce6c550a0 ("mm: x86: Invoke hypercall when page encryption status is changed")
-> Signed-off-by: Steve Rutherford <srutherford@google.com>
+On 8/24/23 11:04, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
+>
+> Stop passing FOLL_GET to __kvm_follow_pfn. This allows the host to map
+> memory into the guest that is backed by un-refcounted struct pages - for
+> example, the tail pages of higher order non-compound pages allocated by
+> the amdgpu driver via ttm_pool_alloc_page.
+>
+> The bulk of this change is tracking the is_refcounted_page flag so that
+> non-refcounted pages don't trigger page_count() == 0 warnings. This is
+> done by storing the flag in an unused bit in the sptes. This only bit is
+> not available in PAE SPTEs, so FOLL_GET is only omitted for TDP on
+> x86-64.
+>
+> Signed-off-by: David Stevens <stevensd@chromium.org>
 > ---
->   arch/x86/include/asm/mem_encrypt.h |  6 +++---
->   arch/x86/kernel/kvm.c              |  4 +---
->   arch/x86/mm/mem_encrypt_amd.c      | 13 ++++++-------
->   3 files changed, 10 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
-> index 7f97a8a97e24..473b16d73b47 100644
-> --- a/arch/x86/include/asm/mem_encrypt.h
-> +++ b/arch/x86/include/asm/mem_encrypt.h
-> @@ -50,8 +50,8 @@ void __init sme_enable(struct boot_params *bp);
+>   arch/x86/kvm/mmu/mmu.c          | 55 +++++++++++++++++++++++----------
+>   arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>   arch/x86/kvm/mmu/paging_tmpl.h  |  8 +++--
+>   arch/x86/kvm/mmu/spte.c         |  4 ++-
+>   arch/x86/kvm/mmu/spte.h         | 12 ++++++-
+>   arch/x86/kvm/mmu/tdp_mmu.c      | 22 +++++++------
+>   include/linux/kvm_host.h        |  3 ++
+>   virt/kvm/kvm_main.c             |  6 ++--
+>   8 files changed, 79 insertions(+), 32 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index dabae67f198b..4f5d33e95c6e 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -553,12 +553,14 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
 >   
->   int __init early_set_memory_decrypted(unsigned long vaddr, unsigned long size);
->   int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size);
-> -void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
-> -					    bool enc);
-> +void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr,
-> +					    unsigned long size, bool enc);
+>   	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
+>   		flush = true;
+> -		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
+> +		if (is_refcounted_page_pte(old_spte))
+> +			kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+>   	}
 >   
->   void __init mem_encrypt_free_decrypted_mem(void);
+>   	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte)) {
+>   		flush = true;
+> -		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
+> +		if (is_refcounted_page_pte(old_spte))
+> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+>   	}
 >   
-> @@ -85,7 +85,7 @@ early_set_memory_decrypted(unsigned long vaddr, unsigned long size) { return 0;
->   static inline int __init
->   early_set_memory_encrypted(unsigned long vaddr, unsigned long size) { return 0; }
->   static inline void __init
-> -early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc) {}
-> +early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc) {}
+>   	return flush;
+> @@ -596,14 +598,18 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+>   	 * before they are reclaimed.  Sanity check that, if the pfn is backed
+>   	 * by a refcounted page, the refcount is elevated.
+>   	 */
+> -	page = kvm_pfn_to_refcounted_page(pfn);
+> -	WARN_ON(page && !page_count(page));
+> +	if (is_refcounted_page_pte(old_spte)) {
+> +		page = kvm_pfn_to_refcounted_page(pfn);
+> +		WARN_ON(!page || !page_count(page));
+> +	}
 >   
->   static inline void mem_encrypt_free_decrypted_mem(void) { }
+> -	if (is_accessed_spte(old_spte))
+> -		kvm_set_pfn_accessed(pfn);
+> +	if (is_refcounted_page_pte(old_spte)) {
+> +		if (is_accessed_spte(old_spte))
+> +			kvm_set_page_accessed(pfn_to_page(pfn));
 >   
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 6a36db4f79fd..b8ab9ee5896c 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -966,10 +966,8 @@ static void __init kvm_init_platform(void)
->   		 * Ensure that _bss_decrypted section is marked as decrypted in the
->   		 * shared pages list.
+> -	if (is_dirty_spte(old_spte))
+> -		kvm_set_pfn_dirty(pfn);
+> +		if (is_dirty_spte(old_spte))
+> +			kvm_set_page_dirty(pfn_to_page(pfn));
+> +	}
+>   
+>   	return old_spte;
+>   }
+> @@ -639,8 +645,8 @@ static bool mmu_spte_age(u64 *sptep)
+>   		 * Capture the dirty status of the page, so that it doesn't get
+>   		 * lost when the SPTE is marked for access tracking.
 >   		 */
-> -		nr_pages = DIV_ROUND_UP(__end_bss_decrypted - __start_bss_decrypted,
-> -					PAGE_SIZE);
->   		early_set_mem_enc_dec_hypercall((unsigned long)__start_bss_decrypted,
-> -						nr_pages, 0);
-> +						__end_bss_decrypted - __start_bss_decrypted, 0);
+> -		if (is_writable_pte(spte))
+> -			kvm_set_pfn_dirty(spte_to_pfn(spte));
+> +		if (is_writable_pte(spte) && is_refcounted_page_pte(spte))
+> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(spte)));
 >   
+>   		spte = mark_spte_for_access_track(spte);
+>   		mmu_spte_update_no_track(sptep, spte);
+> @@ -1278,8 +1284,8 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
+>   {
+>   	bool was_writable = test_and_clear_bit(PT_WRITABLE_SHIFT,
+>   					       (unsigned long *)sptep);
+> -	if (was_writable && !spte_ad_enabled(*sptep))
+> -		kvm_set_pfn_dirty(spte_to_pfn(*sptep));
+> +	if (was_writable && !spte_ad_enabled(*sptep) && is_refcounted_page_pte(*sptep))
+> +		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(*sptep)));
+>   
+>   	return was_writable;
+>   }
+> @@ -2937,6 +2943,11 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+>   	bool host_writable = !fault || fault->map_writable;
+>   	bool prefetch = !fault || fault->prefetch;
+>   	bool write_fault = fault && fault->write;
+> +	/*
+> +	 * Prefetching uses gfn_to_page_many_atomic, which never gets
+> +	 * non-refcounted pages.
+> +	 */
+> +	bool is_refcounted = !fault || fault->is_refcounted_page;
+>   
+>   	pgprintk("%s: spte %llx write_fault %d gfn %llx\n", __func__,
+>   		 *sptep, write_fault, gfn);
+> @@ -2969,7 +2980,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+>   	}
+>   
+>   	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+> -			   true, host_writable, &spte);
+> +			   true, host_writable, is_refcounted, &spte);
+>   
+>   	if (*sptep == spte) {
+>   		ret = RET_PF_SPURIOUS;
+> @@ -4296,11 +4307,19 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>   static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>   {
+>   	struct kvm_memory_slot *slot = fault->slot;
+> +	/*
+> +	 * We only allow non-refcounted pages if we can track whether or not
+> +	 * pages are refcounted via an SPTE bit. This bit is not available
+> +	 * in PAE SPTEs, so pass FOLL_GET if we may have to deal with those.
+> +	 */
+> +	unsigned int get_flag = (tdp_enabled && IS_ENABLED(CONFIG_X86_64)) ?
+> +		0 : FOLL_GET;
+>   	struct kvm_follow_pfn foll = {
+>   		.slot = slot,
+>   		.gfn = fault->gfn,
+> -		.flags = FOLL_GET | (fault->write ? FOLL_WRITE : 0),
+> +		.flags = (fault->write ? FOLL_WRITE : 0) | get_flag,
+>   		.try_map_writable = true,
+> +		.guarded_by_mmu_notifier = true,
+>   	};
+>   
+>   	/*
+> @@ -4317,6 +4336,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   			fault->slot = NULL;
+>   			fault->pfn = KVM_PFN_NOSLOT;
+>   			fault->map_writable = false;
+> +			fault->is_refcounted_page = false;
+>   			return RET_PF_CONTINUE;
+>   		}
 >   		/*
->   		 * If not booted using EFI, enable Live migration support.
-> diff --git a/arch/x86/mm/mem_encrypt_amd.c b/arch/x86/mm/mem_encrypt_amd.c
-> index 54bbd5163e8d..6faea41e99b6 100644
-> --- a/arch/x86/mm/mem_encrypt_amd.c
-> +++ b/arch/x86/mm/mem_encrypt_amd.c
-> @@ -288,11 +288,10 @@ static bool amd_enc_cache_flush_required(void)
->   	return !cpu_feature_enabled(X86_FEATURE_SME_COHERENT);
+> @@ -4372,6 +4392,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   success:
+>   	fault->hva = foll.hva;
+>   	fault->map_writable = foll.writable;
+> +	fault->is_refcounted_page = foll.is_refcounted_page;
+>   	return RET_PF_CONTINUE;
 >   }
 >   
-> -static void enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
-> +static void enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc)
+> @@ -4456,8 +4477,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   	r = direct_map(vcpu, fault);
+>   
+>   out_unlock:
+> +	if (fault->is_refcounted_page)
+> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
+>   	write_unlock(&vcpu->kvm->mmu_lock);
+> -	kvm_release_pfn_clean(fault->pfn);
+
+Should we check FOLL_GET is actually omitted to skip the kvm_release_pfn_clean() ?
+
+
+>   	return r;
+>   }
+>   
+> @@ -4534,8 +4556,9 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
+>   	r = kvm_tdp_mmu_map(vcpu, fault);
+>   
+>   out_unlock:
+> +	if (fault->is_refcounted_page)
+> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
+>   	read_unlock(&vcpu->kvm->mmu_lock);
+> -	kvm_release_pfn_clean(fault->pfn);
+>   	return r;
+>   }
+>   #endif
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index d39af5639ce9..55790085884f 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -240,6 +240,7 @@ struct kvm_page_fault {
+>   	kvm_pfn_t pfn;
+>   	hva_t hva;
+>   	bool map_writable;
+> +	bool is_refcounted_page;
+>   
+>   	/*
+>   	 * Indicates the guest is trying to write a gfn that contains one or
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 0662e0278e70..4ffcebc0c3ce 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -828,8 +828,9 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>   	r = FNAME(fetch)(vcpu, fault, &walker);
+>   
+>   out_unlock:
+> +	if (fault->is_refcounted_page)
+> +		kvm_set_page_accessed(pfn_to_page(fault->pfn));
+>   	write_unlock(&vcpu->kvm->mmu_lock);
+> -	kvm_release_pfn_clean(fault->pfn);
+>   	return r;
+>   }
+>   
+> @@ -883,7 +884,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>    */
+>   static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int i)
 >   {
->   #ifdef CONFIG_PARAVIRT
-> -	unsigned long sz = npages << PAGE_SHIFT;
-> -	unsigned long vaddr_end = vaddr + sz;
-> +	unsigned long vaddr_end = vaddr + size;
+> -	bool host_writable;
+> +	bool host_writable, is_refcounted;
+>   	gpa_t first_pte_gpa;
+>   	u64 *sptep, spte;
+>   	struct kvm_memory_slot *slot;
+> @@ -940,10 +941,11 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+>   	sptep = &sp->spt[i];
+>   	spte = *sptep;
+>   	host_writable = spte & shadow_host_writable_mask;
+> +	is_refcounted = spte & SPTE_MMU_PAGE_REFCOUNTED;
+>   	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+>   	make_spte(vcpu, sp, slot, pte_access, gfn,
+>   		  spte_to_pfn(spte), spte, true, false,
+> -		  host_writable, &spte);
+> +		  host_writable, is_refcounted, &spte);
 >   
->   	while (vaddr < vaddr_end) {
->   		int psize, pmask, level;
-> @@ -342,7 +341,7 @@ static bool amd_enc_status_change_finish(unsigned long vaddr, int npages, bool e
->   		snp_set_memory_private(vaddr, npages);
->   
->   	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
-> -		enc_dec_hypercall(vaddr, npages, enc);
-> +		enc_dec_hypercall(vaddr, npages << PAGE_SHIFT, enc);
->   
->   	return true;
+>   	return mmu_spte_update(sptep, spte);
 >   }
-> @@ -466,7 +465,7 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
->   
->   	ret = 0;
->   
-> -	early_set_mem_enc_dec_hypercall(start, PAGE_ALIGN(size) >> PAGE_SHIFT, enc);
-> +	early_set_mem_enc_dec_hypercall(start, size, enc);
->   out:
->   	__flush_tlb_all();
->   	return ret;
-> @@ -482,9 +481,9 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
->   	return early_set_memory_enc_dec(vaddr, size, true);
->   }
->   
-> -void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc)
-> +void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc)
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index cf2c6426a6fc..5b13d9143d56 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -138,7 +138,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>   	       const struct kvm_memory_slot *slot,
+>   	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+>   	       u64 old_spte, bool prefetch, bool can_unsync,
+> -	       bool host_writable, u64 *new_spte)
+> +	       bool host_writable, bool is_refcounted, u64 *new_spte)
 >   {
-> -	enc_dec_hypercall(vaddr, npages, enc);
-> +	enc_dec_hypercall(vaddr, size, enc);
+>   	int level = sp->role.level;
+>   	u64 spte = SPTE_MMU_PRESENT_MASK;
+> @@ -188,6 +188,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>   
+>   	if (level > PG_LEVEL_4K)
+>   		spte |= PT_PAGE_SIZE_MASK;
+> +	if (is_refcounted)
+> +		spte |= SPTE_MMU_PAGE_REFCOUNTED;
+>   
+>   	if (shadow_memtype_mask)
+>   		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 1279db2eab44..be93dd061ae3 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -95,6 +95,11 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
+>   /* Defined only to keep the above static asserts readable. */
+>   #undef SHADOW_ACC_TRACK_SAVED_MASK
+>   
+> +/*
+> + * Indicates that the SPTE refers to a page with a valid refcount.
+> + */
+> +#define SPTE_MMU_PAGE_REFCOUNTED        BIT_ULL(59)
+> +
+>   /*
+>    * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
+>    * the memslots generation and is derived as follows:
+> @@ -332,6 +337,11 @@ static inline bool is_dirty_spte(u64 spte)
+>   	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
 >   }
 >   
->   void __init sme_early_init(void)
-
-Also had this thought to avoid passing the page boundaries calculation 
-with npages in-place of existing size based, but no strong opinions.
-
-This seems even better. Thanks!
-
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+> +static inline bool is_refcounted_page_pte(u64 spte)
+> +{
+> +	return spte & SPTE_MMU_PAGE_REFCOUNTED;
+> +}
+> +
+>   static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
+>   				int level)
+>   {
+> @@ -462,7 +472,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>   	       const struct kvm_memory_slot *slot,
+>   	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+>   	       u64 old_spte, bool prefetch, bool can_unsync,
+> -	       bool host_writable, u64 *new_spte);
+> +	       bool host_writable, bool is_refcounted, u64 *new_spte);
+>   u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
+>   		      	      union kvm_mmu_page_role role, int index);
+>   u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 512163d52194..a9b1b14d2e26 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -474,6 +474,7 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>   	bool was_leaf = was_present && is_last_spte(old_spte, level);
+>   	bool is_leaf = is_present && is_last_spte(new_spte, level);
+>   	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
+> +	bool is_refcounted = is_refcounted_page_pte(old_spte);
+>   
+>   	WARN_ON(level > PT64_ROOT_MAX_LEVEL);
+>   	WARN_ON(level < PG_LEVEL_4K);
+> @@ -538,9 +539,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>   	if (is_leaf != was_leaf)
+>   		kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
+>   
+> -	if (was_leaf && is_dirty_spte(old_spte) &&
+> +	if (was_leaf && is_dirty_spte(old_spte) && is_refcounted &&
+>   	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
+> -		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
+> +		kvm_set_page_dirty(pfn_to_page(spte_to_pfn(old_spte)));
+>   
+>   	/*
+>   	 * Recursively handle child PTs if the change removed a subtree from
+> @@ -552,9 +553,9 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>   	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
+>   		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
+>   
+> -	if (was_leaf && is_accessed_spte(old_spte) &&
+> +	if (was_leaf && is_accessed_spte(old_spte) && is_refcounted &&
+>   	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
+> -		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
+> +		kvm_set_page_accessed(pfn_to_page(spte_to_pfn(old_spte)));
+>   }
+>   
+>   /*
+> @@ -988,8 +989,9 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+>   		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+>   	else
+>   		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+> -					 fault->pfn, iter->old_spte, fault->prefetch, true,
+> -					 fault->map_writable, &new_spte);
+> +				   fault->pfn, iter->old_spte, fault->prefetch, true,
+> +				   fault->map_writable, fault->is_refcounted_page,
+> +				   &new_spte);
+>   
+>   	if (new_spte == iter->old_spte)
+>   		ret = RET_PF_SPURIOUS;
+> @@ -1205,8 +1207,9 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
+>   		 * Capture the dirty status of the page, so that it doesn't get
+>   		 * lost when the SPTE is marked for access tracking.
+>   		 */
+> -		if (is_writable_pte(iter->old_spte))
+> -			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
+> +		if (is_writable_pte(iter->old_spte) &&
+> +		    is_refcounted_page_pte(iter->old_spte))
+> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter->old_spte)));
+>   
+>   		new_spte = mark_spte_for_access_track(iter->old_spte);
+>   		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep,
+> @@ -1626,7 +1629,8 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+>   		trace_kvm_tdp_mmu_spte_changed(iter.as_id, iter.gfn, iter.level,
+>   					       iter.old_spte,
+>   					       iter.old_spte & ~dbit);
+> -		kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
+> +		if (is_refcounted_page_pte(iter.old_spte))
+> +			kvm_set_page_dirty(pfn_to_page(spte_to_pfn(iter.old_spte)));
+>   	}
+>   
+>   	rcu_read_unlock();
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 713fc2d91f95..292701339198 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1157,6 +1157,9 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_t gfn,
+>   void kvm_release_page_clean(struct page *page);
+>   void kvm_release_page_dirty(struct page *page);
+>   
+> +void kvm_set_page_accessed(struct page *page);
+> +void kvm_set_page_dirty(struct page *page);
+> +
+>   struct kvm_follow_pfn {
+>   	const struct kvm_memory_slot *slot;
+>   	gfn_t gfn;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 963b96cd8ff9..fa1848c6c84f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2949,17 +2949,19 @@ static bool kvm_is_ad_tracked_page(struct page *page)
+>   	return !PageReserved(page);
+>   }
+>   
+> -static void kvm_set_page_dirty(struct page *page)
+> +void kvm_set_page_dirty(struct page *page)
+>   {
+>   	if (kvm_is_ad_tracked_page(page))
+>   		SetPageDirty(page);
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_set_page_dirty);
+>   
+> -static void kvm_set_page_accessed(struct page *page)
+> +void kvm_set_page_accessed(struct page *page)
+>   {
+>   	if (kvm_is_ad_tracked_page(page))
+>   		mark_page_accessed(page);
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_set_page_accessed);
+>   
+>   void kvm_release_page_clean(struct page *page)
+>   {
