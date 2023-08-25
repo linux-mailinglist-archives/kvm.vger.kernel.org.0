@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED2E7788870
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 15:23:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0509788872
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 15:23:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245082AbjHYNXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Aug 2023 09:23:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53076 "EHLO
+        id S245092AbjHYNXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Aug 2023 09:23:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245123AbjHYNXA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Aug 2023 09:23:00 -0400
+        with ESMTP id S245142AbjHYNXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Aug 2023 09:23:06 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5E9198E
-        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 06:22:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7401FCA
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 06:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692969731;
+        s=mimecast20190719; t=1692969734;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SwpRg1vimm5ETXVsPhZVAnSc4Fv0IJpzAFNNkLS8G5k=;
-        b=NSxUM7WCA9Zaxx3h3CmjmADRR1++V0s0AMsvbg7AjvlcuVsEQY2HG1DLfBeobjfoZPOeCG
-        Et71kKSZNBtW1o/fEaTMN3NNabFG1FPax5pjqRIpfIxc71tR0dte4nYVmOPW2qqWqYfJgo
-        7TxxUQ2erk2xwYcJ83/a6mJ0iVNv7Jo=
+        bh=OkC7aJA9vfsubbn44+1Mbm5iCUAPBtmC5qSO5Ya7fdg=;
+        b=AD7lUIfSWx0t4eHbs16+cOO9yPJsxLKnILbizsakkHoM4fGr0t3IUNjkOakyEg6m2RPyqq
+        LPYjy/GNjTqQ5ZBAMB7TwF/ze6mkUXWQEtv+LFYabeAN2GADouFSdqqqHmPfAmdDNWLwWe
+        aXxn2W4eNNmIqhGbs0p3csaCpwW0wEI=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-574-qH3Fln_PNQiuvYXvEPTgSw-1; Fri, 25 Aug 2023 09:22:07 -0400
-X-MC-Unique: qH3Fln_PNQiuvYXvEPTgSw-1
+ us-mta-664-A9LdJiZkNtOCJygFBz1ySg-1; Fri, 25 Aug 2023 09:22:10 -0400
+X-MC-Unique: A9LdJiZkNtOCJygFBz1ySg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AC357185A78B;
-        Fri, 25 Aug 2023 13:22:06 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2BDF8810C2A;
+        Fri, 25 Aug 2023 13:22:10 +0000 (UTC)
 Received: from t14s.fritz.box (unknown [10.39.193.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 63AC3140E950;
-        Fri, 25 Aug 2023 13:22:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E81CA140E950;
+        Fri, 25 Aug 2023 13:22:06 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     David Hildenbrand <david@redhat.com>,
@@ -56,13 +56,12 @@ Cc:     David Hildenbrand <david@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
         kvm@vger.kernel.org
-Subject: [PATCH v2 03/16] softmmu/physmem: Fixup qemu_ram_block_from_host() documentation
-Date:   Fri, 25 Aug 2023 15:21:36 +0200
-Message-ID: <20230825132149.366064-4-david@redhat.com>
+Subject: [PATCH v2 04/16] kvm: Return number of free memslots
+Date:   Fri, 25 Aug 2023 15:21:37 +0200
+Message-ID: <20230825132149.366064-5-david@redhat.com>
 In-Reply-To: <20230825132149.366064-1-david@redhat.com>
 References: <20230825132149.366064-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -75,74 +74,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's fixup the documentation (e.g., removing traces of the ram_addr
-parameter that no longer exists) and move it to the header file while at
-it.
+Let's return the number of free slots instead of only checking if there
+is a free slot. While at it, check all address spaces, which will also
+consider SMM under x86 correctly.
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Make the stub return UINT_MAX, such that we can call the function
+unconditionally.
+
+This is a preparation for memory devices that consume multiple memslots.
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/exec/cpu-common.h | 15 +++++++++++++++
- softmmu/physmem.c         | 17 -----------------
- 2 files changed, 15 insertions(+), 17 deletions(-)
+ accel/kvm/kvm-all.c      | 33 ++++++++++++++++++++-------------
+ accel/stubs/kvm-stub.c   |  4 ++--
+ hw/mem/memory-device.c   |  2 +-
+ include/sysemu/kvm.h     |  2 +-
+ include/sysemu/kvm_int.h |  1 +
+ 5 files changed, 25 insertions(+), 17 deletions(-)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 87dc9a752c..cc491a4bf4 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -76,6 +76,21 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length);
- ram_addr_t qemu_ram_addr_from_host(void *ptr);
- ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr);
- RAMBlock *qemu_ram_block_by_name(const char *name);
-+
-+/*
-+ * Translates a host ptr back to a RAMBlock and an offset in that RAMBlock.
-+ *
-+ * @ptr: The host pointer to translate.
-+ * @round_offset: Whether to round the result offset down to a target page
-+ * @offset: Will be set to the offset within the returned RAMBlock.
-+ *
-+ * Returns: RAMBlock (or NULL if not found)
-+ *
-+ * By the time this function returns, the returned pointer is not protected
-+ * by RCU anymore.  If the caller is not within an RCU critical section and
-+ * does not hold the iothread lock, it must have other means of protecting the
-+ * pointer, such as a reference to the memory region that owns the RAMBlock.
-+ */
- RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-                                    ram_addr_t *offset);
- ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
-diff --git a/softmmu/physmem.c b/softmmu/physmem.c
-index 3df73542e1..57469b3c97 100644
---- a/softmmu/physmem.c
-+++ b/softmmu/physmem.c
-@@ -2181,23 +2181,6 @@ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host)
-     return res;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index d07f1ecbd3..0fcea923a1 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -181,6 +181,24 @@ int kvm_get_max_memslots(void)
+     return s->nr_slots;
  }
  
--/*
-- * Translates a host ptr back to a RAMBlock, a ram_addr and an offset
-- * in that RAMBlock.
-- *
-- * ptr: Host pointer to look up
-- * round_offset: If true round the result offset down to a page boundary
-- * *ram_addr: set to result ram_addr
-- * *offset: set to result offset within the RAMBlock
-- *
-- * Returns: RAMBlock (or NULL if not found)
-- *
-- * By the time this function returns, the returned pointer is not protected
-- * by RCU anymore.  If the caller is not within an RCU critical section and
-- * does not hold the iothread lock, it must have other means of protecting the
-- * pointer, such as a reference to the region that includes the incoming
-- * ram_addr_t.
-- */
- RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-                                    ram_addr_t *offset)
++unsigned int kvm_get_free_memslots(void)
++{
++    unsigned int used_slots = 0;
++    KVMState *s = kvm_state;
++    int i;
++
++    kvm_slots_lock();
++    for (i = 0; i < s->nr_as; i++) {
++        if (!s->as[i].ml) {
++            continue;
++        }
++        used_slots = MAX(used_slots, s->as[i].ml->nr_used_slots);
++    }
++    kvm_slots_unlock();
++
++    return s->nr_slots - used_slots;
++}
++
+ /* Called with KVMMemoryListener.slots_lock held */
+ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
  {
+@@ -196,19 +214,6 @@ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+     return NULL;
+ }
+ 
+-bool kvm_has_free_slot(MachineState *ms)
+-{
+-    KVMState *s = KVM_STATE(ms->accelerator);
+-    bool result;
+-    KVMMemoryListener *kml = &s->memory_listener;
+-
+-    kvm_slots_lock();
+-    result = !!kvm_get_free_slot(kml);
+-    kvm_slots_unlock();
+-
+-    return result;
+-}
+-
+ /* Called with KVMMemoryListener.slots_lock held */
+ static KVMSlot *kvm_alloc_slot(KVMMemoryListener *kml)
+ {
+@@ -1387,6 +1392,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+             }
+             start_addr += slot_size;
+             size -= slot_size;
++            kml->nr_used_slots--;
+         } while (size);
+         return;
+     }
+@@ -1412,6 +1418,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+         ram_start_offset += slot_size;
+         ram += slot_size;
+         size -= slot_size;
++        kml->nr_used_slots++;
+     } while (size);
+ }
+ 
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 235dc661bc..f39997d86e 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -109,9 +109,9 @@ int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
+     return -ENOSYS;
+ }
+ 
+-bool kvm_has_free_slot(MachineState *ms)
++unsigned int kvm_get_free_memslots(void)
+ {
+-    return false;
++    return UINT_MAX;
+ }
+ 
+ void kvm_init_cpu_signals(CPUState *cpu)
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 667d56bd29..7c24685796 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -59,7 +59,7 @@ static void memory_device_check_addable(MachineState *ms, MemoryRegion *mr,
+     const uint64_t size = memory_region_size(mr);
+ 
+     /* we will need a new memory slot for kvm and vhost */
+-    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
++    if (!kvm_get_free_memslots()) {
+         error_setg(errp, "hypervisor has no free memory slots left");
+         return;
+     }
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index ccaf55caf7..321427a543 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -216,7 +216,7 @@ typedef struct KVMRouteChange {
+ 
+ /* external API */
+ 
+-bool kvm_has_free_slot(MachineState *ms);
++unsigned int kvm_get_free_memslots(void);
+ bool kvm_has_sync_mmu(void);
+ int kvm_has_vcpu_events(void);
+ int kvm_has_robust_singlestep(void);
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 511b42bde5..8b09e78b12 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -40,6 +40,7 @@ typedef struct KVMMemoryUpdate {
+ typedef struct KVMMemoryListener {
+     MemoryListener listener;
+     KVMSlot *slots;
++    int nr_used_slots;
+     int as_id;
+     QSIMPLEQ_HEAD(, KVMMemoryUpdate) transaction_add;
+     QSIMPLEQ_HEAD(, KVMMemoryUpdate) transaction_del;
 -- 
 2.41.0
 
