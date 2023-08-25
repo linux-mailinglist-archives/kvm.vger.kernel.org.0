@@ -2,276 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA6D97891BE
-	for <lists+kvm@lfdr.de>; Sat, 26 Aug 2023 00:35:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9C857891EE
+	for <lists+kvm@lfdr.de>; Sat, 26 Aug 2023 00:48:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230215AbjHYWeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Aug 2023 18:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39764 "EHLO
+        id S231398AbjHYWri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Aug 2023 18:47:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbjHYWeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Aug 2023 18:34:19 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE3526A5
-        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 15:34:16 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id e9e14a558f8ab-34bae839382so19215ab.1
-        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 15:34:16 -0700 (PDT)
+        with ESMTP id S231168AbjHYWrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Aug 2023 18:47:20 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BAD826BD
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 15:47:14 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5924b2aac52so19363567b3.2
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 15:47:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693002856; x=1693607656; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VmGrXf9cYjykgOlg/u6doGW9vtPA8bMLiJ9T7b++na4=;
-        b=PAXh1adBUFauZawogz7q389GMBq1WlTduNIc5w2yFy7YwvjAX12asWO89+zph8dr3W
-         18RfY+Svstd8+bWMToVytpP3IiVsFkGapddtnpKG8BwIFkFRFeT/w5vzZbc9LZsUa/wl
-         8SD1ZwdYAwoS7/sEsIjY6sVgGDjgN21v2+j+IMJ46TJeZTJc40RsAGqeBp5kd1ZAAAxm
-         iBy6OXsKj66WVe7MwkHTq9MVQ3R8GoW2pbx/Fj0etosTOK8LkmlPwvTNcYI55eXbAZWJ
-         pY7SKwuhhmjsYGDNfKxn0/vyf1R6tYyBVyA0MNlFTZt3fKXqBuGMdu7qjER0RgSAuKXr
-         mNuQ==
+        d=google.com; s=20221208; t=1693003633; x=1693608433;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fy8dusJmYqsxiCFpM3IjxGXvMbJEv8J/Sip3GIJESiI=;
+        b=PQYOGYayv9KAnS2NtxLEro1nB+dpj9WufnImMELVJYMwS7T4bix2T/ar5btH9gnJNx
+         /X24o2yTGQAS3mgcKiPOzXBaMtcHkIQ2fUblqwV1HugCiRZEHHzJ2MYEownw80AWheMt
+         s0nl7c5w/xJ+hLfMOIbYmDEwC3YJiW8ulGrE52J85hTtW6cpqpdhu7K/GiHNQ73E9X8b
+         7cKLiq/LsiPNVZFUitvCvr2FSI2igolJ4rfmPqk2bkG6inTPBBNOeIbIHh/lpTuTVrrM
+         adkKEYwuzu0Z6R5G+RfCvj7Z01p4vd4KAewbUbYSLCE1u5BTj6/t/ct2nzY+svtc2p41
+         /4bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693002856; x=1693607656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VmGrXf9cYjykgOlg/u6doGW9vtPA8bMLiJ9T7b++na4=;
-        b=QNlbey9TI+bALFh6L5BmXTV/YcBtN0dUUfxliNHoLS5awspCF1KGZCLJv7ca/XKYfi
-         OEBGhTy1s92R+3gniOZmQ6d0xaNSRCF4xyysq9wzuO+of5O7JDxu/vVo+hCO8PrvdxeU
-         3q1kgtBfO1gIdUijL7om+TXsoYlx8g34zjpjP8IM986unVAJJpT1peTp8DzwmYjaZyQG
-         ICpWqvnJ2zvatg0wxwDjpGtdBCX3N3XcIgQnmrZdM03PS5GDA0TvVDz2wBGCURcJhMxK
-         dYL2HhQT3DQXzvQDi+gvjP1/tT5BYY0mVv8HZKACy2uOVmo7gUdRgRcVuQ2eYv3IY+rs
-         /FlQ==
-X-Gm-Message-State: AOJu0YwqllMlTcrrpvgGqLlm9nKql598R0i0qpPblJj250CiwNhgUjaM
-        8KiqLpSR379nDsDB02Qogmb3f25x6W8fKsjEZqjBbQ==
-X-Google-Smtp-Source: AGHT+IF3vhd8OdJzn3dbhBkM5wd1Hnk0dkeY4f07ZarV1sUQ5JqtJCGCgpfhgOuwf6tzaRd87yn7tlhJtjLYV3wJxgs=
-X-Received: by 2002:a92:cda1:0:b0:347:1b96:9d48 with SMTP id
- g1-20020a92cda1000000b003471b969d48mr28190ild.15.1693002856153; Fri, 25 Aug
- 2023 15:34:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230817003029.3073210-1-rananta@google.com> <20230817003029.3073210-9-rananta@google.com>
- <1c6c07af-f6d0-89a6-1b7d-164ca100ac88@redhat.com> <CAJHc60x=rZTpeJ3PDUWmc08Aziow6S+2nndcL90vHfru5GhXtA@mail.gmail.com>
- <a0543866-1fac-6a3f-20cd-43b6d1263c0e@redhat.com>
-In-Reply-To: <a0543866-1fac-6a3f-20cd-43b6d1263c0e@redhat.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Fri, 25 Aug 2023 15:34:04 -0700
-Message-ID: <CAJHc60z=+LG8kayRzYEZ6rCZuov7zC-nLMmzAabPiPKY5OhSEg@mail.gmail.com>
-Subject: Re: [PATCH v5 08/12] KVM: arm64: PMU: Allow userspace to limit
- PMCR_EL0.N for the guest
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        d=1e100.net; s=20221208; t=1693003633; x=1693608433;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fy8dusJmYqsxiCFpM3IjxGXvMbJEv8J/Sip3GIJESiI=;
+        b=GHleS6aDTJ8Yt28YF5zYkN7HqyvcgwG3fcB9aNlxqoRRYRFHb1fgbQ5Okyuh6iBAO9
+         d3dXsW3JnWvo+Jv5fNiDgxOj9tOplG0UCJeRvAtFAJB0jUOiVMfoJEgTeDybctLhWQYW
+         wjcD9LzFm4z9siZvhQ88cuhzYW8XTYkvl7ySvrFfiYyEOut8fs/ZISvgYRuO1m6fZ0f8
+         asbZCfQtciYZj15iY0WvknUzTYoADYSpYa2feBSVgJ27EWks19CCOGj8JzwNMKzSy0i9
+         WY/g/QFGVBKbNbgCVDekAEkWqOsWKBf0UmWLuYCpd9DzvavrcVpWQXt+Rt67upeCDhyc
+         f5eg==
+X-Gm-Message-State: AOJu0YzVEF2HxtvVnVKq4YotdCRI3Pt7D+R5vOjkSEC9Gk1Jx0OLhZrW
+        uWjxd9cX4qBtc6oykpWNQDoHvNKGqFU=
+X-Google-Smtp-Source: AGHT+IH92rCuyl3zbt+Vpza7u0Pgt8d3SHq3CxNbEqY/zOlaEBMdBi4PyRhshMN0fLelpgaNhUVM8Ee9BO0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:af0e:0:b0:58c:6ddd:d27c with SMTP id
+ n14-20020a81af0e000000b0058c6dddd27cmr516511ywh.6.1693003633476; Fri, 25 Aug
+ 2023 15:47:13 -0700 (PDT)
+Date:   Fri, 25 Aug 2023 15:47:11 -0700
+In-Reply-To: <20230714065454.20688-1-yan.y.zhao@intel.com>
+Mime-Version: 1.0
+References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065454.20688-1-yan.y.zhao@intel.com>
+Message-ID: <ZOkvbzR0Sft1lnD1@google.com>
+Subject: Re: [PATCH v4 09/12] KVM: x86/mmu: serialize vCPUs to zap gfn when
+ guest MTRRs are honored
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, chao.gao@intel.com, kai.huang@intel.com,
+        robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 24, 2023 at 1:50=E2=80=AFAM Shaoqin Huang <shahuang@redhat.com>=
- wrote:
->
->
->
-> On 8/24/23 00:06, Raghavendra Rao Ananta wrote:
-> > On Tue, Aug 22, 2023 at 3:06=E2=80=AFAM Shaoqin Huang <shahuang@redhat.=
-com> wrote:
-> >>
-> >> Hi Raghavendra,
-> >>
-> >> On 8/17/23 08:30, Raghavendra Rao Ananta wrote:
-> >>> From: Reiji Watanabe <reijiw@google.com>
-> >>>
-> >>> KVM does not yet support userspace modifying PMCR_EL0.N (With
-> >>> the previous patch, KVM ignores what is written by upserspace).
-> >>> Add support userspace limiting PMCR_EL0.N.
-> >>>
-> >>> Disallow userspace to set PMCR_EL0.N to a value that is greater
-> >>> than the host value (KVM_SET_ONE_REG will fail), as KVM doesn't
-> >>> support more event counters than the host HW implements.
-> >>> Although this is an ABI change, this change only affects
-> >>> userspace setting PMCR_EL0.N to a larger value than the host.
-> >>> As accesses to unadvertised event counters indices is CONSTRAINED
-> >>> UNPREDICTABLE behavior, and PMCR_EL0.N was reset to the host value
-> >>> on every vCPU reset before this series, I can't think of any
-> >>> use case where a user space would do that.
-> >>>
-> >>> Also, ignore writes to read-only bits that are cleared on vCPU reset,
-> >>> and RES{0,1} bits (including writable bits that KVM doesn't support
-> >>> yet), as those bits shouldn't be modified (at least with
-> >>> the current KVM).
-> >>>
-> >>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> >>> ---
-> >>>    arch/arm64/include/asm/kvm_host.h |  3 ++
-> >>>    arch/arm64/kvm/pmu-emul.c         |  1 +
-> >>>    arch/arm64/kvm/sys_regs.c         | 49 +++++++++++++++++++++++++++=
-++--
-> >>>    3 files changed, 51 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
-sm/kvm_host.h
-> >>> index 0f2dbbe8f6a7e..c15ec365283d1 100644
-> >>> --- a/arch/arm64/include/asm/kvm_host.h
-> >>> +++ b/arch/arm64/include/asm/kvm_host.h
-> >>> @@ -259,6 +259,9 @@ struct kvm_arch {
-> >>>        /* PMCR_EL0.N value for the guest */
-> >>>        u8 pmcr_n;
-> >>>
-> >>> +     /* Limit value of PMCR_EL0.N for the guest */
-> >>> +     u8 pmcr_n_limit;
-> >>> +
-> >>>        /* Hypercall features firmware registers' descriptor */
-> >>>        struct kvm_smccc_features smccc_feat;
-> >>>        struct maple_tree smccc_filter;
-> >>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> >>> index ce7de6bbdc967..39ad56a71ad20 100644
-> >>> --- a/arch/arm64/kvm/pmu-emul.c
-> >>> +++ b/arch/arm64/kvm/pmu-emul.c
-> >>> @@ -896,6 +896,7 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct ar=
-m_pmu *arm_pmu)
-> >>>         * while the latter does not.
-> >>>         */
-> >>>        kvm->arch.pmcr_n =3D arm_pmu->num_events - 1;
-> >>> +     kvm->arch.pmcr_n_limit =3D arm_pmu->num_events - 1;
-> >>>
-> >>>        return 0;
-> >>>    }
-> >>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >>> index 2075901356c5b..c01d62afa7db4 100644
-> >>> --- a/arch/arm64/kvm/sys_regs.c
-> >>> +++ b/arch/arm64/kvm/sys_regs.c
-> >>> @@ -1086,6 +1086,51 @@ static int get_pmcr(struct kvm_vcpu *vcpu, con=
-st struct sys_reg_desc *r,
-> >>>        return 0;
-> >>>    }
-> >>>
-> >>> +static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc=
- *r,
-> >>> +                 u64 val)
-> >>> +{
-> >>> +     struct kvm *kvm =3D vcpu->kvm;
-> >>> +     u64 new_n, mutable_mask;
-> >>> +     int ret =3D 0;
-> >>> +
-> >>> +     new_n =3D FIELD_GET(ARMV8_PMU_PMCR_N, val);
-> >>> +
-> >>> +     mutex_lock(&kvm->arch.config_lock);
-> >>> +     if (unlikely(new_n !=3D kvm->arch.pmcr_n)) {
-> >>> +             /*
-> >>> +              * The vCPU can't have more counters than the PMU
-> >>> +              * hardware implements.
-> >>> +              */
-> >>> +             if (new_n <=3D kvm->arch.pmcr_n_limit)
-> >>> +                     kvm->arch.pmcr_n =3D new_n;
-> >>> +             else
-> >>> +                     ret =3D -EINVAL;
-> >>> +     }
-> >>> +     mutex_unlock(&kvm->arch.config_lock);
-> >>
-> >> Another thing I am just wonder is that should we block any modificatio=
-n
-> >> to the pmcr_n after vm start to run? Like add one more checking
-> >> kvm_vm_has_ran_once() at the beginning of the set_pmcr() function.
-> >>
-> > Thanks for bringing it up. Reiji and I discussed about this. Checking
-> > for kvm_vm_has_ran_once() will be a good move, however, it will go
-> > against the ABI expectations of setting the PMCR. I'd like others to
-> > weigh in on this as well. What do you think?
-> >
-> > Thank you.
-> > Raghavendra
->
-> Before this change, kvm not allowed userspace to change the pmcr_n, but
-> allowed to change the lower ARMV8_PMU_PMCR_MASK bits. With this change,
-> we now allow to change the pmcr_n, we should not block the change to
-> ARMV8_PMU_PMCR_MASK after vm start to run, but how about we just block
-> the change to ARMV8_PMU_PMCR_N after vm start to run?
->
-I believe you are referring to the guest trap access part of it
-(access_pmcr()). This patch focuses on the userspace access of PMCR
-via the KVM_SET_ONE_REG ioctl. Before this patch, KVM did not control
-the writes to the reg and userspace was free to write to any bits at
-any time.
+On Fri, Jul 14, 2023, Yan Zhao wrote:
+> +/*
+> + * Add @range into kvm->arch.mtrr_zap_list and sort the list in
+> + * "length" ascending + "start" descending order, so that
+> + * ranges consuming more zap cycles can be dequeued later and their
+> + * chances of being found duplicated are increased.
 
-Thank you.
-Raghavendra
-> Thanks,
-> Shaoqin
->
-> >> Thanks,
-> >> Shaoqin
-> >>
-> >>> +     if (ret)
-> >>> +             return ret;
-> >>> +
-> >>> +     /*
-> >>> +      * Ignore writes to RES0 bits, read only bits that are cleared =
-on
-> >>> +      * vCPU reset, and writable bits that KVM doesn't support yet.
-> >>> +      * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
-> >>> +      * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the=
- vCPU.
-> >>> +      * But, we leave the bit as it is here, as the vCPU's PMUver mi=
-ght
-> >>> +      * be changed later (NOTE: the bit will be cleared on first vCP=
-U run
-> >>> +      * if necessary).
-> >>> +      */
-> >>> +     mutable_mask =3D (ARMV8_PMU_PMCR_MASK | ARMV8_PMU_PMCR_N);
-> >>> +     val &=3D mutable_mask;
-> >>> +     val |=3D (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
-> >>> +
-> >>> +     /* The LC bit is RES1 when AArch32 is not supported */
-> >>> +     if (!kvm_supports_32bit_el0())
-> >>> +             val |=3D ARMV8_PMU_PMCR_LC;
-> >>> +
-> >>> +     __vcpu_sys_reg(vcpu, r->reg) =3D val;
-> >>> +     return 0;
-> >>> +}
-> >>> +
-> >>>    /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers i=
-n one go */
-> >>>    #define DBG_BCR_BVR_WCR_WVR_EL1(n)                                =
-  \
-> >>>        { SYS_DESC(SYS_DBGBVRn_EL1(n)),                               =
-  \
-> >>> @@ -2147,8 +2192,8 @@ static const struct sys_reg_desc sys_reg_descs[=
-] =3D {
-> >>>        { SYS_DESC(SYS_CTR_EL0), access_ctr },
-> >>>        { SYS_DESC(SYS_SVCR), undef_access },
-> >>>
-> >>> -     { PMU_SYS_REG(PMCR_EL0), .access =3D access_pmcr,
-> >>> -       .reset =3D reset_pmcr, .reg =3D PMCR_EL0, .get_user =3D get_p=
-mcr },
-> >>> +     { PMU_SYS_REG(PMCR_EL0), .access =3D access_pmcr, .reset =3D re=
-set_pmcr,
-> >>> +       .reg =3D PMCR_EL0, .get_user =3D get_pmcr, .set_user =3D set_=
-pmcr },
-> >>>        { PMU_SYS_REG(PMCNTENSET_EL0),
-> >>>          .access =3D access_pmcnten, .reg =3D PMCNTENSET_EL0 },
-> >>>        { PMU_SYS_REG(PMCNTENCLR_EL0),
-> >>
-> >> --
-> >> Shaoqin
-> >>
-> >
->
-> --
-> Shaoqin
->
+Wrap comments as close to 80 chars as possible.
+
+> + */
+> +static void kvm_add_mtrr_zap_list(struct kvm *kvm, struct mtrr_zap_range *range)
+> +{
+> +	struct list_head *head = &kvm->arch.mtrr_zap_list;
+> +	u64 len = range->end - range->start;
+> +	struct mtrr_zap_range *cur, *n;
+> +	bool added = false;
+> +
+> +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> +
+> +	if (list_empty(head)) {
+> +		list_add(&range->node, head);
+> +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> +		return;
+
+Make this
+
+		goto out;
+
+or
+		goto out_unlock;
+
+and then do the same instead of the break; in the loop.  Then "added" goes away
+and there's a single unlock.
+
+> +	}
+> +
+> +	list_for_each_entry_safe(cur, n, head, node) {
+
+This shouldn't need to use the _safe() variant, it's not deleting anything.
+
+> +		u64 cur_len = cur->end - cur->start;
+> +
+> +		if (len < cur_len)
+> +			break;
+> +
+> +		if (len > cur_len)
+> +			continue;
+> +
+> +		if (range->start > cur->start)
+> +			break;
+> +
+> +		if (range->start < cur->start)
+> +			continue;
+
+Looking at kvm_zap_mtrr_zap_list(), wouldn't we be better off sorting by start,
+and then batching in kvm_zap_mtrr_zap_list()?  And maybe make the batching "fuzzy"
+for fixed MTRRs?  I.e. if KVM is zapping any fixed MTRRs, zap all fixed MTRR ranges
+even if there's a gap.
+
+> +
+> +		/* equal len & start, no need to add */
+> +		added = true;
+> +		kfree(range);
+
+
+Hmm, the memory allocations are a bit of complexity that'd I'd prefer to avoid.
+At a minimum, I think kvm_add_mtrr_zap_list() should do the allocation.  That'll
+dedup a decount amount of code.
+
+At the risk of rehashing the old memslots implementation, I think we should simply
+have a statically sized array in struct kvm to hold "range to zap".  E.g. use 16
+entries, bin all fixed MTRRs into a single range, and if the remaining 15 fill up,
+purge and fall back to a full zap.
+
+128 bytes per VM is totally acceptable, especially since we're burning waaay
+more than that to deal with per-vCPU MTRRs.  And a well-behaved guest should have
+identical MTRRs across all vCPUs, or maybe at worst one config for the BSP and
+one for APs.
+
+> +		break;
+> +	}
+> +
+> +	if (!added)
+> +		list_add_tail(&range->node, &cur->node);
+> +
+> +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> +}
+> +
+> +static void kvm_zap_mtrr_zap_list(struct kvm *kvm)
+> +{
+> +	struct list_head *head = &kvm->arch.mtrr_zap_list;
+> +	struct mtrr_zap_range *cur = NULL;
+> +
+> +	spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> +
+> +	while (!list_empty(head)) {
+> +		u64 start, end;
+> +
+> +		cur = list_first_entry(head, typeof(*cur), node);
+> +		start = cur->start;
+> +		end = cur->end;
+> +		list_del(&cur->node);
+> +		kfree(cur);
+
+Hmm, the memory allocations are a bit of complexity that'd I'd prefer to avoid.
+
+> +		spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> +
+> +		kvm_zap_gfn_range(kvm, start, end);
+> +
+> +		spin_lock(&kvm->arch.mtrr_zap_list_lock);
+> +	}
+> +
+> +	spin_unlock(&kvm->arch.mtrr_zap_list_lock);
+> +}
+> +
+> +static void kvm_zap_or_wait_mtrr_zap_list(struct kvm *kvm)
+> +{
+> +	if (atomic_cmpxchg_acquire(&kvm->arch.mtrr_zapping, 0, 1) == 0) {
+> +		kvm_zap_mtrr_zap_list(kvm);
+> +		atomic_set_release(&kvm->arch.mtrr_zapping, 0);
+> +		return;
+> +	}
+> +
+> +	while (atomic_read(&kvm->arch.mtrr_zapping))
+> +		cpu_relax();
+> +}
+> +
+> +static void kvm_mtrr_zap_gfn_range(struct kvm_vcpu *vcpu,
+> +				   gfn_t gfn_start, gfn_t gfn_end)
+> +{
+> +	struct mtrr_zap_range *range;
+> +
+> +	range = kmalloc(sizeof(*range), GFP_KERNEL_ACCOUNT);
+> +	if (!range)
+> +		goto fail;
+> +
+> +	range->start = gfn_start;
+> +	range->end = gfn_end;
+> +
+> +	kvm_add_mtrr_zap_list(vcpu->kvm, range);
+> +
+> +	kvm_zap_or_wait_mtrr_zap_list(vcpu->kvm);
+> +	return;
+> +
+> +fail:
+> +	kvm_zap_gfn_range(vcpu->kvm, gfn_start, gfn_end);
+> +}
+> +
+> +void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu)
+
+Rather than provide a one-liner, add something like
+
+  void kvm_mtrr_cr0_cd_changed(struct kvm_vcpu *vcpu)
+  {
+	if (!kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
+		return;
+
+	return kvm_zap_gfn_range(vcpu, 0, -1ull);
+  }
+
+that avoids the comically long function name, and keeps the MTRR logic more
+contained in the MTRR code.
+
+> +{
+> +	return kvm_mtrr_zap_gfn_range(vcpu, gpa_to_gfn(0), gpa_to_gfn(~0ULL));
+
+Meh, just zap 0 => ~0ull.  That 51:0 happens to be the theoretical max gfn on
+x86 is coincidence (AFAIK).  And if the guest.MAXPHYADDR < 52, shifting ~0ull
+still doesn't yield a "legal" gfn.
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 32cc8bfaa5f1..bb79154cf465 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -943,7 +943,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
+>  
+>  	if (((cr0 ^ old_cr0) & X86_CR0_CD) &&
+>  	    kvm_mmu_honors_guest_mtrrs(vcpu->kvm))
+> -		kvm_zap_gfn_range(vcpu->kvm, 0, ~0ULL);
+> +		kvm_honors_guest_mtrrs_zap_on_cd_toggle(vcpu);
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_post_set_cr0);
+>  
+> @@ -12310,6 +12310,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	kvm->arch.guest_can_read_msr_platform_info = true;
+>  	kvm->arch.enable_pmu = enable_pmu;
+>  
+> +	spin_lock_init(&kvm->arch.mtrr_zap_list_lock);
+> +	INIT_LIST_HEAD(&kvm->arch.mtrr_zap_list);
+> +
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>  	spin_lock_init(&kvm->arch.hv_root_tdp_lock);
+>  	kvm->arch.hv_root_tdp = INVALID_PAGE;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index e7733dc4dccc..56d8755b2560 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -315,6 +315,7 @@ bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
+>  					  int page_num);
+>  void kvm_honors_guest_mtrrs_get_cd_memtype(struct kvm_vcpu *vcpu,
+>  					   u8 *type, bool *ipat);
+> +void kvm_honors_guest_mtrrs_zap_on_cd_toggle(struct kvm_vcpu *vcpu);
+>  bool kvm_vector_hashing_enabled(void);
+>  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
+>  int x86_decode_emulated_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+> -- 
+> 2.17.1
+> 
