@@ -2,125 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D19F788B83
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 16:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5F43788BA6
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 16:27:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343598AbjHYOTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Aug 2023 10:19:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34412 "EHLO
+        id S244644AbjHYO0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Aug 2023 10:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343807AbjHYOTe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Aug 2023 10:19:34 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D27EE7B;
-        Fri, 25 Aug 2023 07:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692973158; x=1724509158;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=XlJ5BTZzpqkEXXAdCvRXhAbBmjekbNjP7CxSWawHat0=;
-  b=RmLG0lzNmrP7iNj84KCO7/LSosAErPJem4lKzt0OOrh6Z4qxh9R+4h99
-   XaQ9BxEboiRvE7RuSFJdC+jUMZlrXfmK0rMu3NUS0UtikdiguKNHbZ78R
-   k74cO9m9uEUyR39oDFBxUhpnWs7R7+OQ7/eU4La+8DUpINpaI0LACiDt9
-   p2mDAVop1ozplzfCBD2JZCVFfw7afGg5CGC+bC2X2enL9t+ZyhTa8m5+R
-   UH981nOcS/ePSbQ7R8fR/W3hFsrZJu/AlxeHMHcqaAKNO6yl969cKqCCD
-   tTkFwtkDUWajJUd3yHdOcUE/eY0ajbvRB8Fhxx9P8NORVJUpf0hPgfUd4
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="374698242"
-X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="374698242"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 07:19:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="1068255444"
-X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="1068255444"
-Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.249.169.63]) ([10.249.169.63])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 07:19:15 -0700
-Message-ID: <873ccab4-1470-3ff0-2e59-01d1110809be@intel.com>
-Date:   Fri, 25 Aug 2023 22:18:28 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v10 0/9] Linear Address Masking (LAM) KVM Enabling
-To:     Sean Christopherson <seanjc@google.com>,
-        Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "David.Laight@aculab.com" <David.Laight@aculab.com>,
-        "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>
-References: <20230719144131.29052-1-binbin.wu@linux.intel.com>
- <ZN1M5RvuARP1YMfp@google.com>
- <6e990b88-1e28-9563-2c2f-0d5d52f9c7ca@linux.intel.com>
- <e4aa03cb-0f80-bd5f-f69e-39b636476f00@linux.intel.com>
- <ZN93wp9lgmuJqYIA@google.com>
-Content-Language: en-US
-From:   Zeng Guang <guang.zeng@intel.com>
-In-Reply-To: <ZN93wp9lgmuJqYIA@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S1343855AbjHYO0I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Aug 2023 10:26:08 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E677410FF
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 07:26:04 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7454a43541so1203256276.1
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 07:26:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692973564; x=1693578364;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpKO/2A0f/no2QIyIWC8bhx4Rp180QUhRFsJmxIIf6k=;
+        b=cFkJgG2HgF7ql8/QY+ZSKA5R4EJ76QgRByuQImcO66jhdIVOsnThPj+OKN+Ka6GwJw
+         LDwJfXmt37njPox0SCKS6HtdoZWM6ZKAnPvo2IWC4fidM5IoeqCr98Znox9XCvkaOkg5
+         iR1mizqaTnQ20ylmolDwwgohXf1moQkKWuvlGg2fcH00GWrBQnzdlZKkNw3Jd9zs56Ed
+         gS+vllTY2iAPKvfWqIWBGqVi40qrXnxr1UFnnWPm2zibyB1cY+HQlv1SAkMJAajDCGOA
+         OtAqtn0S9nghmDwRoYT6UPKoghUIrjFerywtwSCDiMxj9N0IOlJb3F+6yZUT9TY27QWL
+         SdiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692973564; x=1693578364;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xpKO/2A0f/no2QIyIWC8bhx4Rp180QUhRFsJmxIIf6k=;
+        b=HWsyJ7nt86aM+qPsT/GoMWT19Y55tcWQG3EoxzoIQoWxCS/BAgYNDiNw2rvZoGnVcX
+         wACE+HMD7Qc2LK6oAl3/vPYE6tAZJ/bmjaHl7U+rRIMfOmZC9gjLgVUwBn9nPIqDIDIb
+         B3ffxSEK7DVbu+P4GaxOWXgNWJ04gXHj+qoL/8Ga6fLRlfLndxBH9VIM5YJPdKg1/jd4
+         vj5Z2z+pzxVKS/hUy9sEk0zDpJvGHjTkedw08vz4X1SqV+8uZdRtBwg5BoSX0+TRQ95w
+         WjeNSvWuJWzWZJFpd/BMx+EX/IFTGKHobG05iPaemOgu/U69SOHSgECHA64R0o87BThu
+         J4vQ==
+X-Gm-Message-State: AOJu0YxfE5OetMKbg2TCFAr69oAxqHXPEXQqwuHLMptwGCWz/aDdHYCu
+        lS9ttHDu1KlFbOT5vTwnFulrg+1LDNE=
+X-Google-Smtp-Source: AGHT+IE64T9Kdj2ejG3B4Nr6Y45EuDCgAtQzT7hL9ZXXsmCS3yNmRUay9Xn0CHteK3xz97jhmqj3De9Ue1E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:7450:0:b0:d7a:a879:614d with SMTP id
+ p77-20020a257450000000b00d7aa879614dmr22384ybc.1.1692973564238; Fri, 25 Aug
+ 2023 07:26:04 -0700 (PDT)
+Date:   Fri, 25 Aug 2023 07:26:02 -0700
+In-Reply-To: <cdad0a8b-0994-d2f3-7c68-e632ce4facf7@amd.com>
+Mime-Version: 1.0
+References: <67fba65c-ba2a-4681-a9bc-2a6e8f0bcb92.chenpeihong.cph@alibaba-inc.com>
+ <ZOYfxgSy/SxCn0Wq@google.com> <174aa0da-0b05-a2dc-7884-4f7b57abcc37@amd.com>
+ <ZOdnuDZUd4mevCqe@google.com> <cdad0a8b-0994-d2f3-7c68-e632ce4facf7@amd.com>
+Message-ID: <ZOi5+rMYTVpmdQ2+@google.com>
+Subject: Re: Question about AMD SVM's virtual NMI support in Linux kernel mainline
+From:   Sean Christopherson <seanjc@google.com>
+To:     Santosh Shukla <santosh.shukla@amd.com>
+Cc:     "=?utf-8?B?6ZmI5Z+56bi/KOS5mOm4vyk=?=" 
+        <chenpeihong.cph@alibaba-inc.com>, mlevitsk <mlevitsk@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Aug 25, 2023, Santosh Shukla wrote:
+> Hi Sean,
+> >> Yes, HW does set BLOCKING_MASK when HW takes the pending vNMI event.
+> > 
+> > I'm not asking about the pending vNMI case, which is clearly spelled out in the
+> > APM.  I'm asking about directly injecting an NMI via:
+> > 
+> > 	svm->vmcb->control.event_inj = SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_NMI;
+> >
+> 
+> Yes. This is documented in APM as well.
+> https://www.amd.com/system/files/TechDocs/24593.pdf : "15.21.10 NMI Virtualization"
+> 
+> "
+> If Event Injection is used to inject an NMI when NMI Virtualization is enabled,
+> VMRUN sets V_NMI_MASK in the guest state.
+> "
 
-On 8/18/2023 9:53 PM, Sean Christopherson wrote:
-> On Fri, Aug 18, 2023, Binbin Wu wrote:
->> On 8/17/2023 5:17 PM, Binbin Wu wrote:
->>> On 8/17/2023 6:25 AM, Sean Christopherson wrote:
->>>> On Wed, Jul 19, 2023, Binbin Wu wrote:
->>>>> Binbin Wu (7):
->>>>>     KVM: x86/mmu: Use GENMASK_ULL() to define __PT_BASE_ADDR_MASK
->>>>>     KVM: x86: Add & use kvm_vcpu_is_legal_cr3() to check CR3's legality
->>>>>     KVM: x86: Use KVM-governed feature framework to track "LAM enabled"
->>>>>     KVM: x86: Virtualize CR3.LAM_{U48,U57}
->>>>>     KVM: x86: Introduce get_untagged_addr() in kvm_x86_ops and
->>>>> call it in
->>>>>       emulator
->>>>>     KVM: VMX: Implement and wire get_untagged_addr() for LAM
->>>>>     KVM: x86: Untag address for vmexit handlers when LAM applicable
->>>>>
->>>>> Robert Hoo (2):
->>>>>     KVM: x86: Virtualize CR4.LAM_SUP
->>>>>     KVM: x86: Expose LAM feature to userspace VMM
->>>> Looks good, just needs a bit of re-organination.  Same goes for the
->>>> LASS series.
->>>>
->>>> For the next version, can you (or Zeng) send a single series for LAM
->>>> and LASS?
->>>> They're both pretty much ready to go, i.e. I don't expect one to
->>>> hold up the other
->>>> at this point, and posting a single series will reduce the
->>>> probability of me
->>>> screwing up a conflict resolution or missing a dependency when applying.
->>>>
->> Hi Sean,
->> Do you still prefer a single series for LAM and LASS  for the next version
->> when we don't need to rush for v6.6?
-> Yes, if it's not too much trouble on your end.  Since the two have overlapping
-> prep work and concepts, and both series are in good shape, my strong preference
-> is to grab them at the same time.  I would much rather apply what you've tested
-> and reduce the probability of messing up any conflicts.
->
->
->
-Hi Sean,
-One more concern, KVM LASS patch has an extra dependency on kernel LASS 
-series in which
-enumerates lass feature bit (X86_FEATURE_LASS/X86_CR4_LASS). So far 
-kernel lass patch is
-still under review, as alternative we may extract relevant patch part 
-along with kvm lass patch
-set for a single series in case kernel lass cannot be merged before v6.7.
-Do you think it OK in that way?
-
+Awesome, thank you!
