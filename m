@@ -2,45 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B4F22787C1E
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 01:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BC7D787C7A
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 02:17:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236290AbjHXXvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 19:51:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40414 "EHLO
+        id S231426AbjHYARF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 20:17:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235165AbjHXXva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 19:51:30 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93D2E77
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 16:51:26 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 737E085;
-        Thu, 24 Aug 2023 16:51:26 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id OaFOtKhSeKnP; Thu, 24 Aug 2023 16:51:22 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id EF5E645;
-        Thu, 24 Aug 2023 16:51:21 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net EF5E645
-Date:   Thu, 24 Aug 2023 16:51:21 -0700 (PDT)
-From:   Eric Wheeler <kvm@lists.ewheeler.net>
-To:     Sean Christopherson <seanjc@google.com>
-cc:     Amaan Cheval <amaan.cheval@gmail.com>, brak@gameservers.com,
-        kvm@vger.kernel.org
-Subject: Re: Deadlock due to EPT_VIOLATION
-In-Reply-To: <ZOaptK09RbJtFbmk@google.com>
-Message-ID: <50b37641-ac2e-c4c4-440-7a443b115913@ewheeler.net>
-References: <5fc6cea-9f51-582c-8bb3-21e0b4bf397@ewheeler.net> <ZOP4lwiMU2Uf89eQ@google.com> <468b1298-e43e-2397-5f3-4b6af6e2f461@ewheeler.net> <ZOTQPUk5kxskDcsi@google.com> <58f24fa2-a5f4-c59a-2bcf-c49f7bddc5b@ewheeler.net> <ZOZH3xe0u4NHhvL8@google.com>
- <db7c65b-6530-692-5e50-c74a7757f22@ewheeler.net> <347d3526-7f8d-4744-2a9c-8240cc556975@ewheeler.net> <ZOaUdP46f8XjQvio@google.com> <5da12792-1e5d-b89d-ea0-e1159c645568@ewheeler.net> <ZOaptK09RbJtFbmk@google.com>
+        with ESMTP id S232438AbjHYAQi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 20:16:38 -0400
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE4B61BC8
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 17:16:36 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-48cfdfa7893so223356e0c.0
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 17:16:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692922596; x=1693527396;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7t4jBs6ANdVOZ+fXA/YvUk9XjJk29rUWw8CEUgNsyuc=;
+        b=C4Gh3k2Q2eM8M36CRLT7ye5PV63jFfM0Qod71NeCl+gHiPrnCkOhYxA0FaRRaBUDeL
+         6pf5Q5GNd+KqY/dhT8pZ5ho3XFuGPAdZoluyt8pdJdCfEE1uurvT4umPi7diZMKjBaza
+         1WO15Y7JhKnBO+tTDEiZgWBqB9FBqVwtzaEqfPXib2ZI3WvEwfCzSC7pepD0k0XuxblC
+         fCI3CDCpY6qDT0QJPQt3TX02LDCP95DpgmVYs5zPKtKMssJfCXSLbS9WZl03YdykaiYB
+         /yCBVj9CxWrZEjjjTkqE/FavGt9vjS/FpOX3NYMaLZ9JzQuQjXAymv8LAgqeSAVsIWlr
+         UTeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692922596; x=1693527396;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7t4jBs6ANdVOZ+fXA/YvUk9XjJk29rUWw8CEUgNsyuc=;
+        b=fCHkPV0Ryu/RqE8m/g+w1yyXXto7EpML1SuWWFaQJ3uKRQdv7Q25e+1WRinpU3Fb+A
+         EIlHkE2vQfjO73N5vlsSiPVKr1YkvmxvIiyQVP+WMMBTNh4mE6uOR3o9nzN0jASew+xO
+         t7kMrei/DPExCfYpR1Z3h63Ev7yD8wSFvJP7GkwN2XTAyROr2fN6mpzospXaXB0NmbVg
+         Oh6Sc4Bvxp/WawkpU4D6ct8WWZR9XAoLTrJRTIewUvDqwfUM8X6CZPlMipNtFr1WYh8m
+         BepcsOK/ChGf+UxdTRBBmLOkU5u1p177SrYRwRFl+B/U3FiUbNq7U6NqLd7s86KRmy0t
+         hBkQ==
+X-Gm-Message-State: AOJu0YxaGtFhqbsnT9iIbhMuqTSJ7nk2uLgnX9c3ILKOU2wMZXK3NMDx
+        /BtgsXcqkpN5WXvxsEKvSUp3fZSAfWJjPwEV5GKuBw==
+X-Google-Smtp-Source: AGHT+IGF5ck2Ld8HKUNY/AFh8ERxd5PNB/Sn3tz9UMkNMgVe5d1AIX+7bSyVWzQ317NBF2reSTtFoVUeF2PbqJctIGI=
+X-Received: by 2002:a05:6122:552:b0:48d:149e:1a41 with SMTP id
+ y18-20020a056122055200b0048d149e1a41mr18663014vko.8.1692922595910; Thu, 24
+ Aug 2023 17:16:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-110721984-1692921081=:30383"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
+ <ZIovIBVLIM69E5Bo@google.com> <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
+ <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com> <ZK11Sxobf53RsAmH@google.com>
+In-Reply-To: <ZK11Sxobf53RsAmH@google.com>
+From:   Anish Moorthy <amoorthy@google.com>
+Date:   Thu, 24 Aug 2023 17:15:59 -0700
+Message-ID: <CAF7b7mp1Bspeqc9n==gE5NgPwxfYLtu9G3=+OTwAcipeYRkPKg@mail.gmail.com>
+Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        robert.hoo.linux@gmail.com, jthoughton@google.com,
+        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
+        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
+        isaku.yamahata@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -48,149 +75,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Tue, Jul 11, 2023 at 8:29=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Well, that description is wrong for other reasons.  As mentioned in my re=
+ply
+> (got snipped), the behavior is not tied to sleeping or waiting on I/O.
+>
+> >  Moving the nowait check out of __kvm_faultin_pfn()/user_mem_abort()
+> > and into __gfn_to_pfn_memslot() means that, obviously, other callers
+> > will start to see behavior changes. Some of that is probably actually
+> > necessary for that documentation to be accurate (since any usages of
+> > __gfn_to_pfn_memslot() under KVM_RUN should respect the memslot flag),
+> > but I think there are consumers of __gfn_to_pfn_memslot() from outside
+> > KVM_RUN.
+>
+> Yeah, replace "in response to page faults" with something along the lines=
+ of "if
+> an access in guest context ..."
 
---8323328-110721984-1692921081=:30383
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Alright, how about
 
-On Wed, 23 Aug 2023, Sean Christopherson wrote:
-> On Wed, Aug 23, 2023, Eric Wheeler wrote:
-> > On Wed, 23 Aug 2023, Sean Christopherson wrote:
-> > > Not a coincidence, at all.  The bug is that, in v6.1, is_page_fault_stale() takes
-> > > the local @mmu_seq snapshot as an int, whereas as the per-VM count is stored as an
-> > > unsigned long.
-> > 
-> > I'm surprised that there were no compiler warnings about signedness or
-> > type precision.  What would have prevented such a compiler warning?
-> 
-> -Wconversion can detect this, but it detects freaking *everything*, i.e. its
-> signal to noise ratio is straight up awful.  It's so noisy in fact that it's not
-> even in the kernel's W=1 build, it's pushed down all the way to W=3.  W=1 is
-> basically "you'll get some noise, but it may find useful stuff.  W=3 is essentially
-> "don't bother wading through the warnings unless you're masochistic".
-> 
-> E.g. turning it on leads to:
-> 
-> linux/include/linux/kvm_host.h:891:60: error:
-> conversion to ‘long unsigned int’ from ‘int’ may change the sign of the result [-Werror=sign-conversion]
->   891 |                           (atomic_read(&kvm->online_vcpus) - 1))
->       |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
-> 
-> which is completely asinine (suppressing the warning would require declaring the
-> above literal as 1u).
++ KVM_MEM_NO_USERFAULT_ON_GUEST_ACCESS
++ The presence of this capability indicates that userspace may pass the
++ KVM_MEM_NO_USERFAULT_ON_GUEST_ACCESS flag to
++ KVM_SET_USER_MEMORY_REGION. Said flag will cause KVM_RUN to fail (-EFAULT=
+)
++ in response to guest-context memory accesses which would require KVM
++ to page fault on the userspace mapping.
 
-I can see that.  I suppose we'll never see the kernel compile with -Wall 
--Werror!
+Although, as Wang mentioned, USERFAULT seems to suggest something
+related to userfaultfd which is a liiiiitle too specific. Perhaps we
+should use USERSPACE_FAULT (*cries*) instead?
 
- 
-> FWIW, I would love to be able to prevent these types of bugs as this isn't the
-> first implicit conversion bug that has hit KVM x86[*], but the signal to noise
-> ratio is just so, so bad.
-> 
-> [*] commit d5aaad6f8342 ("KVM: x86/mmu: Fix per-cpu counter corruption on 32-bit builds")
-> 
-> > > When the sequence sets bit 31, the local @mmu_seq value becomes
-> > > a signed *negative* value, and then when that gets passed to mmu_invalidate_retry_hva(),
-> > > which correctly takes an unsigned long, the negative value gets sign-extended and
-> > > so the comparison ends up being
-> > > 
-> > > 	if (0x8002dc25 != 0xffffffff8002dc25)
-> > >
-> > > and KVM thinks the sequence count is stale.  I missed it for so long because I
-> > > was stupidly looking mostly at upstream code (see below), and because of the subtle
-> > > sign-extension behavior (I was mostly on the lookout for a straight truncation
-> > > bug where bits[63:32] got dropped).
-> > > 
-> > > I suspect others haven't hit this issues because no one else is generating anywhere
-> > > near the same number of mmu_notifier invalidations, and/or live migrates VMs more
-> > > regularly (which effectively resets the sequence count).
-> > > 
-> > > The real kicker to all this is that the bug was accidentally fixed in v6.3 by
-> > > commit ba6e3fe25543 ("KVM: x86/mmu: Grab mmu_invalidate_seq in kvm_faultin_pfn()"),
-> > > as that refactoring correctly stored the "local" mmu_seq as an unsigned long.
-> > > 
-> > > I'll post the below as a proper patch for inclusion in stable kernels.
-> > 
-> > Awesome, and well done.  Can you think of a "simple" patch for the
-> > 6.1-series that would be live-patch safe?
-> 
-> This is what I'm going to post for 6.1, it's as safe and simple a patch as can
-> be.  The only potential hiccup for live-patching is that it's all but guaranteed
-> to be inlined, but the scope creep should be limited to one-level up, e.g. to
-> direct_page_fault().
-> 
-> Author: Sean Christopherson <seanjc@google.com>
-> Date:   Wed Aug 23 16:28:12 2023 -0700
-> 
->     KVM: x86/mmu: Fix an sign-extension bug with mmu_seq that hangs vCPUs
->     
->     Take the vCPU's mmu_seq snapshot as an "unsigned long" instead of an "int"
->     when checking to see if a page fault is stale, as the sequence count is
->     stored as an "unsigned long" everywhere else in KVM.  This fixes a bug
->     where KVM will effectively hang vCPUs due to always thinking page faults
->     are stale, which result in KVM refusing to "fix" faults.
->     
->     mmu_invalidate_seq (née mmu_notifier_seq) is sequence counter used when
->     KVM is handling page faults to detect if userspace mapping relevant to the
->     guest was invalidated snapshotting the counter and acquiring mmu_lock, to
->     ensure that the host pfn that KVM retrieved is still fresh.  If KVM sees
->     that the counter has change, KVM resumes the guest without fixing the
->     fault.
->     
->     What _should_ happen is that the source of the mmu_notifier invalidations
->     eventually goes away, mmu_invalidate_seq will become stable, and KVM can
->     once again fix guest page fault(s).
->     
->     But for a long-lived VM and/or a VM that the host just doesn't particularly
->     like, it's possible for a VM to be on the receiving end of 2 billion (with
->     a B) mmu_notifier invalidations.  When that happens, bit 31 will be set in
->     mmu_invalidate_seq.  This causes the value to be turned into a 32-bit
->     negative value when implicitly cast to an "int" by is_page_fault_stale(),
->     and then sign-extended into a 64-bit unsigned when the signed "int" is
->     implicitly cast back to an "unsigned long" on the call to
->     mmu_invalidate_retry_hva().
->     
->     As a result of the casting and sign-extension, given a sequence counter of
->     e.g. 0x8002dc25, mmu_invalidate_retry_hva() ends up doing
->     
->             if (0x8002dc25 != 0xffffffff8002dc25)
->     
->     and signals that the page fault is stale and needs to be retried even
->     though the sequence counter is stable, and KVM effectively hangs any vCPU
->     that takes a page fault (EPT violation or #NPF when TDP is enabled).
->     
->     Note, upstream commit ba6e3fe25543 ("KVM: x86/mmu: Grab mmu_invalidate_seq
->     in kvm_faultin_pfn()") unknowingly fixed the bug in v6.3 when refactoring
->     how KVM tracks the sequence counter snapshot.
->     
->     Reported-by: Brian Rak <brak@vultr.com>
->     Reported-by: Amaan Cheval <amaan.cheval@gmail.com>
->     Reported-by: Eric Wheeler <kvm@lists.ewheeler.net>
->     Closes: https://lore.kernel.org/all/f023d927-52aa-7e08-2ee5-59a2fbc65953@gameservers.com
+On Wed, Jun 14, 2023 at 2:20=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> However, do we actually need to force vendor code to query nowait?  At a =
+glance,
+> the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot(=
+) are
+> in flows that play nice with nowait or that don't support it at all.  So =
+I *think*
+> we can do this?
 
-Thanks again for all your help on this, I enjoyed working on it with you.
+On Wed, Jun 14, 2023 at 2:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Gah, got turned around and forgot to account for @atomic.  So this?
+>
+>         if (!atomic && memslot_is_nowait_on_fault(slot)) {
+>                 atomic =3D true;
+>                 if (async) {
+>                         *async =3D false;
+>                         async =3D NULL;
+>                 }
+>         }
+>
+> > +
+> >         return hva_to_pfn(addr, atomic, interruptible, async, write_fau=
+lt,
+> >                           writable);
+> >  }
 
--Eric
+Took another look at this and I *think* it works too (I added my notes
+at the end here so if anyone wants to double-check they can). But
+there are a couple of quirks
 
->     Fixes: a955cad84cda ("KVM: x86/mmu: Retry page fault if root is invalidated by memslot update")
->     Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 230108a90cf3..beca03556379 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4212,7 +4212,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->   * root was invalidated by a memslot update or a relevant mmu_notifier fired.
->   */
->  static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
-> -                               struct kvm_page_fault *fault, int mmu_seq)
-> +                               struct kvm_page_fault *fault,
-> +                               unsigned long mmu_seq)
->  {
->         struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
->  
-> 
-> 
---8323328-110721984-1692921081=:30383--
+1. The memslot flag can cause new __gfn_to_pfn_memslot() failures in
+kvm_vcpu_map() (good thing!) but those failures result in an EINVAL
+(bad!). It kinda looks like the current is_error_noslot_pfn() check in
+that function should be returning EFAULT anyways though, any opinions?
+
+2. kvm_vm_ioctl_mte_copy_tags() will see new failures. This function
+has come up before (a) and it doesn't seem like an access in a guest
+context. Is this something to just be documented away?
+
+3. I don't think I've caught parts of the who-calls tree that are in
+drivers/. The one part I know about is the gfn_to_pfn() call in
+is_2MB_gtt_possible() (drivers/gpu/drm/i915/gvt/gtt.c), and I'm not
+sure what to do about it. Again, doesn't look like a guest-context
+access.
+
+(a) https://lore.kernel.org/kvm/ZIoiLGotFsDDvRN3@google.com/T/#u
+
+---------------------------------------------------
+Notes: Tracing the usages of __gfn_to_pfn_memslot()
+"shove" =3D "moving the nowait check inside of __gfn_to_pfn_memslot
+
+* [x86] __gfn_to_pfn_memslot() has 5 callers
+** DONE kvm_faultin_pfn() accounts for two calls, shove will cause
+bail (as intended) after first
+** DONE __gfn_to_pfn_prot(): No usages on x86
+** DONE __gfn_to_pfn_memslot_atomic: already requires atomic access :)
+** gfn_to_pfn_memslot() has two callers
+*** DONE kvm_vcpu_gfn_to_pfn(): No callers
+*** gfn_to_pfn() has two callers
+**** TODO kvm_vcpu_map() When memslot flag trips will get
+KVM_PFN_ERR_FAULT, error is handled
+HOWEVER it will return -EINVAL which is kinda... not right
+**** gfn_to_page() has two callers, but both operate on
+APIC_DEFAULT_PHYS_BASE addr
+** Ok so that's "done," as long as my LSP is reliable
+
+* [arm64] __gfn_to_pfn_memslot() has 4 callers
+** DONE user_mem_abort() has one, accounted for by the subsequent
+is_error_noslot_pfn()
+** DONE __gfn_to_pfn_memslot_atomic() fine as above
+** TODO gfn_to_pfn_prot() One caller in kvm_vm_ioctl_mte_copy_tags()
+There's a is_error_noslot_pfn() to catch the failure, but there's no vCPU
+floating around to annotate a fault in!
+** gfn_to_pfn_memslot() two callers
+*** DONE kvm_vcpu_gfn_to_pfn() no callers
+*** gfn_to_pfn() two callers
+**** kvm_vcpu_map() as above
+**** DONE gfn_to_page() no callers
+
+* TODO Weird driver code reference I discovered only via ripgrep?
