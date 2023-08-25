@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5453789246
-	for <lists+kvm@lfdr.de>; Sat, 26 Aug 2023 01:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39841789248
+	for <lists+kvm@lfdr.de>; Sat, 26 Aug 2023 01:17:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbjHYXQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Aug 2023 19:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54674 "EHLO
+        id S230426AbjHYXRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Aug 2023 19:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230053AbjHYXPt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Aug 2023 19:15:49 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B96062109
-        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 16:15:43 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58e49935630so31538557b3.0
-        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 16:15:43 -0700 (PDT)
+        with ESMTP id S231249AbjHYXRU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Aug 2023 19:17:20 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7BCC2129
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 16:17:11 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d74829dd58fso1827592276.1
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 16:17:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693005343; x=1693610143;
+        d=google.com; s=20221208; t=1693005431; x=1693610231;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AUL1GyRYJNXzwGDpCpWEMsAa6saByKtyyWFg6xkN/k0=;
-        b=iXV98+JlIPikUAGtXoRKwAIqPeJ/R0wrCgEUaD4WK07bKYo/5l0vT9R96BzfQopBo5
-         44N8Dat+cQbuYOXtnau1ODzW0aOJBiXYoPIMOj2XACkZjZH4/J5xUZ/dvIuiC6xFzLld
-         TSpMHbeK8uxfbRaDTH45NQsefuRAAZrnzVjG2sZ+wxOB6qOya/kBzXmnQQ2pEMaWG/OC
-         C8cuDT146WxWvf0VyT/JWkfs1WYH97WJ+dchEe9nxqV89HzO7rX6NIBnIfNz51PI3sM0
-         pctEVhd1iaBoJS9dIGyJAPwK6NQjvSVbq80CGCzQ8TZF1Gga5EooOCRDbDnjGgyrj8fC
-         lK0Q==
+        bh=IbA16e4G5FTrEyMeWKj8UXENnQA5tEiZF2o6wpVFWAU=;
+        b=thv0HRAWuOFftasB16yDDl3uAPY9b/6f559qheYS39Vin0ldCLBOm9TytR75fPnHwS
+         hgw6yLwxviL95z7V8ENoLLLiyBOPpoO3JmalTMAFuQeCXbwGT/cr7mMbNhjmr9fZCwt/
+         rOgwb2f41MmlkyLyrua2Fpbxrjmg1RPRwjlhTLHQahs8M7eGLe9x7pnGMmH1pqbShlA4
+         v+pD8MH2FbC8A5MrFfqimysQJwLMF6xsV32nrBuj/xve+niPujxhadsqCgZSIZTuQ+vk
+         Iedeud8IqCtHnBax1ms32mQmqrfFY/XLLH1QNoS3zgltqJOdprJk9uNZ9BtvWNFUW3wx
+         wlsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693005343; x=1693610143;
+        d=1e100.net; s=20221208; t=1693005431; x=1693610231;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AUL1GyRYJNXzwGDpCpWEMsAa6saByKtyyWFg6xkN/k0=;
-        b=SF1B0fJRMzpjRBa5IRZhpdHrIanExIMxZ2uab/2P7eTgWHRITeT6WXiQhelvXQJ0se
-         +yHh7Z/c2EqrwYc8oYRsm0t9cS4egCxq7bgu8tRn+NlHWDIJbQ2PJNn2bt8pBZblh8uK
-         tiGNCsNbjPaSxNSIvq6NxNbJkbwskFQZKOQajZ9GngyBTQxko61jrvd2O61z+pazBqRW
-         GLq3aHjJku0xgz6e4RRXgT8qUbZANLZsHN0w2/2t4QsNqPBsKQwXgorRegOo9VjPX+GA
-         kHjPBkySYYGsyvVlPjQjFjriIu1JPQ3TCRqC2AdTQy0CwRmKF29X5aC71IdUK5n5cK1/
-         qmkw==
-X-Gm-Message-State: AOJu0YyCwhIRJGLc3oKl/Ve1vKc2W/HRym7PIpH/4VFhBpvR9dhxqXD3
-        lVa/HDiLN0r6K5YgC0LCdsMZwWg+YaY=
-X-Google-Smtp-Source: AGHT+IFToBFcB2nCA3YFbZm1JVgczPz/+vW51zSorJ6yqmN1px3q3LGNycFAi2RnJ1sr/T/Gl2M4d6+bu3Q=
+        bh=IbA16e4G5FTrEyMeWKj8UXENnQA5tEiZF2o6wpVFWAU=;
+        b=dTCBGf6gulkUh0jx6mQIV2jjxkXrSG/N7QbFzatb03biElETwN5cX5ODLqq2nrHyQZ
+         5qqyxwVgWQ0MJ6MzqVNBI6jxkoIRcl9qRm5F96eMDLAD/ugpM+sks87yJQWRNjpThJj1
+         Ir4zFOJCw6E7rN+kzg93EXY4mf2H1ZOKqpu+DDItAwa5g7PgJalkQimgROUeddAvwO4S
+         d+pMHKNeNiT2MP/9iJVnKjU8gWhLg8ooilNV9IDxLjWqkLu+aUH+qspKr4EmGG2GtO1L
+         VBmtj/0Bu0DpU+IhAJOU4Y/I5LOTLBT3DP5B9WbiqI8JZvK0EBPm7cbIaHZnseRDHrQl
+         b3YQ==
+X-Gm-Message-State: AOJu0YzV4OKGaYtqpVYf+2KV8sIsjLQhX5G4KmztUwMSUxtGSocpl0Xi
+        oKegRI7w8P2A/lz26BePS6hAnLtAgMU=
+X-Google-Smtp-Source: AGHT+IFTiUVRDswF1MCfPVgkxj0gqCmd6KaPLl8CBqEY/4jKQt6W6PXso8zzm5KnsMxtD2+p2IzF0da1OQc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:2f87:b0:586:e91a:46c2 with SMTP id
- ew7-20020a05690c2f8700b00586e91a46c2mr570293ywb.4.1693005343091; Fri, 25 Aug
- 2023 16:15:43 -0700 (PDT)
-Date:   Fri, 25 Aug 2023 16:15:41 -0700
-In-Reply-To: <20230714065602.20805-1-yan.y.zhao@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:106:b0:d77:984e:c770 with SMTP id
+ o6-20020a056902010600b00d77984ec770mr425695ybh.5.1693005431047; Fri, 25 Aug
+ 2023 16:17:11 -0700 (PDT)
+Date:   Fri, 25 Aug 2023 16:17:09 -0700
+In-Reply-To: <20230714064656.20147-1-yan.y.zhao@intel.com>
 Mime-Version: 1.0
-References: <20230714064656.20147-1-yan.y.zhao@intel.com> <20230714065602.20805-1-yan.y.zhao@intel.com>
-Message-ID: <ZOk2HWEubJIRo1HN@google.com>
-Subject: Re: [PATCH v4 11/12] KVM: x86/mmu: split a single gfn zap range when
- guest MTRRs are honored
+References: <20230714064656.20147-1-yan.y.zhao@intel.com>
+Message-ID: <ZOk2dSCdc693YOKe@google.com>
+Subject: Re: [PATCH v4 00/12] KVM: x86/mmu: refine memtype related mmu zap
 From:   Sean Christopherson <seanjc@google.com>
 To:     Yan Zhao <yan.y.zhao@intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -59,9 +58,9 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         robert.hoo.linux@gmail.com, yuan.yao@linux.intel.com
 Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -69,21 +68,22 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Jul 14, 2023, Yan Zhao wrote:
-> Split a single gfn zap range (specifially range [0, ~0UL)) to smaller
-> ranges according to current memslot layout when guest MTRRs are honored.
+> This series refines mmu zap caused by EPT memory type update when guest
+> MTRRs are honored.
 > 
-> Though vCPUs have been serialized to perform kvm_zap_gfn_range() for MTRRs
-> updates and CR0.CD toggles, contention caused rescheduling cost is still
-> huge when there're concurrent page fault holding mmu_lock for read.
-
-Unless the pre-check doesn't work for some reason, I definitely want to avoid
-this patch.  This is a lot of complexity that, IIUC, is just working around a
-problem elsewhere in KVM.
-
-> Split a single huge zap range according to the actual memslot layout can
-> reduce unnecessary transversal and yielding cost in tdp mmu.
-> Also, it can increase the chances for larger ranges to find existing ranges
-> to zap in zap list.
+> Patches 1-5 revolve around utilizing helper functions to check if
+> KVM TDP honors guest MTRRs, TDP zaps and page fault max_level reduction
+> are now only targeted to TDPs that honor guest MTRRs.
 > 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
+> -The 5th patch will trigger zapping of TDP leaf entries if non-coherent
+>  DMA devices count goes from 0 to 1 or from 1 to 0.
+> 
+> Patches 6-7 are fixes and patches 9-12 are optimizations for mmu zaps
+> when guest MTRRs are honored.
+> Those mmu zaps are intended to remove stale memtypes of TDP entries
+> caused by changes of guest MTRRs and CR0.CD and are usually triggered from
+> all vCPUs in bursts.
+
+Sorry for the delayed review, especially with respect to patches 1-5.  I completely
+forgot there were cleanups at the beginning of this series.  I'll make to grab
+1-5 early in the 6.7 cycle, even if you haven't sent a new version before then.
