@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AB977886C2
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 14:16:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9BE87886C6
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 14:16:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244549AbjHYMPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Aug 2023 08:15:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53370 "EHLO
+        id S244584AbjHYMPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Aug 2023 08:15:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244587AbjHYMPm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Aug 2023 08:15:42 -0400
+        with ESMTP id S244588AbjHYMPn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Aug 2023 08:15:43 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D6AE6B;
-        Fri, 25 Aug 2023 05:15:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B026A199E;
+        Fri, 25 Aug 2023 05:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692965739; x=1724501739;
+  t=1692965741; x=1724501741;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EqWauSa44/f12/BVF8Zj9prwsDlMLHzsaxtt+I6+Nhg=;
-  b=f7B8Ph/lkO11FwcDKK2M0bsw7Gc839RiNtdw6kYH7TD4Y/wHvj9OkK6L
-   TyfSiYFulcZZQJXVrGvZ/xh23XVX2NNfFGwjMZgJSf7kAY8SfN2jy45V7
-   gGzVWcDj5i+iNa8AGBRiXPg4lxKY9n02DgIJuMA9UUULDcpmxZ2x+kcsV
-   B8txzclLXbvrVJcAxVOLwy9RIjERJ5E+1KqvK8lmPax72oRZBp3ipVmge
-   f9JUAKdXHxtGQrjw9HyW2mQ+/YDUu/EG5iNNhQF21JFbz07W/QGpqMEzi
-   98ZALCSP6TnSVfIcSBM/m8OClIcoHq/WstZNfpBXfzYvA4WKBm2/Nw3Y3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="438639112"
+  bh=Abv/xVRHriBLIV2o1VUGPVuxN37y5hIMozzCW46JDT0=;
+  b=mXJW4XMpzFIrbcdsOyrZuz4VdyhUcsSTqgO57uwr209J2b8QDW6qa0k/
+   vRmLtuH+XNNGYXT58lQnqpKDPChPy68JS/FGyiALSQcCqKw9r1U9eu5iW
+   jwiQX5qh4+1n74cL2P8F1+dEeQhqMdiOuRMj5v90owBCyXuc5wmwnRH76
+   ELqz9LWm2hfiKMPqb6ny/yyE5qOjq6AtVhhDTv2Q7OLgSHpwjzxdghOc7
+   1mh8IY+Yh/bRb3ql6ZGKFHDkgKG0uIMC+C2qKsI4pcL6iezS2U5S8KIMM
+   4EPBzbkQu8T7DI1rlnXWENNBf6OPDguTekf5ggRmV/TsxT4QbLwFofKQs
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="438639143"
 X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="438639112"
+   d="scan'208";a="438639143"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:15:09 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:15:14 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="881157994"
+   d="scan'208";a="881158018"
 Received: from vnaikawa-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.209.185.177])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:15:09 -0700
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:15:14 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     x86@kernel.org, dave.hansen@intel.com,
@@ -50,9 +50,9 @@ Cc:     x86@kernel.org, dave.hansen@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, nik.borisov@suse.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
         kai.huang@intel.com
-Subject: [PATCH v13 02/22] x86/tdx: Define TDX supported page sizes as macros
-Date:   Sat, 26 Aug 2023 00:14:21 +1200
-Message-ID: <39174b01de1b0a16eded0982487a5b6a4fda6318.1692962263.git.kai.huang@intel.com>
+Subject: [PATCH v13 03/22] x86/virt/tdx: Make INTEL_TDX_HOST depend on X86_X2APIC
+Date:   Sat, 26 Aug 2023 00:14:22 +1200
+Message-ID: <d572b9180bf5b49d0865140d8a304429edd7cace.1692962263.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1692962263.git.kai.huang@intel.com>
 References: <cover.1692962263.git.kai.huang@intel.com>
@@ -68,60 +68,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX supports 4K, 2M and 1G page sizes.  The corresponding values are
-defined by the TDX module spec and used as TDX module ABI.  Currently,
-they are used in try_accept_one() when the TDX guest tries to accept a
-page.  However currently try_accept_one() uses hard-coded magic values.
+TDX capable platforms are locked to X2APIC mode and cannot fall back to
+the legacy xAPIC mode when TDX is enabled by the BIOS.  TDX host support
+requires x2APIC.  Make INTEL_TDX_HOST depend on X86_X2APIC.
 
-Define TDX supported page sizes as macros and get rid of the hard-coded
-values in try_accept_one().  TDX host support will need to use them too.
-
+Link: https://lore.kernel.org/lkml/ba80b303-31bf-d44a-b05d-5c0f83038798@intel.com/
 Signed-off-by: Kai Huang <kai.huang@intel.com>
-Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/coco/tdx/tdx-shared.c    | 6 +++---
- arch/x86/include/asm/shared/tdx.h | 5 +++++
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ arch/x86/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/coco/tdx/tdx-shared.c b/arch/x86/coco/tdx/tdx-shared.c
-index 78e413269791..1655aa56a0a5 100644
---- a/arch/x86/coco/tdx/tdx-shared.c
-+++ b/arch/x86/coco/tdx/tdx-shared.c
-@@ -22,13 +22,13 @@ static unsigned long try_accept_one(phys_addr_t start, unsigned long len,
- 	 */
- 	switch (pg_level) {
- 	case PG_LEVEL_4K:
--		page_size = 0;
-+		page_size = TDX_PS_4K;
- 		break;
- 	case PG_LEVEL_2M:
--		page_size = 1;
-+		page_size = TDX_PS_2M;
- 		break;
- 	case PG_LEVEL_1G:
--		page_size = 2;
-+		page_size = TDX_PS_1G;
- 		break;
- 	default:
- 		return 0;
-diff --git a/arch/x86/include/asm/shared/tdx.h b/arch/x86/include/asm/shared/tdx.h
-index 8d1427562c63..257a41d0a36d 100644
---- a/arch/x86/include/asm/shared/tdx.h
-+++ b/arch/x86/include/asm/shared/tdx.h
-@@ -52,6 +52,11 @@
- 	(TDX_RDX | TDX_RBX | TDX_RSI | TDX_RDI | TDX_R8  | TDX_R9  | \
- 	 TDX_R10 | TDX_R11 | TDX_R12 | TDX_R13 | TDX_R14 | TDX_R15)
- 
-+/* TDX supported page sizes from the TDX module ABI. */
-+#define TDX_PS_4K	0
-+#define TDX_PS_2M	1
-+#define TDX_PS_1G	2
-+
- #ifndef __ASSEMBLY__
- 
- /*
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 0558dd98abd7..114f8c6e95d7 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1954,6 +1954,7 @@ config INTEL_TDX_HOST
+ 	depends on CPU_SUP_INTEL
+ 	depends on X86_64
+ 	depends on KVM_INTEL
++	depends on X86_X2APIC
+ 	help
+ 	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
+ 	  host and certain physical attacks.  This option enables necessary TDX
 -- 
 2.41.0
 
