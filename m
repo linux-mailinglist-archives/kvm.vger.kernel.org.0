@@ -2,876 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F6BA787DBD
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 04:34:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E684A787E1F
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 04:57:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241749AbjHYCe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 22:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49978 "EHLO
+        id S236267AbjHYC4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 22:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242137AbjHYCeU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 22:34:20 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C248E6D;
-        Thu, 24 Aug 2023 19:34:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692930857; x=1724466857;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=J9+bc44cKC4+/9uY6t1Tpk1ZsrzQRxlplROAbfQ5taU=;
-  b=H4UGNhfKpw2D7hsD0RqUxxN+b6NXIGq9OIUokeuv6FKmC6rWqqVSS88H
-   6By7LX0Z792+UJMD5dCVg6ds3ESl8/pRz7Rfvds0qVWvlWoowL1wKHOWK
-   9+wr2uoVe5WguQQygiH0872P4t4ekjk9LQHoCyyXeRlSom3bpkadpgfed
-   3z/Dyt9aSZKyRErYyi0PdXtV/Uwc3i+u3+MmNKsw33KslA4rfkA7e0y26
-   PSDIawjEdRuovOi6l9kKif+aDbPZW6XjdPc4JkG7HcKy6JKGkyuYCivVu
-   DOZ5PnXLHJE3Hj5Id+tITkK1CWYGlftmUjPFXDDLGEVRS7elZnelMWeeT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="372009679"
-X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="372009679"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2023 19:33:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10812"; a="730875163"
-X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="730875163"
-Received: from allen-box.sh.intel.com ([10.239.159.127])
-  by orsmga007.jf.intel.com with ESMTP; 24 Aug 2023 19:33:53 -0700
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Nicolin Chen <nicolinc@nvidia.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        iommu@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v4 10/10] iommu: Separate SVA and IOPF
-Date:   Fri, 25 Aug 2023 10:30:26 +0800
-Message-Id: <20230825023026.132919-11-baolu.lu@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230825023026.132919-1-baolu.lu@linux.intel.com>
-References: <20230825023026.132919-1-baolu.lu@linux.intel.com>
+        with ESMTP id S236143AbjHYC4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 22:56:45 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE39E78;
+        Thu, 24 Aug 2023 19:56:43 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37P2UqhG002614;
+        Fri, 25 Aug 2023 02:56:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=I54OJKkbfBa18QgwkudA0v/Jsp2IQaUta6yozDU1STw=;
+ b=hCe+ym9qHyvgHZy+mE+w1h7nzCPeVsVVMeE6I0F/Wzh2n1hovFPuJ1GoIYsY0iGG/ddU
+ oivDW4yTOCmavQvVL4OGV7YUSsRlqYXF9puLRKqkixqWtzP1IGGgkX1nafJNM+/lc6oe
+ SKD4kR6D4qwVXpFRjaU7NMhXYH4N2GMolfREPvi8wnnOayVOyohiUBKhJGUo4rORiWVP
+ yuOSpzVssqsH9yDtva7XOHUNjYRHvW6gSlUF+IxyDYyu4SufrmCX7u77MBH6gqJXb/AB
+ 5P5CUc0L3/kVqBgixIYfzrFyd/x38RaueTkNlGdocc1F7I9L/3ZCtJY5nwCnnhAe5Dpw KA== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3spkk68jqw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Aug 2023 02:56:41 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37P2qYi9016727;
+        Fri, 25 Aug 2023 02:56:41 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sn228496k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Aug 2023 02:56:41 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37P2uedl66322744
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Aug 2023 02:56:40 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E8C858059;
+        Fri, 25 Aug 2023 02:56:40 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 594925804B;
+        Fri, 25 Aug 2023 02:56:39 +0000 (GMT)
+Received: from [9.61.160.138] (unknown [9.61.160.138])
+        by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 25 Aug 2023 02:56:39 +0000 (GMT)
+Message-ID: <0ddf808c-e929-c975-1b39-5ebc1f2fab62@linux.ibm.com>
+Date:   Thu, 24 Aug 2023 22:56:38 -0400
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v2] KVM: s390: fix gisa destroy operation might lead to
+ cpu stalls
+Content-Language: en-US
+To:     Michael Mueller <mimu@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>
+References: <20230824130932.3573866-1-mimu@linux.ibm.com>
+ <f20a40b8-2d7d-2fc5-33eb-ec0273e09308@linux.ibm.com>
+ <a0f4dc8d-a649-3737-df46-c6ce3c1a26dd@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <a0f4dc8d-a649-3737-df46-c6ce3c1a26dd@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6SUk2ema7P2nML3beCHLeBwGivHmLj8u
+X-Proofpoint-ORIG-GUID: 6SUk2ema7P2nML3beCHLeBwGivHmLj8u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-25_01,2023-08-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2308250017
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add CONFIG_IOMMU_IOPF for page fault handling framework and select it
-from its real consumer. Move iopf function declaration from iommu-sva.h
-to iommu.h and remove iommu-sva.h as it's empty now.
+On 8/24/23 4:36 PM, Michael Mueller wrote:
+> 
+> 
+> On 24.08.23 21:17, Matthew Rosato wrote:
+>> On 8/24/23 9:09 AM, Michael Mueller wrote:
+>>> A GISA cannot be destroyed as long it is linked in the GIB alert list
+>>> as this would breake the alert list. Just waiting for its removal from
+>>
+>> Hi Michael,
+>>
+>> Nit: s/breake/break/
+>>
+>>> the list triggered by another vm is not sufficient as it might be the
+>>> only vm. The below shown cpu stall situation might occur when GIB alerts
+>>> are delayed and is fixed by calling process_gib_alert_list() instead of
+>>> waiting.
+>>>
+>>> At this time the vcpus of the vm are already destroyed and thus
+>>> no vcpu can be kicked to enter the SIE again if for some reason an
+>>> interrupt is pending for that vm.
+>>>
+>>> Additianally the IAM restore value ist set to 0x00 if that was not the
+>>
+>> Nits: s/Additianally/Additionally/  as well as s/ist/is/
+>>
+> 
+> Thanks a lot, Matt. I will address of course all these typos ;)
+> 
+>>> case. That would be a bug introduced by incomplete device de-registration,
+>>> i.e. missing kvm_s390_gisc_unregister() call.
+>> If this implies a bug, maybe it should be a WARN_ON instead of a KVM_EVENT?  Because if we missed a call to kvm_s390_gisc_unregister() then we're also leaking refcounts (one for each gisc that we didn't unregister).
+> 
+> I was thinking of a WARN_ON() as well and will most probaly add it because it is much better visible.
+> 
+>>
+>>>
+>>> Setting this value guarantees that late interrupts don't bring the GISA
+>>> back into the alert list.
+>>
+>> Just to make sure I understand -- The idea is that once you set the alert mask to 0x00 then it should be impossible for millicode to deliver further alerts associated with this gisa right?  Thus making it OK to do one last process_gib_alert_list() after that point in time.
+>>
+>> But I guess my question is: will millicode actually see this gi->alert.mask change soon enough to prevent further alerts?  Don't you need to also cmpxchg the mask update into the contents of kvm_s390_gisa (via gisa_set_iam?) 
+> 
+> It is not the IAM directly that I set to 0x00 but gi->alert.mask. It is used the restore the IAM in the gisa by means of gisa_get_ipm_or_restore_iam() under cmpxchg() conditions which is called by process_gib_alert_list() and the hr_timer function gisa_vcpu_kicker() that it triggers. When the gisa is in the alert list, the IAM is always 0x00. It's set by millicode. I just need to ensure that it is not changed to anything else.
 
-Consolidate all SVA related code into iommu-sva.c:
-- Move iommu_sva_domain_alloc() from iommu.c to iommu-sva.c.
-- Move sva iopf handling code from io-pgfault.c to iommu-sva.c.
+Besides zeroing it while on the alert list and restoring the IAM to re-enable millicode alerts, we also change the IAM to enable a gisc (kvm_s390_gisc_register) and disable a gisc (kvm_s390_gisc_register) for alerts via a call to gisa_set_iam().  AFAIU the IAM is telling millicode what giscs host alerts should happen for, and the point of the gisa_set_iam() call during gisc_unregister is to tell millicode to stop alerts from being delivered for that gisc at that point.
 
-Consolidate iommu_report_device_fault() and iommu_page_response() into
-io-pgfault.c.
+Now for this patch, my understanding is that you are basically cleaning up after a driver that did not handle their gisc refcounts properly, right?  Otherwise by the time you reach gisa_destroy the alert.mask would already be 0x00.  Then in that case, wouldn't you want to force the unregistration of any gisc still in the IAM at gisa_destroy time -- meaning shouldn't we do the equivalent gisa_set_iam that would have previously been done during gisc_unregister, had it been called properly? 
 
-Export iopf_free_group() for iopf handlers implemented in modules. Some
-functions are renamed with more meaningful names. No other intentional
-functionality changes.
+For example, rather than just setting gi->alert.mask = 0x00 in kvm_s390_gisa_destroy(), what if you instead did:
+1) issue the warning that gi->alert.mask was nonzero upon entry to gisa_destroy
+2) perform the equivalent of calling kvm_s390_gisc_unregister() for every bit that is still on in the gi->alert.mask, performing the same actions as though the refcount were reaching 0 for each gisc (remove the bit from the alert mask, call gisa_set_iam).
+3) Finally, process the alert list one more time if gisa_in_alert_list(gi->origin).  At this point, since we already set IAM to 0x00, millicode would have no further reason to deliver more alerts, so doing one last check should be safe.
 
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
----
- include/linux/iommu.h                         |  90 +++++++---
- drivers/iommu/iommu-sva.h                     |  69 --------
- .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |   1 -
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |   1 -
- drivers/iommu/intel/iommu.c                   |   1 -
- drivers/iommu/intel/svm.c                     |   1 -
- drivers/iommu/io-pgfault.c                    | 163 ++++++++++++------
- drivers/iommu/iommu-sva.c                     |  79 ++++++++-
- drivers/iommu/iommu.c                         | 132 --------------
- drivers/iommu/Kconfig                         |   4 +
- drivers/iommu/Makefile                        |   3 +-
- drivers/iommu/intel/Kconfig                   |   1 +
- 12 files changed, 255 insertions(+), 290 deletions(-)
- delete mode 100644 drivers/iommu/iommu-sva.h
+That would be the same chain of events (minus the warning) that would occur if a driver actually called kvm_s390_gisc_unregister() the correct number of times.  Of course you could also just collapse step #2 -- doing that gets us _very_ close to this patch; you could just set gi->alert.mask directly to 0x00 like you do here but then you would also need a gisa_set_iam call to tell millicode to stop sending alerts for all of the giscs you just removed from the alert.mask.  In either approach, the -EBUSY return from gisa_set_iam would be an issue that needs to be handled.
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 687dfde2c874..a1ca70d298ee 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -615,10 +615,6 @@ extern struct iommu_group *iommu_group_get(struct device *dev);
- extern struct iommu_group *iommu_group_ref_get(struct iommu_group *group);
- extern void iommu_group_put(struct iommu_group *group);
- 
--extern int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
--extern int iommu_page_response(struct device *dev,
--			       struct iommu_page_response *msg);
--
- extern int iommu_group_id(struct iommu_group *group);
- extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
- 
-@@ -808,8 +804,6 @@ bool iommu_group_dma_owner_claimed(struct iommu_group *group);
- int iommu_device_claim_dma_owner(struct device *dev, void *owner);
- void iommu_device_release_dma_owner(struct device *dev);
- 
--struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
--					    struct mm_struct *mm);
- int iommu_attach_device_pasid(struct iommu_domain *domain,
- 			      struct device *dev, ioasid_t pasid);
- void iommu_detach_device_pasid(struct iommu_domain *domain,
-@@ -996,18 +990,6 @@ static inline void iommu_group_put(struct iommu_group *group)
- {
- }
- 
--static inline
--int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
--{
--	return -ENODEV;
--}
--
--static inline int iommu_page_response(struct device *dev,
--				      struct iommu_page_response *msg)
--{
--	return -ENODEV;
--}
--
- static inline int iommu_group_id(struct iommu_group *group)
- {
- 	return -ENODEV;
-@@ -1144,12 +1126,6 @@ static inline int iommu_device_claim_dma_owner(struct device *dev, void *owner)
- 	return -ENODEV;
- }
- 
--static inline struct iommu_domain *
--iommu_sva_domain_alloc(struct device *dev, struct mm_struct *mm)
--{
--	return NULL;
--}
--
- static inline int iommu_attach_device_pasid(struct iommu_domain *domain,
- 					    struct device *dev, ioasid_t pasid)
- {
-@@ -1271,6 +1247,8 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
- 					struct mm_struct *mm);
- void iommu_sva_unbind_device(struct iommu_sva *handle);
- u32 iommu_sva_get_pasid(struct iommu_sva *handle);
-+struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
-+					    struct mm_struct *mm);
- #else
- static inline struct iommu_sva *
- iommu_sva_bind_device(struct device *dev, struct mm_struct *mm)
-@@ -1289,6 +1267,70 @@ static inline u32 iommu_sva_get_pasid(struct iommu_sva *handle)
- static inline void mm_pasid_init(struct mm_struct *mm) {}
- static inline bool mm_valid_pasid(struct mm_struct *mm) { return false; }
- static inline void mm_pasid_drop(struct mm_struct *mm) {}
-+
-+static inline struct iommu_domain *
-+iommu_sva_domain_alloc(struct device *dev, struct mm_struct *mm)
-+{
-+	return NULL;
-+}
- #endif /* CONFIG_IOMMU_SVA */
- 
-+#ifdef CONFIG_IOMMU_IOPF
-+int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev);
-+int iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev);
-+int iopf_queue_flush_dev(struct device *dev);
-+struct iopf_queue *iopf_queue_alloc(const char *name);
-+void iopf_queue_free(struct iopf_queue *queue);
-+int iopf_queue_discard_partial(struct iopf_queue *queue);
-+void iopf_free_group(struct iopf_group *group);
-+int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt);
-+int iommu_page_response(struct device *dev, struct iommu_page_response *msg);
-+#else
-+static inline int
-+iopf_queue_add_device(struct iopf_queue *queue, struct device *dev)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int
-+iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int iopf_queue_flush_dev(struct device *dev)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline struct iopf_queue *iopf_queue_alloc(const char *name)
-+{
-+	return NULL;
-+}
-+
-+static inline void iopf_queue_free(struct iopf_queue *queue)
-+{
-+}
-+
-+static inline int iopf_queue_discard_partial(struct iopf_queue *queue)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline void iopf_free_group(struct iopf_group *group)
-+{
-+}
-+
-+static inline int
-+iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int
-+iommu_page_response(struct device *dev, struct iommu_page_response *msg)
-+{
-+	return -ENODEV;
-+}
-+#endif /* CONFIG_IOMMU_IOPF */
- #endif /* __LINUX_IOMMU_H */
-diff --git a/drivers/iommu/iommu-sva.h b/drivers/iommu/iommu-sva.h
-deleted file mode 100644
-index 27c8da115b41..000000000000
---- a/drivers/iommu/iommu-sva.h
-+++ /dev/null
-@@ -1,69 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--/*
-- * SVA library for IOMMU drivers
-- */
--#ifndef _IOMMU_SVA_H
--#define _IOMMU_SVA_H
--
--#include <linux/mm_types.h>
--
--/* I/O Page fault */
--struct device;
--struct iommu_fault;
--struct iopf_queue;
--
--#ifdef CONFIG_IOMMU_SVA
--int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev);
--
--int iopf_queue_add_device(struct iopf_queue *queue, struct device *dev);
--int iopf_queue_remove_device(struct iopf_queue *queue,
--			     struct device *dev);
--int iopf_queue_flush_dev(struct device *dev);
--struct iopf_queue *iopf_queue_alloc(const char *name);
--void iopf_queue_free(struct iopf_queue *queue);
--int iopf_queue_discard_partial(struct iopf_queue *queue);
--int iommu_sva_handle_iopf(struct iopf_group *group);
--
--#else /* CONFIG_IOMMU_SVA */
--static inline int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
--{
--	return -ENODEV;
--}
--
--static inline int iopf_queue_add_device(struct iopf_queue *queue,
--					struct device *dev)
--{
--	return -ENODEV;
--}
--
--static inline int iopf_queue_remove_device(struct iopf_queue *queue,
--					   struct device *dev)
--{
--	return -ENODEV;
--}
--
--static inline int iopf_queue_flush_dev(struct device *dev)
--{
--	return -ENODEV;
--}
--
--static inline struct iopf_queue *iopf_queue_alloc(const char *name)
--{
--	return NULL;
--}
--
--static inline void iopf_queue_free(struct iopf_queue *queue)
--{
--}
--
--static inline int iopf_queue_discard_partial(struct iopf_queue *queue)
--{
--	return -ENODEV;
--}
--
--static inline int iommu_sva_handle_iopf(struct iopf_group *group)
--{
--	return IOMMU_PAGE_RESP_INVALID;
--}
--#endif /* CONFIG_IOMMU_SVA */
--#endif /* _IOMMU_SVA_H */
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-index 7748ee30f8c0..fad7de25d28a 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-@@ -10,7 +10,6 @@
- #include <linux/slab.h>
- 
- #include "arm-smmu-v3.h"
--#include "../../iommu-sva.h"
- #include "../../io-pgtable-arm.h"
- 
- struct arm_smmu_mmu_notifier {
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index e537b6c046c5..d0d349bfdba3 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -29,7 +29,6 @@
- 
- #include "arm-smmu-v3.h"
- #include "../../dma-iommu.h"
--#include "../../iommu-sva.h"
- 
- static bool disable_bypass = true;
- module_param(disable_bypass, bool, 0444);
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 35839ef69089..bddc060aa615 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -26,7 +26,6 @@
- #include "iommu.h"
- #include "../dma-iommu.h"
- #include "../irq_remapping.h"
--#include "../iommu-sva.h"
- #include "pasid.h"
- #include "cap_audit.h"
- #include "perfmon.h"
-diff --git a/drivers/iommu/intel/svm.c b/drivers/iommu/intel/svm.c
-index 9e8d4d75d293..3bfdcba841e7 100644
---- a/drivers/iommu/intel/svm.c
-+++ b/drivers/iommu/intel/svm.c
-@@ -22,7 +22,6 @@
- #include "iommu.h"
- #include "pasid.h"
- #include "perf.h"
--#include "../iommu-sva.h"
- #include "trace.h"
- 
- static irqreturn_t prq_event_thread(int irq, void *d);
-diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-index 06330d922925..f307e592547e 100644
---- a/drivers/iommu/io-pgfault.c
-+++ b/drivers/iommu/io-pgfault.c
-@@ -11,12 +11,7 @@
- #include <linux/slab.h>
- #include <linux/workqueue.h>
- 
--#include "iommu-sva.h"
--
--enum iommu_page_response_code
--iommu_sva_handle_mm(struct iommu_fault *fault, struct mm_struct *mm);
--
--static void iopf_free_group(struct iopf_group *group)
-+void iopf_free_group(struct iopf_group *group)
- {
- 	struct iopf_fault *iopf, *next;
- 
-@@ -27,47 +22,10 @@ static void iopf_free_group(struct iopf_group *group)
- 
- 	kfree(group);
- }
--
--static int iopf_complete_group(struct device *dev, struct iopf_fault *iopf,
--			       enum iommu_page_response_code status)
--{
--	struct iommu_page_response resp = {
--		.pasid			= iopf->fault.prm.pasid,
--		.grpid			= iopf->fault.prm.grpid,
--		.code			= status,
--	};
--
--	if ((iopf->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID) &&
--	    (iopf->fault.prm.flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID))
--		resp.flags = IOMMU_PAGE_RESP_PASID_VALID;
--
--	return iommu_page_response(dev, &resp);
--}
--
--static void iopf_handler(struct work_struct *work)
--{
--	struct iopf_fault *iopf;
--	struct iopf_group *group;
--	enum iommu_page_response_code status = IOMMU_PAGE_RESP_SUCCESS;
--
--	group = container_of(work, struct iopf_group, work);
--	list_for_each_entry(iopf, &group->faults, list) {
--		/*
--		 * For the moment, errors are sticky: don't handle subsequent
--		 * faults in the group if there is an error.
--		 */
--		if (status != IOMMU_PAGE_RESP_SUCCESS)
--			break;
--
--		status = iommu_sva_handle_mm(&iopf->fault, group->domain->mm);
--	}
--
--	iopf_complete_group(group->dev, &group->last_fault, status);
--	iopf_free_group(group);
--}
-+EXPORT_SYMBOL_GPL(iopf_free_group);
- 
- /**
-- * iommu_queue_iopf - IO Page Fault handler
-+ * iommu_handle_iopf - IO Page Fault handler
-  * @fault: fault event
-  * @dev: struct device.
-  *
-@@ -106,7 +64,7 @@ static void iopf_handler(struct work_struct *work)
-  *
-  * Return: 0 on success and <0 on error.
-  */
--int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
-+static int iommu_handle_iopf(struct iommu_fault *fault, struct device *dev)
- {
- 	int ret;
- 	struct iopf_group *group;
-@@ -193,18 +151,117 @@ int iommu_queue_iopf(struct iommu_fault *fault, struct device *dev)
- 	}
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(iommu_queue_iopf);
- 
--int iommu_sva_handle_iopf(struct iopf_group *group)
-+/**
-+ * iommu_report_device_fault() - Report fault event to device driver
-+ * @dev: the device
-+ * @evt: fault event data
-+ *
-+ * Called by IOMMU drivers when a fault is detected, typically in a threaded IRQ
-+ * handler. When this function fails and the fault is recoverable, it is the
-+ * caller's responsibility to complete the fault.
-+ *
-+ * Return 0 on success, or an error.
-+ */
-+int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
- {
--	struct iommu_fault_param *fault_param = group->dev->iommu->fault_param;
-+	struct dev_iommu *param = dev->iommu;
-+	struct iopf_fault *evt_pending = NULL;
-+	struct iommu_fault_param *fparam;
-+	int ret = 0;
- 
--	INIT_WORK(&group->work, iopf_handler);
--	if (!queue_work(fault_param->queue->wq, &group->work))
--		return -EBUSY;
-+	if (!param || !evt)
-+		return -EINVAL;
- 
--	return 0;
-+	/* we only report device fault if there is a handler registered */
-+	mutex_lock(&param->lock);
-+	fparam = param->fault_param;
-+
-+	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
-+	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
-+		evt_pending = kmemdup(evt, sizeof(struct iopf_fault),
-+				      GFP_KERNEL);
-+		if (!evt_pending) {
-+			ret = -ENOMEM;
-+			goto done_unlock;
-+		}
-+		mutex_lock(&fparam->lock);
-+		list_add_tail(&evt_pending->list, &fparam->faults);
-+		mutex_unlock(&fparam->lock);
-+	}
-+
-+	ret = iommu_handle_iopf(&evt->fault, dev);
-+	if (ret && evt_pending) {
-+		mutex_lock(&fparam->lock);
-+		list_del(&evt_pending->list);
-+		mutex_unlock(&fparam->lock);
-+		kfree(evt_pending);
-+	}
-+done_unlock:
-+	mutex_unlock(&param->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_report_device_fault);
-+
-+int iommu_page_response(struct device *dev,
-+			struct iommu_page_response *msg)
-+{
-+	bool needs_pasid;
-+	int ret = -EINVAL;
-+	struct iopf_fault *evt;
-+	struct iommu_fault_page_request *prm;
-+	struct dev_iommu *param = dev->iommu;
-+	const struct iommu_ops *ops = dev_iommu_ops(dev);
-+	bool has_pasid = msg->flags & IOMMU_PAGE_RESP_PASID_VALID;
-+
-+	if (!ops->page_response)
-+		return -ENODEV;
-+
-+	if (!param || !param->fault_param)
-+		return -EINVAL;
-+
-+	/* Only send response if there is a fault report pending */
-+	mutex_lock(&param->fault_param->lock);
-+	if (list_empty(&param->fault_param->faults)) {
-+		dev_warn_ratelimited(dev, "no pending PRQ, drop response\n");
-+		goto done_unlock;
-+	}
-+	/*
-+	 * Check if we have a matching page request pending to respond,
-+	 * otherwise return -EINVAL
-+	 */
-+	list_for_each_entry(evt, &param->fault_param->faults, list) {
-+		prm = &evt->fault.prm;
-+		if (prm->grpid != msg->grpid)
-+			continue;
-+
-+		/*
-+		 * If the PASID is required, the corresponding request is
-+		 * matched using the group ID, the PASID valid bit and the PASID
-+		 * value. Otherwise only the group ID matches request and
-+		 * response.
-+		 */
-+		needs_pasid = prm->flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID;
-+		if (needs_pasid && (!has_pasid || msg->pasid != prm->pasid))
-+			continue;
-+
-+		if (!needs_pasid && has_pasid) {
-+			/* No big deal, just clear it. */
-+			msg->flags &= ~IOMMU_PAGE_RESP_PASID_VALID;
-+			msg->pasid = 0;
-+		}
-+
-+		ret = ops->page_response(dev, evt, msg);
-+		list_del(&evt->list);
-+		kfree(evt);
-+		break;
-+	}
-+
-+done_unlock:
-+	mutex_unlock(&param->fault_param->lock);
-+	return ret;
- }
-+EXPORT_SYMBOL_GPL(iommu_page_response);
- 
- /**
-  * iopf_queue_flush_dev - Ensure that all queued faults have been processed
-diff --git a/drivers/iommu/iommu-sva.c b/drivers/iommu/iommu-sva.c
-index ba0d5b7e106a..277a25472658 100644
---- a/drivers/iommu/iommu-sva.c
-+++ b/drivers/iommu/iommu-sva.c
-@@ -7,8 +7,6 @@
- #include <linux/sched/mm.h>
- #include <linux/iommu.h>
- 
--#include "iommu-sva.h"
--
- static DEFINE_MUTEX(iommu_sva_lock);
- 
- /* Allocate a PASID for the mm within range (inclusive) */
-@@ -145,10 +143,18 @@ u32 iommu_sva_get_pasid(struct iommu_sva *handle)
- }
- EXPORT_SYMBOL_GPL(iommu_sva_get_pasid);
- 
-+void mm_pasid_drop(struct mm_struct *mm)
-+{
-+	if (likely(!mm_valid_pasid(mm)))
-+		return;
-+
-+	iommu_free_global_pasid(mm->pasid);
-+}
-+
- /*
-  * I/O page fault handler for SVA
-  */
--enum iommu_page_response_code
-+static enum iommu_page_response_code
- iommu_sva_handle_mm(struct iommu_fault *fault, struct mm_struct *mm)
- {
- 	vm_fault_t ret;
-@@ -202,10 +208,69 @@ iommu_sva_handle_mm(struct iommu_fault *fault, struct mm_struct *mm)
- 	return status;
- }
- 
--void mm_pasid_drop(struct mm_struct *mm)
-+static int iommu_sva_complete_group(struct device *dev, struct iopf_fault *iopf,
-+				    enum iommu_page_response_code status)
- {
--	if (likely(!mm_valid_pasid(mm)))
--		return;
-+	struct iommu_page_response resp = {
-+		.pasid			= iopf->fault.prm.pasid,
-+		.grpid			= iopf->fault.prm.grpid,
-+		.code			= status,
-+	};
- 
--	iommu_free_global_pasid(mm->pasid);
-+	if ((iopf->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_PASID_VALID) &&
-+	    (iopf->fault.prm.flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID))
-+		resp.flags = IOMMU_PAGE_RESP_PASID_VALID;
-+
-+	return iommu_page_response(dev, &resp);
-+}
-+
-+static void iommu_sva_handle_iopf(struct work_struct *work)
-+{
-+	struct iopf_fault *iopf;
-+	struct iopf_group *group;
-+	enum iommu_page_response_code status = IOMMU_PAGE_RESP_SUCCESS;
-+
-+	group = container_of(work, struct iopf_group, work);
-+	list_for_each_entry(iopf, &group->faults, list) {
-+		/*
-+		 * For the moment, errors are sticky: don't handle subsequent
-+		 * faults in the group if there is an error.
-+		 */
-+		if (status != IOMMU_PAGE_RESP_SUCCESS)
-+			break;
-+
-+		status = iommu_sva_handle_mm(&iopf->fault, group->domain->mm);
-+	}
-+
-+	iommu_sva_complete_group(group->dev, &group->last_fault, status);
-+	iopf_free_group(group);
-+}
-+
-+static int iommu_sva_iopf_handler(struct iopf_group *group)
-+{
-+	struct iommu_fault_param *fault_param = group->dev->iommu->fault_param;
-+
-+	INIT_WORK(&group->work, iommu_sva_handle_iopf);
-+	if (!queue_work(fault_param->queue->wq, &group->work))
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
-+struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
-+					    struct mm_struct *mm)
-+{
-+	const struct iommu_ops *ops = dev_iommu_ops(dev);
-+	struct iommu_domain *domain;
-+
-+	domain = ops->domain_alloc(IOMMU_DOMAIN_SVA);
-+	if (!domain)
-+		return NULL;
-+
-+	domain->type = IOMMU_DOMAIN_SVA;
-+	mmgrab(mm);
-+	domain->mm = mm;
-+	domain->iopf_handler = iommu_sva_iopf_handler;
-+
-+	return domain;
- }
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 0704a0f36349..34ac7768d8e3 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -35,8 +35,6 @@
- 
- #include "dma-iommu.h"
- 
--#include "iommu-sva.h"
--
- static struct kset *iommu_group_kset;
- static DEFINE_IDA(iommu_group_ida);
- static DEFINE_IDA(iommu_global_pasid_ida);
-@@ -1250,117 +1248,6 @@ void iommu_group_put(struct iommu_group *group)
- }
- EXPORT_SYMBOL_GPL(iommu_group_put);
- 
--/**
-- * iommu_report_device_fault() - Report fault event to device driver
-- * @dev: the device
-- * @evt: fault event data
-- *
-- * Called by IOMMU drivers when a fault is detected, typically in a threaded IRQ
-- * handler. When this function fails and the fault is recoverable, it is the
-- * caller's responsibility to complete the fault.
-- *
-- * Return 0 on success, or an error.
-- */
--int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
--{
--	struct dev_iommu *param = dev->iommu;
--	struct iopf_fault *evt_pending = NULL;
--	struct iommu_fault_param *fparam;
--	int ret = 0;
--
--	if (!param || !evt)
--		return -EINVAL;
--
--	/* we only report device fault if there is a handler registered */
--	mutex_lock(&param->lock);
--	fparam = param->fault_param;
--
--	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
--	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
--		evt_pending = kmemdup(evt, sizeof(struct iopf_fault),
--				      GFP_KERNEL);
--		if (!evt_pending) {
--			ret = -ENOMEM;
--			goto done_unlock;
--		}
--		mutex_lock(&fparam->lock);
--		list_add_tail(&evt_pending->list, &fparam->faults);
--		mutex_unlock(&fparam->lock);
--	}
--
--	ret = iommu_queue_iopf(&evt->fault, dev);
--	if (ret && evt_pending) {
--		mutex_lock(&fparam->lock);
--		list_del(&evt_pending->list);
--		mutex_unlock(&fparam->lock);
--		kfree(evt_pending);
--	}
--done_unlock:
--	mutex_unlock(&param->lock);
--	return ret;
--}
--EXPORT_SYMBOL_GPL(iommu_report_device_fault);
--
--int iommu_page_response(struct device *dev,
--			struct iommu_page_response *msg)
--{
--	bool needs_pasid;
--	int ret = -EINVAL;
--	struct iopf_fault *evt;
--	struct iommu_fault_page_request *prm;
--	struct dev_iommu *param = dev->iommu;
--	const struct iommu_ops *ops = dev_iommu_ops(dev);
--	bool has_pasid = msg->flags & IOMMU_PAGE_RESP_PASID_VALID;
--
--	if (!ops->page_response)
--		return -ENODEV;
--
--	if (!param || !param->fault_param)
--		return -EINVAL;
--
--	/* Only send response if there is a fault report pending */
--	mutex_lock(&param->fault_param->lock);
--	if (list_empty(&param->fault_param->faults)) {
--		dev_warn_ratelimited(dev, "no pending PRQ, drop response\n");
--		goto done_unlock;
--	}
--	/*
--	 * Check if we have a matching page request pending to respond,
--	 * otherwise return -EINVAL
--	 */
--	list_for_each_entry(evt, &param->fault_param->faults, list) {
--		prm = &evt->fault.prm;
--		if (prm->grpid != msg->grpid)
--			continue;
--
--		/*
--		 * If the PASID is required, the corresponding request is
--		 * matched using the group ID, the PASID valid bit and the PASID
--		 * value. Otherwise only the group ID matches request and
--		 * response.
--		 */
--		needs_pasid = prm->flags & IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID;
--		if (needs_pasid && (!has_pasid || msg->pasid != prm->pasid))
--			continue;
--
--		if (!needs_pasid && has_pasid) {
--			/* No big deal, just clear it. */
--			msg->flags &= ~IOMMU_PAGE_RESP_PASID_VALID;
--			msg->pasid = 0;
--		}
--
--		ret = ops->page_response(dev, evt, msg);
--		list_del(&evt->list);
--		kfree(evt);
--		break;
--	}
--
--done_unlock:
--	mutex_unlock(&param->fault_param->lock);
--	return ret;
--}
--EXPORT_SYMBOL_GPL(iommu_page_response);
--
- /**
-  * iommu_group_id - Return ID for a group
-  * @group: the group to ID
-@@ -3337,25 +3224,6 @@ struct iommu_domain *iommu_get_domain_for_dev_pasid(struct device *dev,
- }
- EXPORT_SYMBOL_GPL(iommu_get_domain_for_dev_pasid);
- 
--struct iommu_domain *iommu_sva_domain_alloc(struct device *dev,
--					    struct mm_struct *mm)
--{
--	const struct iommu_ops *ops = dev_iommu_ops(dev);
--	struct iommu_domain *domain;
--
--	domain = ops->domain_alloc(IOMMU_DOMAIN_SVA);
--	if (!domain)
--		return NULL;
--
--	domain->type = IOMMU_DOMAIN_SVA;
--	mmgrab(mm);
--	domain->mm = mm;
--	domain->iopf_handler = iommu_sva_handle_iopf;
--	domain->fault_data = mm;
--
--	return domain;
--}
--
- ioasid_t iommu_alloc_global_pasid(struct device *dev)
- {
- 	int ret;
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index 2b12b583ef4b..e7b87ec525a7 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -158,6 +158,9 @@ config IOMMU_DMA
- config IOMMU_SVA
- 	bool
- 
-+config IOMMU_IOPF
-+	bool
-+
- config FSL_PAMU
- 	bool "Freescale IOMMU support"
- 	depends on PCI
-@@ -404,6 +407,7 @@ config ARM_SMMU_V3_SVA
- 	bool "Shared Virtual Addressing support for the ARM SMMUv3"
- 	depends on ARM_SMMU_V3
- 	select IOMMU_SVA
-+	select IOMMU_IOPF
- 	select MMU_NOTIFIER
- 	help
- 	  Support for sharing process address spaces with devices using the
-diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
-index 769e43d780ce..6d114fe7ae89 100644
---- a/drivers/iommu/Makefile
-+++ b/drivers/iommu/Makefile
-@@ -27,6 +27,7 @@ obj-$(CONFIG_FSL_PAMU) += fsl_pamu.o fsl_pamu_domain.o
- obj-$(CONFIG_S390_IOMMU) += s390-iommu.o
- obj-$(CONFIG_HYPERV_IOMMU) += hyperv-iommu.o
- obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
--obj-$(CONFIG_IOMMU_SVA) += iommu-sva.o io-pgfault.o
-+obj-$(CONFIG_IOMMU_SVA) += iommu-sva.o
-+obj-$(CONFIG_IOMMU_IOPF) += io-pgfault.o
- obj-$(CONFIG_SPRD_IOMMU) += sprd-iommu.o
- obj-$(CONFIG_APPLE_DART) += apple-dart.o
-diff --git a/drivers/iommu/intel/Kconfig b/drivers/iommu/intel/Kconfig
-index 2e56bd79f589..613f149510a7 100644
---- a/drivers/iommu/intel/Kconfig
-+++ b/drivers/iommu/intel/Kconfig
-@@ -50,6 +50,7 @@ config INTEL_IOMMU_SVM
- 	depends on X86_64
- 	select MMU_NOTIFIER
- 	select IOMMU_SVA
-+	select IOMMU_IOPF
- 	help
- 	  Shared Virtual Memory (SVM) provides a facility for devices
- 	  to access DMA resources through process address space by
--- 
-2.34.1
+Overall I guess until the IAM visible to millicode is set to 0x00 I'm not sure I understand what would prevent millicode from delivering another alert to any gisc still enabled in the IAM.  You say above it will be cmpxchg()'d during process_gib_alert_list() via gisa_get_ipm_or_restore_iam() but if we first check gisa_in_alert_list(gi->origin) with this new patch and the gisa is not yet in the alert list then we would skip the call to process_gib_alert_list() and instead just cancel the timer -- I could very well be misunderstanding something, but my concern is that you are shrinking but not eliminating the window here.  Let me try an example -- With this patch, isn't the following chain of events still possible:
 
+1) enter kvm_s390_gisa_destroy.  Let's say gi->alert.mask = 0x80.
+2) set gi->alert.mask = 0x00
+3) check if(gisa_in_alert_list(gi->origin)) -- it returns false
+4) Since the IAM still had a bit on at this point, millicode now delivers an alert for the gisc associated with bit 0x80 and sets IAM to 0x00 to indicate the gisa in the alert list
+5) call hrtimer_cancel (since we already checked gisa_in_alert_list, we don't notice that last alert delivered)
+6) set gi->origin = NULL, return from kvm_s390_gisa_destroy
+
+Assuming that series of events is possible, wouldn't a solution be to replace step #3 above with something along the lines of this (untested diff on top of this patch):
+
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 06890a58d001..ab99c9ec1282 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -3220,6 +3220,10 @@ void kvm_s390_gisa_destroy(struct kvm *kvm)
+                KVM_EVENT(3, "vm 0x%pK has unexpected restore iam 0x%02x",
+                          kvm, gi->alert.mask);
+                gi->alert.mask = 0x00;
++               while (gisa_set_iam(gi->origin, gi->alert.mask)) {
++                       KVM_EVENT(3, "vm 0x%pK alert while clearing iam", kvm);
++                       process_gib_alert_list();
++               }
+        }
+        if (gisa_in_alert_list(gi->origin)) {
+                KVM_EVENT(3, "vm 0x%pK gisa in alert list during destroy", kvm);
+
+> 
+> in order to ensure an alert can't still be delivered some time after you check gisa_in_alert_list(gi->origin)?  That matches up with what is done per-gisc in kvm_s390_gisc_unregister() today.
+> 
+> right
+> 
+>>
+>> ...  That said, now that I'm looking closer at kvm_s390_gisc_unregister() and gisa_set_iam():  it seems strange that nobody checks the return code from gisa_set_iam today.  AFAICT, even if the device driver(s) call kvm_s390_gisc_unregister correctly for all associated gisc, if gisa_set_iam manages to return -EBUSY because the gisa is already in the alert list then wouldn't the gisc refcounts be decremented but the relevant alert bit left enabled for that gisc until the next time we call gisa_set_iam or gisa_get_ipm_or_restore_iam?
+> 
+> you are right, that should retried in kvm_s390_gisc_register() and kvm_s390_gisc_unregister() until the rc is 0 but that would lead to a CPU stall as well under the condition where GAL interrupts are not delivered in the host.
+> 
+>>
+>> Similar strangeness for kvm_s390_gisc_register() - AFAICT if gisa_set_iam returns -EBUSY then we would increment the gisc refcounts but never actually enable the alert bit for that gisc until the next time we call gisa_set_iam or gisa_get_ipm_or_restore_iam.
+> 
+> I have to think and play around with process_gib_alert_list() being called as well in these situations.
+> 
+> BTW the pci and the vfip_ap device drivers currently also ignore the return codes of kvm_s390_gisc_unregister().
+> 
+
+Hmm, good point.  You're right, we should probably do something there.  I think the 3 reasons kvm_s390_gisc_unregister() could give a nonzero RC today would all be strange, likely implementation bugs...
+
+-ENODEV we also would have never been able to register, or something odd happened to gisa after registration
+-ERANGE we also would have never been able to register, or the gisc got clobbered sometime after registration
+-EINVAL either we never registered, unregistered too many times or gisa was destroyed on us somehow
+
+I think for these cases the best pci/ap can do would be to WARN_ON(_ONCE) and then proceed just assuming that the gisc was unregistered or never properly registered.
+
+Thanks,
+Matt
