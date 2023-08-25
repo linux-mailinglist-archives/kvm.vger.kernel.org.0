@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C87D7883F0
+	by mail.lfdr.de (Postfix) with ESMTP id 6595D7883F1
 	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 11:38:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbjHYJhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Aug 2023 05:37:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56204 "EHLO
+        id S244332AbjHYJhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Aug 2023 05:37:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244407AbjHYJhO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Aug 2023 05:37:14 -0400
+        with ESMTP id S244463AbjHYJh3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Aug 2023 05:37:29 -0400
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805361FFF
-        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 02:37:09 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RXFFb4GbFz6D8WF;
-        Fri, 25 Aug 2023 17:36:19 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5501E1FD5
+        for <kvm@vger.kernel.org>; Fri, 25 Aug 2023 02:37:18 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RXFFm2sJ8z67n5j;
+        Fri, 25 Aug 2023 17:36:28 +0800 (CST)
 Received: from A2006125610.china.huawei.com (10.202.227.178) by
  lhrpeml500005.china.huawei.com (7.191.163.240) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 25 Aug 2023 10:37:01 +0100
+ 15.1.2507.31; Fri, 25 Aug 2023 10:37:09 +0100
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>, <maz@kernel.org>,
@@ -29,9 +29,9 @@ To:     <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
 CC:     <james.morse@arm.com>, <suzuki.poulose@arm.com>,
         <yuzenghui@huawei.com>, <zhukeqian1@huawei.com>,
         <jonathan.cameron@huawei.com>, <linuxarm@huawei.com>
-Subject: [RFC PATCH v2 6/8] KVM: arm64: Only write protect selected PTE
-Date:   Fri, 25 Aug 2023 10:35:26 +0100
-Message-ID: <20230825093528.1637-7-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC PATCH v2 7/8] KVM: arm64: Add KVM_CAP_ARM_HW_DBM
+Date:   Fri, 25 Aug 2023 10:35:27 +0100
+Message-ID: <20230825093528.1637-8-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
 References: <20230825093528.1637-1-shameerali.kolothum.thodi@huawei.com>
@@ -50,45 +50,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Keqian Zhu <zhukeqian1@huawei.com>
+Add a capability for userspace to enable hardware DBM support
+for live migration.
 
-This function write protects all PTEs between the ffs and fls of mask.
-There may be unset bits between this range. It works well under pure
-software dirty log, as software dirty log is not working during this
-process.
+ToDo: Update documentation.
 
-But it will unexpectly clear dirty status of PTE when hardware dirty
-log is enabled. So change it to only write protect selected PTE.
-
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- arch/arm64/kvm/mmu.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/arm.c              | 13 +++++++++++++
+ include/uapi/linux/kvm.h          |  1 +
+ 3 files changed, 16 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index f5ae4b97df4d..34251932560e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1132,10 +1132,17 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
- 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
- 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
-+	int rs, re;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f623b989ddd1..17ac53150a1d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -175,6 +175,8 @@ struct kvm_s2_mmu {
+ 	struct kvm_mmu_memory_cache split_page_cache;
+ 	uint64_t split_page_chunk_size;
  
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 
--	stage2_wp_range(&kvm->arch.mmu, start, end);
-+	for_each_set_bitrange(rs, re, &mask, BITS_PER_LONG) {
-+		phys_addr_t addr_s, addr_e;
++	bool hwdbm_enabled;  /* KVM_CAP_ARM_HW_DBM enabled */
 +
-+		addr_s = (base_gfn + rs) << PAGE_SHIFT;
-+		addr_e = (base_gfn + re) << PAGE_SHIFT;
-+		stage2_wp_range(&kvm->arch.mmu, addr_s, addr_e);
-+	}
+ 	struct kvm_arch *arch;
+ };
  
- 	/*
- 	 * Eager-splitting is done when manual-protect is set.  We
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fd2af63d788d..0dbf2cda40d7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -115,6 +115,16 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->slots_lock);
+ 		break;
++	case KVM_CAP_ARM_HW_DBM:
++		mutex_lock(&kvm->slots_lock);
++		if (!system_supports_hw_dbm()) {
++			r = -EINVAL;
++		} else {
++			r = 0;
++			kvm->arch.mmu.hwdbm_enabled = true;
++		}
++		mutex_unlock(&kvm->slots_lock);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -316,6 +326,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES:
+ 		r = kvm_supported_block_sizes();
+ 		break;
++	case KVM_CAP_ARM_HW_DBM:
++		r = system_supports_hw_dbm();
++		break;
+ 	default:
+ 		r = 0;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index f089ab290978..99bd5c0420ba 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1192,6 +1192,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_COUNTER_OFFSET 227
+ #define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 228
+ #define KVM_CAP_ARM_SUPPORTED_BLOCK_SIZES 229
++#define KVM_CAP_ARM_HW_DBM 230
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.34.1
 
