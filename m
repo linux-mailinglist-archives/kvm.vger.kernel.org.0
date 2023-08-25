@@ -2,193 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BC7D787C7A
-	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 02:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A057D787C7C
+	for <lists+kvm@lfdr.de>; Fri, 25 Aug 2023 02:18:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbjHYARF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Aug 2023 20:17:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
+        id S234738AbjHYARg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Aug 2023 20:17:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232438AbjHYAQi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Aug 2023 20:16:38 -0400
-Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE4B61BC8
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 17:16:36 -0700 (PDT)
-Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-48cfdfa7893so223356e0c.0
-        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 17:16:36 -0700 (PDT)
+        with ESMTP id S232906AbjHYARg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Aug 2023 20:17:36 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 232581BC8
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 17:17:34 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-56fb25fdf06so266890a12.1
+        for <kvm@vger.kernel.org>; Thu, 24 Aug 2023 17:17:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692922596; x=1693527396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7t4jBs6ANdVOZ+fXA/YvUk9XjJk29rUWw8CEUgNsyuc=;
-        b=C4Gh3k2Q2eM8M36CRLT7ye5PV63jFfM0Qod71NeCl+gHiPrnCkOhYxA0FaRRaBUDeL
-         6pf5Q5GNd+KqY/dhT8pZ5ho3XFuGPAdZoluyt8pdJdCfEE1uurvT4umPi7diZMKjBaza
-         1WO15Y7JhKnBO+tTDEiZgWBqB9FBqVwtzaEqfPXib2ZI3WvEwfCzSC7pepD0k0XuxblC
-         fCI3CDCpY6qDT0QJPQt3TX02LDCP95DpgmVYs5zPKtKMssJfCXSLbS9WZl03YdykaiYB
-         /yCBVj9CxWrZEjjjTkqE/FavGt9vjS/FpOX3NYMaLZ9JzQuQjXAymv8LAgqeSAVsIWlr
-         UTeA==
+        d=google.com; s=20221208; t=1692922653; x=1693527453;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=G/sNhMJCqfRueV6LYWBkXLIpdFbSW87yBwkTP+RNfbM=;
+        b=2ler23i86DL5CCFxUVj+/Kupip2CmkfnnkryiVtKq7OcvMMVSrjXSFKEDoAvcS8tgN
+         MwJs+1pkjdD/NRexWKxFsvszAlug3qtzNlNgR3uwy+HM0Q07lLDdYNC7rJ+kUIaXKHyN
+         ZrQWUjSIdaTWFP52B1Y9V/cITLwoKhF7Dl+zm4Pa1i1Xl/mV/T7eCtFzETFl9KYd/jjq
+         lxoB1NM/3ytO+IbUZerGNmZiBG5ZoPNqK05W6QBImjGeAfOG3Iakwv9T5hRboMGy0K8M
+         8IjX1MfDfcP07scvScJKOmK/XhD4mUSGO9ARrSyyps4iDfohCvdRG4Hx5+9LpGQgIrjs
+         2ROA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692922596; x=1693527396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7t4jBs6ANdVOZ+fXA/YvUk9XjJk29rUWw8CEUgNsyuc=;
-        b=fCHkPV0Ryu/RqE8m/g+w1yyXXto7EpML1SuWWFaQJ3uKRQdv7Q25e+1WRinpU3Fb+A
-         EIlHkE2vQfjO73N5vlsSiPVKr1YkvmxvIiyQVP+WMMBTNh4mE6uOR3o9nzN0jASew+xO
-         t7kMrei/DPExCfYpR1Z3h63Ev7yD8wSFvJP7GkwN2XTAyROr2fN6mpzospXaXB0NmbVg
-         Oh6Sc4Bvxp/WawkpU4D6ct8WWZR9XAoLTrJRTIewUvDqwfUM8X6CZPlMipNtFr1WYh8m
-         BepcsOK/ChGf+UxdTRBBmLOkU5u1p177SrYRwRFl+B/U3FiUbNq7U6NqLd7s86KRmy0t
-         hBkQ==
-X-Gm-Message-State: AOJu0YxaGtFhqbsnT9iIbhMuqTSJ7nk2uLgnX9c3ILKOU2wMZXK3NMDx
-        /BtgsXcqkpN5WXvxsEKvSUp3fZSAfWJjPwEV5GKuBw==
-X-Google-Smtp-Source: AGHT+IGF5ck2Ld8HKUNY/AFh8ERxd5PNB/Sn3tz9UMkNMgVe5d1AIX+7bSyVWzQ317NBF2reSTtFoVUeF2PbqJctIGI=
-X-Received: by 2002:a05:6122:552:b0:48d:149e:1a41 with SMTP id
- y18-20020a056122055200b0048d149e1a41mr18663014vko.8.1692922595910; Thu, 24
- Aug 2023 17:16:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230602161921.208564-1-amoorthy@google.com> <20230602161921.208564-10-amoorthy@google.com>
- <ZIovIBVLIM69E5Bo@google.com> <CAF7b7mqKJTCENsb+5MZT+D=DwcSva-jMANjtYszMTm-ACvkiKA@mail.gmail.com>
- <CAF7b7mrabLtnq+0Gtsg9FA+Gfr12FqbmfxwJZuQcBNDz1+3yLw@mail.gmail.com> <ZK11Sxobf53RsAmH@google.com>
-In-Reply-To: <ZK11Sxobf53RsAmH@google.com>
-From:   Anish Moorthy <amoorthy@google.com>
-Date:   Thu, 24 Aug 2023 17:15:59 -0700
-Message-ID: <CAF7b7mp1Bspeqc9n==gE5NgPwxfYLtu9G3=+OTwAcipeYRkPKg@mail.gmail.com>
-Subject: Re: [PATCH v4 09/16] KVM: Introduce KVM_CAP_NOWAIT_ON_FAULT without implementation
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     oliver.upton@linux.dev, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        robert.hoo.linux@gmail.com, jthoughton@google.com,
-        bgardon@google.com, dmatlack@google.com, ricarkol@google.com,
-        axelrasmussen@google.com, peterx@redhat.com, nadav.amit@gmail.com,
-        isaku.yamahata@gmail.com
+        d=1e100.net; s=20221208; t=1692922653; x=1693527453;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=G/sNhMJCqfRueV6LYWBkXLIpdFbSW87yBwkTP+RNfbM=;
+        b=jLRQNzBcyw4sC0OEUpsmBjaKPXm0Qr6Ln6T4dQI9ew/Ut/TSwZ2KdVDXa/nXYUkF+Y
+         ozwPEPSQGfzNleAjNrEvgfQUb1mhSOegNjpZ/RS4fnWc1Owk/D8GskQBKVT2HvXFne3u
+         mzyXBsyNAhR69YR0fHW5tGG+l9CRO74e52MXeu91eyvRa8h5q0U5UH3bYERpKbgVrWSw
+         ZrQYkQhfC8GGLHYecV4i7eHpjag0PZDblRRGfPcvqz/msS/zm9kSa882X5+EGJdwQdS1
+         CFmK24B/Dw3KyBD6Elu1whv2Ug2aA5+vYZMWLWU1Pt7Zz9VaszoaIpp3vN6aIpD6mNSN
+         En9Q==
+X-Gm-Message-State: AOJu0Yyua4SRIDkUiSJwqsnQGe2UUf8twEUbR2Z9VmEyk/QfcHRPC0AM
+        RH4UDyRSWwZUjhXFKY/gzy3UF3GUx9joiq0tZQ==
+X-Google-Smtp-Source: AGHT+IHGyIqwIvw3oEYEzQB/R/efGaZ3PRa7R8J3e7NnMUpHAfKVzTqlX74axC+CwZdalm5wSS3hbgbe3cloXyarTQ==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a63:8f50:0:b0:56c:6b2:95bc with SMTP
+ id r16-20020a638f50000000b0056c06b295bcmr2413845pgn.6.1692922653549; Thu, 24
+ Aug 2023 17:17:33 -0700 (PDT)
+Date:   Fri, 25 Aug 2023 00:17:29 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.rc1.204.g551eb34607-goog
+Message-ID: <20230825001729.1952858-1-ackerleytng@google.com>
+Subject: [PATCH v2] KVM: selftests: Add tests - invalid inputs for KVM_CREATE_GUEST_MEMFD
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, shuah@kernel.org, andrew.jones@linux.dev,
+        ricarkol@google.com, chao.p.peng@linux.intel.com, tabba@google.com,
+        jarkko@kernel.org, yu.c.zhang@linux.intel.com,
+        vannapurve@google.com, ackerleytng@google.com,
+        erdemaktas@google.com, mail@maciej.szmigiero.name, vbabka@suse.cz,
+        david@redhat.com, qperret@google.com, michael.roth@amd.com,
+        wei.w.wang@intel.com, liam.merwick@oracle.com,
+        isaku.yamahata@gmail.com, kirill.shutemov@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 8:29=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Well, that description is wrong for other reasons.  As mentioned in my re=
-ply
-> (got snipped), the behavior is not tied to sleeping or waiting on I/O.
->
-> >  Moving the nowait check out of __kvm_faultin_pfn()/user_mem_abort()
-> > and into __gfn_to_pfn_memslot() means that, obviously, other callers
-> > will start to see behavior changes. Some of that is probably actually
-> > necessary for that documentation to be accurate (since any usages of
-> > __gfn_to_pfn_memslot() under KVM_RUN should respect the memslot flag),
-> > but I think there are consumers of __gfn_to_pfn_memslot() from outside
-> > KVM_RUN.
->
-> Yeah, replace "in response to page faults" with something along the lines=
- of "if
-> an access in guest context ..."
+Test that invalid inputs for KVM_CREATE_GUEST_MEMFD, such as
+non-page-aligned page size and invalid flags, are rejected by the
+KVM_CREATE_GUEST_MEMFD with EINVAL
 
-Alright, how about
+Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+---
+ .../testing/selftests/kvm/guest_memfd_test.c  | 49 +++++++++++++++++++
+ .../selftests/kvm/include/kvm_util_base.h     | 11 ++++-
+ 2 files changed, 58 insertions(+), 2 deletions(-)
 
-+ KVM_MEM_NO_USERFAULT_ON_GUEST_ACCESS
-+ The presence of this capability indicates that userspace may pass the
-+ KVM_MEM_NO_USERFAULT_ON_GUEST_ACCESS flag to
-+ KVM_SET_USER_MEMORY_REGION. Said flag will cause KVM_RUN to fail (-EFAULT=
-)
-+ in response to guest-context memory accesses which would require KVM
-+ to page fault on the userspace mapping.
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index eb93c608a7e0..4d2b110ab0d6 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -8,6 +8,7 @@
+ #define _GNU_SOURCE
+ #include "test_util.h"
+ #include "kvm_util_base.h"
++#include <linux/bitmap.h>
+ #include <linux/falloc.h>
+ #include <sys/mman.h>
+ #include <sys/types.h>
+@@ -90,6 +91,52 @@ static void test_fallocate(int fd, size_t page_size, size_t total_size)
+ 	TEST_ASSERT(!ret, "fallocate to restore punched hole should succeed");
+ }
 
-Although, as Wang mentioned, USERFAULT seems to suggest something
-related to userfaultfd which is a liiiiitle too specific. Perhaps we
-should use USERSPACE_FAULT (*cries*) instead?
++static void test_create_guest_memfd_invalid(struct kvm_vm *vm)
++{
++	uint64_t valid_flags = 0;
++	size_t page_size = getpagesize();
++	uint64_t flag;
++	size_t size;
++	int fd;
++
++	for (size = 1; size < page_size; size++) {
++		fd = __vm_create_guest_memfd(vm, size, 0);
++		TEST_ASSERT(fd == -1 && errno == EINVAL,
++			    "guest_memfd() with non-page-aligned page size '0x%lx' should fail with EINVAL",
++			    size);
++	}
++
++	if (thp_configured()) {
++		for (size = page_size * 2; size < get_trans_hugepagesz(); size += page_size) {
++			fd = __vm_create_guest_memfd(vm, size, KVM_GUEST_MEMFD_ALLOW_HUGEPAGE);
++			TEST_ASSERT(fd == -1 && errno == EINVAL,
++				    "guest_memfd() with non-hugepage-aligned page size '0x%lx' should fail with EINVAL",
++				    size);
++		}
++
++		valid_flags = KVM_GUEST_MEMFD_ALLOW_HUGEPAGE;
++	}
++
++	for (flag = 1; flag; flag <<= 1) {
++		uint64_t bit;
++
++		if (flag & valid_flags)
++			continue;
++
++		fd = __vm_create_guest_memfd(vm, page_size, flag);
++		TEST_ASSERT(fd == -1 && errno == EINVAL,
++			    "guest_memfd() with flag '0x%lx' should fail with EINVAL",
++			    flag);
++
++		for_each_set_bit(bit, &valid_flags, 64) {
++			fd = __vm_create_guest_memfd(vm, page_size, flag | BIT_ULL(bit));
++			TEST_ASSERT(fd == -1 && errno == EINVAL,
++				    "guest_memfd() with flags '0x%llx' should fail with EINVAL",
++				    flag | BIT_ULL(bit));
++		}
++	}
++}
++
 
-On Wed, Jun 14, 2023 at 2:20=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> However, do we actually need to force vendor code to query nowait?  At a =
-glance,
-> the only external (relative to kvm_main.c) users of __gfn_to_pfn_memslot(=
-) are
-> in flows that play nice with nowait or that don't support it at all.  So =
-I *think*
-> we can do this?
+ int main(int argc, char *argv[])
+ {
+@@ -103,6 +150,8 @@ int main(int argc, char *argv[])
 
-On Wed, Jun 14, 2023 at 2:23=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> Gah, got turned around and forgot to account for @atomic.  So this?
->
->         if (!atomic && memslot_is_nowait_on_fault(slot)) {
->                 atomic =3D true;
->                 if (async) {
->                         *async =3D false;
->                         async =3D NULL;
->                 }
->         }
->
-> > +
-> >         return hva_to_pfn(addr, atomic, interruptible, async, write_fau=
-lt,
-> >                           writable);
-> >  }
+ 	vm = vm_create_barebones();
 
-Took another look at this and I *think* it works too (I added my notes
-at the end here so if anyone wants to double-check they can). But
-there are a couple of quirks
++	test_create_guest_memfd_invalid(vm);
++
+ 	fd = vm_create_guest_memfd(vm, total_size, 0);
 
-1. The memslot flag can cause new __gfn_to_pfn_memslot() failures in
-kvm_vcpu_map() (good thing!) but those failures result in an EINVAL
-(bad!). It kinda looks like the current is_error_noslot_pfn() check in
-that function should be returning EFAULT anyways though, any opinions?
+ 	test_file_read_write(fd);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 39b38c75b99c..8bdfadd72349 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -474,7 +474,8 @@ static inline uint64_t vm_get_stat(struct kvm_vm *vm, const char *stat_name)
+ }
 
-2. kvm_vm_ioctl_mte_copy_tags() will see new failures. This function
-has come up before (a) and it doesn't seem like an access in a guest
-context. Is this something to just be documented away?
+ void vm_create_irqchip(struct kvm_vm *vm);
+-static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
++
++static inline int __vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
+ 					uint64_t flags)
+ {
+ 	struct kvm_create_guest_memfd gmem = {
+@@ -482,7 +483,13 @@ static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
+ 		.flags = flags,
+ 	};
 
-3. I don't think I've caught parts of the who-calls tree that are in
-drivers/. The one part I know about is the gfn_to_pfn() call in
-is_2MB_gtt_possible() (drivers/gpu/drm/i915/gvt/gtt.c), and I'm not
-sure what to do about it. Again, doesn't look like a guest-context
-access.
+-	int fd = __vm_ioctl(vm, KVM_CREATE_GUEST_MEMFD, &gmem);
++	return __vm_ioctl(vm, KVM_CREATE_GUEST_MEMFD, &gmem);
++}
++
++static inline int vm_create_guest_memfd(struct kvm_vm *vm, uint64_t size,
++					uint64_t flags)
++{
++	int fd = __vm_create_guest_memfd(vm, size, flags);
 
-(a) https://lore.kernel.org/kvm/ZIoiLGotFsDDvRN3@google.com/T/#u
-
----------------------------------------------------
-Notes: Tracing the usages of __gfn_to_pfn_memslot()
-"shove" =3D "moving the nowait check inside of __gfn_to_pfn_memslot
-
-* [x86] __gfn_to_pfn_memslot() has 5 callers
-** DONE kvm_faultin_pfn() accounts for two calls, shove will cause
-bail (as intended) after first
-** DONE __gfn_to_pfn_prot(): No usages on x86
-** DONE __gfn_to_pfn_memslot_atomic: already requires atomic access :)
-** gfn_to_pfn_memslot() has two callers
-*** DONE kvm_vcpu_gfn_to_pfn(): No callers
-*** gfn_to_pfn() has two callers
-**** TODO kvm_vcpu_map() When memslot flag trips will get
-KVM_PFN_ERR_FAULT, error is handled
-HOWEVER it will return -EINVAL which is kinda... not right
-**** gfn_to_page() has two callers, but both operate on
-APIC_DEFAULT_PHYS_BASE addr
-** Ok so that's "done," as long as my LSP is reliable
-
-* [arm64] __gfn_to_pfn_memslot() has 4 callers
-** DONE user_mem_abort() has one, accounted for by the subsequent
-is_error_noslot_pfn()
-** DONE __gfn_to_pfn_memslot_atomic() fine as above
-** TODO gfn_to_pfn_prot() One caller in kvm_vm_ioctl_mte_copy_tags()
-There's a is_error_noslot_pfn() to catch the failure, but there's no vCPU
-floating around to annotate a fault in!
-** gfn_to_pfn_memslot() two callers
-*** DONE kvm_vcpu_gfn_to_pfn() no callers
-*** gfn_to_pfn() two callers
-**** kvm_vcpu_map() as above
-**** DONE gfn_to_page() no callers
-
-* TODO Weird driver code reference I discovered only via ripgrep?
+ 	TEST_ASSERT(fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_GUEST_MEMFD, fd));
+ 	return fd;
+--
+2.42.0.rc1.204.g551eb34607-goog
