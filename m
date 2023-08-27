@@ -2,79 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48EC3789C6A
-	for <lists+kvm@lfdr.de>; Sun, 27 Aug 2023 11:01:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 208C278A12A
+	for <lists+kvm@lfdr.de>; Sun, 27 Aug 2023 21:33:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbjH0JAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Aug 2023 05:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42900 "EHLO
+        id S229912AbjH0Tc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Aug 2023 15:32:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbjH0I7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Aug 2023 04:59:51 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB49CAC;
-        Sun, 27 Aug 2023 01:59:34 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2ba1e9b1fa9so34226031fa.3;
-        Sun, 27 Aug 2023 01:59:34 -0700 (PDT)
+        with ESMTP id S229608AbjH0TcP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Aug 2023 15:32:15 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FFDA8E
+        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 12:32:13 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-5009d4a4897so3832324e87.0
+        for <kvm@vger.kernel.org>; Sun, 27 Aug 2023 12:32:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693126773; x=1693731573;
+        d=google.com; s=20221208; t=1693164731; x=1693769531;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wDTbBWfZTyLSY1GxTLcGBmj9Y3R8+oQOjLKgrRVSRoI=;
-        b=QsTJuukBOy9Wx5+UjxISZ03vjGGYXro+mcZAYFcirguMTn9wzEcqwl3AWIhPfbjSyk
-         luVnPk0eM9dz9PKRvwu4DR210UOLRAd4/aBqeq6Fv8e7VamaG42C6935IR6Ypka1P2z6
-         5lokt1yKQIEyNSrNa9Wpt4jrLPhkDto+udqpKpNpxXYxTBTLnYZreMAFn0Kthsq5TUzZ
-         NsvqrXNK56usF0VJbCp4Fm2TE8tIzLSj/0agSbXp762Jtu6yFvc3ywz4kfYBRYXEcYRb
-         A6yXEtiwgi0ehzbg2Ke0OYKeokPz9JJabP62Sk+aTjTDgwJkCq8s/CZWe2iEVVHcIeaF
-         vhOw==
+        bh=z/MBlS5jJ6jjoZlLcPQIEqYt3hZ2JHvlatx9SMUr0Ps=;
+        b=J2OSsLR1nwmfWDm2tmxvo5xPT7PeLWCNEEYKdEyt7NLpZhzFXgjC/0TWbzJLkdd+dA
+         kaHq0nRhKhExyscn2m2XDPBrh5I/GSMo+Tmq50grhNkDsQ2xzZAig7R/nqzDSulxtQoe
+         5swtcoEHEnClRf2SmAotbK35z9drsUaxnLWs0UXNXBWVsfGGWAP0MtDZUuyze4bk15NF
+         tpMfIVy7/3/4D93Wunqdr/lQWtPrVp/f5kZ31/1SAvLh8BFRR7Ha6ZAUYWhoVjcYf1Vg
+         TYfyhdnPIiU1o/jveuIfQ/NLtNuqEbEwzHJT5wKDMRnTd3FUHmUst+tGhpXmykJ40we4
+         iO3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693126773; x=1693731573;
+        d=1e100.net; s=20221208; t=1693164731; x=1693769531;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wDTbBWfZTyLSY1GxTLcGBmj9Y3R8+oQOjLKgrRVSRoI=;
-        b=ek+f/g3VbPd5gRkSVCcJz4pvZWu4aE+S5MO/Z/X9xOR3TbbW2ONSf+WY6IbOsqc/Em
-         5m1dSqd82T5GqTUzeMHiqKG9MgCE9qtm3s56yOVfrWRajXDHi+7L+YcSZTqg/tADKTKh
-         mfR38jDIf8sZITmdgPWcK6QS3PslT1+jX9+y1Axvc9uPqP+Oo9cvG+NFCbOwGfnV0ik3
-         XQlZ0KBl/rbrWyuJHvNB6bFDVeet2CRZgxjYfkRZ8hU8WPQUGwEH0rrnbRjTrH1TPBvd
-         ngO5X9dwuFJV++o1TuLwf8N1g8oZ4WSYEZgwREISKm0mtPqjG2E8T6Q+jNv9GD0AFBZ2
-         M2hg==
-X-Gm-Message-State: AOJu0YxA0GvdIhoJJWxdBRtCHdbh9iTmx+VQMgF2aQWW3wzy1Il4UJjc
-        +/DBvFRYeWFKK0A/sK4hcup2P2mW2OuHlP7AjIc=
-X-Google-Smtp-Source: AGHT+IELcxDKtVSIb76h/AeuCg5XOvMcz/LwNeD+AyhN6t71aP3KPCKwg35DFtyslslGZGaVHIe92vXp93/iEL4SPfM=
-X-Received: by 2002:a2e:93c4:0:b0:2b4:6e21:637e with SMTP id
- p4-20020a2e93c4000000b002b46e21637emr14351630ljh.16.1693126772636; Sun, 27
- Aug 2023 01:59:32 -0700 (PDT)
+        bh=z/MBlS5jJ6jjoZlLcPQIEqYt3hZ2JHvlatx9SMUr0Ps=;
+        b=EcckfX6mLIBfYahLH30t8mVXwZBBeArL+9YQMlRFBFX+Jx/MxLksezCuCEb2qLveUa
+         IE9ykpcujYn38boq0bxW4WKnnqcB0QrHFrXHCHTu2adohk0Jv3ILHf5qpfzjlmFO3Mxt
+         w/lkFW7TIxDJP4Qb5SoOy4+aCjwHLix7eSS/KVRE4d2sxa1+3RAG/UhkXEw1cJTDrAVM
+         5DPN/zQsEWd1dJhUgm8HzguAkBODDFNgUr6tcvvvZix4tkLB4YGRA3/K1wY+XLe74ISq
+         Ib0+aDqqjEsQK1pvKGf3jubhfPCkiu/QiqwN9nn+uVFToCyMa5L2yfAzLFd/SoZUpsPB
+         ZFzA==
+X-Gm-Message-State: AOJu0Ywr5+g+XrIMCWAvk5nfzGZCw1zcAOtIQuh4GHE4n1gXK3u8vymC
+        alQkBxGtsw6ftGRbVux9/UhBpPe947paI1SzB3/UgA==
+X-Google-Smtp-Source: AGHT+IEk8IVz7X20eoWgRs8RfBcId72R1Gk0/oK298rH6tojKEkA0RmVaOhWFz7sv42H1xdb6aTjSM76rQJI1s/ODrs=
+X-Received: by 2002:ac2:5e35:0:b0:500:94c3:8e3b with SMTP id
+ o21-20020ac25e35000000b0050094c38e3bmr9043804lfg.57.1693164731128; Sun, 27
+ Aug 2023 12:32:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1690364259.git.haibo1.xu@intel.com> <ZMrVrXlvu/FJEayx@google.com>
-In-Reply-To: <ZMrVrXlvu/FJEayx@google.com>
-From:   Haibo Xu <xiaobo55x@gmail.com>
-Date:   Sun, 27 Aug 2023 16:59:21 +0800
-Message-ID: <CAJve8onbxHjJoC-k-TtOm1BBtjm38moaW-Kk8siKsxt9nwZZZw@mail.gmail.com>
-Subject: Re: [PATCH 0/4] RISCV: Add kvm Sstc timer selftest
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Haibo Xu <haibo1.xu@intel.com>, ajones@ventanamicro.com,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+References: <20230821212243.491660-1-jingzhangos@google.com>
+ <20230821212243.491660-6-jingzhangos@google.com> <878ra3pndw.wl-maz@kernel.org>
+ <CAAdAUti8qSf0PVnWkp4Jua-te6i0cjQKJm=8dt5vWqT0Q6w4iQ@mail.gmail.com> <86a5uef55n.wl-maz@kernel.org>
+In-Reply-To: <86a5uef55n.wl-maz@kernel.org>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Sun, 27 Aug 2023 12:31:59 -0700
+Message-ID: <CAAdAUtiNeVrPxThddhFPNNWjyf1hebYkXugdfV2K8LNnT0yaQg@mail.gmail.com>
+Subject: Re: [PATCH v9 05/11] KVM: arm64: Enable writable for ID_AA64DFR0_EL1
+ and ID_DFR0_EL1
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>,
+        ARMLinux <linux-arm-kernel@lists.infradead.org>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Vipin Sharma <vipinsh@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Vishal Annapurve <vannapurve@google.com>,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Suraj Jitindar Singh <surajjs@amazon.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Shaoqin Huang <shahuang@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,38 +84,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 3, 2023 at 6:16=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
+Hi Marc,
+
+On Sat, Aug 26, 2023 at 3:51=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrote=
+:
 >
-> On Thu, Jul 27, 2023, Haibo Xu wrote:
-> > The sstc_timer selftest is used to validate Sstc timer functionality
-> > in a guest, which sets up periodic timer interrupts and check the
-> > basic interrupt status upon its receipt.
+> On Tue, 22 Aug 2023 19:35:12 +0100,
+> Jing Zhang <jingzhangos@google.com> wrote:
 > >
-> > This KVM selftest was ported from aarch64 arch_timer and tested
-> > with Linux v6.5-rc3 on a Qemu riscv64 virt machine.
+> > Hi Marc,
 > >
-> > Haibo Xu (4):
-> >   tools: riscv: Add header file csr.h
-> >   KVM: riscv: selftests: Add exception handling support
-> >   KVM: riscv: selftests: Add guest helper to get vcpu id
-> >   KVM: riscv: selftests: Add sstc_timer test
+> > On Tue, Aug 22, 2023 at 12:06=E2=80=AFAM Marc Zyngier <maz@kernel.org> =
+wrote:
+> > >
+> > > On Mon, 21 Aug 2023 22:22:37 +0100,
+> > > Jing Zhang <jingzhangos@google.com> wrote:
+> > > >
+> > > > All valid fields in ID_AA64DFR0_EL1 and ID_DFR0_EL1 are writable
+> > > > from userspace with this change.
+> > > > RES0 fields and those fields hidden by KVM are not writable.
+> > > >
+> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > > ---
+> > > >  arch/arm64/kvm/sys_regs.c | 6 ++++--
+> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > > index afade7186675..20fc38bad4e8 100644
+> > > > --- a/arch/arm64/kvm/sys_regs.c
+> > > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > > @@ -1931,6 +1931,8 @@ static bool access_spsr(struct kvm_vcpu *vcpu=
+,
+> > > >       return true;
+> > > >  }
+> > > >
+> > > > +#define ID_AA64DFR0_EL1_RES0_MASK (GENMASK(59, 56) | GENMASK(27, 2=
+4) | GENMASK(19, 16))
+> > > > +
+> > > >  /*
+> > > >   * Architected system registers.
+> > > >   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> > > > @@ -2006,7 +2008,7 @@ static const struct sys_reg_desc sys_reg_desc=
+s[] =3D {
+> > > >         .set_user =3D set_id_dfr0_el1,
+> > > >         .visibility =3D aa32_id_visibility,
+> > > >         .reset =3D read_sanitised_id_dfr0_el1,
+> > > > -       .val =3D ID_DFR0_EL1_PerfMon_MASK, },
+> > > > +       .val =3D GENMASK(31, 0), },
+> > >
+> > > Can you *please* look at the register and realise that we *don't*
+> > > support writing to the whole of the low 32 bits? What does it mean to
+> > > allow selecting the M-profile debug? Or the memory-mapped trace?
+> > >
+> > > You are advertising a lot of crap to userspace, and that's definitely
+> > > not on.
+> > >
+> > > >       ID_HIDDEN(ID_AFR0_EL1),
+> > > >       AA32_ID_SANITISED(ID_MMFR0_EL1),
+> > > >       AA32_ID_SANITISED(ID_MMFR1_EL1),
+> > > > @@ -2055,7 +2057,7 @@ static const struct sys_reg_desc sys_reg_desc=
+s[] =3D {
+> > > >         .get_user =3D get_id_reg,
+> > > >         .set_user =3D set_id_aa64dfr0_el1,
+> > > >         .reset =3D read_sanitised_id_aa64dfr0_el1,
+> > > > -       .val =3D ID_AA64DFR0_EL1_PMUVer_MASK, },
+> > > > +       .val =3D ~(ID_AA64DFR0_EL1_PMSVer_MASK | ID_AA64DFR0_EL1_RE=
+S0_MASK), },
+> > >
+> > > And it is the same thing here. Where is the handling code to deal wit=
+h
+> > > variable breakpoint numbers? Oh wait, there is none. Really, the only
+> > > thing we support writing to are the PMU and Debug versions. And
+> > > nothing else.
+> > >
+> > > What does it mean for userspace? Either the write will be denied
+> > > despite being advertised a writable field (remember the first patch o=
+f
+> > > the series???), or we'll blindly accept the write and further ignore
+> > > the requested values. Do you really think any of this is acceptable?
+> > >
+> > > This is the *9th* version of this series, and we're still battling
+> > > over some extremely basic userspace issues... I don't think we can
+> > > merge this series as is stands.
+> >
+> > I removed sanity checks across multiple fields after the discussion
+> > here: https://lore.kernel.org/all/ZKRC80hb4hXwW8WK@thinky-boi/
+> > I might have misunderstood the discussion. I thought we'd let VMM do
+> > more complete sanity checks.
 >
-> FYI, patch 4 will conflict with the in-flight guest printf changes[*], as=
- will
-> reworking the existing arch_timer test.  My plan is to create an immutabl=
-e tag
-> later this week (waiting to make sure nothing explodes).  I highly recomm=
-end basing
-> v2 on top of that.
+> The problem is that you don't even have a statement about how this is
+> supposed to be handled. What are the rules? How can the VMM author
+> *know*?
 >
+> That's my real issue with this series: at no point do we state when an
+> ID register can be written, what are the rules that must be followed,
+> where is the split in responsibility between KVM and the VMM, and what
+> is the expected behaviour when the VMM exposes something that is
+> completely outlandish to the guest (such as the M-profile debug).
+>
+> Do you see the issue? We can always fix the code. But once we've
+> exposed that to userspace, there is no going back. And I really want
+> everybody's buy-in on that front, including the VMM people.
 
-Hi Sean,
+Understood.
+Looks like it would be less complicated to have KVM do all the sanity
+checks to determine if a feature field is configured correctly.
+The determination can be done by following rules:
+1. Architecture constraints from ARM ARM.
+2. KVM constraints. (Those features not exposed by KVM should be read-only)
+3. VCPU features. (The write mask needs to be determined on-the-fly)
 
-Could you help point me to the immutable tag for the guest printf changes?
+Thanks,
+Jing
 
-Regards,
-Haibo
-
-> [*] https://lore.kernel.org/all/20230729003643.1053367-1-seanjc@google.co=
-m
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
