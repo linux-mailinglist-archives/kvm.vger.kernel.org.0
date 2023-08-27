@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 24463789C77
-	for <lists+kvm@lfdr.de>; Sun, 27 Aug 2023 11:02:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFA6C789C75
+	for <lists+kvm@lfdr.de>; Sun, 27 Aug 2023 11:02:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbjH0JBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Aug 2023 05:01:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
+        id S230401AbjH0JBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Aug 2023 05:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230224AbjH0JBN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230234AbjH0JBN (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 27 Aug 2023 05:01:13 -0400
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E7211A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A079F11B;
         Sun, 27 Aug 2023 02:01:03 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id A5A33120007;
-        Sun, 27 Aug 2023 12:01:00 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A5A33120007
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 7B9A3120008;
+        Sun, 27 Aug 2023 12:01:01 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7B9A3120008
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1693126860;
-        bh=7Dkh0JmDKUZqtrQH3eRyUHxFoigQKcPTmgNWMbjNZmI=;
+        s=mail; t=1693126861;
+        bh=H1HuMdk0Z5inCEBgRwJ5LPU1rqsOdAdmxIvmXUFCL2A=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=g5LOocW2h4LgJ3kw1kok7VcPCgjaCvo4f+7fkDiyF/UXVvCrI3b+onPSfxC3tMqoP
-         99J8l7E0Zv3Z+Rb371WOlun0+jqs+ehl1ADyHjgpHYmiXoJPimsUpAsuCt10dBw9C6
-         2NegaaYiFO8L6k9MVy/snNnuDs8/XSeCak0JO0kP6wL9+n9Cs+3hyAEiUN2qvQXPT8
-         mfTzMrVznhpw6eordKyr7AaLEmCNikC1/Ts3+baqtC75bnB0mUSkE6i7cFR2FGyPVR
-         WaIQVc17t7ZcfM/ra+FOdb8/UPXS6GNDJt+k7E9wZ2uNihHMpOsJppqWM4UtCVNjEB
-         YujH2A2N566yA==
+        b=HGV/a/DYXyKToRatxQ0v86TKvpu4xz/Cxp05XJeYQSZsH5qswpSmVffRL6dpeeh9W
+         s3JKKn9dPEehQcEw8cGTzGjq7D4k2ZYwhPuCZ1vAQMOOC61tlVsGVQ5TMCo0a9+AKW
+         l2eBIJYucKAz2kLaokfC/MJpgg6EZupANs5t/oUaJaCUGqSg0n1sRWQKSd5x7ahSca
+         PEbjg86NnXslf9Uj7gPT4WSHoUJGuImhoS/kURXP8bWdv9TH9INqwYQV0nAk2SBDDK
+         3lhNdJpKM/0xmLEqmBzv76aa5ur0rme/JwRjg0yWjMkQVgaZMS6L4QEBcqQHIxdCtn
+         trLJM3Gv7WUvg==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Sun, 27 Aug 2023 12:01:00 +0300 (MSK)
+        Sun, 27 Aug 2023 12:01:01 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -51,10 +51,12 @@ CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
         <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kernel@sberdevices.ru>, <oxffffaa@gmail.com>,
         <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v7 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
-Date:   Sun, 27 Aug 2023 11:54:32 +0300
-Message-ID: <20230827085436.941183-1-avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v7 1/4] vsock/virtio/vhost: read data from non-linear skb
+Date:   Sun, 27 Aug 2023 11:54:33 +0300
+Message-ID: <20230827085436.941183-2-avkrasnov@salutedevices.com>
 X-Mailer: git-send-email 2.35.0
+In-Reply-To: <20230827085436.941183-1-avkrasnov@salutedevices.com>
+References: <20230827085436.941183-1-avkrasnov@salutedevices.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -70,11 +72,11 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 527 527 5bb611be2ca2baa31d984ccbf4ef4415504fc308, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1;salutedevices.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;git.kernel.org:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-KSMG-AntiSpam-Info: LuaCore: 527 527 5bb611be2ca2baa31d984ccbf4ef4415504fc308, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/08/27 08:09:00
-X-KSMG-LinksScanning: Clean, bases: 2023/08/27 08:09:00
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/27 08:01:00 #21738748
 X-KSMG-AntiVirus-Status: Clean, skipped
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -86,68 +88,191 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+This is preparation patch for MSG_ZEROCOPY support. It adds handling of
+non-linear skbs by replacing direct calls of 'memcpy_to_msg()' with
+'skb_copy_datagram_iter()'. Main advantage of the second one is that it
+can handle paged part of the skb by using 'kmap()' on each page, but if
+there are no pages in the skb, it behaves like simple copying to iov
+iterator. This patch also adds new field to the control block of skb -
+this value shows current offset in the skb to read next portion of data
+(it doesn't matter linear it or not). Idea behind this field is that
+'skb_copy_datagram_iter()' handles both types of skb internally - it
+just needs an offset from which to copy data from the given skb. This
+offset is incremented on each read from skb. This approach allows to
+simplify handling of both linear and non-linear skbs, because for
+linear skb we need to call 'skb_pull()' after reading data from it,
+while in non-linear case we need to update 'data_len'.
 
-this patchset is first of three parts of another big patchset for
-MSG_ZEROCOPY flag support:
-https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
-
-During review of this series, Stefano Garzarella <sgarzare@redhat.com>
-suggested to split it for three parts to simplify review and merging:
-
-1) virtio and vhost updates (for fragged skbs) <--- this patchset
-2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
-   tx completions) and update for Documentation/.
-3) Updates for tests and utils.
-
-This series enables handling of fragged skbs in virtio and vhost parts.
-Newly logic won't be triggered, because SO_ZEROCOPY options is still
-impossible to enable at this moment (next bunch of patches from big
-set above will enable it).
-
-I've included changelog to some patches anyway, because there were some
-comments during review of last big patchset from the link above.
-
-Head for this patchset is:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=b38460bc463c54e0c15ff3b37e81f7e2059bb9bb
-
-Link to v1:
-https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
-Link to v2:
-https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
-Link to v3:
-https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
-Link to v4:
-https://lore.kernel.org/netdev/20230727222627.1895355-1-AVKrasnov@sberdevices.ru/
-Link to v5:
-https://lore.kernel.org/netdev/20230730085905.3420811-1-AVKrasnov@sberdevices.ru/
-Link to v6:
-https://lore.kernel.org/netdev/20230814212720.3679058-1-AVKrasnov@sberdevices.ru/
-
-Changelog:
+Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+---
+ Changelog:
+ v5(big patchset) -> v1:
+  * Merge 'virtio_transport_common.c' and 'vhost/vsock.c' patches into
+    this single patch.
+  * Commit message update: grammar fix and remark that this patch is
+    MSG_ZEROCOPY preparation.
+  * Use 'min_t()' instead of comparison using '<>' operators.
+ v1 -> v2:
+  * R-b tag added.
  v3 -> v4:
- * Patchset rebased and tested on new HEAD of net-next (see hash above).
- v4 -> v5:
- * See per-patch changelog after ---.
+  * R-b tag removed due to rebase:
+    * Part for 'virtio_transport_stream_do_peek()' is changed.
+    * Part for 'virtio_transport_seqpacket_do_peek()' is added.
+  * Comments about sleep in 'memcpy_to_msg()' now describe sleep in
+    'skb_copy_datagram_iter()'.
  v5 -> v6:
- * Patchset rebased and tested on new HEAD of net-next (see hash above).
- * See per-patch changelog after ---.
- v6 -> v7:
- * Patchset rebased and tested on new HEAD of net-next (see hash above).
- * See per-patch changelog after ---.
+  * Commit message update.
+  * Rename 'frag_off' to 'offset' in 'virtio_vsock_skb_cb'.
 
-Arseniy Krasnov (4):
-  vsock/virtio/vhost: read data from non-linear skb
-  vsock/virtio: support to send non-linear skb
-  vsock/virtio: non-linear skb handling for tap
-  vsock/virtio: MSG_ZEROCOPY flag support
+ drivers/vhost/vsock.c                   | 14 +++++++----
+ include/linux/virtio_vsock.h            |  1 +
+ net/vmw_vsock/virtio_transport_common.c | 32 +++++++++++++++----------
+ 3 files changed, 29 insertions(+), 18 deletions(-)
 
- drivers/vhost/vsock.c                   |  14 +-
- include/linux/virtio_vsock.h            |   6 +
- net/vmw_vsock/virtio_transport.c        |  87 ++++++-
- net/vmw_vsock/virtio_transport_common.c | 303 ++++++++++++++++++------
- 4 files changed, 330 insertions(+), 80 deletions(-)
-
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 817d377a3f36..83711aad855c 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -114,6 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 		struct sk_buff *skb;
+ 		unsigned out, in;
+ 		size_t nbytes;
++		u32 offset;
+ 		int head;
+ 
+ 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
+@@ -156,7 +157,8 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 		}
+ 
+ 		iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[out], in, iov_len);
+-		payload_len = skb->len;
++		offset = VIRTIO_VSOCK_SKB_CB(skb)->offset;
++		payload_len = skb->len - offset;
+ 		hdr = virtio_vsock_hdr(skb);
+ 
+ 		/* If the packet is greater than the space available in the
+@@ -197,8 +199,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 			break;
+ 		}
+ 
+-		nbytes = copy_to_iter(skb->data, payload_len, &iov_iter);
+-		if (nbytes != payload_len) {
++		if (skb_copy_datagram_iter(skb,
++					   offset,
++					   &iov_iter,
++					   payload_len)) {
+ 			kfree_skb(skb);
+ 			vq_err(vq, "Faulted on copying pkt buf\n");
+ 			break;
+@@ -212,13 +216,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 		vhost_add_used(vq, head, sizeof(*hdr) + payload_len);
+ 		added = true;
+ 
+-		skb_pull(skb, payload_len);
++		VIRTIO_VSOCK_SKB_CB(skb)->offset += payload_len;
+ 		total_len += payload_len;
+ 
+ 		/* If we didn't send all the payload we can requeue the packet
+ 		 * to send it with the next available buffer.
+ 		 */
+-		if (skb->len > 0) {
++		if (VIRTIO_VSOCK_SKB_CB(skb)->offset < skb->len) {
+ 			hdr->flags |= cpu_to_le32(flags_to_restore);
+ 
+ 			/* We are queueing the same skb to handle
+diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+index c58453699ee9..a91fbdf233e4 100644
+--- a/include/linux/virtio_vsock.h
++++ b/include/linux/virtio_vsock.h
+@@ -12,6 +12,7 @@
+ struct virtio_vsock_skb_cb {
+ 	bool reply;
+ 	bool tap_delivered;
++	u32 offset;
+ };
+ 
+ #define VIRTIO_VSOCK_SKB_CB(skb) ((struct virtio_vsock_skb_cb *)((skb)->cb))
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 352d042b130b..3e08d52a9355 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -364,9 +364,10 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
+ 		spin_unlock_bh(&vvs->rx_lock);
+ 
+ 		/* sk_lock is held by caller so no one else can dequeue.
+-		 * Unlock rx_lock since memcpy_to_msg() may sleep.
++		 * Unlock rx_lock since skb_copy_datagram_iter() may sleep.
+ 		 */
+-		err = memcpy_to_msg(msg, skb->data, bytes);
++		err = skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
++					     &msg->msg_iter, bytes);
+ 		if (err)
+ 			goto out;
+ 
+@@ -410,25 +411,27 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+ 	while (total < len && !skb_queue_empty(&vvs->rx_queue)) {
+ 		skb = skb_peek(&vvs->rx_queue);
+ 
+-		bytes = len - total;
+-		if (bytes > skb->len)
+-			bytes = skb->len;
++		bytes = min_t(size_t, len - total,
++			      skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset);
+ 
+ 		/* sk_lock is held by caller so no one else can dequeue.
+-		 * Unlock rx_lock since memcpy_to_msg() may sleep.
++		 * Unlock rx_lock since skb_copy_datagram_iter() may sleep.
+ 		 */
+ 		spin_unlock_bh(&vvs->rx_lock);
+ 
+-		err = memcpy_to_msg(msg, skb->data, bytes);
++		err = skb_copy_datagram_iter(skb,
++					     VIRTIO_VSOCK_SKB_CB(skb)->offset,
++					     &msg->msg_iter, bytes);
+ 		if (err)
+ 			goto out;
+ 
+ 		spin_lock_bh(&vvs->rx_lock);
+ 
+ 		total += bytes;
+-		skb_pull(skb, bytes);
+ 
+-		if (skb->len == 0) {
++		VIRTIO_VSOCK_SKB_CB(skb)->offset += bytes;
++
++		if (skb->len == VIRTIO_VSOCK_SKB_CB(skb)->offset) {
+ 			u32 pkt_len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+ 
+ 			virtio_transport_dec_rx_pkt(vvs, pkt_len);
+@@ -492,9 +495,10 @@ virtio_transport_seqpacket_do_peek(struct vsock_sock *vsk,
+ 			spin_unlock_bh(&vvs->rx_lock);
+ 
+ 			/* sk_lock is held by caller so no one else can dequeue.
+-			 * Unlock rx_lock since memcpy_to_msg() may sleep.
++			 * Unlock rx_lock since skb_copy_datagram_iter() may sleep.
+ 			 */
+-			err = memcpy_to_msg(msg, skb->data, bytes);
++			err = skb_copy_datagram_iter(skb, VIRTIO_VSOCK_SKB_CB(skb)->offset,
++						     &msg->msg_iter, bytes);
+ 			if (err)
+ 				return err;
+ 
+@@ -553,11 +557,13 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+ 				int err;
+ 
+ 				/* sk_lock is held by caller so no one else can dequeue.
+-				 * Unlock rx_lock since memcpy_to_msg() may sleep.
++				 * Unlock rx_lock since skb_copy_datagram_iter() may sleep.
+ 				 */
+ 				spin_unlock_bh(&vvs->rx_lock);
+ 
+-				err = memcpy_to_msg(msg, skb->data, bytes_to_copy);
++				err = skb_copy_datagram_iter(skb, 0,
++							     &msg->msg_iter,
++							     bytes_to_copy);
+ 				if (err) {
+ 					/* Copy of message failed. Rest of
+ 					 * fragments will be freed without copy.
 -- 
 2.25.1
 
